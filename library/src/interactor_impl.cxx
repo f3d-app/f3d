@@ -142,28 +142,6 @@ public:
     this->Recorder->SetInteractor(this->VTKInteractor);
   }
 
-  //----------------------------------------------------------------------------
-  void SetInteractorStyle(const std::string& style)
-  {
-    if (style == "2d")
-    {
-      this->Style->SetInteractionMode(vtkF3DInteractorStyle::TWO_D);
-    }
-    else if (style == "trackball")
-    {
-      this->Style->SetInteractionMode(vtkF3DInteractorStyle::TRACKBALL);
-    }
-    else if (style == "default")
-    {
-      this->Style->SetInteractionMode(vtkF3DInteractorStyle::DEFAULT);
-    }
-    else
-    {
-      log::warn("Unrecognized interaction style \"" + style + "\", using default");
-      this->Style->SetInteractionMode(vtkF3DInteractorStyle::DEFAULT);
-    }
-  }
-
   std::string VerboseLevelToString(log::VerboseLevel level)
   {
     switch (level)
@@ -2130,11 +2108,5 @@ void interactor_impl::SetCommandBuffer(const char* command)
 {
   // XXX This replace previous command buffer, it should be improved
   this->Internals->CommandBuffer = command;
-}
-
-//----------------------------------------------------------------------------
-void interactor_impl::SetInteractorStyle(const std::string& style)
-{
-  this->Internals->SetInteractorStyle(style);
 }
 }

@@ -170,6 +170,12 @@ public:
   ///@}
 
   /**
+   * Set the interaction style from a string.
+   * Accepted values: "default", "trackball", "2d".
+   */
+  void SetInteractionStyle(const std::string& style);
+
+  /**
    * Reimplemented to configure:
    *  - ActorsProperties
    *  - Timer

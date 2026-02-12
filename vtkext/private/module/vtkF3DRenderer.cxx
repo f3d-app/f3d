@@ -2006,6 +2006,41 @@ void vtkF3DRenderer::SetUseOrthographicProjection(const std::optional<bool>& use
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetInteractionStyle(const std::string& style)
+{
+  vtkRenderWindowInteractor* rwi = this->GetRenderWindow()
+    ? this->GetRenderWindow()->GetInteractor()
+    : nullptr;
+  auto* interactorStyle = rwi
+    ? vtkF3DInteractorStyle::SafeDownCast(rwi->GetInteractorStyle())
+    : nullptr;
+
+  if (!interactorStyle)
+  {
+    return;
+  }
+
+  if (style == "2d")
+  {
+    interactorStyle->SetInteractionMode(vtkF3DInteractorStyle::TWO_D);
+  }
+  else if (style == "trackball")
+  {
+    interactorStyle->SetInteractionMode(vtkF3DInteractorStyle::TRACKBALL);
+  }
+  else if (style == "default")
+  {
+    interactorStyle->SetInteractionMode(vtkF3DInteractorStyle::DEFAULT);
+  }
+  else
+  {
+    F3DLog::Print(F3DLog::Severity::Warning,
+      "Unrecognized interaction style \"" + style + "\", using default");
+    interactorStyle->SetInteractionMode(vtkF3DInteractorStyle::DEFAULT);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::UpdateActors()
 {
   assert(this->Importer);
