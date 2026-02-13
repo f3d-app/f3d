@@ -3,10 +3,11 @@
 
 #include "vtkImageReader.h"
 #include "vtkVersion.h"
+#include "vtkextModule.h"
 
 class vtkResourceStream;
 
-class vtkF3DEXRReader : public vtkImageReader
+class VTKEXT_EXPORT vtkF3DEXRReader : public vtkImageReader
 {
 public:
   static vtkF3DEXRReader* New();

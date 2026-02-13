@@ -7,10 +7,11 @@
 
 #include "vtkImageReader.h"
 #include "vtkVersion.h"
+#include "vtkextModule.h"
 
 class vtkResourceStream;
 
-class vtkF3DWebPReader : public vtkImageReader
+class VTKEXT_EXPORT vtkF3DWebPReader : public vtkImageReader
 {
 public:
   static vtkF3DWebPReader* New();
