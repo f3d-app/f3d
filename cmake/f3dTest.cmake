@@ -38,7 +38,7 @@ f3d_test(<NAME> [ARGS...])
   - `NAME` Provide the name of the test, mandatory and must be unique
   - `CONFIG` Provide the `--config` to use, instead of `--no-config`
   - `RESOLUTION` Provide the `--resolution` to use, instead of `300,300`
-  - `PLUGINS` Provide the `--load-plugins` to use
+  - `PLUGIN` Provide the `--load-plugins` to use
   - `THRESHOLD` Provide the `--reference-threshold` to use instead of the default
   - `REGEXP` Provide the regexp to check for in the stdout of the test, fails if not present
   - `REGEXP_FAIL` Provide the regexp to check for in the stdout of the test, fails if present
@@ -54,7 +54,7 @@ f3d_test(<NAME> [ARGS...])
 
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;PIPED;SCRIPT" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;LABELS;PLUGINS" "DATA;DEPENDS;ENV;ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;PIPED;SCRIPT" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;LABELS;PLUGIN" "DATA;DEPENDS;ENV;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -123,9 +123,9 @@ function(f3d_test)
     endif()
   endif()
 
-  if(F3D_TEST_PLUGINS)
-    list(APPEND F3D_TEST_ARGS "--load-plugins=${F3D_TEST_PLUGINS}")
-    set(F3D_TEST_LABELS "${F3D_TEST_LABELS};plugin;${F3D_TEST_PLUGINS}")
+  if(F3D_TEST_PLUGIN)
+    list(APPEND F3D_TEST_ARGS "--load-plugins=${F3D_TEST_PLUGIN}")
+    set(F3D_TEST_LABELS "${F3D_TEST_LABELS};plugin;${F3D_TEST_PLUGIN}")
   endif()
 
   if(DEFINED f3d_INCLUDE_DIR)

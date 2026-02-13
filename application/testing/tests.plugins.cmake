@@ -3,7 +3,7 @@
 
 # Test plugin fail code path
 f3d_application_test(NAME TestPluginVerbose ARGS --verbose REGEXP "Loading plugin \"native\"" NO_BASELINE LABELS "plugin;native")
-f3d_application_test(NAME TestPluginNonExistent PLUGINS dummy REGEXP "Plugin failed to load" NO_BASELINE)
+f3d_application_test(NAME TestPluginNonExistent PLUGIN dummy REGEXP "Plugin failed to load" NO_BASELINE)
 if(WIN32)
   set(_TEST_PLUGIN_INVALID_REGEXP "is not a valid Win32 application")
 elseif(APPLE)
@@ -43,8 +43,8 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
   f3d_application_test(NAME TestForceReaderInvalid DATA suzanne.stl ARGS --force-reader=INVALID NO_BASELINE REGEXP "Forced reader .* doesn't exist" LABELS "plugin")
 
   if(F3D_PLUGIN_BUILD_DRACO)
-    f3d_application_test(NAME TestForceReaderGLTFDraco DATA BoxAnimated.gltf PLUGINS draco ARGS --force-reader=GLTFDraco LABELS "plugin")
-    f3d_application_test(NAME TestForceReaderGLTFDracoIntoGLTF DATA Box_draco.gltf PLUGINS draco ARGS --force-reader=GLTF NO_BASELINE REGEXP "failed to load scene" LABELS "plugin")
+    f3d_application_test(NAME TestForceReaderGLTFDraco DATA BoxAnimated.gltf PLUGIN draco ARGS --force-reader=GLTFDraco LABELS "plugin")
+    f3d_application_test(NAME TestForceReaderGLTFDracoIntoGLTF DATA Box_draco.gltf PLUGIN draco ARGS --force-reader=GLTF NO_BASELINE REGEXP "failed to load scene" LABELS "plugin")
   endif()
 endif()
 
