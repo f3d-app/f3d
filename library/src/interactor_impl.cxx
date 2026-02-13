@@ -1237,21 +1237,19 @@ interactor& interactor_impl::initCommands()
     "cycle_interactor_style",
     [&](const std::vector<std::string>&)
     {
-      const std::string& style = this->Internals->Options.interactor.style;
-      std::string newStyle;
+      auto& style = this->Internals->Options.interactor.style;
       if (style == "default")
       {
-        newStyle = "trackball";
+        style = "trackball";
       }
       else if (style == "trackball")
       {
-        newStyle = "2d";
+        style = "2d";
       }
       else
       {
-        newStyle = "default";
+        style = "default";
       }
-      this->Internals->Options.interactor.style = newStyle;
       this->Internals->Window.render();
     },
     command_documentation_t{
@@ -1587,8 +1585,9 @@ interactor& interactor_impl::initBindings()
     return std::pair("Color component", ren->ComponentToString(opts.model.scivis.component));
   };
 
-  // "doc", ""
-  auto docStr = [](const std::string& doc) { return std::pair(doc, ""); };
+  // "doc", "value"
+  auto docStr = [](const std::string& doc, const std::string& val = "")
+  { return std::pair(doc, val); };
 
   // "doc", "value"
   auto docDbl = [](const std::string& doc, const double& val)
@@ -1632,9 +1631,6 @@ interactor& interactor_impl::initBindings()
       "Verbose level", this->Internals->VerboseLevelToString(log::getVerboseLevel()));
   };
 
-  auto docStyle = [&]()
-  { return std::pair("Interaction style", this->Internals->Options.interactor.style); };
-
   // clang-format off
   this->addBinding({mod_t::NONE, "W"}, "cycle_animation", "Scene", docAnim, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "C"}, "cycle_coloring field", "Scene", docField, f3d::interactor::BindingType::CYCLIC);
@@ -1663,7 +1659,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "I"}, "toggle model.volume.inverse","Scene", std::bind(docTgl, "Inverse volume opacity", std::cref(opts.model.volume.inverse)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "O"}, "cycle_point_sprites","Scene", docPS, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "U"}, "toggle render.background.blur.enable","Scene", std::bind(docTgl, "Blur background", std::cref(opts.render.background.blur.enable)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::NONE, "K"}, "cycle_interactor_style","Scene", docStyle, f3d::interactor::BindingType::CYCLIC);
+  this->addBinding({mod_t::NONE, "K"}, "cycle_interactor_style","Scene", std::bind(docStr, "Interaction style", std::cref(opts.interactor.style)), f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "F"}, "toggle render.hdri.ambient","Scene", std::bind(docTgl, "HDRI ambient lighting", std::cref(opts.render.hdri.ambient)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "J"}, "toggle render.background.skybox","Scene", std::bind(docTgl, "HDRI skybox", std::cref(opts.render.background.skybox)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "L"}, "increase_light_intensity", "Scene", std::bind(docDbl, "Increase lights intensity", std::cref(opts.render.light.intensity)), f3d::interactor::BindingType::NUMERICAL);
