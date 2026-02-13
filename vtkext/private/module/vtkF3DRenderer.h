@@ -390,6 +390,11 @@ public:
    * Set the meta importer to recover coloring information from
    */
   void SetImporter(vtkF3DMetaImporter* importer);
+  
+  /**
+   * Get the meta importer
+   */
+  vtkF3DMetaImporter* GetImporter() { return this->Importer; }
 
   ///@{
   /**
