@@ -18,7 +18,6 @@ public:
   static vtkF3DGLTFDracoImporter* New();
   vtkTypeMacro(vtkF3DGLTFDracoImporter, vtkF3DGLTFImporter);
 
-  ///@{
   /**
    * Return true if, after a quick check of file header, it looks like the provided stream
    * can be read. Return false if it is sure it cannot be read. The stream version can move the
@@ -27,8 +26,6 @@ public:
    * This only checks that the metadata of the file can be loaded using the draco document loader.
    */
   static bool CanReadFile(vtkResourceStream* stream);
-  static bool CanReadFile(const std::string& filename);
-  ///@}
 
 protected:
   vtkF3DGLTFDracoImporter() = default;

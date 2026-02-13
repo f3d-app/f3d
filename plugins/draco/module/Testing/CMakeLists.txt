@@ -3,6 +3,7 @@ list(APPEND vtkextDraco_list
      TestF3DDracoReaderError.cxx
      TestF3DDracoReaderStream.cxx
      TestF3DDracoReaderStreamError.cxx
+     TestF3DGLTFDracoImporterStreamError.cxx
     )
 
 vtk_add_test_cxx(vtkextDracoTests tests
