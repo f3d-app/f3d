@@ -38,12 +38,14 @@ f3d_test(<NAME> [ARGS...])
   - `NAME` Provide the name of the test, mandatory and must be unique
   - `CONFIG` Provide the `--config` to use, instead of `--no-config`
   - `RESOLUTION` Provide the `--resolution` to use, instead of `300,300`
+  - `PLUGINS` Provide the `--load-plugins` to use
   - `THRESHOLD` Provide the `--reference-threshold` to use instead of the default
   - `REGEXP` Provide the regexp to check for in the stdout of the test, fails if not present
   - `REGEXP_FAIL` Provide the regexp to check for in the stdout of the test, fails if present
   - `HDRI` Provide the `--hdri-file` to use for this test
   - `RENDERING_BACKEND` Provide the `--rendering-backend` to use for this test instead of `auto`
   - `WORKING_DIR` Provide a specific working directory to use for this test instead of current dir
+  - `LABELS` Provide a specific labels to identify and group tests
   - `DATA` Data to open, support multiple input
   - `DEPENDS` Tests the this test depends on if any
   - `ENV` Environment variables to set for this test
@@ -52,7 +54,7 @@ f3d_test(<NAME> [ARGS...])
 
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;PIPED;SCRIPT" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;LABELS" "DATA;DEPENDS;ENV;ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;PIPED;SCRIPT" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;LABELS;PLUGINS" "DATA;DEPENDS;ENV;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -121,6 +123,11 @@ function(f3d_test)
     endif()
   endif()
 
+  if(F3D_TEST_PLUGINS)
+    list(APPEND F3D_TEST_ARGS "--load-plugins=${F3D_TEST_PLUGINS}")
+    set(F3D_TEST_LABELS "${F3D_TEST_LABELS};plugins;${F3D_TEST_PLUGINS}")
+  endif()
+
   if(DEFINED f3d_INCLUDE_DIR)
     if (F3D_TEST_PIPED)
       message(FATAL_ERROR "PIPED test is not supported to external plugins")
@@ -159,7 +166,6 @@ function(f3d_test)
       LABELS "${F3D_TEST_LABELS}"
     )
   endif()
-
 
   set(_timeout "30")
   if(F3D_TEST_LONG_TIMEOUT)

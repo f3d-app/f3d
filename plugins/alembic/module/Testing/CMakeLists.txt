@@ -18,6 +18,6 @@ vtk_test_cxx_executable(vtkextAlembicTests tests)
 foreach(test ${VTKExtensionsPluginAlembic_list})
   get_filename_component (TName ${test} NAME_WE)
   set_tests_properties(f3d::vtkextAlembicCxx-${TName} PROPERTIES
-    LABELS "module;abc"
+    LABELS "module;plugins;alembic;abc"
   )
 endforeach()
