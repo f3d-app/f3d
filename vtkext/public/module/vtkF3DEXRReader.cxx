@@ -188,7 +188,6 @@ int vtkF3DEXRReader::CanReadFile(const char* fname)
 #endif
 }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260106)
 //------------------------------------------------------------------------------
 int vtkF3DEXRReader::CanReadFile(vtkResourceStream* stream)
 {
@@ -207,7 +206,6 @@ int vtkF3DEXRReader::CanReadFile(vtkResourceStream* stream)
 
   return magic == Imf::MAGIC;
 }
-#endif
 
 //------------------------------------------------------------------------------
 void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInformation* outInfo)
