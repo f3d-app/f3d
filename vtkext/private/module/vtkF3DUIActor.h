@@ -284,7 +284,7 @@ protected:
 
   std::string FontFile = "";
   double FontScale = 1.0;
-  std::vector<double> FontColor = { 0.956862745, 0.956862745, 0.956862745 }; // F3D white
+  std::vector<double> FontColor = { 1.0, 1.0, 1.0 }; // F3D white
 
   double BackdropOpacity = 0.9;
 

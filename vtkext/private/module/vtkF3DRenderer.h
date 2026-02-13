@@ -720,7 +720,7 @@ private:
 
   std::optional<fs::path> FontFile;
   double FontScale = 1.0;
-  std::optional<std::vector<double>> FontColor;
+  std::vector<double> FontColor;
 
   bool DPIAware = false;
 

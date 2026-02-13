@@ -1566,11 +1566,7 @@ void vtkF3DRenderer::ConfigureTextActors()
   }
 
   // Font color
-  if (this->FontColor.has_value())
-  {
-    auto fontColor = *this->FontColor;
-    this->UIActor->SetFontColor(fontColor);
-  }
+  this->UIActor->SetFontColor(FontColor);
 
   double scaleFactor = this->DPIAware ? F3DUtils::getDPIScale() : 1.0;
 
