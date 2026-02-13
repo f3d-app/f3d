@@ -20,6 +20,6 @@ vtk_test_cxx_executable(vtkextWebIFCTests tests)
 foreach(test ${vtkextWebIFCTests_list})
   get_filename_component (TName ${test} NAME_WE)
   set_tests_properties(f3d::vtkextWebIFCCxx-${TName} PROPERTIES
-    LABELS "module;webifc"
+    LABELS "plugins;module;webifc"
   )
 endforeach()
