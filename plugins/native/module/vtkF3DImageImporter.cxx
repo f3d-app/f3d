@@ -48,6 +48,7 @@ void vtkF3DImageImporter::ImportActors(vtkRenderer* renderer)
   if (!reader)
   {
     vtkErrorMacro("Could not find a suitable image reader");
+    this->SetFailureStatus();
     return;
   }
 
