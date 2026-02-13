@@ -75,7 +75,7 @@ CLI: `--camera-orthographic`.
 
 ### `interactor.style` (_string_, default: `default`)
 
-Set the interaction style. `default` uses standard 3D interaction, `trackball` enables trackball interaction, `2d` enables 2D interaction mode (pan/zoom only, no rotation). In `2d` mode, the default camera zoom factor is `1.0` (no padding) instead of `0.9`.
+Set the interaction style. `default` uses standard 3D interaction, `trackball` enables trackball interaction, `2d` enables 2D interaction mode (pan/zoom only, no rotation). In `2d` mode, the default camera zoom factor is `1.0` (no padding) instead of `0.9` when using a `set_camera` command.
 
 CLI: `--interaction-style`.
 
