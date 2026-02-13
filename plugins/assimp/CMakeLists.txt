@@ -22,7 +22,7 @@ endif()
 set(F3D_ASSIMP_VERSION "${assimp_VERSION}" CACHE INTERNAL "")
 message(STATUS "Plugin: assimp ${assimp_VERSION} found")
 
-set(_assimp_formats "fbx;dae;dxf;off;x;3mf")
+set(_assimp_formats "fbx;dxf;off;x;3mf")
 foreach(_assimp_format IN LISTS _assimp_formats)
   configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/assimp.inl.in"
@@ -54,7 +54,7 @@ f3d_plugin_declare_reader(
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "COLLADA"
   ${_SUPPORTS_STREAM}
-  CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/dae.inl"
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/dae.inl"
 )
 
 f3d_plugin_declare_reader(
