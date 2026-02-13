@@ -13,6 +13,7 @@
 #include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
 #include <vtkSmartPointer.h>
+#include <vtkTexture.h>
 #include <vtkVersion.h>
 
 #include <cassert>
@@ -233,13 +234,47 @@ bool vtkF3DMetaImporter::Update()
 
     vtkCollectionSimpleIterator ait;
     actorCollection->InitTraversal(ait);
-    while (auto* actor = actorCollection->GetNextActor(ait))
+    while (vtkActor* actor = actorCollection->GetNextActor(ait))
     {
       // Add to the actor collection
       this->ActorCollection->AddItem(actor);
 
       vtkPolyDataMapper* pdMapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
       vtkPolyData* surface = pdMapper->GetInput();
+
+      // convert to PBR materials if needed
+      if (!genericImporter && actor->GetProperty()->GetInterpolation() != VTK_PBR)
+      {
+        actor->GetProperty()->SetInterpolationToPBR();
+        actor->GetProperty()->LightingOn();
+
+        // Convert to linear space
+        auto toLinear = [](double c) { return std::pow(c, 2.2); };
+        double diffuseColor[3];
+        actor->GetProperty()->GetColor(diffuseColor);
+        actor->GetProperty()->SetColor(
+          toLinear(diffuseColor[0]), toLinear(diffuseColor[1]), toLinear(diffuseColor[2]));
+
+        // restore diffuse/specular to 1 and ambient to 0
+        actor->GetProperty()->SetSpecular(1.0);
+        actor->GetProperty()->SetDiffuse(1.0);
+        actor->GetProperty()->SetAmbient(0.0);
+
+        // texture diffuse is now base color
+        vtkSmartPointer<vtkTexture> diffuseTex = actor->GetTexture();
+        if (!diffuseTex)
+        {
+          diffuseTex = actor->GetProperty()->GetTexture("diffuseTex");
+        }
+        if (diffuseTex)
+        {
+          actor->SetTexture(nullptr);
+          diffuseTex->UseSRGBColorSpaceOn();
+
+          actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+          actor->GetProperty()->SetBaseColorTexture(diffuseTex);
+        }
+      }
 
       // Increase bounding box size if needed
       double bounds[6];
