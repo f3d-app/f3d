@@ -36,6 +36,8 @@ f3d_plugin_declare_reader(
   [VTK_READER            <class>]
   [FORMAT_DESCRIPTION    <string>]
   [SCORE                 <integer>]
+  [SUPPORTS_STREAM]
+  [STANDARD_CAN_READ]
   [EXCLUDE_FROM_THUMBNAILER]
   [CUSTOM_CODE           <file>]
   EXTENSIONS             <string>...
@@ -49,9 +51,10 @@ The `NAME` argument is required. The arguments are as follows:
   * `NAME`: (Required) The name of the reader.
   * `VTK_IMPORTER`: The VTK importer class to use.
   * `VTK_READER`: The VTK reader class to use.
-  * `SUPPORTS_STREAM`: Flag to indicate a reader support reading from streams, default is false
   * `FORMAT_DESCRIPTION`: The description of the format read by the reader.
   * `SCORE`: The score of the reader (from 0 to 100). Default value is 50.
+  * `SUPPORTS_STREAM`: Flag to indicate that a reader support reading from streams, default is false
+  * `STANDARD_CAN_READ`: Flag to indicate that stream supporting reader support support a standard canRead method, if not set, should be provided in CUSTOM_CODE
   * `EXCLUDE_FROM_THUMBNAILER`: If specified, the reader will not be used for generating thumbnails.
   * `CUSTOM_CODE`: A custom code file containing the implementation of ``applyCustomReader`` function.
   * `EXTENSIONS`: (Required) The list of file extensions supported by the reader.

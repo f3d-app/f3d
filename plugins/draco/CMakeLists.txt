@@ -35,9 +35,9 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
     set(_SUPPORTS_STREAM SUPPORTS_STREAM)
   endif()
 
-  set(_GLTF_SCORE 50)
+  set(_GLTF_SCORE 51) # GLTFDraco should be lower than GLTF
   if(VTK_VERSION VERSION_LESS 9.6.20260128)
-    set(_GLTF_SCORE 60)
+    set(_GLTF_SCORE 70) # Except with older VTK version where CanReadFile was not implemented
   endif()
 
   f3d_plugin_declare_reader(

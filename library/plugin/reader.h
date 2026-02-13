@@ -200,7 +200,7 @@ public:
   /**
    * Return the list of all reader option names
    */
-  std::vector<std::string> getAllReaderOptionNames()
+  std::vector<std::string> getAllReaderOptionNames() const
   {
     std::vector<std::string> keys;
     keys.reserve(this->ReaderOptions.size());

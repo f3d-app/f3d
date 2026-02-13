@@ -67,7 +67,7 @@ endif()
 
 f3d_plugin_declare_reader(
   NAME GLTF
-  SCORE 60 # higher priority than draco
+  SCORE 60 # Higher priority than draco
   EXTENSIONS gltf
   MIMETYPES model/gltf+json
   VTK_IMPORTER vtkF3DGLTFImporter
@@ -79,7 +79,7 @@ f3d_plugin_declare_reader(
 # GLB reader will be removed once VTK 9.6.0 support is dropped
 f3d_plugin_declare_reader(
   NAME GLB
-  SCORE 60 # Highier priority than draco
+  SCORE 60 # Higher priority than draco
   EXTENSIONS glb
   MIMETYPES model/gltf-binary
   VTK_IMPORTER vtkF3DGLTFImporter
