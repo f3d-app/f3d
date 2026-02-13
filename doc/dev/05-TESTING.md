@@ -49,7 +49,7 @@ Labels can be combined to further refine test selection.
 
 ```
 ctest -L bindings # run all binding tests
-``` 
+```
 
 ## Testing architecture
 
