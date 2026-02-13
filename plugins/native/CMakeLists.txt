@@ -377,7 +377,3 @@ f3d_plugin_build(
   FREEDESKTOP
   FORCE_STATIC
 )
-
-if(F3D_MODULE_EXR OR F3D_MODULE_WEBP)
-  target_link_libraries(f3d-plugin-native PRIVATE f3d::vtkextPrivate)
-endif()

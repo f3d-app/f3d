@@ -12,20 +12,6 @@ set(test_sources
   TestF3DFpsCounter.cxx
   )
 
-if(F3D_MODULE_EXR)
-  list(APPEND test_sources
-       TestF3DEXRReader.cxx
-       TestF3DEXRReaderInvalid.cxx
-       TestF3DEXRMemReader.cxx)
-endif()
-
-if(F3D_MODULE_WEBP)
-  list(APPEND test_sources
-       TestF3DWebPReader.cxx
-       TestF3DWebPReaderInvalid.cxx
-       TestF3DWebPMemReader.cxx)
-endif()
-
 vtk_add_test_cxx(vtkextPrivateTests tests
   NO_DATA NO_VALID NO_OUTPUT
   ${test_sources}
@@ -41,18 +27,6 @@ endif()
 set_tests_properties(f3d::vtkextPrivateCxx-TestF3DGenericImporter
   PROPERTIES
   FAIL_REGULAR_EXPRESSION "")
-
-if(F3D_MODULE_EXR)
-  set_tests_properties(f3d::vtkextPrivateCxx-TestF3DEXRReaderInvalid f3d::vtkextPrivateCxx-TestF3DEXRMemReader
-    PROPERTIES
-    FAIL_REGULAR_EXPRESSION "")
-endif()
-
-if(F3D_MODULE_WEBP)
-  set_tests_properties(f3d::vtkextPrivateCxx-TestF3DWebPReaderInvalid f3d::vtkextPrivateCxx-TestF3DWebPMemReader
-    PROPERTIES
-    FAIL_REGULAR_EXPRESSION "")
-endif()
 
 if (F3D_MODULE_UI)
   target_compile_definitions(vtkextPrivateTests PRIVATE F3D_MODULE_UI)
