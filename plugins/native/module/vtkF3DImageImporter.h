@@ -2,8 +2,8 @@
  * @class   vtkF3DImageImporter
  * @brief   Import an image file as a textured quad
  *
- * This importer reads 2D image files using vtkImageReader2Factory and displays them as a textured quad
- * sized to the image dimensions. Supports both file-based and stream-based reading.
+ * This importer reads 2D image files using vtkImageReader2Factory and displays them as a textured
+ * quad sized to the image dimensions. Supports both file-based and stream-based reading.
  */
 
 #ifndef vtkF3DImageImporter_h
