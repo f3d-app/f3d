@@ -3,8 +3,14 @@ list(APPEND vtkextDraco_list
      TestF3DDracoReaderError.cxx
      TestF3DDracoReaderStream.cxx
      TestF3DDracoReaderStreamError.cxx
-     TestF3DGLTFDracoImporterStreamError.cxx
     )
+
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10884
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
+  list(APPEND vtkextDraco_list
+    TestF3DGLTFDracoImporterStreamError.cxx
+    )
+endif()
 
 vtk_add_test_cxx(vtkextDracoTests tests
   NO_DATA NO_VALID NO_OUTPUT

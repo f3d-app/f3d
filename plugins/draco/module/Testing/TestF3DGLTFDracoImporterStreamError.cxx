@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-int TestF3DGLTFDracoImporterStreamError(int vtkNotUsed(argc), char* argv[])
+int TestF3DGLTFDracoImporterStreamError(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
 {
   if (vtkF3DGLTFDracoImporter::CanReadFile(nullptr))
   {
