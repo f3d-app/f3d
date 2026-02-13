@@ -61,6 +61,14 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
     )
 endif()
 
+# Invalid header detected need proper CanReadFile support
+# Merge with TestSDKScene.cxx when VTK 9.7.0 is required.
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  list(APPEND libf3dSDKTests_list
+    TestSDKSceneInvalidHeader.cxx
+    )
+endif()
+
 # Configure the log file for dropfile test
 configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorCallBack.log.in"
                "${CMAKE_BINARY_DIR}/TestSDKInteractorCallBack.log") # Dragon.vtu; S

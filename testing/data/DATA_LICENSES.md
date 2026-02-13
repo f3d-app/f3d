@@ -26,7 +26,7 @@
 - duck.dae: assimp test models: BSD-3-Clause
 - duck.fbx: assimp test models: BSD-3-Clause
 - Duck0.bin: Copyright 2006 Sony Computer Entertainment Inc.: SCEA Shared Source License
-- duck_invalid.gltf: Copyright 2006 Sony Computer Entertainment Inc.: SCEA Shared Source License
+- invalid_body.gltf: (duck.gltf) Copyright 2006 Sony Computer Entertainment Inc.: SCEA Shared Source License
 - flame_mixed.mdl: LibreQuake Project: BSD-3-Clause
 - HeadMRVolume\*: VTK Data: BSD-3-Clause
 - hornedlizard_small_d\*.spz: Modified from [Niantic's SPZ samples](https://github.com/nianticlabs/spz): MIT
