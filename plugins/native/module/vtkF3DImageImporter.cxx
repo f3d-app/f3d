@@ -75,18 +75,20 @@ void vtkF3DImageImporter::ImportActors(vtkRenderer* renderer)
   polydata->InsertNextCell(VTK_QUAD, 4, pts);
 
   vtkNew<vtkPoints> points;
-  points->InsertNextPoint(0.0, 0.0, 0.0);
-  points->InsertNextPoint(static_cast<double>(w), 0.0, 0.0);
-  points->InsertNextPoint(static_cast<double>(w), static_cast<double>(h), 0.0);
-  points->InsertNextPoint(0.0, static_cast<double>(h), 0.0);
+  points->SetNumberOfPoints(4);
+  points->SetPoint(0, 0.0, 0.0, 0.0);
+  points->SetPoint(1, static_cast<double>(w), 0.0, 0.0);
+  points->SetPoint(2, static_cast<double>(w), static_cast<double>(h), 0.0);
+  points->SetPoint(3, 0.0, static_cast<double>(h), 0.0);
 
   polydata->SetPoints(points);
   vtkNew<vtkFloatArray> tcoords;
   tcoords->SetNumberOfComponents(2);
-  tcoords->InsertNextTuple2(0.0, 0.0);
-  tcoords->InsertNextTuple2(1.0, 0.0);
-  tcoords->InsertNextTuple2(1.0, 1.0);
-  tcoords->InsertNextTuple2(0.0, 1.0);
+  tcoords->SetNumberOfTuples(4);
+  tcoords->SetTuple2(0, 0.0, 0.0);
+  tcoords->SetTuple2(1, 1.0, 0.0);
+  tcoords->SetTuple2(2, 1.0, 1.0);
+  tcoords->SetTuple2(3, 0.0, 1.0);
   polydata->GetPointData()->SetTCoords(tcoords);
 
   vtkNew<vtkActor> actor;

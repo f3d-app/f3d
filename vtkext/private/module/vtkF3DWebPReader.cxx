@@ -8,7 +8,6 @@
 #include <vtkPointData.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkVersion.h>
-#include <vtksys/FStream.hxx>
 
 #include "webp/decode.h"
 
@@ -94,7 +93,6 @@ void vtkF3DWebPReader::ExecuteInformation()
 //------------------------------------------------------------------------------
 int vtkF3DWebPReader::CanReadFile(const char* fname)
 {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260106)
   vtkNew<vtkFileResourceStream> fileStream;
   if (!fileStream->Open(fname))
   {
@@ -102,25 +100,6 @@ int vtkF3DWebPReader::CanReadFile(const char* fname)
     return 0;
   }
   return this->CanReadFile(fileStream);
-#else
-  vtksys::ifstream ifs(fname, vtksys::ifstream::in | vtksys::ifstream::binary);
-
-  if (ifs.fail())
-  {
-    vtkErrorMacro(<< "Could not open file " << fname);
-    return 0;
-  }
-
-  char header[12];
-  ifs.read(header, 12);
-  if (ifs.gcount() != 12)
-  {
-    return 0;
-  }
-
-  std::string_view sv(header, 12);
-  return sv.substr(0, 4) == "RIFF" && sv.substr(8, 4) == "WEBP";
-#endif
 }
 
 //------------------------------------------------------------------------------

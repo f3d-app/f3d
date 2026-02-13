@@ -8,7 +8,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkVersion.h"
-#include "vtksys/FStream.hxx"
 
 #include <ImfArray.h>
 #include <ImfIO.h>
@@ -159,7 +158,6 @@ void vtkF3DEXRReader::ExecuteInformation()
 //------------------------------------------------------------------------------
 int vtkF3DEXRReader::CanReadFile(const char* fname)
 {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260106)
   vtkNew<vtkFileResourceStream> fileStream;
   if (!fileStream->Open(fname))
   {
@@ -167,25 +165,6 @@ int vtkF3DEXRReader::CanReadFile(const char* fname)
     return 0;
   }
   return this->CanReadFile(fileStream);
-#else
-  vtksys::ifstream ifs(fname, vtksys::ifstream::in | vtksys::ifstream::binary);
-
-  if (ifs.fail())
-  {
-    vtkErrorMacro(<< "Could not open file " << fname);
-    return 0;
-  }
-
-  // The file must begin with magic number 76 2F 31 01
-  int magic;
-  ifs.read(reinterpret_cast<char*>(&magic), sizeof(int));
-  if (ifs.gcount() != sizeof(int))
-  {
-    return 0;
-  }
-
-  return magic == Imf::MAGIC;
-#endif
 }
 
 //------------------------------------------------------------------------------
