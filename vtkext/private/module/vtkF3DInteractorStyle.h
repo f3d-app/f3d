@@ -137,6 +137,7 @@ protected:
    */
   void InterpolateTemporaryUp(const double factorDelta, const double* target, double* output);
 
+private:
   /**
    * Temporary up vector to support rolled camera interaction
    */
@@ -147,7 +148,6 @@ protected:
    */
   double TemporaryUpFactor = 1.0;
 
-private:
   int InteractionMode = DEFAULT;
   bool CameraMovementDisabled = false;
 };
