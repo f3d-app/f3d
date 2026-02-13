@@ -68,8 +68,9 @@ public:
   virtual scene& add(const mesh_t& mesh) = 0;
 
   /**
-   * Add and load provided buffer into the scene as it was file
-   * Require the use of `scene.force_reader` to be able to pick the right reader
+   * Add and load provided buffer into the scene as it was file.
+   * Automatically picks the right reader to use, unless you use
+   * VTK < 9.6.20260128, then it require the use of `scene.force_reader`.
    * If it fails to loads the buffer, it clears the scene and
    * throw a load_failure_exception.
    * On other failure, throw a load_failure_exception.
