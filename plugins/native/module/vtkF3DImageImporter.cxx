@@ -9,6 +9,7 @@
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkTexture.h>
 
@@ -93,7 +94,10 @@ void vtkF3DImageImporter::ImportActors(vtkRenderer* renderer)
   mapper->SetInputData(polydata);
   actor->SetMapper(mapper);
 
-  actor->SetTexture(texture);
+  texture->UseSRGBColorSpaceOn();
+  actor->GetProperty()->SetInterpolationToPBR();
+  actor->GetProperty()->SetBaseColorTexture(texture);
+  actor->GetProperty()->SetBaseIOR(1.0);
   renderer->AddActor(actor);
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
