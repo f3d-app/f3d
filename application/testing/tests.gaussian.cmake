@@ -20,7 +20,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
     f3d_test(NAME TestInteractionPointSpritesCycle DATA bonsai_small.ply ARGS -sy --point-sprites-absolute-size --up=-Y --blending=sort --camera-position=-2.6,0.5,-3.2 INTERACTION) #OOOOO
 
     f3d_test(NAME TestSPZDegree0 DATA hornedlizard_small_d0.spz ARGS -sy --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,4.2)
-    f3d_test(NAME TestInvalidSH DATA invalidSH.vtp ARGS -osy --verbose REGEXP "Spherical harmonics array is not valid" NO_BASELINE)
+    f3d_test(NAME TestInvalidSH DATA invalid_spherical_harmonics.vtp ARGS -osy --verbose REGEXP "Spherical harmonics array is not valid" NO_BASELINE)
 
     # Needs texture array support: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12112
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
