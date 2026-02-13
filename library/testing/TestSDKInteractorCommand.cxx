@@ -1,8 +1,10 @@
 #include "PseudoUnitTest.h"
 
+#include <camera.h>
 #include <engine.h>
 #include <interactor.h>
 #include <options.h>
+#include <window.h>
 
 int TestSDKInteractorCommand([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
@@ -70,6 +72,17 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, [[maybe_unused]] char* a
   test("cycle_interactor_style to 2d", options.interactor.style == "2d");
   inter.triggerCommand("cycle_interactor_style");
   test("cycle_interactor_style to default", options.interactor.style == "default");
+
+  // Test camera commands are no-op in 2D mode
+  options.interactor.style = "2d";
+  f3d::camera& cam = eng.getWindow().getCamera();
+  f3d::point3_t posBefore = cam.getPosition();
+  inter.triggerCommand("set_camera front");
+  inter.triggerCommand("roll_camera 90");
+  inter.triggerCommand("elevation_camera 90");
+  inter.triggerCommand("azimuth_camera 90");
+  test("camera commands no-op in 2d mode", cam.getPosition() == posBefore);
+  options.interactor.style = "default";
 
   // Coverage print
   inter.triggerCommand("print model.scivis.cells");
