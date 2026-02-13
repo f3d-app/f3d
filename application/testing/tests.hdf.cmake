@@ -6,7 +6,7 @@ f3d_application_test(NAME TestExodus DATA disk_out_ref.ex2 PLUGINS hdf ARGS -s -
 f3d_application_test(NAME TestExodusExo DATA box.exo PLUGINS hdf ARGS NO_RENDER NO_BASELINE REGEXP "Number of points: 24")
 f3d_application_test(NAME TestExodusG DATA box.g PLUGINS hdf ARGS NO_RENDER NO_BASELINE REGEXP "Number of points: 24")
 f3d_application_test(NAME TestExodusE DATA single_timestep.e PLUGINS hdf ARGS NO_RENDER NO_BASELINE REGEXP "Number of points: 1331")
-f3d_application_test(NAME TestExodusConfig DATA disk_out_ref.ex2 CONFIG ${F3D_SOURCE_DIR}/testing/configs/exodus.json ARGS -s --camera-position=-11,-2,-49 LABELS "plugins;hdf")
+f3d_application_test(NAME TestExodusConfig DATA disk_out_ref.ex2 CONFIG ${F3D_SOURCE_DIR}/testing/configs/exodus.json ARGS -s --camera-position=-11,-2,-49 LABELS "plugin;hdf")
 f3d_application_test(NAME TestNetCDF DATA temperature_grid.nc PLUGINS hdf ARGS -s)
 
 if (VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
@@ -26,25 +26,25 @@ if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/plugins/hdf/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-    f3d_application_test(NAME TestDefaultConfigFileExodus DATA disk_out_ref.ex2 CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI LABELS "plugins;hdf")
+    f3d_application_test(NAME TestDefaultConfigFileExodus DATA disk_out_ref.ex2 CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI LABELS "plugin;hdf")
   endif()
 
   file(COPY "${F3D_SOURCE_DIR}/plugins/hdf/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-  f3d_application_test(NAME TestThumbnailConfigFileExodus DATA disk_out_ref.ex2 CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING LABELS "plugins;hdf")
+  f3d_application_test(NAME TestThumbnailConfigFileExodus DATA disk_out_ref.ex2 CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING LABELS "plugin;hdf")
 
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
     f3d_application_test(NAME TestDefaultConfigFileVTKHDF DATA blob.vtkhdf CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
   endif()
   if (VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
-    f3d_application_test(NAME TestThumbnailConfigFileVTKHDF DATA blob.vtkhdf CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING LABELS "plugins;hdf")
+    f3d_application_test(NAME TestThumbnailConfigFileVTKHDF DATA blob.vtkhdf CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING LABELS "plugin;hdf")
   endif()
 
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-    f3d_application_test(NAME TestDefaultConfigFileNetCDF DATA temperature_grid.nc CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI LABELS "plugins;hdf")
+    f3d_application_test(NAME TestDefaultConfigFileNetCDF DATA temperature_grid.nc CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI LABELS "plugin;hdf")
   endif()
-  f3d_application_test(NAME TestThumbnailConfigFileNetCDF DATA temperature_grid.nc CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING LABELS "plugins;hdf")
+  f3d_application_test(NAME TestThumbnailConfigFileNetCDF DATA temperature_grid.nc CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING LABELS "plugin;hdf")
 endif()
 
 ## Feature tests that rely on HDF plugin
@@ -93,5 +93,5 @@ if (NOT F3D_PLUGINS_STATIC_BUILD AND BUILD_SHARED_LIBS)
   f3d_application_test(NAME TestPluginName DATA disk_out_ref.ex2 PLUGINS hdf ARGS --verbose NO_BASELINE REGEXP "Loaded plugin hdf from")
 
   # Test --load-plugins with a full path plugin
-  f3d_application_test(NAME TestPluginFullPath DATA disk_out_ref.ex2 ARGS --verbose --load-plugins "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_SHARED_MODULE_PREFIX}f3d-plugin-hdf${CMAKE_SHARED_MODULE_SUFFIX}" NO_BASELINE REGEXP "Loaded plugin hdf from" LABELS "plugins;hdf")
+  f3d_application_test(NAME TestPluginFullPath DATA disk_out_ref.ex2 ARGS --verbose --load-plugins "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_SHARED_MODULE_PREFIX}f3d-plugin-hdf${CMAKE_SHARED_MODULE_SUFFIX}" NO_BASELINE REGEXP "Loaded plugin hdf from" LABELS "plugin;hdf")
 endif()

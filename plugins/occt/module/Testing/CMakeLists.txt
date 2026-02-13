@@ -25,6 +25,6 @@ endif()
 foreach(test ${vtkextOCCT_list})
   get_filename_component (TName ${test} NAME_WE)
   set_tests_properties(f3d::vtkextOCCTCxx-${TName} PROPERTIES
-    LABELS "plugins;module;occt"
+    LABELS "plugin;module;occt"
   )
 endforeach()

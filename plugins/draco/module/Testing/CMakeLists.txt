@@ -14,6 +14,6 @@ vtk_test_cxx_executable(vtkextDracoTests tests)
 foreach(test ${vtkextDraco_list})
   get_filename_component (TName ${test} NAME_WE)
   set_tests_properties(f3d::vtkextDracoCxx-${TName} PROPERTIES
-    LABELS "plugins;module;draco"
+    LABELS "plugin;module;draco"
   )
 endforeach()

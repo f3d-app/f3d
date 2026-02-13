@@ -6,7 +6,7 @@ f3d_application_test(NAME TestPipedWebIFC DATA IfcOpenHouse_IFC4.ifc PLUGINS web
 
 if(NOT F3D_MACOS_BUNDLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   file(COPY "${F3D_SOURCE_DIR}/plugins/webifc/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-  f3d_application_test(NAME TestDefaultConfigFileWebIFC DATA IfcOpenHouse_IFC4.ifc CONFIG config_build LONG_TIMEOUT TONE_MAPPING LABELS "plugins;webifc")
+  f3d_application_test(NAME TestDefaultConfigFileWebIFC DATA IfcOpenHouse_IFC4.ifc CONFIG config_build LONG_TIMEOUT TONE_MAPPING LABELS "plugin;webifc")
   file(COPY "${F3D_SOURCE_DIR}/plugins/webifc/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-  f3d_application_test(NAME TestThumbnailConfigFileWebIFC DATA IfcOpenHouse_IFC4.ifc CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING LABELS "plugins;webifc")
+  f3d_application_test(NAME TestThumbnailConfigFileWebIFC DATA IfcOpenHouse_IFC4.ifc CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING LABELS "plugin;webifc")
 endif()
