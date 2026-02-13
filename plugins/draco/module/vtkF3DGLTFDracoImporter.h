@@ -11,6 +11,7 @@
 
 #include <vtkF3DGLTFImporter.h>
 
+class vtkResourceStream;
 class vtkF3DGLTFDracoImporter : public vtkF3DGLTFImporter
 {
 public:
