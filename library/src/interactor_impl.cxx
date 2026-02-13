@@ -1097,6 +1097,10 @@ interactor& interactor_impl::initCommands()
     "roll_camera",
     [&](const std::vector<std::string>& args)
     {
+      if (this->Internals->Options.interactor.style == "2d")
+      {
+        return;
+      }
       check_args(args, 1, "roll_camera");
       this->Internals->Window.getCamera().roll(options::parse<int>(args[0]));
       this->Internals->Style->SetTemporaryUp(
@@ -1118,6 +1122,10 @@ interactor& interactor_impl::initCommands()
     "elevation_camera",
     [&](const std::vector<std::string>& args)
     {
+      if (this->Internals->Options.interactor.style == "2d")
+      {
+        return;
+      }
       check_args(args, 1, "elevation_camera");
       this->Internals->Window.getCamera().elevation(options::parse<int>(args[0]));
       this->Internals->Style->SetTemporaryUp(
@@ -1129,6 +1137,10 @@ interactor& interactor_impl::initCommands()
     "azimuth_camera",
     [&](const std::vector<std::string>& args)
     {
+      if (this->Internals->Options.interactor.style == "2d")
+      {
+        return;
+      }
       check_args(args, 1, "azimuth_camera");
       this->Internals->Window.getCamera().azimuth(options::parse<int>(args[0]));
       this->Internals->Style->SetTemporaryUp(
@@ -1189,6 +1201,10 @@ interactor& interactor_impl::initCommands()
     "set_camera",
     [&](const std::vector<std::string>& args)
     {
+      if (this->Internals->Options.interactor.style == "2d")
+      {
+        return;
+      }
       check_args(args, 1, "set_camera");
       std::string_view type = args[0];
       if (type == "front")
