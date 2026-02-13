@@ -80,7 +80,7 @@ public:
     }
 
     vtkNew<vtkFileResourceStream> stream;
-    if(!stream->Open(fileName.c_str()))
+    if (!stream->Open(fileName.c_str()))
     {
       return false;
     }
