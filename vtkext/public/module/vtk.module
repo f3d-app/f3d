@@ -9,8 +9,6 @@ DEPENDS
 PRIVATE_DEPENDS
   VTK::CommonCore
   VTK::RenderingOpenGL2
-OPTIONAL_DEPENDS
-  VTK::IOImage
 TEST_DEPENDS
   VTK::TestingCore
   VTK::RenderingOpenGL2

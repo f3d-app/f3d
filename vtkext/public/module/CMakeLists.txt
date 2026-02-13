@@ -32,16 +32,6 @@ if(NOT ANDROID AND NOT EMSCRIPTEN AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.2024
   set(classes ${classes} vtkF3DBitonicSort)
 endif()
 
-if(F3D_MODULE_EXR)
-  find_package(OpenEXR 3.0.1 REQUIRED)
-  list(APPEND classes vtkF3DEXRReader)
-endif()
-
-if(F3D_MODULE_WEBP)
-  find_package(WebP REQUIRED)
-  list(APPEND classes vtkF3DWebPReader)
-endif()
-
 vtk_module_add_module(f3d::vtkext
   ${f3d_vtk_no_install}
   ${f3d_vtk_force_static}
@@ -49,11 +39,3 @@ vtk_module_add_module(f3d::vtkext
   SOURCES ${sources}
   PRIVATE_HEADERS ${private_headers}
   )
-
-if(F3D_MODULE_EXR)
-  vtk_module_link(f3d::vtkext PRIVATE OpenEXR::OpenEXR)
-endif()
-
-if(F3D_MODULE_WEBP)
-  vtk_module_link(f3d::vtkext PRIVATE WebP::webp)
-endif()

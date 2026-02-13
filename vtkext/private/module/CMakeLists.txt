@@ -111,6 +111,16 @@ if(ANDROID)
   list(APPEND classes vtkF3DAndroidLogOutputWindow)
 endif()
 
+if(F3D_MODULE_EXR)
+  find_package(OpenEXR 3.0.1 REQUIRED)
+  list(APPEND classes vtkF3DEXRReader)
+endif()
+
+if(F3D_MODULE_WEBP)
+  find_package(WebP REQUIRED)
+  list(APPEND classes vtkF3DWebPReader)
+endif()
+
 if(F3D_MODULE_UI AND NOT F3D_USE_EXTERNAL_IMGUI)
   list(APPEND sources
     "${F3D_SOURCE_DIR}/external/imgui/imgui.cpp"
@@ -130,6 +140,16 @@ vtk_module_add_module(f3d::vtkextPrivate
 
 if(MSVC)
   vtk_module_definitions(f3d::vtkextPrivate PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _CRT_SECURE_NO_WARNINGS)
+endif()
+
+# exr
+if(F3D_MODULE_EXR)
+  vtk_module_link(f3d::vtkextPrivate PRIVATE OpenEXR::OpenEXR)
+endif()
+
+# webp
+if(F3D_MODULE_WEBP)
+  vtk_module_link(f3d::vtkextPrivate PRIVATE WebP::webp)
 endif()
 
 # imgui
