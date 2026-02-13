@@ -18,7 +18,7 @@ if (VTK_VERSION VERSION_GREATER_EQUAL 9.4.0)
   f3d_test(NAME TestVTKHDFPartitionedDataSetCollection DATA pdc_sphere_cone.vtkhdf ARGS --load-plugins=hdf -s)
 endif()
 
-if (VTK_VERSION VERSION_GREATER_EQUAL 9.5.20260128)
+if (VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
   f3d_test(NAME TestPipedVTKHDF DATA blob.vtkhdf ARGS --load-plugins=hdf -s PIPED)
 elseif (VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251109)
   f3d_test(NAME TestPipedVTKHDF DATA blob.vtkhdf ARGS --load-plugins=hdf -s --force-reader=VTKHDF PIPED)

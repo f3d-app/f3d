@@ -35,14 +35,20 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
     set(_SUPPORTS_STREAM SUPPORTS_STREAM)
   endif()
 
+  set(_GLTF_SCORE 50)
+  if(VTK_VERSION VERSION_LESS 9.6.20260128)
+    set(_GLTF_SCORE 60)
+  endif()
+
   f3d_plugin_declare_reader(
     NAME GLTFDraco
     EXTENSIONS gltf
     MIMETYPES model/gltf+json
     VTK_IMPORTER vtkF3DGLTFDracoImporter
+    FORMAT_DESCRIPTION "GL Transmission Format"
+    SCORE ${_GLTF_SCORE}
     ${_SUPPORTS_STREAM}
     STANDARD_CAN_READ
-    FORMAT_DESCRIPTION "GL Transmission Format"
   )
 
   # GLB reader will be removed once 9.6.0 support is dropped
@@ -52,6 +58,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
     MIMETYPES model/gltf-binary
     VTK_IMPORTER vtkF3DGLTFDracoImporter
     FORMAT_DESCRIPTION "GL Transmission Format (binary)"
+    SCORE ${_GLTF_SCORE}
     ${_SUPPORTS_STREAM}
     STANDARD_CAN_READ
     CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/glb.inl"

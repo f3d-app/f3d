@@ -15,7 +15,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
 else()
   f3d_test(NAME TestPipedDRACO DATA suzanne.drc ARGS --load-plugins=draco --force-reader=Draco PIPED)
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250923)
-    f3d_test(NAME TestPipedGLTFDracoImporter DATA Box_draco.glb ARGS --load-plugins=draco --force-reader=GLTFDraco PIPED)
+    f3d_test(NAME TestPipedGLTFDracoImporter DATA Box_draco.glb ARGS --load-plugins=draco --force-reader=GLBraco PIPED)
   endif()
 endif()
 
