@@ -31,6 +31,8 @@
 #include <vtk_glew.h>
 #endif
 
+#include <algorithm>
+#include <array>
 #include <imgui.h>
 #include <numeric>
 #include <optional>
@@ -273,6 +275,10 @@ struct vtkF3DImguiActor::Internals
   vtkSmartPointer<vtkOpenGLBufferObject> IndexBuffer;
   vtkSmartPointer<vtkShaderProgram> Program;
   vtkSmartPointer<vtkTextureObject> LogoTexture;
+
+  std::array<char, 256> SearchFilter = {};
+  int SearchMode = 0;
+  bool SearchFocusRequested = false;
 };
 
 namespace
@@ -670,6 +676,36 @@ void vtkF3DImguiActor::RenderCheatSheet()
   const float plusWidth = ImGui::CalcTextSize("+").x;
   const float spacingX = ImGui::GetStyle().ItemSpacing.x;
 
+  auto caseInsensitiveContains = [](const std::string& haystack, const std::string& needle)
+  {
+    if (needle.empty())
+    {
+      return true;
+    }
+    std::string lowerHaystack = haystack;
+    std::string lowerNeedle = needle;
+    std::transform(lowerHaystack.begin(), lowerHaystack.end(), lowerHaystack.begin(), ::tolower);
+    std::transform(lowerNeedle.begin(), lowerNeedle.end(), lowerNeedle.begin(), ::tolower);
+    return lowerHaystack.find(lowerNeedle) != std::string::npos;
+  };
+
+  const std::string filterStr(this->Pimpl->SearchFilter.data());
+  const bool hasFilter = !filterStr.empty();
+  const int searchMode = this->Pimpl->SearchMode;
+
+  auto entryMatches = [&](const std::string& bind, const std::string& desc)
+  {
+    if (!hasFilter)
+    {
+      return true;
+    }
+    if (searchMode == 0)
+    {
+      return caseInsensitiveContains(desc, filterStr);
+    }
+    return caseInsensitiveContains(bind, filterStr);
+  };
+
   float textHeight = 0.f;
   float winWidth = 0.f;
 
@@ -677,6 +713,10 @@ void vtkF3DImguiActor::RenderCheatSheet()
   float maxBindingTextWidth = 0.f;
   float maxDescTextWidth = 0.f;
   float maxValueTextWidth = 0.f;
+
+  const float searchBarHeight =
+    ImGui::GetTextLineHeightWithSpacing() * 2.f + ImGui::GetStyle().ItemSpacing.y;
+  textHeight += searchBarHeight;
 
   for (const auto& [group, content] : this->CheatSheet)
   {
@@ -727,8 +767,44 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   ImGui::Begin("CheatSheet", nullptr, flags);
 
+  if (this->Pimpl->SearchFocusRequested || !ImGui::IsAnyItemActive())
+  {
+    ImGui::SetKeyboardFocusHere();
+    this->Pimpl->SearchFocusRequested = false;
+  }
+  ImGui::PushStyleColor(ImGuiCol_FrameBg, F3DStyle::imgui::GetMidColor());
+  ImGui::PushItemWidth(-1);
+  ImGui::InputTextWithHint("##SearchFilter", "Search...", this->Pimpl->SearchFilter.data(),
+    this->Pimpl->SearchFilter.size());
+  ImGui::PopItemWidth();
+  ImGui::PopStyleColor();
+
+  if (ImGui::RadioButton("Description", &this->Pimpl->SearchMode, 0))
+  {
+    this->Pimpl->SearchFocusRequested = true;
+  }
+  ImGui::SameLine();
+  if (ImGui::RadioButton("Keybind", &this->Pimpl->SearchMode, 1))
+  {
+    this->Pimpl->SearchFocusRequested = true;
+  }
+
   for (const auto& [group, list] : this->CheatSheet)
   {
+    bool groupHasMatch = false;
+    for (const auto& [bind, desc, val, type] : list)
+    {
+      if (entryMatches(bind, desc))
+      {
+        groupHasMatch = true;
+        break;
+      }
+    }
+    if (!groupHasMatch)
+    {
+      continue;
+    }
+
     ImGui::SeparatorText(group.c_str());
     ImGui::BeginTable("BindingsTable", 3);
     ImGui::TableSetupColumn("Description", ImGuiTableColumnFlags_WidthFixed, maxDescTextWidth);
@@ -736,6 +812,11 @@ void vtkF3DImguiActor::RenderCheatSheet()
     ImGui::TableSetupColumn("Bindings", ImGuiTableColumnFlags_WidthStretch, maxBindingTextWidth);
     for (const auto& [bind, desc, val, type] : list)
     {
+      if (!entryMatches(bind, desc))
+      {
+        continue;
+      }
+
       ImVec4 bindingTextColor, bindingRectColor, descTextColor, valueTextColor;
 
       if (type == CheatSheetBindingType::TOGGLE && val == "ON")
