@@ -1,0 +1,9 @@
+[
+  {
+    "match-type": "glob",
+    "match": "*.{e57}",
+    "options": {
+      "load-plugins": "pdal"
+    }
+  }
+]

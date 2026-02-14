@@ -53,6 +53,30 @@ inputs:
   zlib_version:
     description: "Version of zlib to build"
     required: true
+  pdal_version:
+    description: "Version of pdal to build"
+    required: true
+  gdal_version:
+    description: "Version of gdal to build"
+    required: true
+  libgeotiff_version:
+    description: "Version of libgeotiff to build"
+    required: true
+  proj_version:
+    description: "Version of PROJ to build"
+    required: true
+  sqlite_version:
+    description: "Version of SQLite to build"
+    required: true
+  libtiff_version:
+    description: "Version of libtiff to build"
+    required: true
+  curl_version:
+    description: "Version of curl to build"
+    required: true
+  xercesc_version:
+    description: "Version of xercesc to build"
+    required: true
   global_cache_index:
     description: "Global cache index"
     required: true
@@ -84,12 +108,20 @@ runs:
         occt_version: ${{inputs.occt_version}}
         openexr_version: ${{inputs.openexr_version}}
         openvdb_version: ${{inputs.openvdb_version}}
+        pdal_version: ${{inputs.pdal_version}}
         ospray_version: ${{inputs.ospray_version}}
         tbb_version: ${{inputs.tbb_version}}
         usd_version: ${{inputs.usd_version}}
         webp_version: ${{inputs.webp_version}}
         webifc_version: ${{inputs.webifc_version}}
         zlib_version: ${{inputs.zlib_version}}
+        libgeotiff_version: ${{inputs.libgeotiff_version}}
+        libtiff_version: ${{inputs.libtiff_version}}
+        gdal_version: ${{inputs.gdal_version}}
+        proj_version: ${{inputs.proj_version}}
+        sqlite_version: ${{inputs.sqlite_version}}
+        curl_version: ${{inputs.curl_version}}
+        xercesc_version: ${{inputs.xercesc_version}}
         global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install VTK dependency
@@ -97,10 +129,18 @@ runs:
       with:
         blosc_version: ${{inputs.blosc_version}}
         openvdb_version: ${{inputs.openvdb_version}}
+        pdal_version: ${{inputs.pdal_version}}
         ospray_version: ${{inputs.ospray_version}}
         tbb_version: ${{inputs.tbb_version}}
         vtk_version: ${{inputs.vtk_version}}
         zlib_version: ${{inputs.zlib_version}}
+        gdal_version: ${{inputs.gdal_version}}
+        libgeotiff_version: ${{inputs.libgeotiff_version}}
+        libtiff_version: ${{inputs.libtiff_version}}
+        sqlite_version: ${{inputs.sqlite_version}}
+        xercesc_version: ${{inputs.xercesc_version}}
+        curl_version: ${{inputs.curl_version}}
+        proj_version: ${{inputs.proj_version}}
         global_cache_index: ${{inputs.global_cache_index}}
 
     # coverage build is done in source as it seems to be required for codecov
@@ -132,6 +172,7 @@ runs:
         -DF3D_PLUGIN_BUILD_USD=ON
         -DF3D_PLUGIN_BUILD_VDB=ON
         -DF3D_PLUGIN_BUILD_WEBIFC=ON
+        -DF3D_PLUGIN_BUILD_PDAL=ON
         -DF3D_STRICT_BUILD=ON
         -DF3D_TESTING_ENABLE_EGL_TESTS=ON
         -DF3D_TESTING_ENABLE_EXTERNAL_GLFW=ON
