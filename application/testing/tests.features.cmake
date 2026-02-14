@@ -276,6 +276,7 @@ f3d_test(NAME TestInvalidBlendingMode DATA suzanne.ply ARGS --blending=foo REGEX
 f3d_test(NAME TestTranslucencySupportDeprecated DATA suzanne.ply ARGS --translucency-support REGEXP "--translucency-support is deprecated" NO_BASELINE)
 
 ## InteractionStyle
+f3d_test(NAME TestInteractionStyleImplicit DATA suzanne.ply ARGS -k NO_BASELINE)
 f3d_test(NAME TestTrackballInvalid DATA suzanne.ply ARGS --interaction-trackball=foo REGEXP "Cannot parse --interaction-trackball value" NO_BASELINE)
 
 ## PointSprites

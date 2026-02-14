@@ -246,7 +246,8 @@
           "longName": "interaction-style",
           "shortName": "k",
           "helpText": "Interaction style",
-          "valueHelper": "<style>"
+          "valueHelper": "<style>",
+          "implicitValue": "2d"
         },
         {
           "longName": "interaction-trackball",
