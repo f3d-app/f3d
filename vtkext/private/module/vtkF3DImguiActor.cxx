@@ -678,10 +678,6 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   auto caseInsensitiveContains = [](const std::string& haystack, const std::string& needle)
   {
-    if (needle.empty())
-    {
-      return true;
-    }
     std::string lowerHaystack = haystack;
     std::string lowerNeedle = needle;
     std::transform(lowerHaystack.begin(), lowerHaystack.end(), lowerHaystack.begin(), ::tolower);

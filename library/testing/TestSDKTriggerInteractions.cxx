@@ -132,6 +132,18 @@ int TestSDKTriggerInteractions([[maybe_unused]] int argc, [[maybe_unused]] char*
     engine.getInteractor().triggerTextCharacter('e');
   });
 
+  // Trigger cheatsheet keybind search mode (coverage)
+  helper([](f3d::engine& engine) {
+    engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "H");
+    engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "H");
+    engine.getInteractor().triggerMousePosition(150, 48);
+    engine.getInteractor().triggerMouseButton(
+      f3d::interactor::InputAction::PRESS, f3d::interactor::MouseButton::LEFT);
+    engine.getInteractor().triggerMouseButton(
+      f3d::interactor::InputAction::RELEASE, f3d::interactor::MouseButton::LEFT);
+    engine.getInteractor().triggerTextCharacter('E');
+  });
+
   // following calls are only there for coverage
   // there is no interactor style action associated with these yet
   helper([](f3d::engine& engine) {
