@@ -13,7 +13,6 @@ int TestF3DGLTFDracoImporterStreamError(int vtkNotUsed(argc), char* vtkNotUsed(a
     return EXIT_FAILURE;
   }
 
-
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260212)
   vtkNew<vtkMemoryResourceStream> invalidStream;
   invalidStream->SetBuffer("invalid", 7);
@@ -22,7 +21,7 @@ int TestF3DGLTFDracoImporterStreamError(int vtkNotUsed(argc), char* vtkNotUsed(a
     std::cerr << "Unexpected CanReadFile success\n";
     return EXIT_FAILURE;
   }
-#endif  
+#endif
 
   // No need to actually use the reader, already covered by other tests
   return EXIT_SUCCESS;
