@@ -275,6 +275,10 @@ f3d_test(NAME TestAntiAliasingDeprecated DATA suzanne.ply ARGS --anti-aliasing=t
 f3d_test(NAME TestInvalidBlendingMode DATA suzanne.ply ARGS --blending=foo REGEXP "foo is an invalid blending mode" NO_BASELINE)
 f3d_test(NAME TestTranslucencySupportDeprecated DATA suzanne.ply ARGS --translucency-support REGEXP "--translucency-support is deprecated" NO_BASELINE)
 
+## InteractionStyle
+f3d_test(NAME TestInteractionStyleImplicit DATA suzanne.ply ARGS -k NO_BASELINE)
+f3d_test(NAME TestTrackballInvalid DATA suzanne.ply ARGS --interaction-trackball=foo REGEXP "Cannot parse --interaction-trackball value" NO_BASELINE)
+
 ## PointSprites
 f3d_test(NAME TestInvalidPointSprites DATA suzanne.ply ARGS --point-sprites=foo REGEXP "foo is an invalid point sprites type" NO_BASELINE)
 f3d_test(NAME TestPointSpritesTypeDeprecated DATA pointsCloud.vtp ARGS --point-sprites-type=sphere REGEXP "--point-sprites-type is deprecated" NO_BASELINE)

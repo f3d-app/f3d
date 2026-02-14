@@ -1,0 +1,19 @@
+# StreamVersion 1.2
+# Test 2D style cycling: press K twice to reach 2D mode, then left-drag should pan (not rotate)
+RenderEvent 0 0 0 0 0 0 0
+
+# Press K twice: default -> trackball -> 2d
+KeyPressEvent 150 150 0 0 1 k 0
+CharEvent 150 150 0 0 1 k 0
+KeyReleaseEvent 150 150 0 0 1 k 0
+KeyPressEvent 150 150 0 0 1 k 0
+CharEvent 150 150 0 0 1 k 0
+KeyReleaseEvent 150 150 0 0 1 k 0
+
+# Left-drag in 2D mode: should pan, not rotate
+LeftButtonPressEvent 150 150 0 0 0 0 0
+StartInteractionEvent 150 150 0 0 0 0 0
+MouseMoveEvent 150 200 0 0 0 0 0
+LeftButtonReleaseEvent 150 200 0 0 0 0 0
+EndInteractionEvent 150 200 0 0 0 0 0
+RenderEvent 150 200 0 0 0 0 0

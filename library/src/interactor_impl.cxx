@@ -226,7 +226,7 @@ public:
     /* set camera coordinates back */
     cam.setPosition(newPos);
     cam.setViewUp(up);
-    cam.resetToBounds(0.9);
+    cam.resetToBounds();
   }
 
   //----------------------------------------------------------------------------
@@ -829,6 +829,7 @@ interactor& interactor_impl::initCommands()
   { return complNames(args, this->Internals->Options.getAllNames()); };
 
   static const std::map<std::string, std::vector<std::string>> COMPL_OPTIONS_SET = {
+    { "interactor.style", { "default", "trackball", "2d" } },
     { "model.point_sprites.type", { "sphere", "gaussian" } },
     { "render.effect.antialiasing.mode", { "fxaa", "ssaa", "taa" } },
     { "render.effect.blending.mode", { "ddp", "sort", "sort_cpu", "stochastic" } },
@@ -1096,6 +1097,10 @@ interactor& interactor_impl::initCommands()
     "roll_camera",
     [&](const std::vector<std::string>& args)
     {
+      if (this->Internals->Options.interactor.style == "2d")
+      {
+        return;
+      }
       check_args(args, 1, "roll_camera");
       this->Internals->Window.getCamera().roll(options::parse<int>(args[0]));
       this->Internals->Style->SetTemporaryUp(
@@ -1117,6 +1122,10 @@ interactor& interactor_impl::initCommands()
     "elevation_camera",
     [&](const std::vector<std::string>& args)
     {
+      if (this->Internals->Options.interactor.style == "2d")
+      {
+        return;
+      }
       check_args(args, 1, "elevation_camera");
       this->Internals->Window.getCamera().elevation(options::parse<int>(args[0]));
       this->Internals->Style->SetTemporaryUp(
@@ -1128,6 +1137,10 @@ interactor& interactor_impl::initCommands()
     "azimuth_camera",
     [&](const std::vector<std::string>& args)
     {
+      if (this->Internals->Options.interactor.style == "2d")
+      {
+        return;
+      }
       check_args(args, 1, "azimuth_camera");
       this->Internals->Window.getCamera().azimuth(options::parse<int>(args[0]));
       this->Internals->Style->SetTemporaryUp(
@@ -1188,6 +1201,10 @@ interactor& interactor_impl::initCommands()
     "set_camera",
     [&](const std::vector<std::string>& args)
     {
+      if (this->Internals->Options.interactor.style == "2d")
+      {
+        return;
+      }
       check_args(args, 1, "set_camera");
       std::string_view type = args[0];
       if (type == "front")
@@ -1231,6 +1248,28 @@ interactor& interactor_impl::initCommands()
     },
     command_documentation_t{
       "toggle_volume_rendering", "toggle model.volume.enable and print coloring information" });
+
+  this->addCommand(
+    "cycle_interactor_style",
+    [&](const std::vector<std::string>&)
+    {
+      auto& style = this->Internals->Options.interactor.style;
+      if (style == "default")
+      {
+        style = "trackball";
+      }
+      else if (style == "trackball")
+      {
+        style = "2d";
+      }
+      else
+      {
+        style = "default";
+      }
+      this->Internals->Window.render();
+    },
+    command_documentation_t{
+      "cycle_interactor_style", "cycle between interaction styles (default, trackball, 2d)" });
 
   this->addCommand(
     "stop_interactor", [&](const std::vector<std::string>&) { this->stop(); },
@@ -1562,8 +1601,9 @@ interactor& interactor_impl::initBindings()
     return std::pair("Color component", ren->ComponentToString(opts.model.scivis.component));
   };
 
-  // "doc", ""
-  auto docStr = [](const std::string& doc) { return std::pair(doc, ""); };
+  // "doc", "value"
+  auto docStr = [](const std::string& doc, const std::string& val = "")
+  { return std::pair(doc, val); };
 
   // "doc", "value"
   auto docDbl = [](const std::string& doc, const double& val)
@@ -1635,7 +1675,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "I"}, "toggle model.volume.inverse","Scene", std::bind(docTgl, "Inverse volume opacity", std::cref(opts.model.volume.inverse)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "O"}, "cycle_point_sprites","Scene", docPS, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "U"}, "toggle render.background.blur.enable","Scene", std::bind(docTgl, "Blur background", std::cref(opts.render.background.blur.enable)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::NONE, "K"}, "toggle interactor.trackball","Scene", std::bind(docTgl, "Trackball interaction", std::cref(opts.interactor.trackball)), f3d::interactor::BindingType::TOGGLE);
+  this->addBinding({mod_t::NONE, "K"}, "cycle_interactor_style","Scene", std::bind(docStr, "Interaction style", std::cref(opts.interactor.style)), f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "F"}, "toggle render.hdri.ambient","Scene", std::bind(docTgl, "HDRI ambient lighting", std::cref(opts.render.hdri.ambient)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "J"}, "toggle render.background.skybox","Scene", std::bind(docTgl, "HDRI skybox", std::cref(opts.render.background.skybox)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "L"}, "increase_light_intensity", "Scene", std::bind(docDbl, "Increase lights intensity", std::cref(opts.render.light.intensity)), f3d::interactor::BindingType::NUMERICAL);

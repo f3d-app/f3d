@@ -163,19 +163,17 @@ public:
 
   ///@{
   /**
-   * Set/Get UseTrackball
-   */
-  void SetUseTrackball(bool use);
-  vtkGetMacro(UseTrackball, bool);
-  ///@}
-
-  ///@{
-  /**
    * Set/Get InvertZoom
    */
   vtkSetMacro(InvertZoom, bool);
   vtkGetMacro(InvertZoom, bool);
   ///@}
+
+  /**
+   * Set the interaction style from a string.
+   * Accepted values: "default", "trackball", "2d".
+   */
+  void SetInteractionStyle(const std::string& style);
 
   /**
    * Reimplemented to configure:
@@ -687,7 +685,6 @@ private:
   bool DisplayDepthScalarColoring = false;
   bool UseBlurBackground = false;
   std::optional<bool> UseOrthographicProjection = false;
-  bool UseTrackball = false;
   bool InvertZoom = false;
 
   int RaytracingSamples = 0;
