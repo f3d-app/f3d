@@ -92,11 +92,11 @@ A repeatable option to reset [libf3d options](../libf3d/03-OPTIONS.md) manually.
 
 ## General Options
 
-### `--verbose=<[debug|info|warning|error|quiet]>` (_string_, default: `info`)
+### `--verbose=<[debug|info|warning|error|quiet]>` (_string_, default: `info`, implicit: `debug`)
 
-Set _verbose_ level, in order to provide more information about the loaded data in the output. If no level is provided, assume `debug`. Option parsing may ignore this flag.
+Set _verbose_ level, in order to provide more information about the loaded data in the output. Error reporting during option parsing may ignore this flag.
 
-### `--progress` (_bool_, default: `false`)
+### `--loading-progress` (_bool_, default: `false`)
 
 Show a _progress bar_ when loading the file.
 
@@ -227,7 +227,7 @@ Set the opacity of the backdrop behind text information such as FPS, filename, m
 
 ## Material options
 
-### `-o`, `--point-sprites=<none|sphere|gaussian|circle|stddev|bound|cross>` (_string_, default: `none`)
+### `-o`, `--point-sprites=<none|sphere|gaussian|circle|stddev|bound|cross>` (_string_, default: `none`, implicit: `sphere`)
 
 Select _points sprites_ types to show instead of the geometry.
 
@@ -385,23 +385,23 @@ Enable scalar coloring if present in the file. If `--coloring-array` is not set,
 The coloring array name to use when coloring.
 Use `--verbose` to recover the usable array names.
 
-### `-y`, `--comp=<comp_index>` (_int_, default: `-1`)
+### `-y`, `--coloring-component=<comp_index>` (_int_, default: `-1`, implicit: `-2`)
 
 Specify the _component from the scalar_ array to color with.
-Use with the scalar option. -1 means _magnitude_. -2 or the short option, -y, means _direct values_.
+Use with the scalar option. -1 means _magnitude_. -2 means _direct values_.
 When using _direct values_, components are used as L, LA, RGB, RGBA values depending on the number of components.
 
-### `-c`, `--cells` (_bool_, default: `false`)
+### `-c`, `--coloring-by-cells` (_bool_, default: `false`)
 
 Specify that the scalar array is to be found _on the cells_ instead of on the points.
 Use with the scalar option.
 
-### `--range=<min,max>` (_vector\<double\>_)
+### `--coloring-range=<min,max>` (_vector\<double\>_)
 
 Set the _coloring range_. Automatically computed by default.
 Use with the scalar option.
 
-### `-b`, `--bar` (_bool_, default: `false`)
+### `-b`, `--coloring-scalar-bar` (_bool_, default: `false`)
 
 Show _scalar bar_ of the coloring by array.
 Use with the scalar option.
@@ -422,11 +422,11 @@ Use with the scalar option.
 
 Set the number of distinct colors from [1, N] will be used in the colormap. Any values outside the valid range will result in smooth shading.
 
-### `--opacity-map-file=<name>` (_string_)
+### `--volume-opacity-file=<name>` (_string_)
 
 Set an _opacity map file for the coloring_.
 
-### `--opacity-map=<value, opacity>` (_vector\<double\>_, default: `0.0,0.0,1.0,1.0`)
+### `--volume-opacity-map=<value, opacity>` (_vector\<double\>_, default: `0.0,0.0,1.0,1.0`)
 
 Set a _custom opacity map for the coloring_.
 Only used with volume rendering for now.
@@ -436,7 +436,7 @@ Ignored if `--opacity-map-file` option is specified.
 
 Enable _volume rendering_. It is only functional for 3D image data (VTKXMLVTI, DICOM, NRRD, MetaImage files) and will display nothing with other formats. It forces coloring.
 
-### `-i`, `--inverse` (_bool_, default: `false`)
+### `-i`, `--volume-inverse` (_bool_, default: `false`)
 
 Inverse the linear opacity function used for volume rendering.
 
@@ -484,17 +484,17 @@ Set the camera to use the orthographic projection. Model-specified by default.
 
 Enable _OSPRay raytracing_. Requires OSPRay raytracing to be enabled in the linked VTK dependency.
 
-### `--samples=<samples>` (_int_, default: `5`)
+### `--raytracing-samples=<samples>` (_int_, default: `5`)
 
 Set the number of _samples per pixel_ when using raytracing.
 
-### `-d`, `--denoise` (_bool_, default: `false`)
+### `-d`, `--raytracing-denoise` (_bool_, default: `false`)
 
 _Denoise_ the image when using raytracing.
 
 ## PostFX (OpenGL) options
 
-### `-p`, `--blending` (_string_, default: `ddp`)
+### `-p`, `--blending` (_string_, default: `none`, implicit: `ddp`)
 
 Enable _translucency blending support_.
 This is a technique used to correctly render translucent objects (`ddp`: dual depth peeling for quality, `sort`: for gaussians, `sort_cpu`: for gaussians, `stochastic`: fast).
@@ -509,9 +509,9 @@ This is a technique used to correctly render translucent objects (`ddp`: dual de
 
 Enable _ambient occlusion_. This is a technique used to improve the depth perception of the object.
 
-### `-a`, `--anti-aliasing` (_string_, default: `fxaa`)
+### `-a`, `--anti-aliasing` (_string_, default: `none`, implicit: `fxaa`)
 
-Anti-aliasing method (`fxaa`: fast, `ssaa`: quality, `taa`: balanced)
+Anti-aliasing method (`fxaa`: fast, `ssaa`: quality, `taa`: balanced, `none`: no anti aliasing)
 
 > [!WARNING]
 > `taa` forces rendering of the scene at regular interval and will introduce ghosting artifacts on animated scenes.
@@ -532,11 +532,11 @@ Only opaque objects are displayed, translucent and volumetric objects are ignore
 
 ## Testing options
 
-### `--ref=<png file>` (_string_)
+### `--reference=<png file>` (_string_)
 
 Render and compare with the provided _reference image_, for testing purposes. Use with output option to generate new baselines and diff images.
 
-### `--ref-threshold=<threshold>` (_double_, default: `0.04`)
+### `--reference-threshold=<threshold>` (_double_, default: `0.04`)
 
 Set the _comparison threshold_ to trigger a test failure or success. The default (0.04) correspond to almost visually identical images.
 
@@ -559,6 +559,10 @@ Some rendering options are not compatible between them, here is the precedence o
 ## Options syntax
 
 To turn on/off boolean options, it is possible to write `--option=true` and `--option=false`, eg `--points-sprites=false`.
+
+If an option has an "implicit" value, it means that the options can be used without specifying the value to use the implicit value.
+
+The default correspond to the value without any (configuration file)[06-CONFIGURATION_FILE.md], which F3D is usually distributed with.
 
 As documented, the `--option=value` syntax should be preferred. The syntax `--option value` can have unintended effect with positional arguments.
 
