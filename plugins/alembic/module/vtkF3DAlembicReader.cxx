@@ -735,7 +735,7 @@ int vtkF3DAlembicReader::RequestInformation(vtkInformation* vtkNotUsed(request),
 
   double timeRange[2] = { std::numeric_limits<double>::infinity(),
     -std::numeric_limits<double>::infinity() };
-  std::vector<double> timeSteps {0};
+  std::vector<double> timeSteps{ 0 };
   this->Internals->ComputeTimeRangeAndSteps(timeRange[0], timeRange[1], timeSteps);
 
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
@@ -745,7 +745,8 @@ int vtkF3DAlembicReader::RequestInformation(vtkInformation* vtkNotUsed(request),
   }
   if (timeSteps.size() > 0)
   {
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), timeSteps.data(), timeSteps.size());
+    outInfo->Set(
+      vtkStreamingDemandDrivenPipeline::TIME_STEPS(), timeSteps.data(), timeSteps.size());
   }
 
   return 1;
