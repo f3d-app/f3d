@@ -621,7 +621,6 @@ public:
     {
       const auto& [parent, ohead] = objects.top();
       const Alembic::AbcGeom::IObject obj(parent, ohead.getName());
-      int numSamples = 0;
       Alembic::Abc::TimeSamplingPtr ts;
       if (Alembic::AbcGeom::IXform::matches(ohead))
       {
