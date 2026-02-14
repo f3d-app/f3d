@@ -1,9 +1,9 @@
-#include <vtkNew.h>
 #include <vtkAlgorithm.h>
-#include <vtkTestUtilities.h>
-#include <vtkInformationVector.h>
 #include <vtkInformation.h>
+#include <vtkInformationVector.h>
+#include <vtkNew.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
+#include <vtkTestUtilities.h>
 
 #include "vtkF3DAlembicReader.h"
 
@@ -17,15 +17,21 @@ int TestF3DAlembicReaderRequestInformation(int vtkNotUsed(argc), char* argv[])
   reader->UpdateInformation();
   vtkInformation* readerInfo = reader->GetOutputInformation(0);
   double* readerTimeSteps = nullptr;
-  if (readerInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS())) {
+  if (readerInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
+  {
     readerTimeSteps = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-  } else {
+  }
+  else
+  {
     return EXIT_FAILURE;
   }
   double* readerTimeRange = nullptr;
-  if (readerInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE())) {
+  if (readerInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()))
+  {
     readerTimeRange = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
-  } else {
+  }
+  else
+  {
     return EXIT_FAILURE;
   }
 
