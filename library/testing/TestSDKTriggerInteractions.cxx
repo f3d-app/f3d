@@ -117,6 +117,16 @@ int TestSDKTriggerInteractions([[maybe_unused]] int argc, [[maybe_unused]] char*
       f3d::interactor::InputAction::RELEASE, f3d::interactor::MouseButton::RIGHT);
   });
 
+  // Trigger cheatsheet search filtering
+  helper("TestSDKTriggerInteractionsCheatSheetSearch", [](f3d::engine& engine) {
+    engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "H");
+    engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "H");
+    engine.getInteractor().triggerTextCharacter('e');
+    engine.getInteractor().triggerTextCharacter('d');
+    engine.getInteractor().triggerTextCharacter('g');
+    engine.getInteractor().triggerTextCharacter('e');
+  });
+
   // following calls are only there for coverage
   // there is no interactor style action associated with these yet
   helper([](f3d::engine& engine) {
