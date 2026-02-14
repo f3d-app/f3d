@@ -121,6 +121,11 @@ int TestSDKTriggerInteractions([[maybe_unused]] int argc, [[maybe_unused]] char*
   helper("TestSDKTriggerInteractionsCheatSheetSearch", [](f3d::engine& engine) {
     engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "H");
     engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "H");
+    engine.getInteractor().triggerMousePosition(80, 30);
+    engine.getInteractor().triggerMouseButton(
+      f3d::interactor::InputAction::PRESS, f3d::interactor::MouseButton::LEFT);
+    engine.getInteractor().triggerMouseButton(
+      f3d::interactor::InputAction::RELEASE, f3d::interactor::MouseButton::LEFT);
     engine.getInteractor().triggerTextCharacter('e');
     engine.getInteractor().triggerTextCharacter('d');
     engine.getInteractor().triggerTextCharacter('g');

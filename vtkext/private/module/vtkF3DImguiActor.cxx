@@ -767,7 +767,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   ImGui::Begin("CheatSheet", nullptr, flags);
 
-  if (this->Pimpl->SearchFocusRequested || !ImGui::IsAnyItemActive())
+  if (this->Pimpl->SearchFocusRequested)
   {
     ImGui::SetKeyboardFocusHere();
     this->Pimpl->SearchFocusRequested = false;
@@ -775,7 +775,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
   ImGui::PushStyleColor(ImGuiCol_FrameBg, F3DStyle::imgui::GetMidColor());
   ImGui::PushItemWidth(-1);
   ImGui::InputTextWithHint("##SearchFilter", "Search...", this->Pimpl->SearchFilter.data(),
-    this->Pimpl->SearchFilter.size());
+    this->Pimpl->SearchFilter.size(), ImGuiInputTextFlags_EscapeClearsAll);
   ImGui::PopItemWidth();
   ImGui::PopStyleColor();
 
