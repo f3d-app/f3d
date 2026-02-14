@@ -143,10 +143,19 @@ public:
    * Return true if provided file in path uses a supported extension, exists and its header
    * correspond to a supported file format, false otherwise.
    * header check is only performed with VTK >= 9.6.20260228
-   * scene.force_reader is taken into account and plugin should be loaded for their readers to be
-   * found.
+   * If scene.force_reader is set, no check will be done and this returns true if the forced reader exists.
+   * Plugin should be loaded for their readers to be found.
    */
-  [[nodiscard]] virtual bool supports(const std::filesystem::path& filePath) = 0;
+  [[nodiscard]] virtual bool supports(const std::filesystem::path& filePath) const = 0;
+
+  /**
+   * Return true if provided buffer contains an header
+   * corresponding to a supported file format, false otherwise.
+   * With VTK < 9.6.20260228, the header check will always considered valid.
+   * If scene.force_reader is set, no check will be done and this returns true if the forced reader exists.
+   * Plugin should be loaded for their readers to be found.
+   */
+  [[nodiscard]] virtual bool supports(const std::byte* buffer, std::size_t size) const = 0;
 
   /**
    * Load added files at provided time value if they contain any animation

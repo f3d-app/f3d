@@ -43,7 +43,7 @@ factory::plugin_initializer_t factory::getStaticInitializer(const std::string& p
 }
 
 //----------------------------------------------------------------------------
-reader* factory::getReader(const std::string& fileName, std::optional<std::string> forceReader)
+reader* factory::getReader(const std::string& fileName, std::optional<std::string> forceReader) const
 {
   int bestScore = -1;
   reader* bestReader = nullptr;
@@ -72,7 +72,7 @@ reader* factory::getReader(const std::string& fileName, std::optional<std::strin
 
 //----------------------------------------------------------------------------
 reader* factory::getReader(
-  const std::byte* buffer, std::size_t size, std::optional<std::string> forceReader)
+  const std::byte* buffer, std::size_t size, std::optional<std::string> forceReader) const
 {
   int bestScore = -1;
   reader* bestReader = nullptr;

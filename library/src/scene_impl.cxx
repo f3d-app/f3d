@@ -505,10 +505,17 @@ scene& scene_impl::removeAllLights()
 }
 
 //----------------------------------------------------------------------------
-bool scene_impl::supports(const fs::path& filePath)
+bool scene_impl::supports(const fs::path& filePath) const
 {
   return f3d::factory::instance()->getReader(
            filePath.string(), this->Internals->Options.scene.force_reader) != nullptr;
+}
+
+//----------------------------------------------------------------------------
+bool scene_impl::supports(const std::byte* buffer, std::size_t size) const
+{
+  return f3d::factory::instance()->getReader(buffer, size,
+           this->Internals->Options.scene.force_reader) != nullptr;
 }
 
 //----------------------------------------------------------------------------
