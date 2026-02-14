@@ -24,6 +24,9 @@ public:
     KeyPressEvent
   };
 
+  /**
+   * Interaction mode determining how mouse movements are mapped to camera actions.
+   */
   enum InteractionMode
   {
     DEFAULT = 0,
@@ -31,6 +34,9 @@ public:
     TWO_D = 2
   };
 
+  /**
+   * Set the interaction mode.
+   */
   vtkSetMacro(InteractionMode, int);
 
   ///@{
