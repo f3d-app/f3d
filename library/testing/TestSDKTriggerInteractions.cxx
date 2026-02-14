@@ -132,11 +132,18 @@ int TestSDKTriggerInteractions([[maybe_unused]] int argc, [[maybe_unused]] char*
     engine.getInteractor().triggerTextCharacter('e');
   });
 
-  // Trigger cheatsheet keybind search mode (coverage)
-  helper([](f3d::engine& engine) {
+  // Trigger cheatsheet keybind search mode
+  helper("TestSDKTriggerInteractionsCheatSheetKeybindSearch", [](f3d::engine& engine) {
     engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "H");
     engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "H");
-    engine.getInteractor().triggerMousePosition(150, 48);
+    engine.getWindow().render();
+    engine.getInteractor().triggerMousePosition(200, 55);
+    engine.getWindow().render();
+    engine.getInteractor().triggerMouseButton(
+      f3d::interactor::InputAction::PRESS, f3d::interactor::MouseButton::LEFT);
+    engine.getInteractor().triggerMouseButton(
+      f3d::interactor::InputAction::RELEASE, f3d::interactor::MouseButton::LEFT);
+    engine.getInteractor().triggerMousePosition(80, 30);
     engine.getInteractor().triggerMouseButton(
       f3d::interactor::InputAction::PRESS, f3d::interactor::MouseButton::LEFT);
     engine.getInteractor().triggerMouseButton(
