@@ -43,7 +43,7 @@ if(F3D_PLUGIN_BUILD_VDB)
 endif()
 
 if(F3D_PLUGIN_BUILD_PDAL)
-  f3d_test(NAME TestE57 DATA bunnyInt19.e57 ENV "LD_LIBRARY_PATH=${F3D_SOURCE_DIR}/testing/data:/__w/f3d/f3d/dependencies/install/lib" ARGS --load-plugins=pdal)
+  f3d_test(NAME TestLAZ DATA simple.laz ARGS --load-plugins=pdal --scalar-coloring --coloring-array=Color --coloring-component=-2)
 endif()
 
 include(tests.watch.cmake)

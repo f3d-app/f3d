@@ -15,8 +15,8 @@ f3d_plugin_init()
 
 f3d_plugin_declare_reader(
     NAME PDAL
-    EXTENSIONS e57
-    MIMETYPES model/e57
+    EXTENSIONS laz
+    MIMETYPES model/las
     VTK_READER vtkPDALReader
     FORMAT_DESCRIPTION "E57 Lidar Point Cloud Format"
 )
