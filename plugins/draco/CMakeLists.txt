@@ -51,7 +51,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
     STANDARD_CAN_READ
   )
 
-  # GLB reader will be removed once 9.6.0 support is dropped
+  # GLB reader will be removed once VTK v9.6 support is dropped
   f3d_plugin_declare_reader(
     NAME GLBDraco
     EXTENSIONS glb

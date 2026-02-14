@@ -76,7 +76,7 @@ f3d_plugin_declare_reader(
   STANDARD_CAN_READ
 )
 
-# GLB reader will be removed once VTK 9.6.0 support is dropped
+# GLB reader will be removed once VTK v9.6 support is dropped
 f3d_plugin_declare_reader(
   NAME GLB
   SCORE 60 # Higher priority than draco
