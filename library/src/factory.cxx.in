@@ -4,7 +4,6 @@
 
 #include <vtkMemoryResourceStream.h>
 
-#include <iostream>
 // clang-format off
 ${F3D_STATIC_PLUGIN_EXTERN}
 // clang-format on
@@ -53,7 +52,6 @@ reader* factory::getReader(const std::string& fileName, std::optional<std::strin
   {
     for (const auto& reader : plugin->getReaders())
     {
-      std::cout<<reader->getName()<<std::endl;
       if (forceReader)
       {
         if (reader->getName() == *forceReader)
