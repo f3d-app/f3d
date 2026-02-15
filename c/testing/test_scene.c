@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 
-int test_scene_c_api()
+int test_scene()
 {
   f3d_engine_autoload_plugins();
 
@@ -65,18 +65,14 @@ int test_scene_c_api()
   // no exception should be thrown here, it should return 0
   if (f3d_scene_add(scene, "invalid_path") == 1)
   {
-      return 1;
+    return 1;
   }
 
-  const char* invalid_paths[] = {
-      "invalid_path1",
-      "invalid_path2",
-      "invalid_path3"
-  };
+  const char* invalid_paths[] = { "invalid_path1", "invalid_path2", "invalid_path3" };
 
   if (f3d_scene_add_multiple(scene, invalid_paths, 3) == 1)
   {
-      return 1;
+    return 1;
   }
 
   // Test the rest of the API

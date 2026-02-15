@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-int test_camera_c_api()
+int test_camera()
 {
   f3d_engine_t* engine = f3d_engine_create(1);
   if (!engine)

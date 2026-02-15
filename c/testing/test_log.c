@@ -18,7 +18,7 @@ static void test_log_callback(f3d_log_verbose_level_t level, const char* message
   }
 }
 
-int test_log_c_api()
+int test_log()
 {
   int failed = 0;
 
