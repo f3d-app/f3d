@@ -2,10 +2,14 @@
 #if @_has_supports_stream@
 bool canRead(vtkResourceStream* stream) const override
 {
+#if @_has_supports_can_read@
   std::string hint;
   bool ret = vtkF3DImageImporter::CanReadFile(stream, hint);
   ret &= (hint == "@_image_format@");
   return ret;
+#else
+  return true;
+#endif
 }
 #endif
 

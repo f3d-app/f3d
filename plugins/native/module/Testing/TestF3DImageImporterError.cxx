@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-int TestF3DImageImporterError(int vtkNotUsed(argc), char* argv[])
+int TestF3DImageImporterError(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
 {
   // Suppress VTK error output during this test
   vtkNew<vtkCallbackCommand> nullCallback;

@@ -1,4 +1,9 @@
-set(vtkextNativeTests_list TestF3DImageImporterError.cxx)
+set(vtkextNativeTests_list "")
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
+  list(APPEND vtkextNativeTests_list
+    TestF3DImageImporterError.cxx)
+endif()
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12087
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)

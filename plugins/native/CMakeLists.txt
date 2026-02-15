@@ -165,11 +165,16 @@ f3d_plugin_declare_reader(
   EXCLUDE_FROM_THUMBNAILER
 )
 
-set(_SUPPORTS_STREAM)
 set(_has_supports_stream 0)
+set(_SUPPORTS_STREAM)
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251210)
   set(_SUPPORTS_STREAM SUPPORTS_STREAM)
   set(_has_supports_stream 1)
+endif()
+
+set(_has_supports_can_read 0)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  set(_has_supports_can_read 1)
 endif()
 
 set(_image_formats "png;jpeg;bmp;tga;hdr")
