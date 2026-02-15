@@ -17,6 +17,22 @@ public:
   static vtkF3DImageImporter* New();
   vtkTypeMacro(vtkF3DImageImporter, vtkF3DImporter);
 
+  ///@{
+  /**
+   * Return true if, after a quick check of file header, it looks like the provided stream
+   * can be read. Return false if it is sure it cannot be read as a stream.
+   *
+   * hint is provided to be passed as an ImageHint
+   */
+  static bool CanReadFile(vtkResourceStream* stream, std::string& hint);
+  static bool CanReadFile(vtkResourceStream* stream);
+  ///@}
+
+  /**
+   * Set the image hint create an image reader from
+   */
+  vtkSetMacro(ImageHint, std::string);
+
 protected:
   vtkF3DImageImporter() = default;
   ~vtkF3DImageImporter() override = default;
@@ -26,6 +42,8 @@ protected:
 private:
   vtkF3DImageImporter(const vtkF3DImageImporter&) = delete;
   void operator=(const vtkF3DImageImporter&) = delete;
+
+  std::string ImageHint;
 };
 
 #endif

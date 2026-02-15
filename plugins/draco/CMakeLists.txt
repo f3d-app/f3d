@@ -23,7 +23,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.drc
   VTK_READER vtkF3DDracoReader
   SUPPORTS_STREAM
-  STANDARD_CAN_READ
+  CAN_READ STATIC
   FORMAT_DESCRIPTION "Draco"
 )
 
@@ -48,7 +48,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
     FORMAT_DESCRIPTION "GL Transmission Format"
     SCORE ${_GLTF_SCORE}
     ${_SUPPORTS_STREAM}
-    STANDARD_CAN_READ
+    CAN_READ STATIC
   )
 
   # GLB reader will be removed once VTK v9.6 support is dropped
@@ -60,7 +60,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
     FORMAT_DESCRIPTION "GL Transmission Format (binary)"
     SCORE ${_GLTF_SCORE}
     ${_SUPPORTS_STREAM}
-    STANDARD_CAN_READ
+    CAN_READ STATIC
     CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/glb.inl"
   )
 endif()

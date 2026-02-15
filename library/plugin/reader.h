@@ -89,14 +89,10 @@ public:
   }
 
   /**
-   * Return true if this reader could be able to read provided stream,
+   * Should return true if this reader could be able to read provided stream,
    * false if it is sure it cannot.
-   * Default implementation returns true.
    */
-  virtual bool canRead(vtkResourceStream*) const
-  {
-    return true;
-  }
+  virtual bool canRead(vtkResourceStream*) const = 0;
 
   /**
    * Get the score of this reader.

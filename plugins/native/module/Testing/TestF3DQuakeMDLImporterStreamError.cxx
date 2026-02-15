@@ -1,7 +1,7 @@
+#include "vtkF3DQuakeMDLImporter.h"
+
 #include <vtkFileResourceStream.h>
 #include <vtkNew.h>
-
-#include "vtkF3DQuakeMDLImporter.h"
 
 #include <iostream>
 

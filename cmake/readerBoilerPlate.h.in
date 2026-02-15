@@ -154,6 +154,7 @@ public:
 #endif
 #endif
 
+  using reader::canRead;
 #if @F3D_READER_HAS_SUPPORTS_STREAM@
   /**
    * Return true if this reader supports stream
@@ -164,8 +165,7 @@ public:
     return true;
   }
 
-#if @F3D_READER_HAS_STANDARD_CAN_READ@
-  using reader::canRead;
+#if @F3D_READER_STATIC_CAN_READ@ || @F3D_READER_MEMBER_CAN_READ@
   /**
    * Return true if this reader could be able to read provided stream,
    * false if it is sure it cannot.
@@ -173,18 +173,23 @@ public:
   bool canRead([[maybe_unused]] vtkResourceStream* stream) const override
   {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260128)
-#if @F3D_READER_HAS_GEOMETRY_READER@
-    return @F3D_READER_VTK_READER@::CanReadFile(stream);
-#else // F3D_READER_HAS_GEOMETRY_READER
-#if @F3D_READER_HAS_SCENE_READER@
-    return @F3D_READER_VTK_IMPORTER@::CanReadFile(stream);
-#endif
+#if @F3D_READER_STATIC_CAN_READ@
+    return @F3D_READER_VTK_READER_OR_IMPORTER@::CanReadFile(stream);
+#else // CAN_READ
+    vtkNew<@F3D_READER_VTK_READER_OR_IMPORTER@> object;
+    return object->CanReadFile(stream);
 #endif
 #else // VTK_VERSION
     return true;
 #endif
   }
 #endif
+#else // SUPPORTS_STREAM
+  bool canRead([[maybe_unused]] vtkResourceStream* stream) const override
+  {
+    // streams not supported, always returns true
+    return true;
+  }
 #endif
 
 #if @F3D_READER_HAS_CUSTOM_CODE@
