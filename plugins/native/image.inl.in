@@ -1,19 +1,19 @@
+// clang-format off
+#if @_has_supports_stream@
 bool canRead(vtkResourceStream* stream) const override
 {
   std::string hint;
   bool ret = vtkF3DImageImporter::CanReadFile(stream, hint);
-  // clang-format off
   ret &= (hint == "@_image_format@");
-  // clang-format on
   return ret;
 }
+#endif
 
 void applyCustomImporter(vtkImporter* importer, const std::string& vtkNotUsed(fileName),
-  vtkResourceStream* stream) const override
+  vtkResourceStream* vtkNotUsed(stream)) const override
 {
   // Set hint
   vtkF3DImageImporter* imageImporter = vtkF3DImageImporter::SafeDownCast(importer);
-  // clang-format off
   imageImporter->SetImageHint("@_image_format@");
-  // clang-format on
 }
+// clang-format on
