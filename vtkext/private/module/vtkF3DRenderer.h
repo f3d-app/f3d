@@ -394,6 +394,11 @@ public:
   vtkGetMacro(EnableColoring, bool);
   ///@}
 
+  /**
+   * Set checkerboard mode
+   */
+  void SetEnableCheckerBoard(bool enable);
+
   ///@{
   /**
    * Set/Get if using point or cell data coloring
@@ -754,6 +759,10 @@ private:
   std::optional<fs::path> TextureMaterial;
   std::optional<fs::path> TextureEmissive;
   std::optional<fs::path> TextureNormal;
+
+  bool EnableCheckerBoard = false;
+  vtkSmartPointer<vtkImageReader2> CheckerBoardReader;
+  vtkSmartPointer<vtkTexture> CheckerBoardTexture;
 
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorTransferFunction;
   bool ExpandingRangeSet = false;

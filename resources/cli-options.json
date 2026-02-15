@@ -432,6 +432,12 @@
           "valueHelper": "<file path>"
         },
         {
+          "longName": "checkerboard",
+          "helpText": "Apply checkerboard texture to objects",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
           "longName": "normal-scale",
           "helpText": "Normal scale affects the strength of the normal deviation from the normal texture",
           "valueHelper": "<normalScale>"
