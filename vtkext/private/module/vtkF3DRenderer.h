@@ -647,6 +647,11 @@ private:
   void ConfigurePointSprites();
 
   /**
+   * Configure Normal Glyphs for all actors
+   */
+  void ConfigureNormalGlyphs();
+
+  /**
    * Updates the axis widget size based on the window size
    */
   void UpdateAxisWidgetSize();
@@ -774,6 +779,8 @@ private:
   bool ColoringPointSpritesMappersConfigured = false;
   bool VolumePropsAndMappersConfigured = false;
   bool ColoringConfigured = false;
+
+  bool NormalGlyphsConfigured = false;
 
   std::optional<double> Opacity;
   std::optional<double> Roughness;

@@ -453,11 +453,13 @@ bool vtkF3DMetaImporter::Update()
       double actorBounds[6];
       actor->GetBounds(actorBounds);
 
+      constexpr double normalGlyphScaleMultiplier = 0.05;
+
       double dx = actorBounds[1] - actorBounds[0];
       double dy = actorBounds[3] - actorBounds[2];
       double dz = actorBounds[5] - actorBounds[4];
       double diagonal = std::sqrt(dx * dx + dy * dy + dz * dz);
-      double glyphScale = 0.05 * diagonal;
+      double glyphScale = normalGlyphScaleMultiplier * diagonal;
 
       vtkNew<vtkArrowSource> arrowSource;
       ngs.GlyphMapper->SetInputData(points);
