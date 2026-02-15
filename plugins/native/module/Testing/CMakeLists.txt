@@ -32,3 +32,11 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
     PROPERTIES
     FAIL_REGULAR_EXPRESSION "")
 endif()
+
+if (F3D_MODULE_EXR)
+  target_compile_definitions(vtkextNativeTests PRIVATE F3D_MODULE_EXR)
+endif ()
+
+if (F3D_MODULE_WEBP)
+  target_compile_definitions(vtkextNativeTests PRIVATE F3D_MODULE_WEBP)
+endif ()

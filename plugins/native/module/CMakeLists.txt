@@ -13,10 +13,3 @@ vtk_module_add_module(f3d::vtkextNative
 
 vtk_module_set_properties(f3d::vtkextNative CXX_STANDARD 17)
 
-if (F3D_MODULE_EXR)
-  target_compile_definitions(f3d::vtkextNative PRIVATE F3D_MODULE_EXR)
-endif ()
-
-if (F3D_MODULE_WEBP)
-  target_compile_definitions(f3d::vtkextNative PRIVATE F3D_MODULE_WEBP)
-endif ()
