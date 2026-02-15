@@ -16,6 +16,7 @@
 #include "vtkF3DSolidBackgroundPass.h"
 #include "vtkF3DUserRenderPass.h"
 
+#include <vtkArrowSource.h>
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -27,6 +28,7 @@
 #include <vtkCullerCollection.h>
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkFloatArray.h>
+#include <vtkGlyph3D.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
@@ -328,6 +330,7 @@ void vtkF3DRenderer::Initialize()
   this->ScalarBarActorConfigured = false;
   this->CheatSheetConfigured = false;
   this->ColoringConfigured = false;
+  this->NormalGlyphsConfigured = false;
 
   // create ImGui context if F3D_MODULE_UI is enabled
   this->UIActor->Initialize(vtkOpenGLRenderWindow::SafeDownCast(this->RenderWindow));
@@ -2093,6 +2096,11 @@ void vtkF3DRenderer::UpdateActors()
     this->ConfigureColoring();
   }
 
+  if (!this->NormalGlyphsConfigured)
+  {
+    this->ConfigureNormalGlyphs();
+  }
+
   this->ConfigureHDRI();
 
   if (!this->MetaDataConfigured)
@@ -2766,6 +2774,25 @@ void vtkF3DRenderer::ConfigurePointSprites()
   }
 }
 
+void vtkF3DRenderer::ConfigureNormalGlyphs()
+{
+  bool normalGlyphsVisible =
+    !this->UseRaytracing && !this->UsePointSprites && this->UseNormalGlyphs;
+  for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
+  {
+    if (normalGlyphsVisible && !normalGlyph.InputDataHasNormals)
+    {
+      F3DLog::Print(F3DLog::Severity::Warning,
+        "Data does not contain any normals to display the normal glyphs with");
+      continue;
+    }
+
+    normalGlyph.Actor->SetVisibility(normalGlyphsVisible);
+  }
+
+  this->NormalGlyphsConfigured = true;
+}
+
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowScalarBar(bool show)
 {
@@ -2777,16 +2804,29 @@ void vtkF3DRenderer::ShowScalarBar(bool show)
   }
 }
 
+// ---------------------------------------------------------------------------
+void vtkF3DRenderer::SetUseNormalGlyphs(bool use)
+{
+  if (this->UseNormalGlyphs != use)
+  {
+    this->CheatSheetConfigured = false;
+    this->NormalGlyphsConfigured = false;
+    this->UseNormalGlyphs = use;
+  }
+}
+
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUsePointSprites(bool use)
 {
   if (this->UsePointSprites != use)
   {
     this->UsePointSprites = use;
-    this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
     this->PointSpritesConfigured = false;
   }
+
+  // Need to update the state of the normal glyphs if point sprites state updates
+  this->NormalGlyphsConfigured = false;
 }
 
 //----------------------------------------------------------------------------
