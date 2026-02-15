@@ -29,7 +29,8 @@ void vtkF3DImageImporter::ImportActors(vtkRenderer* renderer)
   }
 
   vtkSmartPointer<vtkImageReader2> reader;
-  reader.TakeReference(vtkImageReader2Factory::CreateImageReader2FromExtension(this->ImageHint.c_str()));
+  reader.TakeReference(
+    vtkImageReader2Factory::CreateImageReader2FromExtension(this->ImageHint.c_str()));
   if (!reader)
   {
     vtkErrorMacro("Could not find a suitable image reader");

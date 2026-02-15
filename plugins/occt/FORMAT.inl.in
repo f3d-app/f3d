@@ -1,4 +1,6 @@
+// clang-format off
 #if @_not_iges@
+// clang-format on
 bool canRead(vtkResourceStream* stream) const override
 {
   vtkF3DOCCTReader::FILE_FORMAT format;
