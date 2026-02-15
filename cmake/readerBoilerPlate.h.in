@@ -178,23 +178,23 @@ public:
 #else // CAN_READ
     vtkNew<@F3D_READER_VTK_READER_OR_IMPORTER@> object;
     return object->CanReadFile(stream);
-#endif
+#endif // F3D_READER_STATIC_CAN_READ
 #else // VTK_VERSION
     return true;
-#endif
+#endif // VTK_VERSION
   }
-#endif
+#endif //STATIC OR MEMBER
 #else // SUPPORTS_STREAM
   bool canRead([[maybe_unused]] vtkResourceStream* stream) const override
   {
     // streams not supported, always returns true
     return true;
   }
-#endif
+#endif // SUPPORTS_STREAM
 
 #if @F3D_READER_HAS_CUSTOM_CODE@
 #include "@F3D_READER_CUSTOM_CODE@"
-#endif
+#endif // F3D_READER_HAS_CUSTOM_CODE
 
 };
 
