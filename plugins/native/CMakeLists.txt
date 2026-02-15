@@ -94,6 +94,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS mha mhd
   MIMETYPES application/vnd.mhd
   VTK_READER vtkMetaImageReader
+  SCORE 40 # No proper CanReadFile implementation
   FORMAT_DESCRIPTION "MetaImage"
 )
 
@@ -102,6 +103,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS nrrd nhdr
   MIMETYPES application/vnd.nrrd
   VTK_READER vtkNrrdReader
+  SCORE 40 # No proper CanReadFile implementation
   FORMAT_DESCRIPTION "Nearly Raw Raster Data"
 )
 
@@ -158,6 +160,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS tiff tif
   MIMETYPES application/x-tgif
   VTK_READER vtkTIFFReader
+  SCORE 40 # No proper CanReadFile implementation
   FORMAT_DESCRIPTION "TIFF"
   EXCLUDE_FROM_THUMBNAILER
 )
@@ -271,6 +274,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS wrl vrml
   MIMETYPES model/vrml
   VTK_IMPORTER vtkVRMLImporter
+  SCORE 40 # No proper CanReadFile implementation
   FORMAT_DESCRIPTION "VRML"
 )
 
@@ -355,6 +359,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS vtm
   MIMETYPES application/vnd.vtm
   VTK_READER vtkXMLGenericDataObjectReader
+  SCORE 40 # No proper CanReadFile implementation
   FORMAT_DESCRIPTION "VTK XML MultiBlock"
 )
 

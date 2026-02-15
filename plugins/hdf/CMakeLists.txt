@@ -33,6 +33,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS exo ex2 e g
   MIMETYPES application/vnd.exodus
   VTK_READER vtkExodusIIReader
+  SCORE 40 # No proper CanReadFile implementation
   FORMAT_DESCRIPTION "Exodus II"
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/exodus.inl"
 )
@@ -42,6 +43,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS nc cdf ncdf
   MIMETYPES application/netcdf application/x-netcdf
   VTK_READER vtkNetCDFReader
+  SCORE 40 # No proper CanReadFile implementation
   FORMAT_DESCRIPTION "NetCDF"
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/netcdf.inl"
 )

@@ -87,6 +87,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS igs iges
   MIMETYPES model/iges
   VTK_READER vtkF3DOCCTReader
+  SCORE 40 # No proper CanReadFile implementation
   FORMAT_DESCRIPTION "Initial Graphics Exchange Specification"
   CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/IGES.inl"
   OPTIONS linear_deflection angular_deflection read_wire relative_deflection
