@@ -311,6 +311,12 @@
           "longName": "command-script",
           "helpText": "Path to a script file containing commands to execute",
           "valueHelper": "<file_path>"
+        },
+        {
+          "longName": "normal-glyphs",
+          "helpText": "Enable normal glyphs",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
         }
       ]
     },
