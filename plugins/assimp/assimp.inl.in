@@ -1,22 +1,19 @@
+// clang-format off
+#if @_has_supports_stream@
 bool canRead(vtkResourceStream* stream) const override
 {
   std::string hint;
   bool ret = vtkF3DAssimpImporter::CanReadFile(stream, hint);
-  // clang-format off
   ret &= (hint == "@_assimp_format@");
-  // clang-format on
   return ret;
 }
+#endif
 
 void applyCustomImporter(vtkImporter* importer, const std::string& vtkNotUsed(fileName),
-  vtkResourceStream* stream) const override
+  vtkResourceStream* vtkNotUsed(stream)) const override
 {
-  if (stream)
-  {
-    // Set hint
-    vtkF3DAssimpImporter* assimpImporter = vtkF3DAssimpImporter::SafeDownCast(importer);
-    // clang-format off
-    assimpImporter->SetMemoryHint("@_assimp_format@");
-    // clang-format on
-  }
+  // Set hint
+  vtkF3DAssimpImporter* assimpImporter = vtkF3DAssimpImporter::SafeDownCast(importer);
+  assimpImporter->SetMemoryHint("@_assimp_format@");
 }
+// clang-format on

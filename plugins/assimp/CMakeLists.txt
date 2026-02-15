@@ -22,7 +22,14 @@ endif()
 set(F3D_ASSIMP_VERSION "${assimp_VERSION}" CACHE INTERNAL "")
 message(STATUS "Plugin: assimp ${assimp_VERSION} found")
 
-set(_assimp_formats "fbx;dxf;off;x;3mf")
+set(_SUPPORTS_STREAM)
+set(_has_supports_stream 0)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251016)
+  set(_SUPPORTS_STREAM SUPPORTS_STREAM)
+  set(_has_supports_stream 1)
+endif()
+
+set(_assimp_formats "fbx;dae;dxf;off;x;3mf")
 foreach(_assimp_format IN LISTS _assimp_formats)
   configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/assimp.inl.in"
@@ -31,11 +38,6 @@ foreach(_assimp_format IN LISTS _assimp_formats)
 endforeach()
 
 f3d_plugin_init()
-
-set(_SUPPORTS_STREAM)
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251016)
-  set(_SUPPORTS_STREAM SUPPORTS_STREAM)
-endif()
 
 f3d_plugin_declare_reader(
   NAME FBX
@@ -56,7 +58,7 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "COLLADA"
   ${_SUPPORTS_STREAM}
   CAN_READ CUSTOM
-  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/dae.inl"
+  CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/dae.inl"
 )
 
 f3d_plugin_declare_reader(
