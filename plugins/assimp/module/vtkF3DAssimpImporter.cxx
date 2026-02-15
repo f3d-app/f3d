@@ -133,7 +133,7 @@ public:
                 aLight->mAttenuationLinear, aLight->mAttenuationQuadratic);
               break;
             case aiLightSourceType::aiLightSource_SPOT:
-              if (this->Parent->GetColladaFixup())
+              if (this->Parent->GetMemoryHint() == "dae")
               {
                 // Needed because of https://github.com/assimp/assimp/issues/4949
                 light->SetConeAngle(vtkMath::DegreesFromRadians(aLight->mAngleInnerCone) / 2);
