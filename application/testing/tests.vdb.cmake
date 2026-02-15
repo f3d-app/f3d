@@ -23,7 +23,9 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
   f3d_test(NAME TestVDBPoints DATA sphere_points.vdb ARGS --load-plugins=vdb -o)
 endif()
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251210)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  f3d_test(NAME TestPipedVDBVolume DATA icosahedron.vdb ARGS --load-plugins=vdb --volume --volume-inverse PIPED)
+elseif(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251210)
   f3d_test(NAME TestPipedVDBVolume DATA icosahedron.vdb ARGS --load-plugins=vdb --volume --volume-inverse --force-reader=VDB PIPED)
 endif()
 

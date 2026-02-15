@@ -26,6 +26,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkOpenVDBReader
   FORMAT_DESCRIPTION "VDB"
   ${_SUPPORTS_STREAM}
+  STANDARD_CAN_READ
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/vdb.inl"
 )
 

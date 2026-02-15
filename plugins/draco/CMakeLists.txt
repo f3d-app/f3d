@@ -23,6 +23,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.drc
   VTK_READER vtkF3DDracoReader
   SUPPORTS_STREAM
+  STANDARD_CAN_READ
   FORMAT_DESCRIPTION "Draco"
 )
 
@@ -34,24 +35,32 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
     set(_SUPPORTS_STREAM SUPPORTS_STREAM)
   endif()
 
+  set(_GLTF_SCORE 51) # GLTFDraco should be lower than GLTF
+  if(VTK_VERSION VERSION_LESS 9.6.20260128)
+    set(_GLTF_SCORE 70) # Except with older VTK version where CanReadFile was not implemented
+  endif()
+
   f3d_plugin_declare_reader(
     NAME GLTFDraco
-    SCORE 90
     EXTENSIONS gltf
     MIMETYPES model/gltf+json
     VTK_IMPORTER vtkF3DGLTFDracoImporter
-    ${_SUPPORTS_STREAM}
     FORMAT_DESCRIPTION "GL Transmission Format"
+    SCORE ${_GLTF_SCORE}
+    ${_SUPPORTS_STREAM}
+    STANDARD_CAN_READ
   )
 
+  # GLB reader will be removed once VTK v9.6 support is dropped
   f3d_plugin_declare_reader(
     NAME GLBDraco
-    SCORE 90
     EXTENSIONS glb
     MIMETYPES model/gltf-binary
     VTK_IMPORTER vtkF3DGLTFDracoImporter
     FORMAT_DESCRIPTION "GL Transmission Format (binary)"
+    SCORE ${_GLTF_SCORE}
     ${_SUPPORTS_STREAM}
+    STANDARD_CAN_READ
     CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/glb.inl"
   )
 endif()
