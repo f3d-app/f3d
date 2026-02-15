@@ -114,7 +114,7 @@ bool vtkF3DImageImporter::CanReadFile(vtkResourceStream* stream)
 }
 
 //------------------------------------------------------------------------------
-bool vtkF3DImageImporter::CanReadFile(vtkResourceStream* stream, std::string& hint)
+bool vtkF3DImageImporter::CanReadFile(vtkResourceStream* stream, [[maybe_unused]] std::string& hint)
 {
   if (!stream)
   {
