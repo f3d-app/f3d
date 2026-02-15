@@ -1557,6 +1557,9 @@ void vtkF3DRenderer::ConfigureTextActors()
     }
   }
 
+  // Font color
+  this->UIActor->SetFontColor(FontColor);
+
   double scaleFactor = this->DPIAware ? F3DUtils::getDPIScale() : 1.0;
 
   this->UIActor->SetFontScale(this->FontScale * scaleFactor);
@@ -1600,6 +1603,18 @@ void vtkF3DRenderer::SetFontScale(const double fontScale)
   if (this->FontScale != fontScale)
   {
     this->FontScale = fontScale;
+    this->TextActorsConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetFontColor(const std::vector<double>& color)
+{
+  assert(color.size() == 3);
+
+  if (this->FontColor != color)
+  {
+    this->FontColor = color;
     this->TextActorsConfigured = false;
   }
 }

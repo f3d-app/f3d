@@ -113,6 +113,7 @@ public:
   void SetPointSize(const std::optional<double>& pointSize);
   void SetFontFile(const std::optional<fs::path>& fontFile);
   void SetFontScale(const double fontScale);
+  void SetFontColor(const std::vector<double>& color);
   void SetDPIAware(bool enable);
   void SetHDRIFile(const std::optional<fs::path>& hdriFile);
   void SetUseImageBasedLighting(bool use) override;
@@ -716,6 +717,8 @@ private:
 
   std::optional<fs::path> FontFile;
   double FontScale = 1.0;
+  std::vector<double> FontColor;
+
   bool DPIAware = false;
 
   double LightIntensity = 1.0;

@@ -34,11 +34,6 @@ const ImVec4 F3DStyle::imgui::GetCompletionColor()
   return intToImVec4(F3DStyle::F3D_GREEN);
 }
 
-const ImVec4 F3DStyle::imgui::GetTextColor()
-{
-  return intToImVec4(F3DStyle::F3D_WHITE);
-}
-
 const ImVec4 F3DStyle::imgui::GetMidColor()
 {
   return intToImVec4(F3DStyle::F3D_GREY);
