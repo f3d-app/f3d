@@ -13,6 +13,7 @@
   <mime-type type="image/vnd.radiance">
     <comment>HDR Radiance Image file</comment>
     <glob pattern="*.hdr"/>
+    <glob pattern="*.pic"/>
   </mime-type>
   <mime-type type="image/x-exr">
     <comment>OpenEXR Image file</comment>
