@@ -66,6 +66,15 @@
   },
   {
     "match-type": "glob",
+    "match": "*.{tga,hdr,webp,exr}",
+    "options": {
+      "camera-direction": "0,0,-1",
+      "camera-orthographic": true,
+      "interaction-style": "2d"
+    }
+  },
+  {
+    "match-type": "glob",
     "match": "*.mdl",
     "options": {
       "up": "+Z"

@@ -151,6 +151,82 @@ f3d_plugin_declare_reader(
   EXCLUDE_FROM_THUMBNAILER
 )
 
+set(_SUPPORTS_STREAM)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260106)
+  set(_SUPPORTS_STREAM SUPPORTS_STREAM)
+endif()
+
+f3d_plugin_declare_reader(
+  NAME PNG
+  EXTENSIONS png
+  MIMETYPES image/png
+  VTK_IMPORTER vtkF3DImageImporter
+  FORMAT_DESCRIPTION "PNG Image"
+  EXCLUDE_FROM_THUMBNAILER
+  ${_SUPPORTS_STREAM}
+)
+
+f3d_plugin_declare_reader(
+  NAME JPEG
+  EXTENSIONS jpg jpeg
+  MIMETYPES image/jpeg
+  VTK_IMPORTER vtkF3DImageImporter
+  FORMAT_DESCRIPTION "JPEG Image"
+  EXCLUDE_FROM_THUMBNAILER
+  ${_SUPPORTS_STREAM}
+)
+
+f3d_plugin_declare_reader(
+  NAME BMP
+  EXTENSIONS bmp
+  MIMETYPES image/bmp
+  VTK_IMPORTER vtkF3DImageImporter
+  FORMAT_DESCRIPTION "BMP Image"
+  EXCLUDE_FROM_THUMBNAILER
+  ${_SUPPORTS_STREAM}
+)
+
+f3d_plugin_declare_reader(
+  NAME TGA
+  EXTENSIONS tga
+  MIMETYPES image/x-tga
+  VTK_IMPORTER vtkF3DImageImporter
+  FORMAT_DESCRIPTION "TGA Image"
+  ${_SUPPORTS_STREAM}
+)
+
+f3d_plugin_declare_reader(
+  NAME HDR
+  EXTENSIONS hdr
+  MIMETYPES image/vnd.radiance
+  VTK_IMPORTER vtkF3DImageImporter
+  FORMAT_DESCRIPTION "HDR Radiance Image"
+  ${_SUPPORTS_STREAM}
+)
+
+if(F3D_MODULE_WEBP)
+  f3d_plugin_declare_reader(
+    NAME WebP
+    EXTENSIONS webp
+    MIMETYPES image/webp
+    VTK_IMPORTER vtkF3DImageImporter
+    FORMAT_DESCRIPTION "WebP Image"
+    EXCLUDE_FROM_THUMBNAILER
+    ${_SUPPORTS_STREAM}
+  )
+endif()
+
+if(F3D_MODULE_EXR)
+  f3d_plugin_declare_reader(
+    NAME EXR
+    EXTENSIONS exr
+    MIMETYPES image/x-exr
+    VTK_IMPORTER vtkF3DImageImporter
+    FORMAT_DESCRIPTION "OpenEXR Image"
+    ${_SUPPORTS_STREAM}
+  )
+endif()
+
 f3d_plugin_declare_reader(
   NAME VRMLReader
   EXTENSIONS wrl vrml

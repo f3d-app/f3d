@@ -85,7 +85,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "edges", "render.show_edges" },
   { "armature", "render.armature.enable" },
   { "camera-index", "scene.camera.index" },
-  { "interaction-trackball", "interactor.trackball" },
+  { "interaction-style", "interactor.style" },
   { "invert-zoom", "interactor.invert_zoom" },
   { "animation-autoplay", "scene.animation.autoplay" },
   { "animation-index", "scene.animation.index" },
@@ -152,6 +152,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
 static inline const std::map<std::string_view, std::string_view> CustomMappingOptions = {
   { "anti-aliasing", "none" },
   { "anti-aliasing-mode", "" },
+  { "interaction-trackball", "false" },
   { "translucency-support", "false" },
   { "blending", "none" },
   { "point-sprites", "none" },

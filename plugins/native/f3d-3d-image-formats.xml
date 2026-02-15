@@ -10,4 +10,12 @@
     <glob pattern="*.mhd"/>
     <glob pattern="*.mha"/>
   </mime-type>
+  <mime-type type="image/vnd.radiance">
+    <comment>HDR Radiance Image file</comment>
+    <glob pattern="*.hdr"/>
+  </mime-type>
+  <mime-type type="image/x-exr">
+    <comment>OpenEXR Image file</comment>
+    <glob pattern="*.exr"/>
+  </mime-type>
 </mime-info>

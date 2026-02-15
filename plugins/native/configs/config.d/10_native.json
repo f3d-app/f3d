@@ -41,6 +41,16 @@
   },
   {
     "match-type": "glob",
+    "match": "*.{png,jpg,jpeg,bmp,tga,hdr,webp,exr}",
+    "options": {
+      "camera-direction": "0,0,-1",
+      "camera-orthographic": true,
+      "interaction-style": "2d",
+      "axis": false
+    }
+  },
+  {
+    "match-type": "glob",
     "match": "*.ply",
     "options": {
       "scalar-coloring": true,
@@ -59,7 +69,7 @@
       "coloring-array": "color",
       "coloring-component": "-2",
       "background-color": "0, 0, 0",
-      "interaction-trackball": true,
+      "interaction-style": "trackball",
       "tone-mapping": false,
       "grid": false,
       "anti-aliasing": "none",

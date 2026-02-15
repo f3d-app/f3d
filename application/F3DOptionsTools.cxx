@@ -588,6 +588,22 @@ std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3
     libf3dOptions.emplace_back(std::make_pair("model.point_sprites.mode", value));
   }
 
+  // handle deprecated interaction-trackball option
+  else if (key == "interaction-trackball")
+  {
+    f3d::log::warn(
+      "--interaction-trackball is deprecated, please use --interaction-style=trackball instead");
+    bool trackball;
+    if (!F3DOptionsTools::Parse(value, trackball))
+    {
+      f3d::log::error("Cannot parse --interaction-trackball value: " + value);
+    }
+    else if (trackball)
+    {
+      libf3dOptions.emplace_back(std::make_pair("interactor.style", "trackball"));
+    }
+  }
+
   else
   {
     // If nothing to convert, just return the input
