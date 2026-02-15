@@ -22,6 +22,7 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   std::string dummyFilename = "dummy.foo";
   std::string nonExistentFilename = "nonExistent.vtp";
   std::string unsupportedFilename = "unsupportedFile.dummy";
+  std::string invalidBodyFilename = "invalid_body.vtp";
   std::string logoFilename = "mb/recursive/f3d.glb";
   std::string sphere1Filename = "mb/recursive/mb_1_0.vtp";
   std::string sphere2Filename = "mb/recursive/mb_2_0.vtp";
@@ -30,6 +31,7 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   std::string dummy = std::string(argv[1]) + "data/" + dummyFilename;
   std::string nonExistent = std::string(argv[1]) + "data/" + nonExistentFilename;
   std::string unsupported = std::string(argv[1]) + "data/" + unsupportedFilename;
+  std::string invalidBody = std::string(argv[1]) + "data/" + invalidBodyFilename;
   std::string logo = std::string(argv[1]) + "data/" + logoFilename;
   std::string sphere1 = std::string(argv[1]) + "data/" + sphere1Filename;
   std::string sphere2 = std::string(argv[1]) + "data/" + sphere2Filename;
@@ -37,9 +39,10 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   std::string world = std::string(argv[1]) + "data/" + worldFilename;
 
   // supports method
-  test("supported with empty filename", !sce.supports(empty));
-  test("supported with dummy filename", !sce.supports(dummy));
-  test("supported with non existent filename", sce.supports(nonExistent));
+  test("not supported with empty filename", !sce.supports(empty));
+  test("not supported with dummy filename", !sce.supports(dummy));
+  test("not supported with non existent filename", !sce.supports(nonExistent));
+  test("supported with invalid body", sce.supports(invalidBody));
   test("supported with default scene format", sce.supports(cube));
   test("supported with full scene format", sce.supports(logo));
 
