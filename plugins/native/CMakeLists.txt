@@ -422,7 +422,7 @@ f3d_plugin_build(
   VTK_MODULES IOXML IOLegacy IOCityGML IOImage IOGeometry IOPLY
   MIMETYPE_XML_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/f3d-3d-formats.xml"
-    "${CMAKE_CURRENT_SOURCE_DIR}/f3d-3d-image-formats.xml"
+    "${CMAKE_CURRENT_SOURCE_DIR}/f3d-image-formats.xml"
     "${CMAKE_CURRENT_SOURCE_DIR}/f3d-vtk-formats.xml"
   CONFIGURATION_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/configs/config.d" "${CMAKE_CURRENT_SOURCE_DIR}/configs/thumbnail.d"
   FREEDESKTOP
