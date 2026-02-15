@@ -1,4 +1,3 @@
-using reader::canRead;
 bool canRead(vtkResourceStream* stream) const override
 {
   std::string hint;

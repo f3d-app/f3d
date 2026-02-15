@@ -26,7 +26,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkF3DWebIFCReader
   FORMAT_DESCRIPTION "Industry Foundation Classes"
   SUPPORTS_STREAM
-  STANDARD_CAN_READ
+  CAN_READ STATIC
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/webifc.inl"
   OPTIONS circle_segments read_openings read_spaces
 )

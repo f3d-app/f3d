@@ -44,6 +44,7 @@ f3d_plugin_declare_reader(
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "Filmbox"
   ${_SUPPORTS_STREAM}
+  CAN_READ CUSTOM
   CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/fbx.inl"
 )
 
@@ -54,6 +55,7 @@ f3d_plugin_declare_reader(
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "COLLADA"
   ${_SUPPORTS_STREAM}
+  CAN_READ CUSTOM
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/dae.inl"
 )
 
@@ -64,6 +66,7 @@ f3d_plugin_declare_reader(
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "AutoCAD DXF"
   ${_SUPPORTS_STREAM}
+  CAN_READ CUSTOM
   CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/dxf.inl"
 )
 
@@ -74,6 +77,7 @@ f3d_plugin_declare_reader(
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "Object File Format"
   ${_SUPPORTS_STREAM}
+  CAN_READ CUSTOM
   CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/off.inl"
 )
 
@@ -84,6 +88,7 @@ f3d_plugin_declare_reader(
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "DirectX File Format"
   ${_SUPPORTS_STREAM}
+  CAN_READ CUSTOM
   CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/x.inl"
 )
 
@@ -95,6 +100,7 @@ f3d_plugin_declare_reader(
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "3D Manufacturing Format"
   ${_SUPPORTS_STREAM}
+  CAN_READ CUSTOM
   CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/3mf.inl"
 )
 

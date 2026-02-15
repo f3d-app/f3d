@@ -42,7 +42,8 @@ else()
   set(F3D_PLUGIN_OCCT_COLORING_SUPPORT ON CACHE INTERNAL "")
 endif()
 
-set(_occt_formats "STEP;IGES;BREP")
+set(_not_iges 1)  
+set(_occt_formats "STEP;BREP")
 if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
   list(APPEND _occt_formats "XBF")
 endif()
@@ -53,6 +54,14 @@ foreach(_occt_format IN LISTS _occt_formats)
     "${CMAKE_CURRENT_BINARY_DIR}/${_occt_format}.inl"
     @ONLY)
 endforeach()
+
+# IGES doesn's support stream, handle the custom code manually  
+set(_not_iges 0)  
+set(_occt_format "IGES")
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/FORMAT.inl.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/${_occt_format}.inl"
+  @ONLY)
 
 f3d_plugin_init()
 
@@ -68,6 +77,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkF3DOCCTReader
   FORMAT_DESCRIPTION "STEP ISO 10303"
   ${_SUPPORTS_STREAM}
+  CAN_READ CUSTOM
   CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/STEP.inl"
   OPTIONS linear_deflection angular_deflection read_wire relative_deflection
 )
@@ -89,6 +99,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkF3DOCCTReader
   FORMAT_DESCRIPTION "Open CASCADE BRep"
   ${_SUPPORTS_STREAM}
+  CAN_READ CUSTOM
   CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/BREP.inl"
   OPTIONS linear_deflection angular_deflection read_wire relative_deflection
 )
@@ -101,6 +112,7 @@ if (F3D_PLUGIN_OCCT_COLORING_SUPPORT)
     VTK_READER vtkF3DOCCTReader
     FORMAT_DESCRIPTION "Open CASCADE XBF"
     ${_SUPPORTS_STREAM}
+    CAN_READ CUSTOM
     CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/XBF.inl"
     OPTIONS linear_deflection angular_deflection read_wire relative_deflection
   )
