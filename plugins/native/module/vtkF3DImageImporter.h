@@ -29,7 +29,8 @@ public:
   ///@}
 
   /**
-   * Set the image hint create an image reader from
+   * Set the image hint that will be used to
+   * create an image reader from.
    */
   vtkSetMacro(ImageHint, std::string);
 
