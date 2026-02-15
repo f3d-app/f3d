@@ -284,6 +284,11 @@ protected:
 
   std::string FontFile = "";
   double FontScale = 1.0;
+
+  /**
+   * Initializing the vector here because its needed in the initialization function,
+   * but set afterwards. This avoids an illegal memory access.
+   */
   std::vector<double> FontColor = { 1.0, 1.0, 1.0 };
 
   double BackdropOpacity = 0.9;
