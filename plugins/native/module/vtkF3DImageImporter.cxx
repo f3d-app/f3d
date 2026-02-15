@@ -11,6 +11,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
+#include <vtkResourceStream.h>
 #include <vtkTexture.h>
 
 //----------------------------------------------------------------------------
@@ -38,7 +39,8 @@ void vtkF3DImageImporter::ImportActors(vtkRenderer* renderer)
     return;
   }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260106)
+// needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12518
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251210)
   if (this->GetStream())
   {
     reader->SetStream(this->GetStream());
@@ -119,6 +121,7 @@ bool vtkF3DImageImporter::CanReadFile(vtkResourceStream* stream, std::string& hi
     return false;
   }
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260128)
   vtkNew<vtkImageReader2Collection> collection;
   vtkImageReader2Factory::GetRegisteredReaders(collection);
   collection->InitTraversal();
@@ -138,4 +141,8 @@ bool vtkF3DImageImporter::CanReadFile(vtkResourceStream* stream, std::string& hi
   }
 
   return false;
+#else
+  // Unreachable
+  return true;
+#endif
 }
