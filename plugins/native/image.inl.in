@@ -1,6 +1,6 @@
 // clang-format off
 #if @_has_supports_stream@
-bool canRead(vtkResourceStream* stream) const override
+bool canRead([[maybe_unused]] vtkResourceStream* stream) const override
 {
 #if @_has_supports_can_read@
   std::string hint;
