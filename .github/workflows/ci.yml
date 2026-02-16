@@ -628,7 +628,6 @@ jobs:
   macos:
     needs: [cache_lfs, cache_vtk_dependency, default_versions]
     if: |
-      contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
     strategy:
@@ -915,6 +914,7 @@ jobs:
   static-analysis:
     needs: [cache_lfs, cache_vtk_dependency, default_versions]
     if: |
+      contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
     strategy:
