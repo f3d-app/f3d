@@ -276,8 +276,14 @@ struct vtkF3DImguiActor::Internals
   vtkSmartPointer<vtkShaderProgram> Program;
   vtkSmartPointer<vtkTextureObject> LogoTexture;
 
+  enum SearchModeEnum
+  {
+    SearchByDescription = 0,
+    SearchByKeybind = 1
+  };
+
   std::array<char, 256> SearchFilter = {};
-  int SearchMode = 0;
+  int SearchMode = SearchByDescription;
   bool SearchFocusRequested = false;
 };
 
@@ -695,7 +701,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
     {
       return true;
     }
-    if (searchMode == 0)
+    if (searchMode == Internals::SearchByDescription)
     {
       return caseInsensitiveContains(desc, filterStr);
     }
@@ -775,12 +781,12 @@ void vtkF3DImguiActor::RenderCheatSheet()
   ImGui::PopItemWidth();
   ImGui::PopStyleColor();
 
-  if (ImGui::RadioButton("Description", &this->Pimpl->SearchMode, 0))
+  if (ImGui::RadioButton("Description", &this->Pimpl->SearchMode, Internals::SearchByDescription))
   {
     this->Pimpl->SearchFocusRequested = true;
   }
   ImGui::SameLine();
-  if (ImGui::RadioButton("Keybind", &this->Pimpl->SearchMode, 1))
+  if (ImGui::RadioButton("Keybind", &this->Pimpl->SearchMode, Internals::SearchByKeybind))
   {
     this->Pimpl->SearchFocusRequested = true;
   }
