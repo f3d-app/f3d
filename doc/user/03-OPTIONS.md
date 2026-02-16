@@ -31,7 +31,7 @@ List available _readers_ and exit. Ignore `--verbose`.
 
 ### `--force-reader=<reader>` (_string_)
 
-Force a specific [reader](02-SUPPORTED_FORMATS.md) to be used, disregarding the file extension and file header.
+Force a specific [reader](02-SUPPORTED_FORMATS.md) to be used, disregarding the file extension and file content.
 
 ### `--list-bindings`
 
