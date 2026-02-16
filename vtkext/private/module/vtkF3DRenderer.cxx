@@ -2605,19 +2605,17 @@ void vtkF3DRenderer::ConfigureActorsProperties()
           this->CheckerBoardTexture->SetColorModeToDirectScalars();
         }
 
-        if (this->CheckerBoardTexture)
-        {
-          coloring.Actor->GetProperty()->SetBaseColorTexture(this->CheckerBoardTexture);
-          coloring.OriginalActor->GetProperty()->SetBaseColorTexture(this->CheckerBoardTexture);
-          coloring.Actor->GetProperty()->SetMetallic(0.f);
-          coloring.OriginalActor->GetProperty()->SetMetallic(0.f);
-          coloring.Actor->GetProperty()->SetBaseIOR(1.f);
-          coloring.OriginalActor->GetProperty()->SetBaseIOR(1.f);
-          coloring.Actor->GetProperty()->SetNormalTexture(nullptr);
-          coloring.OriginalActor->GetProperty()->SetNormalTexture(nullptr);
-          coloring.Actor->GetProperty()->SetEmissiveTexture(nullptr);
-          coloring.OriginalActor->GetProperty()->SetEmissiveTexture(nullptr);
-        }
+        assert(this->CheckerBoardTexture);
+        coloring.Actor->GetProperty()->SetBaseColorTexture(this->CheckerBoardTexture);
+        coloring.OriginalActor->GetProperty()->SetBaseColorTexture(this->CheckerBoardTexture);
+        coloring.Actor->GetProperty()->SetMetallic(0.f);
+        coloring.OriginalActor->GetProperty()->SetMetallic(0.f);
+        coloring.Actor->GetProperty()->SetBaseIOR(1.f);
+        coloring.OriginalActor->GetProperty()->SetBaseIOR(1.f);
+        coloring.Actor->GetProperty()->SetNormalTexture(nullptr);
+        coloring.OriginalActor->GetProperty()->SetNormalTexture(nullptr);
+        coloring.Actor->GetProperty()->SetEmissiveTexture(nullptr);
+        coloring.OriginalActor->GetProperty()->SetEmissiveTexture(nullptr);
       }
       else
       {
