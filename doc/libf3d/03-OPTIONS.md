@@ -503,7 +503,7 @@ Scale fonts. Useful for HiDPI displays.
 
 CLI: `--font-scale`.
 
-### `ui.font_color` (_color_, default: `0.956862745,0.956862745,0.956862745`)
+### `ui.font_color` (_color_, default: `0.957,0.957,0.957`)
 
 Set font color.
 
