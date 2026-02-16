@@ -276,7 +276,7 @@ struct vtkF3DImguiActor::Internals
   vtkSmartPointer<vtkShaderProgram> Program;
   vtkSmartPointer<vtkTextureObject> LogoTexture;
 
-  enum SearchModeEnum
+  enum SearchModeEnum : int
   {
     SearchByDescription = 0,
     SearchByKeybind = 1
