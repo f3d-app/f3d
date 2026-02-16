@@ -2621,7 +2621,8 @@ void vtkF3DRenderer::ConfigureActorsProperties()
       }
       else
       {
-        F3DLog::Print(F3DLog::Severity::Warning, "Uvs required to display checkerboard texture.");
+        F3DLog::Print(F3DLog::Severity::Warning,
+          "Texture coordinates are required to display checkerboard texture.");
       }
     }
   }
