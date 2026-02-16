@@ -159,6 +159,12 @@ Path to a texture file that sets the normal map of the object. Model-specified b
 
 CLI: `--texture-normal`.
 
+### `model.checkerboard.enable` (_bool_, default: `false`, **on load**)
+
+Override model's texture with a checkerboard texture.
+
+CLI: `--checkerboard`.
+
 ### `model.scivis.enable` (_bool_, default: `false`)
 
 _Color by an array_ present in on the data. If `model.scivis.array_name` is not set, the first available array will be used.

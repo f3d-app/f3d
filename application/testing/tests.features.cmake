@@ -134,6 +134,8 @@ f3d_test(NAME TestTexturesTransform DATA world.obj ARGS --textures-transform=1,0
 f3d_test(NAME TestTexturesTransformGL DATA WaterBottle.glb ARGS --textures-transform=1,0,0,0,-1,0,0,0,1 --camera-direction=-1,0,0)
 f3d_test(NAME TestTextureMatCapWithEdges DATA suzanne.ply ARGS -e --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png)
 f3d_test(NAME TestTextureColorWithOptions DATA WaterBottle.glb ARGS --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --color=1,1,0 --opacity=0.4 --blending)
+f3d_test(NAME TestTextureCheckerBoard DATA WaterBottle.glb ARGS --checkerboard)
+f3d_test(NAME TestTextureCheckerBoardOnMissingUV DATA RiggedFigure.glb ARGS --checkerboard REGEXP "Texture coordinates are required to display checkerboard texture." NO_BASELINE)
 
 if(NOT APPLE OR VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
   f3d_test(NAME TestTextureColor DATA WaterBottle.glb ARGS --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --blending)
@@ -246,7 +248,7 @@ f3d_test(NAME TestVerboseAnimation DATA InterpolationTest.glb ARGS --verbose NO_
 f3d_test(NAME TestVerboseAnimationWrongAnimationTimeHigh DATA BoxAnimated.gltf ARGS --animation-time=10 --verbose REGEXP "Animation time 10 is outside of range \\[0, 3\\.70833\\], using 3\\.70833" NO_BASELINE)
 f3d_test(NAME TestVerboseAnimationWrongAnimationTimeLow DATA BoxAnimated.gltf ARGS --animation-time=-5 --verbose REGEXP "Animation time -5 is outside of range \\[0, 3\\.70833\\], using 0" NO_BASELINE)
 f3d_test(NAME TestVerboseAnimationTimeRange DATA InterpolationTest.glb ARGS --verbose REGEXP "0, 1.66667" NO_BASELINE)
-f3d_test(NAME TestCommandScriptVerboseMultiAnimationTimeRange SCRIPT DATA InterpolationTest.glb ARGS --verbose REGEXP "0, 1.70833" NO_BASELINE)# cycle_animation x3
+f3d_test(NAME TestCommandScriptVerboseMultiAnimationTimeRange SCRIPT DATA InterpolationTest.glb ARGS --verbose REGEXP "0, 1.70833" NO_BASELINE) # cycle_animation x3
 
 ## MaxSize
 f3d_test(NAME TestMaxSizeBelow DATA suzanne.stl ARGS --max-size=1)

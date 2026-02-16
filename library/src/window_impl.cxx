@@ -634,6 +634,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetTextureNormal(opt.model.normal.texture);
   renderer->SetNormalScale(opt.model.normal.scale);
   renderer->SetTextureMatCap(opt.model.matcap.texture);
+  renderer->SetEnableCheckerBoard(opt.model.checkerboard.enable);
 
   renderer->SetEnableColoring(opt.model.scivis.enable);
   renderer->SetUseCellColoring(opt.model.scivis.cells);

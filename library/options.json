@@ -298,6 +298,12 @@
         "type": "path"
       }
     },
+    "checkerboard": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      }
+    },
     "color": {
       "opacity": {
         "type": "double"
