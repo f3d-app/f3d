@@ -162,6 +162,7 @@ function(f3d_test)
   endforeach()
 
   if(F3D_TEST_LABELS)
+    list(PREPEND F3D_TEST_LABELS "application")
     set_tests_properties("f3d::${F3D_TEST_NAME}" PROPERTIES
       LABELS "${F3D_TEST_LABELS}"
     )
@@ -248,9 +249,4 @@ function(f3d_test)
   set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES ENVIRONMENT
     "F3D_PLUGINS_PATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY};${f3d_test_env_vars}")
 
-endfunction()
-
-function(f3d_application_test)
-  cmake_parse_arguments(F3D_TEST "" "LABELS" "" ${ARGN})
-  f3d_test(LABELS "application;${F3D_TEST_LABELS}" ${ARGN})
 endfunction()
