@@ -35,6 +35,10 @@ ctest -R PLY
 
 CTest labels allow you to easily target specific groups of tests.
 
+```
+ctest -L bindings # run all binding tests
+```
+
 Available labels:
 
 - application (all f3d application tests)
@@ -48,7 +52,7 @@ Available labels:
 Labels can be combined to further refine test selection.
 
 ```
-ctest -L bindings # run all binding tests
+ctest -L assimp -L fbx # run all tests which use assimp plugin to load fbx data
 ```
 
 ## Testing architecture
