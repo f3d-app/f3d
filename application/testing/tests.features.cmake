@@ -745,9 +745,9 @@ f3d_test(NAME TestVersionPrecedenceWithUnknownOption ARGS --version --unknown RE
 
 # PIPED error code path
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
-  f3d_test(NAME TestPipedForced DATA suzanne.ply ARGS --force-reader=PLYReader --verbose PIPED REGEXP "Forcing reader" NO_BASELINE)
-  f3d_test(NAME TestPipedForcedInvalid DATA suzanne.ply ARGS --force-reader=invalid PIPED REGEXP "is not a valid force reader" NO_BASELINE)
-  f3d_test(NAME TestPipedForcedInvalidStream DATA beach.nrrd ARGS --force-reader=Nrrd PIPED REGEXP "does not support reading streams" NO_BASELINE)
+  f3d_test(NAME TestPipedForced DATA suzanne.ply ARGS --force-reader=PLYReader --verbose PIPED PLYReader REGEXP "Forcing reader" NO_BASELINE)
+  f3d_test(NAME TestPipedForcedInvalid DATA suzanne.ply ARGS --force-reader=invalid PIPED invalid REGEXP "is not a valid force reader" NO_BASELINE)
+  f3d_test(NAME TestPipedForcedInvalidStream DATA beach.nrrd ARGS --force-reader=Nrrd PIPED Nrrd REGEXP "does not support reading streams" NO_BASELINE)
 endif()
 
 ## Filesystem error code path
