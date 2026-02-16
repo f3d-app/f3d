@@ -33,6 +33,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstdint>
 #include <imgui.h>
 #include <numeric>
 #include <optional>
@@ -276,14 +277,14 @@ struct vtkF3DImguiActor::Internals
   vtkSmartPointer<vtkShaderProgram> Program;
   vtkSmartPointer<vtkTextureObject> LogoTexture;
 
-  enum SearchModeEnum : int
+  enum class SearchMode : std::uint8_t
   {
-    SearchByDescription = 0,
-    SearchByKeybind = 1
+    Description,
+    Keybind
   };
 
   std::array<char, 256> SearchFilter = {};
-  int SearchMode = SearchByDescription;
+  SearchMode CurrentSearchMode = SearchMode::Description;
   bool SearchFocusRequested = false;
 };
 
@@ -693,7 +694,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   const std::string filterStr(this->Pimpl->SearchFilter.data());
   const bool hasFilter = !filterStr.empty();
-  const int searchMode = this->Pimpl->SearchMode;
+  const auto searchMode = this->Pimpl->CurrentSearchMode;
 
   auto entryMatches = [&](const std::string& bind, const std::string& desc)
   {
@@ -701,7 +702,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
     {
       return true;
     }
-    if (searchMode == Internals::SearchByDescription)
+    if (searchMode == Internals::SearchMode::Description)
     {
       return caseInsensitiveContains(desc, filterStr);
     }
@@ -781,13 +782,17 @@ void vtkF3DImguiActor::RenderCheatSheet()
   ImGui::PopItemWidth();
   ImGui::PopStyleColor();
 
-  if (ImGui::RadioButton("Description", &this->Pimpl->SearchMode, Internals::SearchByDescription))
+  if (ImGui::RadioButton(
+        "Description", this->Pimpl->CurrentSearchMode == Internals::SearchMode::Description))
   {
+    this->Pimpl->CurrentSearchMode = Internals::SearchMode::Description;
     this->Pimpl->SearchFocusRequested = true;
   }
   ImGui::SameLine();
-  if (ImGui::RadioButton("Keybind", &this->Pimpl->SearchMode, Internals::SearchByKeybind))
+  if (ImGui::RadioButton(
+        "Keybind", this->Pimpl->CurrentSearchMode == Internals::SearchMode::Keybind))
   {
+    this->Pimpl->CurrentSearchMode = Internals::SearchMode::Keybind;
     this->Pimpl->SearchFocusRequested = true;
   }
 
