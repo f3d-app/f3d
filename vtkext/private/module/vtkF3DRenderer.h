@@ -36,6 +36,7 @@ class vtkDiscretizableColorTransferFunction;
 class vtkF3DOpenGLGridMapper;
 class vtkGridAxesActor3D;
 class vtkImageReader2;
+class vtkPNGReader;
 class vtkOrientationMarkerWidget;
 class vtkScalarBarActor;
 class vtkSkybox;
@@ -764,7 +765,7 @@ private:
   std::optional<fs::path> TextureNormal;
 
   bool EnableCheckerBoard = false;
-  vtkSmartPointer<vtkImageReader2> CheckerBoardReader;
+  vtkSmartPointer<vtkPNGReader> CheckerBoardReader;
   vtkSmartPointer<vtkTexture> CheckerBoardTexture;
 
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorTransferFunction;
