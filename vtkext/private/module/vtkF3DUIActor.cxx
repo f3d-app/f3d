@@ -155,7 +155,6 @@ void vtkF3DUIActor::SetFontColor(const std::vector<double>& color)
   if (this->FontColor != color)
   {
     this->FontColor = color;
-    this->Initialized = false;
   }
 }
 
