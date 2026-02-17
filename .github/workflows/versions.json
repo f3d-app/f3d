@@ -11,7 +11,7 @@
   "versions": {
     "alembic": "1.8.10",
     "assimp": "v6.0.2",
-    "blosc": "v1.21.6",
+    "blosc": "v1.21.5",
     "draco": "1.5.7",
     "imath": "v3.2.2",
     "java": "25",
