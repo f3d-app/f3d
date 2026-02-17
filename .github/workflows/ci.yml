@@ -910,11 +910,11 @@ jobs:
   #----------------------------------------------------------------------------
   python_packaging:
     needs:
-        - cache_lfs
-        - cache_vtk_dependency_linux
-        - cache_dependencies_windows
-        - cache_dependencies_macos_arm
-        - default_versions
+      - cache_lfs
+      - cache_vtk_dependency_linux
+      - cache_dependencies_windows
+      - cache_dependencies_macos_arm
+      - default_versions
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
