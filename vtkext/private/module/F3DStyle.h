@@ -9,7 +9,6 @@
 #define F3DStyle_h
 
 #include <tuple>
-#include <vector>
 
 struct ImVec4;
 
