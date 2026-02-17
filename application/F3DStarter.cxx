@@ -976,6 +976,8 @@ public:
       interactor.addBinding({mod_t::CTRL, "Q"}, "exit", "Others", std::bind(docString, "Quit"));
       // clang-format on
 
+      interactor.InitBindNotificationMap();
+
       f3d::log::debug("Adding config defined bindings if any: ");
       bool logBindings = this->AppOptions.VerboseLevel == "debug";
       std::map<std::string, log_entry_t> loggingMap;
@@ -2085,6 +2087,7 @@ void F3DStarter::EventLoop()
   {
     this->LoadRelativeFileGroup(0, true, true);
     this->Internals->ReloadFileRequested = false;
+    this->Internals->Engine->getInteractor().addNotification("File Group Reloaded");
   }
 }
 

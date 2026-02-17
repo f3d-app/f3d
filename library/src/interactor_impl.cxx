@@ -505,6 +505,7 @@ public:
       for (const std::string& command : commandsIt->second.CommandVector)
       {
         std::string commandWithArgs = command;
+        std::string commandWithoutArgs = command;
         if (!argsString.empty())
         {
           commandWithArgs.push_back(' ');
@@ -515,6 +516,7 @@ public:
           // XXX: Ignore the boolean return of triggerCommand,
           // error is already logged by triggerCommand
           this->Interactor.triggerCommand(commandWithArgs);
+          this->Interactor.triggerBindingNotification(commandWithoutArgs);
         }
         catch (const f3d::interactor::command_runtime_exception& ex)
         {
@@ -655,6 +657,7 @@ public:
   std::map<interaction_bind_t, BindingCommands> Bindings;
   std::multimap<std::string, interaction_bind_t> GroupedBinds;
   std::vector<std::string> OrderedBindGroups;
+  std::map<std::string, documentation_callback_t> BindNotifactionMap;
 
   std::map<std::string, std::string> AliasMap;
 
@@ -1732,7 +1735,69 @@ interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
   return *this;
 }
 
+bool interactor_impl::triggerBindingNotification(std::string command)
+{
+#if F3D_MODULE_UI
+  if (this->Internals->BindNotifactionMap.find(command) !=
+    this->Internals->BindNotifactionMap.end())
+  {
+    auto [description, value] = this->Internals->BindNotifactionMap[command]();
+    this->addNotification(description, value);
+
+    return true;
+  }
+#endif
+  return false;
+}
+
 //----------------------------------------------------------------------------
+interactor& interactor_impl::loadBindNotiCallback()
+{
+  for (const auto& bind : this->Internals->Bindings)
+  {
+    const auto& [bind_inter, bind_comm] = bind;
+
+    for (const auto& commStr : bind_comm.CommandVector)
+    {
+      std::string comm_str = commStr;
+      documentation_callback_t doc_callback = bind_comm.DocumentationCallback;
+      this->Internals->BindNotifactionMap.try_emplace(std::move(comm_str), std::move(doc_callback));
+    }
+  }
+
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+bool interactor_impl::addBindNotiCallback(
+  std::string command, documentation_callback_t doc_callback)
+{
+  const auto [it, success] =
+    this->Internals->BindNotifactionMap.insert_or_assign(std::move(command), std::move(doc_callback));
+  return success;
+}
+
+//----------------------------------------------------------------------------
+bool interactor_impl::removeBindNotiCallback(std::string command)
+{
+  return this->Internals->BindNotifactionMap.erase(command);
+}
+
+//----------------------------------------------------------------------------
+void interactor_impl::addNotification(std::string firLine, std::string secLine)
+{
+#if F3D_MODULE_UI
+  if (!firLine.empty())
+  {
+    vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
+    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+
+    ren->AddNotification(firLine, secLine);
+  }
+#endif
+}
+
+  //----------------------------------------------------------------------------
 std::vector<std::string> interactor_impl::getBindGroups() const
 {
   return this->Internals->OrderedBindGroups;
@@ -2079,5 +2144,56 @@ void interactor_impl::SetCommandBuffer(const char* command)
 {
   // XXX This replace previous command buffer, it should be improved
   this->Internals->CommandBuffer = command;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::InitBindNotificationMap()
+{
+  this->Internals->BindNotifactionMap.clear();
+  f3d::options& opts = this->Internals->Options;
+
+  this->loadBindNotiCallback();
+
+  // Define lambdas used for documentation
+
+  // "Animation Forward/Backward" , "Playing/Paused" or "No Animation";
+  auto docPlayAnim = [&](const std::string& doc)
+  {
+      std::string sec = this->Internals->AnimationManager->GetAnimationName() == "No animation"
+      ? "No Animation"
+      : this->isPlayingAnimation()
+      ? "Playing"
+      : "Paused";
+
+      return std::pair(doc, sec);
+  };
+
+  // "Cycle array to color with" , "arrayName"
+  auto docColorArray = [&]()
+  {
+    // enable + no array : ON
+    // enable + array : array
+    // no enable + array : array (forced)
+    // no enable + no array : OFF
+    return std::pair("Color array",
+      (opts.model.scivis.array_name.has_value()
+          ? opts.model.scivis.array_name.value() +
+          (opts.model.scivis.enable ? "" : " (forced)")
+          : opts.model.scivis.enable ? "ON" : "OFF"));
+  };
+
+  // Delete and modify some binding command callback
+  this->removeBindNotiCallback("open_file_dialog");
+  this->removeBindNotiCallback("add_files_or_set_hdri");
+  this->removeBindNotiCallback("add_files");
+  this->removeBindNotiCallback("set_hdri");
+  this->removeBindNotiCallback("exit");
+  this->removeBindNotiCallback("toggle ui.console");
+
+  this->addBindNotiCallback("toggle_animation", std::bind(docPlayAnim, "Animation Forward"));
+  this->addBindNotiCallback("toggle_animation_backward", std::bind(docPlayAnim, "Animation Backward"));
+  this->addBindNotiCallback("cycle_coloring array", docColorArray);
+
+  return *this;
 }
 }

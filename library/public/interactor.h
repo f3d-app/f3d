@@ -251,6 +251,52 @@ public:
    * Getting type for a bind that does not exists will throw a does_not_exists_exception.
    */
   [[nodiscard]] virtual BindingType getBindingType(const interaction_bind_t& bind) const = 0;
+
+  /**
+   * Initialize binding notification map for interaction key press binding notification.
+   * Call after initialization of default binding and before adding custom binding,
+   * prevent the default binding ducumentation callback overwrite by custom binding.
+   *
+   * @return interactor reference.
+   */
+  virtual interactor& InitBindNotificationMap() = 0;
+
+  /**
+   * Load `interactor_impl::internal->BindNotifactionMap` using command string as key
+   * and ducumentation callback as value from `interactor_impl::internal->Bindings`.
+   *
+   * @return interactor reference.
+   */
+  virtual interactor& loadBindNotiCallback() = 0;
+
+  /**
+   * Add or modify binding documentation callback to binding notification map using command string as key.
+   *
+   * @return True if new command and callback inserted; False if existing callback was replaced.
+   */
+  virtual bool addBindNotiCallback(std::string command, documentation_callback_t doc_callback) = 0;
+
+  /**
+   * Helper function to remove element from `interactor_impl::internal->BindNotifactionMap` using command string.
+   *
+   * @return True if element removed; False if element not exist.
+   */
+  virtual bool removeBindNotiCallback(std::string command) = 0;
+
+  /**
+   * Trigger a binding key press notification by command string
+   *
+   * @return True if command string exist; False if command string not exist.
+   */
+  virtual bool triggerBindingNotification(std::string command) = 0;
+
+  /**
+   * Trigger a notification at the bottom right of veiwport.
+   *
+   * @param firLine text string show in first line.
+   * @param secLine text string show in second line.
+   */
+  virtual void addNotification(std::string firLine, std::string secLine = "") = 0;
   ///@}
 
   ///@{ @name Animation

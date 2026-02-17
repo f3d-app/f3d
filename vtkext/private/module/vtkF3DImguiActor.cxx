@@ -879,3 +879,96 @@ void vtkF3DImguiActor::SetDeltaTime(double time)
   ImGuiIO& io = ImGui::GetIO();
   io.DeltaTime = time;
 }
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderNotifications()
+{
+  ImGuiIO& io = ImGui::GetIO();
+  float y_offset = 0.f;
+  int index = 0;
+
+  for (auto it = this->Notifications.begin(); it != this->Notifications.end();)
+  {
+    auto& [desc, value, timeElapsed] = *it;
+
+    timeElapsed += io.DeltaTime;
+
+    if (timeElapsed > 3)
+    {
+      it = Notifications.erase(it);
+    }
+    else
+    {
+      const ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+      constexpr float margin = F3DStyle::GetDefaultMargin();
+
+      ImVec2 descLineSize = ImGui::CalcTextSize(desc.c_str());
+      ImVec2 valueLineSize = ImGui::CalcTextSize(value.c_str());
+
+      float windowWidth = std::max(descLineSize.x, valueLineSize.x);
+      windowWidth += ImGui::GetStyle().WindowPadding.x * 2.f;
+
+      float windowHeight = value.empty()
+        ? descLineSize.y + ImGui::GetStyle().WindowPadding.y * 2.f
+        : descLineSize.y * 2.f + ImGui::GetTextLineHeightWithSpacing();
+
+      ImVec2 position(
+        viewport->WorkSize.x - windowWidth - margin,
+        viewport->WorkSize.y - windowHeight - margin - y_offset);
+
+      ::SetupNextWindow(position, ImVec2(windowWidth, windowHeight));
+
+      float alpha = 1.f, fading = .5f;
+
+      if (3 - timeElapsed < fading)
+      {
+        alpha = (3 - timeElapsed) / fading;
+      }
+
+      ImGui::SetNextWindowBgAlpha(alpha * this->BackdropOpacity);
+
+      ImVec4 descTextColor = F3DStyle::imgui::GetTextColor(); // White
+      descTextColor.w = alpha;
+
+      ImVec4 valueTextColor = F3DStyle::imgui::GetHighlightColor(); // Blue
+
+      if (!value.empty())
+      {
+        if (value == "ON")
+        {
+          valueTextColor = F3DStyle::imgui::GetCompletionColor(); // Green
+        }
+        else if (value == "OFF")
+        {
+          valueTextColor = F3DStyle::imgui::GetErrorColor(); // Red
+        }
+
+        valueTextColor.w = alpha;
+      }
+
+      ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing |
+        ImGuiWindowFlags_NoNav;
+
+      ImGui::Begin(("##notif_" + std::to_string(index)).c_str(), nullptr, flags);
+
+      float posX = (windowWidth - descLineSize.x) * 0.5f; // Text centering
+      ImGui::SetCursorPosX(posX);
+      ImGui::TextColored(descTextColor, desc.c_str());
+
+      if (!value.empty())
+      {
+        posX = (windowWidth - valueLineSize.x) * 0.5f;
+        ImGui::SetCursorPosX(posX);
+        ImGui::TextColored(valueTextColor, value.c_str());
+      }
+
+      ImGui::End();
+
+      ++it;
+      ++index;
+      y_offset += windowHeight + margin;
+    }
+  }
+}

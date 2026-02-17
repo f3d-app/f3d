@@ -36,6 +36,13 @@ public:
   using CheatSheetTuple = std::tuple<std::string, std::string, std::string, CheatSheetBindingType>;
   using CheatSheetGroup = std::pair<std::string, std::vector<CheatSheetTuple>>;
 
+  struct Notification
+  {
+    std::string firLine;
+    std::string secLine;
+    float timeElapsed = 0.f;
+  };
+
   /**
    * Initialize the UI actor resources
    */
@@ -175,6 +182,11 @@ public:
   {
   }
 
+  /**
+   * Add notification info to deque
+   */
+  void AddNotification(std::string& firLine, std::string& secLine);
+
 protected:
   vtkF3DUIActor();
   ~vtkF3DUIActor() override;
@@ -248,6 +260,13 @@ protected:
   virtual void RenderConsoleBadge()
   {
   }
+
+  /**
+   * Render the notifications
+   */
+  virtual void RenderNotifications()
+  {
+  }
   bool DropZoneLogoVisible = false;
   bool DropZoneVisible = false;
   std::string DropText = "";
@@ -282,6 +301,7 @@ protected:
 
   double BackdropOpacity = 0.9;
 
+  std::deque<Notification> Notifications;
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;
   void operator=(const vtkF3DUIActor&) = delete;

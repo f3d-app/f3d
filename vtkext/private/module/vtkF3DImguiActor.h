@@ -96,6 +96,12 @@ private:
    */
   void RenderConsoleBadge() override;
 
+  /**
+   * Render the notifications at the bottom right of veiwport.
+   * Newest to oldest, from bottom to top.
+   */
+  void RenderNotifications() override;
+
 private:
   vtkF3DImguiActor(const vtkF3DImguiActor&) = delete;
   void operator=(const vtkF3DImguiActor&) = delete;
