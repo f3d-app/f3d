@@ -7,6 +7,7 @@ cmake -S /src -B /src/_wasm_build \
     -DCMAKE_BUILD_TYPE=$1 \
     -DCMAKE_FIND_ROOT_PATH:PATH=/depends \
     -DF3D_MODULE_UI=OFF \
+    -DF3D_MODULE_WEBP=ON \
     -DF3D_PLUGIN_BUILD_ASSIMP=ON \
     -DF3D_PLUGIN_BUILD_DRACO=ON \
     -DF3D_PLUGIN_BUILD_HDF=OFF \
