@@ -79,7 +79,7 @@ factory::plugin_initializer_t factory::getStaticInitializer(const std::string& p
 reader* factory::getReader(const std::string& fileName, std::optional<std::string> forceReader)
 {
   return f3d::pickReader(
-    this->Plugins, forceReader, [&](reader* reader) { return reader->canRead(fileName); });
+    this->Plugins, forceReader, [&](const reader* reader) { return reader->canRead(fileName); });
 }
 
 //----------------------------------------------------------------------------
@@ -90,7 +90,7 @@ reader* factory::getReader(
   stream->SetBuffer(buffer, size);
 
   return f3d::pickReader(this->Plugins, forceReader,
-    [&](reader* reader) { return reader->supportsStream() && reader->canRead(stream); });
+    [&](const reader* reader) { return reader->supportsStream() && reader->canRead(stream); });
 }
 
 //----------------------------------------------------------------------------
