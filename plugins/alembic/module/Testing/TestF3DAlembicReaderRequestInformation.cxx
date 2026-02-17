@@ -51,7 +51,6 @@ int TestF3DAlembicReaderRequestInformation(int vtkNotUsed(argc), char* argv[])
 
   for (int i = 0; i < 2; i++)
   {
-    int a = fabs(readerTimeRange[i] - expectedTimeRange[i]);
     if (fabs(readerTimeRange[i] - expectedTimeRange[i]) > 1e-6)
     {
       return EXIT_FAILURE;
