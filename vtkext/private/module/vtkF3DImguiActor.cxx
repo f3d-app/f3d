@@ -49,7 +49,7 @@ constexpr float DROPZONE_PADDING_Y = 2.0f;
 const inline ImVec4 ColorToImVec4(const std::vector<double>& color)
 {
   return ImVec4{ static_cast<float>(color[0]), static_cast<float>(color[1]),
-    static_cast<float>(color[2]), 255.f };
+    static_cast<float>(color[2]), 1.0f };
 }
 
 static std::vector<std::string> SplitBindings(const std::string& s, const char delim)
