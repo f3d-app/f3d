@@ -908,7 +908,7 @@ jobs:
   #----------------------------------------------------------------------------
   # Python packaging: Build and test the Python wheel
   #----------------------------------------------------------------------------
-  python_packaging_linux:
+  python_packaging:
     needs: [cache_lfs, cache_vtk_dependency_linux, default_versions]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -916,10 +916,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python_version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        os: [ubuntu-22.04, windows-latest, macos-15-intel]
+        python_version: ["3.14"]
+        include:
+          - os: ubuntu-22.04
+            python_version: "3.10"
+          - os: ubuntu-22.04
+            python_version: "3.11"
+          - os: ubuntu-22.04
+            python_version: "3.12"
+          - os: ubuntu-22.04
+            python_version: "3.13"
+          - os: ubuntu-22.04
+            python_version: "3.14"
 
-    runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-ci
+    runs-on: ${{matrix.os}}
+    container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
     env:
       DISPLAY: :0
@@ -938,93 +950,6 @@ jobs:
         with:
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           python_version: ${{matrix.python_version}}
-          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-          draco_version: ${{needs.default_versions.outputs.draco_version}}
-          imath_version: ${{needs.default_versions.outputs.imath_version}}
-          occt_version: ${{needs.default_versions.outputs.occt_version}}
-          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-          pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          usd_version: ${{needs.default_versions.outputs.usd_version}}
-          vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-          webp_version: ${{needs.default_versions.outputs.webp_version}}
-          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
-          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
-
-  python_packaging_windows:
-    needs: [cache_lfs, default_versions]
-    if: |
-      contains(github.event.pull_request.labels.*.name, 'ci:full') ||
-      github.ref == 'refs/heads/master'
-    strategy:
-      fail-fast: false
-
-    runs-on: windows-latest
-    container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
-
-    env:
-      CMAKE_POLICY_VERSION_MINIMUM: 3.5
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          path: "source"
-          fetch-depth: 0
-          lfs: false
-
-      - name: Python CI
-        uses: ./source/.github/actions/python-ci
-        with:
-          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-          python_version: "3.14"
-          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-          draco_version: ${{needs.default_versions.outputs.draco_version}}
-          imath_version: ${{needs.default_versions.outputs.imath_version}}
-          occt_version: ${{needs.default_versions.outputs.occt_version}}
-          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-          pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          usd_version: ${{needs.default_versions.outputs.usd_version}}
-          vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-          webp_version: ${{needs.default_versions.outputs.webp_version}}
-          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
-          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
-
-  python_packaging_macos_arm:
-    needs: [cache_lfs, default_versions]
-    if: |
-      contains(github.event.pull_request.labels.*.name, 'ci:full') ||
-      github.ref == 'refs/heads/master'
-    strategy:
-      fail-fast: false
-
-    runs-on: macos-15
-
-    env:
-      CMAKE_POLICY_VERSION_MINIMUM: 3.5
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          path: "source"
-          fetch-depth: 0
-          lfs: false
-
-      - name: Python CI
-        uses: ./source/.github/actions/python-ci
-        with:
-          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-          python_version: "3.14"
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
           blosc_version: ${{needs.default_versions.outputs.blosc_version}}
