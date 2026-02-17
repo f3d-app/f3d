@@ -78,7 +78,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
   f3d_test(NAME TestPipedQuakeMDL DATA zombie.mdl PIPED QuakeMDL)
   f3d_test(NAME TestPipedSPLAT DATA small.splat ARGS -osy --up=-Y --point-sprites-absolute-size --point-sprites-size=1 PIPED Splat)
   f3d_test(NAME TestPipedSPZ DATA hornedlizard_small_d0.spz ARGS -sy --point-sprites-absolute-size --point-sprites-size=1 PIPED SPZ)
-  f3d_test(NAME TestPipedInvalid DATA suzanne.ply PIPED QuakeMDL REGEXP "Input stream could not be loaded" NO_BASELINE)
+  f3d_test(NAME TestPipedInvalid DATA suzanne.ply ARGS --force-reader=QuakeMDL PIPED QuakeMDL REGEXP "Input stream could not be loaded" NO_BASELINE)
 endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250923)
