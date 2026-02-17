@@ -35,7 +35,7 @@ public:
   scene& add(const std::vector<std::filesystem::path>& filePath) override;
   scene& add(const std::vector<std::string>& filePathStrings) override;
   scene& add(const mesh_t& mesh) override;
-  scene& add(std::byte* buffer, std::size_t size) override;
+  scene& add(const std::byte* buffer, std::size_t size) override;
   scene& clear() override;
   int addLight(const light_state_t& lightState) const override;
   int getLightCount() const override;
@@ -43,7 +43,8 @@ public:
   scene& updateLight(int index, const light_state_t& lightState) override;
   scene& removeLight(int index) override;
   scene& removeAllLights() override;
-  bool supports(const std::filesystem::path& filePath) override;
+  bool supports(const std::filesystem::path& filePath) const override;
+  bool supports(const std::byte* buffer, std::size_t size) const override;
   scene& loadAnimationTime(double timeValue) override;
   std::pair<double, double> animationTimeRange() override;
   unsigned int availableAnimations() const override;

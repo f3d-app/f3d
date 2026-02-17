@@ -26,7 +26,7 @@
 - duck.dae: assimp test models: BSD-3-Clause
 - duck.fbx: assimp test models: BSD-3-Clause
 - Duck0.bin: Copyright 2006 Sony Computer Entertainment Inc.: SCEA Shared Source License
-- duck_invalid.gltf: Copyright 2006 Sony Computer Entertainment Inc.: SCEA Shared Source License
+- invalid_body.gltf: (duck.gltf) Copyright 2006 Sony Computer Entertainment Inc.: SCEA Shared Source License
 - flame_mixed.mdl: LibreQuake Project: BSD-3-Clause
 - HeadMRVolume\*: VTK Data: BSD-3-Clause
 - hornedlizard_small_d\*.spz: Modified from [Niantic's SPZ samples](https://github.com/nianticlabs/spz): MIT
@@ -64,9 +64,8 @@
 - UnlitTest.glb: glTF-Sample-Models/Analytical Graphics, Inc.: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - v_rock2.mdl: LibreQuake Project: BSD-3-Clause
 - vase_4comp.vti: VTK Data: BSD-3-Clause
-- w_medkit_hl.mdl: Nomadnetic: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- invalid_version.mdl: (w_medkit_hl.mdl) Nomadnetic: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - WaterBottle.glb: glTF-Sample-Models: Public Domain
-- Wolf.fbx: OLEKSO: [CC-NC 4.0](http://creativecommons.org/licenses/by-nc/4.0/)
 - world\*: VTK Data: BSD-3-Clause
 - xform_anim.abc: Public Domain
 - joint1.abc: Public Domain
