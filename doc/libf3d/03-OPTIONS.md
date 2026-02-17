@@ -61,7 +61,7 @@ CLI: `--up`.
 
 ### `scene.force_reader` (_string_, optional, **on load**)
 
-Force a specific reader to be used, disregarding the file extension and file header. See [user documentation](../user/02-SUPPORTED_FORMATS.md).
+Force a specific reader to be used, disregarding the file extension and file content. See [user documentation](../user/02-SUPPORTED_FORMATS.md).
 
 CLI: `--force-reader`.
 

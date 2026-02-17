@@ -5,10 +5,7 @@ f3d_test(NAME Test3MF DATA cube_gears.3mf ARGS --load-plugins=assimp)
 f3d_test(NAME TestFBX DATA phong_cube.fbx ARGS --load-plugins=assimp)
 f3d_test(NAME TestFBX16bits DATA 16bit.fbx ARGS --load-plugins=assimp)
 f3d_test(NAME TestVerboseCameraAssimp DATA duck.dae ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "camera1")
-
-if(NOT APPLE OR VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
-  f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --background-color=1,1,1 -p --load-plugins=assimp)
-endif()
+f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --background-color=1,1,1 -p --load-plugins=assimp)
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
   f3d_test(NAME TestAssimpInvalid DATA invalid_truncated.fbx ARGS --load-plugins=assimp REGEXP "Some of these files could not be loaded" NO_BASELINE)
@@ -21,9 +18,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251016)
   f3d_test(NAME TestPipedFBX DATA phong_cube.fbx ARGS --load-plugins=assimp PIPED FBX)
   f3d_test(NAME TestPipedDAE DATA duck.dae ARGS --load-plugins=assimp PIPED COLLADA) # Texture not loaded
   f3d_test(NAME TestPipedX DATA anim_test.x ARGS --load-plugins=assimp PIPED DirectX)
-  if (NOT APPLE)
-    f3d_test(NAME TestPipedDXF DATA PinkEggFromLW.dxf ARGS --background-color=1,1,1 -p --load-plugins=assimp PIPED DXF)
-  endif()
+  f3d_test(NAME TestPipedDXF DATA PinkEggFromLW.dxf ARGS --background-color=1,1,1 -p --load-plugins=assimp PIPED DXF)
 endif()
 
 f3d_test(NAME TestVerboseAssimp DATA duck.fbx ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "LOD3sp")

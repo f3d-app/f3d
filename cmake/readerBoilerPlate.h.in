@@ -185,9 +185,9 @@ public:
   }
 #endif //STATIC OR MEMBER
 #else // SUPPORTS_STREAM
-  bool canRead([[maybe_unused]] vtkResourceStream* stream) const override
+  bool canRead(vtkResourceStream* vtkNotUsed(stream)) const override
   {
-    // streams not supported, always returns true
+    // SUPPORTS_STREAM not enabled, so fast content validation should always return true
     return true;
   }
 #endif // SUPPORTS_STREAM

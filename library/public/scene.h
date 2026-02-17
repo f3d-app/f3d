@@ -140,9 +140,9 @@ public:
   virtual scene& removeAllLights() = 0;
 
   /**
-   * Return true if provided file in path uses a supported extension, exists and its header
+   * Return true if provided file in path uses a supported extension, exists and its content
    * correspond to a supported file format, false otherwise.
-   * header check is only performed with VTK >= 9.6.20260228
+   * content validation is only performed with VTK >= 9.6.20260228
    * scene.force_reader is taken into account and plugin should be loaded for their readers to be
    * found.
    */

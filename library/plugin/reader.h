@@ -64,7 +64,7 @@ public:
   virtual const std::vector<std::string> getMimeTypes() const = 0;
 
   /**
-   * Check if this reader can read the given filename - according to its extension and header check
+   * Check if this reader can read the given filename - according to its extension and file content
    */
   virtual bool canRead(const std::string& fileName) const
   {
