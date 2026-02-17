@@ -106,7 +106,7 @@ function(f3d_test)
   if(NOT F3D_TEST_NO_BASELINE)
     list(APPEND F3D_TEST_ARGS "--reference=${F3D_SOURCE_DIR}/testing/baselines/${F3D_TEST_NAME}.png")
 
-    if(F3D_TEST_THRESHOLD)
+    if(DEFINED F3D_TEST_THRESHOLD)
       list(APPEND F3D_TEST_ARGS "--reference-threshold=${F3D_TEST_THRESHOLD}")
     endif()
   endif()
