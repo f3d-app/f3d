@@ -16,4 +16,3 @@ TEST_DEPENDS
   VTK::CommonDataModel
   VTK::FiltersCore
   VTK::IOCore
-  f3d::vtkextPrivate

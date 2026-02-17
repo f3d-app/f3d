@@ -10,6 +10,13 @@ int TestF3DEXRReader(int argc, char* argv[])
   vtkNew<vtkF3DEXRReader> reader;
 
   std::string filename = std::string(argv[1]) + "data/kloofendal_43d_clear_1k.exr";
+
+  if (reader->CanReadFile(filename.c_str()) == 0)
+  {
+    std::cerr << "Unexpected CanReadFile failure.\n";
+    return EXIT_FAILURE;
+  }
+
   reader->SetFileName(filename.c_str());
   reader->Update();
 

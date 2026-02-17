@@ -1,16 +1,7 @@
 #include "vtkF3DImageImporter.h"
 
-#if F3D_MODULE_EXR
-#include "vtkF3DEXRReader.h"
-#endif
-
-#if F3D_MODULE_WEBP
-#include "vtkF3DWebPReader.h"
-#endif
-
 #include <vtkDataSet.h>
 #include <vtkFileResourceStream.h>
-#include <vtkImageReader2Factory.h>
 #include <vtkMapper.h>
 #include <vtkNew.h>
 #include <vtkRenderer.h>
@@ -52,30 +43,16 @@ bool TestCanReadFile(const std::string& filename, std::string_view expectedHint)
 
 int TestF3DImageImporterCanReadFile(int vtkNotUsed(argc), char* argv[])
 {
-
-#if F3D_MODULE_EXR
-  vtkNew<vtkF3DEXRReader> exrReader;
-  vtkImageReader2Factory::RegisterReader(exrReader);
-#endif
-
-#if F3D_MODULE_WEBP
-  vtkNew<vtkF3DWebPReader> webpReader;
-  vtkImageReader2Factory::RegisterReader(webpReader);
-#endif
-
   bool result = true;
   result &= ::TestCanReadFile(std::string(argv[1]) + "data/world.png", "png");
   result &= ::TestCanReadFile(std::string(argv[1]) + "data/albedo.bmp", "bmp");
   result &= ::TestCanReadFile(std::string(argv[1]) + "data/viridis32.hdr", "hdr");
   result &= ::TestCanReadFile(std::string(argv[1]) + "data/world.jpg", "jpeg");
   result &= ::TestCanReadFile(std::string(argv[1]) + "data/world.tga", "tga");
-#if F3D_MODULE_EXR
-  result &= ::TestCanReadFile(std::string(argv[1]) + "data/Rec709.exr", "exr");
-#endif
-#if F3D_MODULE_WEBP
-  result &= ::TestCanReadFile(std::string(argv[1]) + "data/image.webp", "webp");
-#endif
   result &= !::TestCanReadFile(std::string(argv[1]) + "data/f3d.vtp", "");
   result &= !::vtkF3DImageImporter::CanReadFile(nullptr);
   return result ? EXIT_SUCCESS : EXIT_FAILURE;
+
+  // EXR and WEBP not tested here, until they are available in vtkextPublic
+  // https://github.com/f3d-app/f3d/issues/2892
 }
