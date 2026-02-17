@@ -23,6 +23,8 @@ jobs:
     name: Set default versions
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:fast') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:android') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:wasm') ||
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
@@ -87,6 +89,7 @@ jobs:
     name: Update LFS data cache
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:fast') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:android') ||
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
@@ -113,6 +116,8 @@ jobs:
     name: Cache dependencies Linux
     needs: default_versions
     if: |
+      contains(github.event.pull_request.labels.*.name, 'ci:android') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:wasm') ||
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
@@ -374,9 +379,9 @@ jobs:
           zlib_version: ${{matrix.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
-  #----------------------------------------------------------------------------
-  # Cache VTK Dependency: Checkout and compile VTK if not cached
-  #----------------------------------------------------------------------------
+  #---------------------------------------------------------------------------------------------------
+  # Cache VTK Dependency: Checkout and compile VTK if not cached, to avoid building VTK multiple times
+  #---------------------------------------------------------------------------------------------------
   cache_vtk_dependency_linux:
     name: Cache VTK dependency Linux
     needs: [default_versions, cache_dependencies_linux]
@@ -387,14 +392,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version:
-          [
-            "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.6.0,
-            v9.5.2,
-            v9.4.2,
-            v9.3.0,
-          ]
         build_type: [standard]
         include:
           - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
@@ -403,19 +400,16 @@ jobs:
           - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: mindeps
-            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             blosc_version: ${{needs.default_versions.outputs.blosc_min_version}}
             openvdb_version: ${{needs.default_versions.outputs.openvdb_min_version}}
             ospray_version: ${{needs.default_versions.outputs.ospray_min_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
           - build_type: no_optional_deps
-            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             blosc_version: ${{needs.default_versions.outputs.blosc_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: no_raytracing
-            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             blosc_version: ${{needs.default_versions.outputs.blosc_version}}
             openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
@@ -464,236 +458,8 @@ jobs:
       - name: VTK dependency
         uses: ./source/.github/actions/vtk-install-dep
         with:
-          vtk_version: ${{matrix.vtk_version}}
+          vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
           cpu: x86_64
-          blosc_version: ${{matrix.blosc_version}}
-          openvdb_version: ${{matrix.openvdb_version}}
-          ospray_version: ${{matrix.ospray_version}}
-          tbb_version: ${{matrix.tbb_version}}
-          zlib_version: ${{matrix.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
-
-  cache_vtk_dependency_windows:
-    name: Cache VTK dependency Windows
-    needs: [default_versions, cache_dependencies_windows]
-    if: |
-      contains(github.event.pull_request.labels.*.name, 'ci:main') ||
-      contains(github.event.pull_request.labels.*.name, 'ci:full') ||
-      github.ref == 'refs/heads/master'
-    strategy:
-      fail-fast: false
-      matrix:
-        vtk_version:
-          [
-            "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.6.0,
-            v9.5.2,
-            v9.4.2,
-            v9.3.0,
-          ]
-        include:
-          - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-          - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-          - ospray_version: ${{needs.default_versions.outputs.ospray_version}}
-          - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-
-    runs-on: windows-latest
-
-    env:
-      CMAKE_POLICY_VERSION_MINIMUM: 3.5
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          path: "source"
-          fetch-depth: 1
-          lfs: false
-
-      - name: Dependencies Dir
-        shell: bash
-        working-directory: ${{github.workspace}}
-        run: |
-          mkdir dependencies
-          cd dependencies
-          mkdir install
-
-      - name: Install VTK dependencies
-        uses: ./source/.github/actions/vtk-dependencies
-        with:
-          cpu: x86_64
-          openvdb_version: ${{matrix.openvdb_version}}
-          blosc_version: ${{matrix.blosc_version}}
-          tbb_version: ${{matrix.tbb_version}}
-          zlib_version: ${{matrix.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
-
-      - name: Install Raytracing Dependencies
-        uses: ./source/.github/actions/ospray-sb-install-dep
-        with:
-          version: ${{matrix.ospray_version}}
-          cpu: x86_64
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
-
-      - name: VTK dependency
-        uses: ./source/.github/actions/vtk-install-dep
-        with:
-          vtk_version: ${{matrix.vtk_version}}
-          cpu: x86_64
-          blosc_version: ${{matrix.blosc_version}}
-          openvdb_version: ${{matrix.openvdb_version}}
-          ospray_version: ${{matrix.ospray_version}}
-          tbb_version: ${{matrix.tbb_version}}
-          zlib_version: ${{matrix.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
-
-  cache_vtk_dependency_macos_intel:
-    name: Cache VTK dependency macOS Intel
-    needs: [default_versions, cache_dependencies_macos_intel]
-    if: |
-      contains(github.event.pull_request.labels.*.name, 'ci:full') ||
-      github.ref == 'refs/heads/master'
-    strategy:
-      fail-fast: false
-      matrix:
-        vtk_version:
-          [
-            "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.6.0,
-            v9.5.2,
-            v9.4.2,
-          ]
-        exclude:
-          - os: macos-15-intel
-            vtk_version: v9.3.0
-          - os: macos-15
-            vtk_version: v9.3.0
-        include:
-          - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-          - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-          - ospray_version: ${{needs.default_versions.outputs.ospray_version}}
-          - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-
-    runs-on: macos-15-intel
-
-    env:
-      CMAKE_POLICY_VERSION_MINIMUM: 3.5
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          path: "source"
-          fetch-depth: 1
-          lfs: false
-
-      - name: Dependencies Dir
-        shell: bash
-        working-directory: ${{github.workspace}}
-        run: |
-          mkdir dependencies
-          cd dependencies
-          mkdir install
-
-      - name: Install VTK dependencies
-        uses: ./source/.github/actions/vtk-dependencies
-        with:
-          cpu: x86_64
-          openvdb_version: ${{matrix.openvdb_version}}
-          blosc_version: ${{matrix.blosc_version}}
-          tbb_version: ${{matrix.tbb_version}}
-          zlib_version: ${{matrix.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
-
-      - name: Install Raytracing Dependencies
-        uses: ./source/.github/actions/ospray-sb-install-dep
-        with:
-          version: ${{matrix.ospray_version}}
-          cpu: x86_64
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
-
-      - name: VTK dependency
-        uses: ./source/.github/actions/vtk-install-dep
-        with:
-          vtk_version: ${{matrix.vtk_version}}
-          cpu: x86_64
-          blosc_version: ${{matrix.blosc_version}}
-          openvdb_version: ${{matrix.openvdb_version}}
-          ospray_version: ${{matrix.ospray_version}}
-          tbb_version: ${{matrix.tbb_version}}
-          zlib_version: ${{matrix.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
-
-  cache_vtk_dependency_macos_arm:
-    name: Cache VTK dependency
-    needs: [default_versions, cache_dependencies_macos_arm]
-    if: |
-      contains(github.event.pull_request.labels.*.name, 'ci:main') ||
-      contains(github.event.pull_request.labels.*.name, 'ci:full') ||
-      github.ref == 'refs/heads/master'
-    strategy:
-      fail-fast: false
-      matrix:
-        vtk_version:
-          [
-            "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.6.0,
-            v9.5.2,
-            v9.4.2,
-          ]
-        include:
-          - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-          - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-          - ospray_version: ${{needs.default_versions.outputs.ospray_version}}
-          - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-
-    runs-on: macos-15
-
-    env:
-      CMAKE_POLICY_VERSION_MINIMUM: 3.5
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          path: "source"
-          fetch-depth: 1
-          lfs: false
-
-      - name: Dependencies Dir
-        shell: bash
-        working-directory: ${{github.workspace}}
-        run: |
-          mkdir dependencies
-          cd dependencies
-          mkdir install
-
-      - name: Install VTK dependencies
-        uses: ./source/.github/actions/vtk-dependencies
-        with:
-          cpu: arm64
-          openvdb_version: ${{matrix.openvdb_version}}
-          blosc_version: ${{matrix.blosc_version}}
-          tbb_version: ${{matrix.tbb_version}}
-          zlib_version: ${{matrix.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
-
-      - name: Install Raytracing Dependencies
-        if: matrix.ospray_version != ''
-        uses: ./source/.github/actions/ospray-sb-install-dep
-        with:
-          version: ${{matrix.ospray_version}}
-          cpu: arm64
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
-
-      - name: VTK dependency
-        uses: ./source/.github/actions/vtk-install-dep
-        with:
-          vtk_version: ${{matrix.vtk_version}}
-          cpu: arm64
           blosc_version: ${{matrix.blosc_version}}
           openvdb_version: ${{matrix.openvdb_version}}
           ospray_version: ${{matrix.ospray_version}}
@@ -705,7 +471,7 @@ jobs:
   # Windows CI: Build and test, cross-vtk build matrix
   #----------------------------------------------------------------------------
   windows:
-    needs: [cache_lfs, cache_vtk_dependency_windows, default_versions]
+    needs: [cache_lfs, default_versions]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -1019,7 +785,7 @@ jobs:
   # MacOS CI: Build and test, cross-vtk build matrix
   #----------------------------------------------------------------------------
   macos_intel:
-    needs: [cache_lfs, cache_vtk_dependency_macos_intel, default_versions]
+    needs: [cache_lfs, cache_dependencies_macos_intel, default_versions]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
@@ -1075,7 +841,7 @@ jobs:
   # MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
   #----------------------------------------------------------------------------
   macos_arm:
-    needs: [cache_lfs, cache_vtk_dependency_macos_arm, default_versions]
+    needs: [cache_lfs, default_versions]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -1190,7 +956,7 @@ jobs:
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   python_packaging_windows:
-    needs: [cache_lfs, cache_vtk_dependency_windows, default_versions]
+    needs: [cache_lfs, default_versions]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
@@ -1234,7 +1000,7 @@ jobs:
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   python_packaging_macos_arm:
-    needs: [cache_lfs, cache_vtk_dependency_macos_arm, default_versions]
+    needs: [cache_lfs, default_versions]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
@@ -1469,7 +1235,10 @@ jobs:
     # This job does not do anything in master branch but is not skipped for simpler logic
     steps:
       - name: Extract branch name
-        if: contains(github.event.pull_request.labels.*.name, 'ci:full')
+        if: |
+          contains(github.event.pull_request.labels.*.name, 'ci:android') ||
+          contains(github.event.pull_request.labels.*.name, 'ci:wasm') ||
+          contains(github.event.pull_request.labels.*.name, 'ci:full')
         shell: bash
         run: echo "F3D_BRANCH_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_ENV
 
@@ -1492,6 +1261,7 @@ jobs:
   android:
     needs: [default_versions, check_docker_images]
     if: |
+      contains(github.event.pull_request.labels.*.name, 'ci:android') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
     strategy:
@@ -1521,6 +1291,7 @@ jobs:
   webassembly:
     needs: [cache_lfs, default_versions, check_docker_images]
     if: |
+      contains(github.event.pull_request.labels.*.name, 'ci:wasm') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
     strategy:
