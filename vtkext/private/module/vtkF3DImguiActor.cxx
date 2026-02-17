@@ -46,10 +46,10 @@ constexpr float DROPZONE_MARGIN = 0.5f;
 constexpr float DROPZONE_PADDING_X = 5.0f;
 constexpr float DROPZONE_PADDING_Y = 2.0f;
 
-const inline ImVec4 Vec3ToImVec4(const std::vector<double>& v, int alpha = 255)
+const inline ImVec4 ColorToImVec4(const std::vector<double>& color)
 {
-  return ImVec4{ static_cast<float>(v[0]), static_cast<float>(v[1]), static_cast<float>(v[2]),
-    alpha / 255.f };
+  return ImVec4{ static_cast<float>(color[0]), static_cast<float>(color[1]),
+    static_cast<float>(color[2]), 255.f };
 }
 
 static std::vector<std::string> SplitBindings(const std::string& s, const char delim)
@@ -360,7 +360,7 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   style->WindowPadding = ImVec2(10, 10);
   style->WindowRounding = 8.f;
   style->ScaleAllSizes(this->FontScale);
-  style->Colors[ImGuiCol_Text] = ::Vec3ToImVec4(this->FontColor);
+  style->Colors[ImGuiCol_Text] = ::ColorToImVec4(this->FontColor);
   style->Colors[ImGuiCol_WindowBg] = F3DStyle::imgui::GetBackgroundColor();
   style->Colors[ImGuiCol_FrameBg] = colTransparent;
   style->Colors[ImGuiCol_FrameBgActive] = colTransparent;
@@ -397,7 +397,7 @@ void vtkF3DImguiActor::RenderDropZone()
       return;
     }
 
-    const ImVec4 colorImv = ::Vec3ToImVec4(this->FontColor);
+    const ImVec4 colorImv = ::ColorToImVec4(this->FontColor);
     const ImU32 color =
       IM_COL32(colorImv.x * 255, colorImv.y * 255, colorImv.z * 255, colorImv.w * 255);
 
@@ -476,7 +476,7 @@ void vtkF3DImguiActor::RenderDropZone()
       ImVec2 textPos(viewport->GetWorkCenter().x - textSize.x * ::DROPZONE_MARGIN,
         viewport->GetWorkCenter().y - ::DROPZONE_MARGIN * textSize.y + ::LOGO_DISPLAY_HEIGHT / 2 +
           ::DROPZONE_LOGO_TEXT_PADDING);
-      drawList->AddText(textPos, ImColor(::Vec3ToImVec4(this->FontColor)), this->DropText.c_str());
+      drawList->AddText(textPos, ImColor(::ColorToImVec4(this->FontColor)), this->DropText.c_str());
       return;
     }
 
@@ -511,9 +511,9 @@ void vtkF3DImguiActor::RenderDropZone()
       maxBindingsTextWidth = std::max(maxBindingsTextWidth, totalBindingsWidth);
     }
 
-    const ImColor descTextColor = ::Vec3ToImVec4(this->FontColor);
+    const ImColor descTextColor = ::ColorToImVec4(this->FontColor);
     const ImColor bindingRectColor = F3DStyle::imgui::GetMidColor();
-    const ImColor bindingTextColor = ::Vec3ToImVec4(this->FontColor);
+    const ImColor bindingTextColor = ::ColorToImVec4(this->FontColor);
 
     float tableWidth =
       maxDescTextWidth + maxBindingsTextWidth + ::DROPZONE_LOGO_TEXT_PADDING + spacingX;
@@ -753,9 +753,9 @@ void vtkF3DImguiActor::RenderCheatSheet()
       }
       else
       {
-        bindingTextColor = ::Vec3ToImVec4(this->FontColor);
+        bindingTextColor = ::ColorToImVec4(this->FontColor);
         bindingRectColor = F3DStyle::imgui::GetMidColor();
-        descTextColor = ::Vec3ToImVec4(this->FontColor);
+        descTextColor = ::ColorToImVec4(this->FontColor);
         valueTextColor = F3DStyle::imgui::GetHighlightColor();
       }
 
