@@ -19,7 +19,7 @@
     "openexr": "v3.4.4",
     "openvdb": "v13.0.0",
     "ospray": "v2.12.0",
-    "pybind11": "v3.0.1",
+    "pybind11": "v3.0.2",
     "python": "3.14",
     "tbb": "v2021.13.1",
     "usd": "v25.11",
