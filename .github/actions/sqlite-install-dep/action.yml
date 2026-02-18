@@ -29,6 +29,7 @@ runs:
     # when git supports it
     - name: Checkout common-superbuild and set everything up
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: |
         mkdir sqlite_build
