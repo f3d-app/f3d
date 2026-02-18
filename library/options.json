@@ -275,7 +275,7 @@
     },
     "font_color": {
       "type": "color",
-      "default_value": "0.956862745,0.956862745,0.956862745"
+      "default_value": "0.957,0.957,0.957"
     },
     "loader_progress": {
       "type": "bool",
