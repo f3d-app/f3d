@@ -175,7 +175,7 @@ CLI: `--scalar-coloring`.
 
 Color the data with value found _on the cells_ instead of points
 
-CLI: `--cells`.
+CLI: `--coloring-by-cells`.
 
 ### `model.scivis.discretization` (_int_, optional)
 
@@ -194,13 +194,13 @@ CLI: `--colormap`.
 Set a _custom opacity map for the coloring_. The format of the opacity map should be `val, opacity, ...`.
 It is only used for volume rendering currently.
 
-CLI: `--opacity-map`.
+CLI: `--volume-opacity-map`.
 
 ### `model.scivis.component` (_int_, default: `-1`)
 
 Specify the component to color with. `-1` means _magnitude_. `-2` means _direct values_.
 
-CLI: `--comp`.
+CLI: `--coloring-component`.
 
 ### `model.scivis.array_name` (_string_, optional)
 
@@ -212,7 +212,7 @@ CLI: `--coloring-array`.
 
 Set the _coloring range_. Automatically computed by default.
 
-CLI: `--range`.
+CLI: `--coloring-range`.
 
 ### `model.point_sprites.enable` (_bool_, default: `false`)
 
@@ -248,7 +248,7 @@ CLI: `--volume`.
 
 Inverse the linear opacity function.
 
-CLI: `--inverse`.
+CLI: `--volume-inverse`.
 
 ### `model.textures_transform` (_transform2d_, optional)
 
@@ -377,13 +377,13 @@ CLI: `--raytracing`.
 
 The number of _samples per pixel_.
 
-CLI: `--samples`.
+CLI: `--raytracing-samples`.
 
 ### `render.raytracing.denoise` (_bool_, default: `false`)
 
 _Denoise_ the raytracing rendering.
 
-CLI: `--denoise`.
+CLI: `--raytracing-denoise`.
 
 ### `render.hdri.file` (_path_, optional)
 
@@ -468,7 +468,7 @@ CLI: `--z-color`.
 
 Show _scalar bar_ of the coloring by data array.
 
-CLI: `--bar`.
+CLI: `--coloring-scalar-bar`.
 
 ### `ui.cheatsheet` (_bool_, default: `false`)
 
@@ -526,11 +526,11 @@ CLI: `--fps`.
 
 Show a _progress bar_ when loading the file.
 
+CLI: `--loading-progress`.
+
 ### `ui.loader_progress_color` (_color_, optional, **on load**)
 
 Set loader progress bar color or use default one #FFFFFF if not set.
-
-CLI: `--progress`.
 
 ### `ui.animation_progress` (_bool_, default: `false`, **on load**)
 
