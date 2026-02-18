@@ -211,7 +211,7 @@ Can be useful to display non-ASCII filenames.
 
 Scale fonts. Useful for HiDPI displays.
 
-### `--font-color=<color>` (_color_, default: `0.956862745,0.956862745,0.956862745`)
+### `--font-color=<color>` (_color_, default: `0.957,0.957,0.957`)
 
 Set font color. Defaults to #F4F4F4(F3DWhite).
 
