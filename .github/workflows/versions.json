@@ -46,7 +46,7 @@
     "webifc": "0.75",
     "zlib": "v1.2.13"
   },
-  "vtk_commit_sha": "7fc56dc76358206395e55c62837eceedff3543e2",
-  "docker_timestamp": "20260210_0",
+  "vtk_commit_sha": "da023465dfaee4a010baa30a7b8e83b25a440fa1",
+  "docker_timestamp": "20260218_0",
   "global_cache_index": "1"
 }
