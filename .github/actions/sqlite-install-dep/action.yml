@@ -29,8 +29,10 @@ runs:
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
       shell: bash
       run: |
-        git clone --depth=1 --revision=08be462f7fa9816f881dbb93eacb2e287f319208 https://gitlab.kitware.com/paraview/common-superbuild.git sqlite_csb
         mkdir sqlite_build
+        git clone https://gitlab.kitware.com/paraview/common-superbuild.git sqlite_csb
+        cd sqlite_csb
+        git checkout 08be462f7fa9816f881dbb93eacb2e287f319208
 
     - name: Configure sqlite
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
