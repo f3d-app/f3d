@@ -11,6 +11,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
+#include <vtkResourceStream.h>
 #include <vtkTexture.h>
 
 //----------------------------------------------------------------------------
@@ -21,36 +22,34 @@ void vtkF3DImageImporter::ImportActors(vtkRenderer* renderer)
 {
   const char* fileName = this->GetFileName();
 
-  vtkSmartPointer<vtkImageReader2> reader;
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260106)
-  if (this->GetStream())
+  if (this->ImageHint.empty())
   {
-    vtkNew<vtkImageReader2Collection> collection;
-    vtkImageReader2Factory::GetRegisteredReaders(collection);
-    collection->InitTraversal();
-    while (vtkImageReader2* probe = collection->GetNextItem())
-    {
-      if (probe->CanReadFile(this->GetStream()))
-      {
-        reader.TakeReference(probe->NewInstance());
-        reader->SetStream(this->GetStream());
-        break;
-      }
-    }
-  }
-  else
-#endif
-    if (fileName)
-  {
-    reader.TakeReference(vtkImageReader2Factory::CreateImageReader2(fileName));
-    reader->SetFileName(fileName);
+    vtkErrorMacro("ImageHint not set");
+    this->SetFailureStatus();
+    return;
   }
 
+  vtkSmartPointer<vtkImageReader2> reader;
+  reader.TakeReference(
+    vtkImageReader2Factory::CreateImageReader2FromExtension(this->ImageHint.c_str()));
   if (!reader)
   {
     vtkErrorMacro("Could not find a suitable image reader");
     this->SetFailureStatus();
     return;
+  }
+
+// needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12518
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251210)
+  if (this->GetStream())
+  {
+    reader->SetStream(this->GetStream());
+  }
+  else
+#endif
+    if (fileName)
+  {
+    reader->SetFileName(fileName);
   }
 
   reader->UpdateInformation();
@@ -104,5 +103,46 @@ void vtkF3DImageImporter::ImportActors(vtkRenderer* renderer)
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
   this->ActorCollection->AddItem(actor);
+#endif
+}
+
+//------------------------------------------------------------------------------
+bool vtkF3DImageImporter::CanReadFile(vtkResourceStream* stream)
+{
+  std::string unused;
+  return vtkF3DImageImporter::CanReadFile(stream, unused);
+}
+
+//------------------------------------------------------------------------------
+bool vtkF3DImageImporter::CanReadFile(vtkResourceStream* stream, [[maybe_unused]] std::string& hint)
+{
+  if (!stream)
+  {
+    return false;
+  }
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260128)
+  vtkNew<vtkImageReader2Collection> collection;
+  vtkImageReader2Factory::GetRegisteredReaders(collection);
+  collection->InitTraversal();
+  while (vtkImageReader2* probe = collection->GetNextItem())
+  {
+    // We assume that there is no two image readers that return
+    // a positive value on the CanReadFile call
+    if (probe->CanReadFile(stream) > 0)
+    {
+      // Space separated list of supported extensions
+      std::string extensions = probe->GetFileExtensions();
+
+      // Extract the first as a hint
+      hint = extensions.substr(1, extensions.find_first_of(' ') - 1);
+      return true;
+    }
+  }
+
+  return false;
+#else
+  // Unreachable
+  return true;
 #endif
 }

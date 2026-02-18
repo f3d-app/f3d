@@ -1,7 +1,7 @@
+#include "vtkF3DQuakeMDLImporter.h"
+
 #include <vtkFileResourceStream.h>
 #include <vtkNew.h>
-
-#include "vtkF3DQuakeMDLImporter.h"
 
 #include <iostream>
 
@@ -27,7 +27,7 @@ int TestF3DQuakeMDLImporterStreamError(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  path = std::string(argv[1]) + "data/w_medkit_hl.mdl";
+  path = std::string(argv[1]) + "data/invalid_version.mdl";
   if (!stream->Open(path.c_str()))
   {
     std::cerr << "Cannot open file\n";

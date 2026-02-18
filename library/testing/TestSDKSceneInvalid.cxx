@@ -13,8 +13,8 @@ int TestSDKSceneInvalid([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   f3d::scene& sce = eng.getScene();
 
   std::string validFilename = "cow.vtp";
-  std::string invalidDefaultSceneFilename = "invalid.vtp";
-  std::string invalidFullSceneFilename = "duck_invalid.gltf";
+  std::string invalidDefaultSceneFilename = "invalid_body.vtp";
+  std::string invalidFullSceneFilename = "invalid_body.gltf";
   std::string validePath = std::string(argv[1]) + "data/" + validFilename;
   std::string invalidDefaultScene = std::string(argv[1]) + "data/" + invalidDefaultSceneFilename;
   std::string invalidFullScene = std::string(argv[1]) + "data/" + invalidFullSceneFilename;

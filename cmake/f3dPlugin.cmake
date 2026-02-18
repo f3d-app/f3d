@@ -36,6 +36,8 @@ f3d_plugin_declare_reader(
   [VTK_READER            <class>]
   [FORMAT_DESCRIPTION    <string>]
   [SCORE                 <integer>]
+  [SUPPORTS_STREAM]
+  [STANDARD_CAN_READ]
   [EXCLUDE_FROM_THUMBNAILER]
   [CUSTOM_CODE           <file>]
   EXTENSIONS             <string>...
@@ -49,9 +51,10 @@ The `NAME` argument is required. The arguments are as follows:
   * `NAME`: (Required) The name of the reader.
   * `VTK_IMPORTER`: The VTK importer class to use.
   * `VTK_READER`: The VTK reader class to use.
-  * `SUPPORTS_STREAM`: Flag to indicate a reader support reading from streams, default is false
   * `FORMAT_DESCRIPTION`: The description of the format read by the reader.
   * `SCORE`: The score of the reader (from 0 to 100). Default value is 50.
+  * `SUPPORTS_STREAM`: Flag to indicate that a reader support reading from streams, default is false
+  * `CAN_READ`: Style of CAN_READ to use, STATIC, MEMBER or CUSTOM. A CAN_READ is required with SUPPORTS_STREAM
   * `EXCLUDE_FROM_THUMBNAILER`: If specified, the reader will not be used for generating thumbnails.
   * `CUSTOM_CODE`: A custom code file containing the implementation of ``applyCustomReader`` function.
   * `EXTENSIONS`: (Required) The list of file extensions supported by the reader.
@@ -60,7 +63,7 @@ The `NAME` argument is required. The arguments are as follows:
 #]==]
 
 macro(f3d_plugin_declare_reader)
-  cmake_parse_arguments(F3D_READER "EXCLUDE_FROM_THUMBNAILER;SUPPORTS_STREAM" "NAME;VTK_IMPORTER;VTK_READER;FORMAT_DESCRIPTION;SCORE;CUSTOM_CODE" "EXTENSIONS;MIMETYPES;OPTIONS" ${ARGN})
+  cmake_parse_arguments(F3D_READER "EXCLUDE_FROM_THUMBNAILER;SUPPORTS_STREAM" "NAME;VTK_IMPORTER;VTK_READER;FORMAT_DESCRIPTION;SCORE;CAN_READ;CUSTOM_CODE" "EXTENSIONS;MIMETYPES;OPTIONS" ${ARGN})
 
   if(F3D_READER_CUSTOM_CODE)
     set(F3D_READER_HAS_CUSTOM_CODE 1)
@@ -105,10 +108,26 @@ macro(f3d_plugin_declare_reader)
   string(JSON F3D_READER_JSON
     SET "${F3D_READER_JSON}" "mimetypes" "[${F3D_READER_MIMETYPES}]")
 
+  set(F3D_READER_STATIC_CAN_READ 0)
+  set(F3D_READER_MEMBER_CAN_READ 0)
+
   if(F3D_READER_SUPPORTS_STREAM)
     set(F3D_READER_HAS_SUPPORTS_STREAM 1)
     string(JSON F3D_READER_JSON
       SET "${F3D_READER_JSON}" "supports_stream" "true")
+
+    if(F3D_READER_CAN_READ)
+      if (F3D_READER_CAN_READ STREQUAL "STATIC")
+        set(F3D_READER_STATIC_CAN_READ 1)
+        set(F3D_READER_MEMBER_CAN_READ 0)
+      elseif (F3D_READER_CAN_READ STREQUAL "MEMBER")
+        set(F3D_READER_STATIC_CAN_READ 0)
+        set(F3D_READER_MEMBER_CAN_READ 1)
+      endif()
+        # No checks for CUSTOM
+    else()
+      message(FATAL_ERROR "CAN_READ must be specified with SUPPORTS_STREAM")
+    endif()
   else()
     set(F3D_READER_HAS_SUPPORTS_STREAM 0)
     string(JSON F3D_READER_JSON
@@ -139,8 +158,13 @@ macro(f3d_plugin_declare_reader)
   endif()
 
   if(F3D_READER_VTK_READER)
+    if(F3D_READER_VTK_IMPORTER)
+      message(FATAL_ERROR "Please do not provide both a VTK_IMPORTER or a VTK_READER")
+    endif()
+    set(F3D_READER_VTK_READER_OR_IMPORTER ${F3D_READER_VTK_READER})
     set(F3D_READER_HAS_GEOMETRY_READER 1)
   else()
+    set(F3D_READER_VTK_READER_OR_IMPORTER ${F3D_READER_VTK_IMPORTER})
     set(F3D_READER_HAS_GEOMETRY_READER 0)
   endif()
 

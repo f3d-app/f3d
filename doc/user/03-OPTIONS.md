@@ -8,7 +8,6 @@ F3D behavior can be fully controlled from the command line using the following o
 
 The input file or files to read, can also be provided as a positional argument. Support directories as well.
 If `-` is specified instead of a filename, the file will be streamed from the stdin, which will hang until a stream is provided.
-Using this feature requires to use `--force-reader`.
 
 ### `--output=<png file>` (_string_)
 
@@ -32,7 +31,7 @@ List available _readers_ and exit. Ignore `--verbose`.
 
 ### `--force-reader=<reader>` (_string_)
 
-Force a specific [reader](02-SUPPORTED_FORMATS.md) to be used, disregarding the file extension.
+Force a specific [reader](02-SUPPORTED_FORMATS.md) to be used, disregarding the file extension and file content.
 
 ### `--list-bindings`
 
@@ -574,16 +573,16 @@ All options are parsed according to their type, see the [parsing documentation](
 
 ## Piping
 
-F3D supports piping in and out for [most formats](02-SUPPORTED_FORMATS.md), using the `-` char, as long as the reader is specified, eg:
+F3D supports piping in and out for [most formats](02-SUPPORTED_FORMATS.md), using the `-` char, eg:
 
 ```
-f3d - --force-reader=GLB --output=- < path/to/file.glb > path/to/img.png
+f3d - --output=- < path/to/file.glb > path/to/img.png
 ```
 
 or, using [display](https://imagemagick.org/script/display.php#gsc.tab=0):
 
 ```
-cat path/to/file.glb | f3d - --force-reader=GLB --output=- | display
+cat path/to/file.glb | f3d - --output=- | display
 ```
 
 and even, using [build123d](https://github.com/gumyr/build123d):
@@ -601,10 +600,16 @@ BRepTools.Write_s(obj.wrapped, sys.stdout.buffer)
 ```
 
 ```
-python script.py | f3d - --force-reader=BREP --output=- | display
+python script.py | f3d - --output=- | display
 ```
 
 While piping is more common on Linux, F3D supports it perfectly on Windows and MacOS as well.
+
+With versions of VTK < v9.6.20260128, specifying the [reader](02-SUPPORTED_FORMATS.md) to use is required, like this:
+
+```
+cat path/to/file.glb --force-reader=GLB | f3d - --output=- | display
+```
 
 ## Filename templating
 

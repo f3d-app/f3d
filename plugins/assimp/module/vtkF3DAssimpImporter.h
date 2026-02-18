@@ -72,17 +72,13 @@ public:
 
   ///@{
   /**
-   * Set/Get collada fixup flag.
-   */
-  vtkSetMacro(ColladaFixup, bool);
-  vtkGetMacro(ColladaFixup, bool);
-  ///@}
-
-  /**
-   * Set the hint to pass to assimp when reading from memory
+   * Set/Get the hint to pass to assimp when reading from memory
    * Typically the file extension.
+   * Also used to trigger the "ColladaFixup" when memory hint is "dae".
    */
   vtkSetMacro(MemoryHint, std::string);
+  vtkGetMacro(MemoryHint, std::string);
+  ///@}
 
   /**
    * Get temporal information for the currently enabled animation.
@@ -131,7 +127,6 @@ private:
   vtkF3DAssimpImporter(const vtkF3DAssimpImporter&) = delete;
   void operator=(const vtkF3DAssimpImporter&) = delete;
 
-  bool ColladaFixup = false;
   std::string MemoryHint;
 
   class vtkInternals;
