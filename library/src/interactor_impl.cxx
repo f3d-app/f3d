@@ -1753,6 +1753,7 @@ bool interactor_impl::triggerBindingNotification(std::string command)
 //----------------------------------------------------------------------------
 interactor& interactor_impl::loadBindNotiCallback()
 {
+#if F3D_MODULE_UI
   for (const auto& bind : this->Internals->Bindings)
   {
     const auto& [bind_inter, bind_comm] = bind;
@@ -1764,7 +1765,7 @@ interactor& interactor_impl::loadBindNotiCallback()
       this->Internals->BindNotifactionMap.try_emplace(std::move(comm_str), std::move(doc_callback));
     }
   }
-
+#endif
   return *this;
 }
 
@@ -1772,27 +1773,33 @@ interactor& interactor_impl::loadBindNotiCallback()
 bool interactor_impl::addBindNotiCallback(
   std::string command, documentation_callback_t doc_callback)
 {
+#if F3D_MODULE_UI
   const auto [it, success] =
     this->Internals->BindNotifactionMap.insert_or_assign(std::move(command), std::move(doc_callback));
   return success;
+#endif
+  return false;
 }
 
 //----------------------------------------------------------------------------
 bool interactor_impl::removeBindNotiCallback(std::string command)
 {
+#if F3D_MODULE_UI
   return this->Internals->BindNotifactionMap.erase(command);
+#endif
+  return false;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::addNotification(std::string firLine, std::string secLine)
+void interactor_impl::addNotification(std::string desc, std::string value)
 {
 #if F3D_MODULE_UI
-  if (!firLine.empty())
+  if (!desc.empty())
   {
     vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
 
-    ren->AddNotification(firLine, secLine);
+    ren->AddNotification(desc, value);
   }
 #endif
 }
@@ -2149,6 +2156,7 @@ void interactor_impl::SetCommandBuffer(const char* command)
 //----------------------------------------------------------------------------
 interactor& interactor_impl::InitBindNotificationMap()
 {
+#if F3D_MODULE_UI
   this->Internals->BindNotifactionMap.clear();
   f3d::options& opts = this->Internals->Options;
 
@@ -2157,15 +2165,15 @@ interactor& interactor_impl::InitBindNotificationMap()
   // Define lambdas used for documentation
 
   // "Animation Forward/Backward" , "Playing/Paused" or "No Animation";
-  auto docPlayAnim = [&](const std::string& doc)
+  auto docPlayAnim = [&](const std::string& desc)
   {
-      std::string sec = this->Internals->AnimationManager->GetAnimationName() == "No animation"
+      std::string value = this->Internals->AnimationManager->GetAnimationName() == "No animation"
       ? "No Animation"
       : this->isPlayingAnimation()
       ? "Playing"
       : "Paused";
 
-      return std::pair(doc, sec);
+      return std::pair(desc, value);
   };
 
   // "Cycle array to color with" , "arrayName"
@@ -2189,11 +2197,12 @@ interactor& interactor_impl::InitBindNotificationMap()
   this->removeBindNotiCallback("set_hdri");
   this->removeBindNotiCallback("exit");
   this->removeBindNotiCallback("toggle ui.console");
+  this->removeBindNotiCallback("toggle ui.cheatsheet");
 
   this->addBindNotiCallback("toggle_animation", std::bind(docPlayAnim, "Animation Forward"));
   this->addBindNotiCallback("toggle_animation_backward", std::bind(docPlayAnim, "Animation Backward"));
   this->addBindNotiCallback("cycle_coloring array", docColorArray);
-
+ #endif
   return *this;
 }
 }

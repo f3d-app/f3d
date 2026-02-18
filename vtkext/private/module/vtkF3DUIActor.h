@@ -38,8 +38,8 @@ public:
 
   struct Notification
   {
-    std::string firLine;
-    std::string secLine;
+    std::string desc;
+    std::string value;
     float timeElapsed = 0.f;
   };
 
@@ -185,7 +185,7 @@ public:
   /**
    * Add notification info to deque
    */
-  void AddNotification(std::string& firLine, std::string& secLine);
+  void AddNotification(std::string& desc, std::string& value);
 
 protected:
   vtkF3DUIActor();

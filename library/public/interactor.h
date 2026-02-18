@@ -256,16 +256,12 @@ public:
    * Initialize binding notification map for interaction key press binding notification.
    * Call after initialization of default binding and before adding custom binding,
    * prevent the default binding ducumentation callback overwrite by custom binding.
-   *
-   * @return interactor reference.
    */
   virtual interactor& InitBindNotificationMap() = 0;
 
   /**
    * Load `interactor_impl::internal->BindNotifactionMap` using command string as key
    * and ducumentation callback as value from `interactor_impl::internal->Bindings`.
-   *
-   * @return interactor reference.
    */
   virtual interactor& loadBindNotiCallback() = 0;
 
@@ -291,12 +287,13 @@ public:
   virtual bool triggerBindingNotification(std::string command) = 0;
 
   /**
-   * Trigger a notification at the bottom right of veiwport.
+   * Trigger a notification at the bottom left of veiwport.
+   * Both description and value texts render on same line.
    *
-   * @param firLine text string show in first line.
-   * @param secLine text string show in second line.
+   * @param desc text string show in white color.
+   * @param value text string show in blue color by default, green if is "ON", red if is "OFF".
    */
-  virtual void addNotification(std::string firLine, std::string secLine = "") = 0;
+  virtual void addNotification(std::string desc, std::string value = "") = 0;
   ///@}
 
   ///@{ @name Animation

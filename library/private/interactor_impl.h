@@ -65,7 +65,7 @@ public:
   bool addBindNotiCallback(std::string command, documentation_callback_t doc_callback) override;
   bool removeBindNotiCallback(std::string command) override;
   bool triggerBindingNotification(std::string command) override;
-  void addNotification(std::string firLine, std::string secLine = "") override;
+  void addNotification(std::string desc, std::string value = "") override;
 
   interactor& triggerEventLoop(double deltaTime) override;
   interactor& triggerModUpdate(InputModifier mod) override;

@@ -227,15 +227,15 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
   return 1;
 }
 
-void vtkF3DUIActor::AddNotification(std::string& firLine, std::string& secLine)
+void vtkF3DUIActor::AddNotification(std::string& desc, std::string& value)
 {
   for (auto it = this->Notifications.begin(); it != this->Notifications.end(); ++it)
   {
-    if (firLine == (*it).firLine)
+    if (desc == (*it).desc)
     {
       Notifications.erase(it); // Remove duplicate
       break;
     }
   }
-  this->Notifications.emplace_front(Notification{ firLine, secLine });
+  this->Notifications.emplace_front(Notification{ desc, value });
 }

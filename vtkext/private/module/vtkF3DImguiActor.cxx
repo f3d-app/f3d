@@ -890,7 +890,6 @@ void vtkF3DImguiActor::RenderNotifications()
   for (auto it = this->Notifications.begin(); it != this->Notifications.end();)
   {
     auto& [desc, value, timeElapsed] = *it;
-
     timeElapsed += io.DeltaTime;
 
     if (timeElapsed > 3)
@@ -902,21 +901,16 @@ void vtkF3DImguiActor::RenderNotifications()
       const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
       constexpr float margin = F3DStyle::GetDefaultMargin();
-
       ImVec2 descLineSize = ImGui::CalcTextSize(desc.c_str());
       ImVec2 valueLineSize = ImGui::CalcTextSize(value.c_str());
+      ImVec2 windowPadding = ImGui::GetStyle().WindowPadding;
 
-      float windowWidth = std::max(descLineSize.x, valueLineSize.x);
-      windowWidth += ImGui::GetStyle().WindowPadding.x * 2.f;
+      float windowWidth = descLineSize.x + valueLineSize.x + windowPadding.x * 2.f;
+      windowWidth += value.empty() ? 0.f : ImGui::GetStyle().ItemSpacing.x;
 
-      float windowHeight = value.empty()
-        ? descLineSize.y + ImGui::GetStyle().WindowPadding.y * 2.f
-        : descLineSize.y * 2.f + ImGui::GetTextLineHeightWithSpacing();
+      float windowHeight = descLineSize.y + windowPadding.y * 2.f;
 
-      ImVec2 position(
-        viewport->WorkSize.x - windowWidth - margin,
-        viewport->WorkSize.y - windowHeight - margin - y_offset);
-
+      ImVec2 position(margin, viewport->WorkSize.y - windowHeight - margin - y_offset);
       ::SetupNextWindow(position, ImVec2(windowWidth, windowHeight));
 
       float alpha = 1.f, fading = .5f;
@@ -932,7 +926,6 @@ void vtkF3DImguiActor::RenderNotifications()
       descTextColor.w = alpha;
 
       ImVec4 valueTextColor = F3DStyle::imgui::GetHighlightColor(); // Blue
-
       if (!value.empty())
       {
         if (value == "ON")
@@ -943,7 +936,6 @@ void vtkF3DImguiActor::RenderNotifications()
         {
           valueTextColor = F3DStyle::imgui::GetErrorColor(); // Red
         }
-
         valueTextColor.w = alpha;
       }
 
@@ -953,14 +945,10 @@ void vtkF3DImguiActor::RenderNotifications()
 
       ImGui::Begin(("##notif_" + std::to_string(index)).c_str(), nullptr, flags);
 
-      float posX = (windowWidth - descLineSize.x) * 0.5f; // Text centering
-      ImGui::SetCursorPosX(posX);
       ImGui::TextColored(descTextColor, desc.c_str());
-
       if (!value.empty())
       {
-        posX = (windowWidth - valueLineSize.x) * 0.5f;
-        ImGui::SetCursorPosX(posX);
+        ImGui::SameLine();
         ImGui::TextColored(valueTextColor, value.c_str());
       }
 

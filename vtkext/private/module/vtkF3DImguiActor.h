@@ -97,7 +97,7 @@ private:
   void RenderConsoleBadge() override;
 
   /**
-   * Render the notifications at the bottom right of veiwport.
+   * Render the notifications at the bottom left of veiwport.
    * Newest to oldest, from bottom to top.
    */
   void RenderNotifications() override;
