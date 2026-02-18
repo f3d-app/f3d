@@ -25,6 +25,8 @@ runs:
         key: sqlite-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-1
 
     # csb contains sqlite 3.43.0
+    # use --depth=1 --revision=08be462f7fa9816f881dbb93eacb2e287f319208
+    # when git supports it
     - name: Checkout common-superbuild and set everything up
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
       shell: bash
