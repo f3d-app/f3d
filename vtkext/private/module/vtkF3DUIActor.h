@@ -287,7 +287,7 @@ protected:
 
   /**
    * Initializing the vector here because its needed in the initialization function,
-   * but set afterwards. This avoids an illegal memory access.
+   * but set afterwards.
    */
   std::vector<double> FontColor = { 1.0, 1.0, 1.0 };
 

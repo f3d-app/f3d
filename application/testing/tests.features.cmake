@@ -211,7 +211,7 @@ endif()
 f3d_test(NAME TestFont DATA suzanne.ply ARGS -n --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf UI)
 f3d_test(NAME TestFontScale2 DATA suzanne.ply ARGS -n --font-scale=2 UI)
 f3d_test(NAME TestFontScale3 DATA suzanne.ply ARGS -n --font-scale=3 UI)
-f3d_test(NAME TestFontColor1 DATA suzanne.ply ARGS -n --font-color=Orange UI)
+f3d_test(NAME TestFontColor DATA suzanne.ply ARGS -n --font-color=Orange UI)
 
 ## Special CLI syntax
 f3d_test(NAME TestDefines DATA dragon.vtu ARGS -Dscene.up_direction=+Z --define=model.color.rgb=red)
