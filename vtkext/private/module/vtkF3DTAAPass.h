@@ -12,6 +12,8 @@
 
 #include "vtkImageProcessingPass.h"
 
+#include <vtkMatrix4x4.h>
+#include <vtkOpenGLHelper.h>
 #include <vtkSmartPointer.h>
 
 #include <memory>
@@ -45,6 +47,14 @@ public:
   }
 
   /**
+   * Reduce iteratios count. Keep the blending factor at 0.9.
+   */
+  void ReduceIterations()
+  {
+    this->HistoryIteration = 9;
+  }
+
+  /**
    * Modify shader code for jittering
    */
   bool PreReplaceShaderValues(std::string& vertexShader, std::string& geometryShader,
@@ -73,13 +83,19 @@ private:
 
   vtkSmartPointer<vtkOpenGLFramebufferObject> FrameBufferObject;
   vtkSmartPointer<vtkTextureObject> ColorTexture;
+  vtkSmartPointer<vtkTextureObject> DepthTexture;
   vtkSmartPointer<vtkTextureObject> HistoryTexture;
+  vtkSmartPointer<vtkTextureObject> MotionVectorTexture;
 
   std::shared_ptr<vtkOpenGLQuadHelper> QuadHelper;
+  int viewPortSize[2];
 
   int HistoryIteration = 0;
   float Jitter[2] = { 0.0f, 0.0f };
   int TaaHaltonNumerator[2] = { 0, 0 };
   int TaaHaltonDenominator[2] = { 1, 1 };
+
+  vtkSmartPointer<vtkMatrix4x4> CurrentViewProjectionMatrix;
+  vtkSmartPointer<vtkMatrix4x4> PreviousViewProjectionMatrix;
 };
 #endif
