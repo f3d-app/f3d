@@ -23,6 +23,8 @@ jobs:
     name: Set default versions
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:fast') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:android') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:wasm') ||
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
@@ -87,6 +89,7 @@ jobs:
     name: Update LFS data cache
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:fast') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:android') ||
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
@@ -109,22 +112,20 @@ jobs:
   #----------------------------------------------------------------------------
   # Cache Dependencies: Checkout and compile all dependencies but VTK if not cached
   #----------------------------------------------------------------------------
-  cache_dependencies:
-    name: Cache dependencies
+  cache_dependencies_linux:
+    name: Cache dependencies Linux
     needs: default_versions
     if: |
+      contains(github.event.pull_request.labels.*.name, 'ci:android') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:wasm') ||
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-15-intel, macos-15]
         build_type: [standard]
         include:
-          - cpu: x86_64
-          - os: macos-15
-            cpu: arm64
           - alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           - assimp_version: ${{needs.default_versions.outputs.assimp_version}}
           - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
@@ -141,8 +142,6 @@ jobs:
           - webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: mindeps
-            os: ubuntu-22.04
-            cpu: x86_64
             alembic_version: ${{needs.default_versions.outputs.alembic_min_version}}
             assimp_version: ${{needs.default_versions.outputs.assimp_min_version}}
             blosc_version: ${{needs.default_versions.outputs.blosc_min_version}}
@@ -159,8 +158,8 @@ jobs:
             webifc_version: ${{needs.default_versions.outputs.webifc_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
 
-    runs-on: ${{matrix.os}}
-    container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    runs-on: ubuntu-22.04
+    container: ghcr.io/f3d-app/f3d-ci
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
@@ -176,7 +175,7 @@ jobs:
       - name: Generic Dependencies
         uses: ./source/.github/actions/generic-dependencies
         with:
-          cpu: ${{matrix.cpu}}
+          cpu: x86_64
           alembic_version: ${{matrix.alembic_version}}
           assimp_version: ${{matrix.assimp_version}}
           blosc_version: ${{matrix.blosc_version}}
@@ -194,12 +193,9 @@ jobs:
           zlib_version: ${{matrix.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
-  #----------------------------------------------------------------------------
-  # Cache VTK Dependency: Checkout and compile VTK if not cached
-  #----------------------------------------------------------------------------
-  cache_vtk_dependency:
-    name: Cache VTK dependency
-    needs: [default_versions, cache_dependencies]
+  cache_dependencies_windows:
+    name: Cache dependencies Windows
+    needs: default_versions
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -207,57 +203,220 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-15-intel, macos-15]
-        vtk_version:
-          [
-            "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.6.0,
-            v9.5.2,
-            v9.4.2,
-            v9.3.0,
-          ]
         build_type: [standard]
-        exclude:
-          - os: macos-15-intel
-            vtk_version: v9.3.0
-          - os: macos-15
-            vtk_version: v9.3.0
+        include:
+          - alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          - assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
+          - draco_version: ${{needs.default_versions.outputs.draco_version}}
+          - imath_version: ${{needs.default_versions.outputs.imath_version}}
+          - occt_version: ${{needs.default_versions.outputs.occt_version}}
+          - openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          - ospray_version: ${{needs.default_versions.outputs.ospray_version}}
+          - pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
+          - usd_version: ${{needs.default_versions.outputs.usd_version}}
+          - webp_version: ${{needs.default_versions.outputs.webp_version}}
+          - webifc_version: ${{needs.default_versions.outputs.webifc_version}}
+          - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+
+    runs-on: windows-latest
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 1
+          lfs: false
+
+      - name: Generic Dependencies
+        uses: ./source/.github/actions/generic-dependencies
+        with:
+          cpu: x86_64
+          alembic_version: ${{matrix.alembic_version}}
+          assimp_version: ${{matrix.assimp_version}}
+          blosc_version: ${{matrix.blosc_version}}
+          draco_version: ${{matrix.draco_version}}
+          imath_version: ${{matrix.imath_version}}
+          occt_version: ${{matrix.occt_version}}
+          openexr_version: ${{matrix.openexr_version}}
+          openvdb_version: ${{matrix.openvdb_version}}
+          ospray_version: ${{matrix.ospray_version}}
+          pybind11_version: ${{matrix.pybind11_version}}
+          tbb_version: ${{matrix.tbb_version}}
+          usd_version: ${{matrix.usd_version}}
+          webp_version: ${{matrix.webp_version}}
+          webifc_version: ${{matrix.webifc_version}}
+          zlib_version: ${{matrix.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
+
+  cache_dependencies_macos_intel:
+    name: Cache dependencies macOS intel
+    needs: default_versions
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'ci:full') ||
+      github.ref == 'refs/heads/master'
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [standard]
         include:
           - cpu: x86_64
+          - alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          - assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
+          - draco_version: ${{needs.default_versions.outputs.draco_version}}
+          - imath_version: ${{needs.default_versions.outputs.imath_version}}
+          - occt_version: ${{needs.default_versions.outputs.occt_version}}
+          - openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          - ospray_version: ${{needs.default_versions.outputs.ospray_version}}
+          - pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
+          - usd_version: ${{needs.default_versions.outputs.usd_version}}
+          - webp_version: ${{needs.default_versions.outputs.webp_version}}
+          - webifc_version: ${{needs.default_versions.outputs.webifc_version}}
+          - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+
+    runs-on: macos-15-intel
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 1
+          lfs: false
+
+      - name: Generic Dependencies
+        uses: ./source/.github/actions/generic-dependencies
+        with:
+          cpu: x86_64
+          alembic_version: ${{matrix.alembic_version}}
+          assimp_version: ${{matrix.assimp_version}}
+          blosc_version: ${{matrix.blosc_version}}
+          draco_version: ${{matrix.draco_version}}
+          imath_version: ${{matrix.imath_version}}
+          occt_version: ${{matrix.occt_version}}
+          openexr_version: ${{matrix.openexr_version}}
+          openvdb_version: ${{matrix.openvdb_version}}
+          ospray_version: ${{matrix.ospray_version}}
+          pybind11_version: ${{matrix.pybind11_version}}
+          tbb_version: ${{matrix.tbb_version}}
+          usd_version: ${{matrix.usd_version}}
+          webp_version: ${{matrix.webp_version}}
+          webifc_version: ${{matrix.webifc_version}}
+          zlib_version: ${{matrix.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
+
+  cache_dependencies_macos_arm:
+    name: Cache dependencies macOS arm
+    needs: default_versions
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'ci:main') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:full') ||
+      github.ref == 'refs/heads/master'
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [standard]
+        include:
+          - alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          - assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
+          - draco_version: ${{needs.default_versions.outputs.draco_version}}
+          - imath_version: ${{needs.default_versions.outputs.imath_version}}
+          - occt_version: ${{needs.default_versions.outputs.occt_version}}
+          - openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          - ospray_version: ${{needs.default_versions.outputs.ospray_version}}
+          - pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
+          - usd_version: ${{needs.default_versions.outputs.usd_version}}
+          - webp_version: ${{needs.default_versions.outputs.webp_version}}
+          - webifc_version: ${{needs.default_versions.outputs.webifc_version}}
+          - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+
+    runs-on: macos-15
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 1
+          lfs: false
+
+      - name: Generic Dependencies
+        uses: ./source/.github/actions/generic-dependencies
+        with:
+          cpu: arm64
+          alembic_version: ${{matrix.alembic_version}}
+          assimp_version: ${{matrix.assimp_version}}
+          blosc_version: ${{matrix.blosc_version}}
+          draco_version: ${{matrix.draco_version}}
+          imath_version: ${{matrix.imath_version}}
+          occt_version: ${{matrix.occt_version}}
+          openexr_version: ${{matrix.openexr_version}}
+          openvdb_version: ${{matrix.openvdb_version}}
+          ospray_version: ${{matrix.ospray_version}}
+          pybind11_version: ${{matrix.pybind11_version}}
+          tbb_version: ${{matrix.tbb_version}}
+          usd_version: ${{matrix.usd_version}}
+          webp_version: ${{matrix.webp_version}}
+          webifc_version: ${{matrix.webifc_version}}
+          zlib_version: ${{matrix.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
+
+  #---------------------------------------------------------------------------------------------------
+  # Cache VTK Dependency: Checkout and compile VTK if not cached, to avoid building VTK multiple times
+  #---------------------------------------------------------------------------------------------------
+  cache_vtk_dependency_linux:
+    name: Cache VTK dependency Linux
+    needs: [default_versions, cache_dependencies_linux]
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'ci:main') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:full') ||
+      github.ref == 'refs/heads/master'
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [standard]
+        include:
           - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
           - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           - ospray_version: ${{needs.default_versions.outputs.ospray_version}}
           - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          - os: macos-15
-            cpu: arm64
           - build_type: mindeps
-            os: ubuntu-22.04
-            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-            cpu: x86_64
             blosc_version: ${{needs.default_versions.outputs.blosc_min_version}}
             openvdb_version: ${{needs.default_versions.outputs.openvdb_min_version}}
             ospray_version: ${{needs.default_versions.outputs.ospray_min_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
           - build_type: no_optional_deps
-            os: ubuntu-22.04
-            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-            cpu: x86_64
             blosc_version: ${{needs.default_versions.outputs.blosc_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: no_raytracing
-            os: ubuntu-22.04
-            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-            cpu: x86_64
             blosc_version: ${{needs.default_versions.outputs.blosc_version}}
             openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
-    runs-on: ${{matrix.os}}
-    container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    runs-on: ubuntu-22.04
+    container: ghcr.io/f3d-app/f3d-ci
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
@@ -281,7 +440,7 @@ jobs:
       - name: Install VTK dependencies
         uses: ./source/.github/actions/vtk-dependencies
         with:
-          cpu: ${{matrix.cpu}}
+          cpu: x86_64
           openvdb_version: ${{matrix.openvdb_version}}
           blosc_version: ${{matrix.blosc_version}}
           tbb_version: ${{matrix.tbb_version}}
@@ -293,14 +452,14 @@ jobs:
         uses: ./source/.github/actions/ospray-sb-install-dep
         with:
           version: ${{matrix.ospray_version}}
-          cpu: ${{matrix.cpu}}
+          cpu: x86_64
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
       - name: VTK dependency
         uses: ./source/.github/actions/vtk-install-dep
         with:
-          vtk_version: ${{matrix.vtk_version}}
-          cpu: ${{matrix.cpu}}
+          vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+          cpu: x86_64
           blosc_version: ${{matrix.blosc_version}}
           openvdb_version: ${{matrix.openvdb_version}}
           ospray_version: ${{matrix.ospray_version}}
@@ -312,7 +471,7 @@ jobs:
   # Windows CI: Build and test, cross-vtk build matrix
   #----------------------------------------------------------------------------
   windows:
-    needs: [cache_lfs, cache_vtk_dependency, default_versions]
+    needs: [cache_lfs, cache_dependencies_windows, default_versions]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -415,7 +574,7 @@ jobs:
   # Linux CI: Build and test, cross-vtk build matrix
   #----------------------------------------------------------------------------
   linux:
-    needs: [cache_lfs, cache_vtk_dependency, default_versions]
+    needs: [cache_lfs, cache_vtk_dependency_linux, default_versions]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -625,10 +784,9 @@ jobs:
   #----------------------------------------------------------------------------
   # MacOS CI: Build and test, cross-vtk build matrix
   #----------------------------------------------------------------------------
-  macos:
-    needs: [cache_lfs, cache_vtk_dependency, default_versions]
+  macos_intel:
+    needs: [cache_lfs, cache_dependencies_macos_intel, default_versions]
     if: |
-      contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
     strategy:
@@ -683,7 +841,7 @@ jobs:
   # MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
   #----------------------------------------------------------------------------
   macos_arm:
-    needs: [cache_lfs, cache_vtk_dependency, default_versions]
+    needs: [cache_lfs, cache_dependencies_macos_arm, default_versions]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -750,8 +908,13 @@ jobs:
   #----------------------------------------------------------------------------
   # Python packaging: Build and test the Python wheel
   #----------------------------------------------------------------------------
-  python-packaging:
-    needs: [cache_lfs, cache_vtk_dependency, default_versions]
+  python_packaging:
+    needs:
+      - cache_lfs
+      - cache_vtk_dependency_linux
+      - cache_dependencies_windows
+      - cache_dependencies_macos_arm
+      - default_versions
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
@@ -813,7 +976,7 @@ jobs:
   # Coverage: Build and test on linux with last VTK with coverage option
   #----------------------------------------------------------------------------
   coverage:
-    needs: [cache_lfs, cache_vtk_dependency, default_versions]
+    needs: [cache_lfs, cache_vtk_dependency_linux, default_versions]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -863,7 +1026,7 @@ jobs:
   # "memory" returns false positives in VTK:
   # https://stackoverflow.com/questions/60097307/memory-sanitizer-reports-use-of-uninitialized-value-in-global-object-constructio
   sanitizer:
-    needs: [cache_lfs, cache_vtk_dependency, default_versions]
+    needs: [cache_lfs, cache_vtk_dependency_linux, default_versions]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
@@ -913,8 +1076,9 @@ jobs:
   # static-analysis: Run static analysis on linux
   #----------------------------------------------------------------------------
   static-analysis:
-    needs: [cache_lfs, cache_vtk_dependency, default_versions]
+    needs: [cache_lfs, cache_vtk_dependency_linux, default_versions]
     if: |
+      contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
     strategy:
@@ -960,7 +1124,7 @@ jobs:
   # external-build: Check build of F3D as sub-project
   #----------------------------------------------------------------------------
   external-build:
-    needs: [cache_vtk_dependency, default_versions]
+    needs: [cache_vtk_dependency_linux, default_versions]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
@@ -1001,7 +1165,10 @@ jobs:
     # This job does not do anything in master branch but is not skipped for simpler logic
     steps:
       - name: Extract branch name
-        if: contains(github.event.pull_request.labels.*.name, 'ci:full')
+        if: |
+          contains(github.event.pull_request.labels.*.name, 'ci:android') ||
+          contains(github.event.pull_request.labels.*.name, 'ci:wasm') ||
+          contains(github.event.pull_request.labels.*.name, 'ci:full')
         shell: bash
         run: echo "F3D_BRANCH_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_ENV
 
@@ -1024,6 +1191,7 @@ jobs:
   android:
     needs: [default_versions, check_docker_images]
     if: |
+      contains(github.event.pull_request.labels.*.name, 'ci:android') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
     strategy:
@@ -1053,6 +1221,7 @@ jobs:
   webassembly:
     needs: [cache_lfs, default_versions, check_docker_images]
     if: |
+      contains(github.event.pull_request.labels.*.name, 'ci:wasm') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
     strategy:
@@ -1077,7 +1246,6 @@ jobs:
         with:
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
-      # TODO: it's currently NOT using NPM, let's fix it when 3.3 is available
       - name: Install dependencies
         working-directory: ${{github.workspace}}/source/examples/libf3d/web
         run: npm install
