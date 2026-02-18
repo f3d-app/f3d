@@ -21,48 +21,41 @@ runs:
       id: cache-sqlite
       uses: actions/cache/restore@v4
       with:
-        path: ${{github.workspace}}/dependencies/sqlite_install
-        key: sqlite-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
+        path: ${{github.workspace}}/dependencies/sqlite_build/install
+        key: sqlite-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-1
 
-    - name: Checkout sqlite
+    # csb contains sqlite 3.43.0
+    - name: Checkout common-superbuild and set everything up
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
-      uses: actions/checkout@v4
-      with:
-        repository: sqlite/sqlite
-        path: "./dependencies/sqlite"
-        ref: ${{inputs.version}}
-
-    - name: Setup sqlite
-      if: steps.cache-sqlite.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies
-      shell: bash
       run: |
-        mkdir sqlite_install
+        git clone --depth=1 --revision=08be462f7fa9816f881dbb93eacb2e287f319208 https://gitlab.kitware.com/paraview/common-superbuild.git sqlite_csb
+        mkdir sqlite_build
 
     - name: Configure sqlite
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies/sqlite
+      working-directory: ${{github.workspace}}/dependencies/sqlite_build
       shell: bash
-      run: |
-        apt install -y tcl8.6
-        ./configure \
-        --prefix=$(pwd)/dependencies/sqlite_install \
-        --enable-all
+      run: >
+        cmake ../sqlite_csb/selftest
+        -DENABLE_sqlite=ON
+        -DCMAKE_BUILD_TYPE=Release
+        ${{ runner.os == 'Windows' && '-G Ninja' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0' || null }}
 
     - name: Build sqlite
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies/sqlite
+      working-directory: ${{github.workspace}}/dependencies/sqlite_build
       shell: bash
-      run: make install
+      run: cmake --build . --parallel 2
 
     - name: Copy to install
-      working-directory: ${{github.workspace}}/dependencies/sqlite
+      working-directory: ${{github.workspace}}/dependencies/sqlite_build/install
       shell: bash
-      run: cp -r ./* ../install/
+      run: cp -r ./* ../../install/
 
     - name: Save cache
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
       uses: actions/cache/save@v4
       with:
         key: ${{ steps.cache-sqlite.outputs.cache-primary-key }}
-        path: dependencies/sqlite_install
+        path: dependencies/sqlite_build/install
