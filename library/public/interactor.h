@@ -260,40 +260,14 @@ public:
   virtual interactor& InitBindNotificationMap() = 0;
 
   /**
-   * Load `interactor_impl::internal->BindNotifactionMap` using command string as key
-   * and ducumentation callback as value from `interactor_impl::internal->Bindings`.
-   */
-  virtual interactor& loadBindNotiCallback() = 0;
-
-  /**
    * Add or modify binding documentation callback to binding notification map using command string as key.
-   *
-   * @return True if new command and callback inserted; False if existing callback was replaced.
    */
-  virtual bool addBindNotiCallback(std::string command, documentation_callback_t doc_callback) = 0;
+  virtual interactor& addBindNotiCallback(std::string command, documentation_callback_t doc_callback) = 0;
 
   /**
-   * Helper function to remove element from `interactor_impl::internal->BindNotifactionMap` using command string.
-   *
-   * @return True if element removed; False if element not exist.
+   * Remove element from binding notification map using command string.
    */
-  virtual bool removeBindNotiCallback(std::string command) = 0;
-
-  /**
-   * Trigger a binding key press notification by command string
-   *
-   * @return True if command string exist; False if command string not exist.
-   */
-  virtual bool triggerBindingNotification(std::string command) = 0;
-
-  /**
-   * Trigger a notification at the bottom left of veiwport.
-   * Both description and value texts render on same line.
-   *
-   * @param desc text string show in white color.
-   * @param value text string show in blue color by default, green if is "ON", red if is "OFF".
-   */
-  virtual void addNotification(std::string desc, std::string value = "") = 0;
+  virtual interactor& removeBindNotiCallback(std::string command) = 0;
   ///@}
 
   ///@{ @name Animation
@@ -428,6 +402,15 @@ public:
    * Provided file path will be used as is and the parent directories of the file will be created.
    */
   virtual bool recordInteraction(const std::filesystem::path& file) = 0;
+
+  /**
+   * Trigger a notification at the bottom left of veiwport.
+   * Both description and value texts render on same line.
+   *
+   * @param desc text string show in white color.
+   * @param value text string show in blue color by default, green if is "ON", red if is "OFF".
+   */
+  virtual void addNotification(std::string desc, std::string value = "") = 0;
 
   /**
    * Start the interactor event loop.

@@ -61,11 +61,8 @@ public:
   BindingType getBindingType(const interaction_bind_t& bind) const override;
 
   interactor& InitBindNotificationMap() override;
-  interactor& loadBindNotiCallback() override;
-  bool addBindNotiCallback(std::string command, documentation_callback_t doc_callback) override;
-  bool removeBindNotiCallback(std::string command) override;
-  bool triggerBindingNotification(std::string command) override;
-  void addNotification(std::string desc, std::string value = "") override;
+  interactor& addBindNotiCallback(std::string command, documentation_callback_t doc_callback) override;
+  interactor& removeBindNotiCallback(std::string command) override;
 
   interactor& triggerEventLoop(double deltaTime) override;
   interactor& triggerModUpdate(InputModifier mod) override;
@@ -87,6 +84,8 @@ public:
   bool playInteraction(const std::filesystem::path& file, double deltaTime,
     std::function<void()> userCallBack) override;
   bool recordInteraction(const std::filesystem::path& file) override;
+
+  void addNotification(std::string desc, std::string value = "") override;
 
   interactor& start(double deltaTime, std::function<void()> userCallBack) override;
   interactor& stop() override;
