@@ -606,6 +606,7 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->SetFontFile(opt.ui.font_file);
   renderer->SetFontScale(opt.ui.scale);
+  renderer->SetFontColor(opt.ui.font_color);
   renderer->SetDPIAware(opt.ui.dpi_aware);
 
   renderer->SetGridUnitSquare(opt.render.grid.unit);
@@ -634,6 +635,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetTextureNormal(opt.model.normal.texture);
   renderer->SetNormalScale(opt.model.normal.scale);
   renderer->SetTextureMatCap(opt.model.matcap.texture);
+  renderer->SetEnableCheckerBoard(opt.model.checkerboard.enable);
 
   renderer->SetEnableColoring(opt.model.scivis.enable);
   renderer->SetUseCellColoring(opt.model.scivis.cells);

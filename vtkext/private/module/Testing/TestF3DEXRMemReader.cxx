@@ -45,6 +45,15 @@ int TestF3DEXRMemReader(int argc, char* argv[])
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
   vtkNew<vtkMemoryResourceStream> stream;
   stream->SetBuffer(buff.data(), buff.size());
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260128)
+  if (reader->CanReadFile(stream) == 0)
+  {
+    std::cerr << "Unexpected CanReadFile failure.\n";
+    return EXIT_FAILURE;
+  }
+#endif
+
   reader->SetStream(stream);
 #else
   reader->SetMemoryBuffer(buff.data());

@@ -5,25 +5,20 @@ f3d_test(NAME Test3MF DATA cube_gears.3mf PLUGIN assimp)
 f3d_test(NAME TestFBX DATA phong_cube.fbx PLUGIN assimp)
 f3d_test(NAME TestFBX16bits DATA 16bit.fbx PLUGIN assimp)
 f3d_test(NAME TestVerboseCameraAssimp DATA duck.dae ARGS --verbose PLUGIN assimp NO_BASELINE REGEXP "camera1")
-
-if(NOT APPLE OR VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
-  f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --background-color=1,1,1 -p PLUGIN assimp)
-endif()
+f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --background-color=1,1,1 -p PLUGIN assimp)
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
-  f3d_test(NAME TestAssimpValidation DATA Wolf.fbx PLUGIN assimp ARGS REGEXP "Some of these files could not be loaded" NO_BASELINE)
+  f3d_test(NAME TestAssimpInvalid DATA invalid_truncated.fbx PLUGIN assimp REGEXP "Some of these files could not be loaded" NO_BASELINE)
   f3d_test(NAME TestAssimpMetaDataImporter DATA duck.fbx PLUGIN assimp ARGS -m UI)
 endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251016)
-  f3d_test(NAME TestPipedOFF DATA teapot.off PLUGIN assimp ARGS --up=+Z --force-reader=OFF PIPED)
-  f3d_test(NAME TestPiped3MF DATA cube_gears.3mf PLUGIN assimp ARGS --force-reader=3MF PIPED)
-  f3d_test(NAME TestPipedFBX DATA phong_cube.fbx PLUGIN assimp ARGS --force-reader=FBX PIPED)
-  f3d_test(NAME TestPipedDAE DATA duck.dae PLUGIN assimp ARGS --force-reader=COLLADA PIPED) # Texture not loaded
-  f3d_test(NAME TestPipedX DATA anim_test.x PLUGIN assimp ARGS --force-reader=DirectX PIPED)
-  if (NOT APPLE)
-    f3d_test(NAME TestPipedDXF DATA PinkEggFromLW.dxf PLUGIN assimp ARGS --background-color=1,1,1 -p --force-reader=DXF PIPED)
-  endif()
+  f3d_test(NAME TestPipedOFF DATA teapot.off ARGS --up=+Z PLUGIN assimp PIPED OFF)
+  f3d_test(NAME TestPiped3MF DATA cube_gears.3mf PLUGIN assimp PIPED 3MF)
+  f3d_test(NAME TestPipedFBX DATA phong_cube.fbx PLUGIN assimp PIPED FBX)
+  f3d_test(NAME TestPipedDAE DATA duck.dae PLUGIN assimp PIPED COLLADA) # Texture not loaded
+  f3d_test(NAME TestPipedX DATA anim_test.x PLUGIN assimp PIPED DirectX)
+  f3d_test(NAME TestPipedDXF DATA PinkEggFromLW.dxf ARGS --background-color=1,1,1 -p PLUGIN assimp PIPED DXF)
 endif()
 
 f3d_test(NAME TestVerboseAssimp DATA duck.fbx ARGS --verbose PLUGIN assimp NO_BASELINE REGEXP "LOD3sp")

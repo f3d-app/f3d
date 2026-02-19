@@ -11,7 +11,7 @@ tmp_dir=$3
 
 hires_data=$data_dir/cow.vtp
 lowres_data=$data_dir/cowlow.vtp
-invalid_data=$data_dir/invalid.vtp
+invalid_data=$data_dir/invalid_body.vtp
 reloaded_data=$tmp_dir/cow.vtp
 
 rm -rf $reloaded_data

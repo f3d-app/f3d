@@ -46,8 +46,7 @@
         {
           "longName": "force-reader",
           "helpText": "Force a specific reader to be used, disregarding the file extension",
-          "valueHelper": "<reader>",
-          "implicitValue": "1"
+          "valueHelper": "<reader>"
         },
         {
           "longName": "list-bindings",
@@ -298,6 +297,11 @@
           "valueHelper": "<ratio>"
         },
         {
+          "longName": "font-color",
+          "helpText": "Set font color",
+          "valueHelper": "<color>"
+        },
+        {
           "longName": "backdrop-opacity",
           "helpText": "UI backdrop opacity",
           "valueHelper": "<value>",
@@ -339,8 +343,7 @@
         {
           "longName": "point-size",
           "helpText": "Point size when showing vertices, model specified by default",
-          "valueHelper": "<size>",
-          "implicitValue": ""
+          "valueHelper": "<size>"
         },
         {
           "longName": "line-width",
@@ -432,6 +435,12 @@
           "valueHelper": "<file path>"
         },
         {
+          "longName": "checkerboard",
+          "helpText": "Apply checkerboard texture to objects",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
           "longName": "normal-scale",
           "helpText": "Normal scale affects the strength of the normal deviation from the normal texture",
           "valueHelper": "<normalScale>"
@@ -493,8 +502,7 @@
         {
           "longName": "blur-coc",
           "helpText": "Blur circle of confusion radius",
-          "valueHelper": "<value>",
-          "implicitValue": ""
+          "valueHelper": "<value>"
         },
         {
           "longName": "light-intensity",

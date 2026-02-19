@@ -1,5 +1,6 @@
 #include "vtkF3DRenderer.h"
 
+#include "F3DCheckerBoard.h"
 #include "F3DColoringInfoHandler.h"
 #include "F3DDefaultHDRI.h"
 #include "F3DLog.h"
@@ -1557,6 +1558,8 @@ void vtkF3DRenderer::ConfigureTextActors()
     }
   }
 
+  this->UIActor->SetFontColor(FontColor);
+
   double scaleFactor = this->DPIAware ? F3DUtils::getDPIScale() : 1.0;
 
   this->UIActor->SetFontScale(this->FontScale * scaleFactor);
@@ -1600,6 +1603,18 @@ void vtkF3DRenderer::SetFontScale(const double fontScale)
   if (this->FontScale != fontScale)
   {
     this->FontScale = fontScale;
+    this->TextActorsConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetFontColor(const std::vector<double>& color)
+{
+  assert(color.size() == 3);
+
+  if (this->FontColor != color)
+  {
+    this->FontColor = color;
     this->TextActorsConfigured = false;
   }
 }
@@ -2386,6 +2401,16 @@ void vtkF3DRenderer::SetTextureNormal(const std::optional<fs::path>& tex)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetEnableCheckerBoard(bool enable)
+{
+  if (this->EnableCheckerBoard != enable)
+  {
+    this->EnableCheckerBoard = enable;
+    this->ActorsPropertiesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetPointSpritesType(vtkF3DRenderer::SplatType type)
 {
   if (this->PointSpritesType != type)
@@ -2584,6 +2609,56 @@ void vtkF3DRenderer::ConfigureActorsProperties()
       auto matCapTex = ::GetTexture(this->TextureMatCap.value());
       coloring.Actor->GetProperty()->SetTexture("matcap", matCapTex);
       coloring.OriginalActor->GetProperty()->SetTexture("matcap", matCapTex);
+    }
+
+    if (this->EnableCheckerBoard)
+    {
+      vtkPolyData* polydata = vtkPolyData::SafeDownCast(coloring.Actor->GetMapper()->GetInput());
+      const bool actorHasUV = polydata && polydata->GetPointData()->GetTCoords();
+
+      if (actorHasUV)
+      {
+        if (!this->CheckerBoardReader)
+        {
+          this->CheckerBoardReader = vtkSmartPointer<vtkPNGReader>::New();
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+          vtkNew<vtkMemoryResourceStream> stream;
+          stream->SetBuffer(F3DCheckerBoard, sizeof(F3DCheckerBoard));
+          this->CheckerBoardReader->SetStream(stream);
+#else
+          this->CheckerBoardReader->SetMemoryBuffer(F3DCheckerBoard);
+          this->CheckerBoardReader->SetMemoryBufferLength(sizeof(F3DCheckerBoard));
+#endif
+        }
+
+        if (!this->CheckerBoardTexture)
+        {
+          this->CheckerBoardReader->Update();
+          this->CheckerBoardTexture = vtkSmartPointer<vtkTexture>::New();
+          this->CheckerBoardTexture->SetInputConnection(this->CheckerBoardReader->GetOutputPort());
+          this->CheckerBoardTexture->UseSRGBColorSpaceOn();
+          this->CheckerBoardTexture->InterpolateOn();
+          this->CheckerBoardTexture->MipmapOn();
+          this->CheckerBoardTexture->SetColorModeToDirectScalars();
+        }
+
+        assert(this->CheckerBoardTexture);
+        coloring.Actor->GetProperty()->SetBaseColorTexture(this->CheckerBoardTexture);
+        coloring.OriginalActor->GetProperty()->SetBaseColorTexture(this->CheckerBoardTexture);
+        coloring.Actor->GetProperty()->SetMetallic(0.f);
+        coloring.OriginalActor->GetProperty()->SetMetallic(0.f);
+        coloring.Actor->GetProperty()->SetBaseIOR(1.f);
+        coloring.OriginalActor->GetProperty()->SetBaseIOR(1.f);
+        coloring.Actor->GetProperty()->SetNormalTexture(nullptr);
+        coloring.OriginalActor->GetProperty()->SetNormalTexture(nullptr);
+        coloring.Actor->GetProperty()->SetEmissiveTexture(nullptr);
+        coloring.OriginalActor->GetProperty()->SetEmissiveTexture(nullptr);
+      }
+      else
+      {
+        F3DLog::Print(F3DLog::Severity::Warning,
+          "Texture coordinates are required to display checkerboard texture.");
+      }
     }
   }
 

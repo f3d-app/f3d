@@ -23,7 +23,7 @@ int TestF3DEXRReaderInvalid(int argc, char* argv[])
   reader->SetFileName(filename.c_str());
   reader->Update();
 
-  filename = std::string(argv[1]) + "data/invalid_cut.exr";
+  filename = std::string(argv[1]) + "data/invalid_truncated.exr";
   reader->SetFileName(filename.c_str());
   reader->Update();
 

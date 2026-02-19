@@ -36,6 +36,7 @@ class vtkDiscretizableColorTransferFunction;
 class vtkF3DOpenGLGridMapper;
 class vtkGridAxesActor3D;
 class vtkImageReader2;
+class vtkPNGReader;
 class vtkOrientationMarkerWidget;
 class vtkScalarBarActor;
 class vtkSkybox;
@@ -113,6 +114,7 @@ public:
   void SetPointSize(const std::optional<double>& pointSize);
   void SetFontFile(const std::optional<fs::path>& fontFile);
   void SetFontScale(const double fontScale);
+  void SetFontColor(const std::vector<double>& color);
   void SetDPIAware(bool enable);
   void SetHDRIFile(const std::optional<fs::path>& hdriFile);
   void SetUseImageBasedLighting(bool use) override;
@@ -393,6 +395,11 @@ public:
   void SetEnableColoring(bool enable);
   vtkGetMacro(EnableColoring, bool);
   ///@}
+
+  /**
+   * Set checkerboard mode
+   */
+  void SetEnableCheckerBoard(bool enable);
 
   ///@{
   /**
@@ -716,6 +723,8 @@ private:
 
   std::optional<fs::path> FontFile;
   double FontScale = 1.0;
+  std::vector<double> FontColor;
+
   bool DPIAware = false;
 
   double LightIntensity = 1.0;
@@ -754,6 +763,10 @@ private:
   std::optional<fs::path> TextureMaterial;
   std::optional<fs::path> TextureEmissive;
   std::optional<fs::path> TextureNormal;
+
+  bool EnableCheckerBoard = false;
+  vtkSmartPointer<vtkPNGReader> CheckerBoardReader;
+  vtkSmartPointer<vtkTexture> CheckerBoardTexture;
 
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorTransferFunction;
   bool ExpandingRangeSet = false;

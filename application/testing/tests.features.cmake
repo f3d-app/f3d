@@ -134,6 +134,8 @@ f3d_test(NAME TestTexturesTransform DATA world.obj ARGS --textures-transform=1,0
 f3d_test(NAME TestTexturesTransformGL DATA WaterBottle.glb ARGS --textures-transform=1,0,0,0,-1,0,0,0,1 --camera-direction=-1,0,0)
 f3d_test(NAME TestTextureMatCapWithEdges DATA suzanne.ply ARGS -e --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png)
 f3d_test(NAME TestTextureColorWithOptions DATA WaterBottle.glb ARGS --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --color=1,1,0 --opacity=0.4 --blending)
+f3d_test(NAME TestTextureCheckerBoard DATA WaterBottle.glb ARGS --checkerboard)
+f3d_test(NAME TestTextureCheckerBoardOnMissingUV DATA RiggedFigure.glb ARGS --checkerboard REGEXP "Texture coordinates are required to display checkerboard texture." NO_BASELINE)
 
 if(NOT APPLE OR VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
   f3d_test(NAME TestTextureColor DATA WaterBottle.glb ARGS --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --blending)
@@ -158,7 +160,7 @@ f3d_test(NAME TestConsoleBadgeQuiet DATA suzanne.ply ARGS --position=0 --verbose
 
 # Require improved importer support https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11303
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240910)
-  f3d_test(NAME TestConsoleBadgeError DATA invalid.vtp NO_DATA_FORCE_RENDER UI)
+  f3d_test(NAME TestConsoleBadgeError DATA invalid_body.vtp NO_DATA_FORCE_RENDER UI)
 endif()
 
 ## Axis widget
@@ -201,8 +203,8 @@ f3d_test(NAME TestMultiInputMultiArgs ARGS --input ${F3D_SOURCE_DIR}/testing/dat
 
 # Require improved importer support https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11303
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240910)
-  f3d_test(NAME TestInvalidFileFileNameEmpty DATA invalid.vtp ARGS --filename NO_DATA_FORCE_RENDER UI)
-  f3d_test(NAME TestMultiFileInvalid DATA cow.vtp invalid.vtp dragon.vtu ARGS --multi-file-mode=all NO_DATA_FORCE_RENDER UI)
+  f3d_test(NAME TestInvalidFileFileNameEmpty DATA invalid_body.vtp ARGS --filename NO_DATA_FORCE_RENDER UI)
+  f3d_test(NAME TestMultiFileInvalid DATA cow.vtp invalid_body.vtp dragon.vtu ARGS --multi-file-mode=all NO_DATA_FORCE_RENDER UI)
   f3d_test(NAME TestMultiFileUnsupportedFilesFileName DATA unsupportedFile.dummy cow.vtp ARGS --multi-file-mode=all --filename NO_DATA_FORCE_RENDER UI)
   f3d_test(NAME TestMultiFileCameraIndex DATA Cameras.gltf CameraAnimated.glb ARGS --multi-file-mode=all --camera-index=2 --opacity=0.5 --blending)
 endif()
@@ -211,6 +213,7 @@ endif()
 f3d_test(NAME TestFont DATA suzanne.ply ARGS -n --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf UI)
 f3d_test(NAME TestFontScale2 DATA suzanne.ply ARGS -n --font-scale=2 UI)
 f3d_test(NAME TestFontScale3 DATA suzanne.ply ARGS -n --font-scale=3 UI)
+f3d_test(NAME TestFontColor DATA suzanne.ply ARGS -n --font-color=Orange UI)
 
 ## Special CLI syntax
 f3d_test(NAME TestDefines DATA dragon.vtu ARGS -Dscene.up_direction=+Z --define=model.color.rgb=red)
@@ -416,8 +419,8 @@ endif()
 ## Final shader
 
 # Add labels manually because adding thanks to f3d_test methods escape ";}" at the end of the final shader.
-f3d_test(NAME TestFinalShaderNegative DATA cow.vtp ARGS --verbose --final-shader "vec4 pixel(vec2 uv){return vec4(vec3(1.0) - texture(source, uv).rgb, 1.0)\\\\\\\;}" LABELS "application")
-f3d_test(NAME TestFinalShaderNegativeFileName DATA cow.vtp ARGS --verbose --filename --final-shader "vec4 pixel(vec2 uv){return vec4(vec3(1.0) - texture(source, uv).rgb, 1.0)\\\\\\\\;}" UI LABELS "application")
+f3d_test(NAME TestFinalShaderNegative DATA cow.vtp ARGS --verbose --final-shader "vec4 pixel(vec2 uv){return vec4(vec3(1.0) - texture(source, uv).rgb, 1.0)\\\\\\\;}")
+f3d_test(NAME TestFinalShaderNegativeFileName DATA cow.vtp ARGS --verbose --filename --final-shader "vec4 pixel(vec2 uv){return vec4(vec3(1.0) - texture(source, uv).rgb, 1.0)\\\\\\\\;}" UI)
 f3d_test(NAME TestFinalShaderUndefined DATA cow.vtp ARGS --final-shader "undefined" REGEXP "Final shader must define a function" NO_BASELINE)
 f3d_test(NAME TestFinalShaderCompilationFailure DATA cow.vtp ARGS --final-shader "vec4 pixel(vec2 uv){}" --verbose REGEXP " build the shader program" NO_BASELINE)
 
@@ -589,7 +592,7 @@ f3d_test(NAME TestNonExistentTexture DATA cow.vtp ARGS --texture-material=${F3D_
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
   # Test invalid file
-  f3d_test(NAME TestInvalidFile DATA duck_invalid.gltf REGEXP "failed to load scene" NO_BASELINE)
+  f3d_test(NAME TestInvalidFile DATA invalid_body.gltf REGEXP "failed to load scene" NO_BASELINE)
 
   # Test invalid animation
   f3d_test(NAME TestAnimationInvalid DATA BoxAnimated_invalid_animation.gltf ARGS --animation-time 1 REGEXP "Could not load time value: 1" NO_BASELINE)
@@ -717,7 +720,7 @@ f3d_test(NAME TestReadersList ARGS --list-readers REGEXP_FAIL "No registered rea
 f3d_test(NAME TestInteractionInvalidComponent INTERACTION UI DATA cow.vtp ARGS --coloring-component=1 NO_BASELINE) #H
 
 # Test opening invalid file then switching to another file
-f3d_test(NAME TestInteractionInvalidFile INTERACTION DATA invalid.vtp cow.vtp ARGS --loading-progress) #Right
+f3d_test(NAME TestInteractionInvalidFile INTERACTION DATA invalid_body.vtp cow.vtp ARGS --loading-progress) #Right
 
 # Test bindings-list display
 f3d_test(NAME TestBindingsList ARGS --list-bindings REGEXP "Any.5        Orthographic Projection")
@@ -742,6 +745,13 @@ f3d_test(NAME TestHelpPrecedenceWithUnknownOption ARGS --help --unknown REGEXP "
 
 # Test that --version is displayed even when there is an unknown option
 f3d_test(NAME TestVersionPrecedenceWithUnknownOption ARGS --version --unknown REGEXP "Version:" NO_BASELINE)
+
+# PIPED error code path
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
+  f3d_test(NAME TestPipedForced DATA suzanne.ply ARGS --force-reader=PLYReader --verbose PIPED PLYReader REGEXP "Forcing reader" NO_BASELINE)
+  f3d_test(NAME TestPipedForcedInvalid DATA suzanne.ply ARGS --force-reader=invalid PIPED invalid REGEXP "is not a valid force reader" NO_BASELINE)
+  f3d_test(NAME TestPipedForcedInvalidStream DATA beach.nrrd ARGS --force-reader=Nrrd PIPED Nrrd REGEXP "does not support reading streams" NO_BASELINE)
+endif()
 
 ## Filesystem error code path
 if(NOT WIN32)

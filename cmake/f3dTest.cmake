@@ -33,7 +33,7 @@ f3d_test(<NAME> [ARGS...])
   - `DPI_SCALE` Set the DPI scale through the environment variable `CTEST_F3D_FORCE_DPI_SCALE`, default is 1.0
   - `UI` Mark the test to require the presence of UI component and disable it otherwise
   - `PIPED` Mark the test to pipe the data (`cat data | f3d`) instead of providing the filename as data,
-    doesn't work for external plugins.
+    doesn't work for external plugins, pass the reader as an arg, it will be used to force before VTK v9.6.20260128
   - `SCRIPT` Mark the test to use a `--script` of the same name as the test
   - `NAME` Provide the name of the test, mandatory and must be unique
   - `CONFIG` Provide the `--config` to use, instead of `--no-config`
@@ -54,7 +54,7 @@ f3d_test(<NAME> [ARGS...])
 
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;PIPED;SCRIPT" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;LABELS;PLUGIN" "DATA;DEPENDS;ENV;ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED;LABELS;PLUGIN" "DATA;DEPENDS;ENV;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -112,7 +112,7 @@ function(f3d_test)
   if(NOT F3D_TEST_NO_BASELINE)
     list(APPEND F3D_TEST_ARGS "--reference=${F3D_SOURCE_DIR}/testing/baselines/${F3D_TEST_NAME}.png")
 
-    if(F3D_TEST_THRESHOLD)
+    if(DEFINED F3D_TEST_THRESHOLD)
       list(APPEND F3D_TEST_ARGS "--reference-threshold=${F3D_TEST_THRESHOLD}")
     endif()
   endif()
@@ -145,6 +145,10 @@ function(f3d_test)
   endif()
 
   if (F3D_TEST_PIPED)
+    list(APPEND F3D_TEST_LABELS "piped")
+    if(VTK_VERSION VERSION_LESS 9.6.20260128)
+      list(APPEND F3D_TEST_ARGS "--force-reader=${F3D_TEST_PIPED}")
+    endif()
     list(JOIN F3D_TEST_ARGS " " F3D_TEST_ARGS_JOINED)
     add_test(
       NAME "f3d::${F3D_TEST_NAME}"

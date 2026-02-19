@@ -8,11 +8,11 @@ f3d_test(NAME TestAlembicAnimationXFormRotation DATA joint1.abc PLUGIN alembic A
 f3d_test(NAME TestAlembicCurves DATA monkey_curves.abc PLUGIN alembic THRESHOLD 0.07) #  High threshold because of line rendering
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
-  f3d_test(NAME TestAlembicInvalid DATA invalid.abc PLUGIN alembic ARGS -s REGEXP "failed to load scene" NO_BASELINE)
+  f3d_test(NAME TestAlembicInvalid DATA invalid_truncated.abc PLUGIN alembic ARGS -s REGEXP "failed to load scene" NO_BASELINE)
 endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251210)
-  f3d_test(NAME TestPipedAlembic DATA suzanne.abc PLUGIN alembic ARGS -s --force-reader=Alembic PIPED)
+  f3d_test(NAME TestPipedAlembic DATA suzanne.abc PLUGIN alembic ARGS -s PIPED Alembic)
 endif()
 
 if(NOT F3D_MACOS_BUNDLE)

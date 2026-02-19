@@ -273,6 +273,10 @@
       "type": "ratio",
       "default_value": "1.0"
     },
+    "font_color": {
+      "type": "color",
+      "default_value": "0.957,0.957,0.957"
+    },
     "loader_progress": {
       "type": "bool",
       "default_value": "false"
@@ -296,6 +300,12 @@
     "matcap": {
       "texture": {
         "type": "path"
+      }
+    },
+    "checkerboard": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
       }
     },
     "color": {

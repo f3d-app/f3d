@@ -42,7 +42,35 @@ else()
   set(F3D_PLUGIN_OCCT_COLORING_SUPPORT ON CACHE INTERNAL "")
 endif()
 
-set(_occt_formats "STEP;IGES;BREP")
+f3d_plugin_init()
+
+set(_has_supports_stream 0)
+set(_SUPPORTS_STREAM)
+
+# IGES doesn's support stream, handle it first
+set(_occt_format "IGES")
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/FORMAT.inl.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/${_occt_format}.inl"
+  @ONLY)
+
+f3d_plugin_declare_reader(
+  NAME IGES
+  EXTENSIONS igs iges
+  MIMETYPES model/iges
+  VTK_READER vtkF3DOCCTReader
+  SCORE 40 # No proper CanReadFile implementation
+  FORMAT_DESCRIPTION "Initial Graphics Exchange Specification"
+  CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/IGES.inl"
+  OPTIONS linear_deflection angular_deflection read_wire relative_deflection
+)
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251223)
+  set(_SUPPORTS_STREAM SUPPORTS_STREAM)
+  set(_has_supports_stream 1)
+endif()
+
+set(_occt_formats "STEP;BREP")
 if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
   list(APPEND _occt_formats "XBF")
 endif()
@@ -54,13 +82,6 @@ foreach(_occt_format IN LISTS _occt_formats)
     @ONLY)
 endforeach()
 
-f3d_plugin_init()
-
-set(_SUPPORTS_STREAM)
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251223)
-  set(_SUPPORTS_STREAM SUPPORTS_STREAM)
-endif()
-
 f3d_plugin_declare_reader(
   NAME STEP
   EXTENSIONS stp step stpnc p21 210
@@ -68,17 +89,8 @@ f3d_plugin_declare_reader(
   VTK_READER vtkF3DOCCTReader
   FORMAT_DESCRIPTION "STEP ISO 10303"
   ${_SUPPORTS_STREAM}
+  CAN_READ CUSTOM
   CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/STEP.inl"
-  OPTIONS linear_deflection angular_deflection read_wire relative_deflection
-)
-
-f3d_plugin_declare_reader(
-  NAME IGES
-  EXTENSIONS igs iges
-  MIMETYPES model/iges
-  VTK_READER vtkF3DOCCTReader
-  FORMAT_DESCRIPTION "Initial Graphics Exchange Specification"
-  CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/IGES.inl"
   OPTIONS linear_deflection angular_deflection read_wire relative_deflection
 )
 
@@ -89,6 +101,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkF3DOCCTReader
   FORMAT_DESCRIPTION "Open CASCADE BRep"
   ${_SUPPORTS_STREAM}
+  CAN_READ CUSTOM
   CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/BREP.inl"
   OPTIONS linear_deflection angular_deflection read_wire relative_deflection
 )
@@ -101,6 +114,7 @@ if (F3D_PLUGIN_OCCT_COLORING_SUPPORT)
     VTK_READER vtkF3DOCCTReader
     FORMAT_DESCRIPTION "Open CASCADE XBF"
     ${_SUPPORTS_STREAM}
+    CAN_READ CUSTOM
     CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/XBF.inl"
     OPTIONS linear_deflection angular_deflection read_wire relative_deflection
   )
