@@ -227,7 +227,7 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
   return 1;
 }
 
-void vtkF3DUIActor::AddNotification(std::string& desc, std::string& value)
+void vtkF3DUIActor::AddNotification(std::string& desc, std::string& value, std::string& bind)
 {
   for (auto it = this->Notifications.begin(); it != this->Notifications.end(); ++it)
   {
@@ -237,5 +237,5 @@ void vtkF3DUIActor::AddNotification(std::string& desc, std::string& value)
       break;
     }
   }
-  this->Notifications.emplace_front(Notification{ desc, value });
+  this->Notifications.emplace_front(Notification{ desc, value, bind });
 }

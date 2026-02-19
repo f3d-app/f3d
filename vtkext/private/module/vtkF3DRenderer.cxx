@@ -3514,7 +3514,7 @@ void vtkF3DRenderer::SetConsoleBadgeEnabled(bool enabled)
   this->UIActor->SetConsoleBadgeEnabled(enabled);
 }
 
-void vtkF3DRenderer::AddNotification(std::string& desc, std::string& value)
+void vtkF3DRenderer::AddNotification(std::string& desc, std::string& value, std::string& bind)
 {
-  this->UIActor->AddNotification(desc, value);
+  this->UIActor->AddNotification(desc, value, bind);
 }

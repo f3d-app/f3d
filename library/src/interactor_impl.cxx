@@ -516,7 +516,7 @@ public:
           // XXX: Ignore the boolean return of triggerCommand,
           // error is already logged by triggerCommand
           this->Interactor.triggerCommand(commandWithArgs);
-          this->triggerBindingNotification(commandWithoutArgs);
+          this->triggerBindingNotification(commandWithoutArgs, bind.format());
         }
         catch (const f3d::interactor::command_runtime_exception& ex)
         {
@@ -533,14 +533,18 @@ public:
     this->Window.render();
   }
 
-  void triggerBindingNotification(std::string command)
+  void triggerBindingNotification(std::string command, std::string bind)
   {
 #if F3D_MODULE_UI
     if (this->BindNotifactionMap.find(command) !=
       this->BindNotifactionMap.end())
     {
       auto [description, value] = this->BindNotifactionMap[command]();
-      this->Interactor.addNotification(description, value);
+      if (!value.empty())
+      {
+        description.append(":");
+      }
+      this->Interactor.addNotification(description, value, bind);
     }
 #endif
   }
@@ -1900,7 +1904,7 @@ interactor& interactor_impl::removeBindNotiCallback(std::string command)
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::addNotification(std::string desc, std::string value)
+void interactor_impl::addNotification(std::string desc, std::string value, std::string bind)
 {
 #if F3D_MODULE_UI
   if (!desc.empty())
@@ -1908,7 +1912,7 @@ void interactor_impl::addNotification(std::string desc, std::string value)
     vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
 
-    ren->AddNotification(desc, value);
+    ren->AddNotification(desc, value, bind);
   }
 #endif
 }

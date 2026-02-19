@@ -889,7 +889,7 @@ void vtkF3DImguiActor::RenderNotifications()
 
   for (auto it = this->Notifications.begin(); it != this->Notifications.end();)
   {
-    auto& [desc, value, timeElapsed] = *it;
+    auto& [desc, value, bind, timeElapsed] = *it;
     timeElapsed += io.DeltaTime;
 
     if (timeElapsed > 3)
@@ -900,13 +900,31 @@ void vtkF3DImguiActor::RenderNotifications()
     {
       const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
+      // Mimic the style format in cheatsheet
       constexpr float margin = F3DStyle::GetDefaultMargin();
       ImVec2 descLineSize = ImGui::CalcTextSize(desc.c_str());
       ImVec2 valueLineSize = ImGui::CalcTextSize(value.c_str());
       ImVec2 windowPadding = ImGui::GetStyle().WindowPadding;
+      const float plusWidth = ImGui::CalcTextSize("+").x;
+      const float itemSpacingX = ImGui::GetStyle().ItemSpacing.x;
 
       float windowWidth = descLineSize.x + valueLineSize.x + windowPadding.x * 2.f;
-      windowWidth += value.empty() ? 0.f : ImGui::GetStyle().ItemSpacing.x;
+      windowWidth += value.empty() ? 0.f : itemSpacingX;
+      windowWidth += bind.empty() ? 0.f : itemSpacingX;
+
+      auto keys = ::SplitBindings(bind, '+');
+
+      if (!bind.empty())
+      {
+        windowWidth += std::accumulate(keys.begin(), keys.end(), 0.0f,
+          [](float sum, const std::string& key) { return sum + ImGui::CalcTextSize(key.c_str()).x; });
+
+        if (keys.size() > 1)
+        {
+          windowWidth += (keys.size() - 1) * (itemSpacingX + plusWidth + itemSpacingX);
+        }
+        windowWidth += ImGui::CalcTextSize(" ").x + itemSpacingX;
+      }
 
       float windowHeight = descLineSize.y + windowPadding.y * 2.f;
 
@@ -943,7 +961,41 @@ void vtkF3DImguiActor::RenderNotifications()
         ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing |
         ImGuiWindowFlags_NoNav;
 
+      // Render each notification in separated window
       ImGui::Begin(("##notif_" + std::to_string(index)).c_str(), nullptr, flags);
+
+      if (!bind.empty())
+      {
+        ImVec2 topBindingCorner, bottomBindingCorner;
+        ImVec4 keyTextColor = F3DStyle::imgui::GetBackgroundColor(); // Black
+        keyTextColor.w = alpha;
+        ImVec4 keyRectColor = F3DStyle::imgui::GetWarningColor();  // Yellow
+        keyRectColor.w = alpha;
+
+        for (const std::string& key : keys)
+        {
+          ImDrawList* drawList = ImGui::GetWindowDrawList();
+          drawList->ChannelsSplit(2);
+          drawList->ChannelsSetCurrent(1);
+          ImGui::TextColored(keyTextColor, key.c_str());
+          drawList->ChannelsSetCurrent(0);
+          topBindingCorner =
+            ImVec2(ImGui::GetItemRectMin().x - margin, ImGui::GetItemRectMin().y - (margin * .5f));
+          bottomBindingCorner =
+            ImVec2(ImGui::GetItemRectMax().x + margin, ImGui::GetItemRectMax().y + (margin * .5f));
+          drawList->AddRectFilled(
+            topBindingCorner, bottomBindingCorner, ImColor(keyRectColor), 5.f);
+          drawList->ChannelsMerge();
+          if (key != keys.back())
+          {
+            ImGui::SameLine();
+            ImGui::Text("+");
+          }
+          ImGui::SameLine();
+        }
+        ImGui::Text(" ");
+        ImGui::SameLine();
+      }
 
       ImGui::TextColored(descTextColor, desc.c_str());
       if (!value.empty())

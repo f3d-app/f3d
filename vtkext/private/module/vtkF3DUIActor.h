@@ -40,6 +40,7 @@ public:
   {
     std::string desc;
     std::string value;
+    std::string bind;
     float timeElapsed = 0.f;
   };
 
@@ -185,7 +186,7 @@ public:
   /**
    * Add notification info to deque
    */
-  void AddNotification(std::string& desc, std::string& value);
+  void AddNotification(std::string& desc, std::string& value, std::string& bind);
 
 protected:
   vtkF3DUIActor();
