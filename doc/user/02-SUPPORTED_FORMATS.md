@@ -15,6 +15,13 @@ F3D supports the following file formats:
 | NRRD ("nearly raw raster data")           | `.nrrd`, `.nhdr`                               | No         | NONE              | NO                | `native`  | `Nrrd`                  |
 | MetaHeader MetaIO                         | `.mhd`, `.mha`                                 | No         | NONE              | NO                | `native`  | `MetaImage`             |
 | Tag Image File Format 2D/3D               | `.tif`, `.tiff`                                | No         | NONE              | NO                | `native`  | `TIFF`                  |
+| PNG Image                                 | `.png`                                         | Yes        | NONE              | YES (VTK 9.6)     | `native`  | `PNG`                   |
+| JPEG Image                                | `.jpg`, `.jpeg`                                | Yes        | NONE              | YES (VTK 9.6)     | `native`  | `JPEG`                  |
+| BMP Image                                 | `.bmp`                                         | Yes        | NONE              | YES (VTK 9.6)     | `native`  | `BMP`                   |
+| TGA Image                                 | `.tga`                                         | Yes        | NONE              | YES (VTK 9.6)     | `native`  | `TGA`                   |
+| HDR Radiance Image                        | `.hdr`                                         | Yes        | NONE              | YES (VTK 9.6)     | `native`  | `HDR`                   |
+| WebP Image                                | `.webp`                                        | Yes        | NONE              | YES (VTK 9.6)     | `native`  | `WebP`                  |
+| OpenEXR Image                             | `.exr`                                         | Yes        | NONE              | YES (VTK 9.6)     | `native`  | `EXR`                   |
 | QuakeMDL                                  | `.mdl`                                         | Yes        | SINGLE            | YES (VTK 9.5)     | `native`  | `QuakeMDL`              |
 | CityGML                                   | `.gml`                                         | No         | NONE              | YES (VTK 9.6)     | `native`  | `CityGML`               |
 | Point Cloud                               | `.pts`                                         | No         | NONE              | YES (VTK 9.6)     | `native`  | `PTS`                   |
@@ -37,6 +44,7 @@ F3D supports the following file formats:
 | 3D Manufacturing Format                   | `.3mf`                                         | Yes        | NONE              | YES (VTK 9.6)     | `assimp`  | `3MF`                   |
 | Universal Scene Description               | `.usd`, `.usda`, `.usdc`, `.usdz`              | Yes        | SINGLE            | NO                | `usd`     | `USD`                   |
 | VDB                                       | `.vdb`                                         | No         | NONE              | YES (VTK 9.6)     | `vdb`     | `VDB`                   |
+| Industry Foundation Classes               | `.ifc`                                         | No         | NONE              | YES               | `webifc`  | `IFC`                   |
 | 3D Gaussian splatting                     | `.splat`                                       | No         | NONE              | YES (VTK 9.5)     | `native`  | `Splat`                 |
 | Compressed 3D Gaussian splatting          | `.spz`                                         | No         | NONE              | YES (VTK 9.5)     | `native`  | `SPZ`                   |
 
@@ -51,26 +59,29 @@ eg: `-DVDB.downsampling_factor=0.5` or using the `set_reader_option` [command](0
 
 For booleans, 0 means false, not 0 means true. Unsigned int will interpret anything that is not a non-negative integer as the default value.
 
-| File extension | Option Name                | Argument Type  | Description                                                                          |
-| -------------- | -------------------------- | -------------- | ------------------------------------------------------------------------------------ |
-| `vdb`          | `VDB.downsampling_factor`  | `double`       | Control the level of downsampling when reading a volume, default is 0.1.             |
-| `occt`         | `STEP.linear_deflection`   | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
-| `occt`         | `STEP.angular_deflection`  | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
-| `occt`         | `STEP.relative_deflection` | `bool`         | Control if the deflection values are relative to object size, default is false.      |
-| `occt`         | `STEP.read_wire`           | `bool`         | Control if lines should be read, default is true.                                    |
-| `occt`         | `IGES.linear_deflection`   | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
-| `occt`         | `IGES.angular_deflection`  | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
-| `occt`         | `IGES.relative_deflection` | `bool`         | Control if the deflection values are relative to object size, default is false.      |
-| `occt`         | `IGES.read_wire`           | `bool`         | Control if lines should be read, default is true.                                    |
-| `occt`         | `BREP.linear_deflection`   | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
-| `occt`         | `BREP.angular_deflection`  | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
-| `occt`         | `BREP.relative_deflection` | `bool`         | Control if the deflection values are relative to object size, default is false.      |
-| `occt`         | `BREP.read_wire`           | `bool`         | Control if lines should be read, default is true.                                    |
-| `occt`         | `XBF.linear_deflection`    | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
-| `occt`         | `XBF.angular_deflection`   | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
-| `occt`         | `XBF.relative_deflection`  | `bool`         | Control if the deflection values are relative to object size, default is false.      |
-| `occt`         | `XBF.read_wire`            | `bool`         | Control if lines should be read, default is true.                                    |
-| `mdl`          | `QuakeMDL.skin_index`      | `unsigned int` | Select a particular skin from a `mdl` file. Uses 0-indexing, default is 0.           |
+| Plugin   | Option Name                | Argument Type  | Description                                                                          |
+| -------- | -------------------------- | -------------- | ------------------------------------------------------------------------------------ |
+| `vdb`    | `VDB.downsampling_factor`  | `double`       | Control the level of downsampling when reading a volume, default is 0.1.             |
+| `occt`   | `STEP.linear_deflection`   | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
+| `occt`   | `STEP.angular_deflection`  | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
+| `occt`   | `STEP.relative_deflection` | `bool`         | Control if the deflection values are relative to object size, default is false.      |
+| `occt`   | `STEP.read_wire`           | `bool`         | Control if lines should be read, default is true.                                    |
+| `occt`   | `IGES.linear_deflection`   | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
+| `occt`   | `IGES.angular_deflection`  | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
+| `occt`   | `IGES.relative_deflection` | `bool`         | Control if the deflection values are relative to object size, default is false.      |
+| `occt`   | `IGES.read_wire`           | `bool`         | Control if lines should be read, default is true.                                    |
+| `occt`   | `BREP.linear_deflection`   | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
+| `occt`   | `BREP.angular_deflection`  | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
+| `occt`   | `BREP.relative_deflection` | `bool`         | Control if the deflection values are relative to object size, default is false.      |
+| `occt`   | `BREP.read_wire`           | `bool`         | Control if lines should be read, default is true.                                    |
+| `occt`   | `XBF.linear_deflection`    | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
+| `occt`   | `XBF.angular_deflection`   | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
+| `occt`   | `XBF.relative_deflection`  | `bool`         | Control if the deflection values are relative to object size, default is false.      |
+| `occt`   | `XBF.read_wire`            | `bool`         | Control if lines should be read, default is true.                                    |
+| `mdl`    | `QuakeMDL.skin_index`      | `unsigned int` | Select a particular skin from a `mdl` file. Uses 0-indexing, default is 0.           |
+| `webifc` | `IFC.circle_segments`      | `int`          | Number of segments for circular geometry, default is 12.                             |
+| `webifc` | `IFC.read_openings`        | `bool`         | Read IfcOpeningElement entities (doors/windows cutouts), default is false.           |
+| `webifc` | `IFC.read_spaces`          | `bool`         | Read IfcSpace entities (room volumes), default is false.                             |
 
 ## Format details
 

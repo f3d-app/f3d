@@ -1,0 +1,754 @@
+{
+  "$schema": "./cli-options.schema.json",
+  "groups": [
+    {
+      "name": "Applicative",
+      "options": [
+        {
+          "longName": "input",
+          "helpText": "Input Files",
+          "valueHelper": "<files>"
+        },
+        {
+          "longName": "define",
+          "shortName": "D",
+          "helpText": "Define libf3d options"
+        },
+        {
+          "longName": "reset",
+          "shortName": "R",
+          "helpText": "Reset libf3d options"
+        },
+        {
+          "longName": "output",
+          "helpText": "Render to file",
+          "valueHelper": "<png file>"
+        },
+        {
+          "longName": "no-background",
+          "helpText": "No background when render to file",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "help",
+          "shortName": "h",
+          "helpText": "Print help"
+        },
+        {
+          "longName": "version",
+          "helpText": "Print version details"
+        },
+        {
+          "longName": "list-readers",
+          "helpText": "Print the list of readers"
+        },
+        {
+          "longName": "force-reader",
+          "helpText": "Force a specific reader to be used, disregarding the file extension",
+          "valueHelper": "<reader>"
+        },
+        {
+          "longName": "list-bindings",
+          "helpText": "Print the list of interaction bindings and exits, ignored with `--no-render`, only considers the first file group.",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "config",
+          "helpText": "Specify the configuration file to use. absolute/relative path or filename/filestem to search in configuration file locations",
+          "valueHelper": "<filePath/filename/fileStem>"
+        },
+        {
+          "longName": "no-config",
+          "helpText": "Do not read the configuration file",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "no-render",
+          "helpText": "Do not render anything and quit right after loading the first file, use with --verbose to recover information about a file.",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "rendering-backend",
+          "helpText": "Backend to use when rendering (auto|glx|wgl|egl|osmesa)",
+          "valueHelper": "<string>"
+        },
+        {
+          "longName": "list-rendering-backends",
+          "helpText": "Print the list of rendering backends available on this system"
+        },
+        {
+          "longName": "max-size",
+          "helpText": "Maximum size in Mib of a file to load, leave empty for unlimited",
+          "valueHelper": "<size in Mib>"
+        },
+        {
+          "longName": "dpi-aware",
+          "helpText": "Scale font and window resolution according to system scale",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "watch",
+          "helpText": "Watch current file and automatically reload it whenever it is modified on disk",
+          "valueHelper": "<bool>",
+          "implicitValue": "1",
+          "conditional": "F3D_MODULE_DMON"
+        },
+        {
+          "longName": "frame-rate",
+          "helpText": "Frame rate used to refresh animation and other repeated tasks (watch, UI). Does not impact rendering frame rate.",
+          "valueHelper": "<fps>"
+        },
+        {
+          "longName": "load-plugins",
+          "helpText": "List of plugins to load separated with a comma",
+          "valueHelper": "<paths or names>"
+        },
+        {
+          "longName": "scan-plugins",
+          "helpText": "Scan standard directories for plugins and display available plugins (result can be incomplete)"
+        },
+        {
+          "longName": "screenshot-filename",
+          "helpText": "Screenshot filename",
+          "valueHelper": "<filename>"
+        }
+      ]
+    },
+    {
+      "name": "General",
+      "options": [
+        {
+          "longName": "verbose",
+          "helpText": "Set verbose level, providing more information about the loaded data in the console output",
+          "valueHelper": "{debug, info, warning, error, quiet}",
+          "implicitValue": "debug"
+        },
+        {
+          "longName": "loading-progress",
+          "helpText": "Show loading progress bar",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "animation-progress",
+          "helpText": "Show animation progress bar",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "multi-file-mode",
+          "helpText": "Choose the behavior when opening multiple files. \"single\" will show one file at a time, \"all\" will show all files in a single scene, \"dir\" will show files from the same directory in the same scene.",
+          "valueHelper": "<single|all|dir>"
+        },
+        {
+          "longName": "multi-file-regex",
+          "helpText": "Regular expression pattern to group files. Captured groups are replaced with \"*\" so that, for example, the pattern \"part(\\d+)\" would group files \"foo-part1.xyz\" and \"foo-part2.xyz\" together as \"foo-part*.xyz\"",
+          "valueHelper": "<regex>"
+        },
+        {
+          "longName": "recursive-dir-add",
+          "helpText": "Add directories recursively",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "remove-empty-file-groups",
+          "helpText": "Remove file groups that results into an empty scene",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "up",
+          "helpText": "Up direction",
+          "valueHelper": "<direction>"
+        },
+        {
+          "longName": "axis",
+          "shortName": "x",
+          "helpText": "Show axes",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "grid",
+          "shortName": "g",
+          "helpText": "Show grid",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "x-color",
+          "helpText": "Color of the X axis",
+          "valueHelper": "<color>"
+        },
+        {
+          "longName": "y-color",
+          "helpText": "Color of the Y axis",
+          "valueHelper": "<color>"
+        },
+        {
+          "longName": "z-color",
+          "helpText": "Color of the Z axis",
+          "valueHelper": "<color>"
+        },
+        {
+          "longName": "grid-absolute",
+          "helpText": "Position grid at the absolute origin instead of below the model",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "grid-unit",
+          "helpText": "Size of grid unit square, automatically computed by default",
+          "valueHelper": "<value>"
+        },
+        {
+          "longName": "grid-subdivisions",
+          "helpText": "Number of grid subdivisions",
+          "valueHelper": "<value>"
+        },
+        {
+          "longName": "grid-color",
+          "helpText": "Color of main grid lines",
+          "valueHelper": "<color>"
+        },
+        {
+          "longName": "axes-grid",
+          "helpText": "Enable grid axis",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "edges",
+          "shortName": "e",
+          "helpText": "Show cell edges",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "armature",
+          "helpText": "Enable armature visualization",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "camera-index",
+          "helpText": "Select the camera to use",
+          "valueHelper": "<index>"
+        },
+        {
+          "longName": "interaction-style",
+          "shortName": "k",
+          "helpText": "Interaction style",
+          "valueHelper": "<style>",
+          "implicitValue": "2d"
+        },
+        {
+          "longName": "interaction-trackball",
+          "helpText": "Enable trackball interaction (deprecated, use --interaction-style=trackball)",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "invert-zoom",
+          "helpText": "Invert zoom direction with right mouse click",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "animation-autoplay",
+          "helpText": "Automatically start animation",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "animation-index",
+          "helpText": "Select animation to show (deprecated)",
+          "valueHelper": "<index>"
+        },
+        {
+          "longName": "animation-indices",
+          "helpText": "Select animations to show",
+          "valueHelper": "<index,index,index>"
+        },
+        {
+          "longName": "animation-speed-factor",
+          "helpText": "Set animation speed factor",
+          "valueHelper": "<ratio>"
+        },
+        {
+          "longName": "animation-time",
+          "helpText": "Set animation time to load",
+          "valueHelper": "<time>"
+        },
+        {
+          "longName": "font-file",
+          "helpText": "Path to a FreeType compatible font file",
+          "valueHelper": "<file_path>"
+        },
+        {
+          "longName": "font-scale",
+          "helpText": "Scale fonts",
+          "valueHelper": "<ratio>"
+        },
+        {
+          "longName": "font-color",
+          "helpText": "Set font color",
+          "valueHelper": "<color>"
+        },
+        {
+          "longName": "backdrop-opacity",
+          "helpText": "UI backdrop opacity",
+          "valueHelper": "<value>",
+          "conditional": "F3D_MODULE_UI"
+        },
+        {
+          "longName": "command-script",
+          "helpText": "Path to a script file containing commands to execute",
+          "valueHelper": "<file_path>"
+        }
+      ]
+    },
+    {
+      "name": "Material",
+      "options": [
+        {
+          "longName": "point-sprites",
+          "shortName": "o",
+          "helpText": "Select point sprites type (\"none\", \"sphere\", \"gaussian\", \"circle\", \"stddev\", \"bound\")",
+          "valueHelper": "<string>",
+          "implicitValue": "sphere"
+        },
+        {
+          "longName": "point-sprites-type",
+          "helpText": "Point sprites type (deprecated)",
+          "valueHelper": "<sphere|gaussian>"
+        },
+        {
+          "longName": "point-sprites-size",
+          "helpText": "Point sprites sphere size",
+          "valueHelper": "<size>"
+        },
+        {
+          "longName": "point-sprites-absolute-size",
+          "helpText": "Do not scale point sprites size by scene size",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "point-size",
+          "helpText": "Point size when showing vertices, model specified by default",
+          "valueHelper": "<size>"
+        },
+        {
+          "longName": "line-width",
+          "helpText": "Line width when showing edges, model specified by default",
+          "valueHelper": "<width>"
+        },
+        {
+          "longName": "backface-type",
+          "helpText": "Backface type, can be visible or hidden, model specified by default",
+          "valueHelper": "<visible|hidden>"
+        },
+        {
+          "longName": "color",
+          "helpText": "Solid color",
+          "valueHelper": "<color>"
+        },
+        {
+          "longName": "opacity",
+          "helpText": "Opacity",
+          "valueHelper": "<opacity>"
+        },
+        {
+          "longName": "roughness",
+          "helpText": "Roughness coefficient (0.0-1.0)",
+          "valueHelper": "<roughness>"
+        },
+        {
+          "longName": "metallic",
+          "helpText": "Metallic coefficient (0.0-1.0)",
+          "valueHelper": "<metallic>"
+        },
+        {
+          "longName": "base-ior",
+          "helpText": "Index Of Refraction of the base layer (1.0-2.5)",
+          "valueHelper": "<base-ior>"
+        },
+        {
+          "longName": "hdri-file",
+          "helpText": "Path to an image file that can be used as a light source and skybox",
+          "valueHelper": "<file path>"
+        },
+        {
+          "longName": "hdri-ambient",
+          "shortName": "f",
+          "helpText": "Enable HDRI ambient lighting",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "hdri-skybox",
+          "shortName": "j",
+          "helpText": "Enable HDRI skybox background",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "texture-matcap",
+          "helpText": "Path to a texture file containing a material capture",
+          "valueHelper": "<file path>"
+        },
+        {
+          "longName": "texture-base-color",
+          "helpText": "Path to a texture file that sets the color of the object",
+          "valueHelper": "<file path>"
+        },
+        {
+          "longName": "texture-material",
+          "helpText": "Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object",
+          "valueHelper": "<file path>"
+        },
+        {
+          "longName": "texture-emissive",
+          "helpText": "Path to a texture file that sets the emitted light of the object",
+          "valueHelper": "<file path>"
+        },
+        {
+          "longName": "textures-transform",
+          "helpText": "3x3 matrix to transform textures",
+          "valueHelper": "<transform2d>"
+        },
+        {
+          "longName": "emissive-factor",
+          "helpText": "Emissive factor. This value is multiplied with the emissive color when an emissive texture is present",
+          "valueHelper": "<color>"
+        },
+        {
+          "longName": "texture-normal",
+          "helpText": "Path to a texture file that sets the normal map of the object",
+          "valueHelper": "<file path>"
+        },
+        {
+          "longName": "checkerboard",
+          "helpText": "Apply checkerboard texture to objects",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "normal-scale",
+          "helpText": "Normal scale affects the strength of the normal deviation from the normal texture",
+          "valueHelper": "<normalScale>"
+        }
+      ]
+    },
+    {
+      "name": "Window",
+      "options": [
+        {
+          "longName": "background-color",
+          "helpText": "Background color",
+          "valueHelper": "<color>"
+        },
+        {
+          "longName": "resolution",
+          "helpText": "Window resolution",
+          "valueHelper": "<width,height>"
+        },
+        {
+          "longName": "position",
+          "helpText": "Window position",
+          "valueHelper": "<x,y>"
+        },
+        {
+          "longName": "fps",
+          "shortName": "z",
+          "helpText": "Display rendering frame per second",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "filename",
+          "shortName": "n",
+          "helpText": "Display filename",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "metadata",
+          "shortName": "m",
+          "helpText": "Display file metadata",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "hdri-filename",
+          "helpText": "Display hdri filename",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "blur-background",
+          "shortName": "u",
+          "helpText": "Blur background",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "blur-coc",
+          "helpText": "Blur circle of confusion radius",
+          "valueHelper": "<value>"
+        },
+        {
+          "longName": "light-intensity",
+          "helpText": "Light intensity",
+          "valueHelper": "<value>"
+        }
+      ]
+    },
+    {
+      "name": "Scientific visualization",
+      "options": [
+        {
+          "longName": "scalar-coloring",
+          "shortName": "s",
+          "helpText": "Color by a scalar array",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "coloring-array",
+          "helpText": "Name of the array to color with",
+          "valueHelper": "<array_name>"
+        },
+        {
+          "longName": "coloring-component",
+          "shortName": "y",
+          "helpText": "Component from the array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars",
+          "valueHelper": "<comp_index>",
+          "implicitValue": "-2"
+        },
+        {
+          "longName": "coloring-by-cells",
+          "shortName": "c",
+          "helpText": "Use an array from the cells",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "coloring-range",
+          "helpText": "Custom range for the coloring by array, automatically computed by default",
+          "valueHelper": "<min,max>"
+        },
+        {
+          "longName": "coloring-scalar-bar",
+          "shortName": "b",
+          "helpText": "Show scalar bar",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "colormap-file",
+          "helpText": "Specify a colormap image",
+          "valueHelper": "<filePath/filename/fileStem>"
+        },
+        {
+          "longName": "colormap-discretization",
+          "helpText": "Specify number of colors in colormap",
+          "valueHelper": "<int>"
+        },
+        {
+          "longName": "colormap",
+          "helpText": "Specify a custom colormap (ignored if \"colormap-file\" is specified)",
+          "valueHelper": "<color_list>"
+        },
+        {
+          "longName": "volume-opacity-map",
+          "helpText": "Specify a custom opacity map for volume rendering",
+          "valueHelper": "<opacity_list>"
+        },
+        {
+          "longName": "volume-opacity-file",
+          "helpText": "Specify a custom opacity map image for volume rendering",
+          "valueHelper": "<filePath/filename/fileStem>"
+        },
+        {
+          "longName": "volume",
+          "shortName": "v",
+          "helpText": "Show volume if the file is compatible",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "volume-inverse",
+          "shortName": "i",
+          "helpText": "Inverse opacity function for volume rendering",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        }
+      ]
+    },
+    {
+      "name": "Camera",
+      "options": [
+        {
+          "longName": "camera-position",
+          "helpText": "Camera position (overrides camera direction and camera zoom factor if any)",
+          "valueHelper": "<X,Y,Z>"
+        },
+        {
+          "longName": "camera-focal-point",
+          "helpText": "Camera focal point",
+          "valueHelper": "<X,Y,Z>"
+        },
+        {
+          "longName": "camera-view-up",
+          "helpText": "Camera view up",
+          "valueHelper": "<direction>"
+        },
+        {
+          "longName": "camera-view-angle",
+          "helpText": "Camera view angle (non-zero, in degrees)",
+          "valueHelper": "<angle>"
+        },
+        {
+          "longName": "camera-direction",
+          "helpText": "Camera direction",
+          "valueHelper": "<direction>"
+        },
+        {
+          "longName": "camera-zoom-factor",
+          "helpText": "Camera zoom factor (non-zero)",
+          "valueHelper": "<factor>"
+        },
+        {
+          "longName": "camera-azimuth-angle",
+          "helpText": "Camera azimuth angle (in degrees), performed after other camera options",
+          "valueHelper": "<angle>"
+        },
+        {
+          "longName": "camera-elevation-angle",
+          "helpText": "Camera elevation angle (in degrees), performed after other camera options",
+          "valueHelper": "<angle>"
+        },
+        {
+          "longName": "camera-orthographic",
+          "helpText": "Use an orthographic camera",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        }
+      ]
+    },
+    {
+      "name": "Raytracing",
+      "options": [
+        {
+          "longName": "raytracing",
+          "shortName": "r",
+          "helpText": "Enable raytracing",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "raytracing-samples",
+          "helpText": "Number of samples per pixel",
+          "valueHelper": "<samples>"
+        },
+        {
+          "longName": "raytracing-denoise",
+          "shortName": "d",
+          "helpText": "Denoise the image",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        }
+      ],
+      "conditional": "F3D_MODULE_RAYTRACING"
+    },
+    {
+      "name": "PostFX (OpenGL)",
+      "options": [
+        {
+          "longName": "blending",
+          "shortName": "p",
+          "helpText": "Select translucency blending mode (\"none\", \"ddp\", \"sort\", \"sort_cpu\" or \"stochastic\")",
+          "valueHelper": "<string>",
+          "implicitValue": "ddp"
+        },
+        {
+          "longName": "translucency-support",
+          "helpText": "Enable translucency blending (deprecated)",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "ambient-occlusion",
+          "shortName": "q",
+          "helpText": "Enable ambient occlusion providing approximate shadows for better depth perception, implemented using SSAO",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "anti-aliasing",
+          "shortName": "a",
+          "helpText": "Select anti-aliasing method (\"none\", \"fxaa\", \"ssaa\" or \"taa\")",
+          "valueHelper": "<string>",
+          "implicitValue": "fxaa"
+        },
+        {
+          "longName": "anti-aliasing-mode",
+          "helpText": "Select anti-aliasing method (\"fxaa\", \"ssaa\" or \"taa\") (deprecated)",
+          "valueHelper": "<string>",
+          "implicitValue": "fxaa"
+        },
+        {
+          "longName": "tone-mapping",
+          "shortName": "t",
+          "helpText": "Enable Tone Mapping, providing balanced coloring",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "final-shader",
+          "helpText": "Execute the final shader at the end of the rendering pipeline",
+          "valueHelper": "<GLSL code>"
+        },
+        {
+          "longName": "display-depth",
+          "helpText": "Display depth buffer as grayscale image or with a colormap if \"--scalar-coloring\" is specified",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        }
+      ]
+    },
+    {
+      "name": "Testing",
+      "options": [
+        {
+          "longName": "reference",
+          "helpText": "Reference",
+          "valueHelper": "<png file>"
+        },
+        {
+          "longName": "reference-threshold",
+          "helpText": "Testing threshold",
+          "valueHelper": "<threshold>"
+        },
+        {
+          "longName": "interaction-test-record",
+          "helpText": "Path to an interaction log file to record interactions events to",
+          "valueHelper": "<file_path>"
+        },
+        {
+          "longName": "interaction-test-play",
+          "helpText": "Path to an interaction log file to play interaction events from when loading a file",
+          "valueHelper": "<file_path>"
+        }
+      ]
+    }
+  ]
+}

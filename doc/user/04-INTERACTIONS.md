@@ -18,6 +18,18 @@ Simple interaction with the displayed data is possible directly within the windo
 > [!NOTE]
 > When playing an animation with a scene camera, camera interactions are locked.
 
+## 2D Mode
+
+F3D supports a 2D interaction mode designed for viewing images and flat content. In 2D mode:
+
+- Rotation is disabled
+- Camera commands (`set_camera`, `roll_camera`, `elevation_camera`, `azimuth_camera`) are disabled
+- _Click and drag_ with the _left_ or _middle_ mouse button to pan
+- _Click and drag_ with the _right_ mouse button or use the _mouse wheel_ to zoom
+- The default camera zoom factor is `1.0` (no padding) instead of `0.9`
+
+Select 2D interaction styles by pressing <kbd>K</kbd> or through the `--interaction-style=2d` CLI option.
+
 ## Bindings
 
 The coloring can be controlled directly by pressing the following hotkeys:
@@ -50,7 +62,7 @@ Other options can be toggled or cycled directly by pressing the following hotkey
 - <kbd>R</kbd>: raytracing.
 - <kbd>D</kbd>: the denoiser when raytracing.
 - <kbd>U</kbd>: background blur, useful with an HDRI skybox.
-- <kbd>K</kbd>: trackball interaction mode.
+- <kbd>K</kbd>: Cycle interaction modes.
 - <kbd>F</kbd>: HDRI ambient lighting.
 - <kbd>J</kbd>: the display of the HDRI skybox.
 - <kbd>L</kbd>: increase lights intensity.

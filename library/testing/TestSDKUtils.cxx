@@ -7,6 +7,8 @@
 
 namespace fs = std::filesystem;
 
+using namespace std::string_literals;
+
 int TestSDKUtils([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
@@ -91,32 +93,32 @@ int TestSDKUtils([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     f3d::utils::string_template("{greeting} {name}!")
       .substitute({ { "greeting", "hello" }, { "name", "World" } })
       .str(),
-    "hello World!");
+    "hello World!"s);
 
   test("string_template: partial substitution",
     f3d::utils::string_template("{greeting} {name}!").substitute({ { "greeting", "hello" } }).str(),
-    "hello {name}!");
+    "hello {name}!"s);
 
   test("string_template: multi-step substitution",
     f3d::utils::string_template("{greeting} {name}!")
       .substitute({ { "greeting", "hello" } })
       .substitute({ { "name", "World" } })
       .str(),
-    "hello World!");
+    "hello World!"s);
 
   test("string_template: escaped variable substitution",
     f3d::utils::string_template("{greeting} {{name}}!")
       .substitute({ { "greeting", "hello" } })
       .substitute({ { "name", "World" } })
       .str(),
-    "hello {name}!");
+    "hello {name}!"s);
 
   test("string_template: non-recursive substitution",
     f3d::utils::string_template("{greeting} {name}!")
       .substitute({ { "greeting", "hello" }, { "name", "{foo}" } })
       .substitute({ { "foo", "bar" } })
       .str(),
-    "hello {foo}!");
+    "hello {foo}!"s);
 
   test("string_template: has variable",
     f3d::utils::string_template("{foo}{bar}baz").hasVariable(std::regex("ba.")), true);

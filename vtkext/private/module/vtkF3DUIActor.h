@@ -159,6 +159,11 @@ public:
   void SetFontScale(const double fontScale);
 
   /**
+   * Set the font color
+   */
+  void SetFontColor(const std::vector<double>& color);
+
+  /**
    * Render the UI actor
    */
   int RenderOverlay(vtkViewport* vp) override;
@@ -279,6 +284,12 @@ protected:
 
   std::string FontFile = "";
   double FontScale = 1.0;
+
+  /**
+   * Initializing the vector here because its needed in the initialization function,
+   * but set afterwards.
+   */
+  std::vector<double> FontColor = { 1.0, 1.0, 1.0 };
 
   double BackdropOpacity = 0.9;
 

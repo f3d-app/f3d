@@ -13,6 +13,11 @@ KeyPressEvent -465 475 0 112 1 p 0
 CharEvent -465 475 0 112 1 p 0
 KeyReleaseEvent -465 475 0 112 1 p 0
 
+# P
+KeyPressEvent -465 475 0 112 1 p 0
+CharEvent -465 475 0 112 1 p 0
+KeyReleaseEvent -465 475 0 112 1 p 0
+
 # Right
 KeyPressEvent -465 475 0 0 1 Right 0
 CharEvent -465 475 0 0 1 Right 0

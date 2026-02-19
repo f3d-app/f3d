@@ -23,7 +23,7 @@ extern "C"
    *
    * The returned context must be deleted with f3d_context_delete().
    *
-   * @return Context handle.
+   * @return Context handle. NULL if the context cannot be created.
    */
   F3D_EXPORT f3d_context_t* f3d_context_glx();
 
@@ -32,7 +32,7 @@ extern "C"
    *
    * The returned context must be deleted with f3d_context_delete().
    *
-   * @return Context handle.
+   * @return Context handle. NULL if the context cannot be created.
    */
   F3D_EXPORT f3d_context_t* f3d_context_wgl();
 
@@ -41,7 +41,7 @@ extern "C"
    *
    * The returned context must be deleted with f3d_context_delete().
    *
-   * @return Context handle.
+   * @return Context handle. NULL if the context cannot be created.
    */
   F3D_EXPORT f3d_context_t* f3d_context_cocoa();
 
@@ -50,7 +50,7 @@ extern "C"
    *
    * The returned context must be deleted with f3d_context_delete().
    *
-   * @return Context handle.
+   * @return Context handle. NULL if the context cannot be created.
    */
   F3D_EXPORT f3d_context_t* f3d_context_egl();
 
@@ -59,7 +59,7 @@ extern "C"
    *
    * The returned context must be deleted with f3d_context_delete().
    *
-   * @return Context handle.
+   * @return Context handle. NULL if the context cannot be created.
    */
   F3D_EXPORT f3d_context_t* f3d_context_osmesa();
 
@@ -70,7 +70,7 @@ extern "C"
    *
    * @param lib Library name.
    * @param func Function name to resolve.
-   * @return Context handle.
+   * @return Context handle. NULL if the symbol cannot be resolved.
    */
   F3D_EXPORT f3d_context_t* f3d_context_get_symbol(const char* lib, const char* func);
 

@@ -83,7 +83,7 @@ The following formats are supported when parsing a color, case insensitive:
 - hsv(H, S%, V%) where H is integer [0, 360], S and V are integer [0, 100]
 - hwb(H, W%, B%) where H is integer [0, 360], W and B are integer [0, 100]
 - cmyk(C%, M%, Y%, K%) where C, M, Y, K are integer [0, 100]
-- [color name](https://htmlpreview.github.io/?https://github.com/Kitware/vtk-examples/blob/gh-pages/VTKNamedColorPatches.html)
+- [color name](https://examples.vtk.org/site/ColorNamesSeries/ColorNamePatches.html)
 
 See [W3C](https://www.w3.org/TR/css-color-3/#rgb-color) doc for more details on these formats.
 

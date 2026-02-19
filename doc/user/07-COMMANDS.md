@@ -63,6 +63,8 @@ Supports `front`, `top`, `right`, `isometric` arguments. eg: `set_camera top`.
 
 `toggle_volume_rendering`: A specific command to toggle `model.volume.enable` and print coloring information. No argument.
 
+`cycle_interactor_style`: A specific command to cycle between interaction styles (default, trackball, 2d). No argument.
+
 `stop_interactor`: A specific command to stop the interactor hence quitting the application. No argument.
 
 `reset_camera`: A specific command to reset the camera to its original location. No argument.

@@ -1,12 +1,48 @@
 #include "factory.h"
 
 #include "log.h"
+
+#include <vtkMemoryResourceStream.h>
+
 // clang-format off
 ${F3D_STATIC_PLUGIN_EXTERN}
 // clang-format on
 
 namespace f3d
 {
+
+namespace
+{
+template<typename F>
+reader* pickReader(
+  const std::vector<plugin*>& plugins, std::optional<std::string> forceReader, F&& isValid)
+{
+  int bestScore = -1;
+  reader* bestReader = nullptr;
+
+  for (const auto* plugin : plugins)
+  {
+    for (const auto& reader : plugin->getReaders())
+    {
+      if (forceReader)
+      {
+        if (reader->getName() == *forceReader)
+        {
+          return reader.get();
+        }
+      }
+      else if (reader->getScore() > bestScore && isValid(reader.get()))
+      {
+        bestScore = reader->getScore();
+        bestReader = reader.get();
+      }
+    }
+  }
+
+  return bestReader;
+}
+}
+
 //----------------------------------------------------------------------------
 factory* factory::instance()
 {
@@ -42,29 +78,19 @@ factory::plugin_initializer_t factory::getStaticInitializer(const std::string& p
 //----------------------------------------------------------------------------
 reader* factory::getReader(const std::string& fileName, std::optional<std::string> forceReader)
 {
-  int bestScore = -1;
-  reader* bestReader = nullptr;
+  return f3d::pickReader(
+    this->Plugins, forceReader, [&](const reader* reader) { return reader->canRead(fileName); });
+}
 
-  for (const auto* plugin : this->Plugins)
-  {
-    for (const auto& reader : plugin->getReaders())
-    {
-      if (forceReader)
-      {
-        if (reader->getName() == *forceReader)
-        {
-          return reader.get();
-        }
-      }
-      else if (reader->getScore() > bestScore && reader->canRead(fileName))
-      {
-        bestScore = reader->getScore();
-        bestReader = reader.get();
-      }
-    }
-  }
+//----------------------------------------------------------------------------
+reader* factory::getReader(
+  const std::byte* buffer, std::size_t size, std::optional<std::string> forceReader)
+{
+  vtkNew<vtkMemoryResourceStream> stream;
+  stream->SetBuffer(buffer, size);
 
-  return bestReader;
+  return f3d::pickReader(this->Plugins, forceReader,
+    [&](const reader* reader) { return reader->supportsStream() && reader->canRead(stream); });
 }
 
 //----------------------------------------------------------------------------

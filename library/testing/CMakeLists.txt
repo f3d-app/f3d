@@ -24,6 +24,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKUtils.cxx
      TestSDKUI.cxx
      TestSDKWindowAuto.cxx
+     TestTestSDKHelpers.cxx
 )
 
 # Tests having UI widgets
@@ -57,6 +58,14 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
   list(APPEND libf3dSDKTests_list
     TestSDKSceneInvalid.cxx
     TestSDKInvalidForceReader.cxx
+    )
+endif()
+
+# Invalid header detection need proper CanReadFile support
+# Merge with TestSDKScene.cxx when VTK v9.6 support is dropped.
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  list(APPEND libf3dSDKTests_list
+    TestSDKSceneInvalidHeader.cxx
     )
 endif()
 

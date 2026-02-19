@@ -45,6 +45,13 @@ int TestF3DAlembicReaderStreamError(int vtkNotUsed(argc), char* argv[])
   vtkNew<vtkFileResourceStream> fileStream;
   fileStream->Open(filename.c_str());
 
+  // invalid.abc should be less than 5 chars long
+  if (vtkF3DAlembicReader::CanReadFile(nullptr) || vtkF3DAlembicReader::CanReadFile(fileStream))
+  {
+    std::cerr << "Unexpected CanReadFile success.\n";
+    return EXIT_FAILURE;
+  }
+
   vtkNew<vtkF3DAlembicReader> reader;
   reader->SetStream(fileStream);
   reader->AddObserver(vtkCommand::ErrorEvent, errorEventCallback);

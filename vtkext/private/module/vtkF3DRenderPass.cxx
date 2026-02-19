@@ -4,12 +4,14 @@
 #include "vtkF3DImporter.h"
 #include "vtkF3DRenderer.h"
 #include "vtkF3DStochasticTransparentPass.h"
+#include "vtkF3DTAAPass.h"
 
 #include <vtkBoundingBox.h>
 #include <vtkCameraPass.h>
 #include <vtkDualDepthPeelingPass.h>
 #include <vtkInformation.h>
 #include <vtkInformationIntegerKey.h>
+#include <vtkInteractorObserver.h>
 #include <vtkLightsPass.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpaquePass.h>
@@ -22,6 +24,7 @@
 #include <vtkRenderPassCollection.h>
 #include <vtkRenderState.h>
 #include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
 #include <vtkSSAOPass.h>
 #include <vtkSequencePass.h>
@@ -212,11 +215,28 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     camP->SetDelegatePass(sequence);
 
     this->MainPass = vtkSmartPointer<vtkFramebufferPass>::New();
-    this->MainPass->SetDelegatePass(camP);
     this->MainPass->SetColorFormat(vtkTextureObject::Float32);
 
     // Needed because VTK can pick the wrong format with certain drivers
     this->MainPass->SetDepthFormat(vtkTextureObject::Fixed32);
+
+    // TAA
+    if (renderer && renderer->GetAntiAliasingMode() == vtkF3DRenderer::AntiAliasingMode::TAA)
+    {
+      vtkNew<vtkF3DTAAPass> taaP;
+      taaP->SetDelegatePass(camP);
+
+      s->GetRenderer()->GetRenderWindow()->AddObserver(
+        vtkCommand::WindowResizeEvent, taaP.Get(), &vtkF3DTAAPass::ResetIterations);
+      s->GetRenderer()->GetRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(
+        vtkCommand::InteractionEvent, taaP.Get(), &vtkF3DTAAPass::ResetIterations);
+
+      this->MainPass->SetDelegatePass(taaP);
+    }
+    else
+    {
+      this->MainPass->SetDelegatePass(camP);
+    }
   }
 
   {

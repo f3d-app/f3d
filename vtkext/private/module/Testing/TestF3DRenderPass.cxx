@@ -5,7 +5,7 @@
 
 #include "vtkF3DHexagonalBokehBlurPass.h"
 #include "vtkF3DRenderPass.h"
-#include "vtkF3DTAAResolvePass.h"
+#include "vtkF3DTAAPass.h"
 #include "vtkF3DUserRenderPass.h"
 
 #include <iostream>
@@ -15,7 +15,7 @@ int TestF3DRenderPass(int argc, char* argv[])
   vtkNew<vtkF3DRenderPass> pass;
   pass->Print(std::cout);
 
-  vtkNew<vtkF3DTAAResolvePass> taaP;
+  vtkNew<vtkF3DTAAPass> taaP;
   taaP->SetDelegatePass(pass);
   taaP->Print(std::cout);
 

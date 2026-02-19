@@ -1,0 +1,13 @@
+NAME
+  f3d::vtkextWebIFC
+DESCRIPTION
+  A VTK module for the webifc plugin
+DEPENDS
+  VTK::IOCore
+  VTK::CommonCore
+  VTK::CommonExecutionModel
+  VTK::CommonDataModel
+  web-ifc::web-ifc
+TEST_DEPENDS
+  VTK::TestingCore
+  VTK::CommonDataModel

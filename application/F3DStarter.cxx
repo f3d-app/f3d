@@ -169,7 +169,8 @@ public:
 
     if (camConf.CameraPosition.size() != 3)
     {
-      cam.resetToBounds(camConf.CameraZoomFactor > 0 ? camConf.CameraZoomFactor : 0.9);
+      double defaultZoom = this->LibOptions.interactor.style == "2d" ? 1.0 : 0.9;
+      cam.resetToBounds(camConf.CameraZoomFactor > 0 ? camConf.CameraZoomFactor : defaultZoom);
     }
 
     cam.setCurrentAsDefault();
@@ -893,7 +894,10 @@ public:
       f3d::window& window = this->Engine->getWindow();
       if (this->AppOptions.Resolution.size() == 2)
       {
-        window.setSize(this->AppOptions.Resolution[0], this->AppOptions.Resolution[1]);
+        double dpiScale = this->LibOptions.ui.dpi_aware ? f3d::utils::getDPIScale() : 1.0;
+
+        window.setSize(static_cast<int>(this->AppOptions.Resolution[0] * dpiScale),
+          static_cast<int>(this->AppOptions.Resolution[1] * dpiScale));
       }
       else if (!this->AppOptions.Resolution.empty())
       {

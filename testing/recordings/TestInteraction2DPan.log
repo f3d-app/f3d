@@ -1,0 +1,10 @@
+# StreamVersion 1.2
+# Test 2D panning: left-click drag moves the camera vertically
+EnterEvent 150 150 0 0 0 0 0
+MouseMoveEvent 150 150 0 0 0 0 0
+LeftButtonPressEvent 150 150 0 0 0 0 0
+StartInteractionEvent 150 150 0 0 0 0 0
+MouseMoveEvent 150 250 0 0 0 0 0
+LeftButtonReleaseEvent 150 250 0 0 0 0 0
+EndInteractionEvent 150 250 0 0 0 0 0
+RenderEvent 150 250 0 0 0 0 0

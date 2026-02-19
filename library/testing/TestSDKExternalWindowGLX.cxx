@@ -1,7 +1,9 @@
 // Copyright 2008 Arne Reiners
-#include "engine.h"
 
+#include "PseudoUnitTest.h"
 #include "TestSDKHelpers.h"
+
+#include "engine.h"
 
 #include <GL/gl.h>
 #include <GL/glx.h>
@@ -85,18 +87,19 @@ int TestSDKExternalWindowGLX([[maybe_unused]] int argc, [[maybe_unused]] char* a
   std::cout << "Making context current\n";
   glXMakeCurrent(display, win, ctx);
 
+  PseudoUnitTest test;
+
   f3d::engine eng = f3d::engine::createExternalGLX();
   eng.getWindow().setSize(300, 300);
   eng.getScene().add(std::string(argv[1]) + "/data/cow.vtp");
 
-  if (!TestSDKHelpers::RenderTest(
-        eng.getWindow(), std::string(argv[1]) + "baselines/", argv[2], "TestSDKExternalWindowGLX"))
-  {
-    return EXIT_FAILURE;
-  }
+  test("render with external GLX window",
+    TestSDKHelpers::RenderTest(
+      eng.getWindow(), std::string(argv[1]) + "baselines/", argv[2], "TestSDKExternalWindowGLX"));
 
   ctx = glXGetCurrentContext();
   glXMakeCurrent(display, 0, nullptr);
   glXDestroyContext(display, ctx);
-  return EXIT_SUCCESS;
+
+  return test.result();
 }

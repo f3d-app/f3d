@@ -10,6 +10,12 @@ int TestF3DWebPReader(int argc, char* argv[])
   vtkNew<vtkF3DWebPReader> reader;
 
   std::string filename = std::string(argv[1]) + "data/image.webp";
+  if (reader->CanReadFile(filename.c_str()) == 0)
+  {
+    std::cerr << "Unexpected CanReadFile failure.\n";
+    return EXIT_FAILURE;
+  }
+
   reader->SetFileName(filename.c_str());
   reader->Update();
 

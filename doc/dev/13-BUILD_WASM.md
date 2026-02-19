@@ -25,7 +25,7 @@ npm run build
 By default, the latest Docker image is pulled automatically, but you can force a specific Docker image by setting the environment variable `F3D_DOCKER_TIMESTAMP` to a timestamp (see `.github/workflows/versions.json` file)
 It's also possible to use `podman` instead of `docker`, please set the `F3D_DOCKER_CLIENT` environment variable to `podman`.
 On completion, a directory `dist` is created containing the artifacts (`f3d.js` and `f3d.wasm`).
-`assimp`, `occt` and `draco` plugins are automatically included.
+`assimp`, `occt`, `webifc` and `draco` plugins are automatically included.
 
 # Run tests
 

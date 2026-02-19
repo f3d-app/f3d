@@ -55,6 +55,10 @@ jobs:
           dry: True
           prettier_options: "-w **/*.{js,json,md,html,yml}"
 
+      - name: JSON Schema Validation
+        shell: bash
+        run: pipx run check-jsonschema==0.36.1 --schemafile resources/cli-options.schema.json resources/cli-options.json
+
       - name: Echo Diff
         shell: bash
         run: git diff --color=always --exit-code

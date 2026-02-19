@@ -61,13 +61,9 @@ int TestSDKSceneFromMemory([[maybe_unused]] int argc, [[maybe_unused]] char* arg
   });
 
   // Render test
-  test("render mesh from memory", [&]() {
-    if (!TestSDKHelpers::RenderTest(
-          win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKSceneFromMemory"))
-    {
-      throw "rendering test failed";
-    }
-  });
+  test("render mesh from memory",
+    TestSDKHelpers::RenderTest(
+      win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKSceneFromMemory"));
 
   return test.result();
 }

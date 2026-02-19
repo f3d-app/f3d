@@ -9,6 +9,7 @@ Here is a non exhaustive list of F3D limitations:
 - Volume rendering and HDRI support requires a decent GPU.
 - Information about the failure to load a file is not provided before VTK >= 9.4.0.
 - Streaming require different version of VTK depending of the format to read.
+- Options `ui.dpi_aware` and CLI `--dpi-aware` are only supported on Windows platform.
 
 ### Assimp
 

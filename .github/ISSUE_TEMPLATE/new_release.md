@@ -62,6 +62,7 @@ Release :
 - [ ] Communicate on linkedin
 - [ ] Communicate on mastodon
 - [ ] Communicate on bluesky
+- [ ] Communicate by email
 - [ ] Move all issue from current milestone to next milestone, close current roadmap issue and open a next roadmap issue
 - [ ] Commit review and merge an update of `doc/dev/ROADMAPS_AND_RELEASES.md` for next release in https://github.com/f3d-app/f3d
 - [ ] Create an issue for updating dependencies in CI and superbuild

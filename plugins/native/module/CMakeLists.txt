@@ -1,4 +1,5 @@
 set(classes
+  vtkF3DImageImporter
   vtkF3DQuakeMDLImporter
   vtkF3DSPZReader
   vtkF3DSplatReader

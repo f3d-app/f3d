@@ -8,11 +8,11 @@
 #include <vtkPointData.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkVersion.h>
-#include <vtksys/FStream.hxx>
 
 #include "webp/decode.h"
 
 #include <algorithm>
+#include <string_view>
 
 vtkStandardNewMacro(vtkF3DWebPReader);
 
@@ -93,34 +93,33 @@ void vtkF3DWebPReader::ExecuteInformation()
 //------------------------------------------------------------------------------
 int vtkF3DWebPReader::CanReadFile(const char* fname)
 {
-  // get the magic number by reading in a file
-  vtksys::ifstream ifs(fname, vtksys::ifstream::in);
-
-  if (ifs.fail())
+  vtkNew<vtkFileResourceStream> fileStream;
+  if (!fileStream->Open(fname))
   {
     vtkErrorMacro(<< "Could not open file " << fname);
     return 0;
   }
+  return this->CanReadFile(fileStream);
+}
 
-  // The file must begin with magic number RIFF
-  if ((ifs.get() != 'R') || (ifs.get() != 'I') || (ifs.get() != 'F') || (ifs.get() != 'F'))
+//------------------------------------------------------------------------------
+int vtkF3DWebPReader::CanReadFile(vtkResourceStream* stream)
+{
+  if (!stream)
   {
-    ifs.close();
     return 0;
   }
 
-  // Skip 4 bytes (file size field) to get to position 8
-  ifs.ignore(4);
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
 
-  // Check for WEBP signature at bytes 8-11
-  if ((ifs.get() != 'W') || (ifs.get() != 'E') || (ifs.get() != 'B') || (ifs.get() != 'P'))
+  char header[12];
+  if (stream->Read(header, 12) != 12)
   {
-    ifs.close();
     return 0;
   }
 
-  ifs.close();
-  return 1;
+  std::string_view sv(header, 12);
+  return sv.substr(0, 4) == "RIFF" && sv.substr(8, 4) == "WEBP";
 }
 
 //------------------------------------------------------------------------------
