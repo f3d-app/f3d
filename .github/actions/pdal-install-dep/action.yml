@@ -81,9 +81,9 @@ runs:
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DBUILD_PLUGIN_E57=ON
-        -DSQLite3_LIBRARY=$(pwd)/../sqlite/dependencies/sqlite_install/lib/libsqlite3.so
-        -DSQLite3_INCLUDE_DIR=$(pwd)/../sqlite/dependencies/sqlite_install/include
-        -DCURL_INCLUDE_DIR=$(pwd)/../curl_install/include
+        -DSQLite3_LIBRARY=$(pwd)/../install/lib/libsqlite3.so
+        -DSQLite3_INCLUDE_DIR=$(pwd)/../install/include
+        -DCURL_INCLUDE_DIR=$(pwd)/../install/include
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
