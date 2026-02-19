@@ -1,0 +1,25 @@
+From d70f611efafcb34954e99167a985ed8a74bf9dd1 Mon Sep 17 00:00:00 2001
+From: Mathieu Westphal <mathieu.westphal@kitware.com>
+Date: Fri, 20 Feb 2026 19:47:13 +0100
+Subject: [PATCH] install: properly install the interface
+
+---
+ CMakeLists.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2fb2a74..8ce4656 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -27,6 +27,8 @@ endif()
+ 
+ add_library(clip clip.cpp)
+ 
++target_include_directories(clip INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
++
+ if(CLIP_ENABLE_IMAGE)
+   target_sources(clip PRIVATE image.cpp)
+   target_compile_definitions(clip PUBLIC -DCLIP_ENABLE_IMAGE=1)
+-- 
+2.53.0
+

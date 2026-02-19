@@ -1,0 +1,89 @@
+name: "Install Clip Dependency"
+description: "Install Clip Dependency using cache when possible"
+inputs:
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+  version:
+    description: "Version of clip to build"
+    required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+
+    - name: Cache clip
+      id: cache-clip
+      uses: actions/cache/restore@v4
+      with:
+        path: dependencies/clip_install
+        key: clip-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-3
+
+    - name: Checkout clip
+      if: steps.cache-clip.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: dacap/clip
+        path: "./dependencies/clip"
+        ref: ${{inputs.version}}
+
+    # Patch clip for install issues
+    # https://github.com/dacap/clip/pull/92
+    # https://github.com/dacap/clip/pull/93
+    - name: Patch clip install
+      if: steps.cache-clip.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/clip
+      shell: bash
+      run: |
+        patch -p1 < $GITHUB_ACTION_PATH/fix_include_install.patch
+        patch -p1 < $GITHUB_ACTION_PATH/fix_windows_shared_install.patch
+
+    - name: Setup clip
+      if: steps.cache-clip.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir clip_build
+        mkdir clip_install
+
+    - name: Configure clip
+      if: steps.cache-clip.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/clip_build
+      shell: bash
+      run: >
+        cmake ../clip
+        -DBUILD_SHARED_LIBS=ON
+        -DCLIP_EXAMPLES=OFF
+        -DCLIP_TESTS=OFF
+        -DCLIP_X11_WITH_PNG=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX:PATH=../clip_install
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build clip
+      if: steps.cache-clip.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/clip_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/clip_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-clip.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-clip.outputs.cache-primary-key }}
+        path: dependencies/clip_install

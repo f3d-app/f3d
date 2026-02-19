@@ -11,6 +11,9 @@ inputs:
   assimp_version:
     description: "Version of assimp to build"
     required: false
+  clip_version:
+    description: "Version of Clip to build"
+    required: false
   draco_version:
     description: "Version of draco to build"
     required: false
@@ -59,6 +62,14 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.assimp_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
+
+    - name: Install Clip dependency
+      if: inputs.clip_version != ''
+      uses: ./source/.github/actions/clip-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.clip_version}}
         global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install Draco dependency

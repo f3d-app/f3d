@@ -1,0 +1,32 @@
+From d8d0c3e668975bf361ea1f4ce582ce4c04c09942 Mon Sep 17 00:00:00 2001
+From: Mathieu Westphal <mathieu.westphal@kitware.com>
+Date: Sat, 21 Feb 2026 09:46:56 +0100
+Subject: [PATCH] Windows: properly support shared library build
+
+---
+ CMakeLists.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2fb2a74..ce0992a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -7,6 +7,7 @@ project(clip LANGUAGES CXX)
+ 
+ set(CMAKE_CXX_STANDARD 11)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
++set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+ 
+ if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+   # Use libc++ explicitly so we can compile for
+@@ -118,6 +119,7 @@ if(CLIP_INSTALL)
+     EXPORT clip-targets
+     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+   )
+   install(
+     EXPORT clip-targets
+-- 
+2.53.0
+

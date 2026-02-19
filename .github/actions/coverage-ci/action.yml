@@ -17,6 +17,9 @@ inputs:
   blosc_version:
     description: "Version of blosc to build"
     required: true
+  clip_version:
+    description: "Version of clip to build"
+    required: false
   draco_version:
     description: "Version of draco to build"
     required: false
@@ -79,6 +82,7 @@ runs:
         alembic_version: ${{inputs.alembic_version}}
         assimp_version: ${{inputs.assimp_version}}
         blosc_version: ${{inputs.blosc_version}}
+        clip_version: ${{inputs.clip_version}}
         draco_version: ${{inputs.draco_version}}
         imath_version: ${{inputs.imath_version}}
         occt_version: ${{inputs.occt_version}}
