@@ -20,15 +20,39 @@ There are a few CMake options to configure the F3D testing framework:
 
 To run all tests, build and then run `ctest` from the build directory:
 
-```
+```bash
 cmake --build .
 ctest
 ```
 
 To run a specific test, use the `ctest -R <testname>` option:
 
-```
+```bash
 ctest -R PLY
+```
+
+### Test groups
+
+CTest labels allow you to easily target specific groups of tests.
+
+```bash
+ctest -L bindings # run all binding tests
+```
+
+Available labels:
+
+- application (all f3d application tests)
+- libf3d (all libf3d tests)
+- bindings (all binding tests)
+- c, java, python, js
+- module (all vtkext module tests)
+- occt, abc, usd, webifc, draco
+- obj, spz, mdl, etc..
+
+Labels can be combined to further refine test selection.
+
+```bash
+ctest -L assimp -L fbx # run all tests which use assimp plugin to load fbx data
 ```
 
 ## Testing architecture

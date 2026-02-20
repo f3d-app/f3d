@@ -1,6 +1,6 @@
 #include <context_c_api.h>
 
-int test_context_c_api()
+int test_context()
 {
   f3d_context_t* context;
 

@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-int test_scene_buffer_c_api()
+int test_scene_buffer()
 {
   f3d_engine_autoload_plugins();
 
@@ -27,7 +27,7 @@ int test_scene_buffer_c_api()
   // Test adding a memory buffer
 
   char source[256];
-  FILE *fp = fopen(F3D_TESTING_DATA_DIR "points.ply", "r");
+  FILE* fp = fopen(F3D_TESTING_DATA_DIR "points.ply", "r");
   size_t readLength = 0;
   if (fp != NULL)
   {

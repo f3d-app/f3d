@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-int test_image_c_api()
+int test_image()
 {
   f3d_image_t* img_empty = f3d_image_new_empty();
   if (img_empty)
