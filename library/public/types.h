@@ -131,6 +131,11 @@ public:
     return this->Array.data();
   }
 
+  operator std::array<double, N>() const
+  {
+    return this->Array;
+  }
+
 protected:
   std::array<double, N> Array{ 0 };
 };
