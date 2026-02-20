@@ -1904,7 +1904,8 @@ interactor& interactor_impl::removeBindNotiCallback(std::string command)
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::addNotification(std::string desc, std::string value, std::string bind)
+void interactor_impl::addNotification(
+  std::string desc, std::string value, std::string bind, float duration)
 {
 #if F3D_MODULE_UI
   if (!desc.empty())
@@ -1912,7 +1913,7 @@ void interactor_impl::addNotification(std::string desc, std::string value, std::
     vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
 
-    ren->AddNotification(desc, value, bind);
+    ren->AddNotification(desc, value, bind, duration);
   }
 #endif
 }

@@ -12,8 +12,10 @@
 
 #include <cstdint>
 #include <deque>
+#include <map>
 
 class vtkOpenGLRenderWindow;
+class ImFont;
 
 class vtkF3DUIActor : public vtkProp
 {
@@ -41,7 +43,7 @@ public:
     std::string desc;
     std::string value;
     std::string bind;
-    float timeElapsed = 0.f;
+    float duration;
   };
 
   /**
@@ -186,7 +188,8 @@ public:
   /**
    * Add notification info to deque
    */
-  void AddNotification(std::string& desc, std::string& value, std::string& bind);
+  void AddNotification(
+    std::string& desc, std::string& value, std::string& bind, float duration);
 
 protected:
   vtkF3DUIActor();
@@ -303,9 +306,12 @@ protected:
   double BackdropOpacity = 0.9;
 
   std::deque<Notification> Notifications;
+  std::map<std::string, ImFont*> Fonts;
+
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;
   void operator=(const vtkF3DUIActor&) = delete;
+
 
   bool Initialized = false;
 };

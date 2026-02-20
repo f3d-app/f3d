@@ -407,11 +407,13 @@ public:
    * Trigger a notification at the bottom left of veiwport.
    * Both description and value texts render on same line.
    *
-   * @param desc text string render in white color.
-   * @param value text string render in blue color by default, green if is "ON", red if is "OFF".
-   * @param bind formated bind string (eg. CTRL+A) render in yellow solid box.
+   * @param desc text string in white color.
+   * @param value text string in blue color by default, green if is "ON", red if is "OFF".
+   * @param bind formated bind string (eg. CTRL+A) in solid box.
+   * @param duration how long the noticaiton will be shown in second.
    */
-  virtual void addNotification(std::string desc, std::string value = "", std::string bind = "") = 0;
+  virtual void addNotification(
+    std::string desc, std::string value = "", std::string bind = "", float duration = 3.f) = 0;
 
   /**
    * Start the interactor event loop.
