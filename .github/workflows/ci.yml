@@ -319,6 +319,7 @@ jobs:
       github.ref == 'refs/heads/master'
     strategy:
       fail-fast: false
+      max-parallel: ${{ github.ref == 'refs/heads/master' && 1 || 64 }}
       matrix:
         vtk_version:
           [
