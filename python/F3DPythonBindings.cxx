@@ -449,10 +449,20 @@ PYBIND11_MODULE(pyf3d, module)
       "add",
       [](f3d::scene& scene, py::bytes buffer, std::size_t size)
       {
-        std::string str(buffer);
-        scene.add(reinterpret_cast<std::byte*>(str.data()), size);
+        PyErr_WarnEx(
+          PyExc_DeprecationWarning, "add(buffer, size) is deprecated, use add(buffer) instead.", 1);
+        std::string_view sv(buffer);
+        scene.add(reinterpret_cast<const std::byte*>(sv.data()), size);
       },
       "Add a memory buffer containing a file the scene", py::arg("buffer"), py::arg("size"))
+    .def(
+      "add",
+      [](f3d::scene& scene, py::bytes buffer)
+      {
+        std::string_view sv(buffer);
+        scene.add(reinterpret_cast<const std::byte*>(sv.data()), sv.size());
+      },
+      "Add a memory buffer containing a file the scene", py::arg("buffer"), py::prepend())
     .def("load_animation_time", &f3d::scene::loadAnimationTime)
     .def("animation_time_range", &f3d::scene::animationTimeRange)
     .def("available_animations", &f3d::scene::availableAnimations)

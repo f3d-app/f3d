@@ -16,7 +16,7 @@ def test_scene_buffer():
     buf = Path(points).read_bytes()
     options = engine.options
     options["scene.force_reader"] = "PLYReader"
-    engine.scene.add(buf, len(buf))
+    engine.scene.add(buf)
 
     img = engine.window.render_to_image()
     img.save(output)

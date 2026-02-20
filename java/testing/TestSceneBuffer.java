@@ -15,11 +15,11 @@ public class TestSceneBuffer {
 
     char[] array = new char[256];
     FileReader input = new FileReader(testDataPath + "data/points.ply");
-    int size = input.read(array);
+    input.read(array);
     input.close();
     Options options = engine.getOptions();
     options.setAsString("scene.force_reader", "PLYReader");
-    scene.addBuffer(new String(array).getBytes(), size);
+    scene.add(new String(array).getBytes());
 
     engine.close();
   }

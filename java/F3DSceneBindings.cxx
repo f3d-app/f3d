@@ -255,18 +255,19 @@ extern "C"
     return self;
   }
 
-  JNIEXPORT jobject JAVA_BIND(Scene, addBuffer)(
-    JNIEnv* env, jobject self, jbyteArray buffer, jint size)
+  JNIEXPORT jobject JAVA_BIND(Scene, addBuffer)(JNIEnv* env, jobject self, jbyteArray buffer)
   {
+    jsize bufferLen = env->GetArrayLength(buffer);
     jbyte* bufferData = env->GetByteArrayElements(buffer, nullptr);
-    if (!bufferData)
+    if (!bufferData || bufferLen <= 0)
     {
       return self;
     }
 
     try
     {
-      GetEngine(env, self)->getScene().add(reinterpret_cast<std::byte*>(bufferData), size);
+      GetEngine(env, self)->getScene().add(
+        reinterpret_cast<std::byte*>(bufferData), static_cast<size_t>(bufferLen));
     }
     catch (const std::exception& e)
     {
