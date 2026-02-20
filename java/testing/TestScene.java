@@ -35,7 +35,7 @@ public class TestScene {
     scene.supports("test.obj");
 
     scene.add(sphere);
-    scene.addAll(new ArrayList<>(Arrays.asList(world, logo)));
+    scene.add(new ArrayList<>(Arrays.asList(world, logo)));
     scene.clear();
 
     float[] points = new float[] { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.5f, 1.0f, 0.0f };
@@ -43,7 +43,7 @@ public class TestScene {
     int[] faceIndices = new int[] { 0, 1, 2 };
     Types.Mesh mesh = new Types.Mesh(points, new float[0], new float[0], faceSides, faceIndices);
 
-    scene.addMesh(mesh);
+    scene.add(mesh);
 
     scene.loadAnimationTime(0.5);
     scene.animationTimeRange();
