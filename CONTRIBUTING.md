@@ -80,10 +80,8 @@ Make sure to check the results for yourself and ask for help if needed.
 To run the CI, just add a comment like this in your PR:
 
 - `\ci fast`: Style checks and a fast linux job, always make this work first.
-- `\ci main`: Cross platform CI that cover most usecases, including coverage, contains `ci:fast`, always make this work second.
-- `\ci wasm`: Build docker images and then build libf3d with webassambly.
-- `\ci android`: Build docker images and then build libf3d for android.
-- `\ci full`: Complete CI, required before merge, contains `ci:main`, `ci:wasm`, `ci:android`.
+- `\ci main`: Cross platform CI that cover most usecases, including coverage, contains `ci:fast`.
+- `\ci full`: Complete CI, required before merge, contains `ci:main`.
 
 After this, the CI will always be run every time you push to your branch.
 To remove a label, use the same syntax with a `-` before the label, eg: `\ci -fast`.
