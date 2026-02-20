@@ -131,6 +131,10 @@ if(F3D_MODULE_WEBP)
   list(APPEND classes vtkF3DWebPReader)
 endif()
 
+if(F3D_MODULE_CLIP)
+  find_package(clip REQUIRED)
+endif()
+
 if(F3D_MODULE_UI AND NOT F3D_USE_EXTERNAL_IMGUI)
   list(APPEND sources
     "${F3D_SOURCE_DIR}/external/imgui/imgui.cpp"
@@ -178,3 +182,9 @@ endif ()
 if (F3D_MODULE_RAYTRACING)
   vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_RAYTRACING)
 endif ()
+
+# clip
+if(F3D_MODULE_CLIP)
+  vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_CLIP)
+  vtk_module_link(f3d::vtkextPrivate PUBLIC clip::clip)
+endif()
