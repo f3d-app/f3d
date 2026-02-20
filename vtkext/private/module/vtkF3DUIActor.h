@@ -10,6 +10,7 @@
 
 #include <vtkProp.h>
 
+#include <array>
 #include <cstdint>
 #include <deque>
 
@@ -161,7 +162,7 @@ public:
   /**
    * Set the font color
    */
-  void SetFontColor(const std::vector<double>& color);
+  void SetFontColor(const std::array<double, 3>& color);
 
   /**
    * Render the UI actor
@@ -289,7 +290,7 @@ protected:
    * Initializing the vector here because its needed in the initialization function,
    * but set afterwards.
    */
-  std::vector<double> FontColor = { 1.0, 1.0, 1.0 };
+  std::array<double, 3> FontColor = { 1.0, 1.0, 1.0 };
 
   double BackdropOpacity = 0.9;
 
