@@ -232,7 +232,23 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
     this->RenderFpsCounter();
   }
 
+  this->RenderNotifications();
+
   this->EndFrame(renWin);
 
   return 1;
+}
+
+void vtkF3DUIActor::AddNotification(
+  std::string& desc, std::string& value, std::string& bind, float duration)
+{
+  for (auto it = this->Notifications.begin(); it != this->Notifications.end(); ++it)
+  {
+    if (desc == (*it).desc)
+    {
+      Notifications.erase(it); // Remove duplicate
+      break;
+    }
+  }
+  this->Notifications.emplace_front(Notification{ desc, value, bind, duration });
 }

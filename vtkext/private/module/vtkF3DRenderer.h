@@ -498,6 +498,12 @@ public:
    */
   void SetConsoleBadgeEnabled(bool enabled);
 
+   /**
+   * Add notification info to deque
+   */
+  void AddNotification(
+    std::string& desc, std::string& value, std::string& bind, float duration);
+
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;

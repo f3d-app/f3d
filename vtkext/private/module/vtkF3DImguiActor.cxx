@@ -350,11 +350,18 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
     font = io.Fonts->AddFontFromMemoryTTF(
       const_cast<void*>(reinterpret_cast<const void*>(F3DFontBuffer)), sizeof(F3DFontBuffer),
       18 * this->FontScale, &fontConfig, ranges.Data);
+    ImFont* notiFont = io.Fonts->AddFontFromMemoryTTF(
+      const_cast<void*>(reinterpret_cast<const void*>(F3DFontBuffer)), sizeof(F3DFontBuffer),
+      18 * this->FontScale * .8f, &fontConfig, ranges.Data);
+    this->Fonts["notiFont"] = notiFont;
   }
   else
   {
     font = io.Fonts->AddFontFromFileTTF(
       this->FontFile.c_str(), 18 * this->FontScale, &fontConfig, ranges.Data);
+    ImFont* notiFont = io.Fonts->AddFontFromFileTTF(
+      this->FontFile.c_str(), 18 * this->FontScale * .8f, &fontConfig, ranges.Data);
+    this->Fonts["notiFont"] = notiFont;
   }
 
   io.Fonts->Build();
@@ -973,4 +980,167 @@ void vtkF3DImguiActor::SetDeltaTime(double time)
 {
   ImGuiIO& io = ImGui::GetIO();
   io.DeltaTime = time;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderNotifications()
+{
+  ImGuiIO& io = ImGui::GetIO();
+  float y_offset = 0.f;
+  int index = 0;
+
+  for (auto it = this->Notifications.begin(); it != this->Notifications.end();)
+  {
+    auto& [desc, value, bind, duration] = *it;
+    duration -= io.DeltaTime;
+
+    if (duration < 0)
+    {
+      it = Notifications.erase(it);
+    }
+    else
+    {
+      const ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+      // Mimic the style format in cheatsheet
+      ImGui::PushFont(this->Fonts["notiFont"]);
+      constexpr float margin = F3DStyle::GetDefaultMargin();
+      ImVec2 descLineSize = ImGui::CalcTextSize(desc.c_str());
+      ImVec2 valueLineSize = ImGui::CalcTextSize(value.c_str());
+      ImVec2 windowPadding = ImGui::GetStyle().WindowPadding;
+      const float plusWidth = ImGui::CalcTextSize("+").x;
+      const float itemSpacingX = ImGui::GetStyle().ItemSpacing.x;
+
+      float descLineWidth = descLineSize.x + valueLineSize.x;
+      descLineWidth += value.empty() ? 0.f : itemSpacingX;
+
+      auto keys = ::SplitBindings(bind, '+');
+      float bindingLineWidth = 0.f;
+
+      if (!bind.empty())
+      {
+        bindingLineWidth = std::accumulate(keys.begin(), keys.end(), 0.0f,
+          [](float sum, const std::string& key) { return sum + ImGui::CalcTextSize(key.c_str()).x; });
+
+        if (keys.size() > 1)
+        {
+          bindingLineWidth += (keys.size() - 1) * (itemSpacingX + plusWidth + itemSpacingX);
+          bindingLineWidth += ImGui::CalcTextSize("Bind Keys:").x;
+        }
+        else
+        {
+          bindingLineWidth += ImGui::CalcTextSize("Bind Key:").x;
+        }
+        bindingLineWidth += itemSpacingX;
+      }
+
+      float windowWidth = std::max(descLineWidth, bindingLineWidth) + windowPadding.x * 2.f;
+      float windowHeight = descLineSize.y + windowPadding.y * 2.f;
+      windowHeight += bind.empty() ? 0.f : ImGui::CalcTextSize(bind.c_str()).y;
+
+      ImVec4 descTextColor = F3DStyle::imgui::GetTextColor();       // White
+      ImVec4 valueTextColor = F3DStyle::imgui::GetHighlightColor(); // Blue
+      ImVec4 bindingTextColor = F3DStyle::imgui::GetTextColor();    // White
+      ImVec4 bindingRectColor = F3DStyle::imgui::GetMidColor();     // Grey
+
+      if (!value.empty())
+      {
+        if (value == "ON")
+        {
+          valueTextColor = F3DStyle::imgui::GetCompletionColor();   // Green
+          bindingTextColor = F3DStyle::imgui::GetBackgroundColor(); // Black
+          bindingRectColor = F3DStyle::imgui::GetWarningColor();    // Yellow
+        }
+        else if (value == "OFF")
+        {
+          valueTextColor = F3DStyle::imgui::GetErrorColor();        // Red
+        }
+        else if (value == "Playing")
+        {
+          bindingTextColor = F3DStyle::imgui::GetBackgroundColor(); // Black
+          bindingRectColor = F3DStyle::imgui::GetWarningColor();    // Yellow
+        }
+      }
+
+      float alpha = 1.f, fading = .5f;
+
+      if (duration < fading)
+      {
+        alpha = duration / fading;
+      }
+      descTextColor.w = alpha;
+      valueTextColor.w = alpha;
+      bindingTextColor.w = alpha;
+      bindingRectColor.w = alpha;
+      ImGui::SetNextWindowBgAlpha(alpha * this->BackdropOpacity);
+
+      ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing |
+        ImGuiWindowFlags_NoNav;
+
+      ImVec2 position(margin, viewport->WorkSize.y - windowHeight - margin - y_offset);
+      ::SetupNextWindow(position, ImVec2(windowWidth, windowHeight));
+
+      // Render each notification in separated window
+      ImGui::Begin(("##notif_" + std::to_string(index)).c_str(), nullptr, flags);
+
+      float posX = (windowWidth - descLineWidth) * 0.5f; // Text centering
+      ImGui::SetCursorPosX(posX);
+
+      ImGui::TextColored(descTextColor, desc.c_str());
+      if (!value.empty())
+      {
+        ImGui::SameLine();
+        ImGui::TextColored(valueTextColor, value.c_str());
+      }
+
+      if (!bind.empty())
+      {
+        posX = (windowWidth - bindingLineWidth) * 0.5f;
+        ImGui::SetCursorPosX(posX);
+
+        if (keys.size() > 1)
+        {
+          ImGui::TextColored(descTextColor, "Bind Keys:");
+        }
+        else
+        {
+          ImGui::TextColored(descTextColor, "Bind Key:");
+        }
+        ImGui::SameLine();
+
+        ImVec2 topBindingCorner, bottomBindingCorner;
+        for (const std::string& key : keys)
+        {
+          ImDrawList* drawList = ImGui::GetWindowDrawList();
+          drawList->ChannelsSplit(2);
+          drawList->ChannelsSetCurrent(1);
+          ImGui::TextColored(bindingTextColor, key.c_str());
+          drawList->ChannelsSetCurrent(0);
+          topBindingCorner =
+            ImVec2(ImGui::GetItemRectMin().x - margin, ImGui::GetItemRectMin().y - (margin * .5f));
+          bottomBindingCorner =
+            ImVec2(ImGui::GetItemRectMax().x + margin, ImGui::GetItemRectMax().y + (margin * .5f));
+          drawList->AddRectFilled(
+            topBindingCorner, bottomBindingCorner, ImColor(bindingRectColor), 5.f);
+          drawList->ChannelsMerge();
+          if (key != keys.back())
+          {
+            ImGui::SameLine();
+            ImGui::TextColored(descTextColor, "+");
+          }
+          ImGui::SameLine();
+        }
+      }
+      ImGui::End();
+
+      ImGui::PopFont();
+      ImGui::PushFont(io.FontDefault);
+      ImGui::PopFont();
+
+      ++it;
+      ++index;
+      y_offset += windowHeight + margin;
+    }
+  }
 }
