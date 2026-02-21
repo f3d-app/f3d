@@ -41,6 +41,14 @@ runs:
         cpu: ${{inputs.cpu}}
         global_cache_index: ${{inputs.global_cache_index}}
 
+    # Depends on sqlite
+    - name: Install proj
+      uses: ./.actions/proj-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: 9.7.1
+        global_cache_index: ${{inputs.global_cache_index}}
+
     - name: Install TBB
       uses: ./.actions/tbb-install-dep
       with:
