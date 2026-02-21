@@ -141,6 +141,14 @@ jobs:
           - webp_version: ${{needs.default_versions.outputs.webp_version}}
           - webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          - sqlite_version: version-3.42.1
+          - xercesc_version: v3.3.0
+          - curl_version: curl-8_15_0
+          - pdal_version: 2.9.2
+          - proj_version: 9.6.2
+          - libgeotiff_version: 1.7.4
+          - libtiff_version: v4.7.0
+          - gdal_version: v3.11.3
           - build_type: mindeps
             alembic_version: ${{needs.default_versions.outputs.alembic_min_version}}
             assimp_version: ${{needs.default_versions.outputs.assimp_min_version}}
@@ -157,6 +165,14 @@ jobs:
             webp_version: ${{needs.default_versions.outputs.webp_min_version}}
             webifc_version: ${{needs.default_versions.outputs.webifc_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
+            sqlite_version: version-3.42.1
+            xercesc_version: v3.3.0
+            curl_version: curl-8_15_0
+            proj_version: v6.3.0
+            pdal_version: 2.9.2
+            libgeotiff_version: 1.7.4
+            libtiff_version: v4.7.0
+            gdal_version: v3.11.3
 
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
@@ -191,6 +207,14 @@ jobs:
           webp_version: ${{matrix.webp_version}}
           webifc_version: ${{matrix.webifc_version}}
           zlib_version: ${{matrix.zlib_version}}
+          sqlite_version: ${{matrix.sqlite_version}}
+          xercesc_version: ${{matrix.xercesc_version}}
+          curl_version: ${{matrix.curl_version}}
+          pdal_version: ${{matrix.pdal_version}}
+          proj_version: ${{matrix.proj_version}}
+          libgeotiff_version: ${{matrix.libgeotiff_version}}
+          libtiff_version: ${{matrix.libtiff_version}}
+          gdal_version: ${{matrix.gdal_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   cache_dependencies_windows:
@@ -220,6 +244,14 @@ jobs:
           - webp_version: ${{needs.default_versions.outputs.webp_version}}
           - webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          - sqlite_version: version-3.42.1
+          - xercesc_version: v3.3.0
+          - curl_version: curl-8_15_0
+          - pdal_version: 2.9.2
+          - proj_version: 9.6.2
+          - libgeotiff_version: 1.7.4
+          - libtiff_version: v4.7.0
+          - gdal_version: v3.11.3
 
     runs-on: windows-latest
 
@@ -253,6 +285,14 @@ jobs:
           webp_version: ${{matrix.webp_version}}
           webifc_version: ${{matrix.webifc_version}}
           zlib_version: ${{matrix.zlib_version}}
+          sqlite_version: ${{matrix.sqlite_version}}
+          xercesc_version: ${{matrix.xercesc_version}}
+          curl_version: ${{matrix.curl_version}}
+          pdal_version: ${{matrix.pdal_version}}
+          proj_version: ${{matrix.proj_version}}
+          libgeotiff_version: ${{matrix.libgeotiff_version}}
+          libtiff_version: ${{matrix.libtiff_version}}
+          gdal_version: ${{matrix.gdal_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   cache_dependencies_macos_intel:
@@ -282,6 +322,14 @@ jobs:
           - webp_version: ${{needs.default_versions.outputs.webp_version}}
           - webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          - sqlite_version: version-3.42.1
+          - xercesc_version: v3.3.0
+          - curl_version: curl-8_15_0
+          - pdal_version: 2.9.2
+          - proj_version: 9.6.2
+          - libgeotiff_version: 1.7.4
+          - libtiff_version: v4.7.0
+          - gdal_version: v3.11.3
 
     runs-on: macos-15-intel
 
@@ -315,6 +363,14 @@ jobs:
           webp_version: ${{matrix.webp_version}}
           webifc_version: ${{matrix.webifc_version}}
           zlib_version: ${{matrix.zlib_version}}
+          sqlite_version: ${{matrix.sqlite_version}}
+          xercesc_version: ${{matrix.xercesc_version}}
+          curl_version: ${{matrix.curl_version}}
+          pdal_version: ${{matrix.pdal_version}}
+          proj_version: ${{matrix.proj_version}}
+          libgeotiff_version: ${{matrix.libgeotiff_version}}
+          libtiff_version: ${{matrix.libtiff_version}}
+          gdal_version: ${{matrix.gdal_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   cache_dependencies_macos_arm:
@@ -344,6 +400,14 @@ jobs:
           - webp_version: ${{needs.default_versions.outputs.webp_version}}
           - webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          - sqlite_version: version-3.42.1
+          - xercesc_version: v3.3.0
+          - curl_version: curl-8_15_0
+          - pdal_version: 2.9.2
+          - proj_version: 9.6.2
+          - libgeotiff_version: 1.7.4
+          - libtiff_version: v4.7.0
+          - gdal_version: v3.11.3
 
     runs-on: macos-15
 
@@ -377,6 +441,14 @@ jobs:
           webp_version: ${{matrix.webp_version}}
           webifc_version: ${{matrix.webifc_version}}
           zlib_version: ${{matrix.zlib_version}}
+          sqlite_version: ${{matrix.sqlite_version}}
+          xercesc_version: ${{matrix.xercesc_version}}
+          curl_version: ${{matrix.curl_version}}
+          pdal_version: ${{matrix.pdal_version}}
+          proj_version: ${{matrix.proj_version}}
+          libgeotiff_version: ${{matrix.libgeotiff_version}}
+          libtiff_version: ${{matrix.libtiff_version}}
+          gdal_version: ${{matrix.gdal_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #---------------------------------------------------------------------------------------------------
@@ -399,12 +471,28 @@ jobs:
           - ospray_version: ${{needs.default_versions.outputs.ospray_version}}
           - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          - sqlite_version: version-3.42.1
+          - xercesc_version: v3.3.0
+          - curl_version: curl-8_15_0
+          - pdal_version: 2.9.2
+          - proj_version: 9.6.2
+          - libgeotiff_version: 1.7.4
+          - libtiff_version: v4.7.0
+          - gdal_version: v3.11.3
           - build_type: mindeps
             blosc_version: ${{needs.default_versions.outputs.blosc_min_version}}
             openvdb_version: ${{needs.default_versions.outputs.openvdb_min_version}}
             ospray_version: ${{needs.default_versions.outputs.ospray_min_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
+            sqlite_version: version-3.42.1
+            xercesc_version: v3.3.0
+            curl_version: curl-8_15_0
+            pdal_version: 2.9.2
+            proj_version: 9.6.2
+            libgeotiff_version: 1.7.4
+            libtiff_version: v4.7.0
+            gdal_version: v3.11.3
           - build_type: no_optional_deps
             blosc_version: ${{needs.default_versions.outputs.blosc_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
@@ -414,6 +502,14 @@ jobs:
             openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+            sqlite_version: version-3.42.1
+            xercesc_version: v3.3.0
+            curl_version: curl-8_15_0
+            pdal_version: 2.9.2
+            proj_version: 9.6.2
+            libgeotiff_version: 1.7.4
+            libtiff_version: v4.7.0
+            gdal_version: v3.11.3
 
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
@@ -445,6 +541,14 @@ jobs:
           blosc_version: ${{matrix.blosc_version}}
           tbb_version: ${{matrix.tbb_version}}
           zlib_version: ${{matrix.zlib_version}}
+          sqlite_version: ${{matrix.sqlite_version}}
+          xercesc_version: ${{matrix.xercesc_version}}
+          curl_version: ${{matrix.curl_version}}
+          pdal_version: ${{matrix.pdal_version}}
+          proj_version: ${{matrix.proj_version}}
+          libgeotiff_version: ${{matrix.libgeotiff_version}}
+          libtiff_version: ${{matrix.libtiff_version}}
+          gdal_version: ${{matrix.gdal_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
       - name: Install Raytracing Dependencies
@@ -465,6 +569,14 @@ jobs:
           ospray_version: ${{matrix.ospray_version}}
           tbb_version: ${{matrix.tbb_version}}
           zlib_version: ${{matrix.zlib_version}}
+          sqlite_version: ${{matrix.sqlite_version}}
+          xercesc_version: ${{matrix.xercesc_version}}
+          curl_version: ${{matrix.curl_version}}
+          pdal_version: ${{matrix.pdal_version}}
+          proj_version: ${{matrix.proj_version}}
+          libgeotiff_version: ${{matrix.libgeotiff_version}}
+          libtiff_version: ${{matrix.libtiff_version}}
+          gdal_version: ${{matrix.gdal_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -528,6 +640,14 @@ jobs:
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          sqlite_version: version-3.42.1
+          xercesc_version: v3.3.0
+          curl_version: curl-8_15_0
+          pdal_version: 2.9.2
+          proj_version: 9.6.2
+          libgeotiff_version: 1.7.4
+          libtiff_version: v4.7.0
+          gdal_version: v3.11.3
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -568,6 +688,14 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           vtk_version: v9.6.0
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          sqlite_version: version-3.42.1
+          xercesc_version: v3.3.0
+          curl_version: curl-8_15_0
+          pdal_version: 2.9.2
+          proj_version: 9.6.2
+          libgeotiff_version: 1.7.4
+          libtiff_version: v4.7.0
+          gdal_version: v3.11.3
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -613,6 +741,14 @@ jobs:
           - webp_version: ${{needs.default_versions.outputs.webp_version}}
           - webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          - pdal_version: 2.9.2
+          - sqlite_version: version-3.42.1
+          - xercesc_version: v3.3.0
+          - curl_version: curl-8_15_0
+          - proj_version: 9.6.2
+          - libgeotiff_version: 1.7.4
+          - libtiff_version: v4.7.0
+          - gdal_version: v3.11.3
           - build_type: egl
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             optional_deps_label: optional-deps
@@ -636,6 +772,14 @@ jobs:
             webp_version: ${{needs.default_versions.outputs.webp_version}}
             webifc_version: ${{needs.default_versions.outputs.webifc_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+            pdal_version: 2.9.2
+            sqlite_version: version-3.42.1
+            xercesc_version: v3.3.0
+            curl_version: curl-8_15_0
+            proj_version: 9.6.2
+            libgeotiff_version: 1.7.4
+            libtiff_version: v4.7.0
+            gdal_version: v3.11.3
           - build_type: osmesa
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             optional_deps_label: optional-deps
@@ -659,6 +803,14 @@ jobs:
             webp_version: ${{needs.default_versions.outputs.webp_version}}
             webifc_version: ${{needs.default_versions.outputs.webifc_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+            pdal_version: 2.9.2
+            sqlite_version: version-3.42.1
+            xercesc_version: v3.3.0
+            curl_version: curl-8_15_0
+            proj_version: 9.6.2
+            libgeotiff_version: 1.7.4
+            libtiff_version: v4.7.0
+            gdal_version: v3.11.3
           - build_type: exclude_deprecated
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             optional_deps_label: optional-deps
@@ -682,6 +834,14 @@ jobs:
             webp_version: ${{needs.default_versions.outputs.webp_version}}
             webifc_version: ${{needs.default_versions.outputs.webifc_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+            pdal_version: 2.9.2
+            sqlite_version: version-3.42.1
+            xercesc_version: v3.3.0
+            curl_version: curl-8_15_0
+            proj_version: 9.6.2
+            libgeotiff_version: 1.7.4
+            libtiff_version: v4.7.0
+            gdal_version: v3.11.3
           - build_type: no_optional_deps
             blosc_version: ${{needs.default_versions.outputs.blosc_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
@@ -713,6 +873,14 @@ jobs:
             webp_version: ${{needs.default_versions.outputs.webp_version}}
             webifc_version: ${{needs.default_versions.outputs.webifc_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+            pdal_version: 2.9.2
+            sqlite_version: version-3.42.1
+            xercesc_version: v3.3.0
+            curl_version: curl-8_15_0
+            proj_version: 9.6.2
+            libgeotiff_version: 1.7.4
+            libtiff_version: v4.7.0
+            gdal_version: v3.11.3
           - build_type: mindeps
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             optional_deps_label: optional-deps
@@ -736,6 +904,14 @@ jobs:
             webp_version: ${{needs.default_versions.outputs.webp_min_version}}
             webifc_version: ${{needs.default_versions.outputs.webifc_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
+            pdal_version: 2.9.2
+            sqlite_version: version-3.42.1
+            xercesc_version: v3.3.0
+            curl_version: curl-8_15_0
+            proj_version: 9.6.2
+            libgeotiff_version: 1.7.4
+            libtiff_version: v4.7.0
+            gdal_version: v3.11.3
 
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
@@ -779,6 +955,14 @@ jobs:
           webp_version: ${{matrix.webp_version}}
           webifc_version: ${{matrix.webifc_version}}
           zlib_version: ${{matrix.zlib_version}}
+          sqlite_version: ${{matrix.sqlite_version}}
+          xercesc_version: ${{matrix.xercesc_version}}
+          curl_version: ${{matrix.curl_version}}
+          pdal_version: ${{matrix.pdal_version}}
+          proj_version: ${{matrix.proj_version}}
+          libgeotiff_version: ${{matrix.libgeotiff_version}}
+          libtiff_version: ${{matrix.libtiff_version}}
+          gdal_version: ${{matrix.gdal_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -835,6 +1019,14 @@ jobs:
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          sqlite_version: version-3.42.1
+          xercesc_version: v3.3.0
+          curl_version: curl-8_15_0
+          pdal_version: 2.9.2
+          proj_version: 9.6.2
+          libgeotiff_version: 1.7.4
+          libtiff_version: v4.7.0
+          gdal_version: v3.11.3
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -903,6 +1095,14 @@ jobs:
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          sqlite_version: version-3.42.1
+          xercesc_version: v3.3.0
+          curl_version: curl-8_15_0
+          pdal_version: 2.9.2
+          proj_version: 9.6.2
+          libgeotiff_version: 1.7.4
+          libtiff_version: v4.7.0
+          gdal_version: v3.11.3
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -970,6 +1170,14 @@ jobs:
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          sqlite_version: version-3.42.1
+          xercesc_version: v3.3.0
+          curl_version: curl-8_15_0
+          pdal_version: 2.9.2
+          proj_version: 9.6.2
+          libgeotiff_version: 1.7.4
+          libtiff_version: v4.7.0
+          gdal_version: v3.11.3
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -1017,6 +1225,14 @@ jobs:
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          pdal_version: 2.9.2
+          sqlite_version: version-3.42.1
+          xercesc_version: v3.3.0
+          curl_version: curl-8_15_0
+          proj_version: 9.6.2
+          libgeotiff_version: 1.7.4
+          libtiff_version: v4.7.0
+          gdal_version: v3.11.3
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -1118,6 +1334,14 @@ jobs:
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          pdal_version: 2.9.2
+          sqlite_version: version-3.42.1
+          xercesc_version: v3.3.0
+          curl_version: curl-8_15_0
+          proj_version: 9.6.2
+          libgeotiff_version: 1.7.4
+          libtiff_version: v4.7.0
+          gdal_version: v3.11.3
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------

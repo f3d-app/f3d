@@ -21,6 +21,30 @@ inputs:
   zlib_version:
     description: "Version of zlib to build"
     required: true
+  pdal_version:
+    description: "Version of pdal to build against"
+    required: false
+  sqlite_version:
+    description: "Version of sqlite to build against"
+    required: true
+  xercesc_version:
+    description: "Version of xerces-c to build against"
+    required: true
+  curl_version:
+    description: "Version of curl to build against"
+    required: true
+  gdal_version:
+    description: "Version of gdal to build against"
+    required: true
+  libgeotiff_version:
+    description: "Version of libgeotiff to build against"
+    required: true
+  libtiff_version:
+    description: "Version of libtiff to build against"
+    required: true
+  proj_version:
+    description: "Version of proj to build against"
+    required: true
   global_cache_index:
     description: "Global cache index"
     required: true
@@ -67,3 +91,71 @@ runs:
         tbb_version: ${{inputs.tbb_version}}
         zlib_version: ${{inputs.zlib_version}}
         global_cache_index: ${{inputs.global_cache_index}}
+
+    - name: Install sqlite
+      if: inputs.sqlite_version != ''
+      uses: ./.actions/sqlite-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.sqlite_version}}
+
+    - name: Install xerces-c
+      if: inputs.xercesc_version != ''
+      uses: ./.actions/xercesc-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.xercesc_version}}
+
+    - name: Install curl
+      if: inputs.curl_version != ''
+      uses: ./.actions/curl-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.curl_version}}
+
+    - name: Install proj
+      if: inputs.proj_version != ''
+      uses: ./.actions/proj-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.proj_version}}
+        sqlite_version: ${{inputs.sqlite_version}}
+
+    - name: Install gdal
+      if: inputs.gdal_version != ''
+      uses: ./.actions/gdal-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.gdal_version}}
+        proj_version: ${{inputs.proj_version}}
+
+    - name: Install libtiff
+      if: inputs.libtiff_version != ''
+      uses: ./.actions/libtiff-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.libtiff_version}}
+        proj_version: ${{inputs.proj_version}}
+
+    - name: Install libgeotiff
+      if: inputs.libgeotiff_version != ''
+      uses: ./.actions/libgeotiff-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.libgeotiff_version}}
+        proj_version: ${{inputs.proj_version}}
+        libtiff_version: ${{inputs.libtiff_version}}
+
+    - name: Install PDAL
+      if: inputs.pdal_version != ''
+      uses: ./.actions/pdal-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.pdal_version}}
+        gdal_version: ${{inputs.gdal_version}}
+        libgeotiff_version: ${{inputs.libgeotiff_version}}
+        sqlite_version: ${{inputs.sqlite_version}}
+        curl_version: ${{inputs.curl_version}}
+        xercesc_version: ${{inputs.xercesc_version}}
+        proj_version: ${{inputs.proj_version}}
+        blosc_version: ${{inputs.blosc_version}}
