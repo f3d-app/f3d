@@ -13,6 +13,8 @@ unknownMacro
 *:external/dmon/dmon.h
 *:external/imgui/*.h
 *:external/imgui/*.cpp
+*:external/clip/*.cpp
+*:external/clip/*.h
 
 // generated files
 *:*libf3dSDKTests.cxx
