@@ -49,6 +49,14 @@ runs:
         version: ${{inputs.zlib_version}}
         global_cache_index: ${{inputs.global_cache_index}}
 
+    - name: Install tiff
+      uses: ./.actions/tiff-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: v4.7.1
+        zlib_version: ${{inputs.zlib_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
+
     - name: Install blosc
       uses: ./.actions/blosc-install-dep
       with:
