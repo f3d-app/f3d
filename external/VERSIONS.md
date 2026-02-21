@@ -1,4 +1,5 @@
 - cxxopts: v3.3.1
+- clip: v1.13
 - dmon: 1.3.9
 - imgui: v1.92.5
 - nlohmann_json: v3.12.0
