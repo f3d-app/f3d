@@ -35,6 +35,12 @@ runs:
         mkdir .actions
         cp -r ${{inputs.source_dir}}/.github/actions/* .actions/
 
+    - name: Install sqlite
+      uses: ./.actions/sqlite-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        global_cache_index: ${{inputs.global_cache_index}}
+
     - name: Install TBB
       uses: ./.actions/tbb-install-dep
       with:
