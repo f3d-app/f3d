@@ -71,6 +71,8 @@ runs:
         -DCMAKE_INSTALL_PREFIX=../geotiff_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DTiff_DIR=$(pwd)/../dependencies/install/lib/cmake/tiff
+        -DTIFF_LIBRARY=$(pwd)/../dependencies/install/lib/libtiff.so
+        -DTIFF_INCLUDE_DIR=$(pwd)/../dependencies/install/include/
         -DPROJ_ROOT:PATH=../install/
         -DWITH_TIFF=ON
         -DWITH_TOWGS84=OFF
