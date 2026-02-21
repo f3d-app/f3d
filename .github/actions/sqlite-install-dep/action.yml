@@ -22,7 +22,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: ${{github.workspace}}/dependencies/sqlite_build/install
-        key: sqlite-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
+        key: sqlite-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
 
     # Dependents: proj
     # csb contains sqlite 3.43.0
