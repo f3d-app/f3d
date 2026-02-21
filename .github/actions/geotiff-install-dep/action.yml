@@ -68,7 +68,8 @@ runs:
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../geotiff_install
-        -DCMAKE_PREFIX_PATH:PATH=../install/
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
+        -DTiff_DIR=$(pwd)/../dependencies/install/lib/cmake/tiff
         -DPROJ_ROOT:PATH=../install/
         -DWITH_TIFF=ON
         -DWITH_TOWGS84=OFF
