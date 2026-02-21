@@ -126,9 +126,6 @@ if (F3D_USE_EXTERNAL_CLIP)
   find_package(clip REQUIRED)
 endif ()
 
-# Build external dependencies that needs it
-add_subdirectory(external)
-
 # Shared options between application and library
 include(GNUInstallDirs)
 cmake_dependent_option(F3D_WINDOWS_BUILD_CONSOLE_APPLICATION "Build a supplemental f3d-console application" OFF "WIN32" OFF)
@@ -251,6 +248,9 @@ endif()
 
 # F3D Application
 cmake_dependent_option(F3D_BUILD_APPLICATION "Build the application" ON "NOT ANDROID AND NOT EMSCRIPTEN" OFF)
+
+# Build external dependencies that needs it
+add_subdirectory(external)
 
 # Build VTK extension modules
 add_subdirectory(vtkext)
