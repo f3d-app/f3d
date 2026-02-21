@@ -28,7 +28,7 @@ runs:
         path: dependencies/proj_install
         key: proj-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
 
-    # Dependents: gdal
+    # Dependents: gdal geotiff
     # Depends on fixed version sqlite
     - name: Checkout proj
       if: steps.cache-proj.outputs.cache-hit != 'true'

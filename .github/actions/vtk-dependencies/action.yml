@@ -71,6 +71,16 @@ runs:
         zlib_version: ${{inputs.zlib_version}}
         global_cache_index: ${{inputs.global_cache_index}}
 
+    - name: Install geotiff
+      uses: ./.actions/geotiff-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: 1.7.4
+        proj_version: 9.7.1
+        tiff_version: v4.7.1
+        zlib_version: ${{inputs.zlib_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
+
     - name: Install blosc
       uses: ./.actions/blosc-install-dep
       with:
