@@ -58,6 +58,7 @@ runs:
         mkdir geotiff_install
         ls $(pwd)/../dependencies/install/lib/cmake/tiff
 
+    # TIFF off for now, TODO
     - name: Configure geotiff
       if: steps.cache-geotiff.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/geotiff_build
@@ -69,12 +70,8 @@ runs:
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../geotiff_install
-        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
-        -DTiff_DIR=$(pwd)/../dependencies/install/lib/cmake/tiff
-        -DTIFF_LIBRARY=$(pwd)/../dependencies/install/lib/libtiff.so
-        -DTIFF_INCLUDE_DIR=$(pwd)/../dependencies/install/include/
         -DPROJ_ROOT:PATH=../install/
-        -DWITH_TIFF=ON
+        -DWITH_TIFF=OFF
         -DWITH_TOWGS84=OFF
         -DWITH_UTILITIES=OFF
         -DWITH_ZLIB=ON
