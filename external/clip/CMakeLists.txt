@@ -7,6 +7,7 @@ project(clip LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
   # Use libc++ explicitly so we can compile for
@@ -26,6 +27,8 @@ if(UNIX AND NOT APPLE)
 endif()
 
 add_library(clip clip.cpp)
+
+target_include_directories(clip INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 if(CLIP_ENABLE_IMAGE)
   target_sources(clip PRIVATE image.cpp)
@@ -118,6 +121,7 @@ if(CLIP_INSTALL)
     EXPORT clip-targets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   )
   install(
     EXPORT clip-targets
