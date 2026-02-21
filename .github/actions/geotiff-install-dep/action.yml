@@ -70,7 +70,8 @@ runs:
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../geotiff_install
-        -DPROJ_ROOT:PATH=../install/
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
+        -DPROJ_ROOT:PATH=$(pwd)/../dependencies/install/
         -DWITH_TIFF=OFF
         -DWITH_TOWGS84=OFF
         -DWITH_UTILITIES=OFF
