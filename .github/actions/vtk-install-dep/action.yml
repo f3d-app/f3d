@@ -11,11 +11,29 @@ inputs:
   blosc_version:
     description: "Version of blosc to build against"
     required: true
+  curl_version:
+    description: "Version of gdal to build against"
+    required: false
+  gdal_version:
+    description: "Version of gdal to build against"
+    required: false
+  geotiff_version:
+    description: "Version of geotiff to build against"
+    required: false
   openvdb_version:
     description: "Version of openvdb to build against"
     required: false
   ospray_version:
     description: "Version of ospray to build against"
+    required: false
+  pdal_version:
+    description: "Version of pdal to build against"
+    required: false
+  proj_version:
+    description: "Version of proj to build against"
+    required: false
+  tiff_version:
+    description: "Version of tiff to build against"
     required: false
   tbb_version:
     description: "Version of tbb to build against"
@@ -33,9 +51,9 @@ runs:
     - name: Check required inputs
       shell: bash
       run: |
+        [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
         [[ "${{ inputs.blosc_version }}" ]] || { echo "blosc_version input is empty" ; exit 1; }
         [[ "${{ inputs.tbb_version }}" ]] || { echo "tbb_version input is empty" ; exit 1; }
-        [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
         [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
         [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
 
@@ -44,7 +62,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
+        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}${{ inputs.curl_version != '' && format('-curl-{0}', inputs.curl_version) || '' }}${{ inputs.gdal_version != '' && format('-gdal-{0}', inputs.gdal_version) || '' }}${{ inputs.geotiff_version != '' && format('-geotiff-{0}', inputs.geotiff_version) || '' }}${{ inputs.pdal_version != '' && format('-pdal-{0}', inputs.pdal_version) || '' }}${{ inputs.proj_version != '' && format('-proj-{0}', inputs.proj_version) || '' }}${{ inputs.tiff_version != '' && format('-tiff-{0}', inputs.tiff_version) || '' }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -111,6 +129,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_IOLegacy=YES
         -DVTK_MODULE_ENABLE_VTK_IONetCDF=YES
         -DVTK_MODULE_ENABLE_VTK_IOOpenVDB=${{ inputs.openvdb_version != '' && 'YES' || 'DEFAULT' }}
+        -DVTK_MODULE_ENABLE_VTK_IOPDAL=${{ inputs.pdal_version != '' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_IOPLY=YES
         -DVTK_MODULE_ENABLE_VTK_IOXML=YES
         -DVTK_MODULE_ENABLE_VTK_ImagingCore=YES
