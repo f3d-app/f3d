@@ -18,7 +18,7 @@ struct TestTriggerHelper
   template<typename Func>
   void operator()(Func&& func) const
   {
-    f3d::engine engine = f3d::engine::create();
+    f3d::engine engine = f3d::engine::create(true);
     engine.getWindow().setSize(300, 300);
     engine.getScene().add(this->DataPath);
 
