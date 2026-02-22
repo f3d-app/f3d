@@ -35,6 +35,20 @@ runs:
         mkdir .actions
         cp -r ${{inputs.source_dir}}/.github/actions/* .actions/
 
+    - name: Install sqlite
+      uses: ./.actions/sqlite-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        global_cache_index: ${{inputs.global_cache_index}}
+
+    # Depends on sqlite
+    - name: Install proj
+      uses: ./.actions/proj-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: 9.7.1
+        global_cache_index: ${{inputs.global_cache_index}}
+
     - name: Install TBB
       uses: ./.actions/tbb-install-dep
       with:
@@ -47,6 +61,24 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.zlib_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
+
+    - name: Install tiff
+      uses: ./.actions/tiff-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: v4.7.1
+        zlib_version: ${{inputs.zlib_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
+
+    - name: Install geotiff
+      uses: ./.actions/geotiff-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: 1.7.4
+        proj_version: 9.7.1
+        tiff_version: v4.7.1
+        zlib_version: ${{inputs.zlib_version}}
         global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install blosc
