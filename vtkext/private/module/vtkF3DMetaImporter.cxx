@@ -466,7 +466,6 @@ bool vtkF3DMetaImporter::Update()
       ngs.GlyphMapper->SetSourceConnection(arrowSource->GetOutputPort());
       ngs.GlyphMapper->SetOrientationModeToDirection();
       ngs.GlyphMapper->SetOrientationArray(vtkDataSetAttributes::NORMALS);
-      ngs.GlyphMapper->SetScaleFactor(glyphScale);
       ngs.GlyphMapper->ScalingOn();
 
       ngs.Actor->SetMapper(ngs.GlyphMapper);
