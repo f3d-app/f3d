@@ -100,12 +100,15 @@ option(F3D_MODULE_WEBP "WebP images module" OFF)
 option(F3D_MODULE_UI "ImGui widgets module" ON)
 option(F3D_MODULE_DMON "dmon (watch) module" ON)
 option(F3D_MODULE_TINYFILEDIALOGS "tinyfiledialogs module" ON)
+option(F3D_MODULE_CLIP "clip module (experimental)" OFF)
 
 # Use externals
 option(F3D_USE_EXTERNAL_CXXOPTS "Use external cxxopts dependency" OFF)
 option(F3D_USE_EXTERNAL_NLOHMANN_JSON "Use external nlohmann_json dependency" OFF)
+option(F3D_USE_EXTERNAL_CLIP "Use external clip dependency" OFF)
 cmake_dependent_option(F3D_USE_EXTERNAL_DMON "Use external dmon dependency" OFF "F3D_MODULE_DMON" OFF)
 cmake_dependent_option(F3D_USE_EXTERNAL_IMGUI "Use external imgui dependency" OFF "F3D_MODULE_UI" OFF)
+cmake_dependent_option(F3D_USE_EXTERNAL_IMGUI "Use external clip dependency" OFF "F3D_MODULE_CLIP" OFF)
 
 if (F3D_USE_EXTERNAL_CXXOPTS)
   find_package(cxxopts REQUIRED)
@@ -118,6 +121,9 @@ if (F3D_USE_EXTERNAL_DMON)
 endif ()
 if (F3D_USE_EXTERNAL_IMGUI)
   find_package(imgui REQUIRED)
+endif ()
+if (F3D_USE_EXTERNAL_CLIP)
+  find_package(clip REQUIRED)
 endif ()
 
 # Shared options between application and library
@@ -242,6 +248,9 @@ endif()
 
 # F3D Application
 cmake_dependent_option(F3D_BUILD_APPLICATION "Build the application" ON "NOT ANDROID AND NOT EMSCRIPTEN" OFF)
+
+# Build external dependencies that needs it
+add_subdirectory(external)
 
 # Build VTK extension modules
 add_subdirectory(vtkext)
