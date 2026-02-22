@@ -18,8 +18,17 @@ inputs:
   blosc_version:
     description: "Version of blosc to build"
     required: true
+  curl_version:
+    description: "Version of curl to build"
+    required: false
   draco_version:
     description: "Version of draco to build"
+    required: false
+  gdal_version:
+    description: "Version of gdal to build"
+    required: false
+  geotiff_version:
+    description: "Version of geotiff to build"
     required: false
   imath_version:
     description: "Version of imath to build"
@@ -36,12 +45,21 @@ inputs:
   ospray_version:
     description: "Version of ospray to build"
     required: false
+  pdal_version:
+    description: "Version of pdal to build"
+    required: false
+  proj_version:
+    description: "Version of proj to build"
+    required: false
   pybind11_version:
     description: "Version of pybind11 to build"
     required: false
   tbb_version:
     description: "Version of tbb to build"
     required: true
+  tiff_version:
+    description: "Version of tiff to build"
+    required: false
   usd_version:
     description: "Version of usd to build"
     required: false
@@ -74,8 +92,14 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         blosc_version: ${{inputs.blosc_version}}
+        curl_version: ${{inputs.curl_version}}
+        gdal_version: ${{inputs.gdal_version}}
+        geotiff_version: ${{inputs.geotiff_version}}
         openvdb_version: ${{inputs.openvdb_version}}
+        pdal_version: ${{inputs.pdal_version}}
+        proj_version: ${{inputs.proj_version}}
         tbb_version: ${{inputs.tbb_version}}
+        tiff_version: ${{inputs.tiff_version}}
         zlib_version: ${{inputs.zlib_version}}
         global_cache_index: ${{inputs.global_cache_index}}
 

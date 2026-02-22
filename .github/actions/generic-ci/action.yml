@@ -41,8 +41,17 @@ inputs:
   blosc_version:
     description: "Version of blosc to build"
     required: true
+  curl_version:
+    description: "Version of gdal to build"
+    required: false
   draco_version:
     description: "Version of draco to build"
+    required: false
+  gdal_version:
+    description: "Version of gdal to build"
+    required: false
+  geotiff_version:
+    description: "Version of geotiff to build"
     required: false
   imath_version:
     description: "Version of imath to build"
@@ -62,11 +71,20 @@ inputs:
   ospray_version:
     description: "Version of ospray to build"
     required: false
+  pdal_version:
+    description: "Version of pdal to build"
+    required: false
+  proj_version:
+    description: "Version of proj to build"
+    required: false
   pybind11_version:
     description: "Version of pybind11 to build"
     required: false
   python_version:
     description: "Version of python to install"
+    required: false
+  tiff_version:
+    description: "Version of tiff to build"
     required: false
   tbb_version:
     description: "Version of tbb to build"
@@ -113,17 +131,23 @@ runs:
         alembic_version: ${{inputs.alembic_version}}
         assimp_version: ${{inputs.assimp_version}}
         blosc_version: ${{inputs.blosc_version}}
+        curl_version: ${{inputs.curl_version}}
         draco_version: ${{inputs.draco_version}}
+        gdal_version: ${{inputs.gdal_version}}
+        geotiff_version: ${{inputs.geotiff_version}}
         imath_version: ${{inputs.imath_version}}
         occt_version: ${{inputs.occt_version}}
         openexr_version: ${{inputs.openexr_version}}
         openvdb_version: ${{inputs.openvdb_version}}
         ospray_version: ${{inputs.ospray_version}}
+        pdal_version: ${{inputs.pdal_version}}
+        proj_version: ${{inputs.proj_version}}
         pybind11_version: ${{inputs.pybind11_version}}
         tbb_version: ${{inputs.tbb_version}}
+        tiff_version: ${{inputs.tiff_version}}
         usd_version: ${{inputs.usd_version}}
-        webp_version: ${{inputs.webp_version}}
         webifc_version: ${{inputs.webifc_version}}
+        webp_version: ${{inputs.webp_version}}
         zlib_version: ${{inputs.zlib_version}}
         global_cache_index: ${{inputs.global_cache_index}}
 
@@ -132,9 +156,15 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         blosc_version: ${{inputs.blosc_version}}
+        curl_version: ${{inputs.curl_version}}
+        gdal_version: ${{inputs.gdal_version}}
+        geotiff_version: ${{inputs.geotiff_version}}
         openvdb_version: ${{inputs.openvdb_version}}
         ospray_version: ${{inputs.ospray_version}}
+        pdal_version: ${{inputs.pdal_version}}
+        proj_version: ${{inputs.proj_version}}
         tbb_version: ${{inputs.tbb_version}}
+        tiff_version: ${{inputs.tiff_version}}
         vtk_version: ${{inputs.vtk_version}}
         zlib_version: ${{inputs.zlib_version}}
         global_cache_index: ${{inputs.global_cache_index}}
@@ -480,7 +510,7 @@ runs:
 
     - name: Check Install Windows Console Executable
       if: |
-        inputs.vtk_version != 'v9.3.0' && inputs.vtk_version != 'v9.4.2' && inputs.vtk_version != 'v9.5.2' 
+        inputs.vtk_version != 'v9.3.0' && inputs.vtk_version != 'v9.4.2' && inputs.vtk_version != 'v9.5.2'
         && runner.os == 'Windows'
       shell: bash
       working-directory: ${{github.workspace}}/install
