@@ -42,4 +42,8 @@ if(F3D_PLUGIN_BUILD_VDB)
   include(tests.vdb.cmake)
 endif()
 
+if(F3D_PLUGIN_BUILD_PDAL)
+  include(tests.pdal.cmake)
+endif()
+
 include(tests.watch.cmake)
