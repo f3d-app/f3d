@@ -275,6 +275,9 @@ EMSCRIPTEN_BINDINGS(f3d)
     .property("viewAngle",
       static_cast<f3d::angle_deg_t (f3d::camera::*)() const>(&f3d::camera::getViewAngle),
       &f3d::camera::setViewAngle)
+    .function("getWorldAzimuth", &f3d::camera::getWorldAzimuth)
+    .function("getWorldElevation", &f3d::camera::getWorldElevation)
+    .function("getDistance", &f3d::camera::getDistance)
     .function("dolly", &f3d::camera::dolly, emscripten::return_value_policy::reference())
     .function("pan", &f3d::camera::pan, emscripten::return_value_policy::reference())
     .function("zoom", &f3d::camera::zoom, emscripten::return_value_policy::reference())
