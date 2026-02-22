@@ -109,6 +109,8 @@
 #include <chrono>
 #include <sstream>
 
+static constexpr float NormalGlyphScaleMultiplier = 0.02;
+
 namespace
 {
 std::string DeprecatedCollapsePath(const fs::path& path)
@@ -2153,6 +2155,11 @@ void vtkF3DRenderer::UpdateActors()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
+  if (this->UseNormalGlyphs)
+  {
+    ConfigureNormalGlyphs();
+  }
+
   if (!this->TimerVisible)
   {
     this->Superclass::Render();
@@ -2862,6 +2869,8 @@ void vtkF3DRenderer::ConfigureNormalGlyphs()
       continue;
     }
 
+    normalGlyph.GlyphMapper->SetScaleFactor(
+      GetActiveCamera()->GetDistance() * NormalGlyphScaleMultiplier);
     normalGlyph.Actor->SetVisibility(normalGlyphsVisible);
   }
 

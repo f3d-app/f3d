@@ -24,8 +24,6 @@
 #include <numeric>
 #include <vector>
 
-static constexpr double normalGlyphScaleMultiplier = 0.05;
-
 //----------------------------------------------------------------------------
 struct vtkF3DMetaImporter::Internals
 {
@@ -316,21 +314,11 @@ bool vtkF3DMetaImporter::Update()
 
       ngs.InputDataHasNormals = points->GetPointData()->GetNormals() != nullptr;
 
-      double actorBounds[6];
-      actor->GetBounds(actorBounds);
-
-      double dx = actorBounds[1] - actorBounds[0];
-      double dy = actorBounds[3] - actorBounds[2];
-      double dz = actorBounds[5] - actorBounds[4];
-      double diagonal = std::sqrt(dx * dx + dy * dy + dz * dz);
-      double glyphScale = normalGlyphScaleMultiplier * diagonal;
-
       vtkNew<vtkArrowSource> arrowSource;
       ngs.GlyphMapper->SetInputData(points);
       ngs.GlyphMapper->SetSourceConnection(arrowSource->GetOutputPort());
       ngs.GlyphMapper->SetOrientationModeToDirection();
       ngs.GlyphMapper->SetOrientationArray(vtkDataSetAttributes::NORMALS);
-      ngs.GlyphMapper->SetScaleFactor(glyphScale);
       ngs.GlyphMapper->ScalingOn();
 
       ngs.Actor->SetMapper(ngs.GlyphMapper);
