@@ -461,16 +461,16 @@ jobs:
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
           cpu: x86_64
           blosc_version: ${{matrix.blosc_version}}
+          openvdb_version: ${{matrix.openvdb_version}}
+          ospray_version: ${{matrix.ospray_version}}
+          zlib_version: ${{matrix.zlib_version}}
+          tbb_version: ${{matrix.tbb_version}}
           curl_version: curl-8_18_0
           gdal_version: v3.12.2
           geotiff_version: 1.7.4
-          openvdb_version: ${{matrix.openvdb_version}}
-          ospray_version: ${{matrix.ospray_version}}
           pdal_version: 2.10.0
           proj_version: 9.7.1
-          tbb_version: ${{matrix.tbb_version}}
           tiff_version: v4.7.1
-          zlib_version: ${{matrix.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -534,6 +534,12 @@ jobs:
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          curl_version: curl-8_18_0
+          gdal_version: v3.12.2
+          geotiff_version: 1.7.4
+          pdal_version: 2.10.0
+          proj_version: 9.7.1
+          tiff_version: v4.7.1
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -785,6 +791,12 @@ jobs:
           webp_version: ${{matrix.webp_version}}
           webifc_version: ${{matrix.webifc_version}}
           zlib_version: ${{matrix.zlib_version}}
+          curl_version: curl-8_18_0
+          gdal_version: v3.12.2
+          geotiff_version: 1.7.4
+          pdal_version: 2.10.0
+          proj_version: 9.7.1
+          tiff_version: v4.7.1
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -841,6 +853,12 @@ jobs:
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          curl_version: curl-8_18_0
+          gdal_version: v3.12.2
+          geotiff_version: 1.7.4
+          pdal_version: 2.10.0
+          proj_version: 9.7.1
+          tiff_version: v4.7.1
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -909,6 +927,12 @@ jobs:
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          curl_version: curl-8_18_0
+          gdal_version: v3.12.2
+          geotiff_version: 1.7.4
+          pdal_version: 2.10.0
+          proj_version: 9.7.1
+          tiff_version: v4.7.1
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -976,6 +1000,12 @@ jobs:
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          curl_version: curl-8_18_0
+          gdal_version: v3.12.2
+          geotiff_version: 1.7.4
+          pdal_version: 2.10.0
+          proj_version: 9.7.1
+          tiff_version: v4.7.1
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -1023,6 +1053,12 @@ jobs:
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          curl_version: curl-8_18_0
+          gdal_version: v3.12.2
+          geotiff_version: 1.7.4
+          pdal_version: 2.10.0
+          proj_version: 9.7.1
+          tiff_version: v4.7.1
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -1076,6 +1112,12 @@ jobs:
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          curl_version: curl-8_18_0
+          gdal_version: v3.12.2
+          geotiff_version: 1.7.4
+          pdal_version: 2.10.0
+          proj_version: 9.7.1
+          tiff_version: v4.7.1
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -1124,6 +1166,12 @@ jobs:
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          curl_version: curl-8_18_0
+          gdal_version: v3.12.2
+          geotiff_version: 1.7.4
+          pdal_version: 2.10.0
+          proj_version: 9.7.1
+          tiff_version: v4.7.1
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
