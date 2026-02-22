@@ -1,0 +1,88 @@
+name: "Install proj Dependency"
+description: "Install proj Dependency using cache when possible"
+inputs:
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+  version:
+    description: "Version of proj to build"
+    required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+
+    - name: Cache proj
+      id: cache-proj
+      uses: actions/cache/restore@v4
+      with:
+        path: dependencies/proj_install
+        key: proj-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
+
+    # Dependents: gdal geotiff
+    # Depends on fixed version sqlite
+    - name: Checkout proj
+      if: steps.cache-proj.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: OSGeo/PROJ
+        path: "./dependencies/proj"
+        ref: ${{inputs.version}}
+
+    - name: Setup proj
+      if: steps.cache-proj.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir proj_build
+        mkdir proj_install
+
+    - name: Configure proj
+      if: steps.cache-proj.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/proj_build
+      shell: bash
+      run: >
+        cmake ../proj
+        -DBUILD_APPS:BOOL=OFF
+        -DBUILD_BENCHMARKS:BOOL=OFF
+        -DBUILD_CCT:BOOL=OFF
+        -DBUILD_CS2CS:BOOL=OFF
+        -DBUILD_GEOD:BOOL=OFF
+        -DBUILD_GIE:BOOL=OFF
+        -DBUILD_PROJINFO:BOOL=OFF
+        -DBUILD_PROJSYNC:BOOL=OFF
+        -DBUILD_SHARED_LIBS=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX=../proj_install
+        -DCMAKE_PREFIX_PATH:PATH=../install/
+        -DENABLE_CURL:BOOL=OFF
+        -DENABLE_TIFF:BOOL=OFF
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build proj
+      if: steps.cache-proj.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/proj_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/proj_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-proj.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-proj.outputs.cache-primary-key }}
+        path: dependencies/proj_install
