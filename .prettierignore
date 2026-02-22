@@ -1,3 +1,2 @@
 testing/configs/invalid.json
-external/clip/.github/workflows/build.yml
-external/clip/README.md
+external/clip/*
