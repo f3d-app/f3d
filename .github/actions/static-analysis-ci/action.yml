@@ -13,9 +13,18 @@ inputs:
   blosc_version:
     description: "Version of blosc to build"
     required: true
+  curl_version:
+    description: "Version of curl to build"
+    required: false
   draco_version:
     description: "Version of draco to build"
     required: true
+  gdal_version:
+    description: "Version of gdal to build"
+    required: false
+  geotiff_version:
+    description: "Version of geotiff to build"
+    required: false
   imath_version:
     description: "Version of imath to build"
     required: true
@@ -28,12 +37,21 @@ inputs:
   openvdb_version:
     description: "Version of openvdb to build"
     required: true
+  pdal_version:
+    description: "Version of pdal to build"
+    required: false
+  proj_version:
+    description: "Version of proj to build"
+    required: false
   usd_version:
     description: "Version of usd to build"
     required: true
   tbb_version:
     description: "Version of tbb to build"
     required: true
+  tiff_version:
+    description: "Version of tiff to build"
+    required: false
   vtk_version:
     description: "Version of vtk to build"
     required: true
@@ -73,15 +91,27 @@ runs:
         alembic_version: ${{inputs.alembic_version}}
         assimp_version: ${{inputs.assimp_version}}
         blosc_version: ${{inputs.blosc_version}}
+        curl_version: ${{inputs.curl_version}}
+        curl_version: ${{inputs.curl_version}}
         draco_version: ${{inputs.draco_version}}
+        gdal_version: ${{inputs.gdal_version}}
+        gdal_version: ${{inputs.gdal_version}}
+        geotiff_version: ${{inputs.geotiff_version}}
+        geotiff_version: ${{inputs.geotiff_version}}
         imath_version: ${{inputs.imath_version}}
         occt_version: ${{inputs.occt_version}}
         openexr_version: ${{inputs.openexr_version}}
         openvdb_version: ${{inputs.openvdb_version}}
+        pdal_version: ${{inputs.pdal_version}}
+        pdal_version: ${{inputs.pdal_version}}
+        proj_version: ${{inputs.proj_version}}
+        proj_version: ${{inputs.proj_version}}
         tbb_version: ${{inputs.tbb_version}}
+        tiff_version: ${{inputs.tiff_version}}
+        tiff_version: ${{inputs.tiff_version}}
         usd_version: ${{inputs.usd_version}}
-        webp_version: ${{inputs.webp_version}}
         webifc_version: ${{inputs.webifc_version}}
+        webp_version: ${{inputs.webp_version}}
         zlib_version: ${{inputs.zlib_version}}
         global_cache_index: ${{inputs.global_cache_index}}
 
@@ -89,8 +119,14 @@ runs:
       uses: ./source/.github/actions/vtk-install-dep
       with:
         blosc_version: ${{inputs.blosc_version}}
+        curl_version: ${{inputs.curl_version}}
+        gdal_version: ${{inputs.gdal_version}}
+        geotiff_version: ${{inputs.geotiff_version}}
         openvdb_version: ${{inputs.openvdb_version}}
+        pdal_version: ${{inputs.pdal_version}}
+        proj_version: ${{inputs.proj_version}}
         tbb_version: ${{inputs.tbb_version}}
+        tiff_version: ${{inputs.tiff_version}}
         vtk_version: ${{inputs.vtk_version}}
         zlib_version: ${{inputs.zlib_version}}
         global_cache_index: ${{inputs.global_cache_index}}
