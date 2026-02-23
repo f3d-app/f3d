@@ -1608,10 +1608,8 @@ void vtkF3DRenderer::SetFontScale(const double fontScale)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetFontColor(const std::vector<double>& color)
+void vtkF3DRenderer::SetFontColor(const std::array<double, 3>& color)
 {
-  assert(color.size() == 3);
-
   if (this->FontColor != color)
   {
     this->FontColor = color;

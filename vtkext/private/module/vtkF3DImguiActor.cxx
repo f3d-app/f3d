@@ -49,7 +49,7 @@ constexpr float DROPZONE_MARGIN = 0.5f;
 constexpr float DROPZONE_PADDING_X = 5.0f;
 constexpr float DROPZONE_PADDING_Y = 2.0f;
 
-const inline ImVec4 ColorToImVec4(const std::vector<double>& color)
+const inline ImVec4 ColorToImVec4(const std::array<double, 3>& color)
 {
   return ImVec4{ static_cast<float>(color[0]), static_cast<float>(color[1]),
     static_cast<float>(color[2]), 1.0f };
