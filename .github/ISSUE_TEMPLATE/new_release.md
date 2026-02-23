@@ -20,7 +20,7 @@ Before release:
 
 Release Split :
 
-- [ ] Create, review and merge a MR from `master` branch into `release`: https://github.com/f3d-app/f3d/compare/release...master
+- [ ] Create, review and merge a PR from `master` branch into `release`: https://github.com/f3d-app/f3d/compare/release...master
 
 Release Candidates :
 
@@ -48,6 +48,9 @@ Release :
 - [ ] Tag `vX.Y.Z` and push it to https://github.com/f3d-app/f3d: `git tag vX.Y.Z -m vX.Y.Z`
 - [ ] Commit, review and merge adding `X.Y.Z` in https://github.com/f3d-app/f3d-superbuild `versions.cmake` in the `main` branch
 - [ ] Tag `vX.Y.Z` and push it to https://github.com/f3d-app/f3d-superbuild: `git tag vX.Y.Z -m vX.Y.Z`
+- Update Android
+  - [ ] Run `./update_native_libs.sh --branch vX.Y.Z` and merge new libraries and jar file in https://github.com/f3d-app/f3d-android master branch
+  - [ ] Tag `vX.Y.Z` and push it to https://github.com/f3d-app/f3d-android: `git tag vX.Y.Z -m vX.Y.Z`
 - [ ] Merge F3D release into master: https://github.com/f3d-app/f3d/compare/master...release
 - [ ] Trigger a release build using https://github.com/f3d-app/f3d-superbuild actions with `vX.Y.Z` F3D version, `vX.Y.Z` sb version and prerelease publish true
 - [ ] Finalize release note and add them to the release
@@ -128,6 +131,13 @@ eng.interactor.start()
 - Check the following
   - The name of the window is `f3d` at all time
   - Python provides suggestions whenever the "Tab" key is pressed
+
+Android testing protocol:
+
+- Uninstall any F3D app
+- Download and install APK of your architecture (`arm64-v8a` most likely)
+- Open a supported file from a different app, select F3D and make sure you can interact with it
+- Touch the big `+` button, browse to a supported file and open it. Make sure you can interact with it
 
 Webassembly testing protocol:
 
