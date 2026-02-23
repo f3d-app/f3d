@@ -3,6 +3,7 @@
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkViewport.h>
+#include <chrono>
 
 vtkObjectFactoryNewMacro(vtkF3DUIActor);
 
@@ -228,7 +229,7 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
 }
 
 void vtkF3DUIActor::AddNotification(
-  std::string& desc, std::string& value, std::string& bind, float duration)
+  std::string& desc, std::string& value, std::string& bind, const float duration)
 {
   for (auto it = this->Notifications.begin(); it != this->Notifications.end(); ++it)
   {
@@ -238,5 +239,5 @@ void vtkF3DUIActor::AddNotification(
       break;
     }
   }
-  this->Notifications.emplace_front(Notification{ desc, value, bind, duration });
+  this->Notifications.emplace_front(Notification{ desc, value, bind, duration, Clock::now() });
 }

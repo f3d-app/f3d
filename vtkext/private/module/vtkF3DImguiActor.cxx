@@ -36,6 +36,7 @@
 #include <optional>
 #include <sstream>
 #include <string>
+#include <chrono>
 
 namespace
 {
@@ -871,6 +872,25 @@ void vtkF3DImguiActor::StartFrame(vtkOpenGLRenderWindow* renWin)
   this->Pimpl->Initialize(renWin);
 
   ImGui::NewFrame();
+
+  static auto start = std::chrono::steady_clock::now();
+  auto now = std::chrono::steady_clock::now();
+  std::chrono::duration<float> elapsed = now - start;
+  static unsigned int frameCount = 0;
+  ++frameCount;
+
+  static float imguiAccum = 0.f;
+  imguiAccum += io.DeltaTime;
+
+  if (elapsed.count() >= 1.0f)
+  {
+    std::cout << "ImGui DeltaTime: " << io.DeltaTime << std::endl;
+    std::cout << "ImGui accumulated: " << imguiAccum << std::endl;
+    std::cout << "ImGui FPS: " << frameCount << std::endl;
+    imguiAccum = 0.f;
+    start = now;
+    frameCount = 0;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -896,10 +916,10 @@ void vtkF3DImguiActor::RenderNotifications()
 
   for (auto it = this->Notifications.begin(); it != this->Notifications.end();)
   {
-    auto& [desc, value, bind, duration] = *it;
-    duration -= io.DeltaTime;
+    const auto& [desc, value, bind, duration, start_time ] = *it;
+    std::chrono::duration<float> elapsed = Clock::now() - start_time;
 
-    if (duration < 0)
+    if (elapsed.count() > duration)
     {
       it = Notifications.erase(it);
     }
@@ -941,7 +961,8 @@ void vtkF3DImguiActor::RenderNotifications()
 
       float windowWidth = std::max(descLineWidth, bindingLineWidth) + windowPadding.x * 2.f;
       float windowHeight = descLineSize.y + windowPadding.y * 2.f;
-      windowHeight += bind.empty() ? 0.f : ImGui::CalcTextSize(bind.c_str()).y;
+      windowHeight += bind.empty()
+        ? 0.f : ImGui::GetTextLineHeightWithSpacing();
 
       ImVec4 descTextColor = F3DStyle::imgui::GetTextColor();       // White
       ImVec4 valueTextColor = F3DStyle::imgui::GetHighlightColor(); // Blue
@@ -969,9 +990,9 @@ void vtkF3DImguiActor::RenderNotifications()
 
       float alpha = 1.f, fading = .5f;
 
-      if (duration < fading)
+      if ((duration - elapsed.count()) < fading)
       {
-        alpha = duration / fading;
+        alpha = (duration - elapsed.count()) / fading;
       }
       descTextColor.w = alpha;
       valueTextColor.w = alpha;
@@ -991,6 +1012,8 @@ void vtkF3DImguiActor::RenderNotifications()
 
       float posX = (windowWidth - descLineWidth) * 0.5f; // Text centering
       ImGui::SetCursorPosX(posX);
+      float posY = ImGui::GetCursorPosY() - windowPadding.y * .25f;
+      ImGui::SetCursorPosY(posY);
 
       ImGui::TextColored(descTextColor, desc.c_str());
       if (!value.empty())
@@ -1003,6 +1026,8 @@ void vtkF3DImguiActor::RenderNotifications()
       {
         posX = (windowWidth - bindingLineWidth) * 0.5f;
         ImGui::SetCursorPosX(posX);
+        float posY = ImGui::GetCursorPosY() + windowPadding.y * .25f;
+        ImGui::SetCursorPosY(posY);
 
         if (keys.size() > 1)
         {
@@ -1015,6 +1040,9 @@ void vtkF3DImguiActor::RenderNotifications()
         ImGui::SameLine();
 
         ImVec2 topBindingCorner, bottomBindingCorner;
+        float recMarginX = margin * this->FontScale * .5f;
+        float recMarginY = margin * this->FontScale * .1f;
+        float recRadius = 2.f * this->FontScale;
         for (const std::string& key : keys)
         {
           ImDrawList* drawList = ImGui::GetWindowDrawList();
@@ -1023,11 +1051,11 @@ void vtkF3DImguiActor::RenderNotifications()
           ImGui::TextColored(bindingTextColor, key.c_str());
           drawList->ChannelsSetCurrent(0);
           topBindingCorner =
-            ImVec2(ImGui::GetItemRectMin().x - margin, ImGui::GetItemRectMin().y - (margin * .5f));
+            ImVec2(ImGui::GetItemRectMin().x - recMarginX, ImGui::GetItemRectMin().y - recMarginY);
           bottomBindingCorner =
-            ImVec2(ImGui::GetItemRectMax().x + margin, ImGui::GetItemRectMax().y + (margin * .5f));
+            ImVec2(ImGui::GetItemRectMax().x + recMarginX, ImGui::GetItemRectMax().y + recMarginY);
           drawList->AddRectFilled(
-            topBindingCorner, bottomBindingCorner, ImColor(bindingRectColor), 5.f);
+            topBindingCorner, bottomBindingCorner, ImColor(bindingRectColor), recRadius);
           drawList->ChannelsMerge();
           if (key != keys.back())
           {

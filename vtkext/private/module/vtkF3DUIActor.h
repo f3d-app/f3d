@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <deque>
 #include <map>
+#include <chrono>
 
 class vtkOpenGLRenderWindow;
 class ImFont;
@@ -37,6 +38,7 @@ public:
 
   using CheatSheetTuple = std::tuple<std::string, std::string, std::string, CheatSheetBindingType>;
   using CheatSheetGroup = std::pair<std::string, std::vector<CheatSheetTuple>>;
+  using Clock = std::chrono::steady_clock;
 
   struct Notification
   {
@@ -44,6 +46,7 @@ public:
     std::string value;
     std::string bind;
     float duration;
+    Clock::time_point start_time;
   };
 
   /**
@@ -189,7 +192,7 @@ public:
    * Add notification info to deque
    */
   void AddNotification(
-    std::string& desc, std::string& value, std::string& bind, float duration);
+    std::string& desc, std::string& value, std::string& bind, const float duration);
 
 protected:
   vtkF3DUIActor();
@@ -311,7 +314,6 @@ protected:
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;
   void operator=(const vtkF3DUIActor&) = delete;
-
 
   bool Initialized = false;
 };
