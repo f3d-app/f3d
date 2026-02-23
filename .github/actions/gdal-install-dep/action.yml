@@ -100,10 +100,7 @@ runs:
     - name: Copy to install
       working-directory: ${{github.workspace}}/dependencies/gdal_install
       shell: bash
-      run: |
-        cp -r ./* ../install/
-        ldd ../install/lib/libgdal.so
-        readelf -d ../install/lib/libgdal.so
+      run: cp -r ./* ../install/
 
     - name: Save cache
       if: steps.cache-gdal.outputs.cache-hit != 'true'
