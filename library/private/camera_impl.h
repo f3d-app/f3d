@@ -50,6 +50,9 @@ public:
   camera& setState(const camera_state_t& state) override;
   camera_state_t getState() const override;
   void getState(camera_state_t& state) const override;
+  double getWorldAzimuth() const override;
+  double getWorldElevation() const override;
+  double getDistance() const override;
 
   camera& dolly(double val) override;
   camera& pan(double right, double up, double forward) override;
@@ -85,6 +88,13 @@ public:
   bool GetSuccessfullyReset() const;
 
 private:
+  /**
+   * This helper computes the direction vector pointing from the camera position
+   * toward the focal point in world coordinates:
+   * view = focal_point - position
+   */
+  void getPositionToFocalVector(vector3_t& vec) const;
+
   class internals;
   std::unique_ptr<internals> Internals;
 };
