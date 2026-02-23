@@ -42,7 +42,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/gdal_install
-        key: gdal-${{inputs.version}}-${{ inputs.geotiff_version }}-${{inputs.proj_version}}-${{inputs.tiff_version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
+        key: gdal-${{inputs.version}}-${{ inputs.geotiff_version }}-${{inputs.proj_version}}-${{inputs.tiff_version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-2
 
     # Dependents: pdal vtk
     - name: Checkout gdal
@@ -100,7 +100,10 @@ runs:
     - name: Copy to install
       working-directory: ${{github.workspace}}/dependencies/gdal_install
       shell: bash
-      run: cp -r ./* ../install/
+      run: |
+        cp -r ./* ../install/
+        ldd ../install/lib/libgdal.so
+        readelf -d ../install/lib/libgdal.so
 
     - name: Save cache
       if: steps.cache-gdal.outputs.cache-hit != 'true'
