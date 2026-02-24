@@ -1962,6 +1962,18 @@ void vtkF3DRenderer::ShowArmature(bool show)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowNotification(bool show)
+{
+  this->UIActor->SetNotificationVisibility(show);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowBindings(bool show)
+{
+  this->UIActor->SetBindingsVisibility(show);
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowEdge(const std::optional<bool>& show)
 {
   if (this->EdgeVisible != show)

@@ -110,6 +110,24 @@ void vtkF3DUIActor::SetFpsCounterVisibility(bool show)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetNotificationVisibility(bool show)
+{
+  if (this->NotificationVisible != show)
+  {
+    this->NotificationVisible = show;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetBindingsVisibility(bool show)
+{
+  if (this->BindingsVisible != show)
+  {
+    this->BindingsVisible = show;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::UpdateFpsValue(const double elapsedFrameTime)
 {
   this->TotalFrameTimes += elapsedFrameTime;
@@ -226,7 +244,10 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
     this->RenderFpsCounter();
   }
 
-  this->RenderNotifications();
+  if (this->NotificationVisible)
+  {
+    this->RenderNotifications();
+  }
 
   this->EndFrame(renWin);
 
@@ -236,13 +257,16 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
 void vtkF3DUIActor::AddNotification(
   std::string& desc, std::string& value, std::string& bind, double duration)
 {
-  for (auto it = this->Notifications.begin(); it != this->Notifications.end(); ++it)
+  if (this->NotificationVisible)
   {
-    if (desc == (*it).desc)
+    for (auto it = this->Notifications.begin(); it != this->Notifications.end(); ++it)
     {
-      Notifications.erase(it); // Remove duplicate
-      break;
+      if (desc == (*it).desc)
+      {
+        Notifications.erase(it); // Remove duplicate
+        break;
+      }
     }
+    this->Notifications.emplace_front(Notification{ desc, value, bind, duration, this->TotalTime });
   }
-  this->Notifications.emplace_front(Notification{ desc, value, bind, duration, this->TotalTime });
 }

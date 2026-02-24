@@ -914,16 +914,18 @@ void vtkF3DImguiActor::RenderNotifications()
       ImVec2 descLineSize = ImGui::CalcTextSize(desc.c_str());
       ImVec2 valueLineSize = ImGui::CalcTextSize(value.c_str());
       ImVec2 windowPadding = ImGui::GetStyle().WindowPadding;
-      const float plusWidth = ImGui::CalcTextSize("+").x;
       const float itemSpacingX = ImGui::GetStyle().ItemSpacing.x;
+      // Increase line spacing a bit
+      ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(itemSpacingX, 10.0f * this->FontScale));
 
       float descLineWidth = descLineSize.x + valueLineSize.x;
       descLineWidth += value.empty() ? 0.f : itemSpacingX;
 
       auto keys = ::SplitBindings(bind, '+');
+      const float plusWidth = ImGui::CalcTextSize("+").x;
       float bindingLineWidth = 0.f;
 
-      if (!bind.empty())
+      if (this->BindingsVisible && !bind.empty())
       {
         bindingLineWidth = std::accumulate(keys.begin(), keys.end(), 0.0f,
           [](float sum, const std::string& key) { return sum + ImGui::CalcTextSize(key.c_str()).x; });
@@ -937,13 +939,12 @@ void vtkF3DImguiActor::RenderNotifications()
         {
           bindingLineWidth += ImGui::CalcTextSize("Bind Key:").x;
         }
-        bindingLineWidth += itemSpacingX;
+        bindingLineWidth += itemSpacingX + margin * this->FontScale;
       }
 
       float windowWidth = std::max(descLineWidth, bindingLineWidth) + windowPadding.x * 2.f;
       float windowHeight = descLineSize.y + windowPadding.y * 2.f;
-      windowHeight += bind.empty()
-        ? 0.f : ImGui::GetTextLineHeightWithSpacing();
+      windowHeight += !this->BindingsVisible || bind.empty() ? 0.f : ImGui::GetTextLineHeightWithSpacing();
 
       ImVec4 descTextColor = F3DStyle::imgui::GetTextColor();       // White
       ImVec4 valueTextColor = F3DStyle::imgui::GetHighlightColor(); // Blue
@@ -993,8 +994,6 @@ void vtkF3DImguiActor::RenderNotifications()
 
       float posX = (windowWidth - descLineWidth) * 0.5f; // Text centering
       ImGui::SetCursorPosX(posX);
-      float posY = ImGui::GetCursorPosY() - windowPadding.y * .25f;
-      ImGui::SetCursorPosY(posY);
 
       ImGui::TextColored(descTextColor, desc.c_str());
       if (!value.empty())
@@ -1003,12 +1002,10 @@ void vtkF3DImguiActor::RenderNotifications()
         ImGui::TextColored(valueTextColor, value.c_str());
       }
 
-      if (!bind.empty())
+      if (this->BindingsVisible && !bind.empty())
       {
         posX = (windowWidth - bindingLineWidth) * 0.5f;
         ImGui::SetCursorPosX(posX);
-        float posY = ImGui::GetCursorPosY() + windowPadding.y * .25f;
-        ImGui::SetCursorPosY(posY);
 
         if (keys.size() > 1)
         {
@@ -1021,8 +1018,8 @@ void vtkF3DImguiActor::RenderNotifications()
         ImGui::SameLine();
 
         ImVec2 topBindingCorner, bottomBindingCorner;
-        float recMarginX = margin * this->FontScale * .5f;
-        float recMarginY = margin * this->FontScale * .1f;
+        float recMarginX = margin * this->FontScale;
+        float recMarginY = margin * this->FontScale * .5f;
         float recRadius = 2.f * this->FontScale;
         for (const std::string& key : keys)
         {
@@ -1047,9 +1044,7 @@ void vtkF3DImguiActor::RenderNotifications()
         }
       }
       ImGui::End();
-
-      ImGui::PopFont();
-      ImGui::PushFont(io.FontDefault);
+      ImGui::PopStyleVar();
       ImGui::PopFont();
 
       ++it;

@@ -154,6 +154,18 @@ public:
   void SetFpsCounterVisibility(bool show);
 
   /**
+   * Set the notification visibility
+   * False by default
+   */
+  void SetNotificationVisibility(bool show);
+
+  /**
+   * Set the bindings visibility in notifications
+   * False by default
+   */
+  void SetBindingsVisibility(bool show);
+
+  /**
    * Updates the fps value
    * 0 by default
    */
@@ -188,7 +200,7 @@ public:
   }
 
   /**
-   * Set the total time in seconds
+   * Set the total time (time since app start) in seconds
    */
   void SetTotalTime(double time);
 
@@ -315,6 +327,8 @@ protected:
 
   double BackdropOpacity = 0.9;
 
+  bool NotificationVisible = false;
+  bool BindingsVisible = false;
   std::deque<Notification> Notifications;
 
 private:

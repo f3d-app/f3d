@@ -102,6 +102,8 @@ public:
   void ShowDropZoneLogo(bool show);
   void ShowHDRISkybox(bool show);
   void ShowArmature(bool show);
+  void ShowNotification(bool show);
+  void ShowBindings(bool show);
   ///@}
 
   using vtkOpenGLRenderer::SetBackground;
@@ -492,7 +494,7 @@ public:
   void SetUIDeltaTime(double time);
 
   /**
-   * Set the UI delta time (time between frame being rendered) in seconds
+   * Set the UI total time (time since app start) in seconds
    */
   void SetUITotalTime(double time);
 
