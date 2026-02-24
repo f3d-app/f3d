@@ -148,10 +148,8 @@ void vtkF3DUIActor::SetFontScale(const double fontScale)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DUIActor::SetFontColor(const std::vector<double>& color)
+void vtkF3DUIActor::SetFontColor(const std::array<double, 3>& color)
 {
-  assert(color.size() == 3);
-
   if (this->FontColor != color)
   {
     this->FontColor = color;

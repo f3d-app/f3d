@@ -1,6 +1,6 @@
 on:
   pull_request_target:
-    types: [assigned, opened, synchronize, reopened, labeled]
+    types: [opened, synchronize, reopened, labeled]
     branches:
       - master
       - release
