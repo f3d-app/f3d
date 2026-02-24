@@ -418,7 +418,6 @@ endif()
 
 ## Final shader
 
-# Add labels manually because adding thanks to f3d_test methods escape ";}" at the end of the final shader.
 f3d_test(NAME TestFinalShaderNegative DATA cow.vtp ARGS --final-shader "vec4 pixel(vec2 uv){return vec4(vec3(1.0) - texture(source, uv).rgb, 1.0)\\\\\\\;}")
 f3d_test(NAME TestFinalShaderNegativeFileName DATA cow.vtp ARGS --filename --final-shader "vec4 pixel(vec2 uv){return vec4(vec3(1.0) - texture(source, uv).rgb, 1.0)\\\\\\\\;}" UI)
 f3d_test(NAME TestFinalShaderUndefined DATA cow.vtp ARGS --final-shader "undefined" REGEXP "Final shader must define a function" NO_BASELINE)
