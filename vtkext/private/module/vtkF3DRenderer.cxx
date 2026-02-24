@@ -3509,13 +3509,19 @@ void vtkF3DRenderer::SetUIDeltaTime(double time)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUITotalTime(double time)
+{
+  this->UIActor->SetTotalTime(time);
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetConsoleBadgeEnabled(bool enabled)
 {
   this->UIActor->SetConsoleBadgeEnabled(enabled);
 }
 
 void vtkF3DRenderer::AddNotification(
-  std::string& desc, std::string& value, std::string& bind, float duration)
+  std::string& desc, std::string& value, std::string& bind, double duration)
 {
   this->UIActor->AddNotification(desc, value, bind, duration);
 }

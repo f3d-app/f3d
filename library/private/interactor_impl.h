@@ -86,7 +86,7 @@ public:
   bool recordInteraction(const std::filesystem::path& file) override;
 
   void addNotification(
-    std::string desc, std::string value = "", std::string bind = "", float duration = 3.f) override;
+    std::string desc, std::string value = "", std::string bind = "", double duration = 3.f) override;
 
   interactor& start(double deltaTime, std::function<void()> userCallBack) override;
   interactor& stop() override;

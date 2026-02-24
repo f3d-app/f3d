@@ -872,25 +872,6 @@ void vtkF3DImguiActor::StartFrame(vtkOpenGLRenderWindow* renWin)
   this->Pimpl->Initialize(renWin);
 
   ImGui::NewFrame();
-
-  static auto start = std::chrono::steady_clock::now();
-  auto now = std::chrono::steady_clock::now();
-  std::chrono::duration<float> elapsed = now - start;
-  static unsigned int frameCount = 0;
-  ++frameCount;
-
-  static float imguiAccum = 0.f;
-  imguiAccum += io.DeltaTime;
-
-  if (elapsed.count() >= 1.0f)
-  {
-    std::cout << "ImGui DeltaTime: " << io.DeltaTime << std::endl;
-    std::cout << "ImGui accumulated: " << imguiAccum << std::endl;
-    std::cout << "ImGui FPS: " << frameCount << std::endl;
-    imguiAccum = 0.f;
-    start = now;
-    frameCount = 0;
-  }
 }
 
 //----------------------------------------------------------------------------
@@ -917,9 +898,9 @@ void vtkF3DImguiActor::RenderNotifications()
   for (auto it = this->Notifications.begin(); it != this->Notifications.end();)
   {
     const auto& [desc, value, bind, duration, start_time ] = *it;
-    std::chrono::duration<float> elapsed = Clock::now() - start_time;
+    const double elapsed = this->TotalTime - start_time;
 
-    if (elapsed.count() > duration)
+    if (elapsed > duration)
     {
       it = Notifications.erase(it);
     }
@@ -990,9 +971,9 @@ void vtkF3DImguiActor::RenderNotifications()
 
       float alpha = 1.f, fading = .5f;
 
-      if ((duration - elapsed.count()) < fading)
+      if ((duration - elapsed) < fading)
       {
-        alpha = (duration - elapsed.count()) / fading;
+        alpha = (duration - elapsed) / fading;
       }
       descTextColor.w = alpha;
       valueTextColor.w = alpha;

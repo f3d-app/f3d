@@ -413,7 +413,7 @@ public:
    * @param duration how long the noticaiton will be shown in second.
    */
   virtual void addNotification(
-    std::string desc, std::string value = "", std::string bind = "", float duration = 3.f) = 0;
+    std::string desc, std::string value = "", std::string bind = "", double duration = 3.f) = 0;
 
   /**
    * Start the interactor event loop.

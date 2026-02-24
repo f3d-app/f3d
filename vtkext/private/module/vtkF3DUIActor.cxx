@@ -3,7 +3,6 @@
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkViewport.h>
-#include <chrono>
 
 vtkObjectFactoryNewMacro(vtkF3DUIActor);
 
@@ -159,6 +158,12 @@ void vtkF3DUIActor::SetBackdropOpacity(const double backdropOpacity)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetTotalTime(double time)
+{
+  this->TotalTime = time;
+}
+
+//----------------------------------------------------------------------------
 int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
 {
   vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(vp->GetVTKWindow());
@@ -229,7 +234,7 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
 }
 
 void vtkF3DUIActor::AddNotification(
-  std::string& desc, std::string& value, std::string& bind, const float duration)
+  std::string& desc, std::string& value, std::string& bind, double duration)
 {
   for (auto it = this->Notifications.begin(); it != this->Notifications.end(); ++it)
   {
@@ -239,5 +244,5 @@ void vtkF3DUIActor::AddNotification(
       break;
     }
   }
-  this->Notifications.emplace_front(Notification{ desc, value, bind, duration, Clock::now() });
+  this->Notifications.emplace_front(Notification{ desc, value, bind, duration, this->TotalTime });
 }

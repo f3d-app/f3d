@@ -38,15 +38,14 @@ public:
 
   using CheatSheetTuple = std::tuple<std::string, std::string, std::string, CheatSheetBindingType>;
   using CheatSheetGroup = std::pair<std::string, std::vector<CheatSheetTuple>>;
-  using Clock = std::chrono::steady_clock;
 
   struct Notification
   {
     std::string desc;
     std::string value;
     std::string bind;
-    float duration;
-    Clock::time_point start_time;
+    double duration;
+    double start_time;
   };
 
   /**
@@ -189,10 +188,15 @@ public:
   }
 
   /**
+   * Set the total time in seconds
+   */
+  void SetTotalTime(double time);
+
+  /**
    * Add notification info to deque
    */
   void AddNotification(
-    std::string& desc, std::string& value, std::string& bind, const float duration);
+    std::string& desc, std::string& value, std::string& bind, double duration);
 
 protected:
   vtkF3DUIActor();
@@ -303,13 +307,15 @@ protected:
   double TotalFrameTimes = 0.0;
   int FpsValue = 0;
 
+  double TotalTime = 0.0;
+
   std::string FontFile = "";
   double FontScale = 1.0;
+  std::map<std::string, ImFont*> Fonts;
 
   double BackdropOpacity = 0.9;
 
   std::deque<Notification> Notifications;
-  std::map<std::string, ImFont*> Fonts;
 
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;
