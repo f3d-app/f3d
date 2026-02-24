@@ -41,18 +41,19 @@ ctest -L bindings # run all binding tests
 
 Available labels:
 
-- application (all f3d application tests)
-- libf3d (all libf3d tests)
-- bindings (all binding tests)
-- c, java, python, js
-- module (all vtkext module tests)
-- occt, abc, usd, webifc, draco
-- obj, spz, mdl, etc..
+- `application` (all f3d application tests)
+- `libf3d` (all libf3d tests)
+- `bindings` (all binding tests)
+- `c`, `java`, `python`, `js` (label by specific binding)
+- `piped` (all piped tests)
+- `module` (all vtkext module tests)
+- `occt`, `abc`, `usd`, `webifc`, `draco`, ... (tests by specific plugin)
+- `obj`, `spz`, `mdl`, ... (tests by specific file extension)
 
 Labels can be combined to further refine test selection.
 
 ```bash
-ctest -L assimp -L fbx # run all tests which use assimp plugin to load fbx data
+ctest -L assimp -L piped # run all piped tests which use assimp plugin
 ```
 
 ## Testing architecture
