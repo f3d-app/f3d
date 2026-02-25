@@ -526,6 +526,12 @@ std::pair<double, double> scene_impl::animationTimeRange()
 }
 
 //----------------------------------------------------------------------------
+std::vector<double> scene_impl::getAnimationKeyFrames()
+{
+  return this->Internals->AnimationManager.GetKeyFrames();
+}
+
+//----------------------------------------------------------------------------
 unsigned int scene_impl::availableAnimations() const
 {
   return this->Internals->AnimationManager.GetNumberOfAvailableAnimations();

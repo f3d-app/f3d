@@ -257,6 +257,20 @@ void f3d_scene_load_animation_time(f3d_scene_t* scene, double time_value)
 }
 
 //----------------------------------------------------------------------------
+double* f3d_scene_get_animation_keyframes(f3d_scene_t* scene, unsigned int* count)
+{
+  f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
+  std::vector<double> keyframes = cpp_scene->getAnimationKeyFrames();
+  *count = keyframes.size();
+  double* times = new double[keyframes.size()];
+  for (size_t i = 0; i < keyframes.size(); ++i)
+  {
+    times[i] = keyframes[i];
+  }
+  return times;
+}
+
+//----------------------------------------------------------------------------
 void f3d_scene_animation_time_range(f3d_scene_t* scene, double* min_time, double* max_time)
 {
   if (!scene)
