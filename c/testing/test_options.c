@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-int test_options_c_api()
+int test_options()
 {
   f3d_options_t* standalone_options = f3d_options_create();
   f3d_options_delete(standalone_options);

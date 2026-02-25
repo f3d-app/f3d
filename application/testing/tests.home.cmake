@@ -29,7 +29,7 @@ if(NOT WIN32)
   f3d_test(NAME TestHOMEHDRI DATA suzanne.stl ARGS --hdri-file=~/testing/data/palermo_park_1k.hdr --hdri-ambient --hdri-skybox ENV "HOME=${F3D_SOURCE_DIR}" LONG_TIMEOUT)
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-    f3d_test(NAME TestHOMEInteractionDropHDRICollapse INTERACTION_CONFIGURE ENV "HOME=${F3D_SOURCE_DIR}" LONG_TIMEOUT UI)#X;DropEvent dragon.vtu;DropEvent palermo.hdr;
+    f3d_test(NAME TestHOMEInteractionDropHDRICollapse INTERACTION_CONFIGURE ENV "HOME=${F3D_SOURCE_DIR}" LONG_TIMEOUT UI) #X;DropEvent dragon.vtu;DropEvent palermo.hdr;
   endif()
 
   if(NOT APPLE)

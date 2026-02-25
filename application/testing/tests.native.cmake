@@ -84,7 +84,7 @@ endif()
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250923)
   f3d_test(NAME TestPipedGLTFImporter DATA f3d.glb PIPED GLB)
   f3d_test(NAME TestPipedGLTFSkin DATA SimpleSkin.gltf PIPED GLTF)
-endif()  
+endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250925)
   f3d_test(NAME TestPiped3DSImporter DATA iflamigm.3ds ARGS --up=+Z PIPED 3DS)
@@ -99,7 +99,7 @@ endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251109)
   f3d_test(NAME TestPipedPTS DATA samplePTS.pts PIPED PTS)
-endif()  
+endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251208)
   f3d_test(NAME TestPipedCityGML DATA Part-4-Buildings-V4-one.gml PIPED CityGML)

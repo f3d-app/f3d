@@ -11,7 +11,7 @@ f3d_test(NAME TestInteractionCycleCellInvalidIndex DATA waveletArrays.vti INTERA
 f3d_test(NAME TestInteractionCycleBlending DATA suzanne.ply ARGS --opacity=0.8 INTERACTION LONG_TIMEOUT) #PPPPP # Cycle to ddp
 f3d_test(NAME TestInteractionVolumeCycle DATA waveletArrays.vti ARGS INTERACTION) #VSS
 f3d_test(NAME TestInteractionVolumeAfterColoring DATA waveletArrays.vti ARGS INTERACTION) #SSSV
-f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 INTERACTION THRESHOLD 0.05)#VI #Small rendering differences due to volume rendering
+f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 INTERACTION THRESHOLD 0.05) #VI #Small rendering differences due to volume rendering
 f3d_test(NAME TestInteractionCorrectCameraForVolumeSwitch ARGS --no-config -v DATA dragon.vtu INTERACTION UI) #v
 f3d_test(NAME TestInteractionMultiFileVolume DATA multi ARGS --multi-file-mode=all INTERACTION) #SSVB
 f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-sprites-size=20 INTERACTION) #O
@@ -23,9 +23,9 @@ f3d_test(NAME TestInteractionTensorsCycleComp DATA tensors.vti ARGS --scalar-col
 f3d_test(NAME TestInteractionCycleScalarsCompCheck DATA dragon.vtu ARGS -b --scalar-coloring --coloring-component=2 INTERACTION) #S
 f3d_test(NAME TestInteractionTAA DATA suzanne.ply ARGS --anti-aliasing=taa INTERACTION) #Render;Render...
 f3d_test(NAME TestInteractionTAAMiddleClick DATA suzanne.ply ARGS --anti-aliasing=taa INTERACTION) #Render;Render...;MiddleClick;Render;Render...
-f3d_test(NAME TestInteractionCycleVerbose DATA dragon.vtu ARGS --verbose -s NO_BASELINE INTERACTION REGEXP "Not coloring")#SSSSYC
-f3d_test(NAME TestInteractionCycleVerboseLevelsUsingBinding DATA dragon.vtu ARGS --verbose=info NO_BASELINE INTERACTION REGEXP "Verbose level changed to: Debug")#Shift+V;Shift+V;Shift+V;Shift+V;Shift+V
-f3d_test(NAME TestInteractionVerboseLevelPreservedOnReload DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Not coloring")#Shift+V;Shift+V;Shift+V;Shift+V;Up
+f3d_test(NAME TestInteractionCycleVerbose DATA dragon.vtu ARGS --verbose -s NO_BASELINE INTERACTION REGEXP "Not coloring") #SSSSYC
+f3d_test(NAME TestInteractionCycleVerboseLevelsUsingBinding DATA dragon.vtu ARGS --verbose=info NO_BASELINE INTERACTION REGEXP "Verbose level changed to: Debug") #Shift+V;Shift+V;Shift+V;Shift+V;Shift+V
+f3d_test(NAME TestInteractionVerboseLevelPreservedOnReload DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Not coloring") #Shift+V;Shift+V;Shift+V;Shift+V;Up
 f3d_test(NAME TestInteractionLightIntensity DATA dragon.vtu INTERACTION LONG_TIMEOUT)
 f3d_test(NAME TestInteractionMultiFileColoring DATA mb/recursive ARGS --multi-file-mode=all INTERACTION) #SSSB
 f3d_test(NAME TestInteractionOpacity DATA dragon.vtu INTERACTION) # Shift+P * 21; Ctrl+P * 5
@@ -49,7 +49,7 @@ endif()
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250504)
   f3d_test(NAME TestInteractionStochasticTAA DATA alpha.glb ARGS --anti-aliasing=taa --blending=stochastic INTERACTION) #Render;Render...
   f3d_test(NAME TestInteractionGaussianStochasticTAA DATA small.splat ARGS -sy --point-sprites=gaussian --point-sprites-absolute-size --point-sprites-size=1 --blending=stochastic --anti-aliasing=taa --camera-position=-1.65,-0.06,1.96 --camera-focal-point=-1.65,1.24,1.96 --camera-view-up=0.9954,0,0.0955 INTERACTION LONG_TIMEOUT) #Render;Render...
-  f3d_test(NAME TestInteractionAndCLIBlending ARGS --blending DATA suzanne.stl alpha.glb INTERACTION)#PP;Right
+  f3d_test(NAME TestInteractionAndCLIBlending ARGS --blending DATA suzanne.stl alpha.glb INTERACTION) #PP;Right
 endif()
 
 # Using gaussian splatting require > 9.3 to not warn
@@ -58,7 +58,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
 endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
-  f3d_test(NAME TestInteractionAxesGridToggle INTERACTION DATA suzanne.ply THRESHOLD 0.08)#Shift+x
+  f3d_test(NAME TestInteractionAxesGridToggle INTERACTION DATA suzanne.ply THRESHOLD 0.08) #Shift+x
 endif()
 
 if (F3D_MODULE_TINYFILEDIALOGS)
@@ -87,8 +87,8 @@ f3d_test(NAME TestInteraction2DZoom DATA cow.vtp ARGS --interaction-style=2d INT
 f3d_test(NAME TestInteraction2DCycle DATA cow.vtp INTERACTION) #K;K;LeftMouse;MouseMovements
 
 ## Camera
-f3d_test(NAME TestInteractionResetCamera DATA dragon.vtu INTERACTION LONG_TIMEOUT)#MouseMovements;Return;
-f3d_test(NAME TestInteractionResetCameraWithCameraIndex DATA CameraAnimated.glb ARGS --camera-index=0 INTERACTION)#MouseMovements;Return;
+f3d_test(NAME TestInteractionResetCamera DATA dragon.vtu INTERACTION LONG_TIMEOUT) #MouseMovements;Return;
+f3d_test(NAME TestInteractionResetCameraWithCameraIndex DATA CameraAnimated.glb ARGS --camera-index=0 INTERACTION) #MouseMovements;Return;
 f3d_test(NAME TestInteractionCameraUpdate DATA dragon.vtu INTERACTION) #MouseWheel;MouseWheel;MouseWheel;S
 f3d_test(NAME TestInteractionFocalPointPickingDefault DATA dragon.vtu INTERACTION LONG_TIMEOUT)
 f3d_test(NAME TestInteractionFocalPointPickingShift DATA dragon.vtu INTERACTION LONG_TIMEOUT)
@@ -123,7 +123,7 @@ f3d_test(NAME TestProgressScene DATA WaterBottle.glb ARGS --loading-progress NO_
 f3d_test(NAME TestInteractionProgressReload DATA cow.vtp ARGS --loading-progress NO_BASELINE INTERACTION) #Up;Up;Up;Up
 
 ## Animation
-f3d_test(NAME TestInteractionAnimationNotStopped DATA InterpolationTest.glb NO_BASELINE INTERACTION)#Space;
+f3d_test(NAME TestInteractionAnimationNotStopped DATA InterpolationTest.glb NO_BASELINE INTERACTION) #Space;
 f3d_test(NAME TestInteractionAnimationCycleAnimation DATA InterpolationTest.glb INTERACTION) #WWWWWWWWWWWW;Space;Space;
 f3d_test(NAME TestInteractionAnimationIndexDeprecatedCycleAnimation DATA InterpolationTest.glb ARGS --animation-index=2 INTERACTION) #WWWWWWWWWWWW;Space;Space;
 f3d_test(NAME TestInteractionCycleAnimationNoAnimation DATA cow.vtp INTERACTION NO_BASELINE) #W
@@ -134,13 +134,13 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250507)
 endif()
 
 # Test interactive animation and speed factor
-f3d_test(NAME TestInteractionAnimation DATA f3d.glb ARGS --animation-progress INTERACTION)#Space;Wait;Space;
-f3d_test(NAME TestInteractionAnimationFast DATA f3d.glb ARGS --animation-progress --animation-speed-factor=1.5 INTERACTION)#Space;Wait;Space;
-f3d_test(NAME TestInteractionAnimationSlow DATA f3d.glb ARGS --animation-progress --animation-speed-factor=0.5 INTERACTION)#Space;Wait;Space;
-f3d_test(NAME TestInteractionAnimationFrameRate DATA f3d.glb ARGS --animation-progress --frame-rate=1 INTERACTION)#Space;Wait;Space;
-f3d_test(NAME TestInteractionAnimationCameraMovement DATA CameraAnimated.glb ARGS --camera-index=0 --animation-progress INTERACTION)#Space;MouseMovement;Space;
-f3d_test(NAME TestInteractionAnimationInvert DATA f3d.glb ARGS --animation-speed-factor=-1 --animation-progress INTERACTION)#Space;Wait;Space;
-f3d_test(NAME TestInteractionAnimationBackward DATA f3d.glb ARGS --animation-progress INTERACTION)#Ctrl+Shift+Space;Wait;Space;
+f3d_test(NAME TestInteractionAnimation DATA f3d.glb ARGS --animation-progress INTERACTION) #Space;Wait;Space;
+f3d_test(NAME TestInteractionAnimationFast DATA f3d.glb ARGS --animation-progress --animation-speed-factor=1.5 INTERACTION) #Space;Wait;Space;
+f3d_test(NAME TestInteractionAnimationSlow DATA f3d.glb ARGS --animation-progress --animation-speed-factor=0.5 INTERACTION) #Space;Wait;Space;
+f3d_test(NAME TestInteractionAnimationFrameRate DATA f3d.glb ARGS --animation-progress --frame-rate=1 INTERACTION) #Space;Wait;Space;
+f3d_test(NAME TestInteractionAnimationCameraMovement DATA CameraAnimated.glb ARGS --camera-index=0 --animation-progress INTERACTION) #Space;MouseMovement;Space;
+f3d_test(NAME TestInteractionAnimationInvert DATA f3d.glb ARGS --animation-speed-factor=-1 --animation-progress INTERACTION) #Space;Wait;Space;
+f3d_test(NAME TestInteractionAnimationBackward DATA f3d.glb ARGS --animation-progress INTERACTION) #Ctrl+Shift+Space;Wait;Space;
 
 ## Cheatsheet
 f3d_test(NAME TestInteractionCheatsheetWhiteBG DATA cow.vtp ARGS --background-color=1,1,1 INTERACTION UI) #H
@@ -203,8 +203,8 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
   f3d_test(NAME TestInteractionConsoleAutoCompleteTokenizeError DATA BoxAnimated.gltf INTERACTION UI NO_BASELINE REGEXP "unable to tokenize") #Escape;";Tab;
 
   f3d_test(NAME TestInteractionConsoleHistory DATA BoxAnimated.gltf INTERACTION UI) #Escape;ro;Tab;45;Enter;set_c;Tab;top;Enter;Up;Up;Enter;Up;Up;Up;Up;Down;Down;Down;Down
-  f3d_test(NAME TestInteractionConsoleHistoryEmpty DATA BoxAnimated.gltf INTERACTION UI)#Escape;Up;Down
-  f3d_test(NAME TestInteractionConsoleHistoryHide DATA BoxAnimated.gltf INTERACTION UI)#Escape;a;Enter;b;Enter;Up;Escape;Escape;Escape;Up
+  f3d_test(NAME TestInteractionConsoleHistoryEmpty DATA BoxAnimated.gltf INTERACTION UI) #Escape;Up;Down
+  f3d_test(NAME TestInteractionConsoleHistoryHide DATA BoxAnimated.gltf INTERACTION UI) #Escape;a;Enter;b;Enter;Up;Escape;Escape;Escape;Up
 
   file(COPY "${F3D_SOURCE_DIR}/testing/data/cow.vtp" DESTINATION "${CMAKE_BINARY_DIR}/Testing/data/") # Capital T, to avoid confusion on Windows and in-sources build
   # First file (`.d`) doesn't exist and is there to test multi args
@@ -241,7 +241,7 @@ f3d_test(NAME TestInteractionHDRIReload DATA suzanne.ply HDRI palermo_park_1k.hd
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   f3d_test(NAME TestInteractionHDRIChange DATA multi HDRI palermo_park_1k.hdr CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI) #Left
 endif()
-  
+
 f3d_test(NAME TestInteractionHDRICache DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION DEPENDS TestHDRI) #FFFFJJJJ
 f3d_test(NAME TestInteractionHDRIRemoveSkybox DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION)
 f3d_test(NAME TestInteractionHDRIRemoveAmbient DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION)
@@ -252,9 +252,9 @@ f3d_test(NAME TestInteractionHDRIFullFromNone DATA suzanne.ply ARGS --hdri-file=
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   # Interaction HDRI tests
-  f3d_test(NAME TestInteractionDropHDRI INTERACTION_CONFIGURE LONG_TIMEOUT UI)#X;DropEvent dragon.vtu;DropEvent palermo.hdr;
-  f3d_test(NAME TestInteractionDropHDRIInvert INTERACTION_CONFIGURE LONG_TIMEOUT UI)#X;DropEvent palermo.hdr;DropEvent dragon.vtu;
-  f3d_test(NAME TestInteractionDropHDRIMulti INTERACTION_CONFIGURE LONG_TIMEOUT UI)#X;DropEvent dragon.vtu palermo.hdr;
+  f3d_test(NAME TestInteractionDropHDRI INTERACTION_CONFIGURE LONG_TIMEOUT UI) #X;DropEvent dragon.vtu;DropEvent palermo.hdr;
+  f3d_test(NAME TestInteractionDropHDRIInvert INTERACTION_CONFIGURE LONG_TIMEOUT UI) #X;DropEvent palermo.hdr;DropEvent dragon.vtu;
+  f3d_test(NAME TestInteractionDropHDRIMulti INTERACTION_CONFIGURE LONG_TIMEOUT UI) #X;DropEvent dragon.vtu palermo.hdr;
 endif()
 
 if(F3D_MODULE_RAYTRACING)
@@ -270,36 +270,36 @@ if(F3D_MODULE_RAYTRACING)
 endif()
 
 ## Drops
-f3d_test(NAME TestInteractionEmptyDrop INTERACTION REGEXP "Drop event without any provided files.")#DropEvent Empty;
+f3d_test(NAME TestInteractionEmptyDrop INTERACTION REGEXP "Drop event without any provided files.") #DropEvent Empty;
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-  f3d_test(NAME TestInteractionDropFiles ARGS -n INTERACTION_CONFIGURE UI)#X;DropEvent cow.vtp;DropEvent dragon.vtu suzanne.stl;
+  f3d_test(NAME TestInteractionDropFiles ARGS -n INTERACTION_CONFIGURE UI) #X;DropEvent cow.vtp;DropEvent dragon.vtu suzanne.stl;
   f3d_test(NAME TestInteractionDropSameFiles ARGS -x INTERACTION_CONFIGURE UI) #DropEvent cow.vtp;#DropEvent dragon.vtu;#DropEvent cow.vtp#DropEvent cow.vtp;
 endif()
 f3d_test(NAME TestInteractionMultiFileDrop ARGS --multi-file-mode=all -e INTERACTION_CONFIGURE) #DropEvent mb_1_0.vtp mb_2_0.vtp
 
 # A proper test for this is not possible because of the double quotes
-f3d_test(NAME TestInteractionDropFileWithQuotes ARGS -n INTERACTION REGEXP "\"'`Quotes\"'`.stl does not exist" NO_BASELINE)#X;DropEvent "'`Quotes"'`.stl";
+f3d_test(NAME TestInteractionDropFileWithQuotes ARGS -n INTERACTION REGEXP "\"'`Quotes\"'`.stl does not exist" NO_BASELINE) #X;DropEvent "'`Quotes"'`.stl";
 
 if(WIN32)
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
     # Windows specific drop test, using backslashes
-    f3d_test(NAME TestInteractionDropFileBackslashes ARGS -n INTERACTION_CONFIGURE)#X;DropEvent path\to\cow.vtp;
+    f3d_test(NAME TestInteractionDropFileBackslashes ARGS -n INTERACTION_CONFIGURE) #X;DropEvent path\to\cow.vtp;
   endif()
 endif()
 
 # Test modified drops, this test rendering is impacted by https://github.com/f3d-app/f3d/issues/1558
 # Empty drop is for coverage
-f3d_test(NAME TestInteractionDropHDRIModifiers INTERACTION_CONFIGURE LONG_TIMEOUT)#CTRL+DropEvent f3d.tif;SHIFT+DropEvent;SHIFT+DropEvent palermo.tif;SYYYY
+f3d_test(NAME TestInteractionDropHDRIModifiers INTERACTION_CONFIGURE LONG_TIMEOUT) #CTRL+DropEvent f3d.tif;SHIFT+DropEvent;SHIFT+DropEvent palermo.tif;SYYYY
 
 # Test interactive animation and dropping HDRI
-f3d_test(NAME TestInteractionAnimationDropHDRI DATA InterpolationTest.glb ARGS --animation-indices=-1 --animation-progress INTERACTION_CONFIGURE LONG_TIMEOUT)#Space;DropEvent palermo.hdr;Space;
+f3d_test(NAME TestInteractionAnimationDropHDRI DATA InterpolationTest.glb ARGS --animation-indices=-1 --animation-progress INTERACTION_CONFIGURE LONG_TIMEOUT) #Space;DropEvent palermo.hdr;Space;
 
 if(F3D_MODULE_EXR)
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-    f3d_test(NAME TestInteractionDropHDRIExr INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent kloofendal.exr;DropEvent dragon.vtu;
+    f3d_test(NAME TestInteractionDropHDRIExr INTERACTION_CONFIGURE LONG_TIMEOUT) #X;DropEvent kloofendal.exr;DropEvent dragon.vtu;
   endif()
 endif()

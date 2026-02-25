@@ -33,18 +33,21 @@ f3d_test(<NAME> [ARGS...])
   - `DPI_SCALE` Set the DPI scale through the environment variable `CTEST_F3D_FORCE_DPI_SCALE`, default is 1.0
   - `UI` Mark the test to require the presence of UI component and disable it otherwise
   - `PIPED` Mark the test to pipe the data (`cat data | f3d`) instead of providing the filename as data,
-    doesn't work for external plugins, pass the reader as an arg, it will be used to force before VTK v9.6.20260128
+    doesn't work for external plugins, pass the reader as an arg, it will be used to force before VTK v9.6.20260128.
+    Add `piped` test labels.
   - `SCRIPT` Mark the test to use a `--script` of the same name as the test
   - `NAME` Provide the name of the test, mandatory and must be unique
   - `CONFIG` Provide the `--config` to use, instead of `--no-config`
   - `RESOLUTION` Provide the `--resolution` to use, instead of `300,300`
+  - `PLUGIN` Provide the `--load-plugins` to use, also set test labels accordingly
   - `THRESHOLD` Provide the `--reference-threshold` to use instead of the default
   - `REGEXP` Provide the regexp to check for in the stdout of the test, fails if not present
   - `REGEXP_FAIL` Provide the regexp to check for in the stdout of the test, fails if present
   - `HDRI` Provide the `--hdri-file` to use for this test
   - `RENDERING_BACKEND` Provide the `--rendering-backend` to use for this test instead of `auto`
   - `WORKING_DIR` Provide a specific working directory to use for this test instead of current dir
-  - `DATA` Data to open, support multiple input
+  - `LABELS` Provide a specific labels to identify and group tests
+  - `DATA` Data to open, support multiple input, also set test labels accordingly
   - `DEPENDS` Tests the this test depends on if any
   - `ENV` Environment variables to set for this test
   - `ARGS` Supplement arguments to add to the f3d command line
@@ -52,7 +55,7 @@ f3d_test(<NAME> [ARGS...])
 
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED" "DATA;DEPENDS;ENV;ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED;LABELS;PLUGIN" "DATA;DEPENDS;ENV;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -68,6 +71,10 @@ function(f3d_test)
       else()
         list(APPEND _f3d_test_data "${F3D_SOURCE_DIR}/testing/data/${_single_data}")
       endif()
+      get_filename_component(FILE_EXT "${_single_data}" EXT)
+      string(TOLOWER "${FILE_EXT}" FILE_EXT)
+      string(REPLACE "." "" FILE_EXT "${FILE_EXT}")
+      list(APPEND F3D_TEST_LABELS "${FILE_EXT}")
     endforeach()
   endif()
 
@@ -121,6 +128,11 @@ function(f3d_test)
     endif()
   endif()
 
+  if(F3D_TEST_PLUGIN)
+    list(APPEND F3D_TEST_ARGS "--load-plugins=${F3D_TEST_PLUGIN}")
+    set(F3D_TEST_LABELS "${F3D_TEST_LABELS};plugin;${F3D_TEST_PLUGIN}")
+  endif()
+
   if(DEFINED f3d_INCLUDE_DIR)
     if (F3D_TEST_PIPED)
       message(FATAL_ERROR "PIPED test is not supported to external plugins")
@@ -134,6 +146,7 @@ function(f3d_test)
   endif()
 
   if (F3D_TEST_PIPED)
+    list(APPEND F3D_TEST_LABELS "piped")
     if(VTK_VERSION VERSION_LESS 9.6.20260128)
       list(APPEND F3D_TEST_ARGS "--force-reader=${F3D_TEST_PIPED}")
     endif()
@@ -148,6 +161,13 @@ function(f3d_test)
         COMMAND_EXPAND_LISTS)
   else()
     add_test(NAME "f3d::${F3D_TEST_NAME}" COMMAND ${_f3d_target} ${_f3d_test_data} ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
+  endif()
+
+  if(F3D_TEST_LABELS)
+    list(PREPEND F3D_TEST_LABELS "application")
+    set_tests_properties("f3d::${F3D_TEST_NAME}" PROPERTIES
+      LABELS "${F3D_TEST_LABELS}"
+    )
   endif()
 
   set(_timeout "30")
