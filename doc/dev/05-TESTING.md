@@ -47,8 +47,8 @@ Available labels:
 - `c`, `java`, `python`, `js` (label by specific binding)
 - `piped` (all piped tests)
 - `module` (all vtkext module tests)
-- `occt`, `abc`, `usd`, `webifc`, `draco`, ... (tests by specific plugin)
-- `obj`, `spz`, `mdl`, ... (tests by specific file extension)
+- `occt`, `abc`, `usd`, `webifc`, `draco`, ... (label by specific plugin)
+- `obj`, `spz`, `mdl`, ... (label by specific file extension)
 
 Labels can be combined to further refine test selection.
 
