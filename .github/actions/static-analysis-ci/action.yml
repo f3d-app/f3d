@@ -92,22 +92,16 @@ runs:
         assimp_version: ${{inputs.assimp_version}}
         blosc_version: ${{inputs.blosc_version}}
         curl_version: ${{inputs.curl_version}}
-        curl_version: ${{inputs.curl_version}}
         draco_version: ${{inputs.draco_version}}
         gdal_version: ${{inputs.gdal_version}}
-        gdal_version: ${{inputs.gdal_version}}
-        geotiff_version: ${{inputs.geotiff_version}}
         geotiff_version: ${{inputs.geotiff_version}}
         imath_version: ${{inputs.imath_version}}
         occt_version: ${{inputs.occt_version}}
         openexr_version: ${{inputs.openexr_version}}
         openvdb_version: ${{inputs.openvdb_version}}
         pdal_version: ${{inputs.pdal_version}}
-        pdal_version: ${{inputs.pdal_version}}
-        proj_version: ${{inputs.proj_version}}
         proj_version: ${{inputs.proj_version}}
         tbb_version: ${{inputs.tbb_version}}
-        tiff_version: ${{inputs.tiff_version}}
         tiff_version: ${{inputs.tiff_version}}
         usd_version: ${{inputs.usd_version}}
         webifc_version: ${{inputs.webifc_version}}
