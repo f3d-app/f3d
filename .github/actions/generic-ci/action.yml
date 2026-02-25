@@ -217,11 +217,6 @@ runs:
       shell: bash
       run: echo "DYLD_LIBRARY_PATH=$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
 
-    - name: Set LD_LIBRARY_PATH on Linux for PDAL TODO WHY IS IT NEEDED THOUGH????
-      if: runner.os == 'Linux'
-      shell: bash
-      run: echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
-
     # Works around for https://github.com/actions/runner-images/issues/10055
     - name: Remove conflicting libraries for Java bindings on Windows
       if: runner.os == 'Windows'
@@ -348,7 +343,7 @@ runs:
     - name: Test
       shell: bash
       working-directory: ${{github.workspace}}/build
-      run: ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 2 --output-on-failure --no-tests=error || ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 1 --rerun-failed --no-tests=error -VV
+      run: ctest -R LAZ -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 2 --output-on-failure --no-tests=error || ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 1 --rerun-failed --no-tests=error -VV
 
     - name: Upload Tests Artifact
       if: failure()

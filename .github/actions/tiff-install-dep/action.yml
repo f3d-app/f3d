@@ -30,7 +30,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/tiff_install
-        key: tiff-${{inputs.version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-2
+        key: tiff-${{inputs.version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-3
 
     # Dependents: gdal pdal vtk geotiff
     - name: Checkout tiff
@@ -58,6 +58,7 @@ runs:
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../tiff_install
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -Dtiff-docs:BOOL=OFF
         -Djbig:BOOL=OFF
         -Djpeg:BOOL=OFF
