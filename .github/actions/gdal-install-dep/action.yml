@@ -55,7 +55,7 @@ runs:
 
     # https://github.com/OSGeo/gdal/issues/14015
     - name: Patch GDAL rpath issue
-      if: steps.cache-alembic.outputs.cache-hit != 'true'
+      if: steps.cache-gdal.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/gdal
       shell: bash
       run: patch -p1 < $GITHUB_ACTION_PATH/fix_install_rpath.patch
