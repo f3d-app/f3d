@@ -26,6 +26,8 @@
 #include <vtkPolyDataTangents.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
+#include <vtkResourceParser.h>
+#include <vtkResourceStream.h>
 #include <vtkSmartPointer.h>
 #include <vtkSphereSource.h>
 #include <vtkTexture.h>
@@ -57,6 +59,7 @@
 #pragma warning(push, 0)
 #endif
 #include <pxr/usd/ar/asset.h>
+#include <pxr/usd/ar/inMemoryAsset.h>
 #include <pxr/usd/ar/resolver.h>
 #include <pxr/usd/usd/modelAPI.h>
 #include <pxr/usd/usd/primRange.h>
@@ -84,6 +87,8 @@
 #pragma warning(pop, 0)
 #endif
 
+#include <iostream>
+
 class vtkF3DUSDImporter::vtkInternals
 {
 public:
@@ -101,12 +106,73 @@ public:
   vtkInternals(const vtkInternals&) = delete;
   vtkInternals& operator=(const vtkInternals&) = delete;
 
-  void ReadScene(const std::string& filePath)
+  void ReadScene(vtkResourceStream* stream, const char* filePath)
   {
     // in case of failure, you may want to set PXR_PLUGINPATH_NAME to the lib/usd path
     if (!this->Stage)
     {
-      this->Stage = pxr::UsdStage::Open(filePath);
+      if (stream)
+      {
+        /*
+        std::string content;
+        vtkNew<vtkResourceParser> parser;
+        parser->SetStream(stream);
+        parser->Seek(0, vtkResourceStream::SeekDirection::End);
+        std::size_t size = stream->Tell();
+        content.resize(size);
+        parser->Seek(0, vtkResourceStream::SeekDirection::Begin);
+        parser->Read(content.data(), size);
+        */
+
+
+        /*
+        auto streambuf = stream->ToStreambuf();
+        std::istream stream(streambuf.get());
+        std::string content(std::istreambuf_iterator<char>(stream), {});
+
+        pxr::SdfLayer::FileFormatArguments args;
+//        args["target"] = "toto";
+        auto layer = pxr::SdfLayer::CreateAnonymous(".usdc");
+        layer->ImportFromString(content);
+        this->Stage = pxr::UsdStage::Open(layer);
+        */
+
+
+        stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+        auto memStream = vtkMemoryResourceStream::SafeDownCast(stream);
+        vtkNew<vtkMemoryResourceStream> localMemStream;
+        if (!memStream)
+        {
+          // Copy to a mem stream if needed
+          stream->Seek(0, vtkResourceStream::SeekDirection::End);
+          std::size_t size = stream->Tell();
+          stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+          std::vector<std::byte> tempBuffer;
+          tempBuffer.resize(size);
+          stream->Read(tempBuffer.data(), size);
+          localMemStream->SetBuffer(std::move(tempBuffer));
+          memStream = localMemStream;
+        }
+
+        const char* cPtr = static_cast<const char*>(memStream->GetBuffer());
+        std::shared_ptr<const char> ptr(cPtr);
+
+        // Wrap raw bytes in an ArAsset
+        auto asset = pxr::ArInMemoryAsset::FromBuffer(ptr, memStream->GetSize());
+
+        // Open the layer anonymously from the asset
+        pxr::SdfLayerRefPtr layer = pxr::SdfLayer::OpenAsAnonymous("memory.usdc", asset);
+        if (!layer) {
+          // TODO error
+        }
+
+        // Open a stage from the layer
+        this->Stage = pxr::UsdStage::Open(layer);
+      }
+      else
+      {
+        this->Stage = pxr::UsdStage::Open(filePath);
+      }
 
       if (this->Stage)
       {
@@ -1250,7 +1316,7 @@ vtkF3DUSDImporter::~vtkF3DUSDImporter() = default;
 //----------------------------------------------------------------------------
 int vtkF3DUSDImporter::ImportBegin()
 {
-  this->Internals->ReadScene(this->GetFileName());
+  this->Internals->ReadScene(this->GetStream(), this->GetFileName());
 
   return 1;
 }
