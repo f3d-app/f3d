@@ -1,0 +1,6 @@
+application/F3DOptionsTools.cxx:      {"fps", "z", "Display rendering frame per second", "<bool>", "1"},
+application/F3DOptionsTools.h:  { "fps", "ui.fps" },
+application/F3DStarter.cxx:    options.ui.fps = false;
+application/testing/tests.screenshot.cmake:    # show filename, axes, fps before the "minimal screenshot" interaction; compare with --no-background only
+doc/user/03-OPTIONS.md:### `-z`, `--fps` (_bool_, default: `false`)
+
