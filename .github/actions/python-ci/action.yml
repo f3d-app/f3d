@@ -49,6 +49,9 @@ inputs:
   python_version:
     description: "Python version"
     required: true
+  sqlite_csb_version:
+    description: "Version of csb providing sqlite to build against"
+    required: false
   tiff_version:
     description: "Version of tiff to build"
     required: false
@@ -108,6 +111,7 @@ runs:
         pdal_version: ${{inputs.pdal_version}}
         proj_version: ${{inputs.proj_version}}
         pybind11_version: ${{inputs.pybind11_version}}
+        sqlite_csb_version: ${{inputs.sqlite_csb_version}}
         tbb_version: ${{inputs.tbb_version}}
         tiff_version: ${{inputs.tiff_version}}
         usd_version: ${{inputs.usd_version}}
@@ -125,6 +129,7 @@ runs:
         geotiff_version: ${{inputs.geotiff_version}}
         openvdb_version: ${{inputs.openvdb_version}}
         proj_version: ${{inputs.proj_version}}
+        sqlite_csb_version: ${{inputs.sqlite_csb_version}}
         tbb_version: ${{inputs.tbb_version}}
         tiff_version: ${{inputs.tiff_version}}
         vtk_version: ${{inputs.vtk_version}}

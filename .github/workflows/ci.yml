@@ -470,6 +470,7 @@ jobs:
           geotiff_version: 1.7.4
           pdal_version: 2.10.0
           proj_version: 9.7.1
+          sqlite_csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
           tiff_version: v4.7.1
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -538,6 +539,7 @@ jobs:
           gdal_version: v3.12.2
           geotiff_version: 1.7.4
           pdal_version: 2.10.0
+          sqlite_csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
           proj_version: 9.7.1
           tiff_version: v4.7.1
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
@@ -796,6 +798,7 @@ jobs:
           geotiff_version: 1.7.4
           pdal_version: 2.10.0
           proj_version: 9.7.1
+          sqlite_csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
           tiff_version: v4.7.1
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -858,6 +861,7 @@ jobs:
           geotiff_version: 1.7.4
           pdal_version: 2.10.0
           proj_version: 9.7.1
+          sqlite_csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
           tiff_version: v4.7.1
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -932,6 +936,7 @@ jobs:
           geotiff_version: 1.7.4
           pdal_version: 2.10.0
           proj_version: 9.7.1
+          sqlite_csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
           tiff_version: v4.7.1
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -1005,6 +1010,7 @@ jobs:
           geotiff_version: 1.7.4
           pdal_version: 2.10.0
           proj_version: 9.7.1
+          sqlite_csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
           tiff_version: v4.7.1
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -1058,6 +1064,7 @@ jobs:
           geotiff_version: 1.7.4
           pdal_version: 2.10.0
           proj_version: 9.7.1
+          sqlite_csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
           tiff_version: v4.7.1
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -1117,6 +1124,7 @@ jobs:
           geotiff_version: 1.7.4
           pdal_version: 2.10.0
           proj_version: 9.7.1
+          sqlite_csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
           tiff_version: v4.7.1
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -1171,6 +1179,7 @@ jobs:
           geotiff_version: 1.7.4
           pdal_version: 2.10.0
           proj_version: 9.7.1
+          sqlite_csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
           tiff_version: v4.7.1
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
