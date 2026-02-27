@@ -60,6 +60,10 @@ public:
     const interaction_bind_t& bind) const override;
   BindingType getBindingType(const interaction_bind_t& bind) const override;
 
+  interactor& InitBindNotificationMap() override;
+  interactor& addBindNotiCallback(std::string command, documentation_callback_t doc_callback) override;
+  interactor& removeBindNotiCallback(std::string command) override;
+
   interactor& triggerEventLoop(double deltaTime) override;
   interactor& triggerModUpdate(InputModifier mod) override;
   interactor& triggerMouseButton(InputAction action, MouseButton button) override;
@@ -80,6 +84,9 @@ public:
   bool playInteraction(const std::filesystem::path& file, double deltaTime,
     std::function<void()> userCallBack) override;
   bool recordInteraction(const std::filesystem::path& file) override;
+
+  void addNotification(
+    std::string desc, std::string value = "", std::string bind = "", float duration = 3.f) override;
 
   interactor& start(double deltaTime, std::function<void()> userCallBack) override;
   interactor& stop() override;

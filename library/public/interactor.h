@@ -251,6 +251,23 @@ public:
    * Getting type for a bind that does not exists will throw a does_not_exists_exception.
    */
   [[nodiscard]] virtual BindingType getBindingType(const interaction_bind_t& bind) const = 0;
+
+  /**
+   * Initialize binding notification map for interaction key press binding notification.
+   * Call after initialization of default binding and before adding custom binding,
+   * prevent the default binding ducumentation callback overwrite by custom binding.
+   */
+  virtual interactor& InitBindNotificationMap() = 0;
+
+  /**
+   * Add or modify binding documentation callback to binding notification map using command string as key.
+   */
+  virtual interactor& addBindNotiCallback(std::string command, documentation_callback_t doc_callback) = 0;
+
+  /**
+   * Remove element from binding notification map using command string.
+   */
+  virtual interactor& removeBindNotiCallback(std::string command) = 0;
   ///@}
 
   ///@{ @name Animation
@@ -385,6 +402,18 @@ public:
    * Provided file path will be used as is and the parent directories of the file will be created.
    */
   virtual bool recordInteraction(const std::filesystem::path& file) = 0;
+
+  /**
+   * Trigger a notification at the bottom left of veiwport.
+   * Both description and value texts render on same line.
+   *
+   * @param desc text string in white color.
+   * @param value text string in blue color by default, green if is "ON", red if is "OFF".
+   * @param bind formated bind string (eg. CTRL+A) in solid box.
+   * @param duration how long the noticaiton will be shown in second.
+   */
+  virtual void addNotification(
+    std::string desc, std::string value = "", std::string bind = "", float duration = 3.f) = 0;
 
   /**
    * Start the interactor event loop.
