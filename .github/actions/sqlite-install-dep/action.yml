@@ -5,6 +5,9 @@ inputs:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
+  csb_version:
+    description: "Version of common-superbuild to build sqlite with"
+    required: true
   global_cache_index:
     description: "Global cache index"
     required: true
@@ -15,6 +18,7 @@ runs:
     - name: Check required inputs
       shell: bash
       run: |
+        [[ "${{ inputs.csb_version }}" ]] || { echo "csb_version input is empty" ; exit 1; }
         [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
 
     - name: Cache sqlite
@@ -22,11 +26,10 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: ${{github.workspace}}/dependencies/sqlite_build/install
-        key: sqlite-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
+        key: sqlite-${{ inputs.csb_version }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
 
     # Dependents: proj
-    # csb contains sqlite 3.43.0
-    # use --depth=1 --revision=08be462f7fa9816f881dbb93eacb2e287f319208
+    # use --depth=1 --revision=${{ inputs.csb_version }}
     # when git supports it
     - name: Checkout common-superbuild and set everything up
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
@@ -36,10 +39,12 @@ runs:
         mkdir sqlite_build
         git clone https://gitlab.kitware.com/paraview/common-superbuild.git sqlite_csb
         cd sqlite_csb
-        git checkout 08be462f7fa9816f881dbb93eacb2e287f319208
+        git checkout ${{ inputs.csb_version }}
 
     - name: Setup msvc Windows
-      if: runner.os == 'Windows'
+      if: |
+        steps.cache-sqlite.outputs.cache-hit != 'true' &&
+        runner.os == 'Windows'
       uses: TheMrMilchmann/setup-msvc-dev@v4
       with:
         arch: x64

@@ -14,6 +14,9 @@ inputs:
   proj_version:
     description: "Version of proj to build against"
     required: true
+  sqlite_csb_version:
+    description: "Version of csb providing sqlite to build against"
+    required: true
   tiff_version:
     description: "Version of tiff to build against"
     required: true
@@ -33,6 +36,7 @@ runs:
         [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
         [[ "${{ inputs.geotiff_version }}" ]] || { echo "geotiff_version input is empty" ; exit 1; }
         [[ "${{ inputs.proj_version }}" ]] || { echo "proj_version input is empty" ; exit 1; }
+        [[ "${{ inputs.sqlite_csb_version }}" ]] || { echo "sqlite_csb_version input is empty" ; exit 1; }
         [[ "${{ inputs.tiff_version }}" ]] || { echo "tiff_version input is empty" ; exit 1; }
         [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
         [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
@@ -42,7 +46,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/gdal_install
-        key: gdal-${{inputs.version}}-${{ inputs.geotiff_version }}-${{inputs.proj_version}}-${{inputs.tiff_version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-4
+        key: gdal-${{inputs.version}}-${{ inputs.geotiff_version }}-${{inputs.proj_version}}-${{ inputs.sqlite_csb_version }}-${{inputs.tiff_version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-4
 
     # Dependents: pdal vtk
     - name: Checkout gdal

@@ -8,6 +8,9 @@ inputs:
   version:
     description: "Version of proj to build"
     required: true
+  sqlite_csb_version:
+    description: "Version of csb providing sqlite to build against"
+    required: true
   global_cache_index:
     description: "Global cache index"
     required: true
@@ -19,6 +22,7 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.sqlite_csb_version }}" ]] || { echo "sqlite_csb_version input is empty" ; exit 1; }
         [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
 
     - name: Cache proj
@@ -26,10 +30,9 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/proj_install
-        key: proj-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
+        key: proj-${{inputs.version}}-${{ inputs.sqlite_csb_version }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
 
     # Dependents: gdal geotiff
-    # Depends on fixed version sqlite
     - name: Checkout proj
       if: steps.cache-proj.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
