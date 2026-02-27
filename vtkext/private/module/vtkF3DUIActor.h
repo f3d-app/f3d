@@ -8,12 +8,15 @@
 #ifndef vtkF3DUIActor_h
 #define vtkF3DUIActor_h
 
+#include <vtkCommand.h>
 #include <vtkProp.h>
+#include <vtkSmartPointer.h>
 
 #include <array>
 #include <cstdint>
 #include <deque>
 
+class vtkDataAssembly;
 class vtkOpenGLRenderWindow;
 
 class vtkF3DUIActor : public vtkProp
@@ -32,6 +35,14 @@ public:
     NUMERICAL = 1,
     TOGGLE = 2,
     OTHER = 3,
+  };
+
+  /**
+   * Custom events for UI interactions
+   */
+  enum vtkCustomEvents
+  {
+    SceneHierarchyChangedEvent = vtkCommand::UserEvent + 300
   };
 
   using CheatSheetTuple = std::tuple<std::string, std::string, std::string, CheatSheetBindingType>;
@@ -61,6 +72,11 @@ public:
    * Empty by default
    */
   void SetDropText(const std::string& info);
+
+  /**
+   * Set the scene hierarchy
+   */
+  void SetHierarchy(vtkDataAssembly* hierarchy);
 
   /**
    * Set the dropzone binds
@@ -98,6 +114,12 @@ public:
    * False by default
    */
   void SetMetaDataVisibility(bool show);
+
+  /**
+   * Set the scene hierarchy visibility
+   * False by default
+   */
+  void SetSceneHierarchyVisibility(bool show);
 
   /**
    * Set the filename string
@@ -207,6 +229,13 @@ protected:
   }
 
   /**
+   * Render the scene hierarchy UI widget
+   */
+  virtual void RenderSceneHierarchy(vtkOpenGLRenderWindow*)
+  {
+  }
+
+  /**
    * Render the filename UI widget
    */
   virtual void RenderFileName()
@@ -267,6 +296,9 @@ protected:
 
   bool MetaDataVisible = false;
   std::string MetaData = "";
+
+  bool SceneHierarchyVisible = false;
+  vtkSmartPointer<vtkDataAssembly> HierarchyNodes;
 
   bool CheatSheetVisible = false;
   std::vector<CheatSheetGroup> CheatSheet;

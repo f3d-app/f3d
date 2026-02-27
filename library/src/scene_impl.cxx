@@ -164,6 +164,9 @@ public:
     }
 
     scene_impl::internals::DisplayAllInfo(this->MetaImporter, this->Window);
+
+    // Update the scene hierarchy in the window automatically
+    this->Window.SetSceneHierarchy(this->MetaImporter->GetSceneHierarchy());
   }
 
   static void DisplayImporterDescription(log::VerboseLevel level, vtkImporter* importer)
