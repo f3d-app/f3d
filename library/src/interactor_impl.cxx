@@ -103,16 +103,18 @@ public:
 
     this->UIObserver->InstallObservers(this->VTKInteractor);
 
-    // observe console event to trigger commands
+    // observe UI event to trigger commands
     vtkNew<vtkCallbackCommand> commandCallback;
     commandCallback->SetClientData(this);
-    commandCallback->SetCallback(OnConsoleEvent);
+    commandCallback->SetCallback(OnUIEvent);
     vtkOutputWindow::GetInstance()->AddObserver(
       vtkF3DConsoleOutputWindow::TriggerEvent, commandCallback);
     vtkOutputWindow::GetInstance()->AddObserver(
       vtkF3DConsoleOutputWindow::ShowEvent, commandCallback);
     vtkOutputWindow::GetInstance()->AddObserver(
       vtkF3DConsoleOutputWindow::HideEvent, commandCallback);
+    this->VTKInteractor->AddObserver(
+      vtkF3DUIActor::SceneHierarchyChangedEvent, commandCallback);
 
     // Disable standard interactor behavior with timer event
     // in order to be able to interact while animating
@@ -283,7 +285,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  static void OnConsoleEvent(vtkObject*, unsigned long event, void* clientData, void* data)
+  static void OnUIEvent(vtkObject*, unsigned long event, void* clientData, void* data)
   {
     internals* self = static_cast<internals*>(clientData);
 
@@ -1665,6 +1667,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "N"}, "toggle ui.filename","Scene", std::bind(docTgl, "Filename", std::cref(opts.ui.filename)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "M"}, "toggle ui.metadata","Scene", std::bind(docTgl, "Metadata", std::cref(opts.ui.metadata)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::SHIFT, "N"}, "toggle ui.hdri_filename","Scene", std::bind(docTgl, "HDRI filename", std::cref(opts.ui.hdri_filename)), f3d::interactor::BindingType::TOGGLE);
+  this->addBinding({mod_t::SHIFT, "H"}, "toggle ui.scene_hierarchy","Scene", std::bind(docTgl, "Scene hierarchy", std::cref(opts.ui.scene_hierarchy)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "Z"}, "toggle ui.fps","Scene", std::bind(docTgl, "FPS Counter", std::cref(opts.ui.fps)), f3d::interactor::BindingType::TOGGLE);
 #endif
 #if F3D_MODULE_RAYTRACING

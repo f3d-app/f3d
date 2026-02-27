@@ -169,6 +169,9 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestInteractionCheatsheetCentered DATA cow.vtp RESOLUTION 500,1500 INTERACTION UI LONG_TIMEOUT) #H
 endif()
 
+## Scene Hierarchy
+f3d_test(NAME TestInteractionSceneHierarchy DATA BoxAnimated.gltf INTERACTION UI) #Rotate;Shift+H;Click checkbox
+
 ## Console
 f3d_test(NAME TestInteractionConsoleOpen DATA f3d.glb INTERACTION UI) #Escape
 f3d_test(NAME TestInteractionConsoleOpenExit DATA f3d.glb REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE UI) #Escape;exit;Return

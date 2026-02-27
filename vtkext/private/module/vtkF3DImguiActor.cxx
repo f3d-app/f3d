@@ -7,6 +7,10 @@
 #include "vtkF3DImguiFS.h"
 #include "vtkF3DImguiVS.h"
 
+#include <vtkCallbackCommand.h>
+#include <vtkCommand.h>
+#include <vtkDataAssembly.h>
+#include <vtkDataAssemblyVisitor.h>
 #include <vtkImageData.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLBufferObject.h>
@@ -16,8 +20,11 @@
 #include <vtkOpenGLVertexArrayObject.h>
 #include <vtkPNGReader.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkRenderer.h>
+#include <vtkRendererCollection.h>
 #include <vtkShader.h>
 #include <vtkShaderProgram.h>
+#include <vtkSmartPointer.h>
 #include <vtkTextureObject.h>
 #include <vtkVersion.h>
 
@@ -31,14 +38,19 @@
 #include <vtk_glew.h>
 #endif
 
+#include <imgui.h>
+
 #include <algorithm>
 #include <array>
 #include <cstdint>
-#include <imgui.h>
+#include <functional>
 #include <numeric>
 #include <optional>
 #include <sstream>
 #include <string>
+
+// todo remove
+#include <iostream>
 
 namespace
 {
@@ -68,6 +80,76 @@ static std::vector<std::string> SplitBindings(const std::string& s, const char d
 
   return result;
 }
+
+class vtkF3DRenderDataAssemblyVisitor : public vtkDataAssemblyVisitor
+{
+public:
+  static vtkF3DRenderDataAssemblyVisitor* New();
+  vtkTypeMacro(vtkF3DRenderDataAssemblyVisitor, vtkDataAssemblyVisitor);
+
+protected:
+  void BeginSubTree(int nodeid) override
+  {
+  }
+
+  void EndSubTree(int nodeid) override
+  {
+    if (nodeid != vtkDataAssembly::GetRootNode())
+    {
+      ImGui::TreePop();
+    }
+  }
+
+  bool GetTraverseSubtree(int nodeid) override
+  {
+    if (nodeid == vtkDataAssembly::GetRootNode())
+    {
+      return true; // always traverse root node
+    }
+    return this->NodeVisibilityState[nodeid];
+  }
+
+  void Visit(int nodeid) override
+  {
+    if (nodeid == vtkDataAssembly::GetRootNode())
+    {
+      return; // skip root node
+    }
+
+    int flatActorIndex = -1;
+    this->GetAssembly()->GetAttribute(nodeid, "flat_actor_id", flatActorIndex);
+
+    std::vector<unsigned int> path = this->GetCurrentDataSetIndices();
+
+    int flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DrawLinesToNodes;
+
+    if (this->GetAssembly()->GetNumberOfChildren(nodeid) == 0)
+    {
+      flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet;
+    }
+
+    this->NodeVisibilityState[nodeid] = ImGui::TreeNodeEx(
+    ("##tree_" + std::to_string(nodeid)).c_str(), flags);
+
+    ImGui::SameLine();
+    
+    bool visible = true; // TODO: get actor visibility
+
+    ImGui::PushID(nodeid);
+    if (ImGui::Checkbox(this->GetCurrentNodeName(), &visible))
+    {
+      // NodeVisibilityState[node->prop] = visible;
+      // node->prop->SetVisibility(visible ? 1 : 0);
+      // node->prop->Modified();
+      // renWin->GetInteractor()->InvokeEvent(vtkF3DUIActor::SceneHierarchyChangedEvent, nullptr);
+    }
+    ImGui::PopID();
+  }
+
+private:
+  std::map<int, bool> NodeVisibilityState;
+};
+vtkStandardNewMacro(vtkF3DRenderDataAssemblyVisitor);
 
 }
 
@@ -392,12 +474,89 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
 void vtkF3DImguiActor::ReleaseGraphicsResources(vtkWindow* w)
 {
   this->Superclass::ReleaseGraphicsResources(w);
-
   this->Pimpl->Release(vtkOpenGLRenderWindow::SafeDownCast(w));
 }
 
 //----------------------------------------------------------------------------
 vtkF3DImguiActor::~vtkF3DImguiActor() = default;
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
+{
+  if (!this->SceneHierarchyVisible)
+  {
+    return;
+  }
+
+  const ImGuiViewport* viewport = ImGui::GetMainViewport();
+  assert(viewport);
+
+  constexpr float margin = F3DStyle::GetDefaultMargin();
+  float winWidth = this->CalculateHierarchyWidth();
+  float winHeight = viewport->WorkSize.y - 2.0f * margin;
+
+  ::SetupNextWindow(ImVec2(margin, margin), ImVec2(winWidth, winHeight));
+  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+
+  ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
+    ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize;
+
+  ImGui::Begin("Scene Hierarchy", nullptr, flags);
+
+  assert(this->HierarchyNodes != nullptr);
+
+  this->HierarchyNodes->Print(std::cout);
+
+  vtkNew<::vtkF3DRenderDataAssemblyVisitor> visitor;
+
+  this->HierarchyNodes->Visit(visitor, vtkDataAssembly::GetRootNode());
+
+  ImGui::End();
+}
+
+//----------------------------------------------------------------------------
+float vtkF3DImguiActor::CalculateHierarchyWidth()
+{
+  float maxWidth = 0.0f;
+  // const float indentPerLevel = ImGui::GetStyle().IndentSpacing;
+  // const float treeArrowWidth = ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.x * 2.0f;
+  // const float checkboxWidth = ImGui::GetFrameHeight() + ImGui::GetStyle().ItemInnerSpacing.x;
+
+  // std::function<void(const F3DNodeInfo&, int)> processNode = [&](const F3DNodeInfo& node, int
+  // depth)
+  // {
+  //   const std::string& displayText = node.displayName.empty() ? node.name : node.displayName;
+  //   ImVec2 textSize = ImGui::CalcTextSize(displayText.c_str());
+
+  //   float nodeWidth = depth * indentPerLevel + textSize.x;
+  //   if (!node.children.empty())
+  //   {
+  //     nodeWidth += treeArrowWidth;
+  //   }
+  //   if (node.prop)
+  //   {
+  //     nodeWidth += checkboxWidth;
+  //   }
+  //   maxWidth = std::max(maxWidth, nodeWidth);
+
+  //   for (const auto& child : node.children)
+  //   {
+  //     processNode(child, depth + 1);
+  //   }
+  // };
+
+  // for (const auto& node : this->HierarchyNodes)
+  // {
+  //   processNode(node, 0);
+  // }
+
+  constexpr float scrollbarWidth = 16.0f;
+  constexpr float minWidth = 200.0f;
+  constexpr float maxWidthLimit = 800.0f;
+  float totalWidth = maxWidth + 2.0f * ImGui::GetStyle().WindowPadding.x + scrollbarWidth;
+
+  return std::max(minWidth, std::min(totalWidth, maxWidthLimit));
+}
 
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderDropZone()

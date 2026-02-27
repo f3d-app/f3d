@@ -487,6 +487,12 @@
           "implicitValue": "1"
         },
         {
+          "longName": "scene-hierarchy",
+          "helpText": "Display the scene hierarchy widget",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
           "longName": "hdri-filename",
           "helpText": "Display hdri filename",
           "valueHelper": "<bool>",

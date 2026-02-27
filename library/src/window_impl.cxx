@@ -378,6 +378,12 @@ window_impl::~window_impl()
 }
 
 //----------------------------------------------------------------------------
+void window_impl::SetSceneHierarchy(vtkDataAssembly* hierarchy)
+{
+  this->Internals->Renderer->SetSceneHierarchy(hierarchy);
+}
+
+//----------------------------------------------------------------------------
 void window_impl::UpdateDynamicOptions()
 {
   vtkF3DRenderer* renderer = this->Internals->Renderer;
@@ -450,6 +456,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetFilenameInfo(opt.ui.filename_info);
   renderer->ShowMetaData(opt.ui.metadata);
   renderer->ShowHDRIFilename(opt.ui.hdri_filename);
+  renderer->ShowSceneHierarchy(opt.ui.scene_hierarchy);
   renderer->ShowCheatSheet(opt.ui.cheatsheet);
   renderer->ShowConsole(opt.ui.console);
   renderer->ShowMinimalConsole(opt.ui.minimal_console);
