@@ -180,11 +180,6 @@ runs:
       shell: bash
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
-    - name: Set LD_LIBRARY_PATH on Linux for PDAL TODO WHY IS IT NEEDED THOUGH????
-      if: runner.os == 'Linux'
-      shell: bash
-      run: echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
-
     - name: Test
       shell: bash
       working-directory: ${{github.workspace}}/source
