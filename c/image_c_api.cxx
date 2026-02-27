@@ -49,7 +49,6 @@ f3d_image_t* f3d_image_new_params(unsigned int width, unsigned int height,
 {
   f3d::image* img =
     new f3d::image(width, height, channelCount, static_cast<f3d::image::ChannelType>(channelType));
-
   return reinterpret_cast<f3d_image_t*>(img);
 }
 

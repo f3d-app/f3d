@@ -175,8 +175,7 @@ extern "C"
    * @param format Format in which the image will be saved
    * @return Non-zero on success, zero on failure
    */
-  F3D_EXPORT int f3d_image_save(
-    f3d_image_t* img, const char* path, f3d_image_save_format_t format);
+  F3D_EXPORT int f3d_image_save(f3d_image_t* img, const char* path, f3d_image_save_format_t format);
 
   /**
    * @brief Save an image to a buffer
