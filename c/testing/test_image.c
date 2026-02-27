@@ -17,6 +17,9 @@ int test_image()
     return 1;
   }
 
+  // this shouldn't crash
+  f3d_image_t* img_wrong_path = f3d_image_new_path("/non/existent/path/image.png");
+
   unsigned int width = f3d_image_get_width(img);
   (void)width;
   unsigned int height = f3d_image_get_height(img);
@@ -63,6 +66,12 @@ int test_image()
     f3d_image_delete(ref_img);
   }
 
+  unsigned char* tempBuffer = f3d_image_save_buffer(NULL, PNG, &count); // this shouldn't crash
+  if (tempBuffer != NULL)
+  {
+      return 1;
+  }
+
   unsigned int buffer_size;
   unsigned char* buffer = f3d_image_save_buffer(img, PNG, &buffer_size);
   if (buffer)
@@ -72,6 +81,10 @@ int test_image()
 
   const char* tmp_path = "/tmp/f3d_test_image.png";
   f3d_image_save(img, tmp_path, PNG);
+
+  // this shouldn't crash
+  const char* invalid_path = NULL;
+  f3d_image_save(img, invalid_path, PNG);
 
   f3d_image_t* img_from_file = f3d_image_new_path(tmp_path);
   if (img_from_file)
