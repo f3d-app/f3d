@@ -32,6 +32,9 @@ inputs:
   proj_version:
     description: "Version of proj to build against"
     required: false
+  sqlite_csb_version:
+    description: "Version of csb providing sqlite to build against"
+    required: false
   tiff_version:
     description: "Version of tiff to build against"
     required: false
@@ -62,7 +65,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}${{ inputs.curl_version != '' && format('-curl-{0}', inputs.curl_version) || '' }}${{ inputs.gdal_version != '' && format('-gdal-{0}', inputs.gdal_version) || '' }}${{ inputs.geotiff_version != '' && format('-geotiff-{0}', inputs.geotiff_version) || '' }}${{ inputs.pdal_version != '' && format('-pdal-{0}', inputs.pdal_version) || '' }}${{ inputs.proj_version != '' && format('-proj-{0}', inputs.proj_version) || '' }}${{ inputs.tiff_version != '' && format('-tiff-{0}', inputs.tiff_version) || '' }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
+        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}${{ inputs.curl_version != '' && format('-curl-{0}', inputs.curl_version) || '' }}${{ inputs.gdal_version != '' && format('-gdal-{0}', inputs.gdal_version) || '' }}${{ inputs.geotiff_version != '' && format('-geotiff-{0}', inputs.geotiff_version) || '' }}${{ inputs.pdal_version != '' && format('-pdal-{0}', inputs.pdal_version) || '' }}${{ inputs.proj_version != '' && format('-proj-{0}', inputs.proj_version) || '' }}${{ inputs.sqlite_csb_version != '' && format('-sqlite-{0}', inputs.sqlite_csb_version) || '' }}${{ inputs.tiff_version != '' && format('-tiff-{0}', inputs.tiff_version) || '' }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
