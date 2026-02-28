@@ -14,10 +14,15 @@
 #include <vtkOpenGLShaderCache.h>
 #include <vtkOpenGLState.h>
 #include <vtkOpenGLVertexArrayObject.h>
+#include <vtkCallbackCommand.h>
+#include <vtkCommand.h>
 #include <vtkPNGReader.h>
+#include <vtkRenderer.h>
+#include <vtkRendererCollection.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkShader.h>
 #include <vtkShaderProgram.h>
+#include <vtkSmartPointer.h>
 #include <vtkTextureObject.h>
 #include <vtkVersion.h>
 
@@ -35,6 +40,7 @@
 #include <array>
 #include <cstdint>
 #include <imgui.h>
+#include <functional>
 #include <numeric>
 #include <optional>
 #include <sstream>
@@ -392,12 +398,172 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
 void vtkF3DImguiActor::ReleaseGraphicsResources(vtkWindow* w)
 {
   this->Superclass::ReleaseGraphicsResources(w);
-
   this->Pimpl->Release(vtkOpenGLRenderWindow::SafeDownCast(w));
 }
 
 //----------------------------------------------------------------------------
 vtkF3DImguiActor::~vtkF3DImguiActor() = default;
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderNode(F3DNodeInfo* node, vtkOpenGLRenderWindow* renWin)
+{
+  if (!node)
+  {
+    return;
+  }
+
+  const std::string& displayText = node->displayName.empty() ? node->name : node->displayName;
+  bool hasChildren = !node->children.empty();
+
+  if (node->prop)
+  {
+    ImGui::PushID(static_cast<void*>(node->prop));
+    // Always sync visibility state from the actual actor to handle external changes
+    // (e.g., pressing O key or other visibility toggles)
+    bool visible = node->prop->GetVisibility() != 0;
+    NodeVisibilityState[node->prop] = visible;
+
+    if (hasChildren)
+    {
+      // Node with prop and children - use tree node with checkbox
+      ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow;
+      bool isOpen = ImGui::TreeNodeEx(("##tree_" + displayText).c_str(), flags);
+
+      ImGui::SameLine();
+      if (ImGui::Checkbox(displayText.c_str(), &visible))
+      {
+        NodeVisibilityState[node->prop] = visible;
+        node->prop->SetVisibility(visible ? 1 : 0);
+        node->prop->Modified();
+        renWin->GetInteractor()->InvokeEvent(vtkF3DUIActor::SceneHierarchyChangedEvent, nullptr);
+      }
+
+      if (isOpen)
+      {
+        for (auto& child : node->children)
+        {
+          RenderNode(&child, renWin);
+        }
+        ImGui::TreePop();
+      }
+    }
+    else
+    {
+      // Leaf node with prop - just checkbox
+      if (ImGui::Checkbox(displayText.c_str(), &visible))
+      {
+        NodeVisibilityState[node->prop] = visible;
+        node->prop->SetVisibility(visible ? 1 : 0);
+        node->prop->Modified();
+        renWin->GetInteractor()->InvokeEvent(vtkF3DUIActor::SceneHierarchyChangedEvent, nullptr);
+      }
+    }
+
+    ImGui::PopID();
+  }
+  else
+  {
+    // Intermediate node without prop (e.g., "assembly" node)
+    if (hasChildren)
+    {
+      ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen;
+      if (ImGui::TreeNodeEx(displayText.c_str(), flags))
+      {
+        for (auto& child : node->children)
+        {
+          RenderNode(&child, renWin);
+        }
+        ImGui::TreePop();
+      }
+    }
+    else
+    {
+      // Intermediate node without children - just display text
+      ImGui::Text("%s", displayText.c_str());
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
+{
+  if (!this->SceneHierarchyVisible)
+  {
+    return;
+  }
+
+  const ImGuiViewport* viewport = ImGui::GetMainViewport();
+  assert(viewport);
+
+  constexpr float margin = F3DStyle::GetDefaultMargin();
+  float winWidth = this->CalculateHierarchyWidth();
+  float winHeight = viewport->WorkSize.y - 2.0f * margin;
+
+  ::SetupNextWindow(ImVec2(margin, margin), ImVec2(winWidth, winHeight));
+  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+
+  ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
+    ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize;
+
+  ImGui::Begin("Scene Hierarchy", nullptr, flags);
+
+  if (this->HierarchyNodes.empty())
+  {
+    ImGui::Text("No hierarchy available");
+    ImGui::End();
+    return;
+  }
+
+  for (auto& node : this->HierarchyNodes)
+  {
+    RenderNode(&node, renWin);
+  }
+
+  ImGui::End();
+}
+
+//----------------------------------------------------------------------------
+float vtkF3DImguiActor::CalculateHierarchyWidth()
+{
+  float maxWidth = 0.0f;
+  const float indentPerLevel = ImGui::GetStyle().IndentSpacing;
+  const float treeArrowWidth = ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.x * 2.0f;
+  const float checkboxWidth = ImGui::GetFrameHeight() + ImGui::GetStyle().ItemInnerSpacing.x;
+
+  std::function<void(const F3DNodeInfo&, int)> processNode = [&](const F3DNodeInfo& node, int depth)
+  {
+    const std::string& displayText = node.displayName.empty() ? node.name : node.displayName;
+    ImVec2 textSize = ImGui::CalcTextSize(displayText.c_str());
+
+    float nodeWidth = depth * indentPerLevel + textSize.x;
+    if (!node.children.empty())
+    {
+      nodeWidth += treeArrowWidth;
+    }
+    if (node.prop)
+    {
+      nodeWidth += checkboxWidth;
+    }
+    maxWidth = std::max(maxWidth, nodeWidth);
+
+    for (const auto& child : node.children)
+    {
+      processNode(child, depth + 1);
+    }
+  };
+
+  for (const auto& node : this->HierarchyNodes)
+  {
+    processNode(node, 0);
+  }
+
+  constexpr float scrollbarWidth = 16.0f;
+  constexpr float minWidth = 200.0f;
+  constexpr float maxWidthLimit = 800.0f;
+  float totalWidth = maxWidth + 2.0f * ImGui::GetStyle().WindowPadding.x + scrollbarWidth;
+
+  return std::max(minWidth, std::min(totalWidth, maxWidthLimit));
+}
 
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderDropZone()

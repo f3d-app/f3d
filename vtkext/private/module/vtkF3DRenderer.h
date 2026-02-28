@@ -23,6 +23,7 @@
 
 #include <array>
 #include <filesystem>
+#include <functional>
 #include <map>
 #include <optional>
 
@@ -103,6 +104,7 @@ public:
   void ShowDropZoneLogo(bool show);
   void ShowHDRISkybox(bool show);
   void ShowArmature(bool show);
+  void ShowSceneHierarchy(bool show);
   ///@}
 
   using vtkOpenGLRenderer::SetBackground;
@@ -123,6 +125,7 @@ public:
   void SetFilenameInfo(const std::string& info);
   void SetDropZoneInfo(const std::string& info);
   void SetDropZoneBinds(const std::vector<std::pair<std::string, std::string>>& dropZoneBinds);
+  void SetSceneHierarchy(const std::vector<F3DNodeInfo>& hierarchy);
   void SetGridAbsolute(bool absolute);
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
@@ -387,6 +390,11 @@ public:
    * Set the meta importer to recover coloring information from
    */
   void SetImporter(vtkF3DMetaImporter* importer);
+  
+  /**
+   * Get the meta importer
+   */
+  vtkF3DMetaImporter* GetImporter() { return this->Importer; }
 
   ///@{
   /**
@@ -675,6 +683,7 @@ private:
   bool FilenameVisible = false;
   bool MetaDataVisible = false;
   bool HDRIFilenameVisible = false;
+  bool SceneHierarchyVisible = false;
   bool CheatSheetVisible = false;
   bool ConsoleVisible = false;
   bool MinimalConsoleVisible = false;

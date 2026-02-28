@@ -25,6 +25,7 @@
 #include <vtksys/SystemTools.hxx>
 
 #include <vector>
+#include <unordered_set>
 
 namespace fs = std::filesystem;
 
@@ -164,6 +165,9 @@ public:
     }
 
     scene_impl::internals::DisplayAllInfo(this->MetaImporter, this->Window);
+
+    // Update the scene hierarchy in the window automatically
+    this->Window.SetSceneHierarchy(this->GetSceneHierarchyNodes());
   }
 
   static void DisplayImporterDescription(log::VerboseLevel level, vtkImporter* importer)
@@ -196,6 +200,13 @@ public:
 
     // Print scene description
     window.PrintSceneDescription(log::VerboseLevel::DEBUG);
+  }
+
+  std::vector<F3DNodeInfo> GetSceneHierarchyNodes()
+  {
+    assert(this->MetaImporter);
+    // Get the raw hierarchy directly - it already handles duplicates and hierarchy
+    return this->MetaImporter->ComputeNodeInfoHierarchy();
   }
 
   const options& Options;

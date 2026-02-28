@@ -19,6 +19,8 @@
 #include <memory>
 #include <optional>
 
+#include "F3DNodeInfo.h"
+
 class vtkRenderWindow;
 class vtkF3DMetaImporter;
 class vtkF3DRenderer;
@@ -60,6 +62,13 @@ public:
   point3_t getWorldFromDisplay(const point3_t& displayPoint) const override;
   point3_t getDisplayFromWorld(const point3_t& worldPoint) const override;
   ///@}
+
+  /**
+   * Implementation only API.
+   * Set the scene hierarchy for display in UI.
+   * This is called by the scene when content changes.
+   */
+  void SetSceneHierarchy(const std::vector<F3DNodeInfo>& hierarchy);
 
   /**
    * Implementation only API.

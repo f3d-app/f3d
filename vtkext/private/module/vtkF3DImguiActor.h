@@ -11,6 +11,7 @@
 #include "vtkF3DUIActor.h"
 
 #include <memory>
+#include <unordered_map>
 
 class vtkOpenGLRenderWindow;
 class vtkWindow;
@@ -40,9 +41,17 @@ protected:
   vtkF3DImguiActor();
   ~vtkF3DImguiActor() override;
 
+  /**
+   * Recursively render a node in the scene hierarchy tree
+   */
+  void RenderNode(F3DNodeInfo* node, vtkOpenGLRenderWindow* renWin) override;
+
 private:
   struct Internals;
   std::unique_ptr<Internals> Pimpl;
+
+  // Track visibility state for each node
+  std::unordered_map<vtkProp*, bool> NodeVisibilityState;
 
   /**
    * Called at the beginning of the rendering step
@@ -60,6 +69,11 @@ private:
    * Render the dropzone UI widget
    */
   void RenderDropZone() override;
+
+  /**
+   * Render the scene hierarchy UI widget
+   */
+  void RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin) override;
 
   /**
    * Render the filename UI widget
@@ -97,6 +111,11 @@ private:
   void RenderConsoleBadge() override;
 
 private:
+  /**
+   * Calculate the maximum text width needed for the hierarchy
+   */
+  float CalculateHierarchyWidth();
+
   vtkF3DImguiActor(const vtkF3DImguiActor&) = delete;
   void operator=(const vtkF3DImguiActor&) = delete;
 };
