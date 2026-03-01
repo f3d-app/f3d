@@ -103,7 +103,9 @@ Other hotkeys and interactions are available:
 - <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbd>: play the animation backward if any.
 - <kbd>Shift</kbd>+<kbd>V</kbd>: cycle between verbosity levels.
 - <kbd>&larr;</kbd>: load the previous file if any and reset the camera.
+- <kbd>Ctrl</kbd>+<kbd>&larr;</kbd>: load the previous file if any and keep the camera.
 - <kbd>&rarr;</kbd>: load the next file if any and reset the camera.
+- <kbd>Ctrl</kbd>+<kbd>&rarr;</kbd>: load the next file if any and keep the camera.
 - <kbd>&uarr;</kbd>: reload the currently loaded files.
 - <kbd>&darr;</kbd>: add all current files parent directories to the list of files, reload the currently loaded files and reset the camera, respect the `--recursive-dir-add` CLI option.
 - <kbd>F12</kbd>: take a screenshot, ie. render the current view to an image file.
