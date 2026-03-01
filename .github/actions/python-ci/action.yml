@@ -128,6 +128,7 @@ runs:
         gdal_version: ${{inputs.gdal_version}}
         geotiff_version: ${{inputs.geotiff_version}}
         openvdb_version: ${{inputs.openvdb_version}}
+        pdal_version: ${{inputs.pdal_version}}
         proj_version: ${{inputs.proj_version}}
         sqlite_csb_version: ${{inputs.sqlite_csb_version}}
         tbb_version: ${{inputs.tbb_version}}
