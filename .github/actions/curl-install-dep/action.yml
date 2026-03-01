@@ -1,0 +1,99 @@
+name: "Install curl Dependency"
+description: "Install curl Dependency using cache when possible"
+inputs:
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+  version:
+    description: "Version of curl to build"
+    required: true
+  zlib_version:
+    description: "Version of zlib to build against"
+    required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+
+    - name: Cache curl
+      id: cache-curl
+      uses: actions/cache/restore@v4
+      with:
+        path: dependencies/curl_install
+        key: curl-${{inputs.version}}-${{ inputs.zlib_version }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
+
+    # Dependents: pdal vtk
+    - name: Checkout curl
+      if: steps.cache-curl.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: curl/curl
+        path: "./dependencies/curl"
+        ref: ${{inputs.version}}
+
+    - name: Setup curl
+      if: steps.cache-curl.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir curl_build
+        mkdir curl_install
+
+    - name: Configure curl
+      if: steps.cache-curl.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/curl_build
+      shell: bash
+      run: >
+        cmake ../curl
+        -DBUILD_CURL_EXE=OFF
+        -DBUILD_EXAMPLES=OFF
+        -DBUILD_LIBCURL_DOCS=OFF
+        -DBUILD_MISC_DOCS=OFF
+        -DBUILD_SHARED_LIBS=ON
+        -DBUILD_TESTING=OFF
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX=../curl_install
+        -DCURL_ENABLE_SSL=OFF
+        -DCURL_USE_LIBPSL=OFF
+        -DCURL_USE_LIBSSH2=OFF
+        -DCURL_USE_OPENSSL=OFF
+        -DCURL_USE_PKGCONFIG=OFF
+        -DENABLE_CURL_MANUAL=OFF
+        -DENABLE_IPV6=OFF
+        -DENABLE_THREADED_RESOLVER=OFF
+        -DENABLE_THREADED_RESOLVER=OFF
+        -DENABLE_UNIX_SOCKETS=OFF
+        -DPICKY_COMPILER=OFF
+        -DUSE_LIBIDN2=OFF
+        -DUSE_NGHTTP2=OFF
+        -DCURL_ZSTD=OFF
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build curl
+      if: steps.cache-curl.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/curl_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/curl_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-curl.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-curl.outputs.cache-primary-key }}
+        path: dependencies/curl_install

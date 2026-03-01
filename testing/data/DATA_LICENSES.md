@@ -70,6 +70,7 @@
 - xform_anim.abc: Public Domain
 - joint1.abc: Public Domain
 - zombie\*.mdl: LibreQuake Project: BSD-3-Clause
+- simple.laz: PDAL: Copyright (c) 2025, Hobu, Inc.
 
 All other datasets are licensed under the BSD-3-Clause F3D license.
 

@@ -1,0 +1,90 @@
+name: "Install tiff Dependency"
+description: "Install tiff Dependency using cache when possible"
+inputs:
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+  version:
+    description: "Version of tiff to build"
+    required: true
+  zlib_version:
+    description: "Version of zlib to build against"
+    required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+
+    - name: Cache tiff
+      id: cache-tiff
+      uses: actions/cache/restore@v4
+      with:
+        path: dependencies/tiff_install
+        key: tiff-${{inputs.version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-3
+
+    # Dependents: gdal pdal vtk geotiff
+    - name: Checkout tiff
+      if: steps.cache-tiff.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: libsdl-org/libtiff
+        path: "./dependencies/tiff"
+        ref: ${{inputs.version}}
+
+    - name: Setup tiff
+      if: steps.cache-tiff.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir tiff_build
+        mkdir tiff_install
+
+    - name: Configure tiff
+      if: steps.cache-tiff.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/tiff_build
+      shell: bash
+      run: >
+        cmake ../tiff
+        -DBUILD_SHARED_LIBS=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX=../tiff_install
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
+        -Dtiff-docs:BOOL=OFF
+        -Djbig:BOOL=OFF
+        -Djpeg:BOOL=OFF
+        -Dlerc:BOOL=OFF
+        -Dlibdeflate:BOOL=OFF
+        -Dlzma:BOOL=OFF
+        -Dwebp:BOOL=OFF
+        -Dzstd:BOOL=OFF
+        -Dzlib:BOOL=ON
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build tiff
+      if: steps.cache-tiff.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/tiff_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/tiff_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-tiff.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-tiff.outputs.cache-primary-key }}
+        path: dependencies/tiff_install

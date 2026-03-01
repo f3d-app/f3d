@@ -1,0 +1,9 @@
+[
+  {
+    "match-type": "glob",
+    "match": "*.laz",
+    "options": {
+      "load-plugins": "pdal"
+    }
+  }
+]

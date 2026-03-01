@@ -20,6 +20,7 @@ runs:
         mkdir build
         mkdir install
 
+    # TODO enable PDAL in docker
     - name: Configure
       shell: bash
       working-directory: ${{github.workspace}}/build
@@ -37,6 +38,7 @@ runs:
         -DF3D_PLUGIN_BUILD_DRACO=ON
         -DF3D_PLUGIN_BUILD_HDF=OFF
         -DF3D_PLUGIN_BUILD_OCCT=ON
+        -DF3D_PLUGIN_BUILD_PDAL=OFF
         -DF3D_PLUGIN_BUILD_WEBIFC=ON
         -DF3D_STRICT_BUILD=ON
 

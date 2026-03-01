@@ -1,0 +1,108 @@
+name: "Install pdal Dependency"
+description: "Install pdal Dependency using cache when possible"
+inputs:
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+  version:
+    description: "Version of pdal to build"
+    required: true
+  curl_version:
+    description: "Version of gdal to build against"
+    required: true
+  gdal_version:
+    description: "Version of gdal to build against"
+    required: true
+  geotiff_version:
+    description: "Version of geotiff to build against"
+    required: true
+  proj_version:
+    description: "Version of proj to build against"
+    required: true
+  sqlite_csb_version:
+    description: "Version of csb providing sqlite to build against"
+    required: true
+  tiff_version:
+    description: "Version of tiff to build against"
+    required: true
+  zlib_version:
+    description: "Version of zlib to build against"
+    required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.curl_version }}" ]] || { echo "curl_version input is empty" ; exit 1; }
+        [[ "${{ inputs.gdal_version }}" ]] || { echo "gdal_version input is empty" ; exit 1; }
+        [[ "${{ inputs.geotiff_version }}" ]] || { echo "geotiff_version input is empty" ; exit 1; }
+        [[ "${{ inputs.proj_version }}" ]] || { echo "proj_version input is empty" ; exit 1; }
+        [[ "${{ inputs.sqlite_csb_version }}" ]] || { echo "sqlite_csb_version input is empty" ; exit 1; }
+        [[ "${{ inputs.tiff_version }}" ]] || { echo "tiff_version input is empty" ; exit 1; }
+        [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+
+    - name: Cache pdal
+      id: cache-pdal
+      uses: actions/cache/restore@v4
+      with:
+        path: dependencies/pdal_install
+        key: pdal-${{inputs.version}}-${{ inputs.curl_version }}-${{ inputs.gdal_version }}-${{ inputs.geotiff_version }}-${{inputs.proj_version}}-${{ inputs.sqlite_csb_version }}-${{inputs.tiff_version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-3
+
+    # Dependents: vtk
+    - name: Checkout pdal
+      if: steps.cache-pdal.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: PDAL/PDAL
+        path: "./dependencies/pdal"
+        ref: ${{inputs.version}}
+
+    - name: Setup pdal
+      if: steps.cache-pdal.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir pdal_build
+        mkdir pdal_install
+
+    - name: Configure pdal
+      if: steps.cache-pdal.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/pdal_build
+      shell: bash
+      run: >
+        cmake ../pdal
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX=../pdal_install
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
+        -DWITH_BACKTRACE=OFF
+        -DWITH_GCS=OFF
+        -DWITH_TESTS=OFF
+        -DWITH_ZSTD=OFF
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build pdal
+      if: steps.cache-pdal.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/pdal_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/pdal_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-pdal.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-pdal.outputs.cache-primary-key }}
+        path: dependencies/pdal_install

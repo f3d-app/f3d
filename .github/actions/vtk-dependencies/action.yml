@@ -35,6 +35,22 @@ runs:
         mkdir .actions
         cp -r ${{inputs.source_dir}}/.github/actions/* .actions/
 
+    - name: Install sqlite
+      uses: ./.actions/sqlite-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
+        global_cache_index: ${{inputs.global_cache_index}}
+
+    # Depends on sqlite
+    - name: Install proj
+      uses: ./.actions/proj-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        sqlite_csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
+        version: 9.7.1
+        global_cache_index: ${{inputs.global_cache_index}}
+
     - name: Install TBB
       uses: ./.actions/tbb-install-dep
       with:
@@ -49,11 +65,64 @@ runs:
         version: ${{inputs.zlib_version}}
         global_cache_index: ${{inputs.global_cache_index}}
 
+    - name: Install curl
+      uses: ./.actions/curl-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: curl-8_18_0
+        zlib_version: ${{inputs.zlib_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
+
     - name: Install blosc
       uses: ./.actions/blosc-install-dep
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.blosc_version}}
+        zlib_version: ${{inputs.zlib_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
+
+    - name: Install tiff
+      uses: ./.actions/tiff-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: v4.7.1
+        zlib_version: ${{inputs.zlib_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
+
+    - name: Install geotiff
+      uses: ./.actions/geotiff-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: 1.7.4
+        sqlite_csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
+        proj_version: 9.7.1
+        tiff_version: v4.7.1
+        zlib_version: ${{inputs.zlib_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
+
+    - name: Install gdal
+      uses: ./.actions/gdal-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: v3.12.2
+        sqlite_csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
+        geotiff_version: 1.7.4
+        proj_version: 9.7.1
+        tiff_version: v4.7.1
+        zlib_version: ${{inputs.zlib_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
+
+    - name: Install pdal
+      uses: ./.actions/pdal-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: 2.10.0
+        sqlite_csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
+        curl_version: curl-8_18_0
+        gdal_version: v3.12.2
+        geotiff_version: 1.7.4
+        proj_version: 9.7.1
+        tiff_version: v4.7.1
         zlib_version: ${{inputs.zlib_version}}
         global_cache_index: ${{inputs.global_cache_index}}
 

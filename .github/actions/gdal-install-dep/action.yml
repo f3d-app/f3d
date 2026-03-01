@@ -1,0 +1,121 @@
+name: "Install gdal Dependency"
+description: "Install gdal Dependency using cache when possible"
+inputs:
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+  version:
+    description: "Version of gdal to build"
+    required: true
+  geotiff_version:
+    description: "Version of geotiff to build against"
+    required: true
+  proj_version:
+    description: "Version of proj to build against"
+    required: true
+  sqlite_csb_version:
+    description: "Version of csb providing sqlite to build against"
+    required: true
+  tiff_version:
+    description: "Version of tiff to build against"
+    required: true
+  zlib_version:
+    description: "Version of zlib to build against"
+    required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.geotiff_version }}" ]] || { echo "geotiff_version input is empty" ; exit 1; }
+        [[ "${{ inputs.proj_version }}" ]] || { echo "proj_version input is empty" ; exit 1; }
+        [[ "${{ inputs.sqlite_csb_version }}" ]] || { echo "sqlite_csb_version input is empty" ; exit 1; }
+        [[ "${{ inputs.tiff_version }}" ]] || { echo "tiff_version input is empty" ; exit 1; }
+        [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+
+    - name: Cache gdal
+      id: cache-gdal
+      uses: actions/cache/restore@v4
+      with:
+        path: dependencies/gdal_install
+        key: gdal-${{inputs.version}}-${{ inputs.geotiff_version }}-${{inputs.proj_version}}-${{ inputs.sqlite_csb_version }}-${{inputs.tiff_version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-4
+
+    # Dependents: pdal vtk
+    - name: Checkout gdal
+      if: steps.cache-gdal.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: OSGeo/gdal
+        path: "./dependencies/gdal"
+        ref: ${{inputs.version}}
+
+    # https://github.com/OSGeo/gdal/issues/14015
+    - name: Patch GDAL rpath issue
+      if: steps.cache-gdal.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/gdal
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/fix_install_rpath.patch
+
+    - name: Setup gdal
+      if: steps.cache-gdal.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir gdal_build
+        mkdir gdal_install
+
+    - name: Configure gdal
+      if: steps.cache-gdal.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/gdal_build
+      shell: bash
+      run: >
+        cmake ../gdal
+        -DBUILD_APPS=OFF
+        -DBUILD_DOCS=OFF
+        -DBUILD_PYTHON_BINDINGS=OFF
+        -DBUILD_SHARED_LIBS=ON
+        -DBUILD_TESTING=OFF
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX=../gdal_install
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
+        -DENABLE_GNM=OFF
+        -DENABLE_PAM=OFF
+        -DGDAL_BUILD_OPTIONAL_DRIVERS=OFF
+        -DGDAL_SET_INSTALL_RELATIVE_RPATH=ON
+        -DGDAL_USE_EXTERNAL_LIBS=OFF
+        -DGDAL_USE_GEOTIFF=ON 
+        -DGDAL_USE_GEOTIFF_INTERNAL=OFF
+        -DGDAL_USE_TIFF=ON
+        -DGDAL_USE_TIFF_INTERNAL=OFF 
+        -DGDAL_USE_ZLIB=ON
+        -DGDAL_USE_ZLIB_INTERNAL=OFF 
+        -DOGR_BUILD_OPTIONAL_DRIVERS=OFF
+        -DPROJ_ROOT:PATH=$(pwd)/../install/
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build gdal
+      if: steps.cache-gdal.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/gdal_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/gdal_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-gdal.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-gdal.outputs.cache-primary-key }}
+        path: dependencies/gdal_install
