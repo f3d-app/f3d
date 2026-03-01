@@ -166,8 +166,8 @@ runs:
         ospray_version: ${{inputs.ospray_version}}
         pdal_version: ${{inputs.pdal_version}}
         proj_version: ${{inputs.proj_version}}
-        tbb_version: ${{inputs.tbb_version}}
         sqlite_csb_version: ${{inputs.sqlite_csb_version}}
+        tbb_version: ${{inputs.tbb_version}}
         tiff_version: ${{inputs.tiff_version}}
         vtk_version: ${{inputs.vtk_version}}
         zlib_version: ${{inputs.zlib_version}}
