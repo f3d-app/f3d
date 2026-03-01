@@ -2859,8 +2859,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
 
 void vtkF3DRenderer::ConfigureNormalGlyphs()
 {
-  bool normalGlyphsVisible =
-    !this->UseRaytracing && this->UseNormalGlyphs;
+  bool normalGlyphsVisible = !this->UseRaytracing && this->UseNormalGlyphs;
   for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
   {
     if (normalGlyphsVisible && !normalGlyph.InputDataHasNormals)
