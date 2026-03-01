@@ -314,17 +314,18 @@ bool vtkF3DMetaImporter::Update()
 
       ngs.InputDataHasNormals = points->GetPointData()->GetNormals() != nullptr;
 
-      vtkNew<vtkArrowSource> arrowSource;
-      ngs.GlyphMapper->SetInputData(points);
-      ngs.GlyphMapper->SetSourceConnection(arrowSource->GetOutputPort());
-      ngs.GlyphMapper->SetOrientationModeToDirection();
-      ngs.GlyphMapper->SetOrientationArray(vtkDataSetAttributes::NORMALS);
-      ngs.GlyphMapper->ScalingOn();
-
-      ngs.Actor->SetMapper(ngs.GlyphMapper);
-
-      this->Renderer->AddActor(ngs.Actor);
-      ngs.Actor->VisibilityOff();
+      if (ngs.InputDataHasNormals)
+      {
+        vtkNew<vtkArrowSource> arrowSource;
+        ngs.GlyphMapper->SetInputData(points);
+        ngs.GlyphMapper->SetSourceConnection(arrowSource->GetOutputPort());
+        ngs.GlyphMapper->SetOrientationModeToDirection();
+        ngs.GlyphMapper->SetOrientationArray(vtkDataSetAttributes::NORMALS);
+        ngs.GlyphMapper->ScalingOn();
+        ngs.Actor->SetMapper(ngs.GlyphMapper);
+        this->Renderer->AddActor(ngs.Actor);
+        ngs.Actor->VisibilityOff();
+      }
 
       // Create and configure point sprites actors
       this->Pimpl->PointSpritesActorsAndMappers.emplace_back(
