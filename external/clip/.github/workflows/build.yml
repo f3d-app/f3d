@@ -1,0 +1,63 @@
+name: build
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+        enable_image: [on, off]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ilammy/msvc-dev-cmd@v1
+      if: runner.os == 'Windows'
+    - name: Install Dependencies
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y libxcb1-dev libpng-dev
+    - name: Generating Makefiles
+      shell: bash
+      run: |
+        if [[ "${{ runner.os }}" == "Windows" ]] ; then
+          cmake . -G "NMake Makefiles" \
+                  -DCLIP_ENABLE_IMAGE=${{ matrix.enable_image }} \
+                  "-DCMAKE_CXX_FLAGS:STRING=-DWIN32 -D_WINDOWS -GR -EHsc -fsanitize=address" \
+                  "-DCMAKE_EXE_LINKER_FLAGS:STRING=-machine:x64 -fsanitize=address"
+        else
+          cmake . -G "Unix Makefiles" \
+                  -DCLIP_ENABLE_IMAGE=${{ matrix.enable_image }}
+        fi
+    - name: Compiling
+      shell: bash
+      run: cmake --build .
+    - name: Running Tests
+      shell: bash
+      run: |
+        if [[ "${{ runner.os }}" == "Linux" ]] ; then
+          export XVFB=xvfb-run
+        fi
+        $XVFB ctest --output-on-failure
+  mingw:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        sys: [ mingw64, mingw32, ucrt64, clang64 ]
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - uses: msys2/setup-msys2@v2
+      with:
+        release: false
+        msystem: ${{matrix.sys}}
+        pacboy: cc:p cmake:p ninja:p
+    - uses: actions/checkout@v4
+    - name: Generating Makefiles
+      run: cmake .
+    - name: Compiling
+      run: cmake --build .
+    - name: Test
+      run: ctest --output-on-failure

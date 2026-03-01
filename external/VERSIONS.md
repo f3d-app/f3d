@@ -1,5 +1,6 @@
 - cxxopts: v3.3.1
-- dmon: 1.3.8
-- imgui: v1.92.2
+- clip: v1.13 (with patches from master)
+- dmon: 1.3.9
+- imgui: v1.92.5
 - nlohmann_json: v3.12.0
-- tinyfiledialogs: v3.19.1
+- tinyfiledialogs: v3.21.2

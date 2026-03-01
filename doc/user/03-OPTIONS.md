@@ -7,10 +7,11 @@ F3D behavior can be fully controlled from the command line using the following o
 ### `--input=<input file>` (_string_)
 
 The input file or files to read, can also be provided as a positional argument. Support directories as well.
+If `-` is specified instead of a filename, the file will be streamed from the stdin, which will hang until a stream is provided.
 
 ### `--output=<png file>` (_string_)
 
-Instead of showing a render view and render into it, _render directly into a png file_. When used with --ref option, only outputs on failure. If `-` is specified instead of a filename, the PNG file is streamed to the stdout. Can use [template variables](#filename-templating).
+Instead of showing a render view and render into it, _render directly into a png file_. When used with --ref option, only outputs on failure. If `-` is specified instead of a filename, the PNG file is streamed to the stdout. Can use [template variables](#filename-templating). When using the `{frame}` variable, multiple animation frames are exported (see [Exporting animation frames](05-ANIMATIONS.md#exporting-animation-frames)).
 
 ### `--no-background` (_bool_, default: `false`)
 
@@ -30,7 +31,7 @@ List available _readers_ and exit. Ignore `--verbose`.
 
 ### `--force-reader=<reader>` (_string_)
 
-Force a specific [reader](02-SUPPORTED_FORMATS.md) to be used, disregarding the file extension.
+Force a specific [reader](02-SUPPORTED_FORMATS.md) to be used, disregarding the file extension and file content.
 
 ### `--list-bindings`
 
@@ -66,7 +67,7 @@ Frame rate used to refresh animation and other repeated tasks (watch, UI). Does 
 
 ### `--load-plugins=<paths or names>` (_string_)
 
-List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `hdf`, `occt`, `usd`, `vdb`. See [plugins](12-PLUGINS.md) for more info.
+List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `hdf`, `occt`, `usd`, `vdb`, `webifc`. See [plugins](12-PLUGINS.md) for more info.
 
 ### `--scan-plugins`
 
@@ -90,11 +91,11 @@ A repeatable option to reset [libf3d options](../libf3d/03-OPTIONS.md) manually.
 
 ## General Options
 
-### `--verbose=<[debug|info|warning|error|quiet]>` (_string_, default: `info`)
+### `--verbose=<[debug|info|warning|error|quiet]>` (_string_, default: `info`, implicit: `debug`)
 
-Set _verbose_ level, in order to provide more information about the loaded data in the output. If no level is provided, assume `debug`. Option parsing may ignore this flag.
+Set _verbose_ level, in order to provide more information about the loaded data in the output. Error reporting during option parsing may ignore this flag.
 
-### `--progress` (_bool_, default: `false`)
+### `--loading-progress` (_bool_, default: `false`)
 
 Show a _progress bar_ when loading the file.
 
@@ -174,9 +175,9 @@ Show armature if present (glTF only).
 
 Select the scene camera to use when available in the file. Automatically computed by default.
 
-### `-k`, `--trackball` (_bool_, default: `false`)
+### `-k`, `--interaction-style=<default|trackball|2d>` (_string_, default: `default`)
 
-Enable trackball interaction.
+Set the interaction style. `default` uses standard 3D interaction, `trackball` enables trackball interaction, `2d` enables 2D interaction mode (pan/zoom only, no rotation). In `2d` mode, the default camera zoom factor is `1.0` (no padding) instead of `0.9`.
 
 ### `--invert-zoom` (_bool_, default: `false`)
 
@@ -209,6 +210,15 @@ Can be useful to display non-ASCII filenames.
 
 Scale fonts. Useful for HiDPI displays.
 
+### `--font-color=<color>` (_color_, default: `0.957,0.957,0.957`)
+
+Set font color. Defaults to #F4F4F4(F3DWhite).
+
+### `--dpi-aware` (_bool_, default: `false`)
+
+Scale the _font scale_ and _resolution_ by the display scaling factor.
+Only supported on Windows platform.
+
 ### `--command-script=<command script>` (_script_)
 
 Provide a script file containing a list of [commands](07-COMMANDS.md) to be executed sequentially.
@@ -220,7 +230,7 @@ Set the opacity of the backdrop behind text information such as FPS, filename, m
 
 ## Material options
 
-### `-o`, `--point-sprites=<none|sphere|gaussian>` (_string_, default: `none`)
+### `-o`, `--point-sprites=<none|sphere|gaussian|circle|stddev|bound|cross>` (_string_, default: `none`, implicit: `sphere`)
 
 Select _points sprites_ types to show instead of the geometry.
 
@@ -319,6 +329,10 @@ Model-specified by default.
 Set the 2d transform to use for all textures applied to the model.
 Importer may set a default value depending on file type. If a default value exists, the default value is multiplied by the provided transform.
 
+### `--checkerboard` (_bool_, default: `false`)
+
+Override model's texture with a checkerboard texture.
+
 ## Window options
 
 ### `--background-color=<color>` (_color_, default: `0.2, 0.2, 0.2`)
@@ -378,23 +392,23 @@ Enable scalar coloring if present in the file. If `--coloring-array` is not set,
 The coloring array name to use when coloring.
 Use `--verbose` to recover the usable array names.
 
-### `-y`, `--comp=<comp_index>` (_int_, default: `-1`)
+### `-y`, `--coloring-component=<comp_index>` (_int_, default: `-1`, implicit: `-2`)
 
 Specify the _component from the scalar_ array to color with.
-Use with the scalar option. -1 means _magnitude_. -2 or the short option, -y, means _direct values_.
+Use with the scalar option. -1 means _magnitude_. -2 means _direct values_.
 When using _direct values_, components are used as L, LA, RGB, RGBA values depending on the number of components.
 
-### `-c`, `--cells` (_bool_, default: `false`)
+### `-c`, `--coloring-by-cells` (_bool_, default: `false`)
 
 Specify that the scalar array is to be found _on the cells_ instead of on the points.
 Use with the scalar option.
 
-### `--range=<min,max>` (_vector\<double\>_)
+### `--coloring-range=<min,max>` (_vector\<double\>_)
 
 Set the _coloring range_. Automatically computed by default.
 Use with the scalar option.
 
-### `-b`, `--bar` (_bool_, default: `false`)
+### `-b`, `--coloring-scalar-bar` (_bool_, default: `false`)
 
 Show _scalar bar_ of the coloring by array.
 Use with the scalar option.
@@ -415,11 +429,11 @@ Use with the scalar option.
 
 Set the number of distinct colors from [1, N] will be used in the colormap. Any values outside the valid range will result in smooth shading.
 
-### `--opacity-map-file=<name>` (_string_)
+### `--volume-opacity-file=<name>` (_string_)
 
 Set an _opacity map file for the coloring_.
 
-### `--opacity-map=<value, opacity>` (_vector\<double\>_, default: `0.0,0.0,1.0,1.0`)
+### `--volume-opacity-map=<value, opacity>` (_vector\<double\>_, default: `0.0,0.0,1.0,1.0`)
 
 Set a _custom opacity map for the coloring_.
 Only used with volume rendering for now.
@@ -429,7 +443,7 @@ Ignored if `--opacity-map-file` option is specified.
 
 Enable _volume rendering_. It is only functional for 3D image data (VTKXMLVTI, DICOM, NRRD, MetaImage files) and will display nothing with other formats. It forces coloring.
 
-### `-i`, `--inverse` (_bool_, default: `false`)
+### `-i`, `--volume-inverse` (_bool_, default: `false`)
 
 Inverse the linear opacity function used for volume rendering.
 
@@ -477,33 +491,34 @@ Set the camera to use the orthographic projection. Model-specified by default.
 
 Enable _OSPRay raytracing_. Requires OSPRay raytracing to be enabled in the linked VTK dependency.
 
-### `--samples=<samples>` (_int_, default: `5`)
+### `--raytracing-samples=<samples>` (_int_, default: `5`)
 
 Set the number of _samples per pixel_ when using raytracing.
 
-### `-d`, `--denoise` (_bool_, default: `false`)
+### `-d`, `--raytracing-denoise` (_bool_, default: `false`)
 
 _Denoise_ the image when using raytracing.
 
 ## PostFX (OpenGL) options
 
-### `-p`, `--blending` (_string_, default: `ddp`)
+### `-p`, `--blending` (_string_, default: `none`, implicit: `ddp`)
 
 Enable _translucency blending support_.
-This is a technique used to correctly render translucent objects (`ddp`: dual depth peeling for quality, `sort`: for gaussians, `stochastic`: fast).
+This is a technique used to correctly render translucent objects (`ddp`: dual depth peeling for quality, `sort`: for gaussians, `sort_cpu`: for gaussians, `stochastic`: fast).
 
 > [!WARNING]
 > `stochastic` is introducing a lot of noise with strong translucency.
 > It works better when combined with temporal anti-aliasing (when using `--anti-aliasing=taa` option)
 > `sort` is only working for 3D gaussians and requires compute shaders support.
+> Alternatively, `sort_cpu` will give the same result and work everywhere but it's much slower.
 
 ### `-q`, `--ambient-occlusion` (_bool_, default: `false`)
 
 Enable _ambient occlusion_. This is a technique used to improve the depth perception of the object.
 
-### `-a`, `--anti-aliasing` (_string_, default: `fxaa`)
+### `-a`, `--anti-aliasing` (_string_, default: `none`, implicit: `fxaa`)
 
-Anti-aliasing method (`fxaa`: fast, `ssaa`: quality, `taa`: balanced)
+Anti-aliasing method (`fxaa`: fast, `ssaa`: quality, `taa`: balanced, `none`: no anti aliasing)
 
 > [!WARNING]
 > `taa` forces rendering of the scene at regular interval and will introduce ghosting artifacts on animated scenes.
@@ -517,13 +532,18 @@ Enable generic filmic _Tone Mapping Pass_. This technique is used to map colors 
 
 Add a final shader to the output image. See the [dedicated documentation](10-FINAL_SHADER.md) for more details.
 
+### `--display-depth` (_bool_, default: `false`)
+
+Display the depth buffer as a grayscale image or with a colormap if `--scalar-coloring` is specified.
+Only opaque objects are displayed, translucent and volumetric objects are ignored.
+
 ## Testing options
 
-### `--ref=<png file>` (_string_)
+### `--reference=<png file>` (_string_)
 
 Render and compare with the provided _reference image_, for testing purposes. Use with output option to generate new baselines and diff images.
 
-### `--ref-threshold=<threshold>` (_double_, default: `0.04`)
+### `--reference-threshold=<threshold>` (_double_, default: `0.04`)
 
 Set the _comparison threshold_ to trigger a test failure or success. The default (0.04) correspond to almost visually identical images.
 
@@ -547,6 +567,10 @@ Some rendering options are not compatible between them, here is the precedence o
 
 To turn on/off boolean options, it is possible to write `--option=true` and `--option=false`, eg `--points-sprites=false`.
 
+If an option has an "implicit" value, it means that the options can be used without specifying the value to use the implicit value.
+
+The default correspond to the value without any (configuration file)[06-CONFIGURATION_FILE.md], which F3D is usually distributed with.
+
 As documented, the `--option=value` syntax should be preferred. The syntax `--option value` can have unintended effect with positional arguments.
 
 The `-R` short option has a special syntax: `-Rlibf3d.option` but can also be used with `--reset=libf3d.option`
@@ -554,6 +578,46 @@ The `-R` short option has a special syntax: `-Rlibf3d.option` but can also be us
 The `-D/--define` option has a special syntax: `-Dlibf3d.option=value` or `--define=libf3d.option=value`.
 
 All options are parsed according to their type, see the [parsing documentation](08-PARSING.md) for more details.
+
+## Piping
+
+F3D supports piping in and out for [most formats](02-SUPPORTED_FORMATS.md), using the `-` char, eg:
+
+```
+f3d - --output=- < path/to/file.glb > path/to/img.png
+```
+
+or, using [display](https://imagemagick.org/script/display.php#gsc.tab=0):
+
+```
+cat path/to/file.glb | f3d - --output=- | display
+```
+
+and even, using [build123d](https://github.com/gumyr/build123d):
+
+`script.py`:
+
+```py
+import sys
+
+from build123d import Box, Cylinder, export_brep, export_step
+from OCP.BRepTools import BRepTools
+
+obj = Box(2, 2, 1) - Cylinder(0.5, 2)
+BRepTools.Write_s(obj.wrapped, sys.stdout.buffer)
+```
+
+```
+python script.py | f3d - --output=- | display
+```
+
+While piping is more common on Linux, F3D supports it perfectly on Windows and MacOS as well.
+
+With versions of VTK < v9.6.20260128, specifying the [reader](02-SUPPORTED_FORMATS.md) to use is required, like this:
+
+```
+cat path/to/file.glb --force-reader=GLB | f3d - --output=- | display
+```
 
 ## Filename templating
 
@@ -569,6 +633,8 @@ The destination filename used by `--output` or to save screenshots using `--scre
 - `{date:format}`: current date as per C++'s `std::put_time` format
 - `{n}`: auto-incremented number to make filename unique (up to 1000000)
 - `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique (up to 1000000)
+- `{frame}`: frame number when outputting animation frames (see [Animations](05-ANIMATIONS.md))
+- `{frame:4}`, `{frame:5}`, ...: zero-padded frame number when outputting animation frames
 - variable names can be escaped by doubling the braces (eg. use `{{model}}.png` to output `{model}.png` without the model name being substituted)
 
 For example the screenshot filename is configured as `{app}/{model}_{n}.png` by default, meaning that, assuming the model `hello.glb` is being viewed,

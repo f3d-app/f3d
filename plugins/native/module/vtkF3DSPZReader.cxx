@@ -445,3 +445,21 @@ int vtkF3DSPZReader::RequestData(
 
   return 1;
 }
+
+//------------------------------------------------------------------------------
+bool vtkF3DSPZReader::CanReadFile(vtkResourceStream* stream)
+{
+  if (!stream)
+  {
+    return false;
+  }
+
+  // SPZ(Gunzip): 1F 8B
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  uint16_t magic;
+  if (stream->Read(&magic, sizeof(magic)) == sizeof(magic) && magic == 0x8B1F)
+  {
+    return true;
+  }
+  return false;
+}

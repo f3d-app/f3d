@@ -17,6 +17,7 @@
 #include <@F3D_READER_VTK_IMPORTER@.h>
 #endif
 
+#include <vtkMemoryResourceStream.h>
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
@@ -79,6 +80,8 @@ public:
     return true;
   }
 
+  using f3d::reader::createGeometryReader;
+
   /*
    * Create the geometry reader (VTK reader) for the given filename
    * The filename is collapsed as some VTK reader needs it to read reliably TODO add issue
@@ -88,10 +91,26 @@ public:
     vtkNew<@F3D_READER_VTK_READER@> geomReader;
     geomReader->SetFileName(vtksys::SystemTools::CollapseFullPath(fileName).c_str());
 
-    this->applyCustomReader(geomReader, fileName);
+    this->applyCustomReader(geomReader, fileName, nullptr);
 
     return geomReader;
   }
+
+#if @F3D_READER_HAS_SUPPORTS_STREAM@
+  /*
+   * Create the geometry reader (VTK reader) for the given stream
+   */
+  vtkSmartPointer<vtkAlgorithm> createGeometryReader(vtkResourceStream* stream) const override
+  {
+    vtkNew<@F3D_READER_VTK_READER@> geomReader;
+    geomReader->SetStream(stream);
+
+    this->applyCustomReader(geomReader, "", stream);
+
+    return geomReader;
+  }
+
+#endif
 #endif
 
 #if @F3D_READER_HAS_SCENE_READER@
@@ -104,6 +123,7 @@ public:
     return true;
   }
 
+  using f3d::reader::createSceneReader;
   /*
    * Create the scene reader (VTK importer) for the given filename
    * The filename is collapsed as some VTK reader needs it to read reliably TODO add issue
@@ -113,15 +133,68 @@ public:
     vtkNew<@F3D_READER_VTK_IMPORTER@> importer;
     importer->SetFileName(vtksys::SystemTools::CollapseFullPath(fileName).c_str());
 
-    this->applyCustomImporter(importer, fileName);
+    this->applyCustomImporter(importer, fileName, nullptr);
+
+    return importer;
+  }
+
+#if @F3D_READER_HAS_SUPPORTS_STREAM@
+  /*
+   * Create the scene reader (VTK importer) for the given stream
+   */
+  vtkSmartPointer<vtkImporter> createSceneReader(vtkResourceStream* stream) const override
+  {
+    vtkNew<@F3D_READER_VTK_IMPORTER@> importer;
+    importer->SetStream(stream);
+
+    this->applyCustomImporter(importer, "", stream);
 
     return importer;
   }
 #endif
+#endif
+
+  using reader::canRead;
+#if @F3D_READER_HAS_SUPPORTS_STREAM@
+  /**
+   * Return true if this reader supports stream
+   * false otherwise
+   */
+  bool supportsStream() const override
+  {
+    return true;
+  }
+
+#if @F3D_READER_STATIC_CAN_READ@ || @F3D_READER_MEMBER_CAN_READ@
+  /**
+   * Return true if this reader could be able to read provided stream,
+   * false if it is sure it cannot.
+   */
+  bool canRead([[maybe_unused]] vtkResourceStream* stream) const override
+  {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260128)
+#if @F3D_READER_STATIC_CAN_READ@
+    return @F3D_READER_VTK_READER_OR_IMPORTER@::CanReadFile(stream);
+#else // CAN_READ
+    vtkNew<@F3D_READER_VTK_READER_OR_IMPORTER@> object;
+    return object->CanReadFile(stream);
+#endif // F3D_READER_STATIC_CAN_READ
+#else // VTK_VERSION
+    return true;
+#endif // VTK_VERSION
+  }
+#endif //STATIC OR MEMBER
+#else // SUPPORTS_STREAM
+  bool canRead(vtkResourceStream* vtkNotUsed(stream)) const override
+  {
+    // SUPPORTS_STREAM not enabled, so fast content validation should always return true
+    return true;
+  }
+#endif // SUPPORTS_STREAM
 
 #if @F3D_READER_HAS_CUSTOM_CODE@
 #include "@F3D_READER_CUSTOM_CODE@"
-#endif
+#endif // F3D_READER_HAS_CUSTOM_CODE
 
 };
 

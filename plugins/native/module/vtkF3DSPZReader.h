@@ -14,11 +14,22 @@
 
 #include <vtkAbstractPolyDataReader.h>
 
+class vtkResourceStream;
+
 class vtkF3DSPZReader : public vtkAbstractPolyDataReader
 {
 public:
   static vtkF3DSPZReader* New();
   vtkTypeMacro(vtkF3DSPZReader, vtkPolyDataAlgorithm);
+
+  /**
+   * Return true if, after a quick check of file header, it looks like the provided stream
+   * can be read. Return false if it is sure it cannot be read as a stream.
+   *
+   * This only checks this is a gunzip file using the 1F8B magic.
+   * This is ok as SPZ is the only gunzip based format supported by F3D.
+   */
+  static bool CanReadFile(vtkResourceStream* stream);
 
 protected:
   vtkF3DSPZReader() = default;

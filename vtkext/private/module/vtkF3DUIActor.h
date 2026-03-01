@@ -10,6 +10,7 @@
 
 #include <vtkProp.h>
 
+#include <array>
 #include <cstdint>
 #include <deque>
 
@@ -159,6 +160,11 @@ public:
   void SetFontScale(const double fontScale);
 
   /**
+   * Set the font color
+   */
+  void SetFontColor(const std::array<double, 3>& color);
+
+  /**
    * Render the UI actor
    */
   int RenderOverlay(vtkViewport* vp) override;
@@ -279,6 +285,12 @@ protected:
 
   std::string FontFile = "";
   double FontScale = 1.0;
+
+  /**
+   * Initializing the vector here because its needed in the initialization function,
+   * but set afterwards.
+   */
+  std::array<double, 3> FontColor = { 1.0, 1.0, 1.0 };
 
   double BackdropOpacity = 0.9;
 

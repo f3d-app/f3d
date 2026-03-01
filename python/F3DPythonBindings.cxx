@@ -243,6 +243,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("tokenize", &f3d::utils::tokenize, py::arg("str"), py::arg("keep_comments") = true)
     .def_static(
       "glob_to_regex", &f3d::utils::globToRegex, py::arg("glob"), py::arg("path_separator") = '/')
+    .def_static("get_dpi_scale", &f3d::utils::getDPIScale)
     .def_static("get_env", &f3d::utils::getEnv)
     .def_static("get_known_folder", &f3d::utils::getKnownFolder);
 
@@ -444,9 +445,30 @@ PYBIND11_MODULE(pyf3d, module)
       "Add multiple filenames to the scene", py::arg("file_name_vector"))
     .def("add", py::overload_cast<const f3d::mesh_t&>(&f3d::scene::add),
       "Add a surfacic mesh from memory into the scene", py::arg("mesh"))
+    .def(
+      "add",
+      [](f3d::scene& scene, py::bytes buffer, std::size_t size)
+      {
+        PyErr_WarnEx(
+          PyExc_DeprecationWarning, "add(buffer, size) is deprecated, use add(buffer) instead.", 1);
+        std::string_view sv(buffer);
+        scene.add(reinterpret_cast<const std::byte*>(sv.data()), size);
+      },
+      "Add a memory buffer containing a file the scene", py::arg("buffer"), py::arg("size"))
+    .def(
+      "add",
+      [](f3d::scene& scene, py::bytes buffer)
+      {
+        std::string_view sv(buffer);
+        scene.add(reinterpret_cast<const std::byte*>(sv.data()), sv.size());
+      },
+      "Add a memory buffer containing a file the scene", py::arg("buffer"), py::prepend())
     .def("load_animation_time", &f3d::scene::loadAnimationTime)
     .def("animation_time_range", &f3d::scene::animationTimeRange)
     .def("available_animations", &f3d::scene::availableAnimations)
+    .def("get_animation_name", &f3d::scene::getAnimationName, py::arg("index") = -1,
+      "Returns the animation at an index (defaults to current)")
+    .def("get_animation_names", &f3d::scene::getAnimationNames, "Returns all animation names")
     .def("add_light", &f3d::scene::addLight, "Add a light to the scene", py::arg("light_state"))
     .def(
       "remove_light", &f3d::scene::removeLight, "Remove a light from the scene", py::arg("index"))

@@ -80,6 +80,9 @@ inputs:
   webp_version:
     description: "Version of webp to build"
     required: true
+  webifc_version:
+    description: "Version of webifc to build"
+    required: true
   zlib_version:
     description: "Version of zlib to build"
     required: true
@@ -120,6 +123,7 @@ runs:
         tbb_version: ${{inputs.tbb_version}}
         usd_version: ${{inputs.usd_version}}
         webp_version: ${{inputs.webp_version}}
+        webifc_version: ${{inputs.webifc_version}}
         zlib_version: ${{inputs.zlib_version}}
         global_cache_index: ${{inputs.global_cache_index}}
 
@@ -234,6 +238,7 @@ runs:
         -DF3D_PLUGIN_BUILD_ASSIMP=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_DRACO=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_HDF=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_WEBIFC=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_OCCT=${{ inputs.optional_deps_label == 'optional-deps' && inputs.static_label == 'no-static' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_VDB=${{ (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.0') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
@@ -291,7 +296,7 @@ runs:
         runner.os == 'macOS' &&
         inputs.cpu == 'x86_64'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionCycleComp)|(TestGLTFRigArmature)|(TestInteractionNoModelScrollWheel)|(TestInteractionNoModelScrollBar)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionCycleComp)|(TestGLTFRigArmature)|(TestInteractionNoModelScrollWheel)|(TestInteractionNoModelScrollBar)" >> $GITHUB_ENV
 
     # Certain tests are failing on macOS arm64 for unknown reasons
     # https://github.com/f3d-app/f3d/issues/1276
@@ -302,7 +307,7 @@ runs:
         runner.os == 'macOS' &&
         inputs.cpu == 'arm64'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheetConfigFile)|(TestInteractionCheatsheetWhiteBG)|(TestInteractionCheatsheetBlackBG)|(TestInteractionCheatsheetNoFile)|(TestInteractionCheatsheetOpacity)|(TestInteractionCheatsheetAnimationName)|(TestInteractionCheatsheetSSAA)|(TestMaxSizeAboveMultiFile)|(TestAxesCustomColor)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheetConfigFile)|(TestInteractionCheatsheetWhiteBG)|(TestInteractionCheatsheetBlackBG)|(TestInteractionCheatsheetNoFile)|(TestInteractionCheatsheetOpacity)|(TestInteractionCheatsheetAnimationName)|(TestInteractionCheatsheetSSAA)|(TestMaxSizeAboveMultiFile)|(TestAxesCustomColor)|(TestInteractionTAA)|(TestInteractionTAAMiddleClick)|(TestInteractionStochasticTAA)|(TestInteractionPointCloudTAA)" >> $GITHUB_ENV
 
     - name: Test
       shell: bash
@@ -334,6 +339,12 @@ runs:
         cmake --install . --component sdk
         cmake --install . --component configuration
         cmake --install . --component colormaps
+
+    - name: Install Mesa Windows in install
+      if: runner.os == 'Windows'
+      uses: f3d-app/install-mesa-windows-action@v2
+      with:
+        path: ${{github.workspace}}\install\bin
 
     - name: Build and configure python externally
       if: |
@@ -427,12 +438,6 @@ runs:
         inputs.bundle_label != 'bundle'
       shell: bash
       run: echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
-
-    - name: Install Mesa Windows in install
-      if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v2
-      with:
-        path: ${{github.workspace}}\install\bin
 
     # Grid rendering has artifacts in macOS arm64 CI
     # https://github.com/f3d-app/f3d/issues/1276

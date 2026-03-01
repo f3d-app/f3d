@@ -19,10 +19,12 @@ list(APPEND libf3dSDKTests_list
      TestSDKRenderAndInteract.cxx
      TestSDKRenderFinalShader.cxx
      TestSDKScene.cxx
+     TestSDKSceneFromBuffer.cxx
      TestSDKSceneFromMemory.cxx
      TestSDKUtils.cxx
      TestSDKUI.cxx
      TestSDKWindowAuto.cxx
+     TestTestSDKHelpers.cxx
 )
 
 # Tests having UI widgets
@@ -56,6 +58,14 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
   list(APPEND libf3dSDKTests_list
     TestSDKSceneInvalid.cxx
     TestSDKInvalidForceReader.cxx
+    )
+endif()
+
+# Invalid header detection need proper CanReadFile support
+# Merge with TestSDKScene.cxx when VTK v9.6 support is dropped.
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  list(APPEND libf3dSDKTests_list
+    TestSDKSceneInvalidHeader.cxx
     )
 endif()
 
@@ -157,7 +167,10 @@ list(APPEND libf3dSDKTestsNoRender_list
 foreach (test ${libf3dSDKTests_list})
   get_filename_component (TName ${test} NAME_WE)
   add_test (NAME libf3d::${TName} COMMAND libf3dSDKTests ${TName}  "${F3D_SOURCE_DIR}/testing/" "${CMAKE_BINARY_DIR}/Testing/Temporary/" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
-  set_tests_properties(libf3d::${TName} PROPERTIES TIMEOUT 30)
+  set_tests_properties(libf3d::${TName} PROPERTIES
+    LABELS "libf3d"
+    TIMEOUT 30
+  )
   if (NOT F3D_TESTING_ENABLE_RENDERING_TESTS AND NOT ${TName} IN_LIST libf3dSDKTestsNoRender_list)
     set_tests_properties(libf3d::${TName} PROPERTIES DISABLED ON)
   endif ()

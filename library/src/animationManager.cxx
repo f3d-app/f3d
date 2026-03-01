@@ -95,6 +95,7 @@ void animationManager::Initialize()
 
   // Reset animation indices before updating
   this->PreparedAnimationIndices.reset();
+  this->AnimationTimeSteps->Reset();
   this->PrepareForAnimationIndices();
 
   if (this->AvailAnimations == 0)
@@ -214,6 +215,46 @@ void animationManager::JumpToFrame(int frame, bool relative)
   }
 
   this->CurrentTime = this->TimeRange[0] + (nextFrame * this->DeltaTime * this->SpeedFactor);
+
+  if (this->LoadAtTime(this->CurrentTime))
+  {
+    this->Window.render();
+  }
+}
+
+//----------------------------------------------------------------------------
+void animationManager::JumpToKeyFrame(int keyframe, bool relative)
+{
+  if (this->AnimationTimeSteps->GetSize() == 0)
+  {
+    return;
+  }
+
+  const int timeStepsAvailable = this->AnimationTimeSteps->GetSize();
+
+  auto it = std::lower_bound(
+    this->AnimationTimeSteps->Begin(), this->AnimationTimeSteps->End(), this->CurrentTime);
+  const int closestKeyFrame = (it != this->AnimationTimeSteps->End())
+    ? static_cast<int>(std::distance(this->AnimationTimeSteps->Begin(), it))
+    : timeStepsAvailable - 1;
+
+  int nextKeyFrame = closestKeyFrame;
+  if (relative)
+  {
+    nextKeyFrame += keyframe;
+    nextKeyFrame = ((nextKeyFrame % timeStepsAvailable) + timeStepsAvailable) % timeStepsAvailable;
+  }
+  else
+  {
+    nextKeyFrame = keyframe > 0 ? std::min(keyframe, timeStepsAvailable - 1) : 0;
+    if (0 > keyframe || keyframe > timeStepsAvailable)
+    {
+      log::warn("Keyframe index ", keyframe, " is outside of range [0-", timeStepsAvailable - 1,
+        "], converting to ", nextKeyFrame, " instead.");
+    }
+  }
+
+  this->CurrentTime = this->AnimationTimeSteps->GetValue(nextKeyFrame);
 
   if (this->LoadAtTime(this->CurrentTime))
   {
@@ -362,33 +403,63 @@ void animationManager::CycleAnimation()
 }
 
 // ---------------------------------------------------------------------------------
-std::string animationManager::GetAnimationName()
+std::string animationManager::GetAnimationName(int indices)
 {
   assert(this->Importer);
-  if (this->PreparedAnimationIndices.has_value() &&
-    this->PreparedAnimationIndices.value().size() > 1)
+  if (indices == -1)
   {
-    std::vector<bool> animCheck(this->AvailAnimations, false);
-    for (int idx : this->PreparedAnimationIndices.value())
+    if (this->PreparedAnimationIndices.has_value() &&
+      this->PreparedAnimationIndices.value().size() > 1)
     {
-      if (idx < this->AvailAnimations)
+      std::vector<bool> animCheck(this->AvailAnimations, false);
+      for (int idx : this->PreparedAnimationIndices.value())
       {
-        animCheck[idx] = true;
+        if (idx < this->AvailAnimations)
+        {
+          animCheck[idx] = true;
+        }
       }
+      return std::none_of(animCheck.begin(), animCheck.end(), std::logical_not<>())
+        ? "All animations"
+        : "Multi animations";
     }
-    return std::none_of(animCheck.begin(), animCheck.end(), std::logical_not<>())
-      ? "All animations"
-      : "Multi animations";
+
+    if (this->AvailAnimations == 0 || !this->PreparedAnimationIndices.has_value() ||
+      this->PreparedAnimationIndices.value().empty() ||
+      this->PreparedAnimationIndices.value()[0] >= this->AvailAnimations)
+    {
+      return "No animation";
+    }
+
+    return this->Importer->GetAnimationName(this->PreparedAnimationIndices.value()[0]);
   }
 
-  if (this->AvailAnimations == 0 || !this->PreparedAnimationIndices.has_value() ||
-    this->PreparedAnimationIndices.value().empty() ||
-    this->PreparedAnimationIndices.value()[0] >= this->AvailAnimations)
+  if (this->AvailAnimations == 0 || indices < 0 || indices > this->AvailAnimations)
   {
     return "No animation";
   }
 
-  return this->Importer->GetAnimationName(this->PreparedAnimationIndices.value()[0]);
+  return this->Importer->GetAnimationName(indices);
+}
+
+// ---------------------------------------------------------------------------------
+std::vector<std::string> animationManager::GetAnimationNames()
+{
+  assert(this->Importer);
+
+  if (this->AvailAnimations == 0)
+  {
+    return {};
+  }
+
+  std::vector<std::string> animations(this->AvailAnimations);
+
+  for (int index = 0; index < this->AvailAnimations; index++)
+  {
+    animations[index] = this->Importer->GetAnimationName(index);
+  }
+
+  return animations;
 }
 
 //----------------------------------------------------------------------------
@@ -499,14 +570,22 @@ void animationManager::PrepareForAnimationIndices()
   bool foundAnimation = false;
   this->TimeRange[0] = std::numeric_limits<double>::infinity();
   this->TimeRange[1] = -std::numeric_limits<double>::infinity();
+  std::set<double> accumulatedTimeSteps;
   for (vtkIdType animIndex = 0; animIndex < this->AvailAnimations; animIndex++)
   {
     if (this->Importer->IsAnimationEnabled(animIndex))
     {
       double timeRange[2];
       int nbTimeSteps;
-      vtkNew<vtkDoubleArray> timeSteps;
-      this->Importer->GetTemporalInformation(animIndex, timeRange, nbTimeSteps, timeSteps);
+      this->Importer->GetTemporalInformation(
+        animIndex, timeRange, nbTimeSteps, this->AnimationTimeSteps);
+
+      // Accumulate timesteps to avoid overwrite
+      for (vtkIdType stepIndex = 0; stepIndex < this->AnimationTimeSteps->GetNumberOfTuples();
+           stepIndex++)
+      {
+        accumulatedTimeSteps.emplace(this->AnimationTimeSteps->GetValue(stepIndex));
+      }
 
       // Accumulate time ranges
       this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);
@@ -517,6 +596,17 @@ void animationManager::PrepareForAnimationIndices()
 
   if (foundAnimation)
   {
+    // Populate AnimationTimeSteps with accumulated values
+    this->AnimationTimeSteps->Reset();
+    int nbAccumulatedTimeSteps = static_cast<int>(accumulatedTimeSteps.size());
+    this->AnimationTimeSteps->SetNumberOfTuples(nbAccumulatedTimeSteps);
+    int index = 0;
+    for (double timeStep : accumulatedTimeSteps)
+    {
+      this->AnimationTimeSteps->SetValue(index, timeStep);
+      index++;
+    }
+
     // Check time range is valid
     if (this->TimeRange[0] > this->TimeRange[1])
     {

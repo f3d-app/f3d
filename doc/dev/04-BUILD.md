@@ -10,7 +10,7 @@ please take a look at our [getting started guide](03-GETTING_STARTED.md).
 ## Dependencies
 
 - [CMake](https://cmake.org) >= 3.1.
-- [VTK](https://vtk.org) >= 9.3.0 (9.5.2 recommended).
+- [VTK](https://vtk.org) >= 9.3.0 (9.6.0 recommended).
 - A C++17 compiler.
 - A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
 - Optionally, [Assimp](https://www.assimp.org/) >= 5.4.0 (6.0.2 recommended).
@@ -18,17 +18,19 @@ please take a look at our [getting started guide](03-GETTING_STARTED.md).
 - Optionally, [Alembic](http://www.alembic.io/) >= 1.8.5.
 - Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 24.08 (25.05.01 recommended).
 - Optionally, [OpenVDB](https://www.openvdb.org/download/) >= 12.0.0, enable `IOOpenVDB` module during VTK configuration.
-- Optionally, [OSPray](https://www.ospray.org/) == v2.12.0, enable `RenderingRayTracing` module during VTK configuration.
+- Optionally, [web-ifc](https://github.com/ThatOpen/engine_web-ifc) >= 0.75 (only C++ library).
+- Optionally, [OSPray](https://www.ospray.org/) == 2.12.0, enable `RenderingRayTracing` module during VTK configuration.
 - Optionally, [Draco](https://google.github.io/draco/) >= 1.5.6.
 - Optionally, [Python](https://www.python.org/) >= 3.10 and [pybind11](https://github.com/pybind/pybind11) >= 2.9.2.
 - Optionally, [Java](https://www.java.com) >= 17.
 - Optionally, [OpenEXR](https://openexr.com/en/latest/) >= 3.0.1.
+- Optionally, [WebP](https://chromium.googlesource.com/webm/libwebp) >= 1.2.4.
 
 F3D is tested continuously against versions recommended by the [VFX reference platform](https://vfxplatform.com) defined for **CY2025**
 
 ## VTK compatibility
 
-As stated in the dependencies, F3D is compatible with VTK >= 9.3.0, however, some features may not be available. We suggest using VTK 9.5.2 with RenderingRayTracing, IOExodus, IOHDF, IONetCDF and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
+As stated in the dependencies, F3D is compatible with VTK >= 9.3.0, however, some features may not be available. We suggest using VTK 9.6.0 with RenderingRayTracing, IOExodus, IOHDF, IONetCDF and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
 
 ## Configuration and building
 
@@ -51,6 +53,7 @@ Some modules, plugins and language bindings depending on external libraries can 
 - `F3D_MODULE_EXR`: Support for OpenEXR images. Requires `OpenEXR`. Disabled by default.
 - `F3D_MODULE_UI`: Support for ImGui widgets. Uses provided ImGui. Enabled by default.
 - `F3D_MODULE_WEBP`: Support for WebP images. Requires `libwebp`. Disabled by default.
+- `F3D_MODULE_CLIP`: Support for clipboard interaction. Uses provided clip. Experimental and not used yet. Disabled by default.
 - `F3D_PLUGIN_BUILD_HDF`: Support for VTKHDF (.vtkhdf), ExodusII (.ex2), and NetCDF (.nc) file formats. Requires that VTK has been built with `IOHDF`, `IOExodus`, and `IONetCDF` modules (and `hdf5`). Enabled by default.
 - `F3D_PLUGIN_BUILD_OCCT`: Support for STEP, IGES, BREP, and XBF file formats. Requires `OpenCASCADE`. Disabled by default.
 - `F3D_PLUGIN_BUILD_ASSIMP`: Support for FBX, DAE, OFF, DXF, X and 3MF file formats. Requires `Assimp`. Disabled by default.
@@ -60,7 +63,8 @@ Some modules, plugins and language bindings depending on external libraries can 
 - `F3D_PLUGIN_BUILD_VDB`: Support for VDB file format. Requires that VTK has been built with `IOOpenVDB` module (and `OpenVDB`). Disabled by default.
 - `F3D_BINDINGS_PYTHON`: Generate python bindings (requires `Python` and `pybind11`). Disabled by default.
 - `F3D_BINDINGS_PYTHON_GENERATE_STUBS`: Generate python stubs (requires `Python` and `pybind11_stubgen`). Disabled by default.
-- `F3D_BINDINGS_JAVA`: Generate java bindings (requires `Java` and `JNI`). Disabled by default.
+- `F3D_BINDINGS_JAVA`: Generate java bindings (requires `Java` >= 17 and `JNI`). Disabled by default.
+- `F3D_BINDINGS_C`: Generate C bindings. Disabled by default.
 
 Some dependencies are provided internally, eg: ImGui, dmon and others. Use `F3D_USE_EXTERNAL_*` to use an external version of these libraries.
 

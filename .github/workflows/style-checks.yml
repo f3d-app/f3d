@@ -1,6 +1,6 @@
 on:
   pull_request_target:
-    types: [assigned, opened, synchronize, reopened, labeled]
+    types: [opened, synchronize, reopened, labeled]
     branches:
       - master
       - release
@@ -54,6 +54,10 @@ jobs:
         with:
           dry: True
           prettier_options: "-w **/*.{js,json,md,html,yml}"
+
+      - name: JSON Schema Validation
+        shell: bash
+        run: pipx run check-jsonschema==0.36.1 --schemafile resources/cli-options.schema.json resources/cli-options.json
 
       - name: Echo Diff
         shell: bash

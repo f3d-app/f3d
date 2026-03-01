@@ -1,9 +1,11 @@
 #include <vtkNew.h>
 #include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
 #include <vtkTestUtilities.h>
 #include <vtkXMLUnstructuredGridReader.h>
 
 #include "vtkF3DGenericImporter.h"
+#include "vtkF3DInteractorStyle.h"
 #include "vtkF3DRenderer.h"
 
 #include <iostream>
@@ -73,6 +75,16 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   // Smoke test for deprecated HDRI collapse codepath
   // F3D_DEPRECATED
   renderer->SetHDRIFile("path/not/valid/../../to/file.ext");
+
+  // Check SetInteractionStyle without interactor (early return)
+  renderer->SetInteractionStyle("default");
+
+  // Check SetInteractionStyle with invalid style
+  vtkNew<vtkRenderWindowInteractor> interactor;
+  window->SetInteractor(interactor);
+  vtkNew<vtkF3DInteractorStyle> style;
+  interactor->SetInteractorStyle(style);
+  renderer->SetInteractionStyle("invalid");
 
   return EXIT_SUCCESS;
 }

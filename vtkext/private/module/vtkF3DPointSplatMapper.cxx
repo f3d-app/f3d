@@ -34,7 +34,9 @@
 #include <vtk_glew.h>
 #endif
 
+#include <algorithm>
 #include <sstream>
+#include <vector>
 
 //----------------------------------------------------------------------------
 class vtkF3DSplatMapperHelper : public vtkOpenGLPointGaussianMapperHelper
@@ -76,17 +78,22 @@ protected:
 
 private:
 #if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
-  void SortSplats(vtkRenderer* ren);
-
   vtkNew<vtkShader> DepthComputeShader;
   vtkNew<vtkShaderProgram> DepthProgram;
   vtkNew<vtkOpenGLBufferObject> DepthBuffer;
 
   vtkNew<vtkF3DBitonicSort> Sorter;
-
-  double DirectionThreshold = 0.999;
-  double LastDirection[3] = { 0.0, 0.0, 0.0 };
 #endif
+
+  std::vector<unsigned int> CPUSortedIndices;
+  std::vector<float> CPUDepths;
+
+  static constexpr double DirectionThreshold = 0.999;
+  double LastDirection[3] = { 0.0, 0.0, 0.0 };
+
+  bool SortNeeded(vtkRenderer* ren);
+  void SortSplats(vtkRenderer* ren);
+  void SortSplatsCPU(vtkRenderer* ren);
 
   bool OwnerUseInstancing();
 
@@ -311,71 +318,129 @@ void vtkF3DSplatMapperHelper::SetCameraShaderParameters(
   this->Superclass::SetCameraShaderParameters(cellBO, ren, actor);
 }
 
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+//------------------------------------------------------------------------------
+bool vtkF3DSplatMapperHelper::SortNeeded(vtkRenderer* ren)
+{
+  const double* focalPoint = ren->GetActiveCamera()->GetFocalPoint();
+  const double* origin = ren->GetActiveCamera()->GetPosition();
+  double direction[3];
+
+  for (int i = 0; i < 3; ++i)
+  {
+    // the orientation is reverted to sort splats back to front
+    direction[i] = origin[i] - focalPoint[i];
+  }
+
+  vtkMath::Normalize(direction);
+
+  if (vtkMath::Dot(this->LastDirection, direction) >= vtkF3DSplatMapperHelper::DirectionThreshold)
+  {
+    return false;
+  }
+
+  this->LastDirection[0] = direction[0];
+  this->LastDirection[1] = direction[1];
+  this->LastDirection[2] = direction[2];
+
+  return true;
+}
+
 //----------------------------------------------------------------------------
 void vtkF3DSplatMapperHelper::SortSplats(vtkRenderer* ren)
 {
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+
+  if (!this->SortNeeded(ren))
+  {
+    return;
+  }
+
   int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
 
-  if (numVerts)
-  {
-    const double* focalPoint = ren->GetActiveCamera()->GetFocalPoint();
-    const double* origin = ren->GetActiveCamera()->GetPosition();
-    double direction[3];
+  vtkOpenGLShaderCache* shaderCache =
+    vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow())->GetShaderCache();
 
-    for (int i = 0; i < 3; ++i)
-    {
-      // the orientation is reverted to sort splats back to front
-      direction[i] = origin[i] - focalPoint[i];
-    }
+  // compute next power of two
+  unsigned int numVertsExt = vtkMath::NearestPowerOfTwo(numVerts);
 
-    vtkMath::Normalize(direction);
+  // depth computation
+  shaderCache->ReadyShaderProgram(this->DepthProgram);
 
-    // sort the splats only if the camera direction has changed
-    if (vtkMath::Dot(this->LastDirection, direction) < this->DirectionThreshold)
-    {
-      vtkOpenGLShaderCache* shaderCache =
-        vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow())->GetShaderCache();
+  this->DepthProgram->SetUniform3f("viewDirection", this->LastDirection);
+  this->DepthProgram->SetUniformi("count", numVerts);
+  this->VBOs->GetVBO("vertexMC")->BindShaderStorage(0);
+  this->Primitives[PrimitivePoints].IBO->BindShaderStorage(1);
+  this->DepthBuffer->BindShaderStorage(2);
 
-      // compute next power of two
-      unsigned int numVertsExt = vtkMath::NearestPowerOfTwo(numVerts);
+  glDispatchCompute(numVertsExt / 32, 1, 1);
+  glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-      // depth computation
-      shaderCache->ReadyShaderProgram(this->DepthProgram);
-
-      this->LastDirection[0] = direction[0];
-      this->LastDirection[1] = direction[1];
-      this->LastDirection[2] = direction[2];
-
-      this->DepthProgram->SetUniform3f("viewDirection", direction);
-      this->DepthProgram->SetUniformi("count", numVerts);
-      this->VBOs->GetVBO("vertexMC")->BindShaderStorage(0);
-      this->Primitives[PrimitivePoints].IBO->BindShaderStorage(1);
-      this->DepthBuffer->BindShaderStorage(2);
-
-      glDispatchCompute(numVertsExt / 32, 1, 1);
-      glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
-      // sort
-      this->Sorter->Run(vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow()), numVerts,
-        this->DepthBuffer, this->Primitives[PrimitivePoints].IBO);
-    }
-  }
-}
+  // sort
+  this->Sorter->Run(vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow()), numVerts,
+    this->DepthBuffer, this->Primitives[PrimitivePoints].IBO);
 #endif
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DSplatMapperHelper::SortSplatsCPU(vtkRenderer* ren)
+{
+  if (!this->SortNeeded(ren))
+  {
+    return;
+  }
+
+  int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
+
+  this->CPUSortedIndices.resize(static_cast<size_t>(numVerts));
+
+  this->Primitives[PrimitivePoints].IBO->Download(
+    this->CPUSortedIndices.data(), static_cast<size_t>(numVerts));
+
+  this->CPUDepths.resize(static_cast<size_t>(numVerts));
+  // compute depth for each splat
+  vtkPolyData* poly = this->CurrentInput;
+
+  vtkPoints* points = poly->GetPoints();
+
+  for (int i = 0; i < numVerts; ++i)
+  {
+    const double* pos = points->GetPoint(i);
+    this->CPUDepths[i] = pos[0] * this->LastDirection[0] + pos[1] * this->LastDirection[1] +
+      pos[2] * this->LastDirection[2];
+  }
+
+  // Match bitonic sort ordering: sort ascending by depth (back-to-front given reversed direction)
+  std::sort(this->CPUSortedIndices.begin(), this->CPUSortedIndices.end(),
+    [&](const GLuint& a, const GLuint& b) { return this->CPUDepths[a] < this->CPUDepths[b]; });
+
+  this->Primitives[PrimitivePoints].IBO->Upload(this->CPUSortedIndices.data(),
+    static_cast<size_t>(numVerts), vtkOpenGLBufferObject::ObjectType::ElementArrayBuffer);
+}
 
 //----------------------------------------------------------------------------
 void vtkF3DSplatMapperHelper::RenderPieceDraw(vtkRenderer* ren, vtkActor* actor)
 {
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
   const vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(ren);
 
-  if (renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::SORT &&
-    vtkShader::IsComputeShaderSupported() && actor->HasTranslucentPolygonalGeometry())
+  if (actor->HasTranslucentPolygonalGeometry())
   {
-    this->SortSplats(ren);
+    if (renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::SORT)
+    {
+      if (vtkShader::IsComputeShaderSupported())
+      {
+        this->SortSplats(ren);
+      }
+      else
+      {
+        vtkWarningMacro("Compute shaders not supported, falling back to CPU sorting");
+        this->SortSplatsCPU(ren);
+      }
+    }
+    else if (renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::SORT_CPU)
+    {
+      this->SortSplatsCPU(ren);
+    }
   }
-#endif
 
   if (this->OwnerUseInstancing())
   {
@@ -400,43 +465,15 @@ void vtkF3DSplatMapperHelper::RenderPieceDraw(vtkRenderer* ren, vtkActor* actor)
 void vtkF3DSplatMapperHelper::ReplaceShaderPositionVC(
   std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
 {
-  vtkUniforms* uniforms = actor->GetShaderProperty()->GetVertexCustomUniforms();
-
-  // TAA
-  vtkUniforms::TupleType type = uniforms->GetUniformTupleType("jitter");
-  if (type != vtkUniforms::TupleTypeInvalid)
-  {
-    std::string VSSource = shaders[vtkShader::Vertex]->GetSource();
-
-    vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Dec",
-      "//VTK::PositionVC::Dec\n"
-      "  uniform vec2 jitter;\n",
-      false);
-
-    vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Impl",
-      "//VTK::PositionVC::Impl\n"
-      "  // apply temporal jittering for TAA\n"
-      "  gl_Position.xy += jitter * gl_Position.w;\n",
-      false);
-
-    shaders[vtkShader::Vertex]->SetSource(VSSource);
-  }
+  std::string VSSource = shaders[vtkShader::Vertex]->GetSource();
+  std::string FSSource = shaders[vtkShader::Fragment]->GetSource();
 
   if (this->OwnerUseInstancing())
   {
-    std::string FSSource = shaders[vtkShader::Fragment]->GetSource();
-
     vtkShaderProgram::Substitute(FSSource, "//VTK::PositionVC::Dec\n",
       "//VTK::PositionVC::Dec\n"
       "flat in int instanceId;\n");
 
-    shaders[vtkShader::Fragment]->SetSource(FSSource);
-  }
-
-  std::string VSSource = shaders[vtkShader::Vertex]->GetSource();
-
-  if (this->OwnerUseInstancing())
-  {
     vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Dec\n",
       "uniform float boundScale;\n"
       "out vec2 offsetVCVSOutput;\n"
@@ -472,6 +509,7 @@ void vtkF3DSplatMapperHelper::ReplaceShaderPositionVC(
   }
 
   shaders[vtkShader::Vertex]->SetSource(VSSource);
+  shaders[vtkShader::Fragment]->SetSource(FSSource);
 
   this->Superclass::ReplaceShaderPositionVC(shaders, ren, actor);
 }

@@ -18,7 +18,7 @@ struct TestTriggerHelper
   template<typename Func>
   void operator()(Func&& func) const
   {
-    f3d::engine engine = f3d::engine::create();
+    f3d::engine engine = f3d::engine::create(true);
     engine.getWindow().setSize(300, 300);
     engine.getScene().add(this->DataPath);
 
@@ -115,6 +115,40 @@ int TestSDKTriggerInteractions([[maybe_unused]] int argc, [[maybe_unused]] char*
     engine.getInteractor().triggerMousePosition(150, 200);
     engine.getInteractor().triggerMouseButton(
       f3d::interactor::InputAction::RELEASE, f3d::interactor::MouseButton::RIGHT);
+  });
+
+  // Trigger cheatsheet search filtering
+  helper("TestSDKTriggerInteractionsCheatSheetSearch", [](f3d::engine& engine) {
+    engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "H");
+    engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "H");
+    engine.getInteractor().triggerMousePosition(80, 30);
+    engine.getInteractor().triggerMouseButton(
+      f3d::interactor::InputAction::PRESS, f3d::interactor::MouseButton::LEFT);
+    engine.getInteractor().triggerMouseButton(
+      f3d::interactor::InputAction::RELEASE, f3d::interactor::MouseButton::LEFT);
+    engine.getInteractor().triggerTextCharacter('e');
+    engine.getInteractor().triggerTextCharacter('d');
+    engine.getInteractor().triggerTextCharacter('g');
+    engine.getInteractor().triggerTextCharacter('e');
+  });
+
+  // Trigger cheatsheet keybind search mode
+  helper("TestSDKTriggerInteractionsCheatSheetKeybindSearch", [](f3d::engine& engine) {
+    engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "H");
+    engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "H");
+    engine.getWindow().render();
+    engine.getInteractor().triggerMousePosition(200, 55);
+    engine.getWindow().render();
+    engine.getInteractor().triggerMouseButton(
+      f3d::interactor::InputAction::PRESS, f3d::interactor::MouseButton::LEFT);
+    engine.getInteractor().triggerMouseButton(
+      f3d::interactor::InputAction::RELEASE, f3d::interactor::MouseButton::LEFT);
+    engine.getInteractor().triggerMousePosition(80, 30);
+    engine.getInteractor().triggerMouseButton(
+      f3d::interactor::InputAction::PRESS, f3d::interactor::MouseButton::LEFT);
+    engine.getInteractor().triggerMouseButton(
+      f3d::interactor::InputAction::RELEASE, f3d::interactor::MouseButton::LEFT);
+    engine.getInteractor().triggerTextCharacter('E');
   });
 
   // following calls are only there for coverage

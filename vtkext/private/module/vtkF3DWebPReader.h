@@ -6,6 +6,9 @@
 #define vtkF3DWebPReader_h
 
 #include "vtkImageReader.h"
+#include "vtkVersion.h"
+
+class vtkResourceStream;
 
 class vtkF3DWebPReader : public vtkImageReader
 {
@@ -13,10 +16,20 @@ public:
   static vtkF3DWebPReader* New();
   vtkTypeMacro(vtkF3DWebPReader, vtkImageReader);
 
+  ///@{
   /**
-   * Return 1 if the reader is compatible with the given file
+   * Return 1 if, after a quick check of file header, it looks like the provided stream
+   * can be read. Return 0 if it is sure it cannot be read as a stream.
+   *
+   * Only check the header contains "RIFFxxxxWEBP"
    */
   int CanReadFile(const char* fname) override;
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260106)
+  int CanReadFile(vtkResourceStream* stream) override;
+#else
+  int CanReadFile(vtkResourceStream* stream);
+#endif
+  ///@}
 
   /**
    * List of extensions supported by this reader

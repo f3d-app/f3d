@@ -20,15 +20,40 @@ There are a few CMake options to configure the F3D testing framework:
 
 To run all tests, build and then run `ctest` from the build directory:
 
-```
+```bash
 cmake --build .
 ctest
 ```
 
 To run a specific test, use the `ctest -R <testname>` option:
 
-```
+```bash
 ctest -R PLY
+```
+
+### Test groups
+
+CTest labels allow you to easily target specific groups of tests.
+
+```bash
+ctest -L bindings # run all binding tests
+```
+
+Available labels:
+
+- `application` (all f3d application tests)
+- `libf3d` (all libf3d tests)
+- `bindings` (all binding tests)
+- `c`, `java`, `python`, `js` (label by specific binding)
+- `piped` (all piped tests)
+- `module` (all vtkext module tests)
+- `occt`, `abc`, `usd`, `webifc`, `draco`, ... (label by specific plugin)
+- `obj`, `spz`, `mdl`, ... (label by specific file extension)
+
+Labels can be combined to further refine test selection.
+
+```bash
+ctest -L assimp -L piped # run all piped tests which use assimp plugin
 ```
 
 ## Testing architecture
@@ -47,9 +72,10 @@ When contributing to F3D, it is necessary that new code is covered by a test in 
 All application tests are initiated via the [CTest](https://cmake.org/cmake/help/book/mastering-cmake/chapter/Testing%20With%20CMake%20and%20CTest.html) testing framework.
 CTest runs `f3d` with the `--output` and `--reference` arguments which renders an output image and compares it to a reference image. F3D compares the differences between the 2 images and compute a difference value and compare it to a threshold to check if a test passes or not.
 
-All aspects of the application test framework are handled in `application/testing/CMakeLists.txt`.
+All aspects of the application test framework are handled in `application/testing/`.
+Tests are split by plugins, features and such.
 
-Usually, adding a test is as simple as adding a line like this one:
+Usually, adding a test is as simple as adding a line like this to the right file:
 
 ```
 f3d_test(NAME TestName DATA datafile.ext ARGS --args-to-test)
@@ -83,6 +109,8 @@ There is many other keywords in the `f3d_test` macro, here is a non exhaustive l
 - `WILL_FAIL`: Tests that should fail in order to pass
 - `NO_DATA_FORCE_RENDER`: Tests that do not open any data yet require a rendering tests at the end, rely on an environment variable
 - `UI`: Tests that show the ImGui UI, hence require it to be present in order to be enabled
+
+All keywords are documented in the `cmake/f3dTest.cmake` file.
 
 ### Recovering baselines from CI
 
@@ -133,7 +161,7 @@ to add a C++ test in the library layer. These tests are simple C++ methods that 
 Library test cases are handled in `library/testing`.
 
 To add a test, create a new `TestSDKName.cxx` file containing a `int TestSDKName(int argc, char* argv[])` method,
-then implement your test in C++ using the [libf3d](../libf3d/01-OVERVIEW.md) API.
+then implement your test in C++ using the [libf3d](../libf3d/01-OVERVIEW.md) API and the `PseudoUnitTest` framework.
 Then add you new file to `src/library/testing/CMakeLists.txt`.
 
 It is supported to read file as input and perform image comparison against baselines as an output, see other tests as examples.

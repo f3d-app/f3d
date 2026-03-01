@@ -13,6 +13,11 @@ endif()
 
 f3d_plugin_init()
 
+set(_SUPPORTS_STREAM)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251210)
+  set(_SUPPORTS_STREAM SUPPORTS_STREAM)
+endif()
+
 f3d_plugin_declare_reader(
   NAME VDB
   EXTENSIONS vdb
@@ -20,6 +25,8 @@ f3d_plugin_declare_reader(
   OPTIONS downsampling_factor
   VTK_READER vtkOpenVDBReader
   FORMAT_DESCRIPTION "VDB"
+  ${_SUPPORTS_STREAM}
+  CAN_READ STATIC
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/vdb.inl"
 )
 

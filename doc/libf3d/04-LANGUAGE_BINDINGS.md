@@ -150,9 +150,9 @@ Some advanced libf3d API are not bound yet, here's the exhaustive list:
 - `f3d::interactor`: bindings related functions
 - `f3d::interactor`: `playInteraction` and `recordInteraction`
 
-## Java (experimental)
+## Java
 
-If the Java bindings have been generated using the `F3D_BINDINGS_JAVA` CMake option, the libf3d can be used directly from Java.
+If the Java bindings have been generated using the `F3D_BINDINGS_JAVA` CMake option, the libf3d can be used directly from Java >= 17.
 You can import the `f3d.jar` package and use the provided Java classes directly.
 Make sure to set `java.library.path` to the path where the JNI library is built.
 Here is an example showing how to use libf3d Java bindings:

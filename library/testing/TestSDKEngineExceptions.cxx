@@ -4,9 +4,8 @@
 #include <interactor.h>
 #include <window.h>
 
-#include <filesystem>
-
 #include <cstdlib>
+#include <filesystem>
 
 namespace fs = std::filesystem;
 

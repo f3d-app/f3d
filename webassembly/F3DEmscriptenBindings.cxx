@@ -155,13 +155,25 @@ EMSCRIPTEN_BINDINGS(f3d)
         }
       },
       emscripten::return_value_policy::reference())
+    .function(
+      "addBuffer",
+      +[](f3d::scene& scene, emscripten::val jsbuf) -> f3d::scene&
+      {
+        std::vector<unsigned char> data = emscripten::vecFromJSArray<unsigned char>(jsbuf);
+        return scene.add(reinterpret_cast<std::byte*>(data.data()), data.size());
+      },
+      emscripten::return_value_policy::reference())
     .function("clear", &f3d::scene::clear, emscripten::return_value_policy::reference())
     .function("loadAnimationTime", &f3d::scene::loadAnimationTime,
       emscripten::return_value_policy::reference())
     .function(
       "animationTimeRange",
       +[](f3d::scene& o) -> emscripten::val { return pairToJSArray(o.animationTimeRange()); })
-    .function("availableAnimations", &f3d::scene::availableAnimations);
+    .function("availableAnimations", &f3d::scene::availableAnimations)
+    .function("getAnimationName", &f3d::scene::getAnimationName)
+    .function(
+      "getAnimationNames",
+      +[](f3d::scene& scene) { return containerToJSArray(scene.getAnimationNames()); });
 
   // f3d::image
   emscripten::enum_<f3d::image::SaveFormat>("ImageSaveFormat")

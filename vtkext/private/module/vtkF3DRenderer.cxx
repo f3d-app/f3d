@@ -1,17 +1,20 @@
 #include "vtkF3DRenderer.h"
 
+#include "F3DCheckerBoard.h"
 #include "F3DColoringInfoHandler.h"
 #include "F3DDefaultHDRI.h"
 #include "F3DLog.h"
+#include "F3DUtils.h"
 #include "vtkF3DCachedLUTTexture.h"
 #include "vtkF3DCachedSpecularTexture.h"
+#include "vtkF3DDisplayDepthRenderPass.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DOverlayRenderPass.h"
+#include "vtkF3DPointSplatUtilsSDF.h"
 #include "vtkF3DPolyDataMapper.h"
 #include "vtkF3DRenderPass.h"
 #include "vtkF3DSolidBackgroundPass.h"
-#include "vtkF3DTAAResolvePass.h"
 #include "vtkF3DUserRenderPass.h"
 
 #include <vtkAxesActor.h>
@@ -19,6 +22,7 @@
 #include <vtkCamera.h>
 #include <vtkCameraOrientationRepresentation.h>
 #include <vtkCameraOrientationWidget.h>
+#include <vtkCameraPass.h>
 #include <vtkCellData.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkCullerCollection.h>
@@ -35,6 +39,7 @@
 #include <vtkMatrix4x4.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkObjectFactory.h>
+#include <vtkOpaquePass.h>
 #include <vtkOpenGLFXAAPass.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLRenderer.h>
@@ -481,6 +486,22 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   // Image post processing passes
   vtkSmartPointer<vtkRenderPass> renderingPass = newPass;
 
+  if (this->DisplayDepth)
+  {
+    // discard vtkF3DRenderPass if displaying depth
+    vtkNew<vtkOpaquePass> opaqueP;
+    vtkNew<vtkCameraPass> camP;
+    vtkNew<vtkF3DDisplayDepthRenderPass> depthP;
+    camP->SetDelegatePass(opaqueP);
+    depthP->SetDelegatePass(camP);
+    if (this->DisplayDepthScalarColoring)
+    {
+      this->ConfigureColoring();
+      depthP->SetColorMap(this->ColorTransferFunction);
+    }
+    renderingPass = depthP;
+  }
+
   if (this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::SSAA)
   {
     vtkNew<vtkSSAAPass> ssaaP;
@@ -521,18 +542,6 @@ void vtkF3DRenderer::ConfigureRenderPasses()
 
     this->SetPass(fxaaP);
     renderingPass = fxaaP;
-  }
-
-  if (this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::TAA)
-  {
-    vtkNew<vtkF3DTAAResolvePass> taaP;
-    taaP->SetDelegatePass(renderingPass);
-    renderingPass = taaP;
-
-    this->RenderWindow->AddObserver(
-      vtkCommand::WindowResizeEvent, taaP.Get(), &vtkF3DTAAResolvePass::ResetIterations);
-    this->RenderWindow->GetInteractor()->GetInteractorStyle()->AddObserver(
-      vtkCommand::InteractionEvent, taaP.Get(), &vtkF3DTAAResolvePass::ResetIterations);
   }
 
   if (this->FinalShader.has_value())
@@ -1573,7 +1582,11 @@ void vtkF3DRenderer::ConfigureTextActors()
     }
   }
 
-  this->UIActor->SetFontScale(this->FontScale);
+  this->UIActor->SetFontColor(FontColor);
+
+  double scaleFactor = this->DPIAware ? F3DUtils::getDPIScale() : 1.0;
+
+  this->UIActor->SetFontScale(this->FontScale * scaleFactor);
 
   this->TextActorsConfigured = true;
 }
@@ -1614,6 +1627,26 @@ void vtkF3DRenderer::SetFontScale(const double fontScale)
   if (this->FontScale != fontScale)
   {
     this->FontScale = fontScale;
+    this->TextActorsConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetFontColor(const std::array<double, 3>& color)
+{
+  if (this->FontColor != color)
+  {
+    this->FontColor = color;
+    this->TextActorsConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetDPIAware(bool enable)
+{
+  if (this->DPIAware != enable)
+  {
+    this->DPIAware = enable;
     this->TextActorsConfigured = false;
   }
 }
@@ -1744,6 +1777,12 @@ void vtkF3DRenderer::SetAntiAliasingMode(AntiAliasingMode mode)
 }
 
 //----------------------------------------------------------------------------
+vtkF3DRenderer::AntiAliasingMode vtkF3DRenderer::GetAntiAliasingMode() const
+{
+  return this->AntiAliasingModeEnabled;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseToneMappingPass(bool use)
 {
   if (this->UseToneMappingPass != use)
@@ -1751,6 +1790,26 @@ void vtkF3DRenderer::SetUseToneMappingPass(bool use)
     this->UseToneMappingPass = use;
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetDisplayDepth(bool use)
+{
+  if (this->DisplayDepth != use)
+  {
+    this->DisplayDepth = use;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetDisplayDepthScalarColoring(bool use)
+{
+  if (this->DisplayDepthScalarColoring != use)
+  {
+    this->DisplayDepthScalarColoring = use;
+    this->RenderPassesConfigured = false;
   }
 }
 
@@ -1984,12 +2043,35 @@ void vtkF3DRenderer::SetUseOrthographicProjection(const std::optional<bool>& use
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetUseTrackball(bool use)
+void vtkF3DRenderer::SetInteractionStyle(const std::string& style)
 {
-  if (this->UseTrackball != use)
+  vtkRenderWindowInteractor* rwi =
+    this->GetRenderWindow() ? this->GetRenderWindow()->GetInteractor() : nullptr;
+  auto* interactorStyle =
+    rwi ? vtkF3DInteractorStyle::SafeDownCast(rwi->GetInteractorStyle()) : nullptr;
+
+  if (!interactorStyle)
   {
-    this->UseTrackball = use;
-    this->CheatSheetConfigured = false;
+    return;
+  }
+
+  if (style == "2d")
+  {
+    interactorStyle->SetInteractionMode(vtkF3DInteractorStyle::TWO_D);
+  }
+  else if (style == "trackball")
+  {
+    interactorStyle->SetInteractionMode(vtkF3DInteractorStyle::TRACKBALL);
+  }
+  else if (style == "default")
+  {
+    interactorStyle->SetInteractionMode(vtkF3DInteractorStyle::DEFAULT);
+  }
+  else
+  {
+    F3DLog::Print(
+      F3DLog::Severity::Warning, "Unrecognized interaction style \"" + style + "\", using default");
+    interactorStyle->SetInteractionMode(vtkF3DInteractorStyle::DEFAULT);
   }
 }
 
@@ -2085,8 +2167,6 @@ void vtkF3DRenderer::UpdateActors()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
-  this->ConfigureJitter(this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::TAA);
-
   if (!this->TimerVisible)
   {
     this->Superclass::Render();
@@ -2343,6 +2423,16 @@ void vtkF3DRenderer::SetTextureNormal(const std::optional<fs::path>& tex)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetEnableCheckerBoard(bool enable)
+{
+  if (this->EnableCheckerBoard != enable)
+  {
+    this->EnableCheckerBoard = enable;
+    this->ActorsPropertiesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetPointSpritesType(vtkF3DRenderer::SplatType type)
 {
   if (this->PointSpritesType != type)
@@ -2542,6 +2632,56 @@ void vtkF3DRenderer::ConfigureActorsProperties()
       coloring.Actor->GetProperty()->SetTexture("matcap", matCapTex);
       coloring.OriginalActor->GetProperty()->SetTexture("matcap", matCapTex);
     }
+
+    if (this->EnableCheckerBoard)
+    {
+      vtkPolyData* polydata = vtkPolyData::SafeDownCast(coloring.Actor->GetMapper()->GetInput());
+      const bool actorHasUV = polydata && polydata->GetPointData()->GetTCoords();
+
+      if (actorHasUV)
+      {
+        if (!this->CheckerBoardReader)
+        {
+          this->CheckerBoardReader = vtkSmartPointer<vtkPNGReader>::New();
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+          vtkNew<vtkMemoryResourceStream> stream;
+          stream->SetBuffer(F3DCheckerBoard, sizeof(F3DCheckerBoard));
+          this->CheckerBoardReader->SetStream(stream);
+#else
+          this->CheckerBoardReader->SetMemoryBuffer(F3DCheckerBoard);
+          this->CheckerBoardReader->SetMemoryBufferLength(sizeof(F3DCheckerBoard));
+#endif
+        }
+
+        if (!this->CheckerBoardTexture)
+        {
+          this->CheckerBoardReader->Update();
+          this->CheckerBoardTexture = vtkSmartPointer<vtkTexture>::New();
+          this->CheckerBoardTexture->SetInputConnection(this->CheckerBoardReader->GetOutputPort());
+          this->CheckerBoardTexture->UseSRGBColorSpaceOn();
+          this->CheckerBoardTexture->InterpolateOn();
+          this->CheckerBoardTexture->MipmapOn();
+          this->CheckerBoardTexture->SetColorModeToDirectScalars();
+        }
+
+        assert(this->CheckerBoardTexture);
+        coloring.Actor->GetProperty()->SetBaseColorTexture(this->CheckerBoardTexture);
+        coloring.OriginalActor->GetProperty()->SetBaseColorTexture(this->CheckerBoardTexture);
+        coloring.Actor->GetProperty()->SetMetallic(0.f);
+        coloring.OriginalActor->GetProperty()->SetMetallic(0.f);
+        coloring.Actor->GetProperty()->SetBaseIOR(1.f);
+        coloring.OriginalActor->GetProperty()->SetBaseIOR(1.f);
+        coloring.Actor->GetProperty()->SetNormalTexture(nullptr);
+        coloring.OriginalActor->GetProperty()->SetNormalTexture(nullptr);
+        coloring.Actor->GetProperty()->SetEmissiveTexture(nullptr);
+        coloring.OriginalActor->GetProperty()->SetEmissiveTexture(nullptr);
+      }
+      else
+      {
+        F3DLog::Print(F3DLog::Severity::Warning,
+          "Texture coordinates are required to display checkerboard texture.");
+      }
+    }
   }
 
   for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
@@ -2595,6 +2735,14 @@ void vtkF3DRenderer::ConfigurePointSprites()
     splatMapper->SetUseInstancing(this->PointSpritesUseInstancing);
 #endif
 
+    // add SDF functions
+    vtkShaderProperty* sp = sprites.Actor->GetShaderProperty();
+    sp->ClearAllFragmentShaderReplacements();
+
+    std::string sdfFunctions = vtkF3DPointSplatUtilsSDF;
+    sp->AddFragmentShaderReplacement(
+      "//VTK::PositionVC::Dec\n", true, sdfFunctions + "//VTK::PositionVC::Dec\n", true);
+
     sprites.Mapper->EmissiveOff();
     sprites.Mapper->SetScaleFactor(scaleFactor);
 
@@ -2639,21 +2787,76 @@ void vtkF3DRenderer::ConfigurePointSprites()
       sprites.Mapper->SetSplatShaderCode(nullptr); // gaussian is the default VTK shader
       sprites.Actor->ForceTranslucentOn();
     }
-    else
+    else if (this->PointSpritesType == SplatType::SPHERE)
     {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
-      sprites.Mapper->SetBoundScale(1.0);
+      sprites.Mapper->SetBoundScale(1.1);
 #endif
       sprites.Mapper->SetSplatShaderCode(
         "//VTK::Color::Impl\n"
-        "float dist = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"
-        "if (dist > 1.0) {\n"
-        "  discard;\n"
-        "} else {\n"
-        "  float scale = (1.0 - dist);\n"
-        "  ambientColor *= scale;\n"
-        "  diffuseColor *= scale;\n"
-        "}\n");
+        "float dist = sdCircle(offsetVCVSOutput, 1.0);\n"
+        "opacity = fill(dist);\n"
+        // -dist is the cosine of the angle between the camera
+        // direction (Z) and the normal of the "sphere"
+        // so scaling with this value gives an approximation of the Lambertian diffuse
+        "diffuseColor *= clamp(-dist, 0.0, 1.0);\n");
+
+      sprites.Actor->ForceTranslucentOff();
+    }
+    else if (this->PointSpritesType == SplatType::CIRCLE)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(1.1);
+#endif
+
+      sprites.Mapper->SetSplatShaderCode(
+        "//VTK::Color::Impl\n"
+        "opacity = stroke(sdCircle(offsetVCVSOutput, 1.0), 2.0);\n");
+
+      sprites.Actor->ForceTranslucentOff();
+    }
+    else if (this->PointSpritesType == SplatType::STD_DEV)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(3.1);
+#endif
+      sprites.Mapper->SetSplatShaderCode(
+        "//VTK::Color::Impl\n"
+        "opacity = fill(sdCircle(offsetVCVSOutput, 1.0));\n"
+        "opacity += stroke(sdCircle(offsetVCVSOutput, 2.0), 2.0);\n"
+        "opacity += stroke(sdCircle(offsetVCVSOutput, 3.0), 1.0);\n"
+        "opacity = clamp(opacity, 0.0, 1.0);\n");
+
+      sprites.Actor->ForceTranslucentOff();
+    }
+    else if (this->PointSpritesType == SplatType::BOUND)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(3.1);
+#endif
+      sprites.Mapper->SetSplatShaderCode(
+        "//VTK::Color::Impl\n"
+        "vec2 g = fwidth(offsetVCVSOutput);\n"
+        "vec2 p = offsetVCVSOutput / g;\n"
+        "opacity = strokePx(sdRoundBox(p, vec2(3.0) / g, 4.0), 2.0);\n");
+
+      sprites.Actor->ForceTranslucentOff();
+    }
+    else if (this->PointSpritesType == SplatType::CROSS)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(1.1);
+#endif
+      sprites.Mapper->SetSplatShaderCode(
+        "//VTK::Color::Impl\n"
+        "vec2 g = fwidth(offsetVCVSOutput);\n"
+        "vec2 p = offsetVCVSOutput / g;\n"
+        "float d1 = sdSegment(p, vec2(0., -1.0) / g, vec2(0., 1.0) / g);\n"
+        "float d2 = sdSegment(p, vec2(-1.0, 0.) / g, vec2(1.0, 0.) / g);\n"
+        "const float thickness = 2.0;\n"
+        "d1 = opShift(d1, thickness);\n"
+        "d2 = opShift(d2, thickness);\n"
+        "opacity = fillPx(opRoundMerge(d1, d2, thickness));\n");
 
       sprites.Actor->ForceTranslucentOff();
     }
@@ -2860,7 +3063,8 @@ void vtkF3DRenderer::ConfigureColoring()
   assert(this->Importer);
 
   // Recover coloring information and update handler
-  bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
+  bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume) ||
+    (this->DisplayDepth && this->DisplayDepthScalarColoring);
   F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
   auto info = coloringHandler.SetCurrentColoring(
     enableColoring, this->UseCellColoring, this->ArrayNameForColoring, false);
@@ -3134,72 +3338,6 @@ void vtkF3DRenderer::ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf,
       otf->AddPoint(range[0] + (range[1] - range[0]) * opacityMap[i], value);
     }
   }
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::ConfigureJitter(bool enable)
-{
-  // needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12534
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251017)
-  if (!enable)
-  {
-    ExecFuncOnAllPolyDataUniforms(
-      this->GetActors(), [](vtkUniforms* uniforms) { uniforms->RemoveUniform("jitter"); });
-    return;
-  }
-#endif
-
-  float jitter[2];
-
-  if (enable)
-  {
-    jitter[0] = this->ConfigureHaltonSequence(0);
-    jitter[1] = this->ConfigureHaltonSequence(1);
-
-    vtkRenderWindow* renderWindow = this->GetRenderWindow();
-    int width = renderWindow->GetSize()[0];
-    int height = renderWindow->GetSize()[1];
-
-    jitter[0] = ((jitter[0] - 0.5f) / width) * 2.0f;
-    jitter[1] = ((jitter[1] - 0.5f) / height) * 2.0f;
-  }
-  else
-  {
-    jitter[0] = 0.0f;
-    jitter[1] = 0.0f;
-  }
-
-  ExecFuncOnAllPolyDataUniforms(
-    this->GetActors(), [&](vtkUniforms* uniforms) { uniforms->SetUniform2f("jitter", jitter); });
-}
-
-//----------------------------------------------------------------------------
-float vtkF3DRenderer::ConfigureHaltonSequence(int direction)
-{
-  assert(direction == 0 || direction == 1);
-
-  int base = 2 + direction;
-  int& numerator = this->TaaHaltonNumerator[direction];
-  int& denominator = this->TaaHaltonDenominator[direction];
-
-  int difference = denominator - numerator;
-  if (difference == 1)
-  {
-    numerator = 1;
-    denominator *= base;
-  }
-  else
-  {
-    int quotient = denominator / base;
-    while (difference <= quotient && quotient > 0)
-    {
-      quotient = quotient / base;
-    }
-
-    numerator = (base + 1) * quotient - difference;
-  }
-
-  return static_cast<float>(numerator) / static_cast<float>(denominator);
 }
 
 //----------------------------------------------------------------------------

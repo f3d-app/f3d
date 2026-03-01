@@ -1,12 +1,15 @@
+#include "PseudoUnitTest.h"
+#include "TestSDKHelpers.h"
+
 #include <engine.h>
 #include <options.h>
 #include <scene.h>
 #include <window.h>
 
-#include "TestSDKHelpers.h"
-
 int TestSDKRenderFinalShader([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
+  PseudoUnitTest test;
+
   f3d::engine eng = f3d::engine::create(true);
 
   f3d::window& win = eng.getWindow();
@@ -36,22 +39,16 @@ int TestSDKRenderFinalShader([[maybe_unused]] int argc, [[maybe_unused]] char* a
   f3d::options& options = eng.getOptions();
   options.render.effect.final_shader = negativeShader;
 
-  if (!TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
-        "TestSDKRenderFinalShaderNegative"))
-  {
-    std::cerr << "Negative shader failure";
-    return EXIT_FAILURE;
-  }
+  test("render with negative shader",
+    TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
+      "TestSDKRenderFinalShaderNegative"));
 
   // change the shader to test the recompilation is triggered
   options.render.effect.final_shader = vignetteShader;
 
-  if (!TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
-        "TestSDKRenderFinalShaderVignette"))
-  {
-    std::cerr << "Vignette shader failure";
-    return EXIT_FAILURE;
-  }
+  test("render with vignetter shader",
+    TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
+      "TestSDKRenderFinalShaderVignette"));
 
-  return EXIT_SUCCESS;
+  return test.result();
 }

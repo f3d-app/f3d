@@ -25,21 +25,8 @@ f3d_plugin_build(
   FREEDESKTOP
 )
 
+option(BUILD_TESTING "Build the example tests" OFF)
 if(BUILD_TESTING)
   enable_testing()
-
-  # Finding f3d is needed to test the plugin
-  find_package(f3d REQUIRED COMPONENTS application)
-  add_test(NAME TestPluginExample
-          COMMAND "$<TARGET_FILE:f3d::f3d>"
-                  "--no-config"
-                  "--no-render"
-                  "--verbose"
-                  "--load-plugins=$<TARGET_FILE:f3d-plugin-example>"
-                  "${CMAKE_CURRENT_SOURCE_DIR}/data.expl"
-  )
-
-  set_tests_properties(TestPluginExample PROPERTIES
-    PASS_REGULAR_EXPRESSION "Number of points: 3"
-  )
+  f3d_test(NAME TestPluginExample DATA ${CMAKE_CURRENT_SOURCE_DIR}/data.expl NO_RENDER ARGS --verbose --load-plugins=$<TARGET_FILE:f3d-plugin-example> REGEXP "Number of points: 3")
 endif()

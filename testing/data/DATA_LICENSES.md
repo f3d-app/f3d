@@ -26,12 +26,13 @@
 - duck.dae: assimp test models: BSD-3-Clause
 - duck.fbx: assimp test models: BSD-3-Clause
 - Duck0.bin: Copyright 2006 Sony Computer Entertainment Inc.: SCEA Shared Source License
-- duck_invalid.gltf: Copyright 2006 Sony Computer Entertainment Inc.: SCEA Shared Source License
+- invalid_body.gltf: (duck.gltf) Copyright 2006 Sony Computer Entertainment Inc.: SCEA Shared Source License
 - flame_mixed.mdl: LibreQuake Project: BSD-3-Clause
 - HeadMRVolume\*: VTK Data: BSD-3-Clause
 - hornedlizard_small_d\*.spz: Modified from [Niantic's SPZ samples](https://github.com/nianticlabs/spz): MIT
 - icosahedron.vdb: OpenVDB: [MPL-2.0](http://www.mozilla.org/MPL/2.0/)
 - iflamigm.3ds: VTK Data: BSD-3-Clause
+- IfcOpenHouse_IFC4.ifc: [ThatOpen/engine_web-ifc](https://github.com/ThatOpen/engine_web-ifc): [MPL-2.0](https://www.mozilla.org/en-US/MPL/2.0/)
 - IM-0001-1983.dcm: VTK Data: BSD-3-Clause
 - InterpolationTest.glb: glTF-Sample-Models: Public Domain
 - kloofendal_43d_clear_1k.exr: Polyhaven: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
@@ -63,9 +64,8 @@
 - UnlitTest.glb: glTF-Sample-Models/Analytical Graphics, Inc.: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - v_rock2.mdl: LibreQuake Project: BSD-3-Clause
 - vase_4comp.vti: VTK Data: BSD-3-Clause
-- w_medkit_hl.mdl: Nomadnetic: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- invalid_version.mdl: (w_medkit_hl.mdl) Nomadnetic: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - WaterBottle.glb: glTF-Sample-Models: Public Domain
-- Wolf.fbx: OLEKSO: [CC-NC 4.0](http://creativecommons.org/licenses/by-nc/4.0/)
 - world\*: VTK Data: BSD-3-Clause
 - xform_anim.abc: Public Domain
 - joint1.abc: Public Domain

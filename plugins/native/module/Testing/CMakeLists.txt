@@ -1,5 +1,10 @@
 set(vtkextNativeTests_list "")
 
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
+  list(APPEND vtkextNativeTests_list
+    TestF3DImageImporterError.cxx)
+endif()
+
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12087
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
   list(APPEND vtkextNativeTests_list
@@ -7,9 +12,15 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
     TestF3DSplatReader.cxx
     TestF3DPLYReader.cxx
     TestF3DQuakeMDLImporterStream.cxx
+    TestF3DQuakeMDLImporterStreamError.cxx
     TestF3DQuakeMDLImporterInexistent.cxx
     TestF3DQuakeMDLParser.cxx
   )
+endif()
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  list(APPEND vtkextNativeTests_list
+    TestF3DImageImporterCanReadFile.cxx)
 endif()
 
 vtk_add_test_cxx(vtkextNativeTests tests

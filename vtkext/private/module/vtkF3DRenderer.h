@@ -36,6 +36,7 @@ class vtkDiscretizableColorTransferFunction;
 class vtkF3DOpenGLGridMapper;
 class vtkGridAxesActor3D;
 class vtkImageReader2;
+class vtkPNGReader;
 class vtkOrientationMarkerWidget;
 class vtkScalarBarActor;
 class vtkSkybox;
@@ -66,6 +67,7 @@ public:
     NONE,
     DUAL_DEPTH_PEELING,
     SORT,
+    SORT_CPU,
     STOCHASTIC
   };
 
@@ -75,7 +77,11 @@ public:
   enum class SplatType : unsigned char
   {
     SPHERE,
-    GAUSSIAN
+    GAUSSIAN,
+    CIRCLE,
+    STD_DEV,
+    BOUND,
+    CROSS
   };
 
   ///@{
@@ -108,6 +114,8 @@ public:
   void SetPointSize(const std::optional<double>& pointSize);
   void SetFontFile(const std::optional<fs::path>& fontFile);
   void SetFontScale(const double fontScale);
+  void SetFontColor(const std::array<double, 3>& color);
+  void SetDPIAware(bool enable);
   void SetHDRIFile(const std::optional<fs::path>& hdriFile);
   void SetUseImageBasedLighting(bool use) override;
   void SetBackground(const double* backgroundColor) override;
@@ -136,9 +144,13 @@ public:
   void SetUseRaytracing(bool use);
   void SetUseRaytracingDenoiser(bool use);
   void SetBlendingMode(BlendingMode mode);
+  BlendingMode GetBlendingMode() const;
   void SetUseSSAOPass(bool use);
   void SetAntiAliasingMode(AntiAliasingMode mode);
+  AntiAliasingMode GetAntiAliasingMode() const;
   void SetUseToneMappingPass(bool use);
+  void SetDisplayDepth(bool use);
+  void SetDisplayDepthScalarColoring(bool use);
   void SetUseBlurBackground(bool use);
   void SetBlurCircleOfConfusionRadius(double radius);
   void SetRaytracingSamples(int samples);
@@ -147,22 +159,9 @@ public:
   ///@}
 
   /**
-   * Get BlendingMode
-   */
-  BlendingMode GetBlendingMode() const;
-
-  /**
    * Set SetUseOrthographicProjection
    */
   void SetUseOrthographicProjection(const std::optional<bool>& use);
-
-  ///@{
-  /**
-   * Set/Get UseTrackball
-   */
-  void SetUseTrackball(bool use);
-  vtkGetMacro(UseTrackball, bool);
-  ///@}
 
   ///@{
   /**
@@ -171,6 +170,12 @@ public:
   vtkSetMacro(InvertZoom, bool);
   vtkGetMacro(InvertZoom, bool);
   ///@}
+
+  /**
+   * Set the interaction style from a string.
+   * Accepted values: "default", "trackball", "2d".
+   */
+  void SetInteractionStyle(const std::string& style);
 
   /**
    * Reimplemented to configure:
@@ -391,6 +396,11 @@ public:
   vtkGetMacro(EnableColoring, bool);
   ///@}
 
+  /**
+   * Set checkerboard mode
+   */
+  void SetEnableCheckerBoard(bool enable);
+
   ///@{
   /**
    * Set/Get if using point or cell data coloring
@@ -597,17 +607,6 @@ private:
     const std::vector<double>& opacityMap, bool inverseOpacityFlag);
 
   /**
-   * Configure screen spaced jittering for TAA
-   */
-  void ConfigureJitter(bool enable);
-
-  /**
-   * Configure Halton sequence for TAA. Valid direction values are 0 and 1. Returns a value that is
-   * used for jitter
-   */
-  float ConfigureHaltonSequence(int direction);
-
-  /**
    * Convenience method for configuring a scalar bar actor for coloring
    */
   void ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar, std::string arrayName,
@@ -696,9 +695,10 @@ private:
   BlendingMode BlendingModeEnabled = BlendingMode::NONE;
   bool UseSSAOPass = false;
   bool UseToneMappingPass = false;
+  bool DisplayDepth = false;
+  bool DisplayDepthScalarColoring = false;
   bool UseBlurBackground = false;
   std::optional<bool> UseOrthographicProjection = false;
-  bool UseTrackball = false;
   bool InvertZoom = false;
 
   int RaytracingSamples = 0;
@@ -730,6 +730,9 @@ private:
 
   std::optional<fs::path> FontFile;
   double FontScale = 1.0;
+  std::array<double, 3> FontColor = { 1.0, 1.0, 1.0 };
+
+  bool DPIAware = false;
 
   double LightIntensity = 1.0;
   std::map<vtkLight*, double> OriginalLightIntensities;
@@ -768,6 +771,10 @@ private:
   std::optional<fs::path> TextureEmissive;
   std::optional<fs::path> TextureNormal;
 
+  bool EnableCheckerBoard = false;
+  vtkSmartPointer<vtkPNGReader> CheckerBoardReader;
+  vtkSmartPointer<vtkTexture> CheckerBoardTexture;
+
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorTransferFunction;
   bool ExpandingRangeSet = false;
   bool UsingExpandingRange = true;
@@ -790,9 +797,6 @@ private:
   std::optional<int> ColormapDiscretization;
 
   std::vector<double> OpacityMap;
-
-  int TaaHaltonNumerator[2] = { 0, 0 };
-  int TaaHaltonDenominator[2] = { 1, 1 };
 
   SplatType PointSpritesType = SplatType::SPHERE;
   double PointSpritesSize = 10;

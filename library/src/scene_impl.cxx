@@ -17,6 +17,7 @@
 #include <optional>
 #include <vtkCallbackCommand.h>
 #include <vtkLightCollection.h>
+#include <vtkMemoryResourceStream.h>
 #include <vtkProgressBarRepresentation.h>
 #include <vtkProgressBarWidget.h>
 #include <vtkTimerLog.h>
@@ -246,6 +247,7 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       log::debug("An empty file to load was provided\n");
       continue;
     }
+
     if (!vtksys::SystemTools::FileExists(filePath.string(), true))
     {
       throw scene::load_failure_exception(filePath.string() + " does not exists");
@@ -270,8 +272,9 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       {
         throw scene::load_failure_exception(*forceReader + " is not a valid force reader");
       }
-      throw scene::load_failure_exception(
-        filePath.string() + " is not a file of a supported 3D scene file format");
+      throw scene::load_failure_exception(filePath.string() +
+        " is not a file of a supported 3D scene file format, use force reader to force a specific "
+        "reader");
     }
 
     vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(filePath.string());
@@ -303,6 +306,71 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
   log::debug("");
 
   this->Internals->Load(importers);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+scene& scene_impl::add(const std::byte* buffer, std::size_t size)
+{
+  if (buffer == nullptr || size == 0)
+  {
+    log::debug("Empty buffer or zero size when trying to load a buffer into the scene provided\n");
+    return *this;
+  }
+
+  // Recover the appropriate reader
+  std::optional<std::string> forceReader = this->Internals->Options.scene.force_reader;
+
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260128)
+  if (!forceReader)
+  {
+    throw scene::load_failure_exception(
+      "No force reader set while trying to load a buffer from memory");
+  }
+#endif
+
+  const f3d::reader* reader = f3d::factory::instance()->getReader(buffer, size, forceReader);
+  if (reader)
+  {
+    if (forceReader)
+    {
+      log::debug("Forcing reader ", (*forceReader), " for stream");
+    }
+    else
+    {
+      log::debug("Found a reader for stream: ", reader->getName(), "\"");
+    }
+  }
+  else
+  {
+    if (forceReader)
+    {
+      throw scene::load_failure_exception(*forceReader + " is not a valid force reader");
+    }
+    throw scene::load_failure_exception("provided stream is not a file of a supported 3D scene "
+                                        "file format, use force reader to force a specific reader");
+  }
+
+  vtkNew<vtkMemoryResourceStream> stream;
+  stream->SetBuffer(buffer, size);
+
+  vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(stream);
+  if (!importer)
+  {
+    auto vtkReader = reader->createGeometryReader(stream);
+
+    if (!vtkReader)
+    {
+      throw scene::load_failure_exception(reader->getName() + " does not support reading streams");
+    }
+
+    vtkNew<vtkF3DGenericImporter> genericImporter;
+    genericImporter->SetInternalReader(vtkReader);
+    importer = genericImporter;
+  }
+
+  log::debug("\nLoading stream");
+  this->Internals->Load({ importer });
   return *this;
 }
 
@@ -461,6 +529,18 @@ std::pair<double, double> scene_impl::animationTimeRange()
 unsigned int scene_impl::availableAnimations() const
 {
   return this->Internals->AnimationManager.GetNumberOfAvailableAnimations();
+}
+
+//----------------------------------------------------------------------------
+std::string scene_impl::getAnimationName(int indices)
+{
+  return this->Internals->AnimationManager.GetAnimationName(indices);
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> scene_impl::getAnimationNames()
+{
+  return this->Internals->AnimationManager.GetAnimationNames();
 }
 
 //----------------------------------------------------------------------------

@@ -71,34 +71,33 @@ int TestPseudoUnitTest([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   }
   {
     InnerTest test;
-    test("pass", 1, 1.0);
-    metatest("pass with 1 == 1.0", test.result() == EXIT_SUCCESS);
+    test("pass", 1.0, 1.0);
+    metatest("pass with 1.0 == 1.0", test.result() == EXIT_SUCCESS);
   }
   {
     InnerTest test;
-    test("fail", 1, 1.0001);
-    metatest("fail with 1 == 1.0001", test.result() == EXIT_FAILURE);
+    test("fail", 1.0, 1.0 + std::numeric_limits<double>::epsilon());
+    metatest("fail with 1.0 == 1.0 + epsilon", test.result() == EXIT_FAILURE);
   }
 
-  const auto kindaEq = [](double a, double b) { return std::abs(b - a) < 1e-3; };
   {
     InnerTest test;
-    test("pass", 1, 1, kindaEq);
+    test("pass", 1, approx(1));
     metatest("pass with 1 almost 1", test.result() == EXIT_SUCCESS);
   }
   {
     InnerTest test;
-    test("pass", 1, 1.0, kindaEq);
+    test("pass", 1.0, approx(1.0));
     metatest("pass with 1 almost 1.0", test.result() == EXIT_SUCCESS);
   }
   {
     InnerTest test;
-    test("pass", 1, 1.0001, kindaEq);
-    metatest("pass with 1 almost 1.0001", test.result() == EXIT_SUCCESS);
+    test("pass", 1.0, approx(1.0 + std::numeric_limits<double>::epsilon()));
+    metatest("pass with 1 almost 1 + epsilon", test.result() == EXIT_SUCCESS);
   }
   {
     InnerTest test;
-    test("fail", 1, 2.0001, kindaEq);
+    test("fail", 1.0, approx(2.0001));
     metatest("fail with 1 almost 2.0001", test.result() == EXIT_FAILURE);
   }
 
