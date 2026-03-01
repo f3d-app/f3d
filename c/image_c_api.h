@@ -53,7 +53,7 @@ extern "C"
    *
    * The returned image must be deleted with f3d_image_delete().
    *
-   * @return Pointer to the newly created image object
+   * @return Pointer to the newly created image object, NULL on failure
    */
   F3D_EXPORT f3d_image_t* f3d_image_new_path(const char* path);
 
@@ -87,8 +87,9 @@ extern "C"
    * @param x horizontal pixel coordinate
    * @param y vertical pixel coordinate
    * @param pixel Pointer to a preallocated buffer of channel count size
+   * @return Non-zero on success, zero on failure
    */
-  F3D_EXPORT void f3d_image_get_normalized_pixel(f3d_image_t* img, int x, int y, double* pixel);
+  F3D_EXPORT int f3d_image_get_normalized_pixel(f3d_image_t* img, int x, int y, double* pixel);
 
   /**
    * @brief Get the count of supported image formats
@@ -130,9 +131,9 @@ extern "C"
   /**
    * @brief Get the type of channels in an image
    * @param img Pointer to the image object
-   * @return Type of channels in the image
+   * @return Type of channels in the image, -1 on error
    */
-  F3D_EXPORT unsigned int f3d_image_get_channel_type(f3d_image_t* img);
+  F3D_EXPORT int f3d_image_get_channel_type(f3d_image_t* img);
 
   /**
    * @brief Get the size of the channel type in an image
@@ -163,7 +164,7 @@ extern "C"
    * @brief Compare two images
    * @param img Pointer to the image object
    * @param reference Pointer to the reference image object
-   * @return SSIM difference between the two images
+   * @return SSIM difference between the two images, -1.0 on error
    */
   F3D_EXPORT double f3d_image_compare(f3d_image_t* img, f3d_image_t* reference);
 
@@ -172,9 +173,9 @@ extern "C"
    * @param img Pointer to the image object
    * @param path Path to the file where the image will be saved
    * @param format Format in which the image will be saved
+   * @return Non-zero on success, zero on failure
    */
-  F3D_EXPORT void f3d_image_save(
-    f3d_image_t* img, const char* path, f3d_image_save_format_t format);
+  F3D_EXPORT int f3d_image_save(f3d_image_t* img, const char* path, f3d_image_save_format_t format);
 
   /**
    * @brief Save an image to a buffer
@@ -234,7 +235,7 @@ extern "C"
    *
    * @param img Pointer to the image object
    * @param key Metadata key
-   * @return Metadata value
+   * @return Metadata value, NULL if error getting metadata
    */
   F3D_EXPORT const char* f3d_image_get_metadata(f3d_image_t* img, const char* key);
 
