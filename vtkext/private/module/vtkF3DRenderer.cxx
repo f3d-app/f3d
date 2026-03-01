@@ -29,7 +29,6 @@
 #include <vtkCullerCollection.h>
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkFloatArray.h>
-#include <vtkGlyph3D.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
@@ -111,7 +110,7 @@
 #include <chrono>
 #include <sstream>
 
-static constexpr float NormalGlyphScaleMultiplier = 0.02;
+
 
 namespace
 {
@@ -249,6 +248,8 @@ void ExecFuncOnAllPolyDataUniforms(vtkActorCollection* actors, F&& func)
     }
   }
 }
+
+static constexpr float NormalGlyphScaleMultiplier = 0.02;
 }
 
 //----------------------------------------------------------------------------
@@ -2177,7 +2178,7 @@ void vtkF3DRenderer::Render()
 {
   if (this->UseNormalGlyphs)
   {
-    ConfigureNormalGlyphs();
+    UpdateNormalGlyphsScale();
   }
 
   if (!this->TimerVisible)
@@ -2879,7 +2880,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
 void vtkF3DRenderer::ConfigureNormalGlyphs()
 {
   bool normalGlyphsVisible =
-    !this->UseRaytracing && !this->UsePointSprites && this->UseNormalGlyphs;
+    !this->UseRaytracing && this->UseNormalGlyphs;
   for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
   {
     if (normalGlyphsVisible && !normalGlyph.InputDataHasNormals)
@@ -2889,12 +2890,20 @@ void vtkF3DRenderer::ConfigureNormalGlyphs()
       continue;
     }
 
-    normalGlyph.GlyphMapper->SetScaleFactor(
-      GetActiveCamera()->GetDistance() * NormalGlyphScaleMultiplier);
+    UpdateNormalGlyphsScale();
     normalGlyph.Actor->SetVisibility(normalGlyphsVisible);
   }
 
   this->NormalGlyphsConfigured = true;
+}
+
+void vtkF3DRenderer::UpdateNormalGlyphsScale()
+{
+  for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
+  {
+    normalGlyph.GlyphMapper->SetScaleFactor(
+      GetActiveCamera()->GetDistance() * NormalGlyphScaleMultiplier);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -2928,9 +2937,6 @@ void vtkF3DRenderer::SetUsePointSprites(bool use)
     this->ColoringConfigured = false;
     this->PointSpritesConfigured = false;
   }
-
-  // Need to update the state of the normal glyphs if point sprites state updates
-  this->NormalGlyphsConfigured = false;
 }
 
 //----------------------------------------------------------------------------
