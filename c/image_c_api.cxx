@@ -207,6 +207,12 @@ int f3d_image_not_equals(f3d_image_t* img, f3d_image_t* reference)
 //----------------------------------------------------------------------------
 int f3d_image_save(f3d_image_t* img, const char* path, f3d_image_save_format_t format)
 {
+  if (!img || !path)
+  {
+    std::cerr << "Error saving image" << "\n";
+    return 1;
+  }
+
   const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
 
   try
@@ -231,6 +237,12 @@ int f3d_image_save(f3d_image_t* img, const char* path, f3d_image_save_format_t f
 unsigned char* f3d_image_save_buffer(
   f3d_image_t* img, f3d_image_save_format_t format, unsigned int* size)
 {
+  if (!img)
+  {
+    *size = 0;
+    return nullptr;
+  }
+
   const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
   unsigned char* c_buffer = nullptr;
   try

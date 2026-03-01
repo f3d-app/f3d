@@ -69,7 +69,7 @@ int test_image()
   unsigned char* tempBuffer = f3d_image_save_buffer(NULL, PNG, &count); // this shouldn't crash
   if (tempBuffer != NULL)
   {
-      return 1;
+    return 1;
   }
 
   unsigned int buffer_size;
@@ -84,7 +84,11 @@ int test_image()
 
   // this shouldn't crash
   const char* invalid_path = NULL;
-  f3d_image_save(img, invalid_path, PNG);
+  int ret = f3d_image_save(img, invalid_path, PNG);
+  if (ret != 1)
+  {
+    return 1;
+  }
 
   f3d_image_t* img_from_file = f3d_image_new_path(tmp_path);
   if (img_from_file)
