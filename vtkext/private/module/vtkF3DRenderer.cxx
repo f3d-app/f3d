@@ -110,8 +110,6 @@
 #include <chrono>
 #include <sstream>
 
-
-
 namespace
 {
 std::string DeprecatedCollapsePath(const fs::path& path)
@@ -2933,6 +2931,7 @@ void vtkF3DRenderer::SetUsePointSprites(bool use)
   if (this->UsePointSprites != use)
   {
     this->UsePointSprites = use;
+    this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
     this->PointSpritesConfigured = false;
   }
