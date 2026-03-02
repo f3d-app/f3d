@@ -146,6 +146,7 @@ runs:
         pdal_version: ${{inputs.pdal_version}}
         proj_version: ${{inputs.proj_version}}
         pybind11_version: ${{inputs.pybind11_version}}
+        sqlite_csb_version: ${{inputs.sqlite_csb_version}}
         tbb_version: ${{inputs.tbb_version}}
         tiff_version: ${{inputs.tiff_version}}
         usd_version: ${{inputs.usd_version}}
