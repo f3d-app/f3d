@@ -13,8 +13,11 @@
 #include <array>
 #include <cstdint>
 #include <deque>
+#include <map>
+#include <chrono>
 
 class vtkOpenGLRenderWindow;
+class ImFont;
 
 class vtkF3DUIActor : public vtkProp
 {
@@ -36,6 +39,16 @@ public:
 
   using CheatSheetTuple = std::tuple<std::string, std::string, std::string, CheatSheetBindingType>;
   using CheatSheetGroup = std::pair<std::string, std::vector<CheatSheetTuple>>;
+  using Clock = std::chrono::steady_clock;
+
+  struct Notification
+  {
+    std::string desc;
+    std::string value;
+    std::string bind;
+    float duration;
+    Clock::time_point start_time;
+  };
 
   /**
    * Initialize the UI actor resources
@@ -181,6 +194,12 @@ public:
   {
   }
 
+  /**
+   * Add notification info to deque
+   */
+  void AddNotification(
+    std::string& desc, std::string& value, std::string& bind, const float duration);
+
 protected:
   vtkF3DUIActor();
   ~vtkF3DUIActor() override;
@@ -254,6 +273,13 @@ protected:
   virtual void RenderConsoleBadge()
   {
   }
+
+  /**
+   * Render the notifications
+   */
+  virtual void RenderNotifications()
+  {
+  }
   bool DropZoneLogoVisible = false;
   bool DropZoneVisible = false;
   std::string DropText = "";
@@ -293,6 +319,9 @@ protected:
   std::array<double, 3> FontColor = { 1.0, 1.0, 1.0 };
 
   double BackdropOpacity = 0.9;
+
+  std::deque<Notification> Notifications;
+  std::map<std::string, ImFont*> Fonts;
 
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;
