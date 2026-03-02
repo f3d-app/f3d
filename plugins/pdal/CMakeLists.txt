@@ -14,11 +14,11 @@ endif()
 f3d_plugin_init()
 
 f3d_plugin_declare_reader(
-    NAME PDAL
-    EXTENSIONS laz
-    MIMETYPES application/vnd.laszip
-    VTK_READER vtkPDALReader
-    FORMAT_DESCRIPTION "Compressed Lidar point cloud "
+  NAME PDAL
+  EXTENSIONS laz
+  MIMETYPES application/vnd.laszip
+  VTK_READER vtkF3DPDALReader
+  FORMAT_DESCRIPTION "Compressed Lidar point cloud "
 )
 
 f3d_plugin_build(

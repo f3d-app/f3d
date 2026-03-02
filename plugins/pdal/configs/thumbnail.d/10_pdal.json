@@ -3,7 +3,11 @@
     "match-type": "glob",
     "match": "*.laz",
     "options": {
-      "load-plugins": "pdal"
+      "coloring-array": "NormalizedColor",
+      "coloring-component": "-2",
+      "load-plugins": "pdal",
+      "scalar-coloring": true,
+      "up": "+Z"
     }
   }
 ]
