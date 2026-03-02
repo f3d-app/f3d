@@ -59,7 +59,6 @@
     "geotiff": "1.7.4",
     "proj": "9.7.1",
     "tiff": "v4.7.1"
-
   },
   "vtk_commit_sha": "da023465dfaee4a010baa30a7b8e83b25a440fa1",
   "docker_timestamp": "20260218_0",
