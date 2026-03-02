@@ -12,12 +12,33 @@ inputs:
   blosc_version:
     description: "Version of blosc to build"
     required: true
+  curl_version:
+    description: "Version of curl to build"
+    required: false
+  gdal_version:
+    description: "Version of gdal to build"
+    required: false
+  geotiff_version:
+    description: "Version of geotiff to build"
+    required: false
   openvdb_version:
     description: "Version of openvdb to build"
+    required: false
+  pdal_version:
+    description: "Version of pdal to build"
+    required: false
+  proj_version:
+    description: "Version of proj to build"
+    required: false
+  sqlite_csb_version:
+    description: "Version of sqlite common superbuild to build"
     required: false
   tbb_version:
     description: "Version of tbb to build"
     required: true
+  tiff_version:
+    description: "Version of tiff to build"
+    required: false
   zlib_version:
     description: "Version of zlib to build"
     required: true
@@ -39,7 +60,7 @@ runs:
       uses: ./.actions/sqlite-install-dep
       with:
         cpu: ${{inputs.cpu}}
-        csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
+        csb_version: ${{inputs.sqlite_csb_version}}
         global_cache_index: ${{inputs.global_cache_index}}
 
     # Depends on sqlite
@@ -47,8 +68,8 @@ runs:
       uses: ./.actions/proj-install-dep
       with:
         cpu: ${{inputs.cpu}}
-        sqlite_csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
-        version: 9.7.1
+        sqlite_csb_version: ${{inputs.sqlite_csb_version}}
+        version: ${{inputs.proj_version}}
         global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install TBB
@@ -69,7 +90,7 @@ runs:
       uses: ./.actions/curl-install-dep
       with:
         cpu: ${{inputs.cpu}}
-        version: curl-8_18_0
+        version: ${{inputs.curl_version}}
         zlib_version: ${{inputs.zlib_version}}
         global_cache_index: ${{inputs.global_cache_index}}
 
@@ -85,7 +106,7 @@ runs:
       uses: ./.actions/tiff-install-dep
       with:
         cpu: ${{inputs.cpu}}
-        version: v4.7.1
+        version: ${{inputs.tiff_version}}
         zlib_version: ${{inputs.zlib_version}}
         global_cache_index: ${{inputs.global_cache_index}}
 
@@ -93,10 +114,10 @@ runs:
       uses: ./.actions/geotiff-install-dep
       with:
         cpu: ${{inputs.cpu}}
-        version: 1.7.4
-        sqlite_csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
-        proj_version: 9.7.1
-        tiff_version: v4.7.1
+        version: ${{inputs.geotiff_version}}
+        proj_version: ${{inputs.proj_version}}
+        sqlite_csb_version: ${{inputs.sqlite_csb_version}}
+        tiff_version: ${{inputs.tiff_version}}
         zlib_version: ${{inputs.zlib_version}}
         global_cache_index: ${{inputs.global_cache_index}}
 
@@ -104,11 +125,11 @@ runs:
       uses: ./.actions/gdal-install-dep
       with:
         cpu: ${{inputs.cpu}}
-        version: v3.12.2
-        sqlite_csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
-        geotiff_version: 1.7.4
-        proj_version: 9.7.1
-        tiff_version: v4.7.1
+        version: ${{inputs.gdal_version}}
+        geotiff_version: ${{inputs.geotiff_version}}
+        proj_version: ${{inputs.proj_version}}
+        sqlite_csb_version: ${{inputs.sqlite_csb_version}}
+        tiff_version: ${{inputs.tiff_version}}
         zlib_version: ${{inputs.zlib_version}}
         global_cache_index: ${{inputs.global_cache_index}}
 
@@ -116,13 +137,13 @@ runs:
       uses: ./.actions/pdal-install-dep
       with:
         cpu: ${{inputs.cpu}}
-        version: 2.10.0
-        sqlite_csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
-        curl_version: curl-8_18_0
-        gdal_version: v3.12.2
-        geotiff_version: 1.7.4
-        proj_version: 9.7.1
-        tiff_version: v4.7.1
+        version: ${{inputs.pdal_version}}
+        curl_version: ${{inputs.curl_version}}
+        gdal_version: ${{inputs.gdal_version}}
+        geotiff_version: ${{inputs.geotiff_version}}
+        proj_version: ${{inputs.proj_version}}
+        sqlite_csb_version: ${{inputs.sqlite_csb_version}}
+        tiff_version: ${{inputs.tiff_version}}
         zlib_version: ${{inputs.zlib_version}}
         global_cache_index: ${{inputs.global_cache_index}}
 
