@@ -14,11 +14,19 @@ endif()
 f3d_plugin_init()
 
 f3d_plugin_declare_reader(
-  NAME PDAL
+  NAME LAZ
   EXTENSIONS laz
   MIMETYPES application/vnd.laszip
   VTK_READER vtkF3DPDALReader
-  FORMAT_DESCRIPTION "Compressed Lidar point cloud "
+  FORMAT_DESCRIPTION "Compressed Lidar point cloud"
+)
+
+f3d_plugin_declare_reader(
+  NAME TerraScanBinary
+  EXTENSIONS bin
+  MIMETYPES application/vnd.terrascan.binary
+  VTK_READER vtkF3DPDALReader
+  FORMAT_DESCRIPTION "TerraScan binary files"
 )
 
 f3d_plugin_build(
