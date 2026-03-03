@@ -12,4 +12,8 @@
     <comment>Binary Point File</comment>
     <glob pattern="*.bpf"/>
   </mime-type>
+  <mime-type type="application/vnd.csd">
+    <comment>Optech Corrected Sensor Data</comment>
+    <glob pattern="*.bpf"/>
+  </mime-type>
 </mime-info>

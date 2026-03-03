@@ -22,7 +22,15 @@ f3d_plugin_declare_reader(
 )
 
 f3d_plugin_declare_reader(
-  NAME TerraScanBinary
+  NAME BinaryPointFile
+  EXTENSIONS bpf
+  MIMETYPES application/vnd.bfp3
+  VTK_READER vtkF3DPDALReader
+  FORMAT_DESCRIPTION "Binary Point File"
+)
+
+f3d_plugin_declare_reader(
+  NAME TerraScanBIN
   EXTENSIONS bin
   MIMETYPES application/vnd.terrascan.binary
   VTK_READER vtkF3DPDALReader
@@ -30,11 +38,11 @@ f3d_plugin_declare_reader(
 )
 
 f3d_plugin_declare_reader(
-  NAME BinaryPointFile
-  EXTENSIONS bpf
-  MIMETYPES application/vnd.bfp3
+  NAME OptechCSD
+  EXTENSIONS csd
+  MIMETYPES application/vnd.csd
   VTK_READER vtkF3DPDALReader
-  FORMAT_DESCRIPTION "Binary Point File"
+  FORMAT_DESCRIPTION "Optech Corrected Sensor Data"
 )
 
 f3d_plugin_build(

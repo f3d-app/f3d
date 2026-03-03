@@ -54,6 +54,7 @@
 - SimpleSkin.gltf: glTF-Sample-Models: Public Domain
 - Teapot.usd: [USD Working Group](https://github.com/usd-wg/assets): Public Domain - CC0
 - red.jpg: glTF-Sample-Models: Public Domain
+- sample.csd: PDAL: Copyright (c) 2025, Hobu, Inc.
 - samplePTS.pts: VTK Data: BSD-3-Clause
 - simple.laz: PDAL: Copyright (c) 2025, Hobu, Inc.
 - simple_extra.bpf: PDAL: Copyright (c) 2025, Hobu, Inc.

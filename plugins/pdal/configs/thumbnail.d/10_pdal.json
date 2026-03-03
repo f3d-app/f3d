@@ -9,5 +9,14 @@
       "scalar-coloring": true,
       "up": "+Z"
     }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.csd",
+    "options": {
+      "load-plugins": "pdal",
+      "scalar-coloring": true,
+      "up": "+Y"
+    }
   }
 ]
