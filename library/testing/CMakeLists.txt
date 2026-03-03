@@ -41,6 +41,7 @@ if(F3D_MODULE_UI)
     TestSDKDynamicProperties.cxx
     TestSDKInteractorDocumentation.cxx
     TestSDKMultiOptions.cxx
+    TestSDKNotification.cxx
     TestSDKTriggerInteractions.cxx
     )
 
