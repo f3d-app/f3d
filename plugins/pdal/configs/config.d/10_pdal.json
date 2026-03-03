@@ -10,5 +10,15 @@
       "scalar-coloring": true,
       "up": "+Z"
     }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.csd",
+    "options": {
+      "load-plugins": "pdal",
+      "point-size": "5",
+      "scalar-coloring": true,
+      "up": "+Y"
+    }
   }
 ]
