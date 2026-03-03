@@ -58,6 +58,14 @@ def test_animation():
 
     # getAnimationNames returns names
     assert engine.scene.get_animation_names() == [
-      "stand", "dead", "dead_right", "reload", "hit",
-      "down", "stumble", "run", "shoot", "walk"
+      "stand",
+      "dead",
+      "dead_right",
+      "reload",
+      "hit",
+      "down",
+      "stumble",
+      "run",
+      "shoot",
+      "walk"
     ]
