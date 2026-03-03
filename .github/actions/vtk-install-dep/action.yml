@@ -129,7 +129,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_IOLegacy=YES
         -DVTK_MODULE_ENABLE_VTK_IONetCDF=YES
         -DVTK_MODULE_ENABLE_VTK_IOOpenVDB=${{ inputs.openvdb_version != '' && 'YES' || 'DEFAULT' }}
-        -DVTK_MODULE_ENABLE_VTK_IOPDAL=${{ inputs.pdal_version != '' && 'YES' || 'DEFAULT' }}
+        -DVTK_MODULE_ENABLE_VTK_IOPDAL=${{ inputs.pdal_version != '' && inputs.vtk_version != 'v9.3.0' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_IOPLY=YES
         -DVTK_MODULE_ENABLE_VTK_IOXML=YES
         -DVTK_MODULE_ENABLE_VTK_ImagingCore=YES

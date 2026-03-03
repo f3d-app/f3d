@@ -217,7 +217,7 @@ runs:
       shell: bash
       run: echo "DYLD_LIBRARY_PATH=$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
 
-    - name: Set LD_LIBRARY_PATH on Linux for ??? TODO
+    - name: Set LD_LIBRARY_PATH on Linux for PDAL TODO WHY IS IT NEEDED THOUGH????
       if: runner.os == 'Linux'
       shell: bash
       run: echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
@@ -275,7 +275,7 @@ runs:
         -DF3D_PLUGIN_BUILD_HDF=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_WEBIFC=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_OCCT=${{ inputs.optional_deps_label == 'optional-deps' && inputs.static_label == 'no-static' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_PDAL=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_PDAL=${{ inputs.optional_deps_label == 'optional-deps' && inputs.vtk_version != 'v9.3.0' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_VDB=${{ (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.0') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=${{ inputs.occt_version != 'V7_6_3' && 'ON' || 'OFF' }}
