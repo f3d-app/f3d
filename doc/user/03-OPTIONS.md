@@ -569,7 +569,7 @@ To turn on/off boolean options, it is possible to write `--option=true` and `--o
 
 If an option has an "implicit" value, it means that the options can be used without specifying the value to use the implicit value.
 
-The default correspond to the value without any (configuration file)[06-CONFIGURATION_FILE.md], which F3D is usually distributed with.
+The default correspond to the value without any [configuration file](06-CONFIGURATION_FILE.md), which F3D is usually distributed with.
 
 As documented, the `--option=value` syntax should be preferred. The syntax `--option value` can have unintended effect with positional arguments.
 
