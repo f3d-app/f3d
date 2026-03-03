@@ -4,6 +4,7 @@
 
 - (ノಠ益ಠ )ノ.vtp: VTK Data: BSD-3-Clause
 - 16bits.\*: @bisechen: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
+- 20020715-time-color.bin: PDAL: Copyright (c) 2025, Hobu, Inc.
 - albedo.png: glTF-Sample-Models: Public Domain
 - anim_test.x: assimp test models: BSD-3-Clause
 - AnimatedCube.usdz: [USD Working Group](https://github.com/usd-wg/assets): Apache 2.0

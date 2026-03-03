@@ -4,4 +4,8 @@
     <comment>Compressed Lidar point cloud</comment>
     <glob pattern="*.laz"/>
   </mime-type>
+  <mime-type type="application/vnd.terrascan.binary">
+    <comment>TerraScan binary files</comment>
+    <glob pattern="*.bin"/>
+  </mime-type>
 </mime-info>
