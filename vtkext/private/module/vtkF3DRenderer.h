@@ -103,6 +103,7 @@ public:
   void ShowDropZoneLogo(bool show);
   void ShowHDRISkybox(bool show);
   void ShowArmature(bool show);
+  void ShowSceneHierarchy(bool show);
   ///@}
 
   using vtkOpenGLRenderer::SetBackground;
@@ -387,6 +388,13 @@ public:
    * Set the meta importer to recover coloring information from
    */
   void SetImporter(vtkF3DMetaImporter* importer);
+  
+  /**
+   * Get the meta importer
+   */
+  vtkF3DMetaImporter* GetMetaImporter() { return this->Importer; }
+
+  void ForceUpdateColoring() { this->ColoringConfigured = false; }
 
   ///@{
   /**
@@ -675,6 +683,7 @@ private:
   bool FilenameVisible = false;
   bool MetaDataVisible = false;
   bool HDRIFilenameVisible = false;
+  bool SceneHierarchyVisible = false;
   bool CheatSheetVisible = false;
   bool ConsoleVisible = false;
   bool MinimalConsoleVisible = false;

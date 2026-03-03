@@ -58,6 +58,7 @@ Other options can be toggled or cycled directly by pressing the following hotkey
 - <kbd>N</kbd>: the display of the file name.
 - <kbd>Shift</kbd>+<kbd>N</kbd>: the display of the HDRI file name.
 - <kbd>M</kbd>: the display of the metadata if exists.
+- <kbd>Shift</kbd>+<kbd>H</kbd>: the display of the scene hierarchy.
 - <kbd>Z</kbd>: the display of the FPS counter.
 - <kbd>R</kbd>: raytracing.
 - <kbd>D</kbd>: the denoiser when raytracing.

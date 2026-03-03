@@ -22,7 +22,6 @@
 #endif
 
 #include <memory>
-#include <optional>
 #include <string>
 #include <vector>
 
@@ -81,6 +80,13 @@ public:
     vtkNew<vtkPolyDataMapper> Mapper;
     vtkActor* OriginalActor;
   };
+
+  struct ImporterInfo
+  {
+    vtkSmartPointer<vtkImporter> Importer;
+    bool Updated = false;
+    vtkSmartPointer<vtkDataAssembly> DataAssembly;
+  };
   ///@}
 
   /**
@@ -129,6 +135,15 @@ public:
    * Concatenate individual importers output description into one and return it
    */
   std::string GetOutputsDescription() override;
+
+  /**
+   * Information key used to propagate the array name used as texture coordinates
+   */
+  static vtkInformationIntegerKey* ACTOR_HIDDEN();
+
+  int GetImporterInfoCount();
+
+  ImporterInfo GetImporterInfo(int index);
 
   ///@{
   /**

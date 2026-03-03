@@ -62,6 +62,11 @@ private:
   void RenderDropZone() override;
 
   /**
+   * Render the scene hierarchy UI widget
+   */
+  void RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin) override;
+
+  /**
    * Render the filename UI widget
    */
   void RenderFileName() override;
