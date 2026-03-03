@@ -7,6 +7,8 @@
 #include <interactor.h>
 
 #include <string>
+#include <utility>
+#include <functional>
 
 int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
@@ -50,14 +52,23 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
 
   test("notifications fading",
     TestSDKHelpers::RenderTest(win, BaselinePath, OutputPath, "TestSDKNotificationFading"));
-
   inter.triggerEventLoop(.5);
+
+  auto docTgl = [&](const std::string& doc, const bool& value) 
+    { return std::pair(doc, (value ? "ON" : "OFF")); };
+
+  inter.addBinding({ f3d::interaction_bind_t::ModifierKeys::ANY, "Exclam" }, "toggle ui.feedback.show_bindings", "Custom",
+    std::bind(docTgl, "Show Bind Keys", std::cref(opt.ui.feedback.show_bindings)),
+    f3d::interactor::BindingType::TOGGLE);
+
+  inter.initBindNotificationMap();
+
+  inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "Exclam");
+  inter.triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "Exclam");
   inter.addNotification("Test Notification", "Test Value");
 
-  test("custom notifications",
-    TestSDKHelpers::RenderTest(win, BaselinePath, OutputPath, "TestSDKNotificationAdd"));
-
-  opt.ui.feedback.show_bindings = false;
+  test("user define notifications",
+    TestSDKHelpers::RenderTest(win, BaselinePath, OutputPath, "TestSDKNotificationUser"));
 
   inter.triggerEventLoop(3.0);
   inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "E");
