@@ -7,9 +7,9 @@ f3d_test(NAME TestTerraScanBin DATA 20020715-time-color.bin PLUGIN pdal ARGS --s
 
 # Default camera position goes wrong because of https://github.com/f3d-app/f3d/issues/2921
 # and the only sample file found was the one from pdal
-f3d_test(NAME TestCSD DATA sample.csd ARGS --load-plugins=pdal --scalar-coloring --camera-view-angle=15 --camera-zoom-factor=1 --camera-position=-10,10,-10 --up=+Y)
+f3d_test(NAME TestCSD DATA sample.csd PLUGIN pdal ARGS --scalar-coloring --camera-view-angle=15 --camera-zoom-factor=1 --camera-position=-10,10,-10 --up=+Y)
 
-f3d_test(NAME TestPCD DATA autzen-utm.pcd ARGS --load-plugins=pdal --scalar-coloring --coloring-array=Color --coloring-component=-1)
+f3d_test(NAME TestPCD DATA autzen-utm.pcd PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1)
 
 if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/plugins/pdal/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
