@@ -67,5 +67,5 @@ def test_animation():
         "stumble",
         "run",
         "shoot",
-        "walk"
+        "walk",
     ]
