@@ -36,6 +36,7 @@ Release Candidates :
 - [ ] Locally test the python wheels on macOS (Silicon)
 - [ ] Locally test the python wheels on Windows
 - [ ] Locally test the wasm package
+- [ ] Locally test the Android app
 - If it fails,
   - [ ] Fix the issues in `release` branch,
   - [ ] Edit this issue and increment `N`
@@ -49,7 +50,7 @@ Release :
 - [ ] Commit, review and merge adding `X.Y.Z` in https://github.com/f3d-app/f3d-superbuild `versions.cmake` in the `main` branch
 - [ ] Tag `vX.Y.Z` and push it to https://github.com/f3d-app/f3d-superbuild: `git tag vX.Y.Z -m vX.Y.Z`
 - Update Android
-  - [ ] Run `./update_native_libs.sh --branch vX.Y.Z` and merge new libraries and jar file in https://github.com/f3d-app/f3d-android master branch
+  - [ ] Run `./update_native_libs.sh --branch vX.Y.Z` and merge new libraries, jar file and lock file in https://github.com/f3d-app/f3d-android master branch
   - [ ] Tag `vX.Y.Z` and push it to https://github.com/f3d-app/f3d-android: `git tag vX.Y.Z -m vX.Y.Z`
 - [ ] Merge F3D release into master: https://github.com/f3d-app/f3d/compare/master...release
 - [ ] Trigger a release build using https://github.com/f3d-app/f3d-superbuild actions with `vX.Y.Z` F3D version, `vX.Y.Z` sb version and prerelease publish true
@@ -134,7 +135,7 @@ eng.interactor.start()
 
 Android testing protocol:
 
-- Uninstall any F3D app
+- Uninstall any existing F3D app
 - Download and install APK of your architecture (`arm64-v8a` most likely)
 - Open a supported file from a different app, select F3D and make sure you can interact with it
 - Touch the big `+` button, browse to a supported file and open it. Make sure you can interact with it
