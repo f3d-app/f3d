@@ -544,7 +544,10 @@ public:
       {
         description.append(":");
       }
-      this->Interactor.addNotification(description, value, bind);
+      vtkRenderWindow* renWin = this->Window.GetRenderWindow();
+      vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+
+      ren->AddNotification(description, value, bind);
     }
 #endif
   }
@@ -724,7 +727,7 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
   this->initCommands();
   this->initBindings();
 #if F3D_MODULE_UI
-  this->InitBindNotificationMap();
+  this->initBindNotificationMap();
   vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
   assert(console != nullptr);
   console->SetCompletionCallback(
@@ -1831,7 +1834,7 @@ f3d::interactor::BindingType interactor_impl::getBindingType(const interaction_b
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::InitBindNotificationMap()
+interactor& interactor_impl::initBindNotificationMap()
 {
 #if F3D_MODULE_UI
   this->Internals->BindNotifactionMap.clear();
@@ -1875,39 +1878,33 @@ interactor& interactor_impl::InitBindNotificationMap()
   this->removeBindNotiCallback("toggle ui.console");
   this->removeBindNotiCallback("toggle ui.cheatsheet");
 
-  this->addBindNotiCallback("toggle_animation", std::bind(docPlayAnim, "Animation Forward"));
-  this->addBindNotiCallback(
-    "toggle_animation_backward", std::bind(docPlayAnim, "Animation Backward"));
-  this->addBindNotiCallback("cycle_coloring array", docColorArray);
+  this->setBindNotiCallback("toggle_animation", std::bind(docPlayAnim, "Animation Forward"));
+  this->setBindNotiCallback("toggle_animation_backward", std::bind(docPlayAnim, "Animation Backward"));
+  this->setBindNotiCallback("cycle_coloring array", docColorArray);
 #endif
   return *this;
 }
 
-
-
-
 //----------------------------------------------------------------------------
-interactor& interactor_impl::addBindNotiCallback(
+void interactor_impl::setBindNotiCallback(
   std::string command, documentation_callback_t doc_callback)
 {
 #if F3D_MODULE_UI
   this->Internals->BindNotifactionMap.insert_or_assign(std::move(command), std::move(doc_callback));
 #endif
-  return *this;
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::removeBindNotiCallback(std::string command)
+void interactor_impl::removeBindNotiCallback(std::string command)
 {
 #if F3D_MODULE_UI
   this->Internals->BindNotifactionMap.erase(command);
 #endif
-  return *this;
 }
 
 //----------------------------------------------------------------------------
 void interactor_impl::addNotification(
-  std::string desc, std::string value, std::string bind, double duration)
+  std::string desc, std::string value, double duration)
 {
 #if F3D_MODULE_UI
   if (!desc.empty())
@@ -1915,7 +1912,7 @@ void interactor_impl::addNotification(
     vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
 
-    ren->AddNotification(desc, value, bind, duration);
+    ren->AddNotification(desc, value, std::string(), duration);
   }
 #endif
 }

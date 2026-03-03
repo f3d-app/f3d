@@ -976,7 +976,7 @@ public:
       interactor.addBinding({mod_t::CTRL, "Q"}, "exit", "Others", std::bind(docString, "Quit"));
       // clang-format on
 
-      interactor.InitBindNotificationMap();
+      interactor.initBindNotificationMap();
 
       f3d::log::debug("Adding config defined bindings if any: ");
       bool logBindings = this->AppOptions.VerboseLevel == "debug";

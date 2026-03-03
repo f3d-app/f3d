@@ -207,6 +207,16 @@ extern "C"
   F3D_EXPORT void f3d_interactor_init_bindings(f3d_interactor_t* interactor);
 
   /**
+   * @brief Initialize binding notification map for interaction key press binding notification.
+   *
+   * Call after initialization of default binding and before adding custom binding,
+   * prevent the default binding documentation callback overwrite by custom binding.
+   *
+   * @param interactor Interactor handle.
+   */
+  F3D_EXPORT void f3d_interactor_init_bind_notification_map(f3d_interactor_t* interactor);
+
+  /**
    * @brief Add a binding for the provided bind.
    *
    * @param interactor Interactor handle.
@@ -481,6 +491,17 @@ extern "C"
    * @param interactor Interactor handle.
    */
   F3D_EXPORT void f3d_interactor_request_stop(f3d_interactor_t* interactor);
+
+  /**
+   * @brief Trigger a notification at the bottom left of viewport.
+   *
+   * @param interactor Interactor handle.
+   * @param desc Description text.
+   * @param value Value text follow after description.
+   * @param duration Duration of notification in second.
+   */
+  F3D_EXPORT void f3d_interactor_add_notification(f3d_interactor_t* interactor,
+    const char* desc, const char* value, double duration);
 
   /**
    * @brief Free a string array returned by interactor functions.

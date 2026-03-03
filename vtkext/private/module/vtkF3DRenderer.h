@@ -513,7 +513,7 @@ public:
    * Add notification info to deque
    */
   void AddNotification(
-    std::string& desc, std::string& value, std::string& bind, double duration);
+    std::string desc, std::string value = "", std::string bind = "", double duration = 3.0);
 
 private:
   vtkF3DRenderer();

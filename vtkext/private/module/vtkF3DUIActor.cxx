@@ -255,7 +255,7 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
 }
 
 void vtkF3DUIActor::AddNotification(
-  std::string& desc, std::string& value, std::string& bind, double duration)
+  std::string desc, std::string value, std::string bind, double duration)
 {
   if (this->NotificationVisible)
   {

@@ -59,10 +59,7 @@ public:
   std::pair<std::string, std::string> getBindingDocumentation(
     const interaction_bind_t& bind) const override;
   BindingType getBindingType(const interaction_bind_t& bind) const override;
-
-  interactor& InitBindNotificationMap() override;
-  interactor& addBindNotiCallback(std::string command, documentation_callback_t doc_callback) override;
-  interactor& removeBindNotiCallback(std::string command) override;
+  interactor& initBindNotificationMap() override;
 
   interactor& triggerEventLoop(double deltaTime) override;
   interactor& triggerModUpdate(InputModifier mod) override;
@@ -86,7 +83,7 @@ public:
   bool recordInteraction(const std::filesystem::path& file) override;
 
   void addNotification(
-    std::string desc, std::string value = "", std::string bind = "", double duration = 3.f) override;
+    std::string desc, std::string value = "", double duration = 3.f) override;
 
   interactor& start(double deltaTime, std::function<void()> userCallBack) override;
   interactor& stop() override;
@@ -138,6 +135,19 @@ public:
    * Set a command to be run on the next event loop
    */
   void SetCommandBuffer(const char* command);
+
+  /**
+   * Implementation only API.
+   * Add or modify binding documentation callback to binding notification map using command string
+   * as key.
+   */
+  void setBindNotiCallback(std::string command, documentation_callback_t doc_callback);
+
+  /**
+   * Implementation only API.
+   * Remove element from binding notification map using command string.
+   */
+  void removeBindNotiCallback(std::string command);
 
 private:
   class internals;

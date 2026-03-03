@@ -560,6 +560,14 @@ Set the opacity of the backdrop behind the UI elements. Value is between 0.0 (fu
 
 CLI: `--backdrop-opacity`.
 
+### `ui.feedback.enable` (_bool_, default: `false`)
+
+Show feedback notifications at the bottom left of the viewport.
+
+### `ui.feedback.show_bindings` (_bool_, default: `false`)
+
+Show corresponding keyes when notifications are trigger by bindings key press events.
+
 # APIs
 
 There are three APIs to access the options
