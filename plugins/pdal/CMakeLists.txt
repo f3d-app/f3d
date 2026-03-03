@@ -29,6 +29,14 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "TerraScan binary files"
 )
 
+f3d_plugin_declare_reader(
+  NAME BinaryPointFile
+  EXTENSIONS bpf
+  MIMETYPES application/vnd.bfp3
+  VTK_READER vtkF3DPDALReader
+  FORMAT_DESCRIPTION "Binary Point File"
+)
+
 f3d_plugin_build(
   NAME pdal
   VERSION 1.0

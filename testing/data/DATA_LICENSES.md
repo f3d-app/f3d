@@ -48,19 +48,21 @@
 - punch.fbx: batrisya1501: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - RectGrid2.vtr: VTK Data: BSD-3-Clause
 - Rec709.exr: [Copyright 2006 Industrial Light & Magic](https://github.com/AcademySoftwareFoundation/openexr/blob/370db2835843ac75f85e1386c05455f26a6ff58c/website/test_images/Chromaticities/Rec709.rst): BSD-3-Clause
-- red.jpg: glTF-Sample-Models: Public Domain
 - RiggedFigure.glb: glTF-Sample-Models: Public Domain
 - RiggedSimple.usdz: [USD Working Group](https://github.com/usd-wg/assets): [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
-- samplePTS.pts: VTK Data: BSD-3-Clause
 - SimpleMorph.gltf: glTF-Sample-Models: Public Domain
 - SimpleSkin.gltf: glTF-Sample-Models: Public Domain
+- Teapot.usd: [USD Working Group](https://github.com/usd-wg/assets): Public Domain - CC0
+- red.jpg: glTF-Sample-Models: Public Domain
+- samplePTS.pts: VTK Data: BSD-3-Clause
+- simple.laz: PDAL: Copyright (c) 2025, Hobu, Inc.
+- simple_extra.bpf: PDAL: Copyright (c) 2025, Hobu, Inc.
 - skin.png: Blender: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - small.ex2: VTK Data: BSD-3-Clause
 - small.usdz: [Copyright USD contributors](https://github.com/usd-wg/assets/tree/main/full_assets/StandardShaderBall): [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - soldier_animations.mdl: LibreQuake Project: BSD-3-Clause
 - sphere_points.vdb: OpenVDB: [MPL-2.0](http://www.mozilla.org/MPL/2.0/)
 - teapot.off: Utah Teapot: Public Domain
-- Teapot.usd: [USD Working Group](https://github.com/usd-wg/assets): Public Domain - CC0
 - tensors.vti: VTK Data: BSD-3-Clause
 - UnlitTest.glb: glTF-Sample-Models/Analytical Graphics, Inc.: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - v_rock2.mdl: LibreQuake Project: BSD-3-Clause
@@ -71,7 +73,6 @@
 - xform_anim.abc: Public Domain
 - joint1.abc: Public Domain
 - zombie\*.mdl: LibreQuake Project: BSD-3-Clause
-- simple.laz: PDAL: Copyright (c) 2025, Hobu, Inc.
 
 All other datasets are licensed under the BSD-3-Clause F3D license.
 

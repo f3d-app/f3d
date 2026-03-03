@@ -8,4 +8,8 @@
     <comment>TerraScan binary files</comment>
     <glob pattern="*.bin"/>
   </mime-type>
+  <mime-type type="application/vnd.bpf3">
+    <comment>Binary Point File</comment>
+    <glob pattern="*.bpf"/>
+  </mime-type>
 </mime-info>
