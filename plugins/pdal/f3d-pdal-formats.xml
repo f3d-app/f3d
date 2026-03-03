@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/vnd.las">
+    <comment>LASer format for lidar point cloud</comment>
+    <glob pattern="*.las"/>
+  </mime-type>
   <mime-type type="application/vnd.laszip">
-    <comment>Compressed Lidar point cloud</comment>
+    <comment>LASer format for compressed lidar point cloud</comment>
     <glob pattern="*.laz"/>
   </mime-type>
   <mime-type type="application/vnd.terrascan.binary">
