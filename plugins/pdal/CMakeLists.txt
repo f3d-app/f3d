@@ -45,6 +45,14 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "Optech Corrected Sensor Data"
 )
 
+f3d_plugin_declare_reader(
+  NAME PCD
+  EXTENSIONS pcd
+  MIMETYPES application/vnd.pcd
+  VTK_READER vtkF3DPDALReader
+  FORMAT_DESCRIPTION "Point Cloud Data"
+)
+
 f3d_plugin_build(
   NAME pdal
   VERSION 1.0

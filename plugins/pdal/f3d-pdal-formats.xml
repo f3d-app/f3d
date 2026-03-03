@@ -20,4 +20,8 @@
     <comment>Optech Corrected Sensor Data</comment>
     <glob pattern="*.bpf"/>
   </mime-type>
+  <mime-type type="application/vnd.pcd">
+    <comment>Point Cloud Data</comment>
+    <glob pattern="*.pcd"/>
+  </mime-type>
 </mime-info>

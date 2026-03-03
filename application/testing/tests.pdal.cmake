@@ -9,6 +9,8 @@ f3d_test(NAME TestTerraScanBin DATA 20020715-time-color.bin ARGS --load-plugins=
 # and the only sample file found was the one from pdal
 f3d_test(NAME TestCSD DATA sample.csd ARGS --load-plugins=pdal --scalar-coloring --camera-view-angle=15 --camera-zoom-factor=1 --camera-position=-10,10,-10 --up=+Y)
 
+f3d_test(NAME TestPCD DATA autzen-utm.pcd ARGS --load-plugins=pdal --scalar-coloring --coloring-array=Color --coloring-component=-1)
+
 if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/plugins/pdal/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
@@ -17,6 +19,7 @@ if(NOT F3D_MACOS_BUNDLE)
     f3d_test(NAME TestDefaultConfigFileBPF DATA simple-extra.bpf CONFIG config_build LONG_TIMEOUT)
     f3d_test(NAME TestDefaultConfigFileTerraScanBin DATA 20020715-time-color.bin CONFIG config_build LONG_TIMEOUT)
     f3d_test(NAME TestDefaultConfigFileCSD DATA sample.csd ARGS --camera-view-angle=15 --camera-zoom-factor=1 --camera-position=-10,10,-10 CONFIG config_build LONG_TIMEOUT)
+    f3d_test(NAME TestDefaultConfigFilePCD DATA autzen-utm.pcd CONFIG config_build LONG_TIMEOUT)
   endif()
   file(COPY "${F3D_SOURCE_DIR}/plugins/pdal/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
   f3d_test(NAME TestThumbnailConfigFileLAS DATA warsaw_small.las CONFIG thumbnail_build LONG_TIMEOUT)
@@ -24,4 +27,5 @@ if(NOT F3D_MACOS_BUNDLE)
   f3d_test(NAME TestThumbnailConfigFileBPF DATA simple-extra.bpf CONFIG thumbnail_build LONG_TIMEOUT)
   f3d_test(NAME TestThumbnailConfigFileTerraScanBin DATA 20020715-time-color.bin CONFIG thumbnail_build LONG_TIMEOUT)
   f3d_test(NAME TestThumbnailConfigFileCSD DATA sample.csd ARGS --camera-view-angle=15 --camera-zoom-factor=1 --camera-position=-10,10,-10 CONFIG thumbnail_build LONG_TIMEOUT)
+  f3d_test(NAME TestThumbnailConfigFilePCD DATA autzen-utm.pcd CONFIG thumbnail_build LONG_TIMEOUT)
 endif()

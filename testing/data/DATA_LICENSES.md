@@ -11,6 +11,7 @@
 - animatedWorld.fbx: VTK Data: BSD-3-Clause
 - animation_with_skeleton.fbx: assimp test models: BSD-3-Clause
 - armor.mdl: LibreQuake Project: BSD-3-Clause
+- autzen-utm.pcd: PDAL: Copyright (c) 2025, Hobu, Inc.
 - beach.nrrd: VTK Data: BSD-3-Clause
 - bluntfin.vts: VTK Data: BSD-3-Clause
 - bot2.wrl: VTK Data: BSD-3-Clause
