@@ -6,7 +6,7 @@ import f3d
 
 def test_animation():
     testing_dir = Path(__file__).parent.parent.parent / "testing"
-    logo = testing_dir / "data/f3d.glb"
+    logo = testing_dir / "data/soldier_animations.mdl"
 
     engine = f3d.Engine.create(True)
     engine.window.size = 300, 300
@@ -16,16 +16,16 @@ def test_animation():
     # Tests
 
     # availableAnimations
-    assert engine.scene.available_animations() == 1
+    assert engine.scene.available_animations() == 10
 
     keyframes = engine.scene.get_animation_keyframes()
-    assert len(keyframes) == 50
+    assert len(keyframes) == 9
     assert keyframes[0] == 0
-    assert keyframes[49] == 4.0
+    assert keyframes[8] == 0.7999999999999999
 
     # recover animationTimeRange
     engine.scene.load_animation_time(0.5)
-    assert engine.scene.animation_time_range() == (0.0, 4.0)
+    assert engine.scene.animation_time_range() == (0.0, 0.7999999999999999)
 
     # isPlaying after start
     engine.interactor.start_animation()
@@ -48,13 +48,16 @@ def test_animation():
     assert engine.interactor.is_playing_animation() == 0
 
     # getAnimationName returns name at index
-    assert engine.scene.get_animation_name(0) == "unnamed_0"
+    assert engine.scene.get_animation_name(0) == "stand"
 
     # getAnimationName returns for out of range
     assert engine.scene.get_animation_name(9999) == "No animation"
 
     # getAnimationName returns current name
-    assert engine.scene.get_animation_name() == "unnamed_0"
+    assert engine.scene.get_animation_name() == "stand"
 
     # getAnimationNames returns names
-    assert engine.scene.get_animation_names() == ["unnamed_0"]
+    assert engine.scene.get_animation_names() == [
+      "stand", "dead", "dead_right", "reload", "hit",
+      "down", "stumble", "run", "shoot", "walk"
+    ]
