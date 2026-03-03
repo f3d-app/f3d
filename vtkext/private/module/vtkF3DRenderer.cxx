@@ -17,6 +17,10 @@
 #include "vtkF3DSolidBackgroundPass.h"
 #include "vtkF3DUserRenderPass.h"
 
+#if F3D_MODULE_UI
+#include "vtkF3DUIActor.h"
+#endif
+
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -55,6 +59,8 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkSSAAPass.h>
+#include <vtkInformation.h>
+#include <vtkInformationIntegerKey.h>
 #include <vtkScalarBarActor.h>
 #include <vtkShaderProperty.h>
 #include <vtkSkybox.h>
@@ -1673,6 +1679,12 @@ void vtkF3DRenderer::SetDropZoneBinds(
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetSceneHierarchy(const std::vector<F3DNodeInfo>& hierarchy)
+{
+  this->UIActor->SetHierarchy(hierarchy);
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetBlendingMode(BlendingMode mode)
 {
   if (this->BlendingModeEnabled != mode)
@@ -1876,6 +1888,17 @@ void vtkF3DRenderer::ConfigureMetaData()
     this->UIActor->SetMetaData(this->Importer->GetMetaDataDescription());
   }
   this->MetaDataConfigured = true;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowSceneHierarchy(bool show)
+{
+  if (this->SceneHierarchyVisible != show)
+  {
+    this->SceneHierarchyVisible = show;
+    this->UIActor->SetSceneHierarchyVisibility(show);
+    this->CheatSheetConfigured = false;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -3038,6 +3061,31 @@ void vtkF3DRenderer::ConfigureColoring()
 {
   assert(this->Importer);
 
+  // CAPTURE current visibility state BEFORE any changes
+  // Hierarchy checkboxes directly control OriginalActor visibility
+  // User clicks checkbox -> sets OriginalActor.SetVisibility()
+  // So OriginalActor visibility is the SOURCE OF TRUTH for what user wants
+  std::map<vtkActor*, bool> savedVisibility;
+
+  // Only capture OriginalActor visibility (what hierarchy checkboxes show)
+  for (const auto& coloring : this->Importer->GetColoringActorsAndMappers())
+  {
+    if (savedVisibility.find(coloring.OriginalActor) == savedVisibility.end())
+    {
+      // Read directly from OriginalActor - this is what user set via checkbox
+      savedVisibility[coloring.OriginalActor] = (coloring.OriginalActor->GetVisibility() != 0);
+    }
+  }
+
+  for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
+  {
+    if (savedVisibility.find(sprites.OriginalActor) == savedVisibility.end())
+    {
+      // Read directly from OriginalActor - this is what user set via checkbox
+      savedVisibility[sprites.OriginalActor] = (sprites.OriginalActor->GetVisibility() != 0);
+    }
+  }
+
   // Recover coloring information and update handler
   bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume) ||
     (this->DisplayDepth && this->DisplayDepthScalarColoring);
@@ -3070,13 +3118,28 @@ void vtkF3DRenderer::ConfigureColoring()
             this->UseCellColoring);
         }
       }
+
+      // RESTORE saved visibility: if unchecked (false), hide everything
+      auto it = savedVisibility.find(coloring.OriginalActor);
+      if (it != savedVisibility.end() && !it->second)
+      {
+        // User unchecked this actor - hide it
+        visible = false;
+      }
+
+      // Set both actors to same visibility so checkbox matches display
       coloring.Actor->SetVisibility(visible);
-      coloring.OriginalActor->SetVisibility(!visible);
+      coloring.OriginalActor->SetVisibility(visible);
     }
     else
     {
+      // Not in geometry mode - hide display actor but keep OriginalActor for checkbox state
       coloring.Actor->SetVisibility(false);
-      coloring.OriginalActor->SetVisibility(false);
+
+      // Preserve checkbox state in OriginalActor
+      auto it = savedVisibility.find(coloring.OriginalActor);
+      bool checkboxChecked = (it != savedVisibility.end()) ? it->second : true;
+      coloring.OriginalActor->SetVisibility(checkboxChecked);
     }
   }
   if (geometriesVisible)
@@ -3088,7 +3151,17 @@ void vtkF3DRenderer::ConfigureColoring()
   bool pointSpritesVisible = !this->UseRaytracing && !this->UseVolume && this->UsePointSprites;
   for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
   {
-    sprites.Actor->SetVisibility(pointSpritesVisible);
+    // Determine if this actor should be visible based on saved state
+    auto it = savedVisibility.find(sprites.OriginalActor);
+    bool shouldBeVisible = (it != savedVisibility.end()) ? it->second : true;
+
+    // Only show if in sprite mode AND actor should be visible
+    bool visible = pointSpritesVisible && shouldBeVisible;
+
+    // Set both actors to same visibility so checkbox matches display
+    sprites.Actor->SetVisibility(visible);
+    sprites.OriginalActor->SetVisibility(shouldBeVisible);
+
     if (pointSpritesVisible)
     {
       if (hasColoring)
