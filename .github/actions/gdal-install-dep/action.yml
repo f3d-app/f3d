@@ -42,7 +42,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/gdal_install
-        key: gdal-${{inputs.version}}-${{ inputs.geotiff_version }}-${{inputs.proj_version}}-${{inputs.tiff_version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-2
+        key: gdal-${{inputs.version}}-${{ inputs.geotiff_version }}-${{inputs.proj_version}}-${{inputs.tiff_version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-3
 
     # Dependents: pdal vtk
     - name: Checkout gdal
