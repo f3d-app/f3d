@@ -22,6 +22,7 @@
 #include <vtkVersion.h>
 
 #include <cassert>
+#include <numeric>
 #include <sstream>
 
 struct vtkF3DGenericImporter::Internals
@@ -34,7 +35,6 @@ struct vtkF3DGenericImporter::Internals
     vtkNew<vtkPolyDataMapper> Mapper;
     vtkPolyData* Points = nullptr;
     vtkImageData* Image = nullptr;
-    std::string Name;
   };
 
   vtkSmartPointer<vtkAlgorithm> Reader = nullptr;
@@ -136,13 +136,21 @@ bool vtkF3DGenericImporter::GetTemporalInformation([[maybe_unused]] vtkIdType an
 
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::CreateActorForBlock(
-  vtkDataSet* block, vtkRenderer* ren, const std::string& blockName)
+  int nodeid, vtkDataSet* block, vtkRenderer* ren, const std::string& blockName)
 {
   this->Pimpl->Blocks.emplace_back();
   Internals::BlockData& bd = this->Pimpl->Blocks.back();
-  bd.Name = blockName;
 
   this->Pimpl->UpdateBlock(bd, block);
+
+  const int childNodeId = this->SceneHierarchy->AddNode("actor", nodeid);
+  this->SceneHierarchy->SetAttribute(
+    childNodeId, "flat_actor_id", this->ActorCollection->GetNumberOfItems());
+
+  if (!blockName.empty())
+  {
+    this->SceneHierarchy->SetAttribute(childNodeId, "label", blockName.c_str());
+  }
 
   bd.Mapper->SetInputConnection(bd.PostPro->GetOutputPort(0));
   bd.Mapper->ScalarVisibilityOff();
@@ -155,9 +163,7 @@ void vtkF3DGenericImporter::CreateActorForBlock(
   bd.Actor->GetProperty()->SetInterpolationToPBR();
 
   ren->AddActor(bd.Actor);
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
   this->ActorCollection->AddItem(bd.Actor);
-#endif
 
   bd.Actor->VisibilityOn();
 }
@@ -166,6 +172,9 @@ void vtkF3DGenericImporter::CreateActorForBlock(
 void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 {
   assert(this->Pimpl->Reader);
+
+  this->SceneHierarchy = vtkSmartPointer<vtkDataAssembly>::New();
+  this->SceneHierarchy->SetAttribute(vtkDataAssembly::GetRootNode(), "label", "root");
 
   // Clear any previous blocks
   this->Pimpl->Blocks.clear();
@@ -191,7 +200,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
   if (mb)
   {
-    this->ImportMultiBlock(mb, ren);
+    this->ImportMultiBlock(vtkDataAssembly::GetRootNode(), mb, ren);
   }
   else if (pdc)
   {
@@ -222,7 +231,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
             blockName = name;
           }
         }
-        this->CreateActorForBlock(ds, ren, blockName);
+        this->CreateActorForBlock(vtkDataAssembly::GetRootNode(), ds, ren, blockName);
       }
     }
   }
@@ -232,7 +241,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     vtkDataSet* dataset = vtkDataSet::SafeDownCast(output);
     if (dataset)
     {
-      this->CreateActorForBlock(dataset, ren, "");
+      this->CreateActorForBlock(vtkDataAssembly::GetRootNode(), dataset, ren);
     }
     else
     {
@@ -416,11 +425,22 @@ vtkImageData* vtkF3DGenericImporter::GetImportedImage(vtkIdType actorIndex)
 //----------------------------------------------------------------------------
 std::string vtkF3DGenericImporter::GetBlockName(vtkIdType actorIndex)
 {
-  if (actorIndex >= 0 && actorIndex < static_cast<vtkIdType>(this->Pimpl->Blocks.size()))
-  {
-    return this->Pimpl->Blocks[actorIndex].Name;
-  }
-  return "";
+  // select the path to the leaf with the correct actor index, excluding the root
+  const std::string xpath =
+    "//*[@flat_actor_id='" + std::to_string(actorIndex) + "']/ancestor-or-self::*[parent::*]";
+
+  const std::vector<int> nodes = this->SceneHierarchy->SelectNodes({ xpath });
+
+  return std::accumulate(nodes.begin(), nodes.end(), std::string(),
+    [this](const std::string& currentPath, int nodeid) -> std::string
+    {
+      std::string result = currentPath;
+      if (!result.empty())
+      {
+        result += "/";
+      }
+      return result + this->SceneHierarchy->GetAttributeOrDefault(nodeid, "label", "node");
+    });
 }
 
 //----------------------------------------------------------------------------
@@ -430,8 +450,7 @@ vtkIdType vtkF3DGenericImporter::GetNumberOfBlocks()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DGenericImporter::ImportMultiBlock(
-  vtkMultiBlockDataSet* mb, vtkRenderer* ren, const std::string& parentName)
+void vtkF3DGenericImporter::ImportMultiBlock(int nodeid, vtkMultiBlockDataSet* mb, vtkRenderer* ren)
 {
   for (unsigned int i = 0; i < mb->GetNumberOfBlocks(); i++)
   {
@@ -441,20 +460,15 @@ void vtkF3DGenericImporter::ImportMultiBlock(
       continue;
     }
 
-    std::string blockName = parentName;
-    if (!blockName.empty())
-    {
-      blockName += "/";
-    }
+    std::string blockName = "Block_" + std::to_string(i);
 
-    if (const char* name =
-          mb->HasMetaData(i) ? mb->GetMetaData(i)->Get(vtkCompositeDataSet::NAME()) : nullptr)
+    if (mb->HasMetaData(i))
     {
-      blockName += name;
-    }
-    else
-    {
-      blockName += "Block_" + std::to_string(i);
+      const char* name = mb->GetMetaData(i)->Get(vtkCompositeDataSet::NAME());
+      if (name)
+      {
+        blockName = name;
+      }
     }
 
     vtkMultiBlockDataSet* childMB = vtkMultiBlockDataSet::SafeDownCast(obj);
@@ -463,10 +477,16 @@ void vtkF3DGenericImporter::ImportMultiBlock(
 
     if (childMB)
     {
-      this->ImportMultiBlock(childMB, ren, blockName);
+      int childNodeId = this->SceneHierarchy->AddNode("block", nodeid);
+      this->SceneHierarchy->SetAttribute(childNodeId, "label", blockName.c_str());
+
+      this->ImportMultiBlock(childNodeId, childMB, ren);
     }
     else if (childComposite)
     {
+      int childNodeId = this->SceneHierarchy->AddNode("block", nodeid);
+      this->SceneHierarchy->SetAttribute(childNodeId, "label", blockName.c_str());
+
       auto iter = vtkSmartPointer<vtkCompositeDataIterator>::Take(childComposite->NewIterator());
       iter->SkipEmptyNodesOn();
       int subIdx = 0;
@@ -475,17 +495,25 @@ void vtkF3DGenericImporter::ImportMultiBlock(
         vtkDataSet* subDs = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
         if (subDs)
         {
-          const char* name = iter->HasCurrentMetaData()
-            ? iter->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME())
-            : "Block_";
-          blockName += "/" + (name ? std::string(name) : "Block_") + std::to_string(subIdx);
-          this->CreateActorForBlock(subDs, ren, blockName);
+
+          std::string subName = "Object_" + std::to_string(subIdx);
+
+          if (iter->HasCurrentMetaData())
+          {
+            const char* name = iter->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME());
+            if (name)
+            {
+              subName = name;
+            }
+          }
+
+          this->CreateActorForBlock(childNodeId, subDs, ren, subName);
         }
       }
     }
     else if (ds)
     {
-      this->CreateActorForBlock(ds, ren, blockName);
+      this->CreateActorForBlock(nodeid, ds, ren, blockName);
     }
   }
 }
@@ -498,7 +526,7 @@ void vtkF3DGenericImporter::ImportPartitionedDataSetCollection(
   vtkDataAssembly* assembly = pdc->GetDataAssembly();
   if (assembly)
   {
-    std::vector<int> childNodes = assembly->GetChildNodes(assembly->GetRootNode());
+    const std::vector<int> childNodes = assembly->GetChildNodes(assembly->GetRootNode());
     for (int nodeId : childNodes)
     {
       const char* nodeName = assembly->GetNodeName(nodeId);
@@ -585,6 +613,6 @@ void vtkF3DGenericImporter::ImportPartitionedDataSet(
       blockName += std::to_string(j);
     }
 
-    this->CreateActorForBlock(ds, ren, blockName);
+    this->CreateActorForBlock(vtkDataAssembly::GetRootNode(), ds, ren, blockName);
   }
 }

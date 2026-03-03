@@ -1,0 +1,21 @@
+# StreamVersion 1.2
+
+# Enable scene hierarchy by pressing SHIFT+H
+KeyPressEvent 277 115 0 0 1 Shift_L 0
+CharEvent 277 115 0 0 1 Shift_L 0
+KeyPressEvent 276 116 1 72 1 H 0
+CharEvent 276 116 1 72 1 H 0
+KeyReleaseEvent 200 123 1 72 1 H 0
+KeyReleaseEvent 136 135 1 0 1 Shift_L 0
+
+# Move mouse to a checkbox and click on it 3 times
+MouseMoveEvent 70 256 0 0 0 Shift_L 0
+LeftButtonPressEvent 70 256 0 0 0 Shift_L 0
+LeftButtonReleaseEvent 70 256 0 0 0 Shift_L 0
+LeftButtonPressEvent 70 256 0 0 0 Shift_L 0
+LeftButtonReleaseEvent 70 256 0 0 0 Shift_L 0
+LeftButtonPressEvent 70 256 0 0 0 Shift_L 0
+LeftButtonReleaseEvent 70 256 0 0 0 Shift_L 0
+
+# Move away from the checkbox
+MouseMoveEvent 60 175 0 0 0 Shift_L 0

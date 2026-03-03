@@ -1,0 +1,21 @@
+# StreamVersion 1.2
+
+# Enable scene hierarchy by pressing SHIFT+H
+KeyPressEvent 87 120 0 0 1 Shift_L 0
+CharEvent 87 120 0 0 1 Shift_L 0
+KeyPressEvent 87 120 1 72 1 H 0
+CharEvent 87 120 1 72 1 H 0
+KeyReleaseEvent 87 120 1 72 1 H 0
+KeyReleaseEvent 87 120 1 0 1 Shift_L 0
+
+# Move mouse to the right of the scene hierarchy widget and resize it
+MouseMoveEvent 206 153 0 0 0 Shift_L 0
+LeftButtonPressEvent 206 153 0 0 0 Shift_L 0
+MouseMoveEvent 271 150 0 0 0 Shift_L 0
+TimerEvent 271 150 0 0 0 Shift_L 0
+LeftButtonReleaseEvent 270 150 0 0 0 Shift_L 0
+
+# Move mouse to a checkbox and click on it
+MouseMoveEvent 86 144 0 0 0 Shift_L 0
+LeftButtonPressEvent 85 144 0 0 0 Shift_L 0
+LeftButtonReleaseEvent 85 144 0 0 0 Shift_L 0

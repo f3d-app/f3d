@@ -134,13 +134,13 @@ private:
   /**
    * Create an actor for a single dataset block
    */
-  void CreateActorForBlock(vtkDataSet* block, vtkRenderer* ren, const std::string& blockName = "");
+  void CreateActorForBlock(
+    int nodeid, vtkDataSet* block, vtkRenderer* ren, const std::string& blockName = "");
 
   /**
    * Import blocks from a vtkMultiBlockDataSet with proper name extraction
    */
-  void ImportMultiBlock(
-    vtkMultiBlockDataSet* mb, vtkRenderer* ren, const std::string& parentName = "");
+  void ImportMultiBlock(int nodeid, vtkMultiBlockDataSet* mb, vtkRenderer* ren);
 
   /**
    * Import blocks from a vtkPartitionedDataSetCollection with proper name extraction

@@ -17,16 +17,6 @@ public:
   static vtkF3DConsoleOutputWindow* New();
 
   /**
-   * Custom events invoked by this class
-   */
-  enum vtkCustomEvents
-  {
-    TriggerEvent = vtkCommand::UserEvent + 200,
-    ShowEvent,
-    HideEvent
-  };
-
-  /**
    * Reimplemented to support coloring
    */
   void DisplayText(const char*) override;

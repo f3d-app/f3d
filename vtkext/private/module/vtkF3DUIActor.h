@@ -100,6 +100,12 @@ public:
   void SetMetaDataVisibility(bool show);
 
   /**
+   * Set the scene hierarchy visibility
+   * False by default
+   */
+  void SetSceneHierarchyVisibility(bool show);
+
+  /**
    * Set the filename string
    * Empty by default
    */
@@ -207,6 +213,13 @@ protected:
   }
 
   /**
+   * Render the scene hierarchy UI widget
+   */
+  virtual void RenderSceneHierarchy(vtkOpenGLRenderWindow*)
+  {
+  }
+
+  /**
    * Render the filename UI widget
    */
   virtual void RenderFileName()
@@ -267,6 +280,8 @@ protected:
 
   bool MetaDataVisible = false;
   std::string MetaData = "";
+
+  bool SceneHierarchyVisible = false;
 
   bool CheatSheetVisible = false;
   std::vector<CheatSheetGroup> CheatSheet;

@@ -2,6 +2,7 @@
 
 #include "F3DLog.h"
 #include "vtkF3DRenderer.h"
+#include "vtkF3DUserEvents.h"
 
 #include <vtkCamera.h>
 #include <vtkMath.h>
@@ -117,13 +118,13 @@ void vtkF3DInteractorStyle::OnDropFiles(vtkStringArray* files)
     F3DLog::Print(F3DLog::Severity::Warning, "Drop event without any provided files.");
     return;
   }
-  this->InvokeEvent(vtkF3DInteractorStyle::DropFilesEvent, files);
+  this->InvokeEvent(vtkF3DUserEvents::DropFilesEvent, files);
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DInteractorStyle::OnKeyPress()
 {
-  this->InvokeEvent(vtkF3DInteractorStyle::KeyPressEvent, nullptr);
+  this->InvokeEvent(vtkF3DUserEvents::KeyPressEvent, nullptr);
 }
 
 //------------------------------------------------------------------------------

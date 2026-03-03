@@ -103,6 +103,7 @@ public:
   void ShowDropZoneLogo(bool show);
   void ShowHDRISkybox(bool show);
   void ShowArmature(bool show);
+  void ShowSceneHierarchy(bool show);
   ///@}
 
   using vtkOpenGLRenderer::SetBackground;
@@ -388,6 +389,22 @@ public:
    */
   void SetImporter(vtkF3DMetaImporter* importer);
 
+  /**
+   * Get the meta importer
+   */
+  vtkF3DMetaImporter* GetMetaImporter()
+  {
+    return this->Importer;
+  }
+
+  /**
+   * Mark the coloring as dirty for force update
+   */
+  void ForceUpdateColoring()
+  {
+    this->ColoringConfigured = false;
+  }
+
   ///@{
   /**
    * Set/Get if coloring is enabled
@@ -574,9 +591,9 @@ private:
   void CreateCacheDirectory();
 
   /**
-   * Configure coloring for all actors
+   * Configure coloring and handle visibility for all actors
    */
-  void ConfigureColoring();
+  void ConfigureColoringAndVisibilities();
 
   /**
    * Convenience method for configuring a poly data mapper for coloring
@@ -675,6 +692,7 @@ private:
   bool FilenameVisible = false;
   bool MetaDataVisible = false;
   bool HDRIFilenameVisible = false;
+  bool SceneHierarchyVisible = false;
   bool CheatSheetVisible = false;
   bool ConsoleVisible = false;
   bool MinimalConsoleVisible = false;

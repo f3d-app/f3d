@@ -1,3 +1,6 @@
+set(sources "")
+set(private_headers ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DUserEvents.h)
+
 set(F3D_DEFAULT_HDRI "${F3D_SOURCE_DIR}/resources/defaultHDRI.png" CACHE PATH "Default HDRI when no HDRI file is provided")
 mark_as_advanced(F3D_DEFAULT_HDRI)
 include("f3dEmbed")
@@ -6,8 +9,8 @@ f3d_embed_file(
   NAME F3DDefaultHDRI
   BINARY)
 
-set(sources ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.cxx)
-set(private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.h)
+list(APPEND sources ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.cxx)
+list(APPEND private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.h)
 
 set(F3D_CHECKERBOARD_TEXTURE "${F3D_SOURCE_DIR}/resources/checkerboard.png" CACHE PATH "Default F3D Checkerboard")
 mark_as_advanced(F3D_CHECKERBOARD_TEXTURE)
@@ -17,7 +20,7 @@ f3d_embed_file(
   BINARY)
 
 list(APPEND sources ${CMAKE_CURRENT_BINARY_DIR}/F3DCheckerBoard.cxx)
-list(APPEND private_header ${CMAKE_CURRENT_BINARY_DIR}/F3DCheckerBoard.h)
+list(APPEND private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DCheckerBoard.h)
 
 if(F3D_MODULE_UI)
   set(F3D_FONT_FILE "${F3D_SOURCE_DIR}/resources/MonaspaceNeon-Regular.otf" CACHE PATH "Font used in UI widgets")

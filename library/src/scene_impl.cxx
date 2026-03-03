@@ -90,9 +90,9 @@ public:
     data->timer->StartTimer();
   }
 
-  void Load(const std::vector<vtkSmartPointer<vtkImporter>>& importers)
+  void Load(const std::vector<std::pair<std::string, vtkSmartPointer<vtkImporter>>>& importers)
   {
-    for (const vtkSmartPointer<vtkImporter>& importer : importers)
+    for (const auto& importer : importers)
     {
       this->MetaImporter->AddImporter(importer);
     }
@@ -239,7 +239,7 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
     return *this;
   }
 
-  std::vector<vtkSmartPointer<vtkImporter>> importers;
+  std::vector<std::pair<std::string, vtkSmartPointer<vtkImporter>>> importers;
   for (const fs::path& filePath : filePaths)
   {
     if (filePath.empty())
@@ -288,7 +288,7 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       genericImporter->SetInternalReader(vtkReader);
       importer = genericImporter;
     }
-    importers.emplace_back(importer);
+    importers.emplace_back(filePath.filename().string(), importer);
   }
 
   log::debug("\nLoading files: ");
@@ -370,7 +370,7 @@ scene& scene_impl::add(const std::byte* buffer, std::size_t size)
   }
 
   log::debug("\nLoading stream");
-  this->Internals->Load({ importer });
+  this->Internals->Load({ { "<stream>", importer } });
   return *this;
 }
 
@@ -394,7 +394,7 @@ scene& scene_impl::add(const mesh_t& mesh)
   importer->SetInternalReader(vtkSource);
 
   log::debug("Loading 3D scene from memory");
-  this->Internals->Load({ importer });
+  this->Internals->Load({ { "<mesh>", importer } });
   return *this;
 }
 
