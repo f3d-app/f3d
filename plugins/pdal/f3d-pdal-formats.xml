@@ -24,4 +24,8 @@
     <comment>Point Cloud Data</comment>
     <glob pattern="*.pcd"/>
   </mime-type>
+  <mime-type type="application/vnd.ptx">
+    <comment>Leica Cyclone PTX</comment>
+    <glob pattern="*.ptx"/>
+  </mime-type>
 </mime-info>

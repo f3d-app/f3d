@@ -53,6 +53,14 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "Point Cloud Data"
 )
 
+f3d_plugin_declare_reader(
+  NAME LeicaCyclone
+  EXTENSIONS ptx
+  MIMETYPES application/vnd.ptx
+  VTK_READER vtkF3DPDALReader
+  FORMAT_DESCRIPTION "Leica Cyclone"
+)
+
 f3d_plugin_build(
   NAME pdal
   VERSION 1.0

@@ -1,7 +1,7 @@
 [
   {
     "match-type": "glob",
-    "match": "*.{las,laz,bpf,bin,pcd}",
+    "match": "*.{las,laz,bpf,bin,pcd,ptx}",
     "options": {
       "coloring-array": "NormalizedColor",
       "coloring-component": "-2",
