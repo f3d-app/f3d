@@ -1,7 +1,7 @@
 #include "vtkF3DPDALReader.h"
 
-#include "vtkPointData.h"
 #include "vtkDoubleArray.h"
+#include "vtkPointData.h"
 
 #include <iostream>
 
@@ -26,8 +26,8 @@ int vtkF3DPDALReader::RequestData(
     vtkNew<vtkDoubleArray> normalizedColors;
     normalizedColors->SetNumberOfComponents(3);
     normalizedColors->SetName("NormalizedColor");
-    
-    // TODO PROPER API 
+
+    // TODO PROPER API
     double colorRanges[3][2];
     for (int j = 0; j < 3; j++)
     {
@@ -48,7 +48,7 @@ int vtkF3DPDALReader::RequestData(
       {
         normalized[j] = (color[j] - colorRanges[j][0]) / colorRanges[j][1];
       }
-      normalizedColors->InsertNextTuple(normalized); 
+      normalizedColors->InsertNextTuple(normalized);
     }
     pointData->AddArray(normalizedColors);
   }
