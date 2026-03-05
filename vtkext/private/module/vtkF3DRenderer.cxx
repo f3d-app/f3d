@@ -3066,7 +3066,9 @@ void vtkF3DRenderer::ConfigureColoring()
   bool geometriesVisible = this->UseRaytracing || (!this->UseVolume && !this->UsePointSprites);
   for (const auto& coloring : this->Importer->GetColoringActorsAndMappers())
   {
-    if (geometriesVisible && !coloring.OriginalActor->GetPropertyKeys()->Has(vtkF3DMetaImporter::ACTOR_HIDDEN()))
+    if (geometriesVisible &&
+      !(coloring.OriginalActor->GetPropertyKeys() &&
+        coloring.OriginalActor->GetPropertyKeys()->Has(vtkF3DMetaImporter::ACTOR_HIDDEN())))
     {
       bool visible = false;
       if (hasColoring)
@@ -3099,7 +3101,9 @@ void vtkF3DRenderer::ConfigureColoring()
   bool pointSpritesVisible = !this->UseRaytracing && !this->UseVolume && this->UsePointSprites;
   for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
   {
-    if (pointSpritesVisible && !sprites.OriginalActor->GetPropertyKeys()->Has(vtkF3DMetaImporter::ACTOR_HIDDEN()))
+    if (pointSpritesVisible &&
+      !(sprites.OriginalActor->GetPropertyKeys() &&
+        sprites.OriginalActor->GetPropertyKeys()->Has(vtkF3DMetaImporter::ACTOR_HIDDEN())))
     {
       sprites.Actor->VisibilityOn();
       if (hasColoring)
@@ -3127,8 +3131,10 @@ void vtkF3DRenderer::ConfigureColoring()
   bool volumeVisible = !this->UseRaytracing && this->UseVolume;
   const auto& volPropsAndMappers = this->Importer->GetVolumePropsAndMappers();
   for (const auto& volume : volPropsAndMappers)
-  { 
-    if (volumeVisible && !volume.Prop->GetPropertyKeys()->Has(vtkF3DMetaImporter::ACTOR_HIDDEN()))
+  {
+    if (volumeVisible &&
+      !(volume.Prop->GetPropertyKeys() &&
+        volume.Prop->GetPropertyKeys()->Has(vtkF3DMetaImporter::ACTOR_HIDDEN()))) // TODO: I think it's wrong
     {
       bool visible = false;
       if (hasColoring)

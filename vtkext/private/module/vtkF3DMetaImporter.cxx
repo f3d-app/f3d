@@ -8,9 +8,9 @@
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
 #include <vtkImageData.h>
+#include <vtkInformationIntegerKey.h>
 #include <vtkObjectFactory.h>
 #include <vtkPolyData.h>
-#include <vtkInformationIntegerKey.h>
 #include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
 #include <vtkSmartPointer.h>
@@ -245,10 +245,22 @@ bool vtkF3DMetaImporter::Update()
     {
       importerInfo.DataAssembly = vtkSmartPointer<vtkDataAssembly>::New();
 
-      importerInfo.DataAssembly->SetRootNodeName("foo");
-
-      // TODO: fill actors
+      // loop on actors
+      vtkCollectionSimpleIterator ait;
+      actorCollection->InitTraversal(ait);
+      vtkIdType actorIndex = 0;
+      while (vtkActor* actor = actorCollection->GetNextActor(ait))
+      {
+        std::string actorName = "actor" + std::to_string(actorIndex);
+        std::string actorLabel = "Actor #" + std::to_string(actorIndex);
+        int nodeid = importerInfo.DataAssembly->AddNode(actorName.c_str(), importerInfo.DataAssembly->GetRootNode());
+        importerInfo.DataAssembly->SetAttribute(nodeid, "label", actorLabel.c_str());
+        importerInfo.DataAssembly->SetAttribute(nodeid, "flat_actor_id", actorIndex);
+        actorIndex++;
+      }
     }
+
+    importerInfo.DataAssembly->SetRootNodeName(importerInfo.Importer->GetClassName()); // TODO: better naming
 
     // Recover generic importer if any (for indexed access to points/image)
     vtkF3DGenericImporter* genericImporter = vtkF3DGenericImporter::SafeDownCast(importer);

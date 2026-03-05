@@ -108,7 +108,14 @@ protected:
     {
       vtkActorCollection* actors = this->Importer->GetImportedActors();
       vtkActor* actor = vtkActor::SafeDownCast(actors->GetItemAsObject(flatActorIndex));
-      vtkInformation* keys = actor->GetPropertyKeys();
+
+      vtkSmartPointer<vtkInformation> keys = actor->GetPropertyKeys();
+
+      if (!keys)
+      {
+        keys = vtkSmartPointer<vtkInformation>::New();
+        actor->SetPropertyKeys(keys);
+      }
 
       if (this->Visible == 1)
       {
@@ -180,7 +187,9 @@ protected:
     bool visible = (this->GetAssembly()->GetAttributeOrDefault(nodeid, "f3d_visible", 1) != 0);
 
     ImGui::PushID(uuid);
-    if (ImGui::Checkbox(this->GetCurrentNodeName(), &visible))
+    if (ImGui::Checkbox(
+          this->GetAssembly()->GetAttributeOrDefault(nodeid, "label", this->GetCurrentNodeName()),
+          &visible))
     {
       vtkNew<vtkF3DVisibilityDataAssemblyVisitor> attrVisitor;
       attrVisitor->SetImporter(this->Importer);
