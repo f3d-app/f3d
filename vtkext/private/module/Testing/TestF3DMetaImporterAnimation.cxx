@@ -38,7 +38,7 @@ int TestF3DMetaImporterAnimation(int argc, char* argv[])
   importerOBJ->SetFileName(filename.c_str());
   std::string path = vtksys::SystemTools::GetFilenamePath(filename);
   importerOBJ->SetTexturePath(path.c_str());
-  importer->AddImporter(importerOBJ);
+  importer->AddImporter({ "foo", importerOBJ });
 
   vtkNew<vtkRenderWindow> window;
   vtkNew<vtkRenderer> renderer;

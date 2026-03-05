@@ -176,9 +176,14 @@ f3d_test(NAME TestMetaDataImporter DATA BoxAnimated.gltf ARGS -m UI)
 f3d_test(NAME TestMultiblockMetaData DATA mb.vtm ARGS -m UI)
 
 ## Scene Hierarchy
-f3d_test(NAME TestSceneHierarchyGLTF DATA InterpolationTest.glb ARGS --scene-hierarchy UI)
-f3d_test(NAME TestSceneHierarchyGLTFAnimated DATA BoxAnimated.gltf ARGS --scene-hierarchy UI)
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12987
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20260306)
+  f3d_test(NAME TestSceneHierarchyGLTF DATA InterpolationTest.glb ARGS --scene-hierarchy UI)
+  f3d_test(NAME TestSceneHierarchyGLTFAnimated DATA BoxAnimated.gltf ARGS --scene-hierarchy UI)
+  f3d_test(NAME TestSceneHierarchyGLTFNodeNames DATA vtk-dasm-test.glb ARGS --scene-hierarchy RESOLUTION 400,650 UI)
+endif()
 f3d_test(NAME TestSceneHierarchyNonGLTF DATA cow.vtp ARGS --scene-hierarchy UI)
+f3d_test(NAME TestSceneHierarchyMultipleFiles DATA cow.vtp suzanne.obj ARGS --scene-hierarchy --multi-file-mode=all --opacity=0.3 UI)
 
 ## Special files handling
 f3d_test(NAME TestRemoveEmptyFileGroups DATA mb/mb_3_0.vtt mb/mb_0_0.vtu ARGS -n --remove-empty-file-groups UI)

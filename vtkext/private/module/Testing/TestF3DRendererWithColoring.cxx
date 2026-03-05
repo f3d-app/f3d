@@ -30,7 +30,7 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   vtkNew<vtkF3DGenericImporter> importerVTU;
   importerVTU->SetInternalReader(readerVTU);
 
-  importer->AddImporter(importerVTU);
+  importer->AddImporter({ "foo", importerVTU });
   importer->Update();
 
   // Check invalid array code path
