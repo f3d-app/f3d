@@ -77,6 +77,14 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "Smothed Best Estimate of Trajectory"
 )
 
+f3d_plugin_declare_reader(
+  NAME FBI
+  EXTENSIONS fbi
+  MIMETYPES application/vnd.fbi
+  VTK_READER vtkF3DPDALReader
+  FORMAT_DESCRIPTION "TerraScan FastBinary"
+)
+
 f3d_plugin_build(
   NAME pdal
   VERSION 1.0

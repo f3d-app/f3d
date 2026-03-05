@@ -3,6 +3,7 @@
 # Copyrights and Licenses
 
 - (ノಠ益ಠ )ノ.vtp: VTK Data: BSD-3-Clause
+- 1.2-with-color.fbi: PDAL: Copyright (c) 2025, Hobu, Inc.
 - 1.2-with-color.ptx: PDAL: Copyright (c) 2025, Hobu, Inc.
 - 10-word.qi: PDAL: Copyright (c) 2025, Hobu, Inc.
 - 16bits.\*: @bisechen: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
@@ -14,6 +15,7 @@
 - animation_with_skeleton.fbx: assimp test models: BSD-3-Clause
 - armor.mdl: LibreQuake Project: BSD-3-Clause
 - autzen-utm.pcd: PDAL: Copyright (c) 2025, Hobu, Inc.
+- autzen-trim.sbet: PDAL: Copyright (c) 2025, Hobu, Inc.
 - beach.nrrd: VTK Data: BSD-3-Clause
 - bluntfin.vts: VTK Data: BSD-3-Clause
 - bot2.wrl: VTK Data: BSD-3-Clause
