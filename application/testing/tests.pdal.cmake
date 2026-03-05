@@ -10,7 +10,7 @@ f3d_test(NAME TestSBET DATA autzen_trim.sbet PLUGIN pdal ARGS --scalar-coloring 
 
 # Default camera position goes wrong because of https://github.com/f3d-app/f3d/issues/2921
 # and the only sample file found was the one from pdal
-f3d_test(NAME TestCSD DATA sample.csd PLUGIN pdal ARGS --scalar-coloring --camera-view-angle=15 --camera-zoom-factor=1 --camera-position=-10,10,-10 --up=+Y)
+f3d_test(NAME TestCSD DATA sample.csd PLUGIN pdal ARGS --scalar-coloring --camera-direction=-1,-1,-1)
 f3d_test(NAME TestQI DATA 10-word.qi PLUGIN pdal ARGS --scalar-coloring --camera-direction=-1,-1,-1)
 f3d_test(NAME TestSLPK DATA SMALL_AUTZEN_LAS_All.slpk PLUGIN pdal ARGS --camera-direction=-1,-1,-1)
 
