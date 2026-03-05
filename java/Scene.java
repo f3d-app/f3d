@@ -173,7 +173,7 @@ public class Scene {
      *
      * @return list of double
      */
-    public native List<Double> getAnimationKeyFrames();
+    public native double[] getAnimationKeyFrames();
 
     /**
      * Return the number of animations available in the currently loaded files.
