@@ -61,6 +61,14 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "Leica Cyclone"
 )
 
+f3d_plugin_declare_reader(
+  NAME QFIT
+  EXTENSIONS qi
+  MIMETYPES application/vnd.qi
+  VTK_READER vtkF3DPDALReader
+  FORMAT_DESCRIPTION "Airborne Topographic Mapper QFIT"
+)
+
 f3d_plugin_build(
   NAME pdal
   VERSION 1.0

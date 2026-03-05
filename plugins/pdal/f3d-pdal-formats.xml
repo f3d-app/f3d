@@ -28,4 +28,8 @@
     <comment>Leica Cyclone PTX</comment>
     <glob pattern="*.ptx"/>
   </mime-type>
+  <mime-type type="application/vnd.qi">
+    <comment>Airborne Topographic Mapper QFIT</comment>
+    <glob pattern="*.qi"/>
+  </mime-type>
 </mime-info>
