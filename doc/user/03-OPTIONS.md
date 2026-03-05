@@ -360,6 +360,10 @@ Display the _name of the file_ on top of the window.
 
 Display the _metadata_.
 
+### `--scene-hierarchy` (_bool_, default: `false`)
+
+Display the _scene hierarchy_.
+
 ### `--hdri-filename` (_bool_, default: `false`)
 
 Display the _hdri-filename_.
