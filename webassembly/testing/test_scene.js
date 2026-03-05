@@ -42,7 +42,7 @@ const settings = {
       "First KeyFrame should be 0.7999999999999999",
     );
 
-    scene.loadAnimationTime(1.5);
+    scene.loadAnimationTime(0.5);
 
     utils.assert(
       scene.getAnimationName() == "stand",
