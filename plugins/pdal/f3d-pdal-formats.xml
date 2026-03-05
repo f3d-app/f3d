@@ -32,4 +32,8 @@
     <comment>Airborne Topographic Mapper QFIT</comment>
     <glob pattern="*.qi"/>
   </mime-type>
+  <mime-type type="application/vnd.sbet">
+    <comment>Smothed Best Estimate of Trajectory</comment>
+    <glob pattern="*.sbet"/>
+  </mime-type>
 </mime-info>

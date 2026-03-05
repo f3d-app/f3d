@@ -12,6 +12,15 @@
   },
   {
     "match-type": "glob",
+    "match": "*.{sbet}",
+    "options": {
+      "load-plugins": "pdal",
+      "scalar-coloring": true,
+      "up": "+Z"
+    }
+  },
+  {
+    "match-type": "glob",
     "match": "*.{csd,qi}",
     "options": {
       "load-plugins": "pdal",
