@@ -77,9 +77,9 @@ void vtkF3DMetaImporter::Clear()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DMetaImporter::AddImporter(const vtkSmartPointer<vtkImporter>& importer)
+void vtkF3DMetaImporter::AddImporter(const std::pair<std::string, vtkSmartPointer<vtkImporter>>& importer)
 {
-  this->Pimpl->Importers.emplace_back(vtkF3DMetaImporter::ImporterInfo{ importer, false, nullptr });
+  this->Pimpl->Importers.emplace_back(vtkF3DMetaImporter::ImporterInfo{ importer.first, importer.second, false, nullptr });
   this->Modified();
 
   // Add a progress event observer
@@ -102,7 +102,7 @@ void vtkF3DMetaImporter::AddImporter(const vtkSmartPointer<vtkImporter>& importe
       }
       self->InvokeEvent(vtkCommand::ProgressEvent, &actualProgress);
     });
-  importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
+  importer.second->AddObserver(vtkCommand::ProgressEvent, progressCallback);
 }
 
 //----------------------------------------------------------------------------
@@ -251,8 +251,8 @@ bool vtkF3DMetaImporter::Update()
       vtkIdType actorIndex = 0;
       while (vtkActor* actor = actorCollection->GetNextActor(ait))
       {
-        std::string actorName = "actor" + std::to_string(actorIndex);
-        std::string actorLabel = "Actor #" + std::to_string(actorIndex);
+        std::string actorName = "object" + std::to_string(actorIndex);
+        std::string actorLabel = "Object #" + std::to_string(actorIndex);
         int nodeid = importerInfo.DataAssembly->AddNode(actorName.c_str(), importerInfo.DataAssembly->GetRootNode());
         importerInfo.DataAssembly->SetAttribute(nodeid, "label", actorLabel.c_str());
         importerInfo.DataAssembly->SetAttribute(nodeid, "flat_actor_id", actorIndex);
@@ -260,7 +260,7 @@ bool vtkF3DMetaImporter::Update()
       }
     }
 
-    importerInfo.DataAssembly->SetRootNodeName(importerInfo.Importer->GetClassName()); // TODO: better naming
+    importerInfo.DataAssembly->SetAttribute(vtkDataAssembly::GetRootNode(), "label", importerInfo.Name.c_str());
 
     // Recover generic importer if any (for indexed access to points/image)
     vtkF3DGenericImporter* genericImporter = vtkF3DGenericImporter::SafeDownCast(importer);

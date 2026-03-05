@@ -83,6 +83,7 @@ public:
 
   struct ImporterInfo
   {
+    std::string Name;
     vtkSmartPointer<vtkImporter> Importer;
     bool Updated = false;
     vtkSmartPointer<vtkDataAssembly> DataAssembly;
@@ -97,7 +98,7 @@ public:
   /**
    * Add an importer to update when importer all actors
    */
-  void AddImporter(const vtkSmartPointer<vtkImporter>& importer);
+  void AddImporter(const std::pair<std::string, vtkSmartPointer<vtkImporter>>& importer);
 
   /**
    * Get the bounding box of all geometry actors
