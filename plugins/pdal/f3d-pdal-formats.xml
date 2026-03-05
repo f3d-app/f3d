@@ -40,4 +40,8 @@
     <comment>TerraScan FastBinary</comment>
     <glob pattern="*.fbi"/>
   </mime-type>
+  <mime-type type="application/vnd.slpk">
+    <comment>Esri Scene Layer Package</comment>
+    <glob pattern="*.slpk"/>
+  </mime-type>
 </mime-info>

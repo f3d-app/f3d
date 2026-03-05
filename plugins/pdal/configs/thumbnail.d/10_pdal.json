@@ -21,6 +21,14 @@
   },
   {
     "match-type": "glob",
+    "match": "*.slpk",
+    "options": {
+      "load-plugins": "pdal",
+      "up": "+Y"
+    }
+  },
+  {
+    "match-type": "glob",
     "match": "*.{csd,qi}",
     "options": {
       "load-plugins": "pdal",

@@ -67,6 +67,7 @@
 - skin.png: Blender: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - small.ex2: VTK Data: BSD-3-Clause
 - small.usdz: [Copyright USD contributors](https://github.com/usd-wg/assets/tree/main/full_assets/StandardShaderBall): [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- SMALL_AUTZEN_LAS_All.slpk: PDAL: Copyright (c) 2025, Hobu, Inc.
 - soldier_animations.mdl: LibreQuake Project: BSD-3-Clause
 - sphere_points.vdb: OpenVDB: [MPL-2.0](http://www.mozilla.org/MPL/2.0/)
 - teapot.off: Utah Teapot: Public Domain
