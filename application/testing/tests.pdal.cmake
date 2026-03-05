@@ -16,6 +16,8 @@ f3d_test(NAME TestPTX DATA 1.2-with-color.ptx PLUGIN pdal ARGS --scalar-coloring
 # and the only sample file found was the one from pdal
 f3d_test(NAME TestQI DATA 10-word.qi PLUGIN pdal ARGS --scalar-coloring --camera-direction=-1,-1,-1)
 
+f3d_test(NAME TestSBET DATA autzen_trim.sbet PLUGIN pdal ARGS --scalar-coloring --coloring-array=GpsTime)
+
 if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/plugins/pdal/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
@@ -27,6 +29,7 @@ if(NOT F3D_MACOS_BUNDLE)
     f3d_test(NAME TestDefaultConfigFilePCD DATA autzen-utm.pcd CONFIG config_build LONG_TIMEOUT LABELS "plugin;pdal" THRESHOLD 0.05)
     f3d_test(NAME TestDefaultConfigFilePTX DATA 1.2-with-color.ptx CONFIG config_build LONG_TIMEOUT LABELS "plugin;pdal")
     f3d_test(NAME TestDefaultConfigFileQI DATA 10-word.qi ARGS --camera-direction=-1,-1,-1 CONFIG config_build LONG_TIMEOUT LABELS "plugin;pdal")
+    f3d_test(NAME TestDefaultConfigFileSBET DATA autzen_trim.sbet CONFIG config_build LONG_TIMEOUT LABELS "plugin;pdal")
   endif()
   file(COPY "${F3D_SOURCE_DIR}/plugins/pdal/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
   f3d_test(NAME TestThumbnailConfigFileLAS DATA warsaw_small.las CONFIG thumbnail_build LONG_TIMEOUT LABELS "plugin;pdal")
@@ -37,4 +40,5 @@ if(NOT F3D_MACOS_BUNDLE)
   f3d_test(NAME TestThumbnailConfigFilePCD DATA autzen-utm.pcd CONFIG thumbnail_build LONG_TIMEOUT LABELS "plugin;pdal")
   f3d_test(NAME TestThumbnailConfigFilePTX DATA 1.2-with-color.ptx CONFIG thumbnail_build LONG_TIMEOUT LABELS "plugin;pdal")
   f3d_test(NAME TestThumbnailConfigFileQI DATA 10-word.qi ARGS --camera-direction=-1,-1,-1 CONFIG thumbnail_build LONG_TIMEOUT LABELS "plugin;pdal")
+  f3d_test(NAME TestThumbnailConfigFileSBET DATA autzen_trim.sbet CONFIG thumbnail_build LONG_TIMEOUT LABELS "plugin;pdal")
 endif()

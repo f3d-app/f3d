@@ -69,6 +69,14 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "Airborne Topographic Mapper QFIT"
 )
 
+f3d_plugin_declare_reader(
+  NAME SBET
+  EXTENSIONS sbet
+  MIMETYPES application/vnd.sbet
+  VTK_READER vtkF3DPDALReader
+  FORMAT_DESCRIPTION "Smothed Best Estimate of Trajectory"
+)
+
 f3d_plugin_build(
   NAME pdal
   VERSION 1.0

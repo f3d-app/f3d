@@ -13,8 +13,20 @@
   },
   {
     "match-type": "glob",
+    "match": "*.{sbet}",
+    "options": {
+      "coloring-scalar-bar": true,
+      "load-plugins": "pdal",
+      "point-size": "5",
+      "scalar-coloring": true,
+      "up": "+Z"
+    }
+  },
+  {
+    "match-type": "glob",
     "match": "*.{csd,qi}",
     "options": {
+      "coloring-scalar-bar": true,
       "load-plugins": "pdal",
       "point-size": "5",
       "scalar-coloring": true,
