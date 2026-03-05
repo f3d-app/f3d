@@ -399,9 +399,13 @@ extern "C"
     return result;
   }
 
-  JNIEXPORT jobject JAVA_BIND(Scene, getAnimationKeyFrames)(JNIEnv* env, jobject self)
+  JNIEXPORT jdoubleArray JAVA_BIND(Scene, getAnimationKeyFrames)(JNIEnv* env, jobject self)
   {
-    return CreateDoubleList(env, GetEngine(env, self)->getScene().getAnimationKeyFrames());
+    auto keyframeVec = GetEngine(env, self)->getScene().getAnimationKeyFrames();
+    jdoubleArray result = env->NewDoubleArray(keyframeVec.size());
+    const jdouble* keyframes = keyframeVec.data();
+    env->SetDoubleArrayRegion(result, 0, keyframeVec.size(), keyframes);
+    return result;
   }
 
   JNIEXPORT jint JAVA_BIND(Scene, availableAnimations)(JNIEnv* env, jobject self)
