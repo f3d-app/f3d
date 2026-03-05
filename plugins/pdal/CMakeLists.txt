@@ -85,6 +85,14 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "TerraScan FastBinary"
 )
 
+f3d_plugin_declare_reader(
+  NAME SLPK
+  EXTENSIONS slpk
+  MIMETYPES application/vnd.slpk
+  VTK_READER vtkF3DPDALReader
+  FORMAT_DESCRIPTION "Esri Scene Layer Package"
+)
+
 f3d_plugin_build(
   NAME pdal
   VERSION 1.0

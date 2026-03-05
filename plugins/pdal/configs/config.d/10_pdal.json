@@ -24,6 +24,15 @@
   },
   {
     "match-type": "glob",
+    "match": "*.{slpk}",
+    "options": {
+      "load-plugins": "pdal",
+      "point-size": "5",
+      "up": "+Y"
+    }
+  },
+  {
+    "match-type": "glob",
     "match": "*.{csd,qi}",
     "options": {
       "coloring-scalar-bar": true,

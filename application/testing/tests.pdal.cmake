@@ -4,19 +4,15 @@ f3d_test(NAME TestLAS DATA warsaw_small.las PLUGIN pdal ARGS --scalar-coloring -
 f3d_test(NAME TestLAZ DATA simple.laz PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1)
 f3d_test(NAME TestBPF DATA simple-extra.bpf PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1)
 f3d_test(NAME TestTerraScanBin DATA 20020715-time-color.bin PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1)
+f3d_test(NAME TestPCD DATA autzen-utm.pcd PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1)
+f3d_test(NAME TestPTX DATA 1.2-with-color.ptx PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1)
+f3d_test(NAME TestSBET DATA autzen_trim.sbet PLUGIN pdal ARGS --scalar-coloring --coloring-array=GpsTime)
 
 # Default camera position goes wrong because of https://github.com/f3d-app/f3d/issues/2921
 # and the only sample file found was the one from pdal
 f3d_test(NAME TestCSD DATA sample.csd PLUGIN pdal ARGS --scalar-coloring --camera-view-angle=15 --camera-zoom-factor=1 --camera-position=-10,10,-10 --up=+Y)
-
-f3d_test(NAME TestPCD DATA autzen-utm.pcd PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1)
-f3d_test(NAME TestPTX DATA 1.2-with-color.ptx PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1)
-
-# Default camera position goes wrong because of https://github.com/f3d-app/f3d/issues/2921
-# and the only sample file found was the one from pdal
 f3d_test(NAME TestQI DATA 10-word.qi PLUGIN pdal ARGS --scalar-coloring --camera-direction=-1,-1,-1)
-
-f3d_test(NAME TestSBET DATA autzen_trim.sbet PLUGIN pdal ARGS --scalar-coloring --coloring-array=GpsTime)
+f3d_test(NAME TestSLPK DATA SMALL_AUTZEN_LAS_All.slpk PLUGIN pdal ARGS --camera-direction=-1,-1,-1)
 
 # Baseline is incorect because of https://github.com/f3d-app/f3d/issues/2922
 f3d_test(NAME TestFBI DATA 1.2-with-color.fbi PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1)
@@ -34,6 +30,7 @@ if(NOT F3D_MACOS_BUNDLE)
     f3d_test(NAME TestDefaultConfigFileQI DATA 10-word.qi ARGS --camera-direction=-1,-1,-1 CONFIG config_build LONG_TIMEOUT LABELS "plugin;pdal")
     f3d_test(NAME TestDefaultConfigFileSBET DATA autzen_trim.sbet CONFIG config_build LONG_TIMEOUT LABELS "plugin;pdal")
     f3d_test(NAME TestDefaultConfigFileFBI DATA 1.2-with-color.fbi CONFIG config_build LONG_TIMEOUT LABELS "plugin;pdal")
+    f3d_test(NAME TestDefaultConfigFileSLPK DATA SMALL_AUTZEN_LAS_All.slpk ARGS --camera-direction=-1,-1,-1 CONFIG config_build LONG_TIMEOUT LABELS "plugin;pdal")
   endif()
   file(COPY "${F3D_SOURCE_DIR}/plugins/pdal/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
   f3d_test(NAME TestThumbnailConfigFileLAS DATA warsaw_small.las CONFIG thumbnail_build LONG_TIMEOUT LABELS "plugin;pdal")
@@ -46,4 +43,5 @@ if(NOT F3D_MACOS_BUNDLE)
   f3d_test(NAME TestThumbnailConfigFileQI DATA 10-word.qi ARGS --camera-direction=-1,-1,-1 CONFIG thumbnail_build LONG_TIMEOUT LABELS "plugin;pdal")
   f3d_test(NAME TestThumbnailConfigFileSBET DATA autzen_trim.sbet CONFIG thumbnail_build LONG_TIMEOUT LABELS "plugin;pdal")
   f3d_test(NAME TestThumbnailConfigFileFBI DATA 1.2-with-color.fbi CONFIG thumbnail_build LONG_TIMEOUT LABELS "plugin;pdal")
+  f3d_test(NAME TestThumbnailConfigFileSLPK DATA SMALL_AUTZEN_LAS_All.slpk ARGS --camera-direction=-1,-1,-1 CONFIG thumbnail_build LONG_TIMEOUT LABELS "plugin;pdal")
 endif()
