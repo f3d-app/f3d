@@ -12,7 +12,7 @@
   },
   {
     "match-type": "glob",
-    "match": "*.csd",
+    "match": "*.{csd,qi}",
     "options": {
       "load-plugins": "pdal",
       "scalar-coloring": true,
