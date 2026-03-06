@@ -271,6 +271,12 @@ double* f3d_scene_get_animation_keyframes(f3d_scene_t* scene, unsigned int* coun
 }
 
 //----------------------------------------------------------------------------
+void f3d_scene_free_animation_keyframes(double* keyframes)
+{
+  delete[] keyframes;
+}
+
+//----------------------------------------------------------------------------
 void f3d_scene_animation_time_range(f3d_scene_t* scene, double* min_time, double* max_time)
 {
   if (!scene)

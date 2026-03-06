@@ -145,6 +145,13 @@ extern "C"
   F3D_EXPORT double* f3d_scene_get_animation_keyframes(f3d_scene_t* scene, unsigned int* count);
 
   /**
+   * @brief Free the animation keyframes array.
+   *
+   * @param keyframes Pointer to the keyframes array to free.
+   */
+  F3D_EXPORT void f3d_scene_free_animation_keyframes(double* keyframes);
+
+  /**
    * @brief Get animation time range of currently added files.
    *
    * @param scene Scene handle.
