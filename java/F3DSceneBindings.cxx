@@ -413,9 +413,9 @@ extern "C"
     return GetEngine(env, self)->getScene().availableAnimations();
   }
 
-  JNIEXPORT jstring JAVA_BIND(Scene, getAnimationName)(JNIEnv* env, jobject self, jint indices)
+  JNIEXPORT jstring JAVA_BIND(Scene, getAnimationName)(JNIEnv* env, jobject self, jint index)
   {
-    return env->NewStringUTF(GetEngine(env, self)->getScene().getAnimationName(indices).c_str());
+    return env->NewStringUTF(GetEngine(env, self)->getScene().getAnimationName(index).c_str());
   }
 
   JNIEXPORT jobject JAVA_BIND(Scene, getAnimationNames)(JNIEnv* env, jobject self)

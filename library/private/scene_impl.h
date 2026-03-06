@@ -48,7 +48,7 @@ public:
   std::pair<double, double> animationTimeRange() override;
   std::vector<double> getAnimationKeyFrames() override;
   unsigned int availableAnimations() const override;
-  std::string getAnimationName(int indices = -1) override;
+  std::string getAnimationName(int index = -1) override;
   std::vector<std::string> getAnimationNames() override;
   ///@}
 
