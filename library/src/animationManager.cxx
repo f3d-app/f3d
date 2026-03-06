@@ -582,7 +582,7 @@ void animationManager::PrepareForAnimationIndices()
 
       // Accumulate timesteps to avoid overwrite
       for (vtkIdType stepIndex = 0; stepIndex < this->AnimationTimeSteps->GetNumberOfTuples();
-        stepIndex++)
+           stepIndex++)
       {
         accumulatedTimeSteps.emplace(this->AnimationTimeSteps->GetValue(stepIndex));
       }
