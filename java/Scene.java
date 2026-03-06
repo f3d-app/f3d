@@ -193,11 +193,12 @@ public class Scene {
     }
 
     /**
-     * Get the animation name of a given animation indices, if any.
+     * Get the animation name of a given animation index, if any.
      *
+     * @param index animation index, -1 for current animation
      * @return animation name or string error
      */
-    public native String getAnimationName(int indice);
+    public native String getAnimationName(int index);
 
     /**
      * Get all of the animation names, if any.

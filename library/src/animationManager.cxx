@@ -403,10 +403,10 @@ void animationManager::CycleAnimation()
 }
 
 // ---------------------------------------------------------------------------------
-std::string animationManager::GetAnimationName(int indices)
+std::string animationManager::GetAnimationName(int index)
 {
   assert(this->Importer);
-  if (indices == -1)
+  if (index == -1)
   {
     if (this->PreparedAnimationIndices.has_value() &&
       this->PreparedAnimationIndices.value().size() > 1)
@@ -434,12 +434,12 @@ std::string animationManager::GetAnimationName(int indices)
     return this->Importer->GetAnimationName(this->PreparedAnimationIndices.value()[0]);
   }
 
-  if (this->AvailAnimations == 0 || indices < 0 || indices > this->AvailAnimations)
+  if (this->AvailAnimations == 0 || index < 0 || index > this->AvailAnimations)
   {
     return "No animation";
   }
 
-  return this->Importer->GetAnimationName(indices);
+  return this->Importer->GetAnimationName(index);
 }
 
 // ---------------------------------------------------------------------------------
@@ -582,7 +582,7 @@ void animationManager::PrepareForAnimationIndices()
 
       // Accumulate timesteps to avoid overwrite
       for (vtkIdType stepIndex = 0; stepIndex < this->AnimationTimeSteps->GetNumberOfTuples();
-           stepIndex++)
+        stepIndex++)
       {
         accumulatedTimeSteps.emplace(this->AnimationTimeSteps->GetValue(stepIndex));
       }

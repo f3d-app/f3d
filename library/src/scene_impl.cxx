@@ -538,9 +538,9 @@ unsigned int scene_impl::availableAnimations() const
 }
 
 //----------------------------------------------------------------------------
-std::string scene_impl::getAnimationName(int indices)
+std::string scene_impl::getAnimationName(int index)
 {
-  return this->Internals->AnimationManager.GetAnimationName(indices);
+  return this->Internals->AnimationManager.GetAnimationName(index);
 }
 
 //----------------------------------------------------------------------------
