@@ -27,7 +27,10 @@ const settings = {
     const [start, end] = scene.animationTimeRange();
 
     utils.assert(start === 0, "Start value should be 0");
-    utils.assert(end === 0.7999999999999999, "End value should be 0.7999999999999999");
+    utils.assert(
+      end === 0.7999999999999999,
+      "End value should be 0.7999999999999999"
+    );
 
     utils.assert(
       scene.getAnimationKeyFrames().length === 9,
