@@ -65,6 +65,20 @@ jobs:
       zlib_version: ${{ steps.set_default_versions.outputs.zlib_version }}
       vtk_commit_sha: ${{ steps.set_default_versions.outputs.vtk_commit_sha }}
       docker_timestamp: ${{ steps.set_default_versions.outputs.docker_timestamp }}
+      curl_min_version: ${{ steps.set_default_versions.outputs.curl_min_version }}
+      curl_version: ${{ steps.set_default_versions.outputs.curl_version }}
+      gdal_min_version: ${{ steps.set_default_versions.outputs.gdal_min_version }}
+      gdal_version: ${{ steps.set_default_versions.outputs.gdal_version }}
+      geotiff_min_version: ${{ steps.set_default_versions.outputs.geotiff_min_version }}
+      geotiff_version: ${{ steps.set_default_versions.outputs.geotiff_version }}
+      pdal_min_version: ${{ steps.set_default_versions.outputs.pdal_min_version }}
+      pdal_version: ${{ steps.set_default_versions.outputs.pdal_version }}
+      sqlite_csb_min_version: ${{ steps.set_default_versions.outputs.sqlite_csb_min_version }}
+      sqlite_csb_version: ${{ steps.set_default_versions.outputs.sqlite_csb_version }}
+      proj_min_version: ${{ steps.set_default_versions.outputs.proj_min_version }}
+      proj_version: ${{ steps.set_default_versions.outputs.proj_version }}
+      tiff_min_version: ${{ steps.set_default_versions.outputs.tiff_min_version }}
+      tiff_version: ${{ steps.set_default_versions.outputs.tiff_version }}
       global_cache_index: ${{ steps.set_default_versions.outputs.global_cache_index }}
 
     steps:
@@ -141,6 +155,13 @@ jobs:
           - webp_version: ${{needs.default_versions.outputs.webp_version}}
           - webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          - curl_version: ${{needs.default_versions.outputs.curl_version}}
+          - gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+          - geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
+          - pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+          - sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
+          - proj_version: ${{needs.default_versions.outputs.proj_version}}
+          - tiff_version: ${{needs.default_versions.outputs.tiff_version}}
           - build_type: mindeps
             alembic_version: ${{needs.default_versions.outputs.alembic_min_version}}
             assimp_version: ${{needs.default_versions.outputs.assimp_min_version}}
@@ -157,6 +178,13 @@ jobs:
             webp_version: ${{needs.default_versions.outputs.webp_min_version}}
             webifc_version: ${{needs.default_versions.outputs.webifc_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
+            curl_version: ${{needs.default_versions.outputs.curl_min_version}}
+            gdal_version: ${{needs.default_versions.outputs.gdal_min_version}}
+            geotiff_version: ${{needs.default_versions.outputs.geotiff_min_version}}
+            pdal_version: ${{needs.default_versions.outputs.pdal_min_version}}
+            sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_min_version}}
+            proj_version: ${{needs.default_versions.outputs.proj_min_version}}
+            tiff_version: ${{needs.default_versions.outputs.tiff_min_version}}
 
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
@@ -191,6 +219,13 @@ jobs:
           webp_version: ${{matrix.webp_version}}
           webifc_version: ${{matrix.webifc_version}}
           zlib_version: ${{matrix.zlib_version}}
+          curl_version: ${{matrix.curl_version}}
+          gdal_version: ${{matrix.gdal_version}}
+          geotiff_version: ${{matrix.geotiff_version}}
+          pdal_version: ${{matrix.pdal_version}}
+          sqlite_csb_version: ${{matrix.sqlite_csb_version}}
+          proj_version: ${{matrix.proj_version}}
+          tiff_version: ${{matrix.tiff_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   cache_dependencies_windows:
@@ -220,6 +255,13 @@ jobs:
           - webp_version: ${{needs.default_versions.outputs.webp_version}}
           - webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          - curl_version: ${{needs.default_versions.outputs.curl_version}}
+          - gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+          - geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
+          - pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+          - sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
+          - proj_version: ${{needs.default_versions.outputs.proj_version}}
+          - tiff_version: ${{needs.default_versions.outputs.tiff_version}}
 
     runs-on: windows-latest
 
@@ -253,6 +295,13 @@ jobs:
           webp_version: ${{matrix.webp_version}}
           webifc_version: ${{matrix.webifc_version}}
           zlib_version: ${{matrix.zlib_version}}
+          curl_version: ${{matrix.curl_version}}
+          gdal_version: ${{matrix.gdal_version}}
+          geotiff_version: ${{matrix.geotiff_version}}
+          pdal_version: ${{matrix.pdal_version}}
+          sqlite_csb_version: ${{matrix.sqlite_csb_version}}
+          proj_version: ${{matrix.proj_version}}
+          tiff_version: ${{matrix.tiff_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   cache_dependencies_macos_intel:
@@ -282,6 +331,13 @@ jobs:
           - webp_version: ${{needs.default_versions.outputs.webp_version}}
           - webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          - curl_version: ${{needs.default_versions.outputs.curl_version}}
+          - gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+          - geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
+          - pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+          - sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
+          - proj_version: ${{needs.default_versions.outputs.proj_version}}
+          - tiff_version: ${{needs.default_versions.outputs.tiff_version}}
 
     runs-on: macos-15-intel
 
@@ -315,6 +371,13 @@ jobs:
           webp_version: ${{matrix.webp_version}}
           webifc_version: ${{matrix.webifc_version}}
           zlib_version: ${{matrix.zlib_version}}
+          curl_version: ${{matrix.curl_version}}
+          gdal_version: ${{matrix.gdal_version}}
+          geotiff_version: ${{matrix.geotiff_version}}
+          pdal_version: ${{matrix.pdal_version}}
+          sqlite_csb_version: ${{matrix.sqlite_csb_version}}
+          proj_version: ${{matrix.proj_version}}
+          tiff_version: ${{matrix.tiff_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   cache_dependencies_macos_arm:
@@ -344,6 +407,13 @@ jobs:
           - webp_version: ${{needs.default_versions.outputs.webp_version}}
           - webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          - curl_version: ${{needs.default_versions.outputs.curl_version}}
+          - gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+          - geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
+          - pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+          - sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
+          - proj_version: ${{needs.default_versions.outputs.proj_version}}
+          - tiff_version: ${{needs.default_versions.outputs.tiff_version}}
 
     runs-on: macos-15
 
@@ -377,6 +447,13 @@ jobs:
           webp_version: ${{matrix.webp_version}}
           webifc_version: ${{matrix.webifc_version}}
           zlib_version: ${{matrix.zlib_version}}
+          curl_version: ${{matrix.curl_version}}
+          gdal_version: ${{matrix.gdal_version}}
+          geotiff_version: ${{matrix.geotiff_version}}
+          pdal_version: ${{matrix.pdal_version}}
+          sqlite_csb_version: ${{matrix.sqlite_csb_version}}
+          proj_version: ${{matrix.proj_version}}
+          tiff_version: ${{matrix.tiff_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #---------------------------------------------------------------------------------------------------
@@ -399,12 +476,26 @@ jobs:
           - ospray_version: ${{needs.default_versions.outputs.ospray_version}}
           - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          - curl_version: ${{needs.default_versions.outputs.curl_version}}
+          - gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+          - geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
+          - pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+          - sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
+          - proj_version: ${{needs.default_versions.outputs.proj_version}}
+          - tiff_version: ${{needs.default_versions.outputs.tiff_version}}
           - build_type: mindeps
             blosc_version: ${{needs.default_versions.outputs.blosc_min_version}}
             openvdb_version: ${{needs.default_versions.outputs.openvdb_min_version}}
             ospray_version: ${{needs.default_versions.outputs.ospray_min_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
+            curl_version: ${{needs.default_versions.outputs.curl_version}}
+            gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+            geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
+            pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+            sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
+            proj_version: ${{needs.default_versions.outputs.proj_version}}
+            tiff_version: ${{needs.default_versions.outputs.tiff_version}}
           - build_type: no_optional_deps
             blosc_version: ${{needs.default_versions.outputs.blosc_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
@@ -414,6 +505,13 @@ jobs:
             openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+            curl_version: ${{needs.default_versions.outputs.curl_version}}
+            gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+            geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
+            pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+            sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
+            proj_version: ${{needs.default_versions.outputs.proj_version}}
+            tiff_version: ${{needs.default_versions.outputs.tiff_version}}
 
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
@@ -445,6 +543,13 @@ jobs:
           blosc_version: ${{matrix.blosc_version}}
           tbb_version: ${{matrix.tbb_version}}
           zlib_version: ${{matrix.zlib_version}}
+          curl_version: ${{matrix.curl_version}}
+          gdal_version: ${{matrix.gdal_version}}
+          geotiff_version: ${{matrix.geotiff_version}}
+          pdal_version: ${{matrix.pdal_version}}
+          sqlite_csb_version: ${{matrix.sqlite_csb_version}}
+          proj_version: ${{matrix.proj_version}}
+          tiff_version: ${{matrix.tiff_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
       - name: Install Raytracing Dependencies
@@ -463,8 +568,15 @@ jobs:
           blosc_version: ${{matrix.blosc_version}}
           openvdb_version: ${{matrix.openvdb_version}}
           ospray_version: ${{matrix.ospray_version}}
-          tbb_version: ${{matrix.tbb_version}}
           zlib_version: ${{matrix.zlib_version}}
+          tbb_version: ${{matrix.tbb_version}}
+          curl_version: ${{matrix.curl_version}}
+          gdal_version: ${{matrix.gdal_version}}
+          geotiff_version: ${{matrix.geotiff_version}}
+          pdal_version: ${{matrix.pdal_version}}
+          sqlite_csb_version: ${{matrix.sqlite_csb_version}}
+          proj_version: ${{matrix.proj_version}}
+          tiff_version: ${{matrix.tiff_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -528,6 +640,13 @@ jobs:
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          curl_version: ${{needs.default_versions.outputs.curl_version}}
+          gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+          geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
+          pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+          sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
+          proj_version: ${{needs.default_versions.outputs.proj_version}}
+          tiff_version: ${{needs.default_versions.outputs.tiff_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -613,6 +732,13 @@ jobs:
           - webp_version: ${{needs.default_versions.outputs.webp_version}}
           - webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          - curl_version: ${{needs.default_versions.outputs.curl_version}}
+          - gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+          - geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
+          - pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+          - sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
+          - proj_version: ${{needs.default_versions.outputs.proj_version}}
+          - tiff_version: ${{needs.default_versions.outputs.tiff_version}}
           - build_type: egl
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             optional_deps_label: optional-deps
@@ -636,6 +762,13 @@ jobs:
             webp_version: ${{needs.default_versions.outputs.webp_version}}
             webifc_version: ${{needs.default_versions.outputs.webifc_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+            curl_version: ${{needs.default_versions.outputs.curl_version}}
+            gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+            geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
+            pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+            sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
+            proj_version: ${{needs.default_versions.outputs.proj_version}}
+            tiff_version: ${{needs.default_versions.outputs.tiff_version}}
           - build_type: osmesa
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             optional_deps_label: optional-deps
@@ -659,6 +792,13 @@ jobs:
             webp_version: ${{needs.default_versions.outputs.webp_version}}
             webifc_version: ${{needs.default_versions.outputs.webifc_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+            curl_version: ${{needs.default_versions.outputs.curl_version}}
+            gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+            geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
+            pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+            sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
+            proj_version: ${{needs.default_versions.outputs.proj_version}}
+            tiff_version: ${{needs.default_versions.outputs.tiff_version}}
           - build_type: exclude_deprecated
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             optional_deps_label: optional-deps
@@ -682,6 +822,13 @@ jobs:
             webp_version: ${{needs.default_versions.outputs.webp_version}}
             webifc_version: ${{needs.default_versions.outputs.webifc_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+            curl_version: ${{needs.default_versions.outputs.curl_version}}
+            gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+            geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
+            pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+            sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
+            proj_version: ${{needs.default_versions.outputs.proj_version}}
+            tiff_version: ${{needs.default_versions.outputs.tiff_version}}
           - build_type: no_optional_deps
             blosc_version: ${{needs.default_versions.outputs.blosc_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
@@ -713,6 +860,13 @@ jobs:
             webp_version: ${{needs.default_versions.outputs.webp_version}}
             webifc_version: ${{needs.default_versions.outputs.webifc_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+            curl_version: ${{needs.default_versions.outputs.curl_version}}
+            gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+            geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
+            pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+            sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
+            proj_version: ${{needs.default_versions.outputs.proj_version}}
+            tiff_version: ${{needs.default_versions.outputs.tiff_version}}
           - build_type: mindeps
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             optional_deps_label: optional-deps
@@ -736,6 +890,13 @@ jobs:
             webp_version: ${{needs.default_versions.outputs.webp_min_version}}
             webifc_version: ${{needs.default_versions.outputs.webifc_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
+            curl_version: ${{needs.default_versions.outputs.curl_min_version}}
+            gdal_version: ${{needs.default_versions.outputs.gdal_min_version}}
+            geotiff_version: ${{needs.default_versions.outputs.geotiff_min_version}}
+            pdal_version: ${{needs.default_versions.outputs.pdal_min_version}}
+            sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_min_version}}
+            proj_version: ${{needs.default_versions.outputs.proj_min_version}}
+            tiff_version: ${{needs.default_versions.outputs.tiff_min_version}}
 
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
@@ -779,6 +940,13 @@ jobs:
           webp_version: ${{matrix.webp_version}}
           webifc_version: ${{matrix.webifc_version}}
           zlib_version: ${{matrix.zlib_version}}
+          curl_version: ${{matrix.curl_version}}
+          gdal_version: ${{matrix.gdal_version}}
+          geotiff_version: ${{matrix.geotiff_version}}
+          pdal_version: ${{matrix.pdal_version}}
+          sqlite_csb_version: ${{matrix.sqlite_csb_version}}
+          proj_version: ${{matrix.proj_version}}
+          tiff_version: ${{matrix.tiff_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -835,6 +1003,13 @@ jobs:
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          curl_version: ${{needs.default_versions.outputs.curl_version}}
+          gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+          geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
+          pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+          sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
+          proj_version: ${{needs.default_versions.outputs.proj_version}}
+          tiff_version: ${{needs.default_versions.outputs.tiff_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -903,6 +1078,13 @@ jobs:
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          curl_version: ${{needs.default_versions.outputs.curl_version}}
+          gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+          geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
+          pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+          sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
+          proj_version: ${{needs.default_versions.outputs.proj_version}}
+          tiff_version: ${{needs.default_versions.outputs.tiff_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -970,6 +1152,13 @@ jobs:
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          curl_version: ${{needs.default_versions.outputs.curl_version}}
+          gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+          geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
+          pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+          sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
+          proj_version: ${{needs.default_versions.outputs.proj_version}}
+          tiff_version: ${{needs.default_versions.outputs.tiff_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -1017,6 +1206,13 @@ jobs:
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          curl_version: ${{needs.default_versions.outputs.curl_version}}
+          gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+          geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
+          pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+          sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
+          proj_version: ${{needs.default_versions.outputs.proj_version}}
+          tiff_version: ${{needs.default_versions.outputs.tiff_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -1070,6 +1266,13 @@ jobs:
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          curl_version: ${{needs.default_versions.outputs.curl_version}}
+          gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+          geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
+          pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+          sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
+          proj_version: ${{needs.default_versions.outputs.proj_version}}
+          tiff_version: ${{needs.default_versions.outputs.tiff_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
@@ -1118,6 +1321,13 @@ jobs:
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          curl_version: ${{needs.default_versions.outputs.curl_version}}
+          gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+          geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
+          pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+          sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
+          proj_version: ${{needs.default_versions.outputs.proj_version}}
+          tiff_version: ${{needs.default_versions.outputs.tiff_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------

@@ -6,6 +6,7 @@ option(F3D_PLUGIN_BUILD_OCCT "OpenCASCADE plugin (STEP and IGES files)" OFF)
 option(F3D_PLUGIN_BUILD_USD "Universal Scene Description plugin (USD files)" OFF)
 option(F3D_PLUGIN_BUILD_VDB "VDB plugin, using OpenVDB (VDB files)" OFF)
 option(F3D_PLUGIN_BUILD_WEBIFC "webifc plugin (IFC files)" OFF)
+option(F3D_PLUGIN_BUILD_PDAL "PDAL plugin, using PDAL" OFF)
 
 add_subdirectory(native)
 
@@ -39,4 +40,8 @@ endif()
 
 if (F3D_PLUGIN_BUILD_WEBIFC)
   add_subdirectory(webifc)
+endif()
+
+if (F3D_PLUGIN_BUILD_PDAL)
+  add_subdirectory(pdal)
 endif()

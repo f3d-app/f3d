@@ -1,0 +1,40 @@
+From 3b13f58ddae82efd3e0f9b54a041827e5edb3684 Mon Sep 17 00:00:00 2001
+From: Mathieu Westphal <mathieu.westphal@kitware.com>
+Date: Fri, 6 Mar 2026 08:44:03 +0100
+Subject: [PATCH] EsriUtil: Fix a lead with createContext
+
+---
+ io/private/esri/EsriUtil.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/io/private/esri/EsriUtil.cpp b/io/private/esri/EsriUtil.cpp
+index 2b343e0e0..2e47a14ab 100644
+--- a/io/private/esri/EsriUtil.cpp
++++ b/io/private/esri/EsriUtil.cpp
+@@ -104,6 +104,7 @@ std::vector<lepcc::Point3D> decompressXYZ(std::vector<char>* compData)
+         if (stat != (lepcc_status) lepcc::ErrCode::Ok)
+             throw EsriError("LEPCC decompression failed");
+     }
++    lepcc_deleteContext(&ctx);
+     return decVec;
+ }
+ 
+@@ -141,6 +142,7 @@ std::vector<lepcc::RGB_t> decompressRGB(std::vector<char>* compData)
+         if (stat != (lepcc_status) lepcc::ErrCode::Ok)
+             throw EsriError("RGB decompression failed");
+     }
++    lepcc_deleteContext(&ctx);
+     return rgbVec;
+ }
+ 
+@@ -175,6 +177,7 @@ std::vector<uint16_t> decompressIntensity(std::vector<char>* compData)
+         if (stat != (lepcc_status) lepcc::ErrCode::Ok)
+             throw EsriError("Intensity decompression failed");
+     }
++    lepcc_deleteContext(&ctx);
+     return intVec;
+ }
+ 
+-- 
+2.53.0
+

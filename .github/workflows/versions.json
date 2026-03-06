@@ -25,7 +25,14 @@
     "usd": "v25.11",
     "webp": "v1.6.0",
     "webifc": "0.75",
-    "zlib": "v1.3.1"
+    "zlib": "v1.3.1",
+    "pdal": "2.10.0",
+    "sqlite_csb": "08be462f7fa9816f881dbb93eacb2e287f319208",
+    "curl": "curl-8_18_0",
+    "gdal": "v3.12.2",
+    "geotiff": "1.7.4",
+    "proj": "9.7.1",
+    "tiff": "v4.7.1"
   },
   "min_versions": {
     "alembic": "1.8.5",
@@ -44,7 +51,14 @@
     "usd": "v24.08",
     "webp": "v1.2.4",
     "webifc": "0.75",
-    "zlib": "v1.2.13"
+    "zlib": "v1.2.13",
+    "pdal": "2.10.0",
+    "sqlite_csb": "08be462f7fa9816f881dbb93eacb2e287f319208",
+    "curl": "curl-8_18_0",
+    "gdal": "v3.12.2",
+    "geotiff": "1.7.4",
+    "proj": "9.7.1",
+    "tiff": "v4.7.1"
   },
   "vtk_commit_sha": "da023465dfaee4a010baa30a7b8e83b25a440fa1",
   "docker_timestamp": "20260218_0",

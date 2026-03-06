@@ -11,6 +11,9 @@ race:libvtkCommonDataModel
 # OpenEXR
 race:libOpenEXR
 
+# PDAL
+race:libpdalcpp
+
 # Mesa
 race:libOSMesa
 race:libgallium
