@@ -526,15 +526,21 @@ std::pair<double, double> scene_impl::animationTimeRange()
 }
 
 //----------------------------------------------------------------------------
+std::vector<double> scene_impl::getAnimationKeyFrames()
+{
+  return this->Internals->AnimationManager.GetKeyFrames();
+}
+
+//----------------------------------------------------------------------------
 unsigned int scene_impl::availableAnimations() const
 {
   return this->Internals->AnimationManager.GetNumberOfAvailableAnimations();
 }
 
 //----------------------------------------------------------------------------
-std::string scene_impl::getAnimationName(int indices)
+std::string scene_impl::getAnimationName(int index)
 {
-  return this->Internals->AnimationManager.GetAnimationName(indices);
+  return this->Internals->AnimationManager.GetAnimationName(index);
 }
 
 //----------------------------------------------------------------------------
