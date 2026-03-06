@@ -14,7 +14,7 @@ f3d_test(NAME TestCSD DATA sample.csd PLUGIN pdal ARGS --scalar-coloring --camer
 f3d_test(NAME TestQI DATA 10-word.qi PLUGIN pdal ARGS --scalar-coloring --camera-direction=-1,-1,-1)
 f3d_test(NAME TestSLPK DATA SMALL_AUTZEN_LAS_All.slpk PLUGIN pdal ARGS --camera-direction=-1,-1,-1)
 
-# Baseline is incorect because of https://github.com/f3d-app/f3d/issues/2922
+# Baseline is incorrect because of https://github.com/f3d-app/f3d/issues/2922
 f3d_test(NAME TestFBI DATA 1.2-with-color.fbi PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1)
 
 if(NOT F3D_MACOS_BUNDLE)
