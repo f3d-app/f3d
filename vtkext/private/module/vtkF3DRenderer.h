@@ -494,6 +494,12 @@ public:
   void SetUIDeltaTime(double time);
 
   /**
+   * Set/Get the total animation time (cumulative time of each frame being rendered) in seconds
+   */
+  vtkSetMacro(TotalTime, double);
+  vtkGetMacro(TotalTime, double);
+
+  /**
    * Set console badge enabled status
    */
   void SetConsoleBadgeEnabled(bool enabled);
@@ -632,6 +638,7 @@ private:
   vtkSmartPointer<vtkCameraOrientationRepresentation> ModernAxisRepresentation;
   vtkSmartPointer<vtkCallbackCommand> ModernAxisWidgetResizeCallback;
   double ModernAxisBackdropOpacity = 0.0;
+  double TotalTime = 0.0;
 
   // Does vtk version support GridAxesActor
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
