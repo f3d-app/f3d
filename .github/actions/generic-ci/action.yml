@@ -316,12 +316,17 @@ runs:
       with:
         path: ${{github.workspace}}\build\Release\f3d
 
+    # FBI tests excluded because of https://github.com/f3d-app/f3d/issues/2922
+    - name: Set CI test exception
+      shell: bash
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestFBI)|(TestDefaultConfigFileFBI)|(TestThumbnailConfigFileFBI)" >> $GITHUB_ENV
+
     # A EGL test is crashing in the CI but not locally
     - name: Set CI test exception for Linux EGL
       if: runner.os == 'Linux' &&
         inputs.rendering_backend != 'auto'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestSDKExternalWindowEGL)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=$F3D_CTEST_EXCEPTIONS|(TestSDKExternalWindowEGL)" >> $GITHUB_ENV
 
     # Certain tests are failing on macOS with GPU pass through
     # https://github.com/f3d-app/f3d/issues/792
