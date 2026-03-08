@@ -64,6 +64,7 @@ runs:
         -DBUILD_PROJINFO:BOOL=OFF
         -DBUILD_PROJSYNC:BOOL=OFF
         -DBUILD_SHARED_LIBS=ON
+        -DBUILD_TESTING:BOOL=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../proj_install
         -DCMAKE_PREFIX_PATH:PATH=../install/
