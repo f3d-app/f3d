@@ -108,6 +108,7 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
+        -DF3D_BINDINGS_C=${{ inputs.sanitizer_type == 'undefined' && 'OFF' || 'ON' }}
         -DF3D_MODULE_EXR=ON
         -DF3D_MODULE_UI=ON
         -DF3D_MODULE_WEBP=ON
@@ -125,7 +126,6 @@ runs:
         -DF3D_TESTING_ENABLE_GLX_TESTS=ON
         -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON
         -DF3D_TESTING_ENABLE_OSMESA_TESTS=ON
-        ${{ inputs.sanitizer_type == 'undefined' && '-DF3D_BINDINGS_C=OFF' || '' }}
 
     - name: Build
       shell: bash
