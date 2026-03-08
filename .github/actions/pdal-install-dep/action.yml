@@ -66,10 +66,16 @@ runs:
         ref: ${{inputs.version}}
 
     - name: Patch pdal leak
-      if: steps.cache-pdal.outputs.cache-hit != 'true'
+      if: steps.cache-pdal.outputs.cache-hit != 'true' && inputs.version != '2.2.0'
       working-directory: ${{github.workspace}}/dependencies/pdal
       shell: bash
       run: patch -p1 < $GITHUB_ACTION_PATH/fix_leak.patch
+
+    - name: Patch pdal leak minver
+      if: steps.cache-pdal.outputs.cache-hit != 'true' && inputs.version == '2.2.0'
+      working-directory: ${{github.workspace}}/dependencies/pdal
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/fix_leak_minver.patch
 
     - name: Setup pdal
       if: steps.cache-pdal.outputs.cache-hit != 'true'

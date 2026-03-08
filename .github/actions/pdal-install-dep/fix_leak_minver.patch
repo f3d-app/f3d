@@ -1,0 +1,64 @@
+From e94aae3a2c20ae20cca6cee2232601090913ae83 Mon Sep 17 00:00:00 2001
+From: Mathieu Westphal <mathieu.westphal@kitware.com>
+Date: Sun, 8 Mar 2026 12:22:40 +0100
+Subject: [PATCH] fixup leak
+
+---
+ plugins/i3s/io/EsriUtil.cpp | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/plugins/i3s/io/EsriUtil.cpp b/plugins/i3s/io/EsriUtil.cpp
+index 2b343e0e0..3f9e60e66 100644
+--- a/plugins/i3s/io/EsriUtil.cpp
++++ b/plugins/i3s/io/EsriUtil.cpp
+@@ -53,7 +53,6 @@ NL::json parse(const std::string& data)
+     return parse(data, "Error during parsing: ");
+ }
+ 
+-
+ NL::json parse(const std::string& data, const std::string& error)
+ {
+     NL::json j;
+@@ -72,7 +71,6 @@ NL::json parse(const std::string& data, const std::string& error)
+     return j;
+ }
+ 
+-
+ std::vector<lepcc::Point3D> decompressXYZ(std::vector<char>* compData)
+ {
+     int nInfo = lepcc_getBlobInfoSize();
+@@ -104,10 +102,10 @@ std::vector<lepcc::Point3D> decompressXYZ(std::vector<char>* compData)
+         if (stat != (lepcc_status) lepcc::ErrCode::Ok)
+             throw EsriError("LEPCC decompression failed");
+     }
++    lepcc_deleteContext(&ctx);
+     return decVec;
+ }
+ 
+-
+ std::vector<lepcc::RGB_t> decompressRGB(std::vector<char>* compData)
+ {
+     const unsigned char* compressed = reinterpret_cast<const unsigned char*>
+@@ -141,10 +139,10 @@ std::vector<lepcc::RGB_t> decompressRGB(std::vector<char>* compData)
+         if (stat != (lepcc_status) lepcc::ErrCode::Ok)
+             throw EsriError("RGB decompression failed");
+     }
++    lepcc_deleteContext(&ctx);
+     return rgbVec;
+ }
+ 
+-
+ std::vector<uint16_t> decompressIntensity(std::vector<char>* compData)
+ {
+     const unsigned char* compressed = reinterpret_cast<const unsigned char*>
+@@ -175,6 +173,7 @@ std::vector<uint16_t> decompressIntensity(std::vector<char>* compData)
+         if (stat != (lepcc_status) lepcc::ErrCode::Ok)
+             throw EsriError("Intensity decompression failed");
+     }
++    lepcc_deleteContext(&ctx);
+     return intVec;
+ }
+ 
+-- 
+2.53.0
+
