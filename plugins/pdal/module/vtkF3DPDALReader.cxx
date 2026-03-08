@@ -1,6 +1,7 @@
 #include "vtkF3DPDALReader.h"
 
 #include "vtkDoubleArray.h"
+#include "vtkTypeUInt16Array.h"
 #include "vtkPointData.h"
 
 #include <iostream>
@@ -19,7 +20,7 @@ int vtkF3DPDALReader::RequestData(
 
   vtkPolyData* output = vtkPolyData::GetData(outputVector);
   vtkPointData* pointData = output->GetPointData();
-  vtkDataArray* colors = pointData->GetArray("Color");
+  vtkTypeUInt16Array* colors = vtkTypeUInt16Array::SafeDownCast(pointData->GetArray("Color"));
   if (colors)
   {
     // Normalize colors in unsigned char array for rendering
@@ -27,28 +28,28 @@ int vtkF3DPDALReader::RequestData(
     normalizedColors->SetNumberOfComponents(3);
     normalizedColors->SetName("NormalizedColor");
 
-    // TODO PROPER API
+    double divider = std::numeric_limits<std::uint8_t>::max(); 
     double colorRanges[3][2];
     for (int j = 0; j < 3; j++)
     {
       colors->GetRange(colorRanges[j], j);
-      if (colorRanges[j][1] == 0)
+      if (colorRanges[j][1] > std::numeric_limits<std::uint8_t>::max())
       {
-        colorRanges[j][1] = 1;
+        divider = std::numeric_limits<std::uint16_t>::max();
       }
     }
 
     for (vtkIdType i = 0; i < colors->GetNumberOfTuples(); i++)
     {
-      vtkTypeUInt64 color[3];
-      double normalized[3];
-      colors->GetUnsignedTuple(i, color);
+      vtkTypeUInt16 color[3];
+      double divided[3];
+      colors->GetTypedTuple(i, color);
 
       for (int j = 0; j < 3; j++)
       {
-        normalized[j] = (color[j] - colorRanges[j][0]) / colorRanges[j][1];
+        divided[j] = color[j] / divider;
       }
-      normalizedColors->InsertNextTuple(normalized);
+      normalizedColors->InsertNextTuple(divided);
     }
     pointData->AddArray(normalizedColors);
   }
