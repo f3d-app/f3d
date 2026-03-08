@@ -55,7 +55,7 @@
     "pdal": "2.2.0",
     "sqlite_csb": "08be462f7fa9816f881dbb93eacb2e287f319208",
     "curl": "curl-7_74_0",
-    "gdal": "v3.2.2",
+    "gdal": "v3.5.0",
     "geotiff": "1.6.0",
     "proj": "7.2.1",
     "tiff": "v4.2.0"
