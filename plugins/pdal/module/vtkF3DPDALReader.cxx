@@ -44,12 +44,12 @@ int vtkF3DPDALReader::RequestData(
     vtkSMPTools::For(0, colors->GetNumberOfTuples(),
       [&](vtkIdType begin, vtkIdType end)
       {
+        vtkTypeUInt16 in[3] = { 0, 0, 0 };
+        double out[3];
         for (vtkIdType cc = begin; cc < end; ++cc)
         {
-          vtkTypeUInt16 in[3];
           colors->GetTypedTuple(cc, in);
 
-          double out[3];
           out[0] = in[0] / divider;
           out[1] = in[1] / divider;
           out[2] = in[2] / divider;
