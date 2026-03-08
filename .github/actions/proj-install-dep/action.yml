@@ -41,6 +41,13 @@ runs:
         path: "./dependencies/proj"
         ref: ${{inputs.version}}
 
+    # Patch for compilation of minver
+    - name: Patch proj include
+      if: steps.cache-proj.outputs.cache-hit != 'true' && inputs.version == '7.2.1'
+      working-directory: ${{github.workspace}}/dependencies/proj
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/add-missing-cstdint-includes.patch
+
     - name: Setup proj
       if: steps.cache-proj.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies
