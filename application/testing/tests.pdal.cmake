@@ -17,6 +17,8 @@ f3d_test(NAME TestSLPK DATA SMALL_AUTZEN_LAS_All.slpk PLUGIN pdal ARGS --camera-
 # Baseline is incorrect because of https://github.com/f3d-app/f3d/issues/2922
 f3d_test(NAME TestFBI DATA 1.2-with-color.fbi PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1)
 
+f3d_test(NAME TestInvalidPDAL DATA f3d.vtp PLUGIN pdal ARGS --force-reader=LAS  REGEXP "failed to load scene" NO_BASELINE)
+
 if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/plugins/pdal/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
