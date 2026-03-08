@@ -1,0 +1,12 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1496d7f97..387bb4125 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -190,7 +190,6 @@ add_subdirectory(vendor/arbiter)
+ add_subdirectory(vendor/kazhdan)
+ add_subdirectory(pdal/util)
+ add_subdirectory(tools)
+-add_subdirectory(apps)
+ #
+ # On OSX we reexport the symbols in libpdal_util.dylib into libpdalcpp.dylib
+ # so that users only need link libpdalcpp.
