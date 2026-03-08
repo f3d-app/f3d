@@ -1,10 +1,9 @@
 #include "vtkF3DPDALReader.h"
 
 #include "vtkDoubleArray.h"
-#include "vtkTypeUInt16Array.h"
 #include "vtkPointData.h"
-
-#include <iostream>
+#include "vtkSMPTools.h"
+#include "vtkTypeUInt16Array.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DPDALReader);
@@ -23,12 +22,9 @@ int vtkF3DPDALReader::RequestData(
   vtkTypeUInt16Array* colors = vtkTypeUInt16Array::SafeDownCast(pointData->GetArray("Color"));
   if (colors)
   {
-    // Normalize colors in unsigned char array for rendering
-    vtkNew<vtkDoubleArray> normalizedColors;
-    normalizedColors->SetNumberOfComponents(3);
-    normalizedColors->SetName("NormalizedColor");
 
-    double divider = std::numeric_limits<std::uint8_t>::max(); 
+    // Identify the divider to use, colors can be uint8 or uint16
+    double divider = std::numeric_limits<std::uint8_t>::max();
     double colorRanges[3][2];
     for (int j = 0; j < 3; j++)
     {
@@ -39,18 +35,28 @@ int vtkF3DPDALReader::RequestData(
       }
     }
 
-    for (vtkIdType i = 0; i < colors->GetNumberOfTuples(); i++)
-    {
-      vtkTypeUInt16 color[3];
-      double divided[3];
-      colors->GetTypedTuple(i, color);
+    // Convert into [0,1] doubles
+    vtkNew<vtkDoubleArray> normalizedColors;
+    normalizedColors->SetNumberOfComponents(3);
+    normalizedColors->SetName("NormalizedColor");
+    normalizedColors->SetNumberOfTuples(colors->GetNumberOfTuples());
 
-      for (int j = 0; j < 3; j++)
+    vtkSMPTools::For(0, colors->GetNumberOfTuples(),
+      [&](vtkIdType begin, vtkIdType end)
       {
-        divided[j] = color[j] / divider;
-      }
-      normalizedColors->InsertNextTuple(divided);
-    }
+        for (vtkIdType cc = begin; cc < end; ++cc)
+        {
+          vtkTypeUInt16 in[3];
+          colors->GetTypedTuple(cc, in);
+
+          double out[3];
+          out[0] = in[0] / divider;
+          out[1] = in[1] / divider;
+          out[2] = in[2] / divider;
+          normalizedColors->SetTypedTuple(cc, out);
+        }
+      });
+
     pointData->AddArray(normalizedColors);
   }
 
