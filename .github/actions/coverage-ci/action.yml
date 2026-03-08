@@ -185,15 +185,10 @@ runs:
       shell: bash
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
-    # FBI tests excluded because of https://github.com/f3d-app/f3d/issues/2922
-    - name: Set CI test exception
-      shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestFBI)|(TestDefaultConfigFileFBI)|(TestThumbnailConfigFileFBI)" >> $GITHUB_ENV
-
     - name: Test
       shell: bash
       working-directory: ${{github.workspace}}/source
-      run: ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+      run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
 
     - name: Upload Tests Artifact
       if: failure()

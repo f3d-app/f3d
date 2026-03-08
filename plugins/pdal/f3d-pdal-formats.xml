@@ -36,10 +36,6 @@
     <comment>Smothed Best Estimate of Trajectory</comment>
     <glob pattern="*.sbet"/>
   </mime-type>
-  <mime-type type="application/vnd.fbi">
-    <comment>TerraScan FastBinary</comment>
-    <glob pattern="*.fbi"/>
-  </mime-type>
   <mime-type type="application/vnd.slpk">
     <comment>Esri Scene Layer Package</comment>
     <glob pattern="*.slpk"/>

@@ -14,9 +14,6 @@ f3d_test(NAME TestCSD DATA sample.csd PLUGIN pdal ARGS --scalar-coloring --camer
 f3d_test(NAME TestQI DATA 10-word.qi PLUGIN pdal ARGS --scalar-coloring --camera-direction=-1,-1,-1)
 f3d_test(NAME TestSLPK DATA SMALL_AUTZEN_LAS_All.slpk PLUGIN pdal ARGS --camera-direction=-1,-1,-1)
 
-# Baseline is incorrect because of https://github.com/f3d-app/f3d/issues/2922
-f3d_test(NAME TestFBI DATA 1.2-with-color.fbi PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1)
-
 f3d_test(NAME TestInvalidPDAL DATA f3d.vtp PLUGIN pdal ARGS --force-reader=LAS  REGEXP "failed to load scene" NO_BASELINE)
 
 if(NOT F3D_MACOS_BUNDLE)
@@ -32,7 +29,6 @@ if(NOT F3D_MACOS_BUNDLE)
     f3d_test(NAME TestDefaultConfigFileCSD DATA sample.csd CONFIG config_build LONG_TIMEOUT LABELS "pdal;plugin")
     f3d_test(NAME TestDefaultConfigFileQI DATA 10-word.qi CONFIG config_build LONG_TIMEOUT LABELS "pdal;plugin")
     f3d_test(NAME TestDefaultConfigFileSLPK DATA SMALL_AUTZEN_LAS_All.slpk CONFIG config_build LONG_TIMEOUT LABELS "pdal;plugin")
-    f3d_test(NAME TestDefaultConfigFileFBI DATA 1.2-with-color.fbi CONFIG config_build LONG_TIMEOUT LABELS "pdal;plugin")
   endif()
   file(COPY "${F3D_SOURCE_DIR}/plugins/pdal/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
   f3d_test(NAME TestThumbnailConfigFileLAS DATA warsaw_small.las CONFIG thumbnail_build LONG_TIMEOUT LABELS "pdal;plugin")
@@ -45,5 +41,4 @@ if(NOT F3D_MACOS_BUNDLE)
   f3d_test(NAME TestThumbnailConfigFileCSD DATA sample.csd CONFIG thumbnail_build LONG_TIMEOUT LABELS "pdal;plugin")
   f3d_test(NAME TestThumbnailConfigFileQI DATA 10-word.qi CONFIG thumbnail_build LONG_TIMEOUT LABELS "pdal;plugin")
   f3d_test(NAME TestThumbnailConfigFileSLPK DATA SMALL_AUTZEN_LAS_All.slpk CONFIG thumbnail_build LONG_TIMEOUT LABELS "pdal;plugin")
-  f3d_test(NAME TestThumbnailConfigFileFBI DATA 1.2-with-color.fbi CONFIG thumbnail_build LONG_TIMEOUT LABELS "pdal;plugin")
 endif()

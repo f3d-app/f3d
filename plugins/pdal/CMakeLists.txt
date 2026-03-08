@@ -78,14 +78,6 @@ f3d_plugin_declare_reader(
 )
 
 f3d_plugin_declare_reader(
-  NAME FBI
-  EXTENSIONS fbi
-  MIMETYPES application/vnd.fbi
-  VTK_READER vtkF3DPDALReader
-  FORMAT_DESCRIPTION "TerraScan FastBinary"
-)
-
-f3d_plugin_declare_reader(
   NAME SLPK
   EXTENSIONS slpk
   MIMETYPES application/vnd.slpk
