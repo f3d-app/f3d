@@ -57,7 +57,7 @@
     "curl": "curl-7_74_0",
     "gdal": "v3.5.0",
     "geotiff": "1.6.0",
-    "proj": "7.2.1",
+    "proj": "9.0.0",
     "tiff": "v4.2.0"
   },
   "vtk_commit_sha": "da023465dfaee4a010baa30a7b8e83b25a440fa1",

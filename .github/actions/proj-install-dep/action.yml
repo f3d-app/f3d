@@ -30,7 +30,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/proj_install
-        key: proj-${{inputs.version}}-${{ inputs.sqlite_csb_version }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
+        key: proj-${{inputs.version}}-${{ inputs.sqlite_csb_version }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
 
     # Dependents: gdal geotiff
     - name: Checkout proj
@@ -43,7 +43,7 @@ runs:
 
     # Patch for compilation of minver
     - name: Patch proj include
-      if: steps.cache-proj.outputs.cache-hit != 'true' && inputs.version == '7.2.1'
+      if: steps.cache-proj.outputs.cache-hit != 'true' && inputs.version == '9.0.0'
       working-directory: ${{github.workspace}}/dependencies/proj
       shell: bash
       run: patch -p1 < $GITHUB_ACTION_PATH/add-missing-cstdint-includes.patch
