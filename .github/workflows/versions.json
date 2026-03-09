@@ -52,7 +52,7 @@
     "webp": "v1.2.4",
     "webifc": "0.75",
     "zlib": "v1.2.13",
-    "pdal": "2.2.0",
+    "pdal": "2.9.0",
     "sqlite_csb": "08be462f7fa9816f881dbb93eacb2e287f319208",
     "curl": "curl-7_74_0",
     "gdal": "v3.5.0",

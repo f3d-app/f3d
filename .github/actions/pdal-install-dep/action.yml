@@ -54,7 +54,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/pdal_install
-        key: pdal-${{inputs.version}}-${{ inputs.curl_version }}-${{ inputs.gdal_version }}-${{ inputs.geotiff_version }}-${{inputs.proj_version}}-${{ inputs.sqlite_csb_version }}-${{inputs.tiff_version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-4
+        key: pdal-${{inputs.version}}-${{ inputs.curl_version }}-${{ inputs.gdal_version }}-${{ inputs.geotiff_version }}-${{inputs.proj_version}}-${{ inputs.sqlite_csb_version }}-${{inputs.tiff_version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-5
 
     # Dependents: vtk
     - name: Checkout pdal
