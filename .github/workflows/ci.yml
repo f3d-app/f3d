@@ -489,13 +489,13 @@ jobs:
             ospray_version: ${{needs.default_versions.outputs.ospray_min_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
-            curl_version: ${{needs.default_versions.outputs.curl_version}}
-            gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-            geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
-            pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-            sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
-            proj_version: ${{needs.default_versions.outputs.proj_version}}
-            tiff_version: ${{needs.default_versions.outputs.tiff_version}}
+            curl_version: ${{needs.default_versions.outputs.curl_min_version}}
+            gdal_version: ${{needs.default_versions.outputs.gdal_min_version}}
+            geotiff_version: ${{needs.default_versions.outputs.geotiff_min_version}}
+            pdal_version: ${{needs.default_versions.outputs.pdal_min_version}}
+            sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_min_version}}
+            proj_version: ${{needs.default_versions.outputs.proj_min_version}}
+            tiff_version: ${{needs.default_versions.outputs.tiff_min_version}}
           - build_type: no_optional_deps
             blosc_version: ${{needs.default_versions.outputs.blosc_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
