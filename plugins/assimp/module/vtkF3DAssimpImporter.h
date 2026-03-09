@@ -72,13 +72,17 @@ public:
 
   ///@{
   /**
-   * Set/Get the hint to pass to assimp when reading from memory
+   * Set/Get collada fixup flag.
+   */
+  vtkSetMacro(ColladaFixup, bool);
+  vtkGetMacro(ColladaFixup, bool);
+  ///@}
+
+  /**
+   * Set the hint to pass to assimp when reading from memory
    * Typically the file extension.
-   * Also used to trigger the "ColladaFixup" when memory hint is "dae".
    */
   vtkSetMacro(MemoryHint, std::string);
-  vtkGetMacro(MemoryHint, std::string);
-  ///@}
 
   /**
    * Get temporal information for the currently enabled animation.
@@ -103,17 +107,6 @@ public:
    */
   void SetCamera(vtkIdType camIndex) override;
 
-  ///@{
-  /**
-   * Return true if, after a quick check of file header, it looks like the provided stream
-   * can be read. Return false if it is sure it cannot be read as a stream.
-   *
-   * hint is provided to be used as MemoryHint
-   */
-  static bool CanReadFile(vtkResourceStream* stream, std::string& hint);
-  static bool CanReadFile(vtkResourceStream* stream);
-  ///@}
-
 protected:
   vtkF3DAssimpImporter();
   ~vtkF3DAssimpImporter() override;
@@ -127,6 +120,7 @@ private:
   vtkF3DAssimpImporter(const vtkF3DAssimpImporter&) = delete;
   void operator=(const vtkF3DAssimpImporter&) = delete;
 
+  bool ColladaFixup = false;
   std::string MemoryHint;
 
   class vtkInternals;

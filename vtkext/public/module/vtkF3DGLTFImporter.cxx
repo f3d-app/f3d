@@ -5,6 +5,7 @@
 #include <vtkActor.h>
 #include <vtkInformation.h>
 #include <vtkObjectFactory.h>
+#include <vtkOpenGLShaderProperty.h>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DGLTFImporter);

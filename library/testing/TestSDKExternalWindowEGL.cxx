@@ -1,14 +1,11 @@
-#include "PseudoUnitTest.h"
-#include "TestSDKHelpers.h"
-
 #include "engine.h"
+
+#include "TestSDKHelpers.h"
 
 #include <EGL/egl.h>
 
 int TestSDKExternalWindowEGL([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
-  PseudoUnitTest test;
-
   EGLDisplay eglDpy = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 
   // initialize
@@ -40,12 +37,13 @@ int TestSDKExternalWindowEGL([[maybe_unused]] int argc, [[maybe_unused]] char* a
   eng.getWindow().setSize(size[0], size[1]);
   eng.getScene().add(std::string(argv[1]) + "/data/cow.vtp");
 
-  test("render with external EGL window",
-    TestSDKHelpers::RenderTest(
-      eng.getWindow(), std::string(argv[1]) + "baselines/", argv[2], "TestSDKExternalWindowEGL"));
+  if (!TestSDKHelpers::RenderTest(
+        eng.getWindow(), std::string(argv[1]) + "baselines/", argv[2], "TestSDKExternalWindowEGL"))
+  {
+    return EXIT_FAILURE;
+  }
 
   // terminate EGL when finished
   eglTerminate(eglDpy);
-
-  return test.result();
+  return 0;
 }

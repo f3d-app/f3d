@@ -2,7 +2,6 @@
 #define f3d_reader_h
 
 #include <vtkAlgorithm.h>
-#include <vtkFileResourceStream.h>
 #include <vtkImporter.h>
 #include <vtkSmartPointer.h>
 
@@ -12,7 +11,6 @@
 #include <string>
 #include <vector>
 
-class vtkResourceStream;
 namespace f3d
 {
 /**
@@ -64,7 +62,7 @@ public:
   virtual const std::vector<std::string> getMimeTypes() const = 0;
 
   /**
-   * Check if this reader can read the given filename - according to its extension and file content
+   * Check if this reader can read the given filename - generally according its extension
    */
   virtual bool canRead(const std::string& fileName) const
   {
@@ -73,26 +71,9 @@ public:
 
     const std::vector<std::string>& extensions = this->getExtensions();
 
-    if (!std::any_of(
-          extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; }))
-    {
-      return false;
-    }
-
-    vtkNew<vtkFileResourceStream> stream;
-    if (!stream->Open(fileName.c_str()))
-    {
-      return false;
-    }
-
-    return this->canRead(stream);
+    return std::any_of(
+      extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; });
   }
-
-  /**
-   * Should return true if this reader could be able to read provided stream,
-   * false if it is sure it cannot.
-   */
-  virtual bool canRead(vtkResourceStream*) const = 0;
 
   /**
    * Get the score of this reader.
@@ -123,17 +104,9 @@ public:
   }
 
   /**
-   * Create the geometry reader (VTK reader) for the given stream
-   */
-  virtual vtkSmartPointer<vtkAlgorithm> createGeometryReader(vtkResourceStream*) const
-  {
-    return nullptr;
-  }
-
-  /**
    * Apply custom code for the reader
    */
-  virtual void applyCustomReader(vtkAlgorithm*, const std::string&, vtkResourceStream*) const
+  virtual void applyCustomReader(vtkAlgorithm*, const std::string&) const
   {
   }
 
@@ -155,27 +128,10 @@ public:
   }
 
   /**
-   * Create the scene reader (VTK importer) for the given stream
-   */
-  virtual vtkSmartPointer<vtkImporter> createSceneReader(vtkResourceStream*) const
-  {
-    return nullptr;
-  }
-
-  /**
    * Apply custom code for the importer
    */
-  virtual void applyCustomImporter(vtkImporter*, const std::string&, vtkResourceStream*) const
+  virtual void applyCustomImporter(vtkImporter*, const std::string&) const
   {
-  }
-
-  /**
-   * Return true if this reader supports stream
-   * false otherwise
-   */
-  virtual bool supportsStream() const
-  {
-    return false;
   }
 
   /**
@@ -196,7 +152,7 @@ public:
   /**
    * Return the list of all reader option names
    */
-  std::vector<std::string> getAllReaderOptionNames() const
+  std::vector<std::string> getAllReaderOptionNames()
   {
     std::vector<std::string> keys;
     keys.reserve(this->ReaderOptions.size());

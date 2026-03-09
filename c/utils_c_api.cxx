@@ -132,9 +132,3 @@ void f3d_utils_string_free(char* str)
 {
   delete[] str;
 }
-
-//----------------------------------------------------------------------------
-double f3d_utils_get_dpi_scale()
-{
-  return f3d::utils::getDPIScale();
-}

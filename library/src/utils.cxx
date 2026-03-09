@@ -1,6 +1,5 @@
 #include "utils.h"
 
-#include "F3DUtils.h"
 #include "levenshtein.h"
 #include "log.h"
 
@@ -330,12 +329,6 @@ std::string utils::globToRegex(std::string_view glob, char pathSeparator)
   }
 
   return result;
-}
-
-//----------------------------------------------------------------------------
-double utils::getDPIScale()
-{
-  return F3DUtils::getDPIScale();
 }
 
 //----------------------------------------------------------------------------

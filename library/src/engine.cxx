@@ -523,7 +523,6 @@ std::vector<engine::readerInformation> engine::getReadersInfo()
       info.MimeTypes = reader->getMimeTypes();
       info.HasSceneReader = reader->hasSceneReader();
       info.HasGeometryReader = reader->hasGeometryReader();
-      info.SupportsStream = reader->supportsStream();
       readersInfo.push_back(info);
     }
   }

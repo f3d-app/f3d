@@ -1,7 +1,7 @@
-#include "PseudoUnitTest.h"
+#include "engine.h"
+
 #include "TestSDKHelpers.h"
 
-#include <engine.h>
 #include <windows.h>
 
 #include <GL/gl.h>
@@ -67,15 +67,15 @@ int TestSDKExternalWindowWGL([[maybe_unused]] int argc, [[maybe_unused]] char* a
   HGLRC hGLRC = wglCreateContext(hDC);
   wglMakeCurrent(hDC, hGLRC);
 
-  PseudoUnitTest test;
-
   engine = std::make_unique<f3d::engine>(f3d::engine::createExternalWGL());
   engine->getWindow().setSize(size[0], size[1]);
   engine->getScene().add(std::string(argv[1]) + "/data/cow.vtp");
 
-  test("render with external WGL window",
-    TestSDKHelpers::RenderTest(engine->getWindow(), std::string(argv[1]) + "baselines/", argv[2],
-      "TestSDKExternalWindowWGL"));
+  if (!TestSDKHelpers::RenderTest(engine->getWindow(), std::string(argv[1]) + "baselines/", argv[2],
+        "TestSDKExternalWindowWGL"))
+  {
+    return EXIT_FAILURE;
+  }
 
   // Disable the RC and delete it
   wglMakeCurrent(nullptr, nullptr);
@@ -84,5 +84,5 @@ int TestSDKExternalWindowWGL([[maybe_unused]] int argc, [[maybe_unused]] char* a
   // Release the DC
   ReleaseDC(hwnd, hDC);
 
-  return test.result();
+  return 0;
 }

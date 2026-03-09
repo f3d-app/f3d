@@ -1,6 +1,5 @@
 #include "vtkF3DEXRReader.h"
 
-#include "vtkFileResourceStream.h"
 #include "vtkFloatArray.h"
 #include "vtkImageData.h"
 #include "vtkMemoryResourceStream.h"
@@ -8,11 +7,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkVersion.h"
+#include "vtksys/FStream.hxx"
 
 #include <ImfArray.h>
 #include <ImfIO.h>
 #include <ImfRgbaFile.h>
-#include <ImfVersion.h>
 
 #include <algorithm>
 #include <sstream>
@@ -158,32 +157,24 @@ void vtkF3DEXRReader::ExecuteInformation()
 //------------------------------------------------------------------------------
 int vtkF3DEXRReader::CanReadFile(const char* fname)
 {
-  vtkNew<vtkFileResourceStream> fileStream;
-  if (!fileStream->Open(fname))
+  // get the magic number by reading in a file
+  vtksys::ifstream ifs(fname, vtksys::ifstream::in);
+
+  if (ifs.fail())
   {
     vtkErrorMacro(<< "Could not open file " << fname);
     return 0;
   }
-  return this->CanReadFile(fileStream);
-}
 
-//------------------------------------------------------------------------------
-int vtkF3DEXRReader::CanReadFile(vtkResourceStream* stream)
-{
-  if (!stream)
+  // The file must begin with magic number 76 2F 31 01
+  if ((ifs.get() != 0x76) || (ifs.get() != 0x2F) || (ifs.get() != 0x31) || (ifs.get() != 0x01))
   {
+    ifs.close();
     return 0;
   }
 
-  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
-
-  int magic;
-  if (stream->Read(reinterpret_cast<char*>(&magic), sizeof(int)) != sizeof(int))
-  {
-    return 0;
-  }
-
-  return magic == Imf::MAGIC;
+  ifs.close();
+  return 1;
 }
 
 //------------------------------------------------------------------------------
