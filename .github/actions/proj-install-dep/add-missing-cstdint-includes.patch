@@ -30,3 +30,19 @@ index 62676842..163da430 100644
 +#include <cstdint>
  
  #define CPL_DLL
+ 
+diff --git a/src/projections/s2.cpp b/src/projections/s2.cpp
+index 4a98897b..efce0289 100644
+--- a/src/projections/s2.cpp
++++ b/src/projections/s2.cpp
+@@ -58,6 +58,7 @@
+ 
+ #include <errno.h>
+ #include <cmath>
++#include <cstdint>
+ 
+ #include "proj.h"
+ #include "proj_internal.h"
+-- 
+2.53.0
+
