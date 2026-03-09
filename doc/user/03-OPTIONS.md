@@ -547,6 +547,10 @@ Some rendering options are not compatible between them, here is the precedence o
 
 To turn on/off boolean options, it is possible to write `--option=true` and `--option=false`, eg `--points-sprites=false`.
 
+If an option has an "implicit" value, it means that the options can be used without specifying the value to use the implicit value.
+
+The default correspond to the value without any (configuration file)[06-CONFIGURATION_FILE.md], which F3D is usually distributed with.
+
 As documented, the `--option=value` syntax should be preferred. The syntax `--option value` can have unintended effect with positional arguments.
 
 The `-R` short option has a special syntax: `-Rlibf3d.option` but can also be used with `--reset=libf3d.option`
