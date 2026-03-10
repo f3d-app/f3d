@@ -18,6 +18,7 @@ please take a look at our [getting started guide](03-GETTING_STARTED.md).
 - Optionally, [Alembic](http://www.alembic.io/) >= 1.8.5.
 - Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 24.08 (25.05.01 recommended).
 - Optionally, [OpenVDB](https://www.openvdb.org/download/) >= 12.0.0, enable `IOOpenVDB` module during VTK configuration.
+- Optionally, [PDAL](https://pdal.org/en/2.10.0/) >= 2.0.0 (2.9.0 recommended), enable `IOPDAL` module during VTK configuration.
 - Optionally, [web-ifc](https://github.com/ThatOpen/engine_web-ifc) >= 0.75 (only C++ library).
 - Optionally, [OSPray](https://www.ospray.org/) == 2.12.0, enable `RenderingRayTracing` module during VTK configuration.
 - Optionally, [Draco](https://google.github.io/draco/) >= 1.5.6.
@@ -30,7 +31,7 @@ F3D is tested continuously against versions recommended by the [VFX reference pl
 
 ## VTK compatibility
 
-As stated in the dependencies, F3D is compatible with VTK >= 9.3.0, however, some features may not be available. We suggest using VTK 9.6.0 with RenderingRayTracing, IOExodus, IOHDF, IONetCDF and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
+As stated in the dependencies, F3D is compatible with VTK >= 9.3.0, however, some features may not be available. We suggest using VTK 9.6.0 with RenderingRayTracing, IOExodus, IOHDF, IONetCDF, IOPDAL and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
 
 ## Configuration and building
 
@@ -62,6 +63,7 @@ Some modules, plugins and language bindings depending on external libraries can 
 - `F3D_PLUGIN_BUILD_USD`: Support for USD file format. Requires `OpenUSD`. Disabled by default.
 - `F3D_PLUGIN_BUILD_VDB`: Support for VDB file format. Requires that VTK has been built with `IOOpenVDB` module (and `OpenVDB`). Disabled by default.
 - `F3D_PLUGIN_BUILD_PDAL`: Support for Point Cloud file formats. Requires that VTK has been built with `IOPDAL` module (and `PDAL`). Disabled by default.
+- `F3D_PLUGIN_BUILD_WEBIFC`: Support for IFC file format. Requires `web-ifc`. Disabled by default.
 - `F3D_BINDINGS_PYTHON`: Generate python bindings (requires `Python` and `pybind11`). Disabled by default.
 - `F3D_BINDINGS_PYTHON_GENERATE_STUBS`: Generate python stubs (requires `Python` and `pybind11_stubgen`). Disabled by default.
 - `F3D_BINDINGS_JAVA`: Generate java bindings (requires `Java` >= 17 and `JNI`). Disabled by default.

@@ -74,7 +74,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS sbet
   MIMETYPES application/vnd.sbet
   VTK_READER vtkF3DPDALReader
-  FORMAT_DESCRIPTION "Smothed Best Estimate of Trajectory"
+  FORMAT_DESCRIPTION "Smoothed Best Estimate of Trajectory"
 )
 
 f3d_plugin_declare_reader(
