@@ -21,6 +21,10 @@ protected:
   vtkF3DPDALReader() = default;
   ~vtkF3DPDALReader() override = default;
 
+  /**
+   * Call request data on the superclass, then, if Colors are provided,
+   * convert them into a normalized vtkDoubleArray for direct scalars rendering.
+   */
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 private:

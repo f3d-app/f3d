@@ -22,7 +22,6 @@ int vtkF3DPDALReader::RequestData(
   vtkTypeUInt16Array* colors = vtkTypeUInt16Array::SafeDownCast(pointData->GetArray("Color"));
   if (colors)
   {
-
     // Identify the divider to use, colors can be uint8 or uint16
     double divider = std::numeric_limits<std::uint8_t>::max();
     double colorRanges[3][2];

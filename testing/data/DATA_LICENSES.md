@@ -3,7 +3,6 @@
 # Copyrights and Licenses
 
 - (ノಠ益ಠ )ノ.vtp: VTK Data: BSD-3-Clause
-- 1.2-with-color.fbi: PDAL: Copyright (c) 2025, Hobu, Inc.
 - 1.2-with-color.ptx: PDAL: Copyright (c) 2025, Hobu, Inc.
 - 10-word.qi: PDAL: Copyright (c) 2025, Hobu, Inc.
 - 16bits.\*: @bisechen: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)

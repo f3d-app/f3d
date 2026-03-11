@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-# TODO enable PDAL in docker
 cmake -S /src -B /src/_wasm_build \
     -DBUILD_SHARED_LIBS=OFF \
     -DCMAKE_BUILD_TYPE=$1 \

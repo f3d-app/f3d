@@ -54,7 +54,7 @@ f3d_plugin_declare_reader(
 )
 
 f3d_plugin_declare_reader(
-  NAME LeicaCyclone
+  NAME LeicaCyclonePTX
   EXTENSIONS ptx
   MIMETYPES application/vnd.ptx
   VTK_READER vtkF3DPDALReader

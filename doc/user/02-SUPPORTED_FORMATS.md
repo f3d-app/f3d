@@ -52,7 +52,7 @@ F3D supports the following file formats:
 | TerraScan binary files                    | `.bin`                                         | No         | NONE              | NO                | `pdal`    | `TerraScanBIN`          |
 | Optech Corrected Sensor Data              | `.csd`                                         | No         | NONE              | NO                | `pdal`    | `OptechCSD`             |
 | Point Cloud Data                          | `.pcd`                                         | No         | NONE              | NO                | `pdal`    | `PCD`                   |
-| Leica Cyclone                             | `.ptx`                                         | No         | NONE              | NO                | `pdal`    | `LeicaCyclone`          |
+| Leica Cyclone                             | `.ptx`                                         | No         | NONE              | NO                | `pdal`    | `LeicaCyclonePTX`       |
 | Airborne Topographic Mapper QFIT          | `.qi`                                          | No         | NONE              | NO                | `pdal`    | `QFIT`                  |
 | Smoothed Best Estimate of Trajectory      | `.sbet`                                        | No         | NONE              | NO                | `pdal`    | `SBET`                  |
 | Esri Scene Layer Package                  | `.slpk`                                        | No         | NONE              | NO                | `pdal`    | `SLPK`                  |
