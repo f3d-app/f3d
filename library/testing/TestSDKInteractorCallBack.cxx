@@ -1,6 +1,3 @@
-#include "PseudoUnitTest.h"
-#include "TestSDKHelpers.h"
-
 #include <engine.h>
 #include <interactor.h>
 #include <options.h>
@@ -9,12 +6,12 @@
 
 #include <iostream>
 
+#include "TestSDKHelpers.h"
+
 using mod_t = f3d::interaction_bind_t::ModifierKeys;
 
 int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
-  PseudoUnitTest test;
-
   f3d::engine eng = f3d::engine::create(true);
   f3d::scene& sce = eng.getScene();
   f3d::window& win = eng.getWindow();
@@ -23,23 +20,43 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
   win.render();
 
   // Sanity checks coverage
-  test("play empty interaction", !inter.playInteraction(""));
-  test("record empty interaction", !inter.recordInteraction(""));
+  if (inter.playInteraction(""))
+  {
+    std::cerr << "Unexcepted playInteraction output\n";
+    return EXIT_FAILURE;
+  }
+  if (inter.recordInteraction(""))
+  {
+    std::cerr << "Unexcepted recordInteraction output\n";
+    return EXIT_FAILURE;
+  }
 
   // Test callbacks with default interactions
   std::string filename = "TestSDKInteractorCallBack";
   std::string interactionFilePath = std::string(argv[2]) + "../../" + filename + ".log";
 
   // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
-  test("play some interactions", inter.playInteraction(interactionFilePath));
-  test("render interaction result",
-    TestSDKHelpers::RenderTest(
-      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "Default"));
+  if (!inter.playInteraction(interactionFilePath))
+  {
+    std::cerr << "Unexcepted error playing interaction\n";
+    return EXIT_FAILURE;
+  }
+  if (!TestSDKHelpers::RenderTest(
+        win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "Default"))
+  {
+    return EXIT_FAILURE;
+  }
 
   // Check that adding an existing interaction command trigger an exception
-
-  test.expect<f3d::interactor::already_exists_exception>(
-    "add existing interaction", [&]() { inter.addBinding({ mod_t::ANY, "7" }, "exception"); });
+  try
+  {
+    inter.addBinding({ mod_t::ANY, "7" }, "exception");
+    std::cerr << "An exception has not been thrown when adding a existing interaction command\n";
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::interactor::already_exists_exception&)
+  {
+  }
 
   // Remove bindings that will be triggered later and should not have any effect
   inter.removeBinding({ mod_t::ANY, "7" });
@@ -67,7 +84,7 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
     { mod_t::CTRL_SHIFT, "B" }, { "set ui.filename true", "set render.show_edges true" });
 
   // Check ANY modifier
-  inter.addBinding({ mod_t::ANY, "A" }, "toggle ui.metadata");
+  inter.addBinding({ mod_t::ANY, "A" }, "toggle render.background.skybox");
 
   // Replace the add_files command
   inter.removeCommand("add_files");
@@ -75,7 +92,7 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
     const std::string& path = filesVec[0];
     size_t found = path.find_last_of("/\\");
     sce.clear();
-    sce.add(path.substr(0, found + 1) + "f3d.vtp");
+    sce.add(path.substr(0, found + 1) + "suzanne.ply");
   });
 
   // Add a command and binding that throws an exception
@@ -86,12 +103,18 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
 
   // This time the interaction should result in a different rendering
   // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
-  test("play interactions after modifications", inter.playInteraction(interactionFilePath));
+  if (!inter.playInteraction(interactionFilePath))
+  {
+    std::cerr << "Unexcepted error playing interaction\n";
+    return EXIT_FAILURE;
+  }
 
   // With VTK 9.3.0, rendering is slightly different
-  test("render modified interaction result",
-    TestSDKHelpers::RenderTest(
-      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "Modified", 0.11));
+  if (!TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
+        filename + "Modified", 0.11))
+  {
+    return EXIT_FAILURE;
+  }
 
   // Remove a non-existing interaction command
   inter.removeBinding({ mod_t::ANY, "Invalid" });
@@ -107,35 +130,56 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
 
   // Play interaction again, which should not have any effect
   // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
-  test(
-    "play interaction after removing all interactions", inter.playInteraction(interactionFilePath));
+  if (!inter.playInteraction(interactionFilePath))
+  {
+    std::cerr << "Unexcepted error playing interaction\n";
+    return EXIT_FAILURE;
+  }
 
   // With VTK 9.3.0, rendering is slightly different
-  test("render after interaction that should have had no effect",
-    TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
-      filename + "ModifiedAgain", 0.11));
+  if (!TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
+        filename + "ModifiedAgain", 0.11))
+  {
+    return EXIT_FAILURE;
+  }
 
   // initialize default bindings again, two times, and check rendering
   inter.initBindings();
   inter.initBindings();
 
   // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
-  test("play interactions after initialization", inter.playInteraction(interactionFilePath));
-  test("render after playing defaulted interactions",
-    TestSDKHelpers::RenderTest(
-      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "DefaultAgain"));
+  if (!inter.playInteraction(interactionFilePath))
+  {
+    std::cerr << "Unexcepted error playing interaction\n";
+    return EXIT_FAILURE;
+  }
+  if (!TestSDKHelpers::RenderTest(
+        win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "DefaultAgain"))
+  {
+    std::cerr << "Unexcepted rendering playing interaction\n";
+    return EXIT_FAILURE;
+  }
 
   // Check error handling
-  test("record to an invalid path",
-    !inter.recordInteraction("/" + std::string(257, 'x') + "/record.ext"));
-  test("play interaction from an invalid path",
-    !inter.playInteraction("/" + std::string(257, 'x') + "/play.ext"));
+  if (inter.recordInteraction("/" + std::string(257, 'x') + "/record.ext"))
+  {
+    std::cerr << "Unexcepted success recording an invalid path\n";
+    return EXIT_FAILURE;
+  }
+  if (inter.playInteraction("/" + std::string(257, 'x') + "/play.ext"))
+  {
+    std::cerr << "Unexcepted success playing an invalid path\n";
+    return EXIT_FAILURE;
+  }
 
   // Check console error handling
   // Esc;"exception";Enter;Esc
-  test("play an interaction that write a command that trigger an exception internally",
-    inter.playInteraction(
-      std::string(argv[1]) + "recordings/TestSDKInteractorCallBackConsoleException.log"));
+  if (!inter.playInteraction(
+        std::string(argv[1]) + "recordings/TestSDKInteractorCallBackConsoleException.log"))
+  {
+    std::cerr << "Unexcepted failure playing a console command triggering an exception\n";
+    return EXIT_FAILURE;
+  }
 
-  return test.result();
+  return EXIT_SUCCESS;
 }

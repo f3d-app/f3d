@@ -1,17 +1,12 @@
 import app.f3d.F3D.*;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class InteractiveApp {
 
-    // On Windows, try to load opengl32 from Java path
-    // It's only useful in order to force Mesa software OpenGL
     static {
-        if (System.getProperty("os.name").startsWith("Windows"))
-        {
-            try {
-                System.loadLibrary("opengl32");
-            } catch (UnsatisfiedLinkError e) {
-                // Ignore if opengl32 is not available
-            }
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            System.loadLibrary("opengl32");
         }
     }
 
@@ -53,7 +48,15 @@ public class InteractiveApp {
             if (args.length > 1) {
                 // For testing purposes, stop after timeout seconds
                 int timeout = Integer.parseInt(args[1]);
-                interactor.start(timeout, () -> interactor.stop());
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        interactor.requestStop();
+                        timer.cancel();
+                    }
+                }, timeout * 1000L);
+                interactor.start();
             } else {
                 interactor.start();
             }

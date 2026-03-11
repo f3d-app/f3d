@@ -1,41 +1,47 @@
-#include "PseudoUnitTest.h"
-#include "TestSDKHelpers.h"
-
 #include <engine.h>
 #include <options.h>
 #include <scene.h>
 #include <window.h>
 
+#include "TestSDKHelpers.h"
+
 int TestSDKDynamicLightIntensity([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
-  PseudoUnitTest test;
-
   f3d::engine eng = f3d::engine::create(true);
-  f3d::scene& scene = eng.getScene();
+  f3d::scene& Scene = eng.getScene();
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();
   win.setSize(300, 300);
 
-  scene.add(std::string(argv[1]) + "/data/cow.vtp");
+  Scene.add(std::string(argv[1]) + "/data/cow.vtp");
 
   win.render();
 
   // Check render with default light intensity
-  test("render with default light intensity",
-    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-      std::string(argv[2]), "TestSDKDynamicLightIntensity-default"));
+  if (!TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+        std::string(argv[2]), "TestSDKDynamicLightIntensity-default"))
+  {
+    std::cerr << "failed for default light intensity\n";
+    return EXIT_FAILURE;
+  }
 
   // set light intensity to 5x brighter
   opt.render.light.intensity = 5.;
-  test("render with light intensity of 5",
-    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-      std::string(argv[2]), "TestSDKDynamicLightIntensity-5x-brighter"));
+  if (!TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+        std::string(argv[2]), "TestSDKDynamicLightIntensity-5x-brighter"))
+  {
+    std::cerr << "failed for light intensity = 5\n";
+    return EXIT_FAILURE;
+  }
 
   // set light intensity to 5x darker
   opt.render.light.intensity = .2;
-  test("render with light intensity of .2",
-    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-      std::string(argv[2]), "TestSDKDynamicLightIntensity-5x-darker"));
+  if (!TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+        std::string(argv[2]), "TestSDKDynamicLightIntensity-5x-darker"))
+  {
+    std::cerr << "failed for light intensity = .2\n";
+    return EXIT_FAILURE;
+  }
 
-  return test.result();
+  return EXIT_SUCCESS;
 }

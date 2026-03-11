@@ -2,84 +2,10 @@
 #define PseudoUnitTest_h
 
 #include "options.h"
-#include "types.h"
 
-#include <cmath>
 #include <functional>
 #include <iostream>
 #include <sstream>
-#include <type_traits>
-
-namespace
-{
-template<typename T>
-struct is_container : std::false_type
-{
-};
-
-template<>
-struct is_container<f3d::point3_t> : std::true_type
-{
-};
-
-template<>
-struct is_container<f3d::vector3_t> : std::true_type
-{
-};
-
-template<typename T>
-struct is_container<std::vector<T>> : std::true_type
-{
-};
-
-template<typename T>
-std::string toString(const T& value)
-{
-  std::stringstream ss;
-
-  if constexpr (is_container<T>::value)
-  {
-    size_t i = 0;
-    for (const auto& item : value)
-    {
-      ss << (i++ ? ", " : "{ ") << ::toString(item);
-    }
-    ss << " }";
-  }
-  else
-  {
-    ss << value;
-  }
-  return ss.str();
-}
-}
-
-template<typename T>
-class approx
-{
-public:
-  explicit approx(T value, double tol = 128 * std::numeric_limits<double>::epsilon())
-    : Value(std::move(value))
-    , Tol(tol)
-  {
-  }
-  bool operator==(const T& rhs) const
-  {
-    auto fuzzyComp = [this](double a, double b) { return std::fabs(a - b) < this->Tol; };
-
-    if constexpr (is_container<T>::value)
-    {
-      return std::equal(this->Value.begin(), this->Value.end(), rhs.begin(), fuzzyComp);
-    }
-    else
-    {
-      return fuzzyComp(this->Value, rhs);
-    }
-  }
-
-  const T Value;
-  const double Tol;
-};
 
 /** Helper to perform multiple checks within the same `ctest` test.
  * Checks are performed using the various overloads of `operator()`
@@ -109,21 +35,20 @@ public:
     this->testFunction<E>(label, function);
   }
 
-  /** test the equality of two values */
-  template<typename T>
-  void operator()(const std::string& label, const T& actual, const T& expected)
+  /** test the equality of two values with `==` */
+  template<typename T1, typename T2>
+  void operator()(const std::string& label, const T1& actual, const T2& expected)
   {
     const bool success = actual == expected;
     this->record(success, label, this->comparisonMessage(actual, expected, success ? "==" : "!="));
   }
 
-  /** test the equality of two values with fuzzy comparison */
-  template<typename T>
-  void operator()(const std::string& label, const T& actual, const approx<T>& expected_approx)
+  /** test the equality of two values with a comparator */
+  template<typename T1, typename T2, typename F>
+  void operator()(const std::string& label, const T1& actual, const T2& expected, F comparator)
   {
-    const bool success = expected_approx == actual;
-    this->record(success, label,
-      this->comparisonMessage(actual, expected_approx.Value, success ? "~=" : "!="));
+    const bool success = comparator(actual, expected);
+    this->record(success, label, this->comparisonMessage(actual, expected, success ? "~=" : "!="));
   }
 
   int result()
@@ -185,12 +110,33 @@ private:
     this->log(success, label, message);
   }
 
-protected:
   template<typename T>
-  std::string comparisonMessage(const T& actual, const T& expected, const std::string& comp)
+  std::string toString(const T& value)
   {
-    const std::string actualStr = ::toString(actual);
-    const std::string expectedStr = ::toString(expected);
+    std::stringstream ss;
+    ss << value;
+    return ss.str();
+  }
+
+  template<typename T>
+  std::string toString(const std::vector<T>& value)
+  {
+    std::stringstream ss;
+    size_t i = 0;
+    for (const T& item : value)
+    {
+      ss << (i++ ? ", " : "{ ") << this->toString(item);
+    }
+    ss << " }";
+    return ss.str();
+  }
+
+protected:
+  template<typename T1, typename T2>
+  std::string comparisonMessage(const T1& actual, const T2& expected, const std::string& comp)
+  {
+    const std::string actualStr = this->toString(actual);
+    const std::string expectedStr = this->toString(expected);
     if (actualStr != expectedStr)
     {
       std::stringstream ss;

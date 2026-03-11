@@ -81,6 +81,7 @@ const ImVec4 GetErrorColor();
 const ImVec4 GetWarningColor();
 const ImVec4 GetHighlightColor();
 const ImVec4 GetCompletionColor();
+const ImVec4 GetTextColor();
 const ImVec4 GetMidColor();
 const ImVec4 GetBackgroundColor();
 

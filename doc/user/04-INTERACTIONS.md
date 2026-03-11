@@ -18,18 +18,6 @@ Simple interaction with the displayed data is possible directly within the windo
 > [!NOTE]
 > When playing an animation with a scene camera, camera interactions are locked.
 
-## 2D Mode
-
-F3D supports a 2D interaction mode designed for viewing images and flat content. In 2D mode:
-
-- Rotation is disabled
-- Camera commands (`set_camera`, `roll_camera`, `elevation_camera`, `azimuth_camera`) are disabled
-- _Click and drag_ with the _left_ or _middle_ mouse button to pan
-- _Click and drag_ with the _right_ mouse button or use the _mouse wheel_ to zoom
-- The default camera zoom factor is `1.0` (no padding) instead of `0.9`
-
-Select 2D interaction styles by pressing <kbd>K</kbd> or through the `--interaction-style=2d` CLI option.
-
 ## Bindings
 
 The coloring can be controlled directly by pressing the following hotkeys:
@@ -62,7 +50,7 @@ Other options can be toggled or cycled directly by pressing the following hotkey
 - <kbd>R</kbd>: raytracing.
 - <kbd>D</kbd>: the denoiser when raytracing.
 - <kbd>U</kbd>: background blur, useful with an HDRI skybox.
-- <kbd>K</kbd>: Cycle interaction modes.
+- <kbd>K</kbd>: trackball interaction mode.
 - <kbd>F</kbd>: HDRI ambient lighting.
 - <kbd>J</kbd>: the display of the HDRI skybox.
 - <kbd>L</kbd>: increase lights intensity.
@@ -103,9 +91,7 @@ Other hotkeys and interactions are available:
 - <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbd>: play the animation backward if any.
 - <kbd>Shift</kbd>+<kbd>V</kbd>: cycle between verbosity levels.
 - <kbd>&larr;</kbd>: load the previous file if any and reset the camera.
-- <kbd>Ctrl</kbd>+<kbd>&larr;</kbd>: load the previous file if any and keep the camera.
 - <kbd>&rarr;</kbd>: load the next file if any and reset the camera.
-- <kbd>Ctrl</kbd>+<kbd>&rarr;</kbd>: load the next file if any and keep the camera.
 - <kbd>&uarr;</kbd>: reload the currently loaded files.
 - <kbd>&darr;</kbd>: add all current files parent directories to the list of files, reload the currently loaded files and reset the camera, respect the `--recursive-dir-add` CLI option.
 - <kbd>F12</kbd>: take a screenshot, ie. render the current view to an image file.

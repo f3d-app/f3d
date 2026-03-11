@@ -5,7 +5,6 @@ project(minimal_qml)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-set(CMAKE_CXX_STANDARD 17)
 
 find_package(f3d REQUIRED COMPONENTS library)
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick)
@@ -18,17 +17,20 @@ set(SOURCES
   F3DView.h
 )
 
-qt6_add_executable(${PROJECT_NAME} ${SOURCES} )
-qt6_add_qml_module(${PROJECT_NAME}
-    URI F3D
-    VERSION 1.0
-    QML_FILES
-        Main.qml
-    SOURCES
-        ${SOURCES}
-    # do not add prefixes of directory structure to qrc path
-    NO_RESOURCE_TARGET_PATH
+add_executable(minimal_qml ${SOURCES})
+target_link_libraries(minimal_qml
+  PRIVATE
+  f3d::libf3d
+  Qt6::Core
+  Qt6::Gui
+  Qt6::Qml
+  Qt6::Quick
 )
+set_target_properties(minimal_qml PROPERTIES CXX_STANDARD 17)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE f3d::libf3d Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick)
-
+# Copy QML file next to the executable
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/Main.qml"
+  "${CMAKE_CURRENT_BINARY_DIR}/Main.qml"
+  COPYONLY
+)

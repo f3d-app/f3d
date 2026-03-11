@@ -8,47 +8,33 @@ class F3DRenderer;
 class F3DView : public QQuickFramebufferObject
 {
   Q_OBJECT
-
-  QML_ELEMENT
-
-  Q_PROPERTY(QString modelPath READ modelPath WRITE setModelPath NOTIFY modelPathChanged)
-  Q_PROPERTY(bool enableKeyboard MEMBER _enableKeyboard NOTIFY enableKeyboardChanged)
-  Q_PROPERTY(bool enableMouse MEMBER _enableMouse NOTIFY enableMouseChanged)
+  Q_PROPERTY(QString modelPath READ GetModelPath WRITE SetModelPath NOTIFY ModelPathChanged)
 
 public:
   explicit F3DView(QQuickItem* parent = nullptr);
-  ~F3DView() override;
+
+  QString GetModelPath() const;
+  void SetModelPath(const QString& path);
 
   Renderer* createRenderer() const override;
   void releaseResources() override;
 
-  QString modelPath() const;
-  void setModelPath(const QString& path);
+public slots:
+  void MousePress(float x, float y, int button, int modifiers);
+  void MouseMove(float x, float y, int buttons, int modifiers);
+  void MouseRelease(float x, float y, int button, int modifiers);
 
-  Q_INVOKABLE void setOption(const QString& opt, const QVariant& value);
-  QVariantMap& pendingOptions();
+  void MouseWheel(int dx, int dy, int modifiers);
 
-protected:
-  void mousePressEvent(QMouseEvent* event) override;
-  void mouseMoveEvent(QMouseEvent* event) override;
-  void mouseReleaseEvent(QMouseEvent* event) override;
-  void wheelEvent(QWheelEvent* event) override;
-  void keyPressEvent(QKeyEvent* event) override;
-  void keyReleaseEvent(QKeyEvent* event) override;
-  void geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry) override;
+  void KeyPress(int key, const QString& text, int modifiers);
+  void KeyRelease(int key, int modifiers);
 
 signals:
-  void modelPathChanged();
-  void enableKeyboardChanged();
-  void enableMouseChanged();
+  void ModelPathChanged();
 
 private:
-  QString _modelPath;
-  QVariantMap _pendingOptions;
-  mutable F3DRenderer* _renderer = nullptr;
-
-  bool _enableKeyboard = true;
-  bool _enableMouse = true;
+  QString modelPath;
+  mutable F3DRenderer* Renderer = nullptr;
 };
 
 #endif // F3DVIEW_H

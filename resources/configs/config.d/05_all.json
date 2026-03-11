@@ -12,8 +12,7 @@
       "hdri-ambient": true,
       "blending": "ddp",
       "animation-progress": true,
-      "remove-empty-file-groups": true,
-      "dpi-aware": true
+      "remove-empty-file-groups": true
     }
   }
 ]

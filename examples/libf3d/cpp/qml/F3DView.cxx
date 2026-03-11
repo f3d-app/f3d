@@ -1,8 +1,10 @@
 #include "F3DView.h"
+
 #include "F3DRenderer.h"
+
 #include <QtCore/QSysInfo>
 #include <QtGui/QWindow>
-#include <f3d/engine.h>
+
 #include <f3d/interactor.h>
 #include <f3d/scene.h>
 
@@ -10,140 +12,90 @@
 F3DView::F3DView(QQuickItem* parent)
   : QQuickFramebufferObject(parent)
 {
-  this->setMirrorVertically(true);
-  this->setAcceptedMouseButtons(Qt::AllButtons);
 }
 
 //----------------------------------------------------------------------------
-F3DView::~F3DView() = default;
-
-//----------------------------------------------------------------------------
-QString F3DView::modelPath() const
+QString F3DView::GetModelPath() const
 {
-  return this->_modelPath;
+  return this->modelPath;
 }
 
 //----------------------------------------------------------------------------
-void F3DView::setModelPath(const QString& path)
+void F3DView::SetModelPath(const QString& path)
 {
-  if (this->_modelPath == path)
+  if (this->modelPath == path)
   {
     return;
   }
 
-  this->_modelPath = path;
-  emit this->modelPathChanged();
-  this->update();
+  this->modelPath = path;
+  emit this->ModelPathChanged();
 }
 
 //----------------------------------------------------------------------------
 QQuickFramebufferObject::Renderer* F3DView::createRenderer() const
 {
-  // Note that the renderer is managed by QQuickFramebufferObject, do not delete this manually.
-  this->_renderer = new F3DRenderer();
-  return this->_renderer;
+  auto* renderer = new F3DRenderer(const_cast<F3DView*>(this));
+  this->Renderer = renderer;
+  return renderer;
 }
 
 //----------------------------------------------------------------------------
 void F3DView::releaseResources()
 {
-  QQuickFramebufferObject::releaseResources();
+  this->Renderer = nullptr;
 }
 
 //----------------------------------------------------------------------------
-void F3DView::mousePressEvent(QMouseEvent* event)
+void F3DView::MousePress(float x, float y, int button, int modifiers)
 {
-  if (!this->_enableMouse)
+  if (this->Renderer != nullptr)
   {
-    return event->ignore();
-  }
-  if (this->_renderer)
-  {
-    this->_renderer->queueMousePress(event->position(), event->button(), event->modifiers());
+    this->Renderer->QueueMousePress(x, y, button, modifiers);
   }
 }
 
 //----------------------------------------------------------------------------
-void F3DView::mouseMoveEvent(QMouseEvent* event)
+void F3DView::MouseMove(float x, float y, int buttons, int modifiers)
 {
-  if (!this->_enableMouse)
+  if (this->Renderer != nullptr)
   {
-    return event->ignore();
-  }
-  if (this->_renderer)
-  {
-    this->_renderer->queueMouseMove(event->position(), event->button(), event->modifiers());
+    this->Renderer->QueueMouseMove(x, y, buttons, modifiers);
   }
 }
 
 //----------------------------------------------------------------------------
-void F3DView::mouseReleaseEvent(QMouseEvent* event)
+void F3DView::MouseRelease(float x, float y, int button, int modifiers)
 {
-  if (!this->_enableMouse)
+  if (this->Renderer != nullptr)
   {
-    return event->ignore();
-  }
-  if (this->_renderer)
-  {
-    this->_renderer->queueMouseRelease(event->position(), event->button(), event->modifiers());
+    this->Renderer->QueueMouseRelease(x, y, button, modifiers);
   }
 }
 
 //----------------------------------------------------------------------------
-void F3DView::wheelEvent(QWheelEvent* event)
+void F3DView::MouseWheel(int dx, int dy, int modifiers)
 {
-  if (!this->_enableMouse)
+  if (this->Renderer != nullptr)
   {
-    return event->ignore();
-  }
-  if (this->_renderer)
-  {
-    this->_renderer->queueWheel(event->angleDelta(), event->modifiers());
+    this->Renderer->QueueWheel(dx, dy, modifiers);
   }
 }
 
 //----------------------------------------------------------------------------
-void F3DView::keyPressEvent(QKeyEvent* event)
+void F3DView::KeyPress(int key, const QString& text, int modifiers)
 {
-  if (!this->_enableKeyboard)
+  if (this->Renderer != nullptr)
   {
-    return event->ignore();
-  }
-  if (this->_renderer)
-  {
-    this->_renderer->queueKeyPress(event->key(), event->text(), event->modifiers());
+    this->Renderer->QueueKeyPress(key, text, modifiers);
   }
 }
 
 //----------------------------------------------------------------------------
-void F3DView::keyReleaseEvent(QKeyEvent* event)
+void F3DView::KeyRelease(int key, int modifiers)
 {
-  if (!this->_enableKeyboard)
+  if (this->Renderer != nullptr)
   {
-    return event->ignore();
+    this->Renderer->QueueKeyRelease(key, modifiers);
   }
-  if (this->_renderer)
-  {
-    this->_renderer->queueKeyRelease(event->key(), event->modifiers());
-  }
-}
-
-//----------------------------------------------------------------------------
-void F3DView::geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry)
-{
-  QQuickFramebufferObject::geometryChange(newGeometry, oldGeometry);
-  this->update();
-}
-
-//----------------------------------------------------------------------------
-QVariantMap& F3DView::pendingOptions()
-{
-  return this->_pendingOptions;
-}
-
-//----------------------------------------------------------------------------
-void F3DView::setOption(const QString& opt, const QVariant& value)
-{
-  this->_pendingOptions.insert(opt, value);
-  this->update();
 }

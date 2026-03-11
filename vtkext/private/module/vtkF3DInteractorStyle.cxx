@@ -23,17 +23,20 @@ void vtkF3DInteractorStyle::OnLeftButtonDown()
     this->Interactor->GetEventPosition()[0], this->Interactor->GetEventPosition()[1]);
   assert(this->CurrentRenderer != nullptr);
 
-  if (this->InteractionMode == TWO_D || this->Interactor->GetShiftKey())
+  if (this->Interactor->GetShiftKey())
   {
     this->StartPan();
   }
-  else if (this->Interactor->GetControlKey())
-  {
-    this->StartSpin();
-  }
   else
   {
-    this->StartRotate();
+    if (this->Interactor->GetControlKey())
+    {
+      this->StartSpin();
+    }
+    else
+    {
+      this->StartRotate();
+    }
   }
 }
 
@@ -84,7 +87,7 @@ void vtkF3DInteractorStyle::OnRightButtonDown()
     this->Interactor->GetEventPosition()[0], this->Interactor->GetEventPosition()[1]);
   assert(this->CurrentRenderer != nullptr);
 
-  if (this->InteractionMode != TWO_D && this->Interactor->GetShiftKey())
+  if (this->Interactor->GetShiftKey())
   {
     this->StartEnvRotate();
   }
@@ -129,7 +132,7 @@ void vtkF3DInteractorStyle::OnKeyPress()
 //------------------------------------------------------------------------------
 void vtkF3DInteractorStyle::Rotate()
 {
-  if (this->CameraMovementDisabled || this->InteractionMode == TWO_D)
+  if (this->CameraMovementDisabled)
   {
     return;
   }
@@ -150,7 +153,7 @@ void vtkF3DInteractorStyle::Rotate()
 
   vtkCamera* camera = ren->GetActiveCamera();
 
-  if (this->InteractionMode != TRACKBALL)
+  if (!ren->GetUseTrackball())
   {
     double up[3];
     this->InterpolateTemporaryUp(0.1, ren->GetUpDirection(), up);
@@ -201,7 +204,7 @@ void vtkF3DInteractorStyle::Rotate()
 //----------------------------------------------------------------------------
 void vtkF3DInteractorStyle::Spin()
 {
-  if (this->CameraMovementDisabled || this->InteractionMode == TWO_D)
+  if (this->CameraMovementDisabled)
   {
     return;
   }

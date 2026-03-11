@@ -19,17 +19,6 @@
 #include <vtkUnsignedCharArray.h>
 #include <vtkVersion.h>
 
-namespace
-{
-struct splat_t
-{
-  float position[3];
-  float scale[3];
-  unsigned char color[4];
-  unsigned char rotation[4];
-};
-}
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DSplatReader);
 
@@ -62,8 +51,24 @@ int vtkF3DSplatReader::RequestData(
   }
 
   stream->Seek(0, vtkResourceStream::SeekDirection::End);
-  std::size_t nbSplats = stream->Tell() / sizeof(::splat_t);
+  size_t length = stream->Tell(); // <-- get buffer size
+
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+
+  std::vector<unsigned char> buffer(length);
+  stream->Read(buffer.data(), length); // <-- read into buffer
+
+  // position: 3 floats (12 bytes)
+  // scale: 3 floats (12 bytes)
+  // rotation: 4 chars (4 bytes)
+  // color+opacity: 4 chars (4 bytes)
+  constexpr size_t splatSize = 32;
+  constexpr size_t positionOffset = 0;
+  constexpr size_t scaleOffset = 12;
+  constexpr size_t colorOffset = 24;
+  constexpr size_t rotationOffset = 28;
+
+  size_t nbSplats = buffer.size() / splatSize;
 
   vtkNew<vtkFloatArray> positionArray;
   positionArray->SetNumberOfComponents(3);
@@ -85,19 +90,20 @@ int vtkF3DSplatReader::RequestData(
   rotationArray->SetNumberOfTuples(nbSplats);
   rotationArray->SetName("rotation");
 
-  ::splat_t splat;
   for (size_t i = 0; i < nbSplats; i++)
   {
-    // This cannot read less bytes than expected because of nbSplats being computed above
-    stream->Read(&splat, sizeof(::splat_t));
+    float* position = reinterpret_cast<float*>(buffer.data() + (splatSize * i) + positionOffset);
+    float* scale = reinterpret_cast<float*>(buffer.data() + (splatSize * i) + scaleOffset);
+    unsigned char* rotation = buffer.data() + (splatSize * i) + rotationOffset;
+    unsigned char* color = buffer.data() + (splatSize * i) + colorOffset;
 
-    positionArray->SetTypedTuple(i, splat.position);
-    scaleArray->SetTypedTuple(i, splat.scale);
-    colorArray->SetTypedTuple(i, splat.color);
+    positionArray->SetTypedTuple(i, position);
+    scaleArray->SetTypedTuple(i, scale);
+    colorArray->SetTypedTuple(i, color);
+
     for (int c = 0; c < 4; c++)
     {
-      rotationArray->SetTypedComponent(
-        i, c, (static_cast<float>(splat.rotation[c]) - 128.f) / 128.f);
+      rotationArray->SetTypedComponent(i, c, (static_cast<float>(rotation[c]) - 128.f) / 128.f);
     }
   }
 
@@ -111,33 +117,4 @@ int vtkF3DSplatReader::RequestData(
   output->GetPointData()->AddArray(rotationArray);
 
   return 1;
-}
-
-//------------------------------------------------------------------------------
-bool vtkF3DSplatReader::CanReadFile(vtkResourceStream* stream)
-{
-  if (!stream)
-  {
-    return false;
-  }
-
-  // Check the size of the file
-  stream->Seek(0, vtkResourceStream::SeekDirection::End);
-  vtkTypeInt64 streamSize = stream->Tell();
-  if (streamSize % sizeof(::splat_t) != 0)
-  {
-    return false;
-  }
-
-  // Read the first splat
-  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
-  ::splat_t splat;
-  if (stream->Read(&splat, sizeof(::splat_t)) != sizeof(::splat_t))
-  {
-    return false;
-  }
-
-  // Check first splat scales are all positive
-  return std::all_of(
-    std::begin(splat.scale), std::end(splat.scale), [](float val) { return val > 0; });
 }

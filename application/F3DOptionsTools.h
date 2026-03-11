@@ -85,7 +85,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "edges", "render.show_edges" },
   { "armature", "render.armature.enable" },
   { "camera-index", "scene.camera.index" },
-  { "interaction-style", "interactor.style" },
+  { "interaction-trackball", "interactor.trackball" },
   { "invert-zoom", "interactor.invert_zoom" },
   { "animation-autoplay", "scene.animation.autoplay" },
   { "animation-index", "scene.animation.index" },
@@ -94,7 +94,6 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "force-reader", "scene.force_reader" },
   { "font-file", "ui.font_file" },
   { "font-scale", "ui.scale" },
-  { "font-color", "ui.font_color" },
   { "backdrop-opacity", "ui.backdrop.opacity" },
   { "point-sprites-size", "model.point_sprites.size" },
   { "point-sprites-absolute-size", "model.point_sprites.absolute_size" },
@@ -115,7 +114,6 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "texture-emissive", "model.emissive.texture" },
   { "emissive-factor", "model.emissive.factor" },
   { "texture-normal", "model.normal.texture" },
-  { "checkerboard", "model.checkerboard.enable" },
   { "normal-scale", "model.normal.scale" },
   { "background-color", "render.background.color" },
   { "fps", "ui.fps" },
@@ -143,9 +141,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "ambient-occlusion", "render.effect.ambient_occlusion" },
   { "tone-mapping", "render.effect.tone_mapping" },
   { "final-shader", "render.effect.final_shader" },
-  { "display-depth", "render.effect.display_depth" },
   { "textures-transform", "model.textures_transform" },
-  { "dpi-aware", "ui.dpi_aware" },
 };
 
 /**
@@ -154,7 +150,6 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
 static inline const std::map<std::string_view, std::string_view> CustomMappingOptions = {
   { "anti-aliasing", "none" },
   { "anti-aliasing-mode", "" },
-  { "interaction-trackball", "false" },
   { "translucency-support", "false" },
   { "blending", "none" },
   { "point-sprites", "none" },

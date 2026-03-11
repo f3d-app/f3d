@@ -6,7 +6,6 @@
 #ifndef f3d_animationManager_h
 #define f3d_animationManager_h
 
-#include <vtkDoubleArray.h>
 #include <vtkNew.h>
 #include <vtkProgressBarWidget.h>
 #include <vtkSmartPointer.h>
@@ -76,26 +75,10 @@ public:
   void CycleAnimation();
 
   /**
-   * Return the animation name of a given animation indices, if any.
-   *
-   * Specific animation (0..availableAnimations): Returns the name of the animation at that index
-   * Current animation (-1):
-   *   - Returns the name of the current animation
-   *   - Returns "Multi animations" if more than one animation is current
-   *   - Returns "All animations" if all animations are current
-   *   - Returns "No animations" if no animations are current
-   * Fallback: Returns "No animation" for out-of-bounds requests.
-   *
+   * Return the current animation name if any
    * Can be called before initialization safely
    */
-  std::string GetAnimationName(int indices = -1);
-
-  /**
-   * Return all of the animation names, if any.
-   * Returns a vector of length 0 if none.
-   * Can be called before initialization safely
-   */
-  std::vector<std::string> GetAnimationNames();
+  std::string GetAnimationName();
 
   /**
    * Return animation direction
@@ -136,12 +119,6 @@ public:
    * When relative is false frame -1 is equal to last frame
    */
   void JumpToFrame(int frame, bool relative);
-
-  /**
-   * Load animation at a specific keyframe
-   * When relative is false keyframe -1 is equal to last keyframe
-   */
-  void JumpToKeyFrame(int keyframe, bool relative);
 
   /**
    * Return a pair containing the current time range values
@@ -192,7 +169,6 @@ private:
   int AnimationDirection = 1;
 
   std::optional<std::vector<int>> PreparedAnimationIndices;
-  vtkNew<vtkDoubleArray> AnimationTimeSteps;
   double TimeRange[2] = { 0.0, 0.0 };
   bool Playing = false;
   double CurrentTime = 0;
