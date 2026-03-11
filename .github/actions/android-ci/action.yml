@@ -20,7 +20,6 @@ runs:
         mkdir build
         mkdir install
 
-    # TODO enable PDAL in docker
     - name: Configure
       shell: bash
       working-directory: ${{github.workspace}}/build
