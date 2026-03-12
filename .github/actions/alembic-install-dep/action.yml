@@ -30,7 +30,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/alembic_install
-        key: alembic-${{inputs.version}}-${{inputs.imath_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-3
+        key: alembic-${{inputs.version}}-${{inputs.imath_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-4
 
     - name: Checkout Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'
@@ -68,7 +68,7 @@ runs:
         -DCMAKE_PREFIX_PATH:PATH=../install/
         -DUSE_BINARIES=OFF
         -DUSE_TESTS=OFF
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0 -DCMAKE_MACOSX_RPATH=ON' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 -DCMAKE_MACOSX_RPATH=ON' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build Alembic

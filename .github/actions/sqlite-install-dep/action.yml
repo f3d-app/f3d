@@ -26,7 +26,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: ${{github.workspace}}/dependencies/sqlite_build/install
-        key: sqlite-${{ inputs.csb_version }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
+        key: sqlite-${{ inputs.csb_version }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-2
 
     # Dependents: proj
     # use --depth=1 --revision=${{ inputs.csb_version }}

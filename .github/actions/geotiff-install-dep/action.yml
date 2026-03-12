@@ -42,7 +42,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/geotiff_install
-        key: geotiff-${{inputs.version}}-${{inputs.proj_version}}-${{ inputs.sqlite_csb_version }}-${{inputs.tiff_version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
+        key: geotiff-${{inputs.version}}-${{inputs.proj_version}}-${{ inputs.sqlite_csb_version }}-${{inputs.tiff_version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-2
 
     # Dependents: gdal pdal vtk
     - name: Checkout geotiff
@@ -78,7 +78,7 @@ runs:
         -DWITH_TOWGS84=OFF
         -DWITH_UTILITIES=OFF
         -DWITH_ZLIB=ON
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build geotiff

@@ -26,7 +26,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/tbb_install
-        key: tbb-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
+        key: tbb-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
 
     # Dependents: usd openvdb vtk
     # v2021.13.0 somehow cause memory issue in draco and alembic
@@ -59,7 +59,7 @@ runs:
         -DTBB_STRICT=OFF
         -DTBB_TEST=OFF
         -DTBB4PY_BUILD=OFF
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0 -DCMAKE_MACOSX_RPATH=ON' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 -DCMAKE_MACOSX_RPATH=ON' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build TBB

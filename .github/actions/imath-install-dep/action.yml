@@ -26,7 +26,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/imath_install
-        key: imath-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
+        key: imath-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
 
     # Dependents: alembic openexr
     - name: Checkout Imath
@@ -55,7 +55,7 @@ runs:
         -DBUILD_TESTING=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../imath_install
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build Imath

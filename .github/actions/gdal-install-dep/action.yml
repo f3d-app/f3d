@@ -46,7 +46,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/gdal_install
-        key: gdal-${{inputs.version}}-${{ inputs.geotiff_version }}-${{inputs.proj_version}}-${{ inputs.sqlite_csb_version }}-${{inputs.tiff_version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-4
+        key: gdal-${{inputs.version}}-${{ inputs.geotiff_version }}-${{inputs.proj_version}}-${{ inputs.sqlite_csb_version }}-${{inputs.tiff_version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-5
 
     # Dependents: pdal vtk
     - name: Checkout gdal
@@ -99,7 +99,7 @@ runs:
         -DGDAL_USE_ZLIB_INTERNAL=OFF 
         -DOGR_BUILD_OPTIONAL_DRIVERS=OFF
         -DPROJ_ROOT:PATH=$(pwd)/../install/
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build gdal
