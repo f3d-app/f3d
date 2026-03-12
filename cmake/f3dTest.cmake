@@ -130,7 +130,7 @@ function(f3d_test)
 
   if(F3D_TEST_PLUGIN)
     list(APPEND F3D_TEST_ARGS "--load-plugins=${F3D_TEST_PLUGIN}")
-    set(F3D_TEST_LABELS "${F3D_TEST_LABELS};plugin;${F3D_TEST_PLUGIN}")
+    list(APPEND F3D_TEST_LABELS "plugin" "${F3D_TEST_PLUGIN}")
   endif()
 
   if(DEFINED f3d_INCLUDE_DIR)
