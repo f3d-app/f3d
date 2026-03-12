@@ -1,6 +1,6 @@
 #include "vtkF3DPDALReader.h"
 
-#include "vtkDoubleArray.h"
+#include "vtkFloatArray.h"
 #include "vtkPointData.h"
 #include "vtkSMPTools.h"
 #include "vtkTypeUInt16Array.h"
@@ -23,7 +23,7 @@ int vtkF3DPDALReader::RequestData(
   if (colors)
   {
     // Identify the divider to use, colors can be uint8 or uint16
-    double divider = std::numeric_limits<std::uint8_t>::max();
+    float divider = std::numeric_limits<std::uint8_t>::max();
     double colorRanges[3][2];
     for (int j = 0; j < 3; j++)
     {
@@ -34,8 +34,8 @@ int vtkF3DPDALReader::RequestData(
       }
     }
 
-    // Convert into [0,1] doubles
-    vtkNew<vtkDoubleArray> normalizedColors;
+    // Convert into [0,1] floats
+    vtkNew<vtkFloatArray> normalizedColors;
     normalizedColors->SetNumberOfComponents(3);
     normalizedColors->SetName("NormalizedColor");
     normalizedColors->SetNumberOfTuples(colors->GetNumberOfTuples());
@@ -44,7 +44,7 @@ int vtkF3DPDALReader::RequestData(
       [&](vtkIdType begin, vtkIdType end)
       {
         vtkTypeUInt16 in[3] = { 0, 0, 0 };
-        double out[3];
+        float out[3];
         for (vtkIdType cc = begin; cc < end; ++cc)
         {
           colors->GetTypedTuple(cc, in);

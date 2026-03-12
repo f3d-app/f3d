@@ -1,11 +1,12 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index f6531904a..2d808524c 100644
+index f6531904a..eefffabc8 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -168,7 +168,6 @@ add_subdirectory(vendor/utfcpp)
+@@ -167,8 +167,6 @@ add_subdirectory(vendor/lazperf)
+ add_subdirectory(vendor/utfcpp)
  add_subdirectory(vendor/lepcc)
  add_subdirectory(vendor/h3)
- add_subdirectory(tools)
+-add_subdirectory(tools)
 -add_subdirectory(apps)
  
  file(GLOB BASE_SRCS
