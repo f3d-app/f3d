@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/vnd.las">
+    <comment>LASer format for lidar point cloud</comment>
+    <glob pattern="*.las"/>
+  </mime-type>
+  <mime-type type="application/vnd.laszip">
+    <comment>LASer format for compressed lidar point cloud</comment>
+    <glob pattern="*.laz"/>
+  </mime-type>
+  <mime-type type="application/vnd.terrascan.binary">
+    <comment>TerraScan binary files</comment>
+    <glob pattern="*.bin"/>
+  </mime-type>
+  <mime-type type="application/vnd.bpf3">
+    <comment>Binary Point File</comment>
+    <glob pattern="*.bpf"/>
+  </mime-type>
+  <mime-type type="application/vnd.csd">
+    <comment>Optech Corrected Sensor Data</comment>
+    <glob pattern="*.bpf"/>
+  </mime-type>
+  <mime-type type="application/vnd.pcd">
+    <comment>Point Cloud Data</comment>
+    <glob pattern="*.pcd"/>
+  </mime-type>
+  <mime-type type="application/vnd.ptx">
+    <comment>Leica Cyclone PTX</comment>
+    <glob pattern="*.ptx"/>
+  </mime-type>
+  <mime-type type="application/vnd.qi">
+    <comment>Airborne Topographic Mapper QFIT</comment>
+    <glob pattern="*.qi"/>
+  </mime-type>
+  <mime-type type="application/vnd.sbet">
+    <comment>Smothed Best Estimate of Trajectory</comment>
+    <glob pattern="*.sbet"/>
+  </mime-type>
+  <mime-type type="application/vnd.slpk">
+    <comment>Esri Scene Layer Package</comment>
+    <glob pattern="*.slpk"/>
+  </mime-type>
+</mime-info>

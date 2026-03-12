@@ -1,0 +1,45 @@
+[
+  {
+    "match-type": "glob",
+    "match": "*.{las,laz,bpf,bin,pcd,ptx}",
+    "options": {
+      "coloring-array": "NormalizedColor",
+      "coloring-component": "-2",
+      "load-plugins": "pdal",
+      "point-size": "5",
+      "scalar-coloring": true,
+      "up": "+Z"
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.{sbet}",
+    "options": {
+      "coloring-scalar-bar": true,
+      "load-plugins": "pdal",
+      "point-size": "5",
+      "scalar-coloring": true,
+      "up": "+Z"
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.{slpk}",
+    "options": {
+      "load-plugins": "pdal",
+      "point-size": "5",
+      "up": "+Y"
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.{csd,qi}",
+    "options": {
+      "coloring-scalar-bar": true,
+      "load-plugins": "pdal",
+      "point-size": "5",
+      "scalar-coloring": true,
+      "up": "+Y"
+    }
+  }
+]

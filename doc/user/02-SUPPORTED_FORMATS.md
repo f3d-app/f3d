@@ -47,6 +47,15 @@ F3D supports the following file formats:
 | Industry Foundation Classes               | `.ifc`                                         | No         | NONE              | YES               | `webifc`  | `IFC`                   |
 | 3D Gaussian splatting                     | `.splat`                                       | No         | NONE              | YES (VTK 9.5)     | `native`  | `Splat`                 |
 | Compressed 3D Gaussian splatting          | `.spz`                                         | No         | NONE              | YES (VTK 9.5)     | `native`  | `SPZ`                   |
+| LASer format for lidar point cloud        | `.las`, `.laz`                                 | No         | NONE              | NO                | `pdal`    | `LAS`                   |
+| Binary Point File                         | `.bpf`                                         | No         | NONE              | NO                | `pdal`    | `BinaryPointFile`       |
+| TerraScan binary files                    | `.bin`                                         | No         | NONE              | NO                | `pdal`    | `TerraScanBIN`          |
+| Optech Corrected Sensor Data              | `.csd`                                         | No         | NONE              | NO                | `pdal`    | `OptechCSD`             |
+| Point Cloud Data                          | `.pcd`                                         | No         | NONE              | NO                | `pdal`    | `PCD`                   |
+| Leica Cyclone                             | `.ptx`                                         | No         | NONE              | NO                | `pdal`    | `LeicaCyclonePTX`       |
+| Airborne Topographic Mapper QFIT          | `.qi`                                          | No         | NONE              | NO                | `pdal`    | `QFIT`                  |
+| Smoothed Best Estimate of Trajectory      | `.sbet`                                        | No         | NONE              | NO                | `pdal`    | `SBET`                  |
+| Esri Scene Layer Package                  | `.slpk`                                        | No         | NONE              | NO                | `pdal`    | `SLPK`                  |
 
 Streaming support refers to the ability to read from stdin and requires specifying the reader name, see [the examples](03-OPTIONS.md#piping).
 

@@ -1,0 +1,48 @@
+From b0b8937c56ced8eb0ffef532b9c691a1a5fc8634 Mon Sep 17 00:00:00 2001
+From: Sergei Trofimovich <slyich@gmail.com>
+Date: Mon, 14 Nov 2022 08:47:03 +0000
+Subject: [PATCH] PROJ: add missing <cstdint> includes
+
+Without the change build fails on upcomig `gcc-13` as:
+
+    In file included from /build/PROJ/src/iso19111/operation/conversion.cpp:58:
+    src/proj_json_streaming_writer.hpp:42:14:
+      error: 'int64_t' in namespace 'std' does not name a type
+       42 | typedef std::int64_t GIntBig;
+          |              ^~~~~~~
+
+gcc-13 cleaned it's header dependencies and that exposes these failures.
+
+Signed-off-by: Mathieu Westphal <mathieu.westphal@kitware.com>
+---
+ src/proj_json_streaming_writer.hpp | 1 +
+ src/projections/s2.cpp             | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/src/proj_json_streaming_writer.hpp b/src/proj_json_streaming_writer.hpp
+index 62676842..163da430 100644
+--- a/src/proj_json_streaming_writer.hpp
++++ b/src/proj_json_streaming_writer.hpp
+@@ -33,6 +33,7 @@
+ 
+ #include <vector>
+ #include <string>
++#include <cstdint>
+ 
+ #define CPL_DLL
+ 
+diff --git a/src/projections/s2.cpp b/src/projections/s2.cpp
+index 4a98897b..efce0289 100644
+--- a/src/projections/s2.cpp
++++ b/src/projections/s2.cpp
+@@ -58,6 +58,7 @@
+ 
+ #include <errno.h>
+ #include <cmath>
++#include <cstdint>
+ 
+ #include "proj.h"
+ #include "proj_internal.h"
+-- 
+2.53.0
+

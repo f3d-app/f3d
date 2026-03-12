@@ -1,0 +1,100 @@
+name: "Install geotiff Dependency"
+description: "Install geotiff Dependency using cache when possible"
+inputs:
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+  version:
+    description: "Version of geotiff to build"
+    required: true
+  proj_version:
+    description: "Version of proj to build against"
+    required: true
+  sqlite_csb_version:
+    description: "Version of csb providing sqlite to build against"
+    required: true
+  tiff_version:
+    description: "Version of tiff to build against"
+    required: true
+  zlib_version:
+    description: "Version of zlib to build against"
+    required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.proj_version }}" ]] || { echo "proj_version input is empty" ; exit 1; }
+        [[ "${{ inputs.sqlite_csb_version }}" ]] || { echo "sqlite_csb_version input is empty" ; exit 1; }
+        [[ "${{ inputs.tiff_version }}" ]] || { echo "tiff_version input is empty" ; exit 1; }
+        [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+
+    - name: Cache geotiff
+      id: cache-geotiff
+      uses: actions/cache/restore@v4
+      with:
+        path: dependencies/geotiff_install
+        key: geotiff-${{inputs.version}}-${{inputs.proj_version}}-${{ inputs.sqlite_csb_version }}-${{inputs.tiff_version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
+
+    # Dependents: gdal pdal vtk
+    - name: Checkout geotiff
+      if: steps.cache-geotiff.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: OSGeo/libgeotiff
+        path: "./dependencies/geotiff"
+        ref: ${{inputs.version}}
+
+    - name: Setup geotiff
+      if: steps.cache-geotiff.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir geotiff_build
+        mkdir geotiff_install
+
+    - name: Configure geotiff
+      if: steps.cache-geotiff.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/geotiff_build
+      shell: bash
+      run: >
+        cmake ../geotiff/libgeotiff
+        -DBUILD_DOC=OFF
+        -DBUILD_MAN=OFF
+        -DBUILD_SHARED_LIBS=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX=../geotiff_install
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
+        -DPROJ_ROOT:PATH=$(pwd)/../install/
+        -DWITH_TIFF=ON
+        -DWITH_TOWGS84=OFF
+        -DWITH_UTILITIES=OFF
+        -DWITH_ZLIB=ON
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build geotiff
+      if: steps.cache-geotiff.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/geotiff_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/geotiff_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-geotiff.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-geotiff.outputs.cache-primary-key }}
+        path: dependencies/geotiff_install

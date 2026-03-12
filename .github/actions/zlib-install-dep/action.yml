@@ -28,7 +28,7 @@ runs:
         path: dependencies/zlib_install
         key: zlib-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
 
-    # Dependents: blosc openvdb vtk
+    # Dependents: blosc openvdb vtk tiff geotiff pdal gdal
     - name: Checkout zlib
       if: steps.cache-zlib.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
