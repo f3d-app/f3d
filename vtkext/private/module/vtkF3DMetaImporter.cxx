@@ -236,7 +236,7 @@ bool vtkF3DMetaImporter::Update()
     actorCollection->InitTraversal(ait);
     while (vtkActor* actor = actorCollection->GetNextActor(ait))
     {
-      // Check for actor's poly data, skip if none exists
+      // Check for actor's poly data mapper, skip if none exists
       vtkPolyDataMapper* pdMapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
       if (pdMapper == nullptr)
       {
@@ -664,7 +664,7 @@ void vtkF3DMetaImporter::UpdateInfoForColoring()
       while (auto* actor = actorCollection->GetNextActor(ait))
       {
         vtkPolyDataMapper* pdMapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
-        // Check for actor's poly data, skip if none exists
+        // Check for actor's poly data mapper, skip if none exists
         if (pdMapper == nullptr)
         {
           F3DLog::Print(F3DLog::Severity::Warning,
