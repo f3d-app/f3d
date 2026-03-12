@@ -434,36 +434,38 @@ public:
         info->Set(vtkMultiBlockDataSet::NAME(), this->GetName(label));
       }
     }
-
-    for (TDF_ChildIterator it(label); it.More(); it.Next())
+    else
     {
-      TDF_Label child = it.Value();
-
-      vtkNew<vtkMatrix4x4> mat;
-      this->GetLocation(child, mat);
-      vtkMatrix4x4::Multiply4x4(position, mat, mat);
-
-      vtkNew<vtkMultiBlockDataSet> childMb;
-
-      vtkIdType blockId = mb->GetNumberOfBlocks();
-      mb->SetBlock(blockId, childMb);
-
-      vtkInformation* info = mb->GetMetaData(blockId);
-      info->Set(vtkMultiBlockDataSet::NAME(), this->GetName(child));
-
-      if (this->ShapeTool->IsReference(child))
+      for (TDF_ChildIterator it(label); it.More(); it.Next())
       {
-        TDF_Label ref;
-        this->ShapeTool->GetReferredShape(child, ref);
+        TDF_Label child = it.Value();
 
-        vtkNew<vtkMatrix4x4> refMat;
-        this->GetLocation(ref, refMat);
-        vtkMatrix4x4::Multiply4x4(mat, refMat, mat);
-        this->AddLabel(ref, mat, childMb);
-      }
-      else
-      {
-        this->AddLabel(child, mat, childMb);
+        vtkNew<vtkMatrix4x4> mat;
+        this->GetLocation(child, mat);
+        vtkMatrix4x4::Multiply4x4(position, mat, mat);
+
+        vtkNew<vtkMultiBlockDataSet> childMb;
+
+        vtkIdType blockId = mb->GetNumberOfBlocks();
+        mb->SetBlock(blockId, childMb);
+
+        vtkInformation* info = mb->GetMetaData(blockId);
+        info->Set(vtkMultiBlockDataSet::NAME(), this->GetName(child));
+
+        if (this->ShapeTool->IsReference(child))
+        {
+          TDF_Label ref;
+          this->ShapeTool->GetReferredShape(child, ref);
+
+          vtkNew<vtkMatrix4x4> refMat;
+          this->GetLocation(ref, refMat);
+          vtkMatrix4x4::Multiply4x4(mat, refMat, mat);
+          this->AddLabel(ref, mat, childMb);
+        }
+        else
+        {
+          this->AddLabel(child, mat, childMb);
+        }
       }
     }
   }

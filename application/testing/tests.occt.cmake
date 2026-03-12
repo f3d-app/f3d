@@ -7,6 +7,7 @@ f3d_test(NAME TestBinaryBREP DATA f3d.bin.brep PLUGIN occt ARGS --up=+Z)
 f3d_test(NAME TestSTEPDefines DATA cheese.stp PLUGIN occt ARGS -DSTEP.linear_deflection=0.5 -DSTEP.angular_deflection=0.9 -DSTEP.relative_deflection=1)
 f3d_test(NAME TestIGESDefines DATA cheese.igs PLUGIN occt ARGS -DIGES.read_wire=0 --line-width=5 --up=+Z)
 f3d_test(NAME TestBREPDefines DATA cheese.brep PLUGIN occt ARGS -DBREP.linear_deflection=100 --up=+Z)
+f3d_test(NAME TestSTEPAssembly DATA two-parts-transform.stp PLUGIN occt ARGS --up=+Z)
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
   f3d_test(NAME TestInvalidSTEP DATA invalid_truncated.stp PLUGIN occt ARGS --verbose REGEXP "failed to load scene" NO_BASELINE)
