@@ -240,8 +240,8 @@ bool vtkF3DMetaImporter::Update()
       vtkPolyDataMapper* pdMapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
       if (pdMapper == nullptr)
       {
-        F3DLog::Print(F3DLog::Severity::Warning,
-          "Actor has no mapped poly data and will not be rendered.");
+        F3DLog::Print(
+          F3DLog::Severity::Warning, "Actor has no mapped poly data and will not be rendered.");
         continue;
       }
 
@@ -667,8 +667,8 @@ void vtkF3DMetaImporter::UpdateInfoForColoring()
         // Check for actor's poly data mapper, skip if none exists
         if (pdMapper == nullptr)
         {
-          F3DLog::Print(F3DLog::Severity::Warning,
-            "Actor has no mapped poly data and will not be colored.");
+          F3DLog::Print(
+            F3DLog::Severity::Warning, "Actor has no mapped poly data and will not be colored.");
           continue;
         }
 
