@@ -27,7 +27,7 @@ private:
     vtkNew<vtkActor> actor2;
 
     // Push to vtkImporter parent class
-    auto collection = this->GetImportedActors();
+    auto collection = vtkImporter::GetImportedActors();
     collection->AddItem(actor1);
     collection->AddItem(actor2);
   }
