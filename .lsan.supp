@@ -29,5 +29,5 @@ leak:libQt6Core
 # png
 leak:libvtkpng
 
-#gdal
+# gdal
 leak:libgdal
