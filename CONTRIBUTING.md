@@ -68,7 +68,7 @@ F3D uses [GitLab Flow](https://about.gitlab.com/topics/version-control/what-is-g
 - If you are a discord user, then you are most welcome to join the [F3D discord](https://discord.f3d.app)
 - When discussing a specific issue or pull request, create a dedicated thread in the "Contribute" channel
 - As a first message, post a link to the issue, a moderator will pin it to the thread
-- Discussing issue, design and investigation on discord is usually more efficient on discord than on github, but always try to write down the discussion conclusions on github
+- Discussing issues, design and investigation on discord is usually more efficient on discord than on github, but always try to write down the discussion conclusions on github
 
 ## Continuous Integration
 
