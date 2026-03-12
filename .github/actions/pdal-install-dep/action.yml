@@ -66,12 +66,20 @@ runs:
         ref: ${{inputs.version}}
 
     - name: Patch pdal
-      if: steps.cache-pdal.outputs.cache-hit != 'true'
+      if: steps.cache-pdal.outputs.cache-hit != 'true' && inputs.version != '2.9.0'
       working-directory: ${{github.workspace}}/dependencies/pdal
       shell: bash
       run: |
         patch -p1 < $GITHUB_ACTION_PATH/fix_leak.patch
         patch -p1 < $GITHUB_ACTION_PATH/remove_apps_tools.patch
+
+    - name: Patch pdal minver
+      if: steps.cache-pdal.outputs.cache-hit != 'true' && inputs.version == '2.9.0'
+      working-directory: ${{github.workspace}}/dependencies/pdal
+      shell: bash
+      run: |
+        patch -p1 < $GITHUB_ACTION_PATH/fix_leak.patch
+        patch -p1 < $GITHUB_ACTION_PATH/remove_apps_tools_minver.patch
 
     - name: Setup pdal
       if: steps.cache-pdal.outputs.cache-hit != 'true'

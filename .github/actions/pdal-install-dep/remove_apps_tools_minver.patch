@@ -1,0 +1,13 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2a7a6c7e4..ff69d1676 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -169,8 +169,6 @@ add_subdirectory(vendor/utfcpp)
+ add_subdirectory(vendor/lepcc)
+ add_subdirectory(vendor/h3)
+ add_subdirectory(vendor/spz)
+-add_subdirectory(tools)
+-add_subdirectory(apps)
+ 
+ file(GLOB BASE_SRCS
+     ${PDAL_FILTERS_DIR}/*.cpp
