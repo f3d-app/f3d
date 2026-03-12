@@ -1,10 +1,8 @@
 #include "vtkF3DMetaImporter.h"
 
 #include <vtkCubeSource.h>
-#include <vtkNew.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
-#include <vtkVRMLImporter.h>
 
 // NonPolyImporter : Testing class which creates 2 actors, one with polydata (a default cube) and
 // one with no poly data.
