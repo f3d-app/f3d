@@ -26,7 +26,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/webp_install
-        key: webp-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
+        key: webp-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
 
     - name: Checkout WebP
       if: steps.cache-webp.outputs.cache-hit != 'true'
@@ -64,7 +64,7 @@ runs:
         -DWEBP_BUILD_LIBWEBPMUX=OFF
         -DWEBP_BUILD_WEBPMUX=OFF
         -DWEBP_BUILD_EXTRAS=OFF
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0 -DCMAKE_MACOSX_RPATH=ON' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 -DCMAKE_MACOSX_RPATH=ON' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build WebP

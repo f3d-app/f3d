@@ -30,7 +30,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/curl_install
-        key: curl-${{inputs.version}}-${{ inputs.zlib_version }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
+        key: curl-${{inputs.version}}-${{ inputs.zlib_version }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-2
 
     # Dependents: pdal vtk
     - name: Checkout curl
@@ -77,7 +77,7 @@ runs:
         -DUSE_LIBIDN2=OFF
         -DUSE_NGHTTP2=OFF
         -DCURL_ZSTD=OFF
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build curl

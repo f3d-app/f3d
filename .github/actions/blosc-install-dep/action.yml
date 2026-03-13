@@ -30,7 +30,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/blosc_install
-        key: blosc-${{inputs.version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
+        key: blosc-${{inputs.version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-2
 
     # Dependents: openvdb vtk
     - name: Checkout blosc
@@ -64,7 +64,7 @@ runs:
         -DCMAKE_INSTALL_PREFIX=../blosc_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DPREFER_EXTERNAL_ZLIB=ON
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build blosc
