@@ -43,7 +43,7 @@ runs:
 
     - name: Cache gdal
       id: cache-gdal
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: dependencies/gdal_install
         key: gdal-${{inputs.version}}-${{ inputs.geotiff_version }}-${{inputs.proj_version}}-${{ inputs.sqlite_csb_version }}-${{inputs.tiff_version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-4
@@ -51,7 +51,7 @@ runs:
     # Dependents: pdal vtk
     - name: Checkout gdal
       if: steps.cache-gdal.outputs.cache-hit != 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: OSGeo/gdal
         path: "./dependencies/gdal"
@@ -115,7 +115,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-gdal.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         key: ${{ steps.cache-gdal.outputs.cache-primary-key }}
         path: dependencies/gdal_install

@@ -27,7 +27,7 @@ runs:
 
     - name: Cache curl
       id: cache-curl
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: dependencies/curl_install
         key: curl-${{inputs.version}}-${{ inputs.zlib_version }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
@@ -35,7 +35,7 @@ runs:
     # Dependents: pdal vtk
     - name: Checkout curl
       if: steps.cache-curl.outputs.cache-hit != 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: curl/curl
         path: "./dependencies/curl"
@@ -93,7 +93,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-curl.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         key: ${{ steps.cache-curl.outputs.cache-primary-key }}
         path: dependencies/curl_install

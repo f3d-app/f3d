@@ -35,7 +35,7 @@ runs:
 
     - name: Cache OpenVDB
       id: cache-openvdb
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: dependencies/openvdb_install
         key: openvdb-${{inputs.version}}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
@@ -43,7 +43,7 @@ runs:
     # Dependents: vtk
     - name: Checkout OpenVDB
       if: steps.cache-openvdb.outputs.cache-hit != 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: AcademySoftwareFoundation/openvdb
         path: "./dependencies/openvdb"
@@ -102,7 +102,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-openvdb.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         key: ${{ steps.cache-openvdb.outputs.cache-primary-key }}
         path: dependencies/openvdb_install

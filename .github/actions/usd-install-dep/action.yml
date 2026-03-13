@@ -31,14 +31,14 @@ runs:
 
     - name: Cache USD
       id: cache-usd
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: dependencies/usd_install
         key: usd-${{inputs.version}}-${{inputs.openexr_version}}-${{inputs.tbb_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
 
     - name: Checkout USD
       if: steps.cache-usd.outputs.cache-hit != 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: PixarAnimationStudios/USD
         path: "./dependencies/usd"
@@ -100,7 +100,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-usd.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         key: ${{ steps.cache-usd.outputs.cache-primary-key }}
         path: dependencies/usd_install

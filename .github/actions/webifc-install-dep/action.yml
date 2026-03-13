@@ -23,14 +23,14 @@ runs:
 
     - name: Cache webifc
       id: cache-webifc
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: dependencies/webifc_install
         key: webifc-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
 
     - name: Checkout webifc
       if: steps.cache-webifc.outputs.cache-hit != 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: ThatOpen/engine_web-ifc
         path: "./dependencies/webifc"
@@ -69,7 +69,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-webifc.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         key: ${{ steps.cache-webifc.outputs.cache-primary-key }}
         path: dependencies/webifc_install

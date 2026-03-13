@@ -23,14 +23,14 @@ runs:
 
     - name: Cache OCCT
       id: cache-occt
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: dependencies/occt_install
         key: occt-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
 
     - name: Checkout OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: Open-Cascade-SAS/OCCT
         submodules: true
@@ -120,7 +120,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-occt.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         key: ${{ steps.cache-occt.outputs.cache-primary-key }}
         path: dependencies/occt_install

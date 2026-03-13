@@ -23,7 +23,7 @@ runs:
 
     - name: Cache TBB
       id: cache-tbb
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: dependencies/tbb_install
         key: tbb-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
@@ -33,7 +33,7 @@ runs:
     # v2022.1.0 is not supported by usd until their next release > 25.02a
     - name: Checkout TBB
       if: steps.cache-tbb.outputs.cache-hit != 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: oneapi-src/oneTBB
         path: "./dependencies/tbb"
@@ -75,7 +75,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-tbb.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         key: ${{ steps.cache-tbb.outputs.cache-primary-key }}
         path: dependencies/tbb_install

@@ -27,7 +27,7 @@ runs:
 
     - name: Cache blosc
       id: cache-blosc
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: dependencies/blosc_install
         key: blosc-${{inputs.version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
@@ -35,7 +35,7 @@ runs:
     # Dependents: openvdb vtk
     - name: Checkout blosc
       if: steps.cache-blosc.outputs.cache-hit != 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: Blosc/c-blosc
         path: "./dependencies/blosc"
@@ -80,7 +80,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-blosc.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         key: ${{ steps.cache-blosc.outputs.cache-primary-key }}
         path: dependencies/blosc_install

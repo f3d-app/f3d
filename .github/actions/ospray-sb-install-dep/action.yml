@@ -23,7 +23,7 @@ runs:
 
     - name: Cache ospray
       id: cache-ospray
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: dependencies/ospray_install
         key: ospray-sb-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
@@ -31,7 +31,7 @@ runs:
     # Dependents: vtk
     - name: Checkout ospray
       if: steps.cache-ospray.outputs.cache-hit != 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: RenderKit/ospray
         path: "./dependencies/ospray"
@@ -97,7 +97,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-ospray.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         key: ${{ steps.cache-ospray.outputs.cache-primary-key }}
         path: dependencies/ospray_install

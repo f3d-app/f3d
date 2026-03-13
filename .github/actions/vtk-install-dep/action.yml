@@ -62,7 +62,7 @@ runs:
 
     - name: Cache VTK
       id: cache-vtk
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: dependencies/vtk_install
         key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}${{ inputs.curl_version != '' && format('-curl-{0}', inputs.curl_version) || '' }}${{ inputs.gdal_version != '' && format('-gdal-{0}', inputs.gdal_version) || '' }}${{ inputs.geotiff_version != '' && format('-geotiff-{0}', inputs.geotiff_version) || '' }}${{ inputs.pdal_version != '' && format('-pdal-{0}', inputs.pdal_version) || '' }}${{ inputs.proj_version != '' && format('-proj-{0}', inputs.proj_version) || '' }}${{ inputs.sqlite_csb_version != '' && format('-sqlite-{0}', inputs.sqlite_csb_version) || '' }}${{ inputs.tiff_version != '' && format('-tiff-{0}', inputs.tiff_version) || '' }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
@@ -78,7 +78,7 @@ runs:
     # MacOS needs fetch-depth: 0 to avoid an issue with version in linker
     - name: Checkout VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: Kitware/VTK
         submodules: true
@@ -165,7 +165,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-vtk.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         key: ${{ steps.cache-vtk.outputs.cache-primary-key }}
         path: dependencies/vtk_install
