@@ -178,3 +178,16 @@ endif ()
 if (F3D_MODULE_RAYTRACING)
   vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_RAYTRACING)
 endif ()
+
+# clip
+if(F3D_MODULE_CLIP)
+  vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_CLIP)
+  if(F3D_USE_EXTERNAL_CLIP)
+    vtk_module_link(f3d::vtkextPrivate PRIVATE clip::clip)
+  else()
+    vtk_module_include(f3d::vtkextPrivate
+      PRIVATE
+        "${F3D_SOURCE_DIR}/external/clip")
+    vtk_module_link(f3d::vtkextPrivate PRIVATE clip)
+  endif ()
+endif()
