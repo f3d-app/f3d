@@ -1,0 +1,22 @@
+# StreamVersion 1.2
+
+# Enable scene hierarchy by pressing SHIFT+H
+KeyPressEvent 87 120 0 0 1 Shift_L 0
+CharEvent 87 120 0 0 1 Shift_L 0
+KeyPressEvent 87 120 1 72 1 H 0
+CharEvent 87 120 1 72 1 H 0
+KeyReleaseEvent 87 120 1 72 1 H 0
+KeyReleaseEvent 87 120 1 0 1 Shift_L 0
+
+# Enable volume rendering with V
+KeyPressEvent 156 128 0 118 1 v 0
+CharEvent 156 128 0 118 1 v 0
+KeyReleaseEvent 156 128 0 118 1 v 0
+
+# Move to a checkbox and click on it
+MouseMoveEvent 68 252 0 0 0 v 0
+LeftButtonPressEvent 68 252 0 0 0 v 0
+LeftButtonReleaseEvent 68 252 0 0 0 v 0
+
+# Move away from the checkbox
+MouseMoveEvent 124 147 0 0 0 v 0

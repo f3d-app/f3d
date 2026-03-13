@@ -74,6 +74,12 @@ void vtkF3DUIActor::SetMetaData(const std::string& metadata)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetSceneHierarchyVisibility(bool show)
+{
+  this->SceneHierarchyVisible = show;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::SetCheatSheetVisibility(bool show)
 {
   this->CheatSheetVisible = show;
@@ -212,6 +218,11 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
     if (this->CheatSheetVisible)
     {
       this->RenderCheatSheet();
+    }
+
+    if (this->SceneHierarchyVisible)
+    {
+      this->RenderSceneHierarchy(renWin);
     }
   }
 

@@ -496,7 +496,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
     depthP->SetDelegatePass(camP);
     if (this->DisplayDepthScalarColoring)
     {
-      this->ConfigureColoring();
+      this->ConfigureColoringAndVisibilities();
       depthP->SetColorMap(this->ColorTransferFunction);
     }
     renderingPass = depthP;
@@ -1879,6 +1879,17 @@ void vtkF3DRenderer::ConfigureMetaData()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowSceneHierarchy(bool show)
+{
+  if (this->SceneHierarchyVisible != show)
+  {
+    this->SceneHierarchyVisible = show;
+    this->UIActor->SetSceneHierarchyVisibility(show);
+    this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowCheatSheet(bool show)
 {
   if (this->CheatSheetVisible != show)
@@ -2103,7 +2114,7 @@ void vtkF3DRenderer::UpdateActors()
 
   if (!this->ColoringConfigured)
   {
-    this->ConfigureColoring();
+    this->ConfigureColoringAndVisibilities();
   }
 
   this->ConfigureHDRI();
@@ -3034,7 +3045,7 @@ void vtkF3DRenderer::SetComponentForColoring(int component)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::ConfigureColoring()
+void vtkF3DRenderer::ConfigureColoringAndVisibilities()
 {
   assert(this->Importer);
 
@@ -3055,7 +3066,9 @@ void vtkF3DRenderer::ConfigureColoring()
   bool geometriesVisible = this->UseRaytracing || (!this->UseVolume && !this->UsePointSprites);
   for (const auto& coloring : this->Importer->GetColoringActorsAndMappers())
   {
-    if (geometriesVisible)
+    if (geometriesVisible &&
+      !(coloring.OriginalActor->GetPropertyKeys() &&
+        coloring.OriginalActor->GetPropertyKeys()->Has(vtkF3DMetaImporter::ACTOR_HIDDEN())))
     {
       bool visible = false;
       if (hasColoring)
@@ -3075,8 +3088,8 @@ void vtkF3DRenderer::ConfigureColoring()
     }
     else
     {
-      coloring.Actor->SetVisibility(false);
-      coloring.OriginalActor->SetVisibility(false);
+      coloring.Actor->VisibilityOff();
+      coloring.OriginalActor->VisibilityOff();
     }
   }
   if (geometriesVisible)
@@ -3088,9 +3101,11 @@ void vtkF3DRenderer::ConfigureColoring()
   bool pointSpritesVisible = !this->UseRaytracing && !this->UseVolume && this->UsePointSprites;
   for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
   {
-    sprites.Actor->SetVisibility(pointSpritesVisible);
-    if (pointSpritesVisible)
+    if (pointSpritesVisible &&
+      !(sprites.OriginalActor->GetPropertyKeys() &&
+        sprites.OriginalActor->GetPropertyKeys()->Has(vtkF3DMetaImporter::ACTOR_HIDDEN())))
     {
+      sprites.Actor->VisibilityOn();
       if (hasColoring)
       {
         if (!this->ColoringPointSpritesMappersConfigured)
@@ -3101,6 +3116,10 @@ void vtkF3DRenderer::ConfigureColoring()
         }
       }
       sprites.Mapper->SetScalarVisibility(hasColoring);
+    }
+    else
+    {
+      sprites.Actor->VisibilityOff();
     }
   }
   if (pointSpritesVisible)
@@ -3113,11 +3132,9 @@ void vtkF3DRenderer::ConfigureColoring()
   const auto& volPropsAndMappers = this->Importer->GetVolumePropsAndMappers();
   for (const auto& volume : volPropsAndMappers)
   {
-    if (!volumeVisible)
-    {
-      volume.Prop->VisibilityOff();
-    }
-    else
+    if (volumeVisible &&
+      !(volume.OriginalActor->GetPropertyKeys() &&
+        volume.OriginalActor->GetPropertyKeys()->Has(vtkF3DMetaImporter::ACTOR_HIDDEN())))
     {
       bool visible = false;
       if (hasColoring)
@@ -3138,6 +3155,10 @@ void vtkF3DRenderer::ConfigureColoring()
         }
       }
       volume.Prop->SetVisibility(visible);
+    }
+    else
+    {
+      volume.Prop->VisibilityOff();
     }
   }
   if (volumeVisible)

@@ -6,8 +6,15 @@
 #include "vtkF3DImguiConsole.h"
 #include "vtkF3DImguiFS.h"
 #include "vtkF3DImguiVS.h"
+#include "vtkF3DRenderer.h"
+#include "vtkF3DUserEvents.h"
 
+#include <vtkCallbackCommand.h>
+#include <vtkCommand.h>
+#include <vtkDataAssembly.h>
+#include <vtkDataAssemblyVisitor.h>
 #include <vtkImageData.h>
+#include <vtkInformation.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLBufferObject.h>
 #include <vtkOpenGLRenderWindow.h>
@@ -16,8 +23,11 @@
 #include <vtkOpenGLVertexArrayObject.h>
 #include <vtkPNGReader.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkRenderer.h>
+#include <vtkRendererCollection.h>
 #include <vtkShader.h>
 #include <vtkShaderProgram.h>
+#include <vtkSmartPointer.h>
 #include <vtkTextureObject.h>
 #include <vtkVersion.h>
 
@@ -31,10 +41,12 @@
 #include <vtk_glew.h>
 #endif
 
+#include <imgui.h>
+
 #include <algorithm>
 #include <array>
 #include <cstdint>
-#include <imgui.h>
+#include <functional>
 #include <numeric>
 #include <optional>
 #include <sstream>
@@ -68,6 +80,160 @@ static std::vector<std::string> SplitBindings(const std::string& s, const char d
 
   return result;
 }
+
+/**
+ * Visitor used to traverse a subtree when a checkbox is toggled.
+ * It will add an attribute `f3d_visible` on each node to the value of the checkbox.
+ * It will also add (or remove) a `ACTOR_HIDDEN()` information key on nodes associated with actors.
+ */
+class vtkF3DVisibilityDataAssemblyVisitor : public vtkDataAssemblyVisitor
+{
+public:
+  static vtkF3DVisibilityDataAssemblyVisitor* New();
+  vtkTypeMacro(vtkF3DVisibilityDataAssemblyVisitor, vtkDataAssemblyVisitor);
+
+  void SetVisibleAttribute(int visible)
+  {
+    this->Visible = visible;
+  }
+
+  void SetImporter(vtkImporter* importer)
+  {
+    this->Importer = importer;
+  }
+
+protected:
+  void Visit(int nodeid) override
+  {
+    // add the visibility state in the current node
+    // `GetAssembly()` is a const method, but we need to modify it, so the cast is needed
+    vtkDataAssembly* mutableAssembly = const_cast<vtkDataAssembly*>(this->GetAssembly());
+    mutableAssembly->SetAttribute(nodeid, "f3d_visible", this->Visible);
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
+    const int flatActorIndex =
+      this->GetAssembly()->GetAttributeOrDefault(nodeid, "flat_actor_id", -1);
+
+    if (flatActorIndex >= 0)
+    {
+      vtkActorCollection* actors = this->Importer->GetImportedActors();
+      vtkActor* actor = vtkActor::SafeDownCast(actors->GetItemAsObject(flatActorIndex));
+
+      vtkSmartPointer<vtkInformation> keys = actor->GetPropertyKeys();
+
+      // if there's no property keys yet, create one
+      if (!keys)
+      {
+        keys = vtkSmartPointer<vtkInformation>::New();
+        actor->SetPropertyKeys(keys);
+      }
+
+      // this key will be used in the renderer to know if the actor rendering should be skipped
+      if (this->Visible == 1)
+      {
+        keys->Remove(vtkF3DMetaImporter::ACTOR_HIDDEN());
+      }
+      else
+      {
+        keys->Set(vtkF3DMetaImporter::ACTOR_HIDDEN(), 1);
+      }
+    }
+#endif
+  }
+
+private:
+  int Visible = 0;
+  vtkImporter* Importer = nullptr;
+};
+vtkStandardNewMacro(vtkF3DVisibilityDataAssemblyVisitor);
+
+/**
+ * Visitor used to traverse a full tree (one per importer).
+ * It will take care of rendering the tree with imgui.
+ * If a checkbox is toggled, it triggers another traversal of a subtree to change the internal
+ * state.
+ */
+class vtkF3DRenderDataAssemblyVisitor : public vtkDataAssemblyVisitor
+{
+public:
+  static vtkF3DRenderDataAssemblyVisitor* New();
+  vtkTypeMacro(vtkF3DRenderDataAssemblyVisitor, vtkDataAssemblyVisitor);
+
+  void SetRenderWindow(vtkOpenGLRenderWindow* renWin)
+  {
+    this->RenderWindow = renWin;
+  }
+
+  void SetImporter(vtkImporter* importer)
+  {
+    this->Importer = importer;
+  }
+
+  void SetImporterIndex(int index)
+  {
+    this->ImporterId = index;
+  }
+
+protected:
+  void EndSubTree(int vtkNotUsed(nodeid)) override
+  {
+    ImGui::TreePop();
+  }
+
+  bool GetTraverseSubtree(int vtkNotUsed(nodeid)) override
+  {
+    return this->CurrentNodeOpened;
+  }
+
+  void Visit(int nodeid) override
+  {
+    int flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow |
+      ImGuiTreeNodeFlags_DrawLinesToNodes;
+
+    if (this->GetAssembly()->GetNumberOfChildren(nodeid) == 0)
+    {
+      flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet;
+    }
+
+    // this is only used internally by imgui, it must be unique
+    const int uuid = (this->ImporterId << 16) + nodeid;
+
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+    this->CurrentNodeOpened = ImGui::TreeNodeEx(("##tree_" + std::to_string(uuid)).c_str(), flags);
+
+    ImGui::SameLine();
+
+    // get the current visibility state
+    bool visible = (this->GetAssembly()->GetAttributeOrDefault(nodeid, "f3d_visible", 1) != 0);
+
+    const char* defaultLabel =
+      this->GetAssembly()->GetNumberOfChildren(nodeid) > 0 ? "<group>" : "<object>";
+
+    ImGui::PushID(uuid);
+    if (ImGui::Checkbox(
+          this->GetAssembly()->GetAttributeOrDefault(nodeid, "label", defaultLabel), &visible))
+    {
+      // if the checkbox is toggled, trigger a traversal of the subtree to change each node state
+      vtkNew<vtkF3DVisibilityDataAssemblyVisitor> attrVisitor;
+      attrVisitor->SetImporter(this->Importer);
+      attrVisitor->SetVisibleAttribute(visible ? 1 : 0);
+      this->GetAssembly()->Visit(nodeid, attrVisitor);
+
+      this->RenderWindow->GetInteractor()->InvokeEvent(
+        vtkF3DUserEvents::SceneHierarchyChangedEvent, nullptr);
+    }
+
+    ImGui::PopID();
+    ImGui::PopStyleVar();
+  }
+
+private:
+  bool CurrentNodeOpened = true;
+  vtkOpenGLRenderWindow* RenderWindow = nullptr;
+  vtkImporter* Importer = nullptr;
+  int ImporterId = -1;
+};
+vtkStandardNewMacro(vtkF3DRenderDataAssemblyVisitor);
 
 }
 
@@ -292,6 +458,7 @@ struct vtkF3DImguiActor::Internals
   std::array<char, 256> SearchFilter = {};
   SearchMode CurrentSearchMode = SearchMode::Description;
   bool SearchFocusRequested = false;
+  float CheatSheetWidth = 0.f;
 };
 
 namespace
@@ -383,6 +550,9 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   style->Colors[ImGuiCol_ScrollbarGrabActive] = F3DStyle::imgui::GetHighlightColor();
   style->Colors[ImGuiCol_TextSelectedBg] = F3DStyle::imgui::GetHighlightColor();
   style->Colors[ImGuiCol_CheckMark] = F3DStyle::imgui::GetHighlightColor();
+  style->Colors[ImGuiCol_ResizeGrip] = F3DStyle::imgui::GetMidColor();
+  style->Colors[ImGuiCol_ResizeGripHovered] = F3DStyle::imgui::GetHighlightColor();
+  style->Colors[ImGuiCol_ResizeGripActive] = F3DStyle::imgui::GetHighlightColor();
 
   // Setup backend name
   io.BackendPlatformName = io.BackendRendererName = "F3D/VTK";
@@ -392,12 +562,60 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
 void vtkF3DImguiActor::ReleaseGraphicsResources(vtkWindow* w)
 {
   this->Superclass::ReleaseGraphicsResources(w);
-
   this->Pimpl->Release(vtkOpenGLRenderWindow::SafeDownCast(w));
 }
 
 //----------------------------------------------------------------------------
 vtkF3DImguiActor::~vtkF3DImguiActor() = default;
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
+{
+  const ImGuiViewport* viewport = ImGui::GetMainViewport();
+  assert(viewport);
+
+  constexpr float margin = F3DStyle::GetDefaultMargin();
+  constexpr float defaultWidth = 200.f;
+  float winHeight = viewport->WorkSize.y - 2.0f * margin;
+
+  float posX = margin;
+
+  if (this->CheatSheetVisible)
+  {
+    posX += this->Pimpl->CheatSheetWidth + margin;
+  }
+
+  ImGui::SetNextWindowPos(ImVec2(posX, margin));
+  ImGui::SetNextWindowSize(ImVec2(defaultWidth, winHeight), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSizeConstraints(
+    ImVec2(10.f, winHeight), ImVec2(std::numeric_limits<float>::max(), winHeight));
+  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+
+  ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
+    ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_HorizontalScrollbar;
+
+  ImGui::Begin("Scene Hierarchy", nullptr, flags);
+
+  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+  assert(ren != nullptr);
+
+  vtkF3DMetaImporter* importer = ren->GetMetaImporter();
+  assert(importer != nullptr);
+
+  for (int i = 0; i < importer->GetImporterInfoCount(); i++)
+  {
+    vtkF3DMetaImporter::ImporterInfo info = importer->GetImporterInfo(i);
+
+    vtkNew<::vtkF3DRenderDataAssemblyVisitor> visitor;
+    visitor->SetRenderWindow(renWin);
+    visitor->SetImporter(info.Importer);
+    visitor->SetImporterIndex(i);
+
+    info.DataAssembly->Visit(vtkDataAssembly::GetRootNode(), visitor);
+  }
+
+  ImGui::End();
+}
 
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderDropZone()
@@ -717,7 +935,6 @@ void vtkF3DImguiActor::RenderCheatSheet()
   };
 
   float textHeight = 0.f;
-  float winWidth = 0.f;
 
   // Use to create all rect with same size
   float maxBindingTextWidth = 0.f;
@@ -755,11 +972,11 @@ void vtkF3DImguiActor::RenderCheatSheet()
       ImVec2 valueLineSize = ImGui::CalcTextSize(cyclingValue.c_str());
       maxValueTextWidth = std::max(maxValueTextWidth, valueLineSize.x);
 
-      winWidth = maxBindingTextWidth + maxDescTextWidth + maxValueTextWidth;
+      this->Pimpl->CheatSheetWidth = maxBindingTextWidth + maxDescTextWidth + maxValueTextWidth;
     }
   }
 
-  winWidth += ImGui::GetStyle().ScrollbarSize + 4.f * padding;
+  this->Pimpl->CheatSheetWidth += ImGui::GetStyle().ScrollbarSize + 4.f * padding;
   textHeight += 2.f * ImGui::GetStyle().WindowPadding.y;
 
   const float winTop = std::max(margin, (viewport->WorkSize.y - textHeight) * 0.5f);
@@ -767,7 +984,8 @@ void vtkF3DImguiActor::RenderCheatSheet()
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(padding, padding));
 
   ::SetupNextWindow(ImVec2(margin, winTop),
-    ImVec2(winWidth, std::min(viewport->WorkSize.y - (2 * margin), textHeight)));
+    ImVec2(
+      this->Pimpl->CheatSheetWidth, std::min(viewport->WorkSize.y - (2 * margin), textHeight)));
   ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |

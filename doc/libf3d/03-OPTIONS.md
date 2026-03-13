@@ -572,6 +572,12 @@ Set the opacity of the backdrop behind the UI elements. Value is between 0.0 (fu
 
 CLI: `--backdrop-opacity`.
 
+### `ui.scene_hierarchy` (_bool_, default: `false`)
+
+Display the scene hierarchy.
+
+CLI: `--scene-hierarchy`.
+
 # APIs
 
 There are three APIs to access the options

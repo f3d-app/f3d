@@ -90,6 +90,13 @@ public:
 
   /**
    * Implementation only API.
+   * Update the visibility of actors in the renderer based on the scene hierarchy
+   * visibility selection.
+   */
+  void UpdateActorsVisibility();
+
+  /**
+   * Implementation only API.
    * Print scene description to log using provided verbose level
    */
   void PrintSceneDescription(log::VerboseLevel level);

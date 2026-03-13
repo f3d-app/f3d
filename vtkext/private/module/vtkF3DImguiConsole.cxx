@@ -1,6 +1,7 @@
 #include "vtkF3DImguiConsole.h"
 
 #include "F3DStyle.h"
+#include "vtkF3DUserEvents.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkCommand.h>
@@ -282,7 +283,7 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
   {
     this->Pimpl->CommandHistoryIndexInv = -1; // Reset history navigation on hiding
     this->Pimpl->ClearCompletions();          // Clear completion on hiding
-    this->InvokeEvent(vtkF3DImguiConsole::HideEvent);
+    this->InvokeEvent(vtkF3DUserEvents::HideEvent);
   }
 
   ImGui::Begin("Console", nullptr, winFlags);
@@ -378,7 +379,7 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
   {
     this->Pimpl->Logs.emplace_back(std::make_pair(
       Internals::LogType::Typed, std::string("> ") + this->Pimpl->CurrentInput.data()));
-    this->InvokeEvent(vtkF3DImguiConsole::TriggerEvent, this->Pimpl->CurrentInput.data());
+    this->InvokeEvent(vtkF3DUserEvents::TriggerEvent, this->Pimpl->CurrentInput.data());
     this->Pimpl->CommandHistory.emplace_back(this->Pimpl->CurrentInput.data());
     this->Pimpl->CommandHistoryIndexInv = -1; // Reset history navigation, looks natural
     this->Pimpl->CurrentInput = {};
@@ -392,7 +393,7 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
     // exit console immediately after running command if in minimal mode
     if (minimal)
     {
-      this->InvokeEvent(vtkF3DImguiConsole::HideEvent);
+      this->InvokeEvent(vtkF3DUserEvents::HideEvent);
     }
   }
 
@@ -427,7 +428,7 @@ void vtkF3DImguiConsole::ShowBadge()
 
     if (ImGui::Button("!"))
     {
-      this->InvokeEvent(vtkF3DImguiConsole::ShowEvent);
+      this->InvokeEvent(vtkF3DUserEvents::ShowEvent);
     }
 
     ImGui::PopStyleColor(3);

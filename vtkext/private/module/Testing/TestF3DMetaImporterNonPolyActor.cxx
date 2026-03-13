@@ -45,7 +45,7 @@ int TestF3DMetaImporterNonPolyActor(int argc, char* argv[])
   // Setup importers with testing class
   vtkNew<vtkF3DMetaImporter> importer;
   vtkNew<NonPolyImporter> importerNP;
-  importer->AddImporter(importerNP);
+  importer->AddImporter({ "foo", importerNP });
 
   // Try and render image.
   vtkNew<vtkRenderWindow> window;

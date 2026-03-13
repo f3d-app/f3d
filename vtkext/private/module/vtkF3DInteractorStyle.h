@@ -16,15 +16,6 @@ public:
   vtkTypeMacro(vtkF3DInteractorStyle, vtkInteractorStyleTrackballCamera);
 
   /**
-   * Custom events invoked by this class
-   */
-  enum vtkCustomEvents
-  {
-    DropFilesEvent = vtkCommand::UserEvent + 100,
-    KeyPressEvent
-  };
-
-  /**
    * Interaction mode determining how mouse movements are mapped to camera actions.
    */
   enum InteractionMode

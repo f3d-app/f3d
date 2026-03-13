@@ -19,6 +19,14 @@
 #include <vtkResourceStream.h>
 #include <vtkSmartPointer.h>
 #endif
+
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 20240707)
+#include <vtkActorCollection.h>
+#endif
+
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 20240201)
+#include <vtkDataAssembly.h>
+#endif
 /// @endcond
 
 class vtkInformationIntegerKey;
@@ -90,6 +98,27 @@ public:
   vtkSetSmartPointerMacro(Stream, vtkResourceStream);
   vtkGetSmartPointerMacro(Stream, vtkResourceStream);
   ///@}
+#endif
+
+// needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10861
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 20240201)
+  ///@{
+  /**
+   * Get the hierarchy of actors, cameras and lights in the renderer.
+   * Implementations should strive to pack the hierarchy information from
+   * the file in to a vtkDataAssembly using node names from the file.
+   */
+  vtkGetObjectMacro(SceneHierarchy, vtkDataAssembly);
+  ///@}
+#endif
+
+protected:
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 20240201)
+  vtkSmartPointer<vtkDataAssembly> SceneHierarchy;
+#endif
+
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 20240707)
+  vtkNew<vtkActorCollection> ActorCollection;
 #endif
 
 private:

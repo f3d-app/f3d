@@ -18,6 +18,7 @@
 #include "vtkF3DRenderer.h"
 #include "vtkF3DUIActor.h"
 #include "vtkF3DUIObserver.h"
+#include "vtkF3DUserEvents.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkCellPicker.h>
@@ -103,16 +104,14 @@ public:
 
     this->UIObserver->InstallObservers(this->VTKInteractor);
 
-    // observe console event to trigger commands
+    // observe UI event to trigger commands
     vtkNew<vtkCallbackCommand> commandCallback;
     commandCallback->SetClientData(this);
-    commandCallback->SetCallback(OnConsoleEvent);
-    vtkOutputWindow::GetInstance()->AddObserver(
-      vtkF3DConsoleOutputWindow::TriggerEvent, commandCallback);
-    vtkOutputWindow::GetInstance()->AddObserver(
-      vtkF3DConsoleOutputWindow::ShowEvent, commandCallback);
-    vtkOutputWindow::GetInstance()->AddObserver(
-      vtkF3DConsoleOutputWindow::HideEvent, commandCallback);
+    commandCallback->SetCallback(OnUIEvent);
+    vtkOutputWindow::GetInstance()->AddObserver(vtkF3DUserEvents::TriggerEvent, commandCallback);
+    vtkOutputWindow::GetInstance()->AddObserver(vtkF3DUserEvents::ShowEvent, commandCallback);
+    vtkOutputWindow::GetInstance()->AddObserver(vtkF3DUserEvents::HideEvent, commandCallback);
+    this->VTKInteractor->AddObserver(vtkF3DUserEvents::SceneHierarchyChangedEvent, commandCallback);
 
     // Disable standard interactor behavior with timer event
     // in order to be able to interact while animating
@@ -121,12 +120,12 @@ public:
     vtkNew<vtkCallbackCommand> keyPressCallback;
     keyPressCallback->SetClientData(this);
     keyPressCallback->SetCallback(OnKeyPress);
-    this->Style->AddObserver(vtkF3DInteractorStyle::KeyPressEvent, keyPressCallback);
+    this->Style->AddObserver(vtkF3DUserEvents::KeyPressEvent, keyPressCallback);
 
     vtkNew<vtkCallbackCommand> dropFilesCallback;
     dropFilesCallback->SetClientData(this);
     dropFilesCallback->SetCallback(OnDropFiles);
-    this->Style->AddObserver(vtkF3DInteractorStyle::DropFilesEvent, dropFilesCallback);
+    this->Style->AddObserver(vtkF3DUserEvents::DropFilesEvent, dropFilesCallback);
 
     vtkNew<vtkCallbackCommand> middleButtonPressCallback;
     middleButtonPressCallback->SetClientData(this);
@@ -283,26 +282,31 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  static void OnConsoleEvent(vtkObject*, unsigned long event, void* clientData, void* data)
+  static void OnUIEvent(vtkObject*, unsigned long event, void* clientData, void* data)
   {
     internals* self = static_cast<internals*>(clientData);
 
-    if (event == vtkF3DConsoleOutputWindow::TriggerEvent)
+    if (event == vtkF3DUserEvents::TriggerEvent)
     {
       const char* commandWithArgs = static_cast<const char*>(data);
       self->Interactor.SetCommandBuffer(commandWithArgs);
     }
-    else if (event == vtkF3DConsoleOutputWindow::ShowEvent)
+    else if (event == vtkF3DUserEvents::ShowEvent)
     {
       // Invoked when console badge is clicked
       self->Options.ui.console = true;
     }
-    else if (event == vtkF3DConsoleOutputWindow::HideEvent)
+    else if (event == vtkF3DUserEvents::HideEvent)
     {
       // Invoked when esc key is pressed while in minimal console or console display, or when
       // something is submitted to minimal console
       self->Options.ui.console = false;
       self->Options.ui.minimal_console = false;
+    }
+    else if (event == vtkF3DUserEvents::SceneHierarchyChangedEvent)
+    {
+      // Invoked when a node checkbox is toggled in the scene hierarchy
+      self->Window.UpdateActorsVisibility();
     }
 
     self->RenderRequested = true;
@@ -764,9 +768,9 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
 //----------------------------------------------------------------------------
 interactor_impl::~interactor_impl()
 {
-  vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DConsoleOutputWindow::TriggerEvent);
-  vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DConsoleOutputWindow::ShowEvent);
-  vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DConsoleOutputWindow::HideEvent);
+  vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DUserEvents::TriggerEvent);
+  vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DUserEvents::ShowEvent);
+  vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DUserEvents::HideEvent);
 }
 
 //----------------------------------------------------------------------------
@@ -1665,6 +1669,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "N"}, "toggle ui.filename","Scene", std::bind(docTgl, "Filename", std::cref(opts.ui.filename)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "M"}, "toggle ui.metadata","Scene", std::bind(docTgl, "Metadata", std::cref(opts.ui.metadata)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::SHIFT, "N"}, "toggle ui.hdri_filename","Scene", std::bind(docTgl, "HDRI filename", std::cref(opts.ui.hdri_filename)), f3d::interactor::BindingType::TOGGLE);
+  this->addBinding({mod_t::SHIFT, "H"}, "toggle ui.scene_hierarchy","Scene", std::bind(docTgl, "Scene hierarchy", std::cref(opts.ui.scene_hierarchy)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "Z"}, "toggle ui.fps","Scene", std::bind(docTgl, "FPS Counter", std::cref(opts.ui.fps)), f3d::interactor::BindingType::TOGGLE);
 #endif
 #if F3D_MODULE_RAYTRACING

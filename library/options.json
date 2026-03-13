@@ -294,6 +294,10 @@
     "dpi_aware": {
       "type": "bool",
       "default_value": "false"
+    },
+    "scene_hierarchy": {
+      "type": "bool",
+      "default_value": "false"
     }
   },
   "model": {

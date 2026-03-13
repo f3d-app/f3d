@@ -169,6 +169,15 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestInteractionCheatsheetCentered DATA cow.vtp RESOLUTION 500,1500 INTERACTION UI LONG_TIMEOUT) #H
 endif()
 
+## Scene Hierarchy
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12987
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
+  f3d_test(NAME TestInteractionSceneHierarchy DATA BoxAnimated.gltf INTERACTION UI) #Shift+H;Resize widget;Click checkbox
+  f3d_test(NAME TestInteractionSceneHierarchyManyClick DATA cow.vtp INTERACTION UI) #Shift+H;Click checkbox;Click checkbox;Click checkbox
+  f3d_test(NAME TestInteractionSceneHierarchyVolume DATA tensors.vti INTERACTION UI) #Shift+H;V;Click checkbox
+  f3d_test(NAME TestInteractionSceneHierarchyAndCheatsheet DATA cow.vtp RESOLUTION 1200,200 INTERACTION UI) #H;Shift+H
+endif()
+
 ## Console
 f3d_test(NAME TestInteractionConsoleOpen DATA f3d.glb INTERACTION UI) #Escape
 f3d_test(NAME TestInteractionConsoleOpenExit DATA f3d.glb REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE UI) #Escape;exit;Return
