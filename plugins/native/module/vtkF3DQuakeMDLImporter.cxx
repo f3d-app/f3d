@@ -14,6 +14,9 @@
 #include <vtkRenderer.h>
 #include <vtkResourceStream.h>
 
+#include <vtkInterpolateDataSetAttributes.h>
+#include <vtkMathUtilities.h>
+
 #include <cstdint>
 #include <cstring>
 
@@ -652,6 +655,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   std::vector<std::vector<double>> GroupSkinDurations;
 
   vtkIdType ActiveAnimation = -1;
+
+  vtkSmartPointer<vtkInterpolateDataSetAttributes> Interpolator;
 };
 
 //----------------------------------------------------------------------------
@@ -699,6 +704,7 @@ void vtkF3DQuakeMDLImporter::ImportActors(vtkRenderer* renderer)
 }
 
 //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
 {
   if (this->Internals->ActiveAnimation != -1)
@@ -719,23 +725,106 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
     const std::vector<double>& times = isMeshAnimation
       ? this->Internals->AnimationTimes[animIndex]
       : this->Internals->GroupSkinDurations[animIndex];
-    const auto found = std::lower_bound(times.begin(), times.end() - 1, timeValue);
-    // If found at finish time of last frame, select last frame's start time (second last value),
-    // else select distance
-    const size_t i =
-      (found == times.end() - 1) ? times.size() - 2 : std::distance(times.begin(), found);
-    // If time at index i > timeValue, then choose the previous frame
-    const size_t frameIndex = times[i] > timeValue && i > 0 ? i - 1 : i;
-    if (isMeshAnimation)
+
+    // Need at least 2 time values
+    if (times.size() < 2)
     {
-      this->Internals->Mapper->SetInputData(
-        this->Internals->AnimationFrames[animIndex][frameIndex]);
+      return true;
+    }
+    // Clamping timeValue to the valid animation range
+    double clampedTime = std::max(times.front(), std::min(timeValue, times.back()));
+    // Find the frame interval containing our time
+    auto upperIt = std::lower_bound(times.begin(), times.end() - 1, clampedTime);
+    size_t upperIndex = std::distance(times.begin(), upperIt);
+
+    // Get the two frame indices we're interploating between
+    size_t frameIndex0, frameIndex1;
+    double t0, t1;
+
+    if (upperIndex == 0)
+    {
+      // Before or at the first frame
+      frameIndex0 = 0;
+      frameIndex1 = 0;
+      t0 = times[0];
+      t1 = times[0];
+    }
+    else if (upperIndex >= times.size() - 1)
+    {
+      // At or past the last frame
+      frameIndex0 = times.size() - 2;
+      frameIndex1 = times.size() - 2;
+      t0 = times[times.size() - 2];
+      t1 = times[times.size() - 2];
     }
     else
     {
-      this->Internals->Texture->SetInputData(this->Internals->GroupSkins[animIndex][frameIndex]);
+      // between two frames
+      if (times[upperIndex] > clampedTime)
+      {
+        // Time falls between [upperIndex-1] and [upperIndex]
+        frameIndex0 = upperIndex - 1;
+        frameIndex1 = upperIndex;
+      }
+      else
+      {
+        // Time exactly at upperIndex or between [upperIndex] and [upperIndex+1]
+        frameIndex0 = upperIndex;
+        frameIndex1 = std::min(upperIndex + 1, times.size() - 2);
+      }
+
+      t0 = times[frameIndex0];
+      t1 = times[frameIndex1];
+    }
+
+    // Calculate interpolation factor (alpha)
+    double alpha = 0.0;
+    if (frameIndex0 != frameIndex1)
+    {
+      alpha = vtkMathUtilities::SafeDivision(clampedTime - t0, t1 - t0);
+      alpha = std::max(0.0, std::min(1.0, alpha));
+    }
+
+    if (isMeshAnimation)
+    {
+      if (frameIndex0 == frameIndex1)
+      {
+        // No interpolation needed: use frame0
+        this->Internals->Mapper->SetInputData(
+          this->Internals->AnimationFrames[animIndex][frameIndex0]);
+      }
+      else
+      {
+        // Interpolate between frame0 and frame1
+        // using <vtkInterpolateDataSetAttributes>
+        if (!this->Internals->Interpolator)
+        {
+          this->Internals->Interpolator = vtkSmartPointer<vtkInterpolateDataSetAttributes>::New();
+        }
+
+        // Clear previous inputs and add new ones
+        this->Internals->Interpolator->RemoveAllInputs();
+        this->Internals->Interpolator->AddInputData(
+          this->Internals->AnimationFrames[animIndex][frameIndex0]);
+        this->Internals->Interpolator->AddInputData(
+          this->Internals->AnimationFrames[animIndex][frameIndex1]);
+        this->Internals->Interpolator->SetT(alpha);
+        this->Internals->Interpolator->Update();
+
+        // Get the interpolated mesh and set it to the mapper
+        vtkPolyData* interpolatedMesh = this->Internals->Interpolator->GetPolyDataOutput();
+        this->Internals->Mapper->SetInputData(interpolatedMesh);
+      }
+    }
+    else
+    {
+      // For texture animations, use nearest neighbor approach
+      // Not interpolating here since texture interpolation is complex(?)
+      size_t textureIndex = alpha < 0.5 ? frameIndex0 : frameIndex1;
+      this->Internals->Texture->SetInputData(this->Internals->GroupSkins[animIndex][textureIndex]);
     }
   }
+
   return true;
 }
 
