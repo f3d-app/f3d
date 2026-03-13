@@ -43,19 +43,26 @@ jobs:
       alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
       assimp_version: ${{ steps.set_default_versions.outputs.assimp_version }}
       blosc_version: ${{ steps.set_default_versions.outputs.blosc_version }}
+      curl_version: ${{ steps.set_default_versions.outputs.curl_version }}
       draco_version: ${{ steps.set_default_versions.outputs.draco_version }}
+      gdal_version: ${{ steps.set_default_versions.outputs.gdal_version }}
+      geotiff_version: ${{ steps.set_default_versions.outputs.geotiff_version }}
       imath_version: ${{ steps.set_default_versions.outputs.imath_version }}
       java_version: ${{ steps.set_default_versions.outputs.java_version }}
       occt_version: ${{ steps.set_default_versions.outputs.occt_version }}
       openexr_version: ${{ steps.set_default_versions.outputs.openexr_version }}
       openvdb_version: ${{ steps.set_default_versions.outputs.openvdb_version }}
       ospray_version: ${{ steps.set_default_versions.outputs.ospray_version }}
+      pdal_version: ${{ steps.set_default_versions.outputs.pdal_version }}
+      proj_version: ${{ steps.set_default_versions.outputs.proj_version }}
       pybind11_version: ${{ steps.set_default_versions.outputs.pybind11_version }}
       python_version: ${{ steps.set_default_versions.outputs.python_version }}
+      sqlite_csb_version: ${{ steps.set_default_versions.outputs.sqlite_csb_version }}
       tbb_version: ${{ steps.set_default_versions.outputs.tbb_version }}
+      tiff_version: ${{ steps.set_default_versions.outputs.tiff_version }}
       usd_version: ${{ steps.set_default_versions.outputs.usd_version }}
-      webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
       webifc_version: ${{ steps.set_default_versions.outputs.webifc_version }}
+      webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
       zlib_version: ${{ steps.set_default_versions.outputs.zlib_version }}
       docker_timestamp: ${{ steps.set_default_versions.outputs.docker_timestamp }}
       global_cache_index: ${{ steps.set_default_versions.outputs.global_cache_index }}
@@ -128,19 +135,26 @@ jobs:
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
           blosc_version: ${{needs.default_versions.outputs.blosc_version}}
+          curl_version: ${{needs.default_versions.outputs.curl_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
+          gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+          geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
           imath_version: ${{needs.default_versions.outputs.imath_version}}
           java_version: ${{needs.default_versions.outputs.java_version}}
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           ospray_version: ${{needs.default_versions.outputs.ospray_version}}
+          pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+          proj_version: ${{needs.default_versions.outputs.proj_version}}
           pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
           python_version: ${{needs.default_versions.outputs.python_version}}
+          sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
+          tiff_version: ${{needs.default_versions.outputs.tiff_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          webp_version: ${{ needs.default_versions.outputs.webp_version }}
-          webifc_version: ${{ needs.default_versions.outputs.webifc_version }}
+          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
+          webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -185,19 +199,26 @@ jobs:
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
           blosc_version: ${{needs.default_versions.outputs.blosc_version}}
+          curl_version: ${{needs.default_versions.outputs.curl_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
+          gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+          geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
           imath_version: ${{needs.default_versions.outputs.imath_version}}
           java_version: ${{needs.default_versions.outputs.java_version}}
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           ospray_version: ${{needs.default_versions.outputs.ospray_version}}
+          pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+          proj_version: ${{needs.default_versions.outputs.proj_version}}
           pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
           python_version: ${{needs.default_versions.outputs.python_version}}
+          sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
+          tiff_version: ${{needs.default_versions.outputs.tiff_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          webp_version: ${{ needs.default_versions.outputs.webp_version }}
-          webifc_version: ${{ needs.default_versions.outputs.webifc_version }}
+          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
+          webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -232,19 +253,26 @@ jobs:
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
           blosc_version: ${{needs.default_versions.outputs.blosc_version}}
+          curl_version: ${{needs.default_versions.outputs.curl_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
+          gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+          geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
           imath_version: ${{needs.default_versions.outputs.imath_version}}
           java_version: ${{needs.default_versions.outputs.java_version}}
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           ospray_version: ${{needs.default_versions.outputs.ospray_version}}
+          pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+          proj_version: ${{needs.default_versions.outputs.proj_version}}
           pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
           python_version: ${{needs.default_versions.outputs.python_version}}
+          sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
+          tiff_version: ${{needs.default_versions.outputs.tiff_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          webp_version: ${{ needs.default_versions.outputs.webp_version }}
-          webifc_version: ${{ needs.default_versions.outputs.webifc_version }}
+          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
+          webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -279,19 +307,26 @@ jobs:
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
           blosc_version: ${{needs.default_versions.outputs.blosc_version}}
+          curl_version: ${{needs.default_versions.outputs.curl_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
+          gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+          geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
           imath_version: ${{needs.default_versions.outputs.imath_version}}
           java_version: ${{needs.default_versions.outputs.java_version}}
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           ospray_version: ${{needs.default_versions.outputs.ospray_version}}
+          pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+          proj_version: ${{needs.default_versions.outputs.proj_version}}
           pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
           python_version: ${{needs.default_versions.outputs.python_version}}
+          sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
+          tiff_version: ${{needs.default_versions.outputs.tiff_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          webp_version: ${{ needs.default_versions.outputs.webp_version }}
-          webifc_version: ${{ needs.default_versions.outputs.webifc_version }}
+          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
+          webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -337,18 +372,26 @@ jobs:
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
           blosc_version: ${{needs.default_versions.outputs.blosc_version}}
+          curl_version: ${{needs.default_versions.outputs.curl_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
+          gdal_version: ${{needs.default_versions.outputs.gdal_version}}
+          geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
           imath_version: ${{needs.default_versions.outputs.imath_version}}
           java_version: ${{needs.default_versions.outputs.java_version}}
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          ospray_version: ${{needs.default_versions.outputs.ospray_version}}
+          pdal_version: ${{needs.default_versions.outputs.pdal_version}}
+          proj_version: ${{needs.default_versions.outputs.proj_version}}
           pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
           python_version: ${{needs.default_versions.outputs.python_version}}
+          sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
+          tiff_version: ${{needs.default_versions.outputs.tiff_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          webp_version: ${{ needs.default_versions.outputs.webp_version }}
-          webifc_version: ${{ needs.default_versions.outputs.webifc_version }}
+          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
+          webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
