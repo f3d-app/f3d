@@ -39,7 +39,7 @@ runs:
 
     - name: Cache geotiff
       id: cache-geotiff
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: dependencies/geotiff_install
         key: geotiff-${{inputs.version}}-${{inputs.proj_version}}-${{ inputs.sqlite_csb_version }}-${{inputs.tiff_version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-2
@@ -47,7 +47,7 @@ runs:
     # Dependents: gdal pdal vtk
     - name: Checkout geotiff
       if: steps.cache-geotiff.outputs.cache-hit != 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: OSGeo/libgeotiff
         path: "./dependencies/geotiff"
@@ -94,7 +94,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-geotiff.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         key: ${{ steps.cache-geotiff.outputs.cache-primary-key }}
         path: dependencies/geotiff_install

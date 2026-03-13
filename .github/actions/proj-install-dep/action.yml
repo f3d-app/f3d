@@ -27,7 +27,7 @@ runs:
 
     - name: Cache proj
       id: cache-proj
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: dependencies/proj_install
         key: proj-${{inputs.version}}-${{ inputs.sqlite_csb_version }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-2
@@ -35,7 +35,7 @@ runs:
     # Dependents: gdal geotiff
     - name: Checkout proj
       if: steps.cache-proj.outputs.cache-hit != 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: OSGeo/PROJ
         path: "./dependencies/proj"
@@ -93,7 +93,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-proj.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         key: ${{ steps.cache-proj.outputs.cache-primary-key }}
         path: dependencies/proj_install

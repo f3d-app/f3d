@@ -23,7 +23,7 @@ runs:
 
     - name: Cache sqlite
       id: cache-sqlite
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: ${{github.workspace}}/dependencies/sqlite_build/install
         key: sqlite-${{ inputs.csb_version }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-2
@@ -73,7 +73,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         key: ${{ steps.cache-sqlite.outputs.cache-primary-key }}
         path: dependencies/sqlite_build/install

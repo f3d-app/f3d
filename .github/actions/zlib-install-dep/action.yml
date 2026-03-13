@@ -23,7 +23,7 @@ runs:
 
     - name: Cache zlib
       id: cache-zlib
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: dependencies/zlib_install
         key: zlib-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
@@ -31,7 +31,7 @@ runs:
     # Dependents: blosc openvdb vtk tiff geotiff pdal gdal
     - name: Checkout zlib
       if: steps.cache-zlib.outputs.cache-hit != 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: madler/zlib
         path: "./dependencies/zlib"
@@ -70,7 +70,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-zlib.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         key: ${{ steps.cache-zlib.outputs.cache-primary-key }}
         path: dependencies/zlib_install

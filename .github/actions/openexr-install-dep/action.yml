@@ -26,7 +26,7 @@ runs:
 
     - name: Cache OpenEXR
       id: cache-openexr
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: dependencies/openexr_install
         key: openexr-${{inputs.version}}-${{inputs.imath_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
@@ -34,7 +34,7 @@ runs:
     # Dependents: usd
     - name: Checkout OpenEXR
       if: steps.cache-openexr.outputs.cache-hit != 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: AcademySoftwareFoundation/openexr
         path: "./dependencies/openexr"
@@ -83,7 +83,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-openexr.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         key: ${{ steps.cache-openexr.outputs.cache-primary-key }}
         path: dependencies/openexr_install

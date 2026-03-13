@@ -23,14 +23,14 @@ runs:
 
     - name: Cache WebP
       id: cache-webp
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: dependencies/webp_install
         key: webp-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
 
     - name: Checkout WebP
       if: steps.cache-webp.outputs.cache-hit != 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: webmproject/libwebp
         path: "./dependencies/webp"
@@ -80,7 +80,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-webp.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         key: ${{ steps.cache-webp.outputs.cache-primary-key }}
         path: dependencies/webp_install

@@ -19,14 +19,14 @@ runs:
 
     - name: Cache pybind11
       id: cache-pybind11
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: dependencies/pybind11_install
         key: pybind11-${{inputs.version}}-${{runner.os}}-${{inputs.global_cache_index}}-1
 
     - name: Checkout pybind11
       if: steps.cache-pybind11.outputs.cache-hit != 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: pybind/pybind11
         submodules: true
@@ -65,7 +65,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-pybind11.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         key: ${{ steps.cache-pybind11.outputs.cache-primary-key }}
         path: dependencies/pybind11_install

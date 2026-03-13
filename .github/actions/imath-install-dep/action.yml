@@ -23,7 +23,7 @@ runs:
 
     - name: Cache Imath
       id: cache-imath
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: dependencies/imath_install
         key: imath-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
@@ -31,7 +31,7 @@ runs:
     # Dependents: alembic openexr
     - name: Checkout Imath
       if: steps.cache-imath.outputs.cache-hit != 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: AcademySoftwareFoundation/Imath
         path: "./dependencies/imath"
@@ -71,7 +71,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-imath.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         key: ${{ steps.cache-imath.outputs.cache-primary-key }}
         path: dependencies/imath_install

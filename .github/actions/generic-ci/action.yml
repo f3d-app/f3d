@@ -178,7 +178,7 @@ runs:
       if: |
         inputs.optional_deps_label == 'optional-deps' &&
         inputs.python_version != ''
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{inputs.python_version}}
 
@@ -196,7 +196,7 @@ runs:
       if: |
         inputs.optional_deps_label == 'optional-deps' &&
         inputs.java_version != ''
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         distribution: "temurin"
         java-version: ${{inputs.java_version}}
@@ -352,7 +352,7 @@ runs:
 
     - name: Upload Tests Artifact
       if: failure()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         path: ./build/Testing/Temporary
         name: f3d-tests-artifact-${{runner.os}}-${{inputs.vtk_version}}-${{inputs.build_type}}-${{inputs.cpu}}-${{inputs.bundle_label}}-${{inputs.static_label}}
@@ -524,7 +524,7 @@ runs:
 
     - name: Upload Tests Install Artifact
       if: failure()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         path: ./install/output
         name: f3d-tests-install-artifact-${{runner.os}}-${{inputs.vtk_version}}-${{inputs.build_type}}-${{inputs.cpu}}-${{inputs.bundle_label}}-${{inputs.static_label}}
