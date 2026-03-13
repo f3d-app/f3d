@@ -236,10 +236,18 @@ bool vtkF3DMetaImporter::Update()
     actorCollection->InitTraversal(ait);
     while (vtkActor* actor = actorCollection->GetNextActor(ait))
     {
+      // Check for actor's poly data mapper, skip if none exists
+      vtkPolyDataMapper* pdMapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
+      if (pdMapper == nullptr)
+      {
+        F3DLog::Print(
+          F3DLog::Severity::Warning, "Actor has no mapped poly data and will not be rendered.");
+        continue;
+      }
+
       // Add to the actor collection
       this->ActorCollection->AddItem(actor);
 
-      vtkPolyDataMapper* pdMapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
       vtkPolyData* surface = pdMapper->GetInput();
 
       // convert to PBR materials if needed
@@ -656,7 +664,13 @@ void vtkF3DMetaImporter::UpdateInfoForColoring()
       while (auto* actor = actorCollection->GetNextActor(ait))
       {
         vtkPolyDataMapper* pdMapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
-        assert(pdMapper);
+        // Check for actor's poly data mapper, skip if none exists
+        if (pdMapper == nullptr)
+        {
+          F3DLog::Print(
+            F3DLog::Severity::Warning, "Actor has no mapped poly data and will not be colored.");
+          continue;
+        }
 
         // Update coloring vectors, with a dedicated logic for generic importer
         vtkDataSet* datasetForColoring = pdMapper->GetInput();
