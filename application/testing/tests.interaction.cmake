@@ -175,6 +175,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
   f3d_test(NAME TestInteractionSceneHierarchy DATA BoxAnimated.gltf INTERACTION UI) #Shift+H;Resize widget;Click checkbox
   f3d_test(NAME TestInteractionSceneHierarchyManyClick DATA cow.vtp INTERACTION UI) #Shift+H;Click checkbox;Click checkbox;Click checkbox
   f3d_test(NAME TestInteractionSceneHierarchyVolume DATA tensors.vti INTERACTION UI) #Shift+H;V;Click checkbox
+  f3d_test(NAME TestInteractionSceneHierarchyAndCheatsheet DATA cow.vtp RESOLUTION 1200,200 INTERACTION UI) #H;Shift+H
 endif()
 
 ## Console

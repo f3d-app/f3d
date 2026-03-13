@@ -458,6 +458,7 @@ struct vtkF3DImguiActor::Internals
   std::array<char, 256> SearchFilter = {};
   SearchMode CurrentSearchMode = SearchMode::Description;
   bool SearchFocusRequested = false;
+  float CheatSheetWidth = 0.f;
 };
 
 namespace
@@ -570,11 +571,6 @@ vtkF3DImguiActor::~vtkF3DImguiActor() = default;
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
 {
-  if (!this->SceneHierarchyVisible)
-  {
-    return;
-  }
-
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
   assert(viewport);
 
@@ -582,7 +578,14 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
   constexpr float defaultWidth = 200.f;
   float winHeight = viewport->WorkSize.y - 2.0f * margin;
 
-  ImGui::SetNextWindowPos(ImVec2(margin, margin));
+  float posX = margin;
+
+  if (this->CheatSheetVisible)
+  {
+    posX += this->Pimpl->CheatSheetWidth + margin;
+  }
+
+  ImGui::SetNextWindowPos(ImVec2(posX, margin));
   ImGui::SetNextWindowSize(ImVec2(defaultWidth, winHeight), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSizeConstraints(
     ImVec2(10.f, winHeight), ImVec2(std::numeric_limits<float>::max(), winHeight));
@@ -932,7 +935,6 @@ void vtkF3DImguiActor::RenderCheatSheet()
   };
 
   float textHeight = 0.f;
-  float winWidth = 0.f;
 
   // Use to create all rect with same size
   float maxBindingTextWidth = 0.f;
@@ -970,11 +972,11 @@ void vtkF3DImguiActor::RenderCheatSheet()
       ImVec2 valueLineSize = ImGui::CalcTextSize(cyclingValue.c_str());
       maxValueTextWidth = std::max(maxValueTextWidth, valueLineSize.x);
 
-      winWidth = maxBindingTextWidth + maxDescTextWidth + maxValueTextWidth;
+      this->Pimpl->CheatSheetWidth = maxBindingTextWidth + maxDescTextWidth + maxValueTextWidth;
     }
   }
 
-  winWidth += ImGui::GetStyle().ScrollbarSize + 4.f * padding;
+  this->Pimpl->CheatSheetWidth += ImGui::GetStyle().ScrollbarSize + 4.f * padding;
   textHeight += 2.f * ImGui::GetStyle().WindowPadding.y;
 
   const float winTop = std::max(margin, (viewport->WorkSize.y - textHeight) * 0.5f);
@@ -982,7 +984,8 @@ void vtkF3DImguiActor::RenderCheatSheet()
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(padding, padding));
 
   ::SetupNextWindow(ImVec2(margin, winTop),
-    ImVec2(winWidth, std::min(viewport->WorkSize.y - (2 * margin), textHeight)));
+    ImVec2(
+      this->Pimpl->CheatSheetWidth, std::min(viewport->WorkSize.y - (2 * margin), textHeight)));
   ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |

@@ -185,7 +185,6 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
   }
 
   this->StartFrame(renWin);
-  this->RenderSceneHierarchy(renWin);
 
   if (this->DropZoneVisible)
   {
@@ -219,6 +218,11 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
     if (this->CheatSheetVisible)
     {
       this->RenderCheatSheet();
+    }
+
+    if (this->SceneHierarchyVisible)
+    {
+      this->RenderSceneHierarchy(renWin);
     }
   }
 
