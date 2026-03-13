@@ -13,23 +13,26 @@ public:
   static NonPolyImporter* New();
   vtkTypeMacro(NonPolyImporter, vtkImporter);
 
-private:
-  NonPolyImporter()
+  void ImportActors(vtkRenderer* renderer) override
   {
     // Create poly / non-poly containing actors
     vtkNew<vtkActor> actor1;
+    vtkNew<vtkActor> actor2;
     {
-      vtkCubeSource* cube = vtkCubeSource::New();
+      vtkNew<vtkCubeSource> cube;
       vtkNew<vtkPolyDataMapper> pmap;
       pmap->SetInputConnection(cube->GetOutputPort());
       actor1->SetMapper(pmap);
     }
-    vtkNew<vtkActor> actor2;
+    //
+    renderer->AddActor(actor1);
+    renderer->AddActor(actor2);
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
     // Push to vtkImporter parent class
-    auto collection = vtkImporter::GetImportedActors();
-    collection->AddItem(actor1);
-    collection->AddItem(actor2);
+    this->ActorCollection->AddItem(actor1);
+    this->ActorCollection->AddItem(actor2);
+#endif
   }
 };
 
@@ -44,12 +47,14 @@ int TestF3DMetaImporterNonPolyActor(int argc, char* argv[])
   vtkNew<NonPolyImporter> importerNP;
   importer->AddImporter(importerNP);
 
-  // Try and render image. F3D will crash if it cannot handle a non-poly containing actor.
+  // Try and render image.
   vtkNew<vtkRenderWindow> window;
   vtkNew<vtkRenderer> renderer;
   window->AddRenderer(renderer);
   importer->SetRenderWindow(window);
+  // F3D will crash here if it cannot handle a non-poly containing actor.
   importer->Update();
+  importer->GetColoringInfoHandler();
 
   return EXIT_SUCCESS;
 }
