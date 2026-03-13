@@ -123,6 +123,10 @@ f3d_test(NAME TestVolumeDirect DATA vase_4comp.vti ARGS -vb --coloring-component
 f3d_test(NAME TestVolumeCells DATA waveletArrays.vti ARGS -vb --coloring-by-cells)
 f3d_test(NAME TestVolumeColoringArray DATA waveletArrays.vti ARGS -vb --coloring-array=Result LONG_TIMEOUT)
 
+## Normal Glyphs
+f3d_test(NAME TestNormalGlyphsEnable DATA suzanne.obj ARGS --normal-glyphs)
+f3d_test(NAME TestNormalGlyphsNoNormalsAvailable DATA cow.vtp ARGS --normal-glyphs)
+
 ## Textures
 f3d_test(NAME TestTextureNormal DATA WaterBottle.glb ARGS --texture-normal=${F3D_SOURCE_DIR}/testing/data/normal.png --normal-scale=0.1)
 f3d_test(NAME TestTextureMaterial DATA WaterBottle.glb ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/red_mod.jpg --roughness=1 --metallic=1)
