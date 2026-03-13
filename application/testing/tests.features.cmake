@@ -765,3 +765,8 @@ if(NOT WIN32)
   f3d_test(NAME TestOutputWithExistingReferenceTooLong DATA suzanne.ply ARGS --reference=${F3D_SOURCE_DIR}/testing/data/world.png --output=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE NO_OUTPUT)
   f3d_test(NAME TestConfigTooLong CONFIG ${_f3d_test_invalid_folder}/invalid.json REGEXP "File name too long" NO_RENDER NO_BASELINE)
 endif()
+
+if(F3D_MODULE_UI)
+  f3d_test(NAME TestFPS DATA suzanne.ply ARGS -z --font-scale=0.35
+    --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf UI)
+endif()
