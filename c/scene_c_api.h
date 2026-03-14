@@ -138,6 +138,9 @@ extern "C"
   /**
    * @brief Get keyframes times of loaded files
    *
+   * The returned keyframes is heap-allocated and must be freed with
+   * f3d_scene_free_animation_keyframes().
+   *
    * @param scene Scene handle.
    * @param count Pointer to store the count of keyframes
    * @return Pointer to the array of keyframe time keys
