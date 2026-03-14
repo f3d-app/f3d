@@ -54,7 +54,7 @@ protected:
   {
     std::vector<int> childrenIds;
     for (int childIndex = 0; childIndex < this->GetAssembly()->GetNumberOfChildren(nodeid);
-      childIndex++)
+         childIndex++)
     {
       childrenIds.emplace_back(this->GetAssembly()->GetChild(nodeid, childIndex));
     }
@@ -84,7 +84,7 @@ protected:
     if (this->GetAttr(nodeid))
     {
       for (int childIndex = 0; childIndex < this->GetAssembly()->GetNumberOfChildren(nodeid);
-        childIndex++)
+           childIndex++)
       {
         if (!GetAttr(this->GetAssembly()->GetChild(nodeid, childIndex)))
         {
