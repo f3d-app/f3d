@@ -180,7 +180,7 @@ f3d_test(NAME TestMultiblockMetaData DATA mb.vtm ARGS -m UI)
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
   f3d_test(NAME TestSceneHierarchyGLTF DATA InterpolationTest.glb ARGS --scene-hierarchy UI)
   f3d_test(NAME TestSceneHierarchyGLTFAnimated DATA BoxAnimated.gltf ARGS --scene-hierarchy UI)
-  f3d_test(NAME TestSceneHierarchyGLTFNodeNames DATA vtk-dasm-test.glb ARGS --scene-hierarchy RESOLUTION 300,550 UI)
+  f3d_test(NAME TestSceneHierarchyGLTFNodeNames DATA vtk-dasm-test.glb ARGS --scene-hierarchy RESOLUTION 300,700 UI)
 endif()
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10861
