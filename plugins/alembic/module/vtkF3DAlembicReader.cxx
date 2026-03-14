@@ -604,10 +604,12 @@ public:
     }
   }
 
-  void ExtendTimeRange(double& start, double& end)
+  void ComputeTimeRangeAndSteps(double& start, double& end, std::vector<double>& timeSteps)
   {
     Alembic::Abc::IObject top = this->Archive.getTop();
 
+    // Using std::set since we need time steps to be unique and ordered
+    std::set<double> timeStepSet;
     std::stack<std::pair<const Alembic::Abc::IObject, const Alembic::Abc::ObjectHeader>> objects;
 
     for (size_t i = 0; i < top.getNumChildren(); ++i)
@@ -619,28 +621,24 @@ public:
     {
       const auto& [parent, ohead] = objects.top();
       const Alembic::AbcGeom::IObject obj(parent, ohead.getName());
-      int numSamples = 0;
       Alembic::Abc::TimeSamplingPtr ts;
       if (Alembic::AbcGeom::IXform::matches(ohead))
       {
         const Alembic::AbcGeom::IXform xForm(parent, ohead.getName());
         const Alembic::AbcGeom::IXformSchema& schema = xForm.getSchema();
         ts = schema.getTimeSampling();
-        numSamples = static_cast<int>(schema.getNumSamples());
       }
       else if (Alembic::AbcGeom::IPolyMesh::matches(ohead))
       {
         const Alembic::AbcGeom::IPolyMesh polymesh(parent, ohead.getName());
         const Alembic::AbcGeom::IPolyMeshSchema& schema = polymesh.getSchema();
         ts = schema.getTimeSampling();
-        numSamples = static_cast<int>(schema.getNumSamples());
       }
       else if (Alembic::AbcGeom::ICurves::matches(ohead))
       {
         const Alembic::AbcGeom::ICurves curves(parent, ohead.getName());
         const Alembic::AbcGeom::ICurvesSchema& schema = curves.getSchema();
         ts = schema.getTimeSampling();
-        numSamples = static_cast<int>(schema.getNumSamples());
       }
 
       objects.pop();
@@ -654,19 +652,18 @@ public:
         continue;
       }
 
-      if (ts->getTimeSamplingType().isUniform())
+      // Collecting all time steps
+      const auto& times = ts->getStoredTimes();
+      for (auto& timeStep : times)
       {
-        double min = ts->getSampleTime(0);
-        double max = min + (numSamples - 1) * ts->getTimeSamplingType().getTimePerCycle();
-        start = std::min(start, min);
-        end = std::max(end, max);
+        timeStepSet.insert(timeStep);
       }
-      else if (ts->getTimeSamplingType().isCyclic())
-      {
-        const auto& times = ts->getStoredTimes();
-        start = std::min(start, times.front());
-        end = std::max(end, times.back());
-      }
+    }
+    if (timeStepSet.size() > 0)
+    {
+      start = *timeStepSet.begin();
+      end = *timeStepSet.rbegin();
+      timeSteps = std::vector<double>(timeStepSet.begin(), timeStepSet.end());
     }
   }
 
@@ -738,12 +735,18 @@ int vtkF3DAlembicReader::RequestInformation(vtkInformation* vtkNotUsed(request),
 
   double timeRange[2] = { std::numeric_limits<double>::infinity(),
     -std::numeric_limits<double>::infinity() };
-  this->Internals->ExtendTimeRange(timeRange[0], timeRange[1]);
+  std::vector<double> timeSteps{ 0 };
+  this->Internals->ComputeTimeRangeAndSteps(timeRange[0], timeRange[1], timeSteps);
 
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   if (timeRange[0] < timeRange[1])
   {
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
+  }
+  if (timeSteps.size() > 0)
+  {
+    outInfo->Set(
+      vtkStreamingDemandDrivenPipeline::TIME_STEPS(), timeSteps.data(), timeSteps.size());
   }
 
   return 1;
