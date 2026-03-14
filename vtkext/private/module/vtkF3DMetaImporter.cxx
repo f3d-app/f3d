@@ -52,9 +52,10 @@ protected:
 
   void Visit(int nodeid) override
   {
+    const size_t numberOfChildren = this->GetAssembly()->GetNumberOfChildren(nodeid);
     std::vector<int> childrenIds;
-    for (int childIndex = 0; childIndex < this->GetAssembly()->GetNumberOfChildren(nodeid);
-         childIndex++)
+    childrenIds.reserve(numberOfChildren);
+    for (size_t childIndex = 0; childIndex < numberOfChildren; childIndex++)
     {
       childrenIds.emplace_back(this->GetAssembly()->GetChild(nodeid, childIndex));
     }
