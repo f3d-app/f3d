@@ -7,6 +7,7 @@
 #include <vtkActorCollection.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
+#include <vtkDataAssemblyVisitor.h>
 #include <vtkImageData.h>
 #include <vtkInformationIntegerKey.h>
 #include <vtkObjectFactory.h>
@@ -21,6 +22,98 @@
 #include <iostream>
 #include <numeric>
 #include <vector>
+
+namespace
+{
+
+/**
+ * Sets the `f3d_collapsed` attribute on nodes which have
+ * all their children unnamed or named the same as themselves.
+ * Allows to make the tree more compact on load by collapsing subtrees
+ * that don't contain any meaningful user-provided labels.
+ */
+class collapseOnLoadVisitor : public vtkDataAssemblyVisitor
+{
+public:
+  static collapseOnLoadVisitor* New();
+  vtkTypeMacro(collapseOnLoadVisitor, vtkDataAssemblyVisitor);
+
+protected:
+  void SetAttr(int nodeid, bool val)
+  {
+    vtkDataAssembly* mutableAssembly = const_cast<vtkDataAssembly*>(this->GetAssembly());
+    mutableAssembly->SetAttribute(nodeid, "f3d_collapsed", val ? 1 : 0);
+    // TODO is there a way to _remove_ the attr instead of setting it to `0`?
+  }
+  bool GetAttr(int nodeid)
+  {
+    return this->GetAssembly()->GetAttributeOrDefault(nodeid, "f3d_collapsed", 0) != 0;
+  }
+
+  void Visit(int nodeid) override
+  {
+    const int numberOfChildren = this->GetAssembly()->GetNumberOfChildren(nodeid);
+    std::vector<int> childrenIds;
+    childrenIds.reserve(static_cast<size_t>(numberOfChildren));
+    for (int childIndex = 0; childIndex < numberOfChildren; childIndex++)
+    {
+      childrenIds.emplace_back(this->GetAssembly()->GetChild(nodeid, childIndex));
+    }
+
+    const auto allChildrenAreUnnamed = [&]()
+    {
+      return std::none_of(childrenIds.cbegin(), childrenIds.cend(),
+        [&](int id) { return this->GetAssembly()->HasAttribute(id, "label"); });
+    };
+
+    const auto allChildrenHaveSameNameAsNode = [&]()
+    {
+      const char* nodeName = this->GetAssembly()->GetAttributeOrDefault(nodeid, "label", "");
+      return std::all_of(childrenIds.cbegin(), childrenIds.cend(), [&](int id)
+        { return !strcmp(this->GetAssembly()->GetAttributeOrDefault(id, "label", ""), nodeName); });
+    };
+
+    if (allChildrenAreUnnamed() || allChildrenHaveSameNameAsNode())
+    {
+      this->SetAttr(nodeid, true);
+    }
+  }
+
+  void EndSubTree(int nodeid) override
+  {
+    // unset the attr on nodes if not all children have it set
+    if (this->GetAttr(nodeid))
+    {
+      for (int childIndex = 0; childIndex < this->GetAssembly()->GetNumberOfChildren(nodeid);
+           childIndex++)
+      {
+        if (!GetAttr(this->GetAssembly()->GetChild(nodeid, childIndex)))
+        {
+          this->SetAttr(nodeid, false);
+          break;
+        }
+      }
+    }
+
+    // when all the way back up to the root node,
+    // unset the attr on all nodes which have an ancestor that has it already.
+    // This avoids having to expand the collapsed levels one by one.
+    if (nodeid == this->GetAssembly()->GetRootNode())
+    {
+      const std::string xpath = "//*[@f3d_collapsed='1']//*[@f3d_collapsed='1']";
+      for (const int id : this->GetAssembly()->SelectNodes({ xpath }))
+      {
+        this->SetAttr(id, false);
+      }
+
+      // also never collapse the root node
+      this->SetAttr(nodeid, false);
+    }
+  }
+};
+vtkStandardNewMacro(collapseOnLoadVisitor);
+
+}
 
 //----------------------------------------------------------------------------
 struct vtkF3DMetaImporter::Internals
@@ -262,6 +355,9 @@ bool vtkF3DMetaImporter::Update()
 
     importerInfo.DataAssembly->SetAttribute(
       vtkDataAssembly::GetRootNode(), "label", importerInfo.Name.c_str());
+
+    vtkNew<::collapseOnLoadVisitor> visitor;
+    importerInfo.DataAssembly->Visit(vtkDataAssembly::GetRootNode(), visitor);
 
     // Recover generic importer if any (for indexed access to points/image)
     vtkF3DGenericImporter* genericImporter = vtkF3DGenericImporter::SafeDownCast(importer);
