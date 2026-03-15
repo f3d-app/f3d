@@ -136,6 +136,25 @@ extern "C"
   F3D_EXPORT void f3d_scene_load_animation_time(f3d_scene_t* scene, double time_value);
 
   /**
+   * @brief Get keyframes times of loaded files
+   *
+   * The returned keyframes is heap-allocated and must be freed with
+   * f3d_scene_free_animation_keyframes().
+   *
+   * @param scene Scene handle.
+   * @param count Pointer to store the count of keyframes
+   * @return Pointer to the array of keyframe time keys
+   */
+  F3D_EXPORT double* f3d_scene_get_animation_keyframes(f3d_scene_t* scene, unsigned int* count);
+
+  /**
+   * @brief Free the animation keyframes array.
+   *
+   * @param keyframes Pointer to the keyframes array to free.
+   */
+  F3D_EXPORT void f3d_scene_free_animation_keyframes(double* keyframes);
+
+  /**
    * @brief Get animation time range of currently added files.
    *
    * @param scene Scene handle.

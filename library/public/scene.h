@@ -163,12 +163,19 @@ public:
   [[nodiscard]] virtual std::pair<double, double> animationTimeRange() = 0;
 
   /**
+   * Get animation keyframe's time of currently added files.
+   * Can be used in loadAnimationTime to request a specific keyframe.
+   * Returns empty vector if there is no animations.
+   */
+  [[nodiscard]] virtual std::vector<double> getAnimationKeyFrames() = 0;
+
+  /**
    * Return the number of animations available in the currently loaded files.
    */
   [[nodiscard]] virtual unsigned int availableAnimations() const = 0;
 
   /**
-   * Return the animation name of a given animation indices, if any.
+   * Return the animation name of a given animation index, if any.
    *
    * Specific animation (0..availableAnimations): Returns the name of the animation at that index
    * Current animation (-1):
@@ -180,7 +187,7 @@ public:
    *
    * Can be called before initialization safely
    */
-  [[nodiscard]] virtual std::string getAnimationName(int indices = -1) = 0;
+  [[nodiscard]] virtual std::string getAnimationName(int index = -1) = 0;
 
   /**
    * Return all of the animation names, if any.
