@@ -966,11 +966,6 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
       this->GridAxesActor->SetOrientation(orientation);
       this->GridAxesActor->SetVisibility(true);
 
-      double center[4] = { 0, 0, 0, 1 };
-      bbox.GetCenter(center);
-
-      this->GridAxesActor->SetPosition(center);
-
       double a, b, c, x, y, z;
       bbox.GetBounds(a, b, c, x, y, z);
       GridAxesActor->SetGridBounds(a, b, c, x, y, z);
