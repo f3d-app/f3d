@@ -637,7 +637,7 @@ std::vector<double> animationManager::GetKeyFrames()
   this->PrepareForAnimationIndices();
 
   std::vector<double> keyFrames;
-  keyFrames.reserve(this->AnimationTimeSteps->GetSize());
+  keyFrames.reserve(this->AnimationTimeSteps->GetNumberOfTuples());
 
   for (vtkIdType i = 0; i < this->AnimationTimeSteps->GetNumberOfTuples(); ++i)
   {
