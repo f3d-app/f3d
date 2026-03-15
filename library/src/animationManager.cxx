@@ -225,12 +225,12 @@ void animationManager::JumpToFrame(int frame, bool relative)
 //----------------------------------------------------------------------------
 void animationManager::JumpToKeyFrame(int keyframe, bool relative)
 {
-  if (this->AnimationTimeSteps->GetSize() == 0)
+  if (this->AnimationTimeSteps->GetNumberOfTuples() == 0)
   {
     return;
   }
 
-  const int timeStepsAvailable = this->AnimationTimeSteps->GetSize();
+  const int timeStepsAvailable = this->AnimationTimeSteps->GetNumberOfTuples();
 
   auto it = std::lower_bound(
     this->AnimationTimeSteps->Begin(), this->AnimationTimeSteps->End(), this->CurrentTime);
