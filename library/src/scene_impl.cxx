@@ -338,7 +338,7 @@ scene& scene_impl::add(const std::byte* buffer, std::size_t size)
     }
     else
     {
-      log::debug("Found a reader for stream: ", reader->getName(), "\"");
+      log::debug("Found a reader for stream:  \"", reader->getName(), "\"");
     }
   }
   else
