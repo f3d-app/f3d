@@ -20,6 +20,9 @@ f3d_test(NAME TestUSDZRigged DATA RiggedSimple.usdz PLUGIN usd ARGS --animation-
 f3d_test(NAME TestUSDZMaterials DATA McUsd.usdz PLUGIN usd ARGS --camera-position=1055,912,-247 --camera-focal-point=69,173,63 THRESHOLD 0.3) # High threshold because of legacy comparison methods in VTK 9.3
 f3d_test(NAME TestUSDZMaterialsInterationReload DATA McUsd.usdz PLUGIN usd INTERACTION NO_BASELINE) # Up
 
+# Scene hierarchy test for USD importer
+f3d_test(NAME TestUSDSceneHierarchy DATA primitives.usda PLUGIN usd INTERACTION UI) # Shift+H
+
 if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/plugins/usd/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
