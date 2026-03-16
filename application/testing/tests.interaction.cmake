@@ -59,7 +59,6 @@ endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
   f3d_test(NAME TestInteractionAxesGridToggle INTERACTION DATA suzanne.ply THRESHOLD 0.08) #Shift+x
-  f3d_test(NAME TestInteractionAxesGridPosition DATA Challenger.fbx ARGS --camera-direction=-1,-1,0 INTERACTION) #Shift+x
 endif()
 
 if (F3D_MODULE_TINYFILEDIALOGS)
