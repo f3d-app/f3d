@@ -43,7 +43,6 @@ protected:
   {
     vtkDataAssembly* mutableAssembly = const_cast<vtkDataAssembly*>(this->GetAssembly());
     mutableAssembly->SetAttribute(nodeid, "f3d_collapsed", val ? 1 : 0);
-    // TODO is there a way to _remove_ the attr instead of setting it to `0`?
   }
   bool GetAttr(int nodeid)
   {
@@ -52,6 +51,12 @@ protected:
 
   void Visit(int nodeid) override
   {
+    // don't collapse the root node
+    if (nodeid == this->GetAssembly()->GetRootNode())
+    {
+      return;
+    }
+
     const int numberOfChildren = this->GetAssembly()->GetNumberOfChildren(nodeid);
     std::vector<int> childrenIds;
     childrenIds.reserve(static_cast<size_t>(numberOfChildren));
@@ -81,11 +86,11 @@ protected:
 
   void EndSubTree(int nodeid) override
   {
-    // unset the attr on nodes if not all children have it set
+    // after all descendents have been visited, unset the attr if not all children have it set
     if (this->GetAttr(nodeid))
     {
-      for (int childIndex = 0; childIndex < this->GetAssembly()->GetNumberOfChildren(nodeid);
-           childIndex++)
+      const int numberOfChildren = this->GetAssembly()->GetNumberOfChildren(nodeid);
+      for (int childIndex = 0; childIndex < numberOfChildren; childIndex++)
       {
         if (!GetAttr(this->GetAssembly()->GetChild(nodeid, childIndex)))
         {
@@ -93,21 +98,6 @@ protected:
           break;
         }
       }
-    }
-
-    // when all the way back up to the root node,
-    // unset the attr on all nodes which have an ancestor that has it already.
-    // This avoids having to expand the collapsed levels one by one.
-    if (nodeid == this->GetAssembly()->GetRootNode())
-    {
-      const std::string xpath = "//*[@f3d_collapsed='1']//*[@f3d_collapsed='1']";
-      for (const int id : this->GetAssembly()->SelectNodes({ xpath }))
-      {
-        this->SetAttr(id, false);
-      }
-
-      // also never collapse the root node
-      this->SetAttr(nodeid, false);
     }
   }
 };
@@ -358,6 +348,13 @@ bool vtkF3DMetaImporter::Update()
 
     vtkNew<::collapseOnLoadVisitor> visitor;
     importerInfo.DataAssembly->Visit(vtkDataAssembly::GetRootNode(), visitor);
+    // Unset the attr on all nodes which have an ancestor that has it already.
+    // This avoids having to expand the collapsed levels one by one.
+    const std::string xpath = "//*[@f3d_collapsed='1']//*[@f3d_collapsed='1']";
+    for (const int nodeid : importerInfo.DataAssembly->SelectNodes({ xpath }))
+    {
+      importerInfo.DataAssembly->SetAttribute(nodeid, "f3d_collapsed", 0);
+    }
 
     // Recover generic importer if any (for indexed access to points/image)
     vtkF3DGenericImporter* genericImporter = vtkF3DGenericImporter::SafeDownCast(importer);
