@@ -32,11 +32,11 @@ namespace
  * Allows to make the tree more compact on load by collapsing subtrees
  * that don't contain any meaningful user-provided labels.
  */
-class collapseOnLoadVisitor : public vtkDataAssemblyVisitor
+class vtkF3DCollapseOnLoadVisitor : public vtkDataAssemblyVisitor
 {
 public:
-  static collapseOnLoadVisitor* New();
-  vtkTypeMacro(collapseOnLoadVisitor, vtkDataAssemblyVisitor);
+  static vtkF3DCollapseOnLoadVisitor* New();
+  vtkTypeMacro(vtkF3DCollapseOnLoadVisitor, vtkDataAssemblyVisitor);
 
 protected:
   void SetAttr(int nodeid, bool val)
@@ -73,9 +73,10 @@ protected:
 
     const auto allChildrenHaveSameNameAsNode = [&]()
     {
-      const char* nodeName = this->GetAssembly()->GetAttributeOrDefault(nodeid, "label", "");
+      const std::string_view nodeName =
+        this->GetAssembly()->GetAttributeOrDefault(nodeid, "label", "");
       return std::all_of(childrenIds.cbegin(), childrenIds.cend(), [&](int id)
-        { return !strcmp(this->GetAssembly()->GetAttributeOrDefault(id, "label", ""), nodeName); });
+        { return nodeName == this->GetAssembly()->GetAttributeOrDefault(id, "label", ""); });
     };
 
     if (allChildrenAreUnnamed() || allChildrenHaveSameNameAsNode())
@@ -101,8 +102,7 @@ protected:
     }
   }
 };
-vtkStandardNewMacro(collapseOnLoadVisitor);
-
+vtkStandardNewMacro(vtkF3DCollapseOnLoadVisitor);
 }
 
 //----------------------------------------------------------------------------
@@ -346,7 +346,7 @@ bool vtkF3DMetaImporter::Update()
     importerInfo.DataAssembly->SetAttribute(
       vtkDataAssembly::GetRootNode(), "label", importerInfo.Name.c_str());
 
-    vtkNew<::collapseOnLoadVisitor> visitor;
+    vtkNew<::vtkF3DCollapseOnLoadVisitor> visitor;
     importerInfo.DataAssembly->Visit(vtkDataAssembly::GetRootNode(), visitor);
     // Unset the attr on all nodes which have an ancestor that has it already.
     // This avoids having to expand the collapsed levels one by one.
