@@ -593,7 +593,10 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
   ImGui::SetNextWindowSize(ImVec2(defaultWidth, winHeight), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSizeConstraints(
     ImVec2(10.f, winHeight), ImVec2(std::numeric_limits<float>::max(), winHeight));
-  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+  //ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+  ImGuiStyle& style = ImGui::GetStyle();
+  style.Colors[ImGuiCol_WindowBg] = ImVec4(
+    this->BackdropColor[0], this->BackdropColor[1], this->BackdropColor[2], this->BackdropOpacity);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
     ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_HorizontalScrollbar;
@@ -831,7 +834,9 @@ void vtkF3DImguiActor::RenderFileName()
     }
 
     ::SetupNextWindow(ImVec2(viewport->GetWorkCenter().x - 0.5f * totalWidth, margin), winSize);
-    ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+    //ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.Colors[ImGuiCol_WindowBg] = ImVec4(this->BackdropColor[0], this->BackdropColor[1], this->BackdropColor[2], this->BackdropOpacity);
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
       ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
@@ -856,7 +861,10 @@ void vtkF3DImguiActor::RenderMetaData()
   ::SetupNextWindow(ImVec2(viewport->WorkSize.x - winSize.x - margin,
                       viewport->GetWorkCenter().y - 0.5f * winSize.y),
     winSize);
-  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+  //ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+  ImGuiStyle& style = ImGui::GetStyle();
+  style.Colors[ImGuiCol_WindowBg] = ImVec4(
+    this->BackdropColor[0], this->BackdropColor[1], this->BackdropColor[2], this->BackdropOpacity);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
@@ -891,7 +899,10 @@ void vtkF3DImguiActor::RenderHDRIFileName()
 
     ::SetupNextWindow(
       ImVec2(viewport->GetWorkCenter().x - 0.5f * totalWidth + winOffsetX, margin), winSize);
-    ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+    //ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.Colors[ImGuiCol_WindowBg] = ImVec4(this->BackdropColor[0], this->BackdropColor[1],
+      this->BackdropColor[2], this->BackdropOpacity);
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
       ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
@@ -990,7 +1001,10 @@ void vtkF3DImguiActor::RenderCheatSheet()
   ::SetupNextWindow(ImVec2(margin, winTop),
     ImVec2(
       this->Pimpl->CheatSheetWidth, std::min(viewport->WorkSize.y - (2 * margin), textHeight)));
-  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+  //ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+  ImGuiStyle& style = ImGui::GetStyle();
+  style.Colors[ImGuiCol_WindowBg] = ImVec4(
+    this->BackdropColor[0], this->BackdropColor[1], this->BackdropColor[2], this->BackdropOpacity);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
     ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings |
@@ -1141,7 +1155,10 @@ void vtkF3DImguiActor::RenderFpsCounter()
     viewport->WorkSize.x - winSize.x - margin, viewport->WorkSize.y - winSize.y - margin);
 
   ::SetupNextWindow(position, winSize);
-  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+  //ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+  ImGuiStyle& style = ImGui::GetStyle();
+  style.Colors[ImGuiCol_WindowBg] = ImVec4(
+    this->BackdropColor[0], this->BackdropColor[1], this->BackdropColor[2], this->BackdropOpacity);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;

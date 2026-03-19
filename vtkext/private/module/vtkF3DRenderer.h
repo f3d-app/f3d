@@ -138,6 +138,8 @@ public:
    */
   void SetBackdropOpacity(const double backdropOpacity);
 
+  void SetBackdropColor(const std::array<double, 3>& color);
+
   ///@{
   /**
    * Set usages and configurations of different render passes
