@@ -834,7 +834,8 @@ void vtkF3DImguiActor::RenderFileName()
 
     ::SetupNextWindow(ImVec2(viewport->GetWorkCenter().x - 0.5f * totalWidth, margin), winSize);
     ImGuiStyle& style = ImGui::GetStyle();
-    style.Colors[ImGuiCol_WindowBg] = ImVec4(this->BackdropColor[0], this->BackdropColor[1], this->BackdropColor[2], this->BackdropOpacity);
+    style.Colors[ImGuiCol_WindowBg] = ImVec4(this->BackdropColor[0], this->BackdropColor[1],
+      this->BackdropColor[2], this->BackdropOpacity);
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
       ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
