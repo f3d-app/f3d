@@ -43,8 +43,13 @@ void vtkF3DCachedSpecularTexture::Load(vtkRenderer* ren)
 
     this->TextureObject->SetContext(renWin);
     this->TextureObject->SetFormat(GL_RGB);
+#ifdef GL_ES_VERSION_3_0
+    this->TextureObject->SetInternalFormat(GL_RGB8);
+    this->TextureObject->SetDataType(GL_UNSIGNED_BYTE);
+#else
     this->TextureObject->SetInternalFormat(GL_RGB32F);
     this->TextureObject->SetDataType(GL_FLOAT);
+#endif
     this->TextureObject->SetWrapS(vtkTextureObject::ClampToEdge);
     this->TextureObject->SetWrapT(vtkTextureObject::ClampToEdge);
     this->TextureObject->SetWrapR(vtkTextureObject::ClampToEdge);
