@@ -21,3 +21,4 @@ _wasm_build
 
 # testing related
 .cache
+/.vs
