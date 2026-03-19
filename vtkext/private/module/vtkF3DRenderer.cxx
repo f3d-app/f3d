@@ -41,8 +41,10 @@
 #include <vtkObjectFactory.h>
 #include <vtkOpaquePass.h>
 #include <vtkOpenGLFXAAPass.h>
+#include <vtkOpenGLFramebufferObject.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLRenderer.h>
+#include <vtkOpenGLState.h>
 #include <vtkOpenGLTexture.h>
 #include <vtkOrientationMarkerWidget.h>
 #include <vtkPBRLUTTexture.h>
@@ -158,24 +160,33 @@ std::string ComputeFileHash(const std::string& filepath)
 //----------------------------------------------------------------------------
 // Download texture from the GPU to a vtkImageData
 vtkSmartPointer<vtkImageData> SaveTextureToImage(
-  vtkTextureObject* tex, unsigned int target, unsigned int level, unsigned int size, int type)
+  vtkTextureObject* tex, unsigned int target, unsigned int level, unsigned int size)
 {
-  unsigned int dims[2] = { size, size };
-  vtkIdType incr[2] = { 0, 0 };
-
   unsigned int nbFaces = tex->GetTarget() == GL_TEXTURE_CUBE_MAP ? 6 : 1;
+  int type = tex->GetVTKDataType();
 
   vtkNew<vtkImageData> img;
   img->SetDimensions(size, size, nbFaces);
   img->AllocateScalars(type, tex->GetComponents());
 
+  tex->GetContext()->GetState()->PushFramebufferBindings();
+
+  vtkNew<vtkOpenGLFramebufferObject> fbo;
+  fbo->SetContext(tex->GetContext());
+  fbo->Bind();
+
   for (unsigned int i = 0; i < nbFaces; i++)
   {
-    vtkPixelBufferObject* pbo = tex->Download(target + i, level);
+    fbo->RemoveColorAttachment(0);
+    fbo->AddColorAttachment(0, tex, 0, target + i, level);
+    fbo->ActivateReadBuffer(0);
+    fbo->StartNonOrtho(size, size);
 
-    pbo->Download2D(type, img->GetScalarPointer(0, 0, i), dims, tex->GetComponents(), incr);
-    pbo->Delete();
+    glReadPixels(0, 0, size, size, tex->GetFormat(type, tex->GetComponents(), false),
+      tex->GetDataType(type), img->GetScalarPointer(0, 0, i));
   }
+
+  tex->GetContext()->GetState()->PopFramebufferBindings();
 
   return img;
 }
@@ -1394,8 +1405,8 @@ void vtkF3DRenderer::ConfigureHDRILUT()
 
       if (!this->CachePath.empty())
       {
-        vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
-          lut->GetTextureObject(), GL_TEXTURE_2D, 0, lut->GetLUTSize(), VTK_UNSIGNED_SHORT);
+        vtkSmartPointer<vtkImageData> img =
+          ::SaveTextureToImage(lut->GetTextureObject(), GL_TEXTURE_2D, 0, lut->GetLUTSize());
         assert(img);
 
         vtkNew<vtkXMLImageDataWriter> writer;
@@ -1501,7 +1512,7 @@ void vtkF3DRenderer::ConfigureHDRISpecular()
         for (unsigned int i = 0; i < nbLevels; i++)
         {
           vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
-            spec->GetTextureObject(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, i, size >> i, VTK_FLOAT);
+            spec->GetTextureObject(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, i, size >> i);
           assert(img);
           mb->SetBlock(i, img);
         }
