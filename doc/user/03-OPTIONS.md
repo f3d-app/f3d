@@ -362,7 +362,8 @@ Display the _metadata_.
 
 ### `--scene-hierarchy` (_bool_, default: `false`)
 
-Display the _scene hierarchy_.
+Display the _scene hierarchy_ as a tree representing the internal structure of the model, with checkboxes allowing to hide or show individual parts.
+By default the tree is only expanded enough to show nodes that have meaningful names, but all nodes can be fully expanded manually.
 
 ### `--hdri-filename` (_bool_, default: `false`)
 

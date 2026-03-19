@@ -574,7 +574,8 @@ CLI: `--backdrop-opacity`.
 
 ### `ui.scene_hierarchy` (_bool_, default: `false`)
 
-Display the scene hierarchy.
+Display the _scene hierarchy_ as a tree representing the internal structure of the model, with checkboxes allowing to hide or show individual parts.
+By default the tree is only expanded enough to show nodes that have meaningful names, but all nodes can be fully expanded manually.
 
 CLI: `--scene-hierarchy`.
 
