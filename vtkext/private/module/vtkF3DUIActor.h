@@ -181,6 +181,11 @@ public:
   void SetBackdropOpacity(const double backdropOpacity);
 
   /**
+   * Set the backdrop color
+   */
+  void SetBackdropColor(const std::array<double, 3>& color);
+
+  /**
    * Set the delta time (time between UI frames) in seconds
    */
   virtual void SetDeltaTime(double)
@@ -308,6 +313,8 @@ protected:
   std::array<double, 3> FontColor = { 1.0, 1.0, 1.0 };
 
   double BackdropOpacity = 0.9;
+
+  std::array<double, 3> BackdropColor = { 0.0, 0.0, 0.0 };
 
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;

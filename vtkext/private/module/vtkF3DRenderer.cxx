@@ -3623,3 +3623,9 @@ void vtkF3DRenderer::SetConsoleBadgeEnabled(bool enabled)
 {
   this->UIActor->SetConsoleBadgeEnabled(enabled);
 }
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetBackdropColor(const std::array<double, 3>& color)
+{
+  this->UIActor->SetBackdropColor(color);
+}

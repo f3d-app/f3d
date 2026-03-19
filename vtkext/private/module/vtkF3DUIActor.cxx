@@ -245,3 +245,13 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
 
   return 1;
 }
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetBackdropColor(const std::array<double, 3>& color)
+{
+  if (this->BackdropColor != color)
+  {
+    this->BackdropColor = color;
+    this->Initialized = false;
+  }
+}
