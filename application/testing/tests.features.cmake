@@ -308,6 +308,11 @@ f3d_test(NAME TestAnimationInputChangePointSprites DATA v_rock2.mdl ARGS --point
 f3d_test(NAME TestBackdropOpacityOpaque DATA suzanne.ply ARGS -n --backdrop-opacity=1.0 UI)
 f3d_test(NAME TestBackdropOpacityTransparent DATA suzanne.ply ARGS -n --backdrop-opacity=0.0 UI)
 f3d_test(NAME TestBackdropOpacityMedium DATA suzanne.ply ARGS -n --backdrop-opacity=0.5 UI)
+f3d_test(NAME TestBackdropColorBlack DATA suzanne.ply ARGS -n --backdrop-color=0.0,0.0,0.0 UI)
+f3d_test(NAME TestBackdropColorRed DATA suzanne.ply ARGS -n --backdrop-color=1.0,0.0,0.0 UI)
+f3d_test(NAME TestBackdropColorGreen DATA suzanne.ply ARGS -n --backdrop-color=0.0,1.0,0.0 UI)
+f3d_test(NAME TestBackdropColorBlue DATA suzanne.ply ARGS -n --backdrop-color=0.0,0.0,1.0 UI)
+f3d_test(NAME TestBackdropColorWhite DATA suzanne.ply ARGS -n --backdrop-color=1.0,1.0,1.0 UI)
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   f3d_test(NAME TestDefaultConfigFileHDRIFilename DATA dragon.vtu CONFIG config_build ARGS -j --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr UI LONG_TIMEOUT)
