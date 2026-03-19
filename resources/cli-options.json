@@ -308,6 +308,12 @@
           "conditional": "F3D_MODULE_UI"
         },
         {
+          "longName": "backdrop-color",
+          "helpText": "UI backdrop color",
+          "valueHelper": "<color>",
+          "conditional": "F3D_MODULE_UI"
+        },
+        {
           "longName": "command-script",
           "helpText": "Path to a script file containing commands to execute",
           "valueHelper": "<file_path>"
