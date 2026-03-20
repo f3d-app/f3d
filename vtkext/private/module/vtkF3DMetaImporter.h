@@ -11,6 +11,7 @@
 
 #include <vtkActor.h>
 #include <vtkBoundingBox.h>
+#include <vtkGlyph3DMapper.h>
 #include <vtkPointGaussianMapper.h>
 #include <vtkProperty.h>
 #include <vtkSmartVolumeMapper.h>
@@ -57,6 +58,23 @@ public:
     vtkNew<vtkPointGaussianMapper> Mapper;
     vtkActor* OriginalActor;
     vtkImporter* Importer;
+  };
+
+  struct NormalGlyphsStruct
+  {
+    explicit NormalGlyphsStruct(vtkActor* originalActor, vtkImporter* importer)
+      : OriginalActor(originalActor)
+      , Importer(importer)
+    {
+      this->Actor->vtkProp3D::ShallowCopy(originalActor);
+      this->Actor->SetMapper(this->GlyphMapper);
+    }
+
+    vtkNew<vtkActor> Actor;
+    vtkActor* OriginalActor;
+    vtkImporter* Importer;
+    vtkNew<vtkGlyph3DMapper> GlyphMapper;
+    bool InputDataHasNormals = false;
   };
 
   struct ColoringStruct
@@ -116,6 +134,7 @@ public:
    * API to recover information about all imported actors, point sprites and volume if any
    */
   const std::vector<ColoringStruct>& GetColoringActorsAndMappers();
+  const std::vector<NormalGlyphsStruct>& GetNormalGlyphsActorsAndMappers();
   const std::vector<PointSpritesStruct>& GetPointSpritesActorsAndMappers();
   const std::vector<VolumeStruct>& GetVolumePropsAndMappers();
   ///@}
