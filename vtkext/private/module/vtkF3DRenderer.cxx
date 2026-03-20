@@ -246,8 +246,6 @@ void ExecFuncOnAllPolyDataUniforms(vtkActorCollection* actors, F&& func)
     }
   }
 }
-
-static constexpr float NormalGlyphScaleMultiplier = 0.02;
 }
 
 //----------------------------------------------------------------------------
@@ -2875,6 +2873,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
   }
 }
 
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureNormalGlyphs()
 {
   bool normalGlyphsVisible = !this->UseRaytracing && this->UseNormalGlyphs;
@@ -2894,12 +2893,30 @@ void vtkF3DRenderer::ConfigureNormalGlyphs()
   this->NormalGlyphsConfigured = true;
 }
 
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::UpdateNormalGlyphsScale()
 {
+  constexpr float NormalGlyphScaleMultiplier = 0.15f;
+
+  const auto getScale = [](vtkCamera* camera)
+  {
+    if (camera->GetParallelProjection())
+    {
+      return camera->GetParallelScale();
+    }
+    else
+    {
+      const double angle = vtkMath::RadiansFromDegrees(camera->GetViewAngle());
+      const double distance = camera->GetDistance();
+      return distance * tan(angle / 2);
+    }
+  };
+
+  const double scaleFactor = getScale(this->GetActiveCamera()) * NormalGlyphScaleMultiplier;
+
   for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
   {
-    normalGlyph.GlyphMapper->SetScaleFactor(
-      GetActiveCamera()->GetDistance() * NormalGlyphScaleMultiplier);
+    normalGlyph.GlyphMapper->SetScaleFactor(scaleFactor);
   }
 }
 
