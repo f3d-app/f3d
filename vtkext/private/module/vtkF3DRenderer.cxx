@@ -2174,7 +2174,7 @@ void vtkF3DRenderer::Render()
 {
   if (this->UseNormalGlyphs)
   {
-    UpdateNormalGlyphsScale();
+    this->UpdateNormalGlyphsScale();
   }
 
   if (!this->TimerVisible)
@@ -2886,7 +2886,7 @@ void vtkF3DRenderer::ConfigureNormalGlyphs()
       continue;
     }
 
-    UpdateNormalGlyphsScale();
+    this->UpdateNormalGlyphsScale();
     normalGlyph.Actor->SetVisibility(normalGlyphsVisible);
   }
 
@@ -2896,7 +2896,7 @@ void vtkF3DRenderer::ConfigureNormalGlyphs()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::UpdateNormalGlyphsScale()
 {
-  constexpr float NormalGlyphScaleMultiplier = 0.15f;
+  constexpr double normalGlyphScaleMultiplier = 0.15;
 
   const auto getScale = [](vtkCamera* camera)
   {
@@ -2908,11 +2908,11 @@ void vtkF3DRenderer::UpdateNormalGlyphsScale()
     {
       const double angle = vtkMath::RadiansFromDegrees(camera->GetViewAngle());
       const double distance = camera->GetDistance();
-      return distance * tan(angle / 2);
+      return distance * std::tan(0.5 * angle);
     }
   };
 
-  const double scaleFactor = getScale(this->GetActiveCamera()) * NormalGlyphScaleMultiplier;
+  const double scaleFactor = getScale(this->GetActiveCamera()) * normalGlyphScaleMultiplier;
 
   for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
   {
