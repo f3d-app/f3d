@@ -377,7 +377,11 @@ public:
               vtkNew<vtkFloatArray> vNormals;
               vNormals->SetName("Normals");
               vNormals->SetNumberOfComponents(3);
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260320)
+              vNormals->ReserveValues(normals.size());
+#else
               vNormals->Allocate(normals.size());
+#endif
 
               for (const pxr::GfVec3f& n : normals)
               {
@@ -415,7 +419,11 @@ public:
                     pxr::VtArray<int> indices;
                     if (indicesAttr.Get(&indices) && indices.size() > 0)
                     {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260320)
+                      texCoords->ReserveValues(indices.size());
+#else
                       texCoords->Allocate(indices.size());
+#endif
 
                       for (int index : indices)
                       {
@@ -426,7 +434,11 @@ public:
                   }
                   else
                   {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260320)
+                    texCoords->ReserveValues(uvs.size());
+#else
                     texCoords->Allocate(uvs.size());
+#endif
 
                     for (const pxr::GfVec2f& uv : uvs)
                     {
@@ -460,7 +472,11 @@ public:
             pointsAttr.Get(&positions, timeCode);
 
             vtkNew<vtkPoints> points;
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260320)
+            points->Reserve(positions.size());
+#else
             points->Allocate(positions.size());
+#endif
             for (const pxr::GfVec3f& p : positions)
             {
               points->InsertNextPoint(p[0], p[1], p[2]);

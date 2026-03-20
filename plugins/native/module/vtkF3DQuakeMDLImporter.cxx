@@ -313,7 +313,12 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     vtkFloatArray* textureCoordinates)
   {
     vtkNew<vtkPoints> vertices;
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260320)
+    vertices->Reserve(header->numTriangles * 3);
+#else
     vertices->Allocate(header->numTriangles * 3);
+#endif
 
     vtkNew<vtkFloatArray> normals;
     normals->SetNumberOfComponents(3);
@@ -448,7 +453,12 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       vtkNew<vtkFloatArray> textureCoordinates;
       textureCoordinates->SetNumberOfComponents(2);
       textureCoordinates->SetName("TextureCoordinates");
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260320)
+      textureCoordinates->ReserveValues(header->numTriangles * 3);
+#else
       textureCoordinates->Allocate(header->numTriangles * 3);
+#endif
       for (int i = 0; i < header->numTriangles; i++)
       {
         for (int vertex : triangles[i].vertex)
