@@ -113,6 +113,17 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("check 32-bits HDR image channel type size", hdrImg.getChannelTypeSize(), 4u);
   hdrImg.save(tmpDir + "/TestSDKImage32hdr.tif", f3d::image::SaveFormat::TIF);
 
+  // check reading stream
+  std::vector<unsigned char> buffer = generated.saveBuffer();
+  std::byte* bufferData = reinterpret_cast<std::byte*>(buffer.data());
+  f3d::image bufferImage(bufferData, buffer.size());
+  // std::cerr << generated.compare(bufferImage) << "\n";
+  test("check loading stream from image reader", generated.compare(bufferImage), 0.0); // not 1e-14?
+
+  // // check reading invalid stream
+  test.expect<f3d::image::read_exception>(
+    "read invalid image stream", [&]() { f3d::image invalidImgStream(nullptr, 10); });
+
 #if F3D_MODULE_EXR
   // check reading EXR
   f3d::image exrImg(testingDir + "/data/kloofendal_43d_clear_1k.exr");
