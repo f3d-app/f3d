@@ -340,6 +340,7 @@ void vtkF3DRenderer::Initialize()
   this->ScalarBarActorConfigured = false;
   this->CheatSheetConfigured = false;
   this->ColoringConfigured = false;
+  this->NormalGlyphsConfigured = false;
 
   // create ImGui context if F3D_MODULE_UI is enabled
   this->UIActor->Initialize(vtkOpenGLRenderWindow::SafeDownCast(this->RenderWindow));
@@ -2128,6 +2129,11 @@ void vtkF3DRenderer::UpdateActors()
     this->ConfigureColoringAndVisibilities();
   }
 
+  if (!this->NormalGlyphsConfigured)
+  {
+    this->ConfigureNormalGlyphs();
+  }
+
   this->ConfigureHDRI();
 
   if (!this->MetaDataConfigured)
@@ -2165,6 +2171,11 @@ void vtkF3DRenderer::UpdateActors()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
+  if (this->UseNormalGlyphs)
+  {
+    this->UpdateNormalGlyphsScale();
+  }
+
   if (!this->TimerVisible)
   {
     this->Superclass::Render();
@@ -2862,6 +2873,53 @@ void vtkF3DRenderer::ConfigurePointSprites()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureNormalGlyphs()
+{
+  bool normalGlyphsVisible = !this->UseRaytracing && this->UseNormalGlyphs;
+  for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
+  {
+    if (normalGlyphsVisible && !normalGlyph.InputDataHasNormals)
+    {
+      F3DLog::Print(F3DLog::Severity::Warning,
+        "Data does not contain any normals to display the normal glyphs with");
+      continue;
+    }
+
+    this->UpdateNormalGlyphsScale();
+    normalGlyph.Actor->SetVisibility(normalGlyphsVisible);
+  }
+
+  this->NormalGlyphsConfigured = true;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::UpdateNormalGlyphsScale()
+{
+  constexpr double normalGlyphScaleMultiplier = 0.15;
+
+  const auto getScale = [](vtkCamera* camera)
+  {
+    if (camera->GetParallelProjection())
+    {
+      return camera->GetParallelScale();
+    }
+    else
+    {
+      const double angle = vtkMath::RadiansFromDegrees(camera->GetViewAngle());
+      const double distance = camera->GetDistance();
+      return distance * std::tan(0.5 * angle);
+    }
+  };
+
+  const double scaleFactor = getScale(this->GetActiveCamera()) * normalGlyphScaleMultiplier;
+
+  for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
+  {
+    normalGlyph.GlyphMapper->SetScaleFactor(scaleFactor);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowScalarBar(bool show)
 {
   if (this->ScalarBarVisible != show)
@@ -2869,6 +2927,17 @@ void vtkF3DRenderer::ShowScalarBar(bool show)
     this->ScalarBarVisible = show;
     this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
+  }
+}
+
+// ---------------------------------------------------------------------------
+void vtkF3DRenderer::SetUseNormalGlyphs(bool use)
+{
+  if (this->UseNormalGlyphs != use)
+  {
+    this->CheatSheetConfigured = false;
+    this->NormalGlyphsConfigured = false;
+    this->UseNormalGlyphs = use;
   }
 }
 

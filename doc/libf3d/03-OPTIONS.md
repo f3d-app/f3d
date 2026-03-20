@@ -147,6 +147,10 @@ Path to a texture file that sets the Occlusion, Roughness and Metallic values of
 
 CLI: `--texture-material`.
 
+### `model.normal_glyphs.enable` (_bool_, default: `false`)
+
+Render vertex normals as arrows on top of the geometry.
+
 ### `model.normal.scale` (_double_, optional)
 
 Normal scale affects the strength of the normal deviation from the normal texture. Model-specified by default.
