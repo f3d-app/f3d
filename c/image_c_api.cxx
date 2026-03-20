@@ -73,6 +73,25 @@ f3d_image_t* f3d_image_new_path(const char* path)
 }
 
 //----------------------------------------------------------------------------
+f3d_image_t* f3d_image_new_stream(unsigned char* byte, unsigned int size)
+{
+
+  f3d::image* img = nullptr;
+
+  try
+  {
+    img = new f3d::image(reinterpret_cast<std::byte*>(byte), static_cast<size_t>(size));
+  }
+  catch (const f3d::image::read_exception& e)
+  {
+    std::cerr << "Error loading image: " << e.what() << "\n";
+    return nullptr;
+  }
+
+  return reinterpret_cast<f3d_image_t*>(img);
+}
+
+//----------------------------------------------------------------------------
 void f3d_image_delete(f3d_image_t* img)
 {
   f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);

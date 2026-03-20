@@ -73,6 +73,7 @@ public:
   image& operator=(const image& img) noexcept;
   image(image&& img) noexcept;
   image& operator=(image&& img) noexcept;
+  image(std::byte* byte, std::size_t size);
   ///@}
 
   ///@{ @name Operators
