@@ -55,6 +55,10 @@ public class Image {
         this(width, height, channelCount, ChannelType.BYTE);
     }
 
+    public Image(byte[] buffer, int size){
+        mNativeAddress = nativeCreateFromStream(buffer, size);
+    }
+
     Image(long nativeAddress) {
         mNativeAddress = nativeAddress;
     }
@@ -233,5 +237,6 @@ public class Image {
 
     private static native long nativeCreateFromFile(String filePath);
     private static native long nativeCreate(int width, int height, int channelCount, int type);
+    private static native long nativeCreateFromStream(byte[] buffer, int size);
     private static native void nativeDestroy(long nativeAddress);
 }
