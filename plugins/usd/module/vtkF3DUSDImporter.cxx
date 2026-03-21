@@ -3,8 +3,10 @@
 #include "vtkF3DFaceVaryingPointDispatcher.h"
 
 #include <vtkActor.h>
+#include <vtkActorCollection.h>
 #include <vtkConeSource.h>
 #include <vtkCubeSource.h>
+#include <vtkDataAssembly.h>
 #include <vtkCylinderSource.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
@@ -153,8 +155,42 @@ public:
     return this->ConvertMatrix(node.ComputeLocalToWorldTransform(timeCode));
   }
 
-  void AddActor(vtkRenderer* renderer, const pxr::SdfPath& path, const pxr::UsdGeomGprim& geomPrim,
-    const pxr::UsdPrim& prim, vtkMatrix4x4* mat, vtkPolyData* polydata)
+  int GetOrCreateHierarchyNode(
+    vtkDataAssembly* hierarchy, const pxr::SdfPath& path, const std::string& name)
+  {
+    std::string pathStr = path.GetAsString();
+    auto it = this->NodeIdMap.find(pathStr);
+    if (it != this->NodeIdMap.end())
+    {
+      return it->second;
+    }
+
+    // Get parent node ID
+    int parentNodeId = vtkDataAssembly::GetRootNode();
+    pxr::SdfPath parentPath = path.GetParentPath();
+    if (!parentPath.IsEmpty() && parentPath != pxr::SdfPath("/"))
+    {
+      auto parentIt = this->NodeIdMap.find(parentPath.GetAsString());
+      if (parentIt != this->NodeIdMap.end())
+      {
+        parentNodeId = parentIt->second;
+      }
+    }
+
+    // Create a valid node name (vtkDataAssembly requires valid XML names)
+    std::string nodeName = vtkDataAssembly::MakeValidNodeName(name.c_str());
+
+    int nodeId = hierarchy->AddNode(nodeName.c_str(), parentNodeId);
+    hierarchy->SetAttribute(nodeId, "label", name.c_str());
+    this->NodeIdMap[pathStr] = nodeId;
+
+    return nodeId;
+  }
+
+  void AddActor(vtkRenderer* renderer, vtkDataAssembly* hierarchy,
+    vtkActorCollection* actorCollection, const pxr::SdfPath& path,
+    const pxr::UsdGeomGprim& geomPrim, const pxr::UsdPrim& prim, vtkMatrix4x4* mat,
+    vtkPolyData* polydata)
   {
     pxr::SdfPath actorPath = path.AppendChild(pxr::TfToken(prim.GetName()));
 
@@ -164,6 +200,14 @@ public:
     if (!actorAlreadyExists)
     {
       actor = vtkSmartPointer<vtkActor>::New();
+
+      // Add actor to the collection and update hierarchy
+      int actorIndex = actorCollection->GetNumberOfItems();
+      actorCollection->AddItem(actor);
+
+      // Create hierarchy node for this actor
+      int nodeId = this->GetOrCreateHierarchyNode(hierarchy, actorPath, prim.GetName().GetString());
+      hierarchy->SetAttribute(nodeId, "flat_actor_id", actorIndex);
 
       // get associated material/shader
       pxr::UsdShadeMaterial material =
@@ -269,7 +313,8 @@ public:
     actor->SetUserMatrix(mat);
   }
 
-  void ImportNode(vtkRenderer* renderer, const pxr::UsdPrim& node, const pxr::SdfPath& path,
+  void ImportNode(vtkRenderer* renderer, vtkDataAssembly* hierarchy,
+    vtkActorCollection* actorCollection, const pxr::UsdPrim& node, const pxr::SdfPath& path,
     vtkMatrix4x4* currentMatrix)
   {
     pxr::UsdTimeCode timeCode = this->CurrentTime * this->Stage->GetTimeCodesPerSecond();
@@ -307,7 +352,8 @@ public:
         auto mat = this->GetLocalTransform(xform, timeCode);
         vtkMatrix4x4::Multiply4x4(currentMatrix, mat, mat);
 
-        this->ImportNode(renderer, prim.GetPrototype(), path.AppendChild(prim.GetName()), mat);
+        this->ImportNode(renderer, hierarchy, actorCollection, prim.GetPrototype(),
+          path.AppendChild(prim.GetName()), mat);
       }
       else if (prim.IsA<pxr::UsdGeomPointInstancer>())
       {
@@ -327,8 +373,8 @@ public:
 
             pxr::TfToken tok(std::string("instance_") + std::to_string(i++));
 
-            this->ImportNode(
-              renderer, prim, path.AppendChild(prim.GetName()).AppendChild(tok), mat);
+            this->ImportNode(renderer, hierarchy, actorCollection, prim,
+              path.AppendChild(prim.GetName()).AppendChild(tok), mat);
           }
         }
       }
@@ -678,7 +724,7 @@ public:
 
         if (subsets.empty())
         {
-          this->AddActor(renderer, path, geomPrim, prim, mat, polydata);
+          this->AddActor(renderer, hierarchy, actorCollection, path, geomPrim, prim, mat, polydata);
         }
         else
         {
@@ -708,26 +754,35 @@ public:
 
             polydataSubset->SetPolys(cells);
 
-            this->AddActor(renderer, path.AppendChild(pxr::TfToken(prim.GetName())), geomPrim,
-              subset.GetPrim(), mat, polydataSubset);
+            this->AddActor(renderer, hierarchy, actorCollection,
+              path.AppendChild(pxr::TfToken(prim.GetName())), geomPrim, subset.GetPrim(), mat,
+              polydataSubset);
           }
         }
       }
       else
       {
+        // Create hierarchy node for this intermediate node (Xform, Scope, etc.)
+        pxr::SdfPath nodePath = path.AppendChild(prim.GetName());
+        this->GetOrCreateHierarchyNode(hierarchy, nodePath, prim.GetName().GetString());
+
         // just traverse the node
-        this->ImportNode(renderer, prim, path.AppendChild(prim.GetName()), currentMatrix);
+        this->ImportNode(renderer, hierarchy, actorCollection, prim, nodePath, currentMatrix);
       }
     }
   }
 
-  bool ImportRoot(vtkRenderer* renderer)
+  bool ImportRoot(vtkRenderer* renderer, vtkDataAssembly* hierarchy,
+    vtkActorCollection* actorCollection)
   {
     if (!this->Stage)
     {
       vtkErrorWithObjectMacro(renderer, << "Stage failed to open");
       return false;
     }
+
+    // Clear node ID map for fresh hierarchy building
+    this->NodeIdMap.clear();
 
     vtkNew<vtkMatrix4x4> rootTransform;
 
@@ -744,7 +799,8 @@ public:
       rootTransform->SetElement(3, 3, 1.0);
     }
 
-    this->ImportNode(renderer, this->Stage->GetPseudoRoot(), pxr::SdfPath("/"), rootTransform);
+    this->ImportNode(
+      renderer, hierarchy, actorCollection, this->Stage->GetPseudoRoot(), pxr::SdfPath("/"), rootTransform);
     return true;
   }
 
@@ -1187,6 +1243,7 @@ public:
   }
 
   pxr::UsdStageRefPtr Stage = nullptr;
+  std::unordered_map<std::string, int> NodeIdMap;
 
 private:
   std::unordered_map<std::string, vtkSmartPointer<vtkActor>> ActorMap;
@@ -1258,7 +1315,11 @@ int vtkF3DUSDImporter::ImportBegin()
 //----------------------------------------------------------------------------
 void vtkF3DUSDImporter::ImportActors(vtkRenderer* renderer)
 {
-  if (!this->Internals->ImportRoot(renderer))
+  // Initialize the scene hierarchy
+  this->SceneHierarchy = vtkSmartPointer<vtkDataAssembly>::New();
+  this->SceneHierarchy->SetAttribute(vtkDataAssembly::GetRootNode(), "label", "root");
+
+  if (!this->Internals->ImportRoot(renderer, this->SceneHierarchy, this->ActorCollection))
   {
     this->SetFailureStatus();
   }
