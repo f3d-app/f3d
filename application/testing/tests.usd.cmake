@@ -21,7 +21,7 @@ f3d_test(NAME TestUSDZMaterials DATA McUsd.usdz PLUGIN usd ARGS --camera-positio
 f3d_test(NAME TestUSDZMaterialsInterationReload DATA McUsd.usdz PLUGIN usd INTERACTION NO_BASELINE) # Up
 
 # Scene hierarchy test for USD importer
-f3d_test(NAME TestUSDSceneHierarchy DATA primitives.usda PLUGIN usd INTERACTION UI) # Shift+H
+f3d_test(NAME TestUSDSceneHierarchy DATA primitives.usda ARGS --scene-hierarchy PLUGIN usd UI)
 
 if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/plugins/usd/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")

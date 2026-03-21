@@ -178,19 +178,7 @@ public:
     }
 
     // Create a valid node name (vtkDataAssembly requires valid XML names)
-    std::string nodeName = name;
-    if (nodeName.empty() || std::isdigit(static_cast<unsigned char>(nodeName[0])))
-    {
-      nodeName = "node_" + nodeName;
-    }
-    // Replace invalid characters
-    for (char& c : nodeName)
-    {
-      if (!std::isalnum(static_cast<unsigned char>(c)) && c != '_')
-      {
-        c = '_';
-      }
-    }
+    std::string nodeName = vtkDataAssembly::MakeValidNodeName(name.c_str());
 
     int nodeId = hierarchy->AddNode(nodeName.c_str(), parentNodeId);
     hierarchy->SetAttribute(nodeId, "label", name.c_str());
