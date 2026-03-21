@@ -58,6 +58,15 @@ extern "C"
   F3D_EXPORT f3d_image_t* f3d_image_new_path(const char* path);
 
   /**
+   * @brief Create a new image object from a stream
+   *
+   * The returned image must be deleted with f3d_image_delete().
+   *
+   * @return Pointer to the newly created image object, NULL on failure
+   */
+  F3D_EXPORT f3d_image_t* f3d_image_new_stream(unsigned char* buffer, unsigned int size);
+
+  /**
    * @brief Delete an image object
    * @param img Pointer to the image object to be deleted
    */

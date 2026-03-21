@@ -194,6 +194,7 @@ EMSCRIPTEN_BINDINGS(f3d)
     .constructor<>()
     .constructor<const std::string&>()
     .constructor<unsigned int, unsigned int, unsigned int, f3d::image::ChannelType>()
+    .constructor<std::byte* buffer, std::size_t size>()
     .function("equals", &f3d::image::operator==)
     .function(
       "getNormalizedPixel", +[](const f3d::image& img, int x, int y) -> emscripten::val
