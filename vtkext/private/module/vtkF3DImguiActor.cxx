@@ -187,8 +187,12 @@ protected:
 
   void Visit(int nodeid) override
   {
-    int flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow |
-      ImGuiTreeNodeFlags_DrawLinesToNodes;
+    int flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DrawLinesToNodes;
+
+    if (!this->GetAssembly()->GetAttributeOrDefault(nodeid, "f3d_collapsed", 0))
+    {
+      flags |= ImGuiTreeNodeFlags_DefaultOpen;
+    }
 
     if (this->GetAssembly()->GetNumberOfChildren(nodeid) == 0)
     {

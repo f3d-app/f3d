@@ -230,6 +230,10 @@ Set the opacity of the backdrop behind text information such as FPS, filename, m
 
 ## Material options
 
+### `--normal-glyphs` (_bool_, default: `false`)
+
+Display arrows that show vertex normals.
+
 ### `-o`, `--point-sprites=<none|sphere|gaussian|circle|stddev|bound|cross>` (_string_, default: `none`, implicit: `sphere`)
 
 Select _points sprites_ types to show instead of the geometry.
@@ -362,7 +366,8 @@ Display the _metadata_.
 
 ### `--scene-hierarchy` (_bool_, default: `false`)
 
-Display the _scene hierarchy_.
+Display the _scene hierarchy_ as a tree representing the internal structure of the model, with checkboxes allowing to hide or show individual parts.
+By default the tree is only expanded enough to show nodes that have meaningful names, but all nodes can be fully expanded manually.
 
 ### `--hdri-filename` (_bool_, default: `false`)
 

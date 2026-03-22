@@ -147,6 +147,10 @@ Path to a texture file that sets the Occlusion, Roughness and Metallic values of
 
 CLI: `--texture-material`.
 
+### `model.normal_glyphs.enable` (_bool_, default: `false`)
+
+Render vertex normals as arrows on top of the geometry.
+
 ### `model.normal.scale` (_double_, optional)
 
 Normal scale affects the strength of the normal deviation from the normal texture. Model-specified by default.
@@ -574,7 +578,8 @@ CLI: `--backdrop-opacity`.
 
 ### `ui.scene_hierarchy` (_bool_, default: `false`)
 
-Display the scene hierarchy.
+Display the _scene hierarchy_ as a tree representing the internal structure of the model, with checkboxes allowing to hide or show individual parts.
+By default the tree is only expanded enough to show nodes that have meaningful names, but all nodes can be fully expanded manually.
 
 CLI: `--scene-hierarchy`.
 
