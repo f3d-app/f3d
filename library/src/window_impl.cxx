@@ -466,6 +466,12 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowDropZone(opt.ui.drop_zone.enable);
   renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
   renderer->SetBackdropOpacity(opt.ui.backdrop.opacity);
+  if (opt.ui.backdrop.color.has_value())
+  {
+    f3d::color_t color = opt.ui.backdrop.color.value();
+    renderer->SetBackdropColor({ color[0], color[1], color[2] });
+  }
+  
 
   if (this->Internals->Interactor)
   {
