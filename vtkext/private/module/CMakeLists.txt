@@ -80,6 +80,7 @@ set(classes
   vtkF3DInteractorStyle
   vtkF3DMemoryMesh
   vtkF3DMetaImporter
+  vtkF3DNamedColors
   vtkF3DNoRenderWindow
   vtkF3DObjectFactory
   vtkF3DOpenGLGridMapper

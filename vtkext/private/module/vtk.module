@@ -3,6 +3,7 @@ NAME
 DESCRIPTION
   A VTK module only used internally by libf3d
 DEPENDS
+  VTK::CommonColor
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::IOImage
