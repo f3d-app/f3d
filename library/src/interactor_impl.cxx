@@ -33,6 +33,7 @@
 #include <vtkStringArray.h>
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
+#include <vtkTimerLog.h>
 
 #include <algorithm>
 #include <chrono>
@@ -571,7 +572,7 @@ public:
   //----------------------------------------------------------------------------
   bool StartEventLoop(double deltaTime, std::function<void()> userCallBack)
   {
-    if (this->EventLoopObserverId != -1)
+    if (this->EventLoopObserverId[0] != -1)
     {
       log::info("Interaction: event loop has already been started");
       return false;
@@ -594,10 +595,15 @@ public:
       [](vtkObject*, unsigned long, void* clientData, void*)
       {
         internals* that = static_cast<internals*>(clientData);
-        that->EventLoop(that->CallbackDeltaTime);
+        double now = vtkTimerLog::GetUniversalTime();
+        double dt = now - that->LastTime;
+        that->LastTime = now;
+        that->EventLoop(dt);
       });
-    this->EventLoopObserverId =
+    this->EventLoopObserverId[0] =
       this->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
+    this->EventLoopObserverId[1] =
+      this->VTKInteractor->AddObserver(vtkCommand::InteractionEvent, timerCallBack);
     timerCallBack->SetClientData(this);
     return true;
   }
@@ -605,14 +611,16 @@ public:
   //----------------------------------------------------------------------------
   bool StopEventLoop()
   {
-    if (this->EventLoopObserverId == -1)
+    if (this->EventLoopObserverId[0] == -1)
     {
       log::info("Interaction: event loop has not been started hence cannot be stopped");
       return false;
     }
-    this->VTKInteractor->RemoveObserver(this->EventLoopObserverId);
+    this->VTKInteractor->RemoveObserver(this->EventLoopObserverId[0]);
+    this->VTKInteractor->RemoveObserver(this->EventLoopObserverId[1]);
     this->VTKInteractor->DestroyTimer(this->EventLoopTimerId);
-    this->EventLoopObserverId = -1;
+    this->EventLoopObserverId[0] = -1;
+    this->EventLoopObserverId[1] = -1;
     this->EventLoopTimerId = 0;
     return true;
   }
@@ -708,11 +716,12 @@ public:
 
   std::function<void()> EventLoopUserCallBack = nullptr;
   unsigned long EventLoopTimerId = 0;
-  int EventLoopObserverId = -1;
+  int EventLoopObserverId[2] = { -1, -1 };
   std::atomic<bool> RenderRequested = false;
   std::atomic<bool> StopRequested = false;
 
   double CallbackDeltaTime = 1.0 / 30; /* Default DeltaTime (30fps) */
+  double LastTime = vtkTimerLog::GetUniversalTime();
 };
 
 //----------------------------------------------------------------------------
