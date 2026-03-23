@@ -6,8 +6,8 @@
 #include <vtkActorCollection.h>
 #include <vtkConeSource.h>
 #include <vtkCubeSource.h>
-#include <vtkDataAssembly.h>
 #include <vtkCylinderSource.h>
+#include <vtkDataAssembly.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
 #include <vtkImageAppendComponents.h>
@@ -788,8 +788,8 @@ public:
     }
   }
 
-  bool ImportRoot(vtkRenderer* renderer, vtkDataAssembly* hierarchy,
-    vtkActorCollection* actorCollection)
+  bool ImportRoot(
+    vtkRenderer* renderer, vtkDataAssembly* hierarchy, vtkActorCollection* actorCollection)
   {
     if (!this->Stage)
     {
@@ -815,8 +815,8 @@ public:
       rootTransform->SetElement(3, 3, 1.0);
     }
 
-    this->ImportNode(
-      renderer, hierarchy, actorCollection, this->Stage->GetPseudoRoot(), pxr::SdfPath("/"), rootTransform);
+    this->ImportNode(renderer, hierarchy, actorCollection, this->Stage->GetPseudoRoot(),
+      pxr::SdfPath("/"), rootTransform);
     return true;
   }
 
