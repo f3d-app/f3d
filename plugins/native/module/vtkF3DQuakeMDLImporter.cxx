@@ -2,6 +2,7 @@
 #include "vtkF3DQuakeMDLImporterConstants.h"
 
 #include <vtkCommand.h>
+#include <vtkDataAssembly.h>
 #include <vtkDoubleArray.h>
 #include <vtkFileResourceStream.h>
 #include <vtkFloatArray.h>
@@ -693,6 +694,10 @@ int vtkF3DQuakeMDLImporter::ImportBegin()
 //----------------------------------------------------------------------------
 void vtkF3DQuakeMDLImporter::ImportActors(vtkRenderer* renderer)
 {
+  // Initialize the scene hierarchy
+  this->SceneHierarchy = vtkSmartPointer<vtkDataAssembly>::New();
+  this->SceneHierarchy->SetAttribute(vtkDataAssembly::GetRootNode(), "label", "root");
+
   vtkNew<vtkActor> actor;
   vtkNew<vtkPolyDataMapper> mapper;
   mapper->SetInputData(this->Internals->AnimationFrames[0][0]);
@@ -706,6 +711,11 @@ void vtkF3DQuakeMDLImporter::ImportActors(vtkRenderer* renderer)
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
   this->ActorCollection->AddItem(actor);
 #endif
+
+  // Create hierarchy node for the model actor
+  int nodeId = this->SceneHierarchy->AddNode("model", vtkDataAssembly::GetRootNode());
+  this->SceneHierarchy->SetAttribute(nodeId, "label", "model");
+  this->SceneHierarchy->SetAttribute(nodeId, "flat_actor_id", 0);
 }
 
 //----------------------------------------------------------------------------
