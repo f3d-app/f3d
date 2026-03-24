@@ -350,8 +350,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def("get_binding_documentation", &f3d::interactor::getBindingDocumentation)
     .def("get_binding_type", &f3d::interactor::getBindingType)
     .def("add_notification", &f3d::interactor::addNotification,
-      "Trigger a single text line notification at the bottom left of viewport",
-      py::arg("desc"), py::arg("value") = "", py::arg("duration") = 3.0);
+      "Trigger a single text line notification at the bottom left of viewport", py::arg("desc"),
+      py::arg("value") = "", py::arg("duration") = 3.0);
 
   interactor
     .def("add_binding",

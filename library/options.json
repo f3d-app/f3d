@@ -299,7 +299,7 @@
       "type": "bool",
       "default_value": "false"
     },
-    "feedback": {
+    "notifications": {
       "enable": {
         "type": "bool",
         "default_value": "false"

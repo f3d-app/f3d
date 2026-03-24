@@ -219,7 +219,7 @@ public:
    * Add notification info to deque
    */
   void AddNotification(
-    std::string desc, std::string value = "", std::string bind = "", double duration = 3.0);
+    const std::string& desc, const std::string& value, const std::string& bind, double duration);
 
 protected:
   vtkF3DUIActor();

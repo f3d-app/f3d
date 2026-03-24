@@ -508,7 +508,24 @@ public:
 
     if (commandsIt != this->Bindings.end())
     {
-      for (const std::string& command : commandsIt->second.CommandVector)
+      // Copy by value: triggerCommand may call initBindings() which clears the Bindings map,
+      // invalidating any references/iterators into it.
+      const BindingCommands& binding = commandsIt->second;
+
+#if F3D_MODULE_UI
+      if (!binding.SkipNotify && binding.DocumentationCallback)
+      {
+        // trigger notification
+        vtkRenderWindow* renWin = this->Window.GetRenderWindow();
+        vtkF3DRenderer* ren =
+          vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+
+        auto [desc, value] = binding.DocumentationCallback();
+        ren->AddNotification(desc, value, bind.format(), 3.0);
+      }
+#endif
+
+      for (const std::string& command : binding.CommandVector)
       {
         std::string commandWithArgs = command;
         if (!argsString.empty())
@@ -521,16 +538,6 @@ public:
           // XXX: Ignore the boolean return of triggerCommand,
           // error is already logged by triggerCommand
           this->Interactor.triggerCommand(commandWithArgs);
-
-          if (!commandsIt->second.SkipNotify && commandsIt->second.DocumentationCallback)
-          {
-            // trigger notification
-            vtkRenderWindow* renWin = this->Window.GetRenderWindow();
-            vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-
-            auto [desc, value] = commandsIt->second.DocumentationCallback();
-            ren->AddNotification(desc, value, bind.format());
-          }
         }
         catch (const f3d::interactor::command_runtime_exception& ex)
         {
@@ -1758,7 +1765,8 @@ interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addBinding(const interaction_bind_t& bind, std::string command,
-  std::string group, documentation_callback_t documentationCallback, BindingType type, bool skipNotify)
+  std::string group, documentation_callback_t documentationCallback, BindingType type,
+  bool skipNotify)
 {
   return this->addBinding(bind, std::vector<std::string>{ std::move(command) }, std::move(group),
     std::move(documentationCallback), type, skipNotify);
@@ -1861,7 +1869,7 @@ void interactor_impl::addNotification(std::string desc, std::string value, doubl
     vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
 
-    ren->AddNotification(desc, value, std::string(), duration);
+    ren->AddNotification(std::move(desc), std::move(value), {}, duration);
   }
 #endif
 }

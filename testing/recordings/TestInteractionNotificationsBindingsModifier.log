@@ -1,0 +1,11 @@
+# StreamVersion 1.2
+ExposeEvent 0 299 0 0 0 0 0
+RenderEvent 0 299 0 0 0 0 0
+
+# Press SHIFT+L to show a notification with modifiers
+KeyPressEvent -1247 449 0 0 1 Shift_L 0
+CharEvent -1247 449 0 0 1 Shift_L 0
+KeyPressEvent -1247 449 1 76 1 L 0
+KeyReleaseEvent -1247 449 1 76 1 L 0
+KeyReleaseEvent -1247 449 1 0 1 Shift_L 0
+TimerEvent -1247 449 1 0 1 Shift_L 0

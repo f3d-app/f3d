@@ -25,8 +25,8 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   f3d::interactor& inter = eng.getInteractor();
 
   win.setSize(300, 300);
-  opt.ui.feedback.enable = true;
-  opt.ui.feedback.show_bindings = true;
+  opt.ui.notifications.enable = true;
+  opt.ui.notifications.show_bindings = true;
   sce.add(DataPath);
   win.render();
 
@@ -59,8 +59,8 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   };
 
   inter.addBinding({ f3d::interaction_bind_t::ModifierKeys::ANY, "Exclam" },
-    "toggle ui.feedback.show_bindings", "Custom",
-    std::bind(docTgl, "Show Bind Keys", std::cref(opt.ui.feedback.show_bindings)),
+    "toggle ui.notifications.show_bindings", "Custom",
+    std::bind(docTgl, "Show Bind Keys", std::cref(opt.ui.notifications.show_bindings)),
     f3d::interactor::BindingType::TOGGLE);
 
   inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "Exclam");
@@ -81,7 +81,7 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   test("turn off binding keys visibility",
     TestSDKHelpers::RenderTest(win, BaselinePath, OutputPath, "TestSDKNotificationKeysOff"));
 
-  opt.ui.feedback.enable = false;
+  opt.ui.notifications.enable = false;
 
   test("turn off notification visibility",
     TestSDKHelpers::RenderTest(win, BaselinePath, OutputPath, "TestSDKNotificationOff"));

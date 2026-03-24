@@ -583,11 +583,11 @@ By default the tree is only expanded enough to show nodes that have meaningful n
 
 CLI: `--scene-hierarchy`.
 
-### `ui.feedback.enable` (_bool_, default: `false`)
+### `ui.notifications.enable` (_bool_, default: `false`)
 
-Show feedback notifications at the bottom left of the viewport.
+Show notifications at the bottom left of the viewport.
 
-### `ui.feedback.show_bindings` (_bool_, default: `false`)
+### `ui.notifications.show_bindings` (_bool_, default: `false`)
 
 Show corresponding keys when notifications are trigger by bindings key press events.
 

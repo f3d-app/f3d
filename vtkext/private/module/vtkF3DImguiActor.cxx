@@ -1266,23 +1266,16 @@ void vtkF3DImguiActor::RenderNotifications()
     ImVec4 bindingTextColor = ::ColorToImVec4(this->FontColor);
     ImVec4 bindingRectColor = F3DStyle::imgui::GetMidColor(); // Grey
 
-    if (!value.empty())
+    // change color for booleans
+    if (value == "ON")
     {
-      if (value == "ON")
-      {
-        valueTextColor = F3DStyle::imgui::GetCompletionColor();   // Green
-        bindingTextColor = F3DStyle::imgui::GetBackgroundColor(); // Black
-        bindingRectColor = F3DStyle::imgui::GetWarningColor();    // Yellow
-      }
-      else if (value == "OFF")
-      {
-        valueTextColor = F3DStyle::imgui::GetErrorColor(); // Red
-      }
-      else if (value == "Playing")
-      {
-        bindingTextColor = F3DStyle::imgui::GetBackgroundColor(); // Black
-        bindingRectColor = F3DStyle::imgui::GetWarningColor();    // Yellow
-      }
+      valueTextColor = F3DStyle::imgui::GetCompletionColor();   // Green
+      bindingTextColor = F3DStyle::imgui::GetBackgroundColor(); // Black
+      bindingRectColor = F3DStyle::imgui::GetWarningColor();    // Yellow
+    }
+    else if (value == "OFF")
+    {
+      valueTextColor = F3DStyle::imgui::GetErrorColor(); // Red
     }
 
     float alpha = 1.f, fading = .5f;

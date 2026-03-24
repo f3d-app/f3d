@@ -466,8 +466,8 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowDropZone(opt.ui.drop_zone.enable);
   renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
   renderer->SetBackdropOpacity(opt.ui.backdrop.opacity);
-  renderer->ShowNotification(opt.ui.feedback.enable);
-  renderer->ShowBindings(opt.ui.feedback.show_bindings);
+  renderer->ShowNotification(opt.ui.notifications.enable);
+  renderer->ShowBindings(opt.ui.notifications.show_bindings);
 
   if (this->Internals->Interactor)
   {
