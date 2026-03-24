@@ -1207,7 +1207,6 @@ void vtkF3DImguiActor::SetDeltaTime(double time)
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderNotifications()
 {
-  ImGuiIO& io = ImGui::GetIO();
   int index = 0;
 
   for (const auto& [desc, value, bind, duration, startTime] : this->Notifications)
@@ -1306,11 +1305,11 @@ void vtkF3DImguiActor::RenderNotifications()
     float posX = (windowWidth - descLineWidth) * 0.5f; // Text centering
     ImGui::SetCursorPosX(posX);
 
-    ImGui::TextColored(descTextColor, desc.c_str());
+    ImGui::TextColored(descTextColor, "%s", desc.c_str());
     if (!value.empty())
     {
       ImGui::SameLine();
-      ImGui::TextColored(valueTextColor, value.c_str());
+      ImGui::TextColored(valueTextColor, "%s", value.c_str());
     }
 
     if (this->BindingsVisible && !bind.empty())
@@ -1337,7 +1336,7 @@ void vtkF3DImguiActor::RenderNotifications()
         ImDrawList* drawList = ImGui::GetWindowDrawList();
         drawList->ChannelsSplit(2);
         drawList->ChannelsSetCurrent(1);
-        ImGui::TextColored(bindingTextColor, key.c_str());
+        ImGui::TextColored(bindingTextColor, "%s", key.c_str());
         drawList->ChannelsSetCurrent(0);
         topBindingCorner =
           ImVec2(ImGui::GetItemRectMin().x - recMarginX, ImGui::GetItemRectMin().y - recMarginY);

@@ -18,7 +18,7 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   std::string BaselinePath = std::string(argv[1]) + "baselines/";
   std::string OutputPath = std::string(argv[2]);
 
-  f3d::engine eng = f3d::engine::create();
+  f3d::engine eng = f3d::engine::create(true);
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();
   f3d::scene& sce = eng.getScene();
