@@ -510,20 +510,7 @@ public:
     {
       // Copy by value: triggerCommand may call initBindings() which clears the Bindings map,
       // invalidating any references/iterators into it.
-      const BindingCommands& binding = commandsIt->second;
-
-#if F3D_MODULE_UI
-      if (!binding.SkipNotify && binding.DocumentationCallback)
-      {
-        // trigger notification
-        vtkRenderWindow* renWin = this->Window.GetRenderWindow();
-        vtkF3DRenderer* ren =
-          vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-
-        auto [desc, value] = binding.DocumentationCallback();
-        ren->AddNotification(desc, value, bind.format(), 3.0);
-      }
-#endif
+      const BindingCommands binding = commandsIt->second;
 
       for (const std::string& command : binding.CommandVector)
       {
@@ -545,6 +532,19 @@ public:
             "Interaction: error running command: \"" + commandWithArgs + "\": " + ex.what());
         }
       }
+
+#if F3D_MODULE_UI
+      if (!binding.SkipNotify && binding.DocumentationCallback)
+      {
+        // trigger notification
+        vtkRenderWindow* renWin = this->Window.GetRenderWindow();
+        vtkF3DRenderer* ren =
+          vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+
+        auto [desc, value] = binding.DocumentationCallback();
+        ren->AddNotification(desc, value, bind.format(), 3.0);
+      }
+#endif
     }
 
     // Update the dynamic options of the animation manager so check if the cheatsheet needs an
