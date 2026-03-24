@@ -5,7 +5,7 @@
 #include "types.h"
 #include "utils.h"
 
-#include <vtkF3DNamedColors.h>
+#include "vtkF3DNamedColors.h"
 #include <vtkMath.h>
 #include <vtkSmartPointer.h>
 
