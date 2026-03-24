@@ -29,6 +29,7 @@
 #include <vtkCullerCollection.h>
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkFloatArray.h>
+#include <vtkHDRReader.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
@@ -1244,10 +1245,7 @@ void vtkF3DRenderer::ConfigureHDRIReader()
 
     if (!this->HDRIReader)
     {
-      // No valid HDRI file have been provided, read the default HDRI
-      // TODO add support for memory buffer in the vtkHDRReader in VTK
-      // https://github.com/f3d-app/f3d/issues/1100
-      this->HDRIReader = vtkSmartPointer<vtkPNGReader>::New();
+      this->HDRIReader = vtkSmartPointer<vtkHDRReader>::New();
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
       vtkNew<vtkMemoryResourceStream> stream;
       stream->SetBuffer(F3DDefaultHDRI, sizeof(F3DDefaultHDRI));
