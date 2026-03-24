@@ -499,6 +499,12 @@
           "implicitValue": "1"
         },
         {
+          "longName": "notifications",
+          "helpText": "Display notifications",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
           "longName": "hdri-filename",
           "helpText": "Display hdri filename",
           "valueHelper": "<bool>",

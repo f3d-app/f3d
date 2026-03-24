@@ -1,0 +1,9 @@
+# StreamVersion 1.2
+ExposeEvent 0 299 0 0 0 0 0
+RenderEvent 0 299 0 0 0 0 0
+
+# Press E to show a notification
+KeyPressEvent -357 -370 0 101 1 e 0
+CharEvent -357 -370 0 101 1 e 0
+KeyReleaseEvent -357 -370 0 101 1 e 0
+TimerEvent -357 -370 0 101 1 e 0

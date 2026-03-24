@@ -123,6 +123,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "filename", "ui.filename" },
   { "metadata", "ui.metadata" },
   { "scene-hierarchy", "ui.scene_hierarchy" },
+  { "notifications", "ui.feedback.enable" },
   { "hdri-filename", "ui.hdri_filename" },
   { "blur-background", "render.background.blur.enable" },
   { "blur-coc", "render.background.blur.coc" },
