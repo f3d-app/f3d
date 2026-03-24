@@ -207,16 +207,6 @@ extern "C"
   F3D_EXPORT void f3d_interactor_init_bindings(f3d_interactor_t* interactor);
 
   /**
-   * @brief Initialize binding notification map for interaction key press binding notification.
-   *
-   * Call after initialization of default binding and before adding custom binding,
-   * prevent the default binding documentation callback overwrite by custom binding.
-   *
-   * @param interactor Interactor handle.
-   */
-  F3D_EXPORT void f3d_interactor_init_bind_notification_map(f3d_interactor_t* interactor);
-
-  /**
    * @brief Add a binding for the provided bind.
    *
    * @param interactor Interactor handle.

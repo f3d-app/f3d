@@ -215,15 +215,6 @@ public class Interactor {
     public native Interactor initBindings();
 
     /**
-     * Initialize binding notification map for interaction key press binding notification.
-     * Call after initialization of default binding and before adding custom binding,
-     * prevent the default binding documentation callback overwrite by custom binding.
-     *
-     * @return this interactor for method chaining
-     */
-    public native Interactor initBindNotificationMap();
-
-    /**
      * Add binding to trigger commands for a specific bind.
      *
      * @param bind interaction bind (key combination)

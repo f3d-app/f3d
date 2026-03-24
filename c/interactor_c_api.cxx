@@ -636,18 +636,6 @@ f3d_interactor_binding_type_t f3d_interactor_get_binding_type(
 }
 
 //----------------------------------------------------------------------------
-void f3d_interactor_init_bind_notification_map(f3d_interactor_t* interactor)
-{
-  if (!interactor)
-  {
-    return;
-  }
-
-  f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  cpp_interactor->initBindNotificationMap();
-}
-
-//----------------------------------------------------------------------------
 void f3d_interactor_add_notification(
   f3d_interactor_t* interactor, const char* desc, const char* value, double duration)
 {

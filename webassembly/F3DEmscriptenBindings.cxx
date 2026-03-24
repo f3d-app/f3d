@@ -387,8 +387,6 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function(
       "requestStop", &f3d::interactor::requestStop, emscripten::return_value_policy::reference()).
     .function(
-      "initBindNotificationMap", &f3d::interactor::initBindNotificationMap, emscripten::return_value_policy::reference())
-    .function(
       "addNotification", +[](f3d::interactor& interactor, std::string desc, std::string value, double duration)
         {
     interactor.addNotification(desc, value, duration) };

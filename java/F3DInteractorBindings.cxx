@@ -207,12 +207,6 @@ extern "C"
     return self;
   }
 
-  JNIEXPORT jobject JAVA_BIND(Interactor, initBindNotificationMap)(JNIEnv* env, jobject self)
-  {
-    GetInteractor(env, self).initBindNotificationMap();
-    return self;
-  }
-
   JNIEXPORT jobject JAVA_BIND(Interactor, addBindingCommands)(
     JNIEnv* env, jobject self, jobject bind, jobject commands, jstring group, jobject type)
   {
@@ -680,6 +674,14 @@ extern "C"
   JNIEXPORT void JAVA_BIND(Interactor, addNotification)(
     JNIEnv* env, jobject self, jstring desc, jstring value, jdouble duration)
   {
-    GetInteractor(env, self).addNotification(desc, value, duration);
+    const char* descStr = env->GetStringUTFChars(desc, nullptr);
+    std::string descCpp = descStr;
+    env->ReleaseStringUTFChars(desc, descStr);
+
+    const char* valueStr = env->GetStringUTFChars(value, nullptr);
+    std::string valueCpp = valueStr;
+    env->ReleaseStringUTFChars(value, valueStr);
+
+    GetInteractor(env, self).addNotification(valueCpp, valueCpp, duration);
   }
 }
