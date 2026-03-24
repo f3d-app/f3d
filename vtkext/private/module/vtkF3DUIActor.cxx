@@ -285,16 +285,13 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
 void vtkF3DUIActor::AddNotification(
   const std::string& desc, const std::string& value, const std::string& bind, double duration)
 {
-  if (this->NotificationVisible)
+  for (auto it = this->Notifications.begin(); it != this->Notifications.end(); ++it)
   {
-    for (auto it = this->Notifications.begin(); it != this->Notifications.end(); ++it)
+    if (desc == it->desc)
     {
-      if (desc == (*it).desc)
-      {
-        Notifications.erase(it); // Remove duplicate
-        break;
-      }
+      this->Notifications.erase(it); // Remove duplicate
+      break;
     }
-    this->Notifications.emplace_front(Notification{ desc, value, bind, duration, this->TotalTime });
   }
+  this->Notifications.emplace_front(Notification{ desc, value, bind, duration, this->TotalTime });
 }

@@ -533,7 +533,6 @@ public:
         }
       }
 
-#if F3D_MODULE_UI
       if (!binding.SkipNotify && binding.DocumentationCallback)
       {
         // trigger notification
@@ -544,7 +543,6 @@ public:
         auto [desc, value] = binding.DocumentationCallback();
         ren->AddNotification(desc, value, bind.format(), 3.0);
       }
-#endif
     }
 
     // Update the dynamic options of the animation manager so check if the cheatsheet needs an
@@ -1725,6 +1723,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Cheatsheet"), f3d::interactor::BindingType::OTHER, true);
   this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Console"), f3d::interactor::BindingType::OTHER, true);
   this->addBinding({mod_t::ANY, "Colon"}, "toggle ui.minimal_console", "Others", std::bind(docStr, "Minimal console"), f3d::interactor::BindingType::OTHER, true);
+  this->addBinding({mod_t::CTRL, "V"}, "toggle ui.notifications.enable", "Others", std::bind(docTgl, "Notifications", std::cref(opts.ui.notifications.enable)), f3d::interactor::BindingType::TOGGLE);
 #endif
   this->addBinding({mod_t::CTRL, "Q"}, "stop_interactor", "Others", std::bind(docStr, "Stop the interactor"), f3d::interactor::BindingType::OTHER, true);
   this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));
@@ -1863,15 +1862,13 @@ f3d::interactor::BindingType interactor_impl::getBindingType(const interaction_b
 //----------------------------------------------------------------------------
 void interactor_impl::addNotification(std::string desc, std::string value, double duration)
 {
-#if F3D_MODULE_UI
   if (!desc.empty())
   {
     vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
 
-    ren->AddNotification(std::move(desc), std::move(value), {}, duration);
+    ren->AddNotification(desc, value, {}, duration);
   }
-#endif
 }
 //----------------------------------------------------------------------------
 interactor& interactor_impl::triggerModUpdate(InputModifier mod)
