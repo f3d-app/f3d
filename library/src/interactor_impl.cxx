@@ -601,9 +601,8 @@ public:
       {
         internals* that = static_cast<internals*>(clientData);
         double now = vtkTimerLog::GetUniversalTime();
-        double dt = now - that->LastTime;
         that->LastTime = now;
-        that->EventLoop(dt);
+        that->EventLoop(that->CallbackDeltaTime);
       });
     this->EventLoopObserverId[0] =
       this->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
