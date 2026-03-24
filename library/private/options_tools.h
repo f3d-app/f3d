@@ -6,6 +6,7 @@
 #include "utils.h"
 
 #include "vtkF3DNamedColors.h"
+
 #include <vtkMath.h>
 #include <vtkSmartPointer.h>
 
