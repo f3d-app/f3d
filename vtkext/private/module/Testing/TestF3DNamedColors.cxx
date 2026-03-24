@@ -1,8 +1,7 @@
 #include "F3DStyle.h"
+#include "vtkF3DNamedColors.h"
 
 #include <vtkNew.h>
-
-#include <vtkF3DNamedColors.h>
 
 #include <cmath>
 

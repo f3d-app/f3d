@@ -7,7 +7,6 @@
 
 #include <vtkF3DNamedColors.h>
 #include <vtkMath.h>
-#include <vtkNamedColors.h>
 #include <vtkSmartPointer.h>
 
 #include <algorithm>
