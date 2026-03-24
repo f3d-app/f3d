@@ -14,20 +14,8 @@ vtkF3DNamedColors::vtkF3DNamedColors()
   this->SetColor(vtkStdString("f3d_blue"), vtkColor3ub(F3DStyle::F3D_BLUE));
   this->SetColor(vtkStdString("f3d_yellow"), vtkColor3ub(F3DStyle::F3D_YELLOW));
   this->SetColor(vtkStdString("f3d_white"), vtkColor3ub(F3DStyle::F3D_WHITE));
-  this->SetColor(vtkStdString("f3d_gray"), vtkColor3ub(F3DStyle::F3D_GREY));
+  this->SetColor(vtkStdString("f3d_grey"), vtkColor3ub(F3DStyle::F3D_GREY));
   this->SetColor(vtkStdString("f3d_black"), vtkColor3ub(F3DStyle::F3D_BLACK));
-}
-
-// ----------------------------------------------------------------------------
-bool vtkF3DNamedColors::ColorExists(const std::string& color)
-{
-  return this->vtkNamedColors::ColorExists(color);
-}
-
-// ----------------------------------------------------------------------------
-void vtkF3DNamedColors::GetColor(const std::string& color, double rgba[4])
-{
-  this->vtkNamedColors::GetColor(color, rgba);
 }
 
 // ----------------------------------------------------------------------------
