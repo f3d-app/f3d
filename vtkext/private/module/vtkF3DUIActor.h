@@ -17,7 +17,6 @@
 #include <map>
 
 class vtkOpenGLRenderWindow;
-class ImFont;
 
 class vtkF3DUIActor : public vtkProp
 {
@@ -344,7 +343,6 @@ protected:
 
   std::string FontFile = "";
   double FontScale = 1.0;
-  std::map<std::string, ImFont*> Fonts;
 
   /**
    * Initializing the vector here because its needed in the initialization function,

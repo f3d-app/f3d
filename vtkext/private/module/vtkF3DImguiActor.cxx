@@ -463,6 +463,7 @@ struct vtkF3DImguiActor::Internals
   SearchMode CurrentSearchMode = SearchMode::Description;
   bool SearchFocusRequested = false;
   float CheatSheetWidth = 0.f;
+  std::map<std::string, ImFont*> ExtraFonts;
 };
 
 namespace
@@ -524,7 +525,7 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
     ImFont* notiFont = io.Fonts->AddFontFromMemoryTTF(
       const_cast<void*>(reinterpret_cast<const void*>(F3DFontBuffer)), sizeof(F3DFontBuffer),
       18 * this->FontScale * .8f, &fontConfig, ranges.Data);
-    this->Fonts["notiFont"] = notiFont;
+    Pimpl->ExtraFonts["notiFont"] = notiFont;
   }
   else
   {
@@ -532,7 +533,7 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
       this->FontFile.c_str(), 18 * this->FontScale, &fontConfig, ranges.Data);
     ImFont* notiFont = io.Fonts->AddFontFromFileTTF(
       this->FontFile.c_str(), 18 * this->FontScale * .8f, &fontConfig, ranges.Data);
-    this->Fonts["notiFont"] = notiFont;
+    Pimpl->ExtraFonts["notiFont"] = notiFont;
   }
 
   io.Fonts->Build();
@@ -1213,12 +1214,18 @@ void vtkF3DImguiActor::RenderNotifications()
   {
     const double elapsed = this->TotalTime - startTime;
 
+    std::string description = desc;
+    if (!value.empty())
+    {
+      description += ':';
+    }
+
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
     // Mimic the style format in cheatsheet
-    ImGui::PushFont(this->Fonts["notiFont"]);
+    ImGui::PushFont(Pimpl->ExtraFonts["notiFont"]);
     constexpr float margin = F3DStyle::GetDefaultMargin();
-    ImVec2 descLineSize = ImGui::CalcTextSize(desc.c_str());
+    ImVec2 descLineSize = ImGui::CalcTextSize(description.c_str());
     ImVec2 valueLineSize = ImGui::CalcTextSize(value.c_str());
     ImVec2 windowPadding = ImGui::GetStyle().WindowPadding;
     const float itemSpacingX = ImGui::GetStyle().ItemSpacing.x;
@@ -1305,7 +1312,7 @@ void vtkF3DImguiActor::RenderNotifications()
     float posX = (windowWidth - descLineWidth) * 0.5f; // Text centering
     ImGui::SetCursorPosX(posX);
 
-    ImGui::TextColored(descTextColor, "%s", desc.c_str());
+    ImGui::TextColored(descTextColor, "%s", description.c_str());
     if (!value.empty())
     {
       ImGui::SameLine();

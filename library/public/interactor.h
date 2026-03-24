@@ -151,13 +151,6 @@ public:
   virtual interactor& initBindings() = 0;
 
   /**
-   * Initialize binding notification map for interaction key press binding notification.
-   * Call after initialization of default binding and before adding custom binding,
-   * prevent the default binding documentation callback overwrite by custom binding.
-   */
-  virtual interactor& initBindNotificationMap() = 0;
-
-  /**
    * Use this method to add binding, in order to trigger commands for a specific bind
    *
    * Bind modifiers is a binary flag from the dedicated enum that represent KeyModifiers.
@@ -183,11 +176,13 @@ public:
    * ANY modifier interactions will only be triggered if no other interaction bind with modifier
    * is found.
    *
+   * If skipNotify is true, no notification is triggered when pressing the binding
+   *
    * Adding commands for an existing bind will throw a interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
     std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER) = 0;
+    BindingType type = BindingType::OTHER, bool skipNotify = false) = 0;
 
   /**
    * See addBinding
@@ -198,17 +193,17 @@ public:
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::string command,
     std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER) = 0;
+    BindingType type = BindingType::OTHER, bool skipNotify = false) = 0;
 
   /**
    * Convenience initializer list signature for add binding method
    */
   interactor& addBinding(const interaction_bind_t& bind, std::initializer_list<std::string> list,
     std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER)
+    BindingType type = BindingType::OTHER, bool skipNotify = false)
   {
     return this->addBinding(bind, std::vector<std::string>(list), std::move(group),
-      std::move(documentationCallback), type);
+      std::move(documentationCallback), type, skipNotify);
   }
 
   /**

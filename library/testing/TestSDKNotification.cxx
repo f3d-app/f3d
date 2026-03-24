@@ -63,8 +63,6 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
     std::bind(docTgl, "Show Bind Keys", std::cref(opt.ui.feedback.show_bindings)),
     f3d::interactor::BindingType::TOGGLE);
 
-  inter.initBindNotificationMap();
-
   inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "Exclam");
   inter.triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "Exclam");
   inter.addNotification("Test Notification", "Test Value");

@@ -48,10 +48,10 @@ public:
   interactor& initBindings() override;
   interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
     std::string group = std::string(), documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER) override;
+    BindingType type = BindingType::OTHER, bool skipNotify = false) override;
   interactor& addBinding(const interaction_bind_t& bind, std::string command,
     std::string group = std::string(), documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER) override;
+    BindingType type = BindingType::OTHER, bool skipNotify = false) override;
   interactor& removeBinding(const interaction_bind_t& bind) override;
   std::vector<std::string> getBindGroups() const override;
   std::vector<interaction_bind_t> getBindsForGroup(std::string group) const override;
@@ -59,7 +59,6 @@ public:
   std::pair<std::string, std::string> getBindingDocumentation(
     const interaction_bind_t& bind) const override;
   BindingType getBindingType(const interaction_bind_t& bind) const override;
-  interactor& initBindNotificationMap() override;
 
   interactor& triggerEventLoop(double deltaTime) override;
   interactor& triggerModUpdate(InputModifier mod) override;
@@ -138,19 +137,6 @@ public:
 private:
   class internals;
   std::unique_ptr<internals> Internals;
-
-  /**
-   * Implementation only API.
-   * Add or modify binding documentation callback to binding notification map using command string
-   * as key.
-   */
-  void SetBindNotiCallback(std::string command, documentation_callback_t doc_callback);
-
-  /**
-   * Implementation only API.
-   * Remove element from binding notification map using command string.
-   */
-  void RemoveBindNotiCallback(std::string command);
 };
 }
 }
