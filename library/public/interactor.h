@@ -151,6 +151,13 @@ public:
   virtual interactor& initBindings() = 0;
 
   /**
+   * Initialize binding notification map for interaction key press binding notification.
+   * Call after initialization of default binding and before adding custom binding,
+   * prevent the default binding documentation callback overwrite by custom binding.
+   */
+  virtual interactor& initBindNotificationMap() = 0;
+
+  /**
    * Use this method to add binding, in order to trigger commands for a specific bind
    *
    * Bind modifiers is a binary flag from the dedicated enum that represent KeyModifiers.
@@ -412,6 +419,11 @@ public:
    * Safe to call in a multithreaded environment.
    */
   virtual interactor& requestStop() = 0;
+
+  /**
+   * Trigger a single text line notification at the bottom left of viewport.
+   */
+  virtual void addNotification(std::string desc, std::string value = "", double duration = 3.f) = 0;
 
   /**
    * An exception that can be thrown by the interactor

@@ -11,10 +11,13 @@
 #include <vtkProp.h>
 
 #include <array>
+#include <chrono>
 #include <cstdint>
 #include <deque>
+#include <map>
 
 class vtkOpenGLRenderWindow;
+class ImFont;
 
 class vtkF3DUIActor : public vtkProp
 {
@@ -36,6 +39,15 @@ public:
 
   using CheatSheetTuple = std::tuple<std::string, std::string, std::string, CheatSheetBindingType>;
   using CheatSheetGroup = std::pair<std::string, std::vector<CheatSheetTuple>>;
+
+  struct Notification
+  {
+    std::string desc;
+    std::string value;
+    std::string bind;
+    double duration;
+    double startTime;
+  };
 
   /**
    * Initialize the UI actor resources
@@ -149,6 +161,18 @@ public:
   void SetFpsCounterVisibility(bool show);
 
   /**
+   * Set the notification visibility
+   * False by default
+   */
+  void SetNotificationVisibility(bool show);
+
+  /**
+   * Set the bindings visibility in notifications
+   * False by default
+   */
+  void SetBindingsVisibility(bool show);
+
+  /**
    * Updates the fps value
    * 0 by default
    */
@@ -186,6 +210,17 @@ public:
   virtual void SetDeltaTime(double)
   {
   }
+
+  /**
+   * Set the total time (time since app start) in seconds
+   */
+  void SetTotalTime(double time);
+
+  /**
+   * Add notification info to deque
+   */
+  void AddNotification(
+    std::string desc, std::string value = "", std::string bind = "", double duration = 3.0);
 
 protected:
   vtkF3DUIActor();
@@ -267,6 +302,13 @@ protected:
   virtual void RenderConsoleBadge()
   {
   }
+
+  /**
+   * Render the notifications
+   */
+  virtual void RenderNotifications()
+  {
+  }
   bool DropZoneLogoVisible = false;
   bool DropZoneVisible = false;
   std::string DropText = "";
@@ -298,8 +340,11 @@ protected:
   double TotalFrameTimes = 0.0;
   int FpsValue = 0;
 
+  double TotalTime = 0.0;
+
   std::string FontFile = "";
   double FontScale = 1.0;
+  std::map<std::string, ImFont*> Fonts;
 
   /**
    * Initializing the vector here because its needed in the initialization function,
@@ -308,6 +353,10 @@ protected:
   std::array<double, 3> FontColor = { 1.0, 1.0, 1.0 };
 
   double BackdropOpacity = 0.9;
+
+  bool NotificationVisible = false;
+  bool BindingsVisible = false;
+  std::deque<Notification> Notifications;
 
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;

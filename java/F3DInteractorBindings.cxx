@@ -207,6 +207,12 @@ extern "C"
     return self;
   }
 
+  JNIEXPORT jobject JAVA_BIND(Interactor, initBindNotificationMap)(JNIEnv* env, jobject self)
+  {
+    GetInteractor(env, self).initBindNotificationMap();
+    return self;
+  }
+
   JNIEXPORT jobject JAVA_BIND(Interactor, addBindingCommands)(
     JNIEnv* env, jobject self, jobject bind, jobject commands, jstring group, jobject type)
   {
@@ -669,5 +675,11 @@ extern "C"
   {
     GetInteractor(env, self).requestStop();
     return self;
+  }
+
+  JNIEXPORT void JAVA_BIND(Interactor, addNotification)(
+    JNIEnv* env, jobject self, jstring desc, jstring value, jdouble duration)
+  {
+    GetInteractor(env, self).addNotification(desc, value, duration);
   }
 }

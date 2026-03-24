@@ -298,6 +298,16 @@
     "scene_hierarchy": {
       "type": "bool",
       "default_value": "false"
+    },
+    "feedback": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "show_bindings": {
+        "type": "bool",
+        "default_value": "false"
+      }
     }
   },
   "model": {

@@ -32,6 +32,7 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
 #include <vtkStringArray.h>
+#include <vtkTimerLog.h>
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
@@ -509,6 +510,7 @@ public:
       for (const std::string& command : commandsIt->second.CommandVector)
       {
         std::string commandWithArgs = command;
+        std::string commandWithoutArgs = command;
         if (!argsString.empty())
         {
           commandWithArgs.push_back(' ');
@@ -519,6 +521,7 @@ public:
           // XXX: Ignore the boolean return of triggerCommand,
           // error is already logged by triggerCommand
           this->Interactor.triggerCommand(commandWithArgs);
+          this->TriggerBindingNotification(commandWithoutArgs, bind.format());
         }
         catch (const f3d::interactor::command_runtime_exception& ex)
         {
@@ -536,9 +539,45 @@ public:
   }
 
   //----------------------------------------------------------------------------
+  void TriggerBindingNotification(std::string command, std::string bind)
+  {
+#if F3D_MODULE_UI
+    if (this->BindNotificationMap.find(command) != this->BindNotificationMap.end())
+    {
+      auto [description, value] = this->BindNotificationMap[command]();
+      if (!value.empty())
+      {
+        description.append(":");
+      }
+      vtkRenderWindow* renWin = this->Window.GetRenderWindow();
+      vtkF3DRenderer* ren =
+        vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+
+      ren->AddNotification(description, value, bind);
+    }
+#endif
+  }
+
+  //----------------------------------------------------------------------------
+  void LoadBindNotiCallback()
+  {
+    for (const auto& bind : this->Bindings)
+    {
+      const auto& [bind_inter, bind_comm] = bind;
+
+      for (const auto& commStr : bind_comm.CommandVector)
+      {
+        std::string comm_str = commStr;
+        documentation_callback_t doc_callback = bind_comm.DocumentationCallback;
+        this->BindNotificationMap.try_emplace(std::move(comm_str), std::move(doc_callback));
+      }
+    }
+  }
+
+  //----------------------------------------------------------------------------
   bool StartEventLoop(double deltaTime, std::function<void()> userCallBack)
   {
-    if (this->EventLoopObserverId != -1)
+    if (this->EventLoopObserverId[0] != -1)
     {
       log::info("Interaction: event loop has already been started");
       return false;
@@ -561,10 +600,15 @@ public:
       [](vtkObject*, unsigned long, void* clientData, void*)
       {
         internals* that = static_cast<internals*>(clientData);
-        that->EventLoop(that->CallbackDeltaTime);
+        double now = vtkTimerLog::GetUniversalTime();
+        double dt = now - that->LastTime;
+        that->LastTime = now;
+        that->EventLoop(dt);
       });
-    this->EventLoopObserverId =
+    this->EventLoopObserverId[0] =
       this->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
+    // this->EventLoopObserverId[1] =
+    //   this->VTKInteractor->AddObserver(vtkCommand::InteractionEvent, timerCallBack);
     timerCallBack->SetClientData(this);
     return true;
   }
@@ -572,14 +616,16 @@ public:
   //----------------------------------------------------------------------------
   bool StopEventLoop()
   {
-    if (this->EventLoopObserverId == -1)
+    if (this->EventLoopObserverId[0] == -1)
     {
       log::info("Interaction: event loop has not been started hence cannot be stopped");
       return false;
     }
-    this->VTKInteractor->RemoveObserver(this->EventLoopObserverId);
+    this->VTKInteractor->RemoveObserver(this->EventLoopObserverId[0]);
+    // this->VTKInteractor->RemoveObserver(this->EventLoopObserverId[1]);
     this->VTKInteractor->DestroyTimer(this->EventLoopTimerId);
-    this->EventLoopObserverId = -1;
+    this->EventLoopObserverId[0] = -1;
+    this->EventLoopObserverId[1] = -1;
     this->EventLoopTimerId = 0;
     return true;
   }
@@ -624,6 +670,8 @@ public:
     vtkRenderWindow* renWin = this->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
     ren->SetUIDeltaTime(deltaTime);
+    ren->SetTotalTime(ren->GetTotalTime() + deltaTime);
+    ren->SetUITotalTime(ren->GetTotalTime());
 
     // Determine if we need a full render or just a UI render
     // At the moment, only TAA requires a full render each frame
@@ -659,6 +707,7 @@ public:
   std::map<interaction_bind_t, BindingCommands> Bindings;
   std::multimap<std::string, interaction_bind_t> GroupedBinds;
   std::vector<std::string> OrderedBindGroups;
+  std::map<std::string, documentation_callback_t> BindNotificationMap;
 
   std::map<std::string, std::string> AliasMap;
 
@@ -672,11 +721,12 @@ public:
 
   std::function<void()> EventLoopUserCallBack = nullptr;
   unsigned long EventLoopTimerId = 0;
-  int EventLoopObserverId = -1;
+  int EventLoopObserverId[2] = { -1, -1 };
   std::atomic<bool> RenderRequested = false;
   std::atomic<bool> StopRequested = false;
 
   double CallbackDeltaTime = 1.0 / 30; /* Default DeltaTime (30fps) */
+  double LastTime = vtkTimerLog::GetUniversalTime();
 };
 
 //----------------------------------------------------------------------------
@@ -691,6 +741,7 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
   this->initCommands();
   this->initBindings();
 #if F3D_MODULE_UI
+  this->initBindNotificationMap();
   vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
   assert(console != nullptr);
   console->SetCompletionCallback(
@@ -1838,6 +1889,90 @@ f3d::interactor::BindingType interactor_impl::getBindingType(const interaction_b
   return it->second.Type;
 }
 
+//----------------------------------------------------------------------------
+interactor& interactor_impl::initBindNotificationMap()
+{
+#if F3D_MODULE_UI
+  this->Internals->BindNotificationMap.clear();
+  f3d::options& opts = this->Internals->Options;
+
+  this->Internals->LoadBindNotiCallback();
+
+  // Define lambdas used for documentation
+
+  // "Animation Forward/Backward" , "Playing/Paused" or "No Animation";
+  auto docPlayAnim = [&](const std::string& desc)
+  {
+    std::string value = this->Internals->AnimationManager->GetAnimationName() == "No animation"
+      ? "No Animation"
+      : this->isPlayingAnimation() ? "Playing"
+                                   : "Paused";
+
+    return std::pair(desc, value);
+  };
+
+  // "Cycle array to color with" , "arrayName"
+  auto docColorArray = [&]()
+  {
+    // enable + no array : ON
+    // enable + array : array
+    // no enable + array : array (forced)
+    // no enable + no array : OFF
+    return std::pair("Color array",
+      (opts.model.scivis.array_name.has_value()
+          ? opts.model.scivis.array_name.value() + (opts.model.scivis.enable ? "" : " (forced)")
+          : opts.model.scivis.enable ? "ON"
+                                     : "OFF"));
+  };
+
+  // Delete and modify some binding command callback
+  this->RemoveBindNotiCallback("open_file_dialog");
+  this->RemoveBindNotiCallback("add_files_or_set_hdri");
+  this->RemoveBindNotiCallback("add_files");
+  this->RemoveBindNotiCallback("set_hdri");
+  this->RemoveBindNotiCallback("exit");
+  this->RemoveBindNotiCallback("toggle ui.console");
+  this->RemoveBindNotiCallback("toggle ui.cheatsheet");
+
+  this->SetBindNotiCallback("toggle_animation", std::bind(docPlayAnim, "Animation Forward"));
+  this->SetBindNotiCallback(
+    "toggle_animation_backward", std::bind(docPlayAnim, "Animation Backward"));
+  this->SetBindNotiCallback("cycle_coloring array", docColorArray);
+#endif
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+void interactor_impl::SetBindNotiCallback(
+  std::string command, documentation_callback_t doc_callback)
+{
+#if F3D_MODULE_UI
+  this->Internals->BindNotificationMap.insert_or_assign(
+    std::move(command), std::move(doc_callback));
+#endif
+}
+
+//----------------------------------------------------------------------------
+void interactor_impl::RemoveBindNotiCallback(std::string command)
+{
+#if F3D_MODULE_UI
+  this->Internals->BindNotificationMap.erase(command);
+#endif
+}
+
+//----------------------------------------------------------------------------
+void interactor_impl::addNotification(std::string desc, std::string value, double duration)
+{
+#if F3D_MODULE_UI
+  if (!desc.empty())
+  {
+    vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
+    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+
+    ren->AddNotification(desc, value, std::string(), duration);
+  }
+#endif
+}
 //----------------------------------------------------------------------------
 interactor& interactor_impl::triggerModUpdate(InputModifier mod)
 {

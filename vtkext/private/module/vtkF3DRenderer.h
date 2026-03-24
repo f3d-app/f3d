@@ -104,6 +104,8 @@ public:
   void ShowHDRISkybox(bool show);
   void ShowArmature(bool show);
   void ShowSceneHierarchy(bool show);
+  void ShowNotification(bool show);
+  void ShowBindings(bool show);
   ///@}
 
   using vtkOpenGLRenderer::SetBackground;
@@ -518,9 +520,26 @@ public:
   void SetUIDeltaTime(double time);
 
   /**
+   * Set the UI total time (time since app start) in seconds
+   */
+  void SetUITotalTime(double time);
+
+  /**
+   * Set/Get the total animation time (cumulative time of each frame being rendered) in seconds
+   */
+  vtkSetMacro(TotalTime, double);
+  vtkGetMacro(TotalTime, double);
+
+  /**
    * Set console badge enabled status
    */
   void SetConsoleBadgeEnabled(bool enabled);
+
+  /**
+   * Add notification info to deque
+   */
+  void AddNotification(
+    std::string desc, std::string value = "", std::string bind = "", double duration = 3.0);
 
 private:
   vtkF3DRenderer();
@@ -666,6 +685,7 @@ private:
   vtkSmartPointer<vtkCameraOrientationRepresentation> ModernAxisRepresentation;
   vtkSmartPointer<vtkCallbackCommand> ModernAxisWidgetResizeCallback;
   double ModernAxisBackdropOpacity = 0.0;
+  double TotalTime = 0.0;
 
   // Does vtk version support GridAxesActor
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)

@@ -348,7 +348,12 @@ PYBIND11_MODULE(pyf3d, module)
     .def("get_binds_for_group", &f3d::interactor::getBindsForGroup)
     .def("get_binds", &f3d::interactor::getBinds)
     .def("get_binding_documentation", &f3d::interactor::getBindingDocumentation)
-    .def("get_binding_type", &f3d::interactor::getBindingType);
+    .def("get_binding_type", &f3d::interactor::getBindingType)
+    .def("init_bind_notification_map", &f3d::interactor::initBindNotificationMap,
+      "Initialize binding notification map for interaction key press binding notification")
+    .def("add_notification"), &f3d::interactor::addNotification,
+      "Trigger a single text line notification at the bottom left of viewport"
+      py::arg("desc"), py::arg("value") = "", py::arg("duration") = 3.0);
 
   interactor
     .def("add_binding",

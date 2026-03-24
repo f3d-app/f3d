@@ -116,6 +116,24 @@ void vtkF3DUIActor::SetFpsCounterVisibility(bool show)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetNotificationVisibility(bool show)
+{
+  if (this->NotificationVisible != show)
+  {
+    this->NotificationVisible = show;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetBindingsVisibility(bool show)
+{
+  if (this->BindingsVisible != show)
+  {
+    this->BindingsVisible = show;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::UpdateFpsValue(const double elapsedFrameTime)
 {
   this->TotalFrameTimes += elapsedFrameTime;
@@ -171,6 +189,12 @@ void vtkF3DUIActor::SetBackdropOpacity(const double backdropOpacity)
     this->BackdropOpacity = backdropOpacity;
     this->Initialized = false;
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetTotalTime(double time)
+{
+  this->TotalTime = time;
 }
 
 //----------------------------------------------------------------------------
@@ -241,7 +265,36 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
     this->RenderFpsCounter();
   }
 
+  // clear outdated notifications
+  while (!this->Notifications.empty() &&
+    (this->TotalTime - this->Notifications.back().startTime) > this->Notifications.back().duration)
+  {
+    this->Notifications.pop_back();
+  }
+
+  if (this->NotificationVisible)
+  {
+    this->RenderNotifications();
+  }
+
   this->EndFrame(renWin);
 
   return 1;
+}
+
+void vtkF3DUIActor::AddNotification(
+  std::string desc, std::string value, std::string bind, double duration)
+{
+  if (this->NotificationVisible)
+  {
+    for (auto it = this->Notifications.begin(); it != this->Notifications.end(); ++it)
+    {
+      if (desc == (*it).desc)
+      {
+        Notifications.erase(it); // Remove duplicate
+        break;
+      }
+    }
+    this->Notifications.emplace_front(Notification{ desc, value, bind, duration, this->TotalTime });
+  }
 }

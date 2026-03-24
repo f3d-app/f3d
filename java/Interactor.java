@@ -215,6 +215,15 @@ public class Interactor {
     public native Interactor initBindings();
 
     /**
+     * Initialize binding notification map for interaction key press binding notification.
+     * Call after initialization of default binding and before adding custom binding,
+     * prevent the default binding documentation callback overwrite by custom binding.
+     *
+     * @return this interactor for method chaining
+     */
+    public native Interactor initBindNotificationMap();
+
+    /**
      * Add binding to trigger commands for a specific bind.
      *
      * @param bind interaction bind (key combination)
@@ -544,4 +553,32 @@ public class Interactor {
      * @return this interactor for method chaining
      */
     public native Interactor requestStop();
+
+    /**
+     * Trigger a single text line notification at the bottom left of viewport.
+     *
+     * @param desc Text description
+     * @param value Text value
+     * @param duration Duration of notification in second
+     */
+    public native void addNotification(String desc, String value, double duration);
+
+    /**
+     * Trigger a notification with default value and duration.
+     *
+     * @param desc Text description
+     */
+    public void addNotification(String desc) {
+        addNotification(desc, "", 3.0);
+    }
+
+    /**
+     * Trigger a notification with default duration.
+     *
+     * @param desc Text description
+     * @param value Text value
+     */
+    public void addNotification(String desc, String value) {
+        addNotification(desc, value, 3.0);
+    }
 }

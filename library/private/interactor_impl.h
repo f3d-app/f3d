@@ -59,6 +59,7 @@ public:
   std::pair<std::string, std::string> getBindingDocumentation(
     const interaction_bind_t& bind) const override;
   BindingType getBindingType(const interaction_bind_t& bind) const override;
+  interactor& initBindNotificationMap() override;
 
   interactor& triggerEventLoop(double deltaTime) override;
   interactor& triggerModUpdate(InputModifier mod) override;
@@ -80,6 +81,8 @@ public:
   bool playInteraction(const std::filesystem::path& file, double deltaTime,
     std::function<void()> userCallBack) override;
   bool recordInteraction(const std::filesystem::path& file) override;
+
+  void addNotification(std::string desc, std::string value = "", double duration = 3.f) override;
 
   interactor& start(double deltaTime, std::function<void()> userCallBack) override;
   interactor& stop() override;
@@ -135,6 +138,19 @@ public:
 private:
   class internals;
   std::unique_ptr<internals> Internals;
+
+  /**
+   * Implementation only API.
+   * Add or modify binding documentation callback to binding notification map using command string
+   * as key.
+   */
+  void SetBindNotiCallback(std::string command, documentation_callback_t doc_callback);
+
+  /**
+   * Implementation only API.
+   * Remove element from binding notification map using command string.
+   */
+  void RemoveBindNotiCallback(std::string command);
 };
 }
 }
