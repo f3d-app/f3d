@@ -1,5 +1,7 @@
 #include "vtkF3DUIActor.h"
 
+#include <algorithm>
+
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkViewport.h>
@@ -118,19 +120,13 @@ void vtkF3DUIActor::SetFpsCounterVisibility(bool show)
 //----------------------------------------------------------------------------
 void vtkF3DUIActor::SetNotificationVisibility(bool show)
 {
-  if (this->NotificationVisible != show)
-  {
-    this->NotificationVisible = show;
-  }
+  this->NotificationVisible = show;
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DUIActor::SetBindingsVisibility(bool show)
 {
-  if (this->BindingsVisible != show)
-  {
-    this->BindingsVisible = show;
-  }
+  this->BindingsVisible = show;
 }
 
 //----------------------------------------------------------------------------
@@ -285,13 +281,11 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
 void vtkF3DUIActor::AddNotification(
   const std::string& desc, const std::string& value, const std::string& bind, double duration)
 {
-  for (auto it = this->Notifications.begin(); it != this->Notifications.end(); ++it)
+  auto it = std::find_if(this->Notifications.begin(), this->Notifications.end(),
+    [&](const Notification& n) { return desc == n.desc; });
+  if (it != this->Notifications.end())
   {
-    if (desc == it->desc)
-    {
-      this->Notifications.erase(it); // Remove duplicate
-      break;
-    }
+    this->Notifications.erase(it); // Remove duplicate
   }
   this->Notifications.emplace_front(Notification{ desc, value, bind, duration, this->TotalTime });
 }
