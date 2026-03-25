@@ -105,7 +105,7 @@ private:
    * Render the notifications at the bottom left of veiwport.
    * Newest to oldest, from bottom to top.
    */
-  void RenderNotifications() override;
+  void RenderNotifications(double currentTime) override;
 
 private:
   vtkF3DImguiActor(const vtkF3DImguiActor&) = delete;

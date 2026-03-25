@@ -1,10 +1,13 @@
 #include "vtkF3DUIActor.h"
 
-#include <algorithm>
+#include "vtkF3DRenderer.h"
 
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLRenderWindow.h>
+#include <vtkRendererCollection.h>
 #include <vtkViewport.h>
+
+#include <algorithm>
 
 vtkObjectFactoryNewMacro(vtkF3DUIActor);
 
@@ -188,12 +191,6 @@ void vtkF3DUIActor::SetBackdropOpacity(const double backdropOpacity)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DUIActor::SetTotalTime(double time)
-{
-  this->TotalTime = time;
-}
-
-//----------------------------------------------------------------------------
 int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
 {
   vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(vp->GetVTKWindow());
@@ -261,16 +258,20 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
     this->RenderFpsCounter();
   }
 
+  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+  assert(ren != nullptr);
+
+  double currentTime = ren->GetTotalTime();
+
   // clear outdated notifications
-  while (!this->Notifications.empty() &&
-    (this->TotalTime - this->Notifications.back().startTime) > this->Notifications.back().duration)
+  while (!this->Notifications.empty() && currentTime > this->Notifications.back().stopTime)
   {
     this->Notifications.pop_back();
   }
 
   if (this->NotificationVisible)
   {
-    this->RenderNotifications();
+    this->RenderNotifications(currentTime);
   }
 
   this->EndFrame(renWin);
@@ -279,7 +280,7 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
 }
 
 void vtkF3DUIActor::AddNotification(
-  const std::string& desc, const std::string& value, const std::string& bind, double duration)
+  const std::string& desc, const std::string& value, const std::string& bind, double stopTime)
 {
   auto it = std::find_if(this->Notifications.begin(), this->Notifications.end(),
     [&](const Notification& n) { return desc == n.desc; });
@@ -287,5 +288,5 @@ void vtkF3DUIActor::AddNotification(
   {
     this->Notifications.erase(it); // Remove duplicate
   }
-  this->Notifications.emplace_front(Notification{ desc, value, bind, duration, this->TotalTime });
+  this->Notifications.emplace_front(Notification{ desc, value, bind, stopTime });
 }

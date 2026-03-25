@@ -642,7 +642,6 @@ public:
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
     ren->SetUIDeltaTime(deltaTime);
     ren->SetTotalTime(ren->GetTotalTime() + deltaTime);
-    ren->SetUITotalTime(ren->GetTotalTime());
 
     // Determine if we need a full render or just a UI render
     // At the moment, only TAA requires a full render each frame

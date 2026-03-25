@@ -1206,14 +1206,12 @@ void vtkF3DImguiActor::SetDeltaTime(double time)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DImguiActor::RenderNotifications()
+void vtkF3DImguiActor::RenderNotifications(double currentTime)
 {
   int index = 0;
 
-  for (const auto& [desc, value, bind, duration, startTime] : this->Notifications)
+  for (const auto& [desc, value, bind, stopTime] : this->Notifications)
   {
-    const double elapsed = this->TotalTime - startTime;
-
     std::string description = desc;
     if (!value.empty())
     {
@@ -1278,12 +1276,9 @@ void vtkF3DImguiActor::RenderNotifications()
       valueTextColor = F3DStyle::imgui::GetErrorColor(); // Red
     }
 
-    float alpha = 1.f, fading = .5f;
+    constexpr double fadingTime = 0.5;
+    float alpha = std::clamp((stopTime - currentTime) / fadingTime, 0.0, 1.0);
 
-    if ((duration - elapsed) < fading)
-    {
-      alpha = (duration - elapsed) / fading;
-    }
     descTextColor.w = alpha;
     valueTextColor.w = alpha;
     bindingTextColor.w = alpha;

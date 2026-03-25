@@ -44,8 +44,7 @@ public:
     std::string desc;
     std::string value;
     std::string bind;
-    double duration;
-    double startTime;
+    double stopTime;
   };
 
   /**
@@ -211,15 +210,10 @@ public:
   }
 
   /**
-   * Set the total time (time since app start) in seconds
-   */
-  void SetTotalTime(double time);
-
-  /**
    * Add notification info to deque
    */
   void AddNotification(
-    const std::string& desc, const std::string& value, const std::string& bind, double duration);
+    const std::string& desc, const std::string& value, const std::string& bind, double stopTime);
 
 protected:
   vtkF3DUIActor();
@@ -305,7 +299,7 @@ protected:
   /**
    * Render the notifications
    */
-  virtual void RenderNotifications()
+  virtual void RenderNotifications(double vtkNotUsed(currenTime))
   {
   }
 
@@ -339,8 +333,6 @@ protected:
 
   double TotalFrameTimes = 0.0;
   int FpsValue = 0;
-
-  double TotalTime = 0.0;
 
   std::string FontFile = "";
   double FontScale = 1.0;

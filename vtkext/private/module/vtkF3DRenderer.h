@@ -520,11 +520,6 @@ public:
   void SetUIDeltaTime(double time);
 
   /**
-   * Set the UI total time (time since app start) in seconds
-   */
-  void SetUITotalTime(double time);
-
-  /**
    * Set/Get the total animation time (cumulative time of each frame being rendered) in seconds
    */
   vtkSetMacro(TotalTime, double);
