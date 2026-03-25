@@ -207,8 +207,8 @@ extern "C"
     return self;
   }
 
-  JNIEXPORT jobject JAVA_BIND(Interactor, addBindingCommands)(
-    JNIEnv* env, jobject self, jobject bind, jobject commands, jstring group, jobject type, jboolean notify)
+  JNIEXPORT jobject JAVA_BIND(Interactor, addBindingCommands)(JNIEnv* env, jobject self,
+    jobject bind, jobject commands, jstring group, jobject type, jboolean notify)
   {
     f3d::interaction_bind_t nativeBind = JavaBindToNative(env, bind);
 
@@ -252,12 +252,13 @@ extern "C"
         break;
     }
 
-    GetInteractor(env, self).addBinding(nativeBind, commandsVec, groupCpp, nullptr, nativeType, notify);
+    GetInteractor(env, self).addBinding(
+      nativeBind, commandsVec, groupCpp, nullptr, nativeType, notify);
     return self;
   }
 
-  JNIEXPORT jobject JAVA_BIND(Interactor, addBindingCommand)(
-    JNIEnv* env, jobject self, jobject bind, jstring command, jstring group, jobject type, jboolean notify)
+  JNIEXPORT jobject JAVA_BIND(Interactor, addBindingCommand)(JNIEnv* env, jobject self,
+    jobject bind, jstring command, jstring group, jobject type, jboolean notify)
   {
     f3d::interaction_bind_t nativeBind = JavaBindToNative(env, bind);
 
@@ -291,7 +292,8 @@ extern "C"
         break;
     }
 
-    GetInteractor(env, self).addBinding(nativeBind, commandCpp, groupCpp, nullptr, nativeType, notify);
+    GetInteractor(env, self).addBinding(
+      nativeBind, commandCpp, groupCpp, nullptr, nativeType, notify);
     return self;
   }
 
