@@ -1314,11 +1314,11 @@ void vtkF3DImguiActor::RenderNotifications(double currentTime)
 
       if (keys.size() > 1)
       {
-        ImGui::TextColored(descTextColor, "Bind Keys:");
+        ImGui::TextColored(descTextColor, "%s", "Bind Keys:");
       }
       else
       {
-        ImGui::TextColored(descTextColor, "Bind Key:");
+        ImGui::TextColored(descTextColor, "%s", "Bind Key:");
       }
       ImGui::SameLine();
 
@@ -1343,7 +1343,7 @@ void vtkF3DImguiActor::RenderNotifications(double currentTime)
         if (key != keys.back())
         {
           ImGui::SameLine();
-          ImGui::TextColored(descTextColor, "+");
+          ImGui::TextColored(descTextColor, "%s", "+");
         }
         ImGui::SameLine();
       }

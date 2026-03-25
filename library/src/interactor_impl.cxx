@@ -32,7 +32,6 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
 #include <vtkStringArray.h>
-#include <vtkTimerLog.h>
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 

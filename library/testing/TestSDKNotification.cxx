@@ -14,9 +14,9 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
 {
   PseudoUnitTest test;
 
-  std::string DataPath = std::string(argv[1]) + "data/cow.vtp";
-  std::string BaselinePath = std::string(argv[1]) + "baselines/";
-  std::string OutputPath = std::string(argv[2]);
+  std::string dataPath = std::string(argv[1]) + "data/cow.vtp";
+  std::string baselinePath = std::string(argv[1]) + "baselines/";
+  std::string outputPath = std::string(argv[2]);
 
   f3d::engine eng = f3d::engine::create(true);
   f3d::window& win = eng.getWindow();
@@ -27,7 +27,7 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   win.setSize(300, 300);
   opt.ui.notifications.enable = true;
   opt.ui.notifications.show_bindings = true;
-  sce.add(DataPath);
+  sce.add(dataPath);
   win.render();
 
   inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "E");
@@ -38,7 +38,7 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   inter.triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "G");
 
   test("stacking notifications",
-    TestSDKHelpers::RenderTest(win, BaselinePath, OutputPath, "TestSDKNotificationStack"));
+    TestSDKHelpers::RenderTest(win, baselinePath, outputPath, "TestSDKNotificationStack"));
 
   inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "E");
   inter.triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "E");
@@ -51,7 +51,7 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   inter.triggerEventLoop(2.5);
 
   test("notifications fading",
-    TestSDKHelpers::RenderTest(win, BaselinePath, OutputPath, "TestSDKNotificationFading"));
+    TestSDKHelpers::RenderTest(win, baselinePath, outputPath, "TestSDKNotificationFading"));
   inter.triggerEventLoop(.5);
 
   auto docTgl = [&](const std::string& doc, const bool& value) {
@@ -68,7 +68,7 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   inter.addNotification("Test Notification", "Test Value");
 
   test("user define notifications",
-    TestSDKHelpers::RenderTest(win, BaselinePath, OutputPath, "TestSDKNotificationUser"));
+    TestSDKHelpers::RenderTest(win, baselinePath, outputPath, "TestSDKNotificationUser"));
 
   inter.triggerEventLoop(3.0);
   inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "E");
@@ -79,12 +79,12 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   inter.triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "G");
 
   test("turn off binding keys visibility",
-    TestSDKHelpers::RenderTest(win, BaselinePath, OutputPath, "TestSDKNotificationKeysOff"));
+    TestSDKHelpers::RenderTest(win, baselinePath, outputPath, "TestSDKNotificationKeysOff"));
 
   opt.ui.notifications.enable = false;
 
   test("turn off notification visibility",
-    TestSDKHelpers::RenderTest(win, BaselinePath, OutputPath, "TestSDKNotificationOff"));
+    TestSDKHelpers::RenderTest(win, baselinePath, outputPath, "TestSDKNotificationOff"));
 
   return test.result();
 }

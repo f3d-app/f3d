@@ -587,9 +587,11 @@ CLI: `--scene-hierarchy`.
 
 Show notifications at the bottom left of the viewport.
 
+CLI: `--notifications`.
+
 ### `ui.notifications.show_bindings` (_bool_, default: `false`)
 
-Show corresponding keys when notifications are trigger by bindings key press events.
+Show corresponding keys when notifications are triggered by bindings key press events.
 
 # APIs
 

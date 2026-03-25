@@ -264,7 +264,7 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
   double currentTime = ren->GetTotalTime();
 
   // clear outdated notifications
-  while (!this->Notifications.empty() && currentTime > this->Notifications.back().stopTime)
+  while (!this->Notifications.empty() && currentTime >= this->Notifications.back().stopTime)
   {
     this->Notifications.pop_back();
   }
