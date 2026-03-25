@@ -17,6 +17,3 @@ vtkF3DNamedColors::vtkF3DNamedColors()
   this->SetColor(vtkStdString("f3d_grey"), vtkColor3ub(F3DStyle::F3D_GREY));
   this->SetColor(vtkStdString("f3d_black"), vtkColor3ub(F3DStyle::F3D_BLACK));
 }
-
-// ----------------------------------------------------------------------------
-vtkF3DNamedColors::~vtkF3DNamedColors() = default;

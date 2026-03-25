@@ -18,7 +18,7 @@ public:
 
 protected:
   vtkF3DNamedColors();
-  ~vtkF3DNamedColors() override;
+  ~vtkF3DNamedColors() override = default;
 };
 
 #endif
