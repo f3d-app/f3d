@@ -86,6 +86,18 @@ The following formats are supported when parsing a color, case insensitive:
 - [color name](https://examples.vtk.org/site/ColorNamesSeries/ColorNamePatches.html)
 - F3D color name: `f3d_red`, `f3d_green`, `f3d_blue`, `f3d_yellow`, `f3d_white`, `f3d_grey` or `f3d_black`
 
+### F3D color reference:
+
+This is the reference of F3D color name strings to corresponding (R, G, B) values:
+
+- `f3d_red`: (249, 67, 6)
+- `f3d_green`: (122, 255, 122)
+- `f3d_blue`: (120, 139, 255)
+- `f3d_yellow`: (249, 178, 8)
+- `f3d_white`: (244, 244, 244)
+- `f3d_grey`: (84, 84, 84)
+- `f3d_black`: (20, 20, 20)
+
 See [W3C](https://www.w3.org/TR/css-color-3/#rgb-color) doc for more details on these formats.
 
 When formatting a color into a string, it is formatted as `#RRGGBB` if values are multiple of 255. Otherwise, it is formatted as vector of doubles.
