@@ -184,3 +184,4 @@ runs:
         --suppressions-list=.cppcheck.supp
         --inline-suppr
         --error-exitcode=1
+        --check-level=exhaustive
