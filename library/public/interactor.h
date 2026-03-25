@@ -176,13 +176,13 @@ public:
    * ANY modifier interactions will only be triggered if no other interaction bind with modifier
    * is found.
    *
-   * If skipNotify is true, no notification is triggered when pressing the binding
+   * If notify is true, a notification is triggered when pressing the binding
    *
    * Adding commands for an existing bind will throw a interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
     std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool skipNotify = false) = 0;
+    BindingType type = BindingType::OTHER, bool notify = true) = 0;
 
   /**
    * See addBinding
@@ -193,17 +193,17 @@ public:
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::string command,
     std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool skipNotify = false) = 0;
+    BindingType type = BindingType::OTHER, bool notify = true) = 0;
 
   /**
    * Convenience initializer list signature for add binding method
    */
   interactor& addBinding(const interaction_bind_t& bind, std::initializer_list<std::string> list,
     std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool skipNotify = false)
+    BindingType type = BindingType::OTHER, bool notify = true)
   {
     return this->addBinding(bind, std::vector<std::string>(list), std::move(group),
-      std::move(documentationCallback), type, skipNotify);
+      std::move(documentationCallback), type, notify);
   }
 
   /**
@@ -374,6 +374,11 @@ public:
   virtual interactor& triggerEventLoop(double deltaTime) = 0;
 
   /**
+   * Trigger a single text line notification at the bottom left of viewport.
+   */
+  virtual interactor& triggerNotification(std::string desc, std::string value = "", double duration = 3.f) = 0;
+
+  /**
    * Play a VTK interaction file.
    * Provided file path is used as is and file existence will be checked.
    * If the event loop is not already running, it will be triggered every deltaTime in seconds,
@@ -414,11 +419,6 @@ public:
    * Safe to call in a multithreaded environment.
    */
   virtual interactor& requestStop() = 0;
-
-  /**
-   * Trigger a single text line notification at the bottom left of viewport.
-   */
-  virtual void addNotification(std::string desc, std::string value = "", double duration = 3.f) = 0;
 
   /**
    * An exception that can be thrown by the interactor

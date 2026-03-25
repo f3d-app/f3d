@@ -38,6 +38,7 @@ f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been
 f3d_test(NAME TestInteractionNotifications DATA cow.vtp ARGS --notifications INTERACTION UI) #E;
 f3d_test(NAME TestInteractionNotificationsBindings DATA cow.vtp ARGS --notifications -Dui.notifications.show_bindings=ON INTERACTION UI) #E;
 f3d_test(NAME TestInteractionNotificationsBindingsModifier DATA cow.vtp ARGS --notifications -Dui.notifications.show_bindings=ON INTERACTION UI) #SHIFT+L;
+f3d_test(NAME TestInteractionToggleNotifications DATA cow.vtp INTERACTION UI) #CTRL+V;
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)

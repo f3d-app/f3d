@@ -552,7 +552,7 @@ public class Interactor {
      * @param value Text value
      * @param duration Duration of notification in second
      */
-    public native void addNotification(String desc, String value, double duration);
+    public native void triggerNotification(String desc, String value, double duration);
 
     /**
      * Trigger a notification with default duration.
@@ -560,8 +560,8 @@ public class Interactor {
      * @param desc Text description
      * @param value Text value
      */
-    public void addNotification(String desc, String value) {
-        addNotification(desc, value, 3.0);
+    public void triggerNotification(String desc, String value) {
+        triggerNotification(desc, value, 3.0);
     }
 
     /**
@@ -569,7 +569,7 @@ public class Interactor {
      *
      * @param desc Text description
      */
-    public void addNotification(String desc) {
-        addNotification(desc, "");
+    public void triggerNotification(String desc) {
+        triggerNotification(desc, "");
     }
 }

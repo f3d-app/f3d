@@ -2086,7 +2086,7 @@ void F3DStarter::EventLoop()
   {
     this->LoadRelativeFileGroup(0, true, true);
     this->Internals->ReloadFileRequested = false;
-    this->Internals->Engine->getInteractor().addNotification("File Group Reloaded");
+    this->Internals->Engine->getInteractor().triggerNotification("File Group Reloaded");
   }
 }
 

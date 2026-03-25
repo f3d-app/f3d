@@ -671,7 +671,7 @@ extern "C"
     return self;
   }
 
-  JNIEXPORT void JAVA_BIND(Interactor, addNotification)(
+  JNIEXPORT void JAVA_BIND(Interactor, triggerNotification)(
     JNIEnv* env, jobject self, jstring desc, jstring value, jdouble duration)
   {
     const char* descStr = env->GetStringUTFChars(desc, nullptr);
@@ -682,6 +682,6 @@ extern "C"
     std::string valueCpp = valueStr;
     env->ReleaseStringUTFChars(value, valueStr);
 
-    GetInteractor(env, self).addNotification(valueCpp, valueCpp, duration);
+    GetInteractor(env, self).triggerNotification(valueCpp, valueCpp, duration);
   }
 }

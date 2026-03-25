@@ -65,7 +65,7 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
 
   inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "Exclam");
   inter.triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "Exclam");
-  inter.addNotification("Test Notification", "Test Value");
+  inter.triggerNotification("Test Notification", "Test Value");
 
   test("user define notifications",
     TestSDKHelpers::RenderTest(win, baselinePath, outputPath, "TestSDKNotificationUser"));

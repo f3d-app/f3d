@@ -349,7 +349,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def("get_binds", &f3d::interactor::getBinds)
     .def("get_binding_documentation", &f3d::interactor::getBindingDocumentation)
     .def("get_binding_type", &f3d::interactor::getBindingType)
-    .def("add_notification", &f3d::interactor::addNotification,
+    .def("trigger_notification", &f3d::interactor::triggerNotification,
       "Trigger a single text line notification at the bottom left of viewport", py::arg("desc"),
       py::arg("value") = "", py::arg("duration") = 3.0);
 
@@ -360,14 +360,14 @@ PYBIND11_MODULE(pyf3d, module)
         &f3d::interactor::addBinding),
       "Add a binding command", py::arg("bind"), py::arg("command"), py::arg("group"),
       py::arg("documentationCallback") = nullptr,
-      py::arg("type") = f3d::interactor::BindingType::OTHER, py::arg("skipNotify") = false)
+      py::arg("type") = f3d::interactor::BindingType::OTHER, py::arg("notify") = true)
     .def("add_binding",
       py::overload_cast<const f3d::interaction_bind_t&, std::vector<std::string>, std::string,
         std::function<std::pair<std::string, std::string>()>, f3d::interactor::BindingType, bool>(
         &f3d::interactor::addBinding),
       "Add binding commands", py::arg("bind"), py::arg("command"), py::arg("group"),
       py::arg("documentationCallback") = nullptr,
-      py::arg("type") = f3d::interactor::BindingType::OTHER, py::arg("skipNotify") = false);
+      py::arg("type") = f3d::interactor::BindingType::OTHER, py::arg("notify") = true);
 
   // f3d::mesh_t
   py::class_<f3d::mesh_t>(module, "Mesh")

@@ -65,7 +65,7 @@ public:
     std::vector<std::string> CommandVector;
     documentation_callback_t DocumentationCallback;
     BindingType Type;
-    bool SkipNotify;
+    bool Notify;
   };
 
   struct CommandCallbacks
@@ -532,7 +532,7 @@ public:
         }
       }
 
-      if (!binding.SkipNotify && binding.DocumentationCallback)
+      if (binding.Notify && binding.DocumentationCallback)
       {
         // trigger notification
         vtkRenderWindow* renWin = this->Window.GetRenderWindow();
@@ -1737,10 +1737,10 @@ interactor& interactor_impl::initBindings()
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
   std::vector<std::string> commands, std::string group,
-  documentation_callback_t documentationCallback, BindingType type, bool skipNotify)
+  documentation_callback_t documentationCallback, BindingType type, bool notify)
 {
   const auto [it, success] = this->Internals->Bindings.insert(
-    { bind, { std::move(commands), std::move(documentationCallback), type, skipNotify } });
+    { bind, { std::move(commands), std::move(documentationCallback), type, notify } });
   if (!success)
   {
     throw interactor::already_exists_exception(
@@ -1763,10 +1763,10 @@ interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addBinding(const interaction_bind_t& bind, std::string command,
   std::string group, documentation_callback_t documentationCallback, BindingType type,
-  bool skipNotify)
+  bool notify)
 {
   return this->addBinding(bind, std::vector<std::string>{ std::move(command) }, std::move(group),
-    std::move(documentationCallback), type, skipNotify);
+    std::move(documentationCallback), type, notify);
 }
 
 //----------------------------------------------------------------------------
@@ -1858,7 +1858,7 @@ f3d::interactor::BindingType interactor_impl::getBindingType(const interaction_b
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::addNotification(std::string desc, std::string value, double duration)
+interactor& interactor_impl::triggerNotification(std::string desc, std::string value, double duration)
 {
   if (!desc.empty())
   {
@@ -1867,7 +1867,10 @@ void interactor_impl::addNotification(std::string desc, std::string value, doubl
 
     ren->AddNotification(desc, value, {}, duration);
   }
+
+  return *this;
 }
+
 //----------------------------------------------------------------------------
 interactor& interactor_impl::triggerModUpdate(InputModifier mod)
 {
