@@ -259,23 +259,20 @@ EMSCRIPTEN_BINDINGS(f3d)
     .property(
       "position", +[](const f3d::camera& cam) -> emscripten::val
       { return containerToJSArray(cam.getPosition()); },
-      +[](f3d::camera& cam, emscripten::val jsArray)
-      {
+      +[](f3d::camera& cam, emscripten::val jsArray) {
         cam.setPosition({ jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() });
       })
     .property(
       "focalPoint", +[](const f3d::camera& cam) -> emscripten::val
       { return containerToJSArray(cam.getFocalPoint()); },
-      +[](f3d::camera& cam, emscripten::val jsArray)
-      {
+      +[](f3d::camera& cam, emscripten::val jsArray) {
         cam.setFocalPoint(
           { jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() });
       })
     .property(
       "viewUp", +[](const f3d::camera& cam) -> emscripten::val
       { return containerToJSArray(cam.getViewUp()); },
-      +[](f3d::camera& cam, emscripten::val jsArray)
-      {
+      +[](f3d::camera& cam, emscripten::val jsArray) {
         cam.setViewUp({ jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() });
       })
     .property("viewAngle",
@@ -389,7 +386,7 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function(
       "addNotification",
       +[](f3d::interactor& interactor, std::string desc, std::string value, double duration)
-      { interactor.addNotification(desc, value, duration) });
+      { interactor.addNotification(desc, value, duration); });
 
   // f3d::engine
   // Not bound on purpose because only one engine is supported:
