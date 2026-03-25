@@ -1721,7 +1721,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Cheatsheet"), f3d::interactor::BindingType::OTHER, true);
   this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Console"), f3d::interactor::BindingType::OTHER, true);
   this->addBinding({mod_t::ANY, "Colon"}, "toggle ui.minimal_console", "Others", std::bind(docStr, "Minimal console"), f3d::interactor::BindingType::OTHER, true);
-  this->addBinding({mod_t::CTRL, "V"}, "toggle ui.notifications.enable", "Others", std::bind(docTgl, "Notifications", std::cref(opts.ui.notifications.enable)), f3d::interactor::BindingType::TOGGLE);
+  this->addBinding({mod_t::CTRL, "K"}, "toggle ui.notifications.enable", "Others", std::bind(docTgl, "Notifications", std::cref(opts.ui.notifications.enable)), f3d::interactor::BindingType::TOGGLE);
 #endif
   this->addBinding({mod_t::CTRL, "Q"}, "stop_interactor", "Others", std::bind(docStr, "Stop the interactor"), f3d::interactor::BindingType::OTHER, true);
   this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));
