@@ -1762,8 +1762,7 @@ interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addBinding(const interaction_bind_t& bind, std::string command,
-  std::string group, documentation_callback_t documentationCallback, BindingType type,
-  bool notify)
+  std::string group, documentation_callback_t documentationCallback, BindingType type, bool notify)
 {
   return this->addBinding(bind, std::vector<std::string>{ std::move(command) }, std::move(group),
     std::move(documentationCallback), type, notify);
@@ -1858,7 +1857,8 @@ f3d::interactor::BindingType interactor_impl::getBindingType(const interaction_b
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::triggerNotification(std::string desc, std::string value, double duration)
+interactor& interactor_impl::triggerNotification(
+  std::string desc, std::string value, double duration)
 {
   if (!desc.empty())
   {

@@ -376,7 +376,8 @@ public:
   /**
    * Trigger a single text line notification at the bottom left of viewport.
    */
-  virtual interactor& triggerNotification(std::string desc, std::string value = "", double duration = 3.f) = 0;
+  virtual interactor& triggerNotification(
+    std::string desc, std::string value = "", double duration = 3.f) = 0;
 
   /**
    * Play a VTK interaction file.

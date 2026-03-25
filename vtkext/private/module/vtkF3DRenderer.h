@@ -519,11 +519,13 @@ public:
    */
   void SetUIDeltaTime(double time);
 
+  //@{
   /**
-   * Set/Get the total animation time (cumulative time of each frame being rendered) in seconds
+   * Set/Get the total application time in seconds
    */
   vtkSetMacro(TotalTime, double);
   vtkGetMacro(TotalTime, double);
+  //@}
 
   /**
    * Set console badge enabled status
