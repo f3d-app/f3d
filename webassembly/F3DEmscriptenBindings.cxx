@@ -259,20 +259,23 @@ EMSCRIPTEN_BINDINGS(f3d)
     .property(
       "position", +[](const f3d::camera& cam) -> emscripten::val
       { return containerToJSArray(cam.getPosition()); },
-      +[](f3d::camera& cam, emscripten::val jsArray) {
+      +[](f3d::camera& cam, emscripten::val jsArray)
+      {
         cam.setPosition({ jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() });
       })
     .property(
       "focalPoint", +[](const f3d::camera& cam) -> emscripten::val
       { return containerToJSArray(cam.getFocalPoint()); },
-      +[](f3d::camera& cam, emscripten::val jsArray) {
+      +[](f3d::camera& cam, emscripten::val jsArray)
+      {
         cam.setFocalPoint(
           { jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() });
       })
     .property(
       "viewUp", +[](const f3d::camera& cam) -> emscripten::val
       { return containerToJSArray(cam.getViewUp()); },
-      +[](f3d::camera& cam, emscripten::val jsArray) {
+      +[](f3d::camera& cam, emscripten::val jsArray)
+      {
         cam.setViewUp({ jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() });
       })
     .property("viewAngle",
@@ -335,38 +338,36 @@ EMSCRIPTEN_BINDINGS(f3d)
       +[](f3d::interactor& interactor, const std::string& action,
          const emscripten::val& callback) -> f3d::interactor&
       {
-    auto wrapCallback = [=](const std::vector<std::string>& args)
-    { callback(containerToJSArray(args)); };
-    return interactor.addCommand(action, wrapCallback);
+        auto wrapCallback = [=](const std::vector<std::string>& args)
+        { callback(containerToJSArray(args)); };
+        return interactor.addCommand(action, wrapCallback);
       },
       emscripten::return_value_policy::reference())
     .function("removeCommand", &f3d::interactor::removeCommand,
       emscripten::return_value_policy::reference())
     .function(
       "getCommandActions", +[](const f3d::interactor& interactor) -> emscripten::val
-      {
-    return containerToJSArray(interactor.getCommandActions()); })
+      { return containerToJSArray(interactor.getCommandActions()); })
     .function(
       "triggerCommand",
       +[](f3d::interactor& interactor, const std::string& command, bool keepComments) -> bool
-      {
-    return interactor.triggerCommand(command, keepComments); })
+      { return interactor.triggerCommand(command, keepComments); })
     .function(
       "toggleAnimation",
       +[](f3d::interactor& interactor, emscripten::val direction) -> f3d::interactor&
       {
-    return direction.isUndefined()
-      ? interactor.toggleAnimation()
-      : interactor.toggleAnimation(direction.as<f3d::interactor::AnimationDirection>());
+        return direction.isUndefined()
+          ? interactor.toggleAnimation()
+          : interactor.toggleAnimation(direction.as<f3d::interactor::AnimationDirection>());
       },
       emscripten::return_value_policy::reference())
     .function(
       "startAnimation",
       +[](f3d::interactor& interactor, emscripten::val direction) -> f3d::interactor&
       {
-    return direction.isUndefined()
-      ? interactor.startAnimation()
-      : interactor.startAnimation(direction.as<f3d::interactor::AnimationDirection>());
+        return direction.isUndefined()
+          ? interactor.startAnimation()
+          : interactor.startAnimation(direction.as<f3d::interactor::AnimationDirection>());
       },
       emscripten::return_value_policy::reference())
     .function("stopAnimation", &f3d::interactor::stopAnimation,
@@ -378,18 +379,17 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("disableCameraMovement", &f3d::interactor::disableCameraMovement,
       emscripten::return_value_policy::reference())
     .function(
-      "start", +[](f3d::interactor& interactor) -> f3d::interactor& {
-    return interactor.start(); },
+      "start", +[](f3d::interactor& interactor) -> f3d::interactor& { return interactor.start(); },
       emscripten::return_value_policy::reference())
     .function("stop", &f3d::interactor::stop, emscripten::return_value_policy::reference())
     .function("requestRender", &f3d::interactor::requestRender,
       emscripten::return_value_policy::reference())
     .function(
-      "requestStop", &f3d::interactor::requestStop, emscripten::return_value_policy::reference()).
+      "requestStop", &f3d::interactor::requestStop, emscripten::return_value_policy::reference())
     .function(
-      "addNotification", +[](f3d::interactor& interactor, std::string desc, std::string value, double duration)
-        {
-    interactor.addNotification(desc, value, duration) };
+      "addNotification",
+      +[](f3d::interactor& interactor, std::string desc, std::string value, double duration)
+      { interactor.addNotification(desc, value, duration) });
 
   // f3d::engine
   // Not bound on purpose because only one engine is supported:
@@ -404,21 +404,20 @@ EMSCRIPTEN_BINDINGS(f3d)
       "modules",
       +[](const f3d::engine::libInformation& libInfo) -> emscripten::val
       {
-    emscripten::val jsArray = emscripten::val::array();
-    for (const auto& [module, enabled] : libInfo.Modules)
-    {
-      emscripten::val pair = emscripten::val::array();
-      pair.call<void>("push", module);
-      pair.call<void>("push", enabled);
-      jsArray.call<void>("push", pair);
-    }
-    return jsArray;
+        emscripten::val jsArray = emscripten::val::array();
+        for (const auto& [module, enabled] : libInfo.Modules)
+        {
+          emscripten::val pair = emscripten::val::array();
+          pair.call<void>("push", module);
+          pair.call<void>("push", enabled);
+          jsArray.call<void>("push", pair);
+        }
+        return jsArray;
       })
     .property("vtkVersion", &f3d::engine::libInformation::VTKVersion)
     .property(
       "copyrights", +[](const f3d::engine::libInformation& libInfo) -> emscripten::val
-      {
-    return containerToJSArray(libInfo.Copyrights); })
+      { return containerToJSArray(libInfo.Copyrights); })
     .property("license", &f3d::engine::libInformation::License);
 
   emscripten::class_<f3d::engine::readerInformation>("EngineReaderInformation")
@@ -426,25 +425,21 @@ EMSCRIPTEN_BINDINGS(f3d)
     .property("description", &f3d::engine::readerInformation::Description)
     .property(
       "extensions", +[](const f3d::engine::readerInformation& readerInfo) -> emscripten::val
-      {
-    return containerToJSArray(readerInfo.Extensions); })
+      { return containerToJSArray(readerInfo.Extensions); })
     .property(
       "mimeTypes", +[](const f3d::engine::readerInformation& readerInfo) -> emscripten::val
-      {
-    return containerToJSArray(readerInfo.MimeTypes); })
+      { return containerToJSArray(readerInfo.MimeTypes); })
     .property("pluginName", &f3d::engine::readerInformation::PluginName)
     .property("hasSceneReader", &f3d::engine::readerInformation::HasSceneReader)
     .property("hasGeometryReader", &f3d::engine::readerInformation::HasGeometryReader);
 
   emscripten::class_<f3d::engine>("Engine")
     .class_function(
-      "create", +[]() {
-    return f3d::engine::create(); },
+      "create", +[]() { return f3d::engine::create(); },
       emscripten::return_value_policy::take_ownership())
     .function(
       "setCachePath", +[](f3d::engine& engine, const std::string& path) -> f3d::engine&
-      {
-    return engine.setCachePath(path); }, emscripten::return_value_policy::reference())
+      { return engine.setCachePath(path); }, emscripten::return_value_policy::reference())
     .function("setOptions",
       static_cast<f3d::engine& (f3d::engine::*)(const f3d::options&)>(&f3d::engine::setOptions),
       emscripten::return_value_policy::reference())
@@ -456,14 +451,12 @@ EMSCRIPTEN_BINDINGS(f3d)
     .class_function("autoloadPlugins", &f3d::engine::autoloadPlugins)
     .class_function(
       "getAllReaderOptionNames", +[]() -> emscripten::val
-      {
-    return containerToJSArray(f3d::engine::getAllReaderOptionNames()); })
+      { return containerToJSArray(f3d::engine::getAllReaderOptionNames()); })
     .class_function("setReaderOption", &f3d::engine::setReaderOption)
     .class_function("getLibInfo", &f3d::engine::getLibInfo)
     .class_function(
       "getReadersInfo",
-      +[]() -> emscripten::val {
-    return containerToJSArray(f3d::engine::getReadersInfo()); });
+      +[]() -> emscripten::val { return containerToJSArray(f3d::engine::getReadersInfo()); });
 
   // f3d::log
   emscripten::enum_<f3d::log::VerboseLevel>("LogVerboseLevel")
@@ -480,13 +473,12 @@ EMSCRIPTEN_BINDINGS(f3d)
     .class_function(
       "print",
       +[](f3d::log::VerboseLevel level, const std::string& message)
-      {
-    f3d::log::print(level, message); })
+      { f3d::log::print(level, message); })
     .class_function(
       "forward",
       +[](const emscripten::val& callback)
       {
-    f3d::log::forward(
-      [=](f3d::log::VerboseLevel level, const std::string& txt) { callback(level, txt); });
+        f3d::log::forward(
+          [=](f3d::log::VerboseLevel level, const std::string& txt) { callback(level, txt); });
       });
 }

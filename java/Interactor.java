@@ -555,15 +555,6 @@ public class Interactor {
     public native void addNotification(String desc, String value, double duration);
 
     /**
-     * Trigger a notification with default value and duration.
-     *
-     * @param desc Text description
-     */
-    public void addNotification(String desc) {
-        addNotification(desc, "", 3.0);
-    }
-
-    /**
      * Trigger a notification with default duration.
      *
      * @param desc Text description
@@ -571,5 +562,14 @@ public class Interactor {
      */
     public void addNotification(String desc, String value) {
         addNotification(desc, value, 3.0);
+    }
+
+    /**
+     * Trigger a notification with default value and duration.
+     *
+     * @param desc Text description
+     */
+    public void addNotification(String desc) {
+        addNotification(desc, "");
     }
 }

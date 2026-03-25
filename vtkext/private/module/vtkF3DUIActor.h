@@ -308,6 +308,7 @@ protected:
   virtual void RenderNotifications()
   {
   }
+
   bool DropZoneLogoVisible = false;
   bool DropZoneVisible = false;
   std::string DropText = "";
