@@ -60,6 +60,8 @@ int test_interactor()
 
   f3d_interactor_trigger_event_loop(interactor, 0.016);
 
+  f3d_interactor_trigger_notification(interactor, "foo", "bar", 3.0);
+
   f3d_interactor_play_interaction(interactor, "/nonexistent.log", 1.0 / 30.0);
   f3d_interactor_record_interaction(interactor, "/tmp/test_interaction.log");
 

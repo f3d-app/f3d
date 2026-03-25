@@ -221,9 +221,10 @@ public class Interactor {
      * @param commands list of commands to trigger
      * @param group optional group name for organization
      * @param type optional binding type
+     * @param notify notify when the binding is triggered
      * @return this interactor for method chaining
      */
-    private native Interactor addBindingCommands(InteractionBind bind, List<String> commands, String group, BindingType type);
+    private native Interactor addBindingCommands(InteractionBind bind, List<String> commands, String group, BindingType type, boolean notify);
 
     /**
      * Add binding to trigger commands for a specific bind.
@@ -234,8 +235,8 @@ public class Interactor {
      * @param type optional binding type
      * @return this interactor for method chaining
      */
-    public Interactor addBinding(InteractionBind bind, List<String> commands, String group, BindingType type) {
-        return addBindingCommands(bind, commands, group, type);
+    public Interactor addBinding(InteractionBind bind, List<String> commands, String group, BindingType type, boolean notify) {
+        return addBindingCommands(bind, commands, group, type, notify);
     }
 
     /**
@@ -246,7 +247,7 @@ public class Interactor {
      * @return this interactor for method chaining
      */
     public Interactor addBinding(InteractionBind bind, List<String> commands) {
-        return addBindingCommands(bind, commands, "", BindingType.OTHER);
+        return addBindingCommands(bind, commands, "", BindingType.OTHER, true);
     }
 
     /**
@@ -258,7 +259,7 @@ public class Interactor {
      * @param type optional binding type
      * @return this interactor for method chaining
      */
-    private native Interactor addBindingCommand(InteractionBind bind, String command, String group, BindingType type);
+    private native Interactor addBindingCommand(InteractionBind bind, String command, String group, BindingType type, boolean notify);
 
     /**
      * Add binding to trigger a single command for a specific bind.
@@ -269,8 +270,8 @@ public class Interactor {
      * @param type optional binding type
      * @return this interactor for method chaining
      */
-    public Interactor addBinding(InteractionBind bind, String command, String group, BindingType type) {
-        return addBindingCommand(bind, command, group, type);
+    public Interactor addBinding(InteractionBind bind, String command, String group, BindingType type, boolean notify) {
+        return addBindingCommand(bind, command, group, type, notify);
     }
 
     /**
@@ -281,7 +282,7 @@ public class Interactor {
      * @return this interactor for method chaining
      */
     public Interactor addBinding(InteractionBind bind, String command) {
-        return addBindingCommand(bind, command, "", BindingType.OTHER);
+        return addBindingCommand(bind, command, "", BindingType.OTHER, true);
     }
 
     /**
@@ -552,7 +553,7 @@ public class Interactor {
      * @param value Text value
      * @param duration Duration of notification in second
      */
-    public native void triggerNotification(String desc, String value, double duration);
+    public native Interactor triggerNotification(String desc, String value, double duration);
 
     /**
      * Trigger a notification with default duration.
@@ -560,8 +561,8 @@ public class Interactor {
      * @param desc Text description
      * @param value Text value
      */
-    public void triggerNotification(String desc, String value) {
-        triggerNotification(desc, value, 3.0);
+    public Interactor triggerNotification(String desc, String value) {
+        return triggerNotification(desc, value, 3.0);
     }
 
     /**
@@ -569,7 +570,7 @@ public class Interactor {
      *
      * @param desc Text description
      */
-    public void triggerNotification(String desc) {
-        triggerNotification(desc, "");
+    public Interactor triggerNotification(String desc) {
+        return triggerNotification(desc, "");
     }
 }

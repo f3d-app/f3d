@@ -51,6 +51,8 @@ public class TestInteractor {
     interactor.isPlayingAnimation();
     interactor.getAnimationDirection();
 
+    interactor.triggerNotification("foo", "bar", 3.0);
+
     Interactor.AnimationDirection.FORWARD.getValue();
     Interactor.AnimationDirection.BACKWARD.getValue();
     Interactor.AnimationDirection.fromValue(0);

@@ -115,6 +115,7 @@ def test_binding():
         "DummyGroup",
         doc_fn,
         f3d.Interactor.BindingType.OTHER,
+        False,
     )
     assert len(inter.get_bind_groups()) == 1
     assert len(inter.get_binds()) == 5
@@ -154,6 +155,8 @@ def test_trigger_key(capfd: pytest.CaptureFixture[str]):
     engine.interactor.trigger_mouse_position(100, 100)
     engine.interactor.trigger_mouse_wheel(f3d.Interactor.WheelDirection.FORWARD)
     engine.interactor.trigger_text_character(0)
+
+    engine.interactor.trigger_notification("foo", "bar", 3.0)
 
 
 def test_interactor_animation(capfd: pytest.CaptureFixture[str]):
