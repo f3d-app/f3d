@@ -117,7 +117,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   // std::cerr << generated.compare(bufferImage) << "\n";
   test("check loading stream from image reader", generated.compare(bufferImage), 0.0); // not 1e-14?
 
-  // // check reading invalid stream
+  // check reading invalid stream
   test.expect<f3d::image::read_exception>(
     "read invalid image stream", [&]() { f3d::image invalidImgStream(nullptr, 10); });
 
