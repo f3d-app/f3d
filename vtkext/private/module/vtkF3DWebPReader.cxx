@@ -139,7 +139,7 @@ void vtkF3DWebPReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfo
 
   uint8_t* pixels = WebPDecodeRGBA(
     static_cast<uint8_t*>(this->BufferData.data()), this->BufferData.size(), nullptr, nullptr);
-  std::copy_n(pixels, scalars->GetSize(), scalars->GetPointer(0));
+  std::copy_n(pixels, scalars->GetNumberOfValues(), scalars->GetPointer(0));
 
   WebPFree(pixels);
 }

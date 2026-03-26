@@ -44,7 +44,7 @@ public class Scene {
      *
      * @param mesh mesh to add
      * @return this scene for method chaining
-     * 
+     *
      * @deprecated use `add(Types.Mesh mesh)` instead.
      * This function will be private in 4.0
      */
@@ -169,6 +169,13 @@ public class Scene {
     public native double[] animationTimeRange();
 
     /**
+     * Get animation keyframe's time of currently added files.
+     *
+     * @return list of double
+     */
+    public native double[] getAnimationKeyFrames();
+
+    /**
      * Return the number of animations available in the currently loaded files.
      *
      * @return number of available animations
@@ -186,11 +193,12 @@ public class Scene {
     }
 
     /**
-     * Get the animation name of a given animation indices, if any.
+     * Get the animation name of a given animation index, if any.
      *
-     * @return animation name or string error 
+     * @param index animation index, -1 for current animation
+     * @return animation name or string error
      */
-    public native String getAnimationName(int indices);
+    public native String getAnimationName(int index);
 
     /**
      * Get all of the animation names, if any.

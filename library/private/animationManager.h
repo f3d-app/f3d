@@ -76,7 +76,7 @@ public:
   void CycleAnimation();
 
   /**
-   * Return the animation name of a given animation indices, if any.
+   * Return the animation name of a given animation index, if any.
    *
    * Specific animation (0..availableAnimations): Returns the name of the animation at that index
    * Current animation (-1):
@@ -88,7 +88,7 @@ public:
    *
    * Can be called before initialization safely
    */
-  std::string GetAnimationName(int indices = -1);
+  std::string GetAnimationName(int index = -1);
 
   /**
    * Return all of the animation names, if any.
@@ -147,6 +147,11 @@ public:
    * Return a pair containing the current time range values
    */
   std::pair<double, double> GetTimeRange();
+
+  /**
+   * Return a vector containing current animation keyframe's times
+   */
+  std::vector<double> GetKeyFrames();
 
   /**
    * Get the number of available animations

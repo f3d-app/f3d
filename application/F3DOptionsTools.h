@@ -97,6 +97,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "font-color", "ui.font_color" },
   { "backdrop-opacity", "ui.backdrop.opacity" },
   { "backdrop-color", "ui.backdrop.color" },
+  { "normal-glyphs", "model.normal_glyphs.enable" },
   { "point-sprites-size", "model.point_sprites.size" },
   { "point-sprites-absolute-size", "model.point_sprites.absolute_size" },
   { "point-size", "render.point_size" },

@@ -41,8 +41,10 @@
 #include <vtkObjectFactory.h>
 #include <vtkOpaquePass.h>
 #include <vtkOpenGLFXAAPass.h>
+#include <vtkOpenGLFramebufferObject.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLRenderer.h>
+#include <vtkOpenGLState.h>
 #include <vtkOpenGLTexture.h>
 #include <vtkOrientationMarkerWidget.h>
 #include <vtkPBRLUTTexture.h>
@@ -158,24 +160,33 @@ std::string ComputeFileHash(const std::string& filepath)
 //----------------------------------------------------------------------------
 // Download texture from the GPU to a vtkImageData
 vtkSmartPointer<vtkImageData> SaveTextureToImage(
-  vtkTextureObject* tex, unsigned int target, unsigned int level, unsigned int size, int type)
+  vtkTextureObject* tex, unsigned int target, unsigned int level, unsigned int size)
 {
-  unsigned int dims[2] = { size, size };
-  vtkIdType incr[2] = { 0, 0 };
-
   unsigned int nbFaces = tex->GetTarget() == GL_TEXTURE_CUBE_MAP ? 6 : 1;
+  int type = tex->GetVTKDataType();
 
   vtkNew<vtkImageData> img;
   img->SetDimensions(size, size, nbFaces);
   img->AllocateScalars(type, tex->GetComponents());
 
+  tex->GetContext()->GetState()->PushFramebufferBindings();
+
+  vtkNew<vtkOpenGLFramebufferObject> fbo;
+  fbo->SetContext(tex->GetContext());
+  fbo->Bind();
+
   for (unsigned int i = 0; i < nbFaces; i++)
   {
-    vtkPixelBufferObject* pbo = tex->Download(target + i, level);
+    fbo->RemoveColorAttachment(0);
+    fbo->AddColorAttachment(0, tex, 0, target + i, level);
+    fbo->ActivateReadBuffer(0);
+    fbo->StartNonOrtho(size, size);
 
-    pbo->Download2D(type, img->GetScalarPointer(0, 0, i), dims, tex->GetComponents(), incr);
-    pbo->Delete();
+    glReadPixels(0, 0, size, size, tex->GetFormat(type, tex->GetComponents(), false),
+      tex->GetDataType(type), img->GetScalarPointer(0, 0, i));
   }
+
+  tex->GetContext()->GetState()->PopFramebufferBindings();
 
   return img;
 }
@@ -329,6 +340,7 @@ void vtkF3DRenderer::Initialize()
   this->ScalarBarActorConfigured = false;
   this->CheatSheetConfigured = false;
   this->ColoringConfigured = false;
+  this->NormalGlyphsConfigured = false;
 
   // create ImGui context if F3D_MODULE_UI is enabled
   this->UIActor->Initialize(vtkOpenGLRenderWindow::SafeDownCast(this->RenderWindow));
@@ -966,11 +978,6 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
       this->GridAxesActor->SetOrientation(orientation);
       this->GridAxesActor->SetVisibility(true);
 
-      double center[4] = { 0, 0, 0, 1 };
-      bbox.GetCenter(center);
-
-      this->GridAxesActor->SetPosition(center);
-
       double a, b, c, x, y, z;
       bbox.GetBounds(a, b, c, x, y, z);
       GridAxesActor->SetGridBounds(a, b, c, x, y, z);
@@ -1394,8 +1401,8 @@ void vtkF3DRenderer::ConfigureHDRILUT()
 
       if (!this->CachePath.empty())
       {
-        vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
-          lut->GetTextureObject(), GL_TEXTURE_2D, 0, lut->GetLUTSize(), VTK_UNSIGNED_SHORT);
+        vtkSmartPointer<vtkImageData> img =
+          ::SaveTextureToImage(lut->GetTextureObject(), GL_TEXTURE_2D, 0, lut->GetLUTSize());
         assert(img);
 
         vtkNew<vtkXMLImageDataWriter> writer;
@@ -1501,7 +1508,7 @@ void vtkF3DRenderer::ConfigureHDRISpecular()
         for (unsigned int i = 0; i < nbLevels; i++)
         {
           vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
-            spec->GetTextureObject(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, i, size >> i, VTK_FLOAT);
+            spec->GetTextureObject(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, i, size >> i);
           assert(img);
           mb->SetBlock(i, img);
         }
@@ -2117,6 +2124,11 @@ void vtkF3DRenderer::UpdateActors()
     this->ConfigureColoringAndVisibilities();
   }
 
+  if (!this->NormalGlyphsConfigured)
+  {
+    this->ConfigureNormalGlyphs();
+  }
+
   this->ConfigureHDRI();
 
   if (!this->MetaDataConfigured)
@@ -2154,6 +2166,11 @@ void vtkF3DRenderer::UpdateActors()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
+  if (this->UseNormalGlyphs)
+  {
+    this->UpdateNormalGlyphsScale();
+  }
+
   if (!this->TimerVisible)
   {
     this->Superclass::Render();
@@ -2851,6 +2868,53 @@ void vtkF3DRenderer::ConfigurePointSprites()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureNormalGlyphs()
+{
+  bool normalGlyphsVisible = !this->UseRaytracing && this->UseNormalGlyphs;
+  for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
+  {
+    if (normalGlyphsVisible && !normalGlyph.InputDataHasNormals)
+    {
+      F3DLog::Print(F3DLog::Severity::Warning,
+        "Data does not contain any normals to display the normal glyphs with");
+      continue;
+    }
+
+    this->UpdateNormalGlyphsScale();
+    normalGlyph.Actor->SetVisibility(normalGlyphsVisible);
+  }
+
+  this->NormalGlyphsConfigured = true;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::UpdateNormalGlyphsScale()
+{
+  constexpr double normalGlyphScaleMultiplier = 0.15;
+
+  const auto getScale = [](vtkCamera* camera)
+  {
+    if (camera->GetParallelProjection())
+    {
+      return camera->GetParallelScale();
+    }
+    else
+    {
+      const double angle = vtkMath::RadiansFromDegrees(camera->GetViewAngle());
+      const double distance = camera->GetDistance();
+      return distance * std::tan(0.5 * angle);
+    }
+  };
+
+  const double scaleFactor = getScale(this->GetActiveCamera()) * normalGlyphScaleMultiplier;
+
+  for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
+  {
+    normalGlyph.GlyphMapper->SetScaleFactor(scaleFactor);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowScalarBar(bool show)
 {
   if (this->ScalarBarVisible != show)
@@ -2858,6 +2922,17 @@ void vtkF3DRenderer::ShowScalarBar(bool show)
     this->ScalarBarVisible = show;
     this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
+  }
+}
+
+// ---------------------------------------------------------------------------
+void vtkF3DRenderer::SetUseNormalGlyphs(bool use)
+{
+  if (this->UseNormalGlyphs != use)
+  {
+    this->CheatSheetConfigured = false;
+    this->NormalGlyphsConfigured = false;
+    this->UseNormalGlyphs = use;
   }
 }
 

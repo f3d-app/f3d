@@ -225,12 +225,12 @@ void animationManager::JumpToFrame(int frame, bool relative)
 //----------------------------------------------------------------------------
 void animationManager::JumpToKeyFrame(int keyframe, bool relative)
 {
-  if (this->AnimationTimeSteps->GetSize() == 0)
+  if (this->AnimationTimeSteps->GetNumberOfTuples() == 0)
   {
     return;
   }
 
-  const int timeStepsAvailable = this->AnimationTimeSteps->GetSize();
+  const int timeStepsAvailable = this->AnimationTimeSteps->GetNumberOfTuples();
 
   auto it = std::lower_bound(
     this->AnimationTimeSteps->Begin(), this->AnimationTimeSteps->End(), this->CurrentTime);
@@ -403,10 +403,10 @@ void animationManager::CycleAnimation()
 }
 
 // ---------------------------------------------------------------------------------
-std::string animationManager::GetAnimationName(int indices)
+std::string animationManager::GetAnimationName(int index)
 {
   assert(this->Importer);
-  if (indices == -1)
+  if (index == -1)
   {
     if (this->PreparedAnimationIndices.has_value() &&
       this->PreparedAnimationIndices.value().size() > 1)
@@ -434,12 +434,12 @@ std::string animationManager::GetAnimationName(int indices)
     return this->Importer->GetAnimationName(this->PreparedAnimationIndices.value()[0]);
   }
 
-  if (this->AvailAnimations == 0 || indices < 0 || indices > this->AvailAnimations)
+  if (this->AvailAnimations == 0 || index < 0 || index > this->AvailAnimations)
   {
     return "No animation";
   }
 
-  return this->Importer->GetAnimationName(indices);
+  return this->Importer->GetAnimationName(index);
 }
 
 // ---------------------------------------------------------------------------------
@@ -629,6 +629,22 @@ std::pair<double, double> animationManager::GetTimeRange()
 
   // Return updated data
   return std::make_pair(this->TimeRange[0], this->TimeRange[1]);
+}
+
+//----------------------------------------------------------------------------
+std::vector<double> animationManager::GetKeyFrames()
+{
+  this->PrepareForAnimationIndices();
+
+  std::vector<double> keyFrames;
+  keyFrames.reserve(this->AnimationTimeSteps->GetNumberOfTuples());
+
+  for (vtkIdType i = 0; i < this->AnimationTimeSteps->GetNumberOfTuples(); ++i)
+  {
+    keyFrames.push_back(this->AnimationTimeSteps->GetValue(i));
+  }
+
+  return keyFrames;
 }
 
 //----------------------------------------------------------------------------

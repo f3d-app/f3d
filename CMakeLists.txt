@@ -84,6 +84,7 @@ find_package(VTK 9.3.0 REQUIRED
     IOHDF
     IONetCDF
     IOOpenVDB
+    IOPDAL
     RenderingGridAxes
     RenderingRayTracing)
 message(STATUS "VTK ${VTK_VERSION} found")

@@ -95,6 +95,7 @@ endif()
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11209
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
   f3d_test(NAME TestAxesGridEnable DATA suzanne.ply ARGS --axes-grid THRESHOLD 0.08) # Threshold required for MacOS due to line rendering differences
+  f3d_test(NAME TestAxesGridEnableNonCenteredData DATA cow.vtp ARGS --axes-grid)
 endif()
 
 ## Camera
@@ -122,6 +123,11 @@ f3d_test(NAME TestVolumeComp DATA vase_4comp.vti ARGS -vb --coloring-component=3
 f3d_test(NAME TestVolumeDirect DATA vase_4comp.vti ARGS -vb --coloring-component=-2)
 f3d_test(NAME TestVolumeCells DATA waveletArrays.vti ARGS -vb --coloring-by-cells)
 f3d_test(NAME TestVolumeColoringArray DATA waveletArrays.vti ARGS -vb --coloring-array=Result LONG_TIMEOUT)
+
+## Normal Glyphs
+f3d_test(NAME TestNormalGlyphsPerspectiveEnable DATA suzanne.obj ARGS --normal-glyphs)
+f3d_test(NAME TestNormalGlyphsOrthographicEnable DATA suzanne.obj ARGS --normal-glyphs --camera-orthographic)
+f3d_test(NAME TestNormalGlyphsNoNormalsAvailable DATA cow.vtp ARGS --normal-glyphs NO_BASELINE REGEXP "does not contain any normals")
 
 ## Textures
 f3d_test(NAME TestTextureNormal DATA WaterBottle.glb ARGS --texture-normal=${F3D_SOURCE_DIR}/testing/data/normal.png --normal-scale=0.1)
@@ -180,7 +186,7 @@ f3d_test(NAME TestMultiblockMetaData DATA mb.vtm ARGS -m UI)
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
   f3d_test(NAME TestSceneHierarchyGLTF DATA InterpolationTest.glb ARGS --scene-hierarchy UI)
   f3d_test(NAME TestSceneHierarchyGLTFAnimated DATA BoxAnimated.gltf ARGS --scene-hierarchy UI)
-  f3d_test(NAME TestSceneHierarchyGLTFNodeNames DATA vtk-dasm-test.glb ARGS --scene-hierarchy RESOLUTION 300,550 UI)
+  f3d_test(NAME TestSceneHierarchyGLTFNodeNames DATA vtk-dasm-test.glb ARGS --scene-hierarchy RESOLUTION 300,700 UI)
 endif()
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10861
