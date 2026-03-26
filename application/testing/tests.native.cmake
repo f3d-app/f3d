@@ -68,7 +68,6 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
   f3d_test(NAME TestQuakeMDLActorCollection DATA zombie.mdl ARGS --scalar-coloring)
 endif()
 
-# Scene hierarchy test for QuakeMDL importer
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
   f3d_test(NAME TestQuakeMDLSceneHierarchy DATA zombie.mdl ARGS --scene-hierarchy UI)
 endif()

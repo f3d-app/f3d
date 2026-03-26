@@ -17,6 +17,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <filesystem>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DQuakeMDLImporter);
@@ -694,10 +695,6 @@ int vtkF3DQuakeMDLImporter::ImportBegin()
 //----------------------------------------------------------------------------
 void vtkF3DQuakeMDLImporter::ImportActors(vtkRenderer* renderer)
 {
-  // Initialize the scene hierarchy
-  this->SceneHierarchy = vtkSmartPointer<vtkDataAssembly>::New();
-  this->SceneHierarchy->SetAttribute(vtkDataAssembly::GetRootNode(), "label", "root");
-
   vtkNew<vtkActor> actor;
   vtkNew<vtkPolyDataMapper> mapper;
   mapper->SetInputData(this->Internals->AnimationFrames[0][0]);
@@ -712,9 +709,13 @@ void vtkF3DQuakeMDLImporter::ImportActors(vtkRenderer* renderer)
   this->ActorCollection->AddItem(actor);
 #endif
 
-  // Create hierarchy node for the model actor
-  int nodeId = this->SceneHierarchy->AddNode("model", vtkDataAssembly::GetRootNode());
-  this->SceneHierarchy->SetAttribute(nodeId, "label", "model");
+  std::filesystem::path p(this->GetFileName());
+  std::string modelName = p.stem().string();
+
+  this->SceneHierarchy = vtkSmartPointer<vtkDataAssembly>::New();
+  this->SceneHierarchy->SetAttribute(vtkDataAssembly::GetRootNode(), "label", "root");
+  int nodeId = this->SceneHierarchy->AddNode(modelName.c_str(), vtkDataAssembly::GetRootNode());
+  this->SceneHierarchy->SetAttribute(nodeId, "label", modelName.c_str());
   this->SceneHierarchy->SetAttribute(nodeId, "flat_actor_id", 0);
 }
 
