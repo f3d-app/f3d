@@ -19,8 +19,8 @@ In other cases, the binary release archive can be used like this:
 ```bash
 export PATH=$PATH:~/.local/bin
 tar -xzvf f3d-1.3.0-Linux.tar.gz -C ~/.local/
-sudo update-mime-database ~/.local/share/mime/
-sudo update-desktop-database ~/.local/share/applications
+update-mime-database ~/.local/share/mime/
+update-desktop-database ~/.local/share/applications
 ```
 
 ### Rendering
