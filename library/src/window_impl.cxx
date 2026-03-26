@@ -468,8 +468,7 @@ void window_impl::UpdateDynamicOptions()
   {
     f3d::color_t color = opt.ui.backdrop.color.value();
     renderer->SetBackdropColor({ color[0], color[1], color[2] });
-  }
-  
+  }  
 
   if (this->Internals->Interactor)
   {
