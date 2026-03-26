@@ -140,6 +140,9 @@ public:
    */
   void SetBackdropOpacity(const double backdropOpacity);
 
+  /**
+   * Set the backdrop color
+   */
   void SetBackdropColor(const std::array<double, 3>& color);
 
   ///@{
