@@ -456,7 +456,8 @@ void f3d_interactor_init_bindings(f3d_interactor_t* interactor)
 
 //----------------------------------------------------------------------------
 void f3d_interactor_add_binding(f3d_interactor_t* interactor, const f3d_interaction_bind_t* bind,
-  const char** commands, int command_count, const char* group, f3d_interactor_binding_type_t type, int notify)
+  const char** commands, int command_count, const char* group, f3d_interactor_binding_type_t type,
+  int notify)
 {
   if (!interactor || !bind || !commands || command_count <= 0)
   {
@@ -478,7 +479,8 @@ void f3d_interactor_add_binding(f3d_interactor_t* interactor, const f3d_interact
 
   std::string cpp_group = group ? group : "";
 
-  cpp_interactor->addBinding(cpp_bind, cpp_commands, cpp_group, nullptr, static_cast<f3d::interactor::BindingType>(type), notify != 0);
+  cpp_interactor->addBinding(cpp_bind, cpp_commands, cpp_group, nullptr,
+    static_cast<f3d::interactor::BindingType>(type), notify != 0);
 }
 
 //----------------------------------------------------------------------------

@@ -218,8 +218,8 @@ extern "C"
    * @param notify Notify when the binding is triggered.
    */
   F3D_EXPORT void f3d_interactor_add_binding(f3d_interactor_t* interactor,
-    const f3d_interaction_bind_t* bind, const char** commands, int command_count,
-    const char* group, f3d_interactor_binding_type_t type, int notify);
+    const f3d_interaction_bind_t* bind, const char** commands, int command_count, const char* group,
+    f3d_interactor_binding_type_t type, int notify);
 
   /**
    * @brief Remove a binding for the provided bind.
