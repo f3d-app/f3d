@@ -1234,23 +1234,18 @@ void vtkF3DImguiActor::RenderNotifications(double currentTime)
     windowWidth += value.empty() ? 0.f : itemSpacingX;
 
     auto keys = ::SplitBindings(bind, '+');
-    const float plusWidth = ImGui::CalcTextSize("+").x;
 
     if (this->BindingsVisible && !bind.empty())
     {
-      windowWidth += std::accumulate(keys.begin(), keys.end(), 0.0f,
-        [](float sum, const std::string& key) { return sum + ImGui::CalcTextSize(key.c_str()).x; });
-
-      windowWidth += (keys.size() - 1) * (itemSpacingX + plusWidth + itemSpacingX);
-      windowWidth += itemSpacingX + margin * this->FontScale;
+      windowWidth +=
+        std::accumulate(keys.begin(), keys.end(), 0.0f, [&](float sum, const std::string& key)
+          { return sum + this->CalcBadgeWidth(key) + itemSpacingX; });
     }
 
     float windowHeight = descLineSize.y + windowPadding.y * 2.f;
 
     ImVec4 descTextColor = ::ColorToImVec4(this->FontColor);
     ImVec4 valueTextColor = F3DStyle::imgui::GetHighlightColor(); // Blue
-    ImVec4 bindingTextColor = ::ColorToImVec4(this->FontColor);
-    ImVec4 bindingRectColor = F3DStyle::imgui::GetMidColor(); // Grey
 
     // change color for booleans
     if (value == "ON")
@@ -1267,8 +1262,6 @@ void vtkF3DImguiActor::RenderNotifications(double currentTime)
 
     descTextColor.w = alpha;
     valueTextColor.w = alpha;
-    bindingTextColor.w = alpha;
-    bindingRectColor.w = alpha;
     ImGui::SetNextWindowBgAlpha(alpha * this->BackdropOpacity);
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
@@ -1285,37 +1278,11 @@ void vtkF3DImguiActor::RenderNotifications(double currentTime)
 
     if (this->BindingsVisible && !bind.empty())
     {
-      ImVec2 topBindingCorner, bottomBindingCorner;
-      float recMarginX = margin * this->FontScale;
-      float recMarginY = margin * this->FontScale * .5f;
-      float recRadius = 2.f * this->FontScale;
-
-      ImGui::SameLine(0.f, 5.f);
-
       for (const std::string& key : keys)
       {
-        ImDrawList* drawList = ImGui::GetWindowDrawList();
-        drawList->ChannelsSplit(2);
-        drawList->ChannelsSetCurrent(1);
-        ImGui::TextColored(bindingTextColor, "%s", key.c_str());
-        drawList->ChannelsSetCurrent(0);
-        topBindingCorner =
-          ImVec2(ImGui::GetItemRectMin().x - recMarginX, ImGui::GetItemRectMin().y - recMarginY);
-        bottomBindingCorner =
-          ImVec2(ImGui::GetItemRectMax().x + recMarginX, ImGui::GetItemRectMax().y + recMarginY);
-        drawList->AddRectFilled(
-          topBindingCorner, bottomBindingCorner, ImColor(bindingRectColor), recRadius);
-        drawList->ChannelsMerge();
-        if (key != keys.back())
-        {
-          ImGui::SameLine();
-          ImGui::TextColored(descTextColor, "%s", "+");
-        }
+        this->RenderBadge(key, alpha);
         ImGui::SameLine();
       }
-
-      // add padding between bindings and description
-      ImGui::SameLine(0.f, 10.f);
     }
 
     ImGui::TextColored(descTextColor, "%s", description.c_str());
@@ -1331,4 +1298,51 @@ void vtkF3DImguiActor::RenderNotifications(double currentTime)
 
     ++index;
   }
+}
+
+//----------------------------------------------------------------------------
+float vtkF3DImguiActor::CalcBadgeWidth(const std::string& text)
+{
+  ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
+  const float paddingX = F3DStyle::GetDefaultMargin() * this->FontScale;
+  return textSize.x + paddingX * 2.f;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderBadge(const std::string& text, float alpha)
+{
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+  ImVec2 pos = ImGui::GetCursorScreenPos();
+  ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
+
+  const float paddingX = F3DStyle::GetDefaultMargin() * this->FontScale;
+  const float paddingY = F3DStyle::GetDefaultMargin() * this->FontScale * 0.5f;
+
+  ImVec2 badgeSize = ImVec2(textSize.x + paddingX * 2.f, textSize.y + paddingY * 2.f);
+
+  // Align badge vertically
+  pos.y += (ImGui::GetTextLineHeight() - badgeSize.y) * 0.5f;
+
+  ImVec2 rectMin = pos;
+  ImVec2 rectMax = ImVec2(pos.x + badgeSize.x, pos.y + badgeSize.y);
+
+  float rounding = 4.f * this->FontScale;
+
+  ImVec4 bindingTextColor = ::ColorToImVec4(this->FontColor);
+  ImVec4 bindingRectColor = F3DStyle::imgui::GetMidColor();
+  bindingTextColor.w = alpha;
+  bindingRectColor.w = alpha;
+
+  // Background
+  drawList->AddRectFilled(
+    rectMin, rectMax, ImGui::ColorConvertFloat4ToU32(bindingRectColor), rounding);
+
+  // Text
+  ImVec2 textPos = ImVec2(pos.x + paddingX, pos.y + paddingY);
+
+  drawList->AddText(textPos, ImGui::ColorConvertFloat4ToU32(bindingTextColor), text.c_str());
+
+  // Advance layout cursor
+  ImGui::Dummy(badgeSize);
 }

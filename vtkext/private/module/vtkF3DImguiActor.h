@@ -110,6 +110,16 @@ private:
 private:
   vtkF3DImguiActor(const vtkF3DImguiActor&) = delete;
   void operator=(const vtkF3DImguiActor&) = delete;
+
+  /**
+   * Render the text as a grey badge with the provided alpha value
+   */
+  void RenderBadge(const std::string& text, float alpha);
+
+  /**
+   * Compute the width of a badge
+   */
+  float CalcBadgeWidth(const std::string& text);
 };
 
 #endif

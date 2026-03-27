@@ -490,7 +490,7 @@ extern "C"
    * @param interactor Interactor handle.
    * @param desc Description text.
    * @param value Value text follow after description.
-   * @param duration Duration of notification in second.
+   * @param duration Duration of notification in seconds.
    */
   F3D_EXPORT void f3d_interactor_trigger_notification(
     f3d_interactor_t* interactor, const char* desc, const char* value, double duration);

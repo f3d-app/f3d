@@ -374,7 +374,7 @@ public:
   virtual interactor& triggerEventLoop(double deltaTime) = 0;
 
   /**
-   * Trigger a single text line notification with text desc for duration ms.
+   * Trigger a single text line notification with text desc for duration seconds.
    */
   virtual interactor& triggerNotification(
     std::string desc, std::string value = "", double duration = 3.f) = 0;

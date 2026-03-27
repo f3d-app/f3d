@@ -550,11 +550,11 @@ public class Interactor {
     public native Interactor requestStop();
 
     /**
-     * Trigger a single text line notification with text desc for duration ms.
+     * Trigger a single text line notification with text desc for duration seconds.
      *
      * @param desc Text description
      * @param value Text value
-     * @param duration Duration of notification in second
+     * @param duration Duration of notification in seconds
      */
     public native Interactor triggerNotification(String desc, String value, double duration);
 
