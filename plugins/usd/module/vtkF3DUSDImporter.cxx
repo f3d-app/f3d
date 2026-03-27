@@ -36,6 +36,8 @@
 #include <vtkTriangleFilter.h>
 #include <vtkVersion.h>
 
+#include <cassert>
+
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
 #include <vtkMemoryResourceStream.h>
 #endif
@@ -159,11 +161,7 @@ public:
     vtkDataAssembly* hierarchy, const pxr::SdfPath& path, const std::string& name)
   {
     std::string pathStr = path.GetAsString();
-    auto it = this->NodeIdMap.find(pathStr);
-    if (it != this->NodeIdMap.end())
-    {
-      return it->second;
-    }
+    assert(this->NodeIdMap.find(pathStr) == this->NodeIdMap.end());
 
     // Get parent node ID
     int parentNodeId = vtkDataAssembly::GetRootNode();
