@@ -46,7 +46,7 @@ public:
   void ShowBadge();
 
   /**
-   * Check if the console badge is visible
+   * Return true if the console badge is visible, false otherwise
    */
   bool IsBadgeVisible() const;
 
