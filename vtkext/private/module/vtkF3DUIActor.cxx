@@ -279,14 +279,9 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
   return 1;
 }
 
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::AddNotification(
   const std::string& desc, const std::string& value, const std::string& bind, double stopTime)
 {
-  auto it = std::find_if(this->Notifications.begin(), this->Notifications.end(),
-    [&](const Notification& n) { return desc == n.desc; });
-  if (it != this->Notifications.end())
-  {
-    this->Notifications.erase(it); // Remove duplicate
-  }
   this->Notifications.emplace_front(Notification{ desc, value, bind, stopTime });
 }

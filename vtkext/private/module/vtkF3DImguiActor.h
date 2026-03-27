@@ -102,7 +102,7 @@ private:
   void RenderConsoleBadge() override;
 
   /**
-   * Render the notifications at the bottom left of veiwport.
+   * Render the notifications at the bottom left of viewport.
    * Newest to oldest, from bottom to top.
    */
   void RenderNotifications(double currentTime) override;

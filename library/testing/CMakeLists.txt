@@ -43,7 +43,6 @@ if(F3D_MODULE_UI)
     TestSDKMultiOptions.cxx
     TestSDKTriggerInteractions.cxx
     )
-
   
   # This test uses tone mapping which changed after 9.3.20240729
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20240609)

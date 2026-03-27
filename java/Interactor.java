@@ -233,6 +233,7 @@ public class Interactor {
      * @param commands list of commands to trigger
      * @param group optional group name for organization
      * @param type optional binding type
+     * @param notify notify when the binding is triggered
      * @return this interactor for method chaining
      */
     public Interactor addBinding(InteractionBind bind, List<String> commands, String group, BindingType type, boolean notify) {
@@ -257,6 +258,7 @@ public class Interactor {
      * @param command command to trigger
      * @param group optional group name for organization
      * @param type optional binding type
+     * @param notify notify when the binding is triggered
      * @return this interactor for method chaining
      */
     private native Interactor addBindingCommand(InteractionBind bind, String command, String group, BindingType type, boolean notify);
@@ -268,6 +270,7 @@ public class Interactor {
      * @param command command to trigger
      * @param group optional group name for organization
      * @param type optional binding type
+     * @param notify notify when the binding is triggered
      * @return this interactor for method chaining
      */
     public Interactor addBinding(InteractionBind bind, String command, String group, BindingType type, boolean notify) {
@@ -547,7 +550,7 @@ public class Interactor {
     public native Interactor requestStop();
 
     /**
-     * Trigger a single text line notification at the bottom left of viewport.
+     * Trigger a single text line notification with text desc for duration ms.
      *
      * @param desc Text description
      * @param value Text value

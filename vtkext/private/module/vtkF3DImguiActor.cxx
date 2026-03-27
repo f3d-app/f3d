@@ -1230,34 +1230,22 @@ void vtkF3DImguiActor::RenderNotifications(double currentTime)
     // Increase line spacing a bit
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(itemSpacingX, 10.0f * this->FontScale));
 
-    float descLineWidth = descLineSize.x + valueLineSize.x;
-    descLineWidth += value.empty() ? 0.f : itemSpacingX;
+    float windowWidth = descLineSize.x + valueLineSize.x + windowPadding.x * 2.f;
+    windowWidth += value.empty() ? 0.f : itemSpacingX;
 
     auto keys = ::SplitBindings(bind, '+');
     const float plusWidth = ImGui::CalcTextSize("+").x;
-    float bindingLineWidth = 0.f;
 
     if (this->BindingsVisible && !bind.empty())
     {
-      bindingLineWidth = std::accumulate(keys.begin(), keys.end(), 0.0f,
+      windowWidth += std::accumulate(keys.begin(), keys.end(), 0.0f,
         [](float sum, const std::string& key) { return sum + ImGui::CalcTextSize(key.c_str()).x; });
 
-      if (keys.size() > 1)
-      {
-        bindingLineWidth += (keys.size() - 1) * (itemSpacingX + plusWidth + itemSpacingX);
-        bindingLineWidth += ImGui::CalcTextSize("Bind Keys:").x;
-      }
-      else
-      {
-        bindingLineWidth += ImGui::CalcTextSize("Bind Key:").x;
-      }
-      bindingLineWidth += itemSpacingX + margin * this->FontScale;
+      windowWidth += (keys.size() - 1) * (itemSpacingX + plusWidth + itemSpacingX);
+      windowWidth += itemSpacingX + margin * this->FontScale;
     }
 
-    float windowWidth = std::max(descLineWidth, bindingLineWidth) + windowPadding.x * 2.f;
     float windowHeight = descLineSize.y + windowPadding.y * 2.f;
-    windowHeight +=
-      !this->BindingsVisible || bind.empty() ? 0.f : ImGui::GetTextLineHeightWithSpacing();
 
     ImVec4 descTextColor = ::ColorToImVec4(this->FontColor);
     ImVec4 valueTextColor = F3DStyle::imgui::GetHighlightColor(); // Blue
@@ -1267,9 +1255,7 @@ void vtkF3DImguiActor::RenderNotifications(double currentTime)
     // change color for booleans
     if (value == "ON")
     {
-      valueTextColor = F3DStyle::imgui::GetCompletionColor();   // Green
-      bindingTextColor = F3DStyle::imgui::GetBackgroundColor(); // Black
-      bindingRectColor = F3DStyle::imgui::GetWarningColor();    // Yellow
+      valueTextColor = F3DStyle::imgui::GetCompletionColor(); // Green
     }
     else if (value == "OFF")
     {
@@ -1297,35 +1283,15 @@ void vtkF3DImguiActor::RenderNotifications(double currentTime)
     // Render each notification in separated window
     ImGui::Begin(("##notif_" + std::to_string(index)).c_str(), nullptr, flags);
 
-    float posX = (windowWidth - descLineWidth) * 0.5f; // Text centering
-    ImGui::SetCursorPosX(posX);
-
-    ImGui::TextColored(descTextColor, "%s", description.c_str());
-    if (!value.empty())
-    {
-      ImGui::SameLine();
-      ImGui::TextColored(valueTextColor, "%s", value.c_str());
-    }
-
     if (this->BindingsVisible && !bind.empty())
     {
-      posX = (windowWidth - bindingLineWidth) * 0.5f;
-      ImGui::SetCursorPosX(posX);
-
-      if (keys.size() > 1)
-      {
-        ImGui::TextColored(descTextColor, "%s", "Bind Keys:");
-      }
-      else
-      {
-        ImGui::TextColored(descTextColor, "%s", "Bind Key:");
-      }
-      ImGui::SameLine();
-
       ImVec2 topBindingCorner, bottomBindingCorner;
       float recMarginX = margin * this->FontScale;
       float recMarginY = margin * this->FontScale * .5f;
       float recRadius = 2.f * this->FontScale;
+
+      ImGui::SameLine(0.f, 5.f);
+
       for (const std::string& key : keys)
       {
         ImDrawList* drawList = ImGui::GetWindowDrawList();
@@ -1347,7 +1313,18 @@ void vtkF3DImguiActor::RenderNotifications(double currentTime)
         }
         ImGui::SameLine();
       }
+
+      // add padding between bindings and description
+      ImGui::SameLine(0.f, 10.f);
     }
+
+    ImGui::TextColored(descTextColor, "%s", description.c_str());
+    if (!value.empty())
+    {
+      ImGui::SameLine();
+      ImGui::TextColored(valueTextColor, "%s", value.c_str());
+    }
+
     ImGui::End();
     ImGui::PopStyleVar();
     ImGui::PopFont();

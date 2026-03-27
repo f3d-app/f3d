@@ -105,7 +105,7 @@ int test_interactor()
   (void)less1;
 
   const char* test_commands[] = { "test_action" };
-  f3d_interactor_add_binding(interactor, &bind, test_commands, 1, "test_group");
+  f3d_interactor_add_binding(interactor, &bind, test_commands, 1, "test_group", F3D_INTERACTOR_BINDING_CYCLIC, 1);
 
   int group_count = 0;
   char** groups = f3d_interactor_get_bind_groups(interactor, &group_count);

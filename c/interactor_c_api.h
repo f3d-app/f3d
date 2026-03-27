@@ -214,10 +214,12 @@ extern "C"
    * @param commands Array of command strings.
    * @param command_count Number of commands.
    * @param group Optional group name (can be NULL).
+   * @param type Optional binding type.
+   * @param notify Notify when the binding is triggered.
    */
   F3D_EXPORT void f3d_interactor_add_binding(f3d_interactor_t* interactor,
     const f3d_interaction_bind_t* bind, const char** commands, int command_count,
-    const char* group);
+    const char* group, f3d_interactor_binding_type_t type, int notify);
 
   /**
    * @brief Remove a binding for the provided bind.
