@@ -47,7 +47,7 @@ public class TestImage {
         .setMetadata("author", "F3D")
         .save(tmpPath + "chained.png");
 
-    Image img4 = new Image(img1Buffer, img1Buffer.length);
+    Image img4 = new Image(img1Buffer);
     img4.compare(img1);
 
     img1.delete();
