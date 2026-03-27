@@ -37,7 +37,7 @@ f3d_test(NAME TestInteractionInvertZoom DATA suzanne.ply ARGS --invert-zoom INTE
 f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #CTRL+Q
 f3d_test(NAME TestInteractionNotifications DATA cow.vtp ARGS --notifications INTERACTION UI) #E;
 f3d_test(NAME TestInteractionNotificationsBindings DATA cow.vtp ARGS --notifications -Dui.notifications.show_bindings=ON INTERACTION UI) #E;
-f3d_test(NAME TestInteractionNotificationsBindingsModifier DATA cow.vtp ARGS --notifications -Dui.notifications.show_bindings=ON INTERACTION UI) #SHIFT+L;
+f3d_test(NAME TestInteractionNotificationsBindingsModifier DATA cow.vtp ARGS --notifications -Dui.notifications.show_bindings=ON RESOLUTION 400,300 INTERACTION UI) #SHIFT+L;
 f3d_test(NAME TestInteractionToggleNotifications DATA cow.vtp INTERACTION UI) #CTRL+K;
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
