@@ -73,6 +73,12 @@ public:
   image& operator=(const image& img) noexcept;
   image(image&& img) noexcept;
   image& operator=(image&& img) noexcept;
+
+  /**
+   * Create an image from a given stream buffer.
+   * Throws an image::read_exception if buffer is empty, or if no image reader supports
+   * the given stream
+   */
   image(std::byte* byte, std::size_t size);
   ///@}
 
