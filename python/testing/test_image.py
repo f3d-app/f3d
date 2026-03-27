@@ -69,7 +69,7 @@ def test_loading_stream(f3d_engine: f3d.Engine):
     img = f3d_engine.window.render_to_image(True)
     buffer = img.save_buffer(f3d.Image.SaveFormat.PNG)
 
-    stream_image = f3d.Image(buffer, len(buffer))
+    stream_image = f3d.Image(buffer)
     assert stream_image == img
 
 
