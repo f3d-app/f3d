@@ -525,16 +525,16 @@ public:
       Alembic::AbcGeom::Int32ArraySamplePtr curveCounts = samp.getCurvesNumVertices();
 
       vtkNew<vtkPoints> points;
-      vtkNew<vtkCellArray> lines;
-
+      points->SetNumberOfPoints(positions->size());
       for (size_t pIndex = 0; pIndex < positions->size(); ++pIndex)
       {
         Alembic::Abc::V3f tp;
         matrix.multVecMatrix(positions->get()[pIndex], tp);
-        points->InsertNextPoint(tp.x, tp.y, tp.z);
+        points->SetPoint(pIndex, tp.x, tp.y, tp.z);
       }
 
       size_t pOffsetIndex = 0;
+      vtkNew<vtkCellArray> lines;
       for (size_t cIndex = 0; cIndex < curveCounts->size(); ++cIndex)
       {
         const size_t vCount = curveCounts->get()[cIndex];
