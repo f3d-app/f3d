@@ -283,6 +283,16 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
 void vtkF3DUIActor::AddNotification(const std::string& desc, const std::string& value,
   const std::string& bind, double startTime, double duration)
 {
+  if (!this->Notifications.empty())
+  {
+    Notification& last = this->Notifications.front();
+    if (last.desc == desc && last.value != value)
+    {
+      last.value = value;
+      last.stopTime = startTime + duration;
+      return;
+    }
+  }
   this->Notifications.emplace_front(
     Notification{ desc, value, bind, startTime, startTime + duration });
 }
