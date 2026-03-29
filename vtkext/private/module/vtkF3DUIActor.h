@@ -210,6 +210,11 @@ public:
   }
 
   /**
+   * Set the maximum scene hierarchy width to display
+   */
+  void SetSceneHierarchyMaxWidth(const int width);
+
+  /**
    * Add notification info to deque
    */
   void AddNotification(
@@ -318,7 +323,7 @@ protected:
   std::string MetaData = "";
 
   bool SceneHierarchyVisible = false;
-
+  int SceneHierarchyMaxWidth = 600;
   bool CheatSheetVisible = false;
   std::vector<CheatSheetGroup> CheatSheet;
 

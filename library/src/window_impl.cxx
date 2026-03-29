@@ -459,7 +459,8 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetFilenameInfo(opt.ui.filename_info);
   renderer->ShowMetaData(opt.ui.metadata);
   renderer->ShowHDRIFilename(opt.ui.hdri_filename);
-  renderer->ShowSceneHierarchy(opt.ui.scene_hierarchy);
+  renderer->ShowSceneHierarchy(opt.ui.scene_hierarchy.enable);
+  renderer->SetSceneHierarchyMaxWidth(opt.ui.scene_hierarchy.max_width);
   renderer->ShowCheatSheet(opt.ui.cheatsheet);
   renderer->ShowConsole(opt.ui.console);
   renderer->ShowMinimalConsole(opt.ui.minimal_console);

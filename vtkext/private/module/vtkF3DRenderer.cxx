@@ -1886,6 +1886,12 @@ void vtkF3DRenderer::ConfigureMetaData()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetSceneHierarchyMaxWidth(const int maxWidth)
+{
+  this->UIActor->SetSceneHierarchyMaxWidth(maxWidth);
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowSceneHierarchy(bool show)
 {
   if (this->SceneHierarchyVisible != show)
