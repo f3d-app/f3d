@@ -44,6 +44,7 @@ public:
     std::string desc;
     std::string value;
     std::string bind;
+    double startTime;
     double stopTime;
   };
 
@@ -212,8 +213,8 @@ public:
   /**
    * Add notification info to deque
    */
-  void AddNotification(
-    const std::string& desc, const std::string& value, const std::string& bind, double stopTime);
+  void AddNotification(const std::string& desc, const std::string& value, const std::string& bind,
+    double startTime, double duration);
 
 protected:
   vtkF3DUIActor();

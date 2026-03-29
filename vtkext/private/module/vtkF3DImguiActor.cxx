@@ -1208,9 +1208,14 @@ void vtkF3DImguiActor::SetDeltaTime(double time)
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderNotifications(double currentTime)
 {
-  int index = 0;
+  constexpr double slideUpTime = .1;
+  constexpr double fadingInTime = .1;
+  constexpr double fadingOutTime = .5;
 
-  for (const auto& [desc, value, bind, stopTime] : this->Notifications)
+  int index = 0;
+  float yOffset = 0.0f;
+
+  for (const auto& [desc, value, bind, startTime, stopTime] : this->Notifications)
   {
     std::string description = desc;
     if (!value.empty())
@@ -1257,8 +1262,9 @@ void vtkF3DImguiActor::RenderNotifications(double currentTime)
       valueTextColor = F3DStyle::imgui::GetErrorColor(); // Red
     }
 
-    constexpr double fadingTime = 0.5;
-    float alpha = std::clamp((stopTime - currentTime) / fadingTime, 0.0, 1.0);
+    const float alphaIn = (currentTime - startTime - slideUpTime) / fadingInTime;
+    const float alphaOut = (stopTime - currentTime) / fadingOutTime;
+    const float alpha = std::clamp(std::min(alphaIn, alphaOut), 0.0f, 1.0f);
 
     descTextColor.w = alpha;
     valueTextColor.w = alpha;
@@ -1268,9 +1274,10 @@ void vtkF3DImguiActor::RenderNotifications(double currentTime)
       ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing |
       ImGuiWindowFlags_NoNav;
 
-    float yOffset = index * (windowHeight + margin);
+    const float slideUpFactor = std::clamp((currentTime - startTime) / slideUpTime, 0.0, 1.0);
+    yOffset += slideUpFactor * (windowHeight + margin);
 
-    ImVec2 position(margin, viewport->WorkSize.y - windowHeight - margin - yOffset);
+    ImVec2 position(margin, viewport->WorkSize.y - yOffset);
     ::SetupNextWindow(position, ImVec2(windowWidth, windowHeight));
 
     // Render each notification in separated window
