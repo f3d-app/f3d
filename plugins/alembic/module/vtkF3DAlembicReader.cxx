@@ -1,4 +1,5 @@
 #include "vtkF3DAlembicReader.h"
+#include "vtkF3DFaceVaryingPointDispatcher.h"
 
 #include <vtkAppendPolyData.h>
 #include <vtkFloatArray.h>
@@ -47,8 +48,6 @@ struct IntermediateGeometry
   PerMeshWavefrontIndicesTripletsContainer Indices;
   bool uvFaceVarying = false;
   bool nFaceVarying = false;
-  std::vector<vtkIdType> PointSourceIds;
-  std::vector<vtkIdType> NormalSourceIds;
 };
 
 class vtkF3DAlembicReader::vtkInternals
@@ -90,110 +89,6 @@ class vtkF3DAlembicReader::vtkInternals
       {
         perFaceIndices[j][indicesOffset] = thisFaceIndices[j];
       }
-    }
-  }
-
-  void PointDuplicateAccumulator(
-    const IntermediateGeometry& originalData, IntermediateGeometry& duplicatedData)
-  {
-    duplicatedData.uvFaceVarying = originalData.uvFaceVarying;
-    duplicatedData.nFaceVarying = originalData.nFaceVarying;
-    bool needToDuplicate = originalData.uvFaceVarying || originalData.nFaceVarying;
-
-    auto uvMapIter = originalData.Attributes.find("uv");
-    auto nMapIter = originalData.Attributes.find("N");
-    bool haveUV = uvMapIter != originalData.Attributes.end();
-    bool haveN = nMapIter != originalData.Attributes.end();
-
-    if (needToDuplicate)
-    {
-      auto faceCount = originalData.Indices.size();
-      duplicatedData.Indices.resize(faceCount);
-
-      size_t totalVertices = 0;
-      for (size_t i = 0; i < faceCount; i++)
-      {
-        auto thisFaceVertexCount = originalData.Indices[i].size();
-        duplicatedData.Indices[i].resize(thisFaceVertexCount, Alembic::Abc::V3i(0));
-        totalVertices += thisFaceVertexCount;
-      }
-
-      duplicatedData.PointSourceIds.reserve(totalVertices);
-      if (haveN)
-      {
-        duplicatedData.NormalSourceIds.reserve(totalVertices);
-      }
-
-      // Points
-      {
-        V3fContainer pV3F;
-        pV3F.reserve(totalVertices);
-        int pRunningIndex = 0;
-        for (size_t i = 0; i < faceCount; i++)
-        {
-          auto thisFaceVertexCount = originalData.Indices[i].size();
-          for (size_t j = 0; j < thisFaceVertexCount; j++)
-          {
-            Alembic::Abc::V3f originalPosition =
-              originalData.Attributes.at("P")[originalData.Indices[i][j].x];
-            pV3F.emplace_back(originalPosition);
-            duplicatedData.Indices[i][j].x = pRunningIndex;
-            duplicatedData.PointSourceIds.emplace_back(originalData.Indices[i][j].x);
-            pRunningIndex++;
-          }
-        }
-
-        duplicatedData.Attributes.insert(AttributesContainer::value_type("P", pV3F));
-      }
-
-      // UV
-      if (haveUV)
-      {
-        V3fContainer uvV3F;
-        int uvRunningIndex = 0;
-
-        for (size_t i = 0; i < faceCount; i++)
-        {
-          auto thisFaceVertexCount = originalData.Indices[i].size();
-          for (size_t j = 0; j < thisFaceVertexCount; j++)
-          {
-            Alembic::Abc::V3f originalUV =
-              originalData.Attributes.at("uv")[originalData.Indices[i][j].y];
-            uvV3F.emplace_back(originalUV);
-            duplicatedData.Indices[i][j].y = uvRunningIndex;
-            uvRunningIndex++;
-          }
-        }
-
-        duplicatedData.Attributes.insert(AttributesContainer::value_type("uv", uvV3F));
-      }
-
-      // Normal
-      if (haveN)
-      {
-        V3fContainer nV3F;
-        int nRunningIndex = 0;
-
-        for (size_t i = 0; i < faceCount; i++)
-        {
-          auto thisFaceVertexCount = originalData.Indices[i].size();
-          for (size_t j = 0; j < thisFaceVertexCount; j++)
-          {
-            Alembic::Abc::V3f originalN =
-              originalData.Attributes.at("N")[originalData.Indices[i][j].z];
-            nV3F.emplace_back(originalN);
-            duplicatedData.Indices[i][j].z = nRunningIndex;
-            duplicatedData.NormalSourceIds.push_back(originalData.Indices[i][j].z);
-            nRunningIndex++;
-          }
-        }
-
-        duplicatedData.Attributes.insert(AttributesContainer::value_type("N", nV3F));
-      }
-    }
-    else
-    {
-      duplicatedData = originalData;
     }
   }
 
@@ -271,6 +166,9 @@ class vtkF3DAlembicReader::vtkInternals
         const auto& n = nArray[i];
         normals->SetTuple3(i, n.x, n.y, n.z);
       }
+
+      vtkInformation* info = normals->GetInformation();
+      info->Set(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE(), data.nFaceVarying ? 1 : 0);
       pointAttributes->SetNormals(normals);
     }
 
@@ -290,27 +188,10 @@ class vtkF3DAlembicReader::vtkInternals
         uvs->SetTuple2(i, uv.x, uv.y);
       }
 
+      vtkInformation* info = uvs->GetInformation();
+      info->Set(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE(), data.uvFaceVarying ? 1 : 0);
+
       pointAttributes->SetTCoords(uvs);
-    }
-
-    if (!data.PointSourceIds.empty())
-    {
-      vtkNew<vtkIdTypeArray> sourceIds;
-      sourceIds->SetName("AbcSourceIds");
-      sourceIds->SetNumberOfTuples(data.PointSourceIds.size());
-      std::copy(data.PointSourceIds.begin(), data.PointSourceIds.end(), sourceIds->GetPointer(0));
-      polydata->GetFieldData()->AddArray(sourceIds);
-    }
-
-    if (haveN && !data.NormalSourceIds.empty() &&
-      data.NormalSourceIds.size() == static_cast<size_t>(numPoints))
-    {
-      vtkNew<vtkIdTypeArray> normalSourceIds;
-      normalSourceIds->SetName("AbcNormalIds");
-      normalSourceIds->SetNumberOfTuples(data.NormalSourceIds.size());
-      std::copy(
-        data.NormalSourceIds.begin(), data.NormalSourceIds.end(), normalSourceIds->GetPointer(0));
-      polydata->GetFieldData()->AddArray(normalSourceIds);
     }
   }
 
@@ -343,26 +224,22 @@ public:
       vtkPolyData* cachedPoly = this->OutputCache[meshName];
       polydata->ShallowCopy(cachedPoly);
 
-      vtkDataArray* sourceIdsDA = polydata->GetFieldData()->GetArray("AbcSourceIds");
+      vtkIdTypeArray* sourceIds =
+        vtkIdTypeArray::SafeDownCast(polydata->GetPointData()->GetArray("SourceIds"));
 
       const vtkIdType numPoints = polydata->GetNumberOfPoints();
       vtkNew<vtkPoints> newPoints;
       newPoints->SetNumberOfPoints(numPoints);
-      if (sourceIdsDA)
+      if (sourceIds)
       {
-        vtkIdTypeArray* sourceIdsArr = vtkIdTypeArray::SafeDownCast(sourceIdsDA);
-        if (sourceIdsArr)
+        for (vtkIdType i = 0; i < numPoints; i++)
         {
-          const vtkIdType* srcIndices = sourceIdsArr->GetPointer(0);
-          for (vtkIdType i = 0; i < numPoints; i++)
+          vtkIdType rawIndex = sourceIds->GetTypedComponent(i, 0);
+          if (rawIndex < static_cast<vtkIdType>(positions->size()))
           {
-            vtkIdType rawIndex = srcIndices[i];
-            if (rawIndex < static_cast<vtkIdType>(positions->size()))
-            {
-              Alembic::Abc::V3f tp;
-              matrix.multVecMatrix(positions->get()[rawIndex], tp);
-              newPoints->SetPoint(i, tp.x, tp.y, tp.z);
-            }
+            Alembic::Abc::V3f tp;
+            matrix.multVecMatrix(positions->get()[rawIndex], tp);
+            newPoints->SetPoint(i, tp.x, tp.y, tp.z);
           }
         }
       }
@@ -377,7 +254,6 @@ public:
       polydata->SetPoints(newPoints);
 
       // Update Normals
-      vtkDataArray* normalSourceIdsDA = polydata->GetFieldData()->GetArray("AbcNormalIds");
       Alembic::AbcGeom::IN3fGeomParam normalsParam = schema.getNormalsParam();
       if (normalsParam.valid())
       {
@@ -390,16 +266,13 @@ public:
           if (normals)
           {
             const vtkIdType numNormals = normals->GetNumberOfTuples();
-            vtkIdType* normalIndices = normalSourceIdsDA
-              ? static_cast<vtkIdTypeArray*>(normalSourceIdsDA)->GetPointer(0)
-              : nullptr;
 
             auto vals = normalValue.getVals();
             if (vals)
             {
               for (vtkIdType i = 0; i < numNormals; i++)
               {
-                const vtkIdType rawIndex = normalIndices ? normalIndices[i] : i;
+                const vtkIdType rawIndex = sourceIds ? sourceIds->GetTypedComponent(i, 0) : i;
                 if (rawIndex < static_cast<vtkIdType>(vals->size()))
                 {
                   Alembic::Abc::V3f normal;
@@ -494,10 +367,16 @@ public:
         }
       }
 
-      IntermediateGeometry duplicatedData;
-      this->PointDuplicateAccumulator(originalData, duplicatedData);
+      this->FillPolyData(originalData, polydata);
 
-      this->FillPolyData(duplicatedData, polydata);
+      bool needToDuplicate = originalData.uvFaceVarying || originalData.nFaceVarying;
+      if (needToDuplicate)
+      {
+        vtkNew<vtkF3DFaceVaryingPointDispatcher> faceVaryingFilter;
+        faceVaryingFilter->SetInputData(polydata);
+        faceVaryingFilter->Update();
+        polydata->ShallowCopy(faceVaryingFilter->GetOutput());
+      }
 
       // Store data for the next frame
       if (isTopologyConstant)

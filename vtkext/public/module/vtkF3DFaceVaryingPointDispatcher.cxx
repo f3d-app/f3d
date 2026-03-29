@@ -1,6 +1,7 @@
 #include "vtkF3DFaceVaryingPointDispatcher.h"
 
 #include "vtkFloatArray.h"
+#include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationIntegerKey.h"
 #include "vtkInformationVector.h"
@@ -89,6 +90,11 @@ int vtkF3DFaceVaryingPointDispatcher::RequestData(vtkInformation* vtkNotUsed(req
   }
 
   vtkNew<vtkCellArray> outputFaces;
+  vtkNew<vtkIdTypeArray> sourceIds;
+  sourceIds->SetName("SourceIds");
+  sourceIds->SetNumberOfTuples(nbConnectivity);
+
+  outputPointData->AddArray(sourceIds);
 
   std::vector<vtkIdType> cell;
   cell.resize(inputFaces->GetMaxCellSize());
@@ -105,6 +111,7 @@ int vtkF3DFaceVaryingPointDispatcher::RequestData(vtkInformation* vtkNotUsed(req
     {
       cell[j] = currentVertexIndex + j;
       outputPoints->SetPoint(currentVertexIndex + j, inputPoints->GetPoint(cellPoints[j]));
+      sourceIds->SetValue(currentVertexIndex + j, cellPoints[j]);
 
       for (vtkIdType k = 0; k < nbArrays; k++)
       {
