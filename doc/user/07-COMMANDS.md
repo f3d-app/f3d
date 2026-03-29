@@ -27,7 +27,7 @@ The libf3d provides a few commands, many related to manipulating libf3d (options
 
 `cycle_anti_aliasing`: A specific command to cycle between the anti-aliasing method (`none`,`fxaa`,`ssaa`,`taa`).
 
-`cycle_animation`: A specific command to cycle `scene.animation.index` option using model information, No argument.
+`cycle_animation`: A specific command to cycle `scene.animation.index` option using model information. No argument.
 
 `cycle_coloring field/array/component`: A specific command to manipulate scivis options using model information.
 Supports `field`, `array` or `component` arguments, see [documentation](04-INTERACTIONS.md#cycling-coloring).
@@ -50,13 +50,15 @@ eg: `azimuth_camera 120`.
 
 `decrease_opacity`: A specific command to decrease opacity. Unset opacity will be treated as if it has a value of 1. No argument.
 
-`print_scene_info`: A specific command to print information about the scene, No argument.
+`print_scene_info`: A specific command to print information about the scene. No argument.
 
-`print_coloring_info`: A specific command to print information about coloring settings, No argument.
+`print_coloring_info`: A specific command to print information about coloring settings. No argument.
 
-`print_mesh_info`: A specific command to print information from the mesh importer, No argument.
+`print_mesh_info`: A specific command to print information from the mesh importer. No argument.
 
-`print_options_info`: A specific command to print libf3d options that have a value, No argument.
+`print_options_info`: A specific command to print libf3d options that have a value. No argument.
+
+`print_config_info`: A specific command to print config file information. No argument.
 
 `set_camera front/top/right/back/bottom/left/isometric`: A specific command to position the camera in the specified location relative to the model.
 Supports `front`, `top`, `right`, `back`, `bottom`, `left`, `isometric` arguments. eg: `set_camera top`.
