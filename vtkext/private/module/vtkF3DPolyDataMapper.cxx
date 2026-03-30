@@ -312,7 +312,7 @@ void vtkF3DPolyDataMapper::ReplaceShaderTCoord(
   }
 
   // unlit gamma correction
-  if (!actor->GetProperty()->GetLighting())
+  if (!actor->GetProperty()->GetLighting() && actor->GetProperty()->GetInterpolation() != VTK_PBR)
   {
     auto fragmentShader = shaders[vtkShader::Fragment];
     std::string FSSource = fragmentShader->GetSource();
