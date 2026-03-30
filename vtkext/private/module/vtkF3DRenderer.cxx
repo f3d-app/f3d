@@ -2094,7 +2094,7 @@ void vtkF3DRenderer::UpdateActors()
   {
     this->ActorsPropertiesConfigured = false;
     this->GridConfigured = false;
-    this->GridAxesConfigured = false; // fix: recompute axes grid on file switch
+    this->GridAxesConfigured = false;
     this->MetaDataConfigured = false;
   }
   this->ImporterTimeStamp = importerMTime;
