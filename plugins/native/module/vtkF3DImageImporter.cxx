@@ -97,8 +97,8 @@ void vtkF3DImageImporter::ImportActors(vtkRenderer* renderer)
 
   texture->UseSRGBColorSpaceOn();
   actor->GetProperty()->SetInterpolationToPBR();
+  actor->GetProperty()->LightingOff();
   actor->GetProperty()->SetBaseColorTexture(texture);
-  actor->GetProperty()->SetBaseIOR(1.0);
   renderer->AddActor(actor);
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)

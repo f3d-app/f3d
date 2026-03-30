@@ -427,6 +427,11 @@ public:
    */
   void SetEnableCheckerBoard(bool enable);
 
+  /**
+   * Set unlit mode
+   */
+  void SetUnlit(const std::optional<bool>& enable);
+
   ///@{
   /**
    * Set/Get if using point or cell data coloring
@@ -850,6 +855,8 @@ private:
   double PointSpritesSize = 10;
   bool PointSpritesAbsoluteScale = false;
   bool PointSpritesUseInstancing = false;
+
+  std::optional<bool> Unlit;
 };
 
 #endif

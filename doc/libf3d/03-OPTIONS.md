@@ -169,6 +169,13 @@ Override model's texture with a checkerboard texture.
 
 CLI: `--checkerboard`.
 
+### `model.unlit` (_bool_, optional)
+
+Override model's lighting configuration.
+If the value is true, no shading is applied and the model will be unlit.
+
+CLI: `--unlit`.
+
 ### `model.scivis.enable` (_bool_, default: `false`)
 
 _Color by an array_ present in on the data. If `model.scivis.array_name` is not set, the first available array will be used.

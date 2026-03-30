@@ -337,6 +337,11 @@ Importer may set a default value depending on file type. If a default value exis
 
 Override model's texture with a checkerboard texture.
 
+### `--unlit` (_bool_)
+
+Override model's lighting configuration.
+If the value is true, no shading is applied and the model will be unlit.
+
 ## Window options
 
 ### `--background-color=<color>` (_color_, default: `0.2, 0.2, 0.2`)

@@ -2449,6 +2449,16 @@ void vtkF3DRenderer::SetEnableCheckerBoard(bool enable)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUnlit(const std::optional<bool>& enable)
+{
+  if (this->Unlit != enable)
+  {
+    this->Unlit = enable;
+    this->ActorsPropertiesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetPointSpritesType(vtkF3DRenderer::SplatType type)
 {
   if (this->PointSpritesType != type)
@@ -2640,6 +2650,12 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     {
       coloring.Actor->GetProperty()->SetNormalScale(this->NormalScale.value());
       coloring.OriginalActor->GetProperty()->SetNormalScale(this->NormalScale.value());
+    }
+
+    if (this->Unlit.has_value())
+    {
+      coloring.Actor->GetProperty()->SetLighting(!this->Unlit.value());
+      coloring.OriginalActor->GetProperty()->SetLighting(!this->Unlit.value());
     }
 
     if (this->TextureMatCap.has_value())

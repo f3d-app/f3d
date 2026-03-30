@@ -322,6 +322,9 @@
         "default_value": "false"
       }
     },
+    "unlit": {
+      "type": "bool"
+    },
     "color": {
       "opacity": {
         "type": "double"

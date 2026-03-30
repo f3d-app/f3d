@@ -450,6 +450,12 @@
           "longName": "normal-scale",
           "helpText": "Normal scale affects the strength of the normal deviation from the normal texture",
           "valueHelper": "<normalScale>"
+        },
+        {
+          "longName": "unlit",
+          "helpText": "Ignore lights and",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
         }
       ]
     },

@@ -118,6 +118,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "texture-normal", "model.normal.texture" },
   { "checkerboard", "model.checkerboard.enable" },
   { "normal-scale", "model.normal.scale" },
+  { "unlit", "model.unlit" },
   { "background-color", "render.background.color" },
   { "fps", "ui.fps" },
   { "filename", "ui.filename" },
