@@ -390,7 +390,8 @@ bool vtkF3DMetaImporter::Update()
       vtkPolyData* surface = pdMapper->GetInput();
 
       // convert to PBR materials if needed
-      if (!genericImporter && actor->GetProperty()->GetInterpolation() != VTK_PBR && actor->GetProperty()->GetLighting())
+      if (!genericImporter && actor->GetProperty()->GetInterpolation() != VTK_PBR &&
+        actor->GetProperty()->GetLighting())
       {
         actor->GetProperty()->SetInterpolationToPBR();
 
