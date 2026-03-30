@@ -311,6 +311,22 @@ void vtkF3DPolyDataMapper::ReplaceShaderTCoord(
     fragmentShader->SetSource(FSSource);
   }
 
+  // unlit gamma correction
+  if (!actor->GetProperty()->GetLighting())
+  {
+    auto fragmentShader = shaders[vtkShader::Fragment];
+    std::string FSSource = fragmentShader->GetSource();
+
+    // apply final gamma-correction
+    std::string customGamma =
+      "//VTK::TCoord::Impl\n"
+      "gl_FragData[0] = vec4(pow(gl_FragData[0].rgb, vec3(1.0/2.2)), 1.0);\n";
+
+    vtkShaderProgram::Substitute(FSSource, "//VTK::TCoord::Impl", customGamma);
+
+    fragmentShader->SetSource(FSSource);
+  }
+
   this->Superclass::ReplaceShaderTCoord(shaders, ren, actor);
 }
 

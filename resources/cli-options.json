@@ -453,7 +453,7 @@
         },
         {
           "longName": "unlit",
-          "helpText": "Ignore lights and",
+          "helpText": "Ignore shading and make the material unlit",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         }
