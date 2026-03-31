@@ -428,7 +428,7 @@ public:
   void SetEnableCheckerBoard(bool enable);
 
   /**
-   * Set unlit mode
+   * Set unlit mode, ignore all lights in the scene including HDRI
    */
   void SetUnlit(const std::optional<bool>& enable);
 
