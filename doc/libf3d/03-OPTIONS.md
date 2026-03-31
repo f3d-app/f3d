@@ -307,7 +307,7 @@ CLI: `--final-shader`
 ### `render.effect.display_depth` (_bool_, default: `false`)
 
 Display the depth buffer as a grayscale image or with a colormap if `model.scivis.enable` is specified.
-Only opaque objects are displayed, translucent and volumetric objects are ignored.
+Only opaque objects are displayed, the grid and translucent/volumetric objects are ignored.
 
 CLI: `--display-depth`
 
