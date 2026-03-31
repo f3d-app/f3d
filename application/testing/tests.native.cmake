@@ -180,7 +180,7 @@ if(NOT F3D_MACOS_BUNDLE)
     endif()
   endif()
   if(F3D_MODULE_WEBP)
-    f3d_test(NAME TestThumbnailConfigFileWebP DATA image.webp CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING THRESHOLD 0.07) # Slight difference in VTK 9.3
+    f3d_test(NAME TestThumbnailConfigFileWebP DATA image.webp CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING THRESHOLD 0.07) # Slight difference in VTK 9.3 because of different comparison algorithms
   endif()
   f3d_test(NAME TestThumbnailConfigFileQuakeMDL DATA zombie.mdl CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING THRESHOLD 0.07) # Threshold is needed for IBL change after VTK 9.6
 endif()
