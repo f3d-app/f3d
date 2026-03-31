@@ -932,8 +932,8 @@ bool vtkF3DOCCTReader::CanReadFile(vtkResourceStream* stream, vtkF3DOCCTReader::
   {
     // Only "ISO-10303-21" supported schema is STEP, check for it
     // FILE_SCHEMA appears in the HEADER section, typically within the first few lines.
-    // 32 lines is a generous upper bound to account for optional header entries.
-    constexpr int maxLines = 32;
+    // 256 lines is a generous upper bound to account for optional header entries.
+    constexpr int maxLines = 256;
     for (int i = 0; i < maxLines && parser->ReadLine(line) == vtkParseResult::EndOfLine; ++i)
     {
       if (line.find("FILE_SCHEMA") != std::string::npos)
