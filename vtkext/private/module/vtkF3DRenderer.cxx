@@ -2230,7 +2230,7 @@ void vtkF3DRenderer::Render()
 void vtkF3DRenderer::ResetCameraClippingRange()
 {
   const bool gridUseBounds = this->GridActor->GetUseBounds();
-  this->GridActor->UseBoundsOn();
+  this->GridActor->SetUseBounds(!this->DisplayDepth);
   this->Superclass::ResetCameraClippingRange();
   this->GridActor->SetUseBounds(gridUseBounds);
 }

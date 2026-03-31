@@ -64,6 +64,7 @@ f3d_test(NAME TestAnimationInputChangeColoring DATA v_rock2.mdl ARGS --scalar-co
 f3d_test(NAME TestDisplayDepth DATA dragon.vtu ARGS --display-depth)
 f3d_test(NAME TestDisplayDepthColorMap DATA dragon.vtu ARGS --display-depth --scalar-coloring=True)
 f3d_test(NAME TestDisplayDepthCustomColorMap DATA dragon.vtu ARGS --display-depth --scalar-coloring --colormap=0,red,1,blue)
+f3d_test(NAME TestDisplayDepthWithGrid DATA cow.vtp ARGS --display-depth -g)
 
 # DPI scaling
 f3d_test(NAME TestDPI125 DATA dragon.vtu ARGS -nm --dpi-aware DPI_SCALE 1.25 UI)
