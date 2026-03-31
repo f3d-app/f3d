@@ -37,6 +37,7 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "G");
   inter.triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "G");
 
+  inter.triggerEventLoop(0.2); // allow fade-in
   test("stacking notifications",
     TestSDKHelpers::RenderTest(win, baselinePath, outputPath, "TestSDKNotificationStack"));
 
@@ -67,6 +68,7 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   inter.triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "Exclam");
   inter.triggerNotification("Test Notification", "Test Value");
 
+  inter.triggerEventLoop(0.2); // allow fade-in
   test("user define notifications",
     TestSDKHelpers::RenderTest(win, baselinePath, outputPath, "TestSDKNotificationUser"));
 
@@ -78,6 +80,7 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "G");
   inter.triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "G");
 
+  inter.triggerEventLoop(0.2); // allow fade-in
   test("turn off binding keys visibility",
     TestSDKHelpers::RenderTest(win, baselinePath, outputPath, "TestSDKNotificationKeysOff"));
 

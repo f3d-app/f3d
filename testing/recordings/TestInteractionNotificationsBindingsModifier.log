@@ -9,3 +9,12 @@ KeyPressEvent -1247 449 1 76 1 L 0
 KeyReleaseEvent -1247 449 1 76 1 L 0
 KeyReleaseEvent -1247 449 1 0 1 Shift_L 0
 TimerEvent -1247 449 1 0 1 Shift_L 0
+
+# Allow fade-in
+TimerEvent 0 299 0 0 0 0 0
+RenderEvent 0 299 0 0 0 0 0
+TimerEvent 0 299 0 0 0 0 0
+RenderEvent 0 299 0 0 0 0 0
+TimerEvent 0 299 0 0 0 0 0
+RenderEvent 0 299 0 0 0 0 0
+TimerEvent 0 299 0 0 0 0 0

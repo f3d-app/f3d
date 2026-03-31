@@ -10,3 +10,12 @@ CharEvent -484 -172 2 22 1 k 0
 KeyReleaseEvent -484 -172 2 22 1 k 0
 KeyReleaseEvent -484 -172 2 0 1 Control_L 0
 TimerEvent -484 -172 2 0 1 Control_L 0
+
+# Allow fade-in
+TimerEvent 0 299 0 0 0 0 0
+RenderEvent 0 299 0 0 0 0 0
+TimerEvent 0 299 0 0 0 0 0
+RenderEvent 0 299 0 0 0 0 0
+TimerEvent 0 299 0 0 0 0 0
+RenderEvent 0 299 0 0 0 0 0
+TimerEvent 0 299 0 0 0 0 0
