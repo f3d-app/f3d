@@ -135,15 +135,15 @@ public:
   ///@}
 
   /**
+   * Set the backdrop color
+   */
+  void SetBackdropColor(const std::array<double, 3>& color);
+
+  /**
    * Set the backdrop opacity
    * Should be called before ShowAxis
    */
   void SetBackdropOpacity(const double backdropOpacity);
-
-  /**
-   * Set the backdrop color
-   */
-  void SetBackdropColor(const std::array<double, 3>& color);
 
   ///@{
   /**
