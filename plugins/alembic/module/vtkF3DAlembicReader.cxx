@@ -370,8 +370,7 @@ public:
 
       this->FillPolyData(originalData, polydata);
 
-      bool needToDuplicate = originalData.uvFaceVarying || originalData.nFaceVarying;
-      if (needToDuplicate)
+      if (originalData.uvFaceVarying || originalData.nFaceVarying)
       {
         vtkNew<vtkF3DFaceVaryingPointDispatcher> faceVaryingFilter;
         faceVaryingFilter->SetInputData(polydata);
