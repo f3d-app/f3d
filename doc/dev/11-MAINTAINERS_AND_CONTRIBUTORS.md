@@ -31,6 +31,7 @@ Contributors with a single contribution or that may not want to are not listed h
 | Archie Payne                    | ArchiePayne    | Yes        |
 | Jean Fechter                    | noclone        | Yes        |
 | Ash Carter                      | iommu          | Yes        |
+| Ao Gao                          | AoGao-Kedoka   | Yes        |
 
 ---
 
