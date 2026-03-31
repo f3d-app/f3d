@@ -195,18 +195,21 @@ Test Debug Coloring")
 
 if(F3D_MODULE_UI)
   set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES TIMEOUT 120)
+  set_tests_properties(libf3d::TestSDKTriggerInteractions PROPERTIES TIMEOUT 120)
   if(NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
     set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES DISABLED ON)
+    set_tests_properties(libf3d::TestSDKTriggerInteractions PROPERTIES DISABLED ON)
   endif()
 endif()
 
-if(F3D_MODULE_UI AND NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
-  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-    set_tests_properties(libf3d::TestSDKInteractorCallBack PROPERTIES DISABLED ON)
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+  if(F3D_MODULE_UI)
+    set_tests_properties(libf3d::TestSDKInteractorCallBack PROPERTIES TIMEOUT 120)
+    if(NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
+      set_tests_properties(libf3d::TestSDKInteractorCallBack PROPERTIES DISABLED ON)
+    endif()
   endif()
-
-  set_tests_properties(libf3d::TestSDKTriggerInteractions PROPERTIES DISABLED ON)
 endif()
 
 set_tests_properties(libf3d::TestSDKUtils PROPERTIES ENVIRONMENT "F3D_TEST_ENV_STANDARD=TestEnv;F3D_TEST_ENV_EXTENDED=TestËnv;F3D_TEST_ENV_UTF8=🤔;")
