@@ -1725,7 +1725,9 @@ void F3DStarter::LoadFileGroupInternal(
             }
             else
             {
-              f3d::log::warn(tmpPath.string(), " is not a file of a supported file format");
+              f3d::log::warn(tmpPath.string(),
+                " is of an unknown format or contains unsupported contents, use "
+                "--force-reader to select a specific reader");
             }
             unsupported = true;
           }
