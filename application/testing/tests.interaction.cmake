@@ -39,6 +39,7 @@ f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been
 # Needs some event loop fix that's not in 9.3
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.0)
   f3d_test(NAME TestInteractionNotifications DATA cow.vtp ARGS --notifications INTERACTION UI) #E;
+  f3d_test(NAME TestInteractionNotificationsUpdate DATA cow.vtp ARGS --notifications INTERACTION UI) #E;E;Up;Up
   f3d_test(NAME TestInteractionNotificationsBindings DATA cow.vtp ARGS --notifications -Dui.notifications.show_bindings=ON INTERACTION UI) #E;
   f3d_test(NAME TestInteractionNotificationsBindingsModifier DATA cow.vtp ARGS --notifications -Dui.notifications.show_bindings=ON RESOLUTION 400,300 INTERACTION UI) #SHIFT+L;
   f3d_test(NAME TestInteractionToggleNotifications DATA cow.vtp INTERACTION UI) #CTRL+K;
