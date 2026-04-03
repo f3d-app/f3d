@@ -50,6 +50,11 @@ private:
    */
   void RenderUI(vtkRenderWindowInteractor* interactor);
 
+  /**
+   * Update modifier state from interactor to imgui.
+   */
+  void UpdateModifiers(vtkRenderWindowInteractor* interactor);
+
   vtkF3DImguiObserver(const vtkF3DImguiObserver&) = delete;
   void operator=(const vtkF3DImguiObserver&) = delete;
 };
