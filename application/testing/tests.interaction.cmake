@@ -45,6 +45,11 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.0)
   f3d_test(NAME TestInteractionToggleNotifications DATA cow.vtp INTERACTION UI) #CTRL+K;
 endif()
 
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12987
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
+  f3d_test(NAME TestInteractionNotificationsAndSceneHierarchy DATA vtk-dasm-test.glb INTERACTION UI) #SHIFT+H;CTRL+K;E
+endif()
+
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   f3d_test(NAME TestInteractionActors DATA cow.vtp INTERACTION UI) #EXGMN

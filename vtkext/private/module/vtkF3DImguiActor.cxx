@@ -604,7 +604,8 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
   ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
-    ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_HorizontalScrollbar;
+    ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoSavedSettings |
+    ImGuiWindowFlags_HorizontalScrollbar;
 
   ImGui::Begin("Scene Hierarchy", nullptr, flags);
 
