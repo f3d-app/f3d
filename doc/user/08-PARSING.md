@@ -86,19 +86,21 @@ The following formats are supported when parsing a color, case insensitive:
 - [color name](https://examples.vtk.org/site/ColorNamesSeries/ColorNamePatches.html)
 - F3D colors
 
-### F3D color reference:
-
-- `f3d_red`: (249, 67, 6)
-- `f3d_green`: (122, 255, 122)
-- `f3d_blue`: (120, 139, 255)
-- `f3d_yellow`: (249, 178, 8)
-- `f3d_white`: (244, 244, 244)
-- `f3d_grey`: (84, 84, 84)
-- `f3d_black`: (20, 20, 20)
-
 See [W3C](https://www.w3.org/TR/css-color-3/#rgb-color) doc for more details on these formats.
 
 When formatting a color into a string, it is formatted as `#RRGGBB` if values are multiple of 255. Otherwise, it is formatted as vector of doubles.
+
+When using parenthesis in a command line arg, you may need to quote the entire option, eg: `"--background-color=rgb(84, 84, 84)"`.
+
+### F3D colors reference:
+
+- `f3d_red`: rgb(249, 67, 6)
+- `f3d_green`: rgb(122, 255, 122)
+- `f3d_blue`: rgb(120, 139, 255)
+- `f3d_yellow`: rgb(249, 178, 8)
+- `f3d_white`: rgb(244, 244, 244)
+- `f3d_grey`: rgb(84, 84, 84)
+- `f3d_black`: rgb(20, 20, 20)
 
 ## Direction
 
