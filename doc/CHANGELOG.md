@@ -1,5 +1,77 @@
 # Changelog
 
+## v3.5.0
+
+For F3D users:
+
+- Created an Android version
+- Moved macOS binary package to macOS 14 framework. macOS intel binary package is not tested manually anymore
+- Added support for writing multiple images when using `--output` with a file containing animations
+- Added a `--display-depth` option to display the depth image
+- Added a `--checkerboard` option to display a checkerboard texture to check UVs
+- Added a `--scene-hierarchy` option and interactive bind (`Shift+H`) to show a hierarchy widget that let enabling/disabling actor visibility
+- Added a `--normal-glyphs` option to show normals as arrow glyphs
+- Added a `--notifications` option and interactive bind (`Ctrl+K`) to enable/disable notifications, which shows a widget whenever an interactive bind is pressed
+- Added a `--dpi-aware` option to rescale font automatically on HiDPI screens (Windows only)
+- Added a `webifc` plugin to add support for .ifc files
+- Added a `pdal` plugin to add support for many point cloud formats, including .las and .laz
+- Added support for jumping to keyframes using `jump_to_keyframe` command
+- Added support for CPU sorting for gaussian splat (`--blending=sort_cpu`), which enable gaussian splats on macOS
+- Added support for images formats (.png, .jpg, .hdr, .exr, ...)
+- Added a 2D interaction mode (`--interaction-style=2d`), used by default for images
+- Added a `--font-color` option to set the font color
+- Added a `print_config_info` command to print info about the current config file in use
+- Added new arguments to `set_camera` command: `back`, `bottom`, and `left`
+- Added stream and pipe support, eg: `cat file.glb | f3d -`
+- Added more point sprites types, eg: `cross`, `circle`, and more
+- Added support for rendering non-PBR format as PBR
+- Added a searchbar on the cheatsheet
+- Added support for f3d colors in options (eg: `f3d_white`)
+- Improved temporal anti aliasing performance and correctness
+- Improved shell completions by reworking the whole CLI option system
+- Improved alembic animation performance
+- Fixed documentation issues
+- Fixed a potential segfault when parsing colors in options
+- Fixed a crash with certain .vrml files
+- Fixed an issue with axes grid not properly centered on data
+- Deprecated `--interaction-trackball` in favor of `--interaction-style=trackball`
+
+For libf3d users:
+
+- Reworked the Qt/QML example from scratch in order to make it work properly
+- Reworked java and python binding for the `scene` `add` and `addBuffer` API
+- Added missing interaction modifiers in examples
+- Added an API to recover animation keyframes
+- Added an API to recover animation names
+- Added (partial) exception support to the C bindings
+- Added webp support to our npm package
+- Added `ui.font_color` option to set the font color
+- Added `render.effect.display_depth` option to display the depth image
+- Added `model.checkerboard.enable` option to display a checkerboard texture to check UVs
+- Added a `ui.scene_hierarchy` option to show a hierarchy widget that let enabling/disabling actor visibility
+- Added a `model.normal_glyphs.enable` option to show normals as arrow glyphs
+- Added a `ui.font_color` option to set the font color
+- Added a `interactor.style` option to control interaction style, including `2d` mode
+- Added a `ui.notifications.enable` and `ui.notifications.show_bindings` options to enable/disable notifications and bindings, which shows a widget whenever an interactive bind is pressed
+- Added a `ui.dpi_aware` option to rescale font automatically on HiDPI screens (Windows only)
+- Deprecated `interactor.trackball` option in favor of `interactor.style`
+
+For F3D packagers:
+
+- Updated all vendored dependencies
+- Updated all external dependencies in CI and shipping system
+- Added a new optional dependency: `clip`, to enable with `F3D_MODULE_CLIP` CMake option, no effect for now
+- Added a new optional dependency: `web-ifc`, to enable with `F3D_PLUGIN_BUILD_WEBIFC` CMake option, add the `webifc` plugin
+- Added a new optional dependency: `pdal`, through VTK IOPDAL module, to enable with `F3D_PLUGIN_BUILD_PDAL` CMake option, add the `pdal` plugin
+- Fixed an issue on FreeBSD with the logic to detect exectuble using sysproc
+
+For Web viewer users:
+
+- Used the stream feature from the libf3d for drastic performance improvements
+- Removed support for non-stream supporting formats
+- Added .3mf and .dxf support
+- Added .ifc support
+
 ## v3.4.1
 
 For F3D users:
