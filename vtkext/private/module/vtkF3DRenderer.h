@@ -542,7 +542,6 @@ public:
    */
   void AddNotification(
     const std::string& desc, const std::string& value, const std::string& bind, double duration);
-
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;
@@ -676,8 +675,7 @@ private:
    * Updates the normal glyph scale aiming to keep a consistent screen size
    */
   void UpdateNormalGlyphsScale();
-
-  /**
+   /**
    * Updates the axis widget size based on the window size
    */
   void UpdateAxisWidgetSize();
@@ -841,6 +839,7 @@ private:
 
   bool ScalarBarVisible = false;
   bool UseNormalGlyphs = false;
+  double NormalGlyphScaleMultiplier = 1.0;
   bool UsePointSprites = false;
   bool UseVolume = false;
   bool UseInverseOpacityFunction = false;

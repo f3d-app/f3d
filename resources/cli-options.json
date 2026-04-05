@@ -317,6 +317,11 @@
           "helpText": "Enable normal glyphs",
           "valueHelper": "<bool>",
           "implicitValue": "1"
+        },
+        {
+            "longName": "normal-glyphs-scale",
+            "helpText": "Scale normal glyphs",
+            "valueHelper": "<double>",
         }
       ]
     },
