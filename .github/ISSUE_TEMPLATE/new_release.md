@@ -50,7 +50,8 @@ Release :
 - [ ] Commit, review and merge adding `X.Y.Z` in https://github.com/f3d-app/f3d-superbuild `versions.cmake` in the `main` branch
 - [ ] Tag `vX.Y.Z` and push it to https://github.com/f3d-app/f3d-superbuild: `git tag vX.Y.Z -m vX.Y.Z`
 - Update Android
-  - [ ] Run `./update_native_libs.sh --branch vX.Y.Z` and merge new libraries, jar file and lock file in https://github.com/f3d-app/f3d-android master branch
+  - [ ] Run `./update_native_libs.sh --ref vX.Y.Z` and merge new libraries, jar file and lock file in https://github.com/f3d-app/f3d-android master branch
+  - [ ] Commit, review and merge the resulting changes in https://github.com/f3d-app/f3d-android
   - [ ] Tag `vX.Y.Z` and push it to https://github.com/f3d-app/f3d-android: `git tag vX.Y.Z -m vX.Y.Z`
 - [ ] Merge F3D release into master: https://github.com/f3d-app/f3d/compare/master...release
 - [ ] Trigger a release build using https://github.com/f3d-app/f3d-superbuild actions with `vX.Y.Z` F3D version, `vX.Y.Z` sb version and prerelease publish true
@@ -67,9 +68,9 @@ Release :
 - [ ] Communicate on mastodon
 - [ ] Communicate on bluesky
 - [ ] Communicate by email
-- [ ] Move all issue from current milestone to next milestone, close current roadmap issue and open a next roadmap issue
+- [ ] Create next release milestone, move all issue from current milestone to next milestone and close current milestone
 - [ ] Commit review and merge an update of `doc/dev/ROADMAPS_AND_RELEASES.md` for next release in https://github.com/f3d-app/f3d
-- [ ] Create an issue for updating dependencies in CI and superbuild
+- [ ] Create an issue for updating dependencies in thid parties, CI, csb, superbuild, docker, and f3d-website
 - [ ] Commit review and merge an update of `.github/ISSUE_TEMPLATE/new_release.md` in https://github.com/f3d-app/f3d if needed
 
 Linux testing protocol:
