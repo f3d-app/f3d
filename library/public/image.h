@@ -77,7 +77,9 @@ public:
   /**
    * Create an image from a given stream buffer.
    * Throws an image::read_exception if buffer is empty, or if no image reader supports
-   * the given stream
+   * the given stream.
+   * 
+   * This is currently not available with Javascript bindings.
    */
   image(std::byte* byte, std::size_t size);
   ///@}
