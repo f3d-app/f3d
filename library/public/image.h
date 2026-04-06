@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <string>
 #include <vector>
+#include <cstddef>
 /// @endcond
 
 namespace f3d
@@ -57,6 +58,16 @@ public:
   explicit image(const std::filesystem::path& filePath);
 
   /**
+   * Read provided buffer into a new image instance, the following formats are
+   * supported: PNG, PNM, TIFF, BMP, HDR, JPEG, GESigna, MetaImage, TGA. EXR files are also
+   * supported if the associated module is built. The complete list can be retrieved at runtime by
+   * calling getSupportedFormats().
+   * 
+   * Throws an image::read_exception in case of failure.
+   */
+  image(std::byte* byte, std::size_t size);
+
+  /**
    * Create an image from a given width, height, and channel count.
    * A channel type can also be given. Default is BYTE.
    */
@@ -73,15 +84,6 @@ public:
   image& operator=(const image& img) noexcept;
   image(image&& img) noexcept;
   image& operator=(image&& img) noexcept;
-
-  /**
-   * Create an image from a given stream buffer.
-   * Throws an image::read_exception if buffer is empty, or if no image reader supports
-   * the given stream.
-   * 
-   * This is currently not available with Javascript bindings.
-   */
-  image(std::byte* byte, std::size_t size);
   ///@}
 
   ///@{ @name Operators
