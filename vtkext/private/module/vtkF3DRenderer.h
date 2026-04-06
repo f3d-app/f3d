@@ -542,6 +542,10 @@ public:
    */
   void AddNotification(
     const std::string& desc, const std::string& value, const std::string& bind, double duration);
+  /**
+    * Sets the GlyphScaleMultiplier
+    */
+  void SetNormalGlyphScaleMultiplier(double multiplier);
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;

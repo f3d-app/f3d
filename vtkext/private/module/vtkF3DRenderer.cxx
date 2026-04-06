@@ -1726,6 +1726,11 @@ void vtkF3DRenderer::SetBlurCircleOfConfusionRadius(double radius)
     this->RenderPassesConfigured = false;
   }
 }
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetNormalGlyphScaleMultiplier(double multiplier)
+{
+    this->NormalGlyphScaleMultiplier = 1.0;
+}
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseSSAOPass(bool use)
