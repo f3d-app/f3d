@@ -29,6 +29,7 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include <cstddef>
 
 namespace fs = std::filesystem;
 
@@ -216,6 +217,65 @@ image::image(const fs::path& filePath)
 }
 
 //----------------------------------------------------------------------------
+image::image(std::byte* buffer, std::size_t size)
+  : Internals(new image::internals())
+{
+  detail::init::initialize();
+
+  if (buffer == nullptr)
+  {
+    delete this->Internals;
+    throw read_exception("Cannot read image from buffer: Buffer is empty");
+  }
+
+  vtkNew<vtkMemoryResourceStream> stream;
+  stream->SetBuffer(buffer, size);
+
+  vtkNew<vtkImageReader2Collection> collection;
+  vtkImageReader2Factory::GetRegisteredReaders(collection);
+  collection->InitTraversal();
+
+  vtkCollectionSimpleIterator iterator;
+  vtkImageReader2* currentReader;
+  int bestScore = -1;
+  vtkImageReader2* bestReader = nullptr;
+
+  for (availableReaders->InitTraversal(iterator);
+    (currentReader = availableReaders->GetNextImageReader2(iterator));)
+  {
+    int score = currentReader->CanReadFile(stream);
+    if (score > 0)
+    {
+      bestReader = currentReader;
+      bestScore = score;
+      break;
+    }
+  }
+
+  if (bestScore <= 0)
+  {
+    delete this->Internals;
+    throw read_exception("Cannot read image from buffer: No image reader supports this stream.");
+  }
+
+  bestReader->SetStream(stream);
+  bestReader->Update();
+  this->Internals->Image = bestReader->GetOutput();
+
+  vtkPNGReader* pngReader = vtkPNGReader::SafeDownCast(bestReader);
+  if (pngReader != nullptr)
+  {
+    this->Internals->ReadPngMetadata(pngReader);
+  }
+
+  if (!this->Internals->Image)
+  {
+    delete this->Internals;
+    throw read_exception("Cannot read image from buffer");
+  }
+}
+
+//----------------------------------------------------------------------------
 image::~image()
 {
   delete this->Internals;
@@ -252,66 +312,6 @@ image& image::operator=(image&& img) noexcept
 {
   std::swap(this->Internals, img.Internals);
   return *this;
-}
-
-//----------------------------------------------------------------------------
-image::image(std::byte* buffer, std::size_t size)
-  : Internals(new image::internals())
-{
-  detail::init::initialize();
-
-  if (buffer == nullptr)
-  {
-    delete this->Internals;
-    throw read_exception("Cannot read image from buffer: Buffer is empty");
-  }
-
-  vtkNew<vtkMemoryResourceStream> stream;
-  stream->SetBuffer(buffer, size);
-
-  vtkNew<vtkImageReader2Collection> collection;
-  vtkImageReader2Factory::GetRegisteredReaders(collection);
-  collection->InitTraversal();
-  vtkImageReader2* reader = collection->GetNextItem();
-
-  int bestScore = -1;
-  vtkImageReader2* bestReader = nullptr;
-
-  while (reader != nullptr)
-  {
-    int score = reader->CanReadFile(stream);
-    if (score > bestScore)
-    {
-      bestReader = reader;
-      bestScore = score;
-    }
-
-    reader = collection->GetNextItem();
-  }
-
-  if (bestScore <= 0)
-  {
-    delete this->Internals;
-    throw read_exception(
-      "Cannot read image from buffer: No image reader supports this stream.");
-  }
-
-  bestReader->SetStream(stream);
-  bestReader->Update();
-  this->Internals->Image = bestReader->GetOutput();
-
-  vtkPNGReader* pngReader = vtkPNGReader::SafeDownCast(bestReader);
-  if (pngReader != nullptr)
-  {
-    this->Internals->ReadPngMetadata(pngReader);
-  }
-
-  if (!this->Internals->Image)
-  {
-    delete this->Internals;
-    throw read_exception(
-      "Cannot read image from buffer: No image reader supports this stream.");
-  }
 }
 
 //----------------------------------------------------------------------------
