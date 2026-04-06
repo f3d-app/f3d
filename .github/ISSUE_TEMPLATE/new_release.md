@@ -70,7 +70,7 @@ Release :
 - [ ] Communicate by email
 - [ ] Create next release milestone, move all issue from current milestone to next milestone and close current milestone
 - [ ] Commit review and merge an update of `doc/dev/ROADMAPS_AND_RELEASES.md` for next release in https://github.com/f3d-app/f3d
-- [ ] Create an issue for updating dependencies in thid parties, CI, csb, superbuild, docker, and f3d-website
+- [ ] Create an issue for updating dependencies in third parties, CI, csb, superbuild, docker, and f3d-website
 - [ ] Commit review and merge an update of `.github/ISSUE_TEMPLATE/new_release.md` in https://github.com/f3d-app/f3d if needed
 
 Linux testing protocol:
