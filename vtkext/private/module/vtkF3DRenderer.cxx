@@ -1729,7 +1729,7 @@ void vtkF3DRenderer::SetBlurCircleOfConfusionRadius(double radius)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetNormalGlyphScaleMultiplier(double multiplier)
 {
-    this->NormalGlyphScaleMultiplier = 1.0;
+    this->NormalGlyphScaleMultiplier = multiplier;
 }
 
 //----------------------------------------------------------------------------
@@ -2923,8 +2923,7 @@ void vtkF3DRenderer::ConfigureNormalGlyphs()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::UpdateNormalGlyphsScale()
 {
-  constexpr double normalGlyphScaleMultiplier = 0.15;
-
+  const double normalGlyphScaleMultiplier = this->NormalGlyphScaleMultiplier;
   const auto getScale = [](vtkCamera* camera)
   {
     if (camera->GetParallelProjection())

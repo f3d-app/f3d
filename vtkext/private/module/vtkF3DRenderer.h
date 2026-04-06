@@ -843,7 +843,7 @@ private:
 
   bool ScalarBarVisible = false;
   bool UseNormalGlyphs = false;
-  double NormalGlyphScaleMultiplier = 1.0;
+  double NormalGlyphScaleMultiplier = 0.1;
   bool UsePointSprites = false;
   bool UseVolume = false;
   bool UseInverseOpacityFunction = false;
