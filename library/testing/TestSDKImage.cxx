@@ -114,8 +114,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   std::vector<unsigned char> buffer = generated.saveBuffer();
   std::byte* bufferData = reinterpret_cast<std::byte*>(buffer.data());
   f3d::image bufferImage(bufferData, buffer.size());
-  // std::cerr << generated.compare(bufferImage) << "\n";
-  test("check loading stream from image reader", generated.compare(bufferImage), 0.0); // not 1e-14?
+  test("check loading stream from image reader", generated.compare(bufferImage), 0.0);
 
   // check reading invalid stream
   test.expect<f3d::image::read_exception>(

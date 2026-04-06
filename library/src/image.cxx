@@ -231,9 +231,8 @@ image::image(std::byte* buffer, std::size_t size)
   vtkNew<vtkMemoryResourceStream> stream;
   stream->SetBuffer(buffer, size);
 
-  vtkNew<vtkImageReader2Collection> collection;
-  vtkImageReader2Factory::GetRegisteredReaders(collection);
-  collection->InitTraversal();
+  vtkNew<vtkImageReader2Collection> availableReaders;
+  vtkImageReader2Factory::GetRegisteredReaders(availableReaders);
 
   vtkCollectionSimpleIterator iterator;
   vtkImageReader2* currentReader;
