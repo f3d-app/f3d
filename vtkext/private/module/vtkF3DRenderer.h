@@ -533,6 +533,12 @@ public:
   //@}
 
   /**
+   * Set/Get the total animation time (cumulative time of each frame being rendered) in seconds
+   */
+  vtkSetMacro(TotalTime, double);
+  vtkGetMacro(TotalTime, double);
+
+  /**
    * Set console badge enabled status
    */
   void SetConsoleBadgeEnabled(bool enabled);
