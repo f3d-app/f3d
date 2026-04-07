@@ -88,7 +88,7 @@ void vtkF3DTAAPass::Render(const vtkRenderState* state)
 
   if (this->DepthTexture == nullptr)
   {
-    this->DepthTexture = vtkTextureObject::New();
+    this->DepthTexture = vtkSmartPointer<vtkTextureObject>::New();
     this->DepthTexture->SetContext(renWin);
     this->DepthTexture->AllocateDepth(
       this->ViewPortSize[0], this->ViewPortSize[1], vtkTextureObject::Float32);
@@ -103,11 +103,12 @@ void vtkF3DTAAPass::Render(const vtkRenderState* state)
 
   if (!this->PreviousViewProjectionMatrix)
   {
-    this->PreviousViewProjectionMatrix = vtkMatrix4x4::New();
+    this->PreviousViewProjectionMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
+    this->PreviousViewProjectionMatrix->Zero();
   }
   if (!this->CurrentViewProjectionMatrix)
   {
-    this->CurrentViewProjectionMatrix = vtkMatrix4x4::New();
+    this->CurrentViewProjectionMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
     this->CurrentViewProjectionMatrix->Zero();
   }
 
