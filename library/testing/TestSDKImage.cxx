@@ -116,9 +116,15 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   f3d::image bufferImage(bufferData, buffer.size());
   test("check loading stream from image reader", generated.compare(bufferImage), 0.0);
 
-  // check reading invalid stream
+  // check reading inexistent/null stream
   test.expect<f3d::image::read_exception>(
-    "read invalid image stream", [&]() { f3d::image invalidImgStream(nullptr, 10); });
+    "read image from invalid/null stream", [&]() { f3d::image nullImgStream(nullptr, 10); });
+
+  // check reading invalid stream
+  std::vector<unsigned char> invalidBuffer = {0, 1, 2, 3, 4, 5};
+  std::byte* invalidBufferData = reinterpret_cast<std::byte*>(invalidBuffer.data());
+  test.expect<f3d::image::read_exception>(
+    "read image from invalid stream", [&]() { f3d::image invalidImgStream(invalidBufferData, 10); });
 
 #if F3D_MODULE_EXR
   // check reading EXR
