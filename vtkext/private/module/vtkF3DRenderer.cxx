@@ -1729,7 +1729,7 @@ void vtkF3DRenderer::SetBlurCircleOfConfusionRadius(double radius)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetNormalGlyphScaleMultiplier(double multiplier)
 {
-    this->NormalGlyphScaleMultiplier = multiplier;
+  this->NormalGlyphScaleMultiplier = multiplier;
 }
 
 //----------------------------------------------------------------------------

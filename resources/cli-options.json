@@ -321,7 +321,7 @@
         {
           "longName": "normal-glyphs-scale",
           "helpText": "Scale normal glyphs",
-          "valueHelper": "<double>",
+          "valueHelper": "<double>"
         }
       ]
     },
