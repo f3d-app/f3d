@@ -351,6 +351,11 @@ public:
   void SetUseNormalGlyphs(bool use);
 
   /**
+   * Sets the GlyphScaleMultiplier
+   */
+  void SetNormalGlyphScaleMultiplier(double multiplier);
+
+  /**
    * Set the visibility of the point sprites actor.
    * It will only be shown if raytracing and volume are not enabled
    */
@@ -542,10 +547,6 @@ public:
    */
   void AddNotification(
     const std::string& desc, const std::string& value, const std::string& bind, double duration);
-  /**
-   * Sets the GlyphScaleMultiplier
-   */
-  void SetNormalGlyphScaleMultiplier(double multiplier);
 
 private:
   vtkF3DRenderer();
@@ -680,6 +681,7 @@ private:
    * Updates the normal glyph scale aiming to keep a consistent screen size
    */
   void UpdateNormalGlyphsScale();
+
   /**
    * Updates the axis widget size based on the window size
    */

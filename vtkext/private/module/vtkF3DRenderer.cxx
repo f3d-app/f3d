@@ -2923,7 +2923,7 @@ void vtkF3DRenderer::ConfigureNormalGlyphs()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::UpdateNormalGlyphsScale()
 {
-  const double normalGlyphScaleMultiplier = 0.16 * this->NormalGlyphScaleMultiplier;
+  const double normalGlyphScaleMultiplier = 0.15 * this->NormalGlyphScaleMultiplier;
   const auto getScale = [](vtkCamera* camera)
   {
     if (camera->GetParallelProjection())
