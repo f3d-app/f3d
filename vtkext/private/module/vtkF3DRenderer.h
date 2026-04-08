@@ -680,7 +680,7 @@ private:
    * Updates the normal glyph scale aiming to keep a consistent screen size
    */
   void UpdateNormalGlyphsScale();
-   /**
+  /**
    * Updates the axis widget size based on the window size
    */
   void UpdateAxisWidgetSize();
