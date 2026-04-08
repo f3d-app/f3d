@@ -424,8 +424,8 @@
         "default_value": "false"
       },
       "scale": {
-          "type": "double",
-          "default_value": "1.0"
+        "type": "ratio",
+        "default_value": "1.0"
       }
     },
     "volume": {

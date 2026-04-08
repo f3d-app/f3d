@@ -319,9 +319,9 @@
           "implicitValue": "1"
         },
         {
-            "longName": "normal-glyphs-scale",
-            "helpText": "Scale normal glyphs",
-            "valueHelper": "<double>",
+          "longName": "normal-glyphs-scale",
+          "helpText": "Scale normal glyphs",
+          "valueHelper": "<double>",
         }
       ]
     },
