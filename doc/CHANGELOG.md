@@ -5,7 +5,7 @@
 For F3D users:
 
 - Created an Android version
-- Moved macOS binary package to macOS 14 framework. macOS intel binary package is not tested manually anymore
+- Moved macOS binary package to macOS 14 framework.
 - Added support for writing multiple images when using `--output` with a file containing animations
 - Added a `--display-depth` option to display the depth image
 - Added a `--checkerboard` option to display a checkerboard texture to check UVs
