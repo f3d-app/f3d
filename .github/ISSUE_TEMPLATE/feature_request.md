@@ -8,6 +8,7 @@ assignees: ""
 
 **Is your feature request related to a problem? Please describe.**
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+[Do not use AI](../../AI_POLICY.md) to generate this.
 
 **Describe the solution you'd like**
 A clear and concise description of what you want to happen.

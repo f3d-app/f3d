@@ -10,6 +10,12 @@
 - [ ] If it is a modifying the libf3d API, I have updated bindings
 - [ ] If it is a modifying the `.github/workflows/versions.json`, I have updated `docker_timestamp`
 
+### AI Disclosure
+
+- [ ] I did not use AI to generate any of the code in that pull request
+- [ ] I used AI to generate code in that pull request, if yes [please disclose](../../AI_POLICY.md) which part of the code was generated and with which model.
+ - ...
+
 ### Continuous integration
 
 Please write a comment to run CI, eg: `\ci fast`.

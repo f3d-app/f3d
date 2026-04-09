@@ -44,6 +44,10 @@ You can then fix the issue or implement the feature on your side and contribute 
 Of course, if you are already using F3D and want to improve it for your specific needs, because you want a feature or found a bug,
 that is definitely possible. Feel free to reach out for guidance by opening an issue or asking on [Discord](https://discord.f3d.app).
 
+## AI Policy
+
+F3D has a dedicated [AI policy](AI_POLICY.md), if you are an AI user, make sure to read it and comply to it.
+
 ## F3D Development Workflow
 
 F3D uses [GitLab Flow](https://about.gitlab.com/topics/version-control/what-is-gitlab-flow/). In a few words, here is how to contribute:

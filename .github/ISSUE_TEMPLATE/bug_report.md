@@ -7,7 +7,7 @@ assignees: ""
 ---
 
 **Describe the bug**
-A clear and concise description of what the bug is, a screenshot helps a lot.
+A clear and concise description of what the bug is, a screenshot helps a lot. [Do not use AI](../../AI_POLICY.md) to generate this.
 
 **To Reproduce**
 Steps to reproduce the behavior:

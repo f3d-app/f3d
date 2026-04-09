@@ -30,7 +30,7 @@ Usually it looks like this:
 - Your mentor will ask you to open a pull request to show some code. Please do that instead of sharing a branch, it is much easier for mentors.
 - The contribution guide mention running tests, do not worry about tests for now.
 - The contribution guide mention running CI, do not worry about CI for now.
-- If you use AI as a dev tool, mentors will considered it your own code and you should be able to explain what it does.
+- F3D has a dedicated [AI policy](../../AI_POLICY.md), however in the context of mentoring, AI should not be used, as the point is to learn.
 
 ## Resources
 
