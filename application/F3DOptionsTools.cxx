@@ -585,7 +585,7 @@ std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3
   else if (key == "point-sprites-type")
   {
     f3d::log::warn("--point-sprites-type is deprecated");
-    libf3dOptions.emplace_back(std::make_pair("model.point_sprites.mode", value));
+    libf3dOptions.emplace_back(std::make_pair("model.point_sprites.type", value));
   }
 
   // handle deprecated interaction-trackball option
