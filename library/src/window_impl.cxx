@@ -408,7 +408,6 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetPendingUpDirection(opt.scene.up_direction);
 
   renderer->SetUseNormalGlyphs(opt.model.normal_glyphs.enable);
-
   renderer->SetNormalGlyphScaleMultiplier(opt.model.normal_glyphs.scale);
 
   // XXX: model.point_sprites.type only has an effect on geometry scene
