@@ -2,9 +2,9 @@
 
 This is a getting started guide, aimed to people that are not used
 to C++ programming, configuring and compiling. If you are already used
-to such processes, you may be looking for our [build guide](04-BUILD.md).
+to such processes, you may be looking for our [build guide](05-BUILD.md).
 
-You may also want to take a look into the [mentoring program](12-MENTORING.md).
+You may also want to take a look into the [mentoring program](13-MENTORING.md).
 
 This guide will help you to compile your own version of F3D with required dependencies.
 Optional dependencies or covered in the build guide.

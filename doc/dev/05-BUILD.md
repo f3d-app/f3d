@@ -1,11 +1,12 @@
 # Building
 
 > [!NOTE]
-> For WebAssembly cross-compilation, follow the dedicated guide [here](13-BUILD_WASM.md).
+> For WebAssembly cross-compilation, follow the dedicated guide [here](14-BUILD_WASM.md).
+> For other dedicated tools and builds setupo, see [this doc](07-TOOLING.md).
 
 F3D uses a CMake based build system, so building F3D just requires installing
 needed dependencies, configuring and building. If you are not used to such processes
-please take a look at our [getting started guide](03-GETTING_STARTED.md).
+please take a look at our [getting started guide](04-GETTING_STARTED.md).
 
 ## Dependencies
 
@@ -41,7 +42,7 @@ then build the software using your build system.
 Here is some CMake options of interest:
 
 - `F3D_BUILD_APPLICATION`: Build the F3D executable.
-- `BUILD_TESTING`: Enable the [tests](05-TESTING.md).
+- `BUILD_TESTING`: Enable the [tests](06-TESTING.md).
 - `F3D_MACOS_BUNDLE`: On macOS, build a `.app` bundle.
 - `F3D_WINDOWS_BUILD_SHELL_THUMBNAILS_EXTENSION`: On Windows, build the shell thumbnails extension.
 - `F3D_WINDOWS_BUILD_CONSOLE_APPLICATION`: On Windows, build a supplemental Win32 console application.

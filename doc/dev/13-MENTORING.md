@@ -58,5 +58,5 @@ F3D pull request examples:
 Anyone can be a mentor!
 
 That being said, usually mentors are contributors with a bit of experience with the project and with open source contributions.
-So, when a Contributor becomes a [Returning Contributor](./10-GOVERNANCE.md#12-returning-contributors), they can also decide to select the `mentor`
+So, when a Contributor becomes a [Returning Contributor](./11-GOVERNANCE.md#12-returning-contributors), they can also decide to select the `mentor`
 role on discord, which means that they will be informed when a Mentee needs mentorings. There is no obligations and no expectations.

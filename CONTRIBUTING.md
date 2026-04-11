@@ -22,9 +22,9 @@ You can follow the workflow described below.
 ## How to Get Started With Development
 
 To contribute to F3D as a developer, first you may want to try and build F3D for yourself.
-If you are already familiar with software compilation, you can take a look at our [build guide](doc/dev/04-BUILD.md).
-If not, you may want to look at our [getting started guide](doc/dev/03-GETTING_STARTED.md), that provide steps to compile F3D.
-You may also want to take a look into the [F3D mentoring program](doc/dev/12-MENTORING.md) in order to get help with all the
+If you are already familiar with software compilation, you can take a look at our [build guide](doc/dev/06-BUILD.md).
+If not, you may want to look at our [getting started guide](doc/dev/04-GETTING_STARTED.md), that provide steps to compile F3D.
+You may also want to take a look into the [F3D mentoring program](doc/dev/13-MENTORING.md) in order to get help with all the
 contributing steps.
 
 Once you are able to build F3D, you may want to take a look at the open [issues](https://github.com/f3d-app/f3d/issues)!
@@ -33,11 +33,11 @@ If you already have some experience with programming and contribution, definitel
 If an issue is interesting to you and is not yet assigned, then you should _comment on the issue_ and ask for any help or clarification needed.
 F3D maintainers will see your comment, assign the issue to you and provide guidance as needed.
 
-To get involved more deeply, please take a look at the [roadmaps](doc/dev/09-ROADMAPS_AND_RELEASES.md) for the upcoming releases.
+To get involved more deeply, please take a look at the [roadmaps](doc/dev/10-ROADMAPS_AND_RELEASES.md) for the upcoming releases.
 
 It is also recommended to reach out on [Discord](https://discord.f3d.app) to simplify communication, but it is not required.
 
-You may also want to understand the overall [architecture](doc/dev/07-ARCHITECTURE.md) of the F3D project.
+You may also want to understand the overall [architecture](doc/dev/08-ARCHITECTURE.md) of the F3D project.
 
 You can then fix the issue or implement the feature on your side and contribute it to the F3D repository by following the workflow described below.
 
@@ -58,7 +58,7 @@ F3D uses [GitLab Flow](https://about.gitlab.com/topics/version-control/what-is-g
 - As soon as possible, create a draft pull request against `f3d-app/f3d/master` so that maintainers are aware and design can be discussed.
 - When your PR is created, a maintainer will self-assign as a reviewer and will ensure it is followed, please ping if it is not the case.
 - When it is ready for review or when you want to [run the CI](#continuous-integration), undraft your pull request.
-- To ask for a review or if you need help with CI, use the review system of github to request a review from [the maintainers](doc/dev/11-MAINTAINERS_AND_CONTRIBUTORS.md#maintainers).
+- To ask for a review or if you need help with CI, use the review system of github to request a review from [the maintainers](doc/dev/12-MAINTAINERS_AND_CONTRIBUTORS.md#maintainers).
 - You can also tag maintainers on github or [discord](#discord-usage) to ask for help and review.
 - Your PR will then be reviewed by maintainers and returning contributors, please take their feedback into account and resolve discussions when adresssed.
 - In general, do not merge with `master`, even if github suggest you to do so.
@@ -93,10 +93,10 @@ After this, the CI will always be run every time you push to your branch.
 To remove a label, use the same syntax with a `-` before the label, eg: `\ci -fast`.
 
 F3D continuous integration will also check the coverage as it is a good way to evaluate if new features are being tested or not.
-When adding code to F3D, always try to cover it by adding/modifying [tests](doc/dev/05-TESTING.md).
+When adding code to F3D, always try to cover it by adding/modifying [tests](doc/dev/06-TESTING.md).
 
 F3D continuous integration also checks formatting using clang-format and other tools and will inform you if changes needs to be made.
-Some [formatting rules](doc/dev/08-CODING_STYLE.md) are not enforced by clang-format and will be checked during the review process.
+Some [formatting rules](doc/dev/09-CODING_STYLE.md) are not enforced by clang-format and will be checked during the review process.
 
 When making changes to the `libf3d` public API, continuous integration will warn about making related changes to the bindings.
 This is required in order to merge the pull request.

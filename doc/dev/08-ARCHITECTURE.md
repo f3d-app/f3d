@@ -9,7 +9,7 @@ This architecture is reflected by the directories organisation.
 - examples: examples usage of the libf3d and plugin framework in C++, C, python, java and javascript
 - external: dependencies that are included directly in the code
 - **library**: the [libf3d](../libf3d/01-OVERVIEW.md) itself, see below
-- **plugins**: all the [plugins](../libf3d/05-PLUGINS.md) providing different readers, see below
+- **plugins**: all the [plugins](../libf3d/06-PLUGINS.md) providing different readers, see below
 - resources: all non code, non doc, like icon, configs and such
 - testing: all testing related resources, does not contain the test themselves
 - **vtkext**: extensions to VTK and related tests, see below
@@ -60,11 +60,11 @@ that is specifically made for plugin developers to inherit their importers from.
 `private` is a VTK module that contains many classes and utilities used by the libf3d to provide all features of F3D, especially the rendering, interactions and UI.
 A notable class is `vtkF3DRenderer` that is responsible to actually add the different actors in the 3D scene.
 
-Each of these modules also contains [tests](05-TESTING.md#vtkextensions-layer) in the `Testing` directory.
+Each of these modules also contains [tests](06-TESTING.md#vtkextensions-layer) in the `Testing` directory.
 
 ## plugins
 
-`plugins` contains [libf3d plugins](../libf3d/05-PLUGINS.md) that are provided by default in the F3D packages. Each of these plugins correspond to a specific dependency and are named accordingly. Each of these plugins provide access to specific readers for specific formats. Without plugins, F3D and the libf3d would not be able to open any file. These plugins can be loaded statically or dynamically, which makes the dependencies truly optional if needed.
+`plugins` contains [libf3d plugins](../libf3d/06-PLUGINS.md) that are provided by default in the F3D packages. Each of these plugins correspond to a specific dependency and are named accordingly. Each of these plugins provide access to specific readers for specific formats. Without plugins, F3D and the libf3d would not be able to open any file. These plugins can be loaded statically or dynamically, which makes the dependencies truly optional if needed.
 
 ## library
 
@@ -74,7 +74,7 @@ and also contains hidden methods used to communicate between classes, especially
 
 Logically, it is structured in 3 parts, `public` which contains the public API header files and are all installed, `private` which contains the implementation classes headers files and `src` that contains the source files of all the classes, public and private.
 
-There is also a dedicated `testing` directory which contains the [unit and functional testing](05-TESTING.md#library-layer) of the libf3d.
+There is also a dedicated `testing` directory which contains the [unit and functional testing](06-TESTING.md#library-layer) of the libf3d.
 
 It also contains the `options.json` file, which is the file used to generate all [options](../libf3d/03-OPTIONS.md) code.
 
@@ -84,7 +84,7 @@ It also contains the `options.json` file, which is the file used to generate all
 The most important class in the `F3DStarter` which contains most of the top logic on the application. `F3DOptionsTools` is also notable as it handles most of
 the command line options logic.
 
-There is also a dedicated `testing` directory which contains all of the [applicative testing](05-TESTING.md#application-layer) of the F3D application as well as many functional testing of the libf3d.
+There is also a dedicated `testing` directory which contains all of the [applicative testing](06-TESTING.md#application-layer) of the F3D application as well as many functional testing of the libf3d.
 
 ## Other f3d-app repositories
 
