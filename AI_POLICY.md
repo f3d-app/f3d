@@ -1,9 +1,10 @@
 # AI Policy
 
 F3D maintainers believe that generative AI is a special tool that require special care, in that regards, if you use AI to contribute to F3D, you need to:
- - Disclose that you are using AI
- - Use it in a precise way, to help with precise tasks
- - Never let it think or talk for you
+
+- Disclose that you are using AI
+- Use it in a precise way, to help with precise tasks
+- Never let it think or talk for you
 
 Here are different example usages and how acceptable it is:
 
@@ -19,7 +20,7 @@ The model used should be disclosed as well.
 
 1. I use AI to do write comments, chat, and discuss with others.
 
-This is unnacceptable and you will be warned and BANNED on repeated offenses.
+This is unacceptable and you will be warned and BANNED on repeated offenses.
 Use your own voice.
 
 1. I use AI to improve my comments because english is not my first language.
@@ -33,7 +34,7 @@ This is acceptable and doesn't need to be disclosed as long as no AI code is cop
 
 1. I use AI as a smart auto completer to write docs, tests, repeated parts of code.
 
-This must be disclosed in the MR description, with details on which part of the code was generated and 
+This must be disclosed in the MR description, with details on which part of the code was generated and
 which model were used. If you do not, you will be warned and then BANNED. Generated code will be considered
 to be written by you and under your own copyright, as any code you write.
 

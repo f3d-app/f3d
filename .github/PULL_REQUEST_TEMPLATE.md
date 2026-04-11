@@ -14,7 +14,7 @@
 
 - [ ] I did not use AI to generate any of the code in that pull request
 - [ ] I used AI to generate code in that pull request, if yes [please disclose](../../AI_POLICY.md) which part of the code was generated and with which model.
- - ...
+- ...
 
 ### Continuous integration
 
