@@ -234,7 +234,7 @@ Set the opacity of the backdrop behind text information such as FPS, filename, m
 
 Display arrows that show vertex normals.
 
-### '--normal-glyphs-scale' (_ratio_, default: '1.0')
+### `--normal-glyphs-scale` (_ratio_, default: `1.0`)
 
 Adjusts the scales of normal glyphs.
 
