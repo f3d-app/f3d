@@ -22,7 +22,7 @@ You can follow the workflow described below.
 ## How to Get Started With Development
 
 To contribute to F3D as a developer, first you may want to try and build F3D for yourself.
-If you are already familiar with software compilation, you can take a look at our [build guide](doc/dev/06-BUILD.md).
+If you are already familiar with software compilation, you can take a look at our [build guide](doc/dev/05-BUILD.md).
 If not, you may want to look at our [getting started guide](doc/dev/04-GETTING_STARTED.md), that provide steps to compile F3D.
 You may also want to take a look into the [F3D mentoring program](doc/dev/13-MENTORING.md) in order to get help with all the
 contributing steps.
