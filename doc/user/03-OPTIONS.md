@@ -234,6 +234,10 @@ Set the opacity of the backdrop behind text information such as FPS, filename, m
 
 Display arrows that show vertex normals.
 
+### '--normal-glyphs-scale' (_ratio_, default: '1.0')
+
+Adjusts the scales of normal glyphs.
+
 ### `-o`, `--point-sprites=<none|sphere|gaussian|circle|stddev|bound|cross>` (_string_, default: `none`, implicit: `sphere`)
 
 Select _points sprites_ types to show instead of the geometry.
