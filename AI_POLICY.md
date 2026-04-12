@@ -26,7 +26,7 @@ Use your own voice.
 1. I use AI to improve my comments because english is not my first language.
 
 This is acceptable as long as it is used just as a correction tool, not a writing tool,
-but this is really not needed, you will not be judges on the quality of the text.
+but this is really not needed, you will not be judged on the quality of the text.
 
 1. I use AI to write code then rewrite it for my own needs when I contribute code.
 
