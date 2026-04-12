@@ -34,7 +34,7 @@ This is acceptable and doesn't need to be disclosed as long as no AI code is cop
 
 1. I use AI as a smart auto completer to write docs, tests, repeated parts of code.
 
-This must be disclosed in the MR description, with details on which part of the code was generated and
+This must be disclosed in the pull request description, with details on which part of the code was generated and
 which model were used. If you do not, you will be warned and then BANNED. Generated code will be considered
 to be written by you and under your own copyright, as any code you write.
 
