@@ -27,7 +27,7 @@
     "proj": "9.8.0",
     "pybind11": "v3.0.1",
     "python": "3.14",
-    "sqlite_csb": "9a5b5744d69ff1ecbe3bb61a232839742ddad9b0",
+    "sqlite_csb": "0af5f946f7044301c2cbb891c273839070655b54",
     "tbb": "v2021.13.1",
     "tiff": "v4.7.1",
     "usd": "v25.11",
