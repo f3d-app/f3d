@@ -138,7 +138,7 @@ runs:
         global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ inputs.python_version }}
 

@@ -1465,7 +1465,7 @@ jobs:
         run: npm run build
 
       - name: Retrieve f3d package
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: f3d-wasm-package
           path: ${{github.workspace}}/source/examples/libf3d/web
