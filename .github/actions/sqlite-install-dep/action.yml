@@ -8,9 +8,6 @@ inputs:
   csb_version:
     description: "Version of common-superbuild to build sqlite with"
     required: true
-  global_cache_index:
-    description: "Global cache index"
-    required: true
 
 runs:
   using: "composite"
@@ -19,21 +16,20 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.csb_version }}" ]] || { echo "csb_version input is empty" ; exit 1; }
-        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
 
     - name: Cache sqlite
       id: cache-sqlite
       uses: actions/cache/restore@v5
       with:
-        path: ${{github.workspace}}/dependencies/sqlite_build/install
-        key: sqlite-${{ inputs.csb_version }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-2
+        path: ${{github.workspace}}/sqlite_build/install
+        key: sqlite-${{ inputs.csb_version }}-${{runner.os}}-${{inputs.cpu}}-0
 
     # Dependents: proj
     # use --depth=1 --revision=${{ inputs.csb_version }}
     # when git supports it
     - name: Checkout common-superbuild and set everything up
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies
+      working-directory: ${{github.workspace}}
       shell: bash
       run: |
         mkdir sqlite_build
@@ -51,7 +47,7 @@ runs:
 
     - name: Configure sqlite
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies/sqlite_build
+      working-directory: ${{github.workspace}}/sqlite_build
       shell: bash
       run: >
         cmake ../sqlite_csb/selftest
@@ -62,18 +58,13 @@ runs:
 
     - name: Build sqlite
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies/sqlite_build
+      working-directory: ${{github.workspace}}/sqlite_build
       shell: bash
       run: cmake --build . --parallel 2
-
-    - name: Copy to install
-      working-directory: ${{github.workspace}}/dependencies/sqlite_build/install
-      shell: bash
-      run: cp -r ./* ../../install/
 
     - name: Save cache
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
       uses: actions/cache/save@v5
       with:
         key: ${{ steps.cache-sqlite.outputs.cache-primary-key }}
-        path: dependencies/sqlite_build/install
+        path: sqlite_build/install
