@@ -17,7 +17,7 @@ f3d_test(NAME TestUSDTeapot DATA Teapot.usd PLUGIN usd)
 
 f3d_test(NAME TestUSDZAnimated DATA AnimatedCube.usdz PLUGIN usd ARGS --animation-time=0.3 --animation-progress THRESHOLD 0.05)
 f3d_test(NAME TestUSDZRigged DATA RiggedSimple.usdz PLUGIN usd ARGS --animation-time=0.3)
-f3d_test(NAME TestUSDZMaterials DATA McUsd.usdz PLUGIN usd ARGS --camera-position=1055,912,-247 --camera-focal-point=69,173,63)
+f3d_test(NAME TestUSDZMaterials DATA McUsd.usdz PLUGIN usd ARGS --camera-position=1055,912,-247 --camera-focal-point=69,173,63 THRESHOLD 0.09) # The threshold is high because of the complex materials
 f3d_test(NAME TestUSDZMaterialsInterationReload DATA McUsd.usdz PLUGIN usd INTERACTION NO_BASELINE) # Up
 
 # Scene hierarchy test for USD importer

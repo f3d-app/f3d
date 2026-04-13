@@ -45,7 +45,11 @@ context::function context::getSymbol(std::string_view lib, std::string_view func
 //----------------------------------------------------------------------------
 context::function context::glx()
 {
+#if defined(VTK_USE_X)
   return getSymbol("GLX", "glXGetProcAddress");
+#else
+  throw loading_exception("Cannot use a GLX context on this platform");
+#endif
 }
 
 //----------------------------------------------------------------------------
