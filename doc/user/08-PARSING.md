@@ -92,6 +92,8 @@ When formatting a color into a string, it is formatted as `#RRGGBB` if values ar
 
 When using parenthesis in a command line arg, you may need to quote the entire option, eg: `"--background-color=rgb(84, 84, 84)"`.
 
+All colors are expressed in sRGB color space.
+
 ### F3D colors reference:
 
 - `f3d_red`: rgb(249, 67, 6)
