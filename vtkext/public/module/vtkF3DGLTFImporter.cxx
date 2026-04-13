@@ -6,8 +6,13 @@
 #include <vtkInformation.h>
 #include <vtkObjectFactory.h>
 
+// need https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13116
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260409)
 #include <vtkActorCollection.h>
 #include <vtkProperty.h>
+
+#include <cmath>
+#endif
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DGLTFImporter);
