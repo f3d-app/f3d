@@ -57,10 +57,11 @@ runs:
         cp -r ${{inputs.source_dir}}/.github/actions/* .actions/
 
     - name: sqlite action
+      if: inputs.sqlite_csb_version != ''
       uses: ./source/.github/actions/sqlite-install-dep
       with:
-        csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
-        cpu: tutu
+        csb_version: ${{inputs.sqlite_csb_version}}
+        cpu: tptp
 
     - name: Install sqlite
       if: inputs.sqlite_csb_version != ''
