@@ -58,10 +58,10 @@ runs:
 
     - name: sqlite action
       if: inputs.sqlite_csb_version != ''
-      uses: ./source/.github/actions/sqlite-install-dep
+      uses: ./.actions/sqlite-install-dep
       with:
         csb_version: ${{inputs.sqlite_csb_version}}
-        cpu: tptp
+        cpu: tktk
 
     - name: Install sqlite
       if: inputs.sqlite_csb_version != ''
