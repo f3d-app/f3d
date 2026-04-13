@@ -594,7 +594,7 @@ jobs:
         vtk_version:
           [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.6.0,
+            v9.6.1,
             v9.5.2,
             v9.4.2,
             v9.3.0,
@@ -685,7 +685,7 @@ jobs:
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           blosc_version: ${{needs.default_versions.outputs.blosc_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          vtk_version: v9.6.0
+          vtk_version: v9.6.1
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -704,7 +704,7 @@ jobs:
         vtk_version:
           [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.6.0,
+            v9.6.1,
             v9.5.2,
             v9.4.2,
             v9.3.0,
@@ -963,7 +963,7 @@ jobs:
         vtk_version:
           [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.6.0,
+            v9.6.1,
             v9.5.2,
             v9.4.2,
           ]
@@ -1027,7 +1027,7 @@ jobs:
         vtk_version:
           [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.6.0,
+            v9.6.1,
             v9.5.2,
             v9.4.2,
           ]
