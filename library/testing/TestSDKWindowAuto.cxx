@@ -24,8 +24,8 @@ int TestSDKWindowAuto([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   options.render.background.color = { 0.8, 0.2, 0.9 };
 
   test("render with auto window",
-    TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
-      "TestSDKWindowStandard"));
+    TestSDKHelpers::RenderTest(
+      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKWindowStandard"));
 
   return test.result();
 }

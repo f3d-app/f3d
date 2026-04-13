@@ -76,10 +76,10 @@
 #include <vtkXMLMultiBlockDataWriter.h>
 #include <vtkXMLTableReader.h>
 #include <vtkXMLTableWriter.h>
+#include <vtk_glad.h>
 #include <vtksys/FStream.hxx>
 #include <vtksys/MD5.h>
 #include <vtksys/SystemTools.hxx>
-#include <vtk_glad.h>
 
 #if F3D_MODULE_UI
 #include "F3DStyle.h"

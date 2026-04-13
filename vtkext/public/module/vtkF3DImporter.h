@@ -41,7 +41,13 @@ public:
   bool UpdateAtTimeValue(double timeValue) override;
 
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 4, 20250507)
-  enum class AnimationSupportLevel : unsigned char{ NONE, UNIQUE, SINGLE, MULTI };
+  enum class AnimationSupportLevel : unsigned char
+  {
+    NONE,
+    UNIQUE,
+    SINGLE,
+    MULTI
+  };
 
   /**
    * This method should be reimplemented in importer

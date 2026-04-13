@@ -110,8 +110,8 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
     "play interaction after removing all interactions", inter.playInteraction(interactionFilePath));
 
   test("render after interaction that should have had no effect",
-    TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
-      filename + "ModifiedAgain"));
+    TestSDKHelpers::RenderTest(
+      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "ModifiedAgain"));
 
   // initialize default bindings again, two times, and check rendering
   inter.initBindings();
