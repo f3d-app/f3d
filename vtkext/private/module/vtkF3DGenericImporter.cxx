@@ -143,9 +143,11 @@ void vtkF3DGenericImporter::CreateActorForBlock(
 
   this->Pimpl->UpdateBlock(bd, block);
 
-  const int childNodeId = this->SceneHierarchy->AddNode("actor", nodeid);
-  this->SceneHierarchy->SetAttribute(
-    childNodeId, "flat_actor_id", this->ActorCollection->GetNumberOfItems());
+  int actorId = this->ActorCollection->GetNumberOfItems();
+  std::string actorName = "actor_" + std::to_string(actorId);
+
+  const int childNodeId = this->SceneHierarchy->AddNode(actorName.c_str(), nodeid);
+  this->SceneHierarchy->SetAttribute(childNodeId, "flat_actor_id", actorId);
 
   if (!blockName.empty())
   {
@@ -477,14 +479,16 @@ void vtkF3DGenericImporter::ImportMultiBlock(int nodeid, vtkMultiBlockDataSet* m
 
     if (childMB)
     {
-      int childNodeId = this->SceneHierarchy->AddNode("block", nodeid);
+      int childNodeId = this->SceneHierarchy->AddNode(
+        vtkDataAssembly::MakeValidNodeName(blockName.c_str()).c_str(), nodeid);
       this->SceneHierarchy->SetAttribute(childNodeId, "label", blockName.c_str());
 
       this->ImportMultiBlock(childNodeId, childMB, ren);
     }
     else if (childComposite)
     {
-      int childNodeId = this->SceneHierarchy->AddNode("block", nodeid);
+      int childNodeId = this->SceneHierarchy->AddNode(
+        vtkDataAssembly::MakeValidNodeName(blockName.c_str()).c_str(), nodeid);
       this->SceneHierarchy->SetAttribute(childNodeId, "label", blockName.c_str());
 
       auto iter = vtkSmartPointer<vtkCompositeDataIterator>::Take(childComposite->NewIterator());
