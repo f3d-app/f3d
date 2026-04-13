@@ -90,6 +90,12 @@ runs:
         cd dependencies
         mkdir install
 
+    - name: sqlite action
+      uses: ./source/.github/actions/sqlite-install-dep
+      with:
+        csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
+        cpu: titi
+
     - name: Install VTK dependencies
       uses: ./source/.github/actions/vtk-dependencies
       with:
