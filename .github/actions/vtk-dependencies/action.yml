@@ -61,7 +61,7 @@ runs:
       uses: ./.actions/sqlite-install-dep
       with:
         csb_version: ${{inputs.sqlite_csb_version}}
-        cpu: tktk
+        cpu: ${{inputs.cpu}}
 
     - name: Install sqlite
       if: inputs.sqlite_csb_version != ''
