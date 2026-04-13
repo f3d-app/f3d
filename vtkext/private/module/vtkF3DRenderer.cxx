@@ -2528,8 +2528,12 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 
     if (surfaceColor)
     {
-      coloring.Actor->GetProperty()->SetColor(surfaceColor);
-      coloring.OriginalActor->GetProperty()->SetColor(surfaceColor);
+      double linearColor[3];
+      linearColor[0] = std::pow(surfaceColor[0], 2.2);
+      linearColor[1] = std::pow(surfaceColor[1], 2.2);
+      linearColor[2] = std::pow(surfaceColor[2], 2.2);
+      coloring.Actor->GetProperty()->SetColor(linearColor);
+      coloring.OriginalActor->GetProperty()->SetColor(linearColor);
     }
 
     if (this->Opacity.has_value())
@@ -2690,7 +2694,11 @@ void vtkF3DRenderer::ConfigureActorsProperties()
   {
     if (surfaceColor)
     {
-      sprites.Actor->GetProperty()->SetColor(surfaceColor);
+      double linearColor[3];
+      linearColor[0] = std::pow(surfaceColor[0], 2.2);
+      linearColor[1] = std::pow(surfaceColor[1], 2.2);
+      linearColor[2] = std::pow(surfaceColor[2], 2.2);
+      sprites.Actor->GetProperty()->SetColor(linearColor);
     }
 
     if (this->Opacity.has_value())

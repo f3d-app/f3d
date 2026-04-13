@@ -585,6 +585,10 @@ Some rendering options are not compatible between them, here is the precedence o
 - Volume (`-v`)
 - Point Sprites (`-o`)
 
+## Color space
+
+All options of type _color_ must be expressed in sRGB color space. They are converted internally in linear color space for physically correct rendering.
+
 ## Options syntax
 
 To turn on/off boolean options, it is possible to write `--option=true` and `--option=false`, eg `--points-sprites=false`.
