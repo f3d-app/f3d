@@ -247,6 +247,30 @@ bool vtkF3DPolyDataMapper::RenderWithMatCap(vtkActor* actor)
 void vtkF3DPolyDataMapper::ReplaceShaderColor(
   std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
 {
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260413)
+  if (actor->GetProperty()->GetInterpolation() == VTK_PBR)
+  {
+    bool cond = (this->VBOs->GetNumberOfComponents("scalarColor") != 0 && !this->DrawingVertices);
+    cond = cond ||
+      (this->InterpolateScalarsBeforeMapping && this->ColorCoordinates && !this->DrawingVertices);
+    cond = cond || (this->HaveCellScalars && !this->DrawingVertices && !this->PointPicking);
+
+    if (cond)
+    {
+      // PBR requires linear color space
+      // Fixed in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13123
+      auto fragmentShader = shaders[vtkShader::Fragment];
+      auto FSSource = fragmentShader->GetSource();
+
+      vtkShaderProgram::Substitute(FSSource, "//VTK::Color::Impl",
+        "//VTK::Color::Impl\n"
+        "  ambientColor = pow(ambientColor, vec3(2.2));\n"
+        "  diffuseColor = pow(diffuseColor, vec3(2.2));\n");
+      fragmentShader->SetSource(FSSource);
+    }
+  }
+#endif
+
   if (this->RenderWithMatCap(actor))
   {
     auto fragmentShader = shaders[vtkShader::Fragment];
