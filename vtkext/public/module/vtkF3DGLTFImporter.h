@@ -36,6 +36,14 @@ protected:
   void ApplyArmatureProperties(vtkActor* actor) override;
 #endif
 
+  // need https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13116
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260409)
+  /**
+   * This method is reimplemented to add a workaround needed before the fix linked above.
+   */
+  void ImportActors(vtkRenderer* renderer) override;
+#endif
+
 private:
   vtkF3DGLTFImporter(const vtkF3DGLTFImporter&) = delete;
   void operator=(const vtkF3DGLTFImporter&) = delete;
