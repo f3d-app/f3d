@@ -604,11 +604,11 @@ CLI: `--notifications`.
 
 Show corresponding keys when notifications are triggered by bindings key press events.
 
-# APIs
+## APIs
 
 There are three APIs to access the options
 
-## Struct API
+### Struct API
 
 The most straightforward and easy to use API, just access it through the structs available in the options instance, eg:
 
@@ -638,7 +638,7 @@ Please note that when accessing optional options, special care must be used, eg:
 
 It's even more true with the few optional boolean options as std::optional has an implicit boolean cast operator.
 
-## String API
+### String API
 
 The most generic and flexible API, as it rely on parsing and string generation.
 See the [parsing documentation](../user/08-PARSING.md) for more details.
@@ -672,7 +672,7 @@ When using this API make sure to catch exceptions has needed, eg:
   }
 ```
 
-## Variant API
+### Variant API
 
 An API that is similar to the F3D 2.0 options API thanks to std::variant.
 

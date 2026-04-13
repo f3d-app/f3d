@@ -6,15 +6,15 @@ A simple example is available [here](https://github.com/f3d-app/f3d/blob/master/
 
 This guide is describing how to build VTK and F3D with emscripten using Docker on Linux or Windows.
 
-# Building
+## Building
 
 While it's possible to setup an emscripten cross-compiling toolchain locally, it's easier to use Docker and the provided npm scripts.
 
-## Preparing the build
+### Preparing the build
 
 Install `Docker` and `npm` locally.
 
-## Building F3D
+### Building F3D
 
 From the root of the repository run the following command:
 
@@ -27,7 +27,7 @@ It's also possible to use `podman` instead of `docker`, please set the `F3D_DOCK
 On completion, a directory `dist` is created containing the artifacts (`f3d.js` and `f3d.wasm`).
 `assimp`, `occt`, `webifc` and `draco` plugins are automatically included.
 
-# Run tests
+## Run tests
 
 From the root of the repository, after the build step, run the following command:
 
@@ -35,7 +35,7 @@ From the root of the repository, after the build step, run the following command
 npm test
 ```
 
-# Integrating
+## Integrating
 
 It's possible to generate a local package to use in other javascript projects.
 Run the following command:
