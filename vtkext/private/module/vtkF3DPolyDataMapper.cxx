@@ -247,18 +247,15 @@ bool vtkF3DPolyDataMapper::RenderWithMatCap(vtkActor* actor)
 void vtkF3DPolyDataMapper::ReplaceShaderColor(
   std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
 {
+  // Fixed in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13123
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260411)
-  if (actor->GetProperty()->GetInterpolation() == VTK_PBR)
+  if (actor->GetProperty()->GetInterpolation() == VTK_PBR && !this->DrawingVertices)
   {
-    bool cond = (this->VBOs->GetNumberOfComponents("scalarColor") != 0 && !this->DrawingVertices);
-    cond = cond ||
-      (this->InterpolateScalarsBeforeMapping && this->ColorCoordinates && !this->DrawingVertices);
-    cond = cond || (this->HaveCellScalars && !this->DrawingVertices && !this->PointPicking);
-
-    if (cond)
+    if (this->VBOs->GetNumberOfComponents("scalarColor") != 0 ||
+      (this->InterpolateScalarsBeforeMapping && this->ColorCoordinates) ||
+      (this->HaveCellScalars && !this->PointPicking))
     {
       // PBR requires linear color space
-      // Fixed in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13123
       auto fragmentShader = shaders[vtkShader::Fragment];
       auto FSSource = fragmentShader->GetSource();
 
@@ -294,6 +291,22 @@ void vtkF3DPolyDataMapper::ReplaceShaderColor(
 void vtkF3DPolyDataMapper::ReplaceShaderLight(
   std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
 {
+  // Fixed in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13116
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260409)
+  if (actor->GetProperty()->GetInterpolation() == VTK_PBR &&
+    this->PrimitiveInfo[this->LastBoundBO].LastLightComplexity == primitiveInfo::NoLighting)
+  {
+    // Convert unlit to sRGB
+    auto fragmentShader = shaders[vtkShader::Fragment];
+    auto FSSource = fragmentShader->GetSource();
+
+    vtkShaderProgram::Substitute(FSSource, "//VTK::Light::Impl",
+      "//VTK::Light::Impl\n"
+      "  gl_FragData[0].rgb = pow(gl_FragData[0].rgb, vec3(1.0/2.2));\n");
+    fragmentShader->SetSource(FSSource);
+  }
+#endif
+
   if (this->RenderWithMatCap(actor))
   {
     auto fragmentShader = shaders[vtkShader::Fragment];
