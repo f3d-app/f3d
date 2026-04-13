@@ -180,9 +180,11 @@ public:
           if (style.IsSetColorCurv())
           {
             Quantity_Color color = style.GetColorCurv();
-            rgb[0] = static_cast<unsigned char>(255.0 * color.Red());
-            rgb[1] = static_cast<unsigned char>(255.0 * color.Green());
-            rgb[2] = static_cast<unsigned char>(255.0 * color.Blue());
+            double fRGB[3];
+            color.Values(fRGB[0], fRGB[1], fRGB[2], Quantity_TOC_sRGB);
+            rgb[0] = static_cast<unsigned char>(255.0 * fRGB[0]);
+            rgb[1] = static_cast<unsigned char>(255.0 * fRGB[1]);
+            rgb[2] = static_cast<unsigned char>(255.0 * fRGB[2]);
           }
         }
         catch (Standard_NoSuchObject&)
@@ -285,9 +287,11 @@ public:
         if (style.IsSetColorSurf())
         {
           Quantity_Color color = style.GetColorSurf();
-          rgb[0] = static_cast<unsigned char>(255.0 * color.Red());
-          rgb[1] = static_cast<unsigned char>(255.0 * color.Green());
-          rgb[2] = static_cast<unsigned char>(255.0 * color.Blue());
+          double fRGB[3];
+          color.Values(fRGB[0], fRGB[1], fRGB[2], Quantity_TOC_sRGB);
+          rgb[0] = static_cast<unsigned char>(255.0 * fRGB[0]);
+          rgb[1] = static_cast<unsigned char>(255.0 * fRGB[1]);
+          rgb[2] = static_cast<unsigned char>(255.0 * fRGB[2]);
         }
       }
       catch (Standard_NoSuchObject&)
