@@ -2,7 +2,7 @@ name: "Install sqlite Dependency"
 description: "Install sqlite Dependency using cache when possible"
 inputs:
   cpu:
-    description: "CPU architecture to build for"
+    description: "CPU architecture to build forr"
     required: false
     default: "x86_64"
   csb_version:
