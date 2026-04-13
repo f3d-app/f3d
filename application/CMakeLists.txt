@@ -97,13 +97,6 @@ function(f3d_create_exec target_name)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_TINYFILEDIALOGS)
   endif ()
 
-  if(VTK_VERSION VERSION_LESS 9.3.20240914)
-    # Headless EGL build
-    if (VTK_OPENGL_HAS_EGL)
-      target_compile_definitions(${target_name} PRIVATE F3D_HEADLESS_BUILD)
-    endif ()
-  endif ()
-
   # F3D_STRICT_BUILD
   list(APPEND f3d_compile_options_private ${f3d_strict_build_compile_options})
   if(F3D_STRICT_BUILD)

@@ -1,12 +1,7 @@
 #include <vtkObjectFactory.h>
 #include <vtkVersion.h>
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
 #include <vtk_glad.h>
 #include <vtkglad/include/glad/glx.h>
-#else
-#include <vtk_glew.h>
-#endif
 
 #include "vtkF3DGLXRenderWindow.h"
 

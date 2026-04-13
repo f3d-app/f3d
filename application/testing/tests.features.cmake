@@ -33,9 +33,9 @@ endif()
 # FX
 f3d_test(NAME TestSSAO DATA suzanne.ply ARGS -q)
 f3d_test(NAME TestDepthPeeling DATA suzanne.ply ARGS -sp --opacity=0.9)
-f3d_test(NAME TestToneMapping DATA suzanne.ply ARGS -t TONE_MAPPING)
-f3d_test(NAME TestDepthPeelingToneMapping DATA suzanne.ply ARGS --opacity=0.9 -pt TONE_MAPPING)
-f3d_test(NAME TestBackground DATA suzanne.ply ARGS --background-color=0.8,0.2,0.9 THRESHOLD 0.1) # Threshold is needed for legacy image comparison for VTK 9.3
+f3d_test(NAME TestToneMapping DATA suzanne.ply ARGS -t)
+f3d_test(NAME TestDepthPeelingToneMapping DATA suzanne.ply ARGS --opacity=0.9 -pt)
+f3d_test(NAME TestBackground DATA suzanne.ply ARGS --background-color=0.8,0.2,0.9)
 f3d_test(NAME TestNoBackground DATA cow.vtp ARGS --no-background)
 f3d_test(NAME TestMaterial DATA suzanne.ply ARGS --color=0.72,0.45,0.2 --metallic=0.7 --roughness=0.2)
 f3d_test(NAME TestMaterialFullScene DATA WaterBottle.glb ARGS --color=0.9,0.1,0.1 --metallic=0.7 --roughness=0.2)
@@ -79,7 +79,7 @@ f3d_test(NAME TestDPIInvalid DATA dragon.vtu ARGS -nm --dpi-aware DPI_SCALE inva
 
 ## Color/opacity map
 f3d_test(NAME TestColormap DATA IM-0001-1983.dcm ARGS --scalar-coloring --roughness=1 --colormap=0,1,0,0,1,0,1,0)
-f3d_test(NAME TestOpacityMap DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-map=0.0,0.0,0.5,1.0,1.0,0.0 THRESHOLD 0.05) # Small rendering differences when using VTK 9.3.0
+f3d_test(NAME TestOpacityMap DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-map=0.0,0.0,0.5,1.0,1.0,0.0)
 f3d_test(NAME TestOpacityMapFile DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/gaussian_opacity_map.png)
 f3d_test(NAME TestOpacityMapFileNonExistent DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/nonexistent_opacity_map.png)
 f3d_test(NAME TestOpacityMapFileInvalid DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/invalid.png)
@@ -150,10 +150,7 @@ f3d_test(NAME TestTextureMatCapWithEdges DATA suzanne.ply ARGS -e --texture-matc
 f3d_test(NAME TestTextureColorWithOptions DATA WaterBottle.glb ARGS --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --color=1,1,0 --opacity=0.4 --blending)
 f3d_test(NAME TestTextureCheckerBoard DATA WaterBottle.glb ARGS --checkerboard)
 f3d_test(NAME TestTextureCheckerBoardOnMissingUV DATA RiggedFigure.glb ARGS --checkerboard REGEXP "Texture coordinates are required to display checkerboard texture." NO_BASELINE)
-
-if(NOT APPLE OR VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
-  f3d_test(NAME TestTextureColor DATA WaterBottle.glb ARGS --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --blending)
-endif()
+f3d_test(NAME TestTextureColor DATA WaterBottle.glb ARGS --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --blending)
 
 ## Lights
 f3d_test(NAME TestLightIntensityBrighter DATA cow.vtp ARGS --light-intensity=5.0)
@@ -171,11 +168,7 @@ f3d_test(NAME TestHDRIFilenameDefault DATA dragon.vtu ARGS --hdri-filename -f -j
 f3d_test(NAME TestFilenameWhiteBg DATA suzanne.ply ARGS -n --background-color=1,1,1 UI)
 f3d_test(NAME TestConsoleBadgeWarning DATA suzanne.ply ARGS --position=0 UI)
 f3d_test(NAME TestConsoleBadgeQuiet DATA suzanne.ply ARGS --position=0 --verbose=quiet UI)
-
-# Require improved importer support https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11303
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240910)
-  f3d_test(NAME TestConsoleBadgeError DATA invalid_body.vtp NO_DATA_FORCE_RENDER UI)
-endif()
+f3d_test(NAME TestConsoleBadgeError DATA invalid_body.vtp NO_DATA_FORCE_RENDER UI)
 
 ## Axis widget
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
@@ -197,12 +190,9 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
   f3d_test(NAME TestSceneHierarchyGLTFNodeNames DATA vtk-dasm-test.glb ARGS --scene-hierarchy RESOLUTION 300,700 UI)
 endif()
 
-# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10861
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240201)
-  f3d_test(NAME TestSceneHierarchyNonGLTF DATA cow.vtp ARGS --scene-hierarchy UI)
-  f3d_test(NAME TestSceneHierarchyMultipleFiles DATA cow.vtp suzanne.obj ARGS --scene-hierarchy --multi-file-mode=all --opacity=0.3 UI)
-  f3d_test(NAME TestSceneHierarchyMultiBlock DATA mb.vtm ARGS --scene-hierarchy UI)
-endif()
+f3d_test(NAME TestSceneHierarchyNonGLTF DATA cow.vtp ARGS --scene-hierarchy UI)
+f3d_test(NAME TestSceneHierarchyMultipleFiles DATA cow.vtp suzanne.obj ARGS --scene-hierarchy --multi-file-mode=all --opacity=0.3 UI)
+f3d_test(NAME TestSceneHierarchyMultiBlock DATA mb.vtm ARGS --scene-hierarchy UI)
 
 ## Special files handling
 f3d_test(NAME TestRemoveEmptyFileGroups DATA mb/mb_3_0.vtt mb/mb_0_0.vtu ARGS -n --remove-empty-file-groups UI)
@@ -229,14 +219,10 @@ f3d_test(NAME TestMultiFilePositionals DATA mb/recursive/mb_0_0.vtu mb/recursive
 f3d_test(NAME TestMultiFileNonCoherentComponentNames DATA bluntfin.vts bluntfin_t.vtu ARGS --multi-file-mode=all --scalar-coloring --coloring-array=Momentum --coloring-component=2 --coloring-scalar-bar)
 f3d_test(NAME TestMultiInputArg ARGS --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_0_0.vtu ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_1_0.vtp --multi-file-mode=all -s --coloring-array=Polynomial -b)
 f3d_test(NAME TestMultiInputMultiArgs ARGS --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_0_0.vtu --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_1_0.vtp --multi-file-mode=all -s --coloring-array=Polynomial -b)
-
-# Require improved importer support https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11303
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240910)
-  f3d_test(NAME TestInvalidFileFileNameEmpty DATA invalid_body.vtp ARGS --filename NO_DATA_FORCE_RENDER UI)
-  f3d_test(NAME TestMultiFileInvalid DATA cow.vtp invalid_body.vtp dragon.vtu ARGS --multi-file-mode=all NO_DATA_FORCE_RENDER UI)
-  f3d_test(NAME TestMultiFileUnsupportedFilesFileName DATA unsupportedFile.dummy cow.vtp ARGS --multi-file-mode=all --filename NO_DATA_FORCE_RENDER UI)
-  f3d_test(NAME TestMultiFileCameraIndex DATA Cameras.gltf CameraAnimated.glb ARGS --multi-file-mode=all --camera-index=2 --opacity=0.5 --blending)
-endif()
+f3d_test(NAME TestInvalidFileFileNameEmpty DATA invalid_body.vtp ARGS --filename NO_DATA_FORCE_RENDER UI)
+f3d_test(NAME TestMultiFileInvalid DATA cow.vtp invalid_body.vtp dragon.vtu ARGS --multi-file-mode=all NO_DATA_FORCE_RENDER UI)
+f3d_test(NAME TestMultiFileUnsupportedFilesFileName DATA unsupportedFile.dummy cow.vtp ARGS --multi-file-mode=all --filename NO_DATA_FORCE_RENDER UI)
+f3d_test(NAME TestMultiFileCameraIndex DATA Cameras.gltf CameraAnimated.glb ARGS --multi-file-mode=all --camera-index=2 --opacity=0.5 --blending)
 
 ## Font
 f3d_test(NAME TestFont DATA suzanne.ply ARGS -n --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf UI)
@@ -328,19 +314,14 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
 endif()
 
 ## Skinning
-# Needs SSBO: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231108)
-  if(APPLE) # MacOS does not support OpenGL 4.3
-    f3d_test(NAME TestSkinningManyBonesFailure DATA tube_254bones.glb ARGS --verbose REGEXP "which requires OpenGL" NO_BASELINE)
-  else()
-    if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219) # The baseline changed with armature support
-      # Strictly speaking, this test can also fail if ran without OpenGL 4.3 support on Windows and Linux
-      # Instead of checking MacOS only, we should try to get OpenGL capabilities from CMake later instead
-      f3d_test(NAME TestSkinningManyBones DATA tube_254bones.glb)
-    endif()
-  endif()
+if(APPLE) # MacOS does not support OpenGL 4.3
+  f3d_test(NAME TestSkinningManyBonesFailure DATA tube_254bones.glb ARGS --verbose REGEXP "which requires OpenGL" NO_BASELINE)
 else()
-  f3d_test(NAME TestSkinningManyBonesWarning DATA tube_254bones.glb ARGS --verbose REGEXP "with more than 250 bones \\\(254\\\)" NO_BASELINE)
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219) # The baseline changed with armature support
+    # Strictly speaking, this test can also fail if ran without OpenGL 4.3 support on Windows and Linux
+    # Instead of checking MacOS only, we should try to get OpenGL capabilities from CMake later instead
+    f3d_test(NAME TestSkinningManyBones DATA tube_254bones.glb)
+  endif()
 endif()
 
 ## Armature
@@ -358,13 +339,13 @@ f3d_test(NAME TestHDRIBlur DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -u)
 f3d_test(NAME TestHDRIBlurCoCSmall DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=10 --camera-position=-20,0,20)
 f3d_test(NAME TestHDRIBlurCoCMedium DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=50 --camera-position=-20,0,20)
 f3d_test(NAME TestHDRIBlurCoCLarge DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=100 --camera-position=-20,0,20)
-f3d_test(NAME TestHDRIBlurCoCZero DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=0 --camera-position=-20,0,20 THRESHOLD 0.08) # Threshold is needed for legacy comparison method for VTK 9.3
+f3d_test(NAME TestHDRIBlurCoCZero DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=0 --camera-position=-20,0,20)
 f3d_test(NAME TestHDRIBlurCoCNegative DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=-100 --camera-position=-20,0,20)
 f3d_test(NAME TestHDRIBlurRatio DATA suzanne.ply HDRI palermo_park_1k.hdr RESOLUTION 600,100 ARGS -u)
 f3d_test(NAME TestHDRIEdges DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -e THRESHOLD 0.06)
 f3d_test(NAME TestHDRI8Bit DATA suzanne.ply HDRI f3d.tif ARGS --color=1.0,0.0,0.0 THRESHOLD 0.08) # Threshold is needed for IBL change after VTK 9.6
 f3d_test(NAME TestHDRIOrient DATA suzanne.stl HDRI palermo_park_1k.hdr ARGS --up=+Z)
-f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply HDRI palermo_park_1k.hdr TONE_MAPPING ARGS -t)
+f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -t)
 
 # Test non existent HDRI, do not add a dummy.png
 f3d_test(NAME TestNonExistentHDRI DATA cow.vtp HDRI dummy.png REGEXP "HDRI file does not exist" NO_BASELINE)
@@ -373,7 +354,7 @@ f3d_test(NAME TestNonExistentHDRI DATA cow.vtp HDRI dummy.png REGEXP "HDRI file 
 f3d_test(NAME TestInvalidHDRI DATA cow.vtp HDRI invalid.png REGEXP "Cannot open HDRI file" NO_BASELINE)
 
 # Use a dummy HDRI for simplicity to test default HDRI
-f3d_test(NAME TestHDRIDefault DATA suzanne.ply HDRI dummy.png THRESHOLD 0.11) # Threshold is needed for legacy comparison method for VTK 9.3
+f3d_test(NAME TestHDRIDefault DATA suzanne.ply HDRI dummy.png)
 
 configure_file("${F3D_SOURCE_DIR}/testing/configs/hdri.json.in" "${CMAKE_BINARY_DIR}/hdri.json")
 f3d_test(NAME TestConfigFileHDRI DATA dragon.vtu CONFIG "${CMAKE_BINARY_DIR}/hdri.json" LONG_TIMEOUT)
@@ -388,47 +369,39 @@ f3d_test(NAME TestHDRIAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=
 f3d_test(NAME TestHDRINone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LONG_TIMEOUT)
 
 if(F3D_MODULE_RAYTRACING)
-  # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10753
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231213)
-    # XXX: These tests are impacted by https://github.com/f3d-app/f3d/issues/933
-    f3d_test(NAME TestHDRIRaytracing DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -rd --raytracing-samples=4)
-    f3d_test(NAME TestHDRIRaytracingSkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-skybox -rd --raytracing-samples=4 LONG_TIMEOUT)
-    f3d_test(NAME TestHDRIRaytracingAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -rd --raytracing-samples=4 LONG_TIMEOUT)
-    f3d_test(NAME TestHDRIRaytracingAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -rd --raytracing-samples=4 --no-background LONG_TIMEOUT)
-    f3d_test(NAME TestHDRIRaytracingNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -rd --raytracing-samples=4 LONG_TIMEOUT)
-  endif()
+  f3d_test(NAME TestHDRIRaytracing DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -rd --raytracing-samples=4)
+  f3d_test(NAME TestHDRIRaytracingSkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-skybox -rd --raytracing-samples=4 LONG_TIMEOUT)
+  f3d_test(NAME TestHDRIRaytracingAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -rd --raytracing-samples=4 LONG_TIMEOUT)
+  f3d_test(NAME TestHDRIRaytracingAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -rd --raytracing-samples=4 --no-background LONG_TIMEOUT)
+  f3d_test(NAME TestHDRIRaytracingNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -rd --raytracing-samples=4 LONG_TIMEOUT)
 endif()
 
 # SSAA with HDR framebuffer support in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12026
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250329)
-  f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI palermo_park_1k.hdr TONE_MAPPING ARGS -t --anti-aliasing=ssaa)
+  f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -t --anti-aliasing=ssaa)
 endif()
 
 ## Raytracing
 if(F3D_MODULE_RAYTRACING)
-  # Ideally we could test these with ospray 2.7 and VTK 9.3
-  # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10753
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231213)
-    f3d_test(NAME TestRaytracingGLTF DATA WaterBottle.glb ARGS -rd --raytracing-samples=4)
-    f3d_test(NAME TestRaytracingBackground DATA suzanne.ply ARGS -rd --raytracing-samples=4 --background-color=1,0,0 THRESHOLD 0.05) # Threshold needed because of difference in rendering in VTK 9.3
-    f3d_test(NAME TestRaytracingPointCloud DATA pointsCloud.vtp ARGS -rd --raytracing-samples=4 --point-size=20 THRESHOLD 0.1) # Threshold needed because of difference in rendering in VTK 9.3
-    f3d_test(NAME TestRaytracingDenoise DATA suzanne.ply ARGS -rd --raytracing-samples=4)
-    f3d_test(NAME TestRaytracingNoDenoise DATA suzanne.stl ARGS -r --raytracing-samples=20)
-    f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Module Raytracing: ON")
-    f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply ARGS --raytracing-samples=4 INTERACTION) #RD
-    f3d_test(NAME TestRaytracingScalarBar DATA dragon.vtu ARGS -rsbd --raytracing-samples=4 THRESHOLD 0.06) # Threshold needed because of difference in rendering in VTK 9.3 on macOS
+  f3d_test(NAME TestRaytracingGLTF DATA WaterBottle.glb ARGS -rd --raytracing-samples=4)
+  f3d_test(NAME TestRaytracingBackground DATA suzanne.ply ARGS -rd --raytracing-samples=4 --background-color=1,0,0)
+  f3d_test(NAME TestRaytracingPointCloud DATA pointsCloud.vtp ARGS -rd --raytracing-samples=4 --point-size=20)
+  f3d_test(NAME TestRaytracingDenoise DATA suzanne.ply ARGS -rd --raytracing-samples=4)
+  f3d_test(NAME TestRaytracingNoDenoise DATA suzanne.stl ARGS -r --raytracing-samples=20)
+  f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Module Raytracing: ON")
+  f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply ARGS --raytracing-samples=4 INTERACTION) #RD
+  f3d_test(NAME TestRaytracingScalarBar DATA dragon.vtu ARGS -rsbd --raytracing-samples=4)
 
-    if(NOT F3D_MACOS_BUNDLE)
-      # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
-      if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-        f3d_test(NAME TestRaytracingDefaultConfigFile DATA dragon.vtu CONFIG config_build ARGS -rd --raytracing-samples=4 LONG_TIMEOUT TONE_MAPPING)
-      endif()
-
-      f3d_test(NAME TestRaytracingThumbnailConfigFile DATA dragon.vtu CONFIG thumbnail_build ARGS -rd --raytracing-samples=4 LONG_TIMEOUT TONE_MAPPING)
+  if(NOT F3D_MACOS_BUNDLE)
+    # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
+    if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+      f3d_test(NAME TestRaytracingDefaultConfigFile DATA dragon.vtu CONFIG config_build ARGS -rd --raytracing-samples=4 LONG_TIMEOUT)
     endif()
 
-    f3d_test(NAME TestRaytracingNoBackground DATA suzanne.ply ARGS -rd --raytracing-samples=4 --no-background)
+    f3d_test(NAME TestRaytracingThumbnailConfigFile DATA dragon.vtu CONFIG thumbnail_build ARGS -rd --raytracing-samples=4 LONG_TIMEOUT)
   endif()
+
+  f3d_test(NAME TestRaytracingNoBackground DATA suzanne.ply ARGS -rd --raytracing-samples=4 --no-background)
 else(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestCommandScriptRaytracing SCRIPT DATA suzanne.ply NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing")
 endif()
@@ -621,13 +594,11 @@ f3d_test(NAME TestUnsupportedFileText DATA unsupportedFile.dummy ARGS --filename
 # Test non existent texture, do not add a dummy.png
 f3d_test(NAME TestNonExistentTexture DATA cow.vtp ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/dummy.png REGEXP "Texture file does not exist" NO_BASELINE)
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
-  # Test invalid file
-  f3d_test(NAME TestInvalidFile DATA invalid_body.gltf REGEXP "failed to load scene" NO_BASELINE)
+# Test invalid file
+f3d_test(NAME TestInvalidFile DATA invalid_body.gltf REGEXP "failed to load scene" NO_BASELINE)
 
-  # Test invalid animation
-  f3d_test(NAME TestAnimationInvalid DATA BoxAnimated_invalid_animation.gltf ARGS --animation-time 1 REGEXP "Could not load time value: 1" NO_BASELINE)
-endif ()
+# Test invalid animation
+f3d_test(NAME TestAnimationInvalid DATA BoxAnimated_invalid_animation.gltf ARGS --animation-time 1 REGEXP "Could not load time value: 1" NO_BASELINE)
 
 # Test invalid texture
 f3d_test(NAME TestInvalidTexture DATA cow.vtp ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/invalid.png REGEXP "Cannot open texture file" NO_BASELINE)

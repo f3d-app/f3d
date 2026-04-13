@@ -30,15 +30,10 @@
 #include <vtkSmartPointer.h>
 #include <vtkTextureObject.h>
 #include <vtkVersion.h>
+#include <vtk_glad.h>
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
 #include <vtkMemoryResourceStream.h>
-#endif
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
-#include <vtk_glad.h>
-#else
-#include <vtk_glew.h>
 #endif
 
 #include <imgui.h>
@@ -110,7 +105,6 @@ protected:
     vtkDataAssembly* mutableAssembly = const_cast<vtkDataAssembly*>(this->GetAssembly());
     mutableAssembly->SetAttribute(nodeid, "f3d_visible", this->Visible);
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
     const int flatActorIndex =
       this->GetAssembly()->GetAttributeOrDefault(nodeid, "flat_actor_id", -1);
 
@@ -138,7 +132,6 @@ protected:
         keys->Set(vtkF3DMetaImporter::ACTOR_HIDDEN(), 1);
       }
     }
-#endif
   }
 
 private:
@@ -287,19 +280,12 @@ struct vtkF3DImguiActor::Internals
         this->LogoTexture->Create2DFromRaw(dims[0], dims[1], 4, VTK_UNSIGNED_CHAR, logoPixels);
       }
 
-      // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10589
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231016)
       this->VertexBuffer->SetUsage(vtkOpenGLBufferObject::StreamDraw);
-#endif
       this->VertexBuffer->GenerateBuffer(vtkOpenGLBufferObject::ArrayBuffer);
 
       // Create IBO
       this->IndexBuffer = vtkSmartPointer<vtkOpenGLBufferObject>::New();
-
-      // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10589
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231016)
       this->IndexBuffer->SetUsage(vtkOpenGLBufferObject::StreamDraw);
-#endif
       this->IndexBuffer->GenerateBuffer(vtkOpenGLBufferObject::ElementArrayBuffer);
 
       // Create shader program

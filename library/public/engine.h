@@ -41,8 +41,6 @@ public:
   /**
    * Create an engine with an automatic window.
    * Optionally, the window can be hidden by setting offscreen to true.
-   * For VTK < 9.3, the window type will depend on the VTK build options.
-   * For VTK >= 9.4:
    * Linux: Try GLX, then EGL, then OSMesa.
    * Windows: Try Win32, then EGL, then OSMesa.
    * macOS: Always use Cocoa.

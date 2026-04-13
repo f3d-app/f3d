@@ -28,11 +28,9 @@ public:
     renderer->AddActor(actor1);
     renderer->AddActor(actor2);
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
     // Push to vtkImporter parent class
     this->ActorCollection->AddItem(actor1);
     this->ActorCollection->AddItem(actor2);
-#endif
   }
 };
 

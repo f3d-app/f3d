@@ -1,14 +1,8 @@
 set(classes
   vtkF3DDracoReader
+  vtkF3DGLTFDracoDocumentLoader
+  vtkF3DGLTFDracoImporter
   )
-
-# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10884
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
-  list(APPEND classes
-    vtkF3DGLTFDracoDocumentLoader
-    vtkF3DGLTFDracoImporter
-    )
-endif()
 
 vtk_module_add_module(f3d::vtkextDraco
   NO_INSTALL

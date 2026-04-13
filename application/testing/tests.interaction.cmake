@@ -1,6 +1,6 @@
 ## Interaction Tests
 
-f3d_test(NAME TestInteractionPostFX DATA cow.vtp INTERACTION TONE_MAPPING LONG_TIMEOUT) #PQAAAAT
+f3d_test(NAME TestInteractionPostFX DATA cow.vtp INTERACTION LONG_TIMEOUT) #PQAAAAT
 f3d_test(NAME TestInteractionTimer DATA cow.vtp NO_BASELINE INTERACTION UI LONG_TIMEOUT) #Z
 f3d_test(NAME TestInteractionTrackball DATA cow.vtp ARGS --interaction-trackball INTERACTION LONG_TIMEOUT) #Mouse movements;
 f3d_test(NAME TestInteractionTrackballBind DATA cow.vtp INTERACTION LONG_TIMEOUT) #K#Mouse movements;
@@ -35,15 +35,11 @@ f3d_test(NAME TestInteractionEmptyLoadParentDirectory INTERACTION NO_BASELINE RE
 f3d_test(NAME TestInteractionMultiFileLoadParentDirectory DATA mb/mb_0_0.vtu ARGS --multi-file-mode=all --filename INTERACTION UI) #Down;
 f3d_test(NAME TestInteractionInvertZoom DATA suzanne.ply ARGS --invert-zoom INTERACTION)
 f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #CTRL+Q
-
-# Needs some event loop fix that's not in 9.3
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.0)
-  f3d_test(NAME TestInteractionNotifications DATA cow.vtp ARGS --notifications INTERACTION UI) #E;
-  f3d_test(NAME TestInteractionNotificationsUpdate DATA cow.vtp ARGS --notifications INTERACTION UI) #E;E;Up;Up
-  f3d_test(NAME TestInteractionNotificationsBindings DATA cow.vtp ARGS --notifications -Dui.notifications.show_bindings=ON INTERACTION UI) #E;
-  f3d_test(NAME TestInteractionNotificationsBindingsModifier DATA cow.vtp ARGS --notifications -Dui.notifications.show_bindings=ON RESOLUTION 400,300 INTERACTION UI) #SHIFT+L;
-  f3d_test(NAME TestInteractionToggleNotifications DATA cow.vtp INTERACTION UI) #CTRL+K;
-endif()
+f3d_test(NAME TestInteractionNotifications DATA cow.vtp ARGS --notifications INTERACTION UI) #E;
+f3d_test(NAME TestInteractionNotificationsUpdate DATA cow.vtp ARGS --notifications INTERACTION UI) #E;E;Up;Up
+f3d_test(NAME TestInteractionNotificationsBindings DATA cow.vtp ARGS --notifications -Dui.notifications.show_bindings=ON INTERACTION UI) #E;
+f3d_test(NAME TestInteractionNotificationsBindingsModifier DATA cow.vtp ARGS --notifications -Dui.notifications.show_bindings=ON RESOLUTION 400,300 INTERACTION UI) #SHIFT+L;
+f3d_test(NAME TestInteractionToggleNotifications DATA cow.vtp INTERACTION UI) #CTRL+K;
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12987
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
@@ -55,9 +51,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   f3d_test(NAME TestInteractionActors DATA cow.vtp INTERACTION UI) #EXGMN
 endif()
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231102)
-  f3d_test(NAME TestInteractionPointCloudTAA DATA pointsCloud.vtp ARGS --anti-aliasing=taa -o --point-sprites-size=20 INTERACTION) #Render;Render...
-endif()
+f3d_test(NAME TestInteractionPointCloudTAA DATA pointsCloud.vtp ARGS --anti-aliasing=taa -o --point-sprites-size=20 INTERACTION) #Render;Render...
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12098
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250504)
@@ -66,10 +60,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250504)
   f3d_test(NAME TestInteractionAndCLIBlending ARGS --blending DATA suzanne.stl alpha.glb INTERACTION) #PP;Right
 endif()
 
-# Using gaussian splatting require > 9.3 to not warn
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
-  f3d_test(NAME TestInteractionConfigFileAndCommand DATA multi ARGS -o CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI LONG_TIMEOUT) #OX;Right;N;Right;Right;Right
-endif()
+f3d_test(NAME TestInteractionConfigFileAndCommand DATA multi ARGS -o CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI LONG_TIMEOUT) #OX;Right;N;Right;Right;Right
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
   f3d_test(NAME TestInteractionAxesGridToggle INTERACTION DATA suzanne.ply THRESHOLD 0.08) #Shift+x
@@ -166,13 +157,8 @@ f3d_test(NAME TestInteractionCheatsheetAnimationName DATA InterpolationTest.glb 
 f3d_test(NAME TestInteractionCheatsheetConfigFile DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #H;ScrollDown
 f3d_test(NAME TestInteractionCheatsheetMultiModifierBinding DATA dragon.vtu RESOLUTION 1200,300 CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #H;ScrollDown
 f3d_test(NAME TestInteractionCheatsheetCycle DATA cow.vtp RESOLUTION 800,300 INTERACTION UI LONG_TIMEOUT) #HAAPO
-
-# Need SSIM comparison for some reason
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
-  # Test scrolling cheatsheet with no model by mouse wheel and by using scrollbar
-  f3d_test(NAME TestInteractionNoModelScrollWheel RESOLUTION 1000,600 NO_DATA_FORCE_RENDER LONG_TIMEOUT INTERACTION UI)
-  f3d_test(NAME TestInteractionNoModelScrollBar RESOLUTION 1000,600 NO_DATA_FORCE_RENDER LONG_TIMEOUT INTERACTION UI)
-endif()
+f3d_test(NAME TestInteractionNoModelScrollWheel RESOLUTION 1000,600 NO_DATA_FORCE_RENDER LONG_TIMEOUT INTERACTION UI)
+f3d_test(NAME TestInteractionNoModelScrollBar RESOLUTION 1000,600 NO_DATA_FORCE_RENDER LONG_TIMEOUT INTERACTION UI)
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
@@ -211,40 +197,35 @@ f3d_test(NAME TestInteractionConsoleCamera DATA f3d.glb INTERACTION UI) #Escape;
 f3d_test(NAME TestInteractionConsoleScrollbar DATA f3d.glb INTERACTION UI) #Escape;a;Enter;Grab scrollbar
 f3d_test(NAME TestInteractionConsoleEmptyCommand DATA f3d.glb INTERACTION UI) #Escape;Enter
 f3d_test(NAME TestInteractionConsoleOverCheatSheet DATA f3d.glb INTERACTION UI) #h;Escape;Enter
+f3d_test(NAME TestInteractionConsoleAutoComplete DATA BoxAnimated.gltf INTERACTION UI) #Escape;Tab;to;Tab;Tab;_a;Tab;Enter
+f3d_test(NAME TestInteractionConsoleAutoCompleteNoMatch DATA BoxAnimated.gltf INTERACTION UI) #Escape;zz;Tab
+f3d_test(NAME TestInteractionConsoleAutoCompleteCandidates DATA BoxAnimated.gltf INTERACTION UI) #Escape;Tab;to;Tab
+f3d_test(NAME TestInteractionConsoleAutoCompleteHide DATA BoxAnimated.gltf INTERACTION UI) #Escape;Tab;to;Tab;Esc;Esc;Esc
+f3d_test(NAME TestInteractionConsoleAutoCompleteToggleOptions DATA cow.vtp INTERACTION UI) #Escape;to;Tab;space;m;Tab;p;Tab;e;Tab;Enter
+f3d_test(NAME TestInteractionConsoleAutoCompleteSetOptions ARGS --point-sprites=gaussian DATA cow.vtp INTERACTION UI RESOLUTION 400,300) #Escape;se;Tab;space;m;Tab;p;Tab;t;Tab;Tab;s;Tab;Enter
+f3d_test(NAME TestInteractionConsoleAutoCompleteSetDisplayCompl DATA cow.vtp INTERACTION UI RESOLUTION 400,300) #Escape;se;Tab;space;m;Tab;p;Tab;t;Tab;Tab;Tab
+f3d_test(NAME TestInteractionConsoleAutoCompleteReaderOptions DATA BoxAnimated.gltf INTERACTION UI) #Escape;set_r;Tab;Q;Tab;Enter
+f3d_test(NAME TestInteractionConsoleAutoCompleteColoring DATA BoxAnimated.gltf INTERACTION UI) #Escape;cy;Tab;;c;Tab;a;Tab;Enter
+f3d_test(NAME TestInteractionConsoleAutoCompleteCamera DATA BoxAnimated.gltf INTERACTION UI) #Escape;se;Tab;_c;Tab;i;Tab;Enter
+f3d_test(NAME TestInteractionConsoleAutoCompleteHelp DATA BoxAnimated.gltf INTERACTION UI) #Escape;h;Tab;h;Tab;Enter
+f3d_test(NAME TestInteractionConsoleAutoCompleteTokenizeError DATA BoxAnimated.gltf INTERACTION UI NO_BASELINE REGEXP "unable to tokenize") #Escape;";Tab;
+f3d_test(NAME TestInteractionConsoleHistory DATA BoxAnimated.gltf INTERACTION UI) #Escape;ro;Tab;45;Enter;set_c;Tab;top;Enter;Up;Up;Enter;Up;Up;Up;Up;Down;Down;Down;Down
+f3d_test(NAME TestInteractionConsoleHistoryEmpty DATA BoxAnimated.gltf INTERACTION UI) #Escape;Up;Down
+f3d_test(NAME TestInteractionConsoleHistoryHide DATA BoxAnimated.gltf INTERACTION UI) #Escape;a;Enter;b;Enter;Up;Escape;Escape;Escape;Up
 
-# Need SSIM comparison for some reason
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
-  f3d_test(NAME TestInteractionConsoleAutoComplete DATA BoxAnimated.gltf INTERACTION UI) #Escape;Tab;to;Tab;Tab;_a;Tab;Enter
-  f3d_test(NAME TestInteractionConsoleAutoCompleteNoMatch DATA BoxAnimated.gltf INTERACTION UI) #Escape;zz;Tab
-  f3d_test(NAME TestInteractionConsoleAutoCompleteCandidates DATA BoxAnimated.gltf INTERACTION UI) #Escape;Tab;to;Tab
-  f3d_test(NAME TestInteractionConsoleAutoCompleteHide DATA BoxAnimated.gltf INTERACTION UI) #Escape;Tab;to;Tab;Esc;Esc;Esc
-  f3d_test(NAME TestInteractionConsoleAutoCompleteToggleOptions DATA cow.vtp INTERACTION UI) #Escape;to;Tab;space;m;Tab;p;Tab;e;Tab;Enter
-  f3d_test(NAME TestInteractionConsoleAutoCompleteSetOptions ARGS --point-sprites=gaussian DATA cow.vtp INTERACTION UI RESOLUTION 400,300) #Escape;se;Tab;space;m;Tab;p;Tab;t;Tab;Tab;s;Tab;Enter
-  f3d_test(NAME TestInteractionConsoleAutoCompleteSetDisplayCompl DATA cow.vtp INTERACTION UI RESOLUTION 400,300) #Escape;se;Tab;space;m;Tab;p;Tab;t;Tab;Tab;Tab
-  f3d_test(NAME TestInteractionConsoleAutoCompleteReaderOptions DATA BoxAnimated.gltf INTERACTION UI) #Escape;set_r;Tab;Q;Tab;Enter
-  f3d_test(NAME TestInteractionConsoleAutoCompleteColoring DATA BoxAnimated.gltf INTERACTION UI) #Escape;cy;Tab;;c;Tab;a;Tab;Enter
-  f3d_test(NAME TestInteractionConsoleAutoCompleteCamera DATA BoxAnimated.gltf INTERACTION UI) #Escape;se;Tab;_c;Tab;i;Tab;Enter
-  f3d_test(NAME TestInteractionConsoleAutoCompleteHelp DATA BoxAnimated.gltf INTERACTION UI) #Escape;h;Tab;h;Tab;Enter
-  f3d_test(NAME TestInteractionConsoleAutoCompleteTokenizeError DATA BoxAnimated.gltf INTERACTION UI NO_BASELINE REGEXP "unable to tokenize") #Escape;";Tab;
+file(COPY "${F3D_SOURCE_DIR}/testing/data/cow.vtp" DESTINATION "${CMAKE_BINARY_DIR}/Testing/data/") # Capital T, to avoid confusion on Windows and in-sources build
+# First file (`.d`) doesn't exist and is there to test multi args
+f3d_test(NAME TestInteractionConsoleAutoCompleteFilesystem INTERACTION UI) #Escape;ad;Tab;_f;Tab; ;.;Tab;d ..;Tab;T;Tab;i;Tab;d;Tab;Tab;Enter;Esc
+if(WIN32 OR APPLE)
+  f3d_test(NAME TestInteractionConsoleAutoCompleteDirCaseInsensitiveUppercaseF INTERACTION UI NO_DATA_FORCE_RENDER WORKING_DIR ${F3D_SOURCE_DIR}/testing/data/AutoCompletion) #Escape;add_files F;Tab
+  f3d_test(NAME TestInteractionConsoleAutoCompleteDirCaseInsensitiveLowercaseF INTERACTION UI NO_DATA_FORCE_RENDER WORKING_DIR ${F3D_SOURCE_DIR}/testing/data/AutoCompletion) #Escape;add_files f;Tab
+else()
+  f3d_test(NAME TestInteractionConsoleAutoCompleteDirCaseSensitive INTERACTION UI NO_DATA_FORCE_RENDER WORKING_DIR ${F3D_SOURCE_DIR}/testing/data/AutoCompletion) #Escape;add_files F;Tab
+endif()
 
-  f3d_test(NAME TestInteractionConsoleHistory DATA BoxAnimated.gltf INTERACTION UI) #Escape;ro;Tab;45;Enter;set_c;Tab;top;Enter;Up;Up;Enter;Up;Up;Up;Up;Down;Down;Down;Down
-  f3d_test(NAME TestInteractionConsoleHistoryEmpty DATA BoxAnimated.gltf INTERACTION UI) #Escape;Up;Down
-  f3d_test(NAME TestInteractionConsoleHistoryHide DATA BoxAnimated.gltf INTERACTION UI) #Escape;a;Enter;b;Enter;Up;Escape;Escape;Escape;Up
-
-  file(COPY "${F3D_SOURCE_DIR}/testing/data/cow.vtp" DESTINATION "${CMAKE_BINARY_DIR}/Testing/data/") # Capital T, to avoid confusion on Windows and in-sources build
-  # First file (`.d`) doesn't exist and is there to test multi args
-  f3d_test(NAME TestInteractionConsoleAutoCompleteFilesystem INTERACTION UI) #Escape;ad;Tab;_f;Tab; ;.;Tab;d ..;Tab;T;Tab;i;Tab;d;Tab;Tab;Enter;Esc
-  if(WIN32 OR APPLE)
-    f3d_test(NAME TestInteractionConsoleAutoCompleteDirCaseInsensitiveUppercaseF INTERACTION UI NO_DATA_FORCE_RENDER WORKING_DIR ${F3D_SOURCE_DIR}/testing/data/AutoCompletion) #Escape;add_files F;Tab
-    f3d_test(NAME TestInteractionConsoleAutoCompleteDirCaseInsensitiveLowercaseF INTERACTION UI NO_DATA_FORCE_RENDER WORKING_DIR ${F3D_SOURCE_DIR}/testing/data/AutoCompletion) #Escape;add_files f;Tab
-  else()
-    f3d_test(NAME TestInteractionConsoleAutoCompleteDirCaseSensitive INTERACTION UI NO_DATA_FORCE_RENDER WORKING_DIR ${F3D_SOURCE_DIR}/testing/data/AutoCompletion) #Escape;add_files F;Tab
-  endif()
-
-  if(NOT WIN32)
-    # Does not work on windows as it uses hard coded slash
-    f3d_test(NAME TestInteractionConsoleAutoCompleteFilesystemError INTERACTION UI NO_BASELINE LONG_TIMEOUT REGEXP "File name too long") #Escape;ad;Tab;_f;Tab; ;Tab;300*a/a;Tab;Esc
-  endif()
+if(NOT WIN32)
+  # Does not work on windows as it uses hard coded slash
+  f3d_test(NAME TestInteractionConsoleAutoCompleteFilesystemError INTERACTION UI NO_BASELINE LONG_TIMEOUT REGEXP "File name too long") #Escape;ad;Tab;_f;Tab; ;Tab;300*a/a;Tab;Esc
 endif()
 
 f3d_test(NAME TestInteractionMinimalConsoleOpen DATA f3d.glb INTERACTION UI) #Colon
@@ -258,7 +239,7 @@ f3d_test(NAME TestInteractionMinimalConsoleOverCheatSheet DATA f3d.glb INTERACTI
 f3d_test(NAME TestInteractionMinimalConsoleOverCheatSheetAndFilename DATA f3d.glb INTERACTION UI) #h;n;:
 
 ## HDRI
-f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION THRESHOLD 0.05) #Shift+MouseRight; # Threshold is needed for legacy image comparison for VTK 9.3
+f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION) #Shift+MouseRight;
 f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION) #U
 f3d_test(NAME TestInteractionHDRIReload DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION) #Up
 
@@ -283,15 +264,11 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
 endif()
 
 if(F3D_MODULE_RAYTRACING)
-  # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10753
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231213)
-    # XXX: These tests are impacted by https://github.com/f3d-app/f3d/issues/933
-    f3d_test(NAME TestInteractionHDRIRaytracingRemoveSkybox DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION)
-    f3d_test(NAME TestInteractionHDRIRaytracingRemoveAmbient DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION)
-    f3d_test(NAME TestInteractionHDRIRaytracingRemoveBoth DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION)
-    f3d_test(NAME TestInteractionHDRIRaytracingLoop DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION)
-    f3d_test(NAME TestInteractionHDRIRaytracingFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -rd --raytracing-samples=4 INTERACTION LONG_TIMEOUT)
-  endif()
+  f3d_test(NAME TestInteractionHDRIRaytracingRemoveSkybox DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION)
+  f3d_test(NAME TestInteractionHDRIRaytracingRemoveAmbient DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION)
+  f3d_test(NAME TestInteractionHDRIRaytracingRemoveBoth DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION)
+  f3d_test(NAME TestInteractionHDRIRaytracingLoop DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION)
+  f3d_test(NAME TestInteractionHDRIRaytracingFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -rd --raytracing-samples=4 INTERACTION LONG_TIMEOUT)
 endif()
 
 ## Drops

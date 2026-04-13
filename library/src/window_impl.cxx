@@ -44,9 +44,7 @@
 #include <vtkMemoryResourceStream.h>
 #endif
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
 #include <vtkOSOpenGLRenderWindow.h>
-#endif
 
 #include <sstream>
 
@@ -92,11 +90,9 @@ public:
       return eglRenWin;
     }
 #endif
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
+
     // OSMesa
     return vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
-#endif
-    return nullptr;
 #else
     // fallback on VTK logic for other systems
     return vtkSmartPointer<vtkRenderWindow>::New();
@@ -136,12 +132,7 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   }
   else if (type == Type::OSMESA)
   {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
     this->Internals->RenWin = vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
-#else
-    throw engine::no_window_exception(
-      "Window type is OSMesa but the underlying VTK version is not recent enough to support it");
-#endif
   }
   else if (type == Type::GLX)
   {
@@ -171,7 +162,6 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
     throw engine::no_window_exception("Cannot create a window");
   }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
   vtkOpenGLRenderWindow* oglRenWin = vtkOpenGLRenderWindow::SafeDownCast(this->Internals->RenWin);
   if (oglRenWin)
   {
@@ -180,11 +170,8 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
       oglRenWin->SetOpenGLSymbolLoader(&internals::SymbolLoader, &this->Internals->GetProcAddress);
     }
   }
-#endif
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240606)
   this->Internals->RenWin->EnableTranslucentSurfaceOn();
-#endif
   this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
   this->Internals->RenWin->SetOffScreenRendering(offscreen);
   this->Internals->RenWin->SetWindowName("f3d");

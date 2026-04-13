@@ -8,11 +8,8 @@ f3d_test(NAME TestExodusG DATA box.g PLUGIN hdf ARGS NO_RENDER NO_BASELINE REGEX
 f3d_test(NAME TestExodusE DATA single_timestep.e PLUGIN hdf ARGS NO_RENDER NO_BASELINE REGEXP "Number of points: 1331")
 f3d_test(NAME TestExodusConfig DATA disk_out_ref.ex2 CONFIG ${F3D_SOURCE_DIR}/testing/configs/exodus.json ARGS -s --camera-position=-11,-2,-49 LABELS "plugin;hdf")
 f3d_test(NAME TestNetCDF DATA temperature_grid.nc PLUGIN hdf ARGS -s)
-
-if (VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
-  f3d_test(NAME TestVTKHDF DATA blob.vtkhdf PLUGIN hdf ARGS -s)
-  f3d_test(NAME TestAMRDataSet DATA amr.vtkhdf PLUGIN hdf ARGS -s)
-endif()
+f3d_test(NAME TestVTKHDF DATA blob.vtkhdf PLUGIN hdf ARGS -s)
+f3d_test(NAME TestAMRDataSet DATA amr.vtkhdf PLUGIN hdf ARGS -s)
 
 if (VTK_VERSION VERSION_GREATER_EQUAL 9.4.0)
   f3d_test(NAME TestVTKHDFPartitionedDataSetCollection DATA pdc_sphere_cone.vtkhdf PLUGIN hdf ARGS -s)
@@ -26,25 +23,23 @@ if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/plugins/hdf/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-    f3d_test(NAME TestDefaultConfigFileExodus DATA disk_out_ref.ex2 CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI LABELS "plugin;hdf")
+    f3d_test(NAME TestDefaultConfigFileExodus DATA disk_out_ref.ex2 CONFIG config_build LONG_TIMEOUT UI LABELS "plugin;hdf")
   endif()
 
   file(COPY "${F3D_SOURCE_DIR}/plugins/hdf/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-  f3d_test(NAME TestThumbnailConfigFileExodus DATA disk_out_ref.ex2 CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING LABELS "plugin;hdf")
+  f3d_test(NAME TestThumbnailConfigFileExodus DATA disk_out_ref.ex2 CONFIG thumbnail_build LONG_TIMEOUT LABELS "plugin;hdf")
 
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-    f3d_test(NAME TestDefaultConfigFileVTKHDF DATA blob.vtkhdf CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+    f3d_test(NAME TestDefaultConfigFileVTKHDF DATA blob.vtkhdf CONFIG config_build LONG_TIMEOUT UI)
   endif()
-  if (VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
-    f3d_test(NAME TestThumbnailConfigFileVTKHDF DATA blob.vtkhdf CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING LABELS "plugin;hdf")
-  endif()
+  f3d_test(NAME TestThumbnailConfigFileVTKHDF DATA blob.vtkhdf CONFIG thumbnail_build LONG_TIMEOUT LABELS "plugin;hdf")
 
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-    f3d_test(NAME TestDefaultConfigFileNetCDF DATA temperature_grid.nc CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI LABELS "plugin;hdf")
+    f3d_test(NAME TestDefaultConfigFileNetCDF DATA temperature_grid.nc CONFIG config_build LONG_TIMEOUT UI LABELS "plugin;hdf")
   endif()
-  f3d_test(NAME TestThumbnailConfigFileNetCDF DATA temperature_grid.nc CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING LABELS "plugin;hdf")
+  f3d_test(NAME TestThumbnailConfigFileNetCDF DATA temperature_grid.nc CONFIG thumbnail_build LONG_TIMEOUT LABELS "plugin;hdf")
 endif()
 
 ## Feature tests that rely on HDF plugin
@@ -83,9 +78,7 @@ f3d_test(NAME TestTimeRangeLessThanZeroWithAnimationTime DATA negative_range_ani
 f3d_test(NAME TestTimeRangeLessThanZeroNegativeAnimationTime DATA negative_range_animated.e PLUGIN hdf ARGS -s --animation-time=-3)
 
 f3d_test(NAME TestMultiFileAnimationUniqueUnique DATA negative_range_animated.e small.ex2 ARGS --animation-time=0.0043001 --animation-indices=0,1 --multi-file-mode=all PLUGIN hdf)
-if (VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
-  f3d_test(NAME TestMultiFileAnimationMultiUnique DATA f3d.glb blob.vtkhdf ARGS --animation-time=2 --animation-indices=0,1 --multi-file-mode=all --opacity=0.5 PLUGIN hdf)
-endif()
+f3d_test(NAME TestMultiFileAnimationMultiUnique DATA f3d.glb blob.vtkhdf ARGS --animation-time=2 --animation-indices=0,1 --multi-file-mode=all --opacity=0.5 PLUGIN hdf)
 
 if (NOT F3D_PLUGINS_STATIC_BUILD AND BUILD_SHARED_LIBS)
 

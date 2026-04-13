@@ -28,6 +28,9 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   std::string sphere2Filename = "mb/recursive/mb_2_0.vtp";
   std::string cubeFilename = "mb/recursive/mb_0_0.vtu";
   std::string worldFilename = "world.obj";
+  std::string validFilename = "cow.vtp";
+  std::string invalidDefaultSceneFilename = "invalid_body.vtp";
+  std::string invalidFullSceneFilename = "invalid_body.gltf";
   std::string dummy = std::string(argv[1]) + "data/" + dummyFilename;
   std::string nonExistent = std::string(argv[1]) + "data/" + nonExistentFilename;
   std::string unsupported = std::string(argv[1]) + "data/" + unsupportedFilename;
@@ -37,6 +40,9 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   std::string sphere2 = std::string(argv[1]) + "data/" + sphere2Filename;
   std::string cube = std::string(argv[1]) + "data/" + cubeFilename;
   std::string world = std::string(argv[1]) + "data/" + worldFilename;
+  std::string monkey = std::string(argv[1]) + "data/red_translucent_monkey.gltf";
+  std::string invalidDefaultScene = std::string(argv[1]) + "data/" + invalidDefaultSceneFilename;
+  std::string invalidFullScene = std::string(argv[1]) + "data/" + invalidFullSceneFilename;
 
   // supports method
   test("not supported with empty filename", !sce.supports(empty));
@@ -45,6 +51,35 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("supported with invalid body", sce.supports(invalidBody));
   test("supported with default scene format", sce.supports(cube));
   test("supported with full scene format", sce.supports(logo));
+
+  // invalid
+  test.expect<f3d::scene::load_failure_exception>(
+    "add with invalid default scene file", [&]() { sce.add(invalidDefaultScene); });
+  test.expect<f3d::scene::load_failure_exception>(
+    "add with invalid full scene file", [&]() { sce.add(invalidFullScene); });
+  test.expect<f3d::scene::load_failure_exception>("add with invalid multiple files",
+    [&]() { sce.add({ validFilename, invalidFullScene, invalidDefaultScene }); });
+
+  // invalid reader
+  {
+    f3d::engine engine = f3d::engine::create(true);
+    engine.getOptions().scene.force_reader = "INVALID";
+    f3d::scene& scene = engine.getScene();
+    test.expect<f3d::scene::load_failure_exception>(
+      "Handling wrong force reader, exception type check", [&]() { scene.add(fs::path(monkey)); });
+    try
+    {
+      scene.add(fs::path(monkey));
+    }
+    catch (f3d::scene::load_failure_exception& E)
+    {
+      std::string expectedMsg = "is not a valid force reader";
+      std::string exceptMsg = E.what();
+      test("Check exception message size", exceptMsg.size() >= expectedMsg.size());
+      test("Check exception message",
+        exceptMsg.substr(exceptMsg.size() - expectedMsg.size(), expectedMsg.size()) == expectedMsg);
+    }
+  }
 
   // add error code paths
   test.expect<f3d::scene::load_failure_exception>("add with dummy file", [&]() { sce.add(dummy); });

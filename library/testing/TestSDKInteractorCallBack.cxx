@@ -88,10 +88,9 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
   // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   test("play interactions after modifications", inter.playInteraction(interactionFilePath));
 
-  // With VTK 9.3.0, rendering is slightly different
   test("render modified interaction result",
     TestSDKHelpers::RenderTest(
-      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "Modified", 0.11));
+      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "Modified"));
 
   // Remove a non-existing interaction command
   inter.removeBinding({ mod_t::ANY, "Invalid" });
@@ -110,10 +109,9 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
   test(
     "play interaction after removing all interactions", inter.playInteraction(interactionFilePath));
 
-  // With VTK 9.3.0, rendering is slightly different
   test("render after interaction that should have had no effect",
     TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
-      filename + "ModifiedAgain", 0.11));
+      filename + "ModifiedAgain"));
 
   // initialize default bindings again, two times, and check rendering
   inter.initBindings();

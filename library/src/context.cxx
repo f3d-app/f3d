@@ -7,7 +7,7 @@
 #include <vtkRenderingOpenGLConfigure.h>
 #include <vtkVersion.h>
 
-#if defined(VTK_OPENGL_HAS_EGL) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
+#if defined(VTK_OPENGL_HAS_EGL)
 #include <vtkglad/include/glad/egl.h>
 #endif
 
@@ -45,11 +45,7 @@ context::function context::getSymbol(std::string_view lib, std::string_view func
 //----------------------------------------------------------------------------
 context::function context::glx()
 {
-#if defined(VTK_USE_X) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
   return getSymbol("GLX", "glXGetProcAddress");
-#else
-  throw loading_exception("Cannot use a GLX context on this platform");
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -89,7 +85,7 @@ context::function context::cocoa()
 //----------------------------------------------------------------------------
 context::function context::egl()
 {
-#if defined(VTK_OPENGL_HAS_EGL) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
+#if defined(VTK_OPENGL_HAS_EGL)
   gladLoaderLoadEGL(EGL_NO_DISPLAY);
   return getSymbol("EGL", "eglGetProcAddress");
 #else

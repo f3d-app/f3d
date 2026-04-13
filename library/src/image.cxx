@@ -10,6 +10,7 @@
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Collection.h>
 #include <vtkImageReader2Factory.h>
+#include <vtkImageSSIM.h>
 #include <vtkJPEGWriter.h>
 #include <vtkPNGReader.h>
 #include <vtkPNGWriter.h>
@@ -20,12 +21,6 @@
 #include <vtkUnsignedCharArray.h>
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240729)
-#include <vtkImageSSIM.h>
-#else
-#include <vtkImageDifference.h>
-#endif
 
 #include <algorithm>
 #include <cassert>
@@ -371,7 +366,6 @@ double image::compare(const image& reference) const
     return 0.0;
   }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240729)
   vtkNew<vtkImageSSIM> ssim;
   std::vector<int> ranges(count);
   switch (type)
@@ -401,15 +395,6 @@ double image::compare(const image& reference) const
   double error, unused;
   vtkImageSSIM::ComputeErrorMetrics(scalars, error, unused);
   return error;
-#else
-  vtkNew<vtkImageDifference> imDiff;
-  imDiff->SetThreshold(0);
-  imDiff->SetInputData(this->Internals->Image);
-  imDiff->SetImageData(reference.Internals->Image);
-  imDiff->Update();
-  double error = imDiff->GetThresholdedError();
-  return error / 1000.0;
-#endif
 }
 
 //----------------------------------------------------------------------------

@@ -597,7 +597,6 @@ jobs:
             v9.6.1,
             v9.5.2,
             v9.4.2,
-            v9.3.0,
           ]
         static_label: [no-static]
         include:
@@ -707,7 +706,6 @@ jobs:
             v9.6.1,
             v9.5.2,
             v9.4.2,
-            v9.3.0,
           ]
         build_type: [standard]
         include:

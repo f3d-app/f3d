@@ -41,15 +41,10 @@ if(F3D_MODULE_UI)
     TestSDKDynamicProperties.cxx
     TestSDKInteractorDocumentation.cxx
     TestSDKMultiOptions.cxx
+    TestSDKNotification.cxx
+    TestSDKStartInteractor.cxx
     TestSDKTriggerInteractions.cxx
     )
-  
-  # This test uses tone mapping which changed after 9.3.20240729
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20240609)
-    list(APPEND libf3dSDKTests_list
-      TestSDKNotification.cxx
-      )
-  endif()
 
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
@@ -57,15 +52,6 @@ if(F3D_MODULE_UI)
       TestSDKInteractorCallBack.cxx
       )
   endif()
-endif()
-
-# Invalid scene codepath needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11287
-# Merge with TestSDKScene.cxx when VTK 9.4.0 is required.
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
-  list(APPEND libf3dSDKTests_list
-    TestSDKSceneInvalid.cxx
-    TestSDKInvalidForceReader.cxx
-    )
 endif()
 
 # Invalid header detection need proper CanReadFile support
@@ -84,53 +70,49 @@ configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorDropFullSc
 
 set(libf3dSDKTests_link_libs "")
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
-  list(APPEND libf3dSDKTests_list TestSDKStartInteractor.cxx)
+# External window tests
+option(F3D_TESTING_ENABLE_EXTERNAL_GLFW "Test external GLFW" OFF)
+option(F3D_TESTING_ENABLE_EXTERNAL_QT "Test external QT" OFF)
 
-  # External window tests
-  option(F3D_TESTING_ENABLE_EXTERNAL_GLFW "Test external GLFW" OFF)
-  option(F3D_TESTING_ENABLE_EXTERNAL_QT "Test external QT" OFF)
-
-  if(F3D_TESTING_ENABLE_EXTERNAL_GLFW)
-    find_package(glfw3 REQUIRED)
-    list(APPEND libf3dSDKTests_list TestSDKExternalWindowGLFW.cxx)
-    list(APPEND libf3dSDKTests_link_libs glfw)
+if(F3D_TESTING_ENABLE_EXTERNAL_GLFW)
+  find_package(glfw3 REQUIRED)
+  list(APPEND libf3dSDKTests_list TestSDKExternalWindowGLFW.cxx)
+  list(APPEND libf3dSDKTests_link_libs glfw)
+endif()
+if(F3D_TESTING_ENABLE_EXTERNAL_QT)
+  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+    find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGLWidgets)
+    list(APPEND libf3dSDKTests_list TestSDKExternalWindowQT.cxx)
+    list(APPEND libf3dSDKTests_link_libs Qt6::Widgets Qt6::OpenGLWidgets)
   endif()
-  if(F3D_TESTING_ENABLE_EXTERNAL_QT)
-    # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
-    if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-      find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGLWidgets)
-      list(APPEND libf3dSDKTests_list TestSDKExternalWindowQT.cxx)
-      list(APPEND libf3dSDKTests_link_libs Qt6::Widgets Qt6::OpenGLWidgets)
-    endif()
-  endif()
-  if(F3D_TESTING_ENABLE_OSMESA_TESTS)
-    find_library(OSMesa_LIB OSMesa REQUIRED)
-    list(APPEND libf3dSDKTests_list TestSDKExternalWindowOSMesa.cxx)
-    list(APPEND libf3dSDKTests_link_libs "${OSMesa_LIB}")
-  endif()
-  if(F3D_TESTING_ENABLE_GLX_TESTS)
-    find_package(OpenGL COMPONENTS GLX REQUIRED)
-    find_library(X11_LIB X11 REQUIRED)
-    list(APPEND libf3dSDKTests_list TestSDKExternalWindowGLX.cxx)
-    list(APPEND libf3dSDKTests_link_libs OpenGL::GLX "${X11_LIB}")
-  endif()
-  if(F3D_TESTING_ENABLE_EGL_TESTS)
-    find_package(OpenGL COMPONENTS EGL REQUIRED)
-    list(APPEND libf3dSDKTests_list TestSDKExternalWindowEGL.cxx)
-    list(APPEND libf3dSDKTests_link_libs OpenGL::EGL)
-  endif()
-  if(WIN32)
-    find_package(OpenGL COMPONENTS OpenGL REQUIRED)
-    list(APPEND libf3dSDKTests_list TestSDKExternalWindowWGL.cxx)
-    list(APPEND libf3dSDKTests_link_libs OpenGL::GL)
-  endif()
-  if(APPLE)
-    find_library(COCOA_LIBRARY Cocoa)
-    find_library(OpenGL_LIBRARY OpenGL)
-    list(APPEND libf3dSDKTests_list TestSDKExternalWindowCOCOA.mm)
-    list(APPEND libf3dSDKTests_link_libs "${COCOA_LIBRARY}" "${OpenGL_LIBRARY}")
-  endif()
+endif()
+if(F3D_TESTING_ENABLE_OSMESA_TESTS)
+  find_library(OSMesa_LIB OSMesa REQUIRED)
+  list(APPEND libf3dSDKTests_list TestSDKExternalWindowOSMesa.cxx)
+  list(APPEND libf3dSDKTests_link_libs "${OSMesa_LIB}")
+endif()
+if(F3D_TESTING_ENABLE_GLX_TESTS)
+  find_package(OpenGL COMPONENTS GLX REQUIRED)
+  find_library(X11_LIB X11 REQUIRED)
+  list(APPEND libf3dSDKTests_list TestSDKExternalWindowGLX.cxx)
+  list(APPEND libf3dSDKTests_link_libs OpenGL::GLX "${X11_LIB}")
+endif()
+if(F3D_TESTING_ENABLE_EGL_TESTS)
+  find_package(OpenGL COMPONENTS EGL REQUIRED)
+  list(APPEND libf3dSDKTests_list TestSDKExternalWindowEGL.cxx)
+  list(APPEND libf3dSDKTests_link_libs OpenGL::EGL)
+endif()
+if(WIN32)
+  find_package(OpenGL COMPONENTS OpenGL REQUIRED)
+  list(APPEND libf3dSDKTests_list TestSDKExternalWindowWGL.cxx)
+  list(APPEND libf3dSDKTests_link_libs OpenGL::GL)
+endif()
+if(APPLE)
+  find_library(COCOA_LIBRARY Cocoa)
+  find_library(OpenGL_LIBRARY OpenGL)
+  list(APPEND libf3dSDKTests_list TestSDKExternalWindowCOCOA.mm)
+  list(APPEND libf3dSDKTests_link_libs "${COCOA_LIBRARY}" "${OpenGL_LIBRARY}")
 endif()
 
 # create the testing file and list of tests
@@ -148,11 +130,6 @@ set_target_properties(libf3dSDKTests PROPERTIES
   )
 
 target_compile_definitions(libf3dSDKTests PRIVATE GL_SILENCE_DEPRECATION)
-
-# Remove this once VTK 9.3 support is removed
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
-  target_compile_definitions(libf3dSDKTests PRIVATE F3D_SSIM_COMPARE)
-endif()
 
 if (F3D_MODULE_EXR)
   target_compile_definitions(libf3dSDKTests PRIVATE F3D_MODULE_EXR)

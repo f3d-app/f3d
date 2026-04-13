@@ -37,15 +37,13 @@ if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestReadersListMultiplePlugins ARGS --list-readers --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load" LABELS "plugin;assimp;alembic")
 endif()
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
-  f3d_test(NAME TestForceReaderFail DATA suzanne.stl ARGS --force-reader=GLTF NO_BASELINE REGEXP "Some of these files could not be loaded: failed to load scene" LABELS "plugin")
-  f3d_test(NAME TestForceReaderPass DATA suzanne.not_supported ARGS --force-reader=STL LABELS "plugin")
-  f3d_test(NAME TestForceReaderInvalid DATA suzanne.stl ARGS --force-reader=INVALID NO_BASELINE REGEXP "Forced reader .* doesn't exist" LABELS "plugin")
+f3d_test(NAME TestForceReaderFail DATA suzanne.stl ARGS --force-reader=GLTF NO_BASELINE REGEXP "Some of these files could not be loaded: failed to load scene" LABELS "plugin")
+f3d_test(NAME TestForceReaderPass DATA suzanne.not_supported ARGS --force-reader=STL LABELS "plugin")
+f3d_test(NAME TestForceReaderInvalid DATA suzanne.stl ARGS --force-reader=INVALID NO_BASELINE REGEXP "Forced reader .* doesn't exist" LABELS "plugin")
 
-  if(F3D_PLUGIN_BUILD_DRACO)
-    f3d_test(NAME TestForceReaderGLTFDraco DATA BoxAnimated.gltf PLUGIN draco ARGS --force-reader=GLTFDraco)
-    f3d_test(NAME TestForceReaderGLTFDracoIntoGLTF DATA Box_draco.glb PLUGIN draco ARGS --force-reader=GLTF NO_BASELINE REGEXP "failed to load scene")
-  endif()
+if(F3D_PLUGIN_BUILD_DRACO)
+  f3d_test(NAME TestForceReaderGLTFDraco DATA BoxAnimated.gltf PLUGIN draco ARGS --force-reader=GLTFDraco)
+  f3d_test(NAME TestForceReaderGLTFDracoIntoGLTF DATA Box_draco.glb PLUGIN draco ARGS --force-reader=GLTF NO_BASELINE REGEXP "failed to load scene")
 endif()
 
 # Test scan plugins

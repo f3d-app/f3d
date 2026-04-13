@@ -160,43 +160,6 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     return EXIT_FAILURE;
   }*/
 
-// Remove this once VTK 9.3 support is removed
-#ifdef F3D_SSIM_COMPARE
-  // check generated short image with baseline
-  test("check generated short image width", generated16.getWidth(), width);
-  test("check generated short image height", generated16.getHeight(), height);
-  test("check generated short image channel count", generated16.getChannelCount(), channels);
-  test("check generated short image channel type",
-    generated16.getChannelType() == f3d::image::ChannelType::SHORT);
-  test("check generated short image not empty", generated16.getContent() != nullptr);
-
-  f3d::image baseline16(testingDir + "/baselines/TestSDKImage16.png");
-  test("check generated short image is the same as png baseline", generated16 == baseline16);
-
-  // XXX: enable following code once https://github.com/f3d-app/f3d/issues/1558 is fixed
-  /*
-  f3d::image baseline16TIF(testingDir + "/baselines/TestSDKImage16.tif");
-  if (generated16 != baseline16TIF)
-  {
-    std::cerr << "generated short image is different from the TIF baseline: "
-              << generated16.compare(baseline16TIF) << "\n";
-    return EXIT_FAILURE;
-  }*/
-
-  // check generated float image with baseline
-  // XXX: Uncomment once https://github.com/f3d-app/f3d/issues/1558 is fixed
-  // f3d::image baseline32(testingDir + "/baselines/TestSDKImage32.tif");
-  f3d::image baseline32 = generated32;
-
-  test("check generated float image width", generated32.getWidth(), width);
-  test("check generated float image height", generated32.getHeight(), height);
-  test("check generated float image channel count", generated32.getChannelCount(), channels);
-  test("check generated float image channel type",
-    generated32.getChannelType() == f3d::image::ChannelType::FLOAT);
-  test("check generated float image not empty", generated32.getContent() != nullptr);
-  test("check generated float image is the same as png baseline", generated32 == baseline32);
-#endif // F3D_SSIM_COMPARE
-
   // test operators
   f3d::image imgCopy = generated; // copy constructor
   test("check copy constructor", imgCopy == generated);

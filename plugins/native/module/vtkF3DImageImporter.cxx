@@ -106,9 +106,7 @@ void vtkF3DImageImporter::ImportActors(vtkRenderer* renderer)
   actor->SetTexture(texture);
   renderer->AddActor(actor);
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
   this->ActorCollection->AddItem(actor);
-#endif
 }
 
 //------------------------------------------------------------------------------

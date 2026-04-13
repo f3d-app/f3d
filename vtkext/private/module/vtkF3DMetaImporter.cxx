@@ -124,10 +124,6 @@ struct vtkF3DMetaImporter::Internals
   vtkTimeStamp UpdateTime;
 
   F3DColoringInfoHandler ColoringInfoHandler;
-
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 20240707)
-  std::map<vtkImporter*, vtkSmartPointer<vtkActorCollection>> ActorsForImporterMap;
-#endif
 };
 
 //----------------------------------------------------------------------------
@@ -281,68 +277,21 @@ bool vtkF3DMetaImporter::Update()
       importer->SetCamera(localCameraIndex);
     }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
     if (!importer->Update())
     {
       return false;
     }
-#else
-    vtkSmartPointer<vtkActorCollection> actorCollection =
-      vtkSmartPointer<vtkActorCollection>::New();
-
-    vtkNew<vtkActorCollection> previousActorCollection;
-    vtkActorCollection* currentCollection = this->Renderer->GetActors();
-    vtkCollectionSimpleIterator tmpIt;
-    currentCollection->InitTraversal(tmpIt);
-    while (auto* actor = currentCollection->GetNextActor(tmpIt))
-    {
-      previousActorCollection->AddItem(actor);
-    }
-
-    importer->Update();
-
-    currentCollection = this->Renderer->GetActors();
-    currentCollection->InitTraversal(tmpIt);
-
-    vtkCollectionSimpleIterator tmpIt2;
-    previousActorCollection->InitTraversal(tmpIt2);
-    while (auto* actor = currentCollection->GetNextActor(tmpIt))
-    {
-      bool found = false;
-      while (auto* previousActor = previousActorCollection->GetNextActor(tmpIt2))
-      {
-        // This is a N^2 loop
-        if (previousActor == actor)
-        {
-          found = true;
-          break;
-        }
-      }
-      if (!found)
-      {
-        actorCollection->AddItem(actor);
-      }
-    }
-
-    // Store the actor collection for further use
-    this->Pimpl->ActorsForImporterMap[importer] = actorCollection;
-#endif
 
     localCameraIndex -= importer->GetNumberOfCameras();
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
     vtkActorCollection* actorCollection = importer->GetImportedActors();
-#endif
 
     // copy the scene hierarchy if it exists, or create a generic one otherwise
-    // needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10861
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240201)
     if (importer->GetSceneHierarchy() != nullptr)
     {
       importerInfo.DataAssembly->DeepCopy(importer->GetSceneHierarchy());
     }
     else
-#endif
     {
       // add one node per actor
       for (int actorIndex = 0; actorIndex < actorCollection->GetNumberOfItems(); actorIndex++)
@@ -769,11 +718,7 @@ bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
   bool ret = true;
   for (const auto& importerInfo : this->Pimpl->Importers)
   {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
     ret = ret && importerInfo.Importer->UpdateAtTimeValue(timeValue);
-#else
-    importerInfo.Importer->UpdateTimeStep(timeValue);
-#endif
   }
 
   // Update coloring and point sprites
@@ -809,12 +754,7 @@ void vtkF3DMetaImporter::UpdateInfoForColoring()
   {
     for (const auto& importerInfo : this->Pimpl->Importers)
     {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
       vtkActorCollection* actorCollection = importerInfo.Importer->GetImportedActors();
-#else
-      vtkActorCollection* actorCollection =
-        this->Pimpl->ActorsForImporterMap.at(importerInfo.Importer).Get();
-#endif
 
       // Recover generic importer if any (for indexed access to points/image)
       vtkF3DGenericImporter* genericImporter =

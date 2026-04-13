@@ -11,8 +11,6 @@ Usage:
 ```
 f3d_test(<NAME> [ARGS...])
 ```
-  - `TONE_MAPPING` Marks that this test uses tone mapping which automatically
-    disables it when using older version of VTK (<9.3.20240609)
   - `LONG_TIMEOUT` Marks a test to be enabled only if
     F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS is ON
   - `INTERACTION` If present, an interaction recording of the same name as the
@@ -55,7 +53,7 @@ f3d_test(<NAME> [ARGS...])
 
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED;PLUGIN" "DATA;DEPENDS;LABELS;ENV;ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED;PLUGIN" "DATA;DEPENDS;LABELS;ENV;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -189,12 +187,6 @@ function(f3d_test)
 
   if(F3D_TEST_UI AND NOT F3D_MODULE_UI)
     # UI tests require ImGui
-    set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES DISABLED ON)
-  endif()
-
-  if(F3D_TEST_TONE_MAPPING AND VTK_VERSION VERSION_LESS 9.3.20240609)
-    # After VTK 9.3.20240609, the tone mapping used in F3D is PBR Neutral
-    # Testing tone mapping is now disabled because the reference image is different
     set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES DISABLED ON)
   endif()
 

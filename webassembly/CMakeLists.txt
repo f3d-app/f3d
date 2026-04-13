@@ -1,10 +1,5 @@
 cmake_minimum_required(VERSION 3.17) # 3.17 required for CMP0099
 
-# Need https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10551
-if(NOT VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231007)
-  message(FATAL_ERROR "Cannot build emscripten bindings with VTK version below 9.3.20231007")
-endif()
-
 add_executable(f3djs F3DEmscriptenBindings.cxx)
 
 set_target_properties(f3djs PROPERTIES

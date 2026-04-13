@@ -345,13 +345,7 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
 
     ssImpl << "  vec4 mainSample = texture(texMain, texCoord);\n";
 
-    // vtkOSPRayPass output convention changed
-    // It was sRGB before and it's now is linear color space
-    // Thus, on newer versions, we can skip the conversion to linear space
-    // See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8577
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20230824) || !F3D_MODULE_RAYTRACING
     if (!this->UseRaytracing)
-#endif
     {
       // the input color is alpha premultiplied, we need to divide it, then
       // convert to linear space, and finally premultiply back by the alpha value

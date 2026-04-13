@@ -85,7 +85,6 @@ int TestF3DGenericImporter(int argc, char* argv[])
     }
   }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240910)
   // Test UpdateAtTimeValue with invalid animation
   {
     vtkNew<vtkGLTFReader> reader;
@@ -103,7 +102,6 @@ int TestF3DGenericImporter(int argc, char* argv[])
       return EXIT_FAILURE;
     }
   }
-#endif
 
   // Test UpdateAtTimeValue failure path
   {

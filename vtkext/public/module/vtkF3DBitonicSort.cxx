@@ -13,12 +13,7 @@
 #include <vtkShader.h>
 #include <vtkShaderProgram.h>
 #include <vtkVersion.h>
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
 #include <vtk_glad.h>
-#else
-#include <vtk_glew.h>
-#endif
 
 #include <sstream>
 

@@ -294,15 +294,11 @@ bool animationManager::LoadAtTime(double timeValue)
   }
   this->CurrentTime = timeValue;
   this->CurrentTimeSet = true;
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
   if (!this->Importer->UpdateAtTimeValue(this->CurrentTime))
   {
     log::error("Could not load time value: ", this->CurrentTime);
     return false;
   }
-#else
-  this->Importer->UpdateTimeStep(this->CurrentTime);
-#endif
 
   if (this->Interactor && this->ProgressWidget)
   {

@@ -11,6 +11,7 @@
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DOverlayRenderPass.h"
+#include "vtkF3DPointSplatMapper.h"
 #include "vtkF3DPointSplatUtilsSDF.h"
 #include "vtkF3DPolyDataMapper.h"
 #include "vtkF3DRenderPass.h"
@@ -78,13 +79,10 @@
 #include <vtksys/FStream.hxx>
 #include <vtksys/MD5.h>
 #include <vtksys/SystemTools.hxx>
+#include <vtk_glad.h>
 
 #if F3D_MODULE_UI
 #include "F3DStyle.h"
-#endif
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
-#include "vtkF3DPointSplatMapper.h"
 #endif
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
@@ -97,12 +95,6 @@
 
 #if F3D_MODULE_RAYTRACING
 #include <vtkOSPRayRendererNode.h>
-#endif
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
-#include <vtk_glad.h>
-#else
-#include <vtk_glew.h>
 #endif
 
 #include <cctype>
@@ -258,13 +250,8 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->SetClippingRangeExpansion(0.99);
 
   // Create cached texture
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20230902)
   this->EnvMapLookupTable = vtkSmartPointer<vtkF3DCachedLUTTexture>::New();
   this->EnvMapPrefiltered = vtkSmartPointer<vtkF3DCachedSpecularTexture>::New();
-#else
-  this->EnvMapLookupTable = vtkF3DCachedLUTTexture::New();
-  this->EnvMapPrefiltered = vtkF3DCachedSpecularTexture::New();
-#endif
   this->EnvMapPrefiltered->HalfPrecisionOff();
 
   this->SkyboxActor->SetProjection(vtkSkybox::Sphere);
@@ -527,13 +514,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   if (this->UseToneMappingPass)
   {
     vtkNew<vtkToneMappingPass> toneP;
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240609)
     toneP->SetToneMappingType(vtkToneMappingPass::NeutralPBR);
-#else
-    toneP->SetToneMappingType(vtkToneMappingPass::GenericFilmic);
-    toneP->SetGenericFilmicDefaultPresets();
-#endif
     toneP->SetDelegatePass(renderingPass);
     renderingPass = toneP;
   }
@@ -1338,15 +1319,9 @@ void vtkF3DRenderer::ConfigureHDRITexture()
     }
     else
     {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20230902)
       // IBL without textures has been added in VTK in
       // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10454
       this->HDRITexture = nullptr;
-#else
-      vtkNew<vtkImageData> img;
-      this->HDRITexture = vtkSmartPointer<vtkTexture>::New();
-      this->HDRITexture->SetInputData(img);
-#endif
       this->HasValidHDRITexture = false;
     }
   }
@@ -1354,16 +1329,6 @@ void vtkF3DRenderer::ConfigureHDRITexture()
   if (this->GetUseImageBasedLighting())
   {
     this->SetEnvironmentTexture(this->HDRITexture);
-
-    // No cache support before 20221220
-    // IBL without textures has been added in VTK in
-    // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10454
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 20230902)
-    if (this->SphericalHarmonics)
-    {
-      this->SphericalHarmonics->Modified();
-    }
-#endif
   }
   else
   {
@@ -2745,16 +2710,11 @@ void vtkF3DRenderer::ConfigurePointSprites()
     return;
   }
 
-  if (!this->PointSpritesUseInstancing)
+  if (!this->PointSpritesUseInstancing && !vtkShader::IsComputeShaderSupported())
   {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
-    if (!vtkShader::IsComputeShaderSupported())
-    {
-      F3DLog::Print(F3DLog::Severity::Warning,
-        "Compute shaders are not supported, gaussians are not sorted, resulting in blending "
-        "artifacts");
-    }
-#endif
+    F3DLog::Print(F3DLog::Severity::Warning,
+      "Compute shaders are not supported, gaussians are not sorted, resulting in blending "
+      "artifacts");
   }
 
   const vtkBoundingBox& bbox = this->Importer->GetGeometryBoundingBox();
@@ -2767,10 +2727,8 @@ void vtkF3DRenderer::ConfigurePointSprites()
 
   for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
   {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
     vtkF3DPointSplatMapper* splatMapper = vtkF3DPointSplatMapper::SafeDownCast(sprites.Mapper);
     splatMapper->SetUseInstancing(this->PointSpritesUseInstancing);
-#endif
 
     // add SDF functions
     vtkShaderProperty* sp = sprites.Actor->GetShaderProperty();
@@ -2783,7 +2741,6 @@ void vtkF3DRenderer::ConfigurePointSprites()
     sprites.Mapper->EmissiveOff();
     sprites.Mapper->SetScaleFactor(scaleFactor);
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
     // in order to make sure the sprites are at least 1 pixel large we set a lowpass matrix
     // that will convolve the splat with another isotropic splat
     // the value 0.3 is coming from the Gaussian Splatting paper
@@ -2793,42 +2750,31 @@ void vtkF3DRenderer::ConfigurePointSprites()
     float lowPass[3] = { 0.3f / (viewport[0] * viewport[0]), 0.f,
       0.3f / (viewport[1] * viewport[1]) };
     sprites.Mapper->SetLowpassMatrix(lowPass);
-#endif
 
     vtkPolyData* polyData = vtkPolyData::SafeDownCast(sprites.Mapper->GetInput());
     if (polyData && polyData->GetPointData()->HasArray("scale") &&
       polyData->GetPointData()->HasArray("rotation"))
     {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
       sprites.Mapper->AnisotropicOn();
       sprites.Mapper->SetRotationArray("rotation");
       sprites.Mapper->SetScaleArray("scale");
-#else
-      F3DLog::Print(F3DLog::Severity::Warning, "VTK <= 9.3 only supports isotropic point sprites");
-#endif
     }
     else
     {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
       sprites.Mapper->AnisotropicOff();
       sprites.Mapper->SetRotationArray(nullptr);
       sprites.Mapper->SetScaleArray(nullptr);
-#endif
     }
 
     if (this->PointSpritesType == SplatType::GAUSSIAN)
     {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
       sprites.Mapper->SetBoundScale(3.0);
-#endif
       sprites.Mapper->SetSplatShaderCode(nullptr); // gaussian is the default VTK shader
       sprites.Actor->ForceTranslucentOn();
     }
     else if (this->PointSpritesType == SplatType::SPHERE)
     {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
       sprites.Mapper->SetBoundScale(1.1);
-#endif
       sprites.Mapper->SetSplatShaderCode(
         "//VTK::Color::Impl\n"
         "float dist = sdCircle(offsetVCVSOutput, 1.0);\n"
@@ -2842,10 +2788,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
     }
     else if (this->PointSpritesType == SplatType::CIRCLE)
     {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
       sprites.Mapper->SetBoundScale(1.1);
-#endif
-
       sprites.Mapper->SetSplatShaderCode(
         "//VTK::Color::Impl\n"
         "opacity = stroke(sdCircle(offsetVCVSOutput, 1.0), 2.0);\n");
@@ -2854,9 +2797,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
     }
     else if (this->PointSpritesType == SplatType::STD_DEV)
     {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
       sprites.Mapper->SetBoundScale(3.1);
-#endif
       sprites.Mapper->SetSplatShaderCode(
         "//VTK::Color::Impl\n"
         "opacity = fill(sdCircle(offsetVCVSOutput, 1.0));\n"
@@ -2868,9 +2809,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
     }
     else if (this->PointSpritesType == SplatType::BOUND)
     {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
       sprites.Mapper->SetBoundScale(3.1);
-#endif
       sprites.Mapper->SetSplatShaderCode(
         "//VTK::Color::Impl\n"
         "vec2 g = fwidth(offsetVCVSOutput);\n"
@@ -2881,9 +2820,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
     }
     else if (this->PointSpritesType == SplatType::CROSS)
     {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
       sprites.Mapper->SetBoundScale(1.1);
-#endif
       sprites.Mapper->SetSplatShaderCode(
         "//VTK::Color::Impl\n"
         "vec2 g = fwidth(offsetVCVSOutput);\n"

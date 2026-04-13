@@ -55,7 +55,7 @@ mark_as_advanced(F3D_EXCLUDE_DEPRECATED)
 # VTK dependency
 # Optional components should list VTK modules
 # needed by plugins and optional modules
-find_package(VTK 9.3.0 REQUIRED
+find_package(VTK 9.4.0 REQUIRED
   COMPONENTS
     CommonCore
     CommonDataModel
@@ -88,11 +88,6 @@ find_package(VTK 9.3.0 REQUIRED
     RenderingGridAxes
     RenderingRayTracing)
 message(STATUS "VTK ${VTK_VERSION} found")
-
-if(VTK_VERSION VERSION_LESS 9.3.20240914)
-  # Not optional before
-  find_package(VTK REQUIRED COMPONENTS opengl)
-endif()
 
 # Modules
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)

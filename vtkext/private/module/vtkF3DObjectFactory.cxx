@@ -2,11 +2,8 @@
 
 #include <vtkVersion.h>
 
+#include "vtkF3DPointSplatMapper.h"
 #include "vtkF3DPolyDataMapper.h"
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
-#include <vtkF3DPointSplatMapper.h>
-#endif
 
 #ifdef __ANDROID__
 #include <vtkF3DAndroidLogOutputWindow.h>
@@ -38,10 +35,8 @@ vtkF3DObjectFactory::vtkF3DObjectFactory()
   this->RegisterOverride("vtkPolyDataMapper", "vtkF3DPolyDataMapper",
     "vtkPolyDataMapper override for F3D", 1, ::Factory<vtkF3DPolyDataMapper>);
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
   this->RegisterOverride("vtkPointGaussianMapper", "vtkF3DPointSplatMapper",
     "vtkPointGaussianMapper override for F3D", 1, ::Factory<vtkF3DPointSplatMapper>);
-#endif
 
 #ifdef __ANDROID__
   this->RegisterOverride("vtkOutputWindow", "vtkF3DAndroidLogOutputWindow",

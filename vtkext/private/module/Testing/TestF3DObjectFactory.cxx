@@ -1,4 +1,5 @@
 #include "vtkF3DObjectFactory.h"
+#include "vtkF3DPointSplatMapper.h"
 #include "vtkF3DPolyDataMapper.h"
 
 #if F3D_MODULE_UI
@@ -12,10 +13,6 @@
 #include <vtkTestUtilities.h>
 #include <vtkVersion.h>
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
-#include "vtkF3DPointSplatMapper.h"
-#endif
-
 #include <iostream>
 
 int TestF3DObjectFactory(int argc, char* argv[])
@@ -23,10 +20,7 @@ int TestF3DObjectFactory(int argc, char* argv[])
   vtkNew<vtkF3DObjectFactory> factory;
   vtkObjectFactory::RegisterFactory(factory);
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPointGaussianMapper", "vtkOpenGLPointGaussianMapper");
-#endif
 
   // Check factory utility methods
   if (strcmp(factory->GetVTKSourceVersion(), VTK_SOURCE_VERSION) != 0)
@@ -49,7 +43,6 @@ int TestF3DObjectFactory(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
   vtkNew<vtkPointGaussianMapper> pointMapper;
   pointMapper->Print(std::cout);
   vtkF3DPointSplatMapper* pointMapperPtr = vtkF3DPointSplatMapper::SafeDownCast(pointMapper);
@@ -58,7 +51,6 @@ int TestF3DObjectFactory(int argc, char* argv[])
     std::cerr << "vtkF3DObjectFactory failed to create a vtkF3DPointSplatMapper\n";
     return EXIT_FAILURE;
   }
-#endif
 
   vtkNew<vtkOutputWindow> window;
 #if F3D_MODULE_UI

@@ -42,10 +42,6 @@
 #include <vtkMemoryResourceStream.h>
 #endif
 
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 0)
-#include <vtkCapsuleSource.h>
-#endif
-
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Weverything"
@@ -596,8 +592,6 @@ public:
         {
           pxr::UsdGeomCapsule capsulePrim = pxr::UsdGeomCapsule(prim);
 
-          // See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10531
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 0)
           vtkNew<vtkCylinderSource> capsule;
           capsule->CapsuleCapOn();
 
@@ -606,15 +600,6 @@ public:
           {
             capsule->SetHeight(height);
           }
-#else
-          vtkNew<vtkCapsuleSource> capsule;
-
-          double height;
-          if (capsulePrim.GetHeightAttr().Get(&height))
-          {
-            capsule->SetCylinderLength(height);
-          }
-#endif
 
           double radius;
           if (capsulePrim.GetRadiusAttr().Get(&radius))
