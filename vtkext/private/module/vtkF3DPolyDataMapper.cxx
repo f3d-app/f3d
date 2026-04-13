@@ -247,7 +247,7 @@ bool vtkF3DPolyDataMapper::RenderWithMatCap(vtkActor* actor)
 void vtkF3DPolyDataMapper::ReplaceShaderColor(
   std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
 {
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260413)
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260411)
   if (actor->GetProperty()->GetInterpolation() == VTK_PBR)
   {
     bool cond = (this->VBOs->GetNumberOfComponents("scalarColor") != 0 && !this->DrawingVertices);
