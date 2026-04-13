@@ -15,6 +15,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  test_sqlite_cache:
+    runs-on: ubuntu-22.04
+    name: Test sqlite cache
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          path: "source"
+          fetch-depth: 1
+          lfs: false
+
+      - name: sqlite action
+        uses: ./source/.github/actions/sqlite-install-dep
+        with:
+          csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
+          cpu: toto
+
   #----------------------------------------------------------------------------
   # Default versions: Set default version for all dependencies
   #----------------------------------------------------------------------------
