@@ -85,6 +85,7 @@ set(classes
   vtkF3DObjectFactory
   vtkF3DOpenGLGridMapper
   vtkF3DOverlayRenderPass
+  vtkF3DPointSplatMapper
   vtkF3DPolyDataMapper
   vtkF3DPostProcessFilter
   vtkF3DRenderPass
@@ -99,7 +100,7 @@ set(classes
   )
 
 if (F3D_MODULE_UI)
-  set(classes ${classes} vtkF3DImguiActor vtkF3DImguiConsole vtkF3DImguiObserver vtkF3DPointSplatMapper F3DStyle)
+  set(classes ${classes} vtkF3DImguiActor vtkF3DImguiConsole vtkF3DImguiObserver F3DStyle)
 endif ()
 
 if(WIN32)
