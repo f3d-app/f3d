@@ -138,7 +138,6 @@ public:
    * on a SSIM computation, as specified in VTK.
    * Please note, due to possible arithmetic imprecision in the SSIM computation
    * a non-zero value can be returned with identical images.
-   * Depending on the VTK version, another comparison algorithm may be used.
    * Error value meaning is described below:
    *  - 1e-14: Pixel perfect comparison.
    *  - 0.04: Visually indistinguishable.

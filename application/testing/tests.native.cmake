@@ -176,7 +176,7 @@ if(NOT F3D_MACOS_BUNDLE)
     endif()
   endif()
   if(F3D_MODULE_WEBP)
-    f3d_test(NAME TestThumbnailConfigFileWebP DATA image.webp CONFIG thumbnail_build LONG_TIMEOUT)
+    f3d_test(NAME TestThumbnailConfigFileWebP DATA image.webp CONFIG thumbnail_build LONG_TIMEOUT THRESHOLD 0.07) # Threshold is needed even for newer VTK
   endif()
   f3d_test(NAME TestThumbnailConfigFileQuakeMDL DATA zombie.mdl CONFIG thumbnail_build LONG_TIMEOUT THRESHOLD 0.07) # Threshold is needed for IBL change after VTK 9.6
 endif()

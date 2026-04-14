@@ -22,7 +22,7 @@ if(F3D_TESTING_ENABLE_GLX_TESTS)
 endif()
 
 if(F3D_TESTING_ENABLE_EGL_TESTS)
-  f3d_test(NAME TestRenderingBackenListEGL ARGS --list-rendering-backends NO_RENDER NO_BASELINE REGEXP "egl: available")
+  f3d_test(NAME TestRenderingBackendListEGL ARGS --list-rendering-backends NO_RENDER NO_BASELINE REGEXP "egl: available")
 endif()
 
 # For some reason the sanitizer detects leaks because of EGL and OSMesa
