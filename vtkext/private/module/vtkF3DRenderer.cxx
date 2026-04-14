@@ -2745,7 +2745,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
     // that will convolve the splat with another isotropic splat
     // the value 0.3 is coming from the Gaussian Splatting paper
     // ideally we should expose this as a parameter
-    int* viewport = this->GetSize();
+    const int* viewport = this->GetSize();
 
     float lowPass[3] = { 0.3f / (viewport[0] * viewport[0]), 0.f,
       0.3f / (viewport[1] * viewport[1]) };

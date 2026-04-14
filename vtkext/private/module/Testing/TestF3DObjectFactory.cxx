@@ -45,7 +45,7 @@ int TestF3DObjectFactory(int argc, char* argv[])
 
   vtkNew<vtkPointGaussianMapper> pointMapper;
   pointMapper->Print(std::cout);
-  vtkF3DPointSplatMapper* pointMapperPtr = vtkF3DPointSplatMapper::SafeDownCast(pointMapper);
+  const vtkF3DPointSplatMapper* pointMapperPtr = vtkF3DPointSplatMapper::SafeDownCast(pointMapper);
   if (pointMapperPtr == nullptr)
   {
     std::cerr << "vtkF3DObjectFactory failed to create a vtkF3DPointSplatMapper\n";
