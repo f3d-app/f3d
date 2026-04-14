@@ -2465,14 +2465,14 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 {
   assert(this->Importer);
 
-  double* surfaceColor = nullptr;
+  const double* surfaceColor = nullptr;
   if (this->SurfaceColor.has_value())
   {
     assert(this->SurfaceColor->size() == 3);
     surfaceColor = this->SurfaceColor->data();
   }
 
-  double* emissiveFactor = nullptr;
+  const double* emissiveFactor = nullptr;
   if (this->EmissiveFactor.has_value())
   {
     assert(this->EmissiveFactor->size() == 3);
