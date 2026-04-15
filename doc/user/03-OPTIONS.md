@@ -587,7 +587,7 @@ Some rendering options are not compatible between them, here is the precedence o
 
 ## Color space
 
-All options of type _color_ must be expressed in sRGB color space. They are converted internally in linear color space for physically correct rendering.
+All options of type _color_ must be expressed in [sRGB](https://en.wikipedia.org/wiki/SRGB) color space. They are converted internally in linear color space for physically correct rendering.
 
 ## Options syntax
 
