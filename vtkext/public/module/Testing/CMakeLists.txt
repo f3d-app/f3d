@@ -12,3 +12,5 @@ vtk_add_test_cxx(vtkextTests tests
   ${vtkextTests_list}
   ${F3D_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
 vtk_test_cxx_executable(vtkextTests tests)
+
+set_target_properties(vtkextTests PROPERTIES CXX_STANDARD 20)

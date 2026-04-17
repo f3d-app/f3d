@@ -775,8 +775,7 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
           // Use the completion callback of the action with its args if any
           std::vector<std::string> argsCandidates =
             complCallback({ tokens.begin() + 1, tokens.end() });
-          std::transform(argsCandidates.begin(), argsCandidates.end(),
-            std::back_inserter(candidates),
+          std::ranges::transform(argsCandidates, std::back_inserter(candidates),
             [&](const auto& argCandidate) { return actionPattern + " " + argCandidate; });
         }
       }
@@ -840,7 +839,7 @@ interactor& interactor_impl::initCommands()
       argPattern += args[i] + " ";
     }
     // Include it in front of the candidates
-    std::transform(candidates.begin(), candidates.end(), candidates.begin(),
+    std::ranges::transform(candidates, candidates.begin(),
       [&](const auto& argCandidate) { return argPattern + argCandidate; });
 
     if (candidates.size() == 1)
@@ -875,15 +874,14 @@ interactor& interactor_impl::initCommands()
     else if (args.size() == 1)
     {
       // One arg, check if its an option
-      if (std::find(optionNames.begin(), optionNames.end(), args[0]) != optionNames.end())
+      if (std::ranges::find(optionNames, args[0]) != optionNames.end())
       {
         // Its an existing option, check if it should be completed
         const auto it = COMPL_OPTIONS_SET.find(args[0]);
         if (it != COMPL_OPTIONS_SET.end())
         {
           // Transform potential values into found option
-          std::transform(std::begin(it->second), std::end(it->second),
-            std::back_inserter(candidates),
+          std::ranges::transform(it->second, std::back_inserter(candidates),
             [&](const auto& value) { return args[0] + " " + value; });
         }
         else
@@ -1105,7 +1103,7 @@ interactor& interactor_impl::initCommands()
       else
       {
         auto index = std::distance(
-          std::begin(validTypes), std::find(std::begin(validTypes), std::end(validTypes), type));
+          std::begin(validTypes), std::ranges::find(validTypes, type));
         if (static_cast<size_t>(index) == validTypes.size() - 1) // last type
         {
           enabled = false;
@@ -1796,7 +1794,7 @@ interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
   this->Internals->Bindings.erase(bind);
 
   // Look for the group of the removed bind
-  auto it = std::find_if(this->Internals->GroupedBinds.begin(), this->Internals->GroupedBinds.end(),
+  auto it = std::ranges::find_if(this->Internals->GroupedBinds,
     [&](const auto& pair) { return pair.second == bind; });
 
   if (it != this->Internals->GroupedBinds.end())
@@ -1809,8 +1807,7 @@ interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
     {
       // If it was the last one, remove it from the ordered group
       // We know the group is present and unique in the vector, so only erase once
-      auto vecIt = std::find(this->Internals->OrderedBindGroups.begin(),
-        this->Internals->OrderedBindGroups.end(), group);
+      auto vecIt = std::ranges::find(this->Internals->OrderedBindGroups, group);
       assert(vecIt != this->Internals->OrderedBindGroups.end());
       this->Internals->OrderedBindGroups.erase(vecIt);
     }

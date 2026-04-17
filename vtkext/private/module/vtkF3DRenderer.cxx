@@ -364,8 +364,8 @@ void vtkF3DRenderer::ApplyUpDirection(const std::array<double, 3>& up)
   vtkMath::Cross(up.data(), front.data(), orthRight.data());
   vtkMath::Normalize(orthRight.data());
 
-  std::copy(up.begin(), up.end(), this->UpDirection);
-  std::copy(orthRight.begin(), orthRight.end(), this->RightDirection);
+  std::ranges::copy(up, this->UpDirection);
+  std::ranges::copy(orthRight, this->RightDirection);
 
   this->SkyboxActor->SetFloorPlane(up[0], up[1], up[2], 0.0);
   this->SkyboxActor->SetFloorRight(front[0], front[1], front[2]);
@@ -415,7 +415,7 @@ void vtkF3DRenderer::SetPendingUpDirection(const std::vector<double>& upVec)
     return;
   }
 
-  std::copy(up.begin(), up.end(), this->PendingUpDirection);
+  std::ranges::copy(up, this->PendingUpDirection);
   this->UpDirectionConfigured = false;
 }
 
@@ -758,13 +758,13 @@ void vtkF3DRenderer::SetAxesColor(const std::vector<double>& colorXAxis,
 {
   assert(colorXAxis.size() == 3 && colorYAxis.size() == 3 && colorZAxis.size() == 3);
 
-  if (!std::equal(colorXAxis.begin(), colorXAxis.end(), this->ColorAxisX) ||
-    !std::equal(colorYAxis.begin(), colorYAxis.end(), this->ColorAxisY) ||
-    !std::equal(colorZAxis.begin(), colorZAxis.end(), this->ColorAxisZ))
+  if (!std::ranges::equal(colorXAxis, this->ColorAxisX) ||
+    !std::ranges::equal(colorYAxis, this->ColorAxisY) ||
+    !std::ranges::equal(colorZAxis, this->ColorAxisZ))
   {
-    std::copy(colorXAxis.begin(), colorXAxis.end(), this->ColorAxisX);
-    std::copy(colorYAxis.begin(), colorYAxis.end(), this->ColorAxisY);
-    std::copy(colorZAxis.begin(), colorZAxis.end(), this->ColorAxisZ);
+    std::ranges::copy(colorXAxis, this->ColorAxisX);
+    std::ranges::copy(colorYAxis, this->ColorAxisY);
+    std::ranges::copy(colorZAxis, this->ColorAxisZ);
     this->GridConfigured = false;
     this->AxesActorConfigured = false;
   }

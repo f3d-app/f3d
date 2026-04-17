@@ -62,7 +62,7 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
 
   f3d::log::setUseColoring(false);
   std::vector<std::string> orderedCLIGroupNames(F3D::CLIOptions.size());
-  std::transform(F3D::CLIOptions.cbegin(), F3D::CLIOptions.cend(), orderedCLIGroupNames.begin(),
+  std::ranges::transform(F3D::CLIOptions, orderedCLIGroupNames.begin(),
     [](const F3D::CLIGroup& cliGroup) { return cliGroup.GroupName; });
   f3d::log::info(cxxOptions.help(orderedCLIGroupNames));
   f3d::log::info("\nExamples:");
@@ -443,7 +443,7 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
     for (const auto& res : result)
     {
       // Discard boolean option like `--version` or `--help`
-      if (std::find(::CLIBooleans.begin(), ::CLIBooleans.end(), res.key()) == ::CLIBooleans.end())
+      if (std::ranges::find(::CLIBooleans, res.key()) == ::CLIBooleans.end())
       {
         cliOptionsDict[res.key()] = res.value();
       }

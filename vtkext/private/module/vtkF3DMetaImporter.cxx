@@ -70,7 +70,7 @@ protected:
 
     const auto allChildrenAreUnnamed = [&]()
     {
-      return std::none_of(childrenIds.cbegin(), childrenIds.cend(),
+      return std::ranges::none_of(childrenIds,
         [&](int id) { return this->GetAssembly()->HasAttribute(id, "label"); });
     };
 
@@ -78,7 +78,7 @@ protected:
     {
       const std::string_view nodeName =
         this->GetAssembly()->GetAttributeOrDefault(nodeid, "label", "");
-      return std::all_of(childrenIds.cbegin(), childrenIds.cend(), [&](int id)
+      return std::ranges::all_of(childrenIds, [&](int id)
         { return nodeName == this->GetAssembly()->GetAttributeOrDefault(id, "label", ""); });
     };
 

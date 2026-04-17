@@ -397,7 +397,7 @@ public:
 
           auto TimeVarying = [](const auto& a) { return a.ValueMightBeTimeVarying(); };
 
-          bool animatedAttribute = std::any_of(primVars.cbegin(), primVars.cend(), TimeVarying);
+          bool animatedAttribute = std::ranges::any_of(primVars, TimeVarying);
           animatedAttribute = animatedAttribute || TimeVarying(pointsAttr);
           animatedAttribute = animatedAttribute || TimeVarying(normalsAttr);
           animatedAttribute = animatedAttribute || TimeVarying(facesCountAttr);

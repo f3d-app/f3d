@@ -911,8 +911,8 @@ void vtkF3DImguiActor::RenderCheatSheet()
   {
     std::string lowerHaystack = haystack;
     std::string lowerNeedle = needle;
-    std::transform(lowerHaystack.begin(), lowerHaystack.end(), lowerHaystack.begin(), ::tolower);
-    std::transform(lowerNeedle.begin(), lowerNeedle.end(), lowerNeedle.begin(), ::tolower);
+    std::ranges::transform(lowerHaystack, lowerHaystack.begin(), ::tolower);
+    std::ranges::transform(lowerNeedle, lowerNeedle.begin(), ::tolower);
     return lowerHaystack.find(lowerNeedle) != std::string::npos;
   };
 

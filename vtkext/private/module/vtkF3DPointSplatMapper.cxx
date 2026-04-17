@@ -405,7 +405,7 @@ void vtkF3DSplatMapperHelper::SortSplatsCPU(vtkRenderer* ren)
   }
 
   // Match bitonic sort ordering: sort ascending by depth (back-to-front given reversed direction)
-  std::sort(this->CPUSortedIndices.begin(), this->CPUSortedIndices.end(),
+  std::ranges::sort(this->CPUSortedIndices,
     [&](const GLuint& a, const GLuint& b) { return this->CPUDepths[a] < this->CPUDepths[b]; });
 
   this->Primitives[PrimitivePoints].IBO->Upload(this->CPUSortedIndices.data(),

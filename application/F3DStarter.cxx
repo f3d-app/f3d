@@ -259,7 +259,7 @@ public:
   {
     F3DStarter* self = reinterpret_cast<F3DStarter*>(userData);
     const std::lock_guard<std::mutex> lock(self->Internals->FilesToWatchMutex);
-    if (std::find_if(self->Internals->FilesToWatch.begin(), self->Internals->FilesToWatch.end(),
+    if (std::ranges::find_if(self->Internals->FilesToWatch,
           [&](const auto& path)
           { return path.filename() == filename; }) != self->Internals->FilesToWatch.end())
     {
@@ -666,8 +666,7 @@ public:
 
                 // Handle reader options
                 std::vector<std::string> readerOptionNames = f3d::engine::getAllReaderOptionNames();
-                if (std::find(readerOptionNames.begin(), readerOptionNames.end(),
-                      libf3dOptionName) != readerOptionNames.end())
+                if (std::ranges::find(readerOptionNames, libf3dOptionName) != readerOptionNames.end())
                 {
                   f3d::engine::setReaderOption(libf3dOptionName, libf3dOptionValue);
                   continue;
@@ -1647,8 +1646,7 @@ void F3DStarter::LoadFileGroupInternal(
     f3d::log::debug("Checking files:");
     for (const fs::path& tmpPath : paths)
     {
-      if (std::find(this->Internals->LoadedFiles.begin(), this->Internals->LoadedFiles.end(),
-            tmpPath) == this->Internals->LoadedFiles.end())
+      if (std::ranges::find(this->Internals->LoadedFiles, tmpPath) == this->Internals->LoadedFiles.end())
       {
         if (tmpPath == F3D_PIPED)
         {
@@ -1711,7 +1709,7 @@ void F3DStarter::LoadFileGroupInternal(
 
     if (!localPaths.empty())
     {
-      auto cinIt = std::find(localPaths.begin(), localPaths.end(), F3D_PIPED);
+      auto cinIt = std::ranges::find(localPaths, F3D_PIPED);
       if (cinIt != localPaths.end())
       {
         // Remove cin from path
@@ -2006,7 +2004,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
         if (key == groupKey)
         {
           // Check if file has already been added
-          if (std::find(paths.begin(), paths.end(), tmpPath) == paths.end())
+          if (std::ranges::find(paths, tmpPath) == paths.end())
           {
             paths.emplace_back(tmpPath);
           }
@@ -2157,7 +2155,7 @@ void F3DStarter::AddCommands()
         std::set<std::string> supportedExtensions;
         for (const auto& info : f3d::engine::getReadersInfo())
         {
-          std::transform(info.Extensions.begin(), info.Extensions.end(),
+          std::ranges::transform(info.Extensions,
             std::inserter(supportedExtensions, supportedExtensions.begin()),
             [&](const std::string& ext) { return "." + ext; });
         }
@@ -2204,7 +2202,7 @@ void F3DStarter::AddCommands()
       }
 
       // Sort for output readability and test reproducibility
-      std::sort(candidates.begin(), candidates.end());
+      std::ranges::sort(candidates);
 
       if (candidates.size() == 1 && fs::is_directory(candidates[0]))
       {
@@ -2226,7 +2224,7 @@ void F3DStarter::AddCommands()
       std::vector<std::string> multiArgsCandidate;
       const std::string accum = std::accumulate(args.begin() + 1, args.end() - 1, args[0],
         [](const std::string& a, const std::string& b) { return a + " " + b; });
-      std::transform(originalCandidates.begin(), originalCandidates.end(),
+      std::ranges::transform(originalCandidates,
         std::back_inserter(candidates),
         [&](const auto& candidate) { return accum + " " + candidate; });
     }
@@ -2237,8 +2235,7 @@ void F3DStarter::AddCommands()
       std::vector<std::string> originalCandidates = candidates;
       candidates.clear();
 
-      std::transform(originalCandidates.begin(), originalCandidates.end(),
-        std::back_inserter(candidates),
+      std::ranges::transform(originalCandidates, std::back_inserter(candidates),
         [&](std::string candidate)
         {
           for (size_t i = 0; i < candidate.size(); i++)

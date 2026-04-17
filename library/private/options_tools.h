@@ -94,7 +94,7 @@ template<>
 bool parse(const std::string& str)
 {
   std::string s = str;
-  std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::tolower(c); });
+  std::ranges::transform(s, s.begin(), [](unsigned char c) { return std::tolower(c); });
   if (s == "true" || s == "yes" || s == "on" || s == "1")
   {
     return true;
@@ -268,8 +268,7 @@ color_t parse(const std::string& str)
       }
 
       std::string hueFormat = hueMatch[1].str();
-      std::transform(hueFormat.begin(), hueFormat.end(), hueFormat.begin(),
-        [](unsigned char c) { return std::tolower(c); });
+      std::ranges::transform(hueFormat, hueFormat.begin(), [](unsigned char c) { return std::tolower(c); });
       if (hueFormat == "hsl")
       {
         const double l = v;

@@ -142,7 +142,7 @@ std::vector<std::string> options::getNames() const
 std::pair<std::string, unsigned int> options::getClosestOption(std::string_view option) const
 {
   std::vector<std::string> names = options_generated::getNames();
-  if (std::find(names.begin(), names.end(), option) != names.end())
+  if (std::ranges::find(names, option) != names.end())
   {
     return { std::string(option), 0 };
   }

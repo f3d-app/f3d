@@ -80,7 +80,7 @@ class vtkF3DAlembicReader::vtkInternals
       }
       if (doReverseRotate)
       {
-        std::reverse(thisFaceIndices.begin(), thisFaceIndices.end());
+        std::ranges::reverse(thisFaceIndices);
         std::rotate(thisFaceIndices.begin(), thisFaceIndices.begin() + thisFaceIndices.size() - 1,
           thisFaceIndices.end());
       }

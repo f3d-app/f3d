@@ -377,8 +377,8 @@ void f3d_interactor_add_command(f3d_interactor_t* interactor, const char* action
   {
     std::vector<const char*> c_args;
     c_args.resize(args.size());
-    std::transform(
-      args.begin(), args.end(), c_args.begin(), [](const std::string& s) { return s.c_str(); });
+    std::ranges::transform(
+      args, c_args.begin(), [](const std::string& s) { return s.c_str(); });
     callback(c_args.data(), static_cast<int>(c_args.size()), user_data);
   };
 
