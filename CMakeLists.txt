@@ -158,7 +158,7 @@ mark_as_advanced(F3D_COVERAGE)
 set(f3d_coverage_compile_options "")
 set(f3d_coverage_link_options "")
 if(F3D_COVERAGE)
-  set(f3d_coverage_compile_options -g -O0 --coverage)
+  set(f3d_coverage_compile_options -g -O0 --coverage -fprofile-update=atomic)
   set(f3d_coverage_link_options --coverage)
 endif()
 
