@@ -12,7 +12,7 @@ please take a look at our [getting started guide](04-GETTING_STARTED.md).
 
 - [CMake](https://cmake.org) >= 3.1.
 - [VTK](https://vtk.org) >= 9.4.0 (9.6.1 recommended).
-- A C++17 compiler.
+- A C++20 compiler.
 - A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
 - Optionally, [Assimp](https://www.assimp.org/) >= 5.4.0 (6.0.2 recommended).
 - Optionally, Open CASCADE [OCCT](https://dev.opencascade.org/) >= 7.6.3 (7.9.1 recommended).

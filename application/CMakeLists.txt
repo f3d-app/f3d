@@ -14,7 +14,7 @@ function(f3d_create_exec target_name)
 
   set_target_properties(${target_name} PROPERTIES
     CXX_VISIBILITY_PRESET hidden
-    CXX_STANDARD 17
+    CXX_STANDARD 20
     )
 
   if (APPLE)

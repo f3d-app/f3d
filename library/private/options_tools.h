@@ -67,17 +67,15 @@ int stoiStrict(const std::string& str)
  * Splits on `","` and trims chunks before parsing each element
  */
 template<typename T>
-struct is_vector : std::false_type
-{
-};
-template<typename... Args>
-struct is_vector<std::vector<Args...>> : std::true_type
-{
-};
+inline constexpr bool is_vector = false;
+
+template<typename T, typename Alloc>
+inline constexpr bool is_vector<std::vector<T, Alloc>> = true;
+
 template<typename T>
 T parse(const std::string& str)
 {
-  static_assert(is_vector<T>::value, "non-vector types parsing must be specialized");
+  static_assert(is_vector<T>, "non-vector types parsing must be specialized");
 
   T vec;
   std::istringstream split(str);

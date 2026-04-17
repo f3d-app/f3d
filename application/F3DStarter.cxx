@@ -46,6 +46,7 @@
 #include <cmath>
 #include <csignal>
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -553,26 +554,23 @@ public:
     }
   }
 
+  static std::string FormatOrigin(
+    const std::string& source, const std::string& matchType, const std::string& match)
+  {
+    if (source.empty())
+    {
+      return match;
+    }
+
+    return std::format("{}:`{}` ({})", source, match, matchType);
+  }
+
   static void PrintLoggingMap(const std::map<std::string, log_entry_t>& loggingMap, char sep)
   {
     for (const auto& [key, tuple] : loggingMap)
     {
       const auto& [bindStr, source, matchType, match, commands] = tuple;
-      std::string origin;
-      if (source.empty())
-      {
-        origin = match;
-      }
-      else
-      {
-        // TODO: Use std::format once C++20 is supported
-        origin = source;
-        origin += ":`";
-        origin += match;
-        origin += "` (";
-        origin += matchType;
-        origin += ")";
-      }
+      const std::string origin = F3DInternals::FormatOrigin(source, matchType, match);
       f3d::log::debug(" '", bindStr, "' ", sep, " '", commands, "' from ", origin);
     }
     f3d::log::debug("");
@@ -649,8 +647,7 @@ public:
                 bool reset = false;
 
                 // Handle options reset
-                // XXX: Use starts_with once C++20 is supported
-                if (libf3dOptionName.rfind("reset-", 0) == 0)
+                if (libf3dOptionName.starts_with("reset-"))
                 {
                   if (libf3dOptionName.size() > 6)
                   {
@@ -699,21 +696,7 @@ public:
                 {
                   if (!quiet)
                   {
-                    std::string origin;
-                    if (source.empty())
-                    {
-                      origin = match;
-                    }
-                    else
-                    {
-                      // TODO: Use std::format once C++20 is supported
-                      origin = source;
-                      origin += ":`";
-                      origin += match;
-                      origin += "` (";
-                      origin += matchType;
-                      origin += ")";
-                    }
+                    const std::string origin = F3DInternals::FormatOrigin(source, matchType, match);
                     f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue,
                       "' from ", origin, " because: ", ex.what());
                   }
@@ -722,21 +705,7 @@ public:
                 {
                   if (!quiet)
                   {
-                    std::string origin;
-                    if (source.empty())
-                    {
-                      origin = match;
-                    }
-                    else
-                    {
-                      // TODO: Use std::format once C++20 is supported
-                      origin = source;
-                      origin += ":`";
-                      origin += match;
-                      origin += "` (";
-                      origin += matchType;
-                      origin += ")";
-                    }
+                    const std::string origin = F3DInternals::FormatOrigin(source, matchType, match);
                     auto [closestName, dist] =
                       F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
                     f3d::log::warn("'", keyForLog, "' option from ", origin,
@@ -2212,8 +2181,7 @@ void F3DStarter::AddCommands()
 #else
           // Linux filesystems are typically case-sensitive
           // Perform a case sensitive search
-          // Using rfind to avoid dependency for C++20 starts_with
-          return filename.rfind(filePattern, 0) == 0;
+          return filename.starts_with(filePattern);
 #endif
         };
 

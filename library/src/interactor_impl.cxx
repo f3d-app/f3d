@@ -52,11 +52,6 @@ namespace f3d::detail
 {
 using mod_t = interaction_bind_t::ModifierKeys;
 
-bool StartWith(std::string_view str, std::string_view pattern)
-{
-  return str.rfind(pattern, 0) == 0; // To avoid dependency for C++20 starts_with
-};
-
 class interactor_impl::internals
 {
 public:
@@ -751,7 +746,7 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
       bool exact = false;
       for (auto const& [action, callbacks] : this->Internals->Commands)
       {
-        if (f3d::detail::StartWith(action, actionPattern))
+        if (action.starts_with(actionPattern))
         {
           // Copy all action that start with the pattern
           candidates.emplace_back(action);
@@ -836,7 +831,7 @@ interactor& interactor_impl::initCommands()
 
     // Recover all names that starts with args[indexToCheck]
     std::copy_if(names.begin(), names.end(), std::back_inserter(candidates),
-      [&](const std::string& name) { return f3d::detail::StartWith(name, args[indexToCheck]); });
+      [&](const std::string& name) { return name.starts_with(args[indexToCheck]); });
 
     // Create an arg pattern before the indexToCheck
     std::string argPattern;
@@ -1100,9 +1095,8 @@ interactor& interactor_impl::initCommands()
       bool& enabled = this->Internals->Options.model.point_sprites.enable;
       std::string& type = this->Internals->Options.model.point_sprites.type;
 
-      // C++20: use `std::to_array<std::string_view>` to avoid specifying the size explicitly
-      constexpr std::array<std::string_view, 6> validTypes = { "sphere", "gaussian", "circle",
-        "stddev", "bound", "cross" };
+      constexpr auto validTypes = std::to_array({ "sphere", "gaussian", "circle",
+        "stddev", "bound", "cross" });
       if (!enabled)
       {
         enabled = true;

@@ -591,9 +591,9 @@ const image& image::toTerminalText(std::ostream& stream) const
   };
 
   constexpr std::string_view EMPTY_BLOCK = " ";
-  constexpr std::string_view TOP_BLOCK = u8"\u2580";
-  constexpr std::string_view BOTTOM_BLOCK = u8"\u2584";
-  constexpr std::string_view FULL_BLOCK = u8"\u2588";
+  constexpr std::string_view TOP_BLOCK = "\u2580";
+  constexpr std::string_view BOTTOM_BLOCK = "\u2584";
+  constexpr std::string_view FULL_BLOCK = "\u2588";
   constexpr std::string_view EOL = "\n";
 
   for (int y = 0; y < height; y += 2)

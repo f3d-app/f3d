@@ -16,7 +16,7 @@ foreach (module IN LISTS modules)
   vtk_module_compile_options(${module} PUBLIC ${f3d_compile_options_public})
   vtk_module_compile_options(${module} PRIVATE ${f3d_compile_options_private})
   vtk_module_link_options(${module} PUBLIC ${f3d_link_options_public})
-  vtk_module_set_properties(${module} CXX_STANDARD 17)
+  vtk_module_set_properties(${module} CXX_STANDARD 20)
   if(F3D_STRICT_BUILD AND MSVC)
     # There are warnings in VTK related to deprecated features in C++17
     vtk_module_definitions(${module} PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
