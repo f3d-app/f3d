@@ -348,7 +348,7 @@ void animationManager::CycleAnimation()
   else if (this->Options.scene.animation.indices.empty())
   {
     // Select the first one
-    this->Options.scene.animation.indices = { 0 };
+    this->Options.scene.animation.indices.emplace_back(0);
   }
   else
   {
