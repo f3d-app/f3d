@@ -81,7 +81,7 @@ public:
     for (size_t i = 0; i < pngReader->GetNumberOfTextChunks(); ++i)
     {
       const vtkStdString key = pngReader->GetTextKey(static_cast<int>(i));
-      if (key.rfind(metadataKeyPrefix, 0) == 0)
+      if (key.starts_with(metadataKeyPrefix))
       {
         pngReader->GetTextChunks(key.c_str(), beginEndIndex);
         const int index = beginEndIndex[1] - 1; // only read the last key

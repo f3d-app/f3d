@@ -144,7 +144,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   {
     static constexpr auto mdl_simpleframe_t_fixed_size =
       sizeof(mdl_simpleframe_t) - sizeof(mdl_simpleframe_t::verts);
-    static_assert(std::is_standard_layout_v<mdl_simpleframe_t>, "Vector typecast requires POD input");
+    static_assert(
+      std::is_standard_layout_v<mdl_simpleframe_t>, "Vector typecast requires POD input");
 
     // check that we have enough data for the given number of verts requested
     if (offset + mdl_simpleframe_t_fixed_size + num_verts * sizeof(mdl_simpleframe_t::verts[0]) >

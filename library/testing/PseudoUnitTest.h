@@ -13,6 +13,10 @@
 #include <string>
 #include <type_traits>
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 namespace
 {
 template<typename T>
@@ -77,6 +81,14 @@ public:
 class PseudoUnitTest
 {
 public:
+  PseudoUnitTest()
+  {
+#ifdef _WIN32
+    // Set console code page to UTF-8 so console known how to interpret string data
+    SetConsoleOutputCP(CP_UTF8);
+#endif
+  }
+
   /** test a boolean condition */
   void operator()(const std::string& label, bool condition)
   {
