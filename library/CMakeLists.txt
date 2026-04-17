@@ -115,6 +115,7 @@ endif ()
 
 if (WIN32)
   target_link_libraries(libf3d PRIVATE Dwmapi)
+  target_compile_options(libf3d PRIVATE /utf-8)
 endif()
 
 set_target_properties(libf3d PROPERTIES
