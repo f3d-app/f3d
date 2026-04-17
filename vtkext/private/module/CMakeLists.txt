@@ -174,6 +174,11 @@ if (F3D_MODULE_UI)
   endif ()
 endif ()
 
+# UTF-8 encoding for MSVC
+if (MSVC)
+  vtk_module_compile_options(f3d::vtkextPrivate PRIVATE /utf-8)
+endif()
+
 # raytracing
 if (F3D_MODULE_RAYTRACING)
   vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_RAYTRACING)
