@@ -70,8 +70,8 @@ protected:
 
     const auto allChildrenAreUnnamed = [&]()
     {
-      return std::ranges::none_of(childrenIds,
-        [&](int id) { return this->GetAssembly()->HasAttribute(id, "label"); });
+      return std::ranges::none_of(
+        childrenIds, [&](int id) { return this->GetAssembly()->HasAttribute(id, "label"); });
     };
 
     const auto allChildrenHaveSameNameAsNode = [&]()

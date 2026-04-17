@@ -268,7 +268,8 @@ color_t parse(const std::string& str)
       }
 
       std::string hueFormat = hueMatch[1].str();
-      std::ranges::transform(hueFormat, hueFormat.begin(), [](unsigned char c) { return std::tolower(c); });
+      std::ranges::transform(
+        hueFormat, hueFormat.begin(), [](unsigned char c) { return std::tolower(c); });
       if (hueFormat == "hsl")
       {
         const double l = v;

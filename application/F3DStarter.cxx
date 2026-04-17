@@ -259,8 +259,7 @@ public:
   {
     F3DStarter* self = reinterpret_cast<F3DStarter*>(userData);
     const std::lock_guard<std::mutex> lock(self->Internals->FilesToWatchMutex);
-    if (std::ranges::find_if(self->Internals->FilesToWatch,
-          [&](const auto& path)
+    if (std::ranges::find_if(self->Internals->FilesToWatch, [&](const auto& path)
           { return path.filename() == filename; }) != self->Internals->FilesToWatch.end())
     {
       self->Internals->ReloadFileRequested = true;
@@ -666,7 +665,8 @@ public:
 
                 // Handle reader options
                 std::vector<std::string> readerOptionNames = f3d::engine::getAllReaderOptionNames();
-                if (std::ranges::find(readerOptionNames, libf3dOptionName) != readerOptionNames.end())
+                if (std::ranges::find(readerOptionNames, libf3dOptionName) !=
+                  readerOptionNames.end())
                 {
                   f3d::engine::setReaderOption(libf3dOptionName, libf3dOptionValue);
                   continue;
@@ -1646,7 +1646,8 @@ void F3DStarter::LoadFileGroupInternal(
     f3d::log::debug("Checking files:");
     for (const fs::path& tmpPath : paths)
     {
-      if (std::ranges::find(this->Internals->LoadedFiles, tmpPath) == this->Internals->LoadedFiles.end())
+      if (std::ranges::find(this->Internals->LoadedFiles, tmpPath) ==
+        this->Internals->LoadedFiles.end())
       {
         if (tmpPath == F3D_PIPED)
         {
@@ -2224,8 +2225,7 @@ void F3DStarter::AddCommands()
       std::vector<std::string> multiArgsCandidate;
       const std::string accum = std::accumulate(args.begin() + 1, args.end() - 1, args[0],
         [](const std::string& a, const std::string& b) { return a + " " + b; });
-      std::ranges::transform(originalCandidates,
-        std::back_inserter(candidates),
+      std::ranges::transform(originalCandidates, std::back_inserter(candidates),
         [&](const auto& candidate) { return accum + " " + candidate; });
     }
 

@@ -1093,8 +1093,8 @@ interactor& interactor_impl::initCommands()
       bool& enabled = this->Internals->Options.model.point_sprites.enable;
       std::string& type = this->Internals->Options.model.point_sprites.type;
 
-      constexpr auto validTypes = std::to_array({ "sphere", "gaussian", "circle",
-        "stddev", "bound", "cross" });
+      constexpr auto validTypes =
+        std::to_array({ "sphere", "gaussian", "circle", "stddev", "bound", "cross" });
       if (!enabled)
       {
         enabled = true;
@@ -1102,8 +1102,7 @@ interactor& interactor_impl::initCommands()
       }
       else
       {
-        auto index = std::distance(
-          std::begin(validTypes), std::ranges::find(validTypes, type));
+        auto index = std::distance(std::begin(validTypes), std::ranges::find(validTypes, type));
         if (static_cast<size_t>(index) == validTypes.size() - 1) // last type
         {
           enabled = false;
@@ -1794,8 +1793,8 @@ interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
   this->Internals->Bindings.erase(bind);
 
   // Look for the group of the removed bind
-  auto it = std::ranges::find_if(this->Internals->GroupedBinds,
-    [&](const auto& pair) { return pair.second == bind; });
+  auto it = std::ranges::find_if(
+    this->Internals->GroupedBinds, [&](const auto& pair) { return pair.second == bind; });
 
   if (it != this->Internals->GroupedBinds.end())
   {

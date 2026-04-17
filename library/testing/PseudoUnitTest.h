@@ -145,7 +145,8 @@ private:
         else
         {
           // ensure the function returns void
-          static_assert(std::is_void_v<std::invoke_result_t<F&>>, "Function must return bool or void");
+          static_assert(
+            std::is_void_v<std::invoke_result_t<F&>>, "Function must return bool or void");
 
           function();
           this->record(true, label);

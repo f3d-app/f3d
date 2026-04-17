@@ -683,7 +683,8 @@ std::string image::getMetadata(const std::string& key) const
 std::vector<std::string> image::allMetadata() const
 {
   std::vector<std::string> keys;
-  std::ranges::transform(this->Internals->Metadata, std::back_inserter(keys), [](const auto& kv) { return kv.first; });
+  std::ranges::transform(
+    this->Internals->Metadata, std::back_inserter(keys), [](const auto& kv) { return kv.first; });
   return keys;
 }
 

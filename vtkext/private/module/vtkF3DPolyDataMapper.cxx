@@ -68,7 +68,8 @@ void vtkF3DPolyDataMapper::ReplaceShaderValues(
 #endif
   std::vector<f3d_texinfo> textures = this->GetTextures(actor);
   hasTangents = hasTangents &&
-    std::ranges::find_if(textures, [](const f3d_texinfo& tex) { return tex.second == "normalTex"; }) != textures.end();
+    std::ranges::find_if(
+      textures, [](const f3d_texinfo& tex) { return tex.second == "normalTex"; }) != textures.end();
 
   std::string customDecl = "//VTK::CustomUniforms::Dec\n";
   std::string beginImpl;

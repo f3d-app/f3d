@@ -337,7 +337,8 @@ void animationManager::CycleAnimation()
   F3D_SILENT_WARNING_POP()
 
   // If we started with multi animation or all animations (any negative value means all animations)
-  bool negative = std::ranges::any_of(this->Options.scene.animation.indices, [](int idx) { return idx < 0; });
+  bool negative =
+    std::ranges::any_of(this->Options.scene.animation.indices, [](int idx) { return idx < 0; });
   if (this->Options.scene.animation.indices.size() > 1 || negative)
   {
     // Then select no animation
@@ -405,9 +406,8 @@ std::string animationManager::GetAnimationName(int index)
           animCheck[idx] = true;
         }
       }
-      return std::ranges::none_of(animCheck, std::logical_not<>())
-        ? "All animations"
-        : "Multi animations";
+      return std::ranges::none_of(animCheck, std::logical_not<>()) ? "All animations"
+                                                                   : "Multi animations";
     }
 
     if (this->AvailAnimations == 0 || !this->PreparedAnimationIndices.has_value() ||

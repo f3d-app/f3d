@@ -25,8 +25,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("supported formats EXR", std::ranges::find(formats, ".exr") != formats.end());
 #endif
 #if F3D_MODULE_WEBP
-  test(
-    "supported formats WebP", std::ranges::find(formats, ".webp") != formats.end());
+  test("supported formats WebP", std::ranges::find(formats, ".webp") != formats.end());
 #endif
 
   constexpr unsigned int width = 64;
@@ -40,14 +39,12 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   f3d::image generated(width, height, channels);
   std::vector<uint8_t> pixels(width * height * channels);
-  std::ranges::generate(pixels,
-    [&]() { return static_cast<uint8_t>(randGenerator() % 256); });
+  std::ranges::generate(pixels, [&]() { return static_cast<uint8_t>(randGenerator() % 256); });
   generated.setContent(pixels.data());
 
   f3d::image generated16(width, height, channels, f3d::image::ChannelType::SHORT);
   std::vector<uint16_t> pixels16(width * height * channels);
-  std::ranges::generate(pixels16,
-    [&]() { return static_cast<uint16_t>(randGenerator() % 65536); });
+  std::ranges::generate(pixels16, [&]() { return static_cast<uint16_t>(randGenerator() % 65536); });
   generated16.setContent(pixels16.data());
 
   std::uniform_real_distribution<float> dist(
