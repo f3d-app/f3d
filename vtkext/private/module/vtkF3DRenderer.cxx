@@ -99,6 +99,7 @@
 
 #include <cctype>
 #include <chrono>
+#include <numbers>
 #include <sstream>
 
 namespace
@@ -431,7 +432,7 @@ void vtkF3DRenderer::ConfigureUpDirection()
   vtkMath::Cross(oldUp.data(), newUp.data(), axis.data());
   double sinAngle = vtkMath::Normalize(axis.data());
   double cosAngle = vtkMath::Dot(oldUp.data(), newUp.data());
-  double angle = std::atan2(sinAngle, cosAngle) * 180.0 / vtkMath::Pi();
+  double angle = std::atan2(sinAngle, cosAngle) * 180.0 / std::numbers::pi;
 
   vtkCamera* cam = this->GetActiveCamera();
   double foc[3];
