@@ -1010,8 +1010,8 @@ bool vtkF3DOCCTReader::CanReadFile(vtkResourceStream* stream, vtkF3DOCCTReader::
     parser->ReadLine(line2) == vtkParseResult::EndOfLine &&
     parser->ReadLine(line3) == vtkParseResult::EndOfLine)
   {
-    if (line1.rfind("DBRep_DrawableShape", 0) == 0 && line2.empty() &&
-      (line3.rfind("CASCADE Topology", 0) == 0 || line3.rfind("Open CASCADE Topology", 0) == 0))
+    if (line1.starts_with("DBRep_DrawableShape") && line2.empty() &&
+      (line3.starts_with("CASCADE Topology") || line3.starts_with("Open CASCADE Topology")))
     {
       format = vtkF3DOCCTReader::FILE_FORMAT::BREP;
       return true;
@@ -1026,7 +1026,7 @@ bool vtkF3DOCCTReader::CanReadFile(vtkResourceStream* stream, vtkF3DOCCTReader::
     parser->ReadLine(line2) == vtkParseResult::EndOfLine)
   {
     if (line1.empty() &&
-      (line2.rfind("CASCADE Topology", 0) == 0 || line2.rfind("Open CASCADE Topology", 0) == 0))
+      (line2.starts_with("CASCADE Topology") || line2.starts_with("Open CASCADE Topology")))
     {
       format = vtkF3DOCCTReader::FILE_FORMAT::BREP;
       return true;

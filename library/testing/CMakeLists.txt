@@ -139,6 +139,10 @@ if (F3D_MODULE_WEBP)
   target_compile_definitions(libf3dSDKTests PRIVATE F3D_MODULE_WEBP)
 endif ()
 
+if (MSVC)
+  target_compile_options(libf3dSDKTests PRIVATE /utf-8)
+endif()
+
 # List tests that do not require rendering
 list(APPEND libf3dSDKTestsNoRender_list
      TestSDKEngineExceptions
