@@ -19,6 +19,8 @@ endif()
 
 vtk_module_link(f3d::vtkextOCCT PRIVATE "${_occt_link_libs}")
 
+vtk_module_set_properties(f3d::vtkextOCCT CXX_STANDARD 20)
+
 if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
   vtk_module_definitions(f3d::vtkextOCCT
     PRIVATE F3D_PLUGIN_OCCT_XCAF)
