@@ -83,7 +83,8 @@ void vtkF3DGenericImporter::UpdateTemporalInformation()
   if (readerInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
   {
     const double* readerTimeSteps = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-    const int readerNumberOfTimeSteps = readerInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    const int readerNumberOfTimeSteps =
+      readerInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
 
     this->Pimpl->TimeSteps->SetNumberOfTuples(readerNumberOfTimeSteps);
 
@@ -394,8 +395,8 @@ bool vtkF3DGenericImporter::UpdateAtTimeValue(double timeValue)
 
     size_t blockIdx = 0;
     for (iter->InitTraversal();
-         !iter->IsDoneWithTraversal() && blockIdx < this->Pimpl->Blocks.size();
-         iter->GoToNextItem(), blockIdx++)
+      !iter->IsDoneWithTraversal() && blockIdx < this->Pimpl->Blocks.size();
+      iter->GoToNextItem(), blockIdx++)
     {
       vtkDataSet* block = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
       if (block)
