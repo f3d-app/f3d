@@ -44,6 +44,7 @@ int TestF3DGenericImporter(int argc, char* argv[])
     int nbTimeSteps;
     double timeRange[2];
     vtkNew<vtkDoubleArray> timeSteps;
+
     if (importer->GetTemporalInformation(0, timeRange, nbTimeSteps, timeSteps))
     {
       std::cerr << "Unexpected return value with GetTemporalInformation\n";
@@ -437,6 +438,37 @@ int TestF3DGenericImporter(int argc, char* argv[])
     {
       std::cerr << "PDC with metadata: Expected 'MetadataName', got '" << importer->GetBlockName(0)
                 << "'\n";
+      return EXIT_FAILURE;
+    }
+  }
+
+  // Test time step temporal information
+  {
+    vtkNew<vtkGLTFReader> reader;
+    std::string filename = std::string(argv[1]) + "data/BoxAnimated.gltf";
+    reader->SetFileName(filename.c_str());
+    reader->UpdateInformation();
+    reader->EnableAnimation(0);
+
+    vtkNew<vtkF3DGenericImporter> importer;
+    importer->SetInternalReader(reader);
+    importer->Update();
+    importer->Print(std::cout);
+
+    int nbTimeSteps;
+    double timeRange[2];
+    vtkNew<vtkDoubleArray> timeSteps;
+
+    bool temporalInfoExists = importer->GetTemporalInformation(0, timeRange, nbTimeSteps, timeSteps);
+    if (!temporalInfoExists)
+    {
+      std::cerr << "Unexpected return value with GetTemporalInformation\n";
+      return EXIT_FAILURE;
+    }
+
+    if (nbTimeSteps < 1 || nbTimeSteps != timeSteps->GetNumberOfTuples())
+    {
+      std::cerr << "Unexpected number of timesteps\n";
       return EXIT_FAILURE;
     }
   }
