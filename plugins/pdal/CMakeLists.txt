@@ -95,14 +95,23 @@ f3d_plugin_build(
   FREEDESKTOP
 )
 
-target_link_options(pdalcpp INTERFACE
-    "-Wl,--undefined=_ZN4pdal10QfitReaderC1Ev"
-    "-Wl,--undefined=_ZN4pdal10SbetReaderC1Ev"
-    "-Wl,--undefined=_ZN4pdal10SlpkReaderC1Ev"
-    "-Wl,--undefined=_ZN4pdal12OptechReaderC1Ev"
-    "-Wl,--undefined=_ZN4pdal16TerrasolidReaderD0Ev"
-    "-Wl,--undefined=_ZN4pdal9BpfReaderC1Ev"
-    "-Wl,--undefined=_ZN4pdal9LasReaderC1Ev"
-    "-Wl,--undefined=_ZN4pdal9PcdReaderC1Ev"
-    "-Wl,--undefined=_ZN4pdal9PtxReaderD0Ev"
-)
+# PDAL supports static build
+# github.com/PDAL/PDAL/pull/4996
+# but require symbols to be specificaly included on link
+if (TARGET pdalcpp)
+  get_target_property(target_type pdalcpp TYPE)
+  if (target_type STREQUAL STATIC_LIBRARY)
+    if (WIN32)
+      foreach (_pdal_driver Qfit Sbet Slpk Optech Terrasolid Bpf Las Pcd Ptx)
+        target_link_options(pdalcpp INTERFACE "??0${_pdal_driver}Reader@pdal@@QEAA@XZ")
+      endforeach ()
+    else
+      foreach (_pdal_driver 10QfitReaderC1Ev 10SbetReaderC1Ev 10SlpkReaderC1Ev 12OptechReaderC1Ev 16TerrasolidReaderD0Ev 9BpfReaderC1Ev 9LasReaderC1Ev 9PcdReaderC1Ev 9PtxReaderD0Ev)
+        if (APPLE)
+          target_link_options(pdalcpp INTERFACE "-Wl,-u,__ZN4pdal${_pdal_driver}")
+        elseif (UNIX)
+          target_link_options(pdalcpp INTERFACE "-Wl,--undefined=_ZN4pdal${_pdal_driver}")
+        endif ()
+      endforeach ()
+  endif ()
+endif ()
