@@ -31,3 +31,4 @@ TEST_DEPENDS
   VTK::IOPLY
   VTK::IOXML
   VTK::TestingCore
+  VTK::IOHDF

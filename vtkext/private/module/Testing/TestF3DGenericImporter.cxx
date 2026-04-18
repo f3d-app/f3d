@@ -2,6 +2,7 @@
 #include <vtkDataAssembly.h>
 #include <vtkDoubleArray.h>
 #include <vtkGLTFReader.h>
+#include <vtkHDFReader.h>
 #include <vtkInformation.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkMultiPieceDataSet.h>
@@ -444,11 +445,10 @@ int TestF3DGenericImporter(int argc, char* argv[])
 
   // Test time step temporal information
   {
-    vtkNew<vtkGLTFReader> reader;
-    std::string filename = std::string(argv[1]) + "data/BoxAnimated.gltf";
+    vtkNew<vtkHDFReader> reader;
+    std::string filename = std::string(argv[1]) + "data/blob.vtkhdf";
     reader->SetFileName(filename.c_str());
     reader->UpdateInformation();
-    reader->EnableAnimation(0);
 
     vtkNew<vtkF3DGenericImporter> importer;
     importer->SetInternalReader(reader);
@@ -459,7 +459,8 @@ int TestF3DGenericImporter(int argc, char* argv[])
     double timeRange[2];
     vtkNew<vtkDoubleArray> timeSteps;
 
-    bool temporalInfoExists = importer->GetTemporalInformation(0, timeRange, nbTimeSteps, timeSteps);
+    bool temporalInfoExists =
+      importer->GetTemporalInformation(0, timeRange, nbTimeSteps, timeSteps);
     if (!temporalInfoExists)
     {
       std::cerr << "Unexpected return value with GetTemporalInformation\n";

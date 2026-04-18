@@ -395,8 +395,8 @@ bool vtkF3DGenericImporter::UpdateAtTimeValue(double timeValue)
 
     size_t blockIdx = 0;
     for (iter->InitTraversal();
-      !iter->IsDoneWithTraversal() && blockIdx < this->Pimpl->Blocks.size();
-      iter->GoToNextItem(), blockIdx++)
+         !iter->IsDoneWithTraversal() && blockIdx < this->Pimpl->Blocks.size();
+         iter->GoToNextItem(), blockIdx++)
     {
       vtkDataSet* block = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
       if (block)
