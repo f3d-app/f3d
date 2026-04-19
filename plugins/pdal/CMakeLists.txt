@@ -100,8 +100,8 @@ f3d_plugin_build(
 # but require symbols to be specifically included on link
 # please note this is only tested in f3d-superbuild
 if (TARGET pdalcpp)
-  get_target_property(target_type pdalcpp TYPE)
-  if (target_type STREQUAL STATIC_LIBRARY)
+  get_target_property(_target_type pdalcpp TYPE)
+  if (_target_type STREQUAL STATIC_LIBRARY)
     if (WIN32)
       foreach (_pdal_driver Qfit Sbet Slpk Optech Terrasolid Bpf Las Pcd Ptx)
         target_link_options(pdalcpp INTERFACE "/INCLUDE:??0${_pdal_driver}Reader@pdal@@QEAA@XZ")
