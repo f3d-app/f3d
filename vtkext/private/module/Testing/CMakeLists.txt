@@ -28,6 +28,10 @@ if(F3D_MODULE_WEBP)
        TestF3DWebPMemReader.cxx)
 endif()
 
+if(TARGET VTK::IOHDF)
+  list(APPEND test_sources TestF3DGenericImporterTimeSteps.cxx)
+endif()
+
 vtk_add_test_cxx(vtkextPrivateTests tests
   NO_DATA NO_VALID NO_OUTPUT
   ${test_sources}
