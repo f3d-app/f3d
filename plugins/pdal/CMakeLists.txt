@@ -98,6 +98,7 @@ f3d_plugin_build(
 # PDAL supports static build
 # github.com/PDAL/PDAL/pull/4996
 # but require symbols to be specifically included on link
+# please note this is only tested in f3d-superbuild
 if (TARGET pdalcpp)
   get_target_property(target_type pdalcpp TYPE)
   if (target_type STREQUAL STATIC_LIBRARY)
