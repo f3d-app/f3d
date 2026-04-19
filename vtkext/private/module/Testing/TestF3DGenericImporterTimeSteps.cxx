@@ -1,9 +1,8 @@
+#include "vtkF3DGenericImporter.h"
+
 #include <vtkDoubleArray.h>
 #include <vtkHDFReader.h>
 #include <vtkNew.h>
-
-#include "vtkF3DGenericImporter.h"
-
 #include <iostream>
 
 int TestF3DGenericImporterTimeSteps(int argc, char* argv[])
