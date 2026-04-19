@@ -45,7 +45,7 @@ int TestF3DGenericImporterTimeSteps(int argc, char* argv[])
       return EXIT_FAILURE;
     }
 
-    double* timeStepsRange = timeSteps->GetRange();
+    const double* timeStepsRange = timeSteps->GetRange();
     if (timeStepsRange[0] != timeRange[0] || timeStepsRange[1] != timeRange[1])
     {
       std::cerr << "Unexpected time step range\n";
