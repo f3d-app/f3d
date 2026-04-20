@@ -1,5 +1,6 @@
 #include "vtkF3DGenericImporter.h"
 
+#include <vtkDataArrayRange.h>
 #include <vtkDoubleArray.h>
 #include <vtkHDFReader.h>
 #include <vtkNew.h>
@@ -11,7 +12,7 @@ int TestF3DGenericImporterTimeSteps(int argc, char* argv[])
   // Test time step temporal information
   {
     vtkNew<vtkHDFReader> reader;
-    std::string filename = std::string(argv[1]) + "data/blob.vtkhdf";
+    const std::string filename = std::format("{}data/blob.vtkhdf", argv[1]);
     reader->SetFileName(filename.c_str());
     reader->UpdateInformation();
 
@@ -24,7 +25,7 @@ int TestF3DGenericImporterTimeSteps(int argc, char* argv[])
     double timeRange[2];
     vtkNew<vtkDoubleArray> timeSteps;
 
-    bool temporalInfoExists =
+    const bool temporalInfoExists =
       importer->GetTemporalInformation(0, timeRange, nbTimeSteps, timeSteps);
     if (!temporalInfoExists)
     {
@@ -32,23 +33,29 @@ int TestF3DGenericImporterTimeSteps(int argc, char* argv[])
       return EXIT_FAILURE;
     }
 
-    if (nbTimeSteps < 1 || nbTimeSteps != timeSteps->GetNumberOfTuples())
+    const bool validTimeStep
     {
-      std::cerr << "Unexpected number of time steps\n";
-      return EXIT_FAILURE;
-    }
+      nbTimeSteps >= 1
+      && nbTimeSteps == timeSteps->GetNumberOfTuples()
+      && nbTimeSteps == reader->GetNumberOfSteps()
+      && nbTimeSteps == 11 // 11 timesteps in blob.vtkhdf
+    };
 
-    // 11 timesteps in blob.vtkhdf
-    if (nbTimeSteps != reader->GetNumberOfSteps() || nbTimeSteps != 11)
+    if (!validTimeStep)
     {
       std::cerr << "Unexpected time steps recovered\n";
       return EXIT_FAILURE;
     }
 
-    const double* timeStepsRange = timeSteps->GetRange();
-    if (timeStepsRange[0] != timeRange[0] || timeStepsRange[1] != timeRange[1])
+    const auto values = vtk::DataArrayValueRange(timeSteps);
+    const bool allInRange = std::ranges::all_of(values, [&](const double t)
     {
-      std::cerr << "Unexpected time step range\n";
+      return t >= timeRange[0] && t <= timeRange[1];
+    });
+
+    if (!allInRange)
+    {
+      std::cerr << "Unexpected time step in time range\n";
       return EXIT_FAILURE;
     }
   }
