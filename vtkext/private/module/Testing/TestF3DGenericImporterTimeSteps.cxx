@@ -5,6 +5,7 @@
 #include <vtkHDFReader.h>
 #include <vtkNew.h>
 
+#include <format>
 #include <iostream>
 
 int TestF3DGenericImporterTimeSteps(int argc, char* argv[])
@@ -33,12 +34,9 @@ int TestF3DGenericImporterTimeSteps(int argc, char* argv[])
       return EXIT_FAILURE;
     }
 
-    const bool validTimeStep
-    {
-      nbTimeSteps >= 1
-      && nbTimeSteps == timeSteps->GetNumberOfTuples()
-      && nbTimeSteps == reader->GetNumberOfSteps()
-      && nbTimeSteps == 11 // 11 timesteps in blob.vtkhdf
+    const bool validTimeStep{
+      nbTimeSteps >= 1 && nbTimeSteps == timeSteps->GetNumberOfTuples() &&
+      nbTimeSteps == reader->GetNumberOfSteps() && nbTimeSteps == 11 // 11 timesteps in blob.vtkhdf
     };
 
     if (!validTimeStep)
@@ -48,10 +46,8 @@ int TestF3DGenericImporterTimeSteps(int argc, char* argv[])
     }
 
     const auto values = vtk::DataArrayValueRange(timeSteps);
-    const bool allInRange = std::ranges::all_of(values, [&](const double t)
-    {
-      return t >= timeRange[0] && t <= timeRange[1];
-    });
+    const bool allInRange = std::ranges::all_of(
+      values, [&](const double t) { return t >= timeRange[0] && t <= timeRange[1]; });
 
     if (!allInRange)
     {
