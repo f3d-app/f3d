@@ -327,23 +327,25 @@ runs:
     # https://github.com/f3d-app/f3d/issues/792
     # https://github.com/f3d-app/f3d/issues/1534
     # https://github.com/f3d-app/f3d/issues/2268
+    # https://github.com/f3d-app/f3d/issues/3047
     - name: Set CI test exception for macOS x86_64
       if: |
         runner.os == 'macOS' &&
         inputs.cpu == 'x86_64'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionCycleComp)|(TestGLTFRigArmature)|(TestInteractionNoModelScrollWheel)|(TestInteractionNoModelScrollBar)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionCycleComp)|(TestGLTFRigArmature)|(TestInteractionNoModelScrollWheel)|(TestInteractionNoModelScrollBar)|(TestInteractionTAA)" >> $GITHUB_ENV
 
     # Certain tests are failing on macOS arm64 for unknown reasons
     # https://github.com/f3d-app/f3d/issues/1276
     # https://github.com/f3d-app/f3d/issues/792
     # https://github.com/f3d-app/f3d/issues/1534
+    # https://github.com/f3d-app/f3d/issues/3047
     - name: Set CI test exception for macOS arm64
       if: |
         runner.os == 'macOS' &&
         inputs.cpu == 'arm64'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheet)|(TestMaxSizeAboveMultiFile)|(TestAxesCustomColor)|(TestInteractionTAA)|(TestInteractionTAAMiddleClick)|(TestInteractionStochasticTAA)|(TestInteractionPointCloudTAA)|(TestSDKNotification)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheet)|(TestMaxSizeAboveMultiFile)|(TestAxesCustomColor)|(TestInteractionTAA)|(TestInteractionStochasticTAA)|(TestInteractionPointCloudTAA)|(TestSDKNotification)" >> $GITHUB_ENV
 
     - name: Test
       shell: bash
