@@ -23,7 +23,7 @@ int TestF3DGenericImporterTimeSteps(int argc, char* argv[])
     importer->Print(std::cout);
 
     int nbTimeSteps;
-    std::array<double, 2> timeRange;
+    std::array<double, 2> timeRange{};
     vtkNew<vtkDoubleArray> timeSteps;
 
     const bool temporalInfoExists =
