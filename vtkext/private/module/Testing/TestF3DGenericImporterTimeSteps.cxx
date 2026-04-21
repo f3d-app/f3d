@@ -23,11 +23,11 @@ int TestF3DGenericImporterTimeSteps(int argc, char* argv[])
     importer->Print(std::cout);
 
     int nbTimeSteps;
-    double timeRange[2];
+    std::array<double, 2> timeRange;
     vtkNew<vtkDoubleArray> timeSteps;
 
     const bool temporalInfoExists =
-      importer->GetTemporalInformation(0, timeRange, nbTimeSteps, timeSteps);
+      importer->GetTemporalInformation(0, timeRange.data(), nbTimeSteps, timeSteps);
     if (!temporalInfoExists)
     {
       std::cerr << "Unexpected return value with GetTemporalInformation\n";
