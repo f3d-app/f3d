@@ -13,6 +13,13 @@ vtk_add_test_cxx(vtkextTests tests
   ${F3D_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
 vtk_test_cxx_executable(vtkextTests tests)
 
+foreach(test ${vtkextTests_list})
+  get_filename_component (TName ${test} NAME_WE)
+  set_tests_properties(f3d::vtkextCxx-${TName} PROPERTIES
+          LABELS "module"
+  )
+endforeach()
+
 if(NOT ANDROID AND NOT EMSCRIPTEN AND NOT F3D_SANITIZER STREQUAL "address")
   set_target_properties(vtkextTests PROPERTIES CXX_STANDARD 20)
 endif()

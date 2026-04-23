@@ -39,6 +39,13 @@ vtk_add_test_cxx(vtkextPrivateTests tests
 vtk_test_cxx_executable(vtkextPrivateTests tests)
 set_target_properties(vtkextPrivateTests PROPERTIES CXX_STANDARD 20)
 
+foreach(test ${test_sources})
+  get_filename_component (TName ${test} NAME_WE)
+  set_tests_properties(f3d::vtkextPrivateCxx-${TName} PROPERTIES
+          LABELS "module"
+  )
+endforeach()
+
 if(UNIX)
   # On windows, the default window output message does not redirect to cout
   set_tests_properties(f3d::vtkextPrivateCxx-TestF3DLog PROPERTIES PASS_REGULAR_EXPRESSION "Test Info Test Warning Test Error\nTest Debug Test Info Test Warning Test Error\nTest Warning Test Error\nTest Error\nTest Info Coloring Test Warning Coloring Test Error Coloring\n")
