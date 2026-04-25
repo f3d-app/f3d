@@ -290,7 +290,12 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
 
   ImGui::Begin("Console", nullptr, winFlags);
 
-  if (ImGui::Button("Copy to Console"))
+  // Align Right
+  float buttonWidth = ImGui::CalcTextSize("Copy to Clipboard").x + ImGui::GetStyle().FramePadding.x * 2.f;
+  float widthNeeded = buttonWidth + ImGui::GetStyle().ItemSpacing.x;
+  ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - widthNeeded);
+
+  if (ImGui::Button("Copy to Clipboard"))
   {
     std::string cumulative;
 
