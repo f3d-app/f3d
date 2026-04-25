@@ -9,10 +9,12 @@
 #include <vtkObjectFactory.h>
 
 #include <imgui.h>
+#include <clip.h>
 
 #include <algorithm>
 #include <array>
 #include <cstdint>
+#include <iostream>
 
 struct vtkF3DImguiConsole::Internals
 {
@@ -287,6 +289,20 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
   }
 
   ImGui::Begin("Console", nullptr, winFlags);
+
+  if (ImGui::Button("Copy to Console")){
+    std::string logRes;
+
+    for (const auto& logPair : this->Pimpl->Logs){
+      logRes += logPair.second + "\n";
+    }
+
+    if (!logRes.empty() && logRes[logRes.size()-1] == '\n'){
+      logRes = logRes.substr(0, logRes.size()-1);
+    }
+
+    clip::set_text(logRes);
+  }
 
   // Log window, will only show if not in minimal mode
   if (!minimal)
