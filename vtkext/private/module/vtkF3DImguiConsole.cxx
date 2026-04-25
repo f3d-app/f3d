@@ -8,8 +8,8 @@
 #include <vtkNew.h>
 #include <vtkObjectFactory.h>
 
-#include <imgui.h>
 #include <clip.h>
+#include <imgui.h>
 
 #include <algorithm>
 #include <array>
@@ -290,15 +290,18 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
 
   ImGui::Begin("Console", nullptr, winFlags);
 
-  if (ImGui::Button("Copy to Console")){
+  if (ImGui::Button("Copy to Console"))
+  {
     std::string logRes;
 
-    for (const auto& logPair : this->Pimpl->Logs){
+    for (const auto& logPair : this->Pimpl->Logs)
+    {
       logRes += logPair.second + "\n";
     }
 
-    if (!logRes.empty() && logRes[logRes.size()-1] == '\n'){
-      logRes = logRes.substr(0, logRes.size()-1);
+    if (!logRes.empty() && logRes[logRes.size() - 1] == '\n')
+    {
+      logRes = logRes.substr(0, logRes.size() - 1);
     }
 
     clip::set_text(logRes);
