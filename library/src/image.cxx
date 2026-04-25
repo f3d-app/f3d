@@ -242,8 +242,7 @@ image::image(std::byte* buffer, std::size_t size)
   for (availableReaders->InitTraversal(iterator);
     (currentReader = availableReaders->GetNextImageReader2(iterator));)
   {
-    int score = currentReader->CanReadFile(stream);
-    if (score > 0)
+    if (currentReader->CanReadFile(stream) > 0)
     {
       bestReader = currentReader;
       bestScore = score;
