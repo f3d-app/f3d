@@ -292,19 +292,19 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
 
   if (ImGui::Button("Copy to Console"))
   {
-    std::string logRes;
+    std::string cumulative;
 
-    for (const auto& logPair : this->Pimpl->Logs)
+    for (const auto& [severity, msg] : this->Pimpl->Logs)
     {
-      logRes += logPair.second + "\n";
+      cumulative += msg + "\n";
     }
 
-    if (!logRes.empty() && logRes[logRes.size() - 1] == '\n')
+    if (!cumulative.empty() && cumulative[cumulative.size() - 1] == '\n')
     {
-      logRes = logRes.substr(0, logRes.size() - 1);
+      cumulative = cumulative.substr(0, cumulative.size() - 1);
     }
 
-    clip::set_text(logRes);
+    clip::set_text(cumulative);
   }
 
   // Log window, will only show if not in minimal mode
