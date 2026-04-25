@@ -59,7 +59,7 @@ public:
 
   /**
    * Read provided buffer into a new image instance, the following formats are
-   * supported: PNG, PNM , BMP, HDR, JPEG, TGA. EXR files are also
+   * supported: PNG, PNM , BMP, HDR, JPEG, TGA, WebP. EXR files are also
    * supported if the associated module is built. The complete list can be retrieved at runtime by
    * calling getSupportedFormats().
    * 
