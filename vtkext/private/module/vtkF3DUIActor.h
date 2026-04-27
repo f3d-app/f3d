@@ -8,8 +8,8 @@
 #ifndef vtkF3DUIActor_h
 #define vtkF3DUIActor_h
 
+#include <F3DStyle.h>
 #include <vtkProp.h>
-
 #include <array>
 #include <chrono>
 #include <cstdint>
