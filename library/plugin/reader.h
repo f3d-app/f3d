@@ -6,6 +6,8 @@
 #include <vtkImporter.h>
 #include <vtkSmartPointer.h>
 
+#include "../public/reader_types.h"
+
 #include <algorithm>
 #include <cctype>
 #include <map>
@@ -63,29 +65,43 @@ public:
    */
   virtual const std::vector<std::string> getMimeTypes() const = 0;
 
+  enum class file_availability : std::uint8_t
+  {
+    AVAILABLE = 1,
+    UNSUPPORTED_EXSTENSION = 2,
+    UNSUPPORTED_CONTENT = 3,
+  };
+
   /**
    * Check if this reader can read the given filename - according to its extension and file content
    */
-  virtual bool canRead(const std::string& fileName) const
+  virtual bool canRead(
+    const std::string& fileName, reader_types::file_availability& availability) const
   {
     std::string ext = fileName.substr(fileName.find_last_of(".") + 1);
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
     const std::vector<std::string>& extensions = this->getExtensions();
 
-    if (!std::any_of(
+    if (std::any_of(
           extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; }))
     {
+      vtkNew<vtkFileResourceStream> stream;
+      if (stream->Open(fileName.c_str()))
+      {
+        if (this->canRead(stream))
+        {
+          availability = reader_types::file_availability::AVAILABLE;
+          return true;
+        }
+      }
+      availability = reader_types::file_availability::UNSUPPORTED_CONTENT;
       return false;
     }
-
-    vtkNew<vtkFileResourceStream> stream;
-    if (!stream->Open(fileName.c_str()))
+    else
     {
       return false;
     }
-
-    return this->canRead(stream);
   }
 
   /**
