@@ -1,5 +1,6 @@
-on: issue_comment:
-  types: [created]
+on:
+  issue_comment:
+    types: created
 name: Labelize
 jobs:
   #----------------------------------------------------------------------------
