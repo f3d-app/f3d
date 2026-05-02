@@ -3,6 +3,7 @@
 
 #include "exception.h"
 #include "export.h"
+#include "reader_types.h"
 #include "types.h"
 
 /// @cond
@@ -146,7 +147,8 @@ public:
    * scene.force_reader is taken into account and plugin should be loaded for their readers to be
    * found.
    */
-  [[nodiscard]] virtual bool supports(const std::filesystem::path& filePath) = 0;
+  [[nodiscard]] virtual reader_types::file_availability supports(
+    const std::filesystem::path& filePath) = 0;
 
   /**
    * Load added files at provided time value if they contain any animation
