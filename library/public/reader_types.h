@@ -1,5 +1,5 @@
-#ifndef f3d_file_availability_h
-#define f3d_file_availability_h
+#ifndef f3d_reader_types_h
+#define f3d_reader_types_h
 
 namespace f3d
 {
