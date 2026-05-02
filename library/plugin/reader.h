@@ -65,13 +65,6 @@ public:
    */
   virtual const std::vector<std::string> getMimeTypes() const = 0;
 
-  enum class file_availability : std::uint8_t
-  {
-    AVAILABLE = 1,
-    UNSUPPORTED_EXSTENSION = 2,
-    UNSUPPORTED_CONTENT = 3,
-  };
-
   /**
    * Check if this reader can read the given filename - according to its extension and file content
    */
