@@ -44,7 +44,7 @@ public:
   scene& updateLight(int index, const light_state_t& lightState) override;
   scene& removeLight(int index) override;
   scene& removeAllLights() override;
-  bool supports(const std::filesystem::path& filePath) override;
+  reader_types::file_availability supports(const std::filesystem::path& filePath) override;
   scene& loadAnimationTime(double timeValue) override;
   std::pair<double, double> animationTimeRange() override;
   std::vector<double> getAnimationKeyFrames() override;

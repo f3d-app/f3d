@@ -1667,11 +1667,12 @@ void F3DStarter::LoadFileGroupInternal(
 
         try
         {
+          f3d::reader_types::file_availability availability = scene.supports(tmpPath);
           if (!fs::exists(tmpPath))
           {
             f3d::log::error(tmpPath.string(), " does not exist");
           }
-          else if (scene.supports(tmpPath))
+          else if (availability == f3d::reader_types::file_availability::AVAILABLE)
           {
             // Check the size of the file before loading it
             static constexpr int BYTES_IN_MIB = 1048576;
@@ -1687,7 +1688,7 @@ void F3DStarter::LoadFileGroupInternal(
               localPaths.emplace_back(tmpPath);
             }
           }
-          else
+          else if (availability == f3d::reader_types::file_availability::UNSUPPORTED_EXSTENSION)
           {
             auto forceReader = this->Internals->LibOptions.scene.force_reader;
             if (forceReader)
@@ -1697,7 +1698,22 @@ void F3DStarter::LoadFileGroupInternal(
             else
             {
               f3d::log::warn(tmpPath.string(),
-                " is of an unknown format or contains unsupported contents, use "
+                " is of an unknown format, use "
+                "--force-reader to select a specific reader");
+            }
+            unsupported = true;
+          }
+          else if (availability == f3d::reader_types::file_availability::UNSUPPORTED_CONTENT)
+          {
+            auto forceReader = this->Internals->LibOptions.scene.force_reader;
+            if (forceReader)
+            {
+              f3d::log::warn("Forced reader ", *forceReader, " doesn't exist");
+            }
+            else
+            {
+              f3d::log::warn(tmpPath.string(),
+                " contains unsupported contents, use "
                 "--force-reader to select a specific reader");
             }
             unsupported = true;
@@ -1822,7 +1838,7 @@ void F3DStarter::LoadFileGroupInternal(
 
     // Unwatch and erase paths that should not be watched anymore
     for (auto it = this->Internals->FolderWatchIds.begin();
-         it != this->Internals->FolderWatchIds.end();)
+      it != this->Internals->FolderWatchIds.end();)
     {
       const fs::path& path = it->first;
       const dmon_watch_id& dmonId = it->second;
@@ -2307,7 +2323,8 @@ void F3DStarter::AddCommands()
 
   interactor.addCommand(
     "load_next_file_group",
-    [this](const std::vector<std::string>& args) {
+    [this](const std::vector<std::string>& args)
+    {
       this->LoadRelativeFileGroup(
         +1, parse_optional_bool_flag(args, "load_next_file_group", false));
     },
