@@ -23,6 +23,7 @@ jobs:
       - name: Analyze comment
         shell: bash
         run: |
+          echo "${{github.event.comment.body}}"
           label="${{github.event.comment.body}}"
           label=${label#* }
           label=${label%% *}
