@@ -21,10 +21,12 @@ jobs:
       # Extract the second word
       # Sanitize it
       - name: Analyze comment
+        env:
+          COMMENT: ${{github.event.comment.body}}
         shell: bash
         run: |
-          echo "${{github.event.comment.body}}"
-          label="${{github.event.comment.body}}"
+          echo "$TITLE"
+          label="$TITLE"
           label=${label#* }
           label=${label%% *}
           label=${label//[^a-z-]/}
