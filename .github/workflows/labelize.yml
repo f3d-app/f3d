@@ -25,8 +25,8 @@ jobs:
           COMMENT: ${{github.event.comment.body}}
         shell: bash
         run: |
-          echo "$TITLE"
-          label="$TITLE"
+          echo "$COMMENT"
+          label="$COMMENT"
           label=${label#* }
           label=${label%% *}
           label=${label//[^a-z-]/}
