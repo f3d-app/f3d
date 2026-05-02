@@ -17,15 +17,22 @@ jobs:
       GH_TOKEN: ${{ secrets.F3D_CI_LABEL }}
 
     steps:
+
+      - name: Injection check
+        if: ${{contains(github.event.comment.body, '$')}}
+        shell: bash
+        run: exit 1
+
       # Remove the first word
       # Extract the second word
       # Sanitize it
+      # Using an env var is a way to ensure user input is not an injection
+      # https://securitylab.github.com/resources/github-actions-untrusted-input/
       - name: Analyze comment
         env:
           COMMENT: ${{github.event.comment.body}}
         shell: bash
         run: |
-          echo "$COMMENT"
           label="$COMMENT"
           label=${label#* }
           label=${label%% *}
@@ -55,7 +62,4 @@ jobs:
         if: failure()
         uses: GrantBirki/comment@v2.1.1
         with:
-          body: |
-            > ${{github.event.comment.body}}
-
-            ❌ Invalid CI command "${{env.F3D_LABEL_COMMENT}}"
+          body: ❌ Invalid CI command "${{env.F3D_LABEL_COMMENT}}"
