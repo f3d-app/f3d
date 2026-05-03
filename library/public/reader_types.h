@@ -1,6 +1,8 @@
 #ifndef f3d_reader_types_h
 #define f3d_reader_types_h
 
+#include <cstdint>
+
 namespace f3d
 {
 namespace reader_types
