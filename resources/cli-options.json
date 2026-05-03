@@ -56,15 +56,13 @@
         },
         {
           "longName": "list-bindings",
-          "helpText":
-            "Print the list of interaction bindings and exits, ignored with `--no-render`, only considers the first file group.",
+          "helpText": "Print the list of interaction bindings and exits, ignored with `--no-render`, only considers the first file group.",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
         {
           "longName": "config",
-          "helpText":
-            "Specify the configuration file to use. absolute/relative path or filename/filestem to search in configuration file locations",
+          "helpText": "Specify the configuration file to use. absolute/relative path or filename/filestem to search in configuration file locations",
           "valueHelper": "<filePath/filename/fileStem>"
         },
         {
@@ -75,8 +73,7 @@
         },
         {
           "longName": "no-render",
-          "helpText":
-            "Do not render anything and quit right after loading the first file, use with --verbose to recover information about a file.",
+          "helpText": "Do not render anything and quit right after loading the first file, use with --verbose to recover information about a file.",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
@@ -102,16 +99,14 @@
         },
         {
           "longName": "watch",
-          "helpText":
-            "Watch current file and automatically reload it whenever it is modified on disk",
+          "helpText": "Watch current file and automatically reload it whenever it is modified on disk",
           "valueHelper": "<bool>",
           "implicitValue": "1",
           "conditional": "F3D_MODULE_DMON"
         },
         {
           "longName": "frame-rate",
-          "helpText":
-            "Frame rate used to refresh animation and other repeated tasks (watch, UI). Does not impact rendering frame rate.",
+          "helpText": "Frame rate used to refresh animation and other repeated tasks (watch, UI). Does not impact rendering frame rate.",
           "valueHelper": "<fps>"
         },
         {
@@ -121,8 +116,7 @@
         },
         {
           "longName": "scan-plugins",
-          "helpText":
-            "Scan standard directories for plugins and display available plugins (result can be incomplete)"
+          "helpText": "Scan standard directories for plugins and display available plugins (result can be incomplete)"
         },
         {
           "longName": "screenshot-filename",
@@ -136,8 +130,7 @@
       "options": [
         {
           "longName": "verbose",
-          "helpText":
-            "Set verbose level, providing more information about the loaded data in the console output",
+          "helpText": "Set verbose level, providing more information about the loaded data in the console output",
           "valueHelper": "{debug, info, warning, error, quiet}",
           "implicitValue": "debug"
         },
@@ -155,14 +148,12 @@
         },
         {
           "longName": "multi-file-mode",
-          "helpText":
-            "Choose the behavior when opening multiple files. \"single\" will show one file at a time, \"all\" will show all files in a single scene, \"dir\" will show files from the same directory in the same scene.",
+          "helpText": "Choose the behavior when opening multiple files. \"single\" will show one file at a time, \"all\" will show all files in a single scene, \"dir\" will show files from the same directory in the same scene.",
           "valueHelper": "<single|all|dir>"
         },
         {
           "longName": "multi-file-regex",
-          "helpText":
-            "Regular expression pattern to group files. Captured groups are replaced with \"*\" so that, for example, the pattern \"part(\\d+)\" would group files \"foo-part1.xyz\" and \"foo-part2.xyz\" together as \"foo-part*.xyz\"",
+          "helpText": "Regular expression pattern to group files. Captured groups are replaced with \"*\" so that, for example, the pattern \"part(\\d+)\" would group files \"foo-part1.xyz\" and \"foo-part2.xyz\" together as \"foo-part*.xyz\"",
           "valueHelper": "<regex>"
         },
         {
@@ -265,8 +256,7 @@
         },
         {
           "longName": "interaction-trackball",
-          "helpText":
-            "Enable trackball interaction (deprecated, use --interaction-style=trackball)",
+          "helpText": "Enable trackball interaction (deprecated, use --interaction-style=trackball)",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
@@ -347,8 +337,7 @@
         {
           "longName": "point-sprites",
           "shortName": "o",
-          "helpText":
-            "Select point sprites type (\"none\", \"sphere\", \"gaussian\", \"circle\", \"stddev\", \"bound\")",
+          "helpText": "Select point sprites type (\"none\", \"sphere\", \"gaussian\", \"circle\", \"stddev\", \"bound\")",
           "valueHelper": "<string>",
           "implicitValue": "sphere"
         },
@@ -439,8 +428,7 @@
         },
         {
           "longName": "texture-material",
-          "helpText":
-            "Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object",
+          "helpText": "Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object",
           "valueHelper": "<file path>"
         },
         {
@@ -455,8 +443,7 @@
         },
         {
           "longName": "emissive-factor",
-          "helpText":
-            "Emissive factor. This value is multiplied with the emissive color when an emissive texture is present",
+          "helpText": "Emissive factor. This value is multiplied with the emissive color when an emissive texture is present",
           "valueHelper": "<color>"
         },
         {
@@ -472,8 +459,7 @@
         },
         {
           "longName": "normal-scale",
-          "helpText":
-            "Normal scale affects the strength of the normal deviation from the normal texture",
+          "helpText": "Normal scale affects the strength of the normal deviation from the normal texture",
           "valueHelper": "<normalScale>"
         },
         {
@@ -578,8 +564,7 @@
         {
           "longName": "coloring-component",
           "shortName": "y",
-          "helpText":
-            "Component from the array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars",
+          "helpText": "Component from the array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars",
           "valueHelper": "<comp_index>",
           "implicitValue": "-2"
         },
@@ -725,8 +710,7 @@
         {
           "longName": "blending",
           "shortName": "p",
-          "helpText":
-            "Select translucency blending mode (\"none\", \"ddp\", \"sort\", \"sort_cpu\" or \"stochastic\")",
+          "helpText": "Select translucency blending mode (\"none\", \"ddp\", \"sort\", \"sort_cpu\" or \"stochastic\")",
           "valueHelper": "<string>",
           "implicitValue": "ddp"
         },
@@ -739,8 +723,7 @@
         {
           "longName": "ambient-occlusion",
           "shortName": "q",
-          "helpText":
-            "Enable ambient occlusion providing approximate shadows for better depth perception, implemented using SSAO",
+          "helpText": "Enable ambient occlusion providing approximate shadows for better depth perception, implemented using SSAO",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
@@ -771,8 +754,7 @@
         },
         {
           "longName": "display-depth",
-          "helpText":
-            "Display depth buffer as grayscale image or with a colormap if \"--scalar-coloring\" is specified",
+          "helpText": "Display depth buffer as grayscale image or with a colormap if \"--scalar-coloring\" is specified",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         }
@@ -798,8 +780,7 @@
         },
         {
           "longName": "interaction-test-play",
-          "helpText":
-            "Path to an interaction log file to play interaction events from when loading a file",
+          "helpText": "Path to an interaction log file to play interaction events from when loading a file",
           "valueHelper": "<file_path>"
         }
       ]
