@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cctype>
 #include <map>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -68,8 +69,8 @@ public:
   /**
    * Check if this reader can read the given filename - according to its extension and file content
    */
-  virtual bool canRead(
-    const std::string& fileName, reader_types::file_availability& availability) const
+  virtual bool canRead(const std::string& fileName, const std::optional<bool> skipContentCheck,
+    reader_types::file_availability& availability) const
   {
     std::string ext = fileName.substr(fileName.find_last_of(".") + 1);
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
@@ -80,7 +81,12 @@ public:
           extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; }))
     {
       vtkNew<vtkFileResourceStream> stream;
-      if (stream->Open(fileName.c_str()))
+      if (skipContentCheck.has_value() && skipContentCheck.value() == true)
+      {
+        availability = reader_types::file_availability::AVAILABLE;
+        return true;
+      }
+      else if (stream->Open(fileName.c_str()))
       {
         if (this->canRead(stream))
         {
@@ -89,12 +95,8 @@ public:
         }
       }
       availability = reader_types::file_availability::UNSUPPORTED_CONTENT;
-      return false;
     }
-    else
-    {
-      return false;
-    }
+    return false;
   }
 
   /**
