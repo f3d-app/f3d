@@ -776,6 +776,6 @@ if(F3D_MODULE_UI)
   # Require improved importer support https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11303
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240910)
     f3d_test(NAME TestFPSWithBadge DATA invalid_body.vtp ARGS -z --font-scale=0.35
-      --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf NO_DATA_FORCE_RENDER UI NO_BASELINE)
+      --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf NO_DATA_FORCE_RENDER UI THRESHOLD 0.2)
   endif()
 endif()
