@@ -2463,12 +2463,9 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 {
   assert(this->Importer);
 
-  const double* surfaceColor = nullptr;
-  if (this->SurfaceColor.has_value())
-  {
-    assert(this->SurfaceColor->size() == 3);
-    surfaceColor = this->SurfaceColor->data();
-  }
+  std::array<double, 3> defaultSurfaceColor = { 0.65, 0.65, 0.65 };
+  const double* surfaceColor =
+    this->SurfaceColor.has_value() ? this->SurfaceColor->data() : defaultSurfaceColor.data();
 
   const double* emissiveFactor = nullptr;
   if (this->EmissiveFactor.has_value())
@@ -2524,15 +2521,14 @@ void vtkF3DRenderer::ConfigureActorsProperties()
       coloring.OriginalActor->GetProperty()->SetBackfaceCulling(backfaceCulling);
     }
 
-    if (surfaceColor)
-    {
-      double linearColor[3];
-      linearColor[0] = std::pow(surfaceColor[0], 2.2);
-      linearColor[1] = std::pow(surfaceColor[1], 2.2);
-      linearColor[2] = std::pow(surfaceColor[2], 2.2);
-      coloring.Actor->GetProperty()->SetColor(linearColor);
-      coloring.OriginalActor->GetProperty()->SetColor(linearColor);
-    }
+  {
+    double linearColor[3];
+    linearColor[0] = std::pow(surfaceColor[0], 2.2);
+    linearColor[1] = std::pow(surfaceColor[1], 2.2);
+    linearColor[2] = std::pow(surfaceColor[2], 2.2);
+    coloring.Actor->GetProperty()->SetColor(linearColor);
+    coloring.OriginalActor->GetProperty()->SetColor(linearColor);
+  }
 
     if (this->Opacity.has_value())
     {
