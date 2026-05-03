@@ -60,7 +60,7 @@ F3D uses [GitLab Flow](https://about.gitlab.com/topics/version-control/what-is-g
 - When it is ready for review or when you want to [run the CI](#continuous-integration), undraft your pull request, and make sure to check the needed checkboxes in the description.
 - To ask for a review or if you need help with CI, use the review system of github to request a review from [the maintainers](doc/dev/12-MAINTAINERS_AND_CONTRIBUTORS.md#maintainers).
 - You can also tag maintainers on github or [discord](#discord-usage) to ask for help and review.
-- Your PR will then be reviewed by maintainers and returning contributors, please take their feedback into account and resolve discussions when adresssed.
+- Your PR will then be reviewed by maintainers and returning contributors, please take their feedback into account and resolve discussions when addressed.
 - In general, do not merge with `master`, even if github suggest you to do so.
 - In general, there is no need to rebase with `master` but doing so is a good practice when pushing new changes.
 - Once the PR is approved and CI comes back clean, a maintainer will merge your pull request in the master branch.
