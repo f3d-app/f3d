@@ -290,7 +290,8 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
   ImGui::Begin("Console", nullptr, winFlags);
 
   // Align Right
-  float buttonWidth = ImGui::CalcTextSize("Copy to Clipboard").x + ImGui::GetStyle().FramePadding.x * 2.f;
+  float buttonWidth =
+    ImGui::CalcTextSize("Copy to Clipboard").x + ImGui::GetStyle().FramePadding.x * 2.f;
   float widthNeeded = buttonWidth + ImGui::GetStyle().ItemSpacing.x;
   ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - widthNeeded);
 
