@@ -971,7 +971,27 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
 
     double orientation[3];
     vtkTransform::GetOrientation(orientation, upMatrixInv);
-    const vtkBoundingBox bbox = this->ComputeVisiblePropOrientedBounds(upMatrix);
+
+    const vtkBoundingBox& importerBbox = this->Importer->GetGeometryBoundingBox();
+    vtkBoundingBox bbox;
+    if (importerBbox.IsValid())
+    {
+      double bnds[6];
+      importerBbox.GetBounds(bnds);
+      const double corners[8][3] = {
+        { bnds[0], bnds[2], bnds[4] }, { bnds[1], bnds[2], bnds[4] },
+        { bnds[0], bnds[3], bnds[4] }, { bnds[1], bnds[3], bnds[4] },
+        { bnds[0], bnds[2], bnds[5] }, { bnds[1], bnds[2], bnds[5] },
+        { bnds[0], bnds[3], bnds[5] }, { bnds[1], bnds[3], bnds[5] }
+      };
+      for (int i = 0; i < 8; ++i)
+      {
+        double p[4] = { corners[i][0], corners[i][1], corners[i][2], 1.0 };
+        double q[4];
+        upMatrix->MultiplyPoint(p, q);
+        bbox.AddPoint(q[0], q[1], q[2]);
+      }
+    }
 
     if (!bbox.IsValid())
     {
@@ -1080,23 +1100,11 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
   {
     if (prop->GetVisibility() && prop->GetUseBounds())
     {
-      vtkProp3D* prop3d = vtkProp3D::SafeDownCast(prop);
-      if (prop3d)
+      const double* bounds = prop->GetBounds();
+      if (bounds != nullptr && vtkMath::AreBoundsInitialized(bounds))
       {
-        if (vtkActor* actor = vtkActor::SafeDownCast(prop3d))
-        {
-          if (vtkMapper* mapper = actor->GetMapper())
-          {
-            if (vtkAlgorithm* alg = mapper->GetInputAlgorithm())
-            {
-              alg->UpdateWholeExtent();
-            }
-            mapper->Update();
-          }
-        }
-
-        const double* bounds = prop3d->GetBounds();
-        if (bounds != nullptr && vtkMath::AreBoundsInitialized(bounds))
+        vtkProp3D* prop3d = vtkProp3D::SafeDownCast(prop);
+        if (prop3d)
         {
           if (isAxisAligned)
           {
