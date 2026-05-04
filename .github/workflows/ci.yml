@@ -1094,7 +1094,6 @@ jobs:
       - cache_vtk_dependency_linux
       - cache_dependencies_windows
       - cache_dependencies_macos_arm
-      - cache_dependencies_macos_intel
       - default_versions
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -1102,7 +1101,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-15, macos-15-intel]
+        os: [ubuntu-22.04, windows-latest, macos-15]
         python_version: ["3.14"]
         include:
           - os: ubuntu-22.04
