@@ -61,6 +61,7 @@
 #include <vtkShaderProperty.h>
 #include <vtkSkybox.h>
 #include <vtkSphericalHarmonics.h>
+#include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkTable.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
@@ -314,6 +315,10 @@ void vtkF3DRenderer::Initialize()
 #endif
 
   this->GridConfigured = false;
+  this->GridAxesConfigured = false;
+  this->UpDirectionConfigured = false;
+  this->AxesActorConfigured = false;
+  this->PointSpritesConfigured = false;
   this->CheatSheetConfigured = false;
   this->ActorsPropertiesConfigured = false;
   this->RenderPassesConfigured = false;
@@ -1076,11 +1081,29 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
   {
     if (prop->GetVisibility() && prop->GetUseBounds())
     {
-      const double* bounds = prop->GetBounds();
-      if (bounds != nullptr && vtkMath::AreBoundsInitialized(bounds))
+      vtkProp3D* prop3d = vtkProp3D::SafeDownCast(prop);
+      if (prop3d)
       {
-        vtkProp3D* prop3d = vtkProp3D::SafeDownCast(prop);
-        if (prop3d)
+        if (vtkActor* actor = vtkActor::SafeDownCast(prop3d))
+        {
+          if (vtkMapper* mapper = actor->GetMapper())
+          {
+            if (vtkAlgorithm* alg = mapper->GetInputAlgorithm())
+            {
+              alg->UpdateInformation();
+              if (vtkStreamingDemandDrivenPipeline* sddp =
+                    vtkStreamingDemandDrivenPipeline::SafeDownCast(alg->GetExecutive()))
+              {
+                sddp->SetUpdateExtentToWholeExtent(0);
+              }
+              alg->Update();
+            }
+            mapper->Update();
+          }
+        }
+
+        const double* bounds = prop3d->GetBounds();
+        if (bounds != nullptr && vtkMath::AreBoundsInitialized(bounds))
         {
           if (isAxisAligned)
           {
@@ -2096,6 +2119,16 @@ void vtkF3DRenderer::UpdateActors()
     this->GridConfigured = false;
     this->GridAxesConfigured = false;
     this->MetaDataConfigured = false;
+    this->PointSpritesConfigured = false;
+    this->ColoringConfigured = false;
+    this->ColoringMappersConfigured = false;
+    this->ColoringPointSpritesMappersConfigured = false;
+    this->VolumePropsAndMappersConfigured = false;
+    this->ColorTransferFunctionConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
+    this->ScalarBarActorConfigured = false;
+    this->NormalGlyphsConfigured = false;
+    this->TextActorsConfigured = false;
   }
   this->ImporterTimeStamp = importerMTime;
 
