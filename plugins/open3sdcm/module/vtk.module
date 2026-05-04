@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VTKModule name="vtkF3DOpen3SDCMReader">
+  <Description>
+    VTK reader for 3Shape DCM files using Open3SDCM library
+  </Description>
+  <Dependencies>
+    <Depends name="vtkIOGeometry" />
+    <Depends name="vtkCommonDataModel" />
+    <Depends name="vtkCommonCore" />
+  </Dependencies>
+  <Headers>
+    <Header name="vtkF3DOpen3SDCMReader.h" />
+  </Headers>
+  <Sources>
+    <Source name="vtkF3DOpen3SDCMReader.cxx" />
+  </Sources>
+  <CxxFlags>
+    <CxxFlag name="-std=c++20" />
+  </CxxFlags>
+</VTKModule>
