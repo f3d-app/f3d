@@ -61,7 +61,6 @@
 #include <vtkShaderProperty.h>
 #include <vtkSkybox.h>
 #include <vtkSphericalHarmonics.h>
-#include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkTable.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
@@ -1090,13 +1089,7 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
           {
             if (vtkAlgorithm* alg = mapper->GetInputAlgorithm())
             {
-              alg->UpdateInformation();
-              if (vtkStreamingDemandDrivenPipeline* sddp =
-                    vtkStreamingDemandDrivenPipeline::SafeDownCast(alg->GetExecutive()))
-              {
-                sddp->SetUpdateExtentToWholeExtent(0);
-              }
-              alg->Update();
+              alg->UpdateWholeExtent();
             }
             mapper->Update();
           }
