@@ -222,5 +222,5 @@ runs:
     # Qt6 tests only supported on windows for now https://github.com/f3d-app/f3d/issues/2670
     - name: Test wheel
       shell: bash
-      working-directory: ${{github.workspace}}/source/python/testing
+      working-directory: ${{github.workspace}}/source
       run: python -m pytest ${{ runner.os != 'Windows' && '-k "not test_minimal_qt6 and not test_minimal_qml"' || null }}

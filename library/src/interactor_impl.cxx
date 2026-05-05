@@ -600,6 +600,7 @@ public:
     }
     this->VTKInteractor->RemoveObserver(this->EventLoopObserverId);
     this->VTKInteractor->DestroyTimer(this->EventLoopTimerId);
+    this->EventLoopUserCallBack = nullptr;
     this->EventLoopObserverId = -1;
     this->EventLoopTimerId = 0;
     return true;
