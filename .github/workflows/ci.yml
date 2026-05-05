@@ -263,7 +263,7 @@ jobs:
           - webp_version: ${{needs.default_versions.outputs.webp_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
@@ -603,7 +603,7 @@ jobs:
           - vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             static_label: static
 
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
@@ -1101,7 +1101,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-15]
+        os: [ubuntu-22.04, windows-2022, macos-15]
         python_version: ["3.14"]
         include:
           - os: ubuntu-22.04
