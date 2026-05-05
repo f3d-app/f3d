@@ -39,7 +39,8 @@ int main(int argc, char** argv)
     try
     {
       int timeout = std::stoi(argv[2]);
-      inter.start(timeout, [&inter]() { inter.stop(); });
+      inter.setEventLoopUserCallBack([&inter](f3d::interactor_state_t) { inter.stop(); });
+      inter.start(timeout);
     }
     catch (const std::exception& e)
     {

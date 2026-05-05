@@ -20,7 +20,11 @@ int TestSDKSceneFromMemory([[maybe_unused]] int argc, [[maybe_unused]] char* arg
 
   // Add mesh with invalid number of points
   test.expect<f3d::scene::load_failure_exception>("add mesh with invalid number of points", [&]() {
-    sce.add(f3d::mesh_t{ { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f }, {}, {}, { 3 }, { 0, 1, 2 } });
+    sce.add(f3d::mesh_t{ .points = { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f },
+      .normals = {},
+      .texture_coordinates = {},
+      .face_sides = { 3 },
+      .face_indices = { 0, 1, 2 } });
   });
 
   // Add mesh with empty points
@@ -30,34 +34,48 @@ int TestSDKSceneFromMemory([[maybe_unused]] int argc, [[maybe_unused]] char* arg
   // Add mesh with invalid number of cell indices
   test.expect<f3d::scene::load_failure_exception>(
     "add mesh with invalid number of cell indices", [&]() {
-      sce.add(f3d::mesh_t{
-        { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f }, {}, {}, { 3 }, { 0, 1, 2, 3 } });
+      sce.add(f3d::mesh_t{ .points = { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f },
+        .normals = {},
+        .texture_coordinates = {},
+        .face_sides = { 3 },
+        .face_indices = { 0, 1, 2, 3 } });
     });
 
   // Add mesh with invalid vertex index
   test.expect<f3d::scene::load_failure_exception>("add mesh with invalid vertex index", [&]() {
-    sce.add(
-      f3d::mesh_t{ { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f }, {}, {}, { 3 }, { 0, 1, 4 } });
+    sce.add(f3d::mesh_t{ .points = { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f },
+      .normals = {},
+      .texture_coordinates = {},
+      .face_sides = { 3 },
+      .face_indices = { 0, 1, 4 } });
   });
 
   // Add mesh with invalid normals
   test.expect<f3d::scene::load_failure_exception>("add mesh with invalid normals", [&]() {
-    sce.add(f3d::mesh_t{
-      { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f }, { 1.f }, {}, { 3 }, { 0, 1, 2, 4 } });
+    sce.add(f3d::mesh_t{ .points = { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f },
+      .normals = { 1.f },
+      .texture_coordinates = {},
+      .face_sides = { 3 },
+      .face_indices = { 0, 1, 2, 4 } });
   });
 
   // Add mesh with invalid texture coordinates
   test.expect<f3d::scene::load_failure_exception>(
     "add mesh with invalid texture coordinates", [&]() {
-      sce.add(f3d::mesh_t{
-        { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f }, {}, { 1.f }, { 3 }, { 0, 1, 2, 4 } });
+      sce.add(f3d::mesh_t{ .points = { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f },
+        .normals = {},
+        .texture_coordinates = { 1.f },
+        .face_sides = { 3 },
+        .face_indices = { 0, 1, 2, 4 } });
     });
 
   // Add mesh from memory and render it
   test("add mesh from memory", [&]() {
-    sce.add(f3d::mesh_t{ { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f, 1.f, 0.f },
-      { 0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f },
-      { 0.f, 0.f, 0.f, 1.f, 1.f, 0.f, 1.f, 1.f }, { 3, 3 }, { 0, 1, 2, 1, 3, 2 } });
+    sce.add(f3d::mesh_t{ .points = { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f, 1.f, 0.f },
+      .normals = { 0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f },
+      .texture_coordinates = { 0.f, 0.f, 0.f, 1.f, 1.f, 0.f, 1.f, 1.f },
+      .face_sides = { 3, 3 },
+      .face_indices = { 0, 1, 2, 1, 3, 2 } });
   });
 
   // Render test

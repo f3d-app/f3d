@@ -104,7 +104,7 @@ public:
    */
   int GetAnimationDirection() const
   {
-    return AnimationDirection;
+    return this->AnimationDirection;
   }
 
   /**
@@ -112,7 +112,15 @@ public:
    */
   bool IsPlaying() const
   {
-    return Playing;
+    return this->Playing;
+  }
+
+  /**
+   * Return the current animation time in seconds
+   */
+  double GetCurrentTime() const
+  {
+    return this->CurrentTime;
   }
 
   /**

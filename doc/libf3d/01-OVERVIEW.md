@@ -149,3 +149,7 @@ see the installed `f3dConfig.cmake` file for more info.
 
 In order to add new supported file format to libf3d, you can create a plugin using CMake macros. Please follow instructions in the [F3D plugin SDK guide](05-PLUGINS.md).
 Also make sure the `plugin_sdk` component have been installed as well as the `sdk` component.
+
+## Migrate from 3.x
+
+Non backward compatible changes have been introduced in 4.0, please take a look at [the migration guide](06-MIGRATION.md) if you are trying to migrate your libf3d 3.x code base.

@@ -149,6 +149,14 @@ public class Interactor {
         }
     }
 
+    public static class InteractorState {
+        public double animationTime;
+    }
+
+    public interface EventLoopCallback {
+        void execute(InteractorState state);
+    }
+
     public interface CommandCallback {
         void execute(List<String> args);
     }
@@ -463,6 +471,14 @@ public class Interactor {
     public native Interactor triggerEventLoop(double deltaTime);
 
     /**
+     * Set the event loop user callback called automatically on each event loop iteration.
+     *
+     * @param callback callback to be called on each event loop iteration
+     * @return this interactor for method chaining
+     */
+    public native Interactor setEventLoopUserCallBack(EventLoopCallback callback);
+
+    /**
      * Play a VTK interaction file.
      *
      * @param file path to interaction file
@@ -504,28 +520,6 @@ public class Interactor {
      */
     public Interactor start() {
         return start(1.0 / 30);
-    }
-
-    /**
-     * Start the interactor event loop with a callback.
-     * The callback is called on each event loop iteration.
-     *
-     * @param deltaTime time delta in seconds (must be positive)
-     * @param callback callback to execute on each iteration
-     * @return this interactor for method chaining
-     */
-    private native Interactor startWithCallback(double deltaTime, Runnable callback);
-
-    /**
-     * Start the interactor event loop with a callback.
-     * The callback is called on each event loop iteration.
-     *
-     * @param deltaTime time delta in seconds (must be positive)
-     * @param callback callback to execute on each iteration
-     * @return this interactor for method chaining
-     */
-    public Interactor start(double deltaTime, Runnable callback) {
-        return startWithCallback(deltaTime, callback);
     }
 
     /**

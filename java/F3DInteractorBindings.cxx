@@ -9,6 +9,7 @@
 namespace
 {
 std::map<std::string, jobject> g_commandCallbacks;
+jobject g_eventLoopCallback = nullptr;
 JavaVM* g_jvm = nullptr;
 
 f3d::interactor& GetInteractor(JNIEnv* env, jobject self)
@@ -603,6 +604,54 @@ extern "C"
     return self;
   }
 
+  JNIEXPORT jobject JAVA_BIND(Interactor, setEventLoopUserCallBack)(
+    JNIEnv* env, jobject self, jobject callback)
+  {
+    if (g_eventLoopCallback != nullptr)
+    {
+      env->DeleteGlobalRef(g_eventLoopCallback);
+      g_eventLoopCallback = nullptr;
+    }
+
+    if (callback == nullptr)
+    {
+      GetInteractor(env, self).setEventLoopUserCallBack(nullptr);
+      return self;
+    }
+
+    g_eventLoopCallback = env->NewGlobalRef(callback);
+
+    GetInteractor(env, self).setEventLoopUserCallBack(
+      [](f3d::interactor_state_t state)
+      {
+        JNIEnv* env = nullptr;
+#ifdef __ANDROID__
+        if (g_jvm->AttachCurrentThread(&env, nullptr) != JNI_OK)
+#else
+        if (g_jvm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) != JNI_OK)
+#endif
+        {
+          return;
+        }
+
+        jclass callbackClass = env->GetObjectClass(g_eventLoopCallback);
+        jmethodID executeMethod =
+          env->GetMethodID(callbackClass, "execute", "(Lapp/f3d/F3D/Interactor$InteractorState;)V");
+
+        jclass stateClass = env->FindClass("app/f3d/F3D/Interactor$InteractorState");
+        jmethodID stateConstructor = env->GetMethodID(stateClass, "<init>", "()V");
+        jobject stateObj = env->NewObject(stateClass, stateConstructor);
+        jfieldID animationTimeField = env->GetFieldID(stateClass, "animationTime", "D");
+        env->SetDoubleField(stateObj, animationTimeField, state.animationTime);
+
+        env->CallVoidMethod(g_eventLoopCallback, executeMethod, stateObj);
+
+        env->DeleteLocalRef(stateObj);
+        g_jvm->DetachCurrentThread();
+      });
+    return self;
+  }
+
   JNIEXPORT jboolean JAVA_BIND(Interactor, playInteraction)(
     JNIEnv* env, jobject self, jstring file, jdouble deltaTime)
   {
@@ -624,34 +673,6 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Interactor, start)(JNIEnv* env, jobject self, jdouble deltaTime)
   {
     GetInteractor(env, self).start(deltaTime);
-    return self;
-  }
-
-  JNIEXPORT jobject JAVA_BIND(Interactor, startWithCallback)(
-    JNIEnv* env, jobject self, jdouble deltaTime, jobject callback)
-  {
-    jobject globalCallback = env->NewGlobalRef(callback);
-
-    GetInteractor(env, self).start(deltaTime,
-      [globalCallback]()
-      {
-        JNIEnv* env = nullptr;
-#ifdef __ANDROID__
-        if (g_jvm->AttachCurrentThread(&env, nullptr) != JNI_OK)
-#else
-        if (g_jvm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) != JNI_OK)
-#endif
-        {
-          return;
-        }
-
-        jclass runnableClass = env->GetObjectClass(globalCallback);
-        jmethodID runMethod = env->GetMethodID(runnableClass, "run", "()V");
-        env->CallVoidMethod(globalCallback, runMethod);
-
-        env->DeleteGlobalRef(globalCallback);
-        g_jvm->DetachCurrentThread();
-      });
     return self;
   }
 

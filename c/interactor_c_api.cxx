@@ -288,8 +288,8 @@ int f3d_interactor_record_interaction(f3d_interactor_t* interactor, const char* 
 }
 
 //----------------------------------------------------------------------------
-void f3d_interactor_start_with_callback(f3d_interactor_t* interactor, double delta_time,
-  f3d_interactor_callback_t callback, void* user_data)
+void f3d_interactor_set_event_loop_user_callback(
+  f3d_interactor_t* interactor, f3d_interactor_callback_t callback, void* user_data)
 {
   if (!interactor)
   {
@@ -297,21 +297,20 @@ void f3d_interactor_start_with_callback(f3d_interactor_t* interactor, double del
   }
 
   f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-
-  if (callback)
-  {
-    cpp_interactor->start(delta_time, [callback, user_data]() { callback(user_data); });
-  }
-  else
-  {
-    cpp_interactor->start(delta_time, nullptr);
-  }
+  cpp_interactor->setEventLoopUserCallBack(
+    [callback, user_data](f3d::interactor_state_t) { callback(user_data); });
 }
 
 //----------------------------------------------------------------------------
 void f3d_interactor_start(f3d_interactor_t* interactor, double delta_time)
 {
-  f3d_interactor_start_with_callback(interactor, delta_time, nullptr, nullptr);
+  if (!interactor)
+  {
+    return;
+  }
+
+  f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
+  cpp_interactor->start(delta_time);
 }
 
 //----------------------------------------------------------------------------
