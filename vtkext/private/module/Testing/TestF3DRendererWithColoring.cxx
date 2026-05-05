@@ -116,8 +116,8 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
     renderer->ShowScalarBar(true);
     renderer->UpdateActors();
 
-    F3DColoringInfoHandler& coloringHandler = importer->GetColoringInfoHandler();
-    auto coloringInfo = coloringHandler.GetCurrentColoringInfo();
+    const F3DColoringInfoHandler& coloringHandler = importer->GetColoringInfoHandler();
+    const auto coloringInfo = coloringHandler.GetCurrentColoringInfo();
 
     if (!coloringInfo.has_value())
     {
