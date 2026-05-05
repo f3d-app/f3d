@@ -14,7 +14,6 @@ int TestSDKStartInteractor([[maybe_unused]] int argc, [[maybe_unused]] char* arg
 
   // Call start multiple times
   inter.setEventLoopUserCallBack([&inter](f3d::interactor_state_t) {
-
     // Trying to set a callback when loop is already running. Should not do anything.
     inter.setEventLoopUserCallBack([&inter](f3d::interactor_state_t) {});
 
