@@ -1,5 +1,5 @@
 set(classes
-  vtkF3DOpen3SDCMReader
+  vtkF3DOpen3SDCMImporter
   )
 
 # Add Open3SDCM include directory to the VTK module

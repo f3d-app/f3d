@@ -53,14 +53,14 @@ find_package(Boost REQUIRED)
 # Initialize plugin
 f3d_plugin_init()
 
-# Declare the reader for 3Shape DCM files
+# Declare the reader/importer for 3Shape DCM files
 # Note: .dcm extension is also used by DICOM reader
 # We use SCORE 70 (> DICOM's 50) + content-based canRead() to resolve conflict
 f3d_plugin_declare_reader(
   NAME Open3SDCM
   EXTENSIONS dcm
   MIMETYPES application/vnd.3shape-dcm
-  VTK_READER vtkF3DOpen3SDCMReader
+  VTK_IMPORTER vtkF3DOpen3SDCMImporter
   FORMAT_DESCRIPTION "3Shape DCM (Dental CAD Model)"
   SCORE 70
   CAN_READ STATIC
@@ -74,7 +74,7 @@ f3d_plugin_build(
   NAME open3sdcm
   VERSION 1.0
   DESCRIPTION "3Shape DCM file format support via Open3SDCM library"
-  VTK_MODULES IOGeometry
+  VTK_MODULES IOGeometry IOImage RenderingCore
   FREEDESKTOP
 )
 
@@ -105,5 +105,5 @@ message(STATUS "Plugin: open3sdcm configured")
 message(STATUS "  Open3SDCM source: ${OPEN3SDCM_SOURCE_DIR}")
 message(STATUS "  Poco found: ${Poco_DIR}")
 message(STATUS "  OpenSSL found: ${OPENSSL_DIR}")
-message(STATUS "  assimp found: ${assimp_DIR}")
+
 message(STATUS "  Boost found: ${Boost_DIR}")

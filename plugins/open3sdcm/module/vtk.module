@@ -6,8 +6,12 @@ DEPENDS
   VTK::IOGeometry
   VTK::CommonDataModel
   VTK::CommonCore
+  VTK::IOImage
+  VTK::RenderingCore
   f3d::vtkext
 PRIVATE_DEPENDS
   VTK::IOGeometry
+  VTK::IOImage
+  VTK::RenderingCore
 TEST_DEPENDS
   VTK::TestingCore
