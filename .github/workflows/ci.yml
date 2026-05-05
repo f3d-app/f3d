@@ -1134,6 +1134,7 @@ jobs:
         uses: ./source/.github/actions/python-ci
         with:
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          cpu: ${{ matrix.os == 'macos-15' && 'arm64' || 'x86_64' }}
           python_version: ${{matrix.python_version}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
