@@ -2,11 +2,15 @@
 
 #include "ParseDcm.h"
 
+#include <iostream>
 #include <vtkActor.h>
 #include <vtkCellArray.h>
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
+#include <vtkImageReader2.h>
+#include <vtkImageReader2Factory.h>
 #include <vtkInformation.h>
+#include <vtkMemoryResourceStream.h>
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
@@ -18,6 +22,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkTexture.h>
 #include <vtkUnsignedCharArray.h>
+#include <vtkVersion.h>
 
 #include <fstream>
 #include <memory>
@@ -90,8 +95,14 @@ bool vtkF3DOpen3SDCMImporter::vtkInternals::ParseFile(const std::string& filenam
 
   if (!this->Parser.m_SurfaceData.textureImages.empty())
   {
-    this->Description += "Embedded textures: ";
-    this->Description += std::to_string(this->Parser.m_SurfaceData.textureImages.size());
+    const auto& texImg = this->Parser.m_SurfaceData.textureImages[0];
+    this->Description += "Embedded textures: 1\n";
+    this->Description += "  Texture: ";
+    this->Description += std::to_string(texImg.width);
+    this->Description += "x";
+    this->Description += std::to_string(texImg.height);
+    this->Description += " mime=";
+    this->Description += texImg.mimeType ? *texImg.mimeType : "none";
     this->Description += "\n";
   }
 
@@ -111,13 +122,86 @@ vtkSmartPointer<vtkTexture> vtkF3DOpen3SDCMImporter::vtkInternals::CreateTexture
     return nullptr;
   }
 
-  // Create vtkImageData based on the texture format
+  // The imageBytes contain the raw encoded image data (e.g., JPEG bytes)
+  // We need to use a VTK image reader to decode it
+  vtkSmartPointer<vtkImageReader2> reader;
+  
+  // Determine the image format from mimeType or bytesPerPixel
+  std::string formatHint;
+  if (textureImage.mimeType) {
+    formatHint = *textureImage.mimeType;
+  }
+  
+  // Try to determine format from bytesPerPixel as fallback
+  if (formatHint.empty() && textureImage.bytesPerPixel > 0) {
+    // This is likely raw pixel data, not encoded
+    // We'll handle it below
+  }
+  
+  if (!formatHint.empty() && formatHint != "image/jpeg" && formatHint != "image/png") {
+    // For non-JPEG/PNG formats, try to use raw pixel data
+    formatHint.clear();
+  }
+
+  if (!formatHint.empty())
+  {
+    // Use VTK image reader factory to create the appropriate reader
+    reader.TakeReference(vtkImageReader2Factory::CreateImageReader2FromExtension(
+      formatHint == "image/jpeg" ? "jpg" : 
+      formatHint == "image/png" ? "png" : "jpg"));
+    
+    if (reader)
+    {
+      // For VTK 9.5.20251016+, use vtkMemoryResourceStream
+      // For older versions, use SetMemoryBuffer (deprecated but works)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+      vtkNew<vtkMemoryResourceStream> memStream;
+      memStream->SetBuffer(textureImage.imageBytes.data(), textureImage.imageBytes.size());
+      reader->SetStream(memStream);
+#else
+      reader->SetMemoryBuffer(textureImage.imageBytes.data());
+      reader->SetMemoryBufferLength(static_cast<vtkIdType>(textureImage.imageBytes.size()));
+#endif
+      reader->Update();
+      
+      if (reader->GetOutput() && reader->GetOutput()->GetNumberOfPoints() > 0)
+      {
+        texture->SetInputConnection(reader->GetOutputPort());
+        texture->MipmapOn();
+        texture->InterpolateOn();
+        texture->SetColorModeToDirectScalars();
+        return texture;
+      }
+    }
+  }
+
+  // Fallback: if encoded reading failed or no mimeType, try raw pixel data
+  // This handles cases where imageBytes contains raw RGBA/RGB data
   vtkNew<vtkImageData> imageData;
   imageData->SetDimensions(static_cast<int>(textureImage.width), 
                           static_cast<int>(textureImage.height), 1);
 
-  // Determine the number of components based on bytesPerPixel
   int numComponents = static_cast<int>(textureImage.bytesPerPixel);
+  
+  // If we couldn't determine from bytesPerPixel, try to infer from data size
+  if (numComponents == 0) {
+    size_t expectedSize = textureImage.width * textureImage.height;
+    size_t actualSize = textureImage.imageBytes.size();
+    
+    if (actualSize == expectedSize) {
+      numComponents = 1; // Grayscale
+    } else if (actualSize == expectedSize * 3) {
+      numComponents = 3; // RGB
+    } else if (actualSize == expectedSize * 4) {
+      numComponents = 4; // RGBA
+    } else {
+      // Try to guess from actualSize
+      numComponents = static_cast<int>(actualSize / expectedSize);
+      if (numComponents < 1 || numComponents > 4) {
+        numComponents = 3; // Default to RGB
+      }
+    }
+  }
   
   // Handle common cases:
   // - 3 bytes: RGB (3 components)
@@ -319,13 +403,8 @@ vtkSmartPointer<vtkProperty> vtkF3DOpen3SDCMImporter::vtkInternals::CreateProper
     vtkSmartPointer<vtkTexture> texture = this->CreateTextureFromEmbeddedImage(textureImage);
     if (texture)
     {
-      this->Textures.push_back(texture);
-      // Set as base color texture for diffuse mapping
-      property->SetBaseColorTexture(texture);
-      
       // Enable sRGB for most embedded textures (they are typically sRGB)
       // Only disable for HDR/EXR formats if mimeType indicates it
-      bool enableSRGB = true;
       if (textureImage.mimeType) {
         std::string mime = *textureImage.mimeType;
         // Check for HDR formats
@@ -333,12 +412,18 @@ vtkSmartPointer<vtkProperty> vtkF3DOpen3SDCMImporter::vtkInternals::CreateProper
             mime.find("exr") != std::string::npos ||
             mime.find("float") != std::string::npos ||
             mime.find("half") != std::string::npos) {
-          enableSRGB = false;
+          // Don't enable sRGB for HDR formats
+        } else {
+          texture->SetUseSRGBColorSpace(true);
         }
+      } else {
+        // No mime type specified, assume sRGB
+        texture->SetUseSRGBColorSpace(true);
       }
-      if (enableSRGB) {
-        texture->UseSRGBColorSpaceOn();
-      }
+      
+      this->Textures.push_back(texture);
+      // Set as base color texture for diffuse mapping
+      property->SetBaseColorTexture(texture);
     }
   }
 
@@ -440,16 +525,6 @@ int vtkF3DOpen3SDCMImporter::ImportBegin()
   if (!this->Internals->ParseFile(filename))
   {
     return 0;
-  }
-
-  // Log texture info
-  if (!this->Internals->Parser.m_SurfaceData.textureImages.empty())
-  {
-    const auto& texImg = this->Internals->Parser.m_SurfaceData.textureImages[0];
-    vtkDebugMacro("Texture: " << texImg.width << "x" << texImg.height 
-                  << " bpp=" << texImg.bytesPerPixel
-                  << " bytes=" << texImg.imageBytes.size()
-                  << " mime=" << (texImg.mimeType ? *texImg.mimeType : "none"));
   }
 
   // Create the polydata
