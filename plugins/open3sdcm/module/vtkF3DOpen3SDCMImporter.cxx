@@ -294,8 +294,17 @@ vtkSmartPointer<vtkProperty> vtkF3DOpen3SDCMImporter::vtkInternals::CreateProper
 {
   vtkNew<vtkProperty> property;
 
-  // Set base color if available
-  if (this->Parser.m_SurfaceData.baseColor)
+  // Set base color if available and no texture
+  // If we have a texture, set base color to white so texture shows at full brightness
+  bool hasTexture = !this->Parser.m_SurfaceData.textureImages.empty();
+  
+  if (hasTexture)
+  {
+    // Set base color to white when using textures
+    // This ensures the texture is not darkened by the base color
+    property->SetColor(1.0, 1.0, 1.0);
+  }
+  else if (this->Parser.m_SurfaceData.baseColor)
   {
     const auto& color = *this->Parser.m_SurfaceData.baseColor;
     property->SetColor(color.r / 255.0, color.g / 255.0, color.b / 255.0);
@@ -303,7 +312,7 @@ vtkSmartPointer<vtkProperty> vtkF3DOpen3SDCMImporter::vtkInternals::CreateProper
 
   // Create and set textures from embedded images
   // Use the first texture as the base color texture
-  if (!this->Parser.m_SurfaceData.textureImages.empty())
+  if (hasTexture)
   {
     const auto& textureImage = this->Parser.m_SurfaceData.textureImages[0];
     
@@ -314,11 +323,20 @@ vtkSmartPointer<vtkProperty> vtkF3DOpen3SDCMImporter::vtkInternals::CreateProper
       // Set as base color texture for diffuse mapping
       property->SetBaseColorTexture(texture);
       
-      // Enable sRGB if the texture is a standard image format
-      if (textureImage.mimeType && 
-          (textureImage.mimeType->find("jpeg") != std::string::npos ||
-           textureImage.mimeType->find("png") != std::string::npos))
-      {
+      // Enable sRGB for most embedded textures (they are typically sRGB)
+      // Only disable for HDR/EXR formats if mimeType indicates it
+      bool enableSRGB = true;
+      if (textureImage.mimeType) {
+        std::string mime = *textureImage.mimeType;
+        // Check for HDR formats
+        if (mime.find("hdr") != std::string::npos || 
+            mime.find("exr") != std::string::npos ||
+            mime.find("float") != std::string::npos ||
+            mime.find("half") != std::string::npos) {
+          enableSRGB = false;
+        }
+      }
+      if (enableSRGB) {
         texture->UseSRGBColorSpaceOn();
       }
     }
@@ -424,6 +442,16 @@ int vtkF3DOpen3SDCMImporter::ImportBegin()
     return 0;
   }
 
+  // Log texture info
+  if (!this->Internals->Parser.m_SurfaceData.textureImages.empty())
+  {
+    const auto& texImg = this->Internals->Parser.m_SurfaceData.textureImages[0];
+    vtkDebugMacro("Texture: " << texImg.width << "x" << texImg.height 
+                  << " bpp=" << texImg.bytesPerPixel
+                  << " bytes=" << texImg.imageBytes.size()
+                  << " mime=" << (texImg.mimeType ? *texImg.mimeType : "none"));
+  }
+
   // Create the polydata
   this->Internals->PolyData = this->Internals->CreatePolyData();
   
@@ -441,6 +469,7 @@ void vtkF3DOpen3SDCMImporter::ImportActors(vtkRenderer* renderer)
 {
   if (!this->Internals->PolyData)
   {
+    vtkErrorMacro("No polydata available");
     return;
   }
 
