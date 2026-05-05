@@ -1,20 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<VTKModule name="vtkF3DOpen3SDCMReader">
-  <Description>
-    VTK reader for 3Shape DCM files using Open3SDCM library
-  </Description>
-  <Dependencies>
-    <Depends name="vtkIOGeometry" />
-    <Depends name="vtkCommonDataModel" />
-    <Depends name="vtkCommonCore" />
-  </Dependencies>
-  <Headers>
-    <Header name="vtkF3DOpen3SDCMReader.h" />
-  </Headers>
-  <Sources>
-    <Source name="vtkF3DOpen3SDCMReader.cxx" />
-  </Sources>
-  <CxxFlags>
-    <CxxFlag name="-std=c++20" />
-  </CxxFlags>
-</VTKModule>
+NAME
+  f3d::vtkextOpen3SDCM
+DESCRIPTION
+  A VTK module for the Open3SDCM plugin
+DEPENDS
+  VTK::IOGeometry
+  VTK::CommonDataModel
+  VTK::CommonCore
+  f3d::vtkext
+PRIVATE_DEPENDS
+  VTK::IOGeometry
+TEST_DEPENDS
+  VTK::TestingCore

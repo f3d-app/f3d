@@ -20,7 +20,6 @@ vtkStandardNewMacro(vtkF3DOpen3SDCMReader);
 //----------------------------------------------------------------------------
 vtkF3DOpen3SDCMReader::vtkF3DOpen3SDCMReader()
   : FileName(nullptr)
-  , ResourceStream(nullptr)
 {
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
@@ -30,7 +29,6 @@ vtkF3DOpen3SDCMReader::vtkF3DOpen3SDCMReader()
 vtkF3DOpen3SDCMReader::~vtkF3DOpen3SDCMReader()
 {
   this->SetFileName(nullptr);
-  this->SetResourceStream(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -99,18 +97,6 @@ bool vtkF3DOpen3SDCMReader::CanReadStream(vtkResourceStream* vtkNotUsed(stream))
 }
 
 //----------------------------------------------------------------------------
-int vtkF3DOpen3SDCMReader::RequestInformation(
-  vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** vtkNotUsed(inputVector),
-  vtkInformationVector* outputVector)
-{
-  // Set output type
-  vtkInformation* outInfo = vtkInformationVector::GetOutputInformation(outputVector, 0);
-  outInfo->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkPolyData");
-  return 1;
-}
-
-//----------------------------------------------------------------------------
 int vtkF3DOpen3SDCMReader::RequestData(
   vtkInformation* vtkNotUsed(request),
   vtkInformationVector** vtkNotUsed(inputVector),
@@ -125,13 +111,6 @@ int vtkF3DOpen3SDCMReader::RequestData(
   }
 
   // Check if we have a filename
-  if (this->ResourceStream)
-  {
-    // Stream reading is not supported
-    vtkErrorMacro("Stream reading is not supported for 3Shape DCM files");
-    return 0;
-  }
-
   if (!this->FileName || !this->FileName[0])
   {
     vtkErrorMacro("No filename specified");

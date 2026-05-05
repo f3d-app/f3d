@@ -47,12 +47,8 @@ find_package(Poco CONFIG REQUIRED COMPONENTS XML JSON Zip)
 # OpenSSL is required for CE schema (encrypted files)
 find_package(OpenSSL REQUIRED)
 
-# assimp is already available in F3D (used by assimp plugin)
-find_package(assimp REQUIRED)
-
-# Boost.dynamic_bitset is required by Open3SDCM's CMakeLists.txt
-# even though it's not actually used in ParseDcm.cpp
-find_package(Boost REQUIRED COMPONENTS dynamic_bitset)
+# Boost is required by Open3SDCM
+find_package(Boost REQUIRED)
 
 # Initialize plugin
 f3d_plugin_init()
@@ -67,8 +63,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkF3DOpen3SDCMReader
   FORMAT_DESCRIPTION "3Shape DCM (Dental CAD Model)"
   SCORE 70
-  CAN_READ CUSTOM
-  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/open3sdcm.inl"
+  CAN_READ STATIC
 )
 
 # Add Open3SDCM include directory for the generated reader code
@@ -90,20 +85,19 @@ f3d_plugin_build(
 # Link the plugin to the VTK reader library and Open3SDCM
 # This needs to be done after f3d_plugin_build creates the target
 target_link_libraries(f3d-plugin-open3sdcm PRIVATE
-  vtkF3DOpen3SDCMReader
+  f3d::vtkextOpen3SDCM
   Open3SDCMLib
   Poco::XML
   Poco::Zip
   OpenSSL::Crypto
-  assimp::assimp
-  Boost::dynamic_bitset
+  ${Boost_LIBRARIES}
 )
 
 # Add Open3SDCM include directory to the plugin target
 # This is needed for the custom code (.inl file) which includes ParseDcm.h
 target_include_directories(f3d-plugin-open3sdcm
   PRIVATE
-    ${Open3SDCM_SOURCE_DIR}/Lib/src
+    /Users/romainnosenzo/CLionProjects/Open3SDCM/Lib/src
 )
 
 # Print configuration summary

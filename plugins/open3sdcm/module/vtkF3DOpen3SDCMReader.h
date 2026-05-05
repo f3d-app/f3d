@@ -41,13 +41,6 @@ public:
   vtkGetStringMacro(FileName);
 
   /**
-   * Set the resource stream to read from (for in-memory data).
-   * Note: Stream reading is currently not supported as Open3SDCM requires file paths.
-   */
-  vtkSetObjectMacro(ResourceStream);
-  vtkGetObjectMacro(ResourceStream, vtkResourceStream);
-
-  /**
    * Check if the reader can read the given file.
    * Returns true if the file is a valid 3Shape DCM file.
    */
@@ -64,10 +57,8 @@ protected:
   ~vtkF3DOpen3SDCMReader() override;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
-  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   char* FileName;
-  vtkResourceStream* ResourceStream;
 
 private:
   vtkF3DOpen3SDCMReader(const vtkF3DOpen3SDCMReader&) = delete;
