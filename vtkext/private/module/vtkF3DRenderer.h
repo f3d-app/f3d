@@ -153,7 +153,6 @@ public:
   AntiAliasingMode GetAntiAliasingMode() const;
   void SetUseToneMappingPass(bool use);
   void SetDisplayDepth(bool use);
-  void SetDisplayDepthScalarColoring(bool use);
   void SetUseBlurBackground(bool use);
   void SetBlurCircleOfConfusionRadius(double radius);
   void SetRaytracingSamples(int samples);

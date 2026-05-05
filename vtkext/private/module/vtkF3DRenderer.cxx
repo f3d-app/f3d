@@ -494,7 +494,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
     vtkNew<vtkF3DDisplayDepthRenderPass> depthP;
     camP->SetDelegatePass(opaqueP);
     depthP->SetDelegatePass(camP);
-    if (this->DisplayDepthScalarColoring)
+    if (this->EnableColoring)
     {
       this->ConfigureColoringAndVisibilities();
       depthP->SetColorMap(this->ColorTransferFunction);
@@ -1753,16 +1753,6 @@ void vtkF3DRenderer::SetDisplayDepth(bool use)
   if (this->DisplayDepth != use)
   {
     this->DisplayDepth = use;
-    this->RenderPassesConfigured = false;
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::SetDisplayDepthScalarColoring(bool use)
-{
-  if (this->DisplayDepthScalarColoring != use)
-  {
-    this->DisplayDepthScalarColoring = use;
     this->RenderPassesConfigured = false;
   }
 }
@@ -3035,6 +3025,7 @@ void vtkF3DRenderer::SetEnableColoring(bool enable)
     this->EnableColoring = enable;
     this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
+    this->RenderPassesConfigured = false;
   }
 }
 
@@ -3104,7 +3095,7 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
 
   // Recover coloring information and update handler
   bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume) ||
-    (this->DisplayDepth && this->DisplayDepthScalarColoring);
+    this->DisplayDepth;
   F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
   auto info = coloringHandler.SetCurrentColoring(
     enableColoring, this->UseCellColoring, this->ArrayNameForColoring, false);
@@ -3394,12 +3385,8 @@ void vtkF3DRenderer::ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf,
 void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
   vtkScalarBarActor* scalarBar, std::string arrayName, int component, vtkColorTransferFunction* ctf)
 {
-  const std::string componentName = (this->DisplayDepth && this->DisplayDepthScalarColoring)
-    ? "Depth"
-    : this->ComponentToString(component);
-
   arrayName += " (";
-  arrayName += componentName;
+  arrayName += this->ComponentToString(component);
   arrayName += ")";
 
   scalarBar->SetLookupTable(ctf);
@@ -3457,9 +3444,8 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
     }
     else
     {
-      const bool depthEnabled = this->DisplayDepth && this->DisplayDepthScalarColoring;
-      minRange = depthEnabled ? 0.0 : info.MagnitudeRange[0];
-      maxRange = depthEnabled ? 1.0 : info.MagnitudeRange[1];
+      minRange = this->DisplayDepth ? 0.0 : info.MagnitudeRange[0];
+      maxRange = this->DisplayDepth ? 1.0 : info.MagnitudeRange[1];
     }
     if (this->ExpandingRangeSet)
     {
@@ -3624,7 +3610,11 @@ std::string vtkF3DRenderer::ComponentToString(int component)
 {
   assert(this->Importer);
 
-  if (component == -2)
+  if (this->DisplayDepth)
+  {
+    return "Depth";
+  }
+  else if (component == -2)
   {
     return "Direct Scalars";
   }
