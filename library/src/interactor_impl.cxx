@@ -577,16 +577,16 @@ public:
     this->CallbackDeltaTime = deltaTime;
 
     // Create the callback and add an observer
-    vtkNew<vtkCallbackCommand> timerCallBack;
-    timerCallBack->SetCallback(
+    vtkNew<vtkCallbackCommand> timerCallback;
+    timerCallback->SetCallback(
       [](vtkObject*, unsigned long, void* clientData, void*)
       {
         internals* that = static_cast<internals*>(clientData);
         that->EventLoop(that->CallbackDeltaTime);
       });
     this->EventLoopObserverId =
-      this->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
-    timerCallBack->SetClientData(this);
+      this->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallback);
+    timerCallback->SetClientData(this);
     return true;
   }
 
@@ -600,7 +600,7 @@ public:
     }
     this->VTKInteractor->RemoveObserver(this->EventLoopObserverId);
     this->VTKInteractor->DestroyTimer(this->EventLoopTimerId);
-    this->EventLoopUserCallBack = nullptr;
+    this->EventLoopUserCallback = nullptr;
     this->EventLoopObserverId = -1;
     this->EventLoopTimerId = 0;
     return true;
@@ -619,9 +619,9 @@ public:
       this->Interactor.stop();
       return;
     }
-    if (this->EventLoopUserCallBack)
+    if (this->EventLoopUserCallback)
     {
-      this->EventLoopUserCallBack({ .animationTime = this->AnimationManager->GetCurrentTime() });
+      this->EventLoopUserCallback({ .animationTime = this->AnimationManager->GetCurrentTime() });
     }
 
     if (this->CommandBuffer.has_value())
@@ -693,7 +693,7 @@ public:
   int DragDistanceTol = 3;      /* px */
   int TransitionDuration = 100; /* ms */
 
-  std::function<void(interactor_state_t)> EventLoopUserCallBack = nullptr;
+  std::function<void(interactor_state_t)> EventLoopUserCallback = nullptr;
   unsigned long EventLoopTimerId = 0;
   int EventLoopObserverId = -1;
   std::atomic<bool> RenderRequested = false;
@@ -2036,8 +2036,8 @@ interactor& interactor_impl::disableCameraMovement()
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::setEventLoopUserCallBack(
-  std::function<void(interactor_state_t)> userCallBack)
+interactor& interactor_impl::setEventLoopUserCallback(
+  std::function<void(interactor_state_t)> userCallback)
 {
   if (this->Internals->EventLoopObserverId != -1)
   {
@@ -2045,7 +2045,7 @@ interactor& interactor_impl::setEventLoopUserCallBack(
     return *this;
   }
 
-  this->Internals->EventLoopUserCallBack = std::move(userCallBack);
+  this->Internals->EventLoopUserCallback = std::move(userCallback);
   return *this;
 }
 

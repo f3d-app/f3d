@@ -77,8 +77,8 @@ public:
   interactor& enableCameraMovement() override;
   interactor& disableCameraMovement() override;
 
-  interactor& setEventLoopUserCallBack(
-    std::function<void(interactor_state_t)> userCallBack) override;
+  interactor& setEventLoopUserCallback(
+    std::function<void(interactor_state_t)> userCallback) override;
 
   bool playInteraction(const std::filesystem::path& file, double deltaTime) override;
   bool recordInteraction(const std::filesystem::path& file) override;
@@ -128,7 +128,7 @@ public:
 
   /**
    * Event loop being called automatically once the interactor is started
-   * First call the EventLoopUserCallBack, then call render if requested.
+   * First call the EventLoopUserCallback, then call render if requested.
    */
   void EventLoop();
 

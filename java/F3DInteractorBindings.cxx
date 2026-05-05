@@ -604,7 +604,7 @@ extern "C"
     return self;
   }
 
-  JNIEXPORT jobject JAVA_BIND(Interactor, setEventLoopUserCallBack)(
+  JNIEXPORT jobject JAVA_BIND(Interactor, setEventLoopUserCallback)(
     JNIEnv* env, jobject self, jobject callback)
   {
     if (g_eventLoopCallback != nullptr)
@@ -615,13 +615,13 @@ extern "C"
 
     if (callback == nullptr)
     {
-      GetInteractor(env, self).setEventLoopUserCallBack(nullptr);
+      GetInteractor(env, self).setEventLoopUserCallback(nullptr);
       return self;
     }
 
     g_eventLoopCallback = env->NewGlobalRef(callback);
 
-    GetInteractor(env, self).setEventLoopUserCallBack(
+    GetInteractor(env, self).setEventLoopUserCallback(
       [](f3d::interactor_state_t state)
       {
         JNIEnv* env = nullptr;

@@ -403,8 +403,8 @@ public:
   /**
    * Set the user callback of the event loop, which is called right after the rendering.
    */
-  virtual interactor& setEventLoopUserCallBack(
-    std::function<void(interactor_state_t)> userCallBack) = 0;
+  virtual interactor& setEventLoopUserCallback(
+    std::function<void(interactor_state_t)> userCallback) = 0;
 
   /**
    * Start the interactor event loop.

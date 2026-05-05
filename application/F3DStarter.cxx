@@ -1485,7 +1485,7 @@ int F3DStarter::Start(int argc, char** argv)
         std::signal(SIGTERM, F3DInternals::SigCallback);
         std::signal(SIGINT, F3DInternals::SigCallback);
 
-        interactor.setEventLoopUserCallBack([this](f3d::interactor_state_t) { this->EventLoop(); });
+        interactor.setEventLoopUserCallback([this](f3d::interactor_state_t) { this->EventLoop(); });
         interactor.start(deltaTime);
       }
 #endif

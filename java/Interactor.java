@@ -476,7 +476,7 @@ public class Interactor {
      * @param callback callback to be called on each event loop iteration
      * @return this interactor for method chaining
      */
-    public native Interactor setEventLoopUserCallBack(EventLoopCallback callback);
+    public native Interactor setEventLoopUserCallback(EventLoopCallback callback);
 
     /**
      * Play a VTK interaction file.

@@ -297,7 +297,7 @@ void f3d_interactor_set_event_loop_user_callback(
   }
 
   f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  cpp_interactor->setEventLoopUserCallBack(
+  cpp_interactor->setEventLoopUserCallback(
     [callback, user_data](f3d::interactor_state_t) { callback(user_data); });
 }
 
