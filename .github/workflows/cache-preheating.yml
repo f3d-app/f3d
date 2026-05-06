@@ -22,11 +22,11 @@ jobs:
           lfs: false
 
       - name: Extract sqlite version
-        id: extract_sqlite_versions
+        id: sqlite_ver
         uses: f3d-app/extract-version-action@main
         with:
           file: ./.github/workflows/versions.json
-          name: sqlite_csb
+          name: versions.sqlite_csb
 
       - name: Dependencies Dir
         shell: bash
@@ -40,5 +40,5 @@ jobs:
         uses: ./.github/actions/sqlite-install-dep
         with:
           cpu: x86_64
-          csb_version: ${{steps.extract_sqlite_versions.outputs.extracted}}
+          csb_version: ${{steps.sqlite_ver.outputs.extract}}
           global_cache_index: 0
