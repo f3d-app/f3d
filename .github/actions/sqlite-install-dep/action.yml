@@ -5,11 +5,7 @@ inputs:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
-  csb_version:
-    description: "Version of common-superbuild to build sqlite with"
-    required: true
-  global_cache_index:
-    description: "Global cache index"
+  versions_file: "File to recover versions from"
     required: true
 
 runs:
@@ -18,18 +14,31 @@ runs:
     - name: Check required inputs
       shell: bash
       run: |
-        [[ "${{ inputs.csb_version }}" ]] || { echo "csb_version input is empty" ; exit 1; }
-        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+        [[ "${{ inputs.versions_file }}" ]] || { echo "versions_file is empty" ; exit 1; }
+
+    - name: Extract sqlite version
+      id: sqlite_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{ inputs.versions_file }}
+        name: sqlite_csb
+
+    - name: Extract global cache index
+      id: global_idx
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{ inputs.versions_file }}
+        special_name: global_cache_index
 
     - name: Cache sqlite
       id: cache-sqlite
       uses: actions/cache/restore@v5
       with:
         path: dependencies/sqlite_build/install
-        key: sqlite-${{ inputs.csb_version }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-2
+        key: sqlite-${{steps.sqlite_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
 
     # Dependents: proj
-    # use --depth=1 --revision=${{ inputs.csb_version }}
+    # use --depth=1 --revision=${{steps.sqlite_ver.outputs.extract}}
     # when git supports it
     - name: Checkout common-superbuild and set everything up
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
@@ -39,7 +48,7 @@ runs:
         mkdir sqlite_build
         git clone https://gitlab.kitware.com/paraview/common-superbuild.git sqlite_csb
         cd sqlite_csb
-        git checkout ${{ inputs.csb_version }}
+        git checkout ${{steps.sqlite_ver.outputs.extract}}
 
     - name: Setup msvc Windows
       if: |
