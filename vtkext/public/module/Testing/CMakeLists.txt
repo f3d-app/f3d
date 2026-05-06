@@ -1,5 +1,8 @@
 set(vtkextTests_list)
 
+list(APPEND vtkextTests_list
+  TestF3DTable.cxx)
+
 # Also needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
 # Sanitizer exclusion because of https://github.com/f3d-app/f3d/issues/1323
 if(NOT ANDROID AND NOT EMSCRIPTEN AND NOT F3D_SANITIZER STREQUAL "address")

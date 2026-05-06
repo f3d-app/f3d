@@ -284,8 +284,9 @@ vtkSmartPointer<vtkPolyData> vtkF3DOpen3SDCMImporter::vtkInternals::CreatePolyDa
   }
   polyData->SetPolys(cells);
 
-  // Add colors if available
-  if (this->Parser.m_SurfaceData.baseColor)
+  // Add colors if available and no texture (to avoid color/texture conflict)
+  if (this->Parser.m_SurfaceData.baseColor &&
+      this->Parser.m_SurfaceData.textureImages.empty())
   {
     const auto& color = *this->Parser.m_SurfaceData.baseColor;
     
@@ -362,7 +363,10 @@ vtkSmartPointer<vtkPolyData> vtkF3DOpen3SDCMImporter::vtkInternals::CreatePolyDa
           }
           float avgU = sumU / vertexTexCoords[v].size();
           float avgV = sumV / vertexTexCoords[v].size();
-          tcoords->SetTypedTuple(v, std::array<float, 2>{avgU, avgV}.data());
+          // Open3SDCM stores V in top-to-bottom, VTK expects bottom-to-top
+          // So we need to flip V: V_vtk = 1.0 - V_open3sdcm
+          // U coordinates match directly
+          tcoords->SetTypedTuple(v, std::array<float, 2>{avgU, 1.0f - avgV}.data());
         }
       }
       
@@ -563,6 +567,9 @@ void vtkF3DOpen3SDCMImporter::ImportActors(vtkRenderer* renderer)
 
   // Add actor to renderer
   renderer->AddActor(actor);
+
+  // Add actor to importer's actor collection so GetImportedActors() works
+  this->ActorCollection->AddItem(actor);
 }
 
 //----------------------------------------------------------------------------
