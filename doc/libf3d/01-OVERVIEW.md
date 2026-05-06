@@ -152,4 +152,4 @@ Also make sure the `plugin_sdk` component have been installed as well as the `sd
 
 ## Migrate from 3.x
 
-Non backward compatible changes have been introduced in 4.0, please take a look at [the migration guide](06-MIGRATION.md) if you are trying to migrate your libf3d 3.x code base.
+Non backward compatible changes have been introduced in v4.0, please take a look at [the migration guide](06-MIGRATION.md) if you are trying to migrate your libf3d v3.x code base.
