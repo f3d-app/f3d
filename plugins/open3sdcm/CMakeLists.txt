@@ -13,7 +13,7 @@ include(f3dPlugin)
 
 # Open3SDCM library
 # For development, use local path. For production, consider using FetchContent or git submodule
-option(OPEN3SDCM_USE_LOCAL "Use local Open3SDCM path for development" ON)
+option(OPEN3SDCM_USE_LOCAL "Use local Open3SDCM path for development" OFF)
 if(OPEN3SDCM_USE_LOCAL)
   # Local development path
   set(OPEN3SDCM_SOURCE_DIR "/Users/romainnosenzo/CLionProjects/Open3SDCM")
