@@ -26,14 +26,14 @@ jobs:
         uses: f3d-app/extract-version-action@main
         with:
           file: ./.github/workflows/versions.json
-          name: versions.sqlite_csb
+          name: sqlite_csb
 
       - name: Extract global cache index
         id: global_idx
         uses: f3d-app/extract-version-action@main
         with:
           file: ./.github/workflows/versions.json
-          name: global_cache_index
+          special_name: global_cache_index
 
       - name: Dependencies Dir
         shell: bash
