@@ -581,7 +581,7 @@ Space separated custom key bindings to display in the drop zone.
 
 Display the logo. Needs ui.drop_zone.enable to be true.
 
-### `ui.backdrop.color` (_color_, default: `0.078431375324726105, 0.078431375324726105, 0.078431375324726105`)
+### `ui.backdrop.color` (_color_, default: `f3d_black`)
 
 Set the color of the backdrop behind the UI elements.
 
