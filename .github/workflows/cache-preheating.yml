@@ -22,7 +22,7 @@ jobs:
           lfs: false
 
       - name: Install sqlite
-        uses: ./.actions/sqlite-install-dep
+        uses: ./.github/actions/sqlite-install-dep
         with:
           cpu: x86_64
           csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
