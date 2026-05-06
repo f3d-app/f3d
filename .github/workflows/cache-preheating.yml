@@ -28,6 +28,13 @@ jobs:
           file: ./.github/workflows/versions.json
           name: versions.sqlite_csb
 
+      - name: Extract global cache index
+        id: global_idx
+        uses: f3d-app/extract-version-action@main
+        with:
+          file: ./.github/workflows/versions.json
+          name: global_cache_index
+
       - name: Dependencies Dir
         shell: bash
         working-directory: ${{github.workspace}}
@@ -41,4 +48,4 @@ jobs:
         with:
           cpu: x86_64
           csb_version: ${{steps.sqlite_ver.outputs.extract}}
-          global_cache_index: 0
+          global_cache_index: ${{steps.global_idx.outputs.extract}}
