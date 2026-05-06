@@ -25,11 +25,11 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
 #include <regex>
 #include <sstream>
 #include <string>
 #include <unordered_map>
-#include <cstddef>
 
 namespace fs = std::filesystem;
 
@@ -236,7 +236,6 @@ image::image(std::byte* buffer, std::size_t size)
 
   vtkCollectionSimpleIterator iterator;
   vtkImageReader2* currentReader;
-  int bestScore = -1;
   vtkImageReader2* bestReader = nullptr;
 
   for (availableReaders->InitTraversal(iterator);
@@ -245,12 +244,11 @@ image::image(std::byte* buffer, std::size_t size)
     if (currentReader->CanReadFile(stream) > 0)
     {
       bestReader = currentReader;
-      bestScore = score;
       break;
     }
   }
 
-  if (bestScore <= 0)
+  if (bestReader == nullptr)
   {
     delete this->Internals;
     throw read_exception("Cannot read image from buffer: No image reader supports this stream.");

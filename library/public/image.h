@@ -5,10 +5,10 @@
 #include "export.h"
 
 /// @cond
+#include <cstddef>
 #include <filesystem>
 #include <string>
 #include <vector>
-#include <cstddef>
 /// @endcond
 
 namespace f3d
@@ -61,7 +61,7 @@ public:
    * Read provided buffer into a new image instance, the following formats are
    * supported: PNG, PNM , BMP, HDR, JPEG, TGA, WebP. EXR files are also
    * supported if the associated module is built.
-   * 
+   *
    * Throws an image::read_exception in case of failure.
    */
   image(std::byte* byte, std::size_t size);
