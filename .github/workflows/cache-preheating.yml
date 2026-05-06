@@ -21,6 +21,13 @@ jobs:
           fetch-depth: 1
           lfs: false
 
+      - name: Extract sqlite version
+        id: extract_sqlite_versions
+        uses: f3d-app/extract-version-action@main
+        with:
+          file: ./.github/workflows/versions.json
+          name: sqlite_csb
+
       - name: Dependencies Dir
         shell: bash
         working-directory: ${{github.workspace}}
@@ -33,5 +40,5 @@ jobs:
         uses: ./.github/actions/sqlite-install-dep
         with:
           cpu: x86_64
-          csb_version: 08be462f7fa9816f881dbb93eacb2e287f319208
+          csb_version: ${{steps.extract_sqlite_versions.outputs.extracted}}
           global_cache_index: 0
