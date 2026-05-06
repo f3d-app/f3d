@@ -21,20 +21,6 @@ jobs:
           fetch-depth: 1
           lfs: false
 
-      - name: Extract sqlite version
-        id: sqlite_ver
-        uses: f3d-app/extract-version-action@main
-        with:
-          file: ./.github/workflows/versions.json
-          name: sqlite_csb
-
-      - name: Extract global cache index
-        id: global_idx
-        uses: f3d-app/extract-version-action@main
-        with:
-          file: ./.github/workflows/versions.json
-          special_name: global_cache_index
-
       - name: Dependencies Dir
         shell: bash
         working-directory: ${{github.workspace}}
@@ -47,5 +33,6 @@ jobs:
         uses: ./.github/actions/sqlite-install-dep
         with:
           cpu: x86_64
+          versions_file: .github/workflows/versions.json
           csb_version: ${{steps.sqlite_ver.outputs.extract}}
           global_cache_index: ${{steps.global_idx.outputs.extract}}
