@@ -22,7 +22,6 @@ jobs:
           lfs: false
 
       - name: Install sqlite
-        if: inputs.sqlite_csb_version != ''
         uses: ./.actions/sqlite-install-dep
         with:
           cpu: x86_64
