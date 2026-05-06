@@ -34,5 +34,3 @@ jobs:
         with:
           cpu: x86_64
           versions_file: .github/workflows/versions.json
-          csb_version: ${{steps.sqlite_ver.outputs.extract}}
-          global_cache_index: ${{steps.global_idx.outputs.extract}}
