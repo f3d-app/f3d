@@ -135,7 +135,7 @@ public:
   ///@}
 
   /**
-   * Set the backdrop color
+   * Set the backdrop color on the underlying UI Actor
    */
   void SetBackdropColor(const std::array<double, 3>& color);
 
