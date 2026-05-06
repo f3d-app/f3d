@@ -5,7 +5,8 @@ inputs:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
-  versions_file: "File to recover versions from"
+  versions_file:
+    description: "File to recover versions from"
     required: true
 
 runs:
