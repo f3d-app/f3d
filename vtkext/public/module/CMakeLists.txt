@@ -22,6 +22,7 @@ endforeach()
 
 set(classes
   F3DUtils
+  vtkF3DTable
   vtkF3DFaceVaryingPointDispatcher
   vtkF3DGLTFImporter
   vtkF3DImporter

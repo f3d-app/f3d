@@ -3,6 +3,7 @@ option(F3D_PLUGIN_BUILD_ASSIMP "Assimp plugin (FBX, OFF, DAE, DXF, X and 3MF fil
 option(F3D_PLUGIN_BUILD_DRACO "Draco plugin (DRC files)" OFF)
 option(F3D_PLUGIN_BUILD_HDF "HDF plugin (VTKHDF and EX2 files)" ON)
 option(F3D_PLUGIN_BUILD_OCCT "OpenCASCADE plugin (STEP and IGES files)" OFF)
+option(F3D_PLUGIN_BUILD_OPEN3SDCM "Open3SDCM plugin (3Shape DCM files)" ON)
 option(F3D_PLUGIN_BUILD_USD "Universal Scene Description plugin (USD files)" OFF)
 option(F3D_PLUGIN_BUILD_VDB "VDB plugin, using OpenVDB (VDB files)" OFF)
 option(F3D_PLUGIN_BUILD_WEBIFC "webifc plugin (IFC files)" OFF)
@@ -28,6 +29,10 @@ endif()
 
 if (F3D_PLUGIN_BUILD_OCCT)
   add_subdirectory(occt)
+endif()
+
+if (F3D_PLUGIN_BUILD_OPEN3SDCM)
+  add_subdirectory(open3sdcm)
 endif()
 
 if (F3D_PLUGIN_BUILD_USD)
