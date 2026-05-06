@@ -200,6 +200,7 @@ public:
 
   /**
    * Set the backdrop color
+   * f3d_black by default
    */
   void SetBackdropColor(const std::array<double, 3>& color);
 
