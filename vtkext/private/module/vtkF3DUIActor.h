@@ -199,6 +199,11 @@ public:
   int RenderOverlay(vtkViewport* vp) override;
 
   /**
+   * Set the backdrop color
+   */
+  void SetBackdropColor(const std::array<double, 3>& color);
+
+  /**
    * Set the backdrop opacity
    */
   void SetBackdropOpacity(const double backdropOpacity);
@@ -344,6 +349,8 @@ protected:
    */
   std::array<double, 3> FontColor = { 1.0, 1.0, 1.0 };
 
+  std::array<double, 3> BackdropColor = { 0.078431375324726105, 0.078431375324726105,
+    0.078431375324726105 };
   double BackdropOpacity = 0.9;
 
   bool NotificationVisible = false;

@@ -453,6 +453,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowMinimalConsole(opt.ui.minimal_console);
   renderer->ShowDropZone(opt.ui.drop_zone.enable);
   renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
+  renderer->SetBackdropColor(opt.ui.backdrop.color);
   renderer->SetBackdropOpacity(opt.ui.backdrop.opacity);
   renderer->ShowNotification(opt.ui.notifications.enable);
   renderer->ShowBindings(opt.ui.notifications.show_bindings);
