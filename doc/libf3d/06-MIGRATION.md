@@ -1,4 +1,9 @@
-# Migrate from v3.x
+# Migrate from v3.5
+
+This guide explains how to migrate the libf3d code base from v3.5 to v4.0.
+
+> [!WARNING]
+> This guide assumes all deprecation warnings have been addressed, since the deprecated APIs have been removed.
 
 ## User callback
 
