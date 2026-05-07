@@ -750,7 +750,6 @@ private:
   bool UseSSAOPass = false;
   bool UseToneMappingPass = false;
   bool DisplayDepth = false;
-  bool DisplayDepthScalarColoring = false;
   bool UseBlurBackground = false;
   std::optional<bool> UseOrthographicProjection = false;
   bool InvertZoom = false;
