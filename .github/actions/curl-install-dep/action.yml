@@ -1,19 +1,13 @@
 name: "Install curl Dependency"
 description: "Install curl Dependency using cache when possible"
 inputs:
+  versions_file:
+    description: "File to recover versions from"
+    required: true
   cpu:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
-  version:
-    description: "Version of curl to build"
-    required: true
-  zlib_version:
-    description: "Version of zlib to build against"
-    required: true
-  global_cache_index:
-    description: "Global cache index"
-    required: true
 
 runs:
   using: "composite"
@@ -21,16 +15,35 @@ runs:
     - name: Check required inputs
       shell: bash
       run: |
-        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
-        [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
-        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+        [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
+
+    - name: Extract curl version
+      id: curl_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: curl
+
+    - name: Extract zlib version
+      id: zlib_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: zlib
+
+    - name: Extract global cache index
+      id: global_idx
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        special_name: global_cache_index
 
     - name: Cache curl
       id: cache-curl
       uses: actions/cache/restore@v5
       with:
         path: dependencies/curl_install
-        key: curl-${{inputs.version}}-${{ inputs.zlib_version }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-2
+        key: curl-${{steps.curl_ver.outputs.extract}}-${{ steps.zlib_ver.outputs.extract }}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
 
     # Dependents: pdal vtk
     - name: Checkout curl
@@ -39,7 +52,7 @@ runs:
       with:
         repository: curl/curl
         path: "./dependencies/curl"
-        ref: ${{inputs.version}}
+        ref: ${{steps.curl_ver.outputs.extract}}
 
     - name: Setup curl
       if: steps.cache-curl.outputs.cache-hit != 'true'

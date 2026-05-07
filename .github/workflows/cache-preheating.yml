@@ -11,13 +11,17 @@ jobs:
   #----------------------------------------------------------------------------
   cache_preheating:
     name: Cache Preheating
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    container: ghcr.io/f3d-app/f3d-ci
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
       - uses: actions/checkout@v6
         with:
           ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
+          path: "source"
           fetch-depth: 1
           lfs: false
 
@@ -29,8 +33,8 @@ jobs:
           cd dependencies
           mkdir install
 
-      - name: Install sqlite
-        uses: ./.github/actions/sqlite-install-dep
+      - name: VTK Dependencies
+        uses: ./source/.github/actions/vtk-dependencies
         with:
+          versions_file: ./source/.github/workflows/versions.json
           cpu: x86_64
-          versions_file: .github/workflows/versions.json

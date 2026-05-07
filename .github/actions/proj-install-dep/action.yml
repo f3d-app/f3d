@@ -1,19 +1,13 @@
 name: "Install proj Dependency"
 description: "Install proj Dependency using cache when possible"
 inputs:
+  versions_file:
+    description: "File to recover versions from"
+    required: true
   cpu:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
-  version:
-    description: "Version of proj to build"
-    required: true
-  sqlite_csb_version:
-    description: "Version of csb providing sqlite to build against"
-    required: true
-  global_cache_index:
-    description: "Global cache index"
-    required: true
 
 runs:
   using: "composite"
@@ -21,16 +15,35 @@ runs:
     - name: Check required inputs
       shell: bash
       run: |
-        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
-        [[ "${{ inputs.sqlite_csb_version }}" ]] || { echo "sqlite_csb_version input is empty" ; exit 1; }
-        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+        [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
+
+    - name: Extract proj version
+      id: proj_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: proj
+
+    - name: Extract sqlite version
+      id: sqlite_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: sqlite_csb
+
+    - name: Extract global cache index
+      id: global_idx
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        special_name: global_cache_index
 
     - name: Cache proj
       id: cache-proj
       uses: actions/cache/restore@v5
       with:
         path: dependencies/proj_install
-        key: proj-${{inputs.version}}-${{ inputs.sqlite_csb_version }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-2
+        key: proj-${{steps.proj_ver.outputs.extract}}-${{ steps.sqlite_ver.outputs.extract }}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
 
     # Dependents: gdal geotiff
     - name: Checkout proj
@@ -39,11 +52,11 @@ runs:
       with:
         repository: OSGeo/PROJ
         path: "./dependencies/proj"
-        ref: ${{inputs.version}}
+        ref: ${{steps.proj_ver.outputs.extract}}
 
     # Patch for compilation of minver
     - name: Patch proj include
-      if: steps.cache-proj.outputs.cache-hit != 'true' && inputs.version == '9.0.0'
+      if: steps.cache-proj.outputs.cache-hit != 'true' && steps.proj_ver.outputs.extract == '9.0.0'
       working-directory: ${{github.workspace}}/dependencies/proj
       shell: bash
       run: patch -p1 < $GITHUB_ACTION_PATH/add-missing-cstdint-includes.patch
