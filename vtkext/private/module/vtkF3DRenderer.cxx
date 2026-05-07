@@ -3387,7 +3387,8 @@ void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
   if (this->DisplayDepth)
   {
     arrayName = "DEPTH";
-  } else
+  }
+  else
   {
     arrayName += " (";
     arrayName += this->ComponentToString(component);
