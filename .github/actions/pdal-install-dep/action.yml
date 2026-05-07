@@ -57,6 +57,21 @@ runs:
       uses: f3d-app/extract-version-action@main
       with:
         file: ${{inputs.versions_file}}
+        name: tiff
+
+    - name: Extract zlib version
+      id: zlib_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: zlib
+
+    - name: Extract global cache index
+      id: global_idx
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        special_name: global_cache_index
 
     - name: Cache pdal
       id: cache-pdal
