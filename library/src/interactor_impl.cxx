@@ -560,7 +560,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  bool StartEventLoop(double deltaTime, std::function<void()> userCallBack)
+  bool StartEventLoop(double deltaTime)
   {
     if (this->EventLoopObserverId != -1)
     {
@@ -571,25 +571,22 @@ public:
     // Trigger a render to ensure Window is ready to be configured
     this->Window.render();
 
-    // Copy user callback
-    this->EventLoopUserCallBack = std::move(userCallBack);
-
     // Create the timer
     this->EventLoopTimerId = this->VTKInteractor->CreateRepeatingTimer(deltaTime * 1000);
 
     this->CallbackDeltaTime = deltaTime;
 
     // Create the callback and add an observer
-    vtkNew<vtkCallbackCommand> timerCallBack;
-    timerCallBack->SetCallback(
+    vtkNew<vtkCallbackCommand> timerCallback;
+    timerCallback->SetCallback(
       [](vtkObject*, unsigned long, void* clientData, void*)
       {
         internals* that = static_cast<internals*>(clientData);
         that->EventLoop(that->CallbackDeltaTime);
       });
     this->EventLoopObserverId =
-      this->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
-    timerCallBack->SetClientData(this);
+      this->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallback);
+    timerCallback->SetClientData(this);
     return true;
   }
 
@@ -603,6 +600,7 @@ public:
     }
     this->VTKInteractor->RemoveObserver(this->EventLoopObserverId);
     this->VTKInteractor->DestroyTimer(this->EventLoopTimerId);
+    this->EventLoopUserCallback = nullptr;
     this->EventLoopObserverId = -1;
     this->EventLoopTimerId = 0;
     return true;
@@ -621,9 +619,9 @@ public:
       this->Interactor.stop();
       return;
     }
-    if (this->EventLoopUserCallBack)
+    if (this->EventLoopUserCallback)
     {
-      this->EventLoopUserCallBack();
+      this->EventLoopUserCallback({ .animationTime = this->AnimationManager->GetCurrentTime() });
     }
 
     if (this->CommandBuffer.has_value())
@@ -695,7 +693,7 @@ public:
   int DragDistanceTol = 3;      /* px */
   int TransitionDuration = 100; /* ms */
 
-  std::function<void()> EventLoopUserCallBack = nullptr;
+  std::function<void(interactor_state_t)> EventLoopUserCallback = nullptr;
   unsigned long EventLoopTimerId = 0;
   int EventLoopObserverId = -1;
   std::atomic<bool> RenderRequested = false;
@@ -2038,8 +2036,21 @@ interactor& interactor_impl::disableCameraMovement()
 }
 
 //----------------------------------------------------------------------------
-bool interactor_impl::playInteraction(
-  const fs::path& file, double loopTime, std::function<void()> userCallBack)
+interactor& interactor_impl::setEventLoopUserCallback(
+  std::function<void(interactor_state_t)> userCallback)
+{
+  if (this->Internals->EventLoopObserverId != -1)
+  {
+    log::info("Cannot set event loop user callback after the event loop has started");
+    return *this;
+  }
+
+  this->Internals->EventLoopUserCallback = std::move(userCallback);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+bool interactor_impl::playInteraction(const fs::path& file, double loopTime)
 {
   try
   {
@@ -2053,7 +2064,7 @@ bool interactor_impl::playInteraction(
     this->Internals->Recorder->Off();
     this->Internals->Recorder->Clear();
 
-    bool loop = this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
+    bool loop = this->Internals->StartEventLoop(loopTime);
     this->Internals->Recorder->SetFileName(file.string().c_str());
     this->Internals->Recorder->Play();
 
@@ -2114,9 +2125,9 @@ bool interactor_impl::recordInteraction(const fs::path& file)
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::start(double loopTime, std::function<void()> userCallBack)
+interactor& interactor_impl::start(double loopTime)
 {
-  if (this->Internals->StartEventLoop(loopTime, std::move(userCallBack)))
+  if (this->Internals->StartEventLoop(loopTime))
   {
     this->Internals->VTKInteractor->Start();
   }

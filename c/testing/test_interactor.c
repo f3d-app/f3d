@@ -137,7 +137,8 @@ int test_interactor()
 
   f3d_interactor_remove_binding(interactor, &bind);
 
-  f3d_interactor_start_with_callback(interactor, 0.01, stop_callback, interactor);
+  f3d_interactor_set_event_loop_user_callback(interactor, stop_callback, interactor);
+  f3d_interactor_start(interactor, 0.01);
 
   f3d_engine_delete(engine);
   return 0;

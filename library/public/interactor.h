@@ -59,6 +59,14 @@ struct interaction_bind_t
 };
 
 /**
+ * State of the interactor that can be used in the user callback of playInteraction and start.
+ */
+struct interactor_state_t
+{
+  double animationTime = 0.0;
+};
+
+/**
  * @class   interactor
  * @brief   Class used to control interaction and animation
  *
@@ -382,11 +390,9 @@ public:
   /**
    * Play a VTK interaction file.
    * Provided file path is used as is and file existence will be checked.
-   * If the event loop is not already running, it will be triggered every deltaTime in seconds,
-   * and userCallBack will be called at the start of the event loop.
+   * If the event loop is not already running, it will be triggered every deltaTime in seconds.
    */
-  virtual bool playInteraction(const std::filesystem::path& file, double deltaTime = 1.0 / 30,
-    std::function<void()> userCallBack = nullptr) = 0;
+  virtual bool playInteraction(const std::filesystem::path& file, double deltaTime = 1.0 / 30) = 0;
 
   /**
    * Start interaction and record it all in a VTK interaction file.
@@ -395,13 +401,18 @@ public:
   virtual bool recordInteraction(const std::filesystem::path& file) = 0;
 
   /**
+   * Set the user callback of the event loop, which is called right after the rendering.
+   */
+  virtual interactor& setEventLoopUserCallback(
+    std::function<void(interactor_state_t)> userCallback) = 0;
+
+  /**
    * Start the interactor event loop.
-   * The event loop will be triggered every deltaTime in seconds, and userCallBack will be called at
-   * the start of the event loop, deltaTime should be strictly positive.
+   * The event loop will be triggered every deltaTime in seconds.
+   * deltaTime should be strictly positive.
    * Safe to call multiple times but will log an info in that case.
    */
-  virtual interactor& start(
-    double deltaTime = 1.0 / 30, std::function<void()> userCallBack = nullptr) = 0;
+  virtual interactor& start(double deltaTime = 1.0 / 30) = 0;
 
   /**
    * Stop the interactor.
