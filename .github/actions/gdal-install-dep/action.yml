@@ -57,13 +57,21 @@ runs:
       uses: f3d-app/extract-version-action@main
       with:
         file: ${{inputs.versions_file}}
+        name: zlib
+
+    - name: Extract global cache index
+      id: global_idx
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        special_name: global_cache_index
 
     - name: Cache gdal
       id: cache-gdal
       uses: actions/cache/restore@v5
       with:
         path: dependencies/gdal_install
-        key: gdal-${{steps.gdal_ver.outputs.extract}}-${{steps.geotiff_ver.outputs.extract}}-${{steps.proj_ver.outputs.extract}}-${{steps.sqlite_ver.outputs.extract}}-${{steps.tiff_ver.outputs.extract}}-${{steps.zlib_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-5
+        key: gdal-${{steps.gdal_ver.outputs.extract}}-${{steps.geotiff_ver.outputs.extract}}-${{steps.proj_ver.outputs.extract}}-${{steps.sqlite_csb_ver.outputs.extract}}-${{steps.tiff_ver.outputs.extract}}-${{steps.zlib_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-5
 
     # Dependents: pdal vtk
     - name: Checkout gdal
