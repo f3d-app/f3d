@@ -1,34 +1,33 @@
 name: "Install sqlite Dependency"
 description: "Install sqlite Dependency using cache when possible"
 inputs:
+  versions_file:
+    description: "File to recover versions from"
+    required: true
   cpu:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
-  versions_file:
-    description: "File to recover versions from"
-    required: true
-
 runs:
   using: "composite"
   steps:
     - name: Check required inputs
       shell: bash
       run: |
-        [[ "${{ inputs.versions_file }}" ]] || { echo "versions_file is empty" ; exit 1; }
+        [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
 
     - name: Extract sqlite version
       id: sqlite_ver
       uses: f3d-app/extract-version-action@main
       with:
-        file: ${{ inputs.versions_file }}
+        file: ${{inputs.versions_file}}
         name: sqlite_csb
 
     - name: Extract global cache index
       id: global_idx
       uses: f3d-app/extract-version-action@main
       with:
-        file: ${{ inputs.versions_file }}
+        file: ${{inputs.versions_file}}
         special_name: global_cache_index
 
     - name: Cache sqlite

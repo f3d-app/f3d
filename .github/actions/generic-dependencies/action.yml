@@ -1,6 +1,9 @@
 name: "Install F3D dependencies"
 description: "Install all F3D Dependencies but VTK"
 inputs:
+  versions_file:
+    description: "File to recover versions from"
+    required: true
   optional_deps_label:
     description: "Label to optional dependencies"
     required: false
@@ -9,79 +12,15 @@ inputs:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
-  alembic_version:
-    description: "Version of alembic to build"
-    required: false
-  assimp_version:
-    description: "Version of assimp to build"
-    required: false
-  blosc_version:
-    description: "Version of blosc to build"
-    required: true
-  curl_version:
-    description: "Version of curl to build"
-    required: false
-  draco_version:
-    description: "Version of draco to build"
-    required: false
-  gdal_version:
-    description: "Version of gdal to build"
-    required: false
-  geotiff_version:
-    description: "Version of geotiff to build"
-    required: false
-  imath_version:
-    description: "Version of imath to build"
-    required: false
-  occt_version:
-    description: "Version of occt to build"
-    required: false
-  openexr_version:
-    description: "Version of openexr to build"
-    required: false
-  openvdb_version:
-    description: "Version of openvdb to build"
-    required: false
-  ospray_version:
-    description: "Version of ospray to build"
-    required: false
-  pdal_version:
-    description: "Version of pdal to build"
-    required: false
-  proj_version:
-    description: "Version of proj to build"
-    required: false
-  pybind11_version:
-    description: "Version of pybind11 to build"
-    required: false
-  sqlite_csb_version:
-    description: "Version of sqlite common superbuild to build"
-    required: false
-  tbb_version:
-    description: "Version of tbb to build"
-    required: true
-  tiff_version:
-    description: "Version of tiff to build"
-    required: false
-  usd_version:
-    description: "Version of usd to build"
-    required: false
-  webp_version:
-    description: "Version of webp to build"
-    required: false
-  webifc_version:
-    description: "Version of webifc to build"
-    required: false
-  zlib_version:
-    description: "Version of zlib to build"
-    required: true
-  global_cache_index:
-    description: "Global cache index"
-    required: true
 
 runs:
   using: "composite"
   steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.versions_file }}" ]] || { echo "versions_file is empty" ; exit 1; }
+
     - name: Dependencies Dir
       shell: bash
       working-directory: ${{github.workspace}}
@@ -93,42 +32,19 @@ runs:
     - name: Install VTK dependencies
       uses: ./source/.github/actions/vtk-dependencies
       with:
+        versions_file: .github/workflows/versions.json
         cpu: ${{inputs.cpu}}
-        blosc_version: ${{inputs.blosc_version}}
-        curl_version: ${{inputs.curl_version}}
-        gdal_version: ${{inputs.gdal_version}}
-        geotiff_version: ${{inputs.geotiff_version}}
-        openvdb_version: ${{inputs.openvdb_version}}
-        pdal_version: ${{inputs.pdal_version}}
-        proj_version: ${{inputs.proj_version}}
-        sqlite_csb_version: ${{inputs.sqlite_csb_version}}
-        tbb_version: ${{inputs.tbb_version}}
-        tiff_version: ${{inputs.tiff_version}}
-        zlib_version: ${{inputs.zlib_version}}
-        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install Raytracing Dependencies
       if: inputs.ospray_version != ''
       uses: ./source/.github/actions/ospray-sb-install-dep
       with:
-        version: ${{inputs.ospray_version}}
+        versions_file: .github/workflows/versions.json
         cpu: ${{inputs.cpu}}
-        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install F3D dependencies
       if: inputs.optional_deps_label == 'optional-deps'
       uses: ./source/.github/actions/f3d-dependencies
       with:
+        versions_file: .github/workflows/versions.json
         cpu: ${{inputs.cpu}}
-        alembic_version: ${{inputs.alembic_version}}
-        assimp_version: ${{inputs.assimp_version}}
-        draco_version: ${{inputs.draco_version}}
-        imath_version: ${{inputs.imath_version}}
-        occt_version: ${{inputs.occt_version}}
-        openexr_version: ${{inputs.openexr_version}}
-        pybind11_version: ${{inputs.pybind11_version}}
-        tbb_version: ${{inputs.tbb_version}}
-        usd_version: ${{inputs.usd_version}}
-        webp_version: ${{inputs.webp_version}}
-        webifc_version: ${{inputs.webifc_version}}
-        global_cache_index: ${{inputs.global_cache_index}}
