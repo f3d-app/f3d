@@ -64,7 +64,7 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: dependencies/geotiff_install
-        key: geotiff-${{steps.geotiff_ver.outputs.extract}}-${{steps.proj_ver.outputs.extract}}-${{steps.sqlite_ver.outputs.extract}}-${{steps.tiff_ver.outputs.extract}}-${{steps.zlib_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
+        key: geotiff-${{steps.geotiff_ver.outputs.extract}}-${{steps.proj_ver.outputs.extract}}-${{steps.sqlite_csb_ver.outputs.extract}}-${{steps.tiff_ver.outputs.extract}}-${{steps.zlib_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
 
     # Dependents: gdal pdal vtk
     - name: Checkout geotiff
