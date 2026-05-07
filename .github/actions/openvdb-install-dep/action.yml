@@ -29,18 +29,21 @@ runs:
       uses: f3d-app/extract-version-action@main
       with:
         file: ${{inputs.versions_file}}
+        name: zlib
 
     - name: Extract blosc version
       id: blosc_ver
       uses: f3d-app/extract-version-action@main
       with:
         file: ${{inputs.versions_file}}
+        name: blosc
 
     - name: Extract tbb version
       id: tbb_ver
       uses: f3d-app/extract-version-action@main
       with:
         file: ${{inputs.versions_file}}
+        name: tbb
 
     - name: Extract global cache index
       id: global_idx
