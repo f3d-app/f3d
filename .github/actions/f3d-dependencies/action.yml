@@ -55,7 +55,7 @@ runs:
     - name: Install pybind11 dependency
       uses: ./source/.github/actions/pybind11-install-dep
       with:
-        version: ${{inputs.pybind11_version}}
+        versions_file: ${{inputs.versions_file}}
         global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install USD dependency
