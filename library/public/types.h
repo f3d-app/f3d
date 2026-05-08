@@ -312,13 +312,15 @@ protected:
 };
 
 /**
- * Describe a 3D surfacic mesh.
+ * Describe a static 3D surfacic mesh.
  * A valid mesh fulfills these requirements:
  * - points must not be empty and its length must be a multiple of 3 (3 times the number of points)
  * - normals can be empty or its length must be 3 times the number of points
  * - texture_coordinates can be empty or its length must be 2 times the number of points
  * - face_sides can be any size including empty resulting in a point cloud
  * - face_indices length must be the sum of all values in face_sides
+ * @deprecated Derive mesh class instead, as it provides more flexibility and better performance,
+ * and can represent animated meshes as well.
  */
 struct mesh_t
 {

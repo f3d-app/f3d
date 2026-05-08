@@ -16,14 +16,27 @@
 
 #include <optional>
 #include <vtkCallbackCommand.h>
+#include <vtkCellArray.h>
+#include <vtkCellData.h>
+#include <vtkFloatArray.h>
 #include <vtkLightCollection.h>
 #include <vtkMemoryResourceStream.h>
+#include <vtkPointData.h>
+#include <vtkPoints.h>
+#include <vtkPolyData.h>
 #include <vtkProgressBarRepresentation.h>
 #include <vtkProgressBarWidget.h>
 #include <vtkTimerLog.h>
+#include <vtkUnsignedIntArray.h>
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
+// requires https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12411
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251110)
+#include <vtkStridedArray.h>
+#endif
+
+#include <numeric>
 #include <vector>
 
 namespace fs = std::filesystem;
@@ -372,17 +385,172 @@ scene& scene_impl::add(const mesh_t& mesh)
   }
 
   vtkNew<vtkF3DMemoryMesh> vtkSource;
-  vtkSource->SetPoints(mesh.points);
-  vtkSource->SetNormals(mesh.normals);
-  vtkSource->SetTCoords(mesh.texture_coordinates);
-  vtkSource->SetFaces(mesh.face_sides, mesh.face_indices);
 
-  vtkSmartPointer<vtkF3DGenericImporter> importer = vtkSmartPointer<vtkF3DGenericImporter>::New();
+  vtkSource->SetUpdateFunction(
+    [=](double, vtkPolyData* polydata)
+    {
+      vtkNew<vtkFloatArray> positions;
+      positions->SetName("Positions");
+      positions->SetNumberOfComponents(3);
+      positions->SetNumberOfTuples(mesh.points.size() / 3);
+      std::ranges::copy(mesh.points, positions->Begin());
+
+      vtkNew<vtkPoints> points;
+      points->SetData(positions);
+
+      polydata->SetPoints(points);
+
+      if (mesh.normals.size() > 0)
+      {
+        vtkNew<vtkFloatArray> normals;
+        normals->SetName("Normals");
+        normals->SetNumberOfComponents(3);
+        normals->SetNumberOfTuples(mesh.points.size() / 3);
+        std::ranges::copy(mesh.normals, normals->Begin());
+
+        polydata->GetPointData()->SetNormals(normals);
+      }
+
+      if (mesh.texture_coordinates.size() > 0)
+      {
+        vtkNew<vtkFloatArray> tcoords;
+        tcoords->SetName("TCoords");
+        tcoords->SetNumberOfComponents(2);
+        tcoords->SetNumberOfTuples(mesh.points.size() / 3);
+        std::ranges::copy(mesh.texture_coordinates, tcoords->Begin());
+
+        polydata->GetPointData()->SetTCoords(tcoords);
+      }
+
+      vtkNew<vtkIdTypeArray> offsets;
+      vtkNew<vtkIdTypeArray> connectivity;
+
+      offsets->SetNumberOfTuples(mesh.face_sides.size() + 1);
+      connectivity->SetNumberOfTuples(mesh.face_indices.size());
+
+      // fill offsets
+      offsets->SetValue(0, 0);
+      std::inclusive_scan(mesh.face_sides.begin(), mesh.face_sides.end(), offsets->Begin() + 1);
+
+      // fill connectivity
+      std::ranges::copy(mesh.face_indices, connectivity->Begin());
+
+      vtkNew<vtkCellArray> polys;
+      polys->SetData(offsets, connectivity);
+      polydata->SetPolys(polys);
+    });
+
+  vtkNew<vtkF3DGenericImporter> importer;
   importer->SetInternalReader(vtkSource);
 
   log::debug("Loading 3D scene from memory");
   this->Internals->Load({ { "<mesh>", importer } });
   return *this;
+}
+
+//----------------------------------------------------------------------------
+scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
+{
+  // requires https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12411
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251110)
+  vtkNew<vtkF3DMemoryMesh> vtkSource;
+  auto timeRange = mesh->getTimeRange();
+  vtkSource->SetTimeRange(timeRange[0], timeRange[1]);
+
+  vtkSource->SetUpdateFunction(
+    [=](double time, vtkPolyData* polydata)
+    {
+      const auto memoryView = mesh->getMemoryView(time);
+
+      vtkNew<vtkStridedArray<float>> positions;
+      positions->SetName("Positions");
+      positions->SetNumberOfComponents(3);
+      positions->SetNumberOfTuples(memoryView.pointCount);
+      positions->ConstructBackend(memoryView.points, memoryView.pointsStride, 3);
+
+      vtkNew<vtkPoints> points;
+      points->SetData(positions);
+
+      polydata->SetPoints(points);
+
+      if (memoryView.normals != nullptr)
+      {
+        vtkNew<vtkStridedArray<float>> normals;
+        normals->SetName("Normals");
+        normals->SetNumberOfComponents(3);
+        normals->SetNumberOfTuples(memoryView.pointCount);
+        normals->ConstructBackend(memoryView.normals, memoryView.normalsStride, 3);
+
+        polydata->GetPointData()->SetNormals(normals);
+      }
+
+      if (memoryView.textureCoordinates != nullptr)
+      {
+        vtkNew<vtkStridedArray<float>> tcoords;
+        tcoords->SetName("TCoords");
+        tcoords->SetNumberOfComponents(2);
+        tcoords->SetNumberOfTuples(memoryView.pointCount);
+        tcoords->ConstructBackend(
+          memoryView.textureCoordinates, memoryView.textureCoordinatesStride, 2);
+
+        polydata->GetPointData()->SetTCoords(tcoords);
+      }
+
+      for (const auto& scalar : memoryView.pointScalars)
+      {
+        f3d::mesh_view::scalarTypeDispatch(scalar.type,
+          [&]<typename ScalarT>()
+          {
+            vtkNew<vtkStridedArray<ScalarT>> scalars;
+            scalars->SetName(scalar.name.c_str());
+            scalars->SetNumberOfComponents(static_cast<int>(scalar.components));
+            scalars->SetNumberOfTuples(memoryView.pointCount);
+            scalars->ConstructBackend(reinterpret_cast<const ScalarT*>(scalar.data), scalar.stride,
+              static_cast<int>(scalar.components));
+
+            polydata->GetPointData()->AddArray(scalars);
+          });
+      }
+
+      for (const auto& scalar : memoryView.faceScalars)
+      {
+        f3d::mesh_view::scalarTypeDispatch(scalar.type,
+          [&]<typename ScalarT>()
+          {
+            vtkNew<vtkStridedArray<ScalarT>> scalars;
+            scalars->SetName(scalar.name.c_str());
+            scalars->SetNumberOfComponents(static_cast<int>(scalar.components));
+            scalars->SetNumberOfTuples(memoryView.faceOffsetCount - 1);
+            scalars->ConstructBackend(reinterpret_cast<const ScalarT*>(scalar.data), scalar.stride,
+              static_cast<int>(scalar.components));
+
+            polydata->GetCellData()->AddArray(scalars);
+          });
+      }
+
+      vtkNew<vtkUnsignedIntArray> offsets;
+      vtkNew<vtkUnsignedIntArray> connectivity;
+
+      offsets->SetArray(
+        const_cast<unsigned int*>(memoryView.faceOffsets), memoryView.faceOffsetCount, 1);
+      connectivity->SetArray(
+        const_cast<unsigned int*>(memoryView.faceIndices), memoryView.faceIndexCount, 1);
+
+      vtkNew<vtkCellArray> polys;
+      polys->SetData(offsets, connectivity);
+      polydata->SetPolys(polys);
+    });
+
+  vtkNew<vtkF3DGenericImporter> importer;
+  importer->SetInternalReader(vtkSource);
+
+  log::debug("Loading 3D scene from memory");
+  this->Internals->Load({ { "<mesh_view>", importer } });
+  return *this;
+#else
+  throw scene::load_failure_exception(
+    "Loading a mesh from memory using add(std::shared_ptr<mesh>) requires VTK >= 9.6");
+#endif
 }
 
 //----------------------------------------------------------------------------

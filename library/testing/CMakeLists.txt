@@ -62,6 +62,14 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
     )
 endif()
 
+# Needs stride arrays
+# https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12411
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20251110)
+  list(APPEND libf3dSDKTests_list
+    TestSDKSceneFromMemoryZeroCopy.cxx
+    )
+endif()
+
 # Configure the log file for dropfile test
 configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorCallBack.log.in"
                "${CMAKE_BINARY_DIR}/TestSDKInteractorCallBack.log") # Dragon.vtu; S

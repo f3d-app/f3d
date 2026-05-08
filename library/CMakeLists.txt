@@ -81,6 +81,7 @@ set(F3D_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/public/image.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/interactor.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/log.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/mesh_view.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/scene.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/types.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/utils.h

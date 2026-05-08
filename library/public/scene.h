@@ -3,6 +3,7 @@
 
 #include "exception.h"
 #include "export.h"
+#include "mesh_view.h"
 #include "types.h"
 
 /// @cond
@@ -66,6 +67,15 @@ public:
    * On other failure, throw a load_failure_exception.
    */
   virtual scene& add(const mesh_t& mesh) = 0;
+
+  /**
+   * Add and load provided mesh view into the scene
+   * Requires VTK >= 9.6
+   * If it fails to load the mesh, it clears the scene and
+   * throw a load_failure_exception.
+   * On other failure, throw a load_failure_exception.
+   */
+  virtual scene& add(std::shared_ptr<mesh_view> mesh) = 0;
 
   /**
    * Add and load provided buffer into the scene as it was file.
