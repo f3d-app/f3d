@@ -44,7 +44,7 @@ runs:
       with:
         repository: webmproject/libwebp
         path: "./dependencies/webp"
-        ref: ${{inputs.version}}
+        ref: ${{steps.webp_ver.outputs.extract}}
 
     - name: Setup WebP
       if: steps.cache-webp.outputs.cache-hit != 'true'

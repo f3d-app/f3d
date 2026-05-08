@@ -65,7 +65,7 @@ runs:
       with:
         repository: PixarAnimationStudios/USD
         path: "./dependencies/usd"
-        ref: ${{inputs.version}}
+        ref: ${{steps.usd_ver.outputs.extract}}
 
     # Upstream issue: https://github.com/PixarAnimationStudios/OpenUSD/issues/2490
     - name: Patch USD

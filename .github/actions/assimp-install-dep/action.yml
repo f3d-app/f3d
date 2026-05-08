@@ -44,7 +44,7 @@ runs:
       with:
         repository: assimp/assimp
         path: "./dependencies/assimp"
-        ref: ${{inputs.version}}
+        ref: ${{steps.assimp_ver.outputs.extract}}
 
     - name: Setup ASSIMP
       if: steps.cache-assimp.outputs.cache-hit != 'true'

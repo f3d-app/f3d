@@ -45,7 +45,7 @@ runs:
         repository: pybind/pybind11
         submodules: true
         path: "./dependencies/pybind11"
-        ref: ${{inputs.version}}
+        ref: ${{steps.pybind11_ver.outputs.extract}}
 
     - name: Setup pybind11
       if: steps.cache-pybind11.outputs.cache-hit != 'true'
