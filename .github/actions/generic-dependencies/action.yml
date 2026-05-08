@@ -4,10 +4,14 @@ inputs:
   versions_file:
     description: "File to recover versions from"
     required: true
-  optional_deps_label:
-    description: "Label to optional dependencies"
+  optdeps_label:
+    description: "Label to flag for optional dependencies"
     required: false
-    default: "optional-deps"
+    default: "optdeps"
+  mindeps_label:
+    description: "Label to flag for minimum versions dependencies"
+    required: false
+    default: "no-mindeps"
   cpu:
     description: "CPU architecture to build for"
     required: false
@@ -33,18 +37,22 @@ runs:
       uses: ./source/.github/actions/vtk-dependencies
       with:
         versions_file: .github/workflows/versions.json
+        optdeps_label: ${{inputs.optdeps_label}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install Raytracing Dependencies
-      if: inputs.ospray_version != ''
+      if: inputs.optdeps_label == 'optdeps'
       uses: ./source/.github/actions/ospray-sb-install-dep
       with:
         versions_file: .github/workflows/versions.json
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install F3D dependencies
-      if: inputs.optional_deps_label == 'optional-deps'
+      if: inputs.optdeps_label == 'optdeps'
       uses: ./source/.github/actions/f3d-dependencies
       with:
         versions_file: .github/workflows/versions.json
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
