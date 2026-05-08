@@ -61,7 +61,7 @@ runs:
         special_name: global_cache_index
 
     - name: Cache openexr
-      id: cache-openexr
+      id: cache-usd
       uses: actions/cache/restore@v5
       with:
         path: dependencies/openexr_install
