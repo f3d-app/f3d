@@ -17,7 +17,7 @@ runs:
         [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
 
     - name: Extract sqlite version
-      id: sqlite_ver
+      id: sqlite_csb_ver
       uses: f3d-app/extract-version-action@main
       with:
         file: ${{inputs.versions_file}}
@@ -35,7 +35,7 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: dependencies/sqlite_build/install
-        key: sqlite-${{steps.sqlite_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
+        key: sqlite-${{steps.sqlite_csb_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
 
     # Dependents: proj
     # use --depth=1 --revision=${{steps.sqlite_ver.outputs.extract}}

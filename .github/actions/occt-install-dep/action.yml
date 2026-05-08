@@ -1,32 +1,41 @@
 name: "Install OCCT Dependency"
 description: "Install OCCT Dependency using cache when possible"
 inputs:
+  versions_file:
+    description: "File to recover versions from"
+    required: true
   cpu:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
-  version:
-    description: "Version of occt to build"
-    required: true
-  global_cache_index:
-    description: "Global cache index"
-    required: true
 
 runs:
   using: "composite"
   steps:
     - name: Check required inputs
       shell: bash
-      run: |
-        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
-        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+      run: [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
 
-    - name: Cache OCCT
+    - name: Extract occt version
+      id: occt_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: occt
+
+    - name: Extract global cache index
+      id: global_idx
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        special_name: global_cache_index
+
+    - name: Cache occt
       id: cache-occt
       uses: actions/cache/restore@v5
       with:
         path: dependencies/occt_install
-        key: occt-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-2
+        key: occt-${{steps.occt_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
 
     - name: Checkout OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'

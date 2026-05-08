@@ -38,3 +38,15 @@ jobs:
         with:
           versions_file: ./source/.github/workflows/versions.json
           cpu: x86_64
+
+      - name: Install Raytracing Dependencies
+        uses: ./source/.github/actions/ospray-sb-install-dep
+        with:
+          versions_file: .github/workflows/versions.json
+          cpu: x86_64
+
+      - name: Install F3D dependencies
+        uses: ./source/.github/actions/f3d-dependencies
+        with:
+          versions_file: .github/workflows/versions.json
+          cpu: x86_64
