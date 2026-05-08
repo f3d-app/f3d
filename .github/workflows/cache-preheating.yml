@@ -45,4 +45,4 @@ jobs:
           versions_file: ./source/.github/workflows/versions.json
           optdeps_label: ${{matrix.optdeps_label}}
           mindeps_label: ${{matrix.mindeps_label}}
-          cpu: x86_64
+          cpu: cpu: ${{ matrix.os == 'macos-15' && 'arm64' || 'x86_64' }}
