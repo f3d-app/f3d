@@ -14,19 +14,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-22.04, windows-latest, macos-15, macos-15-intel]
         build_type: [standard]
         include:
           - optdeps_label: optdeps
           - mindeps_label: no-mindeps
           - build_type: mindeps
+            os: ubuntu-22.04
             optdeps_label: optdeps
             mindeps_label: mindeps
-          - build_type: no-optdeps
-            optdeps_label: no-optdeps
-            mindeps_label: no-mindeps
 
-    runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-ci
+    runs-on: ${{matrix.os}}
+    container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
