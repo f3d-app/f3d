@@ -56,7 +56,7 @@ runs:
       uses: ./source/.github/actions/pybind11-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
-        global_cache_index: ${{inputs.global_cache_index}}
+        cpu: ${{inputs.cpu}}
 
     - name: Install USD dependency
       uses: ./source/.github/actions/usd-install-dep
