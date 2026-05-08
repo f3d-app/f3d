@@ -51,7 +51,7 @@ runs:
       with:
         repository: alembic/alembic
         path: "./dependencies/alembic"
-        ref: ${{inputs.version}}
+        ref: ${{steps.alembic_ver.outputs.extract}}
 
     # https://github.com/alembic/alembic/issues/476
     - name: Patch Alembic rpath issue

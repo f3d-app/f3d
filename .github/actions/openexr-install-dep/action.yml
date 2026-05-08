@@ -52,7 +52,7 @@ runs:
       with:
         repository: AcademySoftwareFoundation/openexr
         path: "./dependencies/openexr"
-        ref: ${{inputs.version}}
+        ref: ${{steps.openexr_ver.outputs.extract}}
 
     - name: Setup OpenEXR
       if: steps.cache-openexr.outputs.cache-hit != 'true'

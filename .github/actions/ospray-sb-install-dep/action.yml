@@ -49,7 +49,7 @@ runs:
       with:
         repository: RenderKit/ospray
         path: "./dependencies/ospray"
-        ref: ${{inputs.version}}
+        ref: ${{steps.ospray_ver.outputs.extract}}
 
     # https://github.com/ospray/ospray/pull/550
     - name: Patch ospray rkcommon superbuild

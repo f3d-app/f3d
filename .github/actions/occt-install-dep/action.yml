@@ -45,7 +45,7 @@ runs:
         repository: Open-Cascade-SAS/OCCT
         submodules: true
         path: "./dependencies/occt"
-        ref: ${{inputs.version}}
+        ref: ${{steps.occt_ver.outputs.extract}}
 
     - name: Patch OCCT all versions
       if: steps.cache-occt.outputs.cache-hit != 'true'

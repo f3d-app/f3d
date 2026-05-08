@@ -44,7 +44,7 @@ runs:
       with:
         repository: google/draco
         path: "./dependencies/draco"
-        ref: ${{inputs.version}}
+        ref: ${{steps.draco_ver.outputs.extract}}
 
     - name: Setup Draco
       if: steps.cache-draco.outputs.cache-hit != 'true'

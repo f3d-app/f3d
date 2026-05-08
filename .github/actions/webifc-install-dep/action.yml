@@ -44,7 +44,7 @@ runs:
       with:
         repository: ThatOpen/engine_web-ifc
         path: "./dependencies/webifc"
-        ref: ${{inputs.version}}
+        ref: ${{steps.webifc_ver.outputs.extract}}
 
     - name: Setup webifc
       if: steps.cache-webifc.outputs.cache-hit != 'true'
