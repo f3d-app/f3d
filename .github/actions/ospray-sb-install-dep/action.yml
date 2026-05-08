@@ -27,6 +27,7 @@ runs:
       with:
         file: ${{inputs.versions_file}}
         name: ospray
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
 
     - name: Extract global cache index
       id: global_idx

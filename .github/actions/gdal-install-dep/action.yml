@@ -4,6 +4,10 @@ inputs:
   versions_file:
     description: "File to recover versions from"
     required: true
+  mindeps_label:
+    description: "Label to flag for minimum versions dependencies"
+    required: false
+    default: "no-mindeps"
   cpu:
     description: "CPU architecture to build for"
     required: false
@@ -23,6 +27,7 @@ runs:
       with:
         file: ${{inputs.versions_file}}
         name: gdal
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
 
     - name: Extract geotiff version
       id: geotiff_ver
@@ -30,6 +35,7 @@ runs:
       with:
         file: ${{inputs.versions_file}}
         name: geotiff
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
 
     - name: Extract proj version
       id: proj_ver
@@ -37,6 +43,7 @@ runs:
       with:
         file: ${{inputs.versions_file}}
         name: proj
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
 
     - name: Extract sqlite_csb version
       id: sqlite_csb_ver
@@ -44,6 +51,7 @@ runs:
       with:
         file: ${{inputs.versions_file}}
         name: sqlite_csb
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
 
     - name: Extract tiff version
       id: tiff_ver
@@ -51,6 +59,7 @@ runs:
       with:
         file: ${{inputs.versions_file}}
         name: tiff
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
 
     - name: Extract zlib version
       id: zlib_ver
@@ -58,6 +67,7 @@ runs:
       with:
         file: ${{inputs.versions_file}}
         name: zlib
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
 
     - name: Extract global cache index
       id: global_idx

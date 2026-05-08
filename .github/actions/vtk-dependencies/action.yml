@@ -11,7 +11,7 @@ inputs:
   mindeps_label:
     description: "Label to check for minimal version dependencies"
     required: false
-    default: "mindeps"
+    default: "no-mindeps"
   cpu:
     description: "CPU architecture to build for"
     required: false
@@ -41,6 +41,7 @@ runs:
       uses: ./.actions/sqlite-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install proj
@@ -48,18 +49,21 @@ runs:
       uses: ./.actions/proj-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install TBB
       uses: ./.actions/tbb-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install zlib
       uses: ./.actions/zlib-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install curl
@@ -67,12 +71,14 @@ runs:
       uses: ./.actions/curl-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install blosc
       uses: ./.actions/blosc-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install tiff
@@ -80,6 +86,7 @@ runs:
       uses: ./.actions/tiff-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install geotiff
@@ -87,6 +94,7 @@ runs:
       uses: ./.actions/geotiff-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install gdal
@@ -94,6 +102,7 @@ runs:
       uses: ./.actions/gdal-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install pdal
@@ -101,6 +110,7 @@ runs:
       uses: ./.actions/pdal-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install OpenVDB
@@ -108,4 +118,5 @@ runs:
       uses: ./.actions/openvdb-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}

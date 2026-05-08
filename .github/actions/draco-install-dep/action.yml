@@ -4,6 +4,10 @@ inputs:
   versions_file:
     description: "File to recover versions from"
     required: true
+  mindeps_label:
+    description: "Label to flag for minimum versions dependencies"
+    required: false
+    default: "no-mindeps"
   cpu:
     description: "CPU architecture to build for"
     required: false
@@ -23,6 +27,7 @@ runs:
       with:
         file: ${{inputs.versions_file}}
         name: draco
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
 
     - name: Extract global cache index
       id: global_idx

@@ -10,9 +10,24 @@ jobs:
   # Cache preheating
   #----------------------------------------------------------------------------
   cache_preheating:
-    name: Cache Preheating
+
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [standard]
+        include:
+          - optdeps_label: optdeps
+          - mindeps_label: no-mindeps
+          - build_type: mindeps
+            optdeps_label: optdeps
+            mindeps_label: mindeps
+          - build_type: no-optdeps
+            optdeps_label: no-optdeps
+            mindeps_label: no-mindeps
+
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
+
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
@@ -25,28 +40,10 @@ jobs:
           fetch-depth: 1
           lfs: false
 
-      - name: Dependencies Dir
-        shell: bash
-        working-directory: ${{github.workspace}}
-        run: |
-          mkdir dependencies
-          cd dependencies
-          mkdir install
-
-      - name: VTK Dependencies
-        uses: ./source/.github/actions/vtk-dependencies
+      - name: Generic Dependencies
+        uses: ./source/.github/actions/generic-dependencies
         with:
           versions_file: ./source/.github/workflows/versions.json
-          cpu: x86_64
-
-      - name: Install Raytracing Dependencies
-        uses: ./source/.github/actions/ospray-sb-install-dep
-        with:
-          versions_file: ./source/.github/workflows/versions.json
-          cpu: x86_64
-
-      - name: Install F3D dependencies
-        uses: ./source/.github/actions/f3d-dependencies
-        with:
-          versions_file: ./source/.github/workflows/versions.json
+          optdeps_label: ${{matrix.optdeps_label}}
+          mindeps_label: ${{matrix.mindeps_label}}
           cpu: x86_64
