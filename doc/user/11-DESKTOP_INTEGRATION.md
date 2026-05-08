@@ -37,7 +37,33 @@ it is possible to specify it using the `--rendering-backend` CLI option.
   - `libOSMesa.so`
 
 You can use that feature for thumbnail generation whenever needed (e.g., Nautilus or other sandboxing file browser),
-by modifying the [thumbnail config file](06-CONFIGURATION_FILE.md), eg:`~/.config/f3d/thumbnail.json`:
+by modifying the thumbnail configuration.
+
+F3D uses a dedicated `thumbnail.d` configuration directory for thumbnail generation.
+
+The `thumbnail.d` directory contains one or more `.json` configuration files used specifically for thumbnail rendering.
+
+To inspect which configuration files are searched and loaded, run:
+
+```bash
+f3d --config=thumbnail --verbose
+```
+
+Typical Linux configuration locations include:
+
+```text
+/etc/f3d/configs/thumbnail.d
+/usr/share/f3d/configs/thumbnail.d
+$XDG_CONFIG_HOME/f3d/configs/thumbnail.d
+```
+
+You can either edit an existing configuration file or create your own `.json` file inside one of these directories.
+
+Example:
+
+```text
+~/.config/f3d/configs/thumbnail.d/custom.json
+```
 
 ```json
 [
