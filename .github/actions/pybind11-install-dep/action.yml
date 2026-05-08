@@ -14,7 +14,8 @@ runs:
   steps:
     - name: Check required inputs
       shell: bash
-      run: [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
+      run: |
+        [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
 
     - name: Extract pybind11 version
       id: pybind11_ver
