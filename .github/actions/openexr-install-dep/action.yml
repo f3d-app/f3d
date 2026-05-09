@@ -70,7 +70,7 @@ runs:
 
     # OpenEXR 3.0.1 needs patching with recent libstd
     - name: Patch OpenEXR v3.0.1
-      if: steps.cache-openexr.outputs.cache-hit != 'true' && inputs.version == 'v3.0.1'
+      if: steps.cache-openexr.outputs.cache-hit != 'true' && steps.openexr_ver.outputs.extract == 'v3.0.1'
       working-directory: ${{github.workspace}}/dependencies/openexr
       shell: bash
       run: patch -p1 < $GITHUB_ACTION_PATH/include_cstdint.patch
