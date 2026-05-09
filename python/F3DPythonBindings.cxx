@@ -563,7 +563,8 @@ PYBIND11_MODULE(pyf3d, module)
         }
 
         self.faceOffsetCount = info.shape[0];
-        self.faceOffsets.data = static_cast<const int32_t*>(info.ptr);
+        self.faceOffsets.data = info.ptr;
+        self.faceOffsets.type = f3d::mesh_view::data_type::I32;
         self.faceOffsets.stride = info.strides[0] / sizeof(int32_t);
       })
     .def_property("face_indices", nullptr,
@@ -582,7 +583,8 @@ PYBIND11_MODULE(pyf3d, module)
         }
 
         self.faceIndexCount = info.shape[0];
-        self.faceIndices.data = static_cast<const int32_t*>(info.ptr);
+        self.faceIndices.data = info.ptr;
+        self.faceIndices.type = f3d::mesh_view::data_type::I32;
         self.faceIndices.stride = info.strides[0] / sizeof(int32_t);
       })
     .def_property("point_scalars", nullptr,

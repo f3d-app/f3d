@@ -181,7 +181,7 @@ public:
       .faceOffsets = { .data = this->Grid.FaceOffsets.data(),
         .type = f3d::mesh_view::data_type::I32 },
       .faceIndexCount = this->Grid.Quads.size(),
-      .faceIndices = { .data = this->Grid.Quads.data(), .type = f3d::mesh_view::data_type::I32 } };
+      .faceIndices = { .type = f3d::mesh_view::data_type::I32, .data = this->Grid.Quads.data() } };
   }
 
 private:
@@ -211,9 +211,9 @@ public:
              .points = { .data = points, .components = 3, .stride = stride },
              .normals = { .data = points + 3, .components = 3, .stride = stride },
              .faceOffsetCount = this->Grid.FaceOffsets.size(),
-             .faceOffsets = { .data = this->Grid.FaceOffsets.data(), .type = f3d::mesh_view::data_type::I32 },
+             .faceOffsets = { .type = f3d::mesh_view::data_type::I32, .data = this->Grid.FaceOffsets.data() },
              .faceIndexCount = this->Grid.Quads.size(),
-             .faceIndices = { .data = this->Grid.Quads.data(), .type = f3d::mesh_view::data_type::I32 },
+             .faceIndices = { .type = f3d::mesh_view::data_type::I32, .data = this->Grid.Quads.data() },
              .pointScalars = { { .name = "velocity", .data = points + 8, .stride = stride },
                                 },
              .faceScalars = { { .name = "quad_coords",
