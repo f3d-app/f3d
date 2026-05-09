@@ -21,10 +21,6 @@ inputs:
     required: false
     default: "x86_64"
 
-outputs:
-  vtk_commitish:
-    value: "${{steps.extract_vtk_commit-ish.outputs.vtk_commitish}}"
-
 runs:
   using: "composite"
   steps:
@@ -50,11 +46,6 @@ runs:
       if: inputs.vtk_version != 'commit'
       shell: bash
       run: echo "VTK_VERSION=${{inputs.vtk_version}}" >> $GITHUB_ENV
-
-    - name: Output VTK commitish
-      id: extract_vtk_commitish
-      shell: bash
-      run: echo "vtk_commitish=${{env.VTK_VERSION}} >> $GITHUB_OUTPUT
 
     - name: Extract zlib version
       id: zlib_ver
