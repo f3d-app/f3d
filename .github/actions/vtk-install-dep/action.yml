@@ -14,11 +14,16 @@ inputs:
     default: "no-mindeps"
   vtk_version:
     description: "VTK version"
-    required: true
+    required: false
+    default: "commit"
   cpu:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
+
+outputs:
+  vtk_commitish:
+    value: "${{steps.extract_vtk_commit-ish.outputs.vtk_commitish}}"
 
 runs:
   using: "composite"
@@ -27,7 +32,6 @@ runs:
       shell: bash
       run: |
         [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
-        [[ "${{inputs.vtk_version}}" ]] || { echo "vtk_version is empty" ; exit 1; }
 
     - name: Recover VTK version if needed
       if: inputs.vtk_version == 'commit'
@@ -42,10 +46,15 @@ runs:
       shell: bash
       run: echo "VTK_VERSION=${{steps.vtk_ver.outputs.extract}}" >> $GITHUB_ENV
 
-    - name: Name to extract is special name
+    - name: Store input vtk version directitly
       if: inputs.vtk_version != 'commit'
       shell: bash
       run: echo "VTK_VERSION=${{inputs.vtk_version}}" >> $GITHUB_ENV
+
+    - name: Output VTK commitish
+      id: extract_vtk_commitish
+      shell: bash
+      run: echo "vtk_commitish=${{env.VTK_VERSION}} >> $GITHUB_OUTPUT
 
     - name: Extract zlib version
       id: zlib_ver
