@@ -60,11 +60,11 @@ runs:
         file: ${{inputs.versions_file}}
         special_name: global_cache_index
 
-    - name: Cache openexr
+    - name: Cache usd
       id: cache-usd
       uses: actions/cache/restore@v5
       with:
-        path: dependencies/openexr_install
+        path: dependencies/usd_install
         key: usd-${{steps.usd_ver.outputs.extract}}-${{steps.openexr_ver.outputs.extract}}-${{steps.imath_ver.outputs.extract}}-${{steps.tbb_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-0
 
     - name: Checkout USD
