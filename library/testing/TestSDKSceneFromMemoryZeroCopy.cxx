@@ -175,14 +175,13 @@ public:
     size_t stride = sizeof(WavyGridMesh::Vertex) / sizeof(float);
 
     return { .pointCount = this->Grid.Vertices.size(),
-      .points = points,
-      .pointsStride = stride,
-      .textureCoordinates = points + 6,
-      .textureCoordinatesStride = stride,
+      .points = { .data = points, .components = 3, .stride = stride },
+      .textureCoordinates = { .data = points + 6, .components = 2, .stride = stride },
       .faceOffsetCount = this->Grid.FaceOffsets.size(),
-      .faceOffsets = this->Grid.FaceOffsets.data(),
+      .faceOffsets = { .data = this->Grid.FaceOffsets.data(),
+        .type = f3d::mesh_view::data_type::I32 },
       .faceIndexCount = this->Grid.Quads.size(),
-      .faceIndices = this->Grid.Quads.data() };
+      .faceIndices = { .data = this->Grid.Quads.data(), .type = f3d::mesh_view::data_type::I32 } };
   }
 
 private:
@@ -209,14 +208,12 @@ public:
     size_t stride = sizeof(WavyGridMesh::Vertex) / sizeof(float);
 
     return { .pointCount = this->Grid.Vertices.size(),
-             .points = points,
-             .pointsStride = stride,
-             .normals = points + 3,
-             .normalsStride = stride,
+             .points = { .data = points, .components = 3, .stride = stride },
+             .normals = { .data = points + 3, .components = 3, .stride = stride },
              .faceOffsetCount = this->Grid.FaceOffsets.size(),
-             .faceOffsets = this->Grid.FaceOffsets.data(),
+             .faceOffsets = { .data = this->Grid.FaceOffsets.data(), .type = f3d::mesh_view::data_type::I32 },
              .faceIndexCount = this->Grid.Quads.size(),
-             .faceIndices = this->Grid.Quads.data(),
+             .faceIndices = { .data = this->Grid.Quads.data(), .type = f3d::mesh_view::data_type::I32 },
              .pointScalars = { { .name = "velocity", .data = points + 8, .stride = stride },
                                 },
              .faceScalars = { { .name = "quad_coords",

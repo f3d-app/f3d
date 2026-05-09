@@ -485,8 +485,9 @@ PYBIND11_MODULE(pyf3d, module)
         }
 
         self.pointCount = info.shape[0];
-        self.points = static_cast<const float*>(info.ptr);
-        self.pointsStride = info.strides[0] / sizeof(float);
+        self.points.data = static_cast<const float*>(info.ptr);
+        self.points.components = 3;
+        self.points.stride = info.strides[0] / sizeof(float);
       })
     .def_property("normals", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
@@ -513,8 +514,9 @@ PYBIND11_MODULE(pyf3d, module)
           throw std::runtime_error("Incompatible buffer shape: point count does not match!");
         }
 
-        self.normals = static_cast<const float*>(info.ptr);
-        self.normalsStride = info.strides[0] / sizeof(float);
+        self.normals.data = static_cast<const float*>(info.ptr);
+        self.normals.components = 3;
+        self.normals.stride = info.strides[0] / sizeof(float);
       })
     .def_property("texture_coordinates", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
@@ -541,17 +543,18 @@ PYBIND11_MODULE(pyf3d, module)
           throw std::runtime_error("Incompatible buffer shape: point count does not match!");
         }
 
-        self.textureCoordinates = static_cast<const float*>(info.ptr);
-        self.textureCoordinatesStride = info.strides[0] / sizeof(float);
+        self.textureCoordinates.data = static_cast<const float*>(info.ptr);
+        self.textureCoordinates.components = 2;
+        self.textureCoordinates.stride = info.strides[0] / sizeof(float);
       })
     .def_property("face_offsets", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
         py::buffer_info info = b.request();
 
-        if (!info.item_type_is_equivalent_to<unsigned int>())
+        if (!info.item_type_is_equivalent_to<int32_t>())
         {
-          throw std::runtime_error("Incompatible format: expected an unsigned int array!");
+          throw std::runtime_error("Incompatible format: expected an int32_t array!");
         }
 
         if (info.ndim != 1)
@@ -560,16 +563,17 @@ PYBIND11_MODULE(pyf3d, module)
         }
 
         self.faceOffsetCount = info.shape[0];
-        self.faceOffsets = static_cast<const unsigned int*>(info.ptr);
+        self.faceOffsets.data = static_cast<const int32_t*>(info.ptr);
+        self.faceOffsets.stride = info.strides[0] / sizeof(int32_t);
       })
     .def_property("face_indices", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
         py::buffer_info info = b.request();
 
-        if (!info.item_type_is_equivalent_to<unsigned int>())
+        if (!info.item_type_is_equivalent_to<int32_t>())
         {
-          throw std::runtime_error("Incompatible format: expected an unsigned int array!");
+          throw std::runtime_error("Incompatible format: expected an int32_t array!");
         }
 
         if (info.ndim != 1)
@@ -578,7 +582,8 @@ PYBIND11_MODULE(pyf3d, module)
         }
 
         self.faceIndexCount = info.shape[0];
-        self.faceIndices = static_cast<const unsigned int*>(info.ptr);
+        self.faceIndices.data = static_cast<const int32_t*>(info.ptr);
+        self.faceIndices.stride = info.strides[0] / sizeof(int32_t);
       })
     .def_property("point_scalars", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::dict d)

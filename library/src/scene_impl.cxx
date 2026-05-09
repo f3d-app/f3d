@@ -462,50 +462,119 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
     {
       const auto memoryView = mesh->getMemoryView(time);
 
-      vtkNew<vtkStridedArray<float>> positions;
-      positions->SetName("Positions");
-      positions->SetNumberOfComponents(3);
-      positions->SetNumberOfTuples(memoryView.pointCount);
-      positions->ConstructBackend(memoryView.points, memoryView.pointsStride, 3);
+      // handle points
+      if (memoryView.pointCount == 0)
+      {
+        throw scene::load_failure_exception("Mesh view must have points");
+      }
+
+      if (memoryView.points.data == nullptr)
+      {
+        throw scene::load_failure_exception("Mesh view points data pointer is null");
+      }
+
+      if (memoryView.points.type != mesh_view::data_type::F32 &&
+        memoryView.points.type != mesh_view::data_type::F64)
+      {
+        throw scene::load_failure_exception("Mesh view points must have a data type of F32 or F64");
+      }
+
+      if (memoryView.points.components != 3)
+      {
+        throw scene::load_failure_exception("Mesh view points must have 3 components");
+      }
 
       vtkNew<vtkPoints> points;
-      points->SetData(positions);
+
+      f3d::mesh_view::dataTypeDispatch(memoryView.points.type,
+        [&]<typename DataT>()
+        {
+          vtkNew<vtkStridedArray<DataT>> positions;
+          positions->SetName(
+            memoryView.points.name.empty() ? "Positions" : memoryView.points.name.c_str());
+          positions->SetNumberOfComponents(3);
+          positions->SetNumberOfTuples(memoryView.pointCount);
+          positions->ConstructBackend(
+            reinterpret_cast<const DataT*>(memoryView.points.data), memoryView.points.stride, 3);
+
+          points->SetData(positions);
+        });
 
       polydata->SetPoints(points);
 
-      if (memoryView.normals != nullptr)
-      {
-        vtkNew<vtkStridedArray<float>> normals;
-        normals->SetName("Normals");
-        normals->SetNumberOfComponents(3);
-        normals->SetNumberOfTuples(memoryView.pointCount);
-        normals->ConstructBackend(memoryView.normals, memoryView.normalsStride, 3);
+      // handle normals
 
-        polydata->GetPointData()->SetNormals(normals);
+      if (memoryView.normals.data != nullptr)
+      {
+        if (memoryView.normals.type != mesh_view::data_type::F32 &&
+          memoryView.normals.type != mesh_view::data_type::F64)
+        {
+          throw scene::load_failure_exception(
+            "Mesh view normals must have a data type of F32 or F64");
+        }
+
+        if (memoryView.normals.components != 3)
+        {
+          throw scene::load_failure_exception("Mesh view normals must have 3 components");
+        }
+
+        f3d::mesh_view::dataTypeDispatch(memoryView.normals.type,
+          [&]<typename DataT>()
+          {
+            vtkNew<vtkStridedArray<DataT>> normals;
+            normals->SetName(
+              memoryView.normals.name.empty() ? "Normals" : memoryView.normals.name.c_str());
+            normals->SetNumberOfComponents(3);
+            normals->SetNumberOfTuples(memoryView.pointCount);
+            normals->ConstructBackend(reinterpret_cast<const DataT*>(memoryView.normals.data),
+              memoryView.normals.stride, 3);
+
+            polydata->GetPointData()->SetNormals(normals);
+          });
       }
 
-      if (memoryView.textureCoordinates != nullptr)
+      if (memoryView.textureCoordinates.data != nullptr)
       {
-        vtkNew<vtkStridedArray<float>> tcoords;
-        tcoords->SetName("TCoords");
-        tcoords->SetNumberOfComponents(2);
-        tcoords->SetNumberOfTuples(memoryView.pointCount);
-        tcoords->ConstructBackend(
-          memoryView.textureCoordinates, memoryView.textureCoordinatesStride, 2);
+        if (memoryView.textureCoordinates.type != mesh_view::data_type::F32 &&
+          memoryView.textureCoordinates.type != mesh_view::data_type::F64)
+        {
+          throw scene::load_failure_exception(
+            "Mesh view texture coordinates must have a data type of F32 or F64");
+        }
 
-        polydata->GetPointData()->SetTCoords(tcoords);
+        if (memoryView.textureCoordinates.components != 2)
+        {
+          throw scene::load_failure_exception(
+            "Mesh view texture coordinates must have 2 components");
+        }
+
+        f3d::mesh_view::dataTypeDispatch(memoryView.textureCoordinates.type,
+          [&]<typename DataT>()
+          {
+            vtkNew<vtkStridedArray<DataT>> tcoords;
+            tcoords->SetName(memoryView.textureCoordinates.name.empty()
+                ? "TCoords"
+                : memoryView.textureCoordinates.name.c_str());
+            tcoords->SetNumberOfComponents(2);
+            tcoords->SetNumberOfTuples(memoryView.pointCount);
+            tcoords->ConstructBackend(
+              reinterpret_cast<const DataT*>(memoryView.textureCoordinates.data),
+              memoryView.textureCoordinates.stride, 2);
+
+            polydata->GetPointData()->SetTCoords(tcoords);
+          });
       }
 
       for (const auto& scalar : memoryView.pointScalars)
       {
-        f3d::mesh_view::scalarTypeDispatch(scalar.type,
-          [&]<typename ScalarT>()
+        f3d::mesh_view::dataTypeDispatch(scalar.type,
+          [&]<typename DataT>()
           {
-            vtkNew<vtkStridedArray<ScalarT>> scalars;
+            vtkNew<vtkStridedArray<DataT>> scalars;
             scalars->SetName(scalar.name.c_str());
             scalars->SetNumberOfComponents(static_cast<int>(scalar.components));
             scalars->SetNumberOfTuples(memoryView.pointCount);
-            scalars->ConstructBackend(reinterpret_cast<const ScalarT*>(scalar.data), scalar.stride,
+            scalars->ConstructBackend(reinterpret_cast<const DataT*>(scalar.data), scalar.stride,
               static_cast<int>(scalar.components));
 
             polydata->GetPointData()->AddArray(scalars);
@@ -514,31 +583,79 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
 
       for (const auto& scalar : memoryView.faceScalars)
       {
-        f3d::mesh_view::scalarTypeDispatch(scalar.type,
-          [&]<typename ScalarT>()
+        f3d::mesh_view::dataTypeDispatch(scalar.type,
+          [&]<typename DataT>()
           {
-            vtkNew<vtkStridedArray<ScalarT>> scalars;
+            vtkNew<vtkStridedArray<DataT>> scalars;
             scalars->SetName(scalar.name.c_str());
             scalars->SetNumberOfComponents(static_cast<int>(scalar.components));
             scalars->SetNumberOfTuples(memoryView.faceOffsetCount - 1);
-            scalars->ConstructBackend(reinterpret_cast<const ScalarT*>(scalar.data), scalar.stride,
+            scalars->ConstructBackend(reinterpret_cast<const DataT*>(scalar.data), scalar.stride,
               static_cast<int>(scalar.components));
 
             polydata->GetCellData()->AddArray(scalars);
           });
       }
 
-      vtkNew<vtkUnsignedIntArray> offsets;
-      vtkNew<vtkUnsignedIntArray> connectivity;
+      if (memoryView.faceOffsetCount > 0)
+      {
+        if (memoryView.faceOffsets.data == nullptr)
+        {
+          throw scene::load_failure_exception("Mesh view face offsets pointer is null");
+        }
 
-      offsets->SetArray(
-        const_cast<unsigned int*>(memoryView.faceOffsets), memoryView.faceOffsetCount, 1);
-      connectivity->SetArray(
-        const_cast<unsigned int*>(memoryView.faceIndices), memoryView.faceIndexCount, 1);
+        if (memoryView.faceIndices.data == nullptr)
+        {
+          throw scene::load_failure_exception("Mesh view face indices pointer is null");
+        }
 
-      vtkNew<vtkCellArray> polys;
-      polys->SetData(offsets, connectivity);
-      polydata->SetPolys(polys);
+        if (memoryView.faceOffsets.type != mesh_view::data_type::I32 &&
+          memoryView.faceOffsets.type != mesh_view::data_type::I64)
+        {
+          throw scene::load_failure_exception(
+            "Mesh view face offsets must have a data type of I32 or I64");
+        }
+
+        if (memoryView.faceIndices.type != mesh_view::data_type::I32 &&
+          memoryView.faceIndices.type != mesh_view::data_type::I64)
+        {
+          throw scene::load_failure_exception(
+            "Mesh view face indices must have a data type of I32 or I64");
+        }
+
+        if (memoryView.faceIndices.type != memoryView.faceOffsets.type)
+        {
+          throw scene::load_failure_exception(
+            "Mesh view face offsets and face indices must have the same data type");
+        }
+
+        f3d::mesh_view::dataTypeDispatch(memoryView.faceOffsets.type,
+          [&]<typename DataT>()
+          {
+            vtkNew<vtkCellArray> polys;
+
+            vtkNew<vtkStridedArray<DataT>> faceOffsets;
+            faceOffsets->SetName(memoryView.faceOffsets.name.empty()
+                ? "FaceOffsets"
+                : memoryView.faceOffsets.name.c_str());
+            faceOffsets->SetNumberOfTuples(memoryView.faceOffsetCount);
+            faceOffsets->ConstructBackend(
+              reinterpret_cast<const DataT*>(memoryView.faceOffsets.data),
+              memoryView.faceOffsets.stride);
+
+            vtkNew<vtkStridedArray<DataT>> faceIndices;
+            faceIndices->SetName(memoryView.faceIndices.name.empty()
+                ? "FaceIndices"
+                : memoryView.faceIndices.name.c_str());
+            faceIndices->SetNumberOfTuples(memoryView.faceIndexCount);
+            faceIndices->ConstructBackend(
+              reinterpret_cast<const DataT*>(memoryView.faceIndices.data),
+              memoryView.faceIndices.stride);
+
+            polys->SetData(faceOffsets, faceIndices);
+            polydata->SetPolys(polys);
+          });
+      }
     });
 
   vtkNew<vtkF3DGenericImporter> importer;
