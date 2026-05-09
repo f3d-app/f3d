@@ -56,7 +56,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04, windows-latest, macos-15, macos-15-intel]
-        vtk_version: [ commit, v9.6.1, v9.5.2, v9.4.2]
+        vtk_version: [commit, v9.6.1, v9.5.2, v9.4.2]
         build_type: [standard]
         include:
           - optdeps_label: optdeps
