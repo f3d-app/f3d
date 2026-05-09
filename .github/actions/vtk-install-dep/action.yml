@@ -43,7 +43,7 @@ runs:
       run: echo "VTK_VERSION=${{steps.vtk_ver.outputs.extract}}" >> $GITHUB_ENV
 
     - name: Name to extract is special name
-      if: inputs.special_name != 'commit'
+      if: inputs.vtk_version != 'commit'
       shell: bash
       run: echo "VTK_VERSION=${{inputs.vtk_version}}" >> $GITHUB_ENV
 
