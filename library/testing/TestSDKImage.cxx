@@ -47,8 +47,8 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   std::ranges::generate(pixels16, [&]() { return static_cast<uint16_t>(randGenerator() % 65536); });
   generated16.setContent(pixels16.data());
 
-  std::uniform_real_distribution<float> dist(
-    std::numeric_limits<float>::min(), std::numeric_limits<float>::max());
+  std::uniform_real_distribution<float> dist(std::numeric_limits<float>::min(),
+                                             std::numeric_limits<float>::max());
   f3d::image generated32(width, height, channels, f3d::image::ChannelType::FLOAT);
   std::vector<float> pixels32(width * height * channels);
   std::ranges::generate(pixels32, [&]() { return dist(randGenerator); });
@@ -109,6 +109,23 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     hdrImg.getChannelType() == f3d::image::ChannelType::FLOAT);
   test("check 32-bits HDR image channel type size", hdrImg.getChannelTypeSize(), 4u);
   hdrImg.save(tmpDir + "/TestSDKImage32hdr.tif", f3d::image::SaveFormat::TIF);
+
+  // check reading stream
+  std::vector<unsigned char> buffer = generated.saveBuffer();
+  std::byte* bufferData = reinterpret_cast<std::byte*>(buffer.data());
+  f3d::image bufferImage(bufferData, buffer.size());
+  test("check loading stream from image reader", generated.compare(bufferImage), 0.0);
+
+  // check reading inexistent/null stream
+  test.expect<f3d::image::read_exception>(
+    "read image from invalid/null stream", [&]() { f3d::image nullImgStream(nullptr, 10); });
+
+  // check reading invalid stream
+  std::vector<unsigned char> invalidBuffer = { 0, 1, 2, 3, 4, 5 };
+  std::byte* invalidBufferData = reinterpret_cast<std::byte*>(invalidBuffer.data());
+  test.expect<f3d::image::read_exception>("read image from invalid stream", [&]() {
+    f3d::image invalidImgStream(invalidBufferData, 10);
+  });
 
 #if F3D_MODULE_EXR
   // check reading EXR

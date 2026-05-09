@@ -121,6 +121,12 @@ PYBIND11_MODULE(pyf3d, module)
     .def(py::init<>())
     .def(py::init<const std::filesystem::path&>())
     .def(py::init<unsigned int, unsigned int, unsigned int, f3d::image::ChannelType>())
+    .def(py::init(
+      [](const py::bytes& buffer)
+      {
+        const py::buffer_info info(py::buffer(buffer).request());
+        return f3d::image(reinterpret_cast<std::byte*>(info.ptr), info.size);
+      }))
     .def(py::self == py::self)
     .def(py::self != py::self)
     .def_static("supported_formats", &f3d::image::getSupportedFormats)

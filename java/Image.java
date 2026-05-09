@@ -55,6 +55,15 @@ public class Image {
         this(width, height, channelCount, ChannelType.BYTE);
     }
 
+    /**
+     * Create an image from given stream buffer
+     *
+     * @param buffer stream buffer
+     */
+    public Image(byte[] buffer) {
+        mNativeAddress = nativeCreateFromStream(buffer);
+    }
+
     Image(long nativeAddress) {
         mNativeAddress = nativeAddress;
     }
@@ -233,5 +242,6 @@ public class Image {
 
     private static native long nativeCreateFromFile(String filePath);
     private static native long nativeCreate(int width, int height, int channelCount, int type);
+    private static native long nativeCreateFromStream(byte[] buffer);
     private static native void nativeDestroy(long nativeAddress);
 }
