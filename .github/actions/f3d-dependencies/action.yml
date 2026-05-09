@@ -20,58 +20,68 @@ runs:
       uses: ./source/.github/actions/occt-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install Assimp dependency
       uses: ./source/.github/actions/assimp-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install Draco dependency
       uses: ./source/.github/actions/draco-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install Imath dependency
       uses: ./source/.github/actions/imath-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install OpenEXR dependency
       uses: ./source/.github/actions/openexr-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install Alembic dependency
       uses: ./source/.github/actions/alembic-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install pybind11 dependency
       uses: ./source/.github/actions/pybind11-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install USD dependency
       uses: ./source/.github/actions/usd-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install webp dependency
       uses: ./source/.github/actions/webp-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install webifc dependency
       uses: ./source/.github/actions/webifc-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
