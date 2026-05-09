@@ -61,7 +61,7 @@ runs:
 
     # https://github.com/alembic/alembic/issues/476
     - name: Patch Alembic rpath issue
-      if: steps.cache-alembic.outputs.cache-hit != 'true' && inputs.version == '1.8.9'
+      if: steps.cache-alembic.outputs.cache-hit != 'true' && steps.alembic_ver.outputs.extract == '1.8.9'
       working-directory: ${{github.workspace}}/dependencies/alembic
       shell: bash
       run: patch -p1 < $GITHUB_ACTION_PATH/fix_cmake_rpath.patch

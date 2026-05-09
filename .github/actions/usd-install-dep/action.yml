@@ -77,14 +77,14 @@ runs:
 
     # Upstream issue: https://github.com/PixarAnimationStudios/OpenUSD/issues/2490
     - name: Patch USD
-      if: steps.cache-usd.outputs.cache-hit != 'true' && inputs.version == 'v24.08'
+      if: steps.cache-usd.outputs.cache-hit != 'true' && steps.usd_ver.outputs.extract == 'v24.08'
       working-directory: ${{github.workspace}}/dependencies/usd
       shell: bash
       run: patch -p1 < $GITHUB_ACTION_PATH/usd-install-bin-mindep.patch
 
     # Upstream issue: https://github.com/PixarAnimationStudios/OpenUSD/issues/2490
     - name: Patch USD
-      if: steps.cache-usd.outputs.cache-hit != 'true' && inputs.version != 'v24.08'
+      if: steps.cache-usd.outputs.cache-hit != 'true' && steps.usd_ver.outputs.extract != 'v24.08'
       working-directory: ${{github.workspace}}/dependencies/usd
       shell: bash
       run: patch -p1 < $GITHUB_ACTION_PATH/usd-install-bin.patch
