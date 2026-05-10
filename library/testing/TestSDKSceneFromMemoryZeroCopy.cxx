@@ -178,8 +178,7 @@ public:
       .points = { .data = points, .components = 3, .stride = stride },
       .textureCoordinates = { .data = points + 6, .components = 2, .stride = stride },
       .faceOffsetCount = this->Grid.FaceOffsets.size(),
-      .faceOffsets = { .data = this->Grid.FaceOffsets.data(),
-        .type = f3d::mesh_view::data_type::I32 },
+      .faceOffsets = { .type = f3d::mesh_view::data_type::I32, .data = this->Grid.FaceOffsets.data() },
       .faceIndexCount = this->Grid.Quads.size(),
       .faceIndices = { .type = f3d::mesh_view::data_type::I32, .data = this->Grid.Quads.data() } };
   }
