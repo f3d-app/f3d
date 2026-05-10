@@ -66,7 +66,7 @@ runs:
         versions_file: ${{inputs.versions_file}}
         optdeps_label: ${{inputs.optdeps_label}}
         mindeps_label: ${{inputs.mindeps_label}}
-        cpu: ${{ runner.os == 'macos-15' && 'arm64' || 'x86_64' }}
+        cpu: ${{inputs.cpu}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
@@ -74,7 +74,7 @@ runs:
         versions_file: ${{inputs.versions_file}}
         optdeps_label: ${{inputs.optdeps_label}}
         mindeps_label: ${{inputs.mindeps_label}}
-        cpu: ${{ runner.os == 'macos-15' && 'arm64' || 'x86_64' }}
+        cpu: ${{inputs.cpu}}
         vtk_version: ${{inputs.vtk_version}}
 
     - name: Extract python version
