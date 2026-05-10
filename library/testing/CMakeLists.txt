@@ -67,6 +67,7 @@ endif()
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20251110)
   list(APPEND libf3dSDKTests_list
     TestSDKSceneFromMemoryZeroCopy.cxx
+    TestSDKSceneFromMemoryZeroCopyExceptions.cxx
     )
 endif()
 

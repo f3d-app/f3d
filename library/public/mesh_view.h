@@ -84,7 +84,7 @@ public:
   }
 
   /**
-   * Structure representing a scalar array to be associated to the mesh points or faces.
+   * Structure representing a view of an existing data array.
    */
   struct data_array_t
   {
