@@ -164,7 +164,7 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_VERSION}}-${{steps.zlib_ver.outputs.extract}}-${{steps.blosc_ver.outputs.extract}}-${{steps.tbb_ver.outputs.extract}}${{ steps.openvdb_ver.outputs.extract != '' && format('-openvdb-{0}', steps.openvdb_ver.outputs.extract) || '' }}${{ steps.ospray_ver.outputs.extract != '' && format('-ospray-{0}', steps.ospray_ver.outputs.extract) || '' }}${{ steps.curl_ver.outputs.extract != '' && format('-curl-{0}', steps.curl_ver.outputs.extract) || '' }}${{ steps.gdal_ver.outputs.extract != '' && format('-gdal-{0}', steps.gdal_ver.outputs.extract) || '' }}${{ steps.geotiff_ver.outputs.extract != '' && format('-geotiff-{0}', steps.geotiff_ver.outputs.extract) || '' }}${{ steps.pdal_ver.outputs.extract != '' && format('-pdal-{0}', steps.pdal_ver.outputs.extract) || '' }}${{ steps.proj_ver.outputs.extract != '' && format('-proj-{0}', steps.proj_ver.outputs.extract) || '' }}${{ steps.sqlite_csb_ver.outputs.extract != '' && format('-sqlite-{0}', steps.sqlite_csb_ver.outputs.extract) || '' }}${{ steps.tiff_ver.outputs.extract != '' && format('-tiff-{0}', steps.tiff_ver.outputs.extract) || '' }}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-4
+        key: vtk-${{env.VTK_VERSION}}-${{steps.zlib_ver.outputs.extract}}-${{steps.blosc_ver.outputs.extract}}-${{steps.tbb_ver.outputs.extract}}${{ steps.openvdb_ver.outputs.extract != '' && format('-openvdb-{0}', steps.openvdb_ver.outputs.extract) || '' }}${{ steps.ospray_ver.outputs.extract != '' && format('-ospray-{0}', steps.ospray_ver.outputs.extract) || '' }}${{ steps.curl_ver.outputs.extract != '' && format('-curl-{0}', steps.curl_ver.outputs.extract) || '' }}${{ steps.gdal_ver.outputs.extract != '' && format('-gdal-{0}', steps.gdal_ver.outputs.extract) || '' }}${{ steps.geotiff_ver.outputs.extract != '' && format('-geotiff-{0}', steps.geotiff_ver.outputs.extract) || '' }}${{ steps.pdal_ver.outputs.extract != '' && format('-pdal-{0}', steps.pdal_ver.outputs.extract) || '' }}${{ steps.proj_ver.outputs.extract != '' && format('-proj-{0}', steps.proj_ver.outputs.extract) || '' }}${{ steps.sqlite_csb_ver.outputs.extract != '' && format('-sqlite-{0}', steps.sqlite_csb_ver.outputs.extract) || '' }}${{ steps.tiff_ver.outputs.extract != '' && format('-tiff-{0}', steps.tiff_ver.outputs.extract) || '' }}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-5
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -209,7 +209,7 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
-        -DOpenVDB_CMAKE_PATH=${{ inputs.optdeps == 'optdeps' && '$(pwd)/../install/lib/cmake/OpenVDB/' || '' }}
+        -DOpenVDB_CMAKE_PATH=${{ inputs.optdeps_label == 'optdeps' && '$(pwd)/../install/lib/cmake/OpenVDB/' || '' }}
         -DVTKOSPRAY_ENABLE_DENOISER=ON
         -DVTK_BUILD_TESTING=OFF
         -DVTK_DEBUG_LEAKS=ON
@@ -231,8 +231,8 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_IOImport=YES
         -DVTK_MODULE_ENABLE_VTK_IOLegacy=YES
         -DVTK_MODULE_ENABLE_VTK_IONetCDF=YES
-        -DVTK_MODULE_ENABLE_VTK_IOOpenVDB=${{ inputs.optdeps == 'optdeps' && 'YES' || 'DEFAULT' }}
-        -DVTK_MODULE_ENABLE_VTK_IOPDAL=${{ inputs.optdeps == 'optdeps' && 'YES' || 'DEFAULT' }}
+        -DVTK_MODULE_ENABLE_VTK_IOOpenVDB=${{ inputs.optdeps_label == 'optdeps' && 'YES' || 'DEFAULT' }}
+        -DVTK_MODULE_ENABLE_VTK_IOPDAL=${{ inputs.optdeps_label == 'optdeps' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_IOPLY=YES
         -DVTK_MODULE_ENABLE_VTK_IOXML=YES
         -DVTK_MODULE_ENABLE_VTK_ImagingCore=YES
@@ -243,7 +243,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingCore=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingGridAxes=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES
-        -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.optdeps == 'optdeps' && 'YES' || 'DEFAULT' }}
+        -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.optdeps_label == 'optdeps' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
         -DVTK_OPENGL_HAS_EGL=${{ runner.os != 'macOS' && 'ON' || 'OFF' }}
