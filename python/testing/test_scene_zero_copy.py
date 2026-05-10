@@ -28,8 +28,8 @@ def test_scene_zero_copy():
     points = np.array(
         [[0.0, 0.0, 0.0], [0.0, 1.0, 0.0], [1.0, 0.0, 0.0]], dtype=np.float32
     )
-    face_offsets = np.array([0, 3], dtype=np.uint32)
-    face_indices = np.array([0, 1, 2], dtype=np.uint32)
+    face_offsets = np.array([0, 3], dtype=np.int32)
+    face_indices = np.array([0, 1, 2], dtype=np.int32)
     colors = np.empty((3, 3), dtype=np.uint8)
 
     memory_view = f3d.MeshMemoryView()
