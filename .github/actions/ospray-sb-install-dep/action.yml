@@ -7,7 +7,7 @@ inputs:
   mindeps_label:
     description: "Label to check for minimal version dependencies"
     required: false
-    default: "mindeps"
+    default: "no-mindeps"
   cpu:
     description: "CPU architecture to build for"
     required: false
