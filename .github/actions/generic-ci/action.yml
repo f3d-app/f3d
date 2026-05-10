@@ -64,17 +64,17 @@ runs:
       uses: ./source/.github/actions/generic-dependencies
       with:
         versions_file: ${{inputs.versions_file}}
-        optdeps_label: ${{matrix.optdeps_label}}
-        mindeps_label: ${{matrix.mindeps_label}}
-        cpu: ${{ matrix.os == 'macos-15' && 'arm64' || 'x86_64' }}
+        optdeps_label: ${{inputs.optdeps_label}}
+        mindeps_label: ${{inputs.mindeps_label}}
+        cpu: ${{ runner.os == 'macos-15' && 'arm64' || 'x86_64' }}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
-        optdeps_label: ${{matrix.optdeps_label}}
-        mindeps_label: ${{matrix.mindeps_label}}
-        cpu: ${{ matrix.os == 'macos-15' && 'arm64' || 'x86_64' }}
+        optdeps_label: ${{inputs.optdeps_label}}
+        mindeps_label: ${{inputs.mindeps_label}}
+        cpu: ${{ runner.os == 'macos-15' && 'arm64' || 'x86_64' }}
         vtk_version: ${{inputs.vtk_version}}
 
     - name: Extract python version

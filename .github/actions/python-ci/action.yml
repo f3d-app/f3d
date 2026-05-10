@@ -36,13 +36,13 @@ runs:
       uses: ./source/.github/actions/generic-dependencies
       with:
         versions_file: ${{inputs.versions_file}}
-        cpu: ${{ matrix.os == 'macos-15' && 'arm64' || 'x86_64' }}
+        cpu: ${{ runner.os == 'macos-15' && 'arm64' || 'x86_64' }}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
-        cpu: ${{ matrix.os == 'macos-15' && 'arm64' || 'x86_64' }}
+        cpu: ${{ runner.os == 'macos-15' && 'arm64' || 'x86_64' }}
 
     - name: Set up Python
       uses: actions/setup-python@v6

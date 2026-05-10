@@ -104,4 +104,4 @@ runs:
       uses: actions/upload-artifact@v7
       with:
         path: ./build/Testing/Temporary
-        name: f3d-tests-artifact-sanitizer-${{matrix.sanitizer_type}}
+        name: f3d-tests-artifact-sanitizer-${{inputs.sanitizer_type}}
