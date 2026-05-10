@@ -18,7 +18,7 @@ inputs:
   mindeps_label:
     description: "Label to flag for minimal version dependencies"
     required: false
-    default: "mindeps"
+    default: "no-mindeps"
   exclude_deprecated_label:
     description: "Label to control deprecated exclusion"
     required: false
