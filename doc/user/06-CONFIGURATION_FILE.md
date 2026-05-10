@@ -254,7 +254,7 @@ only the filename or filestem (`.json` and `.d` will be added) to look for in th
 for `custom_config.json` and `custom_config.d` in locations listed above.
 When specifying an absolute/relative path for the configuration file, a single file is read. If not, all files from locations listed above, with the overriding logic specified above.
 
-To check which config file is found and used, you can check the verbose output, eg. for thumbnails config: `f3d --config=thumbnail --verbose`:
+To check which config file is found and used, you can check the verbose output, eg. for thumbnails config: `f3d --config=thumbnail --verbose` (or `f3d-console.exe --config=thumbnail --verbose` on Windows) :
 
 ```
 ========== Initializing Options ==========
