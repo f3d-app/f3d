@@ -186,7 +186,7 @@
       },
       "color": {
         "type": "color",
-        "default_value": "f3d_black"
+        "parsed_default_value": "f3d_black"
       }
     },
     "axis": {
