@@ -6,9 +6,12 @@ on:
     branches:
       - master
       - release
+    paths-ignore:
+      - "doc/**"
+      - "_config.yml"
 
 concurrency:
-  group: "${{ github.workflow }}-${{ github.ref_name }}"
+  group: "${{ github.workflow }}-${{GITHUB_HEAD_REF}}"
   cancel-in-progress: true
 
 jobs:
@@ -77,7 +80,6 @@ jobs:
             optdeps_label: no-optdeps
             mindeps_label: no-mindeps
 
-
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
@@ -93,11 +95,19 @@ jobs:
           fetch-depth: 1
           lfs: false
 
-      - name: Generic Dependencies (already cached)
-        uses: ./source/.github/actions/generic-dependencies
+      - name: VTK Dependencies (already cached)
+        uses: ./source/.github/actions/vtk-dependencies
         with:
           versions_file: ./source/.github/workflows/versions.json
           optdeps_label: ${{matrix.optdeps_label}}
+          mindeps_label: ${{matrix.mindeps_label}}
+          cpu: ${{ matrix.os == 'macos-15' && 'arm64' || 'x86_64' }}
+
+      - name: Install Raytracing Dependencies
+        if: matrix.optdeps_label == 'optdeps'
+        uses: ./source/.github/actions/ospray-sb-install-dep
+        with:
+          versions_file: ./source/.github/workflows/versions.json
           mindeps_label: ${{matrix.mindeps_label}}
           cpu: ${{ matrix.os == 'macos-15' && 'arm64' || 'x86_64' }}
 
