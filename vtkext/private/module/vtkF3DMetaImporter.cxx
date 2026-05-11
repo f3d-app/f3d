@@ -368,7 +368,7 @@ bool vtkF3DMetaImporter::Update()
           actor->SetTexture(nullptr);
           diffuseTex->UseSRGBColorSpaceOn();
 
-          actor->GetProperty()->SetColor(0.65, 0.65, 0.65);
+          actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
           actor->GetProperty()->SetBaseColorTexture(diffuseTex);
         }
       }
