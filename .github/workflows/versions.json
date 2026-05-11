@@ -19,7 +19,7 @@
     "geotiff": "1.7.4",
     "imath": "v3.2.2",
     "java": "25",
-    "occt": "V7_9_3",
+    "occt": "V8_0_0",
     "openexr": "v3.4.4",
     "openvdb": "v13.0.0",
     "ospray": "v2.12.0",
@@ -62,6 +62,6 @@
     "zlib": "v1.2.13"
   },
   "vtk_commit_sha": "1c58a40fe829d968e24e29a91b3fe8e17e0ba14f",
-  "docker_timestamp": "20260504_0",
+  "docker_timestamp": "20260511_0",
   "global_cache_index": "2"
 }
