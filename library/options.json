@@ -33,6 +33,9 @@
     },
     "force_reader": {
       "type": "string"
+    },
+    "skip_content_check": {
+      "type": "bool"
     }
   },
   "render": {
@@ -392,7 +395,8 @@
       },
       "colormap": {
         "type": "colormap",
-        "default_value": "0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0"
+        "default_value":
+          "0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0"
       },
       "opacity_map": {
         "type": "double_vector",

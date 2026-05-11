@@ -45,13 +45,14 @@ public:
   /**
    * Get the reader that can read the given file, nullptr if none
    */
-  reader* getReader(const std::string& fileName, std::optional<std::string> forceReader);
+  reader* getReader(const std::string& fileName, std::optional<std::string> forceReader,
+    const std::optional<bool> skipContentCheck, reader_types::file_availability& availability);
 
   /**
    * Get the reader that can read the given buffer, nullptr if none
    */
-  reader* getReader(
-    const std::byte* buffer, std::size_t size, std::optional<std::string> forceReader);
+  reader* getReader(const std::byte* buffer, std::size_t size,
+    std::optional<std::string> forceReader, const std::optional<bool> skipContentCheck);
 
   /**
    * Get the list of the registered plugins
