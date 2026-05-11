@@ -18,14 +18,6 @@ runs:
       working-directory: ${{github.workspace}}
       run: echo -e "cmake_minimum_required(VERSION 3.21)\nproject(toplevel)\nadd_subdirectory(f3d)" > source/CMakeLists.txt
 
-    - name: Dependencies Dir
-      shell: bash
-      working-directory: ${{github.workspace}}
-      run: |
-        mkdir dependencies
-        cd dependencies
-        mkdir install
-
     - name: Install VTK dependencies
       uses: ./source/f3d/.github/actions/vtk-dependencies
       with:
