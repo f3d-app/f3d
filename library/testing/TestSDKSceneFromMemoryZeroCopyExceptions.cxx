@@ -8,8 +8,8 @@
 #include <scene.h>
 #include <window.h>
 
-int TestSDKSceneFromMemoryZeroCopyExceptions([[maybe_unused]] int argc,
-                                             [[maybe_unused]] char* argv[])
+int TestSDKSceneFromMemoryZeroCopyExceptions(
+  [[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
 
@@ -68,9 +68,8 @@ int TestSDKSceneFromMemoryZeroCopyExceptions([[maybe_unused]] int argc,
     }
   };
 
-  test.expect<f3d::scene::load_failure_exception>("add with invalid point component count", [&]() {
-    sce.add(std::make_shared<InvalidPointComponentCountMesh>());
-  });
+  test.expect<f3d::scene::load_failure_exception>("add with invalid point component count",
+    [&]() { sce.add(std::make_shared<InvalidPointComponentCountMesh>()); });
 
   // Mesh view normals must have a data type of F32 or F64
   class InvalidNormalTypeMesh : public f3d::mesh_view
@@ -80,8 +79,8 @@ int TestSDKSceneFromMemoryZeroCopyExceptions([[maybe_unused]] int argc,
     {
       const void* dummyPointer = reinterpret_cast<const void*>(0xf3d);
       return { .pointCount = 1,
-               .points = { .data = dummyPointer, .components = 3 },
-               .normals = { .type = data_type::U8, .data = dummyPointer } };
+        .points = { .data = dummyPointer, .components = 3 },
+        .normals = { .type = data_type::U8, .data = dummyPointer } };
     }
   };
 
@@ -96,14 +95,13 @@ int TestSDKSceneFromMemoryZeroCopyExceptions([[maybe_unused]] int argc,
     {
       const void* dummyPointer = reinterpret_cast<const void*>(0xf3d);
       return { .pointCount = 1,
-               .points = { .data = dummyPointer, .components = 3 },
-               .normals = { .data = dummyPointer, .components = 4 } };
+        .points = { .data = dummyPointer, .components = 3 },
+        .normals = { .data = dummyPointer, .components = 4 } };
     }
   };
 
-  test.expect<f3d::scene::load_failure_exception>("add with invalid normal component count", [&]() {
-    sce.add(std::make_shared<InvalidNormalComponentCountMesh>());
-  });
+  test.expect<f3d::scene::load_failure_exception>("add with invalid normal component count",
+    [&]() { sce.add(std::make_shared<InvalidNormalComponentCountMesh>()); });
 
   // Mesh view texture coordinates must have a data type of F32 or F64
   class InvalidTextureCoordinateTypeMesh : public f3d::mesh_view
@@ -113,13 +111,12 @@ int TestSDKSceneFromMemoryZeroCopyExceptions([[maybe_unused]] int argc,
     {
       const void* dummyPointer = reinterpret_cast<const void*>(0xf3d);
       return { .pointCount = 1,
-               .points = { .data = dummyPointer, .components = 3 },
-               .textureCoordinates = { .type = data_type::U8, .data = dummyPointer } };
+        .points = { .data = dummyPointer, .components = 3 },
+        .textureCoordinates = { .type = data_type::U8, .data = dummyPointer } };
     }
   };
 
-  test.expect<f3d::scene::load_failure_exception>(
-    "add with invalid texture coordinate type",
+  test.expect<f3d::scene::load_failure_exception>("add with invalid texture coordinate type",
     [&]() { sce.add(std::make_shared<InvalidTextureCoordinateTypeMesh>()); });
 
   // Mesh view texture coordinates must have 2 components
@@ -130,8 +127,8 @@ int TestSDKSceneFromMemoryZeroCopyExceptions([[maybe_unused]] int argc,
     {
       const void* dummyPointer = reinterpret_cast<const void*>(0xf3d);
       return { .pointCount = 1,
-               .points = { .data = dummyPointer, .components = 3 },
-               .textureCoordinates = { .data = dummyPointer, .components = 3 } };
+        .points = { .data = dummyPointer, .components = 3 },
+        .textureCoordinates = { .data = dummyPointer, .components = 3 } };
     }
   };
 
@@ -147,9 +144,9 @@ int TestSDKSceneFromMemoryZeroCopyExceptions([[maybe_unused]] int argc,
     {
       const void* dummyPointer = reinterpret_cast<const void*>(0xf3d);
       return { .pointCount = 1,
-               .points = { .data = dummyPointer, .components = 3 },
-               .faceOffsetCount = 1,
-               .faceOffsets = { .data = nullptr } };
+        .points = { .data = dummyPointer, .components = 3 },
+        .faceOffsetCount = 1,
+        .faceOffsets = { .data = nullptr } };
     }
   };
 
@@ -161,11 +158,11 @@ int TestSDKSceneFromMemoryZeroCopyExceptions([[maybe_unused]] int argc,
     {
       const void* dummyPointer = reinterpret_cast<const void*>(0xf3d);
       return { .pointCount = 1,
-               .points = { .data = dummyPointer, .components = 3 },
-               .faceOffsetCount = 2,
-               .faceOffsets = { .data = dummyPointer },
-               .faceIndexCount = 1,
-               .faceIndices = { .data = nullptr } };
+        .points = { .data = dummyPointer, .components = 3 },
+        .faceOffsetCount = 2,
+        .faceOffsets = { .data = dummyPointer },
+        .faceIndexCount = 1,
+        .faceIndices = { .data = nullptr } };
     };
   };
 
@@ -180,17 +177,16 @@ int TestSDKSceneFromMemoryZeroCopyExceptions([[maybe_unused]] int argc,
     {
       const void* dummyPointer = reinterpret_cast<const void*>(0xf3d);
       return { .pointCount = 1,
-               .points = { .data = dummyPointer, .components = 3 },
-               .faceOffsetCount = 2,
-               .faceOffsets = { .type = data_type::U8, .data = dummyPointer },
-               .faceIndexCount = 1,
-               .faceIndices = { .data = dummyPointer } };
+        .points = { .data = dummyPointer, .components = 3 },
+        .faceOffsetCount = 2,
+        .faceOffsets = { .type = data_type::U8, .data = dummyPointer },
+        .faceIndexCount = 1,
+        .faceIndices = { .data = dummyPointer } };
     };
   };
 
-  test.expect<f3d::scene::load_failure_exception>("add with invalid face offsets type", [&]() {
-    sce.add(std::make_shared<InvalidFaceOffsetsTypeMesh>());
-  });
+  test.expect<f3d::scene::load_failure_exception>("add with invalid face offsets type",
+    [&]() { sce.add(std::make_shared<InvalidFaceOffsetsTypeMesh>()); });
 
   // Mesh view face indices must have a data type of I32 or I64
   class InvalidFaceIndicesTypeMesh : public f3d::mesh_view
@@ -200,17 +196,16 @@ int TestSDKSceneFromMemoryZeroCopyExceptions([[maybe_unused]] int argc,
     {
       const void* dummyPointer = reinterpret_cast<const void*>(0xf3d);
       return { .pointCount = 1,
-               .points = { .data = dummyPointer, .components = 3 },
-               .faceOffsetCount = 2,
-               .faceOffsets = { .type = data_type::I32, .data = dummyPointer },
-               .faceIndexCount = 1,
-               .faceIndices = { .type = data_type::U8, .data = dummyPointer } };
+        .points = { .data = dummyPointer, .components = 3 },
+        .faceOffsetCount = 2,
+        .faceOffsets = { .type = data_type::I32, .data = dummyPointer },
+        .faceIndexCount = 1,
+        .faceIndices = { .type = data_type::U8, .data = dummyPointer } };
     };
   };
 
-  test.expect<f3d::scene::load_failure_exception>("add with invalid face indices type", [&]() {
-    sce.add(std::make_shared<InvalidFaceIndicesTypeMesh>());
-  });
+  test.expect<f3d::scene::load_failure_exception>("add with invalid face indices type",
+    [&]() { sce.add(std::make_shared<InvalidFaceIndicesTypeMesh>()); });
 
   // Mesh view face offsets and face indices must have the same data type
   class FaceOffsetsIndicesMismatchedTypeMesh : public f3d::mesh_view
@@ -220,11 +215,11 @@ int TestSDKSceneFromMemoryZeroCopyExceptions([[maybe_unused]] int argc,
     {
       const void* dummyPointer = reinterpret_cast<const void*>(0xf3d);
       return { .pointCount = 1,
-               .points = { .data = dummyPointer, .components = 3 },
-               .faceOffsetCount = 2,
-               .faceOffsets = { .type = data_type::I32, .data = dummyPointer },
-               .faceIndexCount = 1,
-               .faceIndices = { .type = data_type::I64, .data = dummyPointer } };
+        .points = { .data = dummyPointer, .components = 3 },
+        .faceOffsetCount = 2,
+        .faceOffsets = { .type = data_type::I32, .data = dummyPointer },
+        .faceIndexCount = 1,
+        .faceIndices = { .type = data_type::I64, .data = dummyPointer } };
     };
   };
 

@@ -176,7 +176,10 @@ public:
 
     return { .pointCount = this->Grid.Vertices.size(),
       .points = { .name = "custom_points_name", .data = points, .components = 3, .stride = stride },
-      .textureCoordinates = { .name = "custom_texture_coordinates_name", .data = points + 6, .components = 2, .stride = stride },
+      .textureCoordinates = { .name = "custom_texture_coordinates_name",
+        .data = points + 6,
+        .components = 2,
+        .stride = stride },
       .faceOffsetCount = this->Grid.FaceOffsets.size(),
       .faceOffsets = { .type = f3d::mesh_view::data_type::I32,
         .data = this->Grid.FaceOffsets.data() },
