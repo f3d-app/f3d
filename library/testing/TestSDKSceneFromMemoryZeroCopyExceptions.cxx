@@ -150,6 +150,9 @@ int TestSDKSceneFromMemoryZeroCopyExceptions(
     }
   };
 
+  test.expect<f3d::scene::load_failure_exception>(
+    "add with null face offsets", [&]() { sce.add(std::make_shared<NullFaceOffsetsMesh>()); });
+
   // Mesh view face indices pointer is null
   class NullFaceIndicesMesh : public f3d::mesh_view
   {
@@ -167,7 +170,7 @@ int TestSDKSceneFromMemoryZeroCopyExceptions(
   };
 
   test.expect<f3d::scene::load_failure_exception>(
-    "add with null face offsets", [&]() { sce.add(std::make_shared<NullFaceOffsetsMesh>()); });
+    "add with null face indices", [&]() { sce.add(std::make_shared<NullFaceIndicesMesh>()); });
 
   // Mesh view face offsets must have a data type of I32 or I64
   class InvalidFaceOffsetsTypeMesh : public f3d::mesh_view
