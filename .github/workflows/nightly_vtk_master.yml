@@ -114,7 +114,7 @@ jobs:
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
     strategy:
       fail-fast: false
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5

@@ -139,6 +139,10 @@ if (F3D_MODULE_WEBP)
   target_compile_definitions(libf3dSDKTests PRIVATE F3D_MODULE_WEBP)
 endif ()
 
+if (MSVC)
+  target_compile_options(libf3dSDKTests PRIVATE /utf-8)
+endif()
+
 # List tests that do not require rendering
 list(APPEND libf3dSDKTestsNoRender_list
      TestSDKEngineExceptions
@@ -196,4 +200,4 @@ target_compile_options(libf3dSDKTests PUBLIC ${f3d_compile_options_public} PRIVA
 target_link_options(libf3dSDKTests PUBLIC ${f3d_link_options_public})
 
 # make sure the libf3d API is compatible with the right C++ standard
-set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD 17)
+set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD 20)

@@ -68,7 +68,7 @@ f3d_test(NAME TestAnimationInputChangeColoring DATA v_rock2.mdl ARGS --scalar-co
 
 # Depth
 f3d_test(NAME TestDisplayDepth DATA dragon.vtu ARGS --display-depth)
-f3d_test(NAME TestDisplayDepthColorMap DATA dragon.vtu ARGS --display-depth --scalar-coloring=True)
+f3d_test(NAME TestDisplayDepthColorMap DATA dragon.vtu ARGS --display-depth --scalar-coloring=True --coloring-scalar-bar=True)
 f3d_test(NAME TestDisplayDepthCustomColorMap DATA dragon.vtu ARGS --display-depth --scalar-coloring --colormap=0,red,1,blue)
 f3d_test(NAME TestDisplayDepthWithGrid DATA cow.vtp ARGS --display-depth -g)
 
@@ -768,4 +768,12 @@ if(NOT WIN32)
   f3d_test(NAME TestOutputWithReferenceTooLong DATA suzanne.ply ARGS --reference=file.png --output=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE NO_OUTPUT)
   f3d_test(NAME TestOutputWithExistingReferenceTooLong DATA suzanne.ply ARGS --reference=${F3D_SOURCE_DIR}/testing/data/world.png --output=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE NO_OUTPUT)
   f3d_test(NAME TestConfigTooLong CONFIG ${_f3d_test_invalid_folder}/invalid.json REGEXP "File name too long" NO_RENDER NO_BASELINE)
+endif()
+
+f3d_test(NAME TestFPS DATA suzanne.ply ARGS -z --font-scale=0.35
+  --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf UI THRESHOLD 0.2)
+# Require improved importer support https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11303
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240910)
+  f3d_test(NAME TestFPSWithBadge DATA invalid_body.vtp ARGS -z --font-scale=0.35
+    --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf NO_DATA_FORCE_RENDER UI THRESHOLD 0.2)
 endif()

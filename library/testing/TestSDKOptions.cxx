@@ -301,8 +301,7 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // Test getNames
   std::vector<std::string> names = f3d::options::getAllNames();
-  test(
-    "getAllNames find", std::find(names.begin(), names.end(), "render.point_size") != names.end());
+  test("getAllNames find", std::ranges::find(names, "render.point_size") != names.end());
 
   std::vector<std::string> setNames = opt.getNames();
   test("getNames count", setNames.size() != 0);

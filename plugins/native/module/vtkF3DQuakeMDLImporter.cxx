@@ -117,7 +117,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   template<typename TYPE>
   static const TYPE* PeekFromVector(const std::vector<uint8_t>& buffer, const size_t& offset)
   {
-    static_assert(std::is_pod<TYPE>::value, "Vector typecast requires POD input");
+    static_assert(std::is_standard_layout_v<TYPE>, "Vector typecast requires POD input");
 
     if (offset + sizeof(TYPE) > buffer.size())
     {
@@ -144,7 +144,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   {
     static constexpr auto mdl_simpleframe_t_fixed_size =
       sizeof(mdl_simpleframe_t) - sizeof(mdl_simpleframe_t::verts);
-    static_assert(std::is_pod<mdl_simpleframe_t>::value, "Vector typecast requires POD input");
+    static_assert(
+      std::is_standard_layout_v<mdl_simpleframe_t>, "Vector typecast requires POD input");
 
     // check that we have enough data for the given number of verts requested
     if (offset + mdl_simpleframe_t_fixed_size + num_verts * sizeof(mdl_simpleframe_t::verts[0]) >

@@ -5,51 +5,39 @@
 #include "types.h"
 
 #include <cmath>
+#include <concepts>
 #include <functional>
 #include <iostream>
+#include <ranges>
 #include <sstream>
+#include <string>
 #include <type_traits>
 
 namespace
 {
 template<typename T>
-struct is_container : std::false_type
-{
-};
-
-template<>
-struct is_container<f3d::point3_t> : std::true_type
-{
-};
-
-template<>
-struct is_container<f3d::vector3_t> : std::true_type
-{
-};
-
-template<typename T>
-struct is_container<std::vector<T>> : std::true_type
-{
-};
+concept container_type = std::ranges::input_range<T> && !std::same_as<T, std::string>;
 
 template<typename T>
 std::string toString(const T& value)
 {
   std::stringstream ss;
+  ss << value;
+  return ss.str();
+}
 
-  if constexpr (is_container<T>::value)
+template<container_type T>
+std::string toString(const T& value)
+{
+  std::stringstream ss;
+
+  size_t i = 0;
+  for (const auto& item : value)
   {
-    size_t i = 0;
-    for (const auto& item : value)
-    {
-      ss << (i++ ? ", " : "{ ") << ::toString(item);
-    }
-    ss << " }";
+    ss << (i++ ? ", " : "{ ") << ::toString(item);
   }
-  else
-  {
-    ss << value;
-  }
+  ss << " }";
+
   return ss.str();
 }
 }
@@ -67,7 +55,7 @@ public:
   {
     auto fuzzyComp = [this](double a, double b) { return std::fabs(a - b) < this->Tol; };
 
-    if constexpr (is_container<T>::value)
+    if constexpr (container_type<T>)
     {
       return std::equal(this->Value.begin(), this->Value.end(), rhs.begin(), fuzzyComp);
     }
@@ -147,13 +135,26 @@ private:
   {
     try
     {
-      function();
-      if (std::is_same<E, Dummy>::value)
+      if constexpr (std::same_as<E, Dummy>)
       {
-        this->record(true, label);
+        if constexpr (std::same_as<std::invoke_result_t<F&>, bool>)
+        {
+          const bool success = function();
+          this->record(success, label, success ? "" : "returned false");
+        }
+        else
+        {
+          // ensure the function returns void
+          static_assert(
+            std::is_void_v<std::invoke_result_t<F&>>, "Function must return bool or void");
+
+          function();
+          this->record(true, label);
+        }
       }
       else
       {
+        function();
         this->record(false, label, "did not throw");
       }
     }
@@ -206,7 +207,7 @@ protected:
   virtual void log(const bool success, const std::string& label, const std::string& message)
   {
     const std::string line = message.empty() ? label : (label + ": " + message);
-    const std::string icon = success ? u8"\u2714" : u8"\u2718";
+    const std::string icon = success ? "\u2714" : "\u2718";
     (success ? std::cout : std::cerr) << icon << " " << line << "\n";
   }
 

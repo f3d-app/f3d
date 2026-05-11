@@ -38,7 +38,7 @@ struct mdl_header_t
 template<typename TYPE>
 static TYPE* PeekFromVector(const std::vector<uint8_t>& buffer, const size_t& offset)
 {
-  static_assert(std::is_pod<TYPE>::value, "Vector typecast requires POD input");
+  static_assert(std::is_standard_layout_v<TYPE>, "Vector typecast requires POD input");
 
   if (offset + sizeof(TYPE) > buffer.size())
   {

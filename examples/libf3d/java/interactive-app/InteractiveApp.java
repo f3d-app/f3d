@@ -53,7 +53,8 @@ public class InteractiveApp {
             if (args.length > 1) {
                 // For testing purposes, stop after timeout seconds
                 int timeout = Integer.parseInt(args[1]);
-                interactor.start(timeout, () -> interactor.stop());
+                interactor.setEventLoopUserCallback(state -> interactor.stop());
+                interactor.start(timeout);
             } else {
                 interactor.start();
             }

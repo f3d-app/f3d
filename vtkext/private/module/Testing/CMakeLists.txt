@@ -28,12 +28,23 @@ if(F3D_MODULE_WEBP)
        TestF3DWebPMemReader.cxx)
 endif()
 
+if(TARGET VTK::IOHDF)
+  list(APPEND test_sources TestF3DGenericImporterTimeSteps.cxx)
+endif()
+
 vtk_add_test_cxx(vtkextPrivateTests tests
   NO_DATA NO_VALID NO_OUTPUT
   ${test_sources}
   ${F3D_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
 vtk_test_cxx_executable(vtkextPrivateTests tests)
-set_target_properties(vtkextPrivateTests PROPERTIES CXX_STANDARD 17)
+set_target_properties(vtkextPrivateTests PROPERTIES CXX_STANDARD 20)
+
+foreach(test ${test_sources})
+  get_filename_component (TName ${test} NAME_WE)
+  set_tests_properties(f3d::vtkextPrivateCxx-${TName} PROPERTIES
+          LABELS "module"
+  )
+endforeach()
 
 if(UNIX)
   # On windows, the default window output message does not redirect to cout

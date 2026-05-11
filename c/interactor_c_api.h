@@ -452,16 +452,15 @@ extern "C"
 
   typedef void (*f3d_interactor_callback_t)(void* user_data);
   /**
-   * @brief Start the interactor event loop.
+   * @brief Set the event loop user callback.
    *
    * @param interactor Interactor handle.
-   * @param delta_time Time step in seconds.
    * @param callback Optional user callback called at the start of each event-loop
-   *        iteration. May be NULL if no callback is desired.
+   *        iteration.
    * @param user_data Optional opaque pointer passed verbatim to callback.
    */
-  F3D_EXPORT void f3d_interactor_start_with_callback(f3d_interactor_t* interactor,
-    double delta_time, f3d_interactor_callback_t callback, void* user_data);
+  F3D_EXPORT void f3d_interactor_set_event_loop_user_callback(
+    f3d_interactor_t* interactor, f3d_interactor_callback_t callback, void* user_data);
 
   /**
    * @brief Stop the interactor.

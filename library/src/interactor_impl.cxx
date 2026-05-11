@@ -52,11 +52,6 @@ namespace f3d::detail
 {
 using mod_t = interaction_bind_t::ModifierKeys;
 
-bool StartWith(std::string_view str, std::string_view pattern)
-{
-  return str.rfind(pattern, 0) == 0; // To avoid dependency for C++20 starts_with
-};
-
 class interactor_impl::internals
 {
 public:
@@ -565,7 +560,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  bool StartEventLoop(double deltaTime, std::function<void()> userCallBack)
+  bool StartEventLoop(double deltaTime)
   {
     if (this->EventLoopObserverId != -1)
     {
@@ -576,25 +571,22 @@ public:
     // Trigger a render to ensure Window is ready to be configured
     this->Window.render();
 
-    // Copy user callback
-    this->EventLoopUserCallBack = std::move(userCallBack);
-
     // Create the timer
     this->EventLoopTimerId = this->VTKInteractor->CreateRepeatingTimer(deltaTime * 1000);
 
     this->CallbackDeltaTime = deltaTime;
 
     // Create the callback and add an observer
-    vtkNew<vtkCallbackCommand> timerCallBack;
-    timerCallBack->SetCallback(
+    vtkNew<vtkCallbackCommand> timerCallback;
+    timerCallback->SetCallback(
       [](vtkObject*, unsigned long, void* clientData, void*)
       {
         internals* that = static_cast<internals*>(clientData);
         that->EventLoop(that->CallbackDeltaTime);
       });
     this->EventLoopObserverId =
-      this->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
-    timerCallBack->SetClientData(this);
+      this->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallback);
+    timerCallback->SetClientData(this);
     return true;
   }
 
@@ -608,6 +600,7 @@ public:
     }
     this->VTKInteractor->RemoveObserver(this->EventLoopObserverId);
     this->VTKInteractor->DestroyTimer(this->EventLoopTimerId);
+    this->EventLoopUserCallback = nullptr;
     this->EventLoopObserverId = -1;
     this->EventLoopTimerId = 0;
     return true;
@@ -626,9 +619,9 @@ public:
       this->Interactor.stop();
       return;
     }
-    if (this->EventLoopUserCallBack)
+    if (this->EventLoopUserCallback)
     {
-      this->EventLoopUserCallBack();
+      this->EventLoopUserCallback({ .animationTime = this->AnimationManager->GetCurrentTime() });
     }
 
     if (this->CommandBuffer.has_value())
@@ -700,7 +693,7 @@ public:
   int DragDistanceTol = 3;      /* px */
   int TransitionDuration = 100; /* ms */
 
-  std::function<void()> EventLoopUserCallBack = nullptr;
+  std::function<void(interactor_state_t)> EventLoopUserCallback = nullptr;
   unsigned long EventLoopTimerId = 0;
   int EventLoopObserverId = -1;
   std::atomic<bool> RenderRequested = false;
@@ -751,7 +744,7 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
       bool exact = false;
       for (auto const& [action, callbacks] : this->Internals->Commands)
       {
-        if (f3d::detail::StartWith(action, actionPattern))
+        if (action.starts_with(actionPattern))
         {
           // Copy all action that start with the pattern
           candidates.emplace_back(action);
@@ -780,8 +773,7 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
           // Use the completion callback of the action with its args if any
           std::vector<std::string> argsCandidates =
             complCallback({ tokens.begin() + 1, tokens.end() });
-          std::transform(argsCandidates.begin(), argsCandidates.end(),
-            std::back_inserter(candidates),
+          std::ranges::transform(argsCandidates, std::back_inserter(candidates),
             [&](const auto& argCandidate) { return actionPattern + " " + argCandidate; });
         }
       }
@@ -836,7 +828,7 @@ interactor& interactor_impl::initCommands()
 
     // Recover all names that starts with args[indexToCheck]
     std::copy_if(names.begin(), names.end(), std::back_inserter(candidates),
-      [&](const std::string& name) { return f3d::detail::StartWith(name, args[indexToCheck]); });
+      [&](const std::string& name) { return name.starts_with(args[indexToCheck]); });
 
     // Create an arg pattern before the indexToCheck
     std::string argPattern;
@@ -845,7 +837,7 @@ interactor& interactor_impl::initCommands()
       argPattern += args[i] + " ";
     }
     // Include it in front of the candidates
-    std::transform(candidates.begin(), candidates.end(), candidates.begin(),
+    std::ranges::transform(candidates, candidates.begin(),
       [&](const auto& argCandidate) { return argPattern + argCandidate; });
 
     if (candidates.size() == 1)
@@ -880,15 +872,14 @@ interactor& interactor_impl::initCommands()
     else if (args.size() == 1)
     {
       // One arg, check if its an option
-      if (std::find(optionNames.begin(), optionNames.end(), args[0]) != optionNames.end())
+      if (std::ranges::find(optionNames, args[0]) != optionNames.end())
       {
         // Its an existing option, check if it should be completed
         const auto it = COMPL_OPTIONS_SET.find(args[0]);
         if (it != COMPL_OPTIONS_SET.end())
         {
           // Transform potential values into found option
-          std::transform(std::begin(it->second), std::end(it->second),
-            std::back_inserter(candidates),
+          std::ranges::transform(it->second, std::back_inserter(candidates),
             [&](const auto& value) { return args[0] + " " + value; });
         }
         else
@@ -1100,9 +1091,8 @@ interactor& interactor_impl::initCommands()
       bool& enabled = this->Internals->Options.model.point_sprites.enable;
       std::string& type = this->Internals->Options.model.point_sprites.type;
 
-      // C++20: use `std::to_array<std::string_view>` to avoid specifying the size explicitly
-      constexpr std::array<std::string_view, 6> validTypes = { "sphere", "gaussian", "circle",
-        "stddev", "bound", "cross" };
+      constexpr auto validTypes =
+        std::to_array({ "sphere", "gaussian", "circle", "stddev", "bound", "cross" });
       if (!enabled)
       {
         enabled = true;
@@ -1110,8 +1100,7 @@ interactor& interactor_impl::initCommands()
       }
       else
       {
-        auto index = std::distance(
-          std::begin(validTypes), std::find(std::begin(validTypes), std::end(validTypes), type));
+        auto index = std::distance(std::begin(validTypes), std::ranges::find(validTypes, type));
         if (static_cast<size_t>(index) == validTypes.size() - 1) // last type
         {
           enabled = false;
@@ -1802,8 +1791,8 @@ interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
   this->Internals->Bindings.erase(bind);
 
   // Look for the group of the removed bind
-  auto it = std::find_if(this->Internals->GroupedBinds.begin(), this->Internals->GroupedBinds.end(),
-    [&](const auto& pair) { return pair.second == bind; });
+  auto it = std::ranges::find_if(
+    this->Internals->GroupedBinds, [&](const auto& pair) { return pair.second == bind; });
 
   if (it != this->Internals->GroupedBinds.end())
   {
@@ -1815,8 +1804,7 @@ interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
     {
       // If it was the last one, remove it from the ordered group
       // We know the group is present and unique in the vector, so only erase once
-      auto vecIt = std::find(this->Internals->OrderedBindGroups.begin(),
-        this->Internals->OrderedBindGroups.end(), group);
+      auto vecIt = std::ranges::find(this->Internals->OrderedBindGroups, group);
       assert(vecIt != this->Internals->OrderedBindGroups.end());
       this->Internals->OrderedBindGroups.erase(vecIt);
     }
@@ -2048,8 +2036,21 @@ interactor& interactor_impl::disableCameraMovement()
 }
 
 //----------------------------------------------------------------------------
-bool interactor_impl::playInteraction(
-  const fs::path& file, double loopTime, std::function<void()> userCallBack)
+interactor& interactor_impl::setEventLoopUserCallback(
+  std::function<void(interactor_state_t)> userCallback)
+{
+  if (this->Internals->EventLoopObserverId != -1)
+  {
+    log::info("Cannot set event loop user callback after the event loop has started");
+    return *this;
+  }
+
+  this->Internals->EventLoopUserCallback = std::move(userCallback);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+bool interactor_impl::playInteraction(const fs::path& file, double loopTime)
 {
   try
   {
@@ -2063,7 +2064,7 @@ bool interactor_impl::playInteraction(
     this->Internals->Recorder->Off();
     this->Internals->Recorder->Clear();
 
-    bool loop = this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
+    bool loop = this->Internals->StartEventLoop(loopTime);
     this->Internals->Recorder->SetFileName(file.string().c_str());
     this->Internals->Recorder->Play();
 
@@ -2124,9 +2125,9 @@ bool interactor_impl::recordInteraction(const fs::path& file)
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::start(double loopTime, std::function<void()> userCallBack)
+interactor& interactor_impl::start(double loopTime)
 {
-  if (this->Internals->StartEventLoop(loopTime, std::move(userCallBack)))
+  if (this->Internals->StartEventLoop(loopTime))
   {
     this->Internals->VTKInteractor->Start();
   }

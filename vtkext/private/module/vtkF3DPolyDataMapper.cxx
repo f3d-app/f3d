@@ -68,8 +68,8 @@ void vtkF3DPolyDataMapper::ReplaceShaderValues(
 #endif
   std::vector<f3d_texinfo> textures = this->GetTextures(actor);
   hasTangents = hasTangents &&
-    std::find_if(textures.begin(), textures.end(),
-      [](const f3d_texinfo& tex) { return tex.second == "normalTex"; }) != textures.end();
+    std::ranges::find_if(
+      textures, [](const f3d_texinfo& tex) { return tex.second == "normalTex"; }) != textures.end();
 
   std::string customDecl = "//VTK::CustomUniforms::Dec\n";
   std::string beginImpl;
@@ -240,7 +240,7 @@ bool vtkF3DPolyDataMapper::RenderWithMatCap(vtkActor* actor)
 
   auto textures = actor->GetProperty()->GetAllTextures();
   auto fn = [](const std::pair<std::string, vtkTexture*>& tex) { return tex.first == "matcap"; };
-  return std::find_if(textures.begin(), textures.end(), fn) != textures.end();
+  return std::ranges::find_if(textures, fn) != textures.end();
 }
 
 //-----------------------------------------------------------------------------

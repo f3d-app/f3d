@@ -94,3 +94,26 @@ f3d_plugin_build(
   CONFIGURATION_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/configs/config.d" "${CMAKE_CURRENT_SOURCE_DIR}/configs/thumbnail.d"
   FREEDESKTOP
 )
+
+# PDAL supports static build
+# github.com/PDAL/PDAL/pull/4996
+# but require symbols to be specifically included on link
+# please note this is only tested in f3d-superbuild
+if (TARGET pdalcpp)
+  get_target_property(_target_type pdalcpp TYPE)
+  if (_target_type STREQUAL STATIC_LIBRARY)
+    if (WIN32)
+      foreach (_pdal_driver Qfit Sbet Slpk Optech Terrasolid Bpf Las Pcd Ptx)
+        target_link_options(pdalcpp INTERFACE "/INCLUDE:??0${_pdal_driver}Reader@pdal@@QEAA@XZ")
+      endforeach ()
+    else ()
+      foreach (_pdal_driver 10QfitReaderC1Ev 10SbetReaderC1Ev 10SlpkReaderC1Ev 12OptechReaderC1Ev 16TerrasolidReaderD0Ev 9BpfReaderC1Ev 9LasReaderC1Ev 9PcdReaderC1Ev 9PtxReaderD0Ev)
+        if (APPLE)
+          target_link_options(pdalcpp INTERFACE "-Wl,-u,__ZN4pdal${_pdal_driver}")
+        elseif (UNIX)
+          target_link_options(pdalcpp INTERFACE "-Wl,--undefined=_ZN4pdal${_pdal_driver}")
+        endif ()
+      endforeach ()
+    endif ()
+  endif ()
+endif ()

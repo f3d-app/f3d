@@ -6,6 +6,7 @@
 #include <vtkActor.h>
 #include <vtkCompositeDataIterator.h>
 #include <vtkDataAssembly.h>
+#include <vtkDoubleArray.h>
 #include <vtkEventForwarderCommand.h>
 #include <vtkImageData.h>
 #include <vtkInformation.h>
@@ -44,6 +45,7 @@ struct vtkF3DGenericImporter::Internals
   bool HasAnimation = false;
   bool AnimationEnabled = false;
   std::array<double, 2> TimeRange;
+  vtkNew<vtkDoubleArray> TimeSteps;
 
   void UpdateBlock(BlockData& bd, vtkDataSet* dataset)
   {
@@ -76,6 +78,20 @@ void vtkF3DGenericImporter::UpdateTemporalInformation()
     this->Pimpl->TimeRange[0] = readerTimeRange[0];
     this->Pimpl->TimeRange[1] = readerTimeRange[1];
     this->Pimpl->HasAnimation = true;
+  }
+
+  if (readerInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
+  {
+    const double* readerTimeSteps = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    const int readerNumberOfTimeSteps =
+      readerInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+
+    this->Pimpl->TimeSteps->SetNumberOfTuples(readerNumberOfTimeSteps);
+
+    for (vtkIdType idx = 0; idx < readerNumberOfTimeSteps; idx++)
+    {
+      this->Pimpl->TimeSteps->SetValue(idx, readerTimeSteps[idx]);
+    }
   }
 }
 
@@ -121,14 +137,21 @@ bool vtkF3DGenericImporter::IsAnimationEnabled([[maybe_unused]] vtkIdType animat
 
 //----------------------------------------------------------------------------
 bool vtkF3DGenericImporter::GetTemporalInformation([[maybe_unused]] vtkIdType animationIndex,
-  double timeRange[2], int& vtkNotUsed(nbTimeSteps), vtkDoubleArray* vtkNotUsed(timeSteps))
+  double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps)
 {
   assert(animationIndex == 0);
-  // F3D do not care about timesteps
+
   if (this->Pimpl->HasAnimation)
   {
     timeRange[0] = this->Pimpl->TimeRange[0];
     timeRange[1] = this->Pimpl->TimeRange[1];
+
+    if (timeSteps != nullptr)
+    {
+      nbTimeSteps = this->Pimpl->TimeSteps->GetNumberOfTuples();
+      timeSteps->ShallowCopy(this->Pimpl->TimeSteps);
+    }
+
     return true;
   }
   return false;

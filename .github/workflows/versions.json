@@ -27,7 +27,7 @@
     "proj": "9.8.0",
     "pybind11": "v3.0.1",
     "python": "3.14",
-    "sqlite_csb": "08be462f7fa9816f881dbb93eacb2e287f319208",
+    "sqlite_csb": "bb237f11ca039bd01314bb2252eb282086723c18",
     "tbb": "v2021.13.1",
     "tiff": "v4.7.1",
     "usd": "v25.11",
@@ -53,7 +53,7 @@
     "proj": "9.0.0",
     "pybind11": "v2.9.2",
     "python": "3.10",
-    "sqlite_csb": "08be462f7fa9816f881dbb93eacb2e287f319208",
+    "sqlite_csb": "bb237f11ca039bd01314bb2252eb282086723c18",
     "tbb": "v2021.10.0",
     "tiff": "v4.2.0",
     "usd": "v24.08",
@@ -61,7 +61,7 @@
     "webp": "v1.2.4",
     "zlib": "v1.2.13"
   },
-  "vtk_commit_sha": "495934375e076bde1a65a88f127936186ccfadad",
-  "docker_timestamp": "20260418_0",
-  "global_cache_index": "1"
+  "vtk_commit_sha": "1c58a40fe829d968e24e29a91b3fe8e17e0ba14f",
+  "docker_timestamp": "20260504_0",
+  "global_cache_index": "2"
 }

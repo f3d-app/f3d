@@ -262,6 +262,11 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("inter", &f3d::interaction_bind_t::inter)
     .def("format", &f3d::interaction_bind_t::format);
 
+  py::class_<f3d::interactor_state_t> interactor_state(module, "InteractorState");
+
+  interactor_state.def(py::init<>())
+    .def_readonly("animation_time", &f3d::interactor_state_t::animationTime);
+
   py::class_<f3d::interactor, std::unique_ptr<f3d::interactor, py::nodelete>> interactor(
     module, "Interactor");
 
@@ -315,6 +320,8 @@ PYBIND11_MODULE(pyf3d, module)
       "Enable the camera interaction")
     .def("disable_camera_movement", &f3d::interactor::disableCameraMovement,
       "Disable the camera interaction")
+    .def("set_event_loop_user_callback", &f3d::interactor::setEventLoopUserCallback,
+      "Set the user callback of the event loop", py::arg("user_callback") = nullptr)
     .def("trigger_mod_update", &f3d::interactor::triggerModUpdate, "Trigger a key modifier update")
     .def("trigger_mouse_button", &f3d::interactor::triggerMouseButton, "Trigger a mouse button")
     .def(
@@ -328,7 +335,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def("play_interaction", &f3d::interactor::playInteraction, "Play an interaction file")
     .def("record_interaction", &f3d::interactor::recordInteraction, "Record an interaction file")
     .def("start", &f3d::interactor::start, "Start the interactor and the event loop",
-      py::arg("delta_time") = 1.0 / 30, py::arg("user_callback") = nullptr)
+      py::arg("delta_time") = 1.0 / 30)
     .def("stop", &f3d::interactor::stop, "Stop the interactor and the event loop")
     .def(
       "request_render", &f3d::interactor::requestRender, "Request a render on the next event loop")

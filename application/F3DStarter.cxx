@@ -46,6 +46,7 @@
 #include <cmath>
 #include <csignal>
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -258,8 +259,7 @@ public:
   {
     F3DStarter* self = reinterpret_cast<F3DStarter*>(userData);
     const std::lock_guard<std::mutex> lock(self->Internals->FilesToWatchMutex);
-    if (std::find_if(self->Internals->FilesToWatch.begin(), self->Internals->FilesToWatch.end(),
-          [&](const auto& path)
+    if (std::ranges::find_if(self->Internals->FilesToWatch, [&](const auto& path)
           { return path.filename() == filename; }) != self->Internals->FilesToWatch.end())
     {
       self->Internals->ReloadFileRequested = true;
@@ -553,26 +553,23 @@ public:
     }
   }
 
+  static std::string FormatOrigin(
+    const std::string& source, const std::string& matchType, const std::string& match)
+  {
+    if (source.empty())
+    {
+      return match;
+    }
+
+    return std::format("{}:`{}` ({})", source, match, matchType);
+  }
+
   static void PrintLoggingMap(const std::map<std::string, log_entry_t>& loggingMap, char sep)
   {
     for (const auto& [key, tuple] : loggingMap)
     {
       const auto& [bindStr, source, matchType, match, commands] = tuple;
-      std::string origin;
-      if (source.empty())
-      {
-        origin = match;
-      }
-      else
-      {
-        // TODO: Use std::format once C++20 is supported
-        origin = source;
-        origin += ":`";
-        origin += match;
-        origin += "` (";
-        origin += matchType;
-        origin += ")";
-      }
+      const std::string origin = F3DInternals::FormatOrigin(source, matchType, match);
       f3d::log::debug(" '", bindStr, "' ", sep, " '", commands, "' from ", origin);
     }
     f3d::log::debug("");
@@ -649,8 +646,7 @@ public:
                 bool reset = false;
 
                 // Handle options reset
-                // XXX: Use starts_with once C++20 is supported
-                if (libf3dOptionName.rfind("reset-", 0) == 0)
+                if (libf3dOptionName.starts_with("reset-"))
                 {
                   if (libf3dOptionName.size() > 6)
                   {
@@ -669,8 +665,8 @@ public:
 
                 // Handle reader options
                 std::vector<std::string> readerOptionNames = f3d::engine::getAllReaderOptionNames();
-                if (std::find(readerOptionNames.begin(), readerOptionNames.end(),
-                      libf3dOptionName) != readerOptionNames.end())
+                if (std::ranges::find(readerOptionNames, libf3dOptionName) !=
+                  readerOptionNames.end())
                 {
                   f3d::engine::setReaderOption(libf3dOptionName, libf3dOptionValue);
                   continue;
@@ -699,21 +695,7 @@ public:
                 {
                   if (!quiet)
                   {
-                    std::string origin;
-                    if (source.empty())
-                    {
-                      origin = match;
-                    }
-                    else
-                    {
-                      // TODO: Use std::format once C++20 is supported
-                      origin = source;
-                      origin += ":`";
-                      origin += match;
-                      origin += "` (";
-                      origin += matchType;
-                      origin += ")";
-                    }
+                    const std::string origin = F3DInternals::FormatOrigin(source, matchType, match);
                     f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue,
                       "' from ", origin, " because: ", ex.what());
                   }
@@ -722,21 +704,7 @@ public:
                 {
                   if (!quiet)
                   {
-                    std::string origin;
-                    if (source.empty())
-                    {
-                      origin = match;
-                    }
-                    else
-                    {
-                      // TODO: Use std::format once C++20 is supported
-                      origin = source;
-                      origin += ":`";
-                      origin += match;
-                      origin += "` (";
-                      origin += matchType;
-                      origin += ")";
-                    }
+                    const std::string origin = F3DInternals::FormatOrigin(source, matchType, match);
                     auto [closestName, dist] =
                       F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
                     f3d::log::warn("'", keyForLog, "' option from ", origin,
@@ -1517,7 +1485,8 @@ int F3DStarter::Start(int argc, char** argv)
         std::signal(SIGTERM, F3DInternals::SigCallback);
         std::signal(SIGINT, F3DInternals::SigCallback);
 
-        interactor.start(deltaTime, [this]() { this->EventLoop(); });
+        interactor.setEventLoopUserCallback([this](f3d::interactor_state_t) { this->EventLoop(); });
+        interactor.start(deltaTime);
       }
 #endif
     }
@@ -1678,8 +1647,8 @@ void F3DStarter::LoadFileGroupInternal(
     f3d::log::debug("Checking files:");
     for (const fs::path& tmpPath : paths)
     {
-      if (std::find(this->Internals->LoadedFiles.begin(), this->Internals->LoadedFiles.end(),
-            tmpPath) == this->Internals->LoadedFiles.end())
+      if (std::ranges::find(this->Internals->LoadedFiles, tmpPath) ==
+        this->Internals->LoadedFiles.end())
       {
         if (tmpPath == F3D_PIPED)
         {
@@ -1742,7 +1711,7 @@ void F3DStarter::LoadFileGroupInternal(
 
     if (!localPaths.empty())
     {
-      auto cinIt = std::find(localPaths.begin(), localPaths.end(), F3D_PIPED);
+      auto cinIt = std::ranges::find(localPaths, F3D_PIPED);
       if (cinIt != localPaths.end())
       {
         // Remove cin from path
@@ -2037,7 +2006,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
         if (key == groupKey)
         {
           // Check if file has already been added
-          if (std::find(paths.begin(), paths.end(), tmpPath) == paths.end())
+          if (std::ranges::find(paths, tmpPath) == paths.end())
           {
             paths.emplace_back(tmpPath);
           }
@@ -2188,7 +2157,7 @@ void F3DStarter::AddCommands()
         std::set<std::string> supportedExtensions;
         for (const auto& info : f3d::engine::getReadersInfo())
         {
-          std::transform(info.Extensions.begin(), info.Extensions.end(),
+          std::ranges::transform(info.Extensions,
             std::inserter(supportedExtensions, supportedExtensions.begin()),
             [&](const std::string& ext) { return "." + ext; });
         }
@@ -2212,8 +2181,7 @@ void F3DStarter::AddCommands()
 #else
           // Linux filesystems are typically case-sensitive
           // Perform a case sensitive search
-          // Using rfind to avoid dependency for C++20 starts_with
-          return filename.rfind(filePattern, 0) == 0;
+          return filename.starts_with(filePattern);
 #endif
         };
 
@@ -2236,7 +2204,7 @@ void F3DStarter::AddCommands()
       }
 
       // Sort for output readability and test reproducibility
-      std::sort(candidates.begin(), candidates.end());
+      std::ranges::sort(candidates);
 
       if (candidates.size() == 1 && fs::is_directory(candidates[0]))
       {
@@ -2258,8 +2226,7 @@ void F3DStarter::AddCommands()
       std::vector<std::string> multiArgsCandidate;
       const std::string accum = std::accumulate(args.begin() + 1, args.end() - 1, args[0],
         [](const std::string& a, const std::string& b) { return a + " " + b; });
-      std::transform(originalCandidates.begin(), originalCandidates.end(),
-        std::back_inserter(candidates),
+      std::ranges::transform(originalCandidates, std::back_inserter(candidates),
         [&](const auto& candidate) { return accum + " " + candidate; });
     }
 
@@ -2269,8 +2236,7 @@ void F3DStarter::AddCommands()
       std::vector<std::string> originalCandidates = candidates;
       candidates.clear();
 
-      std::transform(originalCandidates.begin(), originalCandidates.end(),
-        std::back_inserter(candidates),
+      std::ranges::transform(originalCandidates, std::back_inserter(candidates),
         [&](std::string candidate)
         {
           for (size_t i = 0; i < candidate.size(); i++)

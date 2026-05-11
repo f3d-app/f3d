@@ -67,17 +67,15 @@ int stoiStrict(const std::string& str)
  * Splits on `","` and trims chunks before parsing each element
  */
 template<typename T>
-struct is_vector : std::false_type
-{
-};
-template<typename... Args>
-struct is_vector<std::vector<Args...>> : std::true_type
-{
-};
+inline constexpr bool is_vector = false;
+
+template<typename T, typename Alloc>
+inline constexpr bool is_vector<std::vector<T, Alloc>> = true;
+
 template<typename T>
 T parse(const std::string& str)
 {
-  static_assert(is_vector<T>::value, "non-vector types parsing must be specialized");
+  static_assert(is_vector<T>, "non-vector types parsing must be specialized");
 
   T vec;
   std::istringstream split(str);
@@ -96,7 +94,7 @@ template<>
 bool parse(const std::string& str)
 {
   std::string s = str;
-  std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::tolower(c); });
+  std::ranges::transform(s, s.begin(), [](unsigned char c) { return std::tolower(c); });
   if (s == "true" || s == "yes" || s == "on" || s == "1")
   {
     return true;
@@ -270,8 +268,8 @@ color_t parse(const std::string& str)
       }
 
       std::string hueFormat = hueMatch[1].str();
-      std::transform(hueFormat.begin(), hueFormat.end(), hueFormat.begin(),
-        [](unsigned char c) { return std::tolower(c); });
+      std::ranges::transform(
+        hueFormat, hueFormat.begin(), [](unsigned char c) { return std::tolower(c); });
       if (hueFormat == "hsl")
       {
         const double l = v;

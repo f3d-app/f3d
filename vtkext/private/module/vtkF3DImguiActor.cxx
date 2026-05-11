@@ -911,8 +911,8 @@ void vtkF3DImguiActor::RenderCheatSheet()
   {
     std::string lowerHaystack = haystack;
     std::string lowerNeedle = needle;
-    std::transform(lowerHaystack.begin(), lowerHaystack.end(), lowerHaystack.begin(), ::tolower);
-    std::transform(lowerNeedle.begin(), lowerNeedle.end(), lowerNeedle.begin(), ::tolower);
+    std::ranges::transform(lowerHaystack, lowerHaystack.begin(), ::tolower);
+    std::ranges::transform(lowerNeedle, lowerNeedle.begin(), ::tolower);
     return lowerHaystack.find(lowerNeedle) != std::string::npos;
   };
 
@@ -1132,8 +1132,17 @@ void vtkF3DImguiActor::RenderFpsCounter()
   winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
   winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-  ImVec2 position(
-    viewport->WorkSize.x - winSize.x - margin, viewport->WorkSize.y - winSize.y - margin);
+  float posX = viewport->WorkSize.x - winSize.x - margin;
+  if (this->ConsoleBadgeEnabled)
+  {
+    vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+    if (console && console->IsBadgeVisible())
+    {
+      ImVec2 badgeSize = console->GetBadgeSize();
+      posX = viewport->WorkSize.x - winSize.x - badgeSize.x - 2.f * margin;
+    }
+  }
+  ImVec2 position(posX, margin);
 
   ::SetupNextWindow(position, winSize);
   ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);

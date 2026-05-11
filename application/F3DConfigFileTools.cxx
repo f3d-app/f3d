@@ -53,7 +53,7 @@ std::vector<fs::path> F3DConfigFileTools::GetConfigPaths(const std::string& conf
         configNames.emplace_back(configSearch);
       }
 
-      std::transform(configNames.begin(), configNames.end(), std::back_inserter(paths),
+      std::ranges::transform(configNames, std::back_inserter(paths),
         [&dir](const auto& configName) { return dir / configName; });
     }
     catch (const fs::filesystem_error&)

@@ -81,7 +81,7 @@ public:
     for (size_t i = 0; i < pngReader->GetNumberOfTextChunks(); ++i)
     {
       const vtkStdString key = pngReader->GetTextKey(static_cast<int>(i));
-      if (key.rfind(metadataKeyPrefix, 0) == 0)
+      if (key.starts_with(metadataKeyPrefix))
       {
         pngReader->GetTextChunks(key.c_str(), beginEndIndex);
         const int index = beginEndIndex[1] - 1; // only read the last key
@@ -371,11 +371,11 @@ double image::compare(const image& reference) const
   switch (type)
   {
     case ChannelType::BYTE:
-      std::fill(ranges.begin(), ranges.end(), 256);
+      std::ranges::fill(ranges, 256);
       ssim->SetInputRange(ranges);
       break;
     case ChannelType::SHORT:
-      std::fill(ranges.begin(), ranges.end(), 65535);
+      std::ranges::fill(ranges, 65535);
       ssim->SetInputRange(ranges);
       break;
     case ChannelType::FLOAT:
@@ -591,9 +591,9 @@ const image& image::toTerminalText(std::ostream& stream) const
   };
 
   constexpr std::string_view EMPTY_BLOCK = " ";
-  constexpr std::string_view TOP_BLOCK = u8"\u2580";
-  constexpr std::string_view BOTTOM_BLOCK = u8"\u2584";
-  constexpr std::string_view FULL_BLOCK = u8"\u2588";
+  constexpr std::string_view TOP_BLOCK = "\u2580";
+  constexpr std::string_view BOTTOM_BLOCK = "\u2584";
+  constexpr std::string_view FULL_BLOCK = "\u2588";
   constexpr std::string_view EOL = "\n";
 
   for (int y = 0; y < height; y += 2)
@@ -683,8 +683,8 @@ std::string image::getMetadata(const std::string& key) const
 std::vector<std::string> image::allMetadata() const
 {
   std::vector<std::string> keys;
-  std::transform(this->Internals->Metadata.begin(), this->Internals->Metadata.end(),
-    std::back_inserter(keys), [](const auto& kv) { return kv.first; });
+  std::ranges::transform(
+    this->Internals->Metadata, std::back_inserter(keys), [](const auto& kv) { return kv.first; });
   return keys;
 }
 

@@ -82,7 +82,7 @@ struct VertexBufferDecoder
       attribute->ConvertValue<T>(
         attribute->mapped_index(i), attribute->num_components(), values.data());
 
-      std::copy(values.begin(), values.end(), reinterpret_cast<T*>(outBuffer.data() + byteOffset));
+      std::ranges::copy(values, reinterpret_cast<T*>(outBuffer.data() + byteOffset));
 
       byteOffset += sizeof(T) * attribute->num_components();
     }

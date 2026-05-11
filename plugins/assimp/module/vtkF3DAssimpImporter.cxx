@@ -1305,7 +1305,7 @@ bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream, std::string& h
   if (parser->ReadLine(line1) == vtkParseResult::EndOfLine &&
     parser->ReadLine(line2) == vtkParseResult::EndOfLine)
   {
-    if (line1.rfind(R"(<?xml version="1.0")", 0) == 0 && line2.rfind("<COLLADA ", 0) == 0)
+    if (line1.starts_with(R"(<?xml version="1.0")") && line2.starts_with("<COLLADA "))
     {
       hint = "dae";
       return true;
@@ -1325,8 +1325,8 @@ bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream, std::string& h
     parser->ReadLine(line3) == vtkParseResult::EndOfLine &&
     parser->ReadLine(line4) == vtkParseResult::EndOfLine)
   {
-    if (line1.rfind('0', 0) == 0 && line2.rfind("SECTION", 0) == 0 && line3.rfind('2', 0) == 0 &&
-      line4.rfind("HEADER", 0) == 0)
+    if (line1.starts_with("0") && line2.starts_with("SECTION") && line3.starts_with("2") &&
+      line4.starts_with("HEADER"))
     {
       hint = "dxf";
       return true;
@@ -1339,7 +1339,7 @@ bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream, std::string& h
   parser->Seek(0, vtkResourceStream::SeekDirection::Begin);
   if (parser->ReadLine(line1) == vtkParseResult::EndOfLine)
   {
-    if (line1.rfind("OFF", 0) == 0)
+    if (line1.starts_with("OFF"))
     {
       hint = "off";
       return true;

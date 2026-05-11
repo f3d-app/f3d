@@ -100,6 +100,7 @@
 
 #include <cctype>
 #include <chrono>
+#include <numbers>
 #include <sstream>
 
 namespace
@@ -365,8 +366,8 @@ void vtkF3DRenderer::ApplyUpDirection(const std::array<double, 3>& up)
   vtkMath::Cross(up.data(), front.data(), orthRight.data());
   vtkMath::Normalize(orthRight.data());
 
-  std::copy(up.begin(), up.end(), this->UpDirection);
-  std::copy(orthRight.begin(), orthRight.end(), this->RightDirection);
+  std::ranges::copy(up, this->UpDirection);
+  std::ranges::copy(orthRight, this->RightDirection);
 
   this->SkyboxActor->SetFloorPlane(up[0], up[1], up[2], 0.0);
   this->SkyboxActor->SetFloorRight(front[0], front[1], front[2]);
@@ -416,7 +417,7 @@ void vtkF3DRenderer::SetPendingUpDirection(const std::vector<double>& upVec)
     return;
   }
 
-  std::copy(up.begin(), up.end(), this->PendingUpDirection);
+  std::ranges::copy(up, this->PendingUpDirection);
   this->UpDirectionConfigured = false;
 }
 
@@ -432,7 +433,7 @@ void vtkF3DRenderer::ConfigureUpDirection()
   vtkMath::Cross(oldUp.data(), newUp.data(), axis.data());
   double sinAngle = vtkMath::Normalize(axis.data());
   double cosAngle = vtkMath::Dot(oldUp.data(), newUp.data());
-  double angle = std::atan2(sinAngle, cosAngle) * 180.0 / vtkMath::Pi();
+  double angle = std::atan2(sinAngle, cosAngle) * 180.0 / std::numbers::pi;
 
   vtkCamera* cam = this->GetActiveCamera();
   double foc[3];
@@ -494,7 +495,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
     vtkNew<vtkF3DDisplayDepthRenderPass> depthP;
     camP->SetDelegatePass(opaqueP);
     depthP->SetDelegatePass(camP);
-    if (this->DisplayDepthScalarColoring)
+    if (this->EnableColoring)
     {
       this->ConfigureColoringAndVisibilities();
       depthP->SetColorMap(this->ColorTransferFunction);
@@ -594,10 +595,10 @@ std::string vtkF3DRenderer::GetSceneDescription()
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
 
-  stream << "Scene bounding box: "                                  //
-         << bounds[0] << u8" \u2264 x \u2264 " << bounds[1] << ", " //
-         << bounds[2] << u8" \u2264 y \u2264 " << bounds[3] << ", " //
-         << bounds[4] << u8" \u2264 z \u2264 " << bounds[5] << "\n\n";
+  stream << "Scene bounding box: "                                //
+         << bounds[0] << " \u2264 x \u2264 " << bounds[1] << ", " //
+         << bounds[2] << " \u2264 y \u2264 " << bounds[3] << ", " //
+         << bounds[4] << " \u2264 z \u2264 " << bounds[5] << "\n\n";
 
   // Camera Info
   vtkCamera* cam = this->GetActiveCamera();
@@ -759,13 +760,13 @@ void vtkF3DRenderer::SetAxesColor(const std::vector<double>& colorXAxis,
 {
   assert(colorXAxis.size() == 3 && colorYAxis.size() == 3 && colorZAxis.size() == 3);
 
-  if (!std::equal(colorXAxis.begin(), colorXAxis.end(), this->ColorAxisX) ||
-    !std::equal(colorYAxis.begin(), colorYAxis.end(), this->ColorAxisY) ||
-    !std::equal(colorZAxis.begin(), colorZAxis.end(), this->ColorAxisZ))
+  if (!std::ranges::equal(colorXAxis, this->ColorAxisX) ||
+    !std::ranges::equal(colorYAxis, this->ColorAxisY) ||
+    !std::ranges::equal(colorZAxis, this->ColorAxisZ))
   {
-    std::copy(colorXAxis.begin(), colorXAxis.end(), this->ColorAxisX);
-    std::copy(colorYAxis.begin(), colorYAxis.end(), this->ColorAxisY);
-    std::copy(colorZAxis.begin(), colorZAxis.end(), this->ColorAxisZ);
+    std::ranges::copy(colorXAxis, this->ColorAxisX);
+    std::ranges::copy(colorYAxis, this->ColorAxisY);
+    std::ranges::copy(colorZAxis, this->ColorAxisZ);
     this->GridConfigured = false;
     this->AxesActorConfigured = false;
   }
@@ -1750,16 +1751,6 @@ void vtkF3DRenderer::SetDisplayDepth(bool use)
   if (this->DisplayDepth != use)
   {
     this->DisplayDepth = use;
-    this->RenderPassesConfigured = false;
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::SetDisplayDepthScalarColoring(bool use)
-{
-  if (this->DisplayDepthScalarColoring != use)
-  {
-    this->DisplayDepthScalarColoring = use;
     this->RenderPassesConfigured = false;
   }
 }
@@ -3032,6 +3023,7 @@ void vtkF3DRenderer::SetEnableColoring(bool enable)
     this->EnableColoring = enable;
     this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
+    this->RenderPassesConfigured = false;
   }
 }
 
@@ -3100,8 +3092,7 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   assert(this->Importer);
 
   // Recover coloring information and update handler
-  bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume) ||
-    (this->DisplayDepth && this->DisplayDepthScalarColoring);
+  bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
   F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
   auto info = coloringHandler.SetCurrentColoring(
     enableColoring, this->UseCellColoring, this->ArrayNameForColoring, false);
@@ -3391,9 +3382,16 @@ void vtkF3DRenderer::ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf,
 void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
   vtkScalarBarActor* scalarBar, std::string arrayName, int component, vtkColorTransferFunction* ctf)
 {
-  arrayName += " (";
-  arrayName += this->ComponentToString(component);
-  arrayName += ")";
+  if (this->DisplayDepth)
+  {
+    arrayName = "Depth";
+  }
+  else
+  {
+    arrayName += " (";
+    arrayName += this->ComponentToString(component);
+    arrayName += ")";
+  }
 
   scalarBar->SetLookupTable(ctf);
   scalarBar->SetTitle(arrayName.c_str());
@@ -3450,8 +3448,8 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
     }
     else
     {
-      minRange = info.MagnitudeRange[0];
-      maxRange = info.MagnitudeRange[1];
+      minRange = this->DisplayDepth ? 0.0 : info.MagnitudeRange[0];
+      maxRange = this->DisplayDepth ? 1.0 : info.MagnitudeRange[1];
     }
     if (this->ExpandingRangeSet)
     {

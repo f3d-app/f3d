@@ -154,7 +154,7 @@ dev
 
 ```sh
 cd C:\dev\vtk\build
-cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=../install ../src
+cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=../install -DVTK_VERSIONED_INSTALL=OFF ../src
 cmake --build . -j 16 --config Debug
 cmake --install . --config Debug
 ```
@@ -167,7 +167,7 @@ Note: These commands will take a while.
 
 ```sh
 cd C:\dev\f3d\build
-cmake -DVTK_DIR=C:/dev/vtk/install/lib/cmake/vtk-9.5 ../src
+cmake -DVTK_DIR=C:/dev/vtk/install/lib/cmake/vtk ../src
 cmake --build . --config Debug
 ```
 

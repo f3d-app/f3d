@@ -286,7 +286,7 @@ void engine::loadPlugin(const std::string& pathOrName, const std::vector<fs::pat
 
   // check if the plugin is already loaded
   auto plugs = factory->getPlugins();
-  if (std::any_of(plugs.cbegin(), plugs.cend(), [pathOrName](const plugin* plug)
+  if (std::ranges::any_of(plugs, [pathOrName](const plugin* plug)
         { return (plug->getName() == pathOrName || plug->getOrigin() == pathOrName); }))
   {
     log::debug("Plugin \"", pathOrName, "\" already loaded");

@@ -373,7 +373,7 @@ const char** f3d_image_get_supported_formats()
   static std::vector<const char*> c_formats;
   c_formats.clear();
   c_formats.resize(formats.size());
-  std::transform(formats.begin(), formats.end(), c_formats.begin(),
-    [](const std::string& s) { return s.c_str(); });
+  std::ranges::transform(
+    formats, c_formats.begin(), [](const std::string& s) { return s.c_str(); });
   return c_formats.data();
 }
