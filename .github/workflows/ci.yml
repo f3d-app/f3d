@@ -531,7 +531,7 @@ jobs:
   # webassembly: Build webassembly artifacts
   #----------------------------------------------------------------------------
   webassembly:
-    needs: [cache_lfs, check_docker_images]
+    needs: [cache_lfs, recover_docker_timestamp]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:wasm') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
