@@ -29,7 +29,17 @@ runs:
       run: |
         [[ "${{ inputs.versions_file }}" ]] || { echo "versions_file is empty" ; exit 1; }
 
-    - name: Copy actions to a common directory, specific to external-build CI
+    # This implies this action must be done before other dependencies actions
+    - name: Create dependencies dir
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        mkdir dependencies
+        cd dependencies
+        mkdir install
+
+    # Specific to external build CI
+    - name: Copy actions to a common directory
       shell: bash
       working-directory: ${{github.workspace}}
       run: |

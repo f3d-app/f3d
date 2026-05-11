@@ -475,40 +475,33 @@ jobs:
           versions_file: ./source/f3d/.github/workflows/versions.json
 
   #----------------------------------------------------------------------------
-  # Check android/wasm docker images TODO
+  # Recover docker timestamp
   #----------------------------------------------------------------------------
-  check_docker_images:
+  recover_docker_timestamp:
     runs-on: ubuntu-22.04
+    outputs:
+      docker_timestamp: ${{steps.docker_timestamp.outputs.extract}}
 
-    # Pull request can require a rebuild of docker image, wait for it to be done
-    # This job does not do anything in master branch but is not skipped for simpler logic
     steps:
-      - name: Extract branch name
-        if: |
-          contains(github.event.pull_request.labels.*.name, 'ci:android') ||
-          contains(github.event.pull_request.labels.*.name, 'ci:wasm') ||
-          contains(github.event.pull_request.labels.*.name, 'ci:full')
-        shell: bash
-        run: echo "F3D_BRANCH_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_ENV
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          path: "source/f3d"
+          fetch-depth: 0
+          lfs: false
 
-      - name: Wait for docker images
-        if: contains(github.event.pull_request.labels.*.name, 'ci:full')
-        run: |
-          gh run list -w build-docker-images.yml --repo ${{ github.repository }} -L 1 -b ${{ env.F3D_BRANCH_NAME }}
-          until gh run list -w build-docker-images.yml --repo ${{ github.repository }} -L 1 -b ${{ env.F3D_BRANCH_NAME }} --json status | jq '.[]| .status' | grep -q "completed";
-          do
-            echo "Waiting 1s"
-            sleep 1;
-          done
-          gh run list -w build-docker-images.yml --repo ${{ github.repository }} -L 1 -b ${{ env.F3D_BRANCH_NAME }} --json conclusion | jq '.[]| .conclusion' | grep -q "success"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract docker timestamp
+        id: docker_timestamp
+        uses: f3d-app/extract-version-action@main
+        with:
+          file: ./source/.github/workflows/versions.json
+          special_name: docker_timestamp
 
   #----------------------------------------------------------------------------
-  # android: Check build of F3D for android TODO
+  # android: Check build of F3D for android
   #----------------------------------------------------------------------------
   android:
-    needs: [check_docker_images]
+    needs: recover_docker_timestamp
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:android') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -519,7 +512,7 @@ jobs:
         arch: [armeabi-v7a, arm64-v8a, x86, x86_64]
 
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-android-${{ matrix.arch }}:${{needs.default_versions.outputs.docker_timestamp}}
+    container: ghcr.io/f3d-app/f3d-android-${{ matrix.arch }}:${{needs.recover_docker_timestamp.outputs.docker_timestamp}}
 
     steps:
       - name: Checkout
@@ -535,7 +528,7 @@ jobs:
           arch: ${{matrix.arch}}
 
   #----------------------------------------------------------------------------
-  # webassembly: Build webassembly artifacts TODO
+  # webassembly: Build webassembly artifacts
   #----------------------------------------------------------------------------
   webassembly:
     needs: [cache_lfs, check_docker_images]
@@ -550,7 +543,7 @@ jobs:
 
     env:
       CMAKE_BUILD_PARALLEL_LEVEL: 4
-      F3D_DOCKER_TIMESTAMP: ${{needs.default_versions.outputs.docker_timestamp}}
+      F3D_DOCKER_TIMESTAMP: ${{needs.recover_docker_timestamp.outputs.docker_timestamp}}
 
     steps:
       - name: Checkout

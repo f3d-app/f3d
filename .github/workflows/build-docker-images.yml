@@ -1,3 +1,5 @@
+name: Build docker images
+
 on:
   pull_request_target:
     types: [opened, synchronize, reopened, labeled]
@@ -8,18 +10,18 @@ on:
       - "doc/**"
       - "_config.yml"
 
-name: Build docker images
+concurrency:
+  group: "${{ github.workflow }}-${{GITHUB_HEAD_REF}}"
+  cancel-in-progress: true
+
 jobs:
   #----------------------------------------------------------------------------
-  # Default versions: Set default version for all dependencies
+  # Build android/wasm docker images if needed
   #----------------------------------------------------------------------------
-  default_versions:
-    runs-on: ubuntu-22.04
-    name: Set default versions
-    if: contains(github.event.pull_request.labels.*.name, 'ci:full')
-    outputs:
-      docker_timestamp: ${{ steps.set_default_versions.outputs.docker_timestamp }}
-
+  build_docker_images:
+    name: Build docker images
+    if: contains(github.event.pull_request.labels.*.name, 'ci:cache')
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
@@ -29,30 +31,23 @@ jobs:
           fetch-depth: 1
           lfs: false
 
-      - name: Set default versions
-        id: set_default_versions
-        uses: f3d-app/default-versions-action@main
+      - name: Extract docker timestamp
+        id: docker_timestamp
+        uses: f3d-app/extract-version-action@main
         with:
           file: ./source/.github/workflows/versions.json
+          special_name: docker_timestamp
 
-  #----------------------------------------------------------------------------
-  # Build android/wasm docker images if needed
-  #----------------------------------------------------------------------------
-  build_docker_images:
-    needs: default_versions
-    name: Build docker images
-    runs-on: ubuntu-latest
-    steps:
       - name: Check docker images exists
         shell: bash
         working-directory: ${{github.workspace}}
         run: |
           res=0
-          docker manifest inspect ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.docker_timestamp}} || res=$?
-          docker manifest inspect ghcr.io/f3d-app/f3d-android-armeabi-v7a:${{needs.default_versions.outputs.docker_timestamp}} || res=$?
-          docker manifest inspect ghcr.io/f3d-app/f3d-android-arm64-v8a:${{needs.default_versions.outputs.docker_timestamp}} || res=$?
-          docker manifest inspect ghcr.io/f3d-app/f3d-android-x86:${{needs.default_versions.outputs.docker_timestamp}} || res=$?
-          docker manifest inspect ghcr.io/f3d-app/f3d-android-x86_64:${{needs.default_versions.outputs.docker_timestamp}} || res=$?
+          docker manifest inspect ghcr.io/f3d-app/f3d-wasm:${{steps.docker_timestamp.outputs.extract}} || res=$?
+          docker manifest inspect ghcr.io/f3d-app/f3d-android-armeabi-v7a:${{steps.docker_timestamp.outputs.extract}} || res=$?
+          docker manifest inspect ghcr.io/f3d-app/f3d-android-arm64-v8a:${{steps.docker_timestamp.outputs.extract}} || res=$?
+          docker manifest inspect ghcr.io/f3d-app/f3d-android-x86:${{steps.docker_timestamp.outputs.extract}} || res=$?
+          docker manifest inspect ghcr.io/f3d-app/f3d-android-x86_64:${{steps.docker_timestamp.outputs.extract}} || res=$?
           echo "F3D_DOCKER_IMAGE_AVAILABLE=$res" >> $GITHUB_ENV
 
       # This require a F3D_DOCKER_CI_DISPATCH secret contain a PAT with read and write admin access
