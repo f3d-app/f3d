@@ -479,6 +479,10 @@ jobs:
   #----------------------------------------------------------------------------
   recover_docker_timestamp:
     runs-on: ubuntu-22.04
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'ci:android') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:full') ||
+      github.ref == 'refs/heads/master'
     outputs:
       docker_timestamp: ${{steps.docker_timestamp.outputs.extract}}
 
@@ -486,7 +490,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          path: "source/f3d"
+          path: "source"
           fetch-depth: 0
           lfs: false
 
