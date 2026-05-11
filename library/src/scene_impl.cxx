@@ -658,6 +658,15 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
       }
     });
 
+  try
+  {
+    vtkSource->Update();
+  }
+  catch (const load_failure_exception& e)
+  {
+    throw load_failure_exception(std::string("Failed to load mesh from memory: ") + e.what());
+  }
+
   vtkNew<vtkF3DGenericImporter> importer;
   importer->SetInternalReader(vtkSource);
 

@@ -175,8 +175,8 @@ public:
     size_t stride = sizeof(WavyGridMesh::Vertex) / sizeof(float);
 
     return { .pointCount = this->Grid.Vertices.size(),
-      .points = { .data = points, .components = 3, .stride = stride },
-      .textureCoordinates = { .data = points + 6, .components = 2, .stride = stride },
+      .points = { .name = "custom_points_name", .data = points, .components = 3, .stride = stride },
+      .textureCoordinates = { .name = "custom_texture_coordinates_name", .data = points + 6, .components = 2, .stride = stride },
       .faceOffsetCount = this->Grid.FaceOffsets.size(),
       .faceOffsets = { .type = f3d::mesh_view::data_type::I32,
         .data = this->Grid.FaceOffsets.data() },
@@ -208,12 +208,12 @@ public:
     size_t stride = sizeof(WavyGridMesh::Vertex) / sizeof(float);
 
     return { .pointCount = this->Grid.Vertices.size(),
-             .points = { .data = points, .components = 3, .stride = stride },
-             .normals = { .data = points + 3, .components = 3, .stride = stride },
+             .points = { .name = "custom_points_name", .data = points, .components = 3, .stride = stride },
+             .normals = { .name = "custom_normals_name", .data = points + 3, .components = 3, .stride = stride },
              .faceOffsetCount = this->Grid.FaceOffsets.size(),
-             .faceOffsets = { .type = f3d::mesh_view::data_type::I32, .data = this->Grid.FaceOffsets.data() },
+             .faceOffsets = { .name = "custom_face_offsets_name", .type = f3d::mesh_view::data_type::I32, .data = this->Grid.FaceOffsets.data() },
              .faceIndexCount = this->Grid.Quads.size(),
-             .faceIndices = { .type = f3d::mesh_view::data_type::I32, .data = this->Grid.Quads.data() },
+             .faceIndices = { .name = "custom_face_indices_name", .type = f3d::mesh_view::data_type::I32, .data = this->Grid.Quads.data() },
              .pointScalars = { { .name = "velocity", .data = points + 8, .stride = stride },
                                 },
              .faceScalars = { { .name = "quad_coords",
