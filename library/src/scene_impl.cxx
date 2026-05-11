@@ -27,7 +27,6 @@
 #include <vtkProgressBarRepresentation.h>
 #include <vtkProgressBarWidget.h>
 #include <vtkTimerLog.h>
-#include <vtkUnsignedIntArray.h>
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
@@ -458,7 +457,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
   vtkSource->SetTimeRange(timeRange[0], timeRange[1]);
 
   vtkSource->SetUpdateFunction(
-    [=](double time, vtkPolyData* polydata)
+    [mesh = std::move(mesh)](double time, vtkPolyData* polydata)
     {
       const auto memoryView = mesh->getMemoryView(time);
 

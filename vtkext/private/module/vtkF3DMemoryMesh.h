@@ -2,9 +2,10 @@
  * @class vtkF3DMemoryMesh
  * @brief create vtkPolyData from vectors.
  *
- * Simple source which convert and copy vectors provided by the user
- * to internal structure of vtkPolyData.
- * Does not support point data (normals, tcoords...) nor cell data yet.
+ * Simple source which uses a user-provided function to fill a vtkPolyData.
+ * The function is called when the pipeline updates, and is passed the time for which the update is
+ * triggered and a pointer to the vtkPolyData to update. The function must fill the provided
+ * vtkPolyData with the mesh data corresponding to the provided time.
  */
 #ifndef vtkF3DMemoryMesh_h
 #define vtkF3DMemoryMesh_h
@@ -46,7 +47,6 @@ private:
   vtkF3DMemoryMesh(const vtkF3DMemoryMesh&) = delete;
   void operator=(const vtkF3DMemoryMesh&) = delete;
 
-  vtkNew<vtkPolyData> Mesh;
   double TimeRange[2] = { 0.0, 0.0 };
   std::function<void(double, vtkPolyData*)> UpdateFunction;
 };

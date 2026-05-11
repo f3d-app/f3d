@@ -461,7 +461,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("face_sides", &f3d::mesh_t::face_sides)
     .def_readwrite("face_indices", &f3d::mesh_t::face_indices);
 
-  // f3d::mesh
+  // f3d::mesh_view
   py::class_<f3d::mesh_view::memory_view_t>(module, "MeshMemoryView", py::buffer_protocol())
     .def(py::init<>())
     .def_property("points", nullptr,
@@ -618,14 +618,13 @@ PYBIND11_MODULE(pyf3d, module)
     , public py::trampoline_self_life_support
   {
   public:
-    using TimeRange = std::array<double, 2>; // needed for PYBIND11_OVERRIDE
-    TimeRange getTimeRange() const override
+    std::array<double, 2> getTimeRange() const override
     {
       py::gil_scoped_acquire gil;
       py::function fn = py::get_override(this, "get_time_range");
       if (fn)
       {
-        return fn().cast<TimeRange>();
+        return fn().cast<std::array<double, 2>>();
       }
       return f3d::mesh_view::getTimeRange();
     }

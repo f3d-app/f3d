@@ -85,6 +85,9 @@ public:
 
   /**
    * Structure representing a view of an existing data array.
+   * `name` is optional but recommended for pointScalars and faceScalars.
+   * `data` pointer must remain valid while the mesh is used in the scene.
+   * `stride` is the number of elements (not bytes) to skip to get to the next tuple.
    */
   struct data_array_t
   {
@@ -102,8 +105,9 @@ public:
    * - points must have a 3 components and a data type of F32 or F64
    * - normals can be empty or must have a 3 components and a data type of F32 or F64
    * - texture_coordinates can be empty or must have a 2 components and a data type of F32 or F64
-   * - faceOffsets can be empty or must have 1 component and a data type of U16, U32 or U64
-   * - faceIndices can be empty or must have 1 component and a data type of U16, U32 or U64
+   * - faceOffsets can be empty or must have 1 component and a data type of I32 or I64
+   * - faceIndices can be empty or must have 1 component and a data type of I32 or I64
+   * - faceOffsets and faceIndices must have the same data type
    */
   struct memory_view_t
   {

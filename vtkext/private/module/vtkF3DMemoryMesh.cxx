@@ -1,16 +1,9 @@
 #include "vtkF3DMemoryMesh.h"
 
-#include "vtkDataArrayRange.h"
-#include "vtkFloatArray.h"
-#include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkPointData.h"
-#include "vtkSMPTools.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-
-#include <numeric>
 
 vtkStandardNewMacro(vtkF3DMemoryMesh);
 
