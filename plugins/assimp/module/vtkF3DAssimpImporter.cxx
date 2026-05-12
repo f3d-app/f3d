@@ -16,6 +16,7 @@
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataTangents.h>
+#include <vtkInformation.h>
 #include <vtkProperty.h>
 #include <vtkQuaternion.h>
 #include <vtkRenderer.h>
@@ -43,6 +44,7 @@
 #include <memory>
 #include <regex>
 #include <set>
+#include <unordered_map>
 
 vtkStandardNewMacro(vtkF3DAssimpImporter);
 
@@ -712,6 +714,90 @@ public:
 
   //----------------------------------------------------------------------------
   /**
+   * Build armature visualization from all bones in the scene
+   */
+  void BuildArmature(vtkRenderer* renderer)
+  {
+    // Collect all unique bone nodes across all meshes
+    for (unsigned int i = 0; i < this->Scene->mNumMeshes; i++)
+    {
+      const aiMesh* mesh = this->Scene->mMeshes[i];
+      for (unsigned int j = 0; j < mesh->mNumBones; j++)
+      {
+        this->ArmatureBoneNames.emplace_back(mesh->mBones[j]->mName.data);
+      }
+    }
+
+    if (this->ArmatureBoneNames.empty())
+    {
+      return;
+    }
+
+    std::ranges::sort(this->ArmatureBoneNames);
+    auto range = std::ranges::unique(this->ArmatureBoneNames);
+    this->ArmatureBoneNames.erase(range.begin(), range.end());
+
+    std::unordered_map<std::string, vtkIdType> boneToPointId;
+    vtkNew<vtkPoints> points;
+    vtkNew<vtkCellArray> vertices;
+
+    for (const std::string& boneName : this->ArmatureBoneNames)
+    {
+      vtkMatrix4x4* globalMat = this->NodeGlobalMatrix[boneName];
+      double p[3] = { 0.0, 0.0, 0.0 };
+      if (globalMat)
+      {
+        p[0] = globalMat->GetElement(0, 3);
+        p[1] = globalMat->GetElement(1, 3);
+        p[2] = globalMat->GetElement(2, 3);
+      }
+      vtkIdType i = points->GetNumberOfPoints();
+      points->InsertNextPoint(p);
+      vertices->InsertNextCell(1, &i);
+      boneToPointId[boneName] = i;
+    }
+
+    vtkNew<vtkCellArray> lines;
+    for (const std::string& boneName : this->ArmatureBoneNames)
+    {
+      const aiNode* boneNode = this->Scene->mRootNode->FindNode(boneName.c_str());
+      if (boneNode)
+      {
+        for (unsigned int c = 0; c < boneNode->mNumChildren; c++)
+        {
+          std::string childName = boneNode->mChildren[c]->mName.data;
+          auto it = boneToPointId.find(childName);
+          if (it != boneToPointId.end())
+          {
+            vtkIdType lineIds[2] = { boneToPointId[boneName], it->second };
+            lines->InsertNextCell(2, lineIds);
+          }
+        }
+      }
+    }
+
+    this->ArmaturePolyData = vtkSmartPointer<vtkPolyData>::New();
+    this->ArmaturePolyData->SetPoints(points);
+    this->ArmaturePolyData->SetVerts(vertices);
+    this->ArmaturePolyData->SetLines(lines);
+
+    vtkNew<vtkPolyDataMapper> mapper;
+    mapper->SetInputData(this->ArmaturePolyData);
+
+    this->ArmatureActor = vtkSmartPointer<vtkActor>::New();
+    this->ArmatureActor->SetMapper(mapper);
+    this->ArmatureActor->GetProperty()->RenderPointsAsSpheresOn();
+    this->ArmatureActor->GetProperty()->RenderLinesAsTubesOn();
+
+    vtkNew<vtkInformation> info;
+    info->Set(vtkF3DImporter::ACTOR_IS_ARMATURE(), 1);
+    this->ArmatureActor->SetPropertyKeys(info);
+
+    renderer->AddActor(this->ArmatureActor);
+  }
+
+  //----------------------------------------------------------------------------
+  /**
    * Build recursively the node tree
    */
   void ImportNode(vtkRenderer* renderer, const aiNode* node, vtkMatrix4x4* parentMat, int level = 0)
@@ -788,6 +874,12 @@ public:
 
       // even if there is no animation, the bones needs to be updated
       this->UpdateBones();
+
+      // Build armature visualization if requested
+      if (this->Parent->GetImportArmature())
+      {
+        this->BuildArmature(renderer);
+      }
     }
   }
 
@@ -928,6 +1020,26 @@ public:
         }
       }
     }
+
+    // Update armature actor joint positions
+    if (this->ArmatureActor)
+    {
+      vtkNew<vtkPoints> points;
+      points->SetNumberOfPoints(static_cast<vtkIdType>(this->ArmatureBoneNames.size()));
+      for (vtkIdType i = 0; i < static_cast<vtkIdType>(this->ArmatureBoneNames.size()); i++)
+      {
+        vtkMatrix4x4* globalMat = this->NodeGlobalMatrix[this->ArmatureBoneNames[i]];
+        double p[3] = { 0.0, 0.0, 0.0 };
+        if (globalMat)
+        {
+          p[0] = globalMat->GetElement(0, 3);
+          p[1] = globalMat->GetElement(1, 3);
+          p[2] = globalMat->GetElement(2, 3);
+        }
+        points->SetPoint(i, p);
+      }
+      this->ArmaturePolyData->SetPoints(points);
+    }
   }
 
   Assimp::Importer Importer;
@@ -945,6 +1057,9 @@ public:
   std::unordered_map<std::string, vtkSmartPointer<vtkActorCollection>> NodeActors;
   std::unordered_map<std::string, vtkSmartPointer<vtkMatrix4x4>> NodeLocalMatrix;
   std::unordered_map<std::string, vtkSmartPointer<vtkMatrix4x4>> NodeGlobalMatrix;
+  vtkSmartPointer<vtkActor> ArmatureActor;
+  vtkSmartPointer<vtkPolyData> ArmaturePolyData;
+  std::vector<std::string> ArmatureBoneNames;
   vtkF3DAssimpImporter* Parent;
 };
 
@@ -952,6 +1067,7 @@ public:
 vtkF3DAssimpImporter::vtkF3DAssimpImporter()
   : Internals(new vtkF3DAssimpImporter::vtkInternals(this))
 {
+  this->ImportArmatureOn();
 }
 
 //----------------------------------------------------------------------------
@@ -978,6 +1094,11 @@ void vtkF3DAssimpImporter::ImportActors(vtkRenderer* renderer)
     {
       this->ActorCollection->AddItem(actor);
     }
+  }
+
+  if (this->Internals->ArmatureActor)
+  {
+    this->ActorCollection->AddItem(this->Internals->ArmatureActor);
   }
 }
 
