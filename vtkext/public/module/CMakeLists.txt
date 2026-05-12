@@ -23,6 +23,7 @@ endforeach()
 set(classes
   F3DUtils
   vtkF3DFaceVaryingPointDispatcher
+  vtkF3DGLTFDocumentLoader
   vtkF3DGLTFImporter
   vtkF3DImporter
   )

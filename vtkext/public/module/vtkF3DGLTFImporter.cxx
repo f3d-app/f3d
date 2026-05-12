@@ -5,7 +5,8 @@
 #include <vtkActor.h>
 #include <vtkInformation.h>
 #include <vtkObjectFactory.h>
-
+#include "vtkF3DGLTFDocumentLoader.h"
+#include <vtkSmartPointer.h>
 // need https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13116
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260409)
 #include <vtkActorCollection.h>
@@ -38,7 +39,11 @@ void vtkF3DGLTFImporter::ApplyArmatureProperties(vtkActor* actor)
   actor->SetPropertyKeys(info);
 }
 #endif
-
+//----------------------------------------------------------------------------
+void vtkF3DGLTFImporter::InitializeLoader()
+{
+  this->Loader = vtkSmartPointer<vtkF3DGLTFDocumentLoader>::New();
+}
 // need https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13116
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260409)
 //----------------------------------------------------------------------------

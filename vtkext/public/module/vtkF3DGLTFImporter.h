@@ -14,7 +14,8 @@
 #include <vtkGLTFImporter.h>
 #include <vtkVersion.h>
 /// @endcond
-
+// Add this include at the top after existing includes
+#include <vtkSmartPointer.h>
 class vtkInformationIntegerKey;
 
 class VTKEXT_EXPORT vtkF3DGLTFImporter : public vtkGLTFImporter
@@ -26,6 +27,10 @@ public:
 protected:
   vtkF3DGLTFImporter();
   ~vtkF3DGLTFImporter() override = default;
+  /**
+   * Overridden to use vtkF3DGLTFDocumentLoader with EXT_texture_webp support
+   */
+  void InitializeLoader() override;
 
   // need https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11774
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20241219)
