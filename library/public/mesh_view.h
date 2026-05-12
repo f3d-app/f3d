@@ -105,8 +105,8 @@ public:
    * - points must have a 3 components and a data type of F32 or F64
    * - normals can be empty or must have a 3 components and a data type of F32 or F64
    * - texture_coordinates can be empty or must have a 2 components and a data type of F32 or F64
-   * - faceOffsets can be empty or must have 1 component and a data type of I32 or I64
-   * - faceIndices can be empty or must have 1 component and a data type of I32 or I64
+   * - faceOffsets can be empty or must have 1 component and a data type of I32, U32, I64, or U64
+   * - faceIndices can be empty or must have 1 component and a data type of I32, U32, I64, or U64
    * - faceOffsets and faceIndices must have the same data type
    */
   struct memory_view_t

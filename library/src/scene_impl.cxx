@@ -453,6 +453,9 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
   // requires https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12411
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251110)
   vtkNew<vtkF3DMemoryMesh> vtkSource;
+
+  // Only time range is supported at the moment but we should also add support
+  // for time steps and simulated meshes in the future
   auto timeRange = mesh->getTimeRange();
   vtkSource->SetTimeRange(timeRange[0], timeRange[1]);
 
@@ -501,8 +504,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
 
       polydata->SetPoints(points);
 
-      // handle normals
-
+      // handle normals if provided
       if (memoryView.normals.data != nullptr)
       {
         if (memoryView.normals.type != mesh_view::data_type::F32 &&
@@ -532,6 +534,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
           });
       }
 
+      // handle texture coordinates if provided
       if (memoryView.textureCoordinates.data != nullptr)
       {
         if (memoryView.textureCoordinates.type != mesh_view::data_type::F32 &&
@@ -564,6 +567,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
           });
       }
 
+      // handle scalars if provided
       for (const auto& scalar : memoryView.pointScalars)
       {
         f3d::mesh_view::dataTypeDispatch(scalar.type,
@@ -596,6 +600,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
           });
       }
 
+      // handle faces
       if (memoryView.faceOffsetCount > 0)
       {
         if (memoryView.faceOffsets.data == nullptr)
@@ -609,17 +614,21 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
         }
 
         if (memoryView.faceOffsets.type != mesh_view::data_type::I32 &&
-          memoryView.faceOffsets.type != mesh_view::data_type::I64)
+          memoryView.faceOffsets.type != mesh_view::data_type::U32 &&
+          memoryView.faceOffsets.type != mesh_view::data_type::I64 &&
+          memoryView.faceOffsets.type != mesh_view::data_type::U64)
         {
           throw scene::load_failure_exception(
-            "Mesh view face offsets must have a data type of I32 or I64");
+            "Mesh view face offsets must have a data type of I32, U32, I64, or U64");
         }
 
         if (memoryView.faceIndices.type != mesh_view::data_type::I32 &&
-          memoryView.faceIndices.type != mesh_view::data_type::I64)
+          memoryView.faceIndices.type != mesh_view::data_type::U32 &&
+          memoryView.faceIndices.type != mesh_view::data_type::I64 &&
+          memoryView.faceIndices.type != mesh_view::data_type::U64)
         {
           throw scene::load_failure_exception(
-            "Mesh view face indices must have a data type of I32 or I64");
+            "Mesh view face indices must have a data type of I32, U32, I64, or U64");
         }
 
         if (memoryView.faceIndices.type != memoryView.faceOffsets.type)
@@ -631,28 +640,34 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
         f3d::mesh_view::dataTypeDispatch(memoryView.faceOffsets.type,
           [&]<typename DataT>()
           {
-            vtkNew<vtkCellArray> polys;
+            if constexpr (std::is_integral_v<DataT>) // makes no sense for F32 or F64
+            {
+              // if the user provided unsigned data, we need to use the corresponding signed type for VTK
+              using IndexingType = std::make_signed_t<DataT>;
 
-            vtkNew<vtkStridedArray<DataT>> faceOffsets;
-            faceOffsets->SetName(memoryView.faceOffsets.name.empty()
-                ? "FaceOffsets"
-                : memoryView.faceOffsets.name.c_str());
-            faceOffsets->SetNumberOfTuples(memoryView.faceOffsetCount);
-            faceOffsets->ConstructBackend(
-              reinterpret_cast<const DataT*>(memoryView.faceOffsets.data),
-              memoryView.faceOffsets.stride);
+              vtkNew<vtkCellArray> polys;
 
-            vtkNew<vtkStridedArray<DataT>> faceIndices;
-            faceIndices->SetName(memoryView.faceIndices.name.empty()
-                ? "FaceIndices"
-                : memoryView.faceIndices.name.c_str());
-            faceIndices->SetNumberOfTuples(memoryView.faceIndexCount);
-            faceIndices->ConstructBackend(
-              reinterpret_cast<const DataT*>(memoryView.faceIndices.data),
-              memoryView.faceIndices.stride);
+              vtkNew<vtkStridedArray<IndexingType>> faceOffsets;
+              faceOffsets->SetName(memoryView.faceOffsets.name.empty()
+                  ? "FaceOffsets"
+                  : memoryView.faceOffsets.name.c_str());
+              faceOffsets->SetNumberOfTuples(memoryView.faceOffsetCount);
+              faceOffsets->ConstructBackend(
+                reinterpret_cast<const IndexingType*>(memoryView.faceOffsets.data),
+                memoryView.faceOffsets.stride);
 
-            polys->SetData(faceOffsets, faceIndices);
-            polydata->SetPolys(polys);
+              vtkNew<vtkStridedArray<IndexingType>> faceIndices;
+              faceIndices->SetName(memoryView.faceIndices.name.empty()
+                  ? "FaceIndices"
+                  : memoryView.faceIndices.name.c_str());
+              faceIndices->SetNumberOfTuples(memoryView.faceIndexCount);
+              faceIndices->ConstructBackend(
+                reinterpret_cast<const IndexingType*>(memoryView.faceIndices.data),
+                memoryView.faceIndices.stride);
+
+              polys->SetData(faceOffsets, faceIndices);
+              polydata->SetPolys(polys);
+            }
           });
       }
     });
