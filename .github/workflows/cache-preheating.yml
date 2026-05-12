@@ -24,16 +24,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-15, macos-15-intel]
+        os: [ubuntu-24.04, windows-2022, macos-15, macos-15-intel]
         build_type: [standard]
         include:
           - mindeps_label: no-mindeps
           - build_type: mindeps
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             mindeps_label: mindeps
 
     runs-on: ${{matrix.os}}
-    container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    container: ${{ matrix.os == 'ubuntu-24.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
@@ -63,25 +63,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-15, macos-15-intel]
+        os: [ubuntu-24.04, windows-2022, macos-15, macos-15-intel]
         vtk_version: [commit, v9.6.1, v9.5.2, v9.4.2]
         build_type: [standard]
         include:
           - optdeps_label: optdeps
           - mindeps_label: no-mindeps
           - build_type: mindeps
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             vtk_version: commit
             optdeps_label: optdeps
             mindeps_label: mindeps
           - build_type: no-optdeps
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             vtk_version: commit
             optdeps_label: no-optdeps
             mindeps_label: no-mindeps
 
     runs-on: ${{matrix.os}}
-    container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    container: ${{ matrix.os == 'ubuntu-24.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5

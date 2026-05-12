@@ -19,7 +19,7 @@ jobs:
   # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
   #----------------------------------------------------------------------------
   cache_lfs:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     name: Update LFS data cache
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:fast') ||
@@ -92,7 +92,7 @@ jobs:
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
@@ -182,7 +182,7 @@ jobs:
             rendering_backend: auto
             static_label: no-static
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
@@ -301,22 +301,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-2022, macos-15]
+        os: [ubuntu-24.04, windows-2022, macos-15]
         python_version: ["3.14"]
         include:
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
             python_version: "3.10"
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
             python_version: "3.11"
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
             python_version: "3.12"
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
             python_version: "3.13"
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
             python_version: "3.14"
 
     runs-on: ${{matrix.os}}
-    container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    container: ${{ matrix.os == 'ubuntu-24.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
     env:
       DISPLAY: :0
@@ -347,7 +347,7 @@ jobs:
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container: ghcr.io/f3d-app/f3d-ci
 
     # Add dummy F3D_PLUGINS_PATH for coverage
@@ -386,7 +386,7 @@ jobs:
       matrix:
         sanitizer_type: [address, thread, undefined]
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
@@ -423,7 +423,7 @@ jobs:
     strategy:
       fail-fast: false
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
@@ -455,7 +455,7 @@ jobs:
     strategy:
       fail-fast: false
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
@@ -479,7 +479,7 @@ jobs:
   #----------------------------------------------------------------------------
   recover_docker_timestamp:
     name: Recover docker timestamp
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:android') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -516,7 +516,7 @@ jobs:
       matrix:
         arch: [armeabi-v7a, arm64-v8a, x86, x86_64]
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container: ghcr.io/f3d-app/f3d-android-${{ matrix.arch }}:${{needs.recover_docker_timestamp.outputs.docker_timestamp}}
 
     steps:
@@ -544,7 +544,7 @@ jobs:
     strategy:
       fail-fast: false
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     env:
       CMAKE_BUILD_PARALLEL_LEVEL: 4
