@@ -105,6 +105,7 @@ public:
     bool Watch;
     double FrameRate;
     std::vector<std::string> Plugins;
+    std::string PluginsPath;
     std::string ScreenshotFilename;
     std::string VerboseLevel;
     std::string MultiFileMode;
@@ -728,7 +729,14 @@ public:
       this->AppOptions.VerboseLevel, this->AppOptions.Output == F3D_PIPED);
 
     // Load any new plugins
-    F3DPluginsTools::LoadPlugins(this->AppOptions.Plugins);
+    if (!this->AppOptions.PluginsPath.empty())
+    {
+      F3DPluginsTools::LoadPlugins(this->AppOptions.Plugins, this->AppOptions.PluginsPath);
+    }
+    else
+    {
+      F3DPluginsTools::LoadPlugins(this->AppOptions.Plugins);
+    }
 
     // Update libf3d options
     this->LibOptions = libOptions;
@@ -787,6 +795,7 @@ public:
     this->ParseOption(appOptions, "frame-rate", this->AppOptions.FrameRate);
     this->ParseOption(appOptions, "watch", this->AppOptions.Watch);
     this->ParseOption(appOptions, "load-plugins", this->AppOptions.Plugins);
+    this->ParseOption(appOptions, "plugins-path", this->AppOptions.PluginsPath);
     this->ParseOption(appOptions, "screenshot-filename", this->AppOptions.ScreenshotFilename);
     this->ParseOption(appOptions, "verbose", this->AppOptions.VerboseLevel);
     this->ParseOption(appOptions, "multi-file-mode", this->AppOptions.MultiFileMode);

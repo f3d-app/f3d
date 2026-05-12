@@ -403,7 +403,17 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
         plugins =
           f3d::options::parse<std::vector<std::string>>(result["load-plugins"].as<std::string>());
       }
-      F3DPluginsTools::LoadPlugins(plugins);
+
+      if (result.count("plugins-path") > 0)
+      {
+        const std::string pluginsPath = f3d::options::parse<std::string>(result["plugins-path"].as<std::string>());
+        F3DPluginsTools::LoadPlugins(plugins, pluginsPath);
+      }
+      else
+      {
+        F3DPluginsTools::LoadPlugins(plugins);
+      }
+
       ::PrintReadersList();
       throw F3DExNoProcess("reader list requested");
     }

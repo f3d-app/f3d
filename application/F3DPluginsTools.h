@@ -12,6 +12,7 @@
 namespace F3DPluginsTools
 {
 void LoadPlugins(const std::vector<std::string>& plugins);
+void LoadPlugins(const std::vector<std::string>& plugins, const std::string& pluginsPath);
 };
 
 #endif
