@@ -16,14 +16,26 @@
 
 #include <optional>
 #include <vtkCallbackCommand.h>
+#include <vtkCellArray.h>
+#include <vtkCellData.h>
+#include <vtkFloatArray.h>
 #include <vtkLightCollection.h>
 #include <vtkMemoryResourceStream.h>
+#include <vtkPointData.h>
+#include <vtkPoints.h>
+#include <vtkPolyData.h>
 #include <vtkProgressBarRepresentation.h>
 #include <vtkProgressBarWidget.h>
 #include <vtkTimerLog.h>
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
+// requires https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12411
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251110)
+#include <vtkStridedArray.h>
+#endif
+
+#include <numeric>
 #include <vector>
 
 namespace fs = std::filesystem;
@@ -372,17 +384,314 @@ scene& scene_impl::add(const mesh_t& mesh)
   }
 
   vtkNew<vtkF3DMemoryMesh> vtkSource;
-  vtkSource->SetPoints(mesh.points);
-  vtkSource->SetNormals(mesh.normals);
-  vtkSource->SetTCoords(mesh.texture_coordinates);
-  vtkSource->SetFaces(mesh.face_sides, mesh.face_indices);
 
-  vtkSmartPointer<vtkF3DGenericImporter> importer = vtkSmartPointer<vtkF3DGenericImporter>::New();
+  vtkSource->SetUpdateFunction(
+    [=](double, vtkPolyData* polydata)
+    {
+      vtkNew<vtkFloatArray> positions;
+      positions->SetName("Positions");
+      positions->SetNumberOfComponents(3);
+      positions->SetNumberOfTuples(mesh.points.size() / 3);
+      std::ranges::copy(mesh.points, positions->Begin());
+
+      vtkNew<vtkPoints> points;
+      points->SetData(positions);
+
+      polydata->SetPoints(points);
+
+      if (mesh.normals.size() > 0)
+      {
+        vtkNew<vtkFloatArray> normals;
+        normals->SetName("Normals");
+        normals->SetNumberOfComponents(3);
+        normals->SetNumberOfTuples(mesh.points.size() / 3);
+        std::ranges::copy(mesh.normals, normals->Begin());
+
+        polydata->GetPointData()->SetNormals(normals);
+      }
+
+      if (mesh.texture_coordinates.size() > 0)
+      {
+        vtkNew<vtkFloatArray> tcoords;
+        tcoords->SetName("TCoords");
+        tcoords->SetNumberOfComponents(2);
+        tcoords->SetNumberOfTuples(mesh.points.size() / 3);
+        std::ranges::copy(mesh.texture_coordinates, tcoords->Begin());
+
+        polydata->GetPointData()->SetTCoords(tcoords);
+      }
+
+      vtkNew<vtkIdTypeArray> offsets;
+      vtkNew<vtkIdTypeArray> connectivity;
+
+      offsets->SetNumberOfTuples(mesh.face_sides.size() + 1);
+      connectivity->SetNumberOfTuples(mesh.face_indices.size());
+
+      // fill offsets
+      offsets->SetValue(0, 0);
+      std::inclusive_scan(mesh.face_sides.begin(), mesh.face_sides.end(), offsets->Begin() + 1);
+
+      // fill connectivity
+      std::ranges::copy(mesh.face_indices, connectivity->Begin());
+
+      vtkNew<vtkCellArray> polys;
+      polys->SetData(offsets, connectivity);
+      polydata->SetPolys(polys);
+    });
+
+  vtkNew<vtkF3DGenericImporter> importer;
   importer->SetInternalReader(vtkSource);
 
   log::debug("Loading 3D scene from memory");
   this->Internals->Load({ { "<mesh>", importer } });
   return *this;
+}
+
+//----------------------------------------------------------------------------
+scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
+{
+  // requires https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12411
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251110)
+  vtkNew<vtkF3DMemoryMesh> vtkSource;
+
+  // Only time range is supported at the moment but we should also add support
+  // for time steps and simulated meshes in the future
+  auto timeRange = mesh->getTimeRange();
+  vtkSource->SetTimeRange(timeRange[0], timeRange[1]);
+
+  vtkSource->SetUpdateFunction(
+    [mesh = std::move(mesh)](double time, vtkPolyData* polydata)
+    {
+      const auto memoryView = mesh->getMemoryView(time);
+
+      // handle points
+      if (memoryView.pointCount == 0)
+      {
+        throw scene::load_failure_exception("Mesh view must have points");
+      }
+
+      if (memoryView.points.data == nullptr)
+      {
+        throw scene::load_failure_exception("Mesh view points data pointer is null");
+      }
+
+      if (memoryView.points.type != mesh_view::data_type::F32 &&
+        memoryView.points.type != mesh_view::data_type::F64)
+      {
+        throw scene::load_failure_exception("Mesh view points must have a data type of F32 or F64");
+      }
+
+      if (memoryView.points.components != 3)
+      {
+        throw scene::load_failure_exception("Mesh view points must have 3 components");
+      }
+
+      vtkNew<vtkPoints> points;
+
+      f3d::mesh_view::dataTypeDispatch(memoryView.points.type,
+        [&]<typename DataT>()
+        {
+          vtkNew<vtkStridedArray<DataT>> positions;
+          positions->SetName(
+            memoryView.points.name.empty() ? "Positions" : memoryView.points.name.c_str());
+          positions->SetNumberOfComponents(3);
+          positions->SetNumberOfTuples(memoryView.pointCount);
+          positions->ConstructBackend(
+            reinterpret_cast<const DataT*>(memoryView.points.data), memoryView.points.stride, 3);
+
+          points->SetData(positions);
+        });
+
+      polydata->SetPoints(points);
+
+      // handle normals if provided
+      if (memoryView.normals.data != nullptr)
+      {
+        if (memoryView.normals.type != mesh_view::data_type::F32 &&
+          memoryView.normals.type != mesh_view::data_type::F64)
+        {
+          throw scene::load_failure_exception(
+            "Mesh view normals must have a data type of F32 or F64");
+        }
+
+        if (memoryView.normals.components != 3)
+        {
+          throw scene::load_failure_exception("Mesh view normals must have 3 components");
+        }
+
+        f3d::mesh_view::dataTypeDispatch(memoryView.normals.type,
+          [&]<typename DataT>()
+          {
+            vtkNew<vtkStridedArray<DataT>> normals;
+            normals->SetName(
+              memoryView.normals.name.empty() ? "Normals" : memoryView.normals.name.c_str());
+            normals->SetNumberOfComponents(3);
+            normals->SetNumberOfTuples(memoryView.pointCount);
+            normals->ConstructBackend(reinterpret_cast<const DataT*>(memoryView.normals.data),
+              memoryView.normals.stride, 3);
+
+            polydata->GetPointData()->SetNormals(normals);
+          });
+      }
+
+      // handle texture coordinates if provided
+      if (memoryView.textureCoordinates.data != nullptr)
+      {
+        if (memoryView.textureCoordinates.type != mesh_view::data_type::F32 &&
+          memoryView.textureCoordinates.type != mesh_view::data_type::F64)
+        {
+          throw scene::load_failure_exception(
+            "Mesh view texture coordinates must have a data type of F32 or F64");
+        }
+
+        if (memoryView.textureCoordinates.components != 2)
+        {
+          throw scene::load_failure_exception(
+            "Mesh view texture coordinates must have 2 components");
+        }
+
+        f3d::mesh_view::dataTypeDispatch(memoryView.textureCoordinates.type,
+          [&]<typename DataT>()
+          {
+            vtkNew<vtkStridedArray<DataT>> tcoords;
+            tcoords->SetName(memoryView.textureCoordinates.name.empty()
+                ? "TCoords"
+                : memoryView.textureCoordinates.name.c_str());
+            tcoords->SetNumberOfComponents(2);
+            tcoords->SetNumberOfTuples(memoryView.pointCount);
+            tcoords->ConstructBackend(
+              reinterpret_cast<const DataT*>(memoryView.textureCoordinates.data),
+              memoryView.textureCoordinates.stride, 2);
+
+            polydata->GetPointData()->SetTCoords(tcoords);
+          });
+      }
+
+      // handle scalars if provided
+      for (const auto& scalar : memoryView.pointScalars)
+      {
+        f3d::mesh_view::dataTypeDispatch(scalar.type,
+          [&]<typename DataT>()
+          {
+            vtkNew<vtkStridedArray<DataT>> scalars;
+            scalars->SetName(scalar.name.c_str());
+            scalars->SetNumberOfComponents(static_cast<int>(scalar.components));
+            scalars->SetNumberOfTuples(memoryView.pointCount);
+            scalars->ConstructBackend(reinterpret_cast<const DataT*>(scalar.data), scalar.stride,
+              static_cast<int>(scalar.components));
+
+            polydata->GetPointData()->AddArray(scalars);
+          });
+      }
+
+      for (const auto& scalar : memoryView.faceScalars)
+      {
+        f3d::mesh_view::dataTypeDispatch(scalar.type,
+          [&]<typename DataT>()
+          {
+            vtkNew<vtkStridedArray<DataT>> scalars;
+            scalars->SetName(scalar.name.c_str());
+            scalars->SetNumberOfComponents(static_cast<int>(scalar.components));
+            scalars->SetNumberOfTuples(memoryView.faceOffsetCount - 1);
+            scalars->ConstructBackend(reinterpret_cast<const DataT*>(scalar.data), scalar.stride,
+              static_cast<int>(scalar.components));
+
+            polydata->GetCellData()->AddArray(scalars);
+          });
+      }
+
+      // handle faces
+      if (memoryView.faceOffsetCount > 0)
+      {
+        if (memoryView.faceOffsets.data == nullptr)
+        {
+          throw scene::load_failure_exception("Mesh view face offsets pointer is null");
+        }
+
+        if (memoryView.faceIndices.data == nullptr)
+        {
+          throw scene::load_failure_exception("Mesh view face indices pointer is null");
+        }
+
+        if (memoryView.faceOffsets.type != mesh_view::data_type::I32 &&
+          memoryView.faceOffsets.type != mesh_view::data_type::U32 &&
+          memoryView.faceOffsets.type != mesh_view::data_type::I64 &&
+          memoryView.faceOffsets.type != mesh_view::data_type::U64)
+        {
+          throw scene::load_failure_exception(
+            "Mesh view face offsets must have a data type of I32, U32, I64, or U64");
+        }
+
+        if (memoryView.faceIndices.type != mesh_view::data_type::I32 &&
+          memoryView.faceIndices.type != mesh_view::data_type::U32 &&
+          memoryView.faceIndices.type != mesh_view::data_type::I64 &&
+          memoryView.faceIndices.type != mesh_view::data_type::U64)
+        {
+          throw scene::load_failure_exception(
+            "Mesh view face indices must have a data type of I32, U32, I64, or U64");
+        }
+
+        if (memoryView.faceIndices.type != memoryView.faceOffsets.type)
+        {
+          throw scene::load_failure_exception(
+            "Mesh view face offsets and face indices must have the same data type");
+        }
+
+        f3d::mesh_view::dataTypeDispatch(memoryView.faceOffsets.type,
+          [&]<typename DataT>()
+          {
+            if constexpr (std::is_integral_v<DataT>) // makes no sense for F32 or F64
+            {
+              // if the user provided unsigned data, we need to use the corresponding signed type
+              // for VTK
+              using IndexingType = std::make_signed_t<DataT>;
+
+              vtkNew<vtkCellArray> polys;
+
+              vtkNew<vtkStridedArray<IndexingType>> faceOffsets;
+              faceOffsets->SetName(memoryView.faceOffsets.name.empty()
+                  ? "FaceOffsets"
+                  : memoryView.faceOffsets.name.c_str());
+              faceOffsets->SetNumberOfTuples(memoryView.faceOffsetCount);
+              faceOffsets->ConstructBackend(
+                reinterpret_cast<const IndexingType*>(memoryView.faceOffsets.data),
+                memoryView.faceOffsets.stride);
+
+              vtkNew<vtkStridedArray<IndexingType>> faceIndices;
+              faceIndices->SetName(memoryView.faceIndices.name.empty()
+                  ? "FaceIndices"
+                  : memoryView.faceIndices.name.c_str());
+              faceIndices->SetNumberOfTuples(memoryView.faceIndexCount);
+              faceIndices->ConstructBackend(
+                reinterpret_cast<const IndexingType*>(memoryView.faceIndices.data),
+                memoryView.faceIndices.stride);
+
+              polys->SetData(faceOffsets, faceIndices);
+              polydata->SetPolys(polys);
+            }
+          });
+      }
+    });
+
+  try
+  {
+    vtkSource->Update();
+  }
+  catch (const load_failure_exception& e)
+  {
+    throw load_failure_exception(std::string("Failed to load mesh from memory: ") + e.what());
+  }
+
+  vtkNew<vtkF3DGenericImporter> importer;
+  importer->SetInternalReader(vtkSource);
+
+  log::debug("Loading 3D scene from memory");
+  this->Internals->Load({ { "<mesh_view>", importer } });
+  return *this;
+#else
+  throw scene::load_failure_exception(
+    "Loading a mesh from memory using add(std::shared_ptr<mesh>) requires VTK >= 9.6");
+#endif
 }
 
 //----------------------------------------------------------------------------

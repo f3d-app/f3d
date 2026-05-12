@@ -312,7 +312,7 @@ protected:
 };
 
 /**
- * Describe a 3D surfacic mesh.
+ * Describe a static 3D surfacic mesh.
  * A valid mesh fulfills these requirements:
  * - points must not be empty and its length must be a multiple of 3 (3 times the number of points)
  * - normals can be empty or its length must be 3 times the number of points

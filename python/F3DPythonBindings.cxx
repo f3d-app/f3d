@@ -9,6 +9,7 @@
 #include "image.h"
 #include "interactor.h"
 #include "log.h"
+#include "mesh_view.h"
 #include "options.h"
 #include "scene.h"
 #include "types.h"
@@ -71,6 +72,75 @@ public:
 
   PYBIND11_TYPE_CASTER(f3d::vector3_t, const_name("f3d.vector3_t"));
 };
+
+f3d::mesh_view::data_array_t fromBuffer(py::buffer buf)
+{
+  py::buffer_info info = buf.request();
+
+  f3d::mesh_view::data_array_t dataArray;
+
+  if (info.item_type_is_equivalent_to<uint8_t>())
+  {
+    dataArray.type = f3d::mesh_view::data_type::U8;
+    dataArray.stride = info.strides[0] / sizeof(uint8_t);
+  }
+  else if (info.item_type_is_equivalent_to<int8_t>())
+  {
+    dataArray.type = f3d::mesh_view::data_type::I8;
+    dataArray.stride = info.strides[0] / sizeof(int8_t);
+  }
+  else if (info.item_type_is_equivalent_to<uint16_t>())
+  {
+    dataArray.type = f3d::mesh_view::data_type::U16;
+    dataArray.stride = info.strides[0] / sizeof(uint16_t);
+  }
+  else if (info.item_type_is_equivalent_to<int16_t>())
+  {
+    dataArray.type = f3d::mesh_view::data_type::I16;
+    dataArray.stride = info.strides[0] / sizeof(int16_t);
+  }
+  else if (info.item_type_is_equivalent_to<uint32_t>())
+  {
+    dataArray.type = f3d::mesh_view::data_type::U32;
+    dataArray.stride = info.strides[0] / sizeof(uint32_t);
+  }
+  else if (info.item_type_is_equivalent_to<int32_t>())
+  {
+    dataArray.type = f3d::mesh_view::data_type::I32;
+    dataArray.stride = info.strides[0] / sizeof(int32_t);
+  }
+  else if (info.item_type_is_equivalent_to<float>())
+  {
+    dataArray.type = f3d::mesh_view::data_type::F32;
+    dataArray.stride = info.strides[0] / sizeof(float);
+  }
+  else if (info.item_type_is_equivalent_to<double>())
+  {
+    dataArray.type = f3d::mesh_view::data_type::F64;
+    dataArray.stride = info.strides[0] / sizeof(double);
+  }
+  else
+  {
+    throw std::runtime_error("Unsupported scalar type!");
+  }
+
+  if (info.ndim == 1)
+  {
+    dataArray.components = 1;
+  }
+  else if (info.ndim == 2)
+  {
+    dataArray.components = info.shape[1];
+  }
+  else
+  {
+    throw std::runtime_error("Incompatible buffer dimension!");
+  }
+
+  dataArray.data = info.ptr;
+
+  return dataArray;
+}
 
 PYBIND11_MODULE(pyf3d, module)
 {
@@ -391,6 +461,191 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("face_sides", &f3d::mesh_t::face_sides)
     .def_readwrite("face_indices", &f3d::mesh_t::face_indices);
 
+  // f3d::mesh_view
+  py::class_<f3d::mesh_view::memory_view_t>(module, "MeshMemoryView", py::buffer_protocol())
+    .def(py::init<>())
+    .def_property("points", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, py::buffer b)
+      {
+        py::buffer_info info = b.request();
+
+        if (!info.item_type_is_equivalent_to<float>())
+        {
+          throw std::runtime_error("Incompatible format: expected a float array!");
+        }
+
+        if (info.ndim != 2)
+        {
+          throw std::runtime_error("Incompatible buffer dimension!");
+        }
+
+        if (info.shape[1] != 3)
+        {
+          throw std::runtime_error("Incompatible buffer shape: expected 3 components per point!");
+        }
+
+        self.pointCount = info.shape[0];
+        self.points.data = static_cast<const float*>(info.ptr);
+        self.points.components = 3;
+        self.points.stride = info.strides[0] / sizeof(float);
+      })
+    .def_property("normals", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, py::buffer b)
+      {
+        py::buffer_info info = b.request();
+
+        if (!info.item_type_is_equivalent_to<float>())
+        {
+          throw std::runtime_error("Incompatible format: expected a float array!");
+        }
+
+        if (info.ndim != 2)
+        {
+          throw std::runtime_error("Incompatible buffer dimension!");
+        }
+
+        if (info.shape[1] != 3)
+        {
+          throw std::runtime_error("Incompatible buffer shape: expected 3 components per point!");
+        }
+
+        if (info.shape[0] != self.pointCount)
+        {
+          throw std::runtime_error("Incompatible buffer shape: point count does not match!");
+        }
+
+        self.normals.data = static_cast<const float*>(info.ptr);
+        self.normals.components = 3;
+        self.normals.stride = info.strides[0] / sizeof(float);
+      })
+    .def_property("texture_coordinates", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, py::buffer b)
+      {
+        py::buffer_info info = b.request();
+
+        if (!info.item_type_is_equivalent_to<float>())
+        {
+          throw std::runtime_error("Incompatible format: expected a float array!");
+        }
+
+        if (info.ndim != 2)
+        {
+          throw std::runtime_error("Incompatible buffer dimension!");
+        }
+
+        if (info.shape[1] != 2)
+        {
+          throw std::runtime_error("Incompatible buffer shape: expected 2 components per point!");
+        }
+
+        if (info.shape[0] != self.pointCount)
+        {
+          throw std::runtime_error("Incompatible buffer shape: point count does not match!");
+        }
+
+        self.textureCoordinates.data = static_cast<const float*>(info.ptr);
+        self.textureCoordinates.components = 2;
+        self.textureCoordinates.stride = info.strides[0] / sizeof(float);
+      })
+    .def_property("face_offsets", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, py::buffer b)
+      {
+        py::buffer_info info = b.request();
+
+        if (!info.item_type_is_equivalent_to<int32_t>())
+        {
+          throw std::runtime_error("Incompatible format: expected an int32_t array!");
+        }
+
+        if (info.ndim != 1)
+        {
+          throw std::runtime_error("Incompatible buffer dimension!");
+        }
+
+        self.faceOffsetCount = info.shape[0];
+        self.faceOffsets.data = info.ptr;
+        self.faceOffsets.type = f3d::mesh_view::data_type::I32;
+        self.faceOffsets.stride = info.strides[0] / sizeof(int32_t);
+      })
+    .def_property("face_indices", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, py::buffer b)
+      {
+        py::buffer_info info = b.request();
+
+        if (!info.item_type_is_equivalent_to<int32_t>())
+        {
+          throw std::runtime_error("Incompatible format: expected an int32_t array!");
+        }
+
+        if (info.ndim != 1)
+        {
+          throw std::runtime_error("Incompatible buffer dimension!");
+        }
+
+        self.faceIndexCount = info.shape[0];
+        self.faceIndices.data = info.ptr;
+        self.faceIndices.type = f3d::mesh_view::data_type::I32;
+        self.faceIndices.stride = info.strides[0] / sizeof(int32_t);
+      })
+    .def_property("point_scalars", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, py::dict d)
+      {
+        self.pointScalars.clear();
+
+        for (auto item : d)
+        {
+          f3d::mesh_view::data_array_t dataArray = fromBuffer(py::cast<py::buffer>(item.second));
+          dataArray.name = py::cast<std::string>(item.first);
+          self.pointScalars.emplace_back(std::move(dataArray));
+        }
+      })
+    .def_property("face_scalars", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, py::dict d)
+      {
+        // TODO: factorize with point_scalars since the code is almost identical
+        self.faceScalars.clear();
+
+        for (auto item : d)
+        {
+          f3d::mesh_view::data_array_t dataArray = fromBuffer(py::cast<py::buffer>(item.second));
+          dataArray.name = py::cast<std::string>(item.first);
+          self.faceScalars.emplace_back(std::move(dataArray));
+        }
+      });
+
+  class PyMesh
+    : public f3d::mesh_view
+    , public py::trampoline_self_life_support
+  {
+  public:
+    std::array<double, 2> getTimeRange() const override
+    {
+      py::gil_scoped_acquire gil;
+      py::function fn = py::get_override(this, "get_time_range");
+      if (fn)
+      {
+        return fn().cast<std::array<double, 2>>();
+      }
+      return f3d::mesh_view::getTimeRange();
+    }
+
+    memory_view_t getMemoryView(double time) const override
+    {
+      py::gil_scoped_acquire gil;
+      py::function fn = py::get_override(this, "get_memory_view");
+      if (fn)
+      {
+        return fn(time).cast<memory_view_t>();
+      }
+      throw std::domain_error("Tried to call pure virtual function getMemoryView");
+    }
+  };
+
+  py::class_<f3d::mesh_view, PyMesh, py::smart_holder>(module, "MeshView")
+    .def(py::init<>())
+    .def("get_time_range", &f3d::mesh_view::getTimeRange)
+    .def("get_memory_view", &f3d::mesh_view::getMemoryView);
+
   // f3d::color_t
   py::class_<f3d::color_t>(module, "Color")
     .def(py::init<>())
@@ -455,6 +710,8 @@ PYBIND11_MODULE(pyf3d, module)
       "Add multiple filenames to the scene", py::arg("file_name_vector"))
     .def("add", py::overload_cast<const f3d::mesh_t&>(&f3d::scene::add),
       "Add a surfacic mesh from memory into the scene", py::arg("mesh"))
+    .def("add", py::overload_cast<std::shared_ptr<f3d::mesh_view>>(&f3d::scene::add),
+      "Add a surfacic mesh view from memory into the scene", py::arg("mesh"))
     .def(
       "add",
       [](f3d::scene& scene, py::bytes buffer, std::size_t size)
