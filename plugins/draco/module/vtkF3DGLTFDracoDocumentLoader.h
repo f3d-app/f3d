@@ -10,11 +10,12 @@
 
 #include <vtkGLTFDocumentLoader.h>
 
-class vtkF3DGLTFDracoDocumentLoader : public vtkGLTFDocumentLoader
+#include "vtkF3DGLTFDocumentLoader.h"
+class vtkF3DGLTFDracoDocumentLoader : public vtkF3DGLTFDocumentLoader
 {
 public:
   static vtkF3DGLTFDracoDocumentLoader* New();
-  vtkTypeMacro(vtkF3DGLTFDracoDocumentLoader, vtkGLTFDocumentLoader);
+  vtkTypeMacro(vtkF3DGLTFDracoDocumentLoader, vtkF3DGLTFDocumentLoader);
 
   /**
    * Overridden to add KHR_draco_mesh_compression support

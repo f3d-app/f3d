@@ -1,7 +1,3 @@
-/**
- * @class   vtkF3DGLTFDocumentLoader
- * @brief   Specialized GLTF document loader with EXT_texture_webp support
- */
 #ifndef vtkF3DGLTFDocumentLoader_h
 #define vtkF3DGLTFDocumentLoader_h
 
@@ -13,10 +9,9 @@ public:
   static vtkF3DGLTFDocumentLoader* New();
   vtkTypeMacro(vtkF3DGLTFDocumentLoader, vtkGLTFDocumentLoader);
 
-  /**
-   * Overridden to add EXT_texture_webp support
-   */
   std::vector<std::string> GetSupportedExtensions() override;
+
+  void PrepareData() override;
 
 protected:
   vtkF3DGLTFDocumentLoader() = default;

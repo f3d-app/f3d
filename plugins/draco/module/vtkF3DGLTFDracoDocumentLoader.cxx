@@ -87,7 +87,6 @@ std::vector<std::string> vtkF3DGLTFDracoDocumentLoader::GetSupportedExtensions()
 {
   std::vector<std::string> extensions = this->Superclass::GetSupportedExtensions();
   extensions.emplace_back("KHR_draco_mesh_compression");
-  extensions.emplace_back("EXT_texture_webp");
   return extensions;
 }
 //----------------------------------------------------------------------------
