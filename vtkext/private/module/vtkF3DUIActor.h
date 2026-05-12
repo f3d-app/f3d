@@ -350,8 +350,7 @@ protected:
    */
   std::array<double, 3> FontColor = { 1.0, 1.0, 1.0 };
 
-  std::array<double, 3> BackdropColor = { 0.078431375324726105, 0.078431375324726105,
-    0.078431375324726105 };
+  std::array<double, 3> BackdropColor = { 0, 0, 0 };
   double BackdropOpacity = 0.9;
 
   bool NotificationVisible = false;
