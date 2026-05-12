@@ -27,9 +27,9 @@ endif()
 
 # Armature
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219)
-  f3d_test(NAME TestUSDRigArmature DATA RiggedSimple.usdz ARGS --animation-time=1 --armature)
-  f3d_test(NAME TestUSDRigArmatureWithOpacity DATA RiggedSimple.usdz ARGS --animation-time=1 --armature --opacity=0.5 -p)
-  f3d_test(NAME TestUSDRigArmatureSphereTube DATA RiggedSimple.usdz ARGS --animation-time=1 --armature --point-size=20 --line-width=5)
+  f3d_test(NAME TestUSDRigArmature DATA RiggedSimple.usdz ARGS --animation-time=1 --armature PLUGIN usd)
+  f3d_test(NAME TestUSDRigArmatureWithOpacity DATA RiggedSimple.usdz ARGS --animation-time=1 --armature --opacity=0.5 -p PLUGIN usd)
+  f3d_test(NAME TestUSDRigArmatureSphereTube DATA RiggedSimple.usdz ARGS --animation-time=1 --armature --point-size=20 --line-width=5 PLUGIN usd)
 endif()
 
 if(NOT F3D_MACOS_BUNDLE)
