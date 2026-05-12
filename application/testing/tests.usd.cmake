@@ -25,6 +25,13 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
   f3d_test(NAME TestUSDSceneHierarchy DATA primitives.usda ARGS --scene-hierarchy PLUGIN usd UI)
 endif()
 
+# Armature
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219)
+  f3d_test(NAME TestUSDRigArmature DATA RiggedSimple.usdz ARGS --animation-time=1 --armature)
+  f3d_test(NAME TestUSDRigArmatureWithOpacity DATA RiggedSimple.usdz ARGS --animation-time=1 --armature --opacity=0.5 -p)
+  f3d_test(NAME TestUSDRigArmatureSphereTube DATA RiggedSimple.usdz ARGS --animation-time=1 --armature --point-size=20 --line-width=5)
+endif()
+
 if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/plugins/usd/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
