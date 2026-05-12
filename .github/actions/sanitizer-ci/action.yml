@@ -4,6 +4,10 @@ inputs:
   versions_file:
     description: "File to recover versions from"
     required: true
+  vtk_version:
+    description: "Descriptive VTK version to build against"
+    required: false
+    default: "commit"
   sanitizer_type:
     description: "Type of sanitizer"
     required: true
@@ -37,6 +41,7 @@ runs:
       uses: ./source/.github/actions/vtk-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
+        vtk_version: ${{inputs.vtk_version}}
 
     - name: Setup Build Directory
       shell: bash

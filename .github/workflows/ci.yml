@@ -478,6 +478,7 @@ jobs:
   # Recover docker timestamp
   #----------------------------------------------------------------------------
   recover_docker_timestamp:
+    name: Recover docker timestamp
     runs-on: ubuntu-22.04
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:android') ||

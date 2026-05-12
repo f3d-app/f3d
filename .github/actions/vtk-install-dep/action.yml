@@ -13,7 +13,7 @@ inputs:
     required: false
     default: "no-mindeps"
   vtk_version:
-    description: "VTK version"
+    description: "VTK version, either a hash/tag, or 'commit', which means recover from versions.json"
     required: false
     default: "commit"
   cpu:
@@ -42,7 +42,7 @@ runs:
       shell: bash
       run: echo "VTK_VERSION=${{steps.vtk_ver.outputs.extract}}" >> $GITHUB_ENV
 
-    - name: Store input vtk version directitly
+    - name: Store VTK version in env from the input directly
       if: inputs.vtk_version != 'commit'
       shell: bash
       run: echo "VTK_VERSION=${{inputs.vtk_version}}" >> $GITHUB_ENV
