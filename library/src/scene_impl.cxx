@@ -642,7 +642,8 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
           {
             if constexpr (std::is_integral_v<DataT>) // makes no sense for F32 or F64
             {
-              // if the user provided unsigned data, we need to use the corresponding signed type for VTK
+              // if the user provided unsigned data, we need to use the corresponding signed type
+              // for VTK
               using IndexingType = std::make_signed_t<DataT>;
 
               vtkNew<vtkCellArray> polys;
