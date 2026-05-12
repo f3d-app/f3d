@@ -20,7 +20,7 @@ namespace f3d
  * The mesh_view class represents a 3D surfacic mesh with points, faces, normals and texture
  * coordinates. It is used to add meshes directly to the scene without having to write them to a
  * file. The interface allows to provide a view of the mesh in memory, making it possible to
- * visualize the user data without having to convert and copy to F3D internal structures. It also
+ * visualize data without having to convert and copy to F3D internal structures. It also
  * allows to provide an animated mesh by providing different views of the mesh at different times.
  */
 class F3D_EXPORT mesh_view
