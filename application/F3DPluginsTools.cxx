@@ -13,6 +13,7 @@ namespace
 //----------------------------------------------------------------------------
 std::vector<fs::path> GetPluginSearchPaths()
 {
+  f3d::log::warn("Loading plugins using F3D_PLUGINS_PATH is deprecated. Please use the --plugins-path CLI option.");
   std::vector<fs::path> searchPaths;
 
   // Recover F3D_PLUGINS_PATH first
@@ -43,7 +44,7 @@ void F3DPluginsTools::LoadPlugins(const std::vector<std::string>& plugins)
     {
       if (!plugin.empty())
       {
-        f3d::engine::loadPlugin(plugin, ::GetPluginSearchPaths());
+          f3d::engine::loadPlugin(plugin, ::GetPluginSearchPaths());
       }
     }
   }
@@ -52,3 +53,27 @@ void F3DPluginsTools::LoadPlugins(const std::vector<std::string>& plugins)
     f3d::log::warn("Plugin failed to load: ", e.what());
   }
 }
+
+//----------------------------------------------------------------------------
+void F3DPluginsTools::LoadPlugins(
+  const std::vector<std::string>& plugins, const std::string& pluginsPath)
+{
+  try
+  {
+    const std::vector pluginsPaths { fs::path { pluginsPath }};
+    f3d::engine::autoloadPlugins();
+
+    for (const std::string& plugin : plugins)
+    {
+      if (!plugin.empty())
+      {
+        f3d::engine::loadPlugin(plugin, pluginsPaths);
+      }
+    }
+  }
+  catch (const f3d::engine::plugin_exception& e)
+  {
+    f3d::log::warn("Plugin failed to load: ", e.what());
+  }
+}
+

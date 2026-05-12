@@ -109,6 +109,11 @@
           "valueHelper": "<paths or names>"
         },
         {
+          "longName": "plugins-path",
+          "helpText": "CODY",
+          "valueHelper": "<path>"
+        },
+        {
           "longName": "scan-plugins",
           "helpText": "Scan standard directories for plugins and display available plugins (result can be incomplete)"
         },

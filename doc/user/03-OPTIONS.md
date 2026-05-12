@@ -69,6 +69,10 @@ Frame rate used to refresh animation and other repeated tasks (watch, UI). Does 
 
 List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `hdf`, `occt`, `pdal`, `usd`, `vdb`, `webifc`. See [plugins](12-PLUGINS.md) for more info.
 
+### `--plugins-path=<path>` (_string_)
+
+Path specifying where to load plugins from.
+
 ### `--scan-plugins`
 
 Scan standard directories for plugins and display their names, results may be incomplete. See [plugins](12-PLUGINS.md) for more info.
