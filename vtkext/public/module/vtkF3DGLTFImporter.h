@@ -13,9 +13,8 @@
 /// @cond
 #include <vtkGLTFImporter.h>
 #include <vtkVersion.h>
-/// @endcond
-// Add this include at the top after existing includes
 #include <vtkSmartPointer.h>
+/// @endcond
 class vtkInformationIntegerKey;
 
 class VTKEXT_EXPORT vtkF3DGLTFImporter : public vtkGLTFImporter
