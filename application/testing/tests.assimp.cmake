@@ -55,9 +55,9 @@ endif()
 
 # Armature support
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219)
-  f3d_test(NAME TestFBXRigArmature DATA punch.fbx ARGS --animation-time=1 --armature)
-  f3d_test(NAME TestFBXRigArmatureWithOpacity DATA punch.fbx ARGS --animation-time=1 --armature --opacity=0.5 -p)
-  f3d_test(NAME TestFBXRigArmatureSphereTube DATA punch.fbx ARGS --animation-time=1 --armature --point-size=20 --line-width=5)
+  f3d_test(NAME TestFBXRigArmature DATA punch.fbx ARGS --animation-time=1 --armature PLUGIN assimp)
+  f3d_test(NAME TestFBXRigArmatureWithOpacity DATA punch.fbx ARGS --animation-time=1 --armature --opacity=0.5 -p PLUGIN assimp)
+  f3d_test(NAME TestFBXRigArmatureSphereTube DATA punch.fbx ARGS --animation-time=1 --armature --point-size=20 --line-width=5 PLUGIN assimp)
 endif()
 
 if(NOT F3D_MACOS_BUNDLE)

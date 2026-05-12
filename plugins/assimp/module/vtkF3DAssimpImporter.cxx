@@ -8,6 +8,7 @@
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
+#include <vtkInformation.h>
 #include <vtkLight.h>
 #include <vtkMatrix4x4.h>
 #include <vtkObjectFactory.h>
@@ -16,7 +17,6 @@
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataTangents.h>
-#include <vtkInformation.h>
 #include <vtkProperty.h>
 #include <vtkQuaternion.h>
 #include <vtkRenderer.h>
