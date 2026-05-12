@@ -38,6 +38,12 @@ jobs:
           label=${label//[^a-z-]/}
           echo "F3D_LABEL_COMMENT=$label" >> $GITHUB_ENV
 
+      # Stop the job if cache is being added
+      - name: cache stop
+        if: env.F3D_LABEL_COMMENT == 'cache'
+        shell: bash
+        run: exit 0
+
       - name: Add ack reaction
         uses: GrantBirki/comment@v2.1.1
         with:
