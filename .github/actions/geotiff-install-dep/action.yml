@@ -1,28 +1,17 @@
 name: "Install geotiff Dependency"
 description: "Install geotiff Dependency using cache when possible"
 inputs:
+  versions_file:
+    description: "File to recover versions from"
+    required: true
+  mindeps_label:
+    description: "Label to flag for minimum versions dependencies"
+    required: false
+    default: "no-mindeps"
   cpu:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
-  version:
-    description: "Version of geotiff to build"
-    required: true
-  proj_version:
-    description: "Version of proj to build against"
-    required: true
-  sqlite_csb_version:
-    description: "Version of csb providing sqlite to build against"
-    required: true
-  tiff_version:
-    description: "Version of tiff to build against"
-    required: true
-  zlib_version:
-    description: "Version of zlib to build against"
-    required: true
-  global_cache_index:
-    description: "Global cache index"
-    required: true
 
 runs:
   using: "composite"
@@ -30,19 +19,61 @@ runs:
     - name: Check required inputs
       shell: bash
       run: |
-        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
-        [[ "${{ inputs.proj_version }}" ]] || { echo "proj_version input is empty" ; exit 1; }
-        [[ "${{ inputs.sqlite_csb_version }}" ]] || { echo "sqlite_csb_version input is empty" ; exit 1; }
-        [[ "${{ inputs.tiff_version }}" ]] || { echo "tiff_version input is empty" ; exit 1; }
-        [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
-        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+        [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
+
+    - name: Extract geotiff version
+      id: geotiff_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: geotiff
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract proj version
+      id: proj_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: proj
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract sqlite_csb version
+      id: sqlite_csb_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: sqlite_csb
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract tiff version
+      id: tiff_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: tiff
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract zlib version
+      id: zlib_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: zlib
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract global cache index
+      id: global_idx
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        special_name: global_cache_index
 
     - name: Cache geotiff
       id: cache-geotiff
       uses: actions/cache/restore@v5
       with:
         path: dependencies/geotiff_install
-        key: geotiff-${{inputs.version}}-${{inputs.proj_version}}-${{ inputs.sqlite_csb_version }}-${{inputs.tiff_version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-2
+        key: geotiff-${{steps.geotiff_ver.outputs.extract}}-${{steps.proj_ver.outputs.extract}}-${{steps.sqlite_csb_ver.outputs.extract}}-${{steps.tiff_ver.outputs.extract}}-${{steps.zlib_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
 
     # Dependents: gdal pdal vtk
     - name: Checkout geotiff
@@ -51,7 +82,7 @@ runs:
       with:
         repository: OSGeo/libgeotiff
         path: "./dependencies/geotiff"
-        ref: ${{inputs.version}}
+        ref: ${{steps.geotiff_ver.outputs.extract}}
 
     - name: Setup geotiff
       if: steps.cache-geotiff.outputs.cache-hit != 'true'

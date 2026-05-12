@@ -1,25 +1,17 @@
 name: "Install OpenVDB Dependency"
 description: "Install OpenVDB Dependency using cache when possible"
 inputs:
+  versions_file:
+    description: "File to recover versions from"
+    required: true
+  mindeps_label:
+    description: "Label to flag for minimum versions dependencies"
+    required: false
+    default: "no-mindeps"
   cpu:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
-  version:
-    description: "Version of openvdb to build"
-    required: true
-  blosc_version:
-    description: "Version of blosc to build against"
-    required: true
-  tbb_version:
-    description: "Version of tbb to build against"
-    required: true
-  zlib_version:
-    description: "Version of zlib to build against"
-    required: true
-  global_cache_index:
-    description: "Global cache index"
-    required: true
 
 runs:
   using: "composite"
@@ -27,18 +19,53 @@ runs:
     - name: Check required inputs
       shell: bash
       run: |
-        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
-        [[ "${{ inputs.blosc_version }}" ]] || { echo "blosc_version input is empty" ; exit 1; }
-        [[ "${{ inputs.tbb_version }}" ]] || { echo "tbb_version input is empty" ; exit 1; }
-        [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
-        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+        [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
+
+    - name: Extract openvdb version
+      id: openvdb_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: openvdb
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract zlib version
+      id: zlib_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: zlib
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract blosc version
+      id: blosc_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: blosc
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract tbb version
+      id: tbb_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: tbb
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract global cache index
+      id: global_idx
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        special_name: global_cache_index
 
     - name: Cache OpenVDB
       id: cache-openvdb
       uses: actions/cache/restore@v5
       with:
         path: dependencies/openvdb_install
-        key: openvdb-${{inputs.version}}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
+        key: openvdb-${{steps.openvdb_ver.outputs.extract}}-${{steps.zlib_ver.outputs.extract}}-${{steps.blosc_ver.outputs.extract}}-${{steps.tbb_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-1
 
     # Dependents: vtk
     - name: Checkout OpenVDB
@@ -47,7 +74,7 @@ runs:
       with:
         repository: AcademySoftwareFoundation/openvdb
         path: "./dependencies/openvdb"
-        ref: ${{inputs.version}}
+        ref: ${{steps.openvdb_ver.outputs.extract}}
 
     - name: Setup OpenVDB
       if: steps.cache-openvdb.outputs.cache-hit != 'true'

@@ -5,10 +5,20 @@ inputs:
     description: "Name of the build"
     required: false
     default: "standard"
-  optional_deps_label:
-    description: "Label to optional dependencies"
+  versions_file:
+    description: "File to recover versions from"
+    required: true
+  vtk_version:
+    description: "Descriptive VTK version to build against"
+    required: true
+  optdeps_label:
+    description: "Label to flag for optional dependencies"
     required: false
-    default: "optional-deps"
+    default: "optdeps"
+  mindeps_label:
+    description: "Label to flag for minimal version dependencies"
+    required: false
+    default: "no-mindeps"
   exclude_deprecated_label:
     description: "Label to control deprecated exclusion"
     required: false
@@ -32,84 +42,6 @@ inputs:
   lfs_sha:
     description: "Cache LFS sha"
     required: true
-  alembic_version:
-    description: "Version of alembic to build"
-    required: false
-  assimp_version:
-    description: "Version of assimp to build"
-    required: false
-  blosc_version:
-    description: "Version of blosc to build"
-    required: true
-  curl_version:
-    description: "Version of gdal to build"
-    required: false
-  draco_version:
-    description: "Version of draco to build"
-    required: false
-  gdal_version:
-    description: "Version of gdal to build"
-    required: false
-  geotiff_version:
-    description: "Version of geotiff to build"
-    required: false
-  imath_version:
-    description: "Version of imath to build"
-    required: false
-  java_version:
-    description: "Version of java to install"
-    required: false
-  occt_version:
-    description: "Version of occt to build"
-    required: false
-  openexr_version:
-    description: "Version of openexr to build"
-    required: false
-  openvdb_version:
-    description: "Version of openvdb to build"
-    required: false
-  ospray_version:
-    description: "Version of ospray to build"
-    required: false
-  pdal_version:
-    description: "Version of pdal to build"
-    required: false
-  proj_version:
-    description: "Version of proj to build"
-    required: false
-  pybind11_version:
-    description: "Version of pybind11 to build"
-    required: false
-  python_version:
-    description: "Version of python to install"
-    required: false
-  sqlite_csb_version:
-    description: "Version of csb providing sqlite to build against"
-    required: false
-  tiff_version:
-    description: "Version of tiff to build"
-    required: false
-  tbb_version:
-    description: "Version of tbb to build"
-    required: true
-  usd_version:
-    description: "Version of usd to build"
-    required: false
-  vtk_version:
-    description: "VTK version"
-    required: true
-  webp_version:
-    description: "Version of webp to build"
-    required: true
-  webifc_version:
-    description: "Version of webifc to build"
-    required: true
-  zlib_version:
-    description: "Version of zlib to build"
-    required: true
-  global_cache_index:
-    description: "Global cache index"
-    required: true
 
 runs:
   using: "composite"
@@ -117,6 +49,7 @@ runs:
     - name: Check required inputs
       shell: bash
       run: |
+        [[ "${{ inputs.versions_file }}" ]] || { echo "versions_file is empty" ; exit 1; }
         [[ "${{ inputs.lfs_sha }}" ]] || { echo "lfs_sha input is empty" ; exit 1; }
         [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
 
@@ -130,76 +63,56 @@ runs:
     - name: Install all F3D dependencies
       uses: ./source/.github/actions/generic-dependencies
       with:
+        versions_file: ${{inputs.versions_file}}
+        optdeps_label: ${{inputs.optdeps_label}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
-        alembic_version: ${{inputs.alembic_version}}
-        assimp_version: ${{inputs.assimp_version}}
-        blosc_version: ${{inputs.blosc_version}}
-        curl_version: ${{inputs.curl_version}}
-        draco_version: ${{inputs.draco_version}}
-        gdal_version: ${{inputs.gdal_version}}
-        geotiff_version: ${{inputs.geotiff_version}}
-        imath_version: ${{inputs.imath_version}}
-        occt_version: ${{inputs.occt_version}}
-        openexr_version: ${{inputs.openexr_version}}
-        openvdb_version: ${{inputs.openvdb_version}}
-        ospray_version: ${{inputs.ospray_version}}
-        pdal_version: ${{inputs.pdal_version}}
-        proj_version: ${{inputs.proj_version}}
-        pybind11_version: ${{inputs.pybind11_version}}
-        sqlite_csb_version: ${{inputs.sqlite_csb_version}}
-        tbb_version: ${{inputs.tbb_version}}
-        tiff_version: ${{inputs.tiff_version}}
-        usd_version: ${{inputs.usd_version}}
-        webifc_version: ${{inputs.webifc_version}}
-        webp_version: ${{inputs.webp_version}}
-        zlib_version: ${{inputs.zlib_version}}
-        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
+        versions_file: ${{inputs.versions_file}}
+        optdeps_label: ${{inputs.optdeps_label}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
-        blosc_version: ${{inputs.blosc_version}}
-        curl_version: ${{inputs.curl_version}}
-        gdal_version: ${{inputs.gdal_version}}
-        geotiff_version: ${{inputs.geotiff_version}}
-        openvdb_version: ${{inputs.openvdb_version}}
-        ospray_version: ${{inputs.ospray_version}}
-        pdal_version: ${{inputs.pdal_version}}
-        proj_version: ${{inputs.proj_version}}
-        sqlite_csb_version: ${{inputs.sqlite_csb_version}}
-        tbb_version: ${{inputs.tbb_version}}
-        tiff_version: ${{inputs.tiff_version}}
         vtk_version: ${{inputs.vtk_version}}
-        zlib_version: ${{inputs.zlib_version}}
-        global_cache_index: ${{inputs.global_cache_index}}
+
+    - name: Extract python version
+      id: python_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: python
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
 
     - name: Set up Python
-      if: |
-        inputs.optional_deps_label == 'optional-deps' &&
-        inputs.python_version != ''
+      if: inputs.optdeps_label == 'optdeps'
       uses: actions/setup-python@v6
       with:
-        python-version: ${{inputs.python_version}}
+        python-version: ${{steps.python_ver.outputs.extract}}
 
     - name: Install Python dependencies
-      if: |
-        inputs.optional_deps_label == 'optional-deps' &&
-        inputs.python_version != ''
+      if: inputs.optdeps_label == 'optdeps'
       shell: bash
       run: |
         python -m pip install --upgrade pip
         python -m pip install pytest==8.0.0
         python -m pip install pybind11_stubgen
 
+    - name: Extract java version
+      id: java_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: java
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
     - name: Setup JDK
-      if: |
-        inputs.optional_deps_label == 'optional-deps' &&
-        inputs.java_version != ''
+      if: inputs.optdeps_label == 'optdeps'
       uses: actions/setup-java@v5
       with:
         distribution: "temurin"
-        java-version: ${{inputs.java_version}}
+        java-version: ${{steps.java_ver.outputs.extract}}
 
     - name: Setup Directories
       shell: bash
@@ -218,7 +131,7 @@ runs:
     - name: Set DYLD_LIBRARY_PATH on macOS for OSPRay dynamic loading
       if: |
         runner.os == 'macOS' &&
-        inputs.ospray_version != ''
+        inputs.optdeps_label == 'optdeps'
       shell: bash
       run: echo "DYLD_LIBRARY_PATH=$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
 
@@ -252,33 +165,33 @@ runs:
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
-        -DCMAKE_MODULE_PATH=${{ inputs.optional_deps_label == 'optional-deps' && '$(pwd)/../dependencies/install/lib/cmake/OpenVDB/' || '' }}
+        -DCMAKE_MODULE_PATH=${{ inputs.optdeps_label == 'optdeps' && '$(pwd)/../dependencies/install/lib/cmake/OpenVDB/' || '' }}
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_BINDINGS_C=ON
-        -DF3D_BINDINGS_JAVA=${{ (runner.os != 'macOS' || inputs.cpu == 'arm64') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_BINDINGS_PYTHON=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_BINDINGS_PYTHON_GENERATE_STUBS=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_BINDINGS_JAVA=${{ (runner.os != 'macOS' || inputs.cpu == 'arm64') && inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_BINDINGS_PYTHON=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_BINDINGS_PYTHON_GENERATE_STUBS=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_EXCLUDE_DEPRECATED=${{ inputs.exclude_deprecated_label == 'exclude-deprecated' && 'ON' || 'OFF' }}
         -DF3D_LINUX_GENERATE_MAN=ON
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
         -DF3D_MACOS_BUNDLE=${{ inputs.bundle_label == 'bundle' && 'ON' || 'OFF' }}
-        -DF3D_MODULE_EXR=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_MODULE_WEBP=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_MODULE_RAYTRACING=${{ inputs.ospray_version != '' && 'ON' || 'OFF' }}
-        -DF3D_MODULE_UI=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_MODULE_DMON=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_MODULE_TINYFILEDIALOGS=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_EXR=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_WEBP=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_RAYTRACING=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_UI=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_DMON=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_TINYFILEDIALOGS=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_PLUGINS_STATIC_BUILD=${{ inputs.bundle_label == 'bundle' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_ALEMBIC=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_ASSIMP=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_DRACO=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_HDF=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_WEBIFC=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_OCCT=${{ inputs.optional_deps_label == 'optional-deps' && inputs.static_label == 'no-static' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_PDAL=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_VDB=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=${{ inputs.occt_version != 'V7_6_3' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_ALEMBIC=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_ASSIMP=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_DRACO=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_HDF=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_WEBIFC=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_OCCT=${{ inputs.optdeps_label == 'optdeps' && inputs.static_label == 'no-static' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_PDAL=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_USD=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_VDB=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=${{ inputs.mindeps_label != 'mindeps' && 'ON' || 'OFF' }}
         -DF3D_STRICT_BUILD=ON
         -DF3D_TESTING_ENABLE_EGL_TESTS=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_EXTERNAL_GLFW=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
@@ -386,7 +299,7 @@ runs:
 
     - name: Build and configure python externally
       if: |
-        inputs.optional_deps_label == 'optional-deps' &&
+        inputs.optdeps_label == 'optdeps' &&
         inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
@@ -404,7 +317,7 @@ runs:
         -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d
         -DBUILD_TESTING=ON
         -DF3D_ENABLE_C_EXAMPLES=ON
-        -DF3D_ENABLE_JAVA_EXAMPLES=${{ (runner.os != 'macOS' || inputs.cpu == 'arm64') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_ENABLE_JAVA_EXAMPLES=${{ (runner.os != 'macOS' || inputs.cpu == 'arm64') && inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_EXAMPLES_EXTERNAL_GLFW=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
         -DF3D_EXAMPLES_EXTERNAL_QT=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
         -DF3D_EXAMPLES_EXTERNAL_FLTK=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
@@ -482,7 +395,7 @@ runs:
     - name: Check F3D_PLUGINS_PATH using plugin example
       if: |
         inputs.vtk_version != 'v9.4.2' && inputs.vtk_version != 'v9.5.2' &&
-        inputs.cpu != 'arm64' && inputs.static_label == 'no-static' && inputs.optional_deps_label == 'optional-deps'
+        inputs.cpu != 'arm64' && inputs.static_label == 'no-static' && inputs.optdeps_label == 'optdeps'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=output/install_example_plugin_output.png --reference=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --rendering-backend=${{ inputs.rendering_backend }} --verbose
@@ -500,7 +413,7 @@ runs:
     - name: Check Install
       if: |
         inputs.vtk_version != 'v9.4.2' && inputs.vtk_version != 'v9.5.2'
-        && inputs.cpu != 'arm64' && inputs.optional_deps_label == 'optional-deps'
+        && inputs.cpu != 'arm64' && inputs.optdeps_label == 'optdeps'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
@@ -509,7 +422,7 @@ runs:
     - name: Check Install plugins
       if: |
         inputs.vtk_version != 'v9.4.2' && inputs.vtk_version != 'v9.5.2' && inputs.cpu != 'arm64'
-        && inputs.static_label == 'no-static' && inputs.optional_deps_label == 'optional-deps'
+        && inputs.static_label == 'no-static' && inputs.optdeps_label == 'optdeps'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
