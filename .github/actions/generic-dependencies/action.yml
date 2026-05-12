@@ -28,16 +28,8 @@ runs:
     - name: Install VTK dependencies
       uses: ./source/.github/actions/vtk-dependencies
       with:
-        versions_file: ./source/.github/workflows/versions.json
+        versions_file: ${{inputs.versions_file}}
         optdeps_label: ${{inputs.optdeps_label}}
-        mindeps_label: ${{inputs.mindeps_label}}
-        cpu: ${{inputs.cpu}}
-
-    - name: Install Raytracing Dependencies
-      if: inputs.optdeps_label == 'optdeps'
-      uses: ./source/.github/actions/ospray-sb-install-dep
-      with:
-        versions_file: ./source/.github/workflows/versions.json
         mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
@@ -45,6 +37,6 @@ runs:
       if: inputs.optdeps_label == 'optdeps'
       uses: ./source/.github/actions/f3d-dependencies
       with:
-        versions_file: ./source/.github/workflows/versions.json
+        versions_file: ${{inputs.versions_file}}
         mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}

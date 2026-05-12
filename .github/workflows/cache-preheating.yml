@@ -103,14 +103,6 @@ jobs:
           mindeps_label: ${{matrix.mindeps_label}}
           cpu: ${{ matrix.os == 'macos-15' && 'arm64' || 'x86_64' }}
 
-      - name: Install Raytracing Dependencies
-        if: matrix.optdeps_label == 'optdeps'
-        uses: ./source/.github/actions/ospray-sb-install-dep
-        with:
-          versions_file: ./source/.github/workflows/versions.json
-          mindeps_label: ${{matrix.mindeps_label}}
-          cpu: ${{ matrix.os == 'macos-15' && 'arm64' || 'x86_64' }}
-
       - name: Cache VTK
         uses: ./source/.github/actions/vtk-install-dep
         with:

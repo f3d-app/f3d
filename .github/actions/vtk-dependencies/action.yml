@@ -130,3 +130,11 @@ runs:
         versions_file: ${{inputs.versions_file}}
         mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
+
+    - name: Install Raytracing Dependencies
+      if: inputs.optdeps_label == 'optdeps'
+      uses: ./source/.github/actions/ospray-sb-install-dep
+      with:
+        versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
+        cpu: ${{inputs.cpu}}
