@@ -1424,8 +1424,7 @@ void vtkF3DUSDImporter::ImportActors(vtkRenderer* renderer)
   constexpr bool armature = false;
 #endif
 
-  if (!this->Internals->ImportRoot(
-        renderer, this->SceneHierarchy, this->ActorCollection, armature))
+  if (!this->Internals->ImportRoot(renderer, this->SceneHierarchy, this->ActorCollection, armature))
   {
     this->SetFailureStatus();
   }
