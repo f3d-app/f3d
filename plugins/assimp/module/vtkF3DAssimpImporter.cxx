@@ -763,9 +763,9 @@ public:
       const aiNode* boneNode = this->Scene->mRootNode->FindNode(boneName.c_str());
       if (boneNode)
       {
-        for (unsigned int c = 0; c < boneNode->mNumChildren; c++)
+        for (unsigned int child = 0; child < boneNode->mNumChildren; child++)
         {
-          std::string childName = boneNode->mChildren[c]->mName.data;
+          std::string childName = boneNode->mChildren[child]->mName.data;
           auto it = boneToPointId.find(childName);
           if (it != boneToPointId.end())
           {
