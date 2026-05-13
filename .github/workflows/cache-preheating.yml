@@ -10,10 +10,6 @@ on:
       - "doc/**"
       - "_config.yml"
 
-concurrency:
-  group: "${{ github.workflow }}-${{  github.ref_name }}"
-  cancel-in-progress: true
-
 jobs:
   #----------------------------------------------------------------------------
   # Cache preheating all dependencies
@@ -59,7 +55,6 @@ jobs:
   cache_preheating_vtk:
     needs: [cache_preheating_dependencies]
     name: Preheat VTK dependency caches
-    if: contains(github.event.pull_request.labels.*.name, 'ci:cache')
     strategy:
       fail-fast: false
       matrix:

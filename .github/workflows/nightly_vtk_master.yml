@@ -138,6 +138,7 @@ jobs:
       - name: Sanitizer CI
         uses: ./source/.github/actions/sanitizer-ci
         with:
+          versions_file: ./source/.github/workflows/versions.json
           vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
           sanitizer_type: ${{matrix.sanitizer_type}}
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
@@ -195,7 +196,7 @@ jobs:
   # android: Check build of F3D for android
   #----------------------------------------------------------------------------
   android:
-    needs: [check_nightly, build_docker_images]
+    needs: [check_nightly, build_docker_images, recover_docker_timestamp]
     strategy:
       fail-fast: false
       matrix:
@@ -221,7 +222,8 @@ jobs:
   # webassembly: Build webassembly artifacts
   #----------------------------------------------------------------------------
   webassembly:
-    needs: [cache_lfs, check_nightly, build_docker_images]
+    needs:
+      [cache_lfs, check_nightly, build_docker_images, recover_docker_timestamp]
     strategy:
       fail-fast: false
 
