@@ -340,8 +340,7 @@ bool vtkF3DMetaImporter::Update()
 
       // convert to PBR materials if needed
       // this should be moved elsewhere, see https://github.com/f3d-app/f3d/issues/2995
-      if (!genericImporter && actor->GetProperty()->GetInterpolation() != VTK_PBR &&
-        actor->GetProperty()->GetLighting())
+      if (!genericImporter && actor->GetProperty()->GetInterpolation() != VTK_PBR)
       {
         actor->GetProperty()->SetInterpolationToPBR();
 
