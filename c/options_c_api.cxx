@@ -1,6 +1,6 @@
 #include "options_c_api.h"
 #include "options.h"
-
+#include "log.h"
 #include <cstring>
 #include <string>
 #include <vector>
@@ -8,8 +8,17 @@
 //----------------------------------------------------------------------------
 f3d_options_t* f3d_options_create()
 {
-  f3d::options* cpp_options = new f3d::options();
-  return reinterpret_cast<f3d_options_t*>(cpp_options);
+  try
+  {
+    f3d::options* cpp_options = new f3d::options();
+    return reinterpret_cast<f3d_options_t*>(cpp_options);
+  }
+  catch (const std::bad_alloc& e)
+  {
+    f3d::log::error("Failed to allocate memory for f3d_options_t: ", e.what());
+  }
+  
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -33,7 +42,15 @@ void f3d_options_set_as_bool(f3d_options_t* options, const char* name, int value
   }
 
   f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
-  cpp_options->set(name, static_cast<bool>(value));
+
+  try
+  {
+    cpp_options->set(name, static_cast<bool>(value));
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -45,7 +62,15 @@ void f3d_options_set_as_int(f3d_options_t* options, const char* name, int value)
   }
 
   f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
-  cpp_options->set(name, value);
+
+  try
+  {
+    cpp_options->set(name, value);
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -57,7 +82,15 @@ void f3d_options_set_as_double(f3d_options_t* options, const char* name, double 
   }
 
   f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
-  cpp_options->set(name, value);
+
+  try
+  {
+    cpp_options->set(name, value);
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -69,7 +102,15 @@ void f3d_options_set_as_string(f3d_options_t* options, const char* name, const c
   }
 
   f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
-  cpp_options->set(name, std::string(value));
+
+  try
+  {
+    cpp_options->set(name, std::string(value));
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -83,7 +124,15 @@ void f3d_options_set_as_double_vector(
 
   f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
   std::vector<double> vec(values, values + count);
-  cpp_options->set(name, vec);
+
+  try
+  {
+    cpp_options->set(name, vec);
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -97,7 +146,15 @@ void f3d_options_set_as_int_vector(
 
   f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
   std::vector<int> vec(values, values + count);
-  cpp_options->set(name, vec);
+
+  try
+  {
+    cpp_options->set(name, vec);
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -109,7 +166,17 @@ int f3d_options_get_as_bool(const f3d_options_t* options, const char* name)
   }
 
   const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
-  return std::get<bool>(cpp_options->get(name)) ? 1 : 0;
+
+  try
+  {
+    return std::get<bool>(cpp_options->get(name)) ? 1 : 0;
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -121,7 +188,17 @@ int f3d_options_get_as_int(const f3d_options_t* options, const char* name)
   }
 
   const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
-  return std::get<int>(cpp_options->get(name));
+
+  try
+  {
+    return std::get<int>(cpp_options->get(name));
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -133,7 +210,17 @@ double f3d_options_get_as_double(const f3d_options_t* options, const char* name)
   }
 
   const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
-  return std::get<double>(cpp_options->get(name));
+
+  try
+  {
+    return std::get<double>(cpp_options->get(name));
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
+
+  return 0.0;
 }
 
 //----------------------------------------------------------------------------
@@ -145,10 +232,28 @@ const char* f3d_options_get_as_string(const f3d_options_t* options, const char* 
   }
 
   const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
-  const std::string str = std::get<std::string>(cpp_options->get(name));
-  char* result = new char[str.length() + 1];
-  std::strcpy(result, str.c_str());
-  return result;
+
+  try
+  {
+    const std::string str = std::get<std::string>(cpp_options->get(name));
+    char* result = new char[str.length() + 1];
+    std::strcpy(result, str.c_str());
+    return result;
+  }
+  catch (const f3d::options::no_value_exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
+  catch (const f3d::options::inexistent_exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
+  catch (const std::bad_alloc& e)
+  {
+    f3d::log::error("Failed to allocate memory for char[]: ", e.what());
+  }
+  
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -161,9 +266,18 @@ void f3d_options_get_as_double_vector(
   }
 
   const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
-  const std::vector<double> vec = std::get<std::vector<double>>(cpp_options->get(name));
-  *count = vec.size();
-  std::copy(vec.begin(), vec.end(), values);
+
+  try
+  {
+    const std::vector<double> vec = std::get<std::vector<double>>(cpp_options->get(name));
+    *count = vec.size();
+    std::copy(vec.begin(), vec.end(), values);
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::warn(e.what());
+    *count = 0;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -176,9 +290,18 @@ void f3d_options_get_as_int_vector(
   }
 
   const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
-  const std::vector<int> vec = std::get<std::vector<int>>(cpp_options->get(name));
-  *count = vec.size();
-  std::copy(vec.begin(), vec.end(), values);
+
+  try
+  {
+    const std::vector<int> vec = std::get<std::vector<int>>(cpp_options->get(name));
+    *count = vec.size();
+    std::copy(vec.begin(), vec.end(), values);
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::warn(e.what());
+    *count = 0;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -190,7 +313,15 @@ void f3d_options_toggle(f3d_options_t* options, const char* name)
   }
 
   f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
-  cpp_options->toggle(name);
+
+  try
+  {
+    cpp_options->toggle(name);
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -203,7 +334,17 @@ int f3d_options_is_same(const f3d_options_t* options, const f3d_options_t* other
 
   const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
   const f3d::options* cpp_other = reinterpret_cast<const f3d::options*>(other);
-  return cpp_options->isSame(*cpp_other, name) ? 1 : 0;
+
+  try
+  {
+    return cpp_options->isSame(*cpp_other, name) ? 1 : 0;
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -215,7 +356,17 @@ int f3d_options_has_value(const f3d_options_t* options, const char* name)
   }
 
   const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
-  return cpp_options->hasValue(name) ? 1 : 0;
+
+  try
+  {
+    return cpp_options->hasValue(name) ? 1 : 0;
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
+  
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -228,7 +379,15 @@ void f3d_options_copy(f3d_options_t* options, const f3d_options_t* other, const 
 
   f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
   const f3d::options* cpp_other = reinterpret_cast<const f3d::options*>(other);
-  cpp_options->copy(*cpp_other, name);
+
+  try
+  {
+    cpp_options->copy(*cpp_other, name);
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -242,14 +401,23 @@ char** f3d_options_get_all_names(size_t* count)
   std::vector<std::string> names = f3d::options::getAllNames();
   *count = names.size();
 
-  char** result = new char*[names.size()];
-  for (size_t i = 0; i < names.size(); i++)
+  try
   {
-    result[i] = new char[names[i].length() + 1];
-    std::strcpy(result[i], names[i].c_str());
+    char** result = new char*[names.size()];
+    for (size_t i = 0; i < names.size(); i++)
+    {
+      result[i] = new char[names[i].length() + 1];
+      std::strcpy(result[i], names[i].c_str());
+    }
+
+    return result;
+  }
+  catch (const std::bad_alloc& e)
+  {
+    f3d::log::error("Failed to allocate memory for char**: ", e.what());
   }
 
-  return result;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -264,14 +432,23 @@ char** f3d_options_get_names(const f3d_options_t* options, size_t* count)
   std::vector<std::string> names = cpp_options->getNames();
   *count = names.size();
 
-  char** result = new char*[names.size()];
-  for (size_t i = 0; i < names.size(); i++)
+  try
   {
-    result[i] = new char[names[i].length() + 1];
-    std::strcpy(result[i], names[i].c_str());
-  }
+    char** result = new char*[names.size()];
+    for (size_t i = 0; i < names.size(); i++)
+    {
+      result[i] = new char[names[i].length() + 1];
+      std::strcpy(result[i], names[i].c_str());
+    }
 
-  return result;
+    return result;
+  }
+  catch (const std::bad_alloc& e)
+  {
+    f3d::log::error("Failed to allocate memory for char**: ", e.what());
+  }
+  
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -298,7 +475,17 @@ int f3d_options_is_optional(const f3d_options_t* options, const char* name)
   }
 
   const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
-  return cpp_options->isOptional(name) ? 1 : 0;
+
+  try
+  {
+    return cpp_options->isOptional(name) ? 1 : 0;
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -310,7 +497,15 @@ void f3d_options_reset(f3d_options_t* options, const char* name)
   }
 
   f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
-  cpp_options->reset(name);
+
+  try
+  {
+    cpp_options->reset(name);
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -322,7 +517,15 @@ void f3d_options_remove_value(f3d_options_t* options, const char* name)
   }
 
   f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
-  cpp_options->removeValue(name);
+
+  try
+  {
+    cpp_options->removeValue(name);
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -334,10 +537,28 @@ const char* f3d_options_get_as_string_representation(const f3d_options_t* option
   }
 
   const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
-  std::string str = cpp_options->getAsString(name);
-  char* result = new char[str.length() + 1];
-  std::strcpy(result, str.c_str());
-  return result;
+
+  try
+  {
+    std::string str = cpp_options->getAsString(name);
+    char* result = new char[str.length() + 1];
+    std::strcpy(result, str.c_str());
+    return result;
+  }
+  catch (const f3d::options::no_value_exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
+  catch (const f3d::options::inexistent_exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
+  catch (const std::bad_alloc& e)
+  {
+    f3d::log::error("Failed to allocate memory for char*: ", e.what());
+  }
+  
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -350,7 +571,15 @@ void f3d_options_set_as_string_representation(
   }
 
   f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
-  cpp_options->setAsString(name, str);
+
+  try
+  {
+    cpp_options->setAsString(name, str);
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::warn(e.what());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -376,10 +605,19 @@ void f3d_options_get_closest_option(
   const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
   auto result = cpp_options->getClosestOption(option);
 
-  char* result_str = new char[result.first.length() + 1];
-  std::strcpy(result_str, result.first.c_str());
-  *closest = result_str;
-  *distance = result.second;
+  try
+  {
+    char* result_str = new char[result.first.length() + 1];
+    std::strcpy(result_str, result.first.c_str());
+    *closest = result_str;
+    *distance = result.second;
+  }
+  catch (const std::bad_alloc& e)
+  {
+    f3d::log::error("Failed to allocate memory for char*: ", e.what());
+    *closest = nullptr;
+    *distance = 0U;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -390,7 +628,16 @@ int f3d_options_parse_bool(const char* str)
     return 0;
   }
 
-  return f3d::options::parse<bool>(str) ? 1 : 0;
+  try
+  {
+    return f3d::options::parse<bool>(str) ? 1 : 0;
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::error("Parsing failed: ", e.what());
+  }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -401,7 +648,16 @@ int f3d_options_parse_int(const char* str)
     return 0;
   }
 
-  return f3d::options::parse<int>(str);
+  try
+  {
+    return f3d::options::parse<int>(str);
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::error("Parsing failed: ", e.what());
+  }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -412,7 +668,16 @@ double f3d_options_parse_double(const char* str)
     return 0.0;
   }
 
-  return f3d::options::parse<double>(str);
+  try
+  {
+    return f3d::options::parse<double>(str);
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::error("Parsing failed: ", e.what());
+  }
+
+  return 0.0;
 }
 
 //----------------------------------------------------------------------------
@@ -423,10 +688,24 @@ const char* f3d_options_parse_string(const char* str)
     return nullptr;
   }
 
-  std::string result = f3d::options::parse<std::string>(str);
-  char* result_str = new char[result.length() + 1];
-  std::strcpy(result_str, result.c_str());
-  return result_str;
+  try
+  {
+
+    std::string result = f3d::options::parse<std::string>(str);
+    char* result_str = new char[result.length() + 1];
+    std::strcpy(result_str, result.c_str());
+    return result_str;
+  }
+  catch (const f3d::options::parsing_exception& e)
+  {
+    f3d::log::error("Parsing failed: ", e.what());
+  }
+  catch (const std::bad_alloc& e)
+  {
+    f3d::log::error("Failed to allocate memory for char*: ", e.what());
+  }
+
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -437,9 +716,17 @@ void f3d_options_parse_double_vector(const char* str, double* values, size_t* co
     return;
   }
 
-  std::vector<double> vec = f3d::options::parse<std::vector<double>>(str);
-  *count = vec.size();
-  std::copy(vec.begin(), vec.end(), values);
+  try
+  {
+    std::vector<double> vec = f3d::options::parse<std::vector<double>>(str);
+    *count = vec.size();
+    std::copy(vec.begin(), vec.end(), values);
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::error("Parsing failed: ", e.what());
+    *count = 0U;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -450,36 +737,73 @@ void f3d_options_parse_int_vector(const char* str, int* values, size_t* count)
     return;
   }
 
-  std::vector<int> vec = f3d::options::parse<std::vector<int>>(str);
-  *count = vec.size();
-  std::copy(vec.begin(), vec.end(), values);
+  try
+  {
+    std::vector<int> vec = f3d::options::parse<std::vector<int>>(str);
+    *count = vec.size();
+    std::copy(vec.begin(), vec.end(), values);
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::error("Parsing failed: ", e.what());
+  }
 }
 
 //----------------------------------------------------------------------------
 const char* f3d_options_format_bool(int value)
 {
   std::string result = f3d::options::format(static_cast<bool>(value));
-  char* result_str = new char[result.length() + 1];
-  std::strcpy(result_str, result.c_str());
-  return result_str;
+
+  try
+  {
+    char* result_str = new char[result.length() + 1];
+    std::strcpy(result_str, result.c_str());
+    return result_str;
+  }
+  catch (const std::bad_alloc& e)
+  {
+    f3d::log::error("Failed to allocate memory for char*: ", e.what());
+  }
+
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
 const char* f3d_options_format_int(int value)
 {
   std::string result = f3d::options::format(value);
-  char* result_str = new char[result.length() + 1];
-  std::strcpy(result_str, result.c_str());
-  return result_str;
+
+  try
+  {
+    char* result_str = new char[result.length() + 1];
+    std::strcpy(result_str, result.c_str());
+    return result_str;
+  }
+  catch (const std::bad_alloc& e)
+  {
+    f3d::log::error("Failed to allocate memory for char*: ", e.what());
+  }
+
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
 const char* f3d_options_format_double(double value)
 {
   std::string result = f3d::options::format(value);
-  char* result_str = new char[result.length() + 1];
-  std::strcpy(result_str, result.c_str());
-  return result_str;
+
+  try
+  {
+    char* result_str = new char[result.length() + 1];
+    std::strcpy(result_str, result.c_str());
+    return result_str;
+  }
+  catch (const std::bad_alloc& e)
+  {
+    f3d::log::error("Failed to allocate memory for char*: ", e.what());
+  }
+
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -491,9 +815,19 @@ const char* f3d_options_format_string(const char* value)
   }
 
   std::string result = f3d::options::format(std::string(value));
-  char* result_str = new char[result.length() + 1];
-  std::strcpy(result_str, result.c_str());
-  return result_str;
+
+  try
+  {
+    char* result_str = new char[result.length() + 1];
+    std::strcpy(result_str, result.c_str());
+    return result_str;
+  }
+  catch (const std::bad_alloc& e)
+  {
+    f3d::log::error("Failed to allocate memory for char*: ", e.what());
+  }
+
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -506,9 +840,19 @@ const char* f3d_options_format_double_vector(const double* values, size_t count)
 
   std::vector<double> vec(values, values + count);
   std::string result = f3d::options::format(vec);
-  char* result_str = new char[result.length() + 1];
-  std::strcpy(result_str, result.c_str());
-  return result_str;
+
+  try
+  {
+    char* result_str = new char[result.length() + 1];
+    std::strcpy(result_str, result.c_str());
+    return result_str;
+  }
+  catch (const std::bad_alloc& e)
+  {
+    f3d::log::error("Failed to allocate memory for char*: ", e.what());
+  }
+
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -521,7 +865,17 @@ const char* f3d_options_format_int_vector(const int* values, size_t count)
 
   std::vector<int> vec(values, values + count);
   std::string result = f3d::options::format(vec);
-  char* result_str = new char[result.length() + 1];
-  std::strcpy(result_str, result.c_str());
-  return result_str;
+
+  try
+  {
+    char* result_str = new char[result.length() + 1];
+    std::strcpy(result_str, result.c_str());
+    return result_str;
+  }
+  catch (const std::bad_alloc& e)
+  {
+    f3d::log::error("Failed to allocate memory for char*: ", e.what());
+  }
+
+  return nullptr;
 }

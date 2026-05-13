@@ -38,7 +38,7 @@ extern "C"
    * @param str Input string to tokenize.
    * @param keep_comments Non-zero to keep comments, zero to treat '#' as a normal character.
    * @param out_count Pointer to receive the number of tokens.
-   * @return Array of C strings.
+   * @return Array of C strings or NULL on failure.
    */
   F3D_EXPORT char** f3d_utils_tokenize(const char* str, int keep_comments, size_t* out_count);
 
@@ -60,7 +60,7 @@ extern "C"
    *
    * @param path Input path.
    * @param base_directory Base directory for relative paths.
-   * @return Collapsed absolute path string.
+   * @return Collapsed absolute path string or NULL on failure.
    */
   F3D_EXPORT char* f3d_utils_collapse_path(const char* path, const char* base_directory);
 

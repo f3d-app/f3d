@@ -181,7 +181,7 @@ extern "C"
    *
    * @param interactor Interactor handle.
    * @param count Output parameter for number of actions.
-   * @return Array of action strings. Caller must free the array with
+   * @return Array of action strings or NULL on failure. Caller must free the array with
    *         f3d_interactor_free_string_array().
    */
   F3D_EXPORT char** f3d_interactor_get_command_actions(f3d_interactor_t* interactor, int* count);
@@ -234,8 +234,8 @@ extern "C"
    * @brief Get all bind groups.
    *
    * @param interactor Interactor handle.
-   * @param count Output parameter for number of groups.
-   * @return Array of group strings. Caller must free the array with
+   * @param count Output parameter for number of groups. It will be set to 0 on failure.
+   * @return Array of group strings or NULL on failure. Caller must free the array with
    *         f3d_interactor_free_string_array().
    */
   F3D_EXPORT char** f3d_interactor_get_bind_groups(f3d_interactor_t* interactor, int* count);
@@ -245,8 +245,8 @@ extern "C"
    *
    * @param interactor Interactor handle.
    * @param group Group name.
-   * @param count Output parameter for number of binds.
-   * @return Array of binds. Caller must free the array with
+   * @param count Output parameter for number of binds. It will be set to 0 on failure.
+   * @return Array of binds or NULL on failure. Caller must free the array with
    *         f3d_interactor_free_bind_array().
    */
   F3D_EXPORT f3d_interaction_bind_t* f3d_interactor_get_binds_for_group(
@@ -257,7 +257,7 @@ extern "C"
    *
    * @param interactor Interactor handle.
    * @param count Output parameter for number of binds.
-   * @return Array of binds. Caller must free the array with
+   * @return Array of binds or NULL on failure. Caller must free the array with
    *         f3d_interactor_free_bind_array().
    */
   F3D_EXPORT f3d_interaction_bind_t* f3d_interactor_get_binds(
@@ -287,7 +287,8 @@ extern "C"
    *
    * @param interactor Interactor handle.
    * @param bind Interaction bind.
-   * @return Binding type.
+   * @return Binding type. Will return F3D_INTERACTOR_BINDING_OTHER on failure or when one of 
+   * the parameters are NULL.
    */
   F3D_EXPORT f3d_interactor_binding_type_t f3d_interactor_get_binding_type(
     f3d_interactor_t* interactor, const f3d_interaction_bind_t* bind);

@@ -1,5 +1,6 @@
 #include "types_c_api.h"
 #include "types.h"
+#include "log.h"
 #include <cmath>
 #include <cstring>
 
@@ -110,8 +111,10 @@ void f3d_transform2d_create(f3d_transform2d_t* transform, double scale_x, double
       transform->data[i] = cpp_transform[i];
     }
   }
-  catch (...)
+  catch (const std::exception& e)
   {
+    f3d::log::warn(e.what());
+
     // Initialize to identity on error
     for (int i = 0; i < 9; ++i)
     {
@@ -142,8 +145,15 @@ int f3d_mesh_is_valid(const f3d_mesh_t* mesh, char** error_message)
     if (error_message)
     {
       const char* msg = "Mesh pointer is NULL";
-      *error_message = new char[std::strlen(msg) + 1];
-      std::strcpy(*error_message, msg);
+      try
+      {
+        *error_message = new char[std::strlen(msg) + 1];
+        std::strcpy(*error_message, msg);
+      }
+      catch (const std::bad_alloc& e)
+      {
+        f3d::log::error("Failed to allocate memory for error message: ", e.what());
+      }
     }
     return 0;
   }
@@ -184,8 +194,15 @@ int f3d_mesh_is_valid(const f3d_mesh_t* mesh, char** error_message)
 
     if (!valid && error_message)
     {
-      *error_message = new char[msg.size() + 1];
-      std::strcpy(*error_message, msg.c_str());
+        try
+        {
+          *error_message = new char[msg.size() + 1];
+          std::strcpy(*error_message, msg.c_str());
+        }
+        catch (const std::bad_alloc& e)
+        {
+          f3d::log::error("Failed to allocate memory for error message: ", e.what());
+        }
     }
 
     return valid ? 1 : 0;
@@ -195,8 +212,15 @@ int f3d_mesh_is_valid(const f3d_mesh_t* mesh, char** error_message)
     if (error_message)
     {
       const char* msg = "Exception during mesh validation";
-      *error_message = new char[std::strlen(msg) + 1];
-      std::strcpy(*error_message, msg);
+      try
+      {
+        *error_message = new char[std::strlen(msg) + 1];
+        std::strcpy(*error_message, msg);
+      }
+      catch (const std::bad_alloc& e)
+      {
+        f3d::log::error("Failed to allocate memory for error message: ", e.what());            
+      }
     }
     return 0;
   }
