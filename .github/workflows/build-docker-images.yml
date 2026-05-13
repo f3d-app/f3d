@@ -10,10 +10,6 @@ on:
       - "doc/**"
       - "_config.yml"
 
-concurrency:
-  group: "${{ github.workflow }}-${{  github.ref_name }}"
-  cancel-in-progress: true
-
 jobs:
   #----------------------------------------------------------------------------
   # Build android/wasm docker images if needed
