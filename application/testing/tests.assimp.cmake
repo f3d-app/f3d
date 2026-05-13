@@ -54,7 +54,7 @@ if("${F3D_ASSIMP_VERSION}" VERSION_GREATER_EQUAL "6.0.1")
 endif()
 
 # Armature support
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219 AND "${F3D_ASSIMP_VERSION}" VERSION_GREATER_EQUAL "5.4.3")
   f3d_test(NAME TestFBXRigArmature DATA punch.fbx ARGS --animation-time=1 --armature PLUGIN assimp)
   f3d_test(NAME TestFBXRigArmatureWithOpacity DATA punch.fbx ARGS --animation-time=1 --armature --opacity=0.5 -p PLUGIN assimp)
   f3d_test(NAME TestFBXRigArmatureSphereTube DATA punch.fbx ARGS --animation-time=1 --armature --point-size=20 --line-width=5 PLUGIN assimp)

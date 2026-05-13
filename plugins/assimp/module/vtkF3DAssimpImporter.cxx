@@ -876,10 +876,12 @@ public:
       this->UpdateBones();
 
       // Build armature visualization if requested
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20241219)
       if (this->Parent->GetImportArmature())
       {
         this->BuildArmature(renderer);
       }
+#endif
     }
   }
 
@@ -1067,7 +1069,9 @@ public:
 vtkF3DAssimpImporter::vtkF3DAssimpImporter()
   : Internals(new vtkF3DAssimpImporter::vtkInternals(this))
 {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20241219)
   this->ImportArmatureOn();
+#endif
 }
 
 //----------------------------------------------------------------------------
