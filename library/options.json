@@ -183,6 +183,10 @@
       "opacity": {
         "type": "double",
         "default_value": "0.9"
+      },
+      "color": {
+        "type": "color",
+        "parsed_default_value": "f3d_black"
       }
     },
     "axis": {

@@ -135,6 +135,11 @@ public:
   ///@}
 
   /**
+   * Set the backdrop color on the underlying UI Actor
+   */
+  void SetBackdropColor(const std::array<double, 3>& color);
+
+  /**
    * Set the backdrop opacity
    * Should be called before ShowAxis
    */

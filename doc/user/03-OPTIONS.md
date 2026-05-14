@@ -224,6 +224,10 @@ Only supported on Windows platform.
 Provide a script file containing a list of [commands](07-COMMANDS.md) to be executed sequentially.
 Allows automation of multiple commands or pre-defined tasks.
 
+### `--backdrop-color=<color>` (_color_, default: `f3d_black`)
+
+Set the color of the backdrop behind text information such as FPS, filename, metadata or cheatsheet.
+
 ### `--backdrop-opacity=<opacity>` (_double_, default: `0.9`)
 
 Set the opacity of the backdrop behind text information such as FPS, filename, metadata or cheatsheet.

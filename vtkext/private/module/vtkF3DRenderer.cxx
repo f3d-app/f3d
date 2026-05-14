@@ -1601,6 +1601,12 @@ void vtkF3DRenderer::SetDPIAware(bool enable)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetBackdropColor(const std::array<double, 3>& color)
+{
+  this->UIActor->SetBackdropColor(color);
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetBackdropOpacity(const double backdropOpacity)
 {
   this->UIActor->SetBackdropOpacity(backdropOpacity);

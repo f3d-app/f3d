@@ -181,6 +181,16 @@ void vtkF3DUIActor::SetFontColor(const std::array<double, 3>& color)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetBackdropColor(const std::array<double, 3>& color)
+{
+  if (this->BackdropColor != color)
+  {
+    this->BackdropColor = color;
+    this->Initialized = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::SetBackdropOpacity(const double backdropOpacity)
 {
   if (this->BackdropOpacity != backdropOpacity)
