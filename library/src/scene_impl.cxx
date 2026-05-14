@@ -264,6 +264,31 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
         "reader");
     }
 
+    // If CanReadFile fails then only proceed if debugging otherwise throw error
+    if (!reader->canRead(filePath.string()))
+    {
+      if (f3d::log::getVerboseLevel() != f3d::log::VerboseLevel::DEBUG)
+      {
+        if (forceReader)
+        {
+          throw scene::load_failure_exception(filePath.string() +
+            " could not be read by the forced reader \"" + reader->getName() +
+            "\" , use the --verbose command flag for more information");
+        }
+        else
+        {
+          throw scene::load_failure_exception(filePath.string() +
+            " could not be read by the guessed reader \"" + reader->getName() +
+            "\" , use the --verbose command flag for more information");
+        }
+      }
+      else
+      {
+        log::debug("The reader \"", reader->getName(), "\" is reporting it cannot read the file \"",
+          filePath.string(), "\".");
+      }
+    }
+
     vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(filePath.string());
     if (!importer)
     {
@@ -340,6 +365,30 @@ scene& scene_impl::add(const std::byte* buffer, std::size_t size)
 
   vtkNew<vtkMemoryResourceStream> stream;
   stream->SetBuffer(buffer, size);
+
+  // If CanReadFile fails then only proceed if debugging otherwise throw error
+    if (!reader->canRead(stream))
+    {
+      if (f3d::log::getVerboseLevel() != f3d::log::VerboseLevel::DEBUG)
+      {
+        if (forceReader)
+        {
+          throw scene::load_failure_exception(
+            "stream could not be read by the forced reader \"" + reader->getName() +
+            "\" , use the --verbose command flag for more information");
+        }
+        else
+        {
+          throw scene::load_failure_exception(
+            "stream could not be read by the guessed reader \"" + reader->getName() +
+            "\" , use the --verbose command flag for more information");
+        }
+      }
+      else
+      {
+        log::debug("The reader \"", reader->getName(), "\" is reporting it cannot read the stream");
+      }
+    }
 
   vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(stream);
   if (!importer)
