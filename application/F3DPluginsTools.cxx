@@ -57,4 +57,3 @@ void F3DPluginsTools::LoadPlugins(
     f3d::log::warn("Plugin failed to load: ", e.what());
   }
 }
-
