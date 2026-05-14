@@ -4,9 +4,20 @@
 add_test(NAME f3d::TestNoNoConfig COMMAND $<TARGET_FILE:f3d> --no-render)
 set_tests_properties(f3d::TestNoNoConfig PROPERTIES TIMEOUT 4)
 
-# Test that we can try loading a plugin without F3D_PLUGINS_PATH being defined
-add_test(NAME f3d::TestNoEnvInvalidPlugin COMMAND $<TARGET_FILE:f3d> --load-plugins=invalid --no-render)
-set_tests_properties(f3d::TestNoEnvInvalidPlugin PROPERTIES PASS_REGULAR_EXPRESSION "Cannot open the library")
+# Test that we can try loading a plugin without --plugins-path being defined
+add_test(NAME f3d::TestNoCliInvalidPlugin COMMAND $<TARGET_FILE:f3d> --load-plugins=invalid --no-render)
+set_tests_properties(f3d::TestNoCliInvalidPlugin PROPERTIES PASS_REGULAR_EXPRESSION "Cannot open the library")
+
+# Test --plugins-path without f3d_test to specify option directly
+if (F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
+    # Load a plugin using --plugins-path defined
+    add_test(NAME f3d::TestCliPluginsPath COMMAND $<TARGET_FILE:f3d> --load-plugins=alembic,assimp --plugins-path=${CMAKE_LIBRARY_OUTPUT_DIRECTORY} --no-render --verbose)
+    set_tests_properties(f3d::TestCliPluginsPath PROPERTIES PASS_REGULAR_EXPRESSION "from\: \\""${CMAKE_LIBRARY_OUTPUT_DIRECTORY}\\""")
+
+    # --list-readers with --plugins-path
+    add_test(NAME f3d::TestListReadersCliPluginsPath COMMAND $<TARGET_FILE:f3d> --list-readers --load-plugins=alembic,assimp --plugins-path=${CMAKE_LIBRARY_OUTPUT_DIRECTORY} --no-render --verbose)
+    set_tests_properties(f3d::TestListReadersCliPluginsPath PROPERTIES FAIL_REGULAR_EXPRESSION "No registered reader found")
+endif ()
 
 # Test invalid CLI args
 add_test(NAME f3d::TestInvalidCLIArgs COMMAND $<TARGET_FILE:f3d> --up)
