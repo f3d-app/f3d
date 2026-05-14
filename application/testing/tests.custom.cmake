@@ -12,7 +12,7 @@ set_tests_properties(f3d::TestNoCliInvalidPlugin PROPERTIES PASS_REGULAR_EXPRESS
 if (F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
     # Load a plugin using --plugins-path defined
     add_test(NAME f3d::TestCliPluginsPath COMMAND $<TARGET_FILE:f3d> --load-plugins=alembic,assimp --plugins-path=${CMAKE_LIBRARY_OUTPUT_DIRECTORY} --no-render --verbose)
-    set_tests_properties(f3d::TestCliPluginsPath PROPERTIES PASS_REGULAR_EXPRESSION "from\: \\""${CMAKE_LIBRARY_OUTPUT_DIRECTORY}\\""")
+    set_tests_properties(f3d::TestCliPluginsPath PROPERTIES PASS_REGULAR_EXPRESSION "from: \"\"${CMAKE_LIBRARY_OUTPUT_DIRECTORY}\"\"")
 
     # --list-readers with --plugins-path
     add_test(NAME f3d::TestListReadersCliPluginsPath COMMAND $<TARGET_FILE:f3d> --list-readers --load-plugins=alembic,assimp --plugins-path=${CMAKE_LIBRARY_OUTPUT_DIRECTORY} --no-render --verbose)
