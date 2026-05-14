@@ -37,6 +37,16 @@ if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestReadersListMultiplePlugins ARGS --list-readers --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load" LABELS "plugin;assimp;alembic")
 endif()
 
+# Test --plugins-path options
+if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
+  # --list-readers with --plugins-path
+  add_test(NAME f3d::TestListReadersCliPluginsPath COMMAND $<TARGET_FILE:f3d> --list-readers --load-plugins=alembic,assimp --plugins-path=${CMAKE_LIBRARY_OUTPUT_DIRECTORY} --no-render --verbose)
+  set_tests_properties(f3d::TestListReadersCliPluginsPath PROPERTIES FAIL_REGULAR_EXPRESSION "No registered reader found")
+
+  f3d_test(NAME TestCliPluginsPath ARGS --load-plugins=assimp,alembic --verbose PLUGINS_PATH ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} NO_BASELINE NO_RENDER REGEXP "from: \"\"${CMAKE_LIBRARY_OUTPUT_DIRECTORY}\"\"" LABELS "plugin;assimp;alembic")
+  f3d_test(NAME TestListReadersCliPluginsPath ARGS --list-readers --load-plugins=assimp,alembic --verbose PLUGINS_PATH ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} NO_BASELINE NO_RENDER REGEXP_FAIL "No registered reader found" LABELS "plugin;assimp;alembic")
+endif()
+
 f3d_test(NAME TestForceReaderFail DATA suzanne.stl ARGS --force-reader=GLTF NO_BASELINE REGEXP "Some of these files could not be loaded: failed to load scene" LABELS "plugin")
 f3d_test(NAME TestForceReaderPass DATA suzanne.not_supported ARGS --force-reader=STL LABELS "plugin")
 f3d_test(NAME TestForceReaderInvalid DATA suzanne.stl ARGS --force-reader=INVALID NO_BASELINE REGEXP "Forced reader .* doesn't exist" LABELS "plugin")
