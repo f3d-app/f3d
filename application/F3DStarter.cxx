@@ -729,14 +729,7 @@ public:
       this->AppOptions.VerboseLevel, this->AppOptions.Output == F3D_PIPED);
 
     // Load any new plugins
-    if (!this->AppOptions.PluginsPath.empty())
-    {
-      F3DPluginsTools::LoadPlugins(this->AppOptions.Plugins, this->AppOptions.PluginsPath);
-    }
-    else
-    {
-      F3DPluginsTools::LoadPlugins(this->AppOptions.Plugins);
-    }
+    F3DPluginsTools::LoadPlugins(this->AppOptions.Plugins, this->AppOptions.PluginsPath);
 
     // Update libf3d options
     this->LibOptions = libOptions;

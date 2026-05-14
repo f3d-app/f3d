@@ -110,7 +110,7 @@
         },
         {
           "longName": "plugins-path",
-          "helpText": "CODY",
+          "helpText": "Path specifying where to load plugins from",
           "valueHelper": "<path>"
         },
         {

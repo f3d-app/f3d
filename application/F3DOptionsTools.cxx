@@ -398,6 +398,7 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       // `--list-readers` needs plugin to be loaded to be useful
       // Load them manually
       std::vector<std::string> plugins;
+      std::string pluginsPath;
       if (result.count("load-plugins") > 0)
       {
         plugins =
@@ -406,14 +407,10 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
 
       if (result.count("plugins-path") > 0)
       {
-        const std::string pluginsPath = f3d::options::parse<std::string>(result["plugins-path"].as<std::string>());
-        F3DPluginsTools::LoadPlugins(plugins, pluginsPath);
-      }
-      else
-      {
-        F3DPluginsTools::LoadPlugins(plugins);
+        pluginsPath = f3d::options::parse<std::string>(result["plugins-path"].as<std::string>());
       }
 
+      F3DPluginsTools::LoadPlugins(plugins, pluginsPath);
       ::PrintReadersList();
       throw F3DExNoProcess("reader list requested");
     }
