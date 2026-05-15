@@ -118,6 +118,10 @@
         "mode": {
           "type": "string",
           "default_value": "fxaa"
+        },
+        "taa_movement_blending": {
+          "type": "string",
+          "default_value": ""
         }
       },
       "ambient_occlusion": {
