@@ -1,7 +1,7 @@
 set(sources "")
 set(private_headers ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DUserEvents.h)
 
-set(F3D_DEFAULT_HDRI "${F3D_SOURCE_DIR}/resources/defaultHDRI.png" CACHE PATH "Default HDRI when no HDRI file is provided")
+set(F3D_DEFAULT_HDRI "${F3D_SOURCE_DIR}/resources/defaultHDRI.hdr" CACHE PATH "Default HDRI when no HDRI file is provided")
 mark_as_advanced(F3D_DEFAULT_HDRI)
 include("f3dEmbed")
 f3d_embed_file(
