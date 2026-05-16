@@ -102,6 +102,18 @@ void apply_to_all(F3DOptionsTools::OptionValue& option, Callable f)
     },
     option);
 }
+void HandleDefine(f3d::options& libOptions, const std::string& optionValue)
+{
+  std::string::size_type sepidx = optionValue.find_first_of('=');
+  if (sepidx == std::string::npos)
+  {
+    f3d::log::warn("Could not parse a define '", optionValue, "'");
+    return;
+  }
+  const auto key = optionValue.substr(0, sepidx);
+  const auto value = optionValue.substr(sepidx + 1);
+  libOptions.setAsString(key, value);
+}
 }
 
 class F3DStarter::F3DInternals
@@ -705,6 +717,15 @@ public:
                           return;
                         }
                         libOptions.reset(value);
+                      });
+                  }
+                  else if (libf3dOptionName == "define")
+                  {
+                    apply_to_all(libf3dOptionValue,
+                      [&libOptions, &keyForLog](const std::string& value)
+                      {
+                        keyForLog = value;
+                        HandleDefine(libOptions, value);
                       });
                   }
                   else
