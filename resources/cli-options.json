@@ -17,7 +17,8 @@
         {
           "longName": "reset",
           "shortName": "R",
-          "helpText": "Reset libf3d options"
+          "helpText": "Reset libf3d options",
+          "valueHelper": "<string_list>"
         },
         {
           "longName": "output",

@@ -27,11 +27,10 @@ namespace
 {
 /**
  * True boolean options need to be filtered out in ParseCLIOptions
- * Also filter out special options like `define` and `reset`
  * This is the easiest, compile time way to do it
  */
 constexpr std::array CLIBooleans = { "version", "help", "list-readers", "scan-plugins",
-  "list-rendering-backends", "list-video-encoders", "define", "reset" };
+  "list-rendering-backends", "list-video-encoders" };
 
 //----------------------------------------------------------------------------
 /**
@@ -290,9 +289,6 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
   std::vector<std::string> defines;
   auto cxxoptsDefines = cxxopts::value<std::vector<std::string>>(defines);
 
-  std::vector<std::string> resets;
-  auto cxxoptsResets = cxxopts::value<std::vector<std::string>>(resets);
-
   try
   {
     cxxopts::Options cxxOptions(execName, F3D::AppTitle);
@@ -307,7 +303,6 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       {
         group("input", "Input files", cxxoptsInputPositionals, "<files>");
         group("D,define", "Define libf3d options", cxxoptsDefines, "libf3d.option=value");
-        group("R,reset", "Reset libf3d options", cxxoptsResets, "libf3d.option");
       }
 
       // Add each option to cxxopts
@@ -325,6 +320,7 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
           std::string defaultValue;
           std::string helpText(cliOption.HelpText);
           const std::string longName(cliOption.LongName);
+          const std::string valueHelper(cliOption.ValueHelper);
 
           // Recover default value from app options
           auto appIter = F3DOptionsTools::DefaultAppOptions.find(longName);
@@ -357,7 +353,14 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
           }
 
           // Recover the implicit value and set it if any
-          cxxoptsValues.emplace_back(cxxopts::value<std::string>());
+          if (valueHelper == "<string_list>")
+          {
+            cxxoptsValues.emplace_back(cxxopts::value<std::vector<std::string>>());
+          }
+          else
+          {
+            cxxoptsValues.emplace_back(cxxopts::value<std::string>());
+          }
           auto& val = cxxoptsValues.back();
           if (!cliOption.ImplicitValue.empty())
           {
@@ -461,9 +464,28 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
     for (const auto& res : result)
     {
       // Discard boolean option like `--version` or `--help`
-      if (std::ranges::find(::CLIBooleans, res.key()) == ::CLIBooleans.end())
+      if (std::ranges::find(::CLIBooleans, res.key()) != ::CLIBooleans.end())
+      {
+        continue;
+      }
+      auto iter = cliOptionsDict.find(res.key());
+      if(iter == cliOptionsDict.end())
       {
         cliOptionsDict[res.key()] = res.value();
+      }
+      else  
+      {
+        // key already exists. Create or append to vector
+        if(std::holds_alternative<std::vector<std::string>>(iter->second))
+        {
+          auto& vec =  std::get<std::vector<std::string>>(iter->second);
+          vec.push_back(res.value());
+        }
+        else 
+        {
+          auto& item =  std::get<std::string>(iter->second);
+          cliOptionsDict[res.key()] = std::vector<std::string>{item,res.value()};
+        }
       }
     }
 
@@ -477,12 +499,6 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
         continue;
       }
       cliOptionsDict[define.substr(0, sepIdx)] = define.substr(sepIdx + 1);
-    }
-
-    // Handles reset using the dedicated syntax
-    for (const std::string& reset : resets)
-    {
-      cliOptionsDict["reset-" + reset] = "";
     }
 
     return cliOptionsDict;
