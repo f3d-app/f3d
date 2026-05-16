@@ -12,7 +12,8 @@
         {
           "longName": "define",
           "shortName": "D",
-          "helpText": "Define libf3d options"
+          "helpText": "Define libf3d options",
+          "valueHelper": "<string_list>"
         },
         {
           "longName": "reset",
