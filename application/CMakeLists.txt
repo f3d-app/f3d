@@ -191,7 +191,7 @@ f3d_generate_cli_options(
   F3D_SOURCE_DIR "${F3D_SOURCE_DIR}"
   F3D_BINARY_DIR "${F3D_BINARY_DIR}"
   ENABLED_CONDITIONALS ${f3d_enabled_conditionals} # Do NOT quote so this stays a list
-  CPP_CLI_OPTIONS_TO_SKIP input;define # Do NOT quote so this stays a list
+  CPP_CLI_OPTIONS_TO_SKIP input # Do NOT quote so this stays a list
 )
 
 set(F3D_SOURCE_FILES

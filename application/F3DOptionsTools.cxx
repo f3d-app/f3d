@@ -274,9 +274,6 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
   std::vector<std::shared_ptr<cxxopts::Value>> cxxoptsValues;
   auto cxxoptsInputPositionals = cxxopts::value<std::vector<std::string>>(positionals);
 
-  std::vector<std::string> defines;
-  auto cxxoptsDefines = cxxopts::value<std::vector<std::string>>(defines);
-
   try
   {
     cxxopts::Options cxxOptions(execName, F3D::AppTitle);
@@ -290,7 +287,6 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       if (std::string(optionGroup.GroupName) == "Applicative")
       {
         group("input", "Input files", cxxoptsInputPositionals, "<files>");
-        group("D,define", "Define libf3d options", cxxoptsDefines, "libf3d.option=value");
       }
 
       // Add each option to cxxopts
@@ -453,36 +449,24 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
         continue;
       }
       auto iter = cliOptionsDict.find(res.key());
-      if(iter == cliOptionsDict.end())
+      if (iter == cliOptionsDict.end())
       {
         cliOptionsDict[res.key()] = res.value();
       }
-      else  
+      else
       {
         // key already exists. Create or append to vector
-        if(std::holds_alternative<std::vector<std::string>>(iter->second))
+        if (std::holds_alternative<std::vector<std::string>>(iter->second))
         {
-          auto& vec =  std::get<std::vector<std::string>>(iter->second);
+          auto& vec = std::get<std::vector<std::string>>(iter->second);
           vec.push_back(res.value());
         }
-        else 
+        else
         {
-          auto& item =  std::get<std::string>(iter->second);
-          cliOptionsDict[res.key()] = std::vector<std::string>{item,res.value()};
+          auto& item = std::get<std::string>(iter->second);
+          cliOptionsDict[res.key()] = std::vector<std::string>{ item, res.value() };
         }
       }
-    }
-
-    // Handle defines and add them as proper options
-    for (const std::string& define : defines)
-    {
-      std::string::size_type sepIdx = define.find_first_of('=');
-      if (sepIdx == std::string::npos)
-      {
-        f3d::log::warn("Could not parse a define '", define, "'");
-        continue;
-      }
-      cliOptionsDict[define.substr(0, sepIdx)] = define.substr(sepIdx + 1);
     }
 
     return cliOptionsDict;
