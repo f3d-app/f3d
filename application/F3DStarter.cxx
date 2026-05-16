@@ -71,6 +71,39 @@ f3d::interactor* GlobalInteractor = nullptr;
 
 constexpr std::string_view F3D_PIPED = "-";
 
+namespace
+{
+// helper to apply Callable to all items of OptionValue no matter if it is a
+// single valued string or a vector of strings
+// based on example at https://en.cppreference.com/cpp/utility/variant/visit2
+
+template<typename Callable>
+void apply_to_all(F3DOptionsTools::OptionValue& option, Callable f)
+{
+  std::visit(
+    [f](auto&& value)
+    {
+      using T = std::decay_t<decltype(value)>;
+      if constexpr (std::is_same_v<T, std::string>)
+      {
+        f(value);
+      }
+      else if constexpr (std::is_same_v<T, std::vector<std::string>>)
+      {
+        for (auto& item : value)
+        {
+          f(item);
+        }
+      }
+      else
+      {
+        static_assert(false, "non-exhaustive visitor!");
+      }
+    },
+    option);
+}
+}
+
 class F3DStarter::F3DInternals
 {
 public:
@@ -645,26 +678,6 @@ public:
               {
                 auto [libf3dOptionName, libf3dOptionValue] = libf3dOption;
 
-                bool reset = false;
-
-                // Handle options reset
-                if (libf3dOptionName.starts_with("reset-"))
-                {
-                  if (libf3dOptionName.size() > 6)
-                  {
-                    reset = true;
-                    libf3dOptionName = libf3dOptionName.substr(6);
-                    keyForLog = libf3dOptionName;
-                    libf3dOptionValue = "reset";
-                  }
-                  else
-                  {
-                    f3d::log::warn("Invalid option: 'reset' must be followed by a valid option "
-                                   "name, ignoring entry");
-                    continue;
-                  }
-                }
-
                 // Handle reader options
                 std::vector<std::string> readerOptionNames = f3d::engine::getAllReaderOptionNames();
                 if (std::ranges::find(readerOptionNames, libf3dOptionName) !=
@@ -679,10 +692,20 @@ public:
 
                 try
                 {
-                  // Assume this is a libf3d option and set/reset the value
-                  if (reset)
+                  if (libf3dOptionName == "reset")
                   {
-                    libOptions.reset(libf3dOptionName);
+                    apply_to_all(libf3dOptionValue,
+                      [&libOptions, &keyForLog](const std::string& value)
+                      {
+                        keyForLog = value;
+                        if (value.empty())
+                        {
+                          f3d::log::warn("Invalid option: 'reset' must be followed by a valid "
+                                         "option name, ignoring entry");
+                          return;
+                        }
+                        libOptions.reset(value);
+                      });
                   }
                   else
                   {
@@ -714,8 +737,7 @@ public:
                   if (!quiet)
                   {
                     const std::string origin = F3DInternals::FormatOrigin(source, matchType, match);
-                    auto [closestName, dist] =
-                      F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
+                    auto [closestName, dist] = F3DOptionsTools::GetClosestOption(keyForLog, true);
                     f3d::log::warn("'", keyForLog, "' option from ", origin,
                       " does not exists , did you mean '", closestName, "'?");
                   }
@@ -1578,6 +1600,7 @@ void F3DStarter::LoadFileGroupInternal(
   // options names are shared between options instance
   F3DOptionsTools::OptionsDict dynamicOptionsDict;
   std::vector<std::string> optionNames = dynamicOptions.getAllNames();
+  std::vector<std::string> resets;
   for (const auto& name : optionNames)
   {
     if (!dynamicOptions.isSame(this->Internals->LibOptions, name))
@@ -1586,7 +1609,7 @@ void F3DStarter::LoadFileGroupInternal(
       {
         // If a dynamic option has been changed and does not have value, it means it was reset using
         // the command line reset it using the dedicated syntax
-        dynamicOptionsDict["reset-" + name] = "";
+        resets.push_back(name);
       }
       else
       {
@@ -1596,6 +1619,7 @@ void F3DStarter::LoadFileGroupInternal(
       }
     }
   }
+  dynamicOptionsDict["reset"] = resets;
 
   // Detect interactively changed verbose level and add it to dynamic options
   f3d::log::VerboseLevel currentVerboseLevel = f3d::log::getVerboseLevel();
