@@ -201,6 +201,16 @@ void vtkF3DUIActor::SetBackdropOpacity(const double backdropOpacity)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetSceneHierarchyMaxWidth(const int width)
+{
+  if (this->SceneHierarchyMaxWidth != width)
+  {
+    this->SceneHierarchyMaxWidth = width;
+    this->Initialized = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
 {
   vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(vp->GetVTKWindow());
