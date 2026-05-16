@@ -76,7 +76,8 @@ class F3DStarter::F3DInternals
 public:
   F3DInternals() = default;
 
-  using log_entry_t = std::tuple<std::string, std::string, std::string, std::string, std::string>;
+  using log_entry_t =
+    std::tuple<std::string, std::string, std::string, std::string, F3DOptionsTools::OptionValue>;
 
   // XXX: The values in the following two structs
   // are left uninitialized as the will all be initialized from
@@ -571,7 +572,8 @@ public:
     {
       const auto& [bindStr, source, matchType, match, commands] = tuple;
       const std::string origin = F3DInternals::FormatOrigin(source, matchType, match);
-      f3d::log::debug(" '", bindStr, "' ", sep, " '", commands, "' from ", origin);
+      f3d::log::debug(" '", bindStr, "' ", sep, " '", F3DOptionsTools::ConvertToString(commands),
+        "' from ", origin);
     }
     f3d::log::debug("");
   }
@@ -669,7 +671,10 @@ public:
                 if (std::ranges::find(readerOptionNames, libf3dOptionName) !=
                   readerOptionNames.end())
                 {
-                  f3d::engine::setReaderOption(libf3dOptionName, libf3dOptionValue);
+                  assert(std::holds_alternative<std::string>(libf3dOptionValue));
+                  std::string libf3dOptionValueStr = std::get<std::string>(libf3dOptionValue);
+
+                  f3d::engine::setReaderOption(libf3dOptionName, libf3dOptionValueStr);
                   continue;
                 }
 
@@ -682,7 +687,10 @@ public:
                   }
                   else
                   {
-                    libOptions.setAsString(libf3dOptionName, libf3dOptionValue);
+                    assert(std::holds_alternative<std::string>(libf3dOptionValue));
+                    const std::string libf3dOptionValueStr =
+                      std::get<std::string>(libf3dOptionValue);
+                    libOptions.setAsString(libf3dOptionName, libf3dOptionValueStr);
                   }
 
                   // Log the option if needed
@@ -697,8 +705,9 @@ public:
                   if (!quiet)
                   {
                     const std::string origin = F3DInternals::FormatOrigin(source, matchType, match);
-                    f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue,
-                      "' from ", origin, " because: ", ex.what());
+                    f3d::log::warn("Could not set '", keyForLog, "' to '",
+                      F3DOptionsTools::ConvertToString(libf3dOptionValue), "' from ", origin,
+                      " because: ", ex.what());
                   }
                 }
                 catch (const f3d::options::inexistent_exception&)
@@ -750,7 +759,8 @@ public:
   {
     if (!F3DOptionsTools::Parse(appOptions.at(name), option))
     {
-      f3d::log::warn("Could not parse '" + appOptions.at(name) + "' into '" + name + "' option");
+      f3d::log::warn("Could not parse '" + F3DOptionsTools::ConvertToString(appOptions.at(name)) +
+        "' into '" + name + "' option");
     }
   }
 
@@ -762,7 +772,7 @@ public:
   void ParseOption(const F3DOptionsTools::OptionsDict& appOptions, const std::string& name,
     std::optional<T>& option)
   {
-    const std::string& optStr = appOptions.at(name);
+    const std::string& optStr = F3DOptionsTools::ConvertToString(appOptions.at(name));
     if (optStr.empty())
     {
       option = std::nullopt;
@@ -1071,8 +1081,8 @@ int F3DStarter::Start(int argc, char** argv)
   {
     if (!F3DOptionsTools::Parse(iter->second, noConfig))
     {
-      f3d::log::warn(
-        "Could not parse '" + iter->second + "' into 'no-config' option, assuming false");
+      f3d::log::warn("Could not parse '" + F3DOptionsTools::ConvertToString(iter->second) +
+        "' into 'no-config' option, assuming false");
     }
   }
 

@@ -312,7 +312,9 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
           auto appIter = F3DOptionsTools::DefaultAppOptions.find(longName);
           if (appIter != F3DOptionsTools::DefaultAppOptions.end())
           {
-            defaultValue = appIter->second;
+            // defaults are always stored as strings
+            assert(std::holds_alternative<std::string>(appIter->second));
+            defaultValue = std::get<std::string>(appIter->second);
           }
           else
           {
@@ -431,7 +433,7 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       throw F3DExFailure("unknown options");
     }
 
-    // Add each CLI options into a vector of string/string and return it
+    // Add each CLI options into a OptionsDict and return it
     F3DOptionsTools::OptionsDict cliOptionsDict;
     for (const auto& res : result)
     {
@@ -484,10 +486,11 @@ void F3DOptionsTools::PrintHelpPair(
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3dOptions(
-  const std::string& key, const std::string& value)
+std::vector<std::pair<std::string, F3DOptionsTools::OptionValue>>
+F3DOptionsTools::ConvertToLibf3dOptions(const std::string& key, const OptionValue& value)
 {
-  std::vector<std::pair<std::string, std::string>> libf3dOptions;
+  std::vector<std::pair<std::string, F3DOptionsTools::OptionValue>> libf3dOptions;
+  const bool is_single_valued = std::holds_alternative<std::string>(value);
 
   // Simple one-to-one case
   auto libf3dIter = F3DOptionsTools::LibOptionsNames.find(key);
@@ -502,4 +505,20 @@ std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3
   }
 
   return libf3dOptions;
+}
+
+std::string F3DOptionsTools::ConvertToString(const F3DOptionsTools::OptionValue& optionValue)
+{
+  if (std::holds_alternative<std::string>(optionValue))
+  {
+    return std::get<std::string>(optionValue);
+  }
+  else if (std::holds_alternative<std::vector<std::string>>(optionValue))
+  {
+    const auto& vec = std::get<std::vector<std::string>>(optionValue);
+    auto concatenate = [](const std::string& result, const std::string& value)
+    { return result + " , " + value; };
+    return std::accumulate(vec.cbegin(), vec.cend(), std::string{ "" }, concatenate);
+  }
+  return "";
 }
