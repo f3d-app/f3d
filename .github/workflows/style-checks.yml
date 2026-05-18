@@ -35,7 +35,7 @@ jobs:
           codespell -fHw .
 
       - name: C++ Formatting
-        uses: DoozyX/clang-format-lint-action@v0.16
+        uses: DoozyX/clang-format-lint-action@v0.20
         with:
           source: "."
           extensions: "h,cxx,in"
