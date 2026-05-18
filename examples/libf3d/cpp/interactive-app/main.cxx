@@ -93,7 +93,7 @@ void AddCustomCommands(f3d::engine& eng)
     f3d::interactor::command_documentation_t{ "toggle_tonemapping", "Toggle tone mapping" });
 }
 
-void AddCustomBindins(f3d::engine& eng)
+void AddCustomBindings(f3d::engine& eng)
 {
   // Get the interactor
   f3d::interactor& inter = eng.getInteractor();
@@ -194,7 +194,7 @@ int main(int argc, char** argv)
   opt.render.effect.tone_mapping = true;
 
   ::AddCustomCommands(eng);
-  ::AddCustomBindins(eng);
+  ::AddCustomBindings(eng);
 
   try
   {

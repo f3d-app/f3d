@@ -5,8 +5,25 @@
 
 ClothSolver::ClothSolver()
 {
+  this->initialize();
+}
+
+void ClothSolver::initialize()
+{
+  this->currentTime = 0.f;
+
   constexpr int gridSize = 40;
   constexpr float edgeLen = 2.0f / static_cast<float>(gridSize);
+
+  this->positions.clear();
+  this->normals.clear();
+  this->tcoords.clear();
+  this->inversed_masses.clear();
+  this->next_positions.clear();
+  this->velocities.clear();
+  this->face_indices.clear();
+  this->face_offsets.clear();
+  this->distance_constraints.clear();
 
   for (int i = 0; i <= gridSize; i++)
   {
@@ -63,11 +80,26 @@ ClothSolver::ClothSolver()
 
 void ClothSolver::update(double newTime)
 {
+  if (newTime == 0.0)
+  {
+    if (this->currentTime != 0.0)
+    {
+      this->initialize();
+    }
+    return;
+  }
+
   double timeStep = newTime - this->currentTime;
 
-  if (timeStep <= 0.0)
+  if (timeStep == 0.0)
   {
-    return; // no update needed
+    return;
+  }
+
+  if (timeStep < 0.0)
+  {
+    this->initialize();
+    return;
   }
 
   this->currentTime = newTime;
@@ -91,9 +123,9 @@ void ClothSolver::update(double newTime)
     {
       unsigned int i1 = constraint.p1 * 3;
       unsigned int i2 = constraint.p2 * 3;
-      float dx = this->next_positions[i1] - this->next_positions[i2];
-      float dy = this->next_positions[i1 + 1] - this->next_positions[i2 + 1];
-      float dz = this->next_positions[i1 + 2] - this->next_positions[i2 + 2];
+      float dx = this->next_positions[i2] - this->next_positions[i1];
+      float dy = this->next_positions[i2 + 1] - this->next_positions[i1 + 1];
+      float dz = this->next_positions[i2 + 2] - this->next_positions[i1 + 2];
       float len = std::sqrt(dx * dx + dy * dy + dz * dz);
       float diff = (len - constraint.rest_length) / len;
       float invMass1 = this->inversed_masses[constraint.p1];
@@ -103,12 +135,12 @@ void ClothSolver::update(double newTime)
       {
         float correction1 = (invMass1 / sumInvMass) * diff;
         float correction2 = (invMass2 / sumInvMass) * diff;
-        this->next_positions[i1] -= correction1 * dx;
-        this->next_positions[i1 + 1] -= correction1 * dy;
-        this->next_positions[i1 + 2] -= correction1 * dz;
-        this->next_positions[i2] += correction2 * dx;
-        this->next_positions[i2 + 1] += correction2 * dy;
-        this->next_positions[i2 + 2] += correction2 * dz;
+        this->next_positions[i1] += correction1 * dx;
+        this->next_positions[i1 + 1] += correction1 * dy;
+        this->next_positions[i1 + 2] += correction1 * dz;
+        this->next_positions[i2] -= correction2 * dx;
+        this->next_positions[i2 + 1] -= correction2 * dy;
+        this->next_positions[i2 + 2] -= correction2 * dz;
       }
     }
   }

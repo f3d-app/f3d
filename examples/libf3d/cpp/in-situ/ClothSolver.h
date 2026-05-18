@@ -6,6 +6,7 @@ class ClothSolver
 public:
   ClothSolver();
 
+  void initialize();
   void update(double timeStep);
 
   // accessors for visualization
