@@ -6,6 +6,26 @@ class ClothSolver
 public:
   ClothSolver();
 
+  void setGridSize(int gridSize)
+  {
+    this->gridSize = gridSize;
+  }
+
+  [[nodiscard]] int getGridSize() const
+  {
+    return this->gridSize;
+  }
+
+  void setIterations(int iterations)
+  {
+    this->iterations = iterations;
+  }
+
+  [[nodiscard]] int getIterations() const
+  {
+    return this->iterations;
+  }
+
   void initialize();
   void update(double timeStep);
 
@@ -24,6 +44,8 @@ public:
 
 private:
   double currentTime = 0.0;
+  int gridSize = 40;
+  int iterations = 100;
 
   std::vector<float> positions;
 

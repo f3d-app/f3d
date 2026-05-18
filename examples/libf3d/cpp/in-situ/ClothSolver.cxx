@@ -12,8 +12,7 @@ void ClothSolver::initialize()
 {
   this->currentTime = 0.f;
 
-  constexpr int gridSize = 40;
-  constexpr float edgeLen = 2.0f / static_cast<float>(gridSize);
+  const float edgeLen = 2.0f / static_cast<float>(this->gridSize);
 
   this->positions.clear();
   this->normals.clear();
@@ -25,9 +24,9 @@ void ClothSolver::initialize()
   this->face_offsets.clear();
   this->distance_constraints.clear();
 
-  for (int i = 0; i <= gridSize; i++)
+  for (int i = 0; i <= this->gridSize; i++)
   {
-    for (int j = 0; j <= gridSize; j++)
+    for (int j = 0; j <= this->gridSize; j++)
     {
       this->positions.push_back(-1.0f + i * edgeLen);
       this->positions.push_back(-1.0f + j * edgeLen);
@@ -35,12 +34,12 @@ void ClothSolver::initialize()
       this->normals.push_back(0.0f);
       this->normals.push_back(0.0f);
       this->normals.push_back(1.0f);
-      this->tcoords.push_back(static_cast<float>(i) / gridSize);
-      this->tcoords.push_back(static_cast<float>(j) / gridSize);
+      this->tcoords.push_back(static_cast<float>(i) / this->gridSize);
+      this->tcoords.push_back(static_cast<float>(j) / this->gridSize);
 
       this->inversed_masses.push_back(1.0f);
 
-      if ((i == gridSize) && (j == 0 || j == gridSize)) // pin the top left and top right corners
+      if ((i == this->gridSize) && (j == 0 || j == this->gridSize)) // pin the top left and top right corners
       {
         this->inversed_masses.back() = 0.0f;
       }
@@ -50,27 +49,40 @@ void ClothSolver::initialize()
   this->next_positions = this->positions;
   this->velocities.resize(this->positions.size(), 0.0f);
 
-  for (int i = 0; i < gridSize; i++)
+  for (int i = 0; i < this->gridSize; i++)
   {
-    for (int j = 0; j < gridSize; j++)
+    for (int j = 0; j < this->gridSize; j++)
     {
-      unsigned int topLeft = (i + 1) * (gridSize + 1) + j;
+      unsigned int topLeft = (i + 1) * (this->gridSize + 1) + j;
       unsigned int topRight = topLeft + 1;
-      unsigned int bottomLeft = i * (gridSize + 1) + j;
+      unsigned int bottomLeft = i * (this->gridSize + 1) + j;
       unsigned int bottomRight = bottomLeft + 1;
       this->face_indices.push_back(topRight);
       this->face_indices.push_back(bottomRight);
       this->face_indices.push_back(bottomLeft);
       this->face_indices.push_back(topLeft);
 
+      // avoid duplicated constraints by only creating them for the top and left edges of each quad
       this->distance_constraints.push_back({ .p1 = topLeft, .p2 = topRight, .rest_length = edgeLen });
       this->distance_constraints.push_back({ .p1 = topLeft, .p2 = bottomLeft, .rest_length = edgeLen });
-      this->distance_constraints.push_back({ .p1 = topRight, .p2 = bottomRight, .rest_length = edgeLen });
-      this->distance_constraints.push_back({ .p1 = bottomLeft, .p2 = bottomRight, .rest_length = edgeLen });
+
+      // but make sure to create constraints for the right and bottom edges of the last quads
+      if (j == this->gridSize - 1)
+      {
+        this->distance_constraints.push_back({ .p1 = topRight, .p2 = bottomRight, .rest_length = edgeLen });
+      }
+      if (i == this->gridSize - 1)
+      {
+        this->distance_constraints.push_back({ .p1 = bottomLeft, .p2 = bottomRight, .rest_length = edgeLen });
+      }
+
+      // add diagonal constraints for better stability
+      this->distance_constraints.push_back({ .p1 = topLeft, .p2 = bottomRight, .rest_length = std::sqrt(2.0f) * edgeLen });
+      this->distance_constraints.push_back({ .p1 = topRight, .p2 = bottomLeft, .rest_length = std::sqrt(2.0f) * edgeLen });
     }
   }
 
-  this->face_offsets.resize(gridSize * gridSize + 1);
+  this->face_offsets.resize(this->gridSize * this->gridSize + 1);
   std::generate(this->face_offsets.begin(), this->face_offsets.end(), [n = 0]() mutable {
       const unsigned int offset = n;
       n += 4;
@@ -117,7 +129,7 @@ void ClothSolver::update(double newTime)
   }
 
   // loop on constraints
-  for (int iter = 0; iter < 200; iter++) // iterate a few times for better convergence
+  for (int iter = 0; iter < this->iterations; iter++) // iterate a few times for better convergence
   {
     for (const DistanceConstraint& constraint : this->distance_constraints)
     {

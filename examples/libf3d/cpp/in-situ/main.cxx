@@ -57,7 +57,7 @@ int main(int argc, char** argv)
   // Load static/native plugins
   f3d::engine::autoloadPlugins();
 
-  f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
+  f3d::log::setVerboseLevel(f3d::log::VerboseLevel::INFO);
 
   // Create a native-window engine
   f3d::engine eng = f3d::engine::create();
@@ -95,6 +95,44 @@ int main(int argc, char** argv)
       eng.getScene().loadAnimationTime(0.0);
     },
     f3d::interactor::command_documentation_t{ "reset_simulation", "Reset simulation" });
+
+  inter.addCommand(
+    "set_cloth_resolution",
+    [&](const std::vector<std::string>& args)
+    {
+      if (args.size() != 1)
+      {
+        f3d::log::error("set_cloth_resolution command requires exactly 1 argument");
+        return;
+      }
+      int gridSize = std::stoi(args[0]);
+      if (gridSize < 2)
+      {
+        f3d::log::error("set_cloth_resolution command requires an integer argument greater than 1");
+        return;
+      }
+      solver.setGridSize(gridSize);
+    },
+    f3d::interactor::command_documentation_t{ "set_cloth_resolution", "Set cloth resolution" });
+
+  inter.addCommand(
+    "set_cloth_iterations",
+    [&](const std::vector<std::string>& args)
+    {
+      if (args.size() != 1)
+      {
+        f3d::log::error("set_cloth_iterations command requires exactly 1 argument");
+        return;
+      }
+      int iterations = std::stoi(args[0]);
+      if (iterations < 1)
+      {
+        f3d::log::error("set_cloth_iterations command requires an integer argument greater than 0");
+        return;
+      }
+      solver.setIterations(iterations);
+    },
+    f3d::interactor::command_documentation_t{ "set_cloth_iterations", "Set cloth iterations" });
 
   // Bindings
   inter.addBinding(
