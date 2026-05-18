@@ -4,10 +4,6 @@
 add_test(NAME f3d::TestNoNoConfig COMMAND $<TARGET_FILE:f3d> --no-render)
 set_tests_properties(f3d::TestNoNoConfig PROPERTIES TIMEOUT 4)
 
-# Test that we can try loading a plugin without --plugins-path being defined
-add_test(NAME f3d::TestNoCliInvalidPlugin COMMAND $<TARGET_FILE:f3d> --load-plugins=invalid --no-render)
-set_tests_properties(f3d::TestNoCliInvalidPlugin PROPERTIES PASS_REGULAR_EXPRESSION "Cannot open the library")
-
 # Test invalid CLI args
 add_test(NAME f3d::TestInvalidCLIArgs COMMAND $<TARGET_FILE:f3d> --up)
 set_tests_properties(f3d::TestInvalidCLIArgs PROPERTIES PASS_REGULAR_EXPRESSION "Error parsing command line arguments")

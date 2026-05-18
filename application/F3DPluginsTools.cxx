@@ -36,11 +36,11 @@ std::vector<fs::path> GetPluginSearchPaths(const std::string& pluginsPath)
 
 //----------------------------------------------------------------------------
 void F3DPluginsTools::LoadPlugins(
-  const std::vector<std::string>& plugins, const std::string& pluginsPath)
+  const std::vector<std::string>& plugins, const std::string& supplementaryPluginsPath)
 {
   try
   {
-    const std::vector pluginsPaths = ::GetPluginSearchPaths(pluginsPath);
+    const std::vector pluginsPaths = ::GetPluginSearchPaths(supplementaryPluginsPath);
 
     f3d::engine::autoloadPlugins();
 
