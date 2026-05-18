@@ -45,7 +45,7 @@ jobs:
         run: exit 0
 
       - name: Add ack reaction
-        uses: GrantBirki/comment@v2.1.1
+        uses: GrantBirki/comment@v3.0.0
         with:
           comment-id: ${{ github.event.comment.id }}
           reactions: eyes
@@ -65,6 +65,6 @@ jobs:
 
       - name: Create comment for invalid command
         if: failure()
-        uses: GrantBirki/comment@v2.1.1
+        uses: GrantBirki/comment@v3.0.0
         with:
           body: ❌ Invalid CI command "${{env.F3D_LABEL_COMMENT}}"
