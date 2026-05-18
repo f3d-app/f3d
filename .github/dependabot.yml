@@ -4,6 +4,10 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+  - package-ecosystem: "github-actions"
+    directories: "/.github/actions/*/"
+    schedule:
+      interval: "weekly"
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
