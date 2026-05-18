@@ -50,7 +50,7 @@ jobs:
 
       - name: Prettier Formatting
         continue-on-error: true
-        uses: creyD/prettier_action@v4.3
+        uses: creyD/prettier_action@v4.6
         with:
           dry: True
           prettier_options: "-w **/*.{js,json,md,html,yml}"
