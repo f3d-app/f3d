@@ -27,6 +27,9 @@ if(BUILD_SHARED_LIBS)
   f3d_test(NAME TestPluginNoInit ARGS --verbose --load-plugins=${_dirname}/${CMAKE_SHARED_LIBRARY_PREFIX}f3d${CMAKE_SHARED_LIBRARY_SUFFIX} NO_BASELINE REGEXP "Cannot find init_plugin symbol in library" LABELS "plugin")
 endif()
 
+# Test that we can try loading a plugin without --plugins-path being set correctly
+f3d_test(NAME TestNoCliInvalidPlugin ARGS --verbose --load-plugins=invalid REGEXP "Cannot open the library" PLUGINS_PATH " " NO_RENDER NO_BASELINE LABELS "plugin")
+
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestMultiplePluginsLoad DATA cow.vtp ARGS --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load" LABELS "plugin;assimp;alembic")
 endif()
