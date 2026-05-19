@@ -1,3 +1,8 @@
+/**
+ * This example demonstrates how to use libf3d in an in-situ context, where the mesh data is not loaded
+ * from a file but generated on the fly by a simulation. The example simulates a cloth using a simple PBD model and displays it in libf3d.
+ */
+
 #include <f3d/engine.h>
 #include <f3d/interactor.h>
 #include <f3d/mesh_view.h>
@@ -6,6 +11,9 @@
 
 #include "ClothSolver.h"
 
+/**
+ * This class implements a f3d::mesh_view that wraps the cloth simulation data provided by ClothSolver. It allows the cloth simulation to be visualized in libf3d without copying the mesh data, by providing direct memory views of the simulation data.
+ */
 class ClothMesh : public f3d::mesh_view
 {
 public:
@@ -85,7 +93,8 @@ int main(int argc, char** argv)
   f3d::interactor& inter = eng.getInteractor();
 
   // Remove unused bindings
-  for (const std::string_view& bind : { "W", "Shift+X", "N", "R", "Shift+N", "Shift+H", "V", "I", "O", "Shift+A", "Ctrl+Y", "Ctrl+Z" })
+  for (const std::string_view& bind : { "W", "Shift+X", "N", "R", "Shift+N", "Shift+H", "V", "I",
+         "O", "Shift+A", "Ctrl+Y", "Ctrl+Z" })
   {
     inter.removeBinding(f3d::interaction_bind_t::parse(bind));
   }
@@ -142,10 +151,12 @@ int main(int argc, char** argv)
   inter.addBinding(f3d::interaction_bind_t::parse("W"), "reset_simulation", "Simulation",
     []() { return std::make_pair<std::string, std::string>("Reset simulation", ""); });
 
-  inter.addBinding(f3d::interaction_bind_t::parse("N"), { "set_cloth_resolution 10", "reset_simulation" }, "Simulation",
+  inter.addBinding(f3d::interaction_bind_t::parse("N"),
+    { "set_cloth_resolution 10", "reset_simulation" }, "Simulation",
     []() { return std::make_pair<std::string, std::string>("10x10", ""); });
 
-  inter.addBinding(f3d::interaction_bind_t::parse("Shift+N"), { "set_cloth_resolution 50", "reset_simulation" }, "Simulation",
+  inter.addBinding(f3d::interaction_bind_t::parse("Shift+N"),
+    { "set_cloth_resolution 50", "reset_simulation" }, "Simulation",
     []() { return std::make_pair<std::string, std::string>("50x50", ""); });
 
   inter.addBinding(f3d::interaction_bind_t::parse("I"), "set_cloth_iterations 10", "Simulation",
@@ -176,13 +187,13 @@ int main(int argc, char** argv)
   win.getCamera().setViewUp({ 0.0f, 0.0f, 1.0f });
 
   // Start interaction loop
-  if (argc > 2)
+  if (argc > 1)
   {
     // For testing purposes only, shutdown the example after 1 second
     try
     {
       inter.setEventLoopUserCallback([&inter](f3d::interactor_state_t) { inter.stop(); });
-      inter.start(1.0);
+      inter.start(std::atoi(argv[1]));
     }
     catch (const std::exception& e)
     {

@@ -28,14 +28,6 @@ public:
   {
     return this->positions.data();
   }
-  const float* getNormals() const
-  {
-    return this->normals.data();
-  }
-  const float* getTextureCoordinates() const
-  {
-    return this->tcoords.data();
-  }
   const float* getInversedMasses() const
   {
     return this->inversed_masses.data();
@@ -68,10 +60,6 @@ private:
   int iterations = 100;
 
   std::vector<float> positions;
-
-  // used for rendering only
-  std::vector<float> normals;
-  std::vector<float> tcoords;
 
   // topology
   std::vector<uint32_t> face_offsets;

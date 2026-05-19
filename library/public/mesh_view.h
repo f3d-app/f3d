@@ -79,6 +79,7 @@ public:
       case f3d::mesh_view::data_type::F32:
         return f.template operator()<float>();
       case f3d::mesh_view::data_type::F64:
+      default:
         return f.template operator()<double>();
     }
   }
@@ -99,15 +100,32 @@ public:
   };
 
   /**
+   * Structure representing a cell array.
+   * For vertices and lines, `offsets` encodes the size of the polyvertex and polylines group respectively.
+   * For polygons, `offsets` encodes the size of each polygons (number of vertices per face).
+   * `offsetCount` must be equal to the number of cells + 1, and the last value in `offsets` must be equal to `indexCount`.
+   * If `offsetCount` is 1, it means that there is no cell.
+   * Will throw a load_failure_exception if any of this assumptions is not respected:
+   * - offsetCount is less than 1
+   * - offsets can be empty or must have 1 component and a data type of I32, U32, I64, or U64
+   * - indices can be empty or must have 1 component and a data type of I32, U32, I64, or U64
+   * - offsets and indices must have the same data type
+   */
+  struct cell_array_t
+  {
+    size_t offsetCount = 1;
+    data_array_t offsets;
+    size_t indexCount = 0;
+    data_array_t indices;
+  };
+
+  /**
    * Structure representing a view of the mesh in memory at a given time.
    * The pointers provided in this structure must remain valid once the mesh is added to the scene.
    * Will throw a load_failure_exception if any of this assumptions is not respected:
    * - points must have a 3 components and a data type of F32 or F64
    * - normals can be empty or must have a 3 components and a data type of F32 or F64
    * - texture_coordinates can be empty or must have a 2 components and a data type of F32 or F64
-   * - faceOffsets can be empty or must have 1 component and a data type of I32, U32, I64, or U64
-   * - faceIndices can be empty or must have 1 component and a data type of I32, U32, I64, or U64
-   * - faceOffsets and faceIndices must have the same data type
    */
   struct memory_view_t
   {
@@ -117,15 +135,14 @@ public:
     data_array_t normals;
     data_array_t textureCoordinates;
 
-    // faces
-    size_t faceOffsetCount = 0;
-    data_array_t faceOffsets;
-    size_t faceIndexCount = 0;
-    data_array_t faceIndices;
+    // cells
+    cell_array_t vertices;
+    cell_array_t lines;
+    cell_array_t polygons;
 
     // scalars
     std::vector<data_array_t> pointScalars;
-    std::vector<data_array_t> faceScalars;
+    std::vector<data_array_t> cellScalars;
   };
 
   /**

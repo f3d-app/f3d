@@ -15,8 +15,6 @@ void ClothSolver::initialize()
   const float edgeLen = 2.0f / static_cast<float>(this->gridSize);
 
   this->positions.clear();
-  this->normals.clear();
-  this->tcoords.clear();
   this->inversed_masses.clear();
   this->next_positions.clear();
   this->velocities.clear();
@@ -31,11 +29,6 @@ void ClothSolver::initialize()
       this->positions.push_back(-1.0f + i * edgeLen);
       this->positions.push_back(-1.0f + j * edgeLen);
       this->positions.push_back(3.0f);
-      this->normals.push_back(0.0f);
-      this->normals.push_back(0.0f);
-      this->normals.push_back(1.0f);
-      this->tcoords.push_back(static_cast<float>(i) / this->gridSize);
-      this->tcoords.push_back(static_cast<float>(j) / this->gridSize);
 
       this->inversed_masses.push_back(1.0f);
 
