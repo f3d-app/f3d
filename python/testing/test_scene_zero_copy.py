@@ -34,8 +34,8 @@ def test_scene_zero_copy():
 
     memory_view = f3d.MeshMemoryView()
     memory_view.points = points
-    memory_view.face_offsets = face_offsets
-    memory_view.face_indices = face_indices
+    memory_view.polygons_offsets = face_offsets
+    memory_view.polygons_indices = face_indices
     memory_view.point_scalars = {"Color": colors}
 
     class CustomMesh(f3d.MeshView):
