@@ -46,6 +46,7 @@ runs:
 
     - name: Cache alembic
       id: cache-alembic
+      continue-on-error: true # https://github.com/actions/cache/issues/1754
       uses: actions/cache/restore@v5
       with:
         path: dependencies/alembic_install

@@ -46,6 +46,7 @@ runs:
 
     - name: Cache openexr
       id: cache-openexr
+      continue-on-error: true # https://github.com/actions/cache/issues/1754
       uses: actions/cache/restore@v5
       with:
         path: dependencies/openexr_install
