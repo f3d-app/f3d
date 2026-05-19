@@ -38,6 +38,7 @@ runs:
 
     - name: Cache occt
       id: cache-occt
+      continue-on-error: true # https://github.com/actions/cache/issues/1754
       uses: actions/cache/restore@v5
       with:
         path: dependencies/occt_install

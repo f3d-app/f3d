@@ -62,6 +62,7 @@ runs:
 
     - name: Cache OpenVDB
       id: cache-openvdb
+      continue-on-error: true # https://github.com/actions/cache/issues/1754
       uses: actions/cache/restore@v5
       with:
         path: dependencies/openvdb_install

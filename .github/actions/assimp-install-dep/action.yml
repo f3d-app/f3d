@@ -38,6 +38,7 @@ runs:
 
     - name: Cache assimp
       id: cache-assimp
+      continue-on-error: true # https://github.com/actions/cache/issues/1754
       uses: actions/cache/restore@v5
       with:
         path: dependencies/assimp_install
