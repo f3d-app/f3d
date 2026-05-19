@@ -547,7 +547,7 @@ PYBIND11_MODULE(pyf3d, module)
         self.textureCoordinates.components = 2;
         self.textureCoordinates.stride = info.strides[0] / sizeof(float);
       })
-    .def_property("face_offsets", nullptr,
+    .def_property("vertices_offsets", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
         py::buffer_info info = b.request();
@@ -562,12 +562,12 @@ PYBIND11_MODULE(pyf3d, module)
           throw std::runtime_error("Incompatible buffer dimension!");
         }
 
-        self.faceOffsetCount = info.shape[0];
-        self.faceOffsets.data = info.ptr;
-        self.faceOffsets.type = f3d::mesh_view::data_type::I32;
-        self.faceOffsets.stride = info.strides[0] / sizeof(int32_t);
+        self.vertices.offsetCount = info.shape[0];
+        self.vertices.offsets.data = info.ptr;
+        self.vertices.offsets.type = f3d::mesh_view::data_type::I32;
+        self.vertices.offsets.stride = info.strides[0] / sizeof(int32_t);
       })
-    .def_property("face_indices", nullptr,
+    .def_property("vertices_indices", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
         py::buffer_info info = b.request();
@@ -582,10 +582,90 @@ PYBIND11_MODULE(pyf3d, module)
           throw std::runtime_error("Incompatible buffer dimension!");
         }
 
-        self.faceIndexCount = info.shape[0];
-        self.faceIndices.data = info.ptr;
-        self.faceIndices.type = f3d::mesh_view::data_type::I32;
-        self.faceIndices.stride = info.strides[0] / sizeof(int32_t);
+        self.vertices.indexCount = info.shape[0];
+        self.vertices.indices.data = info.ptr;
+        self.vertices.indices.type = f3d::mesh_view::data_type::I32;
+        self.vertices.indices.stride = info.strides[0] / sizeof(int32_t);
+      })
+    .def_property("lines_offsets", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, py::buffer b)
+      {
+        py::buffer_info info = b.request();
+
+        if (!info.item_type_is_equivalent_to<int32_t>())
+        {
+          throw std::runtime_error("Incompatible format: expected an int32_t array!");
+        }
+
+        if (info.ndim != 1)
+        {
+          throw std::runtime_error("Incompatible buffer dimension!");
+        }
+
+        self.lines.offsetCount = info.shape[0];
+        self.lines.offsets.data = info.ptr;
+        self.lines.offsets.type = f3d::mesh_view::data_type::I32;
+        self.lines.offsets.stride = info.strides[0] / sizeof(int32_t);
+      })
+    .def_property("lines_indices", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, py::buffer b)
+      {
+        py::buffer_info info = b.request();
+
+        if (!info.item_type_is_equivalent_to<int32_t>())
+        {
+          throw std::runtime_error("Incompatible format: expected an int32_t array!");
+        }
+
+        if (info.ndim != 1)
+        {
+          throw std::runtime_error("Incompatible buffer dimension!");
+        }
+
+        self.lines.indexCount = info.shape[0];
+        self.lines.indices.data = info.ptr;
+        self.lines.indices.type = f3d::mesh_view::data_type::I32;
+        self.lines.indices.stride = info.strides[0] / sizeof(int32_t);
+      })
+    .def_property("polygons_offsets", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, py::buffer b)
+      {
+        py::buffer_info info = b.request();
+
+        if (!info.item_type_is_equivalent_to<int32_t>())
+        {
+          throw std::runtime_error("Incompatible format: expected an int32_t array!");
+        }
+
+        if (info.ndim != 1)
+        {
+          throw std::runtime_error("Incompatible buffer dimension!");
+        }
+
+        self.polygons.offsetCount = info.shape[0];
+        self.polygons.offsets.data = info.ptr;
+        self.polygons.offsets.type = f3d::mesh_view::data_type::I32;
+        self.polygons.offsets.stride = info.strides[0] / sizeof(int32_t);
+      })
+    .def_property("polygons_indices", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, py::buffer b)
+      {
+        py::buffer_info info = b.request();
+
+        if (!info.item_type_is_equivalent_to<int32_t>())
+        {
+          throw std::runtime_error("Incompatible format: expected an int32_t array!");
+        }
+
+        if (info.ndim != 1)
+        {
+          throw std::runtime_error("Incompatible buffer dimension!");
+        }
+
+        self.polygons.indexCount = info.shape[0];
+        self.polygons.indices.data = info.ptr;
+        self.polygons.indices.type = f3d::mesh_view::data_type::I32;
+        self.polygons.indices.stride = info.strides[0] / sizeof(int32_t);
       })
     .def_property("point_scalars", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::dict d)
@@ -599,17 +679,17 @@ PYBIND11_MODULE(pyf3d, module)
           self.pointScalars.emplace_back(std::move(dataArray));
         }
       })
-    .def_property("face_scalars", nullptr,
+    .def_property("cell_scalars", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::dict d)
       {
         // TODO: factorize with point_scalars since the code is almost identical
-        self.faceScalars.clear();
+        self.cellScalars.clear();
 
         for (auto item : d)
         {
           f3d::mesh_view::data_array_t dataArray = fromBuffer(py::cast<py::buffer>(item.second));
           dataArray.name = py::cast<std::string>(item.first);
-          self.faceScalars.emplace_back(std::move(dataArray));
+          self.cellScalars.emplace_back(std::move(dataArray));
         }
       });
 
