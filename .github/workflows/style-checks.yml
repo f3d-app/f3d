@@ -35,7 +35,7 @@ jobs:
           codespell -fHw .
 
       - name: C++ Formatting
-        uses: DoozyX/clang-format-lint-action@v0.16
+        uses: DoozyX/clang-format-lint-action@8b8bbdd8669eec54682e720ebe2fb19d9387fdb0
         with:
           source: "."
           extensions: "h,cxx,in"
@@ -50,7 +50,7 @@ jobs:
 
       - name: Prettier Formatting
         continue-on-error: true
-        uses: creyD/prettier_action@v4.3
+        uses: creyD/prettier_action@8c18391fdc98ed0d884c6345f03975edac71b8f0
         with:
           dry: True
           prettier_options: "-w **/*.{js,json,md,html,yml}"
@@ -83,14 +83,14 @@ jobs:
           name: f3d-style-checks-diff-${{ github.event.pull_request.head.ref }}
 
       - name: Delete comment
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3.0.4
         with:
           header: style
           delete: true
 
       - name: Create comment
         if: failure()
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3.0.4
         with:
           header: style
           message: |
