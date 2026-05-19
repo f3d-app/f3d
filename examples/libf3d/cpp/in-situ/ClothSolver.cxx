@@ -23,9 +23,9 @@ void ClothSolver::initialize()
   this->distance_constraints.clear();
 
   // define the grid
-  for (int i = 0; i <= this->gridSize; i++)
+  for (uint32_t i = 0; i <= this->gridSize; i++)
   {
-    for (int j = 0; j <= this->gridSize; j++)
+    for (uint32_t j = 0; j <= this->gridSize; j++)
     {
       this->positions.push_back(-1.0f + i * edgeLen);
       this->positions.push_back(-1.0f + j * edgeLen);
@@ -48,42 +48,36 @@ void ClothSolver::initialize()
   }
 
   // add cells and distance constraints
-  for (int i = 0; i < this->gridSize; i++)
+  for (uint32_t i = 0; i < this->gridSize; i++)
   {
-    for (int j = 0; j < this->gridSize; j++)
+    for (uint32_t j = 0; j < this->gridSize; j++)
     {
-      unsigned int topLeft = (i + 1) * (this->gridSize + 1) + j;
-      unsigned int topRight = topLeft + 1;
-      unsigned int bottomLeft = i * (this->gridSize + 1) + j;
-      unsigned int bottomRight = bottomLeft + 1;
+      uint32_t topLeft = (i + 1) * (this->gridSize + 1) + j;
+      uint32_t topRight = topLeft + 1;
+      uint32_t bottomLeft = i * (this->gridSize + 1) + j;
+      uint32_t bottomRight = bottomLeft + 1;
       this->face_indices.push_back(topRight);
       this->face_indices.push_back(bottomRight);
       this->face_indices.push_back(bottomLeft);
       this->face_indices.push_back(topLeft);
 
       // avoid duplicated constraints by only creating them for the top and left edges of each quad
-      this->distance_constraints.push_back(
-        { .p1 = topLeft, .p2 = topRight, .rest_length = edgeLen });
-      this->distance_constraints.push_back(
-        { .p1 = topLeft, .p2 = bottomLeft, .rest_length = edgeLen });
+      this->distance_constraints.push_back({ topLeft, topRight, edgeLen });
+      this->distance_constraints.push_back({ topLeft, bottomLeft, edgeLen });
 
       // but make sure to create constraints for the right and bottom edges of the last quads
       if (j == this->gridSize - 1)
       {
-        this->distance_constraints.push_back(
-          { .p1 = topRight, .p2 = bottomRight, .rest_length = edgeLen });
+        this->distance_constraints.push_back({ topRight, bottomRight, edgeLen });
       }
       if (i == this->gridSize - 1)
       {
-        this->distance_constraints.push_back(
-          { .p1 = bottomLeft, .p2 = bottomRight, .rest_length = edgeLen });
+        this->distance_constraints.push_back({ bottomLeft, bottomRight, edgeLen });
       }
 
       // add diagonal constraints for better stability
-      this->distance_constraints.push_back(
-        { .p1 = topLeft, .p2 = bottomRight, .rest_length = std::sqrt(2.0f) * edgeLen });
-      this->distance_constraints.push_back(
-        { .p1 = topRight, .p2 = bottomLeft, .rest_length = std::sqrt(2.0f) * edgeLen });
+      this->distance_constraints.push_back({ topLeft, bottomRight, std::sqrt(2.0f) * edgeLen });
+      this->distance_constraints.push_back({ topRight, bottomLeft, std::sqrt(2.0f) * edgeLen });
     }
   }
 
@@ -137,12 +131,12 @@ void ClothSolver::update(double newTime)
   }
 
   // loop on constraints and project
-  for (int iter = 0; iter < this->iterations; iter++)
+  for (uint32_t iter = 0; iter < this->iterations; iter++)
   {
     for (const DistanceConstraint& constraint : this->distance_constraints)
     {
-      unsigned int i1 = constraint.p1 * 3;
-      unsigned int i2 = constraint.p2 * 3;
+      uint32_t i1 = constraint.p1 * 3;
+      uint32_t i2 = constraint.p2 * 3;
       float dx = this->next_positions[i2] - this->next_positions[i1];
       float dy = this->next_positions[i2 + 1] - this->next_positions[i1 + 1];
       float dz = this->next_positions[i2 + 2] - this->next_positions[i1 + 2];
