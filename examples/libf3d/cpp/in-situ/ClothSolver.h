@@ -1,25 +1,44 @@
 #include <cstdint>
 #include <vector>
 
+/**
+ * Simple cloth solver based on the PBD method.
+ */
 class ClothSolver
 {
 public:
   ClothSolver();
 
+  /**
+   * Set the grid size
+   */
   void setGridSize(uint32_t gridSize)
   {
     this->gridSize = gridSize;
   }
 
+  /**
+   * Number of PBD iterations during a solver step
+   */
   void setIterations(uint32_t iterations)
   {
     this->iterations = iterations;
   }
 
+  /**
+   * Initialize and allocate cloth state
+   */
   void initialize();
+
+  /**
+   * Advance simulation by `timeStep` seconds
+   */
   void update(double timeStep);
 
-  // accessors for visualization
+  //@{
+  /**
+   * Memory accessors
+   */
   size_t getPointCount() const
   {
     return this->positions.size() / 3;
@@ -70,6 +89,7 @@ public:
   {
     return this->fixed_vertices_indices.data();
   }
+  //@}
 
 private:
   double currentTime = 0.0;

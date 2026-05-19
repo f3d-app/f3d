@@ -22,6 +22,7 @@ void ClothSolver::initialize()
   this->face_offsets.clear();
   this->distance_constraints.clear();
 
+  // define the grid
   for (int i = 0; i <= this->gridSize; i++)
   {
     for (int j = 0; j <= this->gridSize; j++)
@@ -46,6 +47,7 @@ void ClothSolver::initialize()
     this->inversed_masses[index] = 0.0f;
   }
 
+  // add cells and distance constraints
   for (int i = 0; i < this->gridSize; i++)
   {
     for (int j = 0; j < this->gridSize; j++)
@@ -121,7 +123,7 @@ void ClothSolver::update(double newTime)
 
   this->currentTime = newTime;
 
-  // Apply gravity on Z axis (m.s^-2)
+  // Apply gravity on Z axis (m.s^-2) and predict next positions
   constexpr float gravity = -9.81f;
 
   for (size_t i = 0; i < this->positions.size(); i++)
@@ -134,8 +136,8 @@ void ClothSolver::update(double newTime)
       this->positions[i] + this->velocities[i] * static_cast<float>(timeStep);
   }
 
-  // loop on constraints
-  for (int iter = 0; iter < this->iterations; iter++) // iterate a few times for better convergence
+  // loop on constraints and project
+  for (int iter = 0; iter < this->iterations; iter++)
   {
     for (const DistanceConstraint& constraint : this->distance_constraints)
     {

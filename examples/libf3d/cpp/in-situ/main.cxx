@@ -30,6 +30,9 @@ public:
     return { 0.0, 10.0 };
   }
 
+  /**
+   * Map solver memory view
+   */
   f3d::mesh_view::memory_view_t getMemoryView(double time) const override
   {
     f3d::mesh_view::memory_view_t view;
