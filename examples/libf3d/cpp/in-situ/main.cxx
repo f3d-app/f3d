@@ -39,17 +39,21 @@ public:
     view.points.components = 3;
     view.points.stride = 3;
 
-    view.faceOffsetCount = this->Solver.getFaceOffsetCount();
-    view.faceOffsets.type = f3d::mesh_view::data_type::U32;
-    view.faceOffsets.data = this->Solver.getFaceOffsets();
-    view.faceOffsets.components = 1;
-    view.faceOffsets.stride = 1;
+    view.polygons.offsetCount = this->Solver.getFaceOffsetCount();
+    view.polygons.offsets.type = f3d::mesh_view::data_type::U32;
+    view.polygons.offsets.data = this->Solver.getFaceOffsets();
 
-    view.faceIndexCount = this->Solver.getFaceIndexCount();
-    view.faceIndices.type = f3d::mesh_view::data_type::U32;
-    view.faceIndices.data = this->Solver.getFaceIndices();
-    view.faceIndices.components = 1;
-    view.faceIndices.stride = 1;
+    view.polygons.indexCount = this->Solver.getFaceIndexCount();
+    view.polygons.indices.type = f3d::mesh_view::data_type::U32;
+    view.polygons.indices.data = this->Solver.getFaceIndices();
+
+    view.vertices.offsetCount = this->Solver.getFixedVertexOffsetCount();
+    view.vertices.offsets.type = f3d::mesh_view::data_type::U32;
+    view.vertices.offsets.data = this->Solver.getFixedVertexOffsets();
+
+    view.vertices.indexCount = this->Solver.getFixedVertexIndexCount();
+    view.vertices.indices.type = f3d::mesh_view::data_type::U32;
+    view.vertices.indices.data = this->Solver.getFixedVertexIndices();
 
     view.pointScalars.push_back(
       { "Mass", f3d::mesh_view::data_type::F32, this->Solver.getInversedMasses(), 1, 1 });

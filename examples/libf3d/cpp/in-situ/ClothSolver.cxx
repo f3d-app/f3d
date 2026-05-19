@@ -31,17 +31,20 @@ void ClothSolver::initialize()
       this->positions.push_back(3.0f);
 
       this->inversed_masses.push_back(1.0f);
-
-      if ((i == this->gridSize) &&
-        (j == 0 || j == this->gridSize)) // pin the top left and top right corners
-      {
-        this->inversed_masses.back() = 0.0f;
-      }
     }
   }
 
   this->next_positions = this->positions;
   this->velocities.resize(this->positions.size(), 0.0f);
+
+  // fixed vertices
+  this->fixed_vertices_indices = { 0, this->gridSize };
+  this->fixed_vertices_offsets = { 0, 1, 2 };
+
+  for (uint32_t index : this->fixed_vertices_indices)
+  {
+    this->inversed_masses[index] = 0.0f;
+  }
 
   for (int i = 0; i < this->gridSize; i++)
   {

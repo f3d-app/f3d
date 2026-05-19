@@ -6,12 +6,12 @@ class ClothSolver
 public:
   ClothSolver();
 
-  void setGridSize(int gridSize)
+  void setGridSize(uint32_t gridSize)
   {
     this->gridSize = gridSize;
   }
 
-  void setIterations(int iterations)
+  void setIterations(uint32_t iterations)
   {
     this->iterations = iterations;
   }
@@ -54,10 +54,27 @@ public:
     return this->face_indices.data();
   }
 
+  size_t getFixedVertexOffsetCount() const
+  {
+    return this->fixed_vertices_offsets.size();
+  }
+  size_t getFixedVertexIndexCount() const
+  {
+    return this->fixed_vertices_indices.size();
+  }
+  const uint32_t* getFixedVertexOffsets() const
+  {
+    return this->fixed_vertices_offsets.data();
+  }
+  const uint32_t* getFixedVertexIndices() const
+  {
+    return this->fixed_vertices_indices.data();
+  }
+
 private:
   double currentTime = 0.0;
-  int gridSize = 40;
-  int iterations = 100;
+  uint32_t gridSize = 40;
+  uint32_t iterations = 100;
 
   std::vector<float> positions;
 
@@ -69,6 +86,10 @@ private:
   std::vector<float> inversed_masses;
   std::vector<float> next_positions;
   std::vector<float> velocities;
+
+  // fixed vertices
+  std::vector<uint32_t> fixed_vertices_indices;
+  std::vector<uint32_t> fixed_vertices_offsets;
 
   // constraints data
   struct DistanceConstraint
