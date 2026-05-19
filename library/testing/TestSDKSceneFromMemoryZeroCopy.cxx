@@ -209,24 +209,23 @@ public:
         .data = points + 6,
         .components = 2,
         .stride = stride },
-      .vertices = {
-      .offsetCount = this->Grid.CornerOffsets.size(),
-      .offsets = { .type = f3d::mesh_view::data_type::I32,
-        .data = this->Grid.CornerOffsets.data() },
-      .indexCount = this->Grid.CornerIndices.size(),
-      .indices = { .type = f3d::mesh_view::data_type::I32, .data = this->Grid.CornerIndices.data() } },
-    .lines = {
-      .offsetCount = this->Grid.BorderOffsets.size(),
-      .offsets = { .type = f3d::mesh_view::data_type::I32,
-        .data = this->Grid.BorderOffsets.data() },
-      .indexCount = this->Grid.BorderIndices.size(),
-      .indices = { .type = f3d::mesh_view::data_type::I32, .data = this->Grid.BorderIndices.data() } },
-    .polygons = {
-      .offsetCount = this->Grid.FaceOffsets.size(),
-      .offsets = { .type = f3d::mesh_view::data_type::I32,
-        .data = this->Grid.FaceOffsets.data() },
-      .indexCount = this->Grid.Quads.size(),
-      .indices = { .type = f3d::mesh_view::data_type::I32, .data = this->Grid.Quads.data() } }};
+      .vertices = { .offsetCount = this->Grid.CornerOffsets.size(),
+        .offsets = { .type = f3d::mesh_view::data_type::I32,
+          .data = this->Grid.CornerOffsets.data() },
+        .indexCount = this->Grid.CornerIndices.size(),
+        .indices = { .type = f3d::mesh_view::data_type::I32,
+          .data = this->Grid.CornerIndices.data() } },
+      .lines = { .offsetCount = this->Grid.BorderOffsets.size(),
+        .offsets = { .type = f3d::mesh_view::data_type::I32,
+          .data = this->Grid.BorderOffsets.data() },
+        .indexCount = this->Grid.BorderIndices.size(),
+        .indices = { .type = f3d::mesh_view::data_type::I32,
+          .data = this->Grid.BorderIndices.data() } },
+      .polygons = { .offsetCount = this->Grid.FaceOffsets.size(),
+        .offsets = { .type = f3d::mesh_view::data_type::I32,
+          .data = this->Grid.FaceOffsets.data() },
+        .indexCount = this->Grid.Quads.size(),
+        .indices = { .type = f3d::mesh_view::data_type::I32, .data = this->Grid.Quads.data() } } };
   }
 
 private:
