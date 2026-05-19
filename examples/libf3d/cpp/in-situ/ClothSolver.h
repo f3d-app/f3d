@@ -11,36 +11,56 @@ public:
     this->gridSize = gridSize;
   }
 
-  [[nodiscard]] int getGridSize() const
-  {
-    return this->gridSize;
-  }
-
   void setIterations(int iterations)
   {
     this->iterations = iterations;
-  }
-
-  [[nodiscard]] int getIterations() const
-  {
-    return this->iterations;
   }
 
   void initialize();
   void update(double timeStep);
 
   // accessors for visualization
-  size_t getPointCount() const { return this->positions.size() / 3; }
-  const float* getPositions() const { return this->positions.data(); }
-  const float* getNormals() const { return this->normals.data(); }
-  const float* getTextureCoordinates() const { return this->tcoords.data(); }
-  const float* getInversedMasses() const { return this->inversed_masses.data(); }
-  const float* getVelocities() const { return this->velocities.data(); }
+  size_t getPointCount() const
+  {
+    return this->positions.size() / 3;
+  }
+  const float* getPositions() const
+  {
+    return this->positions.data();
+  }
+  const float* getNormals() const
+  {
+    return this->normals.data();
+  }
+  const float* getTextureCoordinates() const
+  {
+    return this->tcoords.data();
+  }
+  const float* getInversedMasses() const
+  {
+    return this->inversed_masses.data();
+  }
+  const float* getVelocities() const
+  {
+    return this->velocities.data();
+  }
 
-  size_t getFaceOffsetCount() const { return this->face_offsets.size(); }
-  size_t getFaceIndexCount() const { return this->face_indices.size(); }
-  const uint32_t* getFaceOffsets() const { return this->face_offsets.data(); }
-  const uint32_t* getFaceIndices() const { return this->face_indices.data(); }
+  size_t getFaceOffsetCount() const
+  {
+    return this->face_offsets.size();
+  }
+  size_t getFaceIndexCount() const
+  {
+    return this->face_indices.size();
+  }
+  const uint32_t* getFaceOffsets() const
+  {
+    return this->face_offsets.data();
+  }
+  const uint32_t* getFaceIndices() const
+  {
+    return this->face_indices.data();
+  }
 
 private:
   double currentTime = 0.0;

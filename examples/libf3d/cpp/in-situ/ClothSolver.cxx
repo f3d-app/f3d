@@ -30,7 +30,7 @@ void ClothSolver::initialize()
     {
       this->positions.push_back(-1.0f + i * edgeLen);
       this->positions.push_back(-1.0f + j * edgeLen);
-      this->positions.push_back(5.0f);
+      this->positions.push_back(3.0f);
       this->normals.push_back(0.0f);
       this->normals.push_back(0.0f);
       this->normals.push_back(1.0f);
@@ -39,7 +39,8 @@ void ClothSolver::initialize()
 
       this->inversed_masses.push_back(1.0f);
 
-      if ((i == this->gridSize) && (j == 0 || j == this->gridSize)) // pin the top left and top right corners
+      if ((i == this->gridSize) &&
+        (j == 0 || j == this->gridSize)) // pin the top left and top right corners
       {
         this->inversed_masses.back() = 0.0f;
       }
@@ -63,27 +64,35 @@ void ClothSolver::initialize()
       this->face_indices.push_back(topLeft);
 
       // avoid duplicated constraints by only creating them for the top and left edges of each quad
-      this->distance_constraints.push_back({ .p1 = topLeft, .p2 = topRight, .rest_length = edgeLen });
-      this->distance_constraints.push_back({ .p1 = topLeft, .p2 = bottomLeft, .rest_length = edgeLen });
+      this->distance_constraints.push_back(
+        { .p1 = topLeft, .p2 = topRight, .rest_length = edgeLen });
+      this->distance_constraints.push_back(
+        { .p1 = topLeft, .p2 = bottomLeft, .rest_length = edgeLen });
 
       // but make sure to create constraints for the right and bottom edges of the last quads
       if (j == this->gridSize - 1)
       {
-        this->distance_constraints.push_back({ .p1 = topRight, .p2 = bottomRight, .rest_length = edgeLen });
+        this->distance_constraints.push_back(
+          { .p1 = topRight, .p2 = bottomRight, .rest_length = edgeLen });
       }
       if (i == this->gridSize - 1)
       {
-        this->distance_constraints.push_back({ .p1 = bottomLeft, .p2 = bottomRight, .rest_length = edgeLen });
+        this->distance_constraints.push_back(
+          { .p1 = bottomLeft, .p2 = bottomRight, .rest_length = edgeLen });
       }
 
       // add diagonal constraints for better stability
-      this->distance_constraints.push_back({ .p1 = topLeft, .p2 = bottomRight, .rest_length = std::sqrt(2.0f) * edgeLen });
-      this->distance_constraints.push_back({ .p1 = topRight, .p2 = bottomLeft, .rest_length = std::sqrt(2.0f) * edgeLen });
+      this->distance_constraints.push_back(
+        { .p1 = topLeft, .p2 = bottomRight, .rest_length = std::sqrt(2.0f) * edgeLen });
+      this->distance_constraints.push_back(
+        { .p1 = topRight, .p2 = bottomLeft, .rest_length = std::sqrt(2.0f) * edgeLen });
     }
   }
 
   this->face_offsets.resize(this->gridSize * this->gridSize + 1);
-  std::generate(this->face_offsets.begin(), this->face_offsets.end(), [n = 0]() mutable {
+  std::generate(this->face_offsets.begin(), this->face_offsets.end(),
+    [n = 0]() mutable
+    {
       const unsigned int offset = n;
       n += 4;
       return offset;
@@ -125,7 +134,8 @@ void ClothSolver::update(double newTime)
     {
       this->velocities[i] += gravity * this->inversed_masses[i / 3] * static_cast<float>(timeStep);
     }
-    this->next_positions[i] = this->positions[i] + this->velocities[i] * static_cast<float>(timeStep);
+    this->next_positions[i] =
+      this->positions[i] + this->velocities[i] * static_cast<float>(timeStep);
   }
 
   // loop on constraints
@@ -160,7 +170,8 @@ void ClothSolver::update(double newTime)
   // update velocities and positions
   for (size_t i = 0; i < this->positions.size(); i++)
   {
-    this->velocities[i] = (this->next_positions[i] - this->positions[i]) / static_cast<float>(timeStep);
+    this->velocities[i] =
+      (this->next_positions[i] - this->positions[i]) / static_cast<float>(timeStep);
     this->positions[i] = this->next_positions[i];
   }
 }
