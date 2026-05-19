@@ -1,6 +1,7 @@
 /**
- * This example demonstrates how to use libf3d in an in-situ context, where the mesh data is not loaded
- * from a file but generated on the fly by a simulation. The example simulates a cloth using a simple PBD model and displays it in libf3d.
+ * This example demonstrates how to use libf3d in an in-situ context, where the mesh data is not
+ * loaded from a file but generated on the fly by a simulation. The example simulates a cloth using
+ * a simple PBD model and displays it in libf3d.
  */
 
 #include <f3d/engine.h>
@@ -12,7 +13,9 @@
 #include "ClothSolver.h"
 
 /**
- * This class implements a f3d::mesh_view that wraps the cloth simulation data provided by ClothSolver. It allows the cloth simulation to be visualized in libf3d without copying the mesh data, by providing direct memory views of the simulation data.
+ * This class implements a f3d::mesh_view that wraps the cloth simulation data provided by
+ * ClothSolver. It allows the cloth simulation to be visualized in libf3d without copying the mesh
+ * data, by providing direct memory views of the simulation data.
  */
 class ClothMesh : public f3d::mesh_view
 {

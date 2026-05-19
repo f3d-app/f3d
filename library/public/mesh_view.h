@@ -101,11 +101,11 @@ public:
 
   /**
    * Structure representing a cell array.
-   * For vertices and lines, `offsets` encodes the size of the polyvertex and polylines group respectively.
-   * For polygons, `offsets` encodes the size of each polygons (number of vertices per face).
-   * `offsetCount` must be equal to the number of cells + 1, and the last value in `offsets` must be equal to `indexCount`.
-   * If `offsetCount` is 1, it means that there is no cell.
-   * Will throw a load_failure_exception if any of this assumptions is not respected:
+   * For vertices and lines, `offsets` encodes the size of the polyvertex and polylines group
+   * respectively. For polygons, `offsets` encodes the size of each polygons (number of vertices per
+   * face). `offsetCount` must be equal to the number of cells + 1, and the last value in `offsets`
+   * must be equal to `indexCount`. If `offsetCount` is 1, it means that there is no cell. Will
+   * throw a load_failure_exception if any of this assumptions is not respected:
    * - offsetCount is less than 1
    * - offsets can be empty or must have 1 component and a data type of I32, U32, I64, or U64
    * - indices can be empty or must have 1 component and a data type of I32, U32, I64, or U64

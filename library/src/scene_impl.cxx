@@ -592,7 +592,8 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
             vtkNew<vtkStridedArray<DataT>> scalars;
             scalars->SetName(scalar.name.c_str());
             scalars->SetNumberOfComponents(static_cast<int>(scalar.components));
-            scalars->SetNumberOfTuples(memoryView.vertices.offsetCount + memoryView.lines.offsetCount + memoryView.polygons.offsetCount - 3);
+            scalars->SetNumberOfTuples(memoryView.vertices.offsetCount +
+              memoryView.lines.offsetCount + memoryView.polygons.offsetCount - 3);
             scalars->ConstructBackend(reinterpret_cast<const DataT*>(scalar.data), scalar.stride,
               static_cast<int>(scalar.components));
 
@@ -600,11 +601,13 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
           });
       }
 
-      auto handleCells = [](const f3d::mesh_view::cell_array_t& cells) -> vtkSmartPointer<vtkCellArray>
+      auto handleCells =
+        [](const f3d::mesh_view::cell_array_t& cells) -> vtkSmartPointer<vtkCellArray>
       {
         if (cells.offsetCount <= 0)
         {
-          throw scene::load_failure_exception("Mesh view cell offsets count must be greater than 0");
+          throw scene::load_failure_exception(
+            "Mesh view cell offsets count must be greater than 0");
         }
 
         if (cells.offsetCount > 1)
@@ -655,22 +658,18 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
                 vtkNew<vtkCellArray> cellArray;
 
                 vtkNew<vtkStridedArray<IndexingType>> faceOffsets;
-                faceOffsets->SetName(cells.offsets.name.empty()
-                    ? "FaceOffsets"
-                    : cells.offsets.name.c_str());
+                faceOffsets->SetName(
+                  cells.offsets.name.empty() ? "FaceOffsets" : cells.offsets.name.c_str());
                 faceOffsets->SetNumberOfTuples(cells.offsetCount);
                 faceOffsets->ConstructBackend(
-                  reinterpret_cast<const IndexingType*>(cells.offsets.data),
-                  cells.offsets.stride);
+                  reinterpret_cast<const IndexingType*>(cells.offsets.data), cells.offsets.stride);
 
                 vtkNew<vtkStridedArray<IndexingType>> faceIndices;
-                faceIndices->SetName(cells.indices.name.empty()
-                    ? "FaceIndices"
-                    : cells.indices.name.c_str());
+                faceIndices->SetName(
+                  cells.indices.name.empty() ? "FaceIndices" : cells.indices.name.c_str());
                 faceIndices->SetNumberOfTuples(cells.indexCount);
                 faceIndices->ConstructBackend(
-                  reinterpret_cast<const IndexingType*>(cells.indices.data),
-                  cells.indices.stride);
+                  reinterpret_cast<const IndexingType*>(cells.indices.data), cells.indices.stride);
 
                 cellArray->SetData(faceOffsets, faceIndices);
                 return cellArray;
@@ -684,7 +683,6 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
       polydata->SetVerts(handleCells(memoryView.vertices));
       polydata->SetLines(handleCells(memoryView.lines));
       polydata->SetPolys(handleCells(memoryView.polygons));
-
     });
 
   try
