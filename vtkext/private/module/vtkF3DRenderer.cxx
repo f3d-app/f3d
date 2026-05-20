@@ -2163,7 +2163,6 @@ void vtkF3DRenderer::Render()
   }
 
   vtkInformation* info = this->GetInformation();
-
   bool uiOnly = info->Get(vtkF3DRenderPass::RENDER_UI_ONLY());
 
 #if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
