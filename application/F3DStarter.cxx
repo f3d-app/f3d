@@ -707,25 +707,25 @@ public:
                   if (libf3dOptionName == "reset")
                   {
                     apply_to_all(libf3dOptionValue,
-                      [&libOptions, &keyForLog](const std::string& value)
+                      [&libOptions, &keyForLog](const std::string& optionValue)
                       {
-                        keyForLog = value;
-                        if (value.empty())
+                        keyForLog = optionValue;
+                        if (optionValue.empty())
                         {
                           f3d::log::warn("Invalid option: 'reset' must be followed by a valid "
                                          "option name, ignoring entry");
                           return;
                         }
-                        libOptions.reset(value);
+                        libOptions.reset(optionValue);
                       });
                   }
                   else if (libf3dOptionName == "define")
                   {
                     apply_to_all(libf3dOptionValue,
-                      [&libOptions, &keyForLog](const std::string& value)
+                      [&libOptions, &keyForLog](const std::string& optionValue)
                       {
-                        keyForLog = value;
-                        HandleDefine(libOptions, value);
+                        keyForLog = optionValue;
+                        HandleDefine(libOptions, optionValue);
                       });
                   }
                   else
