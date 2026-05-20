@@ -73,7 +73,7 @@ public:
   PYBIND11_TYPE_CASTER(f3d::vector3_t, const_name("f3d.vector3_t"));
 };
 
-f3d::mesh_view::data_array_t fromBuffer(py::buffer buf)
+std::pair<size_t, f3d::mesh_view::data_array_t> fromBuffer(py::buffer buf)
 {
   py::buffer_info info = buf.request();
 
@@ -139,7 +139,7 @@ f3d::mesh_view::data_array_t fromBuffer(py::buffer buf)
 
   dataArray.data = info.ptr;
 
-  return dataArray;
+  return { info.shape[0], std::move(dataArray) };
 }
 
 PYBIND11_MODULE(pyf3d, module)
@@ -467,125 +467,76 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property("points", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        py::buffer_info info = b.request();
+        auto [count, dataArray] = fromBuffer(b);
 
-        if (!info.item_type_is_equivalent_to<float>())
-        {
-          throw std::runtime_error("Incompatible format: expected a float array!");
-        }
-
-        if (info.ndim != 2)
-        {
-          throw std::runtime_error("Incompatible buffer dimension!");
-        }
-
-        if (info.shape[1] != 3)
-        {
-          throw std::runtime_error("Incompatible buffer shape: expected 3 components per point!");
-        }
-
-        self.pointCount = info.shape[0];
-        self.points.data = static_cast<const float*>(info.ptr);
-        self.points.components = 3;
-        self.points.stride = info.strides[0] / sizeof(float);
+        self.pointCount = count;
+        self.points = std::move(dataArray);
       })
     .def_property("normals", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        py::buffer_info info = b.request();
+        auto [count, dataArray] = fromBuffer(b);
 
-        if (!info.item_type_is_equivalent_to<float>())
-        {
-          throw std::runtime_error("Incompatible format: expected a float array!");
-        }
-
-        if (info.ndim != 2)
-        {
-          throw std::runtime_error("Incompatible buffer dimension!");
-        }
-
-        if (info.shape[1] != 3)
-        {
-          throw std::runtime_error("Incompatible buffer shape: expected 3 components per point!");
-        }
-
-        if (info.shape[0] != self.pointCount)
+        if (count != self.pointCount)
         {
           throw std::runtime_error("Incompatible buffer shape: point count does not match!");
         }
 
-        self.normals.data = static_cast<const float*>(info.ptr);
-        self.normals.components = 3;
-        self.normals.stride = info.strides[0] / sizeof(float);
+        self.normals = std::move(dataArray);
       })
     .def_property("texture_coordinates", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        py::buffer_info info = b.request();
+        auto [count, dataArray] = fromBuffer(b);
 
-        if (!info.item_type_is_equivalent_to<float>())
-        {
-          throw std::runtime_error("Incompatible format: expected a float array!");
-        }
-
-        if (info.ndim != 2)
-        {
-          throw std::runtime_error("Incompatible buffer dimension!");
-        }
-
-        if (info.shape[1] != 2)
-        {
-          throw std::runtime_error("Incompatible buffer shape: expected 2 components per point!");
-        }
-
-        if (info.shape[0] != self.pointCount)
+        if (count != self.pointCount)
         {
           throw std::runtime_error("Incompatible buffer shape: point count does not match!");
         }
 
-        self.textureCoordinates.data = static_cast<const float*>(info.ptr);
-        self.textureCoordinates.components = 2;
-        self.textureCoordinates.stride = info.strides[0] / sizeof(float);
+        self.textureCoordinates = std::move(dataArray);
       })
-    .def_property("face_offsets", nullptr,
+    .def_property("vertices_offsets", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        py::buffer_info info = b.request();
-
-        if (!info.item_type_is_equivalent_to<int32_t>())
-        {
-          throw std::runtime_error("Incompatible format: expected an int32_t array!");
-        }
-
-        if (info.ndim != 1)
-        {
-          throw std::runtime_error("Incompatible buffer dimension!");
-        }
-
-        self.faceOffsetCount = info.shape[0];
-        self.faceOffsets.data = info.ptr;
-        self.faceOffsets.type = f3d::mesh_view::data_type::I32;
-        self.faceOffsets.stride = info.strides[0] / sizeof(int32_t);
+        auto [count, array] = fromBuffer(b);
+        self.vertices.offsetCount = count;
+        self.vertices.offsets = std::move(array);
       })
-    .def_property("face_indices", nullptr,
+    .def_property("vertices_indices", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        py::buffer_info info = b.request();
-
-        if (!info.item_type_is_equivalent_to<int32_t>())
-        {
-          throw std::runtime_error("Incompatible format: expected an int32_t array!");
-        }
-
-        if (info.ndim != 1)
-        {
-          throw std::runtime_error("Incompatible buffer dimension!");
-        }
-
-        self.faceIndexCount = info.shape[0];
-        self.faceIndices.data = info.ptr;
-        self.faceIndices.type = f3d::mesh_view::data_type::I32;
-        self.faceIndices.stride = info.strides[0] / sizeof(int32_t);
+        auto [count, array] = fromBuffer(b);
+        self.vertices.indexCount = count;
+        self.vertices.indices = std::move(array);
+      })
+    .def_property("lines_offsets", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, py::buffer b)
+      {
+        auto [count, array] = fromBuffer(b);
+        self.lines.offsetCount = count;
+        self.lines.offsets = std::move(array);
+      })
+    .def_property("lines_indices", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, py::buffer b)
+      {
+        auto [count, array] = fromBuffer(b);
+        self.lines.indexCount = count;
+        self.lines.indices = std::move(array);
+      })
+    .def_property("polygons_offsets", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, py::buffer b)
+      {
+        auto [count, array] = fromBuffer(b);
+        self.polygons.offsetCount = count;
+        self.polygons.offsets = std::move(array);
+      })
+    .def_property("polygons_indices", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, py::buffer b)
+      {
+        auto [count, array] = fromBuffer(b);
+        self.polygons.indexCount = count;
+        self.polygons.indices = std::move(array);
       })
     .def_property("point_scalars", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::dict d)
@@ -594,22 +545,24 @@ PYBIND11_MODULE(pyf3d, module)
 
         for (auto item : d)
         {
-          f3d::mesh_view::data_array_t dataArray = fromBuffer(py::cast<py::buffer>(item.second));
+          f3d::mesh_view::data_array_t dataArray =
+            fromBuffer(py::cast<py::buffer>(item.second)).second;
           dataArray.name = py::cast<std::string>(item.first);
           self.pointScalars.emplace_back(std::move(dataArray));
         }
       })
-    .def_property("face_scalars", nullptr,
+    .def_property("cell_scalars", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::dict d)
       {
         // TODO: factorize with point_scalars since the code is almost identical
-        self.faceScalars.clear();
+        self.cellScalars.clear();
 
         for (auto item : d)
         {
-          f3d::mesh_view::data_array_t dataArray = fromBuffer(py::cast<py::buffer>(item.second));
+          f3d::mesh_view::data_array_t dataArray =
+            fromBuffer(py::cast<py::buffer>(item.second)).second;
           dataArray.name = py::cast<std::string>(item.first);
-          self.faceScalars.emplace_back(std::move(dataArray));
+          self.cellScalars.emplace_back(std::move(dataArray));
         }
       });
 
