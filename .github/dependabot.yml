@@ -2,22 +2,26 @@ version: 2
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
-    labels: "source:CI"
+    labels:
+      - "source:CI"
     schedule:
       interval: "weekly"
   - package-ecosystem: "github-actions"
     directories:
       - "/.github/actions/*/"
-    labels: "source:CI"
+    labels:
+      - "source:CI"
     schedule:
       interval: "weekly"
   - package-ecosystem: "pip"
     directory: "/"
-    labels: "source:python"
+    labels:
+      - "source:python"
     schedule:
       interval: "weekly"
   - package-ecosystem: "npm"
     directory: "/examples/libf3d/web/"
-    labels: "source:wasm"
+    labels:
+      - "source:wasm"
     schedule:
       interval: "weekly"
