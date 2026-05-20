@@ -497,7 +497,7 @@ std::vector<std::pair<std::string, F3DOptionsTools::OptionValue>>
 F3DOptionsTools::ConvertToLibf3dOptions(const std::string& key, const OptionValue& value)
 {
   std::vector<std::pair<std::string, F3DOptionsTools::OptionValue>> libf3dOptions;
-  const bool is_single_valued = std::holds_alternative<std::string>(value);
+  [[maybe_unused]] const bool is_single_valued = std::holds_alternative<std::string>(value);
 
   // Simple one-to-one case
   auto libf3dIter = F3DOptionsTools::LibOptionsNames.find(key);
