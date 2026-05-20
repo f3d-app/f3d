@@ -109,6 +109,11 @@
           "valueHelper": "<paths or names>"
         },
         {
+          "longName": "plugins-path",
+          "helpText": "Path specifying where to load plugins from",
+          "valueHelper": "<path>"
+        },
+        {
           "longName": "scan-plugins",
           "helpText": "Scan standard directories for plugins and display available plugins (result can be incomplete)"
         },

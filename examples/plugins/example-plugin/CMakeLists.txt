@@ -28,5 +28,6 @@ f3d_plugin_build(
 option(BUILD_TESTING "Build the example tests" OFF)
 if(BUILD_TESTING)
   enable_testing()
+  f3d_test(NAME TestPluginExamplePluginPaths DATA ${CMAKE_CURRENT_SOURCE_DIR}/data.expl NO_RENDER NO_BASELINE ARGS --verbose PLUGIN example PLUGINS_PATH ${CMAKE_CURRENT_BINARY_DIR} REGEXP "from: \"${CMAKE_CURRENT_BINARY_DIR}/.+\"")
   f3d_test(NAME TestPluginExample DATA ${CMAKE_CURRENT_SOURCE_DIR}/data.expl NO_RENDER ARGS --verbose --load-plugins=$<TARGET_FILE:f3d-plugin-example> REGEXP "Number of points: 3")
 endif()

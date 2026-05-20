@@ -39,6 +39,7 @@ static inline const OptionsDict DefaultAppOptions = {
   { "animation-time", "" },
   { "watch", "false" },
   { "load-plugins", "" },
+  { "plugins-path", "" },
   { "screenshot-filename", "{app}/{model}_{n}.png" },
   { "verbose", "info" },
   { "multi-file-mode", "single" },

@@ -391,16 +391,6 @@ runs:
       shell: bash
       run: echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
 
-    # Grid rendering has artifacts in macOS arm64 CI
-    # https://github.com/f3d-app/f3d/issues/1276
-    - name: Check F3D_PLUGINS_PATH using plugin example
-      if: |
-        inputs.vtk_version != 'v9.4.2' && inputs.vtk_version != 'v9.5.2' &&
-        inputs.cpu != 'arm64' && inputs.static_label == 'no-static' && inputs.optdeps_label == 'optdeps'
-      shell: bash
-      working-directory: ${{github.workspace}}/install
-      run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=output/install_example_plugin_output.png --reference=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --rendering-backend=${{ inputs.rendering_backend }} --verbose
-
     - name: Install plugin examples
       if: inputs.static_label == 'no-static'
       shell: bash

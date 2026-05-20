@@ -38,6 +38,7 @@ f3d_test(<NAME> [ARGS...])
   - `CONFIG` Provide the `--config` to use, instead of `--no-config`
   - `RESOLUTION` Provide the `--resolution` to use, instead of `300,300`
   - `PLUGIN` Provide the `--load-plugins` to use, also set test labels accordingly
+  - `PLUGINS_PATH` Provide the `--plugins-path` to use, default is CMAKE_LIBRARY_OUTPUT_DIRECTORY
   - `THRESHOLD` Provide the `--reference-threshold` to use instead of the default
   - `REGEXP` Provide the regexp to check for in the stdout of the test, fails if not present
   - `REGEXP_FAIL` Provide the regexp to check for in the stdout of the test, fails if present
@@ -53,7 +54,7 @@ f3d_test(<NAME> [ARGS...])
 
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED;PLUGIN" "DATA;DEPENDS;LABELS;ENV;ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED;PLUGIN;PLUGINS_PATH" "DATA;DEPENDS;LABELS;ENV;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -141,6 +142,12 @@ function(f3d_test)
     set(_f3d_target "$<TARGET_FILE:f3d::f3d>")
   else()
     set(_f3d_target "$<TARGET_FILE:f3d>")
+  endif()
+
+  if (F3D_TEST_PLUGINS_PATH)
+    list(APPEND F3D_TEST_ARGS "--plugins-path=${F3D_TEST_PLUGINS_PATH}")
+  else()
+    list(APPEND F3D_TEST_ARGS "--plugins-path=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
   endif()
 
   if (F3D_TEST_PIPED)
@@ -240,7 +247,6 @@ function(f3d_test)
     list(APPEND f3d_test_env_vars "CTEST_F3D_FORCE_DPI_SCALE=1.0")
   endif ()
 
-  set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES ENVIRONMENT
-    "F3D_PLUGINS_PATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY};${f3d_test_env_vars}")
+  set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES ENVIRONMENT "${f3d_test_env_vars}")
 
 endfunction()

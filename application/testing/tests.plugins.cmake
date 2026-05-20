@@ -27,6 +27,9 @@ if(BUILD_SHARED_LIBS)
   f3d_test(NAME TestPluginNoInit ARGS --verbose --load-plugins=${_dirname}/${CMAKE_SHARED_LIBRARY_PREFIX}f3d${CMAKE_SHARED_LIBRARY_SUFFIX} NO_BASELINE REGEXP "Cannot find init_plugin symbol in library" LABELS "plugin")
 endif()
 
+# Test that we can try loading a plugin without --plugins-path being set correctly
+f3d_test(NAME TestNoCliInvalidPlugin ARGS --verbose --load-plugins=invalid REGEXP "Cannot open the library" PLUGINS_PATH " " NO_RENDER NO_BASELINE LABELS "plugin")
+
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestMultiplePluginsLoad DATA cow.vtp ARGS --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load" LABELS "plugin;assimp;alembic")
 endif()
@@ -35,6 +38,15 @@ endif()
 # Test multi plugin list-readers
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestReadersListMultiplePlugins ARGS --list-readers --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load" LABELS "plugin;assimp;alembic")
+endif()
+
+# Test --plugins-path options
+if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
+  # Load plugins with --plugins-path
+  f3d_test(NAME TestCliPluginsPath ARGS --load-plugins=assimp,alembic --verbose PLUGINS_PATH ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} NO_BASELINE NO_RENDER REGEXP "from: \"${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/.+\"" LABELS "plugin;assimp;alembic")
+
+  # List readers with --plugins-path
+  f3d_test(NAME TestListReadersCliPluginsPath ARGS --list-readers --load-plugins=assimp,alembic --verbose PLUGINS_PATH ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} NO_BASELINE NO_RENDER REGEXP_FAIL "No registered reader found" LABELS "plugin;assimp;alembic")
 endif()
 
 f3d_test(NAME TestForceReaderFail DATA suzanne.stl ARGS --force-reader=GLTF NO_BASELINE REGEXP "Some of these files could not be loaded: failed to load scene" LABELS "plugin")

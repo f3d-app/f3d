@@ -11,14 +11,16 @@ namespace fs = std::filesystem;
 namespace
 {
 //----------------------------------------------------------------------------
-std::vector<fs::path> GetPluginSearchPaths()
+std::vector<fs::path> GetPluginSearchPaths(const std::string& pluginsPath)
 {
   std::vector<fs::path> searchPaths;
 
-  // Recover F3D_PLUGINS_PATH first
-  std::vector<std::string> stringPaths =
-    F3DSystemTools::GetVectorEnvironnementVariable("F3D_PLUGINS_PATH");
-  std::copy(stringPaths.begin(), stringPaths.end(), std::back_inserter(searchPaths));
+  // Recover user provided plugins path first
+  if (!pluginsPath.empty())
+  {
+    searchPaths.emplace_back(pluginsPath);
+  }
+
 #if F3D_MACOS_BUNDLE
   return searchPaths;
 #else
@@ -33,17 +35,20 @@ std::vector<fs::path> GetPluginSearchPaths()
 };
 
 //----------------------------------------------------------------------------
-void F3DPluginsTools::LoadPlugins(const std::vector<std::string>& plugins)
+void F3DPluginsTools::LoadPlugins(
+  const std::vector<std::string>& plugins, const std::string& supplementaryPluginsPath)
 {
   try
   {
+    const std::vector pluginsPaths = ::GetPluginSearchPaths(supplementaryPluginsPath);
+
     f3d::engine::autoloadPlugins();
 
     for (const std::string& plugin : plugins)
     {
       if (!plugin.empty())
       {
-        f3d::engine::loadPlugin(plugin, ::GetPluginSearchPaths());
+        f3d::engine::loadPlugin(plugin, pluginsPaths);
       }
     }
   }
