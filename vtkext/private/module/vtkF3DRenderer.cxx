@@ -2162,17 +2162,19 @@ void vtkF3DRenderer::Render()
     glGenQueries(1, &this->Timer);
   }
 
+  vtkInformation* info = this->GetInformation();
+  bool uiOnly = info->Get(vtkF3DRenderPass::RENDER_UI_ONLY());
+
 #if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
-  glBeginQuery(GL_TIME_ELAPSED, this->Timer);
+  if (!uiOnly)
+  {
+    glBeginQuery(GL_TIME_ELAPSED, this->Timer);
+  }
 #endif
 
   this->Superclass::Render();
 
   auto cpuElapsed = std::chrono::high_resolution_clock::now() - cpuStart;
-
-  vtkInformation* info = this->GetInformation();
-
-  bool uiOnly = info->Get(vtkF3DRenderPass::RENDER_UI_ONLY());
 
   if (!uiOnly)
   {
