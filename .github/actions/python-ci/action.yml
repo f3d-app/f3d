@@ -56,7 +56,7 @@ runs:
         python -m pip install pytest==8.0.0
         python -m pip install pyopengltk==0.0.4
         python -m pip install PySide6==6.10.1
-        python -m pip install numpy==2.2.0
+        python -m pip install numpy==2.3.0
 
     - name: Set PATH windows
       if: runner.os == 'Windows'
