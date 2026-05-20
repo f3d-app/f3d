@@ -467,7 +467,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property("points", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [ count, dataArray ] = fromBuffer(b);
+        auto [count, dataArray] = fromBuffer(b);
 
         self.pointCount = count;
         self.points = std::move(dataArray);
@@ -475,7 +475,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property("normals", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [ count, dataArray ] = fromBuffer(b);
+        auto [count, dataArray] = fromBuffer(b);
 
         if (count != self.pointCount)
         {
@@ -487,7 +487,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property("texture_coordinates", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [ count, dataArray ] = fromBuffer(b);
+        auto [count, dataArray] = fromBuffer(b);
 
         if (count != self.pointCount)
         {
@@ -501,42 +501,42 @@ PYBIND11_MODULE(pyf3d, module)
       {
         auto [count, array] = fromBuffer(b);
         self.vertices.offsetCount = count;
-        self.vertices.offsets = std::move(array); 
+        self.vertices.offsets = std::move(array);
       })
     .def_property("vertices_indices", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
         auto [count, array] = fromBuffer(b);
         self.vertices.indexCount = count;
-        self.vertices.indices = std::move(array); 
+        self.vertices.indices = std::move(array);
       })
     .def_property("lines_offsets", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
         auto [count, array] = fromBuffer(b);
         self.lines.offsetCount = count;
-        self.lines.offsets = std::move(array); 
+        self.lines.offsets = std::move(array);
       })
     .def_property("lines_indices", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
         auto [count, array] = fromBuffer(b);
         self.lines.indexCount = count;
-        self.lines.indices = std::move(array); 
+        self.lines.indices = std::move(array);
       })
     .def_property("polygons_offsets", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
         auto [count, array] = fromBuffer(b);
         self.polygons.offsetCount = count;
-        self.polygons.offsets = std::move(array); 
+        self.polygons.offsets = std::move(array);
       })
     .def_property("polygons_indices", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
         auto [count, array] = fromBuffer(b);
         self.polygons.indexCount = count;
-        self.polygons.indices = std::move(array); 
+        self.polygons.indices = std::move(array);
       })
     .def_property("point_scalars", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::dict d)
@@ -545,7 +545,8 @@ PYBIND11_MODULE(pyf3d, module)
 
         for (auto item : d)
         {
-          f3d::mesh_view::data_array_t dataArray = fromBuffer(py::cast<py::buffer>(item.second)).second;
+          f3d::mesh_view::data_array_t dataArray =
+            fromBuffer(py::cast<py::buffer>(item.second)).second;
           dataArray.name = py::cast<std::string>(item.first);
           self.pointScalars.emplace_back(std::move(dataArray));
         }
@@ -558,7 +559,8 @@ PYBIND11_MODULE(pyf3d, module)
 
         for (auto item : d)
         {
-          f3d::mesh_view::data_array_t dataArray = fromBuffer(py::cast<py::buffer>(item.second)).second;
+          f3d::mesh_view::data_array_t dataArray =
+            fromBuffer(py::cast<py::buffer>(item.second)).second;
           dataArray.name = py::cast<std::string>(item.first);
           self.cellScalars.emplace_back(std::move(dataArray));
         }

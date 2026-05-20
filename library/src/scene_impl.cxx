@@ -610,74 +610,75 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
             "Mesh view cell offsets count must be greater than 0");
         }
 
-        if (cells.offsetCount > 1)
+        if (cells.offsetCount == 1) // means there is no cell
         {
-          if (cells.offsets.data == nullptr)
-          {
-            throw scene::load_failure_exception("Mesh view cell offsets pointer is null");
-          }
-
-          if (cells.indices.data == nullptr)
-          {
-            throw scene::load_failure_exception("Mesh view cell indices pointer is null");
-          }
-
-          if (cells.offsets.type != mesh_view::data_type::I32 &&
-            cells.offsets.type != mesh_view::data_type::U32 &&
-            cells.offsets.type != mesh_view::data_type::I64 &&
-            cells.offsets.type != mesh_view::data_type::U64)
-          {
-            throw scene::load_failure_exception(
-              "Mesh view cell offsets must have a data type of I32, U32, I64, or U64");
-          }
-
-          if (cells.indices.type != mesh_view::data_type::I32 &&
-            cells.indices.type != mesh_view::data_type::U32 &&
-            cells.indices.type != mesh_view::data_type::I64 &&
-            cells.indices.type != mesh_view::data_type::U64)
-          {
-            throw scene::load_failure_exception(
-              "Mesh view cell indices must have a data type of I32, U32, I64, or U64");
-          }
-
-          if (cells.indices.type != cells.offsets.type)
-          {
-            throw scene::load_failure_exception(
-              "Mesh view cell offsets and cell indices must have the same data type");
-          }
-
-          return f3d::mesh_view::dataTypeDispatch(cells.offsets.type,
-            [&]<typename DataT>() -> vtkSmartPointer<vtkCellArray>
-            {
-              if constexpr (std::is_integral_v<DataT>) // makes no sense for F32 or F64
-              {
-                // if the user provided unsigned data, we need to use the corresponding signed type
-                // for VTK
-                using IndexingType = std::make_signed_t<DataT>;
-
-                vtkNew<vtkCellArray> cellArray;
-
-                vtkNew<vtkStridedArray<IndexingType>> faceOffsets;
-                faceOffsets->SetName(
-                  cells.offsets.name.empty() ? "FaceOffsets" : cells.offsets.name.c_str());
-                faceOffsets->SetNumberOfTuples(cells.offsetCount);
-                faceOffsets->ConstructBackend(
-                  reinterpret_cast<const IndexingType*>(cells.offsets.data), cells.offsets.stride);
-
-                vtkNew<vtkStridedArray<IndexingType>> faceIndices;
-                faceIndices->SetName(
-                  cells.indices.name.empty() ? "FaceIndices" : cells.indices.name.c_str());
-                faceIndices->SetNumberOfTuples(cells.indexCount);
-                faceIndices->ConstructBackend(
-                  reinterpret_cast<const IndexingType*>(cells.indices.data), cells.indices.stride);
-
-                cellArray->SetData(faceOffsets, faceIndices);
-                return cellArray;
-              }
-              return nullptr;
-            });
+          return nullptr;
         }
-        return nullptr;
+
+        if (cells.offsets.data == nullptr)
+        {
+          throw scene::load_failure_exception("Mesh view cell offsets pointer is null");
+        }
+
+        if (cells.indices.data == nullptr)
+        {
+          throw scene::load_failure_exception("Mesh view cell indices pointer is null");
+        }
+
+        if (cells.offsets.type != mesh_view::data_type::I32 &&
+          cells.offsets.type != mesh_view::data_type::U32 &&
+          cells.offsets.type != mesh_view::data_type::I64 &&
+          cells.offsets.type != mesh_view::data_type::U64)
+        {
+          throw scene::load_failure_exception(
+            "Mesh view cell offsets must have a data type of I32, U32, I64, or U64");
+        }
+
+        if (cells.indices.type != mesh_view::data_type::I32 &&
+          cells.indices.type != mesh_view::data_type::U32 &&
+          cells.indices.type != mesh_view::data_type::I64 &&
+          cells.indices.type != mesh_view::data_type::U64)
+        {
+          throw scene::load_failure_exception(
+            "Mesh view cell indices must have a data type of I32, U32, I64, or U64");
+        }
+
+        if (cells.indices.type != cells.offsets.type)
+        {
+          throw scene::load_failure_exception(
+            "Mesh view cell offsets and cell indices must have the same data type");
+        }
+
+        return f3d::mesh_view::dataTypeDispatch(cells.offsets.type,
+          [&]<typename DataT>() -> vtkSmartPointer<vtkCellArray>
+          {
+            if constexpr (std::is_integral_v<DataT>) // makes no sense for F32 or F64
+            {
+              // if the user provided unsigned data, we need to use the corresponding signed type
+              // for VTK
+              using IndexingType = std::make_signed_t<DataT>;
+
+              vtkNew<vtkCellArray> cellArray;
+
+              vtkNew<vtkStridedArray<IndexingType>> faceOffsets;
+              faceOffsets->SetName(
+                cells.offsets.name.empty() ? "FaceOffsets" : cells.offsets.name.c_str());
+              faceOffsets->SetNumberOfTuples(cells.offsetCount);
+              faceOffsets->ConstructBackend(
+                reinterpret_cast<const IndexingType*>(cells.offsets.data), cells.offsets.stride);
+
+              vtkNew<vtkStridedArray<IndexingType>> faceIndices;
+              faceIndices->SetName(
+                cells.indices.name.empty() ? "FaceIndices" : cells.indices.name.c_str());
+              faceIndices->SetNumberOfTuples(cells.indexCount);
+              faceIndices->ConstructBackend(
+                reinterpret_cast<const IndexingType*>(cells.indices.data), cells.indices.stride);
+
+              cellArray->SetData(faceOffsets, faceIndices);
+              return cellArray;
+            }
+            return nullptr;
+          });
       };
 
       polydata->SetVerts(handleCells(memoryView.vertices));
