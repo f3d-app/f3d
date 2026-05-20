@@ -584,7 +584,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
           });
       }
 
-      for (const auto& scalar : memoryView.faceScalars)
+      for (const auto& scalar : memoryView.cellScalars)
       {
         f3d::mesh_view::dataTypeDispatch(scalar.type,
           [&]<typename DataT>()
@@ -592,7 +592,8 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
             vtkNew<vtkStridedArray<DataT>> scalars;
             scalars->SetName(scalar.name.c_str());
             scalars->SetNumberOfComponents(static_cast<int>(scalar.components));
-            scalars->SetNumberOfTuples(memoryView.faceOffsetCount - 1);
+            scalars->SetNumberOfTuples(memoryView.vertices.offsetCount +
+              memoryView.lines.offsetCount + memoryView.polygons.offsetCount - 3);
             scalars->ConstructBackend(reinterpret_cast<const DataT*>(scalar.data), scalar.stride,
               static_cast<int>(scalar.components));
 
@@ -600,77 +601,88 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
           });
       }
 
-      // handle faces
-      if (memoryView.faceOffsetCount > 0)
+      auto handleCells =
+        [](const f3d::mesh_view::cell_array_t& cells) -> vtkSmartPointer<vtkCellArray>
       {
-        if (memoryView.faceOffsets.data == nullptr)
-        {
-          throw scene::load_failure_exception("Mesh view face offsets pointer is null");
-        }
-
-        if (memoryView.faceIndices.data == nullptr)
-        {
-          throw scene::load_failure_exception("Mesh view face indices pointer is null");
-        }
-
-        if (memoryView.faceOffsets.type != mesh_view::data_type::I32 &&
-          memoryView.faceOffsets.type != mesh_view::data_type::U32 &&
-          memoryView.faceOffsets.type != mesh_view::data_type::I64 &&
-          memoryView.faceOffsets.type != mesh_view::data_type::U64)
+        if (cells.offsetCount <= 0)
         {
           throw scene::load_failure_exception(
-            "Mesh view face offsets must have a data type of I32, U32, I64, or U64");
+            "Mesh view cell offsets count must be greater than 0");
         }
 
-        if (memoryView.faceIndices.type != mesh_view::data_type::I32 &&
-          memoryView.faceIndices.type != mesh_view::data_type::U32 &&
-          memoryView.faceIndices.type != mesh_view::data_type::I64 &&
-          memoryView.faceIndices.type != mesh_view::data_type::U64)
+        if (cells.offsetCount > 1)
         {
-          throw scene::load_failure_exception(
-            "Mesh view face indices must have a data type of I32, U32, I64, or U64");
-        }
-
-        if (memoryView.faceIndices.type != memoryView.faceOffsets.type)
-        {
-          throw scene::load_failure_exception(
-            "Mesh view face offsets and face indices must have the same data type");
-        }
-
-        f3d::mesh_view::dataTypeDispatch(memoryView.faceOffsets.type,
-          [&]<typename DataT>()
+          if (cells.offsets.data == nullptr)
           {
-            if constexpr (std::is_integral_v<DataT>) // makes no sense for F32 or F64
+            throw scene::load_failure_exception("Mesh view cell offsets pointer is null");
+          }
+
+          if (cells.indices.data == nullptr)
+          {
+            throw scene::load_failure_exception("Mesh view cell indices pointer is null");
+          }
+
+          if (cells.offsets.type != mesh_view::data_type::I32 &&
+            cells.offsets.type != mesh_view::data_type::U32 &&
+            cells.offsets.type != mesh_view::data_type::I64 &&
+            cells.offsets.type != mesh_view::data_type::U64)
+          {
+            throw scene::load_failure_exception(
+              "Mesh view cell offsets must have a data type of I32, U32, I64, or U64");
+          }
+
+          if (cells.indices.type != mesh_view::data_type::I32 &&
+            cells.indices.type != mesh_view::data_type::U32 &&
+            cells.indices.type != mesh_view::data_type::I64 &&
+            cells.indices.type != mesh_view::data_type::U64)
+          {
+            throw scene::load_failure_exception(
+              "Mesh view cell indices must have a data type of I32, U32, I64, or U64");
+          }
+
+          if (cells.indices.type != cells.offsets.type)
+          {
+            throw scene::load_failure_exception(
+              "Mesh view cell offsets and cell indices must have the same data type");
+          }
+
+          return f3d::mesh_view::dataTypeDispatch(cells.offsets.type,
+            [&]<typename DataT>() -> vtkSmartPointer<vtkCellArray>
             {
-              // if the user provided unsigned data, we need to use the corresponding signed type
-              // for VTK
-              using IndexingType = std::make_signed_t<DataT>;
+              if constexpr (std::is_integral_v<DataT>) // makes no sense for F32 or F64
+              {
+                // if the user provided unsigned data, we need to use the corresponding signed type
+                // for VTK
+                using IndexingType = std::make_signed_t<DataT>;
 
-              vtkNew<vtkCellArray> polys;
+                vtkNew<vtkCellArray> cellArray;
 
-              vtkNew<vtkStridedArray<IndexingType>> faceOffsets;
-              faceOffsets->SetName(memoryView.faceOffsets.name.empty()
-                  ? "FaceOffsets"
-                  : memoryView.faceOffsets.name.c_str());
-              faceOffsets->SetNumberOfTuples(memoryView.faceOffsetCount);
-              faceOffsets->ConstructBackend(
-                reinterpret_cast<const IndexingType*>(memoryView.faceOffsets.data),
-                memoryView.faceOffsets.stride);
+                vtkNew<vtkStridedArray<IndexingType>> faceOffsets;
+                faceOffsets->SetName(
+                  cells.offsets.name.empty() ? "FaceOffsets" : cells.offsets.name.c_str());
+                faceOffsets->SetNumberOfTuples(cells.offsetCount);
+                faceOffsets->ConstructBackend(
+                  reinterpret_cast<const IndexingType*>(cells.offsets.data), cells.offsets.stride);
 
-              vtkNew<vtkStridedArray<IndexingType>> faceIndices;
-              faceIndices->SetName(memoryView.faceIndices.name.empty()
-                  ? "FaceIndices"
-                  : memoryView.faceIndices.name.c_str());
-              faceIndices->SetNumberOfTuples(memoryView.faceIndexCount);
-              faceIndices->ConstructBackend(
-                reinterpret_cast<const IndexingType*>(memoryView.faceIndices.data),
-                memoryView.faceIndices.stride);
+                vtkNew<vtkStridedArray<IndexingType>> faceIndices;
+                faceIndices->SetName(
+                  cells.indices.name.empty() ? "FaceIndices" : cells.indices.name.c_str());
+                faceIndices->SetNumberOfTuples(cells.indexCount);
+                faceIndices->ConstructBackend(
+                  reinterpret_cast<const IndexingType*>(cells.indices.data), cells.indices.stride);
 
-              polys->SetData(faceOffsets, faceIndices);
-              polydata->SetPolys(polys);
-            }
-          });
-      }
+                cellArray->SetData(faceOffsets, faceIndices);
+                return cellArray;
+              }
+              return nullptr;
+            });
+        }
+        return nullptr;
+      };
+
+      polydata->SetVerts(handleCells(memoryView.vertices));
+      polydata->SetLines(handleCells(memoryView.lines));
+      polydata->SetPolys(handleCells(memoryView.polygons));
     });
 
   try

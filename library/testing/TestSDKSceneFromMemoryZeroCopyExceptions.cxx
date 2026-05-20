@@ -136,6 +136,22 @@ int TestSDKSceneFromMemoryZeroCopyExceptions(
     "add with invalid texture coordinate component count",
     [&]() { sce.add(std::make_shared<InvalidTextureCoordinateComponentCountMesh>()); });
 
+  // Mesh view face offsets count invalid
+  class InvalidFaceOffsetsCountMesh : public f3d::mesh_view
+  {
+  public:
+    f3d::mesh_view::memory_view_t getMemoryView(double) const override
+    {
+      const void* dummyPointer = reinterpret_cast<const void*>(0xf3d);
+      return { .pointCount = 1,
+        .points = { .data = dummyPointer, .components = 3 },
+        .polygons = { .offsetCount = 0 } };
+    }
+  };
+
+  test.expect<f3d::scene::load_failure_exception>("add with invalid face offsets count",
+    [&]() { sce.add(std::make_shared<InvalidFaceOffsetsCountMesh>()); });
+
   // Mesh view face offsets pointer is null
   class NullFaceOffsetsMesh : public f3d::mesh_view
   {
@@ -145,8 +161,7 @@ int TestSDKSceneFromMemoryZeroCopyExceptions(
       const void* dummyPointer = reinterpret_cast<const void*>(0xf3d);
       return { .pointCount = 1,
         .points = { .data = dummyPointer, .components = 3 },
-        .faceOffsetCount = 1,
-        .faceOffsets = { .data = nullptr } };
+        .polygons = { .offsetCount = 2, .offsets = { .data = nullptr } } };
     }
   };
 
@@ -162,11 +177,11 @@ int TestSDKSceneFromMemoryZeroCopyExceptions(
       const void* dummyPointer = reinterpret_cast<const void*>(0xf3d);
       return { .pointCount = 1,
         .points = { .data = dummyPointer, .components = 3 },
-        .faceOffsetCount = 2,
-        .faceOffsets = { .data = dummyPointer },
-        .faceIndexCount = 1,
-        .faceIndices = { .data = nullptr } };
-    };
+        .polygons = { .offsetCount = 2,
+          .offsets = { .data = dummyPointer },
+          .indexCount = 1,
+          .indices = { .data = nullptr } } };
+    }
   };
 
   test.expect<f3d::scene::load_failure_exception>(
@@ -181,10 +196,10 @@ int TestSDKSceneFromMemoryZeroCopyExceptions(
       const void* dummyPointer = reinterpret_cast<const void*>(0xf3d);
       return { .pointCount = 1,
         .points = { .data = dummyPointer, .components = 3 },
-        .faceOffsetCount = 2,
-        .faceOffsets = { .type = data_type::U8, .data = dummyPointer },
-        .faceIndexCount = 1,
-        .faceIndices = { .data = dummyPointer } };
+        .polygons = { .offsetCount = 2,
+          .offsets = { .type = data_type::U8, .data = dummyPointer },
+          .indexCount = 1,
+          .indices = { .data = dummyPointer } } };
     };
   };
 
@@ -200,10 +215,10 @@ int TestSDKSceneFromMemoryZeroCopyExceptions(
       const void* dummyPointer = reinterpret_cast<const void*>(0xf3d);
       return { .pointCount = 1,
         .points = { .data = dummyPointer, .components = 3 },
-        .faceOffsetCount = 2,
-        .faceOffsets = { .type = data_type::I32, .data = dummyPointer },
-        .faceIndexCount = 1,
-        .faceIndices = { .type = data_type::U8, .data = dummyPointer } };
+        .polygons = { .offsetCount = 2,
+          .offsets = { .type = data_type::I32, .data = dummyPointer },
+          .indexCount = 1,
+          .indices = { .type = data_type::U8, .data = dummyPointer } } };
     };
   };
 
@@ -219,10 +234,10 @@ int TestSDKSceneFromMemoryZeroCopyExceptions(
       const void* dummyPointer = reinterpret_cast<const void*>(0xf3d);
       return { .pointCount = 1,
         .points = { .data = dummyPointer, .components = 3 },
-        .faceOffsetCount = 2,
-        .faceOffsets = { .type = data_type::I32, .data = dummyPointer },
-        .faceIndexCount = 1,
-        .faceIndices = { .type = data_type::I64, .data = dummyPointer } };
+        .polygons = { .offsetCount = 2,
+          .offsets = { .type = data_type::I32, .data = dummyPointer },
+          .indexCount = 1,
+          .indices = { .type = data_type::I64, .data = dummyPointer } } };
     };
   };
 

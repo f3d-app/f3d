@@ -80,6 +80,29 @@ struct WavyGridMesh
       return offset;
     });
 
+    // Corners
+    this->CornerIndices = { 0, nx, (nx + 1) * ny, (nx + 1) * (ny + 1) - 1 };
+    this->CornerOffsets = { 0, 1, 2, 3, 4 };
+
+    // Borders
+    for (unsigned int i = 0; i < nx; ++i)
+    {
+      this->BorderIndices.push_back(i);
+    }
+    for (unsigned int i = 0; i < nx; ++i)
+    {
+      this->BorderIndices.push_back((nx + 1) * ny + i); // top
+    }
+    for (unsigned int j = 0; j < ny; ++j)
+    {
+      this->BorderIndices.push_back(j * (nx + 1)); // left
+    }
+    for (unsigned int j = 0; j < ny; ++j)
+    {
+      this->BorderIndices.push_back((j + 1) * (nx + 1) - 1); // right
+    }
+    this->BorderOffsets = { 0, nx, 2 * nx, 2 * nx + ny, 2 * nx + 2 * ny };
+
     // Random for coverage
     this->DummyU8.resize(quadCount);
     this->DummyI8.resize(quadCount);
@@ -146,6 +169,12 @@ struct WavyGridMesh
   std::vector<unsigned int> Quads;
   std::vector<unsigned int> FaceOffsets;
 
+  // corners/borders
+  std::vector<unsigned int> CornerIndices;
+  std::vector<unsigned int> CornerOffsets;
+  std::vector<unsigned int> BorderIndices;
+  std::vector<unsigned int> BorderOffsets;
+
   // Cell scalar with 2 short components
   std::vector<unsigned short> QuadCoords;
 
@@ -180,11 +209,23 @@ public:
         .data = points + 6,
         .components = 2,
         .stride = stride },
-      .faceOffsetCount = this->Grid.FaceOffsets.size(),
-      .faceOffsets = { .type = f3d::mesh_view::data_type::I32,
-        .data = this->Grid.FaceOffsets.data() },
-      .faceIndexCount = this->Grid.Quads.size(),
-      .faceIndices = { .type = f3d::mesh_view::data_type::I32, .data = this->Grid.Quads.data() } };
+      .vertices = { .offsetCount = this->Grid.CornerOffsets.size(),
+        .offsets = { .type = f3d::mesh_view::data_type::I32,
+          .data = this->Grid.CornerOffsets.data() },
+        .indexCount = this->Grid.CornerIndices.size(),
+        .indices = { .type = f3d::mesh_view::data_type::I32,
+          .data = this->Grid.CornerIndices.data() } },
+      .lines = { .offsetCount = this->Grid.BorderOffsets.size(),
+        .offsets = { .type = f3d::mesh_view::data_type::I32,
+          .data = this->Grid.BorderOffsets.data() },
+        .indexCount = this->Grid.BorderIndices.size(),
+        .indices = { .type = f3d::mesh_view::data_type::I32,
+          .data = this->Grid.BorderIndices.data() } },
+      .polygons = { .offsetCount = this->Grid.FaceOffsets.size(),
+        .offsets = { .type = f3d::mesh_view::data_type::I32,
+          .data = this->Grid.FaceOffsets.data() },
+        .indexCount = this->Grid.Quads.size(),
+        .indices = { .type = f3d::mesh_view::data_type::I32, .data = this->Grid.Quads.data() } } };
   }
 
 private:
@@ -213,13 +254,14 @@ public:
     return { .pointCount = this->Grid.Vertices.size(),
              .points = { .name = "custom_points_name", .data = points, .components = 3, .stride = stride },
              .normals = { .name = "custom_normals_name", .data = points + 3, .components = 3, .stride = stride },
-             .faceOffsetCount = this->Grid.FaceOffsets.size(),
-             .faceOffsets = { .name = "custom_face_offsets_name", .type = f3d::mesh_view::data_type::I32, .data = this->Grid.FaceOffsets.data() },
-             .faceIndexCount = this->Grid.Quads.size(),
-             .faceIndices = { .name = "custom_face_indices_name", .type = f3d::mesh_view::data_type::I32, .data = this->Grid.Quads.data() },
+             .polygons = {
+               .offsetCount = this->Grid.FaceOffsets.size(),
+               .offsets = { .name = "custom_face_offsets_name", .type = f3d::mesh_view::data_type::I32, .data = this->Grid.FaceOffsets.data() },
+               .indexCount = this->Grid.Quads.size(),
+               .indices = { .name = "custom_face_indices_name", .type = f3d::mesh_view::data_type::I32, .data = this->Grid.Quads.data() } },
              .pointScalars = { { .name = "velocity", .data = points + 8, .stride = stride },
                                 },
-             .faceScalars = { { .name = "quad_coords",
+             .cellScalars = { { .name = "quad_coords",
                                 .type = f3d::mesh_view::data_type::U16,
                                 .data = this->Grid.QuadCoords.data(),
                                 .components = 2,
