@@ -8,6 +8,9 @@ set_target_properties(check-image PROPERTIES CXX_STANDARD 17)
 # check-engine
 add_test(NAME test_check-engine COMMAND "$<TARGET_FILE:check-engine>")
 
+# in-situ
+add_test(NAME test_in-situ COMMAND "$<TARGET_FILE:in-situ>" 1)
+
 # interactive-app
 add_test(NAME test_interactive-app COMMAND "$<TARGET_FILE:interactive-app>" "${CMAKE_CURRENT_SOURCE_DIR}/data/cow.vtp" 1)
 
