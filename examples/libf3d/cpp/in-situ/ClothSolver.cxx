@@ -10,79 +10,79 @@ ClothSolver::ClothSolver()
 
 void ClothSolver::initialize()
 {
-  this->currentTime = 0.f;
+  this->CurrentTime = 0.f;
 
-  const float edgeLen = 2.0f / static_cast<float>(this->gridSize);
+  const float edgeLen = 2.0f / static_cast<float>(this->GridSize);
 
-  this->positions.clear();
-  this->inversed_masses.clear();
-  this->next_positions.clear();
-  this->velocities.clear();
-  this->face_indices.clear();
-  this->face_offsets.clear();
-  this->distance_constraints.clear();
+  this->Positions.clear();
+  this->InversedMasses.clear();
+  this->NextPositions.clear();
+  this->Velocities.clear();
+  this->FaceIndices.clear();
+  this->FaceOffsets.clear();
+  this->DistanceConstraints.clear();
 
   // define the grid
-  for (uint32_t i = 0; i <= this->gridSize; i++)
+  for (uint32_t i = 0; i <= this->GridSize; i++)
   {
-    for (uint32_t j = 0; j <= this->gridSize; j++)
+    for (uint32_t j = 0; j <= this->GridSize; j++)
     {
-      this->positions.push_back(-1.0f + i * edgeLen);
-      this->positions.push_back(-1.0f + j * edgeLen);
-      this->positions.push_back(3.0f);
+      this->Positions.push_back(-1.0f + i * edgeLen);
+      this->Positions.push_back(-1.0f + j * edgeLen);
+      this->Positions.push_back(3.0f);
 
-      this->inversed_masses.push_back(1.0f);
+      this->InversedMasses.push_back(1.0f);
     }
   }
 
-  this->next_positions = this->positions;
-  this->velocities.resize(this->positions.size(), 0.0f);
+  this->NextPositions = this->Positions;
+  this->Velocities.resize(this->Positions.size(), 0.0f);
 
   // fixed vertices
-  this->fixed_vertices_indices = { 0, this->gridSize };
-  this->fixed_vertices_offsets = { 0, 1, 2 };
+  this->FixedVerticesIndices = { 0, this->GridSize };
+  this->FixedVerticesOffsets = { 0, 1, 2 };
 
-  for (uint32_t index : this->fixed_vertices_indices)
+  for (uint32_t index : this->FixedVerticesIndices)
   {
-    this->inversed_masses[index] = 0.0f;
+    this->InversedMasses[index] = 0.0f;
   }
 
   // add cells and distance constraints
-  for (uint32_t i = 0; i < this->gridSize; i++)
+  for (uint32_t i = 0; i < this->GridSize; i++)
   {
-    for (uint32_t j = 0; j < this->gridSize; j++)
+    for (uint32_t j = 0; j < this->GridSize; j++)
     {
-      uint32_t topLeft = (i + 1) * (this->gridSize + 1) + j;
+      uint32_t topLeft = (i + 1) * (this->GridSize + 1) + j;
       uint32_t topRight = topLeft + 1;
-      uint32_t bottomLeft = i * (this->gridSize + 1) + j;
+      uint32_t bottomLeft = i * (this->GridSize + 1) + j;
       uint32_t bottomRight = bottomLeft + 1;
-      this->face_indices.push_back(topRight);
-      this->face_indices.push_back(bottomRight);
-      this->face_indices.push_back(bottomLeft);
-      this->face_indices.push_back(topLeft);
+      this->FaceIndices.push_back(topRight);
+      this->FaceIndices.push_back(bottomRight);
+      this->FaceIndices.push_back(bottomLeft);
+      this->FaceIndices.push_back(topLeft);
 
       // avoid duplicated constraints by only creating them for the top and left edges of each quad
-      this->distance_constraints.push_back({ topLeft, topRight, edgeLen });
-      this->distance_constraints.push_back({ topLeft, bottomLeft, edgeLen });
+      this->DistanceConstraints.push_back({ topLeft, topRight, edgeLen });
+      this->DistanceConstraints.push_back({ topLeft, bottomLeft, edgeLen });
 
       // but make sure to create constraints for the right and bottom edges of the last quads
-      if (j == this->gridSize - 1)
+      if (j == this->GridSize - 1)
       {
-        this->distance_constraints.push_back({ topRight, bottomRight, edgeLen });
+        this->DistanceConstraints.push_back({ topRight, bottomRight, edgeLen });
       }
-      if (i == this->gridSize - 1)
+      if (i == this->GridSize - 1)
       {
-        this->distance_constraints.push_back({ bottomLeft, bottomRight, edgeLen });
+        this->DistanceConstraints.push_back({ bottomLeft, bottomRight, edgeLen });
       }
 
       // add diagonal constraints for better stability
-      this->distance_constraints.push_back({ topLeft, bottomRight, std::sqrt(2.0f) * edgeLen });
-      this->distance_constraints.push_back({ topRight, bottomLeft, std::sqrt(2.0f) * edgeLen });
+      this->DistanceConstraints.push_back({ topLeft, bottomRight, std::sqrt(2.0f) * edgeLen });
+      this->DistanceConstraints.push_back({ topRight, bottomLeft, std::sqrt(2.0f) * edgeLen });
     }
   }
 
-  this->face_offsets.resize(this->gridSize * this->gridSize + 1);
-  std::generate(this->face_offsets.begin(), this->face_offsets.end(),
+  this->FaceOffsets.resize(this->GridSize * this->GridSize + 1);
+  std::generate(this->FaceOffsets.begin(), this->FaceOffsets.end(),
     [n = 0]() mutable
     {
       const unsigned int offset = n;
@@ -95,14 +95,14 @@ void ClothSolver::update(double newTime)
 {
   if (newTime == 0.0)
   {
-    if (this->currentTime != 0.0)
+    if (this->CurrentTime != 0.0)
     {
       this->initialize();
     }
     return;
   }
 
-  double timeStep = newTime - this->currentTime;
+  double timeStep = newTime - this->CurrentTime;
 
   if (timeStep == 0.0)
   {
@@ -115,55 +115,55 @@ void ClothSolver::update(double newTime)
     return;
   }
 
-  this->currentTime = newTime;
+  this->CurrentTime = newTime;
 
-  // Apply gravity on Z axis (m.s^-2) and predict next positions
+  // Apply gravity on Z axis (m.s^-2) and predict next Positions
   constexpr float gravity = -9.81f;
 
-  for (size_t i = 0; i < this->positions.size(); i++)
+  for (size_t i = 0; i < this->Positions.size(); i++)
   {
     if (i % 3 == 2) // Z component
     {
-      this->velocities[i] += gravity * this->inversed_masses[i / 3] * static_cast<float>(timeStep);
+      this->Velocities[i] += gravity * this->InversedMasses[i / 3] * static_cast<float>(timeStep);
     }
-    this->next_positions[i] =
-      this->positions[i] + this->velocities[i] * static_cast<float>(timeStep);
+    this->NextPositions[i] =
+      this->Positions[i] + this->Velocities[i] * static_cast<float>(timeStep);
   }
 
   // loop on constraints and project
-  for (uint32_t iter = 0; iter < this->iterations; iter++)
+  for (uint32_t iter = 0; iter < this->Iterations; iter++)
   {
-    for (const DistanceConstraint& constraint : this->distance_constraints)
+    for (const DistanceConstraint& constraint : this->DistanceConstraints)
     {
-      uint32_t i1 = constraint.p1 * 3;
-      uint32_t i2 = constraint.p2 * 3;
-      float dx = this->next_positions[i2] - this->next_positions[i1];
-      float dy = this->next_positions[i2 + 1] - this->next_positions[i1 + 1];
-      float dz = this->next_positions[i2 + 2] - this->next_positions[i1 + 2];
+      uint32_t i1 = constraint.Indices[0] * 3;
+      uint32_t i2 = constraint.Indices[1] * 3;
+      float dx = this->NextPositions[i2] - this->NextPositions[i1];
+      float dy = this->NextPositions[i2 + 1] - this->NextPositions[i1 + 1];
+      float dz = this->NextPositions[i2 + 2] - this->NextPositions[i1 + 2];
       float len = std::sqrt(dx * dx + dy * dy + dz * dz);
-      float diff = (len - constraint.rest_length) / len;
-      float invMass1 = this->inversed_masses[constraint.p1];
-      float invMass2 = this->inversed_masses[constraint.p2];
+      float diff = (len - constraint.RestLength) / len;
+      float invMass1 = this->InversedMasses[constraint.Indices[0]];
+      float invMass2 = this->InversedMasses[constraint.Indices[1]];
       float sumInvMass = invMass1 + invMass2;
       if (sumInvMass > 0.0f)
       {
         float correction1 = (invMass1 / sumInvMass) * diff;
         float correction2 = (invMass2 / sumInvMass) * diff;
-        this->next_positions[i1] += correction1 * dx;
-        this->next_positions[i1 + 1] += correction1 * dy;
-        this->next_positions[i1 + 2] += correction1 * dz;
-        this->next_positions[i2] -= correction2 * dx;
-        this->next_positions[i2 + 1] -= correction2 * dy;
-        this->next_positions[i2 + 2] -= correction2 * dz;
+        this->NextPositions[i1] += correction1 * dx;
+        this->NextPositions[i1 + 1] += correction1 * dy;
+        this->NextPositions[i1 + 2] += correction1 * dz;
+        this->NextPositions[i2] -= correction2 * dx;
+        this->NextPositions[i2 + 1] -= correction2 * dy;
+        this->NextPositions[i2 + 2] -= correction2 * dz;
       }
     }
   }
 
-  // update velocities and positions
-  for (size_t i = 0; i < this->positions.size(); i++)
+  // update Velocities and Positions
+  for (size_t i = 0; i < this->Positions.size(); i++)
   {
-    this->velocities[i] =
-      (this->next_positions[i] - this->positions[i]) / static_cast<float>(timeStep);
-    this->positions[i] = this->next_positions[i];
+    this->Velocities[i] =
+      (this->NextPositions[i] - this->Positions[i]) / static_cast<float>(timeStep);
+    this->Positions[i] = this->NextPositions[i];
   }
 }

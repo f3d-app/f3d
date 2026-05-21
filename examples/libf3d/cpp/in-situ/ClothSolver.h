@@ -14,7 +14,7 @@ public:
    */
   void setGridSize(uint32_t gridSize)
   {
-    this->gridSize = gridSize;
+    this->GridSize = gridSize;
   }
 
   /**
@@ -22,7 +22,7 @@ public:
    */
   void setIterations(uint32_t iterations)
   {
-    this->iterations = iterations;
+    this->Iterations = iterations;
   }
 
   /**
@@ -41,83 +41,82 @@ public:
    */
   size_t getPointCount() const
   {
-    return this->positions.size() / 3;
+    return this->Positions.size() / 3;
   }
   const float* getPositions() const
   {
-    return this->positions.data();
+    return this->Positions.data();
   }
   const float* getInversedMasses() const
   {
-    return this->inversed_masses.data();
+    return this->InversedMasses.data();
   }
   const float* getVelocities() const
   {
-    return this->velocities.data();
+    return this->Velocities.data();
   }
 
   size_t getFaceOffsetCount() const
   {
-    return this->face_offsets.size();
+    return this->FaceOffsets.size();
   }
   size_t getFaceIndexCount() const
   {
-    return this->face_indices.size();
+    return this->FaceIndices.size();
   }
   const uint32_t* getFaceOffsets() const
   {
-    return this->face_offsets.data();
+    return this->FaceOffsets.data();
   }
   const uint32_t* getFaceIndices() const
   {
-    return this->face_indices.data();
+    return this->FaceIndices.data();
   }
 
   size_t getFixedVertexOffsetCount() const
   {
-    return this->fixed_vertices_offsets.size();
+    return this->FixedVerticesOffsets.size();
   }
   size_t getFixedVertexIndexCount() const
   {
-    return this->fixed_vertices_indices.size();
+    return this->FixedVerticesIndices.size();
   }
   const uint32_t* getFixedVertexOffsets() const
   {
-    return this->fixed_vertices_offsets.data();
+    return this->FixedVerticesOffsets.data();
   }
   const uint32_t* getFixedVertexIndices() const
   {
-    return this->fixed_vertices_indices.data();
+    return this->FixedVerticesIndices.data();
   }
   //@}
 
 private:
-  double currentTime = 0.0;
-  uint32_t gridSize = 40;
-  uint32_t iterations = 100;
+  double CurrentTime = 0.0;
+  uint32_t GridSize = 40;
+  uint32_t Iterations = 100;
 
-  std::vector<float> positions;
+  std::vector<float> Positions;
 
   // topology
-  std::vector<uint32_t> face_offsets;
-  std::vector<uint32_t> face_indices;
+  std::vector<uint32_t> FaceOffsets;
+  std::vector<uint32_t> FaceIndices;
 
   // simulation data on particles
-  std::vector<float> inversed_masses;
-  std::vector<float> next_positions;
-  std::vector<float> velocities;
+  std::vector<float> InversedMasses;
+  std::vector<float> NextPositions;
+  std::vector<float> Velocities;
 
   // fixed vertices
-  std::vector<uint32_t> fixed_vertices_indices;
-  std::vector<uint32_t> fixed_vertices_offsets;
+  std::vector<uint32_t> FixedVerticesIndices;
+  std::vector<uint32_t> FixedVerticesOffsets;
 
   // constraints data
   struct DistanceConstraint
   {
-    uint32_t p1;
-    uint32_t p2;
-    float rest_length;
+    uint32_t Indices[2];
+    float RestLength;
   };
 
-  std::vector<DistanceConstraint> distance_constraints;
+  std::vector<DistanceConstraint> DistanceConstraints;
 };
