@@ -1,5 +1,5 @@
 // Clip Library
-// Copyright (c) 2015-2024 David Capello
+// Copyright (c) 2015-2026 David Capello
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -12,6 +12,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "clip_base.h"
 
 namespace clip {
 
@@ -28,7 +30,7 @@ namespace clip {
 #endif // CLIP_ENABLE_IMAGE
 
 #if CLIP_ENABLE_LIST_FORMATS
-  struct format_info {
+  struct CLIP_EXTERN format_info {
     format id = 0;
     std::string name;
     format_info(const format id,
@@ -39,7 +41,7 @@ namespace clip {
   };
 #endif // CLIP_ENABLE_LIST_FORMATS
 
-  class lock {
+  class CLIP_EXTERN lock {
   public:
     // You can give your current HWND as the "native_window_handle."
     // Windows clipboard functions use this handle to open/close
@@ -84,24 +86,24 @@ namespace clip {
     std::unique_ptr<impl> p;
   };
 
-  format register_format(const std::string& name);
+  CLIP_EXTERN format register_format(const std::string& name);
 
   // This format is when the clipboard has no content.
-  format empty_format();
+  CLIP_EXTERN format empty_format();
 
   // When the clipboard has UTF8 text.
-  format text_format();
+  CLIP_EXTERN format text_format();
 
 #if CLIP_ENABLE_IMAGE
   // When the clipboard has an image.
-  format image_format();
+  CLIP_EXTERN format image_format();
 #endif
 
   // Returns true if the clipboard has content of the given type.
-  bool has(format f);
+  CLIP_EXTERN bool has(format f);
 
   // Clears the clipboard content.
-  bool clear();
+  CLIP_EXTERN bool clear();
 
   // ======================================================================
   // Error handling
@@ -116,8 +118,8 @@ namespace clip {
 
   typedef void (*error_handler)(ErrorCode code);
 
-  void set_error_handler(error_handler f);
-  error_handler get_error_handler();
+  CLIP_EXTERN void set_error_handler(error_handler f);
+  CLIP_EXTERN error_handler get_error_handler();
 
   // ======================================================================
   // Text
@@ -125,8 +127,8 @@ namespace clip {
 
   // High-level API to put/get UTF8 text in/from the clipboard. These
   // functions returns false in case of error.
-  bool set_text(const std::string& value);
-  bool get_text(std::string& value);
+  CLIP_EXTERN bool set_text(const std::string& value);
+  CLIP_EXTERN bool get_text(std::string& value);
 
   // ======================================================================
   // Image
@@ -134,7 +136,7 @@ namespace clip {
 
 #if CLIP_ENABLE_IMAGE
 
-  struct image_spec {
+  struct CLIP_EXTERN image_spec {
     unsigned long width = 0;
     unsigned long height = 0;
     unsigned long bits_per_pixel = 0;
@@ -161,7 +163,7 @@ namespace clip {
   // automatically. macOS handles straight alpha directly, so there is
   // no conversion at all. Linux/X11 images are transferred in
   // image/png format which are specified in straight alpha.
-  class image {
+  class CLIP_EXTERN image {
   public:
     image();
     image(const image_spec& spec);
@@ -190,9 +192,9 @@ namespace clip {
 
   // High-level API to set/get an image in/from the clipboard. These
   // functions returns false in case of error.
-  bool set_image(const image& img);
-  bool get_image(image& img);
-  bool get_image_spec(image_spec& spec);
+  CLIP_EXTERN bool set_image(const image& img);
+  CLIP_EXTERN bool get_image(image& img);
+  CLIP_EXTERN bool get_image_spec(image_spec& spec);
 
 #endif // CLIP_ENABLE_IMAGE
 
@@ -203,8 +205,8 @@ namespace clip {
   // Only for X11: Sets the time (in milliseconds) that we must wait
   // for the selection/clipboard owner to receive the content. This
   // value is 1000 (one second) by default.
-  void set_x11_wait_timeout(int msecs);
-  int get_x11_wait_timeout();
+  CLIP_EXTERN void set_x11_wait_timeout(int msecs);
+  CLIP_EXTERN int get_x11_wait_timeout();
 
 } // namespace clip
 

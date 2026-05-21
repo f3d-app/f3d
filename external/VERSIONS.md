@@ -1,4 +1,4 @@
-- clip: v1.13 (with patches from master)
+- clip: v1.15
 - cxxopts: v3.3.1
 - dmon: 1.3.9
 - imgui: v1.92.5

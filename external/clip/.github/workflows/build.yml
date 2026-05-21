@@ -7,7 +7,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
-        enable_image: [on, off]
+        sanitize: [address, none]
+        shared: [shared, static]
+        enable_image: [with_image, text_only]
     steps:
     - uses: actions/checkout@v4
     - uses: ilammy/msvc-dev-cmd@v1
@@ -21,14 +23,39 @@ jobs:
     - name: Generating Makefiles
       shell: bash
       run: |
-        if [[ "${{ runner.os }}" == "Windows" ]] ; then
-          cmake . -G "NMake Makefiles" \
-                  -DCLIP_ENABLE_IMAGE=${{ matrix.enable_image }} \
-                  "-DCMAKE_CXX_FLAGS:STRING=-DWIN32 -D_WINDOWS -GR -EHsc -fsanitize=address" \
-                  "-DCMAKE_EXE_LINKER_FLAGS:STRING=-machine:x64 -fsanitize=address"
+        if [[ "${{ matrix.shared }}" == "shared" ]] ; then
+          shared=on
         else
-          cmake . -G "Unix Makefiles" \
-                  -DCLIP_ENABLE_IMAGE=${{ matrix.enable_image }}
+          shared=off
+        fi
+        if [[ "${{ matrix.enable_image }}" == "with_image" ]] ; then
+          with_image=on
+        else
+          with_image=off
+        fi
+        if [[ "${{ runner.os }}" == "Windows" ]] ; then
+          if [[ "${{ runner.sanitize }}" == "address" ]] ; then
+            cmake . -G "NMake Makefiles" \
+              -DCLIP_ENABLE_IMAGE=${{ matrix.enable_image }} \
+              "-DCMAKE_CXX_FLAGS:STRING=-DWIN32 -D_WINDOWS -GR -EHsc -fsanitize=address" \
+              "-DCMAKE_EXE_LINKER_FLAGS:STRING=-machine:x64 -fsanitize=address"
+          else
+            cmake . -G "NMake Makefiles" \
+              -DCLIP_ENABLE_IMAGE=${{ matrix.enable_image }} \
+              -DBUILD_SHARED_LIBS=$shared
+          fi
+        else
+          if [[ "${{ runner.sanitize }}" == "address" ]] ; then
+            cmake . -G "Unix Makefiles" \
+              -DCLIP_ENABLE_IMAGE=${{ matrix.enable_image }} \
+              "-DCMAKE_CXX_FLAGS:STRING=-fsanitize=address" \
+              "-DCMAKE_EXE_LINKER_FLAGS:STRING=-fsanitize=address" \
+              -DBUILD_SHARED_LIBS=$shared
+            else
+              cmake . -G "Unix Makefiles" \
+                "-DCLIP_ENABLE_IMAGE=$with_image" \
+                -DBUILD_SHARED_LIBS=$shared
+            fi
         fi
     - name: Compiling
       shell: bash
