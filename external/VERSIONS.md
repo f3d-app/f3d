@@ -3,4 +3,4 @@
 - dmon: 1.3.10
 - imgui: v1.92.8
 - nlohmann_json: v3.12.0
-- tinyfiledialogs: v3.21.2
+- tinyfiledialogs: v3.21.3
