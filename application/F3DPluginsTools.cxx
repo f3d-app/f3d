@@ -11,14 +11,14 @@ namespace fs = std::filesystem;
 namespace
 {
 //----------------------------------------------------------------------------
-std::vector<fs::path> GetPluginSearchPaths(const std::string& pluginsPath)
+std::vector<fs::path> GetPluginSearchPaths(const std::string& supplementaryPluginsPath)
 {
   std::vector<fs::path> searchPaths;
 
-  // Recover user provided plugins path first
-  if (!pluginsPath.empty())
+  // Add user provided plugins path first
+  if (!supplementaryPluginsPath.empty())
   {
-    searchPaths.emplace_back(pluginsPath);
+    searchPaths.emplace_back(supplementaryPluginsPath);
   }
 
 #if F3D_MACOS_BUNDLE

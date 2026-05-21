@@ -71,7 +71,7 @@ List of plugins to load separated with a comma. Official plugins are `alembic`, 
 
 ### `--plugins-path=<path>` (_string_)
 
-Path specifying where to load plugins from.
+Supplementary path to specify where to load plugins from, on top of [default paths](12-PLUGINS.md#supported-plugins).
 
 ### `--scan-plugins`
 
