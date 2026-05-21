@@ -128,7 +128,15 @@ runs:
         path: ${{ env.Python_ROOT_DIR }}
 
     # Qt6 tests only supported on windows for now https://github.com/f3d-app/f3d/issues/2670
-    - name: Test wheel
+    # `import numpy` crashes on Windows, excluding test_scene_zero_copy.py
+    - name: Test wheel (macOS/Linux)
+      if: runner.os != 'Windows'
       shell: bash
       working-directory: ${{github.workspace}}/source
-      run: python -m pytest ${{ runner.os != 'Windows' && '-k "not test_minimal_qt6 and not test_minimal_qml"' || null }}
+      run: python -m pytest -k "not test_minimal_qt6 and not test_minimal_qml"
+
+    - name: Test wheel (Windows)
+      if: runner.os == 'Windows'
+      shell: bash
+      working-directory: ${{github.workspace}}/source
+      run: python -m pytest --ignore=python/testing/test_scene_zero_copy.py
