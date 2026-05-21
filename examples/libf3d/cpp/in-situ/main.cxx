@@ -1,7 +1,8 @@
 /**
  * This example demonstrates how to use libf3d in an in-situ context, where the mesh data is not
  * loaded from a file but generated on the fly by a simulation. The example simulates a cloth using
- * a simple [PBD](https://en.wikipedia.org/wiki/Soft-body_dynamics#Position-based_dynamics) model and displays it in libf3d.
+ * a simple [PBD](https://en.wikipedia.org/wiki/Soft-body_dynamics#Position-based_dynamics) model
+ * and displays it in libf3d.
  */
 
 #include <f3d/engine.h>
