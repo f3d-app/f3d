@@ -68,6 +68,7 @@ eng.getInteractor().start();
 
 It's also possible to visualize your meshes directly from memory without copy, by deriving the `mesh_view` class, making visualization with libf3d fast and with limited additional memory overhead.
 It supports any polygonal meshes, with animation and scalar values on points or faces.
+An example can be found in `examples/libf3d/cpp/in-situ` folder.
 
 ```cpp
 #include <f3d/engine.h>
