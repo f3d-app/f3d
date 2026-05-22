@@ -50,16 +50,42 @@ jobs:
           cpu: ${{ matrix.os == 'macos-15' && 'arm64' || 'x86_64' }}
 
   #----------------------------------------------------------------------------
+  # Recover vtk matrix
+  #----------------------------------------------------------------------------
+  recover_vtk_matrix:
+    name: Recover VTK matrix
+    runs-on: ubuntu-24.04
+    if: contains(github.event.pull_request.labels.*.name, 'ci:cache')
+    outputs:
+      vtk_matrix: ${{steps.vtk_matrix.outputs.extract}}
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{github.event.pull_request.head.ref}}
+          repository: ${{github.event.pull_request.head.repo.full_name}}
+          path: "source"
+          fetch-depth: 1
+          lfs: false
+
+      - name: Extract VTK matrix
+        id: vtk_matrix
+        uses: f3d-app/extract-version-action@main
+        with:
+          file: ./source/.github/workflows/versions.json
+          special_name: vtk_matrix
+
+  #----------------------------------------------------------------------------
   # Cache preheating VTK
   #----------------------------------------------------------------------------
   cache_preheating_vtk:
-    needs: [cache_preheating_dependencies]
+    needs: [cache_preheating_dependencies, recover_vtk_matrix]
     name: Preheat VTK dependency caches
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04, windows-2022, macos-15, macos-15-intel]
-        vtk_version: [commit, v9.6.1, v9.5.2, v9.4.2]
+        vtk_version: ${{needs.recover_vtk_matrix.outputs.docker_timestamp}}
         build_type: [standard]
         include:
           - optdeps_label: optdeps
