@@ -44,10 +44,38 @@ jobs:
           cache_postfix: cache-0
 
   #----------------------------------------------------------------------------
+  # Recover vtk matrix
+  #----------------------------------------------------------------------------
+  recover_vtk_matrix:
+    name: Recover VTK matrix
+    runs-on: ubuntu-24.04
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'ci:main') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:full') ||
+      github.ref == 'refs/heads/master'
+    outputs:
+      vtk_matrix: ${{steps.vtk_matrix.outputs.extract}}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          path: "source"
+          fetch-depth: 1
+          lfs: false
+
+      - name: Extract VTK matrix
+        id: vtk_matrix
+        uses: f3d-app/extract-version-action@main
+        with:
+          file: ./source/.github/workflows/versions.json
+          special_name: vtk_matrix
+
+  #----------------------------------------------------------------------------
   # Windows CI: Build and test, cross-vtk build matrix
   #----------------------------------------------------------------------------
   windows:
-    needs: cache_lfs
+    needs: [cache_lfs, recover_vtk_matrix]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -55,7 +83,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.6.1, v9.5.2, v9.4.2]
+        vtk_version: ${{fromJSON(needs.recover_vtk_matrix.outputs.vtk_matrix)}}
         static_label: [no-static]
         include:
           - vtk_version: commit
@@ -123,7 +151,7 @@ jobs:
   # Linux CI: Build and test, cross-vtk build matrix
   #----------------------------------------------------------------------------
   linux:
-    needs: cache_lfs
+    needs: [cache_lfs, recover_vtk_matrix]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -131,7 +159,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.6.1, v9.5.2, v9.4.2]
+        vtk_version: ${{fromJSON(needs.recover_vtk_matrix.outputs.vtk_matrix)}}
         build_type: [standard]
         include:
           - exclude_deprecated_label: no-exclude-deprecated
@@ -214,14 +242,14 @@ jobs:
   # MacOS CI: Build and test, cross-vtk build matrix
   #----------------------------------------------------------------------------
   macos_intel:
-    needs: cache_lfs
+    needs: [cache_lfs, recover_vtk_matrix]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.6.1, v9.5.2, v9.4.2]
+        vtk_version: ${{fromJSON(needs.recover_vtk_matrix.outputs.vtk_matrix)}}
 
     runs-on: macos-15-intel
 
@@ -248,7 +276,7 @@ jobs:
   # MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
   #----------------------------------------------------------------------------
   macos_arm:
-    needs: cache_lfs
+    needs: [cache_lfs, recover_vtk_matrix]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -256,7 +284,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.6.1, v9.5.2, v9.4.2]
+        vtk_version: ${{fromJSON(needs.recover_vtk_matrix.outputs.vtk_matrix)}}
         bundle_label: [no-bundle]
         static_label: [no-static]
         include:
