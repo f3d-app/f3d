@@ -156,13 +156,11 @@ class ClothMesh(f3d.MeshView):
         view.points = self._solver.positions
         view.points_time_dependent = True  # positions change at each frame (default is true, but set it explicitly for clarity)
         view.polygons_offsets = self._solver.face_offsets
-        view.polygons_offsets_time_dependent = False  # topology is constant in this simulation
         view.polygons_indices = self._solver.face_indices
-        view.polygons_indices_time_dependent = False  # topology is constant in this simulation
+        view.polygons_time_dependent = False  # topology is constant in this simulation
         view.vertices_offsets = self._solver.fixed_vertex_offsets
-        view.vertices_offsets_time_dependent = False  # topology is constant in this simulation
         view.vertices_indices = self._solver.fixed_vertex_indices
-        view.vertices_indices_time_dependent = False  # topology is constant in this simulation
+        view.vertices_time_dependent = False  # topology is constant in this simulation
         view.point_scalars = {
             "Mass": self._solver.inversed_masses,
             "Velocity": self._solver.velocities,

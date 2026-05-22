@@ -542,8 +542,8 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
       }
 
       // handle texture coordinates if provided
-      if (memoryView.textureCoordinates.data != nullptr &&
-        (firstTime || memoryView.textureCoordinates.timeDependent))
+      if ((firstTime || memoryView.textureCoordinates.timeDependent) &&
+        memoryView.textureCoordinates.data != nullptr)
       {
         if (memoryView.textureCoordinates.type != mesh_view::data_type::F32 &&
           memoryView.textureCoordinates.type != mesh_view::data_type::F64)
@@ -695,20 +695,20 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
           });
       };
 
-      if (firstTime || memoryView.vertices.indices.timeDependent ||
-        memoryView.vertices.offsets.timeDependent)
+      if (memoryView.vertices.indices.timeDependent || memoryView.vertices.offsets.timeDependent ||
+        firstTime)
       {
         polydata->SetVerts(handleCells(memoryView.vertices));
       }
 
-      if (firstTime || memoryView.lines.indices.timeDependent ||
-        memoryView.lines.offsets.timeDependent)
+      if (memoryView.lines.indices.timeDependent || memoryView.lines.offsets.timeDependent ||
+        firstTime)
       {
         polydata->SetLines(handleCells(memoryView.lines));
       }
 
-      if (firstTime || memoryView.polygons.indices.timeDependent ||
-        memoryView.polygons.offsets.timeDependent)
+      if (memoryView.polygons.indices.timeDependent || memoryView.polygons.offsets.timeDependent ||
+        firstTime)
       {
         polydata->SetPolys(handleCells(memoryView.polygons));
       }
