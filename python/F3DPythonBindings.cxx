@@ -476,9 +476,7 @@ PYBIND11_MODULE(pyf3d, module)
       })
     .def_property("points_time_dependent", nullptr,
       [](f3d::mesh_view::memory_view_t& self, bool timeDependent)
-      {
-        self.points.timeDependent = timeDependent;
-      })
+      { self.points.timeDependent = timeDependent; })
     .def_property("normals", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
@@ -495,9 +493,7 @@ PYBIND11_MODULE(pyf3d, module)
       })
     .def_property("normals_time_dependent", nullptr,
       [](f3d::mesh_view::memory_view_t& self, bool timeDependent)
-      {
-        self.normals.timeDependent = timeDependent;
-      })
+      { self.normals.timeDependent = timeDependent; })
     .def_property("texture_coordinates", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
@@ -514,9 +510,7 @@ PYBIND11_MODULE(pyf3d, module)
       })
     .def_property("texture_coordinates_time_dependent", nullptr,
       [](f3d::mesh_view::memory_view_t& self, bool timeDependent)
-      {
-        self.textureCoordinates.timeDependent = timeDependent;
-      })
+      { self.textureCoordinates.timeDependent = timeDependent; })
     .def_property("vertices_offsets", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
@@ -528,9 +522,7 @@ PYBIND11_MODULE(pyf3d, module)
       })
     .def_property("vertices_offsets_time_dependent", nullptr,
       [](f3d::mesh_view::memory_view_t& self, bool timeDependent)
-      {
-        self.vertices.offsets.timeDependent = timeDependent;
-      })
+      { self.vertices.offsets.timeDependent = timeDependent; })
     .def_property("vertices_indices", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
@@ -542,9 +534,7 @@ PYBIND11_MODULE(pyf3d, module)
       })
     .def_property("vertices_indices_time_dependent", nullptr,
       [](f3d::mesh_view::memory_view_t& self, bool timeDependent)
-      {
-        self.vertices.indices.timeDependent = timeDependent;
-      })
+      { self.vertices.indices.timeDependent = timeDependent; })
     .def_property("lines_offsets", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
@@ -556,9 +546,7 @@ PYBIND11_MODULE(pyf3d, module)
       })
     .def_property("lines_offsets_time_dependent", nullptr,
       [](f3d::mesh_view::memory_view_t& self, bool timeDependent)
-      {
-        self.lines.offsets.timeDependent = timeDependent;
-      })
+      { self.lines.offsets.timeDependent = timeDependent; })
     .def_property("lines_indices", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
@@ -570,9 +558,7 @@ PYBIND11_MODULE(pyf3d, module)
       })
     .def_property("lines_indices_time_dependent", nullptr,
       [](f3d::mesh_view::memory_view_t& self, bool timeDependent)
-      {
-        self.lines.indices.timeDependent = timeDependent;
-      })
+      { self.lines.indices.timeDependent = timeDependent; })
     .def_property("polygons_offsets", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
@@ -584,9 +570,7 @@ PYBIND11_MODULE(pyf3d, module)
       })
     .def_property("polygons_offsets_time_dependent", nullptr,
       [](f3d::mesh_view::memory_view_t& self, bool timeDependent)
-      {
-        self.polygons.offsets.timeDependent = timeDependent;
-      })
+      { self.polygons.offsets.timeDependent = timeDependent; })
     .def_property("polygons_indices", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
@@ -598,9 +582,7 @@ PYBIND11_MODULE(pyf3d, module)
       })
     .def_property("polygons_indices_time_dependent", nullptr,
       [](f3d::mesh_view::memory_view_t& self, bool timeDependent)
-      {
-        self.polygons.indices.timeDependent = timeDependent;
-      })
+      { self.polygons.indices.timeDependent = timeDependent; })
     .def_property("point_scalars", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::dict d)
       {
