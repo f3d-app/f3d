@@ -85,7 +85,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04, windows-2022, macos-15, macos-15-intel]
-        vtk_version: ${{needs.recover_vtk_matrix.outputs.vtk_matrix}}
+        vtk_version: ${{fromJSON(needs.recover_vtk_matrix.outputs.vtk_matrix)}}
         build_type: [standard]
         include:
           - optdeps_label: optdeps
