@@ -34,9 +34,13 @@ def test_scene_zero_copy():
 
     memory_view = f3d.MeshMemoryView()
     memory_view.points = points
+    memory_view.points_time_dependent = False
     memory_view.polygons_offsets = face_offsets
+    memory_view.polygons_offsets_time_dependent = False
     memory_view.polygons_indices = face_indices
+    memory_view.polygons_indices_time_dependent = False
     memory_view.point_scalars = {"Color": colors}
+    memory_view.set_point_scalars_time_dependent("Color", False)
 
     class CustomMesh(f3d.MeshView):
         def get_time_range(self):

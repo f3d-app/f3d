@@ -90,7 +90,8 @@ public:
    * `data` pointer must remain valid while the mesh is used in the scene.
    * `stride` is the number of elements (not bytes) to skip to get to the next tuple.
    * If `timeDependent` is true, it means that the data in the array can change over time.
-   * Set it to false if the data in the array is constant over time, it can help improving performance.
+   * Set it to false if the data in the array is constant over time, it can help improving
+   * performance.
    */
   struct data_array_t
   {
