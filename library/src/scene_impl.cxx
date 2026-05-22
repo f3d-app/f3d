@@ -464,6 +464,10 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
     {
       const auto memoryView = mesh->getMemoryView(time);
 
+      bool firstTime = polydata->GetPoints() == nullptr;
+
+      f3d::log::debug(firstTime ? "Initializing" : "Updating", " mesh_view at time ", time);
+
       // handle points
       if (memoryView.pointCount == 0)
       {
@@ -486,26 +490,29 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
         throw scene::load_failure_exception("Mesh view points must have 3 components");
       }
 
-      vtkNew<vtkPoints> points;
+      if (firstTime || memoryView.points.timeDependent)
+      {
+        vtkNew<vtkPoints> points;
 
-      f3d::mesh_view::dataTypeDispatch(memoryView.points.type,
-        [&]<typename DataT>()
-        {
-          vtkNew<vtkStridedArray<DataT>> positions;
-          positions->SetName(
-            memoryView.points.name.empty() ? "Positions" : memoryView.points.name.c_str());
-          positions->SetNumberOfComponents(3);
-          positions->SetNumberOfTuples(memoryView.pointCount);
-          positions->ConstructBackend(
-            reinterpret_cast<const DataT*>(memoryView.points.data), memoryView.points.stride, 3);
+        f3d::mesh_view::dataTypeDispatch(memoryView.points.type,
+          [&]<typename DataT>()
+          {
+            vtkNew<vtkStridedArray<DataT>> positions;
+            positions->SetName(
+              memoryView.points.name.empty() ? "Positions" : memoryView.points.name.c_str());
+            positions->SetNumberOfComponents(3);
+            positions->SetNumberOfTuples(memoryView.pointCount);
+            positions->ConstructBackend(
+              reinterpret_cast<const DataT*>(memoryView.points.data), memoryView.points.stride, 3);
 
-          points->SetData(positions);
-        });
+            points->SetData(positions);
+          });
 
-      polydata->SetPoints(points);
+        polydata->SetPoints(points);
+      }
 
       // handle normals if provided
-      if (memoryView.normals.data != nullptr)
+      if (memoryView.normals.data != nullptr && (firstTime || memoryView.normals.timeDependent))
       {
         if (memoryView.normals.type != mesh_view::data_type::F32 &&
           memoryView.normals.type != mesh_view::data_type::F64)
@@ -535,7 +542,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
       }
 
       // handle texture coordinates if provided
-      if (memoryView.textureCoordinates.data != nullptr)
+      if (memoryView.textureCoordinates.data != nullptr && (firstTime || memoryView.textureCoordinates.timeDependent))
       {
         if (memoryView.textureCoordinates.type != mesh_view::data_type::F32 &&
           memoryView.textureCoordinates.type != mesh_view::data_type::F64)
@@ -570,35 +577,41 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
       // handle scalars if provided
       for (const auto& scalar : memoryView.pointScalars)
       {
-        f3d::mesh_view::dataTypeDispatch(scalar.type,
-          [&]<typename DataT>()
-          {
-            vtkNew<vtkStridedArray<DataT>> scalars;
-            scalars->SetName(scalar.name.c_str());
-            scalars->SetNumberOfComponents(static_cast<int>(scalar.components));
-            scalars->SetNumberOfTuples(memoryView.pointCount);
-            scalars->ConstructBackend(reinterpret_cast<const DataT*>(scalar.data), scalar.stride,
-              static_cast<int>(scalar.components));
+        if (firstTime || scalar.timeDependent)
+        {
+          f3d::mesh_view::dataTypeDispatch(scalar.type,
+            [&]<typename DataT>()
+            {
+              vtkNew<vtkStridedArray<DataT>> scalars;
+              scalars->SetName(scalar.name.c_str());
+              scalars->SetNumberOfComponents(static_cast<int>(scalar.components));
+              scalars->SetNumberOfTuples(memoryView.pointCount);
+              scalars->ConstructBackend(reinterpret_cast<const DataT*>(scalar.data), scalar.stride,
+                static_cast<int>(scalar.components));
 
-            polydata->GetPointData()->AddArray(scalars);
-          });
+              polydata->GetPointData()->AddArray(scalars);
+            });
+        }
       }
 
       for (const auto& scalar : memoryView.cellScalars)
       {
-        f3d::mesh_view::dataTypeDispatch(scalar.type,
-          [&]<typename DataT>()
-          {
-            vtkNew<vtkStridedArray<DataT>> scalars;
-            scalars->SetName(scalar.name.c_str());
-            scalars->SetNumberOfComponents(static_cast<int>(scalar.components));
-            scalars->SetNumberOfTuples(memoryView.vertices.offsetCount +
-              memoryView.lines.offsetCount + memoryView.polygons.offsetCount - 3);
-            scalars->ConstructBackend(reinterpret_cast<const DataT*>(scalar.data), scalar.stride,
-              static_cast<int>(scalar.components));
+        if (firstTime || scalar.timeDependent)
+        {
+          f3d::mesh_view::dataTypeDispatch(scalar.type,
+            [&]<typename DataT>()
+            {
+              vtkNew<vtkStridedArray<DataT>> scalars;
+              scalars->SetName(scalar.name.c_str());
+              scalars->SetNumberOfComponents(static_cast<int>(scalar.components));
+              scalars->SetNumberOfTuples(memoryView.vertices.offsetCount +
+                memoryView.lines.offsetCount + memoryView.polygons.offsetCount - 3);
+              scalars->ConstructBackend(reinterpret_cast<const DataT*>(scalar.data), scalar.stride,
+                static_cast<int>(scalar.components));
 
-            polydata->GetCellData()->AddArray(scalars);
-          });
+              polydata->GetCellData()->AddArray(scalars);
+            });
+        }
       }
 
       auto handleCells =
@@ -681,9 +694,20 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
           });
       };
 
-      polydata->SetVerts(handleCells(memoryView.vertices));
-      polydata->SetLines(handleCells(memoryView.lines));
-      polydata->SetPolys(handleCells(memoryView.polygons));
+      if (firstTime || memoryView.vertices.indices.timeDependent || memoryView.vertices.offsets.timeDependent)
+      {
+        polydata->SetVerts(handleCells(memoryView.vertices));
+      }
+
+      if (firstTime || memoryView.lines.indices.timeDependent || memoryView.lines.offsets.timeDependent)
+      {
+        polydata->SetLines(handleCells(memoryView.lines));
+      }
+
+      if (firstTime || memoryView.polygons.indices.timeDependent || memoryView.polygons.offsets.timeDependent)
+      {
+        polydata->SetPolys(handleCells(memoryView.polygons));
+      }
     });
 
   try

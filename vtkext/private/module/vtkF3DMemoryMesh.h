@@ -49,6 +49,7 @@ private:
 
   double TimeRange[2] = { 0.0, 0.0 };
   std::function<void(double, vtkPolyData*)> UpdateFunction;
+  vtkSmartPointer<vtkPolyData> CachedPolyData;
 };
 
 #endif
