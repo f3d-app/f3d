@@ -33,6 +33,10 @@
 #include "tinyfiledialogs.h"
 #endif
 
+#if F3D_MODULE_CLIP
+#include "clip.h"
+#endif
+
 #include "engine.h"
 #include "interactor.h"
 #include "log.h"
@@ -45,6 +49,7 @@
 #include <cassert>
 #include <cmath>
 #include <csignal>
+#include <cstdint>
 #include <filesystem>
 #include <format>
 #include <fstream>
@@ -54,6 +59,7 @@
 #include <numeric>
 #include <regex>
 #include <set>
+#include <vector>
 
 #ifdef _WIN32
 #include <fcntl.h>
@@ -934,6 +940,9 @@ public:
       interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others", std::bind(docString, "Take a screenshot"));
 #if F3D_MODULE_TINYFILEDIALOGS
       interactor.addBinding({ mod_t::CTRL, "O" }, "open_file_dialog", "Others", std::bind(docString, "Open File Dialog"), f3d::interactor::BindingType::OTHER, true);
+#endif
+#if F3D_MODULE_CLIP
+      interactor.addBinding({ mod_t::SHIFT, "F12" }, "take_screenshot_to_clipboard", "Others", std::bind(docString, "Take a screenshot to clipboard"));
 #endif
       interactor.addBinding({ mod_t::CTRL, "F12" }, "take_minimal_screenshot", "Others", std::bind(docString, "Take a minimal screenshot"));
 
@@ -1822,7 +1831,7 @@ void F3DStarter::LoadFileGroupInternal(
 
     // Unwatch and erase paths that should not be watched anymore
     for (auto it = this->Internals->FolderWatchIds.begin();
-         it != this->Internals->FolderWatchIds.end();)
+      it != this->Internals->FolderWatchIds.end();)
     {
       const fs::path& path = it->first;
       const dmon_watch_id& dmonId = it->second;
@@ -2307,7 +2316,8 @@ void F3DStarter::AddCommands()
 
   interactor.addCommand(
     "load_next_file_group",
-    [this](const std::vector<std::string>& args) {
+    [this](const std::vector<std::string>& args)
+    {
       this->LoadRelativeFileGroup(
         +1, parse_optional_bool_flag(args, "load_next_file_group", false));
     },
@@ -2476,6 +2486,51 @@ void F3DStarter::AddCommands()
     },
     f3d::interactor::command_documentation_t{
       "open_file_dialog", "open a file dialog to select a file to load" });
+#endif
+#if F3D_MODULE_CLIP
+  interactor.addCommand("take_screenshot_to_clipboard",
+    [this](const std::vector<std::string>& args)
+    {
+      f3d::image img = this->Internals->Engine->getWindow().renderToImage();
+      unsigned int channelCount = img.getChannelCount();
+      unsigned int channelTypeSize = img.getChannelTypeSize();
+      unsigned int imgWidth = img.getWidth();
+      unsigned int imgHeight = img.getHeight();
+
+      // Flip the image as img.getContent() gives upside down image
+      const size_t rowBytes = static_cast<size_t>(imgWidth) * channelCount * channelTypeSize;
+      auto* pixelData = static_cast<uint8_t*>(img.getContent());
+      std::vector<uint8_t> rowBuffer(rowBytes);
+      for (unsigned int row = 0; row < imgHeight / 2; ++row)
+      {
+        uint8_t* top = pixelData + static_cast<size_t>(row) * rowBytes;
+        uint8_t* bottom = pixelData + static_cast<size_t>(imgHeight - 1 - row) * rowBytes;
+        std::copy_n(top, rowBytes, rowBuffer.begin());
+        std::copy_n(bottom, rowBytes, top);
+        std::copy_n(rowBuffer.begin(), rowBytes, bottom);
+      }
+      const void* buffer = pixelData;
+
+      clip::image_spec spec;
+      spec.width = imgWidth;
+      spec.height = imgHeight;
+      spec.bits_per_pixel = 8u * channelCount * channelTypeSize;
+      spec.bytes_per_row = imgWidth * channelCount * channelTypeSize;
+      spec.red_mask = 0x000000FF;
+      spec.green_mask = 0x0000FF00;
+      spec.blue_mask = 0x00FF0000;
+      spec.alpha_mask = channelCount == 4 ? 0xFF000000 : 0x00000000;
+
+      clip::image clipImg(buffer, spec);
+      if (clip::set_image(clipImg))
+      {
+        f3d::log::info("Copied screenshot to the clipboard");
+      }
+      else
+      {
+        f3d::log::error("Error: couldn't copy screenshot to the clipboard");
+      }
+    });
 #endif
   interactor.addCommand(
     "exit", [&](const std::vector<std::string>&) { interactor.stop(); },
