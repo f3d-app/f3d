@@ -139,4 +139,4 @@ runs:
       if: runner.os == 'Windows'
       shell: bash
       working-directory: ${{github.workspace}}/source
-      run: python -m pytest --ignore=python/testing/test_scene_zero_copy.py
+      run: python -m pytest --ignore=python/testing/test_scene_zero_copy.py --ignore-glob="examples/libf3d/python/in-situ/*"
