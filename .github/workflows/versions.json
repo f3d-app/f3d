@@ -6,7 +6,7 @@
     "OpenVDB min version is not enforced by F3D code and missing from VTK code",
     "Python is part of VFX reference platform (CY2025: 3.11)",
     "OSPRay is fixed at 2.12.0 until full support for OSPRay 3.0 is added in VTK",
-    "TBB is set at v2021.13.1 because OpenUSD seems to not support more revent versions: https://github.com/PixarAnimationStudios/OpenUSD/issues/3878",
+    "TBB is set at v2021.13.1 because OpenUSD seems to not support more recent versions: https://github.com/PixarAnimationStudios/OpenUSD/issues/3878 and https://github.com/PixarAnimationStudios/OpenUSD/issues/4078",
     "sqlite is using a common-superbuild hash as it is not a CMake project"
   ],
   "alembic": {
@@ -82,7 +82,7 @@
     "min_version": "bb237f11ca039bd01314bb2252eb282086723c18"
   },
   "tbb": {
-    "version": "v2023.0.0",
+    "version": "v2021.13.1",
     "min_version": "v2021.10.0"
   },
   "tiff": {
