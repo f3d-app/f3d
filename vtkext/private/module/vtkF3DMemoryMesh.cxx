@@ -11,7 +11,6 @@ vtkStandardNewMacro(vtkF3DMemoryMesh);
 vtkF3DMemoryMesh::vtkF3DMemoryMesh()
 {
   this->SetNumberOfInputPorts(0);
-  this->CachedPolyData = vtkSmartPointer<vtkPolyData>::New();
 }
 
 //------------------------------------------------------------------------------
