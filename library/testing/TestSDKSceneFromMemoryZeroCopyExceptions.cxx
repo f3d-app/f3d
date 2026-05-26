@@ -17,6 +17,8 @@ int TestSDKSceneFromMemoryZeroCopyExceptions(
   f3d::engine eng = f3d::engine::create(true);
   f3d::scene& sce = eng.getScene();
 
+  test.expect<f3d::scene::load_failure_exception>("add nullptr", [&]() { sce.add(nullptr); });
+
   // Mesh view must have points
   class NoPointMesh : public f3d::mesh_view
   {

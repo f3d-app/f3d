@@ -648,6 +648,17 @@ PYBIND11_MODULE(pyf3d, module)
       return f3d::mesh_view::getTimeRange();
     }
 
+    std::string getName() const override
+    {
+      py::gil_scoped_acquire gil;
+      py::function fn = py::get_override(this, "get_name");
+      if (fn)
+      {
+        return fn().cast<std::string>();
+      }
+      return f3d::mesh_view::getName();
+    }
+
     memory_view_t getMemoryView(double time) const override
     {
       py::gil_scoped_acquire gil;
@@ -663,6 +674,7 @@ PYBIND11_MODULE(pyf3d, module)
   py::class_<f3d::mesh_view, PyMesh, py::smart_holder>(module, "MeshView")
     .def(py::init<>())
     .def("get_time_range", &f3d::mesh_view::getTimeRange)
+    .def("get_name", &f3d::mesh_view::getName)
     .def("get_memory_view", &f3d::mesh_view::getMemoryView);
 
   // f3d::color_t

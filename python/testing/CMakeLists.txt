@@ -26,10 +26,12 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
     )
 endif()
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251110)
-  list(APPEND pyf3dTests_list
-     test_scene_zero_copy.py
-    )
+if(F3D_MODULE_UI)
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251110)
+    list(APPEND pyf3dTests_list
+      test_scene_zero_copy.py
+      )
+  endif()
 endif()
 
 list(APPEND pyf3dTestsNoRender_list
