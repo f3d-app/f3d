@@ -154,14 +154,19 @@ class ClothMesh(f3d.MeshView):
     def get_memory_view(self, time: float) -> f3d.MeshMemoryView:
         view = f3d.MeshMemoryView()
         view.points = self._solver.positions
+        view.points_time_dependent = True  # positions change at each frame (default is true, but set it explicitly for clarity)
         view.polygons_offsets = self._solver.face_offsets
         view.polygons_indices = self._solver.face_indices
+        view.polygons_time_dependent = False  # topology is constant in this simulation
         view.vertices_offsets = self._solver.fixed_vertex_offsets
         view.vertices_indices = self._solver.fixed_vertex_indices
+        view.vertices_time_dependent = False  # topology is constant in this simulation
         view.point_scalars = {
             "Mass": self._solver.inversed_masses,
             "Velocity": self._solver.velocities,
         }
+        view.set_point_scalars_time_dependent("Mass", False)
+        view.set_point_scalars_time_dependent("Velocity", True)
         return view
 
 
@@ -194,6 +199,7 @@ def main(argv=None):
             "ui.fps": True,
             "ui.animation_progress": True,
             "ui.scalar_bar": True,
+            "ui.notifications.enable": True,
             "scene.up_direction": [0.0, 0.0, 1.0],
         }
     )

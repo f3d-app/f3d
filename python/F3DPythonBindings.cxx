@@ -470,8 +470,13 @@ PYBIND11_MODULE(pyf3d, module)
         auto [count, dataArray] = fromBuffer(b);
 
         self.pointCount = count;
+        bool timeDependent = self.points.timeDependent;
         self.points = std::move(dataArray);
+        self.points.timeDependent = timeDependent;
       })
+    .def_property("points_time_dependent", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, bool timeDependent)
+      { self.points.timeDependent = timeDependent; })
     .def_property("normals", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
@@ -482,8 +487,13 @@ PYBIND11_MODULE(pyf3d, module)
           throw std::runtime_error("Incompatible buffer shape: point count does not match!");
         }
 
+        bool timeDependent = self.normals.timeDependent;
         self.normals = std::move(dataArray);
+        self.normals.timeDependent = timeDependent;
       })
+    .def_property("normals_time_dependent", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, bool timeDependent)
+      { self.normals.timeDependent = timeDependent; })
     .def_property("texture_coordinates", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
@@ -494,49 +504,84 @@ PYBIND11_MODULE(pyf3d, module)
           throw std::runtime_error("Incompatible buffer shape: point count does not match!");
         }
 
+        bool timeDependent = self.textureCoordinates.timeDependent;
         self.textureCoordinates = std::move(dataArray);
+        self.textureCoordinates.timeDependent = timeDependent;
       })
+    .def_property("texture_coordinates_time_dependent", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, bool timeDependent)
+      { self.textureCoordinates.timeDependent = timeDependent; })
     .def_property("vertices_offsets", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
         auto [count, array] = fromBuffer(b);
         self.vertices.offsetCount = count;
+        bool timeDependent = self.vertices.offsets.timeDependent;
         self.vertices.offsets = std::move(array);
+        self.vertices.offsets.timeDependent = timeDependent;
       })
     .def_property("vertices_indices", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
         auto [count, array] = fromBuffer(b);
         self.vertices.indexCount = count;
+        bool timeDependent = self.vertices.indices.timeDependent;
         self.vertices.indices = std::move(array);
+        self.vertices.indices.timeDependent = timeDependent;
+      })
+    .def_property("vertices_time_dependent", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, bool timeDependent)
+      {
+        self.vertices.indices.timeDependent = timeDependent;
+        self.vertices.offsets.timeDependent = timeDependent;
       })
     .def_property("lines_offsets", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
         auto [count, array] = fromBuffer(b);
         self.lines.offsetCount = count;
+        bool timeDependent = self.lines.offsets.timeDependent;
         self.lines.offsets = std::move(array);
+        self.lines.offsets.timeDependent = timeDependent;
       })
     .def_property("lines_indices", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
         auto [count, array] = fromBuffer(b);
         self.lines.indexCount = count;
+        bool timeDependent = self.lines.indices.timeDependent;
         self.lines.indices = std::move(array);
+        self.lines.indices.timeDependent = timeDependent;
+      })
+    .def_property("lines_time_dependent", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, bool timeDependent)
+      {
+        self.lines.indices.timeDependent = timeDependent;
+        self.lines.offsets.timeDependent = timeDependent;
       })
     .def_property("polygons_offsets", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
         auto [count, array] = fromBuffer(b);
         self.polygons.offsetCount = count;
+        bool timeDependent = self.polygons.offsets.timeDependent;
         self.polygons.offsets = std::move(array);
+        self.polygons.offsets.timeDependent = timeDependent;
       })
     .def_property("polygons_indices", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
         auto [count, array] = fromBuffer(b);
         self.polygons.indexCount = count;
+        bool timeDependent = self.polygons.indices.timeDependent;
         self.polygons.indices = std::move(array);
+        self.polygons.indices.timeDependent = timeDependent;
+      })
+    .def_property("polygons_time_dependent", nullptr,
+      [](f3d::mesh_view::memory_view_t& self, bool timeDependent)
+      {
+        self.polygons.indices.timeDependent = timeDependent;
+        self.polygons.offsets.timeDependent = timeDependent;
       })
     .def_property("point_scalars", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::dict d)
@@ -551,10 +596,20 @@ PYBIND11_MODULE(pyf3d, module)
           self.pointScalars.emplace_back(std::move(dataArray));
         }
       })
+    .def("set_point_scalars_time_dependent",
+      [](f3d::mesh_view::memory_view_t& self, const std::string& name, bool timeDependent)
+      {
+        auto it = std::ranges::find_if(self.pointScalars,
+          [&name](const f3d::mesh_view::data_array_t& array) { return array.name == name; });
+        if (it == self.pointScalars.end())
+        {
+          throw std::runtime_error("No point scalar with name " + name);
+        }
+        it->timeDependent = timeDependent;
+      })
     .def_property("cell_scalars", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::dict d)
       {
-        // TODO: factorize with point_scalars since the code is almost identical
         self.cellScalars.clear();
 
         for (auto item : d)
@@ -564,6 +619,17 @@ PYBIND11_MODULE(pyf3d, module)
           dataArray.name = py::cast<std::string>(item.first);
           self.cellScalars.emplace_back(std::move(dataArray));
         }
+      })
+    .def("set_cell_scalars_time_dependent",
+      [](f3d::mesh_view::memory_view_t& self, const std::string& name, bool timeDependent)
+      {
+        auto it = std::ranges::find_if(self.cellScalars,
+          [&name](const f3d::mesh_view::data_array_t& array) { return array.name == name; });
+        if (it == self.cellScalars.end())
+        {
+          throw std::runtime_error("No cell scalar with name " + name);
+        }
+        it->timeDependent = timeDependent;
       });
 
   class PyMesh

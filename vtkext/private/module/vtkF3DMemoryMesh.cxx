@@ -45,8 +45,6 @@ int vtkF3DMemoryMesh::RequestInformation(vtkInformation* vtkNotUsed(request),
 int vtkF3DMemoryMesh::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
-  vtkPolyData* output = vtkPolyData::GetData(outputVector->GetInformationObject(0));
-
   assert(this->UpdateFunction);
 
   double time = 0.0;
@@ -56,7 +54,10 @@ int vtkF3DMemoryMesh::RequestData(vtkInformation* vtkNotUsed(request),
     time = outputVector->GetInformationObject(0)->Get(
       vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
   }
-  this->UpdateFunction(time, output);
+  this->UpdateFunction(time, this->CachedPolyData);
+
+  vtkPolyData* output = vtkPolyData::GetData(outputVector->GetInformationObject(0));
+  output->ShallowCopy(this->CachedPolyData);
 
   return 1;
 }

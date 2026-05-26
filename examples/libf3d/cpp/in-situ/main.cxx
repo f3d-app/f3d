@@ -42,27 +42,32 @@ public:
     view.points.data = this->Solver.getPositions();
     view.points.components = 3;
     view.points.stride = 3;
+    view.points.timeDependent = true;
 
     view.polygons.offsetCount = this->Solver.getFaceOffsetCount();
     view.polygons.offsets.type = f3d::mesh_view::data_type::U32;
     view.polygons.offsets.data = this->Solver.getFaceOffsets();
+    view.polygons.offsets.timeDependent = false; // topology is constant in this simulation
 
     view.polygons.indexCount = this->Solver.getFaceIndexCount();
     view.polygons.indices.type = f3d::mesh_view::data_type::U32;
     view.polygons.indices.data = this->Solver.getFaceIndices();
+    view.polygons.indices.timeDependent = false; // topology is constant in this simulation
 
     view.vertices.offsetCount = this->Solver.getFixedVertexOffsetCount();
     view.vertices.offsets.type = f3d::mesh_view::data_type::U32;
     view.vertices.offsets.data = this->Solver.getFixedVertexOffsets();
+    view.vertices.offsets.timeDependent = false; // topology is constant in this simulation
 
     view.vertices.indexCount = this->Solver.getFixedVertexIndexCount();
     view.vertices.indices.type = f3d::mesh_view::data_type::U32;
     view.vertices.indices.data = this->Solver.getFixedVertexIndices();
+    view.vertices.indices.timeDependent = false; // topology is constant in this simulation
 
     view.pointScalars.push_back(
-      { "Mass", f3d::mesh_view::data_type::F32, this->Solver.getInversedMasses(), 1, 1 });
+      { "Mass", f3d::mesh_view::data_type::F32, this->Solver.getInversedMasses(), 1, 1, false });
     view.pointScalars.push_back(
-      { "Velocity", f3d::mesh_view::data_type::F32, this->Solver.getVelocities(), 3, 3 });
+      { "Velocity", f3d::mesh_view::data_type::F32, this->Solver.getVelocities(), 3, 3, true });
 
     return view;
   }
@@ -95,6 +100,7 @@ int main(int argc, char** argv)
   opt.ui.fps = true;
   opt.ui.animation_progress = true;
   opt.ui.scalar_bar = true;
+  opt.ui.notifications.enable = true;
 
   opt.scene.up_direction = { 0.0, 0.0, 1.0 };
 
