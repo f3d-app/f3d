@@ -198,6 +198,11 @@ public:
   {
   }
 
+  std::string getName() const override
+  {
+    return "static_mesh";
+  }
+
   f3d::mesh_view::memory_view_t getMemoryView(double) const override
   {
     const float* points = reinterpret_cast<const float*>(this->Grid.Vertices.data());
@@ -321,6 +326,7 @@ int TestSDKSceneFromMemoryZeroCopy([[maybe_unused]] int argc, [[maybe_unused]] c
   eng.getOptions().model.scivis.enable = true;
   eng.getOptions().model.scivis.cells = true;
   eng.getOptions().ui.scalar_bar = true;
+  eng.getOptions().ui.scene_hierarchy = true;
 
   WavyGridMesh grid(20, 20);
 
@@ -336,6 +342,7 @@ int TestSDKSceneFromMemoryZeroCopy([[maybe_unused]] int argc, [[maybe_unused]] c
       "TestSDKSceneFromMemoryZeroCopyTexturedStaticMesh"));
 
   eng.getOptions().model.color.texture = std::nullopt;
+  eng.getOptions().ui.scene_hierarchy = false;
 
   test("clear the scene", [&]() { sce.clear(); });
 

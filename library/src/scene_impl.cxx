@@ -450,6 +450,11 @@ scene& scene_impl::add(const mesh_t& mesh)
 //----------------------------------------------------------------------------
 scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
 {
+  if (!mesh)
+  {
+    throw scene::load_failure_exception("Null mesh view provided");
+  }
+
   // requires https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12411
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251110)
   vtkNew<vtkF3DMemoryMesh> vtkSource;
@@ -460,7 +465,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
   vtkSource->SetTimeRange(timeRange[0], timeRange[1]);
 
   vtkSource->SetUpdateFunction(
-    [mesh = std::move(mesh)](double time, vtkPolyData* polydata)
+    [=](double time, vtkPolyData* polydata)
     {
       const auto memoryView = mesh->getMemoryView(time);
 
@@ -726,8 +731,10 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
   vtkNew<vtkF3DGenericImporter> importer;
   importer->SetInternalReader(vtkSource);
 
+  std::string name = mesh->getName();
+
   log::debug("Loading 3D scene from memory");
-  this->Internals->Load({ { "<mesh_view>", importer } });
+  this->Internals->Load({ { name.empty() ? "<mesh_view>" : name, importer } });
   return *this;
 #else
   throw scene::load_failure_exception(

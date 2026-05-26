@@ -35,6 +35,14 @@ public:
   }
 
   /**
+   * Get the name of the mesh
+   */
+  [[nodiscard]] virtual std::string getName() const
+  {
+    return "";
+  }
+
+  /**
    * Enumeration of supported scalar types for point and face scalars
    */
   enum class data_type : uint8_t

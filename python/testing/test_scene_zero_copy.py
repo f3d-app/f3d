@@ -22,6 +22,7 @@ def test_scene_zero_copy():
             "model.material.base_ior": 1.0,
             "scene.animation.autoplay": True,
             "ui.animation_progress": True,
+            "ui.scene_hierarchy": True,
         }
     )
 
@@ -44,6 +45,9 @@ def test_scene_zero_copy():
     class CustomMesh(f3d.MeshView):
         def get_time_range(self):
             return 0.0, 2 * math.pi
+
+        def get_name(self):
+            return "CustomMesh"
 
         def get_memory_view(self, time):
             c = 0.5 + math.cos(time) * 0.5

@@ -52,6 +52,15 @@ if(F3D_MODULE_UI)
       TestSDKInteractorCallBack.cxx
       )
   endif()
+
+  # Needs stride arrays
+  # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12411
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20251110)
+    list(APPEND libf3dSDKTests_list
+      TestSDKSceneFromMemoryZeroCopy.cxx
+      TestSDKSceneFromMemoryZeroCopyExceptions.cxx
+      )
+  endif()
 endif()
 
 # Invalid header detection need proper CanReadFile support
@@ -59,15 +68,6 @@ endif()
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
   list(APPEND libf3dSDKTests_list
     TestSDKSceneInvalidHeader.cxx
-    )
-endif()
-
-# Needs stride arrays
-# https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12411
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20251110)
-  list(APPEND libf3dSDKTests_list
-    TestSDKSceneFromMemoryZeroCopy.cxx
-    TestSDKSceneFromMemoryZeroCopyExceptions.cxx
     )
 endif()
 
