@@ -48,6 +48,12 @@
 #include <vtkMemoryResourceStream.h>
 #endif
 
+#if F3D_MODULE_OPENXR
+#include <vtkOpenXRCamera.h>
+#include <vtkOpenXRRenderWindow.h>
+#include <vtkOpenXRRenderer.h>
+#endif
+
 #include <vtkOSOpenGLRenderWindow.h>
 
 #include <sstream>
@@ -172,6 +178,14 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
     this->Internals->RenWin = wasmRenWin;
 #endif
   }
+  else if (type == Type::XR)
+  {
+#ifdef F3D_MODULE_OPENXR
+    this->Internals->RenWin = vtkSmartPointer<vtkOpenXRRenderWindow>::New();
+#else
+    assert(false); // Unreachable
+#endif
+  }
   else if (!type.has_value())
   {
     this->Internals->RenWin = internals::AutoBackendWindow();
@@ -197,14 +211,29 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
   this->Internals->RenWin->SetOffScreenRendering(offscreen);
   this->Internals->RenWin->SetWindowName("f3d");
-  this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
+
+  if (type == Type::XR)
+  {
+#ifdef F3D_MODULE_OPENXR
+    vtkOpenXRRenderWindow* xrRenWin = vtkOpenXRRenderWindow::SafeDownCast(this->Internals->RenWin);
+    xrRenWin->vtkOpenGLRenderWindow::AddRenderer(this->Internals->Renderer);
+    vtkNew<vtkOpenXRCamera> xrCamera;
+    this->Internals->Renderer->SetActiveCamera(xrCamera);
+#else
+    assert(false); // Unreachable
+#endif
+  }
+  else
+  {
+    this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
+  }
+
   this->Internals->Camera = std::make_unique<detail::camera_impl>();
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
+  this->Initialize();
 
   this->Internals->Renderer->SetConsoleBadgeEnabled(
     !offscreen || utils::getEnv("CTEST_F3D_CONSOLE_BADGE").has_value());
-
-  this->Initialize();
 
   log::debug("VTK window class type is ", this->Internals->RenWin->GetClassName());
 }
@@ -267,6 +296,13 @@ window_impl::Type window_impl::getType()
   {
     return Type::NONE;
   }
+
+#ifdef F3D_MODULE_OPENXR
+  if (this->Internals->RenWin->IsA("vtkOpenXRRenderWindow"))
+  {
+    return Type::XR;
+  }
+#endif
 
   return Type::UNKNOWN;
 }
@@ -683,6 +719,8 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->SetUseVolume(opt.model.volume.enable);
   renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
+
+  renderer->SetXRMode(this->getType() == Type::XR);
 
   renderer->UpdateActors();
 

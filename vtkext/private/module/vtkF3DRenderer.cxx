@@ -18,6 +18,7 @@
 #include "vtkF3DSolidBackgroundPass.h"
 #include "vtkF3DUserRenderPass.h"
 
+#include <vtkActor.h>
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -49,12 +50,14 @@
 #include <vtkOpenGLState.h>
 #include <vtkOpenGLTexture.h>
 #include <vtkOrientationMarkerWidget.h>
+#include <vtkOutlineSource.h>
 #include <vtkPBRLUTTexture.h>
 #include <vtkPNGReader.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkPixelBufferObject.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
+#include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
@@ -96,6 +99,10 @@
 
 #if F3D_MODULE_RAYTRACING
 #include <vtkOSPRayRendererNode.h>
+#endif
+
+#if F3D_MODULE_OPENXR
+#include <vtkOpenXRRenderWindow.h>
 #endif
 
 #include <cctype>
@@ -352,6 +359,48 @@ void vtkF3DRenderer::Initialize()
   this->RenderWindow->AddObserver(
     vtkCommand::WindowResizeEvent, this->ModernAxisWidgetResizeCallback);
 #endif
+
+  // camera only gets updated by openxr on the first render, so we have to create the bounding box
+  // and align the scene on the first render as well.
+  vtkNew<vtkCallbackCommand> startEventCallback;
+  startEventCallback->SetClientData(this);
+  startEventCallback->SetCallback(
+    [](vtkObject* const, unsigned long, void* clientData, void*)
+    {
+      vtkF3DRenderer* self = static_cast<vtkF3DRenderer*>(clientData);
+      if (!self->Xr)
+      {
+        return;
+      }
+      vtkCamera* cam = self->GetActiveCamera();
+      const vtkBoundingBox bbox = self->CreateCameraFacingBoundingBox(cam, 1.0f, 0.5f);
+      if (bbox.IsValid())
+      {
+        {
+          double bounds[6];
+          bbox.GetBounds(bounds);
+
+          vtkNew<vtkOutlineSource> outlineSource;
+          outlineSource->SetBounds(bounds);
+
+          vtkNew<vtkPolyDataMapper> outlineMapper;
+          outlineMapper->SetInputConnection(outlineSource->GetOutputPort());
+
+          self->XrBBoxActor->SetMapper(outlineMapper);
+          self->XrBBoxActor->GetProperty()->SetColor(1.0, 0.2, 0.2);
+          self->XrBBoxActor->GetProperty()->SetLineWidth(2.0);
+          self->XrBBoxActor->GetProperty()->LightingOff();
+        }
+
+        self->XrBoundingBoxConfigured = true;
+        self->AlignSceneToBounds(bbox);
+
+        self->AxesActorConfigured = false;
+        self->GridConfigured = false;
+        self->UpdateActors();
+      }
+    });
+  this->RenderWindow->AddObserver(vtkCommand::StartEvent, startEventCallback);
 }
 
 //----------------------------------------------------------------------------
@@ -485,6 +534,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   newPass->SetForceOpaqueBackground(this->HDRISkyboxVisible);
   newPass->SetArmatureVisible(this->ArmatureVisible);
   newPass->SetRenderReflection(this->GridVisible && this->GridReflection > 0.0);
+  newPass->SetXrMode(this->Xr);
 
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
@@ -562,10 +612,14 @@ void vtkF3DRenderer::ConfigureRenderPasses()
     }
   }
 
-  vtkNew<vtkF3DOverlayRenderPass> overlayP;
-  overlayP->SetDelegatePass(renderingPass);
+  if (!this->Xr)
+  {
+    vtkNew<vtkF3DOverlayRenderPass> overlayP;
+    overlayP->SetDelegatePass(renderingPass);
+    renderingPass = overlayP;
+  }
 
-  this->SetPass(overlayP);
+  this->SetPass(renderingPass);
 
 #if F3D_MODULE_RAYTRACING
   vtkOSPRayRendererNode::SetRendererType("pathtracer", this);
@@ -864,6 +918,12 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       }
 
       double* gridPos = upMatrixInv->MultiplyDoublePoint(center);
+
+      if (this->Xr)
+      {
+        gridPos[1] = 0; // keep the grid at the floor level in XR
+      }
+
       double delta[3];
       this->GetEnvironmentUp(delta);
       vtkMath::MultiplyScalar(delta, downShift);
@@ -888,7 +948,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       double orientation[3];
       vtkTransform::GetOrientation(orientation, upMatrixInv);
       this->GridActor->SetOrientation(orientation);
-      this->GridActor->SetPosition(gridPos);
+      this->GridActor->SetPosition(gridPos[0], this->Xr ? 0 : gridPos[1], gridPos[2]);
 
       this->GridActor->GetProperty()->SetColor(this->GridColor);
 
@@ -1104,6 +1164,156 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
   }
 
   return box;
+}
+
+//----------------------------------------------------------------------------
+vtkBoundingBox vtkF3DRenderer::CreateCameraFacingBoundingBox(
+  vtkCamera* camera, double scale, double distance)
+{
+  if (this->XrBoundingBoxConfigured)
+  {
+    return {};
+  }
+
+  double position[3];
+  double focalPoint[3];
+
+  camera->GetPosition(position);
+  camera->GetFocalPoint(focalPoint);
+
+  double forward[3] = { focalPoint[0] - position[0], 0.0f, focalPoint[2] - position[2] };
+  vtkMath::Normalize(forward);
+
+  double right[3];
+  const double worldUp[3] = { 0.0, 1.0, 0.0 };
+  vtkMath::Cross(worldUp, forward, right);
+  vtkMath::Normalize(right);
+
+  double up[3];
+  vtkMath::Cross(forward, right, up);
+  vtkMath::Normalize(up);
+
+  double center[3] = { position[0] + forward[0] * distance, position[1] - scale * 0.5,
+    position[2] + forward[2] * distance };
+
+  vtkBoundingBox bbox;
+  const double halfScale = scale * 0.5;
+
+  for (double dx : { -halfScale, halfScale })
+  {
+    for (double dy : { -halfScale, halfScale })
+    {
+      for (double dz : { -halfScale, halfScale })
+      {
+        double point[3] = {
+          center[0] + right[0] * dx + up[0] * dy + forward[0] * dz,
+          center[1] + right[1] * dx + up[1] * dy + forward[1] * dz,
+          center[2] + right[2] * dx + up[2] * dy + forward[2] * dz,
+        };
+        bbox.AddPoint(point);
+      }
+    }
+  }
+
+  return bbox;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::AlignSceneToBounds(const vtkBoundingBox& bounds)
+{
+  if (!bounds.IsValid() || !this->Importer)
+  {
+    return;
+  }
+
+  double* up = this->GetEnvironmentUp();
+  double* right = this->GetEnvironmentRight();
+  double front[3];
+  vtkMath::Cross(right, up, front);
+
+  vtkNew<vtkMatrix4x4> upMatrix;
+  const double m[16] = {
+    right[0], right[1], right[2], 0, //
+    up[0], up[1], up[2], 0,          //
+    front[0], front[1], front[2], 0, //
+    0, 0, 0, 1,                      //
+  };
+  upMatrix->DeepCopy(m);
+  vtkNew<vtkMatrix4x4> upMatrixInv;
+  upMatrixInv->DeepCopy(upMatrix);
+  upMatrixInv->Transpose();
+
+  double orientation[3];
+  vtkTransform::GetOrientation(orientation, upMatrixInv);
+  const vtkBoundingBox sourceBounds = this->ComputeVisiblePropOrientedBounds(upMatrix);
+
+  if (!sourceBounds.IsValid())
+  {
+    return;
+  }
+
+  double sourceCenter[3];
+  sourceBounds.GetCenter(sourceCenter);
+
+  double targetCenter[3];
+  bounds.GetCenter(targetCenter);
+
+  const double sourceLengths[3] = {
+    sourceBounds.GetLength(0),
+    sourceBounds.GetLength(1),
+    sourceBounds.GetLength(2),
+  };
+  const double targetLengths[3] = {
+    bounds.GetLength(0),
+    bounds.GetLength(1),
+    bounds.GetLength(2),
+  };
+
+  double scale = 1.0;
+  bool scaleInitialized = false;
+  for (int i = 0; i < 3; ++i)
+  {
+    if (sourceLengths[i] <= 0.0)
+    {
+      continue;
+    }
+
+    const double ratio = targetLengths[i] / sourceLengths[i];
+    if (!scaleInitialized)
+    {
+      scale = ratio;
+      scaleInitialized = true;
+    }
+    else
+    {
+      scale = std::min(scale, ratio);
+    }
+  }
+
+  vtkPropCollection* props = this->GetViewProps();
+  props->InitTraversal();
+
+  while (vtkProp* prop = props->GetNextProp())
+  {
+    vtkProp3D* prop3D = vtkProp3D::SafeDownCast(prop);
+    if (!prop3D)
+    {
+      continue;
+    }
+
+    if (prop3D == this->GridActor || prop3D == this->XrBBoxActor ||
+      vtkSkybox::SafeDownCast(prop3D) ||
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
+      vtkGridAxesActor3D::SafeDownCast(prop3D)
+#endif
+    )
+    {
+      continue;
+    }
+
+    prop3D->SetPosition(targetCenter[0], targetCenter[1], targetCenter[2]);
+    prop3D->SetScale(scale, scale, scale);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -2255,8 +2465,111 @@ void vtkF3DRenderer::ResetCameraClippingRange()
 {
   const bool gridUseBounds = this->GridActor->GetUseBounds();
   this->GridActor->SetUseBounds(!this->DisplayDepth);
-  this->Superclass::ResetCameraClippingRange();
+  if (!this->Xr)
+  {
+    this->Superclass::ResetCameraClippingRange();
+  }
+  else
+  {
+#ifdef F3D_MODULE_OPENXR
+    double bounds[6];
+
+    this->ComputeVisiblePropBounds(bounds);
+
+    this->GetActiveCameraAndResetIfCreated();
+    if (this->ActiveCamera == nullptr)
+    {
+      vtkErrorMacro(<< "Trying to reset clipping range of non-existent camera");
+      return;
+    }
+
+    vtkVRRenderWindow* win = static_cast<vtkVRRenderWindow*>(this->GetRenderWindow());
+    double physicalScale = win->GetPhysicalScale();
+
+    // reset the clipping range when we don't have any 3D visible props
+    if (!vtkMath::AreBoundsInitialized(bounds))
+    {
+      // default to 0.2 to 10.0 meters in physical space if no data bounds
+      this->ActiveCamera->SetClippingRange(0.2 * physicalScale, 10.0 * physicalScale);
+      return;
+    }
+
+    this->ResetCameraClippingRange(bounds);
+#else
+    assert(false); // Unreachable
+#endif
+  }
   this->GridActor->SetUseBounds(gridUseBounds);
+}
+
+//---------------------------------------------------------------------------
+void vtkF3DRenderer::ResetCameraClippingRange(const double bounds[6])
+{
+  if (!this->Xr)
+  {
+    this->Superclass::ResetCameraClippingRange(bounds);
+  }
+  else
+  {
+#ifdef F3D_MODULE_OPENXR
+    this->GetActiveCameraAndResetIfCreated();
+    if (this->ActiveCamera == nullptr)
+    {
+      vtkErrorMacro(<< "Trying to reset clipping range of non-existent camera");
+      return;
+    }
+
+    double range[2];
+    int i, j, k;
+    vtkVRRenderWindow* win = static_cast<vtkVRRenderWindow*>(this->GetRenderWindow());
+    double physicalScale = win->GetPhysicalScale();
+
+    // reset the clipping range when we don't have any 3D visible props
+    if (!vtkMath::AreBoundsInitialized(bounds))
+    {
+      // default to 0.2 to 10.0 meters in physical space if no data bounds
+      this->ActiveCamera->SetClippingRange(0.2 * physicalScale, 10.0 * physicalScale);
+      return;
+    }
+
+    double expandedBounds[6] = { bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5] };
+    this->ExpandBounds(expandedBounds, this->ActiveCamera->GetModelTransformMatrix());
+
+    double trans[3];
+    win->GetPhysicalTranslation(trans);
+
+    range[0] = 0.2; // 20 cm in front of HMD
+    range[1] = 0.0;
+
+    // Find the farthest bounding box vertex
+    for (k = 0; k < 2; k++)
+    {
+      for (j = 0; j < 2; j++)
+      {
+        for (i = 0; i < 2; i++)
+        {
+          double fard = sqrt((expandedBounds[i] - trans[0]) * (expandedBounds[i] - trans[0]) +
+            (expandedBounds[2 + j] - trans[1]) * (expandedBounds[2 + j] - trans[1]) +
+            (expandedBounds[4 + k] - trans[2]) * (expandedBounds[4 + k] - trans[2]));
+          range[1] = (fard > range[1]) ? fard : range[1];
+        }
+      }
+    }
+
+    range[1] /= physicalScale; // convert to physical scale
+    range[1] += 3.0;           // add 3 meters for room to walk around
+
+    // to see transmitters make sure far is at least 10 meters
+    if (range[1] < 10.0)
+    {
+      range[1] = 10.0;
+    }
+
+    this->ActiveCamera->SetClippingRange(range[0] * physicalScale, range[1] * physicalScale);
+#else
+    assert(false); // Unreachable
+#endif
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -3150,6 +3463,30 @@ void vtkF3DRenderer::SetComponentForColoring(int component)
     this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
     this->ExpandingRangeSet = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetXRMode(bool enable, bool showBbox)
+{
+  if (enable != this->Xr)
+  {
+    this->Xr = enable;
+    this->RenderPassesConfigured = false;
+  }
+
+  if (this->Xr)
+  {
+    this->ClippingRangeExpansion = 0.05;
+
+    if (showBbox)
+    {
+      this->AddActor(this->XrBBoxActor);
+    }
+    else
+    {
+      this->RemoveActor(this->XrBBoxActor);
+    }
   }
 }
 

@@ -444,6 +444,12 @@ public:
   virtual interactor& requestStop() = 0;
 
   /**
+   * Set the directory for Xr resources
+   */
+  virtual void setXrResourcesDirectory(const std::string& actionsManifestDirectory,
+    const std::string& controllerModelDirectory = "") = 0;
+
+  /**
    * An exception that can be thrown by the interactor
    * when adding something that already exists internally
    */
