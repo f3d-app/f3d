@@ -42,7 +42,7 @@
     "min_version": "v3.0.1"
   },
   "java": {
-    "version": "30",
+    "version": "26",
     "min_version": "17"
   },
   "occt": {
