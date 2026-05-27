@@ -44,6 +44,7 @@ public:
     EGL,
     OSMESA,
     WASM,
+    XR,
     UNKNOWN
   };
 

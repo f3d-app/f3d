@@ -119,6 +119,11 @@ public:
   [[nodiscard]] static engine createWasm(std::string_view canvasSelector = "#canvas");
 
   /**
+   * Create an engine with an XR window.
+   */
+  [[nodiscard]] static engine createXR();
+
+  /**
    * Create an engine with an external window.
    * A context to retrieve OpenGL symbols is required.
    * Here's an example if a GLFW window is used:
