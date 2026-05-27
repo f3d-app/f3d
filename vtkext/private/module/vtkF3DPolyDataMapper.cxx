@@ -349,7 +349,7 @@ void vtkF3DPolyDataMapper::ReplaceShaderTCoord(
     // apply final gamma-correction
     std::string customGamma =
       "//VTK::TCoord::Impl\n"
-      "gl_FragData[0] = vec4(pow(gl_FragData[0].rgb, vec3(1.0/2.2)), 1.0);\n";
+      "gl_FragData[0] = vec4(pow(gl_FragData[0].rgb, vec3(1.0/2.2)), gl_FragData[0].a);\n";
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::TCoord::Impl", customGamma);
 

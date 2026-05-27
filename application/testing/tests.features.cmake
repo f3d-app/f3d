@@ -48,6 +48,7 @@ f3d_test(NAME TestLineWidthFullScene DATA suzanne.obj ARGS -e --line-width=3 --u
 # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12702
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251214)
   f3d_test(NAME TestUnlitTexture DATA WaterBottle.glb ARGS --unlit)
+  f3d_test(NAME TestUnlitOBJOpacity DATA cube_unlit.obj ARGS --camera-position=3.93721,3.90197,3.74935 --camera-view-up=-0.422242,0.812423,-0.402095 --camera-view-angle=21.8333 --opacity=0.3)
 endif()
 f3d_test(NAME TestUnlit DATA cow.vtp ARGS --unlit --color=0.9,0.1,0.1)
 
