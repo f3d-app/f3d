@@ -56,8 +56,15 @@ void vtkF3DSolidBackgroundPass::Render(const vtkRenderState* state)
   }
 
   renWin->GetState()->PushFramebufferBindings();
-  this->RenderDelegate(
-    state, size[0], size[1], size[0], size[1], this->FrameBufferObject, this->ColorTexture);
+  this->FrameBufferObject->Bind();
+  this->FrameBufferObject->AddColorAttachment(0, this->ColorTexture);
+  this->FrameBufferObject->ActivateDrawBuffer(0);
+  this->FrameBufferObject->ActivateBuffer(0);
+  this->FrameBufferObject->AddDepthAttachment();
+  this->FrameBufferObject->StartNonOrtho(size[0], size[1]);
+  this->DelegatePass->Render(state);
+  this->FrameBufferObject->RemoveColorAttachments(1);
+  this->FrameBufferObject->UnBind();
   renWin->GetState()->PopFramebufferBindings();
 
   if (!this->QuadHelper)
