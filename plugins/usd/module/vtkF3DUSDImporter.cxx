@@ -1103,8 +1103,8 @@ public:
               allWeights = remapped;
             }
 
-            pxr::UsdSkelBindingAPI binding(skinTarget.GetPrim());
-            pxr::UsdSkelBlendShapeQuery blendShapeQuery(binding);
+            pxr::UsdSkelBindingAPI bindingAPI(skinTarget.GetPrim());
+            pxr::UsdSkelBlendShapeQuery blendShapeQuery(bindingAPI);
 
             pxr::VtFloatArray subShapeWeights;
             pxr::VtUIntArray blendShapeIndices, subShapeIndices;
