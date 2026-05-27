@@ -217,9 +217,14 @@ public:
   void Render() override;
 
   /**
-   * Reimplemented to account for grid actor
+   * Reimplemented to account for grid actor and xr usage
    */
   void ResetCameraClippingRange() override;
+
+  /**
+   * Reset camera clipping range function from vtkVRRenderer
+   */
+  void ResetCameraClippingRange(const double bounds[6]) override;
 
   /**
    * Set properties on each imported actors and also configure the coloring
@@ -656,6 +661,11 @@ public:
    */
   bool CaptureVideoFrame(std::byte* yPlane, std::byte* uPlane, std::byte* vPlane);
 
+  /**
+   * Set XR mode
+   */
+  void SetXRMode(bool enable, bool showBbox = false);
+
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;
@@ -802,6 +812,16 @@ private:
    */
   void SetArrayIsCellData(const std::optional<bool>& arrayIsCellData);
 
+  /**
+   * Create a camera-facing bounding box.
+   */
+  vtkBoundingBox CreateCameraFacingBoundingBox(vtkCamera* camera, double scale, double distance);
+
+  /**
+   * Align the scene to the given bounds.
+   */
+  void AlignSceneToBounds(const vtkBoundingBox& bounds);
+
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
   vtkSmartPointer<vtkCameraOrientationWidget> ModernAxisWidget;
   vtkSmartPointer<vtkCameraOrientationRepresentation> ModernAxisRepresentation;
@@ -842,6 +862,7 @@ private:
   bool HDRISphericalHarmonicsConfigured = false;
   bool HDRISpecularConfigured = false;
   bool HDRISkyboxConfigured = false;
+  bool XrBoundingBoxConfigured = false;
 
   bool GridVisible = false;
   bool GridAbsolute = false;
@@ -983,6 +1004,9 @@ private:
   bool PointSpritesUseInstancing = false;
 
   std::optional<bool> Unlit;
+
+  bool Xr = false;
+  vtkNew<vtkActor> XrBBoxActor;
 };
 
 #endif

@@ -1093,7 +1093,7 @@ public:
     if (!this->AppOptions.NoRender)
     {
       f3d::window& window = this->Engine->getWindow();
-      if (this->AppOptions.Resolution.size() == 2)
+      if (this->AppOptions.Resolution.size() == 2 && this->AppOptions.RenderingBackend != "xr")
       {
         const double dpiScale = window.getDPIScale();
         const int width = static_cast<int>(this->AppOptions.Resolution[0] * dpiScale);
@@ -1104,7 +1104,7 @@ public:
 
         window.setSize(width, height);
       }
-      else if (!this->AppOptions.Resolution.empty())
+      else if (!this->AppOptions.Resolution.empty() && this->AppOptions.RenderingBackend != "xr")
       {
         f3d::log::warn("Provided resolution could not be applied");
       }
@@ -1600,6 +1600,14 @@ int F3DStarter::Start(int argc, char** argv)
       else if (this->Internals->AppOptions.RenderingBackend == "wgl")
       {
         this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createWGL(offscreen));
+      }
+      else if (this->Internals->AppOptions.RenderingBackend == "xr")
+      {
+        std::filesystem::path xrActionManifestDir =
+          F3DSystemTools::GetBinaryResourceDirectory() / "xr_actions_manifest";
+        this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createXR());
+        this->Internals->Engine->getInteractor().setXrResourcesDirectory(
+          xrActionManifestDir.string());
       }
       else
       {

@@ -82,6 +82,9 @@ public:
   interactor& stop() override;
   interactor& requestRender() override;
   interactor& requestStop() override;
+
+  void setXrResourcesDirectory(const std::string& actionsManifestDirectory,
+    const std::string& controllerModelDirectory) override;
   ///@}
 
   /**
