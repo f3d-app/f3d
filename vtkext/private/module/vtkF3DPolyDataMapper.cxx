@@ -292,7 +292,8 @@ void vtkF3DPolyDataMapper::ReplaceShaderLight(
   std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
 {
   // Fixed in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13116
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260409)
+  // which is backported in 9.6.2 in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13185
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 2)
   if (actor->GetProperty()->GetInterpolation() == VTK_PBR &&
     this->PrimitiveInfo[this->LastBoundBO].LastLightComplexity == primitiveInfo::NoLighting)
   {

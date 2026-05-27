@@ -37,7 +37,8 @@ protected:
 #endif
 
   // need https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13116
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260409)
+  // which is backported in 9.6.2 in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13185
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 2)
   /**
    * This method is reimplemented to add a workaround needed before the fix linked above.
    */
