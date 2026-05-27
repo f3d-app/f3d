@@ -704,6 +704,17 @@
       "conditional": "F3D_MODULE_RAYTRACING"
     },
     {
+      "name": "XR",
+      "options": [
+        {
+          "longName": "xr",
+          "helpText": "Enable XR support",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        }
+      ]
+    },
+    {
       "name": "PostFX (OpenGL)",
       "options": [
         {

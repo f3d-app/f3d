@@ -144,6 +144,12 @@ engine engine::createOSMesa()
 }
 
 //----------------------------------------------------------------------------
+engine engine::createXR()
+{
+  return { window::Type::XR, false, nullptr };
+}
+
+//----------------------------------------------------------------------------
 engine engine::createExternal([[maybe_unused]] const context::function& getProcAddress)
 {
   if (getProcAddress == nullptr)

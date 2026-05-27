@@ -1188,6 +1188,10 @@ int F3DStarter::Start(int argc, char** argv)
       {
         this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createWGL(offscreen));
       }
+      else if (this->Internals->AppOptions.RenderingBackend == "xr")
+      {
+        this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createXR());
+      }
       else
       {
         if (this->Internals->AppOptions.RenderingBackend != "auto")

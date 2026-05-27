@@ -35,6 +35,10 @@
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
+#ifdef F3D_MODULE_OPENXR
+#include <vtkOpenXRRenderWindowInteractor.h>
+#endif
+
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -77,8 +81,19 @@ public:
     , Interactor(inter)
   {
     window::Type type = window.getType();
-    if (type == window::Type::GLX || type == window::Type::WGL || type == window::Type::COCOA ||
-      type == window::Type::WASM)
+    if (type == window::Type::XR)
+    {
+#ifdef F3D_MODULE_OPENXR
+      this->VTKInteractor = vtkSmartPointer<vtkOpenXRRenderWindowInteractor>::New();
+      vtkOpenXRRenderWindowInteractor* xrInteractor =
+        vtkOpenXRRenderWindowInteractor::SafeDownCast(this->VTKInteractor);
+      xrInteractor->SetActionManifestDirectory("./share/f3d/xr_actions_manifests/");
+#else
+      assert(false);
+#endif
+    }
+    else if (type == window::Type::GLX || type == window::Type::WGL ||
+      type == window::Type::COCOA || type == window::Type::WASM)
     {
       this->VTKInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
     }
@@ -168,9 +183,15 @@ public:
     double fwd[3];
     vtkMath::Cross(right, up, fwd);
     const double m[9] = {
-      right[0], right[1], right[2], //
-      fwd[0], fwd[1], fwd[2],       //
-      up[0], up[1], up[2],          //
+      right[0],
+      right[1],
+      right[2], //
+      fwd[0],
+      fwd[1],
+      fwd[2], //
+      up[0],
+      up[1],
+      up[2], //
     };
     transform->DeepCopy(m);
   }
