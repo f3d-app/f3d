@@ -442,7 +442,9 @@ extern "C"
     }
 
     JniUTFString str(env, filePath);
-    return GetEngine(env, self)->getScene().supports(str.c_str());
+    f3d::reader_types::file_availability result = GetEngine(env, self)->getScene().supports(str.c_str());
+    env->ReleaseStringUTFChars(filePath, str);
+    return result == f3d::reader_types::file_availability::AVAILABLE;
   }
 
   JNIEXPORT jobject JAVA_BIND(Scene, loadAnimationTime)(
