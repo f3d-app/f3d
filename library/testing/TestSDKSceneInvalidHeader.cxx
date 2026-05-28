@@ -19,7 +19,7 @@ int TestSDKSceneInvalidHeader([[maybe_unused]] int argc, [[maybe_unused]] char* 
   std::string invalidHeader = std::string(argv[1]) + "data/" + invalidHeaderFilename;
 
   // supports method
-  test("not supported with invalid header", !sce.supports(invalidHeader));
+  test("not supported with invalid header", sce.supports(invalidHeader) == f3d::reader_types::file_availability::UNSUPPORTED_CONTENT);
 
   return test.result();
 }

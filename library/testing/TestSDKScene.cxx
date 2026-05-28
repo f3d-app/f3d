@@ -31,6 +31,7 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   std::string validFilename = "cow.vtp";
   std::string invalidDefaultSceneFilename = "invalid_body.vtp";
   std::string invalidFullSceneFilename = "invalid_body.gltf";
+  std::string invalidPNGFilename = "invalid.png";
   std::string dummy = std::string(argv[1]) + "data/" + dummyFilename;
   std::string nonExistent = std::string(argv[1]) + "data/" + nonExistentFilename;
   std::string unsupported = std::string(argv[1]) + "data/" + unsupportedFilename;
@@ -43,15 +44,15 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   std::string monkey = std::string(argv[1]) + "data/red_translucent_monkey.gltf";
   std::string invalidDefaultScene = std::string(argv[1]) + "data/" + invalidDefaultSceneFilename;
   std::string invalidFullScene = std::string(argv[1]) + "data/" + invalidFullSceneFilename;
+  std::string invalidPNG = std::string(argv[1]) + "data/" + invalidPNGFilename;
 
   // supports method
-  test("not supported with empty filename", !sce.supports(empty));
-  test("not supported with dummy filename", !sce.supports(dummy));
-  test("not supported with non existent filename", !sce.supports(nonExistent));
-  test("supported with invalid body", sce.supports(invalidBody));
-  test("supported with default scene format", sce.supports(cube));
-  test("supported with full scene format", sce.supports(logo));
-
+  test("not supported with empty filename", sce.supports(empty) == f3d::reader_types::file_availability::UNSUPPORTED_EXSTENSION);
+  test("not supported with dummy filename", sce.supports(dummy) == f3d::reader_types::file_availability::UNSUPPORTED_EXSTENSION);
+  test("not supported with non existent filename", sce.supports(nonExistent) == f3d::reader_types::file_availability::UNSUPPORTED_EXSTENSION);
+  test("supported with invalid body", sce.supports(invalidBody) == f3d::reader_types::file_availability::AVAILABLE);
+  test("supported with default scene format", sce.supports(cube) == f3d::reader_types::file_availability::AVAILABLE);
+  test("supported with full scene format", sce.supports(logo) == f3d::reader_types::file_availability::AVAILABLE);
   // invalid
   test.expect<f3d::scene::load_failure_exception>(
     "add with invalid default scene file", [&]() { sce.add(invalidDefaultScene); });
