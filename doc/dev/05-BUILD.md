@@ -72,11 +72,21 @@ Some modules, plugins and language bindings depending on external libraries can 
 
 Some dependencies are provided internally, eg: ImGui, dmon and others. Use `F3D_USE_EXTERNAL_*` to use an external version of these libraries.
 
+## Building for contribution
+
+If you plan to contribute to F3D, you may want to use the provided `dev` preset for easier setup:
+
+`cmake --preset=dev /path/to/source`
+
+Please note optional dependencies should then be enabled as needed.
+
 ## VCPKG
 
 It's possible to use VCPKG to automatically build dependencies. A manifest file `vcpkg.json` is available at your convenience. Please read [VCPKG documentation](https://vcpkg.io/en/getting-started.html).
 Basically, just install VCPKG, and configure F3D using `-DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake` option.
-Only VTK is added to the manifest file and additional dependencies must be added manually in this file.
+Only VTK is added to the manifest file and additional dependencies must be added manually in this file. For an easier setup you can use the provided preset `vcpkg`:
+
+`cmake --preset=vcpkg /path/to/source`
 
 ## Installing
 
