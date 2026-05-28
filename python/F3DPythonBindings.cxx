@@ -790,6 +790,13 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("intensity", &f3d::light_state_t::intensity)
     .def_readwrite("switch_state", &f3d::light_state_t::switchState);
 
+  // f3d::reader_types::file_availability
+  py::enum_<f3d::reader_types::file_availability>(module, "FileAvailability")
+    .value("AVAILABLE", f3d::reader_types::file_availability::AVAILABLE)
+    .value("UNSUPPORTED_EXSTENSION", f3d::reader_types::file_availability::UNSUPPORTED_EXSTENSION)
+    .value("UNSUPPORTED_CONTENT", f3d::reader_types::file_availability::UNSUPPORTED_CONTENT)
+    .export_values();
+
   // f3d::node_state_t
   py::class_<f3d::node_state_t>(module, "NodeState")
     .def(py::init<>())
