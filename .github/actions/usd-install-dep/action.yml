@@ -74,7 +74,7 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: dependencies/usd_install
-        key: usd-${{steps.usd_ver.outputs.extract}}-${{steps.openexr_ver.outputs.extract}}-${{steps.imath_ver.outputs.extract}}-${{steps.openjph_ver.outputs.extract}}-${{steps.tbb_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-0
+        key: usd-${{steps.usd_ver.outputs.extract}}-${{steps.openexr_ver.outputs.extract}}-${{steps.imath_ver.outputs.extract}}-${{steps.openjph_ver.outputs.extract}}-${{steps.tbb_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-1
 
     - name: Checkout USD
       if: steps.cache-usd.outputs.cache-hit != 'true'

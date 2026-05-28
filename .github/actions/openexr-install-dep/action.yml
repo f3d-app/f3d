@@ -58,7 +58,7 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: dependencies/openexr_install
-        key: openexr-${{steps.openexr_ver.outputs.extract}}-${{steps.imath_ver.outputs.extract}}-${{steps.openjph_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
+        key: openexr-${{steps.openexr_ver.outputs.extract}}-${{steps.imath_ver.outputs.extract}}-${{steps.openjph_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-3
 
     # Dependents: usd f3d
     - name: Checkout OpenEXR
