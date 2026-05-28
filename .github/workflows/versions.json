@@ -55,8 +55,8 @@
     "min_version": "v3.0.1"
   },
   "openjph": {
-    "version": "v0.27.3",
-    "min_version": "v0.27.3"
+    "version": "0.27.3",
+    "min_version": "0.27.3"
   },
   "openvdb": {
     "version": "v13.0.0",
