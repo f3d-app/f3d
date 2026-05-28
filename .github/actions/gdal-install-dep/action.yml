@@ -95,7 +95,7 @@ runs:
 
     # https://github.com/OSGeo/gdal/issues/14015
     - name: Patch GDAL rpath issue
-      if: steps.cache-gdal.outputs.cache-hit != 'true'
+      if: steps.cache-gdal.outputs.cache-hit != 'true'  && steps.gdal_ver.outputs.extract == 'v3.8.2'
       working-directory: ${{github.workspace}}/dependencies/gdal
       shell: bash
       run: patch -p1 < $GITHUB_ACTION_PATH/fix_install_rpath.patch

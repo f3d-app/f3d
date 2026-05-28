@@ -101,14 +101,8 @@ runs:
         path: "./dependencies/pdal"
         ref: ${{steps.pdal_ver.outputs.extract}}
 
-    - name: Patch pdal
-      if: steps.cache-pdal.outputs.cache-hit != 'true' && steps.pdal_ver.outputs.extract != '2.9.0'
-      working-directory: ${{github.workspace}}/dependencies/pdal
-      shell: bash
-      run: |
-        patch -p1 < $GITHUB_ACTION_PATH/fix_leak.patch
-        patch -p1 < $GITHUB_ACTION_PATH/remove_apps_tools.patch
-
+    # https://github.com/PDAL/PDAL/issues/4966
+    # https://github.com/PDAL/PDAL/pull/4989
     - name: Patch pdal minver
       if: steps.cache-pdal.outputs.cache-hit != 'true' && steps.pdal_ver.outputs.extract == '2.9.0'
       working-directory: ${{github.workspace}}/dependencies/pdal
@@ -134,6 +128,7 @@ runs:
         -DBUILD_PLUGIN_E57=OFF
         -DBUILD_PLUGIN_HDF=OFF
         -DBUILD_PLUGIN_PGPOINTCLOUD=OFF
+        -DBUILD_TOOLS_LASDUMP=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../pdal_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
