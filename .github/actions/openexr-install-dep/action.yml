@@ -58,7 +58,7 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: dependencies/openexr_install
-        key: openexr-${{steps.openexr_ver.outputs.extract}}-${{steps.imath_ver.outputs.extract}}-${{steps.openjph_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-3
+        key: openexr-${{steps.openexr_ver.outputs.extract}}-${{steps.imath_ver.outputs.extract}}-${{steps.openjph_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-4
 
     # Dependents: usd f3d
     - name: Checkout OpenEXR
@@ -94,7 +94,6 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../openexr_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
-        -Dopenjph_DIR=$(pwd)/../install/lib/cmake/openjph/
         -DOPENEXR_FORCE_INTERNAL_OPENJPH=OFF
         -DOPENEXR_INSTALL_TOOLS=OFF
         -DOPENEXR_INSTALL_EXAMPLES=OFF
