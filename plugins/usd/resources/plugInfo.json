@@ -12,7 +12,7 @@
       "LibraryPath": "",
       "Name": "f3dUSDMemResolver",
       "ResourcePath": "resources",
-      "Root": ".",
+      "Root": "..",
       "Type": "library"
     }
   ]

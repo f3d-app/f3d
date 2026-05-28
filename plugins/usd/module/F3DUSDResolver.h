@@ -9,10 +9,6 @@
 
 #include <pxr/usd/ar/resolver.h>
 
-// register the plugInfo.json file
-// TODO: improve
-void F3DRegisterMemoryResolver();
-
 class vtkResourceStream;
 
 class F3DMemoryResolver final : public pxr::ArResolver

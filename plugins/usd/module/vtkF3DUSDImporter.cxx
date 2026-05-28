@@ -121,9 +121,6 @@ public:
   {
     if (!this->Stage)
     {
-      // TODO: can we skip that somehow by moving plugInfo.json somewhere else?
-      F3DRegisterMemoryResolver();
-
       F3DMemoryResolver::ActiveStream = stream;
       this->Stage = pxr::UsdStage::Open("f3dmem:stream." + hint);
       this->InitStage();

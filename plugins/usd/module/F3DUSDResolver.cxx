@@ -15,25 +15,6 @@
 
 vtkResourceStream* F3DMemoryResolver::ActiveStream = nullptr;
 
-//----------------------------------------------------------------------------
-void F3DRegisterMemoryResolver()
-{
-  static bool registered = false;
-  if (!registered)
-  {
-    registered = true;
-    std::string libraryPath;
-    if (!pxr::ArchGetAddressInfo(reinterpret_cast<void*>(&F3DRegisterMemoryResolver), &libraryPath,
-          nullptr, nullptr, nullptr))
-    {
-      return;
-    }
-
-    std::string plugInfoDir = pxr::TfGetPathName(libraryPath) + "usd/resources/";
-    pxr::PlugRegistry::GetInstance().RegisterPlugins(plugInfoDir);
-  }
-}
-
 // Register the resolver
 // TODO: can we avoid using namespace?
 using namespace pxr;
