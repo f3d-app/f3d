@@ -37,6 +37,14 @@ runs:
         name: imath
         minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
 
+    - name: Extract openjph version
+      id: openjph_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: openjph
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
     - name: Extract global cache index
       id: global_idx
       uses: f3d-app/extract-version-action@main
@@ -50,9 +58,9 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: dependencies/openexr_install
-        key: openexr-${{steps.openexr_ver.outputs.extract}}-${{steps.imath_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
+        key: openexr-${{steps.openexr_ver.outputs.extract}}-${{steps.imath_ver.outputs.extract}}-${{steps.openjph_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
 
-    # Dependents: usd
+    # Dependents: usd f3d
     - name: Checkout OpenEXR
       if: steps.cache-openexr.outputs.cache-hit != 'true'
       uses: actions/checkout@v6
@@ -86,6 +94,7 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../openexr_install
         -DCMAKE_PREFIX_PATH:PATH=../install/
+        -DOPENEXR_FORCE_INTERNAL_OPENJPH=OFF
         -DOPENEXR_INSTALL_TOOLS=OFF
         -DOPENEXR_INSTALL_EXAMPLES=OFF
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 -DCMAKE_MACOSX_RPATH=ON' || null }}

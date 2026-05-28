@@ -7,7 +7,8 @@
     "Python is part of VFX reference platform (CY2025: 3.11)",
     "OSPRay is fixed at 2.12.0 until full support for OSPRay 3.0 is added in VTK",
     "TBB is set at v2021.13.1 because OpenUSD seems to not support more recent versions: https://github.com/PixarAnimationStudios/OpenUSD/issues/3878 and https://github.com/PixarAnimationStudios/OpenUSD/issues/4078",
-    "sqlite is using a common-superbuild hash as it is not a CMake project"
+    "sqlite is using a common-superbuild hash as it is not a CMake project",
+    "OpenEXR v3.0.1 is actually not using OpenJPH"
   ],
   "alembic": {
     "version": "1.8.11",
@@ -52,6 +53,10 @@
   "openexr": {
     "version": "v3.4.11",
     "min_version": "v3.0.1"
+  },
+  "openjph": {
+    "version": "v0.27.3",
+    "min_version": "v0.27.3"
   },
   "openvdb": {
     "version": "v13.0.0",

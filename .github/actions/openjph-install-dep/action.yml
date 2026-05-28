@@ -1,0 +1,95 @@
+name: "Install OpenJPH Dependency"
+description: "Install OpenJPH Dependency using cache when possible"
+inputs:
+  versions_file:
+    description: "File to recover versions from"
+    required: true
+  mindeps_label:
+    description: "Label to flag for minimum versions dependencies"
+    required: false
+    default: "no-mindeps"
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
+
+    - name: Extract OpenJPH version
+      id: openjph_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: openjph
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract global cache index
+      id: global_idx
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        special_name: global_cache_index
+
+    - name: Cache OpenJPH
+      id: cache-openjph
+      continue-on-error: true # https://github.com/actions/cache/issues/1754
+      uses: actions/cache/restore@v5
+      with:
+        path: dependencies/openjph_install
+        key: openjph-${{steps.openjph_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
+
+    # Dependents: openexr
+    - name: Checkout OpenJPH
+      if: steps.cache-openjph.outputs.cache-hit != 'true'
+      uses: actions/checkout@v6
+      with:
+        repository: aous72/OpenJPH
+        path: "./dependencies/openjph"
+        ref: ${{steps.openjph_ver.outputs.extract}}
+
+    - name: Setup OpenJPH
+      if: steps.cache-openjph.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir openjph_build
+        mkdir openjph_install
+
+    - name: Configure OpenJPH
+      if: steps.cache-openjph.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/openjph_build
+      shell: bash
+      run: >
+        cmake ../openjph
+        -DBUILD_SHARED_LIBS=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX:PATH=../openjph_install
+        -DCMAKE_PREFIX_PATH:PATH=../install/
+        -DOJPH_ENABLE_TIFF_SUPPORT=OFF
+        -DUSE_TIFF=OFF
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 -DCMAKE_MACOSX_RPATH=ON' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build OpenJPH
+      if: steps.cache-openjph.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/openjph_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/openjph_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-openjph.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v5
+      with:
+        key: ${{ steps.cache-openjph.outputs.cache-primary-key }}
+        path: dependencies/openjph_install
