@@ -42,6 +42,8 @@
 #include <vtkMemoryResourceStream.h>
 #endif
 
+#include "F3DUSDResolver.h"
+
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Weverything"
@@ -110,14 +112,33 @@ public:
     if (!this->Stage)
     {
       this->Stage = pxr::UsdStage::Open(filePath);
+      this->InitStage();
+    }
+  }
 
-      if (this->Stage)
-      {
-        // TODO: USD bake skinning is not performant
-        // We need to read joints and do the skinning in the shader
-        // See https://github.com/f3d-app/f3d/issues/1076
-        pxr::UsdSkelBakeSkinning(this->Stage->Traverse());
-      }
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+  void ReadScene(vtkResourceStream* stream, const std::string& hint)
+  {
+    if (!this->Stage)
+    {
+      // TODO: can we skip that somehow by moving plugInfo.json somewhere else?
+      F3DRegisterMemoryResolver();
+
+      F3DMemoryResolver::ActiveStream = stream;
+      this->Stage = pxr::UsdStage::Open("f3dmem:stream." + hint);
+      this->InitStage();
+    }
+  }
+#endif
+
+  void InitStage()
+  {
+    if (this->Stage)
+    {
+      // TODO: USD bake skinning is not performant
+      // We need to read joints and do the skinning in the shader
+      // See https://github.com/f3d-app/f3d/issues/1076
+      pxr::UsdSkelBakeSkinning(this->Stage->Traverse());
     }
   }
 
@@ -1410,7 +1431,22 @@ int vtkF3DUSDImporter::ImportBegin()
 {
   try
   {
-    this->Internals->ReadScene(this->GetFileName());
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+    if (auto* stream = this->GetStream())
+    {
+      std::string hint;
+      if (!vtkF3DUSDImporter::CanReadFile(stream, hint))
+      {
+        vtkErrorMacro("Cannot determine USD format from stream");
+        return 0;
+      }
+      this->Internals->ReadScene(stream, hint);
+    }
+    else
+#endif
+    {
+      this->Internals->ReadScene(this->GetFileName());
+    }
   }
   catch (const std::runtime_error& e)
   {
@@ -1468,3 +1504,65 @@ void vtkF3DUSDImporter::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "AnimationEnabled: " << std::boolalpha << this->AnimationEnabled << "\n";
 }
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+//------------------------------------------------------------------------------
+bool vtkF3DUSDImporter::CanReadFile(vtkResourceStream* stream)
+{
+  std::string unused;
+  return vtkF3DUSDImporter::CanReadFile(stream, unused);
+}
+
+//------------------------------------------------------------------------------
+bool vtkF3DUSDImporter::CanReadFile(vtkResourceStream* stream, std::string& hint)
+{
+  if (!stream)
+  {
+    return false;
+  }
+
+  // USDC: binary crate format, magic "PXR-USDC" (8 bytes)
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  constexpr std::string_view usdcMagic{ "PXR-USDC", 8 };
+  std::array<char, 8> magic8;
+  if (stream->Read(magic8.data(), magic8.size()) == magic8.size())
+  {
+    if (std::string_view(magic8.data(), magic8.size()) == usdcMagic)
+    {
+      hint = "usdc";
+      stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+      return true;
+    }
+  }
+
+  // USDZ: ZIP archive, magic "PK\x03\x04" (4 bytes)
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  uint32_t zipMagic = 0;
+  if (stream->Read(&zipMagic, sizeof(zipMagic)) == sizeof(zipMagic))
+  {
+    if (zipMagic == 0x04034b50u)
+    {
+      hint = "usdz";
+      stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+      return true;
+    }
+  }
+
+  // USDA: ASCII text, starts with "#usda" (5 bytes)
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  constexpr std::string_view usdaMagic{ "#usda", 5 };
+  std::array<char, 5> magic5;
+  if (stream->Read(magic5.data(), magic5.size()) == magic5.size())
+  {
+    if (std::string_view(magic5.data(), magic5.size()) == usdaMagic)
+    {
+      hint = "usda";
+      stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+      return true;
+    }
+  }
+
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  return false;
+}
+#endif

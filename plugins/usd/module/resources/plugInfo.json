@@ -1,0 +1,19 @@
+{
+  "Plugins": [
+    {
+      "Info": {
+        "Types": {
+          "F3DMemoryResolver": {
+            "bases": ["ArResolver"],
+            "uriSchemes": ["f3dmem"]
+          }
+        }
+      },
+      "LibraryPath": "",
+      "Name": "f3dUSDMemResolver",
+      "ResourcePath": "resources",
+      "Root": ".",
+      "Type": "library"
+    }
+  ]
+}

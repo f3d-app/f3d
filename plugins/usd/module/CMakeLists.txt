@@ -4,7 +4,9 @@ set(classes
 
 vtk_module_add_module(f3d::vtkextUSD
   FORCE_STATIC
-  CLASSES ${classes})
+  CLASSES ${classes}
+  SOURCES F3DUSDResolver.cxx
+  HEADERS F3DUSDResolver.h)
 
 list(GET PXR_LIBRARIES 0 _first_lib)
 get_target_property(_target_type ${_first_lib} TYPE)

@@ -32,6 +32,12 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219)
   f3d_test(NAME TestUSDRigArmatureSphereTube DATA RiggedSimple.usdz ARGS --animation-time=1 --armature --point-size=20 --line-width=5 PLUGIN usd)
 endif()
 
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251210)
+  f3d_test(NAME TestPipedUSD DATA suzanne.usd PLUGIN usd PIPED USD)
+  f3d_test(NAME TestPipedUSDAPrimitives DATA primitives.usda PLUGIN usd PIPED USD)
+  f3d_test(NAME TestPipedUSDZRigged DATA RiggedSimple.usdz PLUGIN usd PIPED USD)
+endif()
+
 if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/plugins/usd/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
