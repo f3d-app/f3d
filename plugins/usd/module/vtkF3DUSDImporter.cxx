@@ -1363,7 +1363,9 @@ private:
 
     void IssueFatalError(const pxr::TfCallContext&, const std::string& msg) override
     {
-      vtkErrorWithObjectMacro(this->Parent, << msg);
+      // if we do not throw here, OpenUSD just exit(1) the process
+      // we catch this exception upstream and only report an importer failure
+      throw std::runtime_error(msg);
     }
 
     void IssueStatus(const pxr::TfStatus& status) override
@@ -1406,7 +1408,15 @@ vtkF3DUSDImporter::~vtkF3DUSDImporter() = default;
 //----------------------------------------------------------------------------
 int vtkF3DUSDImporter::ImportBegin()
 {
-  this->Internals->ReadScene(this->GetFileName());
+  try
+  {
+    this->Internals->ReadScene(this->GetFileName());
+  }
+  catch (const std::runtime_error& e)
+  {
+    vtkErrorMacro(<< e.what());
+    return 0;
+  }
 
   return 1;
 }
