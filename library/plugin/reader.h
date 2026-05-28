@@ -91,8 +91,11 @@ public:
           availability = reader_types::file_availability::AVAILABLE;
           return true;
         }
+        else
+        {
+          availability = reader_types::file_availability::UNSUPPORTED_CONTENT;
+        }
       }
-      availability = reader_types::file_availability::UNSUPPORTED_CONTENT;
     }
     return false;
   }
