@@ -93,7 +93,8 @@ runs:
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../openexr_install
-        -DCMAKE_PREFIX_PATH:PATH=../install/
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
+        -Dopenjph_DIR=$(pwd)/../install/lib/cmake/openjph/
         -DOPENEXR_FORCE_INTERNAL_OPENJPH=OFF
         -DOPENEXR_INSTALL_TOOLS=OFF
         -DOPENEXR_INSTALL_EXAMPLES=OFF
