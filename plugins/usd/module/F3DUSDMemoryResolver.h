@@ -19,15 +19,16 @@ class vtkResourceStream;
 class F3DUSDMemoryResolver final : public pxr::ArResolver
 {
 protected:
-  
   /**
-   * Returns assetPath as the identifier, ignoring anchorAssetPath since it is not relevant for this resolver.
+   * Returns assetPath as the identifier, ignoring anchorAssetPath since it is not relevant for this
+   * resolver.
    */
   std::string _CreateIdentifier(
     const std::string& assetPath, const pxr::ArResolvedPath& anchorAssetPath) const override;
 
   /**
-   * Returns assetPath as the identifier, ignoring anchorAssetPath since it is not relevant for this resolver.
+   * Returns assetPath as the identifier, ignoring anchorAssetPath since it is not relevant for this
+   * resolver.
    */
   pxr::ArResolvedPath _Resolve(const std::string& assetPath) const override;
 
