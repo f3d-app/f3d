@@ -124,7 +124,7 @@ public:
     }
   }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250501)
   void ReadScene(vtkResourceStream* stream, const std::string& hint)
   {
     if (!this->Stage)
@@ -1436,7 +1436,7 @@ int vtkF3DUSDImporter::ImportBegin()
 {
   try
   {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250501)
     if (auto* stream = this->GetStream())
     {
       std::string hint;
@@ -1510,7 +1510,6 @@ void vtkF3DUSDImporter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AnimationEnabled: " << std::boolalpha << this->AnimationEnabled << "\n";
 }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
 //------------------------------------------------------------------------------
 bool vtkF3DUSDImporter::CanReadFile(vtkResourceStream* stream)
 {
@@ -1570,4 +1569,3 @@ bool vtkF3DUSDImporter::CanReadFile(vtkResourceStream* stream, std::string& hint
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
   return false;
 }
-#endif

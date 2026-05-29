@@ -85,12 +85,9 @@ public:
    * Check whether the given stream contains a recognizable USD format.
    * The two-argument overload also sets `hint` to the detected file extension
    * ("usda", "usdc", or "usdz") which is required when reading from a stream.
-   * Requires VTK >= 9.5.20251016.
    */
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
   static bool CanReadFile(vtkResourceStream* stream);
   static bool CanReadFile(vtkResourceStream* stream, std::string& hint);
-#endif
   ///@}
 
   /**

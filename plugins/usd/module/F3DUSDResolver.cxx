@@ -42,8 +42,7 @@ pxr::ArResolvedPath F3DMemoryResolver::_ResolveForNewAsset(const std::string& as
 }
 
 //----------------------------------------------------------------------------
-std::shared_ptr<pxr::ArAsset> F3DMemoryResolver::_OpenAsset(
-  const pxr::ArResolvedPath& resolvedPath) const
+std::shared_ptr<pxr::ArAsset> F3DMemoryResolver::_OpenAsset(const pxr::ArResolvedPath&) const
 {
   assert(F3DMemoryResolver::ActiveStream != nullptr);
 
