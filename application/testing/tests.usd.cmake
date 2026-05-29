@@ -6,7 +6,6 @@ f3d_test(NAME TestUSDAPrimitives DATA primitives.usda PLUGIN usd)
 f3d_test(NAME TestUSDAPrimitivesZAxis DATA primitivesZ.usda PLUGIN usd)
 f3d_test(NAME TestUSDAInstancing DATA instancing.usda PLUGIN usd)
 f3d_test(NAME TestUSDAGlyphs DATA glyphs.usda PLUGIN usd)
-f3d_test(NAME TestUSDInvalid DATA invalid.usd REGEXP "Stage failed to open" PLUGIN usd ARGS --verbose NO_BASELINE)
 f3d_test(NAME TestUSDPurpose DATA purpose.usdc PLUGIN usd)
 f3d_test(NAME TestUSDInterpolation DATA two_quads_interp.usda PLUGIN usd)
 

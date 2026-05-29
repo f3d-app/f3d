@@ -1542,7 +1542,6 @@ bool vtkF3DUSDImporter::CanReadFile(vtkResourceStream* stream, std::string& hint
     if (std::string_view(magic8.data(), magic8.size()) == usdcMagic)
     {
       hint = "usdc";
-      stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
       return true;
     }
   }
@@ -1568,7 +1567,6 @@ bool vtkF3DUSDImporter::CanReadFile(vtkResourceStream* stream, std::string& hint
             firstName.ends_with(".usda"))
           {
             hint = "usdz";
-            stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
             return true;
           }
         }
@@ -1585,11 +1583,9 @@ bool vtkF3DUSDImporter::CanReadFile(vtkResourceStream* stream, std::string& hint
     if (std::string_view(magic5.data(), magic5.size()) == usdaMagic)
     {
       hint = "usda";
-      stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
       return true;
     }
   }
 
-  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
   return false;
 }

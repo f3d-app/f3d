@@ -17,7 +17,7 @@ int TestF3DUSDImporterStreamError(int vtkNotUsed(argc), char* argv[])
   }
 
   // The loaded file has external texture, which requires a filename
-  // this test the warning code path when texture cannot be loaded for this reason
+  // this cover the warning code path when texture cannot be loaded for this reason
   {
     std::string filename = std::string(argv[1]) + "data/Teapot.usd";
     vtkNew<vtkFileResourceStream> stream;
@@ -38,9 +38,9 @@ int TestF3DUSDImporterStreamError(int vtkNotUsed(argc), char* argv[])
     }
   }
 
-  // Check that an error is emitted when trying to read a non-USD file from stream
+  // Check that an error is emitted when trying to read an invalid USD file from stream
   {
-    std::string filename = std::string(argv[1]) + "data/f3d.glb";
+    std::string filename = std::string(argv[1]) + "data/invalid.usd";
 
     vtkNew<vtkFileResourceStream> stream;
     if (!stream->Open(filename.c_str()))
@@ -51,7 +51,7 @@ int TestF3DUSDImporterStreamError(int vtkNotUsed(argc), char* argv[])
 
     if (vtkF3DUSDImporter::CanReadFile(stream))
     {
-      std::cerr << "Unexpected success CanReadFile with glb stream\n";
+      std::cerr << "Unexpected success CanReadFile with an invalid stream\n";
       return EXIT_FAILURE;
     }
 

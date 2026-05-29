@@ -20,7 +20,7 @@ std::string F3DUSDMemoryResolver::_CreateIdentifier(
 
 //----------------------------------------------------------------------------
 std::string F3DUSDMemoryResolver::_CreateIdentifierForNewAsset(
-  const std::string& assetPath, const pxr::ArResolvedPath&) const
+  const std::string&, const pxr::ArResolvedPath&) const
 {
   // unreachable
   return {};
@@ -33,7 +33,7 @@ pxr::ArResolvedPath F3DUSDMemoryResolver::_Resolve(const std::string& assetPath)
 }
 
 //----------------------------------------------------------------------------
-pxr::ArResolvedPath F3DUSDMemoryResolver::_ResolveForNewAsset(const std::string& assetPath) const
+pxr::ArResolvedPath F3DUSDMemoryResolver::_ResolveForNewAsset(const std::string&) const
 {
   // unreachable
   return {};
