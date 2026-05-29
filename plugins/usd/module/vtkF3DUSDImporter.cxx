@@ -103,7 +103,8 @@ public:
     // register our own stream plugin
     // safe to call several times
     std::string libPath;
-    if (pxr::ArchGetAddressInfo((void*)&vtkF3DUSDImporter::New, &libPath, nullptr, nullptr, nullptr))
+    if (pxr::ArchGetAddressInfo(
+          reinterpret_cast<void*>(&vtkF3DUSDImporter::New), &libPath, nullptr, nullptr, nullptr))
     {
       std::string plugInfoDir = pxr::TfGetPathName(libPath) + "../lib/usd/f3d/resources/";
       pxr::PlugRegistry::GetInstance().RegisterPlugins(plugInfoDir);
