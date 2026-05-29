@@ -254,10 +254,10 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
     std::optional<std::string> forceReader = this->Internals->Options.scene.force_reader;
     const std::optional<bool> skipContentCheck = this->Internals->Options.scene.skip_content_check;
     // Recover the importer for the provided file path
-    reader_types::file_availability availability;
+    file_availability availability;
     const f3d::reader* reader = f3d::factory::instance()->getReader(
       filePath.string(), forceReader, skipContentCheck, availability);
-    if (availability == reader_types::file_availability::AVAILABLE)
+    if (availability == file_availability::SUPPORTED)
     {
       if (forceReader)
       {
@@ -277,13 +277,13 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       std::string errorMessage;
       switch (availability)
       {
-        case reader_types::file_availability::UNSUPPORTED_EXSTENSION:
+        case file_availability::UNSUPPORTED_EXTENSION:
           errorMessage = (filePath.string() +
             " is not a file of a supported 3D scene file format, use force reader to force a "
             "specific "
             "reader");
           break;
-        case reader_types::file_availability::UNSUPPORTED_CONTENT:
+        case file_availability::UNSUPPORTED_CONTENT:
           errorMessage = (filePath.string() +
             " contains unsupported content " //! todo add skip content check
             "reader");
@@ -870,10 +870,10 @@ scene& scene_impl::removeAllLights()
 }
 
 //----------------------------------------------------------------------------
-f3d::reader_types::file_availability scene_impl::supports(const fs::path& filePath)
+f3d::file_availability scene_impl::supports(const fs::path& filePath)
 {
-  f3d::reader_types::file_availability availability =
-    reader_types::file_availability::UNSUPPORTED_EXSTENSION;
+  f3d::file_availability availability =
+    f3d::file_availability::UNSUPPORTED_EXTENSION;
   f3d::factory::instance()->getReader(filePath.string(),
     this->Internals->Options.scene.force_reader, this->Internals->Options.scene.skip_content_check,
     availability) != nullptr;

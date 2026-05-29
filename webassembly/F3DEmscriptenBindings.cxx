@@ -140,7 +140,7 @@ EMSCRIPTEN_BINDINGS(f3d)
   emscripten::class_<f3d::scene>("Scene")
     .function(
       "supports",
-      +[](f3d::scene& scene, const std::string& path) -> bool { return scene.supports(std::filesystem(path)) == f3d::reader_types::file_availability::AVAILABLE; })
+      +[](f3d::scene& scene, const std::string& path) -> bool { return scene.supports(std::filesystem(path)) == f3d::file_availability::SUPPORTED; })
     .function(
       "add",
       +[](f3d::scene& scene, emscripten::val arg) -> f3d::scene&

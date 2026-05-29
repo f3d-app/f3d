@@ -3,7 +3,6 @@
 
 #include "exception.h"
 #include "export.h"
-#include "reader_types.h"
 #include "mesh_view.h"
 #include "types.h"
 
@@ -35,6 +34,14 @@ namespace f3d
  * \endcode
  *
  */
+
+enum class file_availability : int
+{
+  SUPPORTED = 1,
+  UNSUPPORTED_EXTENSION = 2,
+  UNSUPPORTED_CONTENT = 3,
+};
+
 class F3D_EXPORT scene
 {
 public:
@@ -157,7 +164,7 @@ public:
    * scene.force_reader is taken into account and plugin should be loaded for their readers to be
    * found.
    */
-  [[nodiscard]] virtual reader_types::file_availability supports(
+  [[nodiscard]] virtual file_availability supports(
     const std::filesystem::path& filePath) = 0;
 
   /**

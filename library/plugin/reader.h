@@ -6,7 +6,6 @@
 #include <vtkImporter.h>
 #include <vtkSmartPointer.h>
 
-#include "../public/reader_types.h"
 
 #include <algorithm>
 #include <cctype>
@@ -16,6 +15,10 @@
 #include <vector>
 
 class vtkResourceStream;
+namespace f3d
+{
+  enum class file_availability;
+}
 namespace f3d
 {
 /**
@@ -70,37 +73,7 @@ public:
    * Check if this reader can read the given filename - according to its extension and file content
    */
   virtual bool canRead(const std::string& fileName, const std::optional<bool> skipContentCheck,
-    reader_types::file_availability& availability) const
-  {
-    std::string ext = fileName.substr(fileName.find_last_of(".") + 1);
-    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-
-    const std::vector<std::string>& extensions = this->getExtensions();
-
-    if (std::any_of(
-          extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; }))
-    {
-      vtkNew<vtkFileResourceStream> stream;
-      if (skipContentCheck.has_value() && skipContentCheck.value() == true)
-      {
-        availability = reader_types::file_availability::AVAILABLE;
-        return true;
-      }
-      else if (stream->Open(fileName.c_str()))
-      {
-        if (this->canRead(stream))
-        {
-          availability = reader_types::file_availability::AVAILABLE;
-          return true;
-        }
-        else
-        {
-          availability = reader_types::file_availability::UNSUPPORTED_CONTENT;
-        }
-      }
-    }
-    return false;
-  }
+    f3d::file_availability& availability) const;
 
   /**
    * Should return true if this reader could be able to read provided stream,
