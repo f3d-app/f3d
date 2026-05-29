@@ -54,10 +54,10 @@ struct F3DUSDMemoryResolverContext
 
 size_t hash_value(const F3DUSDMemoryResolverContext&);
 
-template <>
+template<>
 struct pxr::ArIsContextObject<F3DUSDMemoryResolverContext>
 {
-    static const bool value = true;
+  static const bool value = true;
 };
 
 #endif

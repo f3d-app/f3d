@@ -130,8 +130,9 @@ public:
   {
     if (!this->Stage)
     {
-      F3DUSDMemoryResolverContext ctx { stream };
-      this->Stage = pxr::UsdStage::Open("f3dmem:stream." + hint, pxr::ArResolverContext(ctx));
+      this->MemoryResolverContext.Stream = stream;
+      pxr::ArResolverContext ctx(this->MemoryResolverContext);
+      this->Stage = pxr::UsdStage::Open("f3dmem:stream." + hint, ctx);
       this->InitStage();
     }
   }
@@ -1071,7 +1072,7 @@ public:
         }
 
         const std::string& resolvedPath = path.GetResolvedPath();
-        pxr::ArResolverContextBinder binder(this->Stage->GetPathResolverContext());
+        pxr::ArResolverContextBinder binder(this->MemoryResolverContext);
         auto asset = pxr::ArGetResolver().OpenAsset(pxr::ArResolvedPath(resolvedPath));
 
         if (!asset)
@@ -1365,6 +1366,7 @@ public:
 
   pxr::UsdStageRefPtr Stage = nullptr;
   std::unordered_map<std::string, int> NodeIdMap;
+  F3DUSDMemoryResolverContext MemoryResolverContext;
 
 private:
   std::unordered_map<std::string,
@@ -1548,9 +1550,25 @@ bool vtkF3DUSDImporter::CanReadFile(vtkResourceStream* stream, std::string& hint
   {
     if (zipMagic == 0x04034b50u)
     {
-      hint = "usdz";
-      stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
-      return true;
+      // It's a zip file, now confirm the first file is a USD file
+      // see https://openusd.org/release/spec_usdz.html#layout
+      uint8_t header[26]; // bytes 4 to 29
+      if (stream->Read(header, sizeof(header)) == sizeof(header))
+      {
+        uint16_t nameLen;
+        std::memcpy(&nameLen, header + 22, 2);
+        std::string firstName(nameLen, '\0');
+        if (stream->Read(firstName.data(), nameLen) == nameLen)
+        {
+          if (firstName.ends_with(".usdc") || firstName.ends_with(".usda") || firstName.ends_with(".usdz") ||
+            firstName.ends_with(".usd"))
+          {
+            hint = "usdz";
+            stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+            return true;
+          }
+        }
+      }
     }
   }
 

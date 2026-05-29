@@ -55,7 +55,8 @@ std::shared_ptr<pxr::ArAsset> F3DUSDMemoryResolver::_OpenAsset(const pxr::ArReso
 }
 
 //----------------------------------------------------------------------------
-bool F3DUSDMemoryResolver::_CanWriteAssetToPath(const pxr::ArResolvedPath&, std::string* whyNot) const
+bool F3DUSDMemoryResolver::_CanWriteAssetToPath(
+  const pxr::ArResolvedPath&, std::string* whyNot) const
 {
   if (whyNot)
   {
