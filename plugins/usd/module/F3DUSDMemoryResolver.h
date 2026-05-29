@@ -19,26 +19,39 @@ class vtkResourceStream;
 class F3DUSDMemoryResolver final : public pxr::ArResolver
 {
 protected:
-  // implements pure virtual functions
+  
+  /**
+   * Returns assetPath as the identifier, ignoring anchorAssetPath since it is not relevant for this resolver.
+   */
   std::string _CreateIdentifier(
     const std::string& assetPath, const pxr::ArResolvedPath& anchorAssetPath) const override;
 
+  /**
+   * Returns assetPath as the identifier, ignoring anchorAssetPath since it is not relevant for this resolver.
+   */
+  pxr::ArResolvedPath _Resolve(const std::string& assetPath) const override;
+
+  /**
+   * Function called by usd to open assets, implemented to read data from a vtkResourceStream
+   */
+  std::shared_ptr<pxr::ArAsset> _OpenAsset(const pxr::ArResolvedPath& resolvedPath) const override;
+
+  //@{
+  /**
+   * Implements dummy pure virtual functions
+   */
   std::string _CreateIdentifierForNewAsset(
     const std::string& assetPath, const pxr::ArResolvedPath& anchorAssetPath) const override;
 
-  pxr::ArResolvedPath _Resolve(const std::string& assetPath) const override;
-
   pxr::ArResolvedPath _ResolveForNewAsset(const std::string& assetPath) const override;
-
-  // this is the function that actually gets called to open assets
-  std::shared_ptr<pxr::ArAsset> _OpenAsset(const pxr::ArResolvedPath& resolvedPath) const override;
 
   std::shared_ptr<pxr::ArWritableAsset> _OpenAssetForWrite(
     const pxr::ArResolvedPath& resolvedPath, WriteMode writeMode) const override;
+  //@}
 };
 
 /**
- * The context object used by the F3DUSDMemoryResolver to pass the VTK stream.
+ * The context object used by the F3DUSDMemoryResolver to pass the vtkResourceStream.
  */
 struct F3DUSDMemoryResolverContext
 {
