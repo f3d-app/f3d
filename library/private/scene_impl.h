@@ -49,6 +49,7 @@ public:
   scene& setNodeVisibility(int nodeId, bool visible) override;
   scene_info_t getSceneInfo() const override;
   bool supports(const std::filesystem::path& filePath) override;
+  file_availability supports(const std::filesystem::path& filePath) override;
   scene& loadAnimationTime(double timeValue) override;
   std::pair<double, double> animationTimeRange() override;
   std::vector<double> getAnimationKeyFrames() override;

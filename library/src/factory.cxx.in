@@ -14,8 +14,8 @@ namespace f3d
 namespace
 {
 template<typename F>
-reader* pickReader(
-  const std::vector<plugin*>& plugins, std::optional<std::string> forceReader, F&& isValid)
+reader* pickReader(const std::vector<plugin*>& plugins, std::optional<std::string> forceReader,
+  file_availability& availability, F&& isValid)
 {
   int bestScore = -1;
   reader* bestReader = nullptr;
@@ -77,7 +77,7 @@ factory::plugin_initializer_t factory::getStaticInitializer(const std::string& p
 
 //----------------------------------------------------------------------------
 reader* factory::getReader(const std::string& fileName, std::optional<std::string> forceReader,
-  const std::optional<bool> skipContentCheck, reader_types::file_availability& availability)
+  const std::optional<bool> skipContentCheck, file_availability& availability)
 {
   return f3d::pickReader(this->Plugins, forceReader, availability, [&](const reader* reader)
     { return reader->canRead(fileName, skipContentCheck, availability); });
@@ -89,6 +89,7 @@ reader* factory::getReader(const std::byte* buffer, std::size_t size,
 {
   vtkNew<vtkMemoryResourceStream> stream;
   stream->SetBuffer(buffer, size);
+  file_availability availability;
 
   return f3d::pickReader(this->Plugins, forceReader,
     [&](const reader* reader) { return reader->supportsStream() && reader->canRead(stream); });
