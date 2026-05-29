@@ -60,7 +60,7 @@ f3d_plugin_build(
 
 # installation
 install(
-  FILES "${CMAKE_CURRENT_SOURCE_DIR}/module/resources/plugInfo.json"
+  FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/plugInfo.json"
   DESTINATION "${F3D_PLUGINS_INSTALL_DIR}/lib/usd/f3d/resources"
   COMPONENT plugin
 )
@@ -69,6 +69,6 @@ install(
 file(MAKE_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/usd/f3d/resources")
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/resources/plugInfo.json"
-  "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/usd/f3d/resources/plugInfo.json"
+  "${CMAKE_BINARY_DIR}/lib/usd/f3d/resources/plugInfo.json"
   COPYONLY
 )

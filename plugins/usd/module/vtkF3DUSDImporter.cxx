@@ -58,6 +58,8 @@
 #elif defined(_MSC_VER)
 #pragma warning(push, 0)
 #endif
+#include <pxr/base/arch/systemInfo.h>
+#include <pxr/base/plug/registry.h>
 #include <pxr/usd/ar/asset.h>
 #include <pxr/usd/ar/resolver.h>
 #include <pxr/usd/usd/modelAPI.h>
@@ -96,6 +98,17 @@ public:
     : Delegate(parent)
   {
     pxr::TfDiagnosticMgr::GetInstance().AddDelegate(&this->Delegate);
+
+    static bool registered = false;
+    if (!registered)
+    {
+      registered = true;
+
+      std::string exePath = pxr::ArchGetExecutablePath();
+
+      std::string plugInfoDir = pxr::TfGetPathName(exePath) + "lib/usd/f3d/resources/";
+      pxr::PlugRegistry::GetInstance().RegisterPlugins(plugInfoDir);
+    }
   }
 
   ~vtkInternals()
