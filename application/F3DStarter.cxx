@@ -2120,11 +2120,12 @@ void F3DStarter::LoadFileGroupInternal(
 
         try
         {
+          f3d::file_availability availability = scene.supports(tmpPath);
           if (!fs::exists(tmpPath))
           {
             f3d::log::error(tmpPath.string(), " does not exist");
           }
-          else if (scene.supports(tmpPath))
+          else if (availability == f3d::file_availability::SUPPORTED)
           {
             // Check the size of the file before loading it
             static constexpr int BYTES_IN_MIB = 1048576;
@@ -2140,7 +2141,22 @@ void F3DStarter::LoadFileGroupInternal(
               localPaths.emplace_back(tmpPath);
             }
           }
-          else
+          else if (availability == f3d::file_availability::UNSUPPORTED_EXTENSION)
+          {
+            auto forceReader = this->Internals->LibOptions.scene.force_reader;
+            if (forceReader)
+            {
+              f3d::log::warn("Forced reader ", *forceReader, " doesn't exist");
+            }
+            else
+            {
+              f3d::log::warn(tmpPath.string(),
+                " is of an unknown format, use "
+                "--force-reader to select a specific reader");
+            }
+            unsupported = true;
+          }
+          else if (availability == f3d::file_availability::UNSUPPORTED_CONTENT)
           {
             auto forceReader = this->Internals->LibOptions.scene.force_reader;
             if (forceReader)

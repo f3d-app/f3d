@@ -16,6 +16,10 @@
 class vtkResourceStream;
 namespace f3d
 {
+  enum class file_availability;
+}
+namespace f3d
+{
 /**
  * @class   reader
  * @brief   The basis reader class
