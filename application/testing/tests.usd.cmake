@@ -9,7 +9,10 @@ f3d_test(NAME TestUSDAGlyphs DATA glyphs.usda PLUGIN usd)
 f3d_test(NAME TestUSDInvalid DATA invalid.usd REGEXP "Stage failed to open" PLUGIN usd ARGS --verbose NO_BASELINE)
 f3d_test(NAME TestUSDPurpose DATA purpose.usdc PLUGIN usd)
 f3d_test(NAME TestUSDInterpolation DATA two_quads_interp.usda PLUGIN usd)
-f3d_test(NAME TestUSDZMemEXR DATA small.usdz PLUGIN usd)
+
+if(F3D_MODULE_EXR)
+  f3d_test(NAME TestUSDZMemEXR DATA small.usdz PLUGIN usd)
+endif()
 
 # This test is there to test occlusion texture and face-varying point data
 # TODO: Note that the result looks incorrect because of face-varying attributes and must be fixed later
