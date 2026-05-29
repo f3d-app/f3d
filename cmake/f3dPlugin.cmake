@@ -233,7 +233,7 @@ The `NAME` argument is required. The arguments are as follows:
   * `ADDITIONAL_RPATHS`: The list of additional RPATH for the installed binaries on Unix. VTK path is added automatically.
   * `MIMETYPE_XML_FILES`: The list of mimetype files to install. It's useful for file association on OS using Freedesktop specifications.
   * `CONFIGURATION_DIRS`: The list of configuration directories to install. Generally contain a load-plugins option and format specific options.
-  * `RESOURCES`: A list of destination paths (relative to the plugins install/build dir). For each
+  * `RESOURCES`: A list of destination paths (relative to the plugins install/build dir) to copy resources to. For each
     entry the source file is looked up as ``${CMAKE_CURRENT_SOURCE_DIR}/resources/<filename>``.
   * `FREEDESKTOP`: If specified, generates .desktop and .thumbnailer used for desktop integration on Linux.
   * `FORCE_STATIC`: If specified, the plugin is built as a static library and embedded into libf3d.
