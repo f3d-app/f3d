@@ -22,7 +22,8 @@ std::string F3DUSDMemoryResolver::_CreateIdentifier(
 std::string F3DUSDMemoryResolver::_CreateIdentifierForNewAsset(
   const std::string& assetPath, const pxr::ArResolvedPath&) const
 {
-  return assetPath;
+  // unreachable
+  return {};
 }
 
 //----------------------------------------------------------------------------
@@ -34,7 +35,8 @@ pxr::ArResolvedPath F3DUSDMemoryResolver::_Resolve(const std::string& assetPath)
 //----------------------------------------------------------------------------
 pxr::ArResolvedPath F3DUSDMemoryResolver::_ResolveForNewAsset(const std::string& assetPath) const
 {
-  return pxr::ArResolvedPath(assetPath);
+  // unreachable
+  return {};
 }
 
 //----------------------------------------------------------------------------
@@ -55,20 +57,10 @@ std::shared_ptr<pxr::ArAsset> F3DUSDMemoryResolver::_OpenAsset(const pxr::ArReso
 }
 
 //----------------------------------------------------------------------------
-bool F3DUSDMemoryResolver::_CanWriteAssetToPath(
-  const pxr::ArResolvedPath&, std::string* whyNot) const
-{
-  if (whyNot)
-  {
-    *whyNot = "F3DUSDMemoryResolver is read-only";
-  }
-  return false;
-}
-
-//----------------------------------------------------------------------------
 std::shared_ptr<pxr::ArWritableAsset> F3DUSDMemoryResolver::_OpenAssetForWrite(
   const pxr::ArResolvedPath&, WriteMode) const
 {
+  // unreachable
   return nullptr;
 }
 
