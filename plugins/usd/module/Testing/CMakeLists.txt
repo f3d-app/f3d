@@ -2,6 +2,13 @@ list(APPEND VTKExtensionsPluginUSD_list
      TestF3DUSDImporter.cxx
     )
 
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251016)
+  list(APPEND VTKExtensionsPluginUSD_list
+        TestF3DUSDImporterStream.cxx
+        TestF3DUSDImporterStreamError.cxx
+      )
+endif()
+
 vtk_add_test_cxx(vtkextUSDTests tests
   NO_DATA NO_VALID NO_OUTPUT
   ${VTKExtensionsPluginUSD_list}
