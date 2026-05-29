@@ -106,7 +106,7 @@ public:
 
       std::string exePath = pxr::ArchGetExecutablePath();
 
-      std::string plugInfoDir = pxr::TfGetPathName(exePath) + "lib/usd/f3d/resources/";
+      std::string plugInfoDir = pxr::TfGetPathName(exePath) + "../lib/usd/f3d/resources/";
       pxr::PlugRegistry::GetInstance().RegisterPlugins(plugInfoDir);
     }
   }
