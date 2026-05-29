@@ -91,14 +91,15 @@ runs:
       with:
         python-version: ${{steps.python_ver.outputs.extract}}
 
+    # numpy pinned to 2.2.X until python 3.10 support is dropped
     - name: Install Python dependencies
       if: inputs.optdeps_label == 'optdeps'
       shell: bash
       run: |
         python -m pip install --upgrade pip
-        python -m pip install pytest==8.0.0
+        python -m pip install pytest==9.0.3
         python -m pip install pybind11_stubgen
-        python -m pip install numpy==2.2.0
+        python -m pip install numpy==2.2.6
 
     - name: Extract java version
       id: java_ver
