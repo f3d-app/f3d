@@ -65,6 +65,7 @@ def test_save_buffer(f3d_engine: f3d.Engine):
     assert buffer.startswith(b"\x89PNG")
     assert img._repr_png_() == buffer
 
+
 def test_loading_stream(f3d_engine: f3d.Engine):
     img = f3d_engine.window.render_to_image(True)
     buffer = img.save_buffer(f3d.Image.SaveFormat.PNG)
