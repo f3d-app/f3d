@@ -140,7 +140,7 @@ jobs:
         with:
           versions_file: ./source/.github/workflows/versions.json
           build_type: fast
-          vtk_version: v9.6.1
+          vtk_version: v9.6.2
           rendering_backend: auto
           optdeps_label: no-optdeps
           exclude_deprecated_label: exclude-deprecated
