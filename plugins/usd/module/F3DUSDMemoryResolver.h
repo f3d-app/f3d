@@ -1,21 +1,23 @@
 /**
- * @class   F3DMemoryResolver
+ * @class   F3DUSDMemoryResolver
  * @brief   Custom ArResolver for loading USD assets from memory buffers
  *
- * Handles the "f3dmem:" URI scheme.
+ * Handles the "f3dmem" URI scheme.
+ * When opening an asset using a path like "f3dmem:stream.usdc", this resolver is used
+ * to read the asset's contents from a VTK stream that is passed through the resolver context.
  */
-
-#pragma once
+#ifndef F3DUSDMemoryResolver_h
+#define F3DUSDMemoryResolver_h
 
 #include <pxr/usd/ar/resolver.h>
 
 class vtkResourceStream;
 
-class F3DMemoryResolver final : public pxr::ArResolver
+/**
+ * The actual resolver class that implements the ArResolver interface.
+ */
+class F3DUSDMemoryResolver final : public pxr::ArResolver
 {
-public:
-  static vtkResourceStream* ActiveStream;
-
 protected:
   // implements pure virtual functions
   std::string _CreateIdentifier(
@@ -38,3 +40,24 @@ protected:
   std::shared_ptr<pxr::ArWritableAsset> _OpenAssetForWrite(
     const pxr::ArResolvedPath& resolvedPath, WriteMode writeMode) const override;
 };
+
+/**
+ * The context object used by the F3DUSDMemoryResolver to pass the VTK stream.
+ */
+struct F3DUSDMemoryResolverContext
+{
+  vtkResourceStream* Stream = nullptr;
+
+  bool operator<(const F3DUSDMemoryResolverContext&) const;
+  bool operator==(const F3DUSDMemoryResolverContext&) const;
+};
+
+size_t hash_value(const F3DUSDMemoryResolverContext&);
+
+template <>
+struct pxr::ArIsContextObject<F3DUSDMemoryResolverContext>
+{
+    static const bool value = true;
+};
+
+#endif

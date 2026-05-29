@@ -42,7 +42,7 @@
 #include <vtkMemoryResourceStream.h>
 #endif
 
-#include "F3DUSDResolver.h"
+#include "F3DUSDMemoryResolver.h"
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -62,6 +62,7 @@
 #include <pxr/base/plug/registry.h>
 #include <pxr/usd/ar/asset.h>
 #include <pxr/usd/ar/resolver.h>
+#include <pxr/usd/ar/resolverContextBinder.h>
 #include <pxr/usd/usd/modelAPI.h>
 #include <pxr/usd/usd/primRange.h>
 #include <pxr/usd/usd/stage.h>
@@ -124,13 +125,13 @@ public:
     }
   }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250501)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
   void ReadScene(vtkResourceStream* stream, const std::string& hint)
   {
     if (!this->Stage)
     {
-      F3DMemoryResolver::ActiveStream = stream;
-      this->Stage = pxr::UsdStage::Open("f3dmem:stream." + hint);
+      F3DUSDMemoryResolverContext ctx { stream };
+      this->Stage = pxr::UsdStage::Open("f3dmem:stream." + hint, pxr::ArResolverContext(ctx));
       this->InitStage();
     }
   }
@@ -1070,6 +1071,7 @@ public:
         }
 
         const std::string& resolvedPath = path.GetResolvedPath();
+        pxr::ArResolverContextBinder binder(this->Stage->GetPathResolverContext());
         auto asset = pxr::ArGetResolver().OpenAsset(pxr::ArResolvedPath(resolvedPath));
 
         if (!asset)
@@ -1436,7 +1438,7 @@ int vtkF3DUSDImporter::ImportBegin()
 {
   try
   {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250501)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
     if (auto* stream = this->GetStream())
     {
       std::string hint;

@@ -3,14 +3,15 @@
     {
       "Info": {
         "Types": {
-          "F3DMemoryResolver": {
+          "F3DUSDMemoryResolver": {
             "bases": ["ArResolver"],
+            "implementsContexts": true,
             "uriSchemes": ["f3dmem"]
           }
         }
       },
       "LibraryPath": "",
-      "Name": "f3dUSDMemResolver",
+      "Name": "F3DMemoryResolver",
       "ResourcePath": "resources",
       "Root": "..",
       "Type": "library"
