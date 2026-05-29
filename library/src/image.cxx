@@ -239,7 +239,7 @@ image::image(std::byte* buffer, std::size_t size)
   vtkImageReader2* bestReader = nullptr;
 
   for (availableReaders->InitTraversal(iterator);
-        (currentReader = availableReaders->GetNextImageReader2(iterator));)
+       (currentReader = availableReaders->GetNextImageReader2(iterator));)
   {
     if (currentReader->CanReadFile(stream) > 0)
     {
