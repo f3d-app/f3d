@@ -38,8 +38,14 @@ jobs:
           label=${label//[^a-z-]/}
           echo "F3D_LABEL_COMMENT=$label" >> $GITHUB_ENV
 
+      # Stop the job if cache is being added
+      - name: cache stop
+        if: env.F3D_LABEL_COMMENT == 'cache'
+        shell: bash
+        run: exit 0
+
       - name: Add ack reaction
-        uses: GrantBirki/comment@v2.1.1
+        uses: GrantBirki/comment@v3.0.0
         with:
           comment-id: ${{ github.event.comment.id }}
           reactions: eyes
@@ -59,6 +65,6 @@ jobs:
 
       - name: Create comment for invalid command
         if: failure()
-        uses: GrantBirki/comment@v2.1.1
+        uses: GrantBirki/comment@v3.0.0
         with:
           body: ❌ Invalid CI command "${{env.F3D_LABEL_COMMENT}}"

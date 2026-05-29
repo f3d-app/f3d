@@ -1599,6 +1599,12 @@ void vtkF3DRenderer::SetDPIAware(bool enable)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetBackdropColor(const std::array<double, 3>& color)
+{
+  this->UIActor->SetBackdropColor(color);
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetBackdropOpacity(const double backdropOpacity)
 {
   this->UIActor->SetBackdropOpacity(backdropOpacity);
@@ -2060,6 +2066,14 @@ void vtkF3DRenderer::UpdateActors()
   // XXX: Handle animation update in importer, which may have an impact on the colormap
   // We assume animation change do not change the number of actors
   vtkMTimeType importerUpdateMTime = this->Importer->GetUpdateMTime();
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
+  if (this->AxesGridVisible && importerUpdateMTime > this->ImporterUpdateTimeStamp)
+  {
+    this->GridAxesConfigured = false;
+  }
+#endif
+
   if (this->UsingExpandingRange && (importerUpdateMTime > this->ImporterUpdateTimeStamp) &&
     (this->EnableColoring || (!this->UseRaytracing && this->UseVolume)))
   {
@@ -2154,17 +2168,19 @@ void vtkF3DRenderer::Render()
     glGenQueries(1, &this->Timer);
   }
 
+  vtkInformation* info = this->GetInformation();
+  bool uiOnly = info->Get(vtkF3DRenderPass::RENDER_UI_ONLY());
+
 #if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
-  glBeginQuery(GL_TIME_ELAPSED, this->Timer);
+  if (!uiOnly)
+  {
+    glBeginQuery(GL_TIME_ELAPSED, this->Timer);
+  }
 #endif
 
   this->Superclass::Render();
 
   auto cpuElapsed = std::chrono::high_resolution_clock::now() - cpuStart;
-
-  vtkInformation* info = this->GetInformation();
-
-  bool uiOnly = info->Get(vtkF3DRenderPass::RENDER_UI_ONLY());
 
   if (!uiOnly)
   {

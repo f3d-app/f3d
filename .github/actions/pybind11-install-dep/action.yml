@@ -1,12 +1,17 @@
 name: "Install pybind11 Dependency"
 description: "Install pybind11 Dependency using cache when possible"
 inputs:
-  version:
-    description: "Version of pybind11 to build"
+  versions_file:
+    description: "File to recover versions from"
     required: true
-  global_cache_index:
-    description: "Global cache index"
-    required: true
+  mindeps_label:
+    description: "Label to flag for minimum versions dependencies"
+    required: false
+    default: "no-mindeps"
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
 
 runs:
   using: "composite"
@@ -14,15 +19,30 @@ runs:
     - name: Check required inputs
       shell: bash
       run: |
-        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
-        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+        [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
+
+    - name: Extract pybind11 version
+      id: pybind11_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: pybind11
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract global cache index
+      id: global_idx
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        special_name: global_cache_index
 
     - name: Cache pybind11
       id: cache-pybind11
+      continue-on-error: true # https://github.com/actions/cache/issues/1754
       uses: actions/cache/restore@v5
       with:
         path: dependencies/pybind11_install
-        key: pybind11-${{inputs.version}}-${{runner.os}}-${{inputs.global_cache_index}}-1
+        key: pybind11-${{steps.pybind11_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-1
 
     - name: Checkout pybind11
       if: steps.cache-pybind11.outputs.cache-hit != 'true'
@@ -31,7 +51,7 @@ runs:
         repository: pybind/pybind11
         submodules: true
         path: "./dependencies/pybind11"
-        ref: ${{inputs.version}}
+        ref: ${{steps.pybind11_ver.outputs.extract}}
 
     - name: Setup pybind11
       if: steps.cache-pybind11.outputs.cache-hit != 'true'

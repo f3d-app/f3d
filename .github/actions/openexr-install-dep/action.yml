@@ -1,19 +1,17 @@
 name: "Install OpenEXR Dependency"
 description: "Install OpenEXR Dependency using cache when possible"
 inputs:
+  versions_file:
+    description: "File to recover versions from"
+    required: true
+  mindeps_label:
+    description: "Label to flag for minimum versions dependencies"
+    required: false
+    default: "no-mindeps"
   cpu:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
-  version:
-    description: "Version of openexr to build"
-    required: true
-  imath_version:
-    description: "Version of imath to build against"
-    required: true
-  global_cache_index:
-    description: "Global cache index"
-    required: true
 
 runs:
   using: "composite"
@@ -21,24 +19,55 @@ runs:
     - name: Check required inputs
       shell: bash
       run: |
-        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
-        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+        [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
 
-    - name: Cache OpenEXR
+    - name: Extract openexr version
+      id: openexr_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: openexr
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract imath version
+      id: imath_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: imath
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract openjph version
+      id: openjph_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: openjph
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract global cache index
+      id: global_idx
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        special_name: global_cache_index
+
+    - name: Cache openexr
       id: cache-openexr
+      continue-on-error: true # https://github.com/actions/cache/issues/1754
       uses: actions/cache/restore@v5
       with:
         path: dependencies/openexr_install
-        key: openexr-${{inputs.version}}-${{inputs.imath_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-2
+        key: openexr-${{steps.openexr_ver.outputs.extract}}-${{steps.imath_ver.outputs.extract}}-${{steps.openjph_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-4
 
-    # Dependents: usd
+    # Dependents: usd f3d
     - name: Checkout OpenEXR
       if: steps.cache-openexr.outputs.cache-hit != 'true'
       uses: actions/checkout@v6
       with:
         repository: AcademySoftwareFoundation/openexr
         path: "./dependencies/openexr"
-        ref: ${{inputs.version}}
+        ref: ${{steps.openexr_ver.outputs.extract}}
 
     - name: Setup OpenEXR
       if: steps.cache-openexr.outputs.cache-hit != 'true'
@@ -50,7 +79,7 @@ runs:
 
     # OpenEXR 3.0.1 needs patching with recent libstd
     - name: Patch OpenEXR v3.0.1
-      if: steps.cache-openexr.outputs.cache-hit != 'true' && inputs.version == 'v3.0.1'
+      if: steps.cache-openexr.outputs.cache-hit != 'true' && steps.openexr_ver.outputs.extract == 'v3.0.1'
       working-directory: ${{github.workspace}}/dependencies/openexr
       shell: bash
       run: patch -p1 < $GITHUB_ACTION_PATH/include_cstdint.patch
@@ -64,7 +93,8 @@ runs:
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../openexr_install
-        -DCMAKE_PREFIX_PATH:PATH=../install/
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
+        -DOPENEXR_FORCE_INTERNAL_OPENJPH=OFF
         -DOPENEXR_INSTALL_TOOLS=OFF
         -DOPENEXR_INSTALL_EXAMPLES=OFF
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 -DCMAKE_MACOSX_RPATH=ON' || null }}

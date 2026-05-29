@@ -1,16 +1,17 @@
 name: "Install ospray sb Dependency"
 description: "Install ospray sb Dependency using cache when possible"
 inputs:
-  version:
-    description: "Version of ospray to build"
+  versions_file:
+    description: "File to recover versions from"
     required: true
+  mindeps_label:
+    description: "Label to check for minimal version dependencies"
+    required: false
+    default: "no-mindeps"
   cpu:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
-  global_cache_index:
-    description: "Global cache index"
-    required: true
 
 runs:
   using: "composite"
@@ -18,15 +19,30 @@ runs:
     - name: Check required inputs
       shell: bash
       run: |
-        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
-        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+        [[ "${{ inputs.versions_file }}" ]] || { echo "versions_file is empty" ; exit 1; }
+
+    - name: Extract ospray version
+      id: ospray_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: ospray
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract global cache index
+      id: global_idx
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        special_name: global_cache_index
 
     - name: Cache ospray
       id: cache-ospray
+      continue-on-error: true # https://github.com/actions/cache/issues/1754
       uses: actions/cache/restore@v5
       with:
         path: dependencies/ospray_install
-        key: ospray-sb-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
+        key: ospray-sb-${{steps.ospray_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-1
 
     # Dependents: vtk
     - name: Checkout ospray
@@ -35,7 +51,7 @@ runs:
       with:
         repository: RenderKit/ospray
         path: "./dependencies/ospray"
-        ref: ${{inputs.version}}
+        ref: ${{steps.ospray_ver.outputs.extract}}
 
     # https://github.com/ospray/ospray/pull/550
     - name: Patch ospray rkcommon superbuild

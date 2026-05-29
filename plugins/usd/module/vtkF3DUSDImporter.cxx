@@ -73,9 +73,12 @@
 #include <pxr/usd/usdGeom/sphere.h>
 #include <pxr/usd/usdGeom/tokens.h>
 #include <pxr/usd/usdGeom/xform.h>
+#include <pxr/usd/usdGeom/xformCache.h>
 #include <pxr/usd/usdShade/material.h>
 #include <pxr/usd/usdShade/materialBindingAPI.h>
 #include <pxr/usd/usdSkel/bakeSkinning.h>
+#include <pxr/usd/usdSkel/cache.h>
+#include <pxr/usd/usdSkel/skeletonQuery.h>
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #elif defined(__GNUC__)
@@ -771,8 +774,93 @@ public:
     }
   }
 
-  bool ImportRoot(
-    vtkRenderer* renderer, vtkDataAssembly* hierarchy, vtkActorCollection* actorCollection)
+  void BuildArmature(
+    vtkRenderer* renderer, vtkActorCollection* actorCollection, vtkMatrix4x4* rootTransform)
+  {
+    pxr::UsdTimeCode timeCode = this->CurrentTime * this->Stage->GetTimeCodesPerSecond();
+    pxr::UsdGeomXformCache xfCache(timeCode);
+
+    pxr::UsdSkelCache skelCache;
+
+    for (const pxr::UsdPrim& prim : this->Stage->Traverse())
+    {
+      if (!prim.IsA<pxr::UsdSkelSkeleton>())
+      {
+        continue;
+      }
+
+      pxr::UsdSkelSkeleton skel = pxr::UsdSkelSkeleton(prim);
+      pxr::UsdSkelSkeletonQuery skelQuery = skelCache.GetSkelQuery(skel);
+
+      pxr::VtArray<pxr::GfMatrix4d> jointXforms;
+      skelQuery.ComputeJointWorldTransforms(&jointXforms, &xfCache);
+
+      const pxr::UsdSkelTopology& topology = skelQuery.GetTopology();
+      size_t numJoints = topology.GetNumJoints();
+
+      if (numJoints > 0)
+      {
+        std::string skelPath = skel.GetPath().GetAsString();
+        auto& [actor, polyData] = this->ArmatureMap[skelPath];
+
+        if (actor == nullptr) // first time visiting
+        {
+          vtkNew<vtkCellArray> vertices;
+          vtkNew<vtkCellArray> lines;
+
+          for (size_t i = 0; i < numJoints; i++)
+          {
+            vtkIdType vId = static_cast<vtkIdType>(i);
+            vertices->InsertNextCell(1, &vId);
+          }
+
+          for (size_t i = 0; i < numJoints; i++)
+          {
+            int parentIdx = topology.GetParent(i);
+            if (parentIdx >= 0)
+            {
+              vtkIdType lineIds[2] = { static_cast<vtkIdType>(parentIdx),
+                static_cast<vtkIdType>(i) };
+              lines->InsertNextCell(2, lineIds);
+            }
+          }
+
+          polyData = vtkSmartPointer<vtkPolyData>::New();
+          polyData->SetVerts(vertices);
+          polyData->SetLines(lines);
+
+          vtkNew<vtkPolyDataMapper> mapper;
+          mapper->SetInputData(polyData);
+
+          actor = vtkSmartPointer<vtkActor>::New();
+          actor->SetMapper(mapper);
+          actor->SetUserMatrix(rootTransform);
+          actor->GetProperty()->RenderPointsAsSpheresOn();
+          actor->GetProperty()->RenderLinesAsTubesOn();
+
+          vtkNew<vtkInformation> info;
+          info->Set(vtkF3DImporter::ACTOR_IS_ARMATURE(), 1);
+          actor->SetPropertyKeys(info);
+
+          renderer->AddActor(actor);
+          actorCollection->AddItem(actor);
+        }
+
+        // Update joint positions
+        vtkNew<vtkPoints> points;
+        points->SetNumberOfPoints(static_cast<vtkIdType>(numJoints));
+        for (size_t i = 0; i < numJoints; i++)
+        {
+          pxr::GfVec3d pos = jointXforms[i].ExtractTranslation();
+          points->SetPoint(static_cast<vtkIdType>(i), pos[0], pos[1], pos[2]);
+        }
+        polyData->SetPoints(points);
+      }
+    }
+  }
+
+  bool ImportRoot(vtkRenderer* renderer, vtkDataAssembly* hierarchy,
+    vtkActorCollection* actorCollection, bool armature)
   {
     if (!this->Stage)
     {
@@ -800,6 +888,12 @@ public:
 
     this->ImportNode(renderer, hierarchy, actorCollection, this->Stage->GetPseudoRoot(),
       pxr::SdfPath("/"), rootTransform);
+
+    if (armature)
+    {
+      this->BuildArmature(renderer, actorCollection, rootTransform);
+    }
+
     return true;
   }
 
@@ -1245,6 +1339,9 @@ public:
   std::unordered_map<std::string, int> NodeIdMap;
 
 private:
+  std::unordered_map<std::string,
+    std::pair<vtkSmartPointer<vtkActor>, vtkSmartPointer<vtkPolyData>>>
+    ArmatureMap;
   std::unordered_map<std::string, vtkSmartPointer<vtkActor>> ActorMap;
   std::unordered_map<std::string, vtkSmartPointer<vtkPolyData>> MeshMap;
   std::unordered_map<std::string, vtkSmartPointer<vtkProperty>> ShaderMap;
@@ -1266,7 +1363,9 @@ private:
 
     void IssueFatalError(const pxr::TfCallContext&, const std::string& msg) override
     {
-      vtkErrorWithObjectMacro(this->Parent, << msg);
+      // if we do not throw here, OpenUSD just exit(1) the process
+      // we catch this exception upstream and only report an importer failure
+      throw std::runtime_error(msg);
     }
 
     void IssueStatus(const pxr::TfStatus& status) override
@@ -1298,6 +1397,9 @@ vtkInformationKeyMacro(vtkF3DUSDImporter, TCOORDS_NAME, String);
 vtkF3DUSDImporter::vtkF3DUSDImporter()
   : Internals(new vtkF3DUSDImporter::vtkInternals(this))
 {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20241219)
+  this->ImportArmatureOn();
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -1306,7 +1408,15 @@ vtkF3DUSDImporter::~vtkF3DUSDImporter() = default;
 //----------------------------------------------------------------------------
 int vtkF3DUSDImporter::ImportBegin()
 {
-  this->Internals->ReadScene(this->GetFileName());
+  try
+  {
+    this->Internals->ReadScene(this->GetFileName());
+  }
+  catch (const std::runtime_error& e)
+  {
+    vtkErrorMacro(<< e.what());
+    return 0;
+  }
 
   return 1;
 }
@@ -1318,7 +1428,13 @@ void vtkF3DUSDImporter::ImportActors(vtkRenderer* renderer)
   this->SceneHierarchy = vtkSmartPointer<vtkDataAssembly>::New();
   this->SceneHierarchy->SetAttribute(vtkDataAssembly::GetRootNode(), "label", "root");
 
-  if (!this->Internals->ImportRoot(renderer, this->SceneHierarchy, this->ActorCollection))
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20241219)
+  const bool armature = this->GetImportArmature();
+#else
+  constexpr bool armature = false;
+#endif
+
+  if (!this->Internals->ImportRoot(renderer, this->SceneHierarchy, this->ActorCollection, armature))
   {
     this->SetFailureStatus();
   }

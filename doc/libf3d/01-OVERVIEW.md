@@ -66,6 +66,41 @@ eng.getScene().add(mesh);
 eng.getInteractor().start();
 ```
 
+It's also possible to visualize your meshes directly from memory without copy, by deriving the `mesh_view` class, making visualization with libf3d fast and with limited additional memory overhead.
+It supports any polygonal meshes, with animation and scalar values on points or faces.
+An example can be found in `examples/libf3d/cpp/in-situ` folder.
+
+```cpp
+#include <f3d/engine.h>
+#include <f3d/interactor.h>
+#include <f3d/mesh_view.h>
+#include <f3d/scene.h>
+
+// Create a f3d::engine
+f3d::engine eng = f3d::engine::create();
+
+// Derive f3d::mesh_view
+class CustomMesh : public f3d::mesh_view
+{
+public:
+  std::array<double, 2> getTimeRange() const override
+  {
+    return { 0.0, 10.0 };
+  }
+
+  f3d::mesh_view::memory_view_t getMemoryView(double time) const override
+  {
+    f3d::mesh_view::memory_view_t memoryView = { /* map your data memory here */ };
+    return memoryView;
+  }
+};
+
+eng.getScene().add(std::make_shared<CustomMesh>());
+
+// Start rendering and interacting (press space to start animation)
+eng.getInteractor().start();
+```
+
 Manipulating the window directly can be done this way:
 
 ```cpp

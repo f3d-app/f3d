@@ -1,19 +1,17 @@
 name: "Install Alembic Dependency"
 description: "Install Alembic Dependency using cache when possible"
 inputs:
+  versions_file:
+    description: "File to recover versions from"
+    required: true
+  mindeps_label:
+    description: "Label to flag for minimum versions dependencies"
+    required: false
+    default: "no-mindeps"
   cpu:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
-  version:
-    description: "Version of alembic to build"
-    required: true
-  imath_version:
-    description: "Version of imath to build against"
-    required: true
-  global_cache_index:
-    description: "Global cache index"
-    required: true
 
 runs:
   using: "composite"
@@ -21,16 +19,38 @@ runs:
     - name: Check required inputs
       shell: bash
       run: |
-        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
-        [[ "${{ inputs.imath_version }}" ]] || { echo "imath_version input is empty" ; exit 1; }
-        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+        [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
 
-    - name: Cache Alembic
+    - name: Extract alembic version
+      id: alembic_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: alembic
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract imath version
+      id: imath_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: imath
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract global cache index
+      id: global_idx
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        special_name: global_cache_index
+
+    - name: Cache alembic
       id: cache-alembic
+      continue-on-error: true # https://github.com/actions/cache/issues/1754
       uses: actions/cache/restore@v5
       with:
         path: dependencies/alembic_install
-        key: alembic-${{inputs.version}}-${{inputs.imath_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-4
+        key: alembic-${{steps.alembic_ver.outputs.extract}}-${{steps.imath_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-4
 
     - name: Checkout Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'
@@ -38,14 +58,7 @@ runs:
       with:
         repository: alembic/alembic
         path: "./dependencies/alembic"
-        ref: ${{inputs.version}}
-
-    # https://github.com/alembic/alembic/issues/476
-    - name: Patch Alembic rpath issue
-      if: steps.cache-alembic.outputs.cache-hit != 'true' && inputs.version == '1.8.9'
-      working-directory: ${{github.workspace}}/dependencies/alembic
-      shell: bash
-      run: patch -p1 < $GITHUB_ACTION_PATH/fix_cmake_rpath.patch
+        ref: ${{steps.alembic_ver.outputs.extract}}
 
     - name: Setup Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'

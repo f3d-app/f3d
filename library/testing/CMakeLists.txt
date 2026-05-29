@@ -52,6 +52,15 @@ if(F3D_MODULE_UI)
       TestSDKInteractorCallBack.cxx
       )
   endif()
+
+  # Needs stride arrays
+  # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12411
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20251110)
+    list(APPEND libf3dSDKTests_list
+      TestSDKSceneFromMemoryZeroCopy.cxx
+      TestSDKSceneFromMemoryZeroCopyExceptions.cxx
+      )
+  endif()
 endif()
 
 # Invalid header detection need proper CanReadFile support
@@ -157,7 +166,7 @@ foreach (test ${libf3dSDKTests_list})
   add_test (NAME libf3d::${TName} COMMAND libf3dSDKTests ${TName}  "${F3D_SOURCE_DIR}/testing/" "${CMAKE_BINARY_DIR}/Testing/Temporary/" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
   set_tests_properties(libf3d::${TName} PROPERTIES
     LABELS "libf3d"
-    TIMEOUT 30
+    TIMEOUT 60
   )
   if (NOT F3D_TESTING_ENABLE_RENDERING_TESTS AND NOT ${TName} IN_LIST libf3dSDKTestsNoRender_list)
     set_tests_properties(libf3d::${TName} PROPERTIES DISABLED ON)

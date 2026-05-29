@@ -8,13 +8,13 @@
 #ifndef vtkF3DUIActor_h
 #define vtkF3DUIActor_h
 
-#include <vtkProp.h>
-
+#include <F3DStyle.h>
 #include <array>
 #include <chrono>
 #include <cstdint>
 #include <deque>
 #include <map>
+#include <vtkProp.h>
 
 class vtkOpenGLRenderWindow;
 
@@ -199,6 +199,12 @@ public:
   int RenderOverlay(vtkViewport* vp) override;
 
   /**
+   * Set the backdrop color
+   * black by default
+   */
+  void SetBackdropColor(const std::array<double, 3>& color);
+
+  /**
    * Set the backdrop opacity
    */
   void SetBackdropOpacity(const double backdropOpacity);
@@ -344,6 +350,7 @@ protected:
    */
   std::array<double, 3> FontColor = { 1.0, 1.0, 1.0 };
 
+  std::array<double, 3> BackdropColor = { 0, 0, 0 };
   double BackdropOpacity = 0.9;
 
   bool NotificationVisible = false;

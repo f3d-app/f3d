@@ -292,7 +292,8 @@ void vtkF3DPolyDataMapper::ReplaceShaderLight(
   std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
 {
   // Fixed in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13116
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260409)
+  // which is backported in 9.6.2 in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13185
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 2)
   if (actor->GetProperty()->GetInterpolation() == VTK_PBR &&
     this->PrimitiveInfo[this->LastBoundBO].LastLightComplexity == primitiveInfo::NoLighting)
   {
@@ -349,7 +350,7 @@ void vtkF3DPolyDataMapper::ReplaceShaderTCoord(
     // apply final gamma-correction
     std::string customGamma =
       "//VTK::TCoord::Impl\n"
-      "gl_FragData[0] = vec4(pow(gl_FragData[0].rgb, vec3(1.0/2.2)), 1.0);\n";
+      "gl_FragData[0] = vec4(pow(gl_FragData[0].rgb, vec3(1.0/2.2)), gl_FragData[0].a);\n";
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::TCoord::Impl", customGamma);
 

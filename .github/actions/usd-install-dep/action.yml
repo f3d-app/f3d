@@ -1,22 +1,17 @@
 name: "Install USD Dependency"
 description: "Install USD Dependency using cache when possible"
 inputs:
+  versions_file:
+    description: "File to recover versions from"
+    required: true
+  mindeps_label:
+    description: "Label to flag for minimum versions dependencies"
+    required: false
+    default: "no-mindeps"
   cpu:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
-  version:
-    description: "Version of usd to build"
-    required: true
-  openexr_version:
-    description: "Version of openexr to build against"
-    required: true
-  tbb_version:
-    description: "Version of tbb to build against"
-    required: true
-  global_cache_index:
-    description: "Global cache index"
-    required: true
 
 runs:
   using: "composite"
@@ -24,17 +19,62 @@ runs:
     - name: Check required inputs
       shell: bash
       run: |
-        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
-        [[ "${{ inputs.openexr_version }}" ]] || { echo "openexr_version input is empty" ; exit 1; }
-        [[ "${{ inputs.tbb_version }}" ]] || { echo "tbb_version input is empty" ; exit 1; }
-        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+        [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
 
-    - name: Cache USD
+    - name: Extract usd version
+      id: usd_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: usd
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract openexr version
+      id: openexr_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: openexr
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract imath version
+      id: imath_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: imath
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract openjph version
+      id: openjph_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: openjph
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract tbb version
+      id: tbb_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: tbb
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract global cache index
+      id: global_idx
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        special_name: global_cache_index
+
+    - name: Cache usd
       id: cache-usd
+      continue-on-error: true # https://github.com/actions/cache/issues/1754
       uses: actions/cache/restore@v5
       with:
         path: dependencies/usd_install
-        key: usd-${{inputs.version}}-${{inputs.openexr_version}}-${{inputs.tbb_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
+        key: usd-${{steps.usd_ver.outputs.extract}}-${{steps.openexr_ver.outputs.extract}}-${{steps.imath_ver.outputs.extract}}-${{steps.openjph_ver.outputs.extract}}-${{steps.tbb_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
 
     - name: Checkout USD
       if: steps.cache-usd.outputs.cache-hit != 'true'
@@ -42,18 +82,18 @@ runs:
       with:
         repository: PixarAnimationStudios/USD
         path: "./dependencies/usd"
-        ref: ${{inputs.version}}
+        ref: ${{steps.usd_ver.outputs.extract}}
 
     # Upstream issue: https://github.com/PixarAnimationStudios/OpenUSD/issues/2490
     - name: Patch USD
-      if: steps.cache-usd.outputs.cache-hit != 'true' && inputs.version == 'v24.08'
+      if: steps.cache-usd.outputs.cache-hit != 'true' && steps.usd_ver.outputs.extract == 'v24.08'
       working-directory: ${{github.workspace}}/dependencies/usd
       shell: bash
       run: patch -p1 < $GITHUB_ACTION_PATH/usd-install-bin-mindep.patch
 
     # Upstream issue: https://github.com/PixarAnimationStudios/OpenUSD/issues/2490
     - name: Patch USD
-      if: steps.cache-usd.outputs.cache-hit != 'true' && inputs.version != 'v24.08'
+      if: steps.cache-usd.outputs.cache-hit != 'true' && steps.usd_ver.outputs.extract != 'v24.08'
       working-directory: ${{github.workspace}}/dependencies/usd
       shell: bash
       run: patch -p1 < $GITHUB_ACTION_PATH/usd-install-bin.patch
@@ -72,20 +112,20 @@ runs:
       shell: bash
       run: >
         cmake ../usd
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX:PATH=$(pwd)/../usd_install
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DPXR_BUILD_ALEMBIC_PLUGIN:BOOL=OFF
         -DPXR_BUILD_EMBREE_PLUGIN:BOOL=OFF
+        -DPXR_BUILD_EXAMPLES:BOOL=OFF
         -DPXR_BUILD_IMAGING:BOOL=OFF
         -DPXR_BUILD_MONOLITHIC:BOOL=ON
         -DPXR_BUILD_TESTS:BOOL=OFF
-        -DPXR_BUILD_USD_IMAGING:BOOL=OFF
-        -DPXR_ENABLE_PYTHON_SUPPORT:BOOL=OFF
-        -DPXR_BUILD_EXAMPLES:BOOL=OFF
         -DPXR_BUILD_TUTORIALS:BOOL=OFF
+        -DPXR_BUILD_USD_IMAGING:BOOL=OFF
         -DPXR_BUILD_USD_TOOLS:BOOL=OFF
+        -DPXR_ENABLE_PYTHON_SUPPORT:BOOL=OFF
         -DPXR_INSTALL_LOCATION:PATH=../lib/usd
-        -DCMAKE_BUILD_TYPE=Release
-        -DCMAKE_INSTALL_PREFIX:PATH=$(pwd)/../usd_install
-        -DCMAKE_PREFIX_PATH:PATH=../install/
 
     - name: Build USD
       if: steps.cache-usd.outputs.cache-hit != 'true'

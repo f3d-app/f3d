@@ -69,6 +69,10 @@ Frame rate used to refresh animation and other repeated tasks (watch, UI). Does 
 
 List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `hdf`, `occt`, `pdal`, `usd`, `vdb`, `webifc`. See [plugins](12-PLUGINS.md) for more info.
 
+### `--plugins-path=<path>` (_string_)
+
+Supplementary path to specify where to load plugins from, on top of [default paths](12-PLUGINS.md#supported-plugins).
+
 ### `--scan-plugins`
 
 Scan standard directories for plugins and display their names, results may be incomplete. See [plugins](12-PLUGINS.md) for more info.
@@ -223,6 +227,10 @@ Only supported on Windows platform.
 
 Provide a script file containing a list of [commands](07-COMMANDS.md) to be executed sequentially.
 Allows automation of multiple commands or pre-defined tasks.
+
+### `--backdrop-color=<color>` (_color_, default: `f3d_black`)
+
+Set the color of the backdrop behind text information such as FPS, filename, metadata or cheatsheet.
 
 ### `--backdrop-opacity=<opacity>` (_double_, default: `0.9`)
 

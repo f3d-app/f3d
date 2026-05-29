@@ -7,7 +7,8 @@
 #include <vtkObjectFactory.h>
 
 // need https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13116
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260409)
+// which is backported in 9.6.2 in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13185
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 2)
 #include <vtkActorCollection.h>
 #include <vtkProperty.h>
 
@@ -40,7 +41,8 @@ void vtkF3DGLTFImporter::ApplyArmatureProperties(vtkActor* actor)
 #endif
 
 // need https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13116
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260409)
+// which is backported in 9.6.2 in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13185
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 2)
 //----------------------------------------------------------------------------
 void vtkF3DGLTFImporter::ImportActors(vtkRenderer* renderer)
 {

@@ -29,15 +29,11 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "Universal Scene Descriptor"
 )
 
-set(rpaths "")
-list(GET PXR_LIBRARIES 0 first_lib)
-get_target_property(target_type ${first_lib} TYPE)
-if(target_type STREQUAL SHARED_LIBRARY)
-  list(APPEND rpaths "$<TARGET_FILE_DIR:${first_lib}>")
-else()
-  # When built as a static library, OpenUSD has to be linked with the WHOLE_ARCHIVE link option.
-  # It's not done currently, so just exit with a fatal error.
-  message(FATAL_ERROR "OpenUSD seems to have been built as static libraries. This is currently not supported.")
+set(_additional_rpath "")
+list(GET PXR_LIBRARIES 0 _first_lib)
+get_target_property(_target_type ${_first_lib} TYPE)
+if(_target_type STREQUAL SHARED_LIBRARY)
+  list(APPEND _additional_rpath "$<TARGET_FILE_DIR:${_first_lib}>")
 endif ()
 
 f3d_plugin_build(
@@ -45,7 +41,7 @@ f3d_plugin_build(
   VERSION 1.0
   DESCRIPTION "USD support"
   VTK_MODULES IOImage
-  ADDITIONAL_RPATHS ${rpaths}
+  ADDITIONAL_RPATHS ${_additional_rpath}
   MIMETYPE_XML_FILES "${CMAKE_CURRENT_SOURCE_DIR}/f3d-usd-formats.xml"
   CONFIGURATION_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/configs/config.d" "${CMAKE_CURRENT_SOURCE_DIR}/configs/thumbnail.d"
   FREEDESKTOP

@@ -1,52 +1,25 @@
 name: "Install VTK Dependency"
 description: "Install VTK Dependency using cache when possible"
 inputs:
-  vtk_version:
-    description: "VTK version"
+  versions_file:
+    description: "File to recover versions from"
     required: true
+  optdeps_label:
+    description: "Label to flag for optional dependencies"
+    required: false
+    default: "optdeps"
+  mindeps_label:
+    description: "Label to flag for minimum versions dependencies"
+    required: false
+    default: "no-mindeps"
+  vtk_version:
+    description: "VTK version, either a hash/tag, or 'commit', which means recover from versions.json"
+    required: false
+    default: "commit"
   cpu:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
-  blosc_version:
-    description: "Version of blosc to build against"
-    required: true
-  curl_version:
-    description: "Version of gdal to build against"
-    required: false
-  gdal_version:
-    description: "Version of gdal to build against"
-    required: false
-  geotiff_version:
-    description: "Version of geotiff to build against"
-    required: false
-  openvdb_version:
-    description: "Version of openvdb to build against"
-    required: false
-  ospray_version:
-    description: "Version of ospray to build against"
-    required: false
-  pdal_version:
-    description: "Version of pdal to build against"
-    required: false
-  proj_version:
-    description: "Version of proj to build against"
-    required: false
-  sqlite_csb_version:
-    description: "Version of csb providing sqlite to build against"
-    required: false
-  tiff_version:
-    description: "Version of tiff to build against"
-    required: false
-  tbb_version:
-    description: "Version of tbb to build against"
-    required: true
-  zlib_version:
-    description: "Version of zlib to build against"
-    required: true
-  global_cache_index:
-    description: "Global cache index"
-    required: true
 
 runs:
   using: "composite"
@@ -54,18 +27,145 @@ runs:
     - name: Check required inputs
       shell: bash
       run: |
-        [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
-        [[ "${{ inputs.blosc_version }}" ]] || { echo "blosc_version input is empty" ; exit 1; }
-        [[ "${{ inputs.tbb_version }}" ]] || { echo "tbb_version input is empty" ; exit 1; }
-        [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
-        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+        [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
+
+    - name: Recover VTK version if needed
+      if: inputs.vtk_version == 'commit'
+      id: vtk_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        special_name: vtk_commit_sha
+
+    - name: Store VTK version in env
+      if: inputs.vtk_version == 'commit'
+      shell: bash
+      run: echo "VTK_VERSION=${{steps.vtk_ver.outputs.extract}}" >> $GITHUB_ENV
+
+    - name: Store VTK version in env from the input directly
+      if: inputs.vtk_version != 'commit'
+      shell: bash
+      run: echo "VTK_VERSION=${{inputs.vtk_version}}" >> $GITHUB_ENV
+
+    - name: Extract zlib version
+      id: zlib_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: zlib
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract blosc version
+      id: blosc_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: blosc
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract tbb version
+      id: tbb_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: tbb
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract openvdb version
+      if: inputs.optdeps_label == 'optdeps'
+      id: openvdb_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: openvdb
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract ospray version
+      if: inputs.optdeps_label == 'optdeps'
+      id: ospray_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: ospray
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract curl version
+      if: inputs.optdeps_label == 'optdeps'
+      id: curl_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: curl
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract gdal version
+      if: inputs.optdeps_label == 'optdeps'
+      id: gdal_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: gdal
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract geotiff version
+      if: inputs.optdeps_label == 'optdeps'
+      id: geotiff_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: geotiff
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract pdal version
+      if: inputs.optdeps_label == 'optdeps'
+      id: pdal_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: pdal
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract proj version
+      if: inputs.optdeps_label == 'optdeps'
+      id: proj_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: proj
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract sqlite_csb version
+      if: inputs.optdeps_label == 'optdeps'
+      id: sqlite_csb_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: sqlite_csb
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract tiff version
+      if: inputs.optdeps_label == 'optdeps'
+      id: tiff_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: tiff
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract global cache index
+      id: global_idx
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        special_name: global_cache_index
 
     - name: Cache VTK
       id: cache-vtk
+      continue-on-error: true # https://github.com/actions/cache/issues/1754
       uses: actions/cache/restore@v5
       with:
         path: dependencies/vtk_install
-        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}${{ inputs.curl_version != '' && format('-curl-{0}', inputs.curl_version) || '' }}${{ inputs.gdal_version != '' && format('-gdal-{0}', inputs.gdal_version) || '' }}${{ inputs.geotiff_version != '' && format('-geotiff-{0}', inputs.geotiff_version) || '' }}${{ inputs.pdal_version != '' && format('-pdal-{0}', inputs.pdal_version) || '' }}${{ inputs.proj_version != '' && format('-proj-{0}', inputs.proj_version) || '' }}${{ inputs.sqlite_csb_version != '' && format('-sqlite-{0}', inputs.sqlite_csb_version) || '' }}${{ inputs.tiff_version != '' && format('-tiff-{0}', inputs.tiff_version) || '' }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-3
+        key: vtk-${{env.VTK_VERSION}}-${{steps.zlib_ver.outputs.extract}}-${{steps.blosc_ver.outputs.extract}}-${{steps.tbb_ver.outputs.extract}}${{ steps.openvdb_ver.outputs.extract != '' && format('-openvdb-{0}', steps.openvdb_ver.outputs.extract) || '' }}${{ steps.ospray_ver.outputs.extract != '' && format('-ospray-{0}', steps.ospray_ver.outputs.extract) || '' }}${{ steps.curl_ver.outputs.extract != '' && format('-curl-{0}', steps.curl_ver.outputs.extract) || '' }}${{ steps.gdal_ver.outputs.extract != '' && format('-gdal-{0}', steps.gdal_ver.outputs.extract) || '' }}${{ steps.geotiff_ver.outputs.extract != '' && format('-geotiff-{0}', steps.geotiff_ver.outputs.extract) || '' }}${{ steps.pdal_ver.outputs.extract != '' && format('-pdal-{0}', steps.pdal_ver.outputs.extract) || '' }}${{ steps.proj_ver.outputs.extract != '' && format('-proj-{0}', steps.proj_ver.outputs.extract) || '' }}${{ steps.sqlite_csb_ver.outputs.extract != '' && format('-sqlite-{0}', steps.sqlite_csb_ver.outputs.extract) || '' }}${{ steps.tiff_ver.outputs.extract != '' && format('-tiff-{0}', steps.tiff_ver.outputs.extract) || '' }}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-5
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -84,7 +184,7 @@ runs:
         submodules: true
         fetch-depth: 0
         path: "./dependencies/vtk"
-        ref: ${{ inputs.vtk_version }}
+        ref: ${{env.VTK_VERSION}}
 
     # CMake 3.31 introduced a new policy producing a warning when using vtkModule.cmake
     # See https://gitlab.kitware.com/vtk/vtk/-/issues/19526
@@ -110,7 +210,7 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
-        -DOpenVDB_CMAKE_PATH=${{ inputs.openvdb_version != '' && '$(pwd)/../install/lib/cmake/OpenVDB/' || '' }}
+        -DOpenVDB_CMAKE_PATH=${{ inputs.optdeps_label == 'optdeps' && '$(pwd)/../install/lib/cmake/OpenVDB/' || '' }}
         -DVTKOSPRAY_ENABLE_DENOISER=ON
         -DVTK_BUILD_TESTING=OFF
         -DVTK_DEBUG_LEAKS=ON
@@ -132,8 +232,8 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_IOImport=YES
         -DVTK_MODULE_ENABLE_VTK_IOLegacy=YES
         -DVTK_MODULE_ENABLE_VTK_IONetCDF=YES
-        -DVTK_MODULE_ENABLE_VTK_IOOpenVDB=${{ inputs.openvdb_version != '' && 'YES' || 'DEFAULT' }}
-        -DVTK_MODULE_ENABLE_VTK_IOPDAL=${{ inputs.pdal_version != '' && 'YES' || 'DEFAULT' }}
+        -DVTK_MODULE_ENABLE_VTK_IOOpenVDB=${{ inputs.optdeps_label == 'optdeps' && 'YES' || 'DEFAULT' }}
+        -DVTK_MODULE_ENABLE_VTK_IOPDAL=${{ inputs.optdeps_label == 'optdeps' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_IOPLY=YES
         -DVTK_MODULE_ENABLE_VTK_IOXML=YES
         -DVTK_MODULE_ENABLE_VTK_ImagingCore=YES
@@ -144,7 +244,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingCore=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingGridAxes=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES
-        -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.ospray_version != '' && 'YES' || 'DEFAULT' }}
+        -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.optdeps_label == 'optdeps' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
         -DVTK_OPENGL_HAS_EGL=${{ runner.os != 'macOS' && 'ON' || 'OFF' }}

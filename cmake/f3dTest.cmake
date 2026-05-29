@@ -143,6 +143,8 @@ function(f3d_test)
     set(_f3d_target "$<TARGET_FILE:f3d>")
   endif()
 
+  list(APPEND F3D_TEST_ARGS "--plugins-path=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+
   if (F3D_TEST_PIPED)
     list(APPEND F3D_TEST_LABELS "piped")
     if(VTK_VERSION VERSION_LESS 9.6.20260128)
@@ -240,7 +242,6 @@ function(f3d_test)
     list(APPEND f3d_test_env_vars "CTEST_F3D_FORCE_DPI_SCALE=1.0")
   endif ()
 
-  set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES ENVIRONMENT
-    "F3D_PLUGINS_PATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY};${f3d_test_env_vars}")
+  set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES ENVIRONMENT "${f3d_test_env_vars}")
 
 endfunction()

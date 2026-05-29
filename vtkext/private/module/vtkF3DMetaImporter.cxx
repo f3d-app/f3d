@@ -340,24 +340,9 @@ bool vtkF3DMetaImporter::Update()
 
       // convert to PBR materials if needed
       // this should be moved elsewhere, see https://github.com/f3d-app/f3d/issues/2995
-      if (!genericImporter && actor->GetProperty()->GetInterpolation() != VTK_PBR &&
-        actor->GetProperty()->GetLighting())
+      if (!genericImporter && actor->GetProperty()->GetInterpolation() != VTK_PBR)
       {
-        actor->GetProperty()->SetInterpolationToPBR();
-
-        // Convert to linear space
-        auto toLinear = [](double c) { return std::pow(c, 2.2); };
-        double diffuseColor[3];
-        actor->GetProperty()->GetColor(diffuseColor);
-        actor->GetProperty()->SetColor(
-          toLinear(diffuseColor[0]), toLinear(diffuseColor[1]), toLinear(diffuseColor[2]));
-
-        // restore diffuse/specular to 1 and ambient to 0
-        actor->GetProperty()->SetSpecular(1.0);
-        actor->GetProperty()->SetDiffuse(1.0);
-        actor->GetProperty()->SetAmbient(0.0);
-
-        // texture diffuse is now base color
+        // get texture
         vtkSmartPointer<vtkTexture> diffuseTex = actor->GetTexture();
         if (!diffuseTex)
         {
@@ -365,11 +350,31 @@ bool vtkF3DMetaImporter::Update()
         }
         if (diffuseTex)
         {
-          actor->SetTexture(nullptr);
           diffuseTex->UseSRGBColorSpaceOn();
+        }
 
-          actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-          actor->GetProperty()->SetBaseColorTexture(diffuseTex);
+        if (actor->GetProperty()->GetLighting())
+        {
+          actor->GetProperty()->SetInterpolationToPBR();
+
+          // Convert to linear space
+          auto toLinear = [](double c) { return std::pow(c, 2.2); };
+          double diffuseColor[3];
+          actor->GetProperty()->GetColor(diffuseColor);
+          actor->GetProperty()->SetColor(
+            toLinear(diffuseColor[0]), toLinear(diffuseColor[1]), toLinear(diffuseColor[2]));
+
+          // restore diffuse/specular to 1 and ambient to 0
+          actor->GetProperty()->SetSpecular(1.0);
+          actor->GetProperty()->SetDiffuse(1.0);
+          actor->GetProperty()->SetAmbient(0.0);
+
+          if (diffuseTex)
+          {
+            actor->SetTexture(nullptr);
+            actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+            actor->GetProperty()->SetBaseColorTexture(diffuseTex);
+          }
         }
       }
 

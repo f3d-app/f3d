@@ -1,5 +1,5 @@
 # Clip Library
-# Copyright (c) 2015-2025 David Capello
+# Copyright (c) 2015-2026 David Capello
 
 cmake_minimum_required(VERSION 3.15)
 
@@ -7,7 +7,6 @@ project(clip LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
   # Use libc++ explicitly so we can compile for
@@ -15,6 +14,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 endif()
 
+option(BUILD_SHARED_LIBS "Build clip as a shared library" off)
 option(CLIP_ENABLE_IMAGE "Compile with support to copy/paste images" on)
 if(WIN32)
   option(CLIP_ENABLE_LIST_FORMATS "Compile with support to list clipboard formats" off)
@@ -28,7 +28,13 @@ endif()
 
 add_library(clip clip.cpp)
 
-target_include_directories(clip INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+target_include_directories(clip INTERFACE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+target_compile_definitions(clip PRIVATE -DCLIP_BUILDING_LIB=1)
+if(BUILD_SHARED_LIBS)
+  target_compile_definitions(clip PUBLIC -DCLIP_SHARED=1)
+endif()
 
 if(CLIP_ENABLE_IMAGE)
   target_sources(clip PRIVATE image.cpp)
@@ -102,11 +108,27 @@ endif()
 
 if(CLIP_EXAMPLES)
   add_subdirectory(examples)
+  if(WIN32 AND BUILD_SHARED_LIBS)
+    add_custom_command(
+      TARGET clip
+      BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/examples/clip.dll
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:clip> ${CMAKE_CURRENT_BINARY_DIR}/examples
+      COMMENT "Copy DLL to examples directory")
+  endif()
 endif()
 
 if(CLIP_TESTS)
   enable_testing()
   add_subdirectory(tests)
+  if(WIN32 AND BUILD_SHARED_LIBS)
+    add_custom_command(
+      TARGET clip
+      BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/tests/clip.dll
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:clip> ${CMAKE_CURRENT_BINARY_DIR}/tests
+      COMMENT "Copy DLL to tests directory")
+  endif()
 endif()
 
 if(CLIP_INSTALL)

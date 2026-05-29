@@ -1,16 +1,17 @@
 name: "Install OCCT Dependency"
 description: "Install OCCT Dependency using cache when possible"
 inputs:
+  versions_file:
+    description: "File to recover versions from"
+    required: true
+  mindeps_label:
+    description: "Label to flag for minimum versions dependencies"
+    required: false
+    default: "no-mindeps"
   cpu:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
-  version:
-    description: "Version of occt to build"
-    required: true
-  global_cache_index:
-    description: "Global cache index"
-    required: true
 
 runs:
   using: "composite"
@@ -18,15 +19,30 @@ runs:
     - name: Check required inputs
       shell: bash
       run: |
-        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
-        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+        [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
 
-    - name: Cache OCCT
+    - name: Extract occt version
+      id: occt_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: occt
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract global cache index
+      id: global_idx
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        special_name: global_cache_index
+
+    - name: Cache occt
       id: cache-occt
+      continue-on-error: true # https://github.com/actions/cache/issues/1754
       uses: actions/cache/restore@v5
       with:
         path: dependencies/occt_install
-        key: occt-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-2
+        key: occt-${{steps.occt_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
 
     - name: Checkout OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
@@ -35,7 +51,7 @@ runs:
         repository: Open-Cascade-SAS/OCCT
         submodules: true
         path: "./dependencies/occt"
-        ref: ${{inputs.version}}
+        ref: ${{steps.occt_ver.outputs.extract}}
 
     - name: Patch OCCT all versions
       if: steps.cache-occt.outputs.cache-hit != 'true'
@@ -54,7 +70,7 @@ runs:
     - name: Configure OCCT current version
       if: |
         steps.cache-occt.outputs.cache-hit != 'true' &&
-        inputs.version != 'V7_6_3'
+        steps.occt_ver.outputs.extract != 'V7_6_3'
       working-directory: ${{github.workspace}}/dependencies/occt_build
       shell: bash
       run: >
@@ -83,7 +99,7 @@ runs:
     - name: Configure OCCT min version
       if: |
         steps.cache-occt.outputs.cache-hit != 'true' &&
-        inputs.version == 'V7_6_3'
+        steps.occt_ver.outputs.extract == 'V7_6_3'
       working-directory: ${{github.workspace}}/dependencies/occt_build
       shell: bash
       run: >

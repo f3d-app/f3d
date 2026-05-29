@@ -16,90 +16,10 @@ concurrency:
 
 jobs:
   #----------------------------------------------------------------------------
-  # Default versions: Set default version for all dependencies
-  #----------------------------------------------------------------------------
-  default_versions:
-    runs-on: ubuntu-22.04
-    name: Set default versions
-    if: |
-      contains(github.event.pull_request.labels.*.name, 'ci:fast') ||
-      contains(github.event.pull_request.labels.*.name, 'ci:android') ||
-      contains(github.event.pull_request.labels.*.name, 'ci:wasm') ||
-      contains(github.event.pull_request.labels.*.name, 'ci:main') ||
-      contains(github.event.pull_request.labels.*.name, 'ci:full') ||
-      github.ref == 'refs/heads/master'
-    outputs:
-      alembic_min_version: ${{ steps.set_default_versions.outputs.alembic_min_version }}
-      alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
-      assimp_min_version: ${{ steps.set_default_versions.outputs.assimp_min_version }}
-      assimp_version: ${{ steps.set_default_versions.outputs.assimp_version }}
-      blosc_min_version: ${{ steps.set_default_versions.outputs.blosc_min_version }}
-      blosc_version: ${{ steps.set_default_versions.outputs.blosc_version }}
-      curl_min_version: ${{ steps.set_default_versions.outputs.curl_min_version }}
-      curl_version: ${{ steps.set_default_versions.outputs.curl_version }}
-      draco_min_version: ${{ steps.set_default_versions.outputs.draco_min_version }}
-      draco_version: ${{ steps.set_default_versions.outputs.draco_version }}
-      gdal_min_version: ${{ steps.set_default_versions.outputs.gdal_min_version }}
-      gdal_version: ${{ steps.set_default_versions.outputs.gdal_version }}
-      geotiff_min_version: ${{ steps.set_default_versions.outputs.geotiff_min_version }}
-      geotiff_version: ${{ steps.set_default_versions.outputs.geotiff_version }}
-      imath_min_version: ${{ steps.set_default_versions.outputs.imath_min_version }}
-      imath_version: ${{ steps.set_default_versions.outputs.imath_version }}
-      java_min_version: ${{ steps.set_default_versions.outputs.java_min_version }}
-      java_version: ${{ steps.set_default_versions.outputs.java_version }}
-      occt_min_version: ${{ steps.set_default_versions.outputs.occt_min_version }}
-      occt_version: ${{ steps.set_default_versions.outputs.occt_version }}
-      openexr_min_version: ${{ steps.set_default_versions.outputs.openexr_min_version }}
-      openexr_version: ${{ steps.set_default_versions.outputs.openexr_version }}
-      openvdb_min_version: ${{ steps.set_default_versions.outputs.openvdb_min_version }}
-      openvdb_version: ${{ steps.set_default_versions.outputs.openvdb_version }}
-      ospray_min_version: ${{ steps.set_default_versions.outputs.ospray_min_version }}
-      ospray_version: ${{ steps.set_default_versions.outputs.ospray_version }}
-      pdal_min_version: ${{ steps.set_default_versions.outputs.pdal_min_version }}
-      pdal_version: ${{ steps.set_default_versions.outputs.pdal_version }}
-      proj_min_version: ${{ steps.set_default_versions.outputs.proj_min_version }}
-      proj_version: ${{ steps.set_default_versions.outputs.proj_version }}
-      pybind11_min_version: ${{ steps.set_default_versions.outputs.pybind11_min_version }}
-      pybind11_version: ${{ steps.set_default_versions.outputs.pybind11_version }}
-      python_min_version: ${{ steps.set_default_versions.outputs.python_min_version }}
-      python_version: ${{ steps.set_default_versions.outputs.python_version }}
-      sqlite_csb_min_version: ${{ steps.set_default_versions.outputs.sqlite_csb_min_version }}
-      sqlite_csb_version: ${{ steps.set_default_versions.outputs.sqlite_csb_version }}
-      tbb_min_version: ${{ steps.set_default_versions.outputs.tbb_min_version }}
-      tbb_version: ${{ steps.set_default_versions.outputs.tbb_version }}
-      tiff_min_version: ${{ steps.set_default_versions.outputs.tiff_min_version }}
-      tiff_version: ${{ steps.set_default_versions.outputs.tiff_version }}
-      usd_min_version: ${{ steps.set_default_versions.outputs.usd_min_version }}
-      usd_version: ${{ steps.set_default_versions.outputs.usd_version }}
-      webifc_min_version: ${{ steps.set_default_versions.outputs.webifc_min_version }}
-      webifc_version: ${{ steps.set_default_versions.outputs.webifc_version }}
-      webp_min_version: ${{ steps.set_default_versions.outputs.webp_min_version }}
-      webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
-      zlib_min_version: ${{ steps.set_default_versions.outputs.zlib_min_version }}
-      zlib_version: ${{ steps.set_default_versions.outputs.zlib_version }}
-      vtk_commit_sha: ${{ steps.set_default_versions.outputs.vtk_commit_sha }}
-      docker_timestamp: ${{ steps.set_default_versions.outputs.docker_timestamp }}
-      global_cache_index: ${{ steps.set_default_versions.outputs.global_cache_index }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          path: "source"
-          fetch-depth: 1
-          lfs: false
-
-      - name: Set default versions
-        id: set_default_versions
-        uses: f3d-app/default-versions-action@main
-        with:
-          file: ./source/.github/workflows/versions.json
-
-  #----------------------------------------------------------------------------
   # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
   #----------------------------------------------------------------------------
   cache_lfs:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     name: Update LFS data cache
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:fast') ||
@@ -124,149 +44,17 @@ jobs:
           cache_postfix: cache-0
 
   #----------------------------------------------------------------------------
-  # Cache Dependencies: Checkout and compile all dependencies but VTK if not cached
+  # Recover vtk matrix
   #----------------------------------------------------------------------------
-  cache_dependencies_linux:
-    name: Cache dependencies Linux
-    needs: default_versions
-    if: |
-      contains(github.event.pull_request.labels.*.name, 'ci:android') ||
-      contains(github.event.pull_request.labels.*.name, 'ci:wasm') ||
-      contains(github.event.pull_request.labels.*.name, 'ci:main') ||
-      contains(github.event.pull_request.labels.*.name, 'ci:full') ||
-      github.ref == 'refs/heads/master'
-    strategy:
-      fail-fast: false
-      matrix:
-        build_type: [standard]
-        include:
-          - alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-          - assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-          - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-          - curl_version: ${{needs.default_versions.outputs.curl_version}}
-          - draco_version: ${{needs.default_versions.outputs.draco_version}}
-          - gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-          - geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
-          - imath_version: ${{needs.default_versions.outputs.imath_version}}
-          - occt_version: ${{needs.default_versions.outputs.occt_version}}
-          - openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-          - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-          - ospray_version: ${{needs.default_versions.outputs.ospray_version}}
-          - pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-          - proj_version: ${{needs.default_versions.outputs.proj_version}}
-          - pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-          - sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
-          - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          - tiff_version: ${{needs.default_versions.outputs.tiff_version}}
-          - usd_version: ${{needs.default_versions.outputs.usd_version}}
-          - webifc_version: ${{needs.default_versions.outputs.webifc_version}}
-          - webp_version: ${{needs.default_versions.outputs.webp_version}}
-          - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          - build_type: mindeps
-            alembic_version: ${{needs.default_versions.outputs.alembic_min_version}}
-            assimp_version: ${{needs.default_versions.outputs.assimp_min_version}}
-            blosc_version: ${{needs.default_versions.outputs.blosc_min_version}}
-            curl_version: ${{needs.default_versions.outputs.curl_min_version}}
-            draco_version: ${{needs.default_versions.outputs.draco_min_version}}
-            gdal_version: ${{needs.default_versions.outputs.gdal_min_version}}
-            geotiff_version: ${{needs.default_versions.outputs.geotiff_min_version}}
-            imath_version: ${{needs.default_versions.outputs.imath_min_version}}
-            occt_version: ${{needs.default_versions.outputs.occt_min_version}}
-            openexr_version: ${{needs.default_versions.outputs.openexr_min_version}}
-            openvdb_version: ${{needs.default_versions.outputs.openvdb_min_version}}
-            ospray_version: ${{needs.default_versions.outputs.ospray_min_version}}
-            pdal_version: ${{needs.default_versions.outputs.pdal_min_version}}
-            proj_version: ${{needs.default_versions.outputs.proj_min_version}}
-            pybind11_version: ${{needs.default_versions.outputs.pybind11_min_version}}
-            sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_min_version}}
-            tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
-            tiff_version: ${{needs.default_versions.outputs.tiff_min_version}}
-            usd_version: ${{needs.default_versions.outputs.usd_min_version}}
-            webifc_version: ${{needs.default_versions.outputs.webifc_min_version}}
-            webp_version: ${{needs.default_versions.outputs.webp_min_version}}
-            zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
-
-    runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-ci
-
-    env:
-      CMAKE_POLICY_VERSION_MINIMUM: 3.5
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          path: "source"
-          fetch-depth: 1
-          lfs: false
-
-      - name: Generic Dependencies
-        uses: ./source/.github/actions/generic-dependencies
-        with:
-          cpu: x86_64
-          alembic_version: ${{matrix.alembic_version}}
-          assimp_version: ${{matrix.assimp_version}}
-          blosc_version: ${{matrix.blosc_version}}
-          curl_version: ${{matrix.curl_version}}
-          draco_version: ${{matrix.draco_version}}
-          gdal_version: ${{matrix.gdal_version}}
-          geotiff_version: ${{matrix.geotiff_version}}
-          imath_version: ${{matrix.imath_version}}
-          occt_version: ${{matrix.occt_version}}
-          openexr_version: ${{matrix.openexr_version}}
-          openvdb_version: ${{matrix.openvdb_version}}
-          ospray_version: ${{matrix.ospray_version}}
-          pdal_version: ${{matrix.pdal_version}}
-          proj_version: ${{matrix.proj_version}}
-          pybind11_version: ${{matrix.pybind11_version}}
-          sqlite_csb_version: ${{matrix.sqlite_csb_version}}
-          tbb_version: ${{matrix.tbb_version}}
-          tiff_version: ${{matrix.tiff_version}}
-          usd_version: ${{matrix.usd_version}}
-          webifc_version: ${{matrix.webifc_version}}
-          webp_version: ${{matrix.webp_version}}
-          zlib_version: ${{matrix.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
-
-  cache_dependencies_windows:
-    name: Cache dependencies Windows
-    needs: default_versions
+  recover_vtk_matrix:
+    name: Recover VTK matrix
+    runs-on: ubuntu-24.04
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
-    strategy:
-      fail-fast: false
-      matrix:
-        build_type: [standard]
-        include:
-          - alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-          - assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-          - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-          - curl_version: ${{needs.default_versions.outputs.curl_version}}
-          - draco_version: ${{needs.default_versions.outputs.draco_version}}
-          - gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-          - geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
-          - imath_version: ${{needs.default_versions.outputs.imath_version}}
-          - occt_version: ${{needs.default_versions.outputs.occt_version}}
-          - openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-          - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-          - ospray_version: ${{needs.default_versions.outputs.ospray_version}}
-          - pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-          - proj_version: ${{needs.default_versions.outputs.proj_version}}
-          - pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-          - sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
-          - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          - tiff_version: ${{needs.default_versions.outputs.tiff_version}}
-          - usd_version: ${{needs.default_versions.outputs.usd_version}}
-          - webifc_version: ${{needs.default_versions.outputs.webifc_version}}
-          - webp_version: ${{needs.default_versions.outputs.webp_version}}
-          - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-
-    runs-on: windows-2022
-
-    env:
-      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+    outputs:
+      vtk_matrix: ${{steps.vtk_matrix.outputs.extract}}
 
     steps:
       - name: Checkout
@@ -276,314 +64,18 @@ jobs:
           fetch-depth: 1
           lfs: false
 
-      - name: Generic Dependencies
-        uses: ./source/.github/actions/generic-dependencies
+      - name: Extract VTK matrix
+        id: vtk_matrix
+        uses: f3d-app/extract-version-action@main
         with:
-          cpu: x86_64
-          alembic_version: ${{matrix.alembic_version}}
-          assimp_version: ${{matrix.assimp_version}}
-          blosc_version: ${{matrix.blosc_version}}
-          curl_version: ${{matrix.curl_version}}
-          draco_version: ${{matrix.draco_version}}
-          gdal_version: ${{matrix.gdal_version}}
-          geotiff_version: ${{matrix.geotiff_version}}
-          imath_version: ${{matrix.imath_version}}
-          occt_version: ${{matrix.occt_version}}
-          openexr_version: ${{matrix.openexr_version}}
-          openvdb_version: ${{matrix.openvdb_version}}
-          ospray_version: ${{matrix.ospray_version}}
-          pdal_version: ${{matrix.pdal_version}}
-          proj_version: ${{matrix.proj_version}}
-          pybind11_version: ${{matrix.pybind11_version}}
-          sqlite_csb_version: ${{matrix.sqlite_csb_version}}
-          tbb_version: ${{matrix.tbb_version}}
-          tiff_version: ${{matrix.tiff_version}}
-          usd_version: ${{matrix.usd_version}}
-          webifc_version: ${{matrix.webifc_version}}
-          webp_version: ${{matrix.webp_version}}
-          zlib_version: ${{matrix.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
-
-  cache_dependencies_macos_intel:
-    name: Cache dependencies macOS intel
-    needs: default_versions
-    if: |
-      contains(github.event.pull_request.labels.*.name, 'ci:full') ||
-      github.ref == 'refs/heads/master'
-    strategy:
-      fail-fast: false
-      matrix:
-        build_type: [standard]
-        include:
-          - cpu: x86_64
-          - alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-          - assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-          - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-          - curl_version: ${{needs.default_versions.outputs.curl_version}}
-          - draco_version: ${{needs.default_versions.outputs.draco_version}}
-          - gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-          - geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
-          - imath_version: ${{needs.default_versions.outputs.imath_version}}
-          - occt_version: ${{needs.default_versions.outputs.occt_version}}
-          - openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-          - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-          - ospray_version: ${{needs.default_versions.outputs.ospray_version}}
-          - pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-          - proj_version: ${{needs.default_versions.outputs.proj_version}}
-          - pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-          - sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
-          - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          - tiff_version: ${{needs.default_versions.outputs.tiff_version}}
-          - usd_version: ${{needs.default_versions.outputs.usd_version}}
-          - webifc_version: ${{needs.default_versions.outputs.webifc_version}}
-          - webp_version: ${{needs.default_versions.outputs.webp_version}}
-          - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-
-    runs-on: macos-15-intel
-
-    env:
-      CMAKE_POLICY_VERSION_MINIMUM: 3.5
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          path: "source"
-          fetch-depth: 1
-          lfs: false
-
-      - name: Generic Dependencies
-        uses: ./source/.github/actions/generic-dependencies
-        with:
-          cpu: x86_64
-          alembic_version: ${{matrix.alembic_version}}
-          assimp_version: ${{matrix.assimp_version}}
-          blosc_version: ${{matrix.blosc_version}}
-          curl_version: ${{matrix.curl_version}}
-          draco_version: ${{matrix.draco_version}}
-          gdal_version: ${{matrix.gdal_version}}
-          geotiff_version: ${{matrix.geotiff_version}}
-          imath_version: ${{matrix.imath_version}}
-          occt_version: ${{matrix.occt_version}}
-          openexr_version: ${{matrix.openexr_version}}
-          openvdb_version: ${{matrix.openvdb_version}}
-          ospray_version: ${{matrix.ospray_version}}
-          pdal_version: ${{matrix.pdal_version}}
-          proj_version: ${{matrix.proj_version}}
-          pybind11_version: ${{matrix.pybind11_version}}
-          sqlite_csb_version: ${{matrix.sqlite_csb_version}}
-          tbb_version: ${{matrix.tbb_version}}
-          tiff_version: ${{matrix.tiff_version}}
-          usd_version: ${{matrix.usd_version}}
-          webifc_version: ${{matrix.webifc_version}}
-          webp_version: ${{matrix.webp_version}}
-          zlib_version: ${{matrix.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
-
-  cache_dependencies_macos_arm:
-    name: Cache dependencies macOS arm
-    needs: default_versions
-    if: |
-      contains(github.event.pull_request.labels.*.name, 'ci:main') ||
-      contains(github.event.pull_request.labels.*.name, 'ci:full') ||
-      github.ref == 'refs/heads/master'
-    strategy:
-      fail-fast: false
-      matrix:
-        build_type: [standard]
-        include:
-          - alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-          - assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-          - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-          - curl_version: ${{needs.default_versions.outputs.curl_version}}
-          - draco_version: ${{needs.default_versions.outputs.draco_version}}
-          - gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-          - geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
-          - imath_version: ${{needs.default_versions.outputs.imath_version}}
-          - occt_version: ${{needs.default_versions.outputs.occt_version}}
-          - openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-          - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-          - ospray_version: ${{needs.default_versions.outputs.ospray_version}}
-          - pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-          - proj_version: ${{needs.default_versions.outputs.proj_version}}
-          - pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-          - sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
-          - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          - tiff_version: ${{needs.default_versions.outputs.tiff_version}}
-          - usd_version: ${{needs.default_versions.outputs.usd_version}}
-          - webifc_version: ${{needs.default_versions.outputs.webifc_version}}
-          - webp_version: ${{needs.default_versions.outputs.webp_version}}
-          - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-
-    runs-on: macos-15
-
-    env:
-      CMAKE_POLICY_VERSION_MINIMUM: 3.5
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          path: "source"
-          fetch-depth: 1
-          lfs: false
-
-      - name: Generic Dependencies
-        uses: ./source/.github/actions/generic-dependencies
-        with:
-          cpu: arm64
-          alembic_version: ${{matrix.alembic_version}}
-          assimp_version: ${{matrix.assimp_version}}
-          blosc_version: ${{matrix.blosc_version}}
-          curl_version: ${{matrix.curl_version}}
-          draco_version: ${{matrix.draco_version}}
-          gdal_version: ${{matrix.gdal_version}}
-          geotiff_version: ${{matrix.geotiff_version}}
-          imath_version: ${{matrix.imath_version}}
-          occt_version: ${{matrix.occt_version}}
-          openexr_version: ${{matrix.openexr_version}}
-          openvdb_version: ${{matrix.openvdb_version}}
-          ospray_version: ${{matrix.ospray_version}}
-          pdal_version: ${{matrix.pdal_version}}
-          proj_version: ${{matrix.proj_version}}
-          pybind11_version: ${{matrix.pybind11_version}}
-          sqlite_csb_version: ${{matrix.sqlite_csb_version}}
-          tbb_version: ${{matrix.tbb_version}}
-          tiff_version: ${{matrix.tiff_version}}
-          usd_version: ${{matrix.usd_version}}
-          webifc_version: ${{matrix.webifc_version}}
-          webp_version: ${{matrix.webp_version}}
-          zlib_version: ${{matrix.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
-
-  #---------------------------------------------------------------------------------------------------
-  # Cache VTK Dependency: Checkout and compile VTK if not cached, to avoid building VTK multiple times
-  #---------------------------------------------------------------------------------------------------
-  cache_vtk_dependency_linux:
-    name: Cache VTK dependency Linux
-    needs: [default_versions, cache_dependencies_linux]
-    if: |
-      contains(github.event.pull_request.labels.*.name, 'ci:main') ||
-      contains(github.event.pull_request.labels.*.name, 'ci:full') ||
-      github.ref == 'refs/heads/master'
-    strategy:
-      fail-fast: false
-      matrix:
-        build_type: [standard]
-        include:
-          - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-          - curl_version: ${{needs.default_versions.outputs.curl_version}}
-          - gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-          - geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
-          - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-          - ospray_version: ${{needs.default_versions.outputs.ospray_version}}
-          - pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-          - proj_version: ${{needs.default_versions.outputs.proj_version}}
-          - sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
-          - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          - tiff_version: ${{needs.default_versions.outputs.tiff_version}}
-          - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          - build_type: mindeps
-            blosc_version: ${{needs.default_versions.outputs.blosc_min_version}}
-            curl_version: ${{needs.default_versions.outputs.curl_min_version}}
-            gdal_version: ${{needs.default_versions.outputs.gdal_min_version}}
-            geotiff_version: ${{needs.default_versions.outputs.geotiff_min_version}}
-            openvdb_version: ${{needs.default_versions.outputs.openvdb_min_version}}
-            ospray_version: ${{needs.default_versions.outputs.ospray_min_version}}
-            pdal_version: ${{needs.default_versions.outputs.pdal_min_version}}
-            proj_version: ${{needs.default_versions.outputs.proj_min_version}}
-            sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_min_version}}
-            tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
-            tiff_version: ${{needs.default_versions.outputs.tiff_min_version}}
-            zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
-          - build_type: no_optional_deps
-            blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-            tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-            zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          - build_type: no_raytracing
-            blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-            curl_version: ${{needs.default_versions.outputs.curl_version}}
-            gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-            geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
-            openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-            pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-            proj_version: ${{needs.default_versions.outputs.proj_version}}
-            sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
-            tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-            tiff_version: ${{needs.default_versions.outputs.tiff_version}}
-            zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-
-    runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-ci
-
-    env:
-      CMAKE_POLICY_VERSION_MINIMUM: 3.5
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          path: "source"
-          fetch-depth: 1
-          lfs: false
-
-      - name: Dependencies Dir
-        shell: bash
-        working-directory: ${{github.workspace}}
-        run: |
-          mkdir dependencies
-          cd dependencies
-          mkdir install
-
-      - name: Install VTK dependencies
-        uses: ./source/.github/actions/vtk-dependencies
-        with:
-          cpu: x86_64
-          blosc_version: ${{matrix.blosc_version}}
-          curl_version: ${{matrix.curl_version}}
-          gdal_version: ${{matrix.gdal_version}}
-          geotiff_version: ${{matrix.geotiff_version}}
-          openvdb_version: ${{matrix.openvdb_version}}
-          pdal_version: ${{matrix.pdal_version}}
-          proj_version: ${{matrix.proj_version}}
-          sqlite_csb_version: ${{matrix.sqlite_csb_version}}
-          tbb_version: ${{matrix.tbb_version}}
-          tiff_version: ${{matrix.tiff_version}}
-          zlib_version: ${{matrix.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
-
-      - name: Install Raytracing Dependencies
-        if: matrix.ospray_version != ''
-        uses: ./source/.github/actions/ospray-sb-install-dep
-        with:
-          version: ${{matrix.ospray_version}}
-          cpu: x86_64
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
-
-      - name: VTK dependency
-        uses: ./source/.github/actions/vtk-install-dep
-        with:
-          vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-          cpu: x86_64
-          blosc_version: ${{matrix.blosc_version}}
-          curl_version: ${{matrix.curl_version}}
-          gdal_version: ${{matrix.gdal_version}}
-          geotiff_version: ${{matrix.geotiff_version}}
-          openvdb_version: ${{matrix.openvdb_version}}
-          ospray_version: ${{matrix.ospray_version}}
-          pdal_version: ${{matrix.pdal_version}}
-          proj_version: ${{matrix.proj_version}}
-          sqlite_csb_version: ${{matrix.sqlite_csb_version}}
-          tbb_version: ${{matrix.tbb_version}}
-          tiff_version: ${{matrix.tiff_version}}
-          zlib_version: ${{matrix.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
+          file: ./source/.github/workflows/versions.json
+          special_name: vtk_matrix
 
   #----------------------------------------------------------------------------
   # Windows CI: Build and test, cross-vtk build matrix
   #----------------------------------------------------------------------------
   windows:
-    needs: [cache_lfs, cache_dependencies_windows, default_versions]
+    needs: [cache_lfs, recover_vtk_matrix]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -591,16 +83,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version:
-          [
-            "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.6.1,
-            v9.5.2,
-            v9.4.2,
-          ]
+        vtk_version: ${{fromJSON(needs.recover_vtk_matrix.outputs.vtk_matrix)}}
         static_label: [no-static]
         include:
-          - vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+          - vtk_version: commit
             static_label: static
 
     runs-on: windows-2022
@@ -619,46 +105,22 @@ jobs:
       - name: Generic CI
         uses: ./source/.github/actions/generic-ci
         with:
+          versions_file: ./source/.github/workflows/versions.json
           vtk_version: ${{matrix.vtk_version}}
           static_label: ${{matrix.static_label}}
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-          curl_version: ${{needs.default_versions.outputs.curl_version}}
-          draco_version: ${{needs.default_versions.outputs.draco_version}}
-          gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-          geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
-          imath_version: ${{needs.default_versions.outputs.imath_version}}
-          java_version: ${{needs.default_versions.outputs.java_version}}
-          occt_version: ${{needs.default_versions.outputs.occt_version}}
-          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-          ospray_version: ${{needs.default_versions.outputs.ospray_version}}
-          pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-          proj_version: ${{needs.default_versions.outputs.proj_version}}
-          pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-          python_version: ${{needs.default_versions.outputs.python_version}}
-          sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
-          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          tiff_version: ${{needs.default_versions.outputs.tiff_version}}
-          usd_version: ${{needs.default_versions.outputs.usd_version}}
-          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
-          webp_version: ${{needs.default_versions.outputs.webp_version}}
-          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Linux fast CI: Build and test a single fast CI
   #----------------------------------------------------------------------------
   linux_fast:
-    needs: [cache_lfs, default_versions]
+    needs: cache_lfs
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:fast') ||
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
@@ -676,23 +138,20 @@ jobs:
       - name: Generic CI
         uses: ./source/.github/actions/generic-ci
         with:
+          versions_file: ./source/.github/workflows/versions.json
           build_type: fast
+          vtk_version: v9.6.2
           rendering_backend: auto
-          optional_deps_label: no-optional-deps
+          optdeps_label: no-optdeps
           exclude_deprecated_label: exclude-deprecated
           static_label: no-static
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          vtk_version: v9.6.1
-          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Linux CI: Build and test, cross-vtk build matrix
   #----------------------------------------------------------------------------
   linux:
-    needs: [cache_lfs, cache_vtk_dependency_linux, default_versions]
+    needs: [cache_lfs, recover_vtk_matrix]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -700,203 +159,58 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version:
-          [
-            "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.6.1,
-            v9.5.2,
-            v9.4.2,
-          ]
+        vtk_version: ${{fromJSON(needs.recover_vtk_matrix.outputs.vtk_matrix)}}
         build_type: [standard]
         include:
           - exclude_deprecated_label: no-exclude-deprecated
-          - optional_deps_label: optional-deps
+          - optdeps_label: optdeps
+          - mindeps_label: no-mindeps
           - rendering_backend: auto
           - static_label: no-static
-          - alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-          - assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-          - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-          - curl_version: ${{needs.default_versions.outputs.curl_version}}
-          - draco_version: ${{needs.default_versions.outputs.draco_version}}
-          - gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-          - geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
-          - imath_version: ${{needs.default_versions.outputs.imath_version}}
-          - java_version: ${{needs.default_versions.outputs.java_version}}
-          - occt_version: ${{needs.default_versions.outputs.occt_version}}
-          - openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-          - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-          - ospray_version: ${{needs.default_versions.outputs.ospray_version}}
-          - pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-          - proj_version: ${{needs.default_versions.outputs.proj_version}}
-          - pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-          - python_version: ${{needs.default_versions.outputs.python_version}}
-          - sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
-          - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          - tiff_version: ${{needs.default_versions.outputs.tiff_version}}
-          - usd_version: ${{needs.default_versions.outputs.usd_version}}
-          - webifc_version: ${{needs.default_versions.outputs.webifc_version}}
-          - webp_version: ${{needs.default_versions.outputs.webp_version}}
-          - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: egl
-            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-            optional_deps_label: optional-deps
+            vtk_version: commit
+            optdeps_label: optdeps
+            mindeps_label: no-mindeps
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: egl
             static_label: no-static
-            alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-            assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-            blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-            curl_version: ${{needs.default_versions.outputs.curl_version}}
-            draco_version: ${{needs.default_versions.outputs.draco_version}}
-            gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-            geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
-            imath_version: ${{needs.default_versions.outputs.imath_version}}
-            java_version: ${{needs.default_versions.outputs.java_version}}
-            occt_version: ${{needs.default_versions.outputs.occt_version}}
-            openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-            openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-            ospray_version: ${{needs.default_versions.outputs.ospray_version}}
-            pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-            proj_version: ${{needs.default_versions.outputs.proj_version}}
-            pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-            python_version: ${{needs.default_versions.outputs.python_version}}
-            sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
-            tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-            tiff_version: ${{needs.default_versions.outputs.tiff_version}}
-            usd_version: ${{needs.default_versions.outputs.usd_version}}
-            webifc_version: ${{needs.default_versions.outputs.webifc_version}}
-            webp_version: ${{needs.default_versions.outputs.webp_version}}
-            zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: osmesa
-            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-            optional_deps_label: optional-deps
+            vtk_version: commit
+            optdeps_label: optdeps
+            mindeps_label: no-mindeps
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: osmesa
             static_label: no-static
-            alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-            assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-            blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-            curl_version: ${{needs.default_versions.outputs.curl_version}}
-            draco_version: ${{needs.default_versions.outputs.draco_version}}
-            gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-            geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
-            imath_version: ${{needs.default_versions.outputs.imath_version}}
-            java_version: ${{needs.default_versions.outputs.java_version}}
-            occt_version: ${{needs.default_versions.outputs.occt_version}}
-            openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-            openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-            ospray_version: ${{needs.default_versions.outputs.ospray_version}}
-            pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-            proj_version: ${{needs.default_versions.outputs.proj_version}}
-            pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-            python_version: ${{needs.default_versions.outputs.python_version}}
-            sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
-            tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-            tiff_version: ${{needs.default_versions.outputs.tiff_version}}
-            usd_version: ${{needs.default_versions.outputs.usd_version}}
-            webifc_version: ${{needs.default_versions.outputs.webifc_version}}
-            webp_version: ${{needs.default_versions.outputs.webp_version}}
-            zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: exclude_deprecated
-            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-            optional_deps_label: optional-deps
+            vtk_version: commit
+            optdeps_label: optdeps
+            mindeps_label: no-mindeps
             exclude_deprecated_label: exclude-deprecated
             rendering_backend: auto
             static_label: no-static
-            alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-            assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-            blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-            curl_version: ${{needs.default_versions.outputs.curl_version}}
-            draco_version: ${{needs.default_versions.outputs.draco_version}}
-            gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-            geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
-            imath_version: ${{needs.default_versions.outputs.imath_version}}
-            java_version: ${{needs.default_versions.outputs.java_version}}
-            occt_version: ${{needs.default_versions.outputs.occt_version}}
-            openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-            openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-            ospray_version: ${{needs.default_versions.outputs.ospray_version}}
-            pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-            proj_version: ${{needs.default_versions.outputs.proj_version}}
-            pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-            python_version: ${{needs.default_versions.outputs.python_version}}
-            sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
-            tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-            tiff_version: ${{needs.default_versions.outputs.tiff_version}}
-            usd_version: ${{needs.default_versions.outputs.usd_version}}
-            webifc_version: ${{needs.default_versions.outputs.webifc_version}}
-            webp_version: ${{needs.default_versions.outputs.webp_version}}
-            zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: no_optional_deps
-            blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-            tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-            zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-            optional_deps_label: no-optional-deps
+            vtk_version: commit
+            optdeps_label: no-optdeps
+            mindeps_label: no-mindeps
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: auto
             static_label: no-static
           - build_type: static_libs
-            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-            optional_deps_label: optional-deps
+            vtk_version: commit
+            optdeps_label: optdeps
+            mindeps_label: no-mindeps
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: auto
             static_label: static
-            alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-            assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-            blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-            curl_version: ${{needs.default_versions.outputs.curl_version}}
-            draco_version: ${{needs.default_versions.outputs.draco_version}}
-            gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-            geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
-            imath_version: ${{needs.default_versions.outputs.imath_version}}
-            java_version: ${{needs.default_versions.outputs.java_version}}
-            occt_version: ${{needs.default_versions.outputs.occt_version}}
-            openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-            openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-            pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-            proj_version: ${{needs.default_versions.outputs.proj_version}}
-            pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-            python_version: ${{needs.default_versions.outputs.python_version}}
-            sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
-            tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-            tiff_version: ${{needs.default_versions.outputs.tiff_version}}
-            usd_version: ${{needs.default_versions.outputs.usd_version}}
-            webifc_version: ${{needs.default_versions.outputs.webifc_version}}
-            webp_version: ${{needs.default_versions.outputs.webp_version}}
-            zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: mindeps
-            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-            optional_deps_label: optional-deps
+            vtk_version: commit
+            optdeps_label: optdeps
+            mindeps_label: mindeps
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: auto
             static_label: no-static
-            alembic_version: ${{needs.default_versions.outputs.alembic_min_version}}
-            assimp_version: ${{needs.default_versions.outputs.assimp_min_version}}
-            blosc_version: ${{needs.default_versions.outputs.blosc_min_version}}
-            curl_version: ${{needs.default_versions.outputs.curl_min_version}}
-            draco_version: ${{needs.default_versions.outputs.draco_min_version}}
-            gdal_version: ${{needs.default_versions.outputs.gdal_min_version}}
-            geotiff_version: ${{needs.default_versions.outputs.geotiff_min_version}}
-            imath_version: ${{needs.default_versions.outputs.imath_min_version}}
-            java_version: ${{needs.default_versions.outputs.java_min_version}}
-            occt_version: ${{needs.default_versions.outputs.occt_min_version}}
-            openexr_version: ${{needs.default_versions.outputs.openexr_min_version}}
-            openvdb_version: ${{needs.default_versions.outputs.openvdb_min_version}}
-            ospray_version: ${{needs.default_versions.outputs.ospray_min_version}}
-            pdal_version: ${{needs.default_versions.outputs.pdal_min_version}}
-            proj_version: ${{needs.default_versions.outputs.proj_min_version}}
-            pybind11_version: ${{needs.default_versions.outputs.pybind11_min_version}}
-            python_version: ${{needs.default_versions.outputs.python_min_version}}
-            sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_min_version}}
-            tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
-            tiff_version: ${{needs.default_versions.outputs.tiff_min_version}}
-            usd_version: ${{needs.default_versions.outputs.usd_min_version}}
-            webifc_version: ${{needs.default_versions.outputs.webifc_min_version}}
-            webp_version: ${{needs.default_versions.outputs.webp_min_version}}
-            zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
@@ -914,57 +228,28 @@ jobs:
       - name: Generic CI
         uses: ./source/.github/actions/generic-ci
         with:
+          versions_file: ./source/.github/workflows/versions.json
           build_type: ${{matrix.build_type}}
           vtk_version: ${{matrix.vtk_version}}
           rendering_backend: ${{matrix.rendering_backend}}
-          optional_deps_label: ${{matrix.optional_deps_label}}
+          optdeps_label: ${{matrix.optdeps_label}}
+          mindeps_label: ${{matrix.mindeps_label}}
           exclude_deprecated_label: ${{matrix.exclude_deprecated_label}}
           static_label: ${{matrix.static_label}}
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-          alembic_version: ${{matrix.alembic_version}}
-          assimp_version: ${{matrix.assimp_version}}
-          blosc_version: ${{matrix.blosc_version}}
-          curl_version: ${{matrix.curl_version}}
-          draco_version: ${{matrix.draco_version}}
-          gdal_version: ${{matrix.gdal_version}}
-          geotiff_version: ${{matrix.geotiff_version}}
-          imath_version: ${{matrix.imath_version}}
-          java_version: ${{matrix.java_version}}
-          occt_version: ${{matrix.occt_version}}
-          openexr_version: ${{matrix.openexr_version}}
-          openvdb_version: ${{matrix.openvdb_version}}
-          ospray_version: ${{matrix.ospray_version}}
-          pdal_version: ${{matrix.pdal_version}}
-          proj_version: ${{matrix.proj_version}}
-          pybind11_version: ${{matrix.pybind11_version}}
-          python_version: ${{matrix.python_version}}
-          sqlite_csb_version: ${{matrix.sqlite_csb_version}}
-          tbb_version: ${{matrix.tbb_version}}
-          tiff_version: ${{matrix.tiff_version}}
-          usd_version: ${{matrix.usd_version}}
-          webifc_version: ${{matrix.webifc_version}}
-          webp_version: ${{matrix.webp_version}}
-          zlib_version: ${{matrix.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # MacOS CI: Build and test, cross-vtk build matrix
   #----------------------------------------------------------------------------
   macos_intel:
-    needs: [cache_lfs, cache_dependencies_macos_intel, default_versions]
+    needs: [cache_lfs, recover_vtk_matrix]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
     strategy:
       fail-fast: false
       matrix:
-        vtk_version:
-          [
-            "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.6.1,
-            v9.5.2,
-            v9.4.2,
-          ]
+        vtk_version: ${{fromJSON(needs.recover_vtk_matrix.outputs.vtk_matrix)}}
 
     runs-on: macos-15-intel
 
@@ -982,39 +267,16 @@ jobs:
       - name: Generic CI
         uses: ./source/.github/actions/generic-ci
         with:
+          versions_file: ./source/.github/workflows/versions.json
           vtk_version: ${{matrix.vtk_version}}
           cpu: x86_64
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-          curl_version: ${{needs.default_versions.outputs.curl_version}}
-          draco_version: ${{needs.default_versions.outputs.draco_version}}
-          gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-          geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
-          imath_version: ${{needs.default_versions.outputs.imath_version}}
-          occt_version: ${{needs.default_versions.outputs.occt_version}}
-          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-          ospray_version: ${{needs.default_versions.outputs.ospray_version}}
-          pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-          proj_version: ${{needs.default_versions.outputs.proj_version}}
-          pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-          python_version: ${{needs.default_versions.outputs.python_version}}
-          sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
-          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          tiff_version: ${{needs.default_versions.outputs.tiff_version}}
-          usd_version: ${{needs.default_versions.outputs.usd_version}}
-          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
-          webp_version: ${{needs.default_versions.outputs.webp_version}}
-          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
   #----------------------------------------------------------------------------
   macos_arm:
-    needs: [cache_lfs, cache_dependencies_macos_arm, default_versions]
+    needs: [cache_lfs, recover_vtk_matrix]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -1022,20 +284,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version:
-          [
-            "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.6.1,
-            v9.5.2,
-            v9.4.2,
-          ]
+        vtk_version: ${{fromJSON(needs.recover_vtk_matrix.outputs.vtk_matrix)}}
         bundle_label: [no-bundle]
         static_label: [no-static]
         include:
-          - vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+          - vtk_version: commit
             bundle_label: bundle
             static_label: no-static
-          - vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+          - vtk_version: commit
             bundle_label: no-bundle
             static_label: static
 
@@ -1055,68 +311,40 @@ jobs:
       - name: Generic CI
         uses: ./source/.github/actions/generic-ci
         with:
+          versions_file: ./source/.github/workflows/versions.json
           vtk_version: ${{matrix.vtk_version}}
           bundle_label: ${{matrix.bundle_label}}
           static_label: ${{matrix.static_label}}
           cpu: arm64
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-          curl_version: ${{needs.default_versions.outputs.curl_version}}
-          draco_version: ${{needs.default_versions.outputs.draco_version}}
-          gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-          geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
-          imath_version: ${{needs.default_versions.outputs.imath_version}}
-          occt_version: ${{needs.default_versions.outputs.occt_version}}
-          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-          ospray_version: ${{needs.default_versions.outputs.ospray_version}}
-          pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-          proj_version: ${{needs.default_versions.outputs.proj_version}}
-          pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-          python_version: ${{needs.default_versions.outputs.python_version}}
-          sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
-          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          tiff_version: ${{needs.default_versions.outputs.tiff_version}}
-          usd_version: ${{needs.default_versions.outputs.usd_version}}
-          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
-          webp_version: ${{needs.default_versions.outputs.webp_version}}
-          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Python packaging: Build and test the Python wheel
   #----------------------------------------------------------------------------
   python_packaging:
-    needs:
-      - cache_lfs
-      - cache_vtk_dependency_linux
-      - cache_dependencies_windows
-      - cache_dependencies_macos_arm
-      - default_versions
+    needs: cache_lfs
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-2022, macos-15]
+        os: [ubuntu-24.04, windows-2022, macos-15]
         python_version: ["3.14"]
         include:
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
             python_version: "3.10"
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
             python_version: "3.11"
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
             python_version: "3.12"
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
             python_version: "3.13"
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
             python_version: "3.14"
 
     runs-on: ${{matrix.os}}
-    container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    container: ${{ matrix.os == 'ubuntu-24.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
     env:
       DISPLAY: :0
@@ -1133,49 +361,25 @@ jobs:
       - name: Python CI
         uses: ./source/.github/actions/python-ci
         with:
+          versions_file: ./source/.github/workflows/versions.json
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           cpu: ${{ matrix.os == 'macos-15' && 'arm64' || 'x86_64' }}
           python_version: ${{matrix.python_version}}
-          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-          curl_version: ${{needs.default_versions.outputs.curl_version}}
-          draco_version: ${{needs.default_versions.outputs.draco_version}}
-          gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-          geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
-          imath_version: ${{needs.default_versions.outputs.imath_version}}
-          occt_version: ${{needs.default_versions.outputs.occt_version}}
-          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-          pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-          proj_version: ${{needs.default_versions.outputs.proj_version}}
-          pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-          sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
-          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          tiff_version: ${{needs.default_versions.outputs.tiff_version}}
-          usd_version: ${{needs.default_versions.outputs.usd_version}}
-          vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
-          webp_version: ${{needs.default_versions.outputs.webp_version}}
-          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Coverage: Build and test on linux with last VTK with coverage option
   #----------------------------------------------------------------------------
   coverage:
-    needs: [cache_lfs, cache_vtk_dependency_linux, default_versions]
+    needs: cache_lfs
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container: ghcr.io/f3d-app/f3d-ci
 
-    # Add dummy F3D_PLUGINS_PATH for coverage
     env:
       DISPLAY: :0
-      F3D_PLUGINS_PATH: /dummy1:/dummy2
 
     steps:
       - name: Checkout
@@ -1188,31 +392,9 @@ jobs:
       - name: Coverage CI
         uses: ./source/.github/actions/coverage-ci
         with:
+          versions_file: ./source/.github/workflows/versions.json
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           codecov_token: ${{secrets.CODECOV_TOKEN}}
-          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-          curl_version: ${{needs.default_versions.outputs.curl_version}}
-          draco_version: ${{needs.default_versions.outputs.draco_version}}
-          gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-          geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
-          imath_version: ${{needs.default_versions.outputs.imath_version}}
-          occt_version: ${{needs.default_versions.outputs.occt_version}}
-          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-          ospray_version: ${{needs.default_versions.outputs.ospray_version}}
-          pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-          proj_version: ${{needs.default_versions.outputs.proj_version}}
-          sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
-          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          tiff_version: ${{needs.default_versions.outputs.tiff_version}}
-          usd_version: ${{needs.default_versions.outputs.usd_version}}
-          vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
-          webp_version: ${{needs.default_versions.outputs.webp_version}}
-          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Sanitizer: Build and test on linux with last VTK with sanitizer options
@@ -1221,7 +403,7 @@ jobs:
   # "memory" returns false positives in VTK:
   # https://stackoverflow.com/questions/60097307/memory-sanitizer-reports-use-of-uninitialized-value-in-global-object-constructio
   sanitizer:
-    needs: [cache_lfs, cache_vtk_dependency_linux, default_versions]
+    needs: cache_lfs
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
@@ -1230,7 +412,7 @@ jobs:
       matrix:
         sanitizer_type: [address, thread, undefined]
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
@@ -1251,34 +433,15 @@ jobs:
       - name: Sanitizer CI
         uses: ./source/.github/actions/sanitizer-ci
         with:
+          versions_file: ./source/.github/workflows/versions.json
           sanitizer_type: ${{matrix.sanitizer_type}}
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-          curl_version: ${{needs.default_versions.outputs.curl_version}}
-          draco_version: ${{needs.default_versions.outputs.draco_version}}
-          gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-          geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
-          imath_version: ${{needs.default_versions.outputs.imath_version}}
-          occt_version: ${{needs.default_versions.outputs.occt_version}}
-          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-          pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-          proj_version: ${{needs.default_versions.outputs.proj_version}}
-          sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
-          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          tiff_version: ${{needs.default_versions.outputs.tiff_version}}
-          vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
-          webp_version: ${{needs.default_versions.outputs.webp_version}}
-          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # static-analysis: Run static analysis on linux
   #----------------------------------------------------------------------------
   static-analysis:
-    needs: [cache_lfs, cache_vtk_dependency_linux, default_versions]
+    needs: cache_lfs
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -1286,7 +449,7 @@ jobs:
     strategy:
       fail-fast: false
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
@@ -1305,42 +468,20 @@ jobs:
       - name: Static analysis CI
         uses: ./source/.github/actions/static-analysis-ci
         with:
+          versions_file: ./source/.github/workflows/versions.json
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-          curl_version: ${{needs.default_versions.outputs.curl_version}}
-          draco_version: ${{needs.default_versions.outputs.draco_version}}
-          gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-          geotiff_version: ${{needs.default_versions.outputs.geotiff_version}}
-          imath_version: ${{needs.default_versions.outputs.imath_version}}
-          occt_version: ${{needs.default_versions.outputs.occt_version}}
-          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-          pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-          proj_version: ${{needs.default_versions.outputs.proj_version}}
-          sqlite_csb_version: ${{needs.default_versions.outputs.sqlite_csb_version}}
-          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          tiff_version: ${{needs.default_versions.outputs.tiff_version}}
-          usd_version: ${{needs.default_versions.outputs.usd_version}}
-          vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
-          webp_version: ${{needs.default_versions.outputs.webp_version}}
-          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # external-build: Check build of F3D as sub-project
   #----------------------------------------------------------------------------
   external-build:
-    needs: [cache_vtk_dependency_linux, default_versions]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
     strategy:
       fail-fast: false
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
@@ -1357,48 +498,41 @@ jobs:
       - name: External build CI
         uses: ./source/f3d/.github/actions/external-build-ci
         with:
-          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
-          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
+          versions_file: ./source/f3d/.github/workflows/versions.json
 
   #----------------------------------------------------------------------------
-  # Check android/wasm docker images
+  # Recover docker timestamp
   #----------------------------------------------------------------------------
-  check_docker_images:
-    needs: default_versions
-    runs-on: ubuntu-22.04
+  recover_docker_timestamp:
+    name: Recover docker timestamp
+    runs-on: ubuntu-24.04
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'ci:android') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:full') ||
+      github.ref == 'refs/heads/master'
+    outputs:
+      docker_timestamp: ${{steps.docker_timestamp.outputs.extract}}
 
-    # Pull request can require a rebuild of docker image, wait for it to be done
-    # This job does not do anything in master branch but is not skipped for simpler logic
     steps:
-      - name: Extract branch name
-        if: |
-          contains(github.event.pull_request.labels.*.name, 'ci:android') ||
-          contains(github.event.pull_request.labels.*.name, 'ci:wasm') ||
-          contains(github.event.pull_request.labels.*.name, 'ci:full')
-        shell: bash
-        run: echo "F3D_BRANCH_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_ENV
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
 
-      - name: Wait for docker images
-        if: contains(github.event.pull_request.labels.*.name, 'ci:full')
-        run: |
-          gh run list -w build-docker-images.yml --repo ${{ github.repository }} -L 1 -b ${{ env.F3D_BRANCH_NAME }}
-          until gh run list -w build-docker-images.yml --repo ${{ github.repository }} -L 1 -b ${{ env.F3D_BRANCH_NAME }} --json status | jq '.[]| .status' | grep -q "completed";
-          do
-            echo "Waiting 1s"
-            sleep 1;
-          done
-          gh run list -w build-docker-images.yml --repo ${{ github.repository }} -L 1 -b ${{ env.F3D_BRANCH_NAME }} --json conclusion | jq '.[]| .conclusion' | grep -q "success"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract docker timestamp
+        id: docker_timestamp
+        uses: f3d-app/extract-version-action@main
+        with:
+          file: ./source/.github/workflows/versions.json
+          special_name: docker_timestamp
 
   #----------------------------------------------------------------------------
   # android: Check build of F3D for android
   #----------------------------------------------------------------------------
   android:
-    needs: [default_versions, check_docker_images]
+    needs: recover_docker_timestamp
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:android') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -1408,8 +542,8 @@ jobs:
       matrix:
         arch: [armeabi-v7a, arm64-v8a, x86, x86_64]
 
-    runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-android-${{ matrix.arch }}:${{needs.default_versions.outputs.docker_timestamp}}
+    runs-on: ubuntu-24.04
+    container: ghcr.io/f3d-app/f3d-android-${{ matrix.arch }}:${{needs.recover_docker_timestamp.outputs.docker_timestamp}}
 
     steps:
       - name: Checkout
@@ -1428,7 +562,7 @@ jobs:
   # webassembly: Build webassembly artifacts
   #----------------------------------------------------------------------------
   webassembly:
-    needs: [cache_lfs, default_versions, check_docker_images]
+    needs: [cache_lfs, recover_docker_timestamp]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:wasm') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -1436,11 +570,11 @@ jobs:
     strategy:
       fail-fast: false
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     env:
       CMAKE_BUILD_PARALLEL_LEVEL: 4
-      F3D_DOCKER_TIMESTAMP: ${{needs.default_versions.outputs.docker_timestamp}}
+      F3D_DOCKER_TIMESTAMP: ${{needs.recover_docker_timestamp.outputs.docker_timestamp}}
 
     steps:
       - name: Checkout

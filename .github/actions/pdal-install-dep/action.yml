@@ -1,37 +1,17 @@
 name: "Install pdal Dependency"
 description: "Install pdal Dependency using cache when possible"
 inputs:
+  versions_file:
+    description: "File to recover versions from"
+    required: true
+  mindeps_label:
+    description: "Label to flag for minimum versions dependencies"
+    required: false
+    default: "no-mindeps"
   cpu:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
-  version:
-    description: "Version of pdal to build"
-    required: true
-  curl_version:
-    description: "Version of gdal to build against"
-    required: true
-  gdal_version:
-    description: "Version of gdal to build against"
-    required: true
-  geotiff_version:
-    description: "Version of geotiff to build against"
-    required: true
-  proj_version:
-    description: "Version of proj to build against"
-    required: true
-  sqlite_csb_version:
-    description: "Version of csb providing sqlite to build against"
-    required: true
-  tiff_version:
-    description: "Version of tiff to build against"
-    required: true
-  zlib_version:
-    description: "Version of zlib to build against"
-    required: true
-  global_cache_index:
-    description: "Global cache index"
-    required: true
 
 runs:
   using: "composite"
@@ -39,22 +19,78 @@ runs:
     - name: Check required inputs
       shell: bash
       run: |
-        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
-        [[ "${{ inputs.curl_version }}" ]] || { echo "curl_version input is empty" ; exit 1; }
-        [[ "${{ inputs.gdal_version }}" ]] || { echo "gdal_version input is empty" ; exit 1; }
-        [[ "${{ inputs.geotiff_version }}" ]] || { echo "geotiff_version input is empty" ; exit 1; }
-        [[ "${{ inputs.proj_version }}" ]] || { echo "proj_version input is empty" ; exit 1; }
-        [[ "${{ inputs.sqlite_csb_version }}" ]] || { echo "sqlite_csb_version input is empty" ; exit 1; }
-        [[ "${{ inputs.tiff_version }}" ]] || { echo "tiff_version input is empty" ; exit 1; }
-        [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
-        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+        [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
+
+    - name: Extract pdal version
+      id: pdal_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: pdal
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract gdal version
+      id: gdal_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: gdal
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract geotiff version
+      id: geotiff_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: geotiff
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract proj version
+      id: proj_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: proj
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract sqlite_csb version
+      id: sqlite_csb_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: sqlite_csb
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract tiff version
+      id: tiff_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: tiff
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract zlib version
+      id: zlib_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: zlib
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract global cache index
+      id: global_idx
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        special_name: global_cache_index
 
     - name: Cache pdal
       id: cache-pdal
+      continue-on-error: true # https://github.com/actions/cache/issues/1754
       uses: actions/cache/restore@v5
       with:
         path: dependencies/pdal_install
-        key: pdal-${{inputs.version}}-${{ inputs.curl_version }}-${{ inputs.gdal_version }}-${{ inputs.geotiff_version }}-${{inputs.proj_version}}-${{ inputs.sqlite_csb_version }}-${{inputs.tiff_version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-7
+        key: pdal-${{steps.pdal_ver.outputs.extract}}-${{steps.gdal_ver.outputs.extract}}-${{steps.geotiff_ver.outputs.extract}}-${{steps.proj_ver.outputs.extract}}-${{steps.sqlite_csb_ver.outputs.extract}}-${{steps.tiff_ver.outputs.extract}}-${{steps.zlib_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-7
 
     # Dependents: vtk
     - name: Checkout pdal
@@ -63,18 +99,12 @@ runs:
       with:
         repository: PDAL/PDAL
         path: "./dependencies/pdal"
-        ref: ${{inputs.version}}
+        ref: ${{steps.pdal_ver.outputs.extract}}
 
-    - name: Patch pdal
-      if: steps.cache-pdal.outputs.cache-hit != 'true' && inputs.version != '2.9.0'
-      working-directory: ${{github.workspace}}/dependencies/pdal
-      shell: bash
-      run: |
-        patch -p1 < $GITHUB_ACTION_PATH/fix_leak.patch
-        patch -p1 < $GITHUB_ACTION_PATH/remove_apps_tools.patch
-
+    # https://github.com/PDAL/PDAL/issues/4966
+    # https://github.com/PDAL/PDAL/pull/4989
     - name: Patch pdal minver
-      if: steps.cache-pdal.outputs.cache-hit != 'true' && inputs.version == '2.9.0'
+      if: steps.cache-pdal.outputs.cache-hit != 'true' && steps.pdal_ver.outputs.extract == '2.9.0'
       working-directory: ${{github.workspace}}/dependencies/pdal
       shell: bash
       run: |
@@ -98,6 +128,7 @@ runs:
         -DBUILD_PLUGIN_E57=OFF
         -DBUILD_PLUGIN_HDF=OFF
         -DBUILD_PLUGIN_PGPOINTCLOUD=OFF
+        -DBUILD_TOOLS_LASDUMP=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../pdal_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/

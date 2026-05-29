@@ -48,6 +48,7 @@ f3d_test(NAME TestLineWidthFullScene DATA suzanne.obj ARGS -e --line-width=3 --u
 # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12702
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251214)
   f3d_test(NAME TestUnlitTexture DATA WaterBottle.glb ARGS --unlit)
+  f3d_test(NAME TestUnlitOBJOpacity DATA cube_unlit.obj ARGS --camera-position=3.93721,3.90197,3.74935 --camera-view-up=-0.422242,0.812423,-0.402095 --camera-view-angle=21.8333 --opacity=0.3)
 endif()
 f3d_test(NAME TestUnlit DATA cow.vtp ARGS --unlit --color=0.9,0.1,0.1)
 
@@ -103,6 +104,7 @@ endif()
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
   f3d_test(NAME TestAxesGridEnable DATA suzanne.ply ARGS --axes-grid THRESHOLD 0.08) # Threshold required for MacOS due to line rendering differences
   f3d_test(NAME TestAxesGridEnableNonCenteredData DATA cow.vtp ARGS --axes-grid)
+  f3d_test(NAME TestCommandScriptAxesGridAnimation SCRIPT DATA BoxAnimated.gltf ARGS --axes-grid --camera-zoom-factor=0.2)
 endif()
 
 ## Camera
@@ -308,6 +310,7 @@ f3d_test(NAME TestAnimationInputChangePointSprites DATA v_rock2.mdl ARGS --point
 f3d_test(NAME TestBackdropOpacityOpaque DATA suzanne.ply ARGS -n --backdrop-opacity=1.0 UI)
 f3d_test(NAME TestBackdropOpacityTransparent DATA suzanne.ply ARGS -n --backdrop-opacity=0.0 UI)
 f3d_test(NAME TestBackdropOpacityMedium DATA suzanne.ply ARGS -n --backdrop-opacity=0.5 UI)
+f3d_test(NAME TestBackdropColor DATA suzanne.ply ARGS -n --backdrop-color=0.5,1.0,0.5 UI)
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   f3d_test(NAME TestDefaultConfigFileHDRIFilename DATA dragon.vtu CONFIG config_build ARGS -j --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr UI LONG_TIMEOUT)
@@ -522,7 +525,7 @@ f3d_test(NAME TestVerboseVolume DATA HeadMRVolume.mhd ARGS -v --verbose REGEXP "
 f3d_test(NAME TestIncorrectComponent DATA dragon.vtu ARGS -s --coloring-component=4 REGEXP "Invalid component index: 4" NO_BASELINE)
 
 # Incorrect volume coloring with multi file
-f3d_test(NAME TestIncorrectMultiFileVolume DATA multi ARGS -sv --coloring-array=Normals --multi-file-mode=all REGEXP "Cannot find the array \"Normals\" to display volume with" NO_BASELINE)
+f3d_test(NAME TestIncorrectMultiFileVolume DATA multi ARGS -sv --coloring-array=Normals --multi-file-mode=all REGEXP "Cannot find the array \"Normals\" to display volume with" NO_BASELINE LONG_TIMEOUT)
 
 # Incorrect color map
 f3d_test(NAME TestIncorrectColormap DATA IM-0001-1983.dcm ARGS --scalar-coloring --roughness=1 --colormap=0,1,0,0,1,0,1 REGEXP "Incorrect number of tokens in provided colormap" NO_BASELINE)

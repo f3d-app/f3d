@@ -109,6 +109,11 @@
           "valueHelper": "<paths or names>"
         },
         {
+          "longName": "plugins-path",
+          "helpText": "Path specifying where to load plugins from",
+          "valueHelper": "<path>"
+        },
+        {
           "longName": "scan-plugins",
           "helpText": "Scan standard directories for plugins and display available plugins (result can be incomplete)"
         },
@@ -305,6 +310,12 @@
           "longName": "backdrop-opacity",
           "helpText": "UI backdrop opacity",
           "valueHelper": "<value>",
+          "conditional": "F3D_MODULE_UI"
+        },
+        {
+          "longName": "backdrop-color",
+          "helpText": "UI backdrop color",
+          "valueHelper": "<color>",
           "conditional": "F3D_MODULE_UI"
         },
         {
