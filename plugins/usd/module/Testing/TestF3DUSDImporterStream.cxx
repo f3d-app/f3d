@@ -29,9 +29,6 @@ int TestF3DUSDImporterStream(int vtkNotUsed(argc), char* argv[])
   vtkNew<vtkF3DUSDImporter> importer;
   importer->SetStream(stream);
   importer->Update();
-  return importer->GetRenderer()
-           ->GetActors()
-           ->GetNumberOfItems() == 5
-    ? EXIT_SUCCESS
-    : EXIT_FAILURE;
+  return importer->GetRenderer()->GetActors()->GetNumberOfItems() == 5 ? EXIT_SUCCESS
+                                                                       : EXIT_FAILURE;
 }

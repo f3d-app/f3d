@@ -29,7 +29,7 @@ int TestF3DUSDImporterStreamError(int vtkNotUsed(argc), char* argv[])
 
     vtkNew<vtkF3DUSDImporter> importer;
     importer->SetStream(stream);
-    
+
     // the update should succeed
     if (!importer->Update())
     {
