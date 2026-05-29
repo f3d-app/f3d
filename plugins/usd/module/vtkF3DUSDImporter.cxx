@@ -1560,8 +1560,8 @@ bool vtkF3DUSDImporter::CanReadFile(vtkResourceStream* stream, std::string& hint
         std::string firstName(nameLen, '\0');
         if (stream->Read(firstName.data(), nameLen) == nameLen)
         {
-          if (firstName.ends_with(".usdc") || firstName.ends_with(".usda") || firstName.ends_with(".usdz") ||
-            firstName.ends_with(".usd"))
+          if (firstName.ends_with(".usdc") || firstName.ends_with(".usda") ||
+            firstName.ends_with(".usdz") || firstName.ends_with(".usd"))
           {
             hint = "usdz";
             stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
