@@ -107,6 +107,15 @@ public:
           reinterpret_cast<void*>(&vtkF3DUSDImporter::New), &libPath, nullptr, nullptr, nullptr))
     {
       std::string plugInfoDir = pxr::TfGetPathName(libPath) + "../lib/usd/f3d/resources/";
+
+#ifdef _WIN32
+      // On Windows, we can get a UNC prefix. Strip it if that's the case.
+      if (plugInfoDir.starts_with(R"(\\?\)"))
+      {
+        plugInfoDir.erase(0, 4);
+      }
+#endif
+
       pxr::PlugRegistry::GetInstance().RegisterPlugins(plugInfoDir);
     }
   }
