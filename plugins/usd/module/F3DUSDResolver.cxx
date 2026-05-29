@@ -2,23 +2,18 @@
 
 #include <vtkResourceStream.h>
 
-#include <pxr/base/arch/symbols.h>
-#include <pxr/base/plug/registry.h>
-#include <pxr/base/tf/stringUtils.h>
-#include <pxr/usd/ar/asset.h>
 #include <pxr/usd/ar/defineResolver.h>
 #include <pxr/usd/ar/inMemoryAsset.h>
-#include <pxr/usd/ar/resolvedPath.h>
-#include <pxr/usd/ar/resolverContext.h>
 
 #include <cassert>
 
 vtkResourceStream* F3DMemoryResolver::ActiveStream = nullptr;
 
 // Register the resolver
-// TODO: can we avoid using namespace?
-using namespace pxr;
+namespace pxr
+{
 AR_DEFINE_RESOLVER(F3DMemoryResolver, ArResolver);
+}
 
 //----------------------------------------------------------------------------
 std::string F3DMemoryResolver::_CreateIdentifier(
@@ -61,7 +56,7 @@ std::shared_ptr<pxr::ArAsset> F3DMemoryResolver::_OpenAsset(
 
   F3DMemoryResolver::ActiveStream->Read(buffer.get(), size);
 
-  return ArInMemoryAsset::FromBuffer(buffer, size);
+  return pxr::ArInMemoryAsset::FromBuffer(buffer, size);
 }
 
 //----------------------------------------------------------------------------

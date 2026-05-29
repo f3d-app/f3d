@@ -99,16 +99,11 @@ public:
   {
     pxr::TfDiagnosticMgr::GetInstance().AddDelegate(&this->Delegate);
 
-    static bool registered = false;
-    if (!registered)
-    {
-      registered = true;
-
-      std::string exePath = pxr::ArchGetExecutablePath();
-
-      std::string plugInfoDir = pxr::TfGetPathName(exePath) + "../lib/usd/f3d/resources/";
-      pxr::PlugRegistry::GetInstance().RegisterPlugins(plugInfoDir);
-    }
+    // register our own stream plugin
+    // safe to call several times
+    std::string exePath = pxr::ArchGetExecutablePath();
+    std::string plugInfoDir = pxr::TfGetPathName(exePath) + "../lib/usd/f3d/resources/";
+    pxr::PlugRegistry::GetInstance().RegisterPlugins(plugInfoDir);
   }
 
   ~vtkInternals()

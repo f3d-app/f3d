@@ -53,22 +53,6 @@ f3d_plugin_build(
   ADDITIONAL_RPATHS ${_additional_rpath}
   MIMETYPE_XML_FILES "${CMAKE_CURRENT_SOURCE_DIR}/f3d-usd-formats.xml"
   CONFIGURATION_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/configs/config.d" "${CMAKE_CURRENT_SOURCE_DIR}/configs/thumbnail.d"
+  RESOURCES "lib/usd/f3d/resources/plugInfo.json"
   FREEDESKTOP
-)
-
-# TODO: improve f3d_plugin_build to include that
-
-# installation
-install(
-  FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/plugInfo.json"
-  DESTINATION "${F3D_PLUGINS_INSTALL_DIR}/lib/usd/f3d/resources"
-  COMPONENT plugin
-)
-
-# build environment
-file(MAKE_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/usd/f3d/resources")
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/resources/plugInfo.json"
-  "${CMAKE_BINARY_DIR}/lib/usd/f3d/resources/plugInfo.json"
-  COPYONLY
 )
