@@ -17,10 +17,6 @@
 class vtkResourceStream;
 namespace f3d
 {
-  enum class file_availability;
-}
-namespace f3d
-{
 /**
  * @class   reader
  * @brief   The basis reader class
@@ -35,6 +31,7 @@ namespace f3d
  * @warning This file is used internally by the plugin SDK, it is not intended to be included
  * directly by libf3d users.
  */
+enum class file_availability;
 class reader
 {
 public:
