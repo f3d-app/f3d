@@ -56,3 +56,38 @@ The `ui.animation_progress` option (CLI `--animation-progress`) was a boolean to
 
 The function `f3d::context::getSymbol` function is now expecting a library full path or a filename.
 The library prefix and extension is not appended automatically anymore.
+
+## Commands
+
+The following commands have been removed and should be replaced:
+
+- `cycle_anti_aliasing` -> `cycle render.effect.antialiasing.mode`
+- `cycle_blending` -> `cycle render.effect.blending.mode`
+- `cycle_point_sprites` -> `cycle model.point_sprites.type`
+- `increase_light_intensity` -> `increase render.light.intensity` (increments are different)
+- `decrease_light_intensity` -> `decrease render.light.intensity` (increments are different)
+- `increase_opacity` -> `increase model.color.opacity`
+- `decrease_opacity` -> `decrease model.color.opacity`
+- `cycle_interactor_style` -> `cycle interactor.style`
+
+The `jump_to_frame` and `jump_to_keyframe` commands no longer take a second boolean argument and now always perform an absolute jump. To perform a relative jump, use the new `jump_to_frame_relative` and `jump_to_keyframe_relative` commands:
+
+- `jump_to_frame 10 false` -> `jump_to_frame 10`
+- `jump_to_frame 1 true` -> `jump_to_frame_relative 1`
+- `jump_to_keyframe 4 false` -> `jump_to_keyframe 4`
+- `jump_to_keyframe 1 true` -> `jump_to_keyframe_relative 1`
+
+## ui.animation_progress
+
+The `ui.animation_progress` option (CLI `--animation-progress`) was a boolean toggling a progress bar during animation playback. It is now a string selecting the progress bar mode: `none` (hidden), `default` (the progress bar alone) or `advanced` (the progress bar with time range, animation name, current time labels and keyframe markers). Replace `true` with `default` (or `advanced`) and `false` with `none`.
+
+## Context symbol
+
+The function `f3d::context::getSymbol` function is now expecting a library full path or a filename.
+The library prefix and extension is not appended automatically anymore.
+
+## scene.supports method
+`scene::supports()` method signature changed, it now returns `f3d::file_availability` enum instead of `bool`. Here is how you can check if a file is supported now:
+```cpp
+if (scene.supports("some.obj") == f3d::file_availability::SUPPORTED)
+```
