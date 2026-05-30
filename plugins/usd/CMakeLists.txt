@@ -21,12 +21,21 @@ message(STATUS "Plugin: USD ${PXR_VERSION} found")
 
 f3d_plugin_init()
 
+set(_SUPPORTS_STREAM)
+set(_has_supports_stream 0)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251016)
+  set(_SUPPORTS_STREAM SUPPORTS_STREAM)
+  set(_has_supports_stream 1)
+endif()
+
 f3d_plugin_declare_reader(
   NAME USD
   EXTENSIONS usd usdc usda usdz
   MIMETYPES application/vnd.usd application/vnd.usdc model/vnd.usda model/vnd.usdz+zip
   VTK_IMPORTER vtkF3DUSDImporter
   FORMAT_DESCRIPTION "Universal Scene Descriptor"
+  ${_SUPPORTS_STREAM}
+  CAN_READ STATIC
 )
 
 set(_additional_rpath "")
@@ -44,5 +53,6 @@ f3d_plugin_build(
   ADDITIONAL_RPATHS ${_additional_rpath}
   MIMETYPE_XML_FILES "${CMAKE_CURRENT_SOURCE_DIR}/f3d-usd-formats.xml"
   CONFIGURATION_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/configs/config.d" "${CMAKE_CURRENT_SOURCE_DIR}/configs/thumbnail.d"
+  RESOURCES "lib/usd/f3d/resources/plugInfo.json"
   FREEDESKTOP
 )

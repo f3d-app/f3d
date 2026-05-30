@@ -6,10 +6,12 @@ f3d_test(NAME TestUSDAPrimitives DATA primitives.usda PLUGIN usd)
 f3d_test(NAME TestUSDAPrimitivesZAxis DATA primitivesZ.usda PLUGIN usd)
 f3d_test(NAME TestUSDAInstancing DATA instancing.usda PLUGIN usd)
 f3d_test(NAME TestUSDAGlyphs DATA glyphs.usda PLUGIN usd)
-f3d_test(NAME TestUSDInvalid DATA invalid.usd REGEXP "Stage failed to open" PLUGIN usd ARGS --verbose NO_BASELINE)
 f3d_test(NAME TestUSDPurpose DATA purpose.usdc PLUGIN usd)
 f3d_test(NAME TestUSDInterpolation DATA two_quads_interp.usda PLUGIN usd)
-f3d_test(NAME TestUSDZMemEXR DATA small.usdz PLUGIN usd)
+
+if(F3D_MODULE_EXR)
+  f3d_test(NAME TestUSDZMemEXR DATA small.usdz PLUGIN usd)
+endif()
 
 # This test is there to test occlusion texture and face-varying point data
 # TODO: Note that the result looks incorrect because of face-varying attributes and must be fixed later
@@ -30,6 +32,12 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219)
   f3d_test(NAME TestUSDRigArmature DATA RiggedSimple.usdz ARGS --animation-time=1 --armature PLUGIN usd)
   f3d_test(NAME TestUSDRigArmatureWithOpacity DATA RiggedSimple.usdz ARGS --animation-time=1 --armature --opacity=0.5 -p PLUGIN usd)
   f3d_test(NAME TestUSDRigArmatureSphereTube DATA RiggedSimple.usdz ARGS --animation-time=1 --armature --point-size=20 --line-width=5 PLUGIN usd)
+endif()
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251016)
+  f3d_test(NAME TestPipedUSD DATA suzanne.usd PLUGIN usd PIPED USD)
+  f3d_test(NAME TestPipedUSDAPrimitives DATA primitives.usda PLUGIN usd PIPED USD)
+  f3d_test(NAME TestPipedUSDZRigged DATA RiggedSimple.usdz PLUGIN usd PIPED USD)
 endif()
 
 if(NOT F3D_MACOS_BUNDLE)

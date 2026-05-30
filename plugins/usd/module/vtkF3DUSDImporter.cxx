@@ -42,6 +42,8 @@
 #include <vtkMemoryResourceStream.h>
 #endif
 
+#include "F3DUSDMemoryResolver.h"
+
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Weverything"
@@ -56,8 +58,11 @@
 #elif defined(_MSC_VER)
 #pragma warning(push, 0)
 #endif
+#include <pxr/base/arch/symbols.h>
+#include <pxr/base/plug/registry.h>
 #include <pxr/usd/ar/asset.h>
 #include <pxr/usd/ar/resolver.h>
+#include <pxr/usd/ar/resolverContextBinder.h>
 #include <pxr/usd/usd/modelAPI.h>
 #include <pxr/usd/usd/primRange.h>
 #include <pxr/usd/usd/stage.h>
@@ -94,6 +99,25 @@ public:
     : Delegate(parent)
   {
     pxr::TfDiagnosticMgr::GetInstance().AddDelegate(&this->Delegate);
+
+    // register our own stream plugin
+    // safe to call several times
+    std::string libPath;
+    if (pxr::ArchGetAddressInfo(
+          reinterpret_cast<void*>(&vtkF3DUSDImporter::New), &libPath, nullptr, nullptr, nullptr))
+    {
+      std::string plugInfoDir = pxr::TfGetPathName(libPath) + "../lib/usd/f3d/resources/";
+
+#ifdef _WIN32
+      // On Windows, we can get a Universal Naming Convention prefix. Strip it if that's the case.
+      if (plugInfoDir.starts_with(R"(\\?\)"))
+      {
+        plugInfoDir.erase(0, 4);
+      }
+#endif
+
+      pxr::PlugRegistry::GetInstance().RegisterPlugins(plugInfoDir);
+    }
   }
 
   ~vtkInternals()
@@ -110,14 +134,31 @@ public:
     if (!this->Stage)
     {
       this->Stage = pxr::UsdStage::Open(filePath);
+      this->InitStage();
+    }
+  }
 
-      if (this->Stage)
-      {
-        // TODO: USD bake skinning is not performant
-        // We need to read joints and do the skinning in the shader
-        // See https://github.com/f3d-app/f3d/issues/1076
-        pxr::UsdSkelBakeSkinning(this->Stage->Traverse());
-      }
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+  void ReadScene(vtkResourceStream* stream, const std::string& hint)
+  {
+    if (!this->Stage)
+    {
+      this->MemoryResolverContext.Stream = stream;
+      pxr::ArResolverContext ctx(this->MemoryResolverContext);
+      this->Stage = pxr::UsdStage::Open("f3dmem:stream." + hint, ctx);
+      this->InitStage();
+    }
+  }
+#endif
+
+  void InitStage()
+  {
+    if (this->Stage)
+    {
+      // TODO: USD bake skinning is not performant
+      // We need to read joints and do the skinning in the shader
+      // See https://github.com/f3d-app/f3d/issues/1076
+      pxr::UsdSkelBakeSkinning(this->Stage->Traverse());
     }
   }
 
@@ -1044,6 +1085,7 @@ public:
         }
 
         const std::string& resolvedPath = path.GetResolvedPath();
+        pxr::ArResolverContextBinder binder(this->MemoryResolverContext);
         auto asset = pxr::ArGetResolver().OpenAsset(pxr::ArResolvedPath(resolvedPath));
 
         if (!asset)
@@ -1337,6 +1379,7 @@ public:
 
   pxr::UsdStageRefPtr Stage = nullptr;
   std::unordered_map<std::string, int> NodeIdMap;
+  F3DUSDMemoryResolverContext MemoryResolverContext;
 
 private:
   std::unordered_map<std::string,
@@ -1410,7 +1453,22 @@ int vtkF3DUSDImporter::ImportBegin()
 {
   try
   {
-    this->Internals->ReadScene(this->GetFileName());
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+    if (vtkResourceStream* stream = this->GetStream())
+    {
+      std::string hint;
+      if (!vtkF3DUSDImporter::CanReadFile(stream, hint))
+      {
+        vtkErrorMacro("Cannot determine USD format from stream");
+        return 0;
+      }
+      this->Internals->ReadScene(stream, hint);
+    }
+    else
+#endif
+    {
+      this->Internals->ReadScene(this->GetFileName());
+    }
   }
   catch (const std::runtime_error& e)
   {
@@ -1467,4 +1525,76 @@ void vtkF3DUSDImporter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "AnimationEnabled: " << std::boolalpha << this->AnimationEnabled << "\n";
+}
+
+//------------------------------------------------------------------------------
+bool vtkF3DUSDImporter::CanReadFile(vtkResourceStream* stream)
+{
+  std::string unused;
+  return vtkF3DUSDImporter::CanReadFile(stream, unused);
+}
+
+//------------------------------------------------------------------------------
+bool vtkF3DUSDImporter::CanReadFile(vtkResourceStream* stream, std::string& hint)
+{
+  if (!stream)
+  {
+    return false;
+  }
+
+  // USDC: binary crate format, magic "PXR-USDC" (8 bytes)
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  constexpr std::string_view usdcMagic{ "PXR-USDC", 8 };
+  std::array<char, 8> magic8;
+  if (stream->Read(magic8.data(), magic8.size()) == magic8.size())
+  {
+    if (std::string_view(magic8.data(), magic8.size()) == usdcMagic)
+    {
+      hint = "usdc";
+      return true;
+    }
+  }
+
+  // USDZ: ZIP archive, magic "PK\x03\x04" (4 bytes)
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  uint32_t zipMagic = 0;
+  if (stream->Read(&zipMagic, sizeof(zipMagic)) == sizeof(zipMagic))
+  {
+    if (zipMagic == 0x04034b50u)
+    {
+      // It's a zip file, now confirm the first file is a USD file
+      // see https://openusd.org/release/spec_usdz.html#layout
+      uint8_t header[26]; // bytes 4 to 29
+      if (stream->Read(header, sizeof(header)) == sizeof(header))
+      {
+        uint16_t nameLen;
+        std::memcpy(&nameLen, header + 22, 2);
+        std::string firstName(nameLen, '\0');
+        if (stream->Read(firstName.data(), nameLen) == nameLen)
+        {
+          if (firstName.ends_with(".usd") || firstName.ends_with(".usdc") ||
+            firstName.ends_with(".usda"))
+          {
+            hint = "usdz";
+            return true;
+          }
+        }
+      }
+    }
+  }
+
+  // USDA: ASCII text, starts with "#usda" (5 bytes)
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  constexpr std::string_view usdaMagic{ "#usda", 5 };
+  std::array<char, 5> magic5;
+  if (stream->Read(magic5.data(), magic5.size()) == magic5.size())
+  {
+    if (std::string_view(magic5.data(), magic5.size()) == usdaMagic)
+    {
+      hint = "usda";
+      return true;
+    }
+  }
+
+  return false;
 }
