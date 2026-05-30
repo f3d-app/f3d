@@ -30,6 +30,7 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include <vtkVersion.h>
 
 namespace fs = std::filesystem;
 
@@ -220,6 +221,7 @@ image::image(const fs::path& filePath)
 image::image(std::byte* buffer, std::size_t size)
   : Internals(new image::internals())
 {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260128)
   detail::init::initialize();
 
   if (buffer == nullptr)
@@ -269,6 +271,11 @@ image::image(std::byte* buffer, std::size_t size)
     delete this->Internals;
     throw read_exception("Cannot read image from buffer");
   }
+
+#else
+  delete this->Internals;
+  throw read_exception("VTK >= v9.6.20260128 is required for streaming images");
+#endif
 }
 
 //----------------------------------------------------------------------------
