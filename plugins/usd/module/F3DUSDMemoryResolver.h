@@ -27,8 +27,7 @@ protected:
     const std::string& assetPath, const pxr::ArResolvedPath& anchorAssetPath) const override;
 
   /**
-   * Returns assetPath as the identifier, ignoring anchorAssetPath since it is not relevant for this
-   * resolver.
+   * Returns a resolved path copying assetPath as is.
    */
   pxr::ArResolvedPath _Resolve(const std::string& assetPath) const override;
 

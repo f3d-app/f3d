@@ -109,7 +109,7 @@ public:
       std::string plugInfoDir = pxr::TfGetPathName(libPath) + "../lib/usd/f3d/resources/";
 
 #ifdef _WIN32
-      // On Windows, we can get a UNC prefix. Strip it if that's the case.
+      // On Windows, we can get a Universal Naming Convention prefix. Strip it if that's the case.
       if (plugInfoDir.starts_with(R"(\\?\)"))
       {
         plugInfoDir.erase(0, 4);
