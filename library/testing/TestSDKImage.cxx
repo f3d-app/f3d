@@ -111,9 +111,9 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   hdrImg.save(tmpDir + "/TestSDKImage32hdr.tif", f3d::image::SaveFormat::TIF);
 
   // check reading stream
-  std::vector<unsigned char> buffer = generated.saveBuffer();
-  std::byte* bufferData = reinterpret_cast<std::byte*>(buffer.data());
-  f3d::image bufferImage(bufferData, buffer.size());
+  std::vector<unsigned char> generatedBuffer = generated.saveBuffer();
+  std::byte* bufferData = reinterpret_cast<std::byte*>(generatedBuffer.data());
+  f3d::image bufferImage(bufferData, generatedBuffer.size());
   test("check loading stream from image reader", generated.compare(bufferImage), 0.0);
 
   // check reading inexistent/null stream
