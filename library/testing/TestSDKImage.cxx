@@ -2,6 +2,8 @@
 
 #include <image.h>
 
+#include <vtkVersion.h>
+
 #include <algorithm>
 #include <fstream>
 #include <functional>
@@ -111,20 +113,28 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   hdrImg.save(tmpDir + "/TestSDKImage32hdr.tif", f3d::image::SaveFormat::TIF);
 
   // check reading stream
-  std::vector<unsigned char> buffer = generated.saveBuffer();
-  std::byte* bufferData = reinterpret_cast<std::byte*>(buffer.data());
-  f3d::image bufferImage(bufferData, buffer.size());
-  test("check loading stream from image reader", generated.compare(bufferImage), 0.0);
+  std::vector<unsigned char> imageBuffer = generated.saveBuffer();
+  std::byte* bufferData = reinterpret_cast<std::byte*>(imageBuffer.data());
+
+  #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260128)
+  test("check loading stream from image reader",
+      generated.compare(f3d::image bufferImage(bufferData, buffer.size())), 0.0);
 
   // check reading inexistent/null stream
-  test.expect<f3d::image::read_exception>(
-    "read image from invalid/null stream", [&]() { f3d::image nullImgStream(nullptr, 10); });
+  test.expect<f3d::image::read_exception>("read image from invalid/null stream",
+                                          [&]() { f3d::image nullImgStream(nullptr, 10); });
 
   // check reading invalid stream
   std::vector<unsigned char> invalidBuffer = { 0, 1, 2, 3, 4, 5 };
   std::byte* invalidBufferData = reinterpret_cast<std::byte*>(invalidBuffer.data());
-  test.expect<f3d::image::read_exception>("read image from invalid stream",
-    [&]() { f3d::image invalidImgStream(invalidBufferData, 10); });
+  test.expect<f3d::image::read_exception>("read image from invalid stream", [&]() {
+    f3d::image invalidImgStream(invalidBufferData, 10);
+  });
+  #else
+  test.expect<f3d::image::read_exception>("read image stream with unsupported vtk version", [&]() {
+    f3d::image bufferImage(bufferData, buffer.size());
+  });
+  #endif
 
 #if F3D_MODULE_EXR
   // check reading EXR
