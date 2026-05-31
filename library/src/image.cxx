@@ -217,7 +217,7 @@ image::image(const fs::path& filePath)
 }
 
 //----------------------------------------------------------------------------
-image::image(std::byte* buffer, std::size_t size)
+image::image([[maybe_unused]] std::byte* buffer, [[maybe_unused]] std::size_t size)
   : Internals(new image::internals())
 {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260128)
@@ -272,6 +272,9 @@ image::image(std::byte* buffer, std::size_t size)
   }
 
 #else
+  buffer = buffer;
+  size = size;
+
   delete this->Internals;
   throw read_exception("VTK >= v9.6.20260128 is required for streaming images");
 #endif
