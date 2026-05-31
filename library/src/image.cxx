@@ -272,9 +272,6 @@ image::image([[maybe_unused]] std::byte* buffer, [[maybe_unused]] std::size_t si
   }
 
 #else
-  buffer = buffer;
-  size = size;
-
   delete this->Internals;
   throw read_exception("VTK >= v9.6.20260128 is required for streaming images");
 #endif
