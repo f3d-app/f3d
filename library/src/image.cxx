@@ -30,7 +30,6 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
-#include <vtkVersion.h>
 
 namespace fs = std::filesystem;
 
