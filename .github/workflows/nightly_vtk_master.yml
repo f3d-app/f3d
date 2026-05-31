@@ -77,8 +77,8 @@ jobs:
           - build_type: osmesa
             os: ubuntu-24.04
             rendering_backend: osmesa
-    runs-on: ubuntu-24.04
-    container: ghcr.io/f3d-app/f3d-ci
+    runs-on: ${{matrix.os}}
+    container: ${{ matrix.os == 'ubuntu-24.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
