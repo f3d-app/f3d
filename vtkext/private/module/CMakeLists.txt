@@ -132,6 +132,15 @@ if(F3D_MODULE_WEBP)
 endif()
 
 if(F3D_MODULE_UI AND NOT F3D_USE_EXTERNAL_IMGUI)
+  list(APPEND sources
+    "${F3D_SOURCE_DIR}/external/imgui/imgui.cpp"
+    "${F3D_SOURCE_DIR}/external/imgui/imgui_demo.cpp"
+    "${F3D_SOURCE_DIR}/external/imgui/imgui_draw.cpp"
+    "${F3D_SOURCE_DIR}/external/imgui/imgui_tables.cpp"
+    "${F3D_SOURCE_DIR}/external/imgui/imgui_widgets.cpp")
+endif()
+
+if(F3D_USE_EXTERNAL_CLIP)
   if(APPLE)
     list(APPEND sources "${F3D_SOURCE_DIR}/external/clip/clip_osx.mm")
 
@@ -143,11 +152,6 @@ if(F3D_MODULE_UI AND NOT F3D_USE_EXTERNAL_IMGUI)
   endif()
 
   list(APPEND sources
-    "${F3D_SOURCE_DIR}/external/imgui/imgui.cpp"
-    "${F3D_SOURCE_DIR}/external/imgui/imgui_demo.cpp"
-    "${F3D_SOURCE_DIR}/external/imgui/imgui_draw.cpp"
-    "${F3D_SOURCE_DIR}/external/imgui/imgui_tables.cpp"
-    "${F3D_SOURCE_DIR}/external/imgui/imgui_widgets.cpp"
     "${F3D_SOURCE_DIR}/external/clip/clip_none.cpp"
     "${F3D_SOURCE_DIR}/external/clip/clip.cpp")
 endif()
