@@ -23,7 +23,7 @@ please take a look at our [getting started guide](04-GETTING_STARTED.md).
 - Optionally, [web-ifc](https://github.com/ThatOpen/engine_web-ifc) >= 0.75 (only C++ library).
 - Optionally, [OSPray](https://www.ospray.org/) == 2.12.0, enable `RenderingRayTracing` module during VTK configuration.
 - Optionally, [Draco](https://google.github.io/draco/) >= 1.5.6.
-- Optionally, [Python](https://www.python.org/) >= 3.10 and [pybind11](https://github.com/pybind/pybind11) >= 2.9.2.
+- Optionally, [Python](https://www.python.org/) >= 3.10 and [pybind11](https://github.com/pybind/pybind11) >= 3.0.0.
 - Optionally, [Java](https://www.java.com) >= 17.
 - Optionally, [OpenEXR](https://openexr.com/en/latest/) >= 3.0.1.
 - Optionally, [WebP](https://chromium.googlesource.com/webm/libwebp) >= 1.2.4.
