@@ -36,6 +36,8 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "Universal Scene Descriptor"
   ${_SUPPORTS_STREAM}
   CAN_READ STATIC
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/usd.inl"
+  OPTIONS resources_path
 )
 
 set(_additional_rpath "")
