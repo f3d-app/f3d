@@ -1642,7 +1642,6 @@ public:
   }
 
   pxr::UsdStageRefPtr Stage = nullptr;
-  std::unordered_map<std::string, int> NodeIdMap;
   F3DUSDMemoryResolverContext MemoryResolverContext;
 
 private:
