@@ -101,6 +101,13 @@ public:
    */
   bool UpdateAtTimeValue(double timeValue) override;
 
+  /**
+   * Set additional resources path to find plugInfo.json files
+   * It's usually not needed except if the files location is not relative to the binaries,
+   * which can be the case on sandboxed environment like Android.
+   */
+  void SetResourcesPath(const std::string& path);
+
 protected:
   vtkF3DUSDImporter();
   ~vtkF3DUSDImporter() override;

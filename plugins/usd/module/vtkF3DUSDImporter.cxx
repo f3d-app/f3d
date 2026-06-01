@@ -1598,3 +1598,9 @@ bool vtkF3DUSDImporter::CanReadFile(vtkResourceStream* stream, std::string& hint
 
   return false;
 }
+
+//------------------------------------------------------------------------------
+void vtkF3DUSDImporter::SetResourcesPath(const std::string& path)
+{
+  pxr::PlugRegistry::GetInstance().RegisterPlugins(path);
+}

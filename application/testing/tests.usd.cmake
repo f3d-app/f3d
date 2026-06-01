@@ -13,6 +13,9 @@ if(F3D_MODULE_EXR)
   f3d_test(NAME TestUSDZMemEXR DATA small.usdz PLUGIN usd)
 endif()
 
+# This test only covers the reader option, as providing a new path is not required to make the test pass
+f3d_test(NAME TestUSDDefines DATA suzanne.usd PLUGIN usd ARGS -DUSD.resources_path=/foo/bar NO_BASELINE)
+
 # This test is there to test occlusion texture and face-varying point data
 # TODO: Note that the result looks incorrect because of face-varying attributes and must be fixed later
 f3d_test(NAME TestUSDTeapot DATA Teapot.usd PLUGIN usd)
