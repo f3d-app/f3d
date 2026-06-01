@@ -658,8 +658,8 @@ public:
                       totalWeight += influences[j].first;
                     }
 
-                    // Re-normalize after truncation
-                    if (totalWeight > 0.0f && totalWeight < 0.999f)
+                    // Re-normalize after potential truncation
+                    if (totalWeight > 0.0f)
                     {
                       for (int j = 0; j < components; j++)
                       {
