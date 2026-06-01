@@ -1086,7 +1086,7 @@ public:
             if (jointMatrices.size() > 0)
             {
               uniforms->SetUniformMatrix4x4v(
-               "jointMatrices", static_cast<int>(skinningXforms.size()), jointMatrices.data());
+                "jointMatrices", static_cast<int>(skinningXforms.size()), jointMatrices.data());
             }
 
             // Morphing: compute blend shape deformations and update points
