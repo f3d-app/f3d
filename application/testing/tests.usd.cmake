@@ -8,6 +8,7 @@ f3d_test(NAME TestUSDAInstancing DATA instancing.usda PLUGIN usd)
 f3d_test(NAME TestUSDAGlyphs DATA glyphs.usda PLUGIN usd)
 f3d_test(NAME TestUSDPurpose DATA purpose.usdc PLUGIN usd)
 f3d_test(NAME TestUSDInterpolation DATA two_quads_interp.usda PLUGIN usd)
+f3d_test(NAME TestUSDUnsupportedGeom DATA nurb.usda ARGS --verbose REGEXP "Unknown geometry type" PLUGIN usd NO_BASELINE)
 
 if(F3D_MODULE_EXR)
   f3d_test(NAME TestUSDZMemEXR DATA small.usdz PLUGIN usd)

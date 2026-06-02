@@ -756,6 +756,12 @@ public:
           transform->Update();
           polydata = vtkPolyData::SafeDownCast(transform->GetOutput());
         }
+        else
+        {
+          // unsupported primitive, fallback to an empty polydata
+          vtkWarningWithObjectMacro(nullptr, "Unknown geometry type: " << prim.GetName());
+          polydata = vtkSmartPointer<vtkPolyData>::New();
+        }
 
         // create actors
 
