@@ -28,6 +28,7 @@ reader* pickReader(const std::vector<plugin*>& plugins, std::optional<std::strin
       {
         if (reader->getName() == *forceReader)
         {
+          availability = file_availability::SUPPORTED;
           return reader.get();
         }
       }
