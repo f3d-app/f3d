@@ -596,6 +596,25 @@ public:
 #endif
 #endif
 
+    libOptions.tester.flag = true;
+    libOptions.tester.radius = 9;
+    std::cout<<"radius 9: " << libOptions.tester.radius.isValid()<<std::endl;
+    libOptions.tester.radius = -5;
+    std::cout<<"radius -5 "<< libOptions.tester.radius.isValid()<<std::endl;
+    libOptions.tester.size = 100;
+    std::cout<<" size 100 " << libOptions.tester.size.isValid()<<std::endl;
+    libOptions.tester.size = 200;
+    std::cout<<" size 200 " << libOptions.tester.size.isValid()<<std::endl;
+/*    libOptions.tester.scale = f3d::ratio_t(0.5);
+    libOptions.tester.type = "foo";
+    libOptions.tester.file = "path/to/foo";
+    libOptions.tester.indices = {1,2};
+    libOptions.tester.opacity_map = {1.1,2.2};
+    libOptions.tester.color = f3d::color_t{0,0,0};
+    libOptions.tester.up_direction = f3d::direction_t{1,0,0};
+    libOptions.tester.colormap = f3d::colormap_t{1,0,0,0};
+    libOptions.tester.textures_transform = f3d::transform2d_t{1,0,0,0,1,0,0,0,1};*/
+
     // Copy appOptions
     F3DOptionsTools::OptionsDict appOptions = F3DOptionsTools::DefaultAppOptions;
 
