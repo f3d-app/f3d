@@ -605,6 +605,7 @@ public:
     std::cout<<" size 100 " << libOptions.tester.size.isValid()<<std::endl;
     libOptions.tester.size = 200;
     std::cout<<" size 200 " << libOptions.tester.size.isValid()<<std::endl;
+    std::cout<<libOptions.tester.size.getDomain().size()<<std::endl;
 /*    libOptions.tester.scale = f3d::ratio_t(0.5);
     libOptions.tester.type = "foo";
     libOptions.tester.file = "path/to/foo";

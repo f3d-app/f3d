@@ -251,33 +251,38 @@ public:
       option_range(const T& val)
         : option<T>(val){}
       option_range(T&& val) noexcept
-        : option<T>(val){}
+        : option<T>(std::move(val)){}
 
-      bool isValid()
+      const bool isValid()
       {
-        return this->Value >= this->Domain[0] && this->Value <= this->Domain[1];
+        return this->Value >= MIN && this->Value <= MAX;
       }
 
-      const std::array<T,2>& getDomain()
+      constexpr std::array<T,2> getDomain()
       {
-        return this->Domain;
+        return {MIN, MAX};
       }
-
-    private:
-      std::array<T, 2> Domain{MIN, MAX};
   };
 
-  template<typename T, std::size_t N, T... DOMAIN>
+  template<typename T, std::size_t N>
   class option_enum : public option<T>
   {
     public:
 
-      option_enum(const T& val)
+      option_enum(const T& val, const std::array<T, N>& domain)
         : option<T>(val)
+        , Domain({domain})
       {
       }
-      option_enum(T&& val) noexcept
-        : option<T>(val)
+
+      void operator=(const T& val)
+      {
+        this->Value = val;
+      }
+
+      option_enum(T&& val, std::array<T, N> domain) noexcept
+        : option<T>(std::move(val))
+        , Domain(std::move(domain))
       {
       }
 
@@ -286,19 +291,19 @@ public:
         return std::ranges::find(this->Domain, this->Value) != this->Domain.end();
       }
 
-      const std::array<T, N>& getDomain()
+      std::array<T,N>& getDomain()
       {
         return this->Domain;
       }
-
     private:
-      std::array<T, N> Domain{DOMAIN...};
+      std::array<T,N> Domain;
+
   };
 
     struct tester {
     option<bool> flag = false;
     option_range<int, 0, 100> radius = option_range<int, 0, 100>(10);
-    option_enum<double,3, 0., 10., 100.> size = option_enum<double,3, 0., 10., 100.> (10.);
+    option_enum<double, 3> size = option_enum<double, 3>(10., {0., 10., 100.});
 //    option<2, f3d::ratio_t> scale = f3d::ratio_t{1.0};
 //    option<3, std::string> type = option(std::string("sphere"), domain{"foo", "bar", "bok"});
 /*    option<std::optional<std::filesystem::path>> file;
