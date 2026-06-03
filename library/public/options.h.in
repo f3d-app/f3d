@@ -202,59 +202,16 @@ public:
     explicit no_value_exception(const std::string& what = "");
   };
 
-  template<std::size_t N, typename T>
-  struct domain
-  {
-    domain() = default;
-    ~domain() = default;
-    domain(const domain& opt) = default;
-
-    domain(const std::array<T, N>& vals)
-      : Values(vals)
-    {}
-
-    domain(std::array<T, N>&& vals)
-      : Values(std::move(vals))
-    {}
-
-    virtual bool isValid(const T& val)
-    {
-      return std::ranges::find(this->Values, val) != this->Values.end();
-    }
-
-    std::array<T, N> Values;
-  };
-
   template<typename T>
-  struct domain_range : public domain<2, T>
-  {
-    domain_range(T min, T max)
-      : domain<2, T>(std::array<T, 2>({min, max}))
-    {
-    }
-
-    bool isValid(const T& val) override
-    {
-      return val >= this->Values[0] && val <= this->Values[1];
-    }
-  };
-
-  template<std::size_t N, typename T>
   class option
   {
     public:
-      option() = default;
-      ~option() = default;
-      option(const option& opt) = default;
+      //option() = default;
+      //~option() = default;
+      //option(const option& opt) = default;
 
       option(const T& val)
         : Value(val)
-        {
-        }
-
-      option(const T& val, const domain<N,T>& domain)
-        : Value(val)
-        , Domain(domain)
         {
         }
 
@@ -265,12 +222,6 @@ public:
 
       option(T&& val) noexcept
       : Value(std::move(val))
-      {
-      }
-
-      option(T&& val, domain<N, T>&& domain) noexcept
-      : Value(std::move(val))
-      , Domain(std::move(domain))
       {
       }
 
@@ -289,25 +240,65 @@ public:
         return this->Value;
       }
 
+    protected:
+      T Value;
+  };
+
+  template<typename T, T MIN, T MAX>
+  class option_range : public option<T>
+  {
+    public:
+      option_range(const T& val)
+        : option<T>(val){}
+      option_range(T&& val) noexcept
+        : option<T>(val){}
+
       bool isValid()
       {
-        return this->Domain.isValid(this->Value);
+        return this->Value >= this->Domain[0] && this->Value <= this->Domain[1];
       }
 
-      const domain<N,T>& getDomain()
+      const std::array<T,2>& getDomain()
       {
         return this->Domain;
       }
 
     private:
-      T Value;
-      domain<N, T> Domain;
+      std::array<T, 2> Domain{MIN, MAX};
+  };
+
+  template<typename T, std::size_t N, T... DOMAIN>
+  class option_enum : public option<T>
+  {
+    public:
+
+      option_enum(const T& val)
+        : option<T>(val)
+      {
+      }
+      option_enum(T&& val) noexcept
+        : option<T>(val)
+      {
+      }
+
+      bool isValid()
+      {
+        return std::ranges::find(this->Domain, this->Value) != this->Domain.end();
+      }
+
+      const std::array<T, N>& getDomain()
+      {
+        return this->Domain;
+      }
+
+    private:
+      std::array<T, N> Domain{DOMAIN...};
   };
 
     struct tester {
-    option<2, bool> flag = false;
-    option<2, int> radius = option(10, domain_range(0, 100));
-    option<3, double> size = option(10., domain<3, double>({0., 10., 100.}));
+    option<bool> flag = false;
+    option_range<int, 0, 100> radius = option_range<int, 0, 100>(10);
+    option_enum<double,3, 0., 10., 100.> size = option_enum<double,3, 0., 10., 100.> (10.);
 //    option<2, f3d::ratio_t> scale = f3d::ratio_t{1.0};
 //    option<3, std::string> type = option(std::string("sphere"), domain{"foo", "bar", "bok"});
 /*    option<std::optional<std::filesystem::path>> file;
