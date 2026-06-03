@@ -1246,12 +1246,13 @@ void vtkF3DRenderer::ConfigureHDRIReader()
 
     if (!this->HDRIReader)
     {
-      this->HDRIReader = vtkSmartPointer<vtkHDRReader>::New();
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+      this->HDRIReader = vtkSmartPointer<vtkHDRReader>::New();
       vtkNew<vtkMemoryResourceStream> stream;
       stream->SetBuffer(F3DDefaultHDRI, sizeof(F3DDefaultHDRI));
       this->HDRIReader->SetStream(stream);
 #else
+      this->HDRIReader = vtkSmartPointer<vtkPNGReader>::New();
       this->HDRIReader->SetMemoryBuffer(F3DDefaultHDRI);
       this->HDRIReader->SetMemoryBufferLength(sizeof(F3DDefaultHDRI));
 #endif
