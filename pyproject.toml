@@ -61,6 +61,9 @@ F3D_BUILD_APPLICATION = "OFF"
 F3D_WINDOWS_BUILD_SHELL_THUMBNAILS_EXTENSION = "OFF"
 F3D_ENABLE_SOVERSION = "OFF"
 
+[dependency-groups]
+dev = ["pytest", "pybind11[global]"]
+
 [tool.pytest.ini_options]
 addopts = "-rA"
 filterwarnings = "ignore::DeprecationWarning"

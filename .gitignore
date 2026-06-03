@@ -11,6 +11,7 @@ dist
 # python usage related
 __pycache__
 *.pyc
+.venv
 
 # python wheel process related
 _version.py
