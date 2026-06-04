@@ -633,7 +633,7 @@ public:
                   std::vector<std::pair<float, int>> influences;
                   influences.reserve(numInfluences);
 
-                  for (size_t i = 0; i < positions.size(); i++)
+                  for (std::size_t i = 0; i < positions.size(); i++)
                   {
                     // point influences
                     influences.resize(numInfluences);
@@ -943,7 +943,7 @@ public:
       skelQuery.ComputeJointWorldTransforms(&jointXforms, &xfCache);
 
       const pxr::UsdSkelTopology& topology = skelQuery.GetTopology();
-      size_t numJoints = topology.GetNumJoints();
+      std::size_t numJoints = topology.GetNumJoints();
 
       if (numJoints > 0)
       {
@@ -955,13 +955,13 @@ public:
           vtkNew<vtkCellArray> vertices;
           vtkNew<vtkCellArray> lines;
 
-          for (size_t i = 0; i < numJoints; i++)
+          for (std::size_t i = 0; i < numJoints; i++)
           {
             vtkIdType vId = static_cast<vtkIdType>(i);
             vertices->InsertNextCell(1, &vId);
           }
 
-          for (size_t i = 0; i < numJoints; i++)
+          for (std::size_t i = 0; i < numJoints; i++)
           {
             int parentIdx = topology.GetParent(i);
             if (parentIdx >= 0)
@@ -996,7 +996,7 @@ public:
         // Update joint positions
         vtkNew<vtkPoints> points;
         points->SetNumberOfPoints(static_cast<vtkIdType>(numJoints));
-        for (size_t i = 0; i < numJoints; i++)
+        for (std::size_t i = 0; i < numJoints; i++)
         {
           pxr::GfVec3d pos = jointXforms[i].ExtractTranslation();
           points->SetPoint(static_cast<vtkIdType>(i), pos[0], pos[1], pos[2]);
