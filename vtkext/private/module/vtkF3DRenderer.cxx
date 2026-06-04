@@ -285,6 +285,7 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
 void vtkF3DRenderer::Initialize()
 {
   this->OriginalLightIntensities.clear();
+  this->OriginalBackfaceCulling.clear();
   this->RemoveAllViewProps();
   this->RemoveAllLights();
 
@@ -2522,11 +2523,27 @@ void vtkF3DRenderer::ConfigureActorsProperties()
       coloring.Actor->GetProperty()->SetPointSize(this->PointSize.value());
       coloring.OriginalActor->GetProperty()->SetPointSize(this->PointSize.value());
     }
+    
+    vtkProperty* prop = coloring.Actor->GetProperty();
+    vtkProperty* origProp = coloring.OriginalActor->GetProperty();
+    if (this->OriginalBackfaceCulling.count(prop) == 0)
+    {
+      this->OriginalBackfaceCulling[prop] = (prop->GetBackfaceCulling() != 0);
+    }
+    if (this->OriginalBackfaceCulling.count(origProp) == 0)
+    {
+      this->OriginalBackfaceCulling[origProp] = (origProp->GetBackfaceCulling() != 0);
+    }
 
     if (setBackfaceCulling)
     {
-      coloring.Actor->GetProperty()->SetBackfaceCulling(backfaceCulling);
-      coloring.OriginalActor->GetProperty()->SetBackfaceCulling(backfaceCulling);
+      prop->SetBackfaceCulling(backfaceCulling);
+      origProp->SetBackfaceCulling(backfaceCulling);
+    }
+    else
+    {
+      prop->SetBackfaceCulling(this->OriginalBackfaceCulling[prop]);
+      origProp->SetBackfaceCulling(this->OriginalBackfaceCulling[origProp]);
     }
 
     if (surfaceColor)
