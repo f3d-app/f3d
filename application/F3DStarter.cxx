@@ -590,7 +590,11 @@ public:
     f3d::options libOptions;
 #if F3D_MODULE_UI
 #if F3D_MODULE_TINYFILEDIALOGS
-    libOptions.ui.drop_zone.custom_binds = "None+Drop Ctrl+O None+H";
+    std::string ctrlBinding = "Ctrl";
+#ifdef __APPLE__
+    ctrlBinding = "Cmd";
+#endif
+    libOptions.ui.drop_zone.custom_binds = std::format("None+Drop {}+O None+H", ctrlBinding);
 #else
     libOptions.ui.drop_zone.custom_binds = "None+Drop None+H";
 #endif
@@ -924,27 +928,33 @@ public:
       f3d::interactor& interactor = this->Engine->getInteractor();
       interactor.initBindings();
 
+      mod_t ctrlModifier = mod_t::CTRL;
+
+#ifdef __APPLE__
+      ctrlModifier = mod_t::CMD;
+#endif
+
       // clang-format off
       interactor.addBinding({ mod_t::NONE, "Left" }, "load_previous_file_group", "Others", std::bind(docString, "Load previous file group"));
       interactor.addBinding({ mod_t::NONE, "Right" }, "load_next_file_group", "Others", std::bind(docString, "Load next file group"));
-      interactor.addBinding({ mod_t::CTRL, "Left" }, "load_previous_file_group true", "Others", std::bind(docString, "Load previous file group, keeping camera"));
-      interactor.addBinding({ mod_t::CTRL, "Right" }, "load_next_file_group true", "Others", std::bind(docString, "Load next file group, keeping camera"));
+      interactor.addBinding({ ctrlModifier, "Left" }, "load_previous_file_group true", "Others", std::bind(docString, "Load previous file group, keeping camera"));
+      interactor.addBinding({ ctrlModifier, "Right" }, "load_next_file_group true", "Others", std::bind(docString, "Load next file group, keeping camera"));
       interactor.addBinding({ mod_t::NONE, "Up" }, "reload_current_file_group", "Others", std::bind(docString, "Reload current file group"));
       interactor.addBinding({ mod_t::NONE, "Down" }, "add_current_directories", "Others", std::bind(docString, "Add files from dir of current file"));
       interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others", std::bind(docString, "Take a screenshot"));
 #if F3D_MODULE_TINYFILEDIALOGS
-      interactor.addBinding({ mod_t::CTRL, "O" }, "open_file_dialog", "Others", std::bind(docString, "Open File Dialog"), f3d::interactor::BindingType::OTHER, true);
+      interactor.addBinding({ ctrlModifier, "O" }, "open_file_dialog", "Others", std::bind(docString, "Open File Dialog"), f3d::interactor::BindingType::OTHER, true);
 #endif
-      interactor.addBinding({ mod_t::CTRL, "F12" }, "take_minimal_screenshot", "Others", std::bind(docString, "Take a minimal screenshot"));
+      interactor.addBinding({ ctrlModifier, "F12" }, "take_minimal_screenshot", "Others", std::bind(docString, "Take a minimal screenshot"));
 
       // This replace an existing default binding command in the libf3d
       interactor.removeBinding({ mod_t::NONE, "Drop" });
       interactor.addBinding({ mod_t::NONE, "Drop" }, "add_files_or_set_hdri", "Others", std::bind(docString, "Load dropped files, folder or HDRI"), f3d::interactor::BindingType::OTHER, true);
-      interactor.addBinding({ mod_t::CTRL, "Drop" }, "add_files", "Others", std::bind(docString, "Load dropped files or folder"), f3d::interactor::BindingType::OTHER, true);
+      interactor.addBinding({ ctrlModifier, "Drop" }, "add_files", "Others", std::bind(docString, "Load dropped files or folder"), f3d::interactor::BindingType::OTHER, true);
       interactor.addBinding({ mod_t::SHIFT, "Drop" }, "set_hdri", "Others", std::bind(docString, "Set HDRI and use it"), f3d::interactor::BindingType::OTHER, true);
 
-      interactor.removeBinding({mod_t::CTRL, "Q"});
-      interactor.addBinding({mod_t::CTRL, "Q"}, "exit", "Others", std::bind(docString, "Quit"), f3d::interactor::BindingType::OTHER, true);
+      interactor.removeBinding({ctrlModifier, "Q"});
+      interactor.addBinding({ctrlModifier, "Q"}, "exit", "Others", std::bind(docString, "Quit"), f3d::interactor::BindingType::OTHER, true);
       // clang-format on
 
       f3d::log::debug("Adding config defined bindings if any: ");
