@@ -52,7 +52,7 @@
           "longName": "skip-content-check",
           "helpText": "Make attempt to read file of specific extension without checking it's header",
           "valueHelper": "<bool>",
-          "implicitValue": "0"
+          "implicitValue": "1"
         },
         {
           "longName": "list-bindings",
