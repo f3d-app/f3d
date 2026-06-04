@@ -1049,7 +1049,7 @@ public:
               this->ConvertMatrix(xfCache.GetLocalToWorldTransform(prim));
             vtkMatrix4x4::Multiply4x4(this->RootTransform, skelToWorld, skelToWorld);
 
-            // Geometry bind transform (mesh local → skel space at bind time)
+            // Geometry bind transform (mesh local -> skel space at bind time)
             vtkSmartPointer<vtkMatrix4x4> geomBind =
               this->ConvertMatrix(skinTarget.GetGeomBindTransform());
 
