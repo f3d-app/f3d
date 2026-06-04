@@ -36,7 +36,11 @@ jobs:
 
       - name: non-ASCII check
         shell: bash
-        run: grep -rPn --include="*.h" --include="*.cxx" '[[:^ascii:]]' .
+        run: |
+          if grep -rPn --include="*.h" --include="*.cxx" '[[:^ascii:]]' .; then
+            echo "::error::Non-ASCII characters detected"
+            exit 1
+          fi
 
       - name: C++ Formatting
         uses: DoozyX/clang-format-lint-action@8b8bbdd8669eec54682e720ebe2fb19d9387fdb0

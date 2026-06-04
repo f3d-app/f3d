@@ -147,7 +147,7 @@ protected:
   {
     int key = event->key();
 
-    // A–Z -> "A"..."Z"
+    // A-Z -> "A"..."Z"
     if (key >= Qt::Key_A && key <= Qt::Key_Z)
     {
       char c = static_cast<char>(key);
