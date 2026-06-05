@@ -44,8 +44,6 @@ vtkF3DStochasticTransparentPass::~vtkF3DStochasticTransparentPass()
 //------------------------------------------------------------------------------
 void vtkF3DStochasticTransparentPass::Render(const vtkRenderState* s)
 {
-  this->RenWin = static_cast<vtkOpenGLRenderWindow*>(s->GetRenderer()->GetRenderWindow());
-
   // Setup vtkOpenGLRenderPass
   this->PreRender(s);
 
