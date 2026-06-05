@@ -90,7 +90,11 @@ Only VTK is added to the manifest file and additional dependencies must be added
 
 ## Python bindings
 
-To build the Python bindings, create and activate a Python virtual environment first:
+### Requirements
+
+Only `pybind11` should be available on your system to build python bindings. Additionally, `pytest` and `numpy` must be available to run tests.
+
+In case of issues getting these dependencies, you can optionally create a virtual environment:
 
     python -m venv .venv
     source .venv/bin/activate
@@ -101,6 +105,8 @@ Install the required Python dependencies:
 
 > **Note**: Require pip 25.1 or higher. You can upgrade pip using `python -m pip install --upgrade pip`.
 
+### Build
+
 Configure CMake with the `F3D_BINDINGS_PYTHON` option enabled:
 
     cmake -DF3D_BINDINGS_PYTHON=ON [...]
@@ -108,6 +114,8 @@ Configure CMake with the `F3D_BINDINGS_PYTHON` option enabled:
 Build the project:
 
     cmake --build . --target pyf3d
+
+### Test
 
 Run the Python bindings tests with ctest:
 
