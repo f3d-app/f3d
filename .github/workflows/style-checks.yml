@@ -27,20 +27,20 @@ jobs:
           fetch-depth: 1
           lfs: false
 
-      # Run codespell first to avoid issues with style check on same location
-      - name: Codespell in place
-        shell: bash
-        run: |
-          pip install codespell
-          codespell -fHw .
-
-      - name: non-ASCII check
+      - name: non-ASCII check in C++ files
         shell: bash
         run: |
           if grep -rPn --include="*.h" --include="*.cxx" '[[:^ascii:]]' .; then
             echo "::error::Non-ASCII characters detected"
             exit 1
           fi
+
+      # Run codespell first to avoid issues with style check on same location
+      - name: Codespell in place
+        shell: bash
+        run: |
+          pip install codespell
+          codespell -fHw .
 
       - name: C++ Formatting
         uses: DoozyX/clang-format-lint-action@8b8bbdd8669eec54682e720ebe2fb19d9387fdb0
