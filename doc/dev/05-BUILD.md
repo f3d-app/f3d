@@ -107,7 +107,7 @@ Install the required Python dependencies:
 
 ### Build
 
-Configure CMake with the `F3D_BINDINGS_PYTHON` option enabled:
+Configure F3D with the `F3D_BINDINGS_PYTHON` CMake option enabled:
 
     cmake -DF3D_BINDINGS_PYTHON=ON [...]
 
