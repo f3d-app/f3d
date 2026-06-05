@@ -206,9 +206,9 @@ public:
   class option
   {
     public:
-      //option() = default;
-      //~option() = default;
-      //option(const option& opt) = default;
+      option() = default;
+      ~option() = default;
+      option(const option& opt) = default;
 
       option(const T& val)
         : Value(val)
@@ -304,15 +304,18 @@ public:
     option<bool> flag = false;
     option_range<int, 0, 100> radius = option_range<int, 0, 100>(10);
     option_enum<double, 3> size = option_enum<double, 3>(10., {0., 10., 100.});
-//    option<2, f3d::ratio_t> scale = f3d::ratio_t{1.0};
-//    option<3, std::string> type = option(std::string("sphere"), domain{"foo", "bar", "bok"});
-/*    option<std::optional<std::filesystem::path>> file;
+    option_range<f3d::ratio_t, 0., 0.4> scale_range = option_range<f3d::ratio_t, 0., 0.4>(0.2);
+    option_enum<f3d::ratio_t, 3> scale_enum = option_enum<f3d::ratio_t, 3>(1.0, {0., 0.5, 1.0});
+    option<f3d::ratio_t> scale = f3d::ratio_t{1.0};
+    option_enum<std::string, 3> type = option_enum<std::string, 3>("sphere", {"foo", "bar", "bok"});
+    option_enum<std::optional<std::string>, 3> opttype = option_enum<std::optional<std::string>, 3>(std::nullopt, {std::nullopt, "bar", "bok"});
+    option<std::optional<std::filesystem::path>> file;
     option<std::vector<int>> indices = std::vector<int>({0});
     option<std::vector<double>> opacity_map = std::vector<double>({0.0, 0.0, 1.0, 1.0});
     option<f3d::color_t> color = f3d::color_t{0.2, 0.2, 0.2};
     option<f3d::direction_t> up_direction = f3d::direction_t{0,1,0};
     option<f3d::colormap_t> colormap = f3d::colormap_t{0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0};
-    option<std::optional<f3d::transform2d_t>> textures_transform;*/
+    option<std::optional<f3d::transform2d_t>> textures_transform;
   } tester;
 
   /**
