@@ -190,6 +190,9 @@ if(F3D_MODULE_UI)
     set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES DISABLED ON)
     set_tests_properties(libf3d::TestSDKTriggerInteractions PROPERTIES DISABLED ON)
   endif()
+  if(NOT F3D_TESTING_ENABLE_DEFAULT_HDRI_TESTS)
+    set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES DISABLED ON)
+  endif()
 endif()
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489

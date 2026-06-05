@@ -40,5 +40,5 @@ if(NOT F3D_MACOS_BUNDLE)
   endif()
 
   file(COPY "${F3D_SOURCE_DIR}/plugins/usd/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-  f3d_test(NAME TestThumbnailConfigFileUSD DATA suzanne.usd CONFIG thumbnail_build LONG_TIMEOUT LABELS "plugin;usd")
+  f3d_test(NAME TestThumbnailConfigFileUSD DATA suzanne.usd CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI LABELS "plugin;usd")
 endif()

@@ -167,8 +167,8 @@ if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/resources/configs/thumbnail.d/" "${F3D_SOURCE_DIR}/plugins/native/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
   f3d_test(NAME TestThumbnailConfigFileVTU DATA dragon.vtu CONFIG thumbnail_build LONG_TIMEOUT)
   f3d_test(NAME TestThumbnailConfigFileVTI DATA vase_4comp.vti CONFIG thumbnail_build LONG_TIMEOUT)
-  f3d_test(NAME TestThumbnailConfigFileSTL DATA suzanne.stl CONFIG thumbnail_build LONG_TIMEOUT)
-  f3d_test(NAME TestThumbnailConfigFilePLY DATA suzanneRGBA.ply CONFIG thumbnail_build LONG_TIMEOUT)
+  f3d_test(NAME TestThumbnailConfigFileSTL DATA suzanne.stl CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI)
+  f3d_test(NAME TestThumbnailConfigFilePLY DATA suzanneRGBA.ply CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI)
   f3d_test(NAME TestThumbnailConfigFileTGA DATA world.tga CONFIG thumbnail_build LONG_TIMEOUT)
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250118)
     f3d_test(NAME TestThumbnailConfigFileHDR DATA palermo_park_1k.hdr CONFIG thumbnail_build LONG_TIMEOUT)
@@ -179,5 +179,5 @@ if(NOT F3D_MACOS_BUNDLE)
   if(F3D_MODULE_WEBP)
     f3d_test(NAME TestThumbnailConfigFileWebP DATA image.webp CONFIG thumbnail_build LONG_TIMEOUT THRESHOLD 0.07) # Threshold is needed even for newer VTK
   endif()
-  f3d_test(NAME TestThumbnailConfigFileQuakeMDL DATA zombie.mdl CONFIG thumbnail_build LONG_TIMEOUT THRESHOLD 0.07) # Threshold is needed for IBL change after VTK 9.6
+  f3d_test(NAME TestThumbnailConfigFileQuakeMDL DATA zombie.mdl CONFIG thumbnail_build LONG_TIMEOUT THRESHOLD 0.07 DEFAULT_HDRI) # Threshold is needed for IBL change after VTK 9.6
 endif()
