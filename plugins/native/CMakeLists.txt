@@ -177,7 +177,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
   set(_has_supports_can_read 1)
 endif()
 
-set(_image_formats "png;jpeg;bmp;tga;hdr")
+set(_image_formats "png;jpeg;bmp;hdr")
 if(F3D_MODULE_WEBP)
   list(APPEND _image_formats "webp")
 endif()
@@ -190,6 +190,14 @@ foreach(_image_format IN LISTS _image_formats)
     "${CMAKE_CURRENT_BINARY_DIR}/${_image_format}.inl"
     @ONLY)
 endforeach()
+
+# TGA uses a dedicated template that validates the file header to avoid false positives
+# with random binary/text files (e.g. point-cloud .pts files).
+# See http://www.paulbourke.net/dataformats/tga/
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/tga.inl.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/tga.inl"
+  @ONLY)
 
 f3d_plugin_declare_reader(
   NAME PNG

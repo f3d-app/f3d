@@ -96,6 +96,9 @@ endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251109)
   f3d_test(NAME TestPipedPTS DATA samplePTS.pts PIPED PTS)
+  # Regression: autzen.pts used to be falsely claimed by vtkTGAReader (false positive).
+  # The TGA canRead() must reject it so the PTS reader is selected instead.
+  f3d_test(NAME TestPipedAutzenPTS DATA autzen.pts PIPED PTS NO_BASELINE)
 endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251208)

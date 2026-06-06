@@ -1,0 +1,162 @@
+// clang-format off
+#if @_has_supports_stream@
+bool canRead([[maybe_unused]] vtkResourceStream* stream) const override
+{
+  // ── Strategy 0: TGA 2.0 footer signature (definitive) ─────────────────────
+  // TGA 2.0 appends a mandatory 26-byte footer. Bytes 8-25 are:
+  //   "TRUEVISION-XFILE.\0"  (17 ASCII chars + null terminator = 18 bytes)
+  // If found, this is 100% TGA — no further checks needed.
+  // See https://www.dca.fee.unicamp.br/~martino/disciplinas/ea978/tgaffs.pdf
+  stream->Seek(0, vtkResourceStream::SeekDirection::End);
+  const vtkTypeInt64 fileSize = stream->Tell();
+
+  if (fileSize >= 26)
+  {
+    stream->Seek(fileSize - 26, vtkResourceStream::SeekDirection::Begin);
+    unsigned char footer[26];
+    if (stream->Read(footer, 26) == 26)
+    {
+      static constexpr unsigned char tga2Sig[18] = {
+        'T','R','U','E','V','I','S','I','O','N','-','X','F','I','L','E','.','\0'
+      };
+      if (std::equal(std::begin(tga2Sig), std::end(tga2Sig), footer + 8))
+      {
+        stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+        return true;
+      }
+    }
+  }
+
+  // ── TGA 1.0 heuristics ─────────────────────────────────────────────────────
+  // TGA 1.0 has no magic number. We apply five independent defenses to reduce
+  // the false-positive probability to near zero.
+  // See http://www.paulbourke.net/dataformats/tga/
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  unsigned char h[18];
+  if (stream->Read(h, sizeof(h)) < static_cast<vtkTypeInt64>(sizeof(h)))
+  {
+    return false;
+  }
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+
+  // ── Defense 1: strict enum validation ─────────────────────────────────────
+  const unsigned char colorMapType = h[1];
+  if (colorMapType != 0 && colorMapType != 1)
+  {
+    return false;
+  }
+
+  const unsigned char imageType = h[2];
+  // Only standard uncompressed (1, 2, 3) and RLE-compressed (9, 10, 11) types.
+  // Types 0, 32, 33 are intentionally excluded as too exotic to be in the wild.
+  if (imageType != 1 && imageType != 2 && imageType != 3 &&
+      imageType != 9 && imageType != 10 && imageType != 11)
+  {
+    return false;
+  }
+
+  const unsigned char bpp = h[16];
+  // Only the historical TGA pixel depths: 8, 15, 16, 24, 32.
+  if (bpp != 8 && bpp != 15 && bpp != 16 && bpp != 24 && bpp != 32)
+  {
+    return false;
+  }
+
+  // ── Defense 2: cross-parameter consistency ─────────────────────────────────
+  // Color-mapped images (type 1 / 9) require a color map; others must not.
+  const bool isColorMapped = (imageType == 1 || imageType == 9);
+  if (isColorMapped && colorMapType != 1)
+  {
+    return false;
+  }
+  if (!isColorMapped && colorMapType != 0)
+  {
+    return false;
+  }
+
+  // No color map → color-map spec bytes (3-7) must all be zero.
+  if (colorMapType == 0 &&
+      (h[3] != 0 || h[4] != 0 || h[5] != 0 || h[6] != 0 || h[7] != 0))
+  {
+    return false;
+  }
+
+  // True-color (type 2 / 10): bpp must be > 8 bits.
+  if ((imageType == 2 || imageType == 10) && bpp == 8)
+  {
+    return false;
+  }
+
+  // Grayscale (type 3 / 11): bpp must be exactly 8 bits.
+  if ((imageType == 3 || imageType == 11) && bpp != 8)
+  {
+    return false;
+  }
+
+  // ── Defense 3: image dimension sanity ─────────────────────────────────────
+  const int width = h[12] | (h[13] << 8);
+  const int height = h[14] | (h[15] << 8);
+  if (width == 0 || height == 0 || width > 16384 || height > 16384)
+  {
+    return false;
+  }
+
+  // ── Defense 4: image descriptor bit check ─────────────────────────────────
+  // Bits 6-7 of byte 17 are reserved and must be zero in valid TGA files.
+  if (h[17] & 0xC0)
+  {
+    return false;
+  }
+  // Bits 0-3 are the alpha channel depth; must match the pixel depth.
+  const unsigned char alphaBits = h[17] & 0x0F;
+  if (bpp == 8 && alphaBits != 0)
+  {
+    return false;
+  }
+  if ((bpp == 15 || bpp == 16) && alphaBits > 1)
+  {
+    return false;
+  }
+  if (bpp == 24 && alphaBits != 0)
+  {
+    return false;
+  }
+  if (bpp == 32 && alphaBits != 0 && alphaBits != 8)
+  {
+    return false;
+  }
+
+  // ── Defense 5: file size lower bound ──────────────────────────────────────
+  // For uncompressed TGA (types 1, 2, 3), the minimum file size is deterministic.
+  // For RLE (types 9, 10, 11), pixel data is variable-length; we only check that
+  // the file is at least large enough to hold the header.
+  {
+    const vtkTypeInt64 idLen = h[0];
+    const vtkTypeInt64 cmEntries = h[5] | (h[6] << 8);
+    const vtkTypeInt64 cmEntryBits = h[7];
+    const vtkTypeInt64 colorMapBytes =
+      (colorMapType == 1) ? cmEntries * ((cmEntryBits + 7) / 8) : 0;
+
+    const bool isUncompressed = (imageType == 1 || imageType == 2 || imageType == 3);
+    const vtkTypeInt64 pixelBytes = isUncompressed
+      ? static_cast<vtkTypeInt64>(width) * height * ((bpp + 7) / 8)
+      : 0;
+
+    const vtkTypeInt64 expectedMin = 18 + idLen + colorMapBytes + pixelBytes;
+    if (fileSize < expectedMin)
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
+#endif
+
+void applyCustomImporter(vtkImporter* importer, const std::string& vtkNotUsed(fileName),
+  vtkResourceStream* vtkNotUsed(stream)) const override
+{
+  vtkF3DImageImporter* imageImporter = vtkF3DImageImporter::SafeDownCast(importer);
+  imageImporter->SetImageHint("tga");
+}
+// clang-format on
