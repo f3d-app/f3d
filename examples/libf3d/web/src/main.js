@@ -31,10 +31,6 @@ const settings = {
 
 f3d(settings)
   .then(async (Module) => {
-    // write in the filesystem
-    const defaultFile = await fetch("f3d.vtp").then((b) => b.arrayBuffer());
-    Module.FS.writeFile("f3d.vtp", new Uint8Array(defaultFile));
-
     // automatically load all supported file format readers
     Module.Engine.autoloadPlugins();
 
