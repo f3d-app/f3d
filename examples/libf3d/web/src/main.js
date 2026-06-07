@@ -31,24 +31,20 @@ const settings = {
 
 f3d(settings)
   .then(async (Module) => {
-    // write in the filesystem
-    const defaultFile = await fetch("f3d.vtp").then((b) => b.arrayBuffer());
-    Module.FS.writeFile("f3d.vtp", new Uint8Array(defaultFile));
-
     // automatically load all supported file format readers
     Module.Engine.autoloadPlugins();
 
     Module.engineInstance = Module.Engine.create();
 
-    const openFile = (name) => {
+    const openFile = (name, stream) => {
       document.getElementById("file-name").innerHTML = name;
-      const filePath = "/" + name;
       const scene = Module.engineInstance.getScene();
-      if (scene.supports(filePath)) {
-        scene.clear();
-        scene.add(filePath);
-      } else {
-        console.error("File " + filePath + " cannot be opened");
+      scene.clear();
+      try {
+        scene.addBuffer(stream);
+      } catch (e) {
+        document.getElementById("file-name").innerHTML =
+          '<strong class="has-text-danger">Unsupported file</strong>';
       }
       Module.engineInstance.getWindow().getCamera().resetToBounds(0.9);
       Module.engineInstance.getWindow().render();
@@ -61,8 +57,7 @@ f3d(settings)
       for (const file of evt.target.files) {
         const reader = new FileReader();
         reader.addEventListener("loadend", (e) => {
-          Module.FS.writeFile(file.name, new Uint8Array(reader.result));
-          openFile(file.name);
+          openFile(file.name, new Uint8Array(reader.result));
         });
         reader.readAsArrayBuffer(file);
       }
@@ -99,7 +94,7 @@ f3d(settings)
       document.documentElement.classList.remove("theme-light");
       Module.engineInstance
         .getOptions()
-        .set_color("render.grid.color", 0.25, 0.27, 0.33);
+        .setAsString("render.grid.color", "0.25, 0.27, 0.33");
       Module.engineInstance.getWindow().render();
     };
 
@@ -108,7 +103,7 @@ f3d(settings)
       document.documentElement.classList.remove("theme-dark");
       Module.engineInstance
         .getOptions()
-        .set_color("render.grid.color", 0.67, 0.69, 0.75);
+        .setAsString("render.grid.color", "0.67, 0.69, 0.75");
       Module.engineInstance.getWindow().render();
     };
 

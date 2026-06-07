@@ -28,12 +28,15 @@
 #include <vtkPolyDataTangents.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
+#include <vtkShaderProperty.h>
 #include <vtkSmartPointer.h>
 #include <vtkSphereSource.h>
 #include <vtkTexture.h>
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
 #include <vtkTriangleFilter.h>
+#include <vtkUniforms.h>
+#include <vtkUnsignedShortArray.h>
 #include <vtkVersion.h>
 
 #include <cassert>
@@ -81,9 +84,13 @@
 #include <pxr/usd/usdGeom/xformCache.h>
 #include <pxr/usd/usdShade/material.h>
 #include <pxr/usd/usdShade/materialBindingAPI.h>
-#include <pxr/usd/usdSkel/bakeSkinning.h>
+#include <pxr/usd/usdSkel/binding.h>
+#include <pxr/usd/usdSkel/bindingAPI.h>
+#include <pxr/usd/usdSkel/blendShapeQuery.h>
 #include <pxr/usd/usdSkel/cache.h>
+#include <pxr/usd/usdSkel/root.h>
 #include <pxr/usd/usdSkel/skeletonQuery.h>
+#include <pxr/usd/usdSkel/skinningQuery.h>
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #elif defined(__GNUC__)
@@ -155,10 +162,17 @@ public:
   {
     if (this->Stage)
     {
-      // TODO: USD bake skinning is not performant
-      // We need to read joints and do the skinning in the shader
-      // See https://github.com/f3d-app/f3d/issues/1076
-      pxr::UsdSkelBakeSkinning(this->Stage->Traverse());
+      this->SkelCache = pxr::UsdSkelCache();
+      this->MorphingMap.clear();
+
+      for (const pxr::UsdPrim& prim : this->Stage->Traverse())
+      {
+        if (prim.IsA<pxr::UsdSkelRoot>())
+        {
+          pxr::UsdSkelRoot skelRoot(prim);
+          this->SkelCache.Populate(skelRoot, pxr::UsdPrimDefaultPredicate);
+        }
+      }
     }
   }
 
@@ -589,6 +603,94 @@ public:
 
             newPolyData->SetPolys(cells);
 
+            if (pxr::UsdSkelSkinningQuery skinningQuery = this->SkelCache.GetSkinningQuery(prim))
+            {
+              // save skinning buffers to the polydata
+              if (skinningQuery.HasJointInfluences() && !meshAlreadyExists)
+              {
+                pxr::VtIntArray jointIndices;
+                pxr::VtFloatArray jointWeights;
+                int numInfluences = skinningQuery.GetNumInfluencesPerComponent();
+
+                if (skinningQuery.ComputeVaryingJointInfluences(
+                      positions.size(), &jointIndices, &jointWeights))
+                {
+                  vtkNew<vtkUnsignedShortArray> jointsArr;
+                  jointsArr->SetName("JOINTS_0");
+                  jointsArr->SetNumberOfComponents(4);
+                  jointsArr->SetNumberOfTuples(static_cast<vtkIdType>(positions.size()));
+                  jointsArr->Fill(0);
+
+                  vtkNew<vtkFloatArray> weightsArr;
+                  weightsArr->SetName("WEIGHTS_0");
+                  weightsArr->SetNumberOfComponents(4);
+                  weightsArr->SetNumberOfTuples(static_cast<vtkIdType>(positions.size()));
+                  weightsArr->Fill(0);
+
+                  // F3D mapper is limited to 4 influences
+                  int components = std::min(numInfluences, 4);
+
+                  std::vector<std::pair<float, int>> influences;
+                  influences.reserve(numInfluences);
+
+                  for (std::size_t i = 0; i < positions.size(); i++)
+                  {
+                    // point influences
+                    influences.resize(numInfluences);
+
+                    for (int j = 0; j < numInfluences; j++)
+                    {
+                      int idx = static_cast<int>(i) * numInfluences + j;
+                      influences[j] = std::make_pair(jointWeights[idx], jointIndices[idx]);
+                    }
+
+                    // Sort descending by weight to get the top 4
+                    std::ranges::partial_sort(influences, influences.begin() + components,
+                      [](const auto& a, const auto& b) { return a.first > b.first; });
+
+                    float totalWeight = 0.0f;
+                    for (int j = 0; j < components; j++)
+                    {
+                      jointsArr->SetTypedComponent(static_cast<vtkIdType>(i), j,
+                        static_cast<unsigned short>(influences[j].second));
+                      weightsArr->SetTypedComponent(
+                        static_cast<vtkIdType>(i), j, influences[j].first);
+                      totalWeight += influences[j].first;
+                    }
+
+                    // Re-normalize after potential truncation
+                    if (totalWeight > 0.0f)
+                    {
+                      for (int j = 0; j < components; j++)
+                      {
+                        float w = weightsArr->GetTypedComponent(static_cast<vtkIdType>(i), j);
+                        weightsArr->SetTypedComponent(
+                          static_cast<vtkIdType>(i), j, w / totalWeight);
+                      }
+                    }
+                  }
+                  newPolyData->GetPointData()->AddArray(jointsArr);
+                  newPolyData->GetPointData()->AddArray(weightsArr);
+                }
+              }
+
+              // save morphing info (aka blend shapes)
+              if (skinningQuery.HasBlendShapes() && !meshAlreadyExists)
+              {
+                MorphingInfo& info = this->MorphingMap[meshPrim.GetPath().GetAsString()];
+
+                // Cache blend shape data for per-frame CPU deformation
+                info.BindPositions = positions;
+                pxr::UsdSkelBindingAPI binding(prim);
+                pxr::UsdSkelBlendShapeQuery blendShapeQuery(binding);
+                if (blendShapeQuery)
+                {
+                  info.BlendShapePointIndices = blendShapeQuery.ComputeBlendShapePointIndices();
+                  info.SubShapePointOffsets = blendShapeQuery.ComputeSubShapePointOffsets();
+                }
+              }
+            }
+
             vtkNew<vtkF3DFaceVaryingPointDispatcher> faceVaryingFilter;
             faceVaryingFilter->SetInputData(newPolyData);
             faceVaryingFilter->Update();
@@ -827,8 +929,6 @@ public:
     pxr::UsdTimeCode timeCode = this->CurrentTime * this->Stage->GetTimeCodesPerSecond();
     pxr::UsdGeomXformCache xfCache(timeCode);
 
-    pxr::UsdSkelCache skelCache;
-
     for (const pxr::UsdPrim& prim : this->Stage->Traverse())
     {
       if (!prim.IsA<pxr::UsdSkelSkeleton>())
@@ -837,13 +937,13 @@ public:
       }
 
       pxr::UsdSkelSkeleton skel = pxr::UsdSkelSkeleton(prim);
-      pxr::UsdSkelSkeletonQuery skelQuery = skelCache.GetSkelQuery(skel);
+      pxr::UsdSkelSkeletonQuery skelQuery = this->SkelCache.GetSkelQuery(skel);
 
       pxr::VtArray<pxr::GfMatrix4d> jointXforms;
       skelQuery.ComputeJointWorldTransforms(&jointXforms, &xfCache);
 
       const pxr::UsdSkelTopology& topology = skelQuery.GetTopology();
-      size_t numJoints = topology.GetNumJoints();
+      std::size_t numJoints = topology.GetNumJoints();
 
       if (numJoints > 0)
       {
@@ -855,13 +955,13 @@ public:
           vtkNew<vtkCellArray> vertices;
           vtkNew<vtkCellArray> lines;
 
-          for (size_t i = 0; i < numJoints; i++)
+          for (std::size_t i = 0; i < numJoints; i++)
           {
             vtkIdType vId = static_cast<vtkIdType>(i);
             vertices->InsertNextCell(1, &vId);
           }
 
-          for (size_t i = 0; i < numJoints; i++)
+          for (std::size_t i = 0; i < numJoints; i++)
           {
             int parentIdx = topology.GetParent(i);
             if (parentIdx >= 0)
@@ -896,12 +996,166 @@ public:
         // Update joint positions
         vtkNew<vtkPoints> points;
         points->SetNumberOfPoints(static_cast<vtkIdType>(numJoints));
-        for (size_t i = 0; i < numJoints; i++)
+        for (std::size_t i = 0; i < numJoints; i++)
         {
           pxr::GfVec3d pos = jointXforms[i].ExtractTranslation();
           points->SetPoint(static_cast<vtkIdType>(i), pos[0], pos[1], pos[2]);
         }
         polyData->SetPoints(points);
+      }
+    }
+  }
+
+  void UpdateSkinningAndMorphing()
+  {
+    pxr::UsdTimeCode timeCode = this->CurrentTime * this->Stage->GetTimeCodesPerSecond();
+    pxr::UsdGeomXformCache xfCache(timeCode);
+
+    for (const pxr::UsdPrim& prim : this->Stage->Traverse())
+    {
+      if (prim.IsA<pxr::UsdSkelRoot>())
+      {
+        pxr::UsdSkelRoot skelRoot(prim);
+        this->SkelCache.Populate(skelRoot, pxr::UsdPrimDefaultPredicate);
+
+        std::vector<pxr::UsdSkelBinding> bindings;
+        this->SkelCache.ComputeSkelBindings(skelRoot, &bindings, pxr::UsdPrimDefaultPredicate);
+        for (const auto& binding : bindings)
+        {
+          pxr::UsdSkelSkeletonQuery skelQuery = this->SkelCache.GetSkelQuery(binding.GetSkeleton());
+
+          for (const auto& skinTarget : binding.GetSkinningTargets())
+          {
+            std::string primPath = skinTarget.GetPrim().GetPath().GetAsString();
+
+            vtkActor* actor = this->ActorMap[primPath];
+
+            // Skinning: update shader joint matrices
+            pxr::VtMatrix4dArray skinningXforms;
+            skelQuery.ComputeSkinningTransforms(&skinningXforms, timeCode);
+
+            // Remap to local joint order if needed
+            const pxr::UsdSkelAnimMapperRefPtr& jointMapper = skinTarget.GetJointMapper();
+            if (jointMapper && !jointMapper->IsIdentity())
+            {
+              pxr::VtMatrix4dArray remapped;
+              jointMapper->RemapTransforms(skinningXforms, &remapped);
+              skinningXforms = remapped;
+            }
+
+            // Skeleton world transform in VTK space (apply root transform to match actor UserMatrix
+            // convention)
+            vtkSmartPointer<vtkMatrix4x4> skelToWorld =
+              this->ConvertMatrix(xfCache.GetLocalToWorldTransform(prim));
+            vtkMatrix4x4::Multiply4x4(this->RootTransform, skelToWorld, skelToWorld);
+
+            // Geometry bind transform (mesh local -> skel space at bind time)
+            vtkSmartPointer<vtkMatrix4x4> geomBind =
+              this->ConvertMatrix(skinTarget.GetGeomBindTransform());
+
+            // Actor inverse matrix
+            vtkNew<vtkMatrix4x4> actorInverse;
+            actorInverse->DeepCopy(actor->GetUserMatrix());
+            actorInverse->Invert();
+
+            std::vector<float> jointMatrices;
+            jointMatrices.reserve(skinningXforms.size() * 16);
+
+            for (const pxr::GfMatrix4d& xform : skinningXforms)
+            {
+              // jointMatrix = actorInverse * skelToWorld * xform * geomBind
+              vtkNew<vtkMatrix4x4> jointMat;
+              vtkMatrix4x4::Multiply4x4(this->ConvertMatrix(xform), geomBind, jointMat);
+              vtkMatrix4x4::Multiply4x4(skelToWorld, jointMat, jointMat);
+              vtkMatrix4x4::Multiply4x4(actorInverse, jointMat, jointMat);
+
+              // Store column-major for GLSL
+              for (int col = 0; col < 4; col++)
+              {
+                for (int row = 0; row < 4; row++)
+                {
+                  jointMatrices.push_back(static_cast<float>(jointMat->GetElement(row, col)));
+                }
+              }
+            }
+
+            vtkShaderProperty* shaderProp = actor->GetShaderProperty();
+            vtkUniforms* uniforms = shaderProp->GetVertexCustomUniforms();
+            uniforms->RemoveAllUniforms();
+
+            if (jointMatrices.size() > 0)
+            {
+              uniforms->SetUniformMatrix4x4v(
+                "jointMatrices", static_cast<int>(skinningXforms.size()), jointMatrices.data());
+            }
+
+            // Morphing: compute blend shape deformations and update points
+            pxr::VtFloatArray allWeights;
+            const pxr::UsdSkelAnimQuery& animQuery = skelQuery.GetAnimQuery();
+            if (!animQuery || !animQuery.ComputeBlendShapeWeights(&allWeights, timeCode))
+            {
+              continue;
+            }
+
+            // Remap from animation order to mesh-local blend shape order
+            const pxr::UsdSkelAnimMapperRefPtr& blendMapper = skinTarget.GetBlendShapeMapper();
+            if (blendMapper && !blendMapper->IsIdentity())
+            {
+              pxr::VtFloatArray remapped;
+              const float zero = 0.0f;
+              blendMapper->Remap(allWeights, &remapped, 1, &zero);
+              allWeights = remapped;
+            }
+
+            pxr::UsdSkelBindingAPI bindingAPI(skinTarget.GetPrim());
+            pxr::UsdSkelBlendShapeQuery blendShapeQuery(bindingAPI);
+
+            pxr::VtFloatArray subShapeWeights;
+            pxr::VtUIntArray blendShapeIndices, subShapeIndices;
+            blendShapeQuery.ComputeSubShapeWeights(
+              allWeights, &subShapeWeights, &blendShapeIndices, &subShapeIndices);
+
+            const auto& morphInfo = this->MorphingMap[primPath];
+
+            // Execute CPU-side morphing
+            pxr::VtArray<pxr::GfVec3f> positions = morphInfo.BindPositions;
+            blendShapeQuery.ComputeDeformedPoints(subShapeWeights, blendShapeIndices,
+              subShapeIndices, morphInfo.BlendShapePointIndices, morphInfo.SubShapePointOffsets,
+              positions);
+
+            // Find the VTK polydata for this mesh and update its points in-place
+            vtkPolyData* polydata = this->MeshMap[primPath];
+            vtkPoints* outputPoints = polydata->GetPoints();
+
+            vtkIdTypeArray* sourceIds =
+              vtkIdTypeArray::SafeDownCast(polydata->GetPointData()->GetArray("SourceIds"));
+
+            if (sourceIds)
+            {
+              for (vtkIdType i = 0; i < outputPoints->GetNumberOfPoints(); i++)
+              {
+                // Remap if face-varying
+                vtkIdType srcIdx = sourceIds->GetValue(i);
+                if (srcIdx < static_cast<vtkIdType>(positions.size()))
+                {
+                  const pxr::GfVec3f& p = positions[srcIdx];
+                  outputPoints->SetPoint(i, p[0], p[1], p[2]);
+                }
+              }
+            }
+            else
+            {
+              for (vtkIdType i = 0; i < outputPoints->GetNumberOfPoints(); i++)
+              {
+                if (i < static_cast<vtkIdType>(positions.size()))
+                {
+                  const pxr::GfVec3f& p = positions[i];
+                  outputPoints->SetPoint(i, p[0], p[1], p[2]);
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -933,8 +1187,12 @@ public:
       rootTransform->SetElement(3, 3, 1.0);
     }
 
+    this->RootTransform->DeepCopy(rootTransform);
+
     this->ImportNode(renderer, hierarchy, actorCollection, this->Stage->GetPseudoRoot(),
       pxr::SdfPath("/"), rootTransform);
+
+    this->UpdateSkinningAndMorphing();
 
     if (armature)
     {
@@ -1384,10 +1642,16 @@ public:
   }
 
   pxr::UsdStageRefPtr Stage = nullptr;
-  std::unordered_map<std::string, int> NodeIdMap;
   F3DUSDMemoryResolverContext MemoryResolverContext;
 
 private:
+  struct MorphingInfo
+  {
+    pxr::VtArray<pxr::GfVec3f> BindPositions;
+    std::vector<pxr::VtIntArray> BlendShapePointIndices;
+    std::vector<pxr::VtVec3fArray> SubShapePointOffsets;
+  };
+
   std::unordered_map<std::string,
     std::pair<vtkSmartPointer<vtkActor>, vtkSmartPointer<vtkPolyData>>>
     ArmatureMap;
@@ -1395,6 +1659,12 @@ private:
   std::unordered_map<std::string, vtkSmartPointer<vtkPolyData>> MeshMap;
   std::unordered_map<std::string, vtkSmartPointer<vtkProperty>> ShaderMap;
   std::unordered_map<std::string, vtkSmartPointer<vtkImageData>> TextureMap;
+  std::unordered_map<std::string, MorphingInfo> MorphingMap;
+
+  pxr::UsdSkelCache SkelCache;
+  vtkNew<vtkMatrix4x4> RootTransform;
+  std::unordered_map<std::string, int> NodeIdMap;
+
   double CurrentTime = 0.0;
 
   class DiagDelegate : public pxr::TfDiagnosticMgr::Delegate
