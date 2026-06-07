@@ -107,6 +107,8 @@ const settings = {
       "animation should be playing backward",
     );
     interactor.stopAnimation();
+    interactor.goToKeyframe(4, false);
+    interactor.goToKeyframe(1, true);
 
     // only for coverage, do not test the actual feature yet
     interactor.disableCameraMovement();

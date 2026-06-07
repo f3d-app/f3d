@@ -335,6 +335,17 @@ extern "C"
    */
   F3D_EXPORT f3d_interactor_animation_direction_t f3d_interactor_get_animation_direction(
     f3d_interactor_t* interactor);
+
+  /**
+   * @brief Go to a specific keyframe by index.
+   *
+   * @param interactor Interactor handle.
+   * @param index Keyframe index.
+   * @param relative If non-zero, index is an offset from the closest keyframe to current time.
+   */
+  F3D_EXPORT void f3d_interactor_go_to_keyframe(
+    f3d_interactor_t* interactor, unsigned int index, int relative);
+
   ///@}
 
   ///@{ @name Movement

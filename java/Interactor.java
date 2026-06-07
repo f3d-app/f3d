@@ -398,6 +398,15 @@ public class Interactor {
     public native AnimationDirection getAnimationDirection();
 
     /**
+     * Go to a specific keyframe by index.
+     *
+     * @param index keyframe index
+     * @param relative if true, index is an offset from the closest keyframe to current time
+     * @return this interactor for method chaining
+     */
+    public native Interactor goToKeyframe(long index, boolean relative);
+
+    /**
      * Enable camera movement.
      *
      * @return this interactor for method chaining

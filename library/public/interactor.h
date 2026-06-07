@@ -275,6 +275,13 @@ public:
   virtual interactor& stopAnimation() = 0;
   [[nodiscard]] virtual bool isPlayingAnimation() = 0;
   [[nodiscard]] virtual interactor::AnimationDirection getAnimationDirection() = 0;
+
+  /**
+   * Go to a specific keyframe by index.
+   * When relative is true, the index is an offset from the closest keyframe to the current time.
+   * When relative is false, the index is the absolute keyframe index.
+   */
+  virtual interactor& goToKeyframe(size_t index, bool relative) = 0;
   ///@}
 
   ///@{ @name Movement

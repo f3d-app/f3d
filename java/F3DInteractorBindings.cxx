@@ -438,6 +438,13 @@ extern "C"
     return self;
   }
 
+  JNIEXPORT jobject JAVA_BIND(Interactor, goToKeyframe)(
+    JNIEnv* env, jobject self, jlong index, jboolean relative)
+  {
+    GetInteractor(env, self).goToKeyframe(static_cast<size_t>(index), relative);
+    return self;
+  }
+
   JNIEXPORT jboolean JAVA_BIND(Interactor, isPlayingAnimation)(JNIEnv* env, jobject self)
   {
     return GetInteractor(env, self).isPlayingAnimation();

@@ -69,3 +69,12 @@ def test_animation():
         "shoot",
         "walk",
     ]
+
+    # goToKeyframe absolute
+    engine.scene.load_animation_time(0.0)
+    engine.interactor.go_to_keyframe(4, False)
+    assert engine.scene.animation_time() == keyframes[4]
+
+    # goToKeyframe relative
+    engine.interactor.go_to_keyframe(1, True)
+    assert engine.scene.animation_time() == keyframes[5]

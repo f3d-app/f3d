@@ -145,6 +145,16 @@ f3d_interactor_animation_direction_t f3d_interactor_get_animation_direction(
 }
 
 //----------------------------------------------------------------------------
+void f3d_interactor_go_to_keyframe(
+  f3d_interactor_t* interactor, unsigned int index, int relative)
+{
+  if (!interactor)
+    return;
+
+  f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
+  cpp_interactor->goToKeyframe(static_cast<size_t>(index), relative != 0);
+}
+//----------------------------------------------------------------------------
 void f3d_interactor_enable_camera_movement(f3d_interactor_t* interactor)
 {
   if (!interactor)
