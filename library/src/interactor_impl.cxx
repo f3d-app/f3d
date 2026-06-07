@@ -2030,6 +2030,15 @@ interactor& interactor_impl::goToKeyframe(size_t index, bool relative)
 }
 
 //----------------------------------------------------------------------------
+interactor& interactor_impl::goToFrame(size_t index, bool relative)
+{
+  assert(this->Internals->AnimationManager);
+  this->Internals->AnimationManager->SetDeltaTime(this->Internals->CallbackDeltaTime);
+  this->Internals->AnimationManager->JumpToFrame(static_cast<int>(index), relative);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 interactor& interactor_impl::enableCameraMovement()
 {
   this->Internals->Style->SetCameraMovementDisabled(false);

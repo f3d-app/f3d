@@ -70,6 +70,13 @@ def test_animation():
         "walk",
     ]
 
+    # animationTime
+    engine.scene.load_animation_time(0.0)
+    assert engine.scene.animation_time() == 0.0
+
+    engine.scene.load_animation_time(0.5)
+    assert engine.scene.animation_time() == 0.5
+
     # goToKeyframe absolute
     engine.scene.load_animation_time(0.0)
     engine.interactor.go_to_keyframe(4, False)
@@ -78,3 +85,17 @@ def test_animation():
     # goToKeyframe relative
     engine.interactor.go_to_keyframe(1, True)
     assert engine.scene.animation_time() == keyframes[5]
+
+    # currentFrame
+    engine.scene.load_animation_time(0.0)
+
+    engine.scene.load_animation_time(0.5)
+
+    # goToFrame absolute
+    engine.interactor.go_to_frame(24, False)
+
+    # goToFrame relative
+    engine.interactor.go_to_frame(1, True)
+
+    # goToFrame absolute 0
+    engine.interactor.go_to_frame(0, False)

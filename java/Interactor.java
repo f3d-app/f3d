@@ -407,6 +407,15 @@ public class Interactor {
     public native Interactor goToKeyframe(long index, boolean relative);
 
     /**
+     * Go to a specific frame by index.
+     *
+     * @param index frame index
+     * @param relative if true, index is an offset from the current frame
+     * @return this interactor for method chaining
+     */
+    public native Interactor goToFrame(long index, boolean relative);
+
+    /**
      * Enable camera movement.
      *
      * @return this interactor for method chaining

@@ -346,6 +346,15 @@ extern "C"
   F3D_EXPORT void f3d_interactor_go_to_keyframe(
     f3d_interactor_t* interactor, unsigned int index, int relative);
 
+  /**
+   * @brief Go to a specific frame by index.
+   *
+   * @param interactor Interactor handle.
+   * @param index Frame index.
+   * @param relative If non-zero, index is an offset from the current frame.
+   */
+  F3D_EXPORT void f3d_interactor_go_to_frame(
+    f3d_interactor_t* interactor, unsigned int index, int relative);
   ///@}
 
   ///@{ @name Movement

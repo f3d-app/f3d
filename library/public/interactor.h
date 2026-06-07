@@ -282,6 +282,13 @@ public:
    * When relative is false, the index is the absolute keyframe index.
    */
   virtual interactor& goToKeyframe(size_t index, bool relative) = 0;
+
+  /**
+   * Go to a specific frame by index.
+   * When relative is true, the index is an offset from the current frame.
+   * When relative is false, the index is the absolute frame index.
+   */
+  virtual interactor& goToFrame(size_t index, bool relative) = 0;
   ///@}
 
   ///@{ @name Movement

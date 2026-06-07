@@ -74,6 +74,7 @@ public:
   bool isPlayingAnimation() override;
   interactor::AnimationDirection getAnimationDirection() override;
   interactor& goToKeyframe(size_t index, bool relative) override;
+  interactor& goToFrame(size_t index, bool relative) override;
 
   interactor& enableCameraMovement() override;
   interactor& disableCameraMovement() override;

@@ -44,6 +44,9 @@ int test_interactor()
   f3d_interactor_stop_animation(interactor);
   f3d_interactor_go_to_keyframe(interactor, 4, 0);
   f3d_interactor_go_to_keyframe(interactor, 1, 1);
+  f3d_interactor_go_to_frame(interactor, 24, 0);
+  f3d_interactor_go_to_frame(interactor, 1, 1);
+  f3d_interactor_go_to_frame(interactor, 0, 0);
 
   f3d_interactor_enable_camera_movement(interactor);
   f3d_interactor_disable_camera_movement(interactor);

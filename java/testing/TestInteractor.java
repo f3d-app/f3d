@@ -52,6 +52,9 @@ public class TestInteractor {
     interactor.getAnimationDirection();
     interactor.goToKeyframe(4, false);
     interactor.goToKeyframe(1, true);
+    interactor.goToFrame(24, false);
+    interactor.goToFrame(1, true);
+    interactor.goToFrame(0, false);
 
     interactor.triggerNotification("foo", "bar", 3.0);
 

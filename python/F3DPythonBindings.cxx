@@ -388,6 +388,8 @@ PYBIND11_MODULE(pyf3d, module)
       "Returns the current animation direction")
     .def("go_to_keyframe", &f3d::interactor::goToKeyframe, "Go to keyframe by index",
       py::arg("index"), py::arg("relative"))
+    .def("go_to_frame", &f3d::interactor::goToFrame, "Go to frame by index",
+      py::arg("index"), py::arg("relative"))
     .def("enable_camera_movement", &f3d::interactor::enableCameraMovement,
       "Enable the camera interaction")
     .def("disable_camera_movement", &f3d::interactor::disableCameraMovement,
