@@ -751,6 +751,9 @@ scene& scene_impl::clear()
   // Clear the window of all actors
   this->Internals->Window.Initialize();
 
+  // Clear animation state
+  this->Internals->AnimationManager.Reset();
+
   return *this;
 }
 

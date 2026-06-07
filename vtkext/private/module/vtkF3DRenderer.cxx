@@ -3714,3 +3714,28 @@ vtkMatrix4x4* vtkF3DRenderer::GetGridMatrix() const
 {
   return this->GridActor->GetMatrix();
 }
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetAnimationProgressMode(const std::string& mode)
+{
+  this->UIActor->SetAnimationProgressMode(mode);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetAnimationProgress(const std::pair<double, double>& timeRange,
+  const std::string& name, const std::vector<double>& keyFrames)
+{
+  this->UIActor->SetAnimationProgress(timeRange, name, keyFrames);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetAnimationProgressColor(const std::array<double, 3>& color)
+{
+  this->UIActor->SetAnimationProgressColor(color);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::UpdateAnimationTime(double currentTime)
+{
+  this->UIActor->UpdateAnimationTime(currentTime);
+}

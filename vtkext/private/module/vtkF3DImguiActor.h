@@ -92,6 +92,11 @@ private:
   void RenderFpsCounter() override;
 
   /**
+   * Render the animation progress bar at the bottom of the viewport.
+   */
+  void RenderProgressBar() override;
+
+  /**
    * Render the console widget
    */
   void RenderConsole(bool) override;

@@ -29,7 +29,7 @@ def main(argv: list[str] | None = None):
             # UI overlays: axis + some HUD
             "ui.axis": True,
             "ui.fps": True,
-            "ui.animation_progress": True,
+            "ui.animation_progress": "default",
             "ui.filename": True,
             # FXAA + tone mapping
             "render.effect.antialiasing.enable": True,

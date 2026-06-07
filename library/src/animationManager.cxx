@@ -11,7 +11,6 @@
 #include "vtkF3DRenderer.h"
 
 #include <vtkDoubleArray.h>
-#include <vtkProgressBarRepresentation.h>
 #include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
 #include <vtkVersion.h>
@@ -57,37 +56,14 @@ void animationManager::Initialize()
   this->CurrentTimeSet = false;
 
   this->AvailAnimations = this->Importer->GetNumberOfAnimations();
-  if (this->AvailAnimations > 0 && this->Interactor)
-  {
-    this->ProgressWidget = vtkSmartPointer<vtkProgressBarWidget>::New();
-    this->Interactor->SetInteractorOn(this->ProgressWidget);
-
-    vtkProgressBarRepresentation* progressRep =
-      vtkProgressBarRepresentation::SafeDownCast(this->ProgressWidget->GetRepresentation());
-    progressRep->SetProgressRate(0.0);
-    progressRep->ProportionalResizeOff();
-    progressRep->SetPosition(0.0, 0.0);
-    progressRep->SetPosition2(1.0, 0.0);
-    progressRep->SetMinimumSize(0, 5);
-    f3d::color_t color = this->Options.ui.animation_progress_color;
-    progressRep->SetProgressBarColor(color.r(), color.g(), color.b());
-    progressRep->DrawBackgroundOff();
-    progressRep->DragableOff();
-    progressRep->SetShowBorderToOff();
-    progressRep->DrawFrameOff();
-    progressRep->SetPadding(0.0, 0.0);
-    progressRep->SetVisibility(this->Options.ui.animation_progress);
-    this->ProgressWidget->On();
-  }
-  else
-  {
-    this->ProgressWidget = nullptr;
-  }
 
   // Reset animation indices before updating
   this->PreparedAnimationIndices.reset();
   this->AnimationTimeSteps->Reset();
   this->PrepareForAnimationIndices();
+
+  // Push the animation time range and name to the UI actor
+  this->PushAnimationProgress();
 
   if (this->AvailAnimations == 0)
   {
@@ -108,6 +84,22 @@ void animationManager::Initialize()
   {
     this->StartAnimation();
   }
+}
+
+//----------------------------------------------------------------------------
+void animationManager::Reset()
+{
+  assert(this->Importer);
+  this->Playing = false;
+  this->CurrentTime = 0;
+  this->CurrentTimeSet = false;
+  this->AvailAnimations = 0;
+
+  this->PreparedAnimationIndices.reset();
+  this->AnimationTimeSteps->Reset();
+
+  // No animation is loaded: hide the progress bar
+  this->PushAnimationProgress();
 }
 
 //----------------------------------------------------------------------------
@@ -214,6 +206,29 @@ void animationManager::JumpToFrame(int frame, bool relative)
 }
 
 //----------------------------------------------------------------------------
+void animationManager::JumpToTime(double timeValue, bool relative)
+{
+  double target = 0.0;
+  if (relative)
+  {
+    target = this->CurrentTime + timeValue;
+  }
+  else if (timeValue >= 0.0)
+  {
+    target = timeValue;
+  }
+  else
+  {
+    target = this->TimeRange[1] + timeValue;
+  }
+
+  if (this->LoadAtTime(target))
+  {
+    this->Window.render();
+  }
+}
+
+//----------------------------------------------------------------------------
 void animationManager::JumpToKeyFrame(int keyframe, bool relative)
 {
   if (this->AnimationTimeSteps->GetNumberOfTuples() == 0)
@@ -300,16 +315,13 @@ bool animationManager::LoadAtTime(double timeValue)
     return false;
   }
 
-  if (this->Interactor && this->ProgressWidget)
-  {
-    // Set progress bar
-    vtkProgressBarRepresentation* progressRep =
-      vtkProgressBarRepresentation::SafeDownCast(this->ProgressWidget->GetRepresentation());
-    progressRep->SetProgressRate(
-      (this->CurrentTime - this->TimeRange[0]) / (this->TimeRange[1] - this->TimeRange[0]));
+  this->Window.GetRenderer()->UpdateAnimationTime(this->CurrentTime);
 
+  if (this->AvailAnimations > 0 && this->Interactor)
+  {
     this->Interactor->UpdateRendererAfterInteraction();
   }
+
   return true;
 }
 
@@ -384,6 +396,9 @@ void animationManager::CycleAnimation()
   this->PrepareForAnimationIndices();
   this->LoadAtTime(this->TimeRange[0]);
 
+  // The loaded animation changed: refresh the progress bar's time range and name
+  this->PushAnimationProgress();
+
   vtkRenderWindow* renWin = this->Window.GetRenderWindow();
   vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
   ren->SetCheatSheetConfigured(false);
@@ -446,6 +461,21 @@ std::vector<std::string> animationManager::GetAnimationNames()
   }
 
   return animations;
+}
+
+//----------------------------------------------------------------------------
+void animationManager::PushAnimationProgress()
+{
+  if (this->AvailAnimations <= 0)
+  {
+    // No animation: clear the range so the bar hides itself
+    this->Window.GetRenderer()->SetAnimationProgress({ 0.0, 0.0 }, "", {});
+  }
+  else
+  {
+    this->Window.GetRenderer()->SetAnimationProgress(
+      this->GetTimeRange(), this->GetAnimationName(), this->GetKeyFrames());
+  }
 }
 
 //----------------------------------------------------------------------------

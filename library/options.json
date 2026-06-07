@@ -294,8 +294,8 @@
       "parsed_default_value": "f3d_yellow"
     },
     "animation_progress": {
-      "type": "bool",
-      "default_value": "false"
+      "type": "string",
+      "default_value": "none"
     },
     "animation_progress_color": {
       "type": "color",

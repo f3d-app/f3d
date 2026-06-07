@@ -559,11 +559,14 @@ CLI: `--loading-progress`.
 
 Set loader progress bar color.
 
-### `ui.animation_progress` (_bool_, default: `false`, **on load**)
+### `ui.animation_progress` (_string_, default: `none`, **on load**)
 
-Show a _progress bar_ when playing the animation.
+Control the _progress bar_ shown when playing the animation. Can be `none` (hidden),
+`default` (only the progress bar, which can be clicked or dragged to jump to a
+time) or `advanced` (the progress bar plus time range, animation name and current
+time labels, with a marker for each keyframe).
 
-CLI: `--animation-progress`.
+CLI: `--animation-progress`. A bare `--animation-progress` implies `default`.
 
 ### `ui.animation_progress_color` (_color_, default: `f3d_blue`)
 

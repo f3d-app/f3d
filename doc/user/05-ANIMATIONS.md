@@ -20,7 +20,7 @@ Press <kbd>W</kbd> to cycle through available animations
 
 <img width="1024" alt="4" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_3.png" />
 Press <kbd>space</kbd> to play/pause current animation.
-Note: A blue bar runs along the bottom of screen to indicate the current time interval of the animation sequence if animation-progress was turned on.
+Note: A blue bar runs along the bottom of screen to indicate the current time interval of the animation sequence if `--animation-progress` is set to `default` or `advanced`. The `advanced` mode additionally shows the time range, animation name and current time, and marks each keyframe with a vertical line on the bar; both modes let you click or drag the bar to jump to a given time. While hovering the `advanced` bar near a keyframe marker, the tooltip reports that keyframe's time.
 
 <img width="1024" alt="5" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_4.png" />
 "All Animations" will play all animations at the same time if supported by the file format.
@@ -67,7 +67,7 @@ See [Filename templating](03-OPTIONS.md#filename-templating) for more template v
 - Press <kbd>Space</kbd> to play/pause animation
 - Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbd> to play/pause animation backward
 
-See [COMMANDS](07-COMMANDS.md) for commands like `jump_to_frame`
+See [COMMANDS](07-COMMANDS.md) for commands like `jump_to_frame` and `jump_to_time`
 
 ## Cycling Animations
 

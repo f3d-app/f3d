@@ -1142,6 +1142,18 @@ interactor& interactor_impl::initCommands()
     });
 
   this->addCommand(
+    "jump_to_time",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 2, "jump_to_time");
+      const double time = options::parse<double>(args[0]);
+      const bool relative = options::parse<bool>(args[1]);
+      this->Internals->AnimationManager->JumpToTime(time, relative);
+    },
+    command_documentation_t{
+      "jump_to_time time relative", "load the animation at a specific time" });
+
+  this->addCommand(
     "elevation_camera",
     [&](const std::vector<std::string>& args)
     {

@@ -321,7 +321,7 @@ int TestSDKSceneFromMemoryZeroCopy([[maybe_unused]] int argc, [[maybe_unused]] c
   f3d::window& win = eng.getWindow().setSize(500, 500);
   win.setWindowName("Zero-copy animated mesh");
 
-  eng.getOptions().ui.animation_progress = true;
+  eng.getOptions().ui.animation_progress = "default";
   eng.getOptions().render.show_edges = true;
   eng.getOptions().model.scivis.enable = true;
   eng.getOptions().model.scivis.cells = true;

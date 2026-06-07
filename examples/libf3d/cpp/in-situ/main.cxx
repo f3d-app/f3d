@@ -98,7 +98,7 @@ int main(int argc, char** argv)
 
   opt.ui.axis = true;
   opt.ui.fps = true;
-  opt.ui.animation_progress = true;
+  opt.ui.animation_progress = "default";
   opt.ui.scalar_bar = true;
   opt.ui.notifications.enable = true;
 
