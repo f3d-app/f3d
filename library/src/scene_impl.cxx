@@ -870,6 +870,18 @@ double scene_impl::animationTime()
 }
 
 //----------------------------------------------------------------------------
+size_t scene_impl::animationFrame()
+{
+  assert(this->Internals->Interactor);
+  assert(this->Internals->AnimationManager);
+
+  this->Internals->AnimationManager.SetDeltaTime(
+    this->Internals->Interactor->getDeltaTime()
+  );
+  return this->Internals->AnimationManager.GetCurrentFrame();
+}
+
+//----------------------------------------------------------------------------
 std::pair<double, double> scene_impl::animationTimeRange()
 {
   return this->Internals->AnimationManager.GetTimeRange();

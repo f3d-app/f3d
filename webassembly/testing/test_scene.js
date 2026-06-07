@@ -53,6 +53,11 @@ const settings = {
     );
 
     utils.assert(
+      scene.animationFrame() === 5,
+      "animationFrame should be 5 after loading 0.5",
+    );
+
+    utils.assert(
       scene.getAnimationName() == "stand",
       "getAnimationName returns name",
     );

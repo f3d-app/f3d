@@ -167,6 +167,7 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("loadAnimationTime", &f3d::scene::loadAnimationTime,
       emscripten::return_value_policy::reference())
     .function("animationTime", &f3d::scene::animationTime)
+    .function("animationFrame", &f3d::scene::animationFrame)
     .function(
       "animationTimeRange", +[](f3d::scene& scene) -> emscripten::val
       { return pairToJSArray(scene.animationTimeRange()); })

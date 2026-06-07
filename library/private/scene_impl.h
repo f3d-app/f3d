@@ -47,6 +47,7 @@ public:
   bool supports(const std::filesystem::path& filePath) override;
   scene& loadAnimationTime(double timeValue) override;
   double animationTime() override;
+  size_t animationFrame() override;
   std::pair<double, double> animationTimeRange() override;
   std::vector<double> getAnimationKeyFrames() override;
   unsigned int availableAnimations() const override;

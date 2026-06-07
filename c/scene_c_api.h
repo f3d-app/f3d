@@ -144,6 +144,14 @@ extern "C"
   F3D_EXPORT double f3d_scene_animation_time(f3d_scene_t* scene);
 
   /**
+   * @brief Get current animation frame of the loaded files.
+   *
+   * @param scene Scene handle.
+   * @return Current animation frame.
+   */
+  F3D_EXPORT size_t f3d_scene_animation_frame(f3d_scene_t* scene);
+
+  /**
    * @brief Get keyframes times of loaded files
    *
    * The returned keyframes is heap-allocated and must be freed with

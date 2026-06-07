@@ -267,6 +267,16 @@ double f3d_scene_animation_time(f3d_scene_t* scene)
 }
 
 //----------------------------------------------------------------------------
+size_t f3d_scene_animation_frame(f3d_scene_t* scene)
+{
+  if (!scene)
+    return 0;
+
+  f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
+  return cpp_scene->animationFrame();
+}
+
+//----------------------------------------------------------------------------
 double* f3d_scene_get_animation_keyframes(f3d_scene_t* scene, unsigned int* count)
 {
   f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);

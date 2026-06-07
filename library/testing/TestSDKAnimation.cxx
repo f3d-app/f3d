@@ -79,14 +79,20 @@ int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("goToKeyframe absolute index 0", sce.animationTime(), keyframes[0]);
 
   sce.loadAnimationTime(0.0);
+  test("animationFrame after load 0.0", sce.animationFrame(), static_cast<size_t>(0));
 
   sce.loadAnimationTime(0.5);
+  test("animationFrame after load 0.5", sce.animationFrame(), static_cast<size_t>(5));
 
   inter.goToFrame(24, false);
+  test("goToFrame absolute index 24", sce.animationFrame(), static_cast<size_t>(24));
 
   inter.goToFrame(1, true);
+  test("goToFrame relative +1", sce.animationFrame(), static_cast<size_t>(24));
 
   inter.goToFrame(0, false);
+  test("goToFrame absolute index 0", sce.animationFrame(), static_cast<size_t>(0));
+
   inter.startAnimation(f3d::interactor::AnimationDirection::FORWARD);
   test("isPlaying backward after forward start",
     inter.getAnimationDirection() == f3d::interactor::AnimationDirection::FORWARD);

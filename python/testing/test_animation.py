@@ -89,16 +89,21 @@ def test_animation():
     engine.interactor.go_to_keyframe(1, True)
     assert engine.scene.animation_time() == keyframes[5]
 
-    # currentFrame
+    # animationFrame
     engine.scene.load_animation_time(0.0)
+    assert engine.scene.animation_frame() == 0
 
     engine.scene.load_animation_time(0.5)
+    assert engine.scene.animation_frame() == 5
 
     # goToFrame absolute
     engine.interactor.go_to_frame(24, False)
+    assert engine.scene.animation_frame() == 24
 
     # goToFrame relative
     engine.interactor.go_to_frame(1, True)
+    assert engine.scene.animation_frame() == 24
 
     # goToFrame absolute 0
     engine.interactor.go_to_frame(0, False)
+    assert engine.scene.animation_frame() == 0
