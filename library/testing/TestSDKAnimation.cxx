@@ -74,6 +74,7 @@ int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("goToKeyframe relative +1", sce.animationTime(), keyframes[5]);
 
   inter.goToKeyframe(0, false);
+  test("goToKeyframe absolute index 0", sce.animationTime(), keyframes[0]);
 
   sce.loadAnimationTime(0.0);
 

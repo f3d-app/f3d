@@ -388,6 +388,11 @@ extern "C"
     return self;
   }
 
+  JNIEXPORT jdouble JAVA_BIND(Scene, animationTime)(JNIEnv* env, jobject self)
+  {
+    return GetEngine(env, self)->getScene().animationTime();
+  }
+
   JNIEXPORT jdoubleArray JAVA_BIND(Scene, animationTimeRange)(JNIEnv* env, jobject self)
   {
     auto [minTime, maxTime] = GetEngine(env, self)->getScene().animationTimeRange();

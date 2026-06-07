@@ -864,6 +864,12 @@ scene& scene_impl::loadAnimationTime(double timeValue)
 }
 
 //----------------------------------------------------------------------------
+double scene_impl::animationTime()
+{
+  return this->Internals->AnimationManager.GetCurrentTime();
+}
+
+//----------------------------------------------------------------------------
 std::pair<double, double> scene_impl::animationTimeRange()
 {
   return this->Internals->AnimationManager.GetTimeRange();
