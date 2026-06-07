@@ -13,8 +13,8 @@ f3d_test(<NAME> [ARGS...])
 ```
   - `LONG_TIMEOUT` Marks a test to be enabled only if
     F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS is ON
-  - `DEFAULT_HDRI` Marks a test that uses the default HDRI, to be enabled only
-    if F3D_TESTING_ENABLE_DEFAULT_HDRI_TESTS is ON
+  - `DEFAULT_HDRI` Marks a test that uses the default HDRI, it will be disabled
+    on non-Apple platforms when using VTK older than 9.5.20251001
   - `INTERACTION` If present, an interaction recording of the same name as the
     test will be played using `--interaction-test-play`. Such a recording
     should be cleaned up and long one should consider using LONG_TIMEOUT.
@@ -197,9 +197,9 @@ function(f3d_test)
       set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES DISABLED ON)
     endif()
   endif()
-  if(NOT F3D_TESTING_ENABLE_DEFAULT_HDRI_TESTS)
-    if(F3D_TEST_DEFAULT_HDRI)
-      list(PREPEND F3D_TEST_LABELS "hdri")
+  if(F3D_TEST_DEFAULT_HDRI)
+    list(PREPEND F3D_TEST_LABELS "hdri")
+    if(VTK_VERSION VERSION_LESS 9.5.20251001 AND NOT APPLE)
       set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES DISABLED ON)
     endif()
   endif()
