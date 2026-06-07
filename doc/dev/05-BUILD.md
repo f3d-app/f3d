@@ -116,6 +116,7 @@ pip install --group dev
 ### Build
 
 Configure F3D with the `F3D_BINDINGS_PYTHON` CMake option enabled:
+
 ```bash
 cmake -DF3D_BINDINGS_PYTHON=ON [...]
 ```
