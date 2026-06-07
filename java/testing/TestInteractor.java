@@ -50,6 +50,7 @@ public class TestInteractor {
     interactor.stopAnimation();
     interactor.isPlayingAnimation();
     interactor.getAnimationDirection();
+    interactor.getDeltaTime();
     interactor.goToKeyframe(4, false);
     interactor.goToKeyframe(1, true);
     interactor.goToFrame(24, false);

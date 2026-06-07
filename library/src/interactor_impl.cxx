@@ -2176,6 +2176,12 @@ interactor& interactor_impl::requestStop()
 }
 
 //----------------------------------------------------------------------------
+double interactor_impl::getDeltaTime() const
+{
+  return this->Internals->CallbackDeltaTime;
+}
+
+//----------------------------------------------------------------------------
 void interactor_impl::SetAnimationManager(animationManager* manager)
 {
   this->Internals->AnimationManager = manager;

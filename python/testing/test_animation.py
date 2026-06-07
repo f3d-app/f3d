@@ -43,6 +43,9 @@ def test_animation():
     inter_ref = engine.interactor.trigger_event_loop(0.1)
     assert inter_ref == engine.interactor
 
+    # getDeltaTime after triggerEventLoop
+    assert engine.interactor.get_delta_time() == 0.1
+
     # isPlaying after stop
     engine.interactor.stop_animation()
     assert engine.interactor.is_playing_animation() == 0

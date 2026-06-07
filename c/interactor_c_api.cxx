@@ -145,6 +145,16 @@ f3d_interactor_animation_direction_t f3d_interactor_get_animation_direction(
 }
 
 //----------------------------------------------------------------------------
+double f3d_interactor_get_delta_time(f3d_interactor_t* interactor)
+{
+  if (!interactor)
+    return 0.0;
+
+  f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
+  return cpp_interactor->getDeltaTime();
+}
+
+//----------------------------------------------------------------------------
 void f3d_interactor_go_to_keyframe(
   f3d_interactor_t* interactor, unsigned int index, int relative)
 {

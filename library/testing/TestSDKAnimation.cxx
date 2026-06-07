@@ -43,6 +43,8 @@ int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   f3d::interactor& interRef = inter.triggerEventLoop(0.1);
   test("triggerEventLoop returns self", &interRef == &inter);
 
+  test("getDeltaTime after triggerEventLoop", inter.getDeltaTime(), 0.1);
+
   inter.stopAnimation();
   test("isPlaying after stop", !inter.isPlayingAnimation());
 

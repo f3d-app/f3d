@@ -372,6 +372,7 @@ EMSCRIPTEN_BINDINGS(f3d)
       emscripten::return_value_policy::reference())
     .function("isPlayingAnimation", &f3d::interactor::isPlayingAnimation)
     .function("getAnimationDirection", &f3d::interactor::getAnimationDirection)
+    .function("getDeltaTime", &f3d::interactor::getDeltaTime)
     .function("goToKeyframe", &f3d::interactor::goToKeyframe,
       emscripten::return_value_policy::reference())
     .function("goToFrame", &f3d::interactor::goToFrame,

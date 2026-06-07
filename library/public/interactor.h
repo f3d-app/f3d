@@ -277,6 +277,12 @@ public:
   [[nodiscard]] virtual interactor::AnimationDirection getAnimationDirection() = 0;
 
   /**
+   * Get the delta time used by the event loop.
+   * Returns 0 if the event loop has never been triggered.
+   */
+  [[nodiscard]] virtual double getDeltaTime() const = 0;
+
+  /**
    * Go to a specific keyframe by index.
    * When relative is true, the index is an offset from the closest keyframe to the current time.
    * When relative is false, the index is the absolute keyframe index.

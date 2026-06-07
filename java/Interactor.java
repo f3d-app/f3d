@@ -398,6 +398,13 @@ public class Interactor {
     public native AnimationDirection getAnimationDirection();
 
     /**
+     * Get the delta time used by the event loop.
+     *
+     * @return delta time in seconds
+     */
+    public native double getDeltaTime();
+
+    /**
      * Go to a specific keyframe by index.
      *
      * @param index keyframe index

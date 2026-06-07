@@ -127,6 +127,7 @@ public:
    *Set the animation in delta time in seconds
    */
   void SetDeltaTime(double deltaTime);
+  double GetDeltaTime() const { return this->DeltaTime; }
 
   /**
    * Advance animationTime of deltaTime and call loadAtTime accordingly

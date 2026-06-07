@@ -337,6 +337,14 @@ extern "C"
     f3d_interactor_t* interactor);
 
   /**
+   * @brief Get the delta time used by the event loop.
+   *
+   * @param interactor Interactor handle.
+   * @return delta time in seconds.
+   */
+  F3D_EXPORT double f3d_interactor_get_delta_time(f3d_interactor_t* interactor);
+
+  /**
    * @brief Go to a specific keyframe by index.
    *
    * @param interactor Interactor handle.

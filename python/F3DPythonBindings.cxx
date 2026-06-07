@@ -386,6 +386,8 @@ PYBIND11_MODULE(pyf3d, module)
       "Returns True if the animation is currently started")
     .def("get_animation_direction", &f3d::interactor::getAnimationDirection,
       "Returns the current animation direction")
+    .def("get_delta_time", &f3d::interactor::getDeltaTime,
+      "Returns the delta time used by the event loop")
     .def("go_to_keyframe", &f3d::interactor::goToKeyframe, "Go to keyframe by index",
       py::arg("index"), py::arg("relative"))
     .def("go_to_frame", &f3d::interactor::goToFrame, "Go to frame by index",

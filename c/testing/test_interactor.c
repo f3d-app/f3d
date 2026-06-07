@@ -64,6 +64,8 @@ int test_interactor()
   f3d_interactor_trigger_text_character(interactor, 65);
 
   f3d_interactor_trigger_event_loop(interactor, 0.016);
+  double delta = f3d_interactor_get_delta_time(interactor);
+  (void)delta;
 
   f3d_interactor_trigger_notification(interactor, "foo", "bar", 3.0);
 

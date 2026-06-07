@@ -470,6 +470,11 @@ extern "C"
       enumClass, fromValueMethod, static_cast<int>(nativeDirection));
   }
 
+  JNIEXPORT jdouble JAVA_BIND(Interactor, getDeltaTime)(JNIEnv* env, jobject self)
+  {
+    return GetInteractor(env, self).getDeltaTime();
+  }
+
   JNIEXPORT jobject JAVA_BIND(Interactor, enableCameraMovement)(JNIEnv* env, jobject self)
   {
     GetInteractor(env, self).enableCameraMovement();

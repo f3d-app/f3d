@@ -73,6 +73,7 @@ public:
   interactor& stopAnimation() override;
   bool isPlayingAnimation() override;
   interactor::AnimationDirection getAnimationDirection() override;
+  double getDeltaTime() const override;
   interactor& goToKeyframe(size_t index, bool relative) override;
   interactor& goToFrame(size_t index, bool relative) override;
 

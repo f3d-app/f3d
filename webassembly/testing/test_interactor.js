@@ -113,6 +113,12 @@ const settings = {
     interactor.goToFrame(1, true);
     interactor.goToFrame(0, false);
 
+    interactor.triggerEventLoop(0.1);
+    utils.assert(
+      interactor.getDeltaTime() === 0.1,
+      "getDeltaTime should be 0.1 after triggerEventLoop",
+    );
+
     // only for coverage, do not test the actual feature yet
     interactor.disableCameraMovement();
     interactor.enableCameraMovement();
