@@ -103,9 +103,9 @@ Set _verbose_ level, in order to provide more information about the loaded data 
 
 Show a _progress bar_ when loading the file.
 
-### `--animation-progress` (_bool_, default: `false`)
+### `--animation-progress=<none|default|advanced>` (_string_, default: `none`, implicit: `default`)
 
-Show a _progress bar_ when playing the animation.
+Control the _progress bar_ shown when playing the animation. Can be `none` (hidden), `default` (only the progress bar, which can be clicked or dragged to jump to a time) or `advanced` (the progress bar plus time range, animation name and current time labels, with a marker for each keyframe).
 
 ### `--multi-file-mode=<single|all| dir>` (_string_, default: `single`)
 

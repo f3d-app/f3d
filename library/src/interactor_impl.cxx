@@ -1136,6 +1136,27 @@ interactor& interactor_impl::initCommands()
       "jump_to_frame_relative offset", "move animation a number of frames forward or backward" });
 
   this->addCommand(
+    "jump_to_time",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 1, "jump_to_time");
+      const double time = options::parse<double>(args[0]);
+      this->Internals->AnimationManager->JumpToTime(time, false);
+    },
+    command_documentation_t{ "jump_to_time time", "load the animation at a specific time" });
+
+  this->addCommand(
+    "jump_to_time_relative",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 1, "jump_to_time_relative");
+      const double time = options::parse<double>(args[0]);
+      this->Internals->AnimationManager->JumpToTime(time, true);
+    },
+    command_documentation_t{ "jump_to_time_relative offset",
+      "move the animation a number of seconds forward or backward" });
+
+  this->addCommand(
     "elevation_camera",
     [&](const std::vector<std::string>& args)
     {

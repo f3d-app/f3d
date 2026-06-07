@@ -48,13 +48,13 @@ endif()
 f3d_test(NAME TestVerboseGenericImporterAnimation DATA small.ex2 PLUGIN hdf ARGS --verbose NO_BASELINE REGEXP "0, 0.00429999")
 
 # Test animation with generic importer and coloring
-f3d_test(NAME TestAnimationGenericImporter DATA small.ex2 PLUGIN hdf ARGS -sb --animation-time=0.003 --animation-progress)
+f3d_test(NAME TestAnimationGenericImporter DATA small.ex2 PLUGIN hdf ARGS -sb --animation-time=0.003 --animation-progress UI)
 
 # Test animation with generic importer, coloring and point sprites
-f3d_test(NAME TestAnimationGenericImporterPointSprites DATA small.ex2 PLUGIN hdf ARGS -sbo --animation-time=0.003 --animation-progress)
+f3d_test(NAME TestAnimationGenericImporterPointSprites DATA small.ex2 PLUGIN hdf ARGS -sbo --animation-time=0.003 --animation-progress UI)
 
 # Test animation with generic importer, coloring and a custom scalar range
-f3d_test(NAME TestAnimationGenericImporterScalarRange DATA small.ex2 PLUGIN hdf ARGS -sb --animation-time=0.003 --animation-progress --coloring-range=0,1e7)
+f3d_test(NAME TestAnimationGenericImporterScalarRange DATA small.ex2 PLUGIN hdf ARGS -sb --animation-time=0.003 --animation-progress --coloring-range=0,1e7 UI)
 
 # Test Generic Importer Verbose animation with a single frame.
 f3d_test(NAME TestVerboseAnimationSingleTimestep DATA single_timestep.e PLUGIN hdf ARGS --verbose NO_BASELINE REGEXP "0, 0")
@@ -76,6 +76,9 @@ f3d_test(NAME TestTimeRangeLessThanZeroWithAnimationTime DATA negative_range_ani
 
 # Test if a negative animation-time works when time range[0] is less than zero
 f3d_test(NAME TestTimeRangeLessThanZeroNegativeAnimationTime DATA negative_range_animated.e PLUGIN hdf ARGS -s --animation-time=-3)
+
+# Test the advanced progress bar renders correctly when the animation time range is negative
+f3d_test(NAME TestTimeRangeLessThanZeroAdvancedProgressBar DATA negative_range_animated.e PLUGIN hdf ARGS -s --animation-time=-3 --animation-progress=advanced UI)
 
 f3d_test(NAME TestMultiFileAnimationUniqueUnique DATA negative_range_animated.e small.ex2 ARGS --animation-time=0.0043001 --animation-indices=0,1 --multi-file-mode=all PLUGIN hdf)
 f3d_test(NAME TestMultiFileAnimationMultiUnique DATA f3d.glb blob.vtkhdf ARGS --animation-time=2 --animation-indices=0,1 --multi-file-mode=all --opacity=0.5 PLUGIN hdf)

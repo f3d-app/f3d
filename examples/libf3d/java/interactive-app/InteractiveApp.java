@@ -33,7 +33,7 @@ public class InteractiveApp {
 
             options.setAsBool("ui.axis", true);
             options.setAsBool("ui.fps", true);
-            options.setAsBool("ui.animation_progress", true);
+            options.setAsString("ui.animation_progress", "default");
             options.setAsBool("ui.filename", true);
 
             Scene scene = engine.getScene();

@@ -598,6 +598,23 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetFontFile(opt.ui.font_file);
   renderer->SetFontScale(opt.ui.scale);
   renderer->SetFontColor(opt.ui.font_color);
+  renderer->SetAnimationProgressColor(opt.ui.animation_progress_color);
+  vtkF3DUIActor::AnimationProgressBarMode animationProgressMode =
+    vtkF3DUIActor::AnimationProgressBarMode::NONE;
+  if (opt.ui.animation_progress == "default")
+  {
+    animationProgressMode = vtkF3DUIActor::AnimationProgressBarMode::DEFAULT;
+  }
+  else if (opt.ui.animation_progress == "advanced")
+  {
+    animationProgressMode = vtkF3DUIActor::AnimationProgressBarMode::ADVANCED;
+  }
+  else if (opt.ui.animation_progress != "none")
+  {
+    log::warn(opt.ui.animation_progress,
+      R"( is an invalid animation progress mode. Valid modes are: "none", "default", "advanced". Falling back to "none".)");
+  }
+  renderer->SetAnimationProgressMode(animationProgressMode);
   renderer->SetDPIAware(opt.ui.dpi_aware);
 
   renderer->SetGridUnitSquare(opt.render.grid.unit);
