@@ -96,9 +96,9 @@ cmake --preset=vcpkg /path/to/source
 
 ### Requirements
 
-Only `pybind11` should be available on your system to build python bindings. Additionally, `pytest` and `numpy` must be available to run tests.
+Only `pybind11` should be available on your system to build python bindings. Additionally, `pytest` and `numpy` must be available to run the tests. These dependencies can be installed with `pip`. It is recommended (but not strictly necessary) to install in a virtual environment.
 
-In case of issues getting these dependencies, you can optionally create a virtual environment:
+The virtual environment can be created using the `venv` module:
 
 ```bash
 python -m venv .venv
