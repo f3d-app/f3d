@@ -8,7 +8,8 @@
     "OSPRay is fixed at 2.12.0 until full support for OSPRay 3.0 is added in VTK",
     "TBB is set at v2021.13.1 because OpenUSD seems to not support more recent versions: https://github.com/PixarAnimationStudios/OpenUSD/issues/3878 and https://github.com/PixarAnimationStudios/OpenUSD/issues/4078",
     "sqlite is using a common-superbuild hash as it is not a CMake project",
-    "OpenEXR v3.0.1 is actually not using OpenJPH"
+    "OpenEXR v3.0.1 is actually not using OpenJPH",
+    "zlib is fixed at v1.3.1 until https://github.com/madler/zlib/issues/1181 is fixed"
   ],
   "alembic": {
     "version": "1.8.11",
@@ -83,7 +84,7 @@
     "min_version": "3.10"
   },
   "sqlite_csb": {
-    "version": "794c80fe9ed539c9b353d12ec00335d8c21d5b52",
+    "version": "fee2c760fd54b08104d0c8e9d80f6d52d3a11106",
     "min_version": "bb237f11ca039bd01314bb2252eb282086723c18"
   },
   "tbb": {
@@ -107,11 +108,11 @@
     "min_version": "v1.2.4"
   },
   "zlib": {
-    "version": "v1.3.2",
+    "version": "v1.3.1",
     "min_version": "v1.2.13"
   },
-  "vtk_commit_sha": "27b3522610458af6daf36fd1bbee96e32e676761",
-  "docker_timestamp": "20260528_0",
+  "vtk_commit_sha": "31bcf57f7c6b2b1490f641837f8367a0d8b5277b",
+  "docker_timestamp": "20260531_0",
   "global_cache_index": "2",
   "vtk_matrix": "['commit', 'v9.6.2', 'v9.5.2', 'v9.4.2']"
 }

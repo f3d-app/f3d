@@ -155,3 +155,17 @@ Once a release cycle:
 
 - Check that completions are still working with `fish` and `zsh` when tab is pressed
 - Check that F3D is added for extensions on a fresh Windows installation
+- Check that F3D binary on linux works on ubuntu with almost nothing installed (libosmesa6 should NOT install Xorg, check it)
+
+```
+docker run -it ubuntu:latest /bin/bash
+apt update
+apt install wget xz-utils libosmesa6
+wget https://github.com/f3d-app/f3d/raw/refs/heads/master/testing/data/dragon.vtu
+wget https://github.com/f3d-app/f3d/releases/download/X.Y.Z/F3D-X.Y.Z-Linux-x86_64-raytracing.tar.xz
+tar -xzvf F3D-X.Y.Z-Linux-x86_64-raytracing.tar.xz
+apt autoremove wget xz-utils
+./F3D-X.Y.Z-Linux-x86_64-raytracing/bin/f3d dragon.vtu --output=img.png
+apt install catimg
+catimg img.png
+```

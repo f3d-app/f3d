@@ -217,6 +217,7 @@ f3d_plugin_build(
   [ADDITIONAL_RPATHS     <path>...]
   [MIMETYPE_XML_FILES    <path>...]
   [CONFIGURATION_DIRS    <path>...]
+  [RESOURCES             <path>...]
   [FREEDESKTOP]
   [FORCE_STATIC])
 ~~~
@@ -232,12 +233,14 @@ The `NAME` argument is required. The arguments are as follows:
   * `ADDITIONAL_RPATHS`: The list of additional RPATH for the installed binaries on Unix. VTK path is added automatically.
   * `MIMETYPE_XML_FILES`: The list of mimetype files to install. It's useful for file association on OS using Freedesktop specifications.
   * `CONFIGURATION_DIRS`: The list of configuration directories to install. Generally contain a load-plugins option and format specific options.
+  * `RESOURCES`: A list of destination paths (relative to the plugins install/build dir) to copy resources to. For each
+    entry the source file is looked up as ``${CMAKE_CURRENT_SOURCE_DIR}/resources/<filename>``.
   * `FREEDESKTOP`: If specified, generates .desktop and .thumbnailer used for desktop integration on Linux.
   * `FORCE_STATIC`: If specified, the plugin is built as a static library and embedded into libf3d.
 #]==]
 
 macro(f3d_plugin_build)
-  cmake_parse_arguments(F3D_PLUGIN "FREEDESKTOP;FORCE_STATIC" "NAME;DESCRIPTION;VERSION" "VTK_MODULES;ADDITIONAL_RPATHS;MIMETYPE_XML_FILES;CONFIGURATION_DIRS" ${ARGN})
+  cmake_parse_arguments(F3D_PLUGIN "FREEDESKTOP;FORCE_STATIC" "NAME;DESCRIPTION;VERSION" "VTK_MODULES;ADDITIONAL_RPATHS;MIMETYPE_XML_FILES;CONFIGURATION_DIRS;RESOURCES" ${ARGN})
 
   find_package(VTK 9.4.0 REQUIRED COMPONENTS
                CommonCore CommonExecutionModel IOImport
@@ -377,6 +380,20 @@ macro(f3d_plugin_build)
       DESTINATION "${_f3d_config_dir}"
       COMPONENT configuration
       EXCLUDE_FROM_ALL)
+  endforeach()
+
+  # Install resource files and copy them into the build directory
+  foreach(_resource_dest IN LISTS F3D_PLUGIN_RESOURCES)
+    get_filename_component(_resource_filename "${_resource_dest}" NAME)
+    get_filename_component(_resource_dest_dir "${_resource_dest}" DIRECTORY)
+    set(_resource_source "${CMAKE_CURRENT_SOURCE_DIR}/resources/${_resource_filename}")
+    install(FILES "${_resource_source}"
+      DESTINATION "${_f3d_plugins_install_dir}/${_resource_dest_dir}"
+      COMPONENT plugin)
+    configure_file(
+      "${_resource_source}"
+      "${CMAKE_BINARY_DIR}/${_resource_dest}"
+      COPYONLY)
   endforeach()
 
   # Generate mime, desktop and thumbnailer files

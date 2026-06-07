@@ -360,8 +360,8 @@ bool vtkF3DMetaImporter::Update()
           // Convert to linear space
           auto toLinear = [](double c) { return std::pow(c, 2.2); };
           double diffuseColor[3];
-          actor->GetProperty()->GetColor(diffuseColor);
-          actor->GetProperty()->SetColor(
+          actor->GetProperty()->GetDiffuseColor(diffuseColor);
+          actor->GetProperty()->SetDiffuseColor(
             toLinear(diffuseColor[0]), toLinear(diffuseColor[1]), toLinear(diffuseColor[2]));
 
           // restore diffuse/specular to 1 and ambient to 0

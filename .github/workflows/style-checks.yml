@@ -27,6 +27,14 @@ jobs:
           fetch-depth: 1
           lfs: false
 
+      - name: non-ASCII check in C++ files
+        shell: bash
+        run: |
+          if grep -rPn --include="*.h" --include="*.cxx" '[[:^ascii:]]' .; then
+            echo "::error::Non-ASCII characters detected"
+            exit 1
+          fi
+
       # Run codespell first to avoid issues with style check on same location
       - name: Codespell in place
         shell: bash

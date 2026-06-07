@@ -42,7 +42,7 @@ F3D supports the following file formats:
 | Drawing Exchange Format                   | `.dxf`                                         | Yes        | NONE              | YES (VTK 9.6)     | `assimp`  | `DXF`                   |
 | DirectX                                   | `.x`                                           | Yes        | SINGLE            | YES (VTK 9.6)     | `assimp`  | `DirectX`               |
 | 3D Manufacturing Format                   | `.3mf`                                         | Yes        | NONE              | YES (VTK 9.6)     | `assimp`  | `3MF`                   |
-| Universal Scene Description               | `.usd`, `.usda`, `.usdc`, `.usdz`              | Yes        | SINGLE            | NO                | `usd`     | `USD`                   |
+| Universal Scene Description               | `.usd`, `.usda`, `.usdc`, `.usdz`              | Yes        | SINGLE            | YES (VTK 9.6)     | `usd`     | `USD`                   |
 | VDB                                       | `.vdb`                                         | No         | NONE              | YES (VTK 9.6)     | `vdb`     | `VDB`                   |
 | Industry Foundation Classes               | `.ifc`                                         | No         | NONE              | YES               | `webifc`  | `IFC`                   |
 | 3D Gaussian splatting                     | `.splat`                                       | No         | NONE              | YES (VTK 9.5)     | `native`  | `Splat`                 |
@@ -72,7 +72,7 @@ For booleans, 0 means false, not 0 means true. Unsigned int will interpret anyth
 
 | Plugin   | Option Name                | Argument Type  | Description                                                                          |
 | -------- | -------------------------- | -------------- | ------------------------------------------------------------------------------------ |
-| `vdb`    | `VDB.downsampling_factor`  | `double`       | Control the level of downsampling when reading a volume, default is 0.1.             |
+| `mdl`    | `QuakeMDL.skin_index`      | `unsigned int` | Select a particular skin from a `mdl` file. Uses 0-indexing, default is 0.           |
 | `occt`   | `STEP.linear_deflection`   | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
 | `occt`   | `STEP.angular_deflection`  | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
 | `occt`   | `STEP.relative_deflection` | `bool`         | Control if the deflection values are relative to object size, default is false.      |
@@ -89,7 +89,8 @@ For booleans, 0 means false, not 0 means true. Unsigned int will interpret anyth
 | `occt`   | `XBF.angular_deflection`   | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
 | `occt`   | `XBF.relative_deflection`  | `bool`         | Control if the deflection values are relative to object size, default is false.      |
 | `occt`   | `XBF.read_wire`            | `bool`         | Control if lines should be read, default is true.                                    |
-| `mdl`    | `QuakeMDL.skin_index`      | `unsigned int` | Select a particular skin from a `mdl` file. Uses 0-indexing, default is 0.           |
+| `usd`    | `USD.resources_path`       | `string`       | Additional path to find USD plugInfo.json resources                                  |
+| `vdb`    | `VDB.downsampling_factor`  | `double`       | Control the level of downsampling when reading a volume, default is 0.1.             |
 | `webifc` | `IFC.circle_segments`      | `int`          | Number of segments for circular geometry, default is 12.                             |
 | `webifc` | `IFC.read_openings`        | `bool`         | Read IfcOpeningElement entities (doors/windows cutouts), default is false.           |
 | `webifc` | `IFC.read_spaces`          | `bool`         | Read IfcSpace entities (room volumes), default is false.                             |
