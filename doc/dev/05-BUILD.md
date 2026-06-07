@@ -76,7 +76,9 @@ Some dependencies are provided internally, eg: ImGui, dmon and others. Use `F3D_
 
 If you plan to contribute to F3D, you may want to use the provided `dev` preset for easier setup:
 
-`cmake --preset=dev /path/to/source`
+```bash
+cmake --preset=dev /path/to/source
+```
 
 Please note optional dependencies should then be enabled as needed.
 
@@ -86,7 +88,9 @@ It's possible to use VCPKG to automatically build dependencies. A manifest file 
 Basically, just install VCPKG, and configure F3D using `-DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake` option.
 Only VTK is added to the manifest file and additional dependencies must be added manually in this file. For an easier setup you can use the provided preset `vcpkg`:
 
-`cmake --preset=vcpkg /path/to/source`
+```bash
+cmake --preset=vcpkg /path/to/source
+```
 
 ## Python bindings
 
@@ -96,24 +100,31 @@ Only `pybind11` should be available on your system to build python bindings. Add
 
 In case of issues getting these dependencies, you can optionally create a virtual environment:
 
-    python -m venv .venv
-    source .venv/bin/activate
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
 
 Install the required Python dependencies:
 
-    pip install --group dev
+```bash
+pip install --group dev
+```
 
 > **Note**: Require pip 25.1 or higher. You can upgrade pip using `python -m pip install --upgrade pip`.
 
 ### Build
 
 Configure F3D with the `F3D_BINDINGS_PYTHON` CMake option enabled:
-
-    cmake -DF3D_BINDINGS_PYTHON=ON [...]
+```bash
+cmake -DF3D_BINDINGS_PYTHON=ON [...]
+```
 
 Build the project:
 
-    cmake --build . --target pyf3d
+```bash
+cmake --build . --target pyf3d
+```
 
 ### Test
 
@@ -125,13 +136,13 @@ Run the Python bindings tests with ctest:
 
 Installation can be done through CMake, by running the following command:
 
-```
+```bash
 cmake --install ${your_build_dir}
 ```
 
 Individual components can also be installed by specifying the component name:
 
-```
+```bash
 cmake --install ${your_build_dir} --component ${component_name}
 ```
 
