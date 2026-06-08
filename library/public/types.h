@@ -70,7 +70,7 @@ public:
     return this->Value;
   }
 
-//private:
+private:
   double Value = 0;
 };
 

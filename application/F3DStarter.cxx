@@ -606,15 +606,31 @@ public:
     libOptions.tester.size = 200;
     std::cout<<" size 200 " << libOptions.tester.size.isValid()<<std::endl;
     std::cout<<libOptions.tester.size.getDomain().size()<<std::endl;
-/*    libOptions.tester.scale = f3d::ratio_t(0.5);
+    libOptions.tester.scale = f3d::ratio_t(0.5);
     libOptions.tester.type = "foo";
     libOptions.tester.file = "path/to/foo";
     libOptions.tester.indices = {1,2};
+    libOptions.tester.indices_range = {1,2};
+    std::cout<<" indices ranges true: " << libOptions.tester.indices_range.isValid()<<std::endl;
+    libOptions.tester.indices_range = {1,10};
+    std::cout<<" indices ranges false: " << libOptions.tester.indices_range.isValid()<<std::endl;
+    libOptions.tester.indices_enum = {-5,-2};
+    std::cout<<" indices enum true: " << libOptions.tester.indices_enum.isValid()<<std::endl;
+    libOptions.tester.indices_enum = {-5,2};
+    std::cout<<" indices enum false: " << libOptions.tester.indices_enum.isValid()<<std::endl;
     libOptions.tester.opacity_map = {1.1,2.2};
+    libOptions.tester.opacity_map_range = {0.1,0.2};
+    std::cout<<" opacity range true: " << libOptions.tester.opacity_map_range.isValid()<<std::endl;
+    libOptions.tester.opacity_map_range = {0.1,1.2};
+    std::cout<<" opacity range false: " << libOptions.tester.opacity_map_range.isValid()<<std::endl;
+    libOptions.tester.opacity_map_enum = {0.,1.};
+    std::cout<<" opacity enum true: " << libOptions.tester.opacity_map_enum.isValid()<<std::endl;
+    libOptions.tester.opacity_map_enum = {0.,1.1};
+    std::cout<<" opacity enum false: " << libOptions.tester.opacity_map_enum.isValid()<<std::endl;
     libOptions.tester.color = f3d::color_t{0,0,0};
     libOptions.tester.up_direction = f3d::direction_t{1,0,0};
     libOptions.tester.colormap = f3d::colormap_t{1,0,0,0};
-    libOptions.tester.textures_transform = f3d::transform2d_t{1,0,0,0,1,0,0,0,1};*/
+    libOptions.tester.textures_transform = f3d::transform2d_t{1,0,0,0,1,0,0,0,1};
 
     // Copy appOptions
     F3DOptionsTools::OptionsDict appOptions = F3DOptionsTools::DefaultAppOptions;

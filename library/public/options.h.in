@@ -244,24 +244,39 @@ public:
       T Value;
   };
 
-  template<typename T, T MIN, T MAX>
+  template<typename T>
   class option_range : public option<T>
   {
     public:
-      option_range(const T& val)
-        : option<T>(val){}
-      option_range(T&& val) noexcept
-        : option<T>(std::move(val)){}
+      option_range(const T& val, const T& min, const T& max)
+        : option<T>(val)
+        , Range{min, max}
+        {
+        }
+
+      void operator=(const T& val)
+      {
+        this->Value = val;
+      }
+
+      option_range(T&& val, T&& min, T&& max) noexcept
+        : option<T>(std::move(val))
+        , Range{std::move(min), std::move(max)}
+        {
+        }
 
       const bool isValid()
       {
-        return this->Value >= MIN && this->Value <= MAX;
+        return this->Value >= this->Range[0] && this->Value <= this->Range[1];
       }
 
-      constexpr std::array<T,2> getDomain()
+      constexpr std::array<T,2>& getRange()
       {
-        return {MIN, MAX};
+        return this->Range;
       }
+    private:
+      std::array<T,2> Range;
+
   };
 
   template<typename T, std::size_t N>
@@ -300,18 +315,94 @@ public:
 
   };
 
-    struct tester {
+  template<typename T>
+  class option_vector_range : public option<std::vector<T>>
+  {
+    public:
+      option_vector_range(const std::vector<T>& val, const T& min, const T& max)
+        : option<std::vector<T>>(val)
+        , Range{min, max}
+        {
+        }
+
+      void operator=(const std::vector<T>& val)
+      {
+        this->Value = val;
+      }
+
+      option_vector_range(std::vector<T>&& val, T&& min, T&& max) noexcept
+        : option<std::vector<T>>(std::move(val))
+        , Range{std::move(min), std::move(max)}
+        {
+        }
+
+      const bool isValid()
+      {
+        auto checkRange = [this](auto val){ return val >= this->Range[0] && val <= this->Range[1]; };
+        return std::ranges::all_of(this->Value, checkRange);
+      }
+
+      constexpr std::array<T,2>& getRange()
+      {
+        return this->Range;
+      }
+    private:
+      std::array<T,2> Range;
+
+  };
+
+  template<typename T, std::size_t N>
+  class option_vector_enum : public option<std::vector<T>>
+  {
+    public:
+
+      option_vector_enum(const std::vector<T>& val, const std::array<T, N>& domain)
+        : option<std::vector<T>>(val)
+        , Domain({domain})
+      {
+      }
+
+      void operator=(const std::vector<T>& val)
+      {
+        this->Value = val;
+      }
+
+      option_vector_enum(std::vector<T>&& val, std::array<T, N> domain) noexcept
+        : option<std::vector<T>>(std::move(val))
+        , Domain(std::move(domain))
+      {
+      }
+
+      bool isValid()
+      {
+        auto checkEnum = [this](auto val){ return std::ranges::find(this->Domain, val) != this->Domain.end(); };
+        return std::ranges::all_of(this->Value, checkEnum);
+      }
+
+      std::array<T,N>& getDomain()
+      {
+        return this->Domain;
+      }
+    private:
+      std::array<T,N> Domain;
+  };
+
+  struct tester {
     option<bool> flag = false;
-    option_range<int, 0, 100> radius = option_range<int, 0, 100>(10);
+    option_range<int> radius = option_range<int>(10, 0, 100);
     option_enum<double, 3> size = option_enum<double, 3>(10., {0., 10., 100.});
-    option_range<f3d::ratio_t, 0., 0.4> scale_range = option_range<f3d::ratio_t, 0., 0.4>(0.2);
-    option_enum<f3d::ratio_t, 3> scale_enum = option_enum<f3d::ratio_t, 3>(1.0, {0., 0.5, 1.0});
+    option_range<f3d::ratio_t> scale_range = option_range<f3d::ratio_t>(f3d::ratio_t(0.2), f3d::ratio_t(0.), f3d::ratio_t(0.4));
+    option_enum<f3d::ratio_t, 3> scale_enum = option_enum<f3d::ratio_t, 3>(f3d::ratio_t(1.0), std::array<f3d::ratio_t, 3>{f3d::ratio_t(0.), f3d::ratio_t(0.5), f3d::ratio_t(1.0)});
     option<f3d::ratio_t> scale = f3d::ratio_t{1.0};
     option_enum<std::string, 3> type = option_enum<std::string, 3>("sphere", {"foo", "bar", "bok"});
     option_enum<std::optional<std::string>, 3> opttype = option_enum<std::optional<std::string>, 3>(std::nullopt, {std::nullopt, "bar", "bok"});
     option<std::optional<std::filesystem::path>> file;
     option<std::vector<int>> indices = std::vector<int>({0});
+    option_vector_range<int> indices_range = option_vector_range<int>(std::vector<int>({0}), -5, 5);
+    option_vector_enum<int, 4> indices_enum = option_vector_enum<int, 4>(std::vector<int>({0}), {-5, -2, 0, 1});
     option<std::vector<double>> opacity_map = std::vector<double>({0.0, 0.0, 1.0, 1.0});
+    option_vector_range<double> opacity_map_range = option_vector_range<double>({0.0, 0.0, 1.0, 1.0}, 0., 1.);
+    option_vector_enum<double, 2> opacity_map_enum = option_vector_enum<double, 2>({0.0, 0.0, 1.0, 1.0}, {0., 1.});
     option<f3d::color_t> color = f3d::color_t{0.2, 0.2, 0.2};
     option<f3d::direction_t> up_direction = f3d::direction_t{0,1,0};
     option<f3d::colormap_t> colormap = f3d::colormap_t{0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0};
