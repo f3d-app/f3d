@@ -257,6 +257,20 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     this->BakeReflectionPass = vtkSmartPointer<vtkFramebufferPass>::New();
     this->BakeReflectionPass->SetColorFormat(vtkTextureObject::Float16);
     this->BakeReflectionPass->SetDelegatePass(camP);
+
+    for (int i = 0; i < s->GetPropArrayCount(); i++)
+    {
+      vtkActor* actor = vtkActor::SafeDownCast(props[i]);
+      if (actor)
+      {
+        vtkF3DOpenGLGridMapper* gridMapper = vtkF3DOpenGLGridMapper::SafeDownCast(actor->GetMapper());
+        if (gridMapper)
+        {
+          gridMapper->SetReflectionColorTexture(this->BakeReflectionPass->GetColorTexture());
+          gridMapper->SetReflectionDepthTexture(this->BakeReflectionPass->GetDepthTexture());
+        }
+      }
+    }
   }
 
   {
@@ -280,20 +294,6 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     this->MainOnTopPass->SetDepthFormat(vtkTextureObject::Fixed32);
   }
 
-  for (int i = 0; i < s->GetPropArrayCount(); i++)
-  {
-    vtkActor* actor = vtkActor::SafeDownCast(props[i]);
-    if (actor)
-    {
-      vtkF3DOpenGLGridMapper* gridMapper = vtkF3DOpenGLGridMapper::SafeDownCast(actor->GetMapper());
-      if (gridMapper)
-      {
-        gridMapper->SetReflectionColorTexture(this->BakeReflectionPass->GetColorTexture());
-        gridMapper->SetReflectionDepthTexture(this->BakeReflectionPass->GetDepthTexture());
-      }
-    }
-  }
-
   this->InitializeTime = this->GetMTime();
 }
 
@@ -304,7 +304,7 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
 
   double bgColor[3];
 
-  vtkF3DRenderer* r = vtkF3DRenderer::SafeDownCast(s->GetRenderer());
+  vtkRenderer* r = s->GetRenderer();
   vtkInformation* info = r->GetInformation();
   bool uiOnly = info->Has(vtkF3DRenderPass::RENDER_UI_ONLY());
 
@@ -324,26 +324,33 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
     this->BackgroundPass->Render(&backgroundState);
 
     // the reflection result is used in the main pass so it must be rendered before
-    if (this->RenderReflection)
+    vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(r);
+
+#if F3D_MODULE_RAYTRACING
+    if (!this->UseRaytracing)
+#endif
     {
-      vtkRenderState reflState(s->GetRenderer());
-      reflState.SetPropArrayAndCount(
-        this->ReflectionProps.data(), static_cast<int>(this->ReflectionProps.size()));
-      reflState.SetFrameBuffer(s->GetFrameBuffer());
+      if (this->RenderReflection && renderer != nullptr)
+      {
+        vtkRenderState reflState(s->GetRenderer());
+        reflState.SetPropArrayAndCount(
+          this->ReflectionProps.data(), static_cast<int>(this->ReflectionProps.size()));
+        reflState.SetFrameBuffer(s->GetFrameBuffer());
 
-      vtkMatrix4x4* actorMatrix = r->GetGridMatrix();
+        vtkMatrix4x4* actorMatrix = renderer->GetGridMatrix();
 
-      vtkCamera* originalCam = s->GetRenderer()->GetActiveCamera();
-      vtkNew<vtkCamera> reflectedCam;
+        vtkCamera* originalCam = s->GetRenderer()->GetActiveCamera();
+        vtkNew<vtkCamera> reflectedCam;
 
-      // reflect camera according to the grid plane
-      this->ReflectCamera(originalCam, actorMatrix, reflectedCam);
-      r->SetActiveCamera(reflectedCam);
+        // reflect camera according to the grid plane
+        this->ReflectCamera(originalCam, actorMatrix, reflectedCam);
+        r->SetActiveCamera(reflectedCam);
 
-      this->BakeReflectionPass->Render(&reflState);
+        this->BakeReflectionPass->Render(&reflState);
 
-      // restore camera
-      r->SetActiveCamera(originalCam);
+        // restore camera
+        r->SetActiveCamera(originalCam);
+      }
     }
 
     vtkRenderState mainState(s->GetRenderer());

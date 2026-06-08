@@ -125,8 +125,9 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
       "    vec2 screenUV = gl_FragCoord.xy * pixelSize;\n"
       "    screenUV.x = 1.0 - screenUV.x;\n"
       "    float reflectionDepth = texture(reflectionDepthTexture, screenUV).r;\n"
-      "    vec4 reflectionColor = reflectionStrength * texture(reflectionColorTexture, screenUV);\n"
+      "    vec4 reflectionColor = texture(reflectionColorTexture, screenUV);\n"
       "    reflectionColor.rgb *= reflectionColor.a;\n"
+      "    reflectionColor *= reflectionStrength;\n"
       "    if (reflectionDepth < gl_FragCoord.z) reflectionColor = vec4(0.0);\n"
       "    color.rgb = color.a * color.rgb;"
       "    color = mix(reflectionColor, color, color.a);\n"
@@ -183,8 +184,8 @@ void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
 
   float scaling = 1.f;
 
-  vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(ren);
-  if (renderer->GetAntiAliasingMode() == vtkF3DRenderer::AntiAliasingMode::SSAA)
+  const vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(ren);
+  if (renderer && renderer->GetAntiAliasingMode() == vtkF3DRenderer::AntiAliasingMode::SSAA)
   {
     // The grid line width and reflection sampling need to be scaled up by the SSAA factor
     // to keep a consistent appearance.
@@ -214,8 +215,8 @@ void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
     cellBO.Program->SetUniformi(
       "reflectionDepthTexture", this->ReflectionDepthTexture->GetTextureUnit());
 
-    int* viewportSize = ren->GetRenderWindow()->GetSize();
-    float pixelSize[2] = { 1.f / (viewportSize[0] * scaling), 1.f / (viewportSize[1] * scaling) };
+    const int* viewportSize = ren->GetRenderWindow()->GetSize();
+    const float pixelSize[2] = { 1.f / (viewportSize[0] * scaling), 1.f / (viewportSize[1] * scaling) };
     cellBO.Program->SetUniform2f("pixelSize", pixelSize);
   }
 }
