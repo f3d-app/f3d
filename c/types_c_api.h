@@ -244,6 +244,11 @@ extern "C"
     size_t base_color_texture_height;
     size_t base_color_texture_components;
     int base_color_texture_emissive;
+
+    /* Optional 4x4 GPU transform (translate/rotate/scale) applied to the whole mesh, as a
+       row-major homogeneous matrix (transform_matrix[row * 4 + col]). An all-zero matrix is
+       treated as the identity (no transform), so a zero-initialized struct means no transform. */
+    double transform_matrix[16];
   } f3d_memory_view_t;
 
   /**

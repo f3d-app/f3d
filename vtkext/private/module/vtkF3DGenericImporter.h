@@ -13,6 +13,7 @@
 class vtkAlgorithm;
 class vtkDataObject;
 class vtkImageData;
+class vtkMatrix4x4;
 class vtkMultiBlockDataSet;
 class vtkPartitionedDataSet;
 class vtkPartitionedDataSetCollection;
@@ -36,6 +37,13 @@ public:
    * same texture is also installed as the emissive texture. Pass nullptr to clear.
    */
   void SetBaseColorTexture(vtkTexture* texture, bool emissive = false);
+
+  /**
+   * Set a 4x4 user matrix applied to the imported actor(s) as a GPU transform, as carried by
+   * f3d::mesh_view::transform_3d. Encodes translation, rotation and/or scaling. Pass nullptr
+   * (or the identity) to leave the actor(s) untransformed.
+   */
+  void SetUserMatrix(vtkMatrix4x4* matrix);
 
   /**
    * Get a string describing the outputs

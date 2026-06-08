@@ -183,16 +183,41 @@ f3d::mesh_view::memory_view_t to_cpp_memory_view(const f3d_memory_view_t* c)
 }
 
 //----------------------------------------------------------------------------
+f3d::mesh_view::transform_3d to_cpp_transform(const f3d_memory_view_t* c)
+{
+  f3d::mesh_view::transform_3d t; // defaults to identity
+  bool allZero = true;
+  for (int i = 0; i < 16; ++i)
+  {
+    if (c->transform_matrix[i] != 0.0)
+    {
+      allZero = false;
+      break;
+    }
+  }
+  if (!allZero) // an all-zero (e.g. zero-initialized) matrix means "no transform"
+  {
+    for (int i = 0; i < 16; ++i)
+    {
+      t.matrix[i] = c->transform_matrix[i];
+    }
+  }
+  return t;
+}
+
+//----------------------------------------------------------------------------
 // Concrete mesh_view holding a zero-copy snapshot of the caller's arrays. The data
 // pointers inside View reference caller-owned memory; only the small metadata (names,
 // layout, vectors of scalar descriptors) is owned here.
 class c_mesh_view : public f3d::mesh_view
 {
 public:
-  c_mesh_view(std::string name, std::array<double, 2> range, f3d::mesh_view::memory_view_t view)
+  c_mesh_view(std::string name, std::array<double, 2> range, f3d::mesh_view::memory_view_t view,
+    f3d::mesh_view::transform_3d transform)
     : Name(std::move(name))
     , Range(range)
     , View(std::move(view))
+    , Transform(transform)
   {
   }
 
@@ -211,10 +236,16 @@ public:
     return this->View;
   }
 
+  f3d::mesh_view::transform_3d getTransform(double) const override
+  {
+    return this->Transform;
+  }
+
 private:
   std::string Name;
   std::array<double, 2> Range;
   f3d::mesh_view::memory_view_t View;
+  f3d::mesh_view::transform_3d Transform;
 };
 }
 
@@ -335,7 +366,7 @@ int f3d_scene_add_mesh_view(
   try
   {
     cpp_scene->add(std::make_shared<c_mesh_view>(name ? std::string(name) : std::string(),
-      std::array<double, 2>{ t_min, t_max }, to_cpp_memory_view(view)));
+      std::array<double, 2>{ t_min, t_max }, to_cpp_memory_view(view), to_cpp_transform(view)));
   }
   catch (const f3d::scene::load_failure_exception& e)
   {

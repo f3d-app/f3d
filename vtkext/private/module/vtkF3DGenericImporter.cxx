@@ -10,6 +10,7 @@
 #include <vtkEventForwarderCommand.h>
 #include <vtkImageData.h>
 #include <vtkInformation.h>
+#include <vtkMatrix4x4.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkObjectFactory.h>
 #include <vtkPartitionedDataSet.h>
@@ -46,6 +47,9 @@ struct vtkF3DGenericImporter::Internals
   // Optional in-memory base-color texture (from mesh_view), applied to every imported actor.
   vtkSmartPointer<vtkTexture> BaseColorTexture = nullptr;
   bool BaseColorTextureEmissive = false;
+
+  // Optional 4x4 user transform (from mesh_view::transform_3d), applied to every imported actor.
+  vtkSmartPointer<vtkMatrix4x4> UserMatrix = nullptr;
 
   bool HasAnimation = false;
   bool AnimationEnabled = false;
@@ -204,6 +208,13 @@ void vtkF3DGenericImporter::CreateActorForBlock(
     }
   }
 
+  // 4x4 GPU transform carried by mesh_view::transform_3d. Set on this (original) actor; the
+  // renderer propagates it to the rendered coloring-actor clone in ConfigureActorsProperties.
+  if (this->Pimpl->UserMatrix)
+  {
+    bd.Actor->SetUserMatrix(this->Pimpl->UserMatrix);
+  }
+
   ren->AddActor(bd.Actor);
   this->ActorCollection->AddItem(bd.Actor);
 
@@ -309,6 +320,12 @@ void vtkF3DGenericImporter::SetBaseColorTexture(vtkTexture* texture, bool emissi
 {
   this->Pimpl->BaseColorTexture = texture;
   this->Pimpl->BaseColorTextureEmissive = emissive;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DGenericImporter::SetUserMatrix(vtkMatrix4x4* matrix)
+{
+  this->Pimpl->UserMatrix = matrix;
 }
 
 //----------------------------------------------------------------------------

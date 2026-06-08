@@ -25,6 +25,7 @@
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkImageData.h>
+#include <vtkMatrix4x4.h>
 #include <vtkProgressBarRepresentation.h>
 #include <vtkProgressBarWidget.h>
 #include <vtkTexture.h>
@@ -759,6 +760,20 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
       texture->UseSRGBColorSpaceOn(); // base color is authored in sRGB
       texture->Update();
       importer->SetBaseColorTexture(texture, bct.emissive);
+    }
+  }
+
+  // Optional 4x4 GPU transform carried by the mesh_view (translate/rotate/scale). Skip the
+  // identity to avoid an unnecessary user matrix on the actors.
+  {
+    const mesh_view::transform_3d transform = mesh->getTransform(timeRange[0]);
+    static constexpr std::array<double, 16> identity = { 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+      0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 };
+    if (transform.matrix != identity)
+    {
+      vtkNew<vtkMatrix4x4> mat;
+      mat->DeepCopy(transform.matrix.data()); // row-major, matches vtkMatrix4x4 layout
+      importer->SetUserMatrix(mat);
     }
   }
 

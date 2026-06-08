@@ -183,6 +183,30 @@ public:
    */
   [[nodiscard]] virtual memory_view_t getMemoryView(double time) const = 0;
 
+  /**
+   * Structure representing a 3D affine transform applied to the mesh as a whole, as a single
+   * 4x4 homogeneous `matrix` (row-major, i.e. `matrix[row * 4 + col]`). It can encode any
+   * combination of translation, rotation and (anisotropic) scaling. The transform is applied
+   * on the GPU at render time, so the mesh coordinates returned by getMemoryView() and the
+   * axis labels are left unchanged. The default is the identity matrix (no transform). A
+   * typical use is vertical exaggeration of a surface, encoded as a scale on one axis.
+   */
+  struct transform_3d
+  {
+    std::array<double, 16> matrix = { 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
+      0.0, 0.0, 0.0, 1.0 };
+  };
+
+  /**
+   * Specify a 3D affine transform applied to the whole mesh at a given time. The default
+   * implementation returns the identity transform (no transform). Override to translate,
+   * rotate or scale the mesh, optionally as a function of time for animation.
+   */
+  [[nodiscard]] virtual transform_3d getTransform(double) const
+  {
+    return {};
+  }
+
   //! @cond
   mesh_view() = default;
   virtual ~mesh_view() = default;
