@@ -338,7 +338,6 @@ scene& scene_impl::add(const std::byte* buffer, std::size_t size)
 
   // Recover the appropriate reader
   std::optional<std::string> forceReader = this->Internals->Options.scene.force_reader;
-  const std::optional<bool> skipContentCheck = this->Internals->Options.scene.skip_content_check;
 
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260128)
   if (!forceReader)
@@ -349,7 +348,7 @@ scene& scene_impl::add(const std::byte* buffer, std::size_t size)
 #endif
 
   const f3d::reader* reader =
-    f3d::factory::instance()->getReader(buffer, size, forceReader, skipContentCheck);
+    f3d::factory::instance()->getReader(buffer, size, forceReader, this->Internals->Options.scene.skip_content_check);
   if (reader)
   {
     if (forceReader)

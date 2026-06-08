@@ -58,7 +58,6 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/levenshtein.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/log.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/options.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/reader.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/scene_impl.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/types.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/utils.cxx
