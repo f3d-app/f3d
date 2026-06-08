@@ -161,6 +161,92 @@ extern "C"
   F3D_EXPORT int f3d_mesh_is_valid(const f3d_mesh_t* mesh, char** error_message);
 
   /**
+   * @brief Scalar data types supported by a zero-copy mesh view.
+   *
+   * Values mirror f3d::mesh_view::data_type and MUST stay in the same order.
+   */
+  typedef enum f3d_mesh_data_type_t
+  {
+    F3D_MESH_DATA_U8 = 0,
+    F3D_MESH_DATA_I8,
+    F3D_MESH_DATA_U16,
+    F3D_MESH_DATA_I16,
+    F3D_MESH_DATA_U32,
+    F3D_MESH_DATA_I32,
+    F3D_MESH_DATA_U64,
+    F3D_MESH_DATA_I64,
+    F3D_MESH_DATA_F32,
+    F3D_MESH_DATA_F64
+  } f3d_mesh_data_type_t;
+
+  /**
+   * @brief Zero-copy view of an existing data array (mirrors f3d::mesh_view::data_array_t).
+   *
+   * `data` is NOT copied: it must stay valid and allocated for as long as the mesh view
+   * stays in the scene. `name` may be NULL. `components` and `stride` default to 1 when
+   * left at 0. `stride` is counted in elements (not bytes). Set `time_dependent` to 0 for
+   * arrays whose contents never change to help performance.
+   */
+  typedef struct f3d_data_array_t
+  {
+    const char* name;
+    f3d_mesh_data_type_t type;
+    const void* data;
+    size_t components;
+    size_t stride;
+    int time_dependent;
+  } f3d_data_array_t;
+
+  /**
+   * @brief Zero-copy view of a cell array (mirrors f3d::mesh_view::cell_array_t).
+   *
+   * `offset_count` must equal the number of cells + 1 (1 means no cell). The last offset
+   * value must equal `index_count`. `offsets`/`indices` must use an integer type
+   * (I32/U32/I64/U64) and share the same type.
+   */
+  typedef struct f3d_cell_array_t
+  {
+    size_t offset_count;
+    f3d_data_array_t offsets;
+    size_t index_count;
+    f3d_data_array_t indices;
+  } f3d_cell_array_t;
+
+  /**
+   * @brief Zero-copy view of a mesh in memory (mirrors f3d::mesh_view::memory_view_t).
+   *
+   * Every pointer referenced here must stay valid while the mesh view is in the scene.
+   * `points` must have 3 components and type F32 or F64. `normals` (3 comps) and
+   * `texture_coordinates` (2 comps) are optional (leave `.data` NULL to skip). The
+   * `*_scalars` arrays may be NULL when their count is 0.
+   */
+  typedef struct f3d_memory_view_t
+  {
+    size_t point_count;
+    f3d_data_array_t points;
+    f3d_data_array_t normals;
+    f3d_data_array_t texture_coordinates;
+
+    f3d_cell_array_t vertices;
+    f3d_cell_array_t lines;
+    f3d_cell_array_t polygons;
+
+    const f3d_data_array_t* point_scalars;
+    size_t point_scalars_count;
+    const f3d_data_array_t* cell_scalars;
+    size_t cell_scalars_count;
+
+    /* Optional in-memory base-color texture (sampled via texture_coordinates). Leave
+       base_color_texture NULL for none. Pixels are row-major uint8, components 3 (RGB) or
+       4 (RGBA). Set base_color_texture_emissive != 0 to also use it as the emissive map. */
+    const void* base_color_texture;
+    size_t base_color_texture_width;
+    size_t base_color_texture_height;
+    size_t base_color_texture_components;
+    int base_color_texture_emissive;
+  } f3d_memory_view_t;
+
+  /**
    * @brief Enumeration of light types.
    */
   typedef enum f3d_light_type_t

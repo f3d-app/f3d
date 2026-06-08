@@ -132,6 +132,23 @@ public:
   };
 
   /**
+   * Structure representing an in-memory base-color (albedo) texture, sampled through the
+   * mesh `textureCoordinates`. Avoids writing a temporary image file to disk. `data` is a
+   * row-major uint8 buffer of `width * height * components` bytes, with `components` equal
+   * to 3 (RGB) or 4 (RGBA). Leave `data` null (the default) for no texture. The pointer
+   * must remain valid until the mesh is removed from the scene. When `emissive` is true the
+   * same image is additionally installed as the emissive texture (for unlit/flat display).
+   */
+  struct texture_t
+  {
+    size_t width = 0;
+    size_t height = 0;
+    size_t components = 3;
+    const void* data = nullptr;
+    bool emissive = false;
+  };
+
+  /**
    * Structure representing a view of the mesh in memory at a given time.
    * The pointers provided in this structure must remain valid once the mesh is added to the scene.
    * Will throw a load_failure_exception if any of this assumptions is not respected:
@@ -155,6 +172,9 @@ public:
     // scalars
     std::vector<data_array_t> pointScalars;
     std::vector<data_array_t> cellScalars;
+
+    // optional in-memory base-color texture (sampled via textureCoordinates)
+    texture_t baseColorTexture;
   };
 
   /**

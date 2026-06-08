@@ -45,6 +45,29 @@ extern "C"
   F3D_EXPORT int f3d_scene_add_mesh(f3d_scene_t* scene, const f3d_mesh_t* mesh);
 
   /**
+   * @brief Add a zero-copy in-memory mesh view into the scene.
+   *
+   * Unlike f3d_scene_add_mesh (which copies all arrays into F3D), this keeps references
+   * to the caller-owned arrays described by @p view: no data is copied. All pointers in
+   * @p view must therefore remain valid and allocated until the scene is cleared. The
+   * array metadata (names, layout) is copied internally, so @p view itself may be a
+   * transient/stack value.
+   *
+   * Animation: provide a non-degenerate [t_min, t_max] range and mutate the referenced
+   * buffers in place between renders (the pointers stay the same). Use t_min == t_max for
+   * a static mesh.
+   *
+   * @param scene Scene handle.
+   * @param view Mesh memory view describing caller-owned arrays.
+   * @param name Optional mesh name (may be NULL).
+   * @param t_min Animation time range minimum.
+   * @param t_max Animation time range maximum.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_scene_add_mesh_view(
+    f3d_scene_t* scene, const f3d_memory_view_t* view, const char* name, double t_min, double t_max);
+
+  /**
    * @brief Add and load a memory buffer into the scene.
    *
    * @param scene Scene handle.
