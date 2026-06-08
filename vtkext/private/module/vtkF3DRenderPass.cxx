@@ -1,7 +1,9 @@
 #include "vtkF3DRenderPass.h"
 
+#include "vtkF3DBakePlanarReflectionPass.h"
 #include "vtkF3DHexagonalBokehBlurPass.h"
 #include "vtkF3DImporter.h"
+#include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DRenderer.h"
 #include "vtkF3DStochasticTransparentPass.h"
 #include "vtkF3DTAAPass.h"
@@ -67,6 +69,10 @@ void vtkF3DRenderPass::ReleaseGraphicsResources(vtkWindow* w)
   {
     this->BackgroundPass->ReleaseGraphicsResources(w);
   }
+  if (this->BakeReflectionPass)
+  {
+    this->BakeReflectionPass->ReleaseGraphicsResources(w);
+  }
   if (this->MainPass)
   {
     this->MainPass->ReleaseGraphicsResources(w);
@@ -82,8 +88,9 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
 {
   // Always updates props from the renderstate
   this->BackgroundProps.clear();
-  this->MainProps.clear();
   this->MainOnTopProps.clear();
+  this->MainProps.clear();
+  this->ReflectionProps.clear();
 
   // assign props to the correct pass
   vtkProp** props = s->GetPropArray();
@@ -108,6 +115,17 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
       else
       {
         this->MainProps.push_back(prop);
+
+        vtkActor* actor = vtkActor::SafeDownCast(prop);
+
+        if (actor)
+        {
+          // Do not add the grid into the reflective actors
+          if (vtkF3DOpenGLGridMapper::SafeDownCast(actor->GetMapper()) == nullptr)
+          {
+            this->ReflectionProps.push_back(prop);
+          }
+        }
       }
     }
   }
@@ -138,6 +156,23 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   {
     this->BackgroundPass->SetDelegatePass(bgCamP);
   }
+
+  // bake reflection pass
+  vtkNew<vtkLightsPass> reflLightsP;
+  vtkNew<vtkF3DBakePlanarReflectionPass> reflBakeP;
+
+  vtkNew<vtkRenderPassCollection> reflCollection;
+  reflCollection->AddItem(reflLightsP);
+  reflCollection->AddItem(reflBakeP);
+
+  vtkNew<vtkSequencePass> reflSequence;
+  reflSequence->SetPasses(reflCollection);
+
+  vtkNew<vtkCameraPass> reflCamP;
+  reflCamP->SetDelegatePass(reflSequence);
+  this->BakeReflectionPass = vtkSmartPointer<vtkFramebufferPass>::New();
+  this->BakeReflectionPass->SetColorFormat(vtkTextureObject::Float16);
+  this->BakeReflectionPass->SetDelegatePass(reflCamP);
 
   // main pass
 #if F3D_MODULE_RAYTRACING
@@ -260,6 +295,21 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     this->MainOnTopPass->SetDepthFormat(vtkTextureObject::Fixed32);
   }
 
+  for (int i = 0; i < s->GetPropArrayCount(); i++)
+  {
+    vtkActor* actor = vtkActor::SafeDownCast(props[i]);
+    if (actor)
+    {
+      vtkF3DOpenGLGridMapper* gridMapper = vtkF3DOpenGLGridMapper::SafeDownCast(actor->GetMapper());
+      if (gridMapper)
+      {
+        reflBakeP->SetReflectionActor(actor);
+        gridMapper->SetReflectionColorTexture(this->BakeReflectionPass->GetColorTexture());
+        gridMapper->SetReflectionDepthTexture(this->BakeReflectionPass->GetDepthTexture());
+      }
+    }
+  }
+
   this->InitializeTime = this->GetMTime();
 }
 
@@ -288,6 +338,17 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
     backgroundState.SetFrameBuffer(s->GetFrameBuffer());
 
     this->BackgroundPass->Render(&backgroundState);
+
+    // the reflection result is used in the main pass so it must be rendered before
+    if (this->RenderReflection)
+    {
+      vtkRenderState reflState(s->GetRenderer());
+      reflState.SetPropArrayAndCount(
+        this->ReflectionProps.data(), static_cast<int>(this->ReflectionProps.size()));
+      reflState.SetFrameBuffer(s->GetFrameBuffer());
+
+      this->BakeReflectionPass->Render(&reflState);
+    }
 
     vtkRenderState mainState(s->GetRenderer());
     mainState.SetPropArrayAndCount(
