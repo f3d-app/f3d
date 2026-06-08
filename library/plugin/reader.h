@@ -13,6 +13,8 @@
 #include <string>
 #include <vector>
 
+#include "scene.h"
+
 class vtkResourceStream;
 namespace f3d
 {
@@ -30,7 +32,6 @@ namespace f3d
  * @warning This file is used internally by the plugin SDK, it is not intended to be included
  * directly by libf3d users.
  */
-enum class file_availability;
 class reader
 {
 public:
@@ -69,37 +70,37 @@ public:
    * Check if this reader can read the given filename - according to its extension and file content
    */
   virtual bool canRead(const std::string& fileName, const std::optional<bool> skipContentCheck,
-    reader_types::file_availability& availability) const
-  {
-    std::string ext = fileName.substr(fileName.find_last_of(".") + 1);
-    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-
-    const std::vector<std::string>& extensions = this->getExtensions();
-
-    if (!std::any_of(
-          extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; }))
+    f3d::file_availability& availability) const
     {
-      vtkNew<vtkFileResourceStream> stream;
-      if (skipContentCheck.has_value() && skipContentCheck.value() == true)
+      std::string ext = fileName.substr(fileName.find_last_of(".") + 1);
+      std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
+      const std::vector<std::string>& extensions = this->getExtensions();
+
+      if (std::any_of(
+            extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; }))
       {
-        availability = reader_types::file_availability::AVAILABLE;
-        return true;
-      }
-      else if (stream->Open(fileName.c_str()))
-      {
-        if (this->canRead(stream))
+        vtkNew<vtkFileResourceStream> stream;
+        if (skipContentCheck.has_value() && skipContentCheck.value() == true)
         {
-          availability = reader_types::file_availability::AVAILABLE;
+          availability = f3d::file_availability::SUPPORTED;
           return true;
         }
-        else
+        else if (stream->Open(fileName.c_str()))
         {
-          availability = reader_types::file_availability::UNSUPPORTED_CONTENT;
+          if (this->canRead(stream))
+          {
+            availability = f3d::file_availability::SUPPORTED;
+            return true;
+          }
+          else
+          {
+            availability = f3d::file_availability::UNSUPPORTED_CONTENT;
+          }
         }
       }
+      return false;
     }
-    return false;
-  }
 
   /**
    * Should return true if this reader could be able to read provided stream,
