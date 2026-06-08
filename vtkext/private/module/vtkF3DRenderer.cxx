@@ -3709,3 +3709,9 @@ void vtkF3DRenderer::AddNotification(
 {
   this->UIActor->AddNotification(desc, value, bind, this->TotalTime, duration);
 }
+
+//----------------------------------------------------------------------------
+vtkMatrix4x4* vtkF3DRenderer::GetGridMatrix() const
+{
+  return this->GridActor->GetMatrix();
+}

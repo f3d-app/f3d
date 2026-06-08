@@ -1,5 +1,7 @@
 #include "vtkF3DOpenGLGridMapper.h"
 
+#include "vtkF3DRenderer.h"
+
 #include <vtkFloatArray.h>
 #include <vtkInformation.h>
 #include <vtkObjectFactory.h>
@@ -65,7 +67,7 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
     "in vec2 gridCoord;\n"
     "in vec3 normalVC;\n"
     "uniform vec2 gridOffset;\n"
-    "uniform ivec2 viewportSize;\n"
+    "uniform vec2 pixelSize;\n"
     "//VTK::Reflection::Dec\n"
 
     "float antialias(float dist, float linewidth){\n"
@@ -120,14 +122,15 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
     vtkShaderProgram::Substitute(FSSource, "  //VTK::Reflection::Impl",
       "  if (gl_FrontFacing)\n"
       "  {\n"
-      "    vec2 screenUV = gl_FragCoord.xy / vec2(viewportSize);\n"
+      "    vec2 screenUV = gl_FragCoord.xy * pixelSize;\n"
       "    screenUV.x = 1.0 - screenUV.x;\n"
       "    float reflectionDepth = texture(reflectionDepthTexture, screenUV).r;\n"
       "    vec4 reflectionColor = reflectionStrength * texture(reflectionColorTexture, screenUV);\n"
+      "    reflectionColor.rgb *= reflectionColor.a;\n"
       "    if (reflectionDepth < gl_FragCoord.z) reflectionColor = vec4(0.0);\n"
       "    color.rgb = color.a * color.rgb;"
       "    color = mix(reflectionColor, color, color.a);\n"
-      "    if (color.a > 0.01) color.rgb = color.rgb / color.a;\n"
+      "    if (color.a > 0.0001) color.rgb = color.rgb / color.a;\n"
       "  }\n"
     );
   }
@@ -178,6 +181,16 @@ void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
     }
   }
 
+  float scaling = 1.f;
+
+  vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(ren);
+  if (renderer->GetAntiAliasingMode() == vtkF3DRenderer::AntiAliasingMode::SSAA)
+  {
+    // The grid line width and reflection sampling need to be scaled up by the SSAA factor
+    // to keep a consistent appearance.
+    scaling = std::sqrt(5.f);
+  }
+
   const float offset2d[2] = {
     static_cast<float>(this->OriginOffset[0]), //
     static_cast<float>(this->OriginOffset[2])  //
@@ -186,8 +199,8 @@ void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
   cellBO.Program->SetUniformf("fadeDist", this->FadeDistance);
   cellBO.Program->SetUniformf("unitSquare", this->UnitSquare);
   cellBO.Program->SetUniformi("subdivisions", this->Subdivisions);
-  cellBO.Program->SetUniformf("axesLineWidth", 0.8);
-  cellBO.Program->SetUniformf("gridLineWidth", 0.6);
+  cellBO.Program->SetUniformf("axesLineWidth", 0.8 * scaling);
+  cellBO.Program->SetUniformf("gridLineWidth", 0.6 * scaling);
   cellBO.Program->SetUniformf("minorOpacity", 0.5);
   cellBO.Program->SetUniformf("lineAntialias", 1);
   cellBO.Program->SetUniform4f("axis1Color", this->Axis1Color);
@@ -200,7 +213,10 @@ void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
       "reflectionColorTexture", this->ReflectionColorTexture->GetTextureUnit());
     cellBO.Program->SetUniformi(
       "reflectionDepthTexture", this->ReflectionDepthTexture->GetTextureUnit());
-    cellBO.Program->SetUniform2i("viewportSize", ren->GetRenderWindow()->GetSize());
+
+    int* viewportSize = ren->GetRenderWindow()->GetSize();
+    float pixelSize[2] = { 1.f / (viewportSize[0] * scaling), 1.f / (viewportSize[1] * scaling) };
+    cellBO.Program->SetUniform2f("pixelSize", pixelSize);
   }
 }
 

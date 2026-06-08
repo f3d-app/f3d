@@ -553,6 +553,11 @@ public:
   void AddNotification(
     const std::string& desc, const std::string& value, const std::string& bind, double duration);
 
+  /**
+   * Get the grid actor's matrix
+   */
+  vtkMatrix4x4* GetGridMatrix() const;
+
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;

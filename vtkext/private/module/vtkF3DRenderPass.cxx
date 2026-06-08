@@ -1,6 +1,5 @@
 #include "vtkF3DRenderPass.h"
 
-#include "vtkF3DBakePlanarReflectionPass.h"
 #include "vtkF3DHexagonalBokehBlurPass.h"
 #include "vtkF3DImporter.h"
 #include "vtkF3DOpenGLGridMapper.h"
@@ -9,12 +8,14 @@
 #include "vtkF3DTAAPass.h"
 
 #include <vtkBoundingBox.h>
+#include <vtkCamera.h>
 #include <vtkCameraPass.h>
 #include <vtkDualDepthPeelingPass.h>
 #include <vtkInformation.h>
 #include <vtkInformationIntegerKey.h>
 #include <vtkInteractorObserver.h>
 #include <vtkLightsPass.h>
+#include <vtkMatrix4x4.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpaquePass.h>
 #include <vtkOpenGLRenderUtilities.h>
@@ -117,14 +118,10 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
         this->MainProps.push_back(prop);
 
         vtkActor* actor = vtkActor::SafeDownCast(prop);
-
-        if (actor)
+        if (!actor || vtkF3DOpenGLGridMapper::SafeDownCast(actor->GetMapper()) == nullptr)
         {
           // Do not add the grid into the reflective actors
-          if (vtkF3DOpenGLGridMapper::SafeDownCast(actor->GetMapper()) == nullptr)
-          {
-            this->ReflectionProps.push_back(prop);
-          }
+          this->ReflectionProps.push_back(prop);
         }
       }
     }
@@ -156,23 +153,6 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   {
     this->BackgroundPass->SetDelegatePass(bgCamP);
   }
-
-  // bake reflection pass
-  vtkNew<vtkLightsPass> reflLightsP;
-  vtkNew<vtkF3DBakePlanarReflectionPass> reflBakeP;
-
-  vtkNew<vtkRenderPassCollection> reflCollection;
-  reflCollection->AddItem(reflLightsP);
-  reflCollection->AddItem(reflBakeP);
-
-  vtkNew<vtkSequencePass> reflSequence;
-  reflSequence->SetPasses(reflCollection);
-
-  vtkNew<vtkCameraPass> reflCamP;
-  reflCamP->SetDelegatePass(reflSequence);
-  this->BakeReflectionPass = vtkSmartPointer<vtkFramebufferPass>::New();
-  this->BakeReflectionPass->SetColorFormat(vtkTextureObject::Float16);
-  this->BakeReflectionPass->SetDelegatePass(reflCamP);
 
   // main pass
 #if F3D_MODULE_RAYTRACING
@@ -272,6 +252,11 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     {
       this->MainPass->SetDelegatePass(camP);
     }
+
+    // reflection baking pass, same as main pass but with reflected camera
+    this->BakeReflectionPass = vtkSmartPointer<vtkFramebufferPass>::New();
+    this->BakeReflectionPass->SetColorFormat(vtkTextureObject::Float16);
+    this->BakeReflectionPass->SetDelegatePass(camP);
   }
 
   {
@@ -303,7 +288,6 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
       vtkF3DOpenGLGridMapper* gridMapper = vtkF3DOpenGLGridMapper::SafeDownCast(actor->GetMapper());
       if (gridMapper)
       {
-        reflBakeP->SetReflectionActor(actor);
         gridMapper->SetReflectionColorTexture(this->BakeReflectionPass->GetColorTexture());
         gridMapper->SetReflectionDepthTexture(this->BakeReflectionPass->GetDepthTexture());
       }
@@ -320,7 +304,7 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
 
   double bgColor[3];
 
-  vtkRenderer* r = s->GetRenderer();
+  vtkF3DRenderer* r = vtkF3DRenderer::SafeDownCast(s->GetRenderer());
   vtkInformation* info = r->GetInformation();
   bool uiOnly = info->Has(vtkF3DRenderPass::RENDER_UI_ONLY());
 
@@ -347,7 +331,19 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
         this->ReflectionProps.data(), static_cast<int>(this->ReflectionProps.size()));
       reflState.SetFrameBuffer(s->GetFrameBuffer());
 
+      vtkMatrix4x4* actorMatrix = r->GetGridMatrix();
+
+      vtkCamera* originalCam = s->GetRenderer()->GetActiveCamera();
+      vtkNew<vtkCamera> reflectedCam;
+
+      // reflect camera according to the grid plane
+      this->ReflectCamera(originalCam, actorMatrix, reflectedCam);
+      r->SetActiveCamera(reflectedCam);
+
       this->BakeReflectionPass->Render(&reflState);
+
+      // restore camera
+      r->SetActiveCamera(originalCam);
     }
 
     vtkRenderState mainState(s->GetRenderer());
@@ -484,4 +480,63 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
   this->BackgroundPass->GetColorTexture()->Deactivate();
   this->MainPass->GetColorTexture()->Deactivate();
   this->MainOnTopPass->GetColorTexture()->Deactivate();
+}
+
+// ----------------------------------------------------------------------------
+void vtkF3DRenderPass::ReflectCamera(
+  vtkCamera* originalCam, vtkMatrix4x4* actorMatrix, vtkCamera* reflectedCam)
+{
+  // compute the reflection matrix
+  // see https://www.opengl.org/archives/resources/code/samples/sig99/advanced99/notes/node159.html
+  double n[3] = { actorMatrix->GetElement(0, 1), actorMatrix->GetElement(1, 1),
+    actorMatrix->GetElement(2, 1) };
+  vtkMath::Normalize(n);
+
+  // Plane center point
+  const double p[3] = { actorMatrix->GetElement(0, 3), actorMatrix->GetElement(1, 3),
+    actorMatrix->GetElement(2, 3) };
+
+  const double a = n[0], b = n[1], c = n[2];
+  const double d = a * p[0] + b * p[1] + c * p[2];
+
+  vtkNew<vtkMatrix4x4> reflectionMatrix;
+  reflectionMatrix->SetElement(0, 0, 1 - 2 * a * a);
+  reflectionMatrix->SetElement(0, 1, -2 * a * b);
+  reflectionMatrix->SetElement(0, 2, -2 * a * c);
+  reflectionMatrix->SetElement(0, 3, 2 * a * d);
+
+  reflectionMatrix->SetElement(1, 0, -2 * a * b);
+  reflectionMatrix->SetElement(1, 1, 1 - 2 * b * b);
+  reflectionMatrix->SetElement(1, 2, -2 * b * c);
+  reflectionMatrix->SetElement(1, 3, 2 * b * d);
+
+  reflectionMatrix->SetElement(2, 0, -2 * a * c);
+  reflectionMatrix->SetElement(2, 1, -2 * b * c);
+  reflectionMatrix->SetElement(2, 2, 1 - 2 * c * c);
+  reflectionMatrix->SetElement(2, 3, 2 * c * d);
+
+  reflectionMatrix->SetElement(3, 0, 0);
+  reflectionMatrix->SetElement(3, 1, 0);
+  reflectionMatrix->SetElement(3, 2, 0);
+  reflectionMatrix->SetElement(3, 3, 1);
+
+  // Reflect position
+  double pos[4] = { originalCam->GetPosition()[0], originalCam->GetPosition()[1],
+    originalCam->GetPosition()[2], 1.0 };
+  reflectionMatrix->MultiplyPoint(pos, pos);
+
+  // Reflect focal point
+  double foc[4] = { originalCam->GetFocalPoint()[0], originalCam->GetFocalPoint()[1],
+    originalCam->GetFocalPoint()[2], 1.0 };
+  reflectionMatrix->MultiplyPoint(foc, foc);
+
+  // Reflect up vector (direction, w=0)
+  double up[4] = { originalCam->GetViewUp()[0], originalCam->GetViewUp()[1],
+    originalCam->GetViewUp()[2], 0.0 };
+  reflectionMatrix->MultiplyPoint(up, up);
+
+  reflectedCam->DeepCopy(originalCam);
+  reflectedCam->SetPosition(pos[0], pos[1], pos[2]);
+  reflectedCam->SetFocalPoint(foc[0], foc[1], foc[2]);
+  reflectedCam->SetViewUp(up[0], up[1], up[2]);
 }

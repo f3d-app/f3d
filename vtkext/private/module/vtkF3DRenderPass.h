@@ -23,7 +23,9 @@
 #include <memory>
 #include <vector>
 
+class vtkCamera;
 class vtkInformationIntegerKey;
+class vtkMatrix4x4;
 class vtkProp;
 
 class vtkF3DRenderPass : public vtkRenderPass
@@ -58,6 +60,8 @@ protected:
   void Initialize(const vtkRenderState* s);
 
   void Blend(const vtkRenderState* s);
+
+  void ReflectCamera(vtkCamera* originalCam, vtkMatrix4x4* actorMatrix, vtkCamera* reflectedCam);
 
   bool ArmatureVisible = false;
   bool UseRaytracing = false;
