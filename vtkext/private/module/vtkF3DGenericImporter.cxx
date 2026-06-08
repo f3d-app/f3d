@@ -20,6 +20,7 @@
 #include <vtkRenderer.h>
 #include <vtkSmartPointer.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
+#include <vtkTexture.h>
 #include <vtkVersion.h>
 
 #include <cassert>
@@ -41,6 +42,10 @@ struct vtkF3DGenericImporter::Internals
   vtkSmartPointer<vtkAlgorithm> Reader = nullptr;
   std::vector<BlockData> Blocks;
   std::string OutputDescription;
+
+  // Optional in-memory base-color texture (from mesh_view), applied to every imported actor.
+  vtkSmartPointer<vtkTexture> BaseColorTexture = nullptr;
+  bool BaseColorTextureEmissive = false;
 
   bool HasAnimation = false;
   bool AnimationEnabled = false;
@@ -187,6 +192,18 @@ void vtkF3DGenericImporter::CreateActorForBlock(
   bd.Actor->GetProperty()->SetBaseIOR(1.5);
   bd.Actor->GetProperty()->SetInterpolationToPBR();
 
+  // In-memory base-color texture carried by mesh_view: applied here on the actor so it
+  // survives without any global renderer texture override (gap #1 fold). The renderer's
+  // coloring pass only overrides the base-color texture when a global one is set.
+  if (this->Pimpl->BaseColorTexture)
+  {
+    bd.Actor->GetProperty()->SetBaseColorTexture(this->Pimpl->BaseColorTexture);
+    if (this->Pimpl->BaseColorTextureEmissive)
+    {
+      bd.Actor->GetProperty()->SetEmissiveTexture(this->Pimpl->BaseColorTexture);
+    }
+  }
+
   ren->AddActor(bd.Actor);
   this->ActorCollection->AddItem(bd.Actor);
 
@@ -285,6 +302,13 @@ void vtkF3DGenericImporter::SetInternalReader(vtkAlgorithm* reader)
   {
     this->Pimpl->Reader = reader;
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DGenericImporter::SetBaseColorTexture(vtkTexture* texture, bool emissive)
+{
+  this->Pimpl->BaseColorTexture = texture;
+  this->Pimpl->BaseColorTextureEmissive = emissive;
 }
 
 //----------------------------------------------------------------------------

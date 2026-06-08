@@ -24,11 +24,15 @@
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
+#include <vtkImageData.h>
 #include <vtkProgressBarRepresentation.h>
 #include <vtkProgressBarWidget.h>
+#include <vtkTexture.h>
 #include <vtkTimerLog.h>
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
+
+#include <cstring>
 
 // requires https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12411
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251110)
@@ -730,6 +734,33 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
 
   vtkNew<vtkF3DGenericImporter> importer;
   importer->SetInternalReader(vtkSource);
+
+  // Optional in-memory base-color texture carried by the mesh_view (gap #1 fold): build a
+  // vtkTexture once and hand it to the importer, which applies it to the imported actor.
+  {
+    const auto textureView = mesh->getMemoryView(timeRange[0]);
+    const auto& bct = textureView.baseColorTexture;
+    if (bct.data != nullptr && bct.width > 0 && bct.height > 0)
+    {
+      if (bct.components != 3 && bct.components != 4)
+      {
+        throw scene::load_failure_exception(
+          "Mesh view base color texture must have 3 or 4 components");
+      }
+      vtkNew<vtkImageData> img;
+      img->SetDimensions(static_cast<int>(bct.width), static_cast<int>(bct.height), 1);
+      img->AllocateScalars(VTK_UNSIGNED_CHAR, static_cast<int>(bct.components));
+      std::memcpy(img->GetScalarPointer(), bct.data,
+        bct.width * bct.height * bct.components * sizeof(unsigned char));
+
+      vtkNew<vtkTexture> texture;
+      texture->SetInputData(img);
+      texture->InterpolateOn();
+      texture->UseSRGBColorSpaceOn(); // base color is authored in sRGB
+      texture->Update();
+      importer->SetBaseColorTexture(texture, bct.emissive);
+    }
+  }
 
   std::string name = mesh->getName();
 
