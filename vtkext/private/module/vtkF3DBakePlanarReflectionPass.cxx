@@ -23,7 +23,7 @@ vtkF3DBakePlanarReflectionPass::~vtkF3DBakePlanarReflectionPass() = default;
 //------------------------------------------------------------------------------
 void vtkF3DBakePlanarReflectionPass::Render(const vtkRenderState* s)
 {
-  assert(this->ReflectionActor == nullptr);
+  assert(this->ReflectionActor != nullptr);
 
   vtkNew<vtkMatrix4x4> actorMatrix;
   this->ReflectionActor->GetMatrix(actorMatrix);

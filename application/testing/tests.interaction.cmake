@@ -40,6 +40,8 @@ f3d_test(NAME TestInteractionNotificationsUpdate DATA cow.vtp ARGS --notificatio
 f3d_test(NAME TestInteractionNotificationsBindings DATA cow.vtp ARGS --notifications -Dui.notifications.show_bindings=ON INTERACTION UI) #E;
 f3d_test(NAME TestInteractionNotificationsBindingsModifier DATA cow.vtp ARGS --notifications -Dui.notifications.show_bindings=ON RESOLUTION 400,300 INTERACTION UI) #SHIFT+L;
 f3d_test(NAME TestInteractionToggleNotifications DATA cow.vtp INTERACTION UI) #CTRL+K;
+
+# Test reflection strength change to validate shader recompilation
 f3d_test(NAME TestInteractionGridReflectionChanged DATA suzanne.ply ARGS -g INTERACTION UI) #Escape;"set render.grid.reflection=0.8";Escape
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12987

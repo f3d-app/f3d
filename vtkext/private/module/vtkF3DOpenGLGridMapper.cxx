@@ -192,7 +192,6 @@ void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
   cellBO.Program->SetUniformf("lineAntialias", 1);
   cellBO.Program->SetUniform4f("axis1Color", this->Axis1Color);
   cellBO.Program->SetUniform4f("axis2Color", this->Axis2Color);
-  cellBO.Program->SetUniform2i("viewportSize", ren->GetRenderWindow()->GetSize());
 
   if (this->ReflectionStrength > 0.0)
   {
@@ -201,6 +200,7 @@ void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
       "reflectionColorTexture", this->ReflectionColorTexture->GetTextureUnit());
     cellBO.Program->SetUniformi(
       "reflectionDepthTexture", this->ReflectionDepthTexture->GetTextureUnit());
+    cellBO.Program->SetUniform2i("viewportSize", ren->GetRenderWindow()->GetSize());
   }
 }
 

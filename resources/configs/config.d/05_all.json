@@ -4,6 +4,7 @@
       "axis": true,
       "tone-mapping": true,
       "grid": true,
+      "grid-reflection": 0.5,
       "loading-progress": true,
       "anti-aliasing": "fxaa",
       "filename": true,
