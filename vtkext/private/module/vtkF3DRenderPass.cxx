@@ -263,7 +263,8 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
       vtkActor* actor = vtkActor::SafeDownCast(props[i]);
       if (actor)
       {
-        vtkF3DOpenGLGridMapper* gridMapper = vtkF3DOpenGLGridMapper::SafeDownCast(actor->GetMapper());
+        vtkF3DOpenGLGridMapper* gridMapper =
+          vtkF3DOpenGLGridMapper::SafeDownCast(actor->GetMapper());
         if (gridMapper)
         {
           gridMapper->SetReflectionColorTexture(this->BakeReflectionPass->GetColorTexture());

@@ -214,7 +214,8 @@ void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
       "reflectionDepthTexture", this->ReflectionDepthTexture->GetTextureUnit());
 
     const int* viewportSize = ren->GetRenderWindow()->GetSize();
-    const float pixelSize[2] = { 1.f / (viewportSize[0] * scaling), 1.f / (viewportSize[1] * scaling) };
+    const float pixelSize[2] = { 1.f / (viewportSize[0] * scaling),
+      1.f / (viewportSize[1] * scaling) };
     cellBO.Program->SetUniform2f("pixelSize", pixelSize);
   }
 }
