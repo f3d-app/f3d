@@ -7,6 +7,7 @@
 #include "vtkF3DStochasticTransparentPass.h"
 #include "vtkF3DTAAPass.h"
 
+#include <vtkShadowMapBakerPass.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
 #include <vtkCameraPass.h>
@@ -73,6 +74,10 @@ void vtkF3DRenderPass::ReleaseGraphicsResources(vtkWindow* w)
   if (this->BakeReflectionPass)
   {
     this->BakeReflectionPass->ReleaseGraphicsResources(w);
+  }
+  if (this->BakeShadowsPass)
+  {
+    this->BakeShadowsPass->ReleaseGraphicsResources(w);
   }
   if (this->MainPass)
   {
@@ -153,6 +158,14 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   {
     this->BackgroundPass->SetDelegatePass(bgCamP);
   }
+
+  // bake reflection pass
+  vtkNew<vtkShadowMapBakerPass> shadowsBakeP;
+  vtkNew<vtkCameraPass> shadowsCamP;
+  shadowsCamP->SetDelegatePass(shadowsBakeP);
+  this->BakeShadowsPass = vtkSmartPointer<vtkFramebufferPass>::New();
+  this->BakeShadowsPass->SetColorFormat(vtkTextureObject::Float16);
+  this->BakeShadowsPass->SetDelegatePass(shadowsBakeP);
 
   // main pass
 #if F3D_MODULE_RAYTRACING
@@ -351,6 +364,16 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
 
         // restore camera
         r->SetActiveCamera(originalCam);
+      }
+
+      if (this->RenderShadows)
+      {
+        vtkRenderState shadowsState(s->GetRenderer());
+        shadowsState.SetPropArrayAndCount(
+          this->MainProps.data(), static_cast<int>(this->MainProps.size()));
+        shadowsState.SetFrameBuffer(s->GetFrameBuffer());
+
+        this->BakeShadowsPass->Render(&shadowsState);
       }
     }
 

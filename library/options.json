@@ -124,6 +124,12 @@
         }
       }
     },
+    "shadows": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      }
+    },
     "effect": {
       "blending": {
         "mode": {

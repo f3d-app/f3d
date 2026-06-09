@@ -228,6 +228,12 @@
           "valueHelper": "<value>"
         },
         {
+          "longName": "shadows",
+          "helpText": "Add shadows to the scene",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
           "longName": "axes-grid",
           "helpText": "Enable grid axis",
           "valueHelper": "<bool>",

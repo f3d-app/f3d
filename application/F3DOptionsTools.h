@@ -142,6 +142,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "roughness", "model.material.roughness" },
   { "scalar-coloring", "model.scivis.enable" },
   { "scene-hierarchy", "ui.scene_hierarchy" },
+  { "shadows", "render.shadows.enable" },
   { "texture-base-color", "model.color.texture" },
   { "texture-emissive", "model.emissive.texture" },
   { "texture-matcap", "model.matcap.texture" },
