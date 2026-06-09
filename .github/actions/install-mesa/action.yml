@@ -20,7 +20,9 @@ runs:
     - name: Checkout MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
       shell: bash
-      run: git clone --depth 1 --branch mesa-26.1.2 https://gitlab.freedesktop.org/mesa/mesa.git ${{github.workspace}}/dependencies/mesa
+      run: |
+        mkdir -p ${{github.workspace}}/dependencies
+        git clone --recurse-submodules --depth 1 --branch mesa-26.1.2 https://gitlab.freedesktop.org/mesa/mesa.git ${{github.workspace}}/dependencies/mesa
 
     - name: Setup MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
