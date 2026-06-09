@@ -13,6 +13,9 @@ f3d_test(NAME TestGridAbsolute DATA f3d.vtp ARGS -g --up=-Y --camera-direction=-
 f3d_test(NAME TestGridClipping DATA offset-flat-box.glb ARGS -g --grid-absolute --camera-position=70,120,350)
 f3d_test(NAME TestGridColor DATA suzanne.ply ARGS -g --grid-color=1,1,1)
 f3d_test(NAME TestGridWithDepthPeeling DATA suzanne.ply ARGS -gp --opacity=0.2)
+f3d_test(NAME TestGridReflection DATA suzanne.ply ARGS -g --grid-reflection=0.8)
+f3d_test(NAME TestGridAbsoluteReflection DATA suzanne.ply ARGS -g --grid-absolute --grid-reflection=0.8 --camera-elevation-angle=40)
+f3d_test(NAME TestGridSSAAReflection DATA suzanne.ply ARGS -g --grid-reflection=0.8 --anti-aliasing=ssaa)
 
 # Backface
 f3d_test(NAME TestBackfaceVisible DATA backface.vtp ARGS --backface-type=visible)

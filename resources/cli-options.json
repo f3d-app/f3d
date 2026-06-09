@@ -223,6 +223,11 @@
           "valueHelper": "<color>"
         },
         {
+          "longName": "grid-reflection",
+          "helpText": "Reflection strength of the grid",
+          "valueHelper": "<value>"
+        },
+        {
           "longName": "axes-grid",
           "helpText": "Enable grid axis",
           "valueHelper": "<bool>",

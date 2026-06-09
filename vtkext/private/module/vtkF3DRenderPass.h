@@ -23,7 +23,9 @@
 #include <memory>
 #include <vector>
 
+class vtkCamera;
 class vtkInformationIntegerKey;
+class vtkMatrix4x4;
 class vtkProp;
 
 class vtkF3DRenderPass : public vtkRenderPass
@@ -42,6 +44,7 @@ public:
   vtkSetMacro(ForceOpaqueBackground, bool);
   vtkSetVector6Macro(Bounds, double);
   vtkSetMacro(CircleOfConfusionRadius, double);
+  vtkSetMacro(RenderReflection, bool);
 
   vtkF3DRenderPass(const vtkF3DRenderPass&) = delete;
   void operator=(const vtkF3DRenderPass&) = delete;
@@ -58,15 +61,19 @@ protected:
 
   void Blend(const vtkRenderState* s);
 
+  void ReflectCamera(vtkCamera* originalCam, vtkMatrix4x4* actorMatrix, vtkCamera* reflectedCam);
+
   bool ArmatureVisible = false;
   bool UseRaytracing = false;
   bool UseSSAOPass = false;
   bool UseBlurBackground = false;
   bool ForceOpaqueBackground = false;
+  bool RenderReflection = false;
 
   double CircleOfConfusionRadius = 20.0;
 
   vtkSmartPointer<vtkFramebufferPass> BackgroundPass;
+  vtkSmartPointer<vtkFramebufferPass> BakeReflectionPass;
   vtkSmartPointer<vtkFramebufferPass> MainPass;
   vtkSmartPointer<vtkFramebufferPass> MainOnTopPass;
 
@@ -75,8 +82,9 @@ protected:
   vtkMTimeType InitializeTime = 0;
 
   std::vector<vtkProp*> BackgroundProps;
-  std::vector<vtkProp*> MainProps;
   std::vector<vtkProp*> MainOnTopProps;
+  std::vector<vtkProp*> MainProps;
+  std::vector<vtkProp*> ReflectionProps;
 
   std::shared_ptr<vtkOpenGLQuadHelper> BlendQuadHelper;
 };
