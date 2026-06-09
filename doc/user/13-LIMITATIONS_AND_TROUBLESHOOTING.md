@@ -8,7 +8,7 @@ Here is a non exhaustive list of F3D limitations:
 - Drag and drop interaction cannot be recorded nor played back.
 - Volume rendering and HDRI support requires a decent GPU.
 - Information about the failure to load a file is not provided before VTK >= 9.4.0.
-- Streaming require different version of VTK depending of the format to read.
+- Streaming require different version of VTK depending upon the format to read.
 - Options `ui.dpi_aware` and CLI `--dpi-aware` are only supported on Windows platform.
 
 ### Assimp
@@ -149,6 +149,10 @@ xattr -cr /Applications/F3D.app
 ```
 
 Then F3D should work as expected.
+
+> I can't use hotkeys with F row keys
+
+Because MacOS layers multimedia keys, F keys don't use the normal function code by default. To use the F code, you must press <kbd>Fn</kbd> in combination with the F key. For example, to take a screenshot the hotkey combination would be <kbd>Cmd</kbd>+<kbd>Fn</kbd>+<kbd>F12</kbd>.  
 
 ### Python
 
