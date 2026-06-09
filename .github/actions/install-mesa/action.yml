@@ -32,7 +32,6 @@ runs:
         mkdir mesa_install
 
     - name: Set up Python
-      if: inputs.optdeps_label == 'optdeps'
       uses: actions/setup-python@v6
       with:
         python-version: 3.14
@@ -61,7 +60,8 @@ runs:
         -Dgallium-drivers=softpipe
         -Dvulkan-drivers=[]
         -Dglx=disabled
-        -Dplatforms=[]
+        -Degl=enabled
+        -Dplatforms=surfaceless
 
     - name: Build MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
