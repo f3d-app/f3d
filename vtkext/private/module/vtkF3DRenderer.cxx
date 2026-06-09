@@ -523,6 +523,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   newPass->SetArmatureVisible(this->ArmatureVisible);
   newPass->SetRenderReflection(this->GridVisible && this->GridReflection > 0.0);
   newPass->SetXRMode(this->UseXR);
+  newPass->SetRenderShadows(this->UseShadows);
 
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
@@ -819,6 +820,16 @@ void vtkF3DRenderer::SetGridReflection(const double strength)
   {
     this->GridReflection = strength;
     this->GridConfigured = false;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetShadows(bool use)
+{
+  if (this->UseShadows != use)
+  {
+    this->UseShadows = use;
     this->RenderPassesConfigured = false;
   }
 }

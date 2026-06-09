@@ -730,6 +730,7 @@ void window_impl::UpdateDynamicOptions()
       ? true
       : opt.render.grid.absolute); // In XR mode, the grid is absolute
   renderer->SetGridReflection(opt.render.grid.reflection);
+  renderer->SetShadows(opt.render.shadows.enable);
   renderer->ShowGrid(opt.render.grid.enable);
   renderer->SetGridColor(opt.render.grid.color);
 

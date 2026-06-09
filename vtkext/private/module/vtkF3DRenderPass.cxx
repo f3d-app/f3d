@@ -39,6 +39,7 @@
 #include <vtkSequencePass.h>
 #include <vtkShaderProgram.h>
 #include <vtkShaderProperty.h>
+#include <vtkShadowMapBakerPass.h>
 #include <vtkSkybox.h>
 #include <vtkTextureObject.h>
 #include <vtkToneMappingPass.h>
@@ -81,6 +82,10 @@ void vtkF3DRenderPass::ReleaseGraphicsResources(vtkWindow* w)
   if (this->BakeReflectionPass)
   {
     this->BakeReflectionPass->ReleaseGraphicsResources(w);
+  }
+  if (this->BakeShadowsPass)
+  {
+    this->BakeShadowsPass->ReleaseGraphicsResources(w);
   }
   if (this->MainPass)
   {
@@ -243,6 +248,14 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   {
     this->BackgroundPass->SetDelegatePass(bgCamP);
   }
+
+  // bake reflection pass
+  vtkNew<vtkShadowMapBakerPass> shadowsBakeP;
+  vtkNew<vtkCameraPass> shadowsCamP;
+  shadowsCamP->SetDelegatePass(shadowsBakeP);
+  this->BakeShadowsPass = vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass>::New();
+  this->BakeShadowsPass->SetColorFormat(vtkTextureObject::Float16);
+  this->BakeShadowsPass->SetDelegatePass(shadowsBakeP);
 
   // main pass
 #if F3D_MODULE_RAYTRACING
@@ -799,6 +812,16 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
         // restore camera and mark it dirty to ensure headlights are recomputed
         originalCam->Modified();
         r->SetActiveCamera(originalCam);
+      }
+
+      if (this->RenderShadows)
+      {
+        vtkRenderState shadowsState(s->GetRenderer());
+        shadowsState.SetPropArrayAndCount(
+          this->MainProps.data(), static_cast<int>(this->MainProps.size()));
+        shadowsState.SetFrameBuffer(s->GetFrameBuffer());
+
+        this->BakeShadowsPass->Render(&shadowsState);
       }
     }
 
