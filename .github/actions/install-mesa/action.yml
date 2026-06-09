@@ -42,7 +42,7 @@ runs:
       shell: bash
       run: >
         meson setup ../mesa
-        --prefix=../mesa_install
+        --prefix=${{github.workspace}}/dependencies/mesa_install
         --buildtype=release
         -Db_ndebug=true
         -Dgallium-drivers=llvmpipe
