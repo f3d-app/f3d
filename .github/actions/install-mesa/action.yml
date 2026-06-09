@@ -33,7 +33,7 @@ runs:
     - name: Install MESA build dependencies
       if: steps.cache-mesa.outputs.cache-hit != 'true'
       shell: bash
-      run: pip install meson
+      run: pip install meson mako packaging
 
     - name: Configure MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
