@@ -61,6 +61,7 @@ runs:
         -Dvulkan-drivers=[]
         -Dopengl=true
         -Degl=disabled
+        -Dglx=disabled
 
     - name: Build MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
@@ -71,7 +72,9 @@ runs:
     - name: Copy to install
       working-directory: ${{github.workspace}}/dependencies/mesa_install
       shell: bash
-      run: cp -r ./* ../install/
+      run: |
+        mkdir -p ../install
+        cp -r ./* ../install/
 
     - name: Save cache
       if: steps.cache-mesa.outputs.cache-hit != 'true'
