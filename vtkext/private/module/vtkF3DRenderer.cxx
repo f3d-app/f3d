@@ -557,10 +557,13 @@ void vtkF3DRenderer::ConfigureRenderPasses()
     }
   }
 
-  vtkNew<vtkF3DOverlayRenderPass> overlayP;
-  overlayP->SetDelegatePass(renderingPass);
+  if (!this->Xr)
+  {
+    vtkNew<vtkF3DOverlayRenderPass> overlayP;
+    overlayP->SetDelegatePass(renderingPass);
 
-  this->SetPass(overlayP);
+    this->SetPass(overlayP);
+  }
 
 #if F3D_MODULE_RAYTRACING
   vtkOSPRayRendererNode::SetRendererType("pathtracer", this);

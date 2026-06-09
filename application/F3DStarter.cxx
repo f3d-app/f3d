@@ -862,7 +862,7 @@ public:
     if (!this->AppOptions.NoRender)
     {
       f3d::window& window = this->Engine->getWindow();
-      if (this->AppOptions.Resolution.size() == 2)
+      if (this->AppOptions.Resolution.size() == 2 && this->AppOptions.RenderingBackend != "xr")
       {
         double dpiScale = this->LibOptions.ui.dpi_aware ? f3d::utils::getDPIScale() : 1.0;
 

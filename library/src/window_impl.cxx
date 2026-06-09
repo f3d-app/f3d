@@ -680,6 +680,8 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetUseVolume(opt.model.volume.enable);
   renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
 
+  renderer->SetXr(this->getType() == Type::XR);
+
   renderer->UpdateActors();
 
   // Update the cheatsheet if needed

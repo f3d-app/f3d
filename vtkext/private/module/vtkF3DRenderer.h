@@ -558,6 +558,12 @@ public:
    */
   vtkMatrix4x4* GetGridMatrix() const;
 
+  /**
+   * Set/Get XR mode
+   */
+  vtkSetMacro(Xr, bool);
+  vtkGetMacro(Xr, bool);
+
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;
@@ -872,6 +878,8 @@ private:
   bool PointSpritesUseInstancing = false;
 
   std::optional<bool> Unlit;
+
+  bool Xr = false;
 };
 
 #endif
