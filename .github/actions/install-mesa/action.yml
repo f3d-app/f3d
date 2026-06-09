@@ -34,14 +34,14 @@ runs:
     - name: Install MESA build dependencies
       if: steps.cache-mesa.outputs.cache-hit != 'true'
       shell: bash
-      run: pip3 install meson mako packaging PyYAML
+      run: python -m pip install meson mako packaging PyYAML
 
     - name: Configure MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: >
-        meson setup mesa
+        meson setup mesa_build mesa
         --prefix=$(pwd)/mesa_install
         --buildtype=release
         -Db_ndebug=true
