@@ -34,18 +34,18 @@ runs:
     - name: Install MESA build dependencies
       if: steps.cache-mesa.outputs.cache-hit != 'true'
       shell: bash
-      run: pip install meson mako packaging PyYAML
+      run: pip3 install meson mako packaging PyYAML
 
     - name: Configure MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies/mesa_build
+      working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: >
-        meson setup ../mesa
-        --prefix=${{github.workspace}}/dependencies/mesa_install
+        meson setup mesa
+        --prefix=$(pwd)/mesa_install
         --buildtype=release
         -Db_ndebug=true
-        -Dgallium-drivers=llvmpipe
+        -Dgallium-drivers=softpipe
         -Dvulkan-drivers=[]
         -Dglx=disabled
         -Dplatforms=[]
