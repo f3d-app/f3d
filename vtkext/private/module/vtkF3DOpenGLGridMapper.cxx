@@ -72,8 +72,8 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
 
     "float antialias(float dist, float linewidth){\n"
     "  float aa = lineAntialias;\n"
-    "  float lw = max(linewidth, 1.0) / 2.0;\n"
-    "  float alpha = min(linewidth, 1.0);\n"
+    "  float lw = max(linewidth, lineAntialias) / 2.0;\n"
+    "  float alpha = min(linewidth / lineAntialias, 1.0);\n"
     "  float d = dist - lw;\n"
     "  return d < .0 ? alpha\n"
     "       : d < aa ? pow((1.0 - d / aa) * alpha, 3.0)\n"
@@ -201,7 +201,7 @@ void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
   cellBO.Program->SetUniformf("axesLineWidth", 0.8 * scaling);
   cellBO.Program->SetUniformf("gridLineWidth", 0.6 * scaling);
   cellBO.Program->SetUniformf("minorOpacity", 0.5);
-  cellBO.Program->SetUniformf("lineAntialias", 1);
+  cellBO.Program->SetUniformf("lineAntialias", scaling);
   cellBO.Program->SetUniform4f("axis1Color", this->Axis1Color);
   cellBO.Program->SetUniform4f("axis2Color", this->Axis2Color);
 
