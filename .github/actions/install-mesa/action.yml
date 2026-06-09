@@ -31,8 +31,21 @@ runs:
         mkdir mesa_build
         mkdir mesa_install
 
-    - name: Install MESA build dependencies
-      if: steps.cache-mesa.outputs.cache-hit != 'true'
+    - name: Set up Python
+      if: inputs.optdeps_label == 'optdeps'
+      uses: actions/setup-python@v6
+      with:
+        python-version: 3.14
+
+    - name: Install MESA build dependencies (Windows)
+      if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
+      shell: bash
+      run: |
+        python -m pip install meson mako packaging PyYAML
+        choco install winflexbison3 --no-progress -y
+
+    - name: Install MESA build dependencies (Linux/macOS)
+      if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os != 'Windows'
       shell: bash
       run: python -m pip install meson mako packaging PyYAML
 
