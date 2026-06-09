@@ -61,7 +61,6 @@ runs:
         -Dvulkan-drivers=[]
         -Dopengl=true
         -Degl=disabled
-        -Dosmesa=false
 
     - name: Build MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
