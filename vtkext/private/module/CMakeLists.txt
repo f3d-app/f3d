@@ -140,13 +140,11 @@ if(F3D_MODULE_UI AND NOT F3D_USE_EXTERNAL_IMGUI)
     "${F3D_SOURCE_DIR}/external/imgui/imgui_widgets.cpp")
 endif()
 
-if(F3D_USE_EXTERNAL_CLIP)
+if (F3D_MODULE_UI AND NOT F3D_USE_EXTERNAL_CLIP)
   if(APPLE)
     list(APPEND sources "${F3D_SOURCE_DIR}/external/clip/clip_osx.mm")
-
   elseif(WIN32)
     list(APPEND sources "${F3D_SOURCE_DIR}/external/clip/clip_win.cpp")
-
   else()
     list(APPEND sources "${F3D_SOURCE_DIR}/external/clip/clip_x11.cpp")
   endif()
@@ -181,18 +179,25 @@ endif()
 # imgui, clip
 if (F3D_MODULE_UI)
   vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_UI)
+  vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_CLIP)
   if(F3D_USE_EXTERNAL_IMGUI)
     vtk_module_link(f3d::vtkextPrivate PRIVATE imgui::imgui)
-    vtk_module_link(f3d::vtkextPrivate PRIVATE clip::clip)
   else()
     vtk_module_include(f3d::vtkextPrivate
       PRIVATE
         "${F3D_SOURCE_DIR}/external/imgui")
-
-    vtk_module_include(f3d::vtkextPrivate
+      vtk_module_include(f3d::vtkextPrivate
       PRIVATE
         "${F3D_SOURCE_DIR}/external/clip")
   endif ()
+
+  if (F3D_USE_EXTERNAL_CLIP)
+    vtk_module_link(f3d::vtkextPrivate PRIVATE clip::clip)
+  else()
+    vtk_module_include(f3d::vtkextPrivate
+    PRIVATE
+      "${F3D_SOURCE_DIR}/external/clip")
+  endif()
 endif ()
 
 # UTF-8 encoding for MSVC
