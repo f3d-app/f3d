@@ -21,8 +21,7 @@ runs:
       if: steps.cache-mesa.outputs.cache-hit != 'true'
       shell: bash
       run: |
-        mkdir -p ${{github.workspace}}/dependencies
-        git clone --recurse-submodules --depth 1 --branch mesa-26.1.2 https://gitlab.freedesktop.org/mesa/mesa.git ${{github.workspace}}/dependencies/mesa
+        git clone --recurse-submodules --depth 1 --branch mesa-26.1.2 https://gitlab.freedesktop.org/mesa/mesa.git dependencies/mesa
 
     - name: Setup MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
@@ -43,7 +42,7 @@ runs:
       shell: bash
       run: >
         meson setup ../mesa
-        --prefix=${{github.workspace}}/dependencies/mesa_install
+        --prefix=../mesa_install
         --buildtype=release
         -Db_ndebug=true
         -Dgallium-drivers=llvmpipe
