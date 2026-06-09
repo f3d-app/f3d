@@ -1,5 +1,7 @@
 #include "vtkF3DOpenGLGridMapper.h"
 
+#include "vtkF3DRenderer.h"
+
 #include <vtkFloatArray.h>
 #include <vtkInformation.h>
 #include <vtkObjectFactory.h>
@@ -41,11 +43,14 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
 
   // clang-format off
   vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Dec",
+    "uniform mat3 normalMatrix;\n"
     "uniform float fadeDist;\n"
     "out vec2 gridCoord;\n"
+    "out vec3 normalVC;\n"
   );
   vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Impl",
     "gridCoord = vertexMC.xy * fadeDist;\n"
+    "normalVC = normalMatrix * vec3(0.0, 1.0, 0.0);\n"
     "gl_Position = MCDCMatrix * vec4(vertexMC.xzy * fadeDist, 1.0);\n"
   );
   
@@ -60,18 +65,31 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
     "uniform vec4 axis1Color;\n"
     "uniform vec4 axis2Color;\n"
     "in vec2 gridCoord;\n"
+    "in vec3 normalVC;\n"
     "uniform vec2 gridOffset;\n"
+    "uniform vec2 pixelSize;\n"
+    "//VTK::Reflection::Dec\n"
 
     "float antialias(float dist, float linewidth){\n"
     "  float aa = lineAntialias;\n"
-    "  float lw = max(linewidth, 1.0) / 2.0;\n"
-    "  float alpha = min(linewidth, 1.0);\n"
+    "  float lw = max(linewidth, lineAntialias) / 2.0;\n"
+    "  float alpha = min(linewidth / lineAntialias, 1.0);\n"
     "  float d = dist - lw;\n"
     "  return d < .0 ? alpha\n"
     "       : d < aa ? pow((1.0 - d / aa) * alpha, 3.0)\n"
     "       : 0.0;\n"
     "}\n"
   );
+
+  if (this->ReflectionStrength > 0.0)
+  {
+    vtkShaderProgram::Substitute(FSSource, "//VTK::Reflection::Dec",
+      "uniform sampler2D reflectionDepthTexture;\n"
+      "uniform sampler2D reflectionColorTexture;\n"
+      "uniform float reflectionStrength;\n"
+    );
+  }
+
   vtkShaderProgram::Substitute(FSSource, "//VTK::UniformFlow::Impl",
     "  vec2 fromCenter = gridCoord / unitSquare;\n"
     "  vec2 majorCoord = (gridCoord - gridOffset) / unitSquare;\n"
@@ -82,7 +100,7 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
   vtkShaderProgram::Substitute(FSSource, "//VTK::Color::Impl",
     "  float majorAlpha = antialias(min(majorGrid.x, majorGrid.y), gridLineWidth);\n"
     "  float minorAlpha = antialias(min(minorGrid.x, minorGrid.y), gridLineWidth);\n"
-    "  float zoomFadeFactor = 1.0 - clamp(fwidth(majorCoord.x / unitSquare * fadeDist), 0.0, 1.0);"
+    "  float zoomFadeFactor = 1.0 - clamp(fwidth(majorCoord.x / unitSquare * fadeDist), 0.0, 1.0);\n"
     "  float alpha = max(majorAlpha, minorAlpha * minorOpacity * zoomFadeFactor);\n"
 
     "  vec4 color = vec4(diffuseColorUniform, alpha);\n"
@@ -91,16 +109,36 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
     "  float axis2Weight = abs(majorCoord.x) < 0.5 ? antialias(majorGrid.x, axesLineWidth) : 0.0;\n"
     "  color = mix(color, axis2Color, axis2Weight);\n"
     "  color = mix(color, axis1Color, axis1Weight);\n"
+    "  //VTK::Reflection::Impl\n"
     "  float sqDist = unitSquare * unitSquare * dot(fromCenter, fromCenter);\n"
     "  float radialFadeFactor = 1.0 - sqDist / (fadeDist * fadeDist);\n"
-    "  color.w *= radialFadeFactor;\n"
+    "  color.a *= radialFadeFactor;\n"
 
     "  gl_FragData[0] = color;\n"
   );
+
+  if (this->ReflectionStrength > 0.0)
+  {
+    vtkShaderProgram::Substitute(FSSource, "  //VTK::Reflection::Impl",
+      "  if (gl_FrontFacing)\n"
+      "  {\n"
+      "    vec2 screenUV = gl_FragCoord.xy * pixelSize;\n"
+      "    screenUV.x = 1.0 - screenUV.x;\n"
+      "    float reflectionDepth = texture(reflectionDepthTexture, screenUV).r;\n"
+      "    vec4 reflectionColor = reflectionStrength * texture(reflectionColorTexture, screenUV);\n"
+      "    if (reflectionDepth < gl_FragCoord.z) reflectionColor = vec4(0.0);\n"
+      "    color.rgb = color.a * color.rgb;"
+      "    color = color + reflectionColor * (1.0 - color.a);\n"
+      "    if (color.a > 0.0001) color.rgb = color.rgb / color.a;\n"
+      "  }\n"
+    );
+  }
   // clang-format on
 
   shaders[vtkShader::Fragment]->SetSource(FSSource);
   shaders[vtkShader::Vertex]->SetSource(VSSource);
+
+  this->ShaderBuiltWithReflection = this->ReflectionStrength > 0.0f;
 
   // add camera uniforms declaration
   this->ReplaceShaderPositionVC(shaders, ren, actor);
@@ -114,7 +152,7 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
 
 //----------------------------------------------------------------------------
 void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
-  vtkOpenGLHelper& cellBO, vtkRenderer* vtkNotUsed(ren), vtkActor* actor)
+  vtkOpenGLHelper& cellBO, vtkRenderer* ren, vtkActor* actor)
 {
   if (this->VBOs->GetMTime() > cellBO.AttributeUpdateTime ||
     cellBO.ShaderSourceTime > cellBO.AttributeUpdateTime)
@@ -142,6 +180,16 @@ void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
     }
   }
 
+  float scaling = 1.f;
+
+  const vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(ren);
+  if (renderer && renderer->GetAntiAliasingMode() == vtkF3DRenderer::AntiAliasingMode::SSAA)
+  {
+    // The grid line width and reflection sampling need to be scaled up by the SSAA factor
+    // to keep a consistent appearance.
+    scaling = std::sqrt(5.f);
+  }
+
   const float offset2d[2] = {
     static_cast<float>(this->OriginOffset[0]), //
     static_cast<float>(this->OriginOffset[2])  //
@@ -150,12 +198,26 @@ void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
   cellBO.Program->SetUniformf("fadeDist", this->FadeDistance);
   cellBO.Program->SetUniformf("unitSquare", this->UnitSquare);
   cellBO.Program->SetUniformi("subdivisions", this->Subdivisions);
-  cellBO.Program->SetUniformf("axesLineWidth", 0.8);
-  cellBO.Program->SetUniformf("gridLineWidth", 0.6);
+  cellBO.Program->SetUniformf("axesLineWidth", 0.8 * scaling);
+  cellBO.Program->SetUniformf("gridLineWidth", 0.6 * scaling);
   cellBO.Program->SetUniformf("minorOpacity", 0.5);
-  cellBO.Program->SetUniformf("lineAntialias", 1);
+  cellBO.Program->SetUniformf("lineAntialias", scaling);
   cellBO.Program->SetUniform4f("axis1Color", this->Axis1Color);
   cellBO.Program->SetUniform4f("axis2Color", this->Axis2Color);
+
+  if (this->ReflectionStrength > 0.0)
+  {
+    cellBO.Program->SetUniformf("reflectionStrength", this->ReflectionStrength);
+    cellBO.Program->SetUniformi(
+      "reflectionColorTexture", this->ReflectionColorTexture->GetTextureUnit());
+    cellBO.Program->SetUniformi(
+      "reflectionDepthTexture", this->ReflectionDepthTexture->GetTextureUnit());
+
+    const int* viewportSize = ren->GetRenderWindow()->GetSize();
+    const float pixelSize[2] = { 1.f / (viewportSize[0] * scaling),
+      1.f / (viewportSize[1] * scaling) };
+    cellBO.Program->SetUniform2f("pixelSize", pixelSize);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -166,8 +228,8 @@ void vtkF3DOpenGLGridMapper::BuildBufferObjects(vtkRenderer* ren, vtkActor* vtkN
   infinitePlane->SetNumberOfTuples(4);
 
   float corner1[] = { -1, -1 };
-  float corner2[] = { +1, -1 };
-  float corner3[] = { -1, +1 };
+  float corner2[] = { -1, +1 };
+  float corner3[] = { +1, -1 };
   float corner4[] = { +1, +1 };
 
   infinitePlane->SetTuple(0, corner1);
@@ -201,11 +263,23 @@ double* vtkF3DOpenGLGridMapper::GetBounds()
 //-----------------------------------------------------------------------------
 void vtkF3DOpenGLGridMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
 {
+  if (this->ReflectionStrength > 0.0)
+  {
+    this->ReflectionColorTexture->Activate();
+    this->ReflectionDepthTexture->Activate();
+  }
+
   // Update/build/etc the shader.
   this->UpdateBufferObjects(ren, actor);
   this->UpdateShaders(this->Primitives[PrimitivePoints], ren, actor);
 
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+  if (this->ReflectionStrength > 0.0)
+  {
+    this->ReflectionColorTexture->Deactivate();
+    this->ReflectionDepthTexture->Deactivate();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -213,5 +287,6 @@ bool vtkF3DOpenGLGridMapper::GetNeedToRebuildShaders(
   vtkOpenGLHelper& cellBO, vtkRenderer* vtkNotUsed(ren), vtkActor* act)
 {
   vtkMTimeType renderPassMTime = this->GetRenderPassStageMTime(act, &cellBO);
-  return cellBO.Program == nullptr || cellBO.ShaderSourceTime < renderPassMTime;
+  return cellBO.Program == nullptr || cellBO.ShaderSourceTime < renderPassMTime ||
+    this->ShaderBuiltWithReflection != (this->ReflectionStrength > 0.0f);
 }

@@ -159,6 +159,10 @@ Set the number of subdivisions for the grid.
 
 Set the color grid lines.
 
+### `--grid-reflection=<strength>` (_double_, default: `0`)
+
+Set the reflection strength on the grid.
+
 ### `--grid-absolute` (_bool_, default: `false`)
 
 Position the grid at absolute origin instead of below the model.

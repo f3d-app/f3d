@@ -376,6 +376,12 @@ Set the color of grid lines.
 
 CLI: `--grid-color`.
 
+### `render.grid.reflection` (_ratio_, default: `0.0`)
+
+Set the reflection strength on the grid.
+
+CLI: `--grid-reflection`.
+
 ### `render.axes_grid` (_bool_, default: `false`)
 
 Show _axes grid_ in the scene.

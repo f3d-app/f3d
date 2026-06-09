@@ -9,6 +9,7 @@
 
 #include <vtkOpenGLPolyDataMapper.h>
 #include <vtkSmartPointer.h>
+#include <vtkTextureObject.h>
 
 class vtkF3DOpenGLGridMapper : public vtkOpenGLPolyDataMapper
 {
@@ -47,6 +48,19 @@ public:
    */
   vtkSetVector4Macro(Axis2Color, float);
 
+  /**
+   * Set the strength of the reflection
+   */
+  vtkSetMacro(ReflectionStrength, float);
+
+  //@{
+  /**
+   * Set the reflection textures
+   */
+  vtkSetSmartPointerMacro(ReflectionColorTexture, vtkTextureObject);
+  vtkSetSmartPointerMacro(ReflectionDepthTexture, vtkTextureObject);
+  //@}
+
   using vtkOpenGLPolyDataMapper::GetBounds;
   double* GetBounds() override;
 
@@ -75,6 +89,10 @@ protected:
   int Subdivisions = 10;
   float Axis1Color[4] = { 0.0, 0.0, 0.0, 1.0 };
   float Axis2Color[4] = { 0.0, 0.0, 0.0, 1.0 };
+  float ReflectionStrength = 0.0f;
+  bool ShaderBuiltWithReflection = false;
+  vtkSmartPointer<vtkTextureObject> ReflectionColorTexture;
+  vtkSmartPointer<vtkTextureObject> ReflectionDepthTexture;
 };
 
 #endif

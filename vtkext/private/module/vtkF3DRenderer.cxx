@@ -478,6 +478,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   newPass->SetCircleOfConfusionRadius(this->CircleOfConfusionRadius);
   newPass->SetForceOpaqueBackground(this->HDRISkyboxVisible);
   newPass->SetArmatureVisible(this->ArmatureVisible);
+  newPass->SetRenderReflection(this->GridVisible && this->GridReflection > 0.0);
 
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
@@ -754,6 +755,17 @@ void vtkF3DRenderer::SetGridColor(const std::vector<double>& color)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetGridReflection(const double strength)
+{
+  if (this->GridReflection != strength)
+  {
+    this->GridReflection = strength;
+    this->GridConfigured = false;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetAxesColor(const std::vector<double>& colorXAxis,
   const std::vector<double>& colorYAxis, const std::vector<double>& colorZAxis)
 {
@@ -859,6 +871,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       this->GridMapper->SetFadeDistance(diag);
       this->GridMapper->SetUnitSquare(tmpUnitSquare);
       this->GridMapper->SetSubdivisions(this->GridSubdivisions);
+      this->GridMapper->SetReflectionStrength(this->GridReflection);
 
       if (this->GridAbsolute)
       {
@@ -3695,4 +3708,10 @@ void vtkF3DRenderer::AddNotification(
   const std::string& desc, const std::string& value, const std::string& bind, double duration)
 {
   this->UIActor->AddNotification(desc, value, bind, this->TotalTime, duration);
+}
+
+//----------------------------------------------------------------------------
+vtkMatrix4x4* vtkF3DRenderer::GetGridMatrix() const
+{
+  return this->GridActor->GetMatrix();
 }
