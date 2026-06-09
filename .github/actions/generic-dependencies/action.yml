@@ -40,3 +40,8 @@ runs:
         versions_file: ${{inputs.versions_file}}
         mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
+
+    - name: Install MESA
+      uses: ./source/.github/actions/install-mesa
+      with:
+        cpu: ${{inputs.cpu}}

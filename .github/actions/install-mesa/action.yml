@@ -1,0 +1,68 @@
+name: "Install MESA"
+description: "Install MESA"
+inputs:
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Cache MESA
+      id: cache-mesa
+      continue-on-error: true # https://github.com/actions/cache/issues/1754
+      uses: actions/cache/restore@v5
+      with:
+        path: dependencies/mesa_install
+        key: mesa-26.1.2-${{runner.os}}-${{inputs.cpu}}-0
+
+    - name: Checkout MESA
+      if: steps.cache-mesa.outputs.cache-hit != 'true'
+      shell: bash
+      run: git clone --depth 1 --branch mesa-26.1.2 https://gitlab.freedesktop.org/mesa/mesa.git ${{github.workspace}}/dependencies/mesa
+
+    - name: Setup MESA
+      if: steps.cache-mesa.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir mesa_build
+        mkdir mesa_install
+
+    - name: Install MESA build dependencies
+      if: steps.cache-mesa.outputs.cache-hit != 'true'
+      shell: bash
+      run: pip install meson
+
+    - name: Configure MESA
+      if: steps.cache-mesa.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/mesa_build
+      shell: bash
+      run: >
+        meson setup ../mesa
+        --prefix=${{github.workspace}}/dependencies/mesa_install
+        --buildtype=release
+        -Db_ndebug=true
+        -Dgallium-drivers=llvmpipe
+        -Dvulkan-drivers=[]
+        -Dglx=disabled
+        -Dplatforms=[]
+
+    - name: Build MESA
+      if: steps.cache-mesa.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/mesa_build
+      shell: bash
+      run: ninja -j2 install
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/mesa_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-mesa.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v5
+      with:
+        key: ${{ steps.cache-mesa.outputs.cache-primary-key }}
+        path: dependencies/mesa_install
