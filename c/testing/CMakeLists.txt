@@ -18,6 +18,14 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
     )
 endif()
 
+# Zero-copy mesh_view C API (f3d_scene_add_mesh_view). Needs stride arrays
+# https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12411
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20251110)
+  list(APPEND f3d_c_api_tests_list
+    test_scene_mesh_view.c
+    )
+endif()
+
 set(CMAKE_TESTDRIVER_EXTRA_INCLUDES "")
 set(CMAKE_TESTDRIVER_ARGVC_FUNCTION "")
 set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "")
