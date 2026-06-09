@@ -88,6 +88,7 @@ public class TestScene {
     lightState.type = Types.LightType.HEADLIGHT;
     lightState.intensity = 1.0;
     lightState.switchState = true;
+    lightState.castShadows = true;
 
     int lightIdx = scene.addLight(lightState);
 
@@ -101,6 +102,7 @@ public class TestScene {
       updateLight.type = Types.LightType.HEADLIGHT;
       updateLight.intensity = 2.0;
       updateLight.switchState = true;
+      updateLight.castShadows = true;
 
       scene.updateLight(lightIdx, updateLight);
 

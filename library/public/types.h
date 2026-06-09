@@ -357,13 +357,14 @@ struct F3D_EXPORT light_state_t
   bool positionalLight = false;
   double intensity = 1.0;
   bool switchState = true;
+  bool castShadows = true;
 
   [[nodiscard]] bool operator==(const light_state_t& other) const
   {
     return this->type == other.type && this->position == other.position &&
       this->color == other.color && this->direction == other.direction &&
       this->positionalLight == other.positionalLight && this->intensity == other.intensity &&
-      this->switchState == other.switchState;
+      this->switchState == other.switchState && this->castShadows == other.castShadows;
   }
 };
 

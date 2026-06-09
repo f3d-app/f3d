@@ -22,6 +22,8 @@
 #include <vtkPolyData.h>
 #include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
+#include <vtkShadowMapBakerPass.h>
+#include <vtkShadowMapPass.h>
 #include <vtkSmartPointer.h>
 #include <vtkTexture.h>
 #include <vtkUnsignedIntArray.h>
@@ -575,6 +577,13 @@ bool vtkF3DMetaImporter::Update()
       this->Renderer->AddActor(pss.Actor);
       pss.Actor->VisibilityOff();
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
+      // the point mapper doesn't support shadows, so we exclude it from shadow receivers
+      const vtkNew<vtkInformation> keys;
+      pss.Actor->SetPropertyKeys(keys);
+      pss.Actor->GetPropertyKeys()->Set(vtkShadowMapPass::RECEIVER(), 0);
+#endif
+
       // Create and configure volume props
       if (genericImporter)
       {
@@ -612,8 +621,25 @@ bool vtkF3DMetaImporter::Update()
 
   if (!hasActiveLight)
   {
+    vtkLightCollection* lights = this->Renderer->GetLights();
+
+    [[maybe_unused]] const int offset = lights->GetNumberOfItems();
+
     vtkNew<vtkLightKit> lightKit;
     lightKit->AddLightsToRenderer(this->Renderer);
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
+    // the first light is a headlight so it doesn't cast shadow, the key doesn't matter
+    // the second light is the key light, that's the one that will cast shadows
+    // the 3 last lights are minor lights, so let's disable shadows for them
+    for (int i = offset + 2; i < lights->GetNumberOfItems(); i++)
+    {
+      vtkLight* newLight = vtkLight::SafeDownCast(lights->GetItemAsObject(i));
+      vtkNew<vtkInformation> info;
+      info->Set(vtkShadowMapBakerPass::CAST_SHADOWS(), 0);
+      newLight->SetInformation(info);
+    }
+#endif
   }
 
   if (localCameraIndex > 0)

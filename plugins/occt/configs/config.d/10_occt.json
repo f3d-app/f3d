@@ -8,7 +8,8 @@
       "up": "+Z",
       "ambient-occlusion": true,
       "coloring-field": "cells",
-      "camera-direction": "-1,1,-0.5"
+      "camera-direction": "-1,1,-0.5",
+      "shadows": true
     }
   }
 ]

@@ -41,6 +41,13 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001 AND NOT F3D_USE_GLES)
     )
 endif()
 
+# Shadows
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016)
+  list(APPEND libf3dSDKTests_list
+    TestSDKSceneLights.cxx
+    )
+endif()
+
 # Tests having UI widgets
 if(F3D_MODULE_UI)
   list(APPEND libf3dSDKTests_list

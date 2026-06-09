@@ -94,7 +94,8 @@ endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251104)
   f3d_test(NAME TestPipedSTL DATA suzanne.stl PIPED_READER STL PIPED)
-  if(NOT F3D_MACOS_BUNDLE)
+  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13818
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016 AND NOT F3D_MACOS_BUNDLE)
     f3d_test(NAME TestDefaultConfigFilePipedSTL DATA suzanne.stl PIPED_READER STL CONFIG config_build LONG_TIMEOUT UI PIPED SKIP_GLES)
   endif()
 endif()
@@ -139,8 +140,8 @@ if(NOT F3D_MACOS_BUNDLE)
   # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
   configure_file("${F3D_SOURCE_DIR}/testing/configs/complex.json" "${CMAKE_BINARY_DIR}/share/f3d/configs/complex_build.json" COPYONLY)
   file(COPY "${F3D_SOURCE_DIR}/resources/configs/config.d/" "${F3D_SOURCE_DIR}/plugins/native/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13818
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016)
     f3d_test(NAME TestConfigFileBuild DATA dragon.vtu CONFIG complex_build.json UI)
     f3d_test(NAME TestConfigStemBuild DATA dragon.vtu CONFIG complex_build UI)
     f3d_test(NAME TestConfigFileUpperCase DATA suzanne_upper.STL CONFIG complex_build UI)

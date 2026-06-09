@@ -3,7 +3,8 @@
     "match-type": "glob",
     "match": "*.{fbx,dae,off,dxf,x,3mf,amf}",
     "options": {
-      "load-plugins": "assimp"
+      "load-plugins": "assimp",
+      "shadows": true
     }
   },
   {
@@ -11,7 +12,8 @@
     "match": "*.{off,3mf}",
     "options": {
       "up": "+Z",
-      "camera-direction": "-1,1,-0.5"
+      "camera-direction": "-1,1,-0.5",
+      "shadows": true
     }
   },
   {

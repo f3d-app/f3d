@@ -44,6 +44,7 @@ f3d::light_state_t to_cpp_light_state(const f3d_light_state_t* c_state)
   cpp_state.positionalLight = c_state->positional_light != 0;
   cpp_state.intensity = c_state->intensity;
   cpp_state.switchState = c_state->switch_state != 0;
+  cpp_state.castShadows = c_state->cast_shadows != 0;
 
   return cpp_state;
 }
@@ -81,6 +82,7 @@ f3d_light_state_t* to_c_light_state(const f3d::light_state_t& cpp_state)
   c_state->positional_light = cpp_state.positionalLight ? 1 : 0;
   c_state->intensity = cpp_state.intensity;
   c_state->switch_state = cpp_state.switchState ? 1 : 0;
+  c_state->cast_shadows = cpp_state.castShadows ? 1 : 0;
 
   return c_state;
 }

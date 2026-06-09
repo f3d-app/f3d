@@ -874,19 +874,20 @@ PYBIND11_MODULE(pyf3d, module)
   py::class_<f3d::light_state_t>(module, "LightState")
     .def(py::init<>())
     .def(py::init<const f3d::light_type&, const f3d::point3_t&, const f3d::color_t&,
-           const f3d::vector3_t&, const bool&, const double&, const bool&>(),
+           const f3d::vector3_t&, const bool&, const double&, const bool&, const bool&>(),
       py::arg("type") = f3d::light_type::SCENE_LIGHT,
       py::arg("position") = f3d::point3_t({ 0.0, 0.0, 0.0 }),
       py::arg_v("color", f3d::color_t({ 1.0, 1.0, 1.0 }), "Color(1.0, 1.0, 1.0)"),
       py::arg("direction") = f3d::vector3_t({ 1.0, 0.0, 0.0 }), py::arg("positional_light") = false,
-      py::arg("intensity") = 1.0, py::arg("switch_state") = true)
+      py::arg("intensity") = 1.0, py::arg("switch_state") = true, py::arg("cast_shadows") = false)
     .def_readwrite("type", &f3d::light_state_t::type)
     .def_readwrite("color", &f3d::light_state_t::color)
     .def_readwrite("position", &f3d::light_state_t::position)
     .def_readwrite("direction", &f3d::light_state_t::direction)
     .def_readwrite("positional_light", &f3d::light_state_t::positionalLight)
     .def_readwrite("intensity", &f3d::light_state_t::intensity)
-    .def_readwrite("switch_state", &f3d::light_state_t::switchState);
+    .def_readwrite("switch_state", &f3d::light_state_t::switchState)
+    .def_readwrite("cast_shadows", &f3d::light_state_t::castShadows);
 
   // f3d::file_availability
   py::enum_<f3d::file_availability>(module, "FileAvailability")
