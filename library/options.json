@@ -93,6 +93,12 @@
         "default_value": "5"
       }
     },
+    "shadows": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      }
+    },
     "effect": {
       "translucency_support": {
         "type": "bool",

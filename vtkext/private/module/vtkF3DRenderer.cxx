@@ -479,6 +479,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   newPass->SetForceOpaqueBackground(this->HDRISkyboxVisible);
   newPass->SetArmatureVisible(this->ArmatureVisible);
   newPass->SetRenderReflection(this->GridVisible && this->GridReflection > 0.0);
+  newPass->SetRenderShadows(this->UseShadows);
 
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
@@ -761,6 +762,15 @@ void vtkF3DRenderer::SetGridReflection(const double strength)
   {
     this->GridReflection = strength;
     this->GridConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetShadows(bool use)
+{
+  if (this->UseShadows != use)
+  {
+    this->UseShadows = use;
     this->RenderPassesConfigured = false;
   }
 }
