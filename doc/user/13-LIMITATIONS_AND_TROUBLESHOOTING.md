@@ -150,7 +150,7 @@ xattr -cr /Applications/F3D.app
 
 Then F3D should work as expected.
 
-> I can't use hotkeys with F row keys
+> I can't use hotkeys/bindings with F row keys
 
 Because MacOS layers multimedia keys, F keys don't use the normal function code by default. To use the F code, you must press <kbd>Fn</kbd> in combination with the F key. For example, to take a screenshot the hotkey combination would be <kbd>Cmd</kbd>+<kbd>Fn</kbd>+<kbd>F12</kbd>.  
 

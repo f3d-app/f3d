@@ -28,9 +28,7 @@ struct interaction_bind_t
     NONE = 0x0,       // 00000000
     CTRL = 0x1,       // 00000001
     SHIFT = 0x2,      // 00000010
-    CTRL_SHIFT = 0x3, // 00000011
-    CMD = 0x4,        // 00000100
-    CMD_SHIFT = 0x5   // 00000101
+    CTRL_SHIFT = 0x3  // 00000011
   };
 
   ModifierKeys mod = ModifierKeys::NONE;
@@ -325,9 +323,7 @@ public:
     NONE,
     CTRL,
     SHIFT,
-    CTRL_SHIFT,
-    CMD,
-    CMD_SHIFT
+    CTRL_SHIFT
   };
 
   /**
@@ -505,15 +501,19 @@ inline std::string interaction_bind_t::format() const
   switch (this->mod)
   {
     case ModifierKeys::CTRL_SHIFT:
+#ifdef __APPLE__
+      return "Cmd+Shift+" + this->inter;
+#else
       return "Ctrl+Shift+" + this->inter;
+#endif
     case ModifierKeys::CTRL:
+#ifdef __APPLE__
+      return "Cmd+" + this->inter;
+#else
       return "Ctrl+" + this->inter;
+#endif
     case ModifierKeys::SHIFT:
       return "Shift+" + this->inter;
-    case ModifierKeys::CMD:
-      return "Cmd+" + this->inter;
-    case ModifierKeys::CMD_SHIFT:
-      return "Cmd+Shift+" + this->inter;
     case ModifierKeys::ANY:
       return "Any+" + this->inter;
     default:
@@ -547,14 +547,6 @@ inline interaction_bind_t interaction_bind_t::parse(std::string_view str)
     else if (modStr == "Ctrl")
     {
       bind.mod = ModifierKeys::CTRL;
-    }
-    else if (modStr == "Cmd")
-    {
-      bind.mod = ModifierKeys::CMD;
-    }
-    else if (modStr == "Cmd+Shift")
-    {
-      bind.mod = ModifierKeys::CMD_SHIFT;
     }
     else if (modStr == "Any")
     {
