@@ -24,11 +24,11 @@ struct interaction_bind_t
    */
   enum class ModifierKeys : unsigned char
   {
-    ANY = 0x80,       // 10000000
-    NONE = 0x0,       // 00000000
-    CTRL = 0x1,       // 00000001
-    SHIFT = 0x2,      // 00000010
-    CTRL_SHIFT = 0x3  // 00000011
+    ANY = 0x80,      // 10000000
+    NONE = 0x0,      // 00000000
+    CTRL = 0x1,      // 00000001
+    SHIFT = 0x2,     // 00000010
+    CTRL_SHIFT = 0x3 // 00000011
   };
 
   ModifierKeys mod = ModifierKeys::NONE;

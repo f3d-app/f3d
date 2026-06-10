@@ -152,7 +152,7 @@ Supported modifiers are:
 * `Any` : A special modifier that does not consider modifiers keys but can only be reached
 if there is no bind with the same interaction.
 
-On MacOS, bindings specified via configuration will be specified using `Ctrl` and `Ctrl+Shift` but will be toggled using `Cmd` and `Cmd+Shift` respectively. The cheatsheet will display the correct binding combination regardless.
+On MacOS, bindings specified via configuration will be defined using `Ctrl` and `Ctrl+Shift` but will be toggled in F3D using `Cmd` and `Cmd+Shift` respectively. The cheatsheet will display the correct binding combination regardless.
 
 Supported interactions are legion, eg:
 
