@@ -562,6 +562,37 @@ void window_impl::UpdateDynamicOptions()
     }
   }
 
+  if (opt.render.effect.antialiasing.taa_movement_blending == "")
+  {
+    // no option specified, default to motion reprojection if stochastic blending is disabled,
+    // reset_history otherwise
+    if (opt.render.effect.blending.enable && opt.render.effect.blending.mode == "stochastic")
+    {
+      renderer->SetAntiAliasingTaaMovementBlendingMode(
+        vtkF3DRenderer::MovementBlending::ResetHistory);
+    }
+    else
+    {
+      renderer->SetAntiAliasingTaaMovementBlendingMode(
+        vtkF3DRenderer::MovementBlending::MovementReproject);
+    }
+  }
+  else if (opt.render.effect.antialiasing.taa_movement_blending == "reset_history")
+  {
+    renderer->SetAntiAliasingTaaMovementBlendingMode(
+      vtkF3DRenderer::MovementBlending::ResetHistory);
+  }
+  else if (opt.render.effect.antialiasing.taa_movement_blending == "movement_reproject")
+  {
+    renderer->SetAntiAliasingTaaMovementBlendingMode(
+      vtkF3DRenderer::MovementBlending::MovementReproject);
+  }
+  else
+  {
+    log::warn(opt.render.effect.antialiasing.taa_movement_blending,
+      R"( is an invalid TAA movement blending mode. Valid modes are: "reset_history", "movement_reproject")");
+  }
+
   if (opt.render.effect.blending.enable)
   {
     if (opt.render.effect.blending.mode == "ddp")

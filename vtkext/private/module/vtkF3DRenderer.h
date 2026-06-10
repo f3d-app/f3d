@@ -71,6 +71,12 @@ public:
     STOCHASTIC
   };
 
+  enum class MovementBlending : std::uint8_t
+  {
+    ResetHistory = 0,      // reset history on movement
+    MovementReproject = 1, // use motion vector to blend
+  };
+
   /**
    * Enum listing possible splat types.
    */
@@ -156,7 +162,9 @@ public:
   BlendingMode GetBlendingMode() const;
   void SetUseSSAOPass(bool use);
   void SetAntiAliasingMode(AntiAliasingMode mode);
+  void SetAntiAliasingTaaMovementBlendingMode(MovementBlending mode);
   AntiAliasingMode GetAntiAliasingMode() const;
+  MovementBlending GetAntiAliasingTaaMovementBlendingMode() const;
   void SetUseToneMappingPass(bool use);
   void SetDisplayDepth(bool use);
   void SetUseBlurBackground(bool use);
@@ -757,6 +765,7 @@ private:
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
   AntiAliasingMode AntiAliasingModeEnabled = AntiAliasingMode::NONE;
+  MovementBlending AntiAliasingTaaMovementBlending = MovementBlending::ResetHistory;
   BlendingMode BlendingModeEnabled = BlendingMode::NONE;
   bool UseSSAOPass = false;
   bool UseToneMappingPass = false;

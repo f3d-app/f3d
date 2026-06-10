@@ -751,6 +751,12 @@
           "implicitValue": "fxaa"
         },
         {
+          "longName": "taa-movement-blending",
+          "helpText": "Select the blending mode for TAA when movement is detected (\"reset_history\" or \"movement_reproject\")",
+          "valueHelper": "<string>",
+          "implicitValue": ""
+        },
+        {
           "longName": "tone-mapping",
           "shortName": "t",
           "helpText": "Enable Tone Mapping, providing balanced coloring",
