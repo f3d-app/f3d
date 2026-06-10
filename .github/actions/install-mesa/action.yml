@@ -43,8 +43,8 @@ runs:
         python -m pip install meson mako packaging PyYAML
         choco install winflexbison3 --no-progress -y
 
-    - name: Install MESA build dependencies (Linux/macOS)
-      if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os != 'Windows'
+    - name: Install MESA build dependencies (macOS)
+      if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'macOS'
       shell: bash
       run: python -m pip install meson mako packaging PyYAML
 
@@ -62,6 +62,7 @@ runs:
         -Dopengl=true
         -Degl=disabled
         -Dglx=disabled
+        -Dxlib-lease=disabled
 
     - name: Build MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
