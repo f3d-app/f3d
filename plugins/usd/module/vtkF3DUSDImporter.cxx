@@ -298,8 +298,8 @@ public:
       float totalWeight = 0.0f;
       for (int j = 0; j < components; j++)
       {
-        jointsArr->SetTypedComponent(static_cast<vtkIdType>(i), j,
-          static_cast<unsigned short>(influences[j].second));
+        jointsArr->SetTypedComponent(
+          static_cast<vtkIdType>(i), j, static_cast<unsigned short>(influences[j].second));
         weightsArr->SetTypedComponent(static_cast<vtkIdType>(i), j, influences[j].first);
         totalWeight += influences[j].first;
       }
