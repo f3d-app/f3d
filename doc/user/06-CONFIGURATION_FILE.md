@@ -145,12 +145,12 @@ A bind is the association of a modifier and an interaction.
 
 Supported modifiers are:
 
-* `None` : No modifiers is pressed, can be omitted completely.
-* `Ctrl` : Control key is pressed, no distinction between left and right.
-* `Shift` : Shift key is pressed, no distinction between left and right.
-* `Ctrl+Shift` : Control and Shift keys are pressed, no distinction between left and right.
-* `Any` : A special modifier that does not consider modifiers keys but can only be reached
-if there is no bind with the same interaction.
+- `None` : No modifiers is pressed, can be omitted completely.
+- `Ctrl` : Control key is pressed, no distinction between left and right.
+- `Shift` : Shift key is pressed, no distinction between left and right.
+- `Ctrl+Shift` : Control and Shift keys are pressed, no distinction between left and right.
+- `Any` : A special modifier that does not consider modifiers keys but can only be reached
+  if there is no bind with the same interaction.
 
 On MacOS, bindings specified via configuration will be defined using `Ctrl` and `Ctrl+Shift` but will be toggled in F3D using `Cmd` and `Cmd+Shift` respectively. The cheatsheet will display the correct binding combination regardless.
 
