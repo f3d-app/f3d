@@ -437,6 +437,11 @@ public:
       mapper->SetInputData(polydata);
     }
 
+    if (polydata->GetPointData()->GetScalars())
+    {
+      mapper->SetColorModeToDirectScalars();
+    }
+
     if (!this->HasTimeCode())
     {
       mapper->StaticOn();
@@ -907,14 +912,13 @@ public:
             newPolyData->SetVerts(verts);
           }
 
-          pxr::UsdGeomPrimvar colorPrimvar =
-            pxr::UsdGeomPrimvarsAPI(pointsPrim).GetPrimvar(pxr::UsdGeomTokens->displayColor);
+          pxr::UsdGeomPrimvar colorPrimvar = pointsPrim.GetDisplayColorPrimvar();
           if (colorPrimvar)
           {
             pxr::VtArray<pxr::GfVec3f> colors;
             if (colorPrimvar.Get(&colors, timeCode) && colors.size() > 0)
             {
-              vtkNew<vtkUnsignedCharArray> rgbColors;
+              vtkNew<vtkFloatArray> rgbColors;
               rgbColors->SetName("RGB");
               rgbColors->SetNumberOfComponents(3);
               rgbColors->SetNumberOfTuples(static_cast<vtkIdType>(positions.size()));
@@ -923,11 +927,7 @@ public:
               {
                 const std::size_t colorIndex = colors.size() == positions.size() ? i : 0;
                 const pxr::GfVec3f& c = colors[colorIndex];
-                const unsigned char rgb[3] = {
-                  static_cast<unsigned char>(std::clamp(c[0], 0.0f, 1.0f) * 255.0f),
-                  static_cast<unsigned char>(std::clamp(c[1], 0.0f, 1.0f) * 255.0f),
-                  static_cast<unsigned char>(std::clamp(c[2], 0.0f, 1.0f) * 255.0f),
-                };
+                const float rgb[3] = { c[0], c[1], c[2] };
                 rgbColors->SetTypedTuple(static_cast<vtkIdType>(i), rgb);
               }
 

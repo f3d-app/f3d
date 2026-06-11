@@ -4,6 +4,7 @@
 #include <vtkActorCollection.h>
 #include <vtkDataArray.h>
 #include <vtkNew.h>
+#include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkRenderer.h>
@@ -60,7 +61,8 @@ int TestF3DUSDImporterPoints(int vtkNotUsed(argc), char* argv[])
     }
 
     vtkDataArray* colors = polydata->GetPointData()->GetScalars();
-    if (!colors || std::strcmp(colors->GetName(), "RGB") != 0)
+    if (!colors || std::strcmp(colors->GetName(), "RGB") != 0 ||
+      colors->GetNumberOfComponents() != 3 || colors->GetDataType() != VTK_FLOAT)
     {
       std::cerr << "Missing RGB scalars on USD Points primitive\n";
       return EXIT_FAILURE;
