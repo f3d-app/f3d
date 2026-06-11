@@ -13,7 +13,6 @@
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkResourceStream.h>
-
 #include <vtkMathUtilities.h>
 #include <vtkPoints.h>
 
@@ -737,17 +736,22 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
       (found == times.end() - 1) ? times.size() - 2 : std::distance(times.begin(), found);
     // If time at index i > timeValue, then choose the previous frame
     const size_t frameIndex = times[i] > timeValue && i > 0 ? i - 1 : i;
-    // Make sure time is in valid range
-    // Last index ignored to match number of frames
-    double clampedTime = std::clamp(timeValue, times.front(), times[times.size() - 2]);
-    // Index of frame at or immediately after clamped time
     size_t upperFrameIndex =
-      std::distance(times.begin(), std::lower_bound(times.begin(), times.end() - 1, clampedTime));
-    size_t lowerFrameIndex = upperFrameIndex > 0 ? upperFrameIndex - 1 : 0;
-    // Interpolation factor (0.0 to 1.0)
-    double alpha = vtkMathUtilities::SafeDivision(
-      clampedTime - times[lowerFrameIndex], times[upperFrameIndex] - times[lowerFrameIndex]);
-    alpha = std::max(0.0, std::min(1.0, alpha));
+      std::distance(times.begin(), std::lower_bound(times.begin(), times.end() - 1, timeValue));
+    size_t lowerFrameIndex;
+    double alpha;
+    if (upperFrameIndex >= times.size() - 1)
+    {
+      // Last frame
+      upperFrameIndex = lowerFrameIndex = times.size() - 2;
+      alpha = 0.0;
+    }
+    else
+    {
+      lowerFrameIndex = upperFrameIndex > 0 ? upperFrameIndex - 1 : 0;
+      alpha = vtkMathUtilities::SafeDivision(
+        timeValue - times[lowerFrameIndex], times[upperFrameIndex] - times[lowerFrameIndex]);
+    }
     if (isMeshAnimation)
     {
       vtkPolyData* upperFrame = this->Internals->AnimationFrames[animIndex][upperFrameIndex];
