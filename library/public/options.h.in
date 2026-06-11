@@ -147,6 +147,27 @@ public:
   options& removeValue(std::string_view name);
 
   /**
+   *  Return true if an option has a domain, false otherwise.
+   *
+   *  Throws an options::inexistent_exception if option does not exist.
+   */
+//  [[nodiscard]] bool hasDomain(std::string_view name) const;
+
+  /**
+   *  Increase an option value if it has a domain, else throws options::incompatible_exception.
+   *
+   *  Throws an options::inexistent_exception if option does not exist.
+   */
+  options& increase(std::string_view name);
+
+  /**
+   *  Decrease an option value if it has a domain, else throws options::incompatible_exception.
+   *
+   *  Throws an options::inexistent_exception if option does not exist.
+   */
+//  options& decrease(std::string_view name);
+
+  /**
    * Templated parsing method used internally to parse strings.
    * Implemented for the different supported types,
    * see PARSING.md for more info.
@@ -202,12 +223,35 @@ public:
     explicit no_value_exception(const std::string& what = "");
   };
 
+  template<typename T>
+  struct domain_range_t
+  {
+    std::array<T,2> range;
+    T increment;
+  };
+
+  template<typename T, std::size_t N>
+  struct domain_enum_t
+  {
+    std::array<T,N> enumeration;
+  };
+
+  struct domains {
+    struct render {
+      struct light {
+        domain_range_t<double> intensity { {0, 10}, 0.1};
+      } light;
+    } render;
+  } domains;
+
   /**
    * The complete generated options struct
    */
   // clang-format off
   ${_options_struct}
   // clang-format on
+
+
 };
 
 }

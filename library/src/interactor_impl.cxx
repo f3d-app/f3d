@@ -957,6 +957,16 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{ "clear", "clear console" });
 
   this->addCommand(
+    "increase",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 1, "reset");
+      this->Internals->Options.increase(args[0]);
+    },
+    command_documentation_t{ "increase option.name", "increase a libf3d option according to its domain" },
+    complOptionNames);
+
+  this->addCommand(
     "print",
     [&](const std::vector<std::string>& args)
     {

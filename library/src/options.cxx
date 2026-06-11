@@ -17,6 +17,27 @@ F3D_SILENT_WARNING_POP()
 #include <limits>
 #include <string>
 
+namespace
+{
+void increase(f3d::options& opt, std::string_view name, bool up)
+{
+  // manual handle certains option for now
+  if (name == "render.light.intensity")
+  {
+    char dir = up ? +1 : -1;
+    opt.render.light.intensity += dir * opt.domains.render.light.intensity.increment;
+    if (up && opt.render.light.intensity > opt.domains.render.light.intensity.range[1])
+    {
+      opt.render.light.intensity = opt.domains.render.light.intensity.range[0];
+    }
+    else if (!up && opt.render.light.intensity < opt.domains.render.light.intensity.range[0])
+    {
+      opt.render.light.intensity = opt.domains.render.light.intensity.range[1];
+    }
+  }
+}
+}
+
 namespace f3d
 {
 //----------------------------------------------------------------------------
@@ -185,6 +206,15 @@ options& options::removeValue(std::string_view name)
   {
     throw options::incompatible_exception("Option " + std::string(name) + " is not not optional");
   }
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+options& options::increase(std::string_view name)
+{
+  //  options_generated::increase(*this, name, true);
+  ::increase(*this, name, true);
+
   return *this;
 }
 
