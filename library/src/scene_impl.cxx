@@ -739,26 +739,29 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
   // vtkTexture once and hand it to the importer, which applies it to the imported actor.
   {
     const auto textureView = mesh->getMemoryView(timeRange[0]);
-    const auto& bct = textureView.baseColorTexture;
-    if (bct.data != nullptr && bct.width > 0 && bct.height > 0)
+    const f3d::image& bct = textureView.baseColorTexture;
+    const unsigned int tw = bct.getWidth();
+    const unsigned int th = bct.getHeight();
+    const unsigned int tc = bct.getChannelCount();
+    if (tw > 0 && th > 0 && bct.getContent() != nullptr)
     {
-      if (bct.components != 3 && bct.components != 4)
+      if (tc != 3 && tc != 4)
       {
         throw scene::load_failure_exception(
           "Mesh view base color texture must have 3 or 4 components");
       }
       vtkNew<vtkImageData> img;
-      img->SetDimensions(static_cast<int>(bct.width), static_cast<int>(bct.height), 1);
-      img->AllocateScalars(VTK_UNSIGNED_CHAR, static_cast<int>(bct.components));
-      std::memcpy(img->GetScalarPointer(), bct.data,
-        bct.width * bct.height * bct.components * sizeof(unsigned char));
+      img->SetDimensions(static_cast<int>(tw), static_cast<int>(th), 1);
+      img->AllocateScalars(VTK_UNSIGNED_CHAR, static_cast<int>(tc));
+      std::memcpy(img->GetScalarPointer(), bct.getContent(),
+        static_cast<size_t>(tw) * th * tc * sizeof(unsigned char));
 
       vtkNew<vtkTexture> texture;
       texture->SetInputData(img);
       texture->InterpolateOn();
       texture->UseSRGBColorSpaceOn(); // base color is authored in sRGB
       texture->Update();
-      importer->SetBaseColorTexture(texture, bct.emissive);
+      importer->SetBaseColorTexture(texture, textureView.baseColorTextureEmissive);
     }
   }
 

@@ -173,12 +173,18 @@ f3d::mesh_view::memory_view_t to_cpp_memory_view(const f3d_memory_view_t* c)
     v.cellScalars.push_back(to_cpp_data_array(c->cell_scalars[i]));
   }
 
-  v.baseColorTexture.data = c->base_color_texture;
-  v.baseColorTexture.width = c->base_color_texture_width;
-  v.baseColorTexture.height = c->base_color_texture_height;
-  v.baseColorTexture.components =
-    c->base_color_texture_components ? c->base_color_texture_components : 3;
-  v.baseColorTexture.emissive = c->base_color_texture_emissive != 0;
+  if (c->base_color_texture != nullptr && c->base_color_texture_width > 0 &&
+    c->base_color_texture_height > 0)
+  {
+    const unsigned int comps = static_cast<unsigned int>(
+      c->base_color_texture_components ? c->base_color_texture_components : 3);
+    f3d::image img(static_cast<unsigned int>(c->base_color_texture_width),
+      static_cast<unsigned int>(c->base_color_texture_height), comps, f3d::image::ChannelType::BYTE);
+    // setContent deep-copies, so the caller's buffer need not outlive this call
+    img.setContent(const_cast<void*>(c->base_color_texture));
+    v.baseColorTexture = std::move(img);
+    v.baseColorTextureEmissive = c->base_color_texture_emissive != 0;
+  }
   return v;
 }
 
