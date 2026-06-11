@@ -220,7 +220,7 @@ image::image(const fs::path& filePath)
 image::image([[maybe_unused]] std::byte* buffer, [[maybe_unused]] std::size_t size)
   : Internals(new image::internals())
 {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260128)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 2)
   detail::init::initialize();
 
   if (buffer == nullptr)
