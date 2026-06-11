@@ -2643,13 +2643,10 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     
     vtkProperty* prop = coloring.Actor->GetProperty();
     vtkProperty* origProp = coloring.OriginalActor->GetProperty();
-    if (this->OriginalBackfaceCulling.count(prop) == 0)
+    auto it = this->OriginalBackfaceCulling.find(prop);
+    if (it == this->OriginalBackfaceCulling.end())
     {
       this->OriginalBackfaceCulling[prop] = (prop->GetBackfaceCulling() != 0);
-    }
-    if (this->OriginalBackfaceCulling.count(origProp) == 0)
-    {
-      this->OriginalBackfaceCulling[origProp] = (origProp->GetBackfaceCulling() != 0);
     }
 
     if (setBackfaceCulling)
@@ -2660,7 +2657,7 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     else
     {
       prop->SetBackfaceCulling(this->OriginalBackfaceCulling[prop]);
-      origProp->SetBackfaceCulling(this->OriginalBackfaceCulling[origProp]);
+      origProp->SetBackfaceCulling(this->OriginalBackfaceCulling[prop]);
     }
 
     if (surfaceColor)
