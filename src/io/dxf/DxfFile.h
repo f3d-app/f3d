@@ -1,0 +1,6 @@
+class DxfFile {
+public:
+    // ...
+    void readFile(const std::string& filePath);
+    // ...
+};
