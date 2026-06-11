@@ -6,7 +6,7 @@ Simple interaction with the displayed data is possible directly within the windo
 
 - _Click and drag_ with the _left_ mouse button to rotate around the focal point of the camera.
 - Hold <kbd>Shift</kbd> then _Click and drag_ with the _left_ mouse button to translate the camera.
-- Hold <kbd>Ctrl</kbd> (<kbd>Cmd</kbd> on MacOS) then _Click and drag_ with the _left_ mouse button to rotate around the axis of the camera.
+- Hold <kbd>Ctrl</kbd> then _Click and drag_ with the _left_ mouse button to rotate around the axis of the camera.
 - Hold <kbd>Shift</kbd> then _Click and drag_ horizontally with the _right_ mouse button to rotate the HDRI.
 - _Click and drag_ vertically with the _right_ mouse button to zoom in/out.
 - _Move the mouse wheel_ to zoom in/out.
@@ -68,11 +68,11 @@ Other options can be toggled or cycled directly by pressing the following hotkey
 - <kbd>J</kbd>: the display of the HDRI skybox.
 - <kbd>L</kbd>: increase lights intensity.
 - <kbd>Shift</kbd>+<kbd>L</kbd>: decrease lights intensity.
-- <kbd>Ctrl</kbd> (<kbd>Cmd</kbd> on MacOS) +<kbd>P</kbd>: increase opacity.
+- <kbd>Ctrl</kbd>+<kbd>P</kbd>: increase opacity.
 - <kbd>Shift</kbd>+<kbd>P</kbd>: decrease opacity.
 - <kbd>Shift</kbd>+<kbd>A</kbd>: toggle armature.
-- <kbd>Ctrl</kbd> (<kbd>Cmd</kbd> on MacOS) +<kbd>Y</kbd>: Scene up direction to +Y
-- <kbd>Ctrl</kbd> (<kbd>Cmd</kbd> on MacOS) +<kbd>Z</kbd>: Scene up direction to +Z
+- <kbd>Ctrl</kbd>+<kbd>Y</kbd>: Scene up direction to +Y
+- <kbd>Ctrl</kbd>+<kbd>Z</kbd>: Scene up direction to +Z
 
 Note that the raytracing hotkeys are only available if F3D is build with raytracing enabled.
 
@@ -91,29 +91,29 @@ Camera Hotkeys:
 
 Scene Hotkeys:
 
-- <kbd>Ctrl</kbd> (<kbd>Cmd</kbd> on MacOS) +<kbd>Y</kbd>: set scene up direction to +Y.
-- <kbd>Ctrl</kbd> (<kbd>Cmd</kbd> on MacOS) +<kbd>Z</kbd>: set scene up direction to +Z.
+- <kbd>Ctrl</kbd>+<kbd>Y</kbd>: set scene up direction to +Y.
+- <kbd>Ctrl</kbd>+<kbd>Z</kbd>: set scene up direction to +Z.
 
 Other hotkeys and interactions are available:
 
 - <kbd>H</kbd>: key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
-- <kbd>CTRL</kbd> (<kbd>Cmd</kbd> on MacOS) +<kbd>Q</kbd>: close the window and quit F3D.
+- <kbd>CTRL</kbd>+<kbd>Q</kbd>: close the window and quit F3D.
 - <kbd>Esc</kbd>: display the console or hide console/minimal console.
 - <kbd>:</kbd>: display the minimal console.
-- <kbd>CTRL</kbd> (<kbd>Cmd</kbd> on MacOS) +<kbd>K</kbd>: toggle notifications.
+- <kbd>CTRL</kbd>+<kbd>K</kbd>: toggle notifications.
 - <kbd>Space</kbd>: play the animation if any.
-- <kbd>Ctrl</kbd> (<kbd>Cmd</kbd> on MacOS) +<kbd>Shift</kbd>+<kbd>Space</kbd>: play the animation backward if any.
+- <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbd>: play the animation backward if any.
 - <kbd>Shift</kbd>+<kbd>V</kbd>: cycle between verbosity levels.
 - <kbd>&larr;</kbd>: load the previous file if any and reset the camera.
-- <kbd>Ctrl</kbd> (<kbd>Cmd</kbd> on MacOS) +<kbd>&larr;</kbd>: load the previous file if any and keep the camera.
+- <kbd>Ctrl</kbd>+<kbd>&larr;</kbd>: load the previous file if any and keep the camera.
 - <kbd>&rarr;</kbd>: load the next file if any and reset the camera.
-- <kbd>Ctrl</kbd> (<kbd>Cmd</kbd> on MacOS) +<kbd>&rarr;</kbd>: load the next file if any and keep the camera.
+- <kbd>Ctrl</kbd>+<kbd>&rarr;</kbd>: load the next file if any and keep the camera.
 - <kbd>&uarr;</kbd>: reload the currently loaded files.
 - <kbd>&darr;</kbd>: add all current files parent directories to the list of files, reload the currently loaded files and reset the camera, respect the `--recursive-dir-add` CLI option.
 - <kbd>F12</kbd>: take a screenshot, ie. render the current view to an image file.
-- <kbd>Ctrl</kbd> (<kbd>Cmd</kbd> on MacOS) +<kbd>F12</kbd>: take a "minimal" screenshot, ie. render the current view with no grid and no overlays to an image file with a transparent background.
+- <kbd>Ctrl</kbd>+<kbd>F12</kbd>: take a "minimal" screenshot, ie. render the current view with no grid and no overlays to an image file with a transparent background.
 - _Drop_ a file, directory or HDRI into the F3D window to load it. F3D relies on the extension (`.hdr` or `.exr`) to detect if the dropped file is an HDRI.
-- <kbd>Ctrl</kbd> (<kbd>Cmd</kbd> on MacOS) + _Drop_ a file, directory and load it.
+- <kbd>Ctrl</kbd> + _Drop_ a file, directory and load it.
 - <kbd>Shift</kbd> + _Drop_ a HDRI and use it, no extensions checks performed.
 
 When loading another file or reloading, options that have been changed interactively are kept as is, except when using [imperative options](06-CONFIGURATION_FILE.md#imperative-options) in configuration files.
@@ -135,7 +135,7 @@ as specified above.
 
 ## Taking Screenshots
 
-The destination filename used to save the screenshots (created by pressing <kbd>F12</kbd> or <kbd>Ctrl</kbd> (<kbd>Cmd</kbd> on MacOS) +<kbd>F12</kbd>) is configurable (using the `screenshot-filename` option) and can use template variables as described [on the options page](03-OPTIONS.md#filename-templating).
+The destination filename used to save the screenshots (created by pressing <kbd>F12</kbd> or <kbd>Ctrl</kbd>+<kbd>F12</kbd>) is configurable (using the `screenshot-filename` option) and can use template variables as described [on the options page](03-OPTIONS.md#filename-templating).
 
 Unless the configured filename template is an absolute path, images will be saved in dedicated directories:
 
@@ -152,3 +152,7 @@ So with default options, which are using [templates](03-OPTIONS.md#filename-temp
 ## Configuring bindings
 
 It is supported to change all bindings above using a specific syntax in the [configuration file](06-CONFIGURATION_FILE.md) using [commands](07-COMMANDS.md).
+
+## MacOS Bindings
+
+When using F3D on MacOS, all bindings that specify <kbd>Ctrl</kbd> and <kbd>Ctrl</kbd>+<kbd>Shift</kbd> use <kbd>Cmd</kbd> and <kbd>Cmd</kbd>+<kbd>Shift</kbd> respectively instead. 

@@ -65,6 +65,10 @@ Your data probably contains some translucent data for some reason, turn on trans
 .ply is a generic file format, we cannot assumes it's a 3DGS, thus we do not give good presets for this specific use case.
 It's recommended to use these options: `--point-sprites-size=1 --point-sprites=gaussian -syk`, but you can also add them in your [config file](06-CONFIGURATION_FILE.md).
 
+> I can't use hotkeys/bindings with F row keys
+
+Because some keyboards have layered multimedia keys, F keys (F12 for example) don't use the normal function code by default. To use the F code, you must press <kbd>Fn</kbd> in combination with the F key. For example, to take a screenshot the hotkey combination on MacOS would be <kbd>Cmd</kbd>+<kbd>Fn</kbd>+<kbd>F12</kbd>.
+
 ### Linux
 
 > I have a link error related to `stdc++fs` not found or I'm unable to run F3D due to filesystem errors.
@@ -149,10 +153,6 @@ xattr -cr /Applications/F3D.app
 ```
 
 Then F3D should work as expected.
-
-> I can't use hotkeys/bindings with F row keys
-
-Because MacOS layers multimedia keys, F keys don't use the normal function code by default. To use the F code, you must press <kbd>Fn</kbd> in combination with the F key. For example, to take a screenshot the hotkey combination would be <kbd>Cmd</kbd>+<kbd>Fn</kbd>+<kbd>F12</kbd>.
 
 ### Python
 
