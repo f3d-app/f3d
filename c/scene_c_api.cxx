@@ -348,6 +348,18 @@ int f3d_scene_add_mesh_view(
     f3d::log::error("Failed to add mesh view to scene: {}", e.what());
     return 0;
   }
+  catch (const std::exception& e)
+  {
+    // to_cpp_memory_view builds an f3d::image for the base-color texture, which can throw
+    // outside load_failure_exception; never let a C++ exception cross the C ABI boundary.
+    f3d::log::error("Failed to add mesh view to scene: {}", e.what());
+    return 0;
+  }
+  catch (...)
+  {
+    f3d::log::error("Failed to add mesh view to scene: unknown error");
+    return 0;
+  }
 
   return 1;
 }
