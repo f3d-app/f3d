@@ -14,7 +14,7 @@ f3d_test(<NAME> [ARGS...])
   - `LONG_TIMEOUT` Marks a test to be enabled only if
     F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS is ON
   - `DEFAULT_HDRI` Marks a test that uses the default HDRI, it will be disabled
-    when using VTK older than 9.5.20251001
+    when using VTK older than 9.5.20251001. Also implies LONG_TIMEOUT.
   - `INTERACTION` If present, an interaction recording of the same name as the
     test will be played using `--interaction-test-play`. Such a recording
     should be cleaned up and long one should consider using LONG_TIMEOUT.
