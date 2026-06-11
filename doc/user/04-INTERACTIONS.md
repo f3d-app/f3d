@@ -10,8 +10,8 @@ Simple interaction with the displayed data is possible directly within the windo
 - Hold <kbd>Shift</kbd> then _Click and drag_ horizontally with the _right_ mouse button to rotate the HDRI.
 - _Click and drag_ vertically with the _right_ mouse button to zoom in/out.
 - _Move the mouse wheel_ to zoom in/out.
-- Hold <kbd>Ctrl</kbd> (<kbd>Cmd</kbd> on MacOS), then _Click and drag_ vertically with the _right_ mouse button to zoom in/out to mouse position.
-- Hold <kbd>Ctrl</kbd> (<kbd>Cmd</kbd> on MacOS), then _Move the mouse wheel_ to zoom in/out to mouse position.
+- Hold <kbd>Ctrl</kbd>, then _Click and drag_ vertically with the _right_ mouse button to zoom in/out to mouse position.
+- Hold <kbd>Ctrl</kbd>, then _Move the mouse wheel_ to zoom in/out to mouse position.
 - _Click and drag_ with the _middle_ mouse button to translate the camera.
 - _Click_ with the _middle_ mouse button to center the camera on the point under the cursor (hold <kbd>Shift</kbd> to allow forward or backward movement).
 
