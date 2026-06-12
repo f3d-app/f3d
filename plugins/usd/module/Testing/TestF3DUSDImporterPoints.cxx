@@ -24,9 +24,9 @@ bool IsPointsPolyData(vtkPolyData* polydata)
 
 bool ColorEquals(vtkDataArray* colors, vtkIdType index, float r, float g, float b)
 {
-  float rgb[3];
+  double rgb[3];
   colors->GetTuple(index, rgb);
-  const float tol = 1e-5f;
+  const double tol = 1e-5;
   return std::abs(rgb[0] - r) < tol && std::abs(rgb[1] - g) < tol && std::abs(rgb[2] - b) < tol;
 }
 }
