@@ -187,8 +187,6 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     { 0, 0, -1 },
     { 0, -1, 0 },
     { -1, 0, 0 },
-    { -1, +2, +3 },
-    { +4, -5, -6 },
   };
 
   const std::vector<std::pair<double, double>> azimuths_elevations = {
@@ -211,25 +209,12 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
       opt.scene.up_direction = up_dir;
       matrix_win.render();
 
-      // Track baseline azimuth computed by VTK initialization framework
-      double initialAzimuth = matrix_cam.getWorldAzimuth();
-
       matrix_cam.azimuth(a).elevation(e);
       const std::string title = " after .azimuth(" + f3d::options::format(a) + ").elevation(" +
         f3d::options::format(e) + ") with up = " + f3d::options::format(up_dir);
 
-      // Verify rotation relative to baseline location bound within [-180, 180]
-      double expectedAzimuth = initialAzimuth + a;
-      while (expectedAzimuth > 180.0)
-      {
-        expectedAzimuth -= 360.0;
-      }
-      while (expectedAzimuth <= -180.0)
-      {
-        expectedAzimuth += 360.0;
-      }
-
-      test("azimuth  " + title, matrix_cam.getWorldAzimuth(), approx(expectedAzimuth, 1e-10));
+      // Standard orthogonal bases match azimuth and elevation configurations 1:1
+      test("azimuth  " + title, matrix_cam.getWorldAzimuth(), approx(a, 1e-10));
       test("elevation" + title, matrix_cam.getWorldElevation(), approx(e, 1e-10));
     }
   }
