@@ -59,7 +59,8 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
       cam.setPosition({ 0, 0, 10 }).setFocalPoint({ 0, 0, 0 }).setViewUp(up);
       cam.azimuth(a).elevation(e);
 
-      const std::string title = " (up=" + f3d::options::format(up) + ", a=" + std::to_string((int)a) + ")";
+      const std::string title =
+        " (up=" + f3d::options::format(up) + ", a=" + std::to_string((int)a) + ")";
       test("get azimuth" + title, cam.getWorldAzimuth(), approx(a, 1e-5));
       test("get elevation" + title, cam.getWorldElevation(), approx(e, 1e-5));
     }
