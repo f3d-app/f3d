@@ -9,6 +9,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkRenderer.h>
 
+#include <cmath>
 #include <cstring>
 #include <iostream>
 #include <string>
@@ -19,6 +20,14 @@ bool IsPointsPolyData(vtkPolyData* polydata)
 {
   return polydata->GetNumberOfPoints() > 0 && polydata->GetNumberOfVerts() > 0 &&
     polydata->GetNumberOfPolys() == 0 && polydata->GetNumberOfLines() == 0;
+}
+
+bool ColorEquals(vtkDataArray* colors, vtkIdType index, float r, float g, float b)
+{
+  float rgb[3];
+  colors->GetTuple(index, rgb);
+  const float tol = 1e-5f;
+  return std::abs(rgb[0] - r) < tol && std::abs(rgb[1] - g) < tol && std::abs(rgb[2] - b) < tol;
 }
 }
 
@@ -65,6 +74,13 @@ int TestF3DUSDImporterPoints(int vtkNotUsed(argc), char* argv[])
       colors->GetNumberOfComponents() != 3 || colors->GetDataType() != VTK_FLOAT)
     {
       std::cerr << "Missing RGB scalars on USD Points primitive\n";
+      return EXIT_FAILURE;
+    }
+
+    if (!ColorEquals(colors, 0, 1.f, 0.f, 0.f) || !ColorEquals(colors, 1, 0.f, 1.f, 0.f) ||
+      !ColorEquals(colors, 2, 0.f, 0.f, 1.f))
+    {
+      std::cerr << "Unexpected displayColor values on USD Points primitive\n";
       return EXIT_FAILURE;
     }
 
