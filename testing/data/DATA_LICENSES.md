@@ -66,7 +66,6 @@
 - SimpleSkin.gltf: glTF-Sample-Models: Public Domain
 - skel_animation_sparsity.usda: modified from [godot-usd](https://github.com/migueldeicaza/godot-usd/issues/2) : [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - skeleton_skin_basic.usda: from [godot-usd](https://github.com/migueldeicaza/godot-usd) `project/samples/skeleton_skin_basic.usda` : MIT
-- usd_points_rgb.usda: F3D test data for USD Points render test (BSD-3-Clause)
 - skin.png: Blender: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - small.ex2: VTK Data: BSD-3-Clause
 - small.usdz: [Copyright USD contributors](https://github.com/usd-wg/assets/tree/main/full_assets/StandardShaderBall): [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
