@@ -8,6 +8,7 @@ DEPENDS
   VTK::FiltersSources
   VTK::IOImport
   VTK::IOImage
+  VTK::RenderingOpenGL2
   f3d::vtkext
 TEST_DEPENDS
   VTK::TestingCore
