@@ -181,12 +181,22 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // Equivalence matrix tests (setter/getter verification)
   std::vector<f3d::direction_t> up_directions = {
-    { 0, 0, +1 }, { 0, +1, 0 }, { +1, 0, 0 },   { 0, 0, -1 },
-    { 0, -1, 0 }, { -1, 0, 0 }, { -1, +2, +3 }, { +4, -5, -6 },
+    { 0, 0, +1 },
+    { 0, +1, 0 },
+    { +1, 0, 0 },
+    { 0, 0, -1 },
+    { 0, -1, 0 },
+    { -1, 0, 0 },
+    { -1, +2, +3 },
+    { +4, -5, -6 },
   };
 
   const std::vector<std::pair<double, double>> azimuths_elevations = {
-    { 0, 0 }, { +12, +34 }, { +12, -34 }, { -12, +34 }, { -12, -34 },
+    { 0, 0 },
+    { +12, +34 },
+    { +12, -34 },
+    { -12, +34 },
+    { -12, -34 },
   };
 
   for (const auto up_dir : up_directions)
