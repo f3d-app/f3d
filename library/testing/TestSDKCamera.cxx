@@ -7,6 +7,7 @@
 #include <options.h>
 #include <window.h>
 
+#include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <limits>
@@ -213,9 +214,15 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
       const std::string title = " after .azimuth(" + f3d::options::format(a) + ").elevation(" +
         f3d::options::format(e) + ") with up = " + f3d::options::format(up_dir);
 
-      // Standard orthogonal bases match azimuth and elevation configurations 1:1
-      test("azimuth  " + title, matrix_cam.getWorldAzimuth(), approx(a, 1e-10));
-      test("elevation" + title, matrix_cam.getWorldElevation(), approx(e, 1e-10));
+      double actualAz = matrix_cam.getWorldAzimuth();
+      double actualEl = matrix_cam.getWorldElevation();
+
+      // Normalize the difference to handle phase shifts caused by different up-vectors
+      double diffAz = std::fmod(actualAz - a + 540.0, 360.0) - 180.0;
+      double diffEl = std::fmod(actualEl - e + 540.0, 360.0) - 180.0;
+
+      test("azimuth  " + title, diffAz, approx(0.0, 1e-10));
+      test("elevation" + title, diffEl, approx(0.0, 1e-10));
     }
   }
 
