@@ -165,7 +165,7 @@ public:
    *
    *  Throws an options::inexistent_exception if option does not exist.
    */
-//  options& decrease(std::string_view name);
+  options& decrease(std::string_view name);
 
   /**
    * Templated parsing method used internally to parse strings.
@@ -241,6 +241,11 @@ public:
       struct light {
         domain_range_t<double> intensity { {0, 10}, 0.1};
       } light;
+      struct effect {
+        struct blending {
+          domain_enum_t<std::string, 4> mode = {"ddp", "sort", "sort_cpu", "stochastic"};
+        } blending;
+      } effect;
     } render;
   } domains;
 

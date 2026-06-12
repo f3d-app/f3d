@@ -35,6 +35,35 @@ void increase(f3d::options& opt, std::string_view name, bool up)
       opt.render.light.intensity = opt.domains.render.light.intensity.range[1];
     }
   }
+  else if (name == "render.effect.blending.mode")
+  {
+    char dir = up ? +1 : -1;
+    auto it = std::ranges::find(opt.domains.render.effect.blending.mode.enumeration, opt.render.effect.blending.mode);
+    if (it != opt.domains.render.effect.blending.mode.enumeration.end())
+    {
+      if (up)
+      {
+        it++;
+        if(it == opt.domains.render.effect.blending.mode.enumeration.end())
+        {
+          it = opt.domains.render.effect.blending.mode.enumeration.begin();
+        }
+      }
+      else
+      {
+        if(it == opt.domains.render.effect.blending.mode.enumeration.begin())
+        {
+          it = opt.domains.render.effect.blending.mode.enumeration.end();
+        }
+        it--;
+      }
+      opt.render.effect.blending.mode = *it;
+    }
+    else
+    {
+      opt.render.effect.blending.mode = opt.domains.render.effect.blending.mode.enumeration.front();
+    }
+  }
 }
 }
 
@@ -214,6 +243,15 @@ options& options::increase(std::string_view name)
 {
   //  options_generated::increase(*this, name, true);
   ::increase(*this, name, true);
+
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+options& options::decrease(std::string_view name)
+{
+  //  options_generated::increase(*this, name, false);
+  ::increase(*this, name, false);
 
   return *this;
 }

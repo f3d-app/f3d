@@ -960,10 +960,20 @@ interactor& interactor_impl::initCommands()
     "increase",
     [&](const std::vector<std::string>& args)
     {
-      check_args(args, 1, "reset");
+      check_args(args, 1, "increase");
       this->Internals->Options.increase(args[0]);
     },
     command_documentation_t{ "increase option.name", "increase a libf3d option according to its domain" },
+    complOptionNames);
+
+  this->addCommand(
+    "decrease",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 1, "decrease");
+      this->Internals->Options.decrease(args[0]);
+    },
+    command_documentation_t{ "decrease option.name", "decrease a libf3d option according to its domain" },
     complOptionNames);
 
   this->addCommand(
