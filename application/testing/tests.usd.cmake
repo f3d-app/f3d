@@ -28,7 +28,7 @@ f3d_test(NAME TestUSDZMaterialsInterationReload DATA McUsd.usdz PLUGIN usd INTER
 f3d_test(NAME TestUSDBlendShapes DATA SimpleBlendShapes.usda ARGS --animation-time=1 --animation-progress PLUGIN usd)
 f3d_test(NAME TestUSDBlendShapesFaceVarying DATA SimpleBlendShapesFaceVarying.usda ARGS --animation-time=1 --animation-progress PLUGIN usd)
 f3d_test(NAME TestUSDSkinJointOrder DATA skel_animation_sparsity.usda ARGS --animation-time=0.3 --animation-progress PLUGIN usd)
-f3d_test(NAME TestUSDPointsPrimitive DATA skeleton_skin_basic.usda ARGS --point-size=20 PLUGIN usd)
+f3d_test(NAME TestUSDPointsPrimitive DATA usd_points_rgb.usda ARGS --point-size=20 PLUGIN usd)
 
 # Scene hierarchy test for USD importer
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
