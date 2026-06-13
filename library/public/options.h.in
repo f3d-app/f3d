@@ -242,6 +242,9 @@ public:
         domain_range_t<f3d::ratio_t> speed_factor { {f3d::ratio_t(0.), f3d::ratio_t(2.)}, f3d::ratio_t(0.1)};
         domain_range_t<int> indices { {0, 10}, 1 };
       } animation;
+      struct camera {
+        domain_range_t<int> index { {0,0},1 };
+      } camera;
     } scene;
     struct render {
       struct light {

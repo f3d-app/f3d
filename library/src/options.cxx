@@ -41,6 +41,21 @@ template<typename T> void increase(std::vector<T>& vec, const f3d::options::doma
   std::ranges::for_each(vec, [domain, up](T& val){::increase(val, domain, up);});
 }
 
+template<typename T>void increase(std::optional<T>& val, const f3d::options::domain_range_t<T>& domain, bool up)
+{
+  if (!val.has_value())
+  {
+    if (domain.range[0] != domain.range[1])
+    {
+      val = domain.range[0];
+    }
+  }
+  else
+  {
+    ::increase(val.value(), domain, up);
+  }
+}
+
 template<typename T, std::size_t N> void increase(T& val, const f3d::options::domain_enum_t<T, N>& domain, bool up)
 {
   char dir = up ? +1 : -1;
@@ -147,7 +162,7 @@ void increase(f3d::options& opt, std::string_view name, bool up)
   }
   else if (name == "scene.camera.index")
   {
-    ::increase(opt.scene.camera.index, up);
+    ::increase(opt.scene.camera.index, opt.domains.scene.camera.index, up);
   }
   else if (name == "scene.animation.indices")
   {

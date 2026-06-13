@@ -162,6 +162,8 @@ public:
       this->Window.getCamera().resetToBounds();
     }
 
+    this->Options.domains.scene.camera.index.range[1] = this->MetaImporter->GetNumberOfCameras() - 1;
+
     scene_impl::internals::DisplayAllInfo(this->MetaImporter, this->Window);
   }
 
@@ -197,7 +199,7 @@ public:
     window.PrintSceneDescription(log::VerboseLevel::DEBUG);
   }
 
-  const options& Options;
+  options& Options;
   window_impl& Window;
   interactor_impl* Interactor = nullptr;
   animationManager AnimationManager;
