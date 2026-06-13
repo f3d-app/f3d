@@ -19,6 +19,7 @@ F3D_SILENT_WARNING_POP()
 
 namespace
 {
+
 template<typename T> void increase(T& val, const f3d::options::domain_range_t<T>& domain, bool up)
 {
   char dir = up ? +1 : -1;
@@ -64,6 +65,13 @@ template<typename T, std::size_t N> void increase(T& val, const f3d::options::do
   }
 }
 
+// Implicit double domain
+void increase(double& val, bool up)
+{
+  f3d::options::domain_range_t domain {{-std::numeric_limits<double>::max(), std::numeric_limits<double>::max()}, 0.1};
+  ::increase(val, domain, up);
+}
+
 void increase(f3d::options& opt, std::string_view name, bool up)
 {
   // manual handle certains option for now
@@ -74,6 +82,10 @@ void increase(f3d::options& opt, std::string_view name, bool up)
   else if (name == "render.effect.blending.mode")
   {
     ::increase(opt.render.effect.blending.mode, opt.domains.render.effect.blending.mode, up);
+  }
+  else if (name == "ui.backdrop.opacity")
+  {
+    ::increase(opt.ui.backdrop.opacity, up);
   }
 }
 }
