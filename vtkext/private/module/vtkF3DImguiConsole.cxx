@@ -8,6 +8,7 @@
 #include <vtkNew.h>
 #include <vtkObjectFactory.h>
 
+#include <clip.h>
 #include <imgui.h>
 
 #include <algorithm>
@@ -287,6 +288,29 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
   }
 
   ImGui::Begin("Console", nullptr, winFlags);
+
+  // Align Right
+  float buttonWidth =
+    ImGui::CalcTextSize("Copy to Clipboard").x + ImGui::GetStyle().FramePadding.x * 2.f;
+  float widthNeeded = buttonWidth + ImGui::GetStyle().ItemSpacing.x;
+  ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - widthNeeded);
+
+  if (ImGui::Button("Copy to Clipboard"))
+  {
+    std::string cumulative;
+
+    for (const auto& [severity, msg] : this->Pimpl->Logs)
+    {
+      cumulative += msg + "\n";
+    }
+
+    if (!cumulative.empty() && cumulative[cumulative.size() - 1] == '\n')
+    {
+      cumulative = cumulative.substr(0, cumulative.size() - 1);
+    }
+
+    clip::set_text(cumulative);
+  }
 
   // Log window, will only show if not in minimal mode
   if (!minimal)

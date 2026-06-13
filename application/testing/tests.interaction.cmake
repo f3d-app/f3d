@@ -216,6 +216,7 @@ f3d_test(NAME TestInteractionConsoleAutoCompleteTokenizeError DATA BoxAnimated.g
 f3d_test(NAME TestInteractionConsoleHistory DATA BoxAnimated.gltf INTERACTION UI) #Escape;ro;Tab;45;Enter;set_c;Tab;top;Enter;Up;Up;Enter;Up;Up;Up;Up;Down;Down;Down;Down
 f3d_test(NAME TestInteractionConsoleHistoryEmpty DATA BoxAnimated.gltf INTERACTION UI) #Escape;Up;Down
 f3d_test(NAME TestInteractionConsoleHistoryHide DATA BoxAnimated.gltf INTERACTION UI) #Escape;a;Enter;b;Enter;Up;Escape;Escape;Escape;Up
+f3d_test(NAME TestInteractionConsoleCopyToClipboard DATA f3d.glb INTERACTION UI) #Escape;print ui.scalar_bar;Enter;a;Enter;b;Enter;c;Enter;d;Enter;Left click Copy to Clipboard  
 
 file(COPY "${F3D_SOURCE_DIR}/testing/data/cow.vtp" DESTINATION "${CMAKE_BINARY_DIR}/Testing/data/") # Capital T, to avoid confusion on Windows and in-sources build
 # First file (`.d`) doesn't exist and is there to test multi args
