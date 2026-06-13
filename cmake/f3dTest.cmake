@@ -13,6 +13,8 @@ f3d_test(<NAME> [ARGS...])
 ```
   - `LONG_TIMEOUT` Marks a test to be enabled only if
     F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS is ON
+  - `DEFAULT_HDRI` Marks a test that uses the default HDRI, it will be disabled
+    when using VTK older than 9.5.20251001. Also implies LONG_TIMEOUT.
   - `INTERACTION` If present, an interaction recording of the same name as the
     test will be played using `--interaction-test-play`. Such a recording
     should be cleaned up and long one should consider using LONG_TIMEOUT.
@@ -53,7 +55,7 @@ f3d_test(<NAME> [ARGS...])
 
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED;PLUGIN" "DATA;DEPENDS;LABELS;ENV;ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "LONG_TIMEOUT;DEFAULT_HDRI;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED;PLUGIN" "DATA;DEPENDS;LABELS;ENV;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -163,11 +165,12 @@ function(f3d_test)
     add_test(NAME "f3d::${F3D_TEST_NAME}" COMMAND ${_f3d_target} ${_f3d_test_data} ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
   endif()
 
-  if(F3D_TEST_LABELS)
-    list(PREPEND F3D_TEST_LABELS "application")
-    set_tests_properties("f3d::${F3D_TEST_NAME}" PROPERTIES
-      LABELS "${F3D_TEST_LABELS}"
-    )
+  if(F3D_TEST_DEFAULT_HDRI)
+    list(PREPEND F3D_TEST_LABELS "hdri")
+    set(F3D_TEST_LONG_TIMEOUT ON)
+    if(VTK_VERSION VERSION_LESS 9.5.20251001)
+      set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES DISABLED ON)
+    endif()
   endif()
 
   set(_timeout "30")
@@ -202,6 +205,7 @@ function(f3d_test)
       set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES DISABLED ON)
     endif()
   endif()
+
   set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES TIMEOUT ${_timeout})
 
   if(F3D_TEST_WILL_FAIL)
@@ -243,5 +247,12 @@ function(f3d_test)
   endif ()
 
   set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES ENVIRONMENT "${f3d_test_env_vars}")
+
+  if(F3D_TEST_LABELS)
+    list(PREPEND F3D_TEST_LABELS "application")
+    set_tests_properties("f3d::${F3D_TEST_NAME}" PROPERTIES
+      LABELS "${F3D_TEST_LABELS}"
+    )
+  endif()
 
 endfunction()

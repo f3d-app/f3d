@@ -190,6 +190,10 @@ if(F3D_MODULE_UI)
     set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES DISABLED ON)
     set_tests_properties(libf3d::TestSDKTriggerInteractions PROPERTIES DISABLED ON)
   endif()
+  if(VTK_VERSION VERSION_LESS 9.5.20251001 AND NOT APPLE)
+    set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES DISABLED ON)
+  endif()
+  set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES LABELS "libf3d;hdri")
 endif()
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489

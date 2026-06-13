@@ -20,5 +20,5 @@ if(NOT F3D_MACOS_BUNDLE)
   endif()
 
   file(COPY "${F3D_SOURCE_DIR}/plugins/alembic/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-  f3d_test(NAME TestThumbnailConfigFileAlembic DATA suzanne.abc CONFIG thumbnail_build LONG_TIMEOUT LABELS "plugin;alembic")
+  f3d_test(NAME TestThumbnailConfigFileAlembic DATA suzanne.abc CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI LABELS "plugin;alembic")
 endif()
