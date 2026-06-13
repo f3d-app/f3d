@@ -19,50 +19,61 @@ F3D_SILENT_WARNING_POP()
 
 namespace
 {
+template<typename T> void increase(T& val, const f3d::options::domain_range_t<T>& domain, bool up)
+{
+  char dir = up ? +1 : -1;
+  val += dir * domain.increment;
+  if (up && val > domain.range[1])
+  {
+    val = domain.range[0];
+  }
+  else if (!up && val < domain.range[0])
+  {
+    val = domain.range[1];
+  }
+}
+
+
+template<typename T, std::size_t N> void increase(T& val, const f3d::options::domain_enum_t<T, N>& domain, bool up)
+{
+  char dir = up ? +1 : -1;
+  auto it = std::ranges::find(domain.enumeration, val);
+  if (it != domain.enumeration.end())
+  {
+    if (up)
+    {
+      it++;
+      if(it == domain.enumeration.end())
+      {
+        it = domain.enumeration.begin();
+      }
+    }
+    else
+    {
+      if(it == domain.enumeration.begin())
+      {
+        it = domain.enumeration.end();
+      }
+      it--;
+    }
+    val = *it;
+  }
+  else
+  {
+    val = domain.enumeration.front();
+  }
+}
+
 void increase(f3d::options& opt, std::string_view name, bool up)
 {
   // manual handle certains option for now
   if (name == "render.light.intensity")
   {
-    char dir = up ? +1 : -1;
-    opt.render.light.intensity += dir * opt.domains.render.light.intensity.increment;
-    if (up && opt.render.light.intensity > opt.domains.render.light.intensity.range[1])
-    {
-      opt.render.light.intensity = opt.domains.render.light.intensity.range[0];
-    }
-    else if (!up && opt.render.light.intensity < opt.domains.render.light.intensity.range[0])
-    {
-      opt.render.light.intensity = opt.domains.render.light.intensity.range[1];
-    }
+    ::increase(opt.render.light.intensity, opt.domains.render.light.intensity, up);
   }
   else if (name == "render.effect.blending.mode")
   {
-    char dir = up ? +1 : -1;
-    auto it = std::ranges::find(opt.domains.render.effect.blending.mode.enumeration, opt.render.effect.blending.mode);
-    if (it != opt.domains.render.effect.blending.mode.enumeration.end())
-    {
-      if (up)
-      {
-        it++;
-        if(it == opt.domains.render.effect.blending.mode.enumeration.end())
-        {
-          it = opt.domains.render.effect.blending.mode.enumeration.begin();
-        }
-      }
-      else
-      {
-        if(it == opt.domains.render.effect.blending.mode.enumeration.begin())
-        {
-          it = opt.domains.render.effect.blending.mode.enumeration.end();
-        }
-        it--;
-      }
-      opt.render.effect.blending.mode = *it;
-    }
-    else
-    {
-      opt.render.effect.blending.mode = opt.domains.render.effect.blending.mode.enumeration.front();
-    }
+    ::increase(opt.render.effect.blending.mode, opt.domains.render.effect.blending.mode, up);
   }
 }
 }
