@@ -17,7 +17,7 @@ extern "C"
    *
    * The returned options object must be freed with f3d_options_delete().
    *
-   * @return Options handle.
+   * @return Options handle or NULL on failure.
    */
   F3D_EXPORT f3d_options_t* f3d_options_create();
 
@@ -96,7 +96,7 @@ extern "C"
    *
    * @param options Options handle.
    * @param name Option name.
-   * @return Boolean value (0 for false, non-zero for true).
+   * @return Boolean value (0 for false/failure, non-zero for true).
    */
   F3D_EXPORT int f3d_options_get_as_bool(const f3d_options_t* options, const char* name);
 
@@ -105,7 +105,7 @@ extern "C"
    *
    * @param options Options handle.
    * @param name Option name.
-   * @return Integer value.
+   * @return Integer value. Returns 0 in case of failure.
    */
   F3D_EXPORT int f3d_options_get_as_int(const f3d_options_t* options, const char* name);
 
@@ -114,7 +114,7 @@ extern "C"
    *
    * @param options Options handle.
    * @param name Option name.
-   * @return Double value.
+   * @return Double value. Returns 0 in case of failure.
    */
   F3D_EXPORT double f3d_options_get_as_double(const f3d_options_t* options, const char* name);
 
@@ -125,7 +125,7 @@ extern "C"
    *
    * @param options Options handle.
    * @param name Option name.
-   * @return String value.
+   * @return String value. Returns NULL in case of failure.
    */
   F3D_EXPORT const char* f3d_options_get_as_string(const f3d_options_t* options, const char* name);
 
@@ -136,7 +136,7 @@ extern "C"
    *
    * @param options Options handle.
    * @param name Option name.
-   * @return String representation of the option value.
+   * @return String representation of the option value or NULL on failure.
    */
   F3D_EXPORT const char* f3d_options_get_as_string_representation(
     const f3d_options_t* options, const char* name);
@@ -301,7 +301,7 @@ extern "C"
    * @brief Parse a string as a boolean.
    *
    * @param str String to parse.
-   * @return 1 for true, 0 for false.
+   * @return 1 for true, 0 for false/failure.
    */
   F3D_EXPORT int f3d_options_parse_bool(const char* str);
 
@@ -309,7 +309,7 @@ extern "C"
    * @brief Parse a string as an integer.
    *
    * @param str String to parse.
-   * @return Parsed integer value.
+   * @return Parsed integer value. It will return 0 if it fails.
    */
   F3D_EXPORT int f3d_options_parse_int(const char* str);
 
@@ -317,7 +317,7 @@ extern "C"
    * @brief Parse a string as a double.
    *
    * @param str String to parse.
-   * @return Parsed double value.
+   * @return Parsed double value. It will return 0 if it fails.
    */
   F3D_EXPORT double f3d_options_parse_double(const char* str);
 
@@ -325,7 +325,7 @@ extern "C"
    * @brief Parse a string as a string (returns a copy).
    *
    * @param str String to parse.
-   * @return Parsed string. Caller must free with f3d_options_free_string().
+   * @return Parsed string or NULL on failure. Caller must free with f3d_options_free_string().
    */
   F3D_EXPORT const char* f3d_options_parse_string(const char* str);
 
@@ -351,7 +351,7 @@ extern "C"
    * @brief Format a boolean as a string.
    *
    * @param value Boolean value.
-   * @return Formatted string. Caller must free with f3d_options_free_string().
+   * @return Formatted string or NULL on failure. Caller must free with f3d_options_free_string().
    */
   F3D_EXPORT const char* f3d_options_format_bool(int value);
 
@@ -359,7 +359,7 @@ extern "C"
    * @brief Format an integer as a string.
    *
    * @param value Integer value.
-   * @return Formatted string. Caller must free with f3d_options_free_string().
+   * @return Formatted string or NULL on failure. Caller must free with f3d_options_free_string().
    */
   F3D_EXPORT const char* f3d_options_format_int(int value);
 
@@ -367,7 +367,7 @@ extern "C"
    * @brief Format a double as a string.
    *
    * @param value Double value.
-   * @return Formatted string. Caller must free with f3d_options_free_string().
+   * @return Formatted string or NULL on failure. Caller must free with f3d_options_free_string().
    */
   F3D_EXPORT const char* f3d_options_format_double(double value);
 
@@ -375,7 +375,7 @@ extern "C"
    * @brief Format a string (returns a copy).
    *
    * @param value String value.
-   * @return Formatted string. Caller must free with f3d_options_free_string().
+   * @return Formatted string or NULL on failure. Caller must free with f3d_options_free_string().
    */
   F3D_EXPORT const char* f3d_options_format_string(const char* value);
 
@@ -384,7 +384,7 @@ extern "C"
    *
    * @param values Array of double values.
    * @param count Number of values in the array.
-   * @return Formatted string. Caller must free with f3d_options_free_string().
+   * @return Formatted string or NULL on failure. Caller must free with f3d_options_free_string().
    */
   F3D_EXPORT const char* f3d_options_format_double_vector(const double* values, size_t count);
 
@@ -393,7 +393,7 @@ extern "C"
    *
    * @param values Array of integer values.
    * @param count Number of values in the array.
-   * @return Formatted string. Caller must free with f3d_options_free_string().
+   * @return Formatted string or NULL on failure. Caller must free with f3d_options_free_string().
    */
   F3D_EXPORT const char* f3d_options_format_int_vector(const int* values, size_t count);
   ///@}

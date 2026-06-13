@@ -1,5 +1,6 @@
 #include "utils_c_api.h"
 #include "utils.h"
+#include "log.h"
 #include <cstring>
 #include <filesystem>
 #include <string>
@@ -10,9 +11,18 @@ namespace
 //----------------------------------------------------------------------------
 char* f3d_utils_strdup(const std::string& s)
 {
-  char* r = new char[s.size() + 1];
-  std::memcpy(r, s.c_str(), s.size() + 1);
-  return r;
+  try
+  {
+    char* r = new char[s.size() + 1];
+    std::memcpy(r, s.c_str(), s.size() + 1);
+    return r;
+  }
+  catch (const std::bad_alloc& e)
+  {
+    f3d::log::error("Failed to allocate memory for char*: ", e.what());
+  }
+
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -50,21 +60,35 @@ char** f3d_utils_tokenize(const char* str, int keep_comments, size_t* out_count)
     return nullptr;
   }
 
-  std::vector<std::string> vec = f3d::utils::tokenize(str, keep_comments != 0);
-
-  size_t n = vec.size();
-  char** out = new char*[n];
-  for (size_t i = 0; i < n; ++i)
+  try
   {
-    out[i] = f3d_utils_strdup(vec[i]);
+    std::vector<std::string> vec = f3d::utils::tokenize(str, keep_comments != 0);
+
+    size_t n = vec.size();
+    char** out = new char*[n];
+    for (size_t i = 0; i < n; ++i)
+    {
+      out[i] = f3d_utils_strdup(vec[i]);
+    }
+
+    if (out_count)
+    {
+      *out_count = n;
+    }
+
+    return out;
+  }
+  catch (const f3d::utils::tokenize_exception& e)
+  {
+    f3d::log::error("Failed to tokenize: ", e.what());
+  }
+  catch (const std::bad_alloc& e)
+  {
+    f3d::log::error("Failed to allocate memory for char**: ", e.what());
   }
 
-  if (out_count)
-  {
-    *out_count = n;
-  }
-
-  return out;
+  *out_count = 0;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -76,17 +100,35 @@ void f3d_utils_tokens_free(char** tokens, size_t count)
 //----------------------------------------------------------------------------
 char* f3d_utils_collapse_path(const char* path, const char* base_directory)
 {
-  std::filesystem::path p(path);
-  std::filesystem::path base = base_directory ? base_directory : "";
-  auto collapsed = f3d::utils::collapsePath(p, base);
-  return f3d_utils_strdup(collapsed.string());
+  try
+  {
+    std::filesystem::path p(path);
+    std::filesystem::path base = base_directory ? base_directory : "";
+    auto collapsed = f3d::utils::collapsePath(p, base);
+    return f3d_utils_strdup(collapsed.string()); 
+  }
+  catch (...)
+  {
+    f3d::log::error("Failed to initialize file path.");
+  }
+
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
 char* f3d_utils_glob_to_regex(const char* glob, char path_separator)
 {
-  std::string regex = f3d::utils::globToRegex(glob, path_separator);
-  return f3d_utils_strdup(regex);
+  try
+  {
+    std::string regex = f3d::utils::globToRegex(glob, path_separator);
+    return f3d_utils_strdup(regex);
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::error(e.what());
+  }
+
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
