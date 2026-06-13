@@ -1,5 +1,6 @@
 list(APPEND VTKExtensionsPluginAlembic_list
      TestF3DAlembicReader.cxx
+     TestF3DAlembicReaderRequestInformation.cxx
     )
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251210)
