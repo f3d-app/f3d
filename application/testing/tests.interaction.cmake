@@ -164,7 +164,7 @@ f3d_test(NAME TestInteractionNoModelScrollWheel RESOLUTION 1000,600 NO_DATA_FORC
 f3d_test(NAME TestInteractionNoModelScrollBar RESOLUTION 1000,600 NO_DATA_FORCE_RENDER LONG_TIMEOUT INTERACTION UI)
 
 if(APPLE)
-  f3d_test(NAME TestInteractionCheatsheetMultiModifierBindingApple DATA dragon.vtu RESOLUTION 1200,300 CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #H;ScrollDown
+  f3d_test(NAME TestInteractionCheatsheetMultiModifierBindingApple DATA dragon.vtu RESOLUTION 1200,300 CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json ENV F3D_TEST_APPLE_FORCE_CTRL=false INTERACTION UI) #H;ScrollDown
 else()
   f3d_test(NAME TestInteractionCheatsheetMultiModifierBinding DATA dragon.vtu RESOLUTION 1200,300 CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #H;ScrollDown
 endif()
