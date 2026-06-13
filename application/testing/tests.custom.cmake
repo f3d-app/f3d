@@ -28,6 +28,6 @@ set_tests_properties(f3d::TestNoFileFileNameTemplate PROPERTIES ENVIRONMENT "CTE
 add_test(NAME f3d::TestSystemDPIScaling COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/suzanne.stl --dpi-aware --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestSystemDPIScaling.png)
 
 if (APPLE)
-  add_test(NAME f3d::TestInteractionCheatsheetMultiModifierBindingApple COMMAND $<TARGET_FILE:f3d> --config=${F3D_SOURCE_DIR}/testing/configs/bindings.json ${F3D_SOURCE_DIR}/testing/data/dragon.vtu --reference=${F3D_SOURCE_DIR}/testing/baselines/TestInteractionCheatsheetMultiModifierBindingApple.png --resolution=1200,300 --interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/TestInteractionCheatsheetMultiModifierBindingApple.log)
-  set_tests_properties(f3d::TestInteractionCheatsheetMultiModifierBindingApple PROPERTIES ENVIRONMENT "F3D_TEST_APPLE_FORCE_CTRL=false")
+  add_test(NAME f3d::TestAppleCmdMod COMMAND $<TARGET_FILE:f3d> --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestAppleCmdMod.png --reference=${F3D_SOURCE_DIR}/testing/baselines/TestAppleCmdMod.png --resolution=400,400)
+  set_tests_properties(f3d::TestAppleCmdMod PROPERTIES ENVIRONMENT "CTEST_F3D_NO_DATA_FORCE_RENDER=1")
 endif ()
