@@ -74,11 +74,44 @@ void increase(double& val, bool up)
   ::increase(val, domain, up);
 }
 
+// Implicit int domain
+void increase(int& val, int up)
+{
+  f3d::options::domain_range_t domain {{std::numeric_limits<int>::min(), std::numeric_limits<int>::max()}, 1};
+  ::increase(val, domain, up);
+}
+
 // Implicit f3d::ratio_t domain
 void increase(f3d::ratio_t& val, bool up)
 {
   f3d::options::domain_range_t domain {{f3d::ratio_t(0.), f3d::ratio_t(1.)}, f3d::ratio_t(0.1)};
   ::increase(val, domain, up);
+}
+
+// Implicit optional<double> domain
+void increase(std::optional<double>& val, bool up)
+{
+  if (!val.has_value())
+  {
+    val = 1.0;
+  }
+  else
+  {
+    ::increase(val.value(), up);
+  }
+}
+
+// Implicit optional<int> domain
+void increase(std::optional<int>& val, bool up)
+{
+  if (!val.has_value())
+  {
+    val = 0;
+  }
+  else
+  {
+    ::increase(val.value(), up);
+  }
 }
 
 void increase(f3d::options& opt, std::string_view name, bool up)
@@ -103,6 +136,14 @@ void increase(f3d::options& opt, std::string_view name, bool up)
   else if (name == "scene.animation.speed_factor")
   {
     ::increase(opt.scene.animation.speed_factor, opt.domains.scene.animation.speed_factor, up);
+  }
+  else if (name == "render.line_width")
+  {
+    ::increase(opt.render.line_width, up);
+  }
+  else if (name == "scene.camera.index")
+  {
+    ::increase(opt.scene.camera.index, up);
   }
 }
 }
