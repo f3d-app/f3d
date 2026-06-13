@@ -147,6 +147,20 @@ public:
   options& removeValue(std::string_view name);
 
   /**
+   *  Increase an option value if it has a domain, else throws options::incompatible_exception.
+   *
+   *  Throws an options::inexistent_exception if option does not exist.
+   */
+  options& increase(std::string_view name);
+
+  /**
+   *  Decrease an option value if it has a domain, else throws options::incompatible_exception.
+   *
+   *  Throws an options::inexistent_exception if option does not exist.
+   */
+  options& decrease(std::string_view name);
+
+  /**
    * Templated parsing method used internally to parse strings.
    * Implemented for the different supported types,
    * see PARSING.md for more info.
@@ -201,6 +215,333 @@ public:
   {
     explicit no_value_exception(const std::string& what = "");
   };
+
+  template<typename T>
+  class option
+  {
+    public:
+      option() = default;
+      ~option() = default;
+      option(const option& opt) = default;
+
+      option(const T& val)
+        : Value(val)
+        {
+        }
+
+      void operator=(const T& val)
+      {
+        this->Value = val;
+      }
+
+      option(T&& val) noexcept
+      : Value(std::move(val))
+      {
+      }
+
+      void operator=(T&& val)
+      {
+        this->Value = std::move(val);
+      }
+
+      operator const T&() const
+      {
+        return this->Value;
+      }
+
+      operator T() const
+      {
+        return this->Value;
+      }
+
+    //protected:
+    public:
+      T Value;
+  };
+
+  template<typename T>
+  class option_range : public option<T>
+  {
+    public:
+      option_range(const T& val, const T& min, const T& max, const T& increment)
+        : option<T>(val)
+        , Range{min, max}
+        , Increment{increment}
+        {
+        }
+
+      void operator=(const T& val)
+      {
+        this->Value = val;
+      }
+
+      option_range(T&& val, T&& min, T&& max, T&& increment) noexcept
+        : option<T>(std::move(val))
+        , Range{std::move(min), std::move(max)}
+        , Increment{std::move(increment)}
+        {
+        }
+
+      const bool isValid()
+      {
+        return this->Value >= this->Range[0] && this->Value <= this->Range[1];
+      }
+
+      constexpr std::array<T,2>& getRange()
+      {
+        return this->Range;
+      }
+
+      void increase(bool up)
+      {
+        if (this->isValid())
+        {
+          if (up)
+          {
+            this->Value += this->Increment;
+          }
+          else
+          {
+            this->Value -= this->Increment;
+          }
+        }
+        else
+        {
+          this->Value = up ? this->Range[0] : this->Range[1];
+        }
+      }
+
+    private:
+      std::array<T,2> Range;
+      T Increment;
+
+  };
+
+  template<typename T, std::size_t N>
+  class option_enum : public option<T>
+  {
+    public:
+
+      option_enum(const T& val, const std::array<T, N>& domain)
+        : option<T>(val)
+        , Domain({domain})
+      {
+      }
+
+      void operator=(const T& val)
+      {
+        this->Value = val;
+      }
+
+      option_enum(T&& val, std::array<T, N> domain) noexcept
+        : option<T>(std::move(val))
+        , Domain(std::move(domain))
+      {
+      }
+
+      bool isValid()
+      {
+        return std::ranges::find(this->Domain, this->Value) != this->Domain.end();
+      }
+
+      std::array<T,N>& getDomain()
+      {
+        return this->Domain;
+      }
+
+      void increase(bool up)
+      {
+        auto it = std::ranges::find(this->Domain, this->Value);
+        if (it != this->Domain.end())
+        {
+          if (up)
+          {
+            it++;
+            if (it == this->Domain.end())
+            {
+              it = this->Domain.begin();
+            }
+          }
+          else
+          {
+            if (it == this->Domain.begin())
+            {
+              it = this->Domain.end();
+            }
+            else
+            {
+              it--;
+            }
+          }
+          this->Value = *it;
+        }
+        else
+        {
+          this->Value = up ? this->Domain[0] : this->Domain[N-1];
+        }
+      }
+
+    private:
+      std::array<T,N> Domain;
+
+  };
+
+  template<typename T>
+  class option_vector_range : public option<std::vector<T>>
+  {
+    public:
+      option_vector_range(const std::vector<T>& val, const T& min, const T& max, const T& increment)
+        : option<std::vector<T>>(val)
+        , Range{min, max}
+        , Increment{increment}
+        {
+        }
+
+      void operator=(const std::vector<T>& val)
+      {
+        this->Value = val;
+      }
+
+      option_vector_range(std::vector<T>&& val, T&& min, T&& max, T&& increment) noexcept
+        : option<std::vector<T>>(std::move(val))
+        , Range{std::move(min), std::move(max)}
+        , Increment{increment}
+        {
+        }
+
+      const bool isValid()
+      {
+        auto checkRange = [this](auto val){ return val >= this->Range[0] && val <= this->Range[1]; };
+        return std::ranges::all_of(this->Value, checkRange);
+      }
+
+      constexpr std::array<T,2>& getRange()
+      {
+        return this->Range;
+      }
+
+      void increase(bool up)
+      {
+        auto incrValue = [&](auto val)
+        {
+          if (this->isValid())
+          {
+            if (up)
+            {
+              val += this->Increment;
+            }
+            else
+            {
+              val -= this->Increment;
+            }
+          }
+          else
+          {
+            val = up ? this->Range[0] : this->Range[1];
+          }
+        };
+        std::ranges::all_of(this->Value, incrValue);
+      }
+
+    private:
+      std::array<T,2> Range;
+      T Increment;
+  };
+
+  template<typename T, std::size_t N>
+  class option_vector_enum : public option<std::vector<T>>
+  {
+    public:
+
+      option_vector_enum(const std::vector<T>& val, const std::array<T, N>& domain)
+        : option<std::vector<T>>(val)
+        , Domain({domain})
+      {
+      }
+
+      void operator=(const std::vector<T>& val)
+      {
+        this->Value = val;
+      }
+
+      option_vector_enum(std::vector<T>&& val, std::array<T, N> domain) noexcept
+        : option<std::vector<T>>(std::move(val))
+        , Domain(std::move(domain))
+      {
+      }
+
+      bool isValid()
+      {
+        auto checkEnum = [this](auto val){ return std::ranges::find(this->Domain, val) != this->Domain.end(); };
+        return std::ranges::all_of(this->Value, checkEnum);
+      }
+
+      std::array<T,N>& getDomain()
+      {
+        return this->Domain;
+      }
+
+      void increase(bool up)
+      {
+        auto incrValue = [&](auto val)
+        {
+          auto it = std::ranges::find(this->Domain, val);
+          if (it != this->Domain.end())
+          {
+            if (up)
+            {
+              it++;
+              if (it == this->Domain.end())
+              {
+                it = this->Domain.begin();
+              }
+            }
+            else
+            {
+              if (it == this->Domain.begin())
+              {
+                it = this->Domain.end();
+              }
+              else
+              {
+                it--;
+              }
+            }
+            val = *it;
+          }
+          else
+          {
+            val = up ? this->Domain[0] : this->Domain[N-1];
+          }
+        };
+        std::ranges::all_of(this->Value, incrValue);
+      }
+
+    private:
+      std::array<T,N> Domain;
+  };
+
+  struct tester {
+    option<bool> flag = false;
+    option_range<int> radius = option_range<int>(10, 0, 100, 1);
+    option_enum<double, 3> size = option_enum<double, 3>(10., {0., 10., 100.});
+    option_range<f3d::ratio_t> scale_range = option_range<f3d::ratio_t>(f3d::ratio_t(0.2), f3d::ratio_t(0.), f3d::ratio_t(0.4), f3d::ratio_t(0.1));
+    option_enum<f3d::ratio_t, 3> scale_enum = option_enum<f3d::ratio_t, 3>(f3d::ratio_t(1.0), std::array<f3d::ratio_t, 3>{f3d::ratio_t(0.), f3d::ratio_t(0.5), f3d::ratio_t(1.0)});
+    option<f3d::ratio_t> scale = f3d::ratio_t{1.0};
+    option_enum<std::string, 3> type = option_enum<std::string, 3>("sphere", {"foo", "bar", "bok"});
+    option_enum<std::optional<std::string>, 3> opttype = option_enum<std::optional<std::string>, 3>(std::nullopt, {std::nullopt, "bar", "bok"});
+    option<std::optional<std::filesystem::path>> file;
+    option<std::vector<int>> indices = std::vector<int>({0});
+    option_vector_range<int> indices_range = option_vector_range<int>(std::vector<int>({0}), -5, 5, 1);
+    option_vector_enum<int, 4> indices_enum = option_vector_enum<int, 4>(std::vector<int>({0}), {-5, -2, 0, 1});
+    option<std::vector<double>> opacity_map = std::vector<double>({0.0, 0.0, 1.0, 1.0});
+    option_vector_range<double> opacity_map_range = option_vector_range<double>({0.0, 0.0, 1.0, 1.0}, 0., 1., .1);
+    option_vector_enum<double, 2> opacity_map_enum = option_vector_enum<double, 2>({0.0, 0.0, 1.0, 1.0}, {0., 1.});
+    option<f3d::color_t> color = f3d::color_t{0.2, 0.2, 0.2};
+    option<f3d::direction_t> up_direction = f3d::direction_t{0,1,0};
+    option<f3d::colormap_t> colormap = f3d::colormap_t{0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0};
+    option<std::optional<f3d::transform2d_t>> textures_transform;
+  } tester;
 
   /**
    * The complete generated options struct

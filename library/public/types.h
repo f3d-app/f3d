@@ -69,6 +69,16 @@ public:
   {
     return this->Value;
   }
+  inline ratio_t& operator+=(double incr)
+  {
+    this->Value += incr;
+    return *this;
+  }
+  inline ratio_t& operator-=(double incr)
+  {
+    this->Value -= incr;
+    return *this;
+  }
 
 private:
   double Value = 0;

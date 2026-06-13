@@ -596,6 +596,55 @@ public:
 #endif
 #endif
 
+    libOptions.tester.flag = true;
+    libOptions.tester.radius = 9;
+    std::cout<<"radius 9: " << libOptions.tester.radius.isValid()<<std::endl;
+    libOptions.increase("radius");
+    std::cout<<"radius increase: " << libOptions.tester.radius.Value<<std::endl;
+    libOptions.tester.radius = -5;
+    std::cout<<"radius -5 "<< libOptions.tester.radius.isValid()<<std::endl;
+    libOptions.tester.size = 100;
+    std::cout<<" size 100 " << libOptions.tester.size.isValid()<<std::endl;
+    libOptions.decrease("size");
+    std::cout<<"size decrease: " << libOptions.tester.size.Value<<std::endl;
+    libOptions.tester.size = 200;
+    std::cout<<" size 200 " << libOptions.tester.size.isValid()<<std::endl;
+    std::cout<<libOptions.tester.size.getDomain().size()<<std::endl;
+    libOptions.tester.scale_range = f3d::ratio_t(0.5);
+    std::cout<<" scale range 0.5 " << libOptions.tester.scale_range.isValid()<<std::endl;
+    libOptions.increase("scale");
+    libOptions.increase("scale");
+    libOptions.increase("scale");
+    std::cout<<"scale range increase: " << libOptions.tester.scale_range.Value<<std::endl;
+    libOptions.tester.type = "foo";
+    libOptions.tester.file = "path/to/foo";
+    libOptions.tester.indices = {1,2};
+    libOptions.tester.indices_range = {1,2};
+    std::cout<<" indices ranges true: " << libOptions.tester.indices_range.isValid()<<std::endl;
+//    libOptions.increase("indices_range");
+//    std::cout<<" indices ranges increase: " << libOptions.tester.indices_range.Value<<std::endl;
+    libOptions.tester.indices_range = {1,10};
+    std::cout<<" indices ranges false: " << libOptions.tester.indices_range.isValid()<<std::endl;
+    libOptions.tester.indices_enum = {-5,-2};
+    std::cout<<" indices enum true: " << libOptions.tester.indices_enum.isValid()<<std::endl;
+//    libOptions.decrease("indices_enum");
+//    std::cout<<" indices enum decrease: " << libOptions.tester.indices_enum.Value<<std::endl;
+    libOptions.tester.indices_enum = {-5,2};
+    std::cout<<" indices enum false: " << libOptions.tester.indices_enum.isValid()<<std::endl;
+    libOptions.tester.opacity_map = {1.1,2.2};
+    libOptions.tester.opacity_map_range = {0.1,0.2};
+    std::cout<<" opacity range true: " << libOptions.tester.opacity_map_range.isValid()<<std::endl;
+    libOptions.tester.opacity_map_range = {0.1,1.2};
+    std::cout<<" opacity range false: " << libOptions.tester.opacity_map_range.isValid()<<std::endl;
+    libOptions.tester.opacity_map_enum = {0.,1.};
+    std::cout<<" opacity enum true: " << libOptions.tester.opacity_map_enum.isValid()<<std::endl;
+    libOptions.tester.opacity_map_enum = {0.,1.1};
+    std::cout<<" opacity enum false: " << libOptions.tester.opacity_map_enum.isValid()<<std::endl;
+    libOptions.tester.color = f3d::color_t{0,0,0};
+    libOptions.tester.up_direction = f3d::direction_t{1,0,0};
+    libOptions.tester.colormap = f3d::colormap_t{1,0,0,0};
+    libOptions.tester.textures_transform = f3d::transform2d_t{1,0,0,0,1,0,0,0,1};
+
     // Copy appOptions
     F3DOptionsTools::OptionsDict appOptions = F3DOptionsTools::DefaultAppOptions;
 

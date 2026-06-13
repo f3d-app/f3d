@@ -189,6 +189,68 @@ options& options::removeValue(std::string_view name)
 }
 
 //----------------------------------------------------------------------------
+options& options::increase(std::string_view name)
+{
+//  options_generated::increase(*this, name);
+
+  // manual handle certains option for now
+  if (name == "radius")
+  {
+    this->tester.radius.increase(true);
+  }
+  else if (name == "size")
+  {
+    this->tester.size.increase(true);
+  }
+  else if (name == "scale")
+  {
+    this->tester.scale_range.increase(true);
+  }
+  /* not owkring
+  else if (name == "indices_range")
+  {
+    this->tester.indices_range.increase(true);
+  }
+  else if (name == "indices_enum")
+  {
+    this->tester.indices_enum.increase(true);
+  }*/
+
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+options& options::decrease(std::string_view name)
+{
+//  options_generated::decrease(*this, name);
+
+  // manual handle certains option for now
+  if (name == "radius")
+  {
+    this->tester.radius.increase(false);
+  }
+  else if (name == "size")
+  {
+    this->tester.size.increase(false);
+  }
+  else if (name == "scale")
+  {
+    this->tester.scale_range.increase(false);
+  }
+  /* not working
+  else if (name == "indices_range")
+  {
+    this->tester.indices_range.increase(false);
+  }
+  else if (name == "indices_enum")
+  {
+    this->tester.indices_enum.increase(false);
+  }*/
+
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 template<typename T>
 T options::parse(const std::string& str)
 {
