@@ -237,6 +237,11 @@ public:
   };
 
   struct domains {
+    struct scene {
+      struct animation {
+        domain_range_t<f3d::ratio_t> speed_factor { {f3d::ratio_t(0.), f3d::ratio_t(2.)}, f3d::ratio_t(0.1)};
+      } animation;
+    } scene;
     struct render {
       struct light {
         domain_range_t<double> intensity { {0, 10}, 0.1};

@@ -24,6 +24,8 @@ template<typename T> void increase(T& val, const f3d::options::domain_range_t<T>
 {
   char dir = up ? +1 : -1;
   val += dir * domain.increment;
+
+  // TODO this can be incorrect in case of double computation, how to adress ?
   if (up && val > domain.range[1])
   {
     val = domain.range[0];
@@ -72,6 +74,13 @@ void increase(double& val, bool up)
   ::increase(val, domain, up);
 }
 
+// Implicit f3d::ratio_t domain
+void increase(f3d::ratio_t& val, bool up)
+{
+  f3d::options::domain_range_t domain {{f3d::ratio_t(0.), f3d::ratio_t(1.)}, f3d::ratio_t(0.1)};
+  ::increase(val, domain, up);
+}
+
 void increase(f3d::options& opt, std::string_view name, bool up)
 {
   // manual handle certains option for now
@@ -86,6 +95,14 @@ void increase(f3d::options& opt, std::string_view name, bool up)
   else if (name == "ui.backdrop.opacity")
   {
     ::increase(opt.ui.backdrop.opacity, up);
+  }
+  else if (name == "render.grid.reflection")
+  {
+    ::increase(opt.render.grid.reflection, up);
+  }
+  else if (name == "scene.animation.speed_factor")
+  {
+    ::increase(opt.scene.animation.speed_factor, opt.domains.scene.animation.speed_factor, up);
   }
 }
 }
