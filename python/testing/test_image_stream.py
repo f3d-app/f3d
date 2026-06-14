@@ -5,11 +5,13 @@ import pytest
 
 import f3d
 
+
 @pytest.fixture
 def f3d_engine():
     engine = f3d.Engine.create(True)
     engine.window.size = 300, 200
     return engine
+
 
 def test_loading_stream(f3d_engine: f3d.Engine):
     img = f3d_engine.window.render_to_image(True)
