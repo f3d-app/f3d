@@ -5,6 +5,7 @@
 #include "export.h"
 #include "log.h"
 #include "options.h"
+#include "utils.h"
 #include "window.h"
 
 /// @cond
@@ -498,12 +499,24 @@ inline bool interaction_bind_t::operator==(const interaction_bind_t& bind) const
 //----------------------------------------------------------------------------
 inline std::string interaction_bind_t::format() const
 {
+  std::string ctrlMod = "Ctrl+";
+  std::string ctrlShiftMod = "Ctrl+Shift+";
+
+#ifdef __APPLE__
+  const std::optional<std::string> forceCtrl = f3d::utils::getEnv("F3D_TEST_APPLE_FORCE_CTRL");
+  if (!forceCtrl.has_value() || forceCtrl.value().empty() || forceCtrl != "true")
+  {
+    ctrlMod = "Cmd+";
+    ctrlShiftMod = "Cmd+Shift+";
+  }
+#endif
+
   switch (this->mod)
   {
     case ModifierKeys::CTRL_SHIFT:
-      return "Ctrl+Shift+" + this->inter;
+      return ctrlShiftMod + this->inter;
     case ModifierKeys::CTRL:
-      return "Ctrl+" + this->inter;
+      return ctrlMod + this->inter;
     case ModifierKeys::SHIFT:
       return "Shift+" + this->inter;
     case ModifierKeys::ANY:

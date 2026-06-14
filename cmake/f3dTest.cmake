@@ -234,6 +234,11 @@ function(f3d_test)
 
   set(f3d_test_env_vars ${F3D_TEST_ENV})
   list(APPEND f3d_test_env_vars "CTEST_F3D_PROGRESS_BAR=1")
+
+  # Force CTRL modifier bindings for tests on apple to consistent baselines
+  if (APPLE)
+    list(APPEND f3d_test_env_vars "F3D_TEST_APPLE_FORCE_CTRL=true")
+  endif ()
   if (F3D_TEST_UI)
     list(APPEND f3d_test_env_vars "CTEST_F3D_CONSOLE_BADGE=1")
   endif ()

@@ -8,7 +8,7 @@ Here is a non exhaustive list of F3D limitations:
 - Drag and drop interaction cannot be recorded nor played back.
 - Volume rendering and HDRI support requires a decent GPU.
 - Information about the failure to load a file is not provided before VTK >= 9.4.0.
-- Streaming require different version of VTK depending of the format to read.
+- Streaming require different version of VTK depending upon the format to read.
 - Options `ui.dpi_aware` and CLI `--dpi-aware` are only supported on Windows platform.
 
 ### Assimp
@@ -64,6 +64,10 @@ Your data probably contains some translucent data for some reason, turn on trans
 
 .ply is a generic file format, we cannot assumes it's a 3DGS, thus we do not give good presets for this specific use case.
 It's recommended to use these options: `--point-sprites-size=1 --point-sprites=gaussian -syk`, but you can also add them in your [config file](06-CONFIGURATION_FILE.md).
+
+> I can't use hotkeys/bindings with F row keys
+
+Because some keyboards have layered multimedia keys, F keys (F12 for example) don't use the normal function code by default. To use the F code, you must press <kbd>Fn</kbd> in combination with the F key. For example, to take a minimal screenshot, the hotkey combination on MacOS would be <kbd>Cmd</kbd>+<kbd>Fn</kbd>+<kbd>F12</kbd>.
 
 ### Linux
 

@@ -152,3 +152,7 @@ So with default options, which are using [templates](03-OPTIONS.md#filename-temp
 ## Configuring bindings
 
 It is supported to change all bindings above using a specific syntax in the [configuration file](06-CONFIGURATION_FILE.md) using [commands](07-COMMANDS.md).
+
+## MacOS Bindings
+
+When using F3D on MacOS, all bindings that specify <kbd>Ctrl</kbd> and <kbd>Ctrl</kbd>+<kbd>Shift</kbd> use <kbd>Cmd</kbd> and <kbd>Cmd</kbd>+<kbd>Shift</kbd> respectively instead.

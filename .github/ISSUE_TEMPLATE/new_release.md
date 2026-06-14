@@ -97,7 +97,7 @@ macOS testing protocol:
 - Double click on any new supported file.format, check render
 - Check all supported file in testing/data directory in finder have the f3d mark, if not, check that "open with" suggest F3D
 - Drag&Drop cow.vtp, Drag&Drop palermo_park.hdr, check render
-- Check that CTRL+O (file dialog) is working
+- Check that CMD+O (file dialog) is working
 - Press "Esc" and check the following commands `reload_current_file_group`, `set_camera top`, `toggle_volume_rendering`, `exit`
 
 Windows testing protocol:
