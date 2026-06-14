@@ -25,7 +25,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <cstddef>
 #include <regex>
 #include <sstream>
 #include <string>
