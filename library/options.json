@@ -108,7 +108,7 @@
           "type": "string",
           "default_value": "ddp",
           "domain": {
-            "enum": "\"ddp\", \"sort\", \"sort_cpu\", \"stochastic\""
+            "enum": ["ddp", "sort", "sort_cpu", "stochastic"]
           }
         }
       },
@@ -177,7 +177,7 @@
         "type": "double",
         "default_value": "1.0",
         "domain": {
-          "range": "0, 2",
+          "range": ["0", "2"],
           "increment": "0.1"
         }
       }

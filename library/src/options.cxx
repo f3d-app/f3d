@@ -120,6 +120,7 @@ template<typename T> void cycle(T& val, const f3d::options::domain_enum_t<T>& do
   }
 }
 
+/*
 void increase(f3d::options& opt, std::string_view name, bool up)
 {
   // manual handle certains option for now
@@ -159,7 +160,7 @@ void cycle(f3d::options& opt, std::string_view name)
   {
     ::cycle(opt.render.effect.blending.mode, opt.domains.render.effect.blending.mode);
   }
-}
+}*/
 }
 
 namespace f3d
@@ -229,7 +230,7 @@ options& options::toggle(std::string_view name)
   catch (const std::bad_variant_access&)
   {
     throw options::incompatible_exception(
-      "Trying to get toggle " + std::string(name) + " with incompatible type");
+      "Trying to toggle " + std::string(name) + " with incompatible type");
   }
 }
 
@@ -336,27 +337,21 @@ options& options::removeValue(std::string_view name)
 //----------------------------------------------------------------------------
 options& options::increase(std::string_view name)
 {
-  //  options_generated::increase(*this, name, true);
-  ::increase(*this, name, true);
-
+  options_generated::increase(*this, name, true);
   return *this;
 }
 
 //----------------------------------------------------------------------------
 options& options::decrease(std::string_view name)
 {
-  //  options_generated::increase(*this, name, false);
-  ::increase(*this, name, false);
-
+  options_generated::increase(*this, name, false);
   return *this;
 }
 
 //----------------------------------------------------------------------------
 options& options::cycle(std::string_view name)
 {
-  //  options_generated::cycle(*this, name);
-  ::cycle(*this, name);
-
+  options_generated::cycle(*this, name);
   return *this;
 }
 

@@ -14,6 +14,7 @@ namespace f3d
 {
 namespace options_generated
 {
+
 //----------------------------------------------------------------------------
 /**
  * Generated method, see `options::set`
@@ -119,6 +120,30 @@ void reset(options& opt, std::string_view name)
 {
   // clang-format off
   ${_options_reset};
+  // clang-format on
+  else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Generated method, see `options::increase`
+ */
+void increase(f3d::options& opt, std::string_view name, bool up)
+{
+  // clang-format off
+  ${_options_increase};
+  // clang-format on
+  else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Generated method, see `options::cycle`
+ */
+void cycle(f3d::options& opt, std::string_view name)
+{
+  // clang-format off
+  ${_options_cycle};
   // clang-format on
   else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
 }
