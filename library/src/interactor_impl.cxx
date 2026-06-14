@@ -1015,6 +1015,28 @@ interactor& interactor_impl::initCommands()
       "cycle_anti_aliasing", "cycle between the anti-aliasing method (none,fxaa,ssaa,taa)" });
 
   this->addCommand(
+    "cycle_backface_type",
+    [&](const std::vector<std::string>&)
+    {
+      auto& type = this->Internals->Options.render.backface_type;
+      if (!type.has_value())
+      {
+        type = "visible";
+      }
+      else if (*type == "visible")
+      {
+        type = "hidden";       
+      }
+      else if (*type == "hidden")
+      {
+        type = std::nullopt;
+      }
+      this->Internals->Window.render();
+    },
+    command_documentation_t{
+      "cycle_backface_type", "cycle between backface culling modes (default, visible, hidden)" });
+  
+  this->addCommand(
     "cycle_blending",
     [&](const std::vector<std::string>&)
     {
@@ -1578,6 +1600,22 @@ interactor& interactor_impl::initBindings()
     return std::pair("Anti-aliasing", std::move(desc));
   };
 
+  // "Cycle backface type" , "visible/hidden/default"
+  auto docBackface = [&]()
+  {
+    std::string desc;
+    const auto& type = this->Internals->Options.render.backface_type;
+    if (!type.has_value())
+    {
+      desc = "default"; 
+    }
+    else
+    {
+      desc = *type;
+    }
+    return std::pair("Backface type", std::move(desc));
+  };
+
   // "Cycle point sprites" , "none/sphere/gaussian"
   auto docPS = [&]()
   {
@@ -1694,6 +1732,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "P"}, "cycle_blending", "Scene", docBlend, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "Q"}, "toggle render.effect.ambient_occlusion","Scene", std::bind(docTgl, "Ambient occlusion", std::cref(opts.render.effect.ambient_occlusion)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "A"}, "cycle_anti_aliasing","Scene", docAA, f3d::interactor::BindingType::CYCLIC);
+  this->addBinding({mod_t::CTRL, "B"},"cycle_backface_type","Scene",docBackface,f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "T"}, "toggle render.effect.tone_mapping","Scene", std::bind(docTgl, "Toggle tone mapping", std::cref(opts.render.effect.tone_mapping)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "E"}, "toggle render.show_edges","Scene", std::bind(docTglOpt, "Toggle edges display", std::cref(opts.render.show_edges)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "X"}, "toggle ui.axis","Scene", std::bind(docTgl, "Toggle axes display", std::cref(opts.ui.axis)), f3d::interactor::BindingType::TOGGLE);
