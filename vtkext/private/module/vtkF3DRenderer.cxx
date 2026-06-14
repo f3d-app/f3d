@@ -2059,6 +2059,7 @@ void vtkF3DRenderer::SetInteractionStyle(const std::string& style)
       F3DLog::Severity::Warning, "Unrecognized interaction style \"" + style + "\", using default");
     interactorStyle->SetInteractionMode(vtkF3DInteractorStyle::DEFAULT);
   }
+  this->CheatSheetConfigured = false;
 }
 
 //----------------------------------------------------------------------------

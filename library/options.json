@@ -150,7 +150,8 @@
           "type": "string",
           "default_value": "fxaa",
           "domain": {
-            "enum": ["fxaa", "ssaa", "taa", "none"]
+            "enum": ["fxaa", "ssaa", "taa"],
+            "bool": "render.effect.antialiasing.enable"
           }
         }
       },
@@ -212,8 +213,8 @@
         "type": "double",
         "default_value": "1.0",
         "domain": {
-          "range": ["0", "2"],
-          "increment": "0.1"
+          "range": ["-0.01", "5.01"],
+          "increment": "0.02"
         }
       }
     },
@@ -397,8 +398,8 @@
       "opacity": {
         "type": "double",
         "domain": {
-          "range": ["0.0", "1.0"],
-          "increment": "0.1"
+          "range": ["-0.01", "1.0"],
+          "increment": "0.05"
         }
       },
       "rgb": {
@@ -509,7 +510,8 @@
         "type": "string",
         "default_value": "sphere",
         "domain": {
-          "enum": ["sphere", "gaussian", "circle", "stddev", "bound", "cross", "none"]
+          "enum": ["sphere", "gaussian", "circle", "stddev", "bound", "cross"],
+          "bool": "model.point_sprites.enable"
         }
       },
       "size": {
@@ -553,7 +555,10 @@
   "interactor": {
     "style": {
       "type": "string",
-      "default_value": "default"
+      "default_value": "default",
+      "domain": {
+        "enum": ["default", "trackball", "2d"]
+      }
     },
     "trackball": {
       "type": "bool",

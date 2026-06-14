@@ -238,48 +238,6 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  // Increase/Decrease light intensity
-  void IncreaseLightIntensity(bool negative)
-  {
-    const double intensity = this->Options.render.light.intensity;
-
-    /* `ref < x` is equivalent to:
-     * - `intensity <= x` when going down
-     * - `intensity < x` when going up */
-    const double ref = negative ? intensity - 1e-6 : intensity;
-    // clang-format off
-      /* offset in percentage points */
-      const int offsetPp = ref < .5 ?  1
-      : ref <  1 ?  2
-      : ref <  5 ?  5
-      : ref < 10 ? 10
-      :            25;
-    // clang-format on
-
-    /* new intensity in percents */
-    const int newIntensityPct = std::lround(intensity * 100) + (negative ? -offsetPp : +offsetPp);
-    this->Options.render.light.intensity = std::max(newIntensityPct, 0) / 100.0;
-  }
-
-  //----------------------------------------------------------------------------
-  // Increase/Decrease opacity
-  void IncreaseOpacity(bool negative)
-  {
-    // current opacity, interpreted as 1 if it does not exist
-    const double currentOpacity = this->Options.model.color.opacity.value_or(1.0);
-
-    // new opacity, clamped between 0 and 1 if not already set outside that range
-    const double increment = negative ? -0.05 : 0.05;
-    double newOpacity = currentOpacity + increment;
-    if (currentOpacity <= 1.0 && 0.0 <= currentOpacity)
-    {
-      newOpacity = std::min(1.0, std::max(0.0, newOpacity));
-    }
-
-    this->Options.model.color.opacity = newOpacity;
-  }
-
-  //----------------------------------------------------------------------------
   // Synchronise options from the renderer properties
   static void SynchronizeScivisOptions(f3d::options& opt, vtkF3DRenderer* ren)
   {
@@ -1013,74 +971,6 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{
       "cycle_animation", "cycle scene.animation.index option using model information" });
 
-  // TODO rework
-  this->addCommand(
-    "cycle_anti_aliasing",
-    [&](const std::vector<std::string>&)
-    {
-      bool& enabled = this->Internals->Options.render.effect.antialiasing.enable;
-      std::string& mode = this->Internals->Options.render.effect.antialiasing.mode;
-      if (!enabled)
-      {
-        enabled = true;
-        mode = "fxaa";
-      }
-      else
-      {
-        if (mode == "fxaa")
-        {
-          mode = "ssaa";
-        }
-        else if (mode == "ssaa")
-        {
-          mode = "taa";
-        }
-        else
-        {
-          enabled = false;
-        }
-      }
-      this->Internals->Window.render();
-    },
-    command_documentation_t{
-      "cycle_anti_aliasing", "cycle between the anti-aliasing method (none,fxaa,ssaa,taa)" });
-
-  // TODO rework
-  this->addCommand(
-    "cycle_blending",
-    [&](const std::vector<std::string>&)
-    {
-      bool& enabled = this->Internals->Options.render.effect.blending.enable;
-      std::string& mode = this->Internals->Options.render.effect.blending.mode;
-      if (!enabled)
-      {
-        enabled = true;
-        mode = "ddp";
-      }
-      else
-      {
-        if (mode == "ddp")
-        {
-          mode = "sort";
-        }
-        else if (mode == "sort")
-        {
-          mode = "sort_cpu";
-        }
-        else if (mode == "sort_cpu")
-        {
-          mode = "stochastic";
-        }
-        else
-        {
-          enabled = false;
-        }
-      }
-      this->Internals->Window.render();
-    },
-    command_documentation_t{
-      "cycle_blending", "cycle between the blending method (none,ddp,sort,sort_cpu,stochastic)" });
-
   std::vector<std::string> cycleColoringValidArgs = { "field", "array", "component" };
   this->addCommand(
     "cycle_coloring",
@@ -1115,39 +1005,6 @@ interactor& interactor_impl::initCommands()
       "cycle_coloring field/array/component", "cycle scivis options using model information" },
     std::bind(complNames, std::placeholders::_1,
       std::vector<std::string>{ "field", "array", "component" }));
-
-  // TODO rework
-  this->addCommand(
-    "cycle_point_sprites",
-    [&](const std::vector<std::string>&)
-    {
-      bool& enabled = this->Internals->Options.model.point_sprites.enable;
-      std::string& type = this->Internals->Options.model.point_sprites.type;
-
-      constexpr auto validTypes =
-        std::to_array({ "sphere", "gaussian", "circle", "stddev", "bound", "cross" });
-      if (!enabled)
-      {
-        enabled = true;
-        type = validTypes[0];
-      }
-      else
-      {
-        auto index = std::distance(std::begin(validTypes), std::ranges::find(validTypes, type));
-        if (static_cast<size_t>(index) == validTypes.size() - 1) // last type
-        {
-          enabled = false;
-        }
-        else
-        {
-          type = validTypes[index + 1];
-        }
-      }
-      this->Internals->Window.render();
-    },
-    command_documentation_t{ "cycle_point_sprites",
-      "cycle between the point sprite types "
-      "(none,sphere,gaussian,circle,stddev,bound,cross)" });
 
   this->addCommand(
     "roll_camera",
@@ -1319,28 +1176,6 @@ interactor& interactor_impl::initCommands()
     },
     command_documentation_t{
       "toggle_volume_rendering", "toggle model.volume.enable and print coloring information" });
-
-  this->addCommand(
-    "cycle_interactor_style",
-    [&](const std::vector<std::string>&)
-    {
-      auto& style = this->Internals->Options.interactor.style;
-      if (style == "default")
-      {
-        style = "trackball";
-      }
-      else if (style == "trackball")
-      {
-        style = "2d";
-      }
-      else
-      {
-        style = "default";
-      }
-      this->Internals->Window.render();
-    },
-    command_documentation_t{
-      "cycle_interactor_style", "cycle between interaction styles (default, trackball, 2d)" });
 
   this->addCommand(
     "stop_interactor", [&](const std::vector<std::string>&) { this->stop(); },
@@ -1596,49 +1431,19 @@ interactor& interactor_impl::initBindings()
     }
   };
 
-  // "Cycle anti-aliasing" , "none/fxaa/ssaa"
-  auto docAA = [&]()
+  // "name" , "none / mode"
+  auto docCycle = [&](const std::string& name, bool enable, const std::string& mode)
   {
     std::string desc;
-    if (!this->Internals->Options.render.effect.antialiasing.enable)
+    if (!enable)
     {
       desc = "none";
     }
     else
     {
-      desc = this->Internals->Options.render.effect.antialiasing.mode;
+      desc = mode;
     }
-    return std::pair("Anti-aliasing", std::move(desc));
-  };
-
-  // "Cycle point sprites" , "none/sphere/gaussian"
-  auto docPS = [&]()
-  {
-    std::string desc;
-    if (!this->Internals->Options.model.point_sprites.enable)
-    {
-      desc = "none";
-    }
-    else
-    {
-      desc = this->Internals->Options.model.point_sprites.type;
-    }
-    return std::pair("Point sprites", std::move(desc));
-  };
-
-  // "Cycle blending" , "none/ddp/sort/stochastic"
-  auto docBlend = [&]()
-  {
-    std::string desc;
-    if (!this->Internals->Options.render.effect.blending.enable)
-    {
-      desc = "none";
-    }
-    else
-    {
-      desc = this->Internals->Options.render.effect.blending.mode;
-    }
-    return std::pair("Blending", std::move(desc));
+    return std::pair(name, std::move(desc));
   };
 
   // "Cycle animation" , "animationName"
@@ -1724,9 +1529,9 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "S"}, "cycle_coloring array", "Scene", docArray, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "Y"}, "cycle_coloring component", "Scene", docComp, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "B"}, "toggle ui.scalar_bar", "Scene", std::bind(docTgl, "Scalar bar", std::cref(opts.ui.scalar_bar)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::NONE, "P"}, "cycle_blending", "Scene", docBlend, f3d::interactor::BindingType::CYCLIC);
+  this->addBinding({mod_t::NONE, "P"}, "cycle render.effect.blending.mode", "Scene", std::bind(docCycle, "Blending", std::cref(opts.render.effect.blending.enable), std::cref(opts.render.effect.blending.mode)), f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "Q"}, "toggle render.effect.ambient_occlusion","Scene", std::bind(docTgl, "Ambient occlusion", std::cref(opts.render.effect.ambient_occlusion)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::NONE, "A"}, "cycle_anti_aliasing","Scene", docAA, f3d::interactor::BindingType::CYCLIC);
+  this->addBinding({mod_t::NONE, "A"}, "cycle render.effect.antialiasing.mode","Scene", std::bind(docCycle, "Anti-aliasing", std::cref(opts.render.effect.antialiasing.enable), std::cref(opts.render.effect.antialiasing.mode)), f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "T"}, "toggle render.effect.tone_mapping","Scene", std::bind(docTgl, "Toggle tone mapping", std::cref(opts.render.effect.tone_mapping)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "E"}, "toggle render.show_edges","Scene", std::bind(docTglOpt, "Toggle edges display", std::cref(opts.render.show_edges)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "X"}, "toggle ui.axis","Scene", std::bind(docTgl, "Toggle axes display", std::cref(opts.ui.axis)), f3d::interactor::BindingType::TOGGLE);
@@ -1746,15 +1551,15 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "V"}, "toggle_volume_rendering","Scene", std::bind(docTgl, "Volume rendering", std::cref(opts.model.volume.enable)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "I"}, "toggle model.volume.inverse","Scene", std::bind(docTgl, "Inverse volume opacity", std::cref(opts.model.volume.inverse)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::CTRL, "N"}, "toggle model.normal_glyphs.enable","Scene", std::bind(docTgl, "Normal glyphs", std::cref(opts.model.normal_glyphs.enable)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::NONE, "O"}, "cycle_point_sprites","Scene", docPS, f3d::interactor::BindingType::CYCLIC);
+  this->addBinding({mod_t::NONE, "O"}, "cycle model.point_sprites.type","Scene", std::bind(docCycle, "Point sprites", std::cref(opts.model.point_sprites.enable), std::cref(opts.model.point_sprites.type)), f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "U"}, "toggle render.background.blur.enable","Scene", std::bind(docTgl, "Blur background", std::cref(opts.render.background.blur.enable)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::NONE, "K"}, "cycle_interactor_style","Scene", std::bind(docStr, "Interaction style", std::cref(opts.interactor.style)), f3d::interactor::BindingType::CYCLIC);
+  this->addBinding({mod_t::NONE, "K"}, "cycle interactor.style","Scene", std::bind(docStr, "Interaction style", std::cref(opts.interactor.style)), f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "F"}, "toggle render.hdri.ambient","Scene", std::bind(docTgl, "HDRI ambient lighting", std::cref(opts.render.hdri.ambient)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "J"}, "toggle render.background.skybox","Scene", std::bind(docTgl, "HDRI skybox", std::cref(opts.render.background.skybox)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::NONE, "L"}, "increase_light_intensity", "Scene", std::bind(docDbl, "Increase lights intensity", std::cref(opts.render.light.intensity)), f3d::interactor::BindingType::NUMERICAL);
-  this->addBinding({mod_t::SHIFT, "L"}, "decrease_light_intensity", "Scene", std::bind(docDbl, "Decrease lights intensity", std::cref(opts.render.light.intensity)), f3d::interactor::BindingType::NUMERICAL);
-  this->addBinding({mod_t::CTRL, "P"}, "increase_opacity", "Scene", std::bind(docDblOpt, "Increase opacity", std::cref(opts.model.color.opacity)), f3d::interactor::BindingType::NUMERICAL);
-  this->addBinding({mod_t::SHIFT, "P"}, "decrease_opacity", "Scene", std::bind(docDblOpt, "Decrease opacity", std::cref(opts.model.color.opacity)), f3d::interactor::BindingType::NUMERICAL);
+  this->addBinding({mod_t::NONE, "L"}, "increase render.light.intensity", "Scene", std::bind(docDbl, "Increase lights intensity", std::cref(opts.render.light.intensity)), f3d::interactor::BindingType::NUMERICAL);
+  this->addBinding({mod_t::SHIFT, "L"}, "decrease render.light.intensity", "Scene", std::bind(docDbl, "Decrease lights intensity", std::cref(opts.render.light.intensity)), f3d::interactor::BindingType::NUMERICAL);
+  this->addBinding({mod_t::CTRL, "P"}, "increase model.color.opacity", "Scene", std::bind(docDblOpt, "Increase opacity", std::cref(opts.model.color.opacity)), f3d::interactor::BindingType::NUMERICAL);
+  this->addBinding({mod_t::SHIFT, "P"}, "decrease model.color.opacity", "Scene", std::bind(docDblOpt, "Decrease opacity", std::cref(opts.model.color.opacity)), f3d::interactor::BindingType::NUMERICAL);
   this->addBinding({mod_t::SHIFT, "A"}, "toggle render.armature.enable","Scene", std::bind(docTgl, "Armature", std::cref(opts.render.armature.enable)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::ANY, "1"}, "set_camera front", "Camera", std::bind(docStr, "Front View camera"));
   this->addBinding({mod_t::ANY, "2"}, "elevation_camera -90", "Camera", std::bind(docStr, "Rotate camera down"));
