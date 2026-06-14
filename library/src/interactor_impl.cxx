@@ -1013,6 +1013,7 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{
       "cycle_animation", "cycle scene.animation.index option using model information" });
 
+  // TODO rework
   this->addCommand(
     "cycle_anti_aliasing",
     [&](const std::vector<std::string>&)
@@ -1044,6 +1045,7 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{
       "cycle_anti_aliasing", "cycle between the anti-aliasing method (none,fxaa,ssaa,taa)" });
 
+  // TODO rework
   this->addCommand(
     "cycle_blending",
     [&](const std::vector<std::string>&)
@@ -1114,6 +1116,7 @@ interactor& interactor_impl::initCommands()
     std::bind(complNames, std::placeholders::_1,
       std::vector<std::string>{ "field", "array", "component" }));
 
+  // TODO rework
   this->addCommand(
     "cycle_point_sprites",
     [&](const std::vector<std::string>&)

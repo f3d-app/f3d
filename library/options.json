@@ -20,12 +20,19 @@
       },
       "speed_factor": {
         "type": "ratio",
-        "default_value": "1.0"
+        "default_value": "1.0",
+        "domain": {
+          "range": ["0.0", "2.0"],
+          "increment": "0.1"
+        }
       }
     },
     "camera": {
       "index": {
-        "type": "int"
+        "type": "int",
+        "domain": {
+          "enum": []
+        }
       },
       "orthographic": {
         "type": "bool"
@@ -40,13 +47,25 @@
       "type": "bool"
     },
     "line_width": {
-      "type": "double"
+      "type": "double",
+      "domain": {
+        "range": ["0.0", "10.0"],
+        "increment": "0.1"
+      }
     },
     "point_size": {
-      "type": "double"
+      "type": "double",
+      "domain": {
+        "range": ["0.0", "10.0"],
+        "increment": "0.1"
+      }
     },
     "backface_type": {
-      "type": "string"
+      "type": "string",
+      "domain": {
+        "enum": ["visible", "hidden"]
+      }
+
     },
     "grid": {
       "enable": {
@@ -90,7 +109,11 @@
       },
       "samples": {
         "type": "int",
-        "default_value": "5"
+        "default_value": "5",
+        "domain": {
+          "range": ["1", "20"],
+          "increment": "1"
+        }
       }
     },
     "effect": {
@@ -108,7 +131,7 @@
           "type": "string",
           "default_value": "ddp",
           "domain": {
-            "enum": ["ddp", "sort", "sort_cpu", "stochastic"]
+            "enum": ["ddp", "sort", "sort_cpu", "stochastic", "none"]
           }
         }
       },
@@ -124,7 +147,10 @@
         },
         "mode": {
           "type": "string",
-          "default_value": "fxaa"
+          "default_value": "fxaa",
+          "domain": {
+            "enum": ["fxaa", "ssaa", "taa", "none"]
+          }
         }
       },
       "ambient_occlusion": {
@@ -155,7 +181,11 @@
     "background": {
       "color": {
         "type": "color",
-        "default_value": "0.2, 0.2, 0.2"
+        "default_value": "0.2, 0.2, 0.2",
+        "domain": {
+          "range": ["0.0", "1.0"],
+          "increment": "0.1"
+        }
       },
       "skybox": {
         "type": "bool",
@@ -168,7 +198,11 @@
         },
         "coc": {
           "type": "double",
-          "default_value": "20.0"
+          "default_value": "20.0",
+          "domain": {
+            "range": ["0.0", "100.0"],
+            "increment": "5.0"
+          }
         }
       }
     },
@@ -193,11 +227,19 @@
     "backdrop": {
       "opacity": {
         "type": "double",
-        "default_value": "0.9"
+        "default_value": "0.9",
+        "domain": {
+          "range": ["0.0", "1.0"],
+          "increment": "0.1"
+        }
       },
       "color": {
         "type": "color",
-        "parsed_default_value": "f3d_black"
+        "parsed_default_value": "f3d_black",
+        "domain": {
+          "range": ["0.0", "1.0"],
+          "increment": "0.1"
+        }
       }
     },
     "axis": {
@@ -286,11 +328,19 @@
     },
     "scale": {
       "type": "ratio",
-      "default_value": "1.0"
+      "default_value": "1.0",
+      "domain": {
+        "range": ["0.0", "10.0"],
+        "increment": "0.1"
+      }
     },
     "font_color": {
       "type": "color",
-      "parsed_default_value": "f3d_white"
+      "parsed_default_value": "f3d_white",
+      "domain": {
+        "range": ["0.0", "1.0"],
+        "increment": "0.1"
+      }
     },
     "loader_progress": {
       "type": "bool",
@@ -344,10 +394,18 @@
     },
     "color": {
       "opacity": {
-        "type": "double"
+        "type": "double",
+        "domain": {
+          "range": ["0.0", "1.0"],
+          "increment": "0.1"
+        }
       },
       "rgb": {
-        "type": "color"
+        "type": "color",
+        "domain": {
+          "range": ["0.0", "1.0"],
+          "increment": "0.1"
+        }
       },
       "texture": {
         "type": "path"
@@ -355,7 +413,11 @@
     },
     "emissive": {
       "factor": {
-        "type": "color"
+        "type": "color",
+        "domain": {
+          "range": ["0.0", "1.0"],
+          "increment": "0.1"
+        }
       },
       "texture": {
         "type": "path"
@@ -363,7 +425,11 @@
     },
     "normal": {
       "scale": {
-        "type": "double"
+        "type": "double",
+        "domain": {
+          "range": ["0.0", "1.0"],
+          "increment": "0.1"
+        }
       },
       "texture": {
         "type": "path"
@@ -371,13 +437,25 @@
     },
     "material": {
       "metallic": {
-        "type": "double"
+        "type": "double",
+        "domain": {
+          "range": ["0.0", "1.0"],
+          "increment": "0.1"
+        }
       },
       "roughness": {
-        "type": "double"
+        "type": "double",
+        "domain": {
+          "range": ["0.0", "1.0"],
+          "increment": "0.1"
+        }
       },
       "base_ior": {
-        "type": "double"
+        "type": "double",
+        "domain": {
+          "range": ["0.0", "1.0"],
+          "increment": "0.1"
+        }
       },
       "texture": {
         "type": "path"
@@ -396,7 +474,11 @@
         "default_value": "false"
       },
       "discretization": {
-        "type": "int"
+        "type": "int",
+        "domain": {
+          "range": ["1", "1024"],
+          "increment": "5"
+        }
       },
       "array_name": {
         "type": "string"
@@ -424,11 +506,18 @@
       },
       "type": {
         "type": "string",
-        "default_value": "sphere"
+        "default_value": "sphere",
+        "domain": {
+          "enum": ["sphere", "gaussian", "circle", "stddev", "bound", "cross", "none"]
+        }
       },
       "size": {
         "type": "double",
-        "default_value": 10.0
+        "default_value": 10.0,
+        "domain": {
+          "range": ["1", "100"],
+          "increment": "1"
+        }
       },
       "absolute_size": {
         "type": "bool",
@@ -442,7 +531,11 @@
       },
       "scale": {
         "type": "ratio",
-        "default_value": "1.0"
+        "default_value": "1.0",
+        "domain": {
+          "range": ["0.0", "10.0"],
+          "increment": "0.1"
+        }
       }
     },
     "volume": {
