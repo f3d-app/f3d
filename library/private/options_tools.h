@@ -895,7 +895,6 @@ template<typename T> void increase(T& val, const f3d::options::domain_range_t<T>
   char dir = up ? +1 : -1;
   T newVal = val;
 
-  // TODO how to handle numeric limits properly ?
   newVal += dir * domain.increment;
 
   // TODO this can be incorrect in case of double computation, how to adress ?
