@@ -246,6 +246,7 @@ public:
     std::vector<T> enumeration;
   };
 
+  /*
   struct domains {
     struct scene {
       struct animation {
@@ -266,13 +267,18 @@ public:
         } blending;
       } effect;
     } render;
-  } domains;
+  } domains;*/
 
   /**
    * The complete generated options struct
    */
   // clang-format off
   ${_options_struct}
+
+
+  struct domains {
+  ${_options_domains_struct}
+  } domains;
   // clang-format on
 
 

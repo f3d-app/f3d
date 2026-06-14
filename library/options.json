@@ -106,7 +106,10 @@
         },
         "mode": {
           "type": "string",
-          "default_value": "ddp"
+          "default_value": "ddp",
+          "domain": {
+            "enum": "\"ddp\", \"sort\", \"sort_cpu\", \"stochastic\""
+          }
         }
       },
       "anti_aliasing": {
@@ -172,7 +175,11 @@
     "light": {
       "intensity": {
         "type": "double",
-        "default_value": "1.0"
+        "default_value": "1.0",
+        "domain": {
+          "range": "0, 2",
+          "increment": "0.1"
+        }
       }
     },
     "armature": {
