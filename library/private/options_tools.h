@@ -885,6 +885,164 @@ std::string format(const transform2d_t& var)
   return options_tools::format(static_cast<std::vector<double>>(var));
 }
 
+//----------------------------------------------------------------------------
+/**
+ * Templated generic increase method for provided val and domain.
+ * Increase up to max or decrease down to min.
+ */
+template<typename T>
+void increase(T& val, const f3d::options::domain_range_t<T>& domain, bool up)
+{
+  char dir = up ? +1 : -1;
+  T newVal = val;
+
+  newVal += dir * domain.increment;
+
+  // TODO this can be incorrect in case of double computation, how to address ?
+  if ((up && newVal <= domain.range[1]) || (!up && newVal >= domain.range[0]))
+  {
+    val = newVal;
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Templated std::vector specific increase method for provided vec and domain.
+ * Increase/Decrease each val in the vec.
+ */
+template<typename T>
+void increase(std::vector<T>& vec, const f3d::options::domain_range_t<T>& domain, bool up)
+{
+  std::ranges::for_each(vec, [domain, up](T& val) { increase(val, domain, up); });
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Templated std::optional specific increase method for provided val and domain.
+ * If set, just call increase
+ * If not set, set val to min/max depending on the direction
+ */
+template<typename T>
+void increase(std::optional<T>& val, const f3d::options::domain_range_t<T>& domain, bool up)
+{
+  if (!val.has_value())
+  {
+    if (domain.range[0] != domain.range[1])
+    {
+      val = up ? domain.range[0] : domain.range[1];
+    }
+  }
+  else
+  {
+    increase(val.value(), domain, up);
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
+ * TODO
+ */
+void increase(
+  std::optional<f3d::color_t>& col, const f3d::options::domain_range_t<double>& domain, bool up)
+{
+  if (col.has_value())
+  {
+    //    std::array<double, 3>& arr(vec.value());
+    //    std::ranges::for_each(arr, [domain, up](double& val){increase(val, domain, up);});
+    for (std::size_t i = 0; i < 3; i++)
+    {
+      increase(col.value()[i], domain, up);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
+ * TODO
+ */
+void increase(f3d::color_t& col, const f3d::options::domain_range_t<double>& domain, bool up)
+{
+  for (std::size_t i = 0; i < 3; i++)
+  {
+    increase(col[i], domain, up);
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Templated generic cycle method for provided val and domain.
+ * Cycle on the enum.
+ * If invalid and domain is not empty, set to the first enum value.
+ */
+template<typename T>
+void cycle(T& val, const f3d::options::domain_enum_t<T>& domain)
+{
+  auto it = std::ranges::find(domain.enumeration, val);
+  if (it != domain.enumeration.end())
+  {
+    it++;
+    if (it == domain.enumeration.end())
+    {
+      it = domain.enumeration.begin();
+    }
+    val = *it;
+  }
+  else if (!domain.enumeration.empty())
+  {
+    val = domain.enumeration.front();
+  }
+}
+
+template<typename T>
+void cycle(T& val, const f3d::options::domain_enum_t<T>& domain, bool& boolean)
+{
+  if (!domain.enumeration.empty())
+  {
+    if (boolean)
+    {
+      cycle(val, domain);
+      if (val == domain.enumeration.front())
+      {
+        boolean = false;
+      }
+    }
+    else
+    {
+      boolean = true;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Templated cycle method for std::optional, for the provided val and domain.
+ * If set to the last enum, unset
+ * If set to something else, cycle on the enum.
+ * If not set, set to first enum
+ */
+template<typename T>
+void cycle(std::optional<T>& val, const f3d::options::domain_enum_t<T>& domain)
+{
+  if (!val.has_value())
+  {
+    if (!domain.enumeration.empty())
+    {
+      val = domain.enumeration.front();
+    }
+  }
+  else
+  {
+    if (!domain.enumeration.empty() && val == domain.enumeration.back())
+    {
+      val.reset();
+    }
+    else
+    {
+      cycle(val.value(), domain);
+    }
+  }
+}
+
 } // option_tools
 } // f3d
 #endif // f3d_options_tools_h
