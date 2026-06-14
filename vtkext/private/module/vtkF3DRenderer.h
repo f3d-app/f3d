@@ -784,7 +784,6 @@ private:
   std::string HDRIFile;
   vtkSmartPointer<vtkImageReader2> HDRIReader;
   bool HasValidHDRIReader = false;
-  bool UseDefaultHDRI = false;
   std::string HDRIHash;
   bool HasValidHDRIHash = false;
   vtkSmartPointer<vtkTexture> HDRITexture;
