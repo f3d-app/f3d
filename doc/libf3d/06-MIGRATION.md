@@ -14,3 +14,9 @@ The callback takes an argument of type `f3d::interactor::interactor_state_t` all
 ## F3D_PLUGINS_PATH
 
 When running F3D, it was possible to specify the path for loading plugins using the environment variable `F3D_PLUGINS_PATH`. This variable has been removed in favor of the CLI option `--plugins-path` which is more secure.
+
+## scene.supports method
+`scene::supports()` method signature changed, it now returns `f3d::file_availability` enum instead of `bool`. Here is how you can check if a file is supported now:
+```cpp
+if (scene.supports("some.obj") == f3d::file_availability::SUPPORTED)
+```

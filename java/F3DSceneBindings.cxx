@@ -376,9 +376,9 @@ extern "C"
     }
 
     const char* str = env->GetStringUTFChars(filePath, nullptr);
-    bool result = GetEngine(env, self)->getScene().supports(str);
+    f3d::file_availability result = GetEngine(env, self)->getScene().supports(str);
     env->ReleaseStringUTFChars(filePath, str);
-    return result;
+    return result != f3d::file_availability::SUPPORTED;
   }
 
   JNIEXPORT jobject JAVA_BIND(Scene, loadAnimationTime)(
