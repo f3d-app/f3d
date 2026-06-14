@@ -15,12 +15,14 @@ int test_image_stream()
   unsigned char* tempBuffer = f3d_image_save_buffer(NULL, PNG, &count); // this shouldn't crash
   if (tempBuffer != NULL)
   {
+    f3d_image_delete(img);
     return 1;
   }
 
   f3d_image_t* temp_image_stream = f3d_image_new_stream(tempBuffer, 0);
   if (temp_image_stream != NULL)
   {
+    f3d_image_delete(img);
     return 1;
   }
 
@@ -38,14 +40,17 @@ int test_image_stream()
 
       if (stream_error != 0)
       {
+        f3d_image_delete(img);
         return 1;
       }
     }
     else
     {
+      f3d_image_delete(img);
       return 1;
     }
   }
 
+  f3d_image_delete(img);
   return 0;
 }
