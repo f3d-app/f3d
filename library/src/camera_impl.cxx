@@ -2,6 +2,7 @@
 
 #include <vtkCamera.h>
 #include <vtkMatrix4x4.h>
+#include <vtkPlane.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkVersion.h>
@@ -344,6 +345,51 @@ vtkCamera* camera_impl::GetVTKCamera() const
 bool camera_impl::GetSuccessfullyReset() const
 {
   return this->Internals->SuccessfullyReset;
+}
+
+//----------------------------------------------------------------------------
+double camera_impl::getDistance() const
+{
+  return this->GetVTKCamera()->GetDistance();
+}
+
+//----------------------------------------------------------------------------
+double camera_impl::getWorldAzimuth() const
+{
+  vtkRenderer* ren = this->Internals->VTKRenderer;
+  const double* up = ren->GetEnvironmentUp();
+
+  double projectedView[3];
+  vtkPlane::ProjectVector(this->GetVTKCamera()->GetDirectionOfProjection(),
+    this->getFocalPoint().data(), up, projectedView);
+
+  static constexpr double EPS = 128 * std::numeric_limits<double>::epsilon();
+  if (vtkMath::Norm(projectedView) < EPS)
+  {
+    return 0.0;
+  }
+
+  const double angleRad =
+    vtkMath::SignedAngleBetweenVectors(ren->GetEnvironmentRight(), projectedView, up);
+
+  return vtkMath::DegreesFromRadians(angleRad) - 90.0;
+}
+
+//----------------------------------------------------------------------------
+double camera_impl::getWorldElevation() const
+{
+  double* view = this->GetVTKCamera()->GetDirectionOfProjection();
+
+  static constexpr double EPS = 128 * std::numeric_limits<double>::epsilon();
+  if (vtkMath::Norm(view) < EPS)
+  {
+    return 0.0;
+  }
+
+  vtkRenderer* ren = this->Internals->VTKRenderer;
+  const double angleRad = vtkMath::AngleBetweenVectors(ren->GetEnvironmentUp(), view);
+
+  return vtkMath::DegreesFromRadians(angleRad) - 90.0;
 }
 
 };
