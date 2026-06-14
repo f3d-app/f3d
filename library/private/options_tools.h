@@ -1063,6 +1063,25 @@ template<typename T> void cycle(T& val, const f3d::options::domain_enum_t<T>& do
   }
 }
 
+template<typename T> void cycle(T& val, const f3d::options::domain_enum_t<T>& domain, bool& boolean)
+{
+  if (!domain.enumeration.empty())
+  {
+    if (boolean)
+    {
+      cycle(val, domain);
+      if (val == domain.enumeration.front())
+      {
+        boolean = false;
+      }
+    }
+    else
+    {
+      boolean = true;
+    }
+  }
+}
+
 //----------------------------------------------------------------------------
 /**
  * Templated cycle method for std::optional, for the provided val and domain.

@@ -131,7 +131,8 @@
           "type": "string",
           "default_value": "ddp",
           "domain": {
-            "enum": ["ddp", "sort", "sort_cpu", "stochastic", "none"]
+            "enum": ["ddp", "sort", "sort_cpu", "stochastic"],
+            "bool": "render.effect.blending.enable"
           }
         }
       },
