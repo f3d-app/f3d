@@ -40,7 +40,7 @@ list(APPEND pyf3dTestsNoRender_list
      test_utils.py
     )
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.2)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
   list(APPEND pyf3dTests_list
      test_image_stream.py
     )
