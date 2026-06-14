@@ -154,18 +154,28 @@ public:
 //  [[nodiscard]] bool hasDomain(std::string_view name) const;
 
   /**
-   *  Increase an option value if it has a domain, else throws options::incompatible_exception.
+   *  Increase an option value if it has a range domain, else throws options::incompatible_exception.
+   *  Increasing above the max is capped at the maximum.
    *
    *  Throws an options::inexistent_exception if option does not exist.
    */
   options& increase(std::string_view name);
 
   /**
-   *  Decrease an option value if it has a domain, else throws options::incompatible_exception.
+   *  Decrease an option value if it has a range domain, else throws options::incompatible_exception.
+   *  Decreading below the min is capped at the minimum.
    *
    *  Throws an options::inexistent_exception if option does not exist.
    */
   options& decrease(std::string_view name);
+
+  /**
+   *  Cycle an option value if it has an enumaration domain, else throws options::incompatible_exception.
+   *  Loops over the begining of the enumaration domain when reaching the end.
+   *
+   *  Throws an options::inexistent_exception if option does not exist.
+   */
+  options& cycle(std::string_view name);
 
   /**
    * Templated parsing method used internally to parse strings.

@@ -23,16 +23,15 @@ namespace
 template<typename T> void increase(T& val, const f3d::options::domain_range_t<T>& domain, bool up)
 {
   char dir = up ? +1 : -1;
-  val += dir * domain.increment;
+  T newVal = val;
+
+  // TODO how to handle numeric limits properly ?
+  newVal += dir * domain.increment;
 
   // TODO this can be incorrect in case of double computation, how to adress ?
-  if (up && val > domain.range[1])
+  if ((up && newVal <= domain.range[1]) || (!up && newVal >= domain.range[0]))  
   {
-    val = domain.range[0];
-  }
-  else if (!up && val < domain.range[0])
-  {
-    val = domain.range[1];
+    val = newVal;
   }
 }
 
@@ -47,42 +46,12 @@ template<typename T>void increase(std::optional<T>& val, const f3d::options::dom
   {
     if (domain.range[0] != domain.range[1])
     {
-      val = domain.range[0];
+      val = up ? domain.range[0] : domain.range[1];
     }
   }
   else
   {
     ::increase(val.value(), domain, up);
-  }
-}
-
-template<typename T, std::size_t N> void increase(T& val, const f3d::options::domain_enum_t<T, N>& domain, bool up)
-{
-  char dir = up ? +1 : -1;
-  auto it = std::ranges::find(domain.enumeration, val);
-  if (it != domain.enumeration.end())
-  {
-    if (up)
-    {
-      it++;
-      if(it == domain.enumeration.end())
-      {
-        it = domain.enumeration.begin();
-      }
-    }
-    else
-    {
-      if(it == domain.enumeration.begin())
-      {
-        it = domain.enumeration.end();
-      }
-      it--;
-    }
-    val = *it;
-  }
-  else
-  {
-    val = domain.enumeration.front();
   }
 }
 
@@ -133,16 +102,30 @@ void increase(std::optional<int>& val, bool up)
   }
 }
 
+template<typename T, std::size_t N> void cycle(T& val, const f3d::options::domain_enum_t<T, N>& domain)
+{
+  auto it = std::ranges::find(domain.enumeration, val);
+  if (it != domain.enumeration.end())
+  {
+    it++;
+    if(it == domain.enumeration.end())
+    {
+      it = domain.enumeration.begin();
+    }
+    val = *it;
+  }
+  else
+  {
+    val = domain.enumeration.front();
+  }
+}
+
 void increase(f3d::options& opt, std::string_view name, bool up)
 {
   // manual handle certains option for now
   if (name == "render.light.intensity")
   {
     ::increase(opt.render.light.intensity, opt.domains.render.light.intensity, up);
-  }
-  else if (name == "render.effect.blending.mode")
-  {
-    ::increase(opt.render.effect.blending.mode, opt.domains.render.effect.blending.mode, up);
   }
   else if (name == "ui.backdrop.opacity")
   {
@@ -167,6 +150,14 @@ void increase(f3d::options& opt, std::string_view name, bool up)
   else if (name == "scene.animation.indices")
   {
     ::increase(opt.scene.animation.indices, opt.domains.scene.animation.indices, up);
+  }
+}
+
+void cycle(f3d::options& opt, std::string_view name)
+{
+  if (name == "render.effect.blending.mode")
+  {
+    ::cycle(opt.render.effect.blending.mode, opt.domains.render.effect.blending.mode);
   }
 }
 }
@@ -356,6 +347,15 @@ options& options::decrease(std::string_view name)
 {
   //  options_generated::increase(*this, name, false);
   ::increase(*this, name, false);
+
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+options& options::cycle(std::string_view name)
+{
+  //  options_generated::cycle(*this, name);
+  ::cycle(*this, name);
 
   return *this;
 }
