@@ -22,7 +22,7 @@ int TestSDKUI([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   options.ui.loader_progress = true;
   options.ui.loader_progress_color = f3d::color_t(0.f, 1.f, 1.f);
 
-  options.ui.animation_progress = true;
+  options.ui.animation_progress = "default";
   options.ui.animation_progress_color = f3d::color_t(0.f, 1.f, 0.f);
 
   f3d::scene& sce = eng.getScene();

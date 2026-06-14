@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <deque>
 #include <map>
+#include <vector>
 #include <vtkProp.h>
 
 class vtkOpenGLRenderWindow;
@@ -222,6 +223,34 @@ public:
   void AddNotification(const std::string& desc, const std::string& value, const std::string& bind,
     double startTime, double duration);
 
+  /**
+   * Set the animation progress bar mode: "none", "default" or "advanced".
+   * "none" hides the bar, "default" shows the bar alone, "advanced" adds
+   * time/name labels around it.
+   * "none" by default
+   */
+  void SetAnimationProgressMode(const std::string& mode);
+
+  /**
+   * Set the time range, name and keyframe times of the current animation. Meant
+   * to be pushed when the loaded animation changes.
+   * Empty range, name and keyframes by default
+   */
+  void SetAnimationProgress(const std::pair<double, double>& timeRange, const std::string& name,
+    const std::vector<double>& keyFrames);
+
+  /**
+   * Set the animation progress bar fill color
+   * black by default
+   */
+  void SetAnimationProgressColor(const std::array<double, 3>& color);
+
+  /**
+   * Update the current animation time, meant to be pushed every tick during playback
+   * 0 by default
+   */
+  void UpdateAnimationTime(double currentTime);
+
 protected:
   vtkF3DUIActor();
   ~vtkF3DUIActor() override;
@@ -310,6 +339,13 @@ protected:
   {
   }
 
+  /**
+   * Render the animation progress bar UI widget
+   */
+  virtual void RenderProgressBar()
+  {
+  }
+
   bool DropZoneLogoVisible = false;
   bool DropZoneVisible = false;
   std::string DropText = "";
@@ -356,6 +392,13 @@ protected:
   bool NotificationVisible = false;
   bool BindingsVisible = false;
   std::deque<Notification> Notifications;
+
+  std::string AnimationProgressMode = "none";
+  std::pair<double, double> AnimationTimeRange = { 0.0, 0.0 };
+  std::array<double, 3> AnimationProgressColor = { 0, 0, 0 };
+  double AnimationCurrentTime = 0.0;
+  std::string AnimationName = "";
+  std::vector<double> AnimationKeyFrames;
 
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;

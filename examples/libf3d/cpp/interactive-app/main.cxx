@@ -185,7 +185,7 @@ int main(int argc, char** argv)
   // UI overlays: axis + some HUD
   opt.ui.axis = true;
   opt.ui.fps = true;
-  opt.ui.animation_progress = true;
+  opt.ui.animation_progress = "default";
   opt.ui.filename = true;
 
   // FXAA + tone mapping

@@ -12,7 +12,7 @@
       "camera-direction": "-1,-0.5,-1",
       "hdri-ambient": true,
       "blending": "ddp",
-      "animation-progress": true,
+      "animation-progress": "default",
       "remove-empty-file-groups": true,
       "dpi-aware": true,
       "notifications": true

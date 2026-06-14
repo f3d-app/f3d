@@ -86,6 +86,16 @@ eg:
 - `jump_to_frame -1 false` jump to last frame.
 - `jump_to_frame -2 false` jump to second last frame.
 
+`jump_to_time`: A specific command to load an animation at a specific time, takes a number (in seconds) and a boolean as arguments.
+When relative is false, a negative time is counted from the end of the animation.
+When relative is true, the time is added to the current animation time.
+eg:
+
+- `jump_to_time 2.5 false` jump to time 2.5 seconds.
+- `jump_to_time -1.5 false` jump to 1.5 seconds before the end.
+- `jump_to_time 0.5 true` jump 0.5 seconds forward.
+- `jump_to_time -0.5 true` jump 0.5 seconds backward.
+
 `jump_to_keyframe`: A specific command to load an animation at a specific keyframe, takes a number and a boolean as arguments.
 When jumping between keyframes, the target keyframe index is adjusted to stay within the total number of available keyframes, avoiding invalid keyframe access.
 eg:

@@ -607,6 +607,16 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetFontFile(opt.ui.font_file);
   renderer->SetFontScale(opt.ui.scale);
   renderer->SetFontColor(opt.ui.font_color);
+  renderer->SetAnimationProgressColor(opt.ui.animation_progress_color);
+  std::string animationProgressMode = opt.ui.animation_progress;
+  if (animationProgressMode != "none" && animationProgressMode != "default" &&
+    animationProgressMode != "advanced")
+  {
+    log::warn(animationProgressMode,
+      R"( is an invalid animation progress mode. Valid modes are: "none", "default", "advanced". Falling back to "none".)");
+    animationProgressMode = "none";
+  }
+  renderer->SetAnimationProgressMode(animationProgressMode);
   renderer->SetDPIAware(opt.ui.dpi_aware);
 
   renderer->SetGridUnitSquare(opt.render.grid.unit);
