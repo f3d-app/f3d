@@ -40,6 +40,12 @@ list(APPEND pyf3dTestsNoRender_list
      test_utils.py
     )
 
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  list(APPEND pyf3dTests_list
+     test_image_stream.py
+    )
+endif()
+
 # Add all the ADD_TEST for each test
 foreach(test ${pyf3dTests_list})
   get_filename_component (TName ${test} NAME_WE)
