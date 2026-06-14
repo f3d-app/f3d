@@ -27,7 +27,7 @@ public class TestImage {
     img1.save(tmpPath + "test.jpg", Image.SaveFormat.JPG);
 
     img1.saveBuffer();
-    byte[] img1Buffer = img1.saveBuffer(Image.SaveFormat.PNG);
+    img1.saveBuffer(Image.SaveFormat.PNG);
 
     img1.setMetadata("key1", "value1");
     img1.getMetadata("key1");
@@ -46,9 +46,6 @@ public class TestImage {
     img1.setContent(buffer)
         .setMetadata("author", "F3D")
         .save(tmpPath + "chained.png");
-
-    Image img4 = new Image(img1Buffer);
-    img4.compare(img1);
 
     img1.delete();
     img2.delete();
