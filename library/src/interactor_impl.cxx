@@ -1545,7 +1545,7 @@ bool interactor_impl::triggerCommand(std::string_view command, bool keepComments
   catch (const f3d::options::incompatible_exception&)
   {
     log::error("Command: provided args in command: \"", command,
-      "\" are not compatible with action:\"", action, "\", ignoring");
+      "\" are not compatible with action: \"", action, "\", ignoring");
   }
   catch (const f3d::options::inexistent_exception&)
   {
