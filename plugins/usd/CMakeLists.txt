@@ -51,7 +51,7 @@ f3d_plugin_build(
   NAME usd
   VERSION 1.0
   DESCRIPTION "USD support"
-  VTK_MODULES IOImage
+  VTK_MODULES IOImage RenderingOpenGL2
   ADDITIONAL_RPATHS ${_additional_rpath}
   MIMETYPE_XML_FILES "${CMAKE_CURRENT_SOURCE_DIR}/f3d-usd-formats.xml"
   CONFIGURATION_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/configs/config.d" "${CMAKE_CURRENT_SOURCE_DIR}/configs/thumbnail.d"
