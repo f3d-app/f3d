@@ -503,13 +503,11 @@ inline std::string interaction_bind_t::format() const
   std::string ctrlShiftMod = "Ctrl+Shift+";
 
 #ifdef __APPLE__
-  ctrlMod = "Cmd+";
-  ctrlShiftMod = "Cmd+Shift+";
   const std::optional<std::string> forceCtrl = f3d::utils::getEnv("F3D_TEST_APPLE_FORCE_CTRL");
-  if (forceCtrl.has_value() && !forceCtrl.value().empty() && forceCtrl == "true")
+  if (!forceCtrl.has_value() || forceCtrl.value().empty() || forceCtrl != "true")
   {
-    ctrlMod = "Ctrl+";
-    ctrlShiftMod = "Ctrl+Shift+";
+    ctrlMod = "Cmd+";
+    ctrlShiftMod = "Cmd+Shift+";
   }
 #endif
 

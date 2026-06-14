@@ -67,7 +67,7 @@ It's recommended to use these options: `--point-sprites-size=1 --point-sprites=g
 
 > I can't use hotkeys/bindings with F row keys
 
-Because some keyboards have layered multimedia keys, F keys (F12 for example) don't use the normal function code by default. To use the F code, you must press <kbd>Fn</kbd> in combination with the F key. For example, to take a screenshot the hotkey combination on MacOS would be <kbd>Cmd</kbd>+<kbd>Fn</kbd>+<kbd>F12</kbd>.
+Because some keyboards have layered multimedia keys, F keys (F12 for example) don't use the normal function code by default. To use the F code, you must press <kbd>Fn</kbd> in combination with the F key. For example, to take a minimal screenshot, the hotkey combination on MacOS would be <kbd>Cmd</kbd>+<kbd>Fn</kbd>+<kbd>F12</kbd>.
 
 ### Linux
 
