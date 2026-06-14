@@ -102,7 +102,7 @@ void increase(std::optional<int>& val, bool up)
   }
 }
 
-template<typename T, std::size_t N> void cycle(T& val, const f3d::options::domain_enum_t<T, N>& domain)
+template<typename T> void cycle(T& val, const f3d::options::domain_enum_t<T>& domain)
 {
   auto it = std::ranges::find(domain.enumeration, val);
   if (it != domain.enumeration.end())

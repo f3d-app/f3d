@@ -240,10 +240,10 @@ public:
     T increment;
   };
 
-  template<typename T, std::size_t N>
+  template<typename T>
   struct domain_enum_t
   {
-    std::array<T,N> enumeration;
+    std::vector<T> enumeration;
   };
 
   struct domains {
@@ -262,7 +262,7 @@ public:
       } light;
       struct effect {
         struct blending {
-          domain_enum_t<std::string, 4> mode = {"ddp", "sort", "sort_cpu", "stochastic"};
+          domain_enum_t<std::string> mode = {{"ddp", "sort", "sort_cpu", "stochastic"}};
         } blending;
       } effect;
     } render;
