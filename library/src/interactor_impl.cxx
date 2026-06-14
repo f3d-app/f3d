@@ -921,7 +921,8 @@ interactor& interactor_impl::initCommands()
       check_args(args, 1, "increase");
       this->Internals->Options.increase(args[0]);
     },
-    command_documentation_t{ "increase option.name", "increase a libf3d option according to its range domain" },
+    command_documentation_t{
+      "increase option.name", "increase a libf3d option according to its range domain" },
     complOptionNames);
 
   this->addCommand(
@@ -931,7 +932,8 @@ interactor& interactor_impl::initCommands()
       check_args(args, 1, "decrease");
       this->Internals->Options.decrease(args[0]);
     },
-    command_documentation_t{ "decrease option.name", "decrease a libf3d option according to its range domain" },
+    command_documentation_t{
+      "decrease option.name", "decrease a libf3d option according to its range domain" },
     complOptionNames);
 
   this->addCommand(
@@ -941,7 +943,8 @@ interactor& interactor_impl::initCommands()
       check_args(args, 1, "cycle");
       this->Internals->Options.cycle(args[0]);
     },
-    command_documentation_t{ "cycle option.name", "cycle a libf3d option according to its enumeration domain" },
+    command_documentation_t{
+      "cycle option.name", "cycle a libf3d option according to its enumeration domain" },
     complOptionNames);
 
   this->addCommand(

@@ -74,7 +74,7 @@ public:
   inline ratio_t& operator+=(const double& incr)
   {
     this->Value += incr;
-    return* this;
+    return *this;
   }
 
 private:

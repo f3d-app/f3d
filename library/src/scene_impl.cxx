@@ -163,7 +163,8 @@ public:
     }
 
     // TODO
-    //this->Options.domains.scene.camera.index.range[1] = this->MetaImporter->GetNumberOfCameras() - 1;
+    // this->Options.domains.scene.camera.index.range[1] = this->MetaImporter->GetNumberOfCameras()
+    // - 1;
 
     scene_impl::internals::DisplayAllInfo(this->MetaImporter, this->Window);
   }

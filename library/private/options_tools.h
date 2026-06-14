@@ -890,15 +890,16 @@ std::string format(const transform2d_t& var)
  * Templated generic increase method for provided val and domain.
  * Increase up to max or decrease down to min.
  */
-template<typename T> void increase(T& val, const f3d::options::domain_range_t<T>& domain, bool up)
+template<typename T>
+void increase(T& val, const f3d::options::domain_range_t<T>& domain, bool up)
 {
   char dir = up ? +1 : -1;
   T newVal = val;
 
   newVal += dir * domain.increment;
 
-  // TODO this can be incorrect in case of double computation, how to adress ?
-  if ((up && newVal <= domain.range[1]) || (!up && newVal >= domain.range[0]))  
+  // TODO this can be incorrect in case of double computation, how to address ?
+  if ((up && newVal <= domain.range[1]) || (!up && newVal >= domain.range[0]))
   {
     val = newVal;
   }
@@ -909,9 +910,10 @@ template<typename T> void increase(T& val, const f3d::options::domain_range_t<T>
  * Templated std::vector specific increase method for provided vec and domain.
  * Increase/Decrease each val in the vec.
  */
-template<typename T> void increase(std::vector<T>& vec, const f3d::options::domain_range_t<T>& domain, bool up)
+template<typename T>
+void increase(std::vector<T>& vec, const f3d::options::domain_range_t<T>& domain, bool up)
 {
-  std::ranges::for_each(vec, [domain, up](T& val){increase(val, domain, up);});
+  std::ranges::for_each(vec, [domain, up](T& val) { increase(val, domain, up); });
 }
 
 //----------------------------------------------------------------------------
@@ -920,7 +922,8 @@ template<typename T> void increase(std::vector<T>& vec, const f3d::options::doma
  * If set, just call increase
  * If not set, set val to min/max depending on the direction
  */
-template<typename T>void increase(std::optional<T>& val, const f3d::options::domain_range_t<T>& domain, bool up)
+template<typename T>
+void increase(std::optional<T>& val, const f3d::options::domain_range_t<T>& domain, bool up)
 {
   if (!val.has_value())
   {
@@ -939,12 +942,13 @@ template<typename T>void increase(std::optional<T>& val, const f3d::options::dom
 /**
  * TODO
  */
-void increase(std::optional<f3d::color_t>& col, const f3d::options::domain_range_t<double>& domain, bool up)
+void increase(
+  std::optional<f3d::color_t>& col, const f3d::options::domain_range_t<double>& domain, bool up)
 {
   if (col.has_value())
   {
-//    std::array<double, 3>& arr(vec.value());
-//    std::ranges::for_each(arr, [domain, up](double& val){increase(val, domain, up);});
+    //    std::array<double, 3>& arr(vec.value());
+    //    std::ranges::for_each(arr, [domain, up](double& val){increase(val, domain, up);});
     for (std::size_t i = 0; i < 3; i++)
     {
       increase(col.value()[i], domain, up);
@@ -970,13 +974,14 @@ void increase(f3d::color_t& col, const f3d::options::domain_range_t<double>& dom
  * Cycle on the enum.
  * If invalid and domain is not empty, set to the first enum value.
  */
-template<typename T> void cycle(T& val, const f3d::options::domain_enum_t<T>& domain)
+template<typename T>
+void cycle(T& val, const f3d::options::domain_enum_t<T>& domain)
 {
   auto it = std::ranges::find(domain.enumeration, val);
   if (it != domain.enumeration.end())
   {
     it++;
-    if(it == domain.enumeration.end())
+    if (it == domain.enumeration.end())
     {
       it = domain.enumeration.begin();
     }
@@ -988,7 +993,8 @@ template<typename T> void cycle(T& val, const f3d::options::domain_enum_t<T>& do
   }
 }
 
-template<typename T> void cycle(T& val, const f3d::options::domain_enum_t<T>& domain, bool& boolean)
+template<typename T>
+void cycle(T& val, const f3d::options::domain_enum_t<T>& domain, bool& boolean)
 {
   if (!domain.enumeration.empty())
   {
@@ -1014,7 +1020,8 @@ template<typename T> void cycle(T& val, const f3d::options::domain_enum_t<T>& do
  * If set to something else, cycle on the enum.
  * If not set, set to first enum
  */
-template<typename T> void cycle(std::optional<T>& val, const f3d::options::domain_enum_t<T>& domain)
+template<typename T>
+void cycle(std::optional<T>& val, const f3d::options::domain_enum_t<T>& domain)
 {
   if (!val.has_value())
   {
