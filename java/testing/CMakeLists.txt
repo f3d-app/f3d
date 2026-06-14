@@ -17,6 +17,12 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
     )
 endif()
 
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.2)
+  list(APPEND javaf3dTests_list
+    ${CMAKE_CURRENT_SOURCE_DIR}/TestImageStream.java
+    )
+endif()
+
 set(java_test_args "-ea") # enable assertions
 if (WIN32)
   list(APPEND java_test_args "--enable-native-access=ALL-UNNAMED")
