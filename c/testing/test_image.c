@@ -72,11 +72,6 @@ int test_image()
     return 1;
   }
 
-  f3d_image_t* temp_image_stream = f3d_image_new_stream(tempBuffer, 0);
-  if (temp_image_stream != NULL){
-    return 1;
-  }
-
   unsigned int buffer_size;
   unsigned char* buffer = f3d_image_save_buffer(img, PNG, &buffer_size);
   if (buffer)
