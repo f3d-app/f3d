@@ -3,6 +3,7 @@
 
 #include "exception.h"
 #include "export.h"
+#include "image.h"
 
 /// @cond
 #include <array>
@@ -155,6 +156,14 @@ public:
     // scalars
     std::vector<data_array_t> pointScalars;
     std::vector<data_array_t> cellScalars;
+
+    // Optional in-memory base-color (albedo) texture, sampled through the mesh
+    // `textureCoordinates`. Avoids writing a temporary image file to disk. An empty image
+    // (the default) means no texture; otherwise it must be a BYTE image with 3 (RGB) or
+    // 4 (RGBA) channels. When `baseColorTextureEmissive` is true the same image is
+    // additionally installed as the emissive texture (for unlit/flat display).
+    image baseColorTexture;
+    bool baseColorTextureEmissive = false;
   };
 
   /**
