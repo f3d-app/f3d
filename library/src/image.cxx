@@ -237,29 +237,29 @@ image::image([[maybe_unused]] std::byte* buffer, [[maybe_unused]] std::size_t si
 
   vtkCollectionSimpleIterator iterator;
   vtkImageReader2* currentReader;
-  vtkImageReader2* bestReader = nullptr;
+  vtkImageReader2* reader = nullptr;
 
   for (availableReaders->InitTraversal(iterator);
        (currentReader = availableReaders->GetNextImageReader2(iterator));)
   {
     if (currentReader->CanReadFile(stream) > 0)
     {
-      bestReader = currentReader;
+      reader = currentReader;
       break;
     }
   }
 
-  if (bestReader == nullptr)
+  if (reader == nullptr)
   {
     delete this->Internals;
     throw read_exception("Cannot read image from buffer: No image reader supports this stream.");
   }
 
-  bestReader->SetStream(stream);
-  bestReader->Update();
-  this->Internals->Image = bestReader->GetOutput();
+  reader->SetStream(stream);
+  reader->Update();
+  this->Internals->Image = reader->GetOutput();
 
-  vtkPNGReader* pngReader = vtkPNGReader::SafeDownCast(bestReader);
+  vtkPNGReader* pngReader = vtkPNGReader::SafeDownCast(reader);
   if (pngReader != nullptr)
   {
     this->Internals->ReadPngMetadata(pngReader);
