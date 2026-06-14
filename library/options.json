@@ -65,7 +65,6 @@
       "domain": {
         "enum": ["visible", "hidden"]
       }
-
     },
     "grid": {
       "enable": {
