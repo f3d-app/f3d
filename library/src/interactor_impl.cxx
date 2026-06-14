@@ -1065,26 +1065,6 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{ "azimuth_camera value", "tilt the camera right or left" });
 
   this->addCommand(
-    "increase_light_intensity",
-    [&](const std::vector<std::string>&) { this->Internals->IncreaseLightIntensity(false); },
-    command_documentation_t{ "increase_light_intensity", "increase light intensity" });
-
-  this->addCommand(
-    "decrease_light_intensity",
-    [&](const std::vector<std::string>&) { this->Internals->IncreaseLightIntensity(true); },
-    command_documentation_t{ "decrease_light_intensity", "decrease light intensity" });
-
-  this->addCommand(
-    "increase_opacity",
-    [&](const std::vector<std::string>&) { this->Internals->IncreaseOpacity(false); },
-    command_documentation_t{ "increase_opacity", "increase opacity" });
-
-  this->addCommand(
-    "decrease_opacity",
-    [&](const std::vector<std::string>&) { this->Internals->IncreaseOpacity(true); },
-    command_documentation_t{ "decrease_opacity", "decrease opacity" });
-
-  this->addCommand(
     "print_scene_info", [&](const std::vector<std::string>&)
     { this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO); },
     command_documentation_t{ "print_scene_info", "print information about the scene" });
