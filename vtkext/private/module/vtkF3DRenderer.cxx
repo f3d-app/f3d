@@ -1229,7 +1229,6 @@ void vtkF3DRenderer::ConfigureHDRIReader()
 {
   if (!this->HasValidHDRIReader && (this->HDRISkyboxVisible || this->GetUseImageBasedLighting()))
   {
-    this->UseDefaultHDRI = false;
     this->HDRIReader = nullptr;
     if (!this->HDRIFile.empty())
     {
@@ -1259,17 +1258,24 @@ void vtkF3DRenderer::ConfigureHDRIReader()
 
     if (!this->HDRIReader)
     {
+      // No HDRI set, use default
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
       this->HDRIReader = vtkSmartPointer<vtkHDRReader>::New();
       vtkNew<vtkMemoryResourceStream> stream;
       stream->SetBuffer(F3DDefaultHDRI, sizeof(F3DDefaultHDRI));
       this->HDRIReader->SetStream(stream);
+      this->HDRIHash = "default_hdr";
 #else
       this->HDRIReader = vtkSmartPointer<vtkPNGReader>::New();
       this->HDRIReader->SetMemoryBuffer(F3DDefaultHDRI);
       this->HDRIReader->SetMemoryBufferLength(sizeof(F3DDefaultHDRI));
+      this->HDRIHash = "default_png";
 #endif
-      this->UseDefaultHDRI = true;
+
+      // Handled HDRI hash here, no hash computation needed
+      this->HasValidHDRIHash = true;
+      this->CreateCacheDirectory();
+      this->HDRIHashConfigured = true;
     }
     this->HasValidHDRIReader = true;
   }
@@ -1281,17 +1287,11 @@ void vtkF3DRenderer::ConfigureHDRIHash()
 {
   if (!this->HasValidHDRIHash && this->GetUseImageBasedLighting() && this->HasValidHDRIReader)
   {
-    if (this->UseDefaultHDRI)
-    {
-      this->HDRIHash = "default";
-    }
-    else
-    {
-      // Compute HDRI MD5, here we know the HDRIFile is not empty
-      this->HDRIHash = ::ComputeFileHash(this->HDRIFile);
-    }
+    // Compute HDRI MD5, here we know the HDRIFile is not empty
+    this->HDRIHash = ::ComputeFileHash(this->HDRIFile);
     this->HasValidHDRIHash = true;
     this->CreateCacheDirectory();
+    this->HDRIHashConfigured = true;
   }
 }
 
