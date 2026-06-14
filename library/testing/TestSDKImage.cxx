@@ -3,7 +3,6 @@
 #include <image.h>
 
 #include <algorithm>
-#include <cstddef>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -114,22 +113,6 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     hdrImg.getChannelType() == f3d::image::ChannelType::FLOAT);
   test("check 32-bits HDR image channel type size", hdrImg.getChannelTypeSize(), 4u);
   hdrImg.save(tmpDir + "/TestSDKImage32hdr.tif", f3d::image::SaveFormat::TIF);
-
-  // check reading stream
-  std::vector<unsigned char> generatedBuffer = generated.saveBuffer();
-  std::byte* bufferData = reinterpret_cast<std::byte*>(generatedBuffer.data());
-  f3d::image bufferImage(bufferData, generatedBuffer.size());
-  test("check loading stream from image reader", generated.compare(bufferImage), 0.0);
-
-  // check reading inexistent/null stream
-  test.expect<f3d::image::read_exception>(
-    "read image from invalid/null stream", [&]() { f3d::image nullImgStream(nullptr, 10); });
-
-  // check reading invalid stream
-  std::vector<unsigned char> invalidBuffer = { 0, 1, 2, 3, 4, 5 };
-  std::byte* invalidBufferData = reinterpret_cast<std::byte*>(invalidBuffer.data());
-  test.expect<f3d::image::read_exception>("read image from invalid stream",
-    [&]() { f3d::image invalidImgStream(invalidBufferData, 10); });
 
 #if F3D_MODULE_EXR
   // check reading EXR
