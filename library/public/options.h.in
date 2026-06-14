@@ -246,42 +246,21 @@ public:
     std::vector<T> enumeration;
   };
 
-  /*
-  struct domains {
-    struct scene {
-      struct animation {
-        domain_range_t<f3d::ratio_t> speed_factor { {f3d::ratio_t(0.), f3d::ratio_t(2.)}, f3d::ratio_t(0.1)};
-        domain_range_t<int> indices { {0, 10}, 1 };
-      } animation;
-      struct camera {
-        domain_range_t<int> index { {0,0},1 };
-      } camera;
-    } scene;
-    struct render {
-      struct light {
-        domain_range_t<double> intensity { {0, 10}, 0.1};
-      } light;
-      struct effect {
-        struct blending {
-          domain_enum_t<std::string> mode = {{"ddp", "sort", "sort_cpu", "stochastic"}};
-        } blending;
-      } effect;
-    } render;
-  } domains;*/
-
   /**
    * The complete generated options struct
    */
   // clang-format off
   ${_options_struct}
+  // clang-format on
 
-
+  /**
+   * The complete generated options domains struct
+   */
+  // clang-format off
   struct domains {
   ${_options_domains_struct}
   } domains;
   // clang-format on
-
-
 };
 
 }
