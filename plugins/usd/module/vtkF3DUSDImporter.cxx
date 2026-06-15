@@ -37,7 +37,6 @@
 #include <vtkTransformFilter.h>
 #include <vtkTriangleFilter.h>
 #include <vtkUniforms.h>
-#include <vtkUnsignedCharArray.h>
 #include <vtkUnsignedShortArray.h>
 #include <vtkVersion.h>
 
