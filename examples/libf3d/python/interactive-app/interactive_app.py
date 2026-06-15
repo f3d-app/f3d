@@ -141,10 +141,10 @@ def add_custom_commands(eng: f3d.Engine):
 
     def toggle_fxaa(_):
         if opt["render.effect.antialiasing.mode"] == "none":
-          # keep mode at fxaa in this example
-          opt["render.effect.antialiasing.mode"] = "fxaa"
+            # keep mode at fxaa in this example
+            opt["render.effect.antialiasing.mode"] = "fxaa"
         elif opt["render.effect.antialiasing.mode"] == "fxaa":
-          opt["render.effect.antialiasing.mode"] = "none"
+            opt["render.effect.antialiasing.mode"] = "none"
 
     inter.add_command(
         "toggle_fxaa",
@@ -164,7 +164,7 @@ def add_custom_bindings(eng: f3d.Engine):
     def docTgl(doc: str, key: str):
         return doc, "ON" if opt[key] else "OFF"
 
-    def docStr(doc: str, key: str=""):
+    def docStr(doc: str, key: str = ""):
         return doc, opt[key]
 
     def docDblOpt(doc: str, key: str):

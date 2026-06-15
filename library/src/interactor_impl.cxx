@@ -993,15 +993,15 @@ interactor& interactor_impl::initCommands()
       }
       else if (mode == "fxaa")
       {
-      mode = "ssaa";
+        mode = "ssaa";
       }
       else if (mode == "ssaa")
       {
-      mode = "taa";
+        mode = "taa";
       }
       else // if (mode == "taa")
       {
-      mode = "none";
+        mode = "none";
       }
       this->Internals->Window.render();
     },
@@ -1542,7 +1542,6 @@ interactor& interactor_impl::initBindings()
       return name.substr(0, maxChar - 3) + "...";
     }
   };
-
 
   // "Cycle animation" , "animationName"
   auto docAnim = [&]()
