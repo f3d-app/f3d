@@ -32,7 +32,6 @@ def main(argv: list[str] | None = None):
             "ui.animation_progress": True,
             "ui.filename": True,
             # FXAA + tone mapping
-            "render.effect.antialiasing.enable": True,
             "render.effect.antialiasing.mode": "fxaa",
             "render.effect.tone_mapping": True,
         }
@@ -141,11 +140,11 @@ def add_custom_commands(eng: f3d.Engine):
     inter.remove_command("toggle_fxaa")
 
     def toggle_fxaa(_):
-        opt["render.effect.antialiasing.enable"] = not opt[
-            "render.effect.antialiasing.enable"
-        ]
-        # keep mode at fxaa in this example
-        opt["render.effect.antialiasing.mode"] = "fxaa"
+        if opt["render.effect.antialiasing.mode"] == "none":
+          # keep mode at fxaa in this example
+          opt["render.effect.antialiasing.mode"] = "fxaa"
+        elif opt["render.effect.antialiasing.mode"] == "fxaa":
+          opt["render.effect.antialiasing.mode"] = "none"
 
     inter.add_command(
         "toggle_fxaa",
@@ -165,8 +164,8 @@ def add_custom_bindings(eng: f3d.Engine):
     def docTgl(doc: str, key: str):
         return doc, "ON" if opt[key] else "OFF"
 
-    def docStr(doc: str):
-        return doc, ""
+    def docStr(doc: str, key: str=""):
+        return doc, opt[key]
 
     def docDblOpt(doc: str, key: str):
         val = opt[key]
@@ -237,7 +236,7 @@ def add_custom_bindings(eng: f3d.Engine):
         f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "F"),
         "toggle_fxaa",
         "Example",
-        lambda: docTgl("Toggle FXAA", "render.effect.antialiasing.enable"),
+        lambda: docStr("Toggle FXAA", "render.effect.antialiasing.mode"),
         f3d.Interactor.BindingType.TOGGLE,
     )
 

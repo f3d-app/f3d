@@ -192,7 +192,6 @@ def main(argv=None):
             "render.grid.enable": True,
             "render.grid.absolute": True,
             "render.show_edges": True,
-            "render.effect.antialiasing.enable": True,
             "render.effect.antialiasing.mode": "fxaa",
             "render.effect.tone_mapping": True,
             "ui.axis": True,

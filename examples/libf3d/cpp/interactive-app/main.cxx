@@ -75,9 +75,15 @@ void AddCustomCommands(f3d::engine& eng)
     [&eng](const std::vector<std::string>&)
     {
       auto& o = eng.getOptions();
-      o.render.effect.antialiasing.enable = !o.render.effect.antialiasing.enable;
-      // keep mode at fxaa in this example
-      o.render.effect.antialiasing.mode = "fxaa";
+      if (o.render.effect.antialiasing == "none")
+      {
+        // keep mode at fxaa in this example
+        o.render.effect.antialiasing.mode = "fxaa";
+      }
+      else // if (o.render.effect.antialiasing == "fxaa")
+      {
+        o.render.effect.antialiasing.mode = "none";
+      }
     },
     f3d::interactor::command_documentation_t{ "toggle_fxaa", "Toggle FXAA anti-aliasing" });
 
@@ -103,7 +109,8 @@ void AddCustomBindings(f3d::engine& eng)
 
   auto docTgl = [](const std::string& doc, const bool& val)
   { return std::pair(doc, (val ? "ON" : "OFF")); };
-  auto docStr = [](const std::string& doc) { return std::pair(doc, ""); };
+  auto docStr = [](const std::string& doc, const std::string& val = "")
+  { return std::pair(doc, val); };
   auto docDblOpt = [](const std::string& doc, const std::optional<double>& val)
   {
     std::stringstream valStream;
@@ -150,7 +157,7 @@ void AddCustomBindings(f3d::engine& eng)
   // F: toggle FXAA
   inter.removeBinding({ f3d::interaction_bind_t::ModifierKeys::NONE, "F" });
   inter.addBinding(f3d::interaction_bind_t::parse("F"), "toggle_fxaa", "Example",
-    std::bind(docTgl, "Toggle FXAA", std::cref(opt.render.effect.antialiasing.enable)),
+    std::bind(docStr, "Toggle FXAA", std::cref(opt.render.effect.antialiasing.mode)),
     f3d::interactor::BindingType::TOGGLE);
 
   // T: toggle tone mapping
@@ -189,7 +196,6 @@ int main(int argc, char** argv)
   opt.ui.filename = true;
 
   // FXAA + tone mapping
-  opt.render.effect.antialiasing.enable = true;
   opt.render.effect.antialiasing.mode = "fxaa";
   opt.render.effect.tone_mapping = true;
 

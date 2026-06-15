@@ -15,8 +15,8 @@ def main():
         "scene.up_direction": "+Y",
         "render.effect.tone_mapping": True,
         "render.effect.ambient_occlusion": True,
-        "render.effect.blending.enable": True,
-        "render.effect.antialiasing.enable": True,
+        "render.effect.blending.mode": "ddp",
+        "render.effect.antialiasing.mode": "fxaa",
     }
     anim_fps = 30
     anim_duration = 4
