@@ -2,7 +2,7 @@
 
 f3d_test(NAME TestInteractionPostFX DATA cow.vtp INTERACTION LONG_TIMEOUT) #PQAAAAT
 f3d_test(NAME TestInteractionTimer DATA cow.vtp NO_BASELINE INTERACTION UI LONG_TIMEOUT) #Z
-f3d_test(NAME TestInteractionTrackball DATA cow.vtp ARGS --interaction-trackball INTERACTION LONG_TIMEOUT) #Mouse movements;
+f3d_test(NAME TestInteractionTrackball DATA cow.vtp ARGS --interaction-style=trackball INTERACTION LONG_TIMEOUT) #Mouse movements;
 f3d_test(NAME TestInteractionTrackballBind DATA cow.vtp INTERACTION LONG_TIMEOUT) #K#Mouse movements;
 f3d_test(NAME TestInteractionCycleCell DATA waveletArrays.vti INTERACTION LONG_TIMEOUT) #VCCC
 f3d_test(NAME TestInteractionCycleComp DATA dragon.vtu INTERACTION) #SYYYY

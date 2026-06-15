@@ -259,12 +259,6 @@
           "implicitValue": "2d"
         },
         {
-          "longName": "interaction-trackball",
-          "helpText": "Enable trackball interaction (deprecated, use --interaction-style=trackball)",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
-        },
-        {
           "longName": "invert-zoom",
           "helpText": "Invert zoom direction with right mouse click",
           "valueHelper": "<bool>",
@@ -350,11 +344,6 @@
           "helpText": "Select point sprites type (\"none\", \"sphere\", \"gaussian\", \"circle\", \"stddev\", \"bound\")",
           "valueHelper": "<string>",
           "implicitValue": "sphere"
-        },
-        {
-          "longName": "point-sprites-type",
-          "helpText": "Point sprites type (deprecated)",
-          "valueHelper": "<sphere|gaussian>"
         },
         {
           "longName": "point-sprites-size",

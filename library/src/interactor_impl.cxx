@@ -1081,15 +1081,14 @@ interactor& interactor_impl::initCommands()
 
       constexpr auto validTypes =
         std::to_array({ "none", "sphere", "gaussian", "circle", "stddev", "bound", "cross" });
-        auto index = std::distance(std::begin(validTypes), std::ranges::find(validTypes, type));
-        if (static_cast<size_t>(index) == validTypes.size() - 1) // last type
-        {
-          type = validTypes[0];
-        }
-        else
-        {
-          type = validTypes[index + 1];
-        }
+      auto index = std::distance(std::begin(validTypes), std::ranges::find(validTypes, type));
+      if (static_cast<size_t>(index) == validTypes.size() - 1) // last type
+      {
+        type = validTypes[0];
+      }
+      else
+      {
+        type = validTypes[index + 1];
       }
       this->Internals->Window.render();
     },

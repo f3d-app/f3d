@@ -237,12 +237,6 @@ std::pair<std::string, int> F3DOptionsTools::GetClosestOption(
     checkDistance(key, option, ret);
   }
 
-  // Check cli names in custom mapping options
-  for (const auto& [key, value] : F3DOptionsTools::CustomMappingOptions)
-  {
-    checkDistance(std::string(key), option, ret);
-  }
-
   // Check cli names for libf3d options
   for (const auto& [key, value] : F3DOptionsTools::LibOptionsNames)
   {
@@ -322,22 +316,14 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
           }
           else
           {
-            auto customIter = F3DOptionsTools::CustomMappingOptions.find(longName);
-            if (customIter != F3DOptionsTools::CustomMappingOptions.end())
+            // Recover default value from lib options
+            auto libIter = F3DOptionsTools::LibOptionsNames.find(cliOption.LongName);
+            if (libIter != F3DOptionsTools::LibOptionsNames.end())
             {
-              defaultValue = customIter->second;
-            }
-            else
-            {
-              // Recover default value from lib options
-              auto libIter = F3DOptionsTools::LibOptionsNames.find(cliOption.LongName);
-              if (libIter != F3DOptionsTools::LibOptionsNames.end())
-              {
-                f3d::options opt;
-                std::string name = std::string(libIter->second);
-                // let default value empty for unset options
-                defaultValue = opt.hasValue(name) ? opt.getAsString(name) : "";
-              }
+              f3d::options opt;
+              std::string name = std::string(libIter->second);
+              // let default value empty for unset options
+              defaultValue = opt.hasValue(name) ? opt.getAsString(name) : "";
             }
           }
 
@@ -509,23 +495,6 @@ std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3
   {
     libf3dOptions.emplace_back(std::make_pair(libf3dIter->second, value));
   }
-
-  // handle deprecated interaction-trackball option
-  else if (key == "interaction-trackball")
-  {
-    f3d::log::warn(
-      "--interaction-trackball is deprecated, please use --interaction-style=trackball instead");
-    bool trackball;
-    if (!F3DOptionsTools::Parse(value, trackball))
-    {
-      f3d::log::error("Cannot parse --interaction-trackball value: " + value);
-    }
-    else if (trackball)
-    {
-      libf3dOptions.emplace_back(std::make_pair("interactor.style", "trackball"));
-    }
-  }
-
   else
   {
     // If nothing to convert, just return the input

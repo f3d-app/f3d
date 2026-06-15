@@ -133,6 +133,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "notifications", "ui.notifications.enable" },
   { "opacity", "model.color.opacity" },
   { "point-size", "render.point_size" },
+  { "point-sprites", "model.point_sprites.type" },
   { "point-sprites-absolute-size", "model.point_sprites.absolute_size" },
   { "point-sprites-size", "model.point_sprites.size" },
   { "raytracing", "render.raytracing.enable" },
@@ -156,15 +157,6 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "x-color", "ui.x_color" },
   { "y-color", "ui.y_color" },
   { "z-color", "ui.z_color" },
-};
-
-/**
- * List of CLI option names that requires custom mapping
- */
-static inline const std::map<std::string_view, std::string_view> CustomMappingOptions = {
-  { "interaction-trackball", "false" },
-  { "point-sprites", "none" },
-  { "point-sprites-type", "" },
 };
 
 /**
