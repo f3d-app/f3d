@@ -650,8 +650,7 @@ public:
 
     // Determine if we need a full render or just a UI render
     // At the moment, only TAA requires a full render each frame
-    bool forceRender = (this->Options.render.effect.antialiasing.enable &&
-      this->Options.render.effect.antialiasing.mode == "taa");
+    bool forceRender = this->Options.render.effect.antialiasing.mode == "taa";
 
     if (this->RenderRequested || forceRender)
     {
@@ -987,27 +986,22 @@ interactor& interactor_impl::initCommands()
     "cycle_anti_aliasing",
     [&](const std::vector<std::string>&)
     {
-      bool& enabled = this->Internals->Options.render.effect.antialiasing.enable;
       std::string& mode = this->Internals->Options.render.effect.antialiasing.mode;
-      if (!enabled)
+      if (mode == "none")
       {
-        enabled = true;
         mode = "fxaa";
       }
-      else
+      else if (mode == "fxaa")
       {
-        if (mode == "fxaa")
-        {
-          mode = "ssaa";
-        }
-        else if (mode == "ssaa")
-        {
-          mode = "taa";
-        }
-        else
-        {
-          enabled = false;
-        }
+      mode = "ssaa";
+      }
+      else if (mode == "ssaa")
+      {
+      mode = "taa";
+      }
+      else // if (mode == "taa")
+      {
+      mode = "none";
       }
       this->Internals->Window.render();
     },
@@ -1563,21 +1557,6 @@ interactor& interactor_impl::initBindings()
     }
   };
 
-  // "Cycle anti-aliasing" , "none/fxaa/ssaa"
-  auto docAA = [&]()
-  {
-    std::string desc;
-    if (!this->Internals->Options.render.effect.antialiasing.enable)
-    {
-      desc = "none";
-    }
-    else
-    {
-      desc = this->Internals->Options.render.effect.antialiasing.mode;
-    }
-    return std::pair("Anti-aliasing", std::move(desc));
-  };
-
   // "Cycle point sprites" , "none/sphere/gaussian"
   auto docPS = [&]()
   {
@@ -1693,7 +1672,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "B"}, "toggle ui.scalar_bar", "Scene", std::bind(docTgl, "Scalar bar", std::cref(opts.ui.scalar_bar)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "P"}, "cycle_blending", "Scene", docBlend, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "Q"}, "toggle render.effect.ambient_occlusion","Scene", std::bind(docTgl, "Ambient occlusion", std::cref(opts.render.effect.ambient_occlusion)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::NONE, "A"}, "cycle_anti_aliasing","Scene", docAA, f3d::interactor::BindingType::CYCLIC);
+  this->addBinding({mod_t::NONE, "A"}, "cycle_anti_aliasing","Scene", std::bind(docStr, "Interaction style", std::cref(opts.render.effect.antialiasing.mode)), f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "T"}, "toggle render.effect.tone_mapping","Scene", std::bind(docTgl, "Toggle tone mapping", std::cref(opts.render.effect.tone_mapping)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "E"}, "toggle render.show_edges","Scene", std::bind(docTglOpt, "Toggle edges display", std::cref(opts.render.show_edges)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "X"}, "toggle ui.axis","Scene", std::bind(docTgl, "Toggle axes display", std::cref(opts.ui.axis)), f3d::interactor::BindingType::TOGGLE);

@@ -290,9 +290,8 @@ f3d_test(NAME TestOutputStream DATA suzanne.ply ARGS --verbose=quiet --output=- 
 f3d_test(NAME TestOutputStreamInfo DATA suzanne.ply ARGS --verbose=info --output=- REGEXP "redirected to stderr" NO_BASELINE NO_OUTPUT)
 
 ## AntiAliasing
+f3d_test(NAME TestAntiAliasingImplicit DATA suzanne.ply ARGS -a --verbose REGEXP "'anti-aliasing' = 'fxaa'" NO_BASELINE)
 f3d_test(NAME TestInvalidAntiAliasingMode DATA suzanne.ply ARGS --anti-aliasing=foo REGEXP "foo is an invalid antialiasing mode" NO_BASELINE)
-f3d_test(NAME TestAntiAliasingModeDeprecated DATA suzanne.ply ARGS -a --anti-aliasing-mode=ssaa REGEXP "--anti-aliasing-mode is deprecated" NO_BASELINE)
-f3d_test(NAME TestAntiAliasingDeprecated DATA suzanne.ply ARGS --anti-aliasing=true REGEXP "please specify the type of anti-aliasing" NO_BASELINE)
 
 ## Blending
 f3d_test(NAME TestInvalidBlendingMode DATA suzanne.ply ARGS --blending=foo REGEXP "foo is an invalid blending mode" NO_BASELINE)

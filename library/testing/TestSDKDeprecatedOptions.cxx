@@ -27,7 +27,6 @@ int TestSDKDeprecatedOptions([[maybe_unused]] int argc, [[maybe_unused]] char* a
   f3d::options& opt = eng.getOptions();
   win.setSize(300, 300);
 
-  opt.render.effect.anti_aliasing = true;
   opt.render.effect.translucency_support = true;
 
   sce.add(std::string(argv[1]) + "/data/cow.vtp");

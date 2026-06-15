@@ -115,13 +115,9 @@
         "deprecated": "use render.effect.antialiasing.enable instead"
       },
       "antialiasing": {
-        "enable": {
-          "type": "bool",
-          "default_value": "false"
-        },
         "mode": {
           "type": "string",
-          "default_value": "fxaa"
+          "default_value": "none"
         }
       },
       "ambient_occlusion": {

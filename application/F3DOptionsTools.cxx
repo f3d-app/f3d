@@ -510,38 +510,6 @@ std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3
     libf3dOptions.emplace_back(std::make_pair(libf3dIter->second, value));
   }
 
-  // anti-aliasing is handled in two options in the lib
-  else if (key == "anti-aliasing")
-  {
-    if (value != "none")
-    {
-      // Handle deprecated boolean option
-      bool deprecatedBooleanOption;
-      if (F3DOptionsTools::Parse(value, deprecatedBooleanOption))
-      {
-        f3d::log::warn("--anti-aliasing is a now a string, please specify the type of "
-                       "anti-aliasing or use the implicit default");
-        libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.enable", value));
-      }
-      else
-      {
-        libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.enable", "true"));
-        libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.mode", value));
-      }
-    }
-    else
-    {
-      libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.enable", "false"));
-    }
-  }
-
-  // handle deprecated anti-aliasing option
-  else if (key == "anti-aliasing-mode")
-  {
-    f3d::log::warn("--anti-aliasing-mode is deprecated");
-    libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.mode", value));
-  }
-
   // blending is handled in two options in the lib
   else if (key == "blending")
   {

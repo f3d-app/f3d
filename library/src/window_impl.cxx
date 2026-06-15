@@ -520,19 +520,12 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetRaytracingSamples(opt.render.raytracing.samples);
   renderer->SetUseRaytracingDenoiser(opt.render.raytracing.denoise);
 
-  vtkF3DRenderer::AntiAliasingMode aaMode = vtkF3DRenderer::AntiAliasingMode::NONE;
   vtkF3DRenderer::BlendingMode blendMode = vtkF3DRenderer::BlendingMode::NONE;
 
   // F3D_DEPRECATED
   // Remove this in the next major release
   F3D_SILENT_WARNING_PUSH()
   F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
-  if (opt.render.effect.anti_aliasing)
-  {
-    log::warn("render.effect.anti_aliasing is deprecated, please use "
-              "render.effect.antialiasing.enable instead");
-    aaMode = vtkF3DRenderer::AntiAliasingMode::FXAA;
-  }
   if (opt.render.effect.translucency_support)
   {
     log::warn("render.effect.translucency_support is deprecated, please use "
@@ -541,25 +534,27 @@ void window_impl::UpdateDynamicOptions()
   }
   F3D_SILENT_WARNING_POP()
 
-  if (opt.render.effect.antialiasing.enable)
+  vtkF3DRenderer::AntiAliasingMode aaMode = vtkF3DRenderer::AntiAliasingMode::NONE;
+  if (opt.render.effect.antialiasing.mode == "fxaa")
   {
-    if (opt.render.effect.antialiasing.mode == "fxaa")
-    {
-      aaMode = vtkF3DRenderer::AntiAliasingMode::FXAA;
-    }
-    else if (opt.render.effect.antialiasing.mode == "ssaa")
-    {
-      aaMode = vtkF3DRenderer::AntiAliasingMode::SSAA;
-    }
-    else if (opt.render.effect.antialiasing.mode == "taa")
-    {
-      aaMode = vtkF3DRenderer::AntiAliasingMode::TAA;
-    }
-    else
-    {
-      log::warn(opt.render.effect.antialiasing.mode,
-        R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa", "taa")");
-    }
+    aaMode = vtkF3DRenderer::AntiAliasingMode::FXAA;
+  }
+  else if (opt.render.effect.antialiasing.mode == "ssaa")
+  {
+    aaMode = vtkF3DRenderer::AntiAliasingMode::SSAA;
+  }
+  else if (opt.render.effect.antialiasing.mode == "taa")
+  {
+    aaMode = vtkF3DRenderer::AntiAliasingMode::TAA;
+  }
+  else if (opt.render.effect.antialiasing.mode == "none")
+  {
+    aaMode = vtkF3DRenderer::AntiAliasingMode::NONE;
+  }
+  else
+  {
+    log::warn(opt.render.effect.antialiasing.mode,
+      R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa", "taa", "none")");
   }
 
   if (opt.render.effect.blending.enable)

@@ -745,12 +745,6 @@
           "implicitValue": "fxaa"
         },
         {
-          "longName": "anti-aliasing-mode",
-          "helpText": "Select anti-aliasing method (\"fxaa\", \"ssaa\" or \"taa\") (deprecated)",
-          "valueHelper": "<string>",
-          "implicitValue": "fxaa"
-        },
-        {
           "longName": "tone-mapping",
           "shortName": "t",
           "helpText": "Enable Tone Mapping, providing balanced coloring",
