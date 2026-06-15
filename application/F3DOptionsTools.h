@@ -85,6 +85,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "backface-type", "render.backface_type" },
   { "background-color", "render.background.color" },
   { "base-ior", "model.material.base_ior" },
+  { "blending", "render.effect.blending.mode" },
   { "blur-background", "render.background.blur.enable" },
   { "blur-coc", "render.background.blur.coc" },
   { "camera-index", "scene.camera.index" },
@@ -162,8 +163,6 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
  */
 static inline const std::map<std::string_view, std::string_view> CustomMappingOptions = {
   { "interaction-trackball", "false" },
-  { "translucency-support", "false" },
-  { "blending", "none" },
   { "point-sprites", "none" },
   { "point-sprites-type", "" },
 };

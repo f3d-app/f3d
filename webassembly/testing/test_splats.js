@@ -12,10 +12,8 @@ const settings = {
     options.setAsString("model.scivis.component", "-2");
 
     // splats
-    options.toggle("model.point_sprites.enable");
     options.toggle("model.point_sprites.absolute_size");
     options.setAsString("model.point_sprites.type", "gaussian");
-    options.toggle("render.effect.blending.enable");
     options.setAsString("render.effect.blending.mode", "stochastic");
 
     // display widgets

@@ -725,12 +725,6 @@
           "implicitValue": "ddp"
         },
         {
-          "longName": "translucency-support",
-          "helpText": "Enable translucency blending (deprecated)",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
-        },
-        {
           "longName": "ambient-occlusion",
           "shortName": "q",
           "helpText": "Enable ambient occlusion providing approximate shadows for better depth perception, implemented using SSAO",

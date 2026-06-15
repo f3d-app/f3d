@@ -3,7 +3,6 @@ list(APPEND libf3dSDKTests_list
      TestSDKAnimation.cxx
      TestSDKCamera.cxx
      TestSDKCompareWithFile.cxx
-     TestSDKDeprecatedOptions.cxx
      TestSDKDynamicLightIntensity.cxx
      TestSDKDynamicUpDirection.cxx
      TestSDKEngine.cxx

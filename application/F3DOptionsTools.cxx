@@ -510,59 +510,6 @@ std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3
     libf3dOptions.emplace_back(std::make_pair(libf3dIter->second, value));
   }
 
-  // blending is handled in two options in the lib
-  else if (key == "blending")
-  {
-    if (value != "none")
-    {
-      libf3dOptions.emplace_back(std::make_pair("render.effect.blending.enable", "true"));
-      libf3dOptions.emplace_back(std::make_pair("render.effect.blending.mode", value));
-    }
-    else
-    {
-      libf3dOptions.emplace_back(std::make_pair("render.effect.blending.enable", "false"));
-    }
-  }
-
-  // handle deprecated translucency support
-  else if (key == "translucency-support")
-  {
-    f3d::log::warn("--translucency-support is deprecated, please use --blending instead");
-    libf3dOptions.emplace_back(std::make_pair("render.effect.blending.enable", value));
-  }
-
-  // point sprites is handled in two options in the lib
-  else if (key == "point-sprites")
-  {
-    if (value != "none")
-    {
-      // Handle deprecated boolean option
-      bool deprecatedBooleanOption;
-      if (F3DOptionsTools::Parse(value, deprecatedBooleanOption))
-      {
-        f3d::log::warn("--point-sprites is a now a string, please specify the type of "
-                       "point sprites to use or use the implicit default");
-        libf3dOptions.emplace_back(std::make_pair("model.point_sprites.enable", value));
-      }
-      else
-      {
-        libf3dOptions.emplace_back(std::make_pair("model.point_sprites.enable", "true"));
-        libf3dOptions.emplace_back(std::make_pair("model.point_sprites.type", value));
-      }
-    }
-    else
-    {
-      libf3dOptions.emplace_back(std::make_pair("model.point_sprites.enable", "false"));
-    }
-  }
-
-  // handle deprecated point-sprites-type option
-  else if (key == "point-sprites-type")
-  {
-    f3d::log::warn("--point-sprites-type is deprecated");
-    libf3dOptions.emplace_back(std::make_pair("model.point_sprites.type", value));
-  }
-
   // handle deprecated interaction-trackball option
   else if (key == "interaction-trackball")
   {
