@@ -5,7 +5,8 @@
 #include <algorithm>
 #include <random>
 
-int TestImageStream([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]){
+int TestImageStream([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
+{
   PseudoUnitTest test;
 
   constexpr unsigned int width = 64;
