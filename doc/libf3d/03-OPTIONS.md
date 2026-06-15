@@ -101,7 +101,7 @@ CLI: `--opacity`.
 
 ### `model.color.rgb` (_color_, optional)
 
-Set a _color_ on the geometry. Multiplied with the `model.color.texture` when present. Model-specified by default.
+Set a _color_ on the geometry. Multiplied with the `model.color.texture` when present. Model-specified by default. Overridden by `model.scivis.enable` or `--scalar-coloring`.
 
 CLI: `--color`.
 
