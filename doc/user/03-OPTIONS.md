@@ -127,6 +127,12 @@ When loading a file group, if they results in an empty scene, remove the file gr
 
 Define the Up direction.
 
+#### Up direction
+
+| +Y                     | +Z                     |
+|------------------------|------------------------|
+| ![](./images/up_y.png) | ![](./images/up_z.png) |
+
 ### `-x`, `--axis` (_bool_, default: `false`)
 
 Show _axes_ as a trihedron in the scene.
@@ -178,6 +184,12 @@ Show the _cell edges_.
 ### `--armature` (_bool_, default: `false`)
 
 Show armature if present.
+
+#### Armature display
+
+| Disabled                       | Enable                        |
+|--------------------------------|-------------------------------|
+| ![](./images/armature_off.png) | ![](./images/armature_on.png) |
 
 ### `--camera-index=<idx>` (_int_)
 

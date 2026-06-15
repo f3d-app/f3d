@@ -47,3 +47,5 @@ if(F3D_PLUGIN_BUILD_PDAL)
 endif()
 
 include(tests.watch.cmake)
+
+include(tests.documentation.cmake)
