@@ -74,6 +74,7 @@ Because some keyboards have layered multimedia keys, F keys (F12 for example) do
 When rendering step files, the `--color` option is not respected because scalar coloring is used by default in the configuration file. To override this behavior, you have to disable scalar coloring when specifying the color option. For example: `--color=Blue --scalar-coloring=no`.
 
 Alternatively, add the following in your configuration file:
+
 ```
 {
   "match-type": "glob",
