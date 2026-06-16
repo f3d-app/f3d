@@ -316,7 +316,7 @@ Set the _HDRI_ image that can be used as ambient lighting and skybox.
 Valid file format are `.hdr`, `.exr`, `.png`, `.jpg`, `.pnm`, `.tiff`, `.bmp`.
 If not set, a default is provided.
 
-### `--hdri-ambient` (_string_)
+### `--hdri-ambient` (_bool_, default: `false`)
 
 Light the scene using the _HDRI_ image as ambient lighting.
 The environment act as a light source and is reflected on the material.
@@ -351,7 +351,7 @@ Model-specified by default.
 Set the texture file to control the normal map of the object. Must be in sRGB color space.
 Model-specified by default.
 
-### `--normal-scale=<color>` (_double_)
+### `--normal-scale=<factor>` (_double_)
 
 Set the normal scale. This value affects the strength of the normal deviation from the normal texture.
 Model-specified by default.
