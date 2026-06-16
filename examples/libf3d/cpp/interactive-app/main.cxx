@@ -75,7 +75,7 @@ void AddCustomCommands(f3d::engine& eng)
     [&eng](const std::vector<std::string>&)
     {
       auto& o = eng.getOptions();
-      if (o.render.effect.antialiasing == "none")
+      if (o.render.effect.antialiasing.mode == "none")
       {
         // keep mode at fxaa in this example
         o.render.effect.antialiasing.mode = "fxaa";
