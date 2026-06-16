@@ -99,8 +99,8 @@ f3d_test(NAME TestDocEmissiveFactorDefault DATA Lantern/Lantern.gltf BASELINE_PA
 f3d_test(NAME TestDocEmissiveFactorRed DATA Lantern/Lantern.gltf BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/emissive_factor_red.png RESOLUTION 800,600 ARGS --no-background --emissive-factor=1,0.3,0.3 --anti-aliasing=ssaa LABELS doc)
 
 ## --texture-normal
-f3d_test(NAME TestDocTextureNormalOFF DATA Lantern/Lantern.gltf BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/texture_emissive_off.png RESOLUTION 800,600 ARGS --no-background --texture-base-color= --texture-material= --texture-emissive= --texture-normal= --anti-aliasing=ssaa LABELS doc)
-f3d_test(NAME TestDocTextureNormalON DATA Lantern/Lantern.gltf BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/texture_emissive_on.png RESOLUTION 800,600 ARGS --no-background --texture-base-color= --texture-material= --texture-emissive= --anti-aliasing=ssaa LABELS doc)
+f3d_test(NAME TestDocTextureNormalOFF DATA Lantern/Lantern.gltf BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/texture_normal_off.png RESOLUTION 800,600 ARGS --no-background --texture-base-color= --texture-material= --texture-emissive= --texture-normal= --anti-aliasing=ssaa LABELS doc)
+f3d_test(NAME TestDocTextureNormalON DATA Lantern/Lantern.gltf BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/texture_normal_on.png RESOLUTION 800,600 ARGS --no-background --texture-base-color= --texture-material= --texture-emissive= --anti-aliasing=ssaa LABELS doc)
 
 ## --normal-scale
 f3d_test(NAME TestDocNormalScaleDefault DATA Lantern/Lantern.gltf BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/normal_scale_default.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-position=9.7,4.8,15.9 --camera-focal-point=1.9,2.6,2.8 --camera-view-up=-0.074,0.99,-0.125 LABELS doc)
@@ -120,7 +120,7 @@ f3d_test(NAME TestDocUnlitON DATA Lantern/Lantern.gltf BASELINE_PATH ${F3D_SOURC
 
 ## --background-color
 f3d_test(NAME TestDocBackgroundColorDefault DATA f3d.vtp BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/background_color_default.png RESOLUTION 800,600 ARGS --anti-aliasing=ssaa LABELS doc)
-f3d_test(NAME TestDocBackgroundColorLime DATA f3d.vtp BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/background_color_lime.png RESOLUTION 800,600 ARGS --anti-aliasing=ssaa --background-color=lime LABELS doc)
+f3d_test(NAME TestDocBackgroundColorOrange DATA f3d.vtp BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/background_color_orange.png RESOLUTION 800,600 ARGS --anti-aliasing=ssaa --background-color=orange LABELS doc)
 
 ## --fps
 f3d_test(NAME TestDocFPSOFF DATA f3d.glb BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/fps_off.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa LABELS doc UI)
@@ -141,6 +141,50 @@ f3d_test(NAME TestDocSceneHierarchyON DATA f3d.glb BASELINE_PATH ${F3D_SOURCE_DI
 ## --notifications (TODO: interaction file?)
 
 ## --hdri-filename
-f3d_test(NAME TestDocHDRIFilenameOFF DATA f3d.glb BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/hdri_filename_off.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LABELS doc UI)
-f3d_test(NAME TestDocHDRIFilenameON DATA f3d.glb BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/hdri_filename_on.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-filename LABELS doc UI)
+f3d_test(NAME TestDocHDRIFilenameOFF DATA dragon.vtu BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/hdri_filename_off.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LABELS doc UI)
+f3d_test(NAME TestDocHDRIFilenameON DATA dragon.vtu BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/hdri_filename_on.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -f --hdri-filename LABELS doc UI)
+
+## --hdri-skybox
+f3d_test(NAME TestDocHDRISkyboxOFF DATA dragon.vtu BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/hdri_skybox_off.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -f LABELS doc)
+f3d_test(NAME TestDocHDRISkyboxON DATA dragon.vtu BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/hdri_skybox_on.png RESOLUTION 800,600 ARGS --anti-aliasing=ssaa --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -fj LABELS doc)
+
+## --blur-background
+f3d_test(NAME TestDocHDRIBlurOFF DATA dragon.vtu BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/hdri_blur_off.png RESOLUTION 800,600 ARGS --anti-aliasing=ssaa --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -fj LABELS doc)
+f3d_test(NAME TestDocHDRIBlurON DATA dragon.vtu BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/hdri_blur_on.png RESOLUTION 800,600 ARGS --anti-aliasing=ssaa --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -fju LABELS doc)
+
+## --blur-coc
+f3d_test(NAME TestDocHDRICOCDefault DATA dragon.vtu BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/hdri_coc_default.png RESOLUTION 800,600 ARGS --anti-aliasing=ssaa --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -fju LABELS doc)
+f3d_test(NAME TestDocHDRICOC50 DATA dragon.vtu BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/hdri_coc_50.png RESOLUTION 800,600 ARGS --anti-aliasing=ssaa --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -fju --blur-coc=50 LABELS doc)
+
+## --light-intensity
+f3d_test(NAME TestDocLightIntensity1 DATA dragon.vtu BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/light_intensity_1.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa LABELS doc)
+f3d_test(NAME TestDocLightIntensity05 DATA dragon.vtu BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/light_intensity_0.5.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --light-intensity=0.5 LABELS doc)
+
+## --scalar-coloring
+f3d_test(NAME TestDocScalarColoringOFF DATA bluntfin.vts BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/scalar_coloring_off.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -e --line-width=2 LABELS doc)
+f3d_test(NAME TestDocScalarColoringON DATA bluntfin.vts BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/scalar_coloring_on.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -e --line-width=2 -s LABELS doc)
+
+## --coloring-array
+f3d_test(NAME TestDocColoringArrayDensity DATA bluntfin.vts BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/coloring_array_density.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -e --line-width=2 -s --coloring-array=Density LABELS doc)
+f3d_test(NAME TestDocColoringArrayMomentum DATA bluntfin.vts BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/coloring_array_momentum.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -e --line-width=2 -s --coloring-array=Momentum LABELS doc)
+
+## --coloring-component
+f3d_test(NAME TestDocColoringComponentX DATA bluntfin.vts BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/coloring_component_x.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -e --line-width=2 -s --coloring-array=Momentum --coloring-component=0 LABELS doc)
+f3d_test(NAME TestDocColoringComponentY DATA bluntfin.vts BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/coloring_component_y.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -e --line-width=2 -s --coloring-array=Momentum --coloring-component=1 LABELS doc)
+
+## --coloring-by-cells
+f3d_test(NAME TestDocColoringByCellsOFF DATA waveletArrays.vti BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/coloring_by_cells_off.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -e --line-width=2 -s --coloring-array=Result LABELS doc)
+f3d_test(NAME TestDocColoringByCellsON DATA waveletArrays.vti BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/coloring_by_cells_on.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -e --line-width=2 -sc LABELS doc)
+
+## --coloring-range
+f3d_test(NAME TestDocColoringRangeAuto DATA bluntfin.vts BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/coloring_range_auto.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -e --line-width=2 -s LABELS doc)
+f3d_test(NAME TestDocColoringRangeManual DATA bluntfin.vts BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/coloring_range_manual.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -e --line-width=2 -s --coloring-range=0.5,3 LABELS doc)
+
+## --coloring-scalar-bar
+f3d_test(NAME TestDocScalarBarOFF DATA bluntfin.vts BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/scalar_bar_off.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -e --line-width=2 -s --coloring-array=Momentum LABELS doc)
+f3d_test(NAME TestDocScalarBarON DATA bluntfin.vts BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/scalar_bar_on.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -e --line-width=2 -sb --coloring-array=Momentum LABELS doc)
+
+## ---colormap-file
+f3d_test(NAME TestDocColorMapDefault DATA bluntfin.vts BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/color_map_default.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -e --line-width=2 -s --coloring-array=Momentum LABELS doc)
+f3d_test(NAME TestDocColorMapViridis DATA bluntfin.vts BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/color_map_viridis.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -e --line-width=2 -s --coloring-array=Momentum --colormap-file=${F3D_SOURCE_DIR}/resources/colormaps/viridis.png LABELS doc)
 
