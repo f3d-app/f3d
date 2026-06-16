@@ -241,10 +241,23 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
       vtkNew<vtkF3DTAAPass> taaP;
       taaP->SetDelegatePass(camP);
 
+      taaP->SetMovementBlendingMode(
+        static_cast<int>(renderer->GetAntiAliasingTaaMovementBlendingMode()));
+
       s->GetRenderer()->GetRenderWindow()->AddObserver(
         vtkCommand::WindowResizeEvent, taaP.Get(), &vtkF3DTAAPass::ResetIterations);
-      s->GetRenderer()->GetRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(
-        vtkCommand::InteractionEvent, taaP.Get(), &vtkF3DTAAPass::ResetIterations);
+      if (renderer->GetAntiAliasingTaaMovementBlendingMode() ==
+        vtkF3DRenderer::MovementBlending::ResetHistory)
+      {
+        s->GetRenderer()->GetRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(
+          vtkCommand::InteractionEvent, taaP.Get(), &vtkF3DTAAPass::ResetIterations);
+      }
+      else if (renderer->GetAntiAliasingTaaMovementBlendingMode() ==
+        vtkF3DRenderer::MovementBlending::MovementReproject)
+      {
+        s->GetRenderer()->GetRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(
+          vtkCommand::InteractionEvent, taaP.Get(), &vtkF3DTAAPass::ReduceIterations);
+      }
 
       this->MainPass->SetDelegatePass(taaP);
     }

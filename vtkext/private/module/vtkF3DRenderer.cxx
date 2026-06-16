@@ -1749,9 +1749,25 @@ void vtkF3DRenderer::SetAntiAliasingMode(AntiAliasingMode mode)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetAntiAliasingTaaMovementBlendingMode(vtkF3DRenderer::MovementBlending mode)
+{
+  if (this->AntiAliasingTaaMovementBlending != mode)
+  {
+    this->AntiAliasingTaaMovementBlending = mode;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 vtkF3DRenderer::AntiAliasingMode vtkF3DRenderer::GetAntiAliasingMode() const
 {
   return this->AntiAliasingModeEnabled;
+}
+
+//----------------------------------------------------------------------------
+vtkF3DRenderer::MovementBlending vtkF3DRenderer::GetAntiAliasingTaaMovementBlendingMode() const
+{
+  return this->AntiAliasingTaaMovementBlending;
 }
 
 //----------------------------------------------------------------------------
