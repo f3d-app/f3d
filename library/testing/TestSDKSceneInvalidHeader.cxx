@@ -19,7 +19,9 @@ int TestSDKSceneInvalidHeader([[maybe_unused]] int argc, [[maybe_unused]] char* 
   std::string invalidHeader = std::string(argv[1]) + "data/" + invalidHeaderFilename;
 
   // supports method
-  test("not supported with invalid header", !sce.supports(invalidHeader));
+  test("not supported with invalid header", sce.supports(invalidHeader) == f3d::file_availability::UNSUPPORTED_CONTENT);
+  eng.getOptions().scene.skip_content_check = true;
+  test("skip content check", sce.supports(invalidHeader) == f3d::file_availability::SUPPORTED);
 
   return test.result();
 }

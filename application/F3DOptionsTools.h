@@ -94,6 +94,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "animation-indices", "scene.animation.indices" },
   { "animation-speed-factor", "scene.animation.speed_factor" },
   { "force-reader", "scene.force_reader" },
+  { "skip-content-check", "scene.skip_content_check" },
   { "font-file", "ui.font_file" },
   { "font-scale", "ui.scale" },
   { "font-color", "ui.font_color" },

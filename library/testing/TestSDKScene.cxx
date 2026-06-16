@@ -31,6 +31,7 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   std::string validFilename = "cow.vtp";
   std::string invalidDefaultSceneFilename = "invalid_body.vtp";
   std::string invalidFullSceneFilename = "invalid_body.gltf";
+  std::string invalidMdlFilename = "invalid.mdl";
   std::string dummy = std::string(argv[1]) + "data/" + dummyFilename;
   std::string nonExistent = std::string(argv[1]) + "data/" + nonExistentFilename;
   std::string unsupported = std::string(argv[1]) + "data/" + unsupportedFilename;
@@ -43,15 +44,15 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   std::string monkey = std::string(argv[1]) + "data/red_translucent_monkey.gltf";
   std::string invalidDefaultScene = std::string(argv[1]) + "data/" + invalidDefaultSceneFilename;
   std::string invalidFullScene = std::string(argv[1]) + "data/" + invalidFullSceneFilename;
+  std::string invalidMdl = std::string(argv[1]) + "data/" + invalidMdlFilename;
 
   // supports method
-  test("not supported with empty filename", !sce.supports(empty));
-  test("not supported with dummy filename", !sce.supports(dummy));
-  test("not supported with non existent filename", !sce.supports(nonExistent));
-  test("supported with invalid body", sce.supports(invalidBody));
-  test("supported with default scene format", sce.supports(cube));
-  test("supported with full scene format", sce.supports(logo));
-
+  test("not supported with empty filename", sce.supports(empty) == f3d::file_availability::UNSUPPORTED_EXTENSION);
+  test("not supported with dummy filename", sce.supports(dummy) == f3d::file_availability::UNSUPPORTED_EXTENSION);
+  test("not supported with non existent filename", sce.supports(nonExistent) == f3d::file_availability::UNSUPPORTED_EXTENSION);
+  test("supported with invalid body", sce.supports(invalidBody) == f3d::file_availability::SUPPORTED);
+  test("supported with default scene format", sce.supports(cube) == f3d::file_availability::SUPPORTED);
+  test("supported with full scene format", sce.supports(logo) == f3d::file_availability::SUPPORTED);
   // invalid
   test.expect<f3d::scene::load_failure_exception>(
     "add with invalid default scene file", [&]() { sce.add(invalidDefaultScene); });
@@ -74,6 +75,35 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     catch (f3d::scene::load_failure_exception& E)
     {
       std::string expectedMsg = "is not a valid force reader";
+      std::string exceptMsg = E.what();
+      test("Check exception message size", exceptMsg.size() >= expectedMsg.size());
+      test("Check exception message",
+        exceptMsg.substr(exceptMsg.size() - expectedMsg.size(), expectedMsg.size()) == expectedMsg);
+    }
+  }
+  {
+    f3d::engine engine = f3d::engine::create(true);
+    f3d::scene& scene = engine.getScene();
+    try
+    {
+      scene.add(invalidMdl);
+    }
+    catch (f3d::scene::load_failure_exception& E)
+    {
+      std::string expectedMsg = "contains unsupported content";
+      std::string exceptMsg = E.what();
+      test("Check exception message size", exceptMsg.size() >= expectedMsg.size());
+      test("Check exception message",
+        exceptMsg.substr(exceptMsg.size() - expectedMsg.size(), expectedMsg.size()) == expectedMsg);
+    }
+    engine.getOptions().scene.skip_content_check = true;
+    try
+    {
+      scene.add(invalidMdl);
+    }
+    catch (f3d::scene::load_failure_exception& E)
+    {
+      std::string expectedMsg = "failed to load scene";
       std::string exceptMsg = E.what();
       test("Check exception message size", exceptMsg.size() >= expectedMsg.size());
       test("Check exception message",

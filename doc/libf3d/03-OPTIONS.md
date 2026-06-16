@@ -65,6 +65,12 @@ Force a specific reader to be used, disregarding the file extension and file con
 
 CLI: `--force-reader`.
 
+### `scene.skip_content_check` (_bool_, default: `false`)
+
+Make attempt to read file without checking it's header.
+
+CLI: `--skip-content-check`.
+
 ### `scene.camera.orthographic` (_bool_, optional)
 
 Set to true to force orthographic projection. Model-specified by default, which is false if not specified.
