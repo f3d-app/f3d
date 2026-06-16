@@ -395,7 +395,7 @@
     "point_sprites": {
       "type": {
         "type": "string",
-        "default_value": "sphere"
+        "default_value": "none"
       },
       "size": {
         "type": "double",
