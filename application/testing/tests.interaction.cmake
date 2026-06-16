@@ -306,6 +306,6 @@ f3d_test(NAME TestInteractionAnimationDropHDRI DATA InterpolationTest.glb ARGS -
 if(F3D_MODULE_EXR)
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-    f3d_test(NAME TestInteractionDropHDRIExr INTERACTION_CONFIGURE LONG_TIMEOUT) #X;DropEvent kloofendal.exr;DropEvent dragon.vtu;
+    f3d_test(NAME TestInteractionDropHDRIExr INTERACTION_CONFIGURE LONG_TIMEOUT) #X;DropEvent small_rural_road.exr;DropEvent dragon.vtu;
   endif()
 endif()

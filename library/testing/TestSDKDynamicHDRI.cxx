@@ -67,7 +67,7 @@ int TestSDKDynamicHDRI([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
 #if F3D_MODULE_EXR
   // Change the hdri and make sure it is taken into account
-  opt.render.hdri.file = std::string(argv[1]) + "/data/kloofendal_43d_clear_1k.exr";
+  opt.render.hdri.file = std::string(argv[1]) + "/data/small_rural_road_1k.exr";
   test("render with EXR HDRI",
     TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
       std::string(argv[2]), "TestSDKDynamicHDRIExr"));

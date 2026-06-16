@@ -42,7 +42,6 @@
 - invalid_body.gltf: (duck.gltf) Copyright 2006 Sony Computer Entertainment Inc.: SCEA Shared Source License
 - invalid_version.mdl: (w_medkit_hl.mdl) Nomadnetic: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - joint1.abc: Public Domain
-- kloofendal_43d_clear_1k.exr: Polyhaven: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - Lantern: glTF-Sample-Models: Public Domain
 - McUSD.usdz: [USD Working Group](https://github.com/usd-wg/assets): CC-NC-BY-SA, textures by [jasonjgardner](https://github.com/jasonjgardner)
 - normal.png: glTF-Sample-Models: Public Domain
@@ -69,6 +68,7 @@
 - small.ex2: VTK Data: BSD-3-Clause
 - small.usdz: [Copyright USD contributors](https://github.com/usd-wg/assets/tree/main/full_assets/StandardShaderBall): [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - SMALL_AUTZEN_LAS_All.slpk: PDAL: Copyright (c) 2025, Hobu, Inc.
+- small_rural_road_1k.exr: Polyhaven: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - soldier_animations.mdl: LibreQuake Project: BSD-3-Clause
 - sphere_points.vdb: OpenVDB: [MPL-2.0](http://www.mozilla.org/MPL/2.0/)
 - teapot.off: Utah Teapot: Public Domain
