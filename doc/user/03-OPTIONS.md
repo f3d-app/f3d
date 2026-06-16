@@ -277,7 +277,7 @@ Set the Backface type. Model-specified by default.
 ### `--color=<color>` (_color_)
 
 Set a _color_ on the geometry. Multiplied with the base color texture when present.
-Model-specified by default.
+Model-specified by default. Overridden by `--scalar-coloring`.
 
 ### `--opacity=<opacity>` (_double_)
 

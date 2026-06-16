@@ -69,6 +69,22 @@ It's recommended to use these options: `--point-sprites-size=1 --point-sprites=g
 
 Because some keyboards have layered multimedia keys, F keys (F12 for example) don't use the normal function code by default. To use the F code, you must press <kbd>Fn</kbd> in combination with the F key. For example, to take a minimal screenshot, the hotkey combination on MacOS would be <kbd>Cmd</kbd>+<kbd>Fn</kbd>+<kbd>F12</kbd>.
 
+> My step file doesn't respect the `--color` option
+
+When rendering step files, the `--color` option is not respected because scalar coloring is used by default in the configuration file. To override this behavior, you have to disable scalar coloring when specifying the color option. For example: `--color=Blue --scalar-coloring=no`.
+
+Alternatively, add the following in your configuration file:
+
+```
+{
+  "match-type": "glob",
+  "match": "*.{step,stp,iges,igs,brep,xbf}",
+  "options": {
+    "scalar-coloring": false
+  }
+}
+```
+
 ### Linux
 
 > I have a link error related to `stdc++fs` not found or I'm unable to run F3D due to filesystem errors.
