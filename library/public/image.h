@@ -61,7 +61,8 @@ public:
    * Read provided buffer into a new image instance, the following formats are
    * supported: PNG, PNM , BMP, HDR, JPEG, TGA, WebP. EXR files are also
    * supported if the associated module is built.
-   *
+   * VTK >= 9.6.20260128 required.
+   * 
    * Throws an image::read_exception in case of failure.
    */
   image(std::byte* byte, std::size_t size);
