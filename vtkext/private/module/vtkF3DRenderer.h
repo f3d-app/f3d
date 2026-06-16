@@ -76,7 +76,6 @@ public:
    */
   enum class SplatType : unsigned char
   {
-    NONE,
     SPHERE,
     GAUSSIAN,
     CIRCLE,

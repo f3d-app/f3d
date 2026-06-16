@@ -229,15 +229,10 @@ Set the _coloring range_. Automatically computed by default.
 
 CLI: `--coloring-range`.
 
-### `model.point_sprites.enable` (_bool_, default: `false`)
+### `model.point_sprites.type` (_string_, default: `none`)
 
-Show sphere _points sprites_ instead of the geometry.
-
-CLI: `--point-sprites`.
-
-### `model.point_sprites.type` (_string_, default: `sphere`)
-
-Set the sprites type when showing point sprites (can be `sphere`, `gaussian`, `circle`, `stddev`, `bound` or `cross`).
+Enable and set the point sprites type. This allows to show sprites instead of points.
+Valid values are `sphere`, `gaussian`, `circle`, `stddev`, `bound`, `cross` or `none` (disabled).
 
 CLI: `--point-sprites`.
 
@@ -273,27 +268,17 @@ CLI: `--textures-transform`.
 
 ## Render Options
 
-### `render.effect.blending.enable` (_bool_, default: `false`)
+### `render.effect.blending.mode` (_string_, default: `none`)
 
-Enable _blending support_. This is a technique used to correctly render translucent objects.
-
-CLI: `--blending`.
-
-### `render.effect.blending.mode` (_string_, default: `ddp`)
-
-Set the blending technique. Valid options are: `ddp` (dual depth peeling, quality), `sort` (only for gaussians), `sort_cpu` (only for gaussians, slow), `stochastic` (fast)
+Enable and set the _blending_ technique. This is a technique used to correctly render translucent objects.
+Valid options are: `ddp` (dual depth peeling, quality), `sort` (only for gaussians), `sort_cpu` (only for gaussians, slow), `stochastic` (fast), `none` (disabled).
 
 CLI: `--blending`.
 
-### `render.effect.antialiasing.enable` (_string_, default: `false`)
+### `render.effect.antialiasing.mode` (_string_, default: `none`)
 
-Enable _anti-aliasing_. This technique is used to reduce aliasing.
-
-CLI: `--anti-aliasing`.
-
-### `render.effect.antialiasing.mode` (_string_, default: `fxaa`)
-
-Set the anti-aliasing technique. Valid options are: `fxaa` (fast), `ssaa` (quality), `taa` (balanced)
+Enable and set the anti-aliasing technique. This technique is used to reduce aliasing.
+Valid options are: `fxaa` (fast), `ssaa` (quality), `taa` (balanced), `none` (disabled).
 
 CLI: `--anti-aliasing`.
 

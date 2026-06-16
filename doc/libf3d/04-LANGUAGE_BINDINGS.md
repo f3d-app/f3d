@@ -97,7 +97,7 @@ const settings = {
     options.setAsString("render.background.color", "#000000");
 
     // make it look nice
-    options.toggle("render.effect.antialiasing.enable");
+    options.setAsString("render.effect.antialiasing.mode", "fxaa");
     options.toggle("render.effect.tone_mapping");
     options.toggle("render.effect.ambient_occlusion");
     options.toggle("render.hdri.ambient");

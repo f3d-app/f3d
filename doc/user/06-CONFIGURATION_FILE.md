@@ -115,7 +115,7 @@ A typical config file with bindings may look like this:
     "match": ".*vtu",
     "bindings": {
       "Any+3": "roll_camera 90",
-      "Shift+O": "toggle model.point_sprites.enable",
+      "Shift+O": "set model.point_sprites.type circle",
       "Ctrl+O": [
         "toggle render.grid.enable",
         "toggle scene.camera.orthographic"

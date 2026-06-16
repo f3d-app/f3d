@@ -14,7 +14,7 @@ const settings = {
     options.toggle("model.scivis.cells");
 
     // make it look nice
-    options.set("render.effect.antialiasing.mode ddp");
+    options.setAsString("render.effect.antialiasing.mode", "ddp");
     options.toggle("render.effect.tone_mapping");
     options.toggle("render.effect.ambient_occlusion");
     options.toggle("render.hdri.ambient");

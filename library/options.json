@@ -97,7 +97,7 @@
       "blending": {
         "mode": {
           "type": "string",
-          "default_value": "ddp"
+          "default_value": "none"
         }
       },
       "antialiasing": {

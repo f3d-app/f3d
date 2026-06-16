@@ -429,13 +429,12 @@ void window_impl::UpdateDynamicOptions()
   else if (opt.model.point_sprites.type == "none")
   {
     enablePointSprites = false;
-    splatType = vtkF3DRenderer::SplatType::NONE;
   }
   else
   {
     enablePointSprites = false;
     log::warn(opt.model.point_sprites.type,
-      R"( is an invalid point sprites type. Valid modes are: "sphere", "gaussian", "circle", "stddev", "bound", "cross"). Falling back to "sphere".)");
+      R"( is an invalid point sprites type. Valid modes are: "sphere", "gaussian", "circle", "stddev", "bound", "cross", "none")");
   }
 
   renderer->SetUsePointSprites(enablePointSprites);
