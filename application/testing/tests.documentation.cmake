@@ -113,3 +113,34 @@ f3d_test(NAME TestDocTextureTransformRotation DATA cube_unlit.obj BASELINE_PATH 
 ## --checkerboard
 f3d_test(NAME TestDocCheckerboardOFF DATA Lantern/Lantern.gltf BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/checkerboard_off.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa LABELS doc)
 f3d_test(NAME TestDocCheckerboardON DATA Lantern/Lantern.gltf BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/checkerboard_on.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --checkerboard LABELS doc)
+
+## --unlit
+f3d_test(NAME TestDocUnlitOFF DATA Lantern/Lantern.gltf BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/unlit_off.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa LABELS doc)
+f3d_test(NAME TestDocUnlitON DATA Lantern/Lantern.gltf BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/unlit_on.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --unlit LABELS doc)
+
+## --background-color
+f3d_test(NAME TestDocBackgroundColorDefault DATA f3d.vtp BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/background_color_default.png RESOLUTION 800,600 ARGS --anti-aliasing=ssaa LABELS doc)
+f3d_test(NAME TestDocBackgroundColorLime DATA f3d.vtp BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/background_color_lime.png RESOLUTION 800,600 ARGS --anti-aliasing=ssaa --background-color=lime LABELS doc)
+
+## --fps
+f3d_test(NAME TestDocFPSOFF DATA f3d.glb BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/fps_off.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa LABELS doc UI)
+f3d_test(NAME TestDocFPSON DATA f3d.glb BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/fps_on.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --fps LABELS doc UI)
+
+## --filename
+f3d_test(NAME TestDocFilenameOFF DATA f3d.glb BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/filename_off.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa LABELS doc UI)
+f3d_test(NAME TestDocFilenameON DATA f3d.glb BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/filename_on.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --filename LABELS doc UI)
+
+## --metadata
+f3d_test(NAME TestDocMetadataOFF DATA f3d.glb BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/metadata_off.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa LABELS doc UI)
+f3d_test(NAME TestDocMetadataON DATA f3d.glb BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/metadata_on.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --metadata LABELS doc UI)
+
+## --scene-hierarchy
+f3d_test(NAME TestDocSceneHierarchyOFF DATA f3d.glb BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/scene_hierarchy_off.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa LABELS doc UI)
+f3d_test(NAME TestDocSceneHierarchyON DATA f3d.glb BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/scene_hierarchy_on.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --scene-hierarchy LABELS doc UI)
+
+## --notifications (TODO: interaction file?)
+
+## --hdri-filename
+f3d_test(NAME TestDocHDRIFilenameOFF DATA f3d.glb BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/hdri_filename_off.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LABELS doc UI)
+f3d_test(NAME TestDocHDRIFilenameON DATA f3d.glb BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/hdri_filename_on.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-filename LABELS doc UI)
+
