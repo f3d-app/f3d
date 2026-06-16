@@ -130,7 +130,7 @@ Define the Up direction.
 #### Up direction
 
 | +Y                     | +Z                     |
-|------------------------|------------------------|
+| ---------------------- | ---------------------- |
 | ![](./images/up_y.png) | ![](./images/up_z.png) |
 
 ### `-x`, `--axis` (_bool_, default: `false`)
@@ -188,7 +188,7 @@ Show armature if present.
 #### Armature display
 
 | Disabled                       | Enable                        |
-|--------------------------------|-------------------------------|
+| ------------------------------ | ----------------------------- |
 | ![](./images/armature_off.png) | ![](./images/armature_on.png) |
 
 ### `--camera-index=<idx>` (_int_)

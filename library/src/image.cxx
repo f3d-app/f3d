@@ -384,7 +384,8 @@ double image::compare(const image& reference) const
       break;
   }
 
-  // vtkImageSSIM::ComputeErrorMetrics doesn't work for RGBA images, so we need to extract the RGB components first
+  // vtkImageSSIM::ComputeErrorMetrics doesn't work for RGBA images,
+  // so we need to extract the RGB components first
   vtkNew<vtkImageExtractComponents> extractResult;
   extractResult->SetInputData(this->Internals->Image);
   extractResult->SetComponents(0, 1, 2);
