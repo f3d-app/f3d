@@ -32,30 +32,20 @@ KeyPressEvent 199 142 0 9 1 Tab 0
 CharEvent 199 142 0 9 1 Tab 0
 KeyReleaseEvent 199 142 0 9 1 Tab 0
 
-# M
-KeyPressEvent 199 142 0 109 1 m 0
-CharEvent 199 142 0 109 1 m 0
-KeyReleaseEvent 199 142 0 109 1 m 0
+# R
+KeyPressEvent 199 142 0 114 1 m 0
+CharEvent 199 142 0 114 1 m 0
+KeyReleaseEvent 199 142 0 114 1 m 0
 
 # Tab
 KeyPressEvent 199 142 0 9 1 Tab 0
 CharEvent 199 142 0 9 1 Tab 0
 KeyReleaseEvent 199 142 0 9 1 Tab 0
 
-# P
-KeyPressEvent 199 142 0 112 1 p 0
-CharEvent 199 142 0 112 1 p 0
-KeyReleaseEvent 199 142 0 112 1 p 0
-
-# Tab
-KeyPressEvent 199 142 0 9 1 Tab 0
-CharEvent 199 142 0 9 1 Tab 0
-KeyReleaseEvent 199 142 0 9 1 Tab 0
-
-# E
-KeyPressEvent 199 142 0 101 1 e 0
-CharEvent 199 142 0 101 1 e 0
-KeyReleaseEvent 199 142 0 101 1 e 0
+# S
+KeyPressEvent 199 142 0 115 1 p 0
+CharEvent 199 142 0 115 1 p 0
+KeyReleaseEvent 199 142 0 115 1 p 0
 
 # Tab
 KeyPressEvent 199 142 0 9 1 Tab 0

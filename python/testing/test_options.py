@@ -39,7 +39,7 @@ def test_getitem():
     assert options["scene.animation.speed_factor"] == 1.0
     assert options["render.raytracing.samples"] == 5
     assert options["render.grid.color"] == [0.0, 0.0, 0.0]
-    assert options["model.point_sprites.type"] == "sphere"
+    assert options["model.point_sprites.type"] == "none"
 
 
 def test_get_non_existent_key():
