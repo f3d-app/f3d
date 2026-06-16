@@ -34,11 +34,11 @@ int test_image_stream()
 
     if (image_stream)
     {
-      double stream_error = f3d_image_compare(img, image_stream);
+      double compare_error = f3d_image_compare(img, image_stream);
       f3d_image_free_buffer(buffer);
       f3d_image_delete(image_stream);
 
-      if (stream_error != 0)
+      if (compare_error != 0)
       {
         f3d_image_delete(img);
         return 1;
