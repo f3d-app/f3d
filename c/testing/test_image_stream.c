@@ -47,6 +47,7 @@ int test_image_stream()
     else
     {
       f3d_image_delete(img);
+      f3d_image_delete(image_stream);
       return 1;
     }
   }
