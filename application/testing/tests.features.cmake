@@ -298,7 +298,7 @@ f3d_test(NAME TestBlendingImplicit DATA suzanne.ply ARGS -p --verbose REGEXP "'b
 f3d_test(NAME TestInvalidBlendingMode DATA suzanne.ply ARGS --blending=foo REGEXP "foo is an invalid blending mode" NO_BASELINE)
 
 ## InteractionStyle
-f3d_test(NAME TestInteractionStyleImplicit DATA suzanne.ply ARGS -k REGEXP "'interaction-style' = '2d'" NO_BASELINE)
+f3d_test(NAME TestInteractionStyleImplicit DATA suzanne.ply ARGS -k --verbose REGEXP "'interaction-style' = '2d'" NO_BASELINE)
 f3d_test(NAME TestInteractionStyleInvalid DATA suzanne.ply ARGS --interaction-style=foo REGEXP "Cannot parse --interaction-style value" NO_BASELINE)
 
 ## PointSprites
