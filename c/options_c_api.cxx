@@ -334,7 +334,7 @@ void f3d_options_remove_value(f3d_options_t* options, const char* name)
   {
     cpp_options->removeValue(name);
   }
-  catch (f3d::options::incompatible_exception& ex)
+  catch (const f3d::options::incompatible_exception& ex)
   {
     f3d::log::error(ex.what());
   }
