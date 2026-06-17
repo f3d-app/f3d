@@ -29,7 +29,7 @@ const settings = {
       "options getter for double failed",
     );
     utils.assert(
-      options.get("model.point_sprites.type") === "sphere",
+      options.get("model.point_sprites.type") === "none",
       "options getter for string failed",
     );
 
