@@ -145,6 +145,20 @@ if(F3D_MODULE_UI AND NOT F3D_USE_EXTERNAL_IMGUI)
     "${F3D_SOURCE_DIR}/external/imgui/imgui_widgets.cpp")
 endif()
 
+if (F3D_MODULE_CLIP AND NOT F3D_USE_EXTERNAL_CLIP)
+  if(APPLE)
+    list(APPEND sources "${F3D_SOURCE_DIR}/external/clip/clip_osx.mm")
+  elseif(WIN32)
+    list(APPEND sources "${F3D_SOURCE_DIR}/external/clip/clip_win.cpp")
+  else()
+    list(APPEND sources "${F3D_SOURCE_DIR}/external/clip/clip_x11.cpp")
+  endif()
+
+  list(APPEND sources
+    "${F3D_SOURCE_DIR}/external/clip/clip_none.cpp"
+    "${F3D_SOURCE_DIR}/external/clip/clip.cpp")
+endif()
+
 vtk_module_add_module(f3d::vtkextPrivate
   NO_INSTALL
   FORCE_STATIC
@@ -165,6 +179,18 @@ endif()
 # webp
 if(F3D_MODULE_WEBP)
   vtk_module_link(f3d::vtkextPrivate PRIVATE WebP::webp)
+endif()
+
+# clip
+if (F3D_MODULE_CLIP)
+  vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_CLIP)
+  if (F3D_USE_EXTERNAL_CLIP)
+    vtk_module_link(f3d::vtkextPrivate PRIVATE clip::clip)
+  else()
+    vtk_module_include(f3d::vtkextPrivate
+      PRIVATE
+        "${F3D_SOURCE_DIR}/external/clip")
+  endif()
 endif()
 
 # imgui

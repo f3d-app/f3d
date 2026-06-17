@@ -65,6 +65,7 @@ runs:
         -DF3D_BINDINGS_C=${{ inputs.sanitizer_type == 'undefined' && 'OFF' || 'ON' }}
         -DF3D_MODULE_EXR=ON
         -DF3D_MODULE_UI=ON
+        -DF3D_MODULE_CLIP=ON;
         -DF3D_MODULE_WEBP=ON
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
