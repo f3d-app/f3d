@@ -188,3 +188,18 @@ f3d_test(NAME TestDocScalarBarON DATA bluntfin.vts BASELINE_PATH ${F3D_SOURCE_DI
 f3d_test(NAME TestDocColorMapDefault DATA bluntfin.vts BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/color_map_default.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -e --line-width=2 -s --coloring-array=Momentum LABELS doc)
 f3d_test(NAME TestDocColorMapViridis DATA bluntfin.vts BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/color_map_viridis.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -e --line-width=2 -s --coloring-array=Momentum --colormap-file=${F3D_SOURCE_DIR}/resources/colormaps/viridis.png LABELS doc)
 
+## --colormap-discretization
+f3d_test(NAME TestDocColorMapDiscretizationDefault DATA bluntfin.vts BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/color_map_discretization_default.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -e --line-width=2 -s --coloring-array=Momentum LABELS doc)
+f3d_test(NAME TestDocColorMapDiscretization4 DATA bluntfin.vts BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/color_map_discretization_4.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -e --line-width=2 -s --coloring-array=Momentum --colormap-discretization=4 LABELS doc)
+
+## --volume
+f3d_test(NAME TestDocVolumeOFF DATA waveletArrays.vti BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/volume_off.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -s --coloring-array=Result LABELS doc)
+f3d_test(NAME TestDocVolumeON DATA waveletArrays.vti BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/volume_on.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -vs --coloring-array=Result LABELS doc)
+
+## --volume-opacity-file
+f3d_test(NAME TestDocVolumeOpacityDefault DATA waveletArrays.vti BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/volume_opacity_default.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -vs --coloring-array=Result LABELS doc)
+f3d_test(NAME TestDocVolumeOpacityGaussian DATA waveletArrays.vti BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/volume_opacity_gaussian.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -vs --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/gaussian_opacity_map.png LABELS doc)
+
+## --volume-inverse
+f3d_test(NAME TestDocVolumeInverseOFF DATA waveletArrays.vti BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/volume_inverse_off.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -vs --coloring-array=Result LABELS doc)
+f3d_test(NAME TestDocVolumeInverseON DATA waveletArrays.vti BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/volume_inverse_on.png RESOLUTION 800,600 ARGS --no-background --anti-aliasing=ssaa --camera-azimuth-angle=-20 -vs --coloring-array=Result --volume-inverse LABELS doc)

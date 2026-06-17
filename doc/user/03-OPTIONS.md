@@ -475,6 +475,10 @@ Use with the scalar option.
 
 Set the number of distinct colors from [1, N] will be used in the colormap. Any values outside the valid range will result in smooth shading.
 
+### `-v`, `--volume` (_bool_, default: `false`)
+
+Enable _volume rendering_. It is only functional for 3D image data (VTKXMLVTI, DICOM, NRRD, MetaImage files) and will display nothing with other formats. It forces coloring.
+
 ### `--volume-opacity-file=<name>` (_string_)
 
 Set an _opacity map file for the coloring_.
@@ -484,10 +488,6 @@ Set an _opacity map file for the coloring_.
 Set a _custom opacity map for the coloring_.
 Only used with volume rendering for now.
 Ignored if `--opacity-map-file` option is specified.
-
-### `-v`, `--volume` (_bool_, default: `false`)
-
-Enable _volume rendering_. It is only functional for 3D image data (VTKXMLVTI, DICOM, NRRD, MetaImage files) and will display nothing with other formats. It forces coloring.
 
 ### `-i`, `--volume-inverse` (_bool_, default: `false`)
 
