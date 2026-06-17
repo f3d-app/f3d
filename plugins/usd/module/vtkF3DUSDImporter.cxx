@@ -243,86 +243,10 @@ public:
     return nodeId;
   }
 
-  bool AddSkinningAttributes(
-    vtkPolyData* polyData, const pxr::UsdPrim& prim, std::size_t pointCount)
-  {
-    pxr::UsdSkelSkinningQuery skinningQuery = this->SkelCache.GetSkinningQuery(prim);
-    if (!skinningQuery || !skinningQuery.HasJointInfluences())
-    {
-      return false;
-    }
-
-    pxr::VtIntArray jointIndices;
-    pxr::VtFloatArray jointWeights;
-    int numInfluences = skinningQuery.GetNumInfluencesPerComponent();
-
-    if (!skinningQuery.ComputeVaryingJointInfluences(pointCount, &jointIndices, &jointWeights))
-    {
-      return false;
-    }
-
-    vtkNew<vtkUnsignedShortArray> jointsArr;
-    jointsArr->SetName("JOINTS_0");
-    jointsArr->SetNumberOfComponents(4);
-    jointsArr->SetNumberOfTuples(static_cast<vtkIdType>(pointCount));
-    jointsArr->Fill(0);
-
-    vtkNew<vtkFloatArray> weightsArr;
-    weightsArr->SetName("WEIGHTS_0");
-    weightsArr->SetNumberOfComponents(4);
-    weightsArr->SetNumberOfTuples(static_cast<vtkIdType>(pointCount));
-    weightsArr->Fill(0);
-
-    // F3D mapper is limited to 4 influences
-    int components = std::min(numInfluences, 4);
-
-    std::vector<std::pair<float, int>> influences;
-    influences.reserve(numInfluences);
-
-    for (std::size_t i = 0; i < pointCount; i++)
-    {
-      // point influences
-      influences.resize(numInfluences);
-
-      for (int j = 0; j < numInfluences; j++)
-      {
-        int idx = static_cast<int>(i) * numInfluences + j;
-        influences[j] = std::make_pair(jointWeights[idx], jointIndices[idx]);
-      }
-
-      // Sort descending by weight to get the top 4
-      std::ranges::partial_sort(influences, influences.begin() + components,
-        [](const auto& a, const auto& b) { return a.first > b.first; });
-
-      float totalWeight = 0.0f;
-      for (int j = 0; j < components; j++)
-      {
-        jointsArr->SetTypedComponent(
-          static_cast<vtkIdType>(i), j, static_cast<unsigned short>(influences[j].second));
-        weightsArr->SetTypedComponent(static_cast<vtkIdType>(i), j, influences[j].first);
-        totalWeight += influences[j].first;
-      }
-
-      // Re-normalize after potential truncation
-      if (totalWeight > 0.0f)
-      {
-        for (int j = 0; j < components; j++)
-        {
-          float w = weightsArr->GetTypedComponent(static_cast<vtkIdType>(i), j);
-          weightsArr->SetTypedComponent(static_cast<vtkIdType>(i), j, w / totalWeight);
-        }
-      }
-    }
-
-    polyData->GetPointData()->AddArray(jointsArr);
-    polyData->GetPointData()->AddArray(weightsArr);
-    return true;
-  }
-
   void AddActor(vtkRenderer* renderer, vtkDataAssembly* hierarchy,
     vtkActorCollection* actorCollection, const pxr::SdfPath& path,
     const pxr::UsdGeomGprim& geomPrim, const pxr::UsdPrim& prim, vtkMatrix4x4* mat,
-    vtkPolyData* polydata)
+    vtkPolyData* polydata, bool useDirectScalars = false)
   {
     pxr::SdfPath actorPath = path.AppendChild(pxr::TfToken(prim.GetName()));
 
@@ -436,10 +360,11 @@ public:
       mapper->SetInputData(polydata);
     }
 
-    if (polydata->GetPointData()->GetScalars())
+    if (useDirectScalars)
     {
       mapper->SetColorModeToDirectScalars();
-      if (polydata->GetPointData()->GetScalars()->GetNumberOfComponents() == 4)
+      vtkDataArray* scalars = polydata->GetPointData()->GetScalars();
+      if (scalars && scalars->GetNumberOfComponents() == 4)
       {
         actor->ForceTranslucentOn();
       }
@@ -524,6 +449,7 @@ public:
         pxr::UsdGeomGprim geomPrim = pxr::UsdGeomGprim(prim);
 
         vtkSmartPointer<vtkPolyData> polydata;
+        bool useDirectScalars = false;
 
         if (prim.IsA<pxr::UsdGeomMesh>())
         {
@@ -697,7 +623,70 @@ public:
               // save skinning buffers to the polydata
               if (skinningQuery.HasJointInfluences() && !meshAlreadyExists)
               {
-                this->AddSkinningAttributes(newPolyData, prim, positions.size());
+                pxr::VtIntArray jointIndices;
+                pxr::VtFloatArray jointWeights;
+                int numInfluences = skinningQuery.GetNumInfluencesPerComponent();
+
+                if (skinningQuery.ComputeVaryingJointInfluences(
+                      positions.size(), &jointIndices, &jointWeights))
+                {
+                  vtkNew<vtkUnsignedShortArray> jointsArr;
+                  jointsArr->SetName("JOINTS_0");
+                  jointsArr->SetNumberOfComponents(4);
+                  jointsArr->SetNumberOfTuples(static_cast<vtkIdType>(positions.size()));
+                  jointsArr->Fill(0);
+
+                  vtkNew<vtkFloatArray> weightsArr;
+                  weightsArr->SetName("WEIGHTS_0");
+                  weightsArr->SetNumberOfComponents(4);
+                  weightsArr->SetNumberOfTuples(static_cast<vtkIdType>(positions.size()));
+                  weightsArr->Fill(0);
+
+                  // F3D mapper is limited to 4 influences
+                  int components = std::min(numInfluences, 4);
+
+                  std::vector<std::pair<float, int>> influences;
+                  influences.reserve(numInfluences);
+
+                  for (std::size_t i = 0; i < positions.size(); i++)
+                  {
+                    // point influences
+                    influences.resize(numInfluences);
+
+                    for (int j = 0; j < numInfluences; j++)
+                    {
+                      int idx = static_cast<int>(i) * numInfluences + j;
+                      influences[j] = std::make_pair(jointWeights[idx], jointIndices[idx]);
+                    }
+
+                    // Sort descending by weight to get the top 4
+                    std::ranges::partial_sort(influences, influences.begin() + components,
+                      [](const auto& a, const auto& b) { return a.first > b.first; });
+
+                    float totalWeight = 0.0f;
+                    for (int j = 0; j < components; j++)
+                    {
+                      jointsArr->SetTypedComponent(static_cast<vtkIdType>(i), j,
+                        static_cast<unsigned short>(influences[j].second));
+                      weightsArr->SetTypedComponent(
+                        static_cast<vtkIdType>(i), j, influences[j].first);
+                      totalWeight += influences[j].first;
+                    }
+
+                    // Re-normalize after potential truncation
+                    if (totalWeight > 0.0f)
+                    {
+                      for (int j = 0; j < components; j++)
+                      {
+                        float w = weightsArr->GetTypedComponent(static_cast<vtkIdType>(i), j);
+                        weightsArr->SetTypedComponent(
+                          static_cast<vtkIdType>(i), j, w / totalWeight);
+                      }
+                    }
+                  }
+                  newPolyData->GetPointData()->AddArray(jointsArr);
+                  newPolyData->GetPointData()->AddArray(weightsArr);
+                }
               }
 
               // save morphing info (aka blend shapes)
@@ -954,9 +943,8 @@ public:
             }
 
             newPolyData->GetPointData()->SetScalars(pointColors);
+            useDirectScalars = true;
           }
-
-          this->AddSkinningAttributes(newPolyData, prim, positions.size());
 
           polydata = newPolyData;
         }
@@ -977,7 +965,8 @@ public:
 
         if (subsets.empty())
         {
-          this->AddActor(renderer, hierarchy, actorCollection, path, geomPrim, prim, mat, polydata);
+          this->AddActor(renderer, hierarchy, actorCollection, path, geomPrim, prim, mat, polydata,
+            useDirectScalars);
         }
         else
         {
