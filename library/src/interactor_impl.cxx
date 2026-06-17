@@ -855,7 +855,8 @@ interactor& interactor_impl::initCommands()
 
   static const std::map<std::string, std::vector<std::string>> COMPL_OPTIONS_SET = {
     { "interactor.style", { "default", "trackball", "2d" } },
-    { "model.point_sprites.type", { "none", "sphere", "gaussian", "circle", "stddev", "bound", "cross" } },
+    { "model.point_sprites.type",
+      { "none", "sphere", "gaussian", "circle", "stddev", "bound", "cross" } },
     { "render.effect.antialiasing.mode", { "none", "fxaa", "ssaa", "taa" } },
     { "render.effect.blending.mode", { "none", "ddp", "sort", "sort_cpu", "stochastic" } },
   };
