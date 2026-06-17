@@ -133,6 +133,7 @@ public:
   void SetGridReflection(const double strength);
   void SetAxesColor(const std::vector<double>& colorXAxis, const std::vector<double>& colorYAxis,
     const std::vector<double>& colorZAxis);
+  void SetSceneHierarchyMaxWidth(const int width);
   ///@}
 
   /**
