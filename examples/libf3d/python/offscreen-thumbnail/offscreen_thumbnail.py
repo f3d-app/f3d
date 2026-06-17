@@ -38,7 +38,6 @@ def main(argv: list[str] | None = None):
     opt["render.light.intensity"] = 1.2
 
     # Post-processing: AA + AO for better thumbnails
-    opt["render.effect.antialiasing.enable"] = True
     opt["render.effect.antialiasing.mode"] = "ssaa"
     opt["render.effect.ambient_occlusion"] = True
 

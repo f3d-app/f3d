@@ -2,7 +2,7 @@
 
 f3d_test(NAME TestInteractionPostFX DATA cow.vtp INTERACTION LONG_TIMEOUT) #PQAAAAT
 f3d_test(NAME TestInteractionTimer DATA cow.vtp NO_BASELINE INTERACTION UI LONG_TIMEOUT) #Z
-f3d_test(NAME TestInteractionTrackball DATA cow.vtp ARGS --interaction-trackball INTERACTION LONG_TIMEOUT) #Mouse movements;
+f3d_test(NAME TestInteractionTrackball DATA cow.vtp ARGS --interaction-style=trackball INTERACTION LONG_TIMEOUT) #Mouse movements;
 f3d_test(NAME TestInteractionTrackballBind DATA cow.vtp INTERACTION LONG_TIMEOUT) #K#Mouse movements;
 f3d_test(NAME TestInteractionCycleCell DATA waveletArrays.vti INTERACTION LONG_TIMEOUT) #VCCC
 f3d_test(NAME TestInteractionCycleComp DATA dragon.vtu INTERACTION) #SYYYY
@@ -205,8 +205,8 @@ f3d_test(NAME TestInteractionConsoleAutoComplete DATA BoxAnimated.gltf INTERACTI
 f3d_test(NAME TestInteractionConsoleAutoCompleteNoMatch DATA BoxAnimated.gltf INTERACTION UI) #Escape;zz;Tab
 f3d_test(NAME TestInteractionConsoleAutoCompleteCandidates DATA BoxAnimated.gltf INTERACTION UI) #Escape;Tab;to;Tab
 f3d_test(NAME TestInteractionConsoleAutoCompleteHide DATA BoxAnimated.gltf INTERACTION UI) #Escape;Tab;to;Tab;Esc;Esc;Esc
-f3d_test(NAME TestInteractionConsoleAutoCompleteToggleOptions DATA cow.vtp INTERACTION UI) #Escape;to;Tab;space;m;Tab;p;Tab;e;Tab;Enter
-f3d_test(NAME TestInteractionConsoleAutoCompleteSetOptions ARGS --point-sprites=gaussian DATA cow.vtp INTERACTION UI RESOLUTION 400,300) #Escape;se;Tab;space;m;Tab;p;Tab;t;Tab;Tab;s;Tab;Enter
+f3d_test(NAME TestInteractionConsoleAutoCompleteToggleOptions DATA cow.vtp INTERACTION UI) #Escape;to;Tab;space;r;Tab;s;Tab;Enter
+f3d_test(NAME TestInteractionConsoleAutoCompleteSetOptions ARGS --point-sprites=gaussian DATA cow.vtp INTERACTION UI RESOLUTION 400,300) #Escape;se;Tab;space;m;Tab;p;Tab;t;Tab;Tab;s;p;Tab;Enter
 f3d_test(NAME TestInteractionConsoleAutoCompleteSetDisplayCompl DATA cow.vtp INTERACTION UI RESOLUTION 400,300) #Escape;se;Tab;space;m;Tab;p;Tab;t;Tab;Tab;Tab
 f3d_test(NAME TestInteractionConsoleAutoCompleteReaderOptions DATA BoxAnimated.gltf INTERACTION UI) #Escape;set_r;Tab;Q;Tab;Enter
 f3d_test(NAME TestInteractionConsoleAutoCompleteColoring DATA BoxAnimated.gltf INTERACTION UI) #Escape;cy;Tab;;c;Tab;a;Tab;Enter

@@ -94,34 +94,16 @@
       }
     },
     "effect": {
-      "translucency_support": {
-        "type": "bool",
-        "default_value": "false",
-        "deprecated": "use render.effect.blending.enable instead"
-      },
       "blending": {
-        "enable": {
-          "type": "bool",
-          "default_value": "false"
-        },
         "mode": {
           "type": "string",
-          "default_value": "ddp"
+          "default_value": "none"
         }
       },
-      "anti_aliasing": {
-        "type": "bool",
-        "default_value": "false",
-        "deprecated": "use render.effect.antialiasing.enable instead"
-      },
       "antialiasing": {
-        "enable": {
-          "type": "bool",
-          "default_value": "false"
-        },
         "mode": {
           "type": "string",
-          "default_value": "fxaa"
+          "default_value": "none"
         }
       },
       "ambient_occlusion": {
@@ -411,13 +393,9 @@
       }
     },
     "point_sprites": {
-      "enable": {
-        "type": "bool",
-        "default_value": "false"
-      },
       "type": {
         "type": "string",
-        "default_value": "sphere"
+        "default_value": "none"
       },
       "size": {
         "type": "double",

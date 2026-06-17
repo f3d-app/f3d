@@ -650,8 +650,7 @@ public:
 
     // Determine if we need a full render or just a UI render
     // At the moment, only TAA requires a full render each frame
-    bool forceRender = (this->Options.render.effect.antialiasing.enable &&
-      this->Options.render.effect.antialiasing.mode == "taa");
+    bool forceRender = this->Options.render.effect.antialiasing.mode == "taa";
 
     if (this->RenderRequested || forceRender)
     {
@@ -856,9 +855,10 @@ interactor& interactor_impl::initCommands()
 
   static const std::map<std::string, std::vector<std::string>> COMPL_OPTIONS_SET = {
     { "interactor.style", { "default", "trackball", "2d" } },
-    { "model.point_sprites.type", { "sphere", "gaussian" } },
-    { "render.effect.antialiasing.mode", { "fxaa", "ssaa", "taa" } },
-    { "render.effect.blending.mode", { "ddp", "sort", "sort_cpu", "stochastic" } },
+    { "model.point_sprites.type",
+      { "none", "sphere", "gaussian", "circle", "stddev", "bound", "cross" } },
+    { "render.effect.antialiasing.mode", { "none", "fxaa", "ssaa", "taa" } },
+    { "render.effect.blending.mode", { "none", "ddp", "sort", "sort_cpu", "stochastic" } },
   };
   auto complOptionSet = [&](const std::vector<std::string>& args)
   {
@@ -987,27 +987,22 @@ interactor& interactor_impl::initCommands()
     "cycle_anti_aliasing",
     [&](const std::vector<std::string>&)
     {
-      bool& enabled = this->Internals->Options.render.effect.antialiasing.enable;
       std::string& mode = this->Internals->Options.render.effect.antialiasing.mode;
-      if (!enabled)
+      if (mode == "none")
       {
-        enabled = true;
         mode = "fxaa";
       }
-      else
+      else if (mode == "fxaa")
       {
-        if (mode == "fxaa")
-        {
-          mode = "ssaa";
-        }
-        else if (mode == "ssaa")
-        {
-          mode = "taa";
-        }
-        else
-        {
-          enabled = false;
-        }
+        mode = "ssaa";
+      }
+      else if (mode == "ssaa")
+      {
+        mode = "taa";
+      }
+      else // if (mode == "taa")
+      {
+        mode = "none";
       }
       this->Internals->Window.render();
     },
@@ -1018,31 +1013,26 @@ interactor& interactor_impl::initCommands()
     "cycle_blending",
     [&](const std::vector<std::string>&)
     {
-      bool& enabled = this->Internals->Options.render.effect.blending.enable;
       std::string& mode = this->Internals->Options.render.effect.blending.mode;
-      if (!enabled)
+      if (mode == "none")
       {
-        enabled = true;
         mode = "ddp";
       }
-      else
+      else if (mode == "ddp")
       {
-        if (mode == "ddp")
-        {
-          mode = "sort";
-        }
-        else if (mode == "sort")
-        {
-          mode = "sort_cpu";
-        }
-        else if (mode == "sort_cpu")
-        {
-          mode = "stochastic";
-        }
-        else
-        {
-          enabled = false;
-        }
+        mode = "sort";
+      }
+      else if (mode == "sort")
+      {
+        mode = "sort_cpu";
+      }
+      else if (mode == "sort_cpu")
+      {
+        mode = "stochastic";
+      }
+      else // if (mode == "stochastic")
+      {
+        mode = "none";
       }
       this->Internals->Window.render();
     },
@@ -1088,27 +1078,18 @@ interactor& interactor_impl::initCommands()
     "cycle_point_sprites",
     [&](const std::vector<std::string>&)
     {
-      bool& enabled = this->Internals->Options.model.point_sprites.enable;
       std::string& type = this->Internals->Options.model.point_sprites.type;
 
       constexpr auto validTypes =
-        std::to_array({ "sphere", "gaussian", "circle", "stddev", "bound", "cross" });
-      if (!enabled)
+        std::to_array({ "none", "sphere", "gaussian", "circle", "stddev", "bound", "cross" });
+      auto index = std::distance(std::begin(validTypes), std::ranges::find(validTypes, type));
+      if (static_cast<size_t>(index) == validTypes.size() - 1) // last type
       {
-        enabled = true;
         type = validTypes[0];
       }
       else
       {
-        auto index = std::distance(std::begin(validTypes), std::ranges::find(validTypes, type));
-        if (static_cast<size_t>(index) == validTypes.size() - 1) // last type
-        {
-          enabled = false;
-        }
-        else
-        {
-          type = validTypes[index + 1];
-        }
+        type = validTypes[index + 1];
       }
       this->Internals->Window.render();
     },
@@ -1563,51 +1544,6 @@ interactor& interactor_impl::initBindings()
     }
   };
 
-  // "Cycle anti-aliasing" , "none/fxaa/ssaa"
-  auto docAA = [&]()
-  {
-    std::string desc;
-    if (!this->Internals->Options.render.effect.antialiasing.enable)
-    {
-      desc = "none";
-    }
-    else
-    {
-      desc = this->Internals->Options.render.effect.antialiasing.mode;
-    }
-    return std::pair("Anti-aliasing", std::move(desc));
-  };
-
-  // "Cycle point sprites" , "none/sphere/gaussian"
-  auto docPS = [&]()
-  {
-    std::string desc;
-    if (!this->Internals->Options.model.point_sprites.enable)
-    {
-      desc = "none";
-    }
-    else
-    {
-      desc = this->Internals->Options.model.point_sprites.type;
-    }
-    return std::pair("Point sprites", std::move(desc));
-  };
-
-  // "Cycle blending" , "none/ddp/sort/stochastic"
-  auto docBlend = [&]()
-  {
-    std::string desc;
-    if (!this->Internals->Options.render.effect.blending.enable)
-    {
-      desc = "none";
-    }
-    else
-    {
-      desc = this->Internals->Options.render.effect.blending.mode;
-    }
-    return std::pair("Blending", std::move(desc));
-  };
-
   // "Cycle animation" , "animationName"
   auto docAnim = [&]()
   { return std::pair("Animation", this->Internals->AnimationManager->GetAnimationName()); };
@@ -1691,9 +1627,9 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "S"}, "cycle_coloring array", "Scene", docArray, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "Y"}, "cycle_coloring component", "Scene", docComp, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "B"}, "toggle ui.scalar_bar", "Scene", std::bind(docTgl, "Scalar bar", std::cref(opts.ui.scalar_bar)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::NONE, "P"}, "cycle_blending", "Scene", docBlend, f3d::interactor::BindingType::CYCLIC);
+  this->addBinding({mod_t::NONE, "P"}, "cycle_blending", "Scene", std::bind(docStr, "Blending", std::cref(opts.render.effect.blending.mode)), f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "Q"}, "toggle render.effect.ambient_occlusion","Scene", std::bind(docTgl, "Ambient occlusion", std::cref(opts.render.effect.ambient_occlusion)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::NONE, "A"}, "cycle_anti_aliasing","Scene", docAA, f3d::interactor::BindingType::CYCLIC);
+  this->addBinding({mod_t::NONE, "A"}, "cycle_anti_aliasing","Scene", std::bind(docStr, "Anti-aliasing", std::cref(opts.render.effect.antialiasing.mode)), f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "T"}, "toggle render.effect.tone_mapping","Scene", std::bind(docTgl, "Toggle tone mapping", std::cref(opts.render.effect.tone_mapping)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "E"}, "toggle render.show_edges","Scene", std::bind(docTglOpt, "Toggle edges display", std::cref(opts.render.show_edges)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "X"}, "toggle ui.axis","Scene", std::bind(docTgl, "Toggle axes display", std::cref(opts.ui.axis)), f3d::interactor::BindingType::TOGGLE);
@@ -1713,7 +1649,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "V"}, "toggle_volume_rendering","Scene", std::bind(docTgl, "Volume rendering", std::cref(opts.model.volume.enable)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "I"}, "toggle model.volume.inverse","Scene", std::bind(docTgl, "Inverse volume opacity", std::cref(opts.model.volume.inverse)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::CTRL, "N"}, "toggle model.normal_glyphs.enable","Scene", std::bind(docTgl, "Normal glyphs", std::cref(opts.model.normal_glyphs.enable)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::NONE, "O"}, "cycle_point_sprites","Scene", docPS, f3d::interactor::BindingType::CYCLIC);
+  this->addBinding({mod_t::NONE, "O"}, "cycle_point_sprites","Scene", std::bind(docStr, "Point sprites", std::cref(opts.model.point_sprites.type)), f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "U"}, "toggle render.background.blur.enable","Scene", std::bind(docTgl, "Blur background", std::cref(opts.render.background.blur.enable)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "K"}, "cycle_interactor_style","Scene", std::bind(docStr, "Interaction style", std::cref(opts.interactor.style)), f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "F"}, "toggle render.hdri.ambient","Scene", std::bind(docTgl, "HDRI ambient lighting", std::cref(opts.render.hdri.ambient)), f3d::interactor::BindingType::TOGGLE);

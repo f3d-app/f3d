@@ -237,12 +237,6 @@ std::pair<std::string, int> F3DOptionsTools::GetClosestOption(
     checkDistance(key, option, ret);
   }
 
-  // Check cli names in custom mapping options
-  for (const auto& [key, value] : F3DOptionsTools::CustomMappingOptions)
-  {
-    checkDistance(std::string(key), option, ret);
-  }
-
   // Check cli names for libf3d options
   for (const auto& [key, value] : F3DOptionsTools::LibOptionsNames)
   {
@@ -322,22 +316,14 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
           }
           else
           {
-            auto customIter = F3DOptionsTools::CustomMappingOptions.find(longName);
-            if (customIter != F3DOptionsTools::CustomMappingOptions.end())
+            // Recover default value from lib options
+            auto libIter = F3DOptionsTools::LibOptionsNames.find(cliOption.LongName);
+            if (libIter != F3DOptionsTools::LibOptionsNames.end())
             {
-              defaultValue = customIter->second;
-            }
-            else
-            {
-              // Recover default value from lib options
-              auto libIter = F3DOptionsTools::LibOptionsNames.find(cliOption.LongName);
-              if (libIter != F3DOptionsTools::LibOptionsNames.end())
-              {
-                f3d::options opt;
-                std::string name = std::string(libIter->second);
-                // let default value empty for unset options
-                defaultValue = opt.hasValue(name) ? opt.getAsString(name) : "";
-              }
+              f3d::options opt;
+              std::string name = std::string(libIter->second);
+              // let default value empty for unset options
+              defaultValue = opt.hasValue(name) ? opt.getAsString(name) : "";
             }
           }
 
@@ -509,108 +495,6 @@ std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3
   {
     libf3dOptions.emplace_back(std::make_pair(libf3dIter->second, value));
   }
-
-  // anti-aliasing is handled in two options in the lib
-  else if (key == "anti-aliasing")
-  {
-    if (value != "none")
-    {
-      // Handle deprecated boolean option
-      bool deprecatedBooleanOption;
-      if (F3DOptionsTools::Parse(value, deprecatedBooleanOption))
-      {
-        f3d::log::warn("--anti-aliasing is a now a string, please specify the type of "
-                       "anti-aliasing or use the implicit default");
-        libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.enable", value));
-      }
-      else
-      {
-        libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.enable", "true"));
-        libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.mode", value));
-      }
-    }
-    else
-    {
-      libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.enable", "false"));
-    }
-  }
-
-  // handle deprecated anti-aliasing option
-  else if (key == "anti-aliasing-mode")
-  {
-    f3d::log::warn("--anti-aliasing-mode is deprecated");
-    libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.mode", value));
-  }
-
-  // blending is handled in two options in the lib
-  else if (key == "blending")
-  {
-    if (value != "none")
-    {
-      libf3dOptions.emplace_back(std::make_pair("render.effect.blending.enable", "true"));
-      libf3dOptions.emplace_back(std::make_pair("render.effect.blending.mode", value));
-    }
-    else
-    {
-      libf3dOptions.emplace_back(std::make_pair("render.effect.blending.enable", "false"));
-    }
-  }
-
-  // handle deprecated translucency support
-  else if (key == "translucency-support")
-  {
-    f3d::log::warn("--translucency-support is deprecated, please use --blending instead");
-    libf3dOptions.emplace_back(std::make_pair("render.effect.blending.enable", value));
-  }
-
-  // point sprites is handled in two options in the lib
-  else if (key == "point-sprites")
-  {
-    if (value != "none")
-    {
-      // Handle deprecated boolean option
-      bool deprecatedBooleanOption;
-      if (F3DOptionsTools::Parse(value, deprecatedBooleanOption))
-      {
-        f3d::log::warn("--point-sprites is a now a string, please specify the type of "
-                       "point sprites to use or use the implicit default");
-        libf3dOptions.emplace_back(std::make_pair("model.point_sprites.enable", value));
-      }
-      else
-      {
-        libf3dOptions.emplace_back(std::make_pair("model.point_sprites.enable", "true"));
-        libf3dOptions.emplace_back(std::make_pair("model.point_sprites.type", value));
-      }
-    }
-    else
-    {
-      libf3dOptions.emplace_back(std::make_pair("model.point_sprites.enable", "false"));
-    }
-  }
-
-  // handle deprecated point-sprites-type option
-  else if (key == "point-sprites-type")
-  {
-    f3d::log::warn("--point-sprites-type is deprecated");
-    libf3dOptions.emplace_back(std::make_pair("model.point_sprites.type", value));
-  }
-
-  // handle deprecated interaction-trackball option
-  else if (key == "interaction-trackball")
-  {
-    f3d::log::warn(
-      "--interaction-trackball is deprecated, please use --interaction-style=trackball instead");
-    bool trackball;
-    if (!F3DOptionsTools::Parse(value, trackball))
-    {
-      f3d::log::error("Cannot parse --interaction-trackball value: " + value);
-    }
-    else if (trackball)
-    {
-      libf3dOptions.emplace_back(std::make_pair("interactor.style", "trackball"));
-    }
-  }
-
   else
   {
     // If nothing to convert, just return the input

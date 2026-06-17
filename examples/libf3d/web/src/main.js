@@ -15,7 +15,7 @@ const settings = {
     options.toggle("model.scivis.cells");
 
     // make it look nice
-    options.toggle("render.effect.antialiasing.enable");
+    options.setAsString("render.effect.antialiasing.mode", "fxaa");
     options.toggle("render.effect.tone_mapping");
     options.toggle("render.effect.ambient_occlusion");
     options.toggle("render.hdri.ambient");
@@ -69,7 +69,7 @@ f3d(settings)
     const idOptionMappings = [
       ["grid", "render.grid.enable"],
       ["axis", "ui.axis"],
-      ["fxaa", "render.effect.antialiasing.enable"],
+      ["fxaa", "render.effect.antialiasing.mode"],
       ["tone", "render.effect.tone_mapping"],
       ["ssao", "render.effect.ambient_occlusion"],
       ["ambient", "render.hdri.ambient"],

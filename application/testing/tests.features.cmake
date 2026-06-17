@@ -290,22 +290,20 @@ f3d_test(NAME TestOutputStream DATA suzanne.ply ARGS --verbose=quiet --output=- 
 f3d_test(NAME TestOutputStreamInfo DATA suzanne.ply ARGS --verbose=info --output=- REGEXP "redirected to stderr" NO_BASELINE NO_OUTPUT)
 
 ## AntiAliasing
+f3d_test(NAME TestAntiAliasingImplicit DATA suzanne.ply ARGS -a --verbose REGEXP "'anti-aliasing' = 'fxaa'" NO_BASELINE)
 f3d_test(NAME TestInvalidAntiAliasingMode DATA suzanne.ply ARGS --anti-aliasing=foo REGEXP "foo is an invalid antialiasing mode" NO_BASELINE)
-f3d_test(NAME TestAntiAliasingModeDeprecated DATA suzanne.ply ARGS -a --anti-aliasing-mode=ssaa REGEXP "--anti-aliasing-mode is deprecated" NO_BASELINE)
-f3d_test(NAME TestAntiAliasingDeprecated DATA suzanne.ply ARGS --anti-aliasing=true REGEXP "please specify the type of anti-aliasing" NO_BASELINE)
 
 ## Blending
+f3d_test(NAME TestBlendingImplicit DATA suzanne.ply ARGS -p --verbose REGEXP "'blending' = 'ddp'" NO_BASELINE)
 f3d_test(NAME TestInvalidBlendingMode DATA suzanne.ply ARGS --blending=foo REGEXP "foo is an invalid blending mode" NO_BASELINE)
-f3d_test(NAME TestTranslucencySupportDeprecated DATA suzanne.ply ARGS --translucency-support REGEXP "--translucency-support is deprecated" NO_BASELINE)
 
 ## InteractionStyle
-f3d_test(NAME TestInteractionStyleImplicit DATA suzanne.ply ARGS -k NO_BASELINE)
-f3d_test(NAME TestTrackballInvalid DATA suzanne.ply ARGS --interaction-trackball=foo REGEXP "Cannot parse --interaction-trackball value" NO_BASELINE)
+f3d_test(NAME TestInteractionStyleImplicit DATA suzanne.ply ARGS -k --verbose REGEXP "'interaction-style' = '2d'" NO_BASELINE)
+f3d_test(NAME TestInvalidInteractionStyle DATA suzanne.ply ARGS --interaction-style=foo REGEXP "Unrecognized interaction style" NO_BASELINE)
 
 ## PointSprites
+f3d_test(NAME TestPointSpritesImplicit DATA suzanne.ply ARGS -o --verbose REGEXP "'point-sprites' = 'sphere'" NO_BASELINE)
 f3d_test(NAME TestInvalidPointSprites DATA suzanne.ply ARGS --point-sprites=foo REGEXP "foo is an invalid point sprites type" NO_BASELINE)
-f3d_test(NAME TestPointSpritesTypeDeprecated DATA pointsCloud.vtp ARGS --point-sprites-type=sphere REGEXP "--point-sprites-type is deprecated" NO_BASELINE)
-f3d_test(NAME TestPointSpritesDeprecated DATA pointsCloud.vtp ARGS --point-sprites=true REGEXP "please specify the type of point sprites" NO_BASELINE)
 f3d_test(NAME TestAnimationUserMatrixPointSprites DATA BoxAnimated.gltf ARGS --point-sprites --point-sprites-size=50 --animation-time=2)
 f3d_test(NAME TestAnimationInputChangePointSprites DATA v_rock2.mdl ARGS --point-sprites --point-sprites-size=50 --animation-time=0.01 --animation-indices=1)
 
@@ -657,7 +655,7 @@ f3d_test(NAME TestConfigFileInvalidOptions DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}
 f3d_test(NAME TestConfigFileNoOptions DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/no_options.json REGEXP "does not contains options" NO_BASELINE)
 
 # Test update interaction verbose
-f3d_test(NAME TestConfigFileBindingsVerbose DATA dragon.vtu ARGS --verbose CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json REGEXP "'Shift.O' : '`toggle model.point_sprites.enable` '" NO_BASELINE)
+f3d_test(NAME TestConfigFileBindingsVerbose DATA dragon.vtu ARGS --verbose CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json REGEXP "'Shift.O' : '`set model.point_sprites.type sphere` '" NO_BASELINE)
 
 # Test list-bindings display with config file
 f3d_test(NAME TestConfigFileBindingsList ARGS --list-bindings CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json REGEXP "Ctrl.Shift.O `toggle ui.filename`" NO_BASELINE)
