@@ -190,7 +190,14 @@ void f3d_options_toggle(f3d_options_t* options, const char* name)
   }
 
   f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
-  cpp_options->toggle(name);
+  try
+  {
+    cpp_options->toggle(name);
+  }
+  catch (const f3d::options::incompatible_exception& ex)
+  {
+    f3d::log::error(ex.what());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -322,7 +329,14 @@ void f3d_options_remove_value(f3d_options_t* options, const char* name)
   }
 
   f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
-  cpp_options->removeValue(name);
+  try
+  {
+    cpp_options->removeValue(name);
+  }
+  catch (f3d::options::incompatible_exception& ex)
+  {
+    f3d::log::error(ex.what());
+  }
 }
 
 //----------------------------------------------------------------------------
