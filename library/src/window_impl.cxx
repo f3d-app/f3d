@@ -613,6 +613,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
   renderer->SetGridAbsolute(opt.render.grid.absolute);
   renderer->SetGridReflection(opt.render.grid.reflection);
+  renderer->SetShadows(opt.render.shadows.enable);
   renderer->ShowGrid(opt.render.grid.enable);
   renderer->SetGridColor(opt.render.grid.color);
 
