@@ -1,4 +1,5 @@
 #include "options_c_api.h"
+#include "log.h"
 #include "options.h"
 
 #include <cstring>
