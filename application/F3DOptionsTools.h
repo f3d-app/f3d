@@ -9,13 +9,15 @@
 
 #include <filesystem>
 #include <map>
+#include <set>
 #include <string>
 #include <tuple>
 #include <vector>
 
 namespace F3DOptionsTools
 {
-using OptionsDict = std::map<std::string, std::string>;
+using OptionValue = std::variant<std::vector<std::string>, std::string>;
+using OptionsDict = std::map<std::string, OptionValue>;
 using OptionsEntry = std::tuple<OptionsDict, std::string, std::string, std::string>;
 using OptionsEntries = std::vector<OptionsEntry>;
 
@@ -27,7 +29,7 @@ using OptionsEntries = std::vector<OptionsEntry>;
  * and ParseCLIOptions
  */
 static inline const OptionsDict DefaultAppOptions = {
-  { "input", "" },
+  { "input", { "" } },
   { "output", "" },
   { "list-bindings", "false" },
   { "no-background", "false" },
@@ -170,10 +172,15 @@ static inline const std::map<std::string_view, std::string_view> CustomMappingOp
 };
 
 /**
+ * List of CLI option names that can accept multiple values
+ */
+static inline const std::set<std::string_view> MultiValueOptions = { "define", "input", "reset" };
+
+/**
  * Convert a CLI options key/value to a vector of libf3d options key/value
  */
-std::vector<std::pair<std::string, std::string>> ConvertToLibf3dOptions(
-  const std::string& key, const std::string& value);
+std::vector<std::pair<std::string, F3DOptionsTools::OptionValue>> ConvertToLibf3dOptions(
+  const std::string& key, const OptionValue& value);
 
 /**
  * Browse through all possible option names to find one that have the smallest distance to the
@@ -199,12 +206,18 @@ void PrintHelpPair(
   std::string_view key, std::string_view help, int keyWidth = 10, int helpWidth = 70);
 
 /**
+ * Convert the variant-based OptionValue to a string. Useful for debugging
+ */
+std::string ConvertToString(const OptionValue& optionValue);
+
+/**
  * Parse provided string into provided typed var.
  * Return true if successful, false otherwise.
  */
 template<typename T>
-bool Parse(const std::string& optionString, T& option)
+bool Parse(const OptionValue& optionValue, T& option)
 {
+  const std::string optionString = ConvertToString(optionValue);
   try
   {
     option = f3d::options::parse<T>(optionString);

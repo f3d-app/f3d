@@ -26,11 +26,10 @@ namespace
 {
 /**
  * True boolean options need to be filtered out in ParseCLIOptions
- * Also filter out special options like `define` and `reset`
  * This is the easiest, compile time way to do it
  */
 constexpr std::array CLIBooleans = { "version", "help", "list-readers", "scan-plugins",
-  "list-rendering-backends", "define", "reset" };
+  "list-rendering-backends" };
 
 //----------------------------------------------------------------------------
 /**
@@ -275,12 +274,6 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
   std::vector<std::shared_ptr<cxxopts::Value>> cxxoptsValues;
   auto cxxoptsInputPositionals = cxxopts::value<std::vector<std::string>>(positionals);
 
-  std::vector<std::string> defines;
-  auto cxxoptsDefines = cxxopts::value<std::vector<std::string>>(defines);
-
-  std::vector<std::string> resets;
-  auto cxxoptsResets = cxxopts::value<std::vector<std::string>>(resets);
-
   try
   {
     cxxopts::Options cxxOptions(execName, F3D::AppTitle);
@@ -294,8 +287,6 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       if (std::string(optionGroup.GroupName) == "Applicative")
       {
         group("input", "Input files", cxxoptsInputPositionals, "<files>");
-        group("D,define", "Define libf3d options", cxxoptsDefines, "libf3d.option=value");
-        group("R,reset", "Reset libf3d options", cxxoptsResets, "libf3d.option");
       }
 
       // Add each option to cxxopts
@@ -313,12 +304,15 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
           std::string defaultValue;
           std::string helpText(cliOption.HelpText);
           std::string longName(cliOption.LongName);
+          std::string valueHelper(cliOption.ValueHelper);
 
           // Recover default value from app options
           auto appIter = F3DOptionsTools::DefaultAppOptions.find(longName);
           if (appIter != F3DOptionsTools::DefaultAppOptions.end())
           {
-            defaultValue = appIter->second;
+            // defaults are always stored as strings
+            assert(std::holds_alternative<std::string>(appIter->second));
+            defaultValue = std::get<std::string>(appIter->second);
           }
           else
           {
@@ -351,7 +345,14 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
           }
 
           // Recover the implicit value and set it if any
-          cxxoptsValues.emplace_back(cxxopts::value<std::string>());
+          if (valueHelper == "<string_list>")
+          {
+            cxxoptsValues.emplace_back(cxxopts::value<std::vector<std::string>>());
+          }
+          else
+          {
+            cxxoptsValues.emplace_back(cxxopts::value<std::string>());
+          }
           auto& val = cxxoptsValues.back();
           if (!cliOption.ImplicitValue.empty())
           {
@@ -445,33 +446,34 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       throw F3DExFailure("unknown options");
     }
 
-    // Add each CLI options into a vector of string/string and return it
+    // Add each CLI options into a OptionsDict and return it
     F3DOptionsTools::OptionsDict cliOptionsDict;
     for (const auto& res : result)
     {
       // Discard boolean option like `--version` or `--help`
-      if (std::ranges::find(::CLIBooleans, res.key()) == ::CLIBooleans.end())
+      if (std::ranges::find(::CLIBooleans, res.key()) != ::CLIBooleans.end())
+      {
+        continue;
+      }
+      auto iter = cliOptionsDict.find(res.key());
+      if (iter == cliOptionsDict.end())
       {
         cliOptionsDict[res.key()] = res.value();
       }
-    }
-
-    // Handle defines and add them as proper options
-    for (const std::string& define : defines)
-    {
-      std::string::size_type sepIdx = define.find_first_of('=');
-      if (sepIdx == std::string::npos)
+      else
       {
-        f3d::log::warn("Could not parse a define '", define, "'");
-        continue;
+        // key already exists. Create or append to vector
+        if (std::holds_alternative<std::vector<std::string>>(iter->second))
+        {
+          auto& vec = std::get<std::vector<std::string>>(iter->second);
+          vec.push_back(res.value());
+        }
+        else
+        {
+          auto& item = std::get<std::string>(iter->second);
+          cliOptionsDict[res.key()] = std::vector<std::string>{ item, res.value() };
+        }
       }
-      cliOptionsDict[define.substr(0, sepIdx)] = define.substr(sepIdx + 1);
-    }
-
-    // Handles reset using the dedicated syntax
-    for (const std::string& reset : resets)
-    {
-      cliOptionsDict["reset-" + reset] = "";
     }
 
     return cliOptionsDict;
@@ -498,10 +500,11 @@ void F3DOptionsTools::PrintHelpPair(
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3dOptions(
-  const std::string& key, const std::string& value)
+std::vector<std::pair<std::string, F3DOptionsTools::OptionValue>>
+F3DOptionsTools::ConvertToLibf3dOptions(const std::string& key, const OptionValue& value)
 {
-  std::vector<std::pair<std::string, std::string>> libf3dOptions;
+  std::vector<std::pair<std::string, F3DOptionsTools::OptionValue>> libf3dOptions;
+  [[maybe_unused]] const bool is_single_valued = std::holds_alternative<std::string>(value);
 
   // Simple one-to-one case
   auto libf3dIter = F3DOptionsTools::LibOptionsNames.find(key);
@@ -513,20 +516,22 @@ std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3
   // anti-aliasing is handled in two options in the lib
   else if (key == "anti-aliasing")
   {
-    if (value != "none")
+    assert(is_single_valued);
+    const std::string& value_str = std::get<std::string>(value);
+    if (value_str != "none")
     {
       // Handle deprecated boolean option
       bool deprecatedBooleanOption;
-      if (F3DOptionsTools::Parse(value, deprecatedBooleanOption))
+      if (F3DOptionsTools::Parse(value_str, deprecatedBooleanOption))
       {
         f3d::log::warn("--anti-aliasing is a now a string, please specify the type of "
                        "anti-aliasing or use the implicit default");
-        libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.enable", value));
+        libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.enable", value_str));
       }
       else
       {
         libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.enable", "true"));
-        libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.mode", value));
+        libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.mode", value_str));
       }
     }
     else
@@ -538,17 +543,21 @@ std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3
   // handle deprecated anti-aliasing option
   else if (key == "anti-aliasing-mode")
   {
+    assert(is_single_valued);
+    const std::string& value_str = std::get<std::string>(value);
     f3d::log::warn("--anti-aliasing-mode is deprecated");
-    libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.mode", value));
+    libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.mode", value_str));
   }
 
   // blending is handled in two options in the lib
   else if (key == "blending")
   {
-    if (value != "none")
+    assert(is_single_valued);
+    const std::string& value_str = std::get<std::string>(value);
+    if (value_str != "none")
     {
       libf3dOptions.emplace_back(std::make_pair("render.effect.blending.enable", "true"));
-      libf3dOptions.emplace_back(std::make_pair("render.effect.blending.mode", value));
+      libf3dOptions.emplace_back(std::make_pair("render.effect.blending.mode", value_str));
     }
     else
     {
@@ -559,14 +568,18 @@ std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3
   // handle deprecated translucency support
   else if (key == "translucency-support")
   {
+    assert(is_single_valued);
+    const std::string& value_str = std::get<std::string>(value);
     f3d::log::warn("--translucency-support is deprecated, please use --blending instead");
-    libf3dOptions.emplace_back(std::make_pair("render.effect.blending.enable", value));
+    libf3dOptions.emplace_back(std::make_pair("render.effect.blending.enable", value_str));
   }
 
   // point sprites is handled in two options in the lib
   else if (key == "point-sprites")
   {
-    if (value != "none")
+    assert(is_single_valued);
+    const std::string& value_str = std::get<std::string>(value);
+    if (value_str != "none")
     {
       // Handle deprecated boolean option
       bool deprecatedBooleanOption;
@@ -574,12 +587,12 @@ std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3
       {
         f3d::log::warn("--point-sprites is a now a string, please specify the type of "
                        "point sprites to use or use the implicit default");
-        libf3dOptions.emplace_back(std::make_pair("model.point_sprites.enable", value));
+        libf3dOptions.emplace_back(std::make_pair("model.point_sprites.enable", value_str));
       }
       else
       {
         libf3dOptions.emplace_back(std::make_pair("model.point_sprites.enable", "true"));
-        libf3dOptions.emplace_back(std::make_pair("model.point_sprites.type", value));
+        libf3dOptions.emplace_back(std::make_pair("model.point_sprites.type", value_str));
       }
     }
     else
@@ -591,19 +604,22 @@ std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3
   // handle deprecated point-sprites-type option
   else if (key == "point-sprites-type")
   {
+    assert(is_single_valued);
+    const std::string& value_str = std::get<std::string>(value);
     f3d::log::warn("--point-sprites-type is deprecated");
-    libf3dOptions.emplace_back(std::make_pair("model.point_sprites.type", value));
+    libf3dOptions.emplace_back(std::make_pair("model.point_sprites.type", value_str));
   }
 
   // handle deprecated interaction-trackball option
   else if (key == "interaction-trackball")
   {
+    const std::string& value_str = std::get<std::string>(value);
     f3d::log::warn(
       "--interaction-trackball is deprecated, please use --interaction-style=trackball instead");
     bool trackball;
-    if (!F3DOptionsTools::Parse(value, trackball))
+    if (!F3DOptionsTools::Parse(value_str, trackball))
     {
-      f3d::log::error("Cannot parse --interaction-trackball value: " + value);
+      f3d::log::error("Cannot parse --interaction-trackball value: " + value_str);
     }
     else if (trackball)
     {
@@ -618,4 +634,20 @@ std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3
   }
 
   return libf3dOptions;
+}
+
+std::string F3DOptionsTools::ConvertToString(const F3DOptionsTools::OptionValue& optionValue)
+{
+  if (std::holds_alternative<std::string>(optionValue))
+  {
+    return std::get<std::string>(optionValue);
+  }
+  else if (std::holds_alternative<std::vector<std::string>>(optionValue))
+  {
+    const auto& vec = std::get<std::vector<std::string>>(optionValue);
+    auto concatenate = [](const std::string& result, const std::string& value)
+    { return result + " , " + value; };
+    return std::accumulate(vec.cbegin(), vec.cend(), std::string{ "" }, concatenate);
+  }
+  return "";
 }

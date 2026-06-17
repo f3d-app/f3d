@@ -71,12 +71,58 @@ f3d::interactor* GlobalInteractor = nullptr;
 
 constexpr std::string_view F3D_PIPED = "-";
 
+namespace
+{
+// helper to apply Callable to all items of OptionValue no matter if it is a
+// single valued string or a vector of strings
+// based on example at https://en.cppreference.com/cpp/utility/variant/visit2
+
+template<typename Callable>
+void apply_to_all(F3DOptionsTools::OptionValue& option, Callable f)
+{
+  std::visit(
+    [f](auto&& value)
+    {
+      using T = std::decay_t<decltype(value)>;
+      if constexpr (std::is_same_v<T, std::string>)
+      {
+        f(value);
+      }
+      else if constexpr (std::is_same_v<T, std::vector<std::string>>)
+      {
+        for (auto& item : value)
+        {
+          f(item);
+        }
+      }
+      else
+      {
+        static_assert(false, "non-exhaustive visitor!");
+      }
+    },
+    option);
+}
+void HandleDefine(f3d::options& libOptions, const std::string& optionValue)
+{
+  std::string::size_type sepidx = optionValue.find_first_of('=');
+  if (sepidx == std::string::npos)
+  {
+    f3d::log::warn("Could not parse a define '", optionValue, "'");
+    return;
+  }
+  const auto key = optionValue.substr(0, sepidx);
+  const auto value = optionValue.substr(sepidx + 1);
+  libOptions.setAsString(key, value);
+}
+}
+
 class F3DStarter::F3DInternals
 {
 public:
   F3DInternals() = default;
 
-  using log_entry_t = std::tuple<std::string, std::string, std::string, std::string, std::string>;
+  using log_entry_t =
+    std::tuple<std::string, std::string, std::string, std::string, F3DOptionsTools::OptionValue>;
 
   // XXX: The values in the following two structs
   // are left uninitialized as the will all be initialized from
@@ -571,7 +617,8 @@ public:
     {
       const auto& [bindStr, source, matchType, match, commands] = tuple;
       const std::string origin = F3DInternals::FormatOrigin(source, matchType, match);
-      f3d::log::debug(" '", bindStr, "' ", sep, " '", commands, "' from ", origin);
+      f3d::log::debug(" '", bindStr, "' ", sep, " '", F3DOptionsTools::ConvertToString(commands),
+        "' from ", origin);
     }
     f3d::log::debug("");
   }
@@ -644,45 +691,50 @@ public:
               {
                 auto [libf3dOptionName, libf3dOptionValue] = libf3dOption;
 
-                bool reset = false;
-
-                // Handle options reset
-                if (libf3dOptionName.starts_with("reset-"))
-                {
-                  if (libf3dOptionName.size() > 6)
-                  {
-                    reset = true;
-                    libf3dOptionName = libf3dOptionName.substr(6);
-                    keyForLog = libf3dOptionName;
-                    libf3dOptionValue = "reset";
-                  }
-                  else
-                  {
-                    f3d::log::warn("Invalid option: 'reset' must be followed by a valid option "
-                                   "name, ignoring entry");
-                    continue;
-                  }
-                }
-
                 // Handle reader options
                 std::vector<std::string> readerOptionNames = f3d::engine::getAllReaderOptionNames();
                 if (std::ranges::find(readerOptionNames, libf3dOptionName) !=
                   readerOptionNames.end())
                 {
-                  f3d::engine::setReaderOption(libf3dOptionName, libf3dOptionValue);
+                  assert(std::holds_alternative<std::string>(libf3dOptionValue));
+                  std::string libf3dOptionValueStr = std::get<std::string>(libf3dOptionValue);
+
+                  f3d::engine::setReaderOption(libf3dOptionName, libf3dOptionValueStr);
                   continue;
                 }
 
                 try
                 {
-                  // Assume this is a libf3d option and set/reset the value
-                  if (reset)
+                  if (libf3dOptionName == "reset")
                   {
-                    libOptions.reset(libf3dOptionName);
+                    apply_to_all(libf3dOptionValue,
+                      [&libOptions, &keyForLog](const std::string& optionValue)
+                      {
+                        keyForLog = optionValue;
+                        if (optionValue.empty())
+                        {
+                          f3d::log::warn("Invalid option: 'reset' must be followed by a valid "
+                                         "option name, ignoring entry");
+                          return;
+                        }
+                        libOptions.reset(optionValue);
+                      });
+                  }
+                  else if (libf3dOptionName == "define")
+                  {
+                    apply_to_all(libf3dOptionValue,
+                      [&libOptions, &keyForLog](const std::string& optionValue)
+                      {
+                        keyForLog = optionValue;
+                        HandleDefine(libOptions, optionValue);
+                      });
                   }
                   else
                   {
-                    libOptions.setAsString(libf3dOptionName, libf3dOptionValue);
+                    assert(std::holds_alternative<std::string>(libf3dOptionValue));
+                    const std::string libf3dOptionValueStr =
+                      std::get<std::string>(libf3dOptionValue);
+                    libOptions.setAsString(libf3dOptionName, libf3dOptionValueStr);
                   }
 
                   // Log the option if needed
@@ -697,8 +749,9 @@ public:
                   if (!quiet)
                   {
                     const std::string origin = F3DInternals::FormatOrigin(source, matchType, match);
-                    f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue,
-                      "' from ", origin, " because: ", ex.what());
+                    f3d::log::warn("Could not set '", keyForLog, "' to '",
+                      F3DOptionsTools::ConvertToString(libf3dOptionValue), "' from ", origin,
+                      " because: ", ex.what());
                   }
                 }
                 catch (const f3d::options::inexistent_exception&)
@@ -706,8 +759,7 @@ public:
                   if (!quiet)
                   {
                     const std::string origin = F3DInternals::FormatOrigin(source, matchType, match);
-                    auto [closestName, dist] =
-                      F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
+                    auto [closestName, dist] = F3DOptionsTools::GetClosestOption(keyForLog, true);
                     f3d::log::warn("'", keyForLog, "' option from ", origin,
                       " does not exists , did you mean '", closestName, "'?");
                   }
@@ -750,7 +802,8 @@ public:
   {
     if (!F3DOptionsTools::Parse(appOptions.at(name), option))
     {
-      f3d::log::warn("Could not parse '" + appOptions.at(name) + "' into '" + name + "' option");
+      f3d::log::warn("Could not parse '" + F3DOptionsTools::ConvertToString(appOptions.at(name)) +
+        "' into '" + name + "' option");
     }
   }
 
@@ -762,7 +815,7 @@ public:
   void ParseOption(const F3DOptionsTools::OptionsDict& appOptions, const std::string& name,
     std::optional<T>& option)
   {
-    const std::string& optStr = appOptions.at(name);
+    const std::string& optStr = F3DOptionsTools::ConvertToString(appOptions.at(name));
     if (optStr.empty())
     {
       option = std::nullopt;
@@ -1071,8 +1124,8 @@ int F3DStarter::Start(int argc, char** argv)
   {
     if (!F3DOptionsTools::Parse(iter->second, noConfig))
     {
-      f3d::log::warn(
-        "Could not parse '" + iter->second + "' into 'no-config' option, assuming false");
+      f3d::log::warn("Could not parse '" + F3DOptionsTools::ConvertToString(iter->second) +
+        "' into 'no-config' option, assuming false");
     }
   }
 
@@ -1570,6 +1623,7 @@ void F3DStarter::LoadFileGroupInternal(
   // options names are shared between options instance
   F3DOptionsTools::OptionsDict dynamicOptionsDict;
   std::vector<std::string> optionNames = dynamicOptions.getAllNames();
+  std::vector<std::string> resets;
   for (const auto& name : optionNames)
   {
     if (!dynamicOptions.isSame(this->Internals->LibOptions, name))
@@ -1578,7 +1632,7 @@ void F3DStarter::LoadFileGroupInternal(
       {
         // If a dynamic option has been changed and does not have value, it means it was reset using
         // the command line reset it using the dedicated syntax
-        dynamicOptionsDict["reset-" + name] = "";
+        resets.push_back(name);
       }
       else
       {
@@ -1588,6 +1642,7 @@ void F3DStarter::LoadFileGroupInternal(
       }
     }
   }
+  dynamicOptionsDict["reset"] = resets;
 
   // Detect interactively changed verbose level and add it to dynamic options
   f3d::log::VerboseLevel currentVerboseLevel = f3d::log::getVerboseLevel();

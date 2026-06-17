@@ -237,13 +237,16 @@ f3d_test(NAME TestFontColor DATA suzanne.ply ARGS -n --font-color=Orange UI)
 
 ## Special CLI syntax
 f3d_test(NAME TestDefines DATA dragon.vtu ARGS -Dscene.up_direction=+Z --define=model.color.rgb=red)
+f3d_test(NAME TestDefinesMultiple DATA dragon.vtu ARGS --define=scene.up_direction=+Z --define=model.color.rgb=red)
 f3d_test(NAME TestDefinesInvalid DATA dragon.vtu ARGS -Dscene.up_direction+Z REGEXP "Could not parse a define" NO_BASELINE)
 f3d_test(NAME TestDefinesInexistent DATA dragon.vtu ARGS -Dscene.up_director=+Z REGEXP "option from CLI options does not exists" NO_BASELINE)
 f3d_test(NAME TestAlternativeOptionSyntax DATA WaterBottle.glb ARGS --max-size 0.2 REGEXP "file is bigger than max size" NO_BASELINE)
 f3d_test(NAME TestCustomOptionsNone DATA red_translucent_monkey.gltf ARGS --blending=none --anti-aliasing=none --point-sprites=none)
+f3d_test(NAME TestDefineAndReset DATA dragon.vtu ARGS -Drender.show_edges=1 --define=render.background.color=1,1,1 -Rrender.show_edges --reset=render.background.color)
 
 ## Config
 f3d_test(NAME TestConfigReset DATA suzanne.stl ARGS -Rrender.grid.enable --reset=ui.axis CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json)
+f3d_test(NAME TestConfigResetMultiple DATA suzanne.stl ARGS --reset=render.grid.enable --reset=ui.axis CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json)
 f3d_test(NAME TestConfigResetInexistent DATA suzanne.stl ARGS -Rrender.glid.enable REGEXP "option from CLI options does not exists" NO_BASELINE)
 f3d_test(NAME TestConfigOrder DATA suzanne.ply ARGS CONFIG ${F3D_SOURCE_DIR}/testing/configs/config_order.json) # `.+` > `.*` alphabetically but overridden by the order
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
