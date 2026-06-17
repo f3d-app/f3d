@@ -8,6 +8,7 @@
 #include "vtkF3DNamedColors.h"
 
 #include <vtkMath.h>
+#include <vtkMathUtilities.h>
 #include <vtkSmartPointer.h>
 
 #include <algorithm>
@@ -908,7 +909,28 @@ void increase(T& val, const f3d::options::domain_range_t<T>& domain, bool up)
 
   newVal += dir * domain.increment;
 
-  // TODO this can be incorrect in case of double computation, how to address ?
+  // Required because of double computation
+  bool upEqual = vtkMathUtilities::FuzzyCompare(newVal, domain.range[1], T{1e-12});
+  bool downEqual = vtkMathUtilities::FuzzyCompare(newVal, domain.range[0], T{1e-12});
+  if ((up && (newVal < domain.range[1] || upEqual)) || (!up && (newVal > domain.range[0] || downEqual)))
+  {
+    val = newVal;
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Templated int specific increase method for provided val and domain.
+ * Increase up to max or decrease down to min.
+ */
+template<>
+void increase(int& val, const f3d::options::domain_range_t<int>& domain, bool up)
+{
+  char dir = up ? +1 : -1;
+  int newVal = val;
+
+  newVal += dir * domain.increment;
+
   if ((up && newVal <= domain.range[1]) || (!up && newVal >= domain.range[0]))
   {
     val = newVal;

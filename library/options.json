@@ -192,7 +192,7 @@
         "type": "double",
         "default_value": "1.0",
         "domain": {
-          "range": ["-0.01", "5.01"],
+          "range": ["0.0", "5.0"],
           "increment": "0.02"
         }
       }
@@ -377,7 +377,7 @@
       "opacity": {
         "type": "double",
         "domain": {
-          "range": ["-0.01", "1.0"],
+          "range": ["0.0", "1.0"],
           "increment": "0.05"
         }
       },
