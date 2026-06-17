@@ -70,6 +70,13 @@ public:
     return this->Value;
   }
 
+  // TODO keep here?
+  inline ratio_t& operator+=(const double& incr)
+  {
+    this->Value += incr;
+    return *this;
+  }
+
 private:
   double Value = 0;
 };

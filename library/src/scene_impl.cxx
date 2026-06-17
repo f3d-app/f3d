@@ -162,6 +162,12 @@ public:
       this->Window.getCamera().resetToBounds();
     }
 
+    // Fill the camera index domain
+    this->Options.domains.scene.camera.index.enumeration.resize(
+      this->MetaImporter->GetNumberOfCameras());
+    std::iota(this->Options.domains.scene.camera.index.enumeration.begin(),
+      this->Options.domains.scene.camera.index.enumeration.end(), 0);
+
     scene_impl::internals::DisplayAllInfo(this->MetaImporter, this->Window);
   }
 
@@ -197,7 +203,7 @@ public:
     window.PrintSceneDescription(log::VerboseLevel::DEBUG);
   }
 
-  const options& Options;
+  options& Options;
   window_impl& Window;
   interactor_impl* Interactor = nullptr;
   animationManager AnimationManager;

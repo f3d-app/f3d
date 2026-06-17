@@ -84,7 +84,7 @@ options& options::toggle(std::string_view name)
   catch (const std::bad_variant_access&)
   {
     throw options::incompatible_exception(
-      "Trying to get toggle " + std::string(name) + " with incompatible type");
+      "Trying to toggle " + std::string(name) + " with incompatible type");
   }
 }
 
@@ -185,6 +185,33 @@ options& options::removeValue(std::string_view name)
   {
     throw options::incompatible_exception("Option " + std::string(name) + " is not not optional");
   }
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+bool options::hasDomain(std::string_view option, domain_style& style) const
+{
+  return options_generated::hasDomain(option, style);
+}
+
+//----------------------------------------------------------------------------
+options& options::increase(std::string_view name)
+{
+  options_generated::increase(*this, name, true);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+options& options::decrease(std::string_view name)
+{
+  options_generated::increase(*this, name, false);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+options& options::cycle(std::string_view name)
+{
+  options_generated::cycle(*this, name);
   return *this;
 }
 
