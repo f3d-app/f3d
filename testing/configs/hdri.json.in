@@ -4,7 +4,7 @@
   {
     "hdri-ambient": true,
     "hdri-skybox": true,
-    "hdri-file": "${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr"
+    "hdri-file": "${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr"
   }
 }
 ]

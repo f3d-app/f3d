@@ -243,36 +243,36 @@ f3d_test(NAME TestInteractionMinimalConsoleOverCheatSheet DATA f3d.glb INTERACTI
 f3d_test(NAME TestInteractionMinimalConsoleOverCheatSheetAndFilename DATA f3d.glb INTERACTION UI) #h;n;:
 
 ## HDRI
-f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION) #Shift+MouseRight;
-f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION) #U
-f3d_test(NAME TestInteractionHDRIReload DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION) #Up
+f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION) #Shift+MouseRight;
+f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION) #U
+f3d_test(NAME TestInteractionHDRIReload DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION) #Up
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-  f3d_test(NAME TestInteractionHDRIChange DATA multi HDRI palermo_park_1k.hdr CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI THRESHOLD 0.08) #Left # Threshold needed for IBL change after 9.6
+  f3d_test(NAME TestInteractionHDRIChange DATA multi HDRI shanghai_bund_1k.hdr CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI THRESHOLD 0.08) #Left # Threshold needed for IBL change after 9.6
 endif()
 
-f3d_test(NAME TestInteractionHDRICache DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION DEPENDS TestHDRI) #FFFFJJJJ
-f3d_test(NAME TestInteractionHDRIRemoveSkybox DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION)
-f3d_test(NAME TestInteractionHDRIRemoveAmbient DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION)
-f3d_test(NAME TestInteractionHDRIRemoveBoth DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION)
-f3d_test(NAME TestInteractionHDRILoop DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION)
-f3d_test(NAME TestInteractionHDRIFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LONG_TIMEOUT INTERACTION)
+f3d_test(NAME TestInteractionHDRICache DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION DEPENDS TestHDRI) #FFFFJJJJ
+f3d_test(NAME TestInteractionHDRIRemoveSkybox DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION)
+f3d_test(NAME TestInteractionHDRIRemoveAmbient DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION)
+f3d_test(NAME TestInteractionHDRIRemoveBoth DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION)
+f3d_test(NAME TestInteractionHDRILoop DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION)
+f3d_test(NAME TestInteractionHDRIFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr LONG_TIMEOUT INTERACTION)
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   # Interaction HDRI tests
-  f3d_test(NAME TestInteractionDropHDRI INTERACTION_CONFIGURE LONG_TIMEOUT UI) #X;DropEvent dragon.vtu;DropEvent palermo.hdr;
-  f3d_test(NAME TestInteractionDropHDRIInvert INTERACTION_CONFIGURE LONG_TIMEOUT UI) #X;DropEvent palermo.hdr;DropEvent dragon.vtu;
-  f3d_test(NAME TestInteractionDropHDRIMulti INTERACTION_CONFIGURE LONG_TIMEOUT UI) #X;DropEvent dragon.vtu palermo.hdr;
+  f3d_test(NAME TestInteractionDropHDRI INTERACTION_CONFIGURE LONG_TIMEOUT UI) #X;DropEvent dragon.vtu;DropEvent shanghai.hdr;
+  f3d_test(NAME TestInteractionDropHDRIInvert INTERACTION_CONFIGURE LONG_TIMEOUT UI) #X;DropEvent shanghai.hdr;DropEvent dragon.vtu;
+  f3d_test(NAME TestInteractionDropHDRIMulti INTERACTION_CONFIGURE LONG_TIMEOUT UI) #X;DropEvent dragon.vtu shanghai.hdr;
 endif()
 
 if(F3D_MODULE_RAYTRACING)
-  f3d_test(NAME TestInteractionHDRIRaytracingRemoveSkybox DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION)
-  f3d_test(NAME TestInteractionHDRIRaytracingRemoveAmbient DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION)
-  f3d_test(NAME TestInteractionHDRIRaytracingRemoveBoth DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION)
-  f3d_test(NAME TestInteractionHDRIRaytracingLoop DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION)
-  f3d_test(NAME TestInteractionHDRIRaytracingFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -rd --raytracing-samples=4 INTERACTION LONG_TIMEOUT)
+  f3d_test(NAME TestInteractionHDRIRaytracingRemoveSkybox DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION)
+  f3d_test(NAME TestInteractionHDRIRaytracingRemoveAmbient DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION)
+  f3d_test(NAME TestInteractionHDRIRaytracingRemoveBoth DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION)
+  f3d_test(NAME TestInteractionHDRIRaytracingLoop DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION)
+  f3d_test(NAME TestInteractionHDRIRaytracingFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr -rd --raytracing-samples=4 INTERACTION LONG_TIMEOUT)
 endif()
 
 ## Drops
@@ -301,7 +301,7 @@ endif()
 f3d_test(NAME TestInteractionDropHDRIModifiers INTERACTION_CONFIGURE LONG_TIMEOUT) #CTRL+DropEvent f3d.tif;SHIFT+DropEvent;SHIFT+DropEvent palermo.tif;SYYYY
 
 # Test interactive animation and dropping HDRI
-f3d_test(NAME TestInteractionAnimationDropHDRI DATA InterpolationTest.glb ARGS --animation-indices=-1 --animation-progress INTERACTION_CONFIGURE LONG_TIMEOUT) #Space;DropEvent palermo.hdr;Space;
+f3d_test(NAME TestInteractionAnimationDropHDRI DATA InterpolationTest.glb ARGS --animation-indices=-1 --animation-progress INTERACTION_CONFIGURE LONG_TIMEOUT) #Space;DropEvent shanghai.hdr;Space;
 
 if(F3D_MODULE_EXR)
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489

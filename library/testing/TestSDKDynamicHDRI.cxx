@@ -44,7 +44,7 @@ int TestSDKDynamicHDRI([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
       std::string(argv[2]), "TestSDKDynamicHDRIDefault"));
 
   // Change the hdri and make sure it is taken into account
-  opt.render.hdri.file = std::string(argv[1]) + "data/palermo_park_1k.hdr";
+  opt.render.hdri.file = std::string(argv[1]) + "data/shanghai_bund_1k.hdr";
   test("render with set HDRI",
     TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
       std::string(argv[2]), "TestSDKDynamicHDRI"));

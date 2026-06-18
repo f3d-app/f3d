@@ -47,7 +47,7 @@
 - normal.png: glTF-Sample-Models: Public Domain
 - normalMapping.fbx: assimp test models: BSD-3-Clause; rubberduck: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - nurb.usda: [Arnold USD](https://github.com/Autodesk/arnold-usd): Apache 2.0
-- palermo_park_1k.hdr: Polyhaven: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
+- palermo_park_1k.tif : Polyhaven: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - Part-4-Buildings-V4-one.gml: VTK Data: BSD-3-Clause
 - phong_cube.fbx: assimp test models: BSD-3-Clause
 - PinkEggFromLW.dxf: assimp test models: BSD-3-Clause
@@ -59,6 +59,7 @@
 - RiggedSimple.usdz: [USD Working Group](https://github.com/usd-wg/assets): [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - sample.csd: PDAL: Copyright (c) 2025, Hobu, Inc.
 - samplePTS.pts: VTK Data: BSD-3-Clause
+- shanghai_bund_1k.hdr: Polyhaven: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - simple.laz: PDAL: Copyright (c) 2025, Hobu, Inc.
 - simple_extra.bpf: PDAL: Copyright (c) 2025, Hobu, Inc.
 - SimpleMorph.gltf: glTF-Sample-Models: Public Domain
