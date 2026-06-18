@@ -26,7 +26,7 @@ int TestF3DEXRReader(int argc, char* argv[])
 
   const int* dims = img->GetDimensions();
 
-  if (dims[0] != 1024 && dims[1] != 512)
+  if (dims[0] != 256 && dims[1] != 128)
   {
     std::cerr << "Incorrect EXR image size.\n";
     return EXIT_FAILURE;
