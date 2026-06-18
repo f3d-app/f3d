@@ -714,6 +714,8 @@ public:
   std::atomic<bool> StopRequested = false;
 
   double CallbackDeltaTime = 1.0 / 30; /* Default DeltaTime (30fps) */
+
+  std::string XrActionsManifestDir;
 };
 
 //----------------------------------------------------------------------------
@@ -2107,6 +2109,12 @@ interactor& interactor_impl::requestStop()
 {
   this->Internals->StopRequested = true;
   return *this;
+}
+
+//----------------------------------------------------------------------------
+void interactor_impl::setXrActionsManifestDirectory(const std::string& directory)
+{
+  this->Internals->XrActionsManifestDir = directory;
 }
 
 //----------------------------------------------------------------------------

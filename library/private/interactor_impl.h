@@ -90,6 +90,8 @@ public:
   interactor& stop() override;
   interactor& requestRender() override;
   interactor& requestStop() override;
+
+  void setXrActionsManifestDirectory(const std::string& directory) override;
   ///@}
 
   /**
