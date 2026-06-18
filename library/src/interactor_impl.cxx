@@ -811,13 +811,6 @@ interactor& interactor_impl::initCommands()
   auto complOptionNames = [&](const std::vector<std::string>& args)
   { return complNames(args, this->Internals->Options.getAllNames()); };
 
-  static const std::map<std::string, std::vector<std::string>> COMPL_OPTIONS_SET = {
-    { "interactor.style", { "default", "trackball", "2d" } },
-    { "model.point_sprites.type",
-      { "none", "sphere", "gaussian", "circle", "stddev", "bound", "cross" } },
-    { "render.effect.antialiasing.mode", { "none", "fxaa", "ssaa", "taa" } },
-    { "render.effect.blending.mode", { "none", "ddp", "sort", "sort_cpu", "stochastic" } },
-  };
   auto complOptionSet = [&](const std::vector<std::string>& args)
   {
     std::vector<std::string> optionNames = this->Internals->Options.getAllNames();
@@ -832,12 +825,15 @@ interactor& interactor_impl::initCommands()
       // One arg, check if its an option
       if (std::ranges::find(optionNames, args[0]) != optionNames.end())
       {
-        // Its an existing option, check if it should be completed
-        const auto it = COMPL_OPTIONS_SET.find(args[0]);
-        if (it != COMPL_OPTIONS_SET.end())
+        // Its an existing option, check if it has an enumeration domain
+        f3d::options::domain_style style;
+        if (this->Internals->Options.hasDomain(args[0], style) && style == f3d::options::domain_style::ENUM)
         {
+          // recover the enumeration
+          std::vector<std::string> enumeration = this->Internals->Options.getDomain(args[0]);
+
           // Transform potential values into found option
-          std::ranges::transform(it->second, std::back_inserter(candidates),
+          std::ranges::transform(enumeration, std::back_inserter(candidates),
             [&](const auto& value) { return args[0] + " " + value; });
         }
         else
@@ -854,11 +850,15 @@ interactor& interactor_impl::initCommands()
     }
     else
     {
-      // Complete the option value if possible
-      const auto it = COMPL_OPTIONS_SET.find(args[0]);
-      if (it != COMPL_OPTIONS_SET.end())
+      // Its an existing option, check if it has an enumeration domain
+      f3d::options::domain_style style;
+      if (this->Internals->Options.hasDomain(args[0], style) && style == f3d::options::domain_style::ENUM)
       {
-        return complNames(args, it->second, 1);
+        // recover the enumeration
+        std::vector<std::string> enumeration = this->Internals->Options.getDomain(args[0]);
+
+        // Complete the option value if possible
+        return complNames(args, enumeration, 1);
       }
     }
 

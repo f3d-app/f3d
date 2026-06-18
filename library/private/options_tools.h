@@ -890,10 +890,47 @@ std::string format(const transform2d_t& var)
 /**
  * Set provided domain and return true
  */
-bool domainer(f3d::options::domain_style& styleVar, const f3d::options::domain_style& styleSet)
+bool hasDomain(f3d::options::domain_style& styleVar, const f3d::options::domain_style& styleSet)
 {
   styleVar = styleSet;
   return true;
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Get provided domain_range as a string vector
+ */
+template<typename T>
+std::vector<std::string> getDomain(const f3d::options::domain_range_t<T>& domain)
+{
+  std::vector<std::string> ret;
+  ret.emplace_back(format(domain.range[0]));
+  ret.emplace_back(format(domain.range[1]));
+  ret.emplace_back(format(domain.increment));
+  return ret;
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Get provided domain_enum as a string vector
+ */
+template<typename T>
+std::vector<std::string> getDomain(const f3d::options::domain_enum_t<T>& domain)
+{
+  std::vector<std::string> ret;
+  std::ranges::transform(domain.enumeration, std::back_inserter(ret),
+                         [](const T& val)
+                         { return format(val); });
+  return ret;
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Get provided domain_enum<std::string> enumeration
+ */
+std::vector<std::string> getDomain(const f3d::options::domain_enum_t<std::string>& domain)
+{
+  return domain.enumeration;
 }
 
 //----------------------------------------------------------------------------

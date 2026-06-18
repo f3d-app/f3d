@@ -162,8 +162,17 @@ public:
   [[nodiscard]] bool hasDomain(std::string_view name, domain_style& style) const;
 
   /**
+   *  Return a string vector version of the domain of provided option.
+   *  For a range domain, [0] and [1] are min and max respectively, [2] is the increment.
+   *  For a enum domain, the enumeration is provided as is.
+   *  Throw options::incompatible_exception if option has no domain.
+   *  Throws an options::inexistent_exception if option does not exist.
+   */
+  [[nodiscard]] std::vector<std::string> getDomain(std::string_view name) const;
+
+  /**
    *  Increase an option value if it has a range domain, else throws
-   * options::incompatible_exception. Increasing above the max is capped at the maximum.
+   *  options::incompatible_exception. Increasing above the max is capped at the maximum.
    *
    *  Throws an options::inexistent_exception if option does not exist.
    */

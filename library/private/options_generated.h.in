@@ -138,6 +138,18 @@ bool hasDomain(std::string_view name, f3d::options::domain_style& style)
 
 //----------------------------------------------------------------------------
 /**
+ * Generated method, see `options::getDomain`
+ */
+std::vector<std::string> getDomain(const f3d::options& opt, std::string_view name)
+{
+  // clang-format off
+  ${_options_get_domain};
+  // clang-format on
+  else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
+}
+
+//----------------------------------------------------------------------------
+/**
  * Generated method, see `options::increase`
  */
 void increase(f3d::options& opt, std::string_view name, bool up)

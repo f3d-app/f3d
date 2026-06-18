@@ -189,9 +189,15 @@ options& options::removeValue(std::string_view name)
 }
 
 //----------------------------------------------------------------------------
-bool options::hasDomain(std::string_view option, domain_style& style) const
+bool options::hasDomain(std::string_view name, domain_style& style) const
 {
-  return options_generated::hasDomain(option, style);
+  return options_generated::hasDomain(name, style);
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> options::getDomain(std::string_view name) const
+{
+  return options_generated::getDomain(*this, name);
 }
 
 //----------------------------------------------------------------------------
