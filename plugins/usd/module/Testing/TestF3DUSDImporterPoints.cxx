@@ -22,6 +22,14 @@ bool IsPointsPolyData(vtkPolyData* polydata)
     polydata->GetNumberOfPolys() == 0 && polydata->GetNumberOfLines() == 0;
 }
 
+bool ColorEquals(vtkDataArray* colors, vtkIdType index, float r, float g, float b)
+{
+  double rgb[3];
+  colors->GetTuple(index, rgb);
+  const double tol = 1e-5;
+  return std::abs(rgb[0] - r) < tol && std::abs(rgb[1] - g) < tol && std::abs(rgb[2] - b) < tol;
+}
+
 bool RgbaEquals(vtkDataArray* colors, vtkIdType index, float r, float g, float b, float a)
 {
   double rgba[4];
@@ -31,7 +39,7 @@ bool RgbaEquals(vtkDataArray* colors, vtkIdType index, float r, float g, float b
     std::abs(rgba[2] - b) < tol && std::abs(rgba[3] - a) < tol;
 }
 
-vtkPolyData* GetPointsPolyData(vtkF3DUSDImporter* importer)
+vtkPolyData* GetPointsPolyData(vtkF3DUSDImporter* importer, vtkIdType expectedPointCount)
 {
   vtkRenderer* renderer = importer->GetRenderer();
   if (!renderer)
@@ -51,7 +59,8 @@ vtkPolyData* GetPointsPolyData(vtkF3DUSDImporter* importer)
     }
 
     vtkPolyData* polydata = vtkPolyData::SafeDownCast(mapper->GetInput());
-    if (polydata && IsPointsPolyData(polydata))
+    if (polydata && IsPointsPolyData(polydata) &&
+      polydata->GetNumberOfPoints() == expectedPointCount)
     {
       return polydata;
     }
@@ -68,31 +77,46 @@ int TestF3DUSDImporterPoints(int vtkNotUsed(argc), char* argv[])
   importer->SetFileName(filename.c_str());
   importer->Update();
 
-  vtkPolyData* polydata = GetPointsPolyData(importer);
-  if (!polydata)
+  vtkPolyData* rgbaPolydata = GetPointsPolyData(importer, 2);
+  if (!rgbaPolydata)
   {
-    std::cerr << "Missing polydata for USD Points primitive\n";
+    std::cerr << "Missing RGBA polydata for USD Points primitive\n";
     return EXIT_FAILURE;
   }
 
-  if (polydata->GetNumberOfPoints() != 3)
+  vtkDataArray* rgbaColors = rgbaPolydata->GetPointData()->GetScalars();
+  if (!rgbaColors || std::strcmp(rgbaColors->GetName(), "RGBA") != 0 ||
+    rgbaColors->GetNumberOfComponents() != 4 || rgbaColors->GetDataType() != VTK_FLOAT)
   {
-    std::cerr << "Unexpected point count for USD Points primitive\n";
+    std::cerr << "Missing RGBA scalars on USD Points primitive with opacity\n";
     return EXIT_FAILURE;
   }
 
-  vtkDataArray* colors = polydata->GetPointData()->GetScalars();
-  if (!colors || std::strcmp(colors->GetName(), "RGBA") != 0 ||
-    colors->GetNumberOfComponents() != 4 || colors->GetDataType() != VTK_FLOAT)
-  {
-    std::cerr << "Missing RGBA scalars on USD Points primitive\n";
-    return EXIT_FAILURE;
-  }
-
-  if (!RgbaEquals(colors, 0, 1.f, 0.f, 0.f, 1.f) || !RgbaEquals(colors, 1, 0.f, 1.f, 0.f, 0.5f) ||
-    !RgbaEquals(colors, 2, 0.f, 0.f, 1.f, 0.25f))
+  if (!RgbaEquals(rgbaColors, 0, 1.f, 0.f, 0.f, 1.f) ||
+    !RgbaEquals(rgbaColors, 1, 0.f, 1.f, 0.f, 0.5f))
   {
     std::cerr << "Unexpected displayColor/displayOpacity values on USD Points primitive\n";
+    return EXIT_FAILURE;
+  }
+
+  vtkPolyData* rgbPolydata = GetPointsPolyData(importer, 1);
+  if (!rgbPolydata)
+  {
+    std::cerr << "Missing RGB polydata for USD Points primitive without opacity\n";
+    return EXIT_FAILURE;
+  }
+
+  vtkDataArray* rgbColors = rgbPolydata->GetPointData()->GetScalars();
+  if (!rgbColors || std::strcmp(rgbColors->GetName(), "RGB") != 0 ||
+    rgbColors->GetNumberOfComponents() != 3 || rgbColors->GetDataType() != VTK_FLOAT)
+  {
+    std::cerr << "Missing RGB scalars on USD Points primitive without opacity\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!ColorEquals(rgbColors, 0, 0.f, 0.f, 1.f))
+  {
+    std::cerr << "Unexpected displayColor values on USD Points primitive without opacity\n";
     return EXIT_FAILURE;
   }
 
