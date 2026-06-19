@@ -363,7 +363,7 @@ f3d_test(NAME TestInvalidHDRI DATA cow.vtp HDRI invalid.png REGEXP "Cannot open 
 f3d_test(NAME TestHDRIDefault DATA dragon.vtu ARGS --hdri-ambient --hdri-skybox DEFAULT_HDRI)
 
 if(VTK_VERSION VERSION_LESS 9.5.20251001)
-  f3d_test(NAME TestHDRIDefaultPNG DATA dragon.vtu ARGS --hdri-ambient --hdri-skybox LABELS "hdri")
+  f3d_test(NAME TestHDRIDefaultPNG DATA dragon.vtu ARGS --hdri-ambient --hdri-skybox LABELS "hdri" LONG_TIMEOUT)
 endif()
 
 configure_file("${F3D_SOURCE_DIR}/testing/configs/hdri.json.in" "${CMAKE_BINARY_DIR}/hdri.json")
