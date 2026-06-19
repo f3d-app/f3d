@@ -1193,7 +1193,7 @@ int F3DStarter::Start(int argc, char** argv)
         std::filesystem::path xrActionManifestDir =
           F3DSystemTools::GetBinaryResourceDirectory() / "xr_actions_manifest";
         this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createXR());
-        this->Internals->Engine->getInteractor().setXrActionsManifestDirectory(
+        this->Internals->Engine->getInteractor().setXrResourcesDirectory(
           xrActionManifestDir.string());
       }
       else

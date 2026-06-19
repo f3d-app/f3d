@@ -434,9 +434,10 @@ public:
   virtual interactor& requestStop() = 0;
 
   /**
-   * Set the directory for Xr interaction actions manifests.
+   * Set the directory for Xr resources
    */
-  virtual void setXrActionsManifestDirectory(const std::string& directory) = 0;
+  virtual void setXrResourcesDirectory(const std::string& actionsManifestDirectory,
+    const std::string& controllerModelDirectory = "") = 0;
 
   /**
    * An exception that can be thrown by the interactor

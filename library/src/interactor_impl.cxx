@@ -9,6 +9,9 @@
 
 #include "vtkF3DConsoleOutputWindow.h"
 
+#if F3D_MODULE_OPENXR
+#include <vtkOpenXRRenderWindow.h>
+#endif
 #if F3D_MODULE_UI
 #include "vtkF3DImguiConsole.h"
 #endif
@@ -2112,9 +2115,21 @@ interactor& interactor_impl::requestStop()
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::setXrActionsManifestDirectory(const std::string& directory)
+void interactor_impl::setXrResourcesDirectory(
+  const std::string& actionsManifestDirectory, const std::string& controllerModelDirectory)
 {
-  this->Internals->XrActionsManifestDir = directory;
+#if F3D_MODULE_OPENXR
+  vtkOpenXRRenderWindowInteractor* xrInteractor =
+    vtkOpenXRRenderWindowInteractor::SafeDownCast(this->Internals->VTKInteractor);
+  xrInteractor->SetActionManifestDirectory(actionsManifestDirectory);
+
+  if (!controllerModelDirectory.empty())
+  {
+    vtkOpenXRRenderWindow* xrRenWin =
+      vtkOpenXRRenderWindow::SafeDownCast(this->Internals->Window.GetRenderWindow());
+    xrRenWin->SetModelsManifestDirectory(controllerModelDirectory);
+  }
+#endif
 }
 
 //----------------------------------------------------------------------------
