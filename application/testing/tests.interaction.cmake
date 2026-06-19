@@ -243,12 +243,12 @@ f3d_test(NAME TestInteractionMinimalConsoleOverCheatSheet DATA f3d.glb INTERACTI
 f3d_test(NAME TestInteractionMinimalConsoleOverCheatSheetAndFilename DATA f3d.glb INTERACTION UI) #h;n;:
 
 ## HDRI
-f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION) #Shift+MouseRight;
 f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION) #U
 f3d_test(NAME TestInteractionHDRIReload DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION) #Up
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+  f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION) #Shift+MouseRight;
   f3d_test(NAME TestInteractionHDRIChange DATA multi HDRI shanghai_bund_1k.hdr CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI THRESHOLD 0.08) #Left # Threshold needed for IBL change after 9.6
 endif()
 
@@ -282,6 +282,9 @@ f3d_test(NAME TestInteractionEmptyDrop INTERACTION REGEXP "Drop event without an
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   f3d_test(NAME TestInteractionDropFiles ARGS -n INTERACTION_CONFIGURE UI) #X;DropEvent cow.vtp;DropEvent dragon.vtu suzanne.stl;
   f3d_test(NAME TestInteractionDropSameFiles ARGS -x INTERACTION_CONFIGURE UI) #DropEvent cow.vtp;#DropEvent dragon.vtu;#DropEvent cow.vtp#DropEvent cow.vtp;
+
+  # Test interactive animation and dropping HDRI
+  f3d_test(NAME TestInteractionAnimationDropHDRI DATA InterpolationTest.glb ARGS --animation-indices=-1 --animation-progress INTERACTION_CONFIGURE LONG_TIMEOUT) #Space;DropEvent shanghai.hdr;Space;
 endif()
 f3d_test(NAME TestInteractionMultiFileDrop ARGS --multi-file-mode=all -e INTERACTION_CONFIGURE) #DropEvent mb_1_0.vtp mb_2_0.vtp
 
@@ -299,9 +302,6 @@ endif()
 # Test modified drops, this test rendering is impacted by https://github.com/f3d-app/f3d/issues/1558
 # Empty drop is for coverage
 f3d_test(NAME TestInteractionDropHDRIModifiers INTERACTION_CONFIGURE LONG_TIMEOUT) #CTRL+DropEvent f3d.tif;SHIFT+DropEvent;SHIFT+DropEvent palermo.tif;SYYYY
-
-# Test interactive animation and dropping HDRI
-f3d_test(NAME TestInteractionAnimationDropHDRI DATA InterpolationTest.glb ARGS --animation-indices=-1 --animation-progress INTERACTION_CONFIGURE LONG_TIMEOUT) #Space;DropEvent shanghai.hdr;Space;
 
 if(F3D_MODULE_EXR)
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489

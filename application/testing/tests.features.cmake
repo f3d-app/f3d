@@ -360,12 +360,11 @@ f3d_test(NAME TestNonExistentHDRI DATA cow.vtp HDRI dummy.png REGEXP "HDRI file 
 f3d_test(NAME TestInvalidHDRI DATA cow.vtp HDRI invalid.png REGEXP "Cannot open HDRI file" NO_BASELINE)
 
 # Use a dummy HDRI for simplicity to test default HDRI
-f3d_test(NAME TestHDRIDefault DATA suzanne.ply HDRI dummy.png DEFAULT_HDRI)
+f3d_test(NAME TestHDRIDefault DATA suzanne.ply ARGS --hdri-ambient --hdri-skybox DEFAULT_HDRI)
 
 if(VTK_VERSION VERSION_LESS 9.5.20251001)
-  f3d_test(NAME TestPNGBasedDefaultHDRI DATA dragon.vtu LABELS "hdri")
+  f3d_test(NAME TestPNGBasedDefaultHDRI DATA dragon.vtu ARGS --hdri-ambient --hdri-skybox LABELS "hdri")
 endif()
-
 
 configure_file("${F3D_SOURCE_DIR}/testing/configs/hdri.json.in" "${CMAKE_BINARY_DIR}/hdri.json")
 f3d_test(NAME TestConfigFileHDRI DATA dragon.vtu CONFIG "${CMAKE_BINARY_DIR}/hdri.json" LONG_TIMEOUT)
