@@ -162,11 +162,7 @@
     "background": {
       "color": {
         "type": "color",
-        "default_value": "0.2, 0.2, 0.2",
-        "domain": {
-          "range": ["0.0", "1.0"],
-          "increment": "0.1"
-        }
+        "default_value": "0.2, 0.2, 0.2"
       },
       "skybox": {
         "type": "bool",
@@ -211,16 +207,12 @@
         "default_value": "0.9",
         "domain": {
           "range": ["0.0", "1.0"],
-          "increment": "0.1"
+          "increment": "0.05"
         }
       },
       "color": {
         "type": "color",
-        "parsed_default_value": "f3d_black",
-        "domain": {
-          "range": ["0.0", "1.0"],
-          "increment": "0.1"
-        }
+        "parsed_default_value": "f3d_black"
       }
     },
     "axis": {
@@ -317,11 +309,7 @@
     },
     "font_color": {
       "type": "color",
-      "parsed_default_value": "f3d_white",
-      "domain": {
-        "range": ["0.0", "1.0"],
-        "increment": "0.1"
-      }
+      "parsed_default_value": "f3d_white"
     },
     "loader_progress": {
       "type": "bool",
@@ -382,11 +370,7 @@
         }
       },
       "rgb": {
-        "type": "color",
-        "domain": {
-          "range": ["0.0", "1.0"],
-          "increment": "0.1"
-        }
+        "type": "color"
       },
       "texture": {
         "type": "path"
@@ -394,11 +378,7 @@
     },
     "emissive": {
       "factor": {
-        "type": "color",
-        "domain": {
-          "range": ["0.0", "1.0"],
-          "increment": "0.1"
-        }
+        "type": "color"
       },
       "texture": {
         "type": "path"
@@ -409,7 +389,7 @@
         "type": "double",
         "domain": {
           "range": ["0.0", "1.0"],
-          "increment": "0.1"
+          "increment": "0.05"
         }
       },
       "texture": {
@@ -421,21 +401,21 @@
         "type": "double",
         "domain": {
           "range": ["0.0", "1.0"],
-          "increment": "0.1"
+          "increment": "0.05"
         }
       },
       "roughness": {
         "type": "double",
         "domain": {
           "range": ["0.0", "1.0"],
-          "increment": "0.1"
+          "increment": "0.05"
         }
       },
       "base_ior": {
         "type": "double",
         "domain": {
           "range": ["0.0", "1.0"],
-          "increment": "0.1"
+          "increment": "0.05"
         }
       },
       "texture": {

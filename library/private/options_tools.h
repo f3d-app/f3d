@@ -976,17 +976,6 @@ void increase(int& val, const f3d::options::domain_range_t<int>& domain, bool up
 
 //----------------------------------------------------------------------------
 /**
- * Templated std::vector specific increase method for provided vec and domain.
- * Increase/Decrease each val in the vec.
- */
-template<typename T>
-void increase(std::vector<T>& vec, const f3d::options::domain_range_t<T>& domain, bool up)
-{
-  std::ranges::for_each(vec, [domain, up](T& val) { increase(val, domain, up); });
-}
-
-//----------------------------------------------------------------------------
-/**
  * Templated std::optional specific increase method for provided val and domain.
  * If set, just call increase
  * If not set, set val to min/max depending on the direction
@@ -1004,36 +993,6 @@ void increase(std::optional<T>& val, const f3d::options::domain_range_t<T>& doma
   else
   {
     increase(val.value(), domain, up);
-  }
-}
-
-//----------------------------------------------------------------------------
-/**
- * TODO
- */
-void increase(
-  std::optional<f3d::color_t>& col, const f3d::options::domain_range_t<double>& domain, bool up)
-{
-  if (col.has_value())
-  {
-    //    std::array<double, 3>& arr(vec.value());
-    //    std::ranges::for_each(arr, [domain, up](double& val){increase(val, domain, up);});
-    for (std::size_t i = 0; i < 3; i++)
-    {
-      increase(col.value()[i], domain, up);
-    }
-  }
-}
-
-//----------------------------------------------------------------------------
-/**
- * TODO
- */
-void increase(f3d::color_t& col, const f3d::options::domain_range_t<double>& domain, bool up)
-{
-  for (std::size_t i = 0; i < 3; i++)
-  {
-    increase(col[i], domain, up);
   }
 }
 
