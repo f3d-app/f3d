@@ -1,0 +1,6 @@
+{
+  "files": ["../data/cow.vtp"],
+  "options": {
+    "render.background.color": "#0000ff"
+  }
+}

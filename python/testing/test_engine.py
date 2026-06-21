@@ -76,3 +76,42 @@ def test_reader_options():
 
     with pytest.raises(KeyError):
         f3d.Engine.set_reader_option("inexistent", "value")
+
+
+def test_statefile(tmp_path):
+    testing_dir = Path(__file__).parent.parent.parent / "testing"
+    cow = testing_dir / "data/cow.vtp"
+    statefile = tmp_path / "state.json"
+
+    f3d.Engine.autoload_plugins()
+
+    src = f3d.Engine.create_none()
+    src.options["render.background.color"] = [1.0, 0.0, 0.0]
+    src.options["ui.scalar_bar"] = True
+    src.scene.add(cow)
+
+    src.save_statefile(statefile)
+    assert statefile.exists()
+
+    # File based round-trip
+    dst = f3d.Engine.create_none()
+    dst.load_statefile(statefile)
+    assert dst.options["render.background.color"] == [1.0, 0.0, 0.0]
+    assert dst.options["ui.scalar_bar"] is True
+    assert len(dst.scene.get_added_files()) == 1
+    assert Path(dst.scene.get_added_files()[0]) == cow
+
+    # String based round-trip
+    content = src.save_statefile_to_string()
+    dst_str = f3d.Engine.create_none()
+    dst_str.load_statefile_from_string(content)
+    assert dst_str.options["render.background.color"] == [1.0, 0.0, 0.0]
+    assert len(dst_str.scene.get_added_files()) == 1
+
+
+def test_statefile_invalid():
+    engine = f3d.Engine.create_none()
+    with pytest.raises(RuntimeError):
+        engine.load_statefile("/does/not/exist/state.json")
+    with pytest.raises(RuntimeError):
+        engine.load_statefile_from_string("{ not valid json")
