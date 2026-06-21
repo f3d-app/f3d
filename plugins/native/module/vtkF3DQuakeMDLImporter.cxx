@@ -6,6 +6,7 @@
 #include <vtkFileResourceStream.h>
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
+#include <vtkInterpolateDataSetAttributes.h>
 #include <vtkOpenGLTexture.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
@@ -655,6 +656,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   vtkF3DQuakeMDLImporter* Parent;
   vtkSmartPointer<vtkPolyDataMapper> Mapper;
   vtkSmartPointer<vtkTexture> Texture;
+  vtkNew<vtkInterpolateDataSetAttributes> AttrInterp;
 
   std::vector<std::string> AnimationNames;
   std::vector<std::vector<double>> AnimationTimes;
@@ -785,10 +787,16 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
             lowerCoord[2] + alpha * (upperCoord[2] - lowerCoord[2])); // z
         }
 
+        // Interpolate attributes only
+        vtkInterpolateDataSetAttributes* attrInterp = this->Internals->AttrInterp;
+        attrInterp->RemoveAllInputs();
+        attrInterp->AddInputData(lowerFrame);
+        attrInterp->AddInputData(upperFrame);
+        attrInterp->SetT(alpha);
+        attrInterp->Update();
+
         vtkNew<vtkPolyData> interpolatedMesh;
-        // Only positions actually change
-        interpolatedMesh->CopyStructure(lowerFrame);
-        interpolatedMesh->GetPointData()->PassData(lowerFrame->GetPointData());
+        interpolatedMesh->ShallowCopy(attrInterp->GetOutput());
         interpolatedMesh->SetPoints(interpolatedPoints);
         this->Internals->Mapper->SetInputData(interpolatedMesh);
       }
