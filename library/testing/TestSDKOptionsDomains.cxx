@@ -21,7 +21,7 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   // Test getDomain
   test("getDomain range", opt.getDomain("render.light.intensity"), { "0", "5", "0.02" });
   test("getDomain enum", opt.getDomain("render.effect.blending.mode"),
-       { "none", "ddp", "sort", "sort_cpu", "stochastic" });
+    { "none", "ddp", "sort", "sort_cpu", "stochastic" });
   test.expect<f3d::options::incompatible_exception>(
     "getDomain incompatible", [&]() { std::ignore = opt.getDomain("model.scivis.cells"); });
   test.expect<f3d::options::inexistent_exception>(
@@ -44,8 +44,8 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
 
   test.expect<f3d::options::incompatible_exception>(
     "increase incompatible", [&]() { opt.increase("render.effect.blending.mode"); });
-  test.expect<f3d::options::inexistent_exception>("increase inexistent",
-                                                  [&]() { opt.increase("inexistent"); });
+  test.expect<f3d::options::inexistent_exception>(
+    "increase inexistent", [&]() { opt.increase("inexistent"); });
 
   // Test increase/decrease int
 
@@ -99,10 +99,10 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   opt.cycle("scene.camera.index");
   test("cycle empty domain", opt.scene.camera.index.value(), 0);
 
-  test.expect<f3d::options::incompatible_exception>("cycle incompatible",
-                                                    [&]() { opt.cycle("render.light.intensity"); });
-  test.expect<f3d::options::inexistent_exception>("cycle inexistent",
-                                                  [&]() { opt.cycle("inexistent"); });
+  test.expect<f3d::options::incompatible_exception>(
+    "cycle incompatible", [&]() { opt.cycle("render.light.intensity"); });
+  test.expect<f3d::options::inexistent_exception>(
+    "cycle inexistent", [&]() { opt.cycle("inexistent"); });
 
   // Check individual domains
 
