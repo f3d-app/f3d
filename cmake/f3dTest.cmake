@@ -88,6 +88,7 @@ function(f3d_test)
   endif()
 
   if (F3D_TEST_HDRI)
+    list(PREPEND F3D_TEST_LABELS "hdri")
     list(APPEND F3D_TEST_ARGS "--hdri-file=${F3D_SOURCE_DIR}/testing/data/${F3D_TEST_HDRI}" "--hdri-ambient" "--hdri-skybox")
     set(F3D_TEST_LONG_TIMEOUT ON)
   endif()

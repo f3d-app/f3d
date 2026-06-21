@@ -104,7 +104,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("check 16-bits image channel type size", shortImg.getChannelTypeSize(), 2u);
 
   // check reading a 32-bits image
-  f3d::image hdrImg(testingDir + "/data/palermo_park_1k.hdr");
+  f3d::image hdrImg(testingDir + "/data/shanghai_bund_1k.hdr");
   test("check 32-bits HDR image channel type",
     hdrImg.getChannelType() == f3d::image::ChannelType::FLOAT);
   test("check 32-bits HDR image channel type size", hdrImg.getChannelTypeSize(), 4u);
@@ -112,7 +112,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
 #if F3D_MODULE_EXR
   // check reading EXR
-  f3d::image exrImg(testingDir + "/data/kloofendal_43d_clear_1k.exr");
+  f3d::image exrImg(testingDir + "/data/small_rural_road_1k.exr");
   test("check 32-bits EXR image channel type",
     exrImg.getChannelType() == f3d::image::ChannelType::FLOAT);
 #endif

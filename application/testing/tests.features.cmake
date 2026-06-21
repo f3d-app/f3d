@@ -167,8 +167,8 @@ f3d_test(NAME TestLightIntensityDarkerFullScene DATA WaterBottle.glb ARGS --ligh
 f3d_test(NAME TestUTF8 DATA "(ノಠ益ಠ )ノ.vtp")
 f3d_test(NAME TestFilenameCommasSpaces DATA "tetrahedron, with commas & spaces.stl")
 f3d_test(NAME TestFilename DATA suzanne.ply ARGS -n UI)
-f3d_test(NAME TestHDRIFilename DATA dragon.vtu ARGS --hdri-filename -f -j --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr UI LONG_TIMEOUT)
-f3d_test(NAME TestFilenameHDRIFilename DATA dragon.vtu ARGS --hdri-filename -n -f -j --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr RESOLUTION 400,400 UI LONG_TIMEOUT)
+f3d_test(NAME TestHDRIFilename DATA dragon.vtu ARGS --hdri-filename HDRI shanghai_bund_1k.hdr UI LONG_TIMEOUT)
+f3d_test(NAME TestFilenameHDRIFilename DATA dragon.vtu ARGS --hdri-filename -n HDRI shanghai_bund_1k.hdr RESOLUTION 400,400 UI LONG_TIMEOUT)
 f3d_test(NAME TestHDRIFilenameDefault DATA dragon.vtu ARGS --hdri-filename -f -j UI LONG_TIMEOUT DEFAULT_HDRI)
 f3d_test(NAME TestFilenameWhiteBg DATA suzanne.ply ARGS -n --background-color=1,1,1 UI)
 f3d_test(NAME TestConsoleBadgeWarning DATA suzanne.ply ARGS --position=0 UI)
@@ -314,7 +314,7 @@ f3d_test(NAME TestBackdropOpacityMedium DATA suzanne.ply ARGS -n --backdrop-opac
 f3d_test(NAME TestBackdropColor DATA suzanne.ply ARGS -n --backdrop-color=0.5,1.0,0.5 UI)
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-  f3d_test(NAME TestDefaultConfigFileHDRIFilename DATA dragon.vtu CONFIG config_build ARGS -j --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr UI LONG_TIMEOUT)
+  f3d_test(NAME TestDefaultConfigFileHDRIFilename DATA dragon.vtu CONFIG config_build HDRI shanghai_bund_1k.hdr UI)
 endif()
 
 ## Skinning
@@ -337,19 +337,19 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219)
 endif()
 
 ## HDRI
-f3d_test(NAME TestHDRI DATA suzanne.ply HDRI palermo_park_1k.hdr)
-f3d_test(NAME TestHDRICache DATA suzanne.ply HDRI palermo_park_1k.hdr DEPENDS TestHDRI)
-f3d_test(NAME TestHDRIBlur DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -u)
+f3d_test(NAME TestHDRI DATA suzanne.ply HDRI shanghai_bund_1k.hdr)
+f3d_test(NAME TestHDRICache DATA suzanne.ply HDRI shanghai_bund_1k.hdr DEPENDS TestHDRI)
+f3d_test(NAME TestHDRIBlur DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u)
 f3d_test(NAME TestHDRIBlurCoCSmall DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=10 --camera-position=-20,0,20)
 f3d_test(NAME TestHDRIBlurCoCMedium DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=50 --camera-position=-20,0,20)
 f3d_test(NAME TestHDRIBlurCoCLarge DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=100 --camera-position=-20,0,20)
 f3d_test(NAME TestHDRIBlurCoCZero DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=0 --camera-position=-20,0,20)
 f3d_test(NAME TestHDRIBlurCoCNegative DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=-100 --camera-position=-20,0,20)
-f3d_test(NAME TestHDRIBlurRatio DATA suzanne.ply HDRI palermo_park_1k.hdr RESOLUTION 600,100 ARGS -u)
-f3d_test(NAME TestHDRIEdges DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -e THRESHOLD 0.06)
+f3d_test(NAME TestHDRIBlurRatio DATA suzanne.ply HDRI shanghai_bund_1k.hdr RESOLUTION 600,100 ARGS -u)
+f3d_test(NAME TestHDRIEdges DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -e THRESHOLD 0.06)
 f3d_test(NAME TestHDRI8Bit DATA suzanne.ply HDRI f3d.tif ARGS --color=1.0,0.0,0.0 THRESHOLD 0.08) # Threshold is needed for IBL change after VTK 9.6
-f3d_test(NAME TestHDRIOrient DATA suzanne.stl HDRI palermo_park_1k.hdr ARGS --up=+Z)
-f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -t)
+f3d_test(NAME TestHDRIOrient DATA suzanne.stl HDRI shanghai_bund_1k.hdr ARGS --up=+Z)
+f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -t)
 
 # Test non existent HDRI, do not add a dummy.png
 f3d_test(NAME TestNonExistentHDRI DATA cow.vtp HDRI dummy.png REGEXP "HDRI file does not exist" NO_BASELINE)
@@ -358,36 +358,35 @@ f3d_test(NAME TestNonExistentHDRI DATA cow.vtp HDRI dummy.png REGEXP "HDRI file 
 f3d_test(NAME TestInvalidHDRI DATA cow.vtp HDRI invalid.png REGEXP "Cannot open HDRI file" NO_BASELINE)
 
 # Use a dummy HDRI for simplicity to test default HDRI
-f3d_test(NAME TestHDRIDefault DATA suzanne.ply HDRI dummy.png DEFAULT_HDRI)
+f3d_test(NAME TestHDRIDefault DATA dragon.vtu ARGS --hdri-ambient --hdri-skybox DEFAULT_HDRI)
 
 if(VTK_VERSION VERSION_LESS 9.5.20251001)
-  f3d_test(NAME TestPNGBasedDefaultHDRI DATA dragon.vtu LABELS "hdri")
+  f3d_test(NAME TestHDRIDefaultPNG DATA dragon.vtu ARGS --hdri-ambient --hdri-skybox LABELS "hdri" LONG_TIMEOUT)
 endif()
-
 
 configure_file("${F3D_SOURCE_DIR}/testing/configs/hdri.json.in" "${CMAKE_BINARY_DIR}/hdri.json")
 f3d_test(NAME TestConfigFileHDRI DATA dragon.vtu CONFIG "${CMAKE_BINARY_DIR}/hdri.json" LONG_TIMEOUT)
 
 if(F3D_MODULE_EXR)
-  f3d_test(NAME TestHDRIEXR DATA suzanne.ply HDRI kloofendal_43d_clear_1k.exr)
+  f3d_test(NAME TestHDRIEXR DATA suzanne.ply HDRI small_rural_road_1k.exr)
 endif()
 
-f3d_test(NAME TestHDRISkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-skybox LONG_TIMEOUT)
-f3d_test(NAME TestHDRIAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient LONG_TIMEOUT)
-f3d_test(NAME TestHDRIAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient --no-background LONG_TIMEOUT)
-f3d_test(NAME TestHDRINone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LONG_TIMEOUT)
+f3d_test(NAME TestHDRISkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-skybox LONG_TIMEOUT)
+f3d_test(NAME TestHDRIAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-ambient LONG_TIMEOUT)
+f3d_test(NAME TestHDRIAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-ambient --no-background LONG_TIMEOUT)
+f3d_test(NAME TestHDRINone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr LONG_TIMEOUT)
 
 if(F3D_MODULE_RAYTRACING)
-  f3d_test(NAME TestHDRIRaytracing DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -rd --raytracing-samples=4)
-  f3d_test(NAME TestHDRIRaytracingSkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-skybox -rd --raytracing-samples=4 LONG_TIMEOUT)
-  f3d_test(NAME TestHDRIRaytracingAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -rd --raytracing-samples=4 LONG_TIMEOUT)
-  f3d_test(NAME TestHDRIRaytracingAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -rd --raytracing-samples=4 --no-background LONG_TIMEOUT)
-  f3d_test(NAME TestHDRIRaytracingNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -rd --raytracing-samples=4 LONG_TIMEOUT)
+  f3d_test(NAME TestHDRIRaytracing DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -rd --raytracing-samples=4)
+  f3d_test(NAME TestHDRIRaytracingSkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-skybox -rd --raytracing-samples=4 LONG_TIMEOUT)
+  f3d_test(NAME TestHDRIRaytracingAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-ambient -rd --raytracing-samples=4 LONG_TIMEOUT)
+  f3d_test(NAME TestHDRIRaytracingAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-ambient -rd --raytracing-samples=4 --no-background LONG_TIMEOUT)
+  f3d_test(NAME TestHDRIRaytracingNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr -rd --raytracing-samples=4 LONG_TIMEOUT)
 endif()
 
 # SSAA with HDR framebuffer support in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12026
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250329)
-  f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -t --anti-aliasing=ssaa)
+  f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -t --anti-aliasing=ssaa)
 endif()
 
 ## Raytracing
