@@ -294,11 +294,7 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
     }
     importers.emplace_back(filePath.filename().string(), importer);
 
-    std::vector<fs::path>& addedFiles = this->Internals->AddedFiles;
-    if (std::find(addedFiles.begin(), addedFiles.end(), filePath) == addedFiles.end())
-    {
-      addedFiles.emplace_back(filePath);
-    }
+    this->Internals->AddedFiles.emplace_back(filePath);
   }
 
   log::debug("\nLoading files: ");
