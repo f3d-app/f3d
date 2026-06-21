@@ -229,6 +229,50 @@ int f3d_engine_set_cache_path(f3d_engine_t* engine, const char* cache_path)
 }
 
 //----------------------------------------------------------------------------
+int f3d_engine_save_statefile(f3d_engine_t* engine, const char* statefile_path)
+{
+  if (!engine || !statefile_path)
+  {
+    return 0;
+  }
+
+  try
+  {
+    f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
+    cpp_engine->saveStatefile(statefile_path);
+  }
+  catch (const f3d::engine::statefile_exception& e)
+  {
+    f3d::log::error("Failed to save statefile: ", e.what());
+    return 0;
+  }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int f3d_engine_load_statefile(f3d_engine_t* engine, const char* statefile_path)
+{
+  if (!engine || !statefile_path)
+  {
+    return 0;
+  }
+
+  try
+  {
+    f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
+    cpp_engine->loadStatefile(statefile_path);
+  }
+  catch (const f3d::engine::statefile_exception& e)
+  {
+    f3d::log::error("Failed to load statefile: ", e.what());
+    return 0;
+  }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
 void f3d_engine_set_options(f3d_engine_t* engine, f3d_options_t* options)
 {
   if (!engine || !options)

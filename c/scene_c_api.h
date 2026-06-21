@@ -62,6 +62,26 @@ extern "C"
   F3D_EXPORT void f3d_scene_clear(f3d_scene_t* scene);
 
   /**
+   * @brief Get the list of files currently added to the scene.
+   *
+   * The returned array and its strings must be freed using
+   * f3d_scene_free_added_files().
+   *
+   * @param scene Scene handle.
+   * @param count Output pointer that receives the number of files.
+   * @return A newly allocated array of newly allocated strings.
+   */
+  F3D_EXPORT char** f3d_scene_get_added_files(const f3d_scene_t* scene, unsigned int* count);
+
+  /**
+   * @brief Free the array returned by f3d_scene_get_added_files().
+   *
+   * @param files Array to free.
+   * @param count Number of files in the array.
+   */
+  F3D_EXPORT void f3d_scene_free_added_files(char** files, unsigned int count);
+
+  /**
    * @brief Add a light based on a light state.
    *
    * @param scene Scene handle.

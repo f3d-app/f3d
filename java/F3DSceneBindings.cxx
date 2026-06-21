@@ -5,6 +5,8 @@
 #include <scene.h>
 #include <types.h>
 
+#include <filesystem>
+
 static std::vector<std::string> JavaListToStringVector(JNIEnv* env, jobject list)
 {
   std::vector<std::string> vec;
@@ -421,5 +423,17 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Scene, getAnimationNames)(JNIEnv* env, jobject self)
   {
     return CreateStringList(env, GetEngine(env, self)->getScene().getAnimationNames());
+  }
+
+  JNIEXPORT jobject JAVA_BIND(Scene, getAddedFiles)(JNIEnv* env, jobject self)
+  {
+    std::vector<std::filesystem::path> files = GetEngine(env, self)->getScene().getAddedFiles();
+    std::vector<std::string> fileStrings;
+    fileStrings.reserve(files.size());
+    for (const std::filesystem::path& file : files)
+    {
+      fileStrings.push_back(file.string());
+    }
+    return CreateStringList(env, fileStrings);
   }
 }
