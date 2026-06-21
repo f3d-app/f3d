@@ -107,8 +107,8 @@ public:
   virtual scene& clear() = 0;
 
   /**
-   * Return the list of files currently added to the scene through the path-based add methods.
-   * Files added more than once are listed only once.
+   * Return the list of files added to the scene through the path-based add methods, in the order
+   * they were provided.
    * Meshes added through the mesh, mesh view or buffer based add methods are not listed.
    */
   [[nodiscard]] virtual std::vector<std::filesystem::path> getAddedFiles() const = 0;

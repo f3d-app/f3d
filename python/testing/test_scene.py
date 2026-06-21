@@ -101,9 +101,9 @@ def test_scene_added_files():
     assert len(added) == 1
     assert Path(added[0]) == cow
 
-    # Adding the same file again does not duplicate it
+    # Files are tracked as provided, in order
     engine.scene.add(cow)
-    assert len(engine.scene.get_added_files()) == 1
+    assert len(engine.scene.get_added_files()) == 2
 
     engine.scene.clear()
     assert engine.scene.get_added_files() == []

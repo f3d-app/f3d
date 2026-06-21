@@ -22,6 +22,130 @@
 
 namespace fs = std::filesystem;
 
+namespace
+{
+//----------------------------------------------------------------------------
+nlohmann::ordered_json SerializeState(f3d::engine& eng, const fs::path& baseDir)
+{
+  nlohmann::ordered_json root;
+
+  // Store the added files, relative to the statefile directory (baseDir) when possible so that
+  // the statefile stays portable if moved alongside its files, falling back to an absolute path.
+  // baseDir is empty when serializing to a string, in which case absolute paths are always used.
+  nlohmann::ordered_json files = nlohmann::ordered_json::array();
+  for (const fs::path& file : eng.getScene().getAddedFiles())
+  {
+    fs::path stored = fs::absolute(file);
+    if (!baseDir.empty())
+    {
+      std::error_code ec;
+      fs::path rel = fs::relative(fs::absolute(file), fs::absolute(baseDir), ec);
+      if (!ec && !rel.empty())
+      {
+        stored = rel;
+      }
+    }
+    files.push_back(stored.generic_string());
+  }
+  root["files"] = files;
+
+  // Camera, only if a window is available
+  try
+  {
+    const f3d::camera_state_t state = eng.getWindow().getCamera().getState();
+    nlohmann::ordered_json camera;
+    camera["position"] = { state.position[0], state.position[1], state.position[2] };
+    camera["focal_point"] = { state.focalPoint[0], state.focalPoint[1], state.focalPoint[2] };
+    camera["view_up"] = { state.viewUp[0], state.viewUp[1], state.viewUp[2] };
+    camera["view_angle"] = state.viewAngle;
+    root["camera"] = camera;
+  }
+  catch (const f3d::engine::no_window_exception&)
+  {
+    // No window available, nothing to save for the camera
+  }
+
+  nlohmann::ordered_json options = nlohmann::ordered_json::object();
+  const f3d::options& opts = eng.getOptions();
+  for (const std::string& name : opts.getNames())
+  {
+    options[name] = opts.getAsString(name);
+  }
+  root["options"] = options;
+
+  return root;
+}
+
+//----------------------------------------------------------------------------
+void DeserializeState(f3d::engine& eng, const nlohmann::ordered_json& root, const fs::path& baseDir)
+{
+  // Clear the scene first so that the statefile fully replaces the current state
+  f3d::scene& sce = eng.getScene();
+  sce.clear();
+
+  if (root.contains("options"))
+  {
+    f3d::options& opts = eng.getOptions();
+    for (const auto& [name, value] : root.at("options").items())
+    {
+      try
+      {
+        opts.setAsString(name, value.get<std::string>());
+      }
+      catch (const f3d::options::inexistent_exception&)
+      {
+        f3d::log::warn("Statefile option \"", name, "\" does not exist, skipping it");
+      }
+      catch (const f3d::options::parsing_exception&)
+      {
+        f3d::log::warn("Statefile option \"", name, "\" could not be parsed, skipping it");
+      }
+    }
+  }
+
+  // Add the saved files, resolving relative paths against the statefile directory (baseDir),
+  // mirroring how SerializeState stored them
+  if (root.contains("files"))
+  {
+    std::vector<fs::path> files;
+    for (const auto& file : root.at("files"))
+    {
+      fs::path path = file.get<std::string>();
+      if (path.is_relative() && !baseDir.empty())
+      {
+        path = (baseDir / path).lexically_normal();
+      }
+      files.emplace_back(path);
+    }
+    if (!files.empty())
+    {
+      sce.add(files);
+    }
+  }
+
+  if (root.contains("camera"))
+  {
+    try
+    {
+      const nlohmann::ordered_json& camera = root.at("camera");
+      const auto& pos = camera.at("position");
+      const auto& foc = camera.at("focal_point");
+      const auto& up = camera.at("view_up");
+      f3d::camera_state_t state;
+      state.position = { pos[0].get<double>(), pos[1].get<double>(), pos[2].get<double>() };
+      state.focalPoint = { foc[0].get<double>(), foc[1].get<double>(), foc[2].get<double>() };
+      state.viewUp = { up[0].get<double>(), up[1].get<double>(), up[2].get<double>() };
+      state.viewAngle = camera.at("view_angle").get<double>();
+      eng.getWindow().getCamera().setState(state);
+    }
+    catch (const f3d::engine::no_window_exception&)
+    {
+      f3d::log::warn("No window available, skipping camera state from statefile");
+    }
+  }
+}
+}
+
 namespace f3d
 {
 class engine::internals
@@ -254,160 +378,56 @@ interactor& engine::getInteractor()
   return *this->Internals->Interactor;
 }
 
-namespace
-{
-//----------------------------------------------------------------------------
-nlohmann::ordered_json SerializeState(engine& eng, const fs::path& baseDir)
-{
-  nlohmann::ordered_json root;
-  nlohmann::ordered_json files = nlohmann::ordered_json::array();
-  for (const fs::path& file : eng.getScene().getAddedFiles())
-  {
-    fs::path stored = fs::absolute(file);
-    if (!baseDir.empty())
-    {
-      std::error_code ec;
-      fs::path rel = fs::relative(fs::absolute(file), fs::absolute(baseDir), ec);
-      if (!ec && !rel.empty())
-      {
-        stored = rel;
-      }
-    }
-    files.push_back(stored.generic_string());
-  }
-  root["files"] = files;
-
-  // Camera, only if a window is available
-  try
-  {
-    const camera_state_t state = eng.getWindow().getCamera().getState();
-    nlohmann::ordered_json camera;
-    camera["position"] = { state.position[0], state.position[1], state.position[2] };
-    camera["focal_point"] = { state.focalPoint[0], state.focalPoint[1], state.focalPoint[2] };
-    camera["view_up"] = { state.viewUp[0], state.viewUp[1], state.viewUp[2] };
-    camera["view_angle"] = state.viewAngle;
-    root["camera"] = camera;
-  }
-  catch (const engine::no_window_exception&)
-  {
-    // No window available, nothing to save for the camera
-  }
-
-  nlohmann::ordered_json options = nlohmann::ordered_json::object();
-  const f3d::options& opts = eng.getOptions();
-  for (const std::string& name : opts.getNames())
-  {
-    options[name] = opts.getAsString(name);
-  }
-  root["options"] = options;
-
-  return root;
-}
-
-//----------------------------------------------------------------------------
-void DeserializeState(engine& eng, const nlohmann::ordered_json& root, const fs::path& baseDir)
-{
-  scene& sce = eng.getScene();
-  sce.clear();
-
-  if (root.contains("options"))
-  {
-    f3d::options& opts = eng.getOptions();
-    for (const auto& [name, value] : root.at("options").items())
-    {
-      try
-      {
-        opts.setAsString(name, value.get<std::string>());
-      }
-      catch (const options::inexistent_exception&)
-      {
-        log::warn("Statefile option \"", name, "\" does not exist, skipping it");
-      }
-      catch (const options::parsing_exception&)
-      {
-        log::warn("Statefile option \"", name, "\" could not be parsed, skipping it");
-      }
-    }
-  }
-
-  if (root.contains("files"))
-  {
-    std::vector<fs::path> files;
-    for (const auto& file : root.at("files"))
-    {
-      fs::path path = file.get<std::string>();
-      if (path.is_relative() && !baseDir.empty())
-      {
-        path = (baseDir / path).lexically_normal();
-      }
-      files.emplace_back(path);
-    }
-    if (!files.empty())
-    {
-      sce.add(files);
-    }
-  }
-
-  if (root.contains("camera"))
-  {
-    try
-    {
-      const nlohmann::ordered_json& camera = root.at("camera");
-      const auto& pos = camera.at("position");
-      const auto& foc = camera.at("focal_point");
-      const auto& up = camera.at("view_up");
-      camera_state_t state;
-      state.position = { pos[0].get<double>(), pos[1].get<double>(), pos[2].get<double>() };
-      state.focalPoint = { foc[0].get<double>(), foc[1].get<double>(), foc[2].get<double>() };
-      state.viewUp = { up[0].get<double>(), up[1].get<double>(), up[2].get<double>() };
-      state.viewAngle = camera.at("view_angle").get<double>();
-      eng.getWindow().getCamera().setState(state);
-    }
-    catch (const engine::no_window_exception&)
-    {
-      log::warn("No window available, skipping camera state from statefile");
-    }
-  }
-}
-}
-
 //----------------------------------------------------------------------------
 void engine::saveStatefile(const fs::path& statefilePath)
 {
-  std::ofstream stream(statefilePath);
-  if (!stream.is_open())
+  try
+  {
+    std::ofstream stream(statefilePath);
+    if (!stream.is_open())
+    {
+      throw engine::statefile_exception(
+        "Could not open statefile for writing: " + statefilePath.string());
+    }
+    stream << ::SerializeState(*this, statefilePath.parent_path()).dump(2) << '\n';
+  }
+  catch (const fs::filesystem_error& ex)
   {
     throw engine::statefile_exception(
-      "Could not open statefile for writing: " + statefilePath.string());
+      "Could not save statefile " + statefilePath.string() + ": " + ex.what());
   }
-  stream << SerializeState(*this, statefilePath.parent_path()).dump(2) << '\n';
 }
 
 //----------------------------------------------------------------------------
 void engine::loadStatefile(const fs::path& statefilePath)
 {
-  std::ifstream stream(statefilePath);
-  if (!stream.is_open())
-  {
-    throw engine::statefile_exception(
-      "Could not open statefile for reading: " + statefilePath.string());
-  }
   try
   {
+    std::ifstream stream(statefilePath);
+    if (!stream.is_open())
+    {
+      throw engine::statefile_exception(
+        "Could not open statefile for reading: " + statefilePath.string());
+    }
     nlohmann::ordered_json root = nlohmann::ordered_json::parse(stream);
-    DeserializeState(*this, root, statefilePath.parent_path());
+    ::DeserializeState(*this, root, statefilePath.parent_path());
   }
   catch (const nlohmann::json::exception& ex)
   {
     throw engine::statefile_exception(
       "Could not parse statefile " + statefilePath.string() + ": " + ex.what());
   }
+  catch (const fs::filesystem_error& ex)
+  {
+    throw engine::statefile_exception(
+      "Could not load statefile " + statefilePath.string() + ": " + ex.what());
+  }
 }
 
 //----------------------------------------------------------------------------
 std::string engine::saveStatefileToString()
 {
-  return SerializeState(*this, {}).dump(2);
+  return ::SerializeState(*this, {}).dump(2);
 }
 
 //----------------------------------------------------------------------------
@@ -416,7 +436,7 @@ void engine::loadStatefileFromString(const std::string& statefileContent)
   try
   {
     nlohmann::ordered_json root = nlohmann::ordered_json::parse(statefileContent);
-    DeserializeState(*this, root, {});
+    ::DeserializeState(*this, root, {});
   }
   catch (const nlohmann::json::exception& ex)
   {
