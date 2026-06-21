@@ -53,6 +53,19 @@ public:
    */
   void SaveScreenshot(const std::string& filenameTemplate, bool minimal = false);
 
+  /**
+   * Save the current engine state to a statefile.
+   * `filenameTemplate` is resolved like `--save-statefile` (same template variables as the output).
+   * If it is `-`, the statefile is copied to the system clipboard (requires the clip module).
+   */
+  void SaveStatefile(const std::string& filenameTemplate);
+
+  /**
+   * Restore the engine state from a statefile, reloading the saved files in the process.
+   * `source` is a file path, or `-` to read from the system clipboard (requires the clip module).
+   */
+  void LoadStatefile(const std::string& source);
+
   F3DStarter();
   ~F3DStarter();
 

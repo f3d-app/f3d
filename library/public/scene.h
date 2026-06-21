@@ -107,6 +107,13 @@ public:
   virtual scene& clear() = 0;
 
   /**
+   * Return the list of files currently added to the scene through the path-based add methods.
+   * Files added more than once are listed only once.
+   * Meshes added through the mesh, mesh view or buffer based add methods are not listed.
+   */
+  [[nodiscard]] virtual std::vector<std::filesystem::path> getAddedFiles() const = 0;
+
+  /**
    * An exception that can be thrown by the scene
    * when it fails to index the light
    */

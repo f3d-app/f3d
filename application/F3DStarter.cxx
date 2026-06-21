@@ -33,12 +33,18 @@
 #include "tinyfiledialogs.h"
 #endif
 
+#if F3D_MODULE_CLIP
+#include "clip/clip.h"
+#endif
+
 #include "engine.h"
 #include "interactor.h"
 #include "log.h"
 #include "options.h"
 #include "utils.h"
 #include "window.h"
+
+#include <nlohmann/json.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -96,6 +102,8 @@ public:
   struct F3DAppOptions
   {
     std::string Output;
+    std::string LoadStatefile;
+    std::string SaveStatefile;
     bool BindingsList;
     bool NoBackground;
     bool NoRender;
@@ -176,6 +184,70 @@ public:
     }
 
     cam.setCurrentAsDefault();
+  }
+
+  static bool ParseStatefile(const fs::path& statefilePath,
+    F3DOptionsTools::OptionsDict& outOptions, std::vector<std::string>& outFiles)
+  {
+    std::ifstream stream(statefilePath);
+    if (!stream.is_open())
+    {
+      f3d::log::error("Could not open statefile: ", statefilePath.string());
+      return false;
+    }
+    return F3DInternals::ParseStatefileContent(
+      stream, statefilePath.parent_path(), outOptions, outFiles);
+  }
+
+  static bool ParseStatefileContent(std::istream& stream, const fs::path& baseDir,
+    F3DOptionsTools::OptionsDict& outOptions, std::vector<std::string>& outFiles)
+  {
+    try
+    {
+      const nlohmann::ordered_json root = nlohmann::ordered_json::parse(stream);
+
+      if (root.contains("files"))
+      {
+        for (const auto& file : root.at("files"))
+        {
+          fs::path path = file.get<std::string>();
+          if (path.is_relative() && !baseDir.empty())
+          {
+            path = (baseDir / path).lexically_normal();
+          }
+          outFiles.emplace_back(path.string());
+        }
+      }
+
+      if (root.contains("options"))
+      {
+        for (const auto& [name, value] : root.at("options").items())
+        {
+          outOptions[name] = value.get<std::string>();
+        }
+      }
+
+      if (root.contains("camera"))
+      {
+        const nlohmann::ordered_json& camera = root.at("camera");
+        const auto vecToStr = [](const nlohmann::ordered_json& arr)
+        {
+          return std::format(
+            "{}, {}, {}", arr[0].get<double>(), arr[1].get<double>(), arr[2].get<double>());
+        };
+        outOptions["camera-position"] = vecToStr(camera.at("position"));
+        outOptions["camera-focal-point"] = vecToStr(camera.at("focal_point"));
+        outOptions["camera-view-up"] = vecToStr(camera.at("view_up"));
+        outOptions["camera-view-angle"] = std::format("{}", camera.at("view_angle").get<double>());
+      }
+    }
+    catch (const nlohmann::json::exception& ex)
+    {
+      f3d::log::error("Could not parse statefile content: ", ex.what());
+      return false;
+    }
+
+    return true;
   }
 
   static bool HasHDRIExtension(const std::string& file)
@@ -779,6 +851,8 @@ public:
   {
     // Update typed app options from app options
     this->ParseOption(appOptions, "output", this->AppOptions.Output);
+    this->ParseOption(appOptions, "load-statefile", this->AppOptions.LoadStatefile);
+    this->ParseOption(appOptions, "save-statefile", this->AppOptions.SaveStatefile);
     this->ParseOption(appOptions, "list-bindings", this->AppOptions.BindingsList);
     this->ParseOption(appOptions, "no-background", this->AppOptions.NoBackground);
     this->ParseOption(appOptions, "no-render", this->AppOptions.NoRender);
@@ -1005,6 +1079,7 @@ public:
 
   F3DAppOptions AppOptions;
   f3d::options LibOptions;
+  F3DOptionsTools::OptionsEntries StatefileOptionsEntries;
   F3DOptionsTools::OptionsEntries ConfigOptionsEntries;
   F3DOptionsTools::OptionsEntries CLIOptionsEntries;
   F3DOptionsTools::OptionsEntries DynamicOptionsEntries;
@@ -1123,12 +1198,56 @@ int F3DStarter::Start(int argc, char** argv)
     this->Internals->ConfigBindingsEntries = parsedConfigFiles.Bindings;
   }
 
+  std::string loadStatefile;
+  iter = cliOptionsDict.find("load-statefile");
+  if (iter != cliOptionsDict.end())
+  {
+    F3DOptionsTools::Parse(iter->second, loadStatefile);
+  }
+  if (!loadStatefile.empty())
+  {
+    F3DOptionsTools::OptionsDict statefileOptions;
+    std::vector<std::string> statefileFiles;
+    bool parsed = false;
+    if (loadStatefile == F3D_PIPED)
+    {
+#if F3D_MODULE_CLIP
+      std::string content;
+      if (clip::get_text(content))
+      {
+        std::istringstream stream(content);
+        parsed = F3DInternals::ParseStatefileContent(stream, {}, statefileOptions, statefileFiles);
+      }
+      else
+      {
+        f3d::log::error("Could not read a statefile from the clipboard");
+      }
+#else
+      f3d::log::error("Clipboard support is not available in this build, "
+                      "cannot load a statefile from the clipboard");
+#endif
+    }
+    else
+    {
+      parsed = F3DInternals::ParseStatefile(
+        f3d::utils::collapsePath(loadStatefile), statefileOptions, statefileFiles);
+    }
+
+    if (parsed)
+    {
+      this->Internals->StatefileOptionsEntries.emplace_back(
+        statefileOptions, "", "", "statefile options");
+      // Statefile files are loaded through the normal file group system, before input files
+      inputFiles.insert(inputFiles.begin(), statefileFiles.begin(), statefileFiles.end());
+    }
+  }
+
   // Update app and libf3d options based on config entries, with an empty input file
-  // config < cli.
+  // config < statefile < cli.
   // Force it to be quiet has another options update happens later.
   this->Internals->UpdateOptions(
-    { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
-      this->Internals->ImperativeConfigOptionsEntries },
+    { this->Internals->ConfigOptionsEntries, this->Internals->StatefileOptionsEntries,
+      this->Internals->CLIOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
     { "" }, true);
 
   const auto& mode = this->Internals->AppOptions.MultiFileMode;
@@ -1235,6 +1354,17 @@ int F3DStarter::Start(int argc, char** argv)
 
   // Load a file
   this->LoadFileGroup();
+
+  // Save a statefile if requested
+  if (!this->Internals->AppOptions.SaveStatefile.empty())
+  {
+    if (!this->Internals->AppOptions.NoRender)
+    {
+      // Render once so that the camera is finalized before saving the state
+      this->Internals->Engine->getWindow().render();
+    }
+    this->SaveStatefile(this->Internals->AppOptions.SaveStatefile);
+  }
 
   if (!this->Internals->AppOptions.NoRender)
   {
@@ -1625,8 +1755,9 @@ void F3DStarter::LoadFileGroupInternal(
     // Update options even when there is no file
     // as imperative options should override dynamic option even in that case
     this->Internals->UpdateOptions(
-      { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
-        this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
+      { this->Internals->ConfigOptionsEntries, this->Internals->StatefileOptionsEntries,
+        this->Internals->CLIOptionsEntries, this->Internals->DynamicOptionsEntries,
+        this->Internals->ImperativeConfigOptionsEntries },
       { "" }, false);
     this->Internals->Engine->setOptions(this->Internals->LibOptions);
     f3d::log::debug("No files to load provided");
@@ -1634,13 +1765,14 @@ void F3DStarter::LoadFileGroupInternal(
   else
   {
     // Update app and libf3d options based on config entries, selecting block using the input file
-    // config < cli < dynamic
+    // config < statefile < cli < dynamic
     // Options must be updated before checking the supported files in order to load plugins
     std::vector<fs::path> configPaths = this->Internals->LoadedFiles;
     std::copy(paths.begin(), paths.end(), std::back_inserter(configPaths));
     this->Internals->UpdateOptions(
-      { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
-        this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
+      { this->Internals->ConfigOptionsEntries, this->Internals->StatefileOptionsEntries,
+        this->Internals->CLIOptionsEntries, this->Internals->DynamicOptionsEntries,
+        this->Internals->ImperativeConfigOptionsEntries },
       configPaths, false);
     this->Internals->UpdateBindings(configPaths);
 
@@ -1932,6 +2064,108 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
 
   this->Internals->Engine->setOptions(optionsCopy);
   this->Render();
+}
+
+//----------------------------------------------------------------------------
+void F3DStarter::SaveStatefile(const std::string& filenameTemplate)
+{
+  if (filenameTemplate.empty())
+  {
+    f3d::log::error("No statefile location provided, use --save-statefile or provide a filename");
+    return;
+  }
+
+  if (filenameTemplate == F3D_PIPED)
+  {
+#if F3D_MODULE_CLIP
+    if (clip::set_text(this->Internals->Engine->saveStatefileToString()))
+    {
+      f3d::log::info("Statefile copied to the clipboard");
+    }
+    else
+    {
+      f3d::log::error("Could not copy statefile to the clipboard");
+    }
+#else
+    f3d::log::error("Clipboard support is not available in this build, "
+                    "cannot save the statefile to the clipboard");
+#endif
+    return;
+  }
+
+  const f3d::utils::string_template statefileTemplate =
+    this->Internals->prepareFilenameTemplate(f3d::utils::collapsePath(filenameTemplate));
+  const fs::path statefilePath = this->Internals->finalizeFilenameTemplate(statefileTemplate);
+  try
+  {
+    this->Internals->Engine->saveStatefile(statefilePath);
+    f3d::log::info("Statefile saved to ", statefilePath.string());
+  }
+  catch (const f3d::engine::statefile_exception& ex)
+  {
+    f3d::log::error("Could not save statefile: ", ex.what());
+  }
+}
+
+//----------------------------------------------------------------------------
+void F3DStarter::LoadStatefile(const std::string& source)
+{
+  if (source.empty())
+  {
+    f3d::log::error("No statefile location provided, use --load-statefile or provide a filename");
+    return;
+  }
+
+  F3DOptionsTools::OptionsDict statefileOptions;
+  std::vector<std::string> statefileFiles;
+  bool parsed = false;
+  if (source == F3D_PIPED)
+  {
+#if F3D_MODULE_CLIP
+    std::string content;
+    if (clip::get_text(content))
+    {
+      std::istringstream stream(content);
+      parsed = F3DInternals::ParseStatefileContent(stream, {}, statefileOptions, statefileFiles);
+    }
+    else
+    {
+      f3d::log::error("Could not read a statefile from the clipboard");
+    }
+#else
+    f3d::log::error("Clipboard support is not available in this build, "
+                    "cannot load a statefile from the clipboard");
+#endif
+  }
+  else
+  {
+    parsed = F3DInternals::ParseStatefile(
+      f3d::utils::collapsePath(source), statefileOptions, statefileFiles);
+  }
+
+  if (!parsed)
+  {
+    return;
+  }
+
+  this->Internals->Engine->setOptions(this->Internals->LibOptions);
+  this->Internals->DynamicOptionsEntries.clear();
+
+  this->Internals->StatefileOptionsEntries.clear();
+  this->Internals->StatefileOptionsEntries.emplace_back(
+    statefileOptions, "", "", "statefile options");
+
+  if (!this->Internals->AppOptions.NoRender)
+  {
+    this->Internals->Engine->getInteractor().stopAnimation();
+  }
+  this->Internals->FilesGroups.clear();
+  for (const std::string& file : statefileFiles)
+  {
+    this->AddFile(f3d::utils::collapsePath(file));
+  }
+  this->LoadFileGroup(0, false, true);
+  this->ResetWindowName();
 }
 
 //----------------------------------------------------------------------------
@@ -2360,6 +2594,20 @@ void F3DStarter::AddCommands()
     },
     f3d::interactor::command_documentation_t{ "take_minimal_screenshot [filename]",
       "take a minimal screenshot into provided file or --screenshot-filename" },
+    complFilesystem);
+
+  interactor.addCommand(
+    "save_statefile", [this](const std::vector<std::string>& args)
+    { this->SaveStatefile(args.empty() ? this->Internals->AppOptions.SaveStatefile : args[0]); },
+    f3d::interactor::command_documentation_t{ "save_statefile [filename]",
+      "save the current state into provided file, --save-statefile, or `-` for the clipboard" },
+    complFilesystem);
+
+  interactor.addCommand(
+    "load_statefile", [this](const std::vector<std::string>& args)
+    { this->LoadStatefile(args.empty() ? this->Internals->AppOptions.LoadStatefile : args[0]); },
+    f3d::interactor::command_documentation_t{ "load_statefile [filename]",
+      "restore the state from provided file, --load-statefile, or `-` for the clipboard" },
     complFilesystem);
 
   // This replace an existing command in libf3d
