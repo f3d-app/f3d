@@ -37,6 +37,16 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, [[maybe_unused]] char* a
   inter.triggerCommand("toggle model.scivis.cells");
   test("triggerCommand toggle", options.model.scivis.cells == true);
 
+  // Test increase/decrease
+  inter.triggerCommand("increase render.light.intensity");
+  inter.triggerCommand("increase render.light.intensity");
+  inter.triggerCommand("decrease render.light.intensity");
+  test("triggerCommand increase/decrease", options.render.light.intensity, 1.02);
+
+  // Test cycle
+  inter.triggerCommand("cycle render.effect.blending.mode");
+  test("triggerCommand cycle", options.render.effect.blending.mode == "ddp");
+
   // Test alias command
   inter.triggerCommand("alias axis_on set ui.axis on");
   inter.triggerCommand("axis_on");

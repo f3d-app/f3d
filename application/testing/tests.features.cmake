@@ -480,6 +480,7 @@ f3d_test(NAME TestCommandScriptJumpToTimeAboveMax SCRIPT DATA soldier_animations
 f3d_test(NAME TestCommandScriptSetCameraBack SCRIPT DATA dragon.vtu) # set_camera back
 f3d_test(NAME TestCommandScriptSetCameraBottom SCRIPT DATA dragon.vtu) # set_camera bottom
 f3d_test(NAME TestCommandScriptSetCameraLeft SCRIPT DATA dragon.vtu) # set_camera left
+f3d_test(NAME TestCommandScriptSetCameraIndex SCRIPT DATA Cameras.gltf) # cycle scene.camera.index;cycle scene.camera.index;reload_current_file_group
 
 ## Tests to increase coverage
 # Output option test
