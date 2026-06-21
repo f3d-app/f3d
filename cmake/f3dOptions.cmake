@@ -57,7 +57,6 @@ function (f3d_generate_options)
       "Missing OUTPUT_NAME argument for f3d_generate_options")
   endif ()
 
-
   # Parse options.json and generate headers
   set(_option_basename "")
   set(_option_indent "")
@@ -239,28 +238,38 @@ function(_parse_json_option _top_json)
          list(APPEND _options_reset "if (name == \"${_option_name}\") opt.${_option_name}.reset()")
        endif()
 
+       list(APPEND _options_setter "if (name == \"${_option_name}\") opt.${_option_name} = ${_option_explicit_constr}{std::get<${_option_variant_type}>(value)}")
+       list(APPEND _options_getter "if (name == \"${_option_name}\") return opt.${_option_name}${_optional_getter}${_option_variant_convert}")
+       list(APPEND _options_string_setter "if (name == \"${_option_name}\") opt.${_option_name} = options_tools::parse<${_option_actual_type}>(str)")
+       list(APPEND _options_string_getter "if (name == \"${_option_name}\") return options_tools::format(opt.${_option_name}${_optional_getter})")
+       list(APPEND _options_lister "\"${_option_name}\"")
+
+       # Range domain
        if(_domain_range_error STREQUAL "NOTFOUND")
          if(NOT _domain_increment_error STREQUAL "NOTFOUND")
            set(_option_domain_increment "1")
          endif()
 
+         # {{ range_min, range_max}, range_increment }
          set(_range_value_initialize "{{")
-         string(JSON _domain_range_length LENGTH ${_option_domain_range})
-         math(EXPR _domain_range_length "${_domain_range_length} - 1")
-         foreach(_range_idx RANGE ${_domain_range_length})
-           string(JSON _range_value GET ${_option_domain_range} ${_range_idx})
-           string(APPEND _range_value_initialize "${_option_domain_explicit_constr}${_option_domain_value_start}${_range_value}${_option_domain_value_end}, ")
-         endforeach()
+         string(JSON _range_value GET ${_option_domain_range} 0)
+         string(APPEND _range_value_initialize "${_option_domain_explicit_constr}${_option_domain_value_start}${_range_value}${_option_domain_value_end}, ")
+         string(JSON _range_value GET ${_option_domain_range} 1)
+         string(APPEND _range_value_initialize "${_option_domain_explicit_constr}${_option_domain_value_start}${_range_value}${_option_domain_value_end}, ")
          string(APPEND _range_value_initialize "}, ${_option_domain_explicit_constr}${_option_domain_value_start}${_option_domain_increment}${_option_domain_value_end}}")
 
+         # Add range domain to struct and methods
          string(APPEND _options_domains_struct "${_option_indent}    domain_range_t<${_option_domain_type}> ${_member_name} = ${_range_value_initialize};\n")
          list(APPEND _options_has_domain "if (name == \"${_option_name}\") return options_tools::hasDomain(style, options::domain_style::RANGE)")
          list(APPEND _options_get_domain "if (name == \"${_option_name}\") return options_tools::getDomain(opt.domains.${_option_name})")
          list(APPEND _options_increase "if (name == \"${_option_name}\") options_tools::increase(opt.${_option_name}, opt.domains.${_option_name}, up)")
          list(APPEND _options_cycle "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to increase \" + std::string(\"${_option_name}\") + \" with incompatible option\")")
+
+       # Enum domain
        else()
          if(_domain_enum_error STREQUAL "NOTFOUND")
 
+           # {{ enum_value_0, enum_value_1, ..., enum_value_N }}
            set(_enum_value_initialize "{{")
            string(JSON _domain_enum_length LENGTH ${_option_domain_enum})
            math(EXPR _domain_enum_length "${_domain_enum_length} - 1")
@@ -272,11 +281,14 @@ function(_parse_json_option _top_json)
            endif()
            string(APPEND _enum_value_initialize "}}")
 
+           # Add enum domain to struct and methods
            string(APPEND _options_domains_struct "${_option_indent}    domain_enum_t<${_option_domain_type}> ${_member_name} = ${_enum_value_initialize};\n")
            list(APPEND _options_has_domain "if (name == \"${_option_name}\") return options_tools::hasDomain(style, options::domain_style::ENUM)")
-         list(APPEND _options_get_domain "if (name == \"${_option_name}\") return options_tools::getDomain(opt.domains.${_option_name})")
+           list(APPEND _options_get_domain "if (name == \"${_option_name}\") return options_tools::getDomain(opt.domains.${_option_name})")
            list(APPEND _options_increase "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to cycle \" + std::string(\"${_option_name}\") + \" with incompatible option\")")
            list(APPEND _options_cycle "if (name == \"${_option_name}\") options_tools::cycle(opt.${_option_name}, opt.domains.${_option_name})")
+
+         # No domain
          else()
            list(APPEND _options_has_domain "if (name == \"${_option_name}\") return false")
            list(APPEND _options_get_domain "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to get domain \" + std::string(\"${_option_name}\") + \" with incompatible option\")")
@@ -284,15 +296,9 @@ function(_parse_json_option _top_json)
            list(APPEND _options_cycle "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to increase \" + std::string(\"${_option_name}\") + \" with incompatible option\")")
          endif()
        endif()
-       
-       list(APPEND _options_setter "if (name == \"${_option_name}\") opt.${_option_name} = ${_option_explicit_constr}{std::get<${_option_variant_type}>(value)}")
-       list(APPEND _options_getter "if (name == \"${_option_name}\") return opt.${_option_name}${_optional_getter}${_option_variant_convert}")
-       list(APPEND _options_string_setter "if (name == \"${_option_name}\") opt.${_option_name} = options_tools::parse<${_option_actual_type}>(str)")
-       list(APPEND _options_string_getter "if (name == \"${_option_name}\") return options_tools::format(opt.${_option_name}${_optional_getter})")
-       list(APPEND _options_lister "\"${_option_name}\"")
 
     else()
-      # Group found, add in the struct and recurse
+      # Group found, add in the structs and recurse
       set(_option_prevname ${_option_basename})
       set(_option_previndent ${_option_indent})
       string(APPEND _option_indent "  ")
