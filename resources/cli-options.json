@@ -72,6 +72,16 @@
           "implicitValue": "1"
         },
         {
+          "longName": "load-statefile",
+          "helpText": "Restore the application state from a statefile, applied above config files but below command line options",
+          "valueHelper": "<file path>"
+        },
+        {
+          "longName": "save-statefile",
+          "helpText": "Save the application state to a statefile after loading, supports the same template variables as --output",
+          "valueHelper": "<file path>"
+        },
+        {
           "longName": "rendering-backend",
           "helpText": "Backend to use when rendering (auto|glx|wgl|egl|osmesa)",
           "valueHelper": "<string>"

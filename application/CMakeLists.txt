@@ -44,6 +44,15 @@ function(f3d_create_exec target_name)
     target_include_directories(${target_name} PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/nlohmann_json>)
   endif ()
 
+  if (F3D_MODULE_CLIP)
+    if (F3D_USE_EXTERNAL_CLIP)
+      target_link_libraries(${target_name} PRIVATE clip::clip)
+    else ()
+      target_link_libraries(${target_name} PRIVATE clip)
+      target_include_directories(${target_name} PRIVATE $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external>)
+    endif ()
+  endif ()
+
   if (F3D_MODULE_DMON)
     if (F3D_USE_EXTERNAL_DMON)
       target_link_libraries(${target_name} PRIVATE dmon::dmon)
@@ -80,6 +89,11 @@ function(f3d_create_exec target_name)
   # webp
   if (F3D_MODULE_WEBP)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_WEBP)
+  endif ()
+
+  # clip
+  if (F3D_MODULE_CLIP)
+    target_compile_definitions(${target_name} PRIVATE F3D_MODULE_CLIP)
   endif ()
 
   # dmon
