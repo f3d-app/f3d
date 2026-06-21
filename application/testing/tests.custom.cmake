@@ -16,6 +16,10 @@ set_tests_properties(f3d::TestNoCliInvalidPlugin PROPERTIES PASS_REGULAR_EXPRESS
 add_test(NAME f3d::TestSaveStatefile COMMAND $<TARGET_FILE:f3d> --no-render --no-config -D render.background.color=0,1,0 ${F3D_SOURCE_DIR}/testing/data/cow.vtp --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestSaveStatefile.json --verbose)
 set_tests_properties(f3d::TestSaveStatefile PROPERTIES PASS_REGULAR_EXPRESSION "Statefile saved to")
 
+# Test that `-` writes the statefile to the standard output instead of the clipboard
+add_test(NAME f3d::TestSaveStatefileStdout COMMAND $<TARGET_FILE:f3d> --no-render --no-config ${F3D_SOURCE_DIR}/testing/data/cow.vtp --save-statefile=-)
+set_tests_properties(f3d::TestSaveStatefileStdout PROPERTIES PASS_REGULAR_EXPRESSION "\"options\"")
+
 # Test that f3d can load a statefile, applying its options and files
 add_test(NAME f3d::TestLoadStatefile COMMAND $<TARGET_FILE:f3d> --no-render --no-config --load-statefile=${F3D_SOURCE_DIR}/testing/configs/test_statefile.json --verbose)
 set_tests_properties(f3d::TestLoadStatefile PROPERTIES PASS_REGULAR_EXPRESSION "from statefile options")

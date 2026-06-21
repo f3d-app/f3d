@@ -56,13 +56,15 @@ public:
   /**
    * Save the current engine state to a statefile.
    * `filenameTemplate` is resolved like `--save-statefile` (same template variables as the output).
-   * If it is `-`, the statefile is copied to the system clipboard (requires the clip module).
+   * If it is `-`, the statefile is written to the standard output.
+   * If it is `clip`, the statefile is copied to the system clipboard (requires the clip module).
    */
   void SaveStatefile(const std::string& filenameTemplate);
 
   /**
    * Restore the engine state from a statefile, reloading the saved files in the process.
-   * `source` is a file path, or `-` to read from the system clipboard (requires the clip module).
+   * `source` is a file path, `-` to read from the standard input, or `clip` to read from the
+   * system clipboard (requires the clip module).
    */
   void LoadStatefile(const std::string& source);
 
