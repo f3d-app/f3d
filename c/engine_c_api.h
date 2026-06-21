@@ -212,6 +212,24 @@ extern "C"
   F3D_EXPORT void f3d_engine_set_options(f3d_engine_t* engine, f3d_options_t* options);
 
   /**
+   * @brief Save the engine state to a statefile.
+   *
+   * @param engine Engine handle.
+   * @param statefile_path Path to write the statefile to.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_engine_save_statefile(f3d_engine_t* engine, const char* statefile_path);
+
+  /**
+   * @brief Restore the engine state from a statefile.
+   *
+   * @param engine Engine handle.
+   * @param statefile_path Path to read the statefile from.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_engine_load_statefile(f3d_engine_t* engine, const char* statefile_path);
+
+  /**
    * @brief Get the options object from the engine.
    *
    * @param engine Engine handle.

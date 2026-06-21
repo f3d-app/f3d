@@ -733,6 +733,8 @@ PYBIND11_MODULE(pyf3d, module)
   scene //
     .def("supports", &f3d::scene::supports)
     .def("clear", &f3d::scene::clear)
+    .def("get_added_files", &f3d::scene::getAddedFiles,
+      "Return the list of files currently added to the scene")
     .def("add", py::overload_cast<const std::filesystem::path&>(&f3d::scene::add),
       "Add a file the scene", py::arg("file_path"))
     .def("add", py::overload_cast<const std::vector<std::filesystem::path>&>(&f3d::scene::add),
@@ -922,6 +924,14 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property_readonly("scene", &f3d::engine::getScene, py::return_value_policy::reference)
     .def_property_readonly(
       "interactor", &f3d::engine::getInteractor, py::return_value_policy::reference)
+    .def("save_statefile", &f3d::engine::saveStatefile, "Save the engine state to a statefile",
+      py::arg("statefile_path"))
+    .def("load_statefile", &f3d::engine::loadStatefile, "Restore the engine state from a statefile",
+      py::arg("statefile_path"))
+    .def("save_statefile_to_string", &f3d::engine::saveStatefileToString,
+      "Save the engine state to a JSON string")
+    .def("load_statefile_from_string", &f3d::engine::loadStatefileFromString,
+      "Restore the engine state from a JSON string", py::arg("statefile_content"))
     .def_static("load_plugin", &f3d::engine::loadPlugin, "Load a plugin")
     .def_static(
       "autoload_plugins", &f3d::engine::autoloadPlugins, "Automatically load internal plugins")
