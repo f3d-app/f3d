@@ -55,11 +55,11 @@ Do not render anything and quit just after loading the first file, use with --ve
 
 ### `--load-statefile=<file path>` (_string_)
 
-Restore the application state from a statefile, previously written by `--save-statefile`.
+Restore the application state from a statefile, previously written by `--save-statefile`. The statefile is applied above configuration files but below command line options. If `-` is specified instead of a filename, the statefile is read from the standard input. If `clip` is specified, the statefile is read from the system clipboard (requires a build with the `clip` module).
 
 ### `--save-statefile=<file path>` (_string_)
 
-Save the application state to a statefile. Supports the same [template variables](#filename-templating) as `--output`.
+Save the application state to a statefile. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, the statefile is written to the standard output. If `clip` is specified, the statefile is copied to the system clipboard (requires a build with the `clip` module).
 
 ### `--max-size=<size in MiB>` (_int_, default: `-1`)
 

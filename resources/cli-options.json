@@ -73,12 +73,12 @@
         },
         {
           "longName": "load-statefile",
-          "helpText": "Restore the application state from a statefile, applied above config files but below command line options",
+          "helpText": "Restore the application state from a statefile, applied above config files but below command line options. Use `-` for the standard input or `clip` for the clipboard",
           "valueHelper": "<file path>"
         },
         {
           "longName": "save-statefile",
-          "helpText": "Save the application state to a statefile after loading, supports the same template variables as --output",
+          "helpText": "Save the application state to a statefile after loading, supports the same template variables as --output. Use `-` for the standard output or `clip` for the clipboard",
           "valueHelper": "<file path>"
         },
         {
