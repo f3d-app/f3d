@@ -46,7 +46,7 @@ Set the animation time to load.
 
 CLI: `--animation-time`.
 
-### `scene.camera.index` (_int_, optional, **on load**, domain: enumeration: `dynamic`)
+### `scene.camera.index` (_int_, optional, **on load**, domain: enumeration: dynamic)
 
 Select the scene camera to use when available in the file.
 The default scene always uses automatic camera.
