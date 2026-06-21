@@ -758,9 +758,9 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
     {
       vtkPolyData* upperFrame = this->Internals->AnimationFrames[animIndex][upperFrameIndex];
       vtkPolyData* lowerFrame = this->Internals->AnimationFrames[animIndex][lowerFrameIndex];
-      if (upperFrame == lowerFrame)
+      if (!this->Interpolate || upperFrame == lowerFrame)
       {
-        // Cannot blend if no difference in frames
+        // Interpolation disabled or no difference between frames
         this->Internals->Mapper->SetInputData(lowerFrame);
       }
       else

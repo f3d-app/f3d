@@ -13,4 +13,10 @@ void applyCustomImporter(vtkImporter* importer, const std::string& vtkNotUsed(fi
       nullptr, "QuakeMDL.skin_index must be positive. Defaulting to 0.");
   }
   mdlImporter->SetSkinIndex(skinIndex);
+
+  std::string interpOptName = "QuakeMDL.animation_interpolation";
+  std::string interpOptStr = this->ReaderOptions.at(interpOptName);
+  
+  bool interpolate = (F3DUtils::ParseToDouble(interpOptStr, 0, interpOptName) != 0);
+  mdlImporter->SetInterpolate(interpolate);
 }
