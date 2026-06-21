@@ -91,6 +91,7 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
 
   // Check individual domains
 
+  // clang-format off
   // render.effect.blending.mode: tested above
   // render.light.intensity: tested above
   // render.raytracing.samples: tested above
@@ -113,6 +114,7 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   test("scene.camera.index domain", opt.getDomain("scene.camera.index"), {});
   test("ui.backdrop.opacity domain", opt.getDomain("ui.backdrop.opacity"), {"0", "1", "0.05"});
   test("ui.scale domain", opt.getDomain("ui.scale"), {"0", "10", "0.1"});
+  // clang-format on
 
   return test.result();
  }
