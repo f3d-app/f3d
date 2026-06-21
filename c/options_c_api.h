@@ -96,7 +96,8 @@ extern "C"
    *
    * @param options Options handle.
    * @param name Option name.
-   * @return Boolean value (0 for false, non-zero for true).
+   * @return Boolean value (0 for false or if the option hasn't been set or doesn't exist, non-zero
+   * for true).
    */
   F3D_EXPORT int f3d_options_get_as_bool(const f3d_options_t* options, const char* name);
 
@@ -105,7 +106,7 @@ extern "C"
    *
    * @param options Options handle.
    * @param name Option name.
-   * @return Integer value.
+   * @return Integer value. 0 if the option hasn't been set or doesn't exist.
    */
   F3D_EXPORT int f3d_options_get_as_int(const f3d_options_t* options, const char* name);
 
@@ -114,7 +115,7 @@ extern "C"
    *
    * @param options Options handle.
    * @param name Option name.
-   * @return Double value.
+   * @return Double value. 0.0 if the option hasn't been set or doesn't exist.
    */
   F3D_EXPORT double f3d_options_get_as_double(const f3d_options_t* options, const char* name);
 
@@ -125,7 +126,7 @@ extern "C"
    *
    * @param options Options handle.
    * @param name Option name.
-   * @return String value.
+   * @return String value. NULL if the option hasn't been set or doesn't exist.
    */
   F3D_EXPORT const char* f3d_options_get_as_string(const f3d_options_t* options, const char* name);
 
@@ -136,7 +137,8 @@ extern "C"
    *
    * @param options Options handle.
    * @param name Option name.
-   * @return String representation of the option value.
+   * @return String representation of the option value. NULL if the option hasn't been set or
+   * doesn't exist.
    */
   F3D_EXPORT const char* f3d_options_get_as_string_representation(
     const f3d_options_t* options, const char* name);
@@ -171,7 +173,8 @@ extern "C"
    * @param options Options handle.
    * @param name Option name.
    * @param values Pre-allocated array to store the double values.
-   * @param count Pointer to store the number of values retrieved.
+   * @param count Pointer to store the number of values retrieved. Set to 0 if the option hasn't
+   * been set or doesn't exist.
    */
   F3D_EXPORT void f3d_options_get_as_double_vector(
     const f3d_options_t* options, const char* name, double* values, size_t* count);
@@ -184,7 +187,8 @@ extern "C"
    * @param options Options handle.
    * @param name Option name.
    * @param values Pre-allocated array to store the integer values.
-   * @param count Pointer to store the number of values retrieved.
+   * @param count Pointer to store the number of values retrieved. Set to 0 if the option hasn't
+   * been set or doesn't exist.
    */
   F3D_EXPORT void f3d_options_get_as_int_vector(
     const f3d_options_t* options, const char* name, int* values, size_t* count);
@@ -205,7 +209,7 @@ extern "C"
    * @param options Options handle.
    * @param other Other options handle to compare with.
    * @param name Option name.
-   * @return 1 if the values are the same, 0 otherwise.
+   * @return 1 if the values are the same, 0 otherwise or if the other option doesn't exist.
    */
   F3D_EXPORT int f3d_options_is_same(
     const f3d_options_t* options, const f3d_options_t* other, const char* name);
@@ -215,14 +219,14 @@ extern "C"
    *
    * @param options Options handle.
    * @param name Option name.
-   * @return 1 if the option has a value, 0 otherwise.
+   * @return 1 if the option has a value, 0 otherwise or if the option doesn't exist.
    */
   F3D_EXPORT int f3d_options_has_value(const f3d_options_t* options, const char* name);
 
   /**
    * @brief Copy an option value from another options object.
    *
-   * @param options Destination options handle.
+   * @param options Destination options handle. Will remain as-is if the option doesn't exist.
    * @param other Source options handle to copy from.
    * @param name Option name.
    */
@@ -276,7 +280,7 @@ extern "C"
    *
    * @param options Options handle.
    * @param name Option name.
-   * @return 1 if the option is optional, 0 otherwise.
+   * @return 1 if the option is optional, 0 otherwise or if the option doesn't exist.
    */
   F3D_EXPORT int f3d_options_is_optional(const f3d_options_t* options, const char* name);
 
@@ -301,7 +305,7 @@ extern "C"
    * @brief Parse a string as a boolean.
    *
    * @param str String to parse.
-   * @return 1 for true, 0 for false.
+   * @return 1 for true, 0 for false. 0 if the option cannot be parsed.
    */
   F3D_EXPORT int f3d_options_parse_bool(const char* str);
 
@@ -309,7 +313,7 @@ extern "C"
    * @brief Parse a string as an integer.
    *
    * @param str String to parse.
-   * @return Parsed integer value.
+   * @return Parsed integer value. 0 if the option cannot be parsed.
    */
   F3D_EXPORT int f3d_options_parse_int(const char* str);
 
@@ -317,7 +321,7 @@ extern "C"
    * @brief Parse a string as a double.
    *
    * @param str String to parse.
-   * @return Parsed double value.
+   * @return Parsed double value. 0.0 if the option cannot be parsed.
    */
   F3D_EXPORT double f3d_options_parse_double(const char* str);
 
@@ -325,7 +329,8 @@ extern "C"
    * @brief Parse a string as a string (returns a copy).
    *
    * @param str String to parse.
-   * @return Parsed string. Caller must free with f3d_options_free_string().
+   * @return Parsed string. Caller must free with f3d_options_free_string(). NULL if the option
+   * cannot be parsed.
    */
   F3D_EXPORT const char* f3d_options_parse_string(const char* str);
 
@@ -334,7 +339,7 @@ extern "C"
    *
    * @param str String to parse.
    * @param values Pre-allocated array to store the double values.
-   * @param count Pointer to store the number of values retrieved.
+   * @param count Pointer to store the number of values retrieved. 0 if the option cannot be parsed.
    */
   F3D_EXPORT void f3d_options_parse_double_vector(const char* str, double* values, size_t* count);
 
@@ -343,7 +348,7 @@ extern "C"
    *
    * @param str String to parse.
    * @param values Pre-allocated array to store the integer values.
-   * @param count Pointer to store the number of values retrieved.
+   * @param count Pointer to store the number of values retrieved. 0 if the option cannot be parsed.
    */
   F3D_EXPORT void f3d_options_parse_int_vector(const char* str, int* values, size_t* count);
 

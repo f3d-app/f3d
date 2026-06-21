@@ -126,23 +126,23 @@ public:
     std::string_view option) const;
 
   /**
-   *  Returns true if the option is optional else returns false.
+   * Returns true if the option is optional else returns false.
    *
-   *  Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::inexistent_exception if option does not exist.
    */
   [[nodiscard]] bool isOptional(std::string_view option) const;
 
   /**
-   *  Resets the option to default value.
+   * Resets the option to default value.
    *
-   *  Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::inexistent_exception if option does not exist.
    */
   options& reset(std::string_view name);
 
   /**
-   *  Unset the option if it is optional else throws options::incompatible_exception.
+   * Unset the option if it is optional else throws options::incompatible_exception.
    *
-   *  Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::inexistent_exception if option does not exist.
    */
   options& removeValue(std::string_view name);
 

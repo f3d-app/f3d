@@ -83,6 +83,8 @@ public:
   /**
    * Remove all existing commands and add all default commands,
    * see COMMANDS.md for details.
+   *
+   * Throw an interactor::invalid_args_exception if the arguments provided are wrong, or missing.
    */
   virtual interactor& initCommands() = 0;
 
