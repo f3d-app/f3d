@@ -53,6 +53,14 @@ Do not read any configuration file and consider only the command line options.
 
 Do not render anything and quit just after loading the first file, use with --verbose to recover information about a file.
 
+### `--load-statefile=<file path>` (_string_)
+
+Restore the application state from a statefile, previously written by `--save-statefile`.
+
+### `--save-statefile=<file path>` (_string_)
+
+Save the application state to a statefile. Supports the same [template variables](#filename-templating) as `--output`.
+
 ### `--max-size=<size in MiB>` (_int_, default: `-1`)
 
 Prevent F3D to load a file bigger than the provided size in Mib, leave empty for unlimited, useful for thumbnails.
