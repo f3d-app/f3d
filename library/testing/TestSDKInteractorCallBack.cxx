@@ -121,8 +121,8 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
   // Dragon.vtu; SZZYB; CTRL+S; SHIFT+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   test("play interactions after initialization", inter.playInteraction(interactionFilePath));
   test("render after playing defaulted interactions",
-    TestSDKHelpers::RenderTest(
-      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "DefaultAgain", 0.06));
+    TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
+      filename + "DefaultAgain", 0.06));
 
   // Check error handling
   test("record to an invalid path",
