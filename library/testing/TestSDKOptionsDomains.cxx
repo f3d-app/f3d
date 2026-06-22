@@ -10,7 +10,7 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
 
   // Test hasDomain
   f3d::options::domain_style style;
-  test("hasDomain range", opt.hasDomain("render.light.intensity", style));
+  test("hasDomain range", opt.hasDomain("scene.animation.speed_factor", style));
   test("hasDomain check range", style == f3d::options::domain_style::RANGE);
   test("hasDomain enum", opt.hasDomain("render.effect.blending.mode", style));
   test("hasDomain check enum", style == f3d::options::domain_style::ENUM);
@@ -19,7 +19,7 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
     "hasDomain inexistent", [&]() { std::ignore = opt.hasDomain("inexistent", style); });
 
   // Test getDomain
-  test("getDomain range", opt.getDomain("render.light.intensity"), { "0", "5", "0.02" });
+  test("getDomain range", opt.getDomain("scene.animation.speed_factor"), { "0", "2", "0.1" });
   test("getDomain enum", opt.getDomain("render.effect.blending.mode"),
     { "none", "ddp", "sort", "sort_cpu", "stochastic" });
   test.expect<f3d::options::incompatible_exception>(
@@ -29,18 +29,18 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
 
   // Test increase/decrease
 
-  opt.increase("render.light.intensity")
-    .increase("render.light.intensity")
-    .decrease("render.light.intensity");
-  test("increase/decrease", opt.render.light.intensity, 1.02);
+  opt.increase("scene.animation.speed_factor")
+    .increase("scene.animation.speed_factor")
+    .decrease("scene.animation.speed_factor");
+  test("increase/decrease", opt.scene.animation.speed_factor, f3d::ratio_t(1.1));
 
-  opt.render.light.intensity = 4.98;
-  opt.increase("render.light.intensity").increase("render.light.intensity");
-  test("increase max cap", opt.render.light.intensity, 5.0);
+  opt.scene.animation.speed_factor = f3d::ratio_t(1.9);
+  opt.increase("scene.animation.speed_factor").increase("scene.animation.speed_factor");
+  test("increase max cap", opt.scene.animation.speed_factor, f3d::ratio_t(2.0));
 
-  opt.render.light.intensity = 0.02;
-  opt.decrease("render.light.intensity").decrease("render.light.intensity");
-  test("decrease min cap", opt.render.light.intensity, 0.0);
+  opt.scene.animation.speed_factor = f3d::ratio_t(0.1);
+  opt.decrease("scene.animation.speed_factor").decrease("scene.animation.speed_factor");
+  test("decrease min cap", opt.scene.animation.speed_factor, f3d::ratio_t(0.0));
 
   test.expect<f3d::options::incompatible_exception>(
     "increase incompatible", [&]() { opt.increase("render.effect.blending.mode"); });
@@ -50,16 +50,16 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   // Test increase/decrease int
 
   opt.increase("render.raytracing.samples")
-    .increase("render.light.intensity")
-    .decrease("render.light.intensity");
+    .increase("render.raytracing.samples")
+    .decrease("render.raytracing.samples");
   test("increase/decrease int", opt.render.raytracing.samples, 6);
 
   opt.render.raytracing.samples = 19;
-  opt.increase("render.raytracing.samples").increase("render.light.intensity");
+  opt.increase("render.raytracing.samples").increase("render.raytracing.samples");
   test("increase max cap int", opt.render.raytracing.samples, 20);
 
   opt.render.raytracing.samples = 2;
-  opt.decrease("render.raytracing.samples").decrease("render.light.intensity");
+  opt.decrease("render.raytracing.samples").decrease("render.raytracing.samples");
   test("decrease min cap int", opt.render.raytracing.samples, 1);
 
   // Test increase/decrease optional
@@ -100,7 +100,7 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   test("cycle empty domain", opt.scene.camera.index.value(), 0);
 
   test.expect<f3d::options::incompatible_exception>(
-    "cycle incompatible", [&]() { opt.cycle("render.light.intensity"); });
+    "cycle incompatible", [&]() { opt.cycle("scene.animation.speed_factor"); });
   test.expect<f3d::options::inexistent_exception>(
     "cycle inexistent", [&]() { opt.cycle("inexistent"); });
 
@@ -108,7 +108,7 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
 
   // clang-format off
   // render.effect.blending.mode: tested above
-  // render.light.intensity: tested above
+  // scene.animation.speed_factor: tested above
   // render.raytracing.samples: tested above
   test("interactor.style domain", opt.getDomain("interactor.style"), {"default", "trackball", "2d"});
   test("model.color.opacity domain", opt.getDomain("model.color.opacity"), {"0", "1", "0.05"});
@@ -123,9 +123,9 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   test("render.backface_type domain", opt.getDomain("render.backface_type"), {"visible", "hidden"});
   test("render.background.blur.coc domain", opt.getDomain("render.background.blur.coc"), {"0", "100", "5"});
   test("render.effect.antialiasing.mode domain", opt.getDomain("render.effect.antialiasing.mode"), {"none", "fxaa", "ssaa", "taa"});
+  test("render.light.intensity domain", opt.getDomain("render.light.intensity"), {"0", "5", "0.02"});
   test("render.line_width domain", opt.getDomain("render.line_width"), {"0", "10", "0.1"});
   test("render.point_size domain", opt.getDomain("render.point_size"), {"0", "10", "0.1"});
-  test("scene.animation.speed_factor domain", opt.getDomain("scene.animation.speed_factor"), {"0", "2", "0.1"});
   test("scene.camera.index domain", opt.getDomain("scene.camera.index"), {});
   test("ui.backdrop.opacity domain", opt.getDomain("ui.backdrop.opacity"), {"0", "1", "0.05"});
   test("ui.scale domain", opt.getDomain("ui.scale"), {"0", "10", "0.1"});
