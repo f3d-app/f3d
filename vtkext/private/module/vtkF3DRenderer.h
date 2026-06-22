@@ -703,6 +703,16 @@ private:
    */
   void UpdateAxisWidgetSize();
 
+  /**
+   * Create a camera-facing bounding box.
+   */
+  vtkBoundingBox CreateCameraFacingBoundingBox(vtkCamera* camera, double scale, double distance);
+
+  /**
+   * Align the scene to the given bounds.
+   */
+  void AlignSceneToBounds(const vtkBoundingBox& bounds);
+
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
   vtkSmartPointer<vtkCameraOrientationWidget> ModernAxisWidget;
   vtkSmartPointer<vtkCameraOrientationRepresentation> ModernAxisRepresentation;
@@ -740,6 +750,7 @@ private:
   bool HDRISphericalHarmonicsConfigured = false;
   bool HDRISpecularConfigured = false;
   bool HDRISkyboxConfigured = false;
+  bool XrBoundingBoxConfigured = false;
 
   bool GridVisible = false;
   bool GridAbsolute = false;

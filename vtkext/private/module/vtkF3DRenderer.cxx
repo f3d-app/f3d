@@ -48,6 +48,7 @@
 #include <vtkOpenGLRenderer.h>
 #include <vtkOpenGLState.h>
 #include <vtkOpenGLTexture.h>
+#include <vtkOpenXRRenderWindow.h>
 #include <vtkOrientationMarkerWidget.h>
 #include <vtkPBRLUTTexture.h>
 #include <vtkPNGReader.h>
@@ -347,6 +348,28 @@ void vtkF3DRenderer::Initialize()
   this->RenderWindow->AddObserver(
     vtkCommand::WindowResizeEvent, this->ModernAxisWidgetResizeCallback);
 #endif
+
+  // camera only gets updated by openxr on the first render, so we have to create the bounding box
+  // and align the scene on the first render as well.
+  vtkNew<vtkCallbackCommand> startEventCallback;
+  startEventCallback->SetClientData(this);
+  startEventCallback->SetCallback(
+    [](vtkObject* const, unsigned long, void* clientData, void*)
+    {
+      vtkF3DRenderer* self = static_cast<vtkF3DRenderer*>(clientData);
+      if (!self->Xr)
+      {
+        return;
+      }
+      vtkCamera* cam = self->GetActiveCamera();
+      const vtkBoundingBox bbox = self->CreateCameraFacingBoundingBox(cam, 100.0f, 100.0f);
+      if (bbox.IsValid())
+      {
+        self->XrBoundingBoxConfigured = true;
+        self->AlignSceneToBounds(bbox);
+      }
+    });
+  this->RenderWindow->AddObserver(vtkCommand::StartEvent, startEventCallback);
 }
 
 //----------------------------------------------------------------------------
@@ -1095,6 +1118,147 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
   }
 
   return box;
+}
+
+//----------------------------------------------------------------------------
+vtkBoundingBox vtkF3DRenderer::CreateCameraFacingBoundingBox(
+  vtkCamera* camera, double scale, double distance)
+{
+  if (this->XrBoundingBoxConfigured)
+  {
+    return {};
+  }
+
+  double position[3];
+  double focalPoint[3];
+  double viewUp[3];
+
+  camera->GetPosition(position);
+  camera->GetFocalPoint(focalPoint);
+  camera->GetViewUp(viewUp);
+
+  double forward[3] = { focalPoint[0] - position[0], focalPoint[1] - position[1],
+    focalPoint[2] - position[2] };
+  vtkMath::Normalize(forward);
+
+  double right[3];
+  vtkMath::Cross(forward, viewUp, right);
+  vtkMath::Normalize(right);
+
+  double up[3];
+  vtkMath::Cross(right, forward, up);
+  vtkMath::Normalize(up);
+
+  double center[3] = { position[0] + forward[0] * distance, position[1] + forward[1] * distance,
+    position[2] + forward[2] * distance };
+
+  vtkBoundingBox bbox;
+  const double halfScale = scale * 0.5;
+
+  for (double dx : { -halfScale, halfScale })
+  {
+    for (double dy : { -halfScale, halfScale })
+    {
+      for (double dz : { -halfScale, halfScale })
+      {
+        double point[3] = {
+          center[0] + right[0] * dx + up[0] * dy + forward[0] * dz,
+          center[1] + right[1] * dx + up[1] * dy + forward[1] * dz,
+          center[2] + right[2] * dx + up[2] * dy + forward[2] * dz,
+        };
+        bbox.AddPoint(point);
+      }
+    }
+  }
+
+  return bbox;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::AlignSceneToBounds(const vtkBoundingBox& bounds)
+{
+  if (!bounds.IsValid() || !this->Importer)
+  {
+    return;
+  }
+
+  const vtkBoundingBox& sourceBounds = this->Importer->GetGeometryBoundingBox();
+  if (!sourceBounds.IsValid())
+  {
+    return;
+  }
+
+  double sourceCenter[3];
+  sourceBounds.GetCenter(sourceCenter);
+
+  double targetCenter[3];
+  bounds.GetCenter(targetCenter);
+
+  const double sourceLengths[3] = {
+    sourceBounds.GetLength(0),
+    sourceBounds.GetLength(1),
+    sourceBounds.GetLength(2),
+  };
+  const double targetLengths[3] = {
+    bounds.GetLength(0),
+    bounds.GetLength(1),
+    bounds.GetLength(2),
+  };
+
+  double scale = 1.0;
+  bool scaleInitialized = false;
+  for (int i = 0; i < 3; ++i)
+  {
+    if (sourceLengths[i] <= 0.0)
+    {
+      continue;
+    }
+
+    const double ratio = targetLengths[i] / sourceLengths[i];
+    if (!scaleInitialized)
+    {
+      scale = ratio;
+      scaleInitialized = true;
+    }
+    else
+    {
+      scale = std::min(scale, ratio);
+    }
+  }
+
+  vtkNew<vtkTransform> sceneTransform;
+  sceneTransform->PostMultiply();
+  sceneTransform->Translate(targetCenter);
+  sceneTransform->Scale(scale, scale, scale);
+  sceneTransform->Translate(-sourceCenter[0], -sourceCenter[1], -sourceCenter[2]);
+
+  vtkMatrix4x4* sceneMatrix = sceneTransform->GetMatrix();
+
+  vtkActorCollection* actors = this->GetActors();
+  for (actors->InitTraversal(); vtkActor* actor = actors->GetNextActor();)
+  {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
+    vtkGridAxesActor3D* gridAxesActor = vtkGridAxesActor3D::SafeDownCast(actor);
+    if (gridAxesActor)
+    {
+      continue;
+    }
+#endif
+    if (actor == this->GridActor)
+    {
+      continue;
+    }
+
+    vtkSkybox* skyboxActor = vtkSkybox::SafeDownCast(actor);
+    if (skyboxActor)
+    {
+      continue;
+    }
+
+    vtkNew<vtkMatrix4x4> alignedMatrix;
+    vtkMatrix4x4::Multiply4x4(sceneMatrix, actor->GetMatrix(), alignedMatrix);
+    actor->PokeMatrix(alignedMatrix);
+  }
 }
 
 //----------------------------------------------------------------------------
