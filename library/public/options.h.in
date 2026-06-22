@@ -143,6 +143,7 @@ public:
    * Unset the option if it is optional else throws options::incompatible_exception.
    *
    * Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::incompatible_exception if option is not an optional.
    */
   options& removeValue(std::string_view name);
 

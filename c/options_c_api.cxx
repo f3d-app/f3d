@@ -38,11 +38,11 @@ void f3d_options_set_as_bool(f3d_options_t* options, const char* name, int value
     f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
     cpp_options->set(name, static_cast<bool>(value));
   }
-  catch (const f3d::options::inexistent_exception& ex)
+  catch (const f3d::options::incompatible_exception& ex)
   {
     f3d::log::error(ex.what());
   }
-  catch (const f3d::options::incompatible_exception& ex)
+  catch (const f3d::options::inexistent_exception& ex)
   {
     f3d::log::error(ex.what());
   }
@@ -61,11 +61,11 @@ void f3d_options_set_as_int(f3d_options_t* options, const char* name, int value)
     f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
     cpp_options->set(name, value);
   }
-  catch (const f3d::options::inexistent_exception& ex)
+  catch (const f3d::options::incompatible_exception& ex)
   {
     f3d::log::error(ex.what());
   }
-  catch (const f3d::options::incompatible_exception& ex)
+  catch (const f3d::options::inexistent_exception& ex)
   {
     f3d::log::error(ex.what());
   }
@@ -84,11 +84,11 @@ void f3d_options_set_as_double(f3d_options_t* options, const char* name, double 
     f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
     cpp_options->set(name, value);
   }
-  catch (const f3d::options::inexistent_exception& ex)
+  catch (const f3d::options::incompatible_exception& ex)
   {
     f3d::log::error(ex.what());
   }
-  catch (const f3d::options::incompatible_exception& ex)
+  catch (const f3d::options::inexistent_exception& ex)
   {
     f3d::log::error(ex.what());
   }
@@ -107,11 +107,11 @@ void f3d_options_set_as_string(f3d_options_t* options, const char* name, const c
     f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
     cpp_options->set(name, std::string(value));
   }
-  catch (const f3d::options::inexistent_exception& ex)
+  catch (const f3d::options::incompatible_exception& ex)
   {
     f3d::log::error(ex.what());
   }
-  catch (const f3d::options::incompatible_exception& ex)
+  catch (const f3d::options::inexistent_exception& ex)
   {
     f3d::log::error(ex.what());
   }
@@ -132,11 +132,11 @@ void f3d_options_set_as_double_vector(
     std::vector<double> vec(values, values + count);
     cpp_options->set(name, vec);
   }
-  catch (const f3d::options::inexistent_exception& ex)
+  catch (const f3d::options::incompatible_exception& ex)
   {
     f3d::log::error(ex.what());
   }
-  catch (const f3d::options::incompatible_exception& ex)
+  catch (const f3d::options::inexistent_exception& ex)
   {
     f3d::log::error(ex.what());
   }
@@ -157,11 +157,11 @@ void f3d_options_set_as_int_vector(
     std::vector<int> vec(values, values + count);
     cpp_options->set(name, vec);
   }
-  catch (const f3d::options::inexistent_exception& ex)
+  catch (const f3d::options::incompatible_exception& ex)
   {
     f3d::log::error(ex.what());
   }
-  catch (const f3d::options::incompatible_exception& ex)
+  catch (const f3d::options::inexistent_exception& ex)
   {
     f3d::log::error(ex.what());
   }
@@ -343,11 +343,11 @@ void f3d_options_toggle(f3d_options_t* options, const char* name)
     f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
     cpp_options->toggle(name);
   }
-  catch (const f3d::options::inexistent_exception& ex)
+  catch (const f3d::options::incompatible_exception& ex)
   {
     f3d::log::error(ex.what());
   }
-  catch (const f3d::options::incompatible_exception& ex)
+  catch (const f3d::options::inexistent_exception& ex)
   {
     f3d::log::error(ex.what());
   }
@@ -523,6 +523,10 @@ void f3d_options_remove_value(f3d_options_t* options, const char* name)
   {
     f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
     cpp_options->removeValue(name);
+  }
+  catch (const f3d::options::incompatible_exception& ex)
+  {
+    f3d::log::error(ex.what());
   }
   catch (const f3d::options::inexistent_exception& ex)
   {
