@@ -29,7 +29,7 @@ namespace fs = std::filesystem;
 namespace
 {
 //----------------------------------------------------------------------------
-nlohmann::ordered_json SerializeState(f3d::engine& eng, const fs::path& baseDir)
+nlohmann::ordered_json CaptureState(f3d::engine& eng, const fs::path& baseDir)
 {
   nlohmann::ordered_json root;
 
@@ -81,7 +81,7 @@ nlohmann::ordered_json SerializeState(f3d::engine& eng, const fs::path& baseDir)
 }
 
 //----------------------------------------------------------------------------
-void DeserializeState(f3d::engine& eng, const nlohmann::ordered_json& root, const fs::path& baseDir)
+void RestoreState(f3d::engine& eng, const nlohmann::ordered_json& root, const fs::path& baseDir)
 {
   // Clear the scene first so that the statefile fully replaces the current state
   f3d::scene& sce = eng.getScene();
@@ -108,7 +108,7 @@ void DeserializeState(f3d::engine& eng, const nlohmann::ordered_json& root, cons
   }
 
   // Add the saved files, resolving relative paths against the statefile directory (baseDir),
-  // mirroring how SerializeState stored them
+  // mirroring how CaptureState stored them
   if (root.contains("files"))
   {
     std::vector<fs::path> files;
@@ -414,7 +414,7 @@ void engine::saveStatefile(const fs::path& statefilePath)
       throw engine::statefile_exception(
         "Could not open statefile for writing: " + statefilePath.string());
     }
-    stream << ::SerializeState(*this, statefilePath.parent_path()).dump(2) << '\n';
+    stream << ::CaptureState(*this, statefilePath.parent_path()).dump(2) << '\n';
   }
   catch (const fs::filesystem_error& ex)
   {
@@ -435,7 +435,7 @@ void engine::loadStatefile(const fs::path& statefilePath)
         "Could not open statefile for reading: " + statefilePath.string());
     }
     nlohmann::ordered_json root = nlohmann::ordered_json::parse(stream);
-    ::DeserializeState(*this, root, statefilePath.parent_path());
+    ::RestoreState(*this, root, statefilePath.parent_path());
   }
   catch (const nlohmann::json::exception& ex)
   {
@@ -452,7 +452,7 @@ void engine::loadStatefile(const fs::path& statefilePath)
 //----------------------------------------------------------------------------
 std::string engine::saveStatefileToString()
 {
-  return ::SerializeState(*this, {}).dump(2);
+  return ::CaptureState(*this, {}).dump(2);
 }
 
 //----------------------------------------------------------------------------
@@ -461,7 +461,7 @@ void engine::loadStatefileFromString(const std::string& statefileContent)
   try
   {
     nlohmann::ordered_json root = nlohmann::ordered_json::parse(statefileContent);
-    ::DeserializeState(*this, root, {});
+    ::RestoreState(*this, root, {});
   }
   catch (const nlohmann::json::exception& ex)
   {
