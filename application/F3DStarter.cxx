@@ -352,8 +352,9 @@ public:
 
     if (forceStdErr)
     {
-      f3d::log::info("Output image will be saved to stdout, all log types including debug and info "
-                     "levels are redirected to stderr");
+      f3d::log::info(
+        "Standard output is reserved for piped data, all log types including debug and "
+        "info levels are redirected to stderr");
     }
   }
 
@@ -827,9 +828,10 @@ public:
     // Update typed app options from the string version
     this->UpdateTypedAppOptions(appOptions);
 
-    // Update Verbose level as soon as possible
-    F3DInternals::SetVerboseLevel(
-      this->AppOptions.VerboseLevel, this->AppOptions.Output == F3D_PIPED);
+    // Update Verbose level as soon as possible, redirecting logs to stderr whenever data is
+    // written to stdout so it stays usable when piped
+    F3DInternals::SetVerboseLevel(this->AppOptions.VerboseLevel,
+      this->AppOptions.Output == F3D_PIPED || this->AppOptions.SaveStatefile == F3D_PIPED);
 
     // Load any new plugins
     F3DPluginsTools::LoadPlugins(this->AppOptions.Plugins, this->AppOptions.PluginsPath);
@@ -1040,6 +1042,10 @@ public:
       interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others", std::bind(docString, "Take a screenshot"));
       interactor.addBinding({ mod_t::CTRL, "S" }, "save_statefile", "Others", std::bind(docString, "Save a statefile"));
       interactor.addBinding({ mod_t::CTRL, "L" }, "load_statefile", "Others", std::bind(docString, "Load a statefile"));
+#if F3D_MODULE_CLIP
+      interactor.addBinding({ mod_t::CTRL_SHIFT, "S" }, "save_statefile_to_clipboard", "Others", std::bind(docString, "Save a statefile to the clipboard"));
+      interactor.addBinding({ mod_t::CTRL_SHIFT, "L" }, "load_statefile_from_clipboard", "Others", std::bind(docString, "Load a statefile from the clipboard"));
+#endif
 #if F3D_MODULE_TINYFILEDIALOGS
       interactor.addBinding({ mod_t::CTRL, "O" }, "open_file_dialog", "Others", std::bind(docString, "Open File Dialog"), f3d::interactor::BindingType::OTHER, true);
 #endif
@@ -1208,6 +1214,17 @@ int F3DStarter::Start(int argc, char** argv)
     renderToStdout = localOutput == F3D_PIPED;
   }
 
+  // The statefile is written to stdout when piped, just like the output image
+  bool statefileToStdout = false;
+  iter = cliOptionsDict.find("save-statefile");
+  if (iter != cliOptionsDict.end())
+  {
+    std::string localSaveStatefile;
+    // XXX: Discarding bool return because this cannot return false with a string
+    F3DOptionsTools::Parse(iter->second, localSaveStatefile);
+    statefileToStdout = localSaveStatefile == F3D_PIPED;
+  }
+
   this->Internals->AppOptions.VerboseLevel = "info";
   iter = cliOptionsDict.find("verbose");
   if (iter != cliOptionsDict.end())
@@ -1216,8 +1233,10 @@ int F3DStarter::Start(int argc, char** argv)
     F3DOptionsTools::Parse(iter->second, this->Internals->AppOptions.VerboseLevel);
   }
 
-  // Set verbosity level early from command line
-  F3DInternals::SetVerboseLevel(this->Internals->AppOptions.VerboseLevel, renderToStdout);
+  // Set verbosity level early from command line, redirecting logs to stderr whenever data is
+  // written to stdout so it stays usable when piped
+  F3DInternals::SetVerboseLevel(
+    this->Internals->AppOptions.VerboseLevel, renderToStdout || statefileToStdout);
 
   f3d::log::debug("========== Initializing Options ==========");
 
@@ -2646,6 +2665,7 @@ void F3DStarter::AddCommands()
       "restore the state from provided file or --statefile-filename, `-` for the standard input" },
     complFilesystem);
 
+#if F3D_MODULE_CLIP
   interactor.addCommand(
     "save_statefile_to_clipboard",
     [this](const std::vector<std::string>&) { this->SaveStatefileToClipboard(); },
@@ -2657,6 +2677,7 @@ void F3DStarter::AddCommands()
     [this](const std::vector<std::string>&) { this->LoadStatefileFromClipboard(); },
     f3d::interactor::command_documentation_t{
       "load_statefile_from_clipboard", "restore the state from the system clipboard" });
+#endif
 
   // This replace an existing command in libf3d
   interactor.removeCommand("add_files");
