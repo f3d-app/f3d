@@ -167,7 +167,7 @@ eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 
 `save_statefile [filename]`: A specific command to save the current state into a statefile. If filename is not specified, rely on the `--statefile-filename` CLI option. Use `-` for the standard output. eg: `save_statefile path/to/state.json`.
 
-`load_statefile [filename]`: A specific command to restore the state from a statefile, reloading the saved files. If filename is not specified, rely on the `--load-statefile` CLI option. Use `-` for the standard input. Does nothing but warn if the file does not exist. eg: `load_statefile path/to/state.json`.
+`load_statefile [filename]`: A specific command to restore the state from a statefile, reloading the saved files. If filename is not specified, rely on the `--statefile-filename` CLI option. Use `-` for the standard input. Does nothing but warn if the file does not exist. eg: `load_statefile path/to/state.json`.
 
 `save_statefile_to_clipboard`: A specific command to save the current state into the system clipboard. Requires a build with the `clip` module. No argument.
 

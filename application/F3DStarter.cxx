@@ -2137,13 +2137,24 @@ void F3DStarter::LoadStatefile(const std::string& source)
 {
   if (source.empty())
   {
-    f3d::log::warn("No statefile location provided, use --load-statefile or provide a filename");
+    f3d::log::warn(
+      "No statefile location provided, use --statefile-filename or provide a filename");
     return;
+  }
+
+  // Resolve template variables ({model}, {date}, ...) like the save path does, so that the same
+  // --statefile-filename works for both saving and loading.
+  std::string resolvedSource = source;
+  if (source != F3D_PIPED)
+  {
+    const f3d::utils::string_template sourceTemplate =
+      this->Internals->prepareFilenameTemplate(f3d::utils::collapsePath(source));
+    resolvedSource = this->Internals->finalizeFilenameTemplate(sourceTemplate).string();
   }
 
   F3DOptionsTools::OptionsDict statefileOptions;
   std::vector<std::string> statefileFiles;
-  if (!F3DInternals::ReadStatefileSource(source, statefileOptions, statefileFiles))
+  if (!F3DInternals::ReadStatefileSource(resolvedSource, statefileOptions, statefileFiles))
   {
     return;
   }
@@ -2627,10 +2638,12 @@ void F3DStarter::AddCommands()
     complFilesystem);
 
   interactor.addCommand(
-    "load_statefile", [this](const std::vector<std::string>& args)
-    { this->LoadStatefile(args.empty() ? this->Internals->AppOptions.LoadStatefile : args[0]); },
+    "load_statefile",
+    [this](const std::vector<std::string>& args) {
+      this->LoadStatefile(args.empty() ? this->Internals->AppOptions.StatefileFilename : args[0]);
+    },
     f3d::interactor::command_documentation_t{ "load_statefile [filename]",
-      "restore the state from provided file or --load-statefile, `-` for the standard input" },
+      "restore the state from provided file or --statefile-filename, `-` for the standard input" },
     complFilesystem);
 
   interactor.addCommand(
