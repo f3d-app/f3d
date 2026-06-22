@@ -204,7 +204,7 @@ Set a _custom colormap for the coloring_.See [colormap parsing](../user/08-PARSI
 
 CLI: `--colormap`.
 
-### `model.scivis.opacity_map` (_vector\<double\>_, default: "0.0,0.0,1.0,1.0")
+### `model.scivis.opacity_map` (_vector\<double\>_, default: `0.0,0.0,1.0,1.0`)
 
 Set a _custom opacity map for the coloring_. The format of the opacity map should be `val, opacity, ...`.
 It is only used for volume rendering currently.
