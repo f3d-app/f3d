@@ -55,7 +55,7 @@ Do not render anything and quit just after loading the first file, use with --ve
 
 ### `--load-statefile=<file path>` (_string_)
 
-Restore the application state from a statefile, previously written by `--save-statefile`. The statefile is applied above configuration files but below command line options. If `-` is specified instead of a filename, the statefile is read from the standard input. If the file does not exist, it is skipped with a warning.
+Restore the application state from a statefile right after starting, then continue running. The statefile is applied above configuration files but below command line options. If `-` is specified instead of a filename, the statefile is read from the standard input. If the file does not exist, it is skipped with a warning.
 
 ### `--save-statefile=<file path>` (_string_)
 
@@ -63,7 +63,7 @@ Save the application state to a statefile right after loading, then continue run
 
 ### `--statefile-filename=<file path>` (_string_, default: `{app}/{model}_{n}.json`)
 
-Default filename used by the `save_statefile` [command](07-COMMANDS.md) when none is provided, resolved relative to the current working directory. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, the statefile is written to the standard output.
+Default filename used by the `save_statefile` and `load_statefile` [commands](07-COMMANDS.md) when none is provided, resolved relative to the current working directory. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, the statefile is written to the standard output (save) or read from the standard input (load).
 
 ### `--max-size=<size in MiB>` (_int_, default: `-1`)
 
