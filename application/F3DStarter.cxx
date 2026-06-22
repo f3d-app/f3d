@@ -105,6 +105,7 @@ public:
     std::string Output;
     std::string LoadStatefile;
     std::string SaveStatefile;
+    std::string StatefileFilename;
     bool BindingsList;
     bool NoBackground;
     bool NoRender;
@@ -883,6 +884,7 @@ public:
     this->ParseOption(appOptions, "output", this->AppOptions.Output);
     this->ParseOption(appOptions, "load-statefile", this->AppOptions.LoadStatefile);
     this->ParseOption(appOptions, "save-statefile", this->AppOptions.SaveStatefile);
+    this->ParseOption(appOptions, "statefile-filename", this->AppOptions.StatefileFilename);
     this->ParseOption(appOptions, "list-bindings", this->AppOptions.BindingsList);
     this->ParseOption(appOptions, "no-background", this->AppOptions.NoBackground);
     this->ParseOption(appOptions, "no-render", this->AppOptions.NoRender);
@@ -2076,7 +2078,8 @@ void F3DStarter::SaveStatefile(const std::string& filenameTemplate)
 {
   if (filenameTemplate.empty())
   {
-    f3d::log::error("No statefile location provided, use --save-statefile or provide a filename");
+    f3d::log::error(
+      "No statefile location provided, use --statefile-filename or provide a filename");
     return;
   }
 
@@ -2584,12 +2587,13 @@ void F3DStarter::AddCommands()
     complFilesystem);
 
   interactor.addCommand(
-    "save_statefile", [this](const std::vector<std::string>& args)
-    { this->SaveStatefile(args.empty() ? this->Internals->AppOptions.SaveStatefile : args[0]); },
+    "save_statefile",
+    [this](const std::vector<std::string>& args) {
+      this->SaveStatefile(args.empty() ? this->Internals->AppOptions.StatefileFilename : args[0]);
+    },
     f3d::interactor::command_documentation_t{ "save_statefile [filename]",
-      "save the current state into provided file, --save-statefile, `-` for the standard output, "
-      "or "
-      "`clip` for the clipboard" },
+      "save the current state into provided file or --statefile-filename, `-` for the standard "
+      "output, or `clip` for the clipboard" },
     complFilesystem);
 
   interactor.addCommand(
