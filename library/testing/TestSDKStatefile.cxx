@@ -6,6 +6,9 @@
 #include <scene.h>
 
 #include <filesystem>
+#include <fstream>
+#include <iterator>
+#include <string>
 
 namespace fs = std::filesystem;
 
@@ -42,6 +45,14 @@ int TestSDKStatefile([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     [&]() { src.saveStatefile(tmpDir / "does" / "not" / "exist" / "state.json"); });
 
   src.saveStatefile(statefilePath);
+
+  // Files outside the statefile directory are stored as absolute paths so the statefile can be
+  // loaded without a base directory (e.g. from the standard input or the clipboard)
+  std::ifstream statefileStream(statefilePath);
+  const std::string statefileContent{ std::istreambuf_iterator<char>(statefileStream),
+    std::istreambuf_iterator<char>() };
+  test("file outside statefile dir stored as absolute path",
+    statefileContent.find(fs::absolute(cowFile).generic_string()) != std::string::npos, true);
 
   // Restore the state into a fresh engine, check it matches
   f3d::engine dst = f3d::engine::createNone();

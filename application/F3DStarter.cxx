@@ -76,7 +76,6 @@ namespace fs = std::filesystem;
 f3d::interactor* GlobalInteractor = nullptr;
 
 constexpr std::string_view F3D_PIPED = "-";
-constexpr std::string_view F3D_CLIPBOARD = "clip";
 
 class F3DStarter::F3DInternals
 {
@@ -194,7 +193,7 @@ public:
     std::ifstream stream(statefilePath);
     if (!stream.is_open())
     {
-      f3d::log::error("Could not open statefile: ", statefilePath.string());
+      f3d::log::warn("Could not open statefile, skipping: ", statefilePath.string());
       return false;
     }
     return F3DInternals::ParseStatefileContent(
@@ -260,25 +259,26 @@ public:
       return F3DInternals::ParseStatefileContent(std::cin, {}, outOptions, outFiles);
     }
 
-    if (source == F3D_CLIPBOARD)
-    {
-#if F3D_MODULE_CLIP
-      std::string content;
-      if (!clip::get_text(content))
-      {
-        f3d::log::error("Could not read a statefile from the clipboard");
-        return false;
-      }
-      std::istringstream stream(content);
-      return F3DInternals::ParseStatefileContent(stream, {}, outOptions, outFiles);
-#else
-      f3d::log::error("Clipboard support is not available in this build, "
-                      "cannot load a statefile from the clipboard");
-      return false;
-#endif
-    }
-
     return F3DInternals::ParseStatefile(f3d::utils::collapsePath(source), outOptions, outFiles);
+  }
+
+  static bool ReadStatefileFromClipboard(
+    F3DOptionsTools::OptionsDict& outOptions, std::vector<std::string>& outFiles)
+  {
+#if F3D_MODULE_CLIP
+    std::string content;
+    if (!clip::get_text(content))
+    {
+      f3d::log::error("Could not read a statefile from the clipboard");
+      return false;
+    }
+    std::istringstream stream(content);
+    return F3DInternals::ParseStatefileContent(stream, {}, outOptions, outFiles);
+#else
+    f3d::log::error("Clipboard support is not available in this build, "
+                    "cannot load a statefile from the clipboard");
+    return false;
+#endif
   }
 
   static bool HasHDRIExtension(const std::string& file)
@@ -1038,6 +1038,8 @@ public:
       interactor.addBinding({ mod_t::NONE, "Up" }, "reload_current_file_group", "Others", std::bind(docString, "Reload current file group"));
       interactor.addBinding({ mod_t::NONE, "Down" }, "add_current_directories", "Others", std::bind(docString, "Add files from dir of current file"));
       interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others", std::bind(docString, "Take a screenshot"));
+      interactor.addBinding({ mod_t::CTRL, "S" }, "save_statefile", "Others", std::bind(docString, "Save a statefile"));
+      interactor.addBinding({ mod_t::CTRL, "L" }, "load_statefile", "Others", std::bind(docString, "Load a statefile"));
 #if F3D_MODULE_TINYFILEDIALOGS
       interactor.addBinding({ mod_t::CTRL, "O" }, "open_file_dialog", "Others", std::bind(docString, "Open File Dialog"), f3d::interactor::BindingType::OTHER, true);
 #endif
@@ -2090,29 +2092,15 @@ void F3DStarter::SaveStatefile(const std::string& filenameTemplate)
     return;
   }
 
-  if (filenameTemplate == F3D_CLIPBOARD)
-  {
-#if F3D_MODULE_CLIP
-    if (clip::set_text(this->Internals->Engine->saveStatefileToString()))
-    {
-      f3d::log::info("Statefile copied to the clipboard");
-    }
-    else
-    {
-      f3d::log::error("Could not copy statefile to the clipboard");
-    }
-#else
-    f3d::log::error("Clipboard support is not available in this build, "
-                    "cannot save the statefile to the clipboard");
-#endif
-    return;
-  }
-
   const f3d::utils::string_template statefileTemplate =
     this->Internals->prepareFilenameTemplate(f3d::utils::collapsePath(filenameTemplate));
   const fs::path statefilePath = this->Internals->finalizeFilenameTemplate(statefileTemplate);
   try
   {
+    if (!statefilePath.parent_path().empty())
+    {
+      fs::create_directories(statefilePath.parent_path());
+    }
     this->Internals->Engine->saveStatefile(statefilePath);
     f3d::log::info("Statefile saved to ", statefilePath.string());
   }
@@ -2120,6 +2108,28 @@ void F3DStarter::SaveStatefile(const std::string& filenameTemplate)
   {
     f3d::log::error("Could not save statefile: ", ex.what());
   }
+  catch (const fs::filesystem_error& ex)
+  {
+    f3d::log::error("Could not save statefile: ", ex.what());
+  }
+}
+
+//----------------------------------------------------------------------------
+void F3DStarter::SaveStatefileToClipboard()
+{
+#if F3D_MODULE_CLIP
+  if (clip::set_text(this->Internals->Engine->saveStatefileToString()))
+  {
+    f3d::log::info("Statefile copied to the clipboard");
+  }
+  else
+  {
+    f3d::log::error("Could not copy statefile to the clipboard");
+  }
+#else
+  f3d::log::error("Clipboard support is not available in this build, "
+                  "cannot save the statefile to the clipboard");
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -2127,7 +2137,7 @@ void F3DStarter::LoadStatefile(const std::string& source)
 {
   if (source.empty())
   {
-    f3d::log::error("No statefile location provided, use --load-statefile or provide a filename");
+    f3d::log::warn("No statefile location provided, use --load-statefile or provide a filename");
     return;
   }
 
@@ -2138,6 +2148,26 @@ void F3DStarter::LoadStatefile(const std::string& source)
     return;
   }
 
+  this->ApplyStatefile(statefileOptions, statefileFiles);
+}
+
+//----------------------------------------------------------------------------
+void F3DStarter::LoadStatefileFromClipboard()
+{
+  F3DOptionsTools::OptionsDict statefileOptions;
+  std::vector<std::string> statefileFiles;
+  if (!F3DInternals::ReadStatefileFromClipboard(statefileOptions, statefileFiles))
+  {
+    return;
+  }
+
+  this->ApplyStatefile(statefileOptions, statefileFiles);
+}
+
+//----------------------------------------------------------------------------
+void F3DStarter::ApplyStatefile(const std::map<std::string, std::string>& statefileOptions,
+  const std::vector<std::string>& statefileFiles)
+{
   this->Internals->Engine->setOptions(this->Internals->LibOptions);
   this->Internals->DynamicOptionsEntries.clear();
 
@@ -2593,17 +2623,27 @@ void F3DStarter::AddCommands()
     },
     f3d::interactor::command_documentation_t{ "save_statefile [filename]",
       "save the current state into provided file or --statefile-filename, `-` for the standard "
-      "output, or `clip` for the clipboard" },
+      "output" },
     complFilesystem);
 
   interactor.addCommand(
     "load_statefile", [this](const std::vector<std::string>& args)
     { this->LoadStatefile(args.empty() ? this->Internals->AppOptions.LoadStatefile : args[0]); },
     f3d::interactor::command_documentation_t{ "load_statefile [filename]",
-      "restore the state from provided file, --load-statefile, `-` for the standard input, or "
-      "`clip` "
-      "for the clipboard" },
+      "restore the state from provided file or --load-statefile, `-` for the standard input" },
     complFilesystem);
+
+  interactor.addCommand(
+    "save_statefile_to_clipboard",
+    [this](const std::vector<std::string>&) { this->SaveStatefileToClipboard(); },
+    f3d::interactor::command_documentation_t{
+      "save_statefile_to_clipboard", "save the current state into the system clipboard" });
+
+  interactor.addCommand(
+    "load_statefile_from_clipboard",
+    [this](const std::vector<std::string>&) { this->LoadStatefileFromClipboard(); },
+    f3d::interactor::command_documentation_t{
+      "load_statefile_from_clipboard", "restore the state from the system clipboard" });
 
   // This replace an existing command in libf3d
   interactor.removeCommand("add_files");

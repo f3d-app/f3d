@@ -8,7 +8,9 @@
 #define F3DStarter_h
 
 #include <filesystem>
+#include <map>
 #include <memory>
+#include <string>
 #include <vector>
 
 class F3DStarter
@@ -57,16 +59,33 @@ public:
    * Save the current engine state to a statefile.
    * `filenameTemplate` supports the same template variables as the output.
    * If it is `-`, the statefile is written to the standard output.
-   * If it is `clip`, the statefile is copied to the system clipboard (requires the clip module).
    */
   void SaveStatefile(const std::string& filenameTemplate);
 
   /**
+   * Save the current engine state to the system clipboard.
+   * Requires a build with the clip module, logs an error otherwise.
+   */
+  void SaveStatefileToClipboard();
+
+  /**
    * Restore the engine state from a statefile, reloading the saved files in the process.
-   * `source` is a file path, `-` to read from the standard input, or `clip` to read from the
-   * system clipboard (requires the clip module).
+   * `source` is a file path or `-` to read from the standard input.
    */
   void LoadStatefile(const std::string& source);
+
+  /**
+   * Restore the engine state from the system clipboard, reloading the saved files in the process.
+   * Requires a build with the clip module, logs an error otherwise.
+   */
+  void LoadStatefileFromClipboard();
+
+  /**
+   * Apply a parsed statefile (options and files) to the engine, replacing the current state.
+   * Used by LoadStatefile and LoadStatefileFromClipboard.
+   */
+  void ApplyStatefile(const std::map<std::string, std::string>& statefileOptions,
+    const std::vector<std::string>& statefileFiles);
 
   F3DStarter();
   ~F3DStarter();
