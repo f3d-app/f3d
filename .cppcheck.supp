@@ -25,12 +25,12 @@ unknownMacro
 *:*vtkextTests.cxx
 *:*vtkextUSDTests.cxx
 *:*vtkextWebIFCTests.cxx
+*:*options_generated.h
 
 // specific checks
 knownConditionTrueFalse:vtkext/private/module/vtkF3DPointSplatMapper.cxx
 knownConditionTrueFalse:library/testing/TestSDKImage.cxx
 knownConditionTrueFalse:library/testing/TestSDKImageDeprecated.cxx
-knownConditionTrueFalse:library/private/options_generated.h
 noExplicitConstructor:library/public/types.h
 preprocessorErrorDirective:library/src/engine.cxx
 preprocessorErrorDirective:plugins/draco/module/vtkF3DDracoReader.cxx

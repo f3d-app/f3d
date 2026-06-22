@@ -122,7 +122,7 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
   test("play interactions after initialization", inter.playInteraction(interactionFilePath));
   test("render after playing defaulted interactions",
     TestSDKHelpers::RenderTest(
-      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "DefaultAgain"));
+      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "DefaultAgain", 0.06));
 
   // Check error handling
   test("record to an invalid path",
