@@ -78,7 +78,12 @@
         },
         {
           "longName": "save-statefile",
-          "helpText": "Save the application state to a statefile after loading, supports the same template variables as --output. Use `-` for the standard output or `clip` for the clipboard",
+          "helpText": "Save the application state to a statefile right after loading then continue, supports the same template variables as --output. Use `-` for the standard output or `clip` for the clipboard",
+          "valueHelper": "<file path>"
+        },
+        {
+          "longName": "statefile-filename",
+          "helpText": "Default filename used by the `save_statefile` command, supports the same template variables as --output. Use `-` for the standard output or `clip` for the clipboard",
           "valueHelper": "<file path>"
         },
         {

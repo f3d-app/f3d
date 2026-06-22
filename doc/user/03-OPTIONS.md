@@ -59,7 +59,11 @@ Restore the application state from a statefile, previously written by `--save-st
 
 ### `--save-statefile=<file path>` (_string_)
 
-Save the application state to a statefile. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, the statefile is written to the standard output. If `clip` is specified, the statefile is copied to the system clipboard (requires a build with the `clip` module).
+Save the application state to a statefile right after loading, then continue running. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, the statefile is written to the standard output. If `clip` is specified, the statefile is copied to the system clipboard (requires a build with the `clip` module).
+
+### `--statefile-filename=<file path>` (_string_)
+
+Default filename used by the `save_statefile` [command](07-COMMANDS.md) when none is provided. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, the statefile is written to the standard output. If `clip` is specified, the statefile is copied to the system clipboard (requires a build with the `clip` module).
 
 ### `--max-size=<size in MiB>` (_int_, default: `-1`)
 

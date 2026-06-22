@@ -498,7 +498,7 @@ f3d_test(NAME TestOutputFrameCountStartTime DATA BoxAnimated.gltf ARGS --output=
 f3d_test(NAME TestCommandScriptScreenshotFrame SCRIPT DATA cow.vtp ARGS --screenshot-filename=${CMAKE_BINARY_DIR}/Testing/Temporary/screenshot_{frame}.png REGEXP "{frame} variable can only be used when outputting animation frames" NO_BASELINE)
 
 # Statefile interactor commands (save_statefile / load_statefile)
-f3d_test(NAME TestCommandScriptSaveStatefile SCRIPT DATA cow.vtp ARGS --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestCommandScriptSaveStatefile.json REGEXP "Statefile saved to" NO_BASELINE)
+f3d_test(NAME TestCommandScriptSaveStatefile SCRIPT DATA cow.vtp ARGS --statefile-filename=${CMAKE_BINARY_DIR}/Testing/Temporary/TestCommandScriptSaveStatefile.json REGEXP "Statefile saved to" NO_BASELINE)
 f3d_test(NAME TestCommandScriptLoadStatefile SCRIPT DATA dragon.vtu WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "cow.vtp" NO_BASELINE)
 f3d_test(NAME TestCommandScriptLoadStatefileOverridesTweak SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "background.color' = '#0000ff' from statefile options" NO_BASELINE)
 

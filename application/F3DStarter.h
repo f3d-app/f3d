@@ -55,7 +55,7 @@ public:
 
   /**
    * Save the current engine state to a statefile.
-   * `filenameTemplate` is resolved like `--save-statefile` (same template variables as the output).
+   * `filenameTemplate` supports the same template variables as the output.
    * If it is `-`, the statefile is written to the standard output.
    * If it is `clip`, the statefile is copied to the system clipboard (requires the clip module).
    */
