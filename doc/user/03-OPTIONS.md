@@ -55,15 +55,15 @@ Do not render anything and quit just after loading the first file, use with --ve
 
 ### `--load-statefile=<file path>` (_string_)
 
-Restore the application state from a statefile, previously written by `--save-statefile`. The statefile is applied above configuration files but below command line options. If `-` is specified instead of a filename, the statefile is read from the standard input. If `clip` is specified, the statefile is read from the system clipboard (requires a build with the `clip` module).
+Restore the application state from a statefile, previously written by `--save-statefile`. The statefile is applied above configuration files but below command line options. If `-` is specified instead of a filename, the statefile is read from the standard input. If the file does not exist, it is skipped with a warning.
 
 ### `--save-statefile=<file path>` (_string_)
 
-Save the application state to a statefile right after loading, then continue running. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, the statefile is written to the standard output. If `clip` is specified, the statefile is copied to the system clipboard (requires a build with the `clip` module).
+Save the application state to a statefile right after loading, then continue running. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, the statefile is written to the standard output.
 
-### `--statefile-filename=<file path>` (_string_)
+### `--statefile-filename=<file path>` (_string_, default: `{app}/{model}_{n}.json`)
 
-Default filename used by the `save_statefile` [command](07-COMMANDS.md) when none is provided. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, the statefile is written to the standard output. If `clip` is specified, the statefile is copied to the system clipboard (requires a build with the `clip` module).
+Default filename used by the `save_statefile` [command](07-COMMANDS.md) when none is provided, resolved relative to the current working directory. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, the statefile is written to the standard output.
 
 ### `--max-size=<size in MiB>` (_int_, default: `-1`)
 
@@ -1094,7 +1094,7 @@ cat path/to/file.glb --force-reader=GLB | f3d - --output=- | display
 
 ## Filename templating
 
-The destination filename used by `--output` or to save screenshots using `--screenshot-filename` can use the following template variables:
+The destination filename used by `--output`, to save screenshots using `--screenshot-filename`, or to save statefiles using `--save-statefile`/`--statefile-filename` can use the following template variables:
 
 - `{app}`: application name (ie. `F3D`)
 - `{version}`: application version (eg. `2.4.0`)

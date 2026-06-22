@@ -171,9 +171,13 @@ eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 
 `open_file_dialog`: A specific command to open a file dialog to selected a file to load. No argument.
 
-`save_statefile [filename]`: A specific command to save the current state into a statefile. If filename is not specified, rely on the `--statefile-filename` CLI option. Use `-` for the standard output or `clip` for the clipboard. eg: `save_statefile path/to/state.json`.
+`save_statefile [filename]`: A specific command to save the current state into a statefile. If filename is not specified, rely on the `--statefile-filename` CLI option. Use `-` for the standard output. eg: `save_statefile path/to/state.json`.
 
-`load_statefile [filename]`: A specific command to restore the state from a statefile, reloading the saved files. If filename is not specified, rely on the `--load-statefile` CLI option. Use `-` for the standard input or `clip` for the clipboard. eg: `load_statefile path/to/state.json`.
+`load_statefile [filename]`: A specific command to restore the state from a statefile, reloading the saved files. If filename is not specified, rely on the `--load-statefile` CLI option. Use `-` for the standard input. Does nothing but warn if the file does not exist. eg: `load_statefile path/to/state.json`.
+
+`save_statefile_to_clipboard`: A specific command to save the current state into the system clipboard. Requires a build with the `clip` module. No argument.
+
+`load_statefile_from_clipboard`: A specific command to restore the state from the system clipboard, reloading the saved files. Requires a build with the `clip` module. No argument.
 
 ## Command Script (`--command-script`)
 

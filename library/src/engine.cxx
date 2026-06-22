@@ -29,9 +29,12 @@ nlohmann::ordered_json CaptureState(f3d::engine& eng, const fs::path& baseDir)
 {
   nlohmann::ordered_json root;
 
-  // Store the added files, relative to the statefile directory (baseDir) when possible so that
-  // the statefile stays portable if moved alongside its files, falling back to an absolute path.
-  // baseDir is empty when serializing to a string, in which case absolute paths are always used.
+  // Store the added files, relative to the statefile directory (baseDir) when the file actually
+  // lives under it, so that the statefile stays portable if moved alongside its files. Files
+  // outside baseDir (the relative path would escape it with "..") are stored as absolute paths:
+  // such a relative path is not portable anyway and would break when loaded without a baseDir
+  // (e.g. from the standard input or the clipboard). baseDir is empty when serializing to a
+  // string, in which case absolute paths are always used.
   nlohmann::ordered_json files = nlohmann::ordered_json::array();
   for (const fs::path& file : eng.getScene().getAddedFiles())
   {
@@ -40,7 +43,7 @@ nlohmann::ordered_json CaptureState(f3d::engine& eng, const fs::path& baseDir)
     {
       std::error_code ec;
       fs::path rel = fs::relative(fs::absolute(file), fs::absolute(baseDir), ec);
-      if (!ec && !rel.empty())
+      if (!ec && !rel.empty() && *rel.begin() != "..")
       {
         stored = rel;
       }
