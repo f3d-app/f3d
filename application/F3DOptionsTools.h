@@ -36,7 +36,7 @@ static inline const OptionsDict DefaultAppOptions = {
   { "no-render", "false" },
   { "load-statefile", "" },
   { "save-statefile", "" },
-  { "statefile-filename", "" },
+  { "statefile-filename", "{app}/{model}_{n}.json" },
   { "rendering-backend", "auto" },
   { "max-size", "" },
   { "animation-time", "" },
