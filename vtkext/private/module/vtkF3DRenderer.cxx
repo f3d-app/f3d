@@ -3725,5 +3725,6 @@ vtkMatrix4x4* vtkF3DRenderer::GetGridMatrix() const
 //----------------------------------------------------------------------------
 double vtkF3DRenderer::GetScreenSpaceScaling() const
 {
-  return this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::SSAA ? std::sqrt(5.0) : 1.0;
+  return this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::SSAA ? std::sqrt(5.0)
+                                                                                 : 1.0;
 }
