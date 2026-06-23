@@ -178,7 +178,7 @@ runs:
     # MacOS needs fetch-depth: 0 to avoid an issue with version in linker
     - name: Checkout VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: Kitware/VTK
         submodules: true
