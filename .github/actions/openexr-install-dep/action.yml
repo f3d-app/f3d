@@ -63,7 +63,7 @@ runs:
     # Dependents: usd f3d
     - name: Checkout OpenEXR
       if: steps.cache-openexr.outputs.cache-hit != 'true'
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: AcademySoftwareFoundation/openexr
         path: "./dependencies/openexr"
