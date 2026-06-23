@@ -380,7 +380,14 @@ void f3d_interactor_add_command(f3d_interactor_t* interactor, const char* action
     callback(c_args.data(), static_cast<int>(c_args.size()), user_data);
   };
 
-  cpp_interactor->addCommand(action, cpp_callback);
+  try
+  {
+    cpp_interactor->addCommand(action, cpp_callback);
+  }
+  catch (const f3d::interactor::already_exists_exception& ex)
+  {
+    f3d::log::error(ex.what());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -437,7 +444,15 @@ int f3d_interactor_trigger_command(
   }
 
   f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  return cpp_interactor->triggerCommand(command, keep_comments != 0) ? 1 : 0;
+  try
+  {
+    return cpp_interactor->triggerCommand(command, keep_comments != 0) ? 1 : 0;
+  }
+  catch (const f3d::interactor::command_runtime_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return 0;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -477,8 +492,15 @@ void f3d_interactor_add_binding(f3d_interactor_t* interactor, const f3d_interact
 
   std::string cpp_group = group ? group : "";
 
-  cpp_interactor->addBinding(cpp_bind, cpp_commands, cpp_group, nullptr,
-    static_cast<f3d::interactor::BindingType>(type), notify != 0);
+  try
+  {
+    cpp_interactor->addBinding(cpp_bind, cpp_commands, cpp_group, nullptr,
+      static_cast<f3d::interactor::BindingType>(type), notify != 0);
+  }
+  catch (const f3d::interactor::already_exists_exception& ex)
+  {
+    f3d::log::error(ex.what());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -542,24 +564,32 @@ f3d_interaction_bind_t* f3d_interactor_get_binds_for_group(
   }
 
   const f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  std::vector<f3d::interaction_bind_t> binds = cpp_interactor->getBindsForGroup(group);
-
-  *count = static_cast<int>(binds.size());
-  if (binds.empty())
+  try
   {
+    std::vector<f3d::interaction_bind_t> binds = cpp_interactor->getBindsForGroup(group);
+
+    *count = static_cast<int>(binds.size());
+    if (binds.empty())
+    {
+      return nullptr;
+    }
+
+    f3d_interaction_bind_t* result = new f3d_interaction_bind_t[binds.size()];
+
+    for (size_t i = 0; i < binds.size(); ++i)
+    {
+      result[i].mod = static_cast<f3d_interaction_bind_modifier_keys_t>(binds[i].mod);
+      std::strncpy(result[i].inter, binds[i].inter.c_str(), sizeof(result[i].inter) - 1);
+      result[i].inter[sizeof(result[i].inter) - 1] = '\0';
+    }
+
+    return result;
+  }
+  catch (const f3d::interactor::does_not_exists_exception& ex)
+  {
+    f3d::log::error(ex.what());
     return nullptr;
   }
-
-  f3d_interaction_bind_t* result = new f3d_interaction_bind_t[binds.size()];
-
-  for (size_t i = 0; i < binds.size(); ++i)
-  {
-    result[i].mod = static_cast<f3d_interaction_bind_modifier_keys_t>(binds[i].mod);
-    std::strncpy(result[i].inter, binds[i].inter.c_str(), sizeof(result[i].inter) - 1);
-    result[i].inter[sizeof(result[i].inter) - 1] = '\0';
-  }
-
-  return result;
 }
 
 //----------------------------------------------------------------------------
@@ -609,13 +639,20 @@ void f3d_interactor_get_binding_documentation(f3d_interactor_t* interactor,
   cpp_bind.mod = static_cast<f3d::interaction_bind_t::ModifierKeys>(bind->mod);
   cpp_bind.inter = bind->inter;
 
-  auto [doc_str, value_str] = cpp_interactor->getBindingDocumentation(cpp_bind);
+  try
+  {
+    auto [doc_str, value_str] = cpp_interactor->getBindingDocumentation(cpp_bind);
 
-  std::strncpy(doc->doc, doc_str.c_str(), sizeof(doc->doc) - 1);
-  doc->doc[sizeof(doc->doc) - 1] = '\0';
+    std::strncpy(doc->doc, doc_str.c_str(), sizeof(doc->doc) - 1);
+    doc->doc[sizeof(doc->doc) - 1] = '\0';
 
-  std::strncpy(doc->value, value_str.c_str(), sizeof(doc->value) - 1);
-  doc->value[sizeof(doc->value) - 1] = '\0';
+    std::strncpy(doc->value, value_str.c_str(), sizeof(doc->value) - 1);
+    doc->value[sizeof(doc->value) - 1] = '\0';
+  }
+  catch (const f3d::interactor::does_not_exists_exception& ex)
+  {
+    f3d::log::error(ex.what());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -631,8 +668,16 @@ f3d_interactor_binding_type_t f3d_interactor_get_binding_type(
   f3d::interaction_bind_t cpp_bind;
   cpp_bind.mod = static_cast<f3d::interaction_bind_t::ModifierKeys>(bind->mod);
   cpp_bind.inter = bind->inter;
-  f3d::interactor::BindingType cpp_type = cpp_interactor->getBindingType(cpp_bind);
-  return static_cast<f3d_interactor_binding_type_t>(cpp_type);
+  try
+  {
+    f3d::interactor::BindingType cpp_type = cpp_interactor->getBindingType(cpp_bind);
+    return static_cast<f3d_interactor_binding_type_t>(cpp_type);
+  }
+  catch (const f3d::interactor::does_not_exists_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return F3D_INTERACTOR_BINDING_OTHER;
+  }
 }
 
 //----------------------------------------------------------------------------

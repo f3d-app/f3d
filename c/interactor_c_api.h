@@ -247,7 +247,7 @@ extern "C"
    * @param group Group name.
    * @param count Output parameter for number of binds.
    * @return Array of binds. Caller must free the array with
-   *         f3d_interactor_free_bind_array().
+   *         f3d_interactor_free_bind_array(). NULL if group does not exist.
    */
   F3D_EXPORT f3d_interaction_bind_t* f3d_interactor_get_binds_for_group(
     f3d_interactor_t* interactor, const char* group, int* count);
@@ -287,7 +287,7 @@ extern "C"
    *
    * @param interactor Interactor handle.
    * @param bind Interaction bind.
-   * @return Binding type.
+   * @return Binding type. F3D_INTERACTOR_BINDING_OTHER if bind does not exist.
    */
   F3D_EXPORT f3d_interactor_binding_type_t f3d_interactor_get_binding_type(
     f3d_interactor_t* interactor, const f3d_interaction_bind_t* bind);

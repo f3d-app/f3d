@@ -1,5 +1,7 @@
 #include "utils_c_api.h"
+#include "log.h"
 #include "utils.h"
+
 #include <cstring>
 #include <filesystem>
 #include <string>
@@ -50,21 +52,32 @@ char** f3d_utils_tokenize(const char* str, int keep_comments, size_t* out_count)
     return nullptr;
   }
 
-  std::vector<std::string> vec = f3d::utils::tokenize(str, keep_comments != 0);
-
-  size_t n = vec.size();
-  char** out = new char*[n];
-  for (size_t i = 0; i < n; ++i)
+  try
   {
-    out[i] = f3d_utils_strdup(vec[i]);
-  }
+    std::vector<std::string> vec = f3d::utils::tokenize(str, keep_comments != 0);
 
-  if (out_count)
+    size_t n = vec.size();
+    char** out = new char*[n];
+    for (size_t i = 0; i < n; ++i)
+    {
+      out[i] = f3d_utils_strdup(vec[i]);
+    }
+    if (out_count)
+    {
+      *out_count = n;
+    }
+
+    return out;
+  }
+  catch (f3d::utils::tokenize_exception& ex)
   {
-    *out_count = n;
+    f3d::log::error(ex.what());
+    if (out_count)
+    {
+      *out_count = 0;
+    }
+    return nullptr;
   }
-
-  return out;
 }
 
 //----------------------------------------------------------------------------
@@ -85,8 +98,16 @@ char* f3d_utils_collapse_path(const char* path, const char* base_directory)
 //----------------------------------------------------------------------------
 char* f3d_utils_glob_to_regex(const char* glob, char path_separator)
 {
-  std::string regex = f3d::utils::globToRegex(glob, path_separator);
-  return f3d_utils_strdup(regex);
+  try
+  {
+    std::string regex = f3d::utils::globToRegex(glob, path_separator);
+    return f3d_utils_strdup(regex);
+  }
+  catch (const f3d::utils::glob_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return nullptr;
+  }
 }
 
 //----------------------------------------------------------------------------
