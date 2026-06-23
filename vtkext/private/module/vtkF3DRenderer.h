@@ -560,6 +560,8 @@ public:
 
   /**
    * Get screen-space scaling
+   * The value returned can be used to scale screen space methods like line width
+   * to keep a consistent size on screen when using SSAA anti-aliasing.
    */
   double GetScreenSpaceScaling() const;
 
