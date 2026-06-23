@@ -71,7 +71,7 @@ runs:
     - name: Cache usd
       id: cache-usd
       continue-on-error: true # https://github.com/actions/cache/issues/1754
-      uses: actions/cache/restore@v5
+      uses: actions/cache/restore@v6
       with:
         path: dependencies/usd_install
         key: usd-${{steps.usd_ver.outputs.extract}}-${{steps.openexr_ver.outputs.extract}}-${{steps.imath_ver.outputs.extract}}-${{steps.openjph_ver.outputs.extract}}-${{steps.tbb_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
@@ -140,7 +140,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-usd.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v5
+      uses: actions/cache/save@v6
       with:
         key: ${{ steps.cache-usd.outputs.cache-primary-key }}
         path: dependencies/usd_install
