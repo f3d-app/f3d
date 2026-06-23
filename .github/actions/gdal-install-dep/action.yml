@@ -87,7 +87,7 @@ runs:
     # Dependents: pdal vtk
     - name: Checkout gdal
       if: steps.cache-gdal.outputs.cache-hit != 'true'
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: OSGeo/gdal
         path: "./dependencies/gdal"
