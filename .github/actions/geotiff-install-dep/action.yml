@@ -79,7 +79,7 @@ runs:
     # Dependents: gdal pdal vtk
     - name: Checkout geotiff
       if: steps.cache-geotiff.outputs.cache-hit != 'true'
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: OSGeo/libgeotiff
         path: "./dependencies/geotiff"
