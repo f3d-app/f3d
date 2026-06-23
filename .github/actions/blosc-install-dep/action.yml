@@ -55,7 +55,7 @@ runs:
     # Dependents: openvdb vtk
     - name: Checkout blosc
       if: steps.cache-blosc.outputs.cache-hit != 'true'
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: Blosc/c-blosc
         path: "./dependencies/blosc"
