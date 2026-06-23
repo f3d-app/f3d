@@ -48,4 +48,6 @@ endif()
 
 include(tests.watch.cmake)
 
-include(tests.documentation.cmake)
+if(F3D_TESTING_ENABLE_ILLUSTRATION_TESTS)
+  include(tests.documentation.cmake)
+endif()
