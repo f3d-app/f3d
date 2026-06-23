@@ -46,7 +46,7 @@ runs:
 
     - name: Checkout WebP
       if: steps.cache-webp.outputs.cache-hit != 'true'
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: webmproject/libwebp
         path: "./dependencies/webp"
