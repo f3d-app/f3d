@@ -976,11 +976,17 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
 
       double a, b, c, x, y, z;
       bbox.GetBounds(a, b, c, x, y, z);
-      GridAxesActor->SetGridBounds(a, b, c, x, y, z);
+      this->GridAxesActor->SetGridBounds(a, b, c, x, y, z);
 
-      GridAxesActor->SetXTitle("X Axis");
-      GridAxesActor->SetYTitle("Y Axis");
-      GridAxesActor->SetZTitle("Z Axis");
+      this->GridAxesActor->SetXTitle("X Axis");
+      this->GridAxesActor->SetYTitle("Y Axis");
+      this->GridAxesActor->SetZTitle("Z Axis");
+
+      vtkNew<vtkProperty> property;
+      // scaling must be applied to line width to keep it constant in screen space
+      // the scaling is applied on both side of lines, which is why we multiply by 2
+      property->SetLineWidth(1.0 + 2.0 * (this->GetScreenSpaceScaling() - 1.0));
+      this->GridAxesActor->SetProperty(property);
 
       this->GridAxesConfigured = true;
     }
@@ -1745,6 +1751,7 @@ void vtkF3DRenderer::SetAntiAliasingMode(AntiAliasingMode mode)
     this->AntiAliasingModeEnabled = mode;
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
+    this->GridAxesConfigured = false;
   }
 }
 
@@ -3713,4 +3720,10 @@ void vtkF3DRenderer::AddNotification(
 vtkMatrix4x4* vtkF3DRenderer::GetGridMatrix() const
 {
   return this->GridActor->GetMatrix();
+}
+
+//----------------------------------------------------------------------------
+double vtkF3DRenderer::GetScreenSpaceScaling() const
+{
+  return this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::SSAA ? std::sqrt(5.0) : 1.0;
 }

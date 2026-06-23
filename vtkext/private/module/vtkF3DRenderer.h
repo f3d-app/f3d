@@ -558,6 +558,11 @@ public:
    */
   vtkMatrix4x4* GetGridMatrix() const;
 
+  /**
+   * Get screen-space scaling
+   */
+  double GetScreenSpaceScaling() const;
+
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;
