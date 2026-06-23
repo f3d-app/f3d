@@ -39,7 +39,7 @@ runs:
     - name: Cache imath
       id: cache-imath
       continue-on-error: true # https://github.com/actions/cache/issues/1754
-      uses: actions/cache/restore@v5
+      uses: actions/cache/restore@v6
       with:
         path: dependencies/imath_install
         key: imath-${{steps.imath_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-1
@@ -87,7 +87,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-imath.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v5
+      uses: actions/cache/save@v6
       with:
         key: ${{ steps.cache-imath.outputs.cache-primary-key }}
         path: dependencies/imath_install
