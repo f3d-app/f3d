@@ -504,6 +504,7 @@ f3d_test(NAME TestCommandScriptScreenshotFrame SCRIPT DATA cow.vtp ARGS --screen
 f3d_test(NAME TestCommandScriptSaveStatefile SCRIPT DATA cow.vtp ARGS --statefile-filename=${CMAKE_BINARY_DIR}/Testing/Temporary/TestCommandScriptSaveStatefile.json REGEXP "Statefile saved to" NO_BASELINE)
 f3d_test(NAME TestCommandScriptLoadStatefile SCRIPT DATA dragon.vtu WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "cow.vtp" NO_BASELINE)
 f3d_test(NAME TestCommandScriptLoadStatefileFromOption SCRIPT DATA dragon.vtu WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --statefile-filename=${F3D_SOURCE_DIR}/testing/configs/test_statefile.json --verbose REGEXP "cow.vtp" NO_BASELINE)
+f3d_test(NAME TestCommandScriptLoadStatefileMostRecent SCRIPT DATA cow.vtp ARGS --statefile-filename=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileMostRecent/state_{n}.json --verbose REGEXP "from statefile options" NO_BASELINE)
 f3d_test(NAME TestCommandScriptLoadStatefileOverridesTweak SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "background.color' = '#0000ff' from statefile options" NO_BASELINE)
 
 # Basic record and play test
