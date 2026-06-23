@@ -6,6 +6,10 @@ updates:
       - "source:CI"
     schedule:
       interval: "weekly"
+    groups:
+      actions:
+        patterns:
+          - "actions/*"
   - package-ecosystem: "github-actions"
     directories:
       - "/.github/actions/*/"
@@ -13,6 +17,10 @@ updates:
       - "source:CI"
     schedule:
       interval: "weekly"
+    groups:
+      actions:
+        patterns:
+          - "actions/*"
   - package-ecosystem: "pip"
     directory: "/"
     labels:

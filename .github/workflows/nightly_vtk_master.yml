@@ -17,7 +17,7 @@ jobs:
       vtk_sha: ${{ steps.vtk_sha_recover.outputs.vtk_sha }}
     steps:
       - name: Checkout VTK
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: Kitware/VTK
           submodules: false
@@ -46,7 +46,7 @@ jobs:
       lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source"
           fetch-depth: 1
@@ -86,7 +86,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source"
           fetch-depth: 0
@@ -129,7 +129,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source"
           fetch-depth: 0
@@ -179,7 +179,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source"
           fetch-depth: 0
@@ -207,7 +207,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source"
           fetch-depth: 0
@@ -235,7 +235,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source"
           fetch-depth: 0

@@ -34,10 +34,11 @@ jobs:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
+          allow-unsafe-pr-checkout: true
           path: "source"
           fetch-depth: 1
           lfs: false
@@ -60,10 +61,11 @@ jobs:
       vtk_matrix: ${{steps.vtk_matrix.outputs.extract}}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
+          allow-unsafe-pr-checkout: true
           path: "source"
           fetch-depth: 1
           lfs: false
@@ -108,10 +110,11 @@ jobs:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
+          allow-unsafe-pr-checkout: true
           path: "source"
           fetch-depth: 1
           lfs: false
