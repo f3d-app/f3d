@@ -39,7 +39,7 @@ runs:
     - name: Cache ospray
       id: cache-ospray
       continue-on-error: true # https://github.com/actions/cache/issues/1754
-      uses: actions/cache/restore@v5
+      uses: actions/cache/restore@v6
       with:
         path: dependencies/ospray_install
         key: ospray-sb-${{steps.ospray_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-1
@@ -113,7 +113,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-ospray.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v5
+      uses: actions/cache/save@v6
       with:
         key: ${{ steps.cache-ospray.outputs.cache-primary-key }}
         path: dependencies/ospray_install
