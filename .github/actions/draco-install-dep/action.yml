@@ -39,7 +39,7 @@ runs:
     - name: Cache draco
       id: cache-draco
       continue-on-error: true # https://github.com/actions/cache/issues/1754
-      uses: actions/cache/restore@v5
+      uses: actions/cache/restore@v6
       with:
         path: dependencies/draco_install
         key: draco-${{steps.draco_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-1
@@ -88,7 +88,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-draco.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v5
+      uses: actions/cache/save@v6
       with:
         key: ${{ steps.cache-draco.outputs.cache-primary-key }}
         path: dependencies/draco_install
