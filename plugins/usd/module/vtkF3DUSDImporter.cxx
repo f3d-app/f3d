@@ -11,6 +11,7 @@
 #include <vtkDataAssembly.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
+#include <vtkIdTypeArray.h>
 #include <vtkImageAppendComponents.h>
 #include <vtkImageData.h>
 #include <vtkImageExtractComponents.h>
@@ -42,7 +43,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <numeric>
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
 #include <vtkMemoryResourceStream.h>
@@ -883,24 +883,26 @@ public:
           vtkNew<vtkPolyData> newPolyData;
 
           vtkNew<vtkPoints> points;
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260320)
-          points->Reserve(positions.size());
-#else
-          points->Allocate(positions.size());
-#endif
-          for (const pxr::GfVec3f& p : positions)
+          points->SetNumberOfPoints(static_cast<vtkIdType>(positions.size()));
+          for (std::size_t i = 0; i < positions.size(); i++)
           {
-            points->InsertNextPoint(p[0], p[1], p[2]);
+            const pxr::GfVec3f& p = positions[i];
+            points->SetPoint(static_cast<vtkIdType>(i), p[0], p[1], p[2]);
           }
           newPolyData->SetPoints(points);
 
           if (positions.size() > 0)
           {
-            std::vector<vtkIdType> vertIds(positions.size());
-            std::iota(vertIds.begin(), vertIds.end(), 0);
+            vtkNew<vtkIdTypeArray> vertIds;
+            vertIds->SetNumberOfValues(static_cast<vtkIdType>(positions.size() + 1));
+            vertIds->SetValue(0, static_cast<vtkIdType>(positions.size()));
+            for (std::size_t i = 0; i < positions.size(); i++)
+            {
+              vertIds->SetValue(static_cast<vtkIdType>(i + 1), static_cast<vtkIdType>(i));
+            }
 
             vtkNew<vtkCellArray> verts;
-            verts->InsertNextCell(static_cast<vtkIdType>(positions.size()), vertIds.data());
+            verts->SetCells(1, vertIds);
             newPolyData->SetVerts(verts);
           }
 

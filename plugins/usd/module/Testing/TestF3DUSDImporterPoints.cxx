@@ -77,7 +77,7 @@ int TestF3DUSDImporterPoints(int vtkNotUsed(argc), char* argv[])
   importer->SetFileName(filename.c_str());
   importer->Update();
 
-  vtkPolyData* rgbaPolydata = GetPointsPolyData(importer, 2);
+  vtkPolyData* rgbaPolydata = ::GetPointsPolyData(importer, 2);
   if (!rgbaPolydata)
   {
     std::cerr << "Missing RGBA polydata for USD Points primitive\n";
@@ -92,14 +92,14 @@ int TestF3DUSDImporterPoints(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  if (!RgbaEquals(rgbaColors, 0, 1.f, 0.f, 0.f, 1.f) ||
-    !RgbaEquals(rgbaColors, 1, 0.f, 1.f, 0.f, 0.5f))
+  if (!::RgbaEquals(rgbaColors, 0, 1.f, 0.f, 0.f, 1.f) ||
+    !::RgbaEquals(rgbaColors, 1, 0.f, 1.f, 0.f, 0.5f))
   {
     std::cerr << "Unexpected displayColor/displayOpacity values on USD Points primitive\n";
     return EXIT_FAILURE;
   }
 
-  vtkPolyData* rgbPolydata = GetPointsPolyData(importer, 1);
+  vtkPolyData* rgbPolydata = ::GetPointsPolyData(importer, 1);
   if (!rgbPolydata)
   {
     std::cerr << "Missing RGB polydata for USD Points primitive without opacity\n";
@@ -114,7 +114,7 @@ int TestF3DUSDImporterPoints(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  if (!ColorEquals(rgbColors, 0, 0.f, 0.f, 1.f))
+  if (!::ColorEquals(rgbColors, 0, 0.f, 0.f, 1.f))
   {
     std::cerr << "Unexpected displayColor values on USD Points primitive without opacity\n";
     return EXIT_FAILURE;
