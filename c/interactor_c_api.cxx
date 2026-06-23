@@ -358,14 +358,7 @@ void f3d_interactor_init_commands(f3d_interactor_t* interactor)
   }
 
   f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  try
-  {
-    cpp_interactor->initCommands();
-  }
-  catch (const f3d::interactor::invalid_args_exception& ex)
-  {
-    f3d::log::error(ex.what());
-  }
+  cpp_interactor->initCommands();
 }
 
 //----------------------------------------------------------------------------
