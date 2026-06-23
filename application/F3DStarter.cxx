@@ -536,8 +536,8 @@ public:
    * - `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique
    *   (up to 1000000)
    */
-  fs::path finalizeFilenameTemplate(
-    f3d::utils::string_template stringTemplate, std::optional<int> frame = std::nullopt)
+  fs::path finalizeFilenameTemplate(f3d::utils::string_template stringTemplate,
+    std::optional<int> frame = std::nullopt, bool mostRecent = false)
   {
     const std::regex frameRe("frame(:(.*))?");
     const std::regex numberingRe("n(:(.*))?");
@@ -605,13 +605,21 @@ public:
       };
     };
 
-    /* try substituting incrementing number until file doesn't exist already */
+    /* Substitute an incrementing number: when saving, stop at the first free filename; when loading
+     * (mostRecent), return the last existing filename instead so the most recent save is reloaded
+     */
     for (size_t i = 1; i <= maxNumberingAttempts; ++i)
     {
       const std::string candidate =
         f3d::utils::string_template(stringTemplate).substitute(numberingLookup(i)).str();
       if (!fs::exists(candidate))
       {
+        if (mostRecent && i > 1)
+        {
+          return {
+            f3d::utils::string_template(stringTemplate).substitute(numberingLookup(i - 1)).str()
+          };
+        }
         return { candidate };
       }
     }
@@ -2162,13 +2170,16 @@ void F3DStarter::LoadStatefile(const std::string& source)
   }
 
   // Resolve template variables ({model}, {date}, ...) like the save path does, so that the same
-  // --statefile-filename works for both saving and loading.
+  // --statefile-filename works for both saving and loading. The `{n}` number resolves to the most
+  // recent existing file (instead of the next free one as for saving), so loading picks up the last
+  // saved statefile.
   std::string resolvedSource = source;
   if (source != F3D_PIPED)
   {
     const f3d::utils::string_template sourceTemplate =
       this->Internals->prepareFilenameTemplate(f3d::utils::collapsePath(source));
-    resolvedSource = this->Internals->finalizeFilenameTemplate(sourceTemplate).string();
+    resolvedSource =
+      this->Internals->finalizeFilenameTemplate(sourceTemplate, std::nullopt, true).string();
   }
 
   F3DOptionsTools::OptionsDict statefileOptions;
