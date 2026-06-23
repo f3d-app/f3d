@@ -38,7 +38,7 @@ runs:
     - name: Cache sqlite
       id: cache-sqlite
       continue-on-error: true # https://github.com/actions/cache/issues/1754
-      uses: actions/cache/restore@v5
+      uses: actions/cache/restore@v6
       with:
         path: dependencies/sqlite_build/install
         key: sqlite-${{steps.sqlite_csb_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
@@ -88,7 +88,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v5
+      uses: actions/cache/save@v6
       with:
         key: ${{ steps.cache-sqlite.outputs.cache-primary-key }}
         path: dependencies/sqlite_build/install
