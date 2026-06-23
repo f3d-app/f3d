@@ -55,7 +55,7 @@ runs:
     # Dependents: gdal geotiff
     - name: Checkout proj
       if: steps.cache-proj.outputs.cache-hit != 'true'
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: OSGeo/PROJ
         path: "./dependencies/proj"
