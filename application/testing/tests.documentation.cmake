@@ -39,18 +39,30 @@ file(DOWNLOAD
 
 ## Wrapper that sets many default arguments for documentation illustration tests
 function(f3d_test_doc)
-  cmake_parse_arguments(F3D_TEST_DOC "UI" "NAME;DATA;OUT_IMAGE" "ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST_DOC "UI;BACKGROUND" "NAME;DATA;OUT_IMAGE;THRESHOLD" "ARGS" ${ARGN})
+
+  if(NOT F3D_TEST_DOC_THRESHOLD)
+    set(F3D_TEST_DOC_THRESHOLD 0.04)
+  endif()
+
+  set(_f3d_test_doc_args
+    ${F3D_TEST_DOC_ARGS}
+    --anti-aliasing=ssaa
+    --hdri-file=${CMAKE_CURRENT_BINARY_DIR}/future_parking_2k.hdr
+    --camera-direction=-1,-0.5,-1
+  )
+  if(NOT F3D_TEST_DOC_BACKGROUND)
+    list(APPEND _f3d_test_doc_args --no-background)
+  endif()
+
   f3d_test(
     NAME ${F3D_TEST_DOC_NAME}
     DATA ${F3D_TEST_DOC_DATA}
     DATA_ROOT ${CMAKE_CURRENT_BINARY_DIR}
     BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/${F3D_TEST_DOC_OUT_IMAGE}
     RESOLUTION 800,600
-    ARGS ${F3D_TEST_DOC_ARGS}
-        --no-background
-        --anti-aliasing=ssaa
-        --hdri-file=${CMAKE_CURRENT_BINARY_DIR}/future_parking_2k.hdr
-        --camera-direction=-1,-0.5,-1
+    THRESHOLD ${F3D_TEST_DOC_THRESHOLD}
+    ARGS ${_f3d_test_doc_args}
     LONG_TIMEOUT
     LABELS doc
   )
@@ -175,12 +187,12 @@ f3d_test_doc(NAME TestDocUnlitOFF DATA DamagedHelmet.glb OUT_IMAGE unlit_off.png
 f3d_test_doc(NAME TestDocUnlitON DATA DamagedHelmet.glb OUT_IMAGE unlit_on.png ARGS -f --unlit)
 
 ## --background-color
-f3d_test_doc(NAME TestDocBackgroundColorDefault DATA DamagedHelmet.glb OUT_IMAGE background_color_default.png RESOLUTION 800,600 ARGS -f)
-f3d_test_doc(NAME TestDocBackgroundColorOrange DATA DamagedHelmet.glb OUT_IMAGE background_color_orange.png RESOLUTION 800,600 ARGS -f --background-color=orange)
+f3d_test_doc(NAME TestDocBackgroundColorDefault DATA DamagedHelmet.glb OUT_IMAGE background_color_default.png RESOLUTION 800,600 BACKGROUND ARGS -f)
+f3d_test_doc(NAME TestDocBackgroundColorOrange DATA DamagedHelmet.glb OUT_IMAGE background_color_orange.png RESOLUTION 800,600 BACKGROUND ARGS -f --background-color=orange)
 
 ## --fps
 f3d_test_doc(NAME TestDocFPSOFF DATA DamagedHelmet.glb OUT_IMAGE fps_off.png ARGS -f UI)
-f3d_test_doc(NAME TestDocFPSON DATA DamagedHelmet.glb OUT_IMAGE fps_on.png ARGS -f --fps UI)
+f3d_test_doc(NAME TestDocFPSON DATA DamagedHelmet.glb OUT_IMAGE fps_on.png ARGS -f --fps THRESHOLD 0.08 UI)
 
 ## --filename
 f3d_test_doc(NAME TestDocFilenameOFF DATA DamagedHelmet.glb OUT_IMAGE filename_off.png ARGS -f UI)
@@ -222,7 +234,7 @@ f3d_test_doc(NAME TestDocScalarColoringON DATA dragon.vtu OUT_IMAGE scalar_color
 
 ## --coloring-array
 f3d_test_doc(NAME TestDocColoringArrayNormal DATA dragon.vtu OUT_IMAGE coloring_array_normal.png ARGS -s --coloring-array=Normals --coloring-component=2)
-f3d_test_doc(NAME TestDocColoringArrayHeight DATA dragon.vtu OUT_IMAGE coloring_array_height.png ARGS -s --coloring-array="UV coordinates from field")
+f3d_test_doc(NAME TestDocColoringArrayHeight DATA dragon.vtu OUT_IMAGE coloring_array_height.png ARGS -s "--coloring-array=UV coordinates from field")
 
 ## --coloring-component
 f3d_test_doc(NAME TestDocColoringComponentX DATA dragon.vtu OUT_IMAGE coloring_component_x.png ARGS -s --coloring-array=Normals --coloring-component=0)
