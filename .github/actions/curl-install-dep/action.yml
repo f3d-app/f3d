@@ -47,7 +47,7 @@ runs:
     - name: Cache curl
       id: cache-curl
       continue-on-error: true # https://github.com/actions/cache/issues/1754
-      uses: actions/cache/restore@v5
+      uses: actions/cache/restore@v6
       with:
         path: dependencies/curl_install
         key: curl-${{steps.curl_ver.outputs.extract}}-${{ steps.zlib_ver.outputs.extract }}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
@@ -112,7 +112,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-curl.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v5
+      uses: actions/cache/save@v6
       with:
         key: ${{ steps.cache-curl.outputs.cache-primary-key }}
         path: dependencies/curl_install
