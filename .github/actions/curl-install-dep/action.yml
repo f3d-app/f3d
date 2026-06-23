@@ -55,7 +55,7 @@ runs:
     # Dependents: pdal vtk
     - name: Checkout curl
       if: steps.cache-curl.outputs.cache-hit != 'true'
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: curl/curl
         path: "./dependencies/curl"
