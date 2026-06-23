@@ -46,7 +46,7 @@ runs:
 
     - name: Checkout ASSIMP
       if: steps.cache-assimp.outputs.cache-hit != 'true'
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: assimp/assimp
         path: "./dependencies/assimp"
