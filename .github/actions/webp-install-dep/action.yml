@@ -39,7 +39,7 @@ runs:
     - name: Cache webp
       id: cache-webp
       continue-on-error: true # https://github.com/actions/cache/issues/1754
-      uses: actions/cache/restore@v5
+      uses: actions/cache/restore@v6
       with:
         path: dependencies/webp_install
         key: webp-${{steps.webp_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-1
@@ -96,7 +96,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-webp.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v5
+      uses: actions/cache/save@v6
       with:
         key: ${{ steps.cache-webp.outputs.cache-primary-key }}
         path: dependencies/webp_install
