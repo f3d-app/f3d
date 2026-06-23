@@ -47,7 +47,7 @@ runs:
     # Dependents: blosc openvdb vtk tiff geotiff pdal gdal
     - name: Checkout zlib
       if: steps.cache-zlib.outputs.cache-hit != 'true'
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: madler/zlib
         path: "./dependencies/zlib"
