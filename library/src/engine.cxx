@@ -41,14 +41,17 @@ nlohmann::ordered_json CaptureState(f3d::engine& eng, const fs::path& baseDir)
     fs::path stored = fs::absolute(file);
     if (!baseDir.empty())
     {
-      std::error_code ec;
-      fs::path rel = fs::relative(fs::absolute(file), fs::absolute(baseDir), ec);
-      if (!ec && !rel.empty() && *rel.begin() != "..")
+      const fs::path rel = fs::relative(fs::absolute(file), fs::absolute(baseDir));
+      if (!rel.empty() && *rel.begin() != "..")
       {
         stored = rel;
       }
     }
     files.push_back(stored.generic_string());
+  }
+  if (files.empty())
+  {
+    f3d::log::warn("No files to save in statefile");
   }
   root["files"] = files;
 
@@ -101,9 +104,14 @@ void RestoreState(f3d::engine& eng, const nlohmann::ordered_json& root, const fs
       }
       catch (const f3d::options::parsing_exception&)
       {
-        f3d::log::warn("Statefile option \"", name, "\" could not be parsed, skipping it");
+        f3d::log::warn("Statefile option \"", name, "\" could not be parsed from value \"",
+          value.get<std::string>(), "\", skipping it");
       }
     }
+  }
+  else
+  {
+    f3d::log::warn("No options found in statefile");
   }
 
   // Add the saved files, resolving relative paths against the statefile directory (baseDir),
@@ -122,6 +130,8 @@ void RestoreState(f3d::engine& eng, const nlohmann::ordered_json& root, const fs
     }
     if (!files.empty())
     {
+      // Let any scene::load_failure_exception propagate to the caller: a statefile that cannot
+      // reload its files is a failure to restore the state, not something to silently ignore.
       sce.add(files);
     }
   }
@@ -143,7 +153,7 @@ void RestoreState(f3d::engine& eng, const nlohmann::ordered_json& root, const fs
     }
     catch (const f3d::engine::no_window_exception&)
     {
-      f3d::log::warn("No window available, skipping camera state from statefile");
+      f3d::log::info("No window available, skipping camera state from statefile");
     }
   }
 }
@@ -432,7 +442,15 @@ engine& engine::loadStatefile(const fs::path& statefilePath)
 //----------------------------------------------------------------------------
 std::string engine::saveStatefileToString()
 {
-  return ::CaptureState(*this, {}).dump(2);
+  try
+  {
+    return ::CaptureState(*this, {}).dump(2);
+  }
+  catch (const fs::filesystem_error& ex)
+  {
+    throw engine::statefile_exception(
+      std::string("Could not save statefile to string: ") + ex.what());
+  }
 }
 
 //----------------------------------------------------------------------------
