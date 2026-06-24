@@ -75,6 +75,7 @@ function(f3d_test_doc)
     NAME ${F3D_TEST_DOC_NAME}
     DATA ${_f3d_doc_data}
     BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/${F3D_TEST_DOC_REF_IMAGE}
+    OUTPUT_PATH ${CMAKE_BINARY_DIR}/Testing/Temporary/${F3D_TEST_DOC_REF_IMAGE}
     RESOLUTION 800,600
     THRESHOLD ${F3D_TEST_DOC_THRESHOLD}
     ARGS ${_f3d_test_doc_args}
