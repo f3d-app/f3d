@@ -251,6 +251,8 @@ public:
    * Save the current state of the engine into a statefile at the provided path.
    * The statefile is a JSON file that captures the files added to the scene, the camera
    * configuration and the options that have been set.
+   * File paths are stored as relative paths if they are contained by the directory containing the
+   * statefile, as absolute path otherwise.
    * Scene content added from memory (mesh, mesh view or buffer) is not saved.
    * Throws a engine::statefile_exception if the statefile cannot be written.
    */
