@@ -254,7 +254,7 @@ public:
    * Scene content added from memory (mesh, mesh view or buffer) is not saved.
    * Throws a engine::statefile_exception if the statefile cannot be written.
    */
-  void saveStatefile(const std::filesystem::path& statefilePath);
+  engine& saveStatefile(const std::filesystem::path& statefilePath);
 
   /**
    * Restore the state of the engine from a statefile previously written by saveStatefile.
@@ -263,7 +263,7 @@ public:
    * Throws a engine::statefile_exception if the statefile cannot be read or parsed.
    * Throws a scene::load_failure_exception if one of the saved files cannot be loaded.
    */
-  void loadStatefile(const std::filesystem::path& statefilePath);
+  engine& loadStatefile(const std::filesystem::path& statefilePath);
 
   /**
    * Same as saveStatefile but returns the statefile content as a JSON string instead of writing
@@ -277,7 +277,7 @@ public:
    * Throws a engine::statefile_exception if the content cannot be parsed.
    * Throws a scene::load_failure_exception if one of the saved files cannot be loaded.
    */
-  void loadStatefileFromString(const std::string& statefileContent);
+  engine& loadStatefileFromString(const std::string& statefileContent);
 
   /**
    * List rendering backends supported by libf3d.
