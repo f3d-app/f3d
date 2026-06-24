@@ -441,7 +441,7 @@ Model-specified by default.
 ### `--texture-base-color=<texture file>` (_path_)
 
 Set the texture file to control the color of the object. Please note this will be multiplied with the color and opacity options. Must be in sRGB color space.
-Model-specified by default.
+Model-specified by default. An empty path can be set to remove the model-specified texture.
 
 #### compare
 
@@ -452,7 +452,7 @@ Model-specified by default.
 ### `--texture-material=<texture file>` (_path_)
 
 Set the texture file to control the occlusion, roughness and metallic values of the object. Please note this will be multiplied with the roughness and metallic options, which have impactful default values. To obtain true results, use `--roughness=1` and `--metallic=1`. Must be in linear color space.
-Model-specified by default.
+Model-specified by default. An empty path can be set to remove the model-specified texture.
 
 #### compare
 
@@ -463,7 +463,7 @@ Model-specified by default.
 ### `--texture-emissive=<texture file>` (_path_)
 
 Set the texture file to control the emitted light of the object. Please note this will be multiplied with the emissive factor. Must be in sRGB color space.
-Model-specified by default.
+Model-specified by default. An empty path can be set to remove the model-specified texture.
 
 #### compare
 
@@ -485,7 +485,7 @@ Model-specified by default.
 ### `--texture-normal=<texture file>` (_path_)
 
 Set the texture file to control the normal map of the object. Must be in sRGB color space.
-Model-specified by default.
+Model-specified by default. An empty path can be set to remove the model-specified texture.
 
 #### compare
 
