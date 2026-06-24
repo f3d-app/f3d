@@ -49,7 +49,6 @@ f3d_test(<NAME> [ARGS...])
   - `WORKING_DIR` Provide a specific working directory to use for this test instead of current dir
   - `LABELS` Provide a specific labels to identify and group tests
   - `DATA` Data to open, support multiple input, also set test labels accordingly
-  - `DATA_ROOT` Data root to use for this test, defaults to `${F3D_SOURCE_DIR}/testing/data`
   - `DEPENDS` Tests the this test depends on if any
   - `ENV` Environment variables to set for this test
   - `ARGS` Supplement arguments to add to the f3d command line
@@ -57,7 +56,7 @@ f3d_test(<NAME> [ARGS...])
 
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "LONG_TIMEOUT;DEFAULT_HDRI;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT" "NAME;BASELINE_PATH;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED;PLUGIN;DATA_ROOT" "DATA;DEPENDS;LABELS;ENV;ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "LONG_TIMEOUT;DEFAULT_HDRI;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT" "NAME;BASELINE_PATH;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED;PLUGIN" "DATA;DEPENDS;LABELS;ENV;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -68,14 +67,11 @@ function(f3d_test)
   set(_f3d_test_data)
   if (F3D_TEST_DATA)
     foreach(_single_data ${F3D_TEST_DATA})
-      if(DEFINED F3D_TEST_DATA_ROOT)
-        list(APPEND _f3d_test_data "${F3D_TEST_DATA_ROOT}/${_single_data}")
+      cmake_path(IS_ABSOLUTE _single_data _single_data_absolute)
+      if(DEFINED f3d_INCLUDE_DIR OR _single_data_absolute)
+        list(APPEND _f3d_test_data "${_single_data}")
       else()
-        if(DEFINED f3d_INCLUDE_DIR)
-          list(APPEND _f3d_test_data "${_single_data}")
-        else()
-          list(APPEND _f3d_test_data "${F3D_SOURCE_DIR}/testing/data/${_single_data}")
-        endif()
+        list(APPEND _f3d_test_data "${F3D_SOURCE_DIR}/testing/data/${_single_data}")
       endif()
       get_filename_component(FILE_EXT "${_single_data}" LAST_EXT)
       string(TOLOWER "${FILE_EXT}" FILE_EXT)
