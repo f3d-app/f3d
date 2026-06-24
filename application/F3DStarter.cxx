@@ -537,7 +537,7 @@ public:
    *   (up to 1000000)
    */
   fs::path finalizeFilenameTemplate(f3d::utils::string_template stringTemplate,
-    std::optional<int> frame = std::nullopt, bool mostRecent = false)
+    std::optional<int> frame = std::nullopt, bool existing = false)
   {
     const std::regex frameRe("frame(:(.*))?");
     const std::regex numberingRe("n(:(.*))?");
@@ -606,7 +606,7 @@ public:
     };
 
     /* Substitute an incrementing number: when saving, stop at the first free filename; when loading
-     * (mostRecent), return the last existing filename instead so the most recent save is reloaded
+     * (existing), return the last existing filename instead so the most recent save is reloaded
      */
     for (size_t i = 1; i <= maxNumberingAttempts; ++i)
     {
@@ -614,7 +614,7 @@ public:
         f3d::utils::string_template(stringTemplate).substitute(numberingLookup(i)).str();
       if (!fs::exists(candidate))
       {
-        if (mostRecent && i > 1)
+        if (existing && i > 1)
         {
           return {
             f3d::utils::string_template(stringTemplate).substitute(numberingLookup(i - 1)).str()
