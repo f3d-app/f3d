@@ -53,9 +53,9 @@ function(f3d_test_doc)
   endif()
 
   set(_f3d_test_doc_args
-    ${F3D_TEST_DOC_ARGS}
     --anti-aliasing=ssaa
     --hdri-file=${CMAKE_CURRENT_BINARY_DIR}/future_parking_2k.hdr
+    ${F3D_TEST_DOC_ARGS}
   )
   if(NOT F3D_TEST_DOC_BACKGROUND)
     list(APPEND _f3d_test_doc_args --no-background)
@@ -288,3 +288,41 @@ f3d_test_doc(NAME TestDocVolumeOpacityGaussian DATA skull.vti REF_IMAGE volume_o
 ## --volume-inverse
 f3d_test_doc(NAME TestDocVolumeInverseOFF DATA skull.vti REF_IMAGE volume_inverse_off.png ARGS -vs --up=z --coloring-range=40,200)
 f3d_test_doc(NAME TestDocVolumeInverseON DATA skull.vti REF_IMAGE volume_inverse_on.png ARGS -vs --up=z --coloring-range=40,200 --volume-inverse)
+
+if(F3D_MODULE_RAYTRACING)
+  ## --raytracing
+  f3d_test_doc(NAME TestDocRaytracingOFF DATA dragon.vtu REF_IMAGE raytracing_off.png ROTATE ARGS -f --color=0.5,0.5,0.5)
+  f3d_test_doc(NAME TestDocRaytracingON DATA dragon.vtu REF_IMAGE raytracing_on.png ROTATE ARGS -f --color=0.5,0.5,0.5 --raytracing --raytracing-samples=32)
+
+  ## --raytracing-samples
+  f3d_test_doc(NAME TestDocRaytracingSamples2 DATA dragon.vtu REF_IMAGE raytracing_samples_2.png ROTATE ARGS -f --color=0.5,0.5,0.5 --raytracing --raytracing-samples=2)
+  f3d_test_doc(NAME TestDocRaytracingSamples6 DATA dragon.vtu REF_IMAGE raytracing_samples_6.png ROTATE ARGS -f --color=0.5,0.5,0.5 --raytracing --raytracing-samples=6)
+
+  ## --raytracing-denoise
+  f3d_test_doc(NAME TestDocRaytracingDenoiseOFF DATA dragon.vtu REF_IMAGE raytracing_denoise_off.png ROTATE ARGS -f --color=0.5,0.5,0.5 --raytracing --raytracing-samples=2)
+  f3d_test_doc(NAME TestDocRaytracingDenoiseON DATA dragon.vtu REF_IMAGE raytracing_denoise_on.png ROTATE ARGS -f --color=0.5,0.5,0.5 --raytracing --raytracing-samples=2 --raytracing-denoise)
+endif()
+
+## --blending
+f3d_test_doc(NAME TestDocBlendingOFF DATA dragon.vtu REF_IMAGE blending_off.png ROTATE ARGS -f --opacity=0.6)
+f3d_test_doc(NAME TestDocBlendingON DATA dragon.vtu REF_IMAGE blending_on.png ROTATE ARGS -f --opacity=0.6 --blending=ddp)
+
+## --ambient-occlusion
+f3d_test_doc(NAME TestDocAmbientOcclusionOFF DATA dragon.vtu REF_IMAGE ambient_occlusion_off.png ROTATE ARGS -f)
+f3d_test_doc(NAME TestDocAmbientOcclusionON DATA dragon.vtu REF_IMAGE ambient_occlusion_on.png ROTATE ARGS -f --ambient-occlusion)
+
+## --anti-aliasing
+f3d_test_doc(NAME TestDocAntiAliasingOFF DATA dragon.vtu REF_IMAGE anti_aliasing_off.png ROTATE ARGS -f --anti-aliasing=none)
+f3d_test_doc(NAME TestDocAntiAliasingON DATA dragon.vtu REF_IMAGE anti_aliasing_on.png ROTATE ARGS -f --anti-aliasing=ssaa)
+
+## --tone-mapping
+f3d_test_doc(NAME TestDocToneMappingOFF DATA DamagedHelmet.glb REF_IMAGE tone_mapping_off.png ROTATE ARGS -f)
+f3d_test_doc(NAME TestDocToneMappingON DATA DamagedHelmet.glb REF_IMAGE tone_mapping_on.png ROTATE ARGS -f --tone-mapping)
+
+## --final-shader
+f3d_test_doc(NAME TestDocFinalShaderOFF DATA DamagedHelmet.glb REF_IMAGE final_shader_off.png ROTATE ARGS -f)
+f3d_test_doc(NAME TestDocFinalShaderGrayScale DATA DamagedHelmet.glb REF_IMAGE final_shader_gray.png ROTATE ARGS -f --verbose --final-shader "vec4 pixel(vec2 uv) { vec4 value = texture(source, uv)\\\\\\\\\\\\\\\\; float g = dot(value.rgb, vec3(0.299, 0.587, 0.114))\\\\\\\\\\\\\\\\; return vec4(vec3(g), value.a)\\\\\\\\\\\\\\\\; }")
+
+## --display-depth
+f3d_test_doc(NAME TestDocDisplayDepthOFF DATA DamagedHelmet.glb REF_IMAGE display_depth_off.png ARGS -f)
+f3d_test_doc(NAME TestDocDisplayDepthON DATA DamagedHelmet.glb REF_IMAGE display_depth_on.png ARGS -fs --display-depth)
