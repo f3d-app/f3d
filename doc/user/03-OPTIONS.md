@@ -638,11 +638,10 @@ and even, using [build123d](https://github.com/gumyr/build123d):
 ```py
 import sys
 
-from build123d import Box, Cylinder, export_brep, export_step
-from OCP.BRepTools import BRepTools
+from build123d import Box, Cylinder, export_brep
 
 obj = Box(2, 2, 1) - Cylinder(0.5, 2)
-BRepTools.Write_s(obj.wrapped, sys.stdout.buffer)
+export_brep(obj, sys.stdout.buffer)
 ```
 
 ```
