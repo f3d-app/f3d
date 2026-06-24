@@ -363,7 +363,7 @@ Model-specified by default. Overridden by `--scalar-coloring`.
 
 #### compare
 
-| visible                     | hidden                       |
+| red                         | blue                         |
 | --------------------------- | ---------------------------- |
 | ![](./images/color_red.png) | ![](./images/color_blue.png) |
 
