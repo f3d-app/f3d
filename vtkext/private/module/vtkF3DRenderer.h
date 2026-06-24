@@ -194,9 +194,19 @@ public:
   void Render() override;
 
   /**
-   * Reimplemented to account for grid actor
+   * Reset camera function from vtkVRRenderer
+   */
+  void ResetCamera(const double bounds[6]) override;
+
+  /**
+   * Reimplemented to account for grid actor and xr usage
    */
   void ResetCameraClippingRange() override;
+
+  /**
+   * Reset camera clipping range function from vtkVRRenderer
+   */
+  void ResetCameraClippingRange(const double bounds[6]) override;
 
   /**
    * Set properties on each imported actors and also configure the coloring
@@ -561,8 +571,7 @@ public:
   /**
    * Set/Get XR mode
    */
-  vtkSetMacro(Xr, bool);
-  vtkGetMacro(Xr, bool);
+  void SetXRMode(bool enable);
 
 private:
   vtkF3DRenderer();
@@ -891,6 +900,7 @@ private:
   std::optional<bool> Unlit;
 
   bool Xr = false;
+  vtkNew<vtkActor> outlineActor; // debug outline, remove later
 };
 
 #endif
