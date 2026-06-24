@@ -47,6 +47,7 @@ f3d_test(NAME TestMaxBaseIOR DATA suzanne.ply ARGS --base-ior=2.5)
 f3d_test(NAME TestEdges DATA suzanne.ply ARGS -e)
 f3d_test(NAME TestLineWidth DATA cow.vtk ARGS -e --line-width=5)
 f3d_test(NAME TestLineWidthFullScene DATA suzanne.obj ARGS -e --line-width=3 --up=-Y)
+f3d_test(NAME TestReflectiveMaterial DATA suzanne.ply ARGS --metallic=1 --roughness=0 --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-ambient)
 
 # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12702
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251214)
