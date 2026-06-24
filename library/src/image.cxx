@@ -384,7 +384,8 @@ double image::compare(const image& reference) const
       break;
   }
 
-  // vtkImageSSIM::ComputeErrorMetrics doesn't work for RGBA images,
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260623)
+  // vtkImageSSIM::ComputeErrorMetrics didn't work for RGBA images,
   // so we need to extract the RGB components first
   vtkNew<vtkImageExtractComponents> extractResult;
   extractResult->SetInputData(this->Internals->Image);
@@ -398,6 +399,11 @@ double image::compare(const image& reference) const
 
   ssim->SetInputData(extractResult->GetOutput());
   ssim->SetInputData(1, extractReference->GetOutput());
+#else
+  ssim->SetInputData(this->Internals->Image);
+  ssim->SetInputData(1, reference.Internals->Image);
+#endif
+
   ssim->Update();
   vtkDoubleArray* scalars = vtkArrayDownCast<vtkDoubleArray>(
     vtkDataSet::SafeDownCast(ssim->GetOutputDataObject(0))->GetPointData()->GetScalars());

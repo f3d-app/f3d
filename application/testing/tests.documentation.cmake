@@ -83,24 +83,28 @@ function(f3d_test_doc)
   )
 endfunction()
 
+## Generate common baseline images for documentation illustrations
+f3d_test_doc(NAME TestDocDamagedHelmetBaseline DATA DamagedHelmet.glb REF_IMAGE damaged_helmet_baseline.png ROTATE ARGS -f)
+f3d_test_doc(NAME TestDocSkullBaseline DATA skull.vti REF_IMAGE skull_baseline.png ARGS -sv --up=z --coloring-range=40,200)
+
 ## --up
 f3d_test_doc(NAME TestDocUpY DATA DamagedHelmet.glb REF_IMAGE up_y.png ROTATE ARGS --up=y -gfx)
 f3d_test_doc(NAME TestDocUpZ DATA DamagedHelmet.glb REF_IMAGE up_z.png ROTATE ARGS --up=z -gfx)
 
 ## --axis
-f3d_test_doc(NAME TestDocAxisOff DATA DamagedHelmet.glb REF_IMAGE axis_off.png ROTATE ARGS -f)
+### OFF: damaged_helmet_baseline.png
 f3d_test_doc(NAME TestDocAxisOn DATA DamagedHelmet.glb REF_IMAGE axis_on.png ROTATE ARGS -fx UI)
 
 ## --grid
-f3d_test_doc(NAME TestDocGridOff DATA DamagedHelmet.glb REF_IMAGE grid_off.png ROTATE ARGS -f)
+### OFF: damaged_helmet_baseline.png
 f3d_test_doc(NAME TestDocGridOn DATA DamagedHelmet.glb REF_IMAGE grid_on.png ROTATE ARGS -fg)
 
 ## --axes-grid
-f3d_test_doc(NAME TestDocAxesGridOff DATA DamagedHelmet.glb REF_IMAGE axes_grid_off.png ROTATE ARGS -f)
+### OFF: damaged_helmet_baseline.png
 f3d_test_doc(NAME TestDocAxesGridOn DATA DamagedHelmet.glb REF_IMAGE axes_grid_on.png ROTATE ARGS --axes-grid -f)
 
 ## --edges
-f3d_test_doc(NAME TestDocEdgesOff DATA DamagedHelmet.glb REF_IMAGE edges_off.png ROTATE ARGS -f)
+### OFF: damaged_helmet_baseline.png
 f3d_test_doc(NAME TestDocEdgesOn DATA DamagedHelmet.glb REF_IMAGE edges_on.png ROTATE ARGS -f --edges --line-width=3)
 
 ## --armature
@@ -120,7 +124,7 @@ f3d_test_doc(NAME TestDocBackdropOpacityDefault DATA DamagedHelmet.glb REF_IMAGE
 f3d_test_doc(NAME TestDocBackdropOpacity02 DATA DamagedHelmet.glb REF_IMAGE backdrop_opacity_0.2.png ROTATE ARGS -nfm --backdrop-opacity=0.2 UI)
 
 ## --normal-glyphs
-f3d_test_doc(NAME TestDocNormalGlyphsOff DATA DamagedHelmet.glb REF_IMAGE normal_glyphs_off.png ROTATE ARGS -f)
+### OFF: damaged_helmet_baseline.png
 f3d_test_doc(NAME TestDocNormalGlyphsOn DATA DamagedHelmet.glb REF_IMAGE normal_glyphs_on.png ROTATE ARGS --normal-glyphs --normal-glyphs-scale=.3 -f)
 
 ## --normal-glyphs-scale
@@ -164,8 +168,8 @@ f3d_test_doc(NAME TestDocHDRIAmbientOFF DATA dragon.vtu REF_IMAGE hdri_ambient_o
 f3d_test_doc(NAME TestDocHDRIAmbientON DATA dragon.vtu REF_IMAGE hdri_ambient_on.png ROTATE ARGS -f --tone-mapping)
 
 ## --texture-matcap
-f3d_test_doc(NAME TestDocMatcapOFF DATA DamagedHelmet.glb REF_IMAGE matcap_off.png ROTATE ARGS -f --tone-mapping)
-f3d_test_doc(NAME TestDocMatcapON DATA DamagedHelmet.glb REF_IMAGE matcap_on.png ROTATE ARGS -f --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png --tone-mapping)
+### OFF: damaged_helmet_baseline.png
+f3d_test_doc(NAME TestDocMatcapON DATA DamagedHelmet.glb REF_IMAGE matcap_on.png ROTATE ARGS -f --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png)
 
 ## --texture-base-color
 f3d_test_doc(NAME TestDocTextureBaseColorOFF DATA DamagedHelmet.glb REF_IMAGE texture_base_color_off.png ROTATE ARGS -f --tone-mapping --texture-base-color= --texture-material= --texture-emissive= --texture-normal=)
@@ -180,7 +184,7 @@ f3d_test_doc(NAME TestDocTextureEmissiveOFF DATA DamagedHelmet.glb REF_IMAGE tex
 f3d_test_doc(NAME TestDocTextureEmissiveON DATA DamagedHelmet.glb REF_IMAGE texture_emissive_on.png ROTATE ARGS -f --color=black --tone-mapping --texture-base-color= --texture-material= --texture-normal=)
 
 ## --emissive-factor
-f3d_test_doc(NAME TestDocEmissiveFactorDefault DATA DamagedHelmet.glb REF_IMAGE emissive_factor_default.png ROTATE ARGS -f)
+### OFF: damaged_helmet_baseline.png
 f3d_test_doc(NAME TestDocEmissiveFactorRed DATA DamagedHelmet.glb REF_IMAGE emissive_factor_red.png ROTATE ARGS -f --emissive-factor=2,0.1,0.1)
 
 ## --texture-normal
@@ -188,19 +192,19 @@ f3d_test_doc(NAME TestDocTextureNormalOFF DATA DamagedHelmet.glb REF_IMAGE textu
 f3d_test_doc(NAME TestDocTextureNormalON DATA DamagedHelmet.glb REF_IMAGE texture_normal_on.png ROTATE ARGS -f --tone-mapping --texture-base-color= --texture-material= --texture-emissive=)
 
 ## --normal-scale
-f3d_test_doc(NAME TestDocNormalScaleDefault DATA DamagedHelmet.glb REF_IMAGE normal_scale_default.png ROTATE ARGS -f --tone-mapping)
-f3d_test_doc(NAME TestDocNormalScale2 DATA DamagedHelmet.glb REF_IMAGE normal_scale_2.png ROTATE ARGS -f --tone-mapping --normal-scale=2)
+### OFF: damaged_helmet_baseline.png
+f3d_test_doc(NAME TestDocNormalScale2 DATA DamagedHelmet.glb REF_IMAGE normal_scale_2.png ROTATE ARGS -f --normal-scale=2)
 
 ## --textures-transform
 f3d_test_doc(NAME TestDocTextureTransformDefault DATA ${F3D_SOURCE_DIR}/testing/data/cube_unlit.obj REF_IMAGE texture_transform_default.png ROTATE ARGS -e --line-width=2 --camera-position=5,2.5,5.9 --camera-focal-point=0.2,-0.2,0 --camera-view-up=-0.216,0.942,-0.258)
 f3d_test_doc(NAME TestDocTextureTransformRotation DATA ${F3D_SOURCE_DIR}/testing/data/cube_unlit.obj REF_IMAGE texture_transform_rotation.png ROTATE ARGS -e --line-width=2 --textures-transform=angle:10 --camera-position=5,2.5,5.9 --camera-focal-point=0.2,-0.2,0 --camera-view-up=-0.216,0.942,-0.258)
 
 ## --checkerboard
-f3d_test_doc(NAME TestDocCheckerboardOFF DATA DamagedHelmet.glb REF_IMAGE checkerboard_off.png ROTATE ARGS -f)
+### OFF: damaged_helmet_baseline.png
 f3d_test_doc(NAME TestDocCheckerboardON DATA DamagedHelmet.glb REF_IMAGE checkerboard_on.png ROTATE ARGS -f --checkerboard)
 
 ## --unlit
-f3d_test_doc(NAME TestDocUnlitOFF DATA DamagedHelmet.glb REF_IMAGE unlit_off.png ROTATE ARGS -f)
+### OFF: damaged_helmet_baseline.png
 f3d_test_doc(NAME TestDocUnlitON DATA DamagedHelmet.glb REF_IMAGE unlit_on.png ROTATE ARGS -f --unlit)
 
 ## --background-color
@@ -208,29 +212,29 @@ f3d_test_doc(NAME TestDocBackgroundColorDefault DATA DamagedHelmet.glb REF_IMAGE
 f3d_test_doc(NAME TestDocBackgroundColorOrange DATA DamagedHelmet.glb REF_IMAGE background_color_orange.png RESOLUTION 800,600 BACKGROUND ROTATE ARGS -f --background-color=orange)
 
 ## --fps
-f3d_test_doc(NAME TestDocFPSOFF DATA DamagedHelmet.glb REF_IMAGE fps_off.png ROTATE ARGS -f UI)
+### OFF: damaged_helmet_baseline.png
 f3d_test_doc(NAME TestDocFPSON DATA DamagedHelmet.glb REF_IMAGE fps_on.png ROTATE ARGS -f --fps THRESHOLD 0.08 UI)
 
 ## --filename
-f3d_test_doc(NAME TestDocFilenameOFF DATA DamagedHelmet.glb REF_IMAGE filename_off.png ROTATE ARGS -f UI)
+### OFF: damaged_helmet_baseline.png
 f3d_test_doc(NAME TestDocFilenameON DATA DamagedHelmet.glb REF_IMAGE filename_on.png ROTATE ARGS -f --filename UI)
 
 ## --metadata
-f3d_test_doc(NAME TestDocMetadataOFF DATA DamagedHelmet.glb REF_IMAGE metadata_off.png ROTATE ARGS -f UI)
+### OFF: damaged_helmet_baseline.png
 f3d_test_doc(NAME TestDocMetadataON DATA DamagedHelmet.glb REF_IMAGE metadata_on.png ROTATE ARGS -f --metadata UI)
 
 ## --scene-hierarchy
-f3d_test_doc(NAME TestDocSceneHierarchyOFF DATA bristleback_dota_fan-art.glb REF_IMAGE scene_hierarchy_off.png ROTATE ARGS -f UI)
-f3d_test_doc(NAME TestDocSceneHierarchyON DATA bristleback_dota_fan-art.glb REF_IMAGE scene_hierarchy_on.png ROTATE ARGS -f --scene-hierarchy UI)
+### OFF: damaged_helmet_baseline.png
+f3d_test_doc(NAME TestDocSceneHierarchyON DATA DamagedHelmet.glb REF_IMAGE scene_hierarchy_on.png ROTATE ARGS -f --scene-hierarchy UI)
 
 ## --notifications (TODO: interaction file?)
 
 ## --hdri-filename
-f3d_test_doc(NAME TestDocHDRIFilenameOFF DATA DamagedHelmet.glb REF_IMAGE hdri_filename_off.png ROTATE ARGS -f)
+### OFF: damaged_helmet_baseline.png
 f3d_test_doc(NAME TestDocHDRIFilenameON DATA DamagedHelmet.glb REF_IMAGE hdri_filename_on.png ROTATE ARGS -f --hdri-filename UI)
 
 ## --hdri-skybox
-f3d_test_doc(NAME TestDocHDRISkyboxOFF DATA DamagedHelmet.glb REF_IMAGE hdri_skybox_off.png ROTATE ARGS -f)
+### OFF: damaged_helmet_baseline.png
 f3d_test_doc(NAME TestDocHDRISkyboxON DATA DamagedHelmet.glb REF_IMAGE hdri_skybox_on.png ROTATE ARGS -fj)
 
 ## --blur-background
@@ -263,14 +267,14 @@ f3d_test_doc(NAME TestDocColoringComponentY DATA dragon.vtu REF_IMAGE coloring_c
 
 ## --coloring-range
 f3d_test_doc(NAME TestDocColoringRangeAuto DATA skull.vti REF_IMAGE coloring_range_auto.png ARGS -sv --up=z)
-f3d_test_doc(NAME TestDocColoringRangeManual DATA skull.vti REF_IMAGE coloring_range_manual.png ARGS -sv --up=z --coloring-range=40,200)
+### ON: skull_baseline.png
 
 ## --coloring-scalar-bar
-f3d_test_doc(NAME TestDocScalarBarOFF DATA skull.vti REF_IMAGE scalar_bar_off.png ARGS -sv --up=z --coloring-range=40,200)
+### OFF: skull_baseline.png
 f3d_test_doc(NAME TestDocScalarBarON DATA skull.vti REF_IMAGE scalar_bar_on.png ARGS -svb --up=z --coloring-range=40,200)
 
 ## ---colormap-file
-f3d_test_doc(NAME TestDocColorMapDefault DATA skull.vti REF_IMAGE color_map_default.png ARGS -sv --up=z --coloring-range=40,200)
+### OFF: skull_baseline.png
 f3d_test_doc(NAME TestDocColorMapViridis DATA skull.vti REF_IMAGE color_map_viridis.png ARGS -sv --up=z --coloring-range=40,200 --colormap-file=${F3D_SOURCE_DIR}/resources/colormaps/viridis.png)
 
 ## --colormap-discretization
@@ -279,7 +283,7 @@ f3d_test_doc(NAME TestDocColorMapDiscretization8 DATA dragon.vtu REF_IMAGE color
 
 ## --volume
 f3d_test_doc(NAME TestDocVolumeOFF DATA skull.vti REF_IMAGE volume_off.png ARGS -s --up=z --coloring-range=40,200)
-f3d_test_doc(NAME TestDocVolumeON DATA skull.vti REF_IMAGE volume_on.png ARGS -vs --up=z --coloring-range=40,200)
+### ON: skull_baseline.png
 
 ## --volume-opacity-file
 f3d_test_doc(NAME TestDocVolumeOpacityDefault DATA skull.vti REF_IMAGE volume_opacity_default.png ARGS -vs --up=z --coloring-range=40,200)
@@ -316,11 +320,11 @@ f3d_test_doc(NAME TestDocAntiAliasingOFF DATA dragon.vtu REF_IMAGE anti_aliasing
 f3d_test_doc(NAME TestDocAntiAliasingON DATA dragon.vtu REF_IMAGE anti_aliasing_on.png ROTATE ARGS -f --anti-aliasing=ssaa)
 
 ## --tone-mapping
-f3d_test_doc(NAME TestDocToneMappingOFF DATA DamagedHelmet.glb REF_IMAGE tone_mapping_off.png ROTATE ARGS -f)
+### OFF: damaged_helmet_baseline.png
 f3d_test_doc(NAME TestDocToneMappingON DATA DamagedHelmet.glb REF_IMAGE tone_mapping_on.png ROTATE ARGS -f --tone-mapping)
 
 ## --final-shader
-f3d_test_doc(NAME TestDocFinalShaderOFF DATA DamagedHelmet.glb REF_IMAGE final_shader_off.png ROTATE ARGS -f)
+### OFF: damaged_helmet_baseline.png
 f3d_test_doc(NAME TestDocFinalShaderGrayScale DATA DamagedHelmet.glb REF_IMAGE final_shader_gray.png ROTATE ARGS -f --verbose --final-shader "vec4 pixel(vec2 uv) { vec4 value = texture(source, uv)\\\\\\\\\\\\\\\\; float g = dot(value.rgb, vec3(0.299, 0.587, 0.114))\\\\\\\\\\\\\\\\; return vec4(vec3(g), value.a)\\\\\\\\\\\\\\\\; }")
 
 ## --display-depth
