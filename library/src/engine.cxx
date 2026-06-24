@@ -382,7 +382,7 @@ interactor& engine::getInteractor()
 }
 
 //----------------------------------------------------------------------------
-void engine::saveStatefile(const fs::path& statefilePath)
+engine& engine::saveStatefile(const fs::path& statefilePath)
 {
   try
   {
@@ -399,10 +399,11 @@ void engine::saveStatefile(const fs::path& statefilePath)
     throw engine::statefile_exception(
       "Could not save statefile " + statefilePath.string() + ": " + ex.what());
   }
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void engine::loadStatefile(const fs::path& statefilePath)
+engine& engine::loadStatefile(const fs::path& statefilePath)
 {
   try
   {
@@ -425,6 +426,7 @@ void engine::loadStatefile(const fs::path& statefilePath)
     throw engine::statefile_exception(
       "Could not load statefile " + statefilePath.string() + ": " + ex.what());
   }
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -434,7 +436,7 @@ std::string engine::saveStatefileToString()
 }
 
 //----------------------------------------------------------------------------
-void engine::loadStatefileFromString(const std::string& statefileContent)
+engine& engine::loadStatefileFromString(const std::string& statefileContent)
 {
   try
   {
@@ -446,6 +448,7 @@ void engine::loadStatefileFromString(const std::string& statefileContent)
     throw engine::statefile_exception(
       std::string("Could not parse statefile content: ") + ex.what());
   }
+  return *this;
 }
 
 //----------------------------------------------------------------------------
