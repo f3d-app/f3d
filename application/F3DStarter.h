@@ -81,7 +81,8 @@ public:
   void LoadStatefileFromClipboard();
 
   /**
-   * Apply a parsed statefile (options and files) to the engine, replacing the current state.
+   * Apply a parsed statefile (options, files and camera) to the engine, replacing the current
+   * state.
    * Used by LoadStatefile and LoadStatefileFromClipboard.
    */
   void ApplyStatefile(const std::map<std::string, std::string>& statefileOptions,
