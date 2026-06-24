@@ -177,7 +177,7 @@ Show the _cell edges_.
 
 ### `--armature` (_bool_, default: `false`)
 
-Show armature if present (glTF only).
+Show armature if present.
 
 ### `--camera-index=<idx>` (_int_)
 
