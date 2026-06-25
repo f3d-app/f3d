@@ -195,9 +195,15 @@ bool options::hasDomain(std::string_view name, domain_style& style) const
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> options::getDomain(std::string_view name) const
+std::pair<std::array<std::string, 2>, std::string> options::getRangeDomain(std::string_view name) const
 {
-  return options_generated::getDomain(*this, name);
+  return options_generated::getRangeDomain(*this, name);
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> options::getEnumDomain(std::string_view name) const
+{
+  return options_generated::getEnumDomain(*this, name);
 }
 
 //----------------------------------------------------------------------------

@@ -138,12 +138,24 @@ bool hasDomain(std::string_view name, f3d::options::domain_style& style)
 
 //----------------------------------------------------------------------------
 /**
- * Generated method, see `options::getDomain`
+ * Generated method, see `options::getEnumDomain`
  */
-std::vector<std::string> getDomain(const f3d::options& opt, std::string_view name)
+std::vector<std::string> getEnumDomain(const f3d::options& opt, std::string_view name)
 {
   // clang-format off
-  ${_options_get_domain};
+  ${_options_get_enum_domain};
+  // clang-format on
+  else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Generated method, see `options::getRangeDomain`
+ */
+std::pair<std::array<std::string, 2>, std::string> getRangeDomain(const f3d::options& opt, std::string_view name)
+{
+  // clang-format off
+  ${_options_get_range_domain};
   // clang-format on
   else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
 }

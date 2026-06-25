@@ -18,14 +18,22 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   test.expect<f3d::options::inexistent_exception>(
     "hasDomain inexistent", [&]() { std::ignore = opt.hasDomain("inexistent", style); });
 
-  // Test getDomain
-  test("getDomain range", opt.getDomain("scene.animation.speed_factor"), { "0", "2", "0.1" });
-  test("getDomain enum", opt.getDomain("render.effect.blending.mode"),
+  // Test getRangeDomain
+  std::pair<std::array<std::string, 2>, std::string> rangeDomain = opt.getRangeDomain("scene.animation.speed_factor");
+  test("getRangeDomain range", rangeDomain.first, {"0", "2"});
+  test("getRangeDomain increment", rangeDomain.second, std::string("0.1"));
+  test.expect<f3d::options::incompatible_exception>(
+    "getRangeDomain incompatible", [&]() { std::ignore = opt.getRangeDomain("model.scivis.cells"); });
+  test.expect<f3d::options::inexistent_exception>(
+    "getRangeDomain inexistent", [&]() { std::ignore = opt.getRangeDomain("inexistent"); });
+
+  // Test getEnumDomain
+  test("getEnumDomain", opt.getEnumDomain("render.effect.blending.mode"),
     { "none", "ddp", "sort", "sort_cpu", "stochastic" });
   test.expect<f3d::options::incompatible_exception>(
-    "getDomain incompatible", [&]() { std::ignore = opt.getDomain("model.scivis.cells"); });
+    "getEnumDomain incompatible", [&]() { std::ignore = opt.getEnumDomain("model.scivis.cells"); });
   test.expect<f3d::options::inexistent_exception>(
-    "getDomain inexistent", [&]() { std::ignore = opt.getDomain("inexistent"); });
+    "getEnumDomain inexistent", [&]() { std::ignore = opt.getEnumDomain("inexistent"); });
 
   // Test increase/decrease
 
@@ -110,25 +118,64 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   // render.effect.blending.mode: tested above
   // scene.animation.speed_factor: tested above
   // render.raytracing.samples: tested above
-  test("interactor.style domain", opt.getDomain("interactor.style"), {"default", "trackball", "2d"});
-  test("model.color.opacity domain", opt.getDomain("model.color.opacity"), {"0", "1", "0.05"});
-  test("model.material.base_ior domain", opt.getDomain("model.material.base_ior"), {"0", "1", "0.05"});
-  test("model.material.metallic domain", opt.getDomain("model.material.metallic"), {"0", "1", "0.05"});
-  test("model.material.roughness domain", opt.getDomain("model.material.roughness"), {"0", "1", "0.05"});
-  test("model.normal.scale domain", opt.getDomain("model.normal.scale"), {"0", "1", "0.05"});
-  test("model.normal_glyphs.scale domain", opt.getDomain("model.normal_glyphs.scale"), {"0", "10", "0.1"});
-  test("model.point_sprites.size domain", opt.getDomain("model.point_sprites.size"), {"1", "100", "1"});
-  test("model.point_sprites.type domain", opt.getDomain("model.point_sprites.type"), {"none", "sphere", "gaussian", "circle", "stddev", "bound","cross"});
-  test("model.scivis.discretization domain", opt.getDomain("model.scivis.discretization"), {"1", "1024", "5"});
-  test("render.backface_type domain", opt.getDomain("render.backface_type"), {"visible", "hidden"});
-  test("render.background.blur.coc domain", opt.getDomain("render.background.blur.coc"), {"0", "100", "5"});
-  test("render.effect.antialiasing.mode domain", opt.getDomain("render.effect.antialiasing.mode"), {"none", "fxaa", "ssaa", "taa"});
-  test("render.light.intensity domain", opt.getDomain("render.light.intensity"), {"0", "5", "0.02"});
-  test("render.line_width domain", opt.getDomain("render.line_width"), {"0", "10", "0.1"});
-  test("render.point_size domain", opt.getDomain("render.point_size"), {"0", "10", "0.1"});
-  test("scene.camera.index domain", opt.getDomain("scene.camera.index"), {});
-  test("ui.backdrop.opacity domain", opt.getDomain("ui.backdrop.opacity"), {"0", "1", "0.05"});
-  test("ui.scale domain", opt.getDomain("ui.scale"), {"0", "10", "0.1"});
+
+  rangeDomain = opt.getRangeDomain("model.color.opacity");
+  test("model.color.opacity range", rangeDomain.first, {"0", "1"});
+  test("model.color.opacity increment", rangeDomain.second, std::string("0.05"));
+
+  rangeDomain = opt.getRangeDomain("model.material.base_ior");
+  test("model.material.base_ior range", rangeDomain.first, {"0", "1"});
+  test("model.material.base_ior increment", rangeDomain.second, std::string("0.05"));
+
+  rangeDomain = opt.getRangeDomain("model.material.metallic");
+  test("model.material.metallic range", rangeDomain.first, {"0", "1"});
+  test("model.material.metallic increment", rangeDomain.second, std::string("0.05"));
+
+  rangeDomain = opt.getRangeDomain("model.material.roughness");
+  test("model.material.roughness range", rangeDomain.first, {"0", "1"});
+  test("model.material.roughness increment", rangeDomain.second, std::string("0.05"));
+
+  rangeDomain = opt.getRangeDomain("model.normal.scale");
+  test("model.normal.scale range", rangeDomain.first, {"0", "1"});
+  test("model.normal.scale increment", rangeDomain.second, std::string("0.05"));
+
+  rangeDomain = opt.getRangeDomain("model.normal_glyphs.scale");
+  test("model.normal_glyphs.scale range", rangeDomain.first, {"0", "10"});
+  test("model.normal_glyphs.scale increment", rangeDomain.second, std::string("0.1"));
+
+  rangeDomain = opt.getRangeDomain("model.scivis.discretization");
+  test("model.scivis.discretization range", rangeDomain.first, {"1", "1024"});
+  test("model.scivis.discretization increment", rangeDomain.second, std::string("5"));
+
+  rangeDomain = opt.getRangeDomain("render.background.blur.coc");
+  test("render.background.blur.coc range", rangeDomain.first, {"0", "100"});
+  test("render.background.blur.coc increment", rangeDomain.second, std::string("5"));
+
+  rangeDomain = opt.getRangeDomain("render.light.intensity");
+  test("render.light.intensity range", rangeDomain.first, {"0", "5"});
+  test("render.light.intensity increment", rangeDomain.second, std::string("0.02"));
+
+  rangeDomain = opt.getRangeDomain("render.line_width");
+  test("render.line_width range", rangeDomain.first, {"0", "10"});
+  test("render.line_width increment", rangeDomain.second, std::string("0.1"));
+
+  rangeDomain = opt.getRangeDomain("render.point_size");
+  test("render.point_size range", rangeDomain.first, {"0", "10"});
+  test("render.point_size increment", rangeDomain.second, std::string("0.1"));
+
+  rangeDomain = opt.getRangeDomain("ui.backdrop.opacity");
+  test("ui.backdrop.opacity range", rangeDomain.first, {"0", "1"});
+  test("ui.backdrop.opacity increment", rangeDomain.second, std::string("0.05"));
+
+  rangeDomain = opt.getRangeDomain("ui.scale");
+  test("ui.scale range", rangeDomain.first, {"0", "10"});
+  test("ui.scale increment", rangeDomain.second, std::string("0.1"));
+
+  test("interactor.style enum", opt.getEnumDomain("interactor.style"), {"default", "trackball", "2d"});
+  test("model.point_sprites.type enum", opt.getEnumDomain("model.point_sprites.type"), {"none", "sphere", "gaussian", "circle", "stddev", "bound","cross"});
+  test("render.backface_type enum", opt.getEnumDomain("render.backface_type"), {"visible", "hidden"});
+  test("render.effect.antialiasing.mode enum", opt.getEnumDomain("render.effect.antialiasing.mode"), {"none", "fxaa", "ssaa", "taa"});
+  test("scene.camera.index enum", opt.getEnumDomain("scene.camera.index"), {});
   // clang-format on
 
   return test.result();

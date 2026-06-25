@@ -901,12 +901,24 @@ bool hasDomain(f3d::options::domain_style& styleVar, const f3d::options::domain_
  * Get provided domain_range as a string vector
  */
 template<typename T>
-std::vector<std::string> getDomain(const f3d::options::domain_range_t<T>& domain)
+std::pair<std::array<std::string, 2>, std::string> getRangeDomain(const f3d::options::domain_range_t<T>& domain)
 {
-  std::vector<std::string> ret;
-  ret.emplace_back(format(domain.range[0]));
-  ret.emplace_back(format(domain.range[1]));
-  ret.emplace_back(format(domain.increment));
+  std::pair<std::array<std::string, 2>, std::string> ret;
+  ret.first[0] = std::move(format(domain.range[0]));
+  ret.first[1] = std::move(format(domain.range[1]));
+  ret.second = std::move(format(domain.increment));
+  return ret;
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Get provided domain_range<std::string> as a string vector
+ */
+std::pair<std::array<std::string, 2>, std::string> getRangeDomain(const f3d::options::domain_range_t<std::string>& domain)
+{
+  std::pair<std::array<std::string, 2>, std::string> ret;
+  ret.first = domain.range;
+  ret.second = domain.increment;
   return ret;
 }
 
@@ -915,7 +927,7 @@ std::vector<std::string> getDomain(const f3d::options::domain_range_t<T>& domain
  * Get provided domain_enum as a string vector
  */
 template<typename T>
-std::vector<std::string> getDomain(const f3d::options::domain_enum_t<T>& domain)
+std::vector<std::string> getEnumDomain(const f3d::options::domain_enum_t<T>& domain)
 {
   std::vector<std::string> ret;
   std::ranges::transform(
@@ -927,7 +939,7 @@ std::vector<std::string> getDomain(const f3d::options::domain_enum_t<T>& domain)
 /**
  * Get provided domain_enum<std::string> enumeration
  */
-std::vector<std::string> getDomain(const f3d::options::domain_enum_t<std::string>& domain)
+std::vector<std::string> getEnumDomain(const f3d::options::domain_enum_t<std::string>& domain)
 {
   return domain.enumeration;
 }
