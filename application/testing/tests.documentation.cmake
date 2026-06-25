@@ -89,8 +89,40 @@ f3d_test_doc(NAME TestDocDamagedHelmetBaseline DATA DamagedHelmet.glb REF_IMAGE 
 f3d_test_doc(NAME TestDocSkullBaseline DATA skull.vti REF_IMAGE skull_baseline.png ARGS -sv --up=z --coloring-range=40,200)
 
 ## --up
-f3d_test_doc(NAME TestDocUpY DATA DamagedHelmet.glb REF_IMAGE up_y.png ROTATE ARGS --up=y -gfx)
-f3d_test_doc(NAME TestDocUpZ DATA DamagedHelmet.glb REF_IMAGE up_z.png ROTATE ARGS --up=z -gfx)
+f3d_test_doc(NAME TestDocUpY DATA DamagedHelmet.glb REF_IMAGE up_y.png ARGS --up=y -gfx)
+f3d_test_doc(NAME TestDocUpZ DATA DamagedHelmet.glb REF_IMAGE up_z.png ARGS --up=z -gfx)
+
+## --x-color
+f3d_test_doc(NAME TestDocXColorDefault DATA DamagedHelmet.glb REF_IMAGE color_default.png ROTATE ARGS -gfx)
+f3d_test_doc(NAME TestDocXColorYellow DATA DamagedHelmet.glb REF_IMAGE x_color_yellow.png ROTATE ARGS -gfx --x-color=yellow)
+
+## --y-color
+### Default: color_default.png
+f3d_test_doc(NAME TestDocYColorYellow DATA DamagedHelmet.glb REF_IMAGE y_color_yellow.png ROTATE ARGS -gfx --y-color=yellow)
+
+## --z-color
+### Default: color_default.png
+f3d_test_doc(NAME TestDocZColorYellow DATA DamagedHelmet.glb REF_IMAGE z_color_yellow.png ROTATE ARGS -gfx --z-color=yellow)
+
+## --grid-unit
+f3d_test_doc(NAME TestDocGridUnitDefault DATA DamagedHelmet.glb REF_IMAGE grid_unit_default.png ROTATE ARGS -gf)
+f3d_test_doc(NAME TestDocGridUnit2 DATA DamagedHelmet.glb REF_IMAGE grid_unit_2.png ROTATE ARGS -gf --grid-unit=2)
+
+## --grid-subdivisions
+f3d_test_doc(NAME TestDocGridSubdivisionsDefault DATA DamagedHelmet.glb REF_IMAGE grid_subdivisions_default.png ROTATE ARGS -gf)
+f3d_test_doc(NAME TestDocGridSubdivisions4 DATA DamagedHelmet.glb REF_IMAGE grid_subdivisions_4.png ROTATE ARGS -gf --grid-subdivisions=4)
+
+## --grid-color
+f3d_test_doc(NAME TestDocGridColorDefault DATA DamagedHelmet.glb REF_IMAGE grid_color_default.png ROTATE ARGS -gf)
+f3d_test_doc(NAME TestDocGridColorCyan DATA DamagedHelmet.glb REF_IMAGE grid_color_cyan.png ROTATE ARGS -gf --grid-color=cyan)
+
+## --grid-reflection
+f3d_test_doc(NAME TestDocGridReflectionOFF DATA DamagedHelmet.glb REF_IMAGE grid_reflection_off.png ROTATE ARGS -gf)
+f3d_test_doc(NAME TestDocGridReflectionON DATA DamagedHelmet.glb REF_IMAGE grid_reflection_on.png ROTATE ARGS -gf --grid-reflection=0.5)
+
+## --grid-absolute
+f3d_test_doc(NAME TestDocGridAbsoluteOFF DATA DamagedHelmet.glb REF_IMAGE grid_absolute_off.png ROTATE ARGS -gf)
+f3d_test_doc(NAME TestDocGridAbsoluteON DATA DamagedHelmet.glb REF_IMAGE grid_absolute_on.png ROTATE ARGS -gf --grid-absolute)
 
 ## --axis
 ### OFF: damaged_helmet_baseline.png
@@ -120,6 +152,10 @@ f3d_test_doc(NAME TestDocFontScale2 DATA DamagedHelmet.glb REF_IMAGE font_scale_
 f3d_test_doc(NAME TestDocFontColorDefault DATA DamagedHelmet.glb REF_IMAGE font_color_default.png ROTATE ARGS -nfm UI)
 f3d_test_doc(NAME TestDocFontColorRed DATA DamagedHelmet.glb REF_IMAGE font_color_red.png ROTATE ARGS -nfm --font-color=red UI)
 
+## --backdrop-color
+f3d_test_doc(NAME TestDocBackdropColorDefault DATA DamagedHelmet.glb REF_IMAGE backdrop_color_default.png ROTATE ARGS -nfm UI)
+f3d_test_doc(NAME TestDocBackdropColorNavy DATA DamagedHelmet.glb REF_IMAGE backdrop_color_navy.png ROTATE ARGS -nfm --backdrop-color=navy UI)
+
 ## --backdrop-opacity
 f3d_test_doc(NAME TestDocBackdropOpacityDefault DATA DamagedHelmet.glb REF_IMAGE backdrop_opacity_default.png ROTATE ARGS -nfm UI)
 f3d_test_doc(NAME TestDocBackdropOpacity02 DATA DamagedHelmet.glb REF_IMAGE backdrop_opacity_0.2.png ROTATE ARGS -nfm --backdrop-opacity=0.2 UI)
@@ -130,11 +166,21 @@ f3d_test_doc(NAME TestDocNormalGlyphsOn DATA DamagedHelmet.glb REF_IMAGE normal_
 
 ## --normal-glyphs-scale
 f3d_test_doc(NAME TestDocNormalGlyphsScale03 DATA DamagedHelmet.glb REF_IMAGE normal_glyphs_scale_0.3.png ROTATE ARGS --normal-glyphs --normal-glyphs-scale=.3 -f)
-f3d_test_doc(NAME TestDocNormalGlyphsScale1 DATA DamagedHelmet.glb REF_IMAGE normal_glyphs_scale_1.png ROTATE ARGS --normal-glyphs --normal-glyphs-scale=1 -f)
+f3d_test_doc(NAME TestDocNormalGlyphsScale07 DATA DamagedHelmet.glb REF_IMAGE normal_glyphs_scale_0.7.png ROTATE ARGS --normal-glyphs --normal-glyphs-scale=.7 -f)
 
 ## --point-sprites
-f3d_test_doc(NAME TestDocPointSpritesNone DATA pointCloud.vtp REF_IMAGE point_sprites_none.png ARGS -s --colormap-file=${F3D_SOURCE_DIR}/resources/colormaps/viridis.png)
-f3d_test_doc(NAME TestDocPointSpritesSphere DATA pointCloud.vtp REF_IMAGE point_sprites_sphere.png ARGS -s --point-sprites=sphere --point-sprites-size=5 --colormap-file=${F3D_SOURCE_DIR}/resources/colormaps/viridis.png)
+### OFF: damaged_helmet_baseline.png
+f3d_test_doc(NAME TestDocPointSpritesSphere DATA DamagedHelmet.glb REF_IMAGE point_sprites_sphere.png ARGS --point-sprites=sphere --point-sprites-size=5)
+
+## --point-sprites-size
+### 0.5: point_sprites_sphere.png
+f3d_test_doc(NAME TestDocPointSpritesSize2 DATA DamagedHelmet.glb REF_IMAGE point_sprites_size_2.png ARGS --point-sprites=sphere --point-sprites-size=2)
+
+## --point-sprites-absolute-size (TODO)
+
+## --point-size
+f3d_test_doc(NAME TestDocPointSize10 DATA pointCloud.vtp REF_IMAGE point_size_10.png ARGS -s --colormap-file=${F3D_SOURCE_DIR}/resources/colormaps/viridis.png)
+f3d_test_doc(NAME TestDocPointSize3 DATA pointCloud.vtp REF_IMAGE point_size_3.png ARGS -s --colormap-file=${F3D_SOURCE_DIR}/resources/colormaps/viridis.png --point-size=3)
 
 ## --line-width
 f3d_test_doc(NAME TestDocLineWidth1 DATA DamagedHelmet.glb REF_IMAGE line_width_1.png ROTATE ARGS -f --edges --line-width=1)
@@ -263,8 +309,8 @@ f3d_test_doc(NAME TestDocColoringComponentX DATA dragon.vtu REF_IMAGE coloring_c
 f3d_test_doc(NAME TestDocColoringComponentY DATA dragon.vtu REF_IMAGE coloring_component_y.png ROTATE ARGS -s --coloring-array=Normals --coloring-component=1)
 
 ## --coloring-by-cells
-#f3d_test_doc(NAME TestDocColoringByCellsOFF DATA skull.vti REF_IMAGE coloring_by_cells_off.png ARGS -s --coloring-array=Result)
-#f3d_test_doc(NAME TestDocColoringByCellsON DATA skull.vti REF_IMAGE coloring_by_cells_on.png ARGS -sc)
+f3d_test_doc(NAME TestDocColoringByCellsOFF DATA ${F3D_SOURCE_DIR}/testing/data/waveletArrays.vti REF_IMAGE coloring_by_cells_off.png ROTATE ARGS -fes --line-width=4)
+f3d_test_doc(NAME TestDocColoringByCellsON DATA ${F3D_SOURCE_DIR}/testing/data/waveletArrays.vti REF_IMAGE coloring_by_cells_on.png ROTATE ARGS -fesc  --line-width=4)
 
 ## --coloring-range
 f3d_test_doc(NAME TestDocColoringRangeAuto DATA skull.vti REF_IMAGE coloring_range_auto.png ARGS -sv --up=z)

@@ -145,13 +145,31 @@ Show _axes_ as a trihedron in the scene.
 
 Set the X axis color in both widget and grid.
 
+#### compare
+
+| Default                         | Yellow                           |
+| ------------------------------- | -------------------------------- |
+| ![](./images/color_default.png) | ![](./images/x_color_yellow.png) |
+
 ### `--y-color` (_color_, default: `f3d_green`)
 
 Set the Y axis color in both widget and grid.
 
+#### compare
+
+| Default                         | Yellow                           |
+| ------------------------------- | -------------------------------- |
+| ![](./images/color_default.png) | ![](./images/y_color_yellow.png) |
+
 ### `--z-color` (_color_, default: `f3d_blue`)
 
 Set the Z axis color in both widget and grid.
+
+#### compare
+
+| Default                         | Yellow                           |
+| ------------------------------- | -------------------------------- |
+| ![](./images/color_default.png) | ![](./images/z_color_yellow.png) |
 
 ### `-g`, `--grid` (_bool_, default: `false`)
 
@@ -167,21 +185,51 @@ Show _a grid_ aligned with the horizontal (orthogonal to the Up direction) plane
 
 Set the size of the _unit square_ for the grid. If not set (the default) a suitable value will be automatically computed.
 
+#### compare
+
+| Default                             | ON                            |
+| ----------------------------------- | ----------------------------- |
+| ![](./images/grid_unit_default.png) | ![](./images/grid_unit_2.png) |
+
 ### `--grid-subdivisions=<count>` (_int_, default: `10`)
 
 Set the number of subdivisions for the grid.
+
+#### compare
+
+| 10 (default)                                | 4                                     |
+| ------------------------------------------- | ------------------------------------- |
+| ![](./images/grid_subdivisions_default.png) | ![](./images/grid_subdivisions_4.png) |
 
 ### `--grid-color=<color>` (_color_, default: `0,0,0`)
 
 Set the color grid lines.
 
+#### compare
+
+| Default                              | Cyan                              |
+| ------------------------------------ | --------------------------------- |
+| ![](./images/grid_color_default.png) | ![](./images/grid_color_cyan.png) |
+
 ### `--grid-reflection=<strength>` (_double_, default: `0`)
 
 Set the reflection strength on the grid.
 
+#### compare
+
+| OFF                                   | ON                                   |
+| ------------------------------------- | ------------------------------------ |
+| ![](./images/grid_reflection_off.png) | ![](./images/grid_reflection_on.png) |
+
 ### `--grid-absolute` (_bool_, default: `false`)
 
 Position the grid at absolute origin instead of below the model.
+
+#### compare
+
+| OFF                                 | ON                                 |
+| ----------------------------------- | ---------------------------------- |
+| ![](./images/grid_absolute_off.png) | ![](./images/grid_absolute_on.png) |
 
 ### `--axes-grid` (_bool_, default: `false`)
 
@@ -282,6 +330,12 @@ Allows automation of multiple commands or pre-defined tasks.
 
 Set the color of the backdrop behind text information such as FPS, filename, metadata or cheatsheet.
 
+#### compare
+
+| Default (black)                          | Navy                                  |
+| ---------------------------------------- | ------------------------------------- |
+| ![](./images/backdrop_color_default.png) | ![](./images/backdrop_color_navy.png) |
+
 ### `--backdrop-opacity=<opacity>` (_double_, default: `0.9`)
 
 Set the opacity of the backdrop behind text information such as FPS, filename, metadata or cheatsheet.
@@ -320,13 +374,19 @@ Select _points sprites_ types to show instead of the geometry.
 
 #### compare
 
-| none                                 | sphere                                 |
-| ------------------------------------ | -------------------------------------- |
-| ![](./images/point_sprites_none.png) | ![](./images/point_sprites_sphere.png) |
+| none                                      | sphere                                 |
+| ----------------------------------------- | -------------------------------------- |
+| ![](./images/damaged_helmet_baseline.png) | ![](./images/point_sprites_sphere.png) |
 
 ### `--point-sprites-size=<size>` (_double_, default: `10.0`)
 
 Set the _size_ of point sprites.
+
+#### compare
+
+| 0.5                                    | 0.2                                      |
+| -------------------------------------- | ---------------------------------------- |
+| ![](./images/point_sprites_sphere.png) | ![](./images/point_sprites_size_0.2.png) |
 
 ### `--point-sprites-absolute-size` (_bool_, default: `false`)
 
@@ -335,6 +395,12 @@ Do not scale the point sprites size by the scene bounding box.
 ### `--point-size=<size>` (_double_)
 
 Set the _size_ of points when showing vertices. Model-specified by default.
+
+#### compare
+
+| Default (10)                    | 5                              |
+| ------------------------------- | ------------------------------ |
+| ![](./images/point_size_10.png) | ![](./images/point_size_5.png) |
 
 ### `--line-width=<size>` (_double_)
 
@@ -693,6 +759,12 @@ When using _direct values_, components are used as L, LA, RGB, RGBA values depen
 Specify that the scalar array is to be found _on the cells_ instead of on the points.
 Use with the scalar option.
 
+#### compare
+
+| OFF                                     | ON                                     |
+| --------------------------------------- | -------------------------------------- |
+| ![](./images/coloring_by_cells_off.png) | ![](./images/coloring_by_cells_on.png) |
+
 ### `--coloring-range=<min,max>` (_vector\<double\>_)
 
 Set the _coloring range_. Automatically computed by default.
@@ -894,7 +966,7 @@ Anti-aliasing method (`fxaa`: fast, `ssaa`: quality, `taa`: balanced, `none`: no
 
 ### `-t`, `--tone-mapping` (_bool_, default: `false`)
 
-Enable generic filmic _Tone Mapping Pass_. This technique is used to map colors properly to the monitor colors.
+Enable neutral _Tone Mapping_. This technique is used to map colors properly to the monitor colors.
 
 #### compare
 

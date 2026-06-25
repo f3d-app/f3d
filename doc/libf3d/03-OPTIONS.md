@@ -290,7 +290,7 @@ CLI: `--ambient-occlusion`.
 
 ### `render.effect.tone_mapping` (_bool_, default: `false`)
 
-Enable generic filmic _Tone Mapping Pass_. This technique is used to map colors properly to the monitor colors.
+Enable neutral _Tone Mapping_. This technique is used to map colors properly to the monitor colors.
 
 CLI: `--tone-mapping`.
 
