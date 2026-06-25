@@ -176,8 +176,6 @@ f3d_test_doc(NAME TestDocPointSpritesSphere DATA DamagedHelmet.glb REF_IMAGE poi
 ### 0.5: point_sprites_sphere.png
 f3d_test_doc(NAME TestDocPointSpritesSize2 DATA DamagedHelmet.glb REF_IMAGE point_sprites_size_2.png ARGS --point-sprites=sphere --point-sprites-size=2)
 
-## --point-sprites-absolute-size (TODO)
-
 ## --point-size
 f3d_test_doc(NAME TestDocPointSize10 DATA pointCloud.vtp REF_IMAGE point_size_10.png ARGS -s --colormap-file=${F3D_SOURCE_DIR}/resources/colormaps/viridis.png)
 f3d_test_doc(NAME TestDocPointSize3 DATA pointCloud.vtp REF_IMAGE point_size_3.png ARGS -s --colormap-file=${F3D_SOURCE_DIR}/resources/colormaps/viridis.png --point-size=3)
@@ -273,8 +271,6 @@ f3d_test_doc(NAME TestDocMetadataON DATA DamagedHelmet.glb REF_IMAGE metadata_on
 ## --scene-hierarchy
 ### OFF: damaged_helmet_baseline.png
 f3d_test_doc(NAME TestDocSceneHierarchyON DATA DamagedHelmet.glb REF_IMAGE scene_hierarchy_on.png ROTATE ARGS -f --scene-hierarchy UI)
-
-## --notifications (TODO: interaction file?)
 
 ## --hdri-filename
 ### OFF: damaged_helmet_baseline.png
