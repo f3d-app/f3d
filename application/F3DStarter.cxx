@@ -56,10 +56,13 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <iterator>
 #include <mutex>
 #include <numeric>
+#include <optional>
 #include <regex>
 #include <set>
+#include <sstream>
 
 #ifdef _WIN32
 #include <fcntl.h>
@@ -188,7 +191,8 @@ public:
   }
 
   static bool ParseStatefile(const fs::path& statefilePath,
-    F3DOptionsTools::OptionsDict& outOptions, std::vector<std::string>& outFiles)
+    F3DOptionsTools::OptionsDict& outOptions, std::vector<std::string>& outFiles,
+    std::optional<F3DStarter::StatefileFileGroups>& outFileGroups)
   {
     std::ifstream stream(statefilePath);
     if (!stream.is_open())
@@ -197,12 +201,25 @@ public:
       return false;
     }
     return F3DInternals::ParseStatefileContent(
-      stream, statefilePath.parent_path(), outOptions, outFiles);
+      stream, statefilePath.parent_path(), outOptions, outFiles, outFileGroups);
   }
 
   static bool ParseStatefileContent(std::istream& stream, const fs::path& baseDir,
-    F3DOptionsTools::OptionsDict& outOptions, std::vector<std::string>& outFiles)
+    F3DOptionsTools::OptionsDict& outOptions, std::vector<std::string>& outFiles,
+    std::optional<F3DStarter::StatefileFileGroups>& outFileGroups)
   {
+    /* Resolve a path stored in a statefile against the statefile directory (baseDir), mirroring how
+     * the file paths were stored */
+    const auto resolvePath = [&baseDir](const std::string& stored)
+    {
+      fs::path path = stored;
+      if (path.is_relative() && !baseDir.empty())
+      {
+        path = (baseDir / path).lexically_normal();
+      }
+      return fs::absolute(path);
+    };
+
     try
     {
       const nlohmann::ordered_json root = nlohmann::ordered_json::parse(stream);
@@ -211,13 +228,27 @@ public:
       {
         for (const auto& file : root.at("files"))
         {
-          fs::path path = file.get<std::string>();
-          if (path.is_relative() && !baseDir.empty())
-          {
-            path = (baseDir / path).lexically_normal();
-          }
-          outFiles.emplace_back(path.string());
+          outFiles.emplace_back(resolvePath(file.get<std::string>()).string());
         }
+      }
+
+      // Optional app-specific file groups (including the ones not currently loaded), added by
+      // AugmentStatefileContent. Absent from statefiles produced by libf3d alone.
+      if (root.contains("file_groups"))
+      {
+        const nlohmann::ordered_json& fileGroups = root.at("file_groups");
+        F3DStarter::StatefileFileGroups groups;
+        groups.Current = fileGroups.at("current").get<int>();
+        for (const auto& group : fileGroups.at("groups"))
+        {
+          std::vector<fs::path> paths;
+          for (const auto& file : group.at("files"))
+          {
+            paths.emplace_back(resolvePath(file.get<std::string>()));
+          }
+          groups.Groups.emplace_back(group.at("key").get<std::string>(), std::move(paths));
+        }
+        outFileGroups = std::move(groups);
       }
 
       if (root.contains("options"))
@@ -252,18 +283,21 @@ public:
   }
 
   static bool ReadStatefileSource(const std::string& source,
-    F3DOptionsTools::OptionsDict& outOptions, std::vector<std::string>& outFiles)
+    F3DOptionsTools::OptionsDict& outOptions, std::vector<std::string>& outFiles,
+    std::optional<F3DStarter::StatefileFileGroups>& outFileGroups)
   {
     if (source == F3D_PIPED)
     {
-      return F3DInternals::ParseStatefileContent(std::cin, {}, outOptions, outFiles);
+      return F3DInternals::ParseStatefileContent(std::cin, {}, outOptions, outFiles, outFileGroups);
     }
 
-    return F3DInternals::ParseStatefile(f3d::utils::collapsePath(source), outOptions, outFiles);
+    return F3DInternals::ParseStatefile(
+      f3d::utils::collapsePath(source), outOptions, outFiles, outFileGroups);
   }
 
-  static bool ReadStatefileFromClipboard(
-    F3DOptionsTools::OptionsDict& outOptions, std::vector<std::string>& outFiles)
+  static bool ReadStatefileFromClipboard(F3DOptionsTools::OptionsDict& outOptions,
+    std::vector<std::string>& outFiles,
+    std::optional<F3DStarter::StatefileFileGroups>& outFileGroups)
   {
 #if F3D_MODULE_CLIP
     std::string content;
@@ -273,12 +307,53 @@ public:
       return false;
     }
     std::istringstream stream(content);
-    return F3DInternals::ParseStatefileContent(stream, {}, outOptions, outFiles);
+    return F3DInternals::ParseStatefileContent(stream, {}, outOptions, outFiles, outFileGroups);
 #else
     f3d::log::error("Clipboard support is not available in this build, "
                     "cannot load a statefile from the clipboard");
     return false;
 #endif
+  }
+
+  /* Add the app-specific `file_groups` entry (all file groups, including the ones not currently
+   * loaded) to a statefile content produced by libf3d. baseDir is the statefile directory, used to
+   * store paths relative to it when contained by it (empty to always store absolute paths) */
+  std::string AugmentStatefileContent(const std::string& content, const fs::path& baseDir) const
+  {
+    const auto storedPath = [&baseDir](const fs::path& file)
+    {
+      fs::path stored = fs::absolute(file);
+      if (!baseDir.empty())
+      {
+        const fs::path rel = fs::relative(fs::absolute(file), fs::absolute(baseDir));
+        if (!rel.empty() && *rel.begin() != "..")
+        {
+          stored = rel;
+        }
+      }
+      return stored.generic_string();
+    };
+
+    nlohmann::ordered_json groups = nlohmann::ordered_json::array();
+    for (const auto& [key, paths] : this->FilesGroups)
+    {
+      nlohmann::ordered_json files = nlohmann::ordered_json::array();
+      for (const fs::path& path : paths)
+      {
+        files.push_back(storedPath(path));
+      }
+      nlohmann::ordered_json group;
+      group["key"] = key;
+      group["files"] = files;
+      groups.push_back(group);
+    }
+
+    nlohmann::ordered_json root = nlohmann::ordered_json::parse(content);
+    nlohmann::ordered_json fileGroups;
+    fileGroups["current"] = this->CurrentFilesGroupIndex;
+    fileGroups["groups"] = groups;
+    root["file_groups"] = fileGroups;
+    return root.dump(2);
   }
 
   static bool HasHDRIExtension(const std::string& file)
@@ -1265,16 +1340,23 @@ int F3DStarter::Start(int argc, char** argv)
   {
     F3DOptionsTools::Parse(iter->second, loadStatefile);
   }
+  std::optional<StatefileFileGroups> statefileFileGroups;
   if (!loadStatefile.empty())
   {
     F3DOptionsTools::OptionsDict statefileOptions;
     std::vector<std::string> statefileFiles;
-    if (F3DInternals::ReadStatefileSource(loadStatefile, statefileOptions, statefileFiles))
+    if (F3DInternals::ReadStatefileSource(
+          loadStatefile, statefileOptions, statefileFiles, statefileFileGroups))
     {
       this->Internals->StatefileOptionsEntries.emplace_back(
         statefileOptions, "", "", "statefile options");
-      // Statefile files are loaded through the normal file group system, before input files
-      inputFiles.insert(inputFiles.begin(), statefileFiles.begin(), statefileFiles.end());
+      // When the statefile carries explicit file groups, they are restored as-is below; otherwise
+      // fall back to loading the flat file list through the normal file group system, before input
+      // files
+      if (!statefileFileGroups.has_value())
+      {
+        inputFiles.insert(inputFiles.begin(), statefileFiles.begin(), statefileFiles.end());
+      }
     }
   }
 
@@ -1382,14 +1464,31 @@ int F3DStarter::Start(int argc, char** argv)
   this->Internals->Engine->setOptions(this->Internals->LibOptions);
   f3d::log::debug("Engine configured");
 
+  // Restore explicit statefile file groups first, so command-line input files append after them
+  int statefileCurrentGroup = 0;
+  if (statefileFileGroups.has_value())
+  {
+    this->Internals->FilesGroups = statefileFileGroups->Groups;
+    statefileCurrentGroup = statefileFileGroups->Current;
+  }
+
   // Add all input files
   for (auto& file : inputFiles)
   {
     this->AddFile(file == F3D_PIPED ? fs::path(file) : f3d::utils::collapsePath(file));
   }
 
-  // Load a file
-  this->LoadFileGroup();
+  // Load a file, the statefile current group when one was restored
+  if (statefileFileGroups.has_value())
+  {
+    const int size = static_cast<int>(this->Internals->FilesGroups.size());
+    this->LoadFileGroup(
+      statefileCurrentGroup >= 0 && statefileCurrentGroup < size ? statefileCurrentGroup : 0);
+  }
+  else
+  {
+    this->LoadFileGroup();
+  }
 
   // Save a statefile if requested
   if (!this->Internals->AppOptions.SaveStatefile.empty())
@@ -2114,8 +2213,10 @@ void F3DStarter::SaveStatefile(const std::string& filenameTemplate)
 
   if (filenameTemplate == F3D_PIPED)
   {
-    // Write the statefile to the standard output
-    std::cout << this->Internals->Engine->saveStatefileToString() << "\n";
+    // Write the statefile to the standard output, with absolute file group paths
+    std::cout << this->Internals->AugmentStatefileContent(
+                   this->Internals->Engine->saveStatefileToString(), {})
+              << "\n";
     return;
   }
 
@@ -2129,6 +2230,17 @@ void F3DStarter::SaveStatefile(const std::string& filenameTemplate)
       fs::create_directories(statefilePath.parent_path());
     }
     this->Internals->Engine->saveStatefile(statefilePath);
+
+    // Read the libf3d statefile back to add the app file groups (including the ones not currently
+    // loaded), storing their paths relative to the statefile like libf3d does
+    std::ifstream readStream(statefilePath);
+    const std::string content{ std::istreambuf_iterator<char>(readStream),
+      std::istreambuf_iterator<char>() };
+    readStream.close();
+    std::ofstream writeStream(statefilePath);
+    writeStream << this->Internals->AugmentStatefileContent(content, statefilePath.parent_path())
+                << "\n";
+
     f3d::log::info("Statefile saved to ", statefilePath.string());
   }
   catch (const f3d::engine::statefile_exception& ex)
@@ -2145,7 +2257,9 @@ void F3DStarter::SaveStatefile(const std::string& filenameTemplate)
 void F3DStarter::SaveStatefileToClipboard()
 {
 #if F3D_MODULE_CLIP
-  if (clip::set_text(this->Internals->Engine->saveStatefileToString()))
+  // Absolute file group paths since the clipboard content has no associated directory
+  if (clip::set_text(this->Internals->AugmentStatefileContent(
+        this->Internals->Engine->saveStatefileToString(), {})))
   {
     f3d::log::info("Statefile copied to the clipboard");
   }
@@ -2184,12 +2298,14 @@ void F3DStarter::LoadStatefile(const std::string& source)
 
   F3DOptionsTools::OptionsDict statefileOptions;
   std::vector<std::string> statefileFiles;
-  if (!F3DInternals::ReadStatefileSource(resolvedSource, statefileOptions, statefileFiles))
+  std::optional<StatefileFileGroups> statefileFileGroups;
+  if (!F3DInternals::ReadStatefileSource(
+        resolvedSource, statefileOptions, statefileFiles, statefileFileGroups))
   {
     return;
   }
 
-  this->ApplyStatefile(statefileOptions, statefileFiles);
+  this->ApplyStatefile(statefileOptions, statefileFiles, statefileFileGroups);
 }
 
 //----------------------------------------------------------------------------
@@ -2197,17 +2313,20 @@ void F3DStarter::LoadStatefileFromClipboard()
 {
   F3DOptionsTools::OptionsDict statefileOptions;
   std::vector<std::string> statefileFiles;
-  if (!F3DInternals::ReadStatefileFromClipboard(statefileOptions, statefileFiles))
+  std::optional<StatefileFileGroups> statefileFileGroups;
+  if (!F3DInternals::ReadStatefileFromClipboard(
+        statefileOptions, statefileFiles, statefileFileGroups))
   {
     return;
   }
 
-  this->ApplyStatefile(statefileOptions, statefileFiles);
+  this->ApplyStatefile(statefileOptions, statefileFiles, statefileFileGroups);
 }
 
 //----------------------------------------------------------------------------
 void F3DStarter::ApplyStatefile(const std::map<std::string, std::string>& statefileOptions,
-  const std::vector<std::string>& statefileFiles)
+  const std::vector<std::string>& statefileFiles,
+  const std::optional<StatefileFileGroups>& statefileFileGroups)
 {
   this->Internals->Engine->setOptions(this->Internals->LibOptions);
   this->Internals->DynamicOptionsEntries.clear();
@@ -2220,12 +2339,29 @@ void F3DStarter::ApplyStatefile(const std::map<std::string, std::string>& statef
   {
     this->Internals->Engine->getInteractor().stopAnimation();
   }
+
   this->Internals->FilesGroups.clear();
-  for (const std::string& file : statefileFiles)
+  if (statefileFileGroups.has_value())
   {
-    this->AddFile(f3d::utils::collapsePath(file));
+    // Restore the exact file group structure, including groups that were not loaded
+    this->Internals->FilesGroups = statefileFileGroups->Groups;
+    const int size = static_cast<int>(this->Internals->FilesGroups.size());
+    int current = statefileFileGroups->Current;
+    if (current < 0 || current >= size)
+    {
+      current = 0;
+    }
+    this->LoadFileGroup(current, false, true);
   }
-  this->LoadFileGroup(0, false, true);
+  else
+  {
+    // Older or libf3d-only statefile without file groups: rebuild from the flat file list
+    for (const std::string& file : statefileFiles)
+    {
+      this->AddFile(f3d::utils::collapsePath(file));
+    }
+    this->LoadFileGroup(0, false, true);
+  }
   this->ResetWindowName();
 }
 

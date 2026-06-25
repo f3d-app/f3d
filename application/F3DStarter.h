@@ -10,12 +10,25 @@
 #include <filesystem>
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 class F3DStarter
 {
 public:
+  /**
+   * App-specific file group data stored in a statefile, alongside the libf3d state.
+   * Each group is a (key, files) pair, matching F3DInternals::FilesGroups, and Current is the
+   * index of the group that was loaded when the statefile was saved.
+   */
+  struct StatefileFileGroups
+  {
+    std::vector<std::pair<std::string, std::vector<std::filesystem::path>>> Groups;
+    int Current = 0;
+  };
+
   /**
    * Parse the options and configure a f3d::scene accordingly
    */
@@ -86,7 +99,8 @@ public:
    * Used by LoadStatefile and LoadStatefileFromClipboard.
    */
   void ApplyStatefile(const std::map<std::string, std::string>& statefileOptions,
-    const std::vector<std::string>& statefileFiles);
+    const std::vector<std::string>& statefileFiles,
+    const std::optional<StatefileFileGroups>& statefileFileGroups);
 
   F3DStarter();
   ~F3DStarter();
