@@ -21,6 +21,7 @@ struct TestTriggerHelper
     f3d::engine engine = f3d::engine::create(true);
     engine.getWindow().setSize(300, 300);
     engine.getScene().add(this->DataPath);
+    engine.getWindow().render();
 
     func(engine);
   }
