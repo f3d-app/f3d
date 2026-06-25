@@ -918,9 +918,8 @@ template<typename T>
 std::vector<std::string> getDomain(const f3d::options::domain_enum_t<T>& domain)
 {
   std::vector<std::string> ret;
-  std::ranges::transform(domain.enumeration, std::back_inserter(ret),
-                         [](const T& val)
-                         { return format(val); });
+  std::ranges::transform(
+    domain.enumeration, std::back_inserter(ret), [](const T& val) { return format(val); });
   return ret;
 }
 
@@ -947,9 +946,10 @@ void increase(T& val, const f3d::options::domain_range_t<T>& domain, bool up)
   newVal += dir * domain.increment;
 
   // Required because of double computation
-  bool upEqual = vtkMathUtilities::FuzzyCompare(newVal, domain.range[1], T{1e-12});
-  bool downEqual = vtkMathUtilities::FuzzyCompare(newVal, domain.range[0], T{1e-12});
-  if ((up && (newVal < domain.range[1] || upEqual)) || (!up && (newVal > domain.range[0] || downEqual)))
+  bool upEqual = vtkMathUtilities::FuzzyCompare(newVal, domain.range[1], T{ 1e-12 });
+  bool downEqual = vtkMathUtilities::FuzzyCompare(newVal, domain.range[0], T{ 1e-12 });
+  if ((up && (newVal < domain.range[1] || upEqual)) ||
+    (!up && (newVal > domain.range[0] || downEqual)))
   {
     val = newVal;
   }

@@ -30,7 +30,6 @@ using option_variant_t =
 class F3D_EXPORT options
 {
 public:
-
   /**
    * Enum class used by options::hasDomain
    * to provide information about the style of domain being used
