@@ -506,6 +506,9 @@ f3d_test(NAME TestCommandScriptLoadStatefile SCRIPT DATA dragon.vtu WORKING_DIR 
 f3d_test(NAME TestCommandScriptLoadStatefileFromOption SCRIPT DATA dragon.vtu WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --statefile-filename=${F3D_SOURCE_DIR}/testing/configs/test_statefile.json --verbose REGEXP "cow.vtp" NO_BASELINE)
 f3d_test(NAME TestCommandScriptLoadStatefileMostRecent SCRIPT DATA cow.vtp ARGS --statefile-filename=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileMostRecent/state_{n}.json --verbose REGEXP "from statefile options" NO_BASELINE)
 f3d_test(NAME TestCommandScriptLoadStatefileOverridesTweak SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "background.color' = '#0000ff' from statefile options" NO_BASELINE)
+# Save then reload a statefile with two file groups, navigate to the second (not currently loaded)
+# group: it only loads (VTKXMLVTU) if the file groups were restored
+f3d_test(NAME TestCommandScriptStatefileFileGroups SCRIPT DATA cow.vtp dragon.vtu ARGS --statefile-filename=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileFileGroups.json --verbose REGEXP "VTKXMLVTU" NO_BASELINE)
 
 # Basic record and play test
 f3d_test(NAME TestInteractionRecord DATA cow.vtp ARGS --interaction-test-record=${CMAKE_BINARY_DIR}/Testing/Temporary/TestInteractionRecord.log NO_BASELINE)
