@@ -7,7 +7,6 @@
 #include <vtkDataArrayRange.h>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
-#include <vtkImageExtractComponents.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Collection.h>
 #include <vtkImageReader2Factory.h>
@@ -384,26 +383,8 @@ double image::compare(const image& reference) const
       break;
   }
 
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260623)
-  // vtkImageSSIM::ComputeErrorMetrics didn't work for RGBA images,
-  // so we need to extract the RGB components first
-  vtkNew<vtkImageExtractComponents> extractResult;
-  extractResult->SetInputData(this->Internals->Image);
-  extractResult->SetComponents(0, 1, 2);
-  extractResult->Update();
-
-  vtkNew<vtkImageExtractComponents> extractReference;
-  extractReference->SetInputData(reference.Internals->Image);
-  extractReference->SetComponents(0, 1, 2);
-  extractReference->Update();
-
-  ssim->SetInputData(extractResult->GetOutput());
-  ssim->SetInputData(1, extractReference->GetOutput());
-#else
   ssim->SetInputData(this->Internals->Image);
   ssim->SetInputData(1, reference.Internals->Image);
-#endif
-
   ssim->Update();
   vtkDoubleArray* scalars = vtkArrayDownCast<vtkDoubleArray>(
     vtkDataSet::SafeDownCast(ssim->GetOutputDataObject(0))->GetPointData()->GetScalars());
