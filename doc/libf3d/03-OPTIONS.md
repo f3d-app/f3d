@@ -34,7 +34,7 @@ The default scene always has at most one animation.
 
 CLI: `--animation-indices`.
 
-### `scene.animation.speed_factor` (_ratio_, default: `1`)
+### `scene.animation.speed_factor` (_ratio_, default: `1`, domain: range: `0, 2`, increment: `0.1` )
 
 Set the animation speed factor to slow, speed up or even invert animation.
 
@@ -46,7 +46,7 @@ Set the animation time to load.
 
 CLI: `--animation-time`.
 
-### `scene.camera.index` (_int_, optional, **on load**)
+### `scene.camera.index` (_int_, optional, **on load**, domain: enumeration: `dynamic`)
 
 Select the scene camera to use when available in the file.
 The default scene always uses automatic camera.
@@ -325,7 +325,7 @@ Set the _size_ of points when showing vertices. Model-specified by default.
 
 CLI: `--point-size`.
 
-### `render.backface_type` (_string_, optional, **on load**)
+### `render.backface_type` (_string_, optional, **on load**, domain: enumeration: `visible, hidden`)
 
 Set the Backface type, can be `visible` or `hidden`, Model-specified by default.
 

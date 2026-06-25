@@ -25,7 +25,11 @@ The libf3d provides a few commands, many related to manipulating libf3d (options
 
 `set_reader_option Reader.option_name value`: A specific command to set a [reader option](02-SUPPORTED_FORMATS.md#reader-options), eg: `set_reader_option QuakeMDL.skin_index 1`
 
-`cycle_anti_aliasing`: A specific command to cycle between the anti-aliasing method (`none`,`fxaa`,`ssaa`,`taa`).
+`increase option.name`: A command to increase a libf3d option according to its range domain, if it has one, eg: `increase render.light.intensity`.
+
+`decrease option.name`: A command to decrease a libf3d option according to its range domain, if it has one, eg: `decrease render.light.intensity`.
+
+`cycle option.name`: A command to cycle a libf3d option according to its enumeration domain, if it has one, eg: `cycle render.effect.blending.mode`.
 
 `cycle_animation`: A specific command to cycle `scene.animation.index` option using model information. No argument.
 
@@ -42,14 +46,6 @@ eg: `elevation_camera 120`.
 `azimuth_camera value`: A specific command to tilt the camera right or left, takes an angle in degrees as an argument.
 eg: `azimuth_camera 120`.
 
-`increase_light_intensity`: A specific command to increase light intensity. No argument.
-
-`decrease_light_intensity`: A specific command to decrease light intensity. No argument.
-
-`increase_opacity`: A specific command to increase opacity. Unset opacity will be treated as if it has a value of 1. No argument.
-
-`decrease_opacity`: A specific command to decrease opacity. Unset opacity will be treated as if it has a value of 1. No argument.
-
 `print_scene_info`: A specific command to print information about the scene. No argument.
 
 `print_coloring_info`: A specific command to print information about coloring settings. No argument.
@@ -64,8 +60,6 @@ eg: `azimuth_camera 120`.
 Supports `front`, `top`, `right`, `back`, `bottom`, `left`, `isometric` arguments. eg: `set_camera top`.
 
 `toggle_volume_rendering`: A specific command to toggle `model.volume.enable` and print coloring information. No argument.
-
-`cycle_interactor_style`: A specific command to cycle between interaction styles (default, trackball, 2d). No argument.
 
 `stop_interactor`: A specific command to stop the interactor hence quitting the application. No argument.
 
@@ -170,6 +164,16 @@ eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 `remove_file_groups`: A specific command to remove all files. No argument.
 
 `open_file_dialog`: A specific command to open a file dialog to selected a file to load. No argument.
+
+## Domains
+
+Certain libf3d (options)[../libf3d/03-OPTIONS.md] have domains which can be interacted with using commands.
+
+A range domain is used through `increase` and `decrease` commands, it has inclusive minimum and maximum, as well as an increment.
+`increase` and `decrease` use increment to increase/decrease and cap at maximum/minimum respectively.
+
+An enum domain is used through `cycle` command, it just list possible values of the option.
+`cycle` just iterate over the different possible values and loops when reaching the end.
 
 ## Command Script (`--command-script`)
 

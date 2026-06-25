@@ -28,7 +28,18 @@ The callback takes an argument of type `f3d::interactor::interactor_state_t` all
 
 When running F3D, it was possible to specify the path for loading plugins using the environment variable `F3D_PLUGINS_PATH`. This variable has been removed in favor of the CLI option `--plugins-path` which is more secure.
 
-## Animation jump commands
+## Commands
+
+The following commands have been removed and should be replaced:
+
+ - `cycle_anti_aliasing` -> `cycle render.effect.antialiasing.mode`
+ - `cycle_blending` -> `cycle render.effect.blending.mode`
+ - `cycle_point_sprites` -> `cycle model.point_sprites.type`
+ - `increase_light_intensity` -> `increase render.light.intensity` (increments are different)
+ - `decrease_light_intensity` -> `decrease render.light.intensity` (increments are different)
+ - `increase_opacity` -> `increase model.color.opacity`
+ - `decrease_opacity` -> `decrease model.color.opacity`
+ - `cycle_interactor_style` -> `cycle interactor.style`
 
 The `jump_to_frame` and `jump_to_keyframe` commands no longer take a second boolean argument and now always perform an absolute jump. To perform a relative jump, use the new `jump_to_frame_relative` and `jump_to_keyframe_relative` commands:
 
