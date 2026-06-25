@@ -416,7 +416,7 @@ Set the _width_ of lines when showing edges. Model-specified by default.
 
 Set the Backface type. Model-specified by default.
 
-#### compare
+#### compare: The quad on the right is pointing away from the camera.
 
 | visible                                 | hidden                                 |
 | --------------------------------------- | -------------------------------------- |
@@ -958,7 +958,7 @@ Anti-aliasing method (`fxaa`: fast, `ssaa`: quality, `taa`: balanced, `none`: no
 > `taa` forces rendering of the scene at regular interval and will introduce ghosting artifacts on animated scenes.
 > It also doesn't work with offscreen rendering (when using `--output` option)
 
-#### compare
+#### compare: Notice how edges are smoother with SSAA.
 
 | OFF                                 | ON (SSAA)                          |
 | ----------------------------------- | ---------------------------------- |
