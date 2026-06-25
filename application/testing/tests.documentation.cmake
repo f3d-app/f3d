@@ -44,7 +44,23 @@ file(DOWNLOAD
     SHOW_PROGRESS
 )
 
-## Wrapper that sets many default arguments for documentation illustration tests
+#[==[.md
+# Wrapper that sets many common arguments for documentation illustration tests
+
+Usage:
+
+```
+f3d_doc_test(<NAME> [ARGS...])
+```
+  - `UI` Mark the test to require the presence of UI component and disable it otherwise
+  - `BACKGROUND` The background is visible, otherwise it's transparent
+  - `ROTATE` Rotate the camera to show the model from a different angle, otherwise it's front facing
+  - `NAME` Provide the name of the test, mandatory and must be unique
+  - `THRESHOLD` Provide the `--reference-threshold` to use instead of the default
+  - `DATA` Data to open, support multiple input, also set test labels accordingly
+  - `REF_IMAGE` Provide the reference image name, saved into `doc/user/images`
+  - `ARGS` Supplement arguments to add to the f3d command line
+#]==]
 function(f3d_test_doc)
   cmake_parse_arguments(F3D_TEST_DOC "UI;BACKGROUND;ROTATE" "NAME;DATA;REF_IMAGE;THRESHOLD" "ARGS" ${ARGN})
 
@@ -290,7 +306,7 @@ f3d_test_doc(NAME TestDocHDRICOC50 DATA DamagedHelmet.glb REF_IMAGE hdri_coc_50.
 
 ## --light-intensity
 f3d_test_doc(NAME TestDocLightIntensity1 DATA DamagedHelmet.glb REF_IMAGE light_intensity_1.png ROTATE)
-f3d_test_doc(NAME TestDocLightIntensity05 DATA DamagedHelmet.glb REF_IMAGE light_intensity_0.5.png ROTATE ARGS --light-intensity=0.5)
+f3d_test_doc(NAME TestDocLightIntensity2 DATA DamagedHelmet.glb REF_IMAGE light_intensity_2.png ROTATE ARGS --light-intensity=2)
 
 ## --scalar-coloring
 f3d_test_doc(NAME TestDocScalarColoringOFF DATA dragon.vtu REF_IMAGE scalar_coloring_off.png ROTATE ARGS)
@@ -318,11 +334,11 @@ f3d_test_doc(NAME TestDocScalarBarON DATA skull.vti REF_IMAGE scalar_bar_on.png 
 
 ## ---colormap-file
 ### OFF: skull_baseline.png
-f3d_test_doc(NAME TestDocColorMapViridis DATA skull.vti REF_IMAGE color_map_viridis.png ARGS -sv --up=z --coloring-range=40,200 --colormap-file=${F3D_SOURCE_DIR}/resources/colormaps/viridis.png)
+f3d_test_doc(NAME TestDocColorMapViridis DATA skull.vti REF_IMAGE colormap_viridis.png ARGS -sv --up=z --coloring-range=40,200 --colormap-file=${F3D_SOURCE_DIR}/resources/colormaps/viridis.png)
 
 ## --colormap-discretization
-f3d_test_doc(NAME TestDocColorMapDiscretizationDefault DATA dragon.vtu REF_IMAGE color_map_discretization_default.png ROTATE ARGS -s "--coloring-array=UV coordinates from field")
-f3d_test_doc(NAME TestDocColorMapDiscretization8 DATA dragon.vtu REF_IMAGE color_map_discretization_8.png ROTATE ARGS -s "--coloring-array=UV coordinates from field" --colormap-discretization=8)
+f3d_test_doc(NAME TestDocColorMapDiscretizationDefault DATA dragon.vtu REF_IMAGE colormap_discretization_default.png ROTATE ARGS -s "--coloring-array=UV coordinates from field")
+f3d_test_doc(NAME TestDocColorMapDiscretization8 DATA dragon.vtu REF_IMAGE colormap_discretization_8.png ROTATE ARGS -s "--coloring-array=UV coordinates from field" --colormap-discretization=8)
 
 ## --volume
 f3d_test_doc(NAME TestDocVolumeOFF DATA skull.vti REF_IMAGE volume_off.png ARGS -s --up=z --coloring-range=40,200)

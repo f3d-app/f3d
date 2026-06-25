@@ -715,9 +715,9 @@ _Adjust the intensity_ of every light in the scene (except HDRI).
 
 #### compare
 
-| 1 (default)                         | 0.5                                   |
-| ----------------------------------- | ------------------------------------- |
-| ![](./images/light_intensity_1.png) | ![](./images/light_intensity_0.5.png) |
+| 1 (default)                         | 2                                   |
+| ----------------------------------- | ----------------------------------- |
+| ![](./images/light_intensity_1.png) | ![](./images/light_intensity_2.png) |
 
 ## Scientific visualization options
 
@@ -795,9 +795,9 @@ Use with the scalar option.
 
 #### compare
 
-| Default (inferno)                | Viridis                             |
-| -------------------------------- | ----------------------------------- |
-| ![](./images/skull_baseline.png) | ![](./images/color_map_viridis.png) |
+| Default (inferno)                | Viridis                            |
+| -------------------------------- | ---------------------------------- |
+| ![](./images/skull_baseline.png) | ![](./images/colormap_viridis.png) |
 
 ### `--colormap=<colormap>` (_colormap_)
 
@@ -811,9 +811,9 @@ Set the number of distinct colors from [1, N] will be used in the colormap. Any 
 
 #### compare
 
-| Default                                            | 8                                            |
-| -------------------------------------------------- | -------------------------------------------- |
-| ![](./images/color_map_discretization_default.png) | ![](./images/color_map_discretization_8.png) |
+| Default                                           | 8                                           |
+| ------------------------------------------------- | ------------------------------------------- |
+| ![](./images/colormap_discretization_default.png) | ![](./images/colormap_discretization_8.png) |
 
 ### `-v`, `--volume` (_bool_, default: `false`)
 
