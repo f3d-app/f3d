@@ -59,7 +59,7 @@ Restore the application state from a statefile right after starting, then contin
 
 ### `--save-statefile=<file path>` (_string_)
 
-Save the application state to a statefile right after loading, then continue running. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, the statefile is written to the standard output.
+Save the application state to a statefile right after loading, then continue running. All file groups are saved, including the ones not currently loaded. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, the statefile is written to the standard output.
 
 ### `--statefile-filename=<file path>` (_string_, default: `{app}/{model}_{n}.json`)
 
