@@ -944,6 +944,18 @@ std::vector<std::string> getEnumDomain(const f3d::options::domain_enum_t<std::st
   return domain.enumeration;
 }
 
+
+//----------------------------------------------------------------------------
+/**
+ * Needed for increase implementation for ratio_t
+ */
+ratio_t operator+=(f3d::ratio_t& ratio, const double& incr)
+{
+  double val = static_cast<double>(ratio);
+  val += incr;
+  return f3d::ratio_t(val);
+}
+
 //----------------------------------------------------------------------------
 /**
  * Templated generic increase method for provided val and domain.
