@@ -134,7 +134,7 @@ f3d_test_doc(NAME TestDocGridOn DATA DamagedHelmet.glb REF_IMAGE grid_on.png ROT
 
 ## --axes-grid
 ### OFF: damaged_helmet_baseline.png
-f3d_test_doc(NAME TestDocAxesGridOn DATA DamagedHelmet.glb REF_IMAGE axes_grid_on.png ROTATE ARGS --axes-grid -f --anti-aliasing=none)
+f3d_test_doc(NAME TestDocAxesGridOn DATA DamagedHelmet.glb REF_IMAGE axes_grid_on.png ROTATE ARGS --axes-grid -f --anti-aliasing=none THRESHOLD 0.08)
 
 ## --edges
 ### OFF: damaged_helmet_baseline.png

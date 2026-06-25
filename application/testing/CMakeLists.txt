@@ -48,6 +48,9 @@ endif()
 
 include(tests.watch.cmake)
 
-if(F3D_TESTING_ENABLE_ILLUSTRATION_TESTS)
+# Some documentation images require VTK >= 9.6 to be generated correctly.
+# While we could generate some of them with VTK < 9.6,
+# the goal here is not feature coverage but to ensure that the documentation is correct.
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.0 AND F3D_TESTING_ENABLE_ILLUSTRATION_TESTS)
   include(tests.documentation.cmake)
 endif()
