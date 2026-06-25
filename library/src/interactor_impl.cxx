@@ -1112,15 +1112,28 @@ interactor& interactor_impl::initCommands()
     },
     command_documentation_t{ "roll_camera value", "roll the camera on its side" });
 
-  this->addCommand("jump_to_frame",
+  this->addCommand(
+    "jump_to_frame",
     [&](const std::vector<std::string>& args)
     {
-      check_args(args, 2, "jump_to_frame");
+      check_args(args, 1, "jump_to_frame");
       const int frame = options::parse<int>(args[0]);
-      const bool relative = options::parse<bool>(args[1]);
       this->Internals->AnimationManager->SetDeltaTime(this->Internals->CallbackDeltaTime);
-      this->Internals->AnimationManager->JumpToFrame(frame, relative);
-    });
+      this->Internals->AnimationManager->JumpToFrame(frame, false);
+    },
+    command_documentation_t{ "jump_to_frame index", "load animation at a specific frame" });
+
+  this->addCommand(
+    "jump_to_frame_relative",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 1, "jump_to_frame_relative");
+      const int frame = options::parse<int>(args[0]);
+      this->Internals->AnimationManager->SetDeltaTime(this->Internals->CallbackDeltaTime);
+      this->Internals->AnimationManager->JumpToFrame(frame, true);
+    },
+    command_documentation_t{
+      "jump_to_frame_relative offset", "move animation a number of frames forward or backward" });
 
   this->addCommand(
     "elevation_camera",
@@ -1307,12 +1320,22 @@ interactor& interactor_impl::initCommands()
     "jump_to_keyframe",
     [&](const std::vector<std::string>& args)
     {
-      check_args(args, 2, "jump_to_keyframe");
-      int keyframe = options::parse<int>(args[0]);
-      bool relative = options::parse<bool>(args[1]);
-      this->Internals->AnimationManager->JumpToKeyFrame(keyframe, relative);
+      check_args(args, 1, "jump_to_keyframe");
+      const int keyframe = options::parse<int>(args[0]);
+      this->Internals->AnimationManager->JumpToKeyFrame(keyframe, false);
     },
-    command_documentation_t{ "jump_to_keyframe", "Jump to animation's key frame" });
+    command_documentation_t{ "jump_to_keyframe index", "jump to a specific animation keyframe" });
+
+  this->addCommand(
+    "jump_to_keyframe_relative",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 1, "jump_to_keyframe_relative");
+      const int keyframe = options::parse<int>(args[0]);
+      this->Internals->AnimationManager->JumpToKeyFrame(keyframe, true);
+    },
+    command_documentation_t{
+      "jump_to_keyframe_relative offset", "move a number of keyframes forward or backward" });
 
   this->addCommand(
     "toggle_animation", [&](const std::vector<std::string>&) { this->toggleAnimation(); },

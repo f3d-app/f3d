@@ -27,3 +27,12 @@ The callback takes an argument of type `f3d::interactor::interactor_state_t` all
 ## F3D_PLUGINS_PATH
 
 When running F3D, it was possible to specify the path for loading plugins using the environment variable `F3D_PLUGINS_PATH`. This variable has been removed in favor of the CLI option `--plugins-path` which is more secure.
+
+## Animation jump commands
+
+The `jump_to_frame` and `jump_to_keyframe` commands no longer take a second boolean argument and now always perform an absolute jump. To perform a relative jump, use the new `jump_to_frame_relative` and `jump_to_keyframe_relative` commands:
+
+- `jump_to_frame 10 false` -> `jump_to_frame 10`
+- `jump_to_frame 1 true` -> `jump_to_frame_relative 1`
+- `jump_to_keyframe 4 false` -> `jump_to_keyframe 4`
+- `jump_to_keyframe 1 true` -> `jump_to_keyframe_relative 1`

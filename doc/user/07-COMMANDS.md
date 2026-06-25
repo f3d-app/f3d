@@ -75,28 +75,37 @@ Supports `front`, `top`, `right`, `back`, `bottom`, `left`, `isometric` argument
 
 `toggle_animation_backward`: A specific command to start/stop the animation backward. No argument.
 
-`jump_to_frame`: A specific command to load an animation at a specific frame, takes a number and a boolean as arguments.
+`jump_to_frame`: A specific command to load an animation at a specific frame, takes a frame index as argument.
 eg:
 
-- `jump_to_frame 1 true` jump to next frame.
-- `jump_to_frame -1 true` jump to previous frame.
-- `jump_to_frame 0 false` jump to frame 0.
-- `jump_to_frame 1 false` jump to frame 1.
-- `jump_to_frame 10 false` jump to frame 10.
-- `jump_to_frame -1 false` jump to last frame.
-- `jump_to_frame -2 false` jump to second last frame.
+- `jump_to_frame 0` jump to frame 0.
+- `jump_to_frame 1` jump to frame 1.
+- `jump_to_frame 10` jump to frame 10.
+- `jump_to_frame -1` jump to last frame.
+- `jump_to_frame -2` jump to second last frame.
 
-`jump_to_keyframe`: A specific command to load an animation at a specific keyframe, takes a number and a boolean as arguments.
+`jump_to_frame_relative`: A specific command to move the animation by a number of frames relative to the current frame, takes a frame offset as argument.
+eg:
+
+- `jump_to_frame_relative 1` jump to next frame.
+- `jump_to_frame_relative -1` jump to previous frame.
+
+`jump_to_keyframe`: A specific command to load an animation at a specific keyframe, takes a keyframe index as argument.
+When jumping to a keyframe, the target keyframe index is adjusted to stay within the total number of available keyframes, avoiding invalid keyframe access.
+eg:
+
+- `jump_to_keyframe 0` jump to animation start frame.
+- `jump_to_keyframe 1` jump to keyframe 1.
+- `jump_to_keyframe 10` jump to keyframe 10.
+
+`jump_to_keyframe_relative`: A specific command to move the animation by a number of keyframes relative to the current keyframe, takes a keyframe offset as argument.
 When jumping between keyframes, the target keyframe index is adjusted to stay within the total number of available keyframes, avoiding invalid keyframe access.
 eg:
 
-- `jump_to_keyframe 1 true` jump to next keyframe.
-- `jump_to_keyframe -1 true` jump to previous keyframe.
-- `jump_to_keyframe 0 true` jump to closest keyframe.
-- `jump_to_keyframe 0 false` jump to animation start frame.
-- `jump_to_keyframe 1 false` jump to keyframe 1.
-- `jump_to_keyframe 10 false` jump to keyframe 10.
-- `jump_to_keyframe 10 true` jump 10 keyframes ahead.
+- `jump_to_keyframe_relative 0` jump to closest keyframe.
+- `jump_to_keyframe_relative 1` jump to next keyframe.
+- `jump_to_keyframe_relative -1` jump to previous keyframe.
+- `jump_to_keyframe_relative 10` jump 10 keyframes ahead.
 
 This command is currently supported only by the following readers :
 
