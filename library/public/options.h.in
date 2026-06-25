@@ -30,6 +30,12 @@ using option_variant_t =
 class F3D_EXPORT options
 {
 public:
+
+  /**
+   * Enum class used by options::hasDomain
+   * to provide information about the style of domain being used
+   * for a specific option
+   */
   enum class F3D_EXPORT domain_style : std::uint8_t
   {
     RANGE = 1,
@@ -154,44 +160,50 @@ public:
   options& removeValue(std::string_view name);
 
   /**
-   *  Return true if an option has a domain, false otherwise.
-   *  When returning true, set provided style to the domain style.
+   * Return true if an option has a domain, false otherwise.
+   * When returning true, set provided style to the domain_style.
    *
-   *  Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::inexistent_exception if option does not exist.
    */
   [[nodiscard]] bool hasDomain(std::string_view name, domain_style& style) const;
 
   /**
-   *  Return a string vector version of the domain of provided option.
-   *  For a range domain, [0] and [1] are min and max respectively, [2] is the increment.
-   *  For a enum domain, the enumeration is provided as is.
-   *  Throw options::incompatible_exception if option has no domain.
-   *  Throws an options::inexistent_exception if option does not exist.
+   * Return a string vector version of the domain of provided option.
+   * For a range domain, [0] and [1] are min and max respectively, [2] is the increment.
+   * For a enum domain, the enumeration is provided as is.
+   * Throw options::incompatible_exception if option has no domain.
+   * Throws an options::inexistent_exception if option does not exist.
    */
   [[nodiscard]] std::vector<std::string> getDomain(std::string_view name) const;
 
   /**
-   *  Increase an option value if it has a range domain, else throws
-   *  options::incompatible_exception. Increasing above the max is capped at the maximum.
+   * Increase an option value if it has a range domain, else throws
+   * options::incompatible_exception.
+   * Increasing above the max is capped at the maximum.
+   * Increasing an optional option without a value set it to the domain minimum.
    *
-   *  Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::inexistent_exception if option does not exist.
    */
   options& increase(std::string_view name);
 
   /**
-   *  Decrease an option value if it has a range domain, else throws
-   * options::incompatible_exception. Decreading below the min is capped at the minimum.
+   * Decrease an option value if it has a range domain, else throws
+   * options::incompatible_exception.
+   * Decreasing below the min is capped at the minimum.
+   * Decreasing an optional option without a value set it to the domain maximum.
    *
-   *  Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::inexistent_exception if option does not exist.
    */
   options& decrease(std::string_view name);
 
   /**
-   *  Cycle an option value if it has an enumeration domain, else throws
-   * options::incompatible_exception. Loops over the beginning of the enumeration domain when
-   * reaching the end.
+   * Cycle an option value if it has an enumeration domain, else throws
+   * options::incompatible_exception.
+   * Loops over the beginning of the enumeration domain when reaching the end.
+   * Cycling an optional option with a value set it to the first in the enumeration domain.
+   * Looping an optional option removes the value.
    *
-   *  Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::inexistent_exception if option does not exist.
    */
   options& cycle(std::string_view name);
 
@@ -251,6 +263,10 @@ public:
     explicit no_value_exception(const std::string& what = "");
   };
 
+  /**
+   * Struct used in the domains struct
+   * for range domains
+   */
   template<typename T>
   struct domain_range_t
   {
@@ -258,6 +274,10 @@ public:
     T increment;
   };
 
+  /**
+   * Struct used in the domains struct
+   * for enumeration domains
+   */
   template<typename T>
   struct domain_enum_t
   {
