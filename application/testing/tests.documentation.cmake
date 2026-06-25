@@ -293,8 +293,8 @@ f3d_test_doc(NAME TestDocHDRICOCDefault DATA DamagedHelmet.glb REF_IMAGE hdri_co
 f3d_test_doc(NAME TestDocHDRICOC50 DATA DamagedHelmet.glb REF_IMAGE hdri_coc_50.png RESOLUTION 800,600 ROTATE ARGS -fju --blur-coc=50)
 
 ## --light-intensity
-f3d_test_doc(NAME TestDocLightIntensity1 DATA DamagedHelmet.glb REF_IMAGE light_intensity_1.png ROTATE ARGS -f)
-f3d_test_doc(NAME TestDocLightIntensity05 DATA DamagedHelmet.glb REF_IMAGE light_intensity_0.5.png ROTATE ARGS --light-intensity=0.5 -f)
+f3d_test_doc(NAME TestDocLightIntensity1 DATA DamagedHelmet.glb REF_IMAGE light_intensity_1.png ROTATE)
+f3d_test_doc(NAME TestDocLightIntensity05 DATA DamagedHelmet.glb REF_IMAGE light_intensity_0.5.png ROTATE ARGS --light-intensity=0.5)
 
 ## --scalar-coloring
 f3d_test_doc(NAME TestDocScalarColoringOFF DATA dragon.vtu REF_IMAGE scalar_coloring_off.png ROTATE ARGS)

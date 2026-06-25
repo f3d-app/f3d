@@ -187,7 +187,7 @@ Set the size of the _unit square_ for the grid. If not set (the default) a suita
 
 #### compare
 
-| Default                             | ON                            |
+| Auto                                | 2                             |
 | ----------------------------------- | ----------------------------- |
 | ![](./images/grid_unit_default.png) | ![](./images/grid_unit_2.png) |
 
@@ -207,7 +207,7 @@ Set the color grid lines.
 
 #### compare
 
-| Default                              | Cyan                              |
+| Black (default)                      | Cyan                              |
 | ------------------------------------ | --------------------------------- |
 | ![](./images/grid_color_default.png) | ![](./images/grid_color_cyan.png) |
 
@@ -217,7 +217,7 @@ Set the reflection strength on the grid.
 
 #### compare
 
-| OFF                                   | ON                                   |
+| 0 (OFF)                               | 0.5                                  |
 | ------------------------------------- | ------------------------------------ |
 | ![](./images/grid_reflection_off.png) | ![](./images/grid_reflection_on.png) |
 
@@ -364,9 +364,9 @@ Adjusts the scales of normal glyphs.
 
 #### compare
 
-| 0.3                                       | 1                                       |
-| ----------------------------------------- | --------------------------------------- |
-| ![](./images/normal_glyphs_scale_0.3.png) | ![](./images/normal_glyphs_scale_1.png) |
+| 0.3                                       | 0.7                                       |
+| ----------------------------------------- | ----------------------------------------- |
+| ![](./images/normal_glyphs_scale_0.3.png) | ![](./images/normal_glyphs_scale_0.7.png) |
 
 ### `-o`, `--point-sprites=<none|sphere|gaussian|circle|stddev|bound|cross>` (_string_, default: `none`, implicit: `sphere`)
 
@@ -384,9 +384,9 @@ Set the _size_ of point sprites.
 
 #### compare
 
-| 0.5                                    | 0.2                                      |
-| -------------------------------------- | ---------------------------------------- |
-| ![](./images/point_sprites_sphere.png) | ![](./images/point_sprites_size_0.2.png) |
+| 5                                      | 2                                      |
+| -------------------------------------- | -------------------------------------- |
+| ![](./images/point_sprites_sphere.png) | ![](./images/point_sprites_size_2.png) |
 
 ### `--point-sprites-absolute-size` (_bool_, default: `false`)
 
@@ -398,9 +398,9 @@ Set the _size_ of points when showing vertices. Model-specified by default.
 
 #### compare
 
-| Default (10)                    | 5                              |
+| Default (10)                    | 3                              |
 | ------------------------------- | ------------------------------ |
-| ![](./images/point_size_10.png) | ![](./images/point_size_5.png) |
+| ![](./images/point_size_10.png) | ![](./images/point_size_3.png) |
 
 ### `--line-width=<size>` (_double_)
 
@@ -711,7 +711,7 @@ Blur circle of confusion radius.
 
 ### `--light-intensity` (_double_, default: `1.0`)
 
-_Adjust the intensity_ of every light in the scene.
+_Adjust the intensity_ of every light in the scene (except HDRI).
 
 #### compare
 
