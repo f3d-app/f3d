@@ -595,7 +595,20 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
     ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoSavedSettings |
     ImGuiWindowFlags_HorizontalScrollbar;
 
-  ImGui::Begin("Scene Hierarchy", nullptr, flags);
+  // Set up window with disabled left edge rescaling
+
+  ImVec2 gotMousePosition = ImGui::GetMousePos();
+
+  ImVec2 gotWindowPosition = ImVec2(0.0f, 0.0f);
+
+  if (gotMousePosition.x - 7 <= posX && ImGui::IsAnyItemActive() == false)
+  {
+    ImGui::Begin("Scene Hierarchy", nullptr, flags | ImGuiWindowFlags_NoResize);
+  }
+  else
+  {
+    ImGui::Begin("Scene Hierarchy", nullptr, flags);
+  }
 
   vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
   assert(ren != nullptr);
