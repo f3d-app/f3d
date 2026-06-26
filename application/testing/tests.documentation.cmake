@@ -64,8 +64,9 @@ f3d_doc_test(<NAME> [ARGS...])
 function(f3d_test_doc)
   cmake_parse_arguments(F3D_TEST_DOC "UI;BACKGROUND;ROTATE" "NAME;DATA;REF_IMAGE;THRESHOLD" "ARGS" ${ARGN})
 
-  if(NOT F3D_TEST_DOC_THRESHOLD)
-    set(F3D_TEST_DOC_THRESHOLD 0.04)
+  set(_f3d_test_doc_threshold "")
+  if(F3D_TEST_DOC_THRESHOLD)
+    set(_f3d_test_doc_threshold "THRESHOLD ${F3D_TEST_DOC_THRESHOLD}")
   endif()
 
   set(_f3d_test_doc_args
@@ -98,7 +99,7 @@ function(f3d_test_doc)
     BASELINE_PATH ${F3D_SOURCE_DIR}/doc/user/images/${F3D_TEST_DOC_REF_IMAGE}
     OUTPUT_PATH ${CMAKE_BINARY_DIR}/Testing/Temporary/${F3D_TEST_DOC_REF_IMAGE}
     RESOLUTION 800,600
-    THRESHOLD ${F3D_TEST_DOC_THRESHOLD}
+    ${_f3d_test_doc_threshold}
     ${_f3d_test_doc_ui}
     ARGS ${_f3d_test_doc_args}
     LONG_TIMEOUT
@@ -115,15 +116,15 @@ f3d_test_doc(NAME TestDocUpY DATA DamagedHelmet.glb REF_IMAGE up_y.png ARGS --up
 f3d_test_doc(NAME TestDocUpZ DATA DamagedHelmet.glb REF_IMAGE up_z.png ARGS --up=z -gfx UI)
 
 ## --x-color
-f3d_test_doc(NAME TestDocXColorDefault DATA DamagedHelmet.glb REF_IMAGE color_default.png ROTATE ARGS -gfx UI)
+f3d_test_doc(NAME TestDocXColorDefault DATA DamagedHelmet.glb REF_IMAGE x_color_default.png ROTATE ARGS -gfx UI)
 f3d_test_doc(NAME TestDocXColorYellow DATA DamagedHelmet.glb REF_IMAGE x_color_yellow.png ROTATE ARGS -gfx --x-color=yellow UI)
 
 ## --y-color
-### Default: color_default.png
+### Default: x_color_default.png
 f3d_test_doc(NAME TestDocYColorYellow DATA DamagedHelmet.glb REF_IMAGE y_color_yellow.png ROTATE ARGS -gfx --y-color=yellow UI)
 
 ## --z-color
-### Default: color_default.png
+### Default: x_color_default.png
 f3d_test_doc(NAME TestDocZColorYellow DATA DamagedHelmet.glb REF_IMAGE z_color_yellow.png ROTATE ARGS -gfx --z-color=yellow UI)
 
 ## --grid-unit
