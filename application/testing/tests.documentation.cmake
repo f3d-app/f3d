@@ -81,6 +81,11 @@ function(f3d_test_doc)
     list(APPEND _f3d_test_doc_args --camera-direction=-1,-0.5,-1)
   endif()
 
+  set(_f3d_test_doc_ui "")
+  if(F3D_TEST_DOC_UI)
+    set(_f3d_test_doc_ui "UI")
+  endif()
+
   cmake_path(IS_ABSOLUTE F3D_TEST_DOC_DATA _f3d_doc_data_absolute)
   set(_f3d_doc_data ${F3D_TEST_DOC_DATA})
   if (NOT _f3d_doc_data_absolute)
@@ -94,6 +99,7 @@ function(f3d_test_doc)
     OUTPUT_PATH ${CMAKE_BINARY_DIR}/Testing/Temporary/${F3D_TEST_DOC_REF_IMAGE}
     RESOLUTION 800,600
     THRESHOLD ${F3D_TEST_DOC_THRESHOLD}
+    ${_f3d_test_doc_ui}
     ARGS ${_f3d_test_doc_args}
     LONG_TIMEOUT
     LABELS doc
@@ -105,20 +111,20 @@ f3d_test_doc(NAME TestDocDamagedHelmetBaseline DATA DamagedHelmet.glb REF_IMAGE 
 f3d_test_doc(NAME TestDocSkullBaseline DATA skull.vti REF_IMAGE skull_baseline.png ARGS -sv --up=z --coloring-range=40,200)
 
 ## --up
-f3d_test_doc(NAME TestDocUpY DATA DamagedHelmet.glb REF_IMAGE up_y.png ARGS --up=y -gfx)
-f3d_test_doc(NAME TestDocUpZ DATA DamagedHelmet.glb REF_IMAGE up_z.png ARGS --up=z -gfx)
+f3d_test_doc(NAME TestDocUpY DATA DamagedHelmet.glb REF_IMAGE up_y.png ARGS --up=y -gfx UI)
+f3d_test_doc(NAME TestDocUpZ DATA DamagedHelmet.glb REF_IMAGE up_z.png ARGS --up=z -gfx UI)
 
 ## --x-color
-f3d_test_doc(NAME TestDocXColorDefault DATA DamagedHelmet.glb REF_IMAGE color_default.png ROTATE ARGS -gfx)
-f3d_test_doc(NAME TestDocXColorYellow DATA DamagedHelmet.glb REF_IMAGE x_color_yellow.png ROTATE ARGS -gfx --x-color=yellow)
+f3d_test_doc(NAME TestDocXColorDefault DATA DamagedHelmet.glb REF_IMAGE color_default.png ROTATE ARGS -gfx UI)
+f3d_test_doc(NAME TestDocXColorYellow DATA DamagedHelmet.glb REF_IMAGE x_color_yellow.png ROTATE ARGS -gfx --x-color=yellow UI)
 
 ## --y-color
 ### Default: color_default.png
-f3d_test_doc(NAME TestDocYColorYellow DATA DamagedHelmet.glb REF_IMAGE y_color_yellow.png ROTATE ARGS -gfx --y-color=yellow)
+f3d_test_doc(NAME TestDocYColorYellow DATA DamagedHelmet.glb REF_IMAGE y_color_yellow.png ROTATE ARGS -gfx --y-color=yellow UI)
 
 ## --z-color
 ### Default: color_default.png
-f3d_test_doc(NAME TestDocZColorYellow DATA DamagedHelmet.glb REF_IMAGE z_color_yellow.png ROTATE ARGS -gfx --z-color=yellow)
+f3d_test_doc(NAME TestDocZColorYellow DATA DamagedHelmet.glb REF_IMAGE z_color_yellow.png ROTATE ARGS -gfx --z-color=yellow UI)
 
 ## --grid-unit
 f3d_test_doc(NAME TestDocGridUnitDefault DATA DamagedHelmet.glb REF_IMAGE grid_unit_default.png ROTATE ARGS -gf)
