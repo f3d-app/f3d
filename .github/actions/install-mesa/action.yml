@@ -51,10 +51,15 @@ runs:
         python -m pip install meson mako packaging PyYAML
         choco install winflexbison3 --no-progress -y
 
-    - name: Install MESA build dependencies (macOS)
+    - name: Install MESA build dependencies (macOS/Linux)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os != 'Windows'
       shell: bash
       run: python -m pip install meson mako packaging PyYAML
+
+    - name: Install Bison (Linux)
+      if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Linux'
+      shell: bash
+      run: sudo apt-get install -y bison byacc
 
     - name: Configure MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
@@ -93,23 +98,23 @@ runs:
       if: runner.os == 'Windows'
       shell: bash
       run: |
-        echo "MESA_LIBS=osmesa.dll libgallium_wgl.dll opengl32.dll" >> $GITHUB_ENV
+        echo "MESA_LIBS=bin/*.dll" >> $GITHUB_ENV
 
     - name: Set library names
       if: runner.os == 'Linux'
       shell: bash
       run: |
-        echo "MESA_LIBS=libOSMesa.so libglapi.so" >> $GITHUB_ENV
+        echo "MESA_LIBS=lib/*.so" >> $GITHUB_ENV
 
     - name: Set library names
       if: runner.os == 'macOS'
       shell: bash
       run: |
-        echo "MESA_LIBS=libOSMesa.dylib libglapi.dylib" >> $GITHUB_ENV
+        echo "MESA_LIBS=lib/*.dylib" >> $GITHUB_ENV
 
     - name: Copy to specified path
       if: inputs.path != ''
-      working-directory: ${{github.workspace}}/dependencies/mesa_install/lib
+      working-directory: ${{github.workspace}}/dependencies/mesa_install
       shell: bash
       run: |
         for dir in ${{inputs.path}}; do
