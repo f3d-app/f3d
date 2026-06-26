@@ -193,11 +193,11 @@ f3d_test_doc(NAME TestDocNormalGlyphsScale07 DATA DamagedHelmet.glb REF_IMAGE no
 
 ## --point-sprites
 ### OFF: damaged_helmet_baseline.png
-f3d_test_doc(NAME TestDocPointSpritesSphere DATA DamagedHelmet.glb REF_IMAGE point_sprites_sphere.png ARGS --point-sprites=sphere --point-sprites-size=5)
+f3d_test_doc(NAME TestDocPointSpritesSphere DATA DamagedHelmet.glb REF_IMAGE point_sprites_sphere.png ROTATE ARGS --point-sprites=sphere --point-sprites-size=5)
 
 ## --point-sprites-size
 ### 0.5: point_sprites_sphere.png
-f3d_test_doc(NAME TestDocPointSpritesSize2 DATA DamagedHelmet.glb REF_IMAGE point_sprites_size_2.png ARGS --point-sprites=sphere --point-sprites-size=2)
+f3d_test_doc(NAME TestDocPointSpritesSize2 DATA DamagedHelmet.glb REF_IMAGE point_sprites_size_2.png ROTATE ARGS --point-sprites=sphere --point-sprites-size=2)
 
 ## --point-size
 f3d_test_doc(NAME TestDocPointSize10 DATA pointCloud.vtp REF_IMAGE point_size_10.png ARGS -s --colormap-file=${F3D_SOURCE_DIR}/resources/colormaps/viridis.png)
