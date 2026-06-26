@@ -51,7 +51,7 @@ nlohmann::ordered_json CaptureState(f3d::engine& eng, const fs::path& baseDir)
   }
   if (files.empty())
   {
-    f3d::log::warn("No files to save in statefile");
+    f3d::log::info("No files to save in statefile");
   }
   root["files"] = files;
 
