@@ -290,7 +290,7 @@ CLI: `--ambient-occlusion`.
 
 ### `render.effect.tone_mapping` (_bool_, default: `false`)
 
-Enable generic filmic _Tone Mapping Pass_. This technique is used to map colors properly to the monitor colors.
+Enable neutral _Tone Mapping_. This technique is used to map colors properly to the monitor colors.
 
 CLI: `--tone-mapping`.
 
@@ -434,7 +434,7 @@ CLI: `--blur-coc`.
 
 ### `render.light.intensity` (_double_, default: `1.0`)
 
-Adjust the intensity of every light in the scene.
+Adjust the intensity of every light in the scene (except HDRI).
 
 CLI: `--light-intensity`.
 

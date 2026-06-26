@@ -211,6 +211,7 @@ cmake_dependent_option(F3D_TESTING_ENABLE_GLX_TESTS "Enable tests that require a
 cmake_dependent_option(F3D_TESTING_ENABLE_EGL_TESTS "Enable tests that require EGL to run" ON "F3D_TESTING_ENABLE_RENDERING_TESTS AND UNIX AND NOT APPLE" OFF)
 cmake_dependent_option(F3D_TESTING_ENABLE_OSMESA_TESTS "Enable tests that require OSMESA to run" OFF "F3D_TESTING_ENABLE_RENDERING_TESTS AND UNIX AND NOT APPLE" OFF)
 cmake_dependent_option(F3D_TESTING_DISABLE_CATCH_ALL "Disable the catch all exception code in main for improved testing" OFF "BUILD_TESTING" OFF)
+cmake_dependent_option(F3D_TESTING_ENABLE_ILLUSTRATION_TESTS "Enable documentation illustration tests" OFF "BUILD_TESTING" OFF)
 
 if(BUILD_TESTING)
   enable_testing()

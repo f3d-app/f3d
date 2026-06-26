@@ -37,6 +37,8 @@ f3d_test(<NAME> [ARGS...])
     Add `piped` test labels.
   - `SCRIPT` Mark the test to use a `--script` of the same name as the test
   - `NAME` Provide the name of the test, mandatory and must be unique
+  - `BASELINE_PATH` Provide the path to the baseline to use, instead of the default
+  - `OUTPUT_PATH` Provide the path to the output to use, instead of the default
   - `CONFIG` Provide the `--config` to use, instead of `--no-config`
   - `RESOLUTION` Provide the `--resolution` to use, instead of `300,300`
   - `PLUGIN` Provide the `--load-plugins` to use, also set test labels accordingly
@@ -55,7 +57,7 @@ f3d_test(<NAME> [ARGS...])
 
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "LONG_TIMEOUT;DEFAULT_HDRI;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED;PLUGIN" "DATA;DEPENDS;LABELS;ENV;ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "LONG_TIMEOUT;DEFAULT_HDRI;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT" "NAME;BASELINE_PATH;OUTPUT_PATH;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED;PLUGIN" "DATA;DEPENDS;LABELS;ENV;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -66,7 +68,8 @@ function(f3d_test)
   set(_f3d_test_data)
   if (F3D_TEST_DATA)
     foreach(_single_data ${F3D_TEST_DATA})
-      if(DEFINED f3d_INCLUDE_DIR)
+      cmake_path(IS_ABSOLUTE _single_data _single_data_absolute)
+      if(DEFINED f3d_INCLUDE_DIR OR _single_data_absolute)
         list(APPEND _f3d_test_data "${_single_data}")
       else()
         list(APPEND _f3d_test_data "${F3D_SOURCE_DIR}/testing/data/${_single_data}")
@@ -107,12 +110,20 @@ function(f3d_test)
     endif()
 
     if(NOT F3D_TEST_NO_OUTPUT)
-      list(APPEND F3D_TEST_ARGS "--output=${CMAKE_BINARY_DIR}/Testing/Temporary/${F3D_TEST_NAME}.png")
+      if(DEFINED F3D_TEST_OUTPUT_PATH)
+        list(APPEND F3D_TEST_ARGS "--output=${F3D_TEST_OUTPUT_PATH}")
+      else()
+        list(APPEND F3D_TEST_ARGS "--output=${CMAKE_BINARY_DIR}/Testing/Temporary/${F3D_TEST_NAME}.png")
+      endif()
     endif()
   endif()
 
   if(NOT F3D_TEST_NO_BASELINE)
-    list(APPEND F3D_TEST_ARGS "--reference=${F3D_SOURCE_DIR}/testing/baselines/${F3D_TEST_NAME}.png")
+    if (DEFINED F3D_TEST_BASELINE_PATH)
+      list(APPEND F3D_TEST_ARGS "--reference=${F3D_TEST_BASELINE_PATH}")
+    else()
+      list(APPEND F3D_TEST_ARGS "--reference=${F3D_SOURCE_DIR}/testing/baselines/${F3D_TEST_NAME}.png")
+    endif()
 
     if(DEFINED F3D_TEST_THRESHOLD)
       list(APPEND F3D_TEST_ARGS "--reference-threshold=${F3D_TEST_THRESHOLD}")
