@@ -16,15 +16,6 @@
 namespace f3d
 {
 //----------------------------------------------------------------------------
-std::string context::addLibraryDecoration(std::string_view lib)
-{
-  std::string libName = vtksys::DynamicLoader::LibPrefix();
-  libName += lib;
-  libName += vtksys::DynamicLoader::LibExtension();
-  return libName;
-}
-
-//----------------------------------------------------------------------------
 context::function context::getSymbol(std::string_view lib, std::string_view func)
 {
   vtksys::DynamicLoader::LibraryHandle handle = vtksys::DynamicLoader::OpenLibrary(lib.data());
@@ -51,7 +42,7 @@ context::function context::getSymbol(std::string_view lib, std::string_view func
 context::function context::glx()
 {
 #if defined(VTK_USE_X)
-  return getSymbol(addLibraryDecoration("GLX"), "glXGetProcAddress");
+  return getSymbol("libGLX.so", "glXGetProcAddress");
 #else
   throw loading_exception("Cannot use a GLX context on this platform");
 #endif
