@@ -201,7 +201,7 @@ runs:
         -DF3D_TESTING_ENABLE_ILLUSTRATION_TESTS=${{ (runner.os == 'Linux' && inputs.vtk_version == 'commit' && inputs.build_type == 'standard') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_GLX_TESTS=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=${{ (runner.os == 'Linux' || runner.os == 'Windows') && 'ON' || 'OFF' }}
-        -DF3D_TESTING_ENABLE_OSMESA_TESTS=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_OSMESA_TESTS=ON
         -DF3D_TESTING_DISABLE_CATCH_ALL=ON
         -DF3D_TESTING_FORCE_RENDERING_BACKEND=${{ inputs.rendering_backend }}
         -DF3D_WINDOWS_BUILD_CONSOLE_APPLICATION=ON
@@ -224,13 +224,13 @@ runs:
       if: runner.os == 'Windows'
       uses: ./source/.github/actions/install-mesa
       with:
-        path: ${{github.workspace}}\build\bin_Release
+        path: ${{github.workspace}}/build/bin_Release
 
     - name: Install Mesa Windows Python
       if: runner.os == 'Windows'
       uses: ./source/.github/actions/install-mesa
       with:
-        path: ${{github.workspace}}\build\Release\f3d
+        path: ${{github.workspace}}/build/Release/f3d
 
     # A EGL test is crashing in the CI but not locally
     - name: Set CI test exception for Linux EGL
@@ -304,7 +304,7 @@ runs:
       if: runner.os == 'Windows'
       uses: ./source/.github/actions/install-mesa
       with:
-        path: ${{github.workspace}}\install\bin
+        path: ${{github.workspace}}/install/bin
 
     - name: Build and configure python externally
       if: |
@@ -343,7 +343,7 @@ runs:
         inputs.static_label == 'no-static'
       uses: ./source/.github/actions/install-mesa
       with:
-        path: ${{github.workspace}}\build_examples\*\*\Release
+        path: ${{github.workspace}}/build_examples/**/Release
 
     # older VTK version create different renderings so they are not tested
     - name: Test libf3d examples

@@ -96,7 +96,22 @@ context::function context::egl()
 {
 #if defined(VTK_OPENGL_HAS_EGL)
   gladLoaderLoadEGL(EGL_NO_DISPLAY);
-  return getSymbol(addLibraryDecoration("EGL"), "eglGetProcAddress");
+
+#ifdef _WIN32
+  for (const auto& lib : { "libEGL.dll", "EGL.dll" })
+#else
+  for (const auto& lib : { "libEGL.so", "libEGL.so.1" })
+#endif
+  {
+    try
+    {
+      return getSymbol(lib, "eglGetProcAddress");
+    }
+    catch (const loading_exception&)
+    {
+    }
+  }
+  throw loading_exception("Cannot find EGL library");
 #else
   throw loading_exception("Cannot use a EGL context on this platform");
 #endif
@@ -105,12 +120,24 @@ context::function context::egl()
 //----------------------------------------------------------------------------
 context::function context::osmesa()
 {
-#if defined(__APPLE__)
-  return getSymbol("libOSMesa.dylib", "OSMesaGetProcAddress");
-#elif defined(__linux__) || defined(__FreeBSD__)
-  return getSymbol("libOSMesa.so", "OSMesaGetProcAddress");
-#elif _WIN32
-  return getSymbol("osmesa.dll", "OSMesaGetProcAddress");
+#if defined(__APPLE__) || defined(__linux__) || defined(__FreeBSD__) || defined(_WIN32)
+#ifdef _WIN32
+  for (const auto& lib : { "osmesa.dll" })
+#elif __APPLE__
+  for (const auto& lib : { "libOSMesa.dylib", "libOSMesa.dylib.8", "libOSMesa.dylib.6" })
+#else
+  for (const auto& lib : { "libOSMesa.so", "libOSMesa.so.8", "libOSMesa.so.6" })
+#endif
+  {
+    try
+    {
+      return getSymbol(lib, "OSMesaGetProcAddress");
+    }
+    catch (const loading_exception&)
+    {
+    }
+  }
+  throw loading_exception("Cannot find OSMesa library");
 #else
   throw loading_exception("Cannot use a OSMesa context on this platform");
 #endif
