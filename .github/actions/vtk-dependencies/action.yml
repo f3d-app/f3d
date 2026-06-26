@@ -34,9 +34,9 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
-        mkdir dependencies
+        mkdir -p dependencies
         cd dependencies
-        mkdir install
+        mkdir -p install
 
     # Specific to external build CI
     - name: Copy actions to a common directory
