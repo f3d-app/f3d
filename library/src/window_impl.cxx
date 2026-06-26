@@ -72,7 +72,19 @@ public:
   {
     // Override VTK logic
 #ifdef _WIN32
-    return vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
+    vtkSmartPointer<vtkOpenGLRenderWindow> wglRenWin =
+      vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
+    int major, minor;
+    wglRenWin->GetOpenGLVersion(major, minor);
+    if (major < 3 || (major == 3 && minor < 2))
+    {
+      log::warn("WGL backend does not support OpenGL >= 3.2, falling back to OSMesa");
+      return vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
+    }
+    else
+    {
+      return wglRenWin;
+    }
 #elif defined(__linux__) || defined(__FreeBSD__)
 #if defined(VTK_USE_X)
     // try GLX
