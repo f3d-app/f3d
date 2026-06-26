@@ -1115,6 +1115,8 @@ consecutive screenshots are going to be saved as `F3D/hello_1.png`, `F3D/hello_2
 
 Model related variables will be replaced by `no_file` if no file is loaded and `multi_file` if multiple files are loaded using the `multi-file-mode` option.
 
+When loading a statefile (`--load-statefile`/`load_statefile`), the `{n}` variable resolves to the most recent existing file, instead of the next available one used when saving. This means that, with the default `{n}` template, saving then loading a statefile round-trips to the same file.
+
 ## HDRI Caches
 
 When using HDRI related options, F3D will create and use a cache directory to store related data in order to speed up rendering.
