@@ -51,6 +51,9 @@ public class TestEngine {
 
     engine.getInteractor();
 
+    String state = engine.saveStatefileToString();
+    engine.loadStatefileFromString(state);
+
     engine.close();
   }
 }

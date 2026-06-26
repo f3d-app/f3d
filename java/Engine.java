@@ -228,6 +228,18 @@ public class Engine implements AutoCloseable {
     public native void loadStatefile(String statefilePath);
 
     /**
+     * Save the engine state to a statefile JSON string
+     * @return the statefile content as a JSON string
+     */
+    public native String saveStatefileToString();
+
+    /**
+     * Restore the engine state from a statefile JSON string
+     * @param statefileContent JSON statefile content to read from
+     */
+    public native void loadStatefileFromString(String statefileContent);
+
+    /**
      * Get the options
      * @return Options instance
      */
