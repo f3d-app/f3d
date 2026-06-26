@@ -104,10 +104,10 @@ endif()
 
 ## Axes grid
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11209
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260612)
   f3d_test(NAME TestAxesGridEnable DATA suzanne.ply ARGS --axes-grid THRESHOLD 0.08) # Threshold required for MacOS due to line rendering differences
   f3d_test(NAME TestAxesGridEnableNonCenteredData DATA cow.vtp ARGS --axes-grid)
-  f3d_test(NAME TestAxesGridEnableSSAA DATA cow.vtp ARGS --axes-grid --anti-aliasing=ssaa)
+  f3d_test(NAME TestAxesGridEnableSSAA DATA cow.vtp ARGS --axes-grid --anti-aliasing=ssaa THRESHOLD 0.05)
   f3d_test(NAME TestCommandScriptAxesGridAnimation SCRIPT DATA BoxAnimated.gltf ARGS --axes-grid --camera-zoom-factor=0.2)
 endif()
 

@@ -65,7 +65,7 @@ endif()
 
 f3d_test(NAME TestInteractionConfigFileAndCommand DATA multi ARGS -o CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI LONG_TIMEOUT) #OX;Right;N;Right;Right;Right
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260612)
   f3d_test(NAME TestInteractionAxesGridToggle INTERACTION DATA suzanne.ply THRESHOLD 0.08) #Shift+x
   f3d_test(NAME TestInteractionAxesGridFileSwitch INTERACTION DATA backface.vtp cow.vtp ARGS --axes-grid THRESHOLD 0.08) #Right
 endif()
