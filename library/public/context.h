@@ -66,15 +66,9 @@ public:
   [[nodiscard]] static function osmesa();
 
   /**
-   * Add the appropriate prefix and extension to a library name for the current platform.
-   * For example, `addLibraryDecoration("EGL")` returns `libEGL.so` on Linux.
-   */
-  [[nodiscard]] static std::string addLibraryDecoration(std::string_view lib);
-
-  /**
    * Create a context function from a library filename and a function name.
    * The library name must be specified with its prefix and extension.
-   * `addLibraryDecoration` can be used to add the appropriate prefix and extension.
+   * It can be a full path or a library name that can be found in the system library path.
    * Throw a loading_exception if it fails to find the library or a symbol_exception
    * if the lib does not contains the expected symbol.
    */
