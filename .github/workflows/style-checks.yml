@@ -107,3 +107,8 @@ jobs:
             ```diff
             ${{env.F3D_STYLE_DIFF}}
             ```
+            You can copy the patch above and apply it locally with:
+
+            | X                                              | Wayland                   | Powershell                          | macOS                    |
+            |------------------------------------------------|---------------------------|-------------------------------------|--------------------------|
+            | `xclip -o -selection clipboard | git apply -v` | `wl-paste | git apply -v` | `Get-Clipboard -Raw | git apply -v` | `pbpaste | git apply -v` |
