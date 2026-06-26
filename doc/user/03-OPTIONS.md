@@ -147,8 +147,8 @@ Set the X axis color in both widget and grid.
 
 #### compare
 
-| Default                         | Yellow                           |
-| ------------------------------- | -------------------------------- |
+| Default                           | Yellow                           |
+| --------------------------------- | -------------------------------- |
 | ![](./images/x_color_default.png) | ![](./images/x_color_yellow.png) |
 
 ### `--y-color` (_color_, default: `f3d_green`)
@@ -157,8 +157,8 @@ Set the Y axis color in both widget and grid.
 
 #### compare
 
-| Default                         | Yellow                           |
-| ------------------------------- | -------------------------------- |
+| Default                           | Yellow                           |
+| --------------------------------- | -------------------------------- |
 | ![](./images/x_color_default.png) | ![](./images/y_color_yellow.png) |
 
 ### `--z-color` (_color_, default: `f3d_blue`)
@@ -167,8 +167,8 @@ Set the Z axis color in both widget and grid.
 
 #### compare
 
-| Default                         | Yellow                           |
-| ------------------------------- | -------------------------------- |
+| Default                           | Yellow                           |
+| --------------------------------- | -------------------------------- |
 | ![](./images/x_color_default.png) | ![](./images/z_color_yellow.png) |
 
 ### `-g`, `--grid` (_bool_, default: `false`)
