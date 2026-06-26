@@ -142,6 +142,37 @@ extern "C"
     env->ReleaseStringUTFChars(path, str);
   }
 
+  JNIEXPORT jstring JAVA_BIND(Engine, saveStatefileToString)(JNIEnv* env, jobject self)
+  {
+    try
+    {
+      const std::string content = GetEngine(env, self)->saveStatefileToString();
+      return env->NewStringUTF(content.c_str());
+    }
+    catch (const std::exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+      return nullptr;
+    }
+  }
+
+  JNIEXPORT void JAVA_BIND(Engine, loadStatefileFromString)(
+    JNIEnv* env, jobject self, jstring content)
+  {
+    const char* str = env->GetStringUTFChars(content, nullptr);
+    try
+    {
+      GetEngine(env, self)->loadStatefileFromString(str);
+    }
+    catch (const std::exception& e)
+    {
+      env->ReleaseStringUTFChars(content, str);
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+      return;
+    }
+    env->ReleaseStringUTFChars(content, str);
+  }
+
   JNIEXPORT void JAVA_BIND(Engine, setOptions)(JNIEnv* env, jobject self, jobject options)
   {
     jclass optionsClass = env->GetObjectClass(options);

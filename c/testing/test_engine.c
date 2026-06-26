@@ -94,6 +94,23 @@ int test_engine()
     f3d_engine_delete(engine_none);
   }
 
+  // statefile string round trip
+  const char* state = f3d_engine_save_statefile_to_string(engine);
+  if (!state)
+  {
+    puts("[ERROR] save_statefile_to_string() should return a valid string");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  if (!f3d_engine_load_statefile_from_string(engine, state))
+  {
+    puts("[ERROR] load_statefile_from_string() should succeed");
+    f3d_engine_free_string(state);
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  f3d_engine_free_string(state);
+
   f3d_engine_delete(engine);
   return 0;
 }
