@@ -606,7 +606,6 @@ Show corresponding keys when notifications are triggered by bindings key press e
 
 ## Domains
 
-
 ## APIs
 
 There are three APIs to access the options

@@ -535,7 +535,8 @@ void f3d_options_remove_value(f3d_options_t* options, const char* name)
 }
 
 //----------------------------------------------------------------------------
-int f3d_options_has_domain(const f3d_options_t* options, const char* name, f3d_domain_style_t* style)
+int f3d_options_has_domain(
+  const f3d_options_t* options, const char* name, f3d_domain_style_t* style)
 {
   if (!options || !name || !style)
   {

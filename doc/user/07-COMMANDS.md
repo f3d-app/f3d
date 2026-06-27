@@ -175,7 +175,7 @@ A range domain is used through `increase` and `decrease` commands, it has inclus
 An enum domain is used through `cycle` command, it just list possible values of the option.
 `cycle` just iterate over the different possible values and loops when reaching the end.
 
-An index domain can be used through both `cycle` and `increase`/`decrease` commands. 
+An index domain can be used through both `cycle` and `increase`/`decrease` commands.
 For `increase`/`decrease`, it behaves like a range domain [0, max] with an increment of 1.
 For `cycle`, it behave like an enum domain containing all possible values between o and max.
 

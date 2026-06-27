@@ -324,9 +324,11 @@ extern "C"
    * @param options Options handle.
    * @param name Option name.
    * @param style Domain style pointer, set by the method.
-   * @return 1 if the option has a domain, 0 otherwise or if the option doesn't exist or if any of the param is NULL.
+   * @return 1 if the option has a domain, 0 otherwise or if the option doesn't exist or if any of
+   * the param is NULL.
    */
-  F3D_EXPORT int f3d_options_has_domain(const f3d_options_t* options, const char* name, f3d_domain_style_t* style);
+  F3D_EXPORT int f3d_options_has_domain(
+    const f3d_options_t* options, const char* name, f3d_domain_style_t* style);
 
   /**
    * @brief Get an option enumeration domain if it has one
@@ -336,7 +338,8 @@ extern "C"
    * @return Array of enum strings. Caller must free the array with
    *         f3d_options_free_string_array().
    */
-  F3D_EXPORT char** f3d_options_get_enum_domain(const f3d_options_t* options, const char* name, int* count);
+  F3D_EXPORT char** f3d_options_get_enum_domain(
+    const f3d_options_t* options, const char* name, int* count);
 
   /**
    * @brief Increase an option value if it has a range or index domain
