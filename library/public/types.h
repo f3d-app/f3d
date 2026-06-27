@@ -69,6 +69,11 @@ public:
   {
     return this->Value;
   }
+  inline ratio_t& operator=(const double& val)
+  {
+    this->Value = val;
+    return *this;
+  }
 
 private:
   double Value = 0;

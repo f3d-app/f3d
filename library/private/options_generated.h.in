@@ -150,18 +150,6 @@ std::vector<std::string> getEnumDomain(const f3d::options& opt, std::string_view
 
 //----------------------------------------------------------------------------
 /**
- * Generated method, see `options::getRangeDomain`
- */
-std::pair<std::array<std::string, 2>, std::string> getRangeDomain(const f3d::options& opt, std::string_view name)
-{
-  // clang-format off
-  ${_options_get_range_domain};
-  // clang-format on
-  else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
-}
-
-//----------------------------------------------------------------------------
-/**
  * Generated method, see `options::increase`
  */
 void increase(f3d::options& opt, std::string_view name, bool up)

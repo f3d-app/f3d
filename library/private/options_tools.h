@@ -898,32 +898,6 @@ bool hasDomain(f3d::options::domain_style& styleVar, const f3d::options::domain_
 
 //----------------------------------------------------------------------------
 /**
- * Get provided domain_range as a string vector
- */
-template<typename T>
-std::pair<std::array<std::string, 2>, std::string> getRangeDomain(const f3d::options::domain_range_t<T>& domain)
-{
-  std::pair<std::array<std::string, 2>, std::string> ret;
-  ret.first[0] = std::move(format(domain.range[0]));
-  ret.first[1] = std::move(format(domain.range[1]));
-  ret.second = std::move(format(domain.increment));
-  return ret;
-}
-
-//----------------------------------------------------------------------------
-/**
- * Get provided domain_range<std::string> as a string vector
- */
-std::pair<std::array<std::string, 2>, std::string> getRangeDomain(const f3d::options::domain_range_t<std::string>& domain)
-{
-  std::pair<std::array<std::string, 2>, std::string> ret;
-  ret.first = domain.range;
-  ret.second = domain.increment;
-  return ret;
-}
-
-//----------------------------------------------------------------------------
-/**
  * Get provided domain_enum as a string vector
  */
 template<typename T>
@@ -949,11 +923,11 @@ std::vector<std::string> getEnumDomain(const f3d::options::domain_enum_t<std::st
 /**
  * Needed for increase implementation for ratio_t
  */
-ratio_t operator+=(f3d::ratio_t& ratio, const double& incr)
+void operator+=(f3d::ratio_t& ratio, const double& incr)
 {
-  double val = static_cast<double>(ratio);
+  double val = ratio;
   val += incr;
-  return f3d::ratio_t(val);
+  ratio = val;
 }
 
 //----------------------------------------------------------------------------
