@@ -93,12 +93,14 @@ public class TestEngine {
     dstStr.close();
 
     // Loading an invalid statefile should throw
+    Engine invalid = Engine.createNone();
     boolean threw = false;
     try {
-      Engine.createNone().loadStatefile("/does/not/exist/state.json");
+      invalid.loadStatefile("/does/not/exist/state.json");
     } catch (RuntimeException e) {
       threw = true;
     }
+    invalid.close();
     if (!threw) {
       throw new RuntimeException("load_statefile should throw on a missing file");
     }
