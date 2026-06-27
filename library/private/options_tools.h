@@ -21,6 +21,8 @@ namespace fs = std::filesystem;
 
 namespace f3d
 {
+constexpr unsigned int INT_MAX_UINT = static_cast<unsigned int>(std::numeric_limits<int>::max());
+
 namespace options_tools
 {
 
@@ -1006,12 +1008,9 @@ void increase(int& val, const f3d::options::domain_index_t& domain, bool up)
     return;
   }
 
-  // TODO check int max ?
-  int max = static_cast<int>(domain.max.value());
-
+  int max = static_cast<int>(std::min(domain.max.value(), INT_MAX_UINT));
   char dir = up ? +1 : -1;
   int newVal = val + dir;
-
   if ((up && newVal <= max) || (!up && newVal >= 0))
   {
     val = newVal;
@@ -1030,8 +1029,7 @@ void increase(std::optional<int>& val, const f3d::options::domain_index_t& domai
   {
     if (domain.max.has_value())
     {
-      // TODO check int max ?
-      int max = static_cast<int>(domain.max.value());
+      int max = static_cast<int>(std::min(domain.max.value(), INT_MAX_UINT));
       val = up ? 0 : max;
     }
   }
@@ -1044,26 +1042,28 @@ void increase(std::optional<int>& val, const f3d::options::domain_index_t& domai
 //----------------------------------------------------------------------------
 /**
  * Templated generic cycle method for provided val and domain.
- * Cycle on the enum.
- * If invalid and domain is not empty, set to the first enum value.
+ * Cycle on the enum if domain is not empty.
+ * If invalid, set to the first enum value.
  */
 template<typename T>
 void cycle(T& val, const f3d::options::domain_enum_t<T>& domain)
 {
-  assert(!domain.enumeration.empty());
-  auto it = std::ranges::find(domain.enumeration, val);
-  if (it != domain.enumeration.end())
+  if (!domain.enumeration.empty())
   {
-    it++;
-    if (it == domain.enumeration.end())
+    auto it = std::ranges::find(domain.enumeration, val);
+    if (it != domain.enumeration.end())
     {
-      it = domain.enumeration.begin();
+      it++;
+      if (it == domain.enumeration.end())
+      {
+        it = domain.enumeration.begin();
+      }
+      val = *it;
     }
-    val = *it;
-  }
-  else
-  {
-    val = domain.enumeration.front();
+    else
+    {
+      val = domain.enumeration.front();
+    }
   }
 }
 
@@ -1077,20 +1077,22 @@ void cycle(T& val, const f3d::options::domain_enum_t<T>& domain)
 template<typename T>
 void cycle(std::optional<T>& val, const f3d::options::domain_enum_t<T>& domain)
 {
-  assert(!domain.enumeration.empty());
-  if (!val.has_value())
+  if (!domain.enumeration.empty())
   {
-    val = domain.enumeration.front();
-  }
-  else
-  {
-    if (val == domain.enumeration.back())
+    if (!val.has_value())
     {
-      val.reset();
+      val = domain.enumeration.front();
     }
     else
     {
-      cycle(val.value(), domain);
+      if (val == domain.enumeration.back())
+      {
+        val.reset();
+      }
+      else
+      {
+        cycle(val.value(), domain);
+      }
     }
   }
 }
@@ -1109,8 +1111,7 @@ void cycle(int& val, const f3d::options::domain_index_t& domain)
     return;
   }
 
-  // TODO Check int max ?
-  int max = static_cast<int>(domain.max.value());
+  int max = static_cast<int>(std::min(domain.max.value(), INT_MAX_UINT));
   if (val >= 0 || val <= max)
   {
     int newVal = val + 1;
@@ -1150,8 +1151,7 @@ void cycle(std::optional<int>& val, const f3d::options::domain_index_t& domain)
   }
   else
   {
-    // TODO Check int max ?
-    int max = static_cast<int>(domain.max.value());
+    int max = static_cast<int>(std::min(domain.max.value(), INT_MAX_UINT));
     if (val == max)
     {
       val.reset();
