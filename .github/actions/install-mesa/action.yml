@@ -23,7 +23,7 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: dependencies/mesa_install
-        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-12
+        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-13
 
 
     - name: Set up Python
@@ -37,14 +37,17 @@ runs:
       shell: bash
       run: |
         python -m pip install meson mako packaging PyYAML
-        choco install winflexbison3 llvm --no-progress -y
+        choco install winflexbison3 --no-progress -y
 
     - name: Setup LLVM (Windows)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
+      shell: cmd
+      run: C:\msys64\usr\bin\pacman -S --noconfirm --needed mingw-w64-x86_64-llvm
+
+    - name: Add MSYS2 MinGW64 to PATH (Windows)
+      if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
       shell: pwsh
-      run: |
-        Add-Content $env:GITHUB_PATH "C:\Program Files\LLVM\bin"
-        Add-Content $env:GITHUB_ENV "LLVM_DIR=C:\Program Files\LLVM\lib\cmake\llvm"
+      run: Add-Content $env:GITHUB_PATH "C:\msys64\mingw64\bin"
 
     - name: Install MESA build dependencies (macOS/Linux)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os != 'Windows'
