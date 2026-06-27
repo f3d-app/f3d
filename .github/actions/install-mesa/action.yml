@@ -59,7 +59,7 @@ runs:
     - name: Install Bison (Linux)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Linux'
       shell: bash
-      run: apt-get install -y bison byacc
+      run: apt-get install -y bison byacc flex
 
     - name: Configure MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
@@ -117,6 +117,7 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/mesa_install
       shell: bash
       run: |
-        for dir in ${{inputs.path}}; do
+        p = ${{inputs.path}}
+        for dir in ${p//\\//}; do
             cp $MESA_LIBS "$dir/"
         done
