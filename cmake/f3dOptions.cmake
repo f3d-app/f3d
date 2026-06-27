@@ -317,6 +317,7 @@ function(_parse_json_option _top_json)
 
                # { max }
                if(_domain_index_error STREQUAL "NOTFOUND")
+                 # This is not tested at all yet
                  set(_index_value_initialize "{${_option_domain_max_index}}")
                else()
                  set(_index_value_initialize "{std::nullopt}")
