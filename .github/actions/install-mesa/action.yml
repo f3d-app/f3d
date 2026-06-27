@@ -25,21 +25,9 @@ runs:
         path: dependencies/mesa_install
         key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-12
 
-    - name: Checkout MESA
-      if: steps.cache-mesa.outputs.cache-hit != 'true'
-      shell: bash
-      run: |
-        git clone --recurse-submodules --depth 1 --branch mesa-${{inputs.version}} https://gitlab.freedesktop.org/mesa/mesa.git dependencies/mesa
-
-    - name: Setup MESA
-      if: steps.cache-mesa.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies
-      shell: bash
-      run: |
-        mkdir mesa_build
-        mkdir mesa_install
 
     - name: Set up Python
+      if: steps.cache-mesa.outputs.cache-hit != 'true'
       uses: actions/setup-python@v6
       with:
         python-version: 3.14
@@ -50,7 +38,13 @@ runs:
       run: |
         python -m pip install meson mako packaging PyYAML
         choco install winflexbison3 llvm --no-progress -y
-        echo "C:/Program Files/LLVM/bin" >> $GITHUB_PATH
+
+    - name: Setup LLVM (Windows)
+      if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        Add-Content $env:GITHUB_PATH "C:\Program Files\LLVM\bin"
+        Add-Content $env:GITHUB_ENV "LLVM_DIR=C:\Program Files\LLVM\lib\cmake\llvm"
 
     - name: Install MESA build dependencies (macOS/Linux)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os != 'Windows'
@@ -68,6 +62,20 @@ runs:
       run: |
         brew install llvm
         echo "$(brew --prefix llvm)/bin" >> $GITHUB_PATH
+
+    - name: Checkout MESA
+      if: steps.cache-mesa.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        git clone --recurse-submodules --depth 1 --branch mesa-${{inputs.version}} https://gitlab.freedesktop.org/mesa/mesa.git dependencies/mesa
+
+    - name: Setup MESA
+      if: steps.cache-mesa.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir mesa_build
+        mkdir mesa_install
 
     - name: Configure MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
