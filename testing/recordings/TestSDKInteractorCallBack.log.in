@@ -58,13 +58,6 @@ TimerEvent -604 609 2 16 1 s 0
 KeyReleaseEvent -604 609 2 16 1 s 0
 TimerEvent -604 609 2 16 1 s 0
 TimerEvent -604 609 2 16 1 s 0
-KeyPressEvent -604 609 2 16 1 p 0
-CharEvent -604 609 2 16 1 p 0
-TimerEvent -604 609 2 16 1 p 0
-TimerEvent -604 609 2 16 1 p 0
-KeyReleaseEvent -604 609 2 16 1 p 0
-TimerEvent -604 609 2 16 1 p 0
-TimerEvent -604 609 2 16 1 p 0
 KeyReleaseEvent -604 609 2 0 1 Control_L 0
 TimerEvent -604 609 2 0 1 Control_L 0
 TimerEvent -604 609 2 0 1 Control_L 0
@@ -72,6 +65,13 @@ KeyPressEvent -604 609 0 0 1 Shift_L 0
 CharEvent -604 609 0 0 1 Shift_L 0
 TimerEvent -604 609 0 0 1 Shift_L 0
 TimerEvent -604 609 0 0 1 Shift_L 0
+KeyPressEvent -957 352 1 80 1 P 0
+CharEvent -957 352 1 80 1 P 0
+TimerEvent -957 352 1 80 1 P 0
+TimerEvent -957 352 1 80 1 P 0
+KeyReleaseEvent -957 352 1 80 1 P 0
+TimerEvent -957 352 1 80 1 P 0
+TimerEvent -957 352 1 80 1 P 0
 KeyPressEvent -604 609 1 89 1 Y 0
 CharEvent -604 609 1 89 1 Y 0
 TimerEvent -604 609 1 89 1 Y 0
