@@ -23,7 +23,7 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: dependencies/mesa_install
-        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-11
+        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-12
 
     - name: Checkout MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
@@ -50,6 +50,7 @@ runs:
       run: |
         python -m pip install meson mako packaging PyYAML
         choco install winflexbison3 llvm --no-progress -y
+        echo "C:/Program Files/LLVM/bin" >> $GITHUB_PATH
 
     - name: Install MESA build dependencies (macOS/Linux)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os != 'Windows'
@@ -64,7 +65,9 @@ runs:
     - name: Install LLVM (macOS)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'macOS'
       shell: bash
-      run: brew install llvm
+      run: |
+        brew install llvm
+        echo "$(brew --prefix llvm)/bin" >> $GITHUB_PATH
 
     - name: Configure MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
