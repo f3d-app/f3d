@@ -553,6 +553,8 @@ int f3d_options_has_domain(const f3d_options_t* options, const char* name, f3d_d
         *style = F3D_DOMAIN_STYLE_RANGE;
       case f3d::options::domain_style::ENUM:
         *style = F3D_DOMAIN_STYLE_ENUM;
+      case f3d::options::domain_style::INDEX:
+        *style = F3D_DOMAIN_STYLE_INDEX;
       default:
         // Unreachable
         return 0;

@@ -315,6 +315,7 @@ extern "C"
   {
     F3D_DOMAIN_STYLE_RANGE = 1,
     F3D_DOMAIN_STYLE_ENUM = 2,
+    F3D_DOMAIN_STYLE_INDEX = 3,
   } f3d_domain_style_t;
 
   /**
@@ -338,7 +339,7 @@ extern "C"
   F3D_EXPORT char** f3d_options_get_enum_domain(const f3d_options_t* options, const char* name, int* count);
 
   /**
-   * @brief Increase an option value if it has a range domain
+   * @brief Increase an option value if it has a range or index domain
    *
    * @param options Options handle.
    * @param name Option name.
@@ -346,7 +347,7 @@ extern "C"
   F3D_EXPORT void f3d_options_increase(f3d_options_t* options, const char* name);
 
   /**
-   * @brief Decrease an option value if it has a range domain
+   * @brief Decrease an option value if it has a range or index domain
    *
    * @param options Options handle.
    * @param name Option name.
@@ -354,7 +355,7 @@ extern "C"
   F3D_EXPORT void f3d_options_decrease(f3d_options_t* options, const char* name);
 
   /**
-   * @brief Cycle an option value if it has an enum domain
+   * @brief Cycle an option value if it has an enum or index domain
    *
    * @param options Options handle.
    * @param name Option name.

@@ -172,12 +172,12 @@ public:
    * The enumeration is provided as is in string form.
    * Throw options::incompatible_exception if option doesn't have an enumeration domain.
    * Throws an options::inexistent_exception if option does not exist.
-   * Note: The is no string API to recover a range domain yet.
+   * Note: The is no string API to recover a range or index domain yet.
    */
   [[nodiscard]] std::vector<std::string> getEnumDomain(std::string_view name) const;
 
   /**
-   * Increase an option value if it has a range domain, else throws
+   * Increase an option value if it has a range or index domain, else throws
    * options::incompatible_exception.
    * Increasing above the max is capped at the maximum.
    * Increasing an optional option without a value set it to the domain minimum.
@@ -187,7 +187,7 @@ public:
   options& increase(std::string_view name);
 
   /**
-   * Decrease an option value if it has a range domain, else throws
+   * Decrease an option value if it has a range or index domain, else throws
    * options::incompatible_exception.
    * Decreasing below the min is capped at the minimum.
    * Decreasing an optional option without a value set it to the domain maximum.
@@ -197,7 +197,7 @@ public:
   options& decrease(std::string_view name);
 
   /**
-   * Cycle an option value if it has an enumeration domain, else throws
+   * Cycle an option value if it has an enumeration or index domain, else throws
    * options::incompatible_exception.
    * Loops over the beginning of the enumeration domain when reaching the end.
    * Cycling an optional option with a value set it to the first in the enumeration domain.
