@@ -23,8 +23,7 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: dependencies/mesa_install
-        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-16
-
+        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-17
 
     - name: Set up Python
       if: steps.cache-mesa.outputs.cache-hit != 'true'
@@ -38,35 +37,35 @@ runs:
       with:
         arch: x64
 
+    # https://github.com/ilammy/msvc-dev-cmd#caveats
     - name: Remove Git link.exe (Windows)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
       shell: bash
       run: rm $(which link.exe)
 
-    - name: Install MESA build dependencies (Windows)
+    - name: Install Mesa Python dependencies
+      if: steps.cache-mesa.outputs.cache-hit != 'true'
+      shell: bash
+      run: python -m pip install meson mako packaging PyYAML
+
+    - name: Install Flex/Bison (Windows)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
       shell: bash
-      run: |
-        python -m pip install meson mako packaging PyYAML
-        choco install winflexbison3 --no-progress -y
+      run: choco install winflexbison3 --no-progress -y
+
+    - name: Install Flex/Bison (Linux)
+      if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Linux'
+      shell: bash
+      run: apt-get install -y bison byacc flex pkg-config ninja-build python3-dev
 
     - name: Install LLVM (Windows)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
       shell: pwsh
       run: |
+        choco uninstall llvm -y --no-progress
         Invoke-WebRequest -Uri "https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/LLVM-18.1.8-win64.exe" -OutFile "$env:TEMP\LLVM-installer.exe"
         Start-Process -FilePath "$env:TEMP\LLVM-installer.exe" -ArgumentList "/S" -Wait
-        Add-Content $env:GITHUB_PATH "C:\Program Files\LLVM\bin"
-
-    - name: Install MESA build dependencies (macOS/Linux)
-      if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os != 'Windows'
-      shell: bash
-      run: python -m pip install meson mako packaging PyYAML
-
-    - name: Install Bison (Linux)
-      if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Linux'
-      shell: bash
-      run: apt-get install -y bison byacc flex pkg-config ninja-build python3-dev
+        "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
     - name: Install LLVM (macOS)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'macOS'
@@ -74,6 +73,11 @@ runs:
       run: |
         brew install llvm
         echo "$(brew --prefix llvm)/bin" >> $GITHUB_PATH
+
+    - name: Check LLVM
+      if: steps.cache-mesa.outputs.cache-hit != 'true'
+      shell: bash
+      run: llvm-config --version
 
     - name: Checkout MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
