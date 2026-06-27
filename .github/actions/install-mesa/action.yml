@@ -23,7 +23,7 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: dependencies/mesa_install
-        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-9
+        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-10
 
     - name: Checkout MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
@@ -59,7 +59,7 @@ runs:
     - name: Install Bison (Linux)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Linux'
       shell: bash
-      run: apt-get install -y bison byacc flex pkg-config ninja-build
+      run: apt-get install -y bison byacc flex pkg-config ninja-build python3-dev
 
     - name: Configure MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
