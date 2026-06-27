@@ -38,6 +38,11 @@ runs:
       with:
         arch: x64
 
+    - name: Remove Git link.exe (Windows)
+      if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
+      shell: bash
+      run: rm $(which link.exe)
+
     - name: Install MESA build dependencies (Windows)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
       shell: bash
