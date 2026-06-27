@@ -194,11 +194,6 @@ public:
   void Render() override;
 
   /**
-   * Reset camera function from vtkVRRenderer
-   */
-  void ResetCamera(const double bounds[6]) override;
-
-  /**
    * Reimplemented to account for grid actor and xr usage
    */
   void ResetCameraClippingRange() override;
@@ -569,9 +564,9 @@ public:
   vtkMatrix4x4* GetGridMatrix() const;
 
   /**
-   * Set/Get XR mode
+   * Set XR mode
    */
-  void SetXRMode(bool enable);
+  void SetXRMode(bool enable, bool showBbox = false);
 
 private:
   vtkF3DRenderer();
@@ -900,7 +895,7 @@ private:
   std::optional<bool> Unlit;
 
   bool Xr = false;
-  vtkNew<vtkActor> outlineActor; // debug outline, remove later
+  vtkNew<vtkActor> XrBBoxActor;
 };
 
 #endif

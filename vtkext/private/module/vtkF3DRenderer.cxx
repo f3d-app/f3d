@@ -365,10 +365,9 @@ void vtkF3DRenderer::Initialize()
         return;
       }
       vtkCamera* cam = self->GetActiveCamera();
-      const vtkBoundingBox bbox = self->CreateCameraFacingBoundingBox(cam, 100.0f, 50.0f);
+      const vtkBoundingBox bbox = self->CreateCameraFacingBoundingBox(cam, 1.0f, 0.5f);
       if (bbox.IsValid())
       {
-        // debug bounding box, TODO: remove this when XR is stable
         {
           double bounds[6];
           bbox.GetBounds(bounds);
@@ -379,12 +378,10 @@ void vtkF3DRenderer::Initialize()
           vtkNew<vtkPolyDataMapper> outlineMapper;
           outlineMapper->SetInputConnection(outlineSource->GetOutputPort());
 
-          self->outlineActor->SetMapper(outlineMapper);
-          self->outlineActor->GetProperty()->SetColor(1.0, 0.2, 0.2);
-          self->outlineActor->GetProperty()->SetLineWidth(2.0);
-          self->outlineActor->GetProperty()->LightingOff();
-
-          self->AddActor(self->outlineActor);
+          self->XrBBoxActor->SetMapper(outlineMapper);
+          self->XrBBoxActor->GetProperty()->SetColor(1.0, 0.2, 0.2);
+          self->XrBBoxActor->GetProperty()->SetLineWidth(2.0);
+          self->XrBBoxActor->GetProperty()->LightingOff();
         }
 
         self->XrBoundingBoxConfigured = true;
@@ -1277,7 +1274,7 @@ void vtkF3DRenderer::AlignSceneToBounds(const vtkBoundingBox& bounds)
       continue;
     }
 
-    if (actor == this->outlineActor)
+    if (actor == this->XrBBoxActor)
     {
       continue;
     }
@@ -2407,122 +2404,6 @@ void vtkF3DRenderer::Render()
     this->UIActor->UpdateFpsValue(elapsedTime);
   }
 }
-//---------------------------------------------------------------------------
-void vtkF3DRenderer::ResetCamera(const double bounds[6])
-{
-
-  if (!this->Xr)
-  {
-    this->Superclass::ResetCamera(bounds);
-  }
-  else
-  {
-    // copied from vtkVRRenderer::ResetCamera
-    double center[3];
-    double distance;
-    double vn[3], *vup;
-
-    this->GetActiveCamera();
-    if (this->ActiveCamera != nullptr)
-    {
-      this->ActiveCamera->GetViewPlaneNormal(vn);
-    }
-    else
-    {
-      vtkErrorMacro(<< "Trying to reset non-existent camera");
-      return;
-    }
-
-    // Reset the perspective zoom factors, otherwise subsequent zooms will cause
-    // the view angle to become very small and cause bad depth sorting.
-    this->ActiveCamera->SetViewAngle(110.0);
-
-    double expandedBounds[6] = { bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5] };
-    this->ExpandBounds(expandedBounds, this->ActiveCamera->GetModelTransformMatrix());
-
-    center[0] = (expandedBounds[0] + expandedBounds[1]) / 2.0;
-    center[1] = (expandedBounds[2] + expandedBounds[3]) / 2.0;
-    center[2] = (expandedBounds[4] + expandedBounds[5]) / 2.0;
-
-    double w1 = expandedBounds[1] - expandedBounds[0];
-    double w2 = expandedBounds[3] - expandedBounds[2];
-    double w3 = expandedBounds[5] - expandedBounds[4];
-    w1 *= w1;
-    w2 *= w2;
-    w3 *= w3;
-    double radius = w1 + w2 + w3;
-
-    // If we have just a single point, pick a radius of 1.0
-    radius = (radius == 0) ? (1.0) : (radius);
-
-    // compute the radius of the enclosing sphere
-    radius = sqrt(radius) * 0.5;
-
-    // default so that the bounding sphere fits within the view fustrum
-
-    // compute the distance from the intersection of the view frustum with the
-    // bounding sphere. Basically in 2D draw a circle representing the bounding
-    // sphere in 2D then draw a horizontal line going out from the center of
-    // the circle. That is the camera view. Then draw a line from the camera
-    // position to the point where it intersects the circle. (it will be tangent
-    // to the circle at this point, this is important, only go to the tangent
-    // point, do not draw all the way to the view plane). Then draw the radius
-    // from the tangent point to the center of the circle. You will note that
-    // this forms a right triangle with one side being the radius, another being
-    // the target distance for the camera, then just find the target dist using
-    // a sin.
-    double angle = vtkMath::RadiansFromDegrees(this->ActiveCamera->GetViewAngle());
-
-    this->ComputeAspect();
-    double aspect[2];
-    this->GetAspect(aspect);
-
-    if (aspect[0] >= 1.0) // horizontal window, deal with vertical angle|scale
-    {
-      if (this->ActiveCamera->GetUseHorizontalViewAngle())
-      {
-        angle = 2.0 * atan(tan(angle * 0.5) / aspect[0]);
-      }
-    }
-    else // vertical window, deal with horizontal angle|scale
-    {
-      if (!this->ActiveCamera->GetUseHorizontalViewAngle())
-      {
-        angle = 2.0 * atan(tan(angle * 0.5) * aspect[0]);
-      }
-    }
-    distance = radius / sin(angle * 0.5);
-
-    // check view-up vector against view plane normal
-    vup = this->ActiveCamera->GetViewUp();
-    if (fabs(vtkMath::Dot(vup, vn)) > 0.999)
-    {
-      vtkWarningMacro(<< "Resetting view-up since view plane normal is parallel");
-      this->ActiveCamera->SetViewUp(-vup[2], vup[0], vup[1]);
-    }
-
-    // update the camera
-    this->ActiveCamera->SetFocalPoint(center[0], center[1], center[2]);
-    this->ActiveCamera->SetPosition(
-      center[0] + distance * vn[0], center[1] + distance * vn[1], center[2] + distance * vn[2]);
-
-    // now set the cameras shift and scale to the HMD space
-    // since the vive is always in meters (or something like that)
-    // we use a shift scale to map view space into hmd view space
-    // that way the solar system can be modelled in its units
-    // while the shift scale maps it into meters.  This can also
-    // be done in the actors but then it requires every actor
-    // to be adjusted.  It cannot be done with the camera model
-    // matrix as that is broken.
-    // The additional distance translation in the view up direction is because we
-    // want the center of the world to be above the physical floor instead of at its level.
-    vtkVRRenderWindow* win = static_cast<vtkVRRenderWindow*>(this->GetRenderWindow());
-    win->SetPhysicalTranslation(-center[0] + vup[0] * distance, -center[1] + vup[1] * distance,
-      -center[2] + vup[2] * distance);
-
-    win->SetPhysicalScale(distance);
-  }
-}
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ResetCameraClippingRange()
@@ -3521,7 +3402,7 @@ void vtkF3DRenderer::SetComponentForColoring(int component)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetXRMode(bool enable)
+void vtkF3DRenderer::SetXRMode(bool enable, bool showBbox)
 {
   if (enable != this->Xr)
   {
@@ -3532,6 +3413,15 @@ void vtkF3DRenderer::SetXRMode(bool enable)
   if (this->Xr)
   {
     this->ClippingRangeExpansion = 0.05;
+
+    if (showBbox)
+    {
+      this->AddActor(this->XrBBoxActor);
+    }
+    else
+    {
+      this->RemoveActor(this->XrBBoxActor);
+    }
   }
 }
 
