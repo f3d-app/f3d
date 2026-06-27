@@ -522,9 +522,9 @@ f3d_test(NAME TestStatefileSaveCreatesDir DATA cow.vtp NO_RENDER NO_BASELINE ARG
 f3d_test(NAME TestStatefileFileGroupsSave DATA cow.vtp dragon.vtu NO_RENDER NO_BASELINE ARGS --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileFileGroups.json REGEXP "Statefile saved to")
 f3d_test(NAME TestStatefileFileGroupsLoad SCRIPT DEPENDS TestStatefileFileGroupsSave NO_BASELINE ARGS --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileFileGroups.json --verbose REGEXP "VTKXMLVTU")
 
-# Statefile interactor commands (save_statefile / load_statefile), each test covers a distinct behavior
-# save_statefile saves to the --statefile-filename path
-f3d_test(NAME TestCommandScriptSaveStatefile SCRIPT DATA cow.vtp ARGS --statefile-filename=${CMAKE_BINARY_DIR}/Testing/Temporary/TestCommandScriptSaveStatefile.json REGEXP "Statefile saved to" NO_BASELINE)
+# Statefile interactor command load_statefile, each test covers a distinct behavior. The save_statefile
+# command shares its implementation with the --save-statefile option covered above, the tests below
+# instead focus on the load_statefile command which restores a statefile into the running session
 # load_statefile with an explicit path loads the statefile files (cow.vtp), replacing the loaded dragon.vtu
 f3d_test(NAME TestCommandScriptLoadStatefile SCRIPT DATA dragon.vtu WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "cow.vtp" NO_BASELINE)
 # load_statefile with no argument falls back to the --statefile-filename path
