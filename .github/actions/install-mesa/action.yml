@@ -59,7 +59,7 @@ runs:
     - name: Install Bison (Linux)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Linux'
       shell: bash
-      run: apt-get install -y bison byacc flex
+      run: apt-get install -y bison byacc flex pkgconfig
 
     - name: Configure MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
@@ -118,6 +118,6 @@ runs:
       shell: bash
       run: |
         p = ${{inputs.path}}
-        for dir in ${p//\\//}; do
+        for dir in "${p//\\//}"; do
             cp $MESA_LIBS "$dir/"
         done
