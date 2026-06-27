@@ -23,7 +23,7 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: dependencies/mesa_install
-        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-6
+        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-7
 
     - name: Checkout MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
@@ -79,6 +79,7 @@ runs:
         -Degl=disabled
         -Dglx=disabled
         -Dxlib-lease=disabled
+        -Dplatforms=surfaceless
 
     - name: Build MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
@@ -117,7 +118,7 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/mesa_install
       shell: bash
       run: |
-        p=${{inputs.path}}
-        for dir in "${p//\\//}"; do
+        p=$(echo "${{inputs.path}}" | tr '\\' '/')
+        for dir in $p; do
             cp $MESA_LIBS "$dir/"
         done
