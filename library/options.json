@@ -22,6 +22,7 @@
         "type": "ratio",
         "default_value": "1.0",
         "domain": {
+          "style": "range",
           "range": ["0.0", "2.0"],
           "increment": "0.1"
         }
@@ -31,6 +32,7 @@
       "index": {
         "type": "int",
         "domain": {
+          "style": "enum",
           "enum": []
         }
       },
@@ -49,6 +51,7 @@
     "line_width": {
       "type": "double",
       "domain": {
+        "style": "range",
         "range": ["0.0", "10.0"],
         "increment": "0.1"
       }
@@ -56,6 +59,7 @@
     "point_size": {
       "type": "double",
       "domain": {
+        "style": "range",
         "range": ["0.0", "10.0"],
         "increment": "0.1"
       }
@@ -63,6 +67,7 @@
     "backface_type": {
       "type": "string",
       "domain": {
+        "style": "enum",
         "enum": ["visible", "hidden"]
       }
     },
@@ -110,6 +115,7 @@
         "type": "int",
         "default_value": "5",
         "domain": {
+          "style": "range",
           "range": ["1", "20"],
           "increment": "1"
         }
@@ -121,6 +127,7 @@
           "type": "string",
           "default_value": "none",
           "domain": {
+            "style": "enum",
             "enum": ["none", "ddp", "sort", "sort_cpu", "stochastic"]
           }
         }
@@ -130,6 +137,7 @@
           "type": "string",
           "default_value": "none",
           "domain": {
+            "style": "enum",
             "enum": ["none", "fxaa", "ssaa", "taa"]
           }
         }
@@ -177,6 +185,7 @@
           "type": "double",
           "default_value": "20.0",
           "domain": {
+            "style": "range",
             "range": ["0.0", "100.0"],
             "increment": "5.0"
           }
@@ -188,6 +197,7 @@
         "type": "double",
         "default_value": "1.0",
         "domain": {
+          "style": "range",
           "range": ["0.0", "5.0"],
           "increment": "0.02"
         }
@@ -206,6 +216,7 @@
         "type": "double",
         "default_value": "0.9",
         "domain": {
+          "style": "range",
           "range": ["0.0", "1.0"],
           "increment": "0.05"
         }
@@ -303,6 +314,7 @@
       "type": "ratio",
       "default_value": "1.0",
       "domain": {
+        "style": "range",
         "range": ["0.0", "10.0"],
         "increment": "0.1"
       }
@@ -365,6 +377,7 @@
       "opacity": {
         "type": "double",
         "domain": {
+          "style": "range",
           "range": ["0.0", "1.0"],
           "increment": "0.05"
         }
@@ -388,6 +401,7 @@
       "scale": {
         "type": "double",
         "domain": {
+          "style": "range",
           "range": ["0.0", "1.0"],
           "increment": "0.05"
         }
@@ -400,6 +414,7 @@
       "metallic": {
         "type": "double",
         "domain": {
+          "style": "range",
           "range": ["0.0", "1.0"],
           "increment": "0.05"
         }
@@ -407,6 +422,7 @@
       "roughness": {
         "type": "double",
         "domain": {
+          "style": "range",
           "range": ["0.0", "1.0"],
           "increment": "0.05"
         }
@@ -414,6 +430,7 @@
       "base_ior": {
         "type": "double",
         "domain": {
+          "style": "range",
           "range": ["0.0", "1.0"],
           "increment": "0.05"
         }
@@ -437,6 +454,7 @@
       "discretization": {
         "type": "int",
         "domain": {
+          "style": "range",
           "range": ["1", "1024"],
           "increment": "5"
         }
@@ -465,6 +483,7 @@
         "type": "string",
         "default_value": "none",
         "domain": {
+          "style": "enum",
           "enum": [
             "none",
             "sphere",
@@ -480,6 +499,7 @@
         "type": "double",
         "default_value": 10.0,
         "domain": {
+          "style": "range",
           "range": ["1", "100"],
           "increment": "1"
         }
@@ -498,6 +518,7 @@
         "type": "ratio",
         "default_value": "1.0",
         "domain": {
+          "style": "range",
           "range": ["0.0", "10.0"],
           "increment": "0.1"
         }
@@ -519,6 +540,7 @@
       "type": "string",
       "default_value": "default",
       "domain": {
+        "style": "enum",
         "enum": ["default", "trackball", "2d"]
       }
     },

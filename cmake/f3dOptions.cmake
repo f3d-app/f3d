@@ -120,13 +120,17 @@ function(_parse_json_option _top_json)
        # Recover domain if any
        string(JSON _option_domain ERROR_VARIABLE _domain_error GET ${_cur_json} "domain")
        if (_domain_error STREQUAL "NOTFOUND")
+         string(JSON _option_domain_style ERROR_VARIABLE _domain_style_error GET ${_option_domain} "style")
          string(JSON _option_domain_range ERROR_VARIABLE _domain_range_error GET ${_option_domain} "range")
          string(JSON _option_domain_increment ERROR_VARIABLE _domain_increment_error GET ${_option_domain} "increment")
          string(JSON _option_domain_enum ERROR_VARIABLE _domain_enum_error GET ${_option_domain} "enum")
+         string(JSON _option_domain_max_index ERROR_VARIABLE _domain_max_index_error GET ${_option_domain} "max")
        else ()
+         set(_domain_style_error "")
          set(_domain_range_error "")
          set(_domain_increment_error "")
          set(_domain_enum_error "")
+         set(_domain_max_index_error "")
        endif ()
 
        # Recover deprecated if any
@@ -244,59 +248,74 @@ function(_parse_json_option _top_json)
        list(APPEND _options_string_getter "if (name == \"${_option_name}\") return options_tools::format(opt.${_option_name}${_optional_getter})")
        list(APPEND _options_lister "\"${_option_name}\"")
 
-       # Range domain
-       if(_domain_range_error STREQUAL "NOTFOUND")
-         if(NOT _domain_increment_error STREQUAL "NOTFOUND")
-           set(_option_domain_increment "1")
-         endif()
 
-         # {{ range_min, range_max}, range_increment }
-         set(_range_value_initialize "{{")
-         string(JSON _range_value GET ${_option_domain_range} 0)
-         string(APPEND _range_value_initialize "${_option_domain_explicit_constr}${_option_domain_value_start}${_range_value}${_option_domain_value_end}, ")
-         string(JSON _range_value GET ${_option_domain_range} 1)
-         string(APPEND _range_value_initialize "${_option_domain_explicit_constr}${_option_domain_value_start}${_range_value}${_option_domain_value_end}, ")
-         string(APPEND _range_value_initialize "}, ${_option_domain_explicit_constr}${_option_domain_value_start}${_option_domain_increment}${_option_domain_value_end}}")
+       # Domain
+       if(_domain_style_error STREQUAL "NOTFOUND")
 
-         # Add range domain to struct and methods
-         string(APPEND _options_domains_struct "${_option_indent}    domain_range_t<${_option_domain_type}> ${_member_name} = ${_range_value_initialize};\n")
-         list(APPEND _options_has_domain "if (name == \"${_option_name}\") return options_tools::hasDomain(style, options::domain_style::RANGE)")
-         list(APPEND _options_get_enum_domain "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to get domain \" + std::string(\"${_option_name}\") + \" with incompatible option\")")
-         list(APPEND _options_increase "if (name == \"${_option_name}\") options_tools::increase(opt.${_option_name}, opt.domains.${_option_name}, up)")
-         list(APPEND _options_cycle "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to increase \" + std::string(\"${_option_name}\") + \" with incompatible option\")")
+         # Range domain
+         if(_option_domain_style STREQUAL "range")
 
-       # Enum domain
-       else()
-         if(_domain_enum_error STREQUAL "NOTFOUND")
-
-           # {{ enum_value_0, enum_value_1, ..., enum_value_N }}
-           set(_enum_value_initialize "{{")
-           string(JSON _domain_enum_length LENGTH ${_option_domain_enum})
-           math(EXPR _domain_enum_length "${_domain_enum_length} - 1")
-           if (_domain_enum_length GREATER_EQUAL 0)
-             foreach(_enum_idx RANGE ${_domain_enum_length})
-               string(JSON _enum_value GET ${_option_domain_enum} ${_enum_idx})
-               string(APPEND _enum_value_initialize "${_option_domain_explicit_constr}${_option_domain_value_start}${_enum_value}${_option_domain_value_end}, ")
-             endforeach()
+           # Check inputs
+           if(NOT _domain_range_error STREQUAL "NOTFOUND")
+             message(FATAL_ERROR "Missing range in ${_option_name} range domain")
            endif()
-           string(APPEND _enum_value_initialize "}}")
+           if(NOT _domain_increment_error STREQUAL "NOTFOUND")
+             message(FATAL_ERROR "Missing increment in ${_option_name} range domain")
+           endif()
 
-           # Add enum domain to struct and methods
-           string(APPEND _options_domains_struct "${_option_indent}    domain_enum_t<${_option_domain_type}> ${_member_name} = ${_enum_value_initialize};\n")
-           list(APPEND _options_has_domain "if (name == \"${_option_name}\") return options_tools::hasDomain(style, options::domain_style::ENUM)")
-           list(APPEND _options_get_enum_domain "if (name == \"${_option_name}\") return options_tools::getEnumDomain(opt.domains.${_option_name})")
-           list(APPEND _options_increase "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to cycle \" + std::string(\"${_option_name}\") + \" with incompatible option\")")
-           list(APPEND _options_cycle "if (name == \"${_option_name}\") options_tools::cycle(opt.${_option_name}, opt.domains.${_option_name})")
+           # {{ range_min, range_max}, range_increment }
+           set(_range_value_initialize "{{")
+           string(JSON _range_value GET ${_option_domain_range} 0)
+           string(APPEND _range_value_initialize "${_option_domain_explicit_constr}${_option_domain_value_start}${_range_value}${_option_domain_value_end}, ")
+           string(JSON _range_value GET ${_option_domain_range} 1)
+           string(APPEND _range_value_initialize "${_option_domain_explicit_constr}${_option_domain_value_start}${_range_value}${_option_domain_value_end}, ")
+           string(APPEND _range_value_initialize "}, ${_option_domain_explicit_constr}${_option_domain_value_start}${_option_domain_increment}${_option_domain_value_end}}")
 
-         # No domain
-         else()
-           list(APPEND _options_has_domain "if (name == \"${_option_name}\") return false")
+           # Add range domain to struct and methods
+           string(APPEND _options_domains_struct "${_option_indent}    domain_range_t<${_option_domain_type}> ${_member_name} = ${_range_value_initialize};\n")
+           list(APPEND _options_has_domain "if (name == \"${_option_name}\") return options_tools::hasDomain(style, options::domain_style::RANGE)")
            list(APPEND _options_get_enum_domain "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to get domain \" + std::string(\"${_option_name}\") + \" with incompatible option\")")
-           list(APPEND _options_increase "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to cycle \" + std::string(\"${_option_name}\") + \" with incompatible option\")")
+           list(APPEND _options_increase "if (name == \"${_option_name}\") options_tools::increase(opt.${_option_name}, opt.domains.${_option_name}, up)")
            list(APPEND _options_cycle "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to increase \" + std::string(\"${_option_name}\") + \" with incompatible option\")")
-         endif()
-       endif()
 
+         else()
+
+           # Range domain
+           if(_option_domain_style STREQUAL "enum")
+
+             # Check enum
+             if(NOT _domain_enum_error STREQUAL "NOTFOUND")
+               message(FATAL_ERROR "Missing enum in ${_option_name} enum domain")
+             endif()
+
+             # {{ enum_value_0, enum_value_1, ..., enum_value_N }}
+             set(_enum_value_initialize "{{")
+             string(JSON _domain_enum_length LENGTH ${_option_domain_enum})
+             math(EXPR _domain_enum_length "${_domain_enum_length} - 1")
+             if (_domain_enum_length GREATER_EQUAL 0)
+               foreach(_enum_idx RANGE ${_domain_enum_length})
+                 string(JSON _enum_value GET ${_option_domain_enum} ${_enum_idx})
+                 string(APPEND _enum_value_initialize "${_option_domain_explicit_constr}${_option_domain_value_start}${_enum_value}${_option_domain_value_end}, ")
+               endforeach()
+             endif()
+             string(APPEND _enum_value_initialize "}}")
+
+             # Add enum domain to struct and methods
+             string(APPEND _options_domains_struct "${_option_indent}    domain_enum_t<${_option_domain_type}> ${_member_name} = ${_enum_value_initialize};\n")
+             list(APPEND _options_has_domain "if (name == \"${_option_name}\") return options_tools::hasDomain(style, options::domain_style::ENUM)")
+             list(APPEND _options_get_enum_domain "if (name == \"${_option_name}\") return options_tools::getEnumDomain(opt.domains.${_option_name})")
+             list(APPEND _options_increase "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to cycle \" + std::string(\"${_option_name}\") + \" with incompatible option\")")
+             list(APPEND _options_cycle "if (name == \"${_option_name}\") options_tools::cycle(opt.${_option_name}, opt.domains.${_option_name})")
+           endif()
+         endif()
+
+       # No domain
+       else()
+         list(APPEND _options_has_domain "if (name == \"${_option_name}\") return false")
+         list(APPEND _options_get_enum_domain "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to get domain \" + std::string(\"${_option_name}\") + \" with incompatible option\")")
+         list(APPEND _options_increase "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to cycle \" + std::string(\"${_option_name}\") + \" with incompatible option\")")
+         list(APPEND _options_cycle "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to increase \" + std::string(\"${_option_name}\") + \" with incompatible option\")")
+       endif()
     else()
       # Group found, add in the structs and recurse
       set(_option_prevname ${_option_basename})
