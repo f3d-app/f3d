@@ -23,7 +23,7 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: dependencies/mesa_install
-        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-10
+        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-11
 
     - name: Checkout MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
@@ -71,7 +71,7 @@ runs:
         --buildtype=release
         -Db_ndebug=true
         -Dosmesa=true
-        -Dgallium-drivers=softpipe
+        -Dgallium-drivers=llvmpipe
         -Dvulkan-drivers=[]
         -Dopengl=true
         -Dgles1=disabled
