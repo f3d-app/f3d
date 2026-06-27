@@ -79,7 +79,7 @@ runs:
         -Degl=disabled
         -Dglx=disabled
         -Dxlib-lease=disabled
-        -Dplatforms=surfaceless
+        -Dplatforms=[]
 
     - name: Build MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
