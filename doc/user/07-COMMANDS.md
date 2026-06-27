@@ -175,6 +175,10 @@ A range domain is used through `increase` and `decrease` commands, it has inclus
 An enum domain is used through `cycle` command, it just list possible values of the option.
 `cycle` just iterate over the different possible values and loops when reaching the end.
 
+An index domain can be used through both `cycle` and `increase`/`decrease` commands. 
+For `increase`/`decrease`, it behaves like a range domain [0, max] with an increment of 1.
+For `cycle`, it behave like an enum domain containing all possible values between o and max.
+
 ## Command Script (`--command-script`)
 
 F3D provides a feature to execute commands from a script file using the `--command-script` [CLI option](03-OPTIONS.md). This allows users to automate a sequence of commands by listing them in a plain text file, eg: `f3d --command-script path/to/command_script.txt`.
