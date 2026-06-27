@@ -9,6 +9,7 @@ set(f3djsTests_list
   "test_scene"
   "test_splats"
   "test_custom_canvas"
+  "test_statefile"
 )
 
 find_program(CHROMIUM_EXECUTABLE chromium)
