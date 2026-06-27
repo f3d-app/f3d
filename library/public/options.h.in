@@ -39,6 +39,7 @@ public:
   {
     RANGE = 1,
     ENUM = 2,
+    INDEX = 3,
   };
 
   ///@{ @name Constructors
@@ -281,6 +282,15 @@ public:
   struct domain_enum_t
   {
     std::vector<T> enumeration;
+  };
+
+  /**
+   * Struct used in the domains struct
+   * for index domains
+   */
+  struct domain_index_t
+  {
+    std::optional<unsigned int> max;
   };
 
   /**

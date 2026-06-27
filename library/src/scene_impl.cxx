@@ -162,11 +162,8 @@ public:
       this->Window.getCamera().resetToBounds();
     }
 
-    // Fill the camera index domain
-    this->Options.domains.scene.camera.index.enumeration.resize(
-      this->MetaImporter->GetNumberOfCameras());
-    std::iota(this->Options.domains.scene.camera.index.enumeration.begin(),
-      this->Options.domains.scene.camera.index.enumeration.end(), 0);
+    // Set the camera index domain
+    this->Options.domains.scene.camera.index.max = this->MetaImporter->GetNumberOfCameras();
 
     scene_impl::internals::DisplayAllInfo(this->MetaImporter, this->Window);
   }

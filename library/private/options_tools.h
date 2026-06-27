@@ -918,7 +918,6 @@ std::vector<std::string> getEnumDomain(const f3d::options::domain_enum_t<std::st
   return domain.enumeration;
 }
 
-
 //----------------------------------------------------------------------------
 /**
  * Needed for increase implementation for ratio_t
@@ -996,6 +995,54 @@ void increase(std::optional<T>& val, const f3d::options::domain_range_t<T>& doma
 
 //----------------------------------------------------------------------------
 /**
+ * Specific increase method for provided val and index domain.
+ * If max is not set, just returns.
+ * Increase up to max or decrease down to 0, does not check validity of current value.
+ */
+void increase(int& val, const f3d::options::domain_index_t& domain, bool up)
+{
+  if (!domain.max.has_value())
+  {
+    return;
+  }
+
+  // TODO check int max ?
+  int max = static_cast<int>(domain.max.value());
+
+  char dir = up ? +1 : -1;
+  int newVal = val + dir;
+
+  if ((up && newVal <= max) || (!up && newVal >= 0))
+  {
+    val = newVal;
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
+ * std::optional specific increase method for provided val and index domain.
+ * If set, just call increase
+ * If not set, and domain is set, set val to 0/max depending on the direction
+ */
+void increase(std::optional<int>& val, const f3d::options::domain_index_t& domain, bool up)
+{
+  if (!val.has_value())
+  {
+    if (!domain.max.has_value())
+    {
+      // TODO check int max ?
+      int max = static_cast<int>(domain.max.value());
+      val = up ? 0 : max;
+    }
+  }
+  else
+  {
+    increase(val.value(), domain, up);
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
  * Templated generic cycle method for provided val and domain.
  * Cycle on the enum.
  * If invalid and domain is not empty, set to the first enum value.
@@ -1039,6 +1086,74 @@ void cycle(std::optional<T>& val, const f3d::options::domain_enum_t<T>& domain)
   else
   {
     if (!domain.enumeration.empty() && val == domain.enumeration.back())
+    {
+      val.reset();
+    }
+    else
+    {
+      cycle(val.value(), domain);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Generic cycle method for provided val and index domain.
+ * Cycle on the index domain : [0 max].
+ * If max is not set, just returns.
+ * If invalid and domain is not empty, set to 0.
+ */
+void cycle(int& val, const f3d::options::domain_index_t& domain)
+{
+  if (!domain.max.has_value())
+  {
+    return;
+  }
+
+  // TODO Check int max ?
+  int max = static_cast<int>(domain.max.value());
+  if (val >= 0 || val <= max)
+  {
+    int newVal = val + 1;
+    if (newVal > max)
+    {
+      val = 0;
+    }
+    else
+    {
+      val = newVal;
+    }
+  }
+  else
+  {
+    val = 0;
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Templated cycle method for std::optional, for the provided val and index domain.
+ * If domain is not set, just returns
+ * If set to the max, unset
+ * If set to something else, cycle on the domain.
+ * If not set, set to 0
+ */
+void cycle(std::optional<int>& val, const f3d::options::domain_index_t& domain)
+{
+  if (!domain.max.has_value())
+  {
+    return;
+  }
+
+  if (!val.has_value())
+  {
+    val = 0;
+  }
+  else
+  {
+    // TODO Check int max ?
+    int max = static_cast<int>(domain.max.value());
+    if (val == max)
     {
       val.reset();
     }
