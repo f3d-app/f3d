@@ -531,6 +531,10 @@ f3d_test(NAME TestCommandScriptLoadStatefileMostRecent SCRIPT DATA cow.vtp ARGS 
 # load_statefile applies over the current interactor state, here overriding a `set` tweak
 f3d_test(NAME TestCommandScriptLoadStatefileOverridesTweak SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "background.color' = '#0000ff' from statefile options" NO_BASELINE)
 
+if(F3D_MODULE_CLIP)
+  f3d_test(NAME TestCommandScriptStatefileClipboard SCRIPT DATA cow.vtp ARGS --verbose REGEXP "background.color' = '#0000ff' from statefile options" NO_BASELINE)
+endif()
+
 # Basic record and play test
 f3d_test(NAME TestInteractionRecord DATA cow.vtp ARGS --interaction-test-record=${CMAKE_BINARY_DIR}/Testing/Temporary/TestInteractionRecord.log NO_BASELINE)
 f3d_test(NAME TestInteractionPlay DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/TestInteractionRecord.log DEPENDS TestInteractionRecord NO_BASELINE)
