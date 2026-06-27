@@ -70,6 +70,34 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   opt.decrease("render.line_width").decrease("render.line_width");
   test("decrease optional", opt.render.line_width.value(), 9.9);
 
+  // Test increase/decrease index
+
+  opt.increase("scene.camera.index");
+  test("increase index nullopt domain nullopt value", !opt.scene.camera.index.has_value());
+
+  opt.domains.scene.camera.index.max = 2;
+  opt.increase("scene.camera.index");
+  test("increase index nullopt value", opt.scene.camera.index.value(), 0);
+  opt.increase("scene.camera.index");
+  test("increase index", opt.scene.camera.index.value(), 1);
+  opt.increase("scene.camera.index");
+  opt.increase("scene.camera.index");
+  test("increase index max cap", opt.scene.camera.index.value(), 2);
+
+  opt.scene.camera.index = std::nullopt;
+  opt.decrease("scene.camera.index");
+  test("decrease index nullopt value", opt.scene.camera.index.value(), 2);
+  opt.decrease("scene.camera.index");
+  test("decrease index", opt.scene.camera.index.value(), 1);
+  opt.decrease("scene.camera.index");
+  opt.decrease("scene.camera.index");
+  test("decrease index min cap", opt.scene.camera.index.value(), 0);
+
+  opt.domains.scene.camera.index.max = std::nullopt;
+  opt.increase("scene.camera.index");
+  test("increase index nullopt domain", opt.scene.camera.index.value(), 0);
+  opt.scene.camera.index = std::nullopt;
+
   // Test cycle
 
   opt.cycle("render.effect.blending.mode");
@@ -91,17 +119,30 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   opt.cycle("render.backface_type").cycle("render.backface_type");
   test("cycle optional reset", !opt.render.backface_type.has_value());
 
-  opt.cycle("scene.camera.index");
-  test("cycle empty domain optional", !opt.scene.camera.index.has_value());
-
-  opt.scene.camera.index = 0;
-  opt.cycle("scene.camera.index");
-  test("cycle empty domain", opt.scene.camera.index.value(), 0);
-
   test.expect<f3d::options::incompatible_exception>(
     "cycle incompatible", [&]() { opt.cycle("scene.animation.speed_factor"); });
   test.expect<f3d::options::inexistent_exception>(
     "cycle inexistent", [&]() { opt.cycle("inexistent"); });
+
+  // Test cycle index
+
+  opt.cycle("scene.camera.index");
+  test("cycle index nullopt domain nullopt value", !opt.scene.camera.index.has_value());
+
+  opt.domains.scene.camera.index.max = 2;
+  opt.cycle("scene.camera.index");
+  test("cycle index nullopt", opt.scene.camera.index.value(), 0);
+  opt.cycle("scene.camera.index");
+  test("cycle index", opt.scene.camera.index.value(), 1);
+  opt.cycle("scene.camera.index");
+  opt.cycle("scene.camera.index");
+  test("cycle index loop nullopt", !opt.scene.camera.index.has_value());
+  opt.cycle("scene.camera.index");
+  test("cycle index loop", opt.scene.camera.index.value(), 0);
+
+  opt.domains.scene.camera.index.max = std::nullopt;
+  opt.cycle("scene.camera.index");
+  test("cycle index nullopt domain", opt.scene.camera.index.value(), 0);
 
   // Check individual domains
 

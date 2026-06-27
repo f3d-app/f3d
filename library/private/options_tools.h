@@ -1028,7 +1028,7 @@ void increase(std::optional<int>& val, const f3d::options::domain_index_t& domai
 {
   if (!val.has_value())
   {
-    if (!domain.max.has_value())
+    if (domain.max.has_value())
     {
       // TODO check int max ?
       int max = static_cast<int>(domain.max.value());
@@ -1050,6 +1050,7 @@ void increase(std::optional<int>& val, const f3d::options::domain_index_t& domai
 template<typename T>
 void cycle(T& val, const f3d::options::domain_enum_t<T>& domain)
 {
+  assert(!domain.enumeration.empty());
   auto it = std::ranges::find(domain.enumeration, val);
   if (it != domain.enumeration.end())
   {
@@ -1060,7 +1061,7 @@ void cycle(T& val, const f3d::options::domain_enum_t<T>& domain)
     }
     val = *it;
   }
-  else if (!domain.enumeration.empty())
+  else
   {
     val = domain.enumeration.front();
   }
@@ -1076,16 +1077,14 @@ void cycle(T& val, const f3d::options::domain_enum_t<T>& domain)
 template<typename T>
 void cycle(std::optional<T>& val, const f3d::options::domain_enum_t<T>& domain)
 {
+  assert(!domain.enumeration.empty());
   if (!val.has_value())
   {
-    if (!domain.enumeration.empty())
-    {
-      val = domain.enumeration.front();
-    }
+    val = domain.enumeration.front();
   }
   else
   {
-    if (!domain.enumeration.empty() && val == domain.enumeration.back())
+    if (val == domain.enumeration.back())
     {
       val.reset();
     }
