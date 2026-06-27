@@ -1,5 +1,6 @@
 #include <engine_c_api.h>
 #include <interactor_c_api.h>
+#include <options_c_api.h>
 #include <scene_c_api.h>
 #include <window_c_api.h>
 
