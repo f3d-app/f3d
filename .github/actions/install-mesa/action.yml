@@ -23,7 +23,7 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: dependencies/mesa_install
-        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-15
+        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-16
 
 
     - name: Set up Python
@@ -48,13 +48,15 @@ runs:
       shell: bash
       run: |
         python -m pip install meson mako packaging PyYAML
-        choco install winflexbison3 llvm --no-progress -y
-        echo "C:/Program Files/LLVM/bin" >> $GITHUB_PATH
+        choco install winflexbison3 --no-progress -y
 
-    - name: Setup LLVM cmake path (Windows)
+    - name: Install LLVM (Windows)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
       shell: pwsh
-      run: Add-Content $env:GITHUB_ENV "CMAKE_PREFIX_PATH=C:\Program Files\LLVM"
+      run: |
+        Invoke-WebRequest -Uri "https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/LLVM-18.1.8-win64.exe" -OutFile "$env:TEMP\LLVM-installer.exe"
+        Start-Process -FilePath "$env:TEMP\LLVM-installer.exe" -ArgumentList "/S" -Wait
+        Add-Content $env:GITHUB_PATH "C:\Program Files\LLVM\bin"
 
     - name: Install MESA build dependencies (macOS/Linux)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os != 'Windows'
