@@ -499,7 +499,7 @@ f3d_test(NAME TestCommandScriptScreenshotFrame SCRIPT DATA cow.vtp ARGS --screen
 
 # Round trip: one test saves a statefile, a dependent test loads it back and renders it,
 # checking both that the saved statefile is correct and that its options and camera are applied
-f3d_test(NAME TestStatefileSave DATA cow.vtp NO_BASELINE ARGS -D render.background.color=0,0,1 --camera-azimuth-angle=45 --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileSave.json REGEXP "Statefile saved to")
+f3d_test(NAME TestStatefileSave DATA cow.vtp NO_BASELINE ARGS -D render.background.color=0,0,1 --camera-position=15,8,15 --camera-focal-point=0.78,-0.44,0 --camera-view-up=0,1,0 --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileSave.json REGEXP "Statefile saved to")
 f3d_test(NAME TestStatefileLoad DEPENDS TestStatefileSave ARGS --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileSave.json)
 
 # Load a known statefile, checking its options are applied
@@ -531,7 +531,10 @@ f3d_test(NAME TestCommandScriptLoadStatefileMostRecent SCRIPT DATA cow.vtp ARGS 
 # load_statefile applies over the current interactor state, here overriding a `set` tweak
 f3d_test(NAME TestCommandScriptLoadStatefileOverridesTweak SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "background.color' = '#0000ff' from statefile options" NO_BASELINE)
 
-if(F3D_MODULE_CLIP)
+# The clipboard round-trip needs a real onscreen window for the X11 selection to work, it fails with
+# the offscreen backends (egl, osmesa), so only run it where an onscreen window is available, ie on
+# Windows, macOS, or Linux with GLX tests enabled (where the auto backend resolves to GLX).
+if(F3D_MODULE_CLIP AND (WIN32 OR APPLE OR F3D_TESTING_ENABLE_GLX_TESTS))
   f3d_test(NAME TestCommandScriptStatefileClipboard SCRIPT DATA cow.vtp ARGS --verbose REGEXP "background.color' = '#0000ff' from statefile options" NO_BASELINE)
 endif()
 
