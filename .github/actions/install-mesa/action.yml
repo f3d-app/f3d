@@ -58,22 +58,14 @@ runs:
       shell: bash
       run: apt-get install -y bison byacc flex pkg-config ninja-build python3-dev llvm-dev
 
-    - name: Uninstall Choco LLVM (Windows)
-      if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
-      shell: bash
-      run: |
-        choco uninstall llvm -y --no-progress
-
     - name: Install LLVM (Windows)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
       shell: pwsh
       run: |
-        Invoke-WebRequest -Uri "https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/LLVM-18.1.8-win64.exe" -OutFile "$env:TEMP\LLVM-installer.exe"
-        $proc = Start-Process -FilePath "$env:TEMP\LLVM-installer.exe" -ArgumentList "/S" -Wait -PassThru
-        Write-Host "Installer exit code: $($proc.ExitCode)"
-        Write-Host "Contents of C:\Program Files\LLVM\bin:"
-        Get-ChildItem "C:\Program Files\LLVM\bin" -ErrorAction SilentlyContinue | Select-Object Name
-        "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        Invoke-WebRequest -Uri "https://github.com/llvm/llvm-project/releases/download/llvmorg-22.1.8/clang+llvm-22.1.8-x86_64-pc-windows-msvc.tar.xz" -OutFile "$env:TEMP\llvm.tar.xz"
+        New-Item -ItemType Directory -Force -Path "$env:TEMP\LLVM"
+        tar -xf "$env:TEMP\llvm.tar.xz" -C "$env:TEMP\LLVM" --strip-components=1
+        "$env:TEMP\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
     - name: Install LLVM (macOS)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'macOS'
