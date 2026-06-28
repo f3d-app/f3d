@@ -23,7 +23,7 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: dependencies/mesa_install
-        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-18
+        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-19
 
     - name: Set up Python
       if: steps.cache-mesa.outputs.cache-hit != 'true'
@@ -118,8 +118,12 @@ runs:
         -Dglx=disabled
         -Dxlib-lease=disabled
         -Dxmlconfig=disabled
+        -Dexpat=disabled
         -Dplatforms=[]
         -Dshared-glapi=enabled
+        -Dllvm=enabled
+        -Dshared-llvm=disabled
+        -Dzlib=disabled
 
     - name: Build MESA
       if: steps.cache-mesa.outputs.cache-hit != 'true'
