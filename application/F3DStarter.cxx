@@ -683,19 +683,14 @@ public:
     /* Substitute an incrementing number: when saving, stop at the first free filename; when loading
      * (existing), return the last existing filename instead so the most recent save is reloaded
      */
+    const auto makeCandidate = [&](size_t i)
+    { return f3d::utils::string_template(stringTemplate).substitute(numberingLookup(i)).str(); };
     for (size_t i = 1; i <= maxNumberingAttempts; ++i)
     {
-      const std::string candidate =
-        f3d::utils::string_template(stringTemplate).substitute(numberingLookup(i)).str();
+      const std::string candidate = makeCandidate(i);
       if (!fs::exists(candidate))
       {
-        if (existing && i > 1)
-        {
-          return {
-            f3d::utils::string_template(stringTemplate).substitute(numberingLookup(i - 1)).str()
-          };
-        }
-        return { candidate };
+        return { existing && i > 1 ? makeCandidate(i - 1) : candidate };
       }
     }
     throw std::runtime_error("could not find available unique filename after " +
@@ -2306,6 +2301,7 @@ void F3DStarter::LoadStatefile(const std::string& source)
   }
 
   this->ApplyStatefile(statefileOptions, statefileFiles, statefileFileGroups);
+  f3d::log::info("Statefile loaded from ", resolvedSource);
 }
 
 //----------------------------------------------------------------------------
@@ -2321,6 +2317,7 @@ void F3DStarter::LoadStatefileFromClipboard()
   }
 
   this->ApplyStatefile(statefileOptions, statefileFiles, statefileFileGroups);
+  f3d::log::info("Statefile loaded from the clipboard");
 }
 
 //----------------------------------------------------------------------------
