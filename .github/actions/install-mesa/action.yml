@@ -23,7 +23,7 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: dependencies/mesa_install
-        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-20
+        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-21
 
     - name: Set up Python
       if: steps.cache-mesa.outputs.cache-hit != 'true'
@@ -78,6 +78,7 @@ runs:
       run: |
         brew install llvm zstd
         echo "$(brew --prefix llvm)/bin" >> $GITHUB_PATH
+        echo "LDFLAGS=-L$(brew --prefix zstd)/lib" >> $GITHUB_ENV
 
     - name: Check LLVM
       if: steps.cache-mesa.outputs.cache-hit != 'true'
@@ -122,7 +123,7 @@ runs:
         -Dplatforms=[]
         -Dshared-glapi=disabled
         -Dllvm=enabled
-        -Dshared-llvm=disabled
+        -Dshared-llvm=${{ runner.os == 'Windows' && 'disabled' || 'enabled' }}
         -Dzlib=disabled
 
     - name: Build MESA
