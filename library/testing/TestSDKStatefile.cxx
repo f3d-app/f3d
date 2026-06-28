@@ -88,7 +88,7 @@ int TestSDKStatefile([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   const std::string relContent{ std::istreambuf_iterator<char>(relStream),
     std::istreambuf_iterator<char>() };
   test("file inside statefile dir stored as relative path",
-    relContent.find("\"local_cow.vtp\"") != std::string::npos, true);
+    relContent.find(R"("local_cow.vtp")") != std::string::npos, true);
   f3d::engine relDst = f3d::engine::createNone();
   relDst.loadStatefile(relStatefilePath);
   test("relative file restored", relDst.getScene().getAddedFiles().size(), static_cast<size_t>(1));
@@ -100,22 +100,21 @@ int TestSDKStatefile([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // Loading a statefile without an options entry is valid
   f3d::engine noOptEng = f3d::engine::createNone();
-  noOptEng.loadStatefileFromString("{ \"files\": [] }");
+  noOptEng.loadStatefileFromString(R"({ "files": [] })");
   test(
     "no option statefile leaves no added file", noOptEng.getScene().getAddedFiles().empty(), true);
 
   // Options that do not exist or cannot be parsed are skipped with a warning, not a failure
   f3d::engine optEng = f3d::engine::createNone();
-  optEng.loadStatefileFromString("{ \"options\": { \"not.a.real.option\": \"1\" } }");
-  optEng.loadStatefileFromString("{ \"options\": { \"render.line_width\": \"not_a_number\" } }");
+  optEng.loadStatefileFromString(R"({ "options": { "not.a.real.option": "1" } })");
+  optEng.loadStatefileFromString(R"({ "options": { "render.line_width": "not_a_number" } })");
   test("invalid options are skipped", optEng.getScene().getAddedFiles().empty(), true);
 
   // Restoring a camera into an engine without a window is skipped with a log, not a failure
   f3d::engine noWinEng = f3d::engine::createNone();
   noWinEng.loadStatefileFromString(
-    "{ \"camera\": { \"position\": [0.0, 0.0, 1.0], "
-    "\"focal_point\": [0.0, 0.0, 0.0], \"view_up\": [0.0, 1.0, 0.0], "
-    "\"view_angle\": 30.0 } }");
+    R"({ "camera": { "position": [0.0, 0.0, 1.0], "focal_point": [0.0, 0.0, 0.0], )"
+    R"("view_up": [0.0, 1.0, 0.0], "view_angle": 30.0 } })");
   test("camera without window is skipped", noWinEng.getScene().getAddedFiles().empty(), true);
 
   // Failure modes
