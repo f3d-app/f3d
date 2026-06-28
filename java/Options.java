@@ -14,6 +14,15 @@ public class Options {
     }
 
     /**
+     * Enumeration of supported domain style.
+     */
+    public enum DomainStyle {
+        RANGE,
+        ENUM,
+        INDEX
+    }
+
+    /**
      * Sets a boolean option value.
      *
      * @param name the name of the option to set
@@ -221,6 +230,48 @@ public class Options {
      * @throws IllegalArgumentException if the option name does not exist
      */
     public native void removeValue(String name);
+
+    /**
+     * Return true if an option as a domain, false otherwise.
+     *
+     * @param name the name of the option to remove the value from
+     * @param style the style of the domain, set by the method
+     * @throws IllegalArgumentException if the option name does not exist
+     */
+    public native boolean hasDomain(String name, DomainStyle style);
+
+    /**
+     * Return a vector of string containing the enumeration for the option
+     *
+     * @param name the name of the option to remove the value from
+     * @return enumeration of values
+     * @throws IllegalArgumentException if the option name does not exist or doesn't have an enum domain
+     */
+    public native List<String> getEnumDomain(String name);
+
+    /**
+     * Increase the specified option if it has a range or index domain
+     *
+     * @param name the name of the option to increase
+     * @throws IllegalArgumentException if the option name does not exist or doens't have the expected domain
+     */
+    public native void increase(String name);
+
+    /**
+     * Decrease the specified option if it has a range or index domain
+     *
+     * @param name the name of the option to decrease
+     * @throws IllegalArgumentException if the option name does not exist or doens't have the expected domain
+     */
+    public native void decrease(String name);
+
+    /**
+     * Cycle the specified option if it has an enum or index domain
+     *
+     * @param name the name of the option to cycle
+     * @throws IllegalArgumentException if the option name does not exist or doens't have the expected domain
+     */
+    public native void cycle(String name);
 
     /**
      * Result class for the closest option search operation.
