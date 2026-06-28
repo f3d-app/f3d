@@ -23,7 +23,7 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: dependencies/mesa_install
-        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-19
+        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-20
 
     - name: Set up Python
       if: steps.cache-mesa.outputs.cache-hit != 'true'
@@ -56,7 +56,7 @@ runs:
     - name: Install Flex/Bison (Linux)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Linux'
       shell: bash
-      run: apt-get install -y bison byacc flex pkg-config ninja-build python3-dev llvm-dev
+      run: apt-get install -y bison byacc flex pkg-config ninja-build python3-dev llvm-dev libzstd-dev
 
     #- name: Setup LLVM
     #  uses: ZhongRuoyu/setup-llvm@v0
@@ -76,7 +76,7 @@ runs:
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'macOS'
       shell: bash
       run: |
-        brew install llvm
+        brew install llvm zstd
         echo "$(brew --prefix llvm)/bin" >> $GITHUB_PATH
 
     - name: Check LLVM
@@ -120,7 +120,7 @@ runs:
         -Dxmlconfig=disabled
         -Dexpat=disabled
         -Dplatforms=[]
-        -Dshared-glapi=enabled
+        -Dshared-glapi=disabled
         -Dllvm=enabled
         -Dshared-llvm=disabled
         -Dzlib=disabled
