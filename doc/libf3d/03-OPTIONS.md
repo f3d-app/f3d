@@ -50,7 +50,7 @@ CLI: `--animation-time`.
 
 Select the scene camera to use when available in the file.
 The default scene always uses automatic camera.
-The domain is updated when loading the file to contain the number of cameres in the file.
+The domain is updated when loading the file to contain the number of cameras in the file.
 
 CLI: `--camera-index`.
 
@@ -74,7 +74,7 @@ CLI: `--camera-orthographic`.
 
 ## Interactor Options
 
-### `interactor.style` (_string_, default: `default`)
+### `interactor.style` (_string_, default: `default`, enum domain: `default, trackball, 2d`)
 
 Set the interaction style. `default` uses standard 3D interaction, `trackball` enables trackball interaction, `2d` enables 2D interaction mode (pan/zoom only, no rotation). In `2d` mode, camera commands (`set_camera`, `roll_camera`, `elevation_camera`, `azimuth_camera`) are disabled.
 
@@ -94,7 +94,7 @@ Path to a texture file containing a material capture. All other model options fo
 
 CLI: `--texture-matcap`.
 
-### `model.color.opacity` (_double_, optional)
+### `model.color.opacity` (_double_, optional, range domain: `[0, 1]`, increment: `0.05`)
 
 Set _opacity_ on the geometry. Usually used with Depth Peeling option. Multiplied with the `model.color.texture` when present. Model-specified by default.
 
@@ -124,19 +124,19 @@ Path to a texture file that sets the emitted light of the object. Multiplied wit
 
 CLI: `--texture-emissive`.
 
-### `model.material.metallic` (_double_, optional)
+### `model.material.metallic` (_double_, optional, range domain: `[0, 1]`, increment: `0.05`)
 
 Set the _metallic coefficient_ on the geometry (between `0.0` and `1.0`). Multiplied with the `model.material.texture` when present. Model-specified by default.
 
 CLI: `--metallic`.
 
-### `model.material.roughness` (_double_, optional)
+### `model.material.roughness` (_double_, optional, range domain: `[0, 1]`, increment: `0.05`)
 
 Set the _roughness coefficient_ on the geometry (between `0.0` and `1.0`). Multiplied with the `model.material.texture` when present. Model-specified by default.
 
 CLI: `--roughness`.
 
-### `model.material.base_ior` (_double_, optional)
+### `model.material.base_ior` (_double_, optional, range domain: `[0, 1]`, increment: `0.05`)
 
 Set the _index of refraction of the base layer_ (between `1.0` and `2.5`). Model-specified by default.
 
@@ -152,11 +152,11 @@ CLI: `--texture-material`.
 
 Render vertex normals as arrows on top of the geometry.
 
-### `model.normal_glyphs.scale` (_ratio_, default: `1.0`)
+### `model.normal_glyphs.scale` (_ratio_, default: `1.0`, range domain: `[0, 10]`, increment: `0.1`)
 
 Scales the normal glyphs
 
-### `model.normal.scale` (_double_, optional)
+### `model.normal.scale` (_double_, optional, range domain: `[0, 1]`, increment: `0.05`)
 
 Normal scale affects the strength of the normal deviation from the normal texture. Model-specified by default.
 
@@ -193,7 +193,7 @@ Color the data with value found _on the cells_ instead of points
 
 CLI: `--coloring-by-cells`.
 
-### `model.scivis.discretization` (_int_, optional)
+### `model.scivis.discretization` (_int_, optional, range domain: `[1, 1024]`, increment: `5`)
 
 Set how many distinct colors will be used from the colormap. Should be `>=1`.
 
@@ -230,14 +230,13 @@ Set the _coloring range_. Automatically computed by default.
 
 CLI: `--coloring-range`.
 
-### `model.point_sprites.type` (_string_, default: `none`)
+### `model.point_sprites.type` (_string_, default: `none`, enum domain: `none, sphere, gaussian, circle, stddev, bound, cross`)
 
 Enable and set the point sprites type. This allows to show sprites instead of points.
-Valid values are `sphere`, `gaussian`, `circle`, `stddev`, `bound`, `cross` or `none` (disabled).
 
 CLI: `--point-sprites`.
 
-### `model.point_sprites.size` (_double_, default: `10.0`)
+### `model.point_sprites.size` (_double_, default: `10.0`, range domain: `[1, 100]`, increment: `1`)
 
 Set the _size_ of point sprites.
 
@@ -269,14 +268,14 @@ CLI: `--textures-transform`.
 
 ## Render Options
 
-### `render.effect.blending.mode` (_string_, default: `none`)
+### `render.effect.blending.mode` (_string_, default: `none`, enum domain: `none, ddp, sort, sort_cpu, stochastic`)
 
 Enable and set the _blending_ technique. This is a technique used to correctly render translucent objects.
 Valid options are: `ddp` (dual depth peeling, quality), `sort` (only for gaussians), `sort_cpu` (only for gaussians, slow), `stochastic` (fast), `none` (disabled).
 
 CLI: `--blending`.
 
-### `render.effect.antialiasing.mode` (_string_, default: `none`)
+### `render.effect.antialiasing.mode` (_string_, default: `none`, enum domain: `none, fxaa, ssaa, taa`)
 
 Enable and set the anti-aliasing technique. This technique is used to reduce aliasing.
 Valid options are: `fxaa` (fast), `ssaa` (quality), `taa` (balanced), `none` (disabled).
@@ -308,7 +307,7 @@ Only opaque objects are displayed, the grid and translucent/volumetric objects a
 
 CLI: `--display-depth`
 
-### `render.line_width` (_double_, optional)
+### `render.line_width` (_double_, optional, range domain: `[0, 10]`, increment: `0.1`)
 
 Set the _width_ of lines when showing edges. Model-specified by default.
 
@@ -320,7 +319,7 @@ Set to true to show the _cell edges_. Model-specified by default.
 
 CLI: `--edges`.
 
-### `render.point_size` (_double_, optional)
+### `render.point_size` (_double_, optional, range domain: `[0, 10]`, increment: `0.1`)
 
 Set the _size_ of points when showing vertices. Model-specified by default.
 
@@ -380,7 +379,7 @@ Enable _raytracing_. Requires the raytracing module to be enabled.
 
 CLI: `--raytracing`.
 
-### `render.raytracing.samples` (_int_, default: `5`)
+### `render.raytracing.samples` (_int_, default: `5`, range domain: `[1, 20]`, increment: `1`)
 
 The number of _samples per pixel_.
 
@@ -427,13 +426,13 @@ Blur background, useful with a skybox.
 
 CLI: `--blur-background`.
 
-### `render.background.blur.coc` (_double_, default: `20.0`)
+### `render.background.blur.coc` (_double_, default: `20.0`, range domain: `[0, 100]`, increment: `5`)
 
 Blur background circle of confusion radius.
 
 CLI: `--blur-coc`.
 
-### `render.light.intensity` (_double_, default: `1.0`)
+### `render.light.intensity` (_double_, default: `1.0`, range domain: `[0, 5]`, increment: `0.02`)
 
 Adjust the intensity of every light in the scene (except HDRI).
 
@@ -510,7 +509,7 @@ Can be useful to display non-ASCII filenames.
 
 CLI: `--font-file`.
 
-### `ui.scale` (_ratio_, default: `1.0`)
+### `ui.scale` (_ratio_, default: `1.0`, range domain: `[0, 10]`, increment: `0.1`)
 
 Scale fonts. Useful for HiDPI displays.
 
@@ -582,7 +581,7 @@ Set the color of the backdrop behind the UI elements.
 
 CLI: `--backdrop-color`.
 
-### `ui.backdrop.opacity` (_double_, default: `0.9`)
+### `ui.backdrop.opacity` (_double_, default: `0.9`, range domain: `[0, 1]`, increment: `0.05`)
 
 Set the opacity of the backdrop behind the UI elements. Value is between 0.0 (fully transparent) and 1.0 (fully opaque).
 
