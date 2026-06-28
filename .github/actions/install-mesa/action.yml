@@ -69,7 +69,10 @@ runs:
       shell: pwsh
       run: |
         Invoke-WebRequest -Uri "https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/LLVM-18.1.8-win64.exe" -OutFile "$env:TEMP\LLVM-installer.exe"
-        Start-Process -FilePath "$env:TEMP\LLVM-installer.exe" -ArgumentList "/S" -Wait
+        $proc = Start-Process -FilePath "$env:TEMP\LLVM-installer.exe" -ArgumentList "/S" -Wait -PassThru
+        Write-Host "Installer exit code: $($proc.ExitCode)"
+        Write-Host "Contents of C:\Program Files\LLVM\bin:"
+        Get-ChildItem "C:\Program Files\LLVM\bin" -ErrorAction SilentlyContinue | Select-Object Name
         "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
     - name: Install LLVM (macOS)
