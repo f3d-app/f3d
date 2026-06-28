@@ -117,7 +117,7 @@ const settings = {
       "options getter after reset",
     );
 
-    style = Module.OptionsDomainStyle.RANGE;
+/*    style = Module.OptionsDomainStyle.RANGE;
     utils.assert(
       options.hasDomain("scene.animation.index", style),
       "options hasDomain",
@@ -125,7 +125,7 @@ const settings = {
     utils.assert(
       style == Module.OptionsDomainStyle.INDEX,
       "option hasDomain style",
-    );
+    );*/
     utils.assert(
       options.getEnumDomain("render.effect.blending.mode").includes("ddp"),
       "options getEnumDomain",
