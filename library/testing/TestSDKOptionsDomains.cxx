@@ -147,6 +147,9 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   test("cycle index loop nullopt", !opt.scene.camera.index.has_value());
   opt.cycle("scene.camera.index");
   test("cycle index loop", opt.scene.camera.index.value(), 0);
+  opt.scene.camera.index = 3;
+  opt.cycle("scene.camera.index");
+  test("cycle index loop invalid", opt.scene.camera.index.value(), 0);
 
   opt.domains.scene.camera.index.max = std::nullopt;
   opt.cycle("scene.camera.index");

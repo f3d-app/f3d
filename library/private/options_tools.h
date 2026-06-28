@@ -1108,6 +1108,7 @@ void cycle(int& val, const f3d::options::DomainIndex& domain)
 {
   if (!domain.max.has_value())
   {
+    // Unreachable until we add a non-optional index domain option
     return;
   }
 
@@ -1117,6 +1118,7 @@ void cycle(int& val, const f3d::options::DomainIndex& domain)
     int newVal = val + 1;
     if (newVal > max)
     {
+      // Unreachable until we add a non-optional index domain option
       val = 0;
     }
     else
