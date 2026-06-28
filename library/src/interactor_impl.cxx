@@ -826,9 +826,7 @@ interactor& interactor_impl::initCommands()
       if (std::ranges::find(optionNames, args[0]) != optionNames.end())
       {
         // Its an existing option, check if it has an enumeration domain
-        f3d::options::domain_style style;
-        if (this->Internals->Options.hasDomain(args[0], style) &&
-          style == f3d::options::domain_style::ENUM)
+        if (this->Internals->Options.hasDomain(args[0]) && this->Internals->Options.getDomainStyle(args[0]) == f3d::options::domain_style::ENUM)
         {
           // recover the enumeration
           std::vector<std::string> enumeration = this->Internals->Options.getEnumDomain(args[0]);
@@ -852,9 +850,7 @@ interactor& interactor_impl::initCommands()
     else
     {
       // Its an existing option, check if it has an enumeration domain
-      f3d::options::domain_style style;
-      if (this->Internals->Options.hasDomain(args[0], style) &&
-        style == f3d::options::domain_style::ENUM)
+      if (this->Internals->Options.hasDomain(args[0]) && this->Internals->Options.getDomainStyle(args[0]) == f3d::options::domain_style::ENUM)
       {
         // recover the enumeration
         std::vector<std::string> enumeration = this->Internals->Options.getEnumDomain(args[0]);

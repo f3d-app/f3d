@@ -217,10 +217,12 @@ def test_remove_value():
 
 def test_has_domain():
     options = f3d.Options()
-    domain = f3d.pyf3d.Options.DomainStyle.ENUM  # TODO NEEDED ?
-    flag = options.has_domain("scene.camera.index", domain)
-    assert flag
-    assert domain == f3d.Options.DomainStyle.INDEX
+    assert options.has_domain("scene.camera.index")
+
+
+def test_get_domain_style():
+    options = f3d.Options()
+    assert options.get_domain_style("scene.camera.index") == f3d.Options.DomainStyle.INDEX
 
 
 def test_get_enum_domain():

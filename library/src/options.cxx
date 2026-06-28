@@ -189,9 +189,24 @@ options& options::removeValue(std::string_view name)
 }
 
 //----------------------------------------------------------------------------
-bool options::hasDomain(std::string_view name, domain_style& style) const
+bool options::hasDomain(std::string_view name) const
 {
+  domain_style style;
   return options_generated::hasDomain(name, style);
+}
+
+//----------------------------------------------------------------------------
+f3d::options::domain_style options::getDomainStyle(std::string_view name) const
+{
+  domain_style style;
+  if (options_generated::hasDomain(name, style))
+  {
+    return style;
+  }
+  else
+  {
+    throw options::incompatible_exception("Option " + std::string(name) + " doesn't have a domain");
+  }
 }
 
 //----------------------------------------------------------------------------

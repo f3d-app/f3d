@@ -161,11 +161,16 @@ public:
 
   /**
    * Return true if an option has a domain, false otherwise.
-   * When returning true, set provided style to the domain_style.
-   *
    * Throws an options::inexistent_exception if option does not exist.
    */
-  [[nodiscard]] bool hasDomain(std::string_view name, domain_style& style) const;
+  [[nodiscard]] bool hasDomain(std::string_view name) const;
+
+  /**
+   * Return the domain_style of provided option
+   * Throw options::incompatible_exception if option doesn't have an enumeration domain.
+   * Throws an options::inexistent_exception if option does not exist.
+   */
+  [[nodiscard]] domain_style getDomainStyle(std::string_view name) const;
 
   /**
    * Return a the enumeration of the enum domain of provided option.

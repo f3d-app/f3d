@@ -235,10 +235,17 @@ public class Options {
      * Return true if an option as a domain, false otherwise.
      *
      * @param name the name of the option to remove the value from
-     * @param style the style of the domain, set by the method
      * @throws IllegalArgumentException if the option name does not exist
      */
-    public native boolean hasDomain(String name, DomainStyle style);
+    public native boolean hasDomain(String name);
+
+    /**
+     * Return the domain style of the provided option.
+     *
+     * @param name the name of the option to remove the value from
+     * @throws IllegalArgumentException if the option name does not exist or it doesn't have a domain
+     */
+    public native DomainStyle getDomainStyle(String name);
 
     /**
      * Return a vector of string containing the enumeration for the option

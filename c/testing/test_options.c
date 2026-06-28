@@ -96,8 +96,8 @@ int test_options()
   f3d_options_reset(options, "model.scivis.cells");
   f3d_options_remove_value(options, "render.show_edges");
 
-  enum f3d_domain_style_t style;
-  f3d_options_has_domain(options, "scene.animation.speed_factor", &style);
+  f3d_options_has_domain(options, "scene.animation.speed_factor");
+  f3d_options_get_domain_style(options, "scene.animation.speed_factor");
 
   int enum_count = 0;
   char** enumeration = f3d_options_get_enum_domain(options, "interactor.style", &enum_count);

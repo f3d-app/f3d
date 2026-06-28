@@ -535,10 +535,9 @@ void f3d_options_remove_value(f3d_options_t* options, const char* name)
 }
 
 //----------------------------------------------------------------------------
-int f3d_options_has_domain(
-  const f3d_options_t* options, const char* name, f3d_domain_style_t* style)
+int f3d_options_has_domain(const f3d_options_t* options, const char* name)
 {
-  if (!options || !name || !style)
+  if (!options || !name)
   {
     return 0;
   }
@@ -546,26 +545,48 @@ int f3d_options_has_domain(
   try
   {
     const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
-    f3d::options::domain_style ds;
-    bool ret = cpp_options->hasDomain(name, ds);
-    switch (ds)
-    {
-      case f3d::options::domain_style::RANGE:
-        *style = F3D_DOMAIN_STYLE_RANGE;
-      case f3d::options::domain_style::ENUM:
-        *style = F3D_DOMAIN_STYLE_ENUM;
-      case f3d::options::domain_style::INDEX:
-        *style = F3D_DOMAIN_STYLE_INDEX;
-      default:
-        // Unreachable
-        return 0;
-    }
-    return ret;
+    return cpp_options->hasDomain(name) ? 1 : 0;
   }
   catch (const f3d::options::inexistent_exception& ex)
   {
     f3d::log::error(ex.what());
     return 0;
+  }
+}
+
+//----------------------------------------------------------------------------
+f3d_domain_style_t f3d_options_get_domain_style(
+  const f3d_options_t* options, const char* name)
+{
+  if (!options || !name)
+  {
+    return F3D_DOMAIN_STYLE_NONE;
+  }
+
+  try
+  {
+    const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
+    f3d::options::domain_style ds = cpp_options->getDomainStyle(name);
+    switch (ds)
+    {
+      case f3d::options::domain_style::RANGE:
+        return F3D_DOMAIN_STYLE_RANGE;
+      case f3d::options::domain_style::ENUM:
+        return F3D_DOMAIN_STYLE_ENUM;
+      default:
+      case f3d::options::domain_style::INDEX:
+        return F3D_DOMAIN_STYLE_INDEX;
+    }
+  }
+  catch (const f3d::options::incompatible_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return F3D_DOMAIN_STYLE_NONE;
+  }
+  catch (const f3d::options::inexistent_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return F3D_DOMAIN_STYLE_NONE;
   }
 }
 
@@ -581,24 +602,38 @@ char** f3d_options_get_enum_domain(const f3d_options_t* options, const char* nam
     return nullptr;
   }
 
-  const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
-  std::vector<std::string> enumeration = cpp_options->getEnumDomain(name);
-
-  *count = static_cast<int>(enumeration.size());
-  if (enumeration.empty())
+  try
   {
+    const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
+    std::vector<std::string> enumeration = cpp_options->getEnumDomain(name);
+
+    *count = static_cast<int>(enumeration.size());
+    if (enumeration.empty())
+    {
+      return nullptr;
+    }
+
+    char** result = new char*[enumeration.size()];
+
+    for (size_t i = 0; i < enumeration.size(); ++i)
+    {
+      result[i] = new char[enumeration[i].length() + 1];
+      std::strcpy(result[i], enumeration[i].c_str());
+    }
+
+    return result;
+  }
+
+  catch (const f3d::options::incompatible_exception& ex)
+  {
+    f3d::log::error(ex.what());
     return nullptr;
   }
-
-  char** result = new char*[enumeration.size()];
-
-  for (size_t i = 0; i < enumeration.size(); ++i)
+  catch (const f3d::options::inexistent_exception& ex)
   {
-    result[i] = new char[enumeration[i].length() + 1];
-    std::strcpy(result[i], enumeration[i].c_str());
+    f3d::log::error(ex.what());
+    return nullptr;
   }
-
-  return result;
 }
 
 //----------------------------------------------------------------------------

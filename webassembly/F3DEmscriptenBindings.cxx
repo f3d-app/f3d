@@ -137,11 +137,14 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function(
       "removeValue", +[](f3d::options& o, const std::string& name) -> f3d::options&
       { return o.removeValue(name); }, emscripten::return_value_policy::reference())
-//    .function("hasDomain", &f3d::options::hasDomain)
-/*    .function(
+    .function(
       "hasDomain",
-      +[](const f3d::options& o, const std::string& name, f3d::options::domain_style& style) -> bool
-      { return o.hasDomain(name, style); })*/
+      +[](const f3d::options& o, const std::string& name) -> bool
+      { return o.hasDomain(name); })
+    .function(
+      "getDomainStyle",
+      +[](const f3d::options& o, const std::string& name) -> f3d::options::domain_style
+      { return o.getDomainStyle(name); })
     .function(
       "getEnumDomain", +[](const f3d::options& o, const std::string& name) -> emscripten::val
       { return containerToJSArray(o.getEnumDomain(name)); })

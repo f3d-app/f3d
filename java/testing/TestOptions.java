@@ -58,8 +58,8 @@ public class TestOptions {
     options.reset("render.line_width");
     options.removeValue("model.color.texture");
 
-    Options.DomainStyle style = Options.DomainStyle.ENUM;
-    options.hasDomain("scene.animation.index", style);
+    options.hasDomain("scene.camera.index");
+    options.getDomainStyle("scene.camera.index");
     options.getEnumDomain("render.effect.blending.mode");
     options.increase("render.raytracing.samples");
     options.decrease("render.raytracing.samples");

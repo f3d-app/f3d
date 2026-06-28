@@ -117,15 +117,14 @@ const settings = {
       "options getter after reset",
     );
 
-/*    style = Module.OptionsDomainStyle.RANGE;
     utils.assert(
-      options.hasDomain("scene.animation.index", style),
+      options.hasDomain("scene.camera.index"),
       "options hasDomain",
     );
     utils.assert(
-      style == Module.OptionsDomainStyle.INDEX,
-      "option hasDomain style",
-    );*/
+      options.getDomainStyle("scene.camera.index") == Module.OptionsDomainStyle.INDEX,
+      "option getDomainStyle",
+    );
     utils.assert(
       options.getEnumDomain("render.effect.blending.mode").includes("ddp"),
       "options getEnumDomain",

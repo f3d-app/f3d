@@ -313,6 +313,7 @@ extern "C"
    */
   typedef enum f3d_domain_style_t
   {
+    F3D_DOMAIN_STYLE_NONE = 0,
     F3D_DOMAIN_STYLE_RANGE = 1,
     F3D_DOMAIN_STYLE_ENUM = 2,
     F3D_DOMAIN_STYLE_INDEX = 3,
@@ -323,12 +324,22 @@ extern "C"
    *
    * @param options Options handle.
    * @param name Option name.
-   * @param style Domain style pointer, set by the method.
    * @return 1 if the option has a domain, 0 otherwise or if the option doesn't exist or if any of
    * the param is NULL.
    */
   F3D_EXPORT int f3d_options_has_domain(
-    const f3d_options_t* options, const char* name, f3d_domain_style_t* style);
+    const f3d_options_t* options, const char* name);
+
+  /**
+   * @brief Return the domain style of provided option
+   *
+   * @param options Options handle.
+   * @param name Option name.
+   * @return the domain style, or if the option doesn't exist, doesn't have a domain or if any of
+   * the params is NULL, returns F3D_DOMAIN_STYLE_NONE.
+   */
+  F3D_EXPORT f3d_domain_style_t f3d_options_get_domain_style(
+    const f3d_options_t* options, const char* name);
 
   /**
    * @brief Get an option enumeration domain if it has one

@@ -242,12 +242,19 @@ extern "C"
     env->ReleaseStringUTFChars(name, str);
   }
 
-  JNIEXPORT jboolean JAVA_BIND(Options, hasDomain)(
-    JNIEnv* env, jobject self, jstring name, jobject style)
+  JNIEXPORT jboolean JAVA_BIND(Options, hasDomain)(JNIEnv* env, jobject self, jstring name)
   {
     const char* str = env->GetStringUTFChars(name, nullptr);
-    f3d::options::domain_style ds;
-    bool result = GetOptionsFromEngine(env, self).hasDomain(str, ds);
+    bool result = GetOptionsFromEngine(env, self).hasDomain(str);
+    env->ReleaseStringUTFChars(name, str);
+    return result;
+  }
+
+  JNIEXPORT jobject JAVA_BIND(Options, getDomainStyle)(
+    JNIEnv* env, jobject self, jstring name)
+  {
+    const char* str = env->GetStringUTFChars(name, nullptr);
+    f3d::options::domain_style ds = GetOptionsFromEngine(env, self).getDomainStyle(str);
     env->ReleaseStringUTFChars(name, str);
 
     jclass enumClass = env->FindClass("app/f3d/F3D/Options$DomainStyle");
@@ -266,9 +273,7 @@ extern "C"
         fieldID = env->GetStaticFieldID(enumClass, "INDEX", "Lapp/f3d/F3D/Options$DomainStyle;");
         break;
     }
-    style = env->GetStaticObjectField(enumClass, fieldID);
-
-    return result;
+    return env->GetStaticObjectField(enumClass, fieldID);
   }
 
   JNIEXPORT jobject JAVA_BIND(Options, getEnumDomain)(JNIEnv* env, jobject self, jstring name)
