@@ -104,9 +104,27 @@ int TestSDKStatefile([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test(
     "no option statefile leaves no added file", noOptEng.getScene().getAddedFiles().empty(), true);
 
+  // Options that do not exist or cannot be parsed are skipped with a warning, not a failure
+  f3d::engine optEng = f3d::engine::createNone();
+  optEng.loadStatefileFromString("{ \"options\": { \"not.a.real.option\": \"1\" } }");
+  optEng.loadStatefileFromString("{ \"options\": { \"render.line_width\": \"not_a_number\" } }");
+  test("invalid options are skipped", optEng.getScene().getAddedFiles().empty(), true);
+
+  // Restoring a camera into an engine without a window is skipped with a log, not a failure
+  f3d::engine noWinEng = f3d::engine::createNone();
+  noWinEng.loadStatefileFromString(
+    "{ \"camera\": { \"position\": [0.0, 0.0, 1.0], "
+    "\"focal_point\": [0.0, 0.0, 0.0], \"view_up\": [0.0, 1.0, 0.0], "
+    "\"view_angle\": 30.0 } }");
+  test("camera without window is skipped", noWinEng.getScene().getAddedFiles().empty(), true);
+
   // Failure modes
+  const fs::path invalidStatefilePath = tmpDir / "invalid_statefile.json";
+  std::ofstream(invalidStatefilePath) << "{ not valid json";
   test.expect<f3d::engine::statefile_exception>(
     "load a non existent statefile", [&]() { dst.loadStatefile(tmpDir / "no_such_file.json"); });
+  test.expect<f3d::engine::statefile_exception>(
+    "load an invalid statefile file", [&]() { dst.loadStatefile(invalidStatefilePath); });
   test.expect<f3d::engine::statefile_exception>(
     "load invalid statefile content", [&]() { dst.loadStatefileFromString("{ not valid json"); });
 
