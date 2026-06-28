@@ -272,7 +272,7 @@ function(_parse_json_option _top_json)
            string(APPEND _range_value_initialize "}, ${_option_domain_explicit_constr}${_option_domain_value_start}${_option_domain_increment}${_option_domain_value_end}}")
 
            # Add range domain to struct and methods
-           string(APPEND _options_domains_struct "${_option_indent}    domain_range_t<${_option_domain_type}> ${_member_name} = ${_range_value_initialize};\n")
+           string(APPEND _options_domains_struct "${_option_indent}    DomainRange<${_option_domain_type}> ${_member_name} = ${_range_value_initialize};\n")
            list(APPEND _options_has_domain "if (name == \"${_option_name}\") return options_tools::hasDomain(style, options::domain_style::RANGE)")
            list(APPEND _options_get_enum_domain "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to get domain \" + std::string(\"${_option_name}\") + \" with incompatible option\")")
            list(APPEND _options_increase "if (name == \"${_option_name}\") options_tools::increase(opt.${_option_name}, opt.domains.${_option_name}, up)")
@@ -301,7 +301,7 @@ function(_parse_json_option _top_json)
              string(APPEND _enum_value_initialize "}}")
 
              # Add enum domain to struct and methods
-             string(APPEND _options_domains_struct "${_option_indent}    domain_enum_t<${_option_domain_type}> ${_member_name} = ${_enum_value_initialize};\n")
+             string(APPEND _options_domains_struct "${_option_indent}    DomainEnum<${_option_domain_type}> ${_member_name} = ${_enum_value_initialize};\n")
              list(APPEND _options_has_domain "if (name == \"${_option_name}\") return options_tools::hasDomain(style, options::domain_style::ENUM)")
              list(APPEND _options_get_enum_domain "if (name == \"${_option_name}\") return options_tools::getEnumDomain(opt.domains.${_option_name})")
              list(APPEND _options_increase "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to cycle \" + std::string(\"${_option_name}\") + \" with incompatible option\")")
@@ -324,7 +324,7 @@ function(_parse_json_option _top_json)
                endif()
 
                # Add enum domain to struct and methods
-               string(APPEND _options_domains_struct "${_option_indent}    domain_index_t ${_member_name} = ${_index_value_initialize};\n")
+               string(APPEND _options_domains_struct "${_option_indent}    DomainIndex ${_member_name} = ${_index_value_initialize};\n")
                list(APPEND _options_has_domain "if (name == \"${_option_name}\") return options_tools::hasDomain(style, options::domain_style::INDEX)")
                list(APPEND _options_get_enum_domain "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to get domain \" + std::string(\"${_option_name}\") + \" with incompatible option\")")
                list(APPEND _options_increase "if (name == \"${_option_name}\") options_tools::increase(opt.${_option_name}, opt.domains.${_option_name}, up)")

@@ -250,8 +250,7 @@ extern "C"
     return result;
   }
 
-  JNIEXPORT jobject JAVA_BIND(Options, getDomainStyle)(
-    JNIEnv* env, jobject self, jstring name)
+  JNIEXPORT jobject JAVA_BIND(Options, getDomainStyle)(JNIEnv* env, jobject self, jstring name)
   {
     const char* str = env->GetStringUTFChars(name, nullptr);
     f3d::options::domain_style ds = GetOptionsFromEngine(env, self).getDomainStyle(str);

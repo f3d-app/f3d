@@ -17,11 +17,14 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
     "hasDomain inexistent", [&]() { std::ignore = opt.hasDomain("inexistent"); });
 
   // Test getDomainStyle
-  test("getDomainStyle range", opt.getDomainStyle("scene.animation.speed_factor") == f3d::options::domain_style::RANGE);
-  test("getDomainStyle enum", opt.getDomainStyle("render.effect.blending.mode") == f3d::options::domain_style::ENUM);
-  test("getDomainStyle index", opt.getDomainStyle("scene.camera.index") == f3d::options::domain_style::INDEX);
-  test.expect<f3d::options::incompatible_exception>(
-    "getDomainStyle incompatible", [&]() { std::ignore = opt.getDomainStyle("model.scivis.cells"); });
+  test("getDomainStyle range",
+    opt.getDomainStyle("scene.animation.speed_factor") == f3d::options::domain_style::RANGE);
+  test("getDomainStyle enum",
+    opt.getDomainStyle("render.effect.blending.mode") == f3d::options::domain_style::ENUM);
+  test("getDomainStyle index",
+    opt.getDomainStyle("scene.camera.index") == f3d::options::domain_style::INDEX);
+  test.expect<f3d::options::incompatible_exception>("getDomainStyle incompatible",
+    [&]() { std::ignore = opt.getDomainStyle("model.scivis.cells"); });
 
   // Test getEnumDomain
   test("getEnumDomain", opt.getEnumDomain("render.effect.blending.mode"),

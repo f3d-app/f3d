@@ -273,7 +273,7 @@ public:
    * for range domains
    */
   template<typename T>
-  struct domain_range_t
+  struct DomainRange
   {
     std::array<T, 2> range;
     T increment;
@@ -284,7 +284,7 @@ public:
    * for enumeration domains
    */
   template<typename T>
-  struct domain_enum_t
+  struct DomainEnum
   {
     std::vector<T> enumeration;
   };
@@ -293,7 +293,7 @@ public:
    * Struct used in the domains struct
    * for index domains
    */
-  struct domain_index_t
+  struct DomainIndex
   {
     std::optional<unsigned int> max;
   };

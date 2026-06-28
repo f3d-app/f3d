@@ -903,7 +903,7 @@ bool hasDomain(f3d::options::domain_style& styleVar, const f3d::options::domain_
  * Get provided domain_enum as a string vector
  */
 template<typename T>
-std::vector<std::string> getEnumDomain(const f3d::options::domain_enum_t<T>& domain)
+std::vector<std::string> getEnumDomain(const f3d::options::DomainEnum<T>& domain)
 {
   std::vector<std::string> ret;
   std::ranges::transform(
@@ -915,7 +915,7 @@ std::vector<std::string> getEnumDomain(const f3d::options::domain_enum_t<T>& dom
 /**
  * Get provided domain_enum<std::string> enumeration
  */
-std::vector<std::string> getEnumDomain(const f3d::options::domain_enum_t<std::string>& domain)
+std::vector<std::string> getEnumDomain(const f3d::options::DomainEnum<std::string>& domain)
 {
   return domain.enumeration;
 }
@@ -937,7 +937,7 @@ void operator+=(f3d::ratio_t& ratio, const double& incr)
  * Increase up to max or decrease down to min.
  */
 template<typename T>
-void increase(T& val, const f3d::options::domain_range_t<T>& domain, bool up)
+void increase(T& val, const f3d::options::DomainRange<T>& domain, bool up)
 {
   char dir = up ? +1 : -1;
   T newVal = val;
@@ -960,7 +960,7 @@ void increase(T& val, const f3d::options::domain_range_t<T>& domain, bool up)
  * Increase up to max or decrease down to min.
  */
 template<>
-void increase(int& val, const f3d::options::domain_range_t<int>& domain, bool up)
+void increase(int& val, const f3d::options::DomainRange<int>& domain, bool up)
 {
   char dir = up ? +1 : -1;
   int newVal = val;
@@ -980,7 +980,7 @@ void increase(int& val, const f3d::options::domain_range_t<int>& domain, bool up
  * If not set, set val to min/max depending on the direction
  */
 template<typename T>
-void increase(std::optional<T>& val, const f3d::options::domain_range_t<T>& domain, bool up)
+void increase(std::optional<T>& val, const f3d::options::DomainRange<T>& domain, bool up)
 {
   if (!val.has_value())
   {
@@ -1001,7 +1001,7 @@ void increase(std::optional<T>& val, const f3d::options::domain_range_t<T>& doma
  * If max is not set, just returns.
  * Increase up to max or decrease down to 0, does not check validity of current value.
  */
-void increase(int& val, const f3d::options::domain_index_t& domain, bool up)
+void increase(int& val, const f3d::options::DomainIndex& domain, bool up)
 {
   if (!domain.max.has_value())
   {
@@ -1023,7 +1023,7 @@ void increase(int& val, const f3d::options::domain_index_t& domain, bool up)
  * If set, just call increase
  * If not set, and domain is set, set val to 0/max depending on the direction
  */
-void increase(std::optional<int>& val, const f3d::options::domain_index_t& domain, bool up)
+void increase(std::optional<int>& val, const f3d::options::DomainIndex& domain, bool up)
 {
   if (!val.has_value())
   {
@@ -1046,7 +1046,7 @@ void increase(std::optional<int>& val, const f3d::options::domain_index_t& domai
  * If invalid, set to the first enum value.
  */
 template<typename T>
-void cycle(T& val, const f3d::options::domain_enum_t<T>& domain)
+void cycle(T& val, const f3d::options::DomainEnum<T>& domain)
 {
   if (!domain.enumeration.empty())
   {
@@ -1075,7 +1075,7 @@ void cycle(T& val, const f3d::options::domain_enum_t<T>& domain)
  * If not set, set to first enum
  */
 template<typename T>
-void cycle(std::optional<T>& val, const f3d::options::domain_enum_t<T>& domain)
+void cycle(std::optional<T>& val, const f3d::options::DomainEnum<T>& domain)
 {
   if (!domain.enumeration.empty())
   {
@@ -1104,7 +1104,7 @@ void cycle(std::optional<T>& val, const f3d::options::domain_enum_t<T>& domain)
  * If max is not set, just returns.
  * If invalid and domain is not empty, set to 0.
  */
-void cycle(int& val, const f3d::options::domain_index_t& domain)
+void cycle(int& val, const f3d::options::DomainIndex& domain)
 {
   if (!domain.max.has_value())
   {
@@ -1138,7 +1138,7 @@ void cycle(int& val, const f3d::options::domain_index_t& domain)
  * If set to something else, cycle on the domain.
  * If not set, set to 0
  */
-void cycle(std::optional<int>& val, const f3d::options::domain_index_t& domain)
+void cycle(std::optional<int>& val, const f3d::options::DomainIndex& domain)
 {
   if (!domain.max.has_value())
   {

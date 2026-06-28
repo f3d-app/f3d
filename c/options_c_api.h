@@ -327,8 +327,7 @@ extern "C"
    * @return 1 if the option has a domain, 0 otherwise or if the option doesn't exist or if any of
    * the param is NULL.
    */
-  F3D_EXPORT int f3d_options_has_domain(
-    const f3d_options_t* options, const char* name);
+  F3D_EXPORT int f3d_options_has_domain(const f3d_options_t* options, const char* name);
 
   /**
    * @brief Return the domain style of provided option

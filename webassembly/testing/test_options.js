@@ -117,12 +117,10 @@ const settings = {
       "options getter after reset",
     );
 
+    utils.assert(options.hasDomain("scene.camera.index"), "options hasDomain");
     utils.assert(
-      options.hasDomain("scene.camera.index"),
-      "options hasDomain",
-    );
-    utils.assert(
-      options.getDomainStyle("scene.camera.index") == Module.OptionsDomainStyle.INDEX,
+      options.getDomainStyle("scene.camera.index") ==
+        Module.OptionsDomainStyle.INDEX,
       "option getDomainStyle",
     );
     utils.assert(

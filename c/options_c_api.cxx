@@ -555,8 +555,7 @@ int f3d_options_has_domain(const f3d_options_t* options, const char* name)
 }
 
 //----------------------------------------------------------------------------
-f3d_domain_style_t f3d_options_get_domain_style(
-  const f3d_options_t* options, const char* name)
+f3d_domain_style_t f3d_options_get_domain_style(const f3d_options_t* options, const char* name)
 {
   if (!options || !name)
   {

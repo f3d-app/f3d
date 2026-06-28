@@ -222,7 +222,9 @@ def test_has_domain():
 
 def test_get_domain_style():
     options = f3d.Options()
-    assert options.get_domain_style("scene.camera.index") == f3d.Options.DomainStyle.INDEX
+    assert (
+        options.get_domain_style("scene.camera.index") == f3d.Options.DomainStyle.INDEX
+    )
 
 
 def test_get_enum_domain():
