@@ -117,9 +117,15 @@ const settings = {
       "options getter after reset",
     );
 
-    style  = Module.OptionsDomainStyle.RANGE
-    utils.assert(options.hasDomain("scene.animation.index", style), "options hasDomain");
-    utils.assert(style == Module.OptionsDomainStyle.INDEX, "option hasDomain style");
+    style = Module.OptionsDomainStyle.RANGE;
+    utils.assert(
+      options.hasDomain("scene.animation.index", style),
+      "options hasDomain",
+    );
+    utils.assert(
+      style == Module.OptionsDomainStyle.INDEX,
+      "option hasDomain style",
+    );
     utils.assert(
       options.getEnumDomain("render.effect.blending.mode").includes("ddp"),
       "options getEnumDomain",
@@ -127,9 +133,15 @@ const settings = {
     options.increase("render.raytracing.samples");
     options.increase("render.raytracing.samples");
     options.decrease("render.raytracing.samples");
-    utils.assert(options.get("render.raytracing.samples") == 6, "options increase/decrease");
-    options.cycle("render.effect.blending.mode")
-    utils.assert(options.get("render.effect.blending.mode") == "ddp", "options cycle");
+    utils.assert(
+      options.get("render.raytracing.samples") == 6,
+      "options increase/decrease",
+    );
+    options.cycle("render.effect.blending.mode");
+    utils.assert(
+      options.get("render.effect.blending.mode") == "ddp",
+      "options cycle",
+    );
   },
 };
 

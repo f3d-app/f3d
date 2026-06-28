@@ -253,7 +253,7 @@ public class Options {
      * Increase the specified option if it has a range or index domain
      *
      * @param name the name of the option to increase
-     * @throws IllegalArgumentException if the option name does not exist or doens't have the expected domain
+     * @throws IllegalArgumentException if the option name does not exist or doesn't have the expected domain
      */
     public native void increase(String name);
 
@@ -261,7 +261,7 @@ public class Options {
      * Decrease the specified option if it has a range or index domain
      *
      * @param name the name of the option to decrease
-     * @throws IllegalArgumentException if the option name does not exist or doens't have the expected domain
+     * @throws IllegalArgumentException if the option name does not exist or doesn't have the expected domain
      */
     public native void decrease(String name);
 
@@ -269,7 +269,7 @@ public class Options {
      * Cycle the specified option if it has an enum or index domain
      *
      * @param name the name of the option to cycle
-     * @throws IllegalArgumentException if the option name does not exist or doens't have the expected domain
+     * @throws IllegalArgumentException if the option name does not exist or doesn't have the expected domain
      */
     public native void cycle(String name);
 

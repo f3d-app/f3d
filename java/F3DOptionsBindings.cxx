@@ -242,7 +242,8 @@ extern "C"
     env->ReleaseStringUTFChars(name, str);
   }
 
-  JNIEXPORT jboolean JAVA_BIND(Options, hasDomain)(JNIEnv* env, jobject self, jstring name, jobject style)
+  JNIEXPORT jboolean JAVA_BIND(Options, hasDomain)(
+    JNIEnv* env, jobject self, jstring name, jobject style)
   {
     const char* str = env->GetStringUTFChars(name, nullptr);
     f3d::options::domain_style ds;
@@ -255,17 +256,14 @@ extern "C"
     switch (ds)
     {
       case f3d::options::domain_style::RANGE:
-        fieldID =
-          env->GetStaticFieldID(enumClass, "RANGE", "Lapp/f3d/F3D/Options$DomainStyle;");
+        fieldID = env->GetStaticFieldID(enumClass, "RANGE", "Lapp/f3d/F3D/Options$DomainStyle;");
         break;
       case f3d::options::domain_style::ENUM:
-        fieldID =
-          env->GetStaticFieldID(enumClass, "ENUM", "Lapp/f3d/F3D/Options$DomainStyle;");
+        fieldID = env->GetStaticFieldID(enumClass, "ENUM", "Lapp/f3d/F3D/Options$DomainStyle;");
         break;
       default:
       case f3d::options::domain_style::INDEX:
-        fieldID =
-          env->GetStaticFieldID(enumClass, "INDEX", "Lapp/f3d/F3D/Options$DomainStyle;");
+        fieldID = env->GetStaticFieldID(enumClass, "INDEX", "Lapp/f3d/F3D/Options$DomainStyle;");
         break;
     }
     style = env->GetStaticObjectField(enumClass, fieldID);
