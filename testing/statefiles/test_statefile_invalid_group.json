@@ -1,0 +1,10 @@
+{
+  "files": ["../data/cow.vtp"],
+  "options": {},
+  "file_groups": {
+    "current": 5,
+    "groups": [
+      { "key": "../data/cow.vtp", "files": ["../data/cow.vtp"] }
+    ]
+  }
+}

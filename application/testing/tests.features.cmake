@@ -530,6 +530,10 @@ f3d_test(NAME TestCommandScriptLoadStatefileFromOption SCRIPT DATA dragon.vtu WO
 f3d_test(NAME TestCommandScriptLoadStatefileMostRecent SCRIPT DATA cow.vtp ARGS --statefile-filename=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileMostRecent/state_{n}.json --verbose REGEXP "from statefile options" NO_BASELINE)
 # load_statefile applies over the current interactor state, here overriding a `set` tweak
 f3d_test(NAME TestCommandScriptLoadStatefileOverridesTweak SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "background.color' = '#0000ff' from statefile options" NO_BASELINE)
+# load_statefile of a missing file is skipped with a warning
+f3d_test(NAME TestCommandScriptLoadStatefileMissing SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "Could not open statefile, skipping" NO_BASELINE)
+# load_statefile with an out of range file group index falls back to the first group
+f3d_test(NAME TestCommandScriptLoadStatefileInvalidGroup SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "cow.vtp" NO_BASELINE)
 
 # The clipboard round-trip needs a real onscreen window for the X11 selection to work, it fails with
 # the offscreen backends (egl, osmesa), so only run it where an onscreen window is available, ie on

@@ -21,6 +21,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKSceneFromBuffer.cxx
      TestSDKSceneFromMemory.cxx
      TestSDKStatefile.cxx
+     TestSDKStatefileCamera.cxx
      TestSDKUtils.cxx
      TestSDKWindowAuto.cxx
      TestTestSDKHelpers.cxx
