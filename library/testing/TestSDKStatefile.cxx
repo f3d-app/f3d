@@ -77,6 +77,33 @@ int TestSDKStatefile([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   dst.getScene().clear();
   test("clear resets added files", dst.getScene().getAddedFiles().empty(), true);
 
+  // Files inside the statefile directory are stored as relative paths and resolved back on load
+  const fs::path localCow = tmpDir / "local_cow.vtp";
+  fs::copy_file(cowFile, localCow, fs::copy_options::overwrite_existing);
+  const fs::path relStatefilePath = tmpDir / "relative_statefile.json";
+  f3d::engine relSrc = f3d::engine::createNone();
+  relSrc.getScene().add(localCow);
+  relSrc.saveStatefile(relStatefilePath);
+  std::ifstream relStream(relStatefilePath);
+  const std::string relContent{ std::istreambuf_iterator<char>(relStream),
+    std::istreambuf_iterator<char>() };
+  test("file inside statefile dir stored as relative path",
+    relContent.find("\"local_cow.vtp\"") != std::string::npos, true);
+  f3d::engine relDst = f3d::engine::createNone();
+  relDst.loadStatefile(relStatefilePath);
+  test("relative file restored", relDst.getScene().getAddedFiles().size(), static_cast<size_t>(1));
+
+  // Saving a statefile with no added file still produces a valid statefile
+  f3d::engine emptyEng = f3d::engine::createNone();
+  emptyEng.saveStatefile(tmpDir / "empty_statefile.json");
+  test("empty engine has no added file", emptyEng.getScene().getAddedFiles().empty(), true);
+
+  // Loading a statefile without an options entry is valid
+  f3d::engine noOptEng = f3d::engine::createNone();
+  noOptEng.loadStatefileFromString("{ \"files\": [] }");
+  test(
+    "no option statefile leaves no added file", noOptEng.getScene().getAddedFiles().empty(), true);
+
   // Failure modes
   test.expect<f3d::engine::statefile_exception>(
     "load a non existent statefile", [&]() { dst.loadStatefile(tmpDir / "no_such_file.json"); });
