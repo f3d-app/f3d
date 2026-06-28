@@ -50,6 +50,7 @@ CLI: `--animation-time`.
 
 Select the scene camera to use when available in the file.
 The default scene always uses automatic camera.
+The domain is updated when loading the file to contain the number of cameres in the file.
 
 CLI: `--camera-index`.
 
@@ -606,6 +607,19 @@ Show corresponding keys when notifications are triggered by bindings key press e
 
 ## Domains
 
+Certains options have domains that helps user pick valid values.
+Options with domains are documented as such above.
+Domains are never enforced but are indicative.
+Domains are taken into account when using the dedicated [string API](#string-api)
+or [related commands](../user/07-COMMANDS.md).
+
+Range domains are intended for numeric options that have minimum, a maximum and an increment.
+Enum domains are intended for options that have a finite set of possible value.
+Index domains are intended for integer options that are between 0 and a maximum.
+
+If an option has a `dynamic` domains, it means the libf3d can change the domain.
+It is possible to directly change a domain using the [struct API](#struct-api).
+
 ## APIs
 
 There are three APIs to access the options
@@ -640,6 +654,15 @@ Please note that when accessing optional options, special care must be used, eg:
 
 It's even more true with the few optional boolean options as std::optional has an implicit boolean cast operator.
 
+Domains are accessible through the dedicated struct:
+
+```cpp
+  f3d::engine eng = f3d::engine::create();
+  f3d::options& opt = eng.getOptions();
+  std::cout << opt.domains.render.raytracing.samples.range[1] << "\n";
+  std::cout << opt.domains.render.effect.blending.mode.enum[0] << "\n";
+```
+
 ### String API
 
 The most generic and flexible API, as it rely on parsing and string generation.
@@ -673,6 +696,17 @@ When using this API make sure to catch exceptions has needed, eg:
     std::cout << userProvidedName << " is not set.\n";
   }
 ```
+
+This API can interact directly with domains using `increase`/`decrease` and `cycle`:
+
+```cpp
+  f3d::engine eng = f3d::engine::create();
+  f3d::options& opt = eng.getOptions();
+  opt.increase("render.raytracing.samples").increase("render.raytracing.samples").decrease("render.raytracing.samples");
+  opt.cycle("render.effect.blending.mode").cycle("render.effect.blending.mode");
+```
+
+When using this API make sure to catch exceptions as documented in the `option.h` header.
 
 ### Variant API
 
