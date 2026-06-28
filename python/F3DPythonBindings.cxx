@@ -226,6 +226,12 @@ PYBIND11_MODULE(pyf3d, module)
   // f3d::options
   py::class_<f3d::options> options(module, "Options");
 
+  py::enum_<f3d::options::domain_style>(options, "DomainStyle")
+    .value("RANGE", f3d::options::domain_style::RANGE)
+    .value("ENUM", f3d::options::domain_style::ENUM)
+    .value("INDEX", f3d::options::domain_style::INDEX)
+    .export_values();
+
   options //
     .def(py::init<>())
     .def("__setitem__",
@@ -295,8 +301,18 @@ PYBIND11_MODULE(pyf3d, module)
     .def("keys", &f3d::options::getNames) // to do `dict(options)`
     .def("toggle", &f3d::options::toggle)
     .def("is_same", &f3d::options::isSame)
+    .def("has_value", &f3d::options::hasValue)
+    .def("copy", &f3d::options::copy)
+    .def_static("get_all_names", &f3d::options::getAllNames)
     .def("get_closest_option", &f3d::options::getClosestOption)
-    .def("copy", &f3d::options::copy);
+    .def("is_optional", &f3d::options::isOptional)
+    .def("reset", &f3d::options::reset)
+    .def("remove_value", &f3d::options::removeValue)
+    .def("has_domain", &f3d::options::hasDomain)
+    .def("get_enum_domain", &f3d::options::getEnumDomain)
+    .def("increase", &f3d::options::increase)
+    .def("decrease", &f3d::options::decrease)
+    .def("cycle", &f3d::options::cycle);
 
   // f3d::utils
   py::class_<f3d::utils> utils(module, "Utils");
