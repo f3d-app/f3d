@@ -511,6 +511,8 @@ f3d_test(NAME TestStatefileLoadKnown DATA cow.vtp NO_RENDER NO_BASELINE ARGS --l
 f3d_test(NAME TestStatefileLoadOverride DATA cow.vtp NO_RENDER NO_BASELINE ARGS --load-statefile=${F3D_SOURCE_DIR}/testing/statefiles/test_statefile.json -D render.background.color=1,0,0 REGEXP "'render.background.color' = '1,0,0' from CLI options")
 # A missing statefile is skipped with a warning instead of failing
 f3d_test(NAME TestStatefileLoadMissing DATA cow.vtp NO_RENDER NO_BASELINE ARGS --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/does_not_exist.json REGEXP "Could not open statefile, skipping")
+# A file that exists but is not a valid statefile is reported and skipped
+f3d_test(NAME TestStatefileLoadInvalidContent DATA cow.vtp NO_RENDER NO_BASELINE ARGS --load-statefile=${F3D_SOURCE_DIR}/testing/data/cow.vtp REGEXP "Could not parse statefile content")
 # `-` writes the statefile to the standard output
 f3d_test(NAME TestStatefileSaveStdout DATA cow.vtp NO_RENDER NO_BASELINE ARGS --save-statefile=- REGEXP "\"options\"")
 # Missing parent directories of the statefile path are created
@@ -537,6 +539,10 @@ f3d_test(NAME TestCommandScriptLoadStatefileOverridesTweak SCRIPT DATA cow.vtp W
 f3d_test(NAME TestCommandScriptLoadStatefileMissing SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "Could not open statefile, skipping" NO_BASELINE)
 # load_statefile with an out of range file group index falls back to the first group
 f3d_test(NAME TestCommandScriptLoadStatefileInvalidGroup SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "cow.vtp" NO_BASELINE)
+# save_statefile and load_statefile with no argument and an empty --statefile-filename warn and no-op
+f3d_test(NAME TestCommandScriptStatefileEmptyFilename SCRIPT DATA cow.vtp ARGS --statefile-filename= --verbose REGEXP "No statefile location provided" NO_BASELINE)
+# save_statefile to a path that cannot be written (a directory) reports the error
+f3d_test(NAME TestCommandScriptSaveStatefileError SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "Could not save statefile" NO_BASELINE)
 
 # The clipboard round-trip needs a real onscreen window for the X11 selection to work, it fails with
 # the offscreen backends (egl, osmesa), so only run it where an onscreen window is available, ie on
