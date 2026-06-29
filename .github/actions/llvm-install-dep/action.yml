@@ -69,8 +69,6 @@ runs:
         cmake ../llvm/llvm
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX="../llvm_install"
-        -DLLVM_BUILD_LLVM_DYLIB=ON
-        -DLLVM_DYLIB_COMPONENTS="all"
         -DLLVM_TARGETS_TO_BUILD="host"
         -DLLVM_ENABLE_PROJECTS=""
         -DLLVM_BUILD_TOOLS=ON
