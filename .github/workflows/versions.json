@@ -47,6 +47,10 @@
     "version": "26",
     "min_version": "17"
   },
+  "llvm": {
+    "version": "22.1.8",
+    "min_version": "22.1.8"
+  },
   "occt": {
     "version": "V8_0_0",
     "min_version": "V7_6_3"
