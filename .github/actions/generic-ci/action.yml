@@ -220,18 +220,6 @@ runs:
       shell: bash
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
-    - name: Install Mesa Windows
-      if: runner.os == 'Windows'
-      uses: ./source/.github/actions/install-mesa
-      with:
-        path: ${{github.workspace}}/build/bin_Release
-
-    - name: Install Mesa Windows Python
-      if: runner.os == 'Windows'
-      uses: ./source/.github/actions/install-mesa
-      with:
-        path: ${{github.workspace}}/build/Release/f3d
-
     # A EGL test is crashing in the CI but not locally
     - name: Set CI test exception for Linux EGL
       if: runner.os == 'Linux' &&
@@ -300,12 +288,6 @@ runs:
         cmake --install . --component configuration
         cmake --install . --component colormaps
 
-    - name: Install Mesa Windows in install
-      if: runner.os == 'Windows'
-      uses: ./source/.github/actions/install-mesa
-      with:
-        path: ${{github.workspace}}/install/bin
-
     - name: Build and configure python externally
       if: |
         inputs.optdeps_label == 'optdeps' &&
@@ -336,14 +318,6 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}
       run: cmake --build build_examples --config Release
-
-    - name: Install Mesa Windows examples
-      if: |
-        runner.os == 'Windows' &&
-        inputs.static_label == 'no-static'
-      uses: ./source/.github/actions/install-mesa
-      with:
-        path: ${{github.workspace}}/build_examples/**/Release
 
     # older VTK version create different renderings so they are not tested
     - name: Test libf3d examples

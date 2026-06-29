@@ -51,6 +51,10 @@
     "version": "22.1.8",
     "min_version": "22.1.8"
   },
+  "mesa": {
+    "version": "24.3.4",
+    "min_version": "24.3.4"
+  },
   "occt": {
     "version": "V8_0_0",
     "min_version": "V7_6_3"
