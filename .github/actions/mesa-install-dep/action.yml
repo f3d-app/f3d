@@ -1,0 +1,117 @@
+name: "Install Mesa Dependency"
+description: "Install Mesa Dependency using cache when possible"
+inputs:
+  versions_file:
+    description: "File to recover versions from"
+    required: true
+  mindeps_label:
+    description: "Label to flag for minimum versions dependencies"
+    required: false
+    default: "no-mindeps"
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
+
+    - name: Extract mesa version
+      id: mesa_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: mesa
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract global cache index
+      id: global_idx
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        special_name: global_cache_index
+
+    - name: Cache mesa
+      id: cache-mesa
+      continue-on-error: true # https://github.com/actions/cache/issues/1754
+      uses: actions/cache/restore@v6
+      with:
+        path: dependencies/mesa_install
+        key: mesa-${{steps.mesa_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-1
+
+    - name: Install Mesa Python dependencies
+      if: steps.cache-mesa.outputs.cache-hit != 'true'
+      shell: bash
+      run: python -m pip install meson mako packaging PyYAML
+
+    - name: Install Flex/Bison (Windows)
+      if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
+      shell: bash
+      run: choco install winflexbison3 --no-progress -y
+
+    - name: Install Flex/Bison (Linux)
+      if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Linux'
+      shell: bash
+      run: apt-get install -y bison byacc flex pkg-config ninja-build python3-dev llvm-dev libzstd-dev
+
+    - name: Checkout mesa
+      if: steps.cache-mesa.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        git clone --recurse-submodules --depth 1 --branch mesa-${{steps.mesa_ver.outputs.extract}} https://gitlab.freedesktop.org/mesa/mesa.git dependencies/mesa
+
+    - name: Setup mesa
+      if: steps.cache-mesa.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir mesa_build
+        mkdir mesa_install
+
+    - name: Configure mesa
+      if: steps.cache-mesa.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/mesa_build
+      shell: bash
+      run: >
+        meson setup mesa_build mesa
+        --prefix=$(pwd)/mesa_install
+        --buildtype=release
+        -Db_ndebug=true
+        -Dosmesa=true
+        -Dgallium-drivers=llvmpipe
+        -Dvulkan-drivers=[]
+        -Dopengl=true
+        -Dgles1=disabled
+        -Dgles2=disabled
+        -Degl=disabled
+        -Dglx=disabled
+        -Dxlib-lease=disabled
+        -Dxmlconfig=disabled
+        -Dexpat=disabled
+        -Dplatforms=[]
+        -Dshared-glapi=disabled
+        -Dllvm=enabled
+        -Dzlib=disabled
+
+    - name: Build mesa
+      if: steps.cache-mesa.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/mesa_build
+      shell: bash
+      run: ninja -j2 install
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/mesa_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-mesa.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v6
+      with:
+        key: ${{ steps.cache-mesa.outputs.cache-primary-key }}
+        path: dependencies/mesa_install
