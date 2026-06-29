@@ -57,7 +57,7 @@ runs:
       run: rm $(which link.exe)
 
     - name: Set up Python
-      if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
+      if: steps.cache-mesa.outputs.cache-hit != 'true'
       uses: actions/setup-python@v6
       with:
         python-version: "3.14"
@@ -75,7 +75,7 @@ runs:
     - name: Install Flex/Bison (Linux)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Linux'
       shell: bash
-      run: apt-get install -y bison byacc flex pkg-config ninja-build python3-dev libzstd-dev
+      run: apt-get install -y bison byacc flex pkg-config ninja-build libzstd-dev
 
     - name: Checkout mesa
       if: steps.cache-mesa.outputs.cache-hit != 'true'
