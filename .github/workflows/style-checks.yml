@@ -109,6 +109,9 @@ jobs:
             ```
             You can copy the patch above and apply it locally with:
 
-            | X                                              | Wayland                   | Powershell                          | macOS                    |
-            |------------------------------------------------|---------------------------|-------------------------------------|--------------------------|
-            | `xclip -o -selection clipboard | git apply -v` | `wl-paste | git apply -v` | `Get-Clipboard -Raw | git apply -v` | `pbpaste | git apply -v` |
+            | Platform   | Command                                         |
+            |------------|-------------------------------------------------|
+            | X          | `xclip -o -selection clipboard \| git apply -v` |
+            | Wayland    | `wl-paste \| git apply -v`                      |
+            | Powershell | `Get-Clipboard -Raw \| git apply -v`            |
+            | macOS      | `pbpaste \| git apply -v`                       |
