@@ -386,11 +386,28 @@ double image::compare(const image& reference) const
   ssim->SetInputData(this->Internals->Image);
   ssim->SetInputData(1, reference.Internals->Image);
   ssim->Update();
-  vtkDoubleArray* scalars = vtkArrayDownCast<vtkDoubleArray>(
+  vtkSmartPointer<vtkDoubleArray> scalars = vtkArrayDownCast<vtkDoubleArray>(
     vtkDataSet::SafeDownCast(ssim->GetOutputDataObject(0))->GetPointData()->GetScalars());
 
   // Thanks to the checks above, this is always true
   assert(scalars != nullptr);
+
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260623)
+  // vtkImageSSIM::ComputeErrorMetrics didn't work for RGBA images,
+  // so we need to extract eliminate the alpha channel
+  if (count == 4)
+  {
+    vtkNew<vtkDoubleArray> scalarsWithoutAlpha;
+    scalarsWithoutAlpha->SetNumberOfComponents(3);
+    scalarsWithoutAlpha->SetNumberOfTuples(scalars->GetNumberOfTuples());
+    for (vtkIdType i = 0; i < scalars->GetNumberOfTuples(); ++i)
+    {
+      scalarsWithoutAlpha->SetTuple(i, scalars->GetTuple(i));
+    }
+
+    scalars = scalarsWithoutAlpha;
+  }
+#endif
 
   double error, unused;
   vtkImageSSIM::ComputeErrorMetrics(scalars, error, unused);
