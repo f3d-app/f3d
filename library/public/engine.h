@@ -43,7 +43,7 @@ public:
    * Optionally, the window can be hidden by setting offscreen to true.
    * Linux: Try GLX, then EGL, then OSMesa.
    * Windows: Try Win32, then EGL, then OSMesa.
-   * macOS: Always use Cocoa.
+   * macOS: Try Cocoa, then OSMesa.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
    * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library.
@@ -98,6 +98,7 @@ public:
 
   /**
    * Create an engine with an offscreen OSMesa window.
+   * On macOS, VTK >= 9.6.20260630 is required.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
    * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library.
