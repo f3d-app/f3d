@@ -38,6 +38,20 @@ public class TestScene {
     scene.add(new ArrayList<>(Arrays.asList(world, logo)));
     scene.clear();
 
+    // Test the added files tracking
+    if (!scene.getAddedFiles().isEmpty()) {
+      throw new RuntimeException("a cleared scene should have no added file");
+    }
+    scene.add(sphere);
+    List<String> addedFiles = scene.getAddedFiles();
+    if (addedFiles.size() != 1 || !addedFiles.get(0).contains("mb_1_0.vtp")) {
+      throw new RuntimeException("scene should track the added file");
+    }
+    scene.clear();
+    if (!scene.getAddedFiles().isEmpty()) {
+      throw new RuntimeException("clear should reset the added files");
+    }
+
     float[] points = new float[] { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.5f, 1.0f, 0.0f };
     int[] faceSides = new int[] { 3 };
     int[] faceIndices = new int[] { 0, 1, 2 };
