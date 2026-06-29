@@ -62,7 +62,7 @@ runs:
     - name: Install Flex/Bison (Linux)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Linux'
       shell: bash
-      run: apt-get install -y bison byacc flex pkg-config ninja-build python3-dev llvm-dev libzstd-dev
+      run: apt-get install -y bison byacc flex pkg-config ninja-build python3-dev
 
     - name: Checkout mesa
       if: steps.cache-mesa.outputs.cache-hit != 'true'
@@ -77,6 +77,11 @@ runs:
       run: |
         mkdir mesa_build
         mkdir mesa_install
+
+    - name: Add LLVM to PATH
+      shell: bash
+      run: |
+        echo "$GITHUB_WORKSPACE/dependencies/install/bin" >> "$GITHUB_PATH"
 
     - name: Configure mesa
       if: steps.cache-mesa.outputs.cache-hit != 'true'
