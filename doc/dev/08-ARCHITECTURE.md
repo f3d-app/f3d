@@ -17,7 +17,7 @@ This architecture is reflected by the directories organisation.
 - python: [python bindings](../libf3d/04-LANGUAGE_BINDINGS.md#python) and tests
 - java: [java bindings](../libf3d/04-LANGUAGE_BINDINGS.md#java) and tests
 - webassembly: [webassembly/javascript bindings](../libf3d/04-LANGUAGE_BINDINGS.md#javascript) and tests
-- winshellext: shell extension for Windows, provide [thumbnails for Windows](../user/11-DESKTOP_INTEGRATION.md#windows)
+- winshellext: shell extension for Windows, provide [thumbnails for Windows](../user/12-DESKTOP_INTEGRATION.md#windows)
 
 Here is diagram explaining how some of these parts interact together:
 

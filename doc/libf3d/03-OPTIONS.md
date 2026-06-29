@@ -296,7 +296,7 @@ CLI: `--tone-mapping`.
 
 ### `render.effect.final_shader` (_string_, optional)
 
-Add a final shader to the output image. See [user documentation](../user/10-FINAL_SHADER.md).
+Add a final shader to the output image. See [user documentation](../user/11-FINAL_SHADER.md).
 
 CLI: `--final-shader`
 
