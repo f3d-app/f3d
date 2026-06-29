@@ -145,7 +145,7 @@ int test_engine()
   f3d_engine_delete(engine_str);
 
   // File based round trip
-  const char* statefile_path = "test_engine_c_api_statefile.json";
+  const char* statefile_path = F3D_TESTING_TEMP_DIR "test_engine_c_api_statefile.json";
   if (!f3d_engine_save_statefile(engine, statefile_path))
   {
     puts("[ERROR] save_statefile() should succeed");
