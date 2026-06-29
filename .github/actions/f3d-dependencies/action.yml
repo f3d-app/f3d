@@ -19,6 +19,8 @@ runs:
     - name: Install LLVM dependency
       uses: ./source/.github/actions/llvm-install-dep
       with:
+        versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
     #- name: Install MESA
