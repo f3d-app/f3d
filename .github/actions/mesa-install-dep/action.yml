@@ -62,7 +62,7 @@ runs:
     - name: Install Flex/Bison (Linux)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Linux'
       shell: bash
-      run: apt-get install -y bison byacc flex pkg-config ninja-build python3-dev
+      run: apt-get install -y bison byacc flex pkg-config ninja-build python3-dev libzstd-dev
 
     - name: Checkout mesa
       if: steps.cache-mesa.outputs.cache-hit != 'true'
