@@ -139,6 +139,12 @@ runs:
         key: ${{ steps.cache-mesa.outputs.cache-primary-key }}
         path: dependencies/mesa_install
 
+    - name: Check DLL dependencies
+      if: runner.os == 'Windows'
+      working-directory: ${{github.workspace}}/dependencies/mesa_install/bin
+      shell: bash
+      run: ldd osmesa.dll
+
     # Set the library name to be reused in the next step
     - name: Set library names
       if: runner.os == 'Windows'
