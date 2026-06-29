@@ -62,13 +62,11 @@ runs:
         mkdir llvm_install
 
     - name: Configure LLVM
-      if: |
-        steps.cache-llvm.outputs.cache-hit != 'true' &&
-        steps.llvm_ver.outputs.extract != 'V7_6_3'
+      if: steps.cache-llvm.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/llvm_build
       shell: bash
       run: >
-        cmake ../llvm
+        cmake ../llvm/llvm
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/llvm-install"
         -DLLVM_BUILD_LLVM_DYLIB=ON
