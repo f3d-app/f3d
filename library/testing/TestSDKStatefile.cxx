@@ -38,8 +38,7 @@ int TestSDKStatefile([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   src.getOptions().set("ui.scalar_bar", true);
   src.getScene().add(cowFile);
 
-  test("getAddedFiles returns the added file", src.getScene().getAddedFiles().size(),
-    static_cast<size_t>(1));
+  test("getAddedFiles returns the added file", src.getScene().getAddedFiles().size() == 1);
 
   test.expect<f3d::engine::statefile_exception>("save to an invalid path",
     [&]() { src.saveStatefile(tmpDir / "does" / "not" / "exist" / "state.json"); });
@@ -61,7 +60,7 @@ int TestSDKStatefile([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("restored background color", dst.getOptions().getAsString("render.background.color"),
     src.getOptions().getAsString("render.background.color"));
   test("restored scalar bar option", dst.getOptions().getAsString("ui.scalar_bar"), "true"s);
-  test("restored added files", dst.getScene().getAddedFiles().size(), static_cast<size_t>(1));
+  test("restored added files", dst.getScene().getAddedFiles().size() == 1);
 
   // String based round-trip
   const std::string content = src.saveStatefileToString();
@@ -70,8 +69,7 @@ int TestSDKStatefile([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("string restored background color",
     dstStr.getOptions().getAsString("render.background.color"),
     src.getOptions().getAsString("render.background.color"));
-  test("string restored added files", dstStr.getScene().getAddedFiles().size(),
-    static_cast<size_t>(1));
+  test("string restored added files", dstStr.getScene().getAddedFiles().size() == 1);
 
   // clear resets the added files tracking
   dst.getScene().clear();
@@ -91,7 +89,7 @@ int TestSDKStatefile([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     relContent.find(R"("local_cow.vtp")") != std::string::npos, true);
   f3d::engine relDst = f3d::engine::createNone();
   relDst.loadStatefile(relStatefilePath);
-  test("relative file restored", relDst.getScene().getAddedFiles().size(), static_cast<size_t>(1));
+  test("relative file restored", relDst.getScene().getAddedFiles().size() == 1);
 
   // Saving a statefile with no added file still produces a valid statefile
   f3d::engine emptyEng = f3d::engine::createNone();

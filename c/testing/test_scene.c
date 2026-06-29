@@ -4,6 +4,7 @@
 #include <utils_c_api.h>
 
 #include <stdio.h>
+#include <string.h>
 
 int test_scene()
 {
@@ -35,6 +36,32 @@ int test_scene()
   const char* files[] = { F3D_TESTING_DATA_DIR "cow.vtp", F3D_TESTING_DATA_DIR "suzanne.obj" };
   int add_multiple_result = f3d_scene_add_multiple(scene, files, 2);
   (void)add_multiple_result;
+
+  f3d_scene_clear(scene);
+
+  // Test the added files tracking
+
+  unsigned int added_count = 0;
+  char** added_files = f3d_scene_get_added_files(scene, &added_count);
+  if (added_count != 0)
+  {
+    puts("[ERROR] a cleared scene should have no added file");
+    f3d_scene_free_added_files(added_files, added_count);
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  f3d_scene_free_added_files(added_files, added_count);
+
+  f3d_scene_add(scene, F3D_TESTING_DATA_DIR "cow.vtp");
+  added_files = f3d_scene_get_added_files(scene, &added_count);
+  if (added_count != 1 || !added_files || !strstr(added_files[0], "cow.vtp"))
+  {
+    puts("[ERROR] scene should track the added file");
+    f3d_scene_free_added_files(added_files, added_count);
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  f3d_scene_free_added_files(added_files, added_count);
 
   f3d_scene_clear(scene);
 

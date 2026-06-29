@@ -484,6 +484,33 @@ f3d_test(NAME TestCommandScriptCycleCameraIndex SCRIPT DATA Cameras.gltf) # cycl
 f3d_test(NAME TestCommandScriptIncreaseDecreaseCameraIndex SCRIPT DATA Cameras.gltf) # increase scene.camera.index;increase scene.camera.index;increase.camera.index;decrease.camera.index;reload_current_file_group
 f3d_test(NAME TestCommandScriptOpacityMap SCRIPT DATA vase_4comp.vti ARGS -v) # set model.scivis.opacity_map 0,0.03,1,1
 
+# Statefile interactor command load_statefile, each test covers a distinct behavior. The save_statefile
+# command shares its implementation with the --save-statefile option covered below, the tests below
+# instead focus on the load_statefile command which restores a statefile into the running session
+# load_statefile with an explicit path loads the statefile files (cow.vtp), replacing the loaded dragon.vtu
+f3d_test(NAME TestCommandScriptLoadStatefile SCRIPT DATA dragon.vtu WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "cow.vtp" NO_BASELINE)
+# load_statefile with no argument falls back to the --statefile-filename path
+f3d_test(NAME TestCommandScriptLoadStatefileFromOption SCRIPT DATA dragon.vtu WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --statefile-filename=${F3D_SOURCE_DIR}/testing/statefiles/test_statefile.json --verbose REGEXP "cow.vtp" NO_BASELINE)
+# load_statefile resolves the {n} template to the most recent existing statefile
+f3d_test(NAME TestCommandScriptLoadStatefileMostRecent SCRIPT DATA cow.vtp ARGS --statefile-filename=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileMostRecent/state_{n}.json --verbose REGEXP "from statefile options" NO_BASELINE)
+# load_statefile applies over the current interactor state, here overriding a `set` tweak
+f3d_test(NAME TestCommandScriptLoadStatefileOverridesTweak SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "background.color' = '#0000ff' from statefile options" NO_BASELINE)
+# load_statefile of a missing file is skipped with a warning
+f3d_test(NAME TestCommandScriptLoadStatefileMissing SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "Could not open statefile, skipping" NO_BASELINE)
+# load_statefile with an out of range file group index falls back to the first group
+f3d_test(NAME TestCommandScriptLoadStatefileInvalidGroup SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "cow.vtp" NO_BASELINE)
+# save_statefile and load_statefile with no argument and an empty --statefile-filename warn and no-op
+f3d_test(NAME TestCommandScriptStatefileEmptyFilename SCRIPT DATA cow.vtp ARGS --statefile-filename= --verbose REGEXP "No statefile location provided" NO_BASELINE)
+# save_statefile to a path that cannot be written (a directory) reports the error
+f3d_test(NAME TestCommandScriptSaveStatefileError SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "Could not save statefile" NO_BASELINE)
+
+# The clipboard round-trip needs a real onscreen window for the X11 selection to work, it fails with
+# the offscreen backends (egl, osmesa), so only run it where an onscreen window is available, ie on
+# Windows, macOS, or Linux with GLX tests enabled (where the auto backend resolves to GLX).
+if(F3D_MODULE_CLIP AND (WIN32 OR APPLE OR F3D_TESTING_ENABLE_GLX_TESTS))
+  f3d_test(NAME TestCommandScriptStatefileClipboard SCRIPT DATA cow.vtp ARGS --verbose REGEXP "background.color' = '#0000ff' from statefile options" NO_BASELINE)
+endif()
+
 ## Tests to increase coverage
 # Output option test
 f3d_test(NAME TestOutput DATA cow.vtp NO_BASELINE)
@@ -526,33 +553,6 @@ f3d_test(NAME TestStatefileSaveCreatesDir DATA cow.vtp NO_RENDER NO_BASELINE ARG
 # only appears if that not-currently-loaded group was restored from the statefile
 f3d_test(NAME TestStatefileFileGroupsSave DATA cow.vtp dragon.vtu NO_RENDER NO_BASELINE ARGS --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileFileGroups.json REGEXP "Statefile saved to")
 f3d_test(NAME TestStatefileFileGroupsLoad SCRIPT DEPENDS TestStatefileFileGroupsSave NO_BASELINE ARGS --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileFileGroups.json --verbose REGEXP "VTKXMLVTU")
-
-# Statefile interactor command load_statefile, each test covers a distinct behavior. The save_statefile
-# command shares its implementation with the --save-statefile option covered above, the tests below
-# instead focus on the load_statefile command which restores a statefile into the running session
-# load_statefile with an explicit path loads the statefile files (cow.vtp), replacing the loaded dragon.vtu
-f3d_test(NAME TestCommandScriptLoadStatefile SCRIPT DATA dragon.vtu WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "cow.vtp" NO_BASELINE)
-# load_statefile with no argument falls back to the --statefile-filename path
-f3d_test(NAME TestCommandScriptLoadStatefileFromOption SCRIPT DATA dragon.vtu WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --statefile-filename=${F3D_SOURCE_DIR}/testing/statefiles/test_statefile.json --verbose REGEXP "cow.vtp" NO_BASELINE)
-# load_statefile resolves the {n} template to the most recent existing statefile
-f3d_test(NAME TestCommandScriptLoadStatefileMostRecent SCRIPT DATA cow.vtp ARGS --statefile-filename=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileMostRecent/state_{n}.json --verbose REGEXP "from statefile options" NO_BASELINE)
-# load_statefile applies over the current interactor state, here overriding a `set` tweak
-f3d_test(NAME TestCommandScriptLoadStatefileOverridesTweak SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "background.color' = '#0000ff' from statefile options" NO_BASELINE)
-# load_statefile of a missing file is skipped with a warning
-f3d_test(NAME TestCommandScriptLoadStatefileMissing SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "Could not open statefile, skipping" NO_BASELINE)
-# load_statefile with an out of range file group index falls back to the first group
-f3d_test(NAME TestCommandScriptLoadStatefileInvalidGroup SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "cow.vtp" NO_BASELINE)
-# save_statefile and load_statefile with no argument and an empty --statefile-filename warn and no-op
-f3d_test(NAME TestCommandScriptStatefileEmptyFilename SCRIPT DATA cow.vtp ARGS --statefile-filename= --verbose REGEXP "No statefile location provided" NO_BASELINE)
-# save_statefile to a path that cannot be written (a directory) reports the error
-f3d_test(NAME TestCommandScriptSaveStatefileError SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "Could not save statefile" NO_BASELINE)
-
-# The clipboard round-trip needs a real onscreen window for the X11 selection to work, it fails with
-# the offscreen backends (egl, osmesa), so only run it where an onscreen window is available, ie on
-# Windows, macOS, or Linux with GLX tests enabled (where the auto backend resolves to GLX).
-if(F3D_MODULE_CLIP AND (WIN32 OR APPLE OR F3D_TESTING_ENABLE_GLX_TESTS))
-  f3d_test(NAME TestCommandScriptStatefileClipboard SCRIPT DATA cow.vtp ARGS --verbose REGEXP "background.color' = '#0000ff' from statefile options" NO_BASELINE)
-endif()
 
 # Basic record and play test
 f3d_test(NAME TestInteractionRecord DATA cow.vtp ARGS --interaction-test-record=${CMAKE_BINARY_DIR}/Testing/Temporary/TestInteractionRecord.log NO_BASELINE)
