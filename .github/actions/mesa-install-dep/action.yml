@@ -44,6 +44,11 @@ runs:
         path: dependencies/mesa_install
         key: mesa-${{steps.mesa_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-1
 
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: "3.14"
+
     - name: Install Mesa Python dependencies
       if: steps.cache-mesa.outputs.cache-hit != 'true'
       shell: bash
@@ -75,7 +80,7 @@ runs:
 
     - name: Configure mesa
       if: steps.cache-mesa.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies/mesa_build
+      working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: >
         meson setup mesa_build mesa
