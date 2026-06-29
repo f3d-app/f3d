@@ -512,6 +512,9 @@ f3d_test(NAME TestStatefileLoadMissing DATA cow.vtp NO_RENDER NO_BASELINE ARGS -
 f3d_test(NAME TestStatefileLoadInvalidContent DATA cow.vtp NO_RENDER NO_BASELINE ARGS --load-statefile=${F3D_SOURCE_DIR}/testing/data/cow.vtp REGEXP "Could not parse statefile content")
 # `-` writes the statefile to the standard output
 f3d_test(NAME TestStatefileSaveStdout DATA cow.vtp NO_RENDER NO_BASELINE ARGS --save-statefile=- REGEXP "\"options\"")
+# `-` reads the statefile from the standard input (`cat state.json | f3d --load-statefile=-`). The
+# working directory is the statefile directory so the relative paths it contains resolve correctly
+f3d_test(NAME TestStatefileLoadStdin PIPED_INPUT ${F3D_SOURCE_DIR}/testing/statefiles/test_statefile.json WORKING_DIR ${F3D_SOURCE_DIR}/testing/statefiles NO_RENDER NO_BASELINE ARGS --load-statefile=- REGEXP "background.color' = '#0000ff' from statefile options")
 # Missing parent directories of the statefile path are created
 f3d_test(NAME TestStatefileSaveCreatesDir DATA cow.vtp NO_RENDER NO_BASELINE ARGS --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileSaveCreatesDir/sub/cow.json REGEXP "Statefile saved to")
 
