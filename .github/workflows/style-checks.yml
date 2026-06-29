@@ -76,8 +76,8 @@ jobs:
         if: failure()
         shell: bash
         run: |
-          diff=$(git diff)
-          echo "$diff" > ./f3d_style_checks_diff.patch
+          diff="$(git diff)\n"
+          echo "$diff" > ./f3d_style_diff.patch
           {
             echo 'F3D_STYLE_DIFF<<EOF'
             echo "$diff"
