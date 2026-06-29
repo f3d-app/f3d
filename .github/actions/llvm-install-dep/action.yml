@@ -1,0 +1,110 @@
+name: "Install LLVM Dependency"
+description: "Install LLVM Dependency using cache when possible"
+inputs:
+  versions_file:
+    description: "File to recover versions from"
+    required: true
+  mindeps_label:
+    description: "Label to flag for minimum versions dependencies"
+    required: false
+    default: "no-mindeps"
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
+
+    - name: Extract llvm version
+      id: llvm_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: llvm
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract global cache index
+      id: global_idx
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        special_name: global_cache_index
+
+    - name: Cache llvm
+      id: cache-llvm
+      continue-on-error: true # https://github.com/actions/cache/issues/1754
+      uses: actions/cache/restore@v6
+      with:
+        path: dependencies/llvm_install
+        key: llvm-${{steps.llvm_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
+
+    - name: Checkout LLVM
+      if: steps.cache-llvm.outputs.cache-hit != 'true'
+      uses: actions/checkout@v7
+      with:
+        repository: llvm/llvm-project
+        submodules: true
+        path: "./dependencies/llvm"
+        ref: ${{steps.llvm_ver.outputs.extract}}
+
+    - name: Setup LLVM
+      if: steps.cache-llvm.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir llvm_build
+        mkdir llvm_install
+
+    - name: Configure LLVM
+      if: |
+        steps.cache-llvm.outputs.cache-hit != 'true' &&
+        steps.llvm_ver.outputs.extract != 'V7_6_3'
+      working-directory: ${{github.workspace}}/dependencies/llvm_build
+      shell: bash
+      run: >
+        cmake ../llvm
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/llvm-install"
+        -DLLVM_BUILD_LLVM_DYLIB=ON
+        -DLLVM_DYLIB_COMPONENTS="Native"
+        -DLLVM_TARGETS_TO_BUILD="host"
+        -DLLVM_ENABLE_PROJECTS=""
+        -DLLVM_BUILD_TOOLS=ON
+        -DLLVM_BUILD_TESTS=OFF
+        -DLLVM_BUILD_EXAMPLES=OFF
+        -DLLVM_BUILD_BENCHMARKS=OFF
+        -DLLVM_INCLUDE_TESTS=OFF
+        -DLLVM_INCLUDE_EXAMPLES=OFF
+        -DLLVM_INCLUDE_BENCHMARKS=OFF
+        -DLLVM_INCLUDE_DOCS=OFF
+        -DLLVM_ENABLE_TERMINFO=OFF
+        -DLLVM_ENABLE_ZLIB=OFF
+        -DLLVM_ENABLE_ZSTD=OFF
+        -DLLVM_ENABLE_LIBXML2=OFF
+        -DLLVM_ENABLE_RTTI=OFF
+        ${{ runner.os == 'macOS' && '-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=14.0' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build LLVM
+      if: steps.cache-llvm.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/llvm_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/llvm_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-llvm.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v6
+      with:
+        key: ${{ steps.cache-llvm.outputs.cache-primary-key }}
+        path: dependencies/llvm_install

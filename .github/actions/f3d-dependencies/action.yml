@@ -16,6 +16,16 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Install LLVM dependency
+      uses: ./source/.github/actions/llvm-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+
+    #- name: Install MESA
+    #  uses: ./source/.github/actions/install-mesa
+    #  with:
+    #    cpu: ${{inputs.cpu}}
+
     - name: Install OCCT dependency
       uses: ./source/.github/actions/occt-install-dep
       with:
