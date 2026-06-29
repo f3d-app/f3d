@@ -23,7 +23,7 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: dependencies/mesa_install
-        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-21
+        key: mesa-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-22
 
     - name: Set up Python
       if: steps.cache-mesa.outputs.cache-hit != 'true'
@@ -110,7 +110,7 @@ runs:
         -Db_ndebug=true
         -Db_vscrt=mt
         -Dosmesa=true
-        -Dgallium-drivers=llvmpipe
+        -Dgallium-drivers=softpipe
         -Dvulkan-drivers=[]
         -Dopengl=true
         -Dgles1=disabled
