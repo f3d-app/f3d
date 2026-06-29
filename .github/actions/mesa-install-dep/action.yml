@@ -42,7 +42,7 @@ runs:
       uses: actions/cache/restore@v6
       with:
         path: dependencies/mesa_install
-        key: mesa-${{steps.mesa_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-1
+        key: mesa-${{steps.mesa_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
 
     - name: Set up Python
       uses: actions/setup-python@v6
@@ -93,6 +93,7 @@ runs:
         --buildtype=release
         -Db_ndebug=true
         -Dosmesa=true
+        -Dcpp_rtti=false
         -Dgallium-drivers=llvmpipe
         -Dvulkan-drivers=[]
         -Dopengl=true
