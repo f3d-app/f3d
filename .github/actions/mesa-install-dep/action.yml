@@ -44,7 +44,14 @@ runs:
         path: dependencies/mesa_install
         key: mesa-${{steps.mesa_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
 
+    - name: Setup MSVC (Windows)
+      if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
+      uses: TheMrMilchmann/setup-msvc-dev@v4
+      with:
+        arch: x64
+
     - name: Set up Python
+      if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
       uses: actions/setup-python@v6
       with:
         python-version: "3.14"
@@ -79,6 +86,7 @@ runs:
         mkdir mesa_install
 
     - name: Add LLVM to PATH
+      if: steps.cache-mesa.outputs.cache-hit != 'true'
       shell: bash
       run: |
         echo "$GITHUB_WORKSPACE/dependencies/install/bin" >> "$GITHUB_PATH"
