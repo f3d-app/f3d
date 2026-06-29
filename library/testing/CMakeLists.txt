@@ -21,7 +21,6 @@ list(APPEND libf3dSDKTests_list
      TestSDKSceneFromBuffer.cxx
      TestSDKSceneFromMemory.cxx
      TestSDKUtils.cxx
-     TestSDKUI.cxx
      TestSDKWindowAuto.cxx
      TestTestSDKHelpers.cxx
 )
@@ -43,6 +42,7 @@ if(F3D_MODULE_UI)
     TestSDKNotification.cxx
     TestSDKStartInteractor.cxx
     TestSDKTriggerInteractions.cxx
+    TestSDKUI.cxx
     )
 
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489

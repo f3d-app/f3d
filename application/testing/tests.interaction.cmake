@@ -143,13 +143,17 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250507)
 endif()
 
 # Test interactive animation and speed factor
-f3d_test(NAME TestInteractionAnimation DATA f3d.glb ARGS --animation-progress INTERACTION) #Space;Wait;Space;
-f3d_test(NAME TestInteractionAnimationFast DATA f3d.glb ARGS --animation-progress --animation-speed-factor=1.5 INTERACTION) #Space;Wait;Space;
-f3d_test(NAME TestInteractionAnimationSlow DATA f3d.glb ARGS --animation-progress --animation-speed-factor=0.5 INTERACTION) #Space;Wait;Space;
-f3d_test(NAME TestInteractionAnimationFrameRate DATA f3d.glb ARGS --animation-progress --frame-rate=1 INTERACTION) #Space;Wait;Space;
-f3d_test(NAME TestInteractionAnimationCameraMovement DATA CameraAnimated.glb ARGS --camera-index=0 --animation-progress INTERACTION) #Space;MouseMovement;Space;
-f3d_test(NAME TestInteractionAnimationInvert DATA f3d.glb ARGS --animation-speed-factor=-1 --animation-progress INTERACTION) #Space;Wait;Space;
-f3d_test(NAME TestInteractionAnimationBackward DATA f3d.glb ARGS --animation-progress INTERACTION) #Ctrl+Shift+Space;Wait;Space;
+f3d_test(NAME TestInteractionAnimation DATA f3d.glb ARGS --animation-progress INTERACTION UI) #Space;Wait;Space;
+f3d_test(NAME TestInteractionAnimationFast DATA f3d.glb ARGS --animation-progress --animation-speed-factor=1.5 INTERACTION UI) #Space;Wait;Space;
+f3d_test(NAME TestInteractionAnimationSlow DATA f3d.glb ARGS --animation-progress --animation-speed-factor=0.5 INTERACTION UI) #Space;Wait;Space;
+f3d_test(NAME TestInteractionAnimationFrameRate DATA f3d.glb ARGS --animation-progress --frame-rate=1 INTERACTION UI) #Space;Wait;Space;
+f3d_test(NAME TestInteractionAnimationCameraMovement DATA CameraAnimated.glb ARGS --camera-index=0 --animation-progress INTERACTION UI) #Space;MouseMovement;Space;
+f3d_test(NAME TestInteractionAnimationInvert DATA f3d.glb ARGS --animation-speed-factor=-1 --animation-progress INTERACTION UI) #Space;Wait;Space;
+f3d_test(NAME TestInteractionAnimationBackward DATA f3d.glb ARGS --animation-progress INTERACTION UI) #Ctrl+Shift+Space;Wait;Space;
+
+f3d_test(NAME TestInteractionAnimationProgressBarJumpToKeyFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress=advanced INTERACTION UI) #Left click on a keyframe marker
+f3d_test(NAME TestInteractionAnimationProgressBarJumpToTime DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress=advanced INTERACTION UI) #Left click between keyframe markers
+f3d_test(NAME TestInteractionAnimationProgressBarHover DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress=advanced INTERACTION UI) #Hover mouse over the progress bar
 
 ## Cheatsheet
 f3d_test(NAME TestInteractionCheatsheetWhiteBG DATA cow.vtp ARGS --background-color=1,1,1 INTERACTION UI) #H

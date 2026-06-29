@@ -36,3 +36,7 @@ The `jump_to_frame` and `jump_to_keyframe` commands no longer take a second bool
 - `jump_to_frame 1 true` -> `jump_to_frame_relative 1`
 - `jump_to_keyframe 4 false` -> `jump_to_keyframe 4`
 - `jump_to_keyframe 1 true` -> `jump_to_keyframe_relative 1`
+
+## ui.animation_progress
+
+The `ui.animation_progress` option (CLI `--animation-progress`) was a boolean toggling a progress bar during animation playback. It is now a string selecting the progress bar mode: `none` (hidden), `default` (the progress bar alone) or `advanced` (the progress bar with time range, animation name, current time labels and keyframe markers). Replace `true` with `default` (or `advanced`) and `false` with `none`.

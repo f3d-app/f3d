@@ -2,9 +2,9 @@
 ## This file is only added if alembic is enabled
 f3d_test(NAME TestAlembic DATA suzanne.abc ARGS -s PLUGIN alembic)
 f3d_test(NAME TestAlembicNonFaceVarying DATA tetrahedron_non_facevarying_uv.abc ARGS -s PLUGIN alembic)
-f3d_test(NAME TestAlembicAnimation DATA drop.abc PLUGIN alembic ARGS --animation-time=2 --animation-progress)
-f3d_test(NAME TestAlembicAnimationXForm DATA xform_anim.abc PLUGIN alembic ARGS -g --animation-time=1.5 --animation-progress)
-f3d_test(NAME TestAlembicAnimationXFormRotation DATA joint1.abc PLUGIN alembic ARGS -g --animation-time=1.5 --animation-progress)
+f3d_test(NAME TestAlembicAnimation DATA drop.abc PLUGIN alembic ARGS --animation-time=2 --animation-progress UI)
+f3d_test(NAME TestAlembicAnimationXForm DATA xform_anim.abc PLUGIN alembic ARGS -g --animation-time=1.5 --animation-progress UI)
+f3d_test(NAME TestAlembicAnimationXFormRotation DATA joint1.abc PLUGIN alembic ARGS -g --animation-time=1.5 --animation-progress UI)
 f3d_test(NAME TestAlembicCurves DATA monkey_curves.abc PLUGIN alembic THRESHOLD 0.07) #  High threshold because of line rendering
 f3d_test(NAME TestAlembicInvalid DATA invalid_truncated.abc PLUGIN alembic ARGS -s REGEXP "failed to load scene" NO_BASELINE)
 

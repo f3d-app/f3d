@@ -105,6 +105,11 @@
 
 namespace
 {
+// Placement of the horizontal scalar bar
+constexpr double ScalarBarPositionX = 0.1;
+constexpr double ScalarBarPositionY = 0.01;
+constexpr double ScalarBarHeight = 0.07;
+
 std::string DeprecatedCollapsePath(const fs::path& path)
 {
   std::string collapsed;
@@ -2130,6 +2135,17 @@ void vtkF3DRenderer::UpdateActors()
     this->ConfigureColoringAndVisibilities();
   }
 
+  // Lift the scalar bar above the animation progress bar (which sits at the
+  // bottom edge) so the two bottom overlays do not overlap.
+  if (this->ScalarBarActor->GetVisibility())
+  {
+    const int* size = this->GetSize();
+    const double winHeight = (size && size[1] > 0) ? static_cast<double>(size[1]) : 1.0;
+    const double progressPx = this->UIActor->GetAnimationProgressBarHeight();
+    const double posY = ::ScalarBarPositionY + (progressPx > 0.0 ? progressPx / winHeight : 0.0);
+    this->ScalarBarActor->SetPosition(::ScalarBarPositionX, posY);
+  }
+
   if (!this->NormalGlyphsConfigured)
   {
     this->ConfigureNormalGlyphs();
@@ -3435,8 +3451,8 @@ void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
   scalarBar->SetNumberOfLabels(4);
   scalarBar->SetOrientationToHorizontal();
   scalarBar->SetWidth(0.8);
-  scalarBar->SetHeight(0.07);
-  scalarBar->SetPosition(0.1, 0.01);
+  scalarBar->SetHeight(::ScalarBarHeight);
+  scalarBar->SetPosition(::ScalarBarPositionX, ::ScalarBarPositionY);
   scalarBar->SetMaximumNumberOfColors(512);
 }
 
@@ -3727,4 +3743,29 @@ double vtkF3DRenderer::GetScreenSpaceScaling() const
 {
   return this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::SSAA ? std::sqrt(5.0)
                                                                                  : 1.0;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetAnimationProgressMode(vtkF3DUIActor::AnimationProgressBarMode mode)
+{
+  this->UIActor->SetAnimationProgressMode(mode);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetAnimationProgress(const std::pair<double, double>& timeRange,
+  const std::string& name, const std::vector<double>& keyFrames)
+{
+  this->UIActor->SetAnimationProgress(timeRange, name, keyFrames);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetAnimationProgressColor(const std::array<double, 3>& color)
+{
+  this->UIActor->SetAnimationProgressColor(color);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::UpdateAnimationTime(double currentTime)
+{
+  this->UIActor->UpdateAnimationTime(currentTime);
 }

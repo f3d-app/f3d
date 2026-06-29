@@ -141,9 +141,9 @@
         },
         {
           "longName": "animation-progress",
-          "helpText": "Show animation progress bar",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
+          "helpText": "Animation progress bar mode (\"none\", \"default\" or \"advanced\")",
+          "valueHelper": "<string>",
+          "implicitValue": "default"
         },
         {
           "longName": "multi-file-mode",

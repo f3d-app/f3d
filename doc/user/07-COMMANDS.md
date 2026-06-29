@@ -107,13 +107,24 @@ eg:
 - `jump_to_keyframe_relative -1` jump to previous keyframe.
 - `jump_to_keyframe_relative 10` jump 10 keyframes ahead.
 
-This command is currently supported only by the following readers :
+The jump_to_keyframe* commands are currently supported only by the following readers :
 
 - `vtkF3DGLTFImporter`
 - `vtkF3DQuakeMDLImporter`
 
 You can follow the issue below to track the progress of animation support for other readers:
 [F3D Issue – Improve Animation System #2637](https://github.com/f3d-app/f3d/issues/2637#:~:text=Access%20to%20timesteps)
+
+`jump_to_time`: A specific command to load an animation at a specific time, takes a time in seconds as argument.
+eg:
+
+- `jump_to_time 2.5` jump to time 2.5 seconds.
+
+`jump_to_time_relative`: A specific command to move the animation by a number of seconds relative to the current time, takes a time offset as argument.
+eg:
+
+- `jump_to_time_relative 0.5` jump 0.5 seconds forward.
+- `jump_to_time_relative -0.5` jump 0.5 seconds backward.
 
 `cycle_verbose_level` : A specific command to cycle between the verbose levels (`Debug`, `Info`, `Warning`, `Error`, `Quiet`).
 
