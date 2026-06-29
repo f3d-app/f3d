@@ -42,7 +42,7 @@ runs:
       uses: actions/cache/restore@v6
       with:
         path: dependencies/llvm_install
-        key: llvm-${{steps.llvm_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
+        key: llvm-${{steps.llvm_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-1
 
     - name: Checkout LLVM
       if: steps.cache-llvm.outputs.cache-hit != 'true'
@@ -51,7 +51,7 @@ runs:
         repository: llvm/llvm-project
         submodules: true
         path: "./dependencies/llvm"
-        ref: ${{steps.llvm_ver.outputs.extract}}
+        ref: llvmorg-${{steps.llvm_ver.outputs.extract}}
 
     - name: Setup LLVM
       if: steps.cache-llvm.outputs.cache-hit != 'true'
