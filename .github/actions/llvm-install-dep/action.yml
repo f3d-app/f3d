@@ -70,7 +70,7 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/llvm-install"
         -DLLVM_BUILD_LLVM_DYLIB=ON
-        -DLLVM_DYLIB_COMPONENTS="Native"
+        -DLLVM_DYLIB_COMPONENTS="all"
         -DLLVM_TARGETS_TO_BUILD="host"
         -DLLVM_ENABLE_PROJECTS=""
         -DLLVM_BUILD_TOOLS=ON
@@ -81,7 +81,6 @@ runs:
         -DLLVM_INCLUDE_EXAMPLES=OFF
         -DLLVM_INCLUDE_BENCHMARKS=OFF
         -DLLVM_INCLUDE_DOCS=OFF
-        -DLLVM_ENABLE_TERMINFO=OFF
         -DLLVM_ENABLE_ZLIB=OFF
         -DLLVM_ENABLE_ZSTD=OFF
         -DLLVM_ENABLE_LIBXML2=OFF
