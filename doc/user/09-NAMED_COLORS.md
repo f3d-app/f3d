@@ -3,6 +3,7 @@
 When colors are [parsed](./08-PARSING.md#color), it's possible to use predefined named colors.
 
 The list of colors that can be used in F3D is given below and is separated in four categories:
+
 - [F3D colors](#f3d-colors) listing the palette used in F3D
 - [Web colors](#web-colors) listing the basic and extended of standard [HTML colors](https://en.wikipedia.org/wiki/Web_colors)
 - [ParaView colors](#paraview-colors) listing the two background colors used in ParaView
