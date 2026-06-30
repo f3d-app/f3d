@@ -630,7 +630,14 @@ PYBIND11_MODULE(pyf3d, module)
           throw std::runtime_error("No cell scalar with name " + name);
         }
         it->timeDependent = timeDependent;
-      });
+      })
+    // Optional in-memory base-color (albedo) texture, sampled via texture_coordinates. Assign an
+    // f3d.Image (a BYTE image with 3 or 4 channels); leave default (empty) for no texture. When
+    // base_color_texture_emissive is true the same image is also installed as the emissive map
+    // (flat / full-strength display).
+    .def_readwrite("base_color_texture", &f3d::mesh_view::memory_view_t::baseColorTexture)
+    .def_readwrite("base_color_texture_emissive",
+                   &f3d::mesh_view::memory_view_t::baseColorTextureEmissive);
 
   class PyMesh
     : public f3d::mesh_view

@@ -30,6 +30,7 @@ if(F3D_MODULE_UI)
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251110)
     list(APPEND pyf3dTests_list
       test_scene_zero_copy.py
+      test_scene_mesh_view_texture.py
       )
   endif()
 endif()
