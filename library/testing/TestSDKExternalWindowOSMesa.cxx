@@ -37,13 +37,22 @@ int TestSDKExternalWindowOSMesa([[maybe_unused]] int argc, [[maybe_unused]] char
 
   PseudoUnitTest test;
 
-  f3d::engine eng = f3d::engine::createExternalOSMesa();
-  eng.getWindow().setSize(size[0], size[1]);
-  eng.getScene().add(std::string(argv[1]) + "/data/cow.vtp");
+  try
+  {
+    f3d::engine eng = f3d::engine::createExternalOSMesa();
+    eng.getWindow().setSize(size[0], size[1]);
+    eng.getScene().add(std::string(argv[1]) + "/data/cow.vtp");
 
-  test("render test with external OSMesa window",
-    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", argv[2],
-      "TestSDKExternalWindowOSMesa"));
+    test("render test with external OSMesa window",
+      TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", argv[2],
+        "TestSDKExternalWindowOSMesa"));
+  }
+  catch (const f3d::exception& e)
+  {
+    std::cerr << "OSMesa test failed: " << e.what() << std::endl;
+    OSMesaDestroyContext(ctx);
+    return EXIT_FAILURE;
+  }
 
   OSMesaDestroyContext(ctx);
   return test.result();
