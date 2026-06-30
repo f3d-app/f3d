@@ -74,11 +74,14 @@ public:
 #ifdef _WIN32
     vtkSmartPointer<vtkOpenGLRenderWindow> wglRenWin =
       vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
+    wglRenWin->Initialize();
     int major, minor;
     wglRenWin->GetOpenGLVersion(major, minor);
     if (major < 3 || (major == 3 && minor < 2))
     {
-      log::warn("WGL backend does not support OpenGL >= 3.2, falling back to OSMesa");
+      // TODO: cannot warn because it prints the warning to the console resulting in
+      // baseline changes
+      // log::warn("WGL backend does not support OpenGL >= 3.2, falling back to OSMesa");
       return vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
     }
     else
