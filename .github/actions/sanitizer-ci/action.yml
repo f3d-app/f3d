@@ -63,6 +63,7 @@ runs:
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_BINDINGS_C=${{ inputs.sanitizer_type == 'undefined' && 'OFF' || 'ON' }}
+        -DF3D_MODULE_CLIP=ON
         -DF3D_MODULE_EXR=ON
         -DF3D_MODULE_UI=ON
         -DF3D_MODULE_WEBP=ON
