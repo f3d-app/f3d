@@ -76,8 +76,8 @@ jobs:
         if: failure()
         shell: bash
         run: |
-          diff=$(git diff)
-          echo "$diff" > ./f3d_style_checks_diff.patch
+          diff="$(git diff)\n"
+          echo "$diff" > ./f3d_style_diff.patch
           {
             echo 'F3D_STYLE_DIFF<<EOF'
             echo "$diff"
@@ -107,3 +107,11 @@ jobs:
             ```diff
             ${{env.F3D_STYLE_DIFF}}
             ```
+            You can copy the patch above and apply it locally with:
+
+            | Platform   | Command                                         |
+            |------------|-------------------------------------------------|
+            | X          | `xclip -o -selection clipboard \| git apply -v` |
+            | Wayland    | `wl-paste \| git apply -v`                      |
+            | Powershell | `Get-Clipboard -Raw \| git apply -v`            |
+            | macOS      | `pbpaste \| git apply -v`                       |
