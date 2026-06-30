@@ -13,7 +13,7 @@ f3d_test(NAME TestAMRDataSet DATA amr.vtkhdf PLUGIN hdf ARGS -s)
 f3d_test(NAME TestVTKHDFPartitionedDataSetCollection DATA pdc_sphere_cone.vtkhdf PLUGIN hdf ARGS -s)
 
 if (VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251109)
-  f3d_test(NAME TestPipedVTKHDF DATA blob.vtkhdf PLUGIN hdf ARGS -s PIPED VTKHDF)
+  f3d_test(NAME TestPipedVTKHDF DATA blob.vtkhdf PLUGIN hdf ARGS -s PIPED_READER VTKHDF PIPED)
 endif()
 
 if(NOT F3D_MACOS_BUNDLE)

@@ -43,9 +43,9 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219)
 endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251016)
-  f3d_test(NAME TestPipedUSD DATA suzanne.usd PLUGIN usd PIPED USD)
-  f3d_test(NAME TestPipedUSDAPrimitives DATA primitives.usda PLUGIN usd PIPED USD)
-  f3d_test(NAME TestPipedUSDZRigged DATA RiggedSimple.usdz PLUGIN usd PIPED USD)
+  f3d_test(NAME TestPipedUSD DATA suzanne.usd PLUGIN usd PIPED_READER USD PIPED)
+  f3d_test(NAME TestPipedUSDAPrimitives DATA primitives.usda PLUGIN usd PIPED_READER USD PIPED)
+  f3d_test(NAME TestPipedUSDZRigged DATA RiggedSimple.usdz PLUGIN usd PIPED_READER USD PIPED)
 endif()
 
 if(NOT F3D_MACOS_BUNDLE)
