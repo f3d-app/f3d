@@ -35,9 +35,9 @@ f3d_test(<NAME> [ARGS...])
   - `PIPED` Mark the test to pipe the data (`cat data | f3d`) instead of providing the filename as data,
     doesn't work for external plugins, pass the reader as an arg, it will be used to force before VTK v9.6.20260128.
     Add `piped` test labels.
-  - `PIPED_INPUT` Mark the test to pipe an arbitrary file (provided as an absolute path) to the standard
-    input, to be consumed by a CLI option (e.g. `--load-statefile=-`) instead of as a positional filename.
-    Doesn't work for external plugins. Add `piped` test labels.
+  - `PIPED_ARG` Like `PIPED` but prepend the provided string to the `-` standard input marker, so the piped
+    data is consumed by an option (e.g. pass `--load-statefile=` to load a statefile from `--load-statefile=-`)
+    instead of as the input model. No reader is forced. Add `piped` test labels.
   - `SCRIPT` Mark the test to use a `--script` of the same name as the test
   - `NAME` Provide the name of the test, mandatory and must be unique
   - `BASELINE_PATH` Provide the path to the baseline to use, instead of the default
@@ -60,7 +60,7 @@ f3d_test(<NAME> [ARGS...])
 
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "LONG_TIMEOUT;DEFAULT_HDRI;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT" "NAME;BASELINE_PATH;OUTPUT_PATH;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED;PIPED_INPUT;PLUGIN" "DATA;DEPENDS;LABELS;ENV;ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "LONG_TIMEOUT;DEFAULT_HDRI;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT" "NAME;BASELINE_PATH;OUTPUT_PATH;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED;PIPED_ARG;PLUGIN" "DATA;DEPENDS;LABELS;ENV;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -149,7 +149,7 @@ function(f3d_test)
   endif()
 
   if(DEFINED f3d_INCLUDE_DIR)
-    if (F3D_TEST_PIPED OR F3D_TEST_PIPED_INPUT)
+    if (F3D_TEST_PIPED OR F3D_TEST_PIPED_ARG)
       message(FATAL_ERROR "PIPED test is not supported to external plugins")
     endif ()
 
@@ -162,30 +162,19 @@ function(f3d_test)
 
   list(APPEND F3D_TEST_ARGS "--plugins-path=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 
-  if (F3D_TEST_PIPED OR F3D_TEST_PIPED_INPUT)
+  if (F3D_TEST_PIPED OR F3D_TEST_PIPED_ARG)
     list(APPEND F3D_TEST_LABELS "piped")
-
-    if (F3D_TEST_PIPED_INPUT)
-      # Pipe an arbitrary file consumed by a CLI option, without a positional filename
-      set(_f3d_piped_data "${F3D_TEST_PIPED_INPUT}")
-      set(_f3d_piped_extra "-DF3D_PIPED_NO_FILENAME=ON")
-    else()
-      # Pipe the data model through the `-` filename, forcing the reader if needed
-      set(_f3d_piped_data "${_f3d_test_data}")
-      set(_f3d_piped_extra)
-      if(VTK_VERSION VERSION_LESS 9.6.20260128)
-        list(APPEND F3D_TEST_ARGS "--force-reader=${F3D_TEST_PIPED}")
-      endif()
+    if(F3D_TEST_PIPED AND VTK_VERSION VERSION_LESS 9.6.20260128)
+      list(APPEND F3D_TEST_ARGS "--force-reader=${F3D_TEST_PIPED}")
     endif()
-
     list(JOIN F3D_TEST_ARGS " " F3D_TEST_ARGS_JOINED)
     add_test(
       NAME "f3d::${F3D_TEST_NAME}"
       COMMAND ${CMAKE_COMMAND}
         -DF3D_EXE:FILEPATH=${_f3d_target}
-        -DF3D_PIPED_DATA=${_f3d_piped_data}
+        -DF3D_PIPED_DATA=${_f3d_test_data}
+        -DF3D_PIPED_ARG=${F3D_TEST_PIPED_ARG}
         -DF3D_ARGS=${F3D_TEST_ARGS_JOINED}
-        ${_f3d_piped_extra}
         -P ${CMAKE_CURRENT_SOURCE_DIR}/f3d_piped.cmake
         COMMAND_EXPAND_LISTS)
   else()
