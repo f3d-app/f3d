@@ -15,7 +15,7 @@ Once F3D has been installed, you should be able to open a file in any of the fol
 - Open a file directly from your file manager.
 - Open the F3D application directly, then drag and drop a file into the application window.
 - Run F3D from the terminal with a set of command-line [options](03-OPTIONS.md).
-- Configure F3D as a [thumbnailer](11-DESKTOP_INTEGRATION.md) for supported file formats with certain file managers.
+- Configure F3D as a [thumbnailer](12-DESKTOP_INTEGRATION.md) for supported file formats with certain file managers.
 
 If you choose to run F3D from the terminal, you can open your file by running the following:
 
@@ -98,6 +98,6 @@ For more information, see the [Animations](05-ANIMATIONS.md) page.
 - [A list of all F3D command-line options.](03-OPTIONS.md)
 - [How to interact with scenes in F3D.](04-INTERACTIONS.md)
 - [How to play animations in F3D.](05-ANIMATIONS.md)
-- [How to specify colormaps in F3D.](09-COLOR_MAPS.md)
-- [How to configure plugins in F3D.](12-PLUGINS.md)
-- [Limitations and how to troubleshoot F3D.](13-LIMITATIONS_AND_TROUBLESHOOTING.md)
+- [How to specify colormaps in F3D.](10-COLOR_MAPS.md)
+- [How to configure plugins in F3D.](13-PLUGINS.md)
+- [Limitations and how to troubleshoot F3D.](14-LIMITATIONS_AND_TROUBLESHOOTING.md)

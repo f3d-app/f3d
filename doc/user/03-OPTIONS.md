@@ -67,15 +67,15 @@ Frame rate used to refresh animation and other repeated tasks (watch, UI). Does 
 
 ### `--load-plugins=<paths or names>` (_string_)
 
-List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `hdf`, `occt`, `pdal`, `usd`, `vdb`, `webifc`. See [plugins](12-PLUGINS.md) for more info.
+List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `hdf`, `occt`, `pdal`, `usd`, `vdb`, `webifc`. See [plugins](13-PLUGINS.md) for more info.
 
 ### `--plugins-path=<path>` (_string_)
 
-Supplementary path to specify where to load plugins from, on top of [default paths](12-PLUGINS.md#supported-plugins).
+Supplementary path to specify where to load plugins from, on top of [default paths](13-PLUGINS.md#supported-plugins).
 
 ### `--scan-plugins`
 
-Scan standard directories for plugins and display their names, results may be incomplete. See [plugins](12-PLUGINS.md) for more info.
+Scan standard directories for plugins and display their names, results may be incomplete. See [plugins](13-PLUGINS.md) for more info.
 
 ### `--screenshot-filename=<png file>` (_string_, default: `{app}/{model}_{n}.png`)
 
@@ -790,7 +790,7 @@ Use with the scalar option.
 ### `--colormap-file=<name>` (_string_)
 
 Set a _colormap file for the coloring_.
-See [color maps](09-COLOR_MAPS.md).
+See [color maps](10-COLOR_MAPS.md).
 Use with the scalar option.
 
 #### compare
@@ -976,7 +976,7 @@ Enable neutral _Tone Mapping_. This technique is used to map colors properly to 
 
 ### `--final-shader` (_string_)
 
-Add a final shader to the output image. See the [dedicated documentation](10-FINAL_SHADER.md) for more details.
+Add a final shader to the output image. See the [dedicated documentation](11-FINAL_SHADER.md) for more details.
 
 #### compare
 
