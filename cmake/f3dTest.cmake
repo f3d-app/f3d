@@ -164,8 +164,8 @@ function(f3d_test)
 
   if (F3D_TEST_PIPED)
     list(APPEND F3D_TEST_LABELS "piped")
-    # The reader is only needed to force it on old VTK; recent VTK detects it from the piped stream
-    if(F3D_TEST_PIPED_READER AND VTK_VERSION VERSION_LESS 9.6.20260128)
+    # The reader is only needed to force it on old VTK; recent VTK detects it from the piped stream.
+    if(DEFINED F3D_TEST_PIPED_READER AND VTK_VERSION VERSION_LESS 9.6.20260128)
       list(APPEND F3D_TEST_ARGS "--force-reader=${F3D_TEST_PIPED_READER}")
     endif()
     list(JOIN F3D_TEST_ARGS " " F3D_TEST_ARGS_JOINED)
