@@ -960,7 +960,7 @@ f3d::ratio_t operator-(const f3d::ratio_t& ratio, const f3d::ratio_t &incr)
 template<typename T>
 void increase(T& val, const f3d::options::DomainRange<T>& domain, bool up)
 {
-  val = up ? std::min(val + domain.increment, domain.range[1]) : std::max(val - domain.increment, domain.range[0]);
+  val = up ? std::min(val + domain.increment, domain.max) : std::max(val - domain.increment, domain.min);
 }
 
 //----------------------------------------------------------------------------
@@ -974,7 +974,7 @@ void increase(std::optional<T>& val, const f3d::options::DomainRange<T>& domain,
 {
   if (!val.has_value())
   {
-    val = up ? domain.range[0] : domain.range[1];
+    val = up ? domain.min : domain.max;
   }
   else
   {

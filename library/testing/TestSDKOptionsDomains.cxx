@@ -162,46 +162,60 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   // scene.animation.speed_factor: tested above
   // render.raytracing.samples: tested above
 
-  test("model.color.opacity range", opt.domains.model.color.opacity.range, {0, 1});
+  test("model.color.opacity min", opt.domains.model.color.opacity.min, 0.);
+  test("model.color.opacity max", opt.domains.model.color.opacity.max, 1.);
   test("model.color.opacity increment", opt.domains.model.color.opacity.increment, 0.05);
 
-  test("scene.animation.speed_factor range", opt.domains.scene.animation.speed_factor.range, {f3d::ratio_t(0), f3d::ratio_t(2)});
+  test("scene.animation.speed_factor min", opt.domains.scene.animation.speed_factor.min, f3d::ratio_t(0.));
+  test("scene.animation.speed_factor max", opt.domains.scene.animation.speed_factor.max, f3d::ratio_t(2.));
   test("scene.animation.speed_factor increment", opt.domains.scene.animation.speed_factor.increment, f3d::ratio_t(0.1));
 
-  test("model.material.base_ior range", opt.domains.model.material.base_ior.range, {0, 1});
+  test("model.material.base_ior min", opt.domains.model.material.base_ior.min, 0.);
+  test("model.material.base_ior max", opt.domains.model.material.base_ior.max, 1.);
   test("model.material.base_ior increment", opt.domains.model.material.base_ior.increment, 0.05);
 
-  test("model.material.metallic range", opt.domains.model.material.metallic.range, {0, 1});
+  test("model.material.metallic min", opt.domains.model.material.metallic.min, 0.);
+  test("model.material.metallic max", opt.domains.model.material.metallic.max, 1.);
   test("model.material.metallic increment", opt.domains.model.material.metallic.increment, 0.05);
 
-  test("model.material.roughness range", opt.domains.model.material.roughness.range, {0, 1});
+  test("model.material.roughness min", opt.domains.model.material.roughness.min, 0.);
+  test("model.material.roughness max", opt.domains.model.material.roughness.max, 1.);
   test("model.material.roughness increment", opt.domains.model.material.roughness.increment, 0.05);
 
-  test("model.normal.scale range", opt.domains.model.normal.scale.range, {0, 1});
+  test("model.normal.scale min", opt.domains.model.normal.scale.min, 0.);
+  test("model.normal.scale max", opt.domains.model.normal.scale.max, 1.);
   test("model.normal.scale increment", opt.domains.model.normal.scale.increment, 0.05);
 
-  test("model.normal_glyphs.scale range", opt.domains.model.normal_glyphs.scale.range, {f3d::ratio_t(0), f3d::ratio_t(10)});
+  test("model.normal_glyphs.scale min", opt.domains.model.normal_glyphs.scale.min, f3d::ratio_t(0));
+  test("model.normal_glyphs.scale max", opt.domains.model.normal_glyphs.scale.max, f3d::ratio_t(10));
   test("model.normal_glyphs.scale increment", opt.domains.model.normal_glyphs.scale.increment, f3d::ratio_t(0.1));
 
-  test("model.scivis.discretization range", opt.domains.model.scivis.discretization.range, {1, 1024});
+  test("model.scivis.discretization min", opt.domains.model.scivis.discretization.min, 1);
+  test("model.scivis.discretization max", opt.domains.model.scivis.discretization.max, 1024);
   test("model.scivis.discretization increment", opt.domains.model.scivis.discretization.increment, 5);
 
-  test("render.background.blur.coc range", opt.domains.render.background.blur.coc.range, {0., 100.});
+  test("render.background.blur.coc min", opt.domains.render.background.blur.coc.min, 0.);
+  test("render.background.blur.coc max", opt.domains.render.background.blur.coc.max, 100.);
   test("render.background.blur.coc increment", opt.domains.render.background.blur.coc.increment, 5.);
 
-  test("render.light.intensity range", opt.domains.render.light.intensity.range, {0, 5});
+  test("render.light.intensity min", opt.domains.render.light.intensity.min, 0.);
+  test("render.light.intensity max", opt.domains.render.light.intensity.max, 5.);
   test("render.light.intensity increment", opt.domains.render.light.intensity.increment, 0.02);
 
-  test("render.line_width range", opt.domains.render.line_width.range, {0, 10});
+  test("render.line_width min", opt.domains.render.line_width.min, 0.);
+  test("render.line_width max", opt.domains.render.line_width.max, 10.);
   test("render.line_width increment", opt.domains.render.line_width.increment, 0.1);
 
-  test("render.point_size range", opt.domains.render.point_size.range, {0, 10});
+  test("render.point_size min", opt.domains.render.point_size.min, 0.);
+  test("render.point_size max", opt.domains.render.point_size.max, 10.);
   test("render.point_size increment", opt.domains.render.point_size.increment, 0.1);
 
-  test("ui.backdrop.opacity range", opt.domains.ui.backdrop.opacity.range, {0, 1});
+  test("ui.backdrop.opacity min", opt.domains.ui.backdrop.opacity.min, 0.);
+  test("ui.backdrop.opacity max", opt.domains.ui.backdrop.opacity.max, 1.);
   test("ui.backdrop.opacity increment", opt.domains.ui.backdrop.opacity.increment, 0.05);
 
-  test("ui.scale range", opt.domains.ui.scale.range, {f3d::ratio_t(0), f3d::ratio_t(10)});
+  test("ui.scale min", opt.domains.ui.scale.min, f3d::ratio_t(0));
+  test("ui.scale max", opt.domains.ui.scale.max, f3d::ratio_t(10));
   test("ui.scale increment", opt.domains.ui.scale.increment, f3d::ratio_t(0.1));
 
   test("interactor.style enum", opt.getEnumDomain("interactor.style"), {"default", "trackball", "2d"});

@@ -23,7 +23,8 @@
         "default_value": "1.0",
         "domain": {
           "style": "range",
-          "range": ["0.0", "2.0"],
+          "min": "0.0",
+          "max": "2.0",
           "increment": "0.1"
         }
       }
@@ -51,7 +52,8 @@
       "type": "double",
       "domain": {
         "style": "range",
-        "range": ["0.0", "10.0"],
+        "min": "0.0",
+"max": "10.0",
         "increment": "0.1"
       }
     },
@@ -59,7 +61,8 @@
       "type": "double",
       "domain": {
         "style": "range",
-        "range": ["0.0", "10.0"],
+        "min": "0.0",
+"max": "10.0",
         "increment": "0.1"
       }
     },
@@ -115,7 +118,8 @@
         "default_value": "5",
         "domain": {
           "style": "range",
-          "range": ["1", "20"],
+          "min": "1",
+"max": "20",
           "increment": "1"
         }
       }
@@ -185,7 +189,8 @@
           "default_value": "20.0",
           "domain": {
             "style": "range",
-            "range": ["0.0", "100.0"],
+            "min": "0.0",
+"max": "100.0",
             "increment": "5.0"
           }
         }
@@ -197,7 +202,8 @@
         "default_value": "1.0",
         "domain": {
           "style": "range",
-          "range": ["0.0", "5.0"],
+          "min": "0.0",
+"max": "5.0",
           "increment": "0.02"
         }
       }
@@ -216,7 +222,8 @@
         "default_value": "0.9",
         "domain": {
           "style": "range",
-          "range": ["0.0", "1.0"],
+          "min": "0.0",
+"max": "1.0",
           "increment": "0.05"
         }
       },
@@ -314,7 +321,8 @@
       "default_value": "1.0",
       "domain": {
         "style": "range",
-        "range": ["0.0", "10.0"],
+        "min": "0.0",
+"max": "10.0",
         "increment": "0.1"
       }
     },
@@ -377,7 +385,8 @@
         "type": "double",
         "domain": {
           "style": "range",
-          "range": ["0.0", "1.0"],
+          "min": "0.0",
+"max": "1.0",
           "increment": "0.05"
         }
       },
@@ -401,7 +410,8 @@
         "type": "double",
         "domain": {
           "style": "range",
-          "range": ["0.0", "1.0"],
+          "min": "0.0",
+"max": "1.0",
           "increment": "0.05"
         }
       },
@@ -414,7 +424,8 @@
         "type": "double",
         "domain": {
           "style": "range",
-          "range": ["0.0", "1.0"],
+          "min": "0.0",
+"max": "1.0",
           "increment": "0.05"
         }
       },
@@ -422,7 +433,8 @@
         "type": "double",
         "domain": {
           "style": "range",
-          "range": ["0.0", "1.0"],
+          "min": "0.0",
+"max": "1.0",
           "increment": "0.05"
         }
       },
@@ -430,7 +442,8 @@
         "type": "double",
         "domain": {
           "style": "range",
-          "range": ["0.0", "1.0"],
+          "min": "0.0",
+"max": "1.0",
           "increment": "0.05"
         }
       },
@@ -454,7 +467,8 @@
         "type": "int",
         "domain": {
           "style": "range",
-          "range": ["1", "1024"],
+          "min": "1",
+"max": "1024",
           "increment": "5"
         }
       },
@@ -499,7 +513,8 @@
         "default_value": 10.0,
         "domain": {
           "style": "range",
-          "range": ["1", "100"],
+          "min": "1",
+"max": "100",
           "increment": "1"
         }
       },
@@ -518,7 +533,8 @@
         "default_value": "1.0",
         "domain": {
           "style": "range",
-          "range": ["0.0", "10.0"],
+          "min": "0.0",
+"max": "10.0",
           "increment": "0.1"
         }
       }

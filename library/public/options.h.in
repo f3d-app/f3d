@@ -275,7 +275,8 @@ public:
   template<typename T>
   struct DomainRange
   {
-    std::array<T, 2> range;
+    T min;
+    T max;
     T increment;
   };
 
