@@ -1,18 +1,13 @@
-#include "PseudoUnitTest.h"
-#include "TestSDKHelpers.h"
-
-#include "engine.h"
-
 #ifdef _WIN32
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
 
-// debug
-#ifdef _WIN32
-#include <D:/a/f3d/f3d/dependencies/install/include/GL/gl.h>
-#endif
+#include "PseudoUnitTest.h"
+#include "TestSDKHelpers.h"
+
+#include "engine.h"
 
 #include <GL/osmesa.h>
 
