@@ -303,6 +303,7 @@ public:
     std::string content;
     if (!clip::get_text(content))
     {
+      // Unreachable with testing
       f3d::log::error("Could not read a statefile from the clipboard");
       return false;
     }
@@ -2260,6 +2261,7 @@ void F3DStarter::SaveStatefileToClipboard()
   }
   else
   {
+    // Unreachable with testing
     f3d::log::error("Could not copy statefile to the clipboard");
   }
 #else
@@ -2313,6 +2315,7 @@ void F3DStarter::LoadStatefileFromClipboard()
   if (!F3DInternals::ReadStatefileFromClipboard(
         statefileOptions, statefileFiles, statefileFileGroups))
   {
+    // Unreachable with testing
     return;
   }
 
