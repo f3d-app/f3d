@@ -435,6 +435,34 @@ f3d_test(NAME TestFinalShaderUndefined DATA cow.vtp ARGS --final-shader "undefin
 f3d_test(NAME TestFinalShaderCompilationFailure DATA cow.vtp ARGS --final-shader "vec4 pixel(vec2 uv){}" --verbose REGEXP " build the shader program" NO_BASELINE)
 f3d_test(NAME TestFinalShaderTimeUniform DATA cow.vtp ARGS --final-shader "vec4 pixel(vec2 uv){return vec4(texture(source, uv).rgb * (0.5 + 0.5*cos(time+uv.xyx+vec3(0,2,4))), 1.0)\\\\\\\;}")
 
+## Statefile
+# Round trip: one test saves a statefile, a dependent test loads it back and renders it,
+# checking both that the saved statefile is correct and that its options and camera are applied
+f3d_test(NAME TestStatefileSave DATA cow.vtp NO_BASELINE ARGS -D render.background.color=0,0,1 --camera-position=15,8,15 --camera-focal-point=0.78,-0.44,0 --camera-view-up=0,1,0 --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileSave.json REGEXP "Statefile saved to")
+f3d_test(NAME TestStatefileLoad DEPENDS TestStatefileSave ARGS --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileSave.json)
+
+# Load a known statefile, checking its options are applied
+f3d_test(NAME TestStatefileLoadKnown DATA cow.vtp NO_RENDER NO_BASELINE ARGS --load-statefile=${F3D_SOURCE_DIR}/testing/statefiles/test_statefile.json REGEXP "from statefile options")
+# Command line options take precedence over a loaded statefile
+f3d_test(NAME TestStatefileLoadOverride DATA cow.vtp NO_RENDER NO_BASELINE ARGS --load-statefile=${F3D_SOURCE_DIR}/testing/statefiles/test_statefile.json -D render.background.color=1,0,0 REGEXP "'render.background.color' = '1,0,0' from CLI options")
+# A missing statefile is skipped with a warning instead of failing
+f3d_test(NAME TestStatefileLoadMissing DATA cow.vtp NO_RENDER NO_BASELINE ARGS --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/does_not_exist.json REGEXP "Could not open statefile, skipping")
+# A file that exists but is not a valid statefile is reported and skipped
+f3d_test(NAME TestStatefileLoadInvalidContent DATA cow.vtp NO_RENDER NO_BASELINE ARGS --load-statefile=${F3D_SOURCE_DIR}/testing/data/cow.vtp REGEXP "Could not parse statefile content")
+# `-` writes the statefile to the standard output
+f3d_test(NAME TestStatefileSaveStdout DATA cow.vtp NO_RENDER NO_BASELINE ARGS --save-statefile=- REGEXP "\"options\"")
+# `-` reads the statefile from the standard input (`cat state.json | f3d --load-statefile=-`). The working
+# directory is the statefile directory so the relative paths it contains resolve correctly
+f3d_test(NAME TestStatefileLoadStdin PIPED_ARG --load-statefile= DATA ../statefiles/test_statefile.json WORKING_DIR ${F3D_SOURCE_DIR}/testing/statefiles NO_RENDER NO_BASELINE REGEXP "background.color' = '#0000ff' from statefile options")
+# Missing parent directories of the statefile path are created
+f3d_test(NAME TestStatefileSaveCreatesDir DATA cow.vtp NO_RENDER NO_BASELINE ARGS --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileSaveCreatesDir/sub/cow.json REGEXP "Statefile saved to")
+
+# File groups: one test saves a statefile with two file groups (only the first one loaded), a
+# dependent test loads it back with no file argument and navigates to the second group. VTKXMLVTU
+# only appears if that not-currently-loaded group was restored from the statefile
+f3d_test(NAME TestStatefileFileGroupsSave DATA cow.vtp dragon.vtu NO_RENDER NO_BASELINE ARGS --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileFileGroups.json REGEXP "Statefile saved to")
+f3d_test(NAME TestStatefileFileGroupsLoad SCRIPT DEPENDS TestStatefileFileGroupsSave NO_BASELINE ARGS --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileFileGroups.json --verbose REGEXP "VTKXMLVTU")
+
 ## Command Script
 f3d_test(NAME TestCommandScriptBasic SCRIPT DATA dragon.vtu) # roll_camera 90;toggle ui.scalar_bar;print_scene_info;increase_light_intensity
 f3d_test(NAME TestCommandScriptElevation SCRIPT DATA dragon.vtu) # elevation_camera 90;toggle ui.scalar_bar;print_scene_info;increase_light_intensity
@@ -482,7 +510,7 @@ f3d_test(NAME TestCommandScriptSetCameraBottom SCRIPT DATA dragon.vtu) # set_cam
 f3d_test(NAME TestCommandScriptSetCameraLeft SCRIPT DATA dragon.vtu) # set_camera left
 
 # Statefile interactor command load_statefile, each test covers a distinct behavior. The save_statefile
-# command shares its implementation with the --save-statefile option covered below, the tests below
+# command shares its implementation with the --save-statefile option covered above, the tests below
 # instead focus on the load_statefile command which restores a statefile into the running session
 # load_statefile with an explicit path loads the statefile files (cow.vtp), replacing the loaded dragon.vtu
 f3d_test(NAME TestCommandScriptLoadStatefile SCRIPT DATA dragon.vtu WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "cow.vtp" NO_BASELINE)
@@ -523,33 +551,6 @@ f3d_test(NAME TestOutputFrameCountNoAnimation DATA cow.vtp ARGS --output=${CMAKE
 f3d_test(NAME TestOutputFrameCountInvalidFormat DATA BoxAnimated.gltf ARGS --output=${CMAKE_BINARY_DIR}/Testing/Temporary/invalid_{frame:abc}.png --frame-rate=0.25 REGEXP "ignoring invalid frame format" NO_BASELINE NO_OUTPUT)
 f3d_test(NAME TestOutputFrameCountStartTime DATA BoxAnimated.gltf ARGS --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestOutputFrameCountStartTime_{frame:4}.png --frame-rate=0.3 --animation-time=2.0 REGEXP "Saving 2 animation frame" NO_BASELINE NO_OUTPUT)
 f3d_test(NAME TestCommandScriptScreenshotFrame SCRIPT DATA cow.vtp ARGS --screenshot-filename=${CMAKE_BINARY_DIR}/Testing/Temporary/screenshot_{frame}.png REGEXP "{frame} variable can only be used when outputting animation frames" NO_BASELINE)
-
-# Round trip: one test saves a statefile, a dependent test loads it back and renders it,
-# checking both that the saved statefile is correct and that its options and camera are applied
-f3d_test(NAME TestStatefileSave DATA cow.vtp NO_BASELINE ARGS -D render.background.color=0,0,1 --camera-position=15,8,15 --camera-focal-point=0.78,-0.44,0 --camera-view-up=0,1,0 --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileSave.json REGEXP "Statefile saved to")
-f3d_test(NAME TestStatefileLoad DEPENDS TestStatefileSave ARGS --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileSave.json)
-
-# Load a known statefile, checking its options are applied
-f3d_test(NAME TestStatefileLoadKnown DATA cow.vtp NO_RENDER NO_BASELINE ARGS --load-statefile=${F3D_SOURCE_DIR}/testing/statefiles/test_statefile.json REGEXP "from statefile options")
-# Command line options take precedence over a loaded statefile
-f3d_test(NAME TestStatefileLoadOverride DATA cow.vtp NO_RENDER NO_BASELINE ARGS --load-statefile=${F3D_SOURCE_DIR}/testing/statefiles/test_statefile.json -D render.background.color=1,0,0 REGEXP "'render.background.color' = '1,0,0' from CLI options")
-# A missing statefile is skipped with a warning instead of failing
-f3d_test(NAME TestStatefileLoadMissing DATA cow.vtp NO_RENDER NO_BASELINE ARGS --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/does_not_exist.json REGEXP "Could not open statefile, skipping")
-# A file that exists but is not a valid statefile is reported and skipped
-f3d_test(NAME TestStatefileLoadInvalidContent DATA cow.vtp NO_RENDER NO_BASELINE ARGS --load-statefile=${F3D_SOURCE_DIR}/testing/data/cow.vtp REGEXP "Could not parse statefile content")
-# `-` writes the statefile to the standard output
-f3d_test(NAME TestStatefileSaveStdout DATA cow.vtp NO_RENDER NO_BASELINE ARGS --save-statefile=- REGEXP "\"options\"")
-# `-` reads the statefile from the standard input (`cat state.json | f3d --load-statefile=-`). The working
-# directory is the statefile directory so the relative paths it contains resolve correctly
-f3d_test(NAME TestStatefileLoadStdin PIPED_ARG --load-statefile= DATA ../statefiles/test_statefile.json WORKING_DIR ${F3D_SOURCE_DIR}/testing/statefiles NO_RENDER NO_BASELINE REGEXP "background.color' = '#0000ff' from statefile options")
-# Missing parent directories of the statefile path are created
-f3d_test(NAME TestStatefileSaveCreatesDir DATA cow.vtp NO_RENDER NO_BASELINE ARGS --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileSaveCreatesDir/sub/cow.json REGEXP "Statefile saved to")
-
-# File groups: one test saves a statefile with two file groups (only the first one loaded), a
-# dependent test loads it back with no file argument and navigates to the second group. VTKXMLVTU
-# only appears if that not-currently-loaded group was restored from the statefile
-f3d_test(NAME TestStatefileFileGroupsSave DATA cow.vtp dragon.vtu NO_RENDER NO_BASELINE ARGS --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileFileGroups.json REGEXP "Statefile saved to")
-f3d_test(NAME TestStatefileFileGroupsLoad SCRIPT DEPENDS TestStatefileFileGroupsSave NO_BASELINE ARGS --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileFileGroups.json --verbose REGEXP "VTKXMLVTU")
 
 # Basic record and play test
 f3d_test(NAME TestInteractionRecord DATA cow.vtp ARGS --interaction-test-record=${CMAKE_BINARY_DIR}/Testing/Temporary/TestInteractionRecord.log NO_BASELINE)

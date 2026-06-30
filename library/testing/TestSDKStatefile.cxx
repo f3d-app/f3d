@@ -1,7 +1,6 @@
 #include "PseudoUnitTest.h"
 
 #include <engine.h>
-#include <log.h>
 #include <options.h>
 #include <scene.h>
 
@@ -17,15 +16,6 @@ using namespace std::string_literals;
 int TestSDKStatefile([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
-
-  f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  try
-  {
-    f3d::engine::loadPlugin("native", { argv[3] });
-  }
-  catch (...)
-  {
-  }
 
   const fs::path dataDir = fs::path(argv[1]) / "data";
   const fs::path tmpDir = argv[2];
