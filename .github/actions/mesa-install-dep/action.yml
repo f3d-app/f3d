@@ -130,6 +130,11 @@ runs:
       shell: bash
       run: ninja -j2 install
 
+    - name: Content mesa
+      working-directory: ${{github.workspace}}/dependencies/mesa_install
+      shell: bash
+      run: tree .
+
     - name: Copy to install
       working-directory: ${{github.workspace}}/dependencies/mesa_install
       shell: bash
