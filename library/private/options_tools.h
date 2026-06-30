@@ -924,12 +924,33 @@ std::vector<std::string> getEnumDomain(const f3d::options::DomainEnum<std::strin
 /**
  * Needed for increase implementation for ratio_t
  */
-void operator+=(f3d::ratio_t& ratio, const double& incr)
+void operator+=(f3d::ratio_t& ratio, double incr)
 {
   double val = ratio;
   val += incr;
   ratio = val;
 }
+
+/**
+ * Needed for increase implementation for ratio_t
+ */
+f3d::ratio_t operator+(const f3d::ratio_t& ratio, const f3d::ratio_t &incr)
+{
+  f3d::ratio_t ret(ratio);
+  ret+=static_cast<double>(incr);
+  return ret;
+}
+
+/**
+ * Needed for increase implementation for ratio_t
+ */
+f3d::ratio_t operator-(const f3d::ratio_t& ratio, const f3d::ratio_t &incr)
+{
+  f3d::ratio_t ret(ratio);
+  ret+=-static_cast<double>(incr);
+  return ret;
+}
+
 
 //----------------------------------------------------------------------------
 /**
@@ -939,38 +960,7 @@ void operator+=(f3d::ratio_t& ratio, const double& incr)
 template<typename T>
 void increase(T& val, const f3d::options::DomainRange<T>& domain, bool up)
 {
-  char dir = up ? +1 : -1;
-  T newVal = val;
-
-  newVal += dir * domain.increment;
-
-  // Required because of double computation
-  bool upEqual = vtkMathUtilities::FuzzyCompare(newVal, domain.range[1], T{ 1e-12 });
-  bool downEqual = vtkMathUtilities::FuzzyCompare(newVal, domain.range[0], T{ 1e-12 });
-  if ((up && (newVal < domain.range[1] || upEqual)) ||
-    (!up && (newVal > domain.range[0] || downEqual)))
-  {
-    val = newVal;
-  }
-}
-
-//----------------------------------------------------------------------------
-/**
- * Templated int specific increase method for provided val and domain.
- * Increase up to max or decrease down to min.
- */
-template<>
-void increase(int& val, const f3d::options::DomainRange<int>& domain, bool up)
-{
-  char dir = up ? +1 : -1;
-  int newVal = val;
-
-  newVal += dir * domain.increment;
-
-  if ((up && newVal <= domain.range[1]) || (!up && newVal >= domain.range[0]))
-  {
-    val = newVal;
-  }
+  val = up ? std::min(val + domain.increment, domain.range[1]) : std::max(val - domain.increment, domain.range[0]);
 }
 
 //----------------------------------------------------------------------------
@@ -984,10 +974,7 @@ void increase(std::optional<T>& val, const f3d::options::DomainRange<T>& domain,
 {
   if (!val.has_value())
   {
-    if (domain.range[0] != domain.range[1])
-    {
-      val = up ? domain.range[0] : domain.range[1];
-    }
+    val = up ? domain.range[0] : domain.range[1];
   }
   else
   {
