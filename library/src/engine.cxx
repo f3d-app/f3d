@@ -424,6 +424,8 @@ engine& engine::loadStatefile(const fs::path& statefilePath)
         "Could not open statefile for reading: " + statefilePath.string());
     }
     nlohmann::ordered_json root = nlohmann::ordered_json::parse(stream);
+    // parent_path is purely lexical and does not touch the filesystem, so it cannot throw a
+    // filesystem_error: no filesystem exception handling is needed here
     ::RestoreState(*this, root, statefilePath.parent_path());
   }
   catch (const nlohmann::json::exception& ex)
