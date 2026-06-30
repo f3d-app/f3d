@@ -133,7 +133,7 @@ runs:
     - name: Content mesa
       working-directory: ${{github.workspace}}/dependencies/mesa_install
       shell: bash
-      run: tree .
+      run: ls -R .
 
     - name: Copy to install
       working-directory: ${{github.workspace}}/dependencies/mesa_install
