@@ -468,8 +468,8 @@ std::string engine::saveStatefileToString()
   }
   catch (const fs::filesystem_error& ex)
   {
-    // Unreachable: with an empty baseDir, CaptureState only calls fs::absolute (no fs::relative),
-    // which does not throw in practice. Kept for safety and symmetry with saveStatefile.
+    // Unreachable with testing: with an empty baseDir, CaptureState only calls fs::absolute (no
+    // fs::relative), which does not throw in practice
     throw engine::statefile_exception(
       std::string("Could not save statefile to string: ") + ex.what());
   }
