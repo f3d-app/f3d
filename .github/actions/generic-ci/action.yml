@@ -195,6 +195,7 @@ runs:
         -DF3D_PLUGIN_BUILD_VDB=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=${{ inputs.mindeps_label != 'mindeps' && 'ON' || 'OFF' }}
         -DF3D_STRICT_BUILD=ON
+        -DF3D_TESTING_ENABLE_WGL_TESTS=${{ runner.os == 'Windows' && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_EGL_TESTS=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_EXTERNAL_GLFW=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_EXTERNAL_QT=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
@@ -219,6 +220,13 @@ runs:
         inputs.rendering_backend == 'auto'
       shell: bash
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
+
+    # We install a proper WGL Mesa driver for regular tests
+    - name: Install Mesa Windows
+      if: runner.os == 'Windows'
+      uses: f3d-app/install-mesa-windows-action@v2
+      with:
+        path: ${{github.workspace}}\build\bin_Release
 
     # A EGL test is crashing in the CI but not locally
     - name: Set CI test exception for Linux EGL
