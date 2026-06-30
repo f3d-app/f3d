@@ -934,23 +934,22 @@ void operator+=(f3d::ratio_t& ratio, double incr)
 /**
  * Needed for increase implementation for ratio_t
  */
-f3d::ratio_t operator+(const f3d::ratio_t& ratio, const f3d::ratio_t &incr)
+f3d::ratio_t operator+(const f3d::ratio_t& ratio, const f3d::ratio_t& incr)
 {
   f3d::ratio_t ret(ratio);
-  ret+=static_cast<double>(incr);
+  ret += static_cast<double>(incr);
   return ret;
 }
 
 /**
  * Needed for increase implementation for ratio_t
  */
-f3d::ratio_t operator-(const f3d::ratio_t& ratio, const f3d::ratio_t &incr)
+f3d::ratio_t operator-(const f3d::ratio_t& ratio, const f3d::ratio_t& incr)
 {
   f3d::ratio_t ret(ratio);
-  ret+=-static_cast<double>(incr);
+  ret += -static_cast<double>(incr);
   return ret;
 }
-
 
 //----------------------------------------------------------------------------
 /**
@@ -960,7 +959,8 @@ f3d::ratio_t operator-(const f3d::ratio_t& ratio, const f3d::ratio_t &incr)
 template<typename T>
 void increase(T& val, const f3d::options::DomainRange<T>& domain, bool up)
 {
-  val = up ? std::min(val + domain.increment, domain.max) : std::max(val - domain.increment, domain.min);
+  val = up ? std::min(val + domain.increment, domain.max)
+           : std::max(val - domain.increment, domain.min);
 }
 
 //----------------------------------------------------------------------------

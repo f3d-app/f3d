@@ -53,7 +53,7 @@
       "domain": {
         "style": "range",
         "min": "0.0",
-"max": "10.0",
+        "max": "10.0",
         "increment": "0.1"
       }
     },
@@ -62,7 +62,7 @@
       "domain": {
         "style": "range",
         "min": "0.0",
-"max": "10.0",
+        "max": "10.0",
         "increment": "0.1"
       }
     },
@@ -119,7 +119,7 @@
         "domain": {
           "style": "range",
           "min": "1",
-"max": "20",
+          "max": "20",
           "increment": "1"
         }
       }
@@ -190,7 +190,7 @@
           "domain": {
             "style": "range",
             "min": "0.0",
-"max": "100.0",
+            "max": "100.0",
             "increment": "5.0"
           }
         }
@@ -203,7 +203,7 @@
         "domain": {
           "style": "range",
           "min": "0.0",
-"max": "5.0",
+          "max": "5.0",
           "increment": "0.02"
         }
       }
@@ -223,7 +223,7 @@
         "domain": {
           "style": "range",
           "min": "0.0",
-"max": "1.0",
+          "max": "1.0",
           "increment": "0.05"
         }
       },
@@ -322,7 +322,7 @@
       "domain": {
         "style": "range",
         "min": "0.0",
-"max": "10.0",
+        "max": "10.0",
         "increment": "0.1"
       }
     },
@@ -386,7 +386,7 @@
         "domain": {
           "style": "range",
           "min": "0.0",
-"max": "1.0",
+          "max": "1.0",
           "increment": "0.05"
         }
       },
@@ -411,7 +411,7 @@
         "domain": {
           "style": "range",
           "min": "0.0",
-"max": "1.0",
+          "max": "1.0",
           "increment": "0.05"
         }
       },
@@ -425,7 +425,7 @@
         "domain": {
           "style": "range",
           "min": "0.0",
-"max": "1.0",
+          "max": "1.0",
           "increment": "0.05"
         }
       },
@@ -434,7 +434,7 @@
         "domain": {
           "style": "range",
           "min": "0.0",
-"max": "1.0",
+          "max": "1.0",
           "increment": "0.05"
         }
       },
@@ -443,7 +443,7 @@
         "domain": {
           "style": "range",
           "min": "0.0",
-"max": "1.0",
+          "max": "1.0",
           "increment": "0.05"
         }
       },
@@ -468,7 +468,7 @@
         "domain": {
           "style": "range",
           "min": "1",
-"max": "1024",
+          "max": "1024",
           "increment": "5"
         }
       },
@@ -514,7 +514,7 @@
         "domain": {
           "style": "range",
           "min": "1",
-"max": "100",
+          "max": "100",
           "increment": "1"
         }
       },
@@ -534,7 +534,7 @@
         "domain": {
           "style": "range",
           "min": "0.0",
-"max": "10.0",
+          "max": "10.0",
           "increment": "0.1"
         }
       }
