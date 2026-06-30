@@ -9,6 +9,11 @@
 #include <windows.h>
 #endif
 
+// debug
+#ifdef _WIN32
+#include <D:/a/f3d/f3d/dependencies/install/include/GL/gl.h>
+#endif
+
 #include <GL/osmesa.h>
 
 int TestSDKExternalWindowOSMesa([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
