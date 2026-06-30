@@ -76,13 +76,9 @@ jobs:
         if: failure()
         shell: bash
         run: |
-          diff="$(git diff)\n"
+          diff="$(git diff)"
           echo "$diff" > ./f3d_style_diff.patch
-          {
-            echo 'F3D_STYLE_DIFF<<EOF'
-            echo "$diff"
-            echo EOF
-          } >> "$GITHUB_ENV"
+          printf 'F3D_STYLE_DIFF<<EOF\n%s\nEOF\n' "$diff" >> "$GITHUB_ENV"
 
       - name: Upload diff as an artifact
         if: failure()
