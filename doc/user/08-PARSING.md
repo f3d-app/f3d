@@ -84,7 +84,6 @@ The following formats are supported when parsing a color, case insensitive:
 - hwb(H, W%, B%) where H is integer [0, 360], W and B are integer [0, 100]
 - cmyk(C%, M%, Y%, K%) where C, M, Y, K are integer [0, 100]
 - [color name](./09-NAMED_COLORS.md)
-- [F3D colors](./09-NAMED_COLORS.md#F3D)
 
 See [W3C](https://www.w3.org/TR/css-color-3/#rgb-color) doc for more details on these formats.
 

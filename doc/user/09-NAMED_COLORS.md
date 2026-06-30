@@ -1,6 +1,34 @@
 # Named colors
 
+When colors are [parsed](./08-PARSING.md#color), it's possible to use predefined named colors.
+
+The list of colors that can be used in F3D is given below and is separated in four categories:
+- [F3D colors](#f3d-colors) listing the palette used in F3D
+- [Web colors](#web-colors) listing the basic and extended of standard [HTML colors](https://en.wikipedia.org/wiki/Web_colors)
+- [ParaView colors](#paraview-colors) listing the two background colors used in ParaView
+- [VTK colors](#vtk-colors) listing colors defined by VTK
+
+> [!NOTE]
+> All the named colors are case insensitive.
+
+## F3D colors
+
+The following table shows the 7 colors defining F3D palette.
+
+| Name       | RGB                |
+| ---------- | ------------------ |
+| f3d_red    | rgb(249, 67, 6)    |
+| f3d_green  | rgb(122, 255, 122) |
+| f3d_blue   | rgb(120, 139, 255) |
+| f3d_yellow | rgb(249, 178, 8)   |
+| f3d_white  | rgb(244, 244, 244) |
+| f3d_grey   | rgb(84, 84, 84)    |
+| f3d_black  | rgb(20, 20, 20)    |
+
 ## Web colors
+
+The following tables shows all the basic and extended colors of the standard [web colors](https://en.wikipedia.org/wiki/Web_colors).
+The list is split by color tone.
 
 ### Red colors
 
@@ -193,19 +221,9 @@
 | DarkSlateGray  | rgb(47, 79, 79)    |
 | Black          | rgb(0, 0, 0)       |
 
-## F3D colors
-
-| Name       | RGB                |
-| ---------- | ------------------ |
-| f3d_red    | rgb(249, 67, 6)    |
-| f3d_green  | rgb(122, 255, 122) |
-| f3d_blue   | rgb(120, 139, 255) |
-| f3d_yellow | rgb(249, 178, 8)   |
-| f3d_white  | rgb(244, 244, 244) |
-| f3d_grey   | rgb(84, 84, 84)    |
-| f3d_black  | rgb(20, 20, 20)    |
-
 ## ParaView colors
+
+The following tables shows the two background colors used in ParaView.
 
 | Name                | RGB              |
 | ------------------- | ---------------- |
@@ -213,6 +231,12 @@
 | ParaViewWarmGrayBkg | rgb(98, 93, 90)  |
 
 ## VTK colors
+
+The following tables shows all the custom colors defined in VTK.
+The list is split by color tone.
+
+> [!NOTE]
+> Many of the colors defined below are aliases of [web colors](#web-colors).
 
 ### Whites
 
@@ -459,89 +483,3 @@
 | violet_red           | rgb(208, 32, 144)  |
 | violet_red_medium    | rgb(199, 21, 133)  |
 | violet_red_pale      | rgb(219, 112, 147) |
-
-## Synonyms
-
-| Name                                   | RGB                |
-| -------------------------------------- | ------------------ |
-| AliceBlue, alice_blue                  | rgb(240, 248, 255) |
-| AntiqueWhite, antique_white            | rgb(250, 235, 215) |
-| Aqua, Cyan                             | rgb(0, 255, 255)   |
-| MediumAquamarine, aquamarine_medium    | rgb(102, 205, 170) |
-| Beige, light_beige                     | rgb(245, 245, 220) |
-| BlanchedAlmond, blanched_almond        | rgb(255, 235, 205) |
-| LightBlue, blue_light                  | rgb(173, 216, 230) |
-| MediumBlue, blue_medium                | rgb(0, 0, 205)     |
-| BlueViolet, blue_violet                | rgb(138, 43, 226)  |
-| CadetBlue, cadet                       | rgb(95, 158, 160)  |
-| LightCoral, coral_light                | rgb(240, 128, 128) |
-| CornflowerBlue, cornflower             | rgb(100, 149, 237) |
-| LightCyan, cyan_white                  | rgb(224, 255, 255) |
-| DarkOrange, dark_orange                | rgb(255, 140, 0)   |
-| DarkGoldenrod, goldenrod_dark          | rgb(184, 134, 11)  |
-| DarkGreen, green_dark                  | rgb(0, 100, 0)     |
-| DarkKhaki, khaki_dark                  | rgb(189, 183, 107) |
-| DarkOliveGreen, olive_green_dark       | rgb(85, 107, 47)   |
-| DarkOrchid, orchid_dark                | rgb(153, 50, 204)  |
-| DarkSeaGreen, sea_green_dark           | rgb(143, 188, 143) |
-| DarkSlateBlue, slate_blue_dark         | rgb(72, 61, 139)   |
-| DarkSlateGray, slate_grey_dark         | rgb(47, 79, 79)    |
-| DarkTurquoise, turquoise_dark          | rgb(0, 206, 209)   |
-| DarkViolet, violet_dark                | rgb(148, 0, 211)   |
-| DeepPink, deep_pink                    | rgb(255, 20, 147)  |
-| DeepSkyBlue, sky_blue_deep             | rgb(0, 191, 255)   |
-| DimGray, dim_grey                      | rgb(105, 105, 105) |
-| DodgerBlue, dodger_blue                | rgb(30, 144, 255)  |
-| FloralWhite, floral_white              | rgb(255, 250, 240) |
-| ForestGreen, forest_green              | rgb(34, 139, 34)   |
-| Fuchsia, Magenta                       | rgb(255, 0, 255)   |
-| GhostWhite, ghost_white                | rgb(248, 248, 255) |
-| LightGoldenrodYellow, goldenrod_light  | rgb(250, 250, 210) |
-| PaleGoldenrod, goldenrod_pale          | rgb(238, 232, 170) |
-| PaleGreen, green_pale                  | rgb(152, 251, 152) |
-| GreenYellow, green_yellow              | rgb(173, 255, 47)  |
-| Silver, grey                           | rgb(192, 192, 192) |
-| HotPink, hot_pink                      | rgb(255, 105, 180) |
-| LavenderBlush, lavender_blush          | rgb(255, 240, 245) |
-| LawnGreen, lawn_green                  | rgb(124, 252, 0)   |
-| LemonChiffon, lemon_chiffon            | rgb(255, 250, 205) |
-| LightGrey, light_grey                  | rgb(211, 211, 211) |
-| LightSalmon, light_salmon              | rgb(255, 160, 122) |
-| LightPink, pink_light                  | rgb(255, 182, 193) |
-| LightSeaGreen, sea_green_light         | rgb(32, 178, 170)  |
-| LightSkyBlue, sky_blue_light           | rgb(135, 206, 250) |
-| LightSlateGray, slate_grey_light       | rgb(119, 136, 153) |
-| LightSteelBlue, steel_blue_light       | rgb(176, 196, 222) |
-| LightYellow, yellow_light              | rgb(255, 255, 224) |
-| LimeGreen, lime_green                  | rgb(50, 205, 50)   |
-| MediumOrchid, orchid_medium            | rgb(186, 85, 211)  |
-| MediumPurple, purple_medium            | rgb(147, 112, 219) |
-| MediumSeaGreen, sea_green_medium       | rgb(60, 179, 113)  |
-| MediumSlateBlue, slate_blue_medium     | rgb(123, 104, 238) |
-| MediumSpringGreen, spring_green_medium | rgb(0, 250, 154)   |
-| MediumTurquoise, turquoise_medium      | rgb(72, 209, 204)  |
-| MediumVioletRed, violet_red_medium     | rgb(199, 21, 133)  |
-| MidnightBlue, midnight_blue            | rgb(25, 25, 112)   |
-| MintCream, mint_cream                  | rgb(245, 255, 250) |
-| MistyRose, misty_rose                  | rgb(255, 228, 225) |
-| NavajoWhite, navajo_white              | rgb(255, 222, 173) |
-| OldLace, old_lace                      | rgb(253, 245, 230) |
-| OliveDrab, olive_drab                  | rgb(107, 142, 35)  |
-| OrangeRed, orange_red                  | rgb(255, 69, 0)    |
-| PaleTurquoise, turquoise_pale          | rgb(175, 238, 238) |
-| PaleVioletRed, violet_red_pale         | rgb(219, 112, 147) |
-| PapayaWhip, papaya_whip                | rgb(255, 239, 213) |
-| PeachPuff, peach_puff                  | rgb(255, 218, 185) |
-| PowderBlue, powder_blue                | rgb(176, 224, 230) |
-| RosyBrown, rosy_brown                  | rgb(188, 143, 143) |
-| RoyalBlue, royal_blue                  | rgb(65, 105, 225)  |
-| SaddleBrown, saddle_brown              | rgb(139, 69, 19)   |
-| SandyBrown, sandy_brown                | rgb(244, 164, 96)  |
-| SeaGreen, sea_green                    | rgb(46, 139, 87)   |
-| SkyBlue, sky_blue                      | rgb(135, 206, 235) |
-| SlateBlue, slate_blue                  | rgb(106, 90, 205)  |
-| SlateGray, slate_grey                  | rgb(112, 128, 144) |
-| SpringGreen, spring_green              | rgb(0, 255, 127)   |
-| SteelBlue, steel_blue                  | rgb(70, 130, 180)  |
-| WhiteSmoke, white_smoke                | rgb(245, 245, 245) |
-| YellowGreen, yellow_green              | rgb(154, 205, 50)  |
