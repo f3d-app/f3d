@@ -4,10 +4,9 @@ When colors are [parsed](./08-PARSING.md#color), it's possible to use predefined
 
 The list of colors that can be used in F3D is given below and is separated in four categories:
 
-- [F3D colors](#f3d-colors) listing the palette used in F3D
+- [F3D colors](#f3d-colors) listing the color palette used in F3D
 - [Web colors](#web-colors) listing the basic and extended of standard [HTML colors](https://en.wikipedia.org/wiki/Web_colors)
-- [ParaView colors](#paraview-colors) listing the two background colors used in ParaView
-- [VTK colors](#vtk-colors) listing colors defined by VTK
+- [VTK colors](#vtk-colors) listing custom colors defined by VTK
 
 > [!NOTE]
 > All the named colors are case insensitive.
@@ -221,15 +220,6 @@ The list is split by color tone.
 | SlateGray      | rgb(112, 128, 144) |
 | DarkSlateGray  | rgb(47, 79, 79)    |
 | Black          | rgb(0, 0, 0)       |
-
-## ParaView colors
-
-The following tables shows the two background colors used in ParaView.
-
-| Name                | RGB              |
-| ------------------- | ---------------- |
-| ParaViewBlueGrayBkg | rgb(84, 89, 109) |
-| ParaViewWarmGrayBkg | rgb(98, 93, 90)  |
 
 ## VTK colors
 
@@ -484,3 +474,10 @@ The list is split by color tone.
 | violet_red           | rgb(208, 32, 144)  |
 | violet_red_medium    | rgb(199, 21, 133)  |
 | violet_red_pale      | rgb(219, 112, 147) |
+
+### ParaView backgrounds
+
+| Name                | RGB              |
+| ------------------- | ---------------- |
+| ParaViewBlueGrayBkg | rgb(84, 89, 109) |
+| ParaViewWarmGrayBkg | rgb(98, 93, 90)  |
