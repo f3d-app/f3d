@@ -215,10 +215,5 @@ target_link_libraries(libf3dSDKTests libf3d ${libf3dSDKTests_link_libs})
 target_compile_options(libf3dSDKTests PUBLIC ${f3d_compile_options_public} PRIVATE ${f3d_compile_options_private})
 target_link_options(libf3dSDKTests PUBLIC ${f3d_link_options_public})
 
-if(MSVC)
-  target_compile_options(libf3dSDKTests PRIVATE /showIncludes)
-endif()
-
-
 # make sure the libf3d API is compatible with the right C++ standard
 set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD 20)
