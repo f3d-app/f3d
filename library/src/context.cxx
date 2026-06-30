@@ -120,7 +120,7 @@ context::function context::osmesa()
 #ifdef _WIN32
   for (const auto& lib : { "osmesa.dll" })
 #elif __APPLE__
-  for (const auto& lib : { "libOSMesa.dylib", "libOSMesa.dylib.8", "libOSMesa.dylib.6" })
+  for (const auto& lib : { "libOSMesa.dylib", "libOSMesa.8.dylib", "libOSMesa.6.dylib" })
 #else
   for (const auto& lib : { "libOSMesa.so", "libOSMesa.so.8", "libOSMesa.so.6" })
 #endif

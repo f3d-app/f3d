@@ -135,9 +135,7 @@ runs:
         runner.os == 'macOS' &&
         inputs.optdeps_label == 'optdeps'
       shell: bash
-      run: >
-        ls -l $(pwd)/dependencies/install/lib
-        echo "DYLD_LIBRARY_PATH=$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
+      run: echo "DYLD_LIBRARY_PATH=$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
 
     # Works around for https://github.com/actions/runner-images/issues/10055
     - name: Remove conflicting libraries for Java bindings on Windows
