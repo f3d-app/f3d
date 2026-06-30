@@ -453,7 +453,7 @@ f3d_test(NAME TestStatefileLoadInvalidContent DATA cow.vtp NO_RENDER NO_BASELINE
 f3d_test(NAME TestStatefileSaveStdout DATA cow.vtp NO_RENDER NO_BASELINE ARGS --save-statefile=- REGEXP "\"options\"")
 # `-` reads the statefile from the standard input (`cat state.json | f3d --load-statefile=-`). The working
 # directory is the statefile directory so the relative paths it contains resolve correctly
-f3d_test(NAME TestStatefileLoadStdin PIPED_ARG --load-statefile= DATA ../statefiles/test_statefile.json WORKING_DIR ${F3D_SOURCE_DIR}/testing/statefiles NO_RENDER NO_BASELINE REGEXP "background.color' = '#0000ff' from statefile options")
+f3d_test(NAME TestStatefileLoadStdin PIPED_ARG --load-statefile= DATA ../statefiles/test_statefile.json WORKING_DIR ${F3D_SOURCE_DIR}/testing/statefiles NO_RENDER NO_BASELINE REGEXP "background.color' = '#0000ff' from statefile options" PIPED)
 # Missing parent directories of the statefile path are created
 f3d_test(NAME TestStatefileSaveCreatesDir DATA cow.vtp NO_RENDER NO_BASELINE ARGS --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileSaveCreatesDir/sub/cow.json REGEXP "Statefile saved to")
 
@@ -824,9 +824,9 @@ f3d_test(NAME TestVersionPrecedenceWithUnknownOption ARGS --version --unknown RE
 
 # PIPED error code path
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
-  f3d_test(NAME TestPipedForced DATA suzanne.ply ARGS --force-reader=PLYReader --verbose PIPED PLYReader REGEXP "Forcing reader" NO_BASELINE)
-  f3d_test(NAME TestPipedForcedInvalid DATA suzanne.ply ARGS --force-reader=invalid PIPED invalid REGEXP "is not a valid force reader" NO_BASELINE)
-  f3d_test(NAME TestPipedForcedInvalidStream DATA beach.nrrd ARGS --force-reader=Nrrd PIPED Nrrd REGEXP "does not support reading streams" NO_BASELINE)
+  f3d_test(NAME TestPipedForced DATA suzanne.ply ARGS --force-reader=PLYReader --verbose PIPED_READER PLYReader REGEXP "Forcing reader" NO_BASELINE PIPED)
+  f3d_test(NAME TestPipedForcedInvalid DATA suzanne.ply ARGS --force-reader=invalid PIPED_READER invalid REGEXP "is not a valid force reader" NO_BASELINE PIPED)
+  f3d_test(NAME TestPipedForcedInvalidStream DATA beach.nrrd ARGS --force-reader=Nrrd PIPED_READER Nrrd REGEXP "does not support reading streams" NO_BASELINE PIPED)
 endif()
 
 ## Filesystem error code path
