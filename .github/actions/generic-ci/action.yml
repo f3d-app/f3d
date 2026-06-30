@@ -211,7 +211,7 @@ runs:
     - name: Build
       shell: bash
       working-directory: ${{github.workspace}}/build
-      run: cmake --build . --parallel 2 --config Release
+      run: cmake --build . --parallel 2 --config Release --verbose
 
     - name: Run Xvfb ubuntu
       if: |
