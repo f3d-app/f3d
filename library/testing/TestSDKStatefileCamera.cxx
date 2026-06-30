@@ -2,7 +2,6 @@
 
 #include <camera.h>
 #include <engine.h>
-#include <scene.h>
 #include <window.h>
 
 #include <filesystem>
@@ -13,14 +12,10 @@ int TestSDKStatefileCamera([[maybe_unused]] int argc, [[maybe_unused]] char* arg
 {
   PseudoUnitTest test;
 
-  f3d::engine::loadPlugin("native", { argv[3] });
-
-  const fs::path cowFile = fs::path(argv[1]) / "data" / "cow.vtp";
   const fs::path statefilePath = fs::path(argv[2]) / "camera_statefile.json";
 
   // Save a statefile from an engine with a window so the camera state is captured
   f3d::engine src = f3d::engine::create(true);
-  src.getScene().add(cowFile);
   const f3d::camera_state_t state{ { 1., 2., 3. }, { 0., 0., 0. }, { 0., 1., 0. }, 25. };
   src.getWindow().getCamera().setState(state);
 
