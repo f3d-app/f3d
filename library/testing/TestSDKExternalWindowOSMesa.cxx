@@ -6,10 +6,10 @@
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
+#define GLAPI extern
 #include <windows.h>
 #endif
 
-#include <GL/gl.h>
 #include <GL/osmesa.h>
 
 int TestSDKExternalWindowOSMesa([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
