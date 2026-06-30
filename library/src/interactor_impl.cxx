@@ -61,6 +61,7 @@ public:
     documentation_callback_t DocumentationCallback;
     BindingType Type;
     bool Notify;
+    bool Repeat;
   };
 
   struct CommandCallbacks
@@ -519,36 +520,39 @@ public:
       // invalidating any references/iterators into it.
       const BindingCommands binding = commandsIt->second;
 
-      for (const std::string& command : binding.CommandVector)
+      if (binding.Repeat || rwi->GetRepeatCount() <= 1)
       {
-        std::string commandWithArgs = command;
-        if (!argsString.empty())
+        for (const std::string& command : binding.CommandVector)
         {
-          commandWithArgs.push_back(' ');
-          commandWithArgs.append(argsString);
-        };
-        try
-        {
-          // XXX: Ignore the boolean return of triggerCommand,
-          // error is already logged by triggerCommand
-          this->Interactor.triggerCommand(commandWithArgs);
+          std::string commandWithArgs = command;
+          if (!argsString.empty())
+          {
+            commandWithArgs.push_back(' ');
+            commandWithArgs.append(argsString);
+          };
+          try
+          {
+            // XXX: Ignore the boolean return of triggerCommand,
+            // error is already logged by triggerCommand
+            this->Interactor.triggerCommand(commandWithArgs);
+          }
+          catch (const f3d::interactor::command_runtime_exception& ex)
+          {
+            log::error(
+              "Interaction: error running command: \"" + commandWithArgs + "\": " + ex.what());
+          }
         }
-        catch (const f3d::interactor::command_runtime_exception& ex)
+
+        if (binding.Notify && binding.DocumentationCallback)
         {
-          log::error(
-            "Interaction: error running command: \"" + commandWithArgs + "\": " + ex.what());
+          // trigger notification
+          vtkRenderWindow* renWin = this->Window.GetRenderWindow();
+          vtkF3DRenderer* ren =
+            vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+
+          auto [desc, value] = binding.DocumentationCallback();
+          ren->AddNotification(desc, value, bind.format(), 3.0);
         }
-      }
-
-      if (binding.Notify && binding.DocumentationCallback)
-      {
-        // trigger notification
-        vtkRenderWindow* renWin = this->Window.GetRenderWindow();
-        vtkF3DRenderer* ren =
-          vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-
-        auto [desc, value] = binding.DocumentationCallback();
-        ren->AddNotification(desc, value, bind.format(), 3.0);
       }
     }
 
@@ -1734,10 +1738,10 @@ interactor& interactor_impl::initBindings()
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
   std::vector<std::string> commands, std::string group,
-  documentation_callback_t documentationCallback, BindingType type, bool notify)
+  documentation_callback_t documentationCallback, BindingType type, bool notify, bool repeat)
 {
   const auto [it, success] = this->Internals->Bindings.insert(
-    { bind, { std::move(commands), std::move(documentationCallback), type, notify } });
+    { bind, { std::move(commands), std::move(documentationCallback), type, notify, repeat } });
   if (!success)
   {
     throw interactor::already_exists_exception(
@@ -1759,10 +1763,10 @@ interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addBinding(const interaction_bind_t& bind, std::string command,
-  std::string group, documentation_callback_t documentationCallback, BindingType type, bool notify)
+  std::string group, documentation_callback_t documentationCallback, BindingType type, bool notify, bool repeat)
 {
   return this->addBinding(bind, std::vector<std::string>{ std::move(command) }, std::move(group),
-    std::move(documentationCallback), type, notify);
+    std::move(documentationCallback), type, notify, repeat);
 }
 
 //----------------------------------------------------------------------------
