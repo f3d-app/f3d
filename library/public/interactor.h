@@ -187,11 +187,13 @@ public:
    *
    * If notify is true, a notification is triggered when pressing the binding
    *
+   * If repeat is true, the binding is continuously applied when holding down the key
+   *
    * Adding commands for an existing bind will throw a interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
     std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool notify = true) = 0;
+    BindingType type = BindingType::OTHER, bool notify = true, bool repeat = false) = 0;
 
   /**
    * See addBinding
@@ -202,17 +204,17 @@ public:
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::string command,
     std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool notify = true) = 0;
+    BindingType type = BindingType::OTHER, bool notify = true, bool repeat = false) = 0;
 
   /**
    * Convenience initializer list signature for add binding method
    */
   interactor& addBinding(const interaction_bind_t& bind, std::initializer_list<std::string> list,
     std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool notify = true)
+    BindingType type = BindingType::OTHER, bool notify = true, bool repeat = false)
   {
     return this->addBinding(bind, std::vector<std::string>(list), std::move(group),
-      std::move(documentationCallback), type, notify);
+      std::move(documentationCallback), type, notify, repeat);
   }
 
   /**
