@@ -150,13 +150,13 @@ std::vector<std::string> getEnumDomain(const f3d::options& opt, std::string_view
 
 //----------------------------------------------------------------------------
 /**
- * Generated method, see `options::increase`
+ * Generated method, see `options::increase` and `options::decrease`
  */
 template<bool Up>
-void increase(f3d::options& opt, std::string_view name)
+void increaseDecrease(f3d::options& opt, std::string_view name)
 {
   // clang-format off
-  ${_options_increase};
+  ${_options_increase_decrease};
   // clang-format on
   else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
 }

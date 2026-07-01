@@ -922,7 +922,7 @@ std::vector<std::string> getEnumDomain(const f3d::options::DomainEnum<std::strin
 
 //----------------------------------------------------------------------------
 /**
- * Needed for increase implementation for ratio_t
+ * Needed for increaseDecrease implementation for ratio_t
  */
 void operator+=(f3d::ratio_t& ratio, double incr)
 {
@@ -932,7 +932,7 @@ void operator+=(f3d::ratio_t& ratio, double incr)
 }
 
 /**
- * Needed for increase implementation for ratio_t
+ * Needed for increaseDecrease implementation for ratio_t
  */
 f3d::ratio_t operator+(const f3d::ratio_t& ratio, const f3d::ratio_t& incr)
 {
@@ -942,7 +942,7 @@ f3d::ratio_t operator+(const f3d::ratio_t& ratio, const f3d::ratio_t& incr)
 }
 
 /**
- * Needed for increase implementation for ratio_t
+ * Needed for increaseDecrease implementation for ratio_t
  */
 f3d::ratio_t operator-(const f3d::ratio_t& ratio, const f3d::ratio_t& incr)
 {
@@ -953,11 +953,11 @@ f3d::ratio_t operator-(const f3d::ratio_t& ratio, const f3d::ratio_t& incr)
 
 //----------------------------------------------------------------------------
 /**
- * Templated generic increase method for provided val and domain.
+ * Templated generic increaseDecrease method for provided val and domain.
  * Increase up to max or decrease down to min.
  */
 template<bool Up, typename T>
-void increase(T& val, const f3d::options::DomainRange<T>& domain)
+void increaseDecrease(T& val, const f3d::options::DomainRange<T>& domain)
 {
   val = Up ? std::min(val + domain.increment, domain.max)
            : std::max(val - domain.increment, domain.min);
@@ -965,12 +965,12 @@ void increase(T& val, const f3d::options::DomainRange<T>& domain)
 
 //----------------------------------------------------------------------------
 /**
- * Templated std::optional specific increase method for provided val and domain.
- * If set, just call increase
+ * Templated std::optional specific increaseDecrease method for provided val and domain.
+ * If set, just call increaseDecrease
  * If not set, set val to min/max depending on the direction
  */
 template<bool Up, typename T>
-void increase(std::optional<T>& val, const f3d::options::DomainRange<T>& domain)
+void increaseDecrease(std::optional<T>& val, const f3d::options::DomainRange<T>& domain)
 {
   if (!val.has_value())
   {
@@ -978,18 +978,18 @@ void increase(std::optional<T>& val, const f3d::options::DomainRange<T>& domain)
   }
   else
   {
-    increase<Up>(val.value(), domain);
+    increaseDecrease<Up>(val.value(), domain);
   }
 }
 
 //----------------------------------------------------------------------------
 /**
- * Specific increase method for provided val and index domain.
+ * Specific increaseDecrease method for provided val and index domain.
  * If max is not set, just returns.
  * Increase up to max or decrease down to 0, does not check validity of current value.
  */
 template<bool Up>
-void increase(int& val, const f3d::options::DomainIndex& domain)
+void increaseDecrease(int& val, const f3d::options::DomainIndex& domain)
 {
   if (!domain.max.has_value())
   {
@@ -1002,12 +1002,12 @@ void increase(int& val, const f3d::options::DomainIndex& domain)
 
 //----------------------------------------------------------------------------
 /**
- * std::optional specific increase method for provided val and index domain.
- * If set, just call increase
+ * std::optional specific increaseDecrease method for provided val and index domain.
+ * If set, just call increaseDecrease
  * If not set, and domain is set, set val to 0/max depending on the direction
  */
 template<bool Up>
-void increase(std::optional<int>& val, const f3d::options::DomainIndex& domain)
+void increaseDecrease(std::optional<int>& val, const f3d::options::DomainIndex& domain)
 {
   if (!val.has_value())
   {
@@ -1019,7 +1019,7 @@ void increase(std::optional<int>& val, const f3d::options::DomainIndex& domain)
   }
   else
   {
-    increase<Up>(val.value(), domain);
+    increaseDecrease<Up>(val.value(), domain);
   }
 }
 

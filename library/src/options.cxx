@@ -218,14 +218,14 @@ std::vector<std::string> options::getEnumDomain(std::string_view name) const
 //----------------------------------------------------------------------------
 options& options::increase(std::string_view name)
 {
-  options_generated::increase<true>(*this, name);
+  options_generated::increaseDecrease<true>(*this, name);
   return *this;
 }
 
 //----------------------------------------------------------------------------
 options& options::decrease(std::string_view name)
 {
-  options_generated::increase<false>(*this, name);
+  options_generated::increaseDecrease<false>(*this, name);
   return *this;
 }
 
