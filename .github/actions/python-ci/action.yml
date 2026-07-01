@@ -122,12 +122,6 @@ runs:
       shell: bash
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
-    - name: Install Mesa Windows
-      if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v2
-      with:
-        path: ${{ env.Python_ROOT_DIR }}
-
     # Qt6 tests only supported on windows for now https://github.com/f3d-app/f3d/issues/2670
     # `import numpy` crashes on Windows, excluding test_scene_zero_copy.py
     - name: Test wheel (macOS/Linux)

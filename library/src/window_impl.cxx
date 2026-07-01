@@ -65,6 +65,7 @@ public:
     assert(userptr != nullptr);
     auto* fn = static_cast<context::function*>(userptr);
     assert(fn != nullptr);
+    std::cout << "Trying to load " << name << '\n';
     return (*fn)(name);
   }
 
@@ -72,7 +73,17 @@ public:
   {
     // Override VTK logic
 #ifdef _WIN32
-    return vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
+    vtkSmartPointer<vtkOpenGLRenderWindow> wglRenWin =
+      vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
+    if (!wglRenWin->SupportsOpenGL())
+    {
+      // Can happen when a remote desktop is used, in that case we fallback on OSMesa
+      return vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
+    }
+    else
+    {
+      return wglRenWin;
+    }
 #elif defined(__linux__) || defined(__FreeBSD__)
 #if defined(VTK_USE_X)
     // try GLX

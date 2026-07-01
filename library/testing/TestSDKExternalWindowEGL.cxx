@@ -36,6 +36,12 @@ int TestSDKExternalWindowEGL([[maybe_unused]] int argc, [[maybe_unused]] char* a
   EGLContext eglCtx = eglCreateContext(eglDpy, eglCfg, EGL_NO_CONTEXT, nullptr);
   eglMakeCurrent(eglDpy, eglSurf, eglSurf, eglCtx);
 
+  f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
+
+  std::cout << "eglGetProcAddress: " << (void*)eglGetProcAddress << '\n';
+  std::cout << "egl(): " << (void*)f3d::context::egl()("eglGetProcAddress") << '\n';
+  std::cout << "glGetString: " << (void*)eglGetProcAddress("glGetString") << '\n';
+
   f3d::engine eng = f3d::engine::createExternalEGL();
   eng.getWindow().setSize(size[0], size[1]);
   eng.getScene().add(std::string(argv[1]) + "/data/cow.vtp");
