@@ -288,7 +288,6 @@ jobs:
         vtk_version: ${{fromJSON(needs.recover_vtk_matrix.outputs.vtk_matrix)}}
         bundle_label: [no-bundle]
         static_label: [no-static]
-        rendering_backend: osmesa
         include:
           - vtk_version: commit
             bundle_label: bundle
@@ -317,6 +316,7 @@ jobs:
           vtk_version: ${{matrix.vtk_version}}
           bundle_label: ${{matrix.bundle_label}}
           static_label: ${{matrix.static_label}}
+          rendering_backend: osmesa
           cpu: arm64
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
