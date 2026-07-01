@@ -394,7 +394,7 @@ double image::compare(const image& reference) const
 
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260623)
   // vtkImageSSIM::ComputeErrorMetrics didn't work for RGBA images,
-  // so we need to extract eliminate the alpha channel
+  // so we need to remove the alpha channel
   if (count == 4)
   {
     vtkNew<vtkDoubleArray> scalarsWithoutAlpha;
