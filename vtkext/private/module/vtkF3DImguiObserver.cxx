@@ -12,6 +12,7 @@
 
 #include <imgui.h>
 
+#include <cfloat>
 #include <unordered_map>
 
 namespace
@@ -207,6 +208,18 @@ bool vtkF3DImguiObserver::MouseMove(vtkObject* caller, unsigned long, void*)
 }
 
 //----------------------------------------------------------------------------
+bool vtkF3DImguiObserver::MouseLeave(vtkObject*, unsigned long, void*)
+{
+  if (ImGui::GetCurrentContext() != nullptr)
+  {
+    // Signal to ImGui that the cursor left the window so hovered state (and any
+    // hover tooltip) clears instead of sticking at the last in-window position.
+    ImGui::GetIO().AddMousePosEvent(-FLT_MAX, -FLT_MAX);
+  }
+  return false;
+}
+
+//----------------------------------------------------------------------------
 bool vtkF3DImguiObserver::MouseLeftPress(vtkObject* caller, unsigned long, void*)
 {
   if (ImGui::GetCurrentContext() != nullptr)
@@ -344,6 +357,7 @@ bool vtkF3DImguiObserver::KeyRelease(vtkObject* caller, unsigned long, void*)
 void vtkF3DImguiObserver::InstallObservers(vtkRenderWindowInteractor* interactor)
 {
   interactor->AddObserver(vtkCommand::MouseMoveEvent, this, &vtkF3DImguiObserver::MouseMove, 2.f);
+  interactor->AddObserver(vtkCommand::LeaveEvent, this, &vtkF3DImguiObserver::MouseLeave, 2.f);
   interactor->AddObserver(
     vtkCommand::LeftButtonPressEvent, this, &vtkF3DImguiObserver::MouseLeftPress, 2.f);
   interactor->AddObserver(
