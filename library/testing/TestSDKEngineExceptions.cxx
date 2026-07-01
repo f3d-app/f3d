@@ -59,6 +59,21 @@ int TestSDKEngineExceptions([[maybe_unused]] int argc, [[maybe_unused]] char* ar
   test.expect<f3d::context::symbol_exception>("create external engine with invalid symbol", [&]() {
     std::ignore = f3d::engine::createExternal(f3d::context::getSymbol("GLX", "invalid"));
   });
+
+  // Test exception inheritance
+  try
+  {
+    std::ignore = f3d::context::wgl();
+  }
+  catch (const f3d::exception& e)
+  {
+    // should be caught here
+  }
+  catch (const f3d::context::loading_exception& e)
+  {
+    std::cerr << "f3d::context::loading_exception does not inherit from f3d::exception" << std::endl;
+    return EXIT_FAILURE;
+  }
 #endif
 
   // Test loadPlugin error handling
