@@ -136,7 +136,7 @@ Set the _roughness coefficient_ on the geometry (between `0.0` and `1.0`). Multi
 
 CLI: `--roughness`.
 
-### `model.material.base_ior` (_double_, optional, range domain: `[0, 1]`, increment: `0.05`)
+### `model.material.base_ior` (_double_, optional, range domain: `[1, 2.5]`, increment: `0.1`)
 
 Set the _index of refraction of the base layer_ (between `1.0` and `2.5`). Model-specified by default.
 
@@ -156,7 +156,7 @@ Render vertex normals as arrows on top of the geometry.
 
 Scales the normal glyphs
 
-### `model.normal.scale` (_double_, optional, range domain: `[0, 1]`, increment: `0.05`)
+### `model.normal.scale` (_double_, optional, range domain: `[0, 3]`, increment: `0.1`)
 
 Normal scale affects the strength of the normal deviation from the normal texture. Model-specified by default.
 
@@ -379,7 +379,7 @@ Enable _raytracing_. Requires the raytracing module to be enabled.
 
 CLI: `--raytracing`.
 
-### `render.raytracing.samples` (_int_, default: `5`, range domain: `[1, 20]`, increment: `1`)
+### `render.raytracing.samples` (_int_, default: `5`, range domain: `[1, 50]`, increment: `1`)
 
 The number of _samples per pixel_.
 

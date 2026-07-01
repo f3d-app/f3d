@@ -61,9 +61,9 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
     .decrease("render.raytracing.samples");
   test("increase/decrease int", opt.render.raytracing.samples, 6);
 
-  opt.render.raytracing.samples = 19;
+  opt.render.raytracing.samples = 49;
   opt.increase("render.raytracing.samples").increase("render.raytracing.samples");
-  test("increase max cap int", opt.render.raytracing.samples, 20);
+  test("increase max cap int", opt.render.raytracing.samples, 50);
 
   opt.render.raytracing.samples = 2;
   opt.decrease("render.raytracing.samples").decrease("render.raytracing.samples");
@@ -170,9 +170,9 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   test("scene.animation.speed_factor max", opt.domains.scene.animation.speed_factor.max, f3d::ratio_t(2.));
   test("scene.animation.speed_factor increment", opt.domains.scene.animation.speed_factor.increment, f3d::ratio_t(0.1));
 
-  test("model.material.base_ior min", opt.domains.model.material.base_ior.min, 0.);
-  test("model.material.base_ior max", opt.domains.model.material.base_ior.max, 1.);
-  test("model.material.base_ior increment", opt.domains.model.material.base_ior.increment, 0.05);
+  test("model.material.base_ior min", opt.domains.model.material.base_ior.min, 1.);
+  test("model.material.base_ior max", opt.domains.model.material.base_ior.max, 2.5);
+  test("model.material.base_ior increment", opt.domains.model.material.base_ior.increment, 0.1);
 
   test("model.material.metallic min", opt.domains.model.material.metallic.min, 0.);
   test("model.material.metallic max", opt.domains.model.material.metallic.max, 1.);
@@ -183,8 +183,8 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   test("model.material.roughness increment", opt.domains.model.material.roughness.increment, 0.05);
 
   test("model.normal.scale min", opt.domains.model.normal.scale.min, 0.);
-  test("model.normal.scale max", opt.domains.model.normal.scale.max, 1.);
-  test("model.normal.scale increment", opt.domains.model.normal.scale.increment, 0.05);
+  test("model.normal.scale max", opt.domains.model.normal.scale.max, 3.);
+  test("model.normal.scale increment", opt.domains.model.normal.scale.increment, 0.1);
 
   test("model.normal_glyphs.scale min", opt.domains.model.normal_glyphs.scale.min, f3d::ratio_t(0));
   test("model.normal_glyphs.scale max", opt.domains.model.normal_glyphs.scale.max, f3d::ratio_t(10));
