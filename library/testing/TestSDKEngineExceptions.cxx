@@ -69,11 +69,6 @@ int TestSDKEngineExceptions([[maybe_unused]] int argc, [[maybe_unused]] char* ar
   {
     // should be caught here
   }
-  catch (const f3d::context::loading_exception& e)
-  {
-    std::cerr << "f3d::context::loading_exception does not inherit from f3d::exception" << std::endl;
-    return EXIT_FAILURE;
-  }
 #endif
 
   // Test loadPlugin error handling
