@@ -277,7 +277,7 @@ function(_parse_json_option _top_json)
            list(APPEND _options_has_domain "if (name == \"${_option_name}\") return options_tools::hasDomain(style, options::domain_style::RANGE)")
            list(APPEND _options_get_enum_domain "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to get enum domain of \" + std::string(\"${_option_name}\") + \" which doesn't have such domain\")")
            list(APPEND _options_increase_decrease "if (name == \"${_option_name}\") options_tools::increaseDecrease<Up>(opt.${_option_name}, opt.domains.${_option_name})")
-           list(APPEND _options_cycle "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to increase or decrease \" + std::string(\"${_option_name}\") + \" wich is not compatible\")")
+           list(APPEND _options_cycle "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to increase or decrease \" + std::string(\"${_option_name}\") + \" which is not compatible\")")
 
          else()
 
@@ -305,7 +305,7 @@ function(_parse_json_option _top_json)
              string(APPEND _options_domains_struct "${_option_indent}    DomainEnum<${_option_domain_type}> ${_member_name} = ${_enum_value_initialize};\n")
              list(APPEND _options_has_domain "if (name == \"${_option_name}\") return options_tools::hasDomain(style, options::domain_style::ENUM)")
              list(APPEND _options_get_enum_domain "if (name == \"${_option_name}\") return options_tools::getEnumDomain(opt.domains.${_option_name})")
-             list(APPEND _options_increase_decrease "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to increase or decrease \" + std::string(\"${_option_name}\") + \" wich is not compatible\")")
+             list(APPEND _options_increase_decrease "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to increase or decrease \" + std::string(\"${_option_name}\") + \" which is not compatible\")")
              list(APPEND _options_cycle "if (name == \"${_option_name}\") options_tools::cycle(opt.${_option_name}, opt.domains.${_option_name})")
            else()
 
