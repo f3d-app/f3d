@@ -19,6 +19,8 @@ int TestSDKExternalWindowOSMesa([[maybe_unused]] int argc, [[maybe_unused]] char
   // Create an RGBA buffer to hold the rendered image
   std::vector<unsigned char> buffer(size[0] * size[1] * 4);
 
+  std::cout << "Creating OSMesa context..." << std::endl;
+
   // Create an OSMesa context
   OSMesaContext ctx = OSMesaCreateContext(OSMESA_RGBA, nullptr);
   if (!ctx)
@@ -26,6 +28,8 @@ int TestSDKExternalWindowOSMesa([[maybe_unused]] int argc, [[maybe_unused]] char
     std::cerr << "OSMesa context creation failed!\n";
     return EXIT_FAILURE;
   }
+
+  std::cout << "Making OSMesa context current..." << std::endl;
 
   // Bind the buffer to the context
   if (!OSMesaMakeCurrent(ctx, buffer.data(), GL_UNSIGNED_BYTE, size[0], size[1]))
@@ -35,10 +39,14 @@ int TestSDKExternalWindowOSMesa([[maybe_unused]] int argc, [[maybe_unused]] char
     return EXIT_FAILURE;
   }
 
+  std::cout << "Running F3D..." << std::endl;
+
   PseudoUnitTest test;
 
   try
   {
+    f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
+
     f3d::engine eng = f3d::engine::createExternalOSMesa();
     eng.getWindow().setSize(size[0], size[1]);
     eng.getScene().add(std::string(argv[1]) + "/data/cow.vtp");
