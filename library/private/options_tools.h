@@ -997,12 +997,7 @@ void increase(int& val, const f3d::options::DomainIndex& domain)
   }
 
   int max = static_cast<int>(std::min(domain.max.value(), INT_MAX_UINT));
-  char dir = Up ? +1 : -1;
-  int newVal = val + dir;
-  if ((Up && newVal <= max) || (!Up && newVal >= 0))
-  {
-    val = newVal;
-  }
+  val = Up ? std::min(val + 1, max) : std::max(val - 1, 0);
 }
 
 //----------------------------------------------------------------------------
