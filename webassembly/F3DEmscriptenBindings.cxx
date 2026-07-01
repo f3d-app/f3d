@@ -164,6 +164,17 @@ EMSCRIPTEN_BINDINGS(f3d)
       },
       emscripten::return_value_policy::reference())
     .function("clear", &f3d::scene::clear, emscripten::return_value_policy::reference())
+    .function(
+      "getAddedFiles",
+      +[](f3d::scene& scene) -> emscripten::val
+      {
+        std::vector<std::string> files;
+        for (const std::filesystem::path& file : scene.getAddedFiles())
+        {
+          files.push_back(file.string());
+        }
+        return containerToJSArray(files);
+      })
     .function("loadAnimationTime", &f3d::scene::loadAnimationTime,
       emscripten::return_value_policy::reference())
     .function(
@@ -443,6 +454,15 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("getOptions", &f3d::engine::getOptions, emscripten::return_value_policy::reference())
     .function("getWindow", &f3d::engine::getWindow, emscripten::return_value_policy::reference())
     .function("getScene", &f3d::engine::getScene, emscripten::return_value_policy::reference())
+    .function(
+      "saveStatefile", +[](f3d::engine& engine, const std::string& path) -> f3d::engine&
+      { return engine.saveStatefile(path); }, emscripten::return_value_policy::reference())
+    .function(
+      "loadStatefile", +[](f3d::engine& engine, const std::string& path) -> f3d::engine&
+      { return engine.loadStatefile(path); }, emscripten::return_value_policy::reference())
+    .function("saveStatefileToString", &f3d::engine::saveStatefileToString)
+    .function("loadStatefileFromString", &f3d::engine::loadStatefileFromString,
+      emscripten::return_value_policy::reference())
     .function(
       "getInteractor", &f3d::engine::getInteractor, emscripten::return_value_policy::reference())
     .class_function("autoloadPlugins", &f3d::engine::autoloadPlugins)

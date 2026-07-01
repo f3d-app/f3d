@@ -12,6 +12,17 @@ set_tests_properties(f3d::TestInvalidCLIArgs PROPERTIES PASS_REGULAR_EXPRESSION 
 add_test(NAME f3d::TestNoCliInvalidPlugin COMMAND $<TARGET_FILE:f3d> --load-plugins=invalid --no-render)
 set_tests_properties(f3d::TestNoCliInvalidPlugin PROPERTIES PASS_REGULAR_EXPRESSION "Cannot open the library")
 
+# Exercise the app-side relative-path branch of AugmentStatefileContent: a file group whose file lives
+# in the statefile directory has its path stored relative to it. The file is copied next to the
+# statefile so the relative branch is taken. This only asserts that saving succeeds; the produced path
+# content is not inspected here (relative-path storage itself is asserted by the libf3d TestSDKStatefile
+# test).
+add_test(NAME f3d::TestStatefileRelativeAugmentSetup
+  COMMAND ${CMAKE_COMMAND} -E copy ${F3D_SOURCE_DIR}/testing/data/cow.vtp ${CMAKE_BINARY_DIR}/Testing/Temporary/statefile_relative/cow.vtp)
+set_tests_properties(f3d::TestStatefileRelativeAugmentSetup PROPERTIES FIXTURES_SETUP statefile_relative)
+add_test(NAME f3d::TestStatefileRelativeAugment COMMAND $<TARGET_FILE:f3d> --no-render --no-config ${CMAKE_BINARY_DIR}/Testing/Temporary/statefile_relative/cow.vtp --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/statefile_relative/state.json --verbose)
+set_tests_properties(f3d::TestStatefileRelativeAugment PROPERTIES FIXTURES_REQUIRED statefile_relative PASS_REGULAR_EXPRESSION "Statefile saved to")
+
 # Test that f3d resolution can be controlled from config file
 add_test(NAME f3d::TestConfigResolution COMMAND $<TARGET_FILE:f3d> --config=${F3D_SOURCE_DIR}/testing/configs/resolution.json ${F3D_SOURCE_DIR}/testing/data/suzanne.stl --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestConfigResolution.png --reference=${F3D_SOURCE_DIR}/testing/baselines/TestConfigResolution.png)
 

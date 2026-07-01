@@ -99,6 +99,13 @@ public class Scene {
     public native Scene clear();
 
     /**
+     * Get the list of files currently added to the scene.
+     *
+     * @return list of added file paths
+     */
+    public native List<String> getAddedFiles();
+
+    /**
      * Add a light based on a light state.
      *
      * @param lightState light state

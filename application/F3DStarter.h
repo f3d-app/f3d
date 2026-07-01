@@ -8,12 +8,27 @@
 #define F3DStarter_h
 
 #include <filesystem>
+#include <map>
 #include <memory>
+#include <optional>
+#include <string>
+#include <utility>
 #include <vector>
 
 class F3DStarter
 {
 public:
+  /**
+   * App-specific file group data stored in a statefile, alongside the libf3d state.
+   * Each group is a (key, files) pair, matching F3DInternals::FilesGroups, and Current is the
+   * index of the group that was loaded when the statefile was saved.
+   */
+  struct StatefileFileGroups
+  {
+    std::vector<std::pair<std::string, std::vector<std::filesystem::path>>> Groups;
+    int Current = 0;
+  };
+
   /**
    * Parse the options and configure a f3d::scene accordingly
    */
@@ -52,6 +67,40 @@ public:
    * and no overlays.
    */
   void SaveScreenshot(const std::string& filenameTemplate, bool minimal = false);
+
+  /**
+   * Save the current engine state to a statefile.
+   * `filenameTemplate` supports the same template variables as the output.
+   * If it is `-`, the statefile is written to the standard output.
+   */
+  void SaveStatefile(const std::string& filenameTemplate);
+
+  /**
+   * Save the current engine state to the system clipboard.
+   * Requires a build with the clip module, logs an error otherwise.
+   */
+  void SaveStatefileToClipboard();
+
+  /**
+   * Restore the engine state from a statefile, reloading the saved files in the process.
+   * `source` is a file path or `-` to read from the standard input.
+   */
+  void LoadStatefile(const std::string& source);
+
+  /**
+   * Restore the engine state from the system clipboard, reloading the saved files in the process.
+   * Requires a build with the clip module, logs an error otherwise.
+   */
+  void LoadStatefileFromClipboard();
+
+  /**
+   * Apply a parsed statefile (options, files and camera) to the engine, replacing the current
+   * state.
+   * Used by LoadStatefile and LoadStatefileFromClipboard.
+   */
+  void ApplyStatefile(const std::map<std::string, std::string>& statefileOptions,
+    const std::vector<std::string>& statefileFiles,
+    const std::optional<StatefileFileGroups>& statefileFileGroups);
 
   F3DStarter();
   ~F3DStarter();

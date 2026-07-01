@@ -247,6 +247,40 @@ public:
   [[nodiscard]] interactor& getInteractor();
 
   /**
+   * Save the current state of the engine into a statefile at the provided path.
+   * The statefile is a JSON file that captures the files added to the scene, the camera
+   * configuration and the options that have been set.
+   * File paths are stored as relative paths if they are contained by the directory containing the
+   * statefile, as absolute path otherwise.
+   * Scene content added from memory (mesh, mesh view or buffer) is not saved.
+   * Throws a engine::statefile_exception if the statefile cannot be written.
+   */
+  engine& saveStatefile(const std::filesystem::path& statefilePath);
+
+  /**
+   * Restore the state of the engine from a statefile previously written by saveStatefile.
+   * The scene is cleared first, then the saved files are added, the options are set and the
+   * camera configuration is restored.
+   * Throws a engine::statefile_exception if the statefile cannot be read or parsed.
+   * Throws a scene::load_failure_exception if one of the saved files cannot be loaded.
+   */
+  engine& loadStatefile(const std::filesystem::path& statefilePath);
+
+  /**
+   * Same as saveStatefile but returns the statefile content as a JSON string instead of writing
+   * it to disk. File paths are stored as absolute paths.
+   */
+  [[nodiscard]] std::string saveStatefileToString();
+
+  /**
+   * Same as loadStatefile but reads the statefile content from the provided JSON string instead
+   * of a file. File paths are used as is and should be absolute.
+   * Throws a engine::statefile_exception if the content cannot be parsed.
+   * Throws a scene::load_failure_exception if one of the saved files cannot be loaded.
+   */
+  engine& loadStatefileFromString(const std::string& statefileContent);
+
+  /**
    * List rendering backends supported by libf3d.
    * All backends have an associated boolean flag indicating if it can be used.
    */
@@ -377,6 +411,15 @@ public:
   struct cache_exception : public exception
   {
     explicit cache_exception(const std::string& what = "");
+  };
+
+  /**
+   * An exception that can be thrown by the engine
+   * when a statefile cannot be read, written or parsed.
+   */
+  struct statefile_exception : public exception
+  {
+    explicit statefile_exception(const std::string& what = "");
   };
 
 private:

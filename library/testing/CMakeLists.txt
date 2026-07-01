@@ -20,6 +20,8 @@ list(APPEND libf3dSDKTests_list
      TestSDKScene.cxx
      TestSDKSceneFromBuffer.cxx
      TestSDKSceneFromMemory.cxx
+     TestSDKStatefile.cxx
+     TestSDKStatefileCamera.cxx
      TestSDKUtils.cxx
      TestSDKWindowAuto.cxx
      TestTestSDKHelpers.cxx
@@ -157,7 +159,8 @@ list(APPEND libf3dSDKTestsNoRender_list
      TestSDKLog
      TestSDKOptions
      TestSDKOptionsIO
-     TestSDKScene)
+     TestSDKScene
+     TestSDKStatefile)
 
 # Add all the ADD_TEST for each test
 foreach (test ${libf3dSDKTests_list})

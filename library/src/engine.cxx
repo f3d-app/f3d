@@ -18,7 +18,146 @@
 
 #include <nlohmann/json.hpp>
 
+#include <fstream>
+
 namespace fs = std::filesystem;
+
+namespace
+{
+//----------------------------------------------------------------------------
+nlohmann::ordered_json CaptureState(f3d::engine& eng, const fs::path& baseDir)
+{
+  nlohmann::ordered_json root;
+
+  // Store the added files, relative to the statefile directory (baseDir) when the file actually
+  // lives under it, so that the statefile stays portable if moved alongside its files. Files
+  // outside baseDir (the relative path would escape it with "..") are stored as absolute paths:
+  // such a relative path is not portable anyway and would break when loaded without a baseDir
+  // (e.g. from the standard input or the clipboard). baseDir is empty when serializing to a
+  // string, in which case absolute paths are always used.
+  nlohmann::ordered_json files = nlohmann::ordered_json::array();
+  for (const fs::path& file : eng.getScene().getAddedFiles())
+  {
+    fs::path stored = fs::absolute(file);
+    if (!baseDir.empty())
+    {
+      const fs::path rel = fs::relative(fs::absolute(file), fs::absolute(baseDir));
+      if (!rel.empty() && *rel.begin() != "..")
+      {
+        stored = rel;
+      }
+    }
+    files.push_back(stored.generic_string());
+  }
+  if (files.empty())
+  {
+    f3d::log::info("No files to save in statefile");
+  }
+  root["files"] = files;
+
+  // Camera, only if a window is available
+  try
+  {
+    const f3d::camera_state_t state = eng.getWindow().getCamera().getState();
+    nlohmann::ordered_json camera;
+    camera["position"] = { state.position[0], state.position[1], state.position[2] };
+    camera["focal_point"] = { state.focalPoint[0], state.focalPoint[1], state.focalPoint[2] };
+    camera["view_up"] = { state.viewUp[0], state.viewUp[1], state.viewUp[2] };
+    camera["view_angle"] = state.viewAngle;
+    root["camera"] = camera;
+  }
+  catch (const f3d::engine::no_window_exception&)
+  {
+    // No window available, nothing to save for the camera
+  }
+
+  nlohmann::ordered_json options = nlohmann::ordered_json::object();
+  const f3d::options& opts = eng.getOptions();
+  for (const std::string& name : opts.getNames())
+  {
+    options[name] = opts.getAsString(name);
+  }
+  root["options"] = options;
+
+  return root;
+}
+
+//----------------------------------------------------------------------------
+void RestoreState(f3d::engine& eng, const nlohmann::ordered_json& root, const fs::path& baseDir)
+{
+  // Clear the scene first so that the statefile fully replaces the current state
+  f3d::scene& sce = eng.getScene();
+  sce.clear();
+
+  if (root.contains("options"))
+  {
+    f3d::options& opts = eng.getOptions();
+    for (const auto& [name, value] : root.at("options").items())
+    {
+      try
+      {
+        opts.setAsString(name, value.get<std::string>());
+      }
+      catch (const f3d::options::inexistent_exception&)
+      {
+        f3d::log::warn("Statefile option \"", name, "\" does not exist, skipping it");
+      }
+      catch (const f3d::options::parsing_exception&)
+      {
+        f3d::log::warn("Statefile option \"", name, "\" could not be parsed from value \"",
+          value.get<std::string>(), "\", skipping it");
+      }
+    }
+  }
+  else
+  {
+    f3d::log::warn("No options found in statefile");
+  }
+
+  // Add the saved files, resolving relative paths against the statefile directory (baseDir),
+  // mirroring how CaptureState stored them
+  if (root.contains("files"))
+  {
+    std::vector<fs::path> files;
+    for (const auto& file : root.at("files"))
+    {
+      fs::path path = file.get<std::string>();
+      if (path.is_relative() && !baseDir.empty())
+      {
+        path = (baseDir / path).lexically_normal();
+      }
+      files.emplace_back(path);
+    }
+    if (!files.empty())
+    {
+      // Let any scene::load_failure_exception propagate to the caller: a statefile that cannot
+      // reload its files is a failure to restore the state, not something to silently ignore.
+      sce.add(files);
+    }
+  }
+
+  if (root.contains("camera"))
+  {
+    try
+    {
+      const nlohmann::ordered_json& camera = root.at("camera");
+      const auto& pos = camera.at("position");
+      const auto& foc = camera.at("focal_point");
+      const auto& up = camera.at("view_up");
+      f3d::camera_state_t state;
+      state.position = { pos[0].get<double>(), pos[1].get<double>(), pos[2].get<double>() };
+      state.focalPoint = { foc[0].get<double>(), foc[1].get<double>(), foc[2].get<double>() };
+      state.viewUp = { up[0].get<double>(), up[1].get<double>(), up[2].get<double>() };
+      state.viewAngle = camera.at("view_angle").get<double>();
+      eng.getWindow().getCamera().setState(state);
+    }
+    catch (const f3d::engine::no_window_exception&)
+    {
+      f3d::log::info("No window available, skipping camera state from statefile");
+    }
+  }
+}
+}
 
 namespace f3d
 {
@@ -250,6 +389,83 @@ interactor& engine::getInteractor()
     throw engine::no_interactor_exception("No interactor with this engine");
   }
   return *this->Internals->Interactor;
+}
+
+//----------------------------------------------------------------------------
+engine& engine::saveStatefile(const fs::path& statefilePath)
+{
+  try
+  {
+    std::ofstream stream(statefilePath);
+    if (!stream.is_open())
+    {
+      throw engine::statefile_exception(
+        "Could not open statefile for writing: " + statefilePath.string());
+    }
+    stream << ::CaptureState(*this, statefilePath.parent_path()).dump(2) << '\n';
+  }
+  catch (const fs::filesystem_error& ex)
+  {
+    throw engine::statefile_exception(
+      "Could not save statefile " + statefilePath.string() + ": " + ex.what());
+  }
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+engine& engine::loadStatefile(const fs::path& statefilePath)
+{
+  try
+  {
+    std::ifstream stream(statefilePath);
+    if (!stream.is_open())
+    {
+      throw engine::statefile_exception(
+        "Could not open statefile for reading: " + statefilePath.string());
+    }
+    nlohmann::ordered_json root = nlohmann::ordered_json::parse(stream);
+    // parent_path is purely lexical and does not touch the filesystem, so it cannot throw a
+    // filesystem_error: no filesystem exception handling is needed here
+    ::RestoreState(*this, root, statefilePath.parent_path());
+  }
+  catch (const nlohmann::json::exception& ex)
+  {
+    throw engine::statefile_exception(
+      "Could not parse statefile " + statefilePath.string() + ": " + ex.what());
+  }
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+std::string engine::saveStatefileToString()
+{
+  try
+  {
+    return ::CaptureState(*this, {}).dump(2);
+  }
+  catch (const fs::filesystem_error& ex)
+  {
+    // Unreachable with testing: with an empty baseDir, CaptureState only calls fs::absolute (no
+    // fs::relative), which does not throw in practice
+    throw engine::statefile_exception(
+      std::string("Could not save statefile to string: ") + ex.what());
+  }
+}
+
+//----------------------------------------------------------------------------
+engine& engine::loadStatefileFromString(const std::string& statefileContent)
+{
+  try
+  {
+    nlohmann::ordered_json root = nlohmann::ordered_json::parse(statefileContent);
+    ::RestoreState(*this, root, {});
+  }
+  catch (const nlohmann::json::exception& ex)
+  {
+    throw engine::statefile_exception(
+      std::string("Could not parse statefile content: ") + ex.what());
+  }
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -553,6 +769,12 @@ engine::plugin_exception::plugin_exception(const std::string& what)
 
 //----------------------------------------------------------------------------
 engine::cache_exception::cache_exception(const std::string& what)
+  : exception(what)
+{
+}
+
+//----------------------------------------------------------------------------
+engine::statefile_exception::statefile_exception(const std::string& what)
   : exception(what)
 {
 }

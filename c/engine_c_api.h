@@ -212,6 +212,50 @@ extern "C"
   F3D_EXPORT void f3d_engine_set_options(f3d_engine_t* engine, f3d_options_t* options);
 
   /**
+   * @brief Save the engine state to a statefile.
+   *
+   * @param engine Engine handle.
+   * @param statefile_path Path to write the statefile to.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_engine_save_statefile(f3d_engine_t* engine, const char* statefile_path);
+
+  /**
+   * @brief Restore the engine state from a statefile.
+   *
+   * @param engine Engine handle.
+   * @param statefile_path Path to read the statefile from.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_engine_load_statefile(f3d_engine_t* engine, const char* statefile_path);
+
+  /**
+   * @brief Save the engine state to a statefile JSON string.
+   *
+   * @param engine Engine handle.
+   * @return Heap-allocated JSON string on success, NULL on failure.
+   *         The caller must free it using f3d_engine_free_string().
+   */
+  F3D_EXPORT const char* f3d_engine_save_statefile_to_string(f3d_engine_t* engine);
+
+  /**
+   * @brief Restore the engine state from a statefile JSON string.
+   *
+   * @param engine Engine handle.
+   * @param statefile_content JSON statefile content to read from.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_engine_load_statefile_from_string(
+    f3d_engine_t* engine, const char* statefile_content);
+
+  /**
+   * @brief Free a single string returned by the engine C API.
+   *
+   * @param str String to free.
+   */
+  F3D_EXPORT void f3d_engine_free_string(const char* str);
+
+  /**
    * @brief Get the options object from the engine.
    *
    * @param engine Engine handle.

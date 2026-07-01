@@ -14,6 +14,7 @@
 #include "vtkF3DMetaImporter.h"
 #include "vtkF3DRenderer.h"
 
+#include <algorithm>
 #include <optional>
 #include <vtkCallbackCommand.h>
 #include <vtkCellArray.h>
@@ -203,6 +204,7 @@ public:
   animationManager AnimationManager;
 
   vtkNew<vtkF3DMetaImporter> MetaImporter;
+  std::vector<fs::path> AddedFiles;
 };
 
 //----------------------------------------------------------------------------
@@ -288,6 +290,8 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       importer = genericImporter;
     }
     importers.emplace_back(filePath.filename().string(), importer);
+
+    this->Internals->AddedFiles.emplace_back(filePath);
   }
 
   log::debug("\nLoading files: ");
@@ -751,10 +755,18 @@ scene& scene_impl::clear()
   // Clear the window of all actors
   this->Internals->Window.Initialize();
 
+  this->Internals->AddedFiles.clear();
+
   // Clear animation state
   this->Internals->AnimationManager.Reset();
 
   return *this;
+}
+
+//----------------------------------------------------------------------------
+std::vector<fs::path> scene_impl::getAddedFiles() const
+{
+  return this->Internals->AddedFiles;
 }
 
 //----------------------------------------------------------------------------

@@ -53,6 +53,18 @@ Do not read any configuration file and consider only the command line options.
 
 Do not render anything and quit just after loading the first file, use with --verbose to recover information about a file.
 
+### `--load-statefile=<file path>` (_string_)
+
+Restore the application state from a statefile right after starting, then continue running. The statefile is applied above configuration files but below command line options. If `-` is specified instead of a filename, the statefile is read from the standard input. If the file does not exist, it is skipped with a warning.
+
+### `--save-statefile=<file path>` (_string_)
+
+Save the application state to a statefile right after loading, then continue running. All file groups are saved, including the ones not currently loaded. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, the statefile is written to the standard output.
+
+### `--statefile-filename=<file path>` (_string_, default: `{app}/{model}_{n}.json`)
+
+Default filename used by the `save_statefile` and `load_statefile` [commands](07-COMMANDS.md) when none is provided, resolved relative to the current working directory. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, the statefile is written to the standard output (save) or read from the standard input (load).
+
 ### `--max-size=<size in MiB>` (_int_, default: `-1`)
 
 Prevent F3D to load a file bigger than the provided size in Mib, leave empty for unlimited, useful for thumbnails.
@@ -1082,7 +1094,7 @@ cat path/to/file.glb --force-reader=GLB | f3d - --output=- | display
 
 ## Filename templating
 
-The destination filename used by `--output` or to save screenshots using `--screenshot-filename` can use the following template variables:
+The destination filename used by `--output`, to save screenshots using `--screenshot-filename`, or to save statefiles using `--save-statefile`/`--statefile-filename` can use the following template variables:
 
 - `{app}`: application name (ie. `F3D`)
 - `{version}`: application version (eg. `2.4.0`)
@@ -1102,6 +1114,8 @@ For example the screenshot filename is configured as `{app}/{model}_{n}.png` by 
 consecutive screenshots are going to be saved as `F3D/hello_1.png`, `F3D/hello_2.png`, `F3D/hello_3.png`, ...
 
 Model related variables will be replaced by `no_file` if no file is loaded and `multi_file` if multiple files are loaded using the `multi-file-mode` option.
+
+When loading a statefile (`--load-statefile`/`load_statefile`), the `{n}` variable resolves to the most recent existing file, instead of the next available one used when saving. This means that, with the default `{n}` template, saving then loading a statefile round-trips to the same file.
 
 ## HDRI Caches
 

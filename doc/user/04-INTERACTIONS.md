@@ -112,6 +112,10 @@ Other hotkeys and interactions are available:
 - <kbd>&darr;</kbd>: add all current files parent directories to the list of files, reload the currently loaded files and reset the camera, respect the `--recursive-dir-add` CLI option.
 - <kbd>F12</kbd>: take a screenshot, ie. render the current view to an image file.
 - <kbd>Ctrl</kbd>+<kbd>F12</kbd>: take a "minimal" screenshot, ie. render the current view with no grid and no overlays to an image file with a transparent background.
+- <kbd>Ctrl</kbd>+<kbd>S</kbd>: save the current state into a statefile, see the `--statefile-filename` CLI option.
+- <kbd>Ctrl</kbd>+<kbd>L</kbd>: load the state from a statefile, see the `--statefile-filename` CLI option. Does nothing but warn if the file does not exist.
+- <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd>: save the current state into the system clipboard (requires a build with the `clip` module).
+- <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd>: load the state from the system clipboard (requires a build with the `clip` module).
 - _Drop_ a file, directory or HDRI into the F3D window to load it. F3D relies on the extension (`.hdr` or `.exr`) to detect if the dropped file is an HDRI.
 - <kbd>Ctrl</kbd> + _Drop_ a file, directory and load it.
 - <kbd>Shift</kbd> + _Drop_ a HDRI and use it, no extensions checks performed.

@@ -171,6 +171,14 @@ eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 
 `open_file_dialog`: A specific command to open a file dialog to selected a file to load. No argument.
 
+`save_statefile [filename]`: A specific command to save the current state into a statefile, including all file groups (also the ones not currently loaded). If filename is not specified, rely on the `--statefile-filename` CLI option. Use `-` for the standard output. eg: `save_statefile path/to/state.json`.
+
+`load_statefile [filename]`: A specific command to restore the state from a statefile, restoring all saved file groups and reloading the current one. If filename is not specified, rely on the `--statefile-filename` CLI option. Use `-` for the standard input. Does nothing but warn if the file does not exist. eg: `load_statefile path/to/state.json`.
+
+`save_statefile_to_clipboard`: A specific command to save the current state into the system clipboard. Requires a build with the `clip` module. No argument.
+
+`load_statefile_from_clipboard`: A specific command to restore the state from the system clipboard, reloading the saved files. Requires a build with the `clip` module. No argument.
+
 ## Command Script (`--command-script`)
 
 F3D provides a feature to execute commands from a script file using the `--command-script` [CLI option](03-OPTIONS.md). This allows users to automate a sequence of commands by listing them in a plain text file, eg: `f3d --command-script path/to/command_script.txt`.

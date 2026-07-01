@@ -229,6 +229,101 @@ int f3d_engine_set_cache_path(f3d_engine_t* engine, const char* cache_path)
 }
 
 //----------------------------------------------------------------------------
+int f3d_engine_save_statefile(f3d_engine_t* engine, const char* statefile_path)
+{
+  if (!engine || !statefile_path)
+  {
+    return 0;
+  }
+
+  try
+  {
+    f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
+    cpp_engine->saveStatefile(statefile_path);
+  }
+  catch (const f3d::engine::statefile_exception& e)
+  {
+    f3d::log::error("Failed to save statefile: ", e.what());
+    return 0;
+  }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int f3d_engine_load_statefile(f3d_engine_t* engine, const char* statefile_path)
+{
+  if (!engine || !statefile_path)
+  {
+    return 0;
+  }
+
+  try
+  {
+    f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
+    cpp_engine->loadStatefile(statefile_path);
+  }
+  catch (const f3d::engine::statefile_exception& e)
+  {
+    f3d::log::error("Failed to load statefile: ", e.what());
+    return 0;
+  }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+const char* f3d_engine_save_statefile_to_string(f3d_engine_t* engine)
+{
+  if (!engine)
+  {
+    return nullptr;
+  }
+
+  try
+  {
+    f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
+    const std::string str = cpp_engine->saveStatefileToString();
+    char* result = new char[str.length() + 1];
+    std::strcpy(result, str.c_str());
+    return result;
+  }
+  catch (const f3d::engine::statefile_exception& e)
+  {
+    f3d::log::error("Failed to save statefile: ", e.what());
+    return nullptr;
+  }
+}
+
+//----------------------------------------------------------------------------
+int f3d_engine_load_statefile_from_string(f3d_engine_t* engine, const char* statefile_content)
+{
+  if (!engine || !statefile_content)
+  {
+    return 0;
+  }
+
+  try
+  {
+    f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
+    cpp_engine->loadStatefileFromString(statefile_content);
+  }
+  catch (const f3d::engine::statefile_exception& e)
+  {
+    f3d::log::error("Failed to load statefile from string: ", e.what());
+    return 0;
+  }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+void f3d_engine_free_string(const char* str)
+{
+  delete[] str;
+}
+
+//----------------------------------------------------------------------------
 void f3d_engine_set_options(f3d_engine_t* engine, f3d_options_t* options)
 {
   if (!engine || !options)

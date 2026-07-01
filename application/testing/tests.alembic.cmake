@@ -9,7 +9,7 @@ f3d_test(NAME TestAlembicCurves DATA monkey_curves.abc PLUGIN alembic THRESHOLD 
 f3d_test(NAME TestAlembicInvalid DATA invalid_truncated.abc PLUGIN alembic ARGS -s REGEXP "failed to load scene" NO_BASELINE)
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251210)
-  f3d_test(NAME TestPipedAlembic DATA suzanne.abc PLUGIN alembic ARGS -s PIPED Alembic)
+  f3d_test(NAME TestPipedAlembic DATA suzanne.abc PLUGIN alembic ARGS -s PIPED_READER Alembic PIPED)
 endif()
 
 if(NOT F3D_MACOS_BUNDLE)
