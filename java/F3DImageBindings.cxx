@@ -19,6 +19,15 @@ extern "C"
     return reinterpret_cast<jlong>(img);
   }
 
+  JNIEXPORT jlong JAVA_BIND(Image, nativeCreateFromStream)(JNIEnv* env, jclass, jbyteArray buffer)
+  {
+    jbyte* bufferData = env->GetByteArrayElements(buffer, nullptr);
+    size_t size = env->GetArrayLength(buffer);
+
+    f3d::image* img = new f3d::image(reinterpret_cast<std::byte*>(bufferData), size);
+    return reinterpret_cast<jlong>(img);
+  }
+
   JNIEXPORT jlong JAVA_BIND(Image, nativeCreate)(
     JNIEnv* env, jclass, jint width, jint height, jint channelCount, jint type)
   {
