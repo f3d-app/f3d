@@ -65,6 +65,7 @@ public:
     assert(userptr != nullptr);
     auto* fn = static_cast<context::function*>(userptr);
     assert(fn != nullptr);
+    std::cout << "Trying to load " << name << '\n';
     return (*fn)(name);
   }
 
