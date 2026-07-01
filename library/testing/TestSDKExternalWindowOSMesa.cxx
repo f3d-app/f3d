@@ -22,7 +22,19 @@ int TestSDKExternalWindowOSMesa([[maybe_unused]] int argc, [[maybe_unused]] char
   std::cout << "Creating OSMesa context..." << std::endl;
 
   // Create an OSMesa context
-  OSMesaContext ctx = OSMesaCreateContext(OSMESA_RGBA, nullptr);
+  static const int attribs[] = { OSMESA_FORMAT,
+                                 OSMESA_RGBA,
+                                 OSMESA_DEPTH_BITS,
+                                 32,
+                                 OSMESA_PROFILE,
+                                 OSMESA_CORE_PROFILE,
+                                 OSMESA_CONTEXT_MAJOR_VERSION,
+                                 3,
+                                 OSMESA_CONTEXT_MINOR_VERSION,
+                                 2,
+                                 0 };
+
+  OSMesaContext ctx = OSMesaCreateContextAttribs(attribs, nullptr);
   if (!ctx)
   {
     std::cerr << "OSMesa context creation failed!\n";

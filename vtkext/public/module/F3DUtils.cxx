@@ -83,6 +83,7 @@ double F3DUtils::getDPIScale()
   if (dpi == 0)
   {
     vtkWarningWithObjectMacro(nullptr, "Fail to get DPI.");
+    dpi = baseDPI;
   }
 #endif
 
