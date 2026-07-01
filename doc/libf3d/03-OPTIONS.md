@@ -544,7 +544,7 @@ CLI: `--loading-progress`.
 
 Set loader progress bar color.
 
-### `ui.animation_progress` (_string_, default: `none`, **on load**)
+### `ui.animation_progress` (_string_, default: `none`, enum domain: `none`, `default`, `advanced`)
 
 Control the _progress bar_ shown when playing the animation. Can be `none` (hidden),
 `default` (only the progress bar, which can be clicked or dragged to jump to a

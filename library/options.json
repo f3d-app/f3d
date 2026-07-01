@@ -340,7 +340,11 @@
     },
     "animation_progress": {
       "type": "string",
-      "default_value": "none"
+      "default_value": "none",
+      "domain": {
+        "style": "enum",
+        "enum": ["none", "default", "advanced"]
+      }
     },
     "animation_progress_color": {
       "type": "color",

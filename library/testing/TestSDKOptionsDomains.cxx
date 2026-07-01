@@ -222,6 +222,7 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   test("model.point_sprites.type enum", opt.getEnumDomain("model.point_sprites.type"), {"none", "sphere", "gaussian", "circle", "stddev", "bound","cross"});
   test("render.backface_type enum", opt.getEnumDomain("render.backface_type"), {"visible", "hidden"});
   test("render.effect.antialiasing.mode enum", opt.getEnumDomain("render.effect.antialiasing.mode"), {"none", "fxaa", "ssaa", "taa"});
+  test("ui.animation_progress enum", opt.getEnumDomain("ui.animation_progress"), {"none", "default", "advanced"});
 
   test("scene.camera.index max index", !opt.domains.scene.camera.index.max.has_value());
   // clang-format on
