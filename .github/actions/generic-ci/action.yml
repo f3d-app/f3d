@@ -229,11 +229,11 @@ runs:
         path: ${{github.workspace}}\build\bin_Release
 
     # A EGL test is crashing in the CI but not locally
-    - name: Set CI test exception for Linux EGL
-      if: runner.os == 'Linux' &&
-        inputs.rendering_backend != 'auto'
-      shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestSDKExternalWindowEGL)" >> $GITHUB_ENV
+    #- name: Set CI test exception for Linux EGL
+    #  if: runner.os == 'Linux' &&
+    #    inputs.rendering_backend != 'auto'
+    #  shell: bash
+    #  run: echo "F3D_CTEST_EXCEPTIONS=(TestSDKExternalWindowEGL)" >> $GITHUB_ENV
 
     # numpy makes pytest crashing on Windows in the CI but not locally, skipping for now
     - name: Set CI test exception for Windows
