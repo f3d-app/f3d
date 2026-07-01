@@ -235,6 +235,26 @@ runs:
       shell: bash
       run: echo "F3D_CTEST_EXCEPTIONS=(test_scene_zero_copy)" >> $GITHUB_ENV
 
+    # Certain tests are failing on macOS software rendering
+    # OSMesa is used for VTK > 9.6, remove when it's dropped
+    - name: Set CI test exception for macOS x86_64
+      if: |
+        runner.os == 'macOS' &&
+        inputs.cpu == 'x86_64' &&
+        inputs.vtk_version != 'commit'
+      shell: bash
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionCycleComp)|(TestGLTFRigArmature)|(TestInteractionNoModelScrollWheel)|(TestInteractionNoModelScrollBar)|(TestInteractionTAA)|(TestInteractionPointCloudTAA)|(TestInteractionStochasticTAA)" >> $GITHUB_ENV
+
+    # Certain tests are failing on macOS software rendering
+    # OSMesa is used for VTK > 9.6, remove when it's dropped
+    - name: Set CI test exception for macOS arm64
+      if: |
+        runner.os == 'macOS' &&
+        inputs.cpu == 'arm64' &&
+        inputs.vtk_version != 'commit'
+      shell: bash
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheet)|(TestMaxSizeAboveMultiFile)|(TestAxesCustomColor)|(TestInteractionTAA)|(TestInteractionStochasticTAA)|(TestInteractionPointCloudTAA)|(TestSDKNotification)|(TestUnlitOBJOpacity)|(TestInteractionGridReflectionChanged)|(TestUSDRigArmatureWithOpacity)" >> $GITHUB_ENV
+
     - name: Test
       shell: bash
       working-directory: ${{github.workspace}}/build

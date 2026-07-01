@@ -316,7 +316,7 @@ jobs:
           vtk_version: ${{matrix.vtk_version}}
           bundle_label: ${{matrix.bundle_label}}
           static_label: ${{matrix.static_label}}
-          rendering_backend: osmesa
+          rendering_backend: ${{matrix.vtk_version == 'commit' && 'osmesa' || 'auto'}}
           cpu: arm64
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
