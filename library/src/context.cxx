@@ -96,7 +96,7 @@ context::function context::egl()
 #ifdef _WIN32
   for (const auto& lib : { "libEGL.dll", "EGL.dll" })
 #else
-  for (const auto& lib : { "libEGL.so", "libEGL.so.1" })
+  for (const auto& lib : { "libEGL.so.1", "libEGL.so" })
 #endif
   {
     try
@@ -120,9 +120,9 @@ context::function context::osmesa()
 #ifdef _WIN32
   for (const auto& lib : { "osmesa.dll" })
 #elif __APPLE__
-  for (const auto& lib : { "libOSMesa.dylib", "libOSMesa.8.dylib", "libOSMesa.6.dylib" })
+  for (const auto& lib : { "libOSMesa.8.dylib", "libOSMesa.6.dylib", "libOSMesa.dylib" })
 #else
-  for (const auto& lib : { "libOSMesa.so", "libOSMesa.so.8", "libOSMesa.so.6" })
+  for (const auto& lib : { "libOSMesa.so.8", "libOSMesa.so.6", "libOSMesa.so" })
 #endif
   {
     try
