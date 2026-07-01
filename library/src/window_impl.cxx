@@ -76,9 +76,7 @@ public:
       vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
     if (!wglRenWin->SupportsOpenGL())
     {
-      // TODO: cannot warn because it prints the warning to the console resulting in
-      // baseline changes
-      // log::warn("WGL backend does not support requirements, falling back to OSMesa");
+      // Can happen when a remote desktop is used, in that case we fallback on OSMesa
       return vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
     }
     else
