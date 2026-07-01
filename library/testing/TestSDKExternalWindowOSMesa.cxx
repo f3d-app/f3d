@@ -50,6 +50,11 @@ int TestSDKExternalWindowOSMesa([[maybe_unused]] int argc, [[maybe_unused]] char
   {
     f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
 
+    auto getProc = f3d::context::osmesa();
+    f3d::context::fptr getString = getProc("glGetString");
+
+    std::cout << "getString address = " << reinterpret_cast<void*>(getString) << std::endl;
+
     f3d::engine eng = f3d::engine::createExternalOSMesa();
     eng.getWindow().setSize(size[0], size[1]);
     eng.getScene().add(std::string(argv[1]) + "/data/cow.vtp");
