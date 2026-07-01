@@ -956,10 +956,10 @@ f3d::ratio_t operator-(const f3d::ratio_t& ratio, const f3d::ratio_t& incr)
  * Templated generic increase method for provided val and domain.
  * Increase up to max or decrease down to min.
  */
-template<typename T>
-void increase(T& val, const f3d::options::DomainRange<T>& domain, bool up)
+template<bool Up, typename T>
+void increase(T& val, const f3d::options::DomainRange<T>& domain)
 {
-  val = up ? std::min(val + domain.increment, domain.max)
+  val = Up ? std::min(val + domain.increment, domain.max)
            : std::max(val - domain.increment, domain.min);
 }
 
@@ -969,16 +969,16 @@ void increase(T& val, const f3d::options::DomainRange<T>& domain, bool up)
  * If set, just call increase
  * If not set, set val to min/max depending on the direction
  */
-template<typename T>
-void increase(std::optional<T>& val, const f3d::options::DomainRange<T>& domain, bool up)
+template<bool Up, typename T>
+void increase(std::optional<T>& val, const f3d::options::DomainRange<T>& domain)
 {
   if (!val.has_value())
   {
-    val = up ? domain.min : domain.max;
+    val = Up ? domain.min : domain.max;
   }
   else
   {
-    increase(val.value(), domain, up);
+    increase<Up>(val.value(), domain);
   }
 }
 
@@ -988,7 +988,8 @@ void increase(std::optional<T>& val, const f3d::options::DomainRange<T>& domain,
  * If max is not set, just returns.
  * Increase up to max or decrease down to 0, does not check validity of current value.
  */
-void increase(int& val, const f3d::options::DomainIndex& domain, bool up)
+template<bool Up>
+void increase(int& val, const f3d::options::DomainIndex& domain)
 {
   if (!domain.max.has_value())
   {
@@ -996,9 +997,9 @@ void increase(int& val, const f3d::options::DomainIndex& domain, bool up)
   }
 
   int max = static_cast<int>(std::min(domain.max.value(), INT_MAX_UINT));
-  char dir = up ? +1 : -1;
+  char dir = Up ? +1 : -1;
   int newVal = val + dir;
-  if ((up && newVal <= max) || (!up && newVal >= 0))
+  if ((Up && newVal <= max) || (!Up && newVal >= 0))
   {
     val = newVal;
   }
@@ -1010,19 +1011,20 @@ void increase(int& val, const f3d::options::DomainIndex& domain, bool up)
  * If set, just call increase
  * If not set, and domain is set, set val to 0/max depending on the direction
  */
-void increase(std::optional<int>& val, const f3d::options::DomainIndex& domain, bool up)
+template<bool Up>
+void increase(std::optional<int>& val, const f3d::options::DomainIndex& domain)
 {
   if (!val.has_value())
   {
     if (domain.max.has_value())
     {
       int max = static_cast<int>(std::min(domain.max.value(), INT_MAX_UINT));
-      val = up ? 0 : max;
+      val = Up ? 0 : max;
     }
   }
   else
   {
-    increase(val.value(), domain, up);
+    increase<Up>(val.value(), domain);
   }
 }
 

@@ -152,7 +152,8 @@ std::vector<std::string> getEnumDomain(const f3d::options& opt, std::string_view
 /**
  * Generated method, see `options::increase`
  */
-void increase(f3d::options& opt, std::string_view name, bool up)
+template<bool Up>
+void increase(f3d::options& opt, std::string_view name)
 {
   // clang-format off
   ${_options_increase};

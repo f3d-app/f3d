@@ -276,7 +276,7 @@ function(_parse_json_option _top_json)
            string(APPEND _options_domains_struct "${_option_indent}    DomainRange<${_option_domain_type}> ${_member_name} = ${_range_value_initialize};\n")
            list(APPEND _options_has_domain "if (name == \"${_option_name}\") return options_tools::hasDomain(style, options::domain_style::RANGE)")
            list(APPEND _options_get_enum_domain "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to get domain \" + std::string(\"${_option_name}\") + \" with incompatible option\")")
-           list(APPEND _options_increase "if (name == \"${_option_name}\") options_tools::increase(opt.${_option_name}, opt.domains.${_option_name}, up)")
+           list(APPEND _options_increase "if (name == \"${_option_name}\") options_tools::increase<Up>(opt.${_option_name}, opt.domains.${_option_name})")
            list(APPEND _options_cycle "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to increase \" + std::string(\"${_option_name}\") + \" with incompatible option\")")
 
          else()
@@ -324,11 +324,11 @@ function(_parse_json_option _top_json)
                  set(_index_value_initialize "{std::nullopt}")
                endif()
 
-               # Add enum domain to struct and methods
+               # Add index domain to struct and methods
                string(APPEND _options_domains_struct "${_option_indent}    DomainIndex ${_member_name} = ${_index_value_initialize};\n")
                list(APPEND _options_has_domain "if (name == \"${_option_name}\") return options_tools::hasDomain(style, options::domain_style::INDEX)")
                list(APPEND _options_get_enum_domain "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to get domain \" + std::string(\"${_option_name}\") + \" with incompatible option\")")
-               list(APPEND _options_increase "if (name == \"${_option_name}\") options_tools::increase(opt.${_option_name}, opt.domains.${_option_name}, up)")
+               list(APPEND _options_increase "if (name == \"${_option_name}\") options_tools::increase<Up>(opt.${_option_name}, opt.domains.${_option_name})")
                list(APPEND _options_cycle "if (name == \"${_option_name}\") options_tools::cycle(opt.${_option_name}, opt.domains.${_option_name})")
              endif()
            endif()
