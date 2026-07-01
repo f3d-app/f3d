@@ -80,8 +80,7 @@ runs:
     - name: Checkout mesa
       if: steps.cache-mesa.outputs.cache-hit != 'true'
       shell: bash
-      run: |
-        git clone --recurse-submodules --depth 1 --branch mesa-${{steps.mesa_ver.outputs.extract}} https://gitlab.freedesktop.org/mesa/mesa.git dependencies/mesa
+      run: git clone --recurse-submodules --depth 1 --branch mesa-${{steps.mesa_ver.outputs.extract}} https://gitlab.freedesktop.org/mesa/mesa.git dependencies/mesa
 
     - name: Setup mesa
       if: steps.cache-mesa.outputs.cache-hit != 'true'
@@ -91,11 +90,10 @@ runs:
         mkdir mesa_build
         mkdir mesa_install
 
-    - name: Add LLVM to PATH
+    - name: Add LLVM to PATH to find llvm-config
       if: steps.cache-mesa.outputs.cache-hit != 'true'
       shell: bash
-      run: |
-        echo "$GITHUB_WORKSPACE/dependencies/install/bin" >> "$GITHUB_PATH"
+      run: echo "$GITHUB_WORKSPACE/dependencies/install/bin" >> "$GITHUB_PATH"
 
     - name: Configure mesa
       if: steps.cache-mesa.outputs.cache-hit != 'true'
@@ -129,11 +127,6 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/mesa_build
       shell: bash
       run: ninja -j2 install
-
-    - name: Content mesa
-      working-directory: ${{github.workspace}}/dependencies/mesa_install
-      shell: bash
-      run: ls -R .
 
     - name: Copy to install
       working-directory: ${{github.workspace}}/dependencies/mesa_install
