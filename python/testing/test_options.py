@@ -4,12 +4,6 @@ import pytest
 import f3d
 
 
-def test_closest_option():
-    option, distance = f3d.Options().get_closest_option("scene_direction")
-    assert option == "scene.up_direction"
-    assert distance == 3
-
-
 def test_setitem():
     options = f3d.Options()
     options["ui.axis"] = False
@@ -175,7 +169,14 @@ def test_is_same():
     assert not options2.is_same(options1, "ui.axis")
 
 
-def test_is_copy():
+def test_has_value():
+    options = f3d.Options()
+    assert not options.has_value("scene.camera.index")
+    options["scene.camera.index"] = 1
+    assert options.has_value("scene.camera.index")
+
+
+def test_copy():
     options1 = f3d.Options()
     options2 = f3d.Options()
     options1["ui.axis"] = True
@@ -183,3 +184,64 @@ def test_is_copy():
     assert not options2.is_same(options1, "ui.axis")
     options2.copy(options1, "ui.axis")
     assert options2.is_same(options1, "ui.axis")
+
+
+def test_closest_option():
+    option, distance = f3d.Options().get_closest_option("scene_direction")
+    assert option == "scene.up_direction"
+    assert distance == 3
+
+
+def test_get_all_names():
+    assert len(f3d.Options.get_all_names()) > 0
+
+
+def test_is_optional():
+    options = f3d.Options()
+    assert options.is_optional("scene.camera.index")
+
+
+def test_reset():
+    options = f3d.Options()
+    options["scene.animation.autoplay"] = True
+    options.reset("scene.animation.autoplay")
+    assert options["scene.animation.autoplay"] == False
+
+
+def test_remove_value():
+    options = f3d.Options()
+    options["scene.camera.index"] = 1
+    options.remove_value("scene.camera.index")
+    assert not options.has_value("scene.camera.index")
+
+
+def test_has_domain():
+    options = f3d.Options()
+    assert options.has_domain("scene.camera.index")
+
+
+def test_get_domain_style():
+    options = f3d.Options()
+    assert (
+        options.get_domain_style("scene.camera.index") == f3d.Options.DomainStyle.INDEX
+    )
+
+
+def test_get_enum_domain():
+    options = f3d.Options()
+    enum = options.get_enum_domain("render.effect.blending.mode")
+    assert len(enum) == 5
+
+
+def test_increase_decrease():
+    options = f3d.Options()
+    options.increase("render.raytracing.samples")
+    options.increase("render.raytracing.samples")
+    options.decrease("render.raytracing.samples")
+    assert options["render.raytracing.samples"] == 6
+
+
+def test_cycle():
+    options = f3d.Options()
+    options.cycle("render.effect.blending.mode")
+    assert options["render.effect.blending.mode"] == "ddp"

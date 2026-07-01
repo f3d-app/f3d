@@ -436,9 +436,9 @@ f3d_test(NAME TestFinalShaderCompilationFailure DATA cow.vtp ARGS --final-shader
 f3d_test(NAME TestFinalShaderTimeUniform DATA cow.vtp ARGS --final-shader "vec4 pixel(vec2 uv){return vec4(texture(source, uv).rgb * (0.5 + 0.5*cos(time+uv.xyx+vec3(0,2,4))), 1.0)\\\\\\\;}")
 
 ## Command Script
-f3d_test(NAME TestCommandScriptBasic SCRIPT DATA dragon.vtu) # roll_camera 90;toggle ui.scalar_bar;print_scene_info;increase_light_intensity
-f3d_test(NAME TestCommandScriptElevation SCRIPT DATA dragon.vtu) # elevation_camera 90;toggle ui.scalar_bar;print_scene_info;increase_light_intensity
-f3d_test(NAME TestCommandScriptAzimuth SCRIPT DATA dragon.vtu) # azimuth_camera 90;toggle ui.scalar_bar;print_scene_info;increase_light_intensity
+f3d_test(NAME TestCommandScriptBasic SCRIPT DATA dragon.vtu) # roll_camera 90;toggle ui.scalar_bar;print_scene_info
+f3d_test(NAME TestCommandScriptElevation SCRIPT DATA dragon.vtu) # elevation_camera 90;toggle ui.scalar_bar;print_scene_info
+f3d_test(NAME TestCommandScriptAzimuth SCRIPT DATA dragon.vtu) # azimuth_camera 90;toggle ui.scalar_bar;print_scene_info
 f3d_test(NAME TestCommandScriptInvalid SCRIPT DATA dragon.vtu REGEXP "Command: \"INVALID_COMMAND_1\" is not recognized, ignoring" NO_BASELINE) # INVALID_COMMAND_1
 f3d_test(NAME TestCommandScriptMissingFile SCRIPT DATA dragon.vtu REGEXP "Unable to open command script file" NO_BASELINE)
 f3d_test(NAME TestCommandScriptPrintScene SCRIPT DATA dragon.vtu REGEXP "Camera position: 2.23745, 3.83305, 507.598" NO_BASELINE) # print_scene_info
@@ -480,6 +480,8 @@ f3d_test(NAME TestCommandScriptJumpToTimeAboveMax SCRIPT DATA soldier_animations
 f3d_test(NAME TestCommandScriptSetCameraBack SCRIPT DATA dragon.vtu) # set_camera back
 f3d_test(NAME TestCommandScriptSetCameraBottom SCRIPT DATA dragon.vtu) # set_camera bottom
 f3d_test(NAME TestCommandScriptSetCameraLeft SCRIPT DATA dragon.vtu) # set_camera left
+f3d_test(NAME TestCommandScriptCycleCameraIndex SCRIPT DATA Cameras.gltf) # cycle scene.camera.index;cycle scene.camera.index;reload_current_file_group
+f3d_test(NAME TestCommandScriptIncreaseDecreaseCameraIndex SCRIPT DATA Cameras.gltf) # increase scene.camera.index;increase scene.camera.index;increase.camera.index;decrease.camera.index;reload_current_file_group
 
 ## Tests to increase coverage
 # Output option test

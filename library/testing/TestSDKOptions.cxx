@@ -64,6 +64,9 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   opt.scene.animation.speed_factor = f3d::ratio_t(3.18);
   test("getAsString ratio_t", opt.getAsString("scene.animation.speed_factor") == "3.18");
 
+  opt.scene.animation.speed_factor = 3.19;
+  test("set double ratio_t", opt.getAsString("scene.animation.speed_factor") == "3.19");
+
   opt.set("scene.animation.speed_factor", 3.17);
   test("set/get ratio_t", std::get<double>(opt.get("scene.animation.speed_factor")) == 3.17);
 

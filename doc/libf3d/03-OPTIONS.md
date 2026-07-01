@@ -34,7 +34,7 @@ The default scene always has at most one animation.
 
 CLI: `--animation-indices`.
 
-### `scene.animation.speed_factor` (_ratio_, default: `1`)
+### `scene.animation.speed_factor` (_ratio_, default: `1`, range domain: `[0, 2]`, increment: `0.1` )
 
 Set the animation speed factor to slow, speed up or even invert animation.
 
@@ -46,10 +46,11 @@ Set the animation time to load.
 
 CLI: `--animation-time`.
 
-### `scene.camera.index` (_int_, optional, **on load**)
+### `scene.camera.index` (_int_, optional, **on load**, index domain: dynamic )
 
 Select the scene camera to use when available in the file.
 The default scene always uses automatic camera.
+The domain is updated when loading the file to contain the number of cameras in the file.
 
 CLI: `--camera-index`.
 
@@ -73,7 +74,7 @@ CLI: `--camera-orthographic`.
 
 ## Interactor Options
 
-### `interactor.style` (_string_, default: `default`)
+### `interactor.style` (_string_, default: `default`, enum domain: `default, trackball, 2d`)
 
 Set the interaction style. `default` uses standard 3D interaction, `trackball` enables trackball interaction, `2d` enables 2D interaction mode (pan/zoom only, no rotation). In `2d` mode, camera commands (`set_camera`, `roll_camera`, `elevation_camera`, `azimuth_camera`) are disabled.
 
@@ -93,7 +94,7 @@ Path to a texture file containing a material capture. All other model options fo
 
 CLI: `--texture-matcap`.
 
-### `model.color.opacity` (_double_, optional)
+### `model.color.opacity` (_double_, optional, range domain: `[0, 1]`, increment: `0.05`)
 
 Set _opacity_ on the geometry. Usually used with Depth Peeling option. Multiplied with the `model.color.texture` when present. Model-specified by default.
 
@@ -123,19 +124,19 @@ Path to a texture file that sets the emitted light of the object. Multiplied wit
 
 CLI: `--texture-emissive`.
 
-### `model.material.metallic` (_double_, optional)
+### `model.material.metallic` (_double_, optional, range domain: `[0, 1]`, increment: `0.05`)
 
 Set the _metallic coefficient_ on the geometry (between `0.0` and `1.0`). Multiplied with the `model.material.texture` when present. Model-specified by default.
 
 CLI: `--metallic`.
 
-### `model.material.roughness` (_double_, optional)
+### `model.material.roughness` (_double_, optional, range domain: `[0, 1]`, increment: `0.05`)
 
 Set the _roughness coefficient_ on the geometry (between `0.0` and `1.0`). Multiplied with the `model.material.texture` when present. Model-specified by default.
 
 CLI: `--roughness`.
 
-### `model.material.base_ior` (_double_, optional)
+### `model.material.base_ior` (_double_, optional, range domain: `[1, 2.5]`, increment: `0.1`)
 
 Set the _index of refraction of the base layer_ (between `1.0` and `2.5`). Model-specified by default.
 
@@ -151,11 +152,11 @@ CLI: `--texture-material`.
 
 Render vertex normals as arrows on top of the geometry.
 
-### `model.normal_glyphs.scale` (_ratio_, default: `1.0`)
+### `model.normal_glyphs.scale` (_ratio_, default: `1.0`, range domain: `[0, 10]`, increment: `0.1`)
 
 Scales the normal glyphs
 
-### `model.normal.scale` (_double_, optional)
+### `model.normal.scale` (_double_, optional, range domain: `[0, 3]`, increment: `0.1`)
 
 Normal scale affects the strength of the normal deviation from the normal texture. Model-specified by default.
 
@@ -192,7 +193,7 @@ Color the data with value found _on the cells_ instead of points
 
 CLI: `--coloring-by-cells`.
 
-### `model.scivis.discretization` (_int_, optional)
+### `model.scivis.discretization` (_int_, optional, range domain: `[1, 1024]`, increment: `5`)
 
 Set how many distinct colors will be used from the colormap. Should be `>=1`.
 
@@ -229,14 +230,13 @@ Set the _coloring range_. Automatically computed by default.
 
 CLI: `--coloring-range`.
 
-### `model.point_sprites.type` (_string_, default: `none`)
+### `model.point_sprites.type` (_string_, default: `none`, enum domain: `none, sphere, gaussian, circle, stddev, bound, cross`)
 
 Enable and set the point sprites type. This allows to show sprites instead of points.
-Valid values are `sphere`, `gaussian`, `circle`, `stddev`, `bound`, `cross` or `none` (disabled).
 
 CLI: `--point-sprites`.
 
-### `model.point_sprites.size` (_double_, default: `10.0`)
+### `model.point_sprites.size` (_double_, default: `10.0`, range domain: `[1, 100]`, increment: `1`)
 
 Set the _size_ of point sprites.
 
@@ -268,14 +268,14 @@ CLI: `--textures-transform`.
 
 ## Render Options
 
-### `render.effect.blending.mode` (_string_, default: `none`)
+### `render.effect.blending.mode` (_string_, default: `none`, enum domain: `none, ddp, sort, sort_cpu, stochastic`)
 
 Enable and set the _blending_ technique. This is a technique used to correctly render translucent objects.
 Valid options are: `ddp` (dual depth peeling, quality), `sort` (only for gaussians), `sort_cpu` (only for gaussians, slow), `stochastic` (fast), `none` (disabled).
 
 CLI: `--blending`.
 
-### `render.effect.antialiasing.mode` (_string_, default: `none`)
+### `render.effect.antialiasing.mode` (_string_, default: `none`, enum domain: `none, fxaa, ssaa, taa`)
 
 Enable and set the anti-aliasing technique. This technique is used to reduce aliasing.
 Valid options are: `fxaa` (fast), `ssaa` (quality), `taa` (balanced), `none` (disabled).
@@ -307,7 +307,7 @@ Only opaque objects are displayed, the grid and translucent/volumetric objects a
 
 CLI: `--display-depth`
 
-### `render.line_width` (_double_, optional)
+### `render.line_width` (_double_, optional, range domain: `[0, 10]`, increment: `0.1`)
 
 Set the _width_ of lines when showing edges. Model-specified by default.
 
@@ -319,13 +319,13 @@ Set to true to show the _cell edges_. Model-specified by default.
 
 CLI: `--edges`.
 
-### `render.point_size` (_double_, optional)
+### `render.point_size` (_double_, optional, range domain: `[0, 10]`, increment: `0.1`)
 
 Set the _size_ of points when showing vertices. Model-specified by default.
 
 CLI: `--point-size`.
 
-### `render.backface_type` (_string_, optional, **on load**)
+### `render.backface_type` (_string_, optional, **on load**, enumeration domain: `visible, hidden`)
 
 Set the Backface type, can be `visible` or `hidden`, Model-specified by default.
 
@@ -379,7 +379,7 @@ Enable _raytracing_. Requires the raytracing module to be enabled.
 
 CLI: `--raytracing`.
 
-### `render.raytracing.samples` (_int_, default: `5`)
+### `render.raytracing.samples` (_int_, default: `5`, range domain: `[1, 50]`, increment: `1`)
 
 The number of _samples per pixel_.
 
@@ -426,13 +426,13 @@ Blur background, useful with a skybox.
 
 CLI: `--blur-background`.
 
-### `render.background.blur.coc` (_double_, default: `20.0`)
+### `render.background.blur.coc` (_double_, default: `20.0`, range domain: `[0, 100]`, increment: `5`)
 
 Blur background circle of confusion radius.
 
 CLI: `--blur-coc`.
 
-### `render.light.intensity` (_double_, default: `1.0`)
+### `render.light.intensity` (_double_, default: `1.0`, range domain: `[0, 5]`, increment: `0.02`)
 
 Adjust the intensity of every light in the scene (except HDRI).
 
@@ -509,7 +509,7 @@ Can be useful to display non-ASCII filenames.
 
 CLI: `--font-file`.
 
-### `ui.scale` (_ratio_, default: `1.0`)
+### `ui.scale` (_ratio_, default: `1.0`, range domain: `[0, 10]`, increment: `0.1`)
 
 Scale fonts. Useful for HiDPI displays.
 
@@ -544,7 +544,7 @@ CLI: `--loading-progress`.
 
 Set loader progress bar color.
 
-### `ui.animation_progress` (_string_, default: `none`, **on load**)
+### `ui.animation_progress` (_string_, default: `none`, enum domain: `none`, `default`, `advanced`)
 
 Control the _progress bar_ shown when playing the animation. Can be `none` (hidden),
 `default` (only the progress bar, which can be clicked or dragged to jump to a
@@ -581,7 +581,7 @@ Set the color of the backdrop behind the UI elements.
 
 CLI: `--backdrop-color`.
 
-### `ui.backdrop.opacity` (_double_, default: `0.9`)
+### `ui.backdrop.opacity` (_double_, default: `0.9`, range domain: `[0, 1]`, increment: `0.05`)
 
 Set the opacity of the backdrop behind the UI elements. Value is between 0.0 (fully transparent) and 1.0 (fully opaque).
 
@@ -603,6 +603,21 @@ CLI: `--notifications`.
 ### `ui.notifications.show_bindings` (_bool_, default: `false`)
 
 Show corresponding keys when notifications are triggered by bindings key press events.
+
+## Domains
+
+Certains options have domains that helps user pick valid values.
+Options with domains are documented as such above.
+Domains are never enforced but are indicative.
+Domains are taken into account when using the dedicated [string API](#string-api)
+or [related commands](../user/07-COMMANDS.md).
+
+Range domains are intended for numeric options that have minimum, a maximum and an increment.
+Enum domains are intended for options that have a finite set of possible value.
+Index domains are intended for integer options that are between 0 and a maximum.
+
+If an option has a `dynamic` domains, it means the libf3d can change the domain.
+It is possible to directly change a domain using the [struct API](#struct-api).
 
 ## APIs
 
@@ -638,6 +653,15 @@ Please note that when accessing optional options, special care must be used, eg:
 
 It's even more true with the few optional boolean options as std::optional has an implicit boolean cast operator.
 
+Domains are accessible through the dedicated struct:
+
+```cpp
+  f3d::engine eng = f3d::engine::create();
+  f3d::options& opt = eng.getOptions();
+  std::cout << opt.domains.render.raytracing.samples.range[1] << "\n";
+  std::cout << opt.domains.render.effect.blending.mode.enum[0] << "\n";
+```
+
 ### String API
 
 The most generic and flexible API, as it rely on parsing and string generation.
@@ -671,6 +695,17 @@ When using this API make sure to catch exceptions has needed, eg:
     std::cout << userProvidedName << " is not set.\n";
   }
 ```
+
+This API can interact directly with domains using `increase`/`decrease` and `cycle`:
+
+```cpp
+  f3d::engine eng = f3d::engine::create();
+  f3d::options& opt = eng.getOptions();
+  opt.increase("render.raytracing.samples").increase("render.raytracing.samples").decrease("render.raytracing.samples");
+  opt.cycle("render.effect.blending.mode").cycle("render.effect.blending.mode");
+```
+
+When using this API make sure to catch exceptions as documented in the `option.h` header.
 
 ### Variant API
 

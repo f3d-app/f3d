@@ -25,6 +25,7 @@ unknownMacro
 *:*vtkextTests.cxx
 *:*vtkextUSDTests.cxx
 *:*vtkextWebIFCTests.cxx
+*:*options_generated.h
 
 // specific checks
 knownConditionTrueFalse:vtkext/private/module/vtkF3DPointSplatMapper.cxx

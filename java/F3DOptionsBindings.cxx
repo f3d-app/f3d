@@ -241,4 +241,66 @@ extern "C"
     GetOptionsFromEngine(env, self).removeValue(str);
     env->ReleaseStringUTFChars(name, str);
   }
+
+  JNIEXPORT jboolean JAVA_BIND(Options, hasDomain)(JNIEnv* env, jobject self, jstring name)
+  {
+    const char* str = env->GetStringUTFChars(name, nullptr);
+    bool result = GetOptionsFromEngine(env, self).hasDomain(str);
+    env->ReleaseStringUTFChars(name, str);
+    return result;
+  }
+
+  JNIEXPORT jobject JAVA_BIND(Options, getDomainStyle)(JNIEnv* env, jobject self, jstring name)
+  {
+    const char* str = env->GetStringUTFChars(name, nullptr);
+    f3d::options::domain_style ds = GetOptionsFromEngine(env, self).getDomainStyle(str);
+    env->ReleaseStringUTFChars(name, str);
+
+    jclass enumClass = env->FindClass("app/f3d/F3D/Options$DomainStyle");
+    jfieldID fieldID;
+
+    switch (ds)
+    {
+      case f3d::options::domain_style::RANGE:
+        fieldID = env->GetStaticFieldID(enumClass, "RANGE", "Lapp/f3d/F3D/Options$DomainStyle;");
+        break;
+      case f3d::options::domain_style::ENUM:
+        fieldID = env->GetStaticFieldID(enumClass, "ENUM", "Lapp/f3d/F3D/Options$DomainStyle;");
+        break;
+      default:
+      case f3d::options::domain_style::INDEX:
+        fieldID = env->GetStaticFieldID(enumClass, "INDEX", "Lapp/f3d/F3D/Options$DomainStyle;");
+        break;
+    }
+    return env->GetStaticObjectField(enumClass, fieldID);
+  }
+
+  JNIEXPORT jobject JAVA_BIND(Options, getEnumDomain)(JNIEnv* env, jobject self, jstring name)
+  {
+    const char* str = env->GetStringUTFChars(name, nullptr);
+    jobject enumeration = CreateStringList(env, GetOptionsFromEngine(env, self).getEnumDomain(str));
+    env->ReleaseStringUTFChars(name, str);
+    return enumeration;
+  }
+
+  JNIEXPORT void JAVA_BIND(Options, increase)(JNIEnv* env, jobject self, jstring name)
+  {
+    const char* str = env->GetStringUTFChars(name, nullptr);
+    GetOptionsFromEngine(env, self).increase(str);
+    env->ReleaseStringUTFChars(name, str);
+  }
+
+  JNIEXPORT void JAVA_BIND(Options, decrease)(JNIEnv* env, jobject self, jstring name)
+  {
+    const char* str = env->GetStringUTFChars(name, nullptr);
+    GetOptionsFromEngine(env, self).decrease(str);
+    env->ReleaseStringUTFChars(name, str);
+  }
+
+  JNIEXPORT void JAVA_BIND(Options, cycle)(JNIEnv* env, jobject self, jstring name)
+  {
+    const char* str = env->GetStringUTFChars(name, nullptr);
+    GetOptionsFromEngine(env, self).cycle(str);
+    env->ReleaseStringUTFChars(name, str);
+  }
 }

@@ -434,7 +434,7 @@ void window_impl::UpdateDynamicOptions()
   {
     enablePointSprites = false;
     log::warn(opt.model.point_sprites.type,
-      R"( is an invalid point sprites type. Valid modes are: "sphere", "gaussian", "circle", "stddev", "bound", "cross", "none")");
+      R"( is an invalid point sprites type. Valid types are: "none", "sphere", "gaussian", "circle", "stddev", "bound", "cross")");
   }
 
   renderer->SetUsePointSprites(enablePointSprites);
@@ -548,7 +548,7 @@ void window_impl::UpdateDynamicOptions()
   else
   {
     log::warn(opt.render.effect.antialiasing.mode,
-      R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa", "taa", "none")");
+      R"( is an invalid antialiasing mode. Valid modes are: "none", "fxaa", "ssaa", "taa")");
   }
 
   vtkF3DRenderer::BlendingMode blendMode = vtkF3DRenderer::BlendingMode::NONE;
@@ -575,7 +575,7 @@ void window_impl::UpdateDynamicOptions()
   else
   {
     log::warn(opt.render.effect.blending.mode,
-      R"( is an invalid blending mode. Valid modes are: "ddp", "sort", "sort_cpu", "stochastic", "none")");
+      R"( is an invalid blending mode. Valid modes are: "none", "ddp", "sort", "sort_cpu", "stochastic")");
   }
 
   renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
