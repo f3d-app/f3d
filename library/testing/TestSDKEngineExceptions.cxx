@@ -61,6 +61,18 @@ int TestSDKEngineExceptions([[maybe_unused]] int argc, [[maybe_unused]] char* ar
   });
 #endif
 
+#ifndef _WIN32
+  // Test exception inheritance
+  try
+  {
+    std::ignore = f3d::context::wgl();
+  }
+  catch (const f3d::exception& e)
+  {
+    // should be caught here
+  }
+#endif
+
   // Test loadPlugin error handling
   test.expect<f3d::engine::plugin_exception>("load plugin with invalid library",
     [&]() { f3d::engine::loadPlugin(std::string(argv[1]) + "data/invalid.so"); });
