@@ -59,7 +59,9 @@ int TestSDKEngineExceptions([[maybe_unused]] int argc, [[maybe_unused]] char* ar
   test.expect<f3d::context::symbol_exception>("create external engine with invalid symbol", [&]() {
     std::ignore = f3d::engine::createExternal(f3d::context::getSymbol("GLX", "invalid"));
   });
+#endif
 
+#ifndef _WIN32
   // Test exception inheritance
   try
   {
