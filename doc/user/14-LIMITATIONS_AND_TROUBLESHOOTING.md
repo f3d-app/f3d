@@ -7,7 +7,6 @@ Here is a non exhaustive list of F3D limitations:
 - No support for specifying manual lighting in the default scene apart from using `--light-intensity` option.
 - Drag and drop interaction cannot be recorded nor played back.
 - Volume rendering and HDRI support requires a decent GPU.
-- Information about the failure to load a file is not provided before VTK >= 9.4.0.
 - Streaming require different version of VTK depending upon the format to read.
 - Options `ui.dpi_aware` and CLI `--dpi-aware` are only supported on Windows platform.
 
@@ -104,10 +103,6 @@ The GCC flag `-latomic` is not being added automatically with specific architect
 - If only a few format have working thumbnails, then it is an issue with the mime types database.
 - If no formats have working thumbnails, then it is can be an issue with sandboxing or with the `f3d-plugin-xxx.thumbnailer` files.
 - If only big file do not have thumbnails, this is intended, you can modify this behavior in the `thumbnail.d/05_all.json` configuration directory using the `max-size` option.
-
-> `--rendering-backend` CLI option is not working as expected
-
-Dynamically switching rendering backend require VTK 9.4.0, you may need to update VTK or to use our binary release.
 
 > I'm unable to link C++ examples against my local F3D install directory, it complains about missing VTK symbols
 
