@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iterator>
+#include <sstream>
 #include <string>
 
 namespace fs = std::filesystem;
@@ -60,6 +61,18 @@ int TestSDKStatefile([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     dstStr.getOptions().getAsString("render.background.color"),
     src.getOptions().getAsString("render.background.color"));
   test("string restored added files", dstStr.getScene().getAddedFiles().size() == 1);
+
+  // Stream based round-trip
+  std::stringstream stream;
+  stream << src.dump();
+  f3d::engine::state streamState;
+  stream >> streamState;
+  f3d::engine dstStream = f3d::engine::createNone();
+  dstStream.load(streamState);
+  test("stream restored background color",
+    dstStream.getOptions().getAsString("render.background.color"),
+    src.getOptions().getAsString("render.background.color"));
+  test("stream restored added files", dstStream.getScene().getAddedFiles().size() == 1);
 
   // clear resets the added files tracking
   dst.getScene().clear();
@@ -115,6 +128,8 @@ int TestSDKStatefile([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     [&]() { static_cast<void>(f3d::engine::state::fromFile(invalidStatefilePath)); });
   test.expect<f3d::engine::statefile_exception>("parse invalid statefile content",
     [&]() { static_cast<void>(f3d::engine::state::fromString("{ not valid json")); });
+  test.expect<f3d::engine::statefile_exception>(
+    "load a default constructed state", [&]() { dst.load(f3d::engine::state()); });
 
   return test.result();
 }
