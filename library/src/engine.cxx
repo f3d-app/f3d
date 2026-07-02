@@ -26,6 +26,7 @@
 #include "clip/clip.h"
 #endif
 
+#include <algorithm>
 #include <fstream>
 #include <istream>
 #include <iterator>
@@ -42,10 +43,8 @@ nlohmann::ordered_json CaptureState(f3d::engine& eng)
 
   // Store the added files as absolute paths, the canonical form of a state (see RelativizeFiles).
   nlohmann::ordered_json files = nlohmann::ordered_json::array();
-  for (const fs::path& file : eng.getScene().getAddedFiles())
-  {
-    files.push_back(fs::absolute(file).generic_string());
-  }
+  std::ranges::transform(eng.getScene().getAddedFiles(), std::back_inserter(files),
+    [](const fs::path& file) { return fs::absolute(file).generic_string(); });
   if (files.empty())
   {
     f3d::log::info("No files to save in statefile");
@@ -115,10 +114,8 @@ void RestoreState(f3d::engine& eng, const nlohmann::ordered_json& root)
   if (root.contains("files"))
   {
     std::vector<fs::path> files;
-    for (const auto& file : root.at("files"))
-    {
-      files.emplace_back(file.get<std::string>());
-    }
+    std::ranges::transform(root.at("files"), std::back_inserter(files),
+      [](const nlohmann::ordered_json& file) { return fs::path(file.get<std::string>()); });
     if (!files.empty())
     {
       // Let any scene::load_failure_exception propagate to the caller: a statefile that cannot
