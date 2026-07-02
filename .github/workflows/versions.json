@@ -111,8 +111,8 @@
     "version": "v1.3.1",
     "min_version": "v1.2.13"
   },
-  "vtk_commit_sha": "de9fb55d2f223a0eb3217888a7139132f3bd2ab5",
-  "docker_timestamp": "20260625_0",
+  "vtk_commit_sha": "51effad51145dbb1ebbd7e488e1a77eec282247f",
+  "docker_timestamp": "20260702_0",
   "global_cache_index": "2",
   "vtk_matrix": "['commit', 'v9.6.2', 'v9.5.2', 'v9.4.2']"
 }
