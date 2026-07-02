@@ -59,6 +59,20 @@ EMSCRIPTEN_BINDINGS(f3d)
     .value("ENUM", f3d::options::domain_style::ENUM)
     .value("INDEX", f3d::options::domain_style::INDEX);
 
+  emscripten::enum_<f3d::options::option_type>("OptionType")
+    .value("BOOL", f3d::options::option_type::BOOL)
+    .value("INT", f3d::options::option_type::INT)
+    .value("DOUBLE", f3d::options::option_type::DOUBLE)
+    .value("RATIO", f3d::options::option_type::RATIO)
+    .value("STRING", f3d::options::option_type::STRING)
+    .value("PATH", f3d::options::option_type::PATH)
+    .value("COLOR", f3d::options::option_type::COLOR)
+    .value("DIRECTION", f3d::options::option_type::DIRECTION)
+    .value("COLORMAP", f3d::options::option_type::COLORMAP)
+    .value("TRANSFORM2D", f3d::options::option_type::TRANSFORM2D)
+    .value("DOUBLE_VECTOR", f3d::options::option_type::DOUBLE_VECTOR)
+    .value("INT_VECTOR", f3d::options::option_type::INT_VECTOR);
+
   emscripten::class_<f3d::options>("Options")
     .constructor<>()
     .function(
@@ -131,6 +145,9 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function(
       "isOptional",
       +[](f3d::options& o, const std::string& name) -> bool { return o.isOptional(name); })
+    .function("getType",
+      +[](f3d::options& o, const std::string& name) -> f3d::options::option_type
+      { return o.getType(name); })
     .function(
       "reset", +[](f3d::options& o, const std::string& name) -> f3d::options&
       { return o.reset(name); }, emscripten::return_value_policy::reference())

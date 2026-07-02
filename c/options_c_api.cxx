@@ -493,6 +493,53 @@ int f3d_options_is_optional(const f3d_options_t* options, const char* name)
 }
 
 //----------------------------------------------------------------------------
+f3d_option_type_t f3d_options_get_type(const f3d_options_t* options, const char* name)
+{
+  if (!options || !name)
+  {
+    return F3D_OPTION_TYPE_INVALID;
+  }
+
+  try
+  {
+    const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
+    switch (cpp_options->getType(name))
+    {
+      case f3d::options::option_type::BOOL:
+        return F3D_OPTION_TYPE_BOOL;
+      case f3d::options::option_type::INT:
+        return F3D_OPTION_TYPE_INT;
+      case f3d::options::option_type::DOUBLE:
+        return F3D_OPTION_TYPE_DOUBLE;
+      case f3d::options::option_type::RATIO:
+        return F3D_OPTION_TYPE_RATIO;
+      case f3d::options::option_type::STRING:
+        return F3D_OPTION_TYPE_STRING;
+      case f3d::options::option_type::PATH:
+        return F3D_OPTION_TYPE_PATH;
+      case f3d::options::option_type::COLOR:
+        return F3D_OPTION_TYPE_COLOR;
+      case f3d::options::option_type::DIRECTION:
+        return F3D_OPTION_TYPE_DIRECTION;
+      case f3d::options::option_type::COLORMAP:
+        return F3D_OPTION_TYPE_COLORMAP;
+      case f3d::options::option_type::TRANSFORM2D:
+        return F3D_OPTION_TYPE_TRANSFORM2D;
+      case f3d::options::option_type::DOUBLE_VECTOR:
+        return F3D_OPTION_TYPE_DOUBLE_VECTOR;
+      case f3d::options::option_type::INT_VECTOR:
+        return F3D_OPTION_TYPE_INT_VECTOR;
+    }
+    return F3D_OPTION_TYPE_INVALID;
+  }
+  catch (const f3d::options::inexistent_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return F3D_OPTION_TYPE_INVALID;
+  }
+}
+
+//----------------------------------------------------------------------------
 void f3d_options_reset(f3d_options_t* options, const char* name)
 {
   if (!options || !name)

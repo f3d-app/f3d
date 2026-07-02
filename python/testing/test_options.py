@@ -4,6 +4,13 @@ import pytest
 import f3d
 
 
+def test_get_type():
+    options = f3d.Options()
+    assert options.get_type("render.point_size") == f3d.Options.OptionType.DOUBLE
+    assert options.get_type("render.grid.color") == f3d.Options.OptionType.COLOR
+    assert options.get_type("scene.up_direction") == f3d.Options.OptionType.DIRECTION
+
+
 def test_setitem():
     options = f3d.Options()
     options["ui.axis"] = False
