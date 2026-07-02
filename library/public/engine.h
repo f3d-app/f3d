@@ -305,8 +305,8 @@ public:
 
   private:
     friend class engine;
-    friend std::ostream& operator<<(std::ostream& stream, const state& st);
-    friend std::istream& operator>>(std::istream& stream, state& st);
+    friend F3D_EXPORT std::ostream& operator<<(std::ostream& stream, const state& st);
+    friend F3D_EXPORT std::istream& operator>>(std::istream& stream, state& st);
 
     std::string Content;
   };
