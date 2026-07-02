@@ -10,10 +10,7 @@ f3d_test(NAME TestExodusConfig DATA disk_out_ref.ex2 CONFIG ${F3D_SOURCE_DIR}/te
 f3d_test(NAME TestNetCDF DATA temperature_grid.nc PLUGIN hdf ARGS -s)
 f3d_test(NAME TestVTKHDF DATA blob.vtkhdf PLUGIN hdf ARGS -s)
 f3d_test(NAME TestAMRDataSet DATA amr.vtkhdf PLUGIN hdf ARGS -s)
-
-if (VTK_VERSION VERSION_GREATER_EQUAL 9.4.0)
-  f3d_test(NAME TestVTKHDFPartitionedDataSetCollection DATA pdc_sphere_cone.vtkhdf PLUGIN hdf ARGS -s)
-endif()
+f3d_test(NAME TestVTKHDFPartitionedDataSetCollection DATA pdc_sphere_cone.vtkhdf PLUGIN hdf ARGS -s)
 
 if (VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251109)
   f3d_test(NAME TestPipedVTKHDF DATA blob.vtkhdf PLUGIN hdf ARGS -s PIPED VTKHDF)
