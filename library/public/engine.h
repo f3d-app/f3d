@@ -43,7 +43,7 @@ public:
    * Optionally, the window can be hidden by setting offscreen to true.
    * Linux: GLX if a X server is running, otherwise EGL if available, otherwise OSMesa.
    * Windows: Win32 if it supports OpenGL >= 3.2, otherwise EGL if available, otherwise OSMesa.
-   * macOS: Cocoa.
+   * macOS: Always use Cocoa.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
    * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library.
