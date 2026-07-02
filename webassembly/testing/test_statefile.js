@@ -19,9 +19,13 @@ const settings = {
     scene.add("cow.vtp");
 
     // String based round trip
-    const content = engine.saveStatefileToString();
+    const dumped = engine.dump();
+    const content = dumped.toString();
+    dumped.delete();
     options.setAsString("render.background.color", "#ff0000");
-    engine.loadStatefileFromString(content);
+    const stateFromString = Module.EngineState.fromString(content);
+    engine.load(stateFromString);
+    stateFromString.delete();
     utils.assert(
       options.getAsString("render.background.color") === "#0000ff",
       "option should be restored from the statefile string",
@@ -33,9 +37,13 @@ const settings = {
 
     // File based round trip
     options.setAsString("render.background.color", "#0000ff");
-    engine.saveStatefile("/state.json");
+    const stateToFile = engine.dump();
+    stateToFile.toFile("/state.json");
+    stateToFile.delete();
     options.setAsString("render.background.color", "#ff0000");
-    engine.loadStatefile("/state.json");
+    const stateFromFile = Module.EngineState.fromFile("/state.json");
+    engine.load(stateFromFile);
+    stateFromFile.delete();
     utils.assert(
       options.getAsString("render.background.color") === "#0000ff",
       "option should be restored from the statefile file",

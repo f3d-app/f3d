@@ -507,6 +507,17 @@ EMSCRIPTEN_BINDINGS(f3d)
     .property("hasSceneReader", &f3d::engine::readerInformation::HasSceneReader)
     .property("hasGeometryReader", &f3d::engine::readerInformation::HasGeometryReader);
 
+  emscripten::class_<f3d::engine::state>("EngineState")
+    .class_function(
+      "fromString",
+      +[](const std::string& content) { return f3d::engine::state::fromString(content); })
+    .class_function(
+      "fromFile", +[](const std::string& path) { return f3d::engine::state::fromFile(path); })
+    .function("toString", &f3d::engine::state::toString)
+    .function(
+      "toFile",
+      +[](const f3d::engine::state& state, const std::string& path) { state.toFile(path); });
+
   emscripten::class_<f3d::engine>("Engine")
     .class_function(
       "create", +[](std::string canvas) { return f3d::engine::createWasm(canvas); },
@@ -524,14 +535,10 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("getWindow", &f3d::engine::getWindow, emscripten::return_value_policy::reference())
     .function("getScene", &f3d::engine::getScene, emscripten::return_value_policy::reference())
     .function(
-      "saveStatefile", +[](f3d::engine& engine, const std::string& path) -> f3d::engine&
-      { return engine.saveStatefile(path); }, emscripten::return_value_policy::reference())
+      "dump", +[](f3d::engine& engine) { return engine.dump(); })
     .function(
-      "loadStatefile", +[](f3d::engine& engine, const std::string& path) -> f3d::engine&
-      { return engine.loadStatefile(path); }, emscripten::return_value_policy::reference())
-    .function("saveStatefileToString", &f3d::engine::saveStatefileToString)
-    .function("loadStatefileFromString", &f3d::engine::loadStatefileFromString,
-      emscripten::return_value_policy::reference())
+      "load", +[](f3d::engine& engine, const f3d::engine::state& state) -> f3d::engine&
+      { return engine.load(state); }, emscripten::return_value_policy::reference())
     .function(
       "getInteractor", &f3d::engine::getInteractor, emscripten::return_value_policy::reference())
     .class_function("autoloadPlugins", &f3d::engine::autoloadPlugins)
