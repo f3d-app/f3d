@@ -4,12 +4,50 @@
 #include "engine.h"
 
 #include <EGL/egl.h>
+#include <EGL/eglext.h>
 
 int TestSDKExternalWindowEGL([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
 
-  EGLDisplay eglDpy = eglGetDisplay(EGL_NO_DISPLAY);
+  PFNEGLQUERYDEVICESEXTPROC eglQueryDevicesEXT =
+    reinterpret_cast<PFNEGLQUERYDEVICESEXTPROC>(eglGetProcAddress("eglQueryDevicesEXT"));
+  PFNEGLGETPLATFORMDISPLAYEXTPROC eglGetPlatformDisplayEXT =
+    reinterpret_cast<PFNEGLGETPLATFORMDISPLAYEXTPROC>(eglGetProcAddress("eglGetPlatformDisplayEXT"));
+  PFNEGLQUERYDEVICESTRINGEXTPROC eglQueryDeviceStringEXT =
+    reinterpret_cast<PFNEGLQUERYDEVICESTRINGEXTPROC>(eglGetProcAddress("eglQueryDeviceStringEXT"));
+
+  EGLDisplay eglDpy = EGL_NO_DISPLAY;
+
+  EGLDeviceEXT devices[16];
+  EGLint numDev = 0;
+
+  if (eglQueryDevicesEXT)
+  {
+    eglQueryDevicesEXT(16, devices, &numDev);
+
+    if (eglQueryDeviceStringEXT)
+    {
+      for (int i = 0; i < numDev; ++i)
+      {
+        const char* deviceExts = eglQueryDeviceStringEXT(devices[i], EGL_EXTENSIONS);
+        std::cout << "EGL device " << i << " extensions: "
+                  << (deviceExts ? deviceExts : "(none)") << "\n";
+      }
+    }
+
+    if (numDev > 0 && eglGetPlatformDisplayEXT)
+    {
+      eglDpy = eglGetPlatformDisplayEXT(EGL_PLATFORM_DEVICE_EXT, devices[0], nullptr);
+    }
+  }
+
+  // fallback to default display if platform/device path isn't available
+  if (eglDpy == EGL_NO_DISPLAY)
+  {
+    std::cout << "Falling back to eglGetDisplay(EGL_DEFAULT_DISPLAY)\n";
+    eglDpy = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+  }
 
   // ensure we have a display
   if (eglDpy == EGL_NO_DISPLAY)
@@ -81,11 +119,6 @@ int TestSDKExternalWindowEGL([[maybe_unused]] int argc, [[maybe_unused]] char* a
   }
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-
-  std::cout << "eglGetProcAddress: " << (void*)eglGetProcAddress << '\n';
-  std::cout << "egl(): " << (void*)f3d::context::egl()("eglGetProcAddress") << '\n';
-  std::cout << "glGetString: " << (void*)eglGetProcAddress("glGetString") << '\n';
-  std::cout << "glGetString 2: " << (void*)f3d::context::egl()("glGetString") << '\n';
 
   f3d::engine eng = f3d::engine::createExternalEGL();
   eng.getWindow().setSize(size[0], size[1]);

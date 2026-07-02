@@ -19,6 +19,8 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   std::string outputPath = std::string(argv[2]);
   std::string renderingBackend = std::string(argv[3]);
 
+  f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
+
   f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();

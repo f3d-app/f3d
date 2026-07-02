@@ -17,14 +17,13 @@ inline f3d::engine CreateOffscreenEngine(const std::string& renderingBackend)
   {
     return f3d::engine::createOSMesa();
   }
-  else if (renderingBackend == "egl")
+
+  if (renderingBackend == "egl")
   {
     return f3d::engine::createEGL();
   }
-  else
-  {
-    return f3d::engine::create(true);
-  }
+
+  return f3d::engine::create(true);
 }
 
 inline bool RenderTest(const f3d::image& img, const std::string& baselinePath,
