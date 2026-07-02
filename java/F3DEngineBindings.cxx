@@ -177,8 +177,7 @@ extern "C"
   {
     try
     {
-      return reinterpret_cast<jlong>(
-        new f3d::engine::state(f3d::engine::state::pasteClipboard()));
+      return reinterpret_cast<jlong>(new f3d::engine::state(f3d::engine::state::pasteClipboard()));
     }
     catch (const std::exception& e)
     {
