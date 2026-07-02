@@ -114,6 +114,18 @@ bool isOptional(std::string_view name)
 
 //----------------------------------------------------------------------------
 /**
+ * Generated method, see `options::getType`
+ */
+options::option_type getType(std::string_view name)
+{
+  // clang-format off
+  ${_options_type_getter};
+  // clang-format on
+  else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
+}
+
+//----------------------------------------------------------------------------
+/**
  * Generated method, see `options::reset`
  */
 void reset(options& opt, std::string_view name)

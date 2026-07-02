@@ -7,6 +7,7 @@
 
 /// @cond
 #include <array>
+#include <cstdint>
 #include <filesystem>
 #include <optional>
 #include <string>
@@ -40,6 +41,25 @@ public:
     RANGE = 1,
     ENUM = 2,
     INDEX = 3,
+  };
+
+  /**
+   * Enumeration of the possible types of an option.
+   */
+  enum class F3D_EXPORT option_type : std::uint8_t
+  {
+    BOOL,
+    INT,
+    DOUBLE,
+    RATIO,
+    STRING,
+    PATH,
+    COLOR,
+    DIRECTION,
+    COLORMAP,
+    TRANSFORM2D,
+    DOUBLE_VECTOR,
+    INT_VECTOR
   };
 
   ///@{ @name Constructors
@@ -130,6 +150,13 @@ public:
    * Get all option names that currently have values.
    */
   [[nodiscard]] std::vector<std::string> getNames() const;
+
+  /**
+   * Get the type of an option based on its name.
+   *
+   * Throws an options::inexistent_exception if option does not exist.
+   */
+  [[nodiscard]] option_type getType(std::string_view name) const;
 
   /**
    * Get the closest option name and its Levenshtein distance.

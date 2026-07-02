@@ -228,6 +228,34 @@ extern "C"
     return result;
   }
 
+  JNIEXPORT jobject JAVA_BIND(Options, getType)(JNIEnv* env, jobject self, jstring name)
+  {
+    const char* str = env->GetStringUTFChars(name, nullptr);
+    f3d::options::option_type type = GetOptionsFromEngine(env, self).getType(str);
+    env->ReleaseStringUTFChars(name, str);
+
+    const char* enumName = nullptr;
+    switch (type)
+    {
+      case f3d::options::option_type::BOOL: enumName = "BOOL"; break;
+      case f3d::options::option_type::INT: enumName = "INT"; break;
+      case f3d::options::option_type::DOUBLE: enumName = "DOUBLE"; break;
+      case f3d::options::option_type::RATIO: enumName = "RATIO"; break;
+      case f3d::options::option_type::STRING: enumName = "STRING"; break;
+      case f3d::options::option_type::PATH: enumName = "PATH"; break;
+      case f3d::options::option_type::COLOR: enumName = "COLOR"; break;
+      case f3d::options::option_type::DIRECTION: enumName = "DIRECTION"; break;
+      case f3d::options::option_type::COLORMAP: enumName = "COLORMAP"; break;
+      case f3d::options::option_type::TRANSFORM2D: enumName = "TRANSFORM2D"; break;
+      case f3d::options::option_type::DOUBLE_VECTOR: enumName = "DOUBLE_VECTOR"; break;
+      case f3d::options::option_type::INT_VECTOR: enumName = "INT_VECTOR"; break;
+    }
+
+    jclass typeClass = env->FindClass("app/f3d/F3D/Options$OptionType");
+    jfieldID fid = env->GetStaticFieldID(typeClass, enumName, "Lapp/f3d/F3D/Options$OptionType;");
+    return env->GetStaticObjectField(typeClass, fid);
+  }
+
   JNIEXPORT void JAVA_BIND(Options, reset)(JNIEnv* env, jobject self, jstring name)
   {
     const char* str = env->GetStringUTFChars(name, nullptr);

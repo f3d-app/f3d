@@ -168,6 +168,12 @@ bool options::isOptional(std::string_view option) const
 }
 
 //----------------------------------------------------------------------------
+options::option_type options::getType(std::string_view name) const
+{
+  return options_generated::getType(name);
+}
+
+//----------------------------------------------------------------------------
 options& options::reset(std::string_view name)
 {
   options_generated::reset(*this, name);
