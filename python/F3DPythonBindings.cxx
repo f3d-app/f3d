@@ -927,6 +927,19 @@ PYBIND11_MODULE(pyf3d, module)
   // f3d::engine
   py::class_<f3d::engine> engine(module, "Engine");
 
+  py::class_<f3d::engine::state>(engine, "State")
+    .def_static("from_string", &f3d::engine::state::fromString,
+      "Build a state from a JSON string", py::arg("content"))
+    .def_static("from_file", &f3d::engine::state::fromFile,
+      "Build a state from a JSON statefile", py::arg("file_path"))
+    .def_static("paste_clipboard", &f3d::engine::state::pasteClipboard,
+      "Build a state from the JSON content of the system clipboard")
+    .def("to_string", &f3d::engine::state::toString, "Return the state as a JSON string")
+    .def("to_file", &f3d::engine::state::toFile, "Write the state as a JSON statefile",
+      py::arg("file_path"))
+    .def("copy_clipboard", &f3d::engine::state::copyClipboard,
+      "Copy the state into the system clipboard");
+
   engine //
     .def_static("create", &f3d::engine::create, "Create an engine with a automatic window",
       py::arg("offscreen") = false)
@@ -970,14 +983,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property_readonly("scene", &f3d::engine::getScene, py::return_value_policy::reference)
     .def_property_readonly(
       "interactor", &f3d::engine::getInteractor, py::return_value_policy::reference)
-    .def("save_statefile", &f3d::engine::saveStatefile, "Save the engine state to a statefile",
-      py::arg("statefile_path"), py::return_value_policy::reference)
-    .def("load_statefile", &f3d::engine::loadStatefile, "Restore the engine state from a statefile",
-      py::arg("statefile_path"), py::return_value_policy::reference)
-    .def("save_statefile_to_string", &f3d::engine::saveStatefileToString,
-      "Save the engine state to a JSON string")
-    .def("load_statefile_from_string", &f3d::engine::loadStatefileFromString,
-      "Restore the engine state from a JSON string", py::arg("statefile_content"),
+    .def("dump", &f3d::engine::dump, "Capture the engine state into a State")
+    .def("load", &f3d::engine::load, "Restore the engine from a State", py::arg("state"),
       py::return_value_policy::reference)
     .def_static("load_plugin", &f3d::engine::loadPlugin, "Load a plugin")
     .def_static(

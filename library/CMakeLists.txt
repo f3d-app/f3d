@@ -114,6 +114,15 @@ else ()
     $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/nlohmann_json>)
 endif ()
 
+if (F3D_MODULE_CLIP)
+  if (F3D_USE_EXTERNAL_CLIP)
+    target_link_libraries(libf3d PRIVATE clip::clip)
+  else ()
+    target_link_libraries(libf3d PRIVATE clip)
+    target_include_directories(libf3d PRIVATE $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external>)
+  endif ()
+endif ()
+
 if (WIN32)
   target_link_libraries(libf3d PRIVATE Dwmapi)
   target_compile_options(libf3d PRIVATE /utf-8)
@@ -196,6 +205,11 @@ endif ()
 # ui
 if (F3D_MODULE_UI)
   target_compile_definitions(libf3d PRIVATE F3D_MODULE_UI)
+endif ()
+
+# clip
+if (F3D_MODULE_CLIP)
+  target_compile_definitions(libf3d PRIVATE F3D_MODULE_CLIP)
 endif ()
 
 # raytracing

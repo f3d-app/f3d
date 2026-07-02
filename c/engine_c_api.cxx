@@ -229,51 +229,7 @@ int f3d_engine_set_cache_path(f3d_engine_t* engine, const char* cache_path)
 }
 
 //----------------------------------------------------------------------------
-int f3d_engine_save_statefile(f3d_engine_t* engine, const char* statefile_path)
-{
-  if (!engine || !statefile_path)
-  {
-    return 0;
-  }
-
-  try
-  {
-    f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
-    cpp_engine->saveStatefile(statefile_path);
-  }
-  catch (const f3d::engine::statefile_exception& e)
-  {
-    f3d::log::error("Failed to save statefile: ", e.what());
-    return 0;
-  }
-
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int f3d_engine_load_statefile(f3d_engine_t* engine, const char* statefile_path)
-{
-  if (!engine || !statefile_path)
-  {
-    return 0;
-  }
-
-  try
-  {
-    f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
-    cpp_engine->loadStatefile(statefile_path);
-  }
-  catch (const f3d::engine::statefile_exception& e)
-  {
-    f3d::log::error("Failed to load statefile: ", e.what());
-    return 0;
-  }
-
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-const char* f3d_engine_save_statefile_to_string(f3d_engine_t* engine)
+f3d_engine_state_t* f3d_engine_dump(f3d_engine_t* engine)
 {
   if (!engine)
   {
@@ -283,22 +239,19 @@ const char* f3d_engine_save_statefile_to_string(f3d_engine_t* engine)
   try
   {
     f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
-    const std::string str = cpp_engine->saveStatefileToString();
-    char* result = new char[str.length() + 1];
-    std::strcpy(result, str.c_str());
-    return result;
+    return reinterpret_cast<f3d_engine_state_t*>(new f3d::engine::state(cpp_engine->dump()));
   }
   catch (const f3d::engine::statefile_exception& e)
   {
-    f3d::log::error("Failed to save statefile: ", e.what());
+    f3d::log::error("Failed to dump state: ", e.what());
     return nullptr;
   }
 }
 
 //----------------------------------------------------------------------------
-int f3d_engine_load_statefile_from_string(f3d_engine_t* engine, const char* statefile_content)
+int f3d_engine_load(f3d_engine_t* engine, const f3d_engine_state_t* state)
 {
-  if (!engine || !statefile_content)
+  if (!engine || !state)
   {
     return 0;
   }
@@ -306,15 +259,132 @@ int f3d_engine_load_statefile_from_string(f3d_engine_t* engine, const char* stat
   try
   {
     f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
-    cpp_engine->loadStatefileFromString(statefile_content);
+    cpp_engine->load(*reinterpret_cast<const f3d::engine::state*>(state));
   }
   catch (const f3d::engine::statefile_exception& e)
   {
-    f3d::log::error("Failed to load statefile from string: ", e.what());
+    f3d::log::error("Failed to load state: ", e.what());
     return 0;
   }
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+f3d_engine_state_t* f3d_engine_state_create_from_string(const char* content)
+{
+  if (!content)
+  {
+    return nullptr;
+  }
+
+  try
+  {
+    return reinterpret_cast<f3d_engine_state_t*>(
+      new f3d::engine::state(f3d::engine::state::fromString(content)));
+  }
+  catch (const f3d::engine::statefile_exception& e)
+  {
+    f3d::log::error("Failed to create state from string: ", e.what());
+    return nullptr;
+  }
+}
+
+//----------------------------------------------------------------------------
+f3d_engine_state_t* f3d_engine_state_create_from_file(const char* file_path)
+{
+  if (!file_path)
+  {
+    return nullptr;
+  }
+
+  try
+  {
+    return reinterpret_cast<f3d_engine_state_t*>(
+      new f3d::engine::state(f3d::engine::state::fromFile(file_path)));
+  }
+  catch (const f3d::engine::statefile_exception& e)
+  {
+    f3d::log::error("Failed to create state from file: ", e.what());
+    return nullptr;
+  }
+}
+
+//----------------------------------------------------------------------------
+f3d_engine_state_t* f3d_engine_state_create_from_clipboard(void)
+{
+  try
+  {
+    return reinterpret_cast<f3d_engine_state_t*>(
+      new f3d::engine::state(f3d::engine::state::pasteClipboard()));
+  }
+  catch (const f3d::engine::statefile_exception& e)
+  {
+    f3d::log::error("Failed to create state from clipboard: ", e.what());
+    return nullptr;
+  }
+}
+
+//----------------------------------------------------------------------------
+const char* f3d_engine_state_to_string(const f3d_engine_state_t* state)
+{
+  if (!state)
+  {
+    return nullptr;
+  }
+
+  const std::string str = reinterpret_cast<const f3d::engine::state*>(state)->toString();
+  char* result = new char[str.length() + 1];
+  std::strcpy(result, str.c_str());
+  return result;
+}
+
+//----------------------------------------------------------------------------
+int f3d_engine_state_to_file(const f3d_engine_state_t* state, const char* file_path)
+{
+  if (!state || !file_path)
+  {
+    return 0;
+  }
+
+  try
+  {
+    reinterpret_cast<const f3d::engine::state*>(state)->toFile(file_path);
+  }
+  catch (const f3d::engine::statefile_exception& e)
+  {
+    f3d::log::error("Failed to write state to file: ", e.what());
+    return 0;
+  }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int f3d_engine_state_copy_clipboard(const f3d_engine_state_t* state)
+{
+  if (!state)
+  {
+    return 0;
+  }
+
+  try
+  {
+    reinterpret_cast<const f3d::engine::state*>(state)->copyClipboard();
+  }
+  catch (const f3d::engine::statefile_exception& e)
+  {
+    f3d::log::error("Failed to copy state to clipboard: ", e.what());
+    return 0;
+  }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+void f3d_engine_state_delete(f3d_engine_state_t* state)
+{
+  delete reinterpret_cast<f3d::engine::state*>(state);
 }
 
 //----------------------------------------------------------------------------

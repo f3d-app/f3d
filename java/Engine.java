@@ -216,28 +216,88 @@ public class Engine implements AutoCloseable {
     public native void setOptions(Options options);
 
     /**
-     * Save the engine state to a statefile
-     * @param statefilePath path to write the statefile to
+     * A serializable snapshot of an engine, captured with dump() and applied back with load().
      */
-    public native void saveStatefile(String statefilePath);
+    public static class State implements AutoCloseable {
+        private long mNativeAddress;
+
+        private State(long nativeAddress) {
+            mNativeAddress = nativeAddress;
+        }
+
+        /**
+         * Build a state from a JSON statefile string
+         * @param content JSON statefile content to read from
+         * @return new State instance
+         */
+        public static State fromString(String content) {
+            return new State(nativeFromString(content));
+        }
+
+        /**
+         * Build a state from a JSON statefile
+         * @param filePath path to read the statefile from
+         * @return new State instance
+         */
+        public static State fromFile(String filePath) {
+            return new State(nativeFromFile(filePath));
+        }
+
+        /**
+         * Build a state from the JSON content of the system clipboard
+         * @return new State instance
+         */
+        public static State pasteClipboard() {
+            return new State(nativePasteClipboard());
+        }
+
+        /**
+         * Return the state as a JSON statefile string
+         * @return the state content as a JSON string
+         */
+        @Override
+        public native String toString();
+
+        /**
+         * Write the state as a JSON statefile
+         * @param filePath path to write the statefile to
+         */
+        public native void toFile(String filePath);
+
+        /**
+         * Copy the state into the system clipboard as a JSON string
+         */
+        public native void copyClipboard();
+
+        @Override
+        public void close() {
+            nativeDestroy(mNativeAddress);
+        }
+
+        private static native long nativeFromString(String content);
+        private static native long nativeFromFile(String filePath);
+        private static native long nativePasteClipboard();
+        private static native void nativeDestroy(long nativeAddress);
+    }
 
     /**
-     * Restore the engine state from a statefile
-     * @param statefilePath path to read the statefile from
+     * Capture the current engine state
+     * @return a State capturing the engine
      */
-    public native void loadStatefile(String statefilePath);
+    public State dump() {
+        return new State(nativeDump());
+    }
 
     /**
-     * Save the engine state to a statefile JSON string
-     * @return the statefile content as a JSON string
+     * Restore the engine from a previously captured state
+     * @param state the state to restore from
      */
-    public native String saveStatefileToString();
+    public void load(State state) {
+        nativeLoad(state.mNativeAddress);
+    }
 
-    /**
-     * Restore the engine state from a statefile JSON string
-     * @param statefileContent JSON statefile content to read from
-     */
-    public native void loadStatefileFromString(String statefileContent);
+    private native long nativeDump();
+    private native void nativeLoad(long stateAddress);
 
     /**
      * Get the options

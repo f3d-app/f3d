@@ -90,12 +90,12 @@ def test_statefile(tmp_path):
     src.options["ui.scalar_bar"] = True
     src.scene.add(cow)
 
-    src.save_statefile(statefile)
+    src.dump().to_file(statefile)
     assert statefile.exists()
 
     # File based round-trip
     dst = f3d.Engine.create_none()
-    dst.load_statefile(statefile)
+    dst.load(f3d.Engine.State.from_file(statefile))
     assert dst.options["render.background.color"] == [1.0, 0.0, 0.0]
     assert dst.options["ui.scalar_bar"] is True
     assert len(dst.scene.get_added_files()) == 1
@@ -112,16 +112,15 @@ def test_statefile_string():
     src.options["render.background.color"] = [1.0, 0.0, 0.0]
     src.scene.add(cow)
 
-    content = src.save_statefile_to_string()
+    content = src.dump().to_string()
     dst = f3d.Engine.create_none()
-    dst.load_statefile_from_string(content)
+    dst.load(f3d.Engine.State.from_string(content))
     assert dst.options["render.background.color"] == [1.0, 0.0, 0.0]
     assert len(dst.scene.get_added_files()) == 1
 
 
 def test_statefile_invalid():
-    engine = f3d.Engine.create_none()
     with pytest.raises(RuntimeError):
-        engine.load_statefile("/does/not/exist/state.json")
+        f3d.Engine.State.from_file("/does/not/exist/state.json")
     with pytest.raises(RuntimeError):
-        engine.load_statefile_from_string("{ not valid json")
+        f3d.Engine.State.from_string("{ not valid json")

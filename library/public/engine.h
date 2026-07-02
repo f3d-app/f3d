@@ -10,6 +10,8 @@
 #include "window.h"
 
 /// @cond
+#include <filesystem>
+#include <iosfwd>
 #include <map>
 #include <string>
 #include <vector>
@@ -248,38 +250,81 @@ public:
   [[nodiscard]] interactor& getInteractor();
 
   /**
-   * Save the current state of the engine into a statefile at the provided path.
-   * The statefile is a JSON file that captures the files added to the scene, the camera
-   * configuration and the options that have been set.
-   * File paths are stored as relative paths if they are contained by the directory containing the
-   * statefile, as absolute path otherwise.
-   * Scene content added from memory (mesh, mesh view or buffer) is not saved.
-   * Throws a engine::statefile_exception if the statefile cannot be written.
+   * A serializable snapshot of an engine: the files added to the scene, the camera configuration
+   * and the options that have been set. Captured from an engine with engine::dump() and applied
+   * back with engine::load(), so a state taken from one engine can be restored into another.
+   *
+   * A state can be read from and written to a JSON string, a file, the system clipboard or any
+   * stream. In its string, stream and clipboard forms, file paths are stored as absolute paths; in
+   * its file form, file paths contained by the directory of the file are stored relatively so the
+   * statefile stays portable when moved alongside its files.
+   *
+   * Scene content added from memory (mesh, mesh view or buffer) is not captured.
    */
-  engine& saveStatefile(const std::filesystem::path& statefilePath);
+  struct state
+  {
+    /**
+     * Build a state from a JSON string previously produced by state::toString.
+     * Throws a engine::statefile_exception if the content cannot be parsed.
+     */
+    [[nodiscard]] static state fromString(const std::string& content);
+
+    /**
+     * Build a state from a JSON statefile previously written by state::toFile.
+     * File paths stored relatively are resolved against the directory of the file.
+     * Throws a engine::statefile_exception if the file cannot be read or parsed.
+     */
+    [[nodiscard]] static state fromFile(const std::filesystem::path& filePath);
+
+    /**
+     * Build a state from the JSON content currently held by the system clipboard.
+     * Throws a engine::statefile_exception if the clipboard has no readable text, its content
+     * cannot be parsed, or clipboard support is not available in this build.
+     */
+    [[nodiscard]] static state pasteClipboard();
+
+    /**
+     * Return the state as a JSON string, with file paths stored as absolute paths.
+     */
+    [[nodiscard]] std::string toString() const;
+
+    /**
+     * Write the state as a JSON statefile at the provided path. File paths contained by the
+     * directory of the file are stored relatively, as absolute paths otherwise.
+     * Throws a engine::statefile_exception if the file cannot be written.
+     */
+    void toFile(const std::filesystem::path& filePath) const;
+
+    /**
+     * Copy the state into the system clipboard as a JSON string, with file paths stored as absolute
+     * paths.
+     * Throws a engine::statefile_exception if the clipboard cannot be written or clipboard support
+     * is not available in this build.
+     */
+    void copyClipboard() const;
+
+  private:
+    friend class engine;
+    friend std::ostream& operator<<(std::ostream& stream, const state& st);
+    friend std::istream& operator>>(std::istream& stream, state& st);
+
+    std::string Content;
+  };
 
   /**
-   * Restore the state of the engine from a statefile previously written by saveStatefile.
-   * The scene is cleared first, then the saved files are added, the options are set and the
-   * camera configuration is restored.
-   * Throws a engine::statefile_exception if the statefile cannot be read or parsed.
+   * Capture the current state of the engine (added files, camera and options) into a state that can
+   * be serialized and later applied back with engine::load.
+   * Scene content added from memory (mesh, mesh view or buffer) is not captured.
+   */
+  [[nodiscard]] state dump();
+
+  /**
+   * Restore the engine from a previously captured state. The scene is cleared first, then the saved
+   * files are added, the options are set and the camera configuration is restored.
+   * Throws a engine::statefile_exception if the state content cannot be parsed.
    * Throws a scene::load_failure_exception if one of the saved files cannot be loaded.
    */
-  engine& loadStatefile(const std::filesystem::path& statefilePath);
-
-  /**
-   * Same as saveStatefile but returns the statefile content as a JSON string instead of writing
-   * it to disk. File paths are stored as absolute paths.
-   */
-  [[nodiscard]] std::string saveStatefileToString();
-
-  /**
-   * Same as loadStatefile but reads the statefile content from the provided JSON string instead
-   * of a file. File paths are used as is and should be absolute.
-   * Throws a engine::statefile_exception if the content cannot be parsed.
-   * Throws a scene::load_failure_exception if one of the saved files cannot be loaded.
-   */
-  engine& loadStatefileFromString(const std::string& statefileContent);
+  engine& load(const state& st);
 
   /**
    * List rendering backends supported by libf3d.
@@ -434,6 +479,18 @@ private:
   engine(const std::optional<window::Type>& windowType, bool offscreen,
     const context::function& loader, std::string_view id = "");
 };
+
+/**
+ * Write a state as a JSON string into the provided stream, with file paths stored as absolute
+ * paths.
+ */
+F3D_EXPORT std::ostream& operator<<(std::ostream& stream, const engine::state& st);
+
+/**
+ * Read a state from the JSON content of the provided stream.
+ * Throws a engine::statefile_exception if the content cannot be parsed.
+ */
+F3D_EXPORT std::istream& operator>>(std::istream& stream, engine::state& st);
 }
 
 #endif
