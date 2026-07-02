@@ -29,6 +29,14 @@ runs:
         name: mesa
         minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
 
+    - name: Extract python version
+      id: python_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: python
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
     - name: Extract global cache index
       id: global_idx
       uses: f3d-app/extract-version-action@main
@@ -60,7 +68,7 @@ runs:
       if: steps.cache-mesa.outputs.cache-hit != 'true'
       uses: actions/setup-python@v6
       with:
-        python-version: "3.14"
+        python-version: ${{steps.python_ver.outputs.extract}}
 
     - name: Install Mesa Python dependencies
       if: steps.cache-mesa.outputs.cache-hit != 'true'
