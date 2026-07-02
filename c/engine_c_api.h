@@ -23,6 +23,11 @@ extern "C"
   typedef struct f3d_options_t f3d_options_t;
 
   /**
+   * @brief Opaque handle to an f3d::engine::state object.
+   */
+  typedef struct f3d_engine_state_t f3d_engine_state_t;
+
+  /**
    * @brief Structure representing a rendering backend with its availability.
    */
   typedef struct
@@ -212,41 +217,81 @@ extern "C"
   F3D_EXPORT void f3d_engine_set_options(f3d_engine_t* engine, f3d_options_t* options);
 
   /**
-   * @brief Save the engine state to a statefile.
+   * @brief Capture the current engine state.
    *
    * @param engine Engine handle.
-   * @param statefile_path Path to write the statefile to.
-   * @return 1 on success, 0 on failure.
+   * @return A state handle on success, NULL on failure.
+   *         The returned state must be deleted with f3d_engine_state_delete().
    */
-  F3D_EXPORT int f3d_engine_save_statefile(f3d_engine_t* engine, const char* statefile_path);
+  F3D_EXPORT f3d_engine_state_t* f3d_engine_dump(f3d_engine_t* engine);
 
   /**
-   * @brief Restore the engine state from a statefile.
+   * @brief Restore the engine from a previously captured state.
    *
    * @param engine Engine handle.
-   * @param statefile_path Path to read the statefile from.
+   * @param state State handle to restore from.
    * @return 1 on success, 0 on failure.
    */
-  F3D_EXPORT int f3d_engine_load_statefile(f3d_engine_t* engine, const char* statefile_path);
+  F3D_EXPORT int f3d_engine_load(f3d_engine_t* engine, const f3d_engine_state_t* state);
 
   /**
-   * @brief Save the engine state to a statefile JSON string.
+   * @brief Build a state from a JSON statefile string.
    *
-   * @param engine Engine handle.
+   * @param content JSON statefile content to read from.
+   * @return A state handle on success, NULL on failure.
+   *         The returned state must be deleted with f3d_engine_state_delete().
+   */
+  F3D_EXPORT f3d_engine_state_t* f3d_engine_state_create_from_string(const char* content);
+
+  /**
+   * @brief Build a state from a JSON statefile.
+   *
+   * @param file_path Path to read the statefile from.
+   * @return A state handle on success, NULL on failure.
+   *         The returned state must be deleted with f3d_engine_state_delete().
+   */
+  F3D_EXPORT f3d_engine_state_t* f3d_engine_state_create_from_file(const char* file_path);
+
+  /**
+   * @brief Build a state from the JSON content of the system clipboard.
+   *
+   * @return A state handle on success, NULL on failure.
+   *         The returned state must be deleted with f3d_engine_state_delete().
+   */
+  F3D_EXPORT f3d_engine_state_t* f3d_engine_state_create_from_clipboard(void);
+
+  /**
+   * @brief Return the state as a JSON statefile string.
+   *
+   * @param state State handle.
    * @return Heap-allocated JSON string on success, NULL on failure.
    *         The caller must free it using f3d_engine_free_string().
    */
-  F3D_EXPORT const char* f3d_engine_save_statefile_to_string(f3d_engine_t* engine);
+  F3D_EXPORT const char* f3d_engine_state_to_string(const f3d_engine_state_t* state);
 
   /**
-   * @brief Restore the engine state from a statefile JSON string.
+   * @brief Write the state as a JSON statefile.
    *
-   * @param engine Engine handle.
-   * @param statefile_content JSON statefile content to read from.
+   * @param state State handle.
+   * @param file_path Path to write the statefile to.
    * @return 1 on success, 0 on failure.
    */
-  F3D_EXPORT int f3d_engine_load_statefile_from_string(
-    f3d_engine_t* engine, const char* statefile_content);
+  F3D_EXPORT int f3d_engine_state_to_file(const f3d_engine_state_t* state, const char* file_path);
+
+  /**
+   * @brief Copy the state into the system clipboard as a JSON string.
+   *
+   * @param state State handle.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_engine_state_copy_clipboard(const f3d_engine_state_t* state);
+
+  /**
+   * @brief Delete a state handle.
+   *
+   * @param state State handle to delete.
+   */
+  F3D_EXPORT void f3d_engine_state_delete(f3d_engine_state_t* state);
 
   /**
    * @brief Free a single string returned by the engine C API.

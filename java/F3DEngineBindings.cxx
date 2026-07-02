@@ -1,6 +1,7 @@
 #include "F3DJavaBindings.h"
 
 #include <app_f3d_F3D_Engine.h>
+#include <app_f3d_F3D_Engine_State.h>
 
 #include <context.h>
 
@@ -110,67 +111,118 @@ extern "C"
     env->ReleaseStringUTFChars(path, str);
   }
 
-  JNIEXPORT void JAVA_BIND(Engine, saveStatefile)(JNIEnv* env, jobject self, jstring path)
-  {
-    const char* str = env->GetStringUTFChars(path, nullptr);
-    try
-    {
-      GetEngine(env, self)->saveStatefile(fs::path(str));
-    }
-    catch (const std::exception& e)
-    {
-      env->ReleaseStringUTFChars(path, str);
-      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
-      return;
-    }
-    env->ReleaseStringUTFChars(path, str);
-  }
-
-  JNIEXPORT void JAVA_BIND(Engine, loadStatefile)(JNIEnv* env, jobject self, jstring path)
-  {
-    const char* str = env->GetStringUTFChars(path, nullptr);
-    try
-    {
-      GetEngine(env, self)->loadStatefile(fs::path(str));
-    }
-    catch (const std::exception& e)
-    {
-      env->ReleaseStringUTFChars(path, str);
-      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
-      return;
-    }
-    env->ReleaseStringUTFChars(path, str);
-  }
-
-  JNIEXPORT jstring JAVA_BIND(Engine, saveStatefileToString)(JNIEnv* env, jobject self)
+  JNIEXPORT jlong JAVA_BIND(Engine, nativeDump)(JNIEnv* env, jobject self)
   {
     try
     {
-      const std::string content = GetEngine(env, self)->saveStatefileToString();
-      return env->NewStringUTF(content.c_str());
+      return reinterpret_cast<jlong>(new f3d::engine::state(GetEngine(env, self)->dump()));
     }
     catch (const std::exception& e)
     {
       env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
-      return nullptr;
+      return 0;
     }
   }
 
-  JNIEXPORT void JAVA_BIND(Engine, loadStatefileFromString)(
-    JNIEnv* env, jobject self, jstring content)
+  JNIEXPORT void JAVA_BIND(Engine, nativeLoad)(JNIEnv* env, jobject self, jlong stateAddress)
+  {
+    try
+    {
+      GetEngine(env, self)->load(*reinterpret_cast<f3d::engine::state*>(stateAddress));
+    }
+    catch (const std::exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+    }
+  }
+
+  JNIEXPORT jlong JAVA_BIND(Engine_00024State, nativeFromString)(
+    JNIEnv* env, jclass, jstring content)
   {
     const char* str = env->GetStringUTFChars(content, nullptr);
     try
     {
-      GetEngine(env, self)->loadStatefileFromString(str);
+      jlong ptr =
+        reinterpret_cast<jlong>(new f3d::engine::state(f3d::engine::state::fromString(str)));
+      env->ReleaseStringUTFChars(content, str);
+      return ptr;
     }
     catch (const std::exception& e)
     {
       env->ReleaseStringUTFChars(content, str);
       env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+      return 0;
+    }
+  }
+
+  JNIEXPORT jlong JAVA_BIND(Engine_00024State, nativeFromFile)(JNIEnv* env, jclass, jstring path)
+  {
+    const char* str = env->GetStringUTFChars(path, nullptr);
+    try
+    {
+      jlong ptr = reinterpret_cast<jlong>(
+        new f3d::engine::state(f3d::engine::state::fromFile(fs::path(str))));
+      env->ReleaseStringUTFChars(path, str);
+      return ptr;
+    }
+    catch (const std::exception& e)
+    {
+      env->ReleaseStringUTFChars(path, str);
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+      return 0;
+    }
+  }
+
+  JNIEXPORT jlong JAVA_BIND(Engine_00024State, nativePasteClipboard)(JNIEnv* env, jclass)
+  {
+    try
+    {
+      return reinterpret_cast<jlong>(
+        new f3d::engine::state(f3d::engine::state::pasteClipboard()));
+    }
+    catch (const std::exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+      return 0;
+    }
+  }
+
+  JNIEXPORT jstring JAVA_BIND(Engine_00024State, toString)(JNIEnv* env, jobject self)
+  {
+    return env->NewStringUTF(GetState(env, self)->toString().c_str());
+  }
+
+  JNIEXPORT void JAVA_BIND(Engine_00024State, toFile)(JNIEnv* env, jobject self, jstring path)
+  {
+    const char* str = env->GetStringUTFChars(path, nullptr);
+    try
+    {
+      GetState(env, self)->toFile(fs::path(str));
+    }
+    catch (const std::exception& e)
+    {
+      env->ReleaseStringUTFChars(path, str);
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
       return;
     }
-    env->ReleaseStringUTFChars(content, str);
+    env->ReleaseStringUTFChars(path, str);
+  }
+
+  JNIEXPORT void JAVA_BIND(Engine_00024State, copyClipboard)(JNIEnv* env, jobject self)
+  {
+    try
+    {
+      GetState(env, self)->copyClipboard();
+    }
+    catch (const std::exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+    }
+  }
+
+  JNIEXPORT void JAVA_BIND(Engine_00024State, nativeDestroy)(JNIEnv*, jclass, jlong ptr)
+  {
+    delete reinterpret_cast<f3d::engine::state*>(ptr);
   }
 
   JNIEXPORT void JAVA_BIND(Engine, setOptions)(JNIEnv* env, jobject self, jobject options)

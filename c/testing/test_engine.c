@@ -106,28 +106,43 @@ int test_engine()
     return 1;
   }
 
+  // Capture the engine state once, used for both the string and file round trips
+  f3d_engine_state_t* dumped = f3d_engine_dump(engine);
+  if (!dumped)
+  {
+    puts("[ERROR] dump() should return a valid state");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
   // String based round trip
-  const char* state = f3d_engine_save_statefile_to_string(engine);
+  const char* state = f3d_engine_state_to_string(dumped);
   if (!state)
   {
-    puts("[ERROR] save_statefile_to_string() should return a valid string");
+    puts("[ERROR] state_to_string() should return a valid string");
+    f3d_engine_state_delete(dumped);
     f3d_engine_delete(engine);
     return 1;
   }
-  f3d_engine_t* engine_str = f3d_engine_create(1);
-  if (!f3d_engine_load_statefile_from_string(engine_str, state))
-  {
-    puts("[ERROR] load_statefile_from_string() should succeed");
-    f3d_engine_free_string(state);
-    f3d_engine_delete(engine_str);
-    f3d_engine_delete(engine);
-    return 1;
-  }
+  f3d_engine_state_t* state_from_str = f3d_engine_state_create_from_string(state);
   f3d_engine_free_string(state);
+  f3d_engine_t* engine_str = f3d_engine_create(1);
+  if (!state_from_str || !f3d_engine_load(engine_str, state_from_str))
+  {
+    puts("[ERROR] load() from a string based state should succeed");
+    f3d_engine_state_delete(state_from_str);
+    f3d_engine_state_delete(dumped);
+    f3d_engine_delete(engine_str);
+    f3d_engine_state_delete(dumped);
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  f3d_engine_state_delete(state_from_str);
   if (!f3d_options_get_as_bool(f3d_engine_get_options(engine_str), "ui.scalar_bar"))
   {
     puts("[ERROR] options should be restored from the statefile string");
     f3d_engine_delete(engine_str);
+    f3d_engine_state_delete(dumped);
     f3d_engine_delete(engine);
     return 1;
   }
@@ -138,6 +153,7 @@ int test_engine()
     puts("[ERROR] scene should be restored from the statefile string");
     f3d_scene_free_added_files(str_files, str_count);
     f3d_engine_delete(engine_str);
+    f3d_engine_state_delete(dumped);
     f3d_engine_delete(engine);
     return 1;
   }
@@ -146,20 +162,25 @@ int test_engine()
 
   // File based round trip
   const char* statefile_path = F3D_TESTING_TEMP_DIR "test_engine_c_api_statefile.json";
-  if (!f3d_engine_save_statefile(engine, statefile_path))
+  if (!f3d_engine_state_to_file(dumped, statefile_path))
   {
-    puts("[ERROR] save_statefile() should succeed");
+    puts("[ERROR] state_to_file() should succeed");
+    f3d_engine_state_delete(dumped);
     f3d_engine_delete(engine);
     return 1;
   }
+  f3d_engine_state_delete(dumped);
+  f3d_engine_state_t* state_from_file = f3d_engine_state_create_from_file(statefile_path);
   f3d_engine_t* engine_file = f3d_engine_create(1);
-  if (!f3d_engine_load_statefile(engine_file, statefile_path))
+  if (!state_from_file || !f3d_engine_load(engine_file, state_from_file))
   {
-    puts("[ERROR] load_statefile() should succeed");
+    puts("[ERROR] load() from a file based state should succeed");
+    f3d_engine_state_delete(state_from_file);
     f3d_engine_delete(engine_file);
     f3d_engine_delete(engine);
     return 1;
   }
+  f3d_engine_state_delete(state_from_file);
   unsigned int file_count = 0;
   char** file_files = f3d_scene_get_added_files(f3d_engine_get_scene(engine_file), &file_count);
   if (file_count != 1 || !file_files || !strstr(file_files[0], "cow.vtp"))
@@ -173,16 +194,21 @@ int test_engine()
   f3d_scene_free_added_files(file_files, file_count);
   f3d_engine_delete(engine_file);
 
-  // Loading an invalid statefile should fail gracefully
-  if (f3d_engine_load_statefile(engine, "/does/not/exist/state.json"))
+  // Reading an invalid statefile should fail gracefully by returning a NULL state
+  f3d_engine_state_t* state_missing =
+    f3d_engine_state_create_from_file("/does/not/exist/state.json");
+  if (state_missing)
   {
-    puts("[ERROR] load_statefile() should fail on a missing file");
+    puts("[ERROR] state_create_from_file() should fail on a missing file");
+    f3d_engine_state_delete(state_missing);
     f3d_engine_delete(engine);
     return 1;
   }
-  if (f3d_engine_load_statefile_from_string(engine, "{ not valid json"))
+  f3d_engine_state_t* state_invalid = f3d_engine_state_create_from_string("{ not valid json");
+  if (state_invalid)
   {
-    puts("[ERROR] load_statefile_from_string() should fail on invalid content");
+    puts("[ERROR] state_create_from_string() should fail on invalid content");
+    f3d_engine_state_delete(state_invalid);
     f3d_engine_delete(engine);
     return 1;
   }

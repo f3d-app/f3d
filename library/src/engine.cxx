@@ -22,36 +22,29 @@
 
 #include <nlohmann/json.hpp>
 
+#if F3D_MODULE_CLIP
+#include "clip/clip.h"
+#endif
+
 #include <fstream>
+#include <istream>
+#include <iterator>
+#include <ostream>
 
 namespace fs = std::filesystem;
 
 namespace
 {
 //----------------------------------------------------------------------------
-nlohmann::ordered_json CaptureState(f3d::engine& eng, const fs::path& baseDir)
+nlohmann::ordered_json CaptureState(f3d::engine& eng)
 {
   nlohmann::ordered_json root;
 
-  // Store the added files, relative to the statefile directory (baseDir) when the file actually
-  // lives under it, so that the statefile stays portable if moved alongside its files. Files
-  // outside baseDir (the relative path would escape it with "..") are stored as absolute paths:
-  // such a relative path is not portable anyway and would break when loaded without a baseDir
-  // (e.g. from the standard input or the clipboard). baseDir is empty when serializing to a
-  // string, in which case absolute paths are always used.
+  // Store the added files as absolute paths, the canonical form of a state (see RelativizeFiles).
   nlohmann::ordered_json files = nlohmann::ordered_json::array();
   for (const fs::path& file : eng.getScene().getAddedFiles())
   {
-    fs::path stored = fs::absolute(file);
-    if (!baseDir.empty())
-    {
-      const fs::path rel = fs::relative(fs::absolute(file), fs::absolute(baseDir));
-      if (!rel.empty() && *rel.begin() != "..")
-      {
-        stored = rel;
-      }
-    }
-    files.push_back(stored.generic_string());
+    files.push_back(fs::absolute(file).generic_string());
   }
   if (files.empty())
   {
@@ -87,7 +80,7 @@ nlohmann::ordered_json CaptureState(f3d::engine& eng, const fs::path& baseDir)
 }
 
 //----------------------------------------------------------------------------
-void RestoreState(f3d::engine& eng, const nlohmann::ordered_json& root, const fs::path& baseDir)
+void RestoreState(f3d::engine& eng, const nlohmann::ordered_json& root)
 {
   // Clear the scene first so that the statefile fully replaces the current state
   f3d::scene& sce = eng.getScene();
@@ -118,19 +111,13 @@ void RestoreState(f3d::engine& eng, const nlohmann::ordered_json& root, const fs
     f3d::log::warn("No options found in statefile");
   }
 
-  // Add the saved files, resolving relative paths against the statefile directory (baseDir),
-  // mirroring how CaptureState stored them
+  // Add the saved files as is: a state always holds absolute paths.
   if (root.contains("files"))
   {
     std::vector<fs::path> files;
     for (const auto& file : root.at("files"))
     {
-      fs::path path = file.get<std::string>();
-      if (path.is_relative() && !baseDir.empty())
-      {
-        path = (baseDir / path).lexically_normal();
-      }
-      files.emplace_back(path);
+      files.emplace_back(file.get<std::string>());
     }
     if (!files.empty())
     {
@@ -158,6 +145,45 @@ void RestoreState(f3d::engine& eng, const nlohmann::ordered_json& root, const fs
     catch (const f3d::engine::no_window_exception&)
     {
       f3d::log::info("No window available, skipping camera state from statefile");
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+// Make the stored file paths relative to baseDir when contained by it, so a statefile stays
+// portable alongside its files. Paths outside baseDir are kept absolute.
+void RelativizeFiles(nlohmann::ordered_json& root, const fs::path& baseDir)
+{
+  if (!root.contains("files"))
+  {
+    return;
+  }
+  for (auto& file : root.at("files"))
+  {
+    const fs::path abs = fs::absolute(file.get<std::string>());
+    const fs::path rel = fs::relative(abs, fs::absolute(baseDir));
+    if (!rel.empty() && *rel.begin() != "..")
+    {
+      file = rel.generic_string();
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+// Resolve relative file paths against baseDir so the state holds absolute paths, undoing
+// RelativizeFiles.
+void ResolveFiles(nlohmann::ordered_json& root, const fs::path& baseDir)
+{
+  if (!root.contains("files"))
+  {
+    return;
+  }
+  for (auto& file : root.at("files"))
+  {
+    const fs::path path = file.get<std::string>();
+    if (path.is_relative())
+    {
+      file = (baseDir / path).lexically_normal().generic_string();
     }
   }
 }
@@ -417,80 +443,139 @@ interactor& engine::getInteractor()
 }
 
 //----------------------------------------------------------------------------
-engine& engine::saveStatefile(const fs::path& statefilePath)
+engine::state engine::dump()
+{
+  engine::state st;
+  st.Content = ::CaptureState(*this).dump(2);
+  return st;
+}
+
+//----------------------------------------------------------------------------
+engine& engine::load(const engine::state& st)
 {
   try
   {
-    std::ofstream stream(statefilePath);
-    if (!stream.is_open())
-    {
-      throw engine::statefile_exception(
-        "Could not open statefile for writing: " + statefilePath.string());
-    }
-    stream << ::CaptureState(*this, statefilePath.parent_path()).dump(2) << '\n';
+    ::RestoreState(*this, nlohmann::ordered_json::parse(st.Content));
   }
-  catch (const fs::filesystem_error& ex)
+  catch (const nlohmann::json::exception& ex)
   {
-    throw engine::statefile_exception(
-      "Could not save statefile " + statefilePath.string() + ": " + ex.what());
+    throw engine::statefile_exception(std::string("Could not parse state content: ") + ex.what());
   }
   return *this;
 }
 
 //----------------------------------------------------------------------------
-engine& engine::loadStatefile(const fs::path& statefilePath)
+engine::state engine::state::fromString(const std::string& content)
 {
+  engine::state st;
   try
   {
-    std::ifstream stream(statefilePath);
+    st.Content = nlohmann::ordered_json::parse(content).dump(2);
+  }
+  catch (const nlohmann::json::exception& ex)
+  {
+    throw engine::statefile_exception(std::string("Could not parse state content: ") + ex.what());
+  }
+  return st;
+}
+
+//----------------------------------------------------------------------------
+engine::state engine::state::fromFile(const fs::path& filePath)
+{
+  engine::state st;
+  try
+  {
+    std::ifstream stream(filePath);
     if (!stream.is_open())
     {
       throw engine::statefile_exception(
-        "Could not open statefile for reading: " + statefilePath.string());
+        "Could not open statefile for reading: " + filePath.string());
     }
     nlohmann::ordered_json root = nlohmann::ordered_json::parse(stream);
-    // parent_path is purely lexical and does not touch the filesystem, so it cannot throw a
-    // filesystem_error: no filesystem exception handling is needed here
-    ::RestoreState(*this, root, statefilePath.parent_path());
+    // parent_path is lexical and cannot throw a filesystem_error here
+    ::ResolveFiles(root, filePath.parent_path());
+    st.Content = root.dump(2);
   }
   catch (const nlohmann::json::exception& ex)
   {
     throw engine::statefile_exception(
-      "Could not parse statefile " + statefilePath.string() + ": " + ex.what());
+      "Could not parse statefile " + filePath.string() + ": " + ex.what());
   }
-  return *this;
+  return st;
 }
 
 //----------------------------------------------------------------------------
-std::string engine::saveStatefileToString()
+engine::state engine::state::pasteClipboard()
+{
+#if F3D_MODULE_CLIP
+  std::string content;
+  if (!clip::get_text(content))
+  {
+    throw engine::statefile_exception("Could not read a state from the clipboard");
+  }
+  return engine::state::fromString(content);
+#else
+  throw engine::statefile_exception(
+    "Clipboard support is not available in this build, cannot read a state from the clipboard");
+#endif
+}
+
+//----------------------------------------------------------------------------
+std::string engine::state::toString() const
+{
+  return this->Content;
+}
+
+//----------------------------------------------------------------------------
+void engine::state::toFile(const fs::path& filePath) const
 {
   try
   {
-    return ::CaptureState(*this, {}).dump(2);
+    std::ofstream stream(filePath);
+    if (!stream.is_open())
+    {
+      throw engine::statefile_exception(
+        "Could not open statefile for writing: " + filePath.string());
+    }
+    nlohmann::ordered_json root = nlohmann::ordered_json::parse(this->Content);
+    ::RelativizeFiles(root, filePath.parent_path());
+    stream << root.dump(2) << '\n';
   }
   catch (const fs::filesystem_error& ex)
   {
-    // Unreachable with testing: with an empty baseDir, CaptureState only calls fs::absolute (no
-    // fs::relative), which does not throw in practice
     throw engine::statefile_exception(
-      std::string("Could not save statefile to string: ") + ex.what());
+      "Could not save statefile " + filePath.string() + ": " + ex.what());
   }
 }
 
 //----------------------------------------------------------------------------
-engine& engine::loadStatefileFromString(const std::string& statefileContent)
+void engine::state::copyClipboard() const
 {
-  try
+#if F3D_MODULE_CLIP
+  if (!clip::set_text(this->Content))
   {
-    nlohmann::ordered_json root = nlohmann::ordered_json::parse(statefileContent);
-    ::RestoreState(*this, root, {});
+    throw engine::statefile_exception("Could not copy the state to the clipboard");
   }
-  catch (const nlohmann::json::exception& ex)
-  {
-    throw engine::statefile_exception(
-      std::string("Could not parse statefile content: ") + ex.what());
-  }
-  return *this;
+#else
+  throw engine::statefile_exception(
+    "Clipboard support is not available in this build, cannot copy the state to the clipboard");
+#endif
+}
+
+//----------------------------------------------------------------------------
+std::ostream& operator<<(std::ostream& stream, const engine::state& st)
+{
+  stream << st.Content;
+  return stream;
+}
+
+//----------------------------------------------------------------------------
+std::istream& operator>>(std::istream& stream, engine::state& st)
+{
+  const std::string content{ std::istreambuf_iterator<char>(stream),
+    std::istreambuf_iterator<char>() };
+  st = engine::state::fromString(content);
+  return stream;
 }
 
 //----------------------------------------------------------------------------

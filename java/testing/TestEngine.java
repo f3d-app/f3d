@@ -69,9 +69,13 @@ public class TestEngine {
     src.getScene().add(cow);
 
     // File based round trip
-    src.saveStatefile(statefile);
+    try (Engine.State state = src.dump()) {
+      state.toFile(statefile);
+    }
     Engine dst = Engine.createNone();
-    dst.loadStatefile(statefile);
+    try (Engine.State state = Engine.State.fromFile(statefile)) {
+      dst.load(state);
+    }
     if (!dst.getOptions().getAsBool("ui.scalar_bar")) {
       throw new RuntimeException("options should be restored from the statefile");
     }
@@ -81,9 +85,14 @@ public class TestEngine {
     dst.close();
 
     // String based round trip
-    String content = src.saveStatefileToString();
+    String content;
+    try (Engine.State state = src.dump()) {
+      content = state.toString();
+    }
     Engine dstStr = Engine.createNone();
-    dstStr.loadStatefileFromString(content);
+    try (Engine.State state = Engine.State.fromString(content)) {
+      dstStr.load(state);
+    }
     if (!dstStr.getOptions().getAsBool("ui.scalar_bar")) {
       throw new RuntimeException("options should be restored from the statefile string");
     }
@@ -92,17 +101,15 @@ public class TestEngine {
     }
     dstStr.close();
 
-    // Loading an invalid statefile should throw
-    Engine invalid = Engine.createNone();
+    // Reading an invalid statefile should throw
     boolean threw = false;
     try {
-      invalid.loadStatefile("/does/not/exist/state.json");
+      Engine.State.fromFile("/does/not/exist/state.json");
     } catch (RuntimeException e) {
       threw = true;
     }
-    invalid.close();
     if (!threw) {
-      throw new RuntimeException("load_statefile should throw on a missing file");
+      throw new RuntimeException("State.fromFile should throw on a missing file");
     }
 
     src.close();

@@ -33,10 +33,6 @@
 #include "tinyfiledialogs.h"
 #endif
 
-#if F3D_MODULE_CLIP
-#include "clip/clip.h"
-#endif
-
 #include "engine.h"
 #include "interactor.h"
 #include "log.h"
@@ -299,21 +295,17 @@ public:
     std::vector<std::string>& outFiles,
     std::optional<F3DStarter::StatefileFileGroups>& outFileGroups)
   {
-#if F3D_MODULE_CLIP
-    std::string content;
-    if (!clip::get_text(content))
+    try
     {
-      // Unreachable with testing
-      f3d::log::error("Could not read a statefile from the clipboard");
+      // Read the clipboard through libf3d, which owns clipboard support
+      std::istringstream stream(f3d::engine::state::pasteClipboard().toString());
+      return F3DInternals::ParseStatefileContent(stream, {}, outOptions, outFiles, outFileGroups);
+    }
+    catch (const f3d::engine::statefile_exception& ex)
+    {
+      f3d::log::error(ex.what());
       return false;
     }
-    std::istringstream stream(content);
-    return F3DInternals::ParseStatefileContent(stream, {}, outOptions, outFiles, outFileGroups);
-#else
-    f3d::log::error("Clipboard support is not available in this build, "
-                    "cannot load a statefile from the clipboard");
-    return false;
-#endif
   }
 
   /* Add the app-specific `file_groups` entry (all file groups, including the ones not currently
@@ -2211,7 +2203,7 @@ void F3DStarter::SaveStatefile(const std::string& filenameTemplate)
   {
     // Write the statefile to the standard output, with absolute file group paths
     std::cout << this->Internals->AugmentStatefileContent(
-                   this->Internals->Engine->saveStatefileToString(), {})
+                   this->Internals->Engine->dump().toString(), {})
               << "\n";
     return;
   }
@@ -2225,7 +2217,7 @@ void F3DStarter::SaveStatefile(const std::string& filenameTemplate)
     {
       fs::create_directories(statefilePath.parent_path());
     }
-    this->Internals->Engine->saveStatefile(statefilePath);
+    this->Internals->Engine->dump().toFile(statefilePath);
 
     // Read the libf3d statefile back to add the app file groups (including the ones not currently
     // loaded), storing their paths relative to the statefile like libf3d does
@@ -2252,22 +2244,18 @@ void F3DStarter::SaveStatefile(const std::string& filenameTemplate)
 //----------------------------------------------------------------------------
 void F3DStarter::SaveStatefileToClipboard()
 {
-#if F3D_MODULE_CLIP
-  // Absolute file group paths since the clipboard content has no associated directory
-  if (clip::set_text(this->Internals->AugmentStatefileContent(
-        this->Internals->Engine->saveStatefileToString(), {})))
+  try
   {
+    // Absolute file group paths since the clipboard has no associated directory
+    const f3d::engine::state state = f3d::engine::state::fromString(
+      this->Internals->AugmentStatefileContent(this->Internals->Engine->dump().toString(), {}));
+    state.copyClipboard();
     f3d::log::info("Statefile copied to the clipboard");
   }
-  else
+  catch (const f3d::engine::statefile_exception& ex)
   {
-    // Unreachable with testing
-    f3d::log::error("Could not copy statefile to the clipboard");
+    f3d::log::error(ex.what());
   }
-#else
-  f3d::log::error("Clipboard support is not available in this build, "
-                  "cannot save the statefile to the clipboard");
-#endif
 }
 
 //----------------------------------------------------------------------------

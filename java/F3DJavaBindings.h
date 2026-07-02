@@ -23,6 +23,16 @@ inline f3d::engine* GetEngine(JNIEnv* env, jobject self)
   return reinterpret_cast<f3d::engine*>(ptr);
 }
 
+// Helper function to get the f3d::engine::state pointer from a Java object
+inline f3d::engine::state* GetState(JNIEnv* env, jobject self)
+{
+  jclass cls = env->GetObjectClass(self);
+  jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
+  jlong ptr = env->GetLongField(self, fid);
+
+  return reinterpret_cast<f3d::engine::state*>(ptr);
+}
+
 // Helper function to convert std::vector<std::string> to Java List
 inline jobject CreateStringList(JNIEnv* env, const std::vector<std::string>& vec)
 {

@@ -21,11 +21,11 @@ int TestSDKStatefileCamera([[maybe_unused]] int argc, [[maybe_unused]] char* arg
 
   // Compare against the state as the camera actually holds it (the view up is reorthogonalized)
   const f3d::camera_state_t saved = src.getWindow().getCamera().getState();
-  src.saveStatefile(statefilePath);
+  src.dump().toFile(statefilePath);
 
   // Restore into another windowed engine and check the camera is restored
   f3d::engine dst = f3d::engine::create(true);
-  dst.loadStatefile(statefilePath);
+  dst.load(f3d::engine::state::fromFile(statefilePath));
   const f3d::camera_state_t restored = dst.getWindow().getCamera().getState();
   test("restored camera position", restored.position, approx(saved.position));
   test("restored camera focal point", restored.focalPoint, approx(saved.focalPoint));
