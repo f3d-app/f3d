@@ -26,7 +26,7 @@ context::function context::getSymbol(std::string_view lib, std::string_view func
   // on Windows vtksys::DynamicLoader::OpenLibrary behaves differently (it expects a full path)
   vtksys::DynamicLoader::LibraryHandle handle = LoadLibraryA(lib.data());
 #else
-  vtksys::DynamicLoader::LibraryHandle handle = dlopen(lib.data(), RTLD_NOW | RTLD_LOCAL);
+  vtksys::DynamicLoader::LibraryHandle handle = vtksys::DynamicLoader::OpenLibrary(lib.data());
 #endif
 
   if (!handle)

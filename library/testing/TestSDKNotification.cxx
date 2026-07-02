@@ -17,7 +17,7 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   std::string dataPath = std::string(argv[1]) + "data/cow.vtp";
   std::string baselinePath = std::string(argv[1]) + "baselines/";
   std::string outputPath = std::string(argv[2]);
-  std::string renderingBackend = std::string(argv[3]);
+  std::string renderingBackend = std::string(argv[4]);
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
 
