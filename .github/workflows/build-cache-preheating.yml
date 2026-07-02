@@ -25,6 +25,7 @@ jobs:
         with:
           owner: f3d-app
           repo: f3d
+          ref: master
           github_token: ${{ secrets.F3D_CACHE_CI_DISPATCH }}
           workflow_file_name: cache-preheating.yml
           wait_interval: 60
