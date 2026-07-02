@@ -41,6 +41,7 @@ int TestSDKExternalWindowEGL([[maybe_unused]] int argc, [[maybe_unused]] char* a
   std::cout << "eglGetProcAddress: " << (void*)eglGetProcAddress << '\n';
   std::cout << "egl(): " << (void*)f3d::context::egl()("eglGetProcAddress") << '\n';
   std::cout << "glGetString: " << (void*)eglGetProcAddress("glGetString") << '\n';
+  std::cout << "glGetString 2: " << (void*)f3d::context::egl()("glGetString") << '\n';
 
   f3d::engine eng = f3d::engine::createExternalEGL();
   eng.getWindow().setSize(size[0], size[1]);

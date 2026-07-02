@@ -166,7 +166,7 @@ list(APPEND libf3dSDKTestsNoRender_list
 # Add all the ADD_TEST for each test
 foreach (test ${libf3dSDKTests_list})
   get_filename_component (TName ${test} NAME_WE)
-  add_test (NAME libf3d::${TName} COMMAND libf3dSDKTests ${TName}  "${F3D_SOURCE_DIR}/testing/" "${CMAKE_BINARY_DIR}/Testing/Temporary/" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+  add_test (NAME libf3d::${TName} COMMAND libf3dSDKTests ${TName} "${F3D_SOURCE_DIR}/testing/" "${CMAKE_BINARY_DIR}/Testing/Temporary/" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" "${F3D_TESTING_FORCE_RENDERING_BACKEND}")
   set_tests_properties(libf3d::${TName} PROPERTIES
     LABELS "libf3d"
     TIMEOUT 60
