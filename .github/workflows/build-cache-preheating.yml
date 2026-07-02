@@ -28,7 +28,7 @@ jobs:
           github_token: ${{ secrets.F3D_CACHE_CI_DISPATCH }}
           workflow_file_name: cache-preheating.yml
           wait_interval: 60
-          client_payload: '{"repo": "${{github.event.pull_request.head.repo.full_name}}, "branch": "${{github.event.pull_request.head.ref}}"}'
+          client_payload: '{"repo": "${{github.event.pull_request.head.repo.full_name}}"}'
           propagate_failure: true
           trigger_workflow: true
           wait_workflow: true
