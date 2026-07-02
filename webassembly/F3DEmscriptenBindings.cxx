@@ -145,8 +145,8 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function(
       "isOptional",
       +[](f3d::options& o, const std::string& name) -> bool { return o.isOptional(name); })
-    .function("getType",
-      +[](f3d::options& o, const std::string& name) -> f3d::options::option_type
+    .function(
+      "getType", +[](f3d::options& o, const std::string& name) -> f3d::options::option_type
       { return o.getType(name); })
     .function(
       "reset", +[](f3d::options& o, const std::string& name) -> f3d::options&

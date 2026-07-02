@@ -383,7 +383,8 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     opt6.getType("scene.animation.speed_factor") == f3d::options::option_type::RATIO);
   test("getType string", opt6.getType("interactor.style") == f3d::options::option_type::STRING);
   test("getType path", opt6.getType("render.hdri.file") == f3d::options::option_type::PATH);
-  test("getType color", opt6.getType("render.background.color") == f3d::options::option_type::COLOR);
+  test(
+    "getType color", opt6.getType("render.background.color") == f3d::options::option_type::COLOR);
   test("getType direction",
     opt6.getType("scene.up_direction") == f3d::options::option_type::DIRECTION);
 
