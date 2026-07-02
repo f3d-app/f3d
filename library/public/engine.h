@@ -267,33 +267,33 @@ public:
      * Build a state from a JSON string previously produced by state::toString.
      * Throws a engine::statefile_exception if the content cannot be parsed.
      */
-    [[nodiscard]] static state fromString(const std::string& content);
+    [[nodiscard]] static F3D_EXPORT state fromString(const std::string& content);
 
     /**
      * Build a state from a JSON statefile previously written by state::toFile.
      * File paths stored relatively are resolved against the directory of the file.
      * Throws a engine::statefile_exception if the file cannot be read or parsed.
      */
-    [[nodiscard]] static state fromFile(const std::filesystem::path& filePath);
+    [[nodiscard]] static F3D_EXPORT state fromFile(const std::filesystem::path& filePath);
 
     /**
      * Build a state from the JSON content currently held by the system clipboard.
      * Throws a engine::statefile_exception if the clipboard has no readable text, its content
      * cannot be parsed, or clipboard support is not available in this build.
      */
-    [[nodiscard]] static state pasteClipboard();
+    [[nodiscard]] static F3D_EXPORT state pasteClipboard();
 
     /**
      * Return the state as a JSON string, with file paths stored as absolute paths.
      */
-    [[nodiscard]] std::string toString() const;
+    [[nodiscard]] F3D_EXPORT std::string toString() const;
 
     /**
      * Write the state as a JSON statefile at the provided path. File paths contained by the
      * directory of the file are stored relatively, as absolute paths otherwise.
      * Throws a engine::statefile_exception if the file cannot be written.
      */
-    void toFile(const std::filesystem::path& filePath) const;
+    F3D_EXPORT void toFile(const std::filesystem::path& filePath) const;
 
     /**
      * Copy the state into the system clipboard as a JSON string, with file paths stored as absolute
@@ -301,7 +301,7 @@ public:
      * Throws a engine::statefile_exception if the clipboard cannot be written or clipboard support
      * is not available in this build.
      */
-    void copyClipboard() const;
+    F3D_EXPORT void copyClipboard() const;
 
   private:
     friend class engine;
