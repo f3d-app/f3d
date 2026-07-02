@@ -4,6 +4,10 @@
 #include "context_cocoa.h"
 #endif
 
+#if !defined(_WIN32)
+#include <dlfcn.h>
+#endif
+
 #include <vtkRenderingOpenGLConfigure.h>
 #include <vtkVersion.h>
 
@@ -22,7 +26,7 @@ context::function context::getSymbol(std::string_view lib, std::string_view func
   // on Windows vtksys::DynamicLoader::OpenLibrary behaves differently (it expects a full path)
   vtksys::DynamicLoader::LibraryHandle handle = LoadLibraryA(lib.data());
 #else
-  vtksys::DynamicLoader::LibraryHandle handle = vtksys::DynamicLoader::OpenLibrary(lib.data());
+  vtksys::DynamicLoader::LibraryHandle handle = dlopen(lib.data(), RTLD_NOW | RTLD_LOCAL);
 #endif
 
   if (!handle)

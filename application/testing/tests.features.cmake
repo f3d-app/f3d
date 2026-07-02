@@ -320,7 +320,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
 endif()
 
 ## Skinning
-if(APPLE) # MacOS does not support OpenGL 4.3
+if(APPLE AND NOT F3D_TESTING_FORCE_RENDERING_BACKEND STREQUAL "osmesa") # MacOS driver does not support OpenGL 4.3
   f3d_test(NAME TestSkinningManyBonesFailure DATA tube_254bones.glb ARGS --verbose REGEXP "which requires OpenGL" NO_BASELINE)
 else()
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219) # The baseline changed with armature support
