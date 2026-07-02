@@ -9,7 +9,7 @@ int TestSDKExternalWindowEGL([[maybe_unused]] int argc, [[maybe_unused]] char* a
 {
   PseudoUnitTest test;
 
-  EGLDisplay eglDpy = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+  EGLDisplay eglDpy = eglGetDisplay(EGL_NO_DISPLAY);
 
   // ensure we have a display
   if (eglDpy == EGL_NO_DISPLAY)
