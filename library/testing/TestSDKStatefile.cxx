@@ -113,8 +113,8 @@ int TestSDKStatefile([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     [&]() { f3d::engine::state::fromFile(tmpDir / "no_such_file.json"); });
   test.expect<f3d::engine::statefile_exception>("read an invalid statefile file",
     [&]() { f3d::engine::state::fromFile(invalidStatefilePath); });
-  test.expect<f3d::engine::statefile_exception>(
-    "parse invalid statefile content", [&]() { f3d::engine::state::fromString("{ not valid json"); });
+  test.expect<f3d::engine::statefile_exception>("parse invalid statefile content",
+    [&]() { f3d::engine::state::fromString("{ not valid json"); });
 
   return test.result();
 }

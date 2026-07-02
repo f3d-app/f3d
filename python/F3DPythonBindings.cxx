@@ -928,10 +928,10 @@ PYBIND11_MODULE(pyf3d, module)
   py::class_<f3d::engine> engine(module, "Engine");
 
   py::class_<f3d::engine::state>(engine, "State")
-    .def_static("from_string", &f3d::engine::state::fromString,
-      "Build a state from a JSON string", py::arg("content"))
-    .def_static("from_file", &f3d::engine::state::fromFile,
-      "Build a state from a JSON statefile", py::arg("file_path"))
+    .def_static("from_string", &f3d::engine::state::fromString, "Build a state from a JSON string",
+      py::arg("content"))
+    .def_static("from_file", &f3d::engine::state::fromFile, "Build a state from a JSON statefile",
+      py::arg("file_path"))
     .def_static("paste_clipboard", &f3d::engine::state::pasteClipboard,
       "Build a state from the JSON content of the system clipboard")
     .def("to_string", &f3d::engine::state::toString, "Return the state as a JSON string")
