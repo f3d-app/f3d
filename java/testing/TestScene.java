@@ -108,10 +108,8 @@ public class TestScene {
 
     // Adding a nonexistent file must throw LoadFailureException instead of crashing the JVM.
     boolean caughtLoadFailure = false;
-    try {
-      Engine tmpEngine = Engine.createNone();
+    try (Engine tmpEngine = Engine.createNone()) {
       tmpEngine.getScene().add("/absolutely_nonexistent_file_f3d_test.xyz");
-      tmpEngine.close();
     } catch (Scene.LoadFailureException e) {
       caughtLoadFailure = true;
     }
