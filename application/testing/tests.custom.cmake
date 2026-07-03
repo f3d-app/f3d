@@ -31,3 +31,14 @@ if (APPLE)
   add_test(NAME f3d::TestAppleCmdMod COMMAND $<TARGET_FILE:f3d> --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestAppleCmdMod.png --reference=${F3D_SOURCE_DIR}/testing/baselines/TestAppleCmdMod.png --resolution=400,400)
   set_tests_properties(f3d::TestAppleCmdMod PROPERTIES ENVIRONMENT "CTEST_F3D_NO_DATA_FORCE_RENDER=1")
 endif ()
+
+# Test EGL/OSMesa load failure
+if (UNIX AND NOT APPLE)
+  add_test(NAME f3d::TestEGLLoadFailure COMMAND $<TARGET_FILE:f3d> --output=${CMAKE_BINARY_DIR}/Testing/Temporary/egl.png --rendering-backend=egl --verbose)
+  set_tests_properties(f3d::TestEGLLoadFailure PROPERTIES PASS_REGULAR_EXPRESSION "Cannot find EGL library")
+  set_tests_properties(f3d::TestEGLLoadFailure PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${F3D_SOURCE_DIR}/testing/data")
+
+  add_test(NAME f3d::TestOSMesaLoadFailure COMMAND $<TARGET_FILE:f3d> --output=${CMAKE_BINARY_DIR}/Testing/Temporary/osmesa.png --rendering-backend=osmesa --verbose)
+  set_tests_properties(f3d::TestOSMesaLoadFailure PROPERTIES PASS_REGULAR_EXPRESSION "Cannot find OSMesa library")
+  set_tests_properties(f3d::TestOSMesaLoadFailure PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${F3D_SOURCE_DIR}/testing/data")
+endif ()
