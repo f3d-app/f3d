@@ -4,10 +4,6 @@
 #include "context_cocoa.h"
 #endif
 
-#if !defined(_WIN32)
-#include <dlfcn.h>
-#endif
-
 #include <vtkRenderingOpenGLConfigure.h>
 #include <vtkVersion.h>
 
