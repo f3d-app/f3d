@@ -13,6 +13,26 @@ public class Options {
         mNativeAddress = nativeAddress;
     }
 
+    /** Thrown when the requested option name does not exist. */
+    public static class InexistentException extends F3DException {
+        public InexistentException(String message) { super(message); }
+    }
+
+    /** Thrown when an option's type is incompatible with the requested operation. */
+    public static class IncompatibleException extends F3DException {
+        public IncompatibleException(String message) { super(message); }
+    }
+
+    /** Thrown when a string representation cannot be parsed into the option's type. */
+    public static class ParsingException extends F3DException {
+        public ParsingException(String message) { super(message); }
+    }
+
+    /** Thrown when a get operation is called on an option with no value set. */
+    public static class NoValueException extends F3DException {
+        public NoValueException(String message) { super(message); }
+    }
+
     /**
      * Enumeration of supported domain style.
      */

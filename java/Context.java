@@ -2,6 +2,16 @@ package app.f3d.F3D;
 
 public class Context {
 
+    /** Thrown when a shared library required for a context cannot be loaded. */
+    public static class LoadingException extends F3DException {
+        public LoadingException(String message) { super(message); }
+    }
+
+    /** Thrown when a required symbol cannot be resolved from a shared library. */
+    public static class SymbolException extends F3DException {
+        public SymbolException(String message) { super(message); }
+    }
+
     // Used to load the 'f3d' library on application startup.
     static {
         System.loadLibrary("f3d-java");
