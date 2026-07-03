@@ -8,8 +8,7 @@
 #include <scene.h>
 #include <window.h>
 
-int TestSDKSceneFromMemoryZeroCopyExceptions(
-  [[maybe_unused]] int argc, char* argv[])
+int TestSDKSceneFromMemoryZeroCopyExceptions([[maybe_unused]] int argc, char* argv[])
 {
   PseudoUnitTest test;
 

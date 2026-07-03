@@ -8,7 +8,8 @@
 
 struct TestTriggerHelper
 {
-  TestTriggerHelper(std::string dataPath, std::string baselinePath, std::string outputPath, std::string renderingBackend)
+  TestTriggerHelper(std::string dataPath, std::string baselinePath, std::string outputPath,
+    std::string renderingBackend)
     : DataPath(std::move(dataPath))
     , BaselinePath(std::move(baselinePath))
     , OutputPath(std::move(outputPath))
@@ -52,8 +53,8 @@ int TestSDKTriggerInteractions([[maybe_unused]] int argc, char* argv[])
 {
   try
   {
-    TestTriggerHelper helper(
-      std::string(argv[1]) + "/data/cow.vtp", std::string(argv[1]) + "baselines/", argv[2], argv[4]);
+    TestTriggerHelper helper(std::string(argv[1]) + "/data/cow.vtp",
+      std::string(argv[1]) + "baselines/", argv[2], argv[4]);
 
     // Trigger mouse wheel backward and check if it zoomed out
     helper("TestSDKTriggerInteractionsWheelBackward", [](f3d::engine& engine) {
