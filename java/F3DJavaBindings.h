@@ -17,6 +17,25 @@
 
 namespace fs = std::filesystem;
 
+/**
+ * Throw a Java exception of the given class name with the given message.
+ * Call this from a catch block, then immediately return from the JNI function
+ * so that the pending Java exception is delivered to the caller.
+ *
+ * className uses JNI slash-notation, e.g.
+ *   "app/f3d/F3D/Engine$NoInteractorException"
+ *   "java/lang/RuntimeException"
+ */
+inline void F3DThrowJavaException(JNIEnv* env, const char* className, const char* msg)
+{
+  jclass cls = env->FindClass(className);
+  if (cls)
+  {
+    env->ThrowNew(cls, msg);
+    env->DeleteLocalRef(cls);
+  }
+}
+
 // Helper function to get the f3d::engine pointer from a Java object
 inline f3d::engine* GetEngine(JNIEnv* env, jobject self)
 {
