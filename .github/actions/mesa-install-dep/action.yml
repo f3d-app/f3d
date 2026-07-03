@@ -50,7 +50,7 @@ runs:
       uses: actions/cache/restore@v6
       with:
         path: dependencies/mesa_install
-        key: mesa-${{steps.mesa_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-4
+        key: mesa-${{steps.mesa_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-5
 
     - name: Setup MSVC (Windows)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
@@ -69,11 +69,7 @@ runs:
       uses: actions/setup-python@v6
       with:
         python-version: ${{steps.python_ver.outputs.extract}}
-
-    - name: Install Mesa Python dependencies
-      if: steps.cache-mesa.outputs.cache-hit != 'true'
-      shell: bash
-      run: python -m pip install meson mako packaging PyYAML
+        pip-install: meson mako packaging PyYAML
 
     - name: Install Flex/Bison (Windows)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
@@ -83,7 +79,7 @@ runs:
     - name: Install Flex/Bison (Linux)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Linux'
       shell: bash
-      run: apt-get install -y bison byacc flex pkg-config ninja-build libzstd-dev
+      run: apt-get install -y bison byacc flex pkg-config ninja-build python-dev libzstd-dev
 
     - name: Checkout mesa
       if: steps.cache-mesa.outputs.cache-hit != 'true'
