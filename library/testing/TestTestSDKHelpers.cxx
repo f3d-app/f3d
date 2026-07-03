@@ -13,7 +13,7 @@ int TestTestSDKHelpers([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   PseudoUnitTest test;
 
   // Coverage of CreateOffscreenEngine
-  for (auto backend : {"osmesa", "egl", "auto"})
+  for (auto backend : { "osmesa", "egl", "auto" })
   {
     try
     {
