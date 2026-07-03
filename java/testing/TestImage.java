@@ -50,5 +50,27 @@ public class TestImage {
     img1.delete();
     img2.delete();
     img3.delete();
+
+    // --- Exception handling tests ---
+
+    // Reading a nonexistent image file must throw ReadException instead of crashing the JVM.
+    boolean caughtRead = false;
+    try {
+      new Image("/absolutely_nonexistent_image_f3d_test.png");
+    } catch (Image.ReadException e) {
+      caughtRead = true;
+    }
+    assert caughtRead : "Expected Image.ReadException was not thrown";
+
+    // Getting nonexistent metadata must throw MetadataException.
+    boolean caughtMetadata = false;
+    try {
+      Image tmpImg = new Image(300, 200, 3);
+      tmpImg.getMetadata("key_that_does_not_exist");
+      tmpImg.delete();
+    } catch (Image.MetadataException e) {
+      caughtMetadata = true;
+    }
+    assert caughtMetadata : "Expected Image.MetadataException was not thrown";
   }
 }
