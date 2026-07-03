@@ -387,6 +387,14 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     "getType color", opt6.getType("render.background.color") == f3d::options::option_type::COLOR);
   test("getType direction",
     opt6.getType("scene.up_direction") == f3d::options::option_type::DIRECTION);
+  test("getType colormap",
+    opt6.getType("model.scivis.colormap") == f3d::options::option_type::COLORMAP);
+  test("getType transform2d",
+    opt6.getType("model.textures_transform") == f3d::options::option_type::TRANSFORM2D);
+  test("getType double_vector",
+    opt6.getType("model.scivis.opacity_map") == f3d::options::option_type::DOUBLE_VECTOR);
+  test("getType int_vector",
+    opt6.getType("scene.animation.indices") == f3d::options::option_type::INT_VECTOR);
 
   // Test getType non-existent option
   test.expect<f3d::options::inexistent_exception>(
