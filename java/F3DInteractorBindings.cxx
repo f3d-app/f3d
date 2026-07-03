@@ -168,7 +168,15 @@ extern "C"
       g_jvm->DetachCurrentThread();
     };
 
-    GetInteractor(env, self).addCommand(actionCpp, cppCallback);
+    try
+    {
+      GetInteractor(env, self).addCommand(actionCpp, cppCallback);
+    }
+    catch (const f3d::interactor::already_exists_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Interactor$AlreadyExistsException", e.what());
+      return nullptr;
+    }
     return self;
   }
 
@@ -198,9 +206,23 @@ extern "C"
     JNIEnv* env, jobject self, jstring command, jboolean keepComments)
   {
     const char* commandStr = env->GetStringUTFChars(command, nullptr);
-    bool result = GetInteractor(env, self).triggerCommand(commandStr, keepComments);
-    env->ReleaseStringUTFChars(command, commandStr);
-    return result;
+    try
+    {
+      bool result = GetInteractor(env, self).triggerCommand(commandStr, keepComments);
+      env->ReleaseStringUTFChars(command, commandStr);
+      return result;
+    }
+    catch (const f3d::interactor::command_runtime_exception& e)
+    {
+      env->ReleaseStringUTFChars(command, commandStr);
+      F3DThrowJavaException(env, "app/f3d/F3D/Interactor$CommandRuntimeException", e.what());
+    }
+    catch (const f3d::interactor::invalid_args_exception& e)
+    {
+      env->ReleaseStringUTFChars(command, commandStr);
+      F3DThrowJavaException(env, "app/f3d/F3D/Interactor$InvalidArgsException", e.what());
+    }
+    return false;
   }
 
   JNIEXPORT jobject JAVA_BIND(Interactor, initBindings)(JNIEnv* env, jobject self)
@@ -254,8 +276,16 @@ extern "C"
         break;
     }
 
-    GetInteractor(env, self).addBinding(
-      nativeBind, commandsVec, groupCpp, nullptr, nativeType, notify);
+    try
+    {
+      GetInteractor(env, self).addBinding(
+        nativeBind, commandsVec, groupCpp, nullptr, nativeType, notify);
+    }
+    catch (const f3d::interactor::already_exists_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Interactor$AlreadyExistsException", e.what());
+      return nullptr;
+    }
     return self;
   }
 
@@ -294,15 +324,31 @@ extern "C"
         break;
     }
 
-    GetInteractor(env, self).addBinding(
-      nativeBind, commandCpp, groupCpp, nullptr, nativeType, notify);
+    try
+    {
+      GetInteractor(env, self).addBinding(
+        nativeBind, commandCpp, groupCpp, nullptr, nativeType, notify);
+    }
+    catch (const f3d::interactor::already_exists_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Interactor$AlreadyExistsException", e.what());
+      return nullptr;
+    }
     return self;
   }
 
   JNIEXPORT jobject JAVA_BIND(Interactor, removeBinding)(JNIEnv* env, jobject self, jobject bind)
   {
     f3d::interaction_bind_t nativeBind = JavaBindToNative(env, bind);
-    GetInteractor(env, self).removeBinding(nativeBind);
+    try
+    {
+      GetInteractor(env, self).removeBinding(nativeBind);
+    }
+    catch (const f3d::interactor::does_not_exists_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Interactor$DoesNotExistException", e.what());
+      return nullptr;
+    }
     return self;
   }
 
