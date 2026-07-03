@@ -116,7 +116,8 @@ context::function context::egl()
 //----------------------------------------------------------------------------
 context::function context::osmesa()
 {
-#if (defined(__APPLE__) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260701)) || defined(__linux__) || defined(__FreeBSD__) || defined(_WIN32)
+#if (defined(__APPLE__) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260701)) ||             \
+  defined(__linux__) || defined(__FreeBSD__) || defined(_WIN32)
 #ifdef _WIN32
   for (const auto& lib : { "osmesa.dll" })
 #elif __APPLE__
