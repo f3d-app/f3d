@@ -1,4 +1,5 @@
 #include "PseudoUnitTest.h"
+#include "TestSDKHelpers.h"
 
 #include <engine.h>
 #include <interactor.h>
@@ -10,9 +11,10 @@ constexpr int nBindsCamera = 9;
 constexpr std::string_view initDoc = "Orthographic Projection";
 constexpr std::string_view initVal = "Unset";
 
-int TestSDKInteractorDocumentation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
+int TestSDKInteractorDocumentation([[maybe_unused]] int argc, char* argv[])
 {
-  f3d::engine eng = f3d::engine::create(true);
+  std::string renderingBackend = std::string(argv[4]);
+  f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::interactor& inter = eng.getInteractor();
 
   // Avoid testing something that changes often

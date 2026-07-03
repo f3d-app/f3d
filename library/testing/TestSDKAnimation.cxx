@@ -1,4 +1,5 @@
 #include "PseudoUnitTest.h"
+#include "TestSDKHelpers.h"
 
 #include <engine.h>
 #include <interactor.h>
@@ -6,10 +7,11 @@
 
 using namespace std::string_literals;
 
-int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
+int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
 {
   PseudoUnitTest test;
-  f3d::engine eng = f3d::engine::create(true);
+  std::string renderingBackend = std::string(argv[4]);
+  f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::scene& sce = eng.getScene();
   f3d::interactor& inter = eng.getInteractor();
 

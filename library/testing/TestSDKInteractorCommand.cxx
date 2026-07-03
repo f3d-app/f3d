@@ -1,4 +1,5 @@
 #include "PseudoUnitTest.h"
+#include "TestSDKHelpers.h"
 
 #include <camera.h>
 #include <engine.h>
@@ -6,9 +7,10 @@
 #include <options.h>
 #include <window.h>
 
-int TestSDKInteractorCommand([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
+int TestSDKInteractorCommand([[maybe_unused]] int argc, char* argv[])
 {
-  f3d::engine eng = f3d::engine::create(true);
+  std::string renderingBackend = std::string(argv[4]);
+  f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::options& options = eng.getOptions();
   f3d::interactor& inter = eng.getInteractor();
 

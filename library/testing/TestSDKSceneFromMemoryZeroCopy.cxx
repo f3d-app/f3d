@@ -310,12 +310,13 @@ private:
   const WavyGridMesh& Grid;
 };
 
-int TestSDKSceneFromMemoryZeroCopy([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
+int TestSDKSceneFromMemoryZeroCopy([[maybe_unused]] int argc, char* argv[])
 {
   PseudoUnitTest test;
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  f3d::engine eng = f3d::engine::create(true);
+  std::string renderingBackend = std::string(argv[4]);
+  f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::scene& sce = eng.getScene();
   f3d::interactor& inter = eng.getInteractor();
   f3d::window& win = eng.getWindow().setSize(500, 500);
