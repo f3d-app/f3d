@@ -11,6 +11,10 @@
 
 #define JAVA_BIND(Cls, Func) JNICALL Java_app_f3d_F3D_##Cls##_##Func
 
+// Same as JAVA_BIND but for a method of a nested class (00024 is the JNI encoding of the '$' scope
+// separator, e.g. Engine$State)
+#define JAVA_SCOPED_BIND(Cls, Nested, Func) JNICALL Java_app_f3d_F3D_##Cls##_00024##Nested##_##Func
+
 namespace fs = std::filesystem;
 
 // Helper function to get the f3d::engine pointer from a Java object
