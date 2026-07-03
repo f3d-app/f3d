@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       repo:
-        description: 'Repository to build caches from'
+        description: "Repository to build caches from"
         required: true
       branch:
-        description: 'Branch of repository to build caches from'
+        description: "Branch of repository to build caches from"
         required: true
 
 jobs:
@@ -35,8 +35,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref:  ${{ github.event.inputs.branch }}
-          repository:  ${{ github.event.inputs.repo }}
+          ref: ${{ github.event.inputs.branch }}
+          repository: ${{ github.event.inputs.repo }}
           path: "source"
           fetch-depth: 1
           lfs: false
@@ -60,8 +60,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref:  ${{ github.event.inputs.branch }}
-          repository:  ${{ github.event.inputs.repo }}
+          ref: ${{ github.event.inputs.branch }}
+          repository: ${{ github.event.inputs.repo }}
           path: "source"
           fetch-depth: 1
           lfs: false
@@ -108,8 +108,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref:  ${{ github.event.inputs.branch }}
-          repository:  ${{ github.event.inputs.repo }}
+          ref: ${{ github.event.inputs.branch }}
+          repository: ${{ github.event.inputs.repo }}
           path: "source"
           fetch-depth: 1
           lfs: false
