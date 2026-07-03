@@ -54,5 +54,5 @@ The `ui.animation_progress` option (CLI `--animation-progress`) was a boolean to
 
 ## Context symbol
 
-The function `f3d::context::getSymbol` function is expecting a library full path or a filename.
+The function `f3d::context::getSymbol` function is now expecting a library full path or a filename.
 The library prefix and extension is not appended automatically anymore.

@@ -32,7 +32,7 @@ if (APPLE)
   set_tests_properties(f3d::TestAppleCmdMod PROPERTIES ENVIRONMENT "CTEST_F3D_NO_DATA_FORCE_RENDER=1")
 endif ()
 
-# Test EGL/OSMesa load failure
+# Test EGL/OSMesa load failure by loading fake libraries like libEGL.so located in ${F3D_SOURCE_DIR}/testing/data
 if (UNIX AND NOT APPLE)
   add_test(NAME f3d::TestEGLLoadFailure COMMAND $<TARGET_FILE:f3d> --output=${CMAKE_BINARY_DIR}/Testing/Temporary/egl.png --rendering-backend=egl --verbose)
   set_tests_properties(f3d::TestEGLLoadFailure PROPERTIES PASS_REGULAR_EXPRESSION "Cannot find EGL library")
