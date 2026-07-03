@@ -58,10 +58,8 @@ public class TestEngine {
     // Engine.createNone() has no interactor; calling getInteractor() must throw
     // NoInteractorException and must NOT crash the JVM.
     boolean caughtNoInteractor = false;
-    try {
-      Engine noWinEngine = Engine.createNone();
+    try (Engine noWinEngine = Engine.createNone()) {
       noWinEngine.getInteractor();
-      noWinEngine.close();
     } catch (Engine.NoInteractorException e) {
       caughtNoInteractor = true;
     }

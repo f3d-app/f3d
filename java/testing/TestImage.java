@@ -64,12 +64,13 @@ public class TestImage {
 
     // Getting nonexistent metadata must throw MetadataException.
     boolean caughtMetadata = false;
+    Image tmpImg = new Image(300, 200, 3);
     try {
-      Image tmpImg = new Image(300, 200, 3);
       tmpImg.getMetadata("key_that_does_not_exist");
-      tmpImg.delete();
     } catch (Image.MetadataException e) {
       caughtMetadata = true;
+    } finally {
+      tmpImg.delete();
     }
     assert caughtMetadata : "Expected Image.MetadataException was not thrown";
   }
