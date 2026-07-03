@@ -4,7 +4,9 @@ f3d_test(NAME TestRenderingBackendAuto DATA cow.vtp RENDERING_BACKEND auto)
 f3d_test(NAME TestRenderingBackendInvalid DATA cow.vtp RENDERING_BACKEND invalid ARGS --verbose REGEXP "rendering-backend value is invalid, falling back to" NO_BASELINE)
 
 if(F3D_TESTING_ENABLE_OSMESA_TESTS)
-  f3d_test(NAME TestRenderingBackenListOSMesa ARGS --list-rendering-backends NO_RENDER NO_BASELINE REGEXP "osmesa: available")
+  if (NOT APPLE OR VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260701)
+    f3d_test(NAME TestRenderingBackenListOSMesa ARGS --list-rendering-backends NO_RENDER NO_BASELINE REGEXP "osmesa: available")
+  endif()
 endif()
 
 if(F3D_TESTING_ENABLE_WGL_TESTS)

@@ -264,6 +264,8 @@ jobs:
           fetch-depth: 0
           lfs: false
 
+      # OSMesa is supported on macOS from 9.6.20260701
+      # Since it's more robust than Apple's software renderer, we use it for the macOS ARM CI
       - name: Generic CI
         uses: ./source/.github/actions/generic-ci
         with:
@@ -309,6 +311,8 @@ jobs:
           fetch-depth: 0
           lfs: false
 
+      # OSMesa is supported on macOS from 9.6.20260701
+      # Since it's more robust than Apple's software renderer, we use it for the macOS ARM CI
       - name: Generic CI
         uses: ./source/.github/actions/generic-ci
         with:

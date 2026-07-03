@@ -29,12 +29,17 @@ F3D supports rendering in environments with limited graphical contexts, includin
 In most cases, the default behavior will automatically detect which capabilities are available and use the right rendering backend,
 it is possible to specify it using the `--rendering-backend` CLI option.
 
-- If `libEGL.so` is available, you can use: `--rendering-backend=egl`.
-- If `libOSMesa.so` is available, you can use: `--rendering-backend=osmesa`.
-- When using `--rendering-backend=auto`, F3D will try to load the following libraries in order and use the first one it was able to load and use:
-  - `libGLX.so`
-  - `libEGL.so`
-  - `libOSMesa.so`
+- If EGL is available, you can use: `--rendering-backend=egl`. The following libraries are attempted to be loaded dynamically (in that order):
+  - `libEGL.so.1`, `libEGL.so` on Linux
+  - `libEGL.dll`, `EGL.dll` on Windows
+- If OSMesa is available, you can use: `--rendering-backend=osmesa`. The following libraries are attempted to be loaded dynamically (in that order):
+  - `libOSMesa.so.8`, `libOSMesa.so.6`, `libOSMesa.so` on Linux
+  - `osmesa.dll` on Windows
+  - `libOSMesa.8.dylib`, `libOSMesa.6.dylib`, `libOSMesa.dylib` on macOS
+- When using `--rendering-backend=auto`, F3D have the following logic:
+  - On Linux, check if a X server is running, in which case GLX is used. Otherwise, try to load EGL library and fallback on OSMesa if not available.
+  - On Windows, check if the OpenGL driver supports OpenGL 3.2, in which case WGL is used. Otherwise, try to load EGL library and fallback on OSMesa if not available.
+  - On macOS, always use COCOA.
 
 You can use that feature for thumbnail generation whenever needed (e.g., Nautilus or other sandboxing file browser),
 by creating/modifying your [thumbnail config file](06-CONFIGURATION_FILE.md), eg:`~/.config/f3d/thumbnail.json`:
