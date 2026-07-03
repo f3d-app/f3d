@@ -60,6 +60,20 @@ runs:
         lfs_sha: ${{inputs.lfs_sha}}
         cache_postfix: cache-0
 
+    - name: Extract python version
+      id: python_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: python
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Set up Python
+      if: inputs.optdeps_label == 'optdeps'
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{steps.python_ver.outputs.extract}}
+
     - name: Install all F3D dependencies
       uses: ./source/.github/actions/generic-dependencies
       with:
@@ -76,20 +90,6 @@ runs:
         mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
         vtk_version: ${{inputs.vtk_version}}
-
-    - name: Extract python version
-      id: python_ver
-      uses: f3d-app/extract-version-action@main
-      with:
-        file: ${{inputs.versions_file}}
-        name: python
-        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
-
-    - name: Set up Python
-      if: inputs.optdeps_label == 'optdeps'
-      uses: actions/setup-python@v6
-      with:
-        python-version: ${{steps.python_ver.outputs.extract}}
 
     # numpy pinned to 2.2.X until python 3.10 support is dropped
     - name: Install Python dependencies
