@@ -136,7 +136,7 @@ extern "C"
     }
   }
 
-  JNIEXPORT jlong JAVA_BIND(Engine_00024State, nativeFromString)(
+  JNIEXPORT jlong JAVA_SCOPED_BIND(Engine, State, nativeFromString)(
     JNIEnv* env, jclass, jstring content)
   {
     const char* str = env->GetStringUTFChars(content, nullptr);
@@ -155,7 +155,7 @@ extern "C"
     }
   }
 
-  JNIEXPORT jlong JAVA_BIND(Engine_00024State, nativeFromFile)(JNIEnv* env, jclass, jstring path)
+  JNIEXPORT jlong JAVA_SCOPED_BIND(Engine, State, nativeFromFile)(JNIEnv* env, jclass, jstring path)
   {
     const char* str = env->GetStringUTFChars(path, nullptr);
     try
@@ -173,7 +173,7 @@ extern "C"
     }
   }
 
-  JNIEXPORT jlong JAVA_BIND(Engine_00024State, nativePasteClipboard)(JNIEnv* env, jclass)
+  JNIEXPORT jlong JAVA_SCOPED_BIND(Engine, State, nativePasteClipboard)(JNIEnv* env, jclass)
   {
     try
     {
@@ -186,12 +186,12 @@ extern "C"
     }
   }
 
-  JNIEXPORT jstring JAVA_BIND(Engine_00024State, toString)(JNIEnv* env, jobject self)
+  JNIEXPORT jstring JAVA_SCOPED_BIND(Engine, State, toString)(JNIEnv* env, jobject self)
   {
     return env->NewStringUTF(GetState(env, self)->toString().c_str());
   }
 
-  JNIEXPORT void JAVA_BIND(Engine_00024State, toFile)(JNIEnv* env, jobject self, jstring path)
+  JNIEXPORT void JAVA_SCOPED_BIND(Engine, State, toFile)(JNIEnv* env, jobject self, jstring path)
   {
     const char* str = env->GetStringUTFChars(path, nullptr);
     try
@@ -207,7 +207,7 @@ extern "C"
     env->ReleaseStringUTFChars(path, str);
   }
 
-  JNIEXPORT void JAVA_BIND(Engine_00024State, copyClipboard)(JNIEnv* env, jobject self)
+  JNIEXPORT void JAVA_SCOPED_BIND(Engine, State, copyClipboard)(JNIEnv* env, jobject self)
   {
     try
     {
@@ -219,7 +219,7 @@ extern "C"
     }
   }
 
-  JNIEXPORT void JAVA_BIND(Engine_00024State, nativeDestroy)(JNIEnv*, jclass, jlong ptr)
+  JNIEXPORT void JAVA_SCOPED_BIND(Engine, State, nativeDestroy)(JNIEnv*, jclass, jlong ptr)
   {
     delete reinterpret_cast<f3d::engine::state*>(ptr);
   }
