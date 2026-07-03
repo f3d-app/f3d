@@ -62,6 +62,26 @@ public class Engine implements AutoCloseable {
         }
     }
 
+    /** Thrown when a window-based operation is called on an engine with no window. */
+    public static class NoWindowException extends F3DException {
+        public NoWindowException(String message) { super(message); }
+    }
+
+    /** Thrown when {@link #getInteractor()} is called on an engine with no interactor. */
+    public static class NoInteractorException extends F3DException {
+        public NoInteractorException(String message) { super(message); }
+    }
+
+    /** Thrown when a plugin cannot be loaded. */
+    public static class PluginException extends F3DException {
+        public PluginException(String message) { super(message); }
+    }
+
+    /** Thrown when the cache path cannot be set or used. */
+    public static class CacheException extends F3DException {
+        public CacheException(String message) { super(message); }
+    }
+
     // Used to load the 'f3d' library on application startup.
     static {
         System.loadLibrary("f3d-java");

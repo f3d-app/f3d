@@ -4,6 +4,26 @@ import java.util.List;
 
 public class Interactor {
 
+    /** Thrown when adding a command or binding that already exists. */
+    public static class AlreadyExistsException extends F3DException {
+        public AlreadyExistsException(String message) { super(message); }
+    }
+
+    /** Thrown when removing a command or binding that does not exist. */
+    public static class DoesNotExistException extends F3DException {
+        public DoesNotExistException(String message) { super(message); }
+    }
+
+    /** Thrown when a triggered command fails at runtime. */
+    public static class CommandRuntimeException extends F3DException {
+        public CommandRuntimeException(String message) { super(message); }
+    }
+
+    /** Thrown when a command is invoked with invalid arguments. */
+    public static class InvalidArgsException extends F3DException {
+        public InvalidArgsException(String message) { super(message); }
+    }
+
     private long mNativeAddress;
 
     public enum ModifierKeys {
