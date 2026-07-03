@@ -37,17 +37,13 @@ runs:
       with:
         versions_file: ${{inputs.versions_file}}
         cpu: ${{inputs.cpu}}
+        python_version: ${{ inputs.python_version }}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
         versions_file: ${{inputs.versions_file}}
         cpu: ${{inputs.cpu}}
-
-    - name: Set up Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: ${{ inputs.python_version }}
 
     # numpy pinned to 2.2.X until python 3.10 support is dropped
     - name: Install Python dependencies

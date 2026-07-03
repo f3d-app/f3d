@@ -68,12 +68,6 @@ runs:
         name: python
         minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
 
-    - name: Set up Python
-      if: inputs.optdeps_label == 'optdeps'
-      uses: actions/setup-python@v6
-      with:
-        python-version: ${{steps.python_ver.outputs.extract}}
-
     - name: Install all F3D dependencies
       uses: ./source/.github/actions/generic-dependencies
       with:
@@ -81,6 +75,7 @@ runs:
         optdeps_label: ${{inputs.optdeps_label}}
         mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
+        python_version: ${{steps.python_ver.outputs.extract}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
