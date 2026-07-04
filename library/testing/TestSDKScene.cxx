@@ -13,8 +13,7 @@ int TestSDKScene([[maybe_unused]] int argc, char* argv[])
   PseudoUnitTest test;
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  std::string renderingBackend = std::string(argv[4]);
-  f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
+  f3d::engine eng = f3d::engine::create(true);
   f3d::scene& sce = eng.getScene();
   f3d::window& win = eng.getWindow().setSize(300, 300);
 
