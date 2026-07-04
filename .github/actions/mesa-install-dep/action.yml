@@ -29,14 +29,6 @@ runs:
         name: mesa
         minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
 
-    - name: Extract python version
-      id: python_ver
-      uses: f3d-app/extract-version-action@main
-      with:
-        file: ${{inputs.versions_file}}
-        name: python
-        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
-
     - name: Extract global cache index
       id: global_idx
       uses: f3d-app/extract-version-action@main
@@ -68,7 +60,6 @@ runs:
       if: steps.cache-mesa.outputs.cache-hit != 'true'
       shell: bash
       run: |
-        python -m pip install --upgrade pip
         python -m pip install meson mako packaging PyYAML
 
     - name: Install Flex/Bison (Windows)
