@@ -67,11 +67,6 @@ runs:
       shell: bash
       run: choco install winflexbison3 --no-progress -y
 
-    - name: Install Flex/Bison (Linux)
-      if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Linux'
-      shell: bash
-      run: apt-get install -y bison byacc flex pkg-config ninja-build libzstd-dev
-
     - name: Checkout mesa
       if: steps.cache-mesa.outputs.cache-hit != 'true'
       shell: bash
