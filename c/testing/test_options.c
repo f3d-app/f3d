@@ -93,6 +93,17 @@ int test_options()
   int is_optional = f3d_options_is_optional(options, "render.show_edges");
   (void)is_optional;
 
+  f3d_option_type_t type = f3d_options_get_type(options, "render.show_edges");
+  (void)type;
+
+  if (f3d_options_get_type(options, "dummy") != F3D_OPTION_TYPE_INVALID)
+  {
+    puts("[ERROR] f3d_options_get_type should return F3D_OPTION_TYPE_INVALID for a "
+         "non-existent option");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
   f3d_options_reset(options, "model.scivis.cells");
   f3d_options_remove_value(options, "render.show_edges");
 

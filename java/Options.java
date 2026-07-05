@@ -23,6 +23,24 @@ public class Options {
     }
 
     /**
+     * Enumeration of the possible types of an option.
+     */
+    public enum OptionType {
+        BOOL,
+        INT,
+        DOUBLE,
+        RATIO,
+        STRING,
+        PATH,
+        COLOR,
+        DIRECTION,
+        COLORMAP,
+        TRANSFORM2D,
+        DOUBLE_VECTOR,
+        INT_VECTOR
+    }
+
+    /**
      * Sets a boolean option value.
      *
      * @param name the name of the option to set
@@ -214,6 +232,15 @@ public class Options {
      * @throws IllegalArgumentException if the option name does not exist
      */
     public native boolean isOptional(String name);
+
+    /**
+     * Gets the type of the specified option.
+     *
+     * @param name the name of the option to check
+     * @return the type of the option
+     * @throws IllegalArgumentException if the option name does not exist
+     */
+    public native OptionType getType(String name);
 
     /**
      * Resets the specified option to its default value.

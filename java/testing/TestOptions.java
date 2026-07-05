@@ -48,6 +48,7 @@ public class TestOptions {
     options.getAllNames();
     options.getClosestOption("ui.scalar");
     options.isOptional("ui.scalar_bar");
+    options.getType("render.point_size");
 
     Engine engine2 = Engine.create(true);
     Options options2 = engine2.getOptions();

@@ -232,6 +232,21 @@ PYBIND11_MODULE(pyf3d, module)
     .value("INDEX", f3d::options::domain_style::INDEX)
     .export_values();
 
+  py::enum_<f3d::options::option_type>(options, "OptionType")
+    .value("BOOL", f3d::options::option_type::BOOL)
+    .value("INT", f3d::options::option_type::INT)
+    .value("DOUBLE", f3d::options::option_type::DOUBLE)
+    .value("RATIO", f3d::options::option_type::RATIO)
+    .value("STRING", f3d::options::option_type::STRING)
+    .value("PATH", f3d::options::option_type::PATH)
+    .value("COLOR", f3d::options::option_type::COLOR)
+    .value("DIRECTION", f3d::options::option_type::DIRECTION)
+    .value("COLORMAP", f3d::options::option_type::COLORMAP)
+    .value("TRANSFORM2D", f3d::options::option_type::TRANSFORM2D)
+    .value("DOUBLE_VECTOR", f3d::options::option_type::DOUBLE_VECTOR)
+    .value("INT_VECTOR", f3d::options::option_type::INT_VECTOR)
+    .export_values();
+
   options //
     .def(py::init<>())
     .def("__setitem__",
@@ -313,7 +328,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def("get_enum_domain", &f3d::options::getEnumDomain)
     .def("increase", &f3d::options::increase)
     .def("decrease", &f3d::options::decrease)
-    .def("cycle", &f3d::options::cycle);
+    .def("cycle", &f3d::options::cycle)
+    .def("get_type", &f3d::options::getType);
 
   // f3d::utils
   py::class_<f3d::utils> utils(module, "Utils");

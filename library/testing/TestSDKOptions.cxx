@@ -375,6 +375,31 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test.expect<f3d::options::inexistent_exception>(
     "isOptional with non-existent option", [&]() { std::ignore = opt6.isOptional("dummy"); });
 
+  // Test getType
+  test("getType bool", opt6.getType("render.grid.enable") == f3d::options::option_type::BOOL);
+  test("getType int", opt6.getType("scene.animation.index") == f3d::options::option_type::INT);
+  test("getType double", opt6.getType("render.point_size") == f3d::options::option_type::DOUBLE);
+  test("getType ratio",
+    opt6.getType("scene.animation.speed_factor") == f3d::options::option_type::RATIO);
+  test("getType string", opt6.getType("interactor.style") == f3d::options::option_type::STRING);
+  test("getType path", opt6.getType("render.hdri.file") == f3d::options::option_type::PATH);
+  test(
+    "getType color", opt6.getType("render.background.color") == f3d::options::option_type::COLOR);
+  test("getType direction",
+    opt6.getType("scene.up_direction") == f3d::options::option_type::DIRECTION);
+  test("getType colormap",
+    opt6.getType("model.scivis.colormap") == f3d::options::option_type::COLORMAP);
+  test("getType transform2d",
+    opt6.getType("model.textures_transform") == f3d::options::option_type::TRANSFORM2D);
+  test("getType double_vector",
+    opt6.getType("model.scivis.opacity_map") == f3d::options::option_type::DOUBLE_VECTOR);
+  test("getType int_vector",
+    opt6.getType("scene.animation.indices") == f3d::options::option_type::INT_VECTOR);
+
+  // Test getType non-existent option
+  test.expect<f3d::options::inexistent_exception>(
+    "getType with non-existent option", [&]() { std::ignore = opt6.getType("dummy"); });
+
   f3d::options opt7{};
 
   // Test reset non-optional values

@@ -79,6 +79,7 @@ function (f3d_generate_options)
   list(JOIN _options_get_enum_domain ";\n  else " _options_get_enum_domain)
   list(JOIN _options_increase_decrease ";\n  else " _options_increase_decrease)
   list(JOIN _options_cycle ";\n  else " _options_cycle)
+  list(JOIN _options_type_getter ";\n  else " _options_type_getter)
 
   configure_file(
     "${_f3d_generate_options_INPUT_PUBLIC_HEADER}"
@@ -341,6 +342,11 @@ function(_parse_json_option _top_json)
          list(APPEND _options_increase_decrease "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to increase or decrease \" + std::string(\"${_option_name}\") + \" which is not compatible\")")
          list(APPEND _options_cycle "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to cycle \" + std::string(\"${_option_name}\") + \" which is not compatible\")")
        endif()
+
+       # Type
+       string(TOUPPER ${_option_type} _option_type_enum)
+       list(APPEND _options_type_getter "if (name == \"${_option_name}\") return options::option_type::${_option_type_enum}")
+
     else()
       # Group found, add in the structs and recurse
       set(_option_prevname ${_option_basename})
@@ -371,4 +377,5 @@ function(_parse_json_option _top_json)
   set(_options_get_enum_domain ${_options_get_enum_domain} PARENT_SCOPE)
   set(_options_increase_decrease ${_options_increase_decrease} PARENT_SCOPE)
   set(_options_cycle ${_options_cycle} PARENT_SCOPE)
+  set(_options_type_getter ${_options_type_getter} PARENT_SCOPE)
 endfunction()

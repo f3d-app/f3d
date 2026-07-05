@@ -4,6 +4,11 @@ import pytest
 import f3d
 
 
+def test_get_type():
+    options = f3d.Options()
+    assert options.get_type("render.point_size") == f3d.Options.OptionType.DOUBLE
+
+
 def test_setitem():
     options = f3d.Options()
     options["ui.axis"] = False

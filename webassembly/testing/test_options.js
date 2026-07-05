@@ -105,6 +105,11 @@ const settings = {
       "options !isOptional",
     );
 
+    utils.assert(
+      options.getType("model.point_sprites.size") === Module.OptionType.DOUBLE,
+      "options getType",
+    );
+
     options.removeValue("model.scivis.array_name");
     utils.assert(
       !options.hasValue("model.scivis.array_name"),

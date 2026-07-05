@@ -375,6 +375,35 @@ extern "C"
    */
   F3D_EXPORT void f3d_options_cycle(f3d_options_t* options, const char* name);
 
+  /**
+   * @brief Enumeration of the possible types of an option.
+   */
+  typedef enum
+  {
+    F3D_OPTION_TYPE_INVALID,
+    F3D_OPTION_TYPE_BOOL,
+    F3D_OPTION_TYPE_INT,
+    F3D_OPTION_TYPE_DOUBLE,
+    F3D_OPTION_TYPE_RATIO,
+    F3D_OPTION_TYPE_STRING,
+    F3D_OPTION_TYPE_PATH,
+    F3D_OPTION_TYPE_COLOR,
+    F3D_OPTION_TYPE_DIRECTION,
+    F3D_OPTION_TYPE_COLORMAP,
+    F3D_OPTION_TYPE_TRANSFORM2D,
+    F3D_OPTION_TYPE_DOUBLE_VECTOR,
+    F3D_OPTION_TYPE_INT_VECTOR
+  } f3d_option_type_t;
+
+  /**
+   * @brief Get the type of an option.
+   *
+   * @param options Options handle.
+   * @param name Option name.
+   * @return The type of the option. Returns F3D_OPTION_TYPE_INVALID if the option does not exist.
+   */
+  F3D_EXPORT f3d_option_type_t f3d_options_get_type(const f3d_options_t* options, const char* name);
+
   ///@{ @name Parsing and formatting
   /**
    * @brief Parse a string as a boolean.
