@@ -51,3 +51,8 @@ The `jump_to_frame` and `jump_to_keyframe` commands no longer take a second bool
 ## ui.animation_progress
 
 The `ui.animation_progress` option (CLI `--animation-progress`) was a boolean toggling a progress bar during animation playback. It is now a string selecting the progress bar mode: `none` (hidden), `default` (the progress bar alone) or `advanced` (the progress bar with time range, animation name, current time labels and keyframe markers). Replace `true` with `default` (or `advanced`) and `false` with `none`.
+
+## Context symbol
+
+The function `f3d::context::getSymbol` function is now expecting a library full path or a filename.
+The library prefix and extension is not appended automatically anymore.

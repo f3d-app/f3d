@@ -4,16 +4,23 @@ f3d_test(NAME TestRenderingBackendAuto DATA cow.vtp RENDERING_BACKEND auto)
 f3d_test(NAME TestRenderingBackendInvalid DATA cow.vtp RENDERING_BACKEND invalid ARGS --verbose REGEXP "rendering-backend value is invalid, falling back to" NO_BASELINE)
 
 if(F3D_TESTING_ENABLE_OSMESA_TESTS)
-  f3d_test(NAME TestRenderingBackenListOSMesa ARGS --list-rendering-backends NO_RENDER NO_BASELINE REGEXP "osmesa: available")
+  if (NOT APPLE OR VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260701)
+    f3d_test(NAME TestRenderingBackenListOSMesa ARGS --list-rendering-backends NO_RENDER NO_BASELINE REGEXP "osmesa: available")
+  endif()
 endif()
 
-if(WIN32)
+if(F3D_TESTING_ENABLE_WGL_TESTS)
   f3d_test(NAME TestRenderingBackendWGL DATA cow.vtp RENDERING_BACKEND wgl)
   f3d_test(NAME TestRenderingBackendWGLCheckClass DATA cow.vtp RENDERING_BACKEND wgl ARGS --verbose REGEXP "vtkF3DWGLRenderWindow" NO_BASELINE)
   f3d_test(NAME TestRenderingBackendWindowsAutoCheckClass DATA cow.vtp ARGS --verbose REGEXP "vtkF3DWGLRenderWindow" NO_BASELINE)
-  f3d_test(NAME TestRenderingBackendGLXFailure DATA cow.vtp RENDERING_BACKEND glx REGEXP "Cannot use a GLX context on this platform" NO_BASELINE)
   f3d_test(NAME TestRenderingBackenListWGL ARGS --list-rendering-backends NO_RENDER NO_BASELINE REGEXP "wgl: available")
-elseif(APPLE)
+endif()
+
+if(WIN32 OR APPLE)
+  f3d_test(NAME TestRenderingBackendGLXFailure DATA cow.vtp RENDERING_BACKEND glx REGEXP "Cannot use a GLX context on this platform" NO_BASELINE)
+endif()
+
+if(APPLE)
   f3d_test(NAME TestRenderingBackenListCOCOA ARGS --list-rendering-backends NO_RENDER NO_BASELINE REGEXP "cocoa: available")
 endif()
 

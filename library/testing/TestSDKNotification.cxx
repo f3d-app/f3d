@@ -17,8 +17,11 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   std::string dataPath = std::string(argv[1]) + "data/cow.vtp";
   std::string baselinePath = std::string(argv[1]) + "baselines/";
   std::string outputPath = std::string(argv[2]);
+  std::string renderingBackend = std::string(argv[4]);
 
-  f3d::engine eng = f3d::engine::create(true);
+  f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
+
+  f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();
   f3d::scene& sce = eng.getScene();

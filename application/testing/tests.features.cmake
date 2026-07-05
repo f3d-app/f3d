@@ -129,8 +129,8 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
 endif()
 
 ## Volume
-f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1)
-f3d_test(NAME TestVolumeInverse DATA HeadMRVolume.mhd ARGS -vi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 THRESHOLD 0.05) # Small rendering differences due to volume rendering
+f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 THRESHOLD 0.08) # Small rendering differences on macOS OSMesa
+f3d_test(NAME TestVolumeInverse DATA HeadMRVolume.mhd ARGS -vi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 THRESHOLD 0.11) # Small rendering differences on macOS OSMesa
 f3d_test(NAME TestVolumeMag DATA vase_4comp.vti ARGS -vb)
 f3d_test(NAME TestVolumeComp DATA vase_4comp.vti ARGS -vb --coloring-component=3 LONG_TIMEOUT)
 f3d_test(NAME TestVolumeDirect DATA vase_4comp.vti ARGS -vb --coloring-component=-2)
@@ -320,7 +320,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
 endif()
 
 ## Skinning
-if(APPLE) # MacOS does not support OpenGL 4.3
+if(APPLE AND NOT F3D_TESTING_FORCE_RENDERING_BACKEND STREQUAL "osmesa") # MacOS driver does not support OpenGL 4.3
   f3d_test(NAME TestSkinningManyBonesFailure DATA tube_254bones.glb ARGS --verbose REGEXP "which requires OpenGL" NO_BASELINE)
 else()
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219) # The baseline changed with armature support

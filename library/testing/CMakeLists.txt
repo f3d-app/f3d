@@ -78,6 +78,7 @@ configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorDropFullSc
                "${CMAKE_BINARY_DIR}/TestSDKInteractorDropFullScene.log") # world.obj; S
 
 set(libf3dSDKTests_link_libs "")
+set(libf3dSDKTests_include_dirs "")
 
 # External window tests
 option(F3D_TESTING_ENABLE_EXTERNAL_GLFW "Test external GLFW" OFF)
@@ -97,9 +98,13 @@ if(F3D_TESTING_ENABLE_EXTERNAL_QT)
   endif()
 endif()
 if(F3D_TESTING_ENABLE_OSMESA_TESTS)
-  find_library(OSMesa_LIB OSMesa REQUIRED)
-  list(APPEND libf3dSDKTests_list TestSDKExternalWindowOSMesa.cxx)
-  list(APPEND libf3dSDKTests_link_libs "${OSMesa_LIB}")
+  if (NOT APPLE OR VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260701)
+    find_library(OSMesa_LIB OSMesa REQUIRED)
+    find_path(OSMesa_INCLUDE_DIR GL/osmesa.h REQUIRED)
+    list(APPEND libf3dSDKTests_list TestSDKExternalWindowOSMesa.cxx)
+    list(APPEND libf3dSDKTests_link_libs "${OSMesa_LIB}")
+    list(APPEND libf3dSDKTests_include_dirs "${OSMesa_INCLUDE_DIR}")
+  endif()
 endif()
 if(F3D_TESTING_ENABLE_GLX_TESTS)
   find_package(OpenGL COMPONENTS GLX REQUIRED)
@@ -112,7 +117,7 @@ if(F3D_TESTING_ENABLE_EGL_TESTS)
   list(APPEND libf3dSDKTests_list TestSDKExternalWindowEGL.cxx)
   list(APPEND libf3dSDKTests_link_libs OpenGL::EGL)
 endif()
-if(WIN32)
+if(F3D_TESTING_ENABLE_WGL_TESTS)
   find_package(OpenGL COMPONENTS OpenGL REQUIRED)
   list(APPEND libf3dSDKTests_list TestSDKExternalWindowWGL.cxx)
   list(APPEND libf3dSDKTests_link_libs OpenGL::GL)
@@ -163,7 +168,7 @@ list(APPEND libf3dSDKTestsNoRender_list
 # Add all the ADD_TEST for each test
 foreach (test ${libf3dSDKTests_list})
   get_filename_component (TName ${test} NAME_WE)
-  add_test (NAME libf3d::${TName} COMMAND libf3dSDKTests ${TName}  "${F3D_SOURCE_DIR}/testing/" "${CMAKE_BINARY_DIR}/Testing/Temporary/" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+  add_test (NAME libf3d::${TName} COMMAND libf3dSDKTests ${TName} "${F3D_SOURCE_DIR}/testing/" "${CMAKE_BINARY_DIR}/Testing/Temporary/" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" "${F3D_TESTING_FORCE_RENDERING_BACKEND}")
   set_tests_properties(libf3d::${TName} PROPERTIES
     LABELS "libf3d"
     TIMEOUT 60
@@ -208,6 +213,7 @@ endif()
 
 set_tests_properties(libf3d::TestSDKUtils PROPERTIES ENVIRONMENT "F3D_TEST_ENV_STANDARD=TestEnv;F3D_TEST_ENV_EXTENDED=TestËnv;F3D_TEST_ENV_UTF8=🤔;")
 
+target_include_directories(libf3dSDKTests PRIVATE ${libf3dSDKTests_include_dirs})
 target_link_libraries(libf3dSDKTests libf3d ${libf3dSDKTests_link_libs})
 target_compile_options(libf3dSDKTests PUBLIC ${f3d_compile_options_public} PRIVATE ${f3d_compile_options_private})
 target_link_options(libf3dSDKTests PUBLIC ${f3d_link_options_public})

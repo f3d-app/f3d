@@ -7,11 +7,12 @@
 #include <types.h>
 #include <window.h>
 
-int TestSDKUI([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
+int TestSDKUI([[maybe_unused]] int argc, char* argv[])
 {
   PseudoUnitTest test;
 
-  f3d::engine eng = f3d::engine::create(true);
+  std::string renderingBackend = std::string(argv[4]);
+  f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
 
   f3d::window& win = eng.getWindow();
   win.setSize(300, 300);

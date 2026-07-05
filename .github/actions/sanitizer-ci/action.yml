@@ -32,10 +32,19 @@ runs:
         lfs_sha: ${{inputs.lfs_sha}}
         cache_postfix: cache-0
 
+    # Python is needed in case Mesa must be built
+    - name: Extract python version
+      id: python_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: python
+
     - name: Install all F3D dependencies
       uses: ./source/.github/actions/generic-dependencies
       with:
         versions_file: ${{inputs.versions_file}}
+        python_version: ${{steps.python_ver.outputs.extract}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep

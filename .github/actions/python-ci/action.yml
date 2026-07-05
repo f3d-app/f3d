@@ -37,6 +37,7 @@ runs:
       with:
         versions_file: ${{inputs.versions_file}}
         cpu: ${{inputs.cpu}}
+        python_version: ${{ inputs.python_version }}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
@@ -44,16 +45,10 @@ runs:
         versions_file: ${{inputs.versions_file}}
         cpu: ${{inputs.cpu}}
 
-    - name: Set up Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: ${{ inputs.python_version }}
-
     # numpy pinned to 2.2.X until python 3.10 support is dropped
     - name: Install Python dependencies
       shell: bash
       run: |
-        python -m pip install --upgrade pip
         python -m pip install pytest==9.0.3
         python -m pip install pyopengltk==0.0.4
         python -m pip install PySide6==6.11.1
@@ -122,6 +117,7 @@ runs:
       shell: bash
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
+    # Needed for examples/libf3d/python/qt6/test_minimal_qt6.py
     - name: Install Mesa Windows
       if: runner.os == 'Windows'
       uses: f3d-app/install-mesa-windows-action@v2

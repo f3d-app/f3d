@@ -13,7 +13,8 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   PseudoUnitTest test;
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  f3d::engine eng = f3d::engine::create(true);
+  std::string renderingBackend = argv[4];
+  f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::scene& sce = eng.getScene();
   f3d::window& win = eng.getWindow().setSize(300, 300);
 
@@ -62,7 +63,7 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // invalid reader
   {
-    f3d::engine engine = f3d::engine::create(true);
+    f3d::engine engine = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
     engine.getOptions().scene.force_reader = "INVALID";
     f3d::scene& scene = engine.getScene();
     test.expect<f3d::scene::load_failure_exception>(
