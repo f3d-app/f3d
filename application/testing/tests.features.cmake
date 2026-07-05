@@ -527,8 +527,14 @@ f3d_test(NAME TestCommandScriptLoadStatefileOverridesTweak SCRIPT DATA cow.vtp W
 f3d_test(NAME TestCommandScriptLoadStatefileMissing SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "Could not open statefile, skipping" NO_BASELINE)
 # load_statefile with an out of range file group index falls back to the first group
 f3d_test(NAME TestCommandScriptLoadStatefileInvalidGroup SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "cow.vtp" NO_BASELINE)
-# save_statefile and load_statefile with no argument and an empty --statefile-filename warn and no-op
-f3d_test(NAME TestCommandScriptStatefileEmptyFilename SCRIPT DATA cow.vtp ARGS --statefile-filename= --verbose REGEXP "No statefile location provided" NO_BASELINE)
+if(F3D_MODULE_TINYFILEDIALOGS)
+  f3d_test(NAME TestCommandScriptStatefileDialog SCRIPT DATA cow.vtp ARGS --verbose
+    ENV "CTEST_SAVE_STATEFILE_DIALOG_FILE=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileDialog"
+        "CTEST_LOAD_STATEFILE_DIALOG_FILE=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileDialog.json"
+    REGEXP "background.color' = '#0000ff' from statefile options" NO_BASELINE)
+else()
+  f3d_test(NAME TestCommandScriptStatefileEmptyFilename SCRIPT DATA cow.vtp ARGS --verbose REGEXP "No statefile location provided" NO_BASELINE)
+endif()
 # save_statefile to a path that cannot be written (a directory) reports the error
 f3d_test(NAME TestCommandScriptSaveStatefileError SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "Could not save statefile" NO_BASELINE)
 
