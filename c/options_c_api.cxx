@@ -2,6 +2,7 @@
 #include "log.h"
 #include "options.h"
 
+#include <cassert>
 #include <cstring>
 #include <string>
 #include <vector>
@@ -529,8 +530,11 @@ f3d_option_type_t f3d_options_get_type(const f3d_options_t* options, const char*
         return F3D_OPTION_TYPE_DOUBLE_VECTOR;
       case f3d::options::option_type::INT_VECTOR:
         return F3D_OPTION_TYPE_INT_VECTOR;
+      default:
+        // Unreachable
+        assert(false);
+        return F3D_OPTION_TYPE_INVALID;
     }
-    return F3D_OPTION_TYPE_INVALID;
   }
   catch (const f3d::options::inexistent_exception& ex)
   {

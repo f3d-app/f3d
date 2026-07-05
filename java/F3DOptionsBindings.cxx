@@ -4,6 +4,8 @@
 
 #include <options.h>
 
+#include <cassert>
+
 namespace
 {
 f3d::options& GetOptionsFromEngine(JNIEnv* env, jobject self)
@@ -273,6 +275,9 @@ extern "C"
       case f3d::options::option_type::INT_VECTOR:
         enumName = "INT_VECTOR";
         break;
+      default:
+        // Unreachable
+        assert(false);
     }
 
     jclass typeClass = env->FindClass("app/f3d/F3D/Options$OptionType");
