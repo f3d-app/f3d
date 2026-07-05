@@ -162,7 +162,7 @@ runs:
     - name: Cache VTK
       id: cache-vtk
       continue-on-error: true # https://github.com/actions/cache/issues/1754
-      uses: actions/cache/restore@v5
+      uses: actions/cache/restore@v6
       with:
         path: dependencies/vtk_install
         key: vtk-${{env.VTK_VERSION}}-${{steps.zlib_ver.outputs.extract}}-${{steps.blosc_ver.outputs.extract}}-${{steps.tbb_ver.outputs.extract}}${{ steps.openvdb_ver.outputs.extract != '' && format('-openvdb-{0}', steps.openvdb_ver.outputs.extract) || '' }}${{ steps.ospray_ver.outputs.extract != '' && format('-ospray-{0}', steps.ospray_ver.outputs.extract) || '' }}${{ steps.curl_ver.outputs.extract != '' && format('-curl-{0}', steps.curl_ver.outputs.extract) || '' }}${{ steps.gdal_ver.outputs.extract != '' && format('-gdal-{0}', steps.gdal_ver.outputs.extract) || '' }}${{ steps.geotiff_ver.outputs.extract != '' && format('-geotiff-{0}', steps.geotiff_ver.outputs.extract) || '' }}${{ steps.pdal_ver.outputs.extract != '' && format('-pdal-{0}', steps.pdal_ver.outputs.extract) || '' }}${{ steps.proj_ver.outputs.extract != '' && format('-proj-{0}', steps.proj_ver.outputs.extract) || '' }}${{ steps.sqlite_csb_ver.outputs.extract != '' && format('-sqlite-{0}', steps.sqlite_csb_ver.outputs.extract) || '' }}${{ steps.tiff_ver.outputs.extract != '' && format('-tiff-{0}', steps.tiff_ver.outputs.extract) || '' }}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-5
@@ -178,7 +178,7 @@ runs:
     # MacOS needs fetch-depth: 0 to avoid an issue with version in linker
     - name: Checkout VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: Kitware/VTK
         submodules: true
@@ -266,7 +266,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-vtk.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v5
+      uses: actions/cache/save@v6
       with:
         key: ${{ steps.cache-vtk.outputs.cache-primary-key }}
         path: dependencies/vtk_install

@@ -9,7 +9,8 @@
     "TBB is set at v2021.13.1 because OpenUSD seems to not support more recent versions: https://github.com/PixarAnimationStudios/OpenUSD/issues/3878 and https://github.com/PixarAnimationStudios/OpenUSD/issues/4078",
     "sqlite is using a common-superbuild hash as it is not a CMake project",
     "OpenEXR v3.0.1 is actually not using OpenJPH",
-    "zlib is fixed at v1.3.1 until https://github.com/madler/zlib/issues/1181 is fixed"
+    "zlib is fixed at v1.3.1 until https://github.com/madler/zlib/issues/1181 is fixed",
+    "mesa is fixed at 25.0.7 because OSMesa has been removed from 25.1.0"
   ],
   "alembic": {
     "version": "1.8.11",
@@ -46,6 +47,14 @@
   "java": {
     "version": "26",
     "min_version": "17"
+  },
+  "llvm": {
+    "version": "22.1.8",
+    "min_version": "22.1.8"
+  },
+  "mesa": {
+    "version": "25.0.7",
+    "min_version": "24.3.4"
   },
   "occt": {
     "version": "V8_0_0",
@@ -111,8 +120,8 @@
     "version": "v1.3.1",
     "min_version": "v1.2.13"
   },
-  "vtk_commit_sha": "31bcf57f7c6b2b1490f641837f8367a0d8b5277b",
-  "docker_timestamp": "20260531_0",
+  "vtk_commit_sha": "51effad51145dbb1ebbd7e488e1a77eec282247f",
+  "docker_timestamp": "20260702_0",
   "global_cache_index": "2",
   "vtk_matrix": "['commit', 'v9.6.2', 'v9.5.2', 'v9.4.2']"
 }

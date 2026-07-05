@@ -7,7 +7,6 @@ Here is a non exhaustive list of F3D limitations:
 - No support for specifying manual lighting in the default scene apart from using `--light-intensity` option.
 - Drag and drop interaction cannot be recorded nor played back.
 - Volume rendering and HDRI support requires a decent GPU.
-- Information about the failure to load a file is not provided before VTK >= 9.4.0.
 - Streaming require different version of VTK depending upon the format to read.
 - Options `ui.dpi_aware` and CLI `--dpi-aware` are only supported on Windows platform.
 
@@ -69,6 +68,22 @@ It's recommended to use these options: `--point-sprites-size=1 --point-sprites=g
 
 Because some keyboards have layered multimedia keys, F keys (F12 for example) don't use the normal function code by default. To use the F code, you must press <kbd>Fn</kbd> in combination with the F key. For example, to take a minimal screenshot, the hotkey combination on MacOS would be <kbd>Cmd</kbd>+<kbd>Fn</kbd>+<kbd>F12</kbd>.
 
+> My step file doesn't respect the `--color` option
+
+When rendering step files, the `--color` option is not respected because scalar coloring is used by default in the configuration file. To override this behavior, you have to disable scalar coloring when specifying the color option. For example: `--color=Blue --scalar-coloring=no`.
+
+Alternatively, add the following in your configuration file:
+
+```
+{
+  "match-type": "glob",
+  "match": "*.{step,stp,iges,igs,brep,xbf}",
+  "options": {
+    "scalar-coloring": false
+  }
+}
+```
+
 ### Linux
 
 > I have a link error related to `stdc++fs` not found or I'm unable to run F3D due to filesystem errors.
@@ -88,10 +103,6 @@ The GCC flag `-latomic` is not being added automatically with specific architect
 - If only a few format have working thumbnails, then it is an issue with the mime types database.
 - If no formats have working thumbnails, then it is can be an issue with sandboxing or with the `f3d-plugin-xxx.thumbnailer` files.
 - If only big file do not have thumbnails, this is intended, you can modify this behavior in the `thumbnail.d/05_all.json` configuration directory using the `max-size` option.
-
-> `--rendering-backend` CLI option is not working as expected
-
-Dynamically switching rendering backend require VTK 9.4.0, you may need to update VTK or to use our binary release.
 
 > I'm unable to link C++ examples against my local F3D install directory, it complains about missing VTK symbols
 

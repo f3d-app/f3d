@@ -142,7 +142,7 @@ f3d::engine eng = f3d::engine::create();
 // Recover the options and set the wanted value
 f3d::options& opt = eng.getOptions();
 opt.render.effect.ambient_occlusion = true;
-opt.render.effect.antialiasing.enable = true;
+opt.render.effect.antialiasing.mode = "fxaa";
 
 // Standard libf3d usage
 eng.getScene().add("path/to/file.ext");

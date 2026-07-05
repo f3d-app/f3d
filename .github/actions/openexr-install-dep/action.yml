@@ -55,7 +55,7 @@ runs:
     - name: Cache openexr
       id: cache-openexr
       continue-on-error: true # https://github.com/actions/cache/issues/1754
-      uses: actions/cache/restore@v5
+      uses: actions/cache/restore@v6
       with:
         path: dependencies/openexr_install
         key: openexr-${{steps.openexr_ver.outputs.extract}}-${{steps.imath_ver.outputs.extract}}-${{steps.openjph_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-4
@@ -63,7 +63,7 @@ runs:
     # Dependents: usd f3d
     - name: Checkout OpenEXR
       if: steps.cache-openexr.outputs.cache-hit != 'true'
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: AcademySoftwareFoundation/openexr
         path: "./dependencies/openexr"
@@ -113,7 +113,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-openexr.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v5
+      uses: actions/cache/save@v6
       with:
         key: ${{ steps.cache-openexr.outputs.cache-primary-key }}
         path: dependencies/openexr_install

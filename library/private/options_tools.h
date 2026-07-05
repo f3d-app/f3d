@@ -8,6 +8,7 @@
 #include "vtkF3DNamedColors.h"
 
 #include <vtkMath.h>
+#include <vtkMathUtilities.h>
 #include <vtkSmartPointer.h>
 
 #include <algorithm>
@@ -20,6 +21,8 @@ namespace fs = std::filesystem;
 
 namespace f3d
 {
+constexpr unsigned int INT_MAX_UINT = static_cast<unsigned int>(std::numeric_limits<int>::max());
+
 namespace options_tools
 {
 
@@ -883,6 +886,267 @@ std::string format(const colormap_t& var)
 std::string format(const transform2d_t& var)
 {
   return options_tools::format(static_cast<std::vector<double>>(var));
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Set provided domain and return true
+ */
+bool hasDomain(f3d::options::domain_style& styleVar, const f3d::options::domain_style& styleSet)
+{
+  styleVar = styleSet;
+  return true;
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Get provided domain_enum as a string vector
+ */
+template<typename T>
+std::vector<std::string> getEnumDomain(const f3d::options::DomainEnum<T>& domain)
+{
+  std::vector<std::string> ret;
+  std::ranges::transform(
+    domain.enumeration, std::back_inserter(ret), [](const T& val) { return format(val); });
+  return ret;
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Get provided domain_enum<std::string> enumeration
+ */
+std::vector<std::string> getEnumDomain(const f3d::options::DomainEnum<std::string>& domain)
+{
+  return domain.enumeration;
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Needed for increaseDecrease implementation for ratio_t
+ */
+void operator+=(f3d::ratio_t& ratio, double incr)
+{
+  double val = ratio;
+  val += incr;
+  ratio = val;
+}
+
+/**
+ * Needed for increaseDecrease implementation for ratio_t
+ */
+f3d::ratio_t operator+(const f3d::ratio_t& ratio, const f3d::ratio_t& incr)
+{
+  f3d::ratio_t ret(ratio);
+  ret += static_cast<double>(incr);
+  return ret;
+}
+
+/**
+ * Needed for increaseDecrease implementation for ratio_t
+ */
+f3d::ratio_t operator-(const f3d::ratio_t& ratio, const f3d::ratio_t& incr)
+{
+  f3d::ratio_t ret(ratio);
+  ret += -static_cast<double>(incr);
+  return ret;
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Templated generic increaseDecrease method for provided val and domain.
+ * Increase up to max or decrease down to min.
+ */
+template<bool Up, typename T>
+void increaseDecrease(T& val, const f3d::options::DomainRange<T>& domain)
+{
+  val = Up ? std::min(val + domain.increment, domain.max)
+           : std::max(val - domain.increment, domain.min);
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Templated std::optional specific increaseDecrease method for provided val and domain.
+ * If set, just call increaseDecrease
+ * If not set, set val to min/max depending on the direction
+ */
+template<bool Up, typename T>
+void increaseDecrease(std::optional<T>& val, const f3d::options::DomainRange<T>& domain)
+{
+  if (!val.has_value())
+  {
+    val = Up ? domain.min : domain.max;
+  }
+  else
+  {
+    increaseDecrease<Up>(val.value(), domain);
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Specific increaseDecrease method for provided val and index domain.
+ * If max is not set, just returns.
+ * Increase up to max or decrease down to 0, does not check validity of current value.
+ */
+template<bool Up>
+void increaseDecrease(int& val, const f3d::options::DomainIndex& domain)
+{
+  if (!domain.max.has_value())
+  {
+    return;
+  }
+
+  int max = static_cast<int>(std::min(domain.max.value(), INT_MAX_UINT));
+  val = Up ? std::min(val + 1, max) : std::max(val - 1, 0);
+}
+
+//----------------------------------------------------------------------------
+/**
+ * std::optional specific increaseDecrease method for provided val and index domain.
+ * If set, just call increaseDecrease
+ * If not set, and domain is set, set val to 0/max depending on the direction
+ */
+template<bool Up>
+void increaseDecrease(std::optional<int>& val, const f3d::options::DomainIndex& domain)
+{
+  if (!val.has_value())
+  {
+    if (domain.max.has_value())
+    {
+      int max = static_cast<int>(std::min(domain.max.value(), INT_MAX_UINT));
+      val = Up ? 0 : max;
+    }
+  }
+  else
+  {
+    increaseDecrease<Up>(val.value(), domain);
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Templated generic cycle method for provided val and domain.
+ * Cycle on the enum if domain is not empty.
+ * If invalid, set to the first enum value.
+ */
+template<typename T>
+void cycle(T& val, const f3d::options::DomainEnum<T>& domain)
+{
+  if (!domain.enumeration.empty())
+  {
+    auto it = std::ranges::find(domain.enumeration, val);
+    if (it != domain.enumeration.end())
+    {
+      it++;
+      if (it == domain.enumeration.end())
+      {
+        it = domain.enumeration.begin();
+      }
+      val = *it;
+    }
+    else
+    {
+      val = domain.enumeration.front();
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Templated cycle method for std::optional, for the provided val and domain.
+ * If set to the last enum, unset
+ * If set to something else, cycle on the enum.
+ * If not set, set to first enum
+ */
+template<typename T>
+void cycle(std::optional<T>& val, const f3d::options::DomainEnum<T>& domain)
+{
+  if (!domain.enumeration.empty())
+  {
+    if (!val.has_value())
+    {
+      val = domain.enumeration.front();
+    }
+    else
+    {
+      if (val == domain.enumeration.back())
+      {
+        val.reset();
+      }
+      else
+      {
+        cycle(val.value(), domain);
+      }
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Generic cycle method for provided val and index domain.
+ * Cycle on the index domain : [0 max].
+ * If max is not set, just returns.
+ * If invalid and domain is not empty, set to 0.
+ */
+void cycle(int& val, const f3d::options::DomainIndex& domain)
+{
+  if (!domain.max.has_value())
+  {
+    // Unreachable until we add a non-optional index domain option
+    return;
+  }
+
+  int max = static_cast<int>(std::min(domain.max.value(), INT_MAX_UINT));
+  if (val >= 0 || val <= max)
+  {
+    int newVal = val + 1;
+    if (newVal > max)
+    {
+      // Unreachable until we add a non-optional index domain option
+      val = 0;
+    }
+    else
+    {
+      val = newVal;
+    }
+  }
+  else
+  {
+    val = 0;
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Templated cycle method for std::optional, for the provided val and index domain.
+ * If domain is not set, just returns
+ * If set to the max, unset
+ * If set to something else, cycle on the domain.
+ * If not set, set to 0
+ */
+void cycle(std::optional<int>& val, const f3d::options::DomainIndex& domain)
+{
+  if (!domain.max.has_value())
+  {
+    return;
+  }
+
+  if (!val.has_value())
+  {
+    val = 0;
+  }
+  else
+  {
+    int max = static_cast<int>(std::min(domain.max.value(), INT_MAX_UINT));
+    if (val == max)
+    {
+      val.reset();
+    }
+    else
+    {
+      cycle(val.value(), domain);
+    }
+  }
 }
 
 } // option_tools

@@ -25,7 +25,11 @@ The libf3d provides a few commands, many related to manipulating libf3d (options
 
 `set_reader_option Reader.option_name value`: A specific command to set a [reader option](02-SUPPORTED_FORMATS.md#reader-options), eg: `set_reader_option QuakeMDL.skin_index 1`
 
-`cycle_anti_aliasing`: A specific command to cycle between the anti-aliasing method (`none`,`fxaa`,`ssaa`,`taa`).
+`increase option.name`: A command to increase a libf3d option according to its range domain, if it has one, eg: `increase render.light.intensity`.
+
+`decrease option.name`: A command to decrease a libf3d option according to its range domain, if it has one, eg: `decrease render.light.intensity`.
+
+`cycle option.name`: A command to cycle a libf3d option according to its enumeration domain, if it has one, eg: `cycle render.effect.blending.mode`.
 
 `cycle_animation`: A specific command to cycle `scene.animation.index` option using model information. No argument.
 
@@ -42,14 +46,6 @@ eg: `elevation_camera 120`.
 `azimuth_camera value`: A specific command to tilt the camera right or left, takes an angle in degrees as an argument.
 eg: `azimuth_camera 120`.
 
-`increase_light_intensity`: A specific command to increase light intensity. No argument.
-
-`decrease_light_intensity`: A specific command to decrease light intensity. No argument.
-
-`increase_opacity`: A specific command to increase opacity. Unset opacity will be treated as if it has a value of 1. No argument.
-
-`decrease_opacity`: A specific command to decrease opacity. Unset opacity will be treated as if it has a value of 1. No argument.
-
 `print_scene_info`: A specific command to print information about the scene. No argument.
 
 `print_coloring_info`: A specific command to print information about coloring settings. No argument.
@@ -65,8 +61,6 @@ Supports `front`, `top`, `right`, `back`, `bottom`, `left`, `isometric` argument
 
 `toggle_volume_rendering`: A specific command to toggle `model.volume.enable` and print coloring information. No argument.
 
-`cycle_interactor_style`: A specific command to cycle between interaction styles (default, trackball, 2d). No argument.
-
 `stop_interactor`: A specific command to stop the interactor hence quitting the application. No argument.
 
 `reset_camera`: A specific command to reset the camera to its original location. No argument.
@@ -75,36 +69,56 @@ Supports `front`, `top`, `right`, `back`, `bottom`, `left`, `isometric` argument
 
 `toggle_animation_backward`: A specific command to start/stop the animation backward. No argument.
 
-`jump_to_frame`: A specific command to load an animation at a specific frame, takes a number and a boolean as arguments.
+`jump_to_frame`: A specific command to load an animation at a specific frame, takes a frame index as argument.
 eg:
 
-- `jump_to_frame 1 true` jump to next frame.
-- `jump_to_frame -1 true` jump to previous frame.
-- `jump_to_frame 0 false` jump to frame 0.
-- `jump_to_frame 1 false` jump to frame 1.
-- `jump_to_frame 10 false` jump to frame 10.
-- `jump_to_frame -1 false` jump to last frame.
-- `jump_to_frame -2 false` jump to second last frame.
+- `jump_to_frame 0` jump to frame 0.
+- `jump_to_frame 1` jump to frame 1.
+- `jump_to_frame 10` jump to frame 10.
+- `jump_to_frame -1` jump to last frame.
+- `jump_to_frame -2` jump to second last frame.
 
-`jump_to_keyframe`: A specific command to load an animation at a specific keyframe, takes a number and a boolean as arguments.
+`jump_to_frame_relative`: A specific command to move the animation by a number of frames relative to the current frame, takes a frame offset as argument.
+eg:
+
+- `jump_to_frame_relative 1` jump to next frame.
+- `jump_to_frame_relative -1` jump to previous frame.
+
+`jump_to_keyframe`: A specific command to load an animation at a specific keyframe, takes a keyframe index as argument.
+When jumping to a keyframe, the target keyframe index is adjusted to stay within the total number of available keyframes, avoiding invalid keyframe access.
+eg:
+
+- `jump_to_keyframe 0` jump to animation start frame.
+- `jump_to_keyframe 1` jump to keyframe 1.
+- `jump_to_keyframe 10` jump to keyframe 10.
+
+`jump_to_keyframe_relative`: A specific command to move the animation by a number of keyframes relative to the current keyframe, takes a keyframe offset as argument.
 When jumping between keyframes, the target keyframe index is adjusted to stay within the total number of available keyframes, avoiding invalid keyframe access.
 eg:
 
-- `jump_to_keyframe 1 true` jump to next keyframe.
-- `jump_to_keyframe -1 true` jump to previous keyframe.
-- `jump_to_keyframe 0 true` jump to closest keyframe.
-- `jump_to_keyframe 0 false` jump to animation start frame.
-- `jump_to_keyframe 1 false` jump to keyframe 1.
-- `jump_to_keyframe 10 false` jump to keyframe 10.
-- `jump_to_keyframe 10 true` jump 10 keyframes ahead.
+- `jump_to_keyframe_relative 0` jump to closest keyframe.
+- `jump_to_keyframe_relative 1` jump to next keyframe.
+- `jump_to_keyframe_relative -1` jump to previous keyframe.
+- `jump_to_keyframe_relative 10` jump 10 keyframes ahead.
 
-This command is currently supported only by the following readers :
+The jump_to_keyframe* commands are currently supported only by the following readers :
 
 - `vtkF3DGLTFImporter`
 - `vtkF3DQuakeMDLImporter`
 
 You can follow the issue below to track the progress of animation support for other readers:
 [F3D Issue – Improve Animation System #2637](https://github.com/f3d-app/f3d/issues/2637#:~:text=Access%20to%20timesteps)
+
+`jump_to_time`: A specific command to load an animation at a specific time, takes a time in seconds as argument.
+eg:
+
+- `jump_to_time 2.5` jump to time 2.5 seconds.
+
+`jump_to_time_relative`: A specific command to move the animation by a number of seconds relative to the current time, takes a time offset as argument.
+eg:
+
+- `jump_to_time_relative 0.5` jump 0.5 seconds forward.
+- `jump_to_time_relative -0.5` jump 0.5 seconds backward.
 
 `cycle_verbose_level` : A specific command to cycle between the verbose levels (`Debug`, `Info`, `Warning`, `Error`, `Quiet`).
 
@@ -150,6 +164,20 @@ eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 `remove_file_groups`: A specific command to remove all files. No argument.
 
 `open_file_dialog`: A specific command to open a file dialog to selected a file to load. No argument.
+
+## Domains
+
+Certain libf3d (options)[../libf3d/03-OPTIONS.md] have domains which can be interacted with using commands.
+
+A range domain is used through `increase` and `decrease` commands, it has inclusive minimum and maximum, as well as an increment.
+`increase` and `decrease` use increment to increase/decrease and cap at maximum/minimum respectively.
+
+An enum domain is used through `cycle` command, it just list possible values of the option.
+`cycle` just iterate over the different possible values and loops when reaching the end.
+
+An index domain can be used through both `cycle` and `increase`/`decrease` commands.
+For `increase`/`decrease`, it behaves like a range domain [0, max] with an increment of 1.
+For `cycle`, it behave like an enum domain containing all possible values between o and max.
 
 ## Command Script (`--command-script`)
 

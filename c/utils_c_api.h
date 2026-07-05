@@ -37,8 +37,8 @@ extern "C"
    *
    * @param str Input string to tokenize.
    * @param keep_comments Non-zero to keep comments, zero to treat '#' as a normal character.
-   * @param out_count Pointer to receive the number of tokens.
-   * @return Array of C strings.
+   * @param out_count Pointer to receive the number of tokens. Set to 0 if `str` is ill-formed.
+   * @return Array of C strings. NULL if `str` is malformed.
    */
   F3D_EXPORT char** f3d_utils_tokenize(const char* str, int keep_comments, size_t* out_count);
 
@@ -71,7 +71,7 @@ extern "C"
    *
    * @param glob Glob expression.
    * @param path_separator Path separator character.
-   * @return Regular expression string.
+   * @return Regular expression string. NULL if `glob` is ill-formed.
    */
   F3D_EXPORT char* f3d_utils_glob_to_regex(const char* glob, char path_separator);
 

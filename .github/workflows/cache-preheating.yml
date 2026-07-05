@@ -1,14 +1,14 @@
 name: Cache preheating
 
 on:
-  pull_request_target:
-    types: [opened, synchronize, reopened, labeled]
-    branches:
-      - master
-      - release
-    paths-ignore:
-      - "doc/**"
-      - "_config.yml"
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: "Repository to build caches from"
+        required: true
+      branch:
+        description: "Branch of repository to build caches from"
+        required: true
 
 jobs:
   #----------------------------------------------------------------------------
@@ -16,7 +16,6 @@ jobs:
   #----------------------------------------------------------------------------
   cache_preheating_dependencies:
     name: Preheat dependency caches
-    if: contains(github.event.pull_request.labels.*.name, 'ci:cache')
     strategy:
       fail-fast: false
       matrix:
@@ -34,10 +33,10 @@ jobs:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
-          ref: ${{github.event.pull_request.head.ref}}
-          repository: ${{github.event.pull_request.head.repo.full_name}}
+          ref: ${{ github.event.inputs.branch }}
+          repository: ${{ github.event.inputs.repo }}
           path: "source"
           fetch-depth: 1
           lfs: false
@@ -55,15 +54,14 @@ jobs:
   recover_vtk_matrix:
     name: Recover VTK matrix
     runs-on: ubuntu-24.04
-    if: contains(github.event.pull_request.labels.*.name, 'ci:cache')
     outputs:
       vtk_matrix: ${{steps.vtk_matrix.outputs.extract}}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
-          ref: ${{github.event.pull_request.head.ref}}
-          repository: ${{github.event.pull_request.head.repo.full_name}}
+          ref: ${{ github.event.inputs.branch }}
+          repository: ${{ github.event.inputs.repo }}
           path: "source"
           fetch-depth: 1
           lfs: false
@@ -108,10 +106,10 @@ jobs:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
-          ref: ${{github.event.pull_request.head.ref}}
-          repository: ${{github.event.pull_request.head.repo.full_name}}
+          ref: ${{ github.event.inputs.branch }}
+          repository: ${{ github.event.inputs.repo }}
           path: "source"
           fetch-depth: 1
           lfs: false

@@ -14,6 +14,33 @@ public class Options {
     }
 
     /**
+     * Enumeration of supported domain style.
+     */
+    public enum DomainStyle {
+        RANGE,
+        ENUM,
+        INDEX
+    }
+
+    /**
+     * Enumeration of the possible types of an option.
+     */
+    public enum OptionType {
+        BOOL,
+        INT,
+        DOUBLE,
+        RATIO,
+        STRING,
+        PATH,
+        COLOR,
+        DIRECTION,
+        COLORMAP,
+        TRANSFORM2D,
+        DOUBLE_VECTOR,
+        INT_VECTOR
+    }
+
+    /**
      * Sets a boolean option value.
      *
      * @param name the name of the option to set
@@ -207,6 +234,15 @@ public class Options {
     public native boolean isOptional(String name);
 
     /**
+     * Gets the type of the specified option.
+     *
+     * @param name the name of the option to check
+     * @return the type of the option
+     * @throws IllegalArgumentException if the option name does not exist
+     */
+    public native OptionType getType(String name);
+
+    /**
      * Resets the specified option to its default value.
      *
      * @param name the name of the option to reset
@@ -221,6 +257,55 @@ public class Options {
      * @throws IllegalArgumentException if the option name does not exist
      */
     public native void removeValue(String name);
+
+    /**
+     * Return true if an option as a domain, false otherwise.
+     *
+     * @param name the name of the option to remove the value from
+     * @throws IllegalArgumentException if the option name does not exist
+     */
+    public native boolean hasDomain(String name);
+
+    /**
+     * Return the domain style of the provided option.
+     *
+     * @param name the name of the option to remove the value from
+     * @throws IllegalArgumentException if the option name does not exist or it doesn't have a domain
+     */
+    public native DomainStyle getDomainStyle(String name);
+
+    /**
+     * Return a vector of string containing the enumeration for the option
+     *
+     * @param name the name of the option to remove the value from
+     * @return enumeration of values
+     * @throws IllegalArgumentException if the option name does not exist or doesn't have an enum domain
+     */
+    public native List<String> getEnumDomain(String name);
+
+    /**
+     * Increase the specified option if it has a range or index domain
+     *
+     * @param name the name of the option to increase
+     * @throws IllegalArgumentException if the option name does not exist or doesn't have the expected domain
+     */
+    public native void increase(String name);
+
+    /**
+     * Decrease the specified option if it has a range or index domain
+     *
+     * @param name the name of the option to decrease
+     * @throws IllegalArgumentException if the option name does not exist or doesn't have the expected domain
+     */
+    public native void decrease(String name);
+
+    /**
+     * Cycle the specified option if it has an enum or index domain
+     *
+     * @param name the name of the option to cycle
+     * @throws IllegalArgumentException if the option name does not exist or doesn't have the expected domain
+     */
+    public native void cycle(String name);
 
     /**
      * Result class for the closest option search operation.

@@ -165,4 +165,4 @@ Here is the list of all the components:
 | `java`          | YES                  | ALL              | Java bindings.                                                                                                              |
 | `mimetypes`     | NO                   | Linux            | Plugins mimetype XML files for integration with Freedesktop.                                                                |
 | `assets`        | YES                  | Linux            | Assets for integration with Freedesktop.                                                                                    |
-| `colormaps`     | NO                   | ALL              | Color maps presets, see [documentation](../user/09-COLOR_MAPS.md)                                                           |
+| `colormaps`     | NO                   | ALL              | Color maps presets, see [documentation](../user/10-COLOR_MAPS.md)                                                           |

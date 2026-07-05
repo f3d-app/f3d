@@ -4,7 +4,7 @@
 #include <engine.h>
 #include <window.h>
 
-int TestSDKConsole([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
+int TestSDKConsole([[maybe_unused]] int argc, char* argv[])
 {
   PseudoUnitTest test;
 
@@ -14,7 +14,8 @@ int TestSDKConsole([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   f3d::log::setUseColoring(false);
   f3d::log::warn("Message in console");
 
-  f3d::engine eng = f3d::engine::create(true);
+  std::string renderingBackend = std::string(argv[4]);
+  f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
 
   f3d::options& opt = eng.getOptions();
   opt.ui.console = true;

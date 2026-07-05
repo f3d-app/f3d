@@ -162,6 +162,9 @@ public:
       this->Window.getCamera().resetToBounds();
     }
 
+    // Set the camera index domain
+    this->Options.domains.scene.camera.index.max = this->MetaImporter->GetNumberOfCameras();
+
     scene_impl::internals::DisplayAllInfo(this->MetaImporter, this->Window);
   }
 
@@ -197,7 +200,7 @@ public:
     window.PrintSceneDescription(log::VerboseLevel::DEBUG);
   }
 
-  const options& Options;
+  options& Options;
   window_impl& Window;
   interactor_impl* Interactor = nullptr;
   animationManager AnimationManager;
@@ -750,6 +753,9 @@ scene& scene_impl::clear()
 
   // Clear the window of all actors
   this->Internals->Window.Initialize();
+
+  // Clear animation state
+  this->Internals->AnimationManager.Reset();
 
   return *this;
 }

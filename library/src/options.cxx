@@ -84,7 +84,7 @@ options& options::toggle(std::string_view name)
   catch (const std::bad_variant_access&)
   {
     throw options::incompatible_exception(
-      "Trying to get toggle " + std::string(name) + " with incompatible type");
+      "Trying to toggle " + std::string(name) + " with incompatible type");
   }
 }
 
@@ -168,6 +168,12 @@ bool options::isOptional(std::string_view option) const
 }
 
 //----------------------------------------------------------------------------
+options::option_type options::getType(std::string_view name) const
+{
+  return options_generated::getType(name);
+}
+
+//----------------------------------------------------------------------------
 options& options::reset(std::string_view name)
 {
   options_generated::reset(*this, name);
@@ -185,6 +191,54 @@ options& options::removeValue(std::string_view name)
   {
     throw options::incompatible_exception("Option " + std::string(name) + " is not not optional");
   }
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+bool options::hasDomain(std::string_view name) const
+{
+  domain_style style;
+  return options_generated::hasDomain(name, style);
+}
+
+//----------------------------------------------------------------------------
+f3d::options::domain_style options::getDomainStyle(std::string_view name) const
+{
+  domain_style style;
+  if (options_generated::hasDomain(name, style))
+  {
+    return style;
+  }
+  else
+  {
+    throw options::incompatible_exception("Option " + std::string(name) + " doesn't have a domain");
+  }
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> options::getEnumDomain(std::string_view name) const
+{
+  return options_generated::getEnumDomain(*this, name);
+}
+
+//----------------------------------------------------------------------------
+options& options::increase(std::string_view name)
+{
+  options_generated::increaseDecrease<true>(*this, name);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+options& options::decrease(std::string_view name)
+{
+  options_generated::increaseDecrease<false>(*this, name);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+options& options::cycle(std::string_view name)
+{
+  options_generated::cycle(*this, name);
   return *this;
 }
 

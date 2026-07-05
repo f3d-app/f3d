@@ -22,7 +22,7 @@ endif()
 f3d_test(NAME TestVerboseAssimp DATA duck.fbx ARGS --verbose PLUGIN assimp NO_BASELINE REGEXP "LOD3sp")
 f3d_test(NAME TestVerboseAssimpAnimationIndicesError DATA animatedLights.fbx PLUGIN assimp ARGS --animation-indices=48 NO_BASELINE REGEXP "Specified animation index: 48 is not in range")
 
-f3d_test(NAME TestAssimpAnimationNegativeIndex DATA animatedLights.fbx PLUGIN assimp ARGS --animation-indices=-113 --animation-time=2 --animation-progress)
+f3d_test(NAME TestAssimpAnimationNegativeIndex DATA animatedLights.fbx PLUGIN assimp ARGS --animation-indices=-113 --animation-time=2 --animation-progress UI)
 f3d_test(NAME TestTGATextureFBX DATA duck.fbx PLUGIN assimp)
 f3d_test(NAME TestDAE DATA duck.dae PLUGIN assimp)
 f3d_test(NAME TestX DATA anim_test.x PLUGIN assimp)
@@ -36,21 +36,21 @@ f3d_test(NAME TestEmbeddedTextureFBX DATA texturedCube.fbx PLUGIN assimp)
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12688
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251006)
-  f3d_test(NAME TestFBXAnimation DATA animatedWorld.fbx PLUGIN assimp ARGS --animation-time=2 --animation-progress)
-  f3d_test(NAME TestFBXAnimationLights DATA animatedLights.fbx PLUGIN assimp ARGS --animation-time=1.8 --animation-progress)
-  f3d_test(NAME TestFBXAnimationCamera DATA animatedCamera.fbx PLUGIN assimp ARGS --camera-index=0 --animation-indices=0 --animation-time=3 --animation-progress)
-  f3d_test(NAME TestDAEAnimationLights DATA animatedLights.dae PLUGIN assimp ARGS --animation-time=1.8 --animation-progress)
+  f3d_test(NAME TestFBXAnimation DATA animatedWorld.fbx PLUGIN assimp ARGS --animation-time=2 --animation-progress UI)
+  f3d_test(NAME TestFBXAnimationLights DATA animatedLights.fbx PLUGIN assimp ARGS --animation-time=1.8 --animation-progress UI)
+  f3d_test(NAME TestFBXAnimationCamera DATA animatedCamera.fbx PLUGIN assimp ARGS --camera-index=0 --animation-indices=0 --animation-time=3 --animation-progress UI)
+  f3d_test(NAME TestDAEAnimationLights DATA animatedLights.dae PLUGIN assimp ARGS --animation-time=1.8 --animation-progress UI)
 endif()
 
 if("${F3D_ASSIMP_VERSION}" VERSION_GREATER_EQUAL "5.4.3")
   f3d_test(NAME TestFBXBone DATA animation_with_skeleton.fbx PLUGIN assimp ARGS --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08)
-  f3d_test(NAME TestFBXBoneAnimation DATA animation_with_skeleton.fbx PLUGIN assimp ARGS --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08 --animation-time=0.5 --animation-progress)
+  f3d_test(NAME TestFBXBoneAnimation DATA animation_with_skeleton.fbx PLUGIN assimp ARGS --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08 --animation-time=0.5 --animation-progress UI)
   f3d_test(NAME TestInteractionAnimationFBXBone DATA animation_with_skeleton.fbx PLUGIN assimp ARGS --camera-position=0,0,14000 --camera-focal-point=0,0,0 INTERACTION) #Space;Wait;Space;
 endif()
 
 # The visible boxes are not located at the same position in Assimp 6.0 for some reason
 if("${F3D_ASSIMP_VERSION}" VERSION_GREATER_EQUAL "6.0.1")
-  f3d_test(NAME TestFBXSkinningAnimation DATA punch.fbx PLUGIN assimp ARGS --animation-time=1 --animation-progress)
+  f3d_test(NAME TestFBXSkinningAnimation DATA punch.fbx PLUGIN assimp ARGS --animation-time=1 --animation-progress UI)
 endif()
 
 # Armature support

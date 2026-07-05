@@ -14,6 +14,7 @@ namespace f3d
 {
 namespace options_generated
 {
+
 //----------------------------------------------------------------------------
 /**
  * Generated method, see `options::set`
@@ -113,12 +114,73 @@ bool isOptional(std::string_view name)
 
 //----------------------------------------------------------------------------
 /**
+ * Generated method, see `options::getType`
+ */
+options::option_type getType(std::string_view name)
+{
+  // clang-format off
+  ${_options_type_getter};
+  // clang-format on
+  else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
+}
+
+//----------------------------------------------------------------------------
+/**
  * Generated method, see `options::reset`
  */
 void reset(options& opt, std::string_view name)
 {
   // clang-format off
   ${_options_reset};
+  // clang-format on
+  else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Generated method, see `options::hasDomain`
+ */
+bool hasDomain(std::string_view name, f3d::options::domain_style& style)
+{
+  // clang-format off
+  ${_options_has_domain};
+  // clang-format on
+  else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Generated method, see `options::getEnumDomain`
+ */
+std::vector<std::string> getEnumDomain(const f3d::options& opt, std::string_view name)
+{
+  // clang-format off
+  ${_options_get_enum_domain};
+  // clang-format on
+  else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Generated method, see `options::increase` and `options::decrease`
+ */
+template<bool Up>
+void increaseDecrease(f3d::options& opt, std::string_view name)
+{
+  // clang-format off
+  ${_options_increase_decrease};
+  // clang-format on
+  else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Generated method, see `options::cycle`
+ */
+void cycle(f3d::options& opt, std::string_view name)
+{
+  // clang-format off
+  ${_options_cycle};
   // clang-format on
   else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
 }

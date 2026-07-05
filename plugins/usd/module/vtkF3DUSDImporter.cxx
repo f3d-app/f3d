@@ -4,12 +4,14 @@
 
 #include <vtkActor.h>
 #include <vtkActorCollection.h>
+#include <vtkCellArray.h>
 #include <vtkConeSource.h>
 #include <vtkCubeSource.h>
 #include <vtkCylinderSource.h>
 #include <vtkDataAssembly.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
+#include <vtkIdTypeArray.h>
 #include <vtkImageAppendComponents.h>
 #include <vtkImageData.h>
 #include <vtkImageExtractComponents.h>
@@ -39,6 +41,7 @@
 #include <vtkUnsignedShortArray.h>
 #include <vtkVersion.h>
 
+#include <algorithm>
 #include <cassert>
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
@@ -76,6 +79,7 @@
 #include <pxr/usd/usdGeom/mesh.h>
 #include <pxr/usd/usdGeom/metrics.h>
 #include <pxr/usd/usdGeom/pointInstancer.h>
+#include <pxr/usd/usdGeom/points.h>
 #include <pxr/usd/usdGeom/primvarsAPI.h>
 #include <pxr/usd/usdGeom/scope.h>
 #include <pxr/usd/usdGeom/sphere.h>
@@ -242,7 +246,7 @@ public:
   void AddActor(vtkRenderer* renderer, vtkDataAssembly* hierarchy,
     vtkActorCollection* actorCollection, const pxr::SdfPath& path,
     const pxr::UsdGeomGprim& geomPrim, const pxr::UsdPrim& prim, vtkMatrix4x4* mat,
-    vtkPolyData* polydata)
+    vtkPolyData* polydata, bool useDirectScalars = false)
   {
     pxr::SdfPath actorPath = path.AppendChild(pxr::TfToken(prim.GetName()));
 
@@ -356,6 +360,16 @@ public:
       mapper->SetInputData(polydata);
     }
 
+    if (useDirectScalars)
+    {
+      mapper->SetColorModeToDirectScalars();
+      vtkDataArray* scalars = polydata->GetPointData()->GetScalars();
+      if (scalars && scalars->GetNumberOfComponents() == 4)
+      {
+        actor->ForceTranslucentOn();
+      }
+    }
+
     if (!this->HasTimeCode())
     {
       mapper->StaticOn();
@@ -435,6 +449,7 @@ public:
         pxr::UsdGeomGprim geomPrim = pxr::UsdGeomGprim(prim);
 
         vtkSmartPointer<vtkPolyData> polydata;
+        bool useDirectScalars = false;
 
         if (prim.IsA<pxr::UsdGeomMesh>())
         {
@@ -858,6 +873,82 @@ public:
           transform->Update();
           polydata = vtkPolyData::SafeDownCast(transform->GetOutput());
         }
+        else if (prim.IsA<pxr::UsdGeomPoints>())
+        {
+          pxr::UsdGeomPoints pointsPrim = pxr::UsdGeomPoints(prim);
+
+          pxr::VtArray<pxr::GfVec3f> positions;
+          pointsPrim.GetPointsAttr().Get(&positions, timeCode);
+
+          vtkNew<vtkPolyData> newPolyData;
+
+          vtkNew<vtkPoints> points;
+          points->SetNumberOfPoints(static_cast<vtkIdType>(positions.size()));
+          for (std::size_t i = 0; i < positions.size(); i++)
+          {
+            const pxr::GfVec3f& p = positions[i];
+            points->SetPoint(static_cast<vtkIdType>(i), p[0], p[1], p[2]);
+          }
+          newPolyData->SetPoints(points);
+
+          if (positions.size() > 0)
+          {
+            vtkNew<vtkIdTypeArray> vertIds;
+            vertIds->SetNumberOfValues(static_cast<vtkIdType>(positions.size()));
+            for (std::size_t i = 0; i < positions.size(); i++)
+            {
+              vertIds->SetValue(static_cast<vtkIdType>(i), static_cast<vtkIdType>(i));
+            }
+
+            vtkNew<vtkCellArray> verts;
+            verts->SetData(static_cast<vtkIdType>(positions.size()), vertIds);
+            newPolyData->SetVerts(verts);
+          }
+
+          pxr::UsdGeomPrimvar colorPrimvar = pointsPrim.GetDisplayColorPrimvar();
+          pxr::UsdGeomPrimvar opacityPrimvar = pointsPrim.GetDisplayOpacityPrimvar();
+
+          pxr::VtArray<pxr::GfVec3f> colors;
+          const bool hasColors =
+            colorPrimvar && colorPrimvar.Get(&colors, timeCode) && colors.size() > 0;
+
+          pxr::VtArray<float> opacities;
+          const bool hasOpacity =
+            opacityPrimvar && opacityPrimvar.Get(&opacities, timeCode) && opacities.size() > 0;
+
+          if (hasColors || hasOpacity)
+          {
+            const int numComps = hasOpacity ? 4 : 3;
+            vtkNew<vtkFloatArray> pointColors;
+            pointColors->SetName(hasOpacity ? "RGBA" : "RGB");
+            pointColors->SetNumberOfComponents(numComps);
+            pointColors->SetNumberOfTuples(static_cast<vtkIdType>(positions.size()));
+
+            for (std::size_t i = 0; i < positions.size(); i++)
+            {
+              const std::size_t colorIndex = hasColors && colors.size() == positions.size() ? i : 0;
+              const std::size_t opacityIndex =
+                hasOpacity && opacities.size() == positions.size() ? i : 0;
+              const pxr::GfVec3f c = hasColors ? colors[colorIndex] : pxr::GfVec3f(1.f);
+
+              if (hasOpacity)
+              {
+                const float rgba[4] = { c[0], c[1], c[2], opacities[opacityIndex] };
+                pointColors->SetTypedTuple(static_cast<vtkIdType>(i), rgba);
+              }
+              else
+              {
+                const float rgb[3] = { c[0], c[1], c[2] };
+                pointColors->SetTypedTuple(static_cast<vtkIdType>(i), rgb);
+              }
+            }
+
+            newPolyData->GetPointData()->SetScalars(pointColors);
+            useDirectScalars = true;
+          }
+
+          polydata = newPolyData;
+        }
         else
         {
           // unsupported primitive, fallback to an empty polydata
@@ -875,7 +966,8 @@ public:
 
         if (subsets.empty())
         {
-          this->AddActor(renderer, hierarchy, actorCollection, path, geomPrim, prim, mat, polydata);
+          this->AddActor(renderer, hierarchy, actorCollection, path, geomPrim, prim, mat, polydata,
+            useDirectScalars);
         }
         else
         {

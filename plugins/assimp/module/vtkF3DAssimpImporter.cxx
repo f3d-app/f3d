@@ -342,22 +342,24 @@ public:
       property->SetOpacity(opacity);
     }
 
+    auto toSRGB = [](float c) { return std::pow(c, 1.0 / 2.2); };
+
     aiColor4D diffuse;
     if (material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse) == aiReturn_SUCCESS)
     {
-      property->SetColor(diffuse.r, diffuse.g, diffuse.b);
+      property->SetColor(toSRGB(diffuse.r), toSRGB(diffuse.g), toSRGB(diffuse.b));
     }
 
     aiColor4D specular;
     if (material->Get(AI_MATKEY_COLOR_SPECULAR, specular) == aiReturn_SUCCESS)
     {
-      property->SetSpecularColor(specular.r, specular.g, specular.b);
+      property->SetSpecularColor(toSRGB(specular.r), toSRGB(specular.g), toSRGB(specular.b));
     }
 
     aiColor4D ambient;
     if (material->Get(AI_MATKEY_COLOR_AMBIENT, ambient) == aiReturn_SUCCESS)
     {
-      property->SetAmbientColor(ambient.r, ambient.g, ambient.b);
+      property->SetAmbientColor(toSRGB(ambient.r), toSRGB(ambient.g), toSRGB(ambient.b));
     }
 
     aiString texDiffuse;

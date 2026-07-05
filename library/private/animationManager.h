@@ -8,7 +8,6 @@
 
 #include <vtkDoubleArray.h>
 #include <vtkNew.h>
-#include <vtkProgressBarWidget.h>
 #include <vtkSmartPointer.h>
 
 #include <chrono>
@@ -60,6 +59,11 @@ public:
    * Also start the animation when using autoplay option
    */
   void Initialize();
+
+  /**
+   * Reset the animation manager to a no-animation state.
+   */
+  void Reset();
 
   /**
    * Start/Stop playing the animation
@@ -146,7 +150,7 @@ public:
   bool LoadAtTime(double timeValue);
 
   /**
-   * Load animation at provided frmae value
+   * Load animation at provided frame value
    * When relative is false frame -1 is equal to last frame
    */
   void JumpToFrame(int frame, bool relative);
@@ -156,6 +160,13 @@ public:
    * When relative is false keyframe -1 is equal to last keyframe
    */
   void JumpToKeyFrame(int keyframe, bool relative);
+
+  /**
+   * Load animation at provided time value and render
+   * When relative is true, time is added to the current animation time
+   * When relative is false, a negative time is counted from the end of the animation
+   */
+  void JumpToTime(double timeValue, bool relative);
 
   /**
    * Return a pair containing the current time range values
@@ -186,6 +197,11 @@ private:
    * Return early if already prepared for the current subset of animation in the options
    */
   void PrepareForAnimationIndices();
+
+  /**
+   * Push the current animation's time range and name to the UI actor.
+   */
+  void PushAnimationProgress();
 
   /**
    * Internal setter for Autoplay.
@@ -221,8 +237,6 @@ private:
   // Dynamic options
   bool Autoplay = false;
   double SpeedFactor = 1.0;
-
-  vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;
 };
 }
 }

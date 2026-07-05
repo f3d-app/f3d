@@ -21,13 +21,14 @@ f3d_test(NAME TestUSDDefines DATA suzanne.usd PLUGIN usd ARGS -DUSD.resources_pa
 # TODO: Note that the result looks incorrect because of face-varying attributes and must be fixed later
 f3d_test(NAME TestUSDTeapot DATA Teapot.usd PLUGIN usd)
 
-f3d_test(NAME TestUSDZAnimated DATA AnimatedCube.usdz PLUGIN usd ARGS --animation-time=0.3 --animation-progress THRESHOLD 0.05)
+f3d_test(NAME TestUSDZAnimated DATA AnimatedCube.usdz PLUGIN usd ARGS --animation-time=0.3 --animation-progress THRESHOLD 0.05 UI)
 f3d_test(NAME TestUSDZRigged DATA RiggedSimple.usdz PLUGIN usd ARGS --animation-time=0.3)
 f3d_test(NAME TestUSDZMaterials DATA McUsd.usdz PLUGIN usd ARGS --camera-position=1055,912,-247 --camera-focal-point=69,173,63 THRESHOLD 0.09) # The threshold is high because of the complex materials
 f3d_test(NAME TestUSDZMaterialsInterationReload DATA McUsd.usdz PLUGIN usd INTERACTION NO_BASELINE) # Up
-f3d_test(NAME TestUSDBlendShapes DATA SimpleBlendShapes.usda ARGS --animation-time=1 --animation-progress PLUGIN usd)
-f3d_test(NAME TestUSDBlendShapesFaceVarying DATA SimpleBlendShapesFaceVarying.usda ARGS --animation-time=1 --animation-progress PLUGIN usd)
-f3d_test(NAME TestUSDSkinJointOrder DATA skel_animation_sparsity.usda ARGS --animation-time=0.3 --animation-progress PLUGIN usd)
+f3d_test(NAME TestUSDBlendShapes DATA SimpleBlendShapes.usda ARGS --animation-time=1 --animation-progress PLUGIN usd UI)
+f3d_test(NAME TestUSDBlendShapesFaceVarying DATA SimpleBlendShapesFaceVarying.usda ARGS --animation-time=1 --animation-progress PLUGIN usd UI)
+f3d_test(NAME TestUSDSkinJointOrder DATA skel_animation_sparsity.usda ARGS --animation-time=0.3 --animation-progress PLUGIN usd UI)
+f3d_test(NAME TestUSDPointsPrimitive DATA usd_points_rgb.usda ARGS --point-size=20 THRESHOLD 0.05 PLUGIN usd)
 
 # Scene hierarchy test for USD importer
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)

@@ -1,5 +1,6 @@
 list(APPEND VTKExtensionsPluginUSD_list
      TestF3DUSDImporter.cxx
+     TestF3DUSDImporterPoints.cxx
     )
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251016)

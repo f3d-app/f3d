@@ -60,6 +60,14 @@ runs:
         lfs_sha: ${{inputs.lfs_sha}}
         cache_postfix: cache-0
 
+    - name: Extract python version
+      id: python_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: python
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
     - name: Install all F3D dependencies
       uses: ./source/.github/actions/generic-dependencies
       with:
@@ -67,6 +75,7 @@ runs:
         optdeps_label: ${{inputs.optdeps_label}}
         mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
+        python_version: ${{steps.python_ver.outputs.extract}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
@@ -77,26 +86,11 @@ runs:
         cpu: ${{inputs.cpu}}
         vtk_version: ${{inputs.vtk_version}}
 
-    - name: Extract python version
-      id: python_ver
-      uses: f3d-app/extract-version-action@main
-      with:
-        file: ${{inputs.versions_file}}
-        name: python
-        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
-
-    - name: Set up Python
-      if: inputs.optdeps_label == 'optdeps'
-      uses: actions/setup-python@v6
-      with:
-        python-version: ${{steps.python_ver.outputs.extract}}
-
     # numpy pinned to 2.2.X until python 3.10 support is dropped
     - name: Install Python dependencies
       if: inputs.optdeps_label == 'optdeps'
       shell: bash
       run: |
-        python -m pip install --upgrade pip
         python -m pip install pytest==9.0.3
         python -m pip install pybind11_stubgen
         python -m pip install numpy==2.2.6
@@ -130,7 +124,7 @@ runs:
       working-directory: ${{github.workspace}}
       run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\dependencies\install\lib\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-    - name: Set DYLD_LIBRARY_PATH on macOS for OSPRay dynamic loading
+    - name: Set DYLD_LIBRARY_PATH on macOS for OSPRay/OSMesa dynamic loading
       if: |
         runner.os == 'macOS' &&
         inputs.optdeps_label == 'optdeps'
@@ -195,12 +189,14 @@ runs:
         -DF3D_PLUGIN_BUILD_VDB=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=${{ inputs.mindeps_label != 'mindeps' && 'ON' || 'OFF' }}
         -DF3D_STRICT_BUILD=ON
+        -DF3D_TESTING_ENABLE_WGL_TESTS=${{ runner.os == 'Windows' && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_EGL_TESTS=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_EXTERNAL_GLFW=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_EXTERNAL_QT=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_ILLUSTRATION_TESTS=${{ (runner.os == 'Linux' && inputs.vtk_version == 'commit' && inputs.build_type == 'standard') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_GLX_TESTS=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=${{ (runner.os == 'Linux' || runner.os == 'Windows') && 'ON' || 'OFF' }}
-        -DF3D_TESTING_ENABLE_OSMESA_TESTS=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_OSMESA_TESTS=ON
         -DF3D_TESTING_DISABLE_CATCH_ALL=ON
         -DF3D_TESTING_FORCE_RENDERING_BACKEND=${{ inputs.rendering_backend }}
         -DF3D_WINDOWS_BUILD_CONSOLE_APPLICATION=ON
@@ -219,24 +215,13 @@ runs:
       shell: bash
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
+    # We install a proper WGL Mesa driver for regular tests
+    # This is needed because F3D_TESTING_ENABLE_WGL_TESTS options is enabled
     - name: Install Mesa Windows
       if: runner.os == 'Windows'
       uses: f3d-app/install-mesa-windows-action@v2
       with:
         path: ${{github.workspace}}\build\bin_Release
-
-    - name: Install Mesa Windows Python
-      if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v2
-      with:
-        path: ${{github.workspace}}\build\Release\f3d
-
-    # A EGL test is crashing in the CI but not locally
-    - name: Set CI test exception for Linux EGL
-      if: runner.os == 'Linux' &&
-        inputs.rendering_backend != 'auto'
-      shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestSDKExternalWindowEGL)" >> $GITHUB_ENV
 
     # numpy makes pytest crashing on Windows in the CI but not locally, skipping for now
     - name: Set CI test exception for Windows
@@ -244,29 +229,25 @@ runs:
       shell: bash
       run: echo "F3D_CTEST_EXCEPTIONS=(test_scene_zero_copy)" >> $GITHUB_ENV
 
-    # Certain tests are failing on macOS with GPU pass through
-    # https://github.com/f3d-app/f3d/issues/792
-    # https://github.com/f3d-app/f3d/issues/1534
-    # https://github.com/f3d-app/f3d/issues/2268
-    # https://github.com/f3d-app/f3d/issues/3047
+    # Certain tests are failing on macOS software rendering
+    # OSMesa is used for VTK > 9.6, remove when it's dropped
     - name: Set CI test exception for macOS x86_64
       if: |
         runner.os == 'macOS' &&
-        inputs.cpu == 'x86_64'
+        inputs.cpu == 'x86_64' &&
+        inputs.rendering_backend == 'auto'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionCycleComp)|(TestGLTFRigArmature)|(TestInteractionNoModelScrollWheel)|(TestInteractionNoModelScrollBar)|(TestInteractionTAA)|(TestInteractionPointCloudTAA)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionCycleComp)|(TestGLTFRigArmature)|(TestInteractionNoModelScrollWheel)|(TestInteractionNoModelScrollBar)|(TestInteractionTAA)|(TestInteractionPointCloudTAA)|(TestInteractionStochasticTAA)" >> $GITHUB_ENV
 
-    # Certain tests are failing on macOS arm64 for unknown reasons
-    # https://github.com/f3d-app/f3d/issues/1276
-    # https://github.com/f3d-app/f3d/issues/792
-    # https://github.com/f3d-app/f3d/issues/1534
-    # https://github.com/f3d-app/f3d/issues/3047
+    # Certain tests are failing on macOS software rendering
+    # OSMesa is used for VTK > 9.6, remove when it's dropped
     - name: Set CI test exception for macOS arm64
       if: |
         runner.os == 'macOS' &&
-        inputs.cpu == 'arm64'
+        inputs.cpu == 'arm64' &&
+        inputs.rendering_backend == 'auto'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheet)|(TestMaxSizeAboveMultiFile)|(TestAxesCustomColor)|(TestInteractionTAA)|(TestInteractionStochasticTAA)|(TestInteractionPointCloudTAA)|(TestSDKNotification)|(TestUnlitOBJOpacity)|(TestInteractionGridReflectionChanged)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheet)|(TestMaxSizeAboveMultiFile)|(TestAxesCustomColor)|(TestInteractionTAA)|(TestInteractionStochasticTAA)|(TestInteractionPointCloudTAA)|(TestSDKNotification)|(TestUnlitOBJOpacity)|(TestInteractionGridReflectionChanged)|(TestUSDRigArmatureWithOpacity)" >> $GITHUB_ENV
 
     - name: Test
       shell: bash
@@ -299,12 +280,6 @@ runs:
         cmake --install . --component configuration
         cmake --install . --component colormaps
 
-    - name: Install Mesa Windows in install
-      if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v2
-      with:
-        path: ${{github.workspace}}\install\bin
-
     - name: Build and configure python externally
       if: |
         inputs.optdeps_label == 'optdeps' &&
@@ -335,14 +310,6 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}
       run: cmake --build build_examples --config Release
-
-    - name: Install Mesa Windows examples
-      if: |
-        runner.os == 'Windows' &&
-        inputs.static_label == 'no-static'
-      uses: f3d-app/install-mesa-windows-action@v2
-      with:
-        path: ${{github.workspace}}\build_examples\*\*\Release
 
     # older VTK version create different renderings so they are not tested
     - name: Test libf3d examples

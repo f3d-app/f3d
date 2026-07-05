@@ -72,6 +72,9 @@ constexpr float GetDefaultMargin()
   return 5.f;
 }
 
+// Base font size in pixels, scaled by FontScale wherever it is used.
+constexpr float FontSizeBase = 18.f;
+
 #ifdef F3D_MODULE_UI
 
 namespace imgui

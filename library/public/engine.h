@@ -41,8 +41,8 @@ public:
   /**
    * Create an engine with an automatic window.
    * Optionally, the window can be hidden by setting offscreen to true.
-   * Linux: Try GLX, then EGL, then OSMesa.
-   * Windows: Try Win32, then EGL, then OSMesa.
+   * Linux: GLX if a X server is running, otherwise EGL if available, otherwise OSMesa.
+   * Windows: Win32 if it supports OpenGL >= 3.2, otherwise EGL if available, otherwise OSMesa.
    * macOS: Always use Cocoa.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
@@ -63,7 +63,6 @@ public:
   /**
    * Create an engine with a GLX window.
    * Works on Linux only.
-   * VTK >= 9.4 required.
    * Optionally, the window can be hidden by setting offscreen to true.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
@@ -76,7 +75,6 @@ public:
   /**
    * Create an engine with a WGL window.
    * Works on Windows only.
-   * VTK >= 9.4 required.
    * Optionally, the window can be hidden by setting offscreen to true.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
@@ -88,9 +86,9 @@ public:
 
   /**
    * Create an engine with an offscreen EGL window.
-   * VTK >= 9.4 required.
    * If several GPU are available, the environment variable
    * `VTK_DEFAULT_EGL_DEVICE_INDEX` allows its selection.
+   * Not supported on macOS.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
    * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library.
@@ -101,7 +99,7 @@ public:
 
   /**
    * Create an engine with an offscreen OSMesa window.
-   * VTK >= 9.4 required.
+   * On macOS, VTK >= 9.6.20260630 is required.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
    * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library.
@@ -126,7 +124,6 @@ public:
   /**
    * Create an engine with an external GLX context.
    * Equivalent to createExternal(f3d::context::glx());
-   * VTK >= 9.4 required.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
    * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library.
@@ -138,7 +135,6 @@ public:
   /**
    * Create an engine with an external WGL context.
    * Equivalent to createExternal(f3d::context::wgl());
-   * VTK >= 9.4 required.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
    * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library.
@@ -150,7 +146,6 @@ public:
   /**
    * Create an engine with an external COCOA context.
    * Equivalent to createExternal(f3d::context::cocoa());
-   * VTK >= 9.4 required.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
    * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library.
@@ -162,7 +157,6 @@ public:
   /**
    * Create an engine with an external EGL context.
    * Equivalent to createExternal(f3d::context::egl());
-   * VTK >= 9.4 required.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
    * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library.
@@ -174,7 +168,6 @@ public:
   /**
    * Create an engine with an external OSMesa context.
    * Equivalent to createExternal(f3d::context::osmesa());
-   * VTK >= 9.4 required.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
    * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library.

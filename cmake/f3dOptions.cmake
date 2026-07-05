@@ -57,7 +57,6 @@ function (f3d_generate_options)
       "Missing OUTPUT_NAME argument for f3d_generate_options")
   endif ()
 
-
   # Parse options.json and generate headers
   set(_option_basename "")
   set(_option_indent "")
@@ -76,6 +75,11 @@ function (f3d_generate_options)
   list(JOIN _options_lister ",\n  " _options_lister)
   list(JOIN _options_is_optional ";\n  else " _options_is_optional)
   list(JOIN _options_reset ";\n  else " _options_reset)
+  list(JOIN _options_has_domain ";\n  else " _options_has_domain)
+  list(JOIN _options_get_enum_domain ";\n  else " _options_get_enum_domain)
+  list(JOIN _options_increase_decrease ";\n  else " _options_increase_decrease)
+  list(JOIN _options_cycle ";\n  else " _options_cycle)
+  list(JOIN _options_type_getter ";\n  else " _options_type_getter)
 
   configure_file(
     "${_f3d_generate_options_INPUT_PUBLIC_HEADER}"
@@ -114,6 +118,22 @@ function(_parse_json_option _top_json)
          endif()
        endif()
 
+       # Recover domain if any
+       string(JSON _option_domain ERROR_VARIABLE _domain_error GET ${_cur_json} "domain")
+       if (_domain_error STREQUAL "NOTFOUND")
+         string(JSON _option_domain_style ERROR_VARIABLE _domain_style_error GET ${_option_domain} "style")
+         string(JSON _option_domain_min ERROR_VARIABLE _domain_min_error GET ${_option_domain} "min")
+         string(JSON _option_domain_max ERROR_VARIABLE _domain_max_error GET ${_option_domain} "max")
+         string(JSON _option_domain_increment ERROR_VARIABLE _domain_increment_error GET ${_option_domain} "increment")
+         string(JSON _option_domain_enum ERROR_VARIABLE _domain_enum_error GET ${_option_domain} "enum")
+       else ()
+         set(_domain_style_error "")
+         set(_domain_min_error "")
+         set(_domain_max_error "")
+         set(_domain_increment_error "")
+         set(_domain_enum_error "")
+       endif ()
+
        # Recover deprecated if any
        string(JSON _option_deprecated ERROR_VARIABLE _deprecated_error GET ${_cur_json} "deprecated")
 
@@ -122,26 +142,35 @@ function(_parse_json_option _top_json)
        # Identify types
        set(_option_actual_type ${_option_type})
        set(_option_variant_type ${_option_type})
+       set(_option_domain_type ${_option_type})
        set(_option_variant_convert "")
        set(_option_explicit_constr "")
+       set(_option_domain_explicit_constr "")
        set(_option_default_value_start "")
        set(_option_default_value_end "")
+       set(_option_domain_value_start "")
+       set(_option_domain_value_end "")
 
        if(_option_type STREQUAL "int_vector")
          set(_option_actual_type "std::vector<int>")
          set(_option_variant_type "std::vector<int>")
+         set(_option_domain_type "int")
          set(_option_default_value_start "{")
          set(_option_default_value_end "}")
        elseif(_option_type STREQUAL "double_vector")
          set(_option_actual_type "std::vector<double>")
          set(_option_variant_type "std::vector<double>")
+         set(_option_domain_type "double")
          set(_option_default_value_start "{")
          set(_option_default_value_end "}")
        elseif(_option_type STREQUAL "string")
          set(_option_actual_type "std::string")
          set(_option_variant_type "std::string")
+         set(_option_domain_type "std::string")
          set(_option_default_value_start "\"")
          set(_option_default_value_end "\"")
+         set(_option_domain_value_start "\"")
+         set(_option_domain_value_end "\"")
        elseif(_option_type STREQUAL "path")
          set(_option_actual_type "std::filesystem::path")
          set(_option_variant_type "std::string")
@@ -152,30 +181,38 @@ function(_parse_json_option _top_json)
          set(_option_actual_type "f3d::ratio_t")
          set(_option_explicit_constr "f3d::ratio_t")
          set(_option_variant_type "double")
+         set(_option_domain_type "f3d::ratio_t")
+         set(_option_domain_explicit_constr "f3d::ratio_t")
          set(_option_default_value_start "{")
          set(_option_default_value_end "}")
+         set(_option_domain_value_start "(")
+         set(_option_domain_value_end ")")
        elseif(_option_type STREQUAL "color")
          set(_option_actual_type "f3d::color_t")
          set(_option_explicit_constr "f3d::color_t")
          set(_option_variant_type "std::vector<double>")
+         set(_option_domain_type "double")
          set(_option_default_value_start "{")
          set(_option_default_value_end "}")
        elseif(_option_type STREQUAL "direction")
          set(_option_actual_type "f3d::direction_t")
          set(_option_explicit_constr "f3d::direction_t")
          set(_option_variant_type "std::vector<double>")
+         set(_option_domain_type "double")
          set(_option_default_value_start "{")
          set(_option_default_value_end "}")
        elseif(_option_type STREQUAL "colormap")
          set(_option_actual_type "f3d::colormap_t")
          set(_option_explicit_constr "f3d::colormap_t")
          set(_option_variant_type "std::vector<double>")
+         set(_option_domain_type "double")
          set(_option_default_value_start "{")
          set(_option_default_value_end "}")
        elseif(_option_type STREQUAL "transform2d")
          set(_option_actual_type "f3d::transform2d_t")
          set(_option_explicit_constr "f3d::transform2d_t")
          set(_option_variant_type "std::vector<double>")
+         set(_option_domain_type "double")
          set(_option_default_value_start "{")
          set(_option_default_value_end "}")
        endif()
@@ -212,15 +249,115 @@ function(_parse_json_option _top_json)
        list(APPEND _options_string_getter "if (name == \"${_option_name}\") return options_tools::format(opt.${_option_name}${_optional_getter})")
        list(APPEND _options_lister "\"${_option_name}\"")
 
+
+       # Domain
+       if(_domain_style_error STREQUAL "NOTFOUND")
+
+         # Range domain
+         if(_option_domain_style STREQUAL "range")
+
+           # Check inputs
+           if(NOT _domain_min_error STREQUAL "NOTFOUND")
+             message(FATAL_ERROR "Missing min in ${_option_name} range domain")
+           endif()
+           if(NOT _domain_max_error STREQUAL "NOTFOUND")
+             message(FATAL_ERROR "Missing max in ${_option_name} range domain")
+           endif()
+           if(NOT _domain_increment_error STREQUAL "NOTFOUND")
+             message(FATAL_ERROR "Missing increment in ${_option_name} range domain")
+           endif()
+
+           # {range_min, range_max, range_increment }
+           set(_range_value_initialize "{")
+           string(APPEND _range_value_initialize "${_option_domain_explicit_constr}${_option_domain_value_start}${_option_domain_min}${_option_domain_value_end}, ")
+           string(APPEND _range_value_initialize "${_option_domain_explicit_constr}${_option_domain_value_start}${_option_domain_max}${_option_domain_value_end}, ")
+           string(APPEND _range_value_initialize "${_option_domain_explicit_constr}${_option_domain_value_start}${_option_domain_increment}${_option_domain_value_end}}")
+
+           # Add range domain to struct and methods
+           string(APPEND _options_domains_struct "${_option_indent}    DomainRange<${_option_domain_type}> ${_member_name} = ${_range_value_initialize};\n")
+           list(APPEND _options_has_domain "if (name == \"${_option_name}\") return options_tools::hasDomain(style, options::domain_style::RANGE)")
+           list(APPEND _options_get_enum_domain "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to get enum domain of \" + std::string(\"${_option_name}\") + \" which doesn't have such domain\")")
+           list(APPEND _options_increase_decrease "if (name == \"${_option_name}\") options_tools::increaseDecrease<Up>(opt.${_option_name}, opt.domains.${_option_name})")
+           list(APPEND _options_cycle "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to increase or decrease \" + std::string(\"${_option_name}\") + \" which is not compatible\")")
+
+         else()
+
+           # Enum domain
+           if(_option_domain_style STREQUAL "enum")
+
+             # Check enum
+             if(NOT _domain_enum_error STREQUAL "NOTFOUND")
+               message(FATAL_ERROR "Missing enum in ${_option_name} enum domain")
+             endif()
+
+             # {{ enum_value_0, enum_value_1, ..., enum_value_N }}
+             set(_enum_value_initialize "{{")
+             string(JSON _domain_enum_length LENGTH ${_option_domain_enum})
+             math(EXPR _domain_enum_length "${_domain_enum_length} - 1")
+             if (_domain_enum_length GREATER_EQUAL 0)
+               foreach(_enum_idx RANGE ${_domain_enum_length})
+                 string(JSON _enum_value GET ${_option_domain_enum} ${_enum_idx})
+                 string(APPEND _enum_value_initialize "${_option_domain_explicit_constr}${_option_domain_value_start}${_enum_value}${_option_domain_value_end}, ")
+               endforeach()
+             endif()
+             string(APPEND _enum_value_initialize "}}")
+
+             # Add enum domain to struct and methods
+             string(APPEND _options_domains_struct "${_option_indent}    DomainEnum<${_option_domain_type}> ${_member_name} = ${_enum_value_initialize};\n")
+             list(APPEND _options_has_domain "if (name == \"${_option_name}\") return options_tools::hasDomain(style, options::domain_style::ENUM)")
+             list(APPEND _options_get_enum_domain "if (name == \"${_option_name}\") return options_tools::getEnumDomain(opt.domains.${_option_name})")
+             list(APPEND _options_increase_decrease "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to increase or decrease \" + std::string(\"${_option_name}\") + \" which is not compatible\")")
+             list(APPEND _options_cycle "if (name == \"${_option_name}\") options_tools::cycle(opt.${_option_name}, opt.domains.${_option_name})")
+           else()
+
+             # Index domain
+             if(_option_domain_style STREQUAL "index")
+
+               if (NOT _option_domain_type STREQUAL "int")
+                 message(FATAL_ERROR "Index domain for ${_option_name} is invalid, only int domains supported")
+               endif()
+
+               # { max }
+               if(_domain_index_error STREQUAL "NOTFOUND")
+                 # This is not tested at all yet
+                 set(_index_value_initialize "{${_option_domain_max}}")
+               else()
+                 set(_index_value_initialize "{std::nullopt}")
+               endif()
+
+               # Add index domain to struct and methods
+               string(APPEND _options_domains_struct "${_option_indent}    DomainIndex ${_member_name} = ${_index_value_initialize};\n")
+               list(APPEND _options_has_domain "if (name == \"${_option_name}\") return options_tools::hasDomain(style, options::domain_style::INDEX)")
+               list(APPEND _options_get_enum_domain "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to get enum domain \" + std::string(\"${_option_name}\") + \" which doesn't have such domain\")")
+               list(APPEND _options_increase_decrease "if (name == \"${_option_name}\") options_tools::increaseDecrease<Up>(opt.${_option_name}, opt.domains.${_option_name})")
+               list(APPEND _options_cycle "if (name == \"${_option_name}\") options_tools::cycle(opt.${_option_name}, opt.domains.${_option_name})")
+             endif()
+           endif()
+         endif()
+
+       # No domain
+       else()
+         list(APPEND _options_has_domain "if (name == \"${_option_name}\") return false")
+         list(APPEND _options_get_enum_domain "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to get enum domain \" + std::string(\"${_option_name}\") + \" which doesn't have one\")")
+         list(APPEND _options_increase_decrease "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to increase or decrease \" + std::string(\"${_option_name}\") + \" which is not compatible\")")
+         list(APPEND _options_cycle "if (name == \"${_option_name}\") throw options::incompatible_exception(\"Trying to cycle \" + std::string(\"${_option_name}\") + \" which is not compatible\")")
+       endif()
+
+       # Type
+       string(TOUPPER ${_option_type} _option_type_enum)
+       list(APPEND _options_type_getter "if (name == \"${_option_name}\") return options::option_type::${_option_type_enum}")
+
     else()
-      # Group found, add in the struct and recurse
+      # Group found, add in the structs and recurse
       set(_option_prevname ${_option_basename})
       set(_option_previndent ${_option_indent})
       string(APPEND _option_indent "  ")
       string(APPEND _option_basename "${_member_name}.")
       string(APPEND _options_struct "${_option_indent}struct ${_member_name} {\n")
+      string(APPEND _options_domains_struct "${_option_indent}  struct ${_member_name} {\n")
       _parse_json_option(${_cur_json})
       string(APPEND _options_struct "${_option_indent}} ${_member_name};\n\n")
+      string(APPEND _options_domains_struct "${_option_indent}  } ${_member_name};\n\n")
       set(_option_indent ${_option_previndent})
       set(_option_basename ${_option_prevname})
     endif()
@@ -228,6 +365,7 @@ function(_parse_json_option _top_json)
   # Set appended variables and list in the parent before leaving the recursion
   # Always use quotes for string variable as it contains semi-colons
   set(_options_struct "${_options_struct}" PARENT_SCOPE)
+  set(_options_domains_struct "${_options_domains_struct}" PARENT_SCOPE)
   set(_options_setter ${_options_setter} PARENT_SCOPE)
   set(_options_getter ${_options_getter} PARENT_SCOPE)
   set(_options_string_setter ${_options_string_setter} PARENT_SCOPE)
@@ -235,4 +373,9 @@ function(_parse_json_option _top_json)
   set(_options_lister ${_options_lister} PARENT_SCOPE)
   set(_options_is_optional ${_options_is_optional} PARENT_SCOPE)
   set(_options_reset ${_options_reset} PARENT_SCOPE)
+  set(_options_has_domain ${_options_has_domain} PARENT_SCOPE)
+  set(_options_get_enum_domain ${_options_get_enum_domain} PARENT_SCOPE)
+  set(_options_increase_decrease ${_options_increase_decrease} PARENT_SCOPE)
+  set(_options_cycle ${_options_cycle} PARENT_SCOPE)
+  set(_options_type_getter ${_options_type_getter} PARENT_SCOPE)
 endfunction()

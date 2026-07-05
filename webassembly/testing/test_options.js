@@ -29,7 +29,7 @@ const settings = {
       "options getter for double failed",
     );
     utils.assert(
-      options.get("model.point_sprites.type") === "sphere",
+      options.get("model.point_sprites.type") === "none",
       "options getter for string failed",
     );
 
@@ -105,6 +105,11 @@ const settings = {
       "options !isOptional",
     );
 
+    utils.assert(
+      options.getType("model.point_sprites.size") === Module.OptionType.DOUBLE,
+      "options getType",
+    );
+
     options.removeValue("model.scivis.array_name");
     utils.assert(
       !options.hasValue("model.scivis.array_name"),
@@ -115,6 +120,29 @@ const settings = {
     utils.assert(
       options.get("model.scivis.enable") === false,
       "options getter after reset",
+    );
+
+    utils.assert(options.hasDomain("scene.camera.index"), "options hasDomain");
+    utils.assert(
+      options.getDomainStyle("scene.camera.index") ==
+        Module.OptionsDomainStyle.INDEX,
+      "option getDomainStyle",
+    );
+    utils.assert(
+      options.getEnumDomain("render.effect.blending.mode").includes("ddp"),
+      "options getEnumDomain",
+    );
+    options.increase("render.raytracing.samples");
+    options.increase("render.raytracing.samples");
+    options.decrease("render.raytracing.samples");
+    utils.assert(
+      options.get("render.raytracing.samples") == 6,
+      "options increase/decrease",
+    );
+    options.cycle("render.effect.blending.mode");
+    utils.assert(
+      options.get("render.effect.blending.mode") == "ddp",
+      "options cycle",
     );
   },
 };

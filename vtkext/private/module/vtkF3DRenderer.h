@@ -558,6 +558,37 @@ public:
    */
   vtkMatrix4x4* GetGridMatrix() const;
 
+  /**
+   * Get screen-space scaling
+   * The value returned can be used to scale screen space methods like line width
+   * to keep a consistent size on screen when using SSAA anti-aliasing.
+   */
+  double GetScreenSpaceScaling() const;
+
+  /**
+   * Set the animation progress bar mode.
+   * `NONE` hides the bar, `DEFAULT` shows the bar alone, `ADVANCED` adds
+   * time/name labels around it.
+   */
+  void SetAnimationProgressMode(vtkF3DUIActor::AnimationProgressBarMode mode);
+
+  /**
+   * Set the time range, name and keyframe times of the current animation.
+   * Meant to be pushed when the loaded animation changes.
+   */
+  void SetAnimationProgress(const std::pair<double, double>& timeRange, const std::string& name,
+    const std::vector<double>& keyFrames);
+
+  /**
+   * Set the animation progress bar fill color
+   */
+  void SetAnimationProgressColor(const std::array<double, 3>& color);
+
+  /**
+   * Update the current animation time, meant to be pushed every tick during playback
+   */
+  void UpdateAnimationTime(double currentTime);
+
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;

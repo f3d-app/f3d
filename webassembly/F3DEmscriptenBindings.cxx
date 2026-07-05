@@ -54,6 +54,25 @@ emscripten::val pairToJSArray(const std::pair<U, V>& p)
 EMSCRIPTEN_BINDINGS(f3d)
 {
   // f3d::options
+  emscripten::enum_<f3d::options::domain_style>("OptionsDomainStyle")
+    .value("RANGE", f3d::options::domain_style::RANGE)
+    .value("ENUM", f3d::options::domain_style::ENUM)
+    .value("INDEX", f3d::options::domain_style::INDEX);
+
+  emscripten::enum_<f3d::options::option_type>("OptionType")
+    .value("BOOL", f3d::options::option_type::BOOL)
+    .value("INT", f3d::options::option_type::INT)
+    .value("DOUBLE", f3d::options::option_type::DOUBLE)
+    .value("RATIO", f3d::options::option_type::RATIO)
+    .value("STRING", f3d::options::option_type::STRING)
+    .value("PATH", f3d::options::option_type::PATH)
+    .value("COLOR", f3d::options::option_type::COLOR)
+    .value("DIRECTION", f3d::options::option_type::DIRECTION)
+    .value("COLORMAP", f3d::options::option_type::COLORMAP)
+    .value("TRANSFORM2D", f3d::options::option_type::TRANSFORM2D)
+    .value("DOUBLE_VECTOR", f3d::options::option_type::DOUBLE_VECTOR)
+    .value("INT_VECTOR", f3d::options::option_type::INT_VECTOR);
+
   emscripten::class_<f3d::options>("Options")
     .constructor<>()
     .function(
@@ -127,11 +146,33 @@ EMSCRIPTEN_BINDINGS(f3d)
       "isOptional",
       +[](f3d::options& o, const std::string& name) -> bool { return o.isOptional(name); })
     .function(
+      "getType", +[](f3d::options& o, const std::string& name) -> f3d::options::option_type
+      { return o.getType(name); })
+    .function(
       "reset", +[](f3d::options& o, const std::string& name) -> f3d::options&
       { return o.reset(name); }, emscripten::return_value_policy::reference())
     .function(
       "removeValue", +[](f3d::options& o, const std::string& name) -> f3d::options&
-      { return o.removeValue(name); }, emscripten::return_value_policy::reference());
+      { return o.removeValue(name); }, emscripten::return_value_policy::reference())
+    .function(
+      "hasDomain",
+      +[](const f3d::options& o, const std::string& name) -> bool { return o.hasDomain(name); })
+    .function(
+      "getDomainStyle",
+      +[](const f3d::options& o, const std::string& name) -> f3d::options::domain_style
+      { return o.getDomainStyle(name); })
+    .function(
+      "getEnumDomain", +[](const f3d::options& o, const std::string& name) -> emscripten::val
+      { return containerToJSArray(o.getEnumDomain(name)); })
+    .function(
+      "increase", +[](f3d::options& o, const std::string& name) -> f3d::options&
+      { return o.increase(name); }, emscripten::return_value_policy::reference())
+    .function(
+      "decrease", +[](f3d::options& o, const std::string& name) -> f3d::options&
+      { return o.decrease(name); }, emscripten::return_value_policy::reference())
+    .function(
+      "cycle", +[](f3d::options& o, const std::string& name) -> f3d::options&
+      { return o.cycle(name); }, emscripten::return_value_policy::reference());
 
   // f3d::scene
   // TODO:

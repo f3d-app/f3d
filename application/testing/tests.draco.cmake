@@ -3,7 +3,7 @@
 f3d_test(NAME TestDRACO DATA suzanne.drc PLUGIN draco)
 f3d_test(NAME TestDRACOColoring DATA suzanne.drc PLUGIN draco ARGS --scalar-coloring --coloring-component=0)
 f3d_test(NAME TestGLTFDracoImporter DATA Box_draco.glb PLUGIN draco ARGS --verbose)
-f3d_test(NAME TestGLTFDracoImporterWithoutCompression DATA BoxAnimated.gltf PLUGIN draco ARGS --animation-time=2 --animation-progress --force-reader=GLTFDraco)
+f3d_test(NAME TestGLTFDracoImporterWithoutCompression DATA BoxAnimated.gltf PLUGIN draco ARGS --animation-time=2 --animation-progress --force-reader=GLTFDraco UI)
 
 f3d_test(NAME TestPipedDRACO DATA suzanne.drc PLUGIN draco ARGS PIPED Draco)
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250923)

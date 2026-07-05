@@ -119,7 +119,6 @@ int main(int argc, char** argv)
     opt.render.light.intensity = 1.2;
 
     // Post-processing: AA + AO for better thumbnails
-    opt.render.effect.antialiasing.enable = true;
     opt.render.effect.antialiasing.mode = "ssaa";
     opt.render.effect.ambient_occlusion = true;
 

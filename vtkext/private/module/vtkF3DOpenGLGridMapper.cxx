@@ -183,11 +183,11 @@ void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
   float scaling = 1.f;
 
   const vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(ren);
-  if (renderer && renderer->GetAntiAliasingMode() == vtkF3DRenderer::AntiAliasingMode::SSAA)
+  if (renderer)
   {
     // The grid line width and reflection sampling need to be scaled up by the SSAA factor
     // to keep a consistent appearance.
-    scaling = std::sqrt(5.f);
+    scaling = renderer->GetScreenSpaceScaling();
   }
 
   const float offset2d[2] = {

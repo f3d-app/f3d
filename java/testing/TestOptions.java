@@ -48,6 +48,7 @@ public class TestOptions {
     options.getAllNames();
     options.getClosestOption("ui.scalar");
     options.isOptional("ui.scalar_bar");
+    options.getType("render.point_size");
 
     Engine engine2 = Engine.create(true);
     Options options2 = engine2.getOptions();
@@ -57,6 +58,13 @@ public class TestOptions {
 
     options.reset("render.line_width");
     options.removeValue("model.color.texture");
+
+    options.hasDomain("scene.camera.index");
+    options.getDomainStyle("scene.camera.index");
+    options.getEnumDomain("render.effect.blending.mode");
+    options.increase("render.raytracing.samples");
+    options.decrease("render.raytracing.samples");
+    options.cycle("render.effect.blending.mode");
 
     engine.close();
   }

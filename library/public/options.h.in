@@ -7,6 +7,7 @@
 
 /// @cond
 #include <array>
+#include <cstdint>
 #include <filesystem>
 #include <optional>
 #include <string>
@@ -30,6 +31,37 @@ using option_variant_t =
 class F3D_EXPORT options
 {
 public:
+  /**
+   * Enum class used by options::hasDomain
+   * to provide information about the style of domain being used
+   * for a specific option
+   */
+  enum class F3D_EXPORT domain_style : std::uint8_t
+  {
+    RANGE = 1,
+    ENUM = 2,
+    INDEX = 3,
+  };
+
+  /**
+   * Enumeration of the possible types of an option.
+   */
+  enum class F3D_EXPORT option_type : std::uint8_t
+  {
+    BOOL,
+    INT,
+    DOUBLE,
+    RATIO,
+    STRING,
+    PATH,
+    COLOR,
+    DIRECTION,
+    COLORMAP,
+    TRANSFORM2D,
+    DOUBLE_VECTOR,
+    INT_VECTOR
+  };
+
   ///@{ @name Constructors
   /**
    * Default/Copy/move constructors/operators.
@@ -120,31 +152,92 @@ public:
   [[nodiscard]] std::vector<std::string> getNames() const;
 
   /**
+   * Get the type of an option based on its name.
+   *
+   * Throws an options::inexistent_exception if option does not exist.
+   */
+  [[nodiscard]] option_type getType(std::string_view name) const;
+
+  /**
    * Get the closest option name and its Levenshtein distance.
    */
   [[nodiscard]] std::pair<std::string, unsigned int> getClosestOption(
     std::string_view option) const;
 
   /**
-   *  Returns true if the option is optional else returns false.
+   * Returns true if the option is optional else returns false.
    *
-   *  Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::inexistent_exception if option does not exist.
    */
   [[nodiscard]] bool isOptional(std::string_view option) const;
 
   /**
-   *  Resets the option to default value.
+   * Resets the option to default value.
    *
-   *  Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::inexistent_exception if option does not exist.
    */
   options& reset(std::string_view name);
 
   /**
-   *  Unset the option if it is optional else throws options::incompatible_exception.
+   * Unset the option if it is optional else throws options::incompatible_exception.
    *
-   *  Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::incompatible_exception if option is not an optional.
    */
   options& removeValue(std::string_view name);
+
+  /**
+   * Return true if an option has a domain, false otherwise.
+   * Throws an options::inexistent_exception if option does not exist.
+   */
+  [[nodiscard]] bool hasDomain(std::string_view name) const;
+
+  /**
+   * Return the domain_style of provided option
+   * Throw options::incompatible_exception if option doesn't have an enumeration domain.
+   * Throws an options::inexistent_exception if option does not exist.
+   */
+  [[nodiscard]] domain_style getDomainStyle(std::string_view name) const;
+
+  /**
+   * Return a the enumeration of the enum domain of provided option.
+   * The enumeration is provided as is in string form.
+   * Throw options::incompatible_exception if option doesn't have an enumeration domain.
+   * Throws an options::inexistent_exception if option does not exist.
+   * Note: The is no string API to recover a range or index domain yet.
+   */
+  [[nodiscard]] std::vector<std::string> getEnumDomain(std::string_view name) const;
+
+  /**
+   * Increase an option value if it has a range or index domain, else throws
+   * options::incompatible_exception.
+   * Increasing above the max is capped at the maximum.
+   * Increasing an optional option without a value set it to the domain minimum.
+   *
+   * Throws an options::inexistent_exception if option does not exist.
+   */
+  options& increase(std::string_view name);
+
+  /**
+   * Decrease an option value if it has a range or index domain, else throws
+   * options::incompatible_exception.
+   * Decreasing below the min is capped at the minimum.
+   * Decreasing an optional option without a value set it to the domain maximum.
+   *
+   * Throws an options::inexistent_exception if option does not exist.
+   */
+  options& decrease(std::string_view name);
+
+  /**
+   * Cycle an option value if it has an enumeration or index domain, else throws
+   * options::incompatible_exception.
+   * Loops over the beginning of the enumeration domain when reaching the end.
+   * Cycling an optional option with a value set it to the first in the enumeration domain.
+   * Looping an optional option removes the value.
+   *
+   * Throws an options::inexistent_exception if option does not exist.
+   */
+  options& cycle(std::string_view name);
 
   /**
    * Templated parsing method used internally to parse strings.
@@ -203,10 +296,50 @@ public:
   };
 
   /**
+   * Struct used in the domains struct
+   * for range domains
+   */
+  template<typename T>
+  struct DomainRange
+  {
+    T min;
+    T max;
+    T increment;
+  };
+
+  /**
+   * Struct used in the domains struct
+   * for enumeration domains
+   */
+  template<typename T>
+  struct DomainEnum
+  {
+    std::vector<T> enumeration;
+  };
+
+  /**
+   * Struct used in the domains struct
+   * for index domains
+   */
+  struct DomainIndex
+  {
+    std::optional<unsigned int> max;
+  };
+
+  /**
    * The complete generated options struct
    */
   // clang-format off
   ${_options_struct}
+  // clang-format on
+
+  /**
+   * The complete generated options domains struct
+   */
+  // clang-format off
+  struct domains {
+  ${_options_domains_struct}
+  } domains;
   // clang-format on
 };
 

@@ -104,9 +104,10 @@ endif()
 
 ## Axes grid
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11209
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260612)
   f3d_test(NAME TestAxesGridEnable DATA suzanne.ply ARGS --axes-grid THRESHOLD 0.08) # Threshold required for MacOS due to line rendering differences
   f3d_test(NAME TestAxesGridEnableNonCenteredData DATA cow.vtp ARGS --axes-grid)
+  f3d_test(NAME TestAxesGridEnableSSAA DATA cow.vtp ARGS --axes-grid --anti-aliasing=ssaa THRESHOLD 0.05)
   f3d_test(NAME TestCommandScriptAxesGridAnimation SCRIPT DATA BoxAnimated.gltf ARGS --axes-grid --camera-zoom-factor=0.2)
 endif()
 
@@ -128,8 +129,8 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
 endif()
 
 ## Volume
-f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1)
-f3d_test(NAME TestVolumeInverse DATA HeadMRVolume.mhd ARGS -vi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 THRESHOLD 0.05) # Small rendering differences due to volume rendering
+f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 THRESHOLD 0.08) # Small rendering differences on macOS OSMesa
+f3d_test(NAME TestVolumeInverse DATA HeadMRVolume.mhd ARGS -vi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 THRESHOLD 0.11) # Small rendering differences on macOS OSMesa
 f3d_test(NAME TestVolumeMag DATA vase_4comp.vti ARGS -vb)
 f3d_test(NAME TestVolumeComp DATA vase_4comp.vti ARGS -vb --coloring-component=3 LONG_TIMEOUT)
 f3d_test(NAME TestVolumeDirect DATA vase_4comp.vti ARGS -vb --coloring-component=-2)
@@ -167,8 +168,8 @@ f3d_test(NAME TestLightIntensityDarkerFullScene DATA WaterBottle.glb ARGS --ligh
 f3d_test(NAME TestUTF8 DATA "(ノಠ益ಠ )ノ.vtp")
 f3d_test(NAME TestFilenameCommasSpaces DATA "tetrahedron, with commas & spaces.stl")
 f3d_test(NAME TestFilename DATA suzanne.ply ARGS -n UI)
-f3d_test(NAME TestHDRIFilename DATA dragon.vtu ARGS --hdri-filename -f -j --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr UI LONG_TIMEOUT)
-f3d_test(NAME TestFilenameHDRIFilename DATA dragon.vtu ARGS --hdri-filename -n -f -j --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr RESOLUTION 400,400 UI LONG_TIMEOUT)
+f3d_test(NAME TestHDRIFilename DATA dragon.vtu ARGS --hdri-filename HDRI shanghai_bund_1k.hdr UI LONG_TIMEOUT)
+f3d_test(NAME TestFilenameHDRIFilename DATA dragon.vtu ARGS --hdri-filename -n HDRI shanghai_bund_1k.hdr RESOLUTION 400,400 UI LONG_TIMEOUT)
 f3d_test(NAME TestHDRIFilenameDefault DATA dragon.vtu ARGS --hdri-filename -f -j UI LONG_TIMEOUT DEFAULT_HDRI)
 f3d_test(NAME TestFilenameWhiteBg DATA suzanne.ply ARGS -n --background-color=1,1,1 UI)
 f3d_test(NAME TestConsoleBadgeWarning DATA suzanne.ply ARGS --position=0 UI)
@@ -252,18 +253,19 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
 endif()
 
 ## Animation
-f3d_test(NAME TestAnimationIndicesSingle DATA soldier_animations.mdl ARGS --animation-indices=7 --animation-time=0.5 --animation-progress)
-f3d_test(NAME TestAnimationIndicesMulti DATA InterpolationTest.glb ARGS --animation-indices=7,6 --animation-time=0.5 --animation-progress)
-f3d_test(NAME TestAnimationIndexDeprecated DATA InterpolationTest.glb ARGS --animation-index=7 --animation-time=0.5 --animation-progress)
-f3d_test(NAME TestMultiFileAnimationIndices DATA InterpolationTest.glb BoxAnimated.gltf ARGS --animation-indices=9 --animation-time=0.85 --animation-progress --multi-file-mode=all)
+f3d_test(NAME TestAnimationIndicesSingle DATA soldier_animations.mdl ARGS --animation-indices=7 --animation-time=0.5 --animation-progress UI)
+f3d_test(NAME TestAnimationIndicesMulti DATA InterpolationTest.glb ARGS --animation-indices=7,6 --animation-time=0.5 --animation-progress UI)
+f3d_test(NAME TestAnimationIndexDeprecated DATA InterpolationTest.glb ARGS --animation-index=7 --animation-time=0.5 --animation-progress UI)
+f3d_test(NAME TestMultiFileAnimationIndices DATA InterpolationTest.glb BoxAnimated.gltf ARGS --animation-indices=9 --animation-time=0.85 --animation-progress --multi-file-mode=all UI)
+f3d_test(NAME TestAnimationProgressBarWithScalarBar DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress=advanced --scalar-coloring --coloring-scalar-bar UI)
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12688
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251006)
   f3d_test(NAME TestMultiFileAnimationNoneMulti DATA bot2.wrl InterpolationTest.glb ARGS --animation-indices=6 --animation-time=0.85 --multi-file-mode=all)
 endif()
 f3d_test(NAME TestMultiFileAnimationAnySingle DATA soldier_animations.mdl InterpolationTest.glb ARGS --animation-indices=13 --animation-time=0.85 --multi-file-mode=all --opacity=0.5)
-f3d_test(NAME TestMultiFileAnimationNoAnimationSupport DATA f3d.glb world.obj ARGS --multi-file-mode=all --animation-time=2 --animation-progress)
+f3d_test(NAME TestMultiFileAnimationNoAnimationSupport DATA f3d.glb world.obj ARGS --multi-file-mode=all --animation-time=2 --animation-progress UI)
 f3d_test(NAME TestAnimationAutoplay DATA InterpolationTest.glb ARGS --animation-autoplay)
-f3d_test(NAME TestAnimationAllAnimations DATA InterpolationTest.glb ARGS --animation-indices=-1 --animation-time=1 --animation-progress)
+f3d_test(NAME TestAnimationAllAnimations DATA InterpolationTest.glb ARGS --animation-indices=-1 --animation-time=1 --animation-progress UI)
 f3d_test(NAME TestAnimationNoAnimations DATA InterpolationTest.glb ARGS --animation-indices= --verbose NO_BASELINE REGEXP "Current animation is: No animation")
 f3d_test(NAME TestVerboseAnimation DATA InterpolationTest.glb ARGS --verbose NO_BASELINE REGEXP "7: CubicSpline Translation")
 f3d_test(NAME TestVerboseAnimationWrongAnimationTimeHigh DATA BoxAnimated.gltf ARGS --animation-time=10 --verbose REGEXP "Animation time 10 is outside of range \\[0, 3\\.70833\\], using 3\\.70833" NO_BASELINE)
@@ -290,22 +292,20 @@ f3d_test(NAME TestOutputStream DATA suzanne.ply ARGS --verbose=quiet --output=- 
 f3d_test(NAME TestOutputStreamInfo DATA suzanne.ply ARGS --verbose=info --output=- REGEXP "redirected to stderr" NO_BASELINE NO_OUTPUT)
 
 ## AntiAliasing
+f3d_test(NAME TestAntiAliasingImplicit DATA suzanne.ply ARGS -a --verbose REGEXP "'anti-aliasing' = 'fxaa'" NO_BASELINE)
 f3d_test(NAME TestInvalidAntiAliasingMode DATA suzanne.ply ARGS --anti-aliasing=foo REGEXP "foo is an invalid antialiasing mode" NO_BASELINE)
-f3d_test(NAME TestAntiAliasingModeDeprecated DATA suzanne.ply ARGS -a --anti-aliasing-mode=ssaa REGEXP "--anti-aliasing-mode is deprecated" NO_BASELINE)
-f3d_test(NAME TestAntiAliasingDeprecated DATA suzanne.ply ARGS --anti-aliasing=true REGEXP "please specify the type of anti-aliasing" NO_BASELINE)
 
 ## Blending
+f3d_test(NAME TestBlendingImplicit DATA suzanne.ply ARGS -p --verbose REGEXP "'blending' = 'ddp'" NO_BASELINE)
 f3d_test(NAME TestInvalidBlendingMode DATA suzanne.ply ARGS --blending=foo REGEXP "foo is an invalid blending mode" NO_BASELINE)
-f3d_test(NAME TestTranslucencySupportDeprecated DATA suzanne.ply ARGS --translucency-support REGEXP "--translucency-support is deprecated" NO_BASELINE)
 
 ## InteractionStyle
-f3d_test(NAME TestInteractionStyleImplicit DATA suzanne.ply ARGS -k NO_BASELINE)
-f3d_test(NAME TestTrackballInvalid DATA suzanne.ply ARGS --interaction-trackball=foo REGEXP "Cannot parse --interaction-trackball value" NO_BASELINE)
+f3d_test(NAME TestInteractionStyleImplicit DATA suzanne.ply ARGS -k --verbose REGEXP "'interaction-style' = '2d'" NO_BASELINE)
+f3d_test(NAME TestInvalidInteractionStyle DATA suzanne.ply ARGS --interaction-style=foo REGEXP "Unrecognized interaction style" NO_BASELINE)
 
 ## PointSprites
+f3d_test(NAME TestPointSpritesImplicit DATA suzanne.ply ARGS -o --verbose REGEXP "'point-sprites' = 'sphere'" NO_BASELINE)
 f3d_test(NAME TestInvalidPointSprites DATA suzanne.ply ARGS --point-sprites=foo REGEXP "foo is an invalid point sprites type" NO_BASELINE)
-f3d_test(NAME TestPointSpritesTypeDeprecated DATA pointsCloud.vtp ARGS --point-sprites-type=sphere REGEXP "--point-sprites-type is deprecated" NO_BASELINE)
-f3d_test(NAME TestPointSpritesDeprecated DATA pointsCloud.vtp ARGS --point-sprites=true REGEXP "please specify the type of point sprites" NO_BASELINE)
 f3d_test(NAME TestAnimationUserMatrixPointSprites DATA BoxAnimated.gltf ARGS --point-sprites --point-sprites-size=50 --animation-time=2)
 f3d_test(NAME TestAnimationInputChangePointSprites DATA v_rock2.mdl ARGS --point-sprites --point-sprites-size=50 --animation-time=0.01 --animation-indices=1)
 
@@ -316,11 +316,11 @@ f3d_test(NAME TestBackdropOpacityMedium DATA suzanne.ply ARGS -n --backdrop-opac
 f3d_test(NAME TestBackdropColor DATA suzanne.ply ARGS -n --backdrop-color=0.5,1.0,0.5 UI)
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-  f3d_test(NAME TestDefaultConfigFileHDRIFilename DATA dragon.vtu CONFIG config_build ARGS -j --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr UI LONG_TIMEOUT)
+  f3d_test(NAME TestDefaultConfigFileHDRIFilename DATA dragon.vtu CONFIG config_build HDRI shanghai_bund_1k.hdr UI)
 endif()
 
 ## Skinning
-if(APPLE) # MacOS does not support OpenGL 4.3
+if(APPLE AND NOT F3D_TESTING_FORCE_RENDERING_BACKEND STREQUAL "osmesa") # MacOS driver does not support OpenGL 4.3
   f3d_test(NAME TestSkinningManyBonesFailure DATA tube_254bones.glb ARGS --verbose REGEXP "which requires OpenGL" NO_BASELINE)
 else()
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219) # The baseline changed with armature support
@@ -339,19 +339,19 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219)
 endif()
 
 ## HDRI
-f3d_test(NAME TestHDRI DATA suzanne.ply HDRI palermo_park_1k.hdr)
-f3d_test(NAME TestHDRICache DATA suzanne.ply HDRI palermo_park_1k.hdr DEPENDS TestHDRI)
-f3d_test(NAME TestHDRIBlur DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -u)
+f3d_test(NAME TestHDRI DATA suzanne.ply HDRI shanghai_bund_1k.hdr)
+f3d_test(NAME TestHDRICache DATA suzanne.ply HDRI shanghai_bund_1k.hdr DEPENDS TestHDRI)
+f3d_test(NAME TestHDRIBlur DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u)
 f3d_test(NAME TestHDRIBlurCoCSmall DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=10 --camera-position=-20,0,20)
 f3d_test(NAME TestHDRIBlurCoCMedium DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=50 --camera-position=-20,0,20)
 f3d_test(NAME TestHDRIBlurCoCLarge DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=100 --camera-position=-20,0,20)
 f3d_test(NAME TestHDRIBlurCoCZero DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=0 --camera-position=-20,0,20)
 f3d_test(NAME TestHDRIBlurCoCNegative DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=-100 --camera-position=-20,0,20)
-f3d_test(NAME TestHDRIBlurRatio DATA suzanne.ply HDRI palermo_park_1k.hdr RESOLUTION 600,100 ARGS -u)
-f3d_test(NAME TestHDRIEdges DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -e THRESHOLD 0.06)
+f3d_test(NAME TestHDRIBlurRatio DATA suzanne.ply HDRI shanghai_bund_1k.hdr RESOLUTION 600,100 ARGS -u)
+f3d_test(NAME TestHDRIEdges DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -e THRESHOLD 0.06)
 f3d_test(NAME TestHDRI8Bit DATA suzanne.ply HDRI f3d.tif ARGS --color=1.0,0.0,0.0 THRESHOLD 0.08) # Threshold is needed for IBL change after VTK 9.6
-f3d_test(NAME TestHDRIOrient DATA suzanne.stl HDRI palermo_park_1k.hdr ARGS --up=+Z)
-f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -t)
+f3d_test(NAME TestHDRIOrient DATA suzanne.stl HDRI shanghai_bund_1k.hdr ARGS --up=+Z)
+f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -t)
 
 # Test non existent HDRI, do not add a dummy.png
 f3d_test(NAME TestNonExistentHDRI DATA cow.vtp HDRI dummy.png REGEXP "HDRI file does not exist" NO_BASELINE)
@@ -360,36 +360,35 @@ f3d_test(NAME TestNonExistentHDRI DATA cow.vtp HDRI dummy.png REGEXP "HDRI file 
 f3d_test(NAME TestInvalidHDRI DATA cow.vtp HDRI invalid.png REGEXP "Cannot open HDRI file" NO_BASELINE)
 
 # Use a dummy HDRI for simplicity to test default HDRI
-f3d_test(NAME TestHDRIDefault DATA suzanne.ply HDRI dummy.png DEFAULT_HDRI)
+f3d_test(NAME TestHDRIDefault DATA dragon.vtu ARGS --hdri-ambient --hdri-skybox DEFAULT_HDRI)
 
 if(VTK_VERSION VERSION_LESS 9.5.20251001)
-  f3d_test(NAME TestPNGBasedDefaultHDRI DATA dragon.vtu LABELS "hdri")
+  f3d_test(NAME TestHDRIDefaultPNG DATA dragon.vtu ARGS --hdri-ambient --hdri-skybox LABELS "hdri" LONG_TIMEOUT)
 endif()
-
 
 configure_file("${F3D_SOURCE_DIR}/testing/configs/hdri.json.in" "${CMAKE_BINARY_DIR}/hdri.json")
 f3d_test(NAME TestConfigFileHDRI DATA dragon.vtu CONFIG "${CMAKE_BINARY_DIR}/hdri.json" LONG_TIMEOUT)
 
 if(F3D_MODULE_EXR)
-  f3d_test(NAME TestHDRIEXR DATA suzanne.ply HDRI kloofendal_43d_clear_1k.exr)
+  f3d_test(NAME TestHDRIEXR DATA suzanne.ply HDRI small_rural_road_1k.exr)
 endif()
 
-f3d_test(NAME TestHDRISkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-skybox LONG_TIMEOUT)
-f3d_test(NAME TestHDRIAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient LONG_TIMEOUT)
-f3d_test(NAME TestHDRIAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient --no-background LONG_TIMEOUT)
-f3d_test(NAME TestHDRINone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LONG_TIMEOUT)
+f3d_test(NAME TestHDRISkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-skybox LONG_TIMEOUT)
+f3d_test(NAME TestHDRIAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-ambient LONG_TIMEOUT)
+f3d_test(NAME TestHDRIAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-ambient --no-background LONG_TIMEOUT)
+f3d_test(NAME TestHDRINone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr LONG_TIMEOUT)
 
 if(F3D_MODULE_RAYTRACING)
-  f3d_test(NAME TestHDRIRaytracing DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -rd --raytracing-samples=4)
-  f3d_test(NAME TestHDRIRaytracingSkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-skybox -rd --raytracing-samples=4 LONG_TIMEOUT)
-  f3d_test(NAME TestHDRIRaytracingAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -rd --raytracing-samples=4 LONG_TIMEOUT)
-  f3d_test(NAME TestHDRIRaytracingAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -rd --raytracing-samples=4 --no-background LONG_TIMEOUT)
-  f3d_test(NAME TestHDRIRaytracingNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -rd --raytracing-samples=4 LONG_TIMEOUT)
+  f3d_test(NAME TestHDRIRaytracing DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -rd --raytracing-samples=4)
+  f3d_test(NAME TestHDRIRaytracingSkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-skybox -rd --raytracing-samples=4 LONG_TIMEOUT)
+  f3d_test(NAME TestHDRIRaytracingAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-ambient -rd --raytracing-samples=4 LONG_TIMEOUT)
+  f3d_test(NAME TestHDRIRaytracingAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-ambient -rd --raytracing-samples=4 --no-background LONG_TIMEOUT)
+  f3d_test(NAME TestHDRIRaytracingNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr -rd --raytracing-samples=4 LONG_TIMEOUT)
 endif()
 
 # SSAA with HDR framebuffer support in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12026
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250329)
-  f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -t --anti-aliasing=ssaa)
+  f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -t --anti-aliasing=ssaa)
 endif()
 
 ## Raytracing
@@ -406,10 +405,10 @@ if(F3D_MODULE_RAYTRACING)
   if(NOT F3D_MACOS_BUNDLE)
     # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-      f3d_test(NAME TestRaytracingDefaultConfigFile DATA dragon.vtu CONFIG config_build ARGS -rd --raytracing-samples=4 LONG_TIMEOUT)
+      f3d_test(NAME TestRaytracingDefaultConfigFile DATA dragon.vtu CONFIG config_build ARGS -rd --raytracing-samples=4 LONG_TIMEOUT DEFAULT_HDRI)
     endif()
 
-    f3d_test(NAME TestRaytracingThumbnailConfigFile DATA dragon.vtu CONFIG thumbnail_build ARGS -rd --raytracing-samples=4 LONG_TIMEOUT)
+    f3d_test(NAME TestRaytracingThumbnailConfigFile DATA dragon.vtu CONFIG thumbnail_build ARGS -rd --raytracing-samples=4 LONG_TIMEOUT DEFAULT_HDRI)
   endif()
 
   f3d_test(NAME TestRaytracingNoBackground DATA suzanne.ply ARGS -rd --raytracing-samples=4 --no-background)
@@ -437,9 +436,9 @@ f3d_test(NAME TestFinalShaderCompilationFailure DATA cow.vtp ARGS --final-shader
 f3d_test(NAME TestFinalShaderTimeUniform DATA cow.vtp ARGS --final-shader "vec4 pixel(vec2 uv){return vec4(texture(source, uv).rgb * (0.5 + 0.5*cos(time+uv.xyx+vec3(0,2,4))), 1.0)\\\\\\\;}")
 
 ## Command Script
-f3d_test(NAME TestCommandScriptBasic SCRIPT DATA dragon.vtu) # roll_camera 90;toggle ui.scalar_bar;print_scene_info;increase_light_intensity
-f3d_test(NAME TestCommandScriptElevation SCRIPT DATA dragon.vtu) # elevation_camera 90;toggle ui.scalar_bar;print_scene_info;increase_light_intensity
-f3d_test(NAME TestCommandScriptAzimuth SCRIPT DATA dragon.vtu) # azimuth_camera 90;toggle ui.scalar_bar;print_scene_info;increase_light_intensity
+f3d_test(NAME TestCommandScriptBasic SCRIPT DATA dragon.vtu) # roll_camera 90;toggle ui.scalar_bar;print_scene_info
+f3d_test(NAME TestCommandScriptElevation SCRIPT DATA dragon.vtu) # elevation_camera 90;toggle ui.scalar_bar;print_scene_info
+f3d_test(NAME TestCommandScriptAzimuth SCRIPT DATA dragon.vtu) # azimuth_camera 90;toggle ui.scalar_bar;print_scene_info
 f3d_test(NAME TestCommandScriptInvalid SCRIPT DATA dragon.vtu REGEXP "Command: \"INVALID_COMMAND_1\" is not recognized, ignoring" NO_BASELINE) # INVALID_COMMAND_1
 f3d_test(NAME TestCommandScriptMissingFile SCRIPT DATA dragon.vtu REGEXP "Unable to open command script file" NO_BASELINE)
 f3d_test(NAME TestCommandScriptPrintScene SCRIPT DATA dragon.vtu REGEXP "Camera position: 2.23745, 3.83305, 507.598" NO_BASELINE) # print_scene_info
@@ -455,27 +454,34 @@ f3d_test(NAME TestCommandScriptRemoveFileGroups SCRIPT DATA dragon.vtu NO_DATA_F
 f3d_test(NAME TestCommandScriptInvalidReaderOptions SCRIPT DATA dragon.vtu REGEXP "point to an inexistent option, ignoring" NO_BASELINE) # set_reader_option invalid value
 f3d_test(NAME TestCommandScriptHelp SCRIPT DATA dragon.vtu REGEX "set a libf3d option" NO_BASELINE) # help set
 f3d_test(NAME TestCommandScriptHelpInvalid SCRIPT DATA dragon.vtu REGEX "is not a recognized command" NO_BASELINE) # help invalid
-f3d_test(NAME TestCommandScriptJumpToPreviousFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress)
-f3d_test(NAME TestCommandScriptJumpToNextFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress)
-f3d_test(NAME TestCommandScriptJumpToFirstFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress)
-f3d_test(NAME TestCommandScriptJumpToLastFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress)
-f3d_test(NAME TestCommandScriptJumpToMiddleFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress)
-f3d_test(NAME TestCommandScriptJumpToPreviousKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress)
-f3d_test(NAME TestCommandScriptJumpToNextKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress)
-f3d_test(NAME TestCommandScriptJumpToFirstKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress)
-f3d_test(NAME TestCommandScriptJumpToAbsoluteKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress)
-if (F3D_PLUGIN_BUILD_ASSIMP AND F3D_ASSIMP_VERSION VERSION_GREATER_EQUAL "6.0.1")
+f3d_test(NAME TestCommandScriptJumpToPreviousFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress UI)
+f3d_test(NAME TestCommandScriptJumpToNextFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress UI)
+f3d_test(NAME TestCommandScriptJumpToFirstFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress UI)
+f3d_test(NAME TestCommandScriptJumpToLastFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress UI)
+f3d_test(NAME TestCommandScriptJumpToMiddleFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress UI)
+f3d_test(NAME TestCommandScriptJumpToPreviousKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress UI)
+f3d_test(NAME TestCommandScriptJumpToNextKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress UI)
+f3d_test(NAME TestCommandScriptJumpToFirstKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress UI)
+f3d_test(NAME TestCommandScriptJumpToAbsoluteKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress UI)
+if (VTK_VERSION VERSION_GREATER_EQUAL 9.5.0 AND F3D_PLUGIN_BUILD_ASSIMP AND F3D_ASSIMP_VERSION VERSION_GREATER_EQUAL "6.0.1")
   # TODO: Update this test to NOT use assimp once generic importer supports timesteps properly (issue: https://github.com/f3d-app/f3d/issues/2733)
-  f3d_test(NAME TestCommandScriptJumpToAbsoluteKeyFrameMultipleAnimations SCRIPT DATA punch.fbx soldier_animations.mdl ARGS --load-plugins=assimp --multi-file-mode=all --animation-indices=0,2 --animation-progress)
+  f3d_test(NAME TestCommandScriptJumpToAbsoluteKeyFrameMultipleAnimations SCRIPT DATA punch.fbx soldier_animations.mdl ARGS --load-plugins=assimp --multi-file-mode=all --animation-indices=0,2 --animation-progress UI)
 endif()
-f3d_test(NAME TestCommandScriptJumpToClosestKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-time=0.14 --animation-indices=2 --animation-progress)
-f3d_test(NAME TestCommandScriptJumpToStartKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-time=0.4 --animation-indices=2 --animation-progress)
-f3d_test(NAME TestCommandScriptJumpToPositiveOutsideKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress)
-f3d_test(NAME TestCommandScriptJumpToNegativeOutsideKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress)
+f3d_test(NAME TestCommandScriptJumpToClosestKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-time=0.14 --animation-indices=2 --animation-progress UI)
+f3d_test(NAME TestCommandScriptJumpToStartKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-time=0.4 --animation-indices=2 --animation-progress UI)
+f3d_test(NAME TestCommandScriptJumpToPositiveOutsideKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress UI)
+f3d_test(NAME TestCommandScriptJumpToNegativeOutsideKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress UI)
 f3d_test(NAME TestCommandScriptJumpToKeyFrameNoAnimation SCRIPT DATA cow.vtp)
+f3d_test(NAME TestCommandScriptJumpToTimeAbsolutePositive SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress=advanced UI)
+f3d_test(NAME TestCommandScriptJumpToTimeRelativeForward SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.55 --animation-progress=advanced UI)
+f3d_test(NAME TestCommandScriptJumpToTimeRelativeBackward SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.55 --animation-progress=advanced UI)
+f3d_test(NAME TestCommandScriptJumpToTimeBelowMin SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress=advanced UI)
+f3d_test(NAME TestCommandScriptJumpToTimeAboveMax SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress=advanced UI)
 f3d_test(NAME TestCommandScriptSetCameraBack SCRIPT DATA dragon.vtu) # set_camera back
 f3d_test(NAME TestCommandScriptSetCameraBottom SCRIPT DATA dragon.vtu) # set_camera bottom
 f3d_test(NAME TestCommandScriptSetCameraLeft SCRIPT DATA dragon.vtu) # set_camera left
+f3d_test(NAME TestCommandScriptCycleCameraIndex SCRIPT DATA Cameras.gltf) # cycle scene.camera.index;cycle scene.camera.index;reload_current_file_group
+f3d_test(NAME TestCommandScriptIncreaseDecreaseCameraIndex SCRIPT DATA Cameras.gltf) # increase scene.camera.index;increase scene.camera.index;increase.camera.index;decrease.camera.index;reload_current_file_group
 
 ## Tests to increase coverage
 # Output option test
@@ -550,6 +556,7 @@ f3d_test(NAME TestAnimationIndicesWarningRange DATA InterpolationTest.glb ARGS -
 f3d_test(NAME TestAnimationIndicesWarningNone DATA cow.vtp ARGS --animation-indices=1 REGEXP "Animation indices have been specified but there are no animation available" NO_BASELINE)
 f3d_test(NAME TestAnimationIndicesWarningAllAnimations DATA InterpolationTest.glb ARGS --animation-indices=-1,2,3 REGEXP "Multiple animation indices have been specified include a negative one, all animations will be selected" NO_BASELINE)
 f3d_test(NAME TestVerboseAnimationNoAnimationTime DATA cow.vtp ARGS --animation-time=2 --verbose REGEXP "No animation available, cannot load a specific animation time" NO_BASELINE)
+f3d_test(NAME TestInvalidAnimationProgressMode DATA cow.vtp ARGS --animation-progress=foo REGEXP "foo is an invalid animation progress mode" NO_BASELINE)
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250507)
   f3d_test(NAME TestAnimationIndicesWarningSingle DATA soldier_animations.mdl ARGS --animation-indices=1,2 REGEXP "Multiple animation indices have been specified but currently loaded files may not support enabling multiple animations" NO_BASELINE)
@@ -657,7 +664,7 @@ f3d_test(NAME TestConfigFileInvalidOptions DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}
 f3d_test(NAME TestConfigFileNoOptions DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/no_options.json REGEXP "does not contains options" NO_BASELINE)
 
 # Test update interaction verbose
-f3d_test(NAME TestConfigFileBindingsVerbose DATA dragon.vtu ARGS --verbose CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json REGEXP "'Shift.O' : '`toggle model.point_sprites.enable` '" NO_BASELINE)
+f3d_test(NAME TestConfigFileBindingsVerbose DATA dragon.vtu ARGS --verbose CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json REGEXP "'Shift.O' : '`set model.point_sprites.type sphere` '" NO_BASELINE)
 
 # Test list-bindings display with config file
 f3d_test(NAME TestConfigFileBindingsList ARGS --list-bindings CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json REGEXP "Ctrl.Shift.O `toggle ui.filename`" NO_BASELINE)

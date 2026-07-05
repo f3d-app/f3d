@@ -1,6 +1,6 @@
 ## Test behaviors related to HOME directory and similar
 if(NOT WIN32)
-  f3d_test(NAME TestHDRINoCachePath ENV "HOME=" DATA dragon.vtu ARGS -f --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr REGEXP "Cannot cache .* as no cache path has been set." NO_BASELINE LONG_TIMEOUT)
+  f3d_test(NAME TestHDRINoCachePath ENV "HOME=" DATA dragon.vtu ARGS -f --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr REGEXP "Cannot cache .* as no cache path has been set." NO_BASELINE LONG_TIMEOUT)
 
   add_test(NAME f3d::TestHOMEOutput COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/suzanne.stl --output=~/Testing/Temporary/TestHOMEOutput.png --resolution=300,300 --no-config)
   set_tests_properties(f3d::TestHOMEOutput PROPERTIES ENVIRONMENT "HOME=${CMAKE_BINARY_DIR}")
@@ -26,10 +26,10 @@ if(NOT WIN32)
   f3d_test(NAME TestHOMECommandScript DATA suzanne.ply ARGS --command-script=~/testing/scripts/TestHOMECommandScript.txt REGEXP "Camera focal point" NO_BASELINE ENV "HOME=${F3D_SOURCE_DIR}")
   f3d_test(NAME TestHOMEFontFile DATA suzanne.stl ARGS -n --font-file=~/testing/data/Crosterian.ttf ENV "HOME=${F3D_SOURCE_DIR}" UI)
   f3d_test(NAME TestHOMETexture DATA suzanne.ply ARGS --texture-matcap=~/testing/data/skin.png ENV "HOME=${F3D_SOURCE_DIR}")
-  f3d_test(NAME TestHOMEHDRI DATA suzanne.stl ARGS --hdri-file=~/testing/data/palermo_park_1k.hdr --hdri-ambient --hdri-skybox ENV "HOME=${F3D_SOURCE_DIR}" LONG_TIMEOUT)
+  f3d_test(NAME TestHOMEHDRI DATA suzanne.stl ARGS --hdri-file=~/testing/data/shanghai_bund_1k.hdr --hdri-ambient --hdri-skybox ENV "HOME=${F3D_SOURCE_DIR}" LONG_TIMEOUT)
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-    f3d_test(NAME TestHOMEInteractionDropHDRICollapse INTERACTION_CONFIGURE ENV "HOME=${F3D_SOURCE_DIR}" LONG_TIMEOUT UI) #X;DropEvent dragon.vtu;DropEvent palermo.hdr;
+    f3d_test(NAME TestHOMEInteractionDropHDRICollapse INTERACTION_CONFIGURE ENV "HOME=${F3D_SOURCE_DIR}" LONG_TIMEOUT UI) #X;DropEvent dragon.vtu;DropEvent shanghai.hdr;
   endif()
 
   if(NOT APPLE)

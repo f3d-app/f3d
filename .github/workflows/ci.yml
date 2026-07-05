@@ -31,7 +31,7 @@ jobs:
       lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source"
           fetch-depth: 1
@@ -58,7 +58,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source"
           fetch-depth: 1
@@ -96,7 +96,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source"
           fetch-depth: 0
@@ -129,7 +129,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source"
           fetch-depth: 0
@@ -219,7 +219,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source"
           fetch-depth: 0
@@ -258,12 +258,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source"
           fetch-depth: 0
           lfs: false
 
+      # OSMesa is supported on macOS from 9.6.20260701
+      # Since it's more robust than Apple's software renderer, we use it for the macOS ARM CI
       - name: Generic CI
         uses: ./source/.github/actions/generic-ci
         with:
@@ -271,6 +273,7 @@ jobs:
           vtk_version: ${{matrix.vtk_version}}
           cpu: x86_64
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          rendering_backend: ${{matrix.vtk_version == 'commit' && 'osmesa' || 'auto'}}
 
   #----------------------------------------------------------------------------
   # MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
@@ -302,12 +305,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source"
           fetch-depth: 0
           lfs: false
 
+      # OSMesa is supported on macOS from 9.6.20260701
+      # Since it's more robust than Apple's software renderer, we use it for the macOS ARM CI
       - name: Generic CI
         uses: ./source/.github/actions/generic-ci
         with:
@@ -315,6 +320,7 @@ jobs:
           vtk_version: ${{matrix.vtk_version}}
           bundle_label: ${{matrix.bundle_label}}
           static_label: ${{matrix.static_label}}
+          rendering_backend: ${{matrix.vtk_version == 'commit' && 'osmesa' || 'auto'}}
           cpu: arm64
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
@@ -352,7 +358,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source"
           fetch-depth: 0
@@ -383,7 +389,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source"
           fetch-depth: 0
@@ -424,7 +430,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source"
           fetch-depth: 0
@@ -459,7 +465,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source"
           fetch-depth: 0
@@ -489,7 +495,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source/f3d"
           fetch-depth: 0
@@ -515,7 +521,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source"
           fetch-depth: 0
@@ -547,7 +553,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source"
           fetch-depth: 0
@@ -578,7 +584,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: "source"
           fetch-depth: 0

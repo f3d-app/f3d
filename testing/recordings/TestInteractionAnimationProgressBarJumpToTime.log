@@ -1,0 +1,8 @@
+# StreamVersion 1.2
+ExposeEvent 0 299 0 0 0 0 0
+RenderEvent 0 299 0 0 0 0 0
+# Left click between keyframe markers to jump to that time
+MouseMoveEvent 150 8 0 0 0 0 0
+LeftButtonPressEvent 150 8 0 0 0 0 0
+TimerEvent 150 8 0 0 0 0 0
+LeftButtonReleaseEvent 150 8 0 0 0 0 0
