@@ -49,7 +49,7 @@ There is no support for thumbnails on MacOS, the .dmg binary release provides au
 
 ## Rendering backends
 
-F3D supports rendering in environments with limited graphical contexts, including sandboxes or without Xorg running.
+F3D supports rendering in environments with limited graphical contexts, including sandboxes or without Xorg running on Linux.
 In most cases, the default behavior will automatically detect which capabilities are available and use the right rendering backend,
 it is possible to specify it using the `--rendering-backend` CLI option.
 
@@ -63,7 +63,7 @@ it is possible to specify it using the `--rendering-backend` CLI option.
 - When using `--rendering-backend=auto`, F3D have the following logic:
   - On Linux, check if a X server is running, in which case GLX is used. Otherwise, try to load EGL library and fallback on OSMesa if not available.
   - On Windows, check if the OpenGL driver supports OpenGL 3.2, in which case WGL is used. Otherwise, try to load EGL library and fallback on OSMesa if not available.
-  - On macOS, always use COCOA.
+  - On macOS, always use COCOA. To use OSMesa, you must use `--rendering-backend=osmesa`.
 
 You can use that feature for thumbnail generation whenever needed (e.g., Nautilus or other sandboxing file browser),
 by creating/modifying your [thumbnail config file](06-CONFIGURATION_FILE.md), eg:`~/.config/f3d/thumbnail.json`:

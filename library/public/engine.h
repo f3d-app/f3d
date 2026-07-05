@@ -88,6 +88,7 @@ public:
    * Create an engine with an offscreen EGL window.
    * If several GPU are available, the environment variable
    * `VTK_DEFAULT_EGL_DEVICE_INDEX` allows its selection.
+   * Not supported on macOS.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
    * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library.
