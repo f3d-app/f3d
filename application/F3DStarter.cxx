@@ -1111,11 +1111,13 @@ public:
       interactor.addBinding({ mod_t::NONE, "Up" }, "reload_current_file_group", "Others", std::bind(docString, "Reload current file group"));
       interactor.addBinding({ mod_t::NONE, "Down" }, "add_current_directories", "Others", std::bind(docString, "Add files from dir of current file"));
       interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others", std::bind(docString, "Take a screenshot"));
-      interactor.addBinding({ mod_t::CTRL, "S" }, "save_statefile", "Others", std::bind(docString, "Save a statefile"));
-      interactor.addBinding({ mod_t::CTRL, "L" }, "load_statefile", "Others", std::bind(docString, "Load a statefile"));
+      interactor.addBinding({ mod_t::CTRL, "S" }, "save_statefile", "Others", std::bind(docString, "Save a statefile (file dialog)"));
+      interactor.addBinding({ mod_t::CTRL, "L" }, "load_statefile", "Others", std::bind(docString, "Load a statefile (file dialog)"));
+      interactor.addBinding({ mod_t::CTRL_SHIFT, "S" }, "save_statefile {app}/{model}_{n}.json", "Others", std::bind(docString, "Save a statefile (auto filename)"));
+      interactor.addBinding({ mod_t::CTRL_SHIFT, "L" }, "load_statefile {app}/{model}_{n}.json", "Others", std::bind(docString, "Load the most recent statefile"));
 #if F3D_MODULE_CLIP
-      interactor.addBinding({ mod_t::CTRL_SHIFT, "S" }, "save_statefile_to_clipboard", "Others", std::bind(docString, "Save a statefile to the clipboard"));
-      interactor.addBinding({ mod_t::CTRL_SHIFT, "L" }, "load_statefile_from_clipboard", "Others", std::bind(docString, "Load a statefile from the clipboard"));
+      interactor.addBinding({ mod_t::CTRL, "C" }, "save_statefile_to_clipboard", "Others", std::bind(docString, "Save a statefile to the clipboard"));
+      interactor.addBinding({ mod_t::CTRL, "V" }, "load_statefile_from_clipboard", "Others", std::bind(docString, "Load a statefile from the clipboard"));
 #endif
 #if F3D_MODULE_TINYFILEDIALOGS
       interactor.addBinding({ mod_t::CTRL, "O" }, "open_file_dialog", "Others", std::bind(docString, "Open File Dialog"), f3d::interactor::BindingType::OTHER, true);
@@ -2194,9 +2196,34 @@ void F3DStarter::SaveStatefile(const std::string& filenameTemplate)
 {
   if (filenameTemplate.empty())
   {
+#if F3D_MODULE_TINYFILEDIALOGS
+    // No location provided: let the user pick one with a file dialog
+    std::optional<std::string> file = f3d::utils::getEnv("CTEST_SAVE_STATEFILE_DIALOG_FILE");
+    if (!file.has_value())
+    {
+      const char* pattern = "*.json";
+      char* ptr = tinyfd_saveFileDialog("Save Statefile", nullptr, 1, &pattern, "Statefiles");
+      if (ptr)
+      {
+        file = ptr;
+      }
+    }
+    if (file.has_value() && !file.value().empty())
+    {
+      // Ensure a .json extension, the dialog may return a name typed without one
+      fs::path path = file.value();
+      if (path.extension() != ".json")
+      {
+        path += ".json";
+      }
+      this->SaveStatefile(path.string());
+    }
+    return;
+#else
     f3d::log::error(
       "No statefile location provided, use --statefile-filename or provide a filename");
     return;
+#endif
   }
 
   if (filenameTemplate == F3D_PIPED)
@@ -2263,9 +2290,29 @@ void F3DStarter::LoadStatefile(const std::string& source)
 {
   if (source.empty())
   {
+#if F3D_MODULE_TINYFILEDIALOGS
+    // No location provided: let the user pick one with a file dialog
+    std::optional<std::string> file = f3d::utils::getEnv("CTEST_LOAD_STATEFILE_DIALOG_FILE");
+    if (!file.has_value())
+    {
+      const char* pattern = "*.json";
+      char* ptr =
+        tinyfd_openFileDialog("Load Statefile", nullptr, 1, &pattern, "Statefiles", false);
+      if (ptr)
+      {
+        file = ptr;
+      }
+    }
+    if (file.has_value() && !file.value().empty())
+    {
+      this->LoadStatefile(file.value());
+    }
+    return;
+#else
     f3d::log::warn(
       "No statefile location provided, use --statefile-filename or provide a filename");
     return;
+#endif
   }
 
   // Resolve template variables ({model}, {date}, ...) like the save path does, so that the same
