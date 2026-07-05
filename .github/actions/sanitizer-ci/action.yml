@@ -96,14 +96,15 @@ runs:
       working-directory: ${{github.workspace}}/build
       run: cmake --build . --parallel 2
 
-    - name: Run Xvfb
-      shell: bash
-      run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
-
     # Certain interaction test are failing because sanitizer is slow in CI
     - name: Set CI test exception
       shell: bash
       run: echo "F3D_CTEST_EXCEPTIONS=(TestInteractionAnimationSlow)" >> $GITHUB_ENV
+
+    # We start Xvfb for the few tests that requires GLX
+    - name: Run Xvfb
+      shell: bash
+      run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
     - name: Test
       shell: bash

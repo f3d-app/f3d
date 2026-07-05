@@ -353,7 +353,6 @@ jobs:
     container: ${{ matrix.os == 'ubuntu-24.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
     env:
-      DISPLAY: :0
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
@@ -423,7 +422,6 @@ jobs:
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
-      DISPLAY: :0
       CC: clang
       CXX: clang++
       VTK_SMP_BACKEND_IN_USE: Sequential

@@ -215,6 +215,8 @@ runs:
       working-directory: ${{github.workspace}}/build
       run: cmake --build . --parallel 2 --config Release
 
+    # We start Xvfb for the few tests that requires GLX
+    # Also used when testing without optional dependencies
     - name: Run Xvfb ubuntu
       if: |
         runner.os == 'Linux' &&
