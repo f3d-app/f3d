@@ -136,7 +136,7 @@ runs:
         runner.os == 'Linux' &&
         inputs.optdeps_label == 'optdeps'
       shell: bash
-      run: echo "LD_LIBRARY_PATH=$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
+      run: echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
 
     # Works around for https://github.com/actions/runner-images/issues/10055
     - name: Remove conflicting libraries for Java bindings on Windows
