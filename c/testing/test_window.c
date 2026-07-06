@@ -1,38 +1,42 @@
+#include "pseudo_unit_test.h"
+
 #include <engine_c_api.h>
 #include <image_c_api.h>
 #include <window_c_api.h>
 
-#include <stdio.h>
-
 int test_window()
 {
+  f3d_test_t test;
+  f3d_test_init(&test);
+
   f3d_engine_t* engine = f3d_engine_create(1);
+  f3d_test_check(&test, "engine created", engine != NULL);
   if (!engine)
   {
-    puts("[ERROR] Failed to create engine");
-    return 1;
+    return f3d_test_result(&test);
   }
 
   f3d_window_t* window = f3d_engine_get_window(engine);
+  f3d_test_check(&test, "window retrieved", window != NULL);
   if (!window)
   {
-    puts("[ERROR] Failed to get window");
     f3d_engine_delete(engine);
-    return 1;
+    return f3d_test_result(&test);
   }
 
   f3d_window_type_t type = f3d_window_get_type(window);
   (void)type;
 
   int offscreen = f3d_window_is_offscreen(window);
-  (void)offscreen;
+  f3d_test_check_int(&test, "window is offscreen", offscreen, 1);
 
   f3d_camera_t* camera = f3d_window_get_camera(window);
-  (void)camera;
+  f3d_test_check(&test, "camera retrieved from window", camera != NULL);
 
   f3d_window_render(window);
 
   f3d_image_t* img = f3d_window_render_to_image(window, 0);
+  f3d_test_check(&test, "render_to_image returns a non-null image", img != NULL);
   if (img)
   {
     f3d_image_delete(img);
@@ -40,10 +44,11 @@ int test_window()
 
   f3d_window_set_size(window, 800, 600);
   int width = f3d_window_get_width(window);
-  (void)width;
   int height = f3d_window_get_height(window);
-  (void)height;
+  f3d_test_check_int(&test, "window width matches after set_size", width, 800);
+  f3d_test_check_int(&test, "window height matches after set_size", height, 600);
 
+  /* no getter exists to verify these took effect, so they remain smoke calls */
   f3d_window_set_position(window, 100, 100);
 
   unsigned char icon_data[] = { 0xFF, 0xFF, 0xFF, 0xFF };
@@ -55,10 +60,15 @@ int test_window()
   f3d_point3_t world_point;
   f3d_window_get_world_from_display(window, display_point, world_point);
 
-  f3d_point3_t test_world = { 0.0, 0.0, 0.0 };
-  f3d_point3_t display_out;
-  f3d_window_get_display_from_world(window, test_world, display_out);
+  f3d_point3_t display_roundtrip;
+  f3d_window_get_display_from_world(window, world_point, display_roundtrip);
+  f3d_test_check_double(&test, "display->world->display roundtrip X matches",
+    display_roundtrip[0], display_point[0], 1e-6);
+  f3d_test_check_double(&test, "display->world->display roundtrip Y matches",
+    display_roundtrip[1], display_point[1], 1e-6);
+  f3d_test_check_double(&test, "display->world->display roundtrip Z matches",
+    display_roundtrip[2], display_point[2], 1e-6);
 
   f3d_engine_delete(engine);
-  return 0;
+  return f3d_test_result(&test);
 }
