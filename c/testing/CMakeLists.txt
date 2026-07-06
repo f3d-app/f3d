@@ -1,4 +1,5 @@
 list(APPEND f3d_c_api_tests_list
+  test_pseudo_unit_test.c
   test_camera.c
   test_context.c
   test_engine.c
