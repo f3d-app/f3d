@@ -144,7 +144,6 @@ f3d_test(NAME TestNormalGlyphsScale DATA suzanne.obj ARGS --normal-glyphs --norm
 f3d_test(NAME TestNormalGlyphsColor DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-color=1,0,0)
 f3d_test(NAME TestNormalGlyphsNoNormalsAvailable DATA cow.vtp ARGS --normal-glyphs NO_BASELINE REGEXP "does not contain any normals")
 
-
 ## Textures
 f3d_test(NAME TestTextureNormal DATA WaterBottle.glb ARGS --texture-normal=${F3D_SOURCE_DIR}/testing/data/normal.png --normal-scale=0.1)
 f3d_test(NAME TestTextureMaterial DATA WaterBottle.glb ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/red_mod.jpg --roughness=1 --metallic=1)
