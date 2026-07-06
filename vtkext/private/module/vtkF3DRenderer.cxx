@@ -2916,12 +2916,13 @@ void vtkF3DRenderer::ConfigureNormalGlyphs()
     if (this->NormalGlyphColor.has_value())
     {
       assert(this->NormalGlyphColor->size() == 3);
+      const double* normalGlyphColor = this->NormalGlyphColor->data();
+      double linearColor[3];
+      linearColor[0] = std::pow(normalGlyphColor[0], 2.2);
+      linearColor[1] = std::pow(normalGlyphColor[1], 2.2);
+      linearColor[2] = std::pow(normalGlyphColor[2], 2.2);
       normalGlyph.GlyphMapper->ScalarVisibilityOff();
-      normalGlyph.Actor->GetProperty()->SetColor(this->NormalGlyphColor->data());
-    }
-    else
-    {
-      normalGlyph.GlyphMapper->ScalarVisibilityOn();
+      normalGlyph.Actor->GetProperty()->SetColor(linearColor);
     }
     normalGlyph.Actor->SetVisibility(normalGlyphsVisible);
   }
