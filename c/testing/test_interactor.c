@@ -47,8 +47,8 @@ int test_interactor()
 
   f3d_interactor_animation_direction_t direction =
     f3d_interactor_get_animation_direction(interactor);
-  f3d_test_check_int(
-    &test, "animation direction matches what was started", direction, F3D_INTERACTOR_ANIMATION_BACKWARD);
+  f3d_test_check_int(&test, "animation direction matches what was started", direction,
+    F3D_INTERACTOR_ANIMATION_BACKWARD);
 
   f3d_interactor_stop_animation(interactor);
   playing = f3d_interactor_is_playing_animation(interactor);
@@ -75,9 +75,11 @@ int test_interactor()
 
   f3d_interactor_trigger_notification(interactor, "foo", "bar", 3.0);
 
-  // no return value captured here in the original test either, kept as a no-crash call
-  f3d_interactor_play_interaction(interactor, "/nonexistent.log", 1.0 / 30.0);
-  f3d_interactor_record_interaction(interactor, "/tmp/test_interaction.log");
+  int play_ret = f3d_interactor_play_interaction(interactor, "/nonexistent.log", 1.0 / 30.0);
+  f3d_test_check(&test, "playing a nonexistent interaction file reports failure", play_ret == 0);
+
+  int record_ret = f3d_interactor_record_interaction(interactor, "/tmp/test_interaction.log");
+  f3d_test_check(&test, "recording interaction to /tmp reports success", record_ret == 1);
 
   f3d_interactor_request_render(interactor);
   f3d_interactor_request_stop(interactor);
@@ -85,9 +87,14 @@ int test_interactor()
   f3d_interactor_init_commands(interactor);
   f3d_interactor_remove_command(interactor, "test_action");
 
-  // no return value to assert on for trigger_command in this API
-  f3d_interactor_trigger_command(interactor, "print Test", 0);
-  f3d_interactor_trigger_command(interactor, "print Test # comment", 1);
+  // "print Test" is not a valid/registered command in this context (no such option
+  // exists), so triggering it is expected to fail, not succeed
+  int cmd_ret1 = f3d_interactor_trigger_command(interactor, "print Test", 0);
+  f3d_test_check(&test, "triggering an invalid command reports failure", cmd_ret1 == 0);
+
+  int cmd_ret2 = f3d_interactor_trigger_command(interactor, "print Test # comment", 1);
+  f3d_test_check(
+    &test, "triggering an invalid command with a comment reports failure", cmd_ret2 == 0);
 
   f3d_interactor_init_bindings(interactor);
 
@@ -120,16 +127,16 @@ int test_interactor()
 
   f3d_interaction_bind_t parsed_bind;
   f3d_interaction_bind_parse("Shift+B", &parsed_bind);
-  // not asserting on parsed_bind.mod here: I don't have the modifier enum value for
-  // "Shift" confirmed from the headers seen so far, so I won't guess it
+  f3d_test_check_int(&test, "parse() of \"Shift+B\" extracts the Shift modifier",
+    parsed_bind.mod, F3D_INTERACTION_BIND_SHIFT);
   f3d_test_check(
     &test, "parse() of \"Shift+B\" extracts the key part", strcmp(parsed_bind.inter, "B") == 0);
 
   int equals1 = f3d_interaction_bind_equals(&ctrl_bind, &parsed_bind);
   f3d_test_check(&test, "Ctrl+A and Shift+B binds are not equal", equals1 == 0);
 
-  // not asserting on less_than's result: the ordering semantics between different
-  // modifiers/keys aren't specified anywhere I've seen, so I can't state an expected value
+  // not asserting on less_than's result here: the ordering semantics between different
+  // modifiers/keys aren't documented, so I can't state an expected value for this pair
   int less1 = f3d_interaction_bind_less_than(&ctrl_bind, &parsed_bind);
   (void)less1;
 
@@ -163,9 +170,11 @@ int test_interactor()
     f3d_interactor_free_bind_array(all_binds);
   }
 
-  // no fields of f3d_binding_documentation_t are known/checked here beyond the call not crashing
+  // test_action is a custom command with no registered option behind it, so there's no
+  // documentation string to expect here; just confirming the call doesn't crash
   f3d_binding_documentation_t doc;
   f3d_interactor_get_binding_documentation(interactor, &bind, &doc);
+  (void)doc;
 
   f3d_interactor_binding_type_t binding_type = f3d_interactor_get_binding_type(interactor, &bind);
   f3d_test_check_int(
@@ -180,6 +189,11 @@ int test_interactor()
   {
     f3d_interactor_free_bind_array(binds_for_group);
   }
+
+  f3d_interactor_binding_type_t removed_type =
+    f3d_interactor_get_binding_type(interactor, &bind);
+  f3d_test_check_int(
+    &test, "binding type is OTHER after removal", removed_type, F3D_INTERACTOR_BINDING_OTHER);
 
   f3d_interactor_set_event_loop_user_callback(interactor, stop_callback, interactor);
   f3d_interactor_start(interactor, 0.01);
