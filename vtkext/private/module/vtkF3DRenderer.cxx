@@ -20,6 +20,7 @@
 
 #include <vtkActor.h>
 #include <vtkActorCollection.h>
+#include <vtkArrowSource.h>
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -27,8 +28,10 @@
 #include <vtkCameraOrientationWidget.h>
 #include <vtkCameraPass.h>
 #include <vtkCellData.h>
+#include <vtkConeSource.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkCullerCollection.h>
+#include <vtkCylinderSource.h>
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkFloatArray.h>
 #include <vtkHDRReader.h>
@@ -38,6 +41,7 @@
 #include <vtkImageReader2Factory.h>
 #include <vtkLight.h>
 #include <vtkLightCollection.h>
+#include <vtkLineSource.h>
 #include <vtkMath.h>
 #include <vtkMathUtilities.h>
 #include <vtkMatrix4x4.h>
@@ -73,6 +77,7 @@
 #include <vtkTextureObject.h>
 #include <vtkToneMappingPass.h>
 #include <vtkTransform.h>
+#include <vtkTransformFilter.h>
 #include <vtkUniforms.h>
 #include <vtkVersion.h>
 #include <vtkVolumeProperty.h>
@@ -2061,6 +2066,26 @@ void vtkF3DRenderer::SetNormalGlyphScaleMultiplier(double multiplier)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetNormalGlyphColor(const std::array<double, 3>& color)
+{
+  if (this->NormalGlyphColor != color)
+  {
+    this->NormalGlyphColor = color;
+    this->NormalGlyphsConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetNormalGlyphShape(const NormalGlyphShape& shape)
+{
+  if (this->GlyphShape != shape)
+  {
+    this->GlyphShape = shape;
+    this->NormalGlyphsConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseSSAOPass(bool use)
 {
   if (this->UseSSAOPass != use)
@@ -3376,7 +3401,64 @@ void vtkF3DRenderer::ConfigureNormalGlyphs()
       continue;
     }
 
+    if (this->LineWidth.has_value())
+    {
+      normalGlyph.Actor->GetProperty()->SetLineWidth(this->LineWidth.value());
+    }
+
+    vtkSmartPointer<vtkAlgorithm> glyphSource;
+
+    switch (this->GlyphShape)
+    {
+      case NormalGlyphShape::ARROW:
+        glyphSource = vtkSmartPointer<vtkArrowSource>::New();
+        break;
+      case NormalGlyphShape::CONE:
+      {
+        const vtkNew<vtkConeSource> coneSource;
+        coneSource->SetRadius(0.1);
+        coneSource->SetResolution(16);
+        coneSource->SetCenter(0.5, 0.0, 0.0);
+        glyphSource = coneSource;
+        break;
+      }
+      break;
+      case NormalGlyphShape::CYLINDER:
+      {
+        const vtkNew<vtkCylinderSource> cylinderSource;
+        cylinderSource->SetRadius(0.1);
+        cylinderSource->SetResolution(16);
+        const vtkNew<vtkTransform> transformFilter;
+        transformFilter->RotateZ(-90.0);
+        transformFilter->Translate(0.0, 0.5, 0.0);
+        const vtkNew<vtkTransformFilter> transformPolyDataFilter;
+        transformPolyDataFilter->SetInputConnection(cylinderSource->GetOutputPort());
+        transformPolyDataFilter->SetTransform(transformFilter);
+        glyphSource = transformPolyDataFilter;
+        break;
+      }
+      case NormalGlyphShape::LINE:
+      {
+        const vtkNew<vtkLineSource> lineSource;
+        lineSource->SetPoint1(0.0, 0.0, 0.0);
+        lineSource->SetPoint2(1.0, 0.0, 0.0);
+        glyphSource = lineSource;
+        break;
+      }
+    }
+
+    normalGlyph.GlyphMapper->SetSourceConnection(glyphSource->GetOutputPort());
+
     this->UpdateNormalGlyphsScale();
+
+    const double* normalGlyphColor = this->NormalGlyphColor.data();
+    // default color (0.82, 0.82, 0.82) is (0.65, 0.65, 0.65) in linear space
+    // which match the default generic importer surface color
+    double linearColor[3];
+    linearColor[0] = std::pow(normalGlyphColor[0], 2.2);
+    linearColor[1] = std::pow(normalGlyphColor[1], 2.2);
+    linearColor[2] = std::pow(normalGlyphColor[2], 2.2);
+    normalGlyph.Actor->GetProperty()->SetColor(linearColor);
     normalGlyph.Actor->SetVisibility(normalGlyphsVisible);
   }
 

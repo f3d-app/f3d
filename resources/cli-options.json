@@ -384,6 +384,16 @@
           "longName": "normal-glyphs-scale",
           "helpText": "Scale normal glyphs",
           "valueHelper": "<ratio>"
+        },
+        {
+          "longName": "normal-glyphs-color",
+          "helpText": "Color of normal glyphs",
+          "valueHelper": "<color>"
+        },
+        {
+          "longName": "normal-glyphs-shape",
+          "helpText": "Shape of normal glyphs (\"arrow\", \"cone\", \"cylinder\", \"line\")",
+          "valueHelper": "<shape>"
         }
       ]
     },

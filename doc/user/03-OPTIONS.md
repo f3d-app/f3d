@@ -422,9 +422,29 @@ Adjusts the scales of normal glyphs.
 
 #### compare
 
-| 0.3                                                              | 0.7                                                              |
-| ---------------------------------------------------------------- | ---------------------------------------------------------------- |
-| ![normal glyphs scale 0.3](./images/normal_glyphs_scale_0.3.png) | ![normal glyphs scale 0.7](./images/normal_glyphs_scale_0.7.png) |
+| 0.3                                       | 0.7                                       |
+| ----------------------------------------- | ----------------------------------------- |
+| ![](./images/normal_glyphs_scale_0.3.png) | ![](./images/normal_glyphs_scale_0.7.png) |
+
+### `--normal-glyphs-color` (_color_, default: `0.82, 0.82, 0.82`)
+
+Set the color of normal glyphs.
+
+#### compare
+
+| Default                            | Maroon                                 |
+| ---------------------------------- | -------------------------------------- |
+| ![](./images/normal_glyphs_on.png) | ![](./images/normal_glyphs_maroon.png) |
+
+### `--normal-glyphs-shape=<arrow|cone|cylinder|line>` (_string_, default: `arrow`)
+
+Set the shape of normal glyphs.
+
+#### compare
+
+| Arrow                              | Cylinder                                       |
+| ---------------------------------- | ---------------------------------------------- |
+| ![](./images/normal_glyphs_on.png) | ![](./images/normal_glyphs_shape_cylinder.png) |
 
 ### `-o`, `--point-sprites=<none|sphere|gaussian|circle|stddev|bound|cross>` (_string_, default: `none`, implicit: `sphere`)
 

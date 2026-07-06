@@ -540,6 +540,18 @@
           "max": "10.0",
           "increment": "0.1"
         }
+      },
+      "color": {
+        "type": "color",
+        "default_value": "0.82, 0.82, 0.82"
+      },
+      "shape": {
+        "type": "string",
+        "default_value": "arrow",
+        "domain": {
+          "style": "enum",
+          "enum": ["arrow", "cone", "cylinder", "line"]
+        }
       }
     },
     "volume": {

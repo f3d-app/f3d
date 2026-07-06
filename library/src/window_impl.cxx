@@ -521,8 +521,33 @@ void window_impl::UpdateDynamicOptions()
   // Update pending up direction if changed
   renderer->SetPendingUpDirection(opt.scene.up_direction);
 
+  vtkF3DRenderer::NormalGlyphShape glyphShapeType = vtkF3DRenderer::NormalGlyphShape::ARROW;
+  if (opt.model.normal_glyphs.shape == "arrow")
+  {
+    glyphShapeType = vtkF3DRenderer::NormalGlyphShape::ARROW;
+  }
+  else if (opt.model.normal_glyphs.shape == "cone")
+  {
+    glyphShapeType = vtkF3DRenderer::NormalGlyphShape::CONE;
+  }
+  else if (opt.model.normal_glyphs.shape == "cylinder")
+  {
+    glyphShapeType = vtkF3DRenderer::NormalGlyphShape::CYLINDER;
+  }
+  else if (opt.model.normal_glyphs.shape == "line")
+  {
+    glyphShapeType = vtkF3DRenderer::NormalGlyphShape::LINE;
+  }
+  else
+  {
+    log::warn(opt.model.normal_glyphs.shape,
+      R"( is an invalid normal glyphs shape. Valid types are: "arrow", "cone", "cylinder", "line")");
+  }
+
   renderer->SetUseNormalGlyphs(opt.model.normal_glyphs.enable);
+  renderer->SetNormalGlyphShape(glyphShapeType);
   renderer->SetNormalGlyphScaleMultiplier(opt.model.normal_glyphs.scale);
+  renderer->SetNormalGlyphColor(opt.model.normal_glyphs.color);
 
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
