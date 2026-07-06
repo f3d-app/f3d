@@ -93,7 +93,7 @@ runs:
       run: |
         python -m pip install pytest==9.0.3
         python -m pip install pybind11_stubgen
-        python -m pip install numpy==2.2.6
+        python -m pip install "numpy>=2.2.6"
 
     - name: Extract java version
       id: java_ver
@@ -130,6 +130,13 @@ runs:
         inputs.optdeps_label == 'optdeps'
       shell: bash
       run: echo "DYLD_LIBRARY_PATH=$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
+
+    - name: Set LD_LIBRARY_PATH on Linux for OSMesa dynamic loading
+      if: |
+        runner.os == 'Linux' &&
+        inputs.optdeps_label == 'optdeps'
+      shell: bash
+      run: echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
 
     # Works around for https://github.com/actions/runner-images/issues/10055
     - name: Remove conflicting libraries for Java bindings on Windows
@@ -196,7 +203,7 @@ runs:
         -DF3D_TESTING_ENABLE_ILLUSTRATION_TESTS=${{ (runner.os == 'Linux' && inputs.vtk_version == 'commit' && inputs.build_type == 'standard') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_GLX_TESTS=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=${{ (runner.os == 'Linux' || runner.os == 'Windows') && 'ON' || 'OFF' }}
-        -DF3D_TESTING_ENABLE_OSMESA_TESTS=ON
+        -DF3D_TESTING_ENABLE_OSMESA_TESTS=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_TESTING_DISABLE_CATCH_ALL=ON
         -DF3D_TESTING_FORCE_RENDERING_BACKEND=${{ inputs.rendering_backend }}
         -DF3D_WINDOWS_BUILD_CONSOLE_APPLICATION=ON
