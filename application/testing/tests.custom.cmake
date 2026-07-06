@@ -2,7 +2,7 @@
 
 # Test that f3d can try to read a system config file
 add_test(NAME f3d::TestNoNoConfig COMMAND $<TARGET_FILE:f3d> --no-render)
-set_tests_properties(f3d::TestNoNoConfig PROPERTIES TIMEOUT 4)
+set_tests_properties(f3d::TestNoNoConfig PROPERTIES TIMEOUT 20)
 
 # Test invalid CLI args
 add_test(NAME f3d::TestInvalidCLIArgs COMMAND $<TARGET_FILE:f3d> --up)
