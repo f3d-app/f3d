@@ -27,12 +27,10 @@ foreach(test_name ${f3djsTests_list})
   add_test(NAME libf3d_bindings_js::${test_name}
     COMMAND ${CHROMIUM_EXECUTABLE}
       --disable-application-cache
-      --disable-dev-shm-usage
       --disable-extensions
-      --disable-gpu
       --disable-notifications
       --disable-restore-session-state
-      --disable-setuid-sandbox
+      --disable-gpu
       --enable-unsafe-swiftshader
       --new-window
       --no-default-browser-check
