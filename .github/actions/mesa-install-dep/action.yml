@@ -42,7 +42,7 @@ runs:
       uses: actions/cache/restore@v6
       with:
         path: dependencies/mesa_install
-        key: mesa-${{steps.mesa_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-9
+        key: mesa-${{steps.mesa_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-10
 
     - name: Setup MSVC (Windows)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
@@ -93,6 +93,7 @@ runs:
         meson setup mesa_build mesa
         --prefix=$(pwd)/mesa_install
         --buildtype=release
+        --libdir=lib
         -Db_ndebug=true
         -Dosmesa=true
         -Dcpp_rtti=false
