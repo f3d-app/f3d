@@ -362,6 +362,10 @@ Display arrows that show vertex normals.
 
 Adjusts the scales of normal glyphs.
 
+### `--normal-glyphs-color` (_color_, optional)
+
+Set the color of normal glyphs.
+
 #### compare
 
 | 0.3                                       | 0.7                                       |

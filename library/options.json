@@ -541,6 +541,10 @@
           "max": "10.0",
           "increment": "0.1"
         }
+      },
+      "color": {
+        "type": "color",
+        "default_value":"0.0, 0.0, 0.0"
       }
     },
     "volume": {

@@ -156,6 +156,10 @@ Render vertex normals as arrows on top of the geometry.
 
 Scales the normal glyphs
 
+### `model.normal_glyphs.color` (_color_, optional)
+
+Color of the normal glyphs.
+
 ### `model.normal.scale` (_double_, optional, range domain: `[0, 3]`, increment: `0.1`)
 
 Normal scale affects the strength of the normal deviation from the normal texture. Model-specified by default.

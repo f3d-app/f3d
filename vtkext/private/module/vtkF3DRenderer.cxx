@@ -1728,6 +1728,16 @@ void vtkF3DRenderer::SetNormalGlyphScaleMultiplier(double multiplier)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetNormalGlyphColor(const std::optional<std::vector<double>>& color)
+{
+  if (this->NormalGlyphColor != color)
+  {
+    this->NormalGlyphColor = color;
+    this->NormalGlyphsConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseSSAOPass(bool use)
 {
   if (this->UseSSAOPass != use)
@@ -2903,6 +2913,16 @@ void vtkF3DRenderer::ConfigureNormalGlyphs()
     }
 
     this->UpdateNormalGlyphsScale();
+    if (this->NormalGlyphColor.has_value())
+    {
+      assert(this->NormalGlyphColor->size() == 3);
+      normalGlyph.GlyphMapper->ScalarVisibilityOff();
+      normalGlyph.Actor->GetProperty()->SetColor(this->NormalGlyphColor->data());
+    }
+    else
+    {
+      normalGlyph.GlyphMapper->ScalarVisibilityOn();
+    }
     normalGlyph.Actor->SetVisibility(normalGlyphsVisible);
   }
 
