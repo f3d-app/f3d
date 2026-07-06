@@ -52,7 +52,7 @@ runs:
         python -m pip install pytest==9.0.3
         python -m pip install pyopengltk==0.0.4
         python -m pip install PySide6==6.11.1
-        python -m pip install numpy==2.2.6
+        python -m pip install "numpy>=2.2.6"
 
     - name: Set PATH windows
       if: runner.os == 'Windows'
