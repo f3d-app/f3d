@@ -924,8 +924,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def("to_string", &f3d::engine::state::toString, "Return the state as a JSON string")
     .def("to_file", &f3d::engine::state::toFile, "Write the state as a JSON statefile",
       py::arg("file_path"))
-    .def("to_clipboard", &f3d::engine::state::toClipboard,
-      "Copy the state into the system clipboard");
+    .def(
+      "to_clipboard", &f3d::engine::state::toClipboard, "Copy the state into the system clipboard");
 
   engine //
     .def_static("create", &f3d::engine::create, "Create an engine with a automatic window",
