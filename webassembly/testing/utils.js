@@ -41,8 +41,12 @@ const utils = {
   },
 
   copyLocalFileToWasmFS: async (Module, localPath, wasmPath) => {
-    const data = await fetch(localPath).then((b) => b.arrayBuffer());
-    Module.FS.writeFile(wasmPath, new Uint8Array(data));
+    try {
+      const data = await fetch(localPath).then((b) => b.arrayBuffer());
+      Module.FS.writeFile(wasmPath, new Uint8Array(data));
+    } catch (error) {
+      console.error("Fail to copy file " + localPath);
+    }
   },
 
   runBasicTest: (settings) => {
@@ -59,7 +63,7 @@ const utils = {
   },
 
   runRenderTest: (settings, args) => {
-    settings.canvas = document.getElementById("canvas");
+    settings.canvas = document.getElementById(settings.canvasId || "canvas");
 
     f3d(settings)
       .then(async (Module) => {
@@ -81,7 +85,11 @@ const utils = {
 
         Module.Log.setVerboseLevel(Module.LogVerboseLevel.DEBUG, false);
 
-        Module.engineInstance = Module.Engine.create();
+        if (settings.canvasId !== undefined) {
+          Module.engineInstance = Module.Engine.create(`#${settings.canvasId}`);
+        } else {
+          Module.engineInstance = Module.Engine.create();
+        }
 
         // setup the window size based on the canvas size
         const scale = window.devicePixelRatio;
@@ -122,16 +130,21 @@ const utils = {
 
         // compare images
         const result = Module.engineInstance.getWindow().renderToImage(true);
-        const baseline = new Module.Image("/baseline.png");
-        const ssim = result.compare(baseline);
 
-        if (ssim <= 0.05) {
-          console.log("Passed with SSIM = " + ssim);
-        } else {
-          console.log("F3D_ERROR: Comparison failed with SSIM " + ssim);
+        try {
+          const baseline = new Module.Image("/baseline.png");
+          const ssim = result.compare(baseline);
 
-          utils.printImageBase64(Module, result);
+          if (ssim <= 0.05) {
+            console.log("Passed with SSIM = " + ssim);
+          } else {
+            console.log("F3D_ERROR: Comparison failed with SSIM " + ssim);
+          }
+        } catch (error) {
+          console.error("F3D_ERROR: Cannot read baseline image");
         }
+
+        utils.printImageBase64(Module, result);
 
         window.close();
       })

@@ -7,6 +7,7 @@ set(f3djsTests_list
   "test_render"
   "test_scene"
   "test_splats"
+  "test_custom_canvas"
 )
 
 find_program(CHROMIUM_EXECUTABLE chromium)
@@ -19,6 +20,13 @@ endif()
 foreach(test_name ${f3djsTests_list})
 
   set(TEST_JS_MODULE "${CMAKE_CURRENT_SOURCE_DIR}/${test_name}.js")
+
+  if (${test_name} STREQUAL "test_custom_canvas")
+    set(TEST_CANVAS_ID "custom_id")
+  else()
+    set(TEST_CANVAS_ID "canvas")
+  endif()
+
   configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/test.html.in"
     "${CMAKE_CURRENT_BINARY_DIR}/${test_name}.html"

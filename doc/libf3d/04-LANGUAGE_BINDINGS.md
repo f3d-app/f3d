@@ -99,7 +99,6 @@ const settings = {
     // make it look nice
     options.setAsString("render.effect.antialiasing.mode", "fxaa");
     options.toggle("render.effect.tone_mapping");
-    options.toggle("render.effect.ambient_occlusion");
     options.toggle("render.hdri.ambient");
 
     // display widgets
@@ -110,17 +109,11 @@ const settings = {
 
 f3d(settings)
   .then(async (Module) => {
-    // write a 3D file located on the server to the internal filesystem
-    const modelFile = await fetch("/assets/example.obj").then((b) =>
-      b.arrayBuffer(),
-    );
-    Module.FS.writeFile("example.obj", new Uint8Array(modelFile));
-
     // automatically load all supported file format readers
     Module.Engine.autoloadPlugins();
 
-    // create an engine
-    Module.engineInstance = Module.Engine.create();
+    // create an engine (specify canvas ID)
+    Module.engineInstance = Module.Engine.create("#canvas");
 
     Module.setupOptions(Module.engineInstance.getOptions());
 
@@ -130,8 +123,15 @@ f3d(settings)
       .getWindow()
       .setSize(Module.canvas.clientWidth, scale * Module.canvas.clientHeight);
 
-    const scene = Module.engineInstance.getScene();
-    scene.add("/example.obj");
+    // download file and add stream
+    const response = await fetch("https://f3d.app/data/DamagedHelmet.glb");
+    const arrayBuffer = await response.arrayBuffer();
+    const scene = engine.getScene();
+    try {
+      scene.addBuffer(new Uint8Array(arrayBuffer));
+    } catch (e) {
+      console.error("Unsupported file");
+    }
 
     // do a first render and start the interactor
     Module.engineInstance.getWindow().render();

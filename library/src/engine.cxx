@@ -13,6 +13,10 @@
 
 #include <vtkVersion.h>
 
+#ifdef __EMSCRIPTEN__
+#include <vtkWebAssemblyRenderWindowInteractor.h>
+#endif
+
 #include <vtksys/DynamicLoader.hxx>
 #include <vtksys/SystemTools.hxx>
 
@@ -45,8 +49,8 @@ public:
 };
 
 //----------------------------------------------------------------------------
-engine::engine(
-  const std::optional<window::Type>& windowType, bool offscreen, const context::function& loader)
+engine::engine(const std::optional<window::Type>& windowType, bool offscreen,
+  const context::function& loader, std::string_view id)
   : Internals(new engine::internals)
 {
   // Ensure all lib initialization is done (once)
@@ -87,8 +91,8 @@ engine::engine(
 
   this->Internals->Options = std::make_unique<options>();
 
-  this->Internals->Window =
-    std::make_unique<detail::window_impl>(*this->Internals->Options, windowType, offscreen, loader);
+  this->Internals->Window = std::make_unique<detail::window_impl>(
+    *this->Internals->Options, windowType, offscreen, loader, id);
 
   if (!cachePath.empty())
   {
@@ -105,6 +109,18 @@ engine::engine(
     this->Internals->Interactor = std::make_unique<detail::interactor_impl>(
       *this->Internals->Options, *this->Internals->Window, *this->Internals->Scene);
   }
+
+#ifdef __EMSCRIPTEN__
+  // Set canvas selector for wasm window
+  if (windowType == window::Type::WASM)
+  {
+    vtkRenderWindowInteractor* interactor =
+      this->Internals->Window->GetRenderWindow()->GetInteractor();
+    vtkWebAssemblyRenderWindowInteractor* wasmInteractor =
+      vtkWebAssemblyRenderWindowInteractor::SafeDownCast(interactor);
+    wasmInteractor->SetCanvasSelector(id.empty() ? "#canvas" : id.data());
+  }
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -182,6 +198,15 @@ engine engine::createExternalEGL()
 engine engine::createExternalOSMesa()
 {
   return { window::Type::EXTERNAL, false, context::osmesa() };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createWasm(std::string_view canvasSelector)
+{
+#ifndef __EMSCRIPTEN__
+  throw engine::no_window_exception("Cannot create a WebAssembly window on this platform");
+#endif
+  return { window::Type::WASM, false, nullptr, canvasSelector };
 }
 
 //----------------------------------------------------------------------------
