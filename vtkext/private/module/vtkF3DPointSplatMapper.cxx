@@ -30,6 +30,7 @@
 #include <vtk_glad.h>
 
 #include <algorithm>
+#include <numeric>
 #include <sstream>
 #include <vector>
 
@@ -386,12 +387,14 @@ void vtkF3DSplatMapperHelper::SortSplatsCPU(vtkRenderer* ren)
 
   int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
 
-  this->CPUSortedIndices.resize(static_cast<size_t>(numVerts));
+  if (numVerts != static_cast<int>(this->CPUSortedIndices.size()))
+  {
+    this->CPUSortedIndices.resize(static_cast<size_t>(numVerts));
+    this->CPUDepths.resize(static_cast<size_t>(numVerts));
 
-  this->Primitives[PrimitivePoints].IBO->Download(
-    this->CPUSortedIndices.data(), static_cast<size_t>(numVerts));
+    std::iota(this->CPUSortedIndices.begin(), this->CPUSortedIndices.end(), 0);
+  }
 
-  this->CPUDepths.resize(static_cast<size_t>(numVerts));
   // compute depth for each splat
   vtkPolyData* poly = this->CurrentInput;
 
@@ -521,7 +524,7 @@ void vtkF3DSplatMapperHelper::ReplaceShaderColor(
     {
       vtkShaderProgram::Substitute(VSSource, "//VTK::Color::Dec",
         "//VTK::Color::Dec\n\n"
-        "uniform sampler2DArray sphericalHarmonics;\n"
+        "uniform mediump sampler2DArray sphericalHarmonics;\n"
         "uniform vec3 cameraDirection;\n"
         "vec3 decode(ivec3 texelIndex)\n"
         "{\n"

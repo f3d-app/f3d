@@ -2761,7 +2761,8 @@ void vtkF3DRenderer::ConfigurePointSprites()
     return;
   }
 
-  if (!this->PointSpritesUseInstancing && !vtkShader::IsComputeShaderSupported())
+  if (this->GetBlendingMode() == vtkF3DRenderer::BlendingMode::SORT &&
+    !vtkShader::IsComputeShaderSupported())
   {
     F3DLog::Print(F3DLog::Severity::Warning,
       "Compute shaders are not supported, gaussians are not sorted, resulting in blending "
