@@ -57,22 +57,18 @@ public class TestEngine {
 
     // Engine.createNone() has no interactor; calling getInteractor() must throw
     // NoInteractorException and must NOT crash the JVM.
-    boolean caughtNoInteractor = false;
     try (Engine noWinEngine = Engine.createNone()) {
       noWinEngine.getInteractor();
+      throw new RuntimeException("Expected Engine.NoInteractorException was not thrown");
     } catch (Engine.NoInteractorException e) {
-      caughtNoInteractor = true;
     }
-    assert caughtNoInteractor : "Expected Engine.NoInteractorException was not thrown";
 
     // Loading a nonexistent plugin must throw PluginException.
-    boolean caughtPlugin = false;
     try {
       Engine.loadPlugin("__nonexistent_plugin_f3d_test__");
+      throw new RuntimeException("Expected Engine.PluginException was not thrown");
     } catch (Engine.PluginException e) {
-      caughtPlugin = true;
     }
-    assert caughtPlugin : "Expected Engine.PluginException was not thrown";
 
     testStatefile(args);
   }
