@@ -71,7 +71,7 @@ int test_image()
    * exercising the compare/equals/not_equals bindings meaningfully */
   double error = f3d_image_compare(img, img);
   f3d_test_check_double(
-    &test, "compare() of an image with itself gives zero error", error, 0.0, 1e-9);
+    &test, "compare() of an image with itself gives zero error", error, 0.0);
 
   int is_equal = f3d_image_equals(img, img);
   f3d_test_check(&test, "equals() true for an image compared with itself", is_equal != 0);

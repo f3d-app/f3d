@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <float.h>
 
 typedef struct
 {
@@ -34,8 +35,9 @@ static inline void f3d_test_check(f3d_test_t* test, const char* label, int condi
 
 // check equality of two doubles within a tolerance
 static inline void f3d_test_check_double(
-  f3d_test_t* test, const char* label, double actual, double expected, double tol)
+  f3d_test_t* test, const char* label, double actual, double expected)
 {
+  double tol = 128 * DBL_EPSILON;
   f3d_test_check(test, label, fabs(actual - expected) < tol);
 }
 

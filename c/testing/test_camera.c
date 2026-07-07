@@ -52,7 +52,7 @@ int test_camera()
 
   f3d_camera_set_view_angle(camera, 20.0);
   f3d_angle_deg_t angle = f3d_camera_get_view_angle(camera);
-  f3d_test_check_double(&test, "view angle matches", angle, 20.0, 1e-9);
+  f3d_test_check_double(&test, "view angle matches", angle, 20.0);
 
   f3d_camera_state_t state = { 0 };
   state.position[0] = 0.0;
@@ -72,7 +72,7 @@ int test_camera()
   f3d_test_check_vec3(&test, "state position matches", get_state.position, state.position, 1e-9);
   f3d_test_check_vec3(&test, "state focal point matches", get_state.focal_point, state.focal_point, 1e-9);
   f3d_test_check_vec3(&test, "state view up matches", get_state.view_up, state.view_up, 1e-9);
-  f3d_test_check_double(&test, "state view angle matches", get_state.view_angle, state.view_angle, 1e-9);
+  f3d_test_check_double(&test, "state view angle matches", get_state.view_angle, state.view_angle);
 
   f3d_camera_state_t state_before_transforms;
   f3d_camera_get_state(camera, &state_before_transforms);

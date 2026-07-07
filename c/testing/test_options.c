@@ -40,7 +40,7 @@ int test_options()
 
   f3d_options_set_as_double(options, "render.line_width", 3.5);
   double double_val = f3d_options_get_as_double(options, "render.line_width");
-  f3d_test_check_double(&test, "double value matches", double_val, 3.5, 1e-9);
+  f3d_test_check_double(&test, "double value matches", double_val, 3.5);
 
   f3d_options_set_as_string(options, "render.effect.final_shader", "test.glsl");
   const char* str_val = f3d_options_get_as_string(options, "render.effect.final_shader");
@@ -57,9 +57,9 @@ int test_options()
   size_t out_count;
   f3d_options_get_as_double_vector(options, "render.background.color", out_vec, &out_count);
   f3d_test_check_int(&test, "double vector count matches", (long)out_count, 3);
-  f3d_test_check_double(&test, "double vector[0] matches", out_vec[0], vec_values[0], 1e-9);
-  f3d_test_check_double(&test, "double vector[1] matches", out_vec[1], vec_values[1], 1e-9);
-  f3d_test_check_double(&test, "double vector[2] matches", out_vec[2], vec_values[2], 1e-9);
+  f3d_test_check_double(&test, "double vector[0] matches", out_vec[0], vec_values[0]);
+  f3d_test_check_double(&test, "double vector[1] matches", out_vec[1], vec_values[1]);
+  f3d_test_check_double(&test, "double vector[2] matches", out_vec[2], vec_values[2]);
 
   const int int_vec_values[] = { 1, 2 };
   f3d_options_set_as_int_vector(options, "scene.animation.indices", int_vec_values, 2);
@@ -180,7 +180,7 @@ int test_options()
   f3d_options_set_as_string_representation(options, "render.line_width", "5.0");
   double after_repr_set = f3d_options_get_as_double(options, "render.line_width");
   f3d_test_check_double(
-    &test, "set_as_string_representation updates value", after_repr_set, 5.0, 1e-9);
+    &test, "set_as_string_representation updates value", after_repr_set, 5.0);
 
   char* closest = NULL;
   unsigned int distance = 0;
@@ -201,7 +201,7 @@ int test_options()
   f3d_test_check_int(&test, "parse_int(\"42\") matches", parsed_int, 42);
 
   double parsed_double = f3d_options_parse_double("3.14");
-  f3d_test_check_double(&test, "parse_double(\"3.14\") matches", parsed_double, 3.14, 1e-9);
+  f3d_test_check_double(&test, "parse_double(\"3.14\") matches", parsed_double, 3.14);
 
   const char* parsed_string = f3d_options_parse_string("test");
   f3d_test_check(&test, "parse_string(\"test\") matches",
@@ -215,9 +215,9 @@ int test_options()
   size_t parsed_dvec_count;
   f3d_options_parse_double_vector("1.0,2.0,3.0", parsed_dvec, &parsed_dvec_count);
   f3d_test_check_int(&test, "parsed double vector count matches", (long)parsed_dvec_count, 3);
-  f3d_test_check_double(&test, "parsed double vector[0] matches", parsed_dvec[0], 1.0, 1e-9);
-  f3d_test_check_double(&test, "parsed double vector[1] matches", parsed_dvec[1], 2.0, 1e-9);
-  f3d_test_check_double(&test, "parsed double vector[2] matches", parsed_dvec[2], 3.0, 1e-9);
+  f3d_test_check_double(&test, "parsed double vector[0] matches", parsed_dvec[0], 1.0);
+  f3d_test_check_double(&test, "parsed double vector[1] matches", parsed_dvec[1], 2.0);
+  f3d_test_check_double(&test, "parsed double vector[2] matches", parsed_dvec[2], 3.0);
 
   int parsed_ivec[3];
   size_t parsed_ivec_count;

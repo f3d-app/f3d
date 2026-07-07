@@ -65,11 +65,11 @@ int test_window()
   f3d_point3_t display_roundtrip;
   f3d_window_get_display_from_world(window, world_point, display_roundtrip);
   f3d_test_check_double(&test, "display->world->display roundtrip X matches",
-    display_roundtrip[0], display_point[0], 1e-6);
+    display_roundtrip[0], display_point[0]);
   f3d_test_check_double(&test, "display->world->display roundtrip Y matches",
-    display_roundtrip[1], display_point[1], 1e-6);
+    display_roundtrip[1], display_point[1]);
   f3d_test_check_double(&test, "display->world->display roundtrip Z matches",
-    display_roundtrip[2], display_point[2], 1e-6);
+    display_roundtrip[2], display_point[2]);
 
   f3d_engine_delete(engine);
   return f3d_test_result(&test);

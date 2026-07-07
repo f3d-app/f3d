@@ -109,7 +109,7 @@ int test_scene()
     f3d_test_check_int(
       &test, "retrieved light type matches", (int)get_light->type, (int)F3D_LIGHT_TYPE_HEADLIGHT);
     f3d_test_check_double(
-      &test, "retrieved light intensity matches", get_light->intensity, 1.0, 1e-9);
+      &test, "retrieved light intensity matches", get_light->intensity, 1.0);
     f3d_test_check_int(
       &test, "retrieved light switch_state matches", get_light->switch_state, 1);
     f3d_light_state_free(get_light);
@@ -125,7 +125,7 @@ int test_scene()
   if (get_updated_light)
   {
     f3d_test_check_double(
-      &test, "updated light intensity matches", get_updated_light->intensity, 2.0, 1e-9);
+      &test, "updated light intensity matches", get_updated_light->intensity, 2.0);
     f3d_light_state_free(get_updated_light);
   }
 
