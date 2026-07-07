@@ -168,11 +168,9 @@ int test_interactor()
     f3d_interactor_free_bind_array(all_binds);
   }
 
-  // test_action is a custom command with no registered option behind it, so there's no
-  // documentation string to expect here; just confirming the call doesn't crash
   f3d_binding_documentation_t doc;
   f3d_interactor_get_binding_documentation(interactor, &bind, &doc);
-  (void)doc;
+
 
   f3d_interactor_binding_type_t binding_type = f3d_interactor_get_binding_type(interactor, &bind);
   f3d_test_check_int(
