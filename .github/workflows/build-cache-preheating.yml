@@ -34,6 +34,6 @@ jobs:
           trigger_workflow: true
           wait_workflow: true
 
-      - uses: marocchino/sticky-pull-request-comment@v3.0.4
+      - uses: marocchino/sticky-pull-request-comment@v3.0.5
         with:
           message: Caches have been generated/checked
