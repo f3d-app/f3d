@@ -232,6 +232,12 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     this->MainPass = vtkSmartPointer<vtkFramebufferPass>::New();
     this->MainPass->SetColorFormat(vtkTextureObject::Float32);
 
+#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
+    // Needed because VTK can pick the wrong format with certain drivers
+    // But Fixed32 not supported on GLES
+    this->MainPass->SetDepthFormat(vtkTextureObject::Fixed32);
+#endif
+
     // TAA
     if (renderer && renderer->GetAntiAliasingMode() == vtkF3DRenderer::AntiAliasingMode::TAA)
     {
@@ -287,6 +293,12 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
 
     this->MainOnTopPass = vtkSmartPointer<vtkFramebufferPass>::New();
     this->MainOnTopPass->SetDelegatePass(camP);
+
+#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
+    // Needed because VTK can pick the wrong format with certain drivers
+    // But Fixed32 not supported on GLES
+    this->MainPass->SetDepthFormat(vtkTextureObject::Fixed32);
+#endif
   }
 
   this->InitializeTime = this->GetMTime();
