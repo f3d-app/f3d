@@ -283,18 +283,29 @@ public:
   [[nodiscard]] virtual double getDeltaTime() const = 0;
 
   /**
-   * Go to a specific keyframe by index.
-   * When relative is true, the index is an offset from the closest keyframe to the current time.
-   * When relative is false, the index is the absolute keyframe index.
+   * Jump to a specific frame by index.
+   * A negative index counts from the end of the animation (e.g. -1 is the last frame).
    */
-  virtual interactor& goToKeyframe(size_t index, bool relative) = 0;
+  virtual interactor& jumpToFrame(int index) = 0;
 
   /**
-   * Go to a specific frame by index.
-   * When relative is true, the index is an offset from the current frame.
-   * When relative is false, the index is the absolute frame index.
+   * Move the animation by a number of frames relative to the current frame.
+   * A positive offset moves forward, a negative offset moves backward.
    */
-  virtual interactor& goToFrame(size_t index, bool relative) = 0;
+  virtual interactor& jumpToFrameRelative(int offset) = 0;
+
+  /**
+   * Jump to a specific keyframe by index.
+   * The index is clamped to stay within the available keyframes range.
+   */
+  virtual interactor& jumpToKeyframe(int index) = 0;
+
+  /**
+   * Move the animation by a number of keyframes relative to the closest keyframe to the current time.
+   * A positive offset moves forward, a negative offset moves backward.
+   * An offset of 0 jumps to the closest keyframe.
+   */
+  virtual interactor& jumpToKeyframeRelative(int offset) = 0;
   ///@}
 
   ///@{ @name Movement
