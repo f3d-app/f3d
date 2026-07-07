@@ -35,7 +35,7 @@ int test_image()
   unsigned int channels = f3d_image_get_channel_count(img);
   f3d_test_check_int(&test, "channel count matches params", channels, 3);
 
-  unsigned int type = f3d_image_get_channel_type(img);
+  int type = f3d_image_get_channel_type(img);
   f3d_test_check_int(&test, "channel type matches params", type, BYTE);
 
   unsigned int type_size = f3d_image_get_channel_type_size(img);
@@ -50,7 +50,8 @@ int test_image()
   }
 
   double pixel[3];
-  f3d_image_get_normalized_pixel(img, 0, 0, pixel);
+  int pixel_ret = f3d_image_get_normalized_pixel(img, 0, 0, pixel);
+  f3d_test_check_int(&test, "get_normalized_pixel at valid coordinates succeeds", pixel_ret, 1);
 
   f3d_image_set_metadata(img, "Author", "TestUser");
   const char* author = f3d_image_get_metadata(img, "Author");
@@ -92,7 +93,8 @@ int test_image()
   }
 
   const char* tmp_path = "/tmp/f3d_test_image.png";
-  f3d_image_save(img, tmp_path, PNG);
+  int save_ret = f3d_image_save(img, tmp_path, PNG);
+  f3d_test_check_int(&test, "save with valid path and image succeeds", save_ret, 1);
 
   const char* invalid_path = NULL;
   int ret = f3d_image_save(img, invalid_path, PNG);
