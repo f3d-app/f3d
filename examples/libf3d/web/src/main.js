@@ -141,6 +141,10 @@ f3d(settings)
       .getWindow()
       .setSize(scale * main.clientWidth, scale * main.clientHeight);
 
+    const response = await fetch(`https://f3d.app/data/f3d.vtp`);
+    const arrayBuffer = await response.arrayBuffer();
+    openFile("f3d.vtp", new Uint8Array(arrayBuffer));
+
     // do a first render and start the interactor
     Module.engineInstance.getWindow().render();
     Module.engineInstance.getInteractor().start();

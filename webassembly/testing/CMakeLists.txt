@@ -1,5 +1,6 @@
 set(f3djsTests_list
   "test_camera"
+  "test_depth"
   "test_engine"
   "test_image"
   "test_interactor"

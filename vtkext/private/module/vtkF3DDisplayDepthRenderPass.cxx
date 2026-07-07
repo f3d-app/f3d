@@ -52,14 +52,14 @@ void vtkF3DDisplayDepthRenderPass::Render(const vtkRenderState* state)
     vtkShaderProgram::Substitute(depthDisplayingFS, "//VTK::FSQ::Decl",
       "uniform sampler2D texDepth;\n"
       "uniform bool useColorMap;\n"
-      "uniform sampler1D colorMapTexture;\n"
+      "uniform sampler2D colorMapTexture;\n"
       "//VTK::FSQ::Decl");
 
     vtkShaderProgram::Substitute(depthDisplayingFS, "//VTK::FSQ::Impl",
       "float depth = texture(texDepth, texCoord).r;\n"
       "if (useColorMap)\n"
       "{\n"
-      "  vec4 colorMapped = texture(colorMapTexture, depth);\n"
+      "  vec4 colorMapped = texture(colorMapTexture, vec2(depth, 0.5));\n"
       "  gl_FragData[0] = vec4(colorMapped.rgb, 1.0);\n"
       "  return;\n"
       "}\n"
@@ -127,7 +127,7 @@ void vtkF3DDisplayDepthRenderPass::InitializeResources(vtkOpenGLRenderWindow* re
   {
     this->ColorMapTexture = vtkSmartPointer<vtkTextureObject>::New();
     this->ColorMapTexture->SetContext(renWin);
-    this->ColorMapTexture->Allocate1D(256, 3, VTK_FLOAT);
+    this->ColorMapTexture->Allocate2D(256, 1, 3, VTK_FLOAT);
     this->ColorMapTexture->SetWrapS(vtkTextureObject::ClampToEdge);
     this->ColorMapTexture->SetWrapT(vtkTextureObject::ClampToEdge);
     this->ColorMapTexture->SetMinificationFilter(vtkTextureObject::Linear);
@@ -148,7 +148,7 @@ void vtkF3DDisplayDepthRenderPass::InitializeResources(vtkOpenGLRenderWindow* re
       std::array<float, tableSize * 3> table;
       this->ColorMap->GetTable(range[0], range[1], tableSize, table.data());
 
-      this->ColorMapTexture->Create1DFromRaw(tableSize, 3, VTK_FLOAT, table.data());
+      this->ColorMapTexture->Create2DFromRaw(tableSize, 1, 3, VTK_FLOAT, table.data());
       this->ColorMapBuildTime.Modified();
     }
   }

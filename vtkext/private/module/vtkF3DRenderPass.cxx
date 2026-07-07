@@ -232,9 +232,6 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     this->MainPass = vtkSmartPointer<vtkFramebufferPass>::New();
     this->MainPass->SetColorFormat(vtkTextureObject::Float32);
 
-    // Needed because VTK can pick the wrong format with certain drivers
-    this->MainPass->SetDepthFormat(vtkTextureObject::Fixed32);
-
     // TAA
     if (renderer && renderer->GetAntiAliasingMode() == vtkF3DRenderer::AntiAliasingMode::TAA)
     {
@@ -290,9 +287,6 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
 
     this->MainOnTopPass = vtkSmartPointer<vtkFramebufferPass>::New();
     this->MainOnTopPass->SetDelegatePass(camP);
-
-    // Needed because VTK can pick the wrong format with certain drivers
-    this->MainOnTopPass->SetDepthFormat(vtkTextureObject::Fixed32);
   }
 
   this->InitializeTime = this->GetMTime();
