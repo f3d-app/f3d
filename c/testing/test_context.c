@@ -9,13 +9,25 @@ int test_context()
 
   f3d_context_t* context;
 
-  // none of these should throw; a crash fails the test binary regardless
+#ifdef __linux__
   context = f3d_context_glx();
+  f3d_test_check(&test, "GLX context creation succeeds on Linux", context != NULL);
   if (context)
   {
     f3d_context_delete(context);
   }
 
+  context = f3d_context_egl();
+  f3d_test_check(&test, "EGL context creation succeeds on Linux", context != NULL);
+  if (context)
+  {
+    f3d_context_delete(context);
+  }
+#endif
+
+  /* wgl/cocoa are platform-specific to Windows/macOS; on Linux these are
+   * expected to return NULL per the header docs, so we only check the call
+   * completes without crashing, not a specific non-null result */
   context = f3d_context_wgl();
   if (context)
   {
@@ -28,12 +40,9 @@ int test_context()
     f3d_context_delete(context);
   }
 
-  context = f3d_context_egl();
-  if (context)
-  {
-    f3d_context_delete(context);
-  }
-
+  /* osmesa is a software fallback that could plausibly work on any platform,
+   * but its actual availability depends on whether OSMesa was linked at
+   * build time - not confirmed from the header, so kept as a smoke call */
   context = f3d_context_osmesa();
   if (context)
   {
