@@ -502,7 +502,7 @@ engine::state engine::state::fromFile(const fs::path& filePath)
 }
 
 //----------------------------------------------------------------------------
-engine::state engine::state::pasteClipboard()
+engine::state engine::state::fromClipboard()
 {
 #if F3D_MODULE_CLIP
   std::string content;
@@ -546,7 +546,7 @@ void engine::state::toFile(const fs::path& filePath) const
 }
 
 //----------------------------------------------------------------------------
-void engine::state::copyClipboard() const
+void engine::state::toClipboard() const
 {
 #if F3D_MODULE_CLIP
   if (!clip::set_text(this->Content))

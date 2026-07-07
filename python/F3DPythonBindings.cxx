@@ -919,12 +919,12 @@ PYBIND11_MODULE(pyf3d, module)
       py::arg("content"))
     .def_static("from_file", &f3d::engine::state::fromFile, "Build a state from a JSON statefile",
       py::arg("file_path"))
-    .def_static("paste_clipboard", &f3d::engine::state::pasteClipboard,
+    .def_static("from_clipboard", &f3d::engine::state::fromClipboard,
       "Build a state from the JSON content of the system clipboard")
     .def("to_string", &f3d::engine::state::toString, "Return the state as a JSON string")
     .def("to_file", &f3d::engine::state::toFile, "Write the state as a JSON statefile",
       py::arg("file_path"))
-    .def("copy_clipboard", &f3d::engine::state::copyClipboard,
+    .def("to_clipboard", &f3d::engine::state::toClipboard,
       "Copy the state into the system clipboard");
 
   engine //

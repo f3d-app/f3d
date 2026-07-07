@@ -298,7 +298,7 @@ public:
     try
     {
       // Read the clipboard through libf3d, which owns clipboard support
-      std::istringstream stream(f3d::engine::state::pasteClipboard().toString());
+      std::istringstream stream(f3d::engine::state::fromClipboard().toString());
       return F3DInternals::ParseStatefileContent(stream, {}, outOptions, outFiles, outFileGroups);
     }
     catch (const f3d::engine::statefile_exception& ex)
@@ -1111,8 +1111,10 @@ public:
       interactor.addBinding({ mod_t::NONE, "Up" }, "reload_current_file_group", "Others", std::bind(docString, "Reload current file group"));
       interactor.addBinding({ mod_t::NONE, "Down" }, "add_current_directories", "Others", std::bind(docString, "Add files from dir of current file"));
       interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others", std::bind(docString, "Take a screenshot"));
+#if F3D_MODULE_TINYFILEDIALOGS
       interactor.addBinding({ mod_t::CTRL, "S" }, "save_statefile", "Others", std::bind(docString, "Save a statefile (file dialog)"));
       interactor.addBinding({ mod_t::CTRL, "L" }, "load_statefile", "Others", std::bind(docString, "Load a statefile (file dialog)"));
+#endif
       interactor.addBinding({ mod_t::CTRL_SHIFT, "S" }, "save_statefile {app}/{model}_{n}.json", "Others", std::bind(docString, "Save a statefile (auto filename)"));
       interactor.addBinding({ mod_t::CTRL_SHIFT, "L" }, "load_statefile {app}/{model}_{n}.json", "Others", std::bind(docString, "Load the most recent statefile"));
 #if F3D_MODULE_CLIP
@@ -2276,7 +2278,7 @@ void F3DStarter::SaveStatefileToClipboard()
     // Absolute file group paths since the clipboard has no associated directory
     const f3d::engine::state state = f3d::engine::state::fromString(
       this->Internals->AugmentStatefileContent(this->Internals->Engine->dump().toString(), {}));
-    state.copyClipboard();
+    state.toClipboard();
     f3d::log::info("Statefile copied to the clipboard");
   }
   catch (const f3d::engine::statefile_exception& ex)

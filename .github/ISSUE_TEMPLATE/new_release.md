@@ -87,6 +87,7 @@ Linux testing protocol:
 - Drag&Drop cow.vtp, Drag&Drop shanghai_bund.hdr, check render
 - Check that CTRL+O (file dialog) is working
 - Check that CTRL+S then CTRL+L (statefile save/load file dialogs) are working: save a statefile, change the background color, load it back and check the color is restored
+- Check that CTRL+C then CTRL+V (statefile save/load to clipboard) are working: copy the state, change the background color, paste it back and check the color is restored
 - Press "Esc" and check the following commands `reload_current_file_group`, `set_camera top`, `toggle_volume_rendering`, `exit`
 
 macOS testing protocol:
@@ -100,6 +101,7 @@ macOS testing protocol:
 - Drag&Drop cow.vtp, Drag&Drop shanghai_bund.hdr, check render
 - Check that CMD+O (file dialog) is working
 - Check that CMD+S then CMD+L (statefile save/load file dialogs) are working: save a statefile, change the background color, load it back and check the color is restored
+- Check that CMD+C then CMD+V (statefile save/load to clipboard) are working: copy the state, change the background color, paste it back and check the color is restored
 - Press "Esc" and check the following commands `reload_current_file_group`, `set_camera top`, `toggle_volume_rendering`, `exit`
 
 Windows testing protocol:
@@ -116,6 +118,7 @@ Windows testing protocol:
 - Double click on any new supported file format, check render
 - Check that CTRL+O (file dialog) is working
 - Check that CTRL+S then CTRL+L (statefile save/load file dialogs) are working: save a statefile, change the background color, load it back and check the color is restored
+- Check that CTRL+C then CTRL+V (statefile save/load to clipboard) are working: copy the state, change the background color, paste it back and check the color is restored
 - run `f3d-console --version` in a Windows command line and check it output the version
 - Press "Esc" and check the following commands `reload_current_file_group`, `set_camera top`, `toggle_volume_rendering`, `exit`
 

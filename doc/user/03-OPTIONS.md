@@ -1127,3 +1127,15 @@ The cache directory location is as follows, in order, using the first defined en
 - Windows: `%LOCALAPPDATA%\f3d`
 - Linux: `${XDG_CACHE_HOME}/f3d`,`${HOME}/.cache/f3d`
 - macOS: `${HOME}/Library/Caches/f3d`
+
+## Statefiles
+
+A statefile is a JSON file that captures a session so it can be restored later, using `--save-statefile`/`--load-statefile`
+or the `save_statefile`/`load_statefile` [commands](07-COMMANDS.md).
+
+A libf3d statefile (`engine::dump`/`engine::load`) contains the added `files`, the `camera` and the `options`.
+File paths are stored relatively to the statefile directory when possible, and resolved on load.
+Content added from memory (meshes, buffers) is not captured.
+
+The F3D application adds a `file_groups` entry storing all file groups, including the ones not currently loaded,
+so it can restore the whole navigation state. This entry is ignored when a libf3d statefile is loaded by the library.
