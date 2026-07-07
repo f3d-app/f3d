@@ -151,6 +151,17 @@ npm install f3d --tag rc
 npm run start
 ```
 
+- Test examples manually (Docker required)
+
+```bash
+cd examples/libf3d/web
+npm run install
+npm run dev --workspace simple-ui
+npm run dev --workspace volume-rendering
+npm run dev --workspace multiple-instances
+npm run dev --workspace gaussian-splatting
+```
+
 Once a release cycle:
 
 - Check that completions are still working with `fish` and `zsh` when tab is pressed
