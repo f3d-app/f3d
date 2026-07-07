@@ -281,7 +281,7 @@ public:
      * Throws a engine::statefile_exception if the clipboard has no readable text, its content
      * cannot be parsed, or clipboard support is not available in this build.
      */
-    [[nodiscard]] static F3D_EXPORT state pasteClipboard();
+    [[nodiscard]] static F3D_EXPORT state fromClipboard();
 
     /**
      * Return the state as a JSON string, with file paths stored as absolute paths.
@@ -301,7 +301,7 @@ public:
      * Throws a engine::statefile_exception if the clipboard cannot be written or clipboard support
      * is not available in this build.
      */
-    F3D_EXPORT void copyClipboard() const;
+    F3D_EXPORT void toClipboard() const;
 
   private:
     friend class engine;

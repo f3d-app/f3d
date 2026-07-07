@@ -4,6 +4,8 @@
 #include <app_f3d_F3D_Engine_State.h>
 
 #include <context.h>
+#include <engine.h>
+#include <scene.h>
 
 extern "C"
 {
@@ -117,7 +119,7 @@ extern "C"
     {
       return reinterpret_cast<jlong>(new f3d::engine::state(GetEngine(env, self)->dump()));
     }
-    catch (const std::exception& e)
+    catch (const f3d::engine::statefile_exception& e)
     {
       env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
       return 0;
@@ -130,7 +132,11 @@ extern "C"
     {
       GetEngine(env, self)->load(*reinterpret_cast<f3d::engine::state*>(stateAddress));
     }
-    catch (const std::exception& e)
+    catch (const f3d::engine::statefile_exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+    }
+    catch (const f3d::scene::load_failure_exception& e)
     {
       env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
     }
@@ -147,7 +153,7 @@ extern "C"
       env->ReleaseStringUTFChars(content, str);
       return ptr;
     }
-    catch (const std::exception& e)
+    catch (const f3d::engine::statefile_exception& e)
     {
       env->ReleaseStringUTFChars(content, str);
       env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
@@ -165,7 +171,7 @@ extern "C"
       env->ReleaseStringUTFChars(path, str);
       return ptr;
     }
-    catch (const std::exception& e)
+    catch (const f3d::engine::statefile_exception& e)
     {
       env->ReleaseStringUTFChars(path, str);
       env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
@@ -173,13 +179,13 @@ extern "C"
     }
   }
 
-  JNIEXPORT jlong JAVA_SCOPED_BIND(Engine, State, nativePasteClipboard)(JNIEnv* env, jclass)
+  JNIEXPORT jlong JAVA_SCOPED_BIND(Engine, State, nativeFromClipboard)(JNIEnv* env, jclass)
   {
     try
     {
-      return reinterpret_cast<jlong>(new f3d::engine::state(f3d::engine::state::pasteClipboard()));
+      return reinterpret_cast<jlong>(new f3d::engine::state(f3d::engine::state::fromClipboard()));
     }
-    catch (const std::exception& e)
+    catch (const f3d::engine::statefile_exception& e)
     {
       env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
       return 0;
@@ -198,7 +204,7 @@ extern "C"
     {
       GetState(env, self)->toFile(fs::path(str));
     }
-    catch (const std::exception& e)
+    catch (const f3d::engine::statefile_exception& e)
     {
       env->ReleaseStringUTFChars(path, str);
       env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
@@ -207,13 +213,13 @@ extern "C"
     env->ReleaseStringUTFChars(path, str);
   }
 
-  JNIEXPORT void JAVA_SCOPED_BIND(Engine, State, copyClipboard)(JNIEnv* env, jobject self)
+  JNIEXPORT void JAVA_SCOPED_BIND(Engine, State, toClipboard)(JNIEnv* env, jobject self)
   {
     try
     {
-      GetState(env, self)->copyClipboard();
+      GetState(env, self)->toClipboard();
     }
-    catch (const std::exception& e)
+    catch (const f3d::engine::statefile_exception& e)
     {
       env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
     }

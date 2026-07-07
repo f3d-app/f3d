@@ -23,11 +23,6 @@ extern "C"
   typedef struct f3d_options_t f3d_options_t;
 
   /**
-   * @brief Opaque handle to an f3d::engine::state object.
-   */
-  typedef struct f3d_engine_state_t f3d_engine_state_t;
-
-  /**
    * @brief Structure representing a rendering backend with its availability.
    */
   typedef struct
@@ -217,81 +212,62 @@ extern "C"
   F3D_EXPORT void f3d_engine_set_options(f3d_engine_t* engine, f3d_options_t* options);
 
   /**
-   * @brief Capture the current engine state.
+   * @brief Capture the current engine state as a JSON statefile string.
+   *
+   * File paths are stored as absolute paths.
    *
    * @param engine Engine handle.
-   * @return A state handle on success, NULL on failure.
-   *         The returned state must be deleted with f3d_engine_state_delete().
-   */
-  F3D_EXPORT f3d_engine_state_t* f3d_engine_dump(f3d_engine_t* engine);
-
-  /**
-   * @brief Restore the engine from a previously captured state.
-   *
-   * @param engine Engine handle.
-   * @param state State handle to restore from.
-   * @return 1 on success, 0 on failure.
-   */
-  F3D_EXPORT int f3d_engine_load(f3d_engine_t* engine, const f3d_engine_state_t* state);
-
-  /**
-   * @brief Build a state from a JSON statefile string.
-   *
-   * @param content JSON statefile content to read from.
-   * @return A state handle on success, NULL on failure.
-   *         The returned state must be deleted with f3d_engine_state_delete().
-   */
-  F3D_EXPORT f3d_engine_state_t* f3d_engine_state_create_from_string(const char* content);
-
-  /**
-   * @brief Build a state from a JSON statefile.
-   *
-   * @param file_path Path to read the statefile from.
-   * @return A state handle on success, NULL on failure.
-   *         The returned state must be deleted with f3d_engine_state_delete().
-   */
-  F3D_EXPORT f3d_engine_state_t* f3d_engine_state_create_from_file(const char* file_path);
-
-  /**
-   * @brief Build a state from the JSON content of the system clipboard.
-   *
-   * @return A state handle on success, NULL on failure.
-   *         The returned state must be deleted with f3d_engine_state_delete().
-   */
-  F3D_EXPORT f3d_engine_state_t* f3d_engine_state_create_from_clipboard(void);
-
-  /**
-   * @brief Return the state as a JSON statefile string.
-   *
-   * @param state State handle.
    * @return Heap-allocated JSON string on success, NULL on failure.
    *         The caller must free it using f3d_engine_free_string().
    */
-  F3D_EXPORT const char* f3d_engine_state_to_string(const f3d_engine_state_t* state);
+  F3D_EXPORT const char* f3d_engine_dump_to_string(f3d_engine_t* engine);
 
   /**
-   * @brief Write the state as a JSON statefile.
+   * @brief Capture the current engine state into a JSON statefile.
    *
-   * @param state State handle.
+   * File paths contained by the directory of the file are stored relatively.
+   *
+   * @param engine Engine handle.
    * @param file_path Path to write the statefile to.
    * @return 1 on success, 0 on failure.
    */
-  F3D_EXPORT int f3d_engine_state_to_file(const f3d_engine_state_t* state, const char* file_path);
+  F3D_EXPORT int f3d_engine_dump_to_file(f3d_engine_t* engine, const char* file_path);
 
   /**
-   * @brief Copy the state into the system clipboard as a JSON string.
+   * @brief Capture the current engine state into the system clipboard as a JSON string.
    *
-   * @param state State handle.
+   * @param engine Engine handle.
    * @return 1 on success, 0 on failure.
    */
-  F3D_EXPORT int f3d_engine_state_copy_clipboard(const f3d_engine_state_t* state);
+  F3D_EXPORT int f3d_engine_dump_to_clipboard(f3d_engine_t* engine);
 
   /**
-   * @brief Delete a state handle.
+   * @brief Restore the engine from a JSON statefile string.
    *
-   * @param state State handle to delete.
+   * @param engine Engine handle.
+   * @param content JSON statefile content to restore from.
+   * @return 1 on success, 0 on failure.
    */
-  F3D_EXPORT void f3d_engine_state_delete(f3d_engine_state_t* state);
+  F3D_EXPORT int f3d_engine_load_from_string(f3d_engine_t* engine, const char* content);
+
+  /**
+   * @brief Restore the engine from a JSON statefile.
+   *
+   * File paths stored relatively are resolved against the directory of the file.
+   *
+   * @param engine Engine handle.
+   * @param file_path Path to read the statefile from.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_engine_load_from_file(f3d_engine_t* engine, const char* file_path);
+
+  /**
+   * @brief Restore the engine from the JSON content of the system clipboard.
+   *
+   * @param engine Engine handle.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_engine_load_from_clipboard(f3d_engine_t* engine);
 
   /**
    * @brief Free a single string returned by the engine C API.

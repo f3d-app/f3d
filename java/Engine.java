@@ -247,8 +247,8 @@ public class Engine implements AutoCloseable {
          * Build a state from the JSON content of the system clipboard
          * @return new State instance
          */
-        public static State pasteClipboard() {
-            return new State(nativePasteClipboard());
+        public static State fromClipboard() {
+            return new State(nativeFromClipboard());
         }
 
         /**
@@ -267,7 +267,7 @@ public class Engine implements AutoCloseable {
         /**
          * Copy the state into the system clipboard as a JSON string
          */
-        public native void copyClipboard();
+        public native void toClipboard();
 
         @Override
         public void close() {
@@ -276,7 +276,7 @@ public class Engine implements AutoCloseable {
 
         private static native long nativeFromString(String content);
         private static native long nativeFromFile(String filePath);
-        private static native long nativePasteClipboard();
+        private static native long nativeFromClipboard();
         private static native void nativeDestroy(long nativeAddress);
     }
 
