@@ -19,12 +19,13 @@ endif()
 # Add all the ADD_TEST for each test
 foreach(test_name ${f3djsTests_list})
 
+  # Set TEST_JS_MODULE and TEST_CANVAS_ID used in configure_file
   set(TEST_JS_MODULE "${CMAKE_CURRENT_SOURCE_DIR}/${test_name}.js")
+  set(TEST_CANVAS_ID "canvas")
 
+  # test_custom_canvas needs a different TEST_CANVAS_ID
   if (${test_name} STREQUAL "test_custom_canvas")
     set(TEST_CANVAS_ID "custom_id")
-  else()
-    set(TEST_CANVAS_ID "canvas")
   endif()
 
   configure_file(
