@@ -147,10 +147,28 @@ int test_options()
     f3d_options_free_string_array(enumeration, enum_count);
   }
 
-  //smoke calls only, no observable state change to assert on
+  double speed_before_increase = f3d_options_get_as_double(options, "scene.animation.speed_factor");
   f3d_options_increase(options, "scene.animation.speed_factor");
+  double speed_after_increase = f3d_options_get_as_double(options, "scene.animation.speed_factor");
+  f3d_test_check(&test, "increase changes speed_factor value",
+    speed_after_increase != speed_before_increase);
+
   f3d_options_decrease(options, "scene.animation.speed_factor");
+  double speed_after_decrease = f3d_options_get_as_double(options, "scene.animation.speed_factor");
+  f3d_test_check(&test, "decrease changes speed_factor value",
+    speed_after_decrease != speed_after_increase);
+
+  const char* style_before = f3d_options_get_as_string(options, "interactor.style");
+  char style_before_copy[64];
+  strncpy(style_before_copy, style_before ? style_before : "", sizeof(style_before_copy) - 1);
+  style_before_copy[sizeof(style_before_copy) - 1] = '\0';
+  if (style_before) f3d_options_free_string(style_before);
+
   f3d_options_cycle(options, "interactor.style");
+  const char* style_after = f3d_options_get_as_string(options, "interactor.style");
+  f3d_test_check(&test, "cycle changes interactor.style value",
+    style_after != NULL && strcmp(style_after, style_before_copy) != 0);
+  if (style_after) f3d_options_free_string(style_after);
 
   const char* str_repr = f3d_options_get_as_string_representation(options, "render.line_width");
   f3d_test_check(&test, "string representation is non-null", str_repr != NULL);
