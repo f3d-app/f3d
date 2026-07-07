@@ -135,8 +135,6 @@ int test_interactor()
   int equals1 = f3d_interaction_bind_equals(&ctrl_bind, &parsed_bind);
   f3d_test_check(&test, "Ctrl+A and Shift+B binds are not equal", equals1 == 0);
 
-  // not asserting on less_than's result here: the ordering semantics between different
-  // modifiers/keys aren't documented, so I can't state an expected value for this pair
   int less1 = f3d_interaction_bind_less_than(&ctrl_bind, &parsed_bind);
   (void)less1;
 
