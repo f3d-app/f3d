@@ -543,8 +543,7 @@
         }
       },
       "color": {
-        "type": "color",
-        "default_value": "0.0, 0.0, 0.0"
+        "type": "color"
       }
     },
     "volume": {
