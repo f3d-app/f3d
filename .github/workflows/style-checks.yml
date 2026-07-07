@@ -88,14 +88,14 @@ jobs:
           name: f3d-style-checks-diff-${{ github.event.pull_request.head.ref }}
 
       - name: Delete comment
-        uses: marocchino/sticky-pull-request-comment@v3.0.4
+        uses: marocchino/sticky-pull-request-comment@v3.0.5
         with:
           header: style
           delete: true
 
       - name: Create comment
         if: failure()
-        uses: marocchino/sticky-pull-request-comment@v3.0.4
+        uses: marocchino/sticky-pull-request-comment@v3.0.5
         with:
           header: style
           message: |
