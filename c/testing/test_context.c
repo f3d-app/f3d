@@ -41,8 +41,8 @@ int test_context()
   }
 
   /* osmesa is a software fallback that could plausibly work on any platform,
-   * but its actual availability depends on whether OSMesa was linked at
-   * build time - not confirmed from the header, so kept as a smoke call */
+   * but its actual availability depends on whether OSMesa is available at
+   * runtime */
   context = f3d_context_osmesa();
   if (context)
   {
