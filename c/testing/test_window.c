@@ -25,7 +25,8 @@ int test_window()
   }
 
   f3d_window_type_t type = f3d_window_get_type(window);
-  (void)type;
+  f3d_test_check(&test, "window type is a real backend, not NONE/UNKNOWN",
+    type != F3D_WINDOW_NONE && type != F3D_WINDOW_UNKNOWN);
 
   int offscreen = f3d_window_is_offscreen(window);
   f3d_test_check_int(&test, "window is offscreen", offscreen, 1);
@@ -33,7 +34,8 @@ int test_window()
   f3d_camera_t* camera = f3d_window_get_camera(window);
   f3d_test_check(&test, "camera retrieved from window", camera != NULL);
 
-  f3d_window_render(window);
+  int render_ret = f3d_window_render(window);
+  f3d_test_check_int(&test, "render succeeds on a valid offscreen window", render_ret, 1);
 
   f3d_image_t* img = f3d_window_render_to_image(window, 0);
   f3d_test_check(&test, "render_to_image returns a non-null image", img != NULL);

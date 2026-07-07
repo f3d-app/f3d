@@ -51,11 +51,11 @@ int test_types()
     f3d_test_check_double(&test, label, transform.data[i], expected[i], 1e-9);
   }
 
+  //smoke call
   f3d_colormap_t colormap;
   colormap.data = NULL;
   colormap.count = 0;
   f3d_colormap_free(&colormap);
-  f3d_test_check(&test, "colormap_free handles null data without crashing", 1);
 
   return f3d_test_result(&test);
 }
