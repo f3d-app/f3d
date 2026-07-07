@@ -124,8 +124,9 @@ int test_options()
   f3d_test_check(&test, "unknown option type is INVALID",
     f3d_options_get_type(options, "dummy") == F3D_OPTION_TYPE_INVALID);
 
-  /* reset: unknown default value, smoke call only */
   f3d_options_reset(options, "model.scivis.cells");
+  int reset_val = f3d_options_get_as_bool(options, "model.scivis.cells");
+  f3d_test_check_int(&test, "reset restores default value (false) for model.scivis.cells", reset_val, 0);
 
   f3d_options_remove_value(options, "render.show_edges");
   int has_value_after_remove = f3d_options_has_value(options, "render.show_edges");
@@ -135,8 +136,8 @@ int test_options()
   int has_domain = f3d_options_has_domain(options, "scene.animation.speed_factor");
   f3d_test_check_int(&test, "speed_factor has a domain", has_domain, 1);
 
-  //smoke call only, no observable state change to assert on
-  f3d_options_get_domain_style(options, "scene.animation.speed_factor");
+  f3d_domain_style_t domain_style = f3d_options_get_domain_style(options, "scene.animation.speed_factor");
+  f3d_test_check_int(&test, "speed_factor domain style is RANGE", (int)domain_style, (int)F3D_DOMAIN_STYLE_RANGE);
 
   int enum_count = 0;
   char** enumeration = f3d_options_get_enum_domain(options, "interactor.style", &enum_count);
