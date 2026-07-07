@@ -362,15 +362,21 @@ Display arrows that show vertex normals.
 
 Adjusts the scales of normal glyphs.
 
+#### compare
+
+| 0.3                                       | 0.7                                       |
+| ----------------------------------------- | ----------------------------------------- |
+| ![](./images/normal_glyphs_scale_0.3.png) | ![](./images/normal_glyphs_scale_0.7.png) |
+
 ### `--normal-glyphs-color` (_color_, optional)
 
 Set the color of normal glyphs.
 
 #### compare
 
-| 0.3                                       | 0.7                                       |
-| ----------------------------------------- | ----------------------------------------- |
-| ![](./images/normal_glyphs_scale_0.3.png) | ![](./images/normal_glyphs_scale_0.7.png) |
+| Default                            | Red                                 |
+| ---------------------------------- | ----------------------------------- |
+| ![](./images/normal_glyphs_on.png) | ![](./images/normal_glyphs_red.png) |
 
 ### `-o`, `--point-sprites=<none|sphere|gaussian|circle|stddev|bound|cross>` (_string_, default: `none`, implicit: `sphere`)
 

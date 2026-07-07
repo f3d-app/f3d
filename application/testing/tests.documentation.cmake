@@ -191,6 +191,9 @@ f3d_test_doc(NAME TestDocNormalGlyphsOn DATA DamagedHelmet.glb REF_IMAGE normal_
 f3d_test_doc(NAME TestDocNormalGlyphsScale03 DATA DamagedHelmet.glb REF_IMAGE normal_glyphs_scale_0.3.png ROTATE ARGS --normal-glyphs --normal-glyphs-scale=.3 -f)
 f3d_test_doc(NAME TestDocNormalGlyphsScale07 DATA DamagedHelmet.glb REF_IMAGE normal_glyphs_scale_0.7.png ROTATE ARGS --normal-glyphs --normal-glyphs-scale=.7 -f)
 
+## --normal-glyphs-color
+f3d_test_doc(NAME TestDocNormalGlyphsColorRed DATA DamagedHelmet.glb REF_IMAGE normal_glyphs_red.png ROTATE ARGS --normal-glyphs --normal-glyphs-scale=.3 --normal-glyphs-color=red -f)
+
 ## --point-sprites
 ### OFF: damaged_helmet_baseline.png
 f3d_test_doc(NAME TestDocPointSpritesSphere DATA DamagedHelmet.glb REF_IMAGE point_sprites_sphere.png ROTATE ARGS --point-sprites=sphere --point-sprites-size=5)

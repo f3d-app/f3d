@@ -336,7 +336,7 @@
         {
           "longName": "normal-glyphs-color",
           "helpText": "Color of normal glyphs",
-          "valueHelper": "<R,G,B>"
+          "valueHelper": "<color>"
         }
       ]
     },
