@@ -3066,6 +3066,7 @@ void vtkF3DRenderer::SetOpacityMap(const std::vector<double>& opacityMap)
 
     this->OpacityTransferFunctionConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
+    this->ColoringConfigured = false;
   }
 }
 
