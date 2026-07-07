@@ -28,14 +28,25 @@ int test_scene_buffer()
     return f3d_test_result(&test);
   }
 
-  char source[256];
-  FILE* fp = fopen(F3D_TESTING_DATA_DIR "points.ply", "r");
+  FILE* fp = fopen(F3D_TESTING_DATA_DIR "points.ply", "rb");
   f3d_test_check(&test, "test data file opened", fp != NULL);
 
+  char* source = NULL;
   size_t readLength = 0;
   if (fp != NULL)
   {
-    readLength = fread(source, sizeof(char), 256, fp);
+    fseek(fp, 0, SEEK_END);
+    long fileSize = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+
+    if (fileSize > 0)
+    {
+      source = (char*)malloc((size_t)fileSize);
+      if (source)
+      {
+        readLength = fread(source, sizeof(char), (size_t)fileSize, fp);
+      }
+    }
     fclose(fp);
   }
   f3d_test_check(&test, "test data file read some bytes", readLength > 0);
@@ -45,6 +56,11 @@ int test_scene_buffer()
 
   int add_buffer_result = f3d_scene_add_buffer(scene, source, readLength);
   f3d_test_check_int(&test, "add_buffer with valid PLY data returns 1 (success)", add_buffer_result, 1);
+
+  if (source)
+  {
+    free(source);
+  }
 
   f3d_options_reset(options, "scene.force_reader");
 
