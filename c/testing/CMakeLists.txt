@@ -32,6 +32,22 @@ target_link_libraries(f3d_c_api_tests PRIVATE c_api)
 target_compile_definitions(f3d_c_api_tests PRIVATE F3D_TESTING_DATA_DIR="${F3D_SOURCE_DIR}/testing/data/")
 target_compile_definitions(f3d_c_api_tests PRIVATE F3D_TESTING_TEMP_DIR="${CMAKE_BINARY_DIR}/Testing/Temporary/")
 
+if(F3D_TESTING_ENABLE_GLX_TESTS)
+  target_compile_definitions(f3d_c_api_tests PRIVATE F3D_TESTING_ENABLE_GLX_TESTS)
+endif()
+
+if(F3D_TESTING_ENABLE_WGL_TESTS)
+  target_compile_definitions(f3d_c_api_tests PRIVATE F3D_TESTING_ENABLE_WGL_TESTS)
+endif()
+
+if(F3D_TESTING_ENABLE_EGL_TESTS)
+  target_compile_definitions(f3d_c_api_tests PRIVATE F3D_TESTING_ENABLE_EGL_TESTS)
+endif()
+
+if(F3D_TESTING_ENABLE_OSMESA_TESTS)
+  target_compile_definitions(f3d_c_api_tests PRIVATE F3D_TESTING_ENABLE_OSMESA_TESTS)
+endif()
+
 # Add all the ADD_TEST for each test
 foreach (test ${f3d_c_api_tests_list})
   get_filename_component (TName ${test} NAME_WE)
