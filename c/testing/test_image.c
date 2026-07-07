@@ -94,17 +94,9 @@ int test_image()
   const char* tmp_path = "/tmp/f3d_test_image.png";
   f3d_image_save(img, tmp_path, PNG);
 
-  /* NOTE: f3d_image_save's early-return null-check path returns 1 here
-   * (confirmed in image_c_api.cxx), which is inconsistent with the
-   * function's own documented convention (0 = failure) and with its other
-   * failure paths (write/read exceptions both correctly return 0). The
-   * original pre-conversion smoke test already encoded this same
-   * expectation (checked ret != 1 as its failure condition), so this is
-   * pre-existing, known current behavior. Asserting
-   * actual behavior here rather than the documented one */
   const char* invalid_path = NULL;
   int ret = f3d_image_save(img, invalid_path, PNG);
-  f3d_test_check_int(&test, "save with null path returns 1 (known inconsistency)", ret, 1);
+  f3d_test_check_int(&test, "save with null path reports failure)", ret, 0);
 
   f3d_image_t* img_from_file = f3d_image_new_path(tmp_path);
   f3d_test_check(&test, "loading the just-saved image succeeds", img_from_file != NULL);

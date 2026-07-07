@@ -210,7 +210,7 @@ int f3d_image_save(f3d_image_t* img, const char* path, f3d_image_save_format_t f
   if (!img || !path)
   {
     std::cerr << "Error saving image" << "\n";
-    return 1;
+    return 0;
   }
 
   const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
