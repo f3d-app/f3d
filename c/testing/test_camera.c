@@ -96,6 +96,9 @@ int test_camera()
   f3d_test_check_double(
     &test, "state view angle matches", get_state.view_angle, state.view_angle, 1e-9);
 
+  f3d_camera_state_t state_before_transforms;
+  f3d_camera_get_state(camera, &state_before_transforms);
+
   f3d_camera_dolly(camera, 1.5);
   f3d_camera_pan(camera, 0.1, 0.2, 0.3);
   f3d_camera_zoom(camera, 0.9);
@@ -104,12 +107,39 @@ int test_camera()
   f3d_camera_yaw(camera, 20.0);
   f3d_camera_elevation(camera, 25.0);
   f3d_camera_pitch(camera, 30.0);
-  f3d_test_check(&test, "camera still valid after transforms", camera != NULL);
+
+  f3d_camera_state_t state_after_transforms;
+  f3d_camera_get_state(camera, &state_after_transforms);
+  f3d_test_check(&test, "transform bindings reach the camera and change its state",
+    state_after_transforms.position[0] != state_before_transforms.position[0] ||
+    state_after_transforms.position[1] != state_before_transforms.position[1] ||
+    state_after_transforms.position[2] != state_before_transforms.position[2] ||
+    state_after_transforms.focal_point[0] != state_before_transforms.focal_point[0] ||
+    state_after_transforms.focal_point[1] != state_before_transforms.focal_point[1] ||
+    state_after_transforms.focal_point[2] != state_before_transforms.focal_point[2] ||
+    state_after_transforms.view_up[0] != state_before_transforms.view_up[0] ||
+    state_after_transforms.view_up[1] != state_before_transforms.view_up[1] ||
+    state_after_transforms.view_up[2] != state_before_transforms.view_up[2] ||
+    state_after_transforms.view_angle != state_before_transforms.view_angle);
 
   f3d_camera_set_current_as_default(camera);
+  f3d_camera_state_t default_state;
+  f3d_camera_get_state(camera, &default_state);
+
+  f3d_camera_dolly(camera, 2.0); // mutate away from default
   f3d_camera_reset_to_default(camera);
+  f3d_camera_state_t restored_state;
+  f3d_camera_get_state(camera, &restored_state);
+  f3d_test_check_double(&test, "reset_to_default restores position X",
+    restored_state.position[0], default_state.position[0], 1e-9);
+  f3d_test_check_double(&test, "reset_to_default restores position Y",
+    restored_state.position[1], default_state.position[1], 1e-9);
+  f3d_test_check_double(&test, "reset_to_default restores position Z",
+    restored_state.position[2], default_state.position[2], 1e-9);
+
   f3d_camera_reset_to_bounds(camera, 0.9);
-  f3d_test_check(&test, "camera still valid after reset calls", camera != NULL);
+  // smoke call only: engine has no scene/actors loaded, so there are no bounds
+  // to reset to and no state change is guaranteed here
 
   f3d_engine_delete(engine);
   return f3d_test_result(&test);
