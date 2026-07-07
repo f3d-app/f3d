@@ -107,11 +107,12 @@ const settings = {
       "animation should be playing backward",
     );
     interactor.stopAnimation();
-    interactor.goToKeyframe(4, false);
-    interactor.goToKeyframe(1, true);
-    interactor.goToFrame(24, false);
-    interactor.goToFrame(1, true);
-    interactor.goToFrame(0, false);
+    interactor.jumpToFrame(24);
+    interactor.jumpToFrameRelative(1);
+    interactor.jumpToFrame(0);
+    interactor.jumpToKeyframe(4);
+    interactor.jumpToKeyframeRelative(1);
+    interactor.jumpToKeyframe(0);
 
     interactor.triggerEventLoop(0.1);
     utils.assert(
