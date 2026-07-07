@@ -2204,7 +2204,7 @@ void F3DStarter::SaveStatefile(const std::string& filenameTemplate)
     if (!file.has_value())
     {
       const char* pattern = "*.json";
-      char* ptr = tinyfd_saveFileDialog("Save Statefile", nullptr, 1, &pattern, "Statefiles");
+      char* ptr = tinyfd_saveFileDialog("Save Statefile", "f3d_state.json", 1, &pattern, "Statefiles");
       if (ptr)
       {
         file = ptr;
