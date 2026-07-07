@@ -44,7 +44,7 @@ def test_animation():
     assert inter_ref == engine.interactor
 
     # getDeltaTime after triggerEventLoop
-    assert engine.interactor.get_delta_time() == 0.1
+    assert engine.interactor.get_delta_time() == 0.03333333333333333
 
     # isPlaying after stop
     engine.interactor.stop_animation()
@@ -80,30 +80,34 @@ def test_animation():
     engine.scene.load_animation_time(0.5)
     assert engine.scene.animation_time() == 0.5
 
-    # goToKeyframe absolute
-    engine.scene.load_animation_time(0.0)
-    engine.interactor.go_to_keyframe(4, False)
-    assert engine.scene.animation_time() == keyframes[4]
-
-    # goToKeyframe relative
-    engine.interactor.go_to_keyframe(1, True)
-    assert engine.scene.animation_time() == keyframes[5]
-
     # animationFrame
     engine.scene.load_animation_time(0.0)
     assert engine.scene.animation_frame() == 0
 
     engine.scene.load_animation_time(0.5)
-    assert engine.scene.animation_frame() == 5
+    assert engine.scene.animation_frame() == 15
 
-    # goToFrame absolute
-    engine.interactor.go_to_frame(24, False)
-    assert engine.scene.animation_frame() == 24
+    # jumpToFrame absolute
+    engine.interactor.jump_to_frame(10)
+    assert engine.scene.animation_frame() == 10
 
-    # goToFrame relative
-    engine.interactor.go_to_frame(1, True)
-    assert engine.scene.animation_frame() == 24
+    # jumpToFrameRelative
+    engine.interactor.jump_to_frame_relative(1)
+    assert engine.scene.animation_frame() == 11
 
-    # goToFrame absolute 0
-    engine.interactor.go_to_frame(0, False)
+    # jumpToFrame absolute 0
+    engine.interactor.jump_to_frame(0)
     assert engine.scene.animation_frame() == 0
+
+    # jumpToKeyframe absolute
+    engine.scene.load_animation_time(0.0)
+    engine.interactor.jump_to_keyframe(4)
+    assert engine.scene.animation_time() == keyframes[4]
+
+    # jumpToKeyframeRelative
+    engine.interactor.jump_to_keyframe_relative(1)
+    assert engine.scene.animation_time() == keyframes[5]
+
+    # jumpToKeyframe absolute 0
+    engine.interactor.jump_to_keyframe(0)
+    assert engine.scene.animation_time() == keyframes[0]

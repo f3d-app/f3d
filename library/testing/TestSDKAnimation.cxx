@@ -71,29 +71,31 @@ int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
   sce.loadAnimationTime(0.5);
   test("animationTime after loading 0.5", sce.animationTime(), 0.5);
 
-  inter.goToKeyframe(4, false);
-  test("goToKeyframe absolute index 4", sce.animationTime(), keyframes[4]);
-
-  inter.goToKeyframe(1, true);
-  test("goToKeyframe relative +1", sce.animationTime(), keyframes[5]);
-
-  inter.goToKeyframe(0, false);
-  test("goToKeyframe absolute index 0", sce.animationTime(), keyframes[0]);
-
   sce.loadAnimationTime(0.0);
   test("animationFrame after load 0.0", sce.animationFrame(), static_cast<size_t>(0));
 
   sce.loadAnimationTime(0.5);
   test("animationFrame after load 0.5", sce.animationFrame(), static_cast<size_t>(5));
 
-  inter.goToFrame(24, false);
-  test("goToFrame absolute index 24", sce.animationFrame(), static_cast<size_t>(24));
+  inter.jumpToFrame(24);
+  test("jumpToFrame absolute index 24", sce.animationFrame(), static_cast<size_t>(24));
 
-  inter.goToFrame(1, true);
-  test("goToFrame relative +1", sce.animationFrame(), static_cast<size_t>(24));
+  inter.jumpToFrameRelative(1);
+  test("jumpToFrameRelative +1", sce.animationFrame(), static_cast<size_t>(25));
 
-  inter.goToFrame(0, false);
-  test("goToFrame absolute index 0", sce.animationFrame(), static_cast<size_t>(0));
+  inter.jumpToFrame(0);
+  test("jumpToFrame absolute index 0", sce.animationFrame(), static_cast<size_t>(0));
+
+  sce.loadAnimationTime(0.0);
+  inter.jumpToKeyframe(4);
+  test("jumpToKeyframe absolute index 4", sce.animationTime(), keyframes[4]);
+
+  sce.loadAnimationTime(0.0);
+  inter.jumpToKeyframeRelative(1);
+  test("jumpToKeyframeRelative +1", sce.animationTime(), keyframes[1]);
+
+  inter.jumpToKeyframe(0);
+  test("jumpToKeyframe absolute index 0", sce.animationTime(), keyframes[0]);
 
   inter.startAnimation(f3d::interactor::AnimationDirection::FORWARD);
   test("isPlaying backward after forward start",

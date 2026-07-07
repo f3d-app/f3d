@@ -421,10 +421,16 @@ PYBIND11_MODULE(pyf3d, module)
       "Returns the current animation direction")
     .def("get_delta_time", &f3d::interactor::getDeltaTime,
       "Returns the delta time used by the event loop")
-    .def("go_to_keyframe", &f3d::interactor::goToKeyframe, "Go to keyframe by index",
-      py::arg("index"), py::arg("relative"))
-    .def("go_to_frame", &f3d::interactor::goToFrame, "Go to frame by index",
-      py::arg("index"), py::arg("relative"))
+    .def("jump_to_frame", &f3d::interactor::jumpToFrame, "Jump to a specific frame by index",
+      py::arg("index"))
+    .def("jump_to_frame_relative", &f3d::interactor::jumpToFrameRelative,
+      "Move the animation by a number of frames relative to the current frame",
+      py::arg("offset"))
+    .def("jump_to_keyframe", &f3d::interactor::jumpToKeyframe,
+      "Jump to a specific keyframe by index", py::arg("index"))
+    .def("jump_to_keyframe_relative", &f3d::interactor::jumpToKeyframeRelative,
+      "Move the animation by a number of keyframes relative to the closest keyframe",
+      py::arg("offset"))
     .def("enable_camera_movement", &f3d::interactor::enableCameraMovement,
       "Enable the camera interaction")
     .def("disable_camera_movement", &f3d::interactor::disableCameraMovement,

@@ -155,25 +155,43 @@ double f3d_interactor_get_delta_time(f3d_interactor_t* interactor)
 }
 
 //----------------------------------------------------------------------------
-void f3d_interactor_go_to_keyframe(
-  f3d_interactor_t* interactor, unsigned int index, int relative)
+void f3d_interactor_jump_to_frame(f3d_interactor_t* interactor, int index)
 {
   if (!interactor)
     return;
 
   f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  cpp_interactor->goToKeyframe(static_cast<size_t>(index), relative != 0);
+  cpp_interactor->jumpToFrame(index);
 }
 
 //----------------------------------------------------------------------------
-void f3d_interactor_go_to_frame(
-  f3d_interactor_t* interactor, unsigned int index, int relative)
+void f3d_interactor_jump_to_frame_relative(f3d_interactor_t* interactor, int offset)
 {
   if (!interactor)
     return;
 
   f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  cpp_interactor->goToFrame(static_cast<size_t>(index), relative != 0);
+  cpp_interactor->jumpToFrameRelative(offset);
+}
+
+//----------------------------------------------------------------------------
+void f3d_interactor_jump_to_keyframe(f3d_interactor_t* interactor, int index)
+{
+  if (!interactor)
+    return;
+
+  f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
+  cpp_interactor->jumpToKeyframe(index);
+}
+
+//----------------------------------------------------------------------------
+void f3d_interactor_jump_to_keyframe_relative(f3d_interactor_t* interactor, int offset)
+{
+  if (!interactor)
+    return;
+
+  f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
+  cpp_interactor->jumpToKeyframeRelative(offset);
 }
 
 //----------------------------------------------------------------------------

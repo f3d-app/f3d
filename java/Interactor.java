@@ -405,22 +405,38 @@ public class Interactor {
     public native double getDeltaTime();
 
     /**
-     * Go to a specific keyframe by index.
-     *
-     * @param index keyframe index
-     * @param relative if true, index is an offset from the closest keyframe to current time
-     * @return this interactor for method chaining
-     */
-    public native Interactor goToKeyframe(long index, boolean relative);
-
-    /**
-     * Go to a specific frame by index.
+     * Jump to a specific frame by index.
+     * A negative index counts from the end of the animation.
      *
      * @param index frame index
-     * @param relative if true, index is an offset from the current frame
      * @return this interactor for method chaining
      */
-    public native Interactor goToFrame(long index, boolean relative);
+    public native Interactor jumpToFrame(int index);
+
+    /**
+     * Move the animation by a number of frames relative to the current frame.
+     *
+     * @param offset frame offset, positive moves forward, negative moves backward
+     * @return this interactor for method chaining
+     */
+    public native Interactor jumpToFrameRelative(int offset);
+
+    /**
+     * Jump to a specific keyframe by index.
+     *
+     * @param index keyframe index
+     * @return this interactor for method chaining
+     */
+    public native Interactor jumpToKeyframe(int index);
+
+    /**
+     * Move the animation by a number of keyframes relative to the closest keyframe.
+     *
+     * @param offset keyframe offset, positive moves forward, negative moves backward.
+     *               An offset of 0 jumps to the closest keyframe.
+     * @return this interactor for method chaining
+     */
+    public native Interactor jumpToKeyframeRelative(int offset);
 
     /**
      * Enable camera movement.

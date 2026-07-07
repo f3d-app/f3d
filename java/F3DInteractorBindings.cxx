@@ -438,17 +438,27 @@ extern "C"
     return self;
   }
 
-  JNIEXPORT jobject JAVA_BIND(Interactor, goToKeyframe)(
-    JNIEnv* env, jobject self, jlong index, jboolean relative)
+  JNIEXPORT jobject JAVA_BIND(Interactor, jumpToFrame)(JNIEnv* env, jobject self, jint index)
   {
-    GetInteractor(env, self).goToKeyframe(static_cast<size_t>(index), relative);
+    GetInteractor(env, self).jumpToFrame(static_cast<int>(index));
     return self;
   }
 
-  JNIEXPORT jobject JAVA_BIND(Interactor, goToFrame)(
-    JNIEnv* env, jobject self, jlong index, jboolean relative)
+  JNIEXPORT jobject JAVA_BIND(Interactor, jumpToFrameRelative)(JNIEnv* env, jobject self, jint offset)
   {
-    GetInteractor(env, self).goToFrame(static_cast<size_t>(index), relative);
+    GetInteractor(env, self).jumpToFrameRelative(static_cast<int>(offset));
+    return self;
+  }
+
+  JNIEXPORT jobject JAVA_BIND(Interactor, jumpToKeyframe)(JNIEnv* env, jobject self, jint index)
+  {
+    GetInteractor(env, self).jumpToKeyframe(static_cast<int>(index));
+    return self;
+  }
+
+  JNIEXPORT jobject JAVA_BIND(Interactor, jumpToKeyframeRelative)(JNIEnv* env, jobject self, jint offset)
+  {
+    GetInteractor(env, self).jumpToKeyframeRelative(static_cast<int>(offset));
     return self;
   }
 

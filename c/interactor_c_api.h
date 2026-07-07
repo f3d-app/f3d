@@ -345,24 +345,45 @@ extern "C"
   F3D_EXPORT double f3d_interactor_get_delta_time(f3d_interactor_t* interactor);
 
   /**
-   * @brief Go to a specific keyframe by index.
+   * @brief Jump to a specific frame by index.
    *
-   * @param interactor Interactor handle.
-   * @param index Keyframe index.
-   * @param relative If non-zero, index is an offset from the closest keyframe to current time.
-   */
-  F3D_EXPORT void f3d_interactor_go_to_keyframe(
-    f3d_interactor_t* interactor, unsigned int index, int relative);
-
-  /**
-   * @brief Go to a specific frame by index.
+   * A negative index counts from the end of the animation (e.g. -1 is the last frame).
    *
    * @param interactor Interactor handle.
    * @param index Frame index.
-   * @param relative If non-zero, index is an offset from the current frame.
    */
-  F3D_EXPORT void f3d_interactor_go_to_frame(
-    f3d_interactor_t* interactor, unsigned int index, int relative);
+  F3D_EXPORT void f3d_interactor_jump_to_frame(
+    f3d_interactor_t* interactor, int index);
+
+  /**
+   * @brief Move the animation by a number of frames relative to the current frame.
+   *
+   * @param interactor Interactor handle.
+   * @param offset Frame offset. Positive moves forward, negative moves backward.
+   */
+  F3D_EXPORT void f3d_interactor_jump_to_frame_relative(
+    f3d_interactor_t* interactor, int offset);
+
+  /**
+   * @brief Jump to a specific keyframe by index.
+   *
+   * The index is clamped to stay within the available keyframes range.
+   *
+   * @param interactor Interactor handle.
+   * @param index Keyframe index.
+   */
+  F3D_EXPORT void f3d_interactor_jump_to_keyframe(
+    f3d_interactor_t* interactor, int index);
+
+  /**
+   * @brief Move the animation by a number of keyframes relative to the closest keyframe.
+   *
+   * @param interactor Interactor handle.
+   * @param offset Keyframe offset. Positive moves forward, negative moves backward.
+   *               An offset of 0 jumps to the closest keyframe.
+   */
+  F3D_EXPORT void f3d_interactor_jump_to_keyframe_relative(
+    f3d_interactor_t* interactor, int offset);
   ///@}
 
   ///@{ @name Movement
