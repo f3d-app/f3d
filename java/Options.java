@@ -284,6 +284,34 @@ public class Options {
     public native List<String> getEnumDomain(String name);
 
     /**
+     * Structure holding a range domain: min, max and increment.
+     */
+    public static final class DomainRange<T extends Number> {
+        public final T min;
+        public final T max;
+        public final T increment;
+
+        DomainRange(T min, T max, T increment) {
+            this.min = min;
+            this.max = max;
+            this.increment = increment;
+        }
+    }
+
+    /**
+     * Return the range domain of the option as a DomainRange of the provided type.
+     * Double.class matches double and ratio domains, as ratio does not exist in Java.
+     * Integer.class matches int domains.
+     *
+     * @param name the name of the option to get the range domain from
+     * @param type the expected domain type: Double.class or Integer.class
+     * @return the range domain of the option
+     * @throws IllegalArgumentException if the option name does not exist, doesn't have a range
+     *         domain, or if the provided type does not match the type of the domain
+     */
+    public native <T extends Number> DomainRange<T> getRangeDomain(String name, Class<T> type);
+
+    /**
      * Increase the specified option if it has a range or index domain
      *
      * @param name the name of the option to increase

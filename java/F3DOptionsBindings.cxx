@@ -340,6 +340,66 @@ extern "C"
     return enumeration;
   }
 
+  JNIEXPORT jobject JAVA_BIND(Options, getRangeDomain)(
+    JNIEnv* env, jobject self, jstring name, jclass type)
+  {
+    const char* str = env->GetStringUTFChars(name, nullptr);
+    const std::string nameStr = str;
+    env->ReleaseStringUTFChars(name, str);
+
+    jclass rangeClass = env->FindClass("app/f3d/F3D/Options$DomainRange");
+    jmethodID rangeCtor = env->GetMethodID(
+      rangeClass, "<init>", "(Ljava/lang/Number;Ljava/lang/Number;Ljava/lang/Number;)V");
+
+    try
+    {
+      f3d::options& options = GetOptionsFromEngine(env, self);
+      if (env->IsSameObject(type, env->FindClass("java/lang/Double")))
+      {
+        // Double matches both double and ratio domains, as ratio does not exist in Java
+        f3d::options::DomainRange<double> range{};
+        if (options.getType(nameStr) == f3d::options::option_type::RATIO)
+        {
+          f3d::options::DomainRange<f3d::ratio_t> ratioRange =
+            options.getRangeDomain<f3d::ratio_t>(nameStr);
+          range = { ratioRange.min, ratioRange.max, ratioRange.increment };
+        }
+        else
+        {
+          range = options.getRangeDomain<double>(nameStr);
+        }
+
+        jclass doubleClass = env->FindClass("java/lang/Double");
+        jmethodID valueOf = env->GetStaticMethodID(doubleClass, "valueOf", "(D)Ljava/lang/Double;");
+        return env->NewObject(rangeClass, rangeCtor,
+          env->CallStaticObjectMethod(doubleClass, valueOf, range.min),
+          env->CallStaticObjectMethod(doubleClass, valueOf, range.max),
+          env->CallStaticObjectMethod(doubleClass, valueOf, range.increment));
+      }
+      if (env->IsSameObject(type, env->FindClass("java/lang/Integer")))
+      {
+        f3d::options::DomainRange<int> range = options.getRangeDomain<int>(nameStr);
+
+        jclass integerClass = env->FindClass("java/lang/Integer");
+        jmethodID valueOf =
+          env->GetStaticMethodID(integerClass, "valueOf", "(I)Ljava/lang/Integer;");
+        return env->NewObject(rangeClass, rangeCtor,
+          env->CallStaticObjectMethod(integerClass, valueOf, range.min),
+          env->CallStaticObjectMethod(integerClass, valueOf, range.max),
+          env->CallStaticObjectMethod(integerClass, valueOf, range.increment));
+      }
+
+      env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"),
+        "getRangeDomain only supports Double.class and Integer.class");
+      return nullptr;
+    }
+    catch (const std::exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), e.what());
+      return nullptr;
+    }
+  }
+
   JNIEXPORT void JAVA_BIND(Options, increase)(JNIEnv* env, jobject self, jstring name)
   {
     const char* str = env->GetStringUTFChars(name, nullptr);

@@ -62,6 +62,9 @@ public class TestOptions {
     options.hasDomain("scene.camera.index");
     options.getDomainStyle("scene.camera.index");
     options.getEnumDomain("render.effect.blending.mode");
+    options.getRangeDomain("render.line_width", Double.class);
+    options.getRangeDomain("render.raytracing.samples", Integer.class);
+    options.getRangeDomain("scene.animation.speed_factor", Double.class);
     options.increase("render.raytracing.samples");
     options.decrease("render.raytracing.samples");
     options.cycle("render.effect.blending.mode");
