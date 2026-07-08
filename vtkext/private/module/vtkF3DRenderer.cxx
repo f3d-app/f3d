@@ -1728,7 +1728,7 @@ void vtkF3DRenderer::SetNormalGlyphScaleMultiplier(double multiplier)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetNormalGlyphColor(const std::optional<std::vector<double>>& color)
+void vtkF3DRenderer::SetNormalGlyphColor(const std::vector<double>& color)
 {
   if (this->NormalGlyphColor != color)
   {
