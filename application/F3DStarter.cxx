@@ -186,6 +186,25 @@ public:
     cam.setCurrentAsDefault();
   }
 
+  /**
+   * Drop the camera options carried by a loaded statefile from the persistent statefile options
+   * layer. The statefile camera is a one-shot restore hint: it must only apply to the initial group
+   * load so that switching file groups reframes normally afterwards, instead of keeping the restored
+   * camera pinned like a `--camera-position` command line option.
+   */
+  void ConsumeStatefileCameraOptions()
+  {
+    for (F3DOptionsTools::OptionsEntry& entry : this->StatefileOptionsEntries)
+    {
+      F3DOptionsTools::OptionsDict& dict = std::get<0>(entry);
+      for (const char* key :
+        { "camera-position", "camera-focal-point", "camera-view-up", "camera-view-angle" })
+      {
+        dict.erase(key);
+      }
+    }
+  }
+
   static bool ParseStatefile(const fs::path& statefilePath,
     F3DOptionsTools::OptionsDict& outOptions, std::vector<std::string>& outFiles,
     std::optional<F3DStarter::StatefileFileGroups>& outFileGroups)
@@ -1482,6 +1501,8 @@ int F3DStarter::Start(int argc, char** argv)
     this->LoadFileGroup();
   }
 
+  this->Internals->ConsumeStatefileCameraOptions();
+
   // Save a statefile if requested
   if (!this->Internals->AppOptions.SaveStatefile.empty())
   {
@@ -2399,6 +2420,9 @@ void F3DStarter::ApplyStatefile(const std::map<std::string, std::string>& statef
     }
     this->LoadFileGroup(0, false, true);
   }
+
+  this->Internals->ConsumeStatefileCameraOptions();
+
   this->ResetWindowName();
 }
 

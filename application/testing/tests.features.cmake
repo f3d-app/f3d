@@ -463,6 +463,13 @@ f3d_test(NAME TestStatefileSaveCreatesDir DATA cow.vtp NO_RENDER NO_BASELINE ARG
 f3d_test(NAME TestStatefileFileGroupsSave DATA cow.vtp dragon.vtu NO_RENDER NO_BASELINE ARGS --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileFileGroups.json REGEXP "Statefile saved to")
 f3d_test(NAME TestStatefileFileGroupsLoad SCRIPT DEPENDS TestStatefileFileGroupsSave NO_BASELINE ARGS --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileFileGroups.json --verbose REGEXP "VTKXMLVTU")
 
+# Camera reframing: the statefile camera is a one-shot restore hint, not a persistent option. One
+# test saves a statefile with two file groups (its camera framed on the first group), a dependent
+# test loads it and navigates to the second group, which must be reframed instead of viewed through
+# the restored camera
+f3d_test(NAME TestStatefileCameraReframeSave DATA suzanne.obj cow.vtp NO_BASELINE ARGS --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileCameraReframe.json REGEXP "Statefile saved to")
+f3d_test(NAME TestStatefileCameraReframe SCRIPT DEPENDS TestStatefileCameraReframeSave ARGS --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileCameraReframe.json THRESHOLD 0.05)
+
 ## Command Script
 f3d_test(NAME TestCommandScriptBasic SCRIPT DATA dragon.vtu) # roll_camera 90;toggle ui.scalar_bar;print_scene_info
 f3d_test(NAME TestCommandScriptElevation SCRIPT DATA dragon.vtu) # elevation_camera 90;toggle ui.scalar_bar;print_scene_info
