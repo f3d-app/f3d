@@ -36,7 +36,7 @@ public:
    * and store option ref for later usage
    */
   window_impl(const options& options, const std::optional<Type>& type, bool offscreen,
-    const context::function& getProcAddress);
+    const context::function& getProcAddress, std::string_view id = "");
   /**
    * Default destructor
    */

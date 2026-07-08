@@ -15,7 +15,7 @@
 
   <body>
     <div id="main">
-      <canvas id="canvas"></canvas>
+      <canvas id="@TEST_CANVAS_ID@"></canvas>
     </div>
     <script src="@TEST_JS_MODULE@" type="module"></script>
   </body>

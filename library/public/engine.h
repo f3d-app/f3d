@@ -109,6 +109,14 @@ public:
   [[nodiscard]] static engine createOSMesa();
 
   /**
+   * Create an engine with a webassembly window.
+   * The canvas element can be selected using the `canvasSelector` parameter.
+   *
+   * Throws a engine::no_window_exception if not using WebAssembly.
+   */
+  [[nodiscard]] static engine createWasm(std::string_view canvasSelector = "#canvas");
+
+  /**
    * Create an engine with an external window.
    * A context to retrieve OpenGL symbols is required.
    * Here's an example if a GLFW window is used:
@@ -380,8 +388,8 @@ private:
    * Engine constructor. This is a private method.
    * The user must rely on factories to create the engine instance.
    */
-  engine(
-    const std::optional<window::Type>& windowType, bool offscreen, const context::function& loader);
+  engine(const std::optional<window::Type>& windowType, bool offscreen,
+    const context::function& loader, std::string_view id = "");
 };
 }
 

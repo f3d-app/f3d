@@ -28,6 +28,10 @@
 #include <vtkVersion.h>
 #include <vtkWindowToImageFilter.h>
 
+#ifdef __EMSCRIPTEN__
+#include <vtkWebAssemblyOpenGLRenderWindow.h>
+#endif
+
 #ifdef VTK_USE_X
 #include <vtkF3DGLXRenderWindow.h>
 #endif
@@ -120,7 +124,7 @@ public:
 
 //----------------------------------------------------------------------------
 window_impl::window_impl(const options& options, const std::optional<Type>& type, bool offscreen,
-  const context::function& getProcAddress)
+  const context::function& getProcAddress, [[maybe_unused]] std::string_view id)
   : Internals(std::make_unique<window_impl::internals>(options))
 {
   this->Internals->GetProcAddress = getProcAddress;
@@ -158,6 +162,14 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
     this->Internals->RenWin = vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
 #else
     assert(false); // Unreachable
+#endif
+  }
+  else if (type == Type::WASM)
+  {
+#ifdef __EMSCRIPTEN__
+    auto wasmRenWin = vtkSmartPointer<vtkWebAssemblyOpenGLRenderWindow>::New();
+    wasmRenWin->SetCanvasSelector(id.empty() ? "#canvas" : id.data());
+    this->Internals->RenWin = wasmRenWin;
 #endif
   }
   else if (!type.has_value())

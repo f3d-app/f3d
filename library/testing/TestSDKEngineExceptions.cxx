@@ -25,6 +25,9 @@ int TestSDKEngineExceptions([[maybe_unused]] int argc, [[maybe_unused]] char* ar
   test.expect<f3d::engine::no_window_exception>(
     "create empty external context", []() { std::ignore = f3d::engine::createExternal(nullptr); });
 
+  test.expect<f3d::engine::no_window_exception>(
+    "create wasm context", []() { std::ignore = f3d::engine::createWasm(); });
+
   {
     f3d::engine eng = f3d::engine::createNone();
     test.expect<f3d::engine::no_window_exception>(

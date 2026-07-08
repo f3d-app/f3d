@@ -473,7 +473,10 @@ EMSCRIPTEN_BINDINGS(f3d)
 
   emscripten::class_<f3d::engine>("Engine")
     .class_function(
-      "create", +[]() { return f3d::engine::create(); },
+      "create", +[](std::string canvas) { return f3d::engine::createWasm(canvas); },
+      emscripten::return_value_policy::take_ownership())
+    .class_function(
+      "create", +[]() { return f3d::engine::createWasm(); },
       emscripten::return_value_policy::take_ownership())
     .function(
       "setCachePath", +[](f3d::engine& engine, const std::string& path) -> f3d::engine&
