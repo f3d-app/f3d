@@ -297,7 +297,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
 #if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
     // Needed because VTK can pick the wrong format with certain drivers
     // But Fixed32 not supported on GLES
-    this->MainPass->SetDepthFormat(vtkTextureObject::Fixed32);
+    this->MainOnTopPass->SetDepthFormat(vtkTextureObject::Fixed32);
 #endif
   }
 
