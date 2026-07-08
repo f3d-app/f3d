@@ -222,6 +222,20 @@ std::vector<std::string> options::getEnumDomain(std::string_view name) const
 }
 
 //----------------------------------------------------------------------------
+template<typename T>
+options::DomainRange<T> options::getRangeDomain(std::string_view name) const
+{
+  return options_generated::getRangeDomain<T>(*this, name);
+}
+
+template F3D_EXPORT options::DomainRange<double> options::getRangeDomain<double>(
+  std::string_view name) const;
+template F3D_EXPORT options::DomainRange<int> options::getRangeDomain<int>(
+  std::string_view name) const;
+template F3D_EXPORT options::DomainRange<f3d::ratio_t> options::getRangeDomain<f3d::ratio_t>(
+  std::string_view name) const;
+
+//----------------------------------------------------------------------------
 options& options::increase(std::string_view name)
 {
   options_generated::increaseDecrease<true>(*this, name);

@@ -922,6 +922,27 @@ std::vector<std::string> getEnumDomain(const f3d::options::DomainEnum<std::strin
 
 //----------------------------------------------------------------------------
 /**
+ * Get provided domain_range as a DomainRange<T>,
+ * throws an incompatible_exception if T does not match the type of the domain
+ */
+template<typename T, typename U>
+f3d::options::DomainRange<T> getRangeDomain(
+  [[maybe_unused]] const f3d::options::DomainRange<U>& domain,
+  [[maybe_unused]] std::string_view name)
+{
+  if constexpr (std::is_same_v<T, U>)
+  {
+    return domain;
+  }
+  else
+  {
+    throw f3d::options::incompatible_exception(
+      "Trying to get range domain of " + std::string(name) + " with an incompatible type");
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
  * Needed for increaseDecrease implementation for ratio_t
  */
 void operator+=(f3d::ratio_t& ratio, double incr)

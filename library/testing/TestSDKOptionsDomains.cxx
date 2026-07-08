@@ -34,6 +34,32 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   test.expect<f3d::options::inexistent_exception>(
     "getEnumDomain inexistent", [&]() { std::ignore = opt.getEnumDomain("inexistent"); });
 
+  // Test getRangeDomain
+  f3d::options::DomainRange<double> doubleRange = opt.getRangeDomain<double>("render.line_width");
+  test("getRangeDomain double min", doubleRange.min, 0.);
+  test("getRangeDomain double max", doubleRange.max, 10.);
+  test("getRangeDomain double increment", doubleRange.increment, 0.1);
+
+  f3d::options::DomainRange<f3d::ratio_t> ratioRange =
+    opt.getRangeDomain<f3d::ratio_t>("scene.animation.speed_factor");
+  test("getRangeDomain ratio min", ratioRange.min, f3d::ratio_t(0.));
+  test("getRangeDomain ratio max", ratioRange.max, f3d::ratio_t(2.));
+  test("getRangeDomain ratio increment", ratioRange.increment, f3d::ratio_t(0.1));
+
+  f3d::options::DomainRange<int> intRange = opt.getRangeDomain<int>("render.raytracing.samples");
+  test("getRangeDomain int min", intRange.min, 1);
+  test("getRangeDomain int max", intRange.max, 50);
+  test("getRangeDomain int increment", intRange.increment, 1);
+
+  test.expect<f3d::options::incompatible_exception>("getRangeDomain incompatible type",
+    [&]() { std::ignore = opt.getRangeDomain<double>("render.raytracing.samples"); });
+  test.expect<f3d::options::incompatible_exception>("getRangeDomain incompatible enum",
+    [&]() { std::ignore = opt.getRangeDomain<double>("render.effect.blending.mode"); });
+  test.expect<f3d::options::incompatible_exception>("getRangeDomain incompatible",
+    [&]() { std::ignore = opt.getRangeDomain<double>("model.scivis.cells"); });
+  test.expect<f3d::options::inexistent_exception>(
+    "getRangeDomain inexistent", [&]() { std::ignore = opt.getRangeDomain<double>("inexistent"); });
+
   // Test increase/decrease
 
   opt.increase("scene.animation.speed_factor")
