@@ -327,9 +327,7 @@ extern "C"
     }
     catch (const f3d::engine::plugin_exception& e)
     {
-      env->ReleaseStringUTFChars(str, plugin);
       F3DThrowJavaException(env, "app/f3d/F3D/Engine$PluginException", e.what());
-      return;
     }
     env->ReleaseStringUTFChars(str, plugin);
   }
@@ -348,9 +346,7 @@ extern "C"
     }
     catch (const f3d::engine::cache_exception& e)
     {
-      env->ReleaseStringUTFChars(path, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Engine$CacheException", e.what());
-      return;
     }
     env->ReleaseStringUTFChars(path, str);
   }
@@ -602,10 +598,7 @@ extern "C"
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, nameStr);
-      env->ReleaseStringUTFChars(value, valueStr);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
-      return;
     }
 
     env->ReleaseStringUTFChars(name, nameStr);

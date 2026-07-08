@@ -28,15 +28,11 @@ extern "C"
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
-      return;
     }
     catch (const f3d::options::incompatible_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
-      return;
     }
     env->ReleaseStringUTFChars(name, str);
   }
@@ -50,15 +46,11 @@ extern "C"
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
-      return;
     }
     catch (const f3d::options::incompatible_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
-      return;
     }
     env->ReleaseStringUTFChars(name, str);
   }
@@ -73,15 +65,11 @@ extern "C"
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
-      return;
     }
     catch (const f3d::options::incompatible_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
-      return;
     }
     env->ReleaseStringUTFChars(name, str);
   }
@@ -97,17 +85,11 @@ extern "C"
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, nameStr);
-      env->ReleaseStringUTFChars(value, valueStr);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
-      return;
     }
     catch (const f3d::options::incompatible_exception& e)
     {
-      env->ReleaseStringUTFChars(name, nameStr);
-      env->ReleaseStringUTFChars(value, valueStr);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
-      return;
     }
     env->ReleaseStringUTFChars(name, nameStr);
     env->ReleaseStringUTFChars(value, valueStr);
@@ -128,15 +110,11 @@ extern "C"
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
-      return;
     }
     catch (const f3d::options::incompatible_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
-      return;
     }
     env->ReleaseStringUTFChars(name, str);
   }
@@ -156,15 +134,11 @@ extern "C"
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
-      return;
     }
     catch (const f3d::options::incompatible_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
-      return;
     }
     env->ReleaseStringUTFChars(name, str);
   }
@@ -311,17 +285,11 @@ extern "C"
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, nameStr);
-      env->ReleaseStringUTFChars(str, valueStr);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
-      return;
     }
     catch (const f3d::options::parsing_exception& e)
     {
-      env->ReleaseStringUTFChars(name, nameStr);
-      env->ReleaseStringUTFChars(str, valueStr);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$ParsingException", e.what());
-      return;
     }
     env->ReleaseStringUTFChars(name, nameStr);
     env->ReleaseStringUTFChars(str, valueStr);
@@ -398,15 +366,11 @@ extern "C"
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
-      return;
     }
     catch (const f3d::options::incompatible_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
-      return;
     }
     env->ReleaseStringUTFChars(name, str);
   }
@@ -465,9 +429,7 @@ extern "C"
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
-      return;
     }
     env->ReleaseStringUTFChars(name, str);
   }
@@ -591,9 +553,7 @@ extern "C"
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
-      return;
     }
     env->ReleaseStringUTFChars(name, str);
   }
@@ -607,15 +567,11 @@ extern "C"
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
-      return;
     }
     catch (const f3d::options::incompatible_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
-      return;
     }
     env->ReleaseStringUTFChars(name, str);
   }
@@ -775,9 +731,7 @@ extern "C"
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
-      return;
     }
     env->ReleaseStringUTFChars(name, str);
   }
@@ -791,9 +745,7 @@ extern "C"
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
-      return;
     }
     env->ReleaseStringUTFChars(name, str);
   }
@@ -807,9 +759,7 @@ extern "C"
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
-      return;
     }
     env->ReleaseStringUTFChars(name, str);
   }
