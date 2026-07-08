@@ -189,8 +189,8 @@ public:
   /**
    * Drop the camera options carried by a loaded statefile from the persistent statefile options
    * layer. The statefile camera is a one-shot restore hint: it must only apply to the initial group
-   * load so that switching file groups reframes normally afterwards, instead of keeping the restored
-   * camera pinned like a `--camera-position` command line option.
+   * load so that switching file groups reframes normally afterwards, instead of keeping the
+   * restored camera pinned like a `--camera-position` command line option.
    */
   void ConsumeStatefileCameraOptions()
   {
@@ -2223,7 +2223,8 @@ void F3DStarter::SaveStatefile(const std::string& filenameTemplate)
     if (!file.has_value())
     {
       const char* pattern = "*.json";
-      char* ptr = tinyfd_saveFileDialog("Save Statefile", "f3d_state.json", 1, &pattern, "Statefiles");
+      char* ptr =
+        tinyfd_saveFileDialog("Save Statefile", "f3d_state.json", 1, &pattern, "Statefiles");
       if (ptr)
       {
         file = ptr;
@@ -2859,35 +2860,29 @@ void F3DStarter::AddCommands()
   };
 
   interactor.addCommand(
-    "save_statefile",
-    [this, statefileFilenameOrDefault](const std::vector<std::string>& args) {
-      this->SaveStatefile(args.empty() ? statefileFilenameOrDefault() : args[0]);
-    },
+    "save_statefile", [this, statefileFilenameOrDefault](const std::vector<std::string>& args)
+    { this->SaveStatefile(args.empty() ? statefileFilenameOrDefault() : args[0]); },
     f3d::interactor::command_documentation_t{ "save_statefile [filename]",
       "save the current state into provided file, --statefile-filename or a default filename, `-` "
       "for the standard output" },
     complFilesystem);
 
   interactor.addCommand(
-    "save_statefile_dialog",
-    [this](const std::vector<std::string>&) { this->SaveStatefile(""); },
+    "save_statefile_dialog", [this](const std::vector<std::string>&) { this->SaveStatefile(""); },
     f3d::interactor::command_documentation_t{ "save_statefile_dialog",
       "save the current state into a file picked with a file dialog (requires the tinyfiledialogs "
       "module)" });
 
   interactor.addCommand(
-    "load_statefile",
-    [this, statefileFilenameOrDefault](const std::vector<std::string>& args) {
-      this->LoadStatefile(args.empty() ? statefileFilenameOrDefault() : args[0]);
-    },
+    "load_statefile", [this, statefileFilenameOrDefault](const std::vector<std::string>& args)
+    { this->LoadStatefile(args.empty() ? statefileFilenameOrDefault() : args[0]); },
     f3d::interactor::command_documentation_t{ "load_statefile [filename]",
       "restore the state from provided file, --statefile-filename or a default filename, `-` for "
       "the standard input" },
     complFilesystem);
 
   interactor.addCommand(
-    "load_statefile_dialog",
-    [this](const std::vector<std::string>&) { this->LoadStatefile(""); },
+    "load_statefile_dialog", [this](const std::vector<std::string>&) { this->LoadStatefile(""); },
     f3d::interactor::command_documentation_t{ "load_statefile_dialog",
       "restore the state from a file picked with a file dialog (requires the tinyfiledialogs "
       "module)" });
