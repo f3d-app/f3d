@@ -83,7 +83,7 @@
         },
         {
           "longName": "statefile-filename",
-          "helpText": "Default filename used by the `save_statefile` and `load_statefile` commands, supports the same template variables as --output. Use `-` for the standard output (save) or standard input (load)",
+          "helpText": "Default filename used by the statefile save and load interactions when no file is provided, supports the same template variables as --output. Use `-` for the standard output (save) or standard input (load)",
           "valueHelper": "<file path>"
         },
         {
