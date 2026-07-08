@@ -63,7 +63,7 @@ Save the application state to a statefile right after loading, then continue run
 
 ### `--statefile-filename=<file path>` (_string_, default: empty)
 
-Default filename used by the `save_statefile` and `load_statefile` [commands](07-COMMANDS.md) when none is provided, resolved relative to the current working directory. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, the statefile is written to the standard output (save) or read from the standard input (load). When left empty, the `save_statefile` and `load_statefile` commands open a file dialog to pick the file (requires a build with the `tinyfiledialogs` module).
+Default filename used by the `save_statefile` and `load_statefile` [commands](07-COMMANDS.md) when none is provided, resolved relative to the current working directory. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, the statefile is written to the standard output (save) or read from the standard input (load). When left empty, the `save_statefile` and `load_statefile` commands fall back to a default filename; picking a file through a dialog is instead available with the dedicated `save_statefile_dialog` and `load_statefile_dialog` commands (requires a build with the `tinyfiledialogs` module).
 
 ### `--max-size=<size in MiB>` (_int_, default: `-1`)
 

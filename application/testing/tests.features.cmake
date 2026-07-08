@@ -534,13 +534,17 @@ f3d_test(NAME TestCommandScriptLoadStatefileOverridesTweak SCRIPT DATA cow.vtp W
 f3d_test(NAME TestCommandScriptLoadStatefileMissing SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "Could not open statefile, skipping" NO_BASELINE)
 # load_statefile with an out of range file group index falls back to the first group
 f3d_test(NAME TestCommandScriptLoadStatefileInvalidGroup SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "cow.vtp" NO_BASELINE)
+# save_statefile with no argument and no --statefile-filename falls back to a default auto filename
+f3d_test(NAME TestCommandScriptSaveStatefileAutoFilename SCRIPT DATA cow.vtp WORKING_DIR ${CMAKE_BINARY_DIR}/Testing/Temporary ARGS --verbose REGEXP "Statefile saved to" NO_BASELINE)
+# save_statefile_dialog/load_statefile_dialog open a file dialog, only available with tinyfiledialogs
 if(F3D_MODULE_TINYFILEDIALOGS)
   f3d_test(NAME TestCommandScriptStatefileDialog SCRIPT DATA cow.vtp ARGS --verbose
     ENV "CTEST_SAVE_STATEFILE_DIALOG_FILE=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileDialog"
         "CTEST_LOAD_STATEFILE_DIALOG_FILE=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileDialog.json"
     REGEXP "background.color' = '#0000ff' from statefile options" NO_BASELINE)
 else()
-  f3d_test(NAME TestCommandScriptStatefileEmptyFilename SCRIPT DATA cow.vtp ARGS --verbose REGEXP "No statefile location provided" NO_BASELINE)
+  # Without tinyfiledialogs the dialog commands report a clear error instead of disappearing
+  f3d_test(NAME TestCommandScriptStatefileDialogUnavailable SCRIPT DATA cow.vtp ARGS --verbose REGEXP "File dialog is not available" NO_BASELINE)
 endif()
 # save_statefile to a path that cannot be written (a directory) reports the error
 f3d_test(NAME TestCommandScriptSaveStatefileError SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "Could not save statefile" NO_BASELINE)
