@@ -1130,12 +1130,10 @@ public:
       interactor.addBinding({ mod_t::NONE, "Up" }, "reload_current_file_group", "Others", std::bind(docString, "Reload current file group"));
       interactor.addBinding({ mod_t::NONE, "Down" }, "add_current_directories", "Others", std::bind(docString, "Add files from dir of current file"));
       interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others", std::bind(docString, "Take a screenshot"));
-#if F3D_MODULE_TINYFILEDIALOGS
-      interactor.addBinding({ mod_t::CTRL, "S" }, "save_statefile", "Others", std::bind(docString, "Save a statefile (file dialog)"));
-      interactor.addBinding({ mod_t::CTRL, "L" }, "load_statefile", "Others", std::bind(docString, "Load a statefile (file dialog)"));
-#endif
-      interactor.addBinding({ mod_t::CTRL_SHIFT, "S" }, "save_statefile {app}/{model}_{n}.json", "Others", std::bind(docString, "Save a statefile (auto filename)"));
-      interactor.addBinding({ mod_t::CTRL_SHIFT, "L" }, "load_statefile {app}/{model}_{n}.json", "Others", std::bind(docString, "Load the most recent statefile"));
+      interactor.addBinding({ mod_t::CTRL, "S" }, "save_statefile_dialog", "Others", std::bind(docString, "Save a statefile (file dialog)"));
+      interactor.addBinding({ mod_t::CTRL, "L" }, "load_statefile_dialog", "Others", std::bind(docString, "Load a statefile (file dialog)"));
+      interactor.addBinding({ mod_t::CTRL_SHIFT, "S" }, "save_statefile", "Others", std::bind(docString, "Save a statefile (auto filename or --statefile-filename)"));
+      interactor.addBinding({ mod_t::CTRL_SHIFT, "L" }, "load_statefile", "Others", std::bind(docString, "Load a statefile (auto filename or --statefile-filename)"));
 #if F3D_MODULE_CLIP
       interactor.addBinding({ mod_t::CTRL, "C" }, "save_statefile_to_clipboard", "Others", std::bind(docString, "Save a statefile to the clipboard"));
       interactor.addBinding({ mod_t::CTRL, "V" }, "load_statefile_from_clipboard", "Others", std::bind(docString, "Load a statefile from the clipboard"));
@@ -2244,7 +2242,7 @@ void F3DStarter::SaveStatefile(const std::string& filenameTemplate)
     return;
 #else
     f3d::log::error(
-      "No statefile location provided, use --statefile-filename or provide a filename");
+      "File dialog is not available, F3D was built without the tinyfiledialogs module");
     return;
 #endif
   }
@@ -2332,8 +2330,8 @@ void F3DStarter::LoadStatefile(const std::string& source)
     }
     return;
 #else
-    f3d::log::warn(
-      "No statefile location provided, use --statefile-filename or provide a filename");
+    f3d::log::error(
+      "File dialog is not available, F3D was built without the tinyfiledialogs module");
     return;
 #endif
   }
@@ -2854,24 +2852,45 @@ void F3DStarter::AddCommands()
       "take a minimal screenshot into provided file or --screenshot-filename" },
     complFilesystem);
 
+  const auto statefileFilenameOrDefault = [this]()
+  {
+    const std::string& filename = this->Internals->AppOptions.StatefileFilename;
+    return filename.empty() ? std::string("{app}/{model}_{n}.json") : filename;
+  };
+
   interactor.addCommand(
     "save_statefile",
-    [this](const std::vector<std::string>& args) {
-      this->SaveStatefile(args.empty() ? this->Internals->AppOptions.StatefileFilename : args[0]);
+    [this, statefileFilenameOrDefault](const std::vector<std::string>& args) {
+      this->SaveStatefile(args.empty() ? statefileFilenameOrDefault() : args[0]);
     },
     f3d::interactor::command_documentation_t{ "save_statefile [filename]",
-      "save the current state into provided file or --statefile-filename, `-` for the standard "
-      "output" },
+      "save the current state into provided file, --statefile-filename or a default filename, `-` "
+      "for the standard output" },
     complFilesystem);
 
   interactor.addCommand(
+    "save_statefile_dialog",
+    [this](const std::vector<std::string>&) { this->SaveStatefile(""); },
+    f3d::interactor::command_documentation_t{ "save_statefile_dialog",
+      "save the current state into a file picked with a file dialog (requires the tinyfiledialogs "
+      "module)" });
+
+  interactor.addCommand(
     "load_statefile",
-    [this](const std::vector<std::string>& args) {
-      this->LoadStatefile(args.empty() ? this->Internals->AppOptions.StatefileFilename : args[0]);
+    [this, statefileFilenameOrDefault](const std::vector<std::string>& args) {
+      this->LoadStatefile(args.empty() ? statefileFilenameOrDefault() : args[0]);
     },
     f3d::interactor::command_documentation_t{ "load_statefile [filename]",
-      "restore the state from provided file or --statefile-filename, `-` for the standard input" },
+      "restore the state from provided file, --statefile-filename or a default filename, `-` for "
+      "the standard input" },
     complFilesystem);
+
+  interactor.addCommand(
+    "load_statefile_dialog",
+    [this](const std::vector<std::string>&) { this->LoadStatefile(""); },
+    f3d::interactor::command_documentation_t{ "load_statefile_dialog",
+      "restore the state from a file picked with a file dialog (requires the tinyfiledialogs "
+      "module)" });
 
 #if F3D_MODULE_CLIP
   interactor.addCommand(
