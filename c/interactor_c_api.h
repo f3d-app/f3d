@@ -352,8 +352,7 @@ extern "C"
    * @param interactor Interactor handle.
    * @param index Frame index.
    */
-  F3D_EXPORT void f3d_interactor_jump_to_frame(
-    f3d_interactor_t* interactor, int index);
+  F3D_EXPORT void f3d_interactor_jump_to_frame(f3d_interactor_t* interactor, int index);
 
   /**
    * @brief Move the animation by a number of frames relative to the current frame.
@@ -361,8 +360,7 @@ extern "C"
    * @param interactor Interactor handle.
    * @param offset Frame offset. Positive moves forward, negative moves backward.
    */
-  F3D_EXPORT void f3d_interactor_jump_to_frame_relative(
-    f3d_interactor_t* interactor, int offset);
+  F3D_EXPORT void f3d_interactor_jump_to_frame_relative(f3d_interactor_t* interactor, int offset);
 
   /**
    * @brief Jump to a specific keyframe by index.
@@ -372,8 +370,7 @@ extern "C"
    * @param interactor Interactor handle.
    * @param index Keyframe index.
    */
-  F3D_EXPORT void f3d_interactor_jump_to_keyframe(
-    f3d_interactor_t* interactor, int index);
+  F3D_EXPORT void f3d_interactor_jump_to_keyframe(f3d_interactor_t* interactor, int index);
 
   /**
    * @brief Move the animation by a number of keyframes relative to the closest keyframe.

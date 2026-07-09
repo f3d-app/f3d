@@ -301,9 +301,9 @@ public:
   virtual interactor& jumpToKeyframe(int index) = 0;
 
   /**
-   * Move the animation by a number of keyframes relative to the closest keyframe to the current time.
-   * A positive offset moves forward, a negative offset moves backward.
-   * An offset of 0 jumps to the closest keyframe.
+   * Move the animation by a number of keyframes relative to the closest keyframe to the current
+   * time. A positive offset moves forward, a negative offset moves backward. An offset of 0 jumps
+   * to the closest keyframe.
    */
   virtual interactor& jumpToKeyframeRelative(int offset) = 0;
   ///@}

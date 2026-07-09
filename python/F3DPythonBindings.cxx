@@ -424,8 +424,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def("jump_to_frame", &f3d::interactor::jumpToFrame, "Jump to a specific frame by index",
       py::arg("index"))
     .def("jump_to_frame_relative", &f3d::interactor::jumpToFrameRelative,
-      "Move the animation by a number of frames relative to the current frame",
-      py::arg("offset"))
+      "Move the animation by a number of frames relative to the current frame", py::arg("offset"))
     .def("jump_to_keyframe", &f3d::interactor::jumpToKeyframe,
       "Jump to a specific keyframe by index", py::arg("index"))
     .def("jump_to_keyframe_relative", &f3d::interactor::jumpToKeyframeRelative,

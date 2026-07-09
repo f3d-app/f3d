@@ -415,8 +415,8 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("isPlayingAnimation", &f3d::interactor::isPlayingAnimation)
     .function("getAnimationDirection", &f3d::interactor::getAnimationDirection)
     .function("getDeltaTime", &f3d::interactor::getDeltaTime)
-    .function("jumpToFrame", &f3d::interactor::jumpToFrame,
-      emscripten::return_value_policy::reference())
+    .function(
+      "jumpToFrame", &f3d::interactor::jumpToFrame, emscripten::return_value_policy::reference())
     .function("jumpToFrameRelative", &f3d::interactor::jumpToFrameRelative,
       emscripten::return_value_policy::reference())
     .function("jumpToKeyframe", &f3d::interactor::jumpToKeyframe,
