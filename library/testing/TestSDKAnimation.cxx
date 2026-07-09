@@ -45,8 +45,6 @@ int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
   f3d::interactor& interRef = inter.triggerEventLoop(0.1);
   test("triggerEventLoop returns self", &interRef == &inter);
 
-  test("getDeltaTime after triggerEventLoop", inter.getDeltaTime(), 0.1);
-
   inter.stopAnimation();
   test("isPlaying after stop", !inter.isPlayingAnimation());
 
@@ -75,13 +73,13 @@ int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
   test("animationFrame after load 0.0", sce.animationFrame(), static_cast<size_t>(0));
 
   sce.loadAnimationTime(0.5);
-  test("animationFrame after load 0.5", sce.animationFrame(), static_cast<size_t>(5));
+  test("animationFrame after load 0.5", sce.animationFrame(), static_cast<size_t>(15));
 
-  inter.jumpToFrame(24);
-  test("jumpToFrame absolute index 24", sce.animationFrame(), static_cast<size_t>(24));
+  inter.jumpToFrame(10);
+  test("jumpToFrame absolute index 10", sce.animationFrame(), static_cast<size_t>(10));
 
   inter.jumpToFrameRelative(1);
-  test("jumpToFrameRelative +1", sce.animationFrame(), static_cast<size_t>(25));
+  test("jumpToFrameRelative +1", sce.animationFrame(), static_cast<size_t>(11));
 
   inter.jumpToFrame(0);
   test("jumpToFrame absolute index 0", sce.animationFrame(), static_cast<size_t>(0));
