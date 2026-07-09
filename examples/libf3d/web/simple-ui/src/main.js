@@ -69,7 +69,6 @@ f3d(settings)
     const idOptionMappings = [
       ["grid", "render.grid.enable"],
       ["axis", "ui.axis"],
-      ["fxaa", "render.effect.antialiasing.mode"],
       ["tone", "render.effect.tone_mapping"],
       ["ssao", "render.effect.ambient_occlusion"],
       ["ambient", "render.hdri.ambient"],
@@ -119,7 +118,7 @@ f3d(settings)
     document.querySelector("#z-up").addEventListener("click", (evt) => {
       Module.engineInstance
         .getOptions()
-        .set_as_string("scene.up_direction", "+Z");
+        .setAsString("scene.up_direction", "+Z");
       document.getElementById("z-up").classList.add("is-active");
       document.getElementById("y-up").classList.remove("is-active");
       openFile(document.getElementById("file-name").innerHTML);
@@ -128,7 +127,7 @@ f3d(settings)
     document.querySelector("#y-up").addEventListener("click", (evt) => {
       Module.engineInstance
         .getOptions()
-        .set_as_string("scene.up_direction", "+Y");
+        .setAsString("scene.up_direction", "+Y");
       document.getElementById("y-up").classList.add("is-active");
       document.getElementById("z-up").classList.remove("is-active");
       openFile(document.getElementById("file-name").innerHTML);

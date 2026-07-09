@@ -601,7 +601,7 @@ jobs:
 
       - name: Build F3D web app with npm F3D package
         working-directory: ${{github.workspace}}/source/examples/libf3d/web
-        run: npm run build
+        run: npm run build --workspaces
 
       - name: Retrieve f3d package
         uses: actions/download-artifact@v8
@@ -612,8 +612,8 @@ jobs:
       # Override with the locally built package
       - name: Install f3d package
         working-directory: ${{github.workspace}}/source/examples/libf3d/web
-        run: npm install f3d-*.tgz
+        run: npm install f3d-*.tgz --workspaces
 
       - name: Build F3D web app with package just built from branch
         working-directory: ${{github.workspace}}/source/examples/libf3d/web
-        run: npm run build
+        run: npm run build --workspaces
