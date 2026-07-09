@@ -326,6 +326,29 @@ PYBIND11_MODULE(pyf3d, module)
     .def("has_domain", &f3d::options::hasDomain)
     .def("get_domain_style", &f3d::options::getDomainStyle)
     .def("get_enum_domain", &f3d::options::getEnumDomain)
+    .def("get_range_domain",
+      [](const f3d::options& opts, std::string_view name) -> py::tuple
+      {
+        switch (opts.getType(name))
+        {
+          case f3d::options::option_type::INT:
+          {
+            f3d::options::DomainRange<int> range = opts.getRangeDomain<int>(name);
+            return py::make_tuple(range.min, range.max, range.increment);
+          }
+          case f3d::options::option_type::RATIO:
+          {
+            f3d::options::DomainRange<f3d::ratio_t> range = opts.getRangeDomain<f3d::ratio_t>(name);
+            return py::make_tuple(static_cast<double>(range.min), static_cast<double>(range.max),
+              static_cast<double>(range.increment));
+          }
+          default:
+          {
+            f3d::options::DomainRange<double> range = opts.getRangeDomain<double>(name);
+            return py::make_tuple(range.min, range.max, range.increment);
+          }
+        }
+      })
     .def("increase", &f3d::options::increase)
     .def("decrease", &f3d::options::decrease)
     .def("cycle", &f3d::options::cycle)

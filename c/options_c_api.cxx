@@ -687,6 +687,75 @@ char** f3d_options_get_enum_domain(const f3d_options_t* options, const char* nam
 }
 
 //----------------------------------------------------------------------------
+int f3d_options_get_range_domain_double(
+  const f3d_options_t* options, const char* name, double range[3])
+{
+  if (!options || !name || !range)
+  {
+    return 0;
+  }
+
+  try
+  {
+    const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
+    f3d::options::DomainRange<double> domain{};
+    if (cpp_options->getType(name) == f3d::options::option_type::RATIO)
+    {
+      f3d::options::DomainRange<f3d::ratio_t> ratioDomain =
+        cpp_options->getRangeDomain<f3d::ratio_t>(name);
+      domain = { ratioDomain.min, ratioDomain.max, ratioDomain.increment };
+    }
+    else
+    {
+      domain = cpp_options->getRangeDomain<double>(name);
+    }
+    range[0] = domain.min;
+    range[1] = domain.max;
+    range[2] = domain.increment;
+    return 1;
+  }
+  catch (const f3d::options::incompatible_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return 0;
+  }
+  catch (const f3d::options::inexistent_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return 0;
+  }
+}
+
+//----------------------------------------------------------------------------
+int f3d_options_get_range_domain_int(const f3d_options_t* options, const char* name, int range[3])
+{
+  if (!options || !name || !range)
+  {
+    return 0;
+  }
+
+  try
+  {
+    const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
+    f3d::options::DomainRange<int> domain = cpp_options->getRangeDomain<int>(name);
+    range[0] = domain.min;
+    range[1] = domain.max;
+    range[2] = domain.increment;
+    return 1;
+  }
+  catch (const f3d::options::incompatible_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return 0;
+  }
+  catch (const f3d::options::inexistent_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return 0;
+  }
+}
+
+//----------------------------------------------------------------------------
 void f3d_options_increase(f3d_options_t* options, const char* name)
 {
   if (!options || !name)

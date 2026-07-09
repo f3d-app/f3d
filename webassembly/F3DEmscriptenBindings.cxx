@@ -1,5 +1,7 @@
 #include <emscripten/bind.h>
 
+#include <array>
+
 #include "camera.h"
 #include "engine.h"
 #include "interactor.h"
@@ -164,6 +166,36 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function(
       "getEnumDomain", +[](const f3d::options& o, const std::string& name) -> emscripten::val
       { return containerToJSArray(o.getEnumDomain(name)); })
+    .function(
+      "getRangeDomain",
+      +[](const f3d::options& o, const std::string& name) -> emscripten::val
+      {
+        std::array<double, 3> values{};
+        switch (o.getType(name))
+        {
+          case f3d::options::option_type::INT:
+          {
+            f3d::options::DomainRange<int> range = o.getRangeDomain<int>(name);
+            values = { static_cast<double>(range.min), static_cast<double>(range.max),
+              static_cast<double>(range.increment) };
+            break;
+          }
+          case f3d::options::option_type::RATIO:
+          {
+            f3d::options::DomainRange<f3d::ratio_t> range = o.getRangeDomain<f3d::ratio_t>(name);
+            values = { static_cast<double>(range.min), static_cast<double>(range.max),
+              static_cast<double>(range.increment) };
+            break;
+          }
+          default:
+          {
+            f3d::options::DomainRange<double> range = o.getRangeDomain<double>(name);
+            values = { range.min, range.max, range.increment };
+            break;
+          }
+        }
+        return containerToJSArray(values);
+      })
     .function(
       "increase", +[](f3d::options& o, const std::string& name) -> f3d::options&
       { return o.increase(name); }, emscripten::return_value_policy::reference())
