@@ -94,13 +94,14 @@ public:
   void LoadStatefileFromClipboard();
 
   /**
-   * Apply a parsed statefile (options, files and camera) to the engine, replacing the current
-   * state.
+   * Apply a parsed statefile (options, files, camera and window size) to the engine, replacing the
+   * current state.
    * Used by LoadStatefile and LoadStatefileFromClipboard.
    */
   void ApplyStatefile(const std::map<std::string, std::string>& statefileOptions,
     const std::vector<std::string>& statefileFiles,
-    const std::optional<StatefileFileGroups>& statefileFileGroups);
+    const std::optional<StatefileFileGroups>& statefileFileGroups,
+    const std::optional<std::pair<int, int>>& statefileWindowSize);
 
   F3DStarter();
   ~F3DStarter();

@@ -23,6 +23,23 @@ set_tests_properties(f3d::TestStatefileRelativeAugmentSetup PROPERTIES FIXTURES_
 add_test(NAME f3d::TestStatefileRelativeAugment COMMAND $<TARGET_FILE:f3d> --no-render --no-config ${CMAKE_BINARY_DIR}/Testing/Temporary/statefile_relative/cow.vtp --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/statefile_relative/state.json --verbose)
 set_tests_properties(f3d::TestStatefileRelativeAugment PROPERTIES FIXTURES_REQUIRED statefile_relative PASS_REGULAR_EXPRESSION "Statefile saved to")
 
+# Window size in statefiles: save a statefile at a chosen resolution (a window is needed for the size
+# to be captured), then load it back. These use add_test directly because f3d_test always injects
+# --resolution, which takes precedence over the statefile window size.
+add_test(NAME f3d::TestStatefileWindowSizeSave
+  COMMAND $<TARGET_FILE:f3d> --no-config ${F3D_SOURCE_DIR}/testing/data/cow.vtp --resolution=512,384 --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileWindowSizeSave.png --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileWindowSize.json)
+set_tests_properties(f3d::TestStatefileWindowSizeSave PROPERTIES PASS_REGULAR_EXPRESSION "Statefile saved to")
+
+# Loading without --resolution restores the window size from the statefile
+add_test(NAME f3d::TestStatefileWindowSizeLoad
+  COMMAND $<TARGET_FILE:f3d> --no-config --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileWindowSize.json --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileWindowSizeLoad.png --verbose)
+set_tests_properties(f3d::TestStatefileWindowSizeLoad PROPERTIES DEPENDS f3d::TestStatefileWindowSizeSave PASS_REGULAR_EXPRESSION "Window size set to 512x384")
+
+# An explicit --resolution takes precedence: the statefile window size is not applied
+add_test(NAME f3d::TestStatefileWindowSizeResolutionPrecedence
+  COMMAND $<TARGET_FILE:f3d> --no-config --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileWindowSize.json --resolution=256,192 --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileWindowSizeResolutionPrecedence.png --verbose)
+set_tests_properties(f3d::TestStatefileWindowSizeResolutionPrecedence PROPERTIES DEPENDS f3d::TestStatefileWindowSizeSave FAIL_REGULAR_EXPRESSION "Window size set to")
+
 # Test that f3d resolution can be controlled from config file
 add_test(NAME f3d::TestConfigResolution COMMAND $<TARGET_FILE:f3d> --config=${F3D_SOURCE_DIR}/testing/configs/resolution.json ${F3D_SOURCE_DIR}/testing/data/suzanne.stl --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestConfigResolution.png --reference=${F3D_SOURCE_DIR}/testing/baselines/TestConfigResolution.png)
 

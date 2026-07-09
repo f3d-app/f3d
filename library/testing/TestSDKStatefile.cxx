@@ -119,6 +119,11 @@ int TestSDKStatefile([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     R"("view_up": [0.0, 1.0, 0.0], "view_angle": 30.0 } })"));
   test("camera without window is skipped", noWinEng.getScene().getAddedFiles().empty(), true);
 
+  // Restoring a window size into an engine without a window is skipped with a log, not a failure
+  f3d::engine noWinSizeEng = f3d::engine::createNone();
+  noWinSizeEng.load(f3d::engine::state::fromString(R"({ "window": { "width": 800, "height": 600 } })"));
+  test("window size without window is skipped", noWinSizeEng.getScene().getAddedFiles().empty(), true);
+
   // Failure modes: reading a missing or invalid statefile, or parsing invalid content, all throw
   const fs::path invalidStatefilePath = tmpDir / "invalid_statefile.json";
   std::ofstream(invalidStatefilePath) << "{ not valid json";

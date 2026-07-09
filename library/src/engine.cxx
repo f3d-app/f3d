@@ -67,6 +67,20 @@ nlohmann::ordered_json CaptureState(f3d::engine& eng)
     // No window available, nothing to save for the camera
   }
 
+  // Window size, only if a window is available
+  try
+  {
+    const f3d::window& win = eng.getWindow();
+    nlohmann::ordered_json window;
+    window["width"] = win.getWidth();
+    window["height"] = win.getHeight();
+    root["window"] = window;
+  }
+  catch (const f3d::engine::no_window_exception&)
+  {
+    // No window available, nothing to save for the window
+  }
+
   nlohmann::ordered_json options = nlohmann::ordered_json::object();
   const f3d::options& opts = eng.getOptions();
   for (const std::string& name : opts.getNames())
@@ -142,6 +156,19 @@ void RestoreState(f3d::engine& eng, const nlohmann::ordered_json& root)
     catch (const f3d::engine::no_window_exception&)
     {
       f3d::log::info("No window available, skipping camera state from statefile");
+    }
+  }
+
+  if (root.contains("window"))
+  {
+    try
+    {
+      const nlohmann::ordered_json& window = root.at("window");
+      eng.getWindow().setSize(window.at("width").get<int>(), window.at("height").get<int>());
+    }
+    catch (const f3d::engine::no_window_exception&)
+    {
+      f3d::log::info("No window available, skipping window size from statefile");
     }
   }
 }

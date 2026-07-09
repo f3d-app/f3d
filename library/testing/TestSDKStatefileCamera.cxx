@@ -21,6 +21,12 @@ int TestSDKStatefileCamera([[maybe_unused]] int argc, [[maybe_unused]] char* arg
 
   // Compare against the state as the camera actually holds it (the view up is reorthogonalized)
   const f3d::camera_state_t saved = src.getWindow().getCamera().getState();
+
+  // Also capture a window size, compared against the size the window actually holds
+  src.getWindow().setSize(512, 384);
+  const int savedWidth = src.getWindow().getWidth();
+  const int savedHeight = src.getWindow().getHeight();
+
   src.dump().toFile(statefilePath);
 
   // Restore into another windowed engine and check the camera is restored
@@ -31,6 +37,8 @@ int TestSDKStatefileCamera([[maybe_unused]] int argc, [[maybe_unused]] char* arg
   test("restored camera focal point", restored.focalPoint, approx(saved.focalPoint));
   test("restored camera view up", restored.viewUp, approx(saved.viewUp));
   test("restored camera view angle", restored.viewAngle, approx(saved.viewAngle));
+  test("restored window width", dst.getWindow().getWidth(), savedWidth);
+  test("restored window height", dst.getWindow().getHeight(), savedHeight);
 
   return test.result();
 }

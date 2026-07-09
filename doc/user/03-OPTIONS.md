@@ -55,11 +55,11 @@ Do not render anything and quit just after loading the first file, use with --ve
 
 ### `--load-statefile=<file path>` (_string_)
 
-Restore the application state from a statefile right after starting, then continue running. The statefile is applied above configuration files but below command line options. If `-` is specified instead of a filename, the statefile is read from the standard input. If the file does not exist, it is skipped with a warning.
+Restore the application state from a statefile right after starting, then continue running. The statefile is applied above configuration files but below command line options. The restored window size is overridden by an explicit `--resolution`. If `-` is specified instead of a filename, the statefile is read from the standard input. If the file does not exist, it is skipped with a warning.
 
 ### `--save-statefile=<file path>` (_string_)
 
-Save the application state to a statefile right after loading, then continue running. All file groups are saved, including the ones not currently loaded. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, the statefile is written to the standard output.
+Save the application state to a statefile right after loading, then continue running. The saved state includes the options, camera, window size and all file groups, including the ones not currently loaded. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, the statefile is written to the standard output.
 
 ### `--statefile-filename=<file path>` (_string_, default: empty)
 
