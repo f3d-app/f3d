@@ -170,30 +170,18 @@ EMSCRIPTEN_BINDINGS(f3d)
       "getRangeDomain",
       +[](const f3d::options& o, const std::string& name) -> emscripten::val
       {
-        std::array<double, 3> values{};
-        switch (o.getType(name))
+        f3d::options::DomainRange<f3d::option_variant_t> domain = o.getRangeDomain(name);
+        // All range types are returned as JS numbers (doubles)
+        auto toDouble = [](const f3d::option_variant_t& value) -> double
         {
-          case f3d::options::option_type::INT:
+          if (const int* intValue = std::get_if<int>(&value))
           {
-            f3d::options::DomainRange<int> range = o.getRangeDomain<int>(name);
-            values = { static_cast<double>(range.min), static_cast<double>(range.max),
-              static_cast<double>(range.increment) };
-            break;
+            return static_cast<double>(*intValue);
           }
-          case f3d::options::option_type::RATIO:
-          {
-            f3d::options::DomainRange<f3d::ratio_t> range = o.getRangeDomain<f3d::ratio_t>(name);
-            values = { static_cast<double>(range.min), static_cast<double>(range.max),
-              static_cast<double>(range.increment) };
-            break;
-          }
-          default:
-          {
-            f3d::options::DomainRange<double> range = o.getRangeDomain<double>(name);
-            values = { range.min, range.max, range.increment };
-            break;
-          }
-        }
+          return std::get<double>(value);
+        };
+        std::array<double, 3> values = { toDouble(domain.min), toDouble(domain.max),
+          toDouble(domain.increment) };
         return containerToJSArray(values);
       })
     .function(

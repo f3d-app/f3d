@@ -353,40 +353,40 @@ extern "C"
 
     try
     {
-      f3d::options& options = GetOptionsFromEngine(env, self);
+      f3d::options::DomainRange<f3d::option_variant_t> range =
+        GetOptionsFromEngine(env, self).getRangeDomain(nameStr);
+
       if (env->IsSameObject(type, env->FindClass("java/lang/Double")))
       {
-        // Double matches both double and ratio domains, as ratio does not exist in Java
-        f3d::options::DomainRange<double> range{};
-        if (options.getType(nameStr) == f3d::options::option_type::RATIO)
+        // Double matches both double and ratio domains, as ratio is exposed as double
+        if (!std::holds_alternative<double>(range.min))
         {
-          f3d::options::DomainRange<f3d::ratio_t> ratioRange =
-            options.getRangeDomain<f3d::ratio_t>(nameStr);
-          range = { ratioRange.min, ratioRange.max, ratioRange.increment };
-        }
-        else
-        {
-          range = options.getRangeDomain<double>(nameStr);
+          throw f3d::options::incompatible_exception("Trying to get range domain of " + nameStr +
+            " as a Double but it is an Integer domain");
         }
 
         jclass doubleClass = env->FindClass("java/lang/Double");
         jmethodID valueOf = env->GetStaticMethodID(doubleClass, "valueOf", "(D)Ljava/lang/Double;");
         return env->NewObject(rangeClass, rangeCtor,
-          env->CallStaticObjectMethod(doubleClass, valueOf, range.min),
-          env->CallStaticObjectMethod(doubleClass, valueOf, range.max),
-          env->CallStaticObjectMethod(doubleClass, valueOf, range.increment));
+          env->CallStaticObjectMethod(doubleClass, valueOf, std::get<double>(range.min)),
+          env->CallStaticObjectMethod(doubleClass, valueOf, std::get<double>(range.max)),
+          env->CallStaticObjectMethod(doubleClass, valueOf, std::get<double>(range.increment)));
       }
       if (env->IsSameObject(type, env->FindClass("java/lang/Integer")))
       {
-        f3d::options::DomainRange<int> range = options.getRangeDomain<int>(nameStr);
+        if (!std::holds_alternative<int>(range.min))
+        {
+          throw f3d::options::incompatible_exception("Trying to get range domain of " + nameStr +
+            " as an Integer but it is not an Integer domain");
+        }
 
         jclass integerClass = env->FindClass("java/lang/Integer");
         jmethodID valueOf =
           env->GetStaticMethodID(integerClass, "valueOf", "(I)Ljava/lang/Integer;");
         return env->NewObject(rangeClass, rangeCtor,
-          env->CallStaticObjectMethod(integerClass, valueOf, range.min),
-          env->CallStaticObjectMethod(integerClass, valueOf, range.max),
-          env->CallStaticObjectMethod(integerClass, valueOf, range.increment));
+          env->CallStaticObjectMethod(integerClass, valueOf, std::get<int>(range.min)),
+          env->CallStaticObjectMethod(integerClass, valueOf, std::get<int>(range.max)),
+          env->CallStaticObjectMethod(integerClass, valueOf, std::get<int>(range.increment)));
       }
 
       env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"),

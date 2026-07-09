@@ -698,20 +698,15 @@ int f3d_options_get_range_domain_double(
   try
   {
     const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
-    f3d::options::DomainRange<double> domain{};
-    if (cpp_options->getType(name) == f3d::options::option_type::RATIO)
+    f3d::options::DomainRange<f3d::option_variant_t> domain = cpp_options->getRangeDomain(name);
+    if (!std::holds_alternative<double>(domain.min))
     {
-      f3d::options::DomainRange<f3d::ratio_t> ratioDomain =
-        cpp_options->getRangeDomain<f3d::ratio_t>(name);
-      domain = { ratioDomain.min, ratioDomain.max, ratioDomain.increment };
+      f3d::log::error(std::string("Range domain of ") + name + " is not a double or ratio domain");
+      return 0;
     }
-    else
-    {
-      domain = cpp_options->getRangeDomain<double>(name);
-    }
-    range[0] = domain.min;
-    range[1] = domain.max;
-    range[2] = domain.increment;
+    range[0] = std::get<double>(domain.min);
+    range[1] = std::get<double>(domain.max);
+    range[2] = std::get<double>(domain.increment);
     return 1;
   }
   catch (const f3d::options::incompatible_exception& ex)
@@ -737,10 +732,15 @@ int f3d_options_get_range_domain_int(const f3d_options_t* options, const char* n
   try
   {
     const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
-    f3d::options::DomainRange<int> domain = cpp_options->getRangeDomain<int>(name);
-    range[0] = domain.min;
-    range[1] = domain.max;
-    range[2] = domain.increment;
+    f3d::options::DomainRange<f3d::option_variant_t> domain = cpp_options->getRangeDomain(name);
+    if (!std::holds_alternative<int>(domain.min))
+    {
+      f3d::log::error(std::string("Range domain of ") + name + " is not an int domain");
+      return 0;
+    }
+    range[0] = std::get<int>(domain.min);
+    range[1] = std::get<int>(domain.max);
+    range[2] = std::get<int>(domain.increment);
     return 1;
   }
   catch (const f3d::options::incompatible_exception& ex)
