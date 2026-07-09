@@ -1450,7 +1450,8 @@ void vtkF3DImguiActor::RenderNotifications(double currentTime)
   constexpr double fadingOutTime = .5;
 
   int index = 0;
-  float yOffset = 0.0f;
+  // Start the stack above the progress bar to avoid overlapping it.
+  float yOffset = static_cast<float>(this->GetAnimationProgressBarHeight());
 
   for (const auto& [desc, value, bind, startTime, stopTime] : this->Notifications)
   {

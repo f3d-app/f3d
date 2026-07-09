@@ -669,6 +669,7 @@ void vtkF3DRenderer::ShowAxis(bool show)
       this->ModernAxisRepresentation->SetRenderer(this);
       this->ModernAxisRepresentation->AnchorToLowerRight();
       this->ModernAxisRepresentation->ContainerVisibilityOn();
+      this->ModernAxisRepresentation->GetPadding(this->ModernAxisBasePadding);
 
 #if F3D_MODULE_UI
       auto containerProperty = this->ModernAxisRepresentation->GetContainerProperty();
@@ -2146,6 +2147,16 @@ void vtkF3DRenderer::UpdateActors()
     const double posY = ::ScalarBarPositionY + (progressPx > 0.0 ? progressPx / winHeight : 0.0);
     this->ScalarBarActor->SetPosition(::ScalarBarPositionX, posY);
   }
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
+  // Raise the axis widget by the progress bar height to clear the bar.
+  if (this->ModernAxisRepresentation)
+  {
+    const int progressPx = static_cast<int>(this->UIActor->GetAnimationProgressBarHeight());
+    this->ModernAxisRepresentation->SetPadding(
+      this->ModernAxisBasePadding[0], this->ModernAxisBasePadding[1] + progressPx);
+  }
+#endif
 
   if (!this->NormalGlyphsConfigured)
   {
