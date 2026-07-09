@@ -43,14 +43,9 @@ static inline void f3d_test_check_double(
 
 // check equality of two integers
 static inline void f3d_test_check_int(
-  f3d_test_t* test, const char* label, long actual, long expected)
+  f3d_test_t* test, const char* label, int actual, int expected)
 {
   f3d_test_check(test, label, actual == expected);
-}
-
-static inline int f3d_test_result(const f3d_test_t* test)
-{
-  return test->fail_count == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 // check equality of two 3-component vectors within a tolerance
@@ -59,7 +54,7 @@ static inline void f3d_test_check_vec3(
 {
   double tol = 128 * DBL_EPSILON;
   char full_label[256];
-  
+
   snprintf(full_label, sizeof(full_label),
     "%s (actual=[%.6g, %.6g, %.6g], expected=[%.6g, %.6g, %.6g])",
     label,
@@ -70,6 +65,11 @@ static inline void f3d_test_check_vec3(
     fabs(actual[0] - expected[0]) < tol &&
     fabs(actual[1] - expected[1]) < tol &&
     fabs(actual[2] - expected[2]) < tol);
+}
+
+static inline int f3d_test_result(const f3d_test_t* test)
+{
+  return test->fail_count == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 #endif
