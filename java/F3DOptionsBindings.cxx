@@ -5,6 +5,7 @@
 #include <options.h>
 
 #include <cassert>
+#include <stdexcept>
 
 namespace
 {
@@ -361,7 +362,7 @@ extern "C"
         // Double matches both double and ratio domains, as ratio is exposed as double
         if (!std::holds_alternative<double>(range.min))
         {
-          throw f3d::options::incompatible_exception("Trying to get range domain of " + nameStr +
+          throw std::invalid_argument("Trying to get range domain of " + nameStr +
             " as a Double but it is an Integer domain");
         }
 
@@ -376,7 +377,7 @@ extern "C"
       {
         if (!std::holds_alternative<int>(range.min))
         {
-          throw f3d::options::incompatible_exception("Trying to get range domain of " + nameStr +
+          throw std::invalid_argument("Trying to get range domain of " + nameStr +
             " as an Integer but it is not an Integer domain");
         }
 
