@@ -55,11 +55,17 @@ static inline int f3d_test_result(const f3d_test_t* test)
 
 // check equality of two 3-component vectors within a tolerance
 static inline void f3d_test_check_vec3(
-  f3d_test_t* test, const char* label, const double actual[3], const double expected[3], double tol)
+  f3d_test_t* test, const char* label, const double actual[3], const double expected[3])
 {
+  double tol = 128 * DBL_EPSILON;
   char full_label[256];
-  snprintf(full_label, sizeof(full_label), "%s [%.6g, %.6g, %.6g] vs [%.6g, %.6g, %.6g]",
-    label, actual[0], actual[1], actual[2], expected[0], expected[1], expected[2]);
+  
+  snprintf(full_label, sizeof(full_label),
+    "%s (actual=[%.6g, %.6g, %.6g], expected=[%.6g, %.6g, %.6g])",
+    label,
+    actual[0], actual[1], actual[2],
+    expected[0], expected[1], expected[2]);
+
   f3d_test_check(test, full_label,
     fabs(actual[0] - expected[0]) < tol &&
     fabs(actual[1] - expected[1]) < tol &&
