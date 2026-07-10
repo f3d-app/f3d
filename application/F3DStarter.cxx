@@ -194,13 +194,17 @@ public:
    */
   void ConsumeStatefileCameraOptions()
   {
-    for (F3DOptionsTools::OptionsEntry& entry : this->StatefileOptionsEntries)
+    for (F3DOptionsTools::OptionsEntries* entries :
+      { &this->StatefileOptionsEntries, &this->RuntimeStatefileOptionsEntries })
     {
-      F3DOptionsTools::OptionsDict& dict = std::get<0>(entry);
-      for (const char* key :
-        { "camera-position", "camera-focal-point", "camera-view-up", "camera-view-angle" })
+      for (F3DOptionsTools::OptionsEntry& entry : *entries)
       {
-        dict.erase(key);
+        F3DOptionsTools::OptionsDict& dict = std::get<0>(entry);
+        for (const char* key :
+          { "camera-position", "camera-focal-point", "camera-view-up", "camera-view-angle" })
+        {
+          dict.erase(key);
+        }
       }
     }
   }
@@ -1227,6 +1231,7 @@ public:
   F3DAppOptions AppOptions;
   f3d::options LibOptions;
   F3DOptionsTools::OptionsEntries StatefileOptionsEntries;
+  F3DOptionsTools::OptionsEntries RuntimeStatefileOptionsEntries;
   F3DOptionsTools::OptionsEntries ConfigOptionsEntries;
   F3DOptionsTools::OptionsEntries CLIOptionsEntries;
   F3DOptionsTools::OptionsEntries DynamicOptionsEntries;
@@ -1386,11 +1391,12 @@ int F3DStarter::Start(int argc, char** argv)
   }
 
   // Update app and libf3d options based on config entries, with an empty input file
-  // config < statefile < cli.
+  // config < statefile < cli < runtime statefile.
   // Force it to be quiet has another options update happens later.
   this->Internals->UpdateOptions(
     { this->Internals->ConfigOptionsEntries, this->Internals->StatefileOptionsEntries,
-      this->Internals->CLIOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
+      this->Internals->CLIOptionsEntries, this->Internals->RuntimeStatefileOptionsEntries,
+      this->Internals->ImperativeConfigOptionsEntries },
     { "" }, true);
 
   const auto& mode = this->Internals->AppOptions.MultiFileMode;
@@ -1929,7 +1935,8 @@ void F3DStarter::LoadFileGroupInternal(
     // as imperative options should override dynamic option even in that case
     this->Internals->UpdateOptions(
       { this->Internals->ConfigOptionsEntries, this->Internals->StatefileOptionsEntries,
-        this->Internals->CLIOptionsEntries, this->Internals->DynamicOptionsEntries,
+        this->Internals->CLIOptionsEntries, this->Internals->RuntimeStatefileOptionsEntries,
+        this->Internals->DynamicOptionsEntries,
         this->Internals->ImperativeConfigOptionsEntries },
       { "" }, false);
     this->Internals->Engine->setOptions(this->Internals->LibOptions);
@@ -1938,13 +1945,17 @@ void F3DStarter::LoadFileGroupInternal(
   else
   {
     // Update app and libf3d options based on config entries, selecting block using the input file
-    // config < statefile < cli < dynamic
+    // config < statefile < cli < runtime statefile < dynamic
+    // A statefile loaded interactively (runtime statefile) applies above the command line, like a
+    // dynamic option change, so it is not overridden by the now stale launch options. A statefile
+    // loaded at startup stays below the command line so explicit launch options win.
     // Options must be updated before checking the supported files in order to load plugins
     std::vector<fs::path> configPaths = this->Internals->LoadedFiles;
     std::copy(paths.begin(), paths.end(), std::back_inserter(configPaths));
     this->Internals->UpdateOptions(
       { this->Internals->ConfigOptionsEntries, this->Internals->StatefileOptionsEntries,
-        this->Internals->CLIOptionsEntries, this->Internals->DynamicOptionsEntries,
+        this->Internals->CLIOptionsEntries, this->Internals->RuntimeStatefileOptionsEntries,
+        this->Internals->DynamicOptionsEntries,
         this->Internals->ImperativeConfigOptionsEntries },
       configPaths, false);
     this->Internals->UpdateBindings(configPaths);
@@ -2426,8 +2437,13 @@ void F3DStarter::ApplyStatefile(const std::map<std::string, std::string>& statef
       statefileWindowSize->second, " from statefile");
   }
 
+  // Apply the statefile options in a dedicated tier above the command line: loading a statefile
+  // interactively behaves like setting these options dynamically, so it overrides the now stale
+  // launch options instead of being overridden by them. Also drop any startup statefile options so
+  // the interactive load is a clean, full replacement.
   this->Internals->StatefileOptionsEntries.clear();
-  this->Internals->StatefileOptionsEntries.emplace_back(
+  this->Internals->RuntimeStatefileOptionsEntries.clear();
+  this->Internals->RuntimeStatefileOptionsEntries.emplace_back(
     statefileOptions, "", "", "statefile options");
 
   if (!this->Internals->AppOptions.NoRender)

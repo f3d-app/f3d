@@ -40,6 +40,23 @@ add_test(NAME f3d::TestStatefileWindowSizeResolutionPrecedence
   COMMAND $<TARGET_FILE:f3d> --no-config --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileWindowSize.json --resolution=256,192 --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileWindowSizeResolutionPrecedence.png --verbose)
 set_tests_properties(f3d::TestStatefileWindowSizeResolutionPrecedence PROPERTIES DEPENDS f3d::TestStatefileWindowSizeSave FAIL_REGULAR_EXPRESSION "Window size set to")
 
+# A statefile loaded interactively (at runtime) overrides the launch command line, like a dynamic
+# option change. The save step toggles edges off dynamically (via the `set` command in a command
+# script, which runs at runtime) then saves; the load step loads that state at runtime while
+# `--edges` is on the command line. Edges must stay off: the runtime statefile wins over the cli.
+file(WRITE ${CMAKE_BINARY_DIR}/Testing/Temporary/runtime_statefile_save.txt
+  "set render.show_edges false\nsave_statefile ${CMAKE_BINARY_DIR}/Testing/Temporary/RuntimeStatefile.json\n")
+file(WRITE ${CMAKE_BINARY_DIR}/Testing/Temporary/runtime_statefile_load.txt
+  "load_statefile ${CMAKE_BINARY_DIR}/Testing/Temporary/RuntimeStatefile.json\nprint render.show_edges\n")
+
+add_test(NAME f3d::TestStatefileRuntimeOverrideCliSave
+  COMMAND $<TARGET_FILE:f3d> --no-config --edges ${F3D_SOURCE_DIR}/testing/data/cow.vtp --command-script=${CMAKE_BINARY_DIR}/Testing/Temporary/runtime_statefile_save.txt --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileRuntimeOverrideCliSave.png)
+set_tests_properties(f3d::TestStatefileRuntimeOverrideCliSave PROPERTIES FIXTURES_SETUP statefile_runtime PASS_REGULAR_EXPRESSION "Statefile saved to")
+
+add_test(NAME f3d::TestStatefileRuntimeOverrideCliLoad
+  COMMAND $<TARGET_FILE:f3d> --no-config --edges ${F3D_SOURCE_DIR}/testing/data/cow.vtp --command-script=${CMAKE_BINARY_DIR}/Testing/Temporary/runtime_statefile_load.txt --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileRuntimeOverrideCliLoad.png)
+set_tests_properties(f3d::TestStatefileRuntimeOverrideCliLoad PROPERTIES FIXTURES_REQUIRED statefile_runtime PASS_REGULAR_EXPRESSION "false")
+
 # Test that f3d resolution can be controlled from config file
 add_test(NAME f3d::TestConfigResolution COMMAND $<TARGET_FILE:f3d> --config=${F3D_SOURCE_DIR}/testing/configs/resolution.json ${F3D_SOURCE_DIR}/testing/data/suzanne.stl --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestConfigResolution.png --reference=${F3D_SOURCE_DIR}/testing/baselines/TestConfigResolution.png)
 
