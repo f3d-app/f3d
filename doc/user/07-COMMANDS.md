@@ -131,9 +131,9 @@ eg: `save_statefile /path/to/state.json`.
 `load_statefile [path/to/file]`: A specific command to restore the state from the provided statefile (overridden by a F3D specific command, see below). Take a file as argument.
 eg: `load_statefile /path/to/state.json`.
 
-`save_statefile_to_clipboard`: A specific command to save the current state into the system clipboard. Requires a build with the `clip` module. No argument.
+`save_statefile_to_clipboard`: A specific command to save the current state into the system clipboard (overridden by a F3D specific command, see below). Requires a build with the `clip` module. No argument.
 
-`load_statefile_from_clipboard`: A specific command to restore the state from the system clipboard. Requires a build with the `clip` module. No argument.
+`load_statefile_from_clipboard`: A specific command to restore the state from the system clipboard (overridden by a F3D specific command, see below). Requires a build with the `clip` module. No argument.
 
 `alias [alias_name] [command]`: A specific command to create an alias for a command. Take an alias name and a command as arguments.
 eg: `alias myrotate roll_camera 90`.
