@@ -6,6 +6,7 @@
 #include "interactor_impl.h"
 #include "log.h"
 #include "scene_impl.h"
+#include "statefile.h"
 #include "utils.h"
 #include "window_impl.h"
 
@@ -36,143 +37,6 @@ namespace fs = std::filesystem;
 
 namespace
 {
-//----------------------------------------------------------------------------
-nlohmann::ordered_json CaptureState(f3d::engine& eng)
-{
-  nlohmann::ordered_json root;
-
-  // Store the added files as absolute paths, the canonical form of a state (see RelativizeFiles).
-  nlohmann::ordered_json files = nlohmann::ordered_json::array();
-  std::ranges::transform(eng.getScene().getAddedFiles(), std::back_inserter(files),
-    [](const fs::path& file) { return fs::absolute(file).generic_string(); });
-  if (files.empty())
-  {
-    f3d::log::info("No files to save in statefile");
-  }
-  root["files"] = files;
-
-  // Camera, only if a window is available
-  try
-  {
-    const f3d::camera_state_t state = eng.getWindow().getCamera().getState();
-    nlohmann::ordered_json camera;
-    camera["position"] = { state.position[0], state.position[1], state.position[2] };
-    camera["focal_point"] = { state.focalPoint[0], state.focalPoint[1], state.focalPoint[2] };
-    camera["view_up"] = { state.viewUp[0], state.viewUp[1], state.viewUp[2] };
-    camera["view_angle"] = state.viewAngle;
-    root["camera"] = camera;
-  }
-  catch (const f3d::engine::no_window_exception&)
-  {
-    // No window available, nothing to save for the camera
-  }
-
-  // Window size, only if a window is available
-  try
-  {
-    const f3d::window& win = eng.getWindow();
-    nlohmann::ordered_json window;
-    window["width"] = win.getWidth();
-    window["height"] = win.getHeight();
-    root["window"] = window;
-  }
-  catch (const f3d::engine::no_window_exception&)
-  {
-    // No window available, nothing to save for the window
-  }
-
-  nlohmann::ordered_json options = nlohmann::ordered_json::object();
-  const f3d::options& opts = eng.getOptions();
-  for (const std::string& name : opts.getNames())
-  {
-    options[name] = opts.getAsString(name);
-  }
-  root["options"] = options;
-
-  return root;
-}
-
-//----------------------------------------------------------------------------
-void RestoreState(f3d::engine& eng, const nlohmann::ordered_json& root)
-{
-  // Clear the scene first so that the statefile fully replaces the current state
-  f3d::scene& sce = eng.getScene();
-  sce.clear();
-
-  if (root.contains("options"))
-  {
-    f3d::options& opts = eng.getOptions();
-    for (const auto& [name, value] : root.at("options").items())
-    {
-      try
-      {
-        opts.setAsString(name, value.get<std::string>());
-      }
-      catch (const f3d::options::inexistent_exception&)
-      {
-        f3d::log::warn("Statefile option \"", name, "\" does not exist, skipping it");
-      }
-      catch (const f3d::options::parsing_exception&)
-      {
-        f3d::log::warn("Statefile option \"", name, "\" could not be parsed from value \"",
-          value.get<std::string>(), "\", skipping it");
-      }
-    }
-  }
-  else
-  {
-    f3d::log::warn("No options found in statefile");
-  }
-
-  // Add the saved files as is: a state always holds absolute paths.
-  if (root.contains("files"))
-  {
-    std::vector<fs::path> files;
-    std::ranges::transform(root.at("files"), std::back_inserter(files),
-      [](const nlohmann::ordered_json& file) { return fs::path(file.get<std::string>()); });
-    if (!files.empty())
-    {
-      // Let any scene::load_failure_exception propagate to the caller: a statefile that cannot
-      // reload its files is a failure to restore the state, not something to silently ignore.
-      sce.add(files);
-    }
-  }
-
-  if (root.contains("camera"))
-  {
-    try
-    {
-      const nlohmann::ordered_json& camera = root.at("camera");
-      const auto& pos = camera.at("position");
-      const auto& foc = camera.at("focal_point");
-      const auto& up = camera.at("view_up");
-      f3d::camera_state_t state;
-      state.position = { pos[0].get<double>(), pos[1].get<double>(), pos[2].get<double>() };
-      state.focalPoint = { foc[0].get<double>(), foc[1].get<double>(), foc[2].get<double>() };
-      state.viewUp = { up[0].get<double>(), up[1].get<double>(), up[2].get<double>() };
-      state.viewAngle = camera.at("view_angle").get<double>();
-      eng.getWindow().getCamera().setState(state);
-    }
-    catch (const f3d::engine::no_window_exception&)
-    {
-      f3d::log::info("No window available, skipping camera state from statefile");
-    }
-  }
-
-  if (root.contains("window"))
-  {
-    try
-    {
-      const nlohmann::ordered_json& window = root.at("window");
-      eng.getWindow().setSize(window.at("width").get<int>(), window.at("height").get<int>());
-    }
-    catch (const f3d::engine::no_window_exception&)
-    {
-      f3d::log::info("No window available, skipping window size from statefile");
-    }
-  }
-}
-
 //----------------------------------------------------------------------------
 // Make the stored file paths relative to baseDir when contained by it, so a statefile stays
 // portable alongside its files. Paths outside baseDir are kept absolute.
@@ -470,21 +334,16 @@ interactor& engine::getInteractor()
 engine::state engine::dump()
 {
   engine::state st;
-  st.Content = ::CaptureState(*this).dump(2);
+  st.Content = detail::captureStateContent(
+    *this->Internals->Scene, *this->Internals->Window, *this->Internals->Options);
   return st;
 }
 
 //----------------------------------------------------------------------------
 engine& engine::load(const engine::state& st)
 {
-  try
-  {
-    ::RestoreState(*this, nlohmann::ordered_json::parse(st.Content));
-  }
-  catch (const nlohmann::json::exception& ex)
-  {
-    throw engine::statefile_exception(std::string("Could not parse state content: ") + ex.what());
-  }
+  detail::restoreStateContent(
+    *this->Internals->Scene, *this->Internals->Window, *this->Internals->Options, st.Content);
   return *this;
 }
 

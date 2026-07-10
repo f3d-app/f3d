@@ -2897,6 +2897,9 @@ void F3DStarter::AddCommands()
     return filename.empty() ? std::string("{app}/{model}_{n}.json") : filename;
   };
 
+  // These replace the basic statefile commands from libf3d, to also handle the app file groups,
+  // filename templating (--statefile-filename, `-` for standard streams) and file dialogs
+  interactor.removeCommand("save_statefile");
   interactor.addCommand(
     "save_statefile", [this, statefileFilenameOrDefault](const std::vector<std::string>& args)
     { this->SaveStatefile(args.empty() ? statefileFilenameOrDefault() : args[0]); },
@@ -2911,6 +2914,7 @@ void F3DStarter::AddCommands()
       "save the current state into a file picked with a file dialog (requires the tinyfiledialogs "
       "module)" });
 
+  interactor.removeCommand("load_statefile");
   interactor.addCommand(
     "load_statefile", [this, statefileFilenameOrDefault](const std::vector<std::string>& args)
     { this->LoadStatefile(args.empty() ? statefileFilenameOrDefault() : args[0]); },
@@ -2926,12 +2930,14 @@ void F3DStarter::AddCommands()
       "module)" });
 
 #if F3D_MODULE_CLIP
+  interactor.removeCommand("save_statefile_to_clipboard");
   interactor.addCommand(
     "save_statefile_to_clipboard",
     [this](const std::vector<std::string>&) { this->SaveStatefileToClipboard(); },
     f3d::interactor::command_documentation_t{
       "save_statefile_to_clipboard", "save the current state into the system clipboard" });
 
+  interactor.removeCommand("load_statefile_from_clipboard");
   interactor.addCommand(
     "load_statefile_from_clipboard",
     [this](const std::vector<std::string>&) { this->LoadStatefileFromClipboard(); },

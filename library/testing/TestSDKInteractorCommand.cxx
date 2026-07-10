@@ -7,6 +7,8 @@
 #include <options.h>
 #include <window.h>
 
+#include <filesystem>
+
 int TestSDKInteractorCommand([[maybe_unused]] int argc, char* argv[])
 {
   std::string renderingBackend = std::string(argv[4]);
@@ -102,6 +104,19 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, char* argv[])
   // Coverage exception handling
   test("triggerCommand exception handling",
     inter.triggerCommand(R"(print "render.hdri.file)") == false);
+
+  // Test save_statefile / load_statefile libf3d commands (file based, deterministic)
+  const std::string statePath = std::string(argv[2]) + "interactor_command_statefile.json";
+  options.model.scivis.cells = true;
+  test("save_statefile command", inter.triggerCommand("save_statefile " + statePath) == true);
+  test("save_statefile wrote a file", std::filesystem::exists(statePath), true);
+  options.model.scivis.cells = false;
+  test("load_statefile command", inter.triggerCommand("load_statefile " + statePath) == true);
+  test("load_statefile restored option", options.model.scivis.cells == true);
+  test("save_statefile invalid args", inter.triggerCommand("save_statefile") == false);
+  test("load_statefile invalid args", inter.triggerCommand("load_statefile one two") == false);
+  // Restore the option to the state the rest of the test expects
+  options.model.scivis.cells = false;
 
   // remove all commands
   for (const std::string& action : inter.getCommandActions())
