@@ -17,6 +17,7 @@ class vtkMultiBlockDataSet;
 class vtkPartitionedDataSet;
 class vtkPartitionedDataSetCollection;
 class vtkPolyData;
+class vtkTexture;
 class vtkF3DGenericImporter : public vtkF3DImporter
 {
 public:
@@ -28,6 +29,13 @@ public:
    * Set the internal reader to recover actors and data from
    */
   void SetInternalReader(vtkAlgorithm* reader);
+
+  /**
+   * Set an in-memory base-color (albedo) texture to apply to the imported actor(s), as
+   * carried by f3d::mesh_view::memory_view_t::baseColorTexture. When @p emissive is true the
+   * same texture is also installed as the emissive texture. Pass nullptr to clear.
+   */
+  void SetBaseColorTexture(vtkTexture* texture, bool emissive = false);
 
   /**
    * Get a string describing the outputs
