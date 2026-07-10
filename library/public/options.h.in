@@ -240,7 +240,7 @@ public:
   [[nodiscard]] std::vector<std::string> getEnumDomain(std::string_view name) const;
 
   /**
-   * Return the range domain of provided option as a DomainRange<option_variant_t>.
+   * Return the range domain of provided option as a `DomainRange<option_variant_t>`.
    * Its min, max and increment each hold the actual type of the domain: int for int domains,
    * double for double and ratio domains (ratio is exposed as double, like option values).
    * Throw options::incompatible_exception if option doesn't have a range domain.
