@@ -1,6 +1,7 @@
 #include <emscripten/bind.h>
 
 #include <array>
+#include <stdexcept>
 
 #include "camera.h"
 #include "engine.h"
@@ -178,7 +179,11 @@ EMSCRIPTEN_BINDINGS(f3d)
           {
             return static_cast<double>(*intValue);
           }
-          return std::get<double>(value);
+          if (const double* doubleValue = std::get_if<double>(&value))
+          {
+            return *doubleValue;
+          }
+          throw std::runtime_error("Range domain value cannot be represented as a JS number");
         };
         std::array<double, 3> values = { toDouble(domain.min), toDouble(domain.max),
           toDouble(domain.increment) };

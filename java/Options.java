@@ -299,17 +299,25 @@ public class Options {
     }
 
     /**
-     * Return the range domain of the option as a DomainRange of the provided type.
-     * Double.class matches double and ratio domains, as ratio does not exist in Java.
-     * Integer.class matches int domains.
+     * Return the range domain of the option as a DomainRange of Double.
+     * Matches double and ratio domains, as ratio does not exist in Java.
      *
      * @param name the name of the option to get the range domain from
-     * @param type the expected domain type: Double.class or Integer.class
      * @return the range domain of the option
      * @throws IllegalArgumentException if the option name does not exist, doesn't have a range
-     *         domain, or if the provided type does not match the type of the domain
+     *         domain, or if the domain is not a double or ratio domain
      */
-    public native <T extends Number> DomainRange<T> getRangeDomain(String name, Class<T> type);
+    public native DomainRange<Double> getRangeDomainAsDouble(String name);
+
+    /**
+     * Return the range domain of the option as a DomainRange of Integer.
+     *
+     * @param name the name of the option to get the range domain from
+     * @return the range domain of the option
+     * @throws IllegalArgumentException if the option name does not exist, doesn't have a range
+     *         domain, or if the domain is not an int domain
+     */
+    public native DomainRange<Integer> getRangeDomainAsInt(String name);
 
     /**
      * Increase the specified option if it has a range or index domain

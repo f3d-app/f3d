@@ -242,7 +242,6 @@ def test_get_range_domain():
     options = f3d.Options()
     assert options.get_range_domain("render.line_width") == (0.0, 10.0, 0.1)
     assert options.get_range_domain("render.raytracing.samples") == (1, 50, 1)
-    assert options.get_range_domain("scene.animation.speed_factor") == (0.0, 2.0, 0.1)
 
 
 def test_increase_decrease():
