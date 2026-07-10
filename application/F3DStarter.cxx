@@ -1143,8 +1143,10 @@ public:
       interactor.addBinding({ mod_t::NONE, "Up" }, "reload_current_file_group", "Others", std::bind(docString, "Reload current file group"));
       interactor.addBinding({ mod_t::NONE, "Down" }, "add_current_directories", "Others", std::bind(docString, "Add files from dir of current file"));
       interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others", std::bind(docString, "Take a screenshot"));
+#if F3D_MODULE_TINYFILEDIALOGS
       interactor.addBinding({ mod_t::CTRL, "S" }, "save_statefile_dialog", "Others", std::bind(docString, "Save a statefile (file dialog)"));
       interactor.addBinding({ mod_t::CTRL, "L" }, "load_statefile_dialog", "Others", std::bind(docString, "Load a statefile (file dialog)"));
+#endif
       interactor.addBinding({ mod_t::CTRL_SHIFT, "S" }, "save_statefile", "Others", std::bind(docString, "Save a statefile (auto filename or --statefile-filename)"));
       interactor.addBinding({ mod_t::CTRL_SHIFT, "L" }, "load_statefile", "Others", std::bind(docString, "Load a statefile (auto filename or --statefile-filename)"));
 #if F3D_MODULE_CLIP
