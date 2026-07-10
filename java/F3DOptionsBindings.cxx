@@ -360,8 +360,8 @@ extern "C"
       // Double matches both double and ratio domains, as ratio is exposed as double
       if (!std::holds_alternative<double>(range.min))
       {
-        throw std::invalid_argument("Trying to get range domain of " + nameStr +
-          " as a Double but it is an Integer domain");
+        throw std::invalid_argument(
+          "Trying to get range domain of " + nameStr + " as a Double but it is an Integer domain");
       }
 
       jclass doubleClass = env->FindClass("java/lang/Double");
@@ -378,8 +378,7 @@ extern "C"
     }
   }
 
-  JNIEXPORT jobject JAVA_BIND(Options, getRangeDomainAsInt)(
-    JNIEnv* env, jobject self, jstring name)
+  JNIEXPORT jobject JAVA_BIND(Options, getRangeDomainAsInt)(JNIEnv* env, jobject self, jstring name)
   {
     const char* str = env->GetStringUTFChars(name, nullptr);
     const std::string nameStr = str;
