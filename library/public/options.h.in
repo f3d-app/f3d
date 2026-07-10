@@ -244,7 +244,7 @@ public:
    * Its min, max and increment each hold a variant version of the domain corresponding to the
    * option type. Throw options::incompatible_exception if option doesn't have a range domain.
    * Throws an options::inexistent_exception if option does not exist.
-   * Note: The is no variant API to recover a enum or index domain yet.
+   * Note: There is no variant API to recover an enum or index domain yet.
    */
   [[nodiscard]] DomainRange<option_variant_t> getRangeDomain(std::string_view name) const;
 
