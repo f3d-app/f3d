@@ -62,6 +62,37 @@ public:
     INT_VECTOR
   };
 
+  /**
+   * Struct used in the domains struct
+   * for range domains
+   */
+  template<typename T>
+  struct DomainRange
+  {
+    T min;
+    T max;
+    T increment;
+  };
+
+  /**
+   * Struct used in the domains struct
+   * for enumeration domains
+   */
+  template<typename T>
+  struct DomainEnum
+  {
+    std::vector<T> enumeration;
+  };
+
+  /**
+   * Struct used in the domains struct
+   * for index domains
+   */
+  struct DomainIndex
+  {
+    std::optional<unsigned int> max;
+  };
+
   ///@{ @name Constructors
   /**
    * Default/Copy/move constructors/operators.
@@ -209,6 +240,15 @@ public:
   [[nodiscard]] std::vector<std::string> getEnumDomain(std::string_view name) const;
 
   /**
+   * Return the range domain of provided option as a `DomainRange<option_variant_t>`.
+   * Its min, max and increment each hold a variant version of the domain corresponding to the
+   * option type. Throw options::incompatible_exception if option doesn't have a range domain.
+   * Throws an options::inexistent_exception if option does not exist.
+   * Note: There is no variant API to recover an enum or index domain yet.
+   */
+  [[nodiscard]] DomainRange<option_variant_t> getRangeDomain(std::string_view name) const;
+
+  /**
    * Increase an option value if it has a range or index domain, else throws
    * options::incompatible_exception.
    * Increasing above the max is capped at the maximum.
@@ -293,37 +333,6 @@ public:
   struct no_value_exception : public exception
   {
     explicit no_value_exception(const std::string& what = "");
-  };
-
-  /**
-   * Struct used in the domains struct
-   * for range domains
-   */
-  template<typename T>
-  struct DomainRange
-  {
-    T min;
-    T max;
-    T increment;
-  };
-
-  /**
-   * Struct used in the domains struct
-   * for enumeration domains
-   */
-  template<typename T>
-  struct DomainEnum
-  {
-    std::vector<T> enumeration;
-  };
-
-  /**
-   * Struct used in the domains struct
-   * for index domains
-   */
-  struct DomainIndex
-  {
-    std::optional<unsigned int> max;
   };
 
   /**

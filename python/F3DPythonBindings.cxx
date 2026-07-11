@@ -326,6 +326,19 @@ PYBIND11_MODULE(pyf3d, module)
     .def("has_domain", &f3d::options::hasDomain)
     .def("get_domain_style", &f3d::options::getDomainStyle)
     .def("get_enum_domain", &f3d::options::getEnumDomain)
+    .def("get_range_domain",
+      [](const f3d::options& opts, std::string_view name) -> py::tuple
+      {
+        f3d::options::DomainRange<f3d::option_variant_t> domain = opts.getRangeDomain(name);
+        // min, max and increment all hold the same alternative (int or double)
+        return std::visit(
+          [&domain](const auto& min) -> py::tuple
+          {
+            using T = std::decay_t<decltype(min)>;
+            return py::make_tuple(min, std::get<T>(domain.max), std::get<T>(domain.increment));
+          },
+          domain.min);
+      })
     .def("increase", &f3d::options::increase)
     .def("decrease", &f3d::options::decrease)
     .def("cycle", &f3d::options::cycle)

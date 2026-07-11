@@ -687,6 +687,75 @@ char** f3d_options_get_enum_domain(const f3d_options_t* options, const char* nam
 }
 
 //----------------------------------------------------------------------------
+int f3d_options_get_range_domain_double(
+  const f3d_options_t* options, const char* name, double range[3])
+{
+  if (!options || !name || !range)
+  {
+    return 0;
+  }
+
+  try
+  {
+    const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
+    f3d::options::DomainRange<f3d::option_variant_t> domain = cpp_options->getRangeDomain(name);
+    if (!std::holds_alternative<double>(domain.min))
+    {
+      f3d::log::error(std::string("Range domain of ") + name + " is not a double or ratio domain");
+      return 0;
+    }
+    range[0] = std::get<double>(domain.min);
+    range[1] = std::get<double>(domain.max);
+    range[2] = std::get<double>(domain.increment);
+    return 1;
+  }
+  catch (const f3d::options::incompatible_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return 0;
+  }
+  catch (const f3d::options::inexistent_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return 0;
+  }
+}
+
+//----------------------------------------------------------------------------
+int f3d_options_get_range_domain_int(const f3d_options_t* options, const char* name, int range[3])
+{
+  if (!options || !name || !range)
+  {
+    return 0;
+  }
+
+  try
+  {
+    const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
+    f3d::options::DomainRange<f3d::option_variant_t> domain = cpp_options->getRangeDomain(name);
+    if (!std::holds_alternative<int>(domain.min))
+    {
+      f3d::log::error(std::string("Range domain of ") + name + " is not an int domain");
+      return 0;
+    }
+    range[0] = std::get<int>(domain.min);
+    range[1] = std::get<int>(domain.max);
+    range[2] = std::get<int>(domain.increment);
+    return 1;
+  }
+  catch (const f3d::options::incompatible_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return 0;
+  }
+  catch (const f3d::options::inexistent_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return 0;
+  }
+}
+
+//----------------------------------------------------------------------------
 void f3d_options_increase(f3d_options_t* options, const char* name)
 {
   if (!options || !name)

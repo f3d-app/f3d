@@ -922,6 +922,26 @@ std::vector<std::string> getEnumDomain(const f3d::options::DomainEnum<std::strin
 
 //----------------------------------------------------------------------------
 /**
+ * Get provided domain_range as a DomainRange<option_variant_t>.
+ * ratio_t is exposed as double, consistently with option values.
+ */
+template<typename T>
+f3d::options::DomainRange<f3d::option_variant_t> getRangeDomain(
+  const f3d::options::DomainRange<T>& domain)
+{
+  if constexpr (std::is_same_v<T, f3d::ratio_t>)
+  {
+    return { static_cast<double>(domain.min), static_cast<double>(domain.max),
+      static_cast<double>(domain.increment) };
+  }
+  else
+  {
+    return { domain.min, domain.max, domain.increment };
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
  * Needed for increaseDecrease implementation for ratio_t
  */
 void operator+=(f3d::ratio_t& ratio, double incr)

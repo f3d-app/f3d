@@ -34,6 +34,35 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   test.expect<f3d::options::inexistent_exception>(
     "getEnumDomain inexistent", [&]() { std::ignore = opt.getEnumDomain("inexistent"); });
 
+  // Test getRangeDomain
+  f3d::options::DomainRange<f3d::option_variant_t> doubleRange =
+    opt.getRangeDomain("render.line_width");
+  test("getRangeDomain double min", std::get<double>(doubleRange.min), 0.);
+  test("getRangeDomain double max", std::get<double>(doubleRange.max), 10.);
+  test("getRangeDomain double increment", std::get<double>(doubleRange.increment), 0.1);
+
+  // ratio domains are exposed as double, like option values
+  f3d::options::DomainRange<f3d::option_variant_t> ratioRange =
+    opt.getRangeDomain("scene.animation.speed_factor");
+  test("getRangeDomain ratio min", std::get<double>(ratioRange.min), 0.);
+  test("getRangeDomain ratio max", std::get<double>(ratioRange.max), 2.);
+  test("getRangeDomain ratio increment", std::get<double>(ratioRange.increment), 0.1);
+
+  f3d::options::DomainRange<f3d::option_variant_t> intRange =
+    opt.getRangeDomain("render.raytracing.samples");
+  test("getRangeDomain int min", std::get<int>(intRange.min), 1);
+  test("getRangeDomain int max", std::get<int>(intRange.max), 50);
+  test("getRangeDomain int increment", std::get<int>(intRange.increment), 1);
+
+  test("getRangeDomain holds the option type", std::holds_alternative<int>(intRange.min));
+
+  test.expect<f3d::options::incompatible_exception>("getRangeDomain incompatible enum",
+    [&]() { std::ignore = opt.getRangeDomain("render.effect.blending.mode"); });
+  test.expect<f3d::options::incompatible_exception>("getRangeDomain incompatible",
+    [&]() { std::ignore = opt.getRangeDomain("model.scivis.cells"); });
+  test.expect<f3d::options::inexistent_exception>(
+    "getRangeDomain inexistent", [&]() { std::ignore = opt.getRangeDomain("inexistent"); });
+
   // Test increase/decrease
 
   opt.increase("scene.animation.speed_factor")

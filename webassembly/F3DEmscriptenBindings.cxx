@@ -1,5 +1,8 @@
 #include <emscripten/bind.h>
 
+#include <array>
+#include <stdexcept>
+
 #include "camera.h"
 #include "engine.h"
 #include "interactor.h"
@@ -164,6 +167,28 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function(
       "getEnumDomain", +[](const f3d::options& o, const std::string& name) -> emscripten::val
       { return containerToJSArray(o.getEnumDomain(name)); })
+    .function(
+      "getRangeDomain",
+      +[](const f3d::options& o, const std::string& name) -> emscripten::val
+      {
+        f3d::options::DomainRange<f3d::option_variant_t> domain = o.getRangeDomain(name);
+        // All range types are returned as JS numbers (doubles)
+        auto toDouble = [](const f3d::option_variant_t& value) -> double
+        {
+          if (const int* intValue = std::get_if<int>(&value))
+          {
+            return static_cast<double>(*intValue);
+          }
+          if (const double* doubleValue = std::get_if<double>(&value))
+          {
+            return *doubleValue;
+          }
+          throw std::runtime_error("Range domain value cannot be represented as a JS number");
+        };
+        std::array<double, 3> values = { toDouble(domain.min), toDouble(domain.max),
+          toDouble(domain.increment) };
+        return containerToJSArray(values);
+      })
     .function(
       "increase", +[](f3d::options& o, const std::string& name) -> f3d::options&
       { return o.increase(name); }, emscripten::return_value_policy::reference())

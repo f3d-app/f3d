@@ -222,6 +222,12 @@ std::vector<std::string> options::getEnumDomain(std::string_view name) const
 }
 
 //----------------------------------------------------------------------------
+options::DomainRange<option_variant_t> options::getRangeDomain(std::string_view name) const
+{
+  return options_generated::getRangeDomain(*this, name);
+}
+
+//----------------------------------------------------------------------------
 options& options::increase(std::string_view name)
 {
   options_generated::increaseDecrease<true>(*this, name);

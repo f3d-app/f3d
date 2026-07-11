@@ -5,6 +5,7 @@
 #include <options.h>
 
 #include <cassert>
+#include <stdexcept>
 
 namespace
 {
@@ -338,6 +339,78 @@ extern "C"
     jobject enumeration = CreateStringList(env, GetOptionsFromEngine(env, self).getEnumDomain(str));
     env->ReleaseStringUTFChars(name, str);
     return enumeration;
+  }
+
+  JNIEXPORT jobject JAVA_BIND(Options, getRangeDomainAsDouble)(
+    JNIEnv* env, jobject self, jstring name)
+  {
+    const char* str = env->GetStringUTFChars(name, nullptr);
+    const std::string nameStr = str;
+    env->ReleaseStringUTFChars(name, str);
+
+    jclass rangeClass = env->FindClass("app/f3d/F3D/Options$DomainRange");
+    jmethodID rangeCtor = env->GetMethodID(
+      rangeClass, "<init>", "(Ljava/lang/Number;Ljava/lang/Number;Ljava/lang/Number;)V");
+
+    try
+    {
+      f3d::options::DomainRange<f3d::option_variant_t> range =
+        GetOptionsFromEngine(env, self).getRangeDomain(nameStr);
+
+      // Double matches both double and ratio domains, as ratio is exposed as double
+      if (!std::holds_alternative<double>(range.min))
+      {
+        throw std::invalid_argument(
+          "Trying to get range domain of " + nameStr + " as a Double but it is an Integer domain");
+      }
+
+      jclass doubleClass = env->FindClass("java/lang/Double");
+      jmethodID valueOf = env->GetStaticMethodID(doubleClass, "valueOf", "(D)Ljava/lang/Double;");
+      return env->NewObject(rangeClass, rangeCtor,
+        env->CallStaticObjectMethod(doubleClass, valueOf, std::get<double>(range.min)),
+        env->CallStaticObjectMethod(doubleClass, valueOf, std::get<double>(range.max)),
+        env->CallStaticObjectMethod(doubleClass, valueOf, std::get<double>(range.increment)));
+    }
+    catch (const std::exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), e.what());
+      return nullptr;
+    }
+  }
+
+  JNIEXPORT jobject JAVA_BIND(Options, getRangeDomainAsInt)(JNIEnv* env, jobject self, jstring name)
+  {
+    const char* str = env->GetStringUTFChars(name, nullptr);
+    const std::string nameStr = str;
+    env->ReleaseStringUTFChars(name, str);
+
+    jclass rangeClass = env->FindClass("app/f3d/F3D/Options$DomainRange");
+    jmethodID rangeCtor = env->GetMethodID(
+      rangeClass, "<init>", "(Ljava/lang/Number;Ljava/lang/Number;Ljava/lang/Number;)V");
+
+    try
+    {
+      f3d::options::DomainRange<f3d::option_variant_t> range =
+        GetOptionsFromEngine(env, self).getRangeDomain(nameStr);
+
+      if (!std::holds_alternative<int>(range.min))
+      {
+        throw std::invalid_argument("Trying to get range domain of " + nameStr +
+          " as an Integer but it is not an Integer domain");
+      }
+
+      jclass integerClass = env->FindClass("java/lang/Integer");
+      jmethodID valueOf = env->GetStaticMethodID(integerClass, "valueOf", "(I)Ljava/lang/Integer;");
+      return env->NewObject(rangeClass, rangeCtor,
+        env->CallStaticObjectMethod(integerClass, valueOf, std::get<int>(range.min)),
+        env->CallStaticObjectMethod(integerClass, valueOf, std::get<int>(range.max)),
+        env->CallStaticObjectMethod(integerClass, valueOf, std::get<int>(range.increment)));
+    }
+    catch (const std::exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), e.what());
+      return nullptr;
+    }
   }
 
   JNIEXPORT void JAVA_BIND(Options, increase)(JNIEnv* env, jobject self, jstring name)

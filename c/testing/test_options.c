@@ -104,6 +104,49 @@ int test_options()
     return 1;
   }
 
+  double range[3];
+  if (!f3d_options_get_range_domain_double(options, "render.line_width", range))
+  {
+    puts("[ERROR] f3d_options_get_range_domain_double should succeed for render.line_width");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  if (range[0] != 0.0 || range[1] != 10.0 || range[2] != 0.1)
+  {
+    puts("[ERROR] f3d_options_get_range_domain_double returned unexpected values for "
+         "render.line_width");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  int int_range[3];
+  if (!f3d_options_get_range_domain_int(options, "render.raytracing.samples", int_range))
+  {
+    puts("[ERROR] f3d_options_get_range_domain_int should succeed for render.raytracing.samples");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  if (int_range[0] != 1 || int_range[1] != 50 || int_range[2] != 1)
+  {
+    puts("[ERROR] f3d_options_get_range_domain_int returned unexpected values for "
+         "render.raytracing.samples");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  if (f3d_options_get_range_domain_double(options, "render.raytracing.samples", range))
+  {
+    puts("[ERROR] f3d_options_get_range_domain_double should fail for an int range domain");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  if (f3d_options_get_range_domain_double(options, "dummy", range))
+  {
+    puts("[ERROR] f3d_options_get_range_domain_double should fail for a non-existent option");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
   f3d_options_reset(options, "model.scivis.cells");
   f3d_options_remove_value(options, "render.show_edges");
 

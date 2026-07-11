@@ -110,6 +110,12 @@ const settings = {
       "options getType",
     );
 
+    const range = options.getRangeDomain("render.line_width");
+    utils.assert(
+      range[0] === 0.0 && range[1] === 10.0 && range[2] === 0.1,
+      "options getRangeDomain",
+    );
+
     options.removeValue("model.scivis.array_name");
     utils.assert(
       !options.hasValue("model.scivis.array_name"),

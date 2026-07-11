@@ -352,6 +352,30 @@ extern "C"
     const f3d_options_t* options, const char* name, int* count);
 
   /**
+   * @brief Get an option double or ratio range domain if it has one
+   *
+   * @param options Options handle.
+   * @param name Option name.
+   * @param[out] range Array of size 3 filled with min, max and increment.
+   * @return 1 on success, 0 if the option doesn't exist, doesn't have a double or ratio range
+   *         domain or if any of the parameters is null.
+   */
+  F3D_EXPORT int f3d_options_get_range_domain_double(
+    const f3d_options_t* options, const char* name, double range[3]);
+
+  /**
+   * @brief Get an option int range domain if it has one
+   *
+   * @param options Options handle.
+   * @param name Option name.
+   * @param[out] range Array of size 3 filled with min, max and increment.
+   * @return 1 on success, 0 if the option doesn't exist, doesn't have an int range domain or if
+   *         any of the parameters is null.
+   */
+  F3D_EXPORT int f3d_options_get_range_domain_int(
+    const f3d_options_t* options, const char* name, int range[3]);
+
+  /**
    * @brief Increase an option value if it has a range or index domain
    *
    * @param options Options handle.
