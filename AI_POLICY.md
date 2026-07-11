@@ -21,8 +21,8 @@ If you do not disclose, you will be warned and then BANNED on repeated offenses.
 
 3. _I use AI to do write in github issues and pull request, chat, and discuss with others._
 
-This is unacceptable and you will be warned and then BANNED on repeated offenses.
-Use your own voice.
+This is unacceptable and you will be warned and the text content will be deleted when possible.
+You will be BANNED on repeated offenses. Use your own voice.
 
 4. _I use AI to improve written text in communication channels because english is not my first language._
 
@@ -36,7 +36,7 @@ This is acceptable and doesn't need to be disclosed as long as no AI code is cop
 6. _I use AI to generate code, test, code comments, documentations and anything that is commited into a git repository._
 
 This must be disclosed in the pull request description, with details on which part of the code was generated and
-which model were used. If you do not, you will be warned and then BANNED on repeated offenses.
+which model were used. If you do not, you will be warned and the PR will be closed. You will be BANNED on repeated offenses.
 
 Generated code will be considered to be written by you and under your own copyright, as any code you write, the commit author should reflect that.
 
