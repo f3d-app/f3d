@@ -86,7 +86,7 @@ Make sure to check the results for yourself and ask for help if needed.
 To run the CI, just add a comment like this in your PR:
 
 - `\ci fast`: Style checks and a fast linux job, always make this work first.
-- `\ci main`: Cross platform CI that cover most usecases, including coverage, contains `ci:fast`, always make this work second.
+- `\ci main`: Cross platform CI that cover most usecases, including coverage, contains `ci:fast`, ask for a maintainer review before running this.
 - `\ci wasm`: Build docker images and then build libf3d with webassambly.
 - `\ci android`: Build docker images and then build libf3d for android.
 - `\ci full`: Complete CI, required before merge, contains `ci:main`, `ci:wasm`, `ci:android`.
