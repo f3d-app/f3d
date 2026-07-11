@@ -1391,11 +1391,11 @@ int F3DStarter::Start(int argc, char** argv)
   }
 
   // Update app and libf3d options based on config entries, with an empty input file
-  // config < statefile < cli < runtime statefile.
+  // config < statefile < cli.
   // Force it to be quiet has another options update happens later.
   this->Internals->UpdateOptions(
     { this->Internals->ConfigOptionsEntries, this->Internals->StatefileOptionsEntries,
-      this->Internals->CLIOptionsEntries, this->Internals->RuntimeStatefileOptionsEntries,
+      this->Internals->CLIOptionsEntries,
       this->Internals->ImperativeConfigOptionsEntries },
     { "" }, true);
 
