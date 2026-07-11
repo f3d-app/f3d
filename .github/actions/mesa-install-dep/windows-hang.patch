@@ -1,0 +1,61 @@
+diff --git a/src/gallium/drivers/llvmpipe/lp_rast.c b/src/gallium/drivers/llvmpipe/lp_rast.c
+index 4f493c6..97fbcd0 100644
+--- a/src/gallium/drivers/llvmpipe/lp_rast.c
++++ b/src/gallium/drivers/llvmpipe/lp_rast.c
+@@ -1311,55 +1311,7 @@ no_rast:
+ void
+ lp_rast_destroy(struct lp_rasterizer *rast)
+ {
+-   /* Set exit_flag and signal each thread's work_ready semaphore.
+-    * Each thread will be woken up, notice that the exit_flag is set and
+-    * break out of its main loop.  The thread will then exit.
+-    */
+-   rast->exit_flag = true;
+-   for (unsigned i = 0; i < rast->num_threads; i++) {
+-      util_semaphore_signal(&rast->tasks[i].work_ready);
+-   }
+-
+-   /* Wait for threads to terminate before cleaning up per-thread data.
+-    * We don't actually call pipe_thread_wait to avoid dead lock on Windows
+-    * per https://bugs.freedesktop.org/show_bug.cgi?id=76252 */
+-   for (unsigned i = 0; i < rast->num_threads; i++) {
+-#ifdef _WIN32
+-      /* Threads might already be dead - Windows apparently terminates
+-       * other threads when returning from main.
+-       */
+-      DWORD exit_code = STILL_ACTIVE;
+-      if (GetExitCodeThread(rast->threads[i].handle, &exit_code) &&
+-          exit_code == STILL_ACTIVE) {
+-         util_semaphore_wait(&rast->tasks[i].exited);
+-      }
+-#else
+-      thrd_join(rast->threads[i], NULL);
+-#endif
+-   }
+-
+-   /* Clean up per-thread data */
+-   for (unsigned i = 0; i < rast->num_threads; i++) {
+-      util_semaphore_destroy(&rast->tasks[i].work_ready);
+-      util_semaphore_destroy(&rast->tasks[i].work_done);
+-#ifdef _WIN32
+-      util_semaphore_destroy(&rast->tasks[i].exited);
+-#endif
+-   }
+-   for (unsigned i = 0; i < MAX2(1, rast->num_threads); i++) {
+-      align_free(rast->tasks[i].thread_data.cache);
+-   }
+-
+-   lp_fence_reference(&rast->last_fence, NULL);
+-
+-   /* for synchronizing rasterization threads */
+-   if (rast->num_threads > 0) {
+-      util_barrier_destroy(&rast->barrier);
+-   }
+-
+-   lp_scene_queue_destroy(rast->full_scenes);
+-
+-   FREE(rast);
++  // ENJOY LEAKS
+ }
+ 
+ 
