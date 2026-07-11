@@ -223,7 +223,7 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: |
-        ./bin/f3d ../source/testing/data/dragon.vtu --output=Testing/Temporary/build_output.png --reference=../source/.github/baselines/build_output.png --resolution=300,300 --colormap-file=viridis --coloring-component=0 --verbose
+        ./bin/f3d ../source/testing/data/dragon.vtu --output=Testing/Temporary/build_output.png --reference=../source/.github/baselines/build_output.png --resolution=300,300 --verbose
 
     # When running standard test with auto rendering backend on linux, use glx
     - name: Run Xvfb ubuntu
