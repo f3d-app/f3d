@@ -593,6 +593,16 @@ private:
   void handle_selection_notify_event(xcb_selection_notify_event_t* event) {
     assert(event->requestor == m_window);
 
+#ifdef CLIP_SUPPORT_SAVE_TARGETS
+    // A SAVE_TARGETS conversion produces no reply data (the clipboard
+    // manager acknowledges by setting the property to XCB_ATOM_NONE),
+    // so unblock the waiter directly to avoid the wait_for timeout.
+    if (event->target == get_atom(SAVE_TARGETS)) {
+      call_callback(nullptr);
+      return;
+    }
+#endif
+
     if (event->target == get_atom(TARGETS))
       m_target_atom = get_atom(ATOM);
     else
