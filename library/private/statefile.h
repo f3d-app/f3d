@@ -21,7 +21,7 @@ namespace detail
  * The camera and window geometry are only captured when the window is not of type NONE.
  * File paths are stored as absolute paths, the canonical form of a state.
  */
-std::string captureStateContent(scene& scene, window& window, options& options);
+std::string captureStateContent(const scene& scene, window& window, const options& options);
 
 /**
  * Restore a statefile JSON string into the given scene, window and options, clearing the scene

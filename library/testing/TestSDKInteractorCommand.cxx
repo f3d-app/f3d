@@ -115,6 +115,28 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, char* argv[])
   test("load_statefile restored option", options.model.scivis.cells == true);
   test("save_statefile invalid args", inter.triggerCommand("save_statefile") == false);
   test("load_statefile invalid args", inter.triggerCommand("load_statefile one two") == false);
+  // The statefile_exception is caught and logged, the command still returns true
+  test("save_statefile to unwritable path",
+    inter.triggerCommand("save_statefile " + std::string(argv[2]) + "no_such_dir/state.json") ==
+      true);
+  test("load_statefile from missing file",
+    inter.triggerCommand("load_statefile " + std::string(argv[2]) + "no_such_statefile.json") ==
+      true);
+
+#if F3D_MODULE_CLIP
+  // Clipboard commands: round-trip through the system clipboard. When the clipboard is unavailable
+  // the statefile_exception is caught and logged, the command still returns true.
+  options.model.scivis.cells = true;
+  test("save_statefile_to_clipboard command",
+    inter.triggerCommand("save_statefile_to_clipboard") == true);
+  test("save_statefile_to_clipboard invalid args",
+    inter.triggerCommand("save_statefile_to_clipboard extra") == false);
+  test("load_statefile_from_clipboard command",
+    inter.triggerCommand("load_statefile_from_clipboard") == true);
+  test("load_statefile_from_clipboard invalid args",
+    inter.triggerCommand("load_statefile_from_clipboard extra") == false);
+#endif
+
   // Restore the option to the state the rest of the test expects
   options.model.scivis.cells = false;
 

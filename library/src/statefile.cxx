@@ -18,7 +18,7 @@ namespace fs = std::filesystem;
 namespace f3d::detail
 {
 //----------------------------------------------------------------------------
-std::string captureStateContent(scene& scene, window& window, options& options)
+std::string captureStateContent(const scene& scene, window& window, const options& options)
 {
   nlohmann::ordered_json root;
 

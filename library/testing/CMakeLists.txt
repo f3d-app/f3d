@@ -155,6 +155,10 @@ if (F3D_MODULE_WEBP)
   target_compile_definitions(libf3dSDKTests PRIVATE F3D_MODULE_WEBP)
 endif ()
 
+if (F3D_MODULE_CLIP)
+  target_compile_definitions(libf3dSDKTests PRIVATE F3D_MODULE_CLIP)
+endif ()
+
 if (MSVC)
   target_compile_options(libf3dSDKTests PRIVATE /utf-8)
 endif()
