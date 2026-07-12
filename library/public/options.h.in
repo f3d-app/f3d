@@ -231,22 +231,28 @@ public:
   [[nodiscard]] domain_style getDomainStyle(std::string_view name) const;
 
   /**
-   * Return a the enumeration of the enum domain of provided option.
-   * The enumeration is provided as is in string form.
+   * Return the range domain of provided option as a `DomainRange<option_variant_t>`.
+   * The values are provided as variants according to the variant API.
    * Throw options::incompatible_exception if option doesn't have an enumeration domain.
    * Throws an options::inexistent_exception if option does not exist.
-   * Note: The is no string API to recover a range or index domain yet.
-   */
-  [[nodiscard]] std::vector<std::string> getEnumDomain(std::string_view name) const;
-
-  /**
-   * Return the range domain of provided option as a `DomainRange<option_variant_t>`.
-   * Its min, max and increment each hold a variant version of the domain corresponding to the
-   * option type. Throw options::incompatible_exception if option doesn't have a range domain.
-   * Throws an options::inexistent_exception if option does not exist.
-   * Note: There is no variant API to recover an enum or index domain yet.
    */
   [[nodiscard]] DomainRange<option_variant_t> getRangeDomain(std::string_view name) const;
+
+  /**
+   * Return the enum domain of the provided option as a `DomainEnum<option_variant_t>`.
+   * The values are provided as variants according to the variant API.
+   * Throw options::incompatible_exception if option doesn't have an enumeration domain.
+   * Throws an options::inexistent_exception if option does not exist.
+   */
+  [[nodiscard]] DomainEnum<option_variant_t> getEnumDomain(std::string_view name) const;
+
+  /**
+   * Return the index domain of the provided option as a `DomainIndex<option_variant_t>`.
+   * The values are provided as variants according to the variant API.
+   * Throw options::incompatible_exception if option doesn't have an index domain.
+   * Throws an options::inexistent_exception if option does not exist.
+   */
+  [[nodiscard]] DomainIndex getIndexDomain(std::string_view name) const;
 
   /**
    * Increase an option value if it has a range or index domain, else throws
