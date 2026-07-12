@@ -218,7 +218,7 @@ runs:
 
     # Linux: Xvfb is not running, should fallback to egl
     # Windows: mesa binary is not installed, should fallback to osmesa
-    # macOS: No fallback mechanism to test, CI always uses osmesa (with VTK > 9.6.20260701), check cocoa is functionnal
+    # macOS: No fallback mechanism to test, CI always uses osmesa (with VTK > 9.6.20260701), check cocoa is functional
     - name: Check rendering backend logic
       shell: bash
       working-directory: ${{github.workspace}}/build
