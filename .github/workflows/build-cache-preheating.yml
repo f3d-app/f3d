@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # This require a F3D_CACHE_CI_DISPATCH secret contain a PAT with read and write admin access
-      - name: Trigger docker images build
+      - name: Trigger preheating workflow
         uses: convictional/trigger-workflow-and-wait@v1.6.5
         with:
           owner: f3d-app
