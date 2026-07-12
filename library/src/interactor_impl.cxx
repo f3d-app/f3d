@@ -1309,7 +1309,8 @@ interactor& interactor_impl::initCommands()
         log::error("Could not save statefile: ", ex.what());
       }
     },
-    command_documentation_t{ "save_statefile file", "save the current state into the provided file" });
+    command_documentation_t{
+      "save_statefile file", "save the current state into the provided file" });
 
   this->addCommand(
     "load_statefile",
@@ -1328,8 +1329,7 @@ interactor& interactor_impl::initCommands()
         log::error("Could not load statefile: ", ex.what());
       }
     },
-    command_documentation_t{
-      "load_statefile file", "restore the state from the provided file" });
+    command_documentation_t{ "load_statefile file", "restore the state from the provided file" });
 
 #if F3D_MODULE_CLIP
   this->addCommand(

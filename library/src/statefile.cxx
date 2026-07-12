@@ -62,8 +62,7 @@ std::string captureStateContent(scene& scene, window& window, options& options)
 }
 
 //----------------------------------------------------------------------------
-void restoreStateContent(
-  scene& scene, window& window, options& options, const std::string& content)
+void restoreStateContent(scene& scene, window& window, options& options, const std::string& content)
 {
   nlohmann::ordered_json root;
   try

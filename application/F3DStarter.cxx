@@ -1375,8 +1375,8 @@ int F3DStarter::Start(int argc, char** argv)
   {
     F3DOptionsTools::OptionsDict statefileOptions;
     std::vector<std::string> statefileFiles;
-    if (F3DInternals::ReadStatefileSource(
-          loadStatefile, statefileOptions, statefileFiles, statefileFileGroups, statefileWindowSize))
+    if (F3DInternals::ReadStatefileSource(loadStatefile, statefileOptions, statefileFiles,
+          statefileFileGroups, statefileWindowSize))
     {
       this->Internals->StatefileOptionsEntries.emplace_back(
         statefileOptions, "", "", "statefile options");
@@ -1395,8 +1395,7 @@ int F3DStarter::Start(int argc, char** argv)
   // Force it to be quiet has another options update happens later.
   this->Internals->UpdateOptions(
     { this->Internals->ConfigOptionsEntries, this->Internals->StatefileOptionsEntries,
-      this->Internals->CLIOptionsEntries,
-      this->Internals->ImperativeConfigOptionsEntries },
+      this->Internals->CLIOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
     { "" }, true);
 
   const auto& mode = this->Internals->AppOptions.MultiFileMode;
@@ -1540,7 +1539,8 @@ int F3DStarter::Start(int argc, char** argv)
     // Apply the statefile window size, unless the user explicitly set --resolution: that is always
     // applied by ApplyPositionAndResolution (resolution has a default value) and takes precedence
     const bool explicitResolution = std::ranges::any_of(this->Internals->CLIOptionsEntries,
-      [](const F3DOptionsTools::OptionsEntry& entry) { return std::get<0>(entry).contains("resolution"); });
+      [](const F3DOptionsTools::OptionsEntry& entry)
+      { return std::get<0>(entry).contains("resolution"); });
     if (statefileWindowSize.has_value() && !explicitResolution)
     {
       this->Internals->Engine->getWindow().setSize(
@@ -1936,8 +1936,7 @@ void F3DStarter::LoadFileGroupInternal(
     this->Internals->UpdateOptions(
       { this->Internals->ConfigOptionsEntries, this->Internals->StatefileOptionsEntries,
         this->Internals->CLIOptionsEntries, this->Internals->RuntimeStatefileOptionsEntries,
-        this->Internals->DynamicOptionsEntries,
-        this->Internals->ImperativeConfigOptionsEntries },
+        this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
       { "" }, false);
     this->Internals->Engine->setOptions(this->Internals->LibOptions);
     f3d::log::debug("No files to load provided");
@@ -1955,8 +1954,7 @@ void F3DStarter::LoadFileGroupInternal(
     this->Internals->UpdateOptions(
       { this->Internals->ConfigOptionsEntries, this->Internals->StatefileOptionsEntries,
         this->Internals->CLIOptionsEntries, this->Internals->RuntimeStatefileOptionsEntries,
-        this->Internals->DynamicOptionsEntries,
-        this->Internals->ImperativeConfigOptionsEntries },
+        this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
       configPaths, false);
     this->Internals->UpdateBindings(configPaths);
 
