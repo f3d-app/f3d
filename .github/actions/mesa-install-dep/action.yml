@@ -42,7 +42,7 @@ runs:
       uses: actions/cache/restore@v6
       with:
         path: dependencies/mesa_install
-        key: mesa-${{steps.mesa_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-10
+        key: mesa-${{steps.mesa_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-12
 
     - name: Setup MSVC (Windows)
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
@@ -71,6 +71,14 @@ runs:
       if: steps.cache-mesa.outputs.cache-hit != 'true'
       shell: bash
       run: git clone --recurse-submodules --depth 1 --branch mesa-${{steps.mesa_ver.outputs.extract}} https://gitlab.freedesktop.org/mesa/mesa.git dependencies/mesa
+
+    # Sometimes mesa hangs on Windows at exit
+    # Here's a related MR: https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/12731
+    - name: Patch hang on Windows
+      if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
+      working-directory: ${{github.workspace}}/dependencies/mesa
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/windows-hang.patch
 
     - name: Setup mesa
       if: steps.cache-mesa.outputs.cache-hit != 'true'
