@@ -72,6 +72,8 @@ runs:
       shell: bash
       run: git clone --recurse-submodules --depth 1 --branch mesa-${{steps.mesa_ver.outputs.extract}} https://gitlab.freedesktop.org/mesa/mesa.git dependencies/mesa
 
+    # Sometimes mesa hangs on Windows at exit
+    # Here's a related MR: https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/12731
     - name: Patch hang on Windows
       if: steps.cache-mesa.outputs.cache-hit != 'true' && runner.os == 'Windows'
       working-directory: ${{github.workspace}}/dependencies/mesa
