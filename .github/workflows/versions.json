@@ -82,7 +82,7 @@
   },
   "proj": {
     "version": "9.8.1",
-    "min_version": "9.0.0"
+    "min_version": "9.6.0"
   },
   "pybind11": {
     "version": "v3.0.4",
