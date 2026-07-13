@@ -34,14 +34,16 @@ int TestSDKStatefile([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test.expect<f3d::engine::statefile_exception>("save to an invalid path",
     [&]() { src.dump().toFile(tmpDir / "does" / "not" / "exist" / "state.json"); });
 
+#ifndef _WIN32
   // A file path longer than the OS limit makes the path relativization throw a filesystem_error,
-  // which toFile wraps into a statefile_exception
+  // which toFile wraps into a statefile_exception (POSIX ENAMETOOLONG; Windows handles long paths
+  // differently so this is not portable)
   test.expect<f3d::engine::statefile_exception>(
     "save with a file path exceeding the OS limit", [&]() {
-      const std::string tooLongPath(5000, 'a');
-      f3d::engine::state::fromString(R"({ "files": [")" + tooLongPath + R"("] })")
+      f3d::engine::state::fromString(R"({ "files": [")" + std::string(5000, 'a') + R"("] })")
         .toFile(tmpDir / "too_long.json");
     });
+#endif
 
   src.dump().toFile(statefilePath);
 
