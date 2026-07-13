@@ -413,13 +413,15 @@ runs:
 
     # macOS needs VTK > 9.6.20260701 for proper grid rendering using osmesa
     # this test works with VTK 9.6.1 otherwise
+    # camera-view-angle is needed because of: https://github.com/f3d-app/f3d/issues/3375
+    # camera-position is needed until https://github.com/f3d-app/f3d/pull/3373 is merged
     - name: Check Install
       if: |
-        inputs.vtk_version == 'commit' && inputs.optdeps_label == 'optdeps'
+        inputs.vtk_version == 'commit' && inputs.optdeps_label == 'optdeps' && inputs.cpu != 'arm64'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
-        ${{ env.F3D_BIN_PATH }} ../source/testing/data/dragon.vtu --output=output/install_output.png --reference=../source/.github/baselines/install_output.png --resolution=300,300 --colormap-file=viridis --coloring-component=0 --verbose --rendering-backend=${{ inputs.rendering_backend }}
+        ${{ env.F3D_BIN_PATH }} ../source/testing/data/dragon.vtu --output=output/install_output.png --reference=../source/.github/baselines/install_output.png --resolution=300,300 --colormap-file=viridis --coloring-component=0 --verbose --rendering-backend=${{ inputs.rendering_backend }} --camera-position=334.215,169.822,341.61 --camera-view-angle=32.1111
 
     # macOS needs VTK > 9.6.20260701 for proper grid rendering using osmesa
     # this test works with VTK 9.6.1 otherwise
