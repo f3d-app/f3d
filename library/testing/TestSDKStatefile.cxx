@@ -36,9 +36,8 @@ int TestSDKStatefile([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // A file path longer than the OS limit makes the path relativization throw a filesystem_error,
   // which toFile wraps into a statefile_exception
-  test.expect<f3d::engine::statefile_exception>("save with a file path exceeding the OS limit",
-    [&]()
-    {
+  test.expect<f3d::engine::statefile_exception>(
+    "save with a file path exceeding the OS limit", [&]() {
       const std::string tooLongPath(5000, 'a');
       f3d::engine::state::fromString(R"({ "files": [")" + tooLongPath + R"("] })")
         .toFile(tmpDir / "too_long.json");
