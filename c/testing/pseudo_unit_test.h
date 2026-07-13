@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h>
+#include <string.h>
 
 typedef struct
 {
@@ -65,6 +66,45 @@ static inline void f3d_test_check_vec3(
     fabs(actual[0] - expected[0]) < tol &&
     fabs(actual[1] - expected[1]) < tol &&
     fabs(actual[2] - expected[2]) < tol);
+}
+
+// check equality of two strings
+static inline void f3d_test_check_string(
+  f3d_test_t* test, const char* label, const char* actual, const char* expected)
+{
+  int equal;
+
+  if (actual == NULL || expected == NULL)
+  {
+    equal = (actual == expected);
+  }
+  else
+  {
+    equal = strcmp(actual, expected) == 0;
+  }
+
+  f3d_test_check(test, label, equal);
+}
+
+// check that a pointer is not NULL
+static inline void f3d_test_check_ptr(
+  f3d_test_t* test, const char* label, const void* ptr)
+{
+  f3d_test_check(test, label, ptr != NULL);
+}
+
+// check that a pointer is NULL
+static inline void f3d_test_check_null(
+  f3d_test_t* test, const char* label, const void* ptr)
+{
+  f3d_test_check(test, label, ptr == NULL);
+} 
+
+// check equality of two size_t values
+static inline void f3d_test_check_size(
+  f3d_test_t* test, const char* label, size_t actual, size_t expected)
+{
+  f3d_test_check(test, label, actual == expected);
 }
 
 static inline int f3d_test_result(const f3d_test_t* test)
