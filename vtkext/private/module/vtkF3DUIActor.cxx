@@ -154,6 +154,12 @@ void vtkF3DUIActor::SetAnimationProgressColor(const std::array<double, 3>& color
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetAnimationSpeedFactor(double speedFactor)
+{
+  this->AnimationSpeedFactor = speedFactor;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::UpdateAnimationTime(double currentTime)
 {
   this->AnimationCurrentTime = currentTime;
@@ -253,6 +259,12 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
     return 1;
   }
 
+  // Drawn first so later overlays stack in front, keeping the bar bottom-most.
+  if (this->AnimationProgressMode != AnimationProgressBarMode::NONE)
+  {
+    this->RenderAnimationProgressBar();
+  }
+
   if (this->MinimalConsoleVisible)
   {
     // To improve user readability when minimal console is visible cheatsheet and filename
@@ -293,11 +305,6 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
   if (this->FpsCounterVisible)
   {
     this->RenderFpsCounter();
-  }
-
-  if (this->AnimationProgressMode != AnimationProgressBarMode::NONE)
-  {
-    this->RenderAnimationProgressBar();
   }
 
   vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());

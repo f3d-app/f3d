@@ -474,20 +474,34 @@ void SetupNextWindow(std::optional<ImVec2> position, std::optional<ImVec2> size)
 // Painted thickness of the progress bar itself, independent of font scale.
 constexpr float PROGRESS_BAR_THICKNESS = 5.f;
 
+// Unscaled reach of the pointer around the bar: sizes the click/drag row and the
+// distance at which the tooltip snaps to a keyframe.
+constexpr float PROGRESS_BAR_GRAB_RADIUS = 6.f;
+
+std::string FormatSpeedFactor(double speedFactor)
+{
+  std::ostringstream oss;
+  oss << std::noshowpoint << speedFactor;
+  return oss.str();
+}
+
 // Vertical layout of the animation progress bar window: just the bar row in
 // "default" mode, plus a text row above it in "advanced" mode.
 struct ProgressBarLayout
 {
   float barRowHeight; ///< Height of the click/drag target row containing the bar
   float windowHeight; ///< Total height of the ImGui window
+  float padding;      ///< Space above the text row and between it and the bar
 };
 
 ProgressBarLayout ComputeProgressBarLayout(double fontScale, bool advanced, float lineHeight)
 {
-  const float barRowHeight = 2.f * (6.f * static_cast<float>(fontScale)) + 2.f;
+  const float barRowHeight = 2.f * (PROGRESS_BAR_GRAB_RADIUS * static_cast<float>(fontScale)) + 2.f;
+  const float padding =
+    advanced ? F3DStyle::GetDefaultMargin() * static_cast<float>(fontScale) : 0.f;
   const float windowHeight =
-    advanced ? (lineHeight + F3DStyle::GetDefaultMargin() + barRowHeight) : barRowHeight;
-  return { barRowHeight, windowHeight };
+    advanced ? (padding + lineHeight + padding + PROGRESS_BAR_THICKNESS) : barRowHeight;
+  return { barRowHeight, windowHeight, padding };
 }
 }
 
@@ -1206,38 +1220,56 @@ void vtkF3DImguiActor::RenderAnimationProgressBar()
   // row (start/end/current times and the animation name) above the bar.
   const bool advanced = (this->AnimationProgressMode == AnimationProgressBarMode::ADVANCED);
 
-  const float track = 6.f * this->FontScale;
+  const float grabRadius = ::PROGRESS_BAR_GRAB_RADIUS * this->FontScale;
   const float lineHeight = ImGui::GetTextLineHeight();
   const float barWidth = viewport->WorkSize.x;
 
   const ::ProgressBarLayout layout =
     ::ComputeProgressBarLayout(this->FontScale, advanced, lineHeight);
-  const float barRowHeight = layout.barRowHeight;
-  const float winHeight = layout.windowHeight;
-  const float winY = viewport->WorkSize.y - winHeight;
+  const float winY = viewport->WorkSize.y - layout.windowHeight;
 
-  ::SetupNextWindow(ImVec2(0.f, winY), ImVec2(barWidth, winHeight));
+  ::SetupNextWindow(ImVec2(0.f, winY), ImVec2(barWidth, layout.windowHeight));
   ImGui::SetNextWindowBgAlpha(0.f);
 
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.f, 0.f));
   ImGui::Begin("AnimationProgress", nullptr,
     ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
-      ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove);
+      ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove |
+      ImGuiWindowFlags_NoBringToFrontOnFocus);
+
+  // Submitted before other overlays (see vtkF3DUIActor::RenderOverlay) so it stays bottom-most;
+  // NoBringToFrontOnFocus keeps it there when its seek button is clicked.
 
   ImDrawList* drawList = ImGui::GetWindowDrawList();
 
   const ImVec2 origin = ImGui::GetCursorScreenPos();
-  const float barTop = advanced ? (origin.y + lineHeight + margin) : origin.y;
-  const float barBottom = barTop + barRowHeight;
+  const float contentTop = origin.y + layout.padding;
+  const float barBottom = origin.y + layout.windowHeight;
+  const float barTop = barBottom - layout.barRowHeight;
   const ImVec2 barMin(origin.x, barBottom - ::PROGRESS_BAR_THICKNESS);
   const ImVec2 barMax(origin.x + barWidth, barBottom);
 
+  // Map an animation time to its horizontal position on the bar
+  const auto timeToX = [&](double time)
+  {
+    const float frac = std::clamp(static_cast<float>((time - rangeMin) / span), 0.f, 1.f);
+    return barMin.x + frac * barWidth;
+  };
+
   const ImColor fillColor = ::ColorToImVec4(this->AnimationProgressColor);
   const ImColor textColor = ImColor(F3DStyle::imgui::GetHighlightColor());
+  const ImColor fontColor = ::ColorToImVec4(this->FontColor);
+
+  if (advanced)
+  {
+    const ImColor backdropColor = ImColor(ImVec4(this->BackdropColor[0], this->BackdropColor[1],
+      this->BackdropColor[2], this->BackdropOpacity));
+    drawList->AddRectFilled(origin, ImVec2(origin.x + barWidth, barBottom), backdropColor, 0.f);
+  }
 
   // Invisible button over the bar row captures click/drag
   ImGui::SetCursorScreenPos(ImVec2(origin.x, barTop));
-  ImGui::InvisibleButton("##animSeek", ImVec2(barWidth, barRowHeight));
+  ImGui::InvisibleButton("##animSeek", ImVec2(barWidth, layout.barRowHeight));
   const bool active = ImGui::IsItemActive();
   const bool hovered = ImGui::IsItemHovered();
 
@@ -1253,22 +1285,18 @@ void vtkF3DImguiActor::RenderAnimationProgressBar()
   }
 
   // Filled portion of progress bar up to the current time
-  const float frac =
-    std::clamp(static_cast<float>((this->AnimationCurrentTime - rangeMin) / span), 0.f, 1.f);
-  const float playheadX = barMin.x + frac * barWidth;
-  drawList->AddRectFilled(barMin, ImVec2(playheadX, barMax.y), fillColor, 0.f);
+  drawList->AddRectFilled(
+    barMin, ImVec2(timeToX(this->AnimationCurrentTime), barMax.y), fillColor, 0.f);
 
   // Advanced mode only: keyframe markers, then time/name labels and the hover tooltip
   if (advanced)
   {
     // Keyframe markers
-    const ImColor kfColor = ::ColorToImVec4(this->FontColor);
     for (const double kf : this->AnimationKeyFrames)
     {
-      const float kfFrac = std::clamp(static_cast<float>((kf - rangeMin) / span), 0.f, 1.f);
-      const float kfX = barMin.x + kfFrac * barWidth;
+      const float kfX = timeToX(kf);
       drawList->AddLine(
-        ImVec2(kfX, barMin.y - 2.f), ImVec2(kfX, barMax.y), kfColor, 1.f * this->FontScale);
+        ImVec2(kfX, barMin.y - 2.f), ImVec2(kfX, barMax.y), fontColor, 1.f * this->FontScale);
     }
 
     // Time/name labels above the bar and the hover tooltip
@@ -1283,24 +1311,30 @@ void vtkF3DImguiActor::RenderAnimationProgressBar()
     const std::string endLabel = label(rangeMax);
     const std::string currentLabel = label(this->AnimationCurrentTime);
 
-    drawList->AddText(ImVec2(origin.x + margin, origin.y), textColor, startLabel.c_str());
+    drawList->AddText(ImVec2(origin.x + margin, contentTop), textColor, startLabel.c_str());
     const float endWidth = ImGui::CalcTextSize(endLabel.c_str()).x;
     drawList->AddText(
-      ImVec2(origin.x + barWidth - margin - endWidth, origin.y), textColor, endLabel.c_str());
+      ImVec2(origin.x + barWidth - margin - endWidth, contentTop), textColor, endLabel.c_str());
+
+    std::string nameLabel = this->AnimationName;
+    if (this->AnimationSpeedFactor != 1.0)
+    {
+      const std::string speedLabel = "(x" + ::FormatSpeedFactor(this->AnimationSpeedFactor) + ")";
+      nameLabel += nameLabel.empty() ? speedLabel : " " + speedLabel;
+    }
 
     // Animation name and current time.
-    const ImColor nameColor = ::ColorToImVec4(this->FontColor);
-    const bool hasName = !this->AnimationName.empty();
-    const float nameWidth = hasName ? ImGui::CalcTextSize(this->AnimationName.c_str()).x : 0.f;
+    const bool hasName = !nameLabel.empty();
+    const float nameWidth = hasName ? ImGui::CalcTextSize(nameLabel.c_str()).x : 0.f;
     const float gapWidth = hasName ? ImGui::CalcTextSize("  ").x : 0.f;
     const float curWidth = ImGui::CalcTextSize(currentLabel.c_str()).x;
     float cursorX = origin.x + (barWidth - (nameWidth + gapWidth + curWidth)) * 0.5f;
     if (hasName)
     {
-      drawList->AddText(ImVec2(cursorX, origin.y), nameColor, this->AnimationName.c_str());
+      drawList->AddText(ImVec2(cursorX, contentTop), fontColor, nameLabel.c_str());
       cursorX += nameWidth + gapWidth;
     }
-    drawList->AddText(ImVec2(cursorX, origin.y), textColor, currentLabel.c_str());
+    drawList->AddText(ImVec2(cursorX, contentTop), textColor, currentLabel.c_str());
 
     // Hover tooltip showing the time we would jump to. If the cursor is near a
     // keyframe marker, show keyframe time.
@@ -1308,12 +1342,10 @@ void vtkF3DImguiActor::RenderAnimationProgressBar()
     {
       bool onKeyFrame = false;
       double keyFrameTime = 0.0;
-      float nearestDist = track;
+      float nearestDist = grabRadius;
       for (const double kf : this->AnimationKeyFrames)
       {
-        const float kfFrac = std::clamp(static_cast<float>((kf - rangeMin) / span), 0.f, 1.f);
-        const float kfX = barMin.x + kfFrac * barWidth;
-        const float dist = std::fabs(ImGui::GetIO().MousePos.x - kfX);
+        const float dist = std::fabs(ImGui::GetIO().MousePos.x - timeToX(kf));
         if (dist <= nearestDist)
         {
           nearestDist = dist;
@@ -1322,17 +1354,8 @@ void vtkF3DImguiActor::RenderAnimationProgressBar()
         }
       }
 
-      std::ostringstream tooltipStream;
-      tooltipStream << std::fixed << std::setprecision(2);
-      if (onKeyFrame)
-      {
-        tooltipStream << "Keyframe\n" << keyFrameTime << "s";
-      }
-      else
-      {
-        tooltipStream << mouseTime << "s";
-      }
-      const std::string tooltipText = tooltipStream.str();
+      const std::string tooltipText =
+        onKeyFrame ? "Keyframe\n" + label(keyFrameTime) : label(mouseTime);
 
       // Restore padding for tooltip
       const float tooltipPadding = margin * this->FontScale;

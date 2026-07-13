@@ -621,6 +621,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetFontScale(opt.ui.scale);
   renderer->SetFontColor(opt.ui.font_color);
   renderer->SetAnimationProgressColor(opt.ui.animation_progress_color);
+  renderer->SetAnimationSpeedFactor(opt.scene.animation.speed_factor);
   vtkF3DUIActor::AnimationProgressBarMode animationProgressMode =
     vtkF3DUIActor::AnimationProgressBarMode::NONE;
   if (opt.ui.animation_progress == "default")
