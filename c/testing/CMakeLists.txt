@@ -55,5 +55,6 @@ foreach (test ${f3d_c_api_tests_list})
   set_tests_properties(libf3d_bindings_c::${TName} PROPERTIES
     LABELS "libf3d;bindings;c"
     TIMEOUT 30
+    ENVIRONMENT "F3D_TEST_ENV_STANDARD=TestEnv;F3D_TEST_ENV_EXTENDED=TestËnv;F3D_TEST_ENV_UTF8=🤔;"
   )
 endforeach ()
