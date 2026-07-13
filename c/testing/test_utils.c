@@ -1,7 +1,5 @@
 #include "pseudo_unit_test.h"
-
 #include <utils_c_api.h>
-
 #include <string.h>
 
 int test_utils()
