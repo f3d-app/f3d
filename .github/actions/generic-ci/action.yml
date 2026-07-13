@@ -216,6 +216,39 @@ runs:
       working-directory: ${{github.workspace}}/build
       run: cmake --build . --parallel 2 --config Release
 
+    - name: Set F3D binary path Linux
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        echo "F3D_BUILD_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
+        echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
+
+    - name: Set F3D binary path Windows
+      if: runner.os == 'Windows'
+      shell: bash
+      run: |
+        echo "F3D_BUILD_BIN_PATH=./bin_Release/f3d.exe" >> $GITHUB_ENV
+        echo "F3D_BIN_PATH=./bin/f3d.exe" >> $GITHUB_ENV
+        echo "F3D_CONSOLE_BIN_PATH=./bin/f3d-console.exe" >> $GITHUB_ENV
+
+    - name: Set F3D binary path MacOS bundle
+      if: |
+        runner.os == 'macOS' &&
+        inputs.bundle_label == 'bundle'
+      shell: bash
+      run: |
+        echo "F3D_BUILD_BIN_PATH=./bin/f3d.app/Contents/MacOS/f3d" >> $GITHUB_ENV
+        echo "F3D_BIN_PATH=./f3d.app/Contents/MacOS/f3d" >> $GITHUB_ENV
+
+    - name: Set F3D binary path MacOS no-bundle
+      if: |
+        runner.os == 'macOS' &&
+        inputs.bundle_label != 'bundle'
+      shell: bash
+      run: |
+        echo "F3D_BUILD_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
+        echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
+
     # Linux: Xvfb is not running, should fallback to egl
     # Windows: mesa binary is not installed, should fallback to osmesa
     # macOS: No fallback mechanism to test, CI always uses osmesa (with VTK > 9.6.20260701), check cocoa is functional
@@ -223,7 +256,7 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: |
-        ./bin/f3d ../source/testing/data/dragon.vtu --output=Testing/Temporary/build_output.png --reference=../source/.github/baselines/build_output.png --resolution=300,300 --verbose
+        ${{ env.F3D_BUILD_BIN_PATH }} ../source/testing/data/dragon.vtu --output=Testing/Temporary/build_output.png --reference=../source/.github/baselines/build_output.png --resolution=300,300 --verbose
 
     # When running standard test with auto rendering backend on linux, use glx
     - name: Run Xvfb ubuntu
@@ -370,32 +403,6 @@ runs:
       working-directory: ${{github.workspace}}
       run: ctest --test-dir build_plugins --no-tests=error -C Release -VV
 
-    - name: Set F3D binary path Linux
-      if: runner.os == 'Linux'
-      shell: bash
-      run: echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
-
-    - name: Set F3D binary path Windows
-      if: runner.os == 'Windows'
-      shell: bash
-      run: |
-        echo "F3D_BIN_PATH=./bin/f3d.exe" >> $GITHUB_ENV
-        echo "F3D_CONSOLE_BIN_PATH=./bin/f3d-console.exe" >> $GITHUB_ENV
-
-    - name: Set F3D binary path MacOS bundle
-      if: |
-        runner.os == 'macOS' &&
-        inputs.bundle_label == 'bundle'
-      shell: bash
-      run: echo "F3D_BIN_PATH=./f3d.app/Contents/MacOS/f3d" >> $GITHUB_ENV
-
-    - name: Set F3D binary path MacOS no-bundle
-      if: |
-        runner.os == 'macOS' &&
-        inputs.bundle_label != 'bundle'
-      shell: bash
-      run: echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
-
     - name: Install plugin examples
       if: inputs.static_label == 'no-static'
       shell: bash
@@ -418,7 +425,7 @@ runs:
     # this test works with VTK 9.6.1 otherwise
     - name: Check Install plugins
       if: |
-        inputs.vtk_version == 'commit' && inputs.optdeps_label == 'optdeps'
+        inputs.vtk_version == 'commit' && inputs.optdeps_label == 'optdeps' && inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
