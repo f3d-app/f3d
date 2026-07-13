@@ -788,6 +788,13 @@ fs::path engine::getCachePath() const
 }
 
 //----------------------------------------------------------------------------
+engine& engine::setResourcesPath(const fs::path& resourcesPath)
+{
+  this->Internals->Window->SetResourcesPath(resourcesPath);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 engine::no_window_exception::no_window_exception(const std::string& what)
   : exception(what)
 {
@@ -813,6 +820,12 @@ engine::cache_exception::cache_exception(const std::string& what)
 
 //----------------------------------------------------------------------------
 engine::statefile_exception::statefile_exception(const std::string& what)
+  : exception(what)
+{
+}
+
+//----------------------------------------------------------------------------
+engine::resource_exception::resource_exception(const std::string& what)
   : exception(what)
 {
 }
