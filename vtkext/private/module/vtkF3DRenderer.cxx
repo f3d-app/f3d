@@ -919,11 +919,6 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 
       double* gridPos = upMatrixInv->MultiplyDoublePoint(center);
 
-      if (this->Xr)
-      {
-        gridPos[1] = 0; // keep the grid at the floor level in XR
-      }
-
       double delta[3];
       this->GetEnvironmentUp(delta);
       vtkMath::MultiplyScalar(delta, downShift);

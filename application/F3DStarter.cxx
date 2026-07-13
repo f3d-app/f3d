@@ -1458,11 +1458,7 @@ int F3DStarter::Start(int argc, char** argv)
       }
       else if (this->Internals->AppOptions.RenderingBackend == "xr")
       {
-        std::filesystem::path xrActionManifestDir =
-          F3DSystemTools::GetBinaryResourceDirectory() / "xr_actions_manifest";
         this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createXR());
-        this->Internals->Engine->getInteractor().setXrResourcesDirectory(
-          xrActionManifestDir.string());
       }
       else
       {
@@ -1494,6 +1490,7 @@ int F3DStarter::Start(int argc, char** argv)
       return EXIT_FAILURE;
     }
 
+    this->Internals->Engine->setResourcesPath(F3DSystemTools::GetBinaryResourceDirectory());
     this->ResetWindowName();
     this->Internals->ApplyPositionAndResolution();
     this->AddCommands();

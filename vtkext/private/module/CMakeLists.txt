@@ -188,6 +188,7 @@ if (F3D_MODULE_RAYTRACING)
   vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_RAYTRACING)
 endif ()
 
+# openxr
 if (F3D_MODULE_OPENXR)
   vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_OPENXR)
 endif()

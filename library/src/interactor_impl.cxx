@@ -2135,7 +2135,7 @@ interactor& interactor_impl::requestStop()
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::setXrResourcesDirectory(
+void interactor_impl::SetXrResourcesDirectory(
   const std::string& actionsManifestDirectory, const std::string& controllerModelDirectory)
 {
 #if F3D_MODULE_OPENXR

@@ -121,6 +121,12 @@ public:
 
   /**
    * Implementation only API.
+   * Set the resources path.
+   */
+  void SetResourcesPath(const std::filesystem::path& resourcesPath);
+
+  /**
+   * Implementation only API.
    * Set the interactor to use when recovering bindings documentation.
    */
   void SetInteractor(interactor_impl* interactor);
