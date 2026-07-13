@@ -28,7 +28,7 @@ You may also want to take a look into the [F3D mentoring program](doc/dev/13-MEN
 contributing steps.
 
 Once you are able to build F3D, you may want to take a look at the open [issues](https://github.com/f3d-app/f3d/issues)!
-If you are a beginner, you may want to look at ["good first issues"](https://github.com/f3d-app/f3d/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).
+If you are a beginner, you may want to look at ["good first issues"](https://github.com/f3d-app/f3d/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22). Please note that [generative AI should not be used](AI_POLICY.md) in that context.
 If you already have some experience with programming and contribution, definitely look at ["help wanted"](https://github.com/f3d-app/f3d/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) issues.
 If an issue is interesting to you and is not yet assigned, then you should _comment on the issue_ and ask for any help or clarification needed.
 F3D maintainers will see your comment, assign the issue to you and provide guidance as needed.
@@ -47,7 +47,7 @@ that is definitely possible. Feel free to reach out for guidance by opening an i
 ## AI Policy
 
 F3D has a dedicated [AI policy](AI_POLICY.md), if you are an AI user, make sure to read it and comply to it.
-If not, you are at the risk of being banned.
+If not, you are at risk of being banned.
 
 ## F3D Development Workflow
 
