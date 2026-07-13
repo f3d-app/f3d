@@ -93,9 +93,6 @@ public:
   interactor& stop() override;
   interactor& requestRender() override;
   interactor& requestStop() override;
-
-  void setXrResourcesDirectory(const std::string& actionsManifestDirectory,
-    const std::string& controllerModelDirectory) override;
   ///@}
 
   /**
@@ -131,6 +128,13 @@ public:
    * This is called by the scene after initializing the up vector.
    */
   void ResetTemporaryUp();
+
+  /**
+   * Set the directory for Xr resources
+   * Implementation only API.
+   */
+  void SetXrResourcesDirectory(
+    const std::string& actionsManifestDirectory, const std::string& controllerModelDirectory);
 
   /**
    * Event loop being called automatically once the interactor is started
