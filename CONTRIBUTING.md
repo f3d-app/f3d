@@ -86,7 +86,7 @@ Make sure to check the results for yourself and ask for help if needed.
 To run the CI, just add a comment like this in your PR:
 
 - `\ci fast`: A fast linux job without optional dependencies, always make this work first.
-- `\ci extended`: An extended linux job with depencies and recent VTK, always make this work second.
+- `\ci extended`: An extended linux job with dependencies and recent VTK, always make this work second.
 - `\ci linux`: Many different linux jobs across CMake options, dependencies and vtk versions.
 - `\ci windows`: Cross VTK versions of Windows jobs.
 - `\ci macos_intel`: Cross VTK versions of macOS intel jobs.
