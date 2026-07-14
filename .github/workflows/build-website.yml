@@ -15,6 +15,7 @@ jobs:
   build_website:
     name: Build website
     if: github.event_name == 'push' ||
+      contains(github.event.pull_request.labels.*.name, 'ci:website') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full')
     runs-on: ubuntu-latest
     steps:
