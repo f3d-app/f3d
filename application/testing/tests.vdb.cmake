@@ -20,7 +20,7 @@ f3d_test(NAME TestVDBCommandScriptReaderOptions SCRIPT DATA icosahedron.vdb PLUG
 f3d_test(NAME TestVDBPoints DATA sphere_points.vdb PLUGIN vdb ARGS -o)
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251210)
-  f3d_test(NAME TestPipedVDBVolume DATA icosahedron.vdb PLUGIN vdb ARGS --volume --volume-inverse PIPED VDB)
+  f3d_test(NAME TestPipedVDBVolume DATA icosahedron.vdb PLUGIN vdb ARGS --volume --volume-inverse PIPED_READER VDB PIPED)
 endif()
 
 if(NOT F3D_MACOS_BUNDLE)

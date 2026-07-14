@@ -87,3 +87,23 @@ def test_scene():
     img.save(output)
 
     assert img.compare(f3d.Image(reference_red_light)) < 0.05
+
+
+def test_scene_added_files():
+    testing_dir = Path(__file__).parent.parent.parent / "testing"
+    cow = testing_dir / "data/cow.vtp"
+
+    engine = f3d.Engine.create_none()
+    assert engine.scene.get_added_files() == []
+
+    engine.scene.add(cow)
+    added = engine.scene.get_added_files()
+    assert len(added) == 1
+    assert Path(added[0]) == cow
+
+    # Files are tracked as provided, in order
+    engine.scene.add(cow)
+    assert len(engine.scene.get_added_files()) == 2
+
+    engine.scene.clear()
+    assert engine.scene.get_added_files() == []

@@ -125,6 +125,16 @@ eg:
 `add_files [path/to/file1] [path/to/file2]`: A specific command to add files to the scene (overridden by a F3D specific command, see below). Take one or more files as arguments.
 eg: `add_files /path/to/dragon.vtu`.
 
+`save_statefile [path/to/file]`: A specific command to save the current state into the provided statefile (overridden by a F3D specific command, see below). Take a file as argument.
+eg: `save_statefile /path/to/state.json`.
+
+`load_statefile [path/to/file]`: A specific command to restore the state from the provided statefile (overridden by a F3D specific command, see below). Take a file as argument.
+eg: `load_statefile /path/to/state.json`.
+
+`save_statefile_to_clipboard`: A specific command to save the current state into the system clipboard (overridden by a F3D specific command, see below). Requires a build with the `clip` module. No argument.
+
+`load_statefile_from_clipboard`: A specific command to restore the state from the system clipboard (overridden by a F3D specific command, see below). Requires a build with the `clip` module. No argument.
+
 `alias [alias_name] [command]`: A specific command to create an alias for a command. Take an alias name and a command as arguments.
 eg: `alias myrotate roll_camera 90`.
 
@@ -164,6 +174,18 @@ eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 `remove_file_groups`: A specific command to remove all files. No argument.
 
 `open_file_dialog`: A specific command to open a file dialog to selected a file to load. No argument.
+
+`save_statefile [filename]`: A specific command to save the current state into a statefile, including all file groups (also the ones not currently loaded). If filename is not specified, rely on the `--statefile-filename` CLI option, or a default filename when it is empty too. Use `-` for the standard output. eg: `save_statefile path/to/state.json`.
+
+`save_statefile_dialog`: A specific command to save the current state into a statefile picked with a file dialog. Requires a build with the `tinyfiledialogs` module. No argument.
+
+`load_statefile [filename]`: A specific command to restore the state from a statefile, restoring all saved file groups and reloading the current one. If filename is not specified, rely on the `--statefile-filename` CLI option, or a default filename when it is empty too. Use `-` for the standard input. Does nothing but warn if the file does not exist. eg: `load_statefile path/to/state.json`.
+
+`load_statefile_dialog`: A specific command to restore the state from a statefile picked with a file dialog. Requires a build with the `tinyfiledialogs` module. No argument.
+
+`save_statefile_to_clipboard`: A specific command to save the current state into the system clipboard. Requires a build with the `clip` module. No argument.
+
+`load_statefile_from_clipboard`: A specific command to restore the state from the system clipboard, reloading the saved files. Requires a build with the `clip` module. No argument.
 
 ## Domains
 

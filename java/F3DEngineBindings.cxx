@@ -1,8 +1,11 @@
 #include "F3DJavaBindings.h"
 
 #include <app_f3d_F3D_Engine.h>
+#include <app_f3d_F3D_Engine_State.h>
 
 #include <context.h>
+#include <engine.h>
+#include <scene.h>
 
 extern "C"
 {
@@ -108,6 +111,123 @@ extern "C"
     const char* str = env->GetStringUTFChars(path, nullptr);
     GetEngine(env, self)->setCachePath(fs::path(str));
     env->ReleaseStringUTFChars(path, str);
+  }
+
+  JNIEXPORT jlong JAVA_BIND(Engine, nativeDump)(JNIEnv* env, jobject self)
+  {
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d::engine::state(GetEngine(env, self)->dump()));
+    }
+    catch (const f3d::engine::statefile_exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+      return 0;
+    }
+  }
+
+  JNIEXPORT void JAVA_BIND(Engine, nativeLoad)(JNIEnv* env, jobject self, jlong stateAddress)
+  {
+    try
+    {
+      GetEngine(env, self)->load(*reinterpret_cast<f3d::engine::state*>(stateAddress));
+    }
+    catch (const f3d::engine::statefile_exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+    }
+    catch (const f3d::scene::load_failure_exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+    }
+  }
+
+  JNIEXPORT jlong JAVA_SCOPED_BIND(Engine, State, nativeFromString)(
+    JNIEnv* env, jclass, jstring content)
+  {
+    const char* str = env->GetStringUTFChars(content, nullptr);
+    try
+    {
+      jlong ptr =
+        reinterpret_cast<jlong>(new f3d::engine::state(f3d::engine::state::fromString(str)));
+      env->ReleaseStringUTFChars(content, str);
+      return ptr;
+    }
+    catch (const f3d::engine::statefile_exception& e)
+    {
+      env->ReleaseStringUTFChars(content, str);
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+      return 0;
+    }
+  }
+
+  JNIEXPORT jlong JAVA_SCOPED_BIND(Engine, State, nativeFromFile)(JNIEnv* env, jclass, jstring path)
+  {
+    const char* str = env->GetStringUTFChars(path, nullptr);
+    try
+    {
+      jlong ptr = reinterpret_cast<jlong>(
+        new f3d::engine::state(f3d::engine::state::fromFile(fs::path(str))));
+      env->ReleaseStringUTFChars(path, str);
+      return ptr;
+    }
+    catch (const f3d::engine::statefile_exception& e)
+    {
+      env->ReleaseStringUTFChars(path, str);
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+      return 0;
+    }
+  }
+
+  JNIEXPORT jlong JAVA_SCOPED_BIND(Engine, State, nativeFromClipboard)(JNIEnv* env, jclass)
+  {
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d::engine::state(f3d::engine::state::fromClipboard()));
+    }
+    catch (const f3d::engine::statefile_exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+      return 0;
+    }
+  }
+
+  JNIEXPORT jstring JAVA_SCOPED_BIND(Engine, State, toString)(JNIEnv* env, jobject self)
+  {
+    return env->NewStringUTF(GetState(env, self)->toString().c_str());
+  }
+
+  JNIEXPORT void JAVA_SCOPED_BIND(Engine, State, toFile)(JNIEnv* env, jobject self, jstring path)
+  {
+    const char* str = env->GetStringUTFChars(path, nullptr);
+    try
+    {
+      GetState(env, self)->toFile(fs::path(str));
+    }
+    catch (const f3d::engine::statefile_exception& e)
+    {
+      env->ReleaseStringUTFChars(path, str);
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+      return;
+    }
+    env->ReleaseStringUTFChars(path, str);
+  }
+
+  JNIEXPORT void JAVA_SCOPED_BIND(Engine, State, toClipboard)(JNIEnv* env, jobject self)
+  {
+    try
+    {
+      GetState(env, self)->toClipboard();
+    }
+    catch (const f3d::engine::statefile_exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+    }
+  }
+
+  JNIEXPORT void JAVA_SCOPED_BIND(Engine, State, nativeDestroy)(JNIEnv*, jclass, jlong ptr)
+  {
+    delete reinterpret_cast<f3d::engine::state*>(ptr);
   }
 
   JNIEXPORT void JAVA_BIND(Engine, setOptions)(JNIEnv* env, jobject self, jobject options)

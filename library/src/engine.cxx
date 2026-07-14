@@ -6,6 +6,7 @@
 #include "interactor_impl.h"
 #include "log.h"
 #include "scene_impl.h"
+#include "statefile.h"
 #include "utils.h"
 #include "window_impl.h"
 
@@ -22,7 +23,59 @@
 
 #include <nlohmann/json.hpp>
 
+#if F3D_MODULE_CLIP
+#include "clip/clip.h"
+#endif
+
+#include <algorithm>
+#include <fstream>
+#include <istream>
+#include <iterator>
+#include <ostream>
+
 namespace fs = std::filesystem;
+
+namespace
+{
+//----------------------------------------------------------------------------
+// Make the stored file paths relative to baseDir when contained by it, so a statefile stays
+// portable alongside its files. Paths outside baseDir are kept absolute.
+void RelativizeFiles(nlohmann::ordered_json& root, const fs::path& baseDir)
+{
+  if (!root.contains("files"))
+  {
+    return;
+  }
+  for (auto& file : root.at("files"))
+  {
+    const fs::path abs = fs::absolute(file.get<std::string>());
+    const fs::path rel = fs::relative(abs, fs::absolute(baseDir));
+    if (!rel.empty() && *rel.begin() != "..")
+    {
+      file = rel.generic_string();
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+// Resolve relative file paths against baseDir so the state holds absolute paths, undoing
+// RelativizeFiles.
+void ResolveFiles(nlohmann::ordered_json& root, const fs::path& baseDir)
+{
+  if (!root.contains("files"))
+  {
+    return;
+  }
+  for (auto& file : root.at("files"))
+  {
+    const fs::path path = file.get<std::string>();
+    if (path.is_relative())
+    {
+      file = (baseDir / path).lexically_normal().generic_string();
+    }
+  }
+}
+}
 
 namespace f3d
 {
@@ -275,6 +328,139 @@ interactor& engine::getInteractor()
     throw engine::no_interactor_exception("No interactor with this engine");
   }
   return *this->Internals->Interactor;
+}
+
+//----------------------------------------------------------------------------
+engine::state engine::dump()
+{
+  engine::state st;
+  st.Content = detail::captureStateContent(
+    *this->Internals->Scene, *this->Internals->Window, *this->Internals->Options);
+  return st;
+}
+
+//----------------------------------------------------------------------------
+engine& engine::load(const engine::state& st)
+{
+  detail::restoreStateContent(
+    *this->Internals->Scene, *this->Internals->Window, *this->Internals->Options, st.Content);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+engine::state engine::state::fromString(const std::string& content)
+{
+  engine::state st;
+  try
+  {
+    st.Content = nlohmann::ordered_json::parse(content).dump(2);
+  }
+  catch (const nlohmann::json::exception& ex)
+  {
+    throw engine::statefile_exception(std::string("Could not parse state content: ") + ex.what());
+  }
+  return st;
+}
+
+//----------------------------------------------------------------------------
+engine::state engine::state::fromFile(const fs::path& filePath)
+{
+  engine::state st;
+  try
+  {
+    std::ifstream stream(filePath);
+    if (!stream.is_open())
+    {
+      throw engine::statefile_exception(
+        "Could not open statefile for reading: " + filePath.string());
+    }
+    nlohmann::ordered_json root = nlohmann::ordered_json::parse(stream);
+    // parent_path is lexical and cannot throw a filesystem_error here
+    ::ResolveFiles(root, filePath.parent_path());
+    st.Content = root.dump(2);
+  }
+  catch (const nlohmann::json::exception& ex)
+  {
+    throw engine::statefile_exception(
+      "Could not parse statefile " + filePath.string() + ": " + ex.what());
+  }
+  return st;
+}
+
+//----------------------------------------------------------------------------
+engine::state engine::state::fromClipboard()
+{
+#if F3D_MODULE_CLIP
+  std::string content;
+  if (!clip::get_text(content))
+  {
+    // Unreachable in testing
+    throw engine::statefile_exception("Could not read a state from the clipboard");
+  }
+  return engine::state::fromString(content);
+#else
+  throw engine::statefile_exception(
+    "Clipboard support is not available in this build, cannot read a state from the clipboard");
+#endif
+}
+
+//----------------------------------------------------------------------------
+std::string engine::state::toString() const
+{
+  return this->Content;
+}
+
+//----------------------------------------------------------------------------
+void engine::state::toFile(const fs::path& filePath) const
+{
+  try
+  {
+    std::ofstream stream(filePath);
+    if (!stream.is_open())
+    {
+      throw engine::statefile_exception(
+        "Could not open statefile for writing: " + filePath.string());
+    }
+    nlohmann::ordered_json root = nlohmann::ordered_json::parse(this->Content);
+    ::RelativizeFiles(root, filePath.parent_path());
+    stream << root.dump(2) << '\n';
+  }
+  catch (const fs::filesystem_error& ex)
+  {
+    throw engine::statefile_exception(
+      "Could not save statefile " + filePath.string() + ": " + ex.what());
+  }
+}
+
+//----------------------------------------------------------------------------
+void engine::state::toClipboard() const
+{
+#if F3D_MODULE_CLIP
+  if (!clip::set_text(this->Content))
+  {
+    // Unreachable in testing
+    throw engine::statefile_exception("Could not copy the state to the clipboard");
+  }
+#else
+  throw engine::statefile_exception(
+    "Clipboard support is not available in this build, cannot copy the state to the clipboard");
+#endif
+}
+
+//----------------------------------------------------------------------------
+std::ostream& operator<<(std::ostream& stream, const engine::state& st)
+{
+  stream << st.Content;
+  return stream;
+}
+
+//----------------------------------------------------------------------------
+std::istream& operator>>(std::istream& stream, engine::state& st)
+{
+  const std::string content{ std::istreambuf_iterator<char>(stream),
+    std::istreambuf_iterator<char>() };
+  st = engine::state::fromString(content);
+  return stream;
 }
 
 //----------------------------------------------------------------------------
@@ -578,6 +764,12 @@ engine::plugin_exception::plugin_exception(const std::string& what)
 
 //----------------------------------------------------------------------------
 engine::cache_exception::cache_exception(const std::string& what)
+  : exception(what)
+{
+}
+
+//----------------------------------------------------------------------------
+engine::statefile_exception::statefile_exception(const std::string& what)
   : exception(what)
 {
 }

@@ -33,8 +33,11 @@ f3d_test(<NAME> [ARGS...])
   - `DPI_SCALE` Set the DPI scale through the environment variable `CTEST_F3D_FORCE_DPI_SCALE`, default is 1.0
   - `UI` Mark the test to require the presence of UI component and disable it otherwise
   - `PIPED` Mark the test to pipe the data (`cat data | f3d`) instead of providing the filename as data,
-    doesn't work for external plugins, pass the reader as an arg, it will be used to force before VTK v9.6.20260128.
-    Add `piped` test labels.
+    doesn't work for external plugins. Add `piped` test labels.
+  - `PIPED_READER` Provide the reader to force for a `PIPED` test, only used before VTK v9.6.20260128.
+  - `PIPED_ARG` Prepend the provided string to the `-` standard input marker of a `PIPED` test, so the piped
+    data is consumed by an option (e.g. pass `--load-statefile=` to load a statefile from `--load-statefile=-`)
+    instead of as the input model.
   - `SCRIPT` Mark the test to use a `--script` of the same name as the test
   - `NAME` Provide the name of the test, mandatory and must be unique
   - `BASELINE_PATH` Provide the path to the baseline to use, instead of the default
@@ -57,7 +60,7 @@ f3d_test(<NAME> [ARGS...])
 
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "LONG_TIMEOUT;DEFAULT_HDRI;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT" "NAME;BASELINE_PATH;OUTPUT_PATH;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED;PLUGIN" "DATA;DEPENDS;LABELS;ENV;ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "LONG_TIMEOUT;DEFAULT_HDRI;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT;PIPED" "NAME;BASELINE_PATH;OUTPUT_PATH;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED_READER;PIPED_ARG;PLUGIN" "DATA;DEPENDS;LABELS;ENV;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -161,8 +164,9 @@ function(f3d_test)
 
   if (F3D_TEST_PIPED)
     list(APPEND F3D_TEST_LABELS "piped")
-    if(VTK_VERSION VERSION_LESS 9.6.20260128)
-      list(APPEND F3D_TEST_ARGS "--force-reader=${F3D_TEST_PIPED}")
+    # The reader is only needed to force it on old VTK; recent VTK detects it from the piped stream.
+    if(DEFINED F3D_TEST_PIPED_READER AND VTK_VERSION VERSION_LESS 9.6.20260128)
+      list(APPEND F3D_TEST_ARGS "--force-reader=${F3D_TEST_PIPED_READER}")
     endif()
     list(JOIN F3D_TEST_ARGS " " F3D_TEST_ARGS_JOINED)
     add_test(
@@ -170,6 +174,7 @@ function(f3d_test)
       COMMAND ${CMAKE_COMMAND}
         -DF3D_EXE:FILEPATH=${_f3d_target}
         -DF3D_PIPED_DATA=${_f3d_test_data}
+        -DF3D_PIPED_ARG=${F3D_TEST_PIPED_ARG}
         -DF3D_ARGS=${F3D_TEST_ARGS_JOINED}
         -P ${CMAKE_CURRENT_SOURCE_DIR}/f3d_piped.cmake
         COMMAND_EXPAND_LISTS)

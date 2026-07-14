@@ -2,8 +2,10 @@
 #include "scene.h"
 #include "types.h"
 
+#include <cstring>
 #include <filesystem>
 #include <log.h>
+#include <string>
 #include <vector>
 
 namespace
@@ -140,6 +142,50 @@ void f3d_scene_clear(f3d_scene_t* scene)
 
   f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
   cpp_scene->clear();
+}
+
+//----------------------------------------------------------------------------
+char** f3d_scene_get_added_files(const f3d_scene_t* scene, unsigned int* count)
+{
+  if (!scene || !count)
+  {
+    if (count)
+    {
+      *count = 0;
+    }
+    return nullptr;
+  }
+
+  const f3d::scene* cpp_scene = reinterpret_cast<const f3d::scene*>(scene);
+  std::vector<std::filesystem::path> files = cpp_scene->getAddedFiles();
+  *count = static_cast<unsigned int>(files.size());
+  if (files.empty())
+  {
+    return nullptr;
+  }
+
+  char** result = new char*[files.size()];
+  for (size_t i = 0; i < files.size(); ++i)
+  {
+    std::string str = files[i].string();
+    result[i] = new char[str.size() + 1];
+    std::strcpy(result[i], str.c_str());
+  }
+  return result;
+}
+
+//----------------------------------------------------------------------------
+void f3d_scene_free_added_files(char** files, unsigned int count)
+{
+  if (!files)
+  {
+    return;
+  }
+  for (unsigned int i = 0; i < count; ++i)
+  {
+    delete[] files[i];
+  }
+  delete[] files;
 }
 
 //----------------------------------------------------------------------------

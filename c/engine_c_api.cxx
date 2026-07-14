@@ -2,6 +2,7 @@
 #include "engine.h"
 #include "log.h"
 #include "options.h"
+#include "scene.h"
 
 #include <cstring>
 #include <exception>
@@ -226,6 +227,160 @@ int f3d_engine_set_cache_path(f3d_engine_t* engine, const char* cache_path)
   }
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+const char* f3d_engine_dump_to_string(f3d_engine_t* engine)
+{
+  if (!engine)
+  {
+    return nullptr;
+  }
+
+  try
+  {
+    f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
+    const std::string str = cpp_engine->dump().toString();
+    char* result = new char[str.length() + 1];
+    std::strcpy(result, str.c_str());
+    return result;
+  }
+  catch (const f3d::engine::statefile_exception& e)
+  {
+    f3d::log::error("Failed to dump state to string: ", e.what());
+    return nullptr;
+  }
+}
+
+//----------------------------------------------------------------------------
+int f3d_engine_dump_to_file(f3d_engine_t* engine, const char* file_path)
+{
+  if (!engine || !file_path)
+  {
+    return 0;
+  }
+
+  try
+  {
+    f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
+    cpp_engine->dump().toFile(file_path);
+  }
+  catch (const f3d::engine::statefile_exception& e)
+  {
+    f3d::log::error("Failed to dump state to file: ", e.what());
+    return 0;
+  }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int f3d_engine_dump_to_clipboard(f3d_engine_t* engine)
+{
+  if (!engine)
+  {
+    return 0;
+  }
+
+  try
+  {
+    f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
+    cpp_engine->dump().toClipboard();
+  }
+  catch (const f3d::engine::statefile_exception& e)
+  {
+    f3d::log::error("Failed to dump state to clipboard: ", e.what());
+    return 0;
+  }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int f3d_engine_load_from_string(f3d_engine_t* engine, const char* content)
+{
+  if (!engine || !content)
+  {
+    return 0;
+  }
+
+  try
+  {
+    f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
+    cpp_engine->load(f3d::engine::state::fromString(content));
+  }
+  catch (const f3d::engine::statefile_exception& e)
+  {
+    f3d::log::error("Failed to load state from string: ", e.what());
+    return 0;
+  }
+  catch (const f3d::scene::load_failure_exception& e)
+  {
+    f3d::log::error("Failed to load state from string: ", e.what());
+    return 0;
+  }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int f3d_engine_load_from_file(f3d_engine_t* engine, const char* file_path)
+{
+  if (!engine || !file_path)
+  {
+    return 0;
+  }
+
+  try
+  {
+    f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
+    cpp_engine->load(f3d::engine::state::fromFile(file_path));
+  }
+  catch (const f3d::engine::statefile_exception& e)
+  {
+    f3d::log::error("Failed to load state from file: ", e.what());
+    return 0;
+  }
+  catch (const f3d::scene::load_failure_exception& e)
+  {
+    f3d::log::error("Failed to load state from file: ", e.what());
+    return 0;
+  }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int f3d_engine_load_from_clipboard(f3d_engine_t* engine)
+{
+  if (!engine)
+  {
+    return 0;
+  }
+
+  try
+  {
+    f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
+    cpp_engine->load(f3d::engine::state::fromClipboard());
+  }
+  catch (const f3d::engine::statefile_exception& e)
+  {
+    f3d::log::error("Failed to load state from clipboard: ", e.what());
+    return 0;
+  }
+  catch (const f3d::scene::load_failure_exception& e)
+  {
+    f3d::log::error("Failed to load state from clipboard: ", e.what());
+    return 0;
+  }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+void f3d_engine_free_string(const char* str)
+{
+  delete[] str;
 }
 
 //----------------------------------------------------------------------------

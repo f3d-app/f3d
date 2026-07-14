@@ -50,7 +50,7 @@ runs:
       uses: actions/cache/restore@v6
       with:
         path: dependencies/proj_install
-        key: proj-${{steps.proj_ver.outputs.extract}}-${{ steps.sqlite_ver.outputs.extract }}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
+        key: proj-${{steps.proj_ver.outputs.extract}}-${{ steps.sqlite_ver.outputs.extract }}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-4
 
     # Dependents: gdal geotiff
     - name: Checkout proj
@@ -95,8 +95,10 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../proj_install
         -DCMAKE_PREFIX_PATH:PATH=../install/
+        -DEMBED_RESOURCE_FILES:BOOL=ON
         -DENABLE_CURL:BOOL=OFF
         -DENABLE_TIFF:BOOL=OFF
+        -DUSE_ONLY_EMBEDDED_RESOURCE_FILES:BOOL=ON
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 

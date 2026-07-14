@@ -435,6 +435,41 @@ f3d_test(NAME TestFinalShaderUndefined DATA cow.vtp ARGS --final-shader "undefin
 f3d_test(NAME TestFinalShaderCompilationFailure DATA cow.vtp ARGS --final-shader "vec4 pixel(vec2 uv){}" --verbose REGEXP " build the shader program" NO_BASELINE)
 f3d_test(NAME TestFinalShaderTimeUniform DATA cow.vtp ARGS --final-shader "vec4 pixel(vec2 uv){return vec4(texture(source, uv).rgb * (0.5 + 0.5*cos(time+uv.xyx+vec3(0,2,4))), 1.0)\\\\\\\;}")
 
+## Statefile
+# Round trip: one test saves a statefile, a dependent test loads it back and renders it,
+# checking both that the saved statefile is correct and that its options and camera are applied
+f3d_test(NAME TestStatefileSave DATA cow.vtp NO_BASELINE ARGS -D render.background.color=0,0,1 --camera-position=15,8,15 --camera-focal-point=0.78,-0.44,0 --camera-view-up=0,1,0 --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileSave.json REGEXP "Statefile saved to")
+f3d_test(NAME TestStatefileLoad DEPENDS TestStatefileSave ARGS --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileSave.json)
+
+# Load a known statefile, checking its options are applied
+f3d_test(NAME TestStatefileLoadKnown DATA cow.vtp NO_RENDER NO_BASELINE ARGS --load-statefile=${F3D_SOURCE_DIR}/testing/statefiles/test_statefile.json REGEXP "from statefile options")
+# Command line options take precedence over a loaded statefile
+f3d_test(NAME TestStatefileLoadOverride DATA cow.vtp NO_RENDER NO_BASELINE ARGS --load-statefile=${F3D_SOURCE_DIR}/testing/statefiles/test_statefile.json -D render.background.color=1,0,0 REGEXP "'render.background.color' = '1,0,0' from CLI options")
+# A missing statefile is skipped with a warning instead of failing
+f3d_test(NAME TestStatefileLoadMissing DATA cow.vtp NO_RENDER NO_BASELINE ARGS --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/does_not_exist.json REGEXP "Could not open statefile, skipping")
+# A file that exists but is not a valid statefile is reported and skipped
+f3d_test(NAME TestStatefileLoadInvalidContent DATA cow.vtp NO_RENDER NO_BASELINE ARGS --load-statefile=${F3D_SOURCE_DIR}/testing/data/cow.vtp REGEXP "Could not parse statefile content")
+# `-` writes the statefile to the standard output
+f3d_test(NAME TestStatefileSaveStdout DATA cow.vtp NO_RENDER NO_BASELINE ARGS --save-statefile=- REGEXP "\"options\"")
+# `-` reads the statefile from the standard input (`cat state.json | f3d --load-statefile=-`). The working
+# directory is the statefile directory so the relative paths it contains resolve correctly
+f3d_test(NAME TestStatefileLoadStdin PIPED_ARG --load-statefile= DATA ../statefiles/test_statefile.json WORKING_DIR ${F3D_SOURCE_DIR}/testing/statefiles NO_RENDER NO_BASELINE REGEXP "background.color' = '#0000ff' from statefile options" PIPED)
+# Missing parent directories of the statefile path are created
+f3d_test(NAME TestStatefileSaveCreatesDir DATA cow.vtp NO_RENDER NO_BASELINE ARGS --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileSaveCreatesDir/sub/cow.json REGEXP "Statefile saved to")
+
+# File groups: one test saves a statefile with two file groups (only the first one loaded), a
+# dependent test loads it back with no file argument and navigates to the second group. VTKXMLVTU
+# only appears if that not-currently-loaded group was restored from the statefile
+f3d_test(NAME TestStatefileFileGroupsSave DATA cow.vtp dragon.vtu NO_RENDER NO_BASELINE ARGS --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileFileGroups.json REGEXP "Statefile saved to")
+f3d_test(NAME TestStatefileFileGroupsLoad SCRIPT DEPENDS TestStatefileFileGroupsSave NO_BASELINE ARGS --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileFileGroups.json --verbose REGEXP "VTKXMLVTU")
+
+# Camera reframing: the statefile camera is a one-shot restore hint, not a persistent option. One
+# test saves a statefile with two file groups (its camera framed on the first group), a dependent
+# test loads it and navigates to the second group, which must be reframed instead of viewed through
+# the restored camera
+f3d_test(NAME TestStatefileCameraReframeSave DATA suzanne.obj cow.vtp NO_BASELINE ARGS --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileCameraReframe.json REGEXP "Statefile saved to")
+f3d_test(NAME TestStatefileCameraReframe SCRIPT DEPENDS TestStatefileCameraReframeSave ARGS --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileCameraReframe.json THRESHOLD 0.05)
+
 ## Command Script
 f3d_test(NAME TestCommandScriptBasic SCRIPT DATA dragon.vtu) # roll_camera 90;toggle ui.scalar_bar;print_scene_info
 f3d_test(NAME TestCommandScriptElevation SCRIPT DATA dragon.vtu) # elevation_camera 90;toggle ui.scalar_bar;print_scene_info
@@ -483,6 +518,43 @@ f3d_test(NAME TestCommandScriptSetCameraLeft SCRIPT DATA dragon.vtu) # set_camer
 f3d_test(NAME TestCommandScriptCycleCameraIndex SCRIPT DATA Cameras.gltf) # cycle scene.camera.index;cycle scene.camera.index;reload_current_file_group
 f3d_test(NAME TestCommandScriptIncreaseDecreaseCameraIndex SCRIPT DATA Cameras.gltf) # increase scene.camera.index;increase scene.camera.index;increase.camera.index;decrease.camera.index;reload_current_file_group
 f3d_test(NAME TestCommandScriptOpacityMap SCRIPT DATA vase_4comp.vti ARGS -v) # set model.scivis.opacity_map 0,0.03,1,1
+
+# Statefile interactor command load_statefile, each test covers a distinct behavior. The save_statefile
+# command shares its implementation with the --save-statefile option covered above, the tests below
+# instead focus on the load_statefile command which restores a statefile into the running session
+# load_statefile with an explicit path loads the statefile files (cow.vtp), replacing the loaded dragon.vtu
+f3d_test(NAME TestCommandScriptLoadStatefile SCRIPT DATA dragon.vtu WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "cow.vtp" NO_BASELINE)
+# load_statefile with no argument falls back to the --statefile-filename path
+f3d_test(NAME TestCommandScriptLoadStatefileFromOption SCRIPT DATA dragon.vtu WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --statefile-filename=${F3D_SOURCE_DIR}/testing/statefiles/test_statefile.json --verbose REGEXP "cow.vtp" NO_BASELINE)
+# load_statefile resolves the {n} template to the most recent existing statefile
+f3d_test(NAME TestCommandScriptLoadStatefileMostRecent SCRIPT DATA cow.vtp ARGS --statefile-filename=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileMostRecent/state_{n}.json --verbose REGEXP "from statefile options" NO_BASELINE)
+# load_statefile applies over the current interactor state, here overriding a `set` tweak
+f3d_test(NAME TestCommandScriptLoadStatefileOverridesTweak SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "background.color' = '#0000ff' from statefile options" NO_BASELINE)
+# load_statefile of a missing file is skipped with a warning
+f3d_test(NAME TestCommandScriptLoadStatefileMissing SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "Could not open statefile, skipping" NO_BASELINE)
+# load_statefile with an out of range file group index falls back to the first group
+f3d_test(NAME TestCommandScriptLoadStatefileInvalidGroup SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "cow.vtp" NO_BASELINE)
+# save_statefile with no argument and no --statefile-filename falls back to a default auto filename
+f3d_test(NAME TestCommandScriptSaveStatefileAutoFilename SCRIPT DATA cow.vtp WORKING_DIR ${CMAKE_BINARY_DIR}/Testing/Temporary ARGS --verbose REGEXP "Statefile saved to" NO_BASELINE)
+# save_statefile_dialog/load_statefile_dialog open a file dialog, only available with tinyfiledialogs
+if(F3D_MODULE_TINYFILEDIALOGS)
+  f3d_test(NAME TestCommandScriptStatefileDialog SCRIPT DATA cow.vtp ARGS --verbose
+    ENV "CTEST_SAVE_STATEFILE_DIALOG_FILE=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileDialog"
+        "CTEST_LOAD_STATEFILE_DIALOG_FILE=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileDialog.json"
+    REGEXP "background.color' = '#0000ff' from statefile options" NO_BASELINE)
+else()
+  # Without tinyfiledialogs the dialog commands report a clear error instead of disappearing
+  f3d_test(NAME TestCommandScriptStatefileDialogUnavailable SCRIPT DATA cow.vtp ARGS --verbose REGEXP "File dialog is not available" NO_BASELINE)
+endif()
+# save_statefile to a path that cannot be written (a directory) reports the error
+f3d_test(NAME TestCommandScriptSaveStatefileError SCRIPT DATA cow.vtp WORKING_DIR ${F3D_SOURCE_DIR}/testing ARGS --verbose REGEXP "Could not save statefile" NO_BASELINE)
+
+# The clipboard round-trip needs a real onscreen window for the X11 selection to work, it fails with
+# the offscreen backends (egl, osmesa), so only run it where an onscreen window is available, ie on
+# Windows, macOS, or Linux with GLX tests enabled (where the auto backend resolves to GLX).
+if(F3D_MODULE_CLIP AND (WIN32 OR APPLE OR F3D_TESTING_ENABLE_GLX_TESTS))
+  f3d_test(NAME TestCommandScriptStatefileClipboard SCRIPT DATA cow.vtp ARGS --verbose REGEXP "background.color' = '#0000ff' from statefile options" NO_BASELINE)
+endif()
 
 ## Tests to increase coverage
 # Output option test
@@ -769,9 +841,9 @@ f3d_test(NAME TestVersionPrecedenceWithUnknownOption ARGS --version --unknown RE
 
 # PIPED error code path
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
-  f3d_test(NAME TestPipedForced DATA suzanne.ply ARGS --force-reader=PLYReader --verbose PIPED PLYReader REGEXP "Forcing reader" NO_BASELINE)
-  f3d_test(NAME TestPipedForcedInvalid DATA suzanne.ply ARGS --force-reader=invalid PIPED invalid REGEXP "is not a valid force reader" NO_BASELINE)
-  f3d_test(NAME TestPipedForcedInvalidStream DATA beach.nrrd ARGS --force-reader=Nrrd PIPED Nrrd REGEXP "does not support reading streams" NO_BASELINE)
+  f3d_test(NAME TestPipedForced DATA suzanne.ply ARGS --force-reader=PLYReader --verbose PIPED_READER PLYReader REGEXP "Forcing reader" NO_BASELINE PIPED)
+  f3d_test(NAME TestPipedForcedInvalid DATA suzanne.ply ARGS --force-reader=invalid PIPED_READER invalid REGEXP "is not a valid force reader" NO_BASELINE PIPED)
+  f3d_test(NAME TestPipedForcedInvalidStream DATA beach.nrrd ARGS --force-reader=Nrrd PIPED_READER Nrrd REGEXP "does not support reading streams" NO_BASELINE PIPED)
 endif()
 
 ## Filesystem error code path

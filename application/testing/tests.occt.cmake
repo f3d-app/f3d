@@ -12,9 +12,9 @@ f3d_test(NAME TestInvalidSTEP DATA invalid_truncated.stp PLUGIN occt ARGS --verb
 f3d_test(NAME TestInvalidBREP DATA invalid_truncated.brep PLUGIN occt ARGS --verbose REGEXP "failed to load scene" NO_BASELINE)
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251223)
-  f3d_test(NAME TestPipedSTEP DATA f3d.stp PLUGIN occt ARGS --up=+Z PIPED STEP)
-  f3d_test(NAME TestPipedBREP DATA f3d.brep PLUGIN occt ARGS --up=+Z PIPED BREP)
-  f3d_test(NAME TestPipedBinaryBREP DATA f3d.bin.brep PLUGIN occt ARGS --up=+Z PIPED BREP)
+  f3d_test(NAME TestPipedSTEP DATA f3d.stp PLUGIN occt ARGS --up=+Z PIPED_READER STEP PIPED)
+  f3d_test(NAME TestPipedBREP DATA f3d.brep PLUGIN occt ARGS --up=+Z PIPED_READER BREP PIPED)
+  f3d_test(NAME TestPipedBinaryBREP DATA f3d.bin.brep PLUGIN occt ARGS --up=+Z PIPED_READER BREP PIPED)
 endif()
 
 if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
@@ -24,7 +24,7 @@ if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
   f3d_test(NAME TestXCAFColorsXBF DATA xcaf-colors.xbf PLUGIN occt ARGS -csy --up=+Z --line-width=3 --camera-direction=-1,-1,-1)
   f3d_test(NAME TestInvalidXBF DATA invalid_truncated.xbf PLUGIN occt ARGS --verbose REGEXP "failed to load scene" NO_BASELINE)
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251223)
-    f3d_test(NAME TestPipedXBF DATA f3d.xbf PLUGIN occt ARGS --up=+Z PIPED XBF)
+    f3d_test(NAME TestPipedXBF DATA f3d.xbf PLUGIN occt ARGS --up=+Z PIPED_READER XBF PIPED)
   endif()
 
   if (NOT F3D_MACOS_BUNDLE)
