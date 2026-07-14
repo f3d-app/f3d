@@ -36,6 +36,7 @@ struct vtkF3DImguiConsole::Internals
   std::vector<std::string> CommandHistory;
   std::pair<std::string, int> LastInput; // Last input before navigating history
   int CommandHistoryIndexInv = -1;       // Current inverted index in command history navigation
+  bool ScrollToBottom = false;
 
   /**
    * Clear completions from the logs
@@ -155,6 +156,7 @@ struct vtkF3DImguiConsole::Internals
             [](const std::string& candidate)
             { return std::make_pair(Internals::LogType::Completion, candidate); });
         }
+        this->ScrollToBottom = true;
         break;
       }
       case ImGuiInputTextFlags_CallbackHistory:
@@ -331,6 +333,12 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
         {
           ImGui::PopStyleColor();
         }
+      }
+
+      if (this->Pimpl->ScrollToBottom)
+      {
+        ImGui::SetScrollHereY(1.0f);
+        this->Pimpl->ScrollToBottom = false;
       }
 
       if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
