@@ -892,9 +892,7 @@ PYBIND11_MODULE(pyf3d, module)
       [](f3d::window& win, int h) { win.setSize(win.getWidth(), h); })
     .def_property(
       "position",
-      [](const f3d::window& win) {
-        return std::make_pair(win.getPositionX(), win.getPositionY());
-      },
+      [](const f3d::window& win) { return std::make_pair(win.getPositionX(), win.getPositionY()); },
       [](f3d::window& win, std::pair<int, int> xy) { win.setPosition(xy.first, xy.second); })
     .def("render", &f3d::window::render, "Render the window")
     .def("render_to_image", &f3d::window::renderToImage, "Render the window to an image",

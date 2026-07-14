@@ -48,8 +48,7 @@ int TestSDKStatefileCamera([[maybe_unused]] int argc, [[maybe_unused]] char* arg
   // A legacy statefile without a window position is still valid: size is restored and the position
   // is left untouched
   f3d::engine legacy = f3d::engine::create(true);
-  legacy.load(
-    f3d::engine::state::fromString(R"({ "window": { "width": 256, "height": 128 } })"));
+  legacy.load(f3d::engine::state::fromString(R"({ "window": { "width": 256, "height": 128 } })"));
   test("restored legacy window width", legacy.getWindow().getWidth(), 256);
   test("restored legacy window height", legacy.getWindow().getHeight(), 128);
 
