@@ -114,6 +114,22 @@ extern "C"
   F3D_EXPORT void f3d_window_set_position(f3d_window_t* window, int x, int y);
 
   /**
+   * @brief Get the x position of the window.
+   *
+   * @param window Window handle.
+   * @return Window x position in pixels.
+   */
+  F3D_EXPORT int f3d_window_get_position_x(const f3d_window_t* window);
+
+  /**
+   * @brief Get the y position of the window.
+   *
+   * @param window Window handle.
+   * @return Window y position in pixels.
+   */
+  F3D_EXPORT int f3d_window_get_position_y(const f3d_window_t* window);
+
+  /**
    * @brief Set the icon to be shown by a window manager.
    *
    * @param window Window handle.

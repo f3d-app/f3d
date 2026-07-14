@@ -98,6 +98,16 @@ public:
   virtual window& setPosition(int x, int y) = 0;
 
   /**
+   * Get the x position of the window.
+   */
+  [[nodiscard]] virtual int getPositionX() const = 0;
+
+  /**
+   * Get the y position of the window.
+   */
+  [[nodiscard]] virtual int getPositionY() const = 0;
+
+  /**
    * Set the icon to be shown by a window manager.
    * icon should be an unsigned char array.
    * iconSize should be the sizeof(icon).

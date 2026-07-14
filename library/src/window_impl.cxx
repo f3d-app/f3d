@@ -120,6 +120,8 @@ public:
   interactor_impl* Interactor = nullptr;
   fs::path CachePath;
   context::function GetProcAddress;
+  int PositionX = 0;
+  int PositionY = 0;
 };
 
 //----------------------------------------------------------------------------
@@ -306,6 +308,8 @@ window& window_impl::setSize(int width, int height)
 //----------------------------------------------------------------------------
 window& window_impl::setPosition(int x, int y)
 {
+  this->Internals->PositionX = x;
+  this->Internals->PositionY = y;
   if (this->Internals->RenWin->IsA("vtkCocoaRenderWindow"))
   {
     // vtkCocoaRenderWindow has a different behavior than other render windows
@@ -319,6 +323,18 @@ window& window_impl::setPosition(int x, int y)
     this->Internals->RenWin->SetPosition(x, y);
   }
   return *this;
+}
+
+//----------------------------------------------------------------------------
+int window_impl::getPositionX() const
+{
+  return this->Internals->PositionX;
+}
+
+//----------------------------------------------------------------------------
+int window_impl::getPositionY() const
+{
+  return this->Internals->PositionY;
 }
 
 //----------------------------------------------------------------------------

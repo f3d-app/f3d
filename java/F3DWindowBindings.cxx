@@ -93,6 +93,16 @@ extern "C"
     return self;
   }
 
+  JNIEXPORT jint JAVA_BIND(Window, getPositionX)(JNIEnv* env, jobject self)
+  {
+    return GetEngine(env, self)->getWindow().getPositionX();
+  }
+
+  JNIEXPORT jint JAVA_BIND(Window, getPositionY)(JNIEnv* env, jobject self)
+  {
+    return GetEngine(env, self)->getWindow().getPositionY();
+  }
+
   JNIEXPORT jobject JAVA_BIND(Window, setIcon)(JNIEnv* env, jobject self, jbyteArray icon)
   {
     jsize iconSize = env->GetArrayLength(icon);

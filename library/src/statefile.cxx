@@ -46,8 +46,8 @@ std::string captureStateContent(const scene& scene, window& window, const option
     nlohmann::ordered_json windowJson;
     windowJson["width"] = window.getWidth();
     windowJson["height"] = window.getHeight();
-    // TODO: also save/restore the window position (getPositionX/getPositionY, setPosition) once VTK
-    // is fixed. https://gitlab.kitware.com/vtk/vtk/-/work_items/20112
+    windowJson["x"] = window.getPositionX();
+    windowJson["y"] = window.getPositionY();
     root["window"] = windowJson;
   }
 
@@ -144,6 +144,10 @@ void restoreStateContent(scene& scene, window& window, options& options, const s
     {
       const nlohmann::ordered_json& windowJson = root.at("window");
       window.setSize(windowJson.at("width").get<int>(), windowJson.at("height").get<int>());
+      if (windowJson.contains("x") && windowJson.contains("y"))
+      {
+        window.setPosition(windowJson.at("x").get<int>(), windowJson.at("y").get<int>());
+      }
     }
     else
     {

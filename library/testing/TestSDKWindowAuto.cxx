@@ -17,6 +17,8 @@ int TestSDKWindowAuto([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   test("window width", win.getWidth(), 300);
   test("window height", win.getHeight(), 300);
+  test("window position x", win.getPositionX(), 100);
+  test("window position y", win.getPositionY(), 100);
   test("window type", win.getType() != f3d::window::Type::UNKNOWN);
   test("window offscreen", win.isOffscreen());
 

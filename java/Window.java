@@ -101,6 +101,20 @@ public class Window {
     public native Window setPosition(int x, int y);
 
     /**
+     * Get the x position of the window.
+     *
+     * @return window x position
+     */
+    public native int getPositionX();
+
+    /**
+     * Get the y position of the window.
+     *
+     * @return window y position
+     */
+    public native int getPositionY();
+
+    /**
      * Set the icon to be shown by a window manager.
      *
      * @param icon icon data as byte array

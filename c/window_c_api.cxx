@@ -116,6 +116,30 @@ void f3d_window_set_position(f3d_window_t* window, int x, int y)
 }
 
 //----------------------------------------------------------------------------
+int f3d_window_get_position_x(const f3d_window_t* window)
+{
+  if (!window)
+  {
+    return 0;
+  }
+
+  const f3d::window* cpp_window = reinterpret_cast<const f3d::window*>(window);
+  return cpp_window->getPositionX();
+}
+
+//----------------------------------------------------------------------------
+int f3d_window_get_position_y(const f3d_window_t* window)
+{
+  if (!window)
+  {
+    return 0;
+  }
+
+  const f3d::window* cpp_window = reinterpret_cast<const f3d::window*>(window);
+  return cpp_window->getPositionY();
+}
+
+//----------------------------------------------------------------------------
 void f3d_window_set_icon(f3d_window_t* window, const unsigned char* icon, size_t icon_size)
 {
   if (!window || !icon)

@@ -55,6 +55,8 @@ public:
   int getHeight() const override;
   window& setSize(int width, int height) override;
   window& setPosition(int x, int y) override;
+  int getPositionX() const override;
+  int getPositionY() const override;
   window& setIcon(const unsigned char* icon, size_t iconSize) override;
   window& setWindowName(std::string_view windowName) override;
   point3_t getWorldFromDisplay(const point3_t& displayPoint) const override;
