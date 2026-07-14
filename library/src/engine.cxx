@@ -394,6 +394,7 @@ engine::state engine::state::fromClipboard()
   std::string content;
   if (!clip::get_text(content))
   {
+    // Unreachable in testing
     throw engine::statefile_exception("Could not read a state from the clipboard");
   }
   return engine::state::fromString(content);
@@ -437,6 +438,7 @@ void engine::state::toClipboard() const
 #if F3D_MODULE_CLIP
   if (!clip::set_text(this->Content))
   {
+    // Unreachable in testing
     throw engine::statefile_exception("Could not copy the state to the clipboard");
   }
 #else

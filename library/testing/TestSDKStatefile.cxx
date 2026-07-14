@@ -110,6 +110,16 @@ int TestSDKStatefile([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   emptyEng.dump().toFile(tmpDir / "empty_statefile.json");
   test("empty engine has no added file", emptyEng.getScene().getAddedFiles().empty(), true);
 
+  // A statefile without a "files" entry is valid: saving skips the path relativization and loading
+  // skips the path resolution, both leaving the content untouched
+  const fs::path noFilesStatefilePath = tmpDir / "no_files_statefile.json";
+  f3d::engine::state::fromString(R"({ "options": { "ui.scalar_bar": "true" } })")
+    .toFile(noFilesStatefilePath);
+  f3d::engine noFilesEng = f3d::engine::createNone();
+  noFilesEng.load(f3d::engine::state::fromFile(noFilesStatefilePath));
+  test("statefile without files key restores option",
+    noFilesEng.getOptions().getAsString("ui.scalar_bar"), "true"s);
+
   // Loading a statefile without an options entry is valid
   f3d::engine noOptEng = f3d::engine::createNone();
   noOptEng.load(f3d::engine::state::fromString(R"({ "files": [] })"));

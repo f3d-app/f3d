@@ -339,6 +339,7 @@ public:
     }
     catch (const f3d::engine::statefile_exception& ex)
     {
+      // Unreachable in testing
       f3d::log::error(ex.what());
       return false;
     }
@@ -2258,6 +2259,7 @@ void F3DStarter::SaveStatefile(const std::string& filenameTemplate)
     std::optional<std::string> file = f3d::utils::getEnv("CTEST_SAVE_STATEFILE_DIALOG_FILE");
     if (!file.has_value())
     {
+      // Unreachable in testing
       const char* pattern = "*.json";
       char* ptr =
         tinyfd_saveFileDialog("Save Statefile", "f3d_state.json", 1, &pattern, "Statefiles");
@@ -2339,6 +2341,7 @@ void F3DStarter::SaveStatefileToClipboard()
   }
   catch (const f3d::engine::statefile_exception& ex)
   {
+    // Unreachable in testing
     f3d::log::error(ex.what());
   }
 }
@@ -2353,6 +2356,7 @@ void F3DStarter::LoadStatefile(const std::string& source)
     std::optional<std::string> file = f3d::utils::getEnv("CTEST_LOAD_STATEFILE_DIALOG_FILE");
     if (!file.has_value())
     {
+      // Unreachable in testing
       const char* pattern = "*.json";
       char* ptr =
         tinyfd_openFileDialog("Load Statefile", nullptr, 1, &pattern, "Statefiles", false);

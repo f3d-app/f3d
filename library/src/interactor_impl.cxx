@@ -1346,6 +1346,7 @@ interactor& interactor_impl::initCommands()
       }
       catch (const f3d::engine::statefile_exception& ex)
       {
+        // Unreachable in testing
         log::error(ex.what());
       }
     },
@@ -1366,6 +1367,7 @@ interactor& interactor_impl::initCommands()
       }
       catch (const f3d::engine::statefile_exception& ex)
       {
+        // Unreachable in testing
         log::error(ex.what());
       }
     },
