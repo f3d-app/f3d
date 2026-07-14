@@ -99,7 +99,7 @@ To run the CI, just add a comment like this in your PR:
 - `\ci wasm`: Build docker images and then build libf3d with webassambly.
 - `\ci android`: Build docker images and then build libf3d for android.
 - `\ci website`: Build the f3d.app website using current state of the doc.
-- `\ci full`: All of the above, required before merging
+- `\ci full`: All of the above, required before merging.
 
 After this, the CI will always be run every time you push to your branch.
 To remove a label, use the same syntax with a `-` before the label, eg: `\ci -fast`.
