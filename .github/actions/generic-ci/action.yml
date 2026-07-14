@@ -227,7 +227,7 @@ runs:
     # This is needed because F3D_TESTING_ENABLE_WGL_TESTS options is enabled
     - name: Install Mesa Windows
       if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v2
+      uses: f3d-app/install-mesa-windows-action@v3
       with:
         path: ${{github.workspace}}\build\bin_Release
 
