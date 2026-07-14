@@ -12,9 +12,13 @@
 
 ### AI Disclosure
 
-- [ ] I did not use AI to generate any of the content of that pull request
-- [ ] I used AI to generate code in that pull request, if yes [please disclose](https://f3d.app/dev/AI_POLICY) which part of the code was generated and with which model.
-- ...
+- [ ] I have not used AI to generate any of the content of this pull request
+- [ ] I have used AI to generate code in this pull request:
+  - [ ] I have carefully read and understood the [AI policy](https://f3d.app/dev/AI_POLICY).
+  - [ ] I have carefully reviewed and completely understood every generated line.
+  - [ ] I disclose below which parts of the code were generated and with which AI model:
+
+...
 
 ### Continuous integration
 
