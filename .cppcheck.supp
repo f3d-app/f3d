@@ -6,13 +6,15 @@ unusedFunction
 unknownMacro
 
 // external libraries
+*:external/clip/*.cpp
+*:external/clip/*.h
+*:external/cxxopts/cxxopts.hpp
+*:external/dmon/dmon.h
+*:external/imgui/*.cpp
+*:external/imgui/*.h
 *:external/nlohmann_json/nlohmann/json.hpp
 *:external/tinyfiledialogs/tinyfiledialogs.cxx
 *:external/tinyfiledialogs/tinyfiledialogs.h
-*:external/cxxopts/cxxopts.hpp
-*:external/dmon/dmon.h
-*:external/imgui/*.h
-*:external/imgui/*.cpp
 
 // generated files
 *:*libf3dSDKTests.cxx
