@@ -23,7 +23,7 @@ jobs:
     name: Update LFS data cache
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:fast') ||
-      contains(github.event.pull_request.labels.*.name, 'ci:not_as_fast') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:extended') ||
       contains(github.event.pull_request.labels.*.name, 'ci:linux') ||
       contains(github.event.pull_request.labels.*.name, 'ci:macos_arm') ||
       contains(github.event.pull_request.labels.*.name, 'ci:macos_intel') ||
@@ -158,10 +158,10 @@ jobs:
   #----------------------------------------------------------------------------
   # Linux not as fast CI: Build and test a single complete linux CI
   #----------------------------------------------------------------------------
-  linux_fast:
+  linux_extended:
     needs: cache_lfs
     if: |
-      contains(github.event.pull_request.labels.*.name, 'ci:not_as_fast') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:extended') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
     runs-on: ubuntu-24.04
@@ -183,7 +183,7 @@ jobs:
         uses: ./source/.github/actions/generic-ci
         with:
           versions_file: ./source/.github/workflows/versions.json
-          build_type: not-as-fast
+          build_type: extended
           vtk_version: commit
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
