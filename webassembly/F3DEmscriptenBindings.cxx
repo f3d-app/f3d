@@ -230,6 +230,17 @@ EMSCRIPTEN_BINDINGS(f3d)
       },
       emscripten::return_value_policy::reference())
     .function("clear", &f3d::scene::clear, emscripten::return_value_policy::reference())
+    .function(
+      "getAddedFiles",
+      +[](f3d::scene& scene) -> emscripten::val
+      {
+        std::vector<std::string> files;
+        for (const std::filesystem::path& file : scene.getAddedFiles())
+        {
+          files.push_back(file.string());
+        }
+        return containerToJSArray(files);
+      })
     .function("loadAnimationTime", &f3d::scene::loadAnimationTime,
       emscripten::return_value_policy::reference())
     .function(
@@ -496,6 +507,17 @@ EMSCRIPTEN_BINDINGS(f3d)
     .property("hasSceneReader", &f3d::engine::readerInformation::HasSceneReader)
     .property("hasGeometryReader", &f3d::engine::readerInformation::HasGeometryReader);
 
+  emscripten::class_<f3d::engine::state>("EngineState")
+    .class_function(
+      "fromString",
+      +[](const std::string& content) { return f3d::engine::state::fromString(content); })
+    .class_function(
+      "fromFile", +[](const std::string& path) { return f3d::engine::state::fromFile(path); })
+    .function("toString", &f3d::engine::state::toString)
+    .function(
+      "toFile",
+      +[](const f3d::engine::state& state, const std::string& path) { state.toFile(path); });
+
   emscripten::class_<f3d::engine>("Engine")
     .class_function(
       "create", +[](std::string canvas) { return f3d::engine::createWasm(canvas); },
@@ -512,6 +534,11 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("getOptions", &f3d::engine::getOptions, emscripten::return_value_policy::reference())
     .function("getWindow", &f3d::engine::getWindow, emscripten::return_value_policy::reference())
     .function("getScene", &f3d::engine::getScene, emscripten::return_value_policy::reference())
+    .function(
+      "dump", +[](f3d::engine& engine) { return engine.dump(); })
+    .function(
+      "load", +[](f3d::engine& engine, const f3d::engine::state& state) -> f3d::engine&
+      { return engine.load(state); }, emscripten::return_value_policy::reference())
     .function(
       "getInteractor", &f3d::engine::getInteractor, emscripten::return_value_policy::reference())
     .class_function("autoloadPlugins", &f3d::engine::autoloadPlugins)

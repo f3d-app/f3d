@@ -1,0 +1,4 @@
+set render.background.color 0,0,1
+save_statefile_dialog
+set render.background.color 1,0,0
+load_statefile_dialog

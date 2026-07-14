@@ -11,12 +11,12 @@ f3d_test(NAME TestAssimpInvalid DATA invalid_truncated.fbx PLUGIN assimp REGEXP 
 f3d_test(NAME TestAssimpMetaDataImporter DATA duck.fbx PLUGIN assimp ARGS -m UI)
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251016)
-  f3d_test(NAME TestPipedOFF DATA teapot.off ARGS --up=+Z PLUGIN assimp PIPED OFF)
-  f3d_test(NAME TestPiped3MF DATA cube_gears.3mf PLUGIN assimp PIPED 3MF)
-  f3d_test(NAME TestPipedFBX DATA phong_cube.fbx PLUGIN assimp PIPED FBX)
-  f3d_test(NAME TestPipedDAE DATA duck.dae PLUGIN assimp PIPED COLLADA) # Texture not loaded
-  f3d_test(NAME TestPipedX DATA anim_test.x PLUGIN assimp PIPED DirectX)
-  f3d_test(NAME TestPipedDXF DATA PinkEggFromLW.dxf ARGS --background-color=1,1,1 -p PLUGIN assimp PIPED DXF)
+  f3d_test(NAME TestPipedOFF DATA teapot.off ARGS --up=+Z PLUGIN assimp PIPED_READER OFF PIPED)
+  f3d_test(NAME TestPiped3MF DATA cube_gears.3mf PLUGIN assimp PIPED_READER 3MF PIPED)
+  f3d_test(NAME TestPipedFBX DATA phong_cube.fbx PLUGIN assimp PIPED_READER FBX PIPED)
+  f3d_test(NAME TestPipedDAE DATA duck.dae PLUGIN assimp PIPED_READER COLLADA PIPED) # Texture not loaded
+  f3d_test(NAME TestPipedX DATA anim_test.x PLUGIN assimp PIPED_READER DirectX PIPED)
+  f3d_test(NAME TestPipedDXF DATA PinkEggFromLW.dxf ARGS --background-color=1,1,1 -p PLUGIN assimp PIPED_READER DXF PIPED)
 endif()
 
 f3d_test(NAME TestVerboseAssimp DATA duck.fbx ARGS --verbose PLUGIN assimp NO_BASELINE REGEXP "LOD3sp")

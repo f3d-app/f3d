@@ -38,6 +38,7 @@ public:
   scene& add(std::shared_ptr<mesh_view> mesh) override;
   scene& add(const std::byte* buffer, std::size_t size) override;
   scene& clear() override;
+  std::vector<std::filesystem::path> getAddedFiles() const override;
   int addLight(const light_state_t& lightState) const override;
   int getLightCount() const override;
   light_state_t getLight(int index) const override;

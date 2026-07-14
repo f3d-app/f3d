@@ -212,6 +212,71 @@ extern "C"
   F3D_EXPORT void f3d_engine_set_options(f3d_engine_t* engine, f3d_options_t* options);
 
   /**
+   * @brief Capture the current engine state as a JSON statefile string.
+   *
+   * File paths are stored as absolute paths.
+   *
+   * @param engine Engine handle.
+   * @return Heap-allocated JSON string on success, NULL on failure.
+   *         The caller must free it using f3d_engine_free_string().
+   */
+  F3D_EXPORT const char* f3d_engine_dump_to_string(f3d_engine_t* engine);
+
+  /**
+   * @brief Capture the current engine state into a JSON statefile.
+   *
+   * File paths contained by the directory of the file are stored relatively.
+   *
+   * @param engine Engine handle.
+   * @param file_path Path to write the statefile to.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_engine_dump_to_file(f3d_engine_t* engine, const char* file_path);
+
+  /**
+   * @brief Capture the current engine state into the system clipboard as a JSON string.
+   *
+   * @param engine Engine handle.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_engine_dump_to_clipboard(f3d_engine_t* engine);
+
+  /**
+   * @brief Restore the engine from a JSON statefile string.
+   *
+   * @param engine Engine handle.
+   * @param content JSON statefile content to restore from.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_engine_load_from_string(f3d_engine_t* engine, const char* content);
+
+  /**
+   * @brief Restore the engine from a JSON statefile.
+   *
+   * File paths stored relatively are resolved against the directory of the file.
+   *
+   * @param engine Engine handle.
+   * @param file_path Path to read the statefile from.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_engine_load_from_file(f3d_engine_t* engine, const char* file_path);
+
+  /**
+   * @brief Restore the engine from the JSON content of the system clipboard.
+   *
+   * @param engine Engine handle.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_engine_load_from_clipboard(f3d_engine_t* engine);
+
+  /**
+   * @brief Free a single string returned by the engine C API.
+   *
+   * @param str String to free.
+   */
+  F3D_EXPORT void f3d_engine_free_string(const char* str);
+
+  /**
    * @brief Get the options object from the engine.
    *
    * @param engine Engine handle.
