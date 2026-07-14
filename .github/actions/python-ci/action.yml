@@ -91,6 +91,7 @@ runs:
         -DF3D_PLUGIN_BUILD_VDB=${{ runner.os == 'macOS' && 'OFF' || 'ON' }};
         -DF3D_PLUGIN_BUILD_WEBIFC=ON;
         -DF3D_MACOS_BUNDLE=OFF;
+        -DF3D_MODULE_CLIP=ON;
         -DF3D_MODULE_EXR=ON;
         -DF3D_MODULE_UI=ON;
         -DF3D_MODULE_WEBP=ON;
