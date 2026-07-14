@@ -240,6 +240,25 @@ public class Camera {
     public Camera resetToBounds() {
         return resetToBounds(0.9);
     }
+    /**
+     * Get the world-space azimuth angle of the camera in degrees.
+     *
+     * @return azimuth angle in degrees
+     */
+    public native double getWorldAzimuth();
 
+    /**
+     * Get the world-space elevation angle of the camera in degrees.
+     *
+     * @return elevation angle in degrees
+     */
+    public native double getWorldElevation();
+
+    /**
+     * Get the distance between the camera position and its focal point.
+     *
+     * @return distance value
+     */
+    public native double getDistance();
     private long mNativeAddress;
 }
