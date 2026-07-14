@@ -141,6 +141,26 @@ public:
   void SetupCamera(const CameraConfiguration& camConf)
   {
     f3d::camera& cam = this->Engine->getWindow().getCamera();
+
+    // Handle direction first as it needs reset for proper positions
+    if (camConf.CameraPosition.size() != 3 && camConf.CameraDirection.has_value())
+    {
+      f3d::vector3_t dir = camConf.CameraDirection.value();
+      f3d::point3_t foc;
+      f3d::point3_t pos;
+      cam.getFocalPoint(foc);
+      for (int i = 0; i < 3; i++)
+      {
+        pos[i] = foc[i] - dir[i];
+      }
+      cam.setPosition(pos);
+    }
+
+    // Reset position using bounds
+    double defaultZoom = this->LibOptions.interactor.style == "2d" ? 1.0 : 0.9;
+    cam.resetToBounds(camConf.CameraZoomFactor > 0 ? camConf.CameraZoomFactor : defaultZoom);
+
+    // Take hard coded camera parameters into account
     if (camConf.CameraPosition.size() == 3)
     {
       f3d::point3_t pos;
@@ -162,27 +182,7 @@ public:
       cam.setViewAngle(camConf.CameraViewAngle);
     }
 
-    if (camConf.CameraPosition.size() != 3 && camConf.CameraDirection.has_value())
-    {
-      f3d::vector3_t dir = camConf.CameraDirection.value();
-      f3d::point3_t foc;
-      f3d::point3_t pos;
-      cam.getFocalPoint(foc);
-      for (int i = 0; i < 3; i++)
-      {
-        pos[i] = foc[i] - dir[i];
-      }
-      cam.setPosition(pos);
-    }
-
     cam.azimuth(camConf.CameraAzimuthAngle).elevation(camConf.CameraElevationAngle);
-
-    if (camConf.CameraPosition.size() != 3)
-    {
-      double defaultZoom = this->LibOptions.interactor.style == "2d" ? 1.0 : 0.9;
-      cam.resetToBounds(camConf.CameraZoomFactor > 0 ? camConf.CameraZoomFactor : defaultZoom);
-    }
-
     cam.setCurrentAsDefault();
   }
 

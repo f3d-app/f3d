@@ -126,6 +126,7 @@ f3d_test(NAME TestVerboseCamera DATA Cameras.gltf ARGS --camera-index=1 --verbos
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   f3d_test(NAME TestCameraConfiguration DATA suzanne.obj ARGS --camera-position=0,0,-10 -x --camera-view-up=+X --camera-focal-point=1,0,0 --camera-view-angle=20 --camera-azimuth-angle=40 --camera-elevation-angle=-80 --camera-direction=12,34,56 --camera-zoom-factor=78 UI)
+  f3d_test(NAME TestCameraConfigurationPartial DATA suzanne.obj ARGS --camera-focal-point=1,0,0 --camera-view-angle=20)
 endif()
 
 ## Volume
