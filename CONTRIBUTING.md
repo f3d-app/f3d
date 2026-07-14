@@ -85,17 +85,17 @@ Make sure to check the results for yourself and ask for help if needed.
 
 To run the CI, just add a comment like this in your PR:
 
-- `\ci fast`: A fast linux job, always make this work first.
-- `\ci not_as_fast`: A "not as fast" linux job, always make this work second.
-- `\ci linux: Many different linux jobs across CMake options, dependencies and vtk versions.
-- `\ci windows: Cross VTK versions of Windows jobs.
-- `\ci macos_intel: Cross VTK versions of macOS intel jobs.
-- `\ci macos_arm: Cross VTK versions of macOS arm64 jobs.
-- `\ci coverage: A linux job dedicated to coverage computation.
-- `\ci sanitizer: Linux jobs running with different sanitizer settings.
-- `\ci analysis: A Linux cppcheck job.
-- `\ci external: A linux job building the libf3d as a subproject of a larger project.
-- `\ci python: Cross-platform cross-version jobs building libf3d for python.
+- `\ci fast`: A fast linux job without optional dependencies, always make this work first.
+- `\ci extended`: An extended linux job with depencies and recent VTK, always make this work second.
+- `\ci linux`: Many different linux jobs across CMake options, dependencies and vtk versions.
+- `\ci windows`: Cross VTK versions of Windows jobs.
+- `\ci macos_intel`: Cross VTK versions of macOS intel jobs.
+- `\ci macos_arm`: Cross VTK versions of macOS arm64 jobs.
+- `\ci coverage`: A linux job dedicated to coverage computation.
+- `\ci sanitizer`: Linux jobs running with different sanitizer settings.
+- `\ci analysis`: A Linux cppcheck job.
+- `\ci external`: A linux job building the libf3d as a subproject of a larger project.
+- `\ci python`: Cross-platform cross-version jobs building libf3d for python.
 - `\ci wasm`: Build docker images and then build libf3d with webassambly.
 - `\ci android`: Build docker images and then build libf3d for android.
 - `\ci website`: Build the f3d.app website using current state of the doc.
@@ -103,6 +103,8 @@ To run the CI, just add a comment like this in your PR:
 
 After this, the CI will always be run every time you push to your branch.
 To remove a label, use the same syntax with a `-` before the label, eg: `\ci -fast`.
+
+Please add only the labels required to work on your feature, in order to avoid using the limited pool of runners for no good reason.
 
 F3D continuous integration will also check the coverage as it is a good way to evaluate if new features are being tested or not.
 When adding code to F3D, always try to cover it by adding/modifying [tests](doc/dev/06-TESTING.md).
