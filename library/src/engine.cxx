@@ -392,10 +392,18 @@ engine::state engine::state::fromClipboard()
 {
 #if F3D_MODULE_CLIP
   std::string content;
-  if (!clip::get_text(content))
+  try
+  {
+    if (!clip::get_text(content))
+    {
+      // Unreachable in testing
+      throw engine::statefile_exception("Could not read a state from the clipboard");
+    }
+  }
+  catch (const clip::clip_exception& ex)
   {
     // Unreachable in testing
-    throw engine::statefile_exception("Could not read a state from the clipboard");
+    throw engine::statefile_exception(std::string("Could not use clip: ") + ex.what());
   }
   return engine::state::fromString(content);
 #else
@@ -436,11 +444,20 @@ void engine::state::toFile(const fs::path& filePath) const
 void engine::state::toClipboard() const
 {
 #if F3D_MODULE_CLIP
-  if (!clip::set_text(this->Content))
+  try
+  {
+    if (!clip::set_text(this->Content))
+    {
+      // Unreachable in testing
+      throw engine::statefile_exception("Could not copy the state to the clipboard");
+    }
+  }
+  catch (const clip::clip_exception& ex)
   {
     // Unreachable in testing
-    throw engine::statefile_exception("Could not copy the state to the clipboard");
+    throw engine::statefile_exception(std::string("Could not use clip: ") + ex.what());
   }
+
 #else
   throw engine::statefile_exception(
     "Clipboard support is not available in this build, cannot copy the state to the clipboard");
