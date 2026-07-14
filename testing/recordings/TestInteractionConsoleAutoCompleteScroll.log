@@ -1,10 +1,12 @@
 # StreamVersion 1.2
 RenderEvent 845 163 0 0 0 0 0
 
+# Press `Escape` to display console
 KeyPressEvent 845 163 0 27 1 Escape 0
 CharEvent 845 163 0 27 1 Escape 0
 KeyReleaseEvent 845 163 0 27 1 Escape 0
 
+# print_options_info
 KeyPressEvent 845 163 0 112 1 p 0
 CharEvent 845 163 0 112 1 p 0
 KeyReleaseEvent 845 163 0 112 1 p 0
@@ -85,6 +87,7 @@ KeyPressEvent 845 163 0 13 1 Return 0
 CharEvent 845 163 0 13 1 Return 0
 KeyReleaseEvent 845 163 0 13 1 Return 0
 
+# Scroll up
 MouseWheelForwardEvent 845 163 0 0 0 Return 0
 MouseWheelForwardEvent 845 163 0 0 0 Return 0
 MouseWheelForwardEvent 845 163 0 0 0 Return 0
@@ -115,6 +118,7 @@ MouseWheelForwardEvent 845 163 0 0 0 Return 0
 MouseWheelForwardEvent 845 163 0 0 0 Return 0
 MouseWheelForwardEvent 845 163 0 0 0 Return 0
 
+# print_
 KeyPressEvent 845 163 0 112 1 p 0
 CharEvent 845 163 0 112 1 p 0
 KeyReleaseEvent 845 163 0 112 1 p 0
@@ -142,6 +146,7 @@ CharEvent 845 163 1 95 1 underscore 0
 KeyReleaseEvent 845 163 1 95 1 underscore 0
 KeyReleaseEvent 845 163 0 0 1 Shift_L 0
 
+# Trigger completions
 KeyPressEvent 845 163 0 9 1 Tab 0
 CharEvent 845 163 0 9 1 Tab 0
 KeyReleaseEvent 845 163 0 9 1 Tab 0
