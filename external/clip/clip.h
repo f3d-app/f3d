@@ -10,6 +10,7 @@
 
 #include <cassert>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -208,6 +209,13 @@ namespace clip {
   CLIP_EXTERN void set_x11_wait_timeout(int msecs);
   CLIP_EXTERN int get_x11_wait_timeout();
 
+  /**
+   * An exception that can be thrown by the clip in case of failure
+   */
+  struct clip_exception : public std::runtime_error
+  {
+    explicit clip_exception(const std::string& what = "");
+  };
 } // namespace clip
 
 #endif // CLIP_H_INCLUDED

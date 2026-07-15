@@ -1,4 +1,4 @@
-- clip: v1.15
+- clip: https://github.com/dacap/clip/pull/99
 - cxxopts: v3.3.1
 - dmon: 1.3.10
 - imgui: v1.92.8
