@@ -142,6 +142,8 @@ f3d_test(NAME TestVolumeColoringArray DATA waveletArrays.vti ARGS -vb --coloring
 f3d_test(NAME TestNormalGlyphsPerspectiveEnable DATA suzanne.obj ARGS --normal-glyphs)
 f3d_test(NAME TestNormalGlyphsOrthographicEnable DATA suzanne.obj ARGS --normal-glyphs --camera-orthographic)
 f3d_test(NAME TestNormalGlyphsScale DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-scale=0.1)
+f3d_test(NAME TestNormalGlyphsColor DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-color=1,0,0)
+f3d_test(NAME TestNormalGlyphsArrowResolution DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-arrow-resolution=3)
 f3d_test(NAME TestNormalGlyphsNoNormalsAvailable DATA cow.vtp ARGS --normal-glyphs NO_BASELINE REGEXP "does not contain any normals")
 
 ## Textures
