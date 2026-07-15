@@ -120,7 +120,7 @@ runs:
     # Needed for examples/libf3d/python/qt6/test_minimal_qt6.py
     - name: Install Mesa Windows
       if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v2
+      uses: f3d-app/install-mesa-windows-action@v3
       with:
         path: ${{ env.Python_ROOT_DIR }}
 
