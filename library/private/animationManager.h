@@ -212,6 +212,16 @@ private:
    */
   void SetCheatSheetConfigured(bool configured);
 
+  /**
+   * Internal setter for Mode.
+   */
+  void SetAnimationMode(const std::string& mode);
+
+  /**
+   * Internal setter for repeats.
+   */
+  void SetAnimationRepeat(int repeat);
+
   options& Options;
   window_impl& Window;
   vtkF3DMetaImporter* Importer = nullptr;
@@ -231,6 +241,19 @@ private:
   // Dynamic options
   bool Autoplay = false;
   double SpeedFactor = 1.0;
+
+  /**
+   * Enum listing possible blending modes.
+   */
+  enum class AnimationModeType : unsigned char
+  {
+    FORWARD,
+    BACKWARD,
+    PINGPONG
+  };
+  AnimationModeType AnimationMode = AnimationModeType::FORWARD;
+  int AnimationMaxRepeat = -1;
+  int AnimationCurrentRepeat = 0;
 };
 }
 }
