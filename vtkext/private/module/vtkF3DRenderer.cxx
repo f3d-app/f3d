@@ -18,6 +18,7 @@
 #include "vtkF3DSolidBackgroundPass.h"
 #include "vtkF3DUserRenderPass.h"
 
+#include <vtkArrowSource.h>
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -1726,6 +1727,33 @@ void vtkF3DRenderer::SetBlurCircleOfConfusionRadius(double radius)
 void vtkF3DRenderer::SetNormalGlyphScaleMultiplier(double multiplier)
 {
   this->NormalGlyphScaleMultiplier = multiplier;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetNormalGlyphsColor(const std::vector<double>& color)
+{
+  for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
+  {
+    normalGlyph.Actor->GetProperty()->SetColor(color.data());
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetNormalGlyphsArrowResolution(int resolution)
+{
+  for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
+  {
+    if (normalGlyph.GlyphMapper && normalGlyph.GlyphMapper->GetSourceConnection(0))
+    {
+      vtkArrowSource* arrowSource = vtkArrowSource::SafeDownCast(
+        normalGlyph.GlyphMapper->GetSourceConnection(0)->GetProducer());
+      if (arrowSource)
+      {
+        arrowSource->SetTipResolution(resolution);
+        arrowSource->SetShaftResolution(resolution);
+      }
+    }
+  }
 }
 
 //----------------------------------------------------------------------------

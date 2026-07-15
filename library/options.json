@@ -541,6 +541,20 @@
           "max": "10.0",
           "increment": "0.1"
         }
+      },
+      "color": {
+        "type": "color",
+        "parsed_default_value": "f3d_white"
+      },
+      "arrow_resolution": {
+        "type": "int",
+        "default_value": "6",
+        "domain": {
+          "style": "range",
+          "min": "3",
+          "max": "30",
+          "increment": "1"
+        }
       }
     },
     "volume": {

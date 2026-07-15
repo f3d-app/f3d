@@ -380,6 +380,14 @@ Adjusts the scales of normal glyphs.
 | ----------------------------------------- | ----------------------------------------- |
 | ![](./images/normal_glyphs_scale_0.3.png) | ![](./images/normal_glyphs_scale_0.7.png) |
 
+### `--normal-glyphs-color` (_color_, default: `f3d_white`)
+
+Color of the normal glyphs
+
+### `--normal-glyphs-arrow-resolution` (_int_, default: `6`)
+
+Resolution/discretization of the normal glyph arrows
+
 ### `-o`, `--point-sprites=<none|sphere|gaussian|circle|stddev|bound|cross>` (_string_, default: `none`, implicit: `sphere`)
 
 Select _points sprites_ types to show instead of the geometry.

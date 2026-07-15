@@ -361,6 +361,16 @@ public:
   void SetNormalGlyphScaleMultiplier(double multiplier);
 
   /**
+   * Sets the normal glyphs color
+   */
+  void SetNormalGlyphsColor(const std::vector<double>& color);
+
+  /**
+   * Sets the normal glyphs arrow resolution
+   */
+  void SetNormalGlyphsArrowResolution(int resolution);
+
+  /**
    * Set the visibility of the point sprites actor.
    * It will only be shown if raytracing and volume are not enabled
    */
