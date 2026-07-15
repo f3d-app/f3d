@@ -192,9 +192,7 @@ extern "C"
     }
     catch (const f3d::image::write_exception& e)
     {
-      env->ReleaseStringUTFChars(filePath, path);
       F3DThrowJavaException(env, "app/f3d/F3D/Image$WriteException", e.what());
-      return nullptr;
     }
 
     env->ReleaseStringUTFChars(filePath, path);

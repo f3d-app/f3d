@@ -206,9 +206,7 @@ extern "C"
     }
     catch (const f3d::scene::load_failure_exception& e)
     {
-      env->ReleaseStringUTFChars(path, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Scene$LoadFailureException", e.what());
-      return nullptr;
     }
     env->ReleaseStringUTFChars(path, str);
     return self;
@@ -229,7 +227,6 @@ extern "C"
     catch (const f3d::scene::load_failure_exception& e)
     {
       F3DThrowJavaException(env, "app/f3d/F3D/Scene$LoadFailureException", e.what());
-      return nullptr;
     }
     return self;
   }
@@ -249,7 +246,6 @@ extern "C"
     catch (const f3d::scene::load_failure_exception& e)
     {
       F3DThrowJavaException(env, "app/f3d/F3D/Scene$LoadFailureException", e.what());
-      return nullptr;
     }
     return self;
   }
@@ -271,7 +267,6 @@ extern "C"
     catch (const f3d::scene::load_failure_exception& e)
     {
       F3DThrowJavaException(env, "app/f3d/F3D/Scene$LoadFailureException", e.what());
-      return nullptr;
     }
     env->ReleaseByteArrayElements(buffer, bufferData, 0);
     return self;
@@ -337,7 +332,6 @@ extern "C"
     catch (const f3d::scene::light_exception& e)
     {
       F3DThrowJavaException(env, "app/f3d/F3D/Scene$LightException", e.what());
-      return nullptr;
     }
     return self;
   }
@@ -351,7 +345,6 @@ extern "C"
     catch (const f3d::scene::light_exception& e)
     {
       F3DThrowJavaException(env, "app/f3d/F3D/Scene$LightException", e.what());
-      return nullptr;
     }
     return self;
   }
