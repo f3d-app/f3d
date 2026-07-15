@@ -30,6 +30,7 @@ add_executable(f3d_c_api_tests ${_f3d_c_api_driver_src})
 
 target_link_libraries(f3d_c_api_tests PRIVATE c_api)
 target_compile_definitions(f3d_c_api_tests PRIVATE F3D_TESTING_DATA_DIR="${F3D_SOURCE_DIR}/testing/data/")
+target_compile_definitions( f3d_c_api_tests PRIVATE F3D_TESTING_BUILD_DIR="${CMAKE_BINARY_DIR}/")
 target_compile_definitions(f3d_c_api_tests PRIVATE F3D_TESTING_TEMP_DIR="${CMAKE_BINARY_DIR}/Testing/Temporary/")
 
 if(F3D_TESTING_ENABLE_GLX_TESTS)
