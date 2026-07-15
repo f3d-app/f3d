@@ -257,6 +257,13 @@ public:
   void SetAnimationProgressColor(const std::array<double, 3>& color);
 
   /**
+   * Set the animation playback speed factor, shown next to the animation name as "(xN)"
+   * unless it is 1
+   * 1.0 by default
+   */
+  void SetAnimationSpeedFactor(double speedFactor);
+
+  /**
    * Get the animation progress bar footprint in pixels (bar height plus a margin
    * gap), or 0 when no bar is shown. Computed from the current state so it is
    * available before the bar is actually rendered.
@@ -418,6 +425,7 @@ protected:
   std::pair<double, double> AnimationTimeRange = { 0.0, 0.0 };
   std::array<double, 3> AnimationProgressColor = { 0, 0, 0 };
   double AnimationCurrentTime = 0.0;
+  double AnimationSpeedFactor = 1.0;
   std::string AnimationName = "";
   std::vector<double> AnimationKeyFrames;
 

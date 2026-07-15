@@ -585,7 +585,13 @@ public:
   void SetAnimationProgressColor(const std::array<double, 3>& color);
 
   /**
-   * Update the current animation time, meant to be pushed every tick during playback
+   * Set the animation playback speed factor, for display only, shown next to the animation name
+   */
+  void SetAnimationSpeedFactor(double speedFactor);
+
+  /**
+   * Update the current animation time, for display only, meant to be pushed every tick during
+   * playback
    */
   void UpdateAnimationTime(double currentTime);
 

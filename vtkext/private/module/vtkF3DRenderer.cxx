@@ -3779,6 +3779,12 @@ void vtkF3DRenderer::SetAnimationProgressColor(const std::array<double, 3>& colo
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetAnimationSpeedFactor(double speedFactor)
+{
+  this->UIActor->SetAnimationSpeedFactor(speedFactor);
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::UpdateAnimationTime(double currentTime)
 {
   this->UIActor->UpdateAnimationTime(currentTime);
