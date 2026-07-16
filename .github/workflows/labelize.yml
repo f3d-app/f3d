@@ -35,7 +35,7 @@ jobs:
           label="$COMMENT"
           label=${label#* }
           label=${label%% *}
-          label=${label//[^a-z-]/}
+          label=${label//[^a-z-_]/}
           echo "F3D_LABEL_COMMENT=$label" >> $GITHUB_ENV
 
       # Stop the job if cache is being added
