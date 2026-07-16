@@ -3,6 +3,7 @@ set(f3djsTests_list
   "test_depth"
   "test_engine"
   "test_image"
+  "test_image_stream"
   "test_interactor"
   "test_options"
   "test_render"
