@@ -118,7 +118,6 @@ runs:
       shell: bash
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
-    # Needed for examples/libf3d/python/qt6/test_minimal_qt6.py
     - name: Install Mesa Windows
       if: runner.os == 'Windows'
       uses: f3d-app/install-mesa-windows-action@v3
