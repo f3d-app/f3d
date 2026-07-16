@@ -133,7 +133,14 @@ void animationManager::ToggleAnimation()
       // Initialize time if not already
       if (!this->CurrentTimeSet)
       {
-        this->CurrentTime = this->TimeRange[0];
+        if (this->AnimationMode == AnimationModeType::BACKWARD)
+        {
+          this->CurrentTime = TimeRange[1];
+        }
+        else
+        {
+          this->CurrentTime = TimeRange[0];
+        }
         this->CurrentTimeSet = true;
       }
     }
@@ -182,8 +189,9 @@ void animationManager::Tick()
           break;
         case AnimationModeType::BACKWARD:
           this->AnimationDirection = -1;
-          this->CurrentTime = this->TimeRange[0] +
-            modulo(this->CurrentTime - this->TimeRange[0], this->TimeRange[1] - this->TimeRange[0]);
+          this->CurrentTime = this->TimeRange[1] -
+            modulo(this->TimeRange[1] - this->CurrentTime, this->TimeRange[1] - this->TimeRange[0]);
+          break;
         default:
           this->AnimationDirection = 1;
           this->CurrentTime = this->TimeRange[0] +
@@ -204,6 +212,7 @@ void animationManager::Tick()
   if (this->AnimationMaxRepeat != -1 && this->AnimationCurrentRepeat == this->AnimationMaxRepeat)
   {
     this->Playing = false;
+    this->AnimationCurrentRepeat = 0;
   }
 }
 
