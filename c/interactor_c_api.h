@@ -463,6 +463,27 @@ extern "C"
     f3d_interactor_t* interactor, f3d_interactor_callback_t callback, void* user_data);
 
   /**
+   * @brief Notification callback signature.
+   *
+   * Return zero to prevent standard notification from being displayed.
+   * Arguments are the description, value, bindings, and duration of the notification.
+   */
+  typedef int (*f3d_interactor_notification_callback_t)(const char* desc, const char* value,
+    const char* bind, double duration, void* user_data);
+
+  /**
+   * @brief Set the notification callback.
+   *
+   * The callback is invoked when a notification is triggered.
+   *
+   * @param interactor Interactor handle.
+   * @param callback Notification callback, or NULL to clear.
+   * @param user_data Optional opaque pointer passed to callback.
+   */
+  F3D_EXPORT void f3d_interactor_set_notification_callback(
+    f3d_interactor_t* interactor, f3d_interactor_notification_callback_t callback, void* user_data);
+
+  /**
    * @brief Stop the interactor.
    *
    * @param interactor Interactor handle.

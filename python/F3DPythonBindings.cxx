@@ -438,6 +438,24 @@ PYBIND11_MODULE(pyf3d, module)
       "Disable the camera interaction")
     .def("set_event_loop_user_callback", &f3d::interactor::setEventLoopUserCallback,
       "Set the user callback of the event loop", py::arg("user_callback") = nullptr)
+    .def("set_notification_callback",
+      [](f3d::interactor& interactor, py::object callback)
+      {
+        if (callback.is_none())
+        {
+          interactor.setNotificationCallback(nullptr);
+          return;
+        }
+
+        auto cb = [=](const std::string& desc, const std::string& value,
+                      const std::string& bind, double duration) -> bool
+        {
+          return py::bool_(callback(desc, value, bind, duration));
+        };
+
+        interactor.setNotificationCallback(cb);
+      },
+      "Set the notification callback (desc, value, bind, duration) -> bool", py::arg("callback"))
     .def("trigger_mod_update", &f3d::interactor::triggerModUpdate, "Trigger a key modifier update")
     .def("trigger_mouse_button", &f3d::interactor::triggerMouseButton, "Trigger a mouse button")
     .def(

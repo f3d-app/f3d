@@ -33,12 +33,26 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   sce.add(dataPath);
   win.render();
 
+  int notifCount = 0;
+  inter.setNotificationCallback(
+    [&](std::string, std::string, std::string, double) {
+      notifCount++;
+      return true;
+    });
+
   inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "E");
   inter.triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "E");
   inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "T");
   inter.triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "T");
+
+  test("Expected notifications count", notifCount, 2);
+
+  inter.setNotificationCallback(nullptr);
+
   inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "G");
   inter.triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "G");
+
+  test("Expected notifications count after reset", notifCount, 2);
 
   inter.triggerEventLoop(0.2); // allow fade-in
   test("stacking notifications",
@@ -74,6 +88,19 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   inter.triggerEventLoop(0.2); // allow fade-in
   test("user define notifications",
     TestSDKHelpers::RenderTest(win, baselinePath, outputPath, "TestSDKNotificationUser"));
+
+  // test that returning false from the callback prevents the notification from being displayed
+  inter.setNotificationCallback(
+    [](std::string, std::string, std::string, double) {
+      return false;
+    });
+
+  inter.triggerNotification("Test Hidden Notification", "Test Hidden Value");
+
+  test("hidden notifications",
+    TestSDKHelpers::RenderTest(win, baselinePath, outputPath, "TestSDKNotificationUserHidden"));
+
+  inter.setNotificationCallback(nullptr);
 
   inter.triggerEventLoop(3.0);
   inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "E");

@@ -44,6 +44,8 @@ public:
   interactor& removeCommand(const std::string& action) override;
   std::vector<std::string> getCommandActions() const override;
   bool triggerCommand(std::string_view command, bool keepComments = true) override;
+  interactor& setNotificationCallback(
+    std::function<bool(std::string, std::string, std::string, double)> callback) override;
 
   interactor& initBindings() override;
   interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,

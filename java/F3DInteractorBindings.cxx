@@ -708,4 +708,58 @@ extern "C"
     GetInteractor(env, self).triggerNotification(valueCpp, valueCpp, duration);
     return self;
   }
+
+  JNIEXPORT jobject JAVA_BIND(Interactor, setNotificationCallback)(
+    JNIEnv* env, jobject self, jobject callback)
+  {
+    // store global ref
+    static jobject gNotificationCallback = nullptr;
+    if (gNotificationCallback != nullptr)
+    {
+      env->DeleteGlobalRef(gNotificationCallback);
+      gNotificationCallback = nullptr;
+    }
+
+    if (callback == nullptr)
+    {
+      GetInteractor(env, self).setNotificationCallback(nullptr);
+      return self;
+    }
+
+    gNotificationCallback = env->NewGlobalRef(callback);
+
+    GetInteractor(env, self).setNotificationCallback(
+      [](const std::string& desc, const std::string& value, const std::string& bind,
+         double duration) -> bool
+      {
+        JNIEnv* env = nullptr;
+#ifdef __ANDROID__
+        if (g_jvm->AttachCurrentThread(&env, nullptr) != JNI_OK)
+#else
+        if (g_jvm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) != JNI_OK)
+#endif
+        {
+          return true;
+        }
+
+        jclass callbackClass = env->GetObjectClass(gNotificationCallback);
+        jmethodID callMethod = env->GetMethodID(callbackClass, "execute", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;D)Z");
+
+        jstring jdesc = env->NewStringUTF(desc.c_str());
+        jstring jvalue = env->NewStringUTF(value.c_str());
+        jstring jbind = env->NewStringUTF(bind.c_str());
+
+        jboolean result = env->CallBooleanMethod(gNotificationCallback, callMethod, jdesc, jvalue, jbind, duration);
+
+        env->DeleteLocalRef(jdesc);
+        env->DeleteLocalRef(jvalue);
+        env->DeleteLocalRef(jbind);
+
+        g_jvm->DetachCurrentThread();
+
+        return result == JNI_TRUE;
+      });
+
+    return self;
+  }
 }

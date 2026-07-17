@@ -157,6 +157,15 @@ public class Interactor {
         void execute(InteractorState state);
     }
 
+    /**
+     * Notification callback.
+     * Return false to prevent standard notification from being displayed, true to allow it.
+     * Arguments are the description, value, bindings, and duration of the notification.
+     */
+    public interface NotificationCallback {
+        boolean execute(String desc, String value, String bind, double duration);
+    }
+
     public interface CommandCallback {
         void execute(List<String> args);
     }
@@ -477,6 +486,11 @@ public class Interactor {
      * @return this interactor for method chaining
      */
     public native Interactor setEventLoopUserCallback(EventLoopCallback callback);
+
+    /**
+     * Set notification callback. If null, only standard notifications will be displayed.
+     */
+    public native Interactor setNotificationCallback(NotificationCallback callback);
 
     /**
      * Play a VTK interaction file.

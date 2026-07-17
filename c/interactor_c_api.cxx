@@ -302,6 +302,31 @@ void f3d_interactor_set_event_loop_user_callback(
 }
 
 //----------------------------------------------------------------------------
+void f3d_interactor_set_notification_callback(
+  f3d_interactor_t* interactor, f3d_interactor_notification_callback_t callback, void* user_data)
+{
+  if (!interactor)
+  {
+    return;
+  }
+
+  f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
+  if (!callback)
+  {
+    cpp_interactor->setNotificationCallback(nullptr);
+    return;
+  }
+
+  cpp_interactor->setNotificationCallback(
+    [=](const std::string& desc, const std::string& value,
+                         const std::string& bind, double duration) -> bool
+    {
+      int res = callback(desc.c_str(), value.c_str(), bind.c_str(), duration, user_data);
+      return res != 0;
+    });
+}
+
+//----------------------------------------------------------------------------
 void f3d_interactor_start(f3d_interactor_t* interactor, double delta_time)
 {
   if (!interactor)
