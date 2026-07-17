@@ -1830,9 +1830,6 @@ interactor& interactor_impl::triggerNotification(
 {
   if (!desc.empty())
   {
-    vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
-    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-
     this->Internals->AddNotification(desc, value, {}, duration);
   }
 
