@@ -588,6 +588,7 @@ f3d_interaction_bind_t* f3d_interactor_get_binds_for_group(
   catch (const f3d::interactor::does_not_exists_exception& ex)
   {
     f3d::log::error(ex.what());
+    *count = 0;
     return nullptr;
   }
 }
@@ -690,7 +691,7 @@ void f3d_interactor_trigger_notification(
   }
 
   f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  cpp_interactor->triggerNotification(desc, value, duration);
+  cpp_interactor->triggerNotification(desc, value ? value : "", duration);
 }
 
 //----------------------------------------------------------------------------
