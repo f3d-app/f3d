@@ -34,10 +34,11 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   win.render();
 
   int notifCount = 0;
-  inter.setNotificationCallback([&](const std::string&, const std::string&, const std::string&, double) {
-    notifCount++;
-    return true;
-  });
+  inter.setNotificationCallback(
+    [&](const std::string&, const std::string&, const std::string&, double) {
+      notifCount++;
+      return true;
+    });
 
   inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "E");
   inter.triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "E");

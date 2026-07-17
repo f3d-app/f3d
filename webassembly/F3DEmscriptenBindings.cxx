@@ -465,21 +465,21 @@ EMSCRIPTEN_BINDINGS(f3d)
       +[](f3d::interactor& interactor, std::string desc, std::string value, double duration)
       { interactor.triggerNotification(desc, value, duration); })
     .function(
-    "setNotificationCallback",
-    +[](f3d::interactor& interactor, const emscripten::val& callback)
-    {
-      if (callback.isUndefined() || callback.isNull())
+      "setNotificationCallback",
+      +[](f3d::interactor& interactor, const emscripten::val& callback)
       {
-        interactor.setNotificationCallback(nullptr);
-        return;
-      }
+        if (callback.isUndefined() || callback.isNull())
+        {
+          interactor.setNotificationCallback(nullptr);
+          return;
+        }
 
-      auto cb = [=](const std::string& desc, const std::string& value, const std::string& bind,
-                  double duration) -> bool
-      { return callback(desc, value, bind, duration).as<bool>(); };
+        auto cb = [=](const std::string& desc, const std::string& value, const std::string& bind,
+                    double duration) -> bool
+        { return callback(desc, value, bind, duration).as<bool>(); };
 
-      interactor.setNotificationCallback(cb);
-    });
+        interactor.setNotificationCallback(cb);
+      });
 
   // f3d::engine
   // Not bound on purpose because only one engine is supported:

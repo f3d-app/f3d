@@ -673,7 +673,8 @@ public:
 
   double CallbackDeltaTime = 1.0 / 30; /* Default DeltaTime (30fps) */
 
-  std::function<bool(const std::string&, const std::string&, const std::string&, double)> NotificationCallback = nullptr;
+  std::function<bool(const std::string&, const std::string&, const std::string&, double)>
+    NotificationCallback = nullptr;
 };
 
 //----------------------------------------------------------------------------
