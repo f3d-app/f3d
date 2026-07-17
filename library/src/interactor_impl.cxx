@@ -673,7 +673,7 @@ public:
 
   double CallbackDeltaTime = 1.0 / 30; /* Default DeltaTime (30fps) */
 
-  std::function<bool(std::string, std::string, std::string, double)> NotificationCallback = nullptr;
+  std::function<bool(const std::string&, const std::string&, const std::string&, double)> NotificationCallback = nullptr;
 };
 
 //----------------------------------------------------------------------------
@@ -1838,7 +1838,7 @@ interactor& interactor_impl::triggerNotification(
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::setNotificationCallback(
-  std::function<bool(std::string, std::string, std::string, double)> callback)
+  std::function<bool(const std::string&, const std::string&, const std::string&, double)> callback)
 {
   this->Internals->NotificationCallback = std::move(callback);
   return *this;

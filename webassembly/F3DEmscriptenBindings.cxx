@@ -463,10 +463,8 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function(
       "triggerNotification",
       +[](f3d::interactor& interactor, std::string desc, std::string value, double duration)
-      { interactor.triggerNotification(desc, value, duration); });
-
-  // Bind notification callback: returns true to show notification, false to suppress
-  emscripten::function(
+      { interactor.triggerNotification(desc, value, duration); })
+    .function(
     "setNotificationCallback",
     +[](f3d::interactor& interactor, const emscripten::val& callback)
     {

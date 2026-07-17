@@ -34,7 +34,7 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   win.render();
 
   int notifCount = 0;
-  inter.setNotificationCallback([&](std::string, std::string, std::string, double) {
+  inter.setNotificationCallback([&](const std::string&, const std::string&, const std::string&, double) {
     notifCount++;
     return true;
   });

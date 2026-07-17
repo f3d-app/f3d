@@ -395,7 +395,7 @@ public:
    * the callback is set to nullptr, standard notifications will be displayed.
    */
   virtual interactor& setNotificationCallback(
-    std::function<bool(std::string, std::string, std::string, double)> callback) = 0;
+    std::function<bool(const std::string&, const std::string&, const std::string&, double)> callback) = 0;
 
   /**
    * Play a VTK interaction file.

@@ -15,12 +15,6 @@ def compl_fn(args: list[str]):
     return ["compl"]
 
 
-def notif_fn(desc, value, bind, duration):
-    nonlocal counter_notif
-    counter_notif += 1
-    return True
-
-
 def test_command(capfd: pytest.CaptureFixture[str]):
     engine = f3d.Engine.create(True)
     inter = engine.interactor
@@ -163,6 +157,12 @@ def test_trigger_key(capfd: pytest.CaptureFixture[str]):
     engine.interactor.trigger_text_character(0)
 
     counter_notif = 0
+
+    def notif_fn(desc, value, bind, duration):
+        nonlocal counter_notif
+        counter_notif += 1
+        return True
+
     engine.interactor.set_notification_callback(notif_fn)
     assert counter_notif == 0
 
