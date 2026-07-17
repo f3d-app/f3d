@@ -34,11 +34,10 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   win.render();
 
   int notifCount = 0;
-  inter.setNotificationCallback(
-    [&](std::string, std::string, std::string, double) {
-      notifCount++;
-      return true;
-    });
+  inter.setNotificationCallback([&](std::string, std::string, std::string, double) {
+    notifCount++;
+    return true;
+  });
 
   inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "E");
   inter.triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "E");
@@ -91,9 +90,7 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
 
   // test that returning false from the callback prevents the notification from being displayed
   inter.setNotificationCallback(
-    [](std::string, std::string, std::string, double) {
-      return false;
-    });
+    [](std::string, std::string, std::string, double) { return false; });
 
   inter.triggerNotification("Test Hidden Notification", "Test Hidden Value");
 

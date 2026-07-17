@@ -468,8 +468,8 @@ extern "C"
    * Return zero to prevent standard notification from being displayed.
    * Arguments are the description, value, bindings, and duration of the notification.
    */
-  typedef int (*f3d_interactor_notification_callback_t)(const char* desc, const char* value,
-    const char* bind, double duration, void* user_data);
+  typedef int (*f3d_interactor_notification_callback_t)(
+    const char* desc, const char* value, const char* bind, double duration, void* user_data);
 
   /**
    * @brief Set the notification callback.

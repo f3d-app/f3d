@@ -466,7 +466,8 @@ EMSCRIPTEN_BINDINGS(f3d)
       { interactor.triggerNotification(desc, value, duration); });
 
   // Bind notification callback: returns true to show notification, false to suppress
-  emscripten::function("setNotificationCallback",
+  emscripten::function(
+    "setNotificationCallback",
     +[](f3d::interactor& interactor, const emscripten::val& callback)
     {
       if (callback.isUndefined() || callback.isNull())
@@ -475,11 +476,9 @@ EMSCRIPTEN_BINDINGS(f3d)
         return;
       }
 
-      auto cb = [=](const std::string& desc, const std::string& value,
-                           const std::string& bind, double duration) -> bool
-      {
-        return callback(desc, value, bind, duration).as<bool>();
-      };
+      auto cb = [=](const std::string& desc, const std::string& value, const std::string& bind,
+                  double duration) -> bool
+      { return callback(desc, value, bind, duration).as<bool>(); };
 
       interactor.setNotificationCallback(cb);
     });

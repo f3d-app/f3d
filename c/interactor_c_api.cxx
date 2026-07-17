@@ -318,8 +318,8 @@ void f3d_interactor_set_notification_callback(
   }
 
   cpp_interactor->setNotificationCallback(
-    [=](const std::string& desc, const std::string& value,
-                         const std::string& bind, double duration) -> bool
+    [=](const std::string& desc, const std::string& value, const std::string& bind,
+      double duration) -> bool
     {
       int res = callback(desc.c_str(), value.c_str(), bind.c_str(), duration, user_data);
       return res != 0;

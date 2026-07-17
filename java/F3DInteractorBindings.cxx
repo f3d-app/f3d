@@ -730,7 +730,7 @@ extern "C"
 
     GetInteractor(env, self).setNotificationCallback(
       [](const std::string& desc, const std::string& value, const std::string& bind,
-         double duration) -> bool
+        double duration) -> bool
       {
         JNIEnv* env = nullptr;
 #ifdef __ANDROID__
@@ -743,13 +743,15 @@ extern "C"
         }
 
         jclass callbackClass = env->GetObjectClass(gNotificationCallback);
-        jmethodID callMethod = env->GetMethodID(callbackClass, "execute", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;D)Z");
+        jmethodID callMethod = env->GetMethodID(
+          callbackClass, "execute", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;D)Z");
 
         jstring jdesc = env->NewStringUTF(desc.c_str());
         jstring jvalue = env->NewStringUTF(value.c_str());
         jstring jbind = env->NewStringUTF(bind.c_str());
 
-        jboolean result = env->CallBooleanMethod(gNotificationCallback, callMethod, jdesc, jvalue, jbind, duration);
+        jboolean result =
+          env->CallBooleanMethod(gNotificationCallback, callMethod, jdesc, jvalue, jbind, duration);
 
         env->DeleteLocalRef(jdesc);
         env->DeleteLocalRef(jvalue);
