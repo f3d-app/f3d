@@ -91,7 +91,7 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
 
   // test that returning false from the callback prevents the notification from being displayed
   inter.setNotificationCallback(
-    [](std::string, std::string, std::string, double) { return false; });
+    [](const std::string&, const std::string&, const std::string&, double) { return false; });
 
   inter.triggerNotification("Test Hidden Notification", "Test Hidden Value");
 
