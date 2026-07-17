@@ -520,10 +520,6 @@ public:
       if (binding.Notify && binding.DocumentationCallback)
       {
         // trigger notification
-        vtkRenderWindow* renWin = this->Window.GetRenderWindow();
-        vtkF3DRenderer* ren =
-          vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-
         auto [desc, value] = binding.DocumentationCallback();
         this->AddNotification(desc, value, bind.format(), 3.0);
       }
