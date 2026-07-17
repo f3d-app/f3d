@@ -251,7 +251,7 @@ runs:
 
     # Linux: Xvfb is not running, should fallback to egl
     # Windows: mesa binary is not installed, should fallback to osmesa
-    # macOS: No fallback mechanism to test, CI always uses osmesa (with VTK > 9.6.20260701), check cocoa is functional
+    # macOS: No fallback mechanism to test, CI always uses osmesa (with VTK > 9.7.20260706), check cocoa is functional
     - name: Check rendering backend logic
       shell: bash
       working-directory: ${{github.workspace}}/build
@@ -280,7 +280,7 @@ runs:
       run: echo "F3D_CTEST_EXCEPTIONS=(test_scene_zero_copy)" >> $GITHUB_ENV
 
     # Certain tests are failing on macOS software rendering
-    # OSMesa is used for VTK > 9.6.20260701, remove when it's dropped
+    # OSMesa is used for VTK > 9.7.20260706, remove when it's dropped
     - name: Set CI test exception for macOS x86_64
       if: |
         runner.os == 'macOS' &&
@@ -290,7 +290,7 @@ runs:
       run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionCycleComp)|(TestGLTFRigArmature)|(TestInteractionNoModelScrollWheel)|(TestInteractionNoModelScrollBar)|(TestInteractionTAA)|(TestInteractionPointCloudTAA)|(TestInteractionStochasticTAA)" >> $GITHUB_ENV
 
     # Certain tests are failing on macOS software rendering
-    # OSMesa is used for VTK > 9.6.20260701, remove when it's dropped
+    # OSMesa is used for VTK > 9.7.20260706, remove when it's dropped
     - name: Set CI test exception for macOS arm64
       if: |
         runner.os == 'macOS' &&
@@ -411,7 +411,7 @@ runs:
         cmake --install build_plugins --config Release
         cmake --install build_plugins --config Release --component configuration
 
-    # macOS needs VTK > 9.6.20260701 for proper grid rendering using osmesa
+    # macOS needs VTK > 9.7.20260706 for proper grid rendering using osmesa
     # this test works with VTK 9.6.1 otherwise
     # camera-view-angle is needed because of: https://github.com/f3d-app/f3d/issues/3375
     - name: Check Install
@@ -422,7 +422,7 @@ runs:
       run: |
         ${{ env.F3D_BIN_PATH }} ../source/testing/data/dragon.vtu --output=output/install_output.png --reference=../source/.github/baselines/install_output.png --resolution=300,300 --colormap-file=viridis --coloring-component=0 --verbose --rendering-backend=${{ inputs.rendering_backend }} --camera-view-angle=32.1111
 
-    # macOS needs VTK > 9.6.20260701 for proper grid rendering using osmesa
+    # macOS needs VTK > 9.7.20260706 for proper grid rendering using osmesa
     # this test works with VTK 9.6.1 otherwise
     - name: Check Install plugins
       if: |
