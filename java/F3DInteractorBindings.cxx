@@ -749,8 +749,8 @@ extern "C"
         jstring jvalue = env->NewStringUTF(value.c_str());
         jstring jbind = env->NewStringUTF(bind.c_str());
 
-        jboolean result =
-          env->CallBooleanMethod(g_notificationCallback, callMethod, jdesc, jvalue, jbind, duration);
+        jboolean result = env->CallBooleanMethod(
+          g_notificationCallback, callMethod, jdesc, jvalue, jbind, duration);
 
         env->DeleteLocalRef(jdesc);
         env->DeleteLocalRef(jvalue);
