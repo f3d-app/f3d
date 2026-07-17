@@ -15,6 +15,12 @@ def compl_fn(args: list[str]):
     return ["compl"]
 
 
+def notif_fn(desc, value, bind, duration):
+    nonlocal counter_notif
+    counter_notif += 1
+    return True
+
+
 def test_command(capfd: pytest.CaptureFixture[str]):
     engine = f3d.Engine.create(True)
     inter = engine.interactor
@@ -156,7 +162,12 @@ def test_trigger_key(capfd: pytest.CaptureFixture[str]):
     engine.interactor.trigger_mouse_wheel(f3d.Interactor.WheelDirection.FORWARD)
     engine.interactor.trigger_text_character(0)
 
+    counter_notif = 0
+    engine.interactor.set_notification_callback(notif_fn)
+    assert counter_notif == 0
+
     engine.interactor.trigger_notification("foo", "bar", 3.0)
+    assert counter_notif == 1
 
 
 def test_interactor_animation(capfd: pytest.CaptureFixture[str]):
