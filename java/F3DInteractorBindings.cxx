@@ -10,6 +10,7 @@ namespace
 {
 std::map<std::string, jobject> g_commandCallbacks;
 jobject g_eventLoopCallback = nullptr;
+jobject g_notificationCallback = nullptr;
 JavaVM* g_jvm = nullptr;
 
 f3d::interactor& GetInteractor(JNIEnv* env, jobject self)
@@ -712,12 +713,10 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Interactor, setNotificationCallback)(
     JNIEnv* env, jobject self, jobject callback)
   {
-    // store global ref
-    static jobject gNotificationCallback = nullptr;
-    if (gNotificationCallback != nullptr)
+    if (g_notificationCallback != nullptr)
     {
-      env->DeleteGlobalRef(gNotificationCallback);
-      gNotificationCallback = nullptr;
+      env->DeleteGlobalRef(g_notificationCallback);
+      g_notificationCallback = nullptr;
     }
 
     if (callback == nullptr)
@@ -726,7 +725,7 @@ extern "C"
       return self;
     }
 
-    gNotificationCallback = env->NewGlobalRef(callback);
+    g_notificationCallback = env->NewGlobalRef(callback);
 
     GetInteractor(env, self).setNotificationCallback(
       [](const std::string& desc, const std::string& value, const std::string& bind,
@@ -742,7 +741,7 @@ extern "C"
           return true;
         }
 
-        jclass callbackClass = env->GetObjectClass(gNotificationCallback);
+        jclass callbackClass = env->GetObjectClass(g_notificationCallback);
         jmethodID callMethod = env->GetMethodID(
           callbackClass, "execute", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;D)Z");
 
@@ -751,7 +750,7 @@ extern "C"
         jstring jbind = env->NewStringUTF(bind.c_str());
 
         jboolean result =
-          env->CallBooleanMethod(gNotificationCallback, callMethod, jdesc, jvalue, jbind, duration);
+          env->CallBooleanMethod(g_notificationCallback, callMethod, jdesc, jvalue, jbind, duration);
 
         env->DeleteLocalRef(jdesc);
         env->DeleteLocalRef(jvalue);
