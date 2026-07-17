@@ -55,6 +55,10 @@ f3d_image_t* f3d_image_new_params(unsigned int width, unsigned int height,
 //----------------------------------------------------------------------------
 f3d_image_t* f3d_image_new_path(const char* path)
 {
+  if (!path)
+  {
+    return nullptr;
+  }
 
   f3d::image* img = nullptr;
 
@@ -75,6 +79,11 @@ f3d_image_t* f3d_image_new_path(const char* path)
 //----------------------------------------------------------------------------
 void f3d_image_delete(f3d_image_t* img)
 {
+  if (!img)
+  {
+    return;
+  }
+
   f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
   delete cpp_img;
 }
@@ -82,6 +91,11 @@ void f3d_image_delete(f3d_image_t* img)
 //----------------------------------------------------------------------------
 int f3d_image_get_normalized_pixel(f3d_image_t* img, int x, int y, double* pixel)
 {
+  if (!img || !pixel)
+  {
+    return 0;
+  }
+
   const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
 
   try
@@ -101,6 +115,11 @@ int f3d_image_get_normalized_pixel(f3d_image_t* img, int x, int y, double* pixel
 //----------------------------------------------------------------------------
 unsigned int f3d_image_get_width(f3d_image_t* img)
 {
+  if (!img)
+  {
+    return 0;
+  }
+
   const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
   return cpp_img->getWidth();
 }
@@ -108,6 +127,11 @@ unsigned int f3d_image_get_width(f3d_image_t* img)
 //----------------------------------------------------------------------------
 unsigned int f3d_image_get_height(f3d_image_t* img)
 {
+  if (!img)
+  {
+    return 0;
+  }
+
   const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
   return cpp_img->getHeight();
 }
@@ -115,6 +139,11 @@ unsigned int f3d_image_get_height(f3d_image_t* img)
 //----------------------------------------------------------------------------
 unsigned int f3d_image_get_channel_count(f3d_image_t* img)
 {
+  if (!img)
+  {
+    return 0;
+  }
+
   const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
   return cpp_img->getChannelCount();
 }
@@ -122,6 +151,11 @@ unsigned int f3d_image_get_channel_count(f3d_image_t* img)
 //----------------------------------------------------------------------------
 int f3d_image_get_channel_type(f3d_image_t* img)
 {
+  if (!img)
+  {
+    return -1;
+  }
+
   const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
 
   try
@@ -139,6 +173,11 @@ int f3d_image_get_channel_type(f3d_image_t* img)
 //----------------------------------------------------------------------------
 unsigned int f3d_image_get_channel_type_size(f3d_image_t* img)
 {
+  if (!img)
+  {
+    return 0;
+  }
+
   const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
   return cpp_img->getChannelTypeSize();
 }
@@ -146,6 +185,11 @@ unsigned int f3d_image_get_channel_type_size(f3d_image_t* img)
 //----------------------------------------------------------------------------
 void f3d_image_set_content(f3d_image_t* img, void* buffer)
 {
+  if (!img || !buffer)
+  {
+    return;
+  }
+
   f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
   cpp_img->setContent(buffer);
 }
@@ -153,6 +197,11 @@ void f3d_image_set_content(f3d_image_t* img, void* buffer)
 //----------------------------------------------------------------------------
 void* f3d_image_get_content(f3d_image_t* img)
 {
+  if (!img)
+  {
+    return nullptr;
+  }
+
   const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
   return cpp_img->getContent();
 }
@@ -160,6 +209,12 @@ void* f3d_image_get_content(f3d_image_t* img)
 //----------------------------------------------------------------------------
 double f3d_image_compare(f3d_image_t* img, f3d_image_t* reference)
 {
+  if (!img || !reference)
+  {
+    std::cerr << "Error comparing images: null image" << "\n";
+    return -1.0;
+  }
+
   const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
   const f3d::image* cpp_ref = reinterpret_cast<f3d::image*>(reference);
 
@@ -237,6 +292,11 @@ int f3d_image_save(f3d_image_t* img, const char* path, f3d_image_save_format_t f
 unsigned char* f3d_image_save_buffer(
   f3d_image_t* img, f3d_image_save_format_t format, unsigned int* size)
 {
+  if (!size)
+  {
+    return nullptr;
+  }
+
   if (!img)
   {
     *size = 0;
@@ -302,6 +362,11 @@ void f3d_image_to_terminal_text(f3d_image_t* img, void* stream)
 //----------------------------------------------------------------------------
 const char* f3d_image_to_terminal_text_string(f3d_image_t* img)
 {
+  if (!img)
+  {
+    return nullptr;
+  }
+
   const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
   static std::string result;
   result = cpp_img->toTerminalText();
@@ -311,6 +376,11 @@ const char* f3d_image_to_terminal_text_string(f3d_image_t* img)
 //----------------------------------------------------------------------------
 void f3d_image_set_metadata(f3d_image_t* img, const char* key, const char* value)
 {
+  if (!img || !key || !value)
+  {
+    return;
+  }
+
   f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
   cpp_img->setMetadata(key, value);
 }
@@ -318,6 +388,11 @@ void f3d_image_set_metadata(f3d_image_t* img, const char* key, const char* value
 //----------------------------------------------------------------------------
 const char* f3d_image_get_metadata(f3d_image_t* img, const char* key)
 {
+  if (!img || !key)
+  {
+    return nullptr;
+  }
+
   const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
   static std::string result;
 
@@ -337,6 +412,17 @@ const char* f3d_image_get_metadata(f3d_image_t* img, const char* key)
 //----------------------------------------------------------------------------
 char** f3d_image_all_metadata(f3d_image_t* img, unsigned int* count)
 {
+  if (!count)
+  {
+    return nullptr;
+  }
+
+  if (!img)
+  {
+    *count = 0;
+    return nullptr;
+  }
+
   const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
   std::vector<std::string> metadata_keys = cpp_img->allMetadata();
   *count = metadata_keys.size();
@@ -352,6 +438,11 @@ char** f3d_image_all_metadata(f3d_image_t* img, unsigned int* count)
 //----------------------------------------------------------------------------
 void f3d_image_free_metadata_keys(char** keys, unsigned int count)
 {
+  if (!keys)
+  {
+    return;
+  }
+
   for (unsigned int i = 0; i < count; ++i)
   {
     delete[] keys[i];
