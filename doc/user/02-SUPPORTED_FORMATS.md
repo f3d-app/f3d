@@ -36,11 +36,11 @@ F3D supports the following file formats:
 | Draco                                     | `.drc`                                         | No         | NONE              | YES               | `draco`   | `Draco`                 |
 | Autodesk 3D Studio                        | `.3ds`                                         | Yes        | NONE              | YES (VTK 9.6)     | `native`  | `3DS`                   |
 | Virtual Reality Modeling Language         | `.wrl`, `.vrml`                                | Yes        | NONE              | NO                | `native`  | `VRMLReader`            |
-| Autodesk Filmbox                          | `.fbx`                                         | Yes        | SINGLE            | YES (VTK 9.6)     | `assimp`  | `FBX`                   |
-| COLLADA                                   | `.dae`                                         | Yes        | SINGLE            | PARTIAL (VTK 9.6) | `assimp`  | `COLLADA`               |
+| Autodesk Filmbox                          | `.fbx`                                         | Yes        | MULTI             | YES (VTK 9.6)     | `assimp`  | `FBX`                   |
+| COLLADA                                   | `.dae`                                         | Yes        | MULTI             | PARTIAL (VTK 9.6) | `assimp`  | `COLLADA`               |
 | Object File Format                        | `.off`                                         | Yes        | NONE              | YES (VTK 9.6)     | `assimp`  | `OFF`                   |
 | Drawing Exchange Format                   | `.dxf`                                         | Yes        | NONE              | YES (VTK 9.6)     | `assimp`  | `DXF`                   |
-| DirectX                                   | `.x`                                           | Yes        | SINGLE            | YES (VTK 9.6)     | `assimp`  | `DirectX`               |
+| DirectX                                   | `.x`                                           | Yes        | MULTI             | YES (VTK 9.6)     | `assimp`  | `DirectX`               |
 | 3D Manufacturing Format                   | `.3mf`                                         | Yes        | NONE              | YES (VTK 9.6)     | `assimp`  | `3MF`                   |
 | Universal Scene Description               | `.usd`, `.usda`, `.usdc`, `.usdz`              | Yes        | SINGLE            | YES (VTK 9.6)     | `usd`     | `USD`                   |
 | VDB                                       | `.vdb`                                         | No         | NONE              | YES (VTK 9.6)     | `vdb`     | `VDB`                   |

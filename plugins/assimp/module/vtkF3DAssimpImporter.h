@@ -35,11 +35,11 @@ public:
 
   /**
    * Get the level of animation support in this importer, which is always
-   * AnimationSupportLevel::SINGLE
+   * AnimationSupportLevel::MULTI
    */
   AnimationSupportLevel GetAnimationSupportLevel() override
   {
-    return AnimationSupportLevel::SINGLE;
+    return AnimationSupportLevel::MULTI;
   }
 
   /**
@@ -55,7 +55,7 @@ public:
   ///@{
   /**
    * Enable/Disable/Get the status of specific animations
-   * Only one single animation can be enabled
+   * Multiple animations can be enabled simultaneously
    * By default, no animation are enabled
    * As specified in the vtkImporter API, animationIndex
    * is expected to be 0 < GetNumberOfAnimations
