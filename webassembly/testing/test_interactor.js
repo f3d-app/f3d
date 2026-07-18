@@ -108,6 +108,22 @@ const settings = {
     );
     interactor.stopAnimation();
 
+    // notifications
+    let notifCount = 0;
+
+    interactor.setNotificationCallback((desc, value, bind, duration) => {
+      notifCount++;
+      return true;
+    });
+
+    interactor.triggerNotification(
+      "Test notification",
+      "value",
+      "binding",
+      1.0,
+    );
+    utils.assert(notifCount === 1, "notification callback not called");
+
     // only for coverage, do not test the actual feature yet
     interactor.disableCameraMovement();
     interactor.enableCameraMovement();
