@@ -1736,7 +1736,8 @@ interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addBinding(const interaction_bind_t& bind, std::string command,
-  std::string group, documentation_callback_t documentationCallback, BindingType type, bool notify, bool repeat)
+  std::string group, documentation_callback_t documentationCallback, BindingType type, bool notify,
+  bool repeat)
 {
   return this->addBinding(bind, std::vector<std::string>{ std::move(command) }, std::move(group),
     std::move(documentationCallback), type, notify, repeat);
