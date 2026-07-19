@@ -1,5 +1,6 @@
 #include "image_c_api.h"
 #include "image.h"
+#include "log.h"
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
@@ -57,6 +58,7 @@ f3d_image_t* f3d_image_new_path(const char* path)
 {
   if (!path)
   {
+    f3d::log::warn("Path is null, cannot create image");
     return nullptr;
   }
 
@@ -81,6 +83,7 @@ void f3d_image_delete(f3d_image_t* img)
 {
   if (!img)
   {
+    f3d::log::warn("Image is null, nothing to delete");
     return;
   }
 
@@ -93,6 +96,7 @@ int f3d_image_get_normalized_pixel(f3d_image_t* img, int x, int y, double* pixel
 {
   if (!img || !pixel)
   {
+    f3d::log::warn("Image or pixel pointer is null");
     return 0;
   }
 
@@ -117,6 +121,7 @@ unsigned int f3d_image_get_width(f3d_image_t* img)
 {
   if (!img)
   {
+    f3d::log::warn("Image is null");
     return 0;
   }
 
@@ -129,6 +134,7 @@ unsigned int f3d_image_get_height(f3d_image_t* img)
 {
   if (!img)
   {
+    f3d::log::warn("Image is null");
     return 0;
   }
 
@@ -141,6 +147,7 @@ unsigned int f3d_image_get_channel_count(f3d_image_t* img)
 {
   if (!img)
   {
+    f3d::log::warn("Image is null");
     return 0;
   }
 
@@ -153,6 +160,7 @@ int f3d_image_get_channel_type(f3d_image_t* img)
 {
   if (!img)
   {
+    f3d::log::warn("Image is null");
     return -1;
   }
 
@@ -175,6 +183,7 @@ unsigned int f3d_image_get_channel_type_size(f3d_image_t* img)
 {
   if (!img)
   {
+    f3d::log::warn("Image is null");
     return 0;
   }
 
@@ -187,6 +196,7 @@ void f3d_image_set_content(f3d_image_t* img, void* buffer)
 {
   if (!img || !buffer)
   {
+    f3d::log::warn("Image or buffer is null");
     return;
   }
 
@@ -199,6 +209,7 @@ void* f3d_image_get_content(f3d_image_t* img)
 {
   if (!img)
   {
+    f3d::log::warn("Image is null");
     return nullptr;
   }
 
@@ -211,7 +222,7 @@ double f3d_image_compare(f3d_image_t* img, f3d_image_t* reference)
 {
   if (!img || !reference)
   {
-    std::cerr << "Error comparing images: null image" << "\n";
+    f3d::log::warn("Image or reference is null");
     return -1.0;
   }
 
@@ -238,6 +249,7 @@ int f3d_image_equals(f3d_image_t* img, f3d_image_t* reference)
 {
   if (!img || !reference)
   {
+    f3d::log::warn("Image or reference is null");
     return 0;
   }
 
@@ -251,6 +263,7 @@ int f3d_image_not_equals(f3d_image_t* img, f3d_image_t* reference)
 {
   if (!img || !reference)
   {
+    f3d::log::warn("Image or reference is null");
     return 1;
   }
 
@@ -264,8 +277,8 @@ int f3d_image_save(f3d_image_t* img, const char* path, f3d_image_save_format_t f
 {
   if (!img || !path)
   {
-    std::cerr << "Error saving image" << "\n";
-    return 1;
+    f3d::log::warn("Image or path is null");
+    return 0;
   }
 
   const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
@@ -294,11 +307,13 @@ unsigned char* f3d_image_save_buffer(
 {
   if (!size)
   {
+    f3d::log::warn("Size pointer is null");
     return nullptr;
   }
 
   if (!img)
   {
+    f3d::log::warn("Image is null");
     *size = 0;
     return nullptr;
   }
@@ -339,6 +354,7 @@ void f3d_image_to_terminal_text(f3d_image_t* img, void* stream)
 {
   if (!img || !stream)
   {
+    f3d::log::warn("Image or stream is null");
     return;
   }
 
@@ -364,6 +380,7 @@ const char* f3d_image_to_terminal_text_string(f3d_image_t* img)
 {
   if (!img)
   {
+    f3d::log::warn("Image is null");
     return nullptr;
   }
 
@@ -378,6 +395,7 @@ void f3d_image_set_metadata(f3d_image_t* img, const char* key, const char* value
 {
   if (!img || !key || !value)
   {
+    f3d::log::warn("Image, key or value is null");
     return;
   }
 
@@ -390,6 +408,7 @@ const char* f3d_image_get_metadata(f3d_image_t* img, const char* key)
 {
   if (!img || !key)
   {
+    f3d::log::warn("Image or key is null");
     return nullptr;
   }
 
@@ -414,11 +433,13 @@ char** f3d_image_all_metadata(f3d_image_t* img, unsigned int* count)
 {
   if (!count)
   {
+    f3d::log::warn("Count pointer is null");
     return nullptr;
   }
 
   if (!img)
   {
+    f3d::log::warn("Image is null");
     *count = 0;
     return nullptr;
   }
@@ -440,6 +461,7 @@ void f3d_image_free_metadata_keys(char** keys, unsigned int count)
 {
   if (!keys)
   {
+    f3d::log::warn("Keys is null, nothing to free");
     return;
   }
 
