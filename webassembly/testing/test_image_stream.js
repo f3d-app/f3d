@@ -13,9 +13,7 @@ const settings = {
 
     const img2 = new Module.Image.createFromBuffer(pngBuffer);
 
-    utils.assert(
-        img1.equals(img2), "image from buffer stream comparison"
-    );
+    utils.assert(img1.equals(img2), "image from buffer stream comparison");
   },
 };
 
