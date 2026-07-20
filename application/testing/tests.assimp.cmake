@@ -39,6 +39,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251006)
   f3d_test(NAME TestFBXAnimation DATA animatedWorld.fbx PLUGIN assimp ARGS --animation-time=2 --animation-progress UI)
   f3d_test(NAME TestFBXAnimationLights DATA animatedLights.fbx PLUGIN assimp ARGS --animation-time=1.8 --animation-progress UI)
   f3d_test(NAME TestFBXAnimationCamera DATA animatedCamera.fbx PLUGIN assimp ARGS --camera-index=0 --animation-indices=0 --animation-time=3 --animation-progress UI)
+  f3d_test(NAME TestFBXMultipleAnimations DATA multipleAnimatedObjects.fbx PLUGIN assimp ARGS --animation-indices=-1 --animation-time=1 --animation-progress UI)
   f3d_test(NAME TestDAEAnimationLights DATA animatedLights.dae PLUGIN assimp ARGS --animation-time=1.8 --animation-progress UI)
 endif()
 

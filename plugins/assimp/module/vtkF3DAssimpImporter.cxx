@@ -1052,7 +1052,7 @@ public:
   std::vector<vtkSmartPointer<vtkPolyData>> Meshes;
   std::vector<vtkSmartPointer<vtkProperty>> Properties;
   std::vector<vtkSmartPointer<vtkTexture>> EmbeddedTextures;
-  vtkIdType ActiveAnimation = -1; // -1 means no animation enabled here
+  std::set<vtkIdType> EnabledAnimations; // indices of currently enabled animations
   std::vector<std::pair<std::string, vtkSmartPointer<vtkLight>>> Lights;
   std::vector<
     std::pair<std::string, std::pair<vtkSmartPointer<vtkCamera>, vtkSmartPointer<vtkCamera>>>>
@@ -1117,111 +1117,115 @@ std::string vtkF3DAssimpImporter::GetOutputsDescription()
 //----------------------------------------------------------------------------
 bool vtkF3DAssimpImporter::UpdateAtTimeValue(double timeValue)
 {
-  assert(this->Internals->ActiveAnimation < this->GetNumberOfAnimations());
-  if (this->Internals->ActiveAnimation == -1)
+  if (this->Internals->EnabledAnimations.empty())
   {
     return true;
   }
 
-  // get the animation tick
-  double fps =
-    this->Internals->Scene->mAnimations[this->Internals->ActiveAnimation]->mTicksPerSecond;
-  if (fps == 0.0)
-  {
-    fps = 1.0;
-  }
-
-  aiAnimation* anim = this->Internals->Scene->mAnimations[this->Internals->ActiveAnimation];
-  double tick = timeValue * fps;
-
   Assimp::Interpolator<aiVectorKey> vectorInterpolator;
   Assimp::Interpolator<aiQuatKey> quaternionInterpolator;
 
-  for (unsigned int nodeChannelId = 0; nodeChannelId < anim->mNumChannels; nodeChannelId++)
+  for (vtkIdType activeAnimation : this->Internals->EnabledAnimations)
   {
-    aiNodeAnim* nodeAnim = anim->mChannels[nodeChannelId];
+    assert(activeAnimation < this->GetNumberOfAnimations());
 
-    aiVector3D translation;
-    aiVector3D scaling;
-    aiQuaternion quaternion;
+    aiAnimation* anim = this->Internals->Scene->mAnimations[activeAnimation];
 
-    aiVectorKey* positionKey = std::lower_bound(nodeAnim->mPositionKeys,
-      nodeAnim->mPositionKeys + nodeAnim->mNumPositionKeys, tick,
-      [](const aiVectorKey& key, const double& time) { return key.mTime < time; });
-
-    if (positionKey == nodeAnim->mPositionKeys)
+    // get the animation tick
+    double fps = anim->mTicksPerSecond;
+    if (fps == 0.0)
     {
-      translation = positionKey->mValue;
-    }
-    else if (positionKey == nodeAnim->mPositionKeys + nodeAnim->mNumPositionKeys)
-    {
-      translation = (positionKey - 1)->mValue;
-    }
-    else
-    {
-      aiVectorKey* prev = positionKey - 1;
-      ai_real d = (tick - prev->mTime) / (positionKey->mTime - prev->mTime);
-      vectorInterpolator(translation, *prev, *positionKey, d);
+      fps = 1.0;
     }
 
-    aiQuatKey* rotationKey = std::lower_bound(nodeAnim->mRotationKeys,
-      nodeAnim->mRotationKeys + nodeAnim->mNumRotationKeys, tick,
-      [](const aiQuatKey& key, const double& time) { return key.mTime < time; });
+    double tick = timeValue * fps;
 
-    if (rotationKey == nodeAnim->mRotationKeys)
+    for (unsigned int nodeChannelId = 0; nodeChannelId < anim->mNumChannels; nodeChannelId++)
     {
-      quaternion = rotationKey->mValue;
-    }
-    else if (rotationKey == nodeAnim->mRotationKeys + nodeAnim->mNumRotationKeys)
-    {
-      quaternion = (rotationKey - 1)->mValue;
-    }
-    else
-    {
-      aiQuatKey* prev = rotationKey - 1;
-      ai_real d = (tick - prev->mTime) / (rotationKey->mTime - prev->mTime);
-      quaternionInterpolator(quaternion, *prev, *rotationKey, d);
-    }
+      aiNodeAnim* nodeAnim = anim->mChannels[nodeChannelId];
 
-    aiVectorKey* scalingKey =
-      std::lower_bound(nodeAnim->mScalingKeys, nodeAnim->mScalingKeys + nodeAnim->mNumScalingKeys,
-        tick, [](const aiVectorKey& key, const double& time) { return key.mTime < time; });
+      aiVector3D translation;
+      aiVector3D scaling;
+      aiQuaternion quaternion;
 
-    if (scalingKey == nodeAnim->mScalingKeys)
-    {
-      scaling = scalingKey->mValue;
-    }
-    else if (scalingKey == nodeAnim->mScalingKeys + nodeAnim->mNumScalingKeys)
-    {
-      scaling = (scalingKey - 1)->mValue;
-    }
-    else
-    {
-      aiVectorKey* prev = scalingKey - 1;
-      ai_real d = (tick - prev->mTime) / (scalingKey->mTime - prev->mTime);
-      vectorInterpolator(scaling, *prev, *scalingKey, d);
-    }
+      aiVectorKey* positionKey = std::lower_bound(nodeAnim->mPositionKeys,
+        nodeAnim->mPositionKeys + nodeAnim->mNumPositionKeys, tick,
+        [](const aiVectorKey& key, const double& time) { return key.mTime < time; });
 
-    vtkMatrix4x4* transform = this->Internals->NodeLocalMatrix[nodeAnim->mNodeName.data];
-
-    if (transform)
-    {
-      // Initialize quaternion
-      vtkQuaternion<double> rotation;
-      rotation.Set(quaternion.w, quaternion.x, quaternion.y, quaternion.z);
-      rotation.Normalize();
-
-      double rotationMatrix[3][3];
-      rotation.ToMatrix3x3(rotationMatrix);
-
-      // Apply transformations
-      for (int i = 0; i < 3; i++)
+      if (positionKey == nodeAnim->mPositionKeys)
       {
-        for (int j = 0; j < 3; j++)
+        translation = positionKey->mValue;
+      }
+      else if (positionKey == nodeAnim->mPositionKeys + nodeAnim->mNumPositionKeys)
+      {
+        translation = (positionKey - 1)->mValue;
+      }
+      else
+      {
+        aiVectorKey* prev = positionKey - 1;
+        ai_real d = (tick - prev->mTime) / (positionKey->mTime - prev->mTime);
+        vectorInterpolator(translation, *prev, *positionKey, d);
+      }
+
+      aiQuatKey* rotationKey = std::lower_bound(nodeAnim->mRotationKeys,
+        nodeAnim->mRotationKeys + nodeAnim->mNumRotationKeys, tick,
+        [](const aiQuatKey& key, const double& time) { return key.mTime < time; });
+
+      if (rotationKey == nodeAnim->mRotationKeys)
+      {
+        quaternion = rotationKey->mValue;
+      }
+      else if (rotationKey == nodeAnim->mRotationKeys + nodeAnim->mNumRotationKeys)
+      {
+        quaternion = (rotationKey - 1)->mValue;
+      }
+      else
+      {
+        aiQuatKey* prev = rotationKey - 1;
+        ai_real d = (tick - prev->mTime) / (rotationKey->mTime - prev->mTime);
+        quaternionInterpolator(quaternion, *prev, *rotationKey, d);
+      }
+
+      aiVectorKey* scalingKey =
+        std::lower_bound(nodeAnim->mScalingKeys, nodeAnim->mScalingKeys + nodeAnim->mNumScalingKeys,
+          tick, [](const aiVectorKey& key, const double& time) { return key.mTime < time; });
+
+      if (scalingKey == nodeAnim->mScalingKeys)
+      {
+        scaling = scalingKey->mValue;
+      }
+      else if (scalingKey == nodeAnim->mScalingKeys + nodeAnim->mNumScalingKeys)
+      {
+        scaling = (scalingKey - 1)->mValue;
+      }
+      else
+      {
+        aiVectorKey* prev = scalingKey - 1;
+        ai_real d = (tick - prev->mTime) / (scalingKey->mTime - prev->mTime);
+        vectorInterpolator(scaling, *prev, *scalingKey, d);
+      }
+
+      vtkMatrix4x4* transform = this->Internals->NodeLocalMatrix[nodeAnim->mNodeName.data];
+
+      if (transform)
+      {
+        // Initialize quaternion
+        vtkQuaternion<double> rotation;
+        rotation.Set(quaternion.w, quaternion.x, quaternion.y, quaternion.z);
+        rotation.Normalize();
+
+        double rotationMatrix[3][3];
+        rotation.ToMatrix3x3(rotationMatrix);
+
+        // Apply transformations
+        for (int i = 0; i < 3; i++)
         {
-          transform->SetElement(i, j, scaling[j] * rotationMatrix[i][j]);
+          for (int j = 0; j < 3; j++)
+          {
+            transform->SetElement(i, j, scaling[j] * rotationMatrix[i][j]);
+          }
+          transform->SetElement(i, 3, translation[i]);
         }
-        transform->SetElement(i, 3, translation[i]);
       }
     }
   }
@@ -1254,13 +1258,15 @@ void vtkF3DAssimpImporter::EnableAnimation(vtkIdType animationIndex)
 {
   assert(animationIndex < this->GetNumberOfAnimations());
   assert(animationIndex >= 0);
-  this->Internals->ActiveAnimation = animationIndex;
+  this->Internals->EnabledAnimations.insert(animationIndex);
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DAssimpImporter::DisableAnimation(vtkIdType vtkNotUsed(animationIndex))
+void vtkF3DAssimpImporter::DisableAnimation(vtkIdType animationIndex)
 {
-  this->Internals->ActiveAnimation = -1;
+  assert(animationIndex < this->GetNumberOfAnimations());
+  assert(animationIndex >= 0);
+  this->Internals->EnabledAnimations.erase(animationIndex);
 }
 
 //----------------------------------------------------------------------------
@@ -1268,7 +1274,7 @@ bool vtkF3DAssimpImporter::IsAnimationEnabled(vtkIdType animationIndex)
 {
   assert(animationIndex < this->GetNumberOfAnimations());
   assert(animationIndex >= 0);
-  return this->Internals->ActiveAnimation == animationIndex;
+  return this->Internals->EnabledAnimations.count(animationIndex) > 0;
 }
 
 //----------------------------------------------------------------------------
