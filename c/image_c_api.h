@@ -62,7 +62,7 @@ extern "C"
    * @brief Delete an image object
    * @param img Pointer to the image object to be deleted
    *
-   * If provided img is NULL, do nothing(return).
+   * If provided img is NULL, do nothing.
    */
   F3D_EXPORT void f3d_image_delete(f3d_image_t* img);
 
@@ -72,7 +72,7 @@ extern "C"
    * @param img Pointer to the first image object
    * @param reference Pointer to the second image object
    *
-   * If provided img or reference is NULL, return 0(false).
+   * If provided img or reference is NULL, return zero.
    *
    * @return Non-zero if images are equal, zero otherwise
    */
@@ -97,7 +97,7 @@ extern "C"
    * @param y vertical pixel coordinate
    * @param pixel Pointer to a preallocated buffer of channel count size
    *
-   * If provided img or pixel is NULL, return 0.
+   * If provided img or pixel is NULL, return zero.
    *
    * @return Non-zero on success, zero on failure
    */
@@ -123,7 +123,7 @@ extern "C"
    * @brief Get the width of an image
    * @param img Pointer to the image object
    *
-   * If provided img is NULL, return 0.
+   * If provided img is NULL, return zero.
    *
    * @return Width of the image
    */
@@ -133,7 +133,7 @@ extern "C"
    * @brief Get the height of an image
    * @param img Pointer to the image object
    *
-   * If provided img is NULL, return 0.
+   * If provided img is NULL, return zero.
    *
    * @return Height of the image
    */
@@ -143,7 +143,7 @@ extern "C"
    * @brief Get the number of channels in an image
    * @param img Pointer to the image object
    *
-   * If provided img is NULL, return 0.
+   * If provided img is NULL, return zero.
    *
    * @return Number of channels in the image
    */
@@ -163,7 +163,7 @@ extern "C"
    * @brief Get the size of the channel type in an image
    * @param img Pointer to the image object
    *
-   * If provided img is NULL, return 0.
+   * If provided img is NULL, return zero.
    *
    * @return Size of the channel type in the image
    */
@@ -210,7 +210,7 @@ extern "C"
    * @param path Path to the file where the image will be saved
    * @param format Format in which the image will be saved
    *
-   * If provided img or path is NULL, return 1.
+   * If provided img or path is NULL, return zero.
    *
    * @return Non-zero on success, zero on failure
    */
@@ -225,8 +225,8 @@ extern "C"
    * @param format Format in which the image will be saved
    * @param size Pointer to store the size of the saved buffer
    *
-   * If provided size is NULL, return nullptr.
-   * If provided img is NULL, set size to 0 and return nullptr.
+   * If provided size is NULL, return NULL.
+   * If provided img is NULL, set size to 0 and return NULL.
    *
    * @return Pointer to the buffer containing the saved image
    */
@@ -257,7 +257,7 @@ extern "C"
    * The returned string points to internal static storage and must NOT be freed.
    * The pointer is valid until the next call to this function.
    * This is the C equivalent of toTerminalText() that returns a std::string.
-   * If provided img is NULL, return nullptr.
+   * If provided img is NULL, return NULL.
    *
    * @param img Pointer to the image object
    * @return Pointer to the string representation of the image
@@ -284,7 +284,7 @@ extern "C"
    * @param img Pointer to the image object
    * @param key Metadata key
    *
-   * If provided img or key is NULL, return nullptr
+   * If provided img or key is NULL, return NULL.
    *
    * @return Metadata value, NULL if error getting metadata
    */
@@ -294,8 +294,8 @@ extern "C"
    * @brief Get all metadata keys from an image
    *
    * The returned keys must be freed with f3d_image_free_metadata_keys.
-   * If provided img is NULL, return nullptr.
-   * If provided count is NULL, set count to 0 and return nullptr.
+   * If provided img is NULL, return NULL.
+   * If provided count is NULL, set count to zero and return NULL.
    *
    * @param img Pointer to the image object
    * @param count Pointer to store the count of metadata keys
