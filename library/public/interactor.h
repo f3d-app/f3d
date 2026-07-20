@@ -275,6 +275,37 @@ public:
   virtual interactor& stopAnimation() = 0;
   [[nodiscard]] virtual bool isPlayingAnimation() = 0;
   [[nodiscard]] virtual interactor::AnimationDirection getAnimationDirection() = 0;
+
+  /**
+   * Get the delta time used by the event loop.
+   * Returns 0 if the event loop has never been triggered.
+   */
+  [[nodiscard]] virtual double getDeltaTime() const = 0;
+
+  /**
+   * Jump to a specific frame by index.
+   * A negative index counts from the end of the animation (e.g. -1 is the last frame).
+   */
+  virtual interactor& jumpToFrame(int index) = 0;
+
+  /**
+   * Move the animation by a number of frames relative to the current frame.
+   * A positive offset moves forward, a negative offset moves backward.
+   */
+  virtual interactor& jumpToFrameRelative(int offset) = 0;
+
+  /**
+   * Jump to a specific keyframe by index.
+   * The index is clamped to stay within the available keyframes range.
+   */
+  virtual interactor& jumpToKeyframe(int index) = 0;
+
+  /**
+   * Move the animation by a number of keyframes relative to the closest keyframe to the current
+   * time. A positive offset moves forward, a negative offset moves backward. An offset of 0 jumps
+   * to the closest keyframe.
+   */
+  virtual interactor& jumpToKeyframeRelative(int offset) = 0;
   ///@}
 
   ///@{ @name Movement

@@ -439,6 +439,32 @@ extern "C"
     return self;
   }
 
+  JNIEXPORT jobject JAVA_BIND(Interactor, jumpToFrame)(JNIEnv* env, jobject self, jint index)
+  {
+    GetInteractor(env, self).jumpToFrame(static_cast<int>(index));
+    return self;
+  }
+
+  JNIEXPORT jobject JAVA_BIND(Interactor, jumpToFrameRelative)(
+    JNIEnv* env, jobject self, jint offset)
+  {
+    GetInteractor(env, self).jumpToFrameRelative(static_cast<int>(offset));
+    return self;
+  }
+
+  JNIEXPORT jobject JAVA_BIND(Interactor, jumpToKeyframe)(JNIEnv* env, jobject self, jint index)
+  {
+    GetInteractor(env, self).jumpToKeyframe(static_cast<int>(index));
+    return self;
+  }
+
+  JNIEXPORT jobject JAVA_BIND(Interactor, jumpToKeyframeRelative)(
+    JNIEnv* env, jobject self, jint offset)
+  {
+    GetInteractor(env, self).jumpToKeyframeRelative(static_cast<int>(offset));
+    return self;
+  }
+
   JNIEXPORT jboolean JAVA_BIND(Interactor, isPlayingAnimation)(JNIEnv* env, jobject self)
   {
     return GetInteractor(env, self).isPlayingAnimation();
@@ -455,6 +481,11 @@ extern "C"
 
     return env->CallStaticObjectMethod(
       enumClass, fromValueMethod, static_cast<int>(nativeDirection));
+  }
+
+  JNIEXPORT jdouble JAVA_BIND(Interactor, getDeltaTime)(JNIEnv* env, jobject self)
+  {
+    return GetInteractor(env, self).getDeltaTime();
   }
 
   JNIEXPORT jobject JAVA_BIND(Interactor, enableCameraMovement)(JNIEnv* env, jobject self)
