@@ -253,6 +253,7 @@ private:
   };
   AnimationModeType AnimationMode = AnimationModeType::FORWARD;
   int AnimationMaxRepeat = -1;
+  int AnimationModeDirection = 1;
   int AnimationCurrentRepeat = 0;
 };
 }

@@ -162,7 +162,8 @@ void animationManager::Tick()
   assert(this->DeltaTime > 0);
   if (this->Playing)
   {
-    this->CurrentTime += (this->DeltaTime * this->SpeedFactor) * this->AnimationDirection;
+    this->CurrentTime += (this->DeltaTime * this->SpeedFactor) * this->AnimationDirection *
+      this->AnimationModeDirection;
 
     // Modulo computation, compute CurrentTime in the time range.
     if (this->CurrentTime < this->TimeRange[0] || this->CurrentTime > this->TimeRange[1])
@@ -177,7 +178,7 @@ void animationManager::Tick()
       switch (this->AnimationMode)
       {
         case AnimationModeType::PINGPONG:
-          this->AnimationDirection *= -1;
+          this->AnimationModeDirection *= -1;
           if (this->CurrentTime < this->TimeRange[0])
           {
             this->CurrentTime = this->TimeRange[0] + (this->TimeRange[0] - this->CurrentTime);
@@ -186,21 +187,29 @@ void animationManager::Tick()
           {
             this->CurrentTime = this->TimeRange[1] - (this->CurrentTime - this->TimeRange[1]);
           }
+          if (this->AnimationMaxRepeat != -1 && AnimationModeDirection == 1)
+          {
+            this->AnimationCurrentRepeat++;
+          }
           break;
         case AnimationModeType::BACKWARD:
-          this->AnimationDirection = -1;
+          this->AnimationModeDirection = -1;
           this->CurrentTime = this->TimeRange[1] -
             modulo(this->TimeRange[1] - this->CurrentTime, this->TimeRange[1] - this->TimeRange[0]);
+          if (this->AnimationMaxRepeat != -1)
+          {
+            this->AnimationCurrentRepeat++;
+          }
           break;
         default:
-          this->AnimationDirection = 1;
+          this->AnimationModeDirection = 1;
           this->CurrentTime = this->TimeRange[0] +
             modulo(this->CurrentTime - this->TimeRange[0], this->TimeRange[1] - this->TimeRange[0]);
+          if (this->AnimationMaxRepeat != -1)
+          {
+            this->AnimationCurrentRepeat++;
+          }
           break;
-      }
-      if (this->AnimationMaxRepeat != -1)
-      {
-        this->AnimationCurrentRepeat++;
       }
     }
 
@@ -738,17 +747,17 @@ void animationManager::SetAnimationMode(const std::string& mode)
   if (mode == "backward")
   {
     this->AnimationMode = AnimationModeType::BACKWARD;
-    this->AnimationDirection = -1;
+    this->AnimationModeDirection = -1;
   }
   else if (mode == "pingpong")
   {
     this->AnimationMode = AnimationModeType::PINGPONG;
-    this->AnimationDirection = 1;
+    this->AnimationModeDirection = 1;
   }
   else
   {
     this->AnimationMode = AnimationModeType::FORWARD;
-    this->AnimationDirection = 1;
+    this->AnimationModeDirection = 1;
   }
 }
 
