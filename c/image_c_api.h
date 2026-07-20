@@ -52,6 +52,7 @@ extern "C"
    * @brief Create a new image object from a file path
    *
    * The returned image must be deleted with f3d_image_delete().
+   * If provided path is NULL, return NULL.
    *
    * @return Pointer to the newly created image object, NULL on failure
    */
@@ -60,6 +61,8 @@ extern "C"
   /**
    * @brief Delete an image object
    * @param img Pointer to the image object to be deleted
+   *
+   * If provided img is NULL, do nothing.
    */
   F3D_EXPORT void f3d_image_delete(f3d_image_t* img);
 
@@ -68,6 +71,9 @@ extern "C"
    *
    * @param img Pointer to the first image object
    * @param reference Pointer to the second image object
+   *
+   * If provided img or reference is NULL, return zero.
+   *
    * @return Non-zero if images are equal, zero otherwise
    */
   F3D_EXPORT int f3d_image_equals(f3d_image_t* img, f3d_image_t* reference);
@@ -77,6 +83,9 @@ extern "C"
    *
    * @param img Pointer to the first image object
    * @param reference Pointer to the second image object
+   *
+   * If provided img or reference is NULL, return 1.
+   *
    * @return Non-zero if images are not equal, zero otherwise
    */
   F3D_EXPORT int f3d_image_not_equals(f3d_image_t* img, f3d_image_t* reference);
@@ -87,6 +96,9 @@ extern "C"
    * @param x horizontal pixel coordinate
    * @param y vertical pixel coordinate
    * @param pixel Pointer to a preallocated buffer of channel count size
+   *
+   * If provided img or pixel is NULL, return zero.
+   *
    * @return Non-zero on success, zero on failure
    */
   F3D_EXPORT int f3d_image_get_normalized_pixel(f3d_image_t* img, int x, int y, double* pixel);
@@ -110,6 +122,9 @@ extern "C"
   /**
    * @brief Get the width of an image
    * @param img Pointer to the image object
+   *
+   * If provided img is NULL, return zero.
+   *
    * @return Width of the image
    */
   F3D_EXPORT unsigned int f3d_image_get_width(f3d_image_t* img);
@@ -117,6 +132,9 @@ extern "C"
   /**
    * @brief Get the height of an image
    * @param img Pointer to the image object
+   *
+   * If provided img is NULL, return zero.
+   *
    * @return Height of the image
    */
   F3D_EXPORT unsigned int f3d_image_get_height(f3d_image_t* img);
@@ -124,6 +142,9 @@ extern "C"
   /**
    * @brief Get the number of channels in an image
    * @param img Pointer to the image object
+   *
+   * If provided img is NULL, return zero.
+   *
    * @return Number of channels in the image
    */
   F3D_EXPORT unsigned int f3d_image_get_channel_count(f3d_image_t* img);
@@ -131,6 +152,9 @@ extern "C"
   /**
    * @brief Get the type of channels in an image
    * @param img Pointer to the image object
+   *
+   * If provided img is NULL, return -1.
+   *
    * @return Type of channels in the image, -1 on error
    */
   F3D_EXPORT int f3d_image_get_channel_type(f3d_image_t* img);
@@ -138,6 +162,9 @@ extern "C"
   /**
    * @brief Get the size of the channel type in an image
    * @param img Pointer to the image object
+   *
+   * If provided img is NULL, return zero.
+   *
    * @return Size of the channel type in the image
    */
   F3D_EXPORT unsigned int f3d_image_get_channel_type_size(f3d_image_t* img);
@@ -146,6 +173,9 @@ extern "C"
    * @brief Set the content of an image from a buffer
    * @param img Pointer to the image object
    * @param buffer Pointer to the buffer containing the image content
+   *
+   * If provided img or buffer is NULL, do nothing.
+   *
    */
   F3D_EXPORT void f3d_image_set_content(f3d_image_t* img, void* buffer);
 
@@ -156,6 +186,9 @@ extern "C"
    * It is valid as long as the image exists and its content is not modified.
    *
    * @param img Pointer to the image object
+   *
+   * If provided img is NULL, return nullptr.
+   *
    * @return Pointer to the buffer containing the image content
    */
   F3D_EXPORT void* f3d_image_get_content(f3d_image_t* img);
@@ -164,6 +197,9 @@ extern "C"
    * @brief Compare two images
    * @param img Pointer to the image object
    * @param reference Pointer to the reference image object
+   *
+   * If provided img or reference is NULL, return -1.0.
+   *
    * @return SSIM difference between the two images, -1.0 on error
    */
   F3D_EXPORT double f3d_image_compare(f3d_image_t* img, f3d_image_t* reference);
@@ -173,6 +209,9 @@ extern "C"
    * @param img Pointer to the image object
    * @param path Path to the file where the image will be saved
    * @param format Format in which the image will be saved
+   *
+   * If provided img or path is NULL, return zero.
+   *
    * @return Non-zero on success, zero on failure
    */
   F3D_EXPORT int f3d_image_save(f3d_image_t* img, const char* path, f3d_image_save_format_t format);
@@ -185,6 +224,10 @@ extern "C"
    * @param img Pointer to the image object
    * @param format Format in which the image will be saved
    * @param size Pointer to store the size of the saved buffer
+   *
+   * If provided size is NULL, return NULL.
+   * If provided img is NULL, set size to 0 and return NULL.
+   *
    * @return Pointer to the buffer containing the saved image
    */
   F3D_EXPORT unsigned char* f3d_image_save_buffer(
@@ -201,6 +244,7 @@ extern "C"
    *
    * Writes colored text to the provided file stream.
    * This is the C equivalent of toTerminalText(std::ostream&).
+   * If provided img or stream is NULL, do nothing.
    *
    * @param img Pointer to the image object
    * @param stream File stream to write to (e.g., stdout, stderr, or file handle)
@@ -213,6 +257,7 @@ extern "C"
    * The returned string points to internal static storage and must NOT be freed.
    * The pointer is valid until the next call to this function.
    * This is the C equivalent of toTerminalText() that returns a std::string.
+   * If provided img is NULL, return NULL.
    *
    * @param img Pointer to the image object
    * @return Pointer to the string representation of the image
@@ -224,6 +269,9 @@ extern "C"
    * @param img Pointer to the image object
    * @param key Metadata key
    * @param value Metadata value
+   *
+   * If provided img, key, or value is NULL, do nothing.
+   *
    */
   F3D_EXPORT void f3d_image_set_metadata(f3d_image_t* img, const char* key, const char* value);
 
@@ -235,6 +283,9 @@ extern "C"
    *
    * @param img Pointer to the image object
    * @param key Metadata key
+   *
+   * If provided img or key is NULL, return NULL.
+   *
    * @return Metadata value, NULL if error getting metadata
    */
   F3D_EXPORT const char* f3d_image_get_metadata(f3d_image_t* img, const char* key);
@@ -243,6 +294,8 @@ extern "C"
    * @brief Get all metadata keys from an image
    *
    * The returned keys must be freed with f3d_image_free_metadata_keys.
+   * If provided img is NULL, return NULL.
+   * If provided count is NULL, set count to zero and return NULL.
    *
    * @param img Pointer to the image object
    * @param count Pointer to store the count of metadata keys
@@ -254,6 +307,7 @@ extern "C"
    * @brief Free metadata keys obtained from an image
    *
    * Used to free the return of f3d_image_all_metadata.
+   * If provided keys are NULL, do nothing.
    *
    * @param keys Pointer to the array of metadata keys
    * @param count Count of metadata keys
