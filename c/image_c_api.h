@@ -84,7 +84,7 @@ extern "C"
    * @param img Pointer to the first image object
    * @param reference Pointer to the second image object
    *
-   * If provided img or reference is NULL, return 1(true).
+   * If provided img or reference is NULL, return 1.
    *
    * @return Non-zero if images are not equal, zero otherwise
    */

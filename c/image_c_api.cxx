@@ -249,7 +249,7 @@ int f3d_image_equals(f3d_image_t* img, f3d_image_t* reference)
 {
   if (!img || !reference)
   {
-    f3d::log::warn("Image or reference is null, cannot return if images equal");
+    f3d::log::warn("Image or reference is null, returning not equal");
     return 0;
   }
 
@@ -263,7 +263,7 @@ int f3d_image_not_equals(f3d_image_t* img, f3d_image_t* reference)
 {
   if (!img || !reference)
   {
-    f3d::log::warn("Image or reference is null, cannot return if images not equal");
+    f3d::log::warn("Image or reference is null, returning not equal");
     return 1;
   }
 
