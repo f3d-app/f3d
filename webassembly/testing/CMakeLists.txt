@@ -3,7 +3,6 @@ set(f3djsTests_list
   "test_depth"
   "test_engine"
   "test_image"
-  "test_image_stream"
   "test_interactor"
   "test_options"
   "test_render"
@@ -12,6 +11,12 @@ set(f3djsTests_list
   "test_custom_canvas"
   "test_statefile"
 )
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  list(APPEND f3djsTests_list
+       "test_image_stream"
+    )
+endif()
 
 find_program(CHROMIUM_EXECUTABLE chromium)
 
