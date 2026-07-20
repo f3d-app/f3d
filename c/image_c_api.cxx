@@ -83,7 +83,7 @@ void f3d_image_delete(f3d_image_t* img)
 {
   if (!img)
   {
-    f3d::log::warn("Image is null, nothing to delete");
+    f3d::log::warn("Image is null, cannot delete image");
     return;
   }
 
@@ -96,7 +96,7 @@ int f3d_image_get_normalized_pixel(f3d_image_t* img, int x, int y, double* pixel
 {
   if (!img || !pixel)
   {
-    f3d::log::warn("Image or pixel pointer is null");
+    f3d::log::warn("Image or pixel pointer is null, cannot get normalized pixel");
     return 0;
   }
 
@@ -121,7 +121,7 @@ unsigned int f3d_image_get_width(f3d_image_t* img)
 {
   if (!img)
   {
-    f3d::log::warn("Image is null");
+    f3d::log::warn("Image is null, cannot get width");
     return 0;
   }
 
@@ -134,7 +134,7 @@ unsigned int f3d_image_get_height(f3d_image_t* img)
 {
   if (!img)
   {
-    f3d::log::warn("Image is null");
+    f3d::log::warn("Image is null, cannot get height");
     return 0;
   }
 
@@ -147,7 +147,7 @@ unsigned int f3d_image_get_channel_count(f3d_image_t* img)
 {
   if (!img)
   {
-    f3d::log::warn("Image is null");
+    f3d::log::warn("Image is null, cannot get channel count");
     return 0;
   }
 
@@ -160,7 +160,7 @@ int f3d_image_get_channel_type(f3d_image_t* img)
 {
   if (!img)
   {
-    f3d::log::warn("Image is null");
+    f3d::log::warn("Image is null, cannot get channel type");
     return -1;
   }
 
@@ -183,7 +183,7 @@ unsigned int f3d_image_get_channel_type_size(f3d_image_t* img)
 {
   if (!img)
   {
-    f3d::log::warn("Image is null");
+    f3d::log::warn("Image is null, cannot get channel type size");
     return 0;
   }
 
@@ -196,7 +196,7 @@ void f3d_image_set_content(f3d_image_t* img, void* buffer)
 {
   if (!img || !buffer)
   {
-    f3d::log::warn("Image or buffer is null");
+    f3d::log::warn("Image or buffer is null, cannot set content");
     return;
   }
 
@@ -209,7 +209,7 @@ void* f3d_image_get_content(f3d_image_t* img)
 {
   if (!img)
   {
-    f3d::log::warn("Image is null");
+    f3d::log::warn("Image is null, cannot get content");
     return nullptr;
   }
 
@@ -222,7 +222,7 @@ double f3d_image_compare(f3d_image_t* img, f3d_image_t* reference)
 {
   if (!img || !reference)
   {
-    f3d::log::warn("Image or reference is null");
+    f3d::log::warn("Image or reference is null, cannot compare image");
     return -1.0;
   }
 
@@ -249,7 +249,7 @@ int f3d_image_equals(f3d_image_t* img, f3d_image_t* reference)
 {
   if (!img || !reference)
   {
-    f3d::log::warn("Image or reference is null");
+    f3d::log::warn("Image or reference is null, cannot return if images equal");
     return 0;
   }
 
@@ -263,7 +263,7 @@ int f3d_image_not_equals(f3d_image_t* img, f3d_image_t* reference)
 {
   if (!img || !reference)
   {
-    f3d::log::warn("Image or reference is null");
+    f3d::log::warn("Image or reference is null, cannot return if images not equal");
     return 1;
   }
 
@@ -277,7 +277,7 @@ int f3d_image_save(f3d_image_t* img, const char* path, f3d_image_save_format_t f
 {
   if (!img || !path)
   {
-    f3d::log::warn("Image or path is null");
+    f3d::log::warn("Image or path is null, cannot save image");
     return 0;
   }
 
@@ -307,13 +307,13 @@ unsigned char* f3d_image_save_buffer(
 {
   if (!size)
   {
-    f3d::log::warn("Size pointer is null");
+    f3d::log::warn("Size pointer is null, cannot save image buffer");
     return nullptr;
   }
 
   if (!img)
   {
-    f3d::log::warn("Image is null");
+    f3d::log::warn("Image is null, cannot save image buffer");
     *size = 0;
     return nullptr;
   }
@@ -354,7 +354,7 @@ void f3d_image_to_terminal_text(f3d_image_t* img, void* stream)
 {
   if (!img || !stream)
   {
-    f3d::log::warn("Image or stream is null");
+    f3d::log::warn("Image or stream is null, cannot convert image to terminal text");
     return;
   }
 
@@ -380,7 +380,7 @@ const char* f3d_image_to_terminal_text_string(f3d_image_t* img)
 {
   if (!img)
   {
-    f3d::log::warn("Image is null");
+    f3d::log::warn("Image is null, cannot convert image to terminal text string");
     return nullptr;
   }
 
@@ -395,7 +395,7 @@ void f3d_image_set_metadata(f3d_image_t* img, const char* key, const char* value
 {
   if (!img || !key || !value)
   {
-    f3d::log::warn("Image, key or value is null");
+    f3d::log::warn("Image, key or value is null, cannot set metadata");
     return;
   }
 
@@ -408,7 +408,7 @@ const char* f3d_image_get_metadata(f3d_image_t* img, const char* key)
 {
   if (!img || !key)
   {
-    f3d::log::warn("Image or key is null");
+    f3d::log::warn("Image or key is null, cannot get metadata");
     return nullptr;
   }
 
@@ -433,13 +433,13 @@ char** f3d_image_all_metadata(f3d_image_t* img, unsigned int* count)
 {
   if (!count)
   {
-    f3d::log::warn("Count pointer is null");
+    f3d::log::warn("Count pointer is null, cannot get all metadata");
     return nullptr;
   }
 
   if (!img)
   {
-    f3d::log::warn("Image is null");
+    f3d::log::warn("Image is null, cannot get all metadata");
     *count = 0;
     return nullptr;
   }
@@ -461,7 +461,7 @@ void f3d_image_free_metadata_keys(char** keys, unsigned int count)
 {
   if (!keys)
   {
-    f3d::log::warn("Keys is null, nothing to free");
+    f3d::log::warn("Keys are null, cannot free metadata");
     return;
   }
 
