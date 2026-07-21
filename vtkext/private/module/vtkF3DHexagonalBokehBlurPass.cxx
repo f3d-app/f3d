@@ -163,9 +163,9 @@ void vtkF3DHexagonalBokehBlurPass::RenderDirectionalBlur(
 
     std::stringstream ssImpl;
 
-    ssImpl << "  vec2 blurDir = vec2(cos(PI/2), sin(PI/2));\n";
+    ssImpl << "  vec2 blurDir = vec2(cos(PI/2.0), sin(PI/2.0));\n";
     ssImpl << "  vec3 color1 = BlurTexture(backgroundTexture, texCoord, blurDir).rgb;\n";
-    ssImpl << "  blurDir = vec2(cos(-PI/6), sin(-PI/6));\n";
+    ssImpl << "  blurDir = vec2(cos(-PI/6.0), sin(-PI/6.0));\n";
     ssImpl << "  vec3 color2 = BlurTexture(backgroundTexture, texCoord, blurDir).rgb;\n";
     ssImpl << "  gl_FragData[0] = vec4(color1, 1.0);\n";
     ssImpl << "  gl_FragData[1] = vec4(color1 + color2, 1.0);\n";
@@ -231,11 +231,11 @@ void vtkF3DHexagonalBokehBlurPass::RenderRhomboidBlur(
 
     std::stringstream ssImpl;
 
-    ssImpl << "  vec2 blurDir = vec2(cos(-PI/6), sin(-PI/6));\n";
+    ssImpl << "  vec2 blurDir = vec2(cos(-PI/6.0), sin(-PI/6.0));\n";
     ssImpl << "  vec3 color1 = BlurTexture(verticalBlurTexture, texCoord, blurDir).rgb;\n";
-    ssImpl << "  blurDir = vec2(cos(-5*PI/6), sin(-5*PI/6));\n";
+    ssImpl << "  blurDir = vec2(cos(-5.0*PI/6.0), sin(-5.0*PI/6.0));\n";
     ssImpl << "  vec3 color2 = BlurTexture(diagonalBlurTexture, texCoord, blurDir).rgb;\n";
-    ssImpl << "  gl_FragData[0] = vec4((color1 + color2) / 3, 1.0);\n";
+    ssImpl << "  gl_FragData[0] = vec4((color1 + color2) / 3.0, 1.0);\n";
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl", ssImpl.str());
 
