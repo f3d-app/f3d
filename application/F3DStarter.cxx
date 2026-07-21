@@ -2023,7 +2023,10 @@ void F3DStarter::LoadFileGroupInternal(
             auto forceReader = this->Internals->LibOptions.scene.force_reader;
             if (forceReader)
             {
-              f3d::log::warn("Forced reader ", *forceReader, " doesn't exist");
+              f3d::log::warn(tmpPath.string(),
+                " contains unsupported contents for "
+                "a selected forced reader ",
+                *forceReader);
             }
             else
             {

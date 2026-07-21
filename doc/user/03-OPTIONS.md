@@ -35,7 +35,7 @@ Force a specific [reader](02-SUPPORTED_FORMATS.md) to be used, disregarding the 
 
 ### `--skip-content-check` (_bool_, default: `false`)
 
-Make attempt to read file without checking it's header.
+Select reader to read file without checking its header content, but only based on the file extension.
 
 ### `--list-bindings`
 

@@ -284,17 +284,13 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       {
         case file_availability::UNSUPPORTED_EXTENSION:
           errorMessage = (filePath.string() +
-            " is not a file of a supported 3D scene file format, use force reader to force a "
-            "specific "
-            "reader");
+            " does not have an extension corresponding to a supported file format, use force "
+            "reader to force a specific reader");
           break;
         case file_availability::UNSUPPORTED_CONTENT:
           errorMessage = (filePath.string() +
-            " contains unsupported content");
-          break;
-        default:
-          errorMessage = (filePath.string() +
-            " is not a file of a supported 3D scene file format or contains unsupported content");
+            " contains unsupported content and no reader have been selected, use force reader to "
+            "force a specific reader");
           break;
       }
       throw scene::load_failure_exception(errorMessage);
@@ -354,8 +350,7 @@ scene& scene_impl::add(const std::byte* buffer, std::size_t size)
   }
 #endif
 
-  const f3d::reader* reader =
-    f3d::factory::instance()->getReader(buffer, size, forceReader, this->Internals->Options.scene.skip_content_check);
+  const f3d::reader* reader = f3d::factory::instance()->getReader(buffer, size, forceReader);
   if (reader)
   {
     if (forceReader)
@@ -889,8 +884,7 @@ scene& scene_impl::removeAllLights()
 //----------------------------------------------------------------------------
 f3d::file_availability scene_impl::supports(const fs::path& filePath)
 {
-  f3d::file_availability availability =
-    f3d::file_availability::UNSUPPORTED_EXTENSION;
+  f3d::file_availability availability = f3d::file_availability::UNSUPPORTED_EXTENSION;
   f3d::factory::instance()->getReader(filePath.string(),
     this->Internals->Options.scene.force_reader, this->Internals->Options.scene.skip_content_check,
     availability) != nullptr;

@@ -85,8 +85,8 @@ reader* factory::getReader(const std::string& fileName, std::optional<std::strin
 }
 
 //----------------------------------------------------------------------------
-reader* factory::getReader(const std::byte* buffer, std::size_t size,
-  std::optional<std::string> forceReader, const std::optional<bool> skipContentCheck)
+reader* factory::getReader(
+  const std::byte* buffer, std::size_t size, std::optional<std::string> forceReader)
 {
   vtkNew<vtkMemoryResourceStream> stream;
   stream->SetBuffer(buffer, size);

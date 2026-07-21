@@ -205,8 +205,8 @@ EMSCRIPTEN_BINDINGS(f3d)
   // - add f3d::mesh_t support
   emscripten::class_<f3d::scene>("Scene")
     .function(
-      "supports",
-      +[](f3d::scene& scene, const std::string& path) -> bool { return scene.supports(path) == f3d::file_availability::SUPPORTED; })
+      "supports", +[](f3d::scene& scene, const std::string& path) -> bool
+      { return scene.supports(path) == f3d::file_availability::SUPPORTED; })
     .function(
       "add",
       +[](f3d::scene& scene, emscripten::val arg) -> f3d::scene&
@@ -336,20 +336,23 @@ EMSCRIPTEN_BINDINGS(f3d)
     .property(
       "position", +[](const f3d::camera& cam) -> emscripten::val
       { return containerToJSArray(cam.getPosition()); },
-      +[](f3d::camera& cam, emscripten::val jsArray) {
+      +[](f3d::camera& cam, emscripten::val jsArray)
+      {
         cam.setPosition({ jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() });
       })
     .property(
       "focalPoint", +[](const f3d::camera& cam) -> emscripten::val
       { return containerToJSArray(cam.getFocalPoint()); },
-      +[](f3d::camera& cam, emscripten::val jsArray) {
+      +[](f3d::camera& cam, emscripten::val jsArray)
+      {
         cam.setFocalPoint(
           { jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() });
       })
     .property(
       "viewUp", +[](const f3d::camera& cam) -> emscripten::val
       { return containerToJSArray(cam.getViewUp()); },
-      +[](f3d::camera& cam, emscripten::val jsArray) {
+      +[](f3d::camera& cam, emscripten::val jsArray)
+      {
         cam.setViewUp({ jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() });
       })
     .property("viewAngle",
