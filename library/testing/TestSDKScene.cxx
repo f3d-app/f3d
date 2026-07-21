@@ -98,7 +98,8 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     }
     catch (f3d::scene::load_failure_exception& E)
     {
-      std::string expectedMsg = "contains unsupported content";
+      std::string expectedMsg = "contains unsupported content and no reader have been selected, "
+                                "use force reader to force a specific reader";
       std::string exceptMsg = E.what();
       test("Check exception message size", exceptMsg.size() >= expectedMsg.size());
       test("Check exception message",
