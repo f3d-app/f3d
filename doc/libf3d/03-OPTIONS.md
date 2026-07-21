@@ -68,7 +68,7 @@ CLI: `--force-reader`.
 
 ### `scene.skip_content_check` (_bool_, default: `false`)
 
-Make attempt to read file without checking it's header.
+Select reader to read file without checking its header content but only based on the file extension.
 
 CLI: `--skip-content-check`.
 
