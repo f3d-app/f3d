@@ -280,12 +280,6 @@
           "implicitValue": "2d"
         },
         {
-          "longName": "interaction-trackball",
-          "helpText": "Enable trackball interaction (deprecated, use --interaction-style=trackball)",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
-        },
-        {
           "longName": "invert-zoom",
           "helpText": "Invert zoom direction with right mouse click",
           "valueHelper": "<bool>",
