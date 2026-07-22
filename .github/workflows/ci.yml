@@ -113,10 +113,6 @@ jobs:
           fetch-depth: 0
           lfs: false
 
-      - name: Remove faulty OPENGL32.dll
-        shell: cmd
-        run: rm 'C:\Windows\system32\OPENGL32.dll'
-
       - name: Generic CI
         uses: ./source/.github/actions/generic-ci
         with:

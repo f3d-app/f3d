@@ -118,6 +118,17 @@ runs:
         mkdir install
         mkdir install/output
 
+    - name: Remove faulty OPENGL32.dll
+      shell: cmd
+      run: rm 'C:\Windows\system32\OPENGL32.dll'
+
+    # When running standard test on windows, use wgl
+    - name: Install Mesa Windows
+      if: runner.os == 'Windows'
+      uses: f3d-app/install-mesa-windows-action@v3
+      with:
+        path: ${{github.workspace}}\dependencies\install\bin\
+
     - name: Set PATH windows
       if: runner.os == 'Windows'
       shell: powershell
@@ -266,13 +277,6 @@ runs:
       shell: bash
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
-    # When running standard test on windows, use wgl
-    - name: Install Mesa Windows
-      if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v3
-      with:
-        path: ${{github.workspace}}\build\bin_Release
-
     # numpy makes pytest crashing on Windows in the CI but not locally, skipping for now
     - name: Set CI test exception for Windows
       if: runner.os == 'Windows'
@@ -330,12 +334,6 @@ runs:
         cmake --install . --component configuration
         cmake --install . --component colormaps
 
-    - name: Install Mesa Windows in install
-      if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v3
-      with:
-        path: ${{github.workspace}}\install\bin
-
     - name: Build and configure python externally
       if: |
         inputs.optdeps_label == 'optdeps' &&
@@ -366,14 +364,6 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}
       run: cmake --build build_examples --config Release
-
-    - name: Install Mesa Windows examples
-      if: |
-        runner.os == 'Windows' &&
-        inputs.static_label == 'no-static'
-      uses: f3d-app/install-mesa-windows-action@v3
-      with:
-        path: ${{github.workspace}}\build_examples\*\*\Release
 
     # older VTK version create different renderings so they are not tested
     - name: Test libf3d examples
