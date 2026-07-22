@@ -118,12 +118,13 @@ runs:
         mkdir install
         mkdir install/output
         mkdir install/bin
+        mkdir mesa
 
     - name: Set PATH windows
       if: runner.os == 'Windows'
       shell: powershell
       working-directory: ${{github.workspace}}
-      run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\dependencies\install\lib\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      run: echo "PATH=$env:PATH;$(pwd)\mesa\;$(pwd)\dependencies\install\bin\;$(pwd)\dependencies\install\lib\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Set DYLD_LIBRARY_PATH on macOS for OSPRay/OSMesa dynamic loading
       if: |
@@ -226,7 +227,7 @@ runs:
       if: runner.os == 'Windows'
       uses: f3d-app/install-mesa-windows-action@v3
       with:
-        path: ${{github.workspace}}\install\bin
+        path: ${{github.workspace}}\mesa
 
     - name: Set F3D binary path Linux
       if: runner.os == 'Linux'
