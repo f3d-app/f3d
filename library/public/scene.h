@@ -172,8 +172,7 @@ public:
    * scene.force_reader is taken into account and plugin should be loaded for their readers to be
    * found.
    */
-  [[nodiscard]] virtual file_availability supports(
-    const std::filesystem::path& filePath) = 0;
+  [[nodiscard]] virtual file_availability supports(const std::filesystem::path& filePath) = 0;
 
   /**
    * Load added files at provided time value if they contain any animation

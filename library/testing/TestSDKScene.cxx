@@ -49,24 +49,23 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // supports method
   test("not supported with empty filename",
-       sce.supports(empty) == f3d::file_availability::UNSUPPORTED_EXTENSION);
+    sce.supports(empty) == f3d::file_availability::UNSUPPORTED_EXTENSION);
   test("not supported with dummy filename",
-       sce.supports(dummy) == f3d::file_availability::UNSUPPORTED_EXTENSION);
+    sce.supports(dummy) == f3d::file_availability::UNSUPPORTED_EXTENSION);
   test("not supported with non existent filename",
-       sce.supports(nonExistent) == f3d::file_availability::UNSUPPORTED_EXTENSION);
-  test("supported with invalid body",
-       sce.supports(invalidBody) == f3d::file_availability::SUPPORTED);
-  test("supported with default scene format",
-       sce.supports(cube) == f3d::file_availability::SUPPORTED);
+    sce.supports(nonExistent) == f3d::file_availability::UNSUPPORTED_EXTENSION);
+  test(
+    "supported with invalid body", sce.supports(invalidBody) == f3d::file_availability::SUPPORTED);
+  test(
+    "supported with default scene format", sce.supports(cube) == f3d::file_availability::SUPPORTED);
   test("supported with full scene format", sce.supports(logo) == f3d::file_availability::SUPPORTED);
   // invalid
-  test.expect<f3d::scene::load_failure_exception>("add with invalid default scene file",
-                                                  [&]() { sce.add(invalidDefaultScene); });
-  test.expect<f3d::scene::load_failure_exception>("add with invalid full scene file",
-                                                  [&]() { sce.add(invalidFullScene); });
-  test.expect<f3d::scene::load_failure_exception>("add with invalid multiple files", [&]() {
-    sce.add({ validFilename, invalidFullScene, invalidDefaultScene });
-  });
+  test.expect<f3d::scene::load_failure_exception>(
+    "add with invalid default scene file", [&]() { sce.add(invalidDefaultScene); });
+  test.expect<f3d::scene::load_failure_exception>(
+    "add with invalid full scene file", [&]() { sce.add(invalidFullScene); });
+  test.expect<f3d::scene::load_failure_exception>("add with invalid multiple files",
+    [&]() { sce.add({ validFilename, invalidFullScene, invalidDefaultScene }); });
 
   // invalid reader
   {
@@ -85,8 +84,7 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
       std::string exceptMsg = E.what();
       test("Check exception message size", exceptMsg.size() >= expectedMsg.size());
       test("Check exception message",
-           exceptMsg.substr(exceptMsg.size() - expectedMsg.size(), expectedMsg.size()) ==
-             expectedMsg);
+        exceptMsg.substr(exceptMsg.size() - expectedMsg.size(), expectedMsg.size()) == expectedMsg);
     }
   }
   {
@@ -103,8 +101,7 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
       std::string exceptMsg = E.what();
       test("Check exception message size", exceptMsg.size() >= expectedMsg.size());
       test("Check exception message",
-           exceptMsg.substr(exceptMsg.size() - expectedMsg.size(), expectedMsg.size()) ==
-             expectedMsg);
+        exceptMsg.substr(exceptMsg.size() - expectedMsg.size(), expectedMsg.size()) == expectedMsg);
     }
     engine.getOptions().scene.skip_content_check = true;
     try
@@ -117,17 +114,16 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
       std::string exceptMsg = E.what();
       test("Check exception message size", exceptMsg.size() >= expectedMsg.size());
       test("Check exception message",
-           exceptMsg.substr(exceptMsg.size() - expectedMsg.size(), expectedMsg.size()) ==
-             expectedMsg);
+        exceptMsg.substr(exceptMsg.size() - expectedMsg.size(), expectedMsg.size()) == expectedMsg);
     }
   }
 
   // add error code paths
   test.expect<f3d::scene::load_failure_exception>("add with dummy file", [&]() { sce.add(dummy); });
-  test.expect<f3d::scene::load_failure_exception>("add with unsupported file",
-                                                  [&]() { sce.add(unsupported); });
-  test.expect<f3d::scene::load_failure_exception>("add with inexistent file",
-                                                  [&]() { sce.add(nonExistent); });
+  test.expect<f3d::scene::load_failure_exception>(
+    "add with unsupported file", [&]() { sce.add(unsupported); });
+  test.expect<f3d::scene::load_failure_exception>(
+    "add with inexistent file", [&]() { sce.add(nonExistent); });
 
   // add standard code paths
   test("add with empty file", [&]() { sce.add(std::vector<std::string>{}); });
@@ -137,8 +133,7 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("add with multiples file strings", [&]() { sce.add({ sphere1, world }); });
 
   // render test
-  test(
-    "render after add",
+  test("render after add",
     TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKScene"));
 
   // light test
@@ -166,22 +161,22 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     f3d::light_state_t light = sce.getLight(1);
     return light == redLight;
   });
-  test.expect<f3d::scene::light_exception>("get light at invalid index",
-                                           [&]() { std::ignore = sce.getLight(10); });
-  test.expect<f3d::scene::light_exception>("update light at invalid index",
-                                           [&]() { sce.updateLight(10, redLight); });
+  test.expect<f3d::scene::light_exception>(
+    "get light at invalid index", [&]() { std::ignore = sce.getLight(10); });
+  test.expect<f3d::scene::light_exception>(
+    "update light at invalid index", [&]() { sce.updateLight(10, redLight); });
   sce.updateLight(0, redLight);
   test("update light", sce.getLight(0) == sce.getLight(1));
-  test.expect<f3d::scene::light_exception>("remove light at invalid index",
-                                           [&]() { sce.removeLight(10); });
+  test.expect<f3d::scene::light_exception>(
+    "remove light at invalid index", [&]() { sce.removeLight(10); });
   test("remove light at index 0", [&]() {
     sce.removeLight(0);
     return sce.getLightCount() == 1;
   });
 
   test("render after light",
-       TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", argv[2],
-                                  "TestSDKSceneRedLight"));
+    TestSDKHelpers::RenderTest(
+      win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKSceneRedLight"));
 
   return test.result();
 }
