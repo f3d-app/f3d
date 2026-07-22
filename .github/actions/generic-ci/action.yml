@@ -117,6 +117,7 @@ runs:
         mkdir build
         mkdir install
         mkdir install/output
+        mkdir install/bin
 
     - name: Remove faulty OPENGL32.dll
       shell: cmd
@@ -127,7 +128,7 @@ runs:
       if: runner.os == 'Windows'
       uses: f3d-app/install-mesa-windows-action@v3
       with:
-        path: ${{github.workspace}}\dependencies\install\bin\
+        path: ${{github.workspace}}\install\bin
 
     - name: Set PATH windows
       if: runner.os == 'Windows'
