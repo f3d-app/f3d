@@ -276,6 +276,13 @@ EMSCRIPTEN_BINDINGS(f3d)
       "getNormalizedPixel", +[](const f3d::image& img, int x, int y) -> emscripten::val
       { return containerToJSArray(img.getNormalizedPixel({ x, y })); })
     .class_function(
+      "createFromBuffer",
+      +[](emscripten::val jsbuf) -> f3d::image
+      {
+        std::vector<unsigned char> data = emscripten::vecFromJSArray<unsigned char>(jsbuf);
+        return f3d::image(reinterpret_cast<std::byte*>(data.data()), data.size());
+      })
+    .class_function(
       "getSupportedFormats",
       +[]() -> emscripten::val { return containerToJSArray(f3d::image::getSupportedFormats()); })
     .property("width", &f3d::image::getWidth)

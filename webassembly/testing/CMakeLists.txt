@@ -12,6 +12,12 @@ set(f3djsTests_list
   "test_statefile"
 )
 
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  list(APPEND f3djsTests_list
+       "test_image_stream"
+    )
+endif()
+
 find_program(CHROMIUM_EXECUTABLE chromium)
 
 if (NOT CHROMIUM_EXECUTABLE)

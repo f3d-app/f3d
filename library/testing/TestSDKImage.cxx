@@ -83,6 +83,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   // test exceptions
   test.expect<f3d::image::write_exception>("save incompatible buffer to BMP format",
     [&]() { std::ignore = img16.saveBuffer(f3d::image::SaveFormat::BMP); });
+
   test.expect<f3d::image::write_exception>("save incompatible buffer to PNG format",
     [&]() { std::ignore = img32.saveBuffer(f3d::image::SaveFormat::PNG); });
 
@@ -90,10 +91,13 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   f3d::image img5Ch(4, 4, 5);
   test.expect<f3d::image::write_exception>("save incompatible channel count to BMP format",
     [&]() { std::ignore = img5Ch.saveBuffer(f3d::image::SaveFormat::BMP); });
+
   test.expect<f3d::image::write_exception>("save incompatible channel count to JPG format",
     [&]() { std::ignore = img2Ch.saveBuffer(f3d::image::SaveFormat::JPG); });
+
   test.expect<f3d::image::write_exception>("save image to invalid path",
     [&]() { img2Ch.save("/" + std::string(257, 'x') + "/file.ext"); });
+
   test.expect<f3d::image::write_exception>("save image to invalid filename",
     [&]() { img2Ch.save(testingDir + std::string(257, 'x') + ".ext"); });
 
@@ -174,6 +178,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   {
     test.expect<f3d::image::write_exception>("invalid toTerminalText with BYTE",
       [&]() { std::ignore = f3d::image(3, 3, 1, f3d::image::ChannelType::BYTE).toTerminalText(); });
+
     test.expect<f3d::image::write_exception>("invalid toTerminalText with SHORT", [&]() {
       std::ignore = f3d::image(3, 3, 4, f3d::image::ChannelType::SHORT).toTerminalText();
     });
