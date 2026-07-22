@@ -34,8 +34,8 @@ int TestSDKImageStream([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   // check reading invalid stream
   std::vector<unsigned char> invalidBuffer = { 0, 1, 2, 3, 4, 5 };
   std::byte* invalidBufferData = reinterpret_cast<std::byte*>(invalidBuffer.data());
-  test.expect<f3d::image::read_exception>("read image from invalid stream",
-    [&]() { f3d::image invalidImgStream(invalidBufferData, 2); });
+  test.expect<f3d::image::read_exception>(
+    "read image from invalid stream", [&]() { f3d::image invalidImgStream(invalidBufferData, 2); });
 
   return test.result();
 }
