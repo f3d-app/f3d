@@ -119,17 +119,6 @@ runs:
         mkdir install/output
         mkdir install/bin
 
-    - name: Remove faulty OPENGL32.dll
-      shell: cmd
-      run: rm 'C:\Windows\system32\OPENGL32.dll'
-
-    # When running standard test on windows, use wgl
-    - name: Install Mesa Windows
-      if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v3
-      with:
-        path: ${{github.workspace}}\install\bin
-
     - name: Set PATH windows
       if: runner.os == 'Windows'
       shell: powershell
@@ -227,6 +216,17 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: cmake --build . --parallel 2 --config Release
+
+    - name: Remove faulty OPENGL32.dll
+      shell: cmd
+      run: rm 'C:\Windows\system32\OPENGL32.dll'
+
+    # When running standard test on windows, use wgl
+    - name: Install Mesa Windows
+      if: runner.os == 'Windows'
+      uses: f3d-app/install-mesa-windows-action@v3
+      with:
+        path: ${{github.workspace}}\install\bin
 
     - name: Set F3D binary path Linux
       if: runner.os == 'Linux'
