@@ -165,9 +165,10 @@ public:
   virtual scene& removeAllLights() = 0;
 
   /**
-   * Return true if provided file in path uses a supported extension, exists and its content
-   * correspond to a supported file format, false otherwise.
-   * content validation is only performed with VTK >= 9.6.20260228
+   * Return enum file_availability which indicates if the file at the specified path has
+   * supported extension, unsupported extension or unsupported content.
+   * content validation is only performed with VTK >= 9.6.20260228.
+   * scene.skip_content_check disables content validation.
    * scene.force_reader is taken into account and plugin should be loaded for their readers to be
    * found.
    */
