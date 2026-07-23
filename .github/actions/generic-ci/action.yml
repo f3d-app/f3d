@@ -250,13 +250,25 @@ runs:
         echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
 
     # Linux: Xvfb is not running, should fallback to egl
-    # Windows: mesa binary is not installed, should fallback to osmesa
+    # Windows: mesa binary is not installed and faulty OPENGL32.dll in insufficient, should fallback to osmesa
     # macOS: No fallback mechanism to test, CI always uses osmesa (with VTK > 9.7.20260706), check cocoa is functional
     - name: Check rendering backend logic
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: |
         ${{ env.F3D_BUILD_BIN_PATH }} ../source/testing/data/dragon.vtu --output=Testing/Temporary/build_output.png --reference=../source/.github/baselines/build_output.png --resolution=300,300 --verbose
+
+    - name: Remove faulty OPENGL32.dll
+      if: runner.os == 'Windows'
+      shell: cmd
+      run: rm 'C:\Windows\system32\OPENGL32.dll'
+
+    # When running standard test on windows, use wgl
+    - name: Install Mesa opengl instead
+      if: runner.os == 'Windows'
+      uses: f3d-app/install-mesa-windows-action@v3
+      with:
+        path: C:\Windows\system32
 
     # When running standard test with auto rendering backend on linux, use glx
     - name: Run Xvfb ubuntu
@@ -265,13 +277,6 @@ runs:
         inputs.rendering_backend == 'auto'
       shell: bash
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
-
-    # When running standard test on windows, use wgl
-    - name: Install Mesa Windows
-      if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v3
-      with:
-        path: ${{github.workspace}}\build\bin_Release
 
     # numpy makes pytest crashing on Windows in the CI but not locally, skipping for now
     - name: Set CI test exception for Windows
@@ -330,12 +335,6 @@ runs:
         cmake --install . --component configuration
         cmake --install . --component colormaps
 
-    - name: Install Mesa Windows in install
-      if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v3
-      with:
-        path: ${{github.workspace}}\install\bin
-
     - name: Build and configure python externally
       if: |
         inputs.optdeps_label == 'optdeps' &&
@@ -366,14 +365,6 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}
       run: cmake --build build_examples --config Release
-
-    - name: Install Mesa Windows examples
-      if: |
-        runner.os == 'Windows' &&
-        inputs.static_label == 'no-static'
-      uses: f3d-app/install-mesa-windows-action@v3
-      with:
-        path: ${{github.workspace}}\build_examples\*\*\Release
 
     # older VTK version create different renderings so they are not tested
     - name: Test libf3d examples
