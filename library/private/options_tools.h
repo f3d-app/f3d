@@ -900,28 +900,6 @@ bool hasDomain(f3d::options::domain_style& styleVar, const f3d::options::domain_
 
 //----------------------------------------------------------------------------
 /**
- * Get provided domain_enum as a string vector
- */
-template<typename T>
-std::vector<std::string> getEnumDomain(const f3d::options::DomainEnum<T>& domain)
-{
-  std::vector<std::string> ret;
-  std::ranges::transform(
-    domain.enumeration, std::back_inserter(ret), [](const T& val) { return format(val); });
-  return ret;
-}
-
-//----------------------------------------------------------------------------
-/**
- * Get provided domain_enum<std::string> enumeration
- */
-std::vector<std::string> getEnumDomain(const f3d::options::DomainEnum<std::string>& domain)
-{
-  return domain.enumeration;
-}
-
-//----------------------------------------------------------------------------
-/**
  * Get provided domain_range as a DomainRange<option_variant_t>.
  * ratio_t is exposed as double, consistently with option values.
  */
@@ -938,6 +916,16 @@ f3d::options::DomainRange<f3d::option_variant_t> getRangeDomain(
   {
     return { domain.min, domain.max, domain.increment };
   }
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Get provided domain_enum as a DomainEnum<option_variant_t>.
+ * Only string is supported for now
+ */
+f3d::options::DomainEnum<f3d::option_variant_t> getEnumDomain(const f3d::options::DomainEnum<std::string>& domain)
+{
+  return { domain.enumeration };
 }
 
 //----------------------------------------------------------------------------

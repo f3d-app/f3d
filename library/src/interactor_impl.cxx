@@ -848,11 +848,12 @@ interactor& interactor_impl::initCommands()
           this->Internals->Options.getDomainStyle(args[0]) == f3d::options::domain_style::ENUM)
         {
           // recover the enumeration
-          std::vector<std::string> enumeration = this->Internals->Options.getEnumDomain(args[0]);
+          // TODO
+          //std::vector<std::string> enumeration = this->Internals->Options.getEnumDomain(args[0]);
 
           // Transform potential values into found option
-          std::ranges::transform(enumeration, std::back_inserter(candidates),
-            [&](const auto& value) { return args[0] + " " + value; });
+//          std::ranges::transform(enumeration, std::back_inserter(candidates),
+//            [&](const auto& value) { return args[0] + " " + value; });
         }
         else
         {
@@ -873,10 +874,11 @@ interactor& interactor_impl::initCommands()
         this->Internals->Options.getDomainStyle(args[0]) == f3d::options::domain_style::ENUM)
       {
         // recover the enumeration
-        std::vector<std::string> enumeration = this->Internals->Options.getEnumDomain(args[0]);
+//        std::vector<std::string> enumeration = this->Internals->Options.getEnumDomain(args[0]);
 
         // Complete the option value if possible
-        return complNames(args, enumeration, 1);
+        // TODO
+//        return complNames(args, enumeration, 1);
       }
     }
 
