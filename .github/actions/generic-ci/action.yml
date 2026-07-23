@@ -126,6 +126,17 @@ runs:
       working-directory: ${{github.workspace}}
       run: echo "PATH=$env:PATH;$(pwd)\mesa\;$(pwd)\dependencies\install\bin\;$(pwd)\dependencies\install\lib\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+    - name: Remove faulty OPENGL32.dll
+      shell: cmd
+      run: rm 'C:\Windows\system32\OPENGL32.dll'
+
+    # When running standard test on windows, use wgl
+    - name: Install Mesa Windows
+      if: runner.os == 'Windows'
+      uses: f3d-app/install-mesa-windows-action@v3
+      with:
+        path: C:\Windows\system32
+
     - name: Set DYLD_LIBRARY_PATH on macOS for OSPRay/OSMesa dynamic loading
       if: |
         runner.os == 'macOS' &&
@@ -217,17 +228,6 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: cmake --build . --parallel 2 --config Release
-
-    - name: Remove faulty OPENGL32.dll
-      shell: cmd
-      run: rm 'C:\Windows\system32\OPENGL32.dll'
-
-    # When running standard test on windows, use wgl
-    - name: Install Mesa Windows
-      if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v3
-      with:
-        path: ${{github.workspace}}\mesa
 
     - name: Set F3D binary path Linux
       if: runner.os == 'Linux'
