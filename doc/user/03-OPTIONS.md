@@ -595,7 +595,7 @@ Importer may set a default value depending on file type. If a default value exis
 
 ### `--checkerboard` (_bool_, default: `false`)
 
-Override model's texture with a checkerboard texture.
+Override model's texture with a checkerboard texture. Anti-aliasing is recommended.
 
 #### compare
 

@@ -170,7 +170,7 @@ CLI: `--texture-normal`.
 
 ### `model.checkerboard.enable` (_bool_, default: `false`, **on load**)
 
-Override model's texture with a checkerboard texture.
+Override model's texture with a checkerboard texture. Anti-aliasing is recommended.
 
 CLI: `--checkerboard`.
 
