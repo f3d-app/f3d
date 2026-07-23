@@ -98,8 +98,10 @@
 #include <vtkOSPRayRendererNode.h>
 #endif
 
+#include <algorithm>
 #include <cctype>
 #include <chrono>
+#include <cmath>
 #include <numbers>
 #include <sstream>
 
@@ -109,6 +111,11 @@ namespace
 constexpr double ScalarBarPositionX = 0.1;
 constexpr double ScalarBarPositionY = 0.01;
 constexpr double ScalarBarHeight = 0.07;
+
+// Expand nearly degenerate automatic ranges to the colormap mid; skip user ranges.
+constexpr double DegenerateColoringRangeAbsoluteEpsilon = 1e-8;
+constexpr double DegenerateColoringRangeRelativeEpsilon = 1e-4;
+constexpr double DegenerateColoringRangeMargin = 0.5;
 
 std::string DeprecatedCollapsePath(const fs::path& path)
 {
@@ -3530,6 +3537,21 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
       this->ColorRange[1] = maxRange;
     }
     this->ExpandingRangeSet = true;
+  }
+
+  // Only adjust automatic ranges. Respect an explicit --coloring-range as-is.
+  if (this->UsingExpandingRange)
+  {
+    const double width = std::abs(this->ColorRange[1] - this->ColorRange[0]);
+    const double scale =
+      std::max({ std::abs(this->ColorRange[0]), std::abs(this->ColorRange[1]), 1.0 });
+    if (width < std::max(::DegenerateColoringRangeAbsoluteEpsilon,
+                  ::DegenerateColoringRangeRelativeEpsilon * scale))
+    {
+      const double mid = 0.5 * (this->ColorRange[0] + this->ColorRange[1]);
+      this->ColorRange[0] = mid - ::DegenerateColoringRangeMargin;
+      this->ColorRange[1] = mid + ::DegenerateColoringRangeMargin;
+    }
   }
 
   // Create lookup table
