@@ -1,16 +1,16 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/f3d-app/f3d/ci.yml?label=CI&logo=github)](https://github.com/f3d-app/f3d/actions/workflows/ci.yml) [![Packaging](https://img.shields.io/github/actions/workflow/status/f3d-app/f3d-superbuild/nightly.yml?label=Packaging&logo=github)](https://github.com/f3d-app/f3d-superbuild) [![codecov](https://codecov.io/gh/f3d-app/f3d/branch/master/graph/badge.svg?token=siwG82IXK7)](https://codecov.io/gh/f3d-app/f3d) [![Downloads](https://img.shields.io/github/downloads/f3d-app/f3d/total.svg)](https://github.com/f3d-app/f3d/releases) [![Sponsors](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://f3d.app/thanks) [![Discord](https://discordapp.com/api/guilds/1046005690809978911/widget.png?style=shield)](https://discord.f3d.app) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
-# F3D - Fast and minimalist 3D viewer
+# F3D - fast and minimalist 3D viewer
 
 By the F3D-APP Foundation.
 
 <img src="https://raw.githubusercontent.com/f3d-app/f3d/master/resources/logo.svg" align="left" width="20px"/>
-F3D (pronounced `/fɛd/`) is a fast and minimalist 3D viewer desktop application. It supports many file formats, from digital content to scientific datasets (including glTF, USD, STL, STEP, PLY, OBJ, FBX, Alembic), can show animations and support thumbnails and many rendering and texturing options including real time physically based rendering and raytracing.
+F3D (pronounced `/fɛd/`) is a fast and minimalist 3D viewer desktop application. It supports many file formats, from digital content to scientific datasets, including glTF, USD, STL, STEP, PLY, OBJ, FBX, and Alembic. It can show animations, generate thumbnails, and provide many rendering and texturing options including real-time physically based rendering and raytracing.
 <br clear="left"/>
 
-It is fully controllable from the command line and support configuration files. It can provide thumbnails, support interactive hotkeys, drag&drop and integration into file managers.
+It is fully controllable from the command line and supports configuration files. It supports interactive hotkeys, drag and drop, and integration into file managers.
 
-F3D also contains the libf3d, a simple library to render meshes, with a C++17 API, C, Python, Java and Javascript Bindings.
+F3D also contains libf3d, a simple library to render meshes, with a C++17 API and C, Python, Java, and JavaScript bindings.
 
 <img src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/static/images/typical.png" width="640" />
 
@@ -28,7 +28,11 @@ See the [gallery](https://f3d.app/gallery) for more images, take a look at the [
 
 You can even use F3D directly in your [browser](https://f3d.app/viewer)!
 
-If you need any help or want to discuss with other F3D users and developers, head over to our [discord](https://discord.f3d.app).
+If you need any help or want to discuss with other F3D users and developers, head over to our [Discord](https://discord.f3d.app).
+
+# Installation
+
+Install F3D from the [download page](https://f3d.app/download), which lists the latest release packages and installation options for supported platforms. Once installed, the `f3d` command should be available from your terminal.
 
 # Quickstart
 
@@ -40,7 +44,7 @@ f3d /path/to/file.ext
 
 Optionally, append `--output=/path/to/img.png` to save the rendering into an image file.
 
-See the [Quickstart Guide](doc/user/01-QUICKSTART.md) for more information about getting started with F3D.
+See the [quickstart guide](doc/user/01-QUICKSTART.md) for more information about getting started with F3D.
 
 # Documentation
 
@@ -54,11 +58,11 @@ See the [Quickstart Guide](doc/user/01-QUICKSTART.md) for more information about
 F3D needs your help!
 
 If you can, please consider sponsoring F3D. Even a small donation would help us offset the recurring maintenance costs.
-With enough sponsors we would be able to make F3D grow faster and stronger! Read more about it [here](https://f3d.app/thanks).
+With enough sponsors, F3D can grow faster and stronger! Read the [sponsorship page](https://f3d.app/thanks).
 
 If you are an industry user of F3D and want to make sure it can keep growing and being maintained, [please reach out](https://f3d.app/thanks)!
 
-In any case, please star it on github and share the word about it!
+In any case, please star it on GitHub and share the word about it!
 
 ## Sponsors
 
@@ -101,5 +105,5 @@ F3D was initially created by [Kitware SAS](https://www.kitware.eu/), by Joachim 
 # License
 
 F3D can be used and distributed under the 3-Clause BSD License, see the [license](LICENSE.md).
-F3D integrate the sources of other libraries and tools, all under permissive licenses, see the [third party licenses](THIRD_PARTY_LICENSES.md).
-F3D packages relies on other libraries and tools, all under permissive licenses, all listed in the respective packages.
+F3D integrates the sources of other libraries and tools, all under permissive licenses, see the [third party licenses](THIRD_PARTY_LICENSES.md).
+F3D packages rely on other libraries and tools, all under permissive licenses, all listed in the respective packages.
