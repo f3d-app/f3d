@@ -22,7 +22,9 @@
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLShaderCache.h>
 #include <vtkOpenGLState.h>
+#include <vtkOpenGLVertexBufferObjectGroup.h>
 #include <vtkOverlayPass.h>
+#include <vtkPointData.h>
 #include <vtkProp.h>
 #include <vtkRenderPassCollection.h>
 #include <vtkRenderState.h>
@@ -32,10 +34,12 @@
 #include <vtkSSAOPass.h>
 #include <vtkSequencePass.h>
 #include <vtkShaderProgram.h>
+#include <vtkShaderProperty.h>
 #include <vtkSkybox.h>
 #include <vtkTextureObject.h>
 #include <vtkToneMappingPass.h>
 #include <vtkTranslucentPass.h>
+#include <vtkUniforms.h>
 #include <vtkVersion.h>
 #include <vtkVolumetricPass.h>
 
@@ -115,9 +119,68 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
       }
       else
       {
+        vtkActor* actor = vtkActor::SafeDownCast(prop);
+
+        if (actor)
+        {
+          vtkPolyDataMapper* polyMapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
+          if (polyMapper)
+          {
+            polyMapper->SetVBOShiftScaleMethod(
+              vtkPolyDataMapper::ShiftScaleMethodType::DISABLE_SHIFT_SCALE);
+
+            vtkPolyData* input =
+              polyMapper->GetNumberOfInputPorts() > 0 ? polyMapper->GetInput() : nullptr;
+
+            // handle skinning/morphing attributes for the actor
+            if (input)
+            {
+              if (input->GetNumberOfPoints() == 0)
+              {
+                // skip rendering if no point
+                continue;
+              }
+
+              // skinning
+              if (input->GetPointData()->GetArray("WEIGHTS_0") != nullptr &&
+                input->GetPointData()->GetArray("JOINTS_0") != nullptr)
+              {
+                // map glTF arrays to GPU VBOs
+                polyMapper->MapDataArrayToVertexAttribute(
+                  "weights", "WEIGHTS_0", vtkDataObject::FIELD_ASSOCIATION_POINTS);
+                polyMapper->MapDataArrayToVertexAttribute(
+                  "joints", "JOINTS_0", vtkDataObject::FIELD_ASSOCIATION_POINTS);
+              }
+
+              // morph targets
+              // OpenGL limits the input attributes to 16 vectors
+              // We ignore morphing on tangent on purpose to maximize the number of targets we
+              // can support
+              for (int j = 0; j < 4; j++)
+              {
+                std::string namePosition = "target" + std::to_string(j) + "_position";
+
+                if (input->GetPointData()->GetArray(namePosition.c_str()) == nullptr)
+                {
+                  break;
+                }
+
+                polyMapper->MapDataArrayToVertexAttribute(namePosition.c_str(),
+                  namePosition.c_str(), vtkDataObject::FIELD_ASSOCIATION_POINTS);
+
+                std::string nameNormal = "target" + std::to_string(j) + "_normal";
+                if (input->GetPointData()->GetArray(nameNormal.c_str()) != nullptr)
+                {
+                  polyMapper->MapDataArrayToVertexAttribute(nameNormal.c_str(), nameNormal.c_str(),
+                    vtkDataObject::FIELD_ASSOCIATION_POINTS);
+                }
+              }
+            }
+          }
+        }
+
         this->MainProps.push_back(prop);
 
-        vtkActor* actor = vtkActor::SafeDownCast(prop);
         if (!actor || vtkF3DOpenGLGridMapper::SafeDownCast(actor->GetMapper()) == nullptr)
         {
           // Do not add the grid into the reflective actors
@@ -133,7 +196,10 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     return;
   }
 
-  this->ReleaseGraphicsResources(s->GetRenderer()->GetRenderWindow());
+  vtkOpenGLRenderer* glRenderer = vtkOpenGLRenderer::SafeDownCast(s->GetRenderer());
+  this->LightComplexity = glRenderer->GetLightingComplexity();
+
+  this->ReleaseGraphicsResources(glRenderer->GetRenderWindow());
 
   // background pass, setup framebuffer, clear and draw skybox
   vtkNew<vtkOpaquePass> bgP;
@@ -202,7 +268,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     }
 
     // translucent and volumic
-    const vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(s->GetRenderer());
+    const vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(glRenderer);
     if (renderer && renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING)
     {
       vtkNew<vtkDualDepthPeelingPass> ddpP;
@@ -244,9 +310,9 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
       vtkNew<vtkF3DTAAPass> taaP;
       taaP->SetDelegatePass(camP);
 
-      s->GetRenderer()->GetRenderWindow()->AddObserver(
+      glRenderer->GetRenderWindow()->AddObserver(
         vtkCommand::WindowResizeEvent, taaP.Get(), &vtkF3DTAAPass::ResetIterations);
-      s->GetRenderer()->GetRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(
+      glRenderer->GetRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(
         vtkCommand::InteractionEvent, taaP.Get(), &vtkF3DTAAPass::ResetIterations);
 
       this->MainPass->SetDelegatePass(taaP);
@@ -305,8 +371,202 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
 }
 
 // ----------------------------------------------------------------------------
+void vtkF3DRenderPass::ReplaceMatCapShader(
+  std::string& fragmentShader, vtkActor* actor, vtkPolyData* polyData)
+{
+  if (polyData && polyData->GetPointData()->GetNormals() != nullptr) // check if we have normals
+  {
+    auto textures = actor->GetProperty()->GetAllTextures();
+    auto fn = [](const std::pair<std::string, vtkTexture*>& tex) { return tex.first == "matcap"; };
+    bool hasMatcap = std::ranges::find_if(textures, fn) != textures.end();
+
+    if (hasMatcap)
+    {
+      // disable PBR light, just sample matcap and set final color to gamma-corrected ambient color
+
+      std::string customColor = "  //VTK::Color::Impl\n"
+                                "  vec2 uv = vec2(normalVCVSOutput.xy) * 0.5 + vec2(0.5,0.5);\n"
+                                "  diffuseColor = vec3(0.0);\n"
+                                "  ambientColor = texture(matcap, uv).rgb;\n";
+
+      vtkShaderProgram::Substitute(fragmentShader, "  //VTK::Color::Impl", customColor);
+
+      std::string customLight = "  gl_FragData[0] = vec4(pow(ambientColor, vec3(1.0/2.2)), 1.0);\n";
+
+      vtkShaderProgram::Substitute(fragmentShader, "  //VTK::Light::Impl", customLight);
+
+      // disable default behavior of VTK with textures to avoid blending with itself
+      vtkShaderProgram::Substitute(fragmentShader, "//VTK::TCoord::Impl", "");
+    }
+  }
+}
+
+// ----------------------------------------------------------------------------
+void vtkF3DRenderPass::ReplaceSkinningMorphing(
+  std::string& vertexShader, vtkActor* actor, vtkPolyData* polyData)
+{
+  if (polyData)
+  {
+    vtkUniforms* uniforms = actor->GetShaderProperty()->GetVertexCustomUniforms();
+    bool hasMorphing =
+      uniforms->GetUniformTupleType("morphWeights") != vtkUniforms::TupleTypeInvalid;
+    bool hasSkinning =
+      uniforms->GetUniformTupleType("jointMatrices") != vtkUniforms::TupleTypeInvalid;
+
+    if (hasMorphing || hasSkinning)
+    {
+      bool hasTangents =
+        polyData->GetPointData()->GetTangents() && actor->GetProperty()->GetLighting();
+      bool hasNormals =
+        polyData->GetPointData()->GetNormals() && actor->GetProperty()->GetLighting();
+      hasTangents = hasTangents && (actor->GetProperty()->GetTexture("normalTex") != nullptr);
+
+      std::string customDecl = "//VTK::CustomUniforms::Dec\n";
+      std::string beginImpl = "//VTK::CustomBegin::Impl\n";
+      std::string posImpl = "//VTK::PositionVC::Impl\n"
+                            "  vec4 posMC = vertexMC;\n";
+
+      // normals and tangents can be modified by skinnning and morphing in model space
+      std::string normalImpl = "//VTK::Normal::Impl\n";
+      if (hasNormals)
+      {
+        normalImpl += "  normalVCVSOutput = normalMC;\n";
+      }
+      if (hasTangents)
+      {
+        normalImpl += "  tangentVCVSOutput = tangentMC;\n";
+      }
+
+      // morphing
+      if (hasMorphing)
+      {
+        for (int i = 0; i < 4; i++)
+        {
+          std::string name = "target" + std::to_string(i) + "_position";
+
+          // modify position using morph weights
+          if (polyData->GetPointData()->GetArray(name.c_str()) != nullptr)
+          {
+            customDecl += "in vec3 ";
+            customDecl += name;
+            customDecl += ";\n";
+
+            posImpl += " posMC += morphWeights[";
+            posImpl += std::to_string(i);
+            posImpl += "] * vec4(";
+            posImpl += name;
+            posImpl += ", 0);\n";
+          }
+
+          name = "target" + std::to_string(i) + "_normal";
+
+          // modify normal using morph weights
+          if (polyData->GetPointData()->GetArray(name.c_str()) != nullptr)
+          {
+            customDecl += "in vec3 ";
+            customDecl += name;
+            customDecl += ";\n";
+
+            if (hasNormals)
+            {
+              normalImpl += " normalVCVSOutput += morphWeights[";
+              normalImpl += std::to_string(i);
+              normalImpl += "] * ";
+              normalImpl += name;
+              normalImpl += ";\n";
+            }
+          }
+        }
+      }
+
+      // skin
+      if (hasSkinning)
+      {
+        customDecl += "in vec4 joints;\n"
+                      "in vec4 weights;\n";
+
+        beginImpl += "vec4 currentWeight = weights;\n"
+                     "ivec4 currentJoints = ivec4(joints);\n";
+
+        // compute skinning matrix with current uniform weights
+        beginImpl += "  mat4 skinMat = currentWeight.x * jointMatrices[currentJoints.x]\n"
+                     "               + currentWeight.y * jointMatrices[currentJoints.y]\n"
+                     "               + currentWeight.z * jointMatrices[currentJoints.z]\n"
+                     "               + currentWeight.w * jointMatrices[currentJoints.w];\n";
+
+        posImpl += "  posMC = skinMat * posMC;\n";
+
+        // apply the matrix to normals and tangents
+        if (hasNormals)
+        {
+          normalImpl += "  normalVCVSOutput = mat3(skinMat) * normalVCVSOutput;\n";
+        }
+        if (hasTangents)
+        {
+          normalImpl += "  tangentVCVSOutput = mat3(skinMat) * tangentVCVSOutput;\n";
+        }
+      }
+
+      posImpl += "  gl_Position = MCDCMatrix * posMC;\n";
+
+      if (this->LightComplexity > 0)
+      {
+        posImpl += "  vertexVCVSOutput = MCVCMatrix * posMC;\n";
+      }
+
+      if (hasNormals)
+      {
+        normalImpl += "  normalVCVSOutput = normalMatrix * normalVCVSOutput;\n";
+      }
+      if (hasTangents)
+      {
+        normalImpl += "  tangentVCVSOutput = normalMatrix * tangentVCVSOutput;\n";
+      }
+
+      vtkShaderProgram::Substitute(vertexShader, "//VTK::CustomUniforms::Dec", customDecl);
+      vtkShaderProgram::Substitute(vertexShader, "//VTK::PositionVC::Impl", posImpl);
+      vtkShaderProgram::Substitute(vertexShader, "//VTK::Normal::Impl", normalImpl);
+      vtkShaderProgram::Substitute(vertexShader, "//VTK::CustomBegin::Impl", beginImpl);
+    }
+  }
+}
+
+// ----------------------------------------------------------------------------
+bool vtkF3DRenderPass::PreReplaceShaderValues(std::string& vertexShader, std::string&,
+  std::string& fragmentShader, vtkAbstractMapper* mapper, vtkProp* prop)
+{
+  vtkPolyDataMapper* polyMapper = vtkPolyDataMapper::SafeDownCast(mapper);
+  vtkActor* actor = vtkActor::SafeDownCast(prop);
+
+  if (!polyMapper || !actor)
+  {
+    return true;
+  }
+
+  vtkPolyData* input = polyMapper->GetNumberOfInputPorts() > 0 ? polyMapper->GetInput() : nullptr;
+
+  this->ReplaceMatCapShader(fragmentShader, actor, input);
+
+  if (!actor->GetProperty()->GetLighting() && actor->GetProperty()->GetInterpolation() != VTK_PBR)
+  {
+    // apply final gamma-correction
+    std::string customGamma =
+      "//VTK::TCoord::Impl\n"
+      "gl_FragData[0] = vec4(pow(gl_FragData[0].rgb, vec3(1.0/2.2)), gl_FragData[0].a);\n";
+
+    vtkShaderProgram::Substitute(fragmentShader, "//VTK::TCoord::Impl", customGamma);
+  }
+
+  this->ReplaceSkinningMorphing(vertexShader, actor, input);
+
+  return true;
+}
+
+// ----------------------------------------------------------------------------
 void vtkF3DRenderPass::Render(const vtkRenderState* s)
 {
+  this->PreRender(s);
+
   this->Initialize(s);
 
   double bgColor[3];
@@ -381,6 +641,8 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
   this->Blend(s);
 
   this->NumberOfRenderedProps = this->MainPass->GetNumberOfRenderedProps();
+
+  this->PostRender(s);
 }
 
 // ----------------------------------------------------------------------------
