@@ -265,18 +265,19 @@ extern "C"
     f3d::image* img = reinterpret_cast<f3d::image*>(ptr);
 
     const char* keyStr = env->GetStringUTFChars(key, nullptr);
+    std::string value;
     try
     {
-      std::string value = img->getMetadata(keyStr);
-      env->ReleaseStringUTFChars(key, keyStr);
-      return env->NewStringUTF(value.c_str());
+      value = img->getMetadata(keyStr);
     }
     catch (const f3d::image::metadata_exception& e)
     {
-      env->ReleaseStringUTFChars(key, keyStr);
       F3DThrowJavaException(env, "app/f3d/F3D/Image$MetadataException", e.what());
+      env->ReleaseStringUTFChars(key, keyStr);
+      return nullptr;
     }
-    return nullptr;
+    env->ReleaseStringUTFChars(key, keyStr);
+    return env->NewStringUTF(value.c_str());
   }
 
   JNIEXPORT jobject JAVA_BIND(Image, allMetadata)(JNIEnv* env, jobject self)
