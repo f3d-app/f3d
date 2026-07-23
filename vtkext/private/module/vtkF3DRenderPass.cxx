@@ -18,6 +18,7 @@
 #include <vtkMatrix4x4.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpaquePass.h>
+#include <vtkOpenGLFramebufferObject.h>
 #include <vtkOpenGLRenderUtilities.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLShaderCache.h>
@@ -45,6 +46,10 @@
 
 #if F3D_MODULE_RAYTRACING
 #include <vtkOSPRayPass.h>
+#endif
+
+#if F3D_MODULE_OPENXR
+#include "vtkF3DOpenXRFramebufferPass.h"
 #endif
 
 #include <sstream>
@@ -201,11 +206,25 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
 
   this->ReleaseGraphicsResources(glRenderer->GetRenderWindow());
 
+  auto CreateFramebufferPass = [](bool xrMode) -> vtkSmartPointer<vtkFramebufferPass>
+  {
+    if (xrMode)
+    {
+#if F3D_MODULE_OPENXR
+      return vtkSmartPointer<vtkF3DOpenXRFramebufferPass>::New();
+#else
+      assert(false); // Unreachable
+#endif
+    }
+    return vtkSmartPointer<vtkFramebufferPass>::New();
+  };
+
   // background pass, setup framebuffer, clear and draw skybox
   vtkNew<vtkOpaquePass> bgP;
   vtkNew<vtkCameraPass> bgCamP;
   bgCamP->SetDelegatePass(bgP);
-  this->BackgroundPass = vtkSmartPointer<vtkFramebufferPass>::New();
+
+  this->BackgroundPass = CreateFramebufferPass(this->XrMode);
   this->BackgroundPass->SetColorFormat(vtkTextureObject::Float16);
 
   if (this->UseBlurBackground)
@@ -295,7 +314,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     vtkNew<vtkCameraPass> camP;
     camP->SetDelegatePass(sequence);
 
-    this->MainPass = vtkSmartPointer<vtkFramebufferPass>::New();
+    this->MainPass = CreateFramebufferPass(this->XrMode);
     this->MainPass->SetColorFormat(vtkTextureObject::Float32);
 
 #if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
@@ -323,7 +342,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     }
 
     // reflection baking pass, same as main pass but with reflected camera
-    this->BakeReflectionPass = vtkSmartPointer<vtkFramebufferPass>::New();
+    this->BakeReflectionPass = CreateFramebufferPass(this->XrMode);
     this->BakeReflectionPass->SetColorFormat(vtkTextureObject::Float16);
     this->BakeReflectionPass->SetDelegatePass(camP);
 
@@ -357,7 +376,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     vtkNew<vtkCameraPass> camP;
     camP->SetDelegatePass(sequence);
 
-    this->MainOnTopPass = vtkSmartPointer<vtkFramebufferPass>::New();
+    this->MainOnTopPass = CreateFramebufferPass(this->XrMode);
     this->MainOnTopPass->SetDelegatePass(camP);
 
 #if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)

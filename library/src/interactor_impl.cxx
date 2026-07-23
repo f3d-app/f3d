@@ -36,6 +36,11 @@
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
+#ifdef F3D_MODULE_OPENXR
+#include <vtkOpenXRRenderWindow.h>
+#include <vtkOpenXRRenderWindowInteractor.h>
+#endif
+
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -78,8 +83,19 @@ public:
     , Interactor(inter)
   {
     window::Type type = window.getType();
-    if (type == window::Type::GLX || type == window::Type::WGL || type == window::Type::COCOA ||
-      type == window::Type::WASM)
+    if (type == window::Type::XR)
+    {
+#ifdef F3D_MODULE_OPENXR
+      this->VTKInteractor = vtkSmartPointer<vtkOpenXRRenderWindowInteractor>::New();
+      vtkOpenXRRenderWindowInteractor* xrInteractor =
+        vtkOpenXRRenderWindowInteractor::SafeDownCast(this->VTKInteractor);
+      xrInteractor->SetActionManifestDirectory("./share/f3d/xr_actions_manifests/");
+#else
+      assert(false);
+#endif
+    }
+    else if (type == window::Type::GLX || type == window::Type::WGL ||
+      type == window::Type::COCOA || type == window::Type::WASM)
     {
       this->VTKInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
     }
@@ -675,6 +691,8 @@ public:
 
   std::function<bool(const std::string&, const std::string&, const std::string&, double)>
     NotificationCallback = nullptr;
+
+  std::string XrActionsManifestDir;
 };
 
 //----------------------------------------------------------------------------
@@ -2114,6 +2132,24 @@ interactor& interactor_impl::requestStop()
 {
   this->Internals->StopRequested = true;
   return *this;
+}
+
+//----------------------------------------------------------------------------
+void interactor_impl::SetXrResourcesDirectory(
+  const std::string& actionsManifestDirectory, const std::string& controllerModelDirectory)
+{
+#if F3D_MODULE_OPENXR
+  vtkOpenXRRenderWindowInteractor* xrInteractor =
+    vtkOpenXRRenderWindowInteractor::SafeDownCast(this->Internals->VTKInteractor);
+  xrInteractor->SetActionManifestDirectory(actionsManifestDirectory);
+
+  if (!controllerModelDirectory.empty())
+  {
+    vtkOpenXRRenderWindow* xrRenWin =
+      vtkOpenXRRenderWindow::SafeDownCast(this->Internals->Window.GetRenderWindow());
+    xrRenWin->SetModelsManifestDirectory(controllerModelDirectory);
+  }
+#endif
 }
 
 //----------------------------------------------------------------------------

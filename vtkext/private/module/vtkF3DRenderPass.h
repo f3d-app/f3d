@@ -49,6 +49,7 @@ public:
   vtkSetVector6Macro(Bounds, double);
   vtkSetMacro(CircleOfConfusionRadius, double);
   vtkSetMacro(RenderReflection, bool);
+  vtkSetMacro(XrMode, bool);
 
   /**
    * Modify shader code for jittering
@@ -79,6 +80,7 @@ protected:
   bool UseBlurBackground = false;
   bool ForceOpaqueBackground = false;
   bool RenderReflection = false;
+  bool XrMode = false;
 
   double CircleOfConfusionRadius = 20.0;
 
