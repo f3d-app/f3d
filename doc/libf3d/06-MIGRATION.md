@@ -56,3 +56,11 @@ The `ui.animation_progress` option (CLI `--animation-progress`) was a boolean to
 
 The function `f3d::context::getSymbol` function is now expecting a library full path or a filename.
 The library prefix and extension is not appended automatically anymore.
+
+## scene.supports method
+
+`scene::supports()` method signature changed, it now returns `f3d::file_availability` enum instead of `bool`. Here is how you can check if a file is supported now:
+
+```cpp
+if (scene.supports("some.obj") == f3d::file_availability::SUPPORTED)
+```

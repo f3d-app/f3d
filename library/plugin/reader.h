@@ -9,8 +9,11 @@
 #include <algorithm>
 #include <cctype>
 #include <map>
+#include <optional>
 #include <string>
 #include <vector>
+
+#include "scene.h"
 
 class vtkResourceStream;
 namespace f3d
@@ -66,26 +69,31 @@ public:
   /**
    * Check if this reader can read the given filename - according to its extension and file content
    */
-  virtual bool canRead(const std::string& fileName) const
+  virtual bool canRead(const std::string& fileName, const std::optional<bool> skipContentCheck,
+    f3d::file_availability& availability) const
   {
     std::string ext = fileName.substr(fileName.find_last_of(".") + 1);
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-
     const std::vector<std::string>& extensions = this->getExtensions();
-
-    if (!std::any_of(
+    bool isSkipCheck = skipContentCheck.has_value() && skipContentCheck.value();
+    if (std::any_of(
           extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; }))
     {
-      return false;
+      vtkNew<vtkFileResourceStream> stream;
+      if (stream->Open(fileName.c_str()))
+      {
+        if (isSkipCheck || this->canRead(stream))
+        {
+          availability = f3d::file_availability::SUPPORTED;
+          return true;
+        }
+        else
+        {
+          availability = f3d::file_availability::UNSUPPORTED_CONTENT;
+        }
+      }
     }
-
-    vtkNew<vtkFileResourceStream> stream;
-    if (!stream->Open(fileName.c_str()))
-    {
-      return false;
-    }
-
-    return this->canRead(stream);
+    return false;
   }
 
   /**

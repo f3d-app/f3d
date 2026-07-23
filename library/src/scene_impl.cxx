@@ -257,9 +257,12 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       throw scene::load_failure_exception(filePath.string() + " does not exists");
     }
     std::optional<std::string> forceReader = this->Internals->Options.scene.force_reader;
+    const std::optional<bool> skipContentCheck = this->Internals->Options.scene.skip_content_check;
+    file_availability availability = f3d::file_availability::UNSUPPORTED_EXTENSION;
     // Recover the importer for the provided file path
-    const f3d::reader* reader = f3d::factory::instance()->getReader(filePath.string(), forceReader);
-    if (reader)
+    const f3d::reader* reader = f3d::factory::instance()->getReader(
+      filePath.string(), forceReader, skipContentCheck, availability);
+    if (availability == file_availability::SUPPORTED)
     {
       if (forceReader)
       {
@@ -276,9 +279,21 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       {
         throw scene::load_failure_exception(*forceReader + " is not a valid force reader");
       }
-      throw scene::load_failure_exception(filePath.string() +
-        " is not a file of a supported 3D scene file format, use force reader to force a specific "
-        "reader");
+      std::string errorMessage;
+      switch (availability)
+      {
+        case file_availability::UNSUPPORTED_EXTENSION:
+          errorMessage = (filePath.string() +
+            " does not have an extension corresponding to a supported file format, use force "
+            "reader to force a specific reader");
+          break;
+        case file_availability::UNSUPPORTED_CONTENT:
+          errorMessage = (filePath.string() +
+            " contains unsupported content and no reader have been selected, use force reader to "
+            "force a specific reader");
+          break;
+      }
+      throw scene::load_failure_exception(errorMessage);
     }
 
     vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(filePath.string());
@@ -867,10 +882,13 @@ scene& scene_impl::removeAllLights()
 }
 
 //----------------------------------------------------------------------------
-bool scene_impl::supports(const fs::path& filePath)
+f3d::file_availability scene_impl::supports(const fs::path& filePath)
 {
-  return f3d::factory::instance()->getReader(
-           filePath.string(), this->Internals->Options.scene.force_reader) != nullptr;
+  f3d::file_availability availability = f3d::file_availability::UNSUPPORTED_EXTENSION;
+  f3d::factory::instance()->getReader(filePath.string(),
+    this->Internals->Options.scene.force_reader, this->Internals->Options.scene.skip_content_check,
+    availability) != nullptr;
+  return availability;
 }
 
 //----------------------------------------------------------------------------

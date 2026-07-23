@@ -49,6 +49,12 @@
           "valueHelper": "<reader>"
         },
         {
+          "longName": "skip-content-check",
+          "helpText": "Select reader to read file without checking its header content, but only based on the file extension.",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
           "longName": "list-bindings",
           "helpText": "Print the list of interaction bindings and exits, ignored with `--no-render`, only considers the first file group.",
           "valueHelper": "<bool>",
