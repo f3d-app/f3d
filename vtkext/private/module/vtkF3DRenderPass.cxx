@@ -1,5 +1,6 @@
 #include "vtkF3DRenderPass.h"
 
+#include "F3DLog.h"
 #include "vtkF3DHexagonalBokehBlurPass.h"
 #include "vtkF3DImporter.h"
 #include "vtkF3DOpenGLGridMapper.h"
@@ -271,10 +272,17 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     const vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(glRenderer);
     if (renderer && renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING)
     {
+#ifndef F3D_USE_GLES
       vtkNew<vtkDualDepthPeelingPass> ddpP;
       ddpP->SetTranslucentPass(translucentP);
       ddpP->SetVolumetricPass(volumeP);
       collection->AddItem(ddpP);
+#else
+      F3DLog::Print(F3DLog::Severity::Warning,
+        std::string("Dual depth peeling is not supported on GLES. Ignored."));
+      collection->AddItem(translucentP);
+      collection->AddItem(volumeP);
+#endif
     }
     else if (renderer && renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::STOCHASTIC)
     {
@@ -298,9 +306,11 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     this->MainPass = vtkSmartPointer<vtkFramebufferPass>::New();
     this->MainPass->SetColorFormat(vtkTextureObject::Float32);
 
-#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
     // Needed because VTK can pick the wrong format with certain drivers
-    // But Fixed32 not supported on GLES
+#ifdef F3D_USE_GLES
+    // Fixed32 not supported on GLES
+    this->MainPass->SetDepthFormat(vtkTextureObject::Fixed24);
+#else
     this->MainPass->SetDepthFormat(vtkTextureObject::Fixed32);
 #endif
 
@@ -360,9 +370,11 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     this->MainOnTopPass = vtkSmartPointer<vtkFramebufferPass>::New();
     this->MainOnTopPass->SetDelegatePass(camP);
 
-#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
     // Needed because VTK can pick the wrong format with certain drivers
-    // But Fixed32 not supported on GLES
+#ifdef F3D_USE_GLES
+    // Fixed32 not supported on GLES
+    this->MainOnTopPass->SetDepthFormat(vtkTextureObject::Fixed24);
+#else
     this->MainOnTopPass->SetDepthFormat(vtkTextureObject::Fixed32);
 #endif
   }
@@ -385,7 +397,11 @@ void vtkF3DRenderPass::ReplaceMatCapShader(
       // disable PBR light, just sample matcap and set final color to gamma-corrected ambient color
 
       std::string customColor = "  //VTK::Color::Impl\n"
+#ifdef F3D_USE_GLES
+                                "  vec2 uv = vec2(vertexNormalVCVS.xy) * 0.5 + vec2(0.5,0.5);\n"
+#else
                                 "  vec2 uv = vec2(normalVCVSOutput.xy) * 0.5 + vec2(0.5,0.5);\n"
+#endif
                                 "  diffuseColor = vec3(0.0);\n"
                                 "  ambientColor = texture(matcap, uv).rgb;\n";
 
@@ -434,7 +450,11 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(
       }
       if (hasTangents)
       {
+#ifndef F3D_USE_GLES
         normalImpl += "  tangentVCVSOutput = tangentMC;\n";
+#else
+        normalImpl += "  tangentVCVS = tangentMC;\n";
+#endif
       }
 
       // morphing
@@ -447,6 +467,7 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(
           // modify position using morph weights
           if (polyData->GetPointData()->GetArray(name.c_str()) != nullptr)
           {
+#ifndef F3D_USE_GLES
             customDecl += "in vec3 ";
             customDecl += name;
             customDecl += ";\n";
@@ -456,6 +477,17 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(
             posImpl += "] * vec4(";
             posImpl += name;
             posImpl += ", 0);\n";
+#else
+            customDecl += "uniform sampler2D ";
+            customDecl += name;
+            customDecl += ";\n";
+
+            posImpl += " posMC += morphWeights[";
+            posImpl += std::to_string(i);
+            posImpl += "] * vec4(texelFetchBuffer(";
+            posImpl += name;
+            posImpl += ", pointId).xyz, 0);\n";
+#endif
           }
 
           name = "target" + std::to_string(i) + "_normal";
@@ -463,6 +495,7 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(
           // modify normal using morph weights
           if (polyData->GetPointData()->GetArray(name.c_str()) != nullptr)
           {
+#ifndef F3D_USE_GLES
             customDecl += "in vec3 ";
             customDecl += name;
             customDecl += ";\n";
@@ -475,6 +508,20 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(
               normalImpl += name;
               normalImpl += ";\n";
             }
+#else
+            customDecl += "uniform sampler2D ";
+            customDecl += name;
+            customDecl += ";\n";
+
+            if (hasNormals)
+            {
+              normalImpl += " normalVCVSOutput += morphWeights[";
+              normalImpl += std::to_string(i);
+              normalImpl += "] * texelFetchBuffer(";
+              normalImpl += name;
+              normalImpl += ", pointId).xyz;\n";
+            }
+#endif
           }
         }
       }
@@ -482,11 +529,22 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(
       // skin
       if (hasSkinning)
       {
+        // automatically added with GLES
+#ifndef F3D_USE_GLES
         customDecl += "in vec4 joints;\n"
                       "in vec4 weights;\n";
+#else
+        customDecl += "uniform mediump isampler2D joints;\n"
+                      "uniform mediump sampler2D weights;\n";
+#endif
 
-        beginImpl += "vec4 currentWeight = weights;\n"
-                     "ivec4 currentJoints = ivec4(joints);\n";
+#ifndef F3D_USE_GLES
+        beginImpl += "  vec4 currentWeight = weights;\n"
+                     "  ivec4 currentJoints = ivec4(joints);\n";
+#else
+        beginImpl += "  vec4 currentWeight = texelFetchBuffer(weights, pointId);\n"
+                     "  ivec4 currentJoints = texelFetchBuffer(joints, pointId);\n";
+#endif
 
         // compute skinning matrix with current uniform weights
         beginImpl += "  mat4 skinMat = currentWeight.x * jointMatrices[currentJoints.x]\n"
@@ -503,7 +561,11 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(
         }
         if (hasTangents)
         {
+#ifndef F3D_USE_GLES
           normalImpl += "  tangentVCVSOutput = mat3(skinMat) * tangentVCVSOutput;\n";
+#else
+          normalImpl += "  tangentVCVS = mat3(skinMat) * tangentVCVS;\n";
+#endif
         }
       }
 
@@ -517,10 +579,18 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(
       if (hasNormals)
       {
         normalImpl += "  normalVCVSOutput = normalMatrix * normalVCVSOutput;\n";
+#ifdef F3D_USE_GLES
+        // for some reason GLES shader has two normal outputs
+        normalImpl += "  normalVCVSInput = normalVCVSOutput;\n";
+#endif
       }
       if (hasTangents)
       {
+#ifndef F3D_USE_GLES
         normalImpl += "  tangentVCVSOutput = normalMatrix * tangentVCVSOutput;\n";
+#else
+        normalImpl += "  tangentVCVS = normalMatrix * tangentVCVS;\n";
+#endif
       }
 
       vtkShaderProgram::Substitute(vertexShader, "//VTK::CustomUniforms::Dec", customDecl);

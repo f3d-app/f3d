@@ -8,7 +8,7 @@ f3d_test(NAME TestInteractionCycleCell DATA waveletArrays.vti INTERACTION LONG_T
 f3d_test(NAME TestInteractionCycleComp DATA dragon.vtu INTERACTION) #SYYYY
 f3d_test(NAME TestInteractionCycleScalars DATA dragon.vtu INTERACTION) #BSSSS
 f3d_test(NAME TestInteractionCycleCellInvalidIndex DATA waveletArrays.vti INTERACTION) #SSC
-f3d_test(NAME TestInteractionCycleBlending DATA suzanne.ply ARGS --opacity=0.8 INTERACTION LONG_TIMEOUT) #PPPPP # Cycle to ddp
+f3d_test(NAME TestInteractionCycleBlending DATA suzanne.ply ARGS --opacity=0.8 INTERACTION LONG_TIMEOUT SKIP_GLES) #PPPPP # Cycle to ddp
 f3d_test(NAME TestInteractionVolumeCycle DATA waveletArrays.vti ARGS INTERACTION) #VSS
 f3d_test(NAME TestInteractionVolumeAfterColoring DATA waveletArrays.vti ARGS INTERACTION) #SSSV
 f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 INTERACTION THRESHOLD 0.11) #VI #Small rendering differences on macOS OSMesa
@@ -58,16 +58,19 @@ f3d_test(NAME TestInteractionPointCloudTAA DATA pointsCloud.vtp ARGS --anti-alia
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12098
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250504)
-  f3d_test(NAME TestInteractionStochasticTAA DATA alpha.glb ARGS --anti-aliasing=taa --blending=stochastic INTERACTION) #Render;Render...
-  f3d_test(NAME TestInteractionGaussianStochasticTAA DATA small.splat ARGS -sy --point-sprites=gaussian --point-sprites-absolute-size --point-sprites-size=1 --blending=stochastic --anti-aliasing=taa --camera-position=-1.65,-0.06,1.96 --camera-focal-point=-1.65,1.24,1.96 --camera-view-up=0.9954,0,0.0955 INTERACTION LONG_TIMEOUT) #Render;Render...
-  f3d_test(NAME TestInteractionAndCLIBlending ARGS --blending DATA suzanne.stl alpha.glb INTERACTION) #PP;Right
+  # Random values are different on GLES so the result is different, but still converges
+  # It's not a bug but we should find a solution to have the exact same result
+  f3d_test(NAME TestInteractionStochasticTAA DATA alpha.glb ARGS --anti-aliasing=taa --blending=stochastic INTERACTION SKIP_GLES) #Render;Render...
+  f3d_test(NAME TestInteractionGaussianStochasticTAA DATA small.splat ARGS -sy --point-sprites=gaussian --point-sprites-absolute-size --point-sprites-size=1 --blending=stochastic --anti-aliasing=taa --camera-position=-1.65,-0.06,1.96 --camera-focal-point=-1.65,1.24,1.96 --camera-view-up=0.9954,0,0.0955 INTERACTION LONG_TIMEOUT SKIP_GLES) #Render;Render...
+  f3d_test(NAME TestInteractionAndCLIBlending ARGS --blending DATA suzanne.stl alpha.glb INTERACTION SKIP_GLES) #PP;Right
 endif()
 
 f3d_test(NAME TestInteractionConfigFileAndCommand DATA multi ARGS -o CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI LONG_TIMEOUT) #OX;Right;N;Right;Right;Right
 
+# Axes grid actor not working with GLES
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260612)
-  f3d_test(NAME TestInteractionAxesGridToggle INTERACTION DATA suzanne.ply THRESHOLD 0.08) #Shift+x
-  f3d_test(NAME TestInteractionAxesGridFileSwitch INTERACTION DATA backface.vtp cow.vtp ARGS --axes-grid THRESHOLD 0.08) #Right
+  f3d_test(NAME TestInteractionAxesGridToggle INTERACTION DATA suzanne.ply THRESHOLD 0.08 SKIP_GLES) #Shift+x
+  f3d_test(NAME TestInteractionAxesGridFileSwitch INTERACTION DATA backface.vtp cow.vtp ARGS --axes-grid THRESHOLD 0.08 SKIP_GLES) #Right
 endif()
 
 if (F3D_MODULE_TINYFILEDIALOGS)
@@ -118,7 +121,7 @@ f3d_test(NAME TestInteractionZoomToggleOrthographicProjection DATA cow.vtp INTER
 f3d_test(NAME TestInteractionRotateCameraMinus90 DATA f3d.glb INTERACTION)
 f3d_test(NAME TestInteractionRotateCamera90 DATA f3d.glb INTERACTION)
 f3d_test(NAME TestInteractionRollCameraRotation DATA f3d.glb ARGS -g INTERACTION) #1;4;LeftMouse;MouseMovements
-f3d_test(NAME TestInteractionElevationCameraRotation DATA f3d.glb ARGS -g INTERACTION THRESHOLD 0.06) #8;8;2 # Threshold is needed because camera seems to move slightly differently sometimes
+f3d_test(NAME TestInteractionElevationCameraRotation DATA f3d.glb ARGS -g INTERACTION THRESHOLD 0.07) #8;8;2 # Threshold is needed because camera seems to move slightly differently sometimes
 f3d_test(NAME TestInteractionPanWithShift DATA f3d.glb INTERACTION) #Shift;LeftMouse;MouseMovements
 
 # Test camera preserving/resetting when switching files in interaction mode
@@ -168,7 +171,7 @@ f3d_test(NAME TestInteractionCheatsheetScalarsNoArray DATA dragon.vtu ARGS --sca
 f3d_test(NAME TestInteractionCheatsheetAnimationName DATA InterpolationTest.glb ARGS --animation-indices=6 INTERACTION UI) #HWWW
 f3d_test(NAME TestInteractionCheatsheetConfigFile DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #H;ScrollDown
 f3d_test(NAME TestInteractionCheatsheetMultiModifierBinding DATA dragon.vtu RESOLUTION 1200,300 CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #H;ScrollDown
-f3d_test(NAME TestInteractionCheatsheetCycle DATA cow.vtp RESOLUTION 800,300 INTERACTION UI LONG_TIMEOUT) #HAAPO
+f3d_test(NAME TestInteractionCheatsheetCycle DATA cow.vtp RESOLUTION 800,300 INTERACTION UI LONG_TIMEOUT SKIP_GLES) #HAAPO
 
 # Clip interaction is visible in the bottom part of the cheatsheet
 if(F3D_MODULE_CLIP)
@@ -257,28 +260,28 @@ f3d_test(NAME TestInteractionMinimalConsoleOverCheatSheet DATA f3d.glb INTERACTI
 f3d_test(NAME TestInteractionMinimalConsoleOverCheatSheetAndFilename DATA f3d.glb INTERACTION UI) #h;n;:
 
 ## HDRI
-f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION) #U
-f3d_test(NAME TestInteractionHDRIReload DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION) #Up
+f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION THRESHOLD 0.07) #U
+f3d_test(NAME TestInteractionHDRIReload DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION THRESHOLD 0.07) #Up
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-  f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION) #Shift+MouseRight;
+  f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION THRESHOLD 0.06) #Shift+MouseRight;
   f3d_test(NAME TestInteractionHDRIChange DATA multi HDRI shanghai_bund_1k.hdr CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI THRESHOLD 0.08) #Left # Threshold needed for IBL change after 9.6
 endif()
 
-f3d_test(NAME TestInteractionHDRICache DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION DEPENDS TestHDRI) #FFFFJJJJ
-f3d_test(NAME TestInteractionHDRIRemoveSkybox DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION)
+f3d_test(NAME TestInteractionHDRICache DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION DEPENDS TestHDRI THRESHOLD 0.07) #FFFFJJJJ
+f3d_test(NAME TestInteractionHDRIRemoveSkybox DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION THRESHOLD 0.06)
 f3d_test(NAME TestInteractionHDRIRemoveAmbient DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION)
 f3d_test(NAME TestInteractionHDRIRemoveBoth DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION)
-f3d_test(NAME TestInteractionHDRILoop DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION)
-f3d_test(NAME TestInteractionHDRIFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr LONG_TIMEOUT INTERACTION)
+f3d_test(NAME TestInteractionHDRILoop DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION THRESHOLD 0.07)
+f3d_test(NAME TestInteractionHDRIFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr LONG_TIMEOUT INTERACTION THRESHOLD 0.07)
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   # Interaction HDRI tests
-  f3d_test(NAME TestInteractionDropHDRI INTERACTION_CONFIGURE LONG_TIMEOUT UI) #X;DropEvent dragon.vtu;DropEvent shanghai.hdr;
-  f3d_test(NAME TestInteractionDropHDRIInvert INTERACTION_CONFIGURE LONG_TIMEOUT UI) #X;DropEvent shanghai.hdr;DropEvent dragon.vtu;
-  f3d_test(NAME TestInteractionDropHDRIMulti INTERACTION_CONFIGURE LONG_TIMEOUT UI) #X;DropEvent dragon.vtu shanghai.hdr;
+  f3d_test(NAME TestInteractionDropHDRI INTERACTION_CONFIGURE LONG_TIMEOUT UI THRESHOLD 0.05) #X;DropEvent dragon.vtu;DropEvent shanghai.hdr;
+  f3d_test(NAME TestInteractionDropHDRIInvert INTERACTION_CONFIGURE LONG_TIMEOUT UI THRESHOLD 0.05) #X;DropEvent shanghai.hdr;DropEvent dragon.vtu;
+  f3d_test(NAME TestInteractionDropHDRIMulti INTERACTION_CONFIGURE LONG_TIMEOUT UI  THRESHOLD 0.05) #X;DropEvent dragon.vtu shanghai.hdr;
 endif()
 
 if(F3D_MODULE_RAYTRACING)
@@ -298,9 +301,9 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   f3d_test(NAME TestInteractionDropSameFiles ARGS -x INTERACTION_CONFIGURE UI) #DropEvent cow.vtp;#DropEvent dragon.vtu;#DropEvent cow.vtp#DropEvent cow.vtp;
 
   # Test interactive animation and dropping HDRI
-  f3d_test(NAME TestInteractionAnimationDropHDRI DATA InterpolationTest.glb ARGS --animation-indices=-1 --animation-progress INTERACTION_CONFIGURE LONG_TIMEOUT) #Space;DropEvent shanghai.hdr;Space;
+  f3d_test(NAME TestInteractionAnimationDropHDRI DATA InterpolationTest.glb ARGS --animation-indices=-1 --animation-progress INTERACTION_CONFIGURE LONG_TIMEOUT THRESHOLD 0.07) #Space;DropEvent shanghai.hdr;Space;
 endif()
-f3d_test(NAME TestInteractionMultiFileDrop ARGS --multi-file-mode=all -e INTERACTION_CONFIGURE) #DropEvent mb_1_0.vtp mb_2_0.vtp
+f3d_test(NAME TestInteractionMultiFileDrop ARGS --multi-file-mode=all -e INTERACTION_CONFIGURE THRESHOLD 0.07) #DropEvent mb_1_0.vtp mb_2_0.vtp
 
 # A proper test for this is not possible because of the double quotes
 f3d_test(NAME TestInteractionDropFileWithQuotes ARGS -n INTERACTION REGEXP "\"'`Quotes\"'`.stl does not exist" NO_BASELINE) #X;DropEvent "'`Quotes"'`.stl";

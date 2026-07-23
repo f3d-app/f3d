@@ -35,9 +35,9 @@ endif()
 
 # FX
 f3d_test(NAME TestSSAO DATA suzanne.ply ARGS -q)
-f3d_test(NAME TestDepthPeeling DATA suzanne.ply ARGS -sp --opacity=0.9)
+f3d_test(NAME TestDepthPeeling DATA suzanne.ply ARGS -sp --opacity=0.9 SKIP_GLES)
 f3d_test(NAME TestToneMapping DATA suzanne.ply ARGS -t)
-f3d_test(NAME TestDepthPeelingToneMapping DATA suzanne.ply ARGS --opacity=0.9 -pt)
+f3d_test(NAME TestDepthPeelingToneMapping DATA suzanne.ply ARGS --opacity=0.9 -pt SKIP_GLES)
 f3d_test(NAME TestBackground DATA suzanne.ply ARGS --background-color=0.8,0.2,0.9)
 f3d_test(NAME TestNoBackground DATA cow.vtp ARGS --no-background)
 f3d_test(NAME TestMaterial DATA suzanne.ply ARGS --color=0.72,0.45,0.2 --metallic=0.7 --roughness=0.2)
@@ -105,10 +105,11 @@ endif()
 ## Axes grid
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11209
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260612)
-  f3d_test(NAME TestAxesGridEnable DATA suzanne.ply ARGS --axes-grid THRESHOLD 0.08) # Threshold required for MacOS due to line rendering differences
-  f3d_test(NAME TestAxesGridEnableNonCenteredData DATA cow.vtp ARGS --axes-grid)
-  f3d_test(NAME TestAxesGridEnableSSAA DATA cow.vtp ARGS --axes-grid --anti-aliasing=ssaa THRESHOLD 0.05)
-  f3d_test(NAME TestCommandScriptAxesGridAnimation SCRIPT DATA BoxAnimated.gltf ARGS --axes-grid --camera-zoom-factor=0.2)
+  # Axes grid actor not working with GLES
+  f3d_test(NAME TestAxesGridEnable DATA suzanne.ply ARGS --axes-grid THRESHOLD 0.08 SKIP_GLES) # Threshold required for MacOS due to line rendering differences
+  f3d_test(NAME TestAxesGridEnableNonCenteredData DATA cow.vtp ARGS --axes-grid SKIP_GLES)
+  f3d_test(NAME TestAxesGridEnableSSAA DATA cow.vtp ARGS --axes-grid --anti-aliasing=ssaa THRESHOLD 0.05 SKIP_GLES)
+  f3d_test(NAME TestCommandScriptAxesGridAnimation SCRIPT DATA BoxAnimated.gltf ARGS --axes-grid --camera-zoom-factor=0.2 SKIP_GLES)
 endif()
 
 ## Camera
@@ -153,11 +154,11 @@ f3d_test(NAME TestTextures DATA WaterBottle.glb ARGS --texture-material=${F3D_SO
 f3d_test(NAME TestTextureMatCap DATA suzanne.ply ARGS --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png)
 f3d_test(NAME TestTexturesTransform DATA world.obj ARGS --textures-transform=1,0,0,0,-1,0,0,0,1)
 f3d_test(NAME TestTexturesTransformGL DATA WaterBottle.glb ARGS --textures-transform=1,0,0,0,-1,0,0,0,1 --camera-direction=-1,0,0)
-f3d_test(NAME TestTextureMatCapWithEdges DATA suzanne.ply ARGS -e --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png)
+f3d_test(NAME TestTextureMatCapWithEdges DATA suzanne.ply ARGS -e --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png THRESHOLD 0.05) # Small rendering differences on GLES
 f3d_test(NAME TestTextureColorWithOptions DATA WaterBottle.glb ARGS --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --color=1,1,0 --opacity=0.4 --blending)
 f3d_test(NAME TestTextureCheckerBoard DATA WaterBottle.glb ARGS --checkerboard)
 f3d_test(NAME TestTextureCheckerBoardOnMissingUV DATA RiggedFigure.glb ARGS --checkerboard REGEXP "Texture coordinates are required to display checkerboard texture." NO_BASELINE)
-f3d_test(NAME TestTextureColor DATA WaterBottle.glb ARGS --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --blending)
+f3d_test(NAME TestTextureColor DATA WaterBottle.glb ARGS --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --blending SKIP_GLES) # Skip GLES because of depth peeling
 
 ## Lights
 f3d_test(NAME TestLightIntensityBrighter DATA cow.vtp ARGS --light-intensity=5.0)
@@ -169,8 +170,8 @@ f3d_test(NAME TestLightIntensityDarkerFullScene DATA WaterBottle.glb ARGS --ligh
 f3d_test(NAME TestUTF8 DATA "(ノಠ益ಠ )ノ.vtp")
 f3d_test(NAME TestFilenameCommasSpaces DATA "tetrahedron, with commas & spaces.stl")
 f3d_test(NAME TestFilename DATA suzanne.ply ARGS -n UI)
-f3d_test(NAME TestHDRIFilename DATA dragon.vtu ARGS --hdri-filename HDRI shanghai_bund_1k.hdr UI LONG_TIMEOUT)
-f3d_test(NAME TestFilenameHDRIFilename DATA dragon.vtu ARGS --hdri-filename -n HDRI shanghai_bund_1k.hdr RESOLUTION 400,400 UI LONG_TIMEOUT)
+f3d_test(NAME TestHDRIFilename DATA dragon.vtu ARGS --hdri-filename HDRI shanghai_bund_1k.hdr UI LONG_TIMEOUT THRESHOLD 0.05) # Small rendering differences on GLES
+f3d_test(NAME TestFilenameHDRIFilename DATA dragon.vtu ARGS --hdri-filename -n HDRI shanghai_bund_1k.hdr RESOLUTION 400,400 UI LONG_TIMEOUT THRESHOLD 0.05) # Small rendering differences on GLES
 f3d_test(NAME TestHDRIFilenameDefault DATA dragon.vtu ARGS --hdri-filename -f -j UI LONG_TIMEOUT DEFAULT_HDRI)
 f3d_test(NAME TestFilenameWhiteBg DATA suzanne.ply ARGS -n --background-color=1,1,1 UI)
 f3d_test(NAME TestConsoleBadgeWarning DATA suzanne.ply ARGS --position=0 UI)
@@ -318,7 +319,7 @@ f3d_test(NAME TestBackdropOpacityMedium DATA suzanne.ply ARGS -n --backdrop-opac
 f3d_test(NAME TestBackdropColor DATA suzanne.ply ARGS -n --backdrop-color=0.5,1.0,0.5 UI)
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-  f3d_test(NAME TestDefaultConfigFileHDRIFilename DATA dragon.vtu CONFIG config_build HDRI shanghai_bund_1k.hdr UI)
+  f3d_test(NAME TestDefaultConfigFileHDRIFilename DATA dragon.vtu CONFIG config_build HDRI shanghai_bund_1k.hdr UI SKIP_GLES)
 endif()
 
 ## Skinning
@@ -328,32 +329,32 @@ else()
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219) # The baseline changed with armature support
     # Strictly speaking, this test can also fail if ran without OpenGL 4.3 support on Windows and Linux
     # Instead of checking MacOS only, we should try to get OpenGL capabilities from CMake later instead
-    f3d_test(NAME TestSkinningManyBones DATA tube_254bones.glb)
+    f3d_test(NAME TestSkinningManyBones DATA tube_254bones.glb SKIP_GLES)
   endif()
 endif()
 
 ## Armature
-f3d_test(NAME TestGLTFRigArmatureNoArmature DATA RiggedFigure.glb ARGS --animation-time=1 --opacity=0.5 -p)
+f3d_test(NAME TestGLTFRigArmatureNoArmature DATA RiggedFigure.glb ARGS --animation-time=1 --opacity=0.5 -p SKIP_GLES) # GLES skipped because of depth peeling
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219)
   f3d_test(NAME TestGLTFRigArmature DATA RiggedFigure.glb ARGS --animation-time=1 --armature)
-  f3d_test(NAME TestGLTFRigArmatureWithOpacity DATA RiggedFigure.glb ARGS --animation-time=1 --armature --opacity=0.5 -p)
+  f3d_test(NAME TestGLTFRigArmatureWithOpacity DATA RiggedFigure.glb ARGS --animation-time=1 --armature --opacity=0.5 -p SKIP_GLES) # GLES skipped because of depth peeling
   f3d_test(NAME TestGLTFRigArmatureSphereTube DATA RiggedFigure.glb ARGS --animation-time=1 --armature --point-size=20 --line-width=5)
 endif()
 
 ## HDRI
-f3d_test(NAME TestHDRI DATA suzanne.ply HDRI shanghai_bund_1k.hdr)
-f3d_test(NAME TestHDRICache DATA suzanne.ply HDRI shanghai_bund_1k.hdr DEPENDS TestHDRI)
-f3d_test(NAME TestHDRIBlur DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u)
+f3d_test(NAME TestHDRI DATA suzanne.ply HDRI shanghai_bund_1k.hdr THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
+f3d_test(NAME TestHDRICache DATA suzanne.ply HDRI shanghai_bund_1k.hdr DEPENDS TestHDRI THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
+f3d_test(NAME TestHDRIBlur DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
 f3d_test(NAME TestHDRIBlurCoCSmall DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=10 --camera-position=-20,0,20)
 f3d_test(NAME TestHDRIBlurCoCMedium DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=50 --camera-position=-20,0,20)
-f3d_test(NAME TestHDRIBlurCoCLarge DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=100 --camera-position=-20,0,20)
+f3d_test(NAME TestHDRIBlurCoCLarge DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=100 --camera-position=-20,0,20 THRESHOLD 0.05) # Small rendering differences on GLES due to LUT precision
 f3d_test(NAME TestHDRIBlurCoCZero DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=0 --camera-position=-20,0,20)
-f3d_test(NAME TestHDRIBlurCoCNegative DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=-100 --camera-position=-20,0,20)
+f3d_test(NAME TestHDRIBlurCoCNegative DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=-100 --camera-position=-20,0,20 THRESHOLD 0.05) # Small rendering differences on GLES due to LUT precision
 f3d_test(NAME TestHDRIBlurRatio DATA suzanne.ply HDRI shanghai_bund_1k.hdr RESOLUTION 600,100 ARGS -u)
-f3d_test(NAME TestHDRIEdges DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -e THRESHOLD 0.06)
-f3d_test(NAME TestHDRI8Bit DATA suzanne.ply HDRI f3d.tif ARGS --color=1.0,0.0,0.0 THRESHOLD 0.08) # Threshold is needed for IBL change after VTK 9.6
-f3d_test(NAME TestHDRIOrient DATA suzanne.stl HDRI shanghai_bund_1k.hdr ARGS --up=+Z)
-f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -t)
+f3d_test(NAME TestHDRIEdges DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -e THRESHOLD 0.06 THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
+f3d_test(NAME TestHDRI8Bit DATA suzanne.ply HDRI f3d.tif ARGS --color=1.0,0.0,0.0 THRESHOLD 0.1) # Threshold is needed for IBL change after VTK 9.6
+f3d_test(NAME TestHDRIOrient DATA suzanne.stl HDRI shanghai_bund_1k.hdr ARGS --up=+Z THRESHOLD 0.05) # Small rendering differences on GLES due to LUT precision
+f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -t THRESHOLD 0.06) # Small rendering differences on GLES due to LUT precision
 
 # Test non existent HDRI, do not add a dummy.png
 f3d_test(NAME TestNonExistentHDRI DATA cow.vtp HDRI dummy.png REGEXP "HDRI file does not exist" NO_BASELINE)
@@ -369,15 +370,15 @@ if(VTK_VERSION VERSION_LESS 9.5.20251001)
 endif()
 
 configure_file("${F3D_SOURCE_DIR}/testing/configs/hdri.json.in" "${CMAKE_BINARY_DIR}/hdri.json")
-f3d_test(NAME TestConfigFileHDRI DATA dragon.vtu CONFIG "${CMAKE_BINARY_DIR}/hdri.json" LONG_TIMEOUT)
+f3d_test(NAME TestConfigFileHDRI DATA dragon.vtu CONFIG "${CMAKE_BINARY_DIR}/hdri.json" LONG_TIMEOUT THRESHOLD 0.05) # Small rendering differences on GLES due to LUT precision
 
 if(F3D_MODULE_EXR)
   f3d_test(NAME TestHDRIEXR DATA suzanne.ply HDRI small_rural_road_1k.exr)
 endif()
 
 f3d_test(NAME TestHDRISkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-skybox LONG_TIMEOUT)
-f3d_test(NAME TestHDRIAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-ambient LONG_TIMEOUT)
-f3d_test(NAME TestHDRIAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-ambient --no-background LONG_TIMEOUT)
+f3d_test(NAME TestHDRIAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-ambient LONG_TIMEOUT THRESHOLD 0.06) # Small rendering differences on GLES due to LUT precision
+f3d_test(NAME TestHDRIAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-ambient --no-background LONG_TIMEOUT THRESHOLD 0.06) # Small rendering differences on GLES due to LUT precision
 f3d_test(NAME TestHDRINone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr LONG_TIMEOUT)
 
 if(F3D_MODULE_RAYTRACING)
@@ -863,10 +864,11 @@ if(NOT WIN32)
   f3d_test(NAME TestConfigTooLong CONFIG ${_f3d_test_invalid_folder}/invalid.json REGEXP "File name too long" NO_RENDER NO_BASELINE)
 endif()
 
+# SKIP_GLES because FPS counter is not supported in GLES
 f3d_test(NAME TestFPS DATA suzanne.ply ARGS -z --font-scale=0.35
-  --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf UI THRESHOLD 0.2)
+  --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf UI SKIP_GLES THRESHOLD 0.2)
 # Require improved importer support https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11303
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240910)
   f3d_test(NAME TestFPSWithBadge DATA invalid_body.vtp ARGS -z --font-scale=0.35
-    --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf NO_DATA_FORCE_RENDER UI THRESHOLD 0.2)
+    --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf NO_DATA_FORCE_RENDER UI SKIP_GLES THRESHOLD 0.2)
 endif()

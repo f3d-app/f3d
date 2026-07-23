@@ -205,12 +205,14 @@ jobs:
           - exclude_deprecated_label: no-exclude-deprecated
           - optdeps_label: optdeps
           - mindeps_label: no-mindeps
+          - gles_label: no-gles
           - rendering_backend: auto
           - static_label: no-static
           - build_type: egl
             vtk_version: commit
             optdeps_label: optdeps
             mindeps_label: no-mindeps
+            gles_label: no-gles
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: egl
             static_label: no-static
@@ -218,6 +220,7 @@ jobs:
             vtk_version: commit
             optdeps_label: optdeps
             mindeps_label: no-mindeps
+            gles_label: no-gles
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: osmesa
             static_label: no-static
@@ -225,6 +228,7 @@ jobs:
             vtk_version: commit
             optdeps_label: optdeps
             mindeps_label: no-mindeps
+            gles_label: no-gles
             exclude_deprecated_label: exclude-deprecated
             rendering_backend: auto
             static_label: no-static
@@ -232,6 +236,7 @@ jobs:
             vtk_version: commit
             optdeps_label: no-optdeps
             mindeps_label: no-mindeps
+            gles_label: no-gles
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: auto
             static_label: no-static
@@ -239,6 +244,7 @@ jobs:
             vtk_version: commit
             optdeps_label: optdeps
             mindeps_label: no-mindeps
+            gles_label: no-gles
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: auto
             static_label: static
@@ -246,6 +252,15 @@ jobs:
             vtk_version: commit
             optdeps_label: optdeps
             mindeps_label: mindeps
+            gles_label: no-gles
+            exclude_deprecated_label: no-exclude-deprecated
+            rendering_backend: auto
+            static_label: no-static
+          - build_type: gles
+            vtk_version: commit
+            optdeps_label: optdeps
+            mindeps_label: mindeps
+            gles_label: gles
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: auto
             static_label: no-static
@@ -274,6 +289,7 @@ jobs:
           rendering_backend: ${{matrix.rendering_backend}}
           optdeps_label: ${{matrix.optdeps_label}}
           mindeps_label: ${{matrix.mindeps_label}}
+          gles_label: ${{matrix.gles_label}}
           exclude_deprecated_label: ${{matrix.exclude_deprecated_label}}
           static_label: ${{matrix.static_label}}
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
