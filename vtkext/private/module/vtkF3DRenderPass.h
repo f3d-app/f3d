@@ -24,9 +24,11 @@
 #include <memory>
 #include <vector>
 
+class vtkActor;
 class vtkCamera;
 class vtkInformationIntegerKey;
 class vtkAbstractMapper;
+class vtkPolyData;
 class vtkMatrix4x4;
 class vtkProp;
 
@@ -97,6 +99,10 @@ protected:
   std::vector<vtkProp*> ReflectionProps;
 
   std::shared_ptr<vtkOpenGLQuadHelper> BlendQuadHelper;
+
+private:
+  void ReplaceMatCapShader(std::string& fragmentShader, vtkActor* actor, vtkPolyData* polyData);
+  void ReplaceSkinningMorphing(std::string& vertexShader, vtkActor* actor, vtkPolyData* polyData);
 };
 
 #endif

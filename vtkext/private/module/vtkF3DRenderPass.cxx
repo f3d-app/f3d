@@ -371,22 +371,9 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
 }
 
 // ----------------------------------------------------------------------------
-bool vtkF3DRenderPass::PreReplaceShaderValues(std::string& vertexShader,
-  std::string& geometryShader, std::string& fragmentShader, vtkAbstractMapper* mapper,
-  vtkProp* prop)
+void vtkF3DRenderPass::ReplaceMatCapShader(std::string& fragmentShader, vtkActor* actor, vtkPolyData* polyData)
 {
-  vtkPolyDataMapper* polyMapper = vtkPolyDataMapper::SafeDownCast(mapper);
-  vtkActor* actor = vtkActor::SafeDownCast(prop);
-
-  if (!polyMapper || !actor)
-  {
-    return true;
-  }
-
-  vtkPolyData* input = polyMapper->GetNumberOfInputPorts() > 0 ? polyMapper->GetInput() : nullptr;
-
-  // insert matcap shader
-  if (input && input->GetPointData()->GetNormals() != nullptr) // check if we have normals
+  if (polyData && polyData->GetPointData()->GetNormals() != nullptr) // check if we have normals
   {
     auto textures = actor->GetProperty()->GetAllTextures();
     auto fn = [](const std::pair<std::string, vtkTexture*>& tex) { return tex.first == "matcap"; };
@@ -411,20 +398,12 @@ bool vtkF3DRenderPass::PreReplaceShaderValues(std::string& vertexShader,
       vtkShaderProgram::Substitute(fragmentShader, "//VTK::TCoord::Impl", "");
     }
   }
+}
 
-  // 2. unlit gamma correction
-  if (!actor->GetProperty()->GetLighting() && actor->GetProperty()->GetInterpolation() != VTK_PBR)
-  {
-    // apply final gamma-correction
-    std::string customGamma =
-      "//VTK::TCoord::Impl\n"
-      "gl_FragData[0] = vec4(pow(gl_FragData[0].rgb, vec3(1.0/2.2)), gl_FragData[0].a);\n";
-
-    vtkShaderProgram::Substitute(fragmentShader, "//VTK::TCoord::Impl", customGamma);
-  }
-
-  // 3. skinning/morphing
-  if (input)
+// ----------------------------------------------------------------------------
+void vtkF3DRenderPass::ReplaceSkinningMorphing(std::string& vertexShader, vtkActor* actor, vtkPolyData* polyData)
+{
+  if (polyData)
   {
     vtkUniforms* uniforms = actor->GetShaderProperty()->GetVertexCustomUniforms();
     bool hasMorphing =
@@ -435,8 +414,8 @@ bool vtkF3DRenderPass::PreReplaceShaderValues(std::string& vertexShader,
     if (hasMorphing || hasSkinning)
     {
       bool hasTangents =
-        input->GetPointData()->GetTangents() && actor->GetProperty()->GetLighting();
-      bool hasNormals = input->GetPointData()->GetNormals() && actor->GetProperty()->GetLighting();
+        polyData->GetPointData()->GetTangents() && actor->GetProperty()->GetLighting();
+      bool hasNormals = polyData->GetPointData()->GetNormals() && actor->GetProperty()->GetLighting();
       hasTangents = hasTangents && (actor->GetProperty()->GetTexture("normalTex") != nullptr);
 
       std::string customDecl = "//VTK::CustomUniforms::Dec\n";
@@ -463,7 +442,7 @@ bool vtkF3DRenderPass::PreReplaceShaderValues(std::string& vertexShader,
           std::string name = "target" + std::to_string(i) + "_position";
 
           // modify position using morph weights
-          if (input->GetPointData()->GetArray(name.c_str()) != nullptr)
+          if (polyData->GetPointData()->GetArray(name.c_str()) != nullptr)
           {
             customDecl += "in vec3 ";
             customDecl += name;
@@ -479,7 +458,7 @@ bool vtkF3DRenderPass::PreReplaceShaderValues(std::string& vertexShader,
           name = "target" + std::to_string(i) + "_normal";
 
           // modify normal using morph weights
-          if (input->GetPointData()->GetArray(name.c_str()) != nullptr)
+          if (polyData->GetPointData()->GetArray(name.c_str()) != nullptr)
           {
             customDecl += "in vec3 ";
             customDecl += name;
@@ -538,11 +517,7 @@ bool vtkF3DRenderPass::PreReplaceShaderValues(std::string& vertexShader,
       }
       if (hasTangents)
       {
-#ifndef F3D_USE_GLES
         normalImpl += "  tangentVCVSOutput = normalMatrix * tangentVCVSOutput;\n";
-#else
-        normalImpl += "  tangentVCVS = normalMatrix * tangentVCVS;\n";
-#endif
       }
 
       vtkShaderProgram::Substitute(vertexShader, "//VTK::CustomUniforms::Dec", customDecl);
@@ -551,6 +526,36 @@ bool vtkF3DRenderPass::PreReplaceShaderValues(std::string& vertexShader,
       vtkShaderProgram::Substitute(vertexShader, "//VTK::CustomBegin::Impl", beginImpl);
     }
   }
+}
+
+// ----------------------------------------------------------------------------
+bool vtkF3DRenderPass::PreReplaceShaderValues(std::string& vertexShader,
+  std::string& geometryShader, std::string& fragmentShader, vtkAbstractMapper* mapper,
+  vtkProp* prop)
+{
+  vtkPolyDataMapper* polyMapper = vtkPolyDataMapper::SafeDownCast(mapper);
+  vtkActor* actor = vtkActor::SafeDownCast(prop);
+
+  if (!polyMapper || !actor)
+  {
+    return true;
+  }
+
+  vtkPolyData* input = polyMapper->GetNumberOfInputPorts() > 0 ? polyMapper->GetInput() : nullptr;
+
+  this->ReplaceMatCapShader(fragmentShader, actor, input);
+
+  if (!actor->GetProperty()->GetLighting() && actor->GetProperty()->GetInterpolation() != VTK_PBR)
+  {
+    // apply final gamma-correction
+    std::string customGamma =
+      "//VTK::TCoord::Impl\n"
+      "gl_FragData[0] = vec4(pow(gl_FragData[0].rgb, vec3(1.0/2.2)), gl_FragData[0].a);\n";
+
+    vtkShaderProgram::Substitute(fragmentShader, "//VTK::TCoord::Impl", customGamma);
+  }
+
+  this->ReplaceSkinningMorphing(vertexShader, actor, input);
 
   return true;
 }
