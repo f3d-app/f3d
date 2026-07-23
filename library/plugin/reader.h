@@ -82,7 +82,6 @@ public:
       vtkNew<vtkFileResourceStream> stream;
       if (stream->Open(fileName.c_str()))
       {
-
         if (isSkipCheck || this->canRead(stream))
         {
           availability = f3d::file_availability::SUPPORTED;
