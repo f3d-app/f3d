@@ -418,6 +418,7 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->SetUseNormalGlyphs(opt.model.normal_glyphs.enable);
   renderer->SetNormalGlyphScaleMultiplier(opt.model.normal_glyphs.scale);
+  renderer->SetNormalGlyphColor(opt.model.normal_glyphs.color);
 
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons

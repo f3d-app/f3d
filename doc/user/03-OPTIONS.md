@@ -380,6 +380,16 @@ Adjusts the scales of normal glyphs.
 | ----------------------------------------- | ----------------------------------------- |
 | ![](./images/normal_glyphs_scale_0.3.png) | ![](./images/normal_glyphs_scale_0.7.png) |
 
+### `--normal-glyphs-color` (_color_, optional)
+
+Set the color of normal glyphs.
+
+#### compare
+
+| Default                            | Red                                 |
+| ---------------------------------- | ----------------------------------- |
+| ![](./images/normal_glyphs_on.png) | ![](./images/normal_glyphs_red.png) |
+
 ### `-o`, `--point-sprites=<none|sphere|gaussian|circle|stddev|bound|cross>` (_string_, default: `none`, implicit: `sphere`)
 
 Select _points sprites_ types to show instead of the geometry.
