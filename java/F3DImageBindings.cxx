@@ -14,9 +14,18 @@ extern "C"
   JNIEXPORT jlong JAVA_BIND(Image, nativeCreateFromFile)(JNIEnv* env, jclass, jstring filePath)
   {
     const char* path = env->GetStringUTFChars(filePath, nullptr);
-    f3d::image* img = new f3d::image(path);
-    env->ReleaseStringUTFChars(filePath, path);
-    return reinterpret_cast<jlong>(img);
+    try
+    {
+      f3d::image* img = new f3d::image(path);
+      env->ReleaseStringUTFChars(filePath, path);
+      return reinterpret_cast<jlong>(img);
+    }
+    catch (const f3d::image::read_exception& e)
+    {
+      env->ReleaseStringUTFChars(filePath, path);
+      F3DThrowJavaException(env, "app/f3d/F3D/Image$ReadException", e.what());
+    }
+    return 0;
   }
 
   JNIEXPORT jlong JAVA_BIND(Image, nativeCreate)(
@@ -177,7 +186,14 @@ extern "C"
     jint formatOrdinal = env->CallIntMethod(format, ordinalMethod);
 
     f3d::image::SaveFormat saveFormat = static_cast<f3d::image::SaveFormat>(formatOrdinal);
-    img->save(path, saveFormat);
+    try
+    {
+      img->save(path, saveFormat);
+    }
+    catch (const f3d::image::write_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Image$WriteException", e.what());
+    }
 
     env->ReleaseStringUTFChars(filePath, path);
     return self;
@@ -195,12 +211,20 @@ extern "C"
     jint formatOrdinal = env->CallIntMethod(format, ordinalMethod);
 
     f3d::image::SaveFormat saveFormat = static_cast<f3d::image::SaveFormat>(formatOrdinal);
-    std::vector<unsigned char> buffer = img->saveBuffer(saveFormat);
+    try
+    {
+      std::vector<unsigned char> buffer = img->saveBuffer(saveFormat);
 
-    jbyteArray result = env->NewByteArray(buffer.size());
-    env->SetByteArrayRegion(result, 0, buffer.size(), reinterpret_cast<jbyte*>(buffer.data()));
+      jbyteArray result = env->NewByteArray(buffer.size());
+      env->SetByteArrayRegion(result, 0, buffer.size(), reinterpret_cast<jbyte*>(buffer.data()));
 
-    return result;
+      return result;
+    }
+    catch (const f3d::image::write_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Image$WriteException", e.what());
+    }
+    return nullptr;
   }
 
   JNIEXPORT jstring JAVA_BIND(Image, toTerminalText)(JNIEnv* env, jobject self)
@@ -241,9 +265,18 @@ extern "C"
     f3d::image* img = reinterpret_cast<f3d::image*>(ptr);
 
     const char* keyStr = env->GetStringUTFChars(key, nullptr);
-    std::string value = img->getMetadata(keyStr);
+    std::string value;
+    try
+    {
+      value = img->getMetadata(keyStr);
+    }
+    catch (const f3d::image::metadata_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Image$MetadataException", e.what());
+      env->ReleaseStringUTFChars(key, keyStr);
+      return nullptr;
+    }
     env->ReleaseStringUTFChars(key, keyStr);
-
     return env->NewStringUTF(value.c_str());
   }
 

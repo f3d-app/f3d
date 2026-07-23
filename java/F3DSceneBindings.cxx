@@ -204,12 +204,9 @@ extern "C"
     {
       GetEngine(env, self)->getScene().add(str);
     }
-    catch (const std::exception& e)
+    catch (const f3d::scene::load_failure_exception& e)
     {
-      env->ReleaseStringUTFChars(path, str);
-      jclass exceptionClass = env->FindClass("java/lang/RuntimeException");
-      env->ThrowNew(exceptionClass, e.what());
-      return nullptr;
+      F3DThrowJavaException(env, "app/f3d/F3D/Scene$LoadFailureException", e.what());
     }
     env->ReleaseStringUTFChars(path, str);
     return self;
@@ -227,11 +224,9 @@ extern "C"
     {
       GetEngine(env, self)->getScene().add(vec);
     }
-    catch (const std::exception& e)
+    catch (const f3d::scene::load_failure_exception& e)
     {
-      jclass exceptionClass = env->FindClass("java/lang/RuntimeException");
-      env->ThrowNew(exceptionClass, e.what());
-      return nullptr;
+      F3DThrowJavaException(env, "app/f3d/F3D/Scene$LoadFailureException", e.what());
     }
     return self;
   }
@@ -248,11 +243,9 @@ extern "C"
     {
       GetEngine(env, self)->getScene().add(cppMesh);
     }
-    catch (const std::exception& e)
+    catch (const f3d::scene::load_failure_exception& e)
     {
-      jclass exceptionClass = env->FindClass("java/lang/RuntimeException");
-      env->ThrowNew(exceptionClass, e.what());
-      return nullptr;
+      F3DThrowJavaException(env, "app/f3d/F3D/Scene$LoadFailureException", e.what());
     }
     return self;
   }
@@ -271,11 +264,9 @@ extern "C"
       GetEngine(env, self)->getScene().add(
         reinterpret_cast<std::byte*>(bufferData), static_cast<size_t>(bufferLen));
     }
-    catch (const std::exception& e)
+    catch (const f3d::scene::load_failure_exception& e)
     {
-      jclass exceptionClass = env->FindClass("java/lang/RuntimeException");
-      env->ThrowNew(exceptionClass, e.what());
-      return nullptr;
+      F3DThrowJavaException(env, "app/f3d/F3D/Scene$LoadFailureException", e.what());
     }
     env->ReleaseByteArrayElements(buffer, bufferData, 0);
     return self;
@@ -299,10 +290,9 @@ extern "C"
     {
       return GetEngine(env, self)->getScene().addLight(cppLightState);
     }
-    catch (const std::exception& e)
+    catch (const f3d::scene::light_exception& e)
     {
-      jclass exceptionClass = env->FindClass("java/lang/RuntimeException");
-      env->ThrowNew(exceptionClass, e.what());
+      F3DThrowJavaException(env, "app/f3d/F3D/Scene$LightException", e.what());
       return -1;
     }
   }
@@ -319,10 +309,9 @@ extern "C"
       f3d::light_state_t cppLightState = GetEngine(env, self)->getScene().getLight(index);
       return CppLightStateToJavaLightState(env, cppLightState);
     }
-    catch (const std::exception& e)
+    catch (const f3d::scene::light_exception& e)
     {
-      jclass exceptionClass = env->FindClass("java/lang/RuntimeException");
-      env->ThrowNew(exceptionClass, e.what());
+      F3DThrowJavaException(env, "app/f3d/F3D/Scene$LightException", e.what());
       return nullptr;
     }
   }
@@ -340,11 +329,9 @@ extern "C"
     {
       GetEngine(env, self)->getScene().updateLight(index, cppLightState);
     }
-    catch (const std::exception& e)
+    catch (const f3d::scene::light_exception& e)
     {
-      jclass exceptionClass = env->FindClass("java/lang/RuntimeException");
-      env->ThrowNew(exceptionClass, e.what());
-      return nullptr;
+      F3DThrowJavaException(env, "app/f3d/F3D/Scene$LightException", e.what());
     }
     return self;
   }
@@ -355,11 +342,9 @@ extern "C"
     {
       GetEngine(env, self)->getScene().removeLight(index);
     }
-    catch (const std::exception& e)
+    catch (const f3d::scene::light_exception& e)
     {
-      jclass exceptionClass = env->FindClass("java/lang/RuntimeException");
-      env->ThrowNew(exceptionClass, e.what());
-      return nullptr;
+      F3DThrowJavaException(env, "app/f3d/F3D/Scene$LightException", e.what());
     }
     return self;
   }

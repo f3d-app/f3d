@@ -69,5 +69,26 @@ public class TestOptions {
     options.cycle("render.effect.blending.mode");
 
     engine.close();
+
+    // --- Exception handling tests ---
+    Engine exEngine = Engine.createNone();
+    Options exOptions = exEngine.getOptions();
+
+    // Setting a nonexistent option must throw InexistentException.
+    try {
+      exOptions.setAsBool("this.option.does.not.exist.at.all", true);
+      throw new RuntimeException("Expected Options.InexistentException was not thrown");
+    } catch (Options.InexistentException e) {
+    }
+
+    // Getting an option with wrong type must throw IncompatibleException.
+    try {
+      // render.background.color is a double vector, not a bool
+      exOptions.getAsBool("render.background.color");
+      throw new RuntimeException("Expected Options.IncompatibleException was not thrown");
+    } catch (Options.IncompatibleException e) {
+    }
+
+    exEngine.close();
   }
 }
