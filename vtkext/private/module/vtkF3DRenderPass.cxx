@@ -371,7 +371,8 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
 }
 
 // ----------------------------------------------------------------------------
-void vtkF3DRenderPass::ReplaceMatCapShader(std::string& fragmentShader, vtkActor* actor, vtkPolyData* polyData)
+void vtkF3DRenderPass::ReplaceMatCapShader(
+  std::string& fragmentShader, vtkActor* actor, vtkPolyData* polyData)
 {
   if (polyData && polyData->GetPointData()->GetNormals() != nullptr) // check if we have normals
   {
@@ -401,7 +402,8 @@ void vtkF3DRenderPass::ReplaceMatCapShader(std::string& fragmentShader, vtkActor
 }
 
 // ----------------------------------------------------------------------------
-void vtkF3DRenderPass::ReplaceSkinningMorphing(std::string& vertexShader, vtkActor* actor, vtkPolyData* polyData)
+void vtkF3DRenderPass::ReplaceSkinningMorphing(
+  std::string& vertexShader, vtkActor* actor, vtkPolyData* polyData)
 {
   if (polyData)
   {
@@ -415,7 +417,8 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(std::string& vertexShader, vtkAct
     {
       bool hasTangents =
         polyData->GetPointData()->GetTangents() && actor->GetProperty()->GetLighting();
-      bool hasNormals = polyData->GetPointData()->GetNormals() && actor->GetProperty()->GetLighting();
+      bool hasNormals =
+        polyData->GetPointData()->GetNormals() && actor->GetProperty()->GetLighting();
       hasTangents = hasTangents && (actor->GetProperty()->GetTexture("normalTex") != nullptr);
 
       std::string customDecl = "//VTK::CustomUniforms::Dec\n";
@@ -529,9 +532,8 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(std::string& vertexShader, vtkAct
 }
 
 // ----------------------------------------------------------------------------
-bool vtkF3DRenderPass::PreReplaceShaderValues(std::string& vertexShader,
-  std::string& geometryShader, std::string& fragmentShader, vtkAbstractMapper* mapper,
-  vtkProp* prop)
+bool vtkF3DRenderPass::PreReplaceShaderValues(std::string& vertexShader, std::string&,
+  std::string& fragmentShader, vtkAbstractMapper* mapper, vtkProp* prop)
 {
   vtkPolyDataMapper* polyMapper = vtkPolyDataMapper::SafeDownCast(mapper);
   vtkActor* actor = vtkActor::SafeDownCast(prop);
