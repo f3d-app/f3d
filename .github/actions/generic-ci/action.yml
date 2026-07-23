@@ -250,7 +250,7 @@ runs:
         echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
 
     # Linux: Xvfb is not running, should fallback to egl
-    # Windows: mesa binary is not installed and faulty OPENGL32.dll in insufficient, should fallback to osmesa
+    # Windows: mesa binary is not installed and faulty OPENGL32.dll is insufficient, should fallback to osmesa
     # macOS: No fallback mechanism to test, CI always uses osmesa (with VTK > 9.7.20260706), check cocoa is functional
     - name: Check rendering backend logic
       shell: bash
