@@ -299,6 +299,17 @@ The default scene always has at most one animation.
 
 Set the animation speed factor to slow, speed up or even invert animation time.
 
+### `--animation-mode=<forward|backward|pingpong>` (_string_, default: `forward`)
+
+Defines the playback direction and loop behavior:
+- `forward`: Plays the animation from start to end (normally).
+- `backward`: Plays the animation from end to start (in reverse).
+- `pingpong`: Alternating playback direction, moving forward to the end, then backward to the start.
+
+### `--animation-repeat=<count>` (_int_, default: `-1`)
+
+Specifies the number of animation repeat cycles. A value of `-1` means unlimited, while any integer sets a specific number of repeats.
+
 ### `--animation-time=<time>` (_double_)
 
 Set the animation time to load.
