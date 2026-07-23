@@ -32,6 +32,7 @@ f3d_test(<NAME> [ARGS...])
     even when F3D logic usually would not
   - `DPI_SCALE` Set the DPI scale through the environment variable `CTEST_F3D_FORCE_DPI_SCALE`, default is 1.0
   - `UI` Mark the test to require the presence of UI component and disable it otherwise
+  - `SKIP_GLES` Mark the test to be disabled when using GLES, usually because of missing features
   - `PIPED` Mark the test to pipe the data (`cat data | f3d`) instead of providing the filename as data,
     doesn't work for external plugins. Add `piped` test labels.
   - `PIPED_READER` Provide the reader to force for a `PIPED` test, only used before VTK v9.6.20260128.
@@ -60,7 +61,7 @@ f3d_test(<NAME> [ARGS...])
 
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "LONG_TIMEOUT;DEFAULT_HDRI;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT;PIPED" "NAME;BASELINE_PATH;OUTPUT_PATH;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED_READER;PIPED_ARG;PLUGIN" "DATA;DEPENDS;LABELS;ENV;ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "LONG_TIMEOUT;DEFAULT_HDRI;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT;PIPED;SKIP_GLES" "NAME;BASELINE_PATH;OUTPUT_PATH;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED_READER;PIPED_ARG;PLUGIN" "DATA;DEPENDS;LABELS;ENV;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -221,6 +222,10 @@ function(f3d_test)
     if(F3D_TEST_LONG_TIMEOUT)
       set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES DISABLED ON)
     endif()
+  endif()
+
+  if(F3D_TEST_SKIP_GLES AND F3D_USE_GLES)
+    set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES DISABLED ON)
   endif()
 
   set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES TIMEOUT ${_timeout})

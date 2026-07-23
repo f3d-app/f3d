@@ -1,6 +1,8 @@
 set(shader_files "")
+set(sources "")
+set(private_headers "")
 
-if(NOT ANDROID AND NOT EMSCRIPTEN)
+if(NOT F3D_USE_GLES)
   set(shader_files ${shader_files}
     glsl/vtkF3DBitonicSortGlobalDisperseCS.glsl
     glsl/vtkF3DBitonicSortGlobalFlipCS.glsl
@@ -28,7 +30,7 @@ set(classes
   )
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
-if(NOT ANDROID AND NOT EMSCRIPTEN)
+if(NOT F3D_USE_GLES)
   set(classes ${classes} vtkF3DBitonicSort)
 endif()
 

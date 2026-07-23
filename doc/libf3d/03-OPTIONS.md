@@ -273,6 +273,9 @@ CLI: `--textures-transform`.
 Enable and set the _blending_ technique. This is a technique used to correctly render translucent objects.
 Valid options are: `ddp` (dual depth peeling, quality), `sort` (only for gaussians), `sort_cpu` (only for gaussians, slow), `stochastic` (fast), `none` (disabled).
 
+> [!WARNING]
+> `ddp`, `sort` and `sort_cpu` are not compatible with OpenGL ES (WebAssembly and Android)
+
 CLI: `--blending`.
 
 ### `render.effect.antialiasing.mode` (_string_, default: `none`, enum domain: `none, fxaa, ssaa, taa`)
@@ -370,6 +373,9 @@ CLI: `--grid-reflection`.
 ### `render.axes_grid` (_bool_, default: `false`)
 
 Show _axes grid_ in the scene.
+
+> [!WARNING]
+> this option is not compatible with OpenGL ES (WebAssembly and Android)
 
 CLI: `--axes-grid`.
 
@@ -531,6 +537,9 @@ CLI: `--dpi-aware`.
 ### `ui.fps` (_bool_, default: `false`)
 
 Display a _frame per second counter_.
+
+> [!WARNING]
+> this option is not compatible with OpenGL ES (WebAssembly and Android)
 
 CLI: `--fps`.
 
