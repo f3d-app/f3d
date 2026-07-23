@@ -133,7 +133,14 @@ void animationManager::ToggleAnimation()
       // Initialize time if not already
       if (!this->CurrentTimeSet)
       {
-        this->CurrentTime = this->TimeRange[0];
+        if (this->AnimationMode == AnimationModeType::BACKWARD)
+        {
+          this->CurrentTime = TimeRange[1];
+        }
+        else
+        {
+          this->CurrentTime = TimeRange[0];
+        }
         this->CurrentTimeSet = true;
       }
     }
@@ -155,7 +162,8 @@ void animationManager::Tick()
   assert(this->DeltaTime > 0);
   if (this->Playing)
   {
-    this->CurrentTime += (this->DeltaTime * this->SpeedFactor) * this->AnimationDirection;
+    this->CurrentTime += (this->DeltaTime * this->SpeedFactor) * this->AnimationDirection *
+      this->AnimationModeDirection;
 
     // Modulo computation, compute CurrentTime in the time range.
     if (this->CurrentTime < this->TimeRange[0] || this->CurrentTime > this->TimeRange[1])
@@ -165,14 +173,55 @@ void animationManager::Tick()
         const double remainder = fmod(val, mod);
         return remainder < 0 ? remainder + mod : remainder;
       };
-      this->CurrentTime = this->TimeRange[0] +
-        modulo(this->CurrentTime - this->TimeRange[0], this->TimeRange[1] - this->TimeRange[0]);
+
+      // Switching between animation modes, forward is default
+      switch (this->AnimationMode)
+      {
+        case AnimationModeType::PINGPONG:
+          this->AnimationModeDirection *= -1;
+          if (this->CurrentTime < this->TimeRange[0])
+          {
+            this->CurrentTime = this->TimeRange[0] + (this->TimeRange[0] - this->CurrentTime);
+          }
+          else if (this->CurrentTime > this->TimeRange[1])
+          {
+            this->CurrentTime = this->TimeRange[1] - (this->CurrentTime - this->TimeRange[1]);
+          }
+          if (this->AnimationMaxRepeat != -1 && AnimationModeDirection == 1)
+          {
+            this->AnimationCurrentRepeat++;
+          }
+          break;
+        case AnimationModeType::BACKWARD:
+          this->AnimationModeDirection = -1;
+          this->CurrentTime = this->TimeRange[1] -
+            modulo(this->TimeRange[1] - this->CurrentTime, this->TimeRange[1] - this->TimeRange[0]);
+          if (this->AnimationMaxRepeat != -1)
+          {
+            this->AnimationCurrentRepeat++;
+          }
+          break;
+        default:
+          this->AnimationModeDirection = 1;
+          this->CurrentTime = this->TimeRange[0] +
+            modulo(this->CurrentTime - this->TimeRange[0], this->TimeRange[1] - this->TimeRange[0]);
+          if (this->AnimationMaxRepeat != -1)
+          {
+            this->AnimationCurrentRepeat++;
+          }
+          break;
+      }
     }
 
     if (this->LoadAtTime(this->CurrentTime))
     {
       this->Window.render();
     }
+  }
+  if (this->AnimationMaxRepeat != -1 && this->AnimationCurrentRepeat == this->AnimationMaxRepeat)
+  {
+    this->Playing = false;
+    this->AnimationCurrentRepeat = 0;
   }
 }
 
@@ -693,9 +742,38 @@ void animationManager::SetAnimationDirection(int direction)
 }
 
 //----------------------------------------------------------------------------
+void animationManager::SetAnimationMode(const std::string& mode)
+{
+  if (mode == "backward")
+  {
+    this->AnimationMode = AnimationModeType::BACKWARD;
+    this->AnimationModeDirection = -1;
+  }
+  else if (mode == "pingpong")
+  {
+    this->AnimationMode = AnimationModeType::PINGPONG;
+    this->AnimationModeDirection = 1;
+  }
+  else
+  {
+    this->AnimationMode = AnimationModeType::FORWARD;
+    this->AnimationModeDirection = 1;
+  }
+}
+
+//----------------------------------------------------------------------------
+void animationManager::SetAnimationRepeat(int repeat)
+{
+  assert(repeat >= -1);
+  this->AnimationMaxRepeat = repeat;
+}
+
+//----------------------------------------------------------------------------
 void animationManager::UpdateDynamicOptions()
 {
   this->SetAutoplay(this->Options.scene.animation.autoplay);
   this->SetSpeedFactor(this->Options.scene.animation.speed_factor);
+  this->SetAnimationMode(this->Options.scene.animation.mode);
+  this->SetAnimationRepeat(this->Options.scene.animation.repeat);
 }
 }
