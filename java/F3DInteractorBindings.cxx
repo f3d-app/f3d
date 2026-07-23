@@ -205,23 +205,21 @@ extern "C"
     JNIEnv* env, jobject self, jstring command, jboolean keepComments)
   {
     const char* commandStr = env->GetStringUTFChars(command, nullptr);
+    bool result = false;
     try
     {
-      bool result = GetInteractor(env, self).triggerCommand(commandStr, keepComments);
-      env->ReleaseStringUTFChars(command, commandStr);
-      return result;
+      result = GetInteractor(env, self).triggerCommand(commandStr, keepComments);
     }
     catch (const f3d::interactor::command_runtime_exception& e)
     {
-      env->ReleaseStringUTFChars(command, commandStr);
       F3DThrowJavaException(env, "app/f3d/F3D/Interactor$CommandRuntimeException", e.what());
     }
     catch (const f3d::interactor::invalid_args_exception& e)
     {
-      env->ReleaseStringUTFChars(command, commandStr);
       F3DThrowJavaException(env, "app/f3d/F3D/Interactor$InvalidArgsException", e.what());
     }
-    return false;
+    env->ReleaseStringUTFChars(command, commandStr);
+    return result;
   }
 
   JNIEXPORT jobject JAVA_BIND(Interactor, initBindings)(JNIEnv* env, jobject self)

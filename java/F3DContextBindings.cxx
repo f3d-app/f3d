@@ -106,26 +106,23 @@ extern "C"
     const char* libStr = env->GetStringUTFChars(lib, nullptr);
     const char* funcStr = env->GetStringUTFChars(func, nullptr);
 
+    jlong result = 0;
     try
     {
-      f3d_java_context* ctx = new f3d_java_context(f3d::context::getSymbol(libStr, funcStr));
-      env->ReleaseStringUTFChars(lib, libStr);
-      env->ReleaseStringUTFChars(func, funcStr);
-      return reinterpret_cast<jlong>(ctx);
+      result =
+        reinterpret_cast<jlong>(new f3d_java_context(f3d::context::getSymbol(libStr, funcStr)));
     }
     catch (const f3d::context::loading_exception& e)
     {
-      env->ReleaseStringUTFChars(lib, libStr);
-      env->ReleaseStringUTFChars(func, funcStr);
       F3DThrowJavaException(env, "app/f3d/F3D/Context$LoadingException", e.what());
     }
     catch (const f3d::context::symbol_exception& e)
     {
-      env->ReleaseStringUTFChars(lib, libStr);
-      env->ReleaseStringUTFChars(func, funcStr);
       F3DThrowJavaException(env, "app/f3d/F3D/Context$SymbolException", e.what());
     }
-    return 0;
+    env->ReleaseStringUTFChars(lib, libStr);
+    env->ReleaseStringUTFChars(func, funcStr);
+    return result;
   }
 
   JNIEXPORT void JAVA_BIND(Context, delete)(JNIEnv*, jclass, jlong contextHandle)
