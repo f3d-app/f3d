@@ -384,37 +384,34 @@ extern "C"
     JNIEnv* env, jclass, jstring content)
   {
     const char* str = env->GetStringUTFChars(content, nullptr);
+    jlong ptr = 0;
     try
     {
-      jlong ptr =
-        reinterpret_cast<jlong>(new f3d::engine::state(f3d::engine::state::fromString(str)));
-      env->ReleaseStringUTFChars(content, str);
-      return ptr;
+      ptr = reinterpret_cast<jlong>(new f3d::engine::state(f3d::engine::state::fromString(str)));
     }
     catch (const f3d::engine::statefile_exception& e)
     {
-      env->ReleaseStringUTFChars(content, str);
       env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
-      return 0;
     }
+    env->ReleaseStringUTFChars(content, str);
+    return ptr;
   }
 
   JNIEXPORT jlong JAVA_SCOPED_BIND(Engine, State, nativeFromFile)(JNIEnv* env, jclass, jstring path)
   {
     const char* str = env->GetStringUTFChars(path, nullptr);
+    jlong ptr = 0;
     try
     {
-      jlong ptr = reinterpret_cast<jlong>(
+      ptr = reinterpret_cast<jlong>(
         new f3d::engine::state(f3d::engine::state::fromFile(fs::path(str))));
-      env->ReleaseStringUTFChars(path, str);
-      return ptr;
     }
     catch (const f3d::engine::statefile_exception& e)
     {
-      env->ReleaseStringUTFChars(path, str);
       env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
-      return 0;
     }
+    env->ReleaseStringUTFChars(path, str);
+    return ptr;
   }
 
   JNIEXPORT jlong JAVA_SCOPED_BIND(Engine, State, nativeFromClipboard)(JNIEnv* env, jclass)
@@ -444,9 +441,7 @@ extern "C"
     }
     catch (const f3d::engine::statefile_exception& e)
     {
-      env->ReleaseStringUTFChars(path, str);
       env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
-      return;
     }
     env->ReleaseStringUTFChars(path, str);
   }

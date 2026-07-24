@@ -146,132 +146,118 @@ extern "C"
   JNIEXPORT jboolean JAVA_BIND(Options, getAsBool)(JNIEnv* env, jobject self, jstring name)
   {
     const char* str = env->GetStringUTFChars(name, nullptr);
+    bool value = false;
     try
     {
-      bool value = std::get<bool>(GetOptionsFromEngine(env, self).get(str));
-      env->ReleaseStringUTFChars(name, str);
-      return value;
+      value = std::get<bool>(GetOptionsFromEngine(env, self).get(str));
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
     }
     catch (const f3d::options::no_value_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$NoValueException", e.what());
     }
     catch (const std::bad_variant_access& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
     }
-    return false;
+    env->ReleaseStringUTFChars(name, str);
+    return value;
   }
 
   JNIEXPORT jint JAVA_BIND(Options, getAsInt)(JNIEnv* env, jobject self, jstring name)
   {
     const char* str = env->GetStringUTFChars(name, nullptr);
+    int value = 0;
     try
     {
-      int value = std::get<int>(GetOptionsFromEngine(env, self).get(str));
-      env->ReleaseStringUTFChars(name, str);
-      return value;
+      value = std::get<int>(GetOptionsFromEngine(env, self).get(str));
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
     }
     catch (const f3d::options::no_value_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$NoValueException", e.what());
     }
     catch (const std::bad_variant_access& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
     }
-    return 0;
+    env->ReleaseStringUTFChars(name, str);
+    return value;
   }
 
   JNIEXPORT jdouble JAVA_BIND(Options, getAsDouble)(JNIEnv* env, jobject self, jstring name)
   {
     const char* str = env->GetStringUTFChars(name, nullptr);
+    double value = 0.0;
     try
     {
-      double value = std::get<double>(GetOptionsFromEngine(env, self).get(str));
-      env->ReleaseStringUTFChars(name, str);
-      return value;
+      value = std::get<double>(GetOptionsFromEngine(env, self).get(str));
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
     }
     catch (const f3d::options::no_value_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$NoValueException", e.what());
     }
     catch (const std::bad_variant_access& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
     }
-    return 0.0;
+    env->ReleaseStringUTFChars(name, str);
+    return value;
   }
 
   JNIEXPORT jstring JAVA_BIND(Options, getAsString)(JNIEnv* env, jobject self, jstring name)
   {
     const char* str = env->GetStringUTFChars(name, nullptr);
+    std::string value;
     try
     {
-      std::string value = std::get<std::string>(GetOptionsFromEngine(env, self).get(str));
-      env->ReleaseStringUTFChars(name, str);
-      return env->NewStringUTF(value.c_str());
+      value = std::get<std::string>(GetOptionsFromEngine(env, self).get(str));
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
     }
     catch (const f3d::options::no_value_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$NoValueException", e.what());
     }
     catch (const std::bad_variant_access& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
     }
-    return nullptr;
+    env->ReleaseStringUTFChars(name, str);
+    return env->ExceptionCheck() ? nullptr : env->NewStringUTF(value.c_str());
   }
 
   JNIEXPORT jstring JAVA_BIND(Options, getAsStringRepresentation)(
     JNIEnv* env, jobject self, jstring name)
   {
     const char* str = env->GetStringUTFChars(name, nullptr);
+    std::string value;
     try
     {
-      std::string value = GetOptionsFromEngine(env, self).getAsString(str);
-      env->ReleaseStringUTFChars(name, str);
-      return env->NewStringUTF(value.c_str());
+      value = GetOptionsFromEngine(env, self).getAsString(str);
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
     }
     catch (const f3d::options::no_value_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$NoValueException", e.what());
     }
-    return nullptr;
+    env->ReleaseStringUTFChars(name, str);
+    return env->ExceptionCheck() ? nullptr : env->NewStringUTF(value.c_str());
   }
 
   JNIEXPORT void JAVA_BIND(Options, setAsStringRepresentation)(
@@ -299,62 +285,54 @@ extern "C"
     JNIEnv* env, jobject self, jstring name)
   {
     const char* str = env->GetStringUTFChars(name, nullptr);
+    jdoubleArray result = nullptr;
     try
     {
       std::vector<double> vec =
         std::get<std::vector<double>>(GetOptionsFromEngine(env, self).get(str));
-      env->ReleaseStringUTFChars(name, str);
-
-      jdoubleArray result = env->NewDoubleArray(vec.size());
+      result = env->NewDoubleArray(vec.size());
       env->SetDoubleArrayRegion(result, 0, vec.size(), vec.data());
-      return result;
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
     }
     catch (const f3d::options::no_value_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$NoValueException", e.what());
     }
     catch (const std::bad_variant_access& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
     }
-    return nullptr;
+    env->ReleaseStringUTFChars(name, str);
+    return result;
   }
 
   JNIEXPORT jintArray JAVA_BIND(Options, getAsIntVector)(JNIEnv* env, jobject self, jstring name)
   {
     const char* str = env->GetStringUTFChars(name, nullptr);
+    jintArray result = nullptr;
     try
     {
       std::vector<int> vec = std::get<std::vector<int>>(GetOptionsFromEngine(env, self).get(str));
-      env->ReleaseStringUTFChars(name, str);
-
-      jintArray result = env->NewIntArray(vec.size());
+      result = env->NewIntArray(vec.size());
       env->SetIntArrayRegion(result, 0, vec.size(), vec.data());
-      return result;
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
     }
     catch (const f3d::options::no_value_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$NoValueException", e.what());
     }
     catch (const std::bad_variant_access& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
     }
-    return nullptr;
+    env->ReleaseStringUTFChars(name, str);
+    return result;
   }
 
   JNIEXPORT void JAVA_BIND(Options, toggle)(JNIEnv* env, jobject self, jstring name)
@@ -383,36 +361,34 @@ extern "C"
     jlong otherPtr = env->GetLongField(other, fid);
 
     const char* str = env->GetStringUTFChars(name, nullptr);
+    bool result = false;
     try
     {
-      bool result = GetOptionsFromEngine(env, self).isSame(
+      result = GetOptionsFromEngine(env, self).isSame(
         reinterpret_cast<f3d::engine*>(otherPtr)->getOptions(), str);
-      env->ReleaseStringUTFChars(name, str);
-      return result;
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
     }
-    return false;
+    env->ReleaseStringUTFChars(name, str);
+    return result;
   }
 
   JNIEXPORT jboolean JAVA_BIND(Options, hasValue)(JNIEnv* env, jobject self, jstring name)
   {
     const char* str = env->GetStringUTFChars(name, nullptr);
+    bool result = false;
     try
     {
-      bool result = GetOptionsFromEngine(env, self).hasValue(str);
-      env->ReleaseStringUTFChars(name, str);
-      return result;
+      result = GetOptionsFromEngine(env, self).hasValue(str);
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
     }
-    return false;
+    env->ReleaseStringUTFChars(name, str);
+    return result;
   }
 
   JNIEXPORT void JAVA_BIND(Options, copy)(JNIEnv* env, jobject self, jobject other, jstring name)
@@ -466,27 +442,26 @@ extern "C"
   JNIEXPORT jboolean JAVA_BIND(Options, isOptional)(JNIEnv* env, jobject self, jstring name)
   {
     const char* str = env->GetStringUTFChars(name, nullptr);
+    bool result = false;
     try
     {
-      bool result = GetOptionsFromEngine(env, self).isOptional(str);
-      env->ReleaseStringUTFChars(name, str);
-      return result;
+      result = GetOptionsFromEngine(env, self).isOptional(str);
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
     }
-    return false;
+    env->ReleaseStringUTFChars(name, str);
+    return result;
   }
 
   JNIEXPORT jobject JAVA_BIND(Options, getType)(JNIEnv* env, jobject self, jstring name)
   {
     const char* str = env->GetStringUTFChars(name, nullptr);
+    jobject result = nullptr;
     try
     {
       f3d::options::option_type type = GetOptionsFromEngine(env, self).getType(str);
-      env->ReleaseStringUTFChars(name, str);
 
       const char* enumName = nullptr;
       switch (type)
@@ -534,14 +509,14 @@ extern "C"
 
       jclass typeClass = env->FindClass("app/f3d/F3D/Options$OptionType");
       jfieldID fid = env->GetStaticFieldID(typeClass, enumName, "Lapp/f3d/F3D/Options$OptionType;");
-      return env->GetStaticObjectField(typeClass, fid);
+      result = env->GetStaticObjectField(typeClass, fid);
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
     }
-    return nullptr;
+    env->ReleaseStringUTFChars(name, str);
+    return result;
   }
 
   JNIEXPORT void JAVA_BIND(Options, reset)(JNIEnv* env, jobject self, jstring name)
@@ -579,27 +554,26 @@ extern "C"
   JNIEXPORT jboolean JAVA_BIND(Options, hasDomain)(JNIEnv* env, jobject self, jstring name)
   {
     const char* str = env->GetStringUTFChars(name, nullptr);
+    bool result = false;
     try
     {
-      bool result = GetOptionsFromEngine(env, self).hasDomain(str);
-      env->ReleaseStringUTFChars(name, str);
-      return result;
+      result = GetOptionsFromEngine(env, self).hasDomain(str);
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
     }
-    return false;
+    env->ReleaseStringUTFChars(name, str);
+    return result;
   }
 
   JNIEXPORT jobject JAVA_BIND(Options, getDomainStyle)(JNIEnv* env, jobject self, jstring name)
   {
     const char* str = env->GetStringUTFChars(name, nullptr);
+    jobject result = nullptr;
     try
     {
       f3d::options::domain_style ds = GetOptionsFromEngine(env, self).getDomainStyle(str);
-      env->ReleaseStringUTFChars(name, str);
 
       jclass enumClass = env->FindClass("app/f3d/F3D/Options$DomainStyle");
       jfieldID fieldID;
@@ -617,37 +591,34 @@ extern "C"
           fieldID = env->GetStaticFieldID(enumClass, "INDEX", "Lapp/f3d/F3D/Options$DomainStyle;");
           break;
       }
-      return env->GetStaticObjectField(enumClass, fieldID);
+      result = env->GetStaticObjectField(enumClass, fieldID);
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
     }
-    return nullptr;
+    env->ReleaseStringUTFChars(name, str);
+    return result;
   }
 
   JNIEXPORT jobject JAVA_BIND(Options, getEnumDomain)(JNIEnv* env, jobject self, jstring name)
   {
     const char* str = env->GetStringUTFChars(name, nullptr);
+    jobject result = nullptr;
     try
     {
-      jobject enumeration =
-        CreateStringList(env, GetOptionsFromEngine(env, self).getEnumDomain(str));
-      env->ReleaseStringUTFChars(name, str);
-      return enumeration;
+      result = CreateStringList(env, GetOptionsFromEngine(env, self).getEnumDomain(str));
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
     }
     catch (const f3d::options::incompatible_exception& e)
     {
-      env->ReleaseStringUTFChars(name, str);
       F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
     }
-    return nullptr;
+    env->ReleaseStringUTFChars(name, str);
+    return result;
   }
 
   JNIEXPORT jobject JAVA_BIND(Options, getRangeDomainAsDouble)(

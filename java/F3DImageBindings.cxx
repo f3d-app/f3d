@@ -14,18 +14,17 @@ extern "C"
   JNIEXPORT jlong JAVA_BIND(Image, nativeCreateFromFile)(JNIEnv* env, jclass, jstring filePath)
   {
     const char* path = env->GetStringUTFChars(filePath, nullptr);
+    jlong result = 0;
     try
     {
-      f3d::image* img = new f3d::image(path);
-      env->ReleaseStringUTFChars(filePath, path);
-      return reinterpret_cast<jlong>(img);
+      result = reinterpret_cast<jlong>(new f3d::image(path));
     }
     catch (const f3d::image::read_exception& e)
     {
-      env->ReleaseStringUTFChars(filePath, path);
       F3DThrowJavaException(env, "app/f3d/F3D/Image$ReadException", e.what());
     }
-    return 0;
+    env->ReleaseStringUTFChars(filePath, path);
+    return result;
   }
 
   JNIEXPORT jlong JAVA_BIND(Image, nativeCreate)(
@@ -273,11 +272,9 @@ extern "C"
     catch (const f3d::image::metadata_exception& e)
     {
       F3DThrowJavaException(env, "app/f3d/F3D/Image$MetadataException", e.what());
-      env->ReleaseStringUTFChars(key, keyStr);
-      return nullptr;
     }
     env->ReleaseStringUTFChars(key, keyStr);
-    return env->NewStringUTF(value.c_str());
+    return env->ExceptionCheck() ? nullptr : env->NewStringUTF(value.c_str());
   }
 
   JNIEXPORT jobject JAVA_BIND(Image, allMetadata)(JNIEnv* env, jobject self)
