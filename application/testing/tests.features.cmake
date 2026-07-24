@@ -156,6 +156,8 @@ f3d_test(NAME TestTexturesTransformGL DATA WaterBottle.glb ARGS --textures-trans
 f3d_test(NAME TestTextureMatCapWithEdges DATA suzanne.ply ARGS -e --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png)
 f3d_test(NAME TestTextureColorWithOptions DATA WaterBottle.glb ARGS --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --color=1,1,0 --opacity=0.4 --blending)
 f3d_test(NAME TestTextureCheckerBoard DATA WaterBottle.glb ARGS --checkerboard)
+f3d_test(NAME TestTextureCheckerBoardSSAA DATA WaterBottle.glb ARGS --checkerboard --anti-aliasing=ssaa)
+f3d_test(NAME TestTextureCheckerBoardTAA DATA WaterBottle.glb ARGS --checkerboard --anti-aliasing=taa INTERACTION) #Render;Render...
 f3d_test(NAME TestTextureCheckerBoardOnMissingUV DATA RiggedFigure.glb ARGS --checkerboard REGEXP "Texture coordinates are required to display checkerboard texture." NO_BASELINE)
 f3d_test(NAME TestTextureColor DATA WaterBottle.glb ARGS --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --blending)
 
