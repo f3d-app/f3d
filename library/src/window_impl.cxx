@@ -106,7 +106,9 @@ public:
 #endif
 
     // OSMesa
-    return vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
+    vtkSmartPointer<vtkRenderWindow> osmesaRenWin = vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
+    osmesaRenWin->Initialize();
+    return osmesaRenWin->GetInitialized() ? osmesaRenWin : nullptr;
 #else
     // fallback on VTK logic for other systems
     return vtkSmartPointer<vtkRenderWindow>::New();
