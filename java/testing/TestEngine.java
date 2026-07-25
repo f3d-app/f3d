@@ -42,6 +42,9 @@ public class TestEngine {
     Engine engine = Engine.create(true);
 
     engine.setCachePath("/tmp/f3d_test");
+    if (!engine.getCachePath().equals("/tmp/f3d_test")) {
+      throw new RuntimeException("getCachePath should return the path set with setCachePath");
+    }
 
     engine.getOptions();
 

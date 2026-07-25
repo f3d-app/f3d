@@ -53,6 +53,16 @@ int test_window()
   (void)height;
 
   f3d_window_set_position(window, 100, 100);
+  f3d_window_render(window);
+  int posX = 0;
+  int posY = 0;
+  f3d_window_get_position(window, &posX, &posY);
+  if (posX != 100 || posY != 100)
+  {
+    puts("[ERROR] Unexpected window position");
+    f3d_engine_delete(engine);
+    return 1;
+  }
 
   unsigned char icon_data[] = { 0xFF, 0xFF, 0xFF, 0xFF };
   f3d_window_set_icon(window, icon_data, sizeof(icon_data));

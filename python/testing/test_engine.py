@@ -78,6 +78,12 @@ def test_reader_options():
         f3d.Engine.set_reader_option("inexistent", "value")
 
 
+def test_cache_path(tmp_path):
+    engine = f3d.Engine.create_none()
+    engine.set_cache_path(tmp_path)
+    assert Path(engine.get_cache_path()) == tmp_path
+
+
 def test_statefile(tmp_path):
     testing_dir = Path(__file__).parent.parent.parent / "testing"
     cow = testing_dir / "data/cow.vtp"

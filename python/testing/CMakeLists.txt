@@ -18,6 +18,7 @@ list(APPEND pyf3dTests_list
      test_image_compare.py
      test_scene.py
      test_interactor_start.py
+     test_window.py
     )
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)

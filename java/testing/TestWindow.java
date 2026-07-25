@@ -47,6 +47,11 @@ public class TestWindow {
     window.getHeight();
 
     window.setPosition(100, 100);
+    window.render();
+    int[] position = window.getPosition();
+    if (position[0] != 100 || position[1] != 100) {
+      throw new RuntimeException("window position should be restored");
+    }
 
     byte[] icon = new byte[]{1, 2, 3, 4};
     window.setIcon(icon);

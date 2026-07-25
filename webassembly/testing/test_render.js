@@ -45,12 +45,15 @@ const settings = {
       "point has no been restored to original value",
     );
 
-    // just for coverage
     Module.engineInstance.setCachePath("/tmp");
 
     utils.assert(
       window.getDPIScale() >= 1.0,
       "DPI scale value unexpected: " + window.getDPIScale(),
+    );
+    utils.assert(
+      Module.engineInstance.getCachePath() === "/tmp",
+      "getCachePath should return the path set with setCachePath",
     );
   },
 };

@@ -15,8 +15,13 @@ int TestSDKWindowAuto([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   f3d::window& win = eng.getWindow();
   win.setWindowName("Test").setSize(300, 300).setPosition(100, 100);
 
+  win.render();
+
   test("window width", win.getWidth(), 300);
   test("window height", win.getHeight(), 300);
+  const auto [posX, posY] = win.getPosition();
+  test("window position x", posX, 100);
+  test("window position y", posY, 100);
   test("window type", win.getType() != f3d::window::Type::UNKNOWN);
   test("window offscreen", win.isOffscreen());
   test("window dpi", win.getDPIScale() >= 1.0);
