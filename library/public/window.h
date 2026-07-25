@@ -7,6 +7,7 @@
 
 /// @cond
 #include <string>
+#include <utility>
 /// @endcond
 
 namespace f3d
@@ -102,6 +103,11 @@ public:
    * Set the position of the window.
    */
   virtual window& setPosition(int x, int y) = 0;
+
+  /**
+   * Get the position of the window as an (x, y) pair.
+   */
+  [[nodiscard]] virtual std::pair<int, int> getPosition() const = 0;
 
   /**
    * Set the icon to be shown by a window manager.

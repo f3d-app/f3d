@@ -331,6 +331,31 @@ window& window_impl::setPosition(int x, int y)
 }
 
 //----------------------------------------------------------------------------
+std::pair<int, int> window_impl::getPosition() const
+{
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 7, 20260724)
+  // Warn once if the render window is an X11 window predating the VTK fix that made
+  // vtkXOpenGLRenderWindow::GetPosition() reliable (VTK 9.7.20260724), in which case the reported
+  // position may be inaccurate.
+  static bool warned = false;
+  if (!warned && this->Internals->RenWin->IsA("vtkXOpenGLRenderWindow"))
+  {
+    log::warn("Window position may be inaccurate with VTK older than 9.7.20260724, "
+              "consider updating VTK.");
+    warned = true;
+  }
+#endif
+  const int* pos = this->Internals->RenWin->GetPosition();
+  if (this->Internals->RenWin->IsA("vtkCocoaRenderWindow"))
+  {
+    const int* screenSize = this->Internals->RenWin->GetScreenSize();
+    const int* winSize = this->Internals->RenWin->GetSize();
+    return { pos[0], screenSize[1] - winSize[1] - pos[1] };
+  }
+  return { pos[0], pos[1] };
+}
+
+//----------------------------------------------------------------------------
 window& window_impl::setIcon(const unsigned char* icon, size_t iconSize)
 {
   // XXX This code requires that the interactor has already been set on the render window
@@ -809,6 +834,12 @@ void window_impl::SetCachePath(const fs::path& cachePath)
   }
 
   this->Internals->CachePath = cachePath;
+}
+
+//----------------------------------------------------------------------------
+fs::path window_impl::GetCachePath() const
+{
+  return this->Internals->CachePath;
 }
 
 //----------------------------------------------------------------------------

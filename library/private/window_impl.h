@@ -56,6 +56,7 @@ public:
   int getHeight() const override;
   window& setSize(int width, int height) override;
   window& setPosition(int x, int y) override;
+  std::pair<int, int> getPosition() const override;
   window& setIcon(const unsigned char* icon, size_t iconSize) override;
   window& setWindowName(std::string_view windowName) override;
   point3_t getWorldFromDisplay(const point3_t& displayPoint) const override;
@@ -119,6 +120,12 @@ public:
    * Set the cache path.
    */
   void SetCachePath(const std::filesystem::path& cachePath);
+
+  /**
+   * Implementation only API.
+   * Get the cache path, empty if it could not be recovered.
+   */
+  [[nodiscard]] std::filesystem::path GetCachePath() const;
 
   /**
    * Implementation only API.
