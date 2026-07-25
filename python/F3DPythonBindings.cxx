@@ -906,6 +906,9 @@ PYBIND11_MODULE(pyf3d, module)
       [](f3d::window& win, int w) { win.setSize(w, win.getHeight()); })
     .def_property("height", &f3d::window::getHeight,
       [](f3d::window& win, int h) { win.setSize(win.getWidth(), h); })
+    .def_property(
+      "position", [](const f3d::window& win) { return win.getPosition(); },
+      [](f3d::window& win, std::pair<int, int> xy) { win.setPosition(xy.first, xy.second); })
     .def("render", &f3d::window::render, "Render the window")
     .def("render_to_image", &f3d::window::renderToImage, "Render the window to an image",
       py::arg("no_background") = false)
@@ -993,6 +996,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("create_external_osmesa", &f3d::engine::createExternalOSMesa,
       "Create an engine with an existing OSMesa context (Windows/Linux only)")
     .def("set_cache_path", &f3d::engine::setCachePath, "Set the cache path directory")
+    .def("get_cache_path", &f3d::engine::getCachePath, "Get the cache path directory")
     .def_property("options", &f3d::engine::getOptions,
       py::overload_cast<const f3d::options&>(&f3d::engine::setOptions),
       py::return_value_policy::reference)

@@ -93,6 +93,15 @@ extern "C"
     return self;
   }
 
+  JNIEXPORT jintArray JAVA_BIND(Window, getPosition)(JNIEnv* env, jobject self)
+  {
+    const auto [posX, posY] = GetEngine(env, self)->getWindow().getPosition();
+    const jint position[2] = { posX, posY };
+    jintArray result = env->NewIntArray(2);
+    env->SetIntArrayRegion(result, 0, 2, position);
+    return result;
+  }
+
   JNIEXPORT jobject JAVA_BIND(Window, setIcon)(JNIEnv* env, jobject self, jbyteArray icon)
   {
     jsize iconSize = env->GetArrayLength(icon);
