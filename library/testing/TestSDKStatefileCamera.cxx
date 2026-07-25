@@ -28,14 +28,16 @@ int TestSDKStatefileCamera([[maybe_unused]] int argc, [[maybe_unused]] char* arg
   const int savedHeight = src.getWindow().getHeight();
 
   // Also capture a window position. Its value depends on a window manager (VTK reports (0, 0) in
-  // headless CI), so the round-trip below is checked for self-consistency rather than a fixed value.
+  // headless CI), so the round-trip below is checked for self-consistency rather than a fixed
+  // value.
   src.getWindow().setPosition(64, 96);
   src.getWindow().render();
   const auto [savedPosX, savedPosY] = src.getWindow().getPosition();
 
   const auto savedState = src.dump();
 
-  // The position keys are serialized regardless of the window manager, which is verifiable headlessly
+  // The position keys are serialized regardless of the window manager, which is verifiable
+  // headlessly
   const std::string content = savedState.toString();
   test("statefile serializes window position",
     content.find("\"left\"") != std::string::npos && content.find("\"top\"") != std::string::npos);
