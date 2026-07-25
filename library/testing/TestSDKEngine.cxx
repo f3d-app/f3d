@@ -59,8 +59,7 @@ int TestSDKEngine([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   // Test cache path round-trip
   const std::string cachePath = std::string(argv[2]) + "engine_cache";
   eng0.setCachePath(cachePath);
-  test("get cache path using f3d::engine::getCachePath()",
-    eng0.getCachePath().string(), cachePath);
+  test("get cache path using f3d::engine::getCachePath()", eng0.getCachePath().string(), cachePath);
 
   // Test static information methods
   auto libInfo = f3d::engine::getLibInfo();

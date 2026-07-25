@@ -545,7 +545,8 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function(
       "setCachePath", +[](f3d::engine& engine, const std::string& path) -> f3d::engine&
       { return engine.setCachePath(path); }, emscripten::return_value_policy::reference())
-    .function("getCachePath",
+    .function(
+      "getCachePath",
       +[](const f3d::engine& engine) -> std::string { return engine.getCachePath().string(); })
     .function("setOptions",
       static_cast<f3d::engine& (f3d::engine::*)(const f3d::options&)>(&f3d::engine::setOptions),
