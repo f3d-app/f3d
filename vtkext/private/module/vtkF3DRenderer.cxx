@@ -229,21 +229,6 @@ vtkSmartPointer<vtkTexture> GetTexture(const fs::path& filePath, bool isSRGB = f
 
   return texture;
 }
-
-template<typename F>
-void ExecFuncOnAllPolyDataUniforms(vtkActorCollection* actors, F&& func)
-{
-  actors->InitTraversal();
-  vtkActor* actor = nullptr;
-
-  while ((actor = actors->GetNextActor()))
-  {
-    if (actor->GetMapper() && actor->GetMapper()->IsA("vtkPolyDataMapper"))
-    {
-      func(actor->GetShaderProperty()->GetVertexCustomUniforms());
-    }
-  }
-}
 }
 
 //----------------------------------------------------------------------------
