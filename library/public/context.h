@@ -66,6 +66,14 @@ public:
   [[nodiscard]] static function osmesa();
 
   /**
+   * Create a XR context function.
+   * This is usually required when using a XR context.
+   * Only supported on Linux, Windows.
+   * Throw a loading_exception if it fails.
+   */
+  [[nodiscard]] static function xr();
+
+  /**
    * Create a context function from a library filename and a function name.
    * The library name must be specified with its prefix and extension.
    * It can be a full path or a library name that can be found in the system library path.

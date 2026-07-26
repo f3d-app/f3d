@@ -133,8 +133,7 @@ public:
    * Set the directory for Xr resources
    * Implementation only API.
    */
-  void SetXrResourcesDirectory(
-    const std::string& actionsManifestDirectory, const std::string& controllerModelDirectory);
+  void SetXRResourcesDirectory(const std::string& actionsManifestDirectory);
 
   /**
    * Event loop being called automatically once the interactor is started

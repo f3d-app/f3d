@@ -120,7 +120,7 @@ public:
 
   /**
    * Create an engine with an XR window, `F3D_MODULE_OPENXR` is required.
-   * Assert if the module is not available.
+   * Throws a engine::no_window_exception if XR is not supported
    */
   [[nodiscard]] static engine createXR();
 
@@ -227,7 +227,7 @@ public:
   [[nodiscard]] std::filesystem::path getCachePath() const;
 
   /**
-   * Set the resource path. The provided path is used as is.
+   * Set the resource path. Currently it is used to find the actions manifest files for XR.
    * Throws a engine::resource_exception if the provided resourcesPath cannot be used.
    */
   engine& setResourcesPath(const std::filesystem::path& resourcesPath);

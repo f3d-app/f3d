@@ -11,6 +11,10 @@
 #include <vtkglad/include/glad/egl.h>
 #endif
 
+#ifdef F3D_MODULE_OPENXR
+#include "openxr/openxr.h"
+#endif
+
 #include <vtksys/DynamicLoader.hxx>
 
 namespace f3d
@@ -137,6 +141,40 @@ context::function context::osmesa()
   throw loading_exception("Cannot find OSMesa library");
 #else
   throw loading_exception("Cannot use a OSMesa context on this platform");
+#endif
+}
+
+//----------------------------------------------------------------------------
+context::function context::xr()
+{
+#if F3D_MODULE_OPENXR
+  // try create xr instance
+  XrInstanceCreateInfo createInfo{};
+  createInfo.type = XR_TYPE_INSTANCE_CREATE_INFO;
+  createInfo.applicationInfo.apiVersion = XR_CURRENT_API_VERSION;
+  strcpy(createInfo.applicationInfo.applicationName, "F3D");
+  createInfo.applicationInfo.applicationVersion = 1;
+  strcpy(createInfo.applicationInfo.engineName, "F3D");
+  createInfo.applicationInfo.engineVersion = 1;
+  createInfo.applicationInfo.apiVersion = XR_CURRENT_API_VERSION;
+
+  XrInstance instance = XR_NULL_HANDLE;
+  XrResult result = xrCreateInstance(&createInfo, &instance);
+
+  if (XR_FAILED(result))
+  {
+    throw loading_exception("Cannot create OpenXR instance");
+  }
+
+  // return a function that uses the instance to get the proc address
+  return [instance](const char* name)
+  {
+    PFN_xrVoidFunction fn = nullptr;
+    xrGetInstanceProcAddr(instance, name, &fn);
+    return reinterpret_cast<fptr>(fn);
+  };
+#else
+  throw loading_exception("Cannot use a XR context on this platform");
 #endif
 }
 
