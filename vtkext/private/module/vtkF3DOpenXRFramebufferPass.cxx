@@ -25,6 +25,7 @@ void vtkF3DOpenXRFramebufferPass::RenderDelegate(const vtkRenderState* s, int wi
   vtkTextureObject* colortarget, vtkTextureObject* depthtarget)
 {
 #if F3D_MODULE_OPENXR
+  // copyright: vtkFramebufferPass::RenderDelegate
   assert("pre: s_exists" && s != nullptr);
   assert("pre: fbo_exists" && fbo != nullptr);
   assert("pre: fbo_has_context" && fbo->GetContext() != nullptr);

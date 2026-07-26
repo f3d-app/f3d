@@ -691,8 +691,6 @@ public:
 
   std::function<bool(const std::string&, const std::string&, const std::string&, double)>
     NotificationCallback = nullptr;
-
-  std::string XrActionsManifestDir;
 };
 
 //----------------------------------------------------------------------------
@@ -2135,20 +2133,12 @@ interactor& interactor_impl::requestStop()
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::SetXrResourcesDirectory(
-  const std::string& actionsManifestDirectory, const std::string& controllerModelDirectory)
+void interactor_impl::SetXRResourcesDirectory(const std::string& actionsManifestDirectory)
 {
 #if F3D_MODULE_OPENXR
   vtkOpenXRRenderWindowInteractor* xrInteractor =
     vtkOpenXRRenderWindowInteractor::SafeDownCast(this->Internals->VTKInteractor);
   xrInteractor->SetActionManifestDirectory(actionsManifestDirectory);
-
-  if (!controllerModelDirectory.empty())
-  {
-    vtkOpenXRRenderWindow* xrRenWin =
-      vtkOpenXRRenderWindow::SafeDownCast(this->Internals->Window.GetRenderWindow());
-    xrRenWin->SetModelsManifestDirectory(controllerModelDirectory);
-  }
 #endif
 }
 

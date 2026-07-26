@@ -186,7 +186,8 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
 #ifdef F3D_MODULE_OPENXR
     this->Internals->RenWin = vtkSmartPointer<vtkOpenXRRenderWindow>::New();
 #else
-    assert(false); // Unreachable
+    throw engine::no_window_exception(
+      "Cannot create a window of type XR as F3D_MODULE_OPENXR is not enabled");
 #endif
   }
   else if (!type.has_value())
@@ -880,7 +881,7 @@ void window_impl::SetResourcesPath(const fs::path& resourcesPath)
       throw engine::resource_exception(
         "XR actions manifests folder does not exist: " + xrActionsManifestsFolder.string());
     }
-    this->Internals->Interactor->SetXrResourcesDirectory(xrActionsManifestsFolder, "");
+    this->Internals->Interactor->SetXRResourcesDirectory(xrActionsManifestsFolder);
 #else
     assert(false); // Unreachable
 #endif

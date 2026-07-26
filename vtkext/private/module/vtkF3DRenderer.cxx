@@ -369,7 +369,7 @@ void vtkF3DRenderer::Initialize()
     [](vtkObject* const, unsigned long, void* clientData, void*)
     {
       vtkF3DRenderer* self = static_cast<vtkF3DRenderer*>(clientData);
-      if (!self->Xr)
+      if (!self->UseXR)
       {
         return;
       }
@@ -387,10 +387,10 @@ void vtkF3DRenderer::Initialize()
           vtkNew<vtkPolyDataMapper> outlineMapper;
           outlineMapper->SetInputConnection(outlineSource->GetOutputPort());
 
-          self->XrBBoxActor->SetMapper(outlineMapper);
-          self->XrBBoxActor->GetProperty()->SetColor(1.0, 0.2, 0.2);
-          self->XrBBoxActor->GetProperty()->SetLineWidth(2.0);
-          self->XrBBoxActor->GetProperty()->LightingOff();
+          self->XRBBoxActor->SetMapper(outlineMapper);
+          self->XRBBoxActor->GetProperty()->SetColor(1.0, 0.2, 0.2);
+          self->XRBBoxActor->GetProperty()->SetLineWidth(2.0);
+          self->XRBBoxActor->GetProperty()->LightingOff();
         }
 
         self->XrBoundingBoxConfigured = true;
@@ -535,7 +535,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   newPass->SetForceOpaqueBackground(this->HDRISkyboxVisible);
   newPass->SetArmatureVisible(this->ArmatureVisible);
   newPass->SetRenderReflection(this->GridVisible && this->GridReflection > 0.0);
-  newPass->SetXrMode(this->Xr);
+  newPass->SetXrMode(this->UseXR);
 
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
@@ -613,7 +613,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
     }
   }
 
-  if (!this->Xr)
+  if (!this->UseXR)
   {
     vtkNew<vtkF3DOverlayRenderPass> overlayP;
     overlayP->SetDelegatePass(renderingPass);
@@ -946,7 +946,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       double orientation[3];
       vtkTransform::GetOrientation(orientation, upMatrixInv);
       this->GridActor->SetOrientation(orientation);
-      this->GridActor->SetPosition(gridPos[0], this->Xr ? 0 : gridPos[1], gridPos[2]);
+      this->GridActor->SetPosition(gridPos[0], this->UseXR ? 0 : gridPos[1], gridPos[2]);
 
       this->GridActor->GetProperty()->SetColor(this->GridColor);
 
@@ -1307,7 +1307,7 @@ void vtkF3DRenderer::AlignSceneToBounds(const vtkBoundingBox& bounds)
       continue;
     }
 
-    if (prop3D == this->GridActor || prop3D == this->XrBBoxActor ||
+    if (prop3D == this->GridActor || prop3D == this->XRBBoxActor ||
       vtkSkybox::SafeDownCast(prop3D) ||
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
       vtkGridAxesActor3D::SafeDownCast(prop3D)
@@ -2524,13 +2524,14 @@ void vtkF3DRenderer::ResetCameraClippingRange()
 {
   const bool gridUseBounds = this->GridActor->GetUseBounds();
   this->GridActor->SetUseBounds(!this->DisplayDepth);
-  if (!this->Xr)
+  if (!this->UseXR)
   {
     this->Superclass::ResetCameraClippingRange();
   }
   else
   {
 #ifdef F3D_MODULE_OPENXR
+    // copyright: vtkF3DRenderer::ResetCameraClippingRange()
     double bounds[6];
 
     this->ComputeVisiblePropBounds(bounds);
@@ -2564,13 +2565,14 @@ void vtkF3DRenderer::ResetCameraClippingRange()
 //---------------------------------------------------------------------------
 void vtkF3DRenderer::ResetCameraClippingRange(const double bounds[6])
 {
-  if (!this->Xr)
+  if (!this->UseXR)
   {
     this->Superclass::ResetCameraClippingRange(bounds);
   }
   else
   {
 #ifdef F3D_MODULE_OPENXR
+    // copyright: vtkF3DRenderer::ResetCameraClippingRange(const double bounds[6])
     this->GetActiveCameraAndResetIfCreated();
     if (this->ActiveCamera == nullptr)
     {
@@ -3526,23 +3528,23 @@ void vtkF3DRenderer::SetComponentForColoring(int component)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetXRMode(bool enable, bool showBbox)
 {
-  if (enable != this->Xr)
+  if (enable != this->UseXR)
   {
-    this->Xr = enable;
+    this->UseXR = enable;
     this->RenderPassesConfigured = false;
   }
 
-  if (this->Xr)
+  if (this->UseXR)
   {
     this->ClippingRangeExpansion = 0.05;
 
     if (showBbox)
     {
-      this->AddActor(this->XrBBoxActor);
+      this->AddActor(this->XRBBoxActor);
     }
     else
     {
-      this->RemoveActor(this->XrBBoxActor);
+      this->RemoveActor(this->XRBBoxActor);
     }
   }
 }

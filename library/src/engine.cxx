@@ -496,6 +496,7 @@ std::map<std::string, bool> engine::getRenderingBackendList()
   backends["cocoa"] = engine::internals::BackendAvailable(context::cocoa);
   backends["egl"] = engine::internals::BackendAvailable(context::egl);
   backends["osmesa"] = engine::internals::BackendAvailable(context::osmesa);
+  backends["xr"] = engine::internals::BackendAvailable(context::xr);
 
   return backends;
 }

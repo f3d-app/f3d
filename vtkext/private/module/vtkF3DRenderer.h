@@ -199,7 +199,7 @@ public:
   void ResetCameraClippingRange() override;
 
   /**
-   * Reset camera clipping range function from vtkVRRenderer
+   * Reset camera clipping range
    */
   void ResetCameraClippingRange(const double bounds[6]) override;
 
@@ -938,8 +938,8 @@ private:
 
   std::optional<bool> Unlit;
 
-  bool Xr = false;
-  vtkNew<vtkActor> XrBBoxActor;
+  bool UseXR = false;
+  vtkNew<vtkActor> XRBBoxActor;
 };
 
 #endif
