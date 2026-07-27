@@ -39,7 +39,24 @@ see [the format list](02-SUPPORTED_FORMATS.md) for more details.
 > Native plugin is always loaded automatically.
 > If you downloaded the binaries from the release page, it's not necessary to specify manually the plugins above. F3D loads them automatically.
 
-Here is how the plugins are searched (in preceding order):
+### Plugin availability per binary
+
+Not every binary ships every plugin, so a file may open in one binary but not another. This table shows which plugins are available in each official binary. The `native` plugin is always present.
+
+| Plugin    | Desktop (installer) | Python wheel | npm / WebAssembly | Android |
+| --------- | :-----------------: | :----------: | :---------------: | :-----: |
+| `native`  |         Yes         |     Yes      |        Yes        |   Yes   |
+| `alembic` |         Yes         |     Yes      |        No         |   Yes   |
+| `assimp`  |         Yes         |     Yes      |        Yes        |   Yes   |
+| `draco`   |         Yes         |     Yes      |        Yes        |   Yes   |
+| `hdf`     |         Yes         |     Yes      |        No         |   No    |
+| `occt`    |         Yes         |     Yes      |        Yes        |   Yes   |
+| `pdal`    |         Yes         |     Yes      |        No         |   No    |
+| `usd`     |         Yes         |      No      |        No         |   No    |
+| `vdb`     |         Yes         |      No      |        No         |   No    |
+| `webifc`  |         Yes         |     Yes      |        Yes        |   Yes   |
+
+F3D searches for plugins in this order:
 
 1. Search the static plugins.
 2. Consider the `load-plugins` option given it is a full path.
