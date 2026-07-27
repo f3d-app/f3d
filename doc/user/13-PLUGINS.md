@@ -1,16 +1,16 @@
 # Plugins
 
 F3D officially supports plugins for certain file formats. If you installed F3D using the binary
-release, there's no need to manually load these plugins when opening your file.
-F3D will load them automatically.
+release, you do not need to load these plugins manually when opening your file.
+F3D loads them automatically.
 
 However, if you installed F3D using a package manager,
-it's possible that the packager chose to bundle the plugins into different packages or
-to list plugin dependencies as optional in order to reduce the number of dependencies of the main package.
+the packager may bundle the plugins into different packages or
+list plugin dependencies as optional to reduce the number of dependencies of the main package.
 
-In order to open a file that requires a plugin, make sure you've installed all necessary
-dependencies. You can then specify the `--load-plugins=<path or name>` [option](03-OPTIONS.md)
-in the command line to load your plugin.
+To open a file that requires a plugin, first install all necessary
+dependencies. Then load the plugin with the `--load-plugins=<path or name>`
+[command-line option](03-OPTIONS.md).
 
 Alternatively, you can add your plugin directly in the
 [configuration file](06-CONFIGURATION_FILE.md) if it isn't there already. You can specify one or
@@ -20,9 +20,8 @@ multiple plugins in a single comma-separated list, like in the example below:
 [
   {
     "match": ".*(file_extension)",
-    "options":
-    {
-      "load-plugins": "plugin1", "plugin2"
+    "options": {
+      "load-plugins": "plugin1,plugin2"
     }
   }
 ]
@@ -33,11 +32,11 @@ multiple plugins in a single comma-separated list, like in the example below:
 F3D supports loading plugins and contains the following plugins:
 `native`, `alembic`, `assimp`, `draco`, `hdf`, `occt`, `pdal`, `usd`, `vdb`, `webifc`.
 
-see [the format list](02-SUPPORTED_FORMATS.md) for more details.
+See [the format list](02-SUPPORTED_FORMATS.md) for more details.
 
 > [!NOTE]
-> Native plugin is always loaded automatically.
-> If you downloaded the binaries from the release page, it's not necessary to specify manually the plugins above. F3D loads them automatically.
+> The `native` plugin is always loaded automatically.
+> If you downloaded the binaries from the release page, you do not need to specify the plugins above manually. F3D loads them automatically.
 
 ### Plugin availability per binary
 
@@ -59,10 +58,10 @@ Not every binary ships every plugin, so a file may open in one binary but not an
 F3D searches for plugins in this order:
 
 1. Search the static plugins.
-2. Consider the `load-plugins` option given it is a full path.
-3. Search in the paths specified in the `--plugins-path` CLI option.
-4. Search in a directory relative to the F3D application: `../lib`.
-5. Rely on OS specific paths (e.g. `LD_LIBRARY_PATH` on Linux or `DYLD_LIBRARY_PATH` on macOS).
+2. Use the `load-plugins` option when it is a full path.
+3. Search the paths specified in the `--plugins-path` CLI option.
+4. Search a directory relative to the F3D application: `../lib`.
+5. Rely on OS-specific paths (e.g. `LD_LIBRARY_PATH` on Linux or `DYLD_LIBRARY_PATH` on macOS).
 
 You can also try plugins maintained by the community. If you have created a plugin and would like it to be listed here, please submit a pull request.
 
