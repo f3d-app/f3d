@@ -47,7 +47,7 @@ public:
    * Get the reader that can read the given file, nullptr if none
    */
   reader* getReader(const std::string& fileName, std::optional<std::string> forceReader,
-    const std::optional<bool> skipContentCheck, file_availability& availability);
+    const bool skipContentCheck, file_availability& availability);
 
   /**
    * Get the reader that can read the given buffer, nullptr if none
