@@ -69,20 +69,19 @@ public:
   /**
    * Check if this reader can read the given filename - according to its extension and file content
    */
-  virtual bool canRead(const std::string& fileName, const std::optional<bool> skipContentCheck,
+  virtual bool canRead(const std::string& fileName, const bool skipContentCheck,
     f3d::file_availability& availability) const
   {
     std::string ext = fileName.substr(fileName.find_last_of(".") + 1);
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
     const std::vector<std::string>& extensions = this->getExtensions();
-    bool isSkipCheck = skipContentCheck.has_value() && skipContentCheck.value();
     if (std::any_of(
           extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; }))
     {
       vtkNew<vtkFileResourceStream> stream;
       if (stream->Open(fileName.c_str()))
       {
-        if (isSkipCheck || this->canRead(stream))
+        if (skipContentCheck || this->canRead(stream))
         {
           availability = f3d::file_availability::SUPPORTED;
           return true;

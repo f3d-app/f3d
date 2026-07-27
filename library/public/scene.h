@@ -35,11 +35,11 @@ namespace f3d
  *
  */
 
-enum class file_availability : int
+enum class file_availability : unsigned char
 {
-  SUPPORTED = 1,
-  UNSUPPORTED_EXTENSION = 2,
-  UNSUPPORTED_CONTENT = 3,
+  SUPPORTED = 0,
+  UNSUPPORTED_EXTENSION = 1,
+  UNSUPPORTED_CONTENT = 2,
 };
 
 class F3D_EXPORT scene
@@ -216,7 +216,7 @@ public:
    * Return enum file_availability which indicates if the file at the specified path has
    * supported extension, unsupported extension or unsupported content.
    * content validation is only performed with VTK >= 9.6.20260228.
-   * scene.skip_content_check disables content validation.
+   * Setting scene.skip_content_check to true disables content validation.
    * scene.force_reader is taken into account and plugin should be loaded for their readers to be
    * found.
    */
