@@ -374,6 +374,7 @@ struct F3D_EXPORT node_state_t
 {
   int id = -1;
   int parentId = -1;
+  int level = 0;
   std::string label;
   bool visible = true;
   bool hasChildren = false;
@@ -381,9 +382,9 @@ struct F3D_EXPORT node_state_t
 
   [[nodiscard]] bool operator==(const node_state_t& other) const
   {
-    return this->id == other.id && this->parentId == other.parentId && this->label == other.label &&
-      this->visible == other.visible && this->hasChildren == other.hasChildren &&
-      this->collapsed == other.collapsed;
+    return this->id == other.id && this->parentId == other.parentId && this->level == other.level &&
+      this->label == other.label && this->visible == other.visible &&
+      this->hasChildren == other.hasChildren && this->collapsed == other.collapsed;
   }
 };
 

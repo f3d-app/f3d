@@ -876,8 +876,8 @@ std::vector<node_state_t> scene_impl::getSceneHierarchy() const
   nodeStates.reserve(hierarchy.size());
   for (const vtkF3DMetaImporter::NodeInfo& node : hierarchy)
   {
-    nodeStates.emplace_back(node_state_t{
-      node.Id, node.ParentId, node.Label, node.Visible, node.HasChildren, node.Collapsed });
+    nodeStates.emplace_back(node_state_t{ node.Id, node.ParentId, node.Level, node.Label,
+      node.Visible, node.HasChildren, node.Collapsed });
   }
   return nodeStates;
 }

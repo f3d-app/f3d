@@ -173,6 +173,7 @@ public:
   {
     int Id = -1;
     int ParentId = -1;
+    int Level = 0;
     std::string Label;
     bool Visible = true;
     bool HasChildren = false;

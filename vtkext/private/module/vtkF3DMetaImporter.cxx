@@ -36,19 +36,20 @@ struct FlatNode
   int ImporterIndex = -1;
   int AssemblyNodeId = -1;
   int ParentId = -1;
+  int Level = 0;
 };
 
 void FlattenAssembly(vtkDataAssembly* assembly, int assemblyNodeId, int importerIndex, int parentId,
-  std::vector<FlatNode>& flatNodes)
+  int level, std::vector<FlatNode>& flatNodes)
 {
   const int nodeId = static_cast<int>(flatNodes.size());
-  flatNodes.emplace_back(FlatNode{ importerIndex, assemblyNodeId, parentId });
+  flatNodes.emplace_back(FlatNode{ importerIndex, assemblyNodeId, parentId, level });
 
   const int numberOfChildren = assembly->GetNumberOfChildren(assemblyNodeId);
   for (int childIndex = 0; childIndex < numberOfChildren; childIndex++)
   {
-    ::FlattenAssembly(
-      assembly, assembly->GetChild(assemblyNodeId, childIndex), importerIndex, nodeId, flatNodes);
+    ::FlattenAssembly(assembly, assembly->GetChild(assemblyNodeId, childIndex), importerIndex,
+      nodeId, level + 1, flatNodes);
   }
 }
 
@@ -323,7 +324,7 @@ std::vector<vtkF3DMetaImporter::NodeInfo> vtkF3DMetaImporter::GetSceneHierarchyN
     const int nodeId = flatNode.AssemblyNodeId;
 
     hierarchy.emplace_back(vtkF3DMetaImporter::NodeInfo{ static_cast<int>(i), flatNode.ParentId,
-      vtkF3DMetaImporter::GetNodeLabel(assembly, nodeId),
+      flatNode.Level, vtkF3DMetaImporter::GetNodeLabel(assembly, nodeId),
       assembly->GetAttributeOrDefault(nodeId, "f3d_visible", 1) != 0,
       assembly->GetNumberOfChildren(nodeId) > 0,
       assembly->GetAttributeOrDefault(nodeId, "f3d_collapsed", 0) != 0 });
@@ -584,7 +585,7 @@ bool vtkF3DMetaImporter::Update()
   for (size_t i = 0; i < this->Pimpl->Importers.size(); i++)
   {
     ::FlattenAssembly(this->Pimpl->Importers[i].DataAssembly, vtkDataAssembly::GetRootNode(),
-      static_cast<int>(i), -1, this->Pimpl->FlatNodes);
+      static_cast<int>(i), -1, 0, this->Pimpl->FlatNodes);
   }
 
   // XXX: UpdateStatus is not set, but libf3d does not use it
