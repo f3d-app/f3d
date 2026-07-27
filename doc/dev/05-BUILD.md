@@ -21,7 +21,7 @@ please take a look at our [getting started guide](04-GETTING_STARTED.md).
 - Optionally, [OpenVDB](https://www.openvdb.org/download/) >= 12.0.0, enable `IOOpenVDB` module during VTK configuration.
 - Optionally, [PDAL](https://pdal.org/en/2.10.0/) >= 2.0.0 (2.9.0 recommended), enable `IOPDAL` module during VTK configuration.
 - Optionally, [web-ifc](https://github.com/ThatOpen/engine_web-ifc) >= 0.75 (only C++ library).
-- Optionally, [OSPray](https://www.ospray.org/) == 2.12.0, enable `RenderingRayTracing` module during VTK configuration.
+- Optionally, [OSPRay](https://www.ospray.org/) == 2.12.0, enable `RenderingRayTracing` module during VTK configuration.
 - Optionally, [Draco](https://google.github.io/draco/) >= 1.5.6.
 - Optionally, [Python](https://www.python.org/) >= 3.10 and [pybind11](https://github.com/pybind/pybind11) >= 3.0.0.
 - Optionally, [Java](https://www.java.com) >= 17.
@@ -51,6 +51,7 @@ Here is some CMake options of interest:
 
 Some modules, plugins and language bindings depending on external libraries can be optionally enabled with the following CMake variables:
 
+- `F3D_MODULE_ANARI`: Support for ANARI rendering. Requires that VTK has been built with `RenderingAnari` turned on. Disabled by default.
 - `F3D_MODULE_RAYTRACING`: Support for raytracing rendering. Requires that VTK has been built with `OSPRay` and `RenderingRayTracing` turned on. Disabled by default.
 - `F3D_MODULE_EXR`: Support for OpenEXR images. Requires `OpenEXR`. Disabled by default.
 - `F3D_MODULE_UI`: Support for ImGui widgets. Uses provided ImGui. Enabled by default.

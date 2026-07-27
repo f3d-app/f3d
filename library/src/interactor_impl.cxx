@@ -1659,7 +1659,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::SHIFT, "H"}, "toggle ui.scene_hierarchy","Scene", std::bind(docTgl, "Scene hierarchy", std::cref(opts.ui.scene_hierarchy)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "Z"}, "toggle ui.fps","Scene", std::bind(docTgl, "FPS Counter", std::cref(opts.ui.fps)), f3d::interactor::BindingType::TOGGLE);
 #endif
-#if F3D_MODULE_RAYTRACING
+#if F3D_MODULE_ANARI
   this->addBinding({mod_t::NONE, "R"}, "toggle render.raytracing.enable","Scene", std::bind(docTgl, "Raytracing rendering", std::cref(opts.render.raytracing.enable)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "D"}, "toggle render.raytracing.denoise","Scene", std::bind(docTgl, "Denoising when raytracing", std::cref(opts.render.raytracing.denoise)), f3d::interactor::BindingType::TOGGLE);
 #endif
