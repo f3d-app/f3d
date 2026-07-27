@@ -367,6 +367,26 @@ struct F3D_EXPORT light_state_t
   }
 };
 
+/**
+ * Describe a single node of the scene hierarchy, as returned by scene::getSceneHierarchy.
+ */
+struct F3D_EXPORT node_state_t
+{
+  int id = -1;
+  int parentId = -1;
+  std::string label;
+  bool visible = true;
+  bool hasChildren = false;
+  bool collapsed = false;
+
+  [[nodiscard]] bool operator==(const node_state_t& other) const
+  {
+    return this->id == other.id && this->parentId == other.parentId && this->label == other.label &&
+      this->visible == other.visible && this->hasChildren == other.hasChildren &&
+      this->collapsed == other.collapsed;
+  }
+};
+
 }
 
 #endif

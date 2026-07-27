@@ -8,9 +8,11 @@
 #include <vtkArrowSource.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
+#include <vtkDataAssembly.h>
 #include <vtkDataAssemblyVisitor.h>
 #include <vtkDataSetAttributes.h>
 #include <vtkImageData.h>
+#include <vtkInformation.h>
 #include <vtkInformationIntegerKey.h>
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
@@ -28,6 +30,67 @@
 
 namespace
 {
+
+struct FlatNode
+{
+  int ImporterIndex = -1;
+  int AssemblyNodeId = -1;
+  int ParentId = -1;
+};
+
+void FlattenAssembly(vtkDataAssembly* assembly, int assemblyNodeId, int importerIndex, int parentId,
+  std::vector<FlatNode>& flatNodes)
+{
+  const int nodeId = static_cast<int>(flatNodes.size());
+  flatNodes.emplace_back(FlatNode{ importerIndex, assemblyNodeId, parentId });
+
+  const int numberOfChildren = assembly->GetNumberOfChildren(assemblyNodeId);
+  for (int childIndex = 0; childIndex < numberOfChildren; childIndex++)
+  {
+    ::FlattenAssembly(
+      assembly, assembly->GetChild(assemblyNodeId, childIndex), importerIndex, nodeId, flatNodes);
+  }
+}
+
+/**
+ * Recursively set the `f3d_visible` attribute of the subtree rooted at `assemblyNodeId`.
+ * It will also add (or remove) a `ACTOR_HIDDEN()` information key on nodes associated with actors.
+ */
+void SetSubtreeVisibility(
+  vtkDataAssembly* assembly, int assemblyNodeId, vtkActorCollection* actors, bool visible)
+{
+  assembly->SetAttribute(assemblyNodeId, "f3d_visible", visible ? 1 : 0);
+
+  const int flatActorIndex = assembly->GetAttributeOrDefault(assemblyNodeId, "flat_actor_id", -1);
+  if (flatActorIndex >= 0)
+  {
+    vtkActor* actor = vtkActor::SafeDownCast(actors->GetItemAsObject(flatActorIndex));
+
+    vtkSmartPointer<vtkInformation> keys = actor->GetPropertyKeys();
+
+    if (!keys)
+    {
+      keys = vtkSmartPointer<vtkInformation>::New();
+      actor->SetPropertyKeys(keys);
+    }
+
+    if (visible)
+    {
+      keys->Remove(vtkF3DMetaImporter::ACTOR_HIDDEN());
+    }
+    else
+    {
+      keys->Set(vtkF3DMetaImporter::ACTOR_HIDDEN(), 1);
+    }
+  }
+
+  const int numberOfChildren = assembly->GetNumberOfChildren(assemblyNodeId);
+  for (int childIndex = 0; childIndex < numberOfChildren; childIndex++)
+  {
+    ::SetSubtreeVisibility(
+      assembly, assembly->GetChild(assemblyNodeId, childIndex), actors, visible);
+  }
+}
 
 /**
  * Sets the `f3d_collapsed` attribute on nodes which have
@@ -118,6 +181,9 @@ struct vtkF3DMetaImporter::Internals
   std::vector<vtkF3DMetaImporter::VolumeStruct> VolumePropsAndMappers;
 
   std::vector<vtkF3DMetaImporter::ImporterInfo> Importers;
+
+  std::vector<::FlatNode> FlatNodes;
+
   std::optional<vtkIdType> CameraIndex;
   vtkBoundingBox GeometryBoundingBox;
   vtkTimeStamp ColoringInfoTime;
@@ -150,6 +216,7 @@ vtkF3DMetaImporter::~vtkF3DMetaImporter()
 void vtkF3DMetaImporter::Clear()
 {
   this->Pimpl->Importers.clear();
+  this->Pimpl->FlatNodes.clear();
   this->Pimpl->GeometryBoundingBox.Reset();
   this->ActorCollection->RemoveAllItems();
   this->Pimpl->ColoringActorsAndMappers.clear();
@@ -230,9 +297,63 @@ int vtkF3DMetaImporter::GetImporterInfoCount()
 }
 
 //----------------------------------------------------------------------------
-vtkF3DMetaImporter::ImporterInfo vtkF3DMetaImporter::GetImporterInfo(int index)
+const vtkF3DMetaImporter::ImporterInfo& vtkF3DMetaImporter::GetImporterInfo(int index)
 {
   return this->Pimpl->Importers[index];
+}
+
+//----------------------------------------------------------------------------
+const char* vtkF3DMetaImporter::GetNodeLabel(const vtkDataAssembly* assembly, int assemblyNodeId)
+{
+  const char* defaultLabel =
+    assembly->GetNumberOfChildren(assemblyNodeId) > 0 ? "<group>" : "<object>";
+  return assembly->GetAttributeOrDefault(assemblyNodeId, "label", defaultLabel);
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkF3DMetaImporter::NodeInfo> vtkF3DMetaImporter::GetSceneHierarchyNodes() const
+{
+  std::vector<vtkF3DMetaImporter::NodeInfo> hierarchy;
+  hierarchy.reserve(this->Pimpl->FlatNodes.size());
+
+  for (size_t i = 0; i < this->Pimpl->FlatNodes.size(); i++)
+  {
+    const ::FlatNode& flatNode = this->Pimpl->FlatNodes[i];
+    const vtkDataAssembly* assembly = this->Pimpl->Importers[flatNode.ImporterIndex].DataAssembly;
+    const int nodeId = flatNode.AssemblyNodeId;
+
+    hierarchy.emplace_back(vtkF3DMetaImporter::NodeInfo{ static_cast<int>(i), flatNode.ParentId,
+      vtkF3DMetaImporter::GetNodeLabel(assembly, nodeId),
+      assembly->GetAttributeOrDefault(nodeId, "f3d_visible", 1) != 0,
+      assembly->GetNumberOfChildren(nodeId) > 0,
+      assembly->GetAttributeOrDefault(nodeId, "f3d_collapsed", 0) != 0 });
+  }
+
+  return hierarchy;
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DMetaImporter::SetNodeVisibility(int nodeId, bool visible)
+{
+  if (nodeId < 0 || nodeId >= static_cast<int>(this->Pimpl->FlatNodes.size()))
+  {
+    return false;
+  }
+
+  const ::FlatNode& flatNode = this->Pimpl->FlatNodes[nodeId];
+  this->SetAssemblyNodeVisibility(flatNode.ImporterIndex, flatNode.AssemblyNodeId, visible);
+  return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DMetaImporter::SetAssemblyNodeVisibility(
+  int importerIndex, int assemblyNodeId, bool visible)
+{
+  assert(importerIndex >= 0 && importerIndex < static_cast<int>(this->Pimpl->Importers.size()));
+  const vtkF3DMetaImporter::ImporterInfo& info = this->Pimpl->Importers[importerIndex];
+
+  ::SetSubtreeVisibility(
+    info.DataAssembly, assemblyNodeId, info.Importer->GetImportedActors(), visible);
 }
 
 //----------------------------------------------------------------------------
@@ -455,6 +576,15 @@ bool vtkF3DMetaImporter::Update()
     F3DLog::Print(F3DLog::Severity::Warning,
       "Camera index " + std::to_string(this->Pimpl->CameraIndex.value()) +
         " is higher than the number of available camera in the files. Camera may be incorrect.");
+  }
+
+  // Flatten the hierarchy of all importers, previously assigned node ids are preserved as
+  // importers are only ever appended
+  this->Pimpl->FlatNodes.clear();
+  for (size_t i = 0; i < this->Pimpl->Importers.size(); i++)
+  {
+    ::FlattenAssembly(this->Pimpl->Importers[i].DataAssembly, vtkDataAssembly::GetRootNode(),
+      static_cast<int>(i), -1, this->Pimpl->FlatNodes);
   }
 
   // XXX: UpdateStatus is not set, but libf3d does not use it
