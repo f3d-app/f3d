@@ -791,6 +791,17 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("intensity", &f3d::light_state_t::intensity)
     .def_readwrite("switch_state", &f3d::light_state_t::switchState);
 
+  // f3d::node_state_t
+  py::class_<f3d::node_state_t>(module, "NodeState")
+    .def(py::init<>())
+    .def_readonly("id", &f3d::node_state_t::id)
+    .def_readonly("parent_id", &f3d::node_state_t::parentId)
+    .def_readonly("level", &f3d::node_state_t::level)
+    .def_readonly("label", &f3d::node_state_t::label)
+    .def_readonly("visible", &f3d::node_state_t::visible)
+    .def_readonly("has_children", &f3d::node_state_t::hasChildren)
+    .def_readonly("collapsed", &f3d::node_state_t::collapsed);
+
   // f3d::scene
   py::class_<f3d::scene, std::unique_ptr<f3d::scene, py::nodelete>> scene(module, "Scene");
   scene //
@@ -840,7 +851,12 @@ PYBIND11_MODULE(pyf3d, module)
       py::arg("light_state"))
     .def("get_light", &f3d::scene::getLight, "Get a light from the scene", py::arg("index"))
     .def("get_light_count", &f3d::scene::getLightCount, "Get the number of lights in the scene")
-    .def("remove_all_lights", &f3d::scene::removeAllLights, "Remove all lights from the scene");
+    .def("remove_all_lights", &f3d::scene::removeAllLights, "Remove all lights from the scene")
+    .def("get_scene_hierarchy", &f3d::scene::getSceneHierarchy,
+      "Return the scene hierarchy of all added files, in depth-first pre-order")
+    .def("set_node_visibility", &f3d::scene::setNodeVisibility,
+      "Set the visibility of a scene hierarchy node and of its subtree", py::arg("node_id"),
+      py::arg("visible"));
 
   // f3d::camera_state_t
   py::class_<f3d::camera_state_t>(module, "CameraState")

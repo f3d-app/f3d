@@ -2,6 +2,7 @@ import tempfile
 from pathlib import Path
 
 import f3d
+import pytest
 
 
 def test_scene_memory():
@@ -107,3 +108,52 @@ def test_scene_added_files():
 
     engine.scene.clear()
     assert engine.scene.get_added_files() == []
+
+
+def test_scene_hierarchy():
+    testing_dir = Path(__file__).parent.parent.parent / "testing"
+    cube = testing_dir / "data/mb/recursive/mb_0_0.vtu"
+    sphere = testing_dir / "data/mb/recursive/mb_1_0.vtp"
+
+    engine = f3d.Engine.create_none()
+    assert engine.scene.get_scene_hierarchy() == []
+
+    with pytest.raises(RuntimeError):
+        engine.scene.set_node_visibility(0, False)
+
+    engine.scene.add(cube)
+    hierarchy = engine.scene.get_scene_hierarchy()
+    assert len(hierarchy) > 0
+    assert hierarchy[0].id == 0
+    assert hierarchy[0].parent_id == -1
+    assert hierarchy[0].label == "mb_0_0.vtu"
+    assert all(node.visible for node in hierarchy)
+
+    assert all(node.id == i for i, node in enumerate(hierarchy))
+    assert all(node.parent_id < node.id for node in hierarchy)
+
+    assert all(
+        node.level == (0 if node.parent_id < 0 else hierarchy[node.parent_id].level + 1)
+        for node in hierarchy
+    )
+
+    with pytest.raises(RuntimeError):
+        engine.scene.set_node_visibility(-1, False)
+    with pytest.raises(RuntimeError):
+        engine.scene.set_node_visibility(len(hierarchy), False)
+
+    engine.scene.set_node_visibility(0, False)
+    assert not any(node.visible for node in engine.scene.get_scene_hierarchy())
+    engine.scene.set_node_visibility(0, True)
+    assert all(node.visible for node in engine.scene.get_scene_hierarchy())
+
+    engine.scene.add(sphere)
+    appended = engine.scene.get_scene_hierarchy()
+    assert len(appended) > len(hierarchy)
+    assert [node.id for node in appended[: len(hierarchy)]] == [
+        node.id for node in hierarchy
+    ]
+    assert len([node for node in appended if node.parent_id == -1]) == 2
+
+    engine.scene.clear()
+    assert engine.scene.get_scene_hierarchy() == []

@@ -6,6 +6,8 @@
 #include <scene.h>
 #include <window.h>
 
+#include <algorithm>
+
 namespace fs = std::filesystem;
 
 int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
@@ -141,6 +143,83 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("render after light",
     TestSDKHelpers::RenderTest(
       win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKSceneRedLight"));
+
+  // scene hierarchy test, using a dedicated engine to avoid impacting the renders above
+  {
+    f3d::engine engine = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
+    f3d::scene& scene = engine.getScene();
+
+    test("empty scene hierarchy", scene.getSceneHierarchy().empty());
+    test.expect<f3d::scene::node_exception>(
+      "set node visibility with an empty scene", [&]() { scene.setNodeVisibility(0, false); });
+
+    scene.add(fs::path(logo));
+    const std::vector<f3d::node_state_t> hierarchy = scene.getSceneHierarchy();
+    test("scene hierarchy is not empty", !hierarchy.empty());
+    test("scene hierarchy root is the added file",
+      hierarchy[0].id == 0 && hierarchy[0].parentId == -1 && hierarchy[0].level == 0 &&
+        hierarchy[0].label == fs::path(logo).filename().string());
+    test("scene hierarchy levels", [&]() {
+      for (const f3d::node_state_t& node : hierarchy)
+      {
+        const int expected = node.parentId < 0 ? 0 : hierarchy[node.parentId].level + 1;
+        if (node.level != expected)
+        {
+          return false;
+        }
+      }
+      return std::ranges::any_of(
+        hierarchy, [](const f3d::node_state_t& node) { return node.level > 0; });
+    });
+    test("scene hierarchy nodes are visible by default",
+      std::ranges::all_of(hierarchy, [](const f3d::node_state_t& node) { return node.visible; }));
+    test("scene hierarchy is in depth-first pre-order", [&]() {
+      for (size_t i = 0; i < hierarchy.size(); i++)
+      {
+        if (hierarchy[i].id != static_cast<int>(i) || hierarchy[i].parentId >= hierarchy[i].id)
+        {
+          return false;
+        }
+      }
+      return true;
+    });
+    test("scene hierarchy contains a group node and a leaf node",
+      std::ranges::any_of(
+        hierarchy, [](const f3d::node_state_t& node) { return node.hasChildren; }) &&
+        std::ranges::any_of(
+          hierarchy, [](const f3d::node_state_t& node) { return !node.hasChildren; }));
+
+    test.expect<f3d::scene::node_exception>(
+      "set node visibility with a negative index", [&]() { scene.setNodeVisibility(-1, false); });
+    test.expect<f3d::scene::node_exception>("set node visibility with an out of range index",
+      [&]() { scene.setNodeVisibility(static_cast<int>(hierarchy.size()), false); });
+
+    test("hide the whole hierarchy from its root", [&]() {
+      scene.setNodeVisibility(0, false);
+      const std::vector<f3d::node_state_t> hidden = scene.getSceneHierarchy();
+      return std::ranges::none_of(
+        hidden, [](const f3d::node_state_t& node) { return node.visible; });
+    });
+    test("show the whole hierarchy from its root", [&]() {
+      scene.setNodeVisibility(0, true);
+      const std::vector<f3d::node_state_t> shown = scene.getSceneHierarchy();
+      return std::ranges::all_of(shown, [](const f3d::node_state_t& node) { return node.visible; });
+    });
+
+    scene.add(fs::path(cube));
+    const std::vector<f3d::node_state_t> appended = scene.getSceneHierarchy();
+    test("scene hierarchy is appended when adding a file",
+      appended.size() > hierarchy.size() &&
+        std::equal(hierarchy.begin(), hierarchy.end(), appended.begin()));
+    test("each added file provides a root node",
+      std::ranges::count_if(
+        appended, [](const f3d::node_state_t& node) { return node.parentId == -1; }) == 2);
+
+    test("scene hierarchy is cleared with the scene", [&]() {
+      scene.clear();
+      return scene.getSceneHierarchy().empty();
+    });
+  }
 
   return test.result();
 }

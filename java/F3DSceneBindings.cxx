@@ -190,6 +190,49 @@ static jobject CppLightStateToJavaLightState(JNIEnv* env, const f3d::light_state
   return jlightState;
 }
 
+// Helper function to convert a C++ f3d::node_state_t vector to a Java List of Types.NodeState
+static jobject CppNodeStatesToJavaList(
+  JNIEnv* env, const std::vector<f3d::node_state_t>& cppNodeStates)
+{
+  jclass arrayListClass = env->FindClass("java/util/ArrayList");
+  jmethodID arrayListConstructor = env->GetMethodID(arrayListClass, "<init>", "()V");
+  jmethodID addMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
+  jobject list = env->NewObject(arrayListClass, arrayListConstructor);
+
+  jclass nodeStateClass = env->FindClass("app/f3d/F3D/Types$NodeState");
+  jmethodID nodeStateConstructor = env->GetMethodID(nodeStateClass, "<init>", "()V");
+
+  jfieldID idField = env->GetFieldID(nodeStateClass, "id", "I");
+  jfieldID parentIdField = env->GetFieldID(nodeStateClass, "parentId", "I");
+  jfieldID levelField = env->GetFieldID(nodeStateClass, "level", "I");
+  jfieldID labelField = env->GetFieldID(nodeStateClass, "label", "Ljava/lang/String;");
+  jfieldID visibleField = env->GetFieldID(nodeStateClass, "visible", "Z");
+  jfieldID hasChildrenField = env->GetFieldID(nodeStateClass, "hasChildren", "Z");
+  jfieldID collapsedField = env->GetFieldID(nodeStateClass, "collapsed", "Z");
+
+  for (const f3d::node_state_t& cppNodeState : cppNodeStates)
+  {
+    jobject jnodeState = env->NewObject(nodeStateClass, nodeStateConstructor);
+
+    env->SetIntField(jnodeState, idField, cppNodeState.id);
+    env->SetIntField(jnodeState, parentIdField, cppNodeState.parentId);
+    env->SetIntField(jnodeState, levelField, cppNodeState.level);
+
+    jstring jlabel = env->NewStringUTF(cppNodeState.label.c_str());
+    env->SetObjectField(jnodeState, labelField, jlabel);
+    env->DeleteLocalRef(jlabel);
+
+    env->SetBooleanField(jnodeState, visibleField, cppNodeState.visible);
+    env->SetBooleanField(jnodeState, hasChildrenField, cppNodeState.hasChildren);
+    env->SetBooleanField(jnodeState, collapsedField, cppNodeState.collapsed);
+
+    env->CallBooleanMethod(list, addMethod, jnodeState);
+    env->DeleteLocalRef(jnodeState);
+  }
+
+  return list;
+}
+
 extern "C"
 {
   JNIEXPORT jobject JAVA_BIND(Scene, add)(JNIEnv* env, jobject self, jstring path)
@@ -352,6 +395,27 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Scene, removeAllLights)(JNIEnv* env, jobject self)
   {
     GetEngine(env, self)->getScene().removeAllLights();
+    return self;
+  }
+
+  JNIEXPORT jobject JAVA_BIND(Scene, getSceneHierarchy)(JNIEnv* env, jobject self)
+  {
+    return CppNodeStatesToJavaList(env, GetEngine(env, self)->getScene().getSceneHierarchy());
+  }
+
+  JNIEXPORT jobject JAVA_BIND(Scene, setNodeVisibility)(
+    JNIEnv* env, jobject self, jint nodeId, jboolean visible)
+  {
+    try
+    {
+      GetEngine(env, self)->getScene().setNodeVisibility(nodeId, visible);
+    }
+    catch (const std::exception& e)
+    {
+      jclass exceptionClass = env->FindClass("java/lang/RuntimeException");
+      env->ThrowNew(exceptionClass, e.what());
+      return nullptr;
+    }
     return self;
   }
 

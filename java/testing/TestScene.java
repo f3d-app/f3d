@@ -102,6 +102,65 @@ public class TestScene {
 
     scene.removeAllLights();
 
+    // Test the scene hierarchy
+    scene.clear();
+    if (!scene.getSceneHierarchy().isEmpty()) {
+      throw new RuntimeException("a cleared scene should have an empty scene hierarchy");
+    }
+
+    boolean emptyHierarchyFailed = false;
+    try {
+      scene.setNodeVisibility(0, false);
+    } catch (RuntimeException e) {
+      emptyHierarchyFailed = true;
+    }
+    if (!emptyHierarchyFailed) {
+      throw new RuntimeException("setting node visibility should fail with an empty scene hierarchy");
+    }
+
+    scene.add(sphere);
+    List<Types.NodeState> hierarchy = scene.getSceneHierarchy();
+    if (hierarchy.isEmpty()) {
+      throw new RuntimeException("scene hierarchy should not be empty");
+    }
+
+    Types.NodeState root = hierarchy.get(0);
+    if (root.id != 0 || root.parentId != -1 || root.level != 0 || !root.visible
+        || !root.label.contains("mb_1_0.vtp")) {
+      throw new RuntimeException("unexpected scene hierarchy root node");
+    }
+
+    for (Types.NodeState node : hierarchy) {
+      int expectedLevel = node.parentId < 0 ? 0 : hierarchy.get(node.parentId).level + 1;
+      if (node.level != expectedLevel) {
+        throw new RuntimeException("unexpected scene hierarchy node level");
+      }
+    }
+
+    scene.setNodeVisibility(0, false);
+    for (Types.NodeState node : scene.getSceneHierarchy()) {
+      if (node.visible) {
+        throw new RuntimeException("the whole subtree should be hidden");
+      }
+    }
+
+    scene.setNodeVisibility(0, true);
+    for (Types.NodeState node : scene.getSceneHierarchy()) {
+      if (!node.visible) {
+        throw new RuntimeException("the whole subtree should be visible");
+      }
+    }
+
+    boolean outOfRangeFailed = false;
+    try {
+      scene.setNodeVisibility(hierarchy.size(), false);
+    } catch (RuntimeException e) {
+      outOfRangeFailed = true;
+    }
+    if (!outOfRangeFailed) {
+      throw new RuntimeException("setting node visibility should fail with an out of range index");
+    }
+
     engine.close();
 
     // --- Exception handling tests ---

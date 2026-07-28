@@ -163,6 +163,23 @@ public class Scene {
     public native Scene removeAllLights();
 
     /**
+     * Get the scene hierarchy of all added files, in depth-first pre-order, so that a parent
+     * node always precedes its children.
+     *
+     * @return the list of scene hierarchy nodes
+     */
+    public native List<Types.NodeState> getSceneHierarchy();
+
+    /**
+     * Set the visibility of a scene hierarchy node and of all the nodes in its subtree.
+     *
+     * @param nodeId index of the node
+     * @param visible visibility to set
+     * @return this scene for method chaining
+     */
+    public native Scene setNodeVisibility(int nodeId, boolean visible);
+
+    /**
      * Check if a file path is supported by the scene.
      *
      * @param filePath file path to check
