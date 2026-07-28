@@ -157,7 +157,7 @@ Avoid packing several actions into one sentence.
 
 Show one concept per example.
 
-Prefer short examples that compile or run. Avoid large examples with unrelated setup. Link to [examples/](../../examples/) for complete applications.
+Prefer short examples that compile or run. Avoid large examples with unrelated setup. Link to the [examples directory](https://github.com/f3d-app/f3d/tree/master/examples) for complete applications.
 
 Comments should explain intent that code cannot show on its own. Do not comment every line.
 
