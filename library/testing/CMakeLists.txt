@@ -1,6 +1,7 @@
 list(APPEND libf3dSDKTests_list
      TestPseudoUnitTest.cxx
      TestSDKAnimation.cxx
+     TestSDKBindingRepeat.cxx
      TestSDKCamera.cxx
      TestSDKCompareWithFile.cxx
      TestSDKDynamicLightIntensity.cxx
@@ -78,6 +79,10 @@ configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorCallBack.l
                "${CMAKE_BINARY_DIR}/TestSDKInteractorCallBack.log") # Dragon.vtu; S
 configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorDropFullScene.log.in"
                "${CMAKE_BINARY_DIR}/TestSDKInteractorDropFullScene.log") # world.obj; S
+configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKBindingRepeatOff.log.in"
+               "${CMAKE_BINARY_DIR}/TestSDKBindingRepeatOff.log") # cow.vtp; S
+configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKBindingRepeatOn.log.in"
+               "${CMAKE_BINARY_DIR}/TestSDKBindingRepeatOn.log") # cow.vtp; S
 
 set(libf3dSDKTests_link_libs "")
 set(libf3dSDKTests_include_dirs "")
