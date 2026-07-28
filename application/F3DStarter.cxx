@@ -1254,9 +1254,9 @@ public:
     return cacheDir.empty() ? fs::path() : cacheDir / "window.json";
   }
 
-  /* Recover the remembered window geometry as app options, so that it goes through the regular
+  /* Recover the cached window geometry as app options, so that it goes through the regular
    * options precedence as the weakest source. Empty when there is nothing usable to restore. */
-  F3DOptionsTools::OptionsDict ReadRememberedWindowGeometry() const
+  F3DOptionsTools::OptionsDict ReadCachedWindowGeometry() const
   {
     F3DOptionsTools::OptionsDict geometry;
     const fs::path cachePath = this->WindowGeometryCachePath();
@@ -1286,18 +1286,18 @@ public:
     }
     catch (const nlohmann::json::exception& ex)
     {
-      f3d::log::debug("Could not parse the remembered window geometry: ", ex.what());
+      f3d::log::debug("Could not parse the cached window geometry: ", ex.what());
       geometry.clear();
     }
     catch (const fs::filesystem_error& ex)
     {
-      f3d::log::debug("Could not read the remembered window geometry: ", ex.what());
+      f3d::log::debug("Could not read the cached window geometry: ", ex.what());
       geometry.clear();
     }
     return geometry;
   }
 
-  /* Store the current window geometry so that the next run can restore it */
+  /* Store the current window geometry in the cache so that the next run can restore it */
   void SaveWindowGeometry() const
   {
     const fs::path cachePath = this->WindowGeometryCachePath();
@@ -1320,19 +1320,19 @@ public:
       std::ofstream stream(cachePath);
       if (!stream.is_open())
       {
-        f3d::log::debug("Could not open ", cachePath.string(), " to remember the window geometry");
+        f3d::log::debug("Could not open ", cachePath.string(), " to cache the window geometry");
         return;
       }
       stream << root.dump(2);
-      f3d::log::debug("Window geometry remembered in ", cachePath.string());
+      f3d::log::debug("Window geometry cached in ", cachePath.string());
     }
     catch (const fs::filesystem_error& ex)
     {
-      f3d::log::debug("Could not remember the window geometry: ", ex.what());
+      f3d::log::debug("Could not cache the window geometry: ", ex.what());
     }
   }
 
-  F3DOptionsTools::OptionsEntries RememberedGeometryOptionsEntries;
+  F3DOptionsTools::OptionsEntries CachedOptionsEntries;
   F3DOptionsTools::OptionsEntries StatefileOptionsEntries;
   F3DOptionsTools::OptionsEntries RuntimeStatefileOptionsEntries;
   F3DOptionsTools::OptionsEntries ConfigOptionsEntries;
@@ -1594,16 +1594,16 @@ int F3DStarter::Start(int argc, char** argv)
     if (!this->Internals->AppOptions.NoRender && this->Internals->AppOptions.Output.empty() &&
       this->Internals->AppOptions.Reference.empty())
     {
-      const F3DOptionsTools::OptionsDict rememberedGeometry =
-        this->Internals->ReadRememberedWindowGeometry();
-      if (!rememberedGeometry.empty())
+      const F3DOptionsTools::OptionsDict cachedGeometry =
+        this->Internals->ReadCachedWindowGeometry();
+      if (!cachedGeometry.empty())
       {
-        this->Internals->RememberedGeometryOptionsEntries.emplace_back(
-          rememberedGeometry, "", "", "remembered window geometry");
+        this->Internals->CachedOptionsEntries.emplace_back(
+          cachedGeometry, "", "", "cached options");
         this->Internals->UpdateOptions(
-          { this->Internals->RememberedGeometryOptionsEntries,
-            this->Internals->ConfigOptionsEntries, this->Internals->StatefileOptionsEntries,
-            this->Internals->CLIOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
+          { this->Internals->CachedOptionsEntries, this->Internals->ConfigOptionsEntries,
+            this->Internals->StatefileOptionsEntries, this->Internals->CLIOptionsEntries,
+            this->Internals->ImperativeConfigOptionsEntries },
           { "" }, true);
       }
     }
@@ -2069,7 +2069,7 @@ void F3DStarter::LoadFileGroupInternal(
     // Update options even when there is no file
     // as imperative options should override dynamic option even in that case
     this->Internals->UpdateOptions(
-      { this->Internals->RememberedGeometryOptionsEntries, this->Internals->ConfigOptionsEntries,
+      { this->Internals->CachedOptionsEntries, this->Internals->ConfigOptionsEntries,
         this->Internals->StatefileOptionsEntries, this->Internals->CLIOptionsEntries,
         this->Internals->RuntimeStatefileOptionsEntries, this->Internals->DynamicOptionsEntries,
         this->Internals->ImperativeConfigOptionsEntries },
@@ -2088,7 +2088,7 @@ void F3DStarter::LoadFileGroupInternal(
     std::vector<fs::path> configPaths = this->Internals->LoadedFiles;
     std::copy(paths.begin(), paths.end(), std::back_inserter(configPaths));
     this->Internals->UpdateOptions(
-      { this->Internals->RememberedGeometryOptionsEntries, this->Internals->ConfigOptionsEntries,
+      { this->Internals->CachedOptionsEntries, this->Internals->ConfigOptionsEntries,
         this->Internals->StatefileOptionsEntries, this->Internals->CLIOptionsEntries,
         this->Internals->RuntimeStatefileOptionsEntries, this->Internals->DynamicOptionsEntries,
         this->Internals->ImperativeConfigOptionsEntries },

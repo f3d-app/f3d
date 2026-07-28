@@ -996,7 +996,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("create_external_osmesa", &f3d::engine::createExternalOSMesa,
       "Create an engine with an existing OSMesa context (Windows/Linux only)")
     .def("set_cache_path", &f3d::engine::setCachePath, "Set the cache path directory")
-    .def("get_cache_path", &f3d::engine::getCachePath, "Get the cache path directory")
+    .def_property("cache_path", &f3d::engine::getCachePath,
+      [](f3d::engine& eng, const std::filesystem::path& path) { eng.setCachePath(path); })
     .def_property("options", &f3d::engine::getOptions,
       py::overload_cast<const f3d::options&>(&f3d::engine::setOptions),
       py::return_value_policy::reference)

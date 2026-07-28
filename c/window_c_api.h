@@ -116,9 +116,12 @@ extern "C"
   /**
    * @brief Get the position of the window.
    *
+   * If provided window is NULL, do nothing.
+   * If provided x or y is NULL, the corresponding position is not written.
+   *
    * @param window Window handle.
-   * @param x Output pointer receiving the x position in pixels, may be NULL.
-   * @param y Output pointer receiving the y position in pixels, may be NULL.
+   * @param x Output pointer receiving the x position in pixels.
+   * @param y Output pointer receiving the y position in pixels.
    */
   F3D_EXPORT void f3d_window_get_position(const f3d_window_t* window, int* x, int* y);
 

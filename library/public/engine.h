@@ -203,7 +203,8 @@ public:
 
   /**
    * Set the cache path. The provided path is used as is.
-   * Currently, it's only used to store HDRI baked textures.
+   * It is used to store HDRI baked textures and, when using the F3D application,
+   * the window geometry to restore on the next start.
    * By default, the cache path is:
    * - Windows: %LOCALAPPDATA%\f3d
    * - Linux: ~/.cache/f3d

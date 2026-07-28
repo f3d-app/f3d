@@ -81,7 +81,12 @@ def test_reader_options():
 def test_cache_path(tmp_path):
     engine = f3d.Engine.create_none()
     engine.set_cache_path(tmp_path)
-    assert Path(engine.get_cache_path()) == tmp_path
+    assert Path(engine.cache_path) == tmp_path
+
+    other_path = tmp_path / "other"
+    other_path.mkdir()
+    engine.cache_path = other_path
+    assert Path(engine.cache_path) == other_path
 
 
 def test_statefile(tmp_path):

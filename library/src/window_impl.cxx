@@ -122,6 +122,9 @@ public:
   interactor_impl* Interactor = nullptr;
   fs::path CachePath;
   context::function GetProcAddress;
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 7, 20260724)
+  bool PositionWarningEmitted = false;
+#endif
 };
 
 //----------------------------------------------------------------------------
@@ -337,17 +340,19 @@ std::pair<int, int> window_impl::getPosition() const
   // Warn once if the render window is an X11 window predating the VTK fix that made
   // vtkXOpenGLRenderWindow::GetPosition() reliable (VTK 9.7.20260724), in which case the reported
   // position may be inaccurate.
-  static bool warned = false;
-  if (!warned && this->Internals->RenWin->IsA("vtkXOpenGLRenderWindow"))
+  if (!this->Internals->PositionWarningEmitted &&
+    this->Internals->RenWin->IsA("vtkXOpenGLRenderWindow"))
   {
     log::warn("Window position may be inaccurate with VTK older than 9.7.20260724, "
               "consider updating VTK.");
-    warned = true;
+    this->Internals->PositionWarningEmitted = true;
   }
 #endif
   const int* pos = this->Internals->RenWin->GetPosition();
   if (this->Internals->RenWin->IsA("vtkCocoaRenderWindow"))
   {
+    // vtkCocoaRenderWindow positions are expressed from the bottom left of the screen, convert
+    // back to a top left origin, mirroring what setPosition does
     const int* screenSize = this->Internals->RenWin->GetScreenSize();
     const int* winSize = this->Internals->RenWin->GetSize();
     return { pos[0], screenSize[1] - winSize[1] - pos[1] };
