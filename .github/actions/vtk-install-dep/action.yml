@@ -12,6 +12,10 @@ inputs:
     description: "Label to flag for minimum versions dependencies"
     required: false
     default: "no-mindeps"
+  gles_label:
+    description: "Label to flag for OpenGL ES rendering option"
+    required: false
+    default: "no-gles"
   vtk_version:
     description: "VTK version, either a hash/tag, or 'commit', which means recover from versions.json"
     required: false
@@ -165,7 +169,7 @@ runs:
       uses: actions/cache/restore@v6
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_VERSION}}-${{steps.zlib_ver.outputs.extract}}-${{steps.blosc_ver.outputs.extract}}-${{steps.tbb_ver.outputs.extract}}${{ steps.openvdb_ver.outputs.extract != '' && format('-openvdb-{0}', steps.openvdb_ver.outputs.extract) || '' }}${{ steps.ospray_ver.outputs.extract != '' && format('-ospray-{0}', steps.ospray_ver.outputs.extract) || '' }}${{ steps.curl_ver.outputs.extract != '' && format('-curl-{0}', steps.curl_ver.outputs.extract) || '' }}${{ steps.gdal_ver.outputs.extract != '' && format('-gdal-{0}', steps.gdal_ver.outputs.extract) || '' }}${{ steps.geotiff_ver.outputs.extract != '' && format('-geotiff-{0}', steps.geotiff_ver.outputs.extract) || '' }}${{ steps.pdal_ver.outputs.extract != '' && format('-pdal-{0}', steps.pdal_ver.outputs.extract) || '' }}${{ steps.proj_ver.outputs.extract != '' && format('-proj-{0}', steps.proj_ver.outputs.extract) || '' }}${{ steps.sqlite_csb_ver.outputs.extract != '' && format('-sqlite-{0}', steps.sqlite_csb_ver.outputs.extract) || '' }}${{ steps.tiff_ver.outputs.extract != '' && format('-tiff-{0}', steps.tiff_ver.outputs.extract) || '' }}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-6
+        key: vtk-${{env.VTK_VERSION}}-${{steps.zlib_ver.outputs.extract}}-${{steps.blosc_ver.outputs.extract}}-${{steps.tbb_ver.outputs.extract}}${{ steps.openvdb_ver.outputs.extract != '' && format('-openvdb-{0}', steps.openvdb_ver.outputs.extract) || '' }}${{ steps.ospray_ver.outputs.extract != '' && format('-ospray-{0}', steps.ospray_ver.outputs.extract) || '' }}${{ steps.curl_ver.outputs.extract != '' && format('-curl-{0}', steps.curl_ver.outputs.extract) || '' }}${{ steps.gdal_ver.outputs.extract != '' && format('-gdal-{0}', steps.gdal_ver.outputs.extract) || '' }}${{ steps.geotiff_ver.outputs.extract != '' && format('-geotiff-{0}', steps.geotiff_ver.outputs.extract) || '' }}${{ steps.pdal_ver.outputs.extract != '' && format('-pdal-{0}', steps.pdal_ver.outputs.extract) || '' }}${{ steps.proj_ver.outputs.extract != '' && format('-proj-{0}', steps.proj_ver.outputs.extract) || '' }}${{ steps.sqlite_csb_ver.outputs.extract != '' && format('-sqlite-{0}', steps.sqlite_csb_ver.outputs.extract) || '' }}${{ steps.tiff_ver.outputs.extract != '' && format('-tiff-{0}', steps.tiff_ver.outputs.extract) || '' }}${{ inputs.gles_label == 'gles' && '-gles' || '' }}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-6
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -248,6 +252,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
         -DVTK_OPENGL_HAS_EGL=${{ runner.os != 'macOS' && 'ON' || 'OFF' }}
+        -DVTK_OPENGL_USE_GLES=${{ inputs.gles_label == 'gles' && 'ON' || 'OFF' }}
         -DVTK_SMP_IMPLEMENTATION_TYPE=TBB
         -DVTK_VERSIONED_INSTALL=OFF
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0' || null }}
