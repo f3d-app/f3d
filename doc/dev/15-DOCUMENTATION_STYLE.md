@@ -13,7 +13,7 @@ Use direct, active sentences.
 - Use "you" for the reader.
 - Use imperative mood for instructions: "Run", "Set", "Open", "Build".
 - Use present tense for behavior: "This creates", not "This will create".
-- Avoid hedging unless behavior varies by platform, package, dependency version, or build option.
+- Avoid hedging (vague qualifiers like "should", "might", "usually", or "in most cases") unless behavior really does vary by platform, package, dependency version, or build option.
 - Prefer short sentences over nested clauses.
 
 ### Avoid filler
@@ -73,20 +73,22 @@ Use the same term every time. Repetition is clearer than varied synonyms in tech
 
 ### Preferred terms
 
-| Use                 | Avoid or use only in context                              |
-| ------------------- | --------------------------------------------------------- |
-| F3D                 | the viewer, the app, the software, when ambiguity matters |
-| `f3d` command       | F3D executable, CLI binary                                |
-| libf3d              | the libf3d, LibF3D                                        |
-| command-line option | CLI option, flag, parameter, unless discussing parsing    |
-| configuration file  | config file, except in filenames or option names          |
-| plugin              | reader module, extension, unless explaining internals     |
-| reader              | importer, loader, unless the code/API uses those names    |
-| file format         | file type, when referring to the supported formats table  |
-| rendering backend   | OpenGL backend, when referring to `--rendering-backend`   |
-| screenshot          | render capture, image dump                                |
+| Use                 | Avoid or use only in context                                                          |
+| ------------------- | ------------------------------------------------------------------------------------- |
+| F3D                 | the viewer, the app, the software, when ambiguity matters                             |
+| `f3d` command       | F3D executable, CLI binary                                                            |
+| libf3d              | the libf3d, LibF3D                                                                    |
+| command-line option | flag, parameter, unless discussing parsing (`CLI option` is an acceptable short form) |
+| configuration file  | config file, except in filenames or option names                                      |
+| plugin              | reader module, extension, unless explaining internals                                 |
+| reader              | importer, loader, unless the code/API uses those names                                |
+| file format         | file type, when referring to the supported formats table                              |
+| rendering backend   | OpenGL backend, when referring to `--rendering-backend`                               |
+| screenshot          | render capture, image dump; use "output image" for non-interactive `--output` renders |
 
 ### Product and technology names
+
+Match the casing of these names exactly:
 
 - F3D
 - f3d-app
@@ -181,7 +183,7 @@ eng.getInteractor().start();
 
 - Include the headers required by the snippet.
 - Use API names from the public headers.
-- Prefer paths like `"path/to/file.ext"` only when the exact format does not matter.
+- Use a generic path like `"path/to/file.ext"` when the exact format does not matter.
 - Use real extensions, such as `.glb`, `.stl`, `.vtu`, or `.png`, when behavior depends on the format.
 
 ### Python, Java, JavaScript, and C
@@ -199,6 +201,20 @@ Match visible UI text, shortcuts, and command names exactly.
 - Use exact option names such as `--animation-progress` and `render.light.intensity`.
 - Keep UI labels in the same casing as the application displays them.
 
+## Notes and warnings
+
+Use GitHub-style alerts for callouts that must stand out from the surrounding text. F3D uses two types, so stick to these:
+
+- `[!NOTE]` for information the reader should not miss, such as a default value, a platform detail, or a related option.
+- `[!WARNING]` for something the reader must avoid, such as data loss, a breaking change, or an unsupported combination.
+
+Write an alert as a blockquote. Put the uppercase marker on its own line, then the text, and leave a blank line before and after:
+
+```markdown
+> [!NOTE]
+> This option is ignored on macOS.
+```
+
 ## Links
 
 Use descriptive link text.
@@ -211,7 +227,7 @@ Good:
 
 > See the [command-line options reference](../user/03-OPTIONS.md).
 
-Before submitting a documentation change, check that relative links and anchors resolve. This matters especially when renumbering files or headings under `doc/dev`, `doc/user`, and `doc/libf3d`.
+The website CI checks that relative links and anchors resolve, so broken links are caught automatically. It still helps to verify them yourself when renumbering files or headings under `doc/dev`, `doc/user`, and `doc/libf3d`.
 
 ## Images and comparisons
 

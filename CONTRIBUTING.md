@@ -24,8 +24,8 @@ You can follow the workflow described below.
 
 Where to start depends on the kind of contribution you have in mind:
 
-- **Documentation only**: no build is required. Write your changes following the [documentation style guide](doc/dev/15-DOCUMENTATION_STYLE.md), then preview them with the [website preview recipe](doc/dev/07-TOOLING.md#how-to-locally-generate-and-run-the-website).
-- **Code contributions**: start with our [Getting Started guide](doc/dev/04-GETTING_STARTED.md), then follow the [Build guide](doc/dev/05-BUILD.md). After that, read the [Architecture](doc/dev/08-ARCHITECTURE.md) page and the [F3D mentoring program](doc/dev/13-MENTORING.md) if you want more guidance.
+- **Documentation only**: no build is required. Write your changes following the [documentation style guide](doc/dev/15-DOCUMENTATION_STYLE.md). For small changes you can rely on CI to render the website, or preview locally with the [website preview recipe](doc/dev/07-TOOLING.md#how-to-locally-generate-and-run-the-website).
+- **Code contributions**: start with our [Getting Started guide](doc/dev/04-GETTING_STARTED.md), then check out the [Build guide](doc/dev/05-BUILD.md) if needed. After that, read the [Architecture](doc/dev/08-ARCHITECTURE.md) page, you can even sign up to the [F3D mentoring program](doc/dev/13-MENTORING.md) if you want more guidance.
 
 Once you know which path applies, take a look at the open [issues](https://github.com/f3d-app/f3d/issues).
 If you are a beginner, you may want to start with ["good first issues"](https://github.com/f3d-app/f3d/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).
@@ -45,7 +45,7 @@ that is definitely possible. Feel free to reach out for guidance by opening an i
 
 ## AI policy
 
-F3D has a dedicated [AI policy](AI_POLICY.md). If you are an AI user, make sure to read it and comply with it.
+F3D has a dedicated [AI policy](AI_POLICY.md). If you are an AI user, make sure to read it and comply with it. If not, you are at risk of being banned.
 
 ## F3D development workflow
 
@@ -53,7 +53,7 @@ F3D uses [GitLab Flow](https://about.gitlab.com/topics/version-control/what-is-g
 
 - [Fork](https://github.com/f3d-app/f3d/fork) the F3D repository on GitHub.
 - Comment on a chosen issue, if any, so it can be assigned to you by a maintainer.
-- Create and push a new feature branch on your fork containing new commits, do not use a `main` or `master` branch.
+- Create and push a new feature branch on your fork containing new commits, do not use `main` or `master` branch.
 - As soon as possible, create a _draft_ pull request against `f3d-app/f3d/master` so that maintainers are aware and design can be discussed.
 - Once the PR has been created, even as draft, it is possible to [run the CI](#continuous-integration), feel free to do so.
 - When it is ready for review, undraft your pull request, which will notify maintainers. Also make sure to check the needed checkboxes in the description.
