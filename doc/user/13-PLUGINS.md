@@ -42,18 +42,18 @@ See [the format list](02-SUPPORTED_FORMATS.md) for more details.
 
 Not every binary ships every plugin, so a file may open in one binary but not another. This table shows which plugins are available in each official binary. The `native` plugin is always present.
 
-| Plugin    | Desktop (installer) | Python wheel | npm / WebAssembly | Android |
-| --------- | :-----------------: | :----------: | :---------------: | :-----: |
-| `native`  |         Yes         |     Yes      |        Yes        |   Yes   |
-| `alembic` |         Yes         |     Yes      |        No         |   Yes   |
-| `assimp`  |         Yes         |     Yes      |        Yes        |   Yes   |
-| `draco`   |         Yes         |     Yes      |        Yes        |   Yes   |
-| `hdf`     |         Yes         |     Yes      |        No         |   No    |
-| `occt`    |         Yes         |     Yes      |        Yes        |   Yes   |
-| `pdal`    |         Yes         |     Yes      |        No         |   No    |
-| `usd`     |         Yes         |      No      |        No         |   No    |
-| `vdb`     |         Yes         |      No      |        No         |   No    |
-| `webifc`  |         Yes         |     Yes      |        Yes        |   Yes   |
+| Plugin    | Desktop (installer) | Python wheel | npm / WebAssembly |      Android       |
+| --------- | :-----------------: | :----------: | :---------------: | :----------------: |
+| `native`  |         Yes         |     Yes      |        Yes        |        Yes         |
+| `alembic` |         Yes         |     Yes      |        No         |        Yes         |
+| `assimp`  |         Yes         |     Yes      |        Yes        |        Yes         |
+| `draco`   |         Yes         |     Yes      |        Yes        |        Yes         |
+| `hdf`     |         Yes         |     Yes      |        No         |        Yes         |
+| `occt`    |         Yes         |     Yes      |        Yes        |        Yes         |
+| `pdal`    |         Yes         |      No      |        No         |         No         |
+| `usd`     |         Yes         |      No      |        No         | Yes (64-bits only) |
+| `vdb`     |         Yes         |      No      |        No         |        Yes         |
+| `webifc`  |         Yes         |      No      |        Yes        |        Yes         |
 
 F3D searches for plugins in this order:
 
