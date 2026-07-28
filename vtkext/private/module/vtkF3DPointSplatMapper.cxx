@@ -1,6 +1,6 @@
 #include "vtkF3DPointSplatMapper.h"
 
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+#ifndef F3D_USE_GLES
 #include "vtkF3DBitonicSort.h"
 #include "vtkF3DComputeDepthCS.h"
 #endif
@@ -73,7 +73,7 @@ protected:
     vtkOpenGLHelper& cellBO, vtkRenderer* ren, vtkActor* actor) override;
 
 private:
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+#ifndef F3D_USE_GLES
   vtkNew<vtkShader> DepthComputeShader;
   vtkNew<vtkShaderProgram> DepthProgram;
   vtkNew<vtkOpenGLBufferObject> DepthBuffer;
@@ -104,7 +104,7 @@ vtkStandardNewMacro(vtkF3DSplatMapperHelper);
 //----------------------------------------------------------------------------
 vtkF3DSplatMapperHelper::vtkF3DSplatMapperHelper()
 {
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+#ifndef F3D_USE_GLES
   this->DepthComputeShader->SetType(vtkShader::Compute);
   this->DepthComputeShader->SetSource(vtkF3DComputeDepthCS);
   this->DepthProgram->SetComputeShader(this->DepthComputeShader);
@@ -144,7 +144,7 @@ void vtkF3DSplatMapperHelper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act
 
   vtkOpenGLPointGaussianMapperHelper::BuildBufferObjects(ren, act);
 
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+#ifndef F3D_USE_GLES
   // allocate a buffer of depths used for sorting splats
   this->DepthBuffer->Allocate(splatCount * sizeof(float), vtkOpenGLBufferObject::ArrayBuffer,
     vtkOpenGLBufferObject::DynamicCopy);
@@ -344,7 +344,7 @@ bool vtkF3DSplatMapperHelper::SortNeeded(vtkRenderer* ren)
 //----------------------------------------------------------------------------
 void vtkF3DSplatMapperHelper::SortSplats(vtkRenderer* ren)
 {
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+#ifndef F3D_USE_GLES
 
   if (!this->SortNeeded(ren))
   {

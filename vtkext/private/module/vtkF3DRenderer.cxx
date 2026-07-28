@@ -30,6 +30,7 @@
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkFloatArray.h>
 #include <vtkHDRReader.h>
+#include <vtkImageAppendComponents.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
@@ -287,7 +288,7 @@ void vtkF3DRenderer::Initialize()
   this->AddActor(this->SkyboxActor);
   this->AddActor(this->UIActor);
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513) && !defined(F3D_USE_GLES)
   this->AddActor(this->GridAxesActor);
   this->GridAxesActor->SetUseBounds(false);
 #endif
@@ -931,6 +932,12 @@ void vtkF3DRenderer::ShowAxesGrid([[maybe_unused]] bool show)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
 {
+#ifdef F3D_USE_GLES
+  if (this->AxesGridVisible)
+  {
+    F3DLog::Print(F3DLog::Severity::Warning, "Grid axes are not supported on OpenGL ES, ignoring.");
+  }
+#else
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   bool show = this->AxesGridVisible;
   if (show)
@@ -983,7 +990,7 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
     }
   }
   this->GridAxesActor->SetVisibility(show);
-
+#endif
 #endif
 }
 
@@ -1317,7 +1324,32 @@ void vtkF3DRenderer::ConfigureHDRITexture()
       this->HDRITexture->SetColorModeToDirectScalars();
       this->HDRITexture->MipmapOn();
       this->HDRITexture->InterpolateOn();
+
+#ifdef F3D_USE_GLES
+      // with OpenGL ES, we need to add an alpha channel because RGB32F is not filterable
+      vtkImageData* rgb = this->HDRIReader->GetOutput();
+
+      if (rgb->GetNumberOfScalarComponents() == 3 && rgb->GetScalarType() == VTK_FLOAT)
+      {
+        vtkNew<vtkImageData> alpha;
+        alpha->SetDimensions(rgb->GetDimensions());
+        alpha->AllocateScalars(VTK_FLOAT, 1);
+        std::fill_n(
+          static_cast<float*>(alpha->GetScalarPointer()), alpha->GetNumberOfPoints(), 1.0f);
+
+        vtkNew<vtkImageAppendComponents> append;
+        append->AddInputData(rgb);
+        append->AddInputData(alpha);
+        append->Update();
+        this->HDRITexture->SetInputConnection(append->GetOutputPort());
+      }
+      else
+      {
+        this->HDRITexture->SetInputConnection(this->HDRIReader->GetOutputPort());
+      }
+#else
       this->HDRITexture->SetInputConnection(this->HDRIReader->GetOutputPort());
+#endif
 
       // 8-bit textures are usually gamma-corrected
       if (this->HDRIReader->GetOutput() &&
@@ -2205,7 +2237,7 @@ void vtkF3DRenderer::Render()
   vtkInformation* info = this->GetInformation();
   bool uiOnly = info->Get(vtkF3DRenderPass::RENDER_UI_ONLY());
 
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+#ifndef F3D_USE_GLES
   if (!uiOnly)
   {
     glBeginQuery(GL_TIME_ELAPSED, this->Timer);
@@ -2222,7 +2254,7 @@ void vtkF3DRenderer::Render()
     double elapsedTime =
       std::chrono::duration_cast<std::chrono::microseconds>(cpuElapsed).count() * 1e-6;
 
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+#ifndef F3D_USE_GLES
     glEndQuery(GL_TIME_ELAPSED);
     GLint elapsed;
     glGetQueryObjectiv(this->Timer, GL_QUERY_RESULT, &elapsed);

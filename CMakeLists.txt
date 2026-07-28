@@ -89,6 +89,14 @@ find_package(VTK 9.4.0 REQUIRED
     RenderingRayTracing)
 message(STATUS "VTK ${VTK_VERSION} found")
 
+# define F3D_USE_GLES accordingly
+# Before VTK_OPENGL_USE_GLES was exposed (VTK 9.7.20260709), we could use GLES on Android and Emscripten only.
+if(VTK_OPENGL_USE_GLES OR ANDROID OR EMSCRIPTEN)
+  set(F3D_USE_GLES ON)
+else()
+  set(F3D_USE_GLES OFF)
+endif()
+
 # Modules
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
 option(F3D_MODULE_EXR "OpenEXR images module" OFF)
@@ -347,3 +355,4 @@ f3d_report_variable(F3D_PLUGIN_BUILD_PDAL)
 f3d_report_variable(F3D_PLUGIN_BUILD_USD)
 f3d_report_variable(F3D_PLUGIN_BUILD_VDB)
 f3d_report_variable(F3D_PLUGIN_BUILD_WEBIFC)
+f3d_report_variable(F3D_USE_GLES)
