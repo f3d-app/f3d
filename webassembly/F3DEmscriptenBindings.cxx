@@ -393,7 +393,8 @@ EMSCRIPTEN_BINDINGS(f3d)
       {
         return containerToJSArray(win.getDisplayFromWorld(
           { jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() }));
-      });
+      })
+    .function("getDPIScale", &f3d::window::getDPIScale);
 
   // f3d::interactor
   emscripten::enum_<f3d::interactor::AnimationDirection>("InteractorAnimationDirection")

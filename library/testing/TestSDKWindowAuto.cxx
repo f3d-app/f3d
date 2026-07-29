@@ -19,6 +19,7 @@ int TestSDKWindowAuto([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("window height", win.getHeight(), 300);
   test("window type", win.getType() != f3d::window::Type::UNKNOWN);
   test("window offscreen", win.isOffscreen());
+  test("window dpi", win.getDPIScale() >= 1.0);
 
   f3d::options& options = eng.getOptions();
   options.render.background.color = { 0.8, 0.2, 0.9 };

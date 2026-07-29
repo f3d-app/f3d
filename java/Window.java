@@ -132,6 +132,14 @@ public class Window {
      */
     public native double[] getDisplayFromWorld(double[] worldPoint);
 
+    /**
+    * Get the DPI scale value of the window.
+    * Returns 1.0 on platforms where DPI scaling is not supported.
+    * 
+    * @return DPI scale.
+    */
+    public native double getDPIScale();
+
     private long mNativeAddress;
     private Camera mCamera;
 }

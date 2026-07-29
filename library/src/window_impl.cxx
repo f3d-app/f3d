@@ -280,6 +280,13 @@ bool window_impl::isOffscreen()
 }
 
 //----------------------------------------------------------------------------
+double window_impl::getDPIScale()
+{
+  this->Internals->Renderer->SetDPIAware(this->Internals->Options.ui.dpi_aware);
+  return this->Internals->Renderer->GetDPIScale();
+}
+
+//----------------------------------------------------------------------------
 camera& window_impl::getCamera()
 {
   return *this->Internals->Camera;

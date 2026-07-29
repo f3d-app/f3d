@@ -336,6 +336,22 @@ void vtkF3DRenderer::Initialize()
     });
   this->RenderWindow->AddObserver(vtkCommand::WindowResizeEvent, modernAxisWidgetResizeCallback);
 #endif
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20260729)
+  // create a dpi changed callback to rebuild UI with proper size
+  vtkNew<vtkCallbackCommand> dpiChangedCallback;
+  dpiChangedCallback->SetClientData(this);
+  dpiChangedCallback->SetCallback(
+    [](vtkObject* const, unsigned long, void* clientData, void* callData)
+    {
+      vtkF3DRenderer* self = static_cast<vtkF3DRenderer*>(clientData);
+      self->TextActorsConfigured = false;
+      self->ConfigureTextActors();
+      F3DLog::Print(
+        F3DLog::Severity::Info, "DPI changed to " + std::to_string(*static_cast<int*>(callData)));
+    });
+  this->RenderWindow->AddObserver(vtkCommand::DPIChangedEvent, dpiChangedCallback);
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -1521,6 +1537,35 @@ void vtkF3DRenderer::ConfigureHDRISkybox()
 }
 
 //----------------------------------------------------------------------------
+double vtkF3DRenderer::GetDPIScale()
+{
+  std::string forceDpiStr;
+  if (vtksys::SystemTools::GetEnv("CTEST_F3D_FORCE_DPI_SCALE", forceDpiStr))
+  {
+    try
+    {
+      return std::stod(forceDpiStr);
+    }
+    catch (const std::exception&)
+    {
+      // silently ignore invalid values
+    }
+  }
+
+#ifdef __APPLE__
+  constexpr int baseDPI = 72;
+#else
+  constexpr int baseDPI = 96;
+#endif
+
+  if (this->DPIAware && this->GetRenderWindow()->DetectDPI())
+  {
+    return static_cast<double>(this->GetRenderWindow()->GetDPI()) / baseDPI; // LCOV_EXCL_LINE
+  }
+  return 1.0;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureTextActors()
 {
   // Font
@@ -1543,11 +1588,8 @@ void vtkF3DRenderer::ConfigureTextActors()
     }
   }
 
-  this->UIActor->SetFontColor(FontColor);
-
-  double scaleFactor = this->DPIAware ? F3DUtils::getDPIScale() : 1.0;
-
-  this->UIActor->SetFontScale(this->FontScale * scaleFactor);
+  this->UIActor->SetFontColor(this->FontColor);
+  this->UIActor->SetFontScale(this->FontScale * this->GetDPIScale());
 
   this->TextActorsConfigured = true;
 }

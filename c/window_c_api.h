@@ -151,6 +151,15 @@ extern "C"
   F3D_EXPORT void f3d_window_get_display_from_world(
     const f3d_window_t* window, const f3d_point3_t world_point, f3d_point3_t display_point);
 
+  /**
+   * @brief Get the DPI scale value of the window.
+   *
+   * Returns 1.0 on platforms where DPI scaling is not supported.
+   *
+   * @return DPI scale.
+   */
+  F3D_EXPORT double f3d_window_get_dpi_scale(f3d_window_t* window);
+
 #ifdef __cplusplus
 }
 #endif

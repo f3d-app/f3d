@@ -47,6 +47,11 @@ const settings = {
 
     // just for coverage
     Module.engineInstance.setCachePath("/tmp");
+
+    utils.assert(
+      window.getDPIScale() >= 1.0,
+      "DPI scale value unexpected: " + window.getDPIScale(),
+    );
   },
 };
 

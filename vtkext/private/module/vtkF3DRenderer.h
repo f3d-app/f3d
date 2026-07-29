@@ -595,6 +595,11 @@ public:
    */
   void UpdateAnimationTime(double currentTime);
 
+  /**
+   * Get the DPI scale based on the current render window
+   */
+  double GetDPIScale();
+
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;

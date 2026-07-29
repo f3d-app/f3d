@@ -86,5 +86,8 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   interactor->SetInteractorStyle(style);
   renderer->SetInteractionStyle("invalid");
 
+  // Cover DPI change code path
+  window->SetDPI(144);
+
   return EXIT_SUCCESS;
 }
