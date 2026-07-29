@@ -31,25 +31,25 @@ int TestSDKBindingRepeat([[maybe_unused]] int argc, [[maybe_unused]] char* argv[
   sce.add(dataPath);
   win.render();
 
-  inter.removeBinding({ mod_t::NONE, "G" });
-  inter.addBinding({ mod_t::NONE, "G" }, "toggle render.grid.enable", {}, nullptr,
-    f3d::interactor::BindingType::TOGGLE, true, false);
+  inter.removeBinding({ mod_t::CTRL, "P" });
+  inter.addBinding({ mod_t::CTRL, "P" }, "increase model.color.opacity", {}, nullptr,
+    f3d::interactor::BindingType::NUMERICAL, true, false);
 
   std::string filename = "TestSDKBindingRepeatOff";
-  std::string interactionFilePath = std::format("{}../../{}.log", std::string(argv[2]), filename);
+  std::string interactionFilePath = std::format("{}../recordings/{}.log", baselinePath, filename);
   test("play binding repeat off interaction", inter.playInteraction(interactionFilePath));
 
   test("trigger binding no repeat",
     TestSDKHelpers::RenderTest(win, baselinePath, outputPath, "TestSDKBindingRepeatOff"));
 
-  inter.removeBinding({ mod_t::NONE, "G" });
-  inter.addBinding({ mod_t::NONE, "G" }, "toggle render.grid.enable", {}, nullptr,
-    f3d::interactor::BindingType::TOGGLE, true, true);
+  inter.removeBinding({ mod_t::CTRL, "P" });
+  inter.addBinding({ mod_t::CTRL, "P" }, "increase model.color.opacity", {}, nullptr,
+    f3d::interactor::BindingType::NUMERICAL, true, true);
 
   // Uses a different file to add extra interaction as the render state will already have the axis
   // on
   filename = "TestSDKBindingRepeatOn";
-  interactionFilePath = std::format("{}../../{}.log", std::string(argv[2]), filename);
+  interactionFilePath = std::format("{}../recordings/{}.log", baselinePath, filename);
   test("play binding repeat interaction", inter.playInteraction(interactionFilePath));
 
   test("trigger binding repeat",

@@ -187,7 +187,7 @@ public:
    *
    * If notify is true, a notification is triggered when pressing the binding
    *
-   * If repeat is true, the binding is continuously applied when holding down the key
+   * If repeat is true, the binding is applied repeatedly when holding down the key
    *
    * Adding commands for an existing bind will throw a interactor::already_exists_exception.
    */
