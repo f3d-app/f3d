@@ -1,8 +1,0 @@
-# StreamVersion 1.2
-UpdateDropLocationEvent 677 699 0 0 1 Super_L 0
-DropFilesEvent 781 494 0 0 0 Super_L 1 1 ${F3D_SOURCE_DIR}/testing/data/cow.vtp
-KeyPressEvent 1790 178 0 110 1 g 0
-KeyPressEvent 1790 178 0 110 2 g 0
-KeyPressEvent 1790 178 0 110 3 g 0
-KeyPressEvent 1790 178 0 110 4 g 0
-KeyPressEvent 1790 178 0 110 5 g 0
