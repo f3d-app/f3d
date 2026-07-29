@@ -326,16 +326,15 @@ void vtkF3DRenderer::Initialize()
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
   // create a window resize callback for axis
-  this->ModernAxisWidgetResizeCallback = vtkSmartPointer<vtkCallbackCommand>::New();
-  this->ModernAxisWidgetResizeCallback->SetClientData(this);
-  this->ModernAxisWidgetResizeCallback->SetCallback(
+  vtkNew<vtkCallbackCommand> modernAxisWidgetResizeCallback;
+  modernAxisWidgetResizeCallback->SetClientData(this);
+  modernAxisWidgetResizeCallback->SetCallback(
     [](vtkObject* const, unsigned long, void* clientData, void*)
     {
       vtkF3DRenderer* self = static_cast<vtkF3DRenderer*>(clientData);
       self->UpdateAxisWidgetSize();
     });
-  this->RenderWindow->AddObserver(
-    vtkCommand::WindowResizeEvent, this->ModernAxisWidgetResizeCallback);
+  this->RenderWindow->AddObserver(vtkCommand::WindowResizeEvent, modernAxisWidgetResizeCallback);
 #endif
 }
 
@@ -801,12 +800,14 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
     vtkMath::Cross(right, up, front);
 
     vtkNew<vtkMatrix4x4> upMatrix;
+    // clang-format off
     const double m[16] = {
-      right[0], right[1], right[2], 0, //
-      up[0], up[1], up[2], 0,          //
-      front[0], front[1], front[2], 0, //
-      0, 0, 0, 1,                      //
+      right[0], right[1], right[2], 0,
+      up[0], up[1], up[2], 0,
+      front[0], front[1], front[2], 0,
+      0, 0, 0, 1,
     };
+    // clang-format on
     upMatrix->DeepCopy(m);
     vtkNew<vtkMatrix4x4> upMatrixInv;
     upMatrixInv->DeepCopy(upMatrix);
@@ -941,12 +942,14 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
     vtkMath::Cross(right, up, front);
 
     vtkNew<vtkMatrix4x4> upMatrix;
+    // clang-format off
     const double m[16] = {
-      right[0], right[1], right[2], 0, //
-      up[0], up[1], up[2], 0,          //
-      front[0], front[1], front[2], 0, //
-      0, 0, 0, 1,                      //
+      right[0], right[1], right[2], 0,
+      up[0], up[1], up[2], 0,
+      front[0], front[1], front[2], 0,
+      0, 0, 0, 1,
     };
+    // clang-format on
     upMatrix->DeepCopy(m);
     vtkNew<vtkMatrix4x4> upMatrixInv;
     upMatrixInv->DeepCopy(upMatrix);

@@ -737,7 +737,6 @@ private:
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
   vtkSmartPointer<vtkCameraOrientationWidget> ModernAxisWidget;
   vtkSmartPointer<vtkCameraOrientationRepresentation> ModernAxisRepresentation;
-  vtkSmartPointer<vtkCallbackCommand> ModernAxisWidgetResizeCallback;
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
   int ModernAxisBasePadding[2] = { 0, 0 };
 #endif
