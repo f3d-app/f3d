@@ -113,10 +113,8 @@ constexpr double ScalarBarPositionX = 0.1;
 constexpr double ScalarBarPositionY = 0.01;
 constexpr double ScalarBarHeight = 0.07;
 
-// Expand nearly degenerate automatic ranges to the colormap mid; skip user ranges.
-constexpr double DegenerateColoringRangeAbsoluteEpsilon = 1e-8;
-constexpr double DegenerateColoringRangeRelativeEpsilon = 1e-4;
-constexpr double DegenerateColoringRangeMargin = 0.5;
+// Expand nearly degenerate automatic ranges to val ± epsilon; skip user ranges.
+constexpr double DegenerateColoringRangeEpsilon = 1e-4;
 
 std::string DeprecatedCollapsePath(const fs::path& path)
 {
@@ -3605,14 +3603,11 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
   if (this->UsingExpandingRange)
   {
     const double width = std::abs(this->ColorRange[1] - this->ColorRange[0]);
-    const double scale =
-      std::max({ std::abs(this->ColorRange[0]), std::abs(this->ColorRange[1]), 1.0 });
-    if (width < std::max(::DegenerateColoringRangeAbsoluteEpsilon,
-                  ::DegenerateColoringRangeRelativeEpsilon * scale))
+    if (width < ::DegenerateColoringRangeEpsilon)
     {
-      const double mid = 0.5 * (this->ColorRange[0] + this->ColorRange[1]);
-      this->ColorRange[0] = mid - ::DegenerateColoringRangeMargin;
-      this->ColorRange[1] = mid + ::DegenerateColoringRangeMargin;
+      const double val = 0.5 * (this->ColorRange[0] + this->ColorRange[1]);
+      this->ColorRange[0] = val - ::DegenerateColoringRangeEpsilon;
+      this->ColorRange[1] = val + ::DegenerateColoringRangeEpsilon;
     }
   }
 
