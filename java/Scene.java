@@ -4,6 +4,16 @@ import java.util.List;
 
 public class Scene {
 
+    /** Thrown when a file or mesh cannot be loaded into the scene. */
+    public static class LoadFailureException extends F3DException {
+        public LoadFailureException(String message) { super(message); }
+    }
+
+    /** Thrown when a light operation fails (e.g. invalid index). */
+    public static class LightException extends F3DException {
+        public LightException(String message) { super(message); }
+    }
+
     public Scene(long nativeAddress) {
         mNativeAddress = nativeAddress;
     }

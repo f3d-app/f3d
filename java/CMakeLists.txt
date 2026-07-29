@@ -12,6 +12,7 @@ set(F3D_JAVA_SOURCES
   Camera.java
   Context.java
   Engine.java
+  F3DException.java
   Image.java
   Interactor.java
   Log.java

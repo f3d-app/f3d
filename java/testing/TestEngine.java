@@ -53,6 +53,23 @@ public class TestEngine {
 
     engine.close();
 
+    // --- Exception handling tests ---
+
+    // Engine.createNone() has no interactor; calling getInteractor() must throw
+    // NoInteractorException and must NOT crash the JVM.
+    try (Engine noWinEngine = Engine.createNone()) {
+      noWinEngine.getInteractor();
+      throw new RuntimeException("Expected Engine.NoInteractorException was not thrown");
+    } catch (Engine.NoInteractorException e) {
+    }
+
+    // Loading a nonexistent plugin must throw PluginException.
+    try {
+      Engine.loadPlugin("__nonexistent_plugin_f3d_test__");
+      throw new RuntimeException("Expected Engine.PluginException was not thrown");
+    } catch (Engine.PluginException e) {
+    }
+
     testStatefile(args);
   }
 

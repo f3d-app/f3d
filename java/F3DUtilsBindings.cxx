@@ -33,20 +33,18 @@ extern "C"
     }
 
     const char* strChars = env->GetStringUTFChars(str, nullptr);
-
+    jobject result = nullptr;
     try
     {
-      std::vector<std::string> tokens = f3d::utils::tokenize(strChars, keepComments != 0);
-      env->ReleaseStringUTFChars(str, strChars);
-      return CreateStringList(env, tokens);
+      result = CreateStringList(env, f3d::utils::tokenize(strChars, keepComments != 0));
     }
     catch (const std::exception& e)
     {
-      env->ReleaseStringUTFChars(str, strChars);
       jclass exceptionClass = env->FindClass("java/lang/RuntimeException");
       env->ThrowNew(exceptionClass, e.what());
-      return nullptr;
     }
+    env->ReleaseStringUTFChars(str, strChars);
+    return result;
   }
 
   JNIEXPORT jstring JAVA_BIND(Utils, collapsePath)(
@@ -82,20 +80,18 @@ extern "C"
     }
 
     const char* globChars = env->GetStringUTFChars(glob, nullptr);
-
+    std::string result;
     try
     {
-      std::string result = f3d::utils::globToRegex(globChars, static_cast<char>(pathSeparator));
-      env->ReleaseStringUTFChars(glob, globChars);
-      return env->NewStringUTF(result.c_str());
+      result = f3d::utils::globToRegex(globChars, static_cast<char>(pathSeparator));
     }
     catch (const std::exception& e)
     {
-      env->ReleaseStringUTFChars(glob, globChars);
       jclass exceptionClass = env->FindClass("java/lang/RuntimeException");
       env->ThrowNew(exceptionClass, e.what());
-      return nullptr;
     }
+    env->ReleaseStringUTFChars(glob, globChars);
+    return env->ExceptionCheck() ? nullptr : env->NewStringUTF(result.c_str());
   }
 
   JNIEXPORT jstring JAVA_BIND(Utils, getEnv)(JNIEnv* env, jclass, jstring envVar)
