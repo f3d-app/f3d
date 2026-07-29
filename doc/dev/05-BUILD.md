@@ -74,6 +74,9 @@ Some modules, plugins and language bindings depending on external libraries can 
 
 Some dependencies are provided internally, eg: ImGui, dmon and others. Use `F3D_USE_EXTERNAL_*` to use an external version of these libraries.
 
+VTK can be built with OpenGL ES support, which is mostly the case when targeting mobile or web platforms.
+The CMake variable `F3D_USE_GLES` is automatically defined and reported during the configuration step.
+
 ## Building for contribution
 
 If you plan to contribute to F3D, you may want to use the provided `dev` preset for easier setup:
