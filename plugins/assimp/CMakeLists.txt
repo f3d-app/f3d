@@ -109,7 +109,7 @@ f3d_plugin_declare_reader(
 f3d_plugin_declare_reader(
   NAME AMF
   EXTENSIONS amf
-  MIMETYPES application/vnd.amf
+  MIMETYPES application/x-amf
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "Additive Manufacturing Format"
   ${_SUPPORTS_STREAM}

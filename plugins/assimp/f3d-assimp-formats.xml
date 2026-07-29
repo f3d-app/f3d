@@ -16,4 +16,12 @@
     <comment>DirectX File Format</comment>
     <glob pattern="*.x"/>
   </mime-type>
+  <mime-type type="model/3mf">
+    <comment>3D Manufacturing Format</comment>
+    <glob pattern="*.3mf"/>
+  </mime-type>
+  <mime-type type="application/x-amf">
+    <comment>Additive Manufacturing Format</comment>
+    <glob pattern="*.amf"/>
+  </mime-type>
 </mime-info>
