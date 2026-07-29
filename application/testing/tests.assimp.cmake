@@ -2,6 +2,7 @@
 ## This file is only added if assimp is enabled
 f3d_test(NAME TestOFF DATA teapot.off ARGS --up=+Z PLUGIN assimp)
 f3d_test(NAME Test3MF DATA cube_gears.3mf PLUGIN assimp)
+f3d_test(NAME TestAMF DATA cube-with-hole.amf PLUGIN assimp)
 f3d_test(NAME TestFBX DATA phong_cube.fbx PLUGIN assimp)
 f3d_test(NAME TestFBX16bits DATA 16bit.fbx PLUGIN assimp)
 f3d_test(NAME TestVerboseCameraAssimp DATA duck.dae ARGS --verbose PLUGIN assimp NO_BASELINE REGEXP "camera1")
@@ -13,6 +14,7 @@ f3d_test(NAME TestAssimpMetaDataImporter DATA duck.fbx PLUGIN assimp ARGS -m UI)
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251016)
   f3d_test(NAME TestPipedOFF DATA teapot.off ARGS --up=+Z PLUGIN assimp PIPED_READER OFF PIPED)
   f3d_test(NAME TestPiped3MF DATA cube_gears.3mf PLUGIN assimp PIPED_READER 3MF PIPED)
+  f3d_test(NAME TestPipedAMF DATA cube-with-hole.amf PLUGIN assimp PIPED_READER AMF PIPED)
   f3d_test(NAME TestPipedFBX DATA phong_cube.fbx PLUGIN assimp PIPED_READER FBX PIPED)
   f3d_test(NAME TestPipedDAE DATA duck.dae PLUGIN assimp PIPED_READER COLLADA PIPED) # Texture not loaded
   f3d_test(NAME TestPipedX DATA anim_test.x PLUGIN assimp PIPED_READER DirectX PIPED)

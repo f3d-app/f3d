@@ -6,7 +6,7 @@
  * The list of supported file format is available here:
  * https://github.com/assimp/assimp/blob/master/doc/Fileformats.md
  *
- * The following formats have been tested and are supported by f3d: FBX, DAE, OFF, DXF, X, 3MF
+ * The following formats have been tested and are supported by f3d: FBX, DAE, OFF, DXF, X, 3MF, AMF
 
  * This importer supports reading from stream but prefer memory stream over filestream.
  * Reading from stream require to position the MemoryHint to the correct file extension.

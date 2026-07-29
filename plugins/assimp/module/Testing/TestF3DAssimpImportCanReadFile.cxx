@@ -47,6 +47,7 @@ int TestF3DAssimpImportCanReadFile(int vtkNotUsed(argc), char* argv[])
   result &= ::TestCanReadFile(std::string(argv[1]) + "data/texturedCube.fbx", "fbx");
   result &= ::TestCanReadFile(std::string(argv[1]) + "data/anim_test.x", "x");
   result &= ::TestCanReadFile(std::string(argv[1]) + "data/cube_gears.3mf", "3mf");
+  result &= ::TestCanReadFile(std::string(argv[1]) + "data/cube-with-hole.amf", "amf");
   result &= ::TestCanReadFile(std::string(argv[1]) + "data/duck.dae", "dae");
   result &= ::TestCanReadFile(std::string(argv[1]) + "data/PinkEggFromLW.dxf", "dxf");
   result &= ::TestCanReadFile(std::string(argv[1]) + "data/teapot.off", "off");
