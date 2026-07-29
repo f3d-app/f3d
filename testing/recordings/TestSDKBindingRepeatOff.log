@@ -1,0 +1,6 @@
+# StreamVersion 1.2
+KeyPressEvent 1173 72 2 112 1 p 0
+KeyPressEvent 1173 72 2 112 2 p 0
+KeyPressEvent 1173 72 2 112 3 p 0
+KeyPressEvent 1173 72 2 112 4 p 0
+KeyReleaseEvent 1173 72 0 0 1 Control_L 0
