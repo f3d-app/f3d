@@ -912,7 +912,6 @@ PYBIND11_MODULE(pyf3d, module)
     .def("render", &f3d::window::render, "Render the window")
     .def("render_to_image", &f3d::window::renderToImage, "Render the window to an image",
       py::arg("no_background") = false)
-    .def("set_position", &f3d::window::setPosition)
     .def("set_icon", &f3d::window::setIcon,
       "Set the icon of the window using a memory buffer representing a PNG file")
     .def("set_window_name", &f3d::window::setWindowName, "Set the window name")
@@ -995,7 +994,6 @@ PYBIND11_MODULE(pyf3d, module)
       "Create an engine with an existing EGL context (Windows/Linux only)")
     .def_static("create_external_osmesa", &f3d::engine::createExternalOSMesa,
       "Create an engine with an existing OSMesa context (Windows/Linux only)")
-    .def("set_cache_path", &f3d::engine::setCachePath, "Set the cache path directory")
     .def_property("cache_path", &f3d::engine::getCachePath,
       [](f3d::engine& eng, const std::filesystem::path& path) { eng.setCachePath(path); })
     .def_property("options", &f3d::engine::getOptions,
