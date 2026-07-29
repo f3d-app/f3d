@@ -45,6 +45,11 @@ const settings = {
       "point has no been restored to original value",
     );
 
+    utils.assert(
+      utils.numArrayEquals(window.getSize(), [window.width, window.height], 0),
+      "getSize should return {width, height}",
+    );
+
     Module.engineInstance.setCachePath("/tmp");
 
     utils.assert(

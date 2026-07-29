@@ -89,6 +89,18 @@ extern "C"
   F3D_EXPORT void f3d_window_set_size(f3d_window_t* window, int width, int height);
 
   /**
+   * @brief Get the size of the window.
+   *
+   * If provided window is NULL, do nothing.
+   * If provided width or height is NULL, the corresponding size is not written.
+   *
+   * @param window Window handle.
+   * @param width Output pointer receiving the window width in pixels.
+   * @param height Output pointer receiving the window height in pixels.
+   */
+  F3D_EXPORT void f3d_window_get_size(const f3d_window_t* window, int* width, int* height);
+
+  /**
    * @brief Get the width of the window.
    *
    * @param window Window handle.
@@ -124,6 +136,22 @@ extern "C"
    * @param y Output pointer receiving the y position in pixels.
    */
   F3D_EXPORT void f3d_window_get_position(const f3d_window_t* window, int* x, int* y);
+
+  /**
+   * @brief Get the position of the left border of the window.
+   *
+   * @param window Window handle.
+   * @return Left border position in pixels.
+   */
+  F3D_EXPORT int f3d_window_get_left(const f3d_window_t* window);
+
+  /**
+   * @brief Get the position of the top border of the window.
+   *
+   * @param window Window handle.
+   * @return Top border position in pixels.
+   */
+  F3D_EXPORT int f3d_window_get_top(const f3d_window_t* window);
 
   /**
    * @brief Set the icon to be shown by a window manager.

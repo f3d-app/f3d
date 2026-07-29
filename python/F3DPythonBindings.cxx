@@ -899,8 +899,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property_readonly("offscreen", &f3d::window::isOffscreen)
     .def_property_readonly("camera", &f3d::window::getCamera, py::return_value_policy::reference)
     .def_property(
-      "size",
-      [](const f3d::window& win) { return std::make_pair(win.getWidth(), win.getHeight()); },
+      "size", [](const f3d::window& win) { return win.getSize(); },
       [](f3d::window& win, std::pair<int, int> wh) { win.setSize(wh.first, wh.second); })
     .def_property("width", &f3d::window::getWidth,
       [](f3d::window& win, int w) { win.setSize(w, win.getHeight()); })
@@ -909,6 +908,10 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property(
       "position", [](const f3d::window& win) { return win.getPosition(); },
       [](f3d::window& win, std::pair<int, int> xy) { win.setPosition(xy.first, xy.second); })
+    .def_property("left", &f3d::window::getLeft,
+      [](f3d::window& win, int x) { win.setPosition(x, win.getTop()); })
+    .def_property("top", &f3d::window::getTop,
+      [](f3d::window& win, int y) { win.setPosition(win.getLeft(), y); })
     .def("render", &f3d::window::render, "Render the window")
     .def("render_to_image", &f3d::window::renderToImage, "Render the window to an image",
       py::arg("no_background") = false)

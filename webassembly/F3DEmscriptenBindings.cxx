@@ -372,12 +372,15 @@ EMSCRIPTEN_BINDINGS(f3d)
 
   // f3d::window
   // Not bound on purpose because these functions make no sense on the web:
-  // getType, isOffscreen, setPosition, getPosition, setIcon, setWindowName
+  // getType, isOffscreen, setPosition, getPosition, getLeft, getTop, setIcon, setWindowName
   emscripten::class_<f3d::window>("Window")
     .function("getCamera", &f3d::window::getCamera, emscripten::return_value_policy::reference())
     .function("render", &f3d::window::render)
     .function("renderToImage", &f3d::window::renderToImage)
     .function("setSize", &f3d::window::setSize, emscripten::return_value_policy::reference())
+    .function(
+      "getSize",
+      +[](const f3d::window& win) -> emscripten::val { return pairToJSArray(win.getSize()); })
     .property("width", &f3d::window::getWidth)
     .property("height", &f3d::window::getHeight)
     .function(

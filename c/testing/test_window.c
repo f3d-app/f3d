@@ -48,9 +48,17 @@ int test_window()
 
   f3d_window_set_size(window, 800, 600);
   int width = f3d_window_get_width(window);
-  (void)width;
   int height = f3d_window_get_height(window);
-  (void)height;
+
+  int sizeWidth = 0;
+  int sizeHeight = 0;
+  f3d_window_get_size(window, &sizeWidth, &sizeHeight);
+  if (sizeWidth != width || sizeHeight != height)
+  {
+    puts("[ERROR] Window size does not match the window width/height");
+    f3d_engine_delete(engine);
+    return 1;
+  }
 
   f3d_window_set_position(window, 100, 100);
   f3d_window_render(window);
@@ -65,6 +73,13 @@ int test_window()
   if (posX != posX2 || posY != posY2)
   {
     puts("[ERROR] Window position is not stable");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  if (f3d_window_get_left(window) != posX || f3d_window_get_top(window) != posY)
+  {
+    puts("[ERROR] Window left/top do not match the window position");
     f3d_engine_delete(engine);
     return 1;
   }

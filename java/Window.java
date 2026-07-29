@@ -78,6 +78,13 @@ public class Window {
     public native Window setSize(int width, int height);
 
     /**
+     * Get the size of the window as an array {width, height}.
+     *
+     * @return window size as {width, height}
+     */
+    public native int[] getSize();
+
+    /**
      * Get the width of the window.
      *
      * @return window width
@@ -106,6 +113,20 @@ public class Window {
      * @return window position as {x, y}
      */
     public native int[] getPosition();
+
+    /**
+     * Get the position of the left border of the window.
+     *
+     * @return window left border position
+     */
+    public native int getLeft();
+
+    /**
+     * Get the position of the top border of the window.
+     *
+     * @return window top border position
+     */
+    public native int getTop();
 
     /**
      * Set the icon to be shown by a window manager.

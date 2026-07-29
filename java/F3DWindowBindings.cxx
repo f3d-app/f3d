@@ -77,6 +77,15 @@ extern "C"
     return self;
   }
 
+  JNIEXPORT jintArray JAVA_BIND(Window, getSize)(JNIEnv* env, jobject self)
+  {
+    const auto [width, height] = GetEngine(env, self)->getWindow().getSize();
+    const jint size[2] = { width, height };
+    jintArray result = env->NewIntArray(2);
+    env->SetIntArrayRegion(result, 0, 2, size);
+    return result;
+  }
+
   JNIEXPORT jint JAVA_BIND(Window, getWidth)(JNIEnv* env, jobject self)
   {
     return GetEngine(env, self)->getWindow().getWidth();
@@ -100,6 +109,16 @@ extern "C"
     jintArray result = env->NewIntArray(2);
     env->SetIntArrayRegion(result, 0, 2, position);
     return result;
+  }
+
+  JNIEXPORT jint JAVA_BIND(Window, getLeft)(JNIEnv* env, jobject self)
+  {
+    return GetEngine(env, self)->getWindow().getLeft();
+  }
+
+  JNIEXPORT jint JAVA_BIND(Window, getTop)(JNIEnv* env, jobject self)
+  {
+    return GetEngine(env, self)->getWindow().getTop();
   }
 
   JNIEXPORT jobject JAVA_BIND(Window, setIcon)(JNIEnv* env, jobject self, jbyteArray icon)

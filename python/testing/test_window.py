@@ -7,6 +7,7 @@ def test_window_size():
     assert engine.window.size == (300, 400)
     assert engine.window.width == 300
     assert engine.window.height == 400
+    assert engine.window.size == (engine.window.width, engine.window.height)
 
 
 def test_window_position():
@@ -17,3 +18,5 @@ def test_window_position():
     # that the property is a 2-tuple rather than asserting a specific value.
     pos = engine.window.position
     assert isinstance(pos, tuple) and len(pos) == 2
+    assert engine.window.left == pos[0]
+    assert engine.window.top == pos[1]

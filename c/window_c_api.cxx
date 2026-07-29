@@ -80,6 +80,26 @@ void f3d_window_set_size(f3d_window_t* window, int width, int height)
 }
 
 //----------------------------------------------------------------------------
+void f3d_window_get_size(const f3d_window_t* window, int* width, int* height)
+{
+  if (!window)
+  {
+    return;
+  }
+
+  const f3d::window* cpp_window = reinterpret_cast<const f3d::window*>(window);
+  const auto [winWidth, winHeight] = cpp_window->getSize();
+  if (width)
+  {
+    *width = winWidth;
+  }
+  if (height)
+  {
+    *height = winHeight;
+  }
+}
+
+//----------------------------------------------------------------------------
 int f3d_window_get_width(const f3d_window_t* window)
 {
   if (!window)
@@ -133,6 +153,30 @@ void f3d_window_get_position(const f3d_window_t* window, int* x, int* y)
   {
     *y = posY;
   }
+}
+
+//----------------------------------------------------------------------------
+int f3d_window_get_left(const f3d_window_t* window)
+{
+  if (!window)
+  {
+    return 0;
+  }
+
+  const f3d::window* cpp_window = reinterpret_cast<const f3d::window*>(window);
+  return cpp_window->getLeft();
+}
+
+//----------------------------------------------------------------------------
+int f3d_window_get_top(const f3d_window_t* window)
+{
+  if (!window)
+  {
+    return 0;
+  }
+
+  const f3d::window* cpp_window = reinterpret_cast<const f3d::window*>(window);
+  return cpp_window->getTop();
 }
 
 //----------------------------------------------------------------------------

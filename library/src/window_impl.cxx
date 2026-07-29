@@ -316,6 +316,13 @@ window& window_impl::setSize(int width, int height)
 }
 
 //----------------------------------------------------------------------------
+std::pair<int, int> window_impl::getSize() const
+{
+  const int* size = this->Internals->RenWin->GetSize();
+  return { size[0], size[1] };
+}
+
+//----------------------------------------------------------------------------
 window& window_impl::setPosition(int x, int y)
 {
   if (this->Internals->RenWin->IsA("vtkCocoaRenderWindow"))
@@ -358,6 +365,18 @@ std::pair<int, int> window_impl::getPosition() const
     return { pos[0], screenSize[1] - winSize[1] - pos[1] };
   }
   return { pos[0], pos[1] };
+}
+
+//----------------------------------------------------------------------------
+int window_impl::getLeft() const
+{
+  return this->getPosition().first;
+}
+
+//----------------------------------------------------------------------------
+int window_impl::getTop() const
+{
+  return this->getPosition().second;
 }
 
 //----------------------------------------------------------------------------
