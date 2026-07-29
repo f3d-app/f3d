@@ -42,6 +42,12 @@ int test_interactor()
     f3d_interactor_get_animation_direction(interactor);
   (void)direction;
   f3d_interactor_stop_animation(interactor);
+  f3d_interactor_jump_to_frame(interactor, 24);
+  f3d_interactor_jump_to_frame_relative(interactor, 1);
+  f3d_interactor_jump_to_frame(interactor, 0);
+  f3d_interactor_jump_to_keyframe(interactor, 4);
+  f3d_interactor_jump_to_keyframe_relative(interactor, 1);
+  f3d_interactor_jump_to_keyframe(interactor, 0);
 
   f3d_interactor_enable_camera_movement(interactor);
   f3d_interactor_disable_camera_movement(interactor);
@@ -59,6 +65,8 @@ int test_interactor()
   f3d_interactor_trigger_text_character(interactor, 65);
 
   f3d_interactor_trigger_event_loop(interactor, 0.016);
+  double delta = f3d_interactor_get_delta_time(interactor);
+  (void)delta;
 
   f3d_interactor_trigger_notification(interactor, "foo", "bar", 3.0);
   f3d_interactor_set_notification_callback(interactor, NULL, NULL);

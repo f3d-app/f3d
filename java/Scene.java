@@ -169,6 +169,20 @@ public class Scene {
     public native Scene loadAnimationTime(double timeValue);
 
     /**
+     * Get current animation time of the loaded files.
+     *
+     * @return current animation time
+     */
+    public native double animationTime();
+
+    /**
+     * Get current animation frame of the loaded files.
+     *
+     * @return current animation frame
+     */
+    public native long animationFrame();
+
+    /**
      * Get animation time range of currently added files.
      *
      * @return array of 2 doubles [min_time, max_time]

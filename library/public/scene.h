@@ -174,6 +174,18 @@ public:
   virtual scene& loadAnimationTime(double timeValue) = 0;
 
   /**
+   * Get current animation time of the loaded files.
+   * Returns 0.0 if there is no animations.
+   */
+  [[nodiscard]] virtual double animationTime() = 0;
+
+  /**
+   * Get animation frame of the loaded files.
+   * Returns 0 if there is no animations.
+   */
+  [[nodiscard]] virtual size_t animationFrame() = 0;
+
+  /**
    * Get animation time range of currently added files.
    * Returns [0, 0] if there is no animations.
    */

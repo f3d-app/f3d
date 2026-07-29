@@ -60,6 +60,8 @@ public class TestScene {
     scene.add(mesh);
 
     scene.loadAnimationTime(0.5);
+    scene.animationTime();
+    scene.animationFrame();
     scene.animationTimeRange();
     scene.getAnimationKeyFrames();
     scene.availableAnimations();

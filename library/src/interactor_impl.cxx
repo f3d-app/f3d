@@ -1980,6 +1980,40 @@ interactor::AnimationDirection interactor_impl::getAnimationDirection()
 }
 
 //----------------------------------------------------------------------------
+interactor& interactor_impl::jumpToFrame(int index)
+{
+  assert(this->Internals->AnimationManager);
+  this->Internals->AnimationManager->SetDeltaTime(this->Internals->CallbackDeltaTime);
+  this->Internals->AnimationManager->JumpToFrame(index, false);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::jumpToFrameRelative(int offset)
+{
+  assert(this->Internals->AnimationManager);
+  this->Internals->AnimationManager->SetDeltaTime(this->Internals->CallbackDeltaTime);
+  this->Internals->AnimationManager->JumpToFrame(offset, true);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::jumpToKeyframe(int index)
+{
+  assert(this->Internals->AnimationManager);
+  this->Internals->AnimationManager->JumpToKeyFrame(index, false);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::jumpToKeyframeRelative(int offset)
+{
+  assert(this->Internals->AnimationManager);
+  this->Internals->AnimationManager->JumpToKeyFrame(offset, true);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 interactor& interactor_impl::enableCameraMovement()
 {
   this->Internals->Style->SetCameraMovementDisabled(false);
@@ -2114,6 +2148,12 @@ interactor& interactor_impl::requestStop()
 {
   this->Internals->StopRequested = true;
   return *this;
+}
+
+//----------------------------------------------------------------------------
+double interactor_impl::getDeltaTime() const
+{
+  return this->Internals->CallbackDeltaTime;
 }
 
 //----------------------------------------------------------------------------
