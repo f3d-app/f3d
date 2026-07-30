@@ -350,16 +350,8 @@ bool vtkF3DMetaImporter::Update()
         }
         if (diffuseTex)
         {
-          vtkImageData* image = diffuseTex->GetInput();
-          if (image)
-          {
-            // If 1 byte per channel, the texture is usually sRGB
-            if (image->GetScalarSize() == 1)
-            {
-              diffuseTex->UseSRGBColorSpaceOn();
-            }
-            diffuseTex->SetColorModeToDirectScalars();
-          }
+          diffuseTex->UseSRGBColorSpaceOn();
+          diffuseTex->SetColorModeToDirectScalars();
         }
 
         if (actor->GetProperty()->GetLighting())

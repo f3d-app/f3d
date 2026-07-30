@@ -2,6 +2,7 @@
 f3d_test(NAME TestPLY DATA suzanne.ply)
 f3d_test(NAME TestOBJ DATA world.obj)
 f3d_test(NAME TestOBJUnlit DATA cube_unlit.obj)
+f3d_test(NAME TestOBJ16bits DATA cube_16bits.obj)
 f3d_test(NAME TestSTL DATA suzanne.stl)
 f3d_test(NAME TestVTICell DATA waveletMaterial.vti ARGS -s --coloring-array=Material -c --roughness=1)
 f3d_test(NAME TestVTU DATA dragon.vtu)
