@@ -403,11 +403,9 @@ extern "C"
     {
       GetEngine(env, self)->getScene().setNodeVisibility(nodeId, visible);
     }
-    catch (const std::exception& e)
+    catch (const f3d::scene::node_exception& e)
     {
-      jclass exceptionClass = env->FindClass("java/lang/RuntimeException");
-      env->ThrowNew(exceptionClass, e.what());
-      return nullptr;
+      F3DThrowJavaException(env, "app/f3d/F3D/Scene$NodeException", e.what());
     }
     return self;
   }

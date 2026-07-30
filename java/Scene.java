@@ -14,6 +14,11 @@ public class Scene {
         public LightException(String message) { super(message); }
     }
 
+    /** Thrown when a scene hierarchy node operation fails (e.g. invalid index). */
+    public static class NodeException extends F3DException {
+        public NodeException(String message) { super(message); }
+    }
+
     public Scene(long nativeAddress) {
         mNativeAddress = nativeAddress;
     }

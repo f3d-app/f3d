@@ -105,31 +105,6 @@ public class Types {
 
         public NodeState() {
         }
-
-        public NodeState(int id, int parentId, int level, String label, boolean visible,
-                         boolean hasChildren, boolean collapsed) {
-            this.id = id;
-            this.parentId = parentId;
-            this.level = level;
-            this.label = label;
-            this.visible = visible;
-            this.hasChildren = hasChildren;
-            this.collapsed = collapsed;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (obj == null || getClass() != obj.getClass()) return false;
-            NodeState other = (NodeState) obj;
-            return id == other.id &&
-                   parentId == other.parentId &&
-                   level == other.level &&
-                   java.util.Objects.equals(label, other.label) &&
-                   visible == other.visible &&
-                   hasChildren == other.hasChildren &&
-                   collapsed == other.collapsed;
-        }
     }
 
     /**

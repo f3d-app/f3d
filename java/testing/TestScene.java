@@ -108,14 +108,11 @@ public class TestScene {
       throw new RuntimeException("a cleared scene should have an empty scene hierarchy");
     }
 
-    boolean emptyHierarchyFailed = false;
     try {
       scene.setNodeVisibility(0, false);
-    } catch (RuntimeException e) {
-      emptyHierarchyFailed = true;
-    }
-    if (!emptyHierarchyFailed) {
-      throw new RuntimeException("setting node visibility should fail with an empty scene hierarchy");
+      throw new RuntimeException(
+          "Expected Scene.NodeException was not thrown with an empty scene hierarchy");
+    } catch (Scene.NodeException e) {
     }
 
     scene.add(sphere);
@@ -151,14 +148,11 @@ public class TestScene {
       }
     }
 
-    boolean outOfRangeFailed = false;
     try {
       scene.setNodeVisibility(hierarchy.size(), false);
-    } catch (RuntimeException e) {
-      outOfRangeFailed = true;
-    }
-    if (!outOfRangeFailed) {
-      throw new RuntimeException("setting node visibility should fail with an out of range index");
+      throw new RuntimeException(
+          "Expected Scene.NodeException was not thrown with an out of range index");
+    } catch (Scene.NodeException e) {
     }
 
     engine.close();

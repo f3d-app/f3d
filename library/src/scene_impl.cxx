@@ -15,6 +15,7 @@
 #include "vtkF3DRenderer.h"
 
 #include <algorithm>
+#include <iterator>
 #include <optional>
 #include <vtkCallbackCommand.h>
 #include <vtkCellArray.h>
@@ -874,11 +875,12 @@ std::vector<node_state_t> scene_impl::getSceneHierarchy() const
 
   std::vector<node_state_t> nodeStates;
   nodeStates.reserve(hierarchy.size());
-  for (const vtkF3DMetaImporter::NodeInfo& node : hierarchy)
-  {
-    nodeStates.emplace_back(node_state_t{ node.Id, node.ParentId, node.Level, node.Label,
-      node.Visible, node.HasChildren, node.Collapsed });
-  }
+  std::ranges::transform(hierarchy, std::back_inserter(nodeStates),
+    [](const vtkF3DMetaImporter::NodeInfo& node)
+    {
+      return node_state_t{ node.Id, node.ParentId, node.Level, node.Label, node.Visible,
+        node.HasChildren, node.Collapsed };
+    });
   return nodeStates;
 }
 
