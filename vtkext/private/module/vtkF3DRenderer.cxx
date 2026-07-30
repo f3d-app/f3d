@@ -99,7 +99,6 @@
 #include <vtkOSPRayRendererNode.h>
 #endif
 
-#include <algorithm>
 #include <cctype>
 #include <chrono>
 #include <cmath>
@@ -113,7 +112,7 @@ constexpr double ScalarBarPositionX = 0.1;
 constexpr double ScalarBarPositionY = 0.01;
 constexpr double ScalarBarHeight = 0.07;
 
-// Expand nearly degenerate automatic ranges to val ± epsilon; skip user ranges.
+// Expand nearly degenerate automatic ranges to val +/- epsilon
 constexpr double DegenerateColoringRangeEpsilon = 1e-4;
 
 std::string DeprecatedCollapsePath(const fs::path& path)
@@ -3605,9 +3604,8 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
     const double width = std::abs(this->ColorRange[1] - this->ColorRange[0]);
     if (width < ::DegenerateColoringRangeEpsilon)
     {
-      const double val = 0.5 * (this->ColorRange[0] + this->ColorRange[1]);
-      this->ColorRange[0] = val - ::DegenerateColoringRangeEpsilon;
-      this->ColorRange[1] = val + ::DegenerateColoringRangeEpsilon;
+      this->ColorRange[0] -= ::DegenerateColoringRangeEpsilon;
+      this->ColorRange[1] += ::DegenerateColoringRangeEpsilon;
     }
   }
 
