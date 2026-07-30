@@ -372,12 +372,26 @@ struct F3D_EXPORT light_state_t
  */
 struct F3D_EXPORT node_state_t
 {
+  /// Identifier of the node, to be used with scene::setNodeVisibility
   int id = -1;
+
+  /// Identifier of the parent node, -1 when the node is a root node
   int parentId = -1;
+
+  /// Depth of the node, 0 for a root node, can be used to indent it
   int level = 0;
+
+  /// Name of the node, a placeholder is used when the file does not provide any
   std::string label;
+
+  /// Visibility of the node
   bool visible = true;
+
+  /// True if the node has at least one child
   bool hasChildren = false;
+
+  /// True if a user interface should display this node collapsed by default, which is used to
+  /// compact subtrees whose nodes do not carry any meaningful name
   bool collapsed = false;
 
   [[nodiscard]] bool operator==(const node_state_t& other) const
