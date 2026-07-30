@@ -372,7 +372,11 @@ struct F3D_EXPORT light_state_t
  */
 struct F3D_EXPORT node_state_t
 {
-  /// Identifier of the node, to be used with scene::setNodeVisibility
+  /// Identifier of the node, to be used with scene::setNodeVisibility.
+  /// Ids are assigned in depth-first pre-order, starting at 0 with the root node of the first
+  /// added file, and correspond to the index of the node in the vector returned by
+  /// scene::getSceneHierarchy. They are only invalidated by scene::clear, as adding files to the
+  /// scene only appends nodes.
   int id = -1;
 
   /// Identifier of the parent node, -1 when the node is a root node
