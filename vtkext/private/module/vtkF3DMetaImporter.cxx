@@ -351,6 +351,7 @@ bool vtkF3DMetaImporter::Update()
         if (diffuseTex)
         {
           diffuseTex->UseSRGBColorSpaceOn();
+          diffuseTex->SetColorModeToDirectScalars();
         }
 
         if (actor->GetProperty()->GetLighting())
