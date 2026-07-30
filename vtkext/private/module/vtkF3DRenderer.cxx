@@ -277,7 +277,6 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
 void vtkF3DRenderer::Initialize()
 {
   this->OriginalLightIntensities.clear();
-  this->OriginalBackfaceCulling.clear();
   this->RemoveAllViewProps();
   this->RemoveAllLights();
 
@@ -2623,6 +2622,20 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 
   for (const auto& coloring : this->Importer->GetColoringActorsAndMappers())
   {
+    vtkProperty* prop = coloring.Actor->GetProperty();
+    vtkProperty* origProp = coloring.OriginalActor->GetProperty();
+
+    if (setBackfaceCulling)
+    {
+      prop->SetBackfaceCulling(backfaceCulling);
+      origProp->SetBackfaceCulling(backfaceCulling);
+    }
+    else
+    {
+      prop->SetBackfaceCulling(coloring.OriginalProperty->GetBackfaceCulling());
+      origProp->SetBackfaceCulling(coloring.OriginalProperty->GetBackfaceCulling());
+    }
+
     if (this->EdgeVisible.has_value())
     {
       coloring.Actor->GetProperty()->SetEdgeVisibility(this->EdgeVisible.value());
@@ -2639,25 +2652,6 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     {
       coloring.Actor->GetProperty()->SetPointSize(this->PointSize.value());
       coloring.OriginalActor->GetProperty()->SetPointSize(this->PointSize.value());
-    }
-    
-    vtkProperty* prop = coloring.Actor->GetProperty();
-    vtkProperty* origProp = coloring.OriginalActor->GetProperty();
-    auto it = this->OriginalBackfaceCulling.find(prop);
-    if (it == this->OriginalBackfaceCulling.end())
-    {
-      this->OriginalBackfaceCulling[prop] = (prop->GetBackfaceCulling() != 0);
-    }
-
-    if (setBackfaceCulling)
-    {
-      prop->SetBackfaceCulling(backfaceCulling);
-      origProp->SetBackfaceCulling(backfaceCulling);
-    }
-    else
-    {
-      prop->SetBackfaceCulling(this->OriginalBackfaceCulling[prop]);
-      origProp->SetBackfaceCulling(this->OriginalBackfaceCulling[prop]);
     }
 
     if (surfaceColor)

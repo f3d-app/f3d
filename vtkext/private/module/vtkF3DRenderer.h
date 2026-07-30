@@ -851,7 +851,6 @@ private:
   std::string CachePath;
 
   std::optional<std::string> BackfaceType;
-  std::map<vtkProperty*, bool> OriginalBackfaceCulling;
 
   std::optional<std::string> FinalShader;
 
