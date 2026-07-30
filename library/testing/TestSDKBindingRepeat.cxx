@@ -31,8 +31,8 @@ int TestSDKBindingRepeat([[maybe_unused]] int argc, [[maybe_unused]] char* argv[
   sce.add(dataPath);
   win.render();
 
-  inter.removeBinding({ mod_t::CTRL, "P" });
-  inter.addBinding({ mod_t::CTRL, "P" }, "increase model.color.opacity", {}, nullptr,
+  inter.removeBinding({ mod_t::SHIFT, "P" });
+  inter.addBinding({ mod_t::SHIFT, "P" }, "decrease model.color.opacity", {}, nullptr,
     f3d::interactor::BindingType::NUMERICAL, true, false);
 
   std::string filename = "TestSDKBindingRepeatOff";
@@ -42,8 +42,8 @@ int TestSDKBindingRepeat([[maybe_unused]] int argc, [[maybe_unused]] char* argv[
   test("trigger binding no repeat",
     TestSDKHelpers::RenderTest(win, baselinePath, outputPath, "TestSDKBindingRepeatOff"));
 
-  inter.removeBinding({ mod_t::CTRL, "P" });
-  inter.addBinding({ mod_t::CTRL, "P" }, "increase model.color.opacity", {}, nullptr,
+  inter.removeBinding({ mod_t::SHIFT, "P" });
+  inter.addBinding({ mod_t::SHIFT, "P" }, "decrease model.color.opacity", {}, nullptr,
     f3d::interactor::BindingType::NUMERICAL, true, true);
 
   // Uses a different file to add extra interaction as the render state will already have the axis
