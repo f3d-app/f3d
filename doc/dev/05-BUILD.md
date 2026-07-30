@@ -34,6 +34,8 @@ F3D is tested continuously against versions recommended by the [VFX reference pl
 
 As stated in the dependencies, F3D is compatible with VTK >= 9.4.0, however, some features may not be available. We suggest using VTK 9.6.2 with RenderingRayTracing, IOExodus, IOHDF, IONetCDF, IOPDAL and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
 
+> NOTE: When VTK is compiled for GLES (usually the case for Android and WebAssembly only), F3D is only compatible with the VTK version specified in `.github/workflows/versions.json` file.
+
 ## Configuration and building
 
 Configure and generate the project with CMake,
@@ -71,6 +73,9 @@ Some modules, plugins and language bindings depending on external libraries can 
 - `F3D_BINDINGS_C`: Generate C bindings. Disabled by default.
 
 Some dependencies are provided internally, eg: ImGui, dmon and others. Use `F3D_USE_EXTERNAL_*` to use an external version of these libraries.
+
+VTK can be built with OpenGL ES support, which is mostly the case when targeting mobile or web platforms.
+The CMake variable `F3D_USE_GLES` is automatically defined accordingly and reported during the configuration step.
 
 ## Building for contribution
 

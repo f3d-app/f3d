@@ -16,11 +16,10 @@ int TestF3DRenderPass(int argc, char* argv[])
   pass->Print(std::cout);
 
   vtkNew<vtkF3DTAAPass> taaP;
-  taaP->SetDelegatePass(pass);
   taaP->Print(std::cout);
 
   vtkNew<vtkF3DHexagonalBokehBlurPass> bokeh;
-  bokeh->SetDelegatePass(taaP);
+  bokeh->SetDelegatePass(pass);
   bokeh->Print(std::cout);
 
   bokeh->SetCircleOfConfusionRadius(30.f);

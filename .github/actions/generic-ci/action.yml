@@ -19,6 +19,10 @@ inputs:
     description: "Label to flag for minimal version dependencies"
     required: false
     default: "no-mindeps"
+  gles_label:
+    description: "Label to flag for OpenGL ES rendering option"
+    required: false
+    default: "no-gles"
   exclude_deprecated_label:
     description: "Label to control deprecated exclusion"
     required: false
@@ -83,6 +87,7 @@ runs:
         versions_file: ${{inputs.versions_file}}
         optdeps_label: ${{inputs.optdeps_label}}
         mindeps_label: ${{inputs.mindeps_label}}
+        gles_label: ${{inputs.gles_label}}
         cpu: ${{inputs.cpu}}
         vtk_version: ${{inputs.vtk_version}}
 
@@ -181,7 +186,7 @@ runs:
         -DF3D_MODULE_CLIP=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_EXR=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_WEBP=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
-        -DF3D_MODULE_RAYTRACING=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_RAYTRACING=${{ (inputs.optdeps_label == 'optdeps' && inputs.gles_label == 'no-gles') && 'ON' || 'OFF' }}
         -DF3D_MODULE_UI=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_DMON=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_TINYFILEDIALOGS=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
@@ -204,7 +209,7 @@ runs:
         -DF3D_TESTING_ENABLE_ILLUSTRATION_TESTS=${{ (runner.os == 'Linux' && inputs.vtk_version == 'commit' && inputs.build_type == 'standard') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_GLX_TESTS=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=${{ (runner.os == 'Linux' || runner.os == 'Windows') && 'ON' || 'OFF' }}
-        -DF3D_TESTING_ENABLE_OSMESA_TESTS=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_OSMESA_TESTS=${{ (inputs.optdeps_label == 'optdeps' && inputs.gles_label == 'no-gles') && 'ON' || 'OFF' }}
         -DF3D_TESTING_DISABLE_CATCH_ALL=ON
         -DF3D_TESTING_FORCE_RENDERING_BACKEND=${{ inputs.rendering_backend }}
         -DF3D_WINDOWS_BUILD_CONSOLE_APPLICATION=ON

@@ -103,6 +103,7 @@ function(f3d_test_doc)
     ${_f3d_test_doc_ui}
     ARGS ${_f3d_test_doc_args}
     LONG_TIMEOUT
+    SKIP_GLES
     LABELS doc
   )
 endfunction()
