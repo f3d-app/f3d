@@ -1123,7 +1123,7 @@ When using HDRI related options, F3D will create and use a cache directory to st
 
 F3D also stores the geometry of the last closed interactive window in a `window.json` cache file, in the same directory, so that it can be restored on the next start, see `--resolution` and `--position`.
 
-These cache files can be safely removed, at the cost of recomputing the HDRI data on next use and of losing the remembered window geometry.
+These cache files can be safely removed, at the cost of recomputing the HDRI data on next use and of losing the cached window geometry.
 
 The cache directory location is as follows, in order, using the first defined environment variables:
 
