@@ -20,6 +20,10 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   importer->SetRenderWindow(window);
   renderer->SetImporter(importer);
 
+  // coverage for DPI change
+  renderer->Initialize();
+  window->SetDPI(144);
+
   // Check invalid bounding box code path
   renderer->ShowGrid(true);
   renderer->UpdateActors();
@@ -85,9 +89,6 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   vtkNew<vtkF3DInteractorStyle> style;
   interactor->SetInteractorStyle(style);
   renderer->SetInteractionStyle("invalid");
-
-  // Cover DPI change code path
-  window->SetDPI(144);
 
   return EXIT_SUCCESS;
 }

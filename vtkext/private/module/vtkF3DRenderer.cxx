@@ -1560,6 +1560,8 @@ double vtkF3DRenderer::GetDPIScale()
 
   if (this->DPIAware && this->GetRenderWindow()->DetectDPI())
   {
+    // In the CI, DetectDPI() returns 0, even if .Xresources contains Xft.dpi
+    // xvfb seems to ignore it, so we cannot cover this line
     return static_cast<double>(this->GetRenderWindow()->GetDPI()) / baseDPI; // LCOV_EXCL_LINE
   }
   return 1.0;
