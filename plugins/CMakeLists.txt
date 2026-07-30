@@ -1,5 +1,5 @@
 option(F3D_PLUGIN_BUILD_ALEMBIC "Alembic plugin (ABC files)" OFF)
-option(F3D_PLUGIN_BUILD_ASSIMP "Assimp plugin (FBX, OFF, DAE, DXF, X and 3MF files)" OFF)
+option(F3D_PLUGIN_BUILD_ASSIMP "Assimp plugin (FBX, OFF, DAE, DXF, X, 3MF and AMF files)" OFF)
 option(F3D_PLUGIN_BUILD_DRACO "Draco plugin (DRC files)" OFF)
 option(F3D_PLUGIN_BUILD_HDF "HDF plugin (VTKHDF and EX2 files)" ON)
 option(F3D_PLUGIN_BUILD_OCCT "OpenCASCADE plugin (STEP and IGES files)" OFF)

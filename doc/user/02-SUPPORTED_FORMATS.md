@@ -42,6 +42,7 @@ F3D supports the following file formats:
 | Drawing Exchange Format                   | `.dxf`                                         | Yes        | NONE              | YES (VTK 9.6)     | `assimp`  | `DXF`                   |
 | DirectX                                   | `.x`                                           | Yes        | MULTI             | YES (VTK 9.6)     | `assimp`  | `DirectX`               |
 | 3D Manufacturing Format                   | `.3mf`                                         | Yes        | NONE              | YES (VTK 9.6)     | `assimp`  | `3MF`                   |
+| Additive Manufacturing Format             | `.amf`                                         | Yes        | NONE              | YES (VTK 9.6)     | `assimp`  | `AMF`                   |
 | Universal Scene Description               | `.usd`, `.usda`, `.usdc`, `.usdz`              | Yes        | SINGLE            | YES (VTK 9.6)     | `usd`     | `USD`                   |
 | VDB                                       | `.vdb`                                         | No         | NONE              | YES (VTK 9.6)     | `vdb`     | `VDB`                   |
 | Industry Foundation Classes               | `.ifc`                                         | No         | NONE              | YES               | `webifc`  | `IFC`                   |

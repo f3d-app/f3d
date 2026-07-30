@@ -29,7 +29,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251016)
   set(_has_supports_stream 1)
 endif()
 
-set(_assimp_formats "fbx;dae;dxf;off;x;3mf")
+set(_assimp_formats "fbx;dae;dxf;off;x;3mf;amf")
 foreach(_assimp_format IN LISTS _assimp_formats)
   configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/assimp.inl.in"
@@ -104,6 +104,17 @@ f3d_plugin_declare_reader(
   ${_SUPPORTS_STREAM}
   CAN_READ CUSTOM
   CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/3mf.inl"
+)
+
+f3d_plugin_declare_reader(
+  NAME AMF
+  EXTENSIONS amf
+  MIMETYPES application/x-amf
+  VTK_IMPORTER vtkF3DAssimpImporter
+  FORMAT_DESCRIPTION "Additive Manufacturing Format"
+  ${_SUPPORTS_STREAM}
+  CAN_READ CUSTOM
+  CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/amf.inl"
 )
 
 set(rpaths "")

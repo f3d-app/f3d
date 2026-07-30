@@ -375,6 +375,7 @@ bool vtkF3DMetaImporter::Update()
             actor->SetTexture(nullptr);
             actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
             actor->GetProperty()->SetBaseColorTexture(diffuseTex);
+            actor->GetProperty()->SetTexture("diffuseTex", nullptr);
           }
         }
       }

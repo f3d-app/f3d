@@ -60,7 +60,7 @@ Some modules, plugins and language bindings depending on external libraries can 
 - `F3D_MODULE_CLIP`: Support for clipboard interaction in libf3d, used by `engine::state` and by the application to save/load statefiles to/from the system clipboard. Uses provided clip. Enabled by default.
 - `F3D_PLUGIN_BUILD_HDF`: Support for VTKHDF (.vtkhdf), ExodusII (.ex2), and NetCDF (.nc) file formats. Requires that VTK has been built with `IOHDF`, `IOExodus`, and `IONetCDF` modules (and `hdf5`). Enabled by default.
 - `F3D_PLUGIN_BUILD_OCCT`: Support for STEP, IGES, BREP, and XBF file formats. Requires `OpenCASCADE`. Disabled by default.
-- `F3D_PLUGIN_BUILD_ASSIMP`: Support for FBX, DAE, OFF, DXF, X and 3MF file formats. Requires `Assimp`. Disabled by default.
+- `F3D_PLUGIN_BUILD_ASSIMP`: Support for FBX, DAE, OFF, DXF, X, 3MF and AMF file formats. Requires `Assimp`. Disabled by default.
 - `F3D_PLUGIN_BUILD_ALEMBIC`: Support for ABC file format. Requires `Alembic`. Disabled by default.
 - `F3D_PLUGIN_BUILD_DRACO`: Support for DRC file format. Requires `Draco`. Disabled by default.
 - `F3D_PLUGIN_BUILD_USD`: Support for USD file format. Requires `OpenUSD`. Disabled by default.
