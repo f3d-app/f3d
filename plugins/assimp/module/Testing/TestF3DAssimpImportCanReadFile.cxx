@@ -52,5 +52,6 @@ int TestF3DAssimpImportCanReadFile(int vtkNotUsed(argc), char* argv[])
   result &= ::TestCanReadFile(std::string(argv[1]) + "data/PinkEggFromLW.dxf", "dxf");
   result &= ::TestCanReadFile(std::string(argv[1]) + "data/teapot.off", "off");
   result &= !::TestCanReadFile(std::string(argv[1]) + "data/f3d.vtp", "");
+  result &= !::TestCanReadFile(std::string(argv[1]) + "data/generic.xml", "");
   return result ? EXIT_SUCCESS : EXIT_FAILURE;
 }
