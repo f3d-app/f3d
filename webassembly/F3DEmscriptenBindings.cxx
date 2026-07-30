@@ -378,9 +378,11 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("render", &f3d::window::render)
     .function("renderToImage", &f3d::window::renderToImage)
     .function("setSize", &f3d::window::setSize, emscripten::return_value_policy::reference())
-    .function(
-      "getSize",
-      +[](const f3d::window& win) -> emscripten::val { return pairToJSArray(win.getSize()); })
+    .property(
+      "size",
+      +[](const f3d::window& win) -> emscripten::val { return pairToJSArray(win.getSize()); },
+      +[](f3d::window& win, emscripten::val jsArray)
+      { win.setSize(jsArray[0].as<int>(), jsArray[1].as<int>()); })
     .property("width", &f3d::window::getWidth)
     .property("height", &f3d::window::getHeight)
     .function(
@@ -545,12 +547,10 @@ EMSCRIPTEN_BINDINGS(f3d)
     .class_function(
       "create", +[]() { return f3d::engine::createWasm(); },
       emscripten::return_value_policy::take_ownership())
-    .function(
-      "setCachePath", +[](f3d::engine& engine, const std::string& path) -> f3d::engine&
-      { return engine.setCachePath(path); }, emscripten::return_value_policy::reference())
-    .function(
-      "getCachePath",
-      +[](const f3d::engine& engine) -> std::string { return engine.getCachePath().string(); })
+    .property(
+      "cachePath",
+      +[](const f3d::engine& engine) -> std::string { return engine.getCachePath().string(); },
+      +[](f3d::engine& engine, const std::string& path) { engine.setCachePath(path); })
     .function("setOptions",
       static_cast<f3d::engine& (f3d::engine::*)(const f3d::options&)>(&f3d::engine::setOptions),
       emscripten::return_value_policy::reference())

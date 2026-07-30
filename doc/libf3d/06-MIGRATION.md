@@ -67,3 +67,9 @@ The following Python setter methods have been removed in favor of new properties
 
 - `window.set_position(x, y)` -> `window.position = (x, y)`
 - `engine.set_cache_path(path)` -> `engine.cache_path = path`
+
+## WebAssembly properties
+
+The following WebAssembly methods have been removed in favor of new properties, which can also be read.
+
+- `engine.setCachePath(path)` -> `engine.cachePath = path`

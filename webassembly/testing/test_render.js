@@ -46,19 +46,19 @@ const settings = {
     );
 
     utils.assert(
-      utils.numArrayEquals(window.getSize(), [window.width, window.height], 0),
-      "getSize should return {width, height}",
+      utils.numArrayEquals(window.size, [window.width, window.height], 0),
+      "size should return {width, height}",
     );
 
-    Module.engineInstance.setCachePath("/tmp");
+    Module.engineInstance.cachePath = "/tmp";
 
     utils.assert(
       window.getDPIScale() >= 1.0,
       "DPI scale value unexpected: " + window.getDPIScale(),
     );
     utils.assert(
-      Module.engineInstance.getCachePath() === "/tmp",
-      "getCachePath should return the path set with setCachePath",
+      Module.engineInstance.cachePath === "/tmp",
+      "cachePath should return the path it was set to",
     );
   },
 };
