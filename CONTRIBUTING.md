@@ -108,7 +108,8 @@ Please add only the labels required to work on your feature, in order to avoid u
 
 F3D continuous integration will also check the coverage as it is a good way to evaluate if new features are being tested or not.
 When adding code to F3D, always try to cover it by adding/modifying [tests](doc/dev/06-TESTING.md).
-Only if no coverage is possible, use `// LCOV_EXCL_START` and `// LCOV_EXCL_STOP` comments to exclude unreachable lines.
+Only if no coverage is possible, use `// LCOV_EXCL_START` and `// LCOV_EXCL_STOP` comments to exclude unreachable lines,
+and add another comment to explain why it cannot be reached by the coverage CI.
 
 F3D continuous integration also checks formatting using clang-format and other tools and will inform you if changes needs to be made.
 Some [formatting rules](doc/dev/09-CODING_STYLE.md) are not enforced by clang-format and will be checked during the review process.

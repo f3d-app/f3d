@@ -2260,6 +2260,7 @@ void F3DStarter::SaveStatefile(const std::string& filenameTemplate)
     std::optional<std::string> file = f3d::utils::getEnv("CTEST_SAVE_STATEFILE_DIALOG_FILE");
     if (!file.has_value())
     {
+      // We cannot test dialogs in the CI
       // LCOV_EXCL_START
       const char* pattern = "*.json";
       char* ptr =
@@ -2359,6 +2360,7 @@ void F3DStarter::LoadStatefile(const std::string& source)
     std::optional<std::string> file = f3d::utils::getEnv("CTEST_LOAD_STATEFILE_DIALOG_FILE");
     if (!file.has_value())
     {
+      // We cannot test dialogs in the CI
       // LCOV_EXCL_START
       const char* pattern = "*.json";
       char* ptr =
