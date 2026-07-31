@@ -87,11 +87,8 @@ public:
     {
 #ifdef F3D_MODULE_OPENXR
       this->VTKInteractor = vtkSmartPointer<vtkOpenXRRenderWindowInteractor>::New();
-      vtkOpenXRRenderWindowInteractor* xrInteractor =
-        vtkOpenXRRenderWindowInteractor::SafeDownCast(this->VTKInteractor);
-      xrInteractor->SetActionManifestDirectory("./share/f3d/xr_actions_manifests/");
 #else
-      assert(false);
+      assert(false); // unreachable
 #endif
     }
     else if (type == window::Type::GLX || type == window::Type::WGL ||
