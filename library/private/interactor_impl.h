@@ -113,7 +113,7 @@ public:
   void ResetTemporaryUp();
 
   /**
-   * Set the directory for Xr resources
+   * Set the directory for XR resources
    * Implementation only API.
    */
   void SetXRResourcesDirectory(const std::string& actionsManifestDirectory);
