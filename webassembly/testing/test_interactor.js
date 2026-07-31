@@ -97,8 +97,7 @@ const settings = {
       return true;
     });
 
-    // TODO: remove "binding"
-    interactor.triggerNotification("Test notification", "value", "binding", 1.0);
+    interactor.triggerNotification("Test notification", "value", 1.0);
     utils.assert(notifCount === 1, "notification callback not called");
 
     // only for coverage, do not test the actual feature yet
