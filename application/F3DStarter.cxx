@@ -1246,10 +1246,6 @@ public:
 
   fs::path WindowGeometryCachePath() const
   {
-    if (!this->Engine)
-    {
-      return {};
-    }
     const fs::path cacheDir = this->Engine->getCachePath();
     return cacheDir.empty() ? fs::path() : cacheDir / "window.json";
   }
@@ -1287,11 +1283,6 @@ public:
     catch (const nlohmann::json::exception& ex)
     {
       f3d::log::debug("Could not parse the cached window geometry: ", ex.what());
-      geometry.clear();
-    }
-    catch (const fs::filesystem_error& ex)
-    {
-      f3d::log::debug("Could not read the cached window geometry: ", ex.what());
       geometry.clear();
     }
     return geometry;
