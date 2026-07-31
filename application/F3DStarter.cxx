@@ -1090,12 +1090,14 @@ public:
       f3d::window& window = this->Engine->getWindow();
       if (this->AppOptions.Resolution.size() == 2)
       {
-        double dpiScale = window.getDPIScale();
+        const double dpiScale = window.getDPIScale();
+        const int width = static_cast<int>(this->AppOptions.Resolution[0] * dpiScale);
+        const int height = static_cast<int>(this->AppOptions.Resolution[1] * dpiScale);
 
-        f3d::log::debug("DPI scale: ", dpiScale);
+        f3d::log::debug(
+          "Applying window resolution ", width, "x", height, " with a DPI scale of ", dpiScale);
 
-        window.setSize(static_cast<int>(this->AppOptions.Resolution[0] * dpiScale),
-          static_cast<int>(this->AppOptions.Resolution[1] * dpiScale));
+        window.setSize(width, height);
       }
       else if (!this->AppOptions.Resolution.empty())
       {
@@ -1268,7 +1270,11 @@ public:
       {
         return geometry;
       }
-      const nlohmann::ordered_json root = nlohmann::ordered_json::parse(stream);
+
+      std::stringstream buffer;
+      buffer << stream.rdbuf();
+
+      const nlohmann::ordered_json root = nlohmann::ordered_json::parse(buffer.str());
       if (root.contains("width") && root.contains("height"))
       {
         geometry["resolution"] =
@@ -1297,30 +1303,23 @@ public:
       return;
     }
 
-    try
+    std::ofstream stream(cachePath);
+    if (!stream.is_open())
     {
-      const f3d::window& window = this->Engine->getWindow();
-      nlohmann::ordered_json root;
-      const auto [posX, posY] = window.getPosition();
-      root["width"] = window.getWidth();
-      root["height"] = window.getHeight();
-      root["left"] = posX;
-      root["top"] = posY;
+      f3d::log::debug("Could not open ", cachePath.string(), " to cache the window geometry");
+      return;
+    }
 
-      fs::create_directories(cachePath.parent_path());
-      std::ofstream stream(cachePath);
-      if (!stream.is_open())
-      {
-        f3d::log::debug("Could not open ", cachePath.string(), " to cache the window geometry");
-        return;
-      }
-      stream << root.dump(2);
-      f3d::log::debug("Window geometry cached in ", cachePath.string());
-    }
-    catch (const fs::filesystem_error& ex)
-    {
-      f3d::log::debug("Could not cache the window geometry: ", ex.what());
-    }
+    const f3d::window& window = this->Engine->getWindow();
+    nlohmann::ordered_json root;
+    const auto [posX, posY] = window.getPosition();
+    root["width"] = window.getWidth();
+    root["height"] = window.getHeight();
+    root["left"] = posX;
+    root["top"] = posY;
+
+    stream << root.dump(2);
+    f3d::log::debug("Window geometry cached in ", cachePath.string());
   }
 
   F3DOptionsTools::OptionsEntries CachedOptionsEntries;

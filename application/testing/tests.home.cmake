@@ -43,6 +43,26 @@ if(NOT WIN32)
     # Setting XDG_CACHE_HOME is needed for cache to work when HOME is not set
     f3d_test(NAME TestNoHOMEScreenshot DATA suzanne.ply ARGS --screenshot-filename=TestNoHOMEScreenshot.png --interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/TestScreenshot.log  REGEXP "saving screenshot to ${CMAKE_BINARY_DIR}/application/testing/TestNoHOMEScreenshot.png" NO_BASELINE ENV "XDG_CACHE_HOME=${CMAKE_BINARY_DIR};HOME=")
     f3d_test(NAME TestNoHOMEConfig DATA suzanne.ply CONFIG config_build REGEXP "Using config directory ${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d" NO_RENDER NO_BASELINE ENV "XDG_CACHE_HOME=${CMAKE_BINARY_DIR};HOME=")
+
+    set(_geometry_cache "${CMAKE_BINARY_DIR}/Testing/Temporary/window_geometry_cache")
+    file(WRITE "${_geometry_cache}/f3d/window.json" "{\"width\": 250, \"height\": 150, \"left\": 42, \"top\": 24}")
+
+    if(F3D_TESTING_ENABLE_RENDERING_TESTS)
+      # This uses add_test directly because f3d_test always injects a resolution, which takes
+      # precedence over the cached one
+      add_test(NAME f3d::TestWindowGeometryRestore COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/cow.vtp --no-config --verbose=debug --list-bindings)
+      set_tests_properties(f3d::TestWindowGeometryRestore PROPERTIES
+        PASS_REGULAR_EXPRESSION "Applying window resolution 250x150"
+        ENVIRONMENT "XDG_CACHE_HOME=${_geometry_cache};CTEST_F3D_FORCE_DPI_SCALE=1.0")
+    endif()
+
+    # A cache file that cannot be read is ignored, a directory is used to make it unreadable
+    set(_unreadable_geometry_cache "${CMAKE_BINARY_DIR}/Testing/Temporary/unreadable_window_geometry_cache")
+    file(MAKE_DIRECTORY "${_unreadable_geometry_cache}/f3d/window.json")
+    f3d_test(NAME TestWindowGeometryUnreadableCache DATA cow.vtp NO_BASELINE NO_OUTPUT ARGS --verbose=debug --list-bindings REGEXP "Could not parse the cached window geometry" ENV "XDG_CACHE_HOME=${_unreadable_geometry_cache}")
+
+    # Without any cache directory, there is no geometry to restore
+    f3d_test(NAME TestWindowGeometryNoCachePath DATA cow.vtp NO_BASELINE NO_OUTPUT ARGS --verbose=debug --list-bindings REGEXP_FAIL "Recovered window" ENV "XDG_CACHE_HOME=;HOME=")
   endif()
 
 else()

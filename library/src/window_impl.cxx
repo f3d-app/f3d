@@ -325,6 +325,7 @@ std::pair<int, int> window_impl::getSize() const
 //----------------------------------------------------------------------------
 window& window_impl::setPosition(int x, int y)
 {
+#ifdef __APPLE__
   if (this->Internals->RenWin->IsA("vtkCocoaRenderWindow"))
   {
     // vtkCocoaRenderWindow has a different behavior than other render windows
@@ -332,11 +333,10 @@ window& window_impl::setPosition(int x, int y)
     const int* screenSize = this->Internals->RenWin->GetScreenSize();
     const int* winSize = this->Internals->RenWin->GetSize();
     this->Internals->RenWin->SetPosition(x, screenSize[1] - winSize[1] - y);
+    return *this;
   }
-  else
-  {
-    this->Internals->RenWin->SetPosition(x, y);
-  }
+#endif
+  this->Internals->RenWin->SetPosition(x, y);
   return *this;
 }
 
@@ -356,6 +356,7 @@ std::pair<int, int> window_impl::getPosition() const
   }
 #endif
   const int* pos = this->Internals->RenWin->GetPosition();
+#ifdef __APPLE__
   if (this->Internals->RenWin->IsA("vtkCocoaRenderWindow"))
   {
     // vtkCocoaRenderWindow positions are expressed from the bottom left of the screen, convert
@@ -364,6 +365,7 @@ std::pair<int, int> window_impl::getPosition() const
     const int* winSize = this->Internals->RenWin->GetSize();
     return { pos[0], screenSize[1] - winSize[1] - pos[1] };
   }
+#endif
   return { pos[0], pos[1] };
 }
 
