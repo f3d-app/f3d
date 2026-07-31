@@ -216,7 +216,7 @@ extern "C"
    * @param group Optional group name (can be NULL).
    * @param type Optional binding type.
    * @param notify Notify when the binding is triggered.
-   * @param repeat Binding is continuously applied when holding down the key.
+   * @param repeat Binding is repeatedly applied when holding down the key.
    */
   F3D_EXPORT void f3d_interactor_add_binding(f3d_interactor_t* interactor,
     const f3d_interaction_bind_t* bind, const char** commands, int command_count, const char* group,
