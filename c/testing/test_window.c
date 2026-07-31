@@ -21,6 +21,14 @@ int test_window()
     return 1;
   }
 
+  double dpi_scale = f3d_window_get_dpi_scale(window);
+  if (dpi_scale < 1.0)
+  {
+    puts("[ERROR] DPI scale value unexpected");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
   f3d_window_type_t type = f3d_window_get_type(window);
   (void)type;
 

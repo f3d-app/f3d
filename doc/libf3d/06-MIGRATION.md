@@ -56,3 +56,7 @@ The `ui.animation_progress` option (CLI `--animation-progress`) was a boolean to
 
 The function `f3d::context::getSymbol` function is now expecting a library full path or a filename.
 The library prefix and extension is not appended automatically anymore.
+
+## DPI scaling
+
+`f3d::window::getDPIScale()` should now be used instead of the static `f3d::utils::getDPIScale()` API to get the DPI scaling value.

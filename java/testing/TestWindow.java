@@ -27,6 +27,11 @@ public class TestWindow {
 
     window.render();
 
+    double dpiScale = window.getDPIScale();
+    if (dpiScale < 1.0) {
+      throw new RuntimeException("DPI scale value unexpected: " + dpiScale);
+    }
+
     Image img = window.renderToImage(true);
     img.getWidth();
     img.getHeight();
