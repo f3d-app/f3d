@@ -68,7 +68,6 @@ public:
   /**
    * Create a XR context function.
    * This is usually required when using a XR context.
-   * Only supported on Linux, Windows.
    * Throw a loading_exception if it fails.
    */
   [[nodiscard]] static function xr();
