@@ -531,7 +531,7 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(
       {
         // automatically added with GLES
 #ifdef F3D_USE_GLES
-        customDecl += "uniform mediump isampler2D joints;\n"
+        customDecl += "uniform mediump usampler2D joints;\n"
                       "uniform mediump sampler2D weights;\n";
 #else
         customDecl += "in vec4 joints;\n"
@@ -540,7 +540,7 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(
 
 #ifdef F3D_USE_GLES
         beginImpl += "  vec4 currentWeight = texelFetchBuffer(weights, pointId);\n"
-                     "  ivec4 currentJoints = texelFetchBuffer(joints, pointId);\n";
+                     "  uvec4 currentJoints = texelFetchBuffer(joints, pointId);\n";
 #else
         beginImpl += "  vec4 currentWeight = weights;\n"
                      "  ivec4 currentJoints = ivec4(joints);\n";
@@ -690,7 +690,7 @@ bool vtkF3DRenderPass::PostReplaceShaderValues([[maybe_unused]] std::string& ver
         // clang-format off
         replacementLines +=
           "  vec4 currentWeight" + index + " = texelFetchBuffer(weights, p" + index + ");\n"
-          "  ivec4 currentJoints" + index + " = texelFetchBuffer(joints, p" + index + ");\n"
+          "  uvec4 currentJoints" + index + " = texelFetchBuffer(joints, p" + index + ");\n"
           "  mat4 skinMat" + index + " = currentWeight" + index + ".x * jointMatrices[currentJoints" + index + ".x]\n"
           "             + currentWeight" + index + ".y * jointMatrices[currentJoints" + index + ".y]\n"
           "             + currentWeight" + index + ".z * jointMatrices[currentJoints" + index + ".z]\n"
