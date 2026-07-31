@@ -234,10 +234,11 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
 
   this->Internals->Camera = std::make_unique<detail::camera_impl>();
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
-  this->Initialize();
 
   this->Internals->Renderer->SetConsoleBadgeEnabled(
     !offscreen || utils::getEnv("CTEST_F3D_CONSOLE_BADGE").has_value());
+
+  this->Initialize();
 
   log::debug("VTK window class type is ", this->Internals->RenWin->GetClassName());
 }
@@ -689,8 +690,9 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->SetGridUnitSquare(opt.render.grid.unit);
   renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
-  renderer->SetGridAbsolute(
-    this->getType() == Type::XR ? true : opt.render.grid.absolute); // In XR mode, the grid absolute
+  renderer->SetGridAbsolute(this->getType() == Type::XR
+      ? true
+      : opt.render.grid.absolute); // In XR mode, the grid is absolute
   renderer->SetGridReflection(opt.render.grid.reflection);
   renderer->ShowGrid(opt.render.grid.enable);
   renderer->SetGridColor(opt.render.grid.color);
@@ -864,27 +866,28 @@ void window_impl::SetResourcesPath(const fs::path& resourcesPath)
 
     // create directories if they do not exist
     fs::create_directories(resourcesPath);
+
+    this->Internals->ResourcesPath = resourcesPath;
+
+    if (this->getType() == Type::XR)
+    {
+#if F3D_MODULE_OPENXR
+      fs::path xrActionsManifestsFolder = this->Internals->ResourcesPath / "xr_actions_manifests";
+      if (!fs::exists(xrActionsManifestsFolder))
+      {
+        throw engine::resource_exception(
+          "XR actions manifests folder does not exist: " + xrActionsManifestsFolder.string());
+      }
+      std::string manifestsDir = xrActionsManifestsFolder.string() + fs::path::preferred_separator;
+      this->Internals->Interactor->SetXRResourcesDirectory(manifestsDir);
+    }
+#else
+      assert(false); // Unreachable
+#endif
   }
   catch (const fs::filesystem_error& ex)
   {
     throw engine::resource_exception(std::string("Could not use resources: ") + ex.what());
-  }
-
-  this->Internals->ResourcesPath = resourcesPath;
-
-  if (this->getType() == Type::XR)
-  {
-#if F3D_MODULE_OPENXR
-    fs::path xrActionsManifestsFolder = this->Internals->ResourcesPath / "xr_actions_manifests";
-    if (!fs::exists(xrActionsManifestsFolder))
-    {
-      throw engine::resource_exception(
-        "XR actions manifests folder does not exist: " + xrActionsManifestsFolder.string());
-    }
-    this->Internals->Interactor->SetXRResourcesDirectory(xrActionsManifestsFolder);
-#else
-    assert(false); // Unreachable
-#endif
   }
 }
 

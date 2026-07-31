@@ -535,7 +535,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   newPass->SetForceOpaqueBackground(this->HDRISkyboxVisible);
   newPass->SetArmatureVisible(this->ArmatureVisible);
   newPass->SetRenderReflection(this->GridVisible && this->GridReflection > 0.0);
-  newPass->SetXrMode(this->UseXR);
+  newPass->SetXRMode(this->UseXR);
 
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);

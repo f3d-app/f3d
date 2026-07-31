@@ -39,9 +39,7 @@ if (F3D_MODULE_OPENXR)
 
     install(
       DIRECTORY "${F3D_SOURCE_DIR}/resources/xr_actions_manifests/"
-      DESTINATION "${f3d_resources_dir}/xr_actions_manifests/"
-      COMPONENT sdk
-      EXCLUDE_FROM_ALL)
+      DESTINATION "${f3d_resources_dir}/xr_actions_manifests/")
   else()
     message(FATAL_ERROR "F3D_MODULE_OPENXR option is enabled but VTK::RenderingOpenXR is not found")
   endif()

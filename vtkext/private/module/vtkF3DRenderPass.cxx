@@ -225,7 +225,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   vtkNew<vtkCameraPass> bgCamP;
   bgCamP->SetDelegatePass(bgP);
 
-  this->BackgroundPass = createFramebufferPass(this->XrMode);
+  this->BackgroundPass = createFramebufferPass(this->XRMode);
   this->BackgroundPass->SetColorFormat(vtkTextureObject::Float16);
 
   if (this->UseBlurBackground)
@@ -322,7 +322,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     vtkNew<vtkCameraPass> camP;
     camP->SetDelegatePass(sequence);
 
-    this->MainPass = createFramebufferPass(this->XrMode);
+    this->MainPass = createFramebufferPass(this->XRMode);
     this->MainPass->SetColorFormat(vtkTextureObject::Float32);
 
     // Needed because VTK can pick the wrong format with certain drivers
@@ -352,7 +352,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     }
 
     // reflection baking pass, same as main pass but with reflected camera
-    this->BakeReflectionPass = createFramebufferPass(this->XrMode);
+    this->BakeReflectionPass = createFramebufferPass(this->XRMode);
     this->BakeReflectionPass->SetColorFormat(vtkTextureObject::Float16);
     this->BakeReflectionPass->SetDelegatePass(camP);
 
@@ -386,7 +386,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     vtkNew<vtkCameraPass> camP;
     camP->SetDelegatePass(sequence);
 
-    this->MainOnTopPass = createFramebufferPass(this->XrMode);
+    this->MainOnTopPass = createFramebufferPass(this->XRMode);
     this->MainOnTopPass->SetDelegatePass(camP);
 
     // Needed because VTK can pick the wrong format with certain drivers
