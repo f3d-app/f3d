@@ -175,6 +175,7 @@ public:
 
   /**
    * Set the visibility of the node at provided index and of all the nodes in its subtree.
+   * See types::node_state_t documentation for more information.
    * node_exception is thrown if the index is invalid.
    */
   virtual scene& setNodeVisibility(int nodeId, bool visible) = 0;
