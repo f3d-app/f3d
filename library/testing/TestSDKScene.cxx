@@ -160,16 +160,12 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
       hierarchy[0].id == 0 && hierarchy[0].parentId == -1 && hierarchy[0].level == 0 &&
         hierarchy[0].label == fs::path(logo).filename().string());
     test("scene hierarchy levels", [&]() {
-      for (const f3d::node_state_t& node : hierarchy)
-      {
-        const int expected = node.parentId < 0 ? 0 : hierarchy[node.parentId].level + 1;
-        if (node.level != expected)
-        {
-          return false;
-        }
-      }
-      return std::ranges::any_of(
-        hierarchy, [](const f3d::node_state_t& node) { return node.level > 0; });
+      return std::ranges::all_of(hierarchy,
+               [&](const f3d::node_state_t& node) {
+                 return node.level == (node.parentId < 0 ? 0 : hierarchy[node.parentId].level + 1);
+               }) &&
+        std::ranges::any_of(
+          hierarchy, [](const f3d::node_state_t& node) { return node.level > 0; });
     });
     test("scene hierarchy nodes are visible by default",
       std::ranges::all_of(hierarchy, [](const f3d::node_state_t& node) { return node.visible; }));

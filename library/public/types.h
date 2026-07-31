@@ -370,7 +370,7 @@ struct F3D_EXPORT light_state_t
 /**
  * Describe a single node of the scene hierarchy, as returned by scene::getSceneHierarchy.
  */
-struct F3D_EXPORT node_state_t
+struct node_state_t
 {
   /// Identifier of the node, to be used with scene::setNodeVisibility.
   /// Ids are assigned in depth-first pre-order, starting at 0 with the root node of the first
