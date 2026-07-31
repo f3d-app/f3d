@@ -97,11 +97,9 @@ const settings = {
       return true;
     });
 
-    interactor.triggerNotification("Test notification", "value", 1.0);
+    // TODO: remove "binding"
+    interactor.triggerNotification("Test notification", "value", "binding", 1.0);
     utils.assert(notifCount === 1, "notification callback not called");
-
-    //TODO: remove. It's there to detect an error in the CI.
-    utils.assert(notifCount === 3, "should assert");
 
     // only for coverage, do not test the actual feature yet
     interactor.disableCameraMovement();
