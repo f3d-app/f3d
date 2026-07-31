@@ -259,7 +259,7 @@ public class Interactor {
      * @param group optional group name for organization
      * @param type optional binding type
      * @param notify notify when the binding is triggered
-     * @param repeat continuously apply binding when holding down key
+     * @param repeat repeatedly apply binding when holding down key
      * @return this interactor for method chaining
      */
     private native Interactor addBindingCommands(InteractionBind bind, List<String> commands, String group, BindingType type, boolean notify, boolean repeat);
@@ -272,7 +272,7 @@ public class Interactor {
      * @param group optional group name for organization
      * @param type optional binding type
      * @param notify notify when the binding is triggered
-     * @param repeat continuously apply binding when holding down key
+     * @param repeat repeatedly apply binding when holding down key
      * @return this interactor for method chaining
      */
     public Interactor addBinding(InteractionBind bind, List<String> commands, String group, BindingType type, boolean notify, boolean repeat) {
@@ -298,7 +298,7 @@ public class Interactor {
      * @param group optional group name for organization
      * @param type optional binding type
      * @param notify notify when the binding is triggered
-     * @param repeat continuously apply binding when holding down key
+     * @param repeat repeatedly apply binding when holding down key
      * @return this interactor for method chaining
      */
     private native Interactor addBindingCommand(InteractionBind bind, String command, String group, BindingType type, boolean notify, boolean repeat);
@@ -311,7 +311,7 @@ public class Interactor {
      * @param group optional group name for organization
      * @param type optional binding type
      * @param notify notify when the binding is triggered
-     * @param repeat continuously apply binding when holding down key
+     * @param repeat repeatedly apply binding when holding down key
      * @return this interactor for method chaining
      */
     public Interactor addBinding(InteractionBind bind, String command, String group, BindingType type, boolean notify, boolean repeat) {
