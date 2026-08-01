@@ -124,7 +124,7 @@ def test_binding():
         doc_fn,
         f3d.Interactor.BindingType.OTHER,
         False,
-        True
+        True,
     )
     assert len(inter.get_bind_groups()) == 1
     assert len(inter.get_binds()) == 6
