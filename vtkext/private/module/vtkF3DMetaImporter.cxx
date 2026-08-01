@@ -39,6 +39,11 @@ struct FlatNode
   int Level = 0;
 };
 
+/**
+ * Recursively append the subtree rooted at `assemblyNodeId` to `flatNodes`, in depth-first
+ * pre-order so that a parent is always appended before its children, which makes the index of
+ * a node in `flatNodes` a usable identifier.
+ */
 void FlattenAssembly(vtkDataAssembly* assembly, int assemblyNodeId, int importerIndex, int parentId,
   int level, std::vector<FlatNode>& flatNodes)
 {
@@ -66,7 +71,6 @@ void SetSubtreeVisibility(
   if (flatActorIndex >= 0)
   {
     vtkActor* actor = vtkActor::SafeDownCast(actors->GetItemAsObject(flatActorIndex));
-
     vtkSmartPointer<vtkInformation> keys = actor->GetPropertyKeys();
 
     if (!keys)

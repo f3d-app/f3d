@@ -170,14 +170,10 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     test("scene hierarchy nodes are visible by default",
       std::ranges::all_of(hierarchy, [](const f3d::node_state_t& node) { return node.visible; }));
     test("scene hierarchy is in depth-first pre-order", [&]() {
-      for (size_t i = 0; i < hierarchy.size(); i++)
-      {
-        if (hierarchy[i].id != static_cast<int>(i) || hierarchy[i].parentId >= hierarchy[i].id)
-        {
-          return false;
-        }
-      }
-      return true;
+      int expectedId = 0;
+      return std::ranges::all_of(hierarchy, [&expectedId](const f3d::node_state_t& node) {
+        return node.id == expectedId++ && node.parentId < node.id;
+      });
     });
     test("scene hierarchy contains a group node and a leaf node",
       std::ranges::any_of(
@@ -210,6 +206,17 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     test("each added file provides a root node",
       std::ranges::count_if(
         appended, [](const f3d::node_state_t& node) { return node.parentId == -1; }) == 2);
+
+    // the cube is read by the generic importer, whose actors have no property keys yet
+    test("hide the hierarchy of a single added file", [&]() {
+      const auto appendedBegin = static_cast<std::ptrdiff_t>(hierarchy.size());
+      scene.setNodeVisibility(static_cast<int>(hierarchy.size()), false);
+      const std::vector<f3d::node_state_t> hidden = scene.getSceneHierarchy();
+      return std::all_of(hidden.begin(), hidden.begin() + appendedBegin,
+               [](const f3d::node_state_t& node) { return node.visible; }) &&
+        std::none_of(hidden.begin() + appendedBegin, hidden.end(),
+          [](const f3d::node_state_t& node) { return node.visible; });
+    });
 
     test("scene hierarchy is cleared with the scene", [&]() {
       scene.clear();
