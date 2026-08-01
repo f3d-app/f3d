@@ -1295,7 +1295,7 @@ public:
   }
 
   /* Store the current window geometry in the cache so that the next run can restore it */
-  void SaveWindowGeometry() const
+  void CacheWindowGeometry() const
   {
     const fs::path cachePath = this->WindowGeometryCachePath();
     if (cachePath.empty())
@@ -1648,8 +1648,9 @@ int F3DStarter::Start(int argc, char** argv)
   if (!this->Internals->AppOptions.NoRender)
   {
     this->Internals->ApplyPositionAndResolution();
-    // Apply the statefile window size, unless the user explicitly set --resolution: that is always
-    // applied by ApplyPositionAndResolution (resolution has a default value) and takes precedence
+    // Apply the statefile window size and position, unless the user explicitly set
+    // --resolution/--position: those take precedence and were already applied by
+    // ApplyPositionAndResolution
     const bool explicitResolution = std::ranges::any_of(this->Internals->CLIOptionsEntries,
       [](const F3DOptionsTools::OptionsEntry& entry)
       { return std::get<0>(entry).contains("resolution"); });
@@ -1922,7 +1923,7 @@ int F3DStarter::Start(int argc, char** argv)
         interactor.setEventLoopUserCallback([this](f3d::interactor_state_t) { this->EventLoop(); });
         interactor.start(deltaTime);
 
-        this->Internals->SaveWindowGeometry();
+        this->Internals->CacheWindowGeometry();
       }
 #endif
     }
@@ -2070,7 +2071,7 @@ void F3DStarter::LoadFileGroupInternal(
   else
   {
     // Update app and libf3d options based on config entries, selecting block using the input file
-    // config < statefile < cli < runtime statefile < dynamic
+    // cached < config < statefile < cli < runtime statefile < dynamic
     // A statefile loaded interactively (runtime statefile) applies above the command line, like a
     // dynamic option change, so it is not overridden by the now stale launch options. A statefile
     // loaded at startup stays below the command line so explicit launch options win.

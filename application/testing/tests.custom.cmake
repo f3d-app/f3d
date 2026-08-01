@@ -86,4 +86,13 @@ if (UNIX AND NOT APPLE)
   add_test(NAME f3d::TestOSMesaLoadFailure COMMAND $<TARGET_FILE:f3d> --output=${CMAKE_BINARY_DIR}/Testing/Temporary/osmesa.png --rendering-backend=osmesa --verbose)
   set_tests_properties(f3d::TestOSMesaLoadFailure PROPERTIES PASS_REGULAR_EXPRESSION "Cannot find OSMesa library")
   set_tests_properties(f3d::TestOSMesaLoadFailure PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${F3D_SOURCE_DIR}/testing/data")
+
+  if(F3D_TESTING_ENABLE_RENDERING_TESTS)
+    set(_geometry_cache "${CMAKE_BINARY_DIR}/Testing/Temporary/window_geometry_cache")
+    file(WRITE "${_geometry_cache}/f3d/window.json" "{\"width\": 250, \"height\": 150, \"left\": 42, \"top\": 24}")
+    add_test(NAME f3d::TestWindowGeometryRestore COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/cow.vtp --no-config --verbose=debug --list-bindings)
+    set_tests_properties(f3d::TestWindowGeometryRestore PROPERTIES
+      PASS_REGULAR_EXPRESSION "Applying window resolution 250x150"
+      ENVIRONMENT "XDG_CACHE_HOME=${_geometry_cache};CTEST_F3D_FORCE_DPI_SCALE=1.0")
+  endif()
 endif ()
