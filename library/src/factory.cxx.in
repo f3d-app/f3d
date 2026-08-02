@@ -32,10 +32,19 @@ reader* pickReader(const std::vector<plugin*>& plugins, std::optional<std::strin
           return reader.get();
         }
       }
-      else if (reader->getScore() > bestScore && isValid(reader.get()))
+      else if (reader->getScore() > bestScore)
       {
-        bestScore = reader->getScore();
-        bestReader = reader.get();
+        file_availability availabilityByReader = isValid(reader.get());
+        if (availabilityByReader == file_availability::SUPPORTED)
+        {
+          bestScore = reader->getScore();
+          bestReader = reader.get();
+          availability = availabilityByReader;
+        }
+        else if (availabilityByReader == file_availability::UNSUPPORTED_CONTENT && !bestReader)
+        {
+          availability = availabilityByReader;
+        }
       }
     }
   }
@@ -81,7 +90,7 @@ reader* factory::getReader(const std::string& fileName, std::optional<std::strin
   const bool skipContentCheck, file_availability& availability)
 {
   return f3d::pickReader(this->Plugins, forceReader, availability, [&](const reader* reader)
-    { return reader->canRead(fileName, skipContentCheck, availability); });
+    { return reader->canRead(fileName, skipContentCheck); });
 }
 
 //----------------------------------------------------------------------------
@@ -90,10 +99,16 @@ reader* factory::getReader(
 {
   vtkNew<vtkMemoryResourceStream> stream;
   stream->SetBuffer(buffer, size);
-  file_availability availability;
+  file_availability availability = file_availability::UNSUPPORTED_EXTENSION;
 
-  return f3d::pickReader(this->Plugins, forceReader,
-    [&](const reader* reader) { return reader->supportsStream() && reader->canRead(stream); });
+  return f3d::pickReader(this->Plugins, forceReader, availability, [&](const reader* reader)
+    {
+      if (reader->supportsStream() && reader->canRead(stream))
+      {
+        return file_availability::SUPPORTED;
+      }
+      return file_availability::UNSUPPORTED_CONTENT;
+    });
 }
 
 //----------------------------------------------------------------------------
