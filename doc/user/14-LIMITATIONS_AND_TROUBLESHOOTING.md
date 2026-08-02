@@ -12,7 +12,7 @@ Here is a non exhaustive list of F3D limitations:
 
 ### Assimp
 
-FBX, DAE, OFF, DXF, X and 3MF file formats rely on [Assimp](https://github.com/assimp/assimp) library. It comes with some known limitations:
+FBX, DAE, OFF, DXF, X, 3MF and AMF file formats rely on [Assimp](https://github.com/assimp/assimp) library. It comes with some known limitations:
 
 - PBR materials are not supported for FBX file format.
 - Some files can be empty, crash, or show artifacts.

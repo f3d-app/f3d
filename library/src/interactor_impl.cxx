@@ -442,6 +442,24 @@ public:
   }
 
   //----------------------------------------------------------------------------
+  void AddNotification(
+    const std::string& desc, const std::string& value, const std::string& bind, double duration)
+  {
+    if (this->NotificationCallback)
+    {
+      if (!this->NotificationCallback(desc, value, bind, duration))
+      {
+        return;
+      }
+    }
+
+    vtkRenderWindow* renWin = this->Window.GetRenderWindow();
+    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+
+    ren->AddNotification(desc, value, bind, duration);
+  }
+
+  //----------------------------------------------------------------------------
   void TriggerBinding(const std::string& interaction, const std::string& argsString)
   {
     mod_t mod = mod_t::NONE;
@@ -502,12 +520,8 @@ public:
       if (binding.Notify && binding.DocumentationCallback)
       {
         // trigger notification
-        vtkRenderWindow* renWin = this->Window.GetRenderWindow();
-        vtkF3DRenderer* ren =
-          vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-
         auto [desc, value] = binding.DocumentationCallback();
-        ren->AddNotification(desc, value, bind.format(), 3.0);
+        this->AddNotification(desc, value, bind.format(), 3.0);
       }
     }
 
@@ -658,6 +672,9 @@ public:
   std::atomic<bool> StopRequested = false;
 
   double CallbackDeltaTime = 1.0 / 30; /* Default DeltaTime (30fps) */
+
+  std::function<bool(const std::string&, const std::string&, const std::string&, double)>
+    NotificationCallback = nullptr;
 };
 
 //----------------------------------------------------------------------------
@@ -1814,12 +1831,17 @@ interactor& interactor_impl::triggerNotification(
 {
   if (!desc.empty())
   {
-    vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
-    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-
-    ren->AddNotification(desc, value, {}, duration);
+    this->Internals->AddNotification(desc, value, {}, duration);
   }
 
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::setNotificationCallback(
+  std::function<bool(const std::string&, const std::string&, const std::string&, double)> callback)
+{
+  this->Internals->NotificationCallback = std::move(callback);
   return *this;
 }
 

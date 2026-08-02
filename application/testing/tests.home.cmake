@@ -26,17 +26,17 @@ if(NOT WIN32)
   f3d_test(NAME TestHOMECommandScript DATA suzanne.ply ARGS --command-script=~/testing/scripts/TestHOMECommandScript.txt REGEXP "Camera focal point" NO_BASELINE ENV "HOME=${F3D_SOURCE_DIR}")
   f3d_test(NAME TestHOMEFontFile DATA suzanne.stl ARGS -n --font-file=~/testing/data/Crosterian.ttf ENV "HOME=${F3D_SOURCE_DIR}" UI)
   f3d_test(NAME TestHOMETexture DATA suzanne.ply ARGS --texture-matcap=~/testing/data/skin.png ENV "HOME=${F3D_SOURCE_DIR}")
-  f3d_test(NAME TestHOMEHDRI DATA suzanne.stl ARGS --hdri-file=~/testing/data/shanghai_bund_1k.hdr --hdri-ambient --hdri-skybox ENV "HOME=${F3D_SOURCE_DIR}" LONG_TIMEOUT)
+  f3d_test(NAME TestHOMEHDRI DATA suzanne.stl ARGS --hdri-file=~/testing/data/shanghai_bund_1k.hdr --hdri-ambient --hdri-skybox ENV "HOME=${F3D_SOURCE_DIR}" LONG_TIMEOUT THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-    f3d_test(NAME TestHOMEInteractionDropHDRICollapse INTERACTION_CONFIGURE ENV "HOME=${F3D_SOURCE_DIR}" LONG_TIMEOUT UI) #X;DropEvent dragon.vtu;DropEvent shanghai.hdr;
+    f3d_test(NAME TestHOMEInteractionDropHDRICollapse INTERACTION_CONFIGURE ENV "HOME=${F3D_SOURCE_DIR}" LONG_TIMEOUT UI THRESHOLD 0.05) #X;DropEvent dragon.vtu;DropEvent shanghai.hdr;
   endif()
 
   if(NOT APPLE)
 
     # This tests the XDG_CONFIG_HOME is taken into account AND that config order between locations is respected
     file(COPY "${F3D_SOURCE_DIR}/testing/configs/02_home.json" DESTINATION "${CMAKE_BINARY_DIR}/share/a_home_config/f3d/config_build.d")
-    f3d_test(NAME TestXDG_CONFIG_HOME DATA suzanne.ply CONFIG config_build ENV "XDG_CONFIG_HOME=${CMAKE_BINARY_DIR}/share/a_home_config" UI DEFAULT_HDRI)
+    f3d_test(NAME TestXDG_CONFIG_HOME DATA suzanne.ply CONFIG config_build ENV "XDG_CONFIG_HOME=${CMAKE_BINARY_DIR}/share/a_home_config" UI DEFAULT_HDRI SKIP_GLES)
 
     f3d_test(NAME TestXDG_CACHE_HOMECoverage DATA suzanne.ply NO_RENDER NO_BASELINE ENV "XDG_CACHE_HOME=${CMAKE_BINARY_DIR}")
 

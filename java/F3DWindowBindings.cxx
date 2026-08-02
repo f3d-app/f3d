@@ -138,3 +138,8 @@ extern "C"
     return ret;
   }
 }
+
+JNIEXPORT jdouble JAVA_BIND(Window, getDPIScale)(JNIEnv* env, jobject self)
+{
+  return static_cast<jdouble>(GetEngine(env, self)->getWindow().getDPIScale());
+}

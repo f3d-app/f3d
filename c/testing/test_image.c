@@ -85,7 +85,7 @@ int test_image()
   // this shouldn't crash
   const char* invalid_path = NULL;
   int ret = f3d_image_save(img, invalid_path, PNG);
-  if (ret != 1)
+  if (ret != 0)
   {
     return 1;
   }

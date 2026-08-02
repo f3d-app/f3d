@@ -172,3 +172,15 @@ void f3d_window_get_display_from_world(
   display_point[1] = cpp_display_point[1];
   display_point[2] = cpp_display_point[2];
 }
+
+//----------------------------------------------------------------------------
+double f3d_window_get_dpi_scale(f3d_window_t* window)
+{
+  if (!window)
+  {
+    return 1.0;
+  }
+
+  f3d::window* cpp_window = reinterpret_cast<f3d::window*>(window);
+  return cpp_window->getDPIScale();
+}

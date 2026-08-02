@@ -393,7 +393,8 @@ EMSCRIPTEN_BINDINGS(f3d)
       {
         return containerToJSArray(win.getDisplayFromWorld(
           { jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() }));
-      });
+      })
+    .function("getDPIScale", &f3d::window::getDPIScale);
 
   // f3d::interactor
   emscripten::enum_<f3d::interactor::AnimationDirection>("InteractorAnimationDirection")
@@ -460,10 +461,24 @@ EMSCRIPTEN_BINDINGS(f3d)
       emscripten::return_value_policy::reference())
     .function(
       "requestStop", &f3d::interactor::requestStop, emscripten::return_value_policy::reference())
+    .function("triggerNotification", &f3d::interactor::triggerNotification,
+      emscripten::return_value_policy::reference())
     .function(
-      "triggerNotification",
-      +[](f3d::interactor& interactor, std::string desc, std::string value, double duration)
-      { interactor.triggerNotification(desc, value, duration); });
+      "setNotificationCallback",
+      +[](f3d::interactor& interactor, const emscripten::val& callback)
+      {
+        if (callback.isUndefined() || callback.isNull())
+        {
+          interactor.setNotificationCallback(nullptr);
+          return;
+        }
+
+        auto cb = [=](const std::string& desc, const std::string& value, const std::string& bind,
+                    double duration) -> bool
+        { return callback(desc, value, bind, duration).as<bool>(); };
+
+        interactor.setNotificationCallback(cb);
+      });
 
   // f3d::engine
   // Not bound on purpose because only one engine is supported:

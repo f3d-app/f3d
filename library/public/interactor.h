@@ -389,6 +389,16 @@ public:
     std::string desc, std::string value = "", double duration = 3.f) = 0;
 
   /**
+   * Set the notification callback, which is called when a notification is triggered.
+   * The callback should return true if the internal notification should be displayed, false
+   * otherwise. Arguments are the description, value, bindings, and duration of the notification. If
+   * the callback is set to nullptr, standard notifications will be displayed.
+   */
+  virtual interactor& setNotificationCallback(
+    std::function<bool(const std::string&, const std::string&, const std::string&, double)>
+      callback) = 0;
+
+  /**
    * Play a VTK interaction file.
    * Provided file path is used as is and file existence will be checked.
    * If the event loop is not already running, it will be triggered every deltaTime in seconds.

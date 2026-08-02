@@ -48,7 +48,7 @@ const settings = {
     scene.loadAnimationTime(0.5);
 
     utils.assert(
-      scene.getAnimationName() == "stand",
+      scene.getAnimationName(-1) == "stand",
       "getAnimationName returns name",
     );
 

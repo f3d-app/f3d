@@ -58,6 +58,12 @@ public:
   [[nodiscard]] virtual bool isOffscreen() = 0;
 
   /**
+   * Get the DPI scale value of the window.
+   * Returns 1.0 on platforms where DPI scaling is not supported.
+   */
+  [[nodiscard]] virtual double getDPIScale() = 0;
+
+  /**
    * Get the camera provided by the window.
    */
   [[nodiscard]] virtual camera& getCamera() = 0;

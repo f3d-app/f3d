@@ -2,10 +2,8 @@
  * @class   vtkF3DPolyDataMapper
  * @brief   Custom surface mapper used to include F3D features
  *
- * This mapper is used to add many F3D custom features:
- * - skinning and morphing capabilities
- * - support for MatCap rendering
- * - support for TAA jittering
+ * This mapper is used to add support for SSBO skinning and
+ * backward compatibility with old VTK versions for unlit materials.
  */
 
 #ifndef vtkF3DPolyDataMapper_h
@@ -28,27 +26,26 @@ public:
 
   ///@{
   /**
-   * Modify the shaders to use MatCap if enabled
+   * Modify the shaders to handle color space
    */
   void ReplaceShaderColor(
     std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor) override;
   void ReplaceShaderLight(
     std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor) override;
-  void ReplaceShaderTCoord(
-    std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor) override;
   ///@}
 
+  /**
+   * Set the SSBO for skinning if needed
+   */
+  void SetCustomUniforms(vtkOpenGLHelper& cellBO, vtkActor* actor) override;
+
 protected:
-  vtkF3DPolyDataMapper();
+  vtkF3DPolyDataMapper() = default;
   ~vtkF3DPolyDataMapper() override = default;
 
 private:
-  /**
-   * Returns true if a MatCap texture is defined by the user and the actor has normals
-   */
-  bool RenderWithMatCap(vtkActor* actor);
-
   vtkNew<vtkOpenGLBufferObject> JointMatrices;
+  bool HasSSBOSkinning = false;
 };
 
 #endif

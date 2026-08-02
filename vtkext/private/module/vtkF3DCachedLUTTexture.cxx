@@ -36,14 +36,6 @@ void vtkF3DCachedLUTTexture::Load(vtkRenderer* ren)
     }
 
     this->TextureObject->SetContext(renWin);
-    this->TextureObject->SetFormat(GL_RG);
-#ifdef GL_ES_VERSION_3_0
-    this->TextureObject->SetInternalFormat(GL_RG8);
-    this->TextureObject->SetDataType(GL_UNSIGNED_BYTE);
-#else
-    this->TextureObject->SetInternalFormat(GL_RG16);
-    this->TextureObject->SetDataType(GL_UNSIGNED_SHORT);
-#endif
     this->TextureObject->SetWrapS(vtkTextureObject::ClampToEdge);
     this->TextureObject->SetWrapT(vtkTextureObject::ClampToEdge);
     this->TextureObject->SetMinificationFilter(vtkTextureObject::Linear);
@@ -62,13 +54,8 @@ void vtkF3DCachedLUTTexture::Load(vtkRenderer* ren)
     }
     this->LUTSize = dims[0];
 
-#ifdef GL_ES_VERSION_3_0
     this->TextureObject->Create2DFromRaw(
-      this->LUTSize, this->LUTSize, 2, VTK_UNSIGNED_CHAR, img->GetScalarPointer());
-#else
-    this->TextureObject->Create2DFromRaw(
-      this->LUTSize, this->LUTSize, 2, VTK_UNSIGNED_SHORT, img->GetScalarPointer());
-#endif
+      this->LUTSize, this->LUTSize, 2, img->GetScalarType(), img->GetScalarPointer());
 
     this->RenderWindow = renWin;
     this->LoadTime.Modified();

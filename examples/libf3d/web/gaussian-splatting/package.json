@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "vite": "^8.1.4"
+    "vite": "^8.1.5"
   },
   "dependencies": {
     "f3d": "file:../../../.."

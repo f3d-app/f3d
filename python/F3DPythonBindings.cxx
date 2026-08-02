@@ -359,7 +359,6 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("tokenize", &f3d::utils::tokenize, py::arg("str"), py::arg("keep_comments") = true)
     .def_static(
       "glob_to_regex", &f3d::utils::globToRegex, py::arg("glob"), py::arg("path_separator") = '/')
-    .def_static("get_dpi_scale", &f3d::utils::getDPIScale)
     .def_static("get_env", &f3d::utils::getEnv)
     .def_static("get_known_folder", &f3d::utils::getKnownFolder);
 
@@ -438,6 +437,23 @@ PYBIND11_MODULE(pyf3d, module)
       "Disable the camera interaction")
     .def("set_event_loop_user_callback", &f3d::interactor::setEventLoopUserCallback,
       "Set the user callback of the event loop", py::arg("user_callback") = nullptr)
+    .def(
+      "set_notification_callback",
+      [](f3d::interactor& interactor, py::object callback)
+      {
+        if (callback.is_none())
+        {
+          interactor.setNotificationCallback(nullptr);
+          return;
+        }
+
+        auto cb = [=](const std::string& desc, const std::string& value, const std::string& bind,
+                    double duration) -> bool
+        { return py::bool_(callback(desc, value, bind, duration)); };
+
+        interactor.setNotificationCallback(cb);
+      },
+      "Set the notification callback (desc, value, bind, duration) -> bool", py::arg("callback"))
     .def("trigger_mod_update", &f3d::interactor::triggerModUpdate, "Trigger a key modifier update")
     .def("trigger_mouse_button", &f3d::interactor::triggerMouseButton, "Trigger a mouse button")
     .def(
@@ -900,7 +916,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def("get_world_from_display", &f3d::window::getWorldFromDisplay,
       "Get world coordinate point from display coordinate")
     .def("get_display_from_world", &f3d::window::getDisplayFromWorld,
-      "Get display coordinate point from world coordinate");
+      "Get display coordinate point from world coordinate")
+    .def("get_dpi_scale", &f3d::window::getDPIScale, "Get the DPI scale of the window");
 
   // libInformation
   py::class_<f3d::engine::libInformation>(module, "LibInformation")

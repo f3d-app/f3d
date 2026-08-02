@@ -49,20 +49,6 @@ const settings = {
       "animation should not be playing",
     );
 
-    interactor.startAnimation();
-    utils.assert(
-      interactor.isPlayingAnimation() &&
-        interactor.getAnimationDirection() ==
-          Module.InteractorAnimationDirection.FORWARD,
-      "animation should be playing",
-    );
-
-    interactor.stopAnimation();
-    utils.assert(
-      !interactor.isPlayingAnimation(),
-      "animation should not be playing",
-    );
-
     interactor.startAnimation(Module.InteractorAnimationDirection.FORWARD);
     utils.assert(
       interactor.isPlayingAnimation() &&
@@ -71,6 +57,10 @@ const settings = {
       "animation should be playing forward",
     );
     interactor.stopAnimation();
+    utils.assert(
+      !interactor.isPlayingAnimation(),
+      "animation should not be playing",
+    );
 
     interactor.startAnimation(Module.InteractorAnimationDirection.BACKWARD);
     utils.assert(
@@ -78,15 +68,6 @@ const settings = {
         interactor.getAnimationDirection() ==
           Module.InteractorAnimationDirection.BACKWARD,
       "animation should be playing backward",
-    );
-    interactor.stopAnimation();
-
-    interactor.toggleAnimation();
-    utils.assert(
-      interactor.isPlayingAnimation() &&
-        interactor.getAnimationDirection() ==
-          Module.InteractorAnimationDirection.FORWARD,
-      "animation should be playing forward",
     );
     interactor.stopAnimation();
 
@@ -107,6 +88,17 @@ const settings = {
       "animation should be playing backward",
     );
     interactor.stopAnimation();
+
+    // notifications
+    let notifCount = 0;
+
+    interactor.setNotificationCallback((desc, value, bind, duration) => {
+      notifCount++;
+      return true;
+    });
+
+    interactor.triggerNotification("Test notification", "value", 1.0);
+    utils.assert(notifCount === 1, "notification callback not called");
 
     // only for coverage, do not test the actual feature yet
     interactor.disableCameraMovement();

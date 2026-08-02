@@ -19,6 +19,7 @@
 #include <vtkRendererCollection.h>
 #include <vtkSmartPointer.h>
 #include <vtkTexture.h>
+#include <vtkUnsignedIntArray.h>
 #include <vtkVersion.h>
 
 #include <cassert>
@@ -338,6 +339,21 @@ bool vtkF3DMetaImporter::Update()
 
       vtkPolyData* surface = pdMapper->GetInput();
 
+      // On GLES, 16-bits attributes are not widely supported, which is used for joint indices.
+      // So we convert them to 32-bits attributes, which is supported everywhere.
+#ifdef F3D_USE_GLES
+      vtkDataArray* jointsArray = surface->GetPointData()->GetArray("JOINTS_0");
+      if (jointsArray != nullptr &&
+        (jointsArray->GetDataType() == VTK_SHORT ||
+          jointsArray->GetDataType() == VTK_UNSIGNED_SHORT))
+      {
+        vtkNew<vtkUnsignedIntArray> joints;
+        joints->DeepCopy(jointsArray);
+        joints->SetName("JOINTS_0");
+        surface->GetPointData()->AddArray(joints);
+      }
+#endif
+
       // convert to PBR materials if needed
       // this should be moved elsewhere, see https://github.com/f3d-app/f3d/issues/2995
       if (!genericImporter && actor->GetProperty()->GetInterpolation() != VTK_PBR)
@@ -351,6 +367,7 @@ bool vtkF3DMetaImporter::Update()
         if (diffuseTex)
         {
           diffuseTex->UseSRGBColorSpaceOn();
+          diffuseTex->SetColorModeToDirectScalars();
         }
 
         if (actor->GetProperty()->GetLighting())
@@ -374,6 +391,7 @@ bool vtkF3DMetaImporter::Update()
             actor->SetTexture(nullptr);
             actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
             actor->GetProperty()->SetBaseColorTexture(diffuseTex);
+            actor->GetProperty()->SetTexture("diffuseTex", nullptr);
           }
         }
       }

@@ -27,6 +27,7 @@
 - cowlow.vtp: VTK Data: BSD-3-Clause
 - Crosterian.ttf: Denis Ignatov : [OFL (SIL Open Font License)](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL)
 - cube_gears.3mf: 3MF consortium samples: BSD-2-Clause
+- cube-with-hole.amf: [jscad samples](https://github.com/jscad/sample-files): MIT
 - disk_out_ref.ex2: VTK Data: BSD-3-Clause
 - dragon.vtu: Stanford: Public Domain
 - duck.dae: assimp test models: BSD-3-Clause

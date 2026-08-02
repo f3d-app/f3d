@@ -7,6 +7,7 @@ set(f3djsTests_list
   "test_options"
   "test_render"
   "test_scene"
+  "test_skinning"
   "test_splats"
   "test_custom_canvas"
   "test_statefile"

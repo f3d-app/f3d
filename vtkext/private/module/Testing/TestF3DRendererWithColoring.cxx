@@ -20,6 +20,10 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   importer->SetRenderWindow(window);
   renderer->SetImporter(importer);
 
+  // coverage for DPI change
+  renderer->Initialize();
+  window->SetDPI(144);
+
   // Check invalid bounding box code path
   renderer->ShowGrid(true);
   renderer->UpdateActors();

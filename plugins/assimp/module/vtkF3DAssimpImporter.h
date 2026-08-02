@@ -6,7 +6,7 @@
  * The list of supported file format is available here:
  * https://github.com/assimp/assimp/blob/master/doc/Fileformats.md
  *
- * The following formats have been tested and are supported by f3d: FBX, DAE, OFF, DXF, X, 3MF
+ * The following formats have been tested and are supported by f3d: FBX, DAE, OFF, DXF, X, 3MF, AMF
 
  * This importer supports reading from stream but prefer memory stream over filestream.
  * Reading from stream require to position the MemoryHint to the correct file extension.
@@ -35,11 +35,11 @@ public:
 
   /**
    * Get the level of animation support in this importer, which is always
-   * AnimationSupportLevel::SINGLE
+   * AnimationSupportLevel::MULTI
    */
   AnimationSupportLevel GetAnimationSupportLevel() override
   {
-    return AnimationSupportLevel::SINGLE;
+    return AnimationSupportLevel::MULTI;
   }
 
   /**
@@ -55,7 +55,7 @@ public:
   ///@{
   /**
    * Enable/Disable/Get the status of specific animations
-   * Only one single animation can be enabled
+   * Multiple animations can be enabled simultaneously
    * By default, no animation are enabled
    * As specified in the vtkImporter API, animationIndex
    * is expected to be 0 < GetNumberOfAnimations

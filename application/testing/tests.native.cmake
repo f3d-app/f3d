@@ -3,6 +3,7 @@ f3d_test(NAME TestPLY DATA suzanne.ply)
 f3d_test(NAME TestLYS DATA bunny.lys)
 f3d_test(NAME TestOBJ DATA world.obj)
 f3d_test(NAME TestOBJUnlit DATA cube_unlit.obj)
+f3d_test(NAME TestOBJ16bits DATA cube_16bits.obj)
 f3d_test(NAME TestSTL DATA suzanne.stl)
 f3d_test(NAME TestVTICell DATA waveletMaterial.vti ARGS -s --coloring-array=Material -c --roughness=1)
 f3d_test(NAME TestVTU DATA dragon.vtu)
@@ -54,7 +55,9 @@ f3d_test(NAME TestVerboseQuakeMDLGroupSkin ARGS --verbose DATA groupskin.mdl REG
 f3d_test(NAME TestVerboseQuakeMDLInvalid ARGS --verbose --force-reader=QuakeMDL DATA invalid_version.mdl REGEXP "Unsupported MDL version" NO_BASELINE)
 
 f3d_test(NAME TestSPLAT DATA small.splat ARGS -osy --up=-Y --point-sprites-absolute-size --point-sprites-size=1)
-f3d_test(NAME TestSPLATSortCPU DATA small.splat ARGS -osy --point-sprites=gaussian --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --blending=sort_cpu --camera-position=2,0,0)
+
+# Sort (CPU) isn't supported in GLES because the mapper relies on geometry shaders
+f3d_test(NAME TestSPLATSortCPU DATA small.splat ARGS -osy --point-sprites=gaussian --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --blending=sort_cpu --camera-position=2,0,0 SKIP_GLES)
 f3d_test(NAME TestSPZ DATA hornedlizard_small_d0.spz ARGS -sy --point-sprites-absolute-size --point-sprites-size=1)
 
 set(_splat_args -sy --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --camera-position=-2.00335,1.09654,-0.459485 --camera-focal-point=-0.796712,2.22795,0.705742)
@@ -92,7 +95,7 @@ endif()
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251104)
   f3d_test(NAME TestPipedSTL DATA suzanne.stl PIPED_READER STL PIPED)
   if(NOT F3D_MACOS_BUNDLE)
-    f3d_test(NAME TestDefaultConfigFilePipedSTL DATA suzanne.stl PIPED_READER STL CONFIG config_build LONG_TIMEOUT UI PIPED)
+    f3d_test(NAME TestDefaultConfigFilePipedSTL DATA suzanne.stl PIPED_READER STL CONFIG config_build LONG_TIMEOUT UI PIPED SKIP_GLES)
   endif()
 endif()
 
@@ -144,24 +147,25 @@ if(NOT F3D_MACOS_BUNDLE)
     f3d_test(NAME TestConfigFileMultiFileSTL DATA mb/recursive/mb_1_0.vtp suzanne.stl ARGS --multi-file-mode=all CONFIG complex_build UI)
     f3d_test(NAME TestConfigFileMultiFileVTP DATA mb/recursive/mb_1_0.vtp suzanne.stl mb/recursive/mb_2_0.vtp ARGS --multi-file-mode=all CONFIG complex_build UI)
 
-    f3d_test(NAME TestDefaultConfigFileVTU DATA dragon.vtu CONFIG config_build LONG_TIMEOUT UI)
-    f3d_test(NAME TestDefaultConfigFileVTI DATA vase_4comp.vti CONFIG config_build LONG_TIMEOUT UI)
-    f3d_test(NAME TestDefaultConfigFileSTL DATA suzanne.stl CONFIG config_build LONG_TIMEOUT UI)
-    f3d_test(NAME TestDefaultConfigFileTIFF DATA f3d.tif CONFIG config_build LONG_TIMEOUT UI) # Note: This tests config file order as camera_direction is set in different files
-    f3d_test(NAME TestDefaultConfigFilePNG DATA world.png CONFIG config_build LONG_TIMEOUT UI)
-    f3d_test(NAME TestDefaultConfigFileJPG DATA world.jpg CONFIG config_build LONG_TIMEOUT UI)
-    f3d_test(NAME TestDefaultConfigFileBMP DATA albedo.bmp CONFIG config_build LONG_TIMEOUT UI)
-    f3d_test(NAME TestDefaultConfigFileTGA DATA world.tga CONFIG config_build LONG_TIMEOUT UI)
-    f3d_test(NAME TestDefaultConfigFileHDR DATA shanghai_bund_1k.hdr CONFIG config_build LONG_TIMEOUT UI)
+    f3d_test(NAME TestDefaultConfigFileVTU DATA dragon.vtu CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
+    f3d_test(NAME TestDefaultConfigFileVTI DATA vase_4comp.vti CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
+    f3d_test(NAME TestDefaultConfigFileSTL DATA suzanne.stl CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
+    f3d_test(NAME TestDefaultConfigFileTIFF DATA f3d.tif CONFIG config_build LONG_TIMEOUT UI SKIP_GLES) # Note: This tests config file order as camera_direction is set in different files
+    f3d_test(NAME TestDefaultConfigFilePNG DATA world.png CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
+    f3d_test(NAME TestDefaultConfigFileJPG DATA world.jpg CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
+    f3d_test(NAME TestDefaultConfigFileBMP DATA albedo.bmp CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
+    f3d_test(NAME TestDefaultConfigFileTGA DATA world.tga CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
+    f3d_test(NAME TestDefaultConfigFileHDR DATA shanghai_bund_1k.hdr CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
     if(F3D_MODULE_WEBP)
-      f3d_test(NAME TestDefaultConfigFileWebP DATA image.webp CONFIG config_build LONG_TIMEOUT UI)
+      f3d_test(NAME TestDefaultConfigFileWebP DATA image.webp CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
     endif()
     if(F3D_MODULE_EXR)
-      f3d_test(NAME TestDefaultConfigFileEXR DATA Rec709.exr CONFIG config_build LONG_TIMEOUT UI)
+      f3d_test(NAME TestDefaultConfigFileEXR DATA Rec709.exr CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
     endif()
     f3d_test(NAME TestDefaultConfigFilePLY DATA suzanneRGBA.ply CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
-    f3d_test(NAME TestDefaultConfigFileQuakeMDL DATA zombie.mdl CONFIG config_build LONG_TIMEOUT UI SKIP_GLES THRESHOLD 0.07) # Threshold is needed for IBL change after VTK 9.6
+
     f3d_test(NAME TestDefaultConfigFileLYS DATA bunny.lys CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
+
     f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y --camera-direction=-1,0.5,-1 CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
     f3d_test(NAME TestDefaultConfigTranslucent DATA red_translucent_monkey.gltf CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
     f3d_test(NAME TestDefaultConfigRemoveEmptyFileGroups DATA invalid_body.vtp cow.vtp CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
@@ -183,5 +187,7 @@ if(NOT F3D_MACOS_BUNDLE)
     f3d_test(NAME TestThumbnailConfigFileWebP DATA image.webp CONFIG thumbnail_build LONG_TIMEOUT THRESHOLD 0.07 DEFAULT_HDRI) # Threshold is needed even for newer VTK
   endif()
   f3d_test(NAME TestThumbnailConfigFileQuakeMDL DATA zombie.mdl CONFIG thumbnail_build LONG_TIMEOUT THRESHOLD 0.07 DEFAULT_HDRI SKIP_GLES) # Threshold is needed for IBL change after VTK 9.6
+
   f3d_test(NAME TestThumbnailConfigFileLYS DATA bunny.lys CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI)
+
 endif()

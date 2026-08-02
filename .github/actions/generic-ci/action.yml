@@ -19,6 +19,10 @@ inputs:
     description: "Label to flag for minimal version dependencies"
     required: false
     default: "no-mindeps"
+  gles_label:
+    description: "Label to flag for OpenGL ES rendering option"
+    required: false
+    default: "no-gles"
   exclude_deprecated_label:
     description: "Label to control deprecated exclusion"
     required: false
@@ -83,6 +87,7 @@ runs:
         versions_file: ${{inputs.versions_file}}
         optdeps_label: ${{inputs.optdeps_label}}
         mindeps_label: ${{inputs.mindeps_label}}
+        gles_label: ${{inputs.gles_label}}
         cpu: ${{inputs.cpu}}
         vtk_version: ${{inputs.vtk_version}}
 
@@ -181,7 +186,7 @@ runs:
         -DF3D_MODULE_CLIP=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_EXR=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_WEBP=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
-        -DF3D_MODULE_RAYTRACING=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_RAYTRACING=${{ (inputs.optdeps_label == 'optdeps' && inputs.gles_label == 'no-gles') && 'ON' || 'OFF' }}
         -DF3D_MODULE_UI=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_DMON=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_TINYFILEDIALOGS=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
@@ -204,7 +209,7 @@ runs:
         -DF3D_TESTING_ENABLE_ILLUSTRATION_TESTS=${{ (runner.os == 'Linux' && inputs.vtk_version == 'commit' && inputs.build_type == 'standard') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_GLX_TESTS=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=${{ (runner.os == 'Linux' || runner.os == 'Windows') && 'ON' || 'OFF' }}
-        -DF3D_TESTING_ENABLE_OSMESA_TESTS=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_OSMESA_TESTS=${{ (inputs.optdeps_label == 'optdeps' && inputs.gles_label == 'no-gles') && 'ON' || 'OFF' }}
         -DF3D_TESTING_DISABLE_CATCH_ALL=ON
         -DF3D_TESTING_FORCE_RENDERING_BACKEND=${{ inputs.rendering_backend }}
         -DF3D_WINDOWS_BUILD_CONSOLE_APPLICATION=ON
@@ -250,13 +255,25 @@ runs:
         echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
 
     # Linux: Xvfb is not running, should fallback to egl
-    # Windows: mesa binary is not installed, should fallback to osmesa
+    # Windows: mesa binary is not installed and faulty OPENGL32.dll is insufficient, should fallback to osmesa
     # macOS: No fallback mechanism to test, CI always uses osmesa (with VTK > 9.7.20260706), check cocoa is functional
     - name: Check rendering backend logic
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: |
         ${{ env.F3D_BUILD_BIN_PATH }} ../source/testing/data/dragon.vtu --output=Testing/Temporary/build_output.png --reference=../source/.github/baselines/build_output.png --resolution=300,300 --verbose
+
+    - name: Remove faulty OPENGL32.dll
+      if: runner.os == 'Windows'
+      shell: cmd
+      run: rm 'C:\Windows\system32\OPENGL32.dll'
+
+    # When running standard test on windows, use wgl
+    - name: Install Mesa opengl instead
+      if: runner.os == 'Windows'
+      uses: f3d-app/install-mesa-windows-action@v3
+      with:
+        path: C:\Windows\system32
 
     # When running standard test with auto rendering backend on linux, use glx
     - name: Run Xvfb ubuntu
@@ -265,13 +282,6 @@ runs:
         inputs.rendering_backend == 'auto'
       shell: bash
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
-
-    # When running standard test on windows, use wgl
-    - name: Install Mesa Windows
-      if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v3
-      with:
-        path: ${{github.workspace}}\build\bin_Release
 
     # numpy makes pytest crashing on Windows in the CI but not locally, skipping for now
     - name: Set CI test exception for Windows
@@ -297,7 +307,7 @@ runs:
         inputs.cpu == 'arm64' &&
         inputs.rendering_backend == 'auto'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheet)|(TestMaxSizeAboveMultiFile)|(TestAxesCustomColor)|(TestInteractionTAA)|(TestInteractionStochasticTAA)|(TestInteractionPointCloudTAA)|(TestSDKNotification)|(TestUnlitOBJOpacity)|(TestInteractionGridReflectionChanged)|(TestUSDRigArmatureWithOpacity)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheet)|(TestMaxSizeAboveMultiFile)|(TestAxesCustomColor)|(TestInteractionTAA)|(TestInteractionStochasticTAA)|(TestInteractionPointCloudTAA)|(TestSDKNotification)|(TestUnlitOBJOpacity)|(TestInteractionGridReflectionChanged)|(TestUSDRigArmatureWithOpacity)|(TestInteractionTextureCheckerBoardTAA)" >> $GITHUB_ENV
 
     - name: Test
       shell: bash
@@ -330,12 +340,6 @@ runs:
         cmake --install . --component configuration
         cmake --install . --component colormaps
 
-    - name: Install Mesa Windows in install
-      if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v2
-      with:
-        path: ${{github.workspace}}\install\bin
-
     - name: Build and configure python externally
       if: |
         inputs.optdeps_label == 'optdeps' &&
@@ -366,14 +370,6 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}
       run: cmake --build build_examples --config Release
-
-    - name: Install Mesa Windows examples
-      if: |
-        runner.os == 'Windows' &&
-        inputs.static_label == 'no-static'
-      uses: f3d-app/install-mesa-windows-action@v2
-      with:
-        path: ${{github.workspace}}\build_examples\*\*\Release
 
     # older VTK version create different renderings so they are not tested
     - name: Test libf3d examples
@@ -420,7 +416,7 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
-        ${{ env.F3D_BIN_PATH }} ../source/testing/data/dragon.vtu --output=output/install_output.png --reference=../source/.github/baselines/install_output.png --resolution=300,300 --colormap-file=viridis --coloring-component=0 --verbose --rendering-backend=${{ inputs.rendering_backend }} --camera-view-angle=32.1111
+        ${{ env.F3D_BIN_PATH }} ../source/testing/data/dragon.vtu --output=output/install_output.png --reference=../source/.github/baselines/install_output.png --resolution=300,300 --colormap-file=viridis --coloring-component=0 --dpi-aware=0 --verbose --rendering-backend=${{ inputs.rendering_backend }} --camera-view-angle=32.1111
 
     # macOS needs VTK > 9.7.20260706 for proper grid rendering using osmesa
     # this test works with VTK 9.6.1 otherwise
@@ -430,7 +426,7 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
-        ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --output=output/install_example_plugin_output.png --reference=../source/.github/baselines/install_example_plugin_output.png  --resolution=300,300 --verbose --rendering-backend=${{ inputs.rendering_backend }}
+        ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --output=output/install_example_plugin_output.png --reference=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --dpi-aware=0 --verbose --rendering-backend=${{ inputs.rendering_backend }}
 
     - name: Check Install Windows Console Executable
       if: |
@@ -439,7 +435,7 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
-        ${{ env.F3D_CONSOLE_BIN_PATH }} ../source/testing/data/dragon.vtu --output=output/install_output.png --reference=../source/.github/baselines/install_output.png --resolution=300,300 --colormap-file=viridis --coloring-component=0 --verbose --rendering-backend=${{ inputs.rendering_backend }}
+        ${{ env.F3D_CONSOLE_BIN_PATH }} ../source/testing/data/dragon.vtu --output=output/install_output.png --reference=../source/.github/baselines/install_output.png --resolution=300,300 --colormap-file=viridis --coloring-component=0 --dpi-aware=0 --verbose --rendering-backend=${{ inputs.rendering_backend }}
 
     - name: Upload Tests Install Artifact
       if: failure()

@@ -34,6 +34,8 @@ F3D is tested continuously against versions recommended by the [VFX reference pl
 
 As stated in the dependencies, F3D is compatible with VTK >= 9.4.0, however, some features may not be available. We suggest using VTK 9.6.2 with RenderingRayTracing, IOExodus, IOHDF, IONetCDF, IOPDAL and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
 
+> NOTE: When VTK is compiled for GLES (usually the case for Android and WebAssembly only), F3D is only compatible with the VTK version specified in `.github/workflows/versions.json` file.
+
 ## Configuration and building
 
 Configure and generate the project with CMake,
@@ -58,7 +60,7 @@ Some modules, plugins and language bindings depending on external libraries can 
 - `F3D_MODULE_CLIP`: Support for clipboard interaction in libf3d, used by `engine::state` and by the application to save/load statefiles to/from the system clipboard. Uses provided clip. Enabled by default.
 - `F3D_PLUGIN_BUILD_HDF`: Support for VTKHDF (.vtkhdf), ExodusII (.ex2), and NetCDF (.nc) file formats. Requires that VTK has been built with `IOHDF`, `IOExodus`, and `IONetCDF` modules (and `hdf5`). Enabled by default.
 - `F3D_PLUGIN_BUILD_OCCT`: Support for STEP, IGES, BREP, and XBF file formats. Requires `OpenCASCADE`. Disabled by default.
-- `F3D_PLUGIN_BUILD_ASSIMP`: Support for FBX, DAE, OFF, DXF, X and 3MF file formats. Requires `Assimp`. Disabled by default.
+- `F3D_PLUGIN_BUILD_ASSIMP`: Support for FBX, DAE, OFF, DXF, X, 3MF and AMF file formats. Requires `Assimp`. Disabled by default.
 - `F3D_PLUGIN_BUILD_ALEMBIC`: Support for ABC file format. Requires `Alembic`. Disabled by default.
 - `F3D_PLUGIN_BUILD_DRACO`: Support for DRC file format. Requires `Draco`. Disabled by default.
 - `F3D_PLUGIN_BUILD_USD`: Support for USD file format. Requires `OpenUSD`. Disabled by default.
@@ -71,6 +73,9 @@ Some modules, plugins and language bindings depending on external libraries can 
 - `F3D_BINDINGS_C`: Generate C bindings. Disabled by default.
 
 Some dependencies are provided internally, eg: ImGui, dmon and others. Use `F3D_USE_EXTERNAL_*` to use an external version of these libraries.
+
+VTK can be built with OpenGL ES support, which is mostly the case when targeting mobile or web platforms.
+The CMake variable `F3D_USE_GLES` is automatically defined accordingly and reported during the configuration step.
 
 ## Building for contribution
 
