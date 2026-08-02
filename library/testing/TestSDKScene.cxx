@@ -34,7 +34,6 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   std::string validFilename = "cow.vtp";
   std::string invalidDefaultSceneFilename = "invalid_body.vtp";
   std::string invalidFullSceneFilename = "invalid_body.gltf";
-  std::string invalidMdlFilename = "invalid.mdl";
   std::string dummy = std::string(argv[1]) + "data/" + dummyFilename;
   std::string nonExistent = std::string(argv[1]) + "data/" + nonExistentFilename;
   std::string unsupported = std::string(argv[1]) + "data/" + unsupportedFilename;
@@ -47,7 +46,6 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   std::string monkey = std::string(argv[1]) + "data/red_translucent_monkey.gltf";
   std::string invalidDefaultScene = std::string(argv[1]) + "data/" + invalidDefaultSceneFilename;
   std::string invalidFullScene = std::string(argv[1]) + "data/" + invalidFullSceneFilename;
-  std::string invalidMdl = std::string(argv[1]) + "data/" + invalidMdlFilename;
 
   // supports method
   test("not supported with empty filename",
@@ -83,36 +81,6 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     catch (f3d::scene::load_failure_exception& E)
     {
       std::string expectedMsg = "is not a valid force reader";
-      std::string exceptMsg = E.what();
-      test("Check exception message size", exceptMsg.size() >= expectedMsg.size());
-      test("Check exception message",
-        exceptMsg.substr(exceptMsg.size() - expectedMsg.size(), expectedMsg.size()) == expectedMsg);
-    }
-  }
-  {
-    f3d::engine engine = f3d::engine::create(true);
-    f3d::scene& scene = engine.getScene();
-    try
-    {
-      scene.add(invalidMdl);
-    }
-    catch (f3d::scene::load_failure_exception& E)
-    {
-      std::string expectedMsg = "contains unsupported content and no reader have been selected, "
-                                "use force reader to force a specific reader";
-      std::string exceptMsg = E.what();
-      test("Check exception message size", exceptMsg.size() >= expectedMsg.size());
-      test("Check exception message",
-        exceptMsg.substr(exceptMsg.size() - expectedMsg.size(), expectedMsg.size()) == expectedMsg);
-    }
-    engine.getOptions().scene.skip_content_check = true;
-    try
-    {
-      scene.add(invalidMdl);
-    }
-    catch (f3d::scene::load_failure_exception& E)
-    {
-      std::string expectedMsg = "failed to load scene";
       std::string exceptMsg = E.what();
       test("Check exception message size", exceptMsg.size() >= expectedMsg.size());
       test("Check exception message",

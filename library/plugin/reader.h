@@ -69,8 +69,8 @@ public:
   /**
    * Check if this reader can read the given filename - according to its extension and file content
    */
-  virtual bool canRead(const std::string& fileName, const bool skipContentCheck,
-    f3d::file_availability& availability) const
+  virtual f3d::file_availability canRead(
+    const std::string& fileName, const bool skipContentCheck) const
   {
     std::string ext = fileName.substr(fileName.find_last_of(".") + 1);
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
@@ -83,16 +83,12 @@ public:
       {
         if (skipContentCheck || this->canRead(stream))
         {
-          availability = f3d::file_availability::SUPPORTED;
-          return true;
+          return f3d::file_availability::SUPPORTED;
         }
-        else
-        {
-          availability = f3d::file_availability::UNSUPPORTED_CONTENT;
-        }
+        return f3d::file_availability::UNSUPPORTED_CONTENT;
       }
     }
-    return false;
+    return f3d::file_availability::UNSUPPORTED_EXTENSION;
   }
 
   /**

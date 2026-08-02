@@ -290,7 +290,8 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
           break;
         case file_availability::UNSUPPORTED_CONTENT:
           errorMessage = (filePath.string() +
-            " contains unsupported content and no reader have been selected, use skip content check to skip content validation or force reader to "
+            " contains unsupported content and no reader have been selected, use skip content "
+            "check to skip content validation or force reader to "
             "force a specific reader");
           break;
       }
