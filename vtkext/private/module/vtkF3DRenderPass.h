@@ -49,6 +49,7 @@ public:
   vtkSetVector6Macro(Bounds, double);
   vtkSetMacro(CircleOfConfusionRadius, double);
   vtkSetMacro(RenderReflection, bool);
+  vtkSetMacro(XRMode, bool);
 
   /**
    * Modify shader code for matcap/gamma/skinning
@@ -81,6 +82,7 @@ protected:
   bool UseBlurBackground = false;
   bool ForceOpaqueBackground = false;
   bool RenderReflection = false;
+  bool XRMode = false;
 
   double CircleOfConfusionRadius = 20.0;
 

@@ -102,6 +102,7 @@ set(classes
   vtkF3DUserRenderPass
   vtkF3DDisplayDepthRenderPass
   vtkF3DTAAPass
+  vtkF3DOpenXRFramebufferPass
   )
 
 if (F3D_MODULE_UI)
@@ -186,3 +187,8 @@ endif()
 if (F3D_MODULE_RAYTRACING)
   vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_RAYTRACING)
 endif ()
+
+# openxr
+if (F3D_MODULE_OPENXR)
+  vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_OPENXR)
+endif()

@@ -48,6 +48,12 @@
 #include <vtkMemoryResourceStream.h>
 #endif
 
+#if F3D_MODULE_OPENXR
+#include <vtkOpenXRCamera.h>
+#include <vtkOpenXRRenderWindow.h>
+#include <vtkOpenXRRenderer.h>
+#endif
+
 #include <vtkOSOpenGLRenderWindow.h>
 
 #include <sstream>
@@ -121,6 +127,7 @@ public:
   const options& Options;
   interactor_impl* Interactor = nullptr;
   fs::path CachePath;
+  fs::path ResourcesPath;
   context::function GetProcAddress;
 };
 
@@ -174,6 +181,15 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
     this->Internals->RenWin = wasmRenWin;
 #endif
   }
+  else if (type == Type::XR)
+  {
+#ifdef F3D_MODULE_OPENXR
+    this->Internals->RenWin = vtkSmartPointer<vtkOpenXRRenderWindow>::New();
+#else
+    throw engine::no_window_exception(
+      "Cannot create a window of type XR as F3D_MODULE_OPENXR is not enabled");
+#endif
+  }
   else if (!type.has_value())
   {
     this->Internals->RenWin = internals::AutoBackendWindow();
@@ -199,7 +215,23 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
   this->Internals->RenWin->SetOffScreenRendering(offscreen);
   this->Internals->RenWin->SetWindowName("f3d");
-  this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
+
+  if (type == Type::XR)
+  {
+#ifdef F3D_MODULE_OPENXR
+    vtkOpenXRRenderWindow* xrRenWin = vtkOpenXRRenderWindow::SafeDownCast(this->Internals->RenWin);
+    xrRenWin->vtkOpenGLRenderWindow::AddRenderer(this->Internals->Renderer);
+    vtkNew<vtkOpenXRCamera> xrCamera;
+    this->Internals->Renderer->SetActiveCamera(xrCamera);
+#else
+    assert(false); // Unreachable
+#endif
+  }
+  else
+  {
+    this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
+  }
+
   this->Internals->Camera = std::make_unique<detail::camera_impl>();
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
 
@@ -269,6 +301,13 @@ window_impl::Type window_impl::getType()
   {
     return Type::NONE;
   }
+
+#ifdef F3D_MODULE_OPENXR
+  if (this->Internals->RenWin->IsA("vtkOpenXRRenderWindow"))
+  {
+    return Type::XR;
+  }
+#endif
 
   return Type::UNKNOWN;
 }
@@ -651,7 +690,9 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->SetGridUnitSquare(opt.render.grid.unit);
   renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
-  renderer->SetGridAbsolute(opt.render.grid.absolute);
+  renderer->SetGridAbsolute(this->getType() == Type::XR
+      ? true
+      : opt.render.grid.absolute); // In XR mode, the grid is absolute
   renderer->SetGridReflection(opt.render.grid.reflection);
   renderer->ShowGrid(opt.render.grid.enable);
   renderer->SetGridColor(opt.render.grid.color);
@@ -692,6 +733,8 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->SetUseVolume(opt.model.volume.enable);
   renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
+
+  renderer->SetXRMode(this->getType() == Type::XR);
 
   renderer->UpdateActors();
 
@@ -809,6 +852,43 @@ void window_impl::SetCachePath(const fs::path& cachePath)
   }
 
   this->Internals->CachePath = cachePath;
+}
+
+//----------------------------------------------------------------------------
+void window_impl::SetResourcesPath(const fs::path& resourcesPath)
+{
+  try
+  {
+    if (resourcesPath.empty())
+    {
+      throw engine::resource_exception("Provided resources path is empty");
+    }
+
+    // create directories if they do not exist
+    fs::create_directories(resourcesPath);
+
+    this->Internals->ResourcesPath = resourcesPath;
+
+    if (this->getType() == Type::XR)
+    {
+#if F3D_MODULE_OPENXR
+      fs::path xrActionsManifestsFolder = this->Internals->ResourcesPath / "xr_actions_manifests";
+      if (!fs::exists(xrActionsManifestsFolder))
+      {
+        throw engine::resource_exception(
+          "XR actions manifests folder does not exist: " + xrActionsManifestsFolder.string());
+      }
+      std::string manifestsDir = xrActionsManifestsFolder.string() + fs::path::preferred_separator;
+      this->Internals->Interactor->SetXRResourcesDirectory(manifestsDir);
+    }
+#else
+      assert(false); // Unreachable
+#endif
+  }
+  catch (const fs::filesystem_error& ex)
+  {
+    throw engine::resource_exception(std::string("Could not use resources: ") + ex.what());
+  }
 }
 
 //----------------------------------------------------------------------------

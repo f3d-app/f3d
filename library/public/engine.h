@@ -119,6 +119,12 @@ public:
   [[nodiscard]] static engine createWasm(std::string_view canvasSelector = "#canvas");
 
   /**
+   * Create an engine with an XR window, `F3D_MODULE_OPENXR` is required.
+   * Throws a engine::no_window_exception if XR is not supported
+   */
+  [[nodiscard]] static engine createXR();
+
+  /**
    * Create an engine with an external window.
    * A context to retrieve OpenGL symbols is required.
    * Here's an example if a GLFW window is used:
@@ -212,6 +218,12 @@ public:
    * Throws a engine::cache_exception if the provided cachePath cannot be used.
    */
   engine& setCachePath(const std::filesystem::path& cachePath);
+
+  /**
+   * Set the resource path. Currently it is used to find the actions manifest files for XR.
+   * Throws a engine::resource_exception if the provided resourcesPath cannot be used.
+   */
+  engine& setResourcesPath(const std::filesystem::path& resourcesPath);
 
   /**
    * Engine provide a default options that you can use using engine::getOptions().
@@ -466,6 +478,15 @@ public:
   struct statefile_exception : public exception
   {
     explicit statefile_exception(const std::string& what = "");
+  };
+
+  /**
+   * An exception that can be thrown by the engine
+   * when the resource cannot be used
+   */
+  struct resource_exception : public exception
+  {
+    explicit resource_exception(const std::string& what = "");
   };
 
 private:

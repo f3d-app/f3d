@@ -213,6 +213,12 @@ engine engine::createOSMesa()
 }
 
 //----------------------------------------------------------------------------
+engine engine::createXR()
+{
+  return { window::Type::XR, false, nullptr };
+}
+
+//----------------------------------------------------------------------------
 engine engine::createExternal([[maybe_unused]] const context::function& getProcAddress)
 {
   if (getProcAddress == nullptr)
@@ -490,6 +496,7 @@ std::map<std::string, bool> engine::getRenderingBackendList()
   backends["cocoa"] = engine::internals::BackendAvailable(context::cocoa);
   backends["egl"] = engine::internals::BackendAvailable(context::egl);
   backends["osmesa"] = engine::internals::BackendAvailable(context::osmesa);
+  backends["xr"] = engine::internals::BackendAvailable(context::xr);
 
   return backends;
 }
@@ -762,6 +769,13 @@ engine& engine::setCachePath(const fs::path& cachePath)
 }
 
 //----------------------------------------------------------------------------
+engine& engine::setResourcesPath(const fs::path& resourcesPath)
+{
+  this->Internals->Window->SetResourcesPath(resourcesPath);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 engine::no_window_exception::no_window_exception(const std::string& what)
   : exception(what)
 {
@@ -787,6 +801,12 @@ engine::cache_exception::cache_exception(const std::string& what)
 
 //----------------------------------------------------------------------------
 engine::statefile_exception::statefile_exception(const std::string& what)
+  : exception(what)
+{
+}
+
+//----------------------------------------------------------------------------
+engine::resource_exception::resource_exception(const std::string& what)
   : exception(what)
 {
 }

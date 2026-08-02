@@ -36,6 +36,11 @@
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
+#ifdef F3D_MODULE_OPENXR
+#include <vtkOpenXRRenderWindow.h>
+#include <vtkOpenXRRenderWindowInteractor.h>
+#endif
+
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -78,8 +83,16 @@ public:
     , Interactor(inter)
   {
     window::Type type = window.getType();
-    if (type == window::Type::GLX || type == window::Type::WGL || type == window::Type::COCOA ||
-      type == window::Type::WASM)
+    if (type == window::Type::XR)
+    {
+#ifdef F3D_MODULE_OPENXR
+      this->VTKInteractor = vtkSmartPointer<vtkOpenXRRenderWindowInteractor>::New();
+#else
+      assert(false); // unreachable
+#endif
+    }
+    else if (type == window::Type::GLX || type == window::Type::WGL ||
+      type == window::Type::COCOA || type == window::Type::WASM)
     {
       this->VTKInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
     }
@@ -2114,6 +2127,16 @@ interactor& interactor_impl::requestStop()
 {
   this->Internals->StopRequested = true;
   return *this;
+}
+
+//----------------------------------------------------------------------------
+void interactor_impl::SetXRResourcesDirectory(const std::string& actionsManifestDirectory)
+{
+#if F3D_MODULE_OPENXR
+  vtkOpenXRRenderWindowInteractor* xrInteractor =
+    vtkOpenXRRenderWindowInteractor::SafeDownCast(this->Internals->VTKInteractor);
+  xrInteractor->SetActionManifestDirectory(actionsManifestDirectory);
+#endif
 }
 
 //----------------------------------------------------------------------------
