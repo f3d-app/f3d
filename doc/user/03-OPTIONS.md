@@ -723,7 +723,7 @@ Blur circle of confusion radius.
 
 ### `--light-intensity` (_double_, default: `1.0`)
 
-_Adjust the intensity_ of every light in the scene (except HDRI).
+_Adjust the intensity_ of every light in the scene, including HDRI image-based lighting.
 
 #### compare
 

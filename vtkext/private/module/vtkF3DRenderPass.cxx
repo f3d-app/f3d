@@ -634,9 +634,23 @@ bool vtkF3DRenderPass::PreReplaceShaderValues(std::string& vertexShader, std::st
 
 // ----------------------------------------------------------------------------
 bool vtkF3DRenderPass::PostReplaceShaderValues([[maybe_unused]] std::string& vertexShader,
-  std::string&, std::string&, [[maybe_unused]] vtkAbstractMapper* mapper,
+  std::string&, std::string& fragmentShader, [[maybe_unused]] vtkAbstractMapper* mapper,
   [[maybe_unused]] vtkProp* prop)
 {
+  // Scale the HDRI image-based lighting (diffuse + specular) by IBLIntensity so it
+  // follows render.light.intensity just like explicit lights do.
+  // The IBLIntensity uniform is declared automatically via VTK's //VTK::CustomUniforms::Dec
+  // mechanism: vtkF3DRenderer::UpdateLights calls SetUniformf("IBLIntensity", ...) on every
+  // actor each frame so the declaration is always present when the shader is compiled.
+  // This substitution lives here (in the render pass, not the mapper) so it applies to
+  // both the standard OpenGL mapper and the GLES mapper used for web and Android.
+  // see https://github.com/f3d-app/f3d/issues/3312
+  if (fragmentShader.find("iblDiffuse") != std::string::npos)
+  {
+    vtkShaderProgram::Substitute(fragmentShader, "vec3 color = iblDiffuse + iblSpecular;",
+      "vec3 color = (iblDiffuse + iblSpecular) * IBLIntensity;");
+  }
+
 #ifdef F3D_USE_GLES
   vtkPolyDataMapper* polyMapper = vtkPolyDataMapper::SafeDownCast(mapper);
   vtkActor* actor = vtkActor::SafeDownCast(prop);

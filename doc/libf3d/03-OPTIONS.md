@@ -440,7 +440,7 @@ CLI: `--blur-coc`.
 
 ### `render.light.intensity` (_double_, default: `1.0`, range domain: `[0, 5]`, increment: `0.02`)
 
-Adjust the intensity of every light in the scene (except HDRI).
+Adjust the intensity of every light in the scene, including HDRI image-based lighting.
 
 CLI: `--light-intensity`.
 
