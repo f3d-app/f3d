@@ -139,6 +139,40 @@ extern "C"
   F3D_EXPORT void f3d_scene_remove_all_lights(f3d_scene_t* scene);
 
   /**
+   * @brief Get the scene hierarchy of all added files.
+   *
+   * The nodes are returned in depth-first pre-order, so that a parent node always precedes its
+   * children.
+   *
+   * The returned array and the labels it contains must be freed with
+   * f3d_scene_free_scene_hierarchy().
+   *
+   * @param scene Scene handle.
+   * @param count Output pointer that receives the number of nodes.
+   * @return A newly allocated array of nodes, NULL if the scene is empty.
+   */
+  F3D_EXPORT f3d_node_state_t* f3d_scene_get_scene_hierarchy(
+    const f3d_scene_t* scene, unsigned int* count);
+
+  /**
+   * @brief Free the array returned by f3d_scene_get_scene_hierarchy().
+   *
+   * @param nodes Array to free.
+   * @param count Number of nodes in the array.
+   */
+  F3D_EXPORT void f3d_scene_free_scene_hierarchy(f3d_node_state_t* nodes, unsigned int count);
+
+  /**
+   * @brief Set the visibility of a scene hierarchy node and of its whole subtree.
+   *
+   * @param scene Scene handle.
+   * @param node_id Index of the node.
+   * @param visible 1 to show the node, 0 to hide it.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_scene_set_node_visibility(f3d_scene_t* scene, int node_id, int visible);
+
+  /**
    * @brief Check if a file path is supported by the scene.
    *
    * @param scene Scene handle.

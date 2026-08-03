@@ -15,6 +15,7 @@
 #include "vtkF3DRenderer.h"
 
 #include <algorithm>
+#include <iterator>
 #include <optional>
 #include <vtkCallbackCommand.h>
 #include <vtkCellArray.h>
@@ -863,6 +864,36 @@ scene& scene_impl::removeLight(int index)
 scene& scene_impl::removeAllLights()
 {
   this->Internals->Window.GetRenderer()->RemoveAllLights();
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+std::vector<node_state_t> scene_impl::getSceneHierarchy() const
+{
+  std::vector<vtkF3DMetaImporter::NodeInfo> hierarchy =
+    this->Internals->MetaImporter->GetSceneHierarchyNodes();
+
+  std::vector<node_state_t> nodeStates;
+  nodeStates.reserve(hierarchy.size());
+  std::ranges::transform(hierarchy, std::back_inserter(nodeStates),
+    [](const vtkF3DMetaImporter::NodeInfo& node)
+    {
+      return node_state_t{ node.Id, node.ParentId, node.Level, node.Label, node.Visible,
+        node.HasChildren, node.Collapsed };
+    });
+  return nodeStates;
+}
+
+//----------------------------------------------------------------------------
+scene& scene_impl::setNodeVisibility(int nodeId, bool visible)
+{
+  if (!this->Internals->MetaImporter->SetNodeVisibility(nodeId, visible))
+  {
+    throw scene::node_exception(
+      "No scene hierarchy node at index " + std::to_string(nodeId) + " to update");
+  }
+
+  this->Internals->Window.UpdateActorsVisibility();
   return *this;
 }
 

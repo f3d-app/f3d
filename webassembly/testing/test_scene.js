@@ -6,6 +6,11 @@ const settings = {
     Module.engineInstance.getScene().addBuffer(new Array());
     Module.engineInstance.getScene().clear();
 
+    utils.assert(
+      Module.engineInstance.getScene().getSceneHierarchy().length === 0,
+      "a cleared scene should have an empty scene hierarchy",
+    );
+
     const options = Module.engineInstance.getOptions();
 
     // background must be set to black for proper blending with transparent canvas
@@ -56,6 +61,48 @@ const settings = {
     utils.assert(
       scene.getAnimationNames()[0] == "stand",
       "getAnimationNames returns names",
+    );
+
+    const hierarchy = scene.getSceneHierarchy();
+
+    utils.assert(hierarchy.length > 0, "scene hierarchy should not be empty");
+    utils.assert(
+      hierarchy[0].parentId === -1 && hierarchy[0].hasChildren,
+      "root node should have no parent and have children",
+    );
+    utils.assert(
+      hierarchy[0].label === "soldier_animations.mdl",
+      "root node should be labeled after the added file",
+    );
+    utils.assert(
+      hierarchy.every((node, index) => node.id === index),
+      "node ids should be their index in the hierarchy",
+    );
+    utils.assert(
+      hierarchy.every(
+        (node) =>
+          node.parentId < node.id &&
+          node.level ===
+            (node.parentId < 0 ? 0 : hierarchy[node.parentId].level + 1),
+      ),
+      "a parent node should precede its children and be one level above them",
+    );
+    utils.assert(
+      hierarchy.every((node) => node.visible),
+      "nodes should be visible by default",
+    );
+
+    scene.setNodeVisibility(0, false);
+    utils.assert(
+      scene.getSceneHierarchy().every((node) => !node.visible),
+      "hiding the root node should hide its whole subtree",
+    );
+
+    // restore the visibility expected by the baseline
+    scene.setNodeVisibility(0, true);
+    utils.assert(
+      scene.getSceneHierarchy().every((node) => node.visible),
+      "showing the root node should show its whole subtree",
     );
   },
 };

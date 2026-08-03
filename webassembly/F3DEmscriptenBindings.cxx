@@ -253,7 +253,28 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("getAnimationName", &f3d::scene::getAnimationName)
     .function(
       "getAnimationNames",
-      +[](f3d::scene& scene) { return containerToJSArray(scene.getAnimationNames()); });
+      +[](f3d::scene& scene) { return containerToJSArray(scene.getAnimationNames()); })
+    .function(
+      "getSceneHierarchy",
+      +[](f3d::scene& scene) -> emscripten::val
+      {
+        emscripten::val jsArray = emscripten::val::array();
+        for (const f3d::node_state_t& node : scene.getSceneHierarchy())
+        {
+          emscripten::val jsNode = emscripten::val::object();
+          jsNode.set("id", node.id);
+          jsNode.set("parentId", node.parentId);
+          jsNode.set("level", node.level);
+          jsNode.set("label", node.label);
+          jsNode.set("visible", node.visible);
+          jsNode.set("hasChildren", node.hasChildren);
+          jsNode.set("collapsed", node.collapsed);
+          jsArray.call<void>("push", jsNode);
+        }
+        return jsArray;
+      })
+    .function("setNodeVisibility", &f3d::scene::setNodeVisibility,
+      emscripten::return_value_policy::reference());
 
   // f3d::image
   emscripten::enum_<f3d::image::SaveFormat>("ImageSaveFormat")

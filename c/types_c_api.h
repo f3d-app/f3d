@@ -200,6 +200,20 @@ extern "C"
    */
   F3D_EXPORT int f3d_light_state_equal(const f3d_light_state_t* a, const f3d_light_state_t* b);
 
+  /**
+   * @brief Structure describing a single node of the scene hierarchy.
+   */
+  typedef struct f3d_node_state_t
+  {
+    int id;
+    int parent_id;
+    int level;
+    char* label;
+    int visible;
+    int has_children;
+    int collapsed;
+  } f3d_node_state_t;
+
 #ifdef __cplusplus
 }
 #endif

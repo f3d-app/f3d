@@ -367,6 +367,45 @@ struct F3D_EXPORT light_state_t
   }
 };
 
+/**
+ * Describe a single node of the scene hierarchy, as returned by scene::getSceneHierarchy.
+ */
+struct node_state_t
+{
+  /// Identifier of the node, to be used with scene::setNodeVisibility.
+  /// Ids are assigned in depth-first pre-order, starting at 0 with the root node of the first
+  /// added file, and correspond to the index of the node in the vector returned by
+  /// scene::getSceneHierarchy. They are only invalidated by scene::clear, as adding files to the
+  /// scene only appends nodes.
+  int id = -1;
+
+  /// Identifier of the parent node, -1 when the node is a root node
+  int parentId = -1;
+
+  /// Depth of the node, 0 for a root node, can be used to indent it
+  int level = 0;
+
+  /// Name of the node, a placeholder is used when the file does not provide any
+  std::string label;
+
+  /// Visibility of the node
+  bool visible = true;
+
+  /// True if the node has at least one child
+  bool hasChildren = false;
+
+  /// True if a user interface should display this node collapsed by default, which is used to
+  /// compact subtrees whose nodes do not carry any meaningful name
+  bool collapsed = false;
+
+  [[nodiscard]] bool operator==(const node_state_t& other) const
+  {
+    return this->id == other.id && this->parentId == other.parentId && this->level == other.level &&
+      this->label == other.label && this->visible == other.visible &&
+      this->hasChildren == other.hasChildren && this->collapsed == other.collapsed;
+  }
+};
+
 }
 
 #endif

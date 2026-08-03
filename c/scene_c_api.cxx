@@ -189,6 +189,76 @@ void f3d_scene_free_added_files(char** files, unsigned int count)
 }
 
 //----------------------------------------------------------------------------
+f3d_node_state_t* f3d_scene_get_scene_hierarchy(const f3d_scene_t* scene, unsigned int* count)
+{
+  if (!scene || !count)
+  {
+    if (count)
+    {
+      *count = 0;
+    }
+    return nullptr;
+  }
+
+  const f3d::scene* cpp_scene = reinterpret_cast<const f3d::scene*>(scene);
+  std::vector<f3d::node_state_t> nodes = cpp_scene->getSceneHierarchy();
+  *count = static_cast<unsigned int>(nodes.size());
+  if (nodes.empty())
+  {
+    return nullptr;
+  }
+
+  f3d_node_state_t* result = new f3d_node_state_t[nodes.size()];
+  for (size_t i = 0; i < nodes.size(); ++i)
+  {
+    result[i].id = nodes[i].id;
+    result[i].parent_id = nodes[i].parentId;
+    result[i].level = nodes[i].level;
+    result[i].label = new char[nodes[i].label.size() + 1];
+    std::strcpy(result[i].label, nodes[i].label.c_str());
+    result[i].visible = nodes[i].visible ? 1 : 0;
+    result[i].has_children = nodes[i].hasChildren ? 1 : 0;
+    result[i].collapsed = nodes[i].collapsed ? 1 : 0;
+  }
+  return result;
+}
+
+//----------------------------------------------------------------------------
+void f3d_scene_free_scene_hierarchy(f3d_node_state_t* nodes, unsigned int count)
+{
+  if (!nodes)
+  {
+    return;
+  }
+  for (unsigned int i = 0; i < count; ++i)
+  {
+    delete[] nodes[i].label;
+  }
+  delete[] nodes;
+}
+
+//----------------------------------------------------------------------------
+int f3d_scene_set_node_visibility(f3d_scene_t* scene, int node_id, int visible)
+{
+  if (!scene)
+  {
+    return 0;
+  }
+
+  f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
+  try
+  {
+    cpp_scene->setNodeVisibility(node_id, visible != 0);
+  }
+  catch (const f3d::scene::node_exception& e)
+  {
+    f3d::log::error("Failed to set visibility of node at index {}: {}", node_id, e.what());
+    return 0;
+  }
+  return 1;
+}
+
+//----------------------------------------------------------------------------
 int f3d_scene_add(f3d_scene_t* scene, const char* file_path)
 {
   if (!scene || !file_path)
