@@ -1246,10 +1246,10 @@ public:
   F3DAppOptions AppOptions;
   f3d::options LibOptions;
 
-  fs::path WindowGeometryCachePath() const
+  fs::path CacheFilePath() const
   {
     const fs::path cacheDir = this->Engine->getCachePath();
-    return cacheDir.empty() ? fs::path() : cacheDir / "window.json";
+    return cacheDir.empty() ? fs::path() : cacheDir / "cache.json";
   }
 
   /* Recover the cached window geometry as app options, so that it goes through the regular
@@ -1257,7 +1257,7 @@ public:
   F3DOptionsTools::OptionsDict ReadCachedWindowGeometry() const
   {
     F3DOptionsTools::OptionsDict geometry;
-    const fs::path cachePath = this->WindowGeometryCachePath();
+    const fs::path cachePath = this->CacheFilePath();
     if (cachePath.empty())
     {
       return geometry;
@@ -1275,15 +1275,19 @@ public:
       buffer << stream.rdbuf();
 
       const nlohmann::ordered_json root = nlohmann::ordered_json::parse(buffer.str());
-      if (root.contains("width") && root.contains("height"))
+      if (root.contains("window"))
       {
-        geometry["resolution"] =
-          std::format("{}, {}", root.at("width").get<int>(), root.at("height").get<int>());
-      }
-      if (root.contains("left") && root.contains("top"))
-      {
-        geometry["position"] =
-          std::format("{}, {}", root.at("left").get<int>(), root.at("top").get<int>());
+        const nlohmann::ordered_json& windowJson = root.at("window");
+        if (windowJson.contains("width") && windowJson.contains("height"))
+        {
+          geometry["resolution"] = std::format(
+            "{}, {}", windowJson.at("width").get<int>(), windowJson.at("height").get<int>());
+        }
+        if (windowJson.contains("left") && windowJson.contains("top"))
+        {
+          geometry["position"] = std::format(
+            "{}, {}", windowJson.at("left").get<int>(), windowJson.at("top").get<int>());
+        }
       }
     }
     catch (const nlohmann::json::exception& ex)
@@ -1291,32 +1295,39 @@ public:
       f3d::log::debug("Could not parse the cached window geometry: ", ex.what());
       geometry.clear();
     }
+
+    for (const auto& [name, value] : geometry)
+    {
+      f3d::log::debug("Recovered window ", name, " from cache: ", value);
+    }
     return geometry;
   }
 
   /* Store the current window geometry in the cache so that the next run can restore it */
   void CacheWindowGeometry() const
   {
-    const fs::path cachePath = this->WindowGeometryCachePath();
-    if (cachePath.empty())
-    {
-      return;
-    }
-
+    const fs::path cachePath = this->CacheFilePath();
     std::ofstream stream(cachePath);
     if (!stream.is_open())
     {
+      // Only reached when there is no cache path or when it is not writable, and only once an
+      // interactive window has been closed, which the coverage CI never does with such a path
+      // LCOV_EXCL_START
       f3d::log::debug("Could not open ", cachePath.string(), " to cache the window geometry");
       return;
+      // LCOV_EXCL_STOP
     }
 
     const f3d::window& window = this->Engine->getWindow();
-    nlohmann::ordered_json root;
+    nlohmann::ordered_json windowJson;
     const auto [posX, posY] = window.getPosition();
-    root["width"] = window.getWidth();
-    root["height"] = window.getHeight();
-    root["left"] = posX;
-    root["top"] = posY;
+    windowJson["width"] = window.getWidth();
+    windowJson["height"] = window.getHeight();
+    windowJson["left"] = posX;
+    windowJson["top"] = posY;
+
+    nlohmann::ordered_json root;
+    root["window"] = windowJson;
 
     stream << root.dump(2);
     f3d::log::debug("Window geometry cached in ", cachePath.string());

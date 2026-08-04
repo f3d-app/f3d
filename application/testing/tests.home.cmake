@@ -46,7 +46,7 @@ if(NOT WIN32)
 
     # A cache file that cannot be read is ignored, a directory is used to make it unreadable
     set(_unreadable_geometry_cache "${CMAKE_BINARY_DIR}/Testing/Temporary/unreadable_window_geometry_cache")
-    file(MAKE_DIRECTORY "${_unreadable_geometry_cache}/f3d/window.json")
+    file(MAKE_DIRECTORY "${_unreadable_geometry_cache}/f3d/cache.json")
     f3d_test(NAME TestWindowGeometryUnreadableCache DATA cow.vtp NO_BASELINE NO_OUTPUT ARGS --verbose=debug --list-bindings REGEXP "Could not parse the cached window geometry" ENV "XDG_CACHE_HOME=${_unreadable_geometry_cache}")
 
     # Without any cache directory, there is no geometry to restore

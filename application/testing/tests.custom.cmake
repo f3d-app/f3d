@@ -89,10 +89,11 @@ if (UNIX AND NOT APPLE)
 
   if(F3D_TESTING_ENABLE_RENDERING_TESTS)
     set(_geometry_cache "${CMAKE_BINARY_DIR}/Testing/Temporary/window_geometry_cache")
-    file(WRITE "${_geometry_cache}/f3d/window.json" "{\"width\": 250, \"height\": 150, \"left\": 42, \"top\": 24}")
+    file(WRITE "${_geometry_cache}/f3d/cache.json" "{\"window\": {\"width\": 250, \"height\": 150, \"left\": 42, \"top\": 24}}")
     add_test(NAME f3d::TestWindowGeometryRestore COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/cow.vtp --no-config --verbose=debug --list-bindings)
     set_tests_properties(f3d::TestWindowGeometryRestore PROPERTIES
       PASS_REGULAR_EXPRESSION "Applying window resolution 250x150"
+      FAIL_REGULAR_EXPRESSION "Applying window resolution 1000x600"
       ENVIRONMENT "XDG_CACHE_HOME=${_geometry_cache};CTEST_F3D_FORCE_DPI_SCALE=1.0")
   endif()
 endif ()

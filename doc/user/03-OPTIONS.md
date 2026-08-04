@@ -1121,7 +1121,18 @@ When loading a statefile (`--load-statefile`/`load_statefile`), the `{n}` variab
 
 When using HDRI related options, F3D will create and use a cache directory to store related data in order to speed up rendering.
 
-F3D also stores the geometry of the last closed interactive window in a `window.json` cache file, in the same directory, so that it can be restored on the next start, see `--resolution` and `--position`.
+F3D also stores the geometry of the last closed interactive window in a `cache.json` file, in the same directory, so that it can be restored on the next start, see `--resolution` and `--position`. Its `window` entry uses the same layout as in [statefiles](#statefiles):
+
+```json
+{
+  "window": {
+    "width": 1000,
+    "height": 600,
+    "left": 100,
+    "top": 50
+  }
+}
+```
 
 These cache files can be safely removed, at the cost of recomputing the HDRI data on next use and of losing the cached window geometry.
 
