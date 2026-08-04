@@ -173,6 +173,18 @@ extern "C"
   F3D_EXPORT int f3d_scene_set_node_visibility(f3d_scene_t* scene, int node_id, int visible);
 
   /**
+   * @brief Get information about the contents of the scene.
+   *
+   * All the counters are zero when the scene is empty.
+   * See f3d_scene_info_t documentation for more information.
+   *
+   * @param scene Scene handle.
+   * @param info Output pointer that receives the scene information.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_scene_get_scene_info(const f3d_scene_t* scene, f3d_scene_info_t* info);
+
+  /**
    * @brief Check if a file path is supported by the scene.
    *
    * @param scene Scene handle.

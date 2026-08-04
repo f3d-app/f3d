@@ -11,6 +11,15 @@ const settings = {
       "a cleared scene should have an empty scene hierarchy",
     );
 
+    const clearedInfo = Module.engineInstance.getScene().getSceneInfo();
+    utils.assert(
+      clearedInfo.numberOfFiles === 0 &&
+        clearedInfo.numberOfActors === 0 &&
+        clearedInfo.numberOfPoints === 0n &&
+        clearedInfo.numberOfCells === 0n,
+      "a cleared scene should have zeroed scene info",
+    );
+
     const options = Module.engineInstance.getOptions();
 
     // background must be set to black for proper blending with transparent canvas
@@ -103,6 +112,22 @@ const settings = {
     utils.assert(
       scene.getSceneHierarchy().every((node) => node.visible),
       "showing the root node should show its whole subtree",
+    );
+
+    const info = scene.getSceneInfo();
+
+    utils.assert(
+      info.numberOfFiles === 1 && info.numberOfActors > 0,
+      "scene info should count the added file and its actors",
+    );
+    utils.assert(
+      typeof info.numberOfPoints === "bigint" &&
+        typeof info.numberOfCells === "bigint",
+      "64 bits scene info counters should be mapped to BigInt",
+    );
+    utils.assert(
+      info.numberOfPoints > 0n && info.numberOfCells > 0n,
+      "scene info should count points and cells",
     );
   },
 };

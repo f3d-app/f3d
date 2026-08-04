@@ -410,6 +410,27 @@ extern "C"
     return self;
   }
 
+  JNIEXPORT jobject JAVA_BIND(Scene, getSceneInfo)(JNIEnv* env, jobject self)
+  {
+    const f3d::scene_info_t cppSceneInfo = GetEngine(env, self)->getScene().getSceneInfo();
+
+    jclass sceneInfoClass = env->FindClass("app/f3d/F3D/Types$SceneInfo");
+    jmethodID sceneInfoConstructor = env->GetMethodID(sceneInfoClass, "<init>", "()V");
+    jobject jsceneInfo = env->NewObject(sceneInfoClass, sceneInfoConstructor);
+
+    jfieldID numberOfFilesField = env->GetFieldID(sceneInfoClass, "numberOfFiles", "I");
+    jfieldID numberOfActorsField = env->GetFieldID(sceneInfoClass, "numberOfActors", "I");
+    jfieldID numberOfPointsField = env->GetFieldID(sceneInfoClass, "numberOfPoints", "J");
+    jfieldID numberOfCellsField = env->GetFieldID(sceneInfoClass, "numberOfCells", "J");
+
+    env->SetIntField(jsceneInfo, numberOfFilesField, cppSceneInfo.numberOfFiles);
+    env->SetIntField(jsceneInfo, numberOfActorsField, cppSceneInfo.numberOfActors);
+    env->SetLongField(jsceneInfo, numberOfPointsField, cppSceneInfo.numberOfPoints);
+    env->SetLongField(jsceneInfo, numberOfCellsField, cppSceneInfo.numberOfCells);
+
+    return jsceneInfo;
+  }
+
   JNIEXPORT jboolean JAVA_BIND(Scene, supports)(JNIEnv* env, jobject self, jstring filePath)
   {
     if (!filePath)

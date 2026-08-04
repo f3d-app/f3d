@@ -274,7 +274,20 @@ EMSCRIPTEN_BINDINGS(f3d)
         return jsArray;
       })
     .function("setNodeVisibility", &f3d::scene::setNodeVisibility,
-      emscripten::return_value_policy::reference());
+      emscripten::return_value_policy::reference())
+    .function(
+      "getSceneInfo",
+      +[](f3d::scene& scene) -> emscripten::val
+      {
+        const f3d::scene_info_t info = scene.getSceneInfo();
+
+        emscripten::val jsInfo = emscripten::val::object();
+        jsInfo.set("numberOfFiles", info.numberOfFiles);
+        jsInfo.set("numberOfActors", info.numberOfActors);
+        jsInfo.set("numberOfPoints", info.numberOfPoints);
+        jsInfo.set("numberOfCells", info.numberOfCells);
+        return jsInfo;
+      });
 
   // f3d::image
   emscripten::enum_<f3d::image::SaveFormat>("ImageSaveFormat")

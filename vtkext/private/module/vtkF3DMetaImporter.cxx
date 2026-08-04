@@ -957,36 +957,45 @@ void vtkF3DMetaImporter::UpdateInfoForColoring()
 }
 
 //----------------------------------------------------------------------------
-std::string vtkF3DMetaImporter::GetMetaDataDescription() const
+vtkF3DMetaImporter::SceneInfo vtkF3DMetaImporter::GetSceneInfo() const
 {
-  std::string description;
-  if (this->Pimpl->Importers.size() > 1)
-  {
-    description += "Number of files: ";
-    description += std::to_string(this->Pimpl->Importers.size());
-    description += "\n";
-  }
+  vtkF3DMetaImporter::SceneInfo info;
+  info.NumberOfFiles = static_cast<int>(this->Pimpl->Importers.size());
+  info.NumberOfActors = this->ActorCollection->GetNumberOfItems();
 
-  description += "Number of actors: ";
-  description += std::to_string(this->ActorCollection->GetNumberOfItems());
-  description += "\n";
-
-  vtkIdType nPoints = 0;
-  vtkIdType nCells = 0;
   vtkCollectionSimpleIterator ait;
   this->ActorCollection->InitTraversal(ait);
   while (auto* actor = this->ActorCollection->GetNextActor(ait))
   {
     vtkPolyData* surface = vtkPolyDataMapper::SafeDownCast(actor->GetMapper())->GetInput();
-    nPoints += surface->GetNumberOfPoints();
-    nCells += surface->GetNumberOfCells();
+    info.NumberOfPoints += surface->GetNumberOfPoints();
+    info.NumberOfCells += surface->GetNumberOfCells();
   }
 
+  return info;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkF3DMetaImporter::GetMetaDataDescription() const
+{
+  const vtkF3DMetaImporter::SceneInfo info = this->GetSceneInfo();
+
+  std::string description;
+  if (info.NumberOfFiles > 1)
+  {
+    description += "Number of files: ";
+    description += std::to_string(info.NumberOfFiles);
+    description += "\n";
+  }
+
+  description += "Number of actors: ";
+  description += std::to_string(info.NumberOfActors);
+  description += "\n";
   description += "Number of points: ";
-  description += std::to_string(nPoints);
+  description += std::to_string(info.NumberOfPoints);
   description += "\n";
   description += "Number of cells: ";
-  description += std::to_string(nCells);
+  description += std::to_string(info.NumberOfCells);
   return description;
 }
 

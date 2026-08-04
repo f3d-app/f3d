@@ -214,6 +214,20 @@ extern "C"
     int collapsed;
   } f3d_node_state_t;
 
+  /**
+   * @brief Structure describing the contents of the scene.
+   *
+   * number_of_files counts every file added with f3d_scene_add() as well as every mesh and buffer
+   * added with f3d_scene_add_mesh() and f3d_scene_add_buffer().
+   */
+  typedef struct f3d_scene_info_t
+  {
+    int number_of_files;
+    int number_of_actors;
+    int64_t number_of_points;
+    int64_t number_of_cells;
+  } f3d_scene_info_t;
+
 #ifdef __cplusplus
 }
 #endif
