@@ -47,7 +47,6 @@ public:
   scene& removeAllLights() override;
   std::vector<node_state_t> getSceneHierarchy() const override;
   scene& setNodeVisibility(int nodeId, bool visible) override;
-  bool supports(const std::filesystem::path& filePath) override;
   file_availability supports(const std::filesystem::path& filePath) override;
   scene& loadAnimationTime(double timeValue) override;
   std::pair<double, double> animationTimeRange() override;
