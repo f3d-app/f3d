@@ -57,6 +57,8 @@ int vtkF3DLYSReader::RequestData(
     fileStream->Open(this->FileName);
     stream = fileStream;
   }
+  // Seek to the beginning in case the stream was already read (e.g. by CanReadFile).
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
   // Read the 16-byte container header
   // bytes  0- 3 : container format version (uint32 LE); observed value: 4
   // bytes  4- 7 : padded JSON block size (uint32 LE) - includes trailing alignment bytes
