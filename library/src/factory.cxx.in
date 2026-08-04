@@ -89,8 +89,8 @@ factory::plugin_initializer_t factory::getStaticInitializer(const std::string& p
 reader* factory::getReader(const std::string& fileName, std::optional<std::string> forceReader,
   const bool skipContentCheck, file_availability& availability)
 {
-  return f3d::pickReader(this->Plugins, forceReader, availability, [&](const reader* reader)
-    { return reader->canRead(fileName, skipContentCheck); });
+  return f3d::pickReader(this->Plugins, forceReader, availability,
+    [&](const reader* reader) { return reader->canRead(fileName, skipContentCheck); });
 }
 
 //----------------------------------------------------------------------------
@@ -101,7 +101,8 @@ reader* factory::getReader(
   stream->SetBuffer(buffer, size);
   file_availability availability = file_availability::UNSUPPORTED_EXTENSION;
 
-  return f3d::pickReader(this->Plugins, forceReader, availability, [&](const reader* reader)
+  return f3d::pickReader(this->Plugins, forceReader, availability,
+    [&](const reader* reader)
     {
       if (reader->supportsStream() && reader->canRead(stream))
       {
