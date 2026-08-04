@@ -229,7 +229,7 @@ extern "C"
   }
 
   JNIEXPORT jobject JAVA_BIND(Interactor, addBindingCommands)(JNIEnv* env, jobject self,
-    jobject bind, jobject commands, jstring group, jobject type, jboolean notify)
+    jobject bind, jobject commands, jstring group, jobject type, jboolean notify, jboolean repeat)
   {
     f3d::interaction_bind_t nativeBind = JavaBindToNative(env, bind);
 
@@ -276,7 +276,7 @@ extern "C"
     try
     {
       GetInteractor(env, self).addBinding(
-        nativeBind, commandsVec, groupCpp, nullptr, nativeType, notify);
+        nativeBind, commandsVec, groupCpp, nullptr, nativeType, notify, repeat);
     }
     catch (const f3d::interactor::already_exists_exception& e)
     {
@@ -286,7 +286,7 @@ extern "C"
   }
 
   JNIEXPORT jobject JAVA_BIND(Interactor, addBindingCommand)(JNIEnv* env, jobject self,
-    jobject bind, jstring command, jstring group, jobject type, jboolean notify)
+    jobject bind, jstring command, jstring group, jobject type, jboolean notify, jboolean repeat)
   {
     f3d::interaction_bind_t nativeBind = JavaBindToNative(env, bind);
 
@@ -323,7 +323,7 @@ extern "C"
     try
     {
       GetInteractor(env, self).addBinding(
-        nativeBind, commandCpp, groupCpp, nullptr, nativeType, notify);
+        nativeBind, commandCpp, groupCpp, nullptr, nativeType, notify, repeat);
     }
     catch (const f3d::interactor::already_exists_exception& e)
     {
