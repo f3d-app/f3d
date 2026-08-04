@@ -212,7 +212,8 @@ public:
   static bool ParseStatefile(const fs::path& statefilePath,
     F3DOptionsTools::OptionsDict& outOptions, std::vector<std::string>& outFiles,
     std::optional<F3DStarter::StatefileFileGroups>& outFileGroups,
-    std::optional<std::pair<int, int>>& outWindowSize)
+    std::optional<std::pair<int, int>>& outWindowSize,
+    std::optional<std::pair<int, int>>& outWindowPosition)
   {
     std::ifstream stream(statefilePath);
     if (!stream.is_open())
@@ -220,14 +221,15 @@ public:
       f3d::log::warn("Could not open statefile, skipping: ", statefilePath.string());
       return false;
     }
-    return F3DInternals::ParseStatefileContent(
-      stream, statefilePath.parent_path(), outOptions, outFiles, outFileGroups, outWindowSize);
+    return F3DInternals::ParseStatefileContent(stream, statefilePath.parent_path(), outOptions,
+      outFiles, outFileGroups, outWindowSize, outWindowPosition);
   }
 
   static bool ParseStatefileContent(std::istream& stream, const fs::path& baseDir,
     F3DOptionsTools::OptionsDict& outOptions, std::vector<std::string>& outFiles,
     std::optional<F3DStarter::StatefileFileGroups>& outFileGroups,
-    std::optional<std::pair<int, int>>& outWindowSize)
+    std::optional<std::pair<int, int>>& outWindowSize,
+    std::optional<std::pair<int, int>>& outWindowPosition)
   {
     /* Resolve a path stored in a statefile against the statefile directory (baseDir), mirroring how
      * the file paths were stored */
@@ -299,6 +301,12 @@ public:
         const nlohmann::ordered_json& window = root.at("window");
         outWindowSize =
           std::make_pair(window.at("width").get<int>(), window.at("height").get<int>());
+
+        if (window.contains("left") && window.contains("top"))
+        {
+          outWindowPosition =
+            std::make_pair(window.at("left").get<int>(), window.at("top").get<int>());
+        }
       }
     }
     catch (const nlohmann::json::exception& ex)
@@ -313,29 +321,31 @@ public:
   static bool ReadStatefileSource(const std::string& source,
     F3DOptionsTools::OptionsDict& outOptions, std::vector<std::string>& outFiles,
     std::optional<F3DStarter::StatefileFileGroups>& outFileGroups,
-    std::optional<std::pair<int, int>>& outWindowSize)
+    std::optional<std::pair<int, int>>& outWindowSize,
+    std::optional<std::pair<int, int>>& outWindowPosition)
   {
     if (source == F3D_PIPED)
     {
       return F3DInternals::ParseStatefileContent(
-        std::cin, {}, outOptions, outFiles, outFileGroups, outWindowSize);
+        std::cin, {}, outOptions, outFiles, outFileGroups, outWindowSize, outWindowPosition);
     }
 
-    return F3DInternals::ParseStatefile(
-      f3d::utils::collapsePath(source), outOptions, outFiles, outFileGroups, outWindowSize);
+    return F3DInternals::ParseStatefile(f3d::utils::collapsePath(source), outOptions, outFiles,
+      outFileGroups, outWindowSize, outWindowPosition);
   }
 
   static bool ReadStatefileFromClipboard(F3DOptionsTools::OptionsDict& outOptions,
     std::vector<std::string>& outFiles,
     std::optional<F3DStarter::StatefileFileGroups>& outFileGroups,
-    std::optional<std::pair<int, int>>& outWindowSize)
+    std::optional<std::pair<int, int>>& outWindowSize,
+    std::optional<std::pair<int, int>>& outWindowPosition)
   {
     try
     {
       // Read the clipboard through libf3d, which owns clipboard support
       std::istringstream stream(f3d::engine::state::fromClipboard().toString());
       return F3DInternals::ParseStatefileContent(
-        stream, {}, outOptions, outFiles, outFileGroups, outWindowSize);
+        stream, {}, outOptions, outFiles, outFileGroups, outWindowSize, outWindowPosition);
     }
     catch (const f3d::engine::statefile_exception& ex)
     {
@@ -1080,12 +1090,14 @@ public:
       f3d::window& window = this->Engine->getWindow();
       if (this->AppOptions.Resolution.size() == 2)
       {
-        double dpiScale = window.getDPIScale();
+        const double dpiScale = window.getDPIScale();
+        const int width = static_cast<int>(this->AppOptions.Resolution[0] * dpiScale);
+        const int height = static_cast<int>(this->AppOptions.Resolution[1] * dpiScale);
 
-        f3d::log::debug("DPI scale: ", dpiScale);
+        f3d::log::debug(
+          "Applying window resolution ", width, "x", height, " with a DPI scale of ", dpiScale);
 
-        window.setSize(static_cast<int>(this->AppOptions.Resolution[0] * dpiScale),
-          static_cast<int>(this->AppOptions.Resolution[1] * dpiScale));
+        window.setSize(width, height);
       }
       else if (!this->AppOptions.Resolution.empty())
       {
@@ -1233,6 +1245,95 @@ public:
 
   F3DAppOptions AppOptions;
   f3d::options LibOptions;
+
+  fs::path CacheFilePath() const
+  {
+    const fs::path cacheDir = this->Engine->getCachePath();
+    return cacheDir.empty() ? fs::path() : cacheDir / "cache.json";
+  }
+
+  /* Recover the cached window geometry as app options, so that it goes through the regular
+   * options precedence as the weakest source. Empty when there is nothing usable to restore. */
+  F3DOptionsTools::OptionsDict ReadCachedWindowGeometry() const
+  {
+    F3DOptionsTools::OptionsDict geometry;
+    const fs::path cachePath = this->CacheFilePath();
+    if (cachePath.empty())
+    {
+      return geometry;
+    }
+
+    try
+    {
+      std::ifstream stream(cachePath);
+      if (!stream.is_open())
+      {
+        return geometry;
+      }
+
+      std::stringstream buffer;
+      buffer << stream.rdbuf();
+
+      const nlohmann::ordered_json root = nlohmann::ordered_json::parse(buffer.str());
+      if (root.contains("window"))
+      {
+        const nlohmann::ordered_json& windowJson = root.at("window");
+        if (windowJson.contains("width") && windowJson.contains("height"))
+        {
+          geometry["resolution"] = std::format(
+            "{}, {}", windowJson.at("width").get<int>(), windowJson.at("height").get<int>());
+        }
+        if (windowJson.contains("left") && windowJson.contains("top"))
+        {
+          geometry["position"] = std::format(
+            "{}, {}", windowJson.at("left").get<int>(), windowJson.at("top").get<int>());
+        }
+      }
+    }
+    catch (const nlohmann::json::exception& ex)
+    {
+      f3d::log::debug("Could not parse the cached window geometry: ", ex.what());
+      geometry.clear();
+    }
+
+    for (const auto& [name, value] : geometry)
+    {
+      f3d::log::debug("Recovered window ", name, " from cache: ", value);
+    }
+    return geometry;
+  }
+
+  /* Store the current window geometry in the cache so that the next run can restore it */
+  void CacheWindowGeometry() const
+  {
+    const fs::path cachePath = this->CacheFilePath();
+    std::ofstream stream(cachePath);
+    if (!stream.is_open())
+    {
+      // Only reached when there is no cache path or when it is not writable, and only once an
+      // interactive window has been closed, which the coverage CI never does with such a path
+      // LCOV_EXCL_START
+      f3d::log::debug("Could not open ", cachePath.string(), " to cache the window geometry");
+      return;
+      // LCOV_EXCL_STOP
+    }
+
+    const f3d::window& window = this->Engine->getWindow();
+    nlohmann::ordered_json windowJson;
+    const auto [posX, posY] = window.getPosition();
+    windowJson["width"] = window.getWidth();
+    windowJson["height"] = window.getHeight();
+    windowJson["left"] = posX;
+    windowJson["top"] = posY;
+
+    nlohmann::ordered_json root;
+    root["window"] = windowJson;
+
+    stream << root.dump(2);
+    f3d::log::debug("Window geometry cached in ", cachePath.string());
+  }
+
+  F3DOptionsTools::OptionsEntries CachedOptionsEntries;
   F3DOptionsTools::OptionsEntries StatefileOptionsEntries;
   F3DOptionsTools::OptionsEntries RuntimeStatefileOptionsEntries;
   F3DOptionsTools::OptionsEntries ConfigOptionsEntries;
@@ -1374,12 +1475,13 @@ int F3DStarter::Start(int argc, char** argv)
   }
   std::optional<StatefileFileGroups> statefileFileGroups;
   std::optional<std::pair<int, int>> statefileWindowSize;
+  std::optional<std::pair<int, int>> statefileWindowPosition;
   if (!loadStatefile.empty())
   {
     F3DOptionsTools::OptionsDict statefileOptions;
     std::vector<std::string> statefileFiles;
     if (F3DInternals::ReadStatefileSource(loadStatefile, statefileOptions, statefileFiles,
-          statefileFileGroups, statefileWindowSize))
+          statefileFileGroups, statefileWindowSize, statefileWindowPosition))
     {
       this->Internals->StatefileOptionsEntries.emplace_back(
         statefileOptions, "", "", "statefile options");
@@ -1489,6 +1591,24 @@ int F3DStarter::Start(int argc, char** argv)
     }
 
     this->ResetWindowName();
+
+    if (!this->Internals->AppOptions.NoRender && this->Internals->AppOptions.Output.empty() &&
+      this->Internals->AppOptions.Reference.empty())
+    {
+      const F3DOptionsTools::OptionsDict cachedGeometry =
+        this->Internals->ReadCachedWindowGeometry();
+      if (!cachedGeometry.empty())
+      {
+        this->Internals->CachedOptionsEntries.emplace_back(
+          cachedGeometry, "", "", "cached options");
+        this->Internals->UpdateOptions(
+          { this->Internals->CachedOptionsEntries, this->Internals->ConfigOptionsEntries,
+            this->Internals->StatefileOptionsEntries, this->Internals->CLIOptionsEntries,
+            this->Internals->ImperativeConfigOptionsEntries },
+          { "" }, true);
+      }
+    }
+
     this->Internals->ApplyPositionAndResolution();
     this->AddCommands();
     this->Internals->UpdateBindings({ "" });
@@ -1539,8 +1659,9 @@ int F3DStarter::Start(int argc, char** argv)
   if (!this->Internals->AppOptions.NoRender)
   {
     this->Internals->ApplyPositionAndResolution();
-    // Apply the statefile window size, unless the user explicitly set --resolution: that is always
-    // applied by ApplyPositionAndResolution (resolution has a default value) and takes precedence
+    // Apply the statefile window size and position, unless the user explicitly set
+    // --resolution/--position: those take precedence and were already applied by
+    // ApplyPositionAndResolution
     const bool explicitResolution = std::ranges::any_of(this->Internals->CLIOptionsEntries,
       [](const F3DOptionsTools::OptionsEntry& entry)
       { return std::get<0>(entry).contains("resolution"); });
@@ -1550,6 +1671,17 @@ int F3DStarter::Start(int argc, char** argv)
         statefileWindowSize->first, statefileWindowSize->second);
       f3d::log::debug("Window size set to ", statefileWindowSize->first, "x",
         statefileWindowSize->second, " from statefile");
+    }
+
+    const bool explicitPosition = std::ranges::any_of(this->Internals->CLIOptionsEntries,
+      [](const F3DOptionsTools::OptionsEntry& entry)
+      { return std::get<0>(entry).contains("position"); });
+    if (statefileWindowPosition.has_value() && !explicitPosition)
+    {
+      this->Internals->Engine->getWindow().setPosition(
+        statefileWindowPosition->first, statefileWindowPosition->second);
+      f3d::log::debug("Window position set to ", statefileWindowPosition->first, ",",
+        statefileWindowPosition->second, " from statefile");
     }
     f3d::window& window = this->Internals->Engine->getWindow();
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
@@ -1801,6 +1933,8 @@ int F3DStarter::Start(int argc, char** argv)
 
         interactor.setEventLoopUserCallback([this](f3d::interactor_state_t) { this->EventLoop(); });
         interactor.start(deltaTime);
+
+        this->Internals->CacheWindowGeometry();
       }
 #endif
     }
@@ -1937,9 +2071,10 @@ void F3DStarter::LoadFileGroupInternal(
     // Update options even when there is no file
     // as imperative options should override dynamic option even in that case
     this->Internals->UpdateOptions(
-      { this->Internals->ConfigOptionsEntries, this->Internals->StatefileOptionsEntries,
-        this->Internals->CLIOptionsEntries, this->Internals->RuntimeStatefileOptionsEntries,
-        this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
+      { this->Internals->CachedOptionsEntries, this->Internals->ConfigOptionsEntries,
+        this->Internals->StatefileOptionsEntries, this->Internals->CLIOptionsEntries,
+        this->Internals->RuntimeStatefileOptionsEntries, this->Internals->DynamicOptionsEntries,
+        this->Internals->ImperativeConfigOptionsEntries },
       { "" }, false);
     this->Internals->Engine->setOptions(this->Internals->LibOptions);
     f3d::log::debug("No files to load provided");
@@ -1947,7 +2082,7 @@ void F3DStarter::LoadFileGroupInternal(
   else
   {
     // Update app and libf3d options based on config entries, selecting block using the input file
-    // config < statefile < cli < runtime statefile < dynamic
+    // cached < config < statefile < cli < runtime statefile < dynamic
     // A statefile loaded interactively (runtime statefile) applies above the command line, like a
     // dynamic option change, so it is not overridden by the now stale launch options. A statefile
     // loaded at startup stays below the command line so explicit launch options win.
@@ -1955,9 +2090,10 @@ void F3DStarter::LoadFileGroupInternal(
     std::vector<fs::path> configPaths = this->Internals->LoadedFiles;
     std::copy(paths.begin(), paths.end(), std::back_inserter(configPaths));
     this->Internals->UpdateOptions(
-      { this->Internals->ConfigOptionsEntries, this->Internals->StatefileOptionsEntries,
-        this->Internals->CLIOptionsEntries, this->Internals->RuntimeStatefileOptionsEntries,
-        this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
+      { this->Internals->CachedOptionsEntries, this->Internals->ConfigOptionsEntries,
+        this->Internals->StatefileOptionsEntries, this->Internals->CLIOptionsEntries,
+        this->Internals->RuntimeStatefileOptionsEntries, this->Internals->DynamicOptionsEntries,
+        this->Internals->ImperativeConfigOptionsEntries },
       configPaths, false);
     this->Internals->UpdateBindings(configPaths);
 
@@ -2396,13 +2532,15 @@ void F3DStarter::LoadStatefile(const std::string& source)
   std::vector<std::string> statefileFiles;
   std::optional<StatefileFileGroups> statefileFileGroups;
   std::optional<std::pair<int, int>> statefileWindowSize;
-  if (!F3DInternals::ReadStatefileSource(
-        resolvedSource, statefileOptions, statefileFiles, statefileFileGroups, statefileWindowSize))
+  std::optional<std::pair<int, int>> statefileWindowPosition;
+  if (!F3DInternals::ReadStatefileSource(resolvedSource, statefileOptions, statefileFiles,
+        statefileFileGroups, statefileWindowSize, statefileWindowPosition))
   {
     return;
   }
 
-  this->ApplyStatefile(statefileOptions, statefileFiles, statefileFileGroups, statefileWindowSize);
+  this->ApplyStatefile(statefileOptions, statefileFiles, statefileFileGroups, statefileWindowSize,
+    statefileWindowPosition);
   f3d::log::info("Statefile loaded from ", resolvedSource);
 }
 
@@ -2413,14 +2551,16 @@ void F3DStarter::LoadStatefileFromClipboard()
   std::vector<std::string> statefileFiles;
   std::optional<StatefileFileGroups> statefileFileGroups;
   std::optional<std::pair<int, int>> statefileWindowSize;
-  if (!F3DInternals::ReadStatefileFromClipboard(
-        statefileOptions, statefileFiles, statefileFileGroups, statefileWindowSize))
+  std::optional<std::pair<int, int>> statefileWindowPosition;
+  if (!F3DInternals::ReadStatefileFromClipboard(statefileOptions, statefileFiles,
+        statefileFileGroups, statefileWindowSize, statefileWindowPosition))
   {
     // Unreachable with testing
     return;
   }
 
-  this->ApplyStatefile(statefileOptions, statefileFiles, statefileFileGroups, statefileWindowSize);
+  this->ApplyStatefile(statefileOptions, statefileFiles, statefileFileGroups, statefileWindowSize,
+    statefileWindowPosition);
   f3d::log::info("Statefile loaded from the clipboard");
 }
 
@@ -2428,7 +2568,8 @@ void F3DStarter::LoadStatefileFromClipboard()
 void F3DStarter::ApplyStatefile(const std::map<std::string, std::string>& statefileOptions,
   const std::vector<std::string>& statefileFiles,
   const std::optional<StatefileFileGroups>& statefileFileGroups,
-  const std::optional<std::pair<int, int>>& statefileWindowSize)
+  const std::optional<std::pair<int, int>>& statefileWindowSize,
+  const std::optional<std::pair<int, int>>& statefileWindowPosition)
 {
   this->Internals->Engine->setOptions(this->Internals->LibOptions);
   this->Internals->DynamicOptionsEntries.clear();
@@ -2439,6 +2580,14 @@ void F3DStarter::ApplyStatefile(const std::map<std::string, std::string>& statef
       statefileWindowSize->first, statefileWindowSize->second);
     f3d::log::debug("Window size set to ", statefileWindowSize->first, "x",
       statefileWindowSize->second, " from statefile");
+  }
+
+  if (statefileWindowPosition.has_value() && !this->Internals->AppOptions.NoRender)
+  {
+    this->Internals->Engine->getWindow().setPosition(
+      statefileWindowPosition->first, statefileWindowPosition->second);
+    f3d::log::debug("Window position set to ", statefileWindowPosition->first, ",",
+      statefileWindowPosition->second, " from statefile");
   }
 
   // Apply the statefile options in a dedicated tier above the command line: loading a statefile

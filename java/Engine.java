@@ -230,6 +230,12 @@ public class Engine implements AutoCloseable {
     public native void setCachePath(String cachePath);
 
     /**
+     * Get the cache path directory
+     * @return path to cache directory
+     */
+    public native String getCachePath();
+
+    /**
      * Set options for this engine
      * @param options the options to set
      */

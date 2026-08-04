@@ -101,7 +101,8 @@ public:
   void ApplyStatefile(const std::map<std::string, std::string>& statefileOptions,
     const std::vector<std::string>& statefileFiles,
     const std::optional<StatefileFileGroups>& statefileFileGroups,
-    const std::optional<std::pair<int, int>>& statefileWindowSize);
+    const std::optional<std::pair<int, int>>& statefileWindowSize,
+    const std::optional<std::pair<int, int>>& statefileWindowPosition);
 
   F3DStarter();
   ~F3DStarter();

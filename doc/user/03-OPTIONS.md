@@ -55,7 +55,7 @@ Do not render anything and quit just after loading the first file, use with --ve
 
 ### `--load-statefile=<file path>` (_string_)
 
-Restore the application state from a statefile right after starting, then continue running. The statefile is applied above configuration files but below command line options. The restored window size is overridden by an explicit `--resolution`. If `-` is specified instead of a filename, the statefile is read from the standard input. If the file does not exist, it is skipped with a warning.
+Restore the application state from a statefile right after starting, then continue running. The statefile is applied above configuration files but below command line options. The restored window size is overridden by an explicit `--resolution`, and the restored window position by an explicit `--position`. If `-` is specified instead of a filename, the statefile is read from the standard input. If the file does not exist, it is skipped with a warning.
 
 ### `--save-statefile=<file path>` (_string_)
 
@@ -629,11 +629,11 @@ Ignored if `--hdri-skybox` is enabled.
 
 ### `--resolution=<width,height>` (_vector\<double\>_, default: `1000, 600`)
 
-Set the _window resolution_.
+Set the _window resolution_. When closing an interactive window, its resolution is remembered in a [cache file](#caches), and restored on the next start, unless it is set in a configuration file, a statefile or on the command line. Rendering to a file with `--output` or `--reference` is unaffected.
 
 ### `--position=<x,y>` (_vector\<double\>_)
 
-Set the _window position_ (top left corner) , in pixels, starting from the top left of your screens.
+Set the _window position_ (top left corner) , in pixels, starting from the top left of your screens. When closing an interactive window, its position is remembered in a [cache file](#caches), and restored on the next start, unless it is set in a configuration file, a statefile or on the command line. Rendering to a file with `--output` or `--reference` is unaffected.
 
 ### `-z`, `--fps` (_bool_, default: `false`)
 
@@ -1117,10 +1117,24 @@ Model related variables will be replaced by `no_file` if no file is loaded and `
 
 When loading a statefile (`--load-statefile`/`load_statefile`), the `{n}` variable resolves to the most recent existing file, instead of the next available one used when saving. This means that, with the default `{n}` template, saving then loading a statefile round-trips to the same file.
 
-## HDRI Caches
+## Caches
 
 When using HDRI related options, F3D will create and use a cache directory to store related data in order to speed up rendering.
-These cache files can be safely removed at the cost of recomputing them on next use.
+
+F3D also stores the geometry of the last closed interactive window in a `cache.json` file, in the same directory, so that it can be restored on the next start, see `--resolution` and `--position`. Its `window` entry uses the same layout as in [statefiles](#statefiles):
+
+```json
+{
+  "window": {
+    "width": 1000,
+    "height": 600,
+    "left": 100,
+    "top": 50
+  }
+}
+```
+
+These cache files can be safely removed, at the cost of recomputing the HDRI data on next use and of losing the cached window geometry.
 
 The cache directory location is as follows, in order, using the first defined environment variables:
 

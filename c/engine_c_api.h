@@ -202,6 +202,16 @@ extern "C"
   F3D_EXPORT int f3d_engine_set_cache_path(f3d_engine_t* engine, const char* cache_path);
 
   /**
+   * @brief Get the cache path directory.
+   *
+   * The returned string must be freed with f3d_engine_free_string().
+   *
+   * @param engine Engine handle.
+   * @return Cache path string, or NULL on failure.
+   */
+  F3D_EXPORT const char* f3d_engine_get_cache_path(f3d_engine_t* engine);
+
+  /**
    * @brief Set options for the engine.
    *
    * This will copy the provided options into the engine.

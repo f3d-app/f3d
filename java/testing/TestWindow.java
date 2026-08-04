@@ -46,7 +46,23 @@ public class TestWindow {
     window.getWidth();
     window.getHeight();
 
+    int[] size = window.getSize();
+    if (size.length != 2 || size[0] != window.getWidth() || size[1] != window.getHeight()) {
+      throw new RuntimeException("getSize should return {width, height}");
+    }
+
     window.setPosition(100, 100);
+    window.render();
+    // The window position depends on a window manager and is (0, 0) in headless CI, so only check
+    // the array shape rather than asserting a specific value.
+    int[] position = window.getPosition();
+    if (position.length != 2) {
+      throw new RuntimeException("getPosition should return {x, y}");
+    }
+
+    if (window.getLeft() != position[0] || window.getTop() != position[1]) {
+      throw new RuntimeException("getLeft/getTop should match getPosition");
+    }
 
     byte[] icon = new byte[]{1, 2, 3, 4};
     window.setIcon(icon);

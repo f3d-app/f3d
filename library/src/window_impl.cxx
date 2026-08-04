@@ -122,6 +122,9 @@ public:
   interactor_impl* Interactor = nullptr;
   fs::path CachePath;
   context::function GetProcAddress;
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 7, 20260724)
+  bool PositionWarningEmitted = false;
+#endif
 };
 
 //----------------------------------------------------------------------------
@@ -313,8 +316,16 @@ window& window_impl::setSize(int width, int height)
 }
 
 //----------------------------------------------------------------------------
+std::pair<int, int> window_impl::getSize() const
+{
+  const int* size = this->Internals->RenWin->GetSize();
+  return { size[0], size[1] };
+}
+
+//----------------------------------------------------------------------------
 window& window_impl::setPosition(int x, int y)
 {
+#ifdef __APPLE__
   if (this->Internals->RenWin->IsA("vtkCocoaRenderWindow"))
   {
     // vtkCocoaRenderWindow has a different behavior than other render windows
@@ -322,12 +333,52 @@ window& window_impl::setPosition(int x, int y)
     const int* screenSize = this->Internals->RenWin->GetScreenSize();
     const int* winSize = this->Internals->RenWin->GetSize();
     this->Internals->RenWin->SetPosition(x, screenSize[1] - winSize[1] - y);
+    return *this;
   }
-  else
-  {
-    this->Internals->RenWin->SetPosition(x, y);
-  }
+#endif
+  this->Internals->RenWin->SetPosition(x, y);
   return *this;
+}
+
+//----------------------------------------------------------------------------
+std::pair<int, int> window_impl::getPosition() const
+{
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 7, 20260724)
+  // Warn once if the render window is an X11 window predating the VTK fix that made
+  // vtkXOpenGLRenderWindow::GetPosition() reliable (VTK 9.7.20260724), in which case the reported
+  // position may be inaccurate.
+  if (!this->Internals->PositionWarningEmitted &&
+    this->Internals->RenWin->IsA("vtkXOpenGLRenderWindow"))
+  {
+    log::warn("Window position may be inaccurate with VTK older than 9.7.20260724, "
+              "consider updating VTK.");
+    this->Internals->PositionWarningEmitted = true;
+  }
+#endif
+  const int* pos = this->Internals->RenWin->GetPosition();
+#ifdef __APPLE__
+  if (this->Internals->RenWin->IsA("vtkCocoaRenderWindow"))
+  {
+    // vtkCocoaRenderWindow positions are expressed from the bottom left of the screen, convert
+    // back to a top left origin, mirroring what setPosition does
+    const int* screenSize = this->Internals->RenWin->GetScreenSize();
+    const int* winSize = this->Internals->RenWin->GetSize();
+    return { pos[0], screenSize[1] - winSize[1] - pos[1] };
+  }
+#endif
+  return { pos[0], pos[1] };
+}
+
+//----------------------------------------------------------------------------
+int window_impl::getLeft() const
+{
+  return this->getPosition().first;
+}
+
+//----------------------------------------------------------------------------
+int window_impl::getTop() const
+{
+  return this->getPosition().second;
 }
 
 //----------------------------------------------------------------------------
@@ -809,6 +860,12 @@ void window_impl::SetCachePath(const fs::path& cachePath)
   }
 
   this->Internals->CachePath = cachePath;
+}
+
+//----------------------------------------------------------------------------
+fs::path window_impl::GetCachePath() const
+{
+  return this->Internals->CachePath;
 }
 
 //----------------------------------------------------------------------------

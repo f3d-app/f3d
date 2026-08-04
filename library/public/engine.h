@@ -203,7 +203,8 @@ public:
 
   /**
    * Set the cache path. The provided path is used as is.
-   * Currently, it's only used to store HDRI baked textures.
+   * Internally used to store HDRI baked textures but can be used to store any other information
+   * worth caching.
    * By default, the cache path is:
    * - Windows: %LOCALAPPDATA%\f3d
    * - Linux: ~/.cache/f3d
@@ -212,6 +213,12 @@ public:
    * Throws a engine::cache_exception if the provided cachePath cannot be used.
    */
   engine& setCachePath(const std::filesystem::path& cachePath);
+
+  /**
+   * Get the cache path currently in use, see setCachePath.
+   * Returns an empty path if the default cache path could not be recovered.
+   */
+  [[nodiscard]] std::filesystem::path getCachePath() const;
 
   /**
    * Engine provide a default options that you can use using engine::getOptions().

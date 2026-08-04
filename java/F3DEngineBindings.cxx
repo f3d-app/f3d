@@ -351,6 +351,11 @@ extern "C"
     env->ReleaseStringUTFChars(path, str);
   }
 
+  JNIEXPORT jstring JAVA_BIND(Engine, getCachePath)(JNIEnv* env, jobject self)
+  {
+    return env->NewStringUTF(GetEngine(env, self)->getCachePath().string().c_str());
+  }
+
   JNIEXPORT jlong JAVA_BIND(Engine, nativeDump)(JNIEnv* env, jobject self)
   {
     try

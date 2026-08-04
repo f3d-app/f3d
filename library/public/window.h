@@ -7,6 +7,7 @@
 
 /// @cond
 #include <string>
+#include <utility>
 /// @endcond
 
 namespace f3d
@@ -89,12 +90,17 @@ public:
   virtual window& setSize(int width, int height) = 0;
 
   /**
-   * Get the width of the window.
+   * Get the size of the window as a (width, height) pair.
+   */
+  [[nodiscard]] virtual std::pair<int, int> getSize() const = 0;
+
+  /**
+   * Get the width of the window, see getSize.
    */
   [[nodiscard]] virtual int getWidth() const = 0;
 
   /**
-   * Get the height of the window.
+   * Get the height of the window, see getSize.
    */
   [[nodiscard]] virtual int getHeight() const = 0;
 
@@ -102,6 +108,21 @@ public:
    * Set the position of the window.
    */
   virtual window& setPosition(int x, int y) = 0;
+
+  /**
+   * Get the position of the window as an (x, y) pair.
+   */
+  [[nodiscard]] virtual std::pair<int, int> getPosition() const = 0;
+
+  /**
+   * Get the position of the left border of the window, see getPosition.
+   */
+  [[nodiscard]] virtual int getLeft() const = 0;
+
+  /**
+   * Get the position of the top border of the window, see getPosition.
+   */
+  [[nodiscard]] virtual int getTop() const = 0;
 
   /**
    * Set the icon to be shown by a window manager.

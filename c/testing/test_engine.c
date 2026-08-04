@@ -39,6 +39,15 @@ int test_engine()
   (void)interactor;
 
   f3d_engine_set_cache_path(engine, "/tmp/f3d_test_cache");
+  const char* cache_path = f3d_engine_get_cache_path(engine);
+  if (!cache_path || strcmp(cache_path, "/tmp/f3d_test_cache") != 0)
+  {
+    puts("[ERROR] get_cache_path() should return the path set with set_cache_path()");
+    f3d_engine_free_string(cache_path);
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  f3d_engine_free_string(cache_path);
 
   f3d_engine_autoload_plugins();
   f3d_engine_load_plugin("native");

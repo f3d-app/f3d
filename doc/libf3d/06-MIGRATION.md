@@ -60,3 +60,16 @@ The library prefix and extension is not appended automatically anymore.
 ## DPI scaling
 
 `f3d::window::getDPIScale()` should now be used instead of the static `f3d::utils::getDPIScale()` API to get the DPI scaling value.
+
+## Python properties
+
+The following Python setter methods have been removed in favor of new properties, which can also be read.
+
+- `window.set_position(x, y)` -> `window.position = (x, y)`
+- `engine.set_cache_path(path)` -> `engine.cache_path = path`
+
+## WebAssembly properties
+
+The following WebAssembly methods have been removed in favor of new properties, which can also be read.
+
+- `engine.setCachePath(path)` -> `engine.cachePath = path`

@@ -56,6 +56,11 @@ int TestSDKEngine([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("set options value using f3d::engine::setOptions(options&& opt)",
     eng0.getOptions().render.line_width.value(), 1.7);
 
+  // Test cache path round-trip
+  const std::string cachePath = std::string(argv[2]) + "engine_cache";
+  eng0.setCachePath(cachePath);
+  test("get cache path using f3d::engine::getCachePath()", eng0.getCachePath().string(), cachePath);
+
   // Test static information methods
   auto libInfo = f3d::engine::getLibInfo();
   test("check libInfo output", libInfo.License, "BSD-3-Clause"s);

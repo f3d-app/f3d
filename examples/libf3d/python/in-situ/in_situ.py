@@ -339,7 +339,7 @@ def main(argv=None):
     win = eng.window
     win.set_window_name("libf3d in-situ example")
     win.size = (1500, 1000)
-    win.set_position(500, 500)
+    win.position = (500, 500)
     win.render()
 
     cam = win.camera

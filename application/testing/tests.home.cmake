@@ -43,6 +43,14 @@ if(NOT WIN32)
     # Setting XDG_CACHE_HOME is needed for cache to work when HOME is not set
     f3d_test(NAME TestNoHOMEScreenshot DATA suzanne.ply ARGS --screenshot-filename=TestNoHOMEScreenshot.png --interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/TestScreenshot.log  REGEXP "saving screenshot to ${CMAKE_BINARY_DIR}/application/testing/TestNoHOMEScreenshot.png" NO_BASELINE ENV "XDG_CACHE_HOME=${CMAKE_BINARY_DIR};HOME=")
     f3d_test(NAME TestNoHOMEConfig DATA suzanne.ply CONFIG config_build REGEXP "Using config directory ${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d" NO_RENDER NO_BASELINE ENV "XDG_CACHE_HOME=${CMAKE_BINARY_DIR};HOME=")
+
+    # A cache file that cannot be read is ignored, a directory is used to make it unreadable
+    set(_unreadable_geometry_cache "${CMAKE_BINARY_DIR}/Testing/Temporary/unreadable_window_geometry_cache")
+    file(MAKE_DIRECTORY "${_unreadable_geometry_cache}/f3d/cache.json")
+    f3d_test(NAME TestWindowGeometryUnreadableCache DATA cow.vtp NO_BASELINE NO_OUTPUT ARGS --verbose=debug --list-bindings REGEXP "Could not parse the cached window geometry" ENV "XDG_CACHE_HOME=${_unreadable_geometry_cache}")
+
+    # Without any cache directory, there is no geometry to restore
+    f3d_test(NAME TestWindowGeometryNoCachePath DATA cow.vtp NO_BASELINE NO_OUTPUT ARGS --verbose=debug --list-bindings REGEXP_FAIL "Recovered window" ENV "XDG_CACHE_HOME=;HOME=")
   endif()
 
 else()

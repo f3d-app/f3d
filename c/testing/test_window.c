@@ -48,11 +48,41 @@ int test_window()
 
   f3d_window_set_size(window, 800, 600);
   int width = f3d_window_get_width(window);
-  (void)width;
   int height = f3d_window_get_height(window);
-  (void)height;
+
+  int sizeWidth = 0;
+  int sizeHeight = 0;
+  f3d_window_get_size(window, &sizeWidth, &sizeHeight);
+  if (sizeWidth != width || sizeHeight != height)
+  {
+    puts("[ERROR] Window size does not match the window width/height");
+    f3d_engine_delete(engine);
+    return 1;
+  }
 
   f3d_window_set_position(window, 100, 100);
+  f3d_window_render(window);
+  // The window position depends on a window manager and is (0, 0) in headless CI, so only exercise
+  // the binding and check the getter is stable rather than asserting a specific value.
+  int posX = 0;
+  int posY = 0;
+  int posX2 = 0;
+  int posY2 = 0;
+  f3d_window_get_position(window, &posX, &posY);
+  f3d_window_get_position(window, &posX2, &posY2);
+  if (posX != posX2 || posY != posY2)
+  {
+    puts("[ERROR] Window position is not stable");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  if (f3d_window_get_left(window) != posX || f3d_window_get_top(window) != posY)
+  {
+    puts("[ERROR] Window left/top do not match the window position");
+    f3d_engine_delete(engine);
+    return 1;
+  }
 
   unsigned char icon_data[] = { 0xFF, 0xFF, 0xFF, 0xFF };
   f3d_window_set_icon(window, icon_data, sizeof(icon_data));

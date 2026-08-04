@@ -762,6 +762,12 @@ engine& engine::setCachePath(const fs::path& cachePath)
 }
 
 //----------------------------------------------------------------------------
+fs::path engine::getCachePath() const
+{
+  return this->Internals->Window->GetCachePath();
+}
+
+//----------------------------------------------------------------------------
 engine::no_window_exception::no_window_exception(const std::string& what)
   : exception(what)
 {

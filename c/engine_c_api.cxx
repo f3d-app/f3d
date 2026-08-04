@@ -230,6 +230,21 @@ int f3d_engine_set_cache_path(f3d_engine_t* engine, const char* cache_path)
 }
 
 //----------------------------------------------------------------------------
+const char* f3d_engine_get_cache_path(f3d_engine_t* engine)
+{
+  if (!engine)
+  {
+    return nullptr;
+  }
+
+  const f3d::engine* cpp_engine = reinterpret_cast<const f3d::engine*>(engine);
+  const std::string str = cpp_engine->getCachePath().string();
+  char* result = new char[str.length() + 1];
+  std::strcpy(result, str.c_str());
+  return result;
+}
+
+//----------------------------------------------------------------------------
 const char* f3d_engine_dump_to_string(f3d_engine_t* engine)
 {
   if (!engine)

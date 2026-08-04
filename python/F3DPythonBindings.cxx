@@ -915,17 +915,22 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property_readonly("offscreen", &f3d::window::isOffscreen)
     .def_property_readonly("camera", &f3d::window::getCamera, py::return_value_policy::reference)
     .def_property(
-      "size",
-      [](const f3d::window& win) { return std::make_pair(win.getWidth(), win.getHeight()); },
+      "size", [](const f3d::window& win) { return win.getSize(); },
       [](f3d::window& win, std::pair<int, int> wh) { win.setSize(wh.first, wh.second); })
     .def_property("width", &f3d::window::getWidth,
       [](f3d::window& win, int w) { win.setSize(w, win.getHeight()); })
     .def_property("height", &f3d::window::getHeight,
       [](f3d::window& win, int h) { win.setSize(win.getWidth(), h); })
+    .def_property(
+      "position", [](const f3d::window& win) { return win.getPosition(); },
+      [](f3d::window& win, std::pair<int, int> xy) { win.setPosition(xy.first, xy.second); })
+    .def_property("left", &f3d::window::getLeft,
+      [](f3d::window& win, int x) { win.setPosition(x, win.getTop()); })
+    .def_property("top", &f3d::window::getTop,
+      [](f3d::window& win, int y) { win.setPosition(win.getLeft(), y); })
     .def("render", &f3d::window::render, "Render the window")
     .def("render_to_image", &f3d::window::renderToImage, "Render the window to an image",
       py::arg("no_background") = false)
-    .def("set_position", &f3d::window::setPosition)
     .def("set_icon", &f3d::window::setIcon,
       "Set the icon of the window using a memory buffer representing a PNG file")
     .def("set_window_name", &f3d::window::setWindowName, "Set the window name")
@@ -1008,7 +1013,8 @@ PYBIND11_MODULE(pyf3d, module)
       "Create an engine with an existing EGL context (Windows/Linux only)")
     .def_static("create_external_osmesa", &f3d::engine::createExternalOSMesa,
       "Create an engine with an existing OSMesa context (Windows/Linux only)")
-    .def("set_cache_path", &f3d::engine::setCachePath, "Set the cache path directory")
+    .def_property("cache_path", &f3d::engine::getCachePath,
+      [](f3d::engine& eng, const std::filesystem::path& path) { eng.setCachePath(path); })
     .def_property("options", &f3d::engine::getOptions,
       py::overload_cast<const f3d::options&>(&f3d::engine::setOptions),
       py::return_value_policy::reference)
