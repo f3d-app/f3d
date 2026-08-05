@@ -61,6 +61,7 @@ f3d_test(NAME TestScalarsCell DATA f3d.vtp ARGS --scalar-coloring --coloring-by-
 f3d_test(NAME TestScalarsRange DATA suzanne.ply ARGS -s --coloring-array=Normals --coloring-component=1 --coloring-range=0,1)
 f3d_test(NAME TestScalarsWithBar DATA suzanne.ply ARGS -b -s --coloring-array=Normals --coloring-component=0)
 f3d_test(NAME TestScalarsWithBarContinuity DATA suzanne.ply ARGS -b -s --coloring-array=Normals --coloring-component=0)
+f3d_test(NAME TestScalarsDegenerateRange DATA suzanne.ply ARGS --no-config -sb)
 f3d_test(NAME TestComponentName DATA from_abq.vtu ARGS --scalar-coloring --coloring-scalar-bar --coloring-component=2)
 f3d_test(NAME TestUserMatrixColoring DATA InterpolationTest.glb ARGS --scalar-coloring --coloring-array=TEXCOORD_0)
 f3d_test(NAME TestSkinColoring DATA SimpleSkin.gltf ARGS --scalar-coloring --coloring-array=WEIGHTS_0)
