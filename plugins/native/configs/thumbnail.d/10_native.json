@@ -79,5 +79,12 @@
     "options": {
       "up": "+Z"
     }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.lys",
+    "options": {
+      "up": "+Z"
+    }
   }
 ]

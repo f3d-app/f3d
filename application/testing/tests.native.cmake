@@ -1,5 +1,6 @@
 ## Tests file formats from native plugin
 f3d_test(NAME TestPLY DATA suzanne.ply)
+f3d_test(NAME TestLYS DATA bunny.lys)
 f3d_test(NAME TestOBJ DATA world.obj)
 f3d_test(NAME TestOBJUnlit DATA cube_unlit.obj)
 f3d_test(NAME TestOBJ16bits DATA cube_16bits.obj)
@@ -78,6 +79,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
   f3d_test(NAME TestPipedQuakeMDL DATA zombie.mdl PIPED_READER QuakeMDL PIPED)
   f3d_test(NAME TestPipedSPLAT DATA small.splat ARGS -osy --up=-Y --point-sprites-absolute-size --point-sprites-size=1 PIPED_READER Splat PIPED)
   f3d_test(NAME TestPipedSPZ DATA hornedlizard_small_d0.spz ARGS -sy --point-sprites-absolute-size --point-sprites-size=1 PIPED_READER SPZ PIPED)
+  f3d_test(NAME TestPipedLYS DATA bunny.lys PIPED_READER LYS PIPED)
   f3d_test(NAME TestPipedInvalid DATA suzanne.ply ARGS --force-reader=QuakeMDL PIPED_READER QuakeMDL REGEXP "Input stream could not be loaded" NO_BASELINE PIPED)
 endif()
 
@@ -161,7 +163,9 @@ if(NOT F3D_MACOS_BUNDLE)
       f3d_test(NAME TestDefaultConfigFileEXR DATA Rec709.exr CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
     endif()
     f3d_test(NAME TestDefaultConfigFilePLY DATA suzanneRGBA.ply CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
-    f3d_test(NAME TestDefaultConfigFileQuakeMDL DATA zombie.mdl CONFIG config_build LONG_TIMEOUT UI SKIP_GLES THRESHOLD 0.07) # Threshold is needed for IBL change after VTK 9.6
+
+    f3d_test(NAME TestDefaultConfigFileLYS DATA bunny.lys CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
+
     f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y --camera-direction=-1,0.5,-1 CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
     f3d_test(NAME TestDefaultConfigTranslucent DATA red_translucent_monkey.gltf CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
     f3d_test(NAME TestDefaultConfigRemoveEmptyFileGroups DATA invalid_body.vtp cow.vtp CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
@@ -183,4 +187,7 @@ if(NOT F3D_MACOS_BUNDLE)
     f3d_test(NAME TestThumbnailConfigFileWebP DATA image.webp CONFIG thumbnail_build LONG_TIMEOUT THRESHOLD 0.07 DEFAULT_HDRI) # Threshold is needed even for newer VTK
   endif()
   f3d_test(NAME TestThumbnailConfigFileQuakeMDL DATA zombie.mdl CONFIG thumbnail_build LONG_TIMEOUT THRESHOLD 0.07 DEFAULT_HDRI SKIP_GLES) # Threshold is needed for IBL change after VTK 9.6
+
+  f3d_test(NAME TestThumbnailConfigFileLYS DATA bunny.lys CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI)
+
 endif()
