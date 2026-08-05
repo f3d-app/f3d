@@ -44,6 +44,10 @@
 #include <vtkVersion.h>
 #include <vtkVolumetricPass.h>
 
+#if F3D_MODULE_ANARI
+#include <vtkAnariPass.h>
+#endif
+
 #if F3D_MODULE_RAYTRACING
 #include <vtkOSPRayPass.h>
 #endif
@@ -222,10 +226,10 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   }
 
   // main pass
-#if F3D_MODULE_RAYTRACING
+#if F3D_MODULE_ANARI
   if (this->UseRaytracing)
   {
-    vtkNew<vtkOSPRayPass> ospP;
+    vtkNew<vtkAnariPass> ospP;
     this->MainPass = vtkSmartPointer<vtkFramebufferPass>::New();
     this->MainPass->SetDelegatePass(ospP);
     this->MainPass->SetColorFormat(vtkTextureObject::Float32);
@@ -737,7 +741,7 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
     // the reflection result is used in the main pass so it must be rendered before
     vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(r);
 
-#if F3D_MODULE_RAYTRACING
+#if F3D_MODULE_ANARI
     if (!this->UseRaytracing)
 #endif
     {

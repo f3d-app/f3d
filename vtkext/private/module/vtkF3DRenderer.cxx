@@ -477,7 +477,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   }
 
   vtkNew<vtkF3DRenderPass> newPass;
-#if F3D_MODULE_RAYTRACING
+#if F3D_MODULE_ANARI
   newPass->SetUseRaytracing(this->UseRaytracing);
 #endif
   newPass->SetUseSSAOPass(this->UseSSAOPass);

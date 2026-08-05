@@ -23,6 +23,7 @@ PRIVATE_DEPENDS
   VTK::InteractionWidgets
 OPTIONAL_DEPENDS
   VTK::opengl
+  VTK::RenderingAnari
   VTK::RenderingRayTracing
   VTK::RenderingGridAxes
 TEST_DEPENDS

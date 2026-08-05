@@ -72,6 +72,11 @@ function(f3d_create_exec target_name)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_RAYTRACING)
   endif ()
 
+  # anari
+  if (F3D_MODULE_ANARI)
+    target_compile_definitions(${target_name} PRIVATE F3D_MODULE_ANARI)
+  endif ()
+
   # exr
   if (F3D_MODULE_EXR)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_EXR)
@@ -183,6 +188,9 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/F3DConfig.h.in"
 set(f3d_enabled_conditionals)
 if(F3D_MODULE_RAYTRACING)
   list(APPEND f3d_enabled_conditionals "F3D_MODULE_RAYTRACING")
+endif()
+if(F3D_MODULE_ANARI)
+  list(APPEND f3d_enabled_conditionals "F3D_MODULE_ANARI")
 endif()
 if(F3D_MODULE_DMON)
   list(APPEND f3d_enabled_conditionals "F3D_MODULE_DMON")
