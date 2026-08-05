@@ -1361,11 +1361,12 @@ interactor& interactor_impl::initCommands()
         f3d::engine::state::fromString(content).toClipboard();
         log::info("Statefile copied to the clipboard");
       }
+      // LCOV_EXCL_START
       catch (const f3d::engine::statefile_exception& ex)
       {
-        // Unreachable in testing
         log::error(ex.what());
       }
+      // LCOV_EXCL_STOP
     },
     command_documentation_t{
       "save_statefile_to_clipboard", "save the current state into the system clipboard" });
@@ -1382,11 +1383,12 @@ interactor& interactor_impl::initCommands()
           this->Internals->Scene, this->Internals->Window, this->Internals->Options, st.toString());
         log::info("Statefile loaded from the clipboard");
       }
+      // LCOV_EXCL_START
       catch (const f3d::engine::statefile_exception& ex)
       {
-        // Unreachable in testing
         log::error(ex.what());
       }
+      // LCOV_EXCL_STOP
     },
     command_documentation_t{
       "load_statefile_from_clipboard", "restore the state from the system clipboard" });
