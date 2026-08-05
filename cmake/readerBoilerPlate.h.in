@@ -20,6 +20,8 @@
 #include <vtkMemoryResourceStream.h>
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
+#include <iostream>
+
 
 class reader_@F3D_READER_NAME@ : public f3d::reader
 {

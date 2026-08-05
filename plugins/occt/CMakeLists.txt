@@ -58,7 +58,7 @@ f3d_plugin_declare_reader(
   NAME IGES
   EXTENSIONS igs iges
   MIMETYPES model/iges
-  VTK_READER vtkF3DOCCTReader
+  VTK_READER vtkOCCTPDCReader
   SCORE 40 # No proper CanReadFile implementation
   FORMAT_DESCRIPTION "Initial Graphics Exchange Specification"
   CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/IGES.inl"
@@ -86,7 +86,7 @@ f3d_plugin_declare_reader(
   NAME STEP
   EXTENSIONS stp step stpnc p21 210
   MIMETYPES application/vnd.step
-  VTK_READER vtkF3DOCCTReader
+  VTK_READER vtkOCCTPDCReader
   FORMAT_DESCRIPTION "STEP ISO 10303"
   ${_SUPPORTS_STREAM}
   CAN_READ CUSTOM
@@ -98,7 +98,7 @@ f3d_plugin_declare_reader(
   NAME BREP
   EXTENSIONS brep
   MIMETYPES application/vnd.brep
-  VTK_READER vtkF3DOCCTReader
+  VTK_READER vtkOCCTPDCReader
   FORMAT_DESCRIPTION "Open CASCADE BRep"
   ${_SUPPORTS_STREAM}
   CAN_READ CUSTOM
@@ -111,7 +111,7 @@ if (F3D_PLUGIN_OCCT_COLORING_SUPPORT)
     NAME XBF
     EXTENSIONS xbf
     MIMETYPES application/vnd.xbf
-    VTK_READER vtkF3DOCCTReader
+    VTK_READER vtkOCCTPDCReader
     FORMAT_DESCRIPTION "Open CASCADE XBF"
     ${_SUPPORTS_STREAM}
     CAN_READ CUSTOM
@@ -131,7 +131,7 @@ f3d_plugin_build(
   NAME occt
   VERSION 1.0
   DESCRIPTION "OpenCASCADE support (version ${OpenCASCADE_VERSION})"
-  VTK_MODULES FiltersGeneral RenderingOpenGL2
+  VTK_MODULES FiltersGeneral RenderingOpenGL2 IOOCCT
   ADDITIONAL_RPATHS ${rpaths}
   MIMETYPE_XML_FILES "${CMAKE_CURRENT_SOURCE_DIR}/f3d-occt-formats.xml"
   CONFIGURATION_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/configs/config.d" "${CMAKE_CURRENT_SOURCE_DIR}/configs/thumbnail.d"
