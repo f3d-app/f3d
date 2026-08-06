@@ -752,7 +752,6 @@ void animationManager::SetAnimationMode(const std::string& mode)
   else if (mode == "pingpong")
   {
     this->AnimationMode = AnimationModeType::PINGPONG;
-    this->AnimationModeDirection = 1;
   }
   else
   {
