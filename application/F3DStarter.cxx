@@ -2164,13 +2164,14 @@ void F3DStarter::LoadFileGroupInternal(
               f3d::log::warn(tmpPath.string(),
                 " contains unsupported contents for "
                 "a selected forced reader ",
-                *forceReader);
+                *forceReader, ", use --skip-content-check to try reading it anyway");
             }
             else
             {
               f3d::log::warn(tmpPath.string(),
-                " is of an unknown format or contains unsupported contents, use "
-                "--force-reader to select a specific reader");
+                " contains unsupported contents, use "
+                "--skip-content-check to try reading it anyway or --force-reader to select a "
+                "specific reader");
             }
             unsupported = true;
           }
