@@ -851,6 +851,7 @@ private:
   std::string CachePath;
 
   std::optional<std::string> BackfaceType;
+
   std::optional<std::string> FinalShader;
 
   vtkF3DMetaImporter* Importer = nullptr;

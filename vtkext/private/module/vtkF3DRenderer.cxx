@@ -1774,6 +1774,8 @@ void vtkF3DRenderer::SetBackfaceType(const std::optional<std::string>& backfaceT
   {
     this->BackfaceType = backfaceType;
     this->RenderPassesConfigured = false;
+    this->CheatSheetConfigured = false;
+    this->ActorsPropertiesConfigured = false;
   }
 }
 
@@ -2620,6 +2622,20 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 
   for (const auto& coloring : this->Importer->GetColoringActorsAndMappers())
   {
+    vtkProperty* prop = coloring.Actor->GetProperty();
+    vtkProperty* origProp = coloring.OriginalActor->GetProperty();
+
+    if (setBackfaceCulling)
+    {
+      prop->SetBackfaceCulling(backfaceCulling);
+      origProp->SetBackfaceCulling(backfaceCulling);
+    }
+    else
+    {
+      prop->SetBackfaceCulling(coloring.OriginalProperty->GetBackfaceCulling());
+      origProp->SetBackfaceCulling(coloring.OriginalProperty->GetBackfaceCulling());
+    }
+
     if (this->EdgeVisible.has_value())
     {
       coloring.Actor->GetProperty()->SetEdgeVisibility(this->EdgeVisible.value());
@@ -2636,12 +2652,6 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     {
       coloring.Actor->GetProperty()->SetPointSize(this->PointSize.value());
       coloring.OriginalActor->GetProperty()->SetPointSize(this->PointSize.value());
-    }
-
-    if (setBackfaceCulling)
-    {
-      coloring.Actor->GetProperty()->SetBackfaceCulling(backfaceCulling);
-      coloring.OriginalActor->GetProperty()->SetBackfaceCulling(backfaceCulling);
     }
 
     if (surfaceColor)
