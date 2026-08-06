@@ -1,0 +1,52 @@
+# StreamVersion 1.2
+# Start animation with infinity repeats
+KeyPressEvent 1863 -160 0 32 1 space 0
+CharEvent 1863 -160 0 32 1 space 0
+KeyReleaseEvent 1863 -160 0 32 1 space 0
+
+# Watch, it doesn't stop
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+TimerEvent 1863 -160 0 32 1 space 0
+
+# Stop animation
+KeyPressEvent 1863 -160 0 32 1 space 0
+CharEvent 1863 -160 0 32 1 space 0
+KeyReleaseEvent 1863 -160 0 32 1 space 0

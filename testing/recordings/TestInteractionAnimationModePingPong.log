@@ -1,0 +1,69 @@
+# StreamVersion 1.2
+# Start animation mode pingpong
+KeyPressEvent 1751 -55 0 32 1 space 0
+CharEvent 1751 -55 0 32 1 space 0
+KeyReleaseEvent 1751 -55 0 32 1 space 0
+
+# Time for moving
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+TimerEvent 1751 -55 0 32 1 space 0
+
+# Stop animation mode pingpong
+KeyPressEvent 1751 -55 0 32 1 space 0
+CharEvent 1751 -55 0 32 1 space 0
+KeyReleaseEvent 1751 -55 0 32 1 space 0

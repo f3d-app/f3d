@@ -306,6 +306,16 @@
           "valueHelper": "<time>"
         },
         {
+          "longName": "animation-mode",
+          "helpText": "Set the animation mode (forward, backward, pingpong...)",
+          "valueHelper": "<string>"
+        },
+        {
+          "longName": "animation-repeat",
+          "helpText": "Set the animation repeat count",
+          "valueHelper": "<int>"
+        },
+        {
           "longName": "font-file",
           "helpText": "Path to a FreeType compatible font file",
           "valueHelper": "<file_path>"
