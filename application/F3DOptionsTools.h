@@ -132,6 +132,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "metallic", "model.material.metallic" },
   { "normal-glyphs", "model.normal_glyphs.enable" },
   { "normal-glyphs-scale", "model.normal_glyphs.scale" },
+  { "normal-glyphs-color", "model.normal_glyphs.color" },
   { "normal-scale", "model.normal.scale" },
   { "notifications", "ui.notifications.enable" },
   { "opacity", "model.color.opacity" },

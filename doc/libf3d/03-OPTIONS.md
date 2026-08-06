@@ -152,9 +152,19 @@ CLI: `--texture-material`.
 
 Render vertex normals as arrows on top of the geometry.
 
+CLI: `--normal-glyphs`.
+
 ### `model.normal_glyphs.scale` (_ratio_, default: `1.0`, range domain: `[0, 10]`, increment: `0.1`)
 
 Scales the normal glyphs
+
+CLI: `--normal-glyphs-scale`.
+
+### `model.normal_glyphs.color` (_color_, optional)
+
+Color of the normal glyphs.
+
+CLI: `--normal-glyphs-color`.
 
 ### `model.normal.scale` (_double_, optional, range domain: `[0, 3]`, increment: `0.1`)
 
