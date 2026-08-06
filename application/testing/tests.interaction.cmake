@@ -165,6 +165,11 @@ f3d_test(NAME TestInteractionAnimationModeForward DATA soldier_animations.mdl AR
 f3d_test(NAME TestInteractionAnimationModeBackward DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-mode=backward --animation-progress=advanced INTERACTION UI)
 f3d_test(NAME TestInteractionAnimationModePingPong DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-mode=pingpong --animation-progress=advanced INTERACTION UI)
 
+# Animation repeats tests
+f3d_test(NAME TestInteractionAnimationRepeatOnce DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-repeat=1 --animation-speed-factor=2.0 --animation-progress=advanced INTERACTION UI)
+f3d_test(NAME TestInteractionAnimationRepeatTwice DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-repeat=2 --animation-speed-factor=2.0 --animation-progress=advanced INTERACTION UI)
+f3d_test(NAME TestInteractionAnimationRepeatInfinity DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-repeat=-1 --animation-speed-factor=2.0 --animation-progress=advanced INTERACTION UI)
+
 ## Cheatsheet
 f3d_test(NAME TestInteractionCheatsheetWhiteBG DATA cow.vtp ARGS --background-color=1,1,1 INTERACTION UI) #H
 f3d_test(NAME TestInteractionCheatsheetBlackBG DATA cow.vtp ARGS --background-color=0,0,0 INTERACTION UI) #H
