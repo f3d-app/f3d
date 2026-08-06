@@ -1,0 +1,31 @@
+# StreamVersion 1.2
+# Start animation mode forward
+KeyPressEvent 8 16 0 32 1 space 0
+CharEvent 8 16 0 32 1 space 0
+KeyReleaseEvent 8 16 0 32 1 space 0
+
+# Time for moving
+TimerEvent 8 16 0 32 1 space 0
+TimerEvent 8 16 0 32 1 space 0
+TimerEvent 8 16 0 32 1 space 0
+TimerEvent 8 16 0 32 1 space 0
+TimerEvent 8 16 0 32 1 space 0
+TimerEvent 8 16 0 32 1 space 0
+TimerEvent 8 16 0 32 1 space 0
+TimerEvent 8 16 0 32 1 space 0
+TimerEvent 8 16 0 32 1 space 0
+TimerEvent 8 16 0 32 1 space 0
+TimerEvent 8 16 0 32 1 space 0
+TimerEvent 8 16 0 32 1 space 0
+TimerEvent 8 16 0 32 1 space 0
+TimerEvent 8 16 0 32 1 space 0
+TimerEvent 8 16 0 32 1 space 0
+TimerEvent 8 16 0 32 1 space 0
+TimerEvent 8 16 0 32 1 space 0
+TimerEvent 8 16 0 32 1 space 0
+TimerEvent 8 16 0 32 1 space 0
+
+# Stop animation mode forward
+KeyPressEvent 8 16 0 32 1 space 0
+CharEvent 8 16 0 32 1 space 0
+KeyReleaseEvent 8 16 0 32 1 space 0
