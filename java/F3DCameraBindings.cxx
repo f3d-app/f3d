@@ -65,6 +65,21 @@ extern "C"
     return GetEngine(env, self)->getWindow().getCamera().getViewAngle();
   }
 
+  JNIEXPORT jdouble JAVA_BIND(Camera, getDistance)(JNIEnv* env, jobject self)
+  {
+    return GetEngine(env, self)->getWindow().getCamera().getDistance();
+  }
+
+  JNIEXPORT jdouble JAVA_BIND(Camera, getWorldAzimuth)(JNIEnv* env, jobject self)
+  {
+    return GetEngine(env, self)->getWindow().getCamera().getWorldAzimuth();
+  }
+
+  JNIEXPORT jdouble JAVA_BIND(Camera, getWorldElevation)(JNIEnv* env, jobject self)
+  {
+    return GetEngine(env, self)->getWindow().getCamera().getWorldElevation();
+  }
+
   JNIEXPORT jobject JAVA_BIND(Camera, setState)(JNIEnv* env, jobject self, jobject state)
   {
     jclass stateClass = env->GetObjectClass(state);
