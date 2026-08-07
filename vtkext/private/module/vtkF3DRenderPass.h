@@ -49,6 +49,7 @@ public:
   vtkSetVector6Macro(Bounds, double);
   vtkSetMacro(CircleOfConfusionRadius, double);
   vtkSetMacro(RenderReflection, bool);
+  vtkSetMacro(RenderShadows, bool);
 
   /**
    * Modify shader code for matcap/gamma/skinning
@@ -81,11 +82,13 @@ protected:
   bool UseBlurBackground = false;
   bool ForceOpaqueBackground = false;
   bool RenderReflection = false;
+  bool RenderShadows = false;
 
   double CircleOfConfusionRadius = 20.0;
 
   vtkSmartPointer<vtkFramebufferPass> BackgroundPass;
   vtkSmartPointer<vtkFramebufferPass> BakeReflectionPass;
+  vtkSmartPointer<vtkFramebufferPass> BakeShadowsPass;
   vtkSmartPointer<vtkFramebufferPass> MainPass;
   vtkSmartPointer<vtkFramebufferPass> MainOnTopPass;
 
