@@ -6,6 +6,7 @@
 #include <vtkFileResourceStream.h>
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
+#include <vtkInterpolateDataSetAttributes.h>
 #include <vtkOpenGLTexture.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
@@ -13,6 +14,8 @@
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkResourceStream.h>
+#include <vtkMathUtilities.h>
+#include <vtkPoints.h>
 
 #include <cstdint>
 #include <cstring>
@@ -653,6 +656,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   vtkF3DQuakeMDLImporter* Parent;
   vtkSmartPointer<vtkPolyDataMapper> Mapper;
   vtkSmartPointer<vtkTexture> Texture;
+  vtkNew<vtkInterpolateDataSetAttributes> AttrInterp;
 
   std::vector<std::string> AnimationNames;
   std::vector<std::vector<double>> AnimationTimes;
@@ -734,10 +738,68 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
       (found == times.end() - 1) ? times.size() - 2 : std::distance(times.begin(), found);
     // If time at index i > timeValue, then choose the previous frame
     const size_t frameIndex = times[i] > timeValue && i > 0 ? i - 1 : i;
+    size_t upperFrameIndex =
+      std::distance(times.begin(), std::lower_bound(times.begin(), times.end() - 1, timeValue));
+    size_t lowerFrameIndex;
+    double alpha;
+    if (upperFrameIndex >= times.size() - 1)
+    {
+      // Last frame
+      upperFrameIndex = lowerFrameIndex = times.size() - 2;
+      alpha = 0.0;
+    }
+    else
+    {
+      lowerFrameIndex = upperFrameIndex > 0 ? upperFrameIndex - 1 : 0;
+      alpha = vtkMathUtilities::SafeDivision(
+        timeValue - times[lowerFrameIndex], times[upperFrameIndex] - times[lowerFrameIndex]);
+    }
     if (isMeshAnimation)
     {
-      this->Internals->Mapper->SetInputData(
-        this->Internals->AnimationFrames[animIndex][frameIndex]);
+      vtkPolyData* upperFrame = this->Internals->AnimationFrames[animIndex][upperFrameIndex];
+      vtkPolyData* lowerFrame = this->Internals->AnimationFrames[animIndex][lowerFrameIndex];
+      if (!this->Interpolate || upperFrame == lowerFrame)
+      {
+        // Interpolation disabled or no difference between frames
+        this->Internals->Mapper->SetInputData(lowerFrame);
+      }
+      else
+      {
+        // Interpolate every point between the two frames to get
+        // resulting interpolatedPoints
+        vtkPoints* lowerPoints = lowerFrame->GetPoints();
+        vtkPoints* upperPoints = upperFrame->GetPoints();
+
+        const vtkIdType numPoints = lowerPoints->GetNumberOfPoints();
+        vtkNew<vtkPoints> interpolatedPoints;
+        interpolatedPoints->SetNumberOfPoints(numPoints);
+        for (vtkIdType p = 0; p < numPoints; ++p)
+        {
+          // Get x, y, z coordinates from both frames
+          double lowerCoord[3];
+          double upperCoord[3];
+          lowerPoints->GetPoint(p, lowerCoord);
+          upperPoints->GetPoint(p, upperCoord);
+
+          interpolatedPoints->SetPoint(p,
+            lowerCoord[0] + alpha * (upperCoord[0] - lowerCoord[0]),  // x
+            lowerCoord[1] + alpha * (upperCoord[1] - lowerCoord[1]),  // y
+            lowerCoord[2] + alpha * (upperCoord[2] - lowerCoord[2])); // z
+        }
+
+        // Interpolate attributes only
+        vtkInterpolateDataSetAttributes* attrInterp = this->Internals->AttrInterp;
+        attrInterp->RemoveAllInputs();
+        attrInterp->AddInputData(lowerFrame);
+        attrInterp->AddInputData(upperFrame);
+        attrInterp->SetT(alpha);
+        attrInterp->Update();
+
+        vtkNew<vtkPolyData> interpolatedMesh;
+        interpolatedMesh->ShallowCopy(attrInterp->GetOutput());
+        interpolatedMesh->SetPoints(interpolatedPoints);
+        this->Internals->Mapper->SetInputData(interpolatedMesh);
+      }
     }
     else
     {
