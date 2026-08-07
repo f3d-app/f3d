@@ -1,6 +1,8 @@
 #ifndef f3d_exception_h
 #define f3d_exception_h
 
+#include "export.h"
+
 /// @cond
 #include <stdexcept>
 #include <string>
@@ -15,7 +17,7 @@ namespace f3d
  * A generic exception used in the libf3d.
  * Can be used to catch all exceptions when needed.
  */
-struct exception : public std::runtime_error
+struct F3D_EXPORT exception : public std::runtime_error
 {
   explicit exception(const std::string& what = "")
     : std::runtime_error(what)
