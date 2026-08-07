@@ -12,6 +12,7 @@
 #include <vtkImageReader2Factory.h>
 #include <vtkImageSSIM.h>
 #include <vtkJPEGWriter.h>
+#include <vtkMemoryResourceStream.h>
 #include <vtkPNGReader.h>
 #include <vtkPNGWriter.h>
 #include <vtkPointData.h>
@@ -212,6 +213,67 @@ image::image(const fs::path& filePath)
     delete this->Internals;
     throw read_exception(std::string("Cannot read image: ") + ex.what());
   }
+}
+
+//----------------------------------------------------------------------------
+image::image([[maybe_unused]] std::byte* buffer, [[maybe_unused]] std::size_t size)
+  : Internals(new image::internals())
+{
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260128)
+  detail::init::initialize();
+
+  if (buffer == nullptr)
+  {
+    delete this->Internals;
+    throw read_exception("Cannot read image from buffer: Buffer is empty");
+  }
+
+  vtkNew<vtkMemoryResourceStream> stream;
+  stream->SetBuffer(buffer, size);
+
+  vtkNew<vtkImageReader2Collection> availableReaders;
+  vtkImageReader2Factory::GetRegisteredReaders(availableReaders);
+
+  vtkCollectionSimpleIterator iterator;
+  vtkImageReader2* currentReader;
+  vtkImageReader2* reader = nullptr;
+
+  for (availableReaders->InitTraversal(iterator);
+       (currentReader = availableReaders->GetNextImageReader2(iterator));)
+  {
+    if (currentReader->CanReadFile(stream) > 0)
+    {
+      reader = currentReader;
+      break;
+    }
+  }
+
+  if (reader == nullptr)
+  {
+    delete this->Internals;
+    throw read_exception("Cannot read image from buffer: No image reader supports this stream.");
+  }
+
+  reader->SetStream(stream);
+  reader->Update();
+  this->Internals->Image = reader->GetOutput();
+
+  vtkPNGReader* pngReader = vtkPNGReader::SafeDownCast(reader);
+  if (pngReader != nullptr)
+  {
+    this->Internals->ReadPngMetadata(pngReader);
+  }
+
+  if (!this->Internals->Image)
+  {
+    delete this->Internals;
+    throw read_exception("Cannot read image from buffer");
+  }
+
+#else
+  delete this->Internals;
+  throw read_exception("VTK >= v9.6.20260128 is required for streaming images");
+#endif
 }
 
 //----------------------------------------------------------------------------
