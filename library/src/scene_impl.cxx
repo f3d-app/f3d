@@ -898,6 +898,15 @@ scene& scene_impl::setNodeVisibility(int nodeId, bool visible)
 }
 
 //----------------------------------------------------------------------------
+scene_info_t scene_impl::getSceneInfo() const
+{
+  const vtkF3DMetaImporter::SceneInfo info = this->Internals->MetaImporter->GetSceneInfo();
+
+  return scene_info_t{ info.NumberOfFiles, info.NumberOfActors,
+    static_cast<std::int64_t>(info.NumberOfPoints), static_cast<std::int64_t>(info.NumberOfCells) };
+}
+
+//----------------------------------------------------------------------------
 bool scene_impl::supports(const fs::path& filePath)
 {
   return f3d::factory::instance()->getReader(

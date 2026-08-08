@@ -259,6 +259,24 @@ int f3d_scene_set_node_visibility(f3d_scene_t* scene, int node_id, int visible)
 }
 
 //----------------------------------------------------------------------------
+int f3d_scene_get_scene_info(const f3d_scene_t* scene, f3d_scene_info_t* info)
+{
+  if (!scene || !info)
+  {
+    return 0;
+  }
+
+  const f3d::scene* cpp_scene = reinterpret_cast<const f3d::scene*>(scene);
+  const f3d::scene_info_t cpp_info = cpp_scene->getSceneInfo();
+
+  info->number_of_files = cpp_info.numberOfFiles;
+  info->number_of_actors = cpp_info.numberOfActors;
+  info->number_of_points = cpp_info.numberOfPoints;
+  info->number_of_cells = cpp_info.numberOfCells;
+  return 1;
+}
+
+//----------------------------------------------------------------------------
 int f3d_scene_add(f3d_scene_t* scene, const char* file_path)
 {
   if (!scene || !file_path)

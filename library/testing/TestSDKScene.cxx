@@ -224,5 +224,32 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     });
   }
 
+  // scene info test, using a dedicated engine to avoid impacting the renders above
+  {
+    f3d::engine engine = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
+    f3d::scene& scene = engine.getScene();
+
+    test("empty scene info", scene.getSceneInfo() == f3d::scene_info_t{});
+
+    scene.add(fs::path(logo));
+    const f3d::scene_info_t info = scene.getSceneInfo();
+    test("scene info counts the added file", info.numberOfFiles == 1);
+    test("scene info counts actors, points and cells",
+      info.numberOfActors > 0 && info.numberOfPoints > 0 && info.numberOfCells > 0);
+
+    scene.add(fs::path(cube));
+    const f3d::scene_info_t appended = scene.getSceneInfo();
+    test("scene info counts both added files", appended.numberOfFiles == 2);
+    test("scene info counters increase when adding a file",
+      appended.numberOfActors > info.numberOfActors &&
+        appended.numberOfPoints > info.numberOfPoints &&
+        appended.numberOfCells > info.numberOfCells);
+
+    test("scene info is cleared with the scene", [&]() {
+      scene.clear();
+      return scene.getSceneInfo() == f3d::scene_info_t{};
+    });
+  }
+
   return test.result();
 }

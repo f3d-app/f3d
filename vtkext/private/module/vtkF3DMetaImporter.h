@@ -122,8 +122,22 @@ public:
    */
   const vtkBoundingBox& GetGeometryBoundingBox();
 
+  struct SceneInfo
+  {
+    int NumberOfFiles = 0;
+    int NumberOfActors = 0;
+    vtkIdType NumberOfPoints = 0;
+    vtkIdType NumberOfCells = 0;
+  };
+
   /**
-   * Get a meta data description of all imported data
+   * Recover counters describing all imported data.
+   * Only actors are taken into account, so volumes contribute no points nor cells.
+   */
+  SceneInfo GetSceneInfo() const;
+
+  /**
+   * Get a meta data description of all imported data, built from GetSceneInfo
    */
   std::string GetMetaDataDescription() const;
 

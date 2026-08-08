@@ -406,6 +406,32 @@ struct node_state_t
   }
 };
 
+/**
+ * Describe the contents of the scene, as returned by scene::getSceneInfo.
+ */
+struct scene_info_t
+{
+  /// Number of importers in the scene, which counts every file added with scene::add as well as
+  /// every mesh and buffer added with it
+  int numberOfFiles = 0;
+
+  /// Number of actors in the scene
+  int numberOfActors = 0;
+
+  /// Total number of points of all the actors in the scene.
+  std::int64_t numberOfPoints = 0;
+
+  /// Total number of cells of all the actors in the scene.
+  std::int64_t numberOfCells = 0;
+
+  [[nodiscard]] bool operator==(const scene_info_t& other) const
+  {
+    return this->numberOfFiles == other.numberOfFiles &&
+      this->numberOfActors == other.numberOfActors &&
+      this->numberOfPoints == other.numberOfPoints && this->numberOfCells == other.numberOfCells;
+  }
+};
+
 }
 
 #endif

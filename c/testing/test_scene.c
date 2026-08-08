@@ -232,6 +232,56 @@ int test_scene()
   }
   f3d_scene_free_scene_hierarchy(nodes, node_count);
 
+  // Test the scene info
+
+  f3d_scene_clear(scene);
+
+  f3d_scene_info_t info;
+  if (f3d_scene_get_scene_info(NULL, &info) || f3d_scene_get_scene_info(scene, NULL))
+  {
+    puts("[ERROR] scene info API should handle NULL arguments");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  if (!f3d_scene_get_scene_info(scene, &info) || info.number_of_files != 0 ||
+    info.number_of_actors != 0 || info.number_of_points != 0 || info.number_of_cells != 0)
+  {
+    puts("[ERROR] a cleared scene should have zeroed scene info");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  f3d_scene_add(scene, F3D_TESTING_DATA_DIR "mb/recursive/mb_0_0.vtu");
+  if (!f3d_scene_get_scene_info(scene, &info) || info.number_of_files != 1 ||
+    info.number_of_actors <= 0 || info.number_of_points <= 0 || info.number_of_cells <= 0)
+  {
+    puts("[ERROR] unexpected scene info after adding a file");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  f3d_scene_info_t appended_info;
+  f3d_scene_add(scene, F3D_TESTING_DATA_DIR "mb/recursive/mb_1_0.vtp");
+  if (!f3d_scene_get_scene_info(scene, &appended_info) || appended_info.number_of_files != 2 ||
+    appended_info.number_of_actors <= info.number_of_actors ||
+    appended_info.number_of_points <= info.number_of_points ||
+    appended_info.number_of_cells <= info.number_of_cells)
+  {
+    puts("[ERROR] scene info should increase when adding a file");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  f3d_scene_clear(scene);
+  if (!f3d_scene_get_scene_info(scene, &info) || info.number_of_files != 0 ||
+    info.number_of_actors != 0 || info.number_of_points != 0 || info.number_of_cells != 0)
+  {
+    puts("[ERROR] scene info should be cleared with the scene");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
   f3d_engine_delete(engine);
   return 0;
 }
