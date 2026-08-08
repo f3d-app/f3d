@@ -34,6 +34,14 @@ namespace f3d
  * \endcode
  *
  */
+
+enum class file_availability : unsigned char
+{
+  SUPPORTED = 0,
+  UNSUPPORTED_EXTENSION = 1,
+  UNSUPPORTED_CONTENT = 2,
+};
+
 class F3D_EXPORT scene
 {
 public:
@@ -181,13 +189,14 @@ public:
   virtual scene& setNodeVisibility(int nodeId, bool visible) = 0;
 
   /**
-   * Return true if provided file in path uses a supported extension, exists and its content
-   * correspond to a supported file format, false otherwise.
-   * content validation is only performed with VTK >= 9.6.20260228
+   * Return enum file_availability which indicates if the file at the specified path has
+   * supported extension, unsupported extension or unsupported content.
+   * content validation is only performed with VTK >= 9.6.20260228.
+   * Setting scene.skip_content_check to true disables content validation.
    * scene.force_reader is taken into account and plugin should be loaded for their readers to be
    * found.
    */
-  [[nodiscard]] virtual bool supports(const std::filesystem::path& filePath) = 0;
+  [[nodiscard]] virtual file_availability supports(const std::filesystem::path& filePath) = 0;
 
   /**
    * Load added files at provided time value if they contain any animation
