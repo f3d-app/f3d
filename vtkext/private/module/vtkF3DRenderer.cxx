@@ -18,6 +18,8 @@
 #include "vtkF3DSolidBackgroundPass.h"
 #include "vtkF3DUserRenderPass.h"
 
+#include <vtkActor.h>
+#include <vtkActorCollection.h>
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -2368,7 +2370,27 @@ int vtkF3DRenderer::UpdateLights()
 
       light->SetIntensity(originalIntensity * this->LightIntensity);
     }
+
     this->LightIntensitiesConfigured = true;
+  }
+
+  // Push IBLIntensity to every actor's custom uniforms so the HDRI ambient
+  // contribution (iblDiffuse + iblSpecular) scales with the same factor.
+  // This runs every frame (not just when intensity changes) to ensure that newly
+  // added actors always have the uniform set before their shader is compiled.
+  // VTK's //VTK::CustomUniforms::Dec mechanism then declares the uniform in the
+  // GLSL shader source. The actual GPU upload (glUniform1f) is already performed
+  // each frame by VTK's SetCustomUniforms, so this dict update is negligible.
+  // see https://github.com/f3d-app/f3d/issues/3312
+  {
+    vtkActorCollection* actors = this->GetActors();
+    vtkCollectionSimpleIterator ait;
+    vtkActor* actor;
+    for (actors->InitTraversal(ait); (actor = actors->GetNextActor(ait));)
+    {
+      actor->GetShaderProperty()->GetFragmentCustomUniforms()->SetUniformf(
+        "IBLIntensity", static_cast<float>(this->LightIntensity));
+    }
   }
 
   return lightCount;
