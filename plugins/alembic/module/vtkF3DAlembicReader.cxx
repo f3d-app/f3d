@@ -536,14 +536,18 @@ public:
       }
 
       // Collecting all time steps
-      if (ts->getTimeSamplingType().isUniform()) {
+      if (ts->getTimeSamplingType().isUniform())
+      {
         double startTime = ts->getSampleTime(0);
         double timePerCycle = ts->getTimeSamplingType().getTimePerCycle();
 
-        for (int currSampleNum = 0; currSampleNum < numSamples; currSampleNum ++) {
+        for (int currSampleNum = 0; currSampleNum < numSamples; currSampleNum++)
+        {
           timeStepSet.insert(startTime + timePerCycle * currSampleNum);
         }
-      } else {
+      }
+      else
+      {
         const auto& times = ts->getStoredTimes();
         for (auto& timeStep : times)
         {
