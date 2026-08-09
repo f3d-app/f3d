@@ -622,23 +622,27 @@ public:
       const auto& [parent, ohead] = objects.top();
       const Alembic::AbcGeom::IObject obj(parent, ohead.getName());
       Alembic::Abc::TimeSamplingPtr ts;
+      int numSamples = 0;
       if (Alembic::AbcGeom::IXform::matches(ohead))
       {
         const Alembic::AbcGeom::IXform xForm(parent, ohead.getName());
         const Alembic::AbcGeom::IXformSchema& schema = xForm.getSchema();
         ts = schema.getTimeSampling();
+        numSamples = static_cast<int>(schema.getNumSamples());
       }
       else if (Alembic::AbcGeom::IPolyMesh::matches(ohead))
       {
         const Alembic::AbcGeom::IPolyMesh polymesh(parent, ohead.getName());
         const Alembic::AbcGeom::IPolyMeshSchema& schema = polymesh.getSchema();
         ts = schema.getTimeSampling();
+        numSamples = static_cast<int>(schema.getNumSamples());
       }
       else if (Alembic::AbcGeom::ICurves::matches(ohead))
       {
         const Alembic::AbcGeom::ICurves curves(parent, ohead.getName());
         const Alembic::AbcGeom::ICurvesSchema& schema = curves.getSchema();
         ts = schema.getTimeSampling();
+        numSamples = static_cast<int>(schema.getNumSamples());
       }
 
       objects.pop();
@@ -653,10 +657,19 @@ public:
       }
 
       // Collecting all time steps
-      const auto& times = ts->getStoredTimes();
-      for (auto& timeStep : times)
-      {
-        timeStepSet.insert(timeStep);
+      if (ts->getTimeSamplingType().isUniform()) {
+        double startTime = ts->getSampleTime(0);
+        double timePerCycle = ts->getTimeSamplingType().getTimePerCycle();
+
+        for (int currSampleNum = 0; currSampleNum < numSamples; currSampleNum ++) {
+          timeStepSet.insert(startTime + timePerCycle * currSampleNum);
+        }
+      } else {
+        const auto& times = ts->getStoredTimes();
+        for (auto& timeStep : times)
+        {
+          timeStepSet.insert(timeStep);
+        }
       }
     }
     if (timeStepSet.size() > 0)
