@@ -1,4 +1,5 @@
 #include "PseudoUnitTest.h"
+#include "TestSDKHelpers.h"
 
 #include <engine.h>
 #include <interactor.h>
@@ -6,10 +7,11 @@
 
 using namespace std::string_literals;
 
-int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
+int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
 {
   PseudoUnitTest test;
-  f3d::engine eng = f3d::engine::create(true);
+  std::string renderingBackend = std::string(argv[4]);
+  f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::scene& sce = eng.getScene();
   f3d::interactor& inter = eng.getInteractor();
 
@@ -19,12 +21,13 @@ int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   test("getAnimationNames returns 0 len vec for empty scene", sce.getAnimationNames().size() == 0);
 
-  sce.add(std::string(argv[1]) + "/data/f3d.glb");
+  sce.add(std::string(argv[1]) + "/data/soldier_animations.mdl");
 
-  test("availableAnimations", sce.availableAnimations() == 1);
+  test("availableAnimations", sce.availableAnimations() == 10);
 
   sce.loadAnimationTime(0.5);
-  test("recover animationTimeRange", sce.animationTimeRange() == std::make_pair(0.0, 4.0));
+  test("recover animationTimeRange",
+    sce.animationTimeRange() == std::make_pair(0.0, 0.7999999999999999));
 
   inter.startAnimation();
   test("isPlaying after start", inter.isPlayingAnimation());
@@ -45,14 +48,21 @@ int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   inter.stopAnimation();
   test("isPlaying after stop", !inter.isPlayingAnimation());
 
-  test("getAnimationName returns name at index", sce.getAnimationName(0), "unnamed_0"s);
+  test("getAnimationName returns name at index", sce.getAnimationName(0), "stand"s);
 
   test("getAnimationName returns for out of range", sce.getAnimationName(9999), "No animation"s);
 
-  test("getAnimationName returns current name", sce.getAnimationName(), "unnamed_0"s);
+  test("getAnimationName returns current name", sce.getAnimationName(), "stand"s);
 
   test("getAnimationNames returns names", sce.getAnimationNames(),
-    std::vector<std::string>{ "unnamed_0" });
+    std::vector<std::string>{
+      "stand", "dead", "dead_right", "reload", "hit", "down", "stumble", "run", "shoot", "walk" });
+
+  auto keyframes = sce.getAnimationKeyFrames();
+  test("check keyframes size", static_cast<int>(keyframes.size()), 9);
+  test("check first keyframes", keyframes[0], 0.0);
+  test("check last keyframes", keyframes[8], 0.7999999999999999);
+
   inter.startAnimation(f3d::interactor::AnimationDirection::FORWARD);
   test("isPlaying backward after forward start",
     inter.getAnimationDirection() == f3d::interactor::AnimationDirection::FORWARD);

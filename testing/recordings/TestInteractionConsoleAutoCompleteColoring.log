@@ -18,6 +18,13 @@ KeyPressEvent 199 142 0 9 1 Tab 0
 CharEvent 199 142 0 9 1 Tab 0
 KeyReleaseEvent 199 142 0 9 1 Tab 0
 
+KeyPressEvent 833 249 0 0 1 Shift_L 0
+CharEvent 833 249 0 0 1 Shift_L 0
+KeyPressEvent 833 249 1 95 1 underscore 0
+CharEvent 833 249 1 95 1 underscore 0
+KeyReleaseEvent 833 249 1 95 1 underscore 0
+KeyReleaseEvent 833 249 1 0 1 Shift_L 0
+
 KeyPressEvent 199 142 0 99 1 c 0
 CharEvent 199 142 0 99 1 c 0
 KeyReleaseEvent 199 142 0 99 1 c 0

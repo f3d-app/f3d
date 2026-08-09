@@ -72,6 +72,21 @@
           "implicitValue": "1"
         },
         {
+          "longName": "load-statefile",
+          "helpText": "Restore the application state from a statefile, applied above config files but below command line options. Use `-` for the standard input",
+          "valueHelper": "<file path>"
+        },
+        {
+          "longName": "save-statefile",
+          "helpText": "Save the application state to a statefile right after loading then continue, supports the same template variables as --output. Use `-` for the standard output",
+          "valueHelper": "<file path>"
+        },
+        {
+          "longName": "statefile-filename",
+          "helpText": "Default filename used by the statefile save and load interactions when no file is provided, supports the same template variables as --output. Use `-` for the standard output (save) or standard input (load)",
+          "valueHelper": "<file path>"
+        },
+        {
           "longName": "rendering-backend",
           "helpText": "Backend to use when rendering (auto|glx|wgl|egl|osmesa)",
           "valueHelper": "<string>"
@@ -109,6 +124,11 @@
           "valueHelper": "<paths or names>"
         },
         {
+          "longName": "plugins-path",
+          "helpText": "Path specifying where to load plugins from",
+          "valueHelper": "<path>"
+        },
+        {
           "longName": "scan-plugins",
           "helpText": "Scan standard directories for plugins and display available plugins (result can be incomplete)"
         },
@@ -136,9 +156,9 @@
         },
         {
           "longName": "animation-progress",
-          "helpText": "Show animation progress bar",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
+          "helpText": "Animation progress bar mode (\"none\", \"default\" or \"advanced\")",
+          "valueHelper": "<string>",
+          "implicitValue": "default"
         },
         {
           "longName": "multi-file-mode",
@@ -218,6 +238,11 @@
           "valueHelper": "<color>"
         },
         {
+          "longName": "grid-reflection",
+          "helpText": "Reflection strength of the grid",
+          "valueHelper": "<value>"
+        },
+        {
           "longName": "axes-grid",
           "helpText": "Enable grid axis",
           "valueHelper": "<bool>",
@@ -247,12 +272,6 @@
           "helpText": "Interaction style",
           "valueHelper": "<style>",
           "implicitValue": "2d"
-        },
-        {
-          "longName": "interaction-trackball",
-          "helpText": "Enable trackball interaction (deprecated, use --interaction-style=trackball)",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
         },
         {
           "longName": "invert-zoom",
@@ -308,9 +327,26 @@
           "conditional": "F3D_MODULE_UI"
         },
         {
+          "longName": "backdrop-color",
+          "helpText": "UI backdrop color",
+          "valueHelper": "<color>",
+          "conditional": "F3D_MODULE_UI"
+        },
+        {
           "longName": "command-script",
           "helpText": "Path to a script file containing commands to execute",
           "valueHelper": "<file_path>"
+        },
+        {
+          "longName": "normal-glyphs",
+          "helpText": "Enable normal glyphs",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "normal-glyphs-scale",
+          "helpText": "Scale normal glyphs",
+          "valueHelper": "<ratio>"
         }
       ]
     },
@@ -323,11 +359,6 @@
           "helpText": "Select point sprites type (\"none\", \"sphere\", \"gaussian\", \"circle\", \"stddev\", \"bound\")",
           "valueHelper": "<string>",
           "implicitValue": "sphere"
-        },
-        {
-          "longName": "point-sprites-type",
-          "helpText": "Point sprites type (deprecated)",
-          "valueHelper": "<sphere|gaussian>"
         },
         {
           "longName": "point-sprites-size",
@@ -444,6 +475,12 @@
           "longName": "normal-scale",
           "helpText": "Normal scale affects the strength of the normal deviation from the normal texture",
           "valueHelper": "<normalScale>"
+        },
+        {
+          "longName": "unlit",
+          "helpText": "Ignore shading and make the material unlit",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
         }
       ]
     },
@@ -489,6 +526,12 @@
         {
           "longName": "scene-hierarchy",
           "helpText": "Display the scene hierarchy widget",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "notifications",
+          "helpText": "Display notifications",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
@@ -686,12 +729,6 @@
           "implicitValue": "ddp"
         },
         {
-          "longName": "translucency-support",
-          "helpText": "Enable translucency blending (deprecated)",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
-        },
-        {
           "longName": "ambient-occlusion",
           "shortName": "q",
           "helpText": "Enable ambient occlusion providing approximate shadows for better depth perception, implemented using SSAO",
@@ -702,12 +739,6 @@
           "longName": "anti-aliasing",
           "shortName": "a",
           "helpText": "Select anti-aliasing method (\"none\", \"fxaa\", \"ssaa\" or \"taa\")",
-          "valueHelper": "<string>",
-          "implicitValue": "fxaa"
-        },
-        {
-          "longName": "anti-aliasing-mode",
-          "helpText": "Select anti-aliasing method (\"fxaa\", \"ssaa\" or \"taa\") (deprecated)",
           "valueHelper": "<string>",
           "implicitValue": "fxaa"
         },

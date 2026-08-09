@@ -20,13 +20,12 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // check supported formats
   std::vector<std::string> formats = f3d::image::getSupportedFormats();
-  test("supported formats PNG", std::find(formats.begin(), formats.end(), ".png") != formats.end());
+  test("supported formats PNG", std::ranges::find(formats, ".png") != formats.end());
 #if F3D_MODULE_EXR
-  test("supported formats EXR", std::find(formats.begin(), formats.end(), ".exr") != formats.end());
+  test("supported formats EXR", std::ranges::find(formats, ".exr") != formats.end());
 #endif
 #if F3D_MODULE_WEBP
-  test(
-    "supported formats WebP", std::find(formats.begin(), formats.end(), ".webp") != formats.end());
+  test("supported formats WebP", std::ranges::find(formats, ".webp") != formats.end());
 #endif
 
   constexpr unsigned int width = 64;
@@ -40,21 +39,19 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   f3d::image generated(width, height, channels);
   std::vector<uint8_t> pixels(width * height * channels);
-  std::generate(std::begin(pixels), std::end(pixels),
-    [&]() { return static_cast<uint8_t>(randGenerator() % 256); });
+  std::ranges::generate(pixels, [&]() { return static_cast<uint8_t>(randGenerator() % 256); });
   generated.setContent(pixels.data());
 
   f3d::image generated16(width, height, channels, f3d::image::ChannelType::SHORT);
   std::vector<uint16_t> pixels16(width * height * channels);
-  std::generate(std::begin(pixels16), std::end(pixels16),
-    [&]() { return static_cast<uint16_t>(randGenerator() % 65536); });
+  std::ranges::generate(pixels16, [&]() { return static_cast<uint16_t>(randGenerator() % 65536); });
   generated16.setContent(pixels16.data());
 
   std::uniform_real_distribution<float> dist(
     std::numeric_limits<float>::min(), std::numeric_limits<float>::max());
   f3d::image generated32(width, height, channels, f3d::image::ChannelType::FLOAT);
   std::vector<float> pixels32(width * height * channels);
-  std::generate(std::begin(pixels32), std::end(pixels32), [&]() { return dist(randGenerator); });
+  std::ranges::generate(pixels32, [&]() { return dist(randGenerator); });
   generated32.setContent(pixels32.data());
 
   // test save in different formats and different types
@@ -107,7 +104,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("check 16-bits image channel type size", shortImg.getChannelTypeSize(), 2u);
 
   // check reading a 32-bits image
-  f3d::image hdrImg(testingDir + "/data/palermo_park_1k.hdr");
+  f3d::image hdrImg(testingDir + "/data/shanghai_bund_1k.hdr");
   test("check 32-bits HDR image channel type",
     hdrImg.getChannelType() == f3d::image::ChannelType::FLOAT);
   test("check 32-bits HDR image channel type size", hdrImg.getChannelTypeSize(), 4u);
@@ -115,7 +112,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
 #if F3D_MODULE_EXR
   // check reading EXR
-  f3d::image exrImg(testingDir + "/data/kloofendal_43d_clear_1k.exr");
+  f3d::image exrImg(testingDir + "/data/small_rural_road_1k.exr");
   test("check 32-bits EXR image channel type",
     exrImg.getChannelType() == f3d::image::ChannelType::FLOAT);
 #endif
@@ -159,43 +156,6 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
               << generated.compare(baselineTIF) << "\n";
     return EXIT_FAILURE;
   }*/
-
-// Remove this once VTK 9.3 support is removed
-#ifdef F3D_SSIM_COMPARE
-  // check generated short image with baseline
-  test("check generated short image width", generated16.getWidth(), width);
-  test("check generated short image height", generated16.getHeight(), height);
-  test("check generated short image channel count", generated16.getChannelCount(), channels);
-  test("check generated short image channel type",
-    generated16.getChannelType() == f3d::image::ChannelType::SHORT);
-  test("check generated short image not empty", generated16.getContent() != nullptr);
-
-  f3d::image baseline16(testingDir + "/baselines/TestSDKImage16.png");
-  test("check generated short image is the same as png baseline", generated16 == baseline16);
-
-  // XXX: enable following code once https://github.com/f3d-app/f3d/issues/1558 is fixed
-  /*
-  f3d::image baseline16TIF(testingDir + "/baselines/TestSDKImage16.tif");
-  if (generated16 != baseline16TIF)
-  {
-    std::cerr << "generated short image is different from the TIF baseline: "
-              << generated16.compare(baseline16TIF) << "\n";
-    return EXIT_FAILURE;
-  }*/
-
-  // check generated float image with baseline
-  // XXX: Uncomment once https://github.com/f3d-app/f3d/issues/1558 is fixed
-  // f3d::image baseline32(testingDir + "/baselines/TestSDKImage32.tif");
-  f3d::image baseline32 = generated32;
-
-  test("check generated float image width", generated32.getWidth(), width);
-  test("check generated float image height", generated32.getHeight(), height);
-  test("check generated float image channel count", generated32.getChannelCount(), channels);
-  test("check generated float image channel type",
-    generated32.getChannelType() == f3d::image::ChannelType::FLOAT);
-  test("check generated float image not empty", generated32.getContent() != nullptr);
-  test("check generated float image is the same as png baseline", generated32 == baseline32);
-#endif // F3D_SSIM_COMPARE
 
   // test operators
   f3d::image imgCopy = generated; // copy constructor

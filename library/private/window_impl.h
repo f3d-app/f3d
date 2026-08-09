@@ -36,7 +36,7 @@ public:
    * and store option ref for later usage
    */
   window_impl(const options& options, const std::optional<Type>& type, bool offscreen,
-    const context::function& getProcAddress);
+    const context::function& getProcAddress, std::string_view id = "");
   /**
    * Default destructor
    */
@@ -48,13 +48,18 @@ public:
    */
   Type getType() override;
   bool isOffscreen() override;
+  double getDPIScale() override;
   camera& getCamera() override;
   bool render() override;
   image renderToImage(bool noBackground = false) override;
   int getWidth() const override;
   int getHeight() const override;
   window& setSize(int width, int height) override;
+  std::pair<int, int> getSize() const override;
   window& setPosition(int x, int y) override;
+  std::pair<int, int> getPosition() const override;
+  int getLeft() const override;
+  int getTop() const override;
   window& setIcon(const unsigned char* icon, size_t iconSize) override;
   window& setWindowName(std::string_view windowName) override;
   point3_t getWorldFromDisplay(const point3_t& displayPoint) const override;
@@ -118,6 +123,12 @@ public:
    * Set the cache path.
    */
   void SetCachePath(const std::filesystem::path& cachePath);
+
+  /**
+   * Implementation only API.
+   * Get the cache path, empty if it could not be recovered.
+   */
+  [[nodiscard]] std::filesystem::path GetCachePath() const;
 
   /**
    * Implementation only API.

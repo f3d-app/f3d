@@ -48,6 +48,7 @@ public class TestOptions {
     options.getAllNames();
     options.getClosestOption("ui.scalar");
     options.isOptional("ui.scalar_bar");
+    options.getType("render.point_size");
 
     Engine engine2 = Engine.create(true);
     Options options2 = engine2.getOptions();
@@ -58,6 +59,36 @@ public class TestOptions {
     options.reset("render.line_width");
     options.removeValue("model.color.texture");
 
+    options.hasDomain("scene.camera.index");
+    options.getDomainStyle("scene.camera.index");
+    options.getEnumDomain("render.effect.blending.mode");
+    options.getRangeDomainAsDouble("render.line_width");
+    options.getRangeDomainAsInt("render.raytracing.samples");
+    options.increase("render.raytracing.samples");
+    options.decrease("render.raytracing.samples");
+    options.cycle("render.effect.blending.mode");
+
     engine.close();
+
+    // --- Exception handling tests ---
+    Engine exEngine = Engine.createNone();
+    Options exOptions = exEngine.getOptions();
+
+    // Setting a nonexistent option must throw InexistentException.
+    try {
+      exOptions.setAsBool("this.option.does.not.exist.at.all", true);
+      throw new RuntimeException("Expected Options.InexistentException was not thrown");
+    } catch (Options.InexistentException e) {
+    }
+
+    // Getting an option with wrong type must throw IncompatibleException.
+    try {
+      // render.background.color is a double vector, not a bool
+      exOptions.getAsBool("render.background.color");
+      throw new RuntimeException("Expected Options.IncompatibleException was not thrown");
+    } catch (Options.IncompatibleException e) {
+    }
+
+    exEngine.close();
   }
 }

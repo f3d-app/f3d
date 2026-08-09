@@ -46,6 +46,11 @@ public:
   void ShowBadge();
 
   /**
+   * Return true if the console badge is visible, false otherwise
+   */
+  bool IsBadgeVisible() const;
+
+  /**
    * Clear console
    */
   void Clear();

@@ -14,7 +14,7 @@ function(f3d_create_exec target_name)
 
   set_target_properties(${target_name} PROPERTIES
     CXX_VISIBILITY_PRESET hidden
-    CXX_STANDARD 17
+    CXX_STANDARD 20
     )
 
   if (APPLE)
@@ -82,6 +82,11 @@ function(f3d_create_exec target_name)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_WEBP)
   endif ()
 
+  # clip
+  if (F3D_MODULE_CLIP)
+    target_compile_definitions(${target_name} PRIVATE F3D_MODULE_CLIP)
+  endif ()
+
   # dmon
   if (F3D_MODULE_DMON)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_DMON)
@@ -95,13 +100,6 @@ function(f3d_create_exec target_name)
   # tinyfiledialogs
   if (F3D_MODULE_TINYFILEDIALOGS)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_TINYFILEDIALOGS)
-  endif ()
-
-  if(VTK_VERSION VERSION_LESS 9.3.20240914)
-    # Headless EGL build
-    if (VTK_OPENGL_HAS_EGL)
-      target_compile_definitions(${target_name} PRIVATE F3D_HEADLESS_BUILD)
-    endif ()
   endif ()
 
   # F3D_STRICT_BUILD

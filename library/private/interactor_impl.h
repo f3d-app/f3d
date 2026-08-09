@@ -44,14 +44,17 @@ public:
   interactor& removeCommand(const std::string& action) override;
   std::vector<std::string> getCommandActions() const override;
   bool triggerCommand(std::string_view command, bool keepComments = true) override;
+  interactor& setNotificationCallback(
+    std::function<bool(const std::string&, const std::string&, const std::string&, double)>
+      callback) override;
 
   interactor& initBindings() override;
   interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
     std::string group = std::string(), documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER) override;
+    BindingType type = BindingType::OTHER, bool notify = true) override;
   interactor& addBinding(const interaction_bind_t& bind, std::string command,
     std::string group = std::string(), documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER) override;
+    BindingType type = BindingType::OTHER, bool notify = true) override;
   interactor& removeBinding(const interaction_bind_t& bind) override;
   std::vector<std::string> getBindGroups() const override;
   std::vector<interaction_bind_t> getBindsForGroup(std::string group) const override;
@@ -77,11 +80,16 @@ public:
   interactor& enableCameraMovement() override;
   interactor& disableCameraMovement() override;
 
-  bool playInteraction(const std::filesystem::path& file, double deltaTime,
-    std::function<void()> userCallBack) override;
+  interactor& setEventLoopUserCallback(
+    std::function<void(interactor_state_t)> userCallback) override;
+
+  bool playInteraction(const std::filesystem::path& file, double deltaTime) override;
   bool recordInteraction(const std::filesystem::path& file) override;
 
-  interactor& start(double deltaTime, std::function<void()> userCallBack) override;
+  interactor& triggerNotification(
+    std::string desc, std::string value = "", double duration = 3.f) override;
+
+  interactor& start(double deltaTime) override;
   interactor& stop() override;
   interactor& requestRender() override;
   interactor& requestStop() override;
@@ -123,7 +131,7 @@ public:
 
   /**
    * Event loop being called automatically once the interactor is started
-   * First call the EventLoopUserCallBack, then call render if requested.
+   * First call the EventLoopUserCallback, then call render if requested.
    */
   void EventLoop();
 

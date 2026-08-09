@@ -8,43 +8,35 @@ f3d_test(NAME TestExodusG DATA box.g PLUGIN hdf ARGS NO_RENDER NO_BASELINE REGEX
 f3d_test(NAME TestExodusE DATA single_timestep.e PLUGIN hdf ARGS NO_RENDER NO_BASELINE REGEXP "Number of points: 1331")
 f3d_test(NAME TestExodusConfig DATA disk_out_ref.ex2 CONFIG ${F3D_SOURCE_DIR}/testing/configs/exodus.json ARGS -s --camera-position=-11,-2,-49 LABELS "plugin;hdf")
 f3d_test(NAME TestNetCDF DATA temperature_grid.nc PLUGIN hdf ARGS -s)
-
-if (VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
-  f3d_test(NAME TestVTKHDF DATA blob.vtkhdf PLUGIN hdf ARGS -s)
-  f3d_test(NAME TestAMRDataSet DATA amr.vtkhdf PLUGIN hdf ARGS -s)
-endif()
-
-if (VTK_VERSION VERSION_GREATER_EQUAL 9.4.0)
-  f3d_test(NAME TestVTKHDFPartitionedDataSetCollection DATA pdc_sphere_cone.vtkhdf PLUGIN hdf ARGS -s)
-endif()
+f3d_test(NAME TestVTKHDF DATA blob.vtkhdf PLUGIN hdf ARGS -s)
+f3d_test(NAME TestAMRDataSet DATA amr.vtkhdf PLUGIN hdf ARGS -s)
+f3d_test(NAME TestVTKHDFPartitionedDataSetCollection DATA pdc_sphere_cone.vtkhdf PLUGIN hdf ARGS -s)
 
 if (VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251109)
-  f3d_test(NAME TestPipedVTKHDF DATA blob.vtkhdf PLUGIN hdf ARGS -s PIPED VTKHDF)
+  f3d_test(NAME TestPipedVTKHDF DATA blob.vtkhdf PLUGIN hdf ARGS -s PIPED_READER VTKHDF PIPED)
 endif()
 
 if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/plugins/hdf/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-    f3d_test(NAME TestDefaultConfigFileExodus DATA disk_out_ref.ex2 CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI LABELS "plugin;hdf")
+    f3d_test(NAME TestDefaultConfigFileExodus DATA disk_out_ref.ex2 CONFIG config_build LONG_TIMEOUT UI SKIP_GLES LABELS "plugin;hdf")
   endif()
 
   file(COPY "${F3D_SOURCE_DIR}/plugins/hdf/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-  f3d_test(NAME TestThumbnailConfigFileExodus DATA disk_out_ref.ex2 CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING LABELS "plugin;hdf")
+  f3d_test(NAME TestThumbnailConfigFileExodus DATA disk_out_ref.ex2 CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI SKIP_GLES LABELS "plugin;hdf")
 
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-    f3d_test(NAME TestDefaultConfigFileVTKHDF DATA blob.vtkhdf CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+    f3d_test(NAME TestDefaultConfigFileVTKHDF DATA blob.vtkhdf CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
   endif()
-  if (VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
-    f3d_test(NAME TestThumbnailConfigFileVTKHDF DATA blob.vtkhdf CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING LABELS "plugin;hdf")
-  endif()
+  f3d_test(NAME TestThumbnailConfigFileVTKHDF DATA blob.vtkhdf CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI SKIP_GLES LABELS "plugin;hdf")
 
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-    f3d_test(NAME TestDefaultConfigFileNetCDF DATA temperature_grid.nc CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI LABELS "plugin;hdf")
+    f3d_test(NAME TestDefaultConfigFileNetCDF DATA temperature_grid.nc CONFIG config_build LONG_TIMEOUT UI SKIP_GLES LABELS "plugin;hdf")
   endif()
-  f3d_test(NAME TestThumbnailConfigFileNetCDF DATA temperature_grid.nc CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING LABELS "plugin;hdf")
+  f3d_test(NAME TestThumbnailConfigFileNetCDF DATA temperature_grid.nc CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI SKIP_GLES LABELS "plugin;hdf")
 endif()
 
 ## Feature tests that rely on HDF plugin
@@ -53,13 +45,13 @@ endif()
 f3d_test(NAME TestVerboseGenericImporterAnimation DATA small.ex2 PLUGIN hdf ARGS --verbose NO_BASELINE REGEXP "0, 0.00429999")
 
 # Test animation with generic importer and coloring
-f3d_test(NAME TestAnimationGenericImporter DATA small.ex2 PLUGIN hdf ARGS -sb --animation-time=0.003 --animation-progress)
+f3d_test(NAME TestAnimationGenericImporter DATA small.ex2 PLUGIN hdf ARGS -sb --animation-time=0.003 --animation-progress UI)
 
 # Test animation with generic importer, coloring and point sprites
-f3d_test(NAME TestAnimationGenericImporterPointSprites DATA small.ex2 PLUGIN hdf ARGS -sbo --animation-time=0.003 --animation-progress)
+f3d_test(NAME TestAnimationGenericImporterPointSprites DATA small.ex2 PLUGIN hdf ARGS -sbo --animation-time=0.003 --animation-progress UI)
 
 # Test animation with generic importer, coloring and a custom scalar range
-f3d_test(NAME TestAnimationGenericImporterScalarRange DATA small.ex2 PLUGIN hdf ARGS -sb --animation-time=0.003 --animation-progress --coloring-range=0,1e7)
+f3d_test(NAME TestAnimationGenericImporterScalarRange DATA small.ex2 PLUGIN hdf ARGS -sb --animation-time=0.003 --animation-progress --coloring-range=0,1e7 UI)
 
 # Test Generic Importer Verbose animation with a single frame.
 f3d_test(NAME TestVerboseAnimationSingleTimestep DATA single_timestep.e PLUGIN hdf ARGS --verbose NO_BASELINE REGEXP "0, 0")
@@ -82,10 +74,11 @@ f3d_test(NAME TestTimeRangeLessThanZeroWithAnimationTime DATA negative_range_ani
 # Test if a negative animation-time works when time range[0] is less than zero
 f3d_test(NAME TestTimeRangeLessThanZeroNegativeAnimationTime DATA negative_range_animated.e PLUGIN hdf ARGS -s --animation-time=-3)
 
+# Test the advanced progress bar renders correctly when the animation time range is negative
+f3d_test(NAME TestTimeRangeLessThanZeroAdvancedProgressBar DATA negative_range_animated.e PLUGIN hdf ARGS -s --animation-time=-3 --animation-progress=advanced UI)
+
 f3d_test(NAME TestMultiFileAnimationUniqueUnique DATA negative_range_animated.e small.ex2 ARGS --animation-time=0.0043001 --animation-indices=0,1 --multi-file-mode=all PLUGIN hdf)
-if (VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
-  f3d_test(NAME TestMultiFileAnimationMultiUnique DATA f3d.glb blob.vtkhdf ARGS --animation-time=2 --animation-indices=0,1 --multi-file-mode=all --opacity=0.5 PLUGIN hdf)
-endif()
+f3d_test(NAME TestMultiFileAnimationMultiUnique DATA f3d.glb blob.vtkhdf ARGS --animation-time=2 --animation-indices=0,1 --multi-file-mode=all --opacity=0.5 PLUGIN hdf)
 
 if (NOT F3D_PLUGINS_STATIC_BUILD AND BUILD_SHARED_LIBS)
 

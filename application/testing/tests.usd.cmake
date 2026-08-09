@@ -6,27 +6,55 @@ f3d_test(NAME TestUSDAPrimitives DATA primitives.usda PLUGIN usd)
 f3d_test(NAME TestUSDAPrimitivesZAxis DATA primitivesZ.usda PLUGIN usd)
 f3d_test(NAME TestUSDAInstancing DATA instancing.usda PLUGIN usd)
 f3d_test(NAME TestUSDAGlyphs DATA glyphs.usda PLUGIN usd)
-f3d_test(NAME TestUSDInvalid DATA invalid.usd REGEXP "Stage failed to open" PLUGIN usd ARGS --verbose NO_BASELINE)
 f3d_test(NAME TestUSDPurpose DATA purpose.usdc PLUGIN usd)
 f3d_test(NAME TestUSDInterpolation DATA two_quads_interp.usda PLUGIN usd)
-f3d_test(NAME TestUSDZMemEXR DATA small.usdz PLUGIN usd)
+f3d_test(NAME TestUSDUnsupportedGeom DATA nurb.usda ARGS --verbose REGEXP "Unknown geometry type" PLUGIN usd NO_BASELINE)
+
+if(F3D_MODULE_EXR)
+  f3d_test(NAME TestUSDZMemEXR DATA small.usdz PLUGIN usd)
+endif()
+
+# This test only covers the reader option, as providing a new path is not required to make the test pass
+f3d_test(NAME TestUSDDefines DATA suzanne.usd PLUGIN usd ARGS -DUSD.resources_path=/foo/bar NO_BASELINE)
 
 # This test is there to test occlusion texture and face-varying point data
 # TODO: Note that the result looks incorrect because of face-varying attributes and must be fixed later
 f3d_test(NAME TestUSDTeapot DATA Teapot.usd PLUGIN usd)
 
-f3d_test(NAME TestUSDZAnimated DATA AnimatedCube.usdz PLUGIN usd ARGS --animation-time=0.3 --animation-progress THRESHOLD 0.05)
+f3d_test(NAME TestUSDZAnimated DATA AnimatedCube.usdz PLUGIN usd ARGS --animation-time=0.3 --animation-progress THRESHOLD 0.05 UI SKIP_GLES) # Disabled on GLES because of texture filtering differences
 f3d_test(NAME TestUSDZRigged DATA RiggedSimple.usdz PLUGIN usd ARGS --animation-time=0.3)
-f3d_test(NAME TestUSDZMaterials DATA McUsd.usdz PLUGIN usd ARGS --camera-position=1055,912,-247 --camera-focal-point=69,173,63 THRESHOLD 0.3) # High threshold because of legacy comparison methods in VTK 9.3
+f3d_test(NAME TestUSDZMaterials DATA McUsd.usdz PLUGIN usd ARGS --camera-position=1055,912,-247 --camera-focal-point=69,173,63 THRESHOLD 0.09 SKIP_GLES) # The threshold is high because of the complex materials (disabled on GLES)
 f3d_test(NAME TestUSDZMaterialsInterationReload DATA McUsd.usdz PLUGIN usd INTERACTION NO_BASELINE) # Up
+f3d_test(NAME TestUSDBlendShapes DATA SimpleBlendShapes.usda ARGS --animation-time=1 --animation-progress PLUGIN usd UI)
+f3d_test(NAME TestUSDBlendShapesFaceVarying DATA SimpleBlendShapesFaceVarying.usda ARGS --animation-time=1 --animation-progress PLUGIN usd UI)
+f3d_test(NAME TestUSDSkinJointOrder DATA skel_animation_sparsity.usda ARGS --animation-time=0.3 --animation-progress PLUGIN usd UI)
+f3d_test(NAME TestUSDPointsPrimitive DATA usd_points_rgb.usda ARGS --point-size=20 THRESHOLD 0.05 PLUGIN usd)
+
+# Scene hierarchy test for USD importer
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
+  f3d_test(NAME TestUSDSceneHierarchy DATA primitives.usda ARGS --scene-hierarchy PLUGIN usd UI)
+endif()
+
+# Armature
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219)
+  f3d_test(NAME TestUSDRigArmature DATA RiggedSimple.usdz ARGS --animation-time=1 --armature PLUGIN usd)
+  f3d_test(NAME TestUSDRigArmatureWithOpacity DATA RiggedSimple.usdz ARGS --animation-time=1 --armature --opacity=0.5 -p PLUGIN usd)
+  f3d_test(NAME TestUSDRigArmatureSphereTube DATA RiggedSimple.usdz ARGS --animation-time=1 --armature --point-size=20 --line-width=5 PLUGIN usd)
+endif()
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251016)
+  f3d_test(NAME TestPipedUSD DATA suzanne.usd PLUGIN usd PIPED_READER USD PIPED)
+  f3d_test(NAME TestPipedUSDAPrimitives DATA primitives.usda PLUGIN usd PIPED_READER USD PIPED)
+  f3d_test(NAME TestPipedUSDZRigged DATA RiggedSimple.usdz PLUGIN usd PIPED_READER USD PIPED)
+endif()
 
 if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/plugins/usd/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-    f3d_test(NAME TestDefaultConfigFileUSD DATA suzanne.usd CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI LABELS "plugin;usd")
+    f3d_test(NAME TestDefaultConfigFileUSD DATA suzanne.usd CONFIG config_build LONG_TIMEOUT UI SKIP_GLES LABELS "plugin;usd")
   endif()
 
   file(COPY "${F3D_SOURCE_DIR}/plugins/usd/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-  f3d_test(NAME TestThumbnailConfigFileUSD DATA suzanne.usd CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING LABELS "plugin;usd")
+  f3d_test(NAME TestThumbnailConfigFileUSD DATA suzanne.usd CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI SKIP_GLES LABELS "plugin;usd")
 endif()

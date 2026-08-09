@@ -1,6 +1,7 @@
 #ifndef TestSDKHelpers_h
 #define TestSDKHelpers_h
 
+#include <engine.h>
 #include <image.h>
 #include <window.h>
 
@@ -10,6 +11,20 @@
 
 namespace TestSDKHelpers
 {
+inline f3d::engine CreateOffscreenEngine(const std::string& renderingBackend)
+{
+  if (renderingBackend == "osmesa")
+  {
+    return f3d::engine::createOSMesa();
+  }
+
+  if (renderingBackend == "egl")
+  {
+    return f3d::engine::createEGL();
+  }
+
+  return f3d::engine::create(true);
+}
 
 inline bool RenderTest(const f3d::image& img, const std::string& baselinePath,
   const std::string& outputPath, const std::string& name, double threshold = 0.05)

@@ -1,7 +1,12 @@
 set(sources "")
 set(private_headers ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DUserEvents.h)
 
-set(F3D_DEFAULT_HDRI "${F3D_SOURCE_DIR}/resources/defaultHDRI.png" CACHE PATH "Default HDRI when no HDRI file is provided")
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+  set(F3D_DEFAULT_HDRI "${F3D_SOURCE_DIR}/resources/defaultHDRI.hdr" CACHE PATH "Default HDRI when no HDRI file is provided")
+else()
+  set(F3D_DEFAULT_HDRI "${F3D_SOURCE_DIR}/resources/defaultHDRI.png" CACHE PATH "Default HDRI when no HDRI file is provided")
+endif()
+
 mark_as_advanced(F3D_DEFAULT_HDRI)
 include("f3dEmbed")
 f3d_embed_file(
@@ -80,10 +85,12 @@ set(classes
   vtkF3DInteractorStyle
   vtkF3DMemoryMesh
   vtkF3DMetaImporter
+  vtkF3DNamedColors
   vtkF3DNoRenderWindow
   vtkF3DObjectFactory
   vtkF3DOpenGLGridMapper
   vtkF3DOverlayRenderPass
+  vtkF3DPointSplatMapper
   vtkF3DPolyDataMapper
   vtkF3DPostProcessFilter
   vtkF3DRenderPass
@@ -101,18 +108,11 @@ if (F3D_MODULE_UI)
   set(classes ${classes} vtkF3DImguiActor vtkF3DImguiConsole vtkF3DImguiObserver F3DStyle)
 endif ()
 
-# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
-  set(classes ${classes} vtkF3DPointSplatMapper)
-endif()
-
 if(WIN32)
   list(APPEND classes vtkF3DWGLRenderWindow)
 endif()
 
-# In theory the test should be `if (VTK_USE_X)` but this variable is
-# only exported starting from VTK 9.4
-if(UNIX AND NOT APPLE AND NOT EMSCRIPTEN AND NOT ANDROID)
+if(VTK_USE_X)
   list(APPEND classes vtkF3DGLXRenderWindow)
 endif()
 
@@ -176,6 +176,11 @@ if (F3D_MODULE_UI)
         "${F3D_SOURCE_DIR}/external/imgui")
   endif ()
 endif ()
+
+# UTF-8 encoding for MSVC
+if (MSVC)
+  vtk_module_compile_options(f3d::vtkextPrivate PRIVATE /utf-8)
+endif()
 
 # raytracing
 if (F3D_MODULE_RAYTRACING)

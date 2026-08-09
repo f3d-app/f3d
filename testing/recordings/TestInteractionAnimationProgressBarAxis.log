@@ -1,0 +1,10 @@
+# StreamVersion 1.2
+ExposeEvent 0 299 0 0 0 0 0
+RenderEvent 0 299 0 0 0 0 0
+
+# Hover the last keyframe to show its tooltip at the bottom-right.
+MouseMoveEvent 297 8 0 0 0 0 0
+TimerEvent 297 8 0 0 0 0 0
+RenderEvent 297 8 0 0 0 0 0
+TimerEvent 297 8 0 0 0 0 0
+RenderEvent 297 8 0 0 0 0 0

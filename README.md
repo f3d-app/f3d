@@ -65,7 +65,6 @@ In any case, please star it on github and share the word about it!
 Many thanks to our sponsors for supporting F3D
 
 <a href="https://nlnet.nl/project/F3D/" target="_blank"><img src="https://nlnet.nl/image/logos/NGI0Core_tag.svg" height="45"/></a>
-<a href="https://www.testmuai.com/?utm_medium=sponsor&utm_source=f3d-app" target="_blank"><img src="https://f3d.app/assets/images/testmu-ee484398e4f0ff464fd5c8a24ad92e89.png" height="45" /></a>
 <a href="https://www.opendronemap.org/" target="_blank"><img src="https://f3d.app/assets/images/opendronemap-95d4ad6e24c091a06ec00e1828e1eb38.png" height="45" /></a>
 
 # Vision
@@ -89,7 +88,7 @@ but there is no plan to:
 
 # Contributing
 
-F3D is a community-driven, inclusive and beginner-friendly project. We love to see how the project is growing thanks to the contributions from the community. We would love to see your face in the list below! If you want to contribute to F3D, you are very welcome to! Take a look at our [contribution documentation](CONTRIBUTING.md), [governance documentation](doc/dev/10-GOVERNANCE.md) and [code of conduct](CODE_OF_CONDUCT.md).
+F3D is a community-driven, inclusive and beginner-friendly project. We love to see how the project is growing thanks to the contributions from the community. We would love to see your face in the list below! If you want to contribute to F3D, you are very welcome to! Take a look at our [contribution documentation](CONTRIBUTING.md), [governance documentation](doc/dev/11-GOVERNANCE.md) and [code of conduct](CODE_OF_CONDUCT.md).
 
 <a href="https://github.com/f3d-app/f3d/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=f3d-app/f3d" />

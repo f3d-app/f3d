@@ -11,10 +11,10 @@ Usage:
 ```
 f3d_test(<NAME> [ARGS...])
 ```
-  - `TONE_MAPPING` Marks that this test uses tone mapping which automatically
-    disables it when using older version of VTK (<9.3.20240609)
   - `LONG_TIMEOUT` Marks a test to be enabled only if
     F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS is ON
+  - `DEFAULT_HDRI` Marks a test that uses the default HDRI, it will be disabled
+    when using VTK older than 9.5.20251001. Also implies LONG_TIMEOUT.
   - `INTERACTION` If present, an interaction recording of the same name as the
     test will be played using `--interaction-test-play`. Such a recording
     should be cleaned up and long one should consider using LONG_TIMEOUT.
@@ -32,11 +32,18 @@ f3d_test(<NAME> [ARGS...])
     even when F3D logic usually would not
   - `DPI_SCALE` Set the DPI scale through the environment variable `CTEST_F3D_FORCE_DPI_SCALE`, default is 1.0
   - `UI` Mark the test to require the presence of UI component and disable it otherwise
+  - `SKIP_GLES` Mark the test to be disabled when using GLES, usually because of missing features
+    (depth peeling and sort blending, grid axes and fps counter)
   - `PIPED` Mark the test to pipe the data (`cat data | f3d`) instead of providing the filename as data,
-    doesn't work for external plugins, pass the reader as an arg, it will be used to force before VTK v9.6.20260128.
-    Add `piped` test labels.
+    doesn't work for external plugins. Add `piped` test labels.
+  - `PIPED_READER` Provide the reader to force for a `PIPED` test, only used before VTK v9.6.20260128.
+  - `PIPED_ARG` Prepend the provided string to the `-` standard input marker of a `PIPED` test, so the piped
+    data is consumed by an option (e.g. pass `--load-statefile=` to load a statefile from `--load-statefile=-`)
+    instead of as the input model.
   - `SCRIPT` Mark the test to use a `--script` of the same name as the test
   - `NAME` Provide the name of the test, mandatory and must be unique
+  - `BASELINE_PATH` Provide the path to the baseline to use, instead of the default
+  - `OUTPUT_PATH` Provide the path to the output to use, instead of the default
   - `CONFIG` Provide the `--config` to use, instead of `--no-config`
   - `RESOLUTION` Provide the `--resolution` to use, instead of `300,300`
   - `PLUGIN` Provide the `--load-plugins` to use, also set test labels accordingly
@@ -55,7 +62,7 @@ f3d_test(<NAME> [ARGS...])
 
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED;PLUGIN" "DATA;DEPENDS;LABELS;ENV;ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "LONG_TIMEOUT;DEFAULT_HDRI;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT;PIPED;SKIP_GLES" "NAME;BASELINE_PATH;OUTPUT_PATH;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED_READER;PIPED_ARG;PLUGIN" "DATA;DEPENDS;LABELS;ENV;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -66,7 +73,8 @@ function(f3d_test)
   set(_f3d_test_data)
   if (F3D_TEST_DATA)
     foreach(_single_data ${F3D_TEST_DATA})
-      if(DEFINED f3d_INCLUDE_DIR)
+      cmake_path(IS_ABSOLUTE _single_data _single_data_absolute)
+      if(DEFINED f3d_INCLUDE_DIR OR _single_data_absolute)
         list(APPEND _f3d_test_data "${_single_data}")
       else()
         list(APPEND _f3d_test_data "${F3D_SOURCE_DIR}/testing/data/${_single_data}")
@@ -88,6 +96,7 @@ function(f3d_test)
   endif()
 
   if (F3D_TEST_HDRI)
+    list(PREPEND F3D_TEST_LABELS "hdri")
     list(APPEND F3D_TEST_ARGS "--hdri-file=${F3D_SOURCE_DIR}/testing/data/${F3D_TEST_HDRI}" "--hdri-ambient" "--hdri-skybox")
     set(F3D_TEST_LONG_TIMEOUT ON)
   endif()
@@ -106,12 +115,20 @@ function(f3d_test)
     endif()
 
     if(NOT F3D_TEST_NO_OUTPUT)
-      list(APPEND F3D_TEST_ARGS "--output=${CMAKE_BINARY_DIR}/Testing/Temporary/${F3D_TEST_NAME}.png")
+      if(DEFINED F3D_TEST_OUTPUT_PATH)
+        list(APPEND F3D_TEST_ARGS "--output=${F3D_TEST_OUTPUT_PATH}")
+      else()
+        list(APPEND F3D_TEST_ARGS "--output=${CMAKE_BINARY_DIR}/Testing/Temporary/${F3D_TEST_NAME}.png")
+      endif()
     endif()
   endif()
 
   if(NOT F3D_TEST_NO_BASELINE)
-    list(APPEND F3D_TEST_ARGS "--reference=${F3D_SOURCE_DIR}/testing/baselines/${F3D_TEST_NAME}.png")
+    if (DEFINED F3D_TEST_BASELINE_PATH)
+      list(APPEND F3D_TEST_ARGS "--reference=${F3D_TEST_BASELINE_PATH}")
+    else()
+      list(APPEND F3D_TEST_ARGS "--reference=${F3D_SOURCE_DIR}/testing/baselines/${F3D_TEST_NAME}.png")
+    endif()
 
     if(DEFINED F3D_TEST_THRESHOLD)
       list(APPEND F3D_TEST_ARGS "--reference-threshold=${F3D_TEST_THRESHOLD}")
@@ -145,10 +162,13 @@ function(f3d_test)
     set(_f3d_target "$<TARGET_FILE:f3d>")
   endif()
 
+  list(APPEND F3D_TEST_ARGS "--plugins-path=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+
   if (F3D_TEST_PIPED)
     list(APPEND F3D_TEST_LABELS "piped")
-    if(VTK_VERSION VERSION_LESS 9.6.20260128)
-      list(APPEND F3D_TEST_ARGS "--force-reader=${F3D_TEST_PIPED}")
+    # The reader is only needed to force it on old VTK; recent VTK detects it from the piped stream.
+    if(DEFINED F3D_TEST_PIPED_READER AND VTK_VERSION VERSION_LESS 9.6.20260128)
+      list(APPEND F3D_TEST_ARGS "--force-reader=${F3D_TEST_PIPED_READER}")
     endif()
     list(JOIN F3D_TEST_ARGS " " F3D_TEST_ARGS_JOINED)
     add_test(
@@ -156,6 +176,7 @@ function(f3d_test)
       COMMAND ${CMAKE_COMMAND}
         -DF3D_EXE:FILEPATH=${_f3d_target}
         -DF3D_PIPED_DATA=${_f3d_test_data}
+        -DF3D_PIPED_ARG=${F3D_TEST_PIPED_ARG}
         -DF3D_ARGS=${F3D_TEST_ARGS_JOINED}
         -P ${CMAKE_CURRENT_SOURCE_DIR}/f3d_piped.cmake
         COMMAND_EXPAND_LISTS)
@@ -163,11 +184,12 @@ function(f3d_test)
     add_test(NAME "f3d::${F3D_TEST_NAME}" COMMAND ${_f3d_target} ${_f3d_test_data} ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
   endif()
 
-  if(F3D_TEST_LABELS)
-    list(PREPEND F3D_TEST_LABELS "application")
-    set_tests_properties("f3d::${F3D_TEST_NAME}" PROPERTIES
-      LABELS "${F3D_TEST_LABELS}"
-    )
+  if(F3D_TEST_DEFAULT_HDRI)
+    list(PREPEND F3D_TEST_LABELS "hdri")
+    set(F3D_TEST_LONG_TIMEOUT ON)
+    if(VTK_VERSION VERSION_LESS 9.5.20251001)
+      set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES DISABLED ON)
+    endif()
   endif()
 
   set(_timeout "30")
@@ -192,12 +214,6 @@ function(f3d_test)
     set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES DISABLED ON)
   endif()
 
-  if(F3D_TEST_TONE_MAPPING AND VTK_VERSION VERSION_LESS 9.3.20240609)
-    # After VTK 9.3.20240609, the tone mapping used in F3D is PBR Neutral
-    # Testing tone mapping is now disabled because the reference image is different
-    set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES DISABLED ON)
-  endif()
-
   if(NOT F3D_TESTING_ENABLE_RENDERING_TESTS)
     if(NOT F3D_TEST_NO_RENDER)
       set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES DISABLED ON)
@@ -208,6 +224,11 @@ function(f3d_test)
       set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES DISABLED ON)
     endif()
   endif()
+
+  if(F3D_TEST_SKIP_GLES AND F3D_USE_GLES)
+    set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES DISABLED ON)
+  endif()
+
   set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES TIMEOUT ${_timeout})
 
   if(F3D_TEST_WILL_FAIL)
@@ -236,6 +257,11 @@ function(f3d_test)
 
   set(f3d_test_env_vars ${F3D_TEST_ENV})
   list(APPEND f3d_test_env_vars "CTEST_F3D_PROGRESS_BAR=1")
+
+  # Force CTRL modifier bindings for tests on apple to consistent baselines
+  if (APPLE)
+    list(APPEND f3d_test_env_vars "F3D_TEST_APPLE_FORCE_CTRL=true")
+  endif ()
   if (F3D_TEST_UI)
     list(APPEND f3d_test_env_vars "CTEST_F3D_CONSOLE_BADGE=1")
   endif ()
@@ -248,7 +274,13 @@ function(f3d_test)
     list(APPEND f3d_test_env_vars "CTEST_F3D_FORCE_DPI_SCALE=1.0")
   endif ()
 
-  set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES ENVIRONMENT
-    "F3D_PLUGINS_PATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY};${f3d_test_env_vars}")
+  set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES ENVIRONMENT "${f3d_test_env_vars}")
+
+  if(F3D_TEST_LABELS)
+    list(PREPEND F3D_TEST_LABELS "application")
+    set_tests_properties("f3d::${F3D_TEST_NAME}" PROPERTIES
+      LABELS "${F3D_TEST_LABELS}"
+    )
+  endif()
 
 endfunction()

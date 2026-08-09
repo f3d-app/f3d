@@ -1,5 +1,5 @@
 // Clip Library
-// Copyright (c) 2020-2024 David Capello
+// Copyright (c) 2020-2026 David Capello
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -12,9 +12,11 @@
   #error This file can be include only when CLIP_ENABLE_IMAGE is defined
 #endif
 
-#include <cstdint>
+#include "clip_base.h"
 
 #include <windows.h>
+
+#include <cstdint>
 
 namespace clip {
 
@@ -28,46 +30,46 @@ typedef bool (*ReadWicImageFormatFunc)(const uint8_t*,
                                        clip::image*,
                                        clip::image_spec*);
 
-ReadWicImageFormatFunc wic_image_format_available(UINT* output_cbformat);
+CLIP_EXTERN ReadWicImageFormatFunc wic_image_format_available(UINT* output_cbformat);
 
 //////////////////////////////////////////////////////////////////////
 // Encode the image as PNG format
 
-bool write_png_on_stream(const image& image, IStream* stream);
+CLIP_EXTERN bool write_png_on_stream(const image& image, IStream* stream);
 
-HGLOBAL write_png(const image& image);
+CLIP_EXTERN HGLOBAL write_png(const image& image);
 
 //////////////////////////////////////////////////////////////////////
 // Decode the clipboard data from PNG format
 
-bool read_png(const uint8_t* buf,
-              const UINT len,
-              image* output_image,
-              image_spec* output_spec);
+CLIP_EXTERN bool read_png(const uint8_t* buf,
+                          const UINT len,
+                          image* output_image,
+                          image_spec* output_spec);
 
 //////////////////////////////////////////////////////////////////////
 // Decode the clipboard data from JPEG format
 
-bool read_jpg(const uint8_t* buf,
-              const UINT len,
-              image* output_image,
-              image_spec* output_spec);
+CLIP_EXTERN bool read_jpg(const uint8_t* buf,
+                          const UINT len,
+                          image* output_image,
+                          image_spec* output_spec);
 
 //////////////////////////////////////////////////////////////////////
 // Decode the clipboard data from GIF format
 
-bool read_gif(const uint8_t* buf,
-              const UINT len,
-              image* output_image,
-              image_spec* output_spec);
+CLIP_EXTERN bool read_gif(const uint8_t* buf,
+                          const UINT len,
+                          image* output_image,
+                          image_spec* output_spec);
 
 //////////////////////////////////////////////////////////////////////
 // Decode the clipboard data from BMP format
 
-bool read_bmp(const uint8_t* buf,
-              const UINT len,
-              image* output_image,
-              image_spec* output_spec);
+CLIP_EXTERN bool read_bmp(const uint8_t* buf,
+                          const UINT len,
+                          image* output_image,
+                          image_spec* output_spec);
 
 
 } // namespace win

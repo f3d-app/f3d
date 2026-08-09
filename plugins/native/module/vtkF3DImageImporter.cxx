@@ -95,15 +95,18 @@ void vtkF3DImageImporter::ImportActors(vtkRenderer* renderer)
   mapper->SetInputData(polydata);
   actor->SetMapper(mapper);
 
-  texture->UseSRGBColorSpaceOn();
-  actor->GetProperty()->SetInterpolationToPBR();
-  actor->GetProperty()->SetBaseColorTexture(texture);
-  actor->GetProperty()->SetBaseIOR(1.0);
+  // HDR and EXR files are expressed in linear color space
+  // All other ones so far are gamma-corrected
+  if (this->ImageHint != "hdr" && this->ImageHint != "exr")
+  {
+    texture->UseSRGBColorSpaceOn();
+  }
+
+  actor->GetProperty()->LightingOff();
+  actor->SetTexture(texture);
   renderer->AddActor(actor);
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
   this->ActorCollection->AddItem(actor);
-#endif
 }
 
 //------------------------------------------------------------------------------

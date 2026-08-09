@@ -1,8 +1,13 @@
 #include "vtkF3DUIActor.h"
 
+#include "vtkF3DRenderer.h"
+
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLRenderWindow.h>
+#include <vtkRendererCollection.h>
 #include <vtkViewport.h>
+
+#include <algorithm>
 
 vtkObjectFactoryNewMacro(vtkF3DUIActor);
 
@@ -116,6 +121,51 @@ void vtkF3DUIActor::SetFpsCounterVisibility(bool show)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetNotificationVisibility(bool show)
+{
+  this->NotificationVisible = show;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetBindingsVisibility(bool show)
+{
+  this->BindingsVisible = show;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetAnimationProgressMode(AnimationProgressBarMode mode)
+{
+  this->AnimationProgressMode = mode;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetAnimationProgress(const std::pair<double, double>& timeRange,
+  const std::string& name, const std::vector<double>& keyFrames)
+{
+  this->AnimationTimeRange = timeRange;
+  this->AnimationName = name;
+  this->AnimationKeyFrames = keyFrames;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetAnimationProgressColor(const std::array<double, 3>& color)
+{
+  this->AnimationProgressColor = color;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetAnimationSpeedFactor(double speedFactor)
+{
+  this->AnimationSpeedFactor = speedFactor;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::UpdateAnimationTime(double currentTime)
+{
+  this->AnimationCurrentTime = currentTime;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::UpdateFpsValue(const double elapsedFrameTime)
 {
   this->TotalFrameTimes += elapsedFrameTime;
@@ -164,6 +214,16 @@ void vtkF3DUIActor::SetFontColor(const std::array<double, 3>& color)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetBackdropColor(const std::array<double, 3>& color)
+{
+  if (this->BackdropColor != color)
+  {
+    this->BackdropColor = color;
+    this->Initialized = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::SetBackdropOpacity(const double backdropOpacity)
 {
   if (this->BackdropOpacity != backdropOpacity)
@@ -197,6 +257,12 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
     this->RenderConsole(false);
     this->EndFrame(renWin);
     return 1;
+  }
+
+  // Drawn first so later overlays stack in front, keeping the bar bottom-most.
+  if (this->AnimationProgressMode != AnimationProgressBarMode::NONE)
+  {
+    this->RenderAnimationProgressBar();
   }
 
   if (this->MinimalConsoleVisible)
@@ -241,7 +307,41 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
     this->RenderFpsCounter();
   }
 
+  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+  assert(ren != nullptr);
+
+  double currentTime = ren->GetTotalTime();
+
+  // clear outdated notifications
+  while (!this->Notifications.empty() && currentTime >= this->Notifications.back().stopTime)
+  {
+    this->Notifications.pop_back();
+  }
+
+  if (this->NotificationVisible)
+  {
+    this->RenderNotifications(currentTime);
+  }
+
   this->EndFrame(renWin);
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::AddNotification(const std::string& desc, const std::string& value,
+  const std::string& bind, double startTime, double duration)
+{
+  if (!this->Notifications.empty())
+  {
+    Notification& last = this->Notifications.front();
+    if (last.desc == desc && last.value != value)
+    {
+      last.value = value;
+      last.stopTime = startTime + duration;
+      return;
+    }
+  }
+  this->Notifications.emplace_front(
+    Notification{ desc, value, bind, startTime, startTime + duration });
 }

@@ -5,16 +5,23 @@
 #include "vtkF3DImporter.h"
 
 #include <vtkActorCollection.h>
+#include <vtkArrowSource.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
+#include <vtkDataAssembly.h>
+#include <vtkDataAssemblyVisitor.h>
+#include <vtkDataSetAttributes.h>
 #include <vtkImageData.h>
+#include <vtkInformation.h>
 #include <vtkInformationIntegerKey.h>
 #include <vtkObjectFactory.h>
+#include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
 #include <vtkSmartPointer.h>
 #include <vtkTexture.h>
+#include <vtkUnsignedIntArray.h>
 #include <vtkVersion.h>
 
 #include <cassert>
@@ -22,25 +29,173 @@
 #include <numeric>
 #include <vector>
 
+namespace
+{
+
+struct FlatNode
+{
+  int ImporterIndex = -1;
+  int AssemblyNodeId = -1;
+  int ParentId = -1;
+  int Level = 0;
+};
+
+/**
+ * Recursively append the subtree rooted at `assemblyNodeId` to `flatNodes`, in depth-first
+ * pre-order so that a parent is always appended before its children, which makes the index of
+ * a node in `flatNodes` a usable identifier.
+ */
+void FlattenAssembly(vtkDataAssembly* assembly, int assemblyNodeId, int importerIndex, int parentId,
+  int level, std::vector<FlatNode>& flatNodes)
+{
+  const int nodeId = static_cast<int>(flatNodes.size());
+  flatNodes.emplace_back(FlatNode{ importerIndex, assemblyNodeId, parentId, level });
+
+  const int numberOfChildren = assembly->GetNumberOfChildren(assemblyNodeId);
+  for (int childIndex = 0; childIndex < numberOfChildren; childIndex++)
+  {
+    ::FlattenAssembly(assembly, assembly->GetChild(assemblyNodeId, childIndex), importerIndex,
+      nodeId, level + 1, flatNodes);
+  }
+}
+
+/**
+ * Recursively set the `f3d_visible` attribute of the subtree rooted at `assemblyNodeId`.
+ * It will also add (or remove) a `ACTOR_HIDDEN()` information key on nodes associated with actors.
+ */
+void SetSubtreeVisibility(
+  vtkDataAssembly* assembly, int assemblyNodeId, vtkActorCollection* actors, bool visible)
+{
+  assembly->SetAttribute(assemblyNodeId, "f3d_visible", visible ? 1 : 0);
+
+  const int flatActorIndex = assembly->GetAttributeOrDefault(assemblyNodeId, "flat_actor_id", -1);
+  if (flatActorIndex >= 0)
+  {
+    vtkActor* actor = vtkActor::SafeDownCast(actors->GetItemAsObject(flatActorIndex));
+    vtkSmartPointer<vtkInformation> keys = actor->GetPropertyKeys();
+
+    if (!keys)
+    {
+      keys = vtkSmartPointer<vtkInformation>::New();
+      actor->SetPropertyKeys(keys);
+    }
+
+    if (visible)
+    {
+      keys->Remove(vtkF3DMetaImporter::ACTOR_HIDDEN());
+    }
+    else
+    {
+      keys->Set(vtkF3DMetaImporter::ACTOR_HIDDEN(), 1);
+    }
+  }
+
+  const int numberOfChildren = assembly->GetNumberOfChildren(assemblyNodeId);
+  for (int childIndex = 0; childIndex < numberOfChildren; childIndex++)
+  {
+    ::SetSubtreeVisibility(
+      assembly, assembly->GetChild(assemblyNodeId, childIndex), actors, visible);
+  }
+}
+
+/**
+ * Sets the `f3d_collapsed` attribute on nodes which have
+ * all their children unnamed or named the same as themselves.
+ * Allows to make the tree more compact on load by collapsing subtrees
+ * that don't contain any meaningful user-provided labels.
+ */
+class vtkF3DCollapseOnLoadVisitor : public vtkDataAssemblyVisitor
+{
+public:
+  static vtkF3DCollapseOnLoadVisitor* New();
+  vtkTypeMacro(vtkF3DCollapseOnLoadVisitor, vtkDataAssemblyVisitor);
+
+protected:
+  void SetAttr(int nodeid, bool val)
+  {
+    vtkDataAssembly* mutableAssembly = const_cast<vtkDataAssembly*>(this->GetAssembly());
+    mutableAssembly->SetAttribute(nodeid, "f3d_collapsed", val ? 1 : 0);
+  }
+  bool GetAttr(int nodeid)
+  {
+    return this->GetAssembly()->GetAttributeOrDefault(nodeid, "f3d_collapsed", 0) != 0;
+  }
+
+  void Visit(int nodeid) override
+  {
+    // don't collapse the root node
+    if (nodeid == this->GetAssembly()->GetRootNode())
+    {
+      return;
+    }
+
+    const int numberOfChildren = this->GetAssembly()->GetNumberOfChildren(nodeid);
+    std::vector<int> childrenIds;
+    childrenIds.reserve(static_cast<size_t>(numberOfChildren));
+    for (int childIndex = 0; childIndex < numberOfChildren; childIndex++)
+    {
+      childrenIds.emplace_back(this->GetAssembly()->GetChild(nodeid, childIndex));
+    }
+
+    const auto allChildrenAreUnnamed = [&]()
+    {
+      return std::ranges::none_of(
+        childrenIds, [&](int id) { return this->GetAssembly()->HasAttribute(id, "label"); });
+    };
+
+    const auto allChildrenHaveSameNameAsNode = [&]()
+    {
+      const std::string_view nodeName =
+        this->GetAssembly()->GetAttributeOrDefault(nodeid, "label", "");
+      return std::ranges::all_of(childrenIds, [&](int id)
+        { return nodeName == this->GetAssembly()->GetAttributeOrDefault(id, "label", ""); });
+    };
+
+    if (allChildrenAreUnnamed() || allChildrenHaveSameNameAsNode())
+    {
+      this->SetAttr(nodeid, true);
+    }
+  }
+
+  void EndSubTree(int nodeid) override
+  {
+    // after all descendents have been visited, unset the attr if not all children have it set
+    if (this->GetAttr(nodeid))
+    {
+      const int numberOfChildren = this->GetAssembly()->GetNumberOfChildren(nodeid);
+      for (int childIndex = 0; childIndex < numberOfChildren; childIndex++)
+      {
+        if (!GetAttr(this->GetAssembly()->GetChild(nodeid, childIndex)))
+        {
+          this->SetAttr(nodeid, false);
+          break;
+        }
+      }
+    }
+  }
+};
+vtkStandardNewMacro(vtkF3DCollapseOnLoadVisitor);
+}
+
 //----------------------------------------------------------------------------
 struct vtkF3DMetaImporter::Internals
 {
   // Actors related vectors
   std::vector<vtkF3DMetaImporter::ColoringStruct> ColoringActorsAndMappers;
+  std::vector<vtkF3DMetaImporter::NormalGlyphsStruct> NormalGlyphsActorsAndMappers;
   std::vector<vtkF3DMetaImporter::PointSpritesStruct> PointSpritesActorsAndMappers;
   std::vector<vtkF3DMetaImporter::VolumeStruct> VolumePropsAndMappers;
 
   std::vector<vtkF3DMetaImporter::ImporterInfo> Importers;
+
+  std::vector<::FlatNode> FlatNodes;
+
   std::optional<vtkIdType> CameraIndex;
   vtkBoundingBox GeometryBoundingBox;
   vtkTimeStamp ColoringInfoTime;
   vtkTimeStamp UpdateTime;
 
   F3DColoringInfoHandler ColoringInfoHandler;
-
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 20240707)
-  std::map<vtkImporter*, vtkSmartPointer<vtkActorCollection>> ActorsForImporterMap;
-#endif
 };
 
 //----------------------------------------------------------------------------
@@ -67,6 +222,7 @@ vtkF3DMetaImporter::~vtkF3DMetaImporter()
 void vtkF3DMetaImporter::Clear()
 {
   this->Pimpl->Importers.clear();
+  this->Pimpl->FlatNodes.clear();
   this->Pimpl->GeometryBoundingBox.Reset();
   this->ActorCollection->RemoveAllItems();
   this->Pimpl->ColoringActorsAndMappers.clear();
@@ -121,6 +277,13 @@ vtkF3DMetaImporter::GetColoringActorsAndMappers()
 }
 
 //----------------------------------------------------------------------------
+const std::vector<vtkF3DMetaImporter::NormalGlyphsStruct>&
+vtkF3DMetaImporter::GetNormalGlyphsActorsAndMappers()
+{
+  return this->Pimpl->NormalGlyphsActorsAndMappers;
+}
+
+//----------------------------------------------------------------------------
 const std::vector<vtkF3DMetaImporter::PointSpritesStruct>&
 vtkF3DMetaImporter::GetPointSpritesActorsAndMappers()
 {
@@ -140,9 +303,63 @@ int vtkF3DMetaImporter::GetImporterInfoCount()
 }
 
 //----------------------------------------------------------------------------
-vtkF3DMetaImporter::ImporterInfo vtkF3DMetaImporter::GetImporterInfo(int index)
+const vtkF3DMetaImporter::ImporterInfo& vtkF3DMetaImporter::GetImporterInfo(int index)
 {
   return this->Pimpl->Importers[index];
+}
+
+//----------------------------------------------------------------------------
+const char* vtkF3DMetaImporter::GetNodeLabel(const vtkDataAssembly* assembly, int assemblyNodeId)
+{
+  const char* defaultLabel =
+    assembly->GetNumberOfChildren(assemblyNodeId) > 0 ? "<group>" : "<object>";
+  return assembly->GetAttributeOrDefault(assemblyNodeId, "label", defaultLabel);
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkF3DMetaImporter::NodeInfo> vtkF3DMetaImporter::GetSceneHierarchyNodes() const
+{
+  std::vector<vtkF3DMetaImporter::NodeInfo> hierarchy;
+  hierarchy.reserve(this->Pimpl->FlatNodes.size());
+
+  for (size_t i = 0; i < this->Pimpl->FlatNodes.size(); i++)
+  {
+    const ::FlatNode& flatNode = this->Pimpl->FlatNodes[i];
+    const vtkDataAssembly* assembly = this->Pimpl->Importers[flatNode.ImporterIndex].DataAssembly;
+    const int nodeId = flatNode.AssemblyNodeId;
+
+    hierarchy.emplace_back(vtkF3DMetaImporter::NodeInfo{ static_cast<int>(i), flatNode.ParentId,
+      flatNode.Level, vtkF3DMetaImporter::GetNodeLabel(assembly, nodeId),
+      assembly->GetAttributeOrDefault(nodeId, "f3d_visible", 1) != 0,
+      assembly->GetNumberOfChildren(nodeId) > 0,
+      assembly->GetAttributeOrDefault(nodeId, "f3d_collapsed", 0) != 0 });
+  }
+
+  return hierarchy;
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DMetaImporter::SetNodeVisibility(int nodeId, bool visible)
+{
+  if (nodeId < 0 || nodeId >= static_cast<int>(this->Pimpl->FlatNodes.size()))
+  {
+    return false;
+  }
+
+  const ::FlatNode& flatNode = this->Pimpl->FlatNodes[nodeId];
+  this->SetAssemblyNodeVisibility(flatNode.ImporterIndex, flatNode.AssemblyNodeId, visible);
+  return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DMetaImporter::SetAssemblyNodeVisibility(
+  int importerIndex, int assemblyNodeId, bool visible)
+{
+  assert(importerIndex >= 0 && importerIndex < static_cast<int>(this->Pimpl->Importers.size()));
+  const vtkF3DMetaImporter::ImporterInfo& info = this->Pimpl->Importers[importerIndex];
+
+  ::SetSubtreeVisibility(
+    info.DataAssembly, assemblyNodeId, info.Importer->GetImportedActors(), visible);
 }
 
 //----------------------------------------------------------------------------
@@ -187,68 +404,21 @@ bool vtkF3DMetaImporter::Update()
       importer->SetCamera(localCameraIndex);
     }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
     if (!importer->Update())
     {
       return false;
     }
-#else
-    vtkSmartPointer<vtkActorCollection> actorCollection =
-      vtkSmartPointer<vtkActorCollection>::New();
-
-    vtkNew<vtkActorCollection> previousActorCollection;
-    vtkActorCollection* currentCollection = this->Renderer->GetActors();
-    vtkCollectionSimpleIterator tmpIt;
-    currentCollection->InitTraversal(tmpIt);
-    while (auto* actor = currentCollection->GetNextActor(tmpIt))
-    {
-      previousActorCollection->AddItem(actor);
-    }
-
-    importer->Update();
-
-    currentCollection = this->Renderer->GetActors();
-    currentCollection->InitTraversal(tmpIt);
-
-    vtkCollectionSimpleIterator tmpIt2;
-    previousActorCollection->InitTraversal(tmpIt2);
-    while (auto* actor = currentCollection->GetNextActor(tmpIt))
-    {
-      bool found = false;
-      while (auto* previousActor = previousActorCollection->GetNextActor(tmpIt2))
-      {
-        // This is a N^2 loop
-        if (previousActor == actor)
-        {
-          found = true;
-          break;
-        }
-      }
-      if (!found)
-      {
-        actorCollection->AddItem(actor);
-      }
-    }
-
-    // Store the actor collection for further use
-    this->Pimpl->ActorsForImporterMap[importer] = actorCollection;
-#endif
 
     localCameraIndex -= importer->GetNumberOfCameras();
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
     vtkActorCollection* actorCollection = importer->GetImportedActors();
-#endif
 
     // copy the scene hierarchy if it exists, or create a generic one otherwise
-    // needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10861
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240201)
     if (importer->GetSceneHierarchy() != nullptr)
     {
       importerInfo.DataAssembly->DeepCopy(importer->GetSceneHierarchy());
     }
     else
-#endif
     {
       // add one node per actor
       for (int actorIndex = 0; actorIndex < actorCollection->GetNumberOfItems(); actorIndex++)
@@ -262,6 +432,16 @@ bool vtkF3DMetaImporter::Update()
 
     importerInfo.DataAssembly->SetAttribute(
       vtkDataAssembly::GetRootNode(), "label", importerInfo.Name.c_str());
+
+    vtkNew<::vtkF3DCollapseOnLoadVisitor> visitor;
+    importerInfo.DataAssembly->Visit(vtkDataAssembly::GetRootNode(), visitor);
+    // Unset the attr on all nodes which have an ancestor that has it already.
+    // This avoids having to expand the collapsed levels one by one.
+    const std::string xpath = "//*[@f3d_collapsed='1']//*[@f3d_collapsed='1']";
+    for (const int nodeid : importerInfo.DataAssembly->SelectNodes({ xpath }))
+    {
+      importerInfo.DataAssembly->SetAttribute(nodeid, "f3d_collapsed", 0);
+    }
 
     // Recover generic importer if any (for indexed access to points/image)
     vtkF3DGenericImporter* genericImporter = vtkF3DGenericImporter::SafeDownCast(importer);
@@ -285,25 +465,26 @@ bool vtkF3DMetaImporter::Update()
 
       vtkPolyData* surface = pdMapper->GetInput();
 
+      // On GLES, 16-bits attributes are not widely supported, which is used for joint indices.
+      // So we convert them to 32-bits attributes, which is supported everywhere.
+#ifdef F3D_USE_GLES
+      vtkDataArray* jointsArray = surface->GetPointData()->GetArray("JOINTS_0");
+      if (jointsArray != nullptr &&
+        (jointsArray->GetDataType() == VTK_SHORT ||
+          jointsArray->GetDataType() == VTK_UNSIGNED_SHORT))
+      {
+        vtkNew<vtkUnsignedIntArray> joints;
+        joints->DeepCopy(jointsArray);
+        joints->SetName("JOINTS_0");
+        surface->GetPointData()->AddArray(joints);
+      }
+#endif
+
       // convert to PBR materials if needed
+      // this should be moved elsewhere, see https://github.com/f3d-app/f3d/issues/2995
       if (!genericImporter && actor->GetProperty()->GetInterpolation() != VTK_PBR)
       {
-        actor->GetProperty()->SetInterpolationToPBR();
-        actor->GetProperty()->LightingOn();
-
-        // Convert to linear space
-        auto toLinear = [](double c) { return std::pow(c, 2.2); };
-        double diffuseColor[3];
-        actor->GetProperty()->GetColor(diffuseColor);
-        actor->GetProperty()->SetColor(
-          toLinear(diffuseColor[0]), toLinear(diffuseColor[1]), toLinear(diffuseColor[2]));
-
-        // restore diffuse/specular to 1 and ambient to 0
-        actor->GetProperty()->SetSpecular(1.0);
-        actor->GetProperty()->SetDiffuse(1.0);
-        actor->GetProperty()->SetAmbient(0.0);
-
-        // texture diffuse is now base color
+        // get texture
         vtkSmartPointer<vtkTexture> diffuseTex = actor->GetTexture();
         if (!diffuseTex)
         {
@@ -311,11 +492,33 @@ bool vtkF3DMetaImporter::Update()
         }
         if (diffuseTex)
         {
-          actor->SetTexture(nullptr);
           diffuseTex->UseSRGBColorSpaceOn();
+          diffuseTex->SetColorModeToDirectScalars();
+        }
 
-          actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-          actor->GetProperty()->SetBaseColorTexture(diffuseTex);
+        if (actor->GetProperty()->GetLighting())
+        {
+          actor->GetProperty()->SetInterpolationToPBR();
+
+          // Convert to linear space
+          auto toLinear = [](double c) { return std::pow(c, 2.2); };
+          double diffuseColor[3];
+          actor->GetProperty()->GetDiffuseColor(diffuseColor);
+          actor->GetProperty()->SetDiffuseColor(
+            toLinear(diffuseColor[0]), toLinear(diffuseColor[1]), toLinear(diffuseColor[2]));
+
+          // restore diffuse/specular to 1 and ambient to 0
+          actor->GetProperty()->SetSpecular(1.0);
+          actor->GetProperty()->SetDiffuse(1.0);
+          actor->GetProperty()->SetAmbient(0.0);
+
+          if (diffuseTex)
+          {
+            actor->SetTexture(nullptr);
+            actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+            actor->GetProperty()->SetBaseColorTexture(diffuseTex);
+            actor->GetProperty()->SetTexture("diffuseTex", nullptr);
+          }
         }
       }
 
@@ -331,18 +534,40 @@ bool vtkF3DMetaImporter::Update()
       this->Renderer->AddActor(cs.Actor);
       cs.Actor->VisibilityOff();
 
-      // Create and configure point sprites actors
-      this->Pimpl->PointSpritesActorsAndMappers.emplace_back(
-        vtkF3DMetaImporter::PointSpritesStruct(actor, importer));
-      vtkF3DMetaImporter::PointSpritesStruct& pss =
-        this->Pimpl->PointSpritesActorsAndMappers.back();
-
       vtkPolyData* points = surface;
       if (genericImporter)
       {
         // Use indexed accessor for composite support
         points = genericImporter->GetImportedPoints(actorIndex);
       }
+
+      // Create and configure normal glyph actors
+      this->Pimpl->NormalGlyphsActorsAndMappers.emplace_back(
+        vtkF3DMetaImporter::NormalGlyphsStruct(actor, importer));
+      vtkF3DMetaImporter::NormalGlyphsStruct& ngs =
+        this->Pimpl->NormalGlyphsActorsAndMappers.back();
+
+      ngs.InputDataHasNormals = points->GetPointData()->GetNormals() != nullptr;
+
+      if (ngs.InputDataHasNormals)
+      {
+        vtkNew<vtkArrowSource> arrowSource;
+        ngs.GlyphMapper->SetInputData(points);
+        ngs.GlyphMapper->SetSourceConnection(arrowSource->GetOutputPort());
+        ngs.GlyphMapper->SetOrientationModeToDirection();
+        ngs.GlyphMapper->SetOrientationArray(vtkDataSetAttributes::NORMALS);
+        ngs.GlyphMapper->ScalingOn();
+        ngs.Actor->SetMapper(ngs.GlyphMapper);
+        this->Renderer->AddActor(ngs.Actor);
+        ngs.Actor->VisibilityOff();
+      }
+
+      // Create and configure point sprites actors
+      this->Pimpl->PointSpritesActorsAndMappers.emplace_back(
+        vtkF3DMetaImporter::PointSpritesStruct(actor, importer));
+      vtkF3DMetaImporter::PointSpritesStruct& pss =
+        this->Pimpl->PointSpritesActorsAndMappers.back();
+
       pss.Mapper->SetInputData(points);
       this->Renderer->AddActor(pss.Actor);
       pss.Actor->VisibilityOff();
@@ -374,6 +599,15 @@ bool vtkF3DMetaImporter::Update()
     F3DLog::Print(F3DLog::Severity::Warning,
       "Camera index " + std::to_string(this->Pimpl->CameraIndex.value()) +
         " is higher than the number of available camera in the files. Camera may be incorrect.");
+  }
+
+  // Flatten the hierarchy of all importers, previously assigned node ids are preserved as
+  // importers are only ever appended
+  this->Pimpl->FlatNodes.clear();
+  for (size_t i = 0; i < this->Pimpl->Importers.size(); i++)
+  {
+    ::FlattenAssembly(this->Pimpl->Importers[i].DataAssembly, vtkDataAssembly::GetRootNode(),
+      static_cast<int>(i), -1, 0, this->Pimpl->FlatNodes);
   }
 
   // XXX: UpdateStatus is not set, but libf3d does not use it
@@ -642,11 +876,7 @@ bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
   bool ret = true;
   for (const auto& importerInfo : this->Pimpl->Importers)
   {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
     ret = ret && importerInfo.Importer->UpdateAtTimeValue(timeValue);
-#else
-    importerInfo.Importer->UpdateTimeStep(timeValue);
-#endif
   }
 
   // Update coloring and point sprites
@@ -682,12 +912,7 @@ void vtkF3DMetaImporter::UpdateInfoForColoring()
   {
     for (const auto& importerInfo : this->Pimpl->Importers)
     {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
       vtkActorCollection* actorCollection = importerInfo.Importer->GetImportedActors();
-#else
-      vtkActorCollection* actorCollection =
-        this->Pimpl->ActorsForImporterMap.at(importerInfo.Importer).Get();
-#endif
 
       // Recover generic importer if any (for indexed access to points/image)
       vtkF3DGenericImporter* genericImporter =

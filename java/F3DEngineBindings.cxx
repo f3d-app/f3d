@@ -1,39 +1,154 @@
 #include "F3DJavaBindings.h"
 
 #include <app_f3d_F3D_Engine.h>
+#include <app_f3d_F3D_Engine_State.h>
 
 #include <context.h>
+#include <engine.h>
+#include <scene.h>
 
 extern "C"
 {
-  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreate)(JNIEnv*, jclass, jboolean offscreen)
+  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreate)(JNIEnv* env, jclass, jboolean offscreen)
   {
-    return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::create(offscreen)));
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::create(offscreen)));
+    }
+    catch (const f3d::context::loading_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$LoadingException", e.what());
+    }
+    catch (const f3d::context::symbol_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$SymbolException", e.what());
+    }
+    catch (const f3d::engine::no_window_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$NoWindowException", e.what());
+    }
+    catch (const f3d::engine::cache_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$CacheException", e.what());
+    }
+    return 0;
   }
 
-  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateNone)(JNIEnv*, jclass)
+  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateNone)(JNIEnv* env, jclass)
   {
-    return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createNone()));
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createNone()));
+    }
+    catch (const f3d::engine::no_window_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$NoWindowException", e.what());
+    }
+    catch (const f3d::engine::cache_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$CacheException", e.what());
+    }
+    return 0;
   }
 
-  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateGLX)(JNIEnv*, jclass, jboolean offscreen)
+  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateGLX)(JNIEnv* env, jclass, jboolean offscreen)
   {
-    return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createGLX(offscreen)));
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createGLX(offscreen)));
+    }
+    catch (const f3d::context::loading_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$LoadingException", e.what());
+    }
+    catch (const f3d::context::symbol_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$SymbolException", e.what());
+    }
+    catch (const f3d::engine::no_window_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$NoWindowException", e.what());
+    }
+    catch (const f3d::engine::cache_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$CacheException", e.what());
+    }
+    return 0;
   }
 
-  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateWGL)(JNIEnv*, jclass, jboolean offscreen)
+  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateWGL)(JNIEnv* env, jclass, jboolean offscreen)
   {
-    return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createWGL(offscreen)));
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createWGL(offscreen)));
+    }
+    catch (const f3d::context::loading_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$LoadingException", e.what());
+    }
+    catch (const f3d::context::symbol_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$SymbolException", e.what());
+    }
+    catch (const f3d::engine::no_window_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$NoWindowException", e.what());
+    }
+    catch (const f3d::engine::cache_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$CacheException", e.what());
+    }
+    return 0;
   }
 
-  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateEGL)(JNIEnv*, jclass)
+  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateEGL)(JNIEnv* env, jclass)
   {
-    return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createEGL()));
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createEGL()));
+    }
+    catch (const f3d::context::loading_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$LoadingException", e.what());
+    }
+    catch (const f3d::context::symbol_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$SymbolException", e.what());
+    }
+    catch (const f3d::engine::no_window_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$NoWindowException", e.what());
+    }
+    catch (const f3d::engine::cache_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$CacheException", e.what());
+    }
+    return 0;
   }
 
-  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateOSMesa)(JNIEnv*, jclass)
+  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateOSMesa)(JNIEnv* env, jclass)
   {
-    return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createOSMesa()));
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createOSMesa()));
+    }
+    catch (const f3d::context::loading_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$LoadingException", e.what());
+    }
+    catch (const f3d::context::symbol_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$SymbolException", e.what());
+    }
+    catch (const f3d::engine::no_window_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$NoWindowException", e.what());
+    }
+    catch (const f3d::engine::cache_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$CacheException", e.what());
+    }
+    return 0;
   }
 
   JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateExternal)(
@@ -58,32 +173,144 @@ extern "C"
       return reinterpret_cast<f3d::context::fptr>(addr);
     };
 
-    return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createExternal(func)));
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createExternal(func)));
+    }
+    catch (const f3d::engine::no_window_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$NoWindowException", e.what());
+    }
+    catch (const f3d::engine::cache_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$CacheException", e.what());
+    }
+    return 0;
   }
 
-  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateExternalGLX)(JNIEnv*, jclass)
+  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateExternalGLX)(JNIEnv* env, jclass)
   {
-    return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createExternalGLX()));
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createExternalGLX()));
+    }
+    catch (const f3d::context::loading_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$LoadingException", e.what());
+    }
+    catch (const f3d::context::symbol_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$SymbolException", e.what());
+    }
+    catch (const f3d::engine::no_window_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$NoWindowException", e.what());
+    }
+    catch (const f3d::engine::cache_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$CacheException", e.what());
+    }
+    return 0;
   }
 
-  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateExternalWGL)(JNIEnv*, jclass)
+  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateExternalWGL)(JNIEnv* env, jclass)
   {
-    return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createExternalWGL()));
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createExternalWGL()));
+    }
+    catch (const f3d::context::loading_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$LoadingException", e.what());
+    }
+    catch (const f3d::context::symbol_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$SymbolException", e.what());
+    }
+    catch (const f3d::engine::no_window_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$NoWindowException", e.what());
+    }
+    catch (const f3d::engine::cache_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$CacheException", e.what());
+    }
+    return 0;
   }
 
-  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateExternalCOCOA)(JNIEnv*, jclass)
+  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateExternalCOCOA)(JNIEnv* env, jclass)
   {
-    return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createExternalCOCOA()));
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createExternalCOCOA()));
+    }
+    catch (const f3d::context::loading_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$LoadingException", e.what());
+    }
+    catch (const f3d::context::symbol_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$SymbolException", e.what());
+    }
+    catch (const f3d::engine::no_window_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$NoWindowException", e.what());
+    }
+    catch (const f3d::engine::cache_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$CacheException", e.what());
+    }
+    return 0;
   }
 
-  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateExternalEGL)(JNIEnv*, jclass)
+  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateExternalEGL)(JNIEnv* env, jclass)
   {
-    return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createExternalEGL()));
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createExternalEGL()));
+    }
+    catch (const f3d::context::loading_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$LoadingException", e.what());
+    }
+    catch (const f3d::context::symbol_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$SymbolException", e.what());
+    }
+    catch (const f3d::engine::no_window_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$NoWindowException", e.what());
+    }
+    catch (const f3d::engine::cache_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$CacheException", e.what());
+    }
+    return 0;
   }
 
-  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateExternalOSMesa)(JNIEnv*, jclass)
+  JNIEXPORT jlong JAVA_BIND(Engine, nativeCreateExternalOSMesa)(JNIEnv* env, jclass)
   {
-    return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createExternalOSMesa()));
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createExternalOSMesa()));
+    }
+    catch (const f3d::context::loading_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$LoadingException", e.what());
+    }
+    catch (const f3d::context::symbol_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$SymbolException", e.what());
+    }
+    catch (const f3d::engine::no_window_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$NoWindowException", e.what());
+    }
+    catch (const f3d::engine::cache_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$CacheException", e.what());
+    }
+    return 0;
   }
 
   JNIEXPORT void JAVA_BIND(Engine, nativeDestroy)(JNIEnv*, jclass, jlong ptr)
@@ -94,7 +321,14 @@ extern "C"
   JNIEXPORT void JAVA_BIND(Engine, loadPlugin)(JNIEnv* env, jclass, jstring str)
   {
     const char* plugin = env->GetStringUTFChars(str, nullptr);
-    f3d::engine::loadPlugin(plugin);
+    try
+    {
+      f3d::engine::loadPlugin(plugin);
+    }
+    catch (const f3d::engine::plugin_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$PluginException", e.what());
+    }
     env->ReleaseStringUTFChars(str, plugin);
   }
 
@@ -106,8 +340,132 @@ extern "C"
   JNIEXPORT void JAVA_BIND(Engine, setCachePath)(JNIEnv* env, jobject self, jstring path)
   {
     const char* str = env->GetStringUTFChars(path, nullptr);
-    GetEngine(env, self)->setCachePath(fs::path(str));
+    try
+    {
+      GetEngine(env, self)->setCachePath(fs::path(str));
+    }
+    catch (const f3d::engine::cache_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$CacheException", e.what());
+    }
     env->ReleaseStringUTFChars(path, str);
+  }
+
+  JNIEXPORT jstring JAVA_BIND(Engine, getCachePath)(JNIEnv* env, jobject self)
+  {
+    return env->NewStringUTF(GetEngine(env, self)->getCachePath().string().c_str());
+  }
+
+  JNIEXPORT jlong JAVA_BIND(Engine, nativeDump)(JNIEnv* env, jobject self)
+  {
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d::engine::state(GetEngine(env, self)->dump()));
+    }
+    catch (const f3d::engine::statefile_exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+      return 0;
+    }
+  }
+
+  JNIEXPORT void JAVA_BIND(Engine, nativeLoad)(JNIEnv* env, jobject self, jlong stateAddress)
+  {
+    try
+    {
+      GetEngine(env, self)->load(*reinterpret_cast<f3d::engine::state*>(stateAddress));
+    }
+    catch (const f3d::engine::statefile_exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+    }
+    catch (const f3d::scene::load_failure_exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+    }
+  }
+
+  JNIEXPORT jlong JAVA_SCOPED_BIND(Engine, State, nativeFromString)(
+    JNIEnv* env, jclass, jstring content)
+  {
+    const char* str = env->GetStringUTFChars(content, nullptr);
+    jlong ptr = 0;
+    try
+    {
+      ptr = reinterpret_cast<jlong>(new f3d::engine::state(f3d::engine::state::fromString(str)));
+    }
+    catch (const f3d::engine::statefile_exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+    }
+    env->ReleaseStringUTFChars(content, str);
+    return ptr;
+  }
+
+  JNIEXPORT jlong JAVA_SCOPED_BIND(Engine, State, nativeFromFile)(JNIEnv* env, jclass, jstring path)
+  {
+    const char* str = env->GetStringUTFChars(path, nullptr);
+    jlong ptr = 0;
+    try
+    {
+      ptr = reinterpret_cast<jlong>(
+        new f3d::engine::state(f3d::engine::state::fromFile(fs::path(str))));
+    }
+    catch (const f3d::engine::statefile_exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+    }
+    env->ReleaseStringUTFChars(path, str);
+    return ptr;
+  }
+
+  JNIEXPORT jlong JAVA_SCOPED_BIND(Engine, State, nativeFromClipboard)(JNIEnv* env, jclass)
+  {
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d::engine::state(f3d::engine::state::fromClipboard()));
+    }
+    catch (const f3d::engine::statefile_exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+      return 0;
+    }
+  }
+
+  JNIEXPORT jstring JAVA_SCOPED_BIND(Engine, State, toString)(JNIEnv* env, jobject self)
+  {
+    return env->NewStringUTF(GetState(env, self)->toString().c_str());
+  }
+
+  JNIEXPORT void JAVA_SCOPED_BIND(Engine, State, toFile)(JNIEnv* env, jobject self, jstring path)
+  {
+    const char* str = env->GetStringUTFChars(path, nullptr);
+    try
+    {
+      GetState(env, self)->toFile(fs::path(str));
+    }
+    catch (const f3d::engine::statefile_exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+    }
+    env->ReleaseStringUTFChars(path, str);
+  }
+
+  JNIEXPORT void JAVA_SCOPED_BIND(Engine, State, toClipboard)(JNIEnv* env, jobject self)
+  {
+    try
+    {
+      GetState(env, self)->toClipboard();
+    }
+    catch (const f3d::engine::statefile_exception& e)
+    {
+      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+    }
+  }
+
+  JNIEXPORT void JAVA_SCOPED_BIND(Engine, State, nativeDestroy)(JNIEnv*, jclass, jlong ptr)
+  {
+    delete reinterpret_cast<f3d::engine::state*>(ptr);
   }
 
   JNIEXPORT void JAVA_BIND(Engine, setOptions)(JNIEnv* env, jobject self, jobject options)
@@ -121,12 +479,20 @@ extern "C"
 
   JNIEXPORT jobject JAVA_BIND(Engine, getInteractor)(JNIEnv* env, jobject self)
   {
-    f3d::interactor& interactor = GetEngine(env, self)->getInteractor();
+    try
+    {
+      f3d::interactor& interactor = GetEngine(env, self)->getInteractor();
 
-    jclass interactorClass = env->FindClass("app/f3d/F3D/Interactor");
-    jmethodID constructor = env->GetMethodID(interactorClass, "<init>", "(J)V");
+      jclass interactorClass = env->FindClass("app/f3d/F3D/Interactor");
+      jmethodID constructor = env->GetMethodID(interactorClass, "<init>", "(J)V");
 
-    return env->NewObject(interactorClass, constructor, reinterpret_cast<jlong>(&interactor));
+      return env->NewObject(interactorClass, constructor, reinterpret_cast<jlong>(&interactor));
+    }
+    catch (const f3d::engine::no_interactor_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Engine$NoInteractorException", e.what());
+    }
+    return nullptr;
   }
 
   JNIEXPORT jobject JAVA_BIND(Engine, getPluginsList)(JNIEnv* env, jclass, jstring path)
@@ -232,12 +598,7 @@ extern "C"
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      env->ReleaseStringUTFChars(name, nameStr);
-      env->ReleaseStringUTFChars(value, valueStr);
-
-      jclass exceptionClass = env->FindClass("java/lang/IllegalArgumentException");
-      env->ThrowNew(exceptionClass, e.what());
-      return;
+      F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
     }
 
     env->ReleaseStringUTFChars(name, nameStr);

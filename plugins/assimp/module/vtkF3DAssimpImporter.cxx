@@ -8,6 +8,7 @@
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
+#include <vtkInformation.h>
 #include <vtkLight.h>
 #include <vtkMatrix4x4.h>
 #include <vtkObjectFactory.h>
@@ -43,6 +44,7 @@
 #include <memory>
 #include <regex>
 #include <set>
+#include <unordered_map>
 
 vtkStandardNewMacro(vtkF3DAssimpImporter);
 
@@ -340,22 +342,24 @@ public:
       property->SetOpacity(opacity);
     }
 
+    auto toSRGB = [](float c) { return std::pow(c, 1.0 / 2.2); };
+
     aiColor4D diffuse;
     if (material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse) == aiReturn_SUCCESS)
     {
-      property->SetColor(diffuse.r, diffuse.g, diffuse.b);
+      property->SetColor(toSRGB(diffuse.r), toSRGB(diffuse.g), toSRGB(diffuse.b));
     }
 
     aiColor4D specular;
     if (material->Get(AI_MATKEY_COLOR_SPECULAR, specular) == aiReturn_SUCCESS)
     {
-      property->SetSpecularColor(specular.r, specular.g, specular.b);
+      property->SetSpecularColor(toSRGB(specular.r), toSRGB(specular.g), toSRGB(specular.b));
     }
 
     aiColor4D ambient;
     if (material->Get(AI_MATKEY_COLOR_AMBIENT, ambient) == aiReturn_SUCCESS)
     {
-      property->SetAmbientColor(ambient.r, ambient.g, ambient.b);
+      property->SetAmbientColor(toSRGB(ambient.r), toSRGB(ambient.g), toSRGB(ambient.b));
     }
 
     aiString texDiffuse;
@@ -712,6 +716,90 @@ public:
 
   //----------------------------------------------------------------------------
   /**
+   * Build armature visualization from all bones in the scene
+   */
+  void BuildArmature(vtkRenderer* renderer)
+  {
+    // Collect all unique bone nodes across all meshes
+    for (unsigned int i = 0; i < this->Scene->mNumMeshes; i++)
+    {
+      const aiMesh* mesh = this->Scene->mMeshes[i];
+      for (unsigned int j = 0; j < mesh->mNumBones; j++)
+      {
+        this->ArmatureBoneNames.emplace_back(mesh->mBones[j]->mName.data);
+      }
+    }
+
+    if (this->ArmatureBoneNames.empty())
+    {
+      return;
+    }
+
+    std::ranges::sort(this->ArmatureBoneNames);
+    auto range = std::ranges::unique(this->ArmatureBoneNames);
+    this->ArmatureBoneNames.erase(range.begin(), range.end());
+
+    std::unordered_map<std::string, vtkIdType> boneToPointId;
+    vtkNew<vtkPoints> points;
+    vtkNew<vtkCellArray> vertices;
+
+    for (const std::string& boneName : this->ArmatureBoneNames)
+    {
+      vtkMatrix4x4* globalMat = this->NodeGlobalMatrix[boneName];
+      double p[3] = { 0.0, 0.0, 0.0 };
+      if (globalMat)
+      {
+        p[0] = globalMat->GetElement(0, 3);
+        p[1] = globalMat->GetElement(1, 3);
+        p[2] = globalMat->GetElement(2, 3);
+      }
+      vtkIdType i = points->GetNumberOfPoints();
+      points->InsertNextPoint(p);
+      vertices->InsertNextCell(1, &i);
+      boneToPointId[boneName] = i;
+    }
+
+    vtkNew<vtkCellArray> lines;
+    for (const std::string& boneName : this->ArmatureBoneNames)
+    {
+      const aiNode* boneNode = this->Scene->mRootNode->FindNode(boneName.c_str());
+      if (boneNode)
+      {
+        for (unsigned int child = 0; child < boneNode->mNumChildren; child++)
+        {
+          std::string childName = boneNode->mChildren[child]->mName.data;
+          auto it = boneToPointId.find(childName);
+          if (it != boneToPointId.end())
+          {
+            vtkIdType lineIds[2] = { boneToPointId[boneName], it->second };
+            lines->InsertNextCell(2, lineIds);
+          }
+        }
+      }
+    }
+
+    this->ArmaturePolyData = vtkSmartPointer<vtkPolyData>::New();
+    this->ArmaturePolyData->SetPoints(points);
+    this->ArmaturePolyData->SetVerts(vertices);
+    this->ArmaturePolyData->SetLines(lines);
+
+    vtkNew<vtkPolyDataMapper> mapper;
+    mapper->SetInputData(this->ArmaturePolyData);
+
+    this->ArmatureActor = vtkSmartPointer<vtkActor>::New();
+    this->ArmatureActor->SetMapper(mapper);
+    this->ArmatureActor->GetProperty()->RenderPointsAsSpheresOn();
+    this->ArmatureActor->GetProperty()->RenderLinesAsTubesOn();
+
+    vtkNew<vtkInformation> info;
+    info->Set(vtkF3DImporter::ACTOR_IS_ARMATURE(), 1);
+    this->ArmatureActor->SetPropertyKeys(info);
+
+    renderer->AddActor(this->ArmatureActor);
+  }
+
+  //----------------------------------------------------------------------------
+  /**
    * Build recursively the node tree
    */
   void ImportNode(vtkRenderer* renderer, const aiNode* node, vtkMatrix4x4* parentMat, int level = 0)
@@ -788,6 +876,14 @@ public:
 
       // even if there is no animation, the bones needs to be updated
       this->UpdateBones();
+
+      // Build armature visualization if requested
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20241219)
+      if (this->Parent->GetImportArmature())
+      {
+        this->BuildArmature(renderer);
+      }
+#endif
     }
   }
 
@@ -928,6 +1024,26 @@ public:
         }
       }
     }
+
+    // Update armature actor joint positions
+    if (this->ArmatureActor)
+    {
+      vtkNew<vtkPoints> points;
+      points->SetNumberOfPoints(static_cast<vtkIdType>(this->ArmatureBoneNames.size()));
+      for (vtkIdType i = 0; i < static_cast<vtkIdType>(this->ArmatureBoneNames.size()); i++)
+      {
+        vtkMatrix4x4* globalMat = this->NodeGlobalMatrix[this->ArmatureBoneNames[i]];
+        double p[3] = { 0.0, 0.0, 0.0 };
+        if (globalMat)
+        {
+          p[0] = globalMat->GetElement(0, 3);
+          p[1] = globalMat->GetElement(1, 3);
+          p[2] = globalMat->GetElement(2, 3);
+        }
+        points->SetPoint(i, p);
+      }
+      this->ArmaturePolyData->SetPoints(points);
+    }
   }
 
   Assimp::Importer Importer;
@@ -936,7 +1052,7 @@ public:
   std::vector<vtkSmartPointer<vtkPolyData>> Meshes;
   std::vector<vtkSmartPointer<vtkProperty>> Properties;
   std::vector<vtkSmartPointer<vtkTexture>> EmbeddedTextures;
-  vtkIdType ActiveAnimation = -1; // -1 means no animation enabled here
+  std::set<vtkIdType> EnabledAnimations; // indices of currently enabled animations
   std::vector<std::pair<std::string, vtkSmartPointer<vtkLight>>> Lights;
   std::vector<
     std::pair<std::string, std::pair<vtkSmartPointer<vtkCamera>, vtkSmartPointer<vtkCamera>>>>
@@ -945,6 +1061,9 @@ public:
   std::unordered_map<std::string, vtkSmartPointer<vtkActorCollection>> NodeActors;
   std::unordered_map<std::string, vtkSmartPointer<vtkMatrix4x4>> NodeLocalMatrix;
   std::unordered_map<std::string, vtkSmartPointer<vtkMatrix4x4>> NodeGlobalMatrix;
+  vtkSmartPointer<vtkActor> ArmatureActor;
+  vtkSmartPointer<vtkPolyData> ArmaturePolyData;
+  std::vector<std::string> ArmatureBoneNames;
   vtkF3DAssimpImporter* Parent;
 };
 
@@ -952,6 +1071,9 @@ public:
 vtkF3DAssimpImporter::vtkF3DAssimpImporter()
   : Internals(new vtkF3DAssimpImporter::vtkInternals(this))
 {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20241219)
+  this->ImportArmatureOn();
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -968,7 +1090,7 @@ int vtkF3DAssimpImporter::ImportBegin()
 void vtkF3DAssimpImporter::ImportActors(vtkRenderer* renderer)
 {
   this->Internals->ImportRoot(renderer);
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
+
   // Record all actors imported from internals to importer itself
   for (auto& pair : this->Internals->NodeActors)
   {
@@ -979,7 +1101,11 @@ void vtkF3DAssimpImporter::ImportActors(vtkRenderer* renderer)
       this->ActorCollection->AddItem(actor);
     }
   }
-#endif
+
+  if (this->Internals->ArmatureActor)
+  {
+    this->ActorCollection->AddItem(this->Internals->ArmatureActor);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -991,111 +1117,115 @@ std::string vtkF3DAssimpImporter::GetOutputsDescription()
 //----------------------------------------------------------------------------
 bool vtkF3DAssimpImporter::UpdateAtTimeValue(double timeValue)
 {
-  assert(this->Internals->ActiveAnimation < this->GetNumberOfAnimations());
-  if (this->Internals->ActiveAnimation == -1)
+  if (this->Internals->EnabledAnimations.empty())
   {
     return true;
   }
 
-  // get the animation tick
-  double fps =
-    this->Internals->Scene->mAnimations[this->Internals->ActiveAnimation]->mTicksPerSecond;
-  if (fps == 0.0)
-  {
-    fps = 1.0;
-  }
-
-  aiAnimation* anim = this->Internals->Scene->mAnimations[this->Internals->ActiveAnimation];
-  double tick = timeValue * fps;
-
   Assimp::Interpolator<aiVectorKey> vectorInterpolator;
   Assimp::Interpolator<aiQuatKey> quaternionInterpolator;
 
-  for (unsigned int nodeChannelId = 0; nodeChannelId < anim->mNumChannels; nodeChannelId++)
+  for (vtkIdType activeAnimation : this->Internals->EnabledAnimations)
   {
-    aiNodeAnim* nodeAnim = anim->mChannels[nodeChannelId];
+    assert(activeAnimation < this->GetNumberOfAnimations());
 
-    aiVector3D translation;
-    aiVector3D scaling;
-    aiQuaternion quaternion;
+    aiAnimation* anim = this->Internals->Scene->mAnimations[activeAnimation];
 
-    aiVectorKey* positionKey = std::lower_bound(nodeAnim->mPositionKeys,
-      nodeAnim->mPositionKeys + nodeAnim->mNumPositionKeys, tick,
-      [](const aiVectorKey& key, const double& time) { return key.mTime < time; });
-
-    if (positionKey == nodeAnim->mPositionKeys)
+    // get the animation tick
+    double fps = anim->mTicksPerSecond;
+    if (fps == 0.0)
     {
-      translation = positionKey->mValue;
-    }
-    else if (positionKey == nodeAnim->mPositionKeys + nodeAnim->mNumPositionKeys)
-    {
-      translation = (positionKey - 1)->mValue;
-    }
-    else
-    {
-      aiVectorKey* prev = positionKey - 1;
-      ai_real d = (tick - prev->mTime) / (positionKey->mTime - prev->mTime);
-      vectorInterpolator(translation, *prev, *positionKey, d);
+      fps = 1.0;
     }
 
-    aiQuatKey* rotationKey = std::lower_bound(nodeAnim->mRotationKeys,
-      nodeAnim->mRotationKeys + nodeAnim->mNumRotationKeys, tick,
-      [](const aiQuatKey& key, const double& time) { return key.mTime < time; });
+    double tick = timeValue * fps;
 
-    if (rotationKey == nodeAnim->mRotationKeys)
+    for (unsigned int nodeChannelId = 0; nodeChannelId < anim->mNumChannels; nodeChannelId++)
     {
-      quaternion = rotationKey->mValue;
-    }
-    else if (rotationKey == nodeAnim->mRotationKeys + nodeAnim->mNumRotationKeys)
-    {
-      quaternion = (rotationKey - 1)->mValue;
-    }
-    else
-    {
-      aiQuatKey* prev = rotationKey - 1;
-      ai_real d = (tick - prev->mTime) / (rotationKey->mTime - prev->mTime);
-      quaternionInterpolator(quaternion, *prev, *rotationKey, d);
-    }
+      aiNodeAnim* nodeAnim = anim->mChannels[nodeChannelId];
 
-    aiVectorKey* scalingKey =
-      std::lower_bound(nodeAnim->mScalingKeys, nodeAnim->mScalingKeys + nodeAnim->mNumScalingKeys,
-        tick, [](const aiVectorKey& key, const double& time) { return key.mTime < time; });
+      aiVector3D translation;
+      aiVector3D scaling;
+      aiQuaternion quaternion;
 
-    if (scalingKey == nodeAnim->mScalingKeys)
-    {
-      scaling = scalingKey->mValue;
-    }
-    else if (scalingKey == nodeAnim->mScalingKeys + nodeAnim->mNumScalingKeys)
-    {
-      scaling = (scalingKey - 1)->mValue;
-    }
-    else
-    {
-      aiVectorKey* prev = scalingKey - 1;
-      ai_real d = (tick - prev->mTime) / (scalingKey->mTime - prev->mTime);
-      vectorInterpolator(scaling, *prev, *scalingKey, d);
-    }
+      aiVectorKey* positionKey = std::lower_bound(nodeAnim->mPositionKeys,
+        nodeAnim->mPositionKeys + nodeAnim->mNumPositionKeys, tick,
+        [](const aiVectorKey& key, const double& time) { return key.mTime < time; });
 
-    vtkMatrix4x4* transform = this->Internals->NodeLocalMatrix[nodeAnim->mNodeName.data];
-
-    if (transform)
-    {
-      // Initialize quaternion
-      vtkQuaternion<double> rotation;
-      rotation.Set(quaternion.w, quaternion.x, quaternion.y, quaternion.z);
-      rotation.Normalize();
-
-      double rotationMatrix[3][3];
-      rotation.ToMatrix3x3(rotationMatrix);
-
-      // Apply transformations
-      for (int i = 0; i < 3; i++)
+      if (positionKey == nodeAnim->mPositionKeys)
       {
-        for (int j = 0; j < 3; j++)
+        translation = positionKey->mValue;
+      }
+      else if (positionKey == nodeAnim->mPositionKeys + nodeAnim->mNumPositionKeys)
+      {
+        translation = (positionKey - 1)->mValue;
+      }
+      else
+      {
+        aiVectorKey* prev = positionKey - 1;
+        ai_real d = (tick - prev->mTime) / (positionKey->mTime - prev->mTime);
+        vectorInterpolator(translation, *prev, *positionKey, d);
+      }
+
+      aiQuatKey* rotationKey = std::lower_bound(nodeAnim->mRotationKeys,
+        nodeAnim->mRotationKeys + nodeAnim->mNumRotationKeys, tick,
+        [](const aiQuatKey& key, const double& time) { return key.mTime < time; });
+
+      if (rotationKey == nodeAnim->mRotationKeys)
+      {
+        quaternion = rotationKey->mValue;
+      }
+      else if (rotationKey == nodeAnim->mRotationKeys + nodeAnim->mNumRotationKeys)
+      {
+        quaternion = (rotationKey - 1)->mValue;
+      }
+      else
+      {
+        aiQuatKey* prev = rotationKey - 1;
+        ai_real d = (tick - prev->mTime) / (rotationKey->mTime - prev->mTime);
+        quaternionInterpolator(quaternion, *prev, *rotationKey, d);
+      }
+
+      aiVectorKey* scalingKey =
+        std::lower_bound(nodeAnim->mScalingKeys, nodeAnim->mScalingKeys + nodeAnim->mNumScalingKeys,
+          tick, [](const aiVectorKey& key, const double& time) { return key.mTime < time; });
+
+      if (scalingKey == nodeAnim->mScalingKeys)
+      {
+        scaling = scalingKey->mValue;
+      }
+      else if (scalingKey == nodeAnim->mScalingKeys + nodeAnim->mNumScalingKeys)
+      {
+        scaling = (scalingKey - 1)->mValue;
+      }
+      else
+      {
+        aiVectorKey* prev = scalingKey - 1;
+        ai_real d = (tick - prev->mTime) / (scalingKey->mTime - prev->mTime);
+        vectorInterpolator(scaling, *prev, *scalingKey, d);
+      }
+
+      vtkMatrix4x4* transform = this->Internals->NodeLocalMatrix[nodeAnim->mNodeName.data];
+
+      if (transform)
+      {
+        // Initialize quaternion
+        vtkQuaternion<double> rotation;
+        rotation.Set(quaternion.w, quaternion.x, quaternion.y, quaternion.z);
+        rotation.Normalize();
+
+        double rotationMatrix[3][3];
+        rotation.ToMatrix3x3(rotationMatrix);
+
+        // Apply transformations
+        for (int i = 0; i < 3; i++)
         {
-          transform->SetElement(i, j, scaling[j] * rotationMatrix[i][j]);
+          for (int j = 0; j < 3; j++)
+          {
+            transform->SetElement(i, j, scaling[j] * rotationMatrix[i][j]);
+          }
+          transform->SetElement(i, 3, translation[i]);
         }
-        transform->SetElement(i, 3, translation[i]);
       }
     }
   }
@@ -1128,13 +1258,15 @@ void vtkF3DAssimpImporter::EnableAnimation(vtkIdType animationIndex)
 {
   assert(animationIndex < this->GetNumberOfAnimations());
   assert(animationIndex >= 0);
-  this->Internals->ActiveAnimation = animationIndex;
+  this->Internals->EnabledAnimations.insert(animationIndex);
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DAssimpImporter::DisableAnimation(vtkIdType vtkNotUsed(animationIndex))
+void vtkF3DAssimpImporter::DisableAnimation(vtkIdType animationIndex)
 {
-  this->Internals->ActiveAnimation = -1;
+  assert(animationIndex < this->GetNumberOfAnimations());
+  assert(animationIndex >= 0);
+  this->Internals->EnabledAnimations.erase(animationIndex);
 }
 
 //----------------------------------------------------------------------------
@@ -1142,7 +1274,7 @@ bool vtkF3DAssimpImporter::IsAnimationEnabled(vtkIdType animationIndex)
 {
   assert(animationIndex < this->GetNumberOfAnimations());
   assert(animationIndex >= 0);
-  return this->Internals->ActiveAnimation == animationIndex;
+  return this->Internals->EnabledAnimations.count(animationIndex) > 0;
 }
 
 //----------------------------------------------------------------------------
@@ -1295,21 +1427,37 @@ bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream, std::string& h
     }
   }
 
-  /* COLLADA:
-  <?xml version="1.0"...
-  <COLLADA ...
-  */
+  // both COLLADA and AMF are XML-based
+  // check if the first line starts with <?xml version="1.0"
+  // skip comments
+  // then check if the next line starts with <COLLADA> or <amf> tags
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
   vtkNew<vtkResourceParser> parser;
   parser->SetStream(stream);
-  std::string line1, line2;
-  if (parser->ReadLine(line1) == vtkParseResult::EndOfLine &&
-    parser->ReadLine(line2) == vtkParseResult::EndOfLine)
+  std::string line;
+  if (parser->ReadLine(line) == vtkParseResult::EndOfLine)
   {
-    if (line1.rfind(R"(<?xml version="1.0")", 0) == 0 && line2.rfind("<COLLADA ", 0) == 0)
+    if (line.starts_with(R"(<?xml version="1.0")"))
     {
-      hint = "dae";
-      return true;
+      // skip comments
+      while (parser->ReadLine(line) == vtkParseResult::EndOfLine)
+      {
+        if (line.starts_with("<!--"))
+        {
+          continue;
+        }
+        if (line.starts_with("<COLLADA"))
+        {
+          hint = "dae";
+          return true;
+        }
+        if (line.starts_with("<amf"))
+        {
+          hint = "amf";
+          return true;
+        }
+        break;
+      }
     }
   }
 
@@ -1320,14 +1468,14 @@ bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream, std::string& h
    * HEADER
    */
   parser->Seek(0, vtkResourceStream::SeekDirection::Begin);
-  std::string line3, line4;
+  std::string line1, line2, line3, line4;
   if (parser->ReadLine(line1) == vtkParseResult::EndOfLine &&
     parser->ReadLine(line2) == vtkParseResult::EndOfLine &&
     parser->ReadLine(line3) == vtkParseResult::EndOfLine &&
     parser->ReadLine(line4) == vtkParseResult::EndOfLine)
   {
-    if (line1.rfind('0', 0) == 0 && line2.rfind("SECTION", 0) == 0 && line3.rfind('2', 0) == 0 &&
-      line4.rfind("HEADER", 0) == 0)
+    if (line1.starts_with("0") && line2.starts_with("SECTION") && line3.starts_with("2") &&
+      line4.starts_with("HEADER"))
     {
       hint = "dxf";
       return true;
@@ -1340,7 +1488,7 @@ bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream, std::string& h
   parser->Seek(0, vtkResourceStream::SeekDirection::Begin);
   if (parser->ReadLine(line1) == vtkParseResult::EndOfLine)
   {
-    if (line1.rfind("OFF", 0) == 0)
+    if (line1.starts_with("OFF"))
     {
       hint = "off";
       return true;

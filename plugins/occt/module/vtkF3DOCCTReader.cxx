@@ -20,9 +20,7 @@
 #include <Quantity_Color.hxx>
 #include <STEPControl_Reader.hxx>
 #include <Standard_Handle.hxx>
-#include <Standard_PrimitiveTypes.hxx>
 #include <Storage_StreamTypeMismatchError.hxx>
-#include <TColgp_Array1OfVec.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
@@ -81,7 +79,7 @@ vtkCxxSetSmartPointerMacro(vtkF3DOCCTReader, Stream, vtkResourceStream);
 class vtkF3DOCCTReader::vtkInternals
 {
 #if F3D_PLUGIN_OCCT_XCAF
-  using StyleMap = XCAFPrs_IndexedDataMapOfShapeStyle;
+  using StyleMap = NCollection_IndexedDataMap<TopoDS_Shape, XCAFPrs_Style, TopTools_ShapeMapHasher>;
 #endif
 
 public:
@@ -113,7 +111,7 @@ public:
     vtkNew<vtkCellArray> trianglesCells;
     vtkNew<vtkCellArray> linesCells;
 
-    Standard_Integer shift = 0;
+    int shift = 0;
 
 #if F3D_PLUGIN_OCCT_XCAF
     const StyleMap inheritedStyles = this->CollectInheritedStyles(label, shape);
@@ -121,7 +119,7 @@ public:
 
     /* Mesh the whole shape. This only affect faces, edges have to be handled separately. */
     BRepMesh_IncrementalMesh(shape, this->Parent->GetLinearDeflection(),
-      this->Parent->GetRelativeDeflection(), this->Parent->GetAngularDeflection(), Standard_True);
+      this->Parent->GetRelativeDeflection(), this->Parent->GetAngularDeflection(), true);
 
     if (this->Parent->GetReadWire())
     {
@@ -138,8 +136,7 @@ public:
           edges.push_back(edge);
         }
         BRepMesh_IncrementalMesh(compound, this->Parent->GetLinearDeflection(),
-          this->Parent->GetRelativeDeflection(), this->Parent->GetAngularDeflection(),
-          Standard_True);
+          this->Parent->GetRelativeDeflection(), this->Parent->GetAngularDeflection(), true);
       }
 
       // Add all edges to polydata
@@ -153,11 +150,11 @@ public:
           continue;
         }
 
-        Standard_Integer nbV = poly->NbNodes();
+        int nbV = poly->NbNodes();
 
         // Points
-        const TColgp_Array1OfPnt& aNodes = poly->Nodes();
-        for (Standard_Integer i = 1; i <= nbV; i++)
+        const NCollection_Array1<gp_Pnt>& aNodes = poly->Nodes();
+        for (int i = 1; i <= nbV; i++)
         {
           gp_Pnt pt = aNodes(i).Transformed(location);
           points->InsertNextPoint(pt.X(), pt.Y(), pt.Z());
@@ -180,9 +177,11 @@ public:
           if (style.IsSetColorCurv())
           {
             Quantity_Color color = style.GetColorCurv();
-            rgb[0] = static_cast<unsigned char>(255.0 * color.Red());
-            rgb[1] = static_cast<unsigned char>(255.0 * color.Green());
-            rgb[2] = static_cast<unsigned char>(255.0 * color.Blue());
+            double fRGB[3];
+            color.Values(fRGB[0], fRGB[1], fRGB[2], Quantity_TOC_sRGB);
+            rgb[0] = static_cast<unsigned char>(255.0 * fRGB[0]);
+            rgb[1] = static_cast<unsigned char>(255.0 * fRGB[1]);
+            rgb[2] = static_cast<unsigned char>(255.0 * fRGB[2]);
           }
         }
         catch (Standard_NoSuchObject&)
@@ -213,11 +212,11 @@ public:
       Poly::ComputeNormals(poly);
       TopAbs_Orientation faceOrientation = face.Orientation();
 
-      Standard_Integer nbT = poly->NbTriangles();
-      Standard_Integer nbV = poly->NbNodes();
+      int nbT = poly->NbTriangles();
+      int nbV = poly->NbNodes();
 
       // Points
-      for (Standard_Integer i = 1; i <= nbV; i++)
+      for (int i = 1; i <= nbV; i++)
       {
         gp_Pnt pt = poly->Node(i).Transformed(location);
         points->InsertNextPoint(pt.X(), pt.Y(), pt.Z());
@@ -226,7 +225,7 @@ public:
       // Normals
       if (poly->HasNormals())
       {
-        for (Standard_Integer i = 1; i <= nbV; i++)
+        for (int i = 1; i <= nbV; i++)
         {
           gp_Dir n = poly->Normal(i);
           float fn[3] = { static_cast<float>(n.X()), static_cast<float>(n.Y()),
@@ -242,7 +241,7 @@ public:
       {
         // just in case a face does not have normals, add a dummy normal
         float fn[3] = { 0.0, 0.0, 1.0 };
-        for (Standard_Integer i = 1; i <= nbV; i++)
+        for (int i = 1; i <= nbV; i++)
         {
           normals->InsertNextTypedTuple(fn);
         }
@@ -251,7 +250,7 @@ public:
       // UVs
       if (poly->HasUVNodes())
       {
-        for (Standard_Integer i = 1; i <= nbV; i++)
+        for (int i = 1; i <= nbV; i++)
         {
           gp_Pnt2d uv = poly->UVNode(i);
           float fn[2] = { static_cast<float>(uv.X()), static_cast<float>(uv.Y()) };
@@ -285,9 +284,11 @@ public:
         if (style.IsSetColorSurf())
         {
           Quantity_Color color = style.GetColorSurf();
-          rgb[0] = static_cast<unsigned char>(255.0 * color.Red());
-          rgb[1] = static_cast<unsigned char>(255.0 * color.Green());
-          rgb[2] = static_cast<unsigned char>(255.0 * color.Blue());
+          double fRGB[3];
+          color.Values(fRGB[0], fRGB[1], fRGB[2], Quantity_TOC_sRGB);
+          rgb[0] = static_cast<unsigned char>(255.0 * fRGB[0]);
+          rgb[1] = static_cast<unsigned char>(255.0 * fRGB[1]);
+          rgb[2] = static_cast<unsigned char>(255.0 * fRGB[2]);
         }
       }
       catch (Standard_NoSuchObject&)
@@ -572,7 +573,7 @@ public:
   }
 
 protected:
-  void Show(const Message_ProgressScope&, const Standard_Boolean) override
+  void Show(const Message_ProgressScope&, bool) override
   {
     double currentPosition = this->GetPosition();
     if (currentPosition - this->LastPosition > 0.01)
@@ -763,12 +764,12 @@ int vtkF3DOCCTReader::RequestData(
 
   this->Internals->ShapeTool = XCAFDoc_DocumentTool::ShapeTool(doc->Main());
 
-  TDF_LabelSequence topLevelShapes;
+  NCollection_Sequence<TDF_Label> topLevelShapes;
 
   // create polydata leaves
   this->Internals->ShapeTool->GetShapes(topLevelShapes);
 
-  for (Standard_Integer iLabel = 1; iLabel <= topLevelShapes.Length(); ++iLabel)
+  for (int iLabel = 1; iLabel <= topLevelShapes.Length(); ++iLabel)
   {
     TDF_Label label = topLevelShapes.Value(iLabel);
 
@@ -787,7 +788,7 @@ int vtkF3DOCCTReader::RequestData(
 
   vtkNew<vtkMatrix4x4> mat;
   mat->Identity();
-  for (Standard_Integer iLabel = 1; iLabel <= topLevelShapes.Length(); ++iLabel)
+  for (int iLabel = 1; iLabel <= topLevelShapes.Length(); ++iLabel)
   {
     this->Internals->AddLabel(topLevelShapes.Value(iLabel), mat, output);
   }
@@ -828,7 +829,7 @@ int vtkF3DOCCTReader::RequestData(
     ProgressIndicator pi(this);
     reader->TransferRoots(pi.Start());
 
-    Standard_Integer nbShapes = reader->NbShapes();
+    int nbShapes = reader->NbShapes();
 
     output->SetNumberOfBlocks(nbShapes);
 
@@ -932,14 +933,18 @@ bool vtkF3DOCCTReader::CanReadFile(vtkResourceStream* stream, vtkF3DOCCTReader::
   {
     // Only "ISO-10303-21" supported schema is STEP, check for it
     // FILE_SCHEMA appears in the HEADER section, typically within the first few lines.
-    // 32 lines is a generous upper bound to account for optional header entries.
-    constexpr int maxLines = 32;
+    // 256 lines is a generous upper bound to account for optional header entries.
+    constexpr int maxLines = 256;
     for (int i = 0; i < maxLines && parser->ReadLine(line) == vtkParseResult::EndOfLine; ++i)
     {
       if (line.find("FILE_SCHEMA") != std::string::npos)
       {
         format = vtkF3DOCCTReader::FILE_FORMAT::STEP;
-        return line.find("AUTOMOTIVE_DESIGN") != std::string::npos;
+        // Exclude IFC schema as this reader is not able to read it.
+        // Other unsupported schema may need to be added if we stumble upon them.
+        std::array unsupportedSchemas = std::to_array<std::string_view>({ "IFC" });
+        return std::ranges::none_of(unsupportedSchemas, [line](const std::string_view& schema)
+          { return line.find(schema) != std::string::npos; });
       }
 
       if (line.find("ENDSEC") != std::string::npos)
@@ -1006,8 +1011,8 @@ bool vtkF3DOCCTReader::CanReadFile(vtkResourceStream* stream, vtkF3DOCCTReader::
     parser->ReadLine(line2) == vtkParseResult::EndOfLine &&
     parser->ReadLine(line3) == vtkParseResult::EndOfLine)
   {
-    if (line1.rfind("DBRep_DrawableShape", 0) == 0 && line2.empty() &&
-      (line3.rfind("CASCADE Topology", 0) == 0 || line3.rfind("Open CASCADE Topology", 0) == 0))
+    if (line1.starts_with("DBRep_DrawableShape") && line2.empty() &&
+      (line3.starts_with("CASCADE Topology") || line3.starts_with("Open CASCADE Topology")))
     {
       format = vtkF3DOCCTReader::FILE_FORMAT::BREP;
       return true;
@@ -1022,7 +1027,7 @@ bool vtkF3DOCCTReader::CanReadFile(vtkResourceStream* stream, vtkF3DOCCTReader::
     parser->ReadLine(line2) == vtkParseResult::EndOfLine)
   {
     if (line1.empty() &&
-      (line2.rfind("CASCADE Topology", 0) == 0 || line2.rfind("Open CASCADE Topology", 0) == 0))
+      (line2.starts_with("CASCADE Topology") || line2.starts_with("Open CASCADE Topology")))
     {
       format = vtkF3DOCCTReader::FILE_FORMAT::BREP;
       return true;

@@ -9,7 +9,7 @@
  * background (and optionally blur it using Bokeh depth of field) and the dataset image.
  *
  * @sa
- * vtkRenderPass
+ * vtkOpenGLRenderPass
  */
 
 #ifndef vtkF3DRenderPass_h
@@ -17,20 +17,26 @@
 
 #include <vtkFramebufferPass.h>
 #include <vtkOpenGLQuadHelper.h>
+#include <vtkOpenGLRenderPass.h>
 #include <vtkSmartPointer.h>
 #include <vtkTimeStamp.h>
 
 #include <memory>
 #include <vector>
 
+class vtkActor;
+class vtkCamera;
 class vtkInformationIntegerKey;
+class vtkAbstractMapper;
+class vtkPolyData;
+class vtkMatrix4x4;
 class vtkProp;
 
-class vtkF3DRenderPass : public vtkRenderPass
+class vtkF3DRenderPass : public vtkOpenGLRenderPass
 {
 public:
   static vtkF3DRenderPass* New();
-  vtkTypeMacro(vtkF3DRenderPass, vtkRenderPass);
+  vtkTypeMacro(vtkF3DRenderPass, vtkOpenGLRenderPass);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   void Render(const vtkRenderState* s) override;
@@ -42,6 +48,15 @@ public:
   vtkSetMacro(ForceOpaqueBackground, bool);
   vtkSetVector6Macro(Bounds, double);
   vtkSetMacro(CircleOfConfusionRadius, double);
+  vtkSetMacro(RenderReflection, bool);
+
+  /**
+   * Modify shader code for matcap/gamma/skinning
+   */
+  bool PreReplaceShaderValues(std::string& vertexShader, std::string& geometryShader,
+    std::string& fragmentShader, vtkAbstractMapper* mapper, vtkProp* prop) override;
+  bool PostReplaceShaderValues(std::string& vertexShader, std::string& geometryShader,
+    std::string& fragmentShader, vtkAbstractMapper* mapper, vtkProp* prop) override;
 
   vtkF3DRenderPass(const vtkF3DRenderPass&) = delete;
   void operator=(const vtkF3DRenderPass&) = delete;
@@ -58,15 +73,19 @@ protected:
 
   void Blend(const vtkRenderState* s);
 
+  void ReflectCamera(vtkCamera* originalCam, vtkMatrix4x4* actorMatrix, vtkCamera* reflectedCam);
+
   bool ArmatureVisible = false;
   bool UseRaytracing = false;
   bool UseSSAOPass = false;
   bool UseBlurBackground = false;
   bool ForceOpaqueBackground = false;
+  bool RenderReflection = false;
 
   double CircleOfConfusionRadius = 20.0;
 
   vtkSmartPointer<vtkFramebufferPass> BackgroundPass;
+  vtkSmartPointer<vtkFramebufferPass> BakeReflectionPass;
   vtkSmartPointer<vtkFramebufferPass> MainPass;
   vtkSmartPointer<vtkFramebufferPass> MainOnTopPass;
 
@@ -74,11 +93,18 @@ protected:
 
   vtkMTimeType InitializeTime = 0;
 
+  int LightComplexity = 0;
+
   std::vector<vtkProp*> BackgroundProps;
-  std::vector<vtkProp*> MainProps;
   std::vector<vtkProp*> MainOnTopProps;
+  std::vector<vtkProp*> MainProps;
+  std::vector<vtkProp*> ReflectionProps;
 
   std::shared_ptr<vtkOpenGLQuadHelper> BlendQuadHelper;
+
+private:
+  void ReplaceMatCapShader(std::string& fragmentShader, vtkActor* actor, vtkPolyData* polyData);
+  void ReplaceSkinningMorphing(std::string& vertexShader, vtkActor* actor, vtkPolyData* polyData);
 };
 
 #endif

@@ -38,8 +38,8 @@ int TestF3DBitonicSort(int argc, char* argv[])
   std::mt19937 rng(dev());
   std::uniform_real_distribution<double> dist(0.0, 1.0);
 
-  std::generate(std::begin(keys), std::end(keys), [&]() { return dist(rng); });
-  std::fill(std::begin(values), std::end(values), 0); // we do not care about the values
+  std::ranges::generate(keys, [&]() { return dist(rng); });
+  std::ranges::fill(values, 0); // we do not care about the values
 
   // upload these buffers to the GPU
   vtkNew<vtkOpenGLBufferObject> bufferKeys;

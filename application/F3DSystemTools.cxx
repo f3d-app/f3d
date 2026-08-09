@@ -15,6 +15,10 @@
 #ifdef __APPLE__
 #include <mach-o/dyld.h>
 #endif
+#ifdef __FreeBSD__
+#include <sys/sysctl.h>
+#include <sys/types.h>
+#endif
 
 namespace fs = std::filesystem;
 
@@ -45,6 +49,14 @@ fs::path GetApplicationPath()
   try
   {
 #if defined(__FreeBSD__)
+    int mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1 };
+    char buf[PATH_MAX];
+    std::size_t len = sizeof(buf);
+    if (sysctl(mib, 4, buf, &len, nullptr, 0) == 0)
+    {
+      return fs::path(buf);
+    }
+    // Fallback to procfs if sysctl fails
     return fs::canonical("/proc/curproc/file");
 #else
     return fs::canonical("/proc/self/exe");

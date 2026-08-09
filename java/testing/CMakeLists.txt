@@ -49,5 +49,6 @@ foreach(test_file ${javaf3dTests_list})
   set_tests_properties(libf3d_bindings_java::${TName} PROPERTIES
     LABELS "libf3d;bindings;java"
     DISABLED ${java_test_disabled}
+    TIMEOUT 180
   )
 endforeach()

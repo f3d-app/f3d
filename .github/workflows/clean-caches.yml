@@ -9,4 +9,4 @@ jobs:
 
     steps:
       - name: Clear caches
-        uses: easimon/wipe-cache@v2
+        uses: easimon/wipe-cache@5f305e3ee1b681c44328cdf11eaedf943b60edff

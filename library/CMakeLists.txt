@@ -59,6 +59,7 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/log.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/options.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/scene_impl.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/statefile.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/types.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/utils.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/window_impl.cxx
@@ -81,6 +82,7 @@ set(F3D_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/public/image.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/interactor.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/log.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/mesh_view.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/scene.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/types.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/utils.h
@@ -113,13 +115,23 @@ else ()
     $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/nlohmann_json>)
 endif ()
 
+if (F3D_MODULE_CLIP)
+  if (F3D_USE_EXTERNAL_CLIP)
+    target_link_libraries(libf3d PRIVATE clip::clip)
+  else ()
+    target_link_libraries(libf3d PRIVATE clip)
+    target_include_directories(libf3d PRIVATE $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external>)
+  endif ()
+endif ()
+
 if (WIN32)
   target_link_libraries(libf3d PRIVATE Dwmapi)
+  target_compile_options(libf3d PRIVATE /utf-8)
 endif()
 
 set_target_properties(libf3d PROPERTIES
   CXX_VISIBILITY_PRESET hidden
-  CXX_STANDARD 17
+  CXX_STANDARD 20
   POSITION_INDEPENDENT_CODE ON
   OUTPUT_NAME "f3d"
   PDB_NAME "libf3d"
@@ -194,6 +206,11 @@ endif ()
 # ui
 if (F3D_MODULE_UI)
   target_compile_definitions(libf3d PRIVATE F3D_MODULE_UI)
+endif ()
+
+# clip
+if (F3D_MODULE_CLIP)
+  target_compile_definitions(libf3d PRIVATE F3D_MODULE_CLIP)
 endif ()
 
 # raytracing

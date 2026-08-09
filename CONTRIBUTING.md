@@ -22,27 +22,32 @@ You can follow the workflow described below.
 ## How to Get Started With Development
 
 To contribute to F3D as a developer, first you may want to try and build F3D for yourself.
-If you are already familiar with software compilation, you can take a look at our [build guide](doc/dev/04-BUILD.md).
-If not, you may want to look at our [getting started guide](doc/dev/03-GETTING_STARTED.md), that provide steps to compile F3D.
-You may also want to take a look into the [F3D mentoring program](doc/dev/12-MENTORING.md) in order to get help with all the
+If you are already familiar with software compilation, you can take a look at our [build guide](doc/dev/05-BUILD.md).
+If not, you may want to look at our [getting started guide](doc/dev/04-GETTING_STARTED.md), that provide steps to compile F3D.
+You may also want to take a look into the [F3D mentoring program](doc/dev/13-MENTORING.md) in order to get help with all the
 contributing steps.
 
 Once you are able to build F3D, you may want to take a look at the open [issues](https://github.com/f3d-app/f3d/issues)!
-If you are a beginner, you may want to look at ["good first issues"](https://github.com/f3d-app/f3d/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).
+If you are a beginner, you may want to look at ["good first issues"](https://github.com/f3d-app/f3d/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22). Please note that [generative AI should not be used](AI_POLICY.md) in that context.
 If you already have some experience with programming and contribution, definitely look at ["help wanted"](https://github.com/f3d-app/f3d/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) issues.
 If an issue is interesting to you and is not yet assigned, then you should _comment on the issue_ and ask for any help or clarification needed.
 F3D maintainers will see your comment, assign the issue to you and provide guidance as needed.
 
-To get involved more deeply, please take a look at the [roadmaps](doc/dev/09-ROADMAPS_AND_RELEASES.md) for the upcoming releases.
+To get involved more deeply, please take a look at the [roadmaps](doc/dev/10-ROADMAPS_AND_RELEASES.md) for the upcoming releases.
 
 It is also recommended to reach out on [Discord](https://discord.f3d.app) to simplify communication, but it is not required.
 
-You may also want to understand the overall [architecture](doc/dev/07-ARCHITECTURE.md) of the F3D project.
+You may also want to understand the overall [architecture](doc/dev/08-ARCHITECTURE.md) of the F3D project.
 
 You can then fix the issue or implement the feature on your side and contribute it to the F3D repository by following the workflow described below.
 
 Of course, if you are already using F3D and want to improve it for your specific needs, because you want a feature or found a bug,
 that is definitely possible. Feel free to reach out for guidance by opening an issue or asking on [Discord](https://discord.f3d.app).
+
+## AI Policy
+
+F3D has a dedicated [AI policy](AI_POLICY.md), if you are an AI user, make sure to read it and comply to it.
+If not, you are at risk of being banned.
 
 ## F3D Development Workflow
 
@@ -51,12 +56,13 @@ F3D uses [GitLab Flow](https://about.gitlab.com/topics/version-control/what-is-g
 - [Fork](https://github.com/f3d-app/f3d/fork) the F3D repository on GitHub.
 - Comment on a chosen issue, if any, so it can be assigned to you by a maintainer.
 - Create and push a new feature branch on your fork containing new commits, do not use `main` or `master` branch.
-- As soon as possible, create a draft pull request against `f3d-app/f3d/master` so that maintainers are aware and design can be discussed.
-- When your PR is created, a maintainer will self-assign as a reviewer and will ensure it is followed, please ping if it is not the case.
-- When it is ready for review or when you want to [run the CI](#continuous-integration), undraft your pull request.
-- To ask for a review or if you need help with CI, use the review system of github to request a review from [the maintainers](doc/dev/11-MAINTAINERS_AND_CONTRIBUTORS.md#maintainers).
+- As soon as possible, create a _draft_ pull request against `f3d-app/f3d/master` so that maintainers are aware and design can be discussed.
+- Once the PR has been created, even as draft, it is possible to [run the CI](#continuous-integration), feel free to do so.
+- When it is ready for review, undraft your pull request, which will notify maintainers. Also make sure to check the needed checkboxes in the description.
+- To ask for a review or if you need help with CI, use the review system of github to request a review from [the maintainers](doc/dev/12-MAINTAINERS_AND_CONTRIBUTORS.md#maintainers).
 - You can also tag maintainers on github or [discord](#discord-usage) to ask for help and review.
-- Your PR will then be reviewed by maintainers and returning contributors, please take their feedback into account and resolve discussions when adresssed.
+- Your PR will then be reviewed by maintainers and returning contributors, please take their feedback into account and resolve discussions when addressed.
+- This process of reviewing and then addressing reviews may be repeated and take some time depending on the complexity of the PR.
 - In general, do not merge with `master`, even if github suggest you to do so.
 - In general, there is no need to rebase with `master` but doing so is a good practice when pushing new changes.
 - Once the PR is approved and CI comes back clean, a maintainer will merge your pull request in the master branch.
@@ -79,25 +85,37 @@ Make sure to check the results for yourself and ask for help if needed.
 
 To run the CI, just add a comment like this in your PR:
 
-- `\ci fast`: Style checks and a fast linux job, always make this work first.
-- `\ci main`: Cross platform CI that cover most usecases, including coverage, contains `ci:fast`, always make this work second.
+- `\ci fast`: A fast linux job without optional dependencies, always make this work first.
+- `\ci extended`: An extended linux job with dependencies and recent VTK, always make this work second.
+- `\ci linux`: Many different linux jobs across CMake options, dependencies and vtk versions.
+- `\ci windows`: Cross VTK versions of Windows jobs.
+- `\ci macos_intel`: Cross VTK versions of macOS intel jobs.
+- `\ci macos_arm`: Cross VTK versions of macOS arm64 jobs.
+- `\ci coverage`: A linux job dedicated to coverage computation.
+- `\ci sanitizer`: Linux jobs running with different sanitizer settings.
+- `\ci analysis`: A Linux cppcheck job.
+- `\ci external`: A linux job building the libf3d as a subproject of a larger project.
+- `\ci python`: Cross-platform cross-version jobs building libf3d for python.
 - `\ci wasm`: Build docker images and then build libf3d with webassambly.
 - `\ci android`: Build docker images and then build libf3d for android.
-- `\ci full`: Complete CI, required before merge, contains `ci:main`, `ci:wasm`, `ci:android`.
+- `\ci website`: Build the f3d.app website using current state of the doc.
+- `\ci full`: All of the above, required before merging.
 
 After this, the CI will always be run every time you push to your branch.
 To remove a label, use the same syntax with a `-` before the label, eg: `\ci -fast`.
 
+Please add only the labels required to work on your feature, in order to avoid using the limited pool of runners for no good reason.
+
 F3D continuous integration will also check the coverage as it is a good way to evaluate if new features are being tested or not.
-When adding code to F3D, always try to cover it by adding/modifying [tests](doc/dev/05-TESTING.md).
+When adding code to F3D, always try to cover it by adding/modifying [tests](doc/dev/06-TESTING.md).
 
 F3D continuous integration also checks formatting using clang-format and other tools and will inform you if changes needs to be made.
-Some [formatting rules](doc/dev/08-CODING_STYLE.md) are not enforced by clang-format and will be checked during the review process.
+Some [formatting rules](doc/dev/09-CODING_STYLE.md) are not enforced by clang-format and will be checked during the review process.
 
 When making changes to the `libf3d` public API, continuous integration will warn about making related changes to the bindings.
 This is required in order to merge the pull request.
 
 When making changes to the `default_versions.json` file, continuous integration will warn about updating the docker timestamp in the same file.
-This is required in order to merge the pull request.
+This is required in order to merge the pull request. This also requires running the `cache` part of the CI, which can only be triggered by maintainers.
 
 The continuous integration is just code, as the rest of F3D is. If you want to fix or improve it, you are very welcome to!

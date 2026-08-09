@@ -1,0 +1,14 @@
+# StreamVersion 1.2
+
+# Enable scene hierarchy by pressing SHIFT+H
+KeyPressEvent 87 120 0 0 1 Shift_L 0
+CharEvent 87 120 0 0 1 Shift_L 0
+KeyPressEvent 87 120 1 72 1 H 0
+CharEvent 87 120 1 72 1 H 0
+KeyReleaseEvent 87 120 1 72 1 H 0
+KeyReleaseEvent 87 120 1 0 1 Shift_L 0
+
+# Move mouse to a collapsed item arrow and click on it
+MouseMoveEvent 45 256 0 0 0 Shift_L 0
+LeftButtonPressEvent 45 256 0 0 0 Shift_L 0
+LeftButtonReleaseEvent 45 256 0 0 0 Shift_L 0

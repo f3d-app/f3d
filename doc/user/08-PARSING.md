@@ -83,11 +83,15 @@ The following formats are supported when parsing a color, case insensitive:
 - hsv(H, S%, V%) where H is integer [0, 360], S and V are integer [0, 100]
 - hwb(H, W%, B%) where H is integer [0, 360], W and B are integer [0, 100]
 - cmyk(C%, M%, Y%, K%) where C, M, Y, K are integer [0, 100]
-- [color name](https://examples.vtk.org/site/ColorNamesSeries/ColorNamePatches.html)
+- [color name](./09-NAMED_COLORS.md)
 
 See [W3C](https://www.w3.org/TR/css-color-3/#rgb-color) doc for more details on these formats.
 
 When formatting a color into a string, it is formatted as `#RRGGBB` if values are multiple of 255. Otherwise, it is formatted as vector of doubles.
+
+When using parenthesis in a command line arg, you may need to quote the entire option, eg: `"--background-color=rgb(84, 84, 84)"`.
+
+All colors are expressed in sRGB color space.
 
 ## Direction
 

@@ -2,10 +2,8 @@
  * @class   vtkF3DPolyDataMapper
  * @brief   Custom surface mapper used to include F3D features
  *
- * This mapper is used to add many F3D custom features:
- * - skinning and morphing capabilities
- * - support for MatCap rendering
- * - support for TAA jittering
+ * This mapper is used to add support for SSBO skinning and
+ * backward compatibility with old VTK versions for unlit materials.
  */
 
 #ifndef vtkF3DPolyDataMapper_h
@@ -28,44 +26,26 @@ public:
 
   ///@{
   /**
-   * Modify the shaders to use MatCap if enabled
+   * Modify the shaders to handle color space
    */
   void ReplaceShaderColor(
     std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor) override;
   void ReplaceShaderLight(
     std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor) override;
-  void ReplaceShaderTCoord(
-    std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor) override;
   ///@}
 
-protected:
-  vtkF3DPolyDataMapper();
-  ~vtkF3DPolyDataMapper() override = default;
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 20230902)
   /**
-   * Call superclass then check for changes in the environment texture
-   * in order to support correctly dynamic HDRIs.
-   * Return true if the HDRI texture was changed since last call, false otherwise.
-   * Integrated in VTK in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10456
+   * Set the SSBO for skinning if needed
    */
-  bool GetNeedToRebuildShaders(vtkOpenGLHelper& cellBO, vtkRenderer* ren, vtkActor* act) override;
-#endif
+  void SetCustomUniforms(vtkOpenGLHelper& cellBO, vtkActor* actor) override;
+
+protected:
+  vtkF3DPolyDataMapper() = default;
+  ~vtkF3DPolyDataMapper() override = default;
 
 private:
-  /**
-   * Returns true if a MatCap texture is defined by the user and the actor has normals
-   */
-  bool RenderWithMatCap(vtkActor* actor);
-
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 20230902)
-  vtkMTimeType EnvTextureTime = 0;
-  vtkTexture* EnvTexture = nullptr;
-#endif
-
-// SSBO support: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231108)
   vtkNew<vtkOpenGLBufferObject> JointMatrices;
-#endif
+  bool HasSSBOSkinning = false;
 };
 
 #endif

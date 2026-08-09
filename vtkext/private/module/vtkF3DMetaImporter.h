@@ -11,6 +11,7 @@
 
 #include <vtkActor.h>
 #include <vtkBoundingBox.h>
+#include <vtkGlyph3DMapper.h>
 #include <vtkPointGaussianMapper.h>
 #include <vtkProperty.h>
 #include <vtkSmartVolumeMapper.h>
@@ -57,6 +58,23 @@ public:
     vtkNew<vtkPointGaussianMapper> Mapper;
     vtkActor* OriginalActor;
     vtkImporter* Importer;
+  };
+
+  struct NormalGlyphsStruct
+  {
+    explicit NormalGlyphsStruct(vtkActor* originalActor, vtkImporter* importer)
+      : OriginalActor(originalActor)
+      , Importer(importer)
+    {
+      this->Actor->vtkProp3D::ShallowCopy(originalActor);
+      this->Actor->SetMapper(this->GlyphMapper);
+    }
+
+    vtkNew<vtkActor> Actor;
+    vtkActor* OriginalActor;
+    vtkImporter* Importer;
+    vtkNew<vtkGlyph3DMapper> GlyphMapper;
+    bool InputDataHasNormals = false;
   };
 
   struct ColoringStruct
@@ -116,6 +134,7 @@ public:
    * API to recover information about all imported actors, point sprites and volume if any
    */
   const std::vector<ColoringStruct>& GetColoringActorsAndMappers();
+  const std::vector<NormalGlyphsStruct>& GetNormalGlyphsActorsAndMappers();
   const std::vector<PointSpritesStruct>& GetPointSpritesActorsAndMappers();
   const std::vector<VolumeStruct>& GetVolumePropsAndMappers();
   ///@}
@@ -148,7 +167,42 @@ public:
   /**
    * Return info about a specific importer
    */
-  ImporterInfo GetImporterInfo(int index);
+  const ImporterInfo& GetImporterInfo(int index);
+
+  struct NodeInfo
+  {
+    int Id = -1;
+    int ParentId = -1;
+    int Level = 0;
+    std::string Label;
+    bool Visible = true;
+    bool HasChildren = false;
+    bool Collapsed = false;
+  };
+
+  /**
+   * Recover the scene hierarchy of all importers as a flat vector, in depth-first pre-order,
+   * so that a parent node always precedes its children.
+   */
+  std::vector<NodeInfo> GetSceneHierarchyNodes() const;
+
+  /**
+   * Set the visibility of the node identified by nodeId and of all the nodes in its subtree.
+   * Return false if nodeId does not identify any node, true otherwise.
+   */
+  bool SetNodeVisibility(int nodeId, bool visible);
+
+  /**
+   * Same as SetNodeVisibility but identifying the node with an importer index and a node id in the
+   * data assembly of that importer, as used by the scene hierarchy widget.
+   */
+  void SetAssemblyNodeVisibility(int importerIndex, int assemblyNodeId, bool visible);
+
+  /**
+   * Recover the label to display for the provided node of the provided data assembly.
+   * Return a placeholder when the node does not provide any label.
+   */
+  static const char* GetNodeLabel(const vtkDataAssembly* assembly, int assemblyNodeId);
 
   ///@{
   /**

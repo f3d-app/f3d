@@ -1,0 +1,28 @@
+# StreamVersion 1.2
+
+# Enable scene hierarchy by pressing SHIFT+H
+KeyPressEvent 0 0 1 0 1 Shift_L 0
+KeyPressEvent 0 0 1 72 1 H 0
+CharEvent 0 0 1 72 1 H 0
+KeyReleaseEvent 0 0 1 72 1 H 0
+KeyReleaseEvent 0 0 0 0 1 Shift_L 0
+
+# Enable notifications by pressing CTRL+K
+KeyPressEvent 0 0 2 0 1 Control_L 0
+KeyPressEvent 0 0 2 11 1 k 0
+CharEvent 0 0 2 11 1 k 0
+KeyReleaseEvent 0 0 2 11 1 k 0
+KeyReleaseEvent 0 0 0 0 1 Control_L 0
+
+# Enable edges by pressing E
+KeyPressEvent 0 0 0 101 1 e 0
+CharEvent 0 0 0 101 1 e 0
+KeyReleaseEvent 0 0 0 101 1 e 0
+
+# Fade-in
+TimerEvent 0 0 0 101 1 e 0
+TimerEvent 0 0 0 101 1 e 0
+TimerEvent 0 0 0 101 1 e 0
+TimerEvent 0 0 0 101 1 e 0
+TimerEvent 0 0 0 101 1 e 0
+TimerEvent 0 0 0 101 1 e 0

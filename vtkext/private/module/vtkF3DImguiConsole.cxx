@@ -36,6 +36,7 @@ struct vtkF3DImguiConsole::Internals
   std::vector<std::string> CommandHistory;
   std::pair<std::string, int> LastInput; // Last input before navigating history
   int CommandHistoryIndexInv = -1;       // Current inverted index in command history navigation
+  bool ScrollToBottom = false;
 
   /**
    * Clear completions from the logs
@@ -116,7 +117,7 @@ struct vtkF3DImguiConsole::Internals
             {
               // Check if all candidates match the current character
               const char target = bestCandidate[matchLen];
-              allCandidatesMatches = std::all_of(candidates.begin(), candidates.end(),
+              allCandidatesMatches = std::ranges::all_of(candidates,
                 [matchLen, target](const std::string& s)
                 {
                   return s.size() > matchLen &&
@@ -151,10 +152,11 @@ struct vtkF3DImguiConsole::Internals
           // Add all candidates to the logs
           this->Logs.emplace_back(
             std::make_pair(Internals::LogType::Completion, "Possible matches:"));
-          std::transform(candidates.begin(), candidates.end(), std::back_inserter(this->Logs),
+          std::ranges::transform(candidates, std::back_inserter(this->Logs),
             [](const std::string& candidate)
             { return std::make_pair(Internals::LogType::Completion, candidate); });
         }
+        this->ScrollToBottom = true;
         break;
       }
       case ImGuiInputTextFlags_CallbackHistory:
@@ -333,6 +335,12 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
         }
       }
 
+      if (this->Pimpl->ScrollToBottom)
+      {
+        ImGui::SetScrollHereY(1.0f);
+        this->Pimpl->ScrollToBottom = false;
+      }
+
       if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
       {
         ImGui::SetScrollHereY(1.0f);
@@ -435,6 +443,12 @@ void vtkF3DImguiConsole::ShowBadge()
 
     ImGui::End();
   }
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DImguiConsole::IsBadgeVisible() const
+{
+  return this->Pimpl->NewError || this->Pimpl->NewWarning;
 }
 
 //----------------------------------------------------------------------------

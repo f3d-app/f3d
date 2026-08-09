@@ -18,12 +18,21 @@ list(APPEND pyf3dTests_list
      test_image_compare.py
      test_scene.py
      test_interactor_start.py
+     test_window.py
     )
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
   list(APPEND pyf3dTests_list
      test_scene_buffer.py
     )
+endif()
+
+if(F3D_MODULE_UI)
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251110)
+    list(APPEND pyf3dTests_list
+      test_scene_zero_copy.py
+      )
+  endif()
 endif()
 
 list(APPEND pyf3dTestsNoRender_list
@@ -40,6 +49,7 @@ foreach(test ${pyf3dTests_list})
     LABELS "libf3d;bindings;python"
     ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG>>"
     FAIL_REGULAR_EXPRESSION "[^X]FAILURES"
+    TIMEOUT 180
   )
   if (NOT F3D_TESTING_ENABLE_RENDERING_TESTS AND NOT ${test} IN_LIST pyf3dTestsNoRender_list)
     set_tests_properties(libf3d_bindings_py::${TName} PROPERTIES DISABLED ON)

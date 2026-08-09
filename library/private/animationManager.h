@@ -8,7 +8,6 @@
 
 #include <vtkDoubleArray.h>
 #include <vtkNew.h>
-#include <vtkProgressBarWidget.h>
 #include <vtkSmartPointer.h>
 
 #include <chrono>
@@ -62,6 +61,11 @@ public:
   void Initialize();
 
   /**
+   * Reset the animation manager to a no-animation state.
+   */
+  void Reset();
+
+  /**
    * Start/Stop playing the animation
    * Direction must always be equal to 1 (forward) or -1 (backward)
    */
@@ -76,7 +80,7 @@ public:
   void CycleAnimation();
 
   /**
-   * Return the animation name of a given animation indices, if any.
+   * Return the animation name of a given animation index, if any.
    *
    * Specific animation (0..availableAnimations): Returns the name of the animation at that index
    * Current animation (-1):
@@ -88,7 +92,7 @@ public:
    *
    * Can be called before initialization safely
    */
-  std::string GetAnimationName(int indices = -1);
+  std::string GetAnimationName(int index = -1);
 
   /**
    * Return all of the animation names, if any.
@@ -104,7 +108,7 @@ public:
    */
   int GetAnimationDirection() const
   {
-    return AnimationDirection;
+    return this->AnimationDirection;
   }
 
   /**
@@ -112,7 +116,15 @@ public:
    */
   bool IsPlaying() const
   {
-    return Playing;
+    return this->Playing;
+  }
+
+  /**
+   * Return the current animation time in seconds
+   */
+  double GetCurrentTime() const
+  {
+    return this->CurrentTime;
   }
 
   /**
@@ -132,7 +144,7 @@ public:
   bool LoadAtTime(double timeValue);
 
   /**
-   * Load animation at provided frmae value
+   * Load animation at provided frame value
    * When relative is false frame -1 is equal to last frame
    */
   void JumpToFrame(int frame, bool relative);
@@ -144,9 +156,21 @@ public:
   void JumpToKeyFrame(int keyframe, bool relative);
 
   /**
+   * Load animation at provided time value and render
+   * When relative is true, time is added to the current animation time
+   * When relative is false, a negative time is counted from the end of the animation
+   */
+  void JumpToTime(double timeValue, bool relative);
+
+  /**
    * Return a pair containing the current time range values
    */
   std::pair<double, double> GetTimeRange();
+
+  /**
+   * Return a vector containing current animation keyframe's times
+   */
+  std::vector<double> GetKeyFrames();
 
   /**
    * Get the number of available animations
@@ -167,6 +191,11 @@ private:
    * Return early if already prepared for the current subset of animation in the options
    */
   void PrepareForAnimationIndices();
+
+  /**
+   * Push the current animation's time range and name to the UI actor.
+   */
+  void PushAnimationProgress();
 
   /**
    * Internal setter for Autoplay.
@@ -202,8 +231,6 @@ private:
   // Dynamic options
   bool Autoplay = false;
   double SpeedFactor = 1.0;
-
-  vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;
 };
 }
 }

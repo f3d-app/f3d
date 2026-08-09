@@ -104,6 +104,8 @@ public:
   void ShowHDRISkybox(bool show);
   void ShowArmature(bool show);
   void ShowSceneHierarchy(bool show);
+  void ShowNotification(bool show);
+  void ShowBindings(bool show);
   ///@}
 
   using vtkOpenGLRenderer::SetBackground;
@@ -128,9 +130,15 @@ public:
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
   void SetGridColor(const std::vector<double>& color);
+  void SetGridReflection(const double strength);
   void SetAxesColor(const std::vector<double>& colorXAxis, const std::vector<double>& colorYAxis,
     const std::vector<double>& colorZAxis);
   ///@}
+
+  /**
+   * Set the backdrop color on the underlying UI Actor
+   */
+  void SetBackdropColor(const std::array<double, 3>& color);
 
   /**
    * Set the backdrop opacity
@@ -151,7 +159,6 @@ public:
   AntiAliasingMode GetAntiAliasingMode() const;
   void SetUseToneMappingPass(bool use);
   void SetDisplayDepth(bool use);
-  void SetDisplayDepthScalarColoring(bool use);
   void SetUseBlurBackground(bool use);
   void SetBlurCircleOfConfusionRadius(double radius);
   void SetRaytracingSamples(int samples);
@@ -342,6 +349,18 @@ public:
   void ShowScalarBar(bool show);
 
   /**
+   * Set the visibility of the normal glyphs actor.
+   * Normal glyphs actor displays arrows depicting the direction of vertex normals.
+   * It will only be shown if raytracing and Point Sprites rendering modes are disabled.
+   */
+  void SetUseNormalGlyphs(bool use);
+
+  /**
+   * Sets the GlyphScaleMultiplier
+   */
+  void SetNormalGlyphScaleMultiplier(double multiplier);
+
+  /**
    * Set the visibility of the point sprites actor.
    * It will only be shown if raytracing and volume are not enabled
    */
@@ -417,6 +436,11 @@ public:
    * Set checkerboard mode
    */
   void SetEnableCheckerBoard(bool enable);
+
+  /**
+   * Set unlit mode, ignore all lights in the scene including HDRI
+   */
+  void SetUnlit(const std::optional<bool>& enable);
 
   ///@{
   /**
@@ -510,10 +534,71 @@ public:
    */
   void SetUIDeltaTime(double time);
 
+  //@{
+  /**
+   * Set/Get the total application time in seconds
+   */
+  vtkSetMacro(TotalTime, double);
+  vtkGetMacro(TotalTime, double);
+  //@}
+
   /**
    * Set console badge enabled status
    */
   void SetConsoleBadgeEnabled(bool enabled);
+
+  /**
+   * Add notification info to deque
+   */
+  void AddNotification(
+    const std::string& desc, const std::string& value, const std::string& bind, double duration);
+
+  /**
+   * Get the grid actor's matrix
+   */
+  vtkMatrix4x4* GetGridMatrix() const;
+
+  /**
+   * Get screen-space scaling
+   * The value returned can be used to scale screen space methods like line width
+   * to keep a consistent size on screen when using SSAA anti-aliasing.
+   */
+  double GetScreenSpaceScaling() const;
+
+  /**
+   * Set the animation progress bar mode.
+   * `NONE` hides the bar, `DEFAULT` shows the bar alone, `ADVANCED` adds
+   * time/name labels around it.
+   */
+  void SetAnimationProgressMode(vtkF3DUIActor::AnimationProgressBarMode mode);
+
+  /**
+   * Set the time range, name and keyframe times of the current animation.
+   * Meant to be pushed when the loaded animation changes.
+   */
+  void SetAnimationProgress(const std::pair<double, double>& timeRange, const std::string& name,
+    const std::vector<double>& keyFrames);
+
+  /**
+   * Set the animation progress bar fill color
+   */
+  void SetAnimationProgressColor(const std::array<double, 3>& color);
+
+  /**
+   * Set the animation playback speed factor, for display only, shown next to the animation name
+   */
+  void SetAnimationSpeedFactor(double speedFactor);
+
+  /**
+   * Update the current animation time, for display only, meant to be pushed every tick during
+   * playback
+   */
+  void UpdateAnimationTime(double currentTime);
+
+  /**
+   * Get the DPI scale based on the current render window
+   */
+  double GetDPIScale();
 
 private:
   vtkF3DRenderer();
@@ -640,6 +725,16 @@ private:
   void ConfigurePointSprites();
 
   /**
+   * Configure Normal Glyphs for all actors
+   */
+  void ConfigureNormalGlyphs();
+
+  /**
+   * Updates the normal glyph scale aiming to keep a consistent screen size
+   */
+  void UpdateNormalGlyphsScale();
+
+  /**
    * Updates the axis widget size based on the window size
    */
   void UpdateAxisWidgetSize();
@@ -647,8 +742,11 @@ private:
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
   vtkSmartPointer<vtkCameraOrientationWidget> ModernAxisWidget;
   vtkSmartPointer<vtkCameraOrientationRepresentation> ModernAxisRepresentation;
-  vtkSmartPointer<vtkCallbackCommand> ModernAxisWidgetResizeCallback;
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
+  int ModernAxisBasePadding[2] = { 0, 0 };
+#endif
   double ModernAxisBackdropOpacity = 0.0;
+  double TotalTime = 0.0;
 
   // Does vtk version support GridAxesActor
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
@@ -707,7 +805,6 @@ private:
   bool UseSSAOPass = false;
   bool UseToneMappingPass = false;
   bool DisplayDepth = false;
-  bool DisplayDepthScalarColoring = false;
   bool UseBlurBackground = false;
   std::optional<bool> UseOrthographicProjection = false;
   bool InvertZoom = false;
@@ -722,6 +819,7 @@ private:
   std::optional<double> GridUnitSquare;
   int GridSubdivisions = 10;
   double GridColor[3] = { 0.0, 0.0, 0.0 };
+  double GridReflection = 0.0;
 
   double ColorAxisX[3] = { 0.0, 0.0, 0.0 };
   double ColorAxisY[3] = { 0.0, 0.0, 0.0 };
@@ -730,7 +828,6 @@ private:
   std::string HDRIFile;
   vtkSmartPointer<vtkImageReader2> HDRIReader;
   bool HasValidHDRIReader = false;
-  bool UseDefaultHDRI = false;
   std::string HDRIHash;
   bool HasValidHDRIHash = false;
   vtkSmartPointer<vtkTexture> HDRITexture;
@@ -768,6 +865,8 @@ private:
   bool VolumePropsAndMappersConfigured = false;
   bool ColoringConfigured = false;
 
+  bool NormalGlyphsConfigured = false;
+
   std::optional<double> Opacity;
   std::optional<double> Roughness;
   std::optional<double> Metallic;
@@ -799,6 +898,8 @@ private:
   std::optional<std::string> ArrayNameForColoring;
 
   bool ScalarBarVisible = false;
+  bool UseNormalGlyphs = false;
+  double NormalGlyphScaleMultiplier = 1.0;
   bool UsePointSprites = false;
   bool UseVolume = false;
   bool UseInverseOpacityFunction = false;
@@ -813,6 +914,8 @@ private:
   double PointSpritesSize = 10;
   bool PointSpritesAbsoluteScale = false;
   bool PointSpritesUseInstancing = false;
+
+  std::optional<bool> Unlit;
 };
 
 #endif

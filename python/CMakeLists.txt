@@ -14,7 +14,7 @@ include(GNUInstallDirs)
 include(f3dPython)
 
 find_package(Python 3.10 COMPONENTS Interpreter Development)
-find_package(pybind11 2.9.2 REQUIRED)
+find_package(pybind11 3.0.0 REQUIRED)
 
 pybind11_add_module(pyf3d MODULE F3DPythonBindings.cxx)
 
@@ -36,7 +36,7 @@ set(f3d_binary_dir "${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG
 set(f3d_module_dir "${f3d_binary_dir}/${f3d_python_package_name}")
 
 set_target_properties(pyf3d PROPERTIES
-  CXX_STANDARD 17
+  CXX_STANDARD 20
   CXX_VISIBILITY_PRESET hidden
   LIBRARY_OUTPUT_DIRECTORY "${f3d_module_dir}"
   )

@@ -47,8 +47,8 @@ std::pair<bool, std::string> mesh_t::isValid() const
     return { false, std::move(err) };
   }
 
-  auto it = std::find_if(this->face_indices.cbegin(), this->face_indices.cend(),
-    [=](unsigned int idx) { return idx >= nbPoints; });
+  auto it =
+    std::ranges::find_if(this->face_indices, [=](unsigned int idx) { return idx >= nbPoints; });
   if (it != this->face_indices.cend())
   {
     std::string err = "Face vertex at index ";

@@ -34,7 +34,10 @@ def main(argv: list[str] | None = None):
 
     if args.timeout:
         # For testing purposes only, exit after `timeout` seconds
-        eng.interactor.start(args.timeout, eng.interactor.stop)
+        eng.interactor.set_event_loop_user_callback(
+            lambda _state: eng.interactor.request_stop()
+        )
+        eng.interactor.start(args.timeout)
     else:
         eng.interactor.start()
 

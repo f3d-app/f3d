@@ -2,6 +2,18 @@
   "version": 3,
   "configurePresets": [
     {
+      "name": "dev",
+      "displayName": "Developer config",
+      "description": "Developer build in debug mode and with testing activated",
+      "cacheVariables": {
+        "BUILD_TESTING": "ON",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "F3D_STRICT_BUILD": "ON",
+        "F3D_TESTING_DISABLE_CATCH_ALL": "ON",
+        "F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS": "ON"
+      }
+    },
+    {
       "name": "vcpkg",
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {

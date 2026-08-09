@@ -1,4 +1,5 @@
 #include "PseudoUnitTest.h"
+#include "TestSDKHelpers.h"
 
 #include <camera.h>
 #include <engine.h>
@@ -6,9 +7,12 @@
 #include <options.h>
 #include <window.h>
 
-int TestSDKInteractorCommand([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
+#include <filesystem>
+
+int TestSDKInteractorCommand([[maybe_unused]] int argc, char* argv[])
 {
-  f3d::engine eng = f3d::engine::create(true);
+  std::string renderingBackend = std::string(argv[4]);
+  f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::options& options = eng.getOptions();
   f3d::interactor& inter = eng.getInteractor();
 
@@ -36,6 +40,16 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, [[maybe_unused]] char* a
   // Test toggle
   inter.triggerCommand("toggle model.scivis.cells");
   test("triggerCommand toggle", options.model.scivis.cells == true);
+
+  // Test increase/decrease
+  inter.triggerCommand("increase render.light.intensity");
+  inter.triggerCommand("increase render.light.intensity");
+  inter.triggerCommand("decrease render.light.intensity");
+  test("triggerCommand increase/decrease", options.render.light.intensity, 1.02);
+
+  // Test cycle
+  inter.triggerCommand("cycle render.effect.blending.mode");
+  test("triggerCommand cycle", options.render.effect.blending.mode == "ddp");
 
   // Test alias command
   inter.triggerCommand("alias axis_on set ui.axis on");
@@ -65,14 +79,6 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, [[maybe_unused]] char* a
   inter.removeCommand("test_toggle");
   test("removeCommand", inter.triggerCommand("test_toggle") == false);
 
-  // Test cycle_interactor_style
-  inter.triggerCommand("cycle_interactor_style");
-  test("cycle_interactor_style to trackball", options.interactor.style == "trackball");
-  inter.triggerCommand("cycle_interactor_style");
-  test("cycle_interactor_style to 2d", options.interactor.style == "2d");
-  inter.triggerCommand("cycle_interactor_style");
-  test("cycle_interactor_style to default", options.interactor.style == "default");
-
   // Test camera commands are no-op in 2D mode
   options.interactor.style = "2d";
   f3d::camera& cam = eng.getWindow().getCamera();
@@ -98,6 +104,41 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, [[maybe_unused]] char* a
   // Coverage exception handling
   test("triggerCommand exception handling",
     inter.triggerCommand(R"(print "render.hdri.file)") == false);
+
+  // Test save_statefile / load_statefile libf3d commands (file based, deterministic)
+  const std::string statePath = std::string(argv[2]) + "interactor_command_statefile.json";
+  options.model.scivis.cells = true;
+  test("save_statefile command", inter.triggerCommand("save_statefile " + statePath) == true);
+  test("save_statefile wrote a file", std::filesystem::exists(statePath), true);
+  options.model.scivis.cells = false;
+  test("load_statefile command", inter.triggerCommand("load_statefile " + statePath) == true);
+  test("load_statefile restored option", options.model.scivis.cells == true);
+  test("save_statefile invalid args", inter.triggerCommand("save_statefile") == false);
+  test("load_statefile invalid args", inter.triggerCommand("load_statefile one two") == false);
+  // The statefile_exception is caught and logged, the command still returns true
+  test("save_statefile to unwritable path",
+    inter.triggerCommand("save_statefile " + std::string(argv[2]) + "no_such_dir/state.json") ==
+      true);
+  test("load_statefile from missing file",
+    inter.triggerCommand("load_statefile " + std::string(argv[2]) + "no_such_statefile.json") ==
+      true);
+
+#if F3D_MODULE_CLIP
+  // Clipboard commands: round-trip through the system clipboard. When the clipboard is unavailable
+  // the statefile_exception is caught and logged, the command still returns true.
+  options.model.scivis.cells = true;
+  test("save_statefile_to_clipboard command",
+    inter.triggerCommand("save_statefile_to_clipboard") == true);
+  test("save_statefile_to_clipboard invalid args",
+    inter.triggerCommand("save_statefile_to_clipboard extra") == false);
+  test("load_statefile_from_clipboard command",
+    inter.triggerCommand("load_statefile_from_clipboard") == true);
+  test("load_statefile_from_clipboard invalid args",
+    inter.triggerCommand("load_statefile_from_clipboard extra") == false);
+#endif
+
+  // Restore the option to the state the rest of the test expects
+  options.model.scivis.cells = false;
 
   // remove all commands
   for (const std::string& action : inter.getCommandActions())

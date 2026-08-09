@@ -1,0 +1,19 @@
+# StreamVersion 1.2
+
+# Enable scene hierarchy by pressing SHIFT+H
+KeyPressEvent 117 85 0 0 1 Shift_L 0
+CharEvent 117 85 0 0 1 Shift_L 0
+KeyPressEvent 117 85 1 72 1 H 0
+CharEvent 117 85 1 72 1 H 0
+KeyReleaseEvent 117 85 1 72 1 H 0
+KeyReleaseEvent 117 94 1 0 1 Shift_L 0
+
+# Scroll to bottom
+MouseMoveEvent 121 103 0 0 0 Shift_L 0
+TimerEvent 121 103 0 0 0 Shift_L 0
+MouseWheelBackwardEvent 121 103 0 0 0 Shift_L 0
+MouseWheelBackwardEvent 121 102 0 0 1 Shift_L 0
+MouseWheelBackwardEvent 121 101 0 0 0 Shift_L 0
+MouseWheelBackwardEvent 121 101 0 0 1 Shift_L 0
+MouseWheelBackwardEvent 121 101 0 0 0 Shift_L 0
+MouseMoveEvent 10 44 0 0 0 Shift_L 0

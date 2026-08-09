@@ -5,6 +5,7 @@
 #include "export.h"
 #include "log.h"
 #include "options.h"
+#include "utils.h"
 #include "window.h"
 
 /// @cond
@@ -56,6 +57,14 @@ struct interaction_bind_t
    * Create and return an interaction bind from provided string
    */
   [[nodiscard]] static interaction_bind_t parse(std::string_view str);
+};
+
+/**
+ * State of the interactor that can be used in the user callback of playInteraction and start.
+ */
+struct interactor_state_t
+{
+  double animationTime = 0.0;
 };
 
 /**
@@ -176,11 +185,13 @@ public:
    * ANY modifier interactions will only be triggered if no other interaction bind with modifier
    * is found.
    *
+   * If notify is true, a notification is triggered when pressing the binding
+   *
    * Adding commands for an existing bind will throw a interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
     std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER) = 0;
+    BindingType type = BindingType::OTHER, bool notify = true) = 0;
 
   /**
    * See addBinding
@@ -191,17 +202,17 @@ public:
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::string command,
     std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER) = 0;
+    BindingType type = BindingType::OTHER, bool notify = true) = 0;
 
   /**
    * Convenience initializer list signature for add binding method
    */
   interactor& addBinding(const interaction_bind_t& bind, std::initializer_list<std::string> list,
     std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER)
+    BindingType type = BindingType::OTHER, bool notify = true)
   {
     return this->addBinding(bind, std::vector<std::string>(list), std::move(group),
-      std::move(documentationCallback), type);
+      std::move(documentationCallback), type, notify);
   }
 
   /**
@@ -372,13 +383,27 @@ public:
   virtual interactor& triggerEventLoop(double deltaTime) = 0;
 
   /**
+   * Trigger a single text line notification with text desc for duration seconds.
+   */
+  virtual interactor& triggerNotification(
+    std::string desc, std::string value = "", double duration = 3.f) = 0;
+
+  /**
+   * Set the notification callback, which is called when a notification is triggered.
+   * The callback should return true if the internal notification should be displayed, false
+   * otherwise. Arguments are the description, value, bindings, and duration of the notification. If
+   * the callback is set to nullptr, standard notifications will be displayed.
+   */
+  virtual interactor& setNotificationCallback(
+    std::function<bool(const std::string&, const std::string&, const std::string&, double)>
+      callback) = 0;
+
+  /**
    * Play a VTK interaction file.
    * Provided file path is used as is and file existence will be checked.
-   * If the event loop is not already running, it will be triggered every deltaTime in seconds,
-   * and userCallBack will be called at the start of the event loop.
+   * If the event loop is not already running, it will be triggered every deltaTime in seconds.
    */
-  virtual bool playInteraction(const std::filesystem::path& file, double deltaTime = 1.0 / 30,
-    std::function<void()> userCallBack = nullptr) = 0;
+  virtual bool playInteraction(const std::filesystem::path& file, double deltaTime = 1.0 / 30) = 0;
 
   /**
    * Start interaction and record it all in a VTK interaction file.
@@ -387,13 +412,18 @@ public:
   virtual bool recordInteraction(const std::filesystem::path& file) = 0;
 
   /**
+   * Set the user callback of the event loop, which is called right after the rendering.
+   */
+  virtual interactor& setEventLoopUserCallback(
+    std::function<void(interactor_state_t)> userCallback) = 0;
+
+  /**
    * Start the interactor event loop.
-   * The event loop will be triggered every deltaTime in seconds, and userCallBack will be called at
-   * the start of the event loop, deltaTime should be strictly positive.
+   * The event loop will be triggered every deltaTime in seconds.
+   * deltaTime should be strictly positive.
    * Safe to call multiple times but will log an info in that case.
    */
-  virtual interactor& start(
-    double deltaTime = 1.0 / 30, std::function<void()> userCallBack = nullptr) = 0;
+  virtual interactor& start(double deltaTime = 1.0 / 30) = 0;
 
   /**
    * Stop the interactor.
@@ -479,12 +509,24 @@ inline bool interaction_bind_t::operator==(const interaction_bind_t& bind) const
 //----------------------------------------------------------------------------
 inline std::string interaction_bind_t::format() const
 {
+  std::string ctrlMod = "Ctrl+";
+  std::string ctrlShiftMod = "Ctrl+Shift+";
+
+#ifdef __APPLE__
+  const std::optional<std::string> forceCtrl = f3d::utils::getEnv("F3D_TEST_APPLE_FORCE_CTRL");
+  if (!forceCtrl.has_value() || forceCtrl.value().empty() || forceCtrl != "true")
+  {
+    ctrlMod = "Cmd+";
+    ctrlShiftMod = "Cmd+Shift+";
+  }
+#endif
+
   switch (this->mod)
   {
     case ModifierKeys::CTRL_SHIFT:
-      return "Ctrl+Shift+" + this->inter;
+      return ctrlShiftMod + this->inter;
     case ModifierKeys::CTRL:
-      return "Ctrl+" + this->inter;
+      return ctrlMod + this->inter;
     case ModifierKeys::SHIFT:
       return "Shift+" + this->inter;
     case ModifierKeys::ANY:

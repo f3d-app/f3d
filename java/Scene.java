@@ -4,6 +4,21 @@ import java.util.List;
 
 public class Scene {
 
+    /** Thrown when a file or mesh cannot be loaded into the scene. */
+    public static class LoadFailureException extends F3DException {
+        public LoadFailureException(String message) { super(message); }
+    }
+
+    /** Thrown when a light operation fails (e.g. invalid index). */
+    public static class LightException extends F3DException {
+        public LightException(String message) { super(message); }
+    }
+
+    /** Thrown when a scene hierarchy node operation fails (e.g. invalid index). */
+    public static class NodeException extends F3DException {
+        public NodeException(String message) { super(message); }
+    }
+
     public Scene(long nativeAddress) {
         mNativeAddress = nativeAddress;
     }
@@ -44,7 +59,7 @@ public class Scene {
      *
      * @param mesh mesh to add
      * @return this scene for method chaining
-     * 
+     *
      * @deprecated use `add(Types.Mesh mesh)` instead.
      * This function will be private in 4.0
      */
@@ -99,6 +114,13 @@ public class Scene {
     public native Scene clear();
 
     /**
+     * Get the list of files currently added to the scene.
+     *
+     * @return list of added file paths
+     */
+    public native List<String> getAddedFiles();
+
+    /**
      * Add a light based on a light state.
      *
      * @param lightState light state
@@ -146,6 +168,23 @@ public class Scene {
     public native Scene removeAllLights();
 
     /**
+     * Get the scene hierarchy of all added files, in depth-first pre-order, so that a parent
+     * node always precedes its children.
+     *
+     * @return the list of scene hierarchy nodes
+     */
+    public native List<Types.NodeState> getSceneHierarchy();
+
+    /**
+     * Set the visibility of a scene hierarchy node and of all the nodes in its subtree.
+     *
+     * @param nodeId index of the node
+     * @param visible visibility to set
+     * @return this scene for method chaining
+     */
+    public native Scene setNodeVisibility(int nodeId, boolean visible);
+
+    /**
      * Check if a file path is supported by the scene.
      *
      * @param filePath file path to check
@@ -169,6 +208,13 @@ public class Scene {
     public native double[] animationTimeRange();
 
     /**
+     * Get animation keyframe's time of currently added files.
+     *
+     * @return list of double
+     */
+    public native double[] getAnimationKeyFrames();
+
+    /**
      * Return the number of animations available in the currently loaded files.
      *
      * @return number of available animations
@@ -186,11 +232,12 @@ public class Scene {
     }
 
     /**
-     * Get the animation name of a given animation indices, if any.
+     * Get the animation name of a given animation index, if any.
      *
-     * @return animation name or string error 
+     * @param index animation index, -1 for current animation
+     * @return animation name or string error
      */
-    public native String getAnimationName(int indices);
+    public native String getAnimationName(int index);
 
     /**
      * Get all of the animation names, if any.

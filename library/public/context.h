@@ -66,10 +66,9 @@ public:
   [[nodiscard]] static function osmesa();
 
   /**
-   * Create a context function from a library name and a function name.
-   * The library name must be specified without its prefix and extension.
-   * For example, `getSymbol("EGL", "eglGetProcAddress")` looks for the symbol
-   * `eglGetProcAddress` in the library `libEGL.so` on Linux.
+   * Create a context function from a library filename and a function name.
+   * The library name must be specified with its prefix and extension.
+   * It can be a full path or a library name that can be found in the system library path.
    * Throw a loading_exception if it fails to find the library or a symbol_exception
    * if the lib does not contains the expected symbol.
    */

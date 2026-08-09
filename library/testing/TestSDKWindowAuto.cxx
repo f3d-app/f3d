@@ -15,19 +15,29 @@ int TestSDKWindowAuto([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   f3d::window& win = eng.getWindow();
   win.setWindowName("Test").setSize(300, 300).setPosition(100, 100);
 
+  win.render();
+
   test("window width", win.getWidth(), 300);
   test("window height", win.getHeight(), 300);
+  const auto [width, height] = win.getSize();
+  test("window size", width == 300 && height == 300);
+  // The window position depends on a window manager (VTK reports (0, 0) in headless CI), so verify
+  // the getter is stable rather than asserting the value set above.
+  const auto [posX, posY] = win.getPosition();
+  const auto [posX2, posY2] = win.getPosition();
+  test("window position is stable", posX == posX2 && posY == posY2);
+  test("window left", win.getLeft(), posX);
+  test("window top", win.getTop(), posY);
   test("window type", win.getType() != f3d::window::Type::UNKNOWN);
   test("window offscreen", win.isOffscreen());
+  test("window dpi", win.getDPIScale() >= 1.0);
 
   f3d::options& options = eng.getOptions();
   options.render.background.color = { 0.8, 0.2, 0.9 };
 
-  // XXX: Use a higher threshold as background difference can be strong with older versions of VTK
-  // This can be removed once VTK 9.3 support is removed
   test("render with auto window",
-    TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
-      "TestSDKWindowStandard", 0.12));
+    TestSDKHelpers::RenderTest(
+      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKWindowStandard"));
 
   return test.result();
 }

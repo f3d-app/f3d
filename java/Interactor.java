@@ -4,6 +4,26 @@ import java.util.List;
 
 public class Interactor {
 
+    /** Thrown when adding a command or binding that already exists. */
+    public static class AlreadyExistsException extends F3DException {
+        public AlreadyExistsException(String message) { super(message); }
+    }
+
+    /** Thrown when removing a command or binding that does not exist. */
+    public static class DoesNotExistException extends F3DException {
+        public DoesNotExistException(String message) { super(message); }
+    }
+
+    /** Thrown when a triggered command fails at runtime. */
+    public static class CommandRuntimeException extends F3DException {
+        public CommandRuntimeException(String message) { super(message); }
+    }
+
+    /** Thrown when a command is invoked with invalid arguments. */
+    public static class InvalidArgsException extends F3DException {
+        public InvalidArgsException(String message) { super(message); }
+    }
+
     private long mNativeAddress;
 
     public enum ModifierKeys {
@@ -149,6 +169,23 @@ public class Interactor {
         }
     }
 
+    public static class InteractorState {
+        public double animationTime;
+    }
+
+    public interface EventLoopCallback {
+        void execute(InteractorState state);
+    }
+
+    /**
+     * Notification callback.
+     * Return false to prevent standard notification from being displayed, true to allow it.
+     * Arguments are the description, value, bindings, and duration of the notification.
+     */
+    public interface NotificationCallback {
+        boolean execute(String desc, String value, String bind, double duration);
+    }
+
     public interface CommandCallback {
         void execute(List<String> args);
     }
@@ -221,9 +258,10 @@ public class Interactor {
      * @param commands list of commands to trigger
      * @param group optional group name for organization
      * @param type optional binding type
+     * @param notify notify when the binding is triggered
      * @return this interactor for method chaining
      */
-    private native Interactor addBindingCommands(InteractionBind bind, List<String> commands, String group, BindingType type);
+    private native Interactor addBindingCommands(InteractionBind bind, List<String> commands, String group, BindingType type, boolean notify);
 
     /**
      * Add binding to trigger commands for a specific bind.
@@ -232,10 +270,11 @@ public class Interactor {
      * @param commands list of commands to trigger
      * @param group optional group name for organization
      * @param type optional binding type
+     * @param notify notify when the binding is triggered
      * @return this interactor for method chaining
      */
-    public Interactor addBinding(InteractionBind bind, List<String> commands, String group, BindingType type) {
-        return addBindingCommands(bind, commands, group, type);
+    public Interactor addBinding(InteractionBind bind, List<String> commands, String group, BindingType type, boolean notify) {
+        return addBindingCommands(bind, commands, group, type, notify);
     }
 
     /**
@@ -246,7 +285,7 @@ public class Interactor {
      * @return this interactor for method chaining
      */
     public Interactor addBinding(InteractionBind bind, List<String> commands) {
-        return addBindingCommands(bind, commands, "", BindingType.OTHER);
+        return addBindingCommands(bind, commands, "", BindingType.OTHER, true);
     }
 
     /**
@@ -256,9 +295,10 @@ public class Interactor {
      * @param command command to trigger
      * @param group optional group name for organization
      * @param type optional binding type
+     * @param notify notify when the binding is triggered
      * @return this interactor for method chaining
      */
-    private native Interactor addBindingCommand(InteractionBind bind, String command, String group, BindingType type);
+    private native Interactor addBindingCommand(InteractionBind bind, String command, String group, BindingType type, boolean notify);
 
     /**
      * Add binding to trigger a single command for a specific bind.
@@ -267,10 +307,11 @@ public class Interactor {
      * @param command command to trigger
      * @param group optional group name for organization
      * @param type optional binding type
+     * @param notify notify when the binding is triggered
      * @return this interactor for method chaining
      */
-    public Interactor addBinding(InteractionBind bind, String command, String group, BindingType type) {
-        return addBindingCommand(bind, command, group, type);
+    public Interactor addBinding(InteractionBind bind, String command, String group, BindingType type, boolean notify) {
+        return addBindingCommand(bind, command, group, type, notify);
     }
 
     /**
@@ -281,7 +322,7 @@ public class Interactor {
      * @return this interactor for method chaining
      */
     public Interactor addBinding(InteractionBind bind, String command) {
-        return addBindingCommand(bind, command, "", BindingType.OTHER);
+        return addBindingCommand(bind, command, "", BindingType.OTHER, true);
     }
 
     /**
@@ -459,6 +500,19 @@ public class Interactor {
     public native Interactor triggerEventLoop(double deltaTime);
 
     /**
+     * Set the event loop user callback called automatically on each event loop iteration.
+     *
+     * @param callback callback to be called on each event loop iteration
+     * @return this interactor for method chaining
+     */
+    public native Interactor setEventLoopUserCallback(EventLoopCallback callback);
+
+    /**
+     * Set notification callback. If null, only standard notifications will be displayed.
+     */
+    public native Interactor setNotificationCallback(NotificationCallback callback);
+
+    /**
      * Play a VTK interaction file.
      *
      * @param file path to interaction file
@@ -503,28 +557,6 @@ public class Interactor {
     }
 
     /**
-     * Start the interactor event loop with a callback.
-     * The callback is called on each event loop iteration.
-     *
-     * @param deltaTime time delta in seconds (must be positive)
-     * @param callback callback to execute on each iteration
-     * @return this interactor for method chaining
-     */
-    private native Interactor startWithCallback(double deltaTime, Runnable callback);
-
-    /**
-     * Start the interactor event loop with a callback.
-     * The callback is called on each event loop iteration.
-     *
-     * @param deltaTime time delta in seconds (must be positive)
-     * @param callback callback to execute on each iteration
-     * @return this interactor for method chaining
-     */
-    public Interactor start(double deltaTime, Runnable callback) {
-        return startWithCallback(deltaTime, callback);
-    }
-
-    /**
      * Stop the interactor.
      *
      * @return this interactor for method chaining
@@ -544,4 +576,32 @@ public class Interactor {
      * @return this interactor for method chaining
      */
     public native Interactor requestStop();
+
+    /**
+     * Trigger a single text line notification with text desc for duration seconds.
+     *
+     * @param desc Text description
+     * @param value Text value
+     * @param duration Duration of notification in seconds
+     */
+    public native Interactor triggerNotification(String desc, String value, double duration);
+
+    /**
+     * Trigger a notification with default duration.
+     *
+     * @param desc Text description
+     * @param value Text value
+     */
+    public Interactor triggerNotification(String desc, String value) {
+        return triggerNotification(desc, value, 3.0);
+    }
+
+    /**
+     * Trigger a notification with default value and duration.
+     *
+     * @param desc Text description
+     */
+    public Interactor triggerNotification(String desc) {
+        return triggerNotification(desc, "");
+    }
 }

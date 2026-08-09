@@ -9,6 +9,8 @@
 namespace
 {
 std::map<std::string, jobject> g_commandCallbacks;
+jobject g_eventLoopCallback = nullptr;
+jobject g_notificationCallback = nullptr;
 JavaVM* g_jvm = nullptr;
 
 f3d::interactor& GetInteractor(JNIEnv* env, jobject self)
@@ -166,7 +168,14 @@ extern "C"
       g_jvm->DetachCurrentThread();
     };
 
-    GetInteractor(env, self).addCommand(actionCpp, cppCallback);
+    try
+    {
+      GetInteractor(env, self).addCommand(actionCpp, cppCallback);
+    }
+    catch (const f3d::interactor::already_exists_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Interactor$AlreadyExistsException", e.what());
+    }
     return self;
   }
 
@@ -196,7 +205,19 @@ extern "C"
     JNIEnv* env, jobject self, jstring command, jboolean keepComments)
   {
     const char* commandStr = env->GetStringUTFChars(command, nullptr);
-    bool result = GetInteractor(env, self).triggerCommand(commandStr, keepComments);
+    bool result = false;
+    try
+    {
+      result = GetInteractor(env, self).triggerCommand(commandStr, keepComments);
+    }
+    catch (const f3d::interactor::command_runtime_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Interactor$CommandRuntimeException", e.what());
+    }
+    catch (const f3d::interactor::invalid_args_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Interactor$InvalidArgsException", e.what());
+    }
     env->ReleaseStringUTFChars(command, commandStr);
     return result;
   }
@@ -207,8 +228,8 @@ extern "C"
     return self;
   }
 
-  JNIEXPORT jobject JAVA_BIND(Interactor, addBindingCommands)(
-    JNIEnv* env, jobject self, jobject bind, jobject commands, jstring group, jobject type)
+  JNIEXPORT jobject JAVA_BIND(Interactor, addBindingCommands)(JNIEnv* env, jobject self,
+    jobject bind, jobject commands, jstring group, jobject type, jboolean notify)
   {
     f3d::interaction_bind_t nativeBind = JavaBindToNative(env, bind);
 
@@ -252,12 +273,20 @@ extern "C"
         break;
     }
 
-    GetInteractor(env, self).addBinding(nativeBind, commandsVec, groupCpp, nullptr, nativeType);
+    try
+    {
+      GetInteractor(env, self).addBinding(
+        nativeBind, commandsVec, groupCpp, nullptr, nativeType, notify);
+    }
+    catch (const f3d::interactor::already_exists_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Interactor$AlreadyExistsException", e.what());
+    }
     return self;
   }
 
-  JNIEXPORT jobject JAVA_BIND(Interactor, addBindingCommand)(
-    JNIEnv* env, jobject self, jobject bind, jstring command, jstring group, jobject type)
+  JNIEXPORT jobject JAVA_BIND(Interactor, addBindingCommand)(JNIEnv* env, jobject self,
+    jobject bind, jstring command, jstring group, jobject type, jboolean notify)
   {
     f3d::interaction_bind_t nativeBind = JavaBindToNative(env, bind);
 
@@ -291,14 +320,29 @@ extern "C"
         break;
     }
 
-    GetInteractor(env, self).addBinding(nativeBind, commandCpp, groupCpp, nullptr, nativeType);
+    try
+    {
+      GetInteractor(env, self).addBinding(
+        nativeBind, commandCpp, groupCpp, nullptr, nativeType, notify);
+    }
+    catch (const f3d::interactor::already_exists_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Interactor$AlreadyExistsException", e.what());
+    }
     return self;
   }
 
   JNIEXPORT jobject JAVA_BIND(Interactor, removeBinding)(JNIEnv* env, jobject self, jobject bind)
   {
     f3d::interaction_bind_t nativeBind = JavaBindToNative(env, bind);
-    GetInteractor(env, self).removeBinding(nativeBind);
+    try
+    {
+      GetInteractor(env, self).removeBinding(nativeBind);
+    }
+    catch (const f3d::interactor::does_not_exists_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Interactor$DoesNotExistException", e.what());
+    }
     return self;
   }
 
@@ -601,6 +645,54 @@ extern "C"
     return self;
   }
 
+  JNIEXPORT jobject JAVA_BIND(Interactor, setEventLoopUserCallback)(
+    JNIEnv* env, jobject self, jobject callback)
+  {
+    if (g_eventLoopCallback != nullptr)
+    {
+      env->DeleteGlobalRef(g_eventLoopCallback);
+      g_eventLoopCallback = nullptr;
+    }
+
+    if (callback == nullptr)
+    {
+      GetInteractor(env, self).setEventLoopUserCallback(nullptr);
+      return self;
+    }
+
+    g_eventLoopCallback = env->NewGlobalRef(callback);
+
+    GetInteractor(env, self).setEventLoopUserCallback(
+      [](f3d::interactor_state_t state)
+      {
+        JNIEnv* env = nullptr;
+#ifdef __ANDROID__
+        if (g_jvm->AttachCurrentThread(&env, nullptr) != JNI_OK)
+#else
+        if (g_jvm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) != JNI_OK)
+#endif
+        {
+          return;
+        }
+
+        jclass callbackClass = env->GetObjectClass(g_eventLoopCallback);
+        jmethodID executeMethod =
+          env->GetMethodID(callbackClass, "execute", "(Lapp/f3d/F3D/Interactor$InteractorState;)V");
+
+        jclass stateClass = env->FindClass("app/f3d/F3D/Interactor$InteractorState");
+        jmethodID stateConstructor = env->GetMethodID(stateClass, "<init>", "()V");
+        jobject stateObj = env->NewObject(stateClass, stateConstructor);
+        jfieldID animationTimeField = env->GetFieldID(stateClass, "animationTime", "D");
+        env->SetDoubleField(stateObj, animationTimeField, state.animationTime);
+
+        env->CallVoidMethod(g_eventLoopCallback, executeMethod, stateObj);
+
+        env->DeleteLocalRef(stateObj);
+        g_jvm->DetachCurrentThread();
+      });
+    return self;
+  }
+
   JNIEXPORT jboolean JAVA_BIND(Interactor, playInteraction)(
     JNIEnv* env, jobject self, jstring file, jdouble deltaTime)
   {
@@ -625,34 +717,6 @@ extern "C"
     return self;
   }
 
-  JNIEXPORT jobject JAVA_BIND(Interactor, startWithCallback)(
-    JNIEnv* env, jobject self, jdouble deltaTime, jobject callback)
-  {
-    jobject globalCallback = env->NewGlobalRef(callback);
-
-    GetInteractor(env, self).start(deltaTime,
-      [globalCallback]()
-      {
-        JNIEnv* env = nullptr;
-#ifdef __ANDROID__
-        if (g_jvm->AttachCurrentThread(&env, nullptr) != JNI_OK)
-#else
-        if (g_jvm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) != JNI_OK)
-#endif
-        {
-          return;
-        }
-
-        jclass runnableClass = env->GetObjectClass(globalCallback);
-        jmethodID runMethod = env->GetMethodID(runnableClass, "run", "()V");
-        env->CallVoidMethod(globalCallback, runMethod);
-
-        env->DeleteGlobalRef(globalCallback);
-        g_jvm->DetachCurrentThread();
-      });
-    return self;
-  }
-
   JNIEXPORT jobject JAVA_BIND(Interactor, stop)(JNIEnv* env, jobject self)
   {
     GetInteractor(env, self).stop();
@@ -668,6 +732,75 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Interactor, requestStop)(JNIEnv* env, jobject self)
   {
     GetInteractor(env, self).requestStop();
+    return self;
+  }
+
+  JNIEXPORT jobject JAVA_BIND(Interactor, triggerNotification)(
+    JNIEnv* env, jobject self, jstring desc, jstring value, jdouble duration)
+  {
+    const char* descStr = env->GetStringUTFChars(desc, nullptr);
+    std::string descCpp = descStr;
+    env->ReleaseStringUTFChars(desc, descStr);
+
+    const char* valueStr = env->GetStringUTFChars(value, nullptr);
+    std::string valueCpp = valueStr;
+    env->ReleaseStringUTFChars(value, valueStr);
+
+    GetInteractor(env, self).triggerNotification(valueCpp, valueCpp, duration);
+    return self;
+  }
+
+  JNIEXPORT jobject JAVA_BIND(Interactor, setNotificationCallback)(
+    JNIEnv* env, jobject self, jobject callback)
+  {
+    if (g_notificationCallback != nullptr)
+    {
+      env->DeleteGlobalRef(g_notificationCallback);
+      g_notificationCallback = nullptr;
+    }
+
+    if (callback == nullptr)
+    {
+      GetInteractor(env, self).setNotificationCallback(nullptr);
+      return self;
+    }
+
+    g_notificationCallback = env->NewGlobalRef(callback);
+
+    GetInteractor(env, self).setNotificationCallback(
+      [](const std::string& desc, const std::string& value, const std::string& bind,
+        double duration) -> bool
+      {
+        JNIEnv* env = nullptr;
+#ifdef __ANDROID__
+        if (g_jvm->AttachCurrentThread(&env, nullptr) != JNI_OK)
+#else
+        if (g_jvm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) != JNI_OK)
+#endif
+        {
+          return true;
+        }
+
+        jclass callbackClass = env->GetObjectClass(g_notificationCallback);
+        jmethodID callMethod = env->GetMethodID(
+          callbackClass, "execute", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;D)Z");
+
+        jstring jdesc = env->NewStringUTF(desc.c_str());
+        jstring jvalue = env->NewStringUTF(value.c_str());
+        jstring jbind = env->NewStringUTF(bind.c_str());
+
+        jboolean result = env->CallBooleanMethod(
+          g_notificationCallback, callMethod, jdesc, jvalue, jbind, duration);
+
+        env->DeleteLocalRef(jdesc);
+        env->DeleteLocalRef(jvalue);
+        env->DeleteLocalRef(jbind);
+
+        g_jvm->DetachCurrentThread();
+
+        return result == JNI_TRUE;
+      });
+
     return self;
   }
 }

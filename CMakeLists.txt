@@ -30,8 +30,8 @@ include(f3dVersion)
 
 # Handle F3D_VERSION
 set(F3D_MAJOR_VERSION 3)
-set(F3D_MINOR_VERSION 4)
-set(F3D_PATCH_VERSION 1)
+set(F3D_MINOR_VERSION 5)
+set(F3D_PATCH_VERSION 0)
 set(F3D_VERSION ${F3D_MAJOR_VERSION}.${F3D_MINOR_VERSION}.${F3D_PATCH_VERSION})
 
 set(F3D_PATCH_VERSION_EXTRA "")
@@ -55,7 +55,7 @@ mark_as_advanced(F3D_EXCLUDE_DEPRECATED)
 # VTK dependency
 # Optional components should list VTK modules
 # needed by plugins and optional modules
-find_package(VTK 9.3.0 REQUIRED
+find_package(VTK 9.4.0 REQUIRED
   COMPONENTS
     CommonCore
     CommonDataModel
@@ -84,13 +84,17 @@ find_package(VTK 9.3.0 REQUIRED
     IOHDF
     IONetCDF
     IOOpenVDB
+    IOPDAL
     RenderingGridAxes
     RenderingRayTracing)
 message(STATUS "VTK ${VTK_VERSION} found")
 
-if(VTK_VERSION VERSION_LESS 9.3.20240914)
-  # Not optional before
-  find_package(VTK REQUIRED COMPONENTS opengl)
+# define F3D_USE_GLES accordingly
+# Before VTK_OPENGL_USE_GLES was exposed (VTK 9.7.20260709), we could use GLES on Android and Emscripten only.
+if(VTK_OPENGL_USE_GLES OR ANDROID OR EMSCRIPTEN)
+  set(F3D_USE_GLES ON)
+else()
+  set(F3D_USE_GLES OFF)
 endif()
 
 # Modules
@@ -100,7 +104,7 @@ option(F3D_MODULE_WEBP "WebP images module" OFF)
 option(F3D_MODULE_UI "ImGui widgets module" ON)
 option(F3D_MODULE_DMON "dmon (watch) module" ON)
 option(F3D_MODULE_TINYFILEDIALOGS "tinyfiledialogs module" ON)
-option(F3D_MODULE_CLIP "clip module (experimental)" OFF)
+option(F3D_MODULE_CLIP "clip module" ON)
 
 # Use externals
 option(F3D_USE_EXTERNAL_CXXOPTS "Use external cxxopts dependency" OFF)
@@ -162,7 +166,7 @@ mark_as_advanced(F3D_COVERAGE)
 set(f3d_coverage_compile_options "")
 set(f3d_coverage_link_options "")
 if(F3D_COVERAGE)
-  set(f3d_coverage_compile_options -g -O0 --coverage)
+  set(f3d_coverage_compile_options -g -O0 --coverage -fprofile-update=atomic)
   set(f3d_coverage_link_options --coverage)
 endif()
 
@@ -211,10 +215,12 @@ list(APPEND f3d_link_options_public ${f3d_sanitizer_link_options})
 option(BUILD_TESTING "Build the tests" OFF)
 cmake_dependent_option(F3D_TESTING_ENABLE_RENDERING_TESTS "Enable rendering tests" ON "BUILD_TESTING" OFF)
 cmake_dependent_option(F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS "Enable long timeout tests" OFF "BUILD_TESTING" OFF)
+cmake_dependent_option(F3D_TESTING_ENABLE_WGL_TESTS "Enable tests that require a Windows driver with OpenGL >= 3.2" ON "F3D_TESTING_ENABLE_RENDERING_TESTS AND WIN32" OFF)
 cmake_dependent_option(F3D_TESTING_ENABLE_GLX_TESTS "Enable tests that require a X server running on Linux" ON "F3D_TESTING_ENABLE_RENDERING_TESTS AND UNIX AND NOT APPLE" OFF)
-cmake_dependent_option(F3D_TESTING_ENABLE_EGL_TESTS "Enable tests that require EGL to run" ON "F3D_TESTING_ENABLE_RENDERING_TESTS AND UNIX AND NOT APPLE" OFF)
-cmake_dependent_option(F3D_TESTING_ENABLE_OSMESA_TESTS "Enable tests that require OSMESA to run" OFF "F3D_TESTING_ENABLE_RENDERING_TESTS AND UNIX AND NOT APPLE" OFF)
+cmake_dependent_option(F3D_TESTING_ENABLE_EGL_TESTS "Enable tests that require EGL to run" ON "F3D_TESTING_ENABLE_RENDERING_TESTS AND NOT APPLE" OFF)
+cmake_dependent_option(F3D_TESTING_ENABLE_OSMESA_TESTS "Enable tests that require OSMESA to run" OFF "F3D_TESTING_ENABLE_RENDERING_TESTS" OFF)
 cmake_dependent_option(F3D_TESTING_DISABLE_CATCH_ALL "Disable the catch all exception code in main for improved testing" OFF "BUILD_TESTING" OFF)
+cmake_dependent_option(F3D_TESTING_ENABLE_ILLUSTRATION_TESTS "Enable documentation illustration tests" OFF "BUILD_TESTING" OFF)
 
 if(BUILD_TESTING)
   enable_testing()
@@ -349,3 +355,4 @@ f3d_report_variable(F3D_PLUGIN_BUILD_PDAL)
 f3d_report_variable(F3D_PLUGIN_BUILD_USD)
 f3d_report_variable(F3D_PLUGIN_BUILD_VDB)
 f3d_report_variable(F3D_PLUGIN_BUILD_WEBIFC)
+f3d_report_variable(F3D_USE_GLES)

@@ -8,11 +8,14 @@
 #ifndef vtkF3DUIActor_h
 #define vtkF3DUIActor_h
 
-#include <vtkProp.h>
-
+#include <F3DStyle.h>
 #include <array>
+#include <chrono>
 #include <cstdint>
 #include <deque>
+#include <map>
+#include <vector>
+#include <vtkProp.h>
 
 class vtkOpenGLRenderWindow;
 
@@ -36,6 +39,26 @@ public:
 
   using CheatSheetTuple = std::tuple<std::string, std::string, std::string, CheatSheetBindingType>;
   using CheatSheetGroup = std::pair<std::string, std::vector<CheatSheetTuple>>;
+
+  /**
+   * Enumeration of the animation progress bar modes, matching the
+   * `ui.animation_progress` option string values.
+   */
+  enum class AnimationProgressBarMode : std::uint8_t
+  {
+    NONE = 0,
+    DEFAULT = 1,
+    ADVANCED = 2,
+  };
+
+  struct Notification
+  {
+    std::string desc;
+    std::string value;
+    std::string bind;
+    double startTime;
+    double stopTime;
+  };
 
   /**
    * Initialize the UI actor resources
@@ -149,6 +172,18 @@ public:
   void SetFpsCounterVisibility(bool show);
 
   /**
+   * Set the notification visibility
+   * False by default
+   */
+  void SetNotificationVisibility(bool show);
+
+  /**
+   * Set the bindings visibility in notifications
+   * False by default
+   */
+  void SetBindingsVisibility(bool show);
+
+  /**
    * Updates the fps value
    * 0 by default
    */
@@ -176,6 +211,12 @@ public:
   int RenderOverlay(vtkViewport* vp) override;
 
   /**
+   * Set the backdrop color
+   * black by default
+   */
+  void SetBackdropColor(const std::array<double, 3>& color);
+
+  /**
    * Set the backdrop opacity
    */
   void SetBackdropOpacity(const double backdropOpacity);
@@ -186,6 +227,57 @@ public:
   virtual void SetDeltaTime(double)
   {
   }
+
+  /**
+   * Add notification info to deque
+   */
+  void AddNotification(const std::string& desc, const std::string& value, const std::string& bind,
+    double startTime, double duration);
+
+  /**
+   * Set the animation progress bar mode.
+   * `NONE` hides the bar, `DEFAULT` shows the bar alone, `ADVANCED` adds
+   * time/name labels around it.
+   * `NONE` by default
+   */
+  void SetAnimationProgressMode(AnimationProgressBarMode mode);
+
+  /**
+   * Set the time range, name and keyframe times of the current animation. Meant
+   * to be pushed when the loaded animation changes.
+   * Empty range, name and keyframes by default
+   */
+  void SetAnimationProgress(const std::pair<double, double>& timeRange, const std::string& name,
+    const std::vector<double>& keyFrames);
+
+  /**
+   * Set the animation progress bar fill color
+   * black by default
+   */
+  void SetAnimationProgressColor(const std::array<double, 3>& color);
+
+  /**
+   * Set the animation playback speed factor, shown next to the animation name as "(xN)"
+   * unless it is 1
+   * 1.0 by default
+   */
+  void SetAnimationSpeedFactor(double speedFactor);
+
+  /**
+   * Get the animation progress bar footprint in pixels (bar height plus a margin
+   * gap), or 0 when no bar is shown. Computed from the current state so it is
+   * available before the bar is actually rendered.
+   */
+  virtual double GetAnimationProgressBarHeight() const
+  {
+    return 0.0;
+  }
+
+  /**
+   * Update the current animation time, meant to be pushed every tick during playback
+   * 0 by default
+   */
+  void UpdateAnimationTime(double currentTime);
 
 protected:
   vtkF3DUIActor();
@@ -267,6 +359,21 @@ protected:
   virtual void RenderConsoleBadge()
   {
   }
+
+  /**
+   * Render the notifications
+   */
+  virtual void RenderNotifications(double vtkNotUsed(currenTime))
+  {
+  }
+
+  /**
+   * Render the animation progress bar UI widget
+   */
+  virtual void RenderAnimationProgressBar()
+  {
+  }
+
   bool DropZoneLogoVisible = false;
   bool DropZoneVisible = false;
   std::string DropText = "";
@@ -307,7 +414,20 @@ protected:
    */
   std::array<double, 3> FontColor = { 1.0, 1.0, 1.0 };
 
+  std::array<double, 3> BackdropColor = { 0, 0, 0 };
   double BackdropOpacity = 0.9;
+
+  bool NotificationVisible = false;
+  bool BindingsVisible = false;
+  std::deque<Notification> Notifications;
+
+  AnimationProgressBarMode AnimationProgressMode = AnimationProgressBarMode::NONE;
+  std::pair<double, double> AnimationTimeRange = { 0.0, 0.0 };
+  std::array<double, 3> AnimationProgressColor = { 0, 0, 0 };
+  double AnimationCurrentTime = 0.0;
+  double AnimationSpeedFactor = 1.0;
+  std::string AnimationName = "";
+  std::vector<double> AnimationKeyFrames;
 
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;

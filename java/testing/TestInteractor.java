@@ -51,6 +51,13 @@ public class TestInteractor {
     interactor.isPlayingAnimation();
     interactor.getAnimationDirection();
 
+    interactor.setNotificationCallback((desc, value, bindStr, duration) -> {
+      System.out.println("Notification: " + desc + " " + value + " " + bindStr + " " + duration);
+      return true;
+    });
+
+    interactor.triggerNotification("foo", "bar", 3.0);
+
     Interactor.AnimationDirection.FORWARD.getValue();
     Interactor.AnimationDirection.BACKWARD.getValue();
     Interactor.AnimationDirection.fromValue(0);

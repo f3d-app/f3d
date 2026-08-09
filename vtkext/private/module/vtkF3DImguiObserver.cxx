@@ -12,6 +12,7 @@
 
 #include <imgui.h>
 
+#include <limits>
 #include <unordered_map>
 
 namespace
@@ -207,12 +208,26 @@ bool vtkF3DImguiObserver::MouseMove(vtkObject* caller, unsigned long, void*)
 }
 
 //----------------------------------------------------------------------------
+bool vtkF3DImguiObserver::MouseLeave(vtkObject*, unsigned long, void*)
+{
+  if (ImGui::GetCurrentContext() != nullptr)
+  {
+    // Signal to ImGui that the cursor left the window so hovered state (and any
+    // hover tooltip) clears instead of sticking at the last in-window position.
+    constexpr float offscreen = -std::numeric_limits<float>::max();
+    ImGui::GetIO().AddMousePosEvent(offscreen, offscreen);
+  }
+  return false;
+}
+
+//----------------------------------------------------------------------------
 bool vtkF3DImguiObserver::MouseLeftPress(vtkObject* caller, unsigned long, void*)
 {
   if (ImGui::GetCurrentContext() != nullptr)
   {
     vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
     ImGuiIO& io = ImGui::GetIO();
+    this->UpdateModifiers(that);
     io.AddMouseButtonEvent(ImGuiMouseButton_Left, true);
     this->RenderUI(that);
     return io.WantCaptureMouse;
@@ -227,6 +242,7 @@ bool vtkF3DImguiObserver::MouseLeftRelease(vtkObject* caller, unsigned long, voi
   {
     vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
     ImGuiIO& io = ImGui::GetIO();
+    this->UpdateModifiers(that);
     io.AddMouseButtonEvent(ImGuiMouseButton_Left, false);
     this->RenderUI(that);
     return io.WantCaptureMouse;
@@ -241,6 +257,7 @@ bool vtkF3DImguiObserver::MouseRightPress(vtkObject* caller, unsigned long, void
   {
     vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
     ImGuiIO& io = ImGui::GetIO();
+    this->UpdateModifiers(that);
     io.AddMouseButtonEvent(ImGuiMouseButton_Right, true);
     this->RenderUI(that);
     return io.WantCaptureMouse;
@@ -255,6 +272,7 @@ bool vtkF3DImguiObserver::MouseRightRelease(vtkObject* caller, unsigned long, vo
   {
     vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
     ImGuiIO& io = ImGui::GetIO();
+    this->UpdateModifiers(that);
     io.AddMouseButtonEvent(ImGuiMouseButton_Right, false);
     this->RenderUI(that);
     return io.WantCaptureMouse;
@@ -269,6 +287,7 @@ bool vtkF3DImguiObserver::MouseWheelForward(vtkObject* caller, unsigned long, vo
   {
     vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
     ImGuiIO& io = ImGui::GetIO();
+    this->UpdateModifiers(that);
     io.AddMouseWheelEvent(0.f, 1.f);
     this->RenderUI(that);
     return io.WantCaptureMouse;
@@ -283,6 +302,7 @@ bool vtkF3DImguiObserver::MouseWheelBackward(vtkObject* caller, unsigned long, v
   {
     vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
     ImGuiIO& io = ImGui::GetIO();
+    this->UpdateModifiers(that);
     io.AddMouseWheelEvent(0.f, -1.f);
     this->RenderUI(that);
     return io.WantCaptureMouse;
@@ -311,9 +331,7 @@ bool vtkF3DImguiObserver::KeyPress(vtkObject* caller, unsigned long, void*)
   {
     vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
     ImGuiIO& io = ImGui::GetIO();
-    io.AddKeyEvent(ImGuiMod_Ctrl, that->GetControlKey() == 1);
-    io.AddKeyEvent(ImGuiMod_Shift, that->GetShiftKey() == 1);
-    io.AddKeyEvent(ImGuiMod_Alt, that->GetAltKey() == 1);
+    this->UpdateModifiers(that);
     io.AddKeyEvent(::GetImGuiKeyFromKeySym(that->GetKeySym()), true);
     this->RenderUI(that);
     return io.WantCaptureKeyboard;
@@ -328,9 +346,7 @@ bool vtkF3DImguiObserver::KeyRelease(vtkObject* caller, unsigned long, void*)
   {
     vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
     ImGuiIO& io = ImGui::GetIO();
-    io.AddKeyEvent(ImGuiMod_Ctrl, that->GetControlKey() == 1);
-    io.AddKeyEvent(ImGuiMod_Shift, that->GetShiftKey() == 1);
-    io.AddKeyEvent(ImGuiMod_Alt, that->GetAltKey() == 1);
+    this->UpdateModifiers(that);
     io.AddKeyEvent(::GetImGuiKeyFromKeySym(that->GetKeySym()), false);
     this->RenderUI(that);
     return io.WantCaptureKeyboard;
@@ -342,6 +358,7 @@ bool vtkF3DImguiObserver::KeyRelease(vtkObject* caller, unsigned long, void*)
 void vtkF3DImguiObserver::InstallObservers(vtkRenderWindowInteractor* interactor)
 {
   interactor->AddObserver(vtkCommand::MouseMoveEvent, this, &vtkF3DImguiObserver::MouseMove, 2.f);
+  interactor->AddObserver(vtkCommand::LeaveEvent, this, &vtkF3DImguiObserver::MouseLeave, 2.f);
   interactor->AddObserver(
     vtkCommand::LeftButtonPressEvent, this, &vtkF3DImguiObserver::MouseLeftPress, 2.f);
   interactor->AddObserver(
@@ -357,4 +374,13 @@ void vtkF3DImguiObserver::InstallObservers(vtkRenderWindowInteractor* interactor
   interactor->AddObserver(vtkCommand::KeyPressEvent, this, &vtkF3DImguiObserver::KeyPress, 2.f);
   interactor->AddObserver(vtkCommand::KeyReleaseEvent, this, &vtkF3DImguiObserver::KeyRelease, 2.f);
   interactor->AddObserver(vtkCommand::CharEvent, this, &vtkF3DImguiObserver::Char, 2.f);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiObserver::UpdateModifiers(vtkRenderWindowInteractor* interactor)
+{
+  ImGuiIO& io = ImGui::GetIO();
+  io.AddKeyEvent(ImGuiMod_Ctrl, interactor->GetControlKey() == 1);
+  io.AddKeyEvent(ImGuiMod_Shift, interactor->GetShiftKey() == 1);
+  io.AddKeyEvent(ImGuiMod_Alt, interactor->GetAltKey() == 1);
 }

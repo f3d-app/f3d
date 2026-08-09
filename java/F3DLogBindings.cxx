@@ -15,11 +15,22 @@ static void cpp_log_forwarder(f3d::log::VerboseLevel level, const std::string& m
   }
 
   JNIEnv* env;
+  bool needsDetach = false;
+  int envStatus = g_jvm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6);
+
+  if (envStatus == JNI_EDETACHED)
+  {
 #ifdef __ANDROID__
-  if (g_jvm->AttachCurrentThread(&env, nullptr) != 0)
+    if (g_jvm->AttachCurrentThread(&env, nullptr) != 0)
 #else
-  if (g_jvm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) != 0)
+    if (g_jvm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) != 0)
 #endif
+    {
+      return;
+    }
+    needsDetach = true;
+  }
+  else if (envStatus != JNI_OK)
   {
     return;
   }
@@ -40,7 +51,10 @@ static void cpp_log_forwarder(f3d::log::VerboseLevel level, const std::string& m
   env->DeleteLocalRef(jLevel);
   env->DeleteLocalRef(jMessage);
 
-  g_jvm->DetachCurrentThread();
+  if (needsDetach)
+  {
+    g_jvm->DetachCurrentThread();
+  }
 }
 
 extern "C"

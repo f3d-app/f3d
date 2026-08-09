@@ -38,6 +38,20 @@ public class TestScene {
     scene.add(new ArrayList<>(Arrays.asList(world, logo)));
     scene.clear();
 
+    // Test the added files tracking
+    if (!scene.getAddedFiles().isEmpty()) {
+      throw new RuntimeException("a cleared scene should have no added file");
+    }
+    scene.add(sphere);
+    List<String> addedFiles = scene.getAddedFiles();
+    if (addedFiles.size() != 1 || !addedFiles.get(0).contains("mb_1_0.vtp")) {
+      throw new RuntimeException("scene should track the added file");
+    }
+    scene.clear();
+    if (!scene.getAddedFiles().isEmpty()) {
+      throw new RuntimeException("clear should reset the added files");
+    }
+
     float[] points = new float[] { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.5f, 1.0f, 0.0f };
     int[] faceSides = new int[] { 3 };
     int[] faceIndices = new int[] { 0, 1, 2 };
@@ -47,6 +61,7 @@ public class TestScene {
 
     scene.loadAnimationTime(0.5);
     scene.animationTimeRange();
+    scene.getAnimationKeyFrames();
     scene.availableAnimations();
     scene.getAnimationName();
     scene.getAnimationName(0);
@@ -87,6 +102,68 @@ public class TestScene {
 
     scene.removeAllLights();
 
+    // Test the scene hierarchy
+    scene.clear();
+    if (!scene.getSceneHierarchy().isEmpty()) {
+      throw new RuntimeException("a cleared scene should have an empty scene hierarchy");
+    }
+
+    try {
+      scene.setNodeVisibility(0, false);
+      throw new RuntimeException(
+          "Expected Scene.NodeException was not thrown with an empty scene hierarchy");
+    } catch (Scene.NodeException e) {
+    }
+
+    scene.add(sphere);
+    List<Types.NodeState> hierarchy = scene.getSceneHierarchy();
+    if (hierarchy.isEmpty()) {
+      throw new RuntimeException("scene hierarchy should not be empty");
+    }
+
+    Types.NodeState root = hierarchy.get(0);
+    if (root.id != 0 || root.parentId != -1 || root.level != 0 || !root.visible
+        || !root.label.contains("mb_1_0.vtp")) {
+      throw new RuntimeException("unexpected scene hierarchy root node");
+    }
+
+    for (Types.NodeState node : hierarchy) {
+      int expectedLevel = node.parentId < 0 ? 0 : hierarchy.get(node.parentId).level + 1;
+      if (node.level != expectedLevel) {
+        throw new RuntimeException("unexpected scene hierarchy node level");
+      }
+    }
+
+    scene.setNodeVisibility(0, false);
+    for (Types.NodeState node : scene.getSceneHierarchy()) {
+      if (node.visible) {
+        throw new RuntimeException("the whole subtree should be hidden");
+      }
+    }
+
+    scene.setNodeVisibility(0, true);
+    for (Types.NodeState node : scene.getSceneHierarchy()) {
+      if (!node.visible) {
+        throw new RuntimeException("the whole subtree should be visible");
+      }
+    }
+
+    try {
+      scene.setNodeVisibility(hierarchy.size(), false);
+      throw new RuntimeException(
+          "Expected Scene.NodeException was not thrown with an out of range index");
+    } catch (Scene.NodeException e) {
+    }
+
     engine.close();
+
+    // --- Exception handling tests ---
+
+    // Adding a nonexistent file must throw LoadFailureException instead of crashing the JVM.
+    try (Engine tmpEngine = Engine.createNone()) {
+      tmpEngine.getScene().add("/absolutely_nonexistent_file_f3d_test.xyz");
+      throw new RuntimeException("Expected Scene.LoadFailureException was not thrown");
+    } catch (Scene.LoadFailureException e) {
+    }
   }
 }

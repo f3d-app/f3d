@@ -10,6 +10,7 @@
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Collection.h>
 #include <vtkImageReader2Factory.h>
+#include <vtkImageSSIM.h>
 #include <vtkJPEGWriter.h>
 #include <vtkPNGReader.h>
 #include <vtkPNGWriter.h>
@@ -20,12 +21,6 @@
 #include <vtkUnsignedCharArray.h>
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240729)
-#include <vtkImageSSIM.h>
-#else
-#include <vtkImageDifference.h>
-#endif
 
 #include <algorithm>
 #include <cassert>
@@ -86,7 +81,7 @@ public:
     for (size_t i = 0; i < pngReader->GetNumberOfTextChunks(); ++i)
     {
       const vtkStdString key = pngReader->GetTextKey(static_cast<int>(i));
-      if (key.rfind(metadataKeyPrefix, 0) == 0)
+      if (key.starts_with(metadataKeyPrefix))
       {
         pngReader->GetTextChunks(key.c_str(), beginEndIndex);
         const int index = beginEndIndex[1] - 1; // only read the last key
@@ -371,17 +366,16 @@ double image::compare(const image& reference) const
     return 0.0;
   }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240729)
   vtkNew<vtkImageSSIM> ssim;
   std::vector<int> ranges(count);
   switch (type)
   {
     case ChannelType::BYTE:
-      std::fill(ranges.begin(), ranges.end(), 256);
+      std::ranges::fill(ranges, 256);
       ssim->SetInputRange(ranges);
       break;
     case ChannelType::SHORT:
-      std::fill(ranges.begin(), ranges.end(), 65535);
+      std::ranges::fill(ranges, 65535);
       ssim->SetInputRange(ranges);
       break;
     case ChannelType::FLOAT:
@@ -392,24 +386,32 @@ double image::compare(const image& reference) const
   ssim->SetInputData(this->Internals->Image);
   ssim->SetInputData(1, reference.Internals->Image);
   ssim->Update();
-  vtkDoubleArray* scalars = vtkArrayDownCast<vtkDoubleArray>(
+  vtkSmartPointer<vtkDoubleArray> scalars = vtkArrayDownCast<vtkDoubleArray>(
     vtkDataSet::SafeDownCast(ssim->GetOutputDataObject(0))->GetPointData()->GetScalars());
 
   // Thanks to the checks above, this is always true
   assert(scalars != nullptr);
 
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260623)
+  // vtkImageSSIM::ComputeErrorMetrics didn't work for RGBA images,
+  // so we need to remove the alpha channel
+  if (count == 4)
+  {
+    vtkNew<vtkDoubleArray> scalarsWithoutAlpha;
+    scalarsWithoutAlpha->SetNumberOfComponents(3);
+    scalarsWithoutAlpha->SetNumberOfTuples(scalars->GetNumberOfTuples());
+    for (vtkIdType i = 0; i < scalars->GetNumberOfTuples(); ++i)
+    {
+      scalarsWithoutAlpha->SetTuple(i, scalars->GetTuple(i));
+    }
+
+    scalars = scalarsWithoutAlpha;
+  }
+#endif
+
   double error, unused;
   vtkImageSSIM::ComputeErrorMetrics(scalars, error, unused);
   return error;
-#else
-  vtkNew<vtkImageDifference> imDiff;
-  imDiff->SetThreshold(0);
-  imDiff->SetInputData(this->Internals->Image);
-  imDiff->SetImageData(reference.Internals->Image);
-  imDiff->Update();
-  double error = imDiff->GetThresholdedError();
-  return error / 1000.0;
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -606,9 +608,9 @@ const image& image::toTerminalText(std::ostream& stream) const
   };
 
   constexpr std::string_view EMPTY_BLOCK = " ";
-  constexpr std::string_view TOP_BLOCK = u8"\u2580";
-  constexpr std::string_view BOTTOM_BLOCK = u8"\u2584";
-  constexpr std::string_view FULL_BLOCK = u8"\u2588";
+  constexpr std::string_view TOP_BLOCK = "\u2580";
+  constexpr std::string_view BOTTOM_BLOCK = "\u2584";
+  constexpr std::string_view FULL_BLOCK = "\u2588";
   constexpr std::string_view EOL = "\n";
 
   for (int y = 0; y < height; y += 2)
@@ -698,8 +700,8 @@ std::string image::getMetadata(const std::string& key) const
 std::vector<std::string> image::allMetadata() const
 {
   std::vector<std::string> keys;
-  std::transform(this->Internals->Metadata.begin(), this->Internals->Metadata.end(),
-    std::back_inserter(keys), [](const auto& kv) { return kv.first; });
+  std::ranges::transform(
+    this->Internals->Metadata, std::back_inserter(keys), [](const auto& kv) { return kv.first; });
   return keys;
 }
 

@@ -3,6 +3,7 @@
 
 #include "exception.h"
 #include "export.h"
+#include "mesh_view.h"
 #include "types.h"
 
 /// @cond
@@ -52,7 +53,7 @@ public:
    * Already added file will NOT be reloaded
    * If it fails to loads a file, it clears the scene and
    * throw a load_failure_exception.
-   * On other failure, throw a load_failure_exception.
+   * On other failures, throw a load_failure_exception.
    */
   virtual scene& add(const std::filesystem::path& filePath) = 0;
   virtual scene& add(const std::vector<std::filesystem::path>& filePath) = 0;
@@ -63,9 +64,18 @@ public:
    * Add and load provided mesh into the scene
    * If it fails to load the mesh, it clears the scene and
    * throw a load_failure_exception.
-   * On other failure, throw a load_failure_exception.
+   * On other failures, throw a load_failure_exception.
    */
   virtual scene& add(const mesh_t& mesh) = 0;
+
+  /**
+   * Add and load provided mesh view into the scene
+   * Requires VTK >= 9.6
+   * If it fails to load the mesh, it clears the scene and
+   * throw a load_failure_exception.
+   * On other failures, throw a load_failure_exception.
+   */
+  virtual scene& add(std::shared_ptr<mesh_view> mesh) = 0;
 
   /**
    * Add and load provided buffer into the scene as it was file.
@@ -73,7 +83,7 @@ public:
    * VTK < 9.6.20260128, then it requires the use of `scene.force_reader`.
    * If it fails to loads the buffer, it clears the scene and
    * throw a load_failure_exception.
-   * On other failure, throw a load_failure_exception.
+   * On other failures, throw a load_failure_exception.
    */
   virtual scene& add(const std::byte* buffer, std::size_t size) = 0;
 
@@ -95,6 +105,13 @@ public:
    * Clear the scene of all added files
    */
   virtual scene& clear() = 0;
+
+  /**
+   * Return the list of files added to the scene through the path-based add methods, in the order
+   * they were provided.
+   * Meshes added through the mesh, mesh view or buffer based add methods are not listed.
+   */
+  [[nodiscard]] virtual std::vector<std::filesystem::path> getAddedFiles() const = 0;
 
   /**
    * An exception that can be thrown by the scene
@@ -140,6 +157,30 @@ public:
   virtual scene& removeAllLights() = 0;
 
   /**
+   * An exception that can be thrown by the scene
+   * when it fails to index a scene hierarchy node
+   */
+  struct node_exception : public exception
+  {
+    explicit node_exception(const std::string& what = "")
+      : f3d::exception(what) {};
+  };
+
+  /**
+   * Return the scene hierarchy of all added files as a flat vector, in depth-first pre-order,
+   * so that a parent node always precedes its children.
+   * Returns an empty vector if the scene is empty.
+   */
+  [[nodiscard]] virtual std::vector<node_state_t> getSceneHierarchy() const = 0;
+
+  /**
+   * Set the visibility of the node at provided index and of all the nodes in its subtree.
+   * See types::node_state_t documentation for more information.
+   * node_exception is thrown if the index is invalid.
+   */
+  virtual scene& setNodeVisibility(int nodeId, bool visible) = 0;
+
+  /**
    * Return true if provided file in path uses a supported extension, exists and its content
    * correspond to a supported file format, false otherwise.
    * content validation is only performed with VTK >= 9.6.20260228
@@ -163,12 +204,19 @@ public:
   [[nodiscard]] virtual std::pair<double, double> animationTimeRange() = 0;
 
   /**
+   * Get animation keyframe's time of currently added files.
+   * Can be used in loadAnimationTime to request a specific keyframe.
+   * Returns empty vector if there is no animations.
+   */
+  [[nodiscard]] virtual std::vector<double> getAnimationKeyFrames() = 0;
+
+  /**
    * Return the number of animations available in the currently loaded files.
    */
   [[nodiscard]] virtual unsigned int availableAnimations() const = 0;
 
   /**
-   * Return the animation name of a given animation indices, if any.
+   * Return the animation name of a given animation index, if any.
    *
    * Specific animation (0..availableAnimations): Returns the name of the animation at that index
    * Current animation (-1):
@@ -180,7 +228,7 @@ public:
    *
    * Can be called before initialization safely
    */
-  [[nodiscard]] virtual std::string getAnimationName(int indices = -1) = 0;
+  [[nodiscard]] virtual std::string getAnimationName(int index = -1) = 0;
 
   /**
    * Return all of the animation names, if any.

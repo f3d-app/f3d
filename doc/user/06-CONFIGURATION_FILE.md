@@ -115,7 +115,7 @@ A typical config file with bindings may look like this:
     "match": ".*vtu",
     "bindings": {
       "Any+3": "roll_camera 90",
-      "Shift+O": "toggle model.point_sprites.enable",
+      "Shift+O": "set model.point_sprites.type circle",
       "Ctrl+O": [
         "toggle render.grid.enable",
         "toggle scene.camera.orthographic"
@@ -145,12 +145,14 @@ A bind is the association of a modifier and an interaction.
 
 Supported modifiers are:
 
-`None` : No modifiers is pressed, can be omitted completely.
-`Ctrl` : Control key is pressed, no distinction between left and right.
-`Shift` : Shift key is pressed, no distinction between left and right.
-`Ctrl+Shift` : Control and Shift keys are pressed, no distinction between left and right.
-`Any` : A special modifier that does not consider modifiers keys but can only be reached
-if there is no bind with the same interaction.
+- `None` : No modifiers is pressed, can be omitted completely.
+- `Ctrl` : Control key is pressed, no distinction between left and right.
+- `Shift` : Shift key is pressed, no distinction between left and right.
+- `Ctrl+Shift` : Control and Shift keys are pressed, no distinction between left and right.
+- `Any` : A special modifier that does not consider modifiers keys but can only be reached
+  if there is no bind with the same interaction.
+
+On MacOS, bindings specified via configuration will be defined using `Ctrl` and `Ctrl+Shift` but will be toggled in F3D using `Cmd` and `Cmd+Shift` respectively. The cheatsheet will display the correct binding combination regardless.
 
 Supported interactions are legion, eg:
 
@@ -238,6 +240,7 @@ You can edit the file contained in these directory or add your own in specific d
 
 F3D looks for configuration files in different locations depending on your operating system.
 Existing configuration files are read in order and combined with later entries, potentially overriding previously read entry with the same names.
+For thumbnails, just replace `config` by `thumbnail`, as the thumbnails configuration is just passed to f3d using the `--config` [CLI option](03-OPTIONS.md).
 
 - Linux: `/etc/f3d/config(.json,.d)`, `/usr/share/f3d/configs/config(.json,.d)`, `[install_dir]/share/f3d/configs/config(.json,.d)`, `${XDG_CONFIG_HOME}/f3d/config(.json,.d)`
 - Windows: `[install_dir]\share\f3d\configs\(config.json,.d)`, `%APPDATA%\f3d\(config.json,.d)`
@@ -252,3 +255,19 @@ Please note there is a command line option to control the configuration file to 
 only the filename or filestem (`.json` and `.d` will be added) to look for in the locations listed above, , eg: `f3d --config=custom_config` will look
 for `custom_config.json` and `custom_config.d` in locations listed above.
 When specifying an absolute/relative path for the configuration file, a single file is read. If not, all files from locations listed above, with the overriding logic specified above.
+
+To check which config file is found and used, you can check the verbose output, eg. for thumbnails config: `f3d --config=thumbnail --verbose` (or `f3d-console.exe --config=thumbnail --verbose` on Windows) :
+
+```
+========== Initializing Options ==========
+Found available config path
+Candidate config file not found: "/etc/f3d/thumbnail.json"
+Candidate config file not found: "/etc/f3d/thumbnail.d"
+Candidate config file not found: "/usr/share/f3d/configs/thumbnail.json"
+Candidate config file not found: "/usr/share/f3d/configs/thumbnail.d"
+Candidate config file not found: "/home/glow/dev/f3d/pack/F3D-3.5.0-Linux-x86_64-raytracing/share/f3d/configs/thumbnail.json"
+Config file found: "/home/glow/dev/f3d/pack/F3D-3.5.0-Linux-x86_64-raytracing/share/f3d/configs/thumbnail.d"
+Candidate config file not found: "/home/glow/.config/f3d/thumbnail.json"
+Candidate config file not found: "/home/glow/.config/f3d/thumbnail.d"
+Using config directory /home/glow/dev/f3d/pack/F3D-3.5.0-Linux-x86_64-raytracing/share/f3d/configs/thumbnail.d
+```

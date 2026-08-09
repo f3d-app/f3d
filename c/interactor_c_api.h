@@ -214,10 +214,12 @@ extern "C"
    * @param commands Array of command strings.
    * @param command_count Number of commands.
    * @param group Optional group name (can be NULL).
+   * @param type Optional binding type.
+   * @param notify Notify when the binding is triggered.
    */
   F3D_EXPORT void f3d_interactor_add_binding(f3d_interactor_t* interactor,
-    const f3d_interaction_bind_t* bind, const char** commands, int command_count,
-    const char* group);
+    const f3d_interaction_bind_t* bind, const char** commands, int command_count, const char* group,
+    f3d_interactor_binding_type_t type, int notify);
 
   /**
    * @brief Remove a binding for the provided bind.
@@ -245,7 +247,7 @@ extern "C"
    * @param group Group name.
    * @param count Output parameter for number of binds.
    * @return Array of binds. Caller must free the array with
-   *         f3d_interactor_free_bind_array().
+   *         f3d_interactor_free_bind_array(). NULL if group does not exist.
    */
   F3D_EXPORT f3d_interaction_bind_t* f3d_interactor_get_binds_for_group(
     f3d_interactor_t* interactor, const char* group, int* count);
@@ -285,7 +287,7 @@ extern "C"
    *
    * @param interactor Interactor handle.
    * @param bind Interaction bind.
-   * @return Binding type.
+   * @return Binding type. F3D_INTERACTOR_BINDING_OTHER if bind does not exist.
    */
   F3D_EXPORT f3d_interactor_binding_type_t f3d_interactor_get_binding_type(
     f3d_interactor_t* interactor, const f3d_interaction_bind_t* bind);
@@ -450,16 +452,36 @@ extern "C"
 
   typedef void (*f3d_interactor_callback_t)(void* user_data);
   /**
-   * @brief Start the interactor event loop.
+   * @brief Set the event loop user callback.
    *
    * @param interactor Interactor handle.
-   * @param delta_time Time step in seconds.
    * @param callback Optional user callback called at the start of each event-loop
-   *        iteration. May be NULL if no callback is desired.
+   *        iteration.
    * @param user_data Optional opaque pointer passed verbatim to callback.
    */
-  F3D_EXPORT void f3d_interactor_start_with_callback(f3d_interactor_t* interactor,
-    double delta_time, f3d_interactor_callback_t callback, void* user_data);
+  F3D_EXPORT void f3d_interactor_set_event_loop_user_callback(
+    f3d_interactor_t* interactor, f3d_interactor_callback_t callback, void* user_data);
+
+  /**
+   * @brief Notification callback signature.
+   *
+   * Return zero to prevent standard notification from being displayed.
+   * Arguments are the description, value, bindings, and duration of the notification.
+   */
+  typedef int (*f3d_interactor_notification_callback_t)(
+    const char* desc, const char* value, const char* bind, double duration, void* user_data);
+
+  /**
+   * @brief Set the notification callback.
+   *
+   * The callback is invoked when a notification is triggered.
+   *
+   * @param interactor Interactor handle.
+   * @param callback Notification callback, or NULL to clear.
+   * @param user_data Optional opaque pointer passed to callback.
+   */
+  F3D_EXPORT void f3d_interactor_set_notification_callback(
+    f3d_interactor_t* interactor, f3d_interactor_notification_callback_t callback, void* user_data);
 
   /**
    * @brief Stop the interactor.
@@ -481,6 +503,17 @@ extern "C"
    * @param interactor Interactor handle.
    */
   F3D_EXPORT void f3d_interactor_request_stop(f3d_interactor_t* interactor);
+
+  /**
+   * @brief Trigger a notification at the bottom left of viewport.
+   *
+   * @param interactor Interactor handle.
+   * @param desc Description text.
+   * @param value Value text follow after description.
+   * @param duration Duration of notification in seconds.
+   */
+  F3D_EXPORT void f3d_interactor_trigger_notification(
+    f3d_interactor_t* interactor, const char* desc, const char* value, double duration);
 
   /**
    * @brief Free a string array returned by interactor functions.

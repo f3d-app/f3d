@@ -16,13 +16,13 @@ Remove-Item $reloaded_data
 $log = "$tmp_dir/output.log"
 $id = (Start-Process -FilePath $f3d_cmd -ArgumentList "--watch --verbose $reloaded_data" -RedirectStandardOutput $log -PassThru).Id
 
-Start-Sleep -Seconds 1
+Start-Sleep -Seconds 3
 Copy-Item $hires_data -Destination $reloaded_data
-Start-Sleep -Seconds 1
+Start-Sleep -Seconds 3
 Copy-Item $invalid_data -Destination $reloaded_data
-Start-Sleep -Seconds 1
+Start-Sleep -Seconds 3
 Copy-Item $lowres_data -Destination $reloaded_data
-Start-Sleep -Seconds 1
+Start-Sleep -Seconds 3
 
 $str = Select-String $log -Pattern "Number of points: 634"
 if ($str -ne $null) {

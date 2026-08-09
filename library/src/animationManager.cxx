@@ -11,7 +11,6 @@
 #include "vtkF3DRenderer.h"
 
 #include <vtkDoubleArray.h>
-#include <vtkProgressBarRepresentation.h>
 #include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
 #include <vtkVersion.h>
@@ -57,46 +56,14 @@ void animationManager::Initialize()
   this->CurrentTimeSet = false;
 
   this->AvailAnimations = this->Importer->GetNumberOfAnimations();
-  if (this->AvailAnimations > 0 && this->Interactor)
-  {
-    this->ProgressWidget = vtkSmartPointer<vtkProgressBarWidget>::New();
-    this->Interactor->SetInteractorOn(this->ProgressWidget);
-
-    vtkProgressBarRepresentation* progressRep =
-      vtkProgressBarRepresentation::SafeDownCast(this->ProgressWidget->GetRepresentation());
-    progressRep->SetProgressRate(0.0);
-    progressRep->ProportionalResizeOff();
-    progressRep->SetPosition(0.0, 0.0);
-    progressRep->SetPosition2(1.0, 0.0);
-    progressRep->SetMinimumSize(0, 5);
-    f3d::color_t color;
-    if (!this->Options.ui.animation_progress_color.has_value())
-    {
-      const auto [r, g, b] = F3DStyle::GetF3DBlue();
-      color = color_t(r, g, b);
-    }
-    else
-    {
-      color = this->Options.ui.animation_progress_color.value();
-    }
-    progressRep->SetProgressBarColor(color.r(), color.g(), color.b());
-    progressRep->DrawBackgroundOff();
-    progressRep->DragableOff();
-    progressRep->SetShowBorderToOff();
-    progressRep->DrawFrameOff();
-    progressRep->SetPadding(0.0, 0.0);
-    progressRep->SetVisibility(this->Options.ui.animation_progress);
-    this->ProgressWidget->On();
-  }
-  else
-  {
-    this->ProgressWidget = nullptr;
-  }
 
   // Reset animation indices before updating
   this->PreparedAnimationIndices.reset();
   this->AnimationTimeSteps->Reset();
   this->PrepareForAnimationIndices();
+
+  // Push the animation time range and name to the UI actor
+  this->PushAnimationProgress();
 
   if (this->AvailAnimations == 0)
   {
@@ -117,6 +84,22 @@ void animationManager::Initialize()
   {
     this->StartAnimation();
   }
+}
+
+//----------------------------------------------------------------------------
+void animationManager::Reset()
+{
+  assert(this->Importer);
+  this->Playing = false;
+  this->CurrentTime = 0;
+  this->CurrentTimeSet = false;
+  this->AvailAnimations = 0;
+
+  this->PreparedAnimationIndices.reset();
+  this->AnimationTimeSteps->Reset();
+
+  // No animation is loaded: hide the progress bar
+  this->PushAnimationProgress();
 }
 
 //----------------------------------------------------------------------------
@@ -223,14 +206,25 @@ void animationManager::JumpToFrame(int frame, bool relative)
 }
 
 //----------------------------------------------------------------------------
+void animationManager::JumpToTime(double timeValue, bool relative)
+{
+  const double target = relative ? this->CurrentTime + timeValue : timeValue;
+
+  if (this->LoadAtTime(target))
+  {
+    this->Window.render();
+  }
+}
+
+//----------------------------------------------------------------------------
 void animationManager::JumpToKeyFrame(int keyframe, bool relative)
 {
-  if (this->AnimationTimeSteps->GetSize() == 0)
+  if (this->AnimationTimeSteps->GetNumberOfTuples() == 0)
   {
     return;
   }
 
-  const int timeStepsAvailable = this->AnimationTimeSteps->GetSize();
+  const int timeStepsAvailable = this->AnimationTimeSteps->GetNumberOfTuples();
 
   auto it = std::lower_bound(
     this->AnimationTimeSteps->Begin(), this->AnimationTimeSteps->End(), this->CurrentTime);
@@ -303,26 +297,19 @@ bool animationManager::LoadAtTime(double timeValue)
   }
   this->CurrentTime = timeValue;
   this->CurrentTimeSet = true;
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
   if (!this->Importer->UpdateAtTimeValue(this->CurrentTime))
   {
     log::error("Could not load time value: ", this->CurrentTime);
     return false;
   }
-#else
-  this->Importer->UpdateTimeStep(this->CurrentTime);
-#endif
 
-  if (this->Interactor && this->ProgressWidget)
+  this->Window.GetRenderer()->UpdateAnimationTime(this->CurrentTime);
+
+  if (this->AvailAnimations > 0 && this->Interactor)
   {
-    // Set progress bar
-    vtkProgressBarRepresentation* progressRep =
-      vtkProgressBarRepresentation::SafeDownCast(this->ProgressWidget->GetRepresentation());
-    progressRep->SetProgressRate(
-      (this->CurrentTime - this->TimeRange[0]) / (this->TimeRange[1] - this->TimeRange[0]));
-
     this->Interactor->UpdateRendererAfterInteraction();
   }
+
   return true;
 }
 
@@ -350,8 +337,8 @@ void animationManager::CycleAnimation()
   F3D_SILENT_WARNING_POP()
 
   // If we started with multi animation or all animations (any negative value means all animations)
-  bool negative = std::any_of(this->Options.scene.animation.indices.begin(),
-    this->Options.scene.animation.indices.end(), [](int idx) { return idx < 0; });
+  bool negative =
+    std::ranges::any_of(this->Options.scene.animation.indices, [](int idx) { return idx < 0; });
   if (this->Options.scene.animation.indices.size() > 1 || negative)
   {
     // Then select no animation
@@ -361,7 +348,7 @@ void animationManager::CycleAnimation()
   else if (this->Options.scene.animation.indices.empty())
   {
     // Select the first one
-    this->Options.scene.animation.indices = { 0 };
+    this->Options.scene.animation.indices.emplace_back(0);
   }
   else
   {
@@ -397,16 +384,19 @@ void animationManager::CycleAnimation()
   this->PrepareForAnimationIndices();
   this->LoadAtTime(this->TimeRange[0]);
 
+  // The loaded animation changed: refresh the progress bar's time range and name
+  this->PushAnimationProgress();
+
   vtkRenderWindow* renWin = this->Window.GetRenderWindow();
   vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
   ren->SetCheatSheetConfigured(false);
 }
 
 // ---------------------------------------------------------------------------------
-std::string animationManager::GetAnimationName(int indices)
+std::string animationManager::GetAnimationName(int index)
 {
   assert(this->Importer);
-  if (indices == -1)
+  if (index == -1)
   {
     if (this->PreparedAnimationIndices.has_value() &&
       this->PreparedAnimationIndices.value().size() > 1)
@@ -419,9 +409,8 @@ std::string animationManager::GetAnimationName(int indices)
           animCheck[idx] = true;
         }
       }
-      return std::none_of(animCheck.begin(), animCheck.end(), std::logical_not<>())
-        ? "All animations"
-        : "Multi animations";
+      return std::ranges::none_of(animCheck, std::logical_not<>()) ? "All animations"
+                                                                   : "Multi animations";
     }
 
     if (this->AvailAnimations == 0 || !this->PreparedAnimationIndices.has_value() ||
@@ -434,12 +423,12 @@ std::string animationManager::GetAnimationName(int indices)
     return this->Importer->GetAnimationName(this->PreparedAnimationIndices.value()[0]);
   }
 
-  if (this->AvailAnimations == 0 || indices < 0 || indices > this->AvailAnimations)
+  if (this->AvailAnimations == 0 || index < 0 || index > this->AvailAnimations)
   {
     return "No animation";
   }
 
-  return this->Importer->GetAnimationName(indices);
+  return this->Importer->GetAnimationName(index);
 }
 
 // ---------------------------------------------------------------------------------
@@ -463,6 +452,21 @@ std::vector<std::string> animationManager::GetAnimationNames()
 }
 
 //----------------------------------------------------------------------------
+void animationManager::PushAnimationProgress()
+{
+  if (this->AvailAnimations <= 0)
+  {
+    // No animation: clear the range so the bar hides itself
+    this->Window.GetRenderer()->SetAnimationProgress({ 0.0, 0.0 }, "", {});
+  }
+  else
+  {
+    this->Window.GetRenderer()->SetAnimationProgress(
+      this->GetTimeRange(), this->GetAnimationName(), this->GetKeyFrames());
+  }
+}
+
+//----------------------------------------------------------------------------
 void animationManager::PrepareForAnimationIndices()
 {
   assert(this->Importer);
@@ -482,7 +486,7 @@ void animationManager::PrepareForAnimationIndices()
   F3D_SILENT_WARNING_POP()
 
   // If it contains a negative value, all animations should be selected
-  if (std::any_of(animIndices.begin(), animIndices.end(), [](int idx) { return idx < 0; }))
+  if (std::ranges::any_of(animIndices, [](int idx) { return idx < 0; }))
   {
     if (animIndices.size() > 1)
     {
@@ -629,6 +633,22 @@ std::pair<double, double> animationManager::GetTimeRange()
 
   // Return updated data
   return std::make_pair(this->TimeRange[0], this->TimeRange[1]);
+}
+
+//----------------------------------------------------------------------------
+std::vector<double> animationManager::GetKeyFrames()
+{
+  this->PrepareForAnimationIndices();
+
+  std::vector<double> keyFrames;
+  keyFrames.reserve(this->AnimationTimeSteps->GetNumberOfTuples());
+
+  for (vtkIdType i = 0; i < this->AnimationTimeSteps->GetNumberOfTuples(); ++i)
+  {
+    keyFrames.push_back(this->AnimationTimeSteps->GetValue(i));
+  }
+
+  return keyFrames;
 }
 
 //----------------------------------------------------------------------------

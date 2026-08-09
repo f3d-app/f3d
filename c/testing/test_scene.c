@@ -4,6 +4,7 @@
 #include <utils_c_api.h>
 
 #include <stdio.h>
+#include <string.h>
 
 int test_scene()
 {
@@ -35,6 +36,32 @@ int test_scene()
   const char* files[] = { F3D_TESTING_DATA_DIR "cow.vtp", F3D_TESTING_DATA_DIR "suzanne.obj" };
   int add_multiple_result = f3d_scene_add_multiple(scene, files, 2);
   (void)add_multiple_result;
+
+  f3d_scene_clear(scene);
+
+  // Test the added files tracking
+
+  unsigned int added_count = 0;
+  char** added_files = f3d_scene_get_added_files(scene, &added_count);
+  if (added_count != 0)
+  {
+    puts("[ERROR] a cleared scene should have no added file");
+    f3d_scene_free_added_files(added_files, added_count);
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  f3d_scene_free_added_files(added_files, added_count);
+
+  f3d_scene_add(scene, F3D_TESTING_DATA_DIR "cow.vtp");
+  added_files = f3d_scene_get_added_files(scene, &added_count);
+  if (added_count != 1 || !added_files || !strstr(added_files[0], "cow.vtp"))
+  {
+    puts("[ERROR] scene should track the added file");
+    f3d_scene_free_added_files(added_files, added_count);
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  f3d_scene_free_added_files(added_files, added_count);
 
   f3d_scene_clear(scene);
 
@@ -82,6 +109,10 @@ int test_scene()
   f3d_scene_animation_time_range(scene, &min_time, &max_time);
   unsigned int anim_count = f3d_scene_available_animations(scene);
   (void)anim_count;
+  unsigned int keyframes_number;
+  double* keyframes = f3d_scene_get_animation_keyframes(scene, &keyframes_number);
+  f3d_scene_free_animation_keyframes(keyframes);
+  (void)keyframes;
 
   f3d_light_state_t light_state = { 0 };
   light_state.type = F3D_LIGHT_TYPE_HEADLIGHT;
@@ -121,6 +152,85 @@ int test_scene()
   (void)equal;
 
   f3d_scene_remove_all_lights(scene);
+
+  // Test the scene hierarchy
+
+  f3d_scene_clear(scene);
+
+  unsigned int null_count = 42;
+  if (f3d_scene_get_scene_hierarchy(NULL, &null_count) || null_count != 0 ||
+    f3d_scene_get_scene_hierarchy(scene, NULL) || f3d_scene_set_node_visibility(NULL, 0, 1))
+  {
+    puts("[ERROR] scene hierarchy API should handle NULL arguments");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  unsigned int node_count = 0;
+  f3d_node_state_t* nodes = f3d_scene_get_scene_hierarchy(scene, &node_count);
+  if (node_count != 0 || nodes)
+  {
+    puts("[ERROR] a cleared scene should have an empty scene hierarchy");
+    f3d_scene_free_scene_hierarchy(nodes, node_count);
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  if (f3d_scene_set_node_visibility(scene, 0, 0) != 0)
+  {
+    puts("[ERROR] setting node visibility should fail with an empty scene hierarchy");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  f3d_scene_add(scene, F3D_TESTING_DATA_DIR "mb/recursive/mb_0_0.vtu");
+  nodes = f3d_scene_get_scene_hierarchy(scene, &node_count);
+  if (node_count == 0 || !nodes)
+  {
+    puts("[ERROR] scene hierarchy should not be empty");
+    f3d_scene_free_scene_hierarchy(nodes, node_count);
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  if (nodes[0].id != 0 || nodes[0].parent_id != -1 || nodes[0].level != 0 || !nodes[0].visible ||
+    !strstr(nodes[0].label, "mb_0_0.vtu"))
+  {
+    puts("[ERROR] unexpected scene hierarchy root node");
+    f3d_scene_free_scene_hierarchy(nodes, node_count);
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  if (f3d_scene_set_node_visibility(scene, 0, 0) != 1)
+  {
+    puts("[ERROR] failed to hide the scene hierarchy root node");
+    f3d_scene_free_scene_hierarchy(nodes, node_count);
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  f3d_scene_free_scene_hierarchy(nodes, node_count);
+
+  nodes = f3d_scene_get_scene_hierarchy(scene, &node_count);
+  for (unsigned int i = 0; i < node_count; ++i)
+  {
+    if (nodes[i].visible)
+    {
+      puts("[ERROR] the whole subtree should be hidden");
+      f3d_scene_free_scene_hierarchy(nodes, node_count);
+      f3d_engine_delete(engine);
+      return 1;
+    }
+  }
+
+  if (f3d_scene_set_node_visibility(scene, (int)node_count, 1) != 0)
+  {
+    puts("[ERROR] setting node visibility should fail with an out of range index");
+    f3d_scene_free_scene_hierarchy(nodes, node_count);
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  f3d_scene_free_scene_hierarchy(nodes, node_count);
 
   f3d_engine_delete(engine);
   return 0;

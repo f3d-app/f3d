@@ -7,11 +7,6 @@ vtk_module_scan(
   PROVIDES_MODULES  modules
   WANT_BY_DEFAULT   ON
   ENABLE_TESTS      ${BUILD_TESTING})
-
-set(f3d_vtkext_headers_exclude "")
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240312)
-  set(f3d_vtkext_headers_exclude "HEADERS_EXCLUDE_FROM_ALL;ON")
-endif()
   
 set(export_name "")
 set(headers_component "")
@@ -35,7 +30,7 @@ vtk_module_build(
   INSTALL_EXPORT ${export_name}
   INSTALL_HEADERS ON
   HEADERS_COMPONENT ${headers_component}
-  ${f3d_vtkext_headers_exclude}
+  HEADERS_EXCLUDE_FROM_ALL ON
   HEADERS_DESTINATION "include/f3d"
   TARGETS_COMPONENT library
   PACKAGE "f3d_vtkext")
@@ -44,7 +39,7 @@ foreach (module IN LISTS modules)
   vtk_module_compile_options(${module} PUBLIC ${f3d_compile_options_public})
   vtk_module_compile_options(${module} PRIVATE ${f3d_compile_options_private})
   vtk_module_link_options(${module} PUBLIC ${f3d_link_options_public})
-  vtk_module_set_properties(${module} CXX_STANDARD 17)
+  vtk_module_set_properties(${module} CXX_STANDARD 20)
   if(F3D_STRICT_BUILD AND MSVC)
     # There are warnings in VTK related to deprecated features in C++17
     vtk_module_definitions(${module} PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)

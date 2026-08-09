@@ -34,6 +34,7 @@ private:
    * Callbacks called when an event is invoked by the interactor
    */
   bool MouseMove(vtkObject* caller, unsigned long, void*);
+  bool MouseLeave(vtkObject* caller, unsigned long, void*);
   bool MouseLeftPress(vtkObject* caller, unsigned long, void*);
   bool MouseLeftRelease(vtkObject* caller, unsigned long, void*);
   bool MouseRightPress(vtkObject* caller, unsigned long, void*);
@@ -49,6 +50,11 @@ private:
    * Trigger a window rendering, but render only the UI/overlay actors.
    */
   void RenderUI(vtkRenderWindowInteractor* interactor);
+
+  /**
+   * Update modifier state from interactor to imgui.
+   */
+  void UpdateModifiers(vtkRenderWindowInteractor* interactor);
 
   vtkF3DImguiObserver(const vtkF3DImguiObserver&) = delete;
   void operator=(const vtkF3DImguiObserver&) = delete;

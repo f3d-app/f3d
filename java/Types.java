@@ -92,6 +92,22 @@ public class Types {
     }
 
     /**
+     * Structure describing a single node of the scene hierarchy.
+     */
+    public static class NodeState {
+        public int id = -1;
+        public int parentId = -1;
+        public int level = 0;
+        public String label = "";
+        public boolean visible = true;
+        public boolean hasChildren = false;
+        public boolean collapsed = false;
+
+        public NodeState() {
+        }
+    }
+
+    /**
      * Describes a 3D surfacic mesh.
      */
     public static class Mesh {

@@ -7,5 +7,6 @@ DEPENDS
   VTK::IOImport
   VTK::IOImage
   Alembic::Alembic
+  f3d::vtkext
 TEST_DEPENDS
   VTK::TestingCore

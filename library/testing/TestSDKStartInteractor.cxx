@@ -9,13 +9,18 @@ int TestSDKStartInteractor([[maybe_unused]] int argc, [[maybe_unused]] char* arg
   f3d::scene& sce = eng.getScene();
   sce.add(std::string(argv[1]) + "/data/cow.vtp");
   f3d::interactor& inter = eng.getInteractor();
-  inter.start(0.1, [&inter]() { inter.stop(); });
+  inter.setEventLoopUserCallback([&inter](f3d::interactor_state_t) { inter.stop(); });
+  inter.start(0.1);
 
   // Call start multiple times
-  inter.start(0.1, [&inter]() {
-    inter.start(1, []() {});
+  inter.setEventLoopUserCallback([&inter](f3d::interactor_state_t) {
+    // Trying to set a callback when loop is already running. Should not do anything.
+    inter.setEventLoopUserCallback([](f3d::interactor_state_t) {});
+
+    inter.start();
     inter.stop();
   });
+  inter.start(0.1);
 
   // Call stop without loop running
   inter.stop();

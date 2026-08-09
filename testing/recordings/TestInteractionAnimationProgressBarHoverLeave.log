@@ -1,0 +1,7 @@
+# StreamVersion 1.2
+ExposeEvent 0 299 0 0 0 0 0
+RenderEvent 0 299 0 0 0 0 0
+# Hover the mouse over the progress bar so the advanced-mode tooltip appears
+MouseMoveEvent 246 8 0 0 0 0 0
+# Mouse leaves the render window, the hover tooltip should disappear
+LeaveEvent 246 8 0 0 0 0 0

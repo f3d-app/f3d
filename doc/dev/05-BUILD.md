@@ -1,0 +1,173 @@
+# Building
+
+> [!NOTE]
+> For WebAssembly cross-compilation, follow the dedicated guide [here](14-BUILD_WASM.md).
+> For other dedicated tools and builds setupo, see [this doc](07-TOOLING.md).
+
+F3D uses a CMake based build system, so building F3D just requires installing
+needed dependencies, configuring and building. If you are not used to such processes
+please take a look at our [getting started guide](04-GETTING_STARTED.md).
+
+## Dependencies
+
+- [CMake](https://cmake.org) >= 3.1.
+- [VTK](https://vtk.org) >= 9.4.0 (9.6.2 recommended).
+- A C++20 compiler.
+- A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
+- Optionally, [Assimp](https://www.assimp.org/) >= 5.4.0 (6.0.2 recommended).
+- Optionally, Open CASCADE [OCCT](https://dev.opencascade.org/) >= 7.6.3 (7.9.1 recommended).
+- Optionally, [Alembic](http://www.alembic.io/) >= 1.8.5.
+- Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 24.08 (25.05.01 recommended).
+- Optionally, [OpenVDB](https://www.openvdb.org/download/) >= 12.0.0, enable `IOOpenVDB` module during VTK configuration.
+- Optionally, [PDAL](https://pdal.org/en/2.10.0/) >= 2.0.0 (2.9.0 recommended), enable `IOPDAL` module during VTK configuration.
+- Optionally, [web-ifc](https://github.com/ThatOpen/engine_web-ifc) >= 0.75 (only C++ library).
+- Optionally, [OSPray](https://www.ospray.org/) == 2.12.0, enable `RenderingRayTracing` module during VTK configuration.
+- Optionally, [Draco](https://google.github.io/draco/) >= 1.5.6.
+- Optionally, [Python](https://www.python.org/) >= 3.10 and [pybind11](https://github.com/pybind/pybind11) >= 3.0.0.
+- Optionally, [Java](https://www.java.com) >= 17.
+- Optionally, [OpenEXR](https://openexr.com/en/latest/) >= 3.0.1.
+- Optionally, [WebP](https://chromium.googlesource.com/webm/libwebp) >= 1.2.4.
+
+F3D is tested continuously against versions recommended by the [VFX reference platform](https://vfxplatform.com) defined for **CY2025**
+
+## VTK compatibility
+
+As stated in the dependencies, F3D is compatible with VTK >= 9.4.0, however, some features may not be available. We suggest using VTK 9.6.2 with RenderingRayTracing, IOExodus, IOHDF, IONetCDF, IOPDAL and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
+
+> NOTE: When VTK is compiled for GLES (usually the case for Android and WebAssembly only), F3D is only compatible with the VTK version specified in `.github/workflows/versions.json` file.
+
+## Configuration and building
+
+Configure and generate the project with CMake,
+then build the software using your build system.
+
+Here is some CMake options of interest:
+
+- `F3D_BUILD_APPLICATION`: Build the F3D executable.
+- `BUILD_TESTING`: Enable the [tests](06-TESTING.md).
+- `F3D_MACOS_BUNDLE`: On macOS, build a `.app` bundle.
+- `F3D_WINDOWS_BUILD_SHELL_THUMBNAILS_EXTENSION`: On Windows, build the shell thumbnails extension.
+- `F3D_WINDOWS_BUILD_CONSOLE_APPLICATION`: On Windows, build a supplemental Win32 console application.
+- `F3D_PLUGINS_STATIC_BUILD`: Build all plugins as static library (embedded into `libf3d`) and automatically loaded by the application. Incompatible with `F3D_MACOS_BUNDLE`.
+- `BUILD_SHARED_LIBS`: Build the libf3d and all plugins as static library (embedded into `f3d` executable). The `library` and `plugin_sdk` component will not be installed.
+
+Some modules, plugins and language bindings depending on external libraries can be optionally enabled with the following CMake variables:
+
+- `F3D_MODULE_RAYTRACING`: Support for raytracing rendering. Requires that VTK has been built with `OSPRay` and `RenderingRayTracing` turned on. Disabled by default.
+- `F3D_MODULE_EXR`: Support for OpenEXR images. Requires `OpenEXR`. Disabled by default.
+- `F3D_MODULE_UI`: Support for ImGui widgets. Uses provided ImGui. Enabled by default.
+- `F3D_MODULE_WEBP`: Support for WebP images. Requires `libwebp`. Disabled by default.
+- `F3D_MODULE_CLIP`: Support for clipboard interaction in libf3d, used by `engine::state` and by the application to save/load statefiles to/from the system clipboard. Uses provided clip. Enabled by default.
+- `F3D_PLUGIN_BUILD_HDF`: Support for VTKHDF (.vtkhdf), ExodusII (.ex2), and NetCDF (.nc) file formats. Requires that VTK has been built with `IOHDF`, `IOExodus`, and `IONetCDF` modules (and `hdf5`). Enabled by default.
+- `F3D_PLUGIN_BUILD_OCCT`: Support for STEP, IGES, BREP, and XBF file formats. Requires `OpenCASCADE`. Disabled by default.
+- `F3D_PLUGIN_BUILD_ASSIMP`: Support for FBX, DAE, OFF, DXF, X, 3MF and AMF file formats. Requires `Assimp`. Disabled by default.
+- `F3D_PLUGIN_BUILD_ALEMBIC`: Support for ABC file format. Requires `Alembic`. Disabled by default.
+- `F3D_PLUGIN_BUILD_DRACO`: Support for DRC file format. Requires `Draco`. Disabled by default.
+- `F3D_PLUGIN_BUILD_USD`: Support for USD file format. Requires `OpenUSD`. Disabled by default.
+- `F3D_PLUGIN_BUILD_VDB`: Support for VDB file format. Requires that VTK has been built with `IOOpenVDB` module (and `OpenVDB`). Disabled by default.
+- `F3D_PLUGIN_BUILD_PDAL`: Support for Point Cloud file formats. Requires that VTK has been built with `IOPDAL` module (and `PDAL`). Disabled by default.
+- `F3D_PLUGIN_BUILD_WEBIFC`: Support for IFC file format. Requires `web-ifc`. Disabled by default.
+- `F3D_BINDINGS_PYTHON`: Generate python bindings (requires `Python` and `pybind11`). Disabled by default.
+- `F3D_BINDINGS_PYTHON_GENERATE_STUBS`: Generate python stubs (requires `Python` and `pybind11_stubgen`). Disabled by default.
+- `F3D_BINDINGS_JAVA`: Generate java bindings (requires `Java` >= 17 and `JNI`). Disabled by default.
+- `F3D_BINDINGS_C`: Generate C bindings. Disabled by default.
+
+Some dependencies are provided internally, eg: ImGui, dmon and others. Use `F3D_USE_EXTERNAL_*` to use an external version of these libraries.
+
+VTK can be built with OpenGL ES support, which is mostly the case when targeting mobile or web platforms.
+The CMake variable `F3D_USE_GLES` is automatically defined accordingly and reported during the configuration step.
+
+## Building for contribution
+
+If you plan to contribute to F3D, you may want to use the provided `dev` preset for easier setup:
+
+```bash
+cmake --preset=dev /path/to/source
+```
+
+Please note optional dependencies should then be enabled as needed.
+
+## VCPKG
+
+It's possible to use VCPKG to automatically build dependencies. A manifest file `vcpkg.json` is available at your convenience. Please read [VCPKG documentation](https://vcpkg.io/en/getting-started.html).
+Basically, just install VCPKG, and configure F3D using `-DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake` option.
+Only VTK is added to the manifest file and additional dependencies must be added manually in this file. For an easier setup you can use the provided preset `vcpkg`:
+
+```bash
+cmake --preset=vcpkg /path/to/source
+```
+
+## Python bindings
+
+### Requirements
+
+Only `pybind11` should be available on your system to build python bindings. Additionally, `pytest` and `numpy` must be available to run the tests. These dependencies can be installed with `pip`. It is recommended (but not strictly necessary) to install in a virtual environment.
+
+The virtual environment can be created using the `venv` module:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+Install the required Python dependencies:
+
+```bash
+pip install --group dev
+```
+
+> **Note**: Require pip 25.1 or higher. You can upgrade pip using `python -m pip install --upgrade pip`.
+
+### Build
+
+Configure F3D with the `F3D_BINDINGS_PYTHON` CMake option enabled:
+
+```bash
+cmake -DF3D_BINDINGS_PYTHON=ON [...]
+```
+
+Build the project:
+
+```bash
+cmake --build . --target pyf3d
+```
+
+### Test
+
+Run the Python bindings tests with ctest:
+
+    ctest -L python
+
+## Installing
+
+Installation can be done through CMake, by running the following command:
+
+```bash
+cmake --install ${your_build_dir}
+```
+
+Individual components can also be installed by specifying the component name:
+
+```bash
+cmake --install ${your_build_dir} --component ${component_name}
+```
+
+Here is the list of all the components:
+
+| Name            | Installed by default | Operating system | Description                                                                                                                 |
+| --------------- | -------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `application`   | YES                  | ALL              | F3D application.                                                                                                            |
+| `configuration` | NO                   | ALL              | Default configuration files, `config` and `thumbnail`.                                                                      |
+| `library`       | YES                  | ALL              | libf3d library binaries.                                                                                                    |
+| `plugin`        | YES                  | ALL              | libf3d plugins.                                                                                                             |
+| `dependencies`  | NO                   | ALL              | libf3d runtime dependencies. Can be used to create a self-contained and relocatable package. System libraries are excluded. |
+| `sdk`           | NO                   | ALL              | libf3d SDK (headers and CMake config files) for `library` and `application` find_package components.                        |
+| `plugin_sdk`    | NO                   | ALL              | libf3d plugin SDK (headers and CMake config files including macros) for `pluginsdk` find_package components.                |
+| `licenses`      | YES                  | ALL              | F3D and third party licenses.                                                                                               |
+| `documentation` | YES                  | Linux            | `man` documentation.                                                                                                        |
+| `shellext`      | YES                  | Windows/Linux    | Desktop integration.                                                                                                        |
+| `python`        | YES                  | ALL              | Python bindings.                                                                                                            |
+| `java`          | YES                  | ALL              | Java bindings.                                                                                                              |
+| `mimetypes`     | NO                   | Linux            | Plugins mimetype XML files for integration with Freedesktop.                                                                |
+| `assets`        | YES                  | Linux            | Assets for integration with Freedesktop.                                                                                    |
+| `colormaps`     | NO                   | ALL              | Color maps presets, see [documentation](../user/10-COLOR_MAPS.md)                                                           |

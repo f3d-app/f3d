@@ -92,6 +92,16 @@ private:
   void RenderFpsCounter() override;
 
   /**
+   * Render the animation progress bar at the bottom of the viewport.
+   */
+  void RenderAnimationProgressBar() override;
+
+  /**
+   * Compute the animation progress bar footprint in pixels, see base class.
+   */
+  double GetAnimationProgressBarHeight() const override;
+
+  /**
    * Render the console widget
    */
   void RenderConsole(bool) override;
@@ -101,9 +111,25 @@ private:
    */
   void RenderConsoleBadge() override;
 
+  /**
+   * Render the notifications at the bottom left of viewport.
+   * Newest to oldest, from bottom to top.
+   */
+  void RenderNotifications(double currentTime) override;
+
 private:
   vtkF3DImguiActor(const vtkF3DImguiActor&) = delete;
   void operator=(const vtkF3DImguiActor&) = delete;
+
+  /**
+   * Render the text as a grey badge with the provided alpha value
+   */
+  void RenderBadge(const std::string& text, float alpha);
+
+  /**
+   * Compute the width of a badge
+   */
+  float CalcBadgeWidth(const std::string& text);
 };
 
 #endif

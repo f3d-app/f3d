@@ -25,8 +25,10 @@
 #include <vtkVersion.h>
 
 #include <memory>
+#include <string>
 
 class vtkInformationStringKey;
+class vtkResourceStream;
 
 class vtkF3DUSDImporter : public vtkF3DImporter
 {
@@ -78,6 +80,16 @@ public:
    */
   static vtkInformationStringKey* TCOORDS_NAME();
 
+  ///@{
+  /**
+   * Check whether the given stream contains a recognizable USD format.
+   * The two-argument overload also sets `hint` to the detected file extension
+   * ("usda", "usdc", or "usdz") which is required when reading from a stream.
+   */
+  static bool CanReadFile(vtkResourceStream* stream);
+  static bool CanReadFile(vtkResourceStream* stream, std::string& hint);
+  ///@}
+
   /**
    * Recover animation timeRange, all other args are ignored
    */
@@ -88,6 +100,13 @@ public:
    * Update importer at provided timeValue
    */
   bool UpdateAtTimeValue(double timeValue) override;
+
+  /**
+   * Set additional resources path to find plugInfo.json files
+   * It's usually not needed except if the files location is not relative to the binaries,
+   * which can be the case on sandboxed environment like Android.
+   */
+  void SetResourcesPath(const std::string& path);
 
 protected:
   vtkF3DUSDImporter();

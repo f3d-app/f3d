@@ -37,8 +37,8 @@ extern "C"
    *
    * @param str Input string to tokenize.
    * @param keep_comments Non-zero to keep comments, zero to treat '#' as a normal character.
-   * @param out_count Pointer to receive the number of tokens.
-   * @return Array of C strings.
+   * @param out_count Pointer to receive the number of tokens. Set to 0 if `str` is ill-formed.
+   * @return Array of C strings. NULL if `str` is malformed.
    */
   F3D_EXPORT char** f3d_utils_tokenize(const char* str, int keep_comments, size_t* out_count);
 
@@ -71,7 +71,7 @@ extern "C"
    *
    * @param glob Glob expression.
    * @param path_separator Path separator character.
-   * @return Regular expression string.
+   * @return Regular expression string. NULL if `glob` is ill-formed.
    */
   F3D_EXPORT char* f3d_utils_glob_to_regex(const char* glob, char path_separator);
 
@@ -101,15 +101,6 @@ extern "C"
    * @param str String to free.
    */
   F3D_EXPORT void f3d_utils_string_free(char* str);
-
-  /**
-   * @brief Calculate the primary monitor system zoom scale base on DPI.
-   *
-   * Only supported on Windows platform.
-   *
-   * @return DPI scale in double, or 1.0 on other platforms.
-   */
-  F3D_EXPORT double f3d_utils_get_dpi_scale();
 
 #ifdef __cplusplus
 }
