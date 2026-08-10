@@ -128,9 +128,9 @@ Scan standard directories for plugins and display their names. Results may be in
 
 Filename to save [screenshots](04-INTERACTIONS.md#take-screenshots) to. Can use [template variables](#filename-templating). Supports [relative screenshot paths](04-INTERACTIONS.md#take-screenshots).
 
-### `--rendering-backend=<auto|egl|osmesa|glx|wgl>` (_string_, default: `auto`)
+### `--rendering-backend=<auto|egl|osmesa|glx|openxr|wgl>` (_string_, default: `auto`)
 
-Rendering backend to load, `auto` means to let F3D pick the correct one for you depending on your system capabilities. Use `egl` or `osmesa` to force headless rendering. See [rendering backends](12-DESKTOP_INTEGRATION.md#rendering-backends).
+Rendering backend to load, `auto` means to let F3D pick the correct one for you depending on your system capabilities. Use `egl` or `osmesa` on linux to force headless rendering. Use `openxr` to launch F3D in XR mode.
 
 ### `-D`, `--define=<libf3d.option=value>` (_special_)
 
@@ -280,7 +280,7 @@ Set the reflection strength on the grid.
 
 ### `--grid-absolute` (_bool_, default: `false`)
 
-Position the grid at absolute origin instead of below the model.
+Position the grid at absolute origin instead of below the model. Forced to true if XR mode is enabled.
 
 #### compare
 
@@ -674,8 +674,7 @@ Ignored if `--hdri-skybox` is enabled.
 
 ### `--resolution=<width,height>` (_vector\<double\>_, default: `1000, 600`)
 
-Set the _window resolution_. When closing an interactive window, its resolution is remembered in a [cache file](#caches), and restored on the next start, unless it is set in a configuration file, a statefile or on the command-line. Rendering to a file with `--output` or `--reference` is unaffected.
-To always start with the same window size, set it in a [configuration file](06-CONFIGURATION_FILE.md), eg: `"resolution": "1280,720"`. It is only applied on the first load.
+Set the _window resolution_. When closing an interactive window, its resolution is remembered in a [cache file](#caches), and restored on the next start, unless it is set in a configuration file, a statefile or on the command line. Rendering to a file with `--output` or `--reference` is unaffected. Ignored in XR mode.
 
 ### `--position=<x,y>` (_vector\<double\>_)
 
