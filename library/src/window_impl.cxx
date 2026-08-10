@@ -959,41 +959,41 @@ void window_impl::SetResourcesPath(const fs::path& resourcesPath)
       }
       std::string manifestsDir = xrActionsManifestsFolder.string() + fs::path::preferred_separator;
       this->Internals->Interactor->SetXRResourcesDirectory(manifestsDir);
-    }
 #else
-      assert(false); // Unreachable
+    }
+    assert(false); // Unreachable
 #endif
+    }
+    catch (const fs::filesystem_error& ex)
+    {
+      throw engine::resource_exception(std::string("Could not use resources: ") + ex.what());
+    }
   }
-  catch (const fs::filesystem_error& ex)
+
+  //----------------------------------------------------------------------------
+  void window_impl::SetInteractor(interactor_impl * interactor)
   {
-    throw engine::resource_exception(std::string("Could not use resources: ") + ex.what());
+    this->Internals->Interactor = interactor;
   }
-}
 
-//----------------------------------------------------------------------------
-void window_impl::SetInteractor(interactor_impl* interactor)
-{
-  this->Internals->Interactor = interactor;
-}
-
-//----------------------------------------------------------------------------
-void window_impl::RenderUIOnly()
-{
+  //----------------------------------------------------------------------------
+  void window_impl::RenderUIOnly()
+  {
 #if F3D_MODULE_UI
-  // Do only a partial render of the UI
-  vtkRenderWindow* renWin = this->Internals->RenWin;
-  vtkRenderer* ren = renWin->GetRenderers()->GetFirstRenderer();
-  vtkInformation* info = ren->GetInformation();
+    // Do only a partial render of the UI
+    vtkRenderWindow* renWin = this->Internals->RenWin;
+    vtkRenderer* ren = renWin->GetRenderers()->GetFirstRenderer();
+    vtkInformation* info = ren->GetInformation();
 
-  info->Set(vtkF3DRenderPass::RENDER_UI_ONLY(), 1);
-  renWin->Render();
-  info->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
+    info->Set(vtkF3DRenderPass::RENDER_UI_ONLY(), 1);
+    renWin->Render();
+    info->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
 #endif
-}
+  }
 
-//----------------------------------------------------------------------------
-vtkF3DRenderer* window_impl::GetRenderer() const
-{
-  return this->Internals->Renderer;
-}
+  //----------------------------------------------------------------------------
+  vtkF3DRenderer* window_impl::GetRenderer() const
+  {
+    return this->Internals->Renderer;
+  }
 }
