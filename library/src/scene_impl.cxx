@@ -902,7 +902,7 @@ scene_info_t scene_impl::getSceneInfo() const
 {
   const vtkF3DMetaImporter::SceneInfo info = this->Internals->MetaImporter->GetSceneInfo();
 
-  return scene_info_t{ info.NumberOfFiles, info.NumberOfActors,
+  return scene_info_t{ info.NumberOfImporters, info.NumberOfActors,
     static_cast<std::int64_t>(info.NumberOfPoints), static_cast<std::int64_t>(info.NumberOfCells) };
 }
 

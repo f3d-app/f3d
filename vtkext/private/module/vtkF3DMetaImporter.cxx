@@ -960,7 +960,7 @@ void vtkF3DMetaImporter::UpdateInfoForColoring()
 vtkF3DMetaImporter::SceneInfo vtkF3DMetaImporter::GetSceneInfo() const
 {
   vtkF3DMetaImporter::SceneInfo info;
-  info.NumberOfFiles = static_cast<int>(this->Pimpl->Importers.size());
+  info.NumberOfImporters = static_cast<int>(this->Pimpl->Importers.size());
   info.NumberOfActors = this->ActorCollection->GetNumberOfItems();
 
   vtkCollectionSimpleIterator ait;
@@ -981,10 +981,10 @@ std::string vtkF3DMetaImporter::GetMetaDataDescription() const
   const vtkF3DMetaImporter::SceneInfo info = this->GetSceneInfo();
 
   std::string description;
-  if (info.NumberOfFiles > 1)
+  if (info.NumberOfImporters > 1)
   {
     description += "Number of files: ";
-    description += std::to_string(info.NumberOfFiles);
+    description += std::to_string(info.NumberOfImporters);
     description += "\n";
   }
 

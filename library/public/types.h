@@ -411,7 +411,7 @@ struct node_state_t
  */
 struct scene_info_t
 {
-  /// Number of importers in the scene, which counts every file added with scene::add as well as
+  /// Number of files in the scene, which counts every file added with scene::add as well as
   /// every mesh and buffer added with it
   int numberOfFiles = 0;
 

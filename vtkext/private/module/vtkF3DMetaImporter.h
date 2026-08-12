@@ -124,7 +124,7 @@ public:
 
   struct SceneInfo
   {
-    int NumberOfFiles = 0;
+    int NumberOfImporters = 0;
     int NumberOfActors = 0;
     vtkIdType NumberOfPoints = 0;
     vtkIdType NumberOfCells = 0;
@@ -132,7 +132,7 @@ public:
 
   /**
    * Recover counters describing all imported data.
-   * Only actors are taken into account, so volumes contribute no points nor cells.
+   * Only surface actors are taken into account for point and cell count
    */
   SceneInfo GetSceneInfo() const;
 
