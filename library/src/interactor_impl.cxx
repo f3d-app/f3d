@@ -497,7 +497,7 @@ public:
       // invalidating any references/iterators into it.
       const BindingCommands binding = commandsIt->second;
 
-      if (binding.Repeat || rwi->GetRepeatCount() <= 1)
+      if (binding.Repeat || rwi->GetRepeatCount() == 0)
       {
         for (const std::string& command : binding.CommandVector)
         {
