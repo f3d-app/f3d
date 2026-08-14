@@ -252,7 +252,7 @@ int f3d_scene_set_node_visibility(f3d_scene_t* scene, int node_id, int visible)
   }
   catch (const f3d::scene::node_exception& e)
   {
-    f3d::log::error("Failed to set visibility of node at index {}: {}", node_id, e.what());
+    f3d::log::error("Failed to set visibility of node at index ", node_id, ": ", e.what());
     return 0;
   }
   return 1;
@@ -273,7 +273,7 @@ int f3d_scene_add(f3d_scene_t* scene, const char* file_path)
   }
   catch (const f3d::scene::load_failure_exception& e)
   {
-    f3d::log::error("Failed to add file to scene: {}", file_path);
+    f3d::log::error("Failed to add file to scene: ", file_path);
     return 0;
   }
 
@@ -454,7 +454,7 @@ int f3d_scene_remove_light(f3d_scene_t* scene, int index)
   }
   catch (const f3d::scene::light_exception& e)
   {
-    f3d::log::error("Failed to remove light at index {}: {}", index, e.what());
+    f3d::log::error("Failed to remove light at index ", index, ": ", e.what());
     return 0;
   }
 
@@ -478,7 +478,7 @@ int f3d_scene_update_light(f3d_scene_t* scene, int index, const f3d_light_state_
   }
   catch (const f3d::scene::light_exception& e)
   {
-    f3d::log::error("Failed to update light at index {}: {}", index, e.what());
+    f3d::log::error("Failed to update light at index ", index, ": ", e.what());
     return 0;
   }
 
@@ -502,7 +502,7 @@ f3d_light_state_t* f3d_scene_get_light(const f3d_scene_t* scene, int index)
   }
   catch (const f3d::scene::light_exception& e)
   {
-    f3d::log::error("Failed to get light at index {}: {}", index, e.what());
+    f3d::log::error("Failed to get light at index ", index, ": ", e.what());
     return nullptr;
   }
 }

@@ -2,7 +2,7 @@
 
 > [!NOTE]
 > For WebAssembly cross-compilation, follow the dedicated guide [here](14-BUILD_WASM.md).
-> For other dedicated tools and builds setupo, see [this doc](07-TOOLING.md).
+> For other dedicated tools and build setups, see [this doc](07-TOOLING.md).
 
 F3D uses a CMake based build system, so building F3D just requires installing
 needed dependencies, configuring and building. If you are not used to such processes
