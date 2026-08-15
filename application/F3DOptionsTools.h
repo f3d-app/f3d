@@ -116,6 +116,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "grid", "render.grid.enable" },
   { "grid-absolute", "render.grid.absolute" },
   { "grid-color", "render.grid.color" },
+  { "grid-opacity", "render.grid.opacity" },
   { "grid-reflection", "render.grid.reflection" },
   { "grid-subdivisions", "render.grid.subdivisions" },
   { "grid-unit", "render.grid.unit" },
