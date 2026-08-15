@@ -48,6 +48,7 @@ f3d_test(NAME TestQuakeMDLSkinIndexNonInteger DATA armor.mdl ARGS -DQuakeMDL.ski
 f3d_test(NAME TestQuakeMDLSkinIndexOutOfBounds DATA armor.mdl ARGS -DQuakeMDL.skin_index=4)
 f3d_test(NAME TestQuakeMDLSkinIndexOverflow DATA armor.mdl ARGS -DQuakeMDL.skin_index=9223372036854775808)
 f3d_test(NAME TestQuakeMDLGroupSkin DATA groupskin.mdl ARGS --animation-indices=1 --animation-time=0.3)
+f3d_test(NAME TestQuakeMDLAnimationInterpolation DATA zombie.mdl ARGS --animation-time=1.42 -DQuakeMDL.animation_interpolation=1)
 f3d_test(NAME TestVerboseQuakeMDLAnimationNoNamingScheme ARGS --verbose DATA v_rock2.mdl REGEXP "0: flame" NO_BASELINE)
 f3d_test(NAME TestVerboseQuakeMDLGroupSkin ARGS --verbose DATA groupskin.mdl REGEXP "0: group_skin" NO_BASELINE)
 f3d_test(NAME TestVerboseQuakeMDLInvalid ARGS --verbose --force-reader=QuakeMDL DATA invalid_version.mdl REGEXP "Unsupported MDL version" NO_BASELINE)

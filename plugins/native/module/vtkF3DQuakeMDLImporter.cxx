@@ -7,15 +7,15 @@
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
 #include <vtkInterpolateDataSetAttributes.h>
+#include <vtkMathUtilities.h>
 #include <vtkOpenGLTexture.h>
 #include <vtkPointData.h>
+#include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkResourceStream.h>
-#include <vtkMathUtilities.h>
-#include <vtkPoints.h>
 
 #include <cstdint>
 #include <cstring>

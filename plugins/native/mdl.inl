@@ -1,4 +1,5 @@
-void applyCustomImporter(vtkImporter* importer, const std::string& vtkNotUsed(fileName), vtkResourceStream*) const override
+void applyCustomImporter(
+  vtkImporter* importer, const std::string& vtkNotUsed(fileName), vtkResourceStream*) const override
 {
   vtkF3DQuakeMDLImporter* mdlImporter = vtkF3DQuakeMDLImporter::SafeDownCast(importer);
 
@@ -9,14 +10,13 @@ void applyCustomImporter(vtkImporter* importer, const std::string& vtkNotUsed(fi
   if (skinIndex < 0)
   {
     skinIndex = 0;
-    vtkWarningWithObjectMacro(
-      nullptr, "QuakeMDL.skin_index must be positive. Defaulting to 0.");
+    vtkWarningWithObjectMacro(nullptr, "QuakeMDL.skin_index must be positive. Defaulting to 0.");
   }
   mdlImporter->SetSkinIndex(skinIndex);
 
   std::string interpOptName = "QuakeMDL.animation_interpolation";
   std::string interpOptStr = this->ReaderOptions.at(interpOptName);
-  
+
   bool interpolate = (F3DUtils::ParseToDouble(interpOptStr, 0, interpOptName) != 0);
   mdlImporter->SetInterpolate(interpolate);
 }
