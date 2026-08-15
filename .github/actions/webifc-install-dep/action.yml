@@ -38,14 +38,14 @@ runs:
     - name: Cache webifc
       id: cache-webifc
       continue-on-error: true # https://github.com/actions/cache/issues/1754
-      uses: actions/cache/restore@v5
+      uses: actions/cache/restore@v6
       with:
         path: dependencies/webifc_install
         key: webifc-${{steps.webifc_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-1
 
     - name: Checkout webifc
       if: steps.cache-webifc.outputs.cache-hit != 'true'
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: ThatOpen/engine_web-ifc
         path: "./dependencies/webifc"
@@ -84,7 +84,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-webifc.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v5
+      uses: actions/cache/save@v6
       with:
         key: ${{ steps.cache-webifc.outputs.cache-primary-key }}
         path: dependencies/webifc_install

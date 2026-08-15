@@ -14,7 +14,6 @@
 #include <vtkRenderState.h>
 #include <vtkRenderer.h>
 #include <vtkShaderProgram.h>
-#include <vtkSkybox.h>
 #include <vtkTextureObject.h>
 
 vtkStandardNewMacro(vtkF3DOverlayRenderPass);

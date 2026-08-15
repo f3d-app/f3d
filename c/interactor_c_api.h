@@ -247,7 +247,7 @@ extern "C"
    * @param group Group name.
    * @param count Output parameter for number of binds.
    * @return Array of binds. Caller must free the array with
-   *         f3d_interactor_free_bind_array().
+   *         f3d_interactor_free_bind_array(). NULL if group does not exist.
    */
   F3D_EXPORT f3d_interaction_bind_t* f3d_interactor_get_binds_for_group(
     f3d_interactor_t* interactor, const char* group, int* count);
@@ -287,7 +287,7 @@ extern "C"
    *
    * @param interactor Interactor handle.
    * @param bind Interaction bind.
-   * @return Binding type.
+   * @return Binding type. F3D_INTERACTOR_BINDING_OTHER if bind does not exist.
    */
   F3D_EXPORT f3d_interactor_binding_type_t f3d_interactor_get_binding_type(
     f3d_interactor_t* interactor, const f3d_interaction_bind_t* bind);
@@ -461,6 +461,27 @@ extern "C"
    */
   F3D_EXPORT void f3d_interactor_set_event_loop_user_callback(
     f3d_interactor_t* interactor, f3d_interactor_callback_t callback, void* user_data);
+
+  /**
+   * @brief Notification callback signature.
+   *
+   * Return zero to prevent standard notification from being displayed.
+   * Arguments are the description, value, bindings, and duration of the notification.
+   */
+  typedef int (*f3d_interactor_notification_callback_t)(
+    const char* desc, const char* value, const char* bind, double duration, void* user_data);
+
+  /**
+   * @brief Set the notification callback.
+   *
+   * The callback is invoked when a notification is triggered.
+   *
+   * @param interactor Interactor handle.
+   * @param callback Notification callback, or NULL to clear.
+   * @param user_data Optional opaque pointer passed to callback.
+   */
+  F3D_EXPORT void f3d_interactor_set_notification_callback(
+    f3d_interactor_t* interactor, f3d_interactor_notification_callback_t callback, void* user_data);
 
   /**
    * @brief Stop the interactor.

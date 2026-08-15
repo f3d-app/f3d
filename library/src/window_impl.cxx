@@ -28,6 +28,10 @@
 #include <vtkVersion.h>
 #include <vtkWindowToImageFilter.h>
 
+#ifdef __EMSCRIPTEN__
+#include <vtkWebAssemblyOpenGLRenderWindow.h>
+#endif
+
 #ifdef VTK_USE_X
 #include <vtkF3DGLXRenderWindow.h>
 #endif
@@ -72,7 +76,17 @@ public:
   {
     // Override VTK logic
 #ifdef _WIN32
-    return vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
+    vtkSmartPointer<vtkOpenGLRenderWindow> wglRenWin =
+      vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
+    if (!wglRenWin->SupportsOpenGL())
+    {
+      // Can happen when a remote desktop is used, in that case we fallback on OSMesa
+      return vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
+    }
+    else
+    {
+      return wglRenWin;
+    }
 #elif defined(__linux__) || defined(__FreeBSD__)
 #if defined(VTK_USE_X)
     // try GLX
@@ -92,7 +106,9 @@ public:
 #endif
 
     // OSMesa
-    return vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
+    vtkSmartPointer<vtkRenderWindow> osmesaRenWin = vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
+    osmesaRenWin->Initialize();
+    return osmesaRenWin->GetInitialized() ? osmesaRenWin : nullptr;
 #else
     // fallback on VTK logic for other systems
     return vtkSmartPointer<vtkRenderWindow>::New();
@@ -106,11 +122,14 @@ public:
   interactor_impl* Interactor = nullptr;
   fs::path CachePath;
   context::function GetProcAddress;
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 7, 20260724)
+  bool PositionWarningEmitted = false;
+#endif
 };
 
 //----------------------------------------------------------------------------
 window_impl::window_impl(const options& options, const std::optional<Type>& type, bool offscreen,
-  const context::function& getProcAddress)
+  const context::function& getProcAddress, [[maybe_unused]] std::string_view id)
   : Internals(std::make_unique<window_impl::internals>(options))
 {
   this->Internals->GetProcAddress = getProcAddress;
@@ -148,6 +167,14 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
     this->Internals->RenWin = vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
 #else
     assert(false); // Unreachable
+#endif
+  }
+  else if (type == Type::WASM)
+  {
+#ifdef __EMSCRIPTEN__
+    auto wasmRenWin = vtkSmartPointer<vtkWebAssemblyOpenGLRenderWindow>::New();
+    wasmRenWin->SetCanvasSelector(id.empty() ? "#canvas" : id.data());
+    this->Internals->RenWin = wasmRenWin;
 #endif
   }
   else if (!type.has_value())
@@ -256,6 +283,13 @@ bool window_impl::isOffscreen()
 }
 
 //----------------------------------------------------------------------------
+double window_impl::getDPIScale()
+{
+  this->Internals->Renderer->SetDPIAware(this->Internals->Options.ui.dpi_aware);
+  return this->Internals->Renderer->GetDPIScale();
+}
+
+//----------------------------------------------------------------------------
 camera& window_impl::getCamera()
 {
   return *this->Internals->Camera;
@@ -282,8 +316,16 @@ window& window_impl::setSize(int width, int height)
 }
 
 //----------------------------------------------------------------------------
+std::pair<int, int> window_impl::getSize() const
+{
+  const int* size = this->Internals->RenWin->GetSize();
+  return { size[0], size[1] };
+}
+
+//----------------------------------------------------------------------------
 window& window_impl::setPosition(int x, int y)
 {
+#ifdef __APPLE__
   if (this->Internals->RenWin->IsA("vtkCocoaRenderWindow"))
   {
     // vtkCocoaRenderWindow has a different behavior than other render windows
@@ -291,12 +333,52 @@ window& window_impl::setPosition(int x, int y)
     const int* screenSize = this->Internals->RenWin->GetScreenSize();
     const int* winSize = this->Internals->RenWin->GetSize();
     this->Internals->RenWin->SetPosition(x, screenSize[1] - winSize[1] - y);
+    return *this;
   }
-  else
-  {
-    this->Internals->RenWin->SetPosition(x, y);
-  }
+#endif
+  this->Internals->RenWin->SetPosition(x, y);
   return *this;
+}
+
+//----------------------------------------------------------------------------
+std::pair<int, int> window_impl::getPosition() const
+{
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 7, 20260724)
+  // Warn once if the render window is an X11 window predating the VTK fix that made
+  // vtkXOpenGLRenderWindow::GetPosition() reliable (VTK 9.7.20260724), in which case the reported
+  // position may be inaccurate.
+  if (!this->Internals->PositionWarningEmitted &&
+    this->Internals->RenWin->IsA("vtkXOpenGLRenderWindow"))
+  {
+    log::warn("Window position may be inaccurate with VTK older than 9.7.20260724, "
+              "consider updating VTK.");
+    this->Internals->PositionWarningEmitted = true;
+  }
+#endif
+  const int* pos = this->Internals->RenWin->GetPosition();
+#ifdef __APPLE__
+  if (this->Internals->RenWin->IsA("vtkCocoaRenderWindow"))
+  {
+    // vtkCocoaRenderWindow positions are expressed from the bottom left of the screen, convert
+    // back to a top left origin, mirroring what setPosition does
+    const int* screenSize = this->Internals->RenWin->GetScreenSize();
+    const int* winSize = this->Internals->RenWin->GetSize();
+    return { pos[0], screenSize[1] - winSize[1] - pos[1] };
+  }
+#endif
+  return { pos[0], pos[1] };
+}
+
+//----------------------------------------------------------------------------
+int window_impl::getLeft() const
+{
+  return this->getPosition().first;
+}
+
+//----------------------------------------------------------------------------
+int window_impl::getTop() const
+{
+  return this->getPosition().second;
 }
 
 //----------------------------------------------------------------------------
@@ -399,39 +481,47 @@ void window_impl::UpdateDynamicOptions()
 
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
-  renderer->SetUsePointSprites(opt.model.point_sprites.enable);
   vtkF3DRenderer::SplatType splatType = vtkF3DRenderer::SplatType::SPHERE;
-  if (opt.model.point_sprites.enable)
+
+  bool enablePointSprites = true;
+  if (opt.model.point_sprites.type == "gaussian")
   {
-    if (opt.model.point_sprites.type == "gaussian")
-    {
-      splatType = vtkF3DRenderer::SplatType::GAUSSIAN;
-    }
-    else if (opt.model.point_sprites.type == "sphere")
-    {
-      splatType = vtkF3DRenderer::SplatType::SPHERE;
-    }
-    else if (opt.model.point_sprites.type == "circle")
-    {
-      splatType = vtkF3DRenderer::SplatType::CIRCLE;
-    }
-    else if (opt.model.point_sprites.type == "stddev")
-    {
-      splatType = vtkF3DRenderer::SplatType::STD_DEV;
-    }
-    else if (opt.model.point_sprites.type == "bound")
-    {
-      splatType = vtkF3DRenderer::SplatType::BOUND;
-    }
-    else if (opt.model.point_sprites.type == "cross")
-    {
-      splatType = vtkF3DRenderer::SplatType::CROSS;
-    }
-    else
-    {
-      log::warn(opt.model.point_sprites.type,
-        R"( is an invalid point sprites type. Valid modes are: "sphere", "gaussian", "circle", "stddev", "bound", "cross"). Falling back to "sphere".)");
-    }
+    splatType = vtkF3DRenderer::SplatType::GAUSSIAN;
+  }
+  else if (opt.model.point_sprites.type == "sphere")
+  {
+    splatType = vtkF3DRenderer::SplatType::SPHERE;
+  }
+  else if (opt.model.point_sprites.type == "circle")
+  {
+    splatType = vtkF3DRenderer::SplatType::CIRCLE;
+  }
+  else if (opt.model.point_sprites.type == "stddev")
+  {
+    splatType = vtkF3DRenderer::SplatType::STD_DEV;
+  }
+  else if (opt.model.point_sprites.type == "bound")
+  {
+    splatType = vtkF3DRenderer::SplatType::BOUND;
+  }
+  else if (opt.model.point_sprites.type == "cross")
+  {
+    splatType = vtkF3DRenderer::SplatType::CROSS;
+  }
+  else if (opt.model.point_sprites.type == "none")
+  {
+    enablePointSprites = false;
+  }
+  else
+  {
+    enablePointSprites = false;
+    log::warn(opt.model.point_sprites.type,
+      R"( is an invalid point sprites type. Valid types are: "none", "sphere", "gaussian", "circle", "stddev", "bound", "cross")");
+  }
+
+  renderer->SetUsePointSprites(enablePointSprites);
+  if (enablePointSprites)
+  {
     renderer->SetPointSpritesType(splatType);
     renderer->SetPointSpritesSize(
       opt.model.point_sprites.absolute_size, opt.model.point_sprites.size);
@@ -521,70 +611,53 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetUseRaytracingDenoiser(opt.render.raytracing.denoise);
 
   vtkF3DRenderer::AntiAliasingMode aaMode = vtkF3DRenderer::AntiAliasingMode::NONE;
-  vtkF3DRenderer::BlendingMode blendMode = vtkF3DRenderer::BlendingMode::NONE;
-
-  // F3D_DEPRECATED
-  // Remove this in the next major release
-  F3D_SILENT_WARNING_PUSH()
-  F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
-  if (opt.render.effect.anti_aliasing)
+  if (opt.render.effect.antialiasing.mode == "fxaa")
   {
-    log::warn("render.effect.anti_aliasing is deprecated, please use "
-              "render.effect.antialiasing.enable instead");
     aaMode = vtkF3DRenderer::AntiAliasingMode::FXAA;
   }
-  if (opt.render.effect.translucency_support)
+  else if (opt.render.effect.antialiasing.mode == "ssaa")
   {
-    log::warn("render.effect.translucency_support is deprecated, please use "
-              "render.effect.blending.enable instead");
+    aaMode = vtkF3DRenderer::AntiAliasingMode::SSAA;
+  }
+  else if (opt.render.effect.antialiasing.mode == "taa")
+  {
+    aaMode = vtkF3DRenderer::AntiAliasingMode::TAA;
+  }
+  else if (opt.render.effect.antialiasing.mode == "none")
+  {
+    aaMode = vtkF3DRenderer::AntiAliasingMode::NONE;
+  }
+  else
+  {
+    log::warn(opt.render.effect.antialiasing.mode,
+      R"( is an invalid antialiasing mode. Valid modes are: "none", "fxaa", "ssaa", "taa")");
+  }
+
+  vtkF3DRenderer::BlendingMode blendMode = vtkF3DRenderer::BlendingMode::NONE;
+  if (opt.render.effect.blending.mode == "ddp")
+  {
     blendMode = vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING;
   }
-  F3D_SILENT_WARNING_POP()
-
-  if (opt.render.effect.antialiasing.enable)
+  else if (opt.render.effect.blending.mode == "sort")
   {
-    if (opt.render.effect.antialiasing.mode == "fxaa")
-    {
-      aaMode = vtkF3DRenderer::AntiAliasingMode::FXAA;
-    }
-    else if (opt.render.effect.antialiasing.mode == "ssaa")
-    {
-      aaMode = vtkF3DRenderer::AntiAliasingMode::SSAA;
-    }
-    else if (opt.render.effect.antialiasing.mode == "taa")
-    {
-      aaMode = vtkF3DRenderer::AntiAliasingMode::TAA;
-    }
-    else
-    {
-      log::warn(opt.render.effect.antialiasing.mode,
-        R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa", "taa")");
-    }
+    blendMode = vtkF3DRenderer::BlendingMode::SORT;
   }
-
-  if (opt.render.effect.blending.enable)
+  else if (opt.render.effect.blending.mode == "sort_cpu")
   {
-    if (opt.render.effect.blending.mode == "ddp")
-    {
-      blendMode = vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING;
-    }
-    else if (opt.render.effect.blending.mode == "sort")
-    {
-      blendMode = vtkF3DRenderer::BlendingMode::SORT;
-    }
-    else if (opt.render.effect.blending.mode == "sort_cpu")
-    {
-      blendMode = vtkF3DRenderer::BlendingMode::SORT_CPU;
-    }
-    else if (opt.render.effect.blending.mode == "stochastic")
-    {
-      blendMode = vtkF3DRenderer::BlendingMode::STOCHASTIC;
-    }
-    else
-    {
-      log::warn(opt.render.effect.blending.mode,
-        R"( is an invalid blending mode. Valid modes are: "ddp", "sort", "sort_cpu", "stochastic")");
-    }
+    blendMode = vtkF3DRenderer::BlendingMode::SORT_CPU;
+  }
+  else if (opt.render.effect.blending.mode == "stochastic")
+  {
+    blendMode = vtkF3DRenderer::BlendingMode::STOCHASTIC;
+  }
+  else if (opt.render.effect.blending.mode == "none")
+  {
+    blendMode = vtkF3DRenderer::BlendingMode::NONE;
+  }
+  else
+  {
+    log::warn(opt.render.effect.blending.mode,
+      R"( is an invalid blending mode. Valid modes are: "none", "ddp", "sort", "sort_cpu", "stochastic")");
   }
 
   renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
@@ -607,11 +680,30 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetFontFile(opt.ui.font_file);
   renderer->SetFontScale(opt.ui.scale);
   renderer->SetFontColor(opt.ui.font_color);
+  renderer->SetAnimationProgressColor(opt.ui.animation_progress_color);
+  renderer->SetAnimationSpeedFactor(opt.scene.animation.speed_factor);
+  vtkF3DUIActor::AnimationProgressBarMode animationProgressMode =
+    vtkF3DUIActor::AnimationProgressBarMode::NONE;
+  if (opt.ui.animation_progress == "default")
+  {
+    animationProgressMode = vtkF3DUIActor::AnimationProgressBarMode::DEFAULT;
+  }
+  else if (opt.ui.animation_progress == "advanced")
+  {
+    animationProgressMode = vtkF3DUIActor::AnimationProgressBarMode::ADVANCED;
+  }
+  else if (opt.ui.animation_progress != "none")
+  {
+    log::warn(opt.ui.animation_progress,
+      R"( is an invalid animation progress mode. Valid modes are: "none", "default", "advanced". Falling back to "none".)");
+  }
+  renderer->SetAnimationProgressMode(animationProgressMode);
   renderer->SetDPIAware(opt.ui.dpi_aware);
 
   renderer->SetGridUnitSquare(opt.render.grid.unit);
   renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
   renderer->SetGridAbsolute(opt.render.grid.absolute);
+  renderer->SetGridReflection(opt.render.grid.reflection);
   renderer->ShowGrid(opt.render.grid.enable);
   renderer->SetGridColor(opt.render.grid.color);
 
@@ -768,6 +860,12 @@ void window_impl::SetCachePath(const fs::path& cachePath)
   }
 
   this->Internals->CachePath = cachePath;
+}
+
+//----------------------------------------------------------------------------
+fs::path window_impl::GetCachePath() const
+{
+  return this->Internals->CachePath;
 }
 
 //----------------------------------------------------------------------------

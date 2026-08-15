@@ -21,7 +21,7 @@ def test_scene_zero_copy():
             "model.scivis.array_name": "Color",
             "model.material.base_ior": 1.0,
             "scene.animation.autoplay": True,
-            "ui.animation_progress": True,
+            "ui.animation_progress": "default",
             "ui.scene_hierarchy": True,
         }
     )

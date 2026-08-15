@@ -92,13 +92,12 @@ int main(int argc, char** argv)
   opt.render.grid.enable = true;
   opt.render.grid.absolute = true;
   opt.render.show_edges = true;
-  opt.render.effect.antialiasing.enable = true;
   opt.render.effect.antialiasing.mode = "fxaa";
   opt.render.effect.tone_mapping = true;
 
   opt.ui.axis = true;
   opt.ui.fps = true;
-  opt.ui.animation_progress = true;
+  opt.ui.animation_progress = "default";
   opt.ui.scalar_bar = true;
   opt.ui.notifications.enable = true;
 

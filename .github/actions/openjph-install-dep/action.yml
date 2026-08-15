@@ -39,7 +39,7 @@ runs:
     - name: Cache OpenJPH
       id: cache-openjph
       continue-on-error: true # https://github.com/actions/cache/issues/1754
-      uses: actions/cache/restore@v5
+      uses: actions/cache/restore@v6
       with:
         path: dependencies/openjph_install
         key: openjph-${{steps.openjph_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
@@ -47,7 +47,7 @@ runs:
     # Dependents: openexr
     - name: Checkout OpenJPH
       if: steps.cache-openjph.outputs.cache-hit != 'true'
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: aous72/OpenJPH
         path: "./dependencies/openjph"
@@ -89,7 +89,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-openjph.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v5
+      uses: actions/cache/save@v6
       with:
         key: ${{ steps.cache-openjph.outputs.cache-primary-key }}
         path: dependencies/openjph_install

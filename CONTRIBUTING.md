@@ -28,7 +28,7 @@ You may also want to take a look into the [F3D mentoring program](doc/dev/13-MEN
 contributing steps.
 
 Once you are able to build F3D, you may want to take a look at the open [issues](https://github.com/f3d-app/f3d/issues)!
-If you are a beginner, you may want to look at ["good first issues"](https://github.com/f3d-app/f3d/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).
+If you are a beginner, you may want to look at ["good first issues"](https://github.com/f3d-app/f3d/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22). Please note that [generative AI should not be used](AI_POLICY.md) in that context.
 If you already have some experience with programming and contribution, definitely look at ["help wanted"](https://github.com/f3d-app/f3d/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) issues.
 If an issue is interesting to you and is not yet assigned, then you should _comment on the issue_ and ask for any help or clarification needed.
 F3D maintainers will see your comment, assign the issue to you and provide guidance as needed.
@@ -47,6 +47,7 @@ that is definitely possible. Feel free to reach out for guidance by opening an i
 ## AI Policy
 
 F3D has a dedicated [AI policy](AI_POLICY.md), if you are an AI user, make sure to read it and comply to it.
+If not, you are at risk of being banned.
 
 ## F3D Development Workflow
 
@@ -84,14 +85,26 @@ Make sure to check the results for yourself and ask for help if needed.
 
 To run the CI, just add a comment like this in your PR:
 
-- `\ci fast`: Style checks and a fast linux job, always make this work first.
-- `\ci main`: Cross platform CI that cover most usecases, including coverage, contains `ci:fast`, always make this work second.
+- `\ci fast`: A fast linux job without optional dependencies, always make this work first.
+- `\ci extended`: An extended linux job with dependencies and recent VTK, always make this work second.
+- `\ci linux`: Many different linux jobs across CMake options, dependencies and vtk versions.
+- `\ci windows`: Cross VTK versions of Windows jobs.
+- `\ci macos_intel`: Cross VTK versions of macOS intel jobs.
+- `\ci macos_arm`: Cross VTK versions of macOS arm64 jobs.
+- `\ci coverage`: A linux job dedicated to coverage computation.
+- `\ci sanitizer`: Linux jobs running with different sanitizer settings.
+- `\ci analysis`: A Linux cppcheck job.
+- `\ci external`: A linux job building the libf3d as a subproject of a larger project.
+- `\ci python`: Cross-platform cross-version jobs building libf3d for python.
 - `\ci wasm`: Build docker images and then build libf3d with webassambly.
 - `\ci android`: Build docker images and then build libf3d for android.
-- `\ci full`: Complete CI, required before merge, contains `ci:main`, `ci:wasm`, `ci:android`.
+- `\ci website`: Build the f3d.app website using current state of the doc.
+- `\ci full`: All of the above, required before merging.
 
 After this, the CI will always be run every time you push to your branch.
 To remove a label, use the same syntax with a `-` before the label, eg: `\ci -fast`.
+
+Please add only the labels required to work on your feature, in order to avoid using the limited pool of runners for no good reason.
 
 F3D continuous integration will also check the coverage as it is a good way to evaluate if new features are being tested or not.
 When adding code to F3D, always try to cover it by adding/modifying [tests](doc/dev/06-TESTING.md).

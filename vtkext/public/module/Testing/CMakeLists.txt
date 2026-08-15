@@ -2,7 +2,7 @@ set(vtkextTests_list)
 
 # Also needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
 # Sanitizer exclusion because of https://github.com/f3d-app/f3d/issues/1323
-if(NOT ANDROID AND NOT EMSCRIPTEN AND NOT F3D_SANITIZER STREQUAL "address")
+if(NOT F3D_USE_GLES AND NOT F3D_SANITIZER STREQUAL "address")
   list(APPEND vtkextTests_list
        TestF3DBitonicSort.cxx)
 endif()
@@ -20,6 +20,6 @@ foreach(test ${vtkextTests_list})
   )
 endforeach()
 
-if(NOT ANDROID AND NOT EMSCRIPTEN AND NOT F3D_SANITIZER STREQUAL "address")
+if(NOT F3D_USE_GLES AND NOT F3D_SANITIZER STREQUAL "address")
   set_target_properties(vtkextTests PROPERTIES CXX_STANDARD 20)
 endif()

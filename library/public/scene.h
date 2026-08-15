@@ -107,6 +107,13 @@ public:
   virtual scene& clear() = 0;
 
   /**
+   * Return the list of files added to the scene through the path-based add methods, in the order
+   * they were provided.
+   * Meshes added through the mesh, mesh view or buffer based add methods are not listed.
+   */
+  [[nodiscard]] virtual std::vector<std::filesystem::path> getAddedFiles() const = 0;
+
+  /**
    * An exception that can be thrown by the scene
    * when it fails to index the light
    */
@@ -148,6 +155,30 @@ public:
    * Remove all lights from the scene.
    */
   virtual scene& removeAllLights() = 0;
+
+  /**
+   * An exception that can be thrown by the scene
+   * when it fails to index a scene hierarchy node
+   */
+  struct node_exception : public exception
+  {
+    explicit node_exception(const std::string& what = "")
+      : f3d::exception(what) {};
+  };
+
+  /**
+   * Return the scene hierarchy of all added files as a flat vector, in depth-first pre-order,
+   * so that a parent node always precedes its children.
+   * Returns an empty vector if the scene is empty.
+   */
+  [[nodiscard]] virtual std::vector<node_state_t> getSceneHierarchy() const = 0;
+
+  /**
+   * Set the visibility of the node at provided index and of all the nodes in its subtree.
+   * See types::node_state_t documentation for more information.
+   * node_exception is thrown if the index is invalid.
+   */
+  virtual scene& setNodeVisibility(int nodeId, bool visible) = 0;
 
   /**
    * Return true if provided file in path uses a supported extension, exists and its content

@@ -189,4 +189,8 @@ void set_x11_wait_timeout(int) { }
 int get_x11_wait_timeout() { return 1000; }
 #endif
 
+clip_exception::clip_exception(const std::string& what)
+  : std::runtime_error(what)
+{
+}
 } // namespace clip

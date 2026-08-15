@@ -38,12 +38,15 @@ public:
   scene& add(std::shared_ptr<mesh_view> mesh) override;
   scene& add(const std::byte* buffer, std::size_t size) override;
   scene& clear() override;
+  std::vector<std::filesystem::path> getAddedFiles() const override;
   int addLight(const light_state_t& lightState) const override;
   int getLightCount() const override;
   light_state_t getLight(int index) const override;
   scene& updateLight(int index, const light_state_t& lightState) override;
   scene& removeLight(int index) override;
   scene& removeAllLights() override;
+  std::vector<node_state_t> getSceneHierarchy() const override;
+  scene& setNodeVisibility(int nodeId, bool visible) override;
   bool supports(const std::filesystem::path& filePath) override;
   scene& loadAnimationTime(double timeValue) override;
   std::pair<double, double> animationTimeRange() override;

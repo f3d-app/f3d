@@ -34,6 +34,7 @@ private:
    * Callbacks called when an event is invoked by the interactor
    */
   bool MouseMove(vtkObject* caller, unsigned long, void*);
+  bool MouseLeave(vtkObject* caller, unsigned long, void*);
   bool MouseLeftPress(vtkObject* caller, unsigned long, void*);
   bool MouseLeftRelease(vtkObject* caller, unsigned long, void*);
   bool MouseRightPress(vtkObject* caller, unsigned long, void*);

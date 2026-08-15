@@ -44,7 +44,7 @@ int main(int argc, char** argv)
   f3d_options_set_as_bool(options, "render.show_edges", 1);
   f3d_options_set_as_bool(options, "ui.axis", 1);
   f3d_options_set_as_bool(options, "ui.fps", 1);
-  f3d_options_set_as_bool(options, "ui.animation_progress", 1);
+  f3d_options_set_as_string(options, "ui.animation_progress", "default");
   f3d_options_set_as_bool(options, "ui.filename", 1);
 
   f3d_scene_t* scene = f3d_engine_get_scene(engine);

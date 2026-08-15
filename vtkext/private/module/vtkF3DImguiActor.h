@@ -92,6 +92,16 @@ private:
   void RenderFpsCounter() override;
 
   /**
+   * Render the animation progress bar at the bottom of the viewport.
+   */
+  void RenderAnimationProgressBar() override;
+
+  /**
+   * Compute the animation progress bar footprint in pixels, see base class.
+   */
+  double GetAnimationProgressBarHeight() const override;
+
+  /**
    * Render the console widget
    */
   void RenderConsole(bool) override;

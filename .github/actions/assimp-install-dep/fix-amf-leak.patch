@@ -1,0 +1,22 @@
+From 07cf4d5315d8c45245ffc8f9ebdc4912a9959359 Mon Sep 17 00:00:00 2001
+From: Michael Migliore <mcmigliore@gmail.com>
+Date: Thu, 30 Jul 2026 09:19:38 +0200
+Subject: [PATCH] Fix leak in AMF importer
+
+---
+ code/AssetLib/AMF/AMFImporter_Postprocess.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/code/AssetLib/AMF/AMFImporter_Postprocess.cpp b/code/AssetLib/AMF/AMFImporter_Postprocess.cpp
+index 7e9f2e05f6..3870a1f678 100644
+--- a/code/AssetLib/AMF/AMFImporter_Postprocess.cpp
++++ b/code/AssetLib/AMF/AMFImporter_Postprocess.cpp
+@@ -812,7 +812,7 @@ void AMFImporter::Postprocess_BuildScene(aiScene *pScene) {
+             for (; next_it != nodeArray.end(); ++next_it) {
+                 if ((*next_it)->FindNode((*nl_it)->mName) != nullptr) {
+                     // if current top node(nl_it) found in another top node then erase it from node_list and restart search loop.
+-                    // FIXME: this leaks memory on test models test8.amf and test9.amf
++                    delete *nl_it;
+                     nodeArray.erase(nl_it);
+ 
+                     goto nl_clean_loop;

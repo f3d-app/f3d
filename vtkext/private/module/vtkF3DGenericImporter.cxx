@@ -185,6 +185,7 @@ void vtkF3DGenericImporter::CreateActorForBlock(
   bd.Actor->GetProperty()->SetLineWidth(1.0);
   bd.Actor->GetProperty()->SetRoughness(0.3);
   bd.Actor->GetProperty()->SetBaseIOR(1.5);
+  bd.Actor->GetProperty()->SetColor(0.65, 0.65, 0.65);
   bd.Actor->GetProperty()->SetInterpolationToPBR();
 
   ren->AddActor(bd.Actor);

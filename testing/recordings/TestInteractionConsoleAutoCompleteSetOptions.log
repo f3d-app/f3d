@@ -72,6 +72,11 @@ KeyPressEvent 199 142 0 115 1 s 0
 CharEvent 199 142 0 115 1 s 0
 KeyReleaseEvent 199 142 0 115 1 s 0
 
+# P
+KeyPressEvent 199 142 0 112 1 s 0
+CharEvent 199 142 0 112 1 s 0
+KeyReleaseEvent 199 142 0 112 1 s 0
+
 # Tab
 KeyPressEvent 199 142 0 9 1 Tab 0
 CharEvent 199 142 0 9 1 Tab 0

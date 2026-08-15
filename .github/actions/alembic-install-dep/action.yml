@@ -47,14 +47,14 @@ runs:
     - name: Cache alembic
       id: cache-alembic
       continue-on-error: true # https://github.com/actions/cache/issues/1754
-      uses: actions/cache/restore@v5
+      uses: actions/cache/restore@v6
       with:
         path: dependencies/alembic_install
         key: alembic-${{steps.alembic_ver.outputs.extract}}-${{steps.imath_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-4
 
     - name: Checkout Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: alembic/alembic
         path: "./dependencies/alembic"
@@ -97,7 +97,7 @@ runs:
 
     - name: Save cache
       if: steps.cache-alembic.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v5
+      uses: actions/cache/save@v6
       with:
         key: ${{ steps.cache-alembic.outputs.cache-primary-key }}
         path: dependencies/alembic_install

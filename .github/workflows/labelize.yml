@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.event.issue.pull_request &&
-      contains(github.event.comment.body, '\ci')
+      startsWith(github.event.comment.body, '\ci')
     env:
       GH_REPO: ${{ github.repository }}
       GH_TOKEN: ${{ secrets.F3D_CI_LABEL }}
@@ -35,7 +35,7 @@ jobs:
           label="$COMMENT"
           label=${label#* }
           label=${label%% *}
-          label=${label//[^a-z-]/}
+          label=${label//[^a-z-_]/}
           echo "F3D_LABEL_COMMENT=$label" >> $GITHUB_ENV
 
       # Stop the job if cache is being added
@@ -45,7 +45,7 @@ jobs:
         run: exit 0
 
       - name: Add ack reaction
-        uses: GrantBirki/comment@v3.0.0
+        uses: GrantBirki/comment@v3.0.3
         with:
           comment-id: ${{ github.event.comment.id }}
           reactions: eyes
@@ -65,6 +65,6 @@ jobs:
 
       - name: Create comment for invalid command
         if: failure()
-        uses: GrantBirki/comment@v3.0.0
+        uses: GrantBirki/comment@v3.0.3
         with:
           body: ❌ Invalid CI command "${{env.F3D_LABEL_COMMENT}}"

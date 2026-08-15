@@ -112,6 +112,12 @@ Other hotkeys and interactions are available:
 - <kbd>&darr;</kbd>: add all current files parent directories to the list of files, reload the currently loaded files and reset the camera, respect the `--recursive-dir-add` CLI option.
 - <kbd>F12</kbd>: take a screenshot, ie. render the current view to an image file.
 - <kbd>Ctrl</kbd>+<kbd>F12</kbd>: take a "minimal" screenshot, ie. render the current view with no grid and no overlays to an image file with a transparent background.
+- <kbd>Ctrl</kbd>+<kbd>S</kbd>: save the current state into a statefile picked with a file dialog (requires a build with the `tinyfiledialogs` module).
+- <kbd>Ctrl</kbd>+<kbd>L</kbd>: load the state from a statefile picked with a file dialog (requires a build with the `tinyfiledialogs` module). Does nothing but warn if the file does not exist.
+- <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd>: save the current state into the statefile set by the `--statefile-filename` CLI option, or an automatic filename (`{app}/{model}_{n}.json`) when it is not set.
+- <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd>: load the state from the `--statefile-filename` CLI option, or the most recent statefile saved with the automatic filename when it is not set.
+- <kbd>Ctrl</kbd>+<kbd>C</kbd>: save the current state into the system clipboard (requires a build with the `clip` module).
+- <kbd>Ctrl</kbd>+<kbd>V</kbd>: load the state from the system clipboard (requires a build with the `clip` module).
 - _Drop_ a file, directory or HDRI into the F3D window to load it. F3D relies on the extension (`.hdr` or `.exr`) to detect if the dropped file is an HDRI.
 - <kbd>Ctrl</kbd> + _Drop_ a file, directory and load it.
 - <kbd>Shift</kbd> + _Drop_ a HDRI and use it, no extensions checks performed.
@@ -152,3 +158,7 @@ So with default options, which are using [templates](03-OPTIONS.md#filename-temp
 ## Configuring bindings
 
 It is supported to change all bindings above using a specific syntax in the [configuration file](06-CONFIGURATION_FILE.md) using [commands](07-COMMANDS.md).
+
+## MacOS Bindings
+
+When using F3D on MacOS, all bindings that specify <kbd>Ctrl</kbd> and <kbd>Ctrl</kbd>+<kbd>Shift</kbd> use <kbd>Cmd</kbd> and <kbd>Cmd</kbd>+<kbd>Shift</kbd> respectively instead.

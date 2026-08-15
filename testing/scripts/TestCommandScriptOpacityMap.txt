@@ -1,0 +1,1 @@
+set model.scivis.opacity_map 0,0.03,1,1

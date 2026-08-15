@@ -15,6 +15,7 @@ Usually it looks like this:
 - You join the discord as Mentee.
 - A maintainer/moderator welcomes you and guide you to a dedicated channel.
 - Your mentor ask you about what you want to do and what are your skills in order to adapt the mentoring.
+- Your mentor highlight and explain the [AI policy](../../AI_POLICY.md) to you.
 - Your mentor points you to resources to get started, usually with compiling the software.
 - Once you are able to build and use F3D, your mentor asks you to look at ["good-first-issue"](https://github.com/f3d-app/f3d/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
 - You pick an _unassigned_ issue

@@ -10,6 +10,8 @@
 #include "window.h"
 
 /// @cond
+#include <filesystem>
+#include <iosfwd>
 #include <map>
 #include <string>
 #include <vector>
@@ -41,8 +43,8 @@ public:
   /**
    * Create an engine with an automatic window.
    * Optionally, the window can be hidden by setting offscreen to true.
-   * Linux: Try GLX, then EGL, then OSMesa.
-   * Windows: Try Win32, then EGL, then OSMesa.
+   * Linux: GLX if a X server is running, otherwise EGL if available, otherwise OSMesa.
+   * Windows: Win32 if it supports OpenGL >= 3.2, otherwise EGL if available, otherwise OSMesa.
    * macOS: Always use Cocoa.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
@@ -63,7 +65,6 @@ public:
   /**
    * Create an engine with a GLX window.
    * Works on Linux only.
-   * VTK >= 9.4 required.
    * Optionally, the window can be hidden by setting offscreen to true.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
@@ -76,7 +77,6 @@ public:
   /**
    * Create an engine with a WGL window.
    * Works on Windows only.
-   * VTK >= 9.4 required.
    * Optionally, the window can be hidden by setting offscreen to true.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
@@ -88,9 +88,9 @@ public:
 
   /**
    * Create an engine with an offscreen EGL window.
-   * VTK >= 9.4 required.
    * If several GPU are available, the environment variable
    * `VTK_DEFAULT_EGL_DEVICE_INDEX` allows its selection.
+   * Not supported on macOS.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
    * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library.
@@ -101,7 +101,7 @@ public:
 
   /**
    * Create an engine with an offscreen OSMesa window.
-   * VTK >= 9.4 required.
+   * On macOS, VTK >= 9.6.20260630 is required.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
    * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library.
@@ -109,6 +109,14 @@ public:
    * Throws a engine::cache_exception if the default cache directory cannot be used.
    */
   [[nodiscard]] static engine createOSMesa();
+
+  /**
+   * Create an engine with a webassembly window.
+   * The canvas element can be selected using the `canvasSelector` parameter.
+   *
+   * Throws a engine::no_window_exception if not using WebAssembly.
+   */
+  [[nodiscard]] static engine createWasm(std::string_view canvasSelector = "#canvas");
 
   /**
    * Create an engine with an external window.
@@ -126,7 +134,6 @@ public:
   /**
    * Create an engine with an external GLX context.
    * Equivalent to createExternal(f3d::context::glx());
-   * VTK >= 9.4 required.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
    * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library.
@@ -138,7 +145,6 @@ public:
   /**
    * Create an engine with an external WGL context.
    * Equivalent to createExternal(f3d::context::wgl());
-   * VTK >= 9.4 required.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
    * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library.
@@ -150,7 +156,6 @@ public:
   /**
    * Create an engine with an external COCOA context.
    * Equivalent to createExternal(f3d::context::cocoa());
-   * VTK >= 9.4 required.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
    * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library.
@@ -162,7 +167,6 @@ public:
   /**
    * Create an engine with an external EGL context.
    * Equivalent to createExternal(f3d::context::egl());
-   * VTK >= 9.4 required.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
    * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library.
@@ -174,7 +178,6 @@ public:
   /**
    * Create an engine with an external OSMesa context.
    * Equivalent to createExternal(f3d::context::osmesa());
-   * VTK >= 9.4 required.
    *
    * Throws a context::loading_exception if a needed graphic library cannot be loaded.
    * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library.
@@ -200,7 +203,8 @@ public:
 
   /**
    * Set the cache path. The provided path is used as is.
-   * Currently, it's only used to store HDRI baked textures.
+   * Internally used to store HDRI baked textures but can be used to store any other information
+   * worth caching.
    * By default, the cache path is:
    * - Windows: %LOCALAPPDATA%\f3d
    * - Linux: ~/.cache/f3d
@@ -209,6 +213,12 @@ public:
    * Throws a engine::cache_exception if the provided cachePath cannot be used.
    */
   engine& setCachePath(const std::filesystem::path& cachePath);
+
+  /**
+   * Get the cache path currently in use, see setCachePath.
+   * Returns an empty path if the default cache path could not be recovered.
+   */
+  [[nodiscard]] std::filesystem::path getCachePath() const;
 
   /**
    * Engine provide a default options that you can use using engine::getOptions().
@@ -245,6 +255,83 @@ public:
    * If not, will throw a engine::no_interactor_exception.
    */
   [[nodiscard]] interactor& getInteractor();
+
+  /**
+   * A serializable snapshot of an engine: the files added to the scene, the camera configuration
+   * and the options that have been set. Captured from an engine with engine::dump() and applied
+   * back with engine::load(), so a state taken from one engine can be restored into another.
+   *
+   * A state can be read from and written to a JSON string, a file, the system clipboard or any
+   * stream. In its string, stream and clipboard forms, file paths are stored as absolute paths; in
+   * its file form, file paths contained by the directory of the file are stored relatively so the
+   * statefile stays portable when moved alongside its files.
+   *
+   * Scene content added from memory (mesh, mesh view or buffer) is not captured.
+   */
+  struct state
+  {
+    /**
+     * Build a state from a JSON string previously produced by state::toString.
+     * Throws a engine::statefile_exception if the content cannot be parsed.
+     */
+    [[nodiscard]] static F3D_EXPORT state fromString(const std::string& content);
+
+    /**
+     * Build a state from a JSON statefile previously written by state::toFile.
+     * File paths stored relatively are resolved against the directory of the file.
+     * Throws a engine::statefile_exception if the file cannot be read or parsed.
+     */
+    [[nodiscard]] static F3D_EXPORT state fromFile(const std::filesystem::path& filePath);
+
+    /**
+     * Build a state from the JSON content currently held by the system clipboard.
+     * Throws a engine::statefile_exception if the clipboard has no readable text, its content
+     * cannot be parsed, or clipboard support is not available in this build.
+     */
+    [[nodiscard]] static F3D_EXPORT state fromClipboard();
+
+    /**
+     * Return the state as a JSON string, with file paths stored as absolute paths.
+     */
+    [[nodiscard]] F3D_EXPORT std::string toString() const;
+
+    /**
+     * Write the state as a JSON statefile at the provided path. File paths contained by the
+     * directory of the file are stored relatively, as absolute paths otherwise.
+     * Throws a engine::statefile_exception if the file cannot be written.
+     */
+    F3D_EXPORT void toFile(const std::filesystem::path& filePath) const;
+
+    /**
+     * Copy the state into the system clipboard as a JSON string, with file paths stored as absolute
+     * paths.
+     * Throws a engine::statefile_exception if the clipboard cannot be written or clipboard support
+     * is not available in this build.
+     */
+    F3D_EXPORT void toClipboard() const;
+
+  private:
+    friend class engine;
+    friend F3D_EXPORT std::ostream& operator<<(std::ostream& stream, const state& st);
+    friend F3D_EXPORT std::istream& operator>>(std::istream& stream, state& st);
+
+    std::string Content;
+  };
+
+  /**
+   * Capture the current state of the engine (added files, camera and options) into a state that can
+   * be serialized and later applied back with engine::load.
+   * Scene content added from memory (mesh, mesh view or buffer) is not captured.
+   */
+  [[nodiscard]] state dump();
+
+  /**
+   * Restore the engine from a previously captured state. The scene is cleared first, then the saved
+   * files are added, the options are set and the camera configuration is restored.
+   * Throws a engine::statefile_exception if the state content cannot be parsed.
+   * Throws a scene::load_failure_exception if one of the saved files cannot be loaded.
+   */
+  engine& load(const state& st);
 
   /**
    * List rendering backends supported by libf3d.
@@ -379,6 +466,15 @@ public:
     explicit cache_exception(const std::string& what = "");
   };
 
+  /**
+   * An exception that can be thrown by the engine
+   * when a statefile cannot be read, written or parsed.
+   */
+  struct statefile_exception : public exception
+  {
+    explicit statefile_exception(const std::string& what = "");
+  };
+
 private:
   class internals;
   internals* Internals;
@@ -387,9 +483,21 @@ private:
    * Engine constructor. This is a private method.
    * The user must rely on factories to create the engine instance.
    */
-  engine(
-    const std::optional<window::Type>& windowType, bool offscreen, const context::function& loader);
+  engine(const std::optional<window::Type>& windowType, bool offscreen,
+    const context::function& loader, std::string_view id = "");
 };
+
+/**
+ * Write a state as a JSON string into the provided stream, with file paths stored as absolute
+ * paths.
+ */
+F3D_EXPORT std::ostream& operator<<(std::ostream& stream, const engine::state& st);
+
+/**
+ * Read a state from the JSON content of the provided stream.
+ * Throws a engine::statefile_exception if the content cannot be parsed.
+ */
+F3D_EXPORT std::istream& operator>>(std::istream& stream, engine::state& st);
 }
 
 #endif

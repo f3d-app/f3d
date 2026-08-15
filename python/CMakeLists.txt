@@ -14,7 +14,7 @@ include(GNUInstallDirs)
 include(f3dPython)
 
 find_package(Python 3.10 COMPONENTS Interpreter Development)
-find_package(pybind11 2.9.2 REQUIRED)
+find_package(pybind11 3.0.0 REQUIRED)
 
 pybind11_add_module(pyf3d MODULE F3DPythonBindings.cxx)
 

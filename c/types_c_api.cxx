@@ -99,24 +99,15 @@ void f3d_transform2d_create(f3d_transform2d_t* transform, double scale_x, double
     return;
   }
 
-  try
-  {
-    f3d::double_array_t<2> scale({ scale_x, scale_y });
-    f3d::double_array_t<2> translate({ translate_x, translate_y });
-    f3d::transform2d_t cpp_transform(scale, translate, angle_deg);
+  // double_array_t can throw if the size is wrong
+  // but this cannot happen here
+  f3d::double_array_t<2> scale({ scale_x, scale_y });
+  f3d::double_array_t<2> translate({ translate_x, translate_y });
+  f3d::transform2d_t cpp_transform(scale, translate, angle_deg);
 
-    for (int i = 0; i < 9; ++i)
-    {
-      transform->data[i] = cpp_transform[i];
-    }
-  }
-  catch (...)
+  for (int i = 0; i < 9; ++i)
   {
-    // Initialize to identity on error
-    for (int i = 0; i < 9; ++i)
-    {
-      transform->data[i] = (i % 4 == 0) ? 1.0 : 0.0;
-    }
+    transform->data[i] = cpp_transform[i];
   }
 }
 

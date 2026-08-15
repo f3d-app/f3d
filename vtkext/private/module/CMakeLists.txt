@@ -1,7 +1,12 @@
 set(sources "")
 set(private_headers ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DUserEvents.h)
 
-set(F3D_DEFAULT_HDRI "${F3D_SOURCE_DIR}/resources/defaultHDRI.png" CACHE PATH "Default HDRI when no HDRI file is provided")
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+  set(F3D_DEFAULT_HDRI "${F3D_SOURCE_DIR}/resources/defaultHDRI.hdr" CACHE PATH "Default HDRI when no HDRI file is provided")
+else()
+  set(F3D_DEFAULT_HDRI "${F3D_SOURCE_DIR}/resources/defaultHDRI.png" CACHE PATH "Default HDRI when no HDRI file is provided")
+endif()
+
 mark_as_advanced(F3D_DEFAULT_HDRI)
 include("f3dEmbed")
 f3d_embed_file(
@@ -107,9 +112,7 @@ if(WIN32)
   list(APPEND classes vtkF3DWGLRenderWindow)
 endif()
 
-# In theory the test should be `if (VTK_USE_X)` but this variable is
-# only exported starting from VTK 9.4
-if(UNIX AND NOT APPLE AND NOT EMSCRIPTEN AND NOT ANDROID)
+if(VTK_USE_X)
   list(APPEND classes vtkF3DGLXRenderWindow)
 endif()
 

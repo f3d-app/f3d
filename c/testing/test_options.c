@@ -93,8 +93,76 @@ int test_options()
   int is_optional = f3d_options_is_optional(options, "render.show_edges");
   (void)is_optional;
 
+  f3d_option_type_t type = f3d_options_get_type(options, "render.show_edges");
+  (void)type;
+
+  if (f3d_options_get_type(options, "dummy") != F3D_OPTION_TYPE_INVALID)
+  {
+    puts("[ERROR] f3d_options_get_type should return F3D_OPTION_TYPE_INVALID for a "
+         "non-existent option");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  double range[3];
+  if (!f3d_options_get_range_domain_double(options, "render.line_width", range))
+  {
+    puts("[ERROR] f3d_options_get_range_domain_double should succeed for render.line_width");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  if (range[0] != 0.0 || range[1] != 10.0 || range[2] != 0.1)
+  {
+    puts("[ERROR] f3d_options_get_range_domain_double returned unexpected values for "
+         "render.line_width");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  int int_range[3];
+  if (!f3d_options_get_range_domain_int(options, "render.raytracing.samples", int_range))
+  {
+    puts("[ERROR] f3d_options_get_range_domain_int should succeed for render.raytracing.samples");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  if (int_range[0] != 1 || int_range[1] != 50 || int_range[2] != 1)
+  {
+    puts("[ERROR] f3d_options_get_range_domain_int returned unexpected values for "
+         "render.raytracing.samples");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  if (f3d_options_get_range_domain_double(options, "render.raytracing.samples", range))
+  {
+    puts("[ERROR] f3d_options_get_range_domain_double should fail for an int range domain");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  if (f3d_options_get_range_domain_double(options, "dummy", range))
+  {
+    puts("[ERROR] f3d_options_get_range_domain_double should fail for a non-existent option");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
   f3d_options_reset(options, "model.scivis.cells");
   f3d_options_remove_value(options, "render.show_edges");
+
+  f3d_options_has_domain(options, "scene.animation.speed_factor");
+  f3d_options_get_domain_style(options, "scene.animation.speed_factor");
+
+  int enum_count = 0;
+  char** enumeration = f3d_options_get_enum_domain(options, "interactor.style", &enum_count);
+  if (enumeration)
+  {
+    f3d_options_free_string_array(enumeration, enum_count);
+  }
+
+  f3d_options_increase(options, "scene.animation.speed_factor");
+  f3d_options_decrease(options, "scene.animation.speed_factor");
+  f3d_options_cycle(options, "interactor.style");
 
   const char* str_repr = f3d_options_get_as_string_representation(options, "render.line_width");
   if (str_repr)

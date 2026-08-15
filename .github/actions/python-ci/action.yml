@@ -37,6 +37,7 @@ runs:
       with:
         versions_file: ${{inputs.versions_file}}
         cpu: ${{inputs.cpu}}
+        python_version: ${{ inputs.python_version }}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
@@ -44,20 +45,14 @@ runs:
         versions_file: ${{inputs.versions_file}}
         cpu: ${{inputs.cpu}}
 
-    - name: Set up Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: ${{ inputs.python_version }}
-
     # numpy pinned to 2.2.X until python 3.10 support is dropped
     - name: Install Python dependencies
       shell: bash
       run: |
-        python -m pip install --upgrade pip
         python -m pip install pytest==9.0.3
         python -m pip install pyopengltk==0.0.4
         python -m pip install PySide6==6.11.1
-        python -m pip install numpy==2.2.6
+        python -m pip install "numpy>=2.2.6"
 
     - name: Set PATH windows
       if: runner.os == 'Windows'
@@ -96,6 +91,7 @@ runs:
         -DF3D_PLUGIN_BUILD_VDB=${{ runner.os == 'macOS' && 'OFF' || 'ON' }};
         -DF3D_PLUGIN_BUILD_WEBIFC=ON;
         -DF3D_MACOS_BUNDLE=OFF;
+        -DF3D_MODULE_CLIP=ON;
         -DF3D_MODULE_EXR=ON;
         -DF3D_MODULE_UI=ON;
         -DF3D_MODULE_WEBP=ON;
@@ -124,7 +120,7 @@ runs:
 
     - name: Install Mesa Windows
       if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v2
+      uses: f3d-app/install-mesa-windows-action@v3
       with:
         path: ${{ env.Python_ROOT_DIR }}
 

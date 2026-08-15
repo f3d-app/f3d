@@ -133,6 +133,39 @@ void vtkF3DUIActor::SetBindingsVisibility(bool show)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetAnimationProgressMode(AnimationProgressBarMode mode)
+{
+  this->AnimationProgressMode = mode;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetAnimationProgress(const std::pair<double, double>& timeRange,
+  const std::string& name, const std::vector<double>& keyFrames)
+{
+  this->AnimationTimeRange = timeRange;
+  this->AnimationName = name;
+  this->AnimationKeyFrames = keyFrames;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetAnimationProgressColor(const std::array<double, 3>& color)
+{
+  this->AnimationProgressColor = color;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetAnimationSpeedFactor(double speedFactor)
+{
+  this->AnimationSpeedFactor = speedFactor;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::UpdateAnimationTime(double currentTime)
+{
+  this->AnimationCurrentTime = currentTime;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::UpdateFpsValue(const double elapsedFrameTime)
 {
   this->TotalFrameTimes += elapsedFrameTime;
@@ -224,6 +257,12 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
     this->RenderConsole(false);
     this->EndFrame(renWin);
     return 1;
+  }
+
+  // Drawn first so later overlays stack in front, keeping the bar bottom-most.
+  if (this->AnimationProgressMode != AnimationProgressBarMode::NONE)
+  {
+    this->RenderAnimationProgressBar();
   }
 
   if (this->MinimalConsoleVisible)

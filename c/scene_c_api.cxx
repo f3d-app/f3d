@@ -2,8 +2,10 @@
 #include "scene.h"
 #include "types.h"
 
+#include <cstring>
 #include <filesystem>
 #include <log.h>
+#include <string>
 #include <vector>
 
 namespace
@@ -143,6 +145,120 @@ void f3d_scene_clear(f3d_scene_t* scene)
 }
 
 //----------------------------------------------------------------------------
+char** f3d_scene_get_added_files(const f3d_scene_t* scene, unsigned int* count)
+{
+  if (!scene || !count)
+  {
+    if (count)
+    {
+      *count = 0;
+    }
+    return nullptr;
+  }
+
+  const f3d::scene* cpp_scene = reinterpret_cast<const f3d::scene*>(scene);
+  std::vector<std::filesystem::path> files = cpp_scene->getAddedFiles();
+  *count = static_cast<unsigned int>(files.size());
+  if (files.empty())
+  {
+    return nullptr;
+  }
+
+  char** result = new char*[files.size()];
+  for (size_t i = 0; i < files.size(); ++i)
+  {
+    std::string str = files[i].string();
+    result[i] = new char[str.size() + 1];
+    std::strcpy(result[i], str.c_str());
+  }
+  return result;
+}
+
+//----------------------------------------------------------------------------
+void f3d_scene_free_added_files(char** files, unsigned int count)
+{
+  if (!files)
+  {
+    return;
+  }
+  for (unsigned int i = 0; i < count; ++i)
+  {
+    delete[] files[i];
+  }
+  delete[] files;
+}
+
+//----------------------------------------------------------------------------
+f3d_node_state_t* f3d_scene_get_scene_hierarchy(const f3d_scene_t* scene, unsigned int* count)
+{
+  if (!scene || !count)
+  {
+    if (count)
+    {
+      *count = 0;
+    }
+    return nullptr;
+  }
+
+  const f3d::scene* cpp_scene = reinterpret_cast<const f3d::scene*>(scene);
+  std::vector<f3d::node_state_t> nodes = cpp_scene->getSceneHierarchy();
+  *count = static_cast<unsigned int>(nodes.size());
+  if (nodes.empty())
+  {
+    return nullptr;
+  }
+
+  f3d_node_state_t* result = new f3d_node_state_t[nodes.size()];
+  for (size_t i = 0; i < nodes.size(); ++i)
+  {
+    result[i].id = nodes[i].id;
+    result[i].parent_id = nodes[i].parentId;
+    result[i].level = nodes[i].level;
+    result[i].label = new char[nodes[i].label.size() + 1];
+    std::strcpy(result[i].label, nodes[i].label.c_str());
+    result[i].visible = nodes[i].visible ? 1 : 0;
+    result[i].has_children = nodes[i].hasChildren ? 1 : 0;
+    result[i].collapsed = nodes[i].collapsed ? 1 : 0;
+  }
+  return result;
+}
+
+//----------------------------------------------------------------------------
+void f3d_scene_free_scene_hierarchy(f3d_node_state_t* nodes, unsigned int count)
+{
+  if (!nodes)
+  {
+    return;
+  }
+  for (unsigned int i = 0; i < count; ++i)
+  {
+    delete[] nodes[i].label;
+  }
+  delete[] nodes;
+}
+
+//----------------------------------------------------------------------------
+int f3d_scene_set_node_visibility(f3d_scene_t* scene, int node_id, int visible)
+{
+  if (!scene)
+  {
+    return 0;
+  }
+
+  f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
+  try
+  {
+    cpp_scene->setNodeVisibility(node_id, visible != 0);
+  }
+  catch (const f3d::scene::node_exception& e)
+  {
+    f3d::log::error("Failed to set visibility of node at index ", node_id, ": ", e.what());
+    return 0;
+  }
+  return 1;
+}
+
+//----------------------------------------------------------------------------
 int f3d_scene_add(f3d_scene_t* scene, const char* file_path)
 {
   if (!scene || !file_path)
@@ -157,7 +273,7 @@ int f3d_scene_add(f3d_scene_t* scene, const char* file_path)
   }
   catch (const f3d::scene::load_failure_exception& e)
   {
-    f3d::log::error("Failed to add file to scene: {}", file_path);
+    f3d::log::error("Failed to add file to scene: ", file_path);
     return 0;
   }
 
@@ -338,7 +454,7 @@ int f3d_scene_remove_light(f3d_scene_t* scene, int index)
   }
   catch (const f3d::scene::light_exception& e)
   {
-    f3d::log::error("Failed to remove light at index {}: {}", index, e.what());
+    f3d::log::error("Failed to remove light at index ", index, ": ", e.what());
     return 0;
   }
 
@@ -362,7 +478,7 @@ int f3d_scene_update_light(f3d_scene_t* scene, int index, const f3d_light_state_
   }
   catch (const f3d::scene::light_exception& e)
   {
-    f3d::log::error("Failed to update light at index {}: {}", index, e.what());
+    f3d::log::error("Failed to update light at index ", index, ": ", e.what());
     return 0;
   }
 
@@ -386,7 +502,7 @@ f3d_light_state_t* f3d_scene_get_light(const f3d_scene_t* scene, int index)
   }
   catch (const f3d::scene::light_exception& e)
   {
-    f3d::log::error("Failed to get light at index {}: {}", index, e.what());
+    f3d::log::error("Failed to get light at index ", index, ": ", e.what());
     return nullptr;
   }
 }

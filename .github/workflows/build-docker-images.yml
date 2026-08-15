@@ -19,10 +19,11 @@ jobs:
     if: contains(github.event.pull_request.labels.*.name, 'ci:cache')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
+          allow-unsafe-pr-checkout: true
           path: "source"
           fetch-depth: 1
           lfs: false
@@ -61,7 +62,7 @@ jobs:
           trigger_workflow: true
           wait_workflow: true
 
-      - uses: marocchino/sticky-pull-request-comment@v3.0.4
+      - uses: marocchino/sticky-pull-request-comment@v3.0.5
         if: ${{env.F3D_DOCKER_IMAGE_AVAILABLE == '1'}}
         with:
           message: New docker images have been generated

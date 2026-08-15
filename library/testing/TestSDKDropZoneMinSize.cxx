@@ -1,14 +1,16 @@
 #include "PseudoUnitTest.h"
+#include "TestSDKHelpers.h"
 
 #include <engine.h>
 #include <iostream>
 #include <window.h>
 
-int TestSDKDropZoneMinSize(int, char*[])
+int TestSDKDropZoneMinSize(int, char* argv[])
 {
   PseudoUnitTest test;
 
-  f3d::engine eng = f3d::engine::create(true);
+  std::string renderingBackend = std::string(argv[4]);
+  f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();
 

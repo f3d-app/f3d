@@ -11,7 +11,30 @@
 
 #define JAVA_BIND(Cls, Func) JNICALL Java_app_f3d_F3D_##Cls##_##Func
 
+// Same as JAVA_BIND but for a method of a nested class (00024 is the JNI encoding of the '$' scope
+// separator, e.g. Engine$State)
+#define JAVA_SCOPED_BIND(Cls, Nested, Func) JNICALL Java_app_f3d_F3D_##Cls##_00024##Nested##_##Func
+
 namespace fs = std::filesystem;
+
+/**
+ * Throw a Java exception of the given class name with the given message.
+ * Call this from a catch block, then immediately return from the JNI function
+ * so that the pending Java exception is delivered to the caller.
+ *
+ * className uses JNI slash-notation, e.g.
+ *   "app/f3d/F3D/Engine$NoInteractorException"
+ *   "java/lang/RuntimeException"
+ */
+inline void F3DThrowJavaException(JNIEnv* env, const char* className, const char* msg)
+{
+  jclass cls = env->FindClass(className);
+  if (cls)
+  {
+    env->ThrowNew(cls, msg);
+    env->DeleteLocalRef(cls);
+  }
+}
 
 // Helper function to get the f3d::engine pointer from a Java object
 inline f3d::engine* GetEngine(JNIEnv* env, jobject self)
@@ -21,6 +44,16 @@ inline f3d::engine* GetEngine(JNIEnv* env, jobject self)
   jlong ptr = env->GetLongField(self, fid);
 
   return reinterpret_cast<f3d::engine*>(ptr);
+}
+
+// Helper function to get the f3d::engine::state pointer from a Java object
+inline f3d::engine::state* GetState(JNIEnv* env, jobject self)
+{
+  jclass cls = env->GetObjectClass(self);
+  jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
+  jlong ptr = env->GetLongField(self, fid);
+
+  return reinterpret_cast<f3d::engine::state*>(ptr);
 }
 
 // Helper function to convert std::vector<std::string> to Java List

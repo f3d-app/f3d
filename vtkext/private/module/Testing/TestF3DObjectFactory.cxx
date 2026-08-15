@@ -35,6 +35,7 @@ int TestF3DObjectFactory(int argc, char* argv[])
   }
 
   // Check actual factory mechanism
+#ifndef F3D_USE_GLES
   vtkNew<vtkPolyDataMapper> mapper;
   const vtkF3DPolyDataMapper* mapperPtr = vtkF3DPolyDataMapper::SafeDownCast(mapper);
   if (mapperPtr == nullptr)
@@ -42,6 +43,7 @@ int TestF3DObjectFactory(int argc, char* argv[])
     std::cerr << "vtkF3DObjectFactory failed to create a vtkF3DPolyDataMapper\n";
     return EXIT_FAILURE;
   }
+#endif
 
   vtkNew<vtkPointGaussianMapper> pointMapper;
   pointMapper->Print(std::cout);

@@ -12,20 +12,25 @@ jobs:
   style_checks:
     name: Formatting Check
     runs-on: ubuntu-latest
-    if: |
-      contains(github.event.pull_request.labels.*.name, 'ci:fast') ||
-      contains(github.event.pull_request.labels.*.name, 'ci:main') ||
-      contains(github.event.pull_request.labels.*.name, 'ci:full')
     env:
       ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
+          allow-unsafe-pr-checkout: true
           fetch-depth: 1
           lfs: false
+
+      - name: non-ASCII check in C++ files
+        shell: bash
+        run: |
+          if grep -rPn --include="*.h" --include="*.cxx" '[[:^ascii:]]' .; then
+            echo "::error::Non-ASCII characters detected"
+            exit 1
+          fi
 
       # Run codespell first to avoid issues with style check on same location
       - name: Codespell in place
@@ -67,13 +72,9 @@ jobs:
         if: failure()
         shell: bash
         run: |
-          diff=$(git diff)
-          echo "$diff" > ./f3d_style_checks_diff.patch
-          {
-            echo 'F3D_STYLE_DIFF<<EOF'
-            echo "$diff"
-            echo EOF
-          } >> "$GITHUB_ENV"
+          diff="$(git diff)"
+          echo "$diff" > ./f3d_style_diff.patch
+          printf 'F3D_STYLE_DIFF<<EOF\n%s\nEOF\n' "$diff" >> "$GITHUB_ENV"
 
       - name: Upload diff as an artifact
         if: failure()
@@ -83,14 +84,14 @@ jobs:
           name: f3d-style-checks-diff-${{ github.event.pull_request.head.ref }}
 
       - name: Delete comment
-        uses: marocchino/sticky-pull-request-comment@v3.0.4
+        uses: marocchino/sticky-pull-request-comment@v3.0.5
         with:
           header: style
           delete: true
 
       - name: Create comment
         if: failure()
-        uses: marocchino/sticky-pull-request-comment@v3.0.4
+        uses: marocchino/sticky-pull-request-comment@v3.0.5
         with:
           header: style
           message: |
@@ -98,3 +99,11 @@ jobs:
             ```diff
             ${{env.F3D_STYLE_DIFF}}
             ```
+            You can copy the patch above and apply it locally with:
+
+            | Platform   | Command                                         |
+            |------------|-------------------------------------------------|
+            | X          | `xclip -o -selection clipboard \| git apply -v` |
+            | Wayland    | `wl-paste \| git apply -v`                      |
+            | Powershell | `Get-Clipboard -Raw \| git apply -v`            |
+            | macOS      | `pbpaste \| git apply -v`                       |

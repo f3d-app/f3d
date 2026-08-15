@@ -130,6 +130,7 @@ public:
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
   void SetGridColor(const std::vector<double>& color);
+  void SetGridReflection(const double strength);
   void SetAxesColor(const std::vector<double>& colorXAxis, const std::vector<double>& colorYAxis,
     const std::vector<double>& colorZAxis);
   ///@}
@@ -552,6 +553,53 @@ public:
   void AddNotification(
     const std::string& desc, const std::string& value, const std::string& bind, double duration);
 
+  /**
+   * Get the grid actor's matrix
+   */
+  vtkMatrix4x4* GetGridMatrix() const;
+
+  /**
+   * Get screen-space scaling
+   * The value returned can be used to scale screen space methods like line width
+   * to keep a consistent size on screen when using SSAA anti-aliasing.
+   */
+  double GetScreenSpaceScaling() const;
+
+  /**
+   * Set the animation progress bar mode.
+   * `NONE` hides the bar, `DEFAULT` shows the bar alone, `ADVANCED` adds
+   * time/name labels around it.
+   */
+  void SetAnimationProgressMode(vtkF3DUIActor::AnimationProgressBarMode mode);
+
+  /**
+   * Set the time range, name and keyframe times of the current animation.
+   * Meant to be pushed when the loaded animation changes.
+   */
+  void SetAnimationProgress(const std::pair<double, double>& timeRange, const std::string& name,
+    const std::vector<double>& keyFrames);
+
+  /**
+   * Set the animation progress bar fill color
+   */
+  void SetAnimationProgressColor(const std::array<double, 3>& color);
+
+  /**
+   * Set the animation playback speed factor, for display only, shown next to the animation name
+   */
+  void SetAnimationSpeedFactor(double speedFactor);
+
+  /**
+   * Update the current animation time, for display only, meant to be pushed every tick during
+   * playback
+   */
+  void UpdateAnimationTime(double currentTime);
+
+  /**
+   * Get the DPI scale based on the current render window
+   */
+  double GetDPIScale();
+
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;
@@ -694,7 +742,9 @@ private:
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
   vtkSmartPointer<vtkCameraOrientationWidget> ModernAxisWidget;
   vtkSmartPointer<vtkCameraOrientationRepresentation> ModernAxisRepresentation;
-  vtkSmartPointer<vtkCallbackCommand> ModernAxisWidgetResizeCallback;
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
+  int ModernAxisBasePadding[2] = { 0, 0 };
+#endif
   double ModernAxisBackdropOpacity = 0.0;
   double TotalTime = 0.0;
 
@@ -769,6 +819,7 @@ private:
   std::optional<double> GridUnitSquare;
   int GridSubdivisions = 10;
   double GridColor[3] = { 0.0, 0.0, 0.0 };
+  double GridReflection = 0.0;
 
   double ColorAxisX[3] = { 0.0, 0.0, 0.0 };
   double ColorAxisY[3] = { 0.0, 0.0, 0.0 };
@@ -777,7 +828,6 @@ private:
   std::string HDRIFile;
   vtkSmartPointer<vtkImageReader2> HDRIReader;
   bool HasValidHDRIReader = false;
-  bool UseDefaultHDRI = false;
   std::string HDRIHash;
   bool HasValidHDRIHash = false;
   vtkSmartPointer<vtkTexture> HDRITexture;

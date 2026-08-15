@@ -192,12 +192,11 @@ def main(argv=None):
             "render.grid.enable": True,
             "render.grid.absolute": True,
             "render.show_edges": True,
-            "render.effect.antialiasing.enable": True,
             "render.effect.antialiasing.mode": "fxaa",
             "render.effect.tone_mapping": True,
             "ui.axis": True,
             "ui.fps": True,
-            "ui.animation_progress": True,
+            "ui.animation_progress": "default",
             "ui.scalar_bar": True,
             "ui.notifications.enable": True,
             "scene.up_direction": [0.0, 0.0, 1.0],
@@ -340,7 +339,7 @@ def main(argv=None):
     win = eng.window
     win.set_window_name("libf3d in-situ example")
     win.size = (1500, 1000)
-    win.set_position(500, 500)
+    win.position = (500, 500)
     win.render()
 
     cam = win.camera

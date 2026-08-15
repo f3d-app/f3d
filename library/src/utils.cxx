@@ -333,12 +333,6 @@ std::string utils::globToRegex(std::string_view glob, char pathSeparator)
 }
 
 //----------------------------------------------------------------------------
-double utils::getDPIScale()
-{
-  return F3DUtils::getDPIScale();
-}
-
-//----------------------------------------------------------------------------
 std::optional<std::string> utils::getEnv(const std::string& env)
 {
   std::string val;

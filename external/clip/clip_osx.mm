@@ -230,7 +230,7 @@ bool lock::impl::get_data(format f, char* buf, size_t len) const {
 
     if (f == text_format()) {
       NSString* string = [pasteboard stringForType:NSPasteboardTypeString];
-      int reqsize = [string lengthOfBytesUsingEncoding:NSUTF8StringEncoding]+1;
+      size_t reqsize = [string lengthOfBytesUsingEncoding:NSUTF8StringEncoding]+1;
 
       assert(reqsize <= len);
       if (reqsize > len) {

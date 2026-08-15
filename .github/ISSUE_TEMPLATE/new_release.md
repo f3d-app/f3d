@@ -84,8 +84,11 @@ Linux testing protocol:
 - `pcmanfm` (or another supported file manager)
 - Check that all supported files in testing/data have a generated thumbnails, especially for new file formats if any
 - Double click on supported file in testing/data, especially for new file formats if any and check it opens in F3D
-- Drag&Drop cow.vtp, Drag&Drop palermo_park.hdr, check render
+- Drag&Drop cow.vtp, Drag&Drop shanghai_bund.hdr, check render
 - Check that CTRL+O (file dialog) is working
+- Check that CTRL+S then CTRL+L (statefile save/load file dialogs) are working: save a statefile, change the background color, load it back and check the color is restored
+- Check that CTRL+C then CTRL+V (statefile save/load to clipboard) are working: copy the state, change the background color, paste it back and check the color is restored
+- Check that `--dpi-aware` has an effect and match the system value.
 - Press "Esc" and check the following commands `reload_current_file_group`, `set_camera top`, `toggle_volume_rendering`, `exit`
 
 macOS testing protocol:
@@ -96,8 +99,11 @@ macOS testing protocol:
 - Double click on f3d.glb, press "Space", check animation is going smoothly and takes 4 seconds
 - Double click on any new supported file.format, check render
 - Check all supported file in testing/data directory in finder have the f3d mark, if not, check that "open with" suggest F3D
-- Drag&Drop cow.vtp, Drag&Drop palermo_park.hdr, check render
-- Check that CTRL+O (file dialog) is working
+- Drag&Drop cow.vtp, Drag&Drop shanghai_bund.hdr, check render
+- Check that CMD+O (file dialog) is working
+- Check that CMD+S then CMD+L (statefile save/load file dialogs) are working: save a statefile, change the background color, load it back and check the color is restored
+- Check that CMD+C then CMD+V (statefile save/load to clipboard) are working: copy the state, change the background color, paste it back and check the color is restored
+- Check that `--dpi-aware` has an effect and match the system value.
 - Press "Esc" and check the following commands `reload_current_file_group`, `set_camera top`, `toggle_volume_rendering`, `exit`
 
 Windows testing protocol:
@@ -113,7 +119,10 @@ Windows testing protocol:
 - Double click on f3d.glb, press "Space", check animation is going smoothly and takes 4 seconds
 - Double click on any new supported file format, check render
 - Check that CTRL+O (file dialog) is working
+- Check that CTRL+S then CTRL+L (statefile save/load file dialogs) are working: save a statefile, change the background color, load it back and check the color is restored
+- Check that CTRL+C then CTRL+V (statefile save/load to clipboard) are working: copy the state, change the background color, paste it back and check the color is restored
 - run `f3d-console --version` in a Windows command line and check it output the version
+- Check that `--dpi-aware` has an effect and match the system value.
 - Press "Esc" and check the following commands `reload_current_file_group`, `set_camera top`, `toggle_volume_rendering`, `exit`
 
 Python testing protocol:
@@ -149,6 +158,17 @@ Webassembly testing protocol:
 npm uninstall f3d
 npm install f3d --tag rc
 npm run start
+```
+
+- Test examples manually (Docker required)
+
+```bash
+cd examples/libf3d/web
+npm run install
+npm run dev --workspace simple-ui
+npm run dev --workspace volume-rendering
+npm run dev --workspace multiple-instances
+npm run dev --workspace gaussian-splatting
 ```
 
 Once a release cycle:

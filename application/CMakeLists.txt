@@ -82,6 +82,11 @@ function(f3d_create_exec target_name)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_WEBP)
   endif ()
 
+  # clip
+  if (F3D_MODULE_CLIP)
+    target_compile_definitions(${target_name} PRIVATE F3D_MODULE_CLIP)
+  endif ()
+
   # dmon
   if (F3D_MODULE_DMON)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_DMON)

@@ -4,6 +4,26 @@ import java.util.List;
 
 public class Interactor {
 
+    /** Thrown when adding a command or binding that already exists. */
+    public static class AlreadyExistsException extends F3DException {
+        public AlreadyExistsException(String message) { super(message); }
+    }
+
+    /** Thrown when removing a command or binding that does not exist. */
+    public static class DoesNotExistException extends F3DException {
+        public DoesNotExistException(String message) { super(message); }
+    }
+
+    /** Thrown when a triggered command fails at runtime. */
+    public static class CommandRuntimeException extends F3DException {
+        public CommandRuntimeException(String message) { super(message); }
+    }
+
+    /** Thrown when a command is invoked with invalid arguments. */
+    public static class InvalidArgsException extends F3DException {
+        public InvalidArgsException(String message) { super(message); }
+    }
+
     private long mNativeAddress;
 
     public enum ModifierKeys {
@@ -155,6 +175,15 @@ public class Interactor {
 
     public interface EventLoopCallback {
         void execute(InteractorState state);
+    }
+
+    /**
+     * Notification callback.
+     * Return false to prevent standard notification from being displayed, true to allow it.
+     * Arguments are the description, value, bindings, and duration of the notification.
+     */
+    public interface NotificationCallback {
+        boolean execute(String desc, String value, String bind, double duration);
     }
 
     public interface CommandCallback {
@@ -477,6 +506,11 @@ public class Interactor {
      * @return this interactor for method chaining
      */
     public native Interactor setEventLoopUserCallback(EventLoopCallback callback);
+
+    /**
+     * Set notification callback. If null, only standard notifications will be displayed.
+     */
+    public native Interactor setNotificationCallback(NotificationCallback callback);
 
     /**
      * Play a VTK interaction file.

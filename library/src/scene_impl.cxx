@@ -14,6 +14,8 @@
 #include "vtkF3DMetaImporter.h"
 #include "vtkF3DRenderer.h"
 
+#include <algorithm>
+#include <iterator>
 #include <optional>
 #include <vtkCallbackCommand.h>
 #include <vtkCellArray.h>
@@ -162,6 +164,9 @@ public:
       this->Window.getCamera().resetToBounds();
     }
 
+    // Set the camera index domain
+    this->Options.domains.scene.camera.index.max = this->MetaImporter->GetNumberOfCameras();
+
     scene_impl::internals::DisplayAllInfo(this->MetaImporter, this->Window);
   }
 
@@ -197,12 +202,13 @@ public:
     window.PrintSceneDescription(log::VerboseLevel::DEBUG);
   }
 
-  const options& Options;
+  options& Options;
   window_impl& Window;
   interactor_impl* Interactor = nullptr;
   animationManager AnimationManager;
 
   vtkNew<vtkF3DMetaImporter> MetaImporter;
+  std::vector<fs::path> AddedFiles;
 };
 
 //----------------------------------------------------------------------------
@@ -288,6 +294,8 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       importer = genericImporter;
     }
     importers.emplace_back(filePath.filename().string(), importer);
+
+    this->Internals->AddedFiles.emplace_back(filePath);
   }
 
   log::debug("\nLoading files: ");
@@ -751,7 +759,18 @@ scene& scene_impl::clear()
   // Clear the window of all actors
   this->Internals->Window.Initialize();
 
+  this->Internals->AddedFiles.clear();
+
+  // Clear animation state
+  this->Internals->AnimationManager.Reset();
+
   return *this;
+}
+
+//----------------------------------------------------------------------------
+std::vector<fs::path> scene_impl::getAddedFiles() const
+{
+  return this->Internals->AddedFiles;
 }
 
 //----------------------------------------------------------------------------
@@ -845,6 +864,36 @@ scene& scene_impl::removeLight(int index)
 scene& scene_impl::removeAllLights()
 {
   this->Internals->Window.GetRenderer()->RemoveAllLights();
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+std::vector<node_state_t> scene_impl::getSceneHierarchy() const
+{
+  std::vector<vtkF3DMetaImporter::NodeInfo> hierarchy =
+    this->Internals->MetaImporter->GetSceneHierarchyNodes();
+
+  std::vector<node_state_t> nodeStates;
+  nodeStates.reserve(hierarchy.size());
+  std::ranges::transform(hierarchy, std::back_inserter(nodeStates),
+    [](const vtkF3DMetaImporter::NodeInfo& node)
+    {
+      return node_state_t{ node.Id, node.ParentId, node.Level, node.Label, node.Visible,
+        node.HasChildren, node.Collapsed };
+    });
+  return nodeStates;
+}
+
+//----------------------------------------------------------------------------
+scene& scene_impl::setNodeVisibility(int nodeId, bool visible)
+{
+  if (!this->Internals->MetaImporter->SetNodeVisibility(nodeId, visible))
+  {
+    throw scene::node_exception(
+      "No scene hierarchy node at index " + std::to_string(nodeId) + " to update");
+  }
+
+  this->Internals->Window.UpdateActorsVisibility();
   return *this;
 }
 
