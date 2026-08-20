@@ -260,8 +260,8 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
     std::optional<std::string> forceReader = this->Internals->Options.scene.force_reader;
     file_availability availability = f3d::file_availability::UNSUPPORTED_EXTENSION;
     // Recover the importer for the provided file path
-    const f3d::reader* reader = f3d::factory::instance()->getReader(
-      filePath.string(), forceReader, this->Internals->Options.scene.skip_content_check, availability);
+    const f3d::reader* reader = f3d::factory::instance()->getReader(filePath.string(), forceReader,
+      this->Internals->Options.scene.skip_content_check, availability);
     auto fail = [&](const std::string& message)
     {
       if (forceReader)
