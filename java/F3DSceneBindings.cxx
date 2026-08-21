@@ -19,8 +19,7 @@ static std::vector<std::string> JavaListToStringVector(JNIEnv* env, jobject list
 
   for (jint i = 0; i < size; i++)
   {
-    JniLocalRef<jstring> jstr(
-      env, static_cast<jstring>(env->CallObjectMethod(list, getMethod, i)));
+    JniLocalRef<jstring> jstr(env, static_cast<jstring>(env->CallObjectMethod(list, getMethod, i)));
     if (jstr.get())
     {
       JniUTFString str(env, jstr);

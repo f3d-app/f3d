@@ -348,8 +348,8 @@ extern "C"
     bool result = false;
     try
     {
-      result = GetOptionsFromEngine(env, self)
-                 .isSame(reinterpret_cast<f3d::engine*>(otherPtr)->getOptions(), str.c_str());
+      result = GetOptionsFromEngine(env, self).isSame(
+        reinterpret_cast<f3d::engine*>(otherPtr)->getOptions(), str.c_str());
     }
     catch (const f3d::options::inexistent_exception& e)
     {
@@ -382,8 +382,8 @@ extern "C"
     JniUTFString str(env, name);
     try
     {
-      GetOptionsFromEngine(env, self)
-        .copy(reinterpret_cast<f3d::engine*>(otherPtr)->getOptions(), str.c_str());
+      GetOptionsFromEngine(env, self).copy(
+        reinterpret_cast<f3d::engine*>(otherPtr)->getOptions(), str.c_str());
     }
     catch (const f3d::options::inexistent_exception& e)
     {

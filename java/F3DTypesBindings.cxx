@@ -128,8 +128,7 @@ extern "C"
       env->GetMethodID(validationResultClass, "<init>", "(ZLjava/lang/String;)V");
 
     JniLocalRef<jstring> jErrorMessage(env, env->NewStringUTF(errorMessage.c_str()));
-    jobject result =
-      env->NewObject(validationResultClass, constructor, valid, jErrorMessage.get());
+    jobject result = env->NewObject(validationResultClass, constructor, valid, jErrorMessage.get());
 
     return result;
   }

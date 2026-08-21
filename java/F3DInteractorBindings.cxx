@@ -78,8 +78,7 @@ f3d::interaction_bind_t JavaBindToNative(JNIEnv* env, jobject bind)
   nativeBind.mod = JavaModToNative(modOrdinal);
 
   jfieldID interField = env->GetFieldID(bindClass, "inter", "Ljava/lang/String;");
-  JniLocalRef<jstring> interStr(
-    env, static_cast<jstring>(env->GetObjectField(bind, interField)));
+  JniLocalRef<jstring> interStr(env, static_cast<jstring>(env->GetObjectField(bind, interField)));
   JniUTFString interCStr(env, interStr);
   nativeBind.inter = interCStr.c_str();
 

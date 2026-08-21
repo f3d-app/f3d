@@ -51,8 +51,14 @@ public:
   JniUTFString(JniUTFString&&) = delete;
   JniUTFString& operator=(JniUTFString&&) = delete;
 
-  operator const char*() const { return this->CStr; }
-  const char* c_str() const { return this->CStr; }
+  operator const char*() const
+  {
+    return this->CStr;
+  }
+  const char* c_str() const
+  {
+    return this->CStr;
+  }
 
 private:
   JNIEnv* Env;
@@ -67,7 +73,7 @@ private:
  *
  * A null reference is handled gracefully: no JNI call is made on destruction.
  */
-template <typename T>
+template<typename T>
 class JniLocalRef
 {
 public:
@@ -90,8 +96,14 @@ public:
   JniLocalRef(JniLocalRef&&) = delete;
   JniLocalRef& operator=(JniLocalRef&&) = delete;
 
-  operator T() const { return this->Ref; }
-  T get() const { return this->Ref; }
+  operator T() const
+  {
+    return this->Ref;
+  }
+  T get() const
+  {
+    return this->Ref;
+  }
 
 private:
   JNIEnv* Env;
