@@ -22,6 +22,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib${output_postfix}")
 
 project(F3D
   DESCRIPTION "F3D - A fast and minimalist 3D viewer"
+  HOMEPAGE_URL "https://f3d.app"
   LANGUAGES C CXX)
 
 set(f3d_cmake_dir "${F3D_SOURCE_DIR}/cmake")

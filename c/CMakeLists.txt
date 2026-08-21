@@ -108,4 +108,13 @@ if (BUILD_SHARED_LIBS)
     DESTINATION
     "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
     COMPONENT sdk EXCLUDE_FROM_ALL)
+
+  # pkg-config
+  configure_file(
+    "${F3D_SOURCE_DIR}/cmake/f3d_c_api.pc.in"
+    "${CMAKE_BINARY_DIR}/cmake/f3d_c_api.pc"
+    @ONLY)
+  install(FILES "${CMAKE_BINARY_DIR}/cmake/f3d_c_api.pc"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
+    COMPONENT sdk EXCLUDE_FROM_ALL)
 endif ()

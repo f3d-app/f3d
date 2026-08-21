@@ -161,7 +161,7 @@ Here is the list of all the components:
 | `library`       | YES                  | ALL              | libf3d library binaries.                                                                                                    |
 | `plugin`        | YES                  | ALL              | libf3d plugins.                                                                                                             |
 | `dependencies`  | NO                   | ALL              | libf3d runtime dependencies. Can be used to create a self-contained and relocatable package. System libraries are excluded. |
-| `sdk`           | NO                   | ALL              | libf3d SDK (headers and CMake config files) for `library` and `application` find_package components.                        |
+| `sdk`           | NO                   | ALL              | libf3d SDK (headers, CMake config files and pkg-config files) for `library` and `application` find_package components.      |
 | `plugin_sdk`    | NO                   | ALL              | libf3d plugin SDK (headers and CMake config files including macros) for `pluginsdk` find_package components.                |
 | `licenses`      | YES                  | ALL              | F3D and third party licenses.                                                                                               |
 | `documentation` | YES                  | Linux            | `man` documentation.                                                                                                        |

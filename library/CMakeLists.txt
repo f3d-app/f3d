@@ -314,6 +314,16 @@ if(BUILD_SHARED_LIBS)
     COMPONENT sdk
     EXCLUDE_FROM_ALL)
 
+  # Install a pkg-config file for libf3d
+  configure_file(
+    "${F3D_SOURCE_DIR}/cmake/f3d.pc.in"
+    "${CMAKE_BINARY_DIR}/cmake/f3d.pc"
+    @ONLY)
+  install(FILES "${CMAKE_BINARY_DIR}/cmake/f3d.pc"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
+    COMPONENT sdk
+    EXCLUDE_FROM_ALL)
+
   # Install plugin headers
   install(FILES ${F3D_PLUGIN_HEADERS}
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/f3d"
