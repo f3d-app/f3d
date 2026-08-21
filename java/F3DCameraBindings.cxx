@@ -67,16 +67,19 @@ extern "C"
 
   JNIEXPORT jobject JAVA_BIND(Camera, setState)(JNIEnv* env, jobject self, jobject state)
   {
-    jclass stateClass = env->GetObjectClass(state);
+    JniLocalRef<jclass> stateClass(env, env->GetObjectClass(state));
 
     jfieldID positionField = env->GetFieldID(stateClass, "position", "[D");
     jfieldID focalPointField = env->GetFieldID(stateClass, "focalPoint", "[D");
     jfieldID viewUpField = env->GetFieldID(stateClass, "viewUp", "[D");
     jfieldID viewAngleField = env->GetFieldID(stateClass, "viewAngle", "D");
 
-    jdoubleArray posArray = static_cast<jdoubleArray>(env->GetObjectField(state, positionField));
-    jdoubleArray focArray = static_cast<jdoubleArray>(env->GetObjectField(state, focalPointField));
-    jdoubleArray upArray = static_cast<jdoubleArray>(env->GetObjectField(state, viewUpField));
+    JniLocalRef<jdoubleArray> posArray(
+      env, static_cast<jdoubleArray>(env->GetObjectField(state, positionField)));
+    JniLocalRef<jdoubleArray> focArray(
+      env, static_cast<jdoubleArray>(env->GetObjectField(state, focalPointField)));
+    JniLocalRef<jdoubleArray> upArray(
+      env, static_cast<jdoubleArray>(env->GetObjectField(state, viewUpField)));
     jdouble angle = env->GetDoubleField(state, viewAngleField);
 
     double* pos = env->GetDoubleArrayElements(posArray, nullptr);
@@ -102,8 +105,10 @@ extern "C"
   {
     f3d::camera_state_t cppState = GetEngine(env, self)->getWindow().getCamera().getState();
 
-    jclass stateClass = env->FindClass("app/f3d/F3D/Camera$CameraState");
+    JniLocalRef<jclass> stateClass(env, env->FindClass("app/f3d/F3D/Camera$CameraState"));
     jmethodID constructor = env->GetMethodID(stateClass, "<init>", "()V");
+    // Not wrapped in JniLocalRef: this is the return value, and its local reference
+    // must remain valid until it crosses back into the JVM after this function returns.
     jobject state = env->NewObject(stateClass, constructor);
 
     jfieldID positionField = env->GetFieldID(stateClass, "position", "[D");
@@ -111,9 +116,9 @@ extern "C"
     jfieldID viewUpField = env->GetFieldID(stateClass, "viewUp", "[D");
     jfieldID viewAngleField = env->GetFieldID(stateClass, "viewAngle", "D");
 
-    jdoubleArray posArray = env->NewDoubleArray(3);
-    jdoubleArray focArray = env->NewDoubleArray(3);
-    jdoubleArray upArray = env->NewDoubleArray(3);
+    JniLocalRef<jdoubleArray> posArray(env, env->NewDoubleArray(3));
+    JniLocalRef<jdoubleArray> focArray(env, env->NewDoubleArray(3));
+    JniLocalRef<jdoubleArray> upArray(env, env->NewDoubleArray(3));
 
     env->SetDoubleArrayRegion(posArray, 0, 3, cppState.position.data());
     env->SetDoubleArrayRegion(focArray, 0, 3, cppState.focalPoint.data());
