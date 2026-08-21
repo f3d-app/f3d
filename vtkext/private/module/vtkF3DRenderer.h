@@ -162,7 +162,7 @@ public:
   void SetUseBlurBackground(bool use);
   void SetBlurCircleOfConfusionRadius(double radius);
   void SetRaytracingSamples(int samples);
-  void SetBackfaceType(const std::optional<std::string>& backfaceType);
+  void SetBackfaceType(const std::string& backfaceType);
   void SetFinalShader(const std::optional<std::string>& finalShader);
   ///@}
 
@@ -850,8 +850,7 @@ private:
 
   std::string CachePath;
 
-  std::optional<std::string> BackfaceType;
-
+  std::string BackfaceType = "default";
   std::optional<std::string> FinalShader;
 
   vtkF3DMetaImporter* Importer = nullptr;

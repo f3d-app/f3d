@@ -1768,7 +1768,7 @@ void vtkF3DRenderer::SetUseBlurBackground(bool use)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetBackfaceType(const std::optional<std::string>& backfaceType)
+void vtkF3DRenderer::SetBackfaceType(const std::string& backfaceType)
 {
   if (this->BackfaceType != backfaceType)
   {
@@ -2601,14 +2601,14 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 
   bool setBackfaceCulling = false;
   bool backfaceCulling = true;
-  if (this->BackfaceType.has_value())
+  if (this->BackfaceType != "default")
   {
     setBackfaceCulling = true;
-    if (this->BackfaceType.value() == "visible")
+    if (this->BackfaceType == "visible")
     {
       backfaceCulling = false;
     }
-    else if (this->BackfaceType.value() == "hidden")
+    else if (this->BackfaceType == "hidden")
     {
       backfaceCulling = true;
     }
@@ -2616,7 +2616,7 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     {
       setBackfaceCulling = false;
       F3DLog::Print(F3DLog::Severity::Warning,
-        this->BackfaceType.value() + " is not a valid backface type, assuming it is not set");
+        this->BackfaceType + " is not a valid backface type, assuming it is not set");
     }
   }
 
