@@ -27,7 +27,7 @@ namespace f3d
  *  f3d::engine eng(f3d::window::Type::NATIVE);
  *  f3d::scene& load = eng.getScene();
  *
- *  if (load.supports(path)
+ *  if (load.supports(path) == file_availability::SUPPORTED)
  *  {
  *    load.add(path);
  *  }
