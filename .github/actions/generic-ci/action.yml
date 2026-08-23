@@ -386,9 +386,10 @@ runs:
       working-directory: ${{github.workspace}}
       run: |
         export PKG_CONFIG_PATH=$(pwd)/install/lib/pkgconfig
+        export LD_LIBRARY_PATH=$(pwd)/dependencies/install/lib
         for lang in c cpp; do
-          make -C source/examples/libf3d/$lang/pkgconfig LDFLAGS="-Wl,-rpath-link,$(pwd)/dependencies/install/lib"
-          LD_LIBRARY_PATH=$(pwd)/dependencies/install/lib source/examples/libf3d/$lang/pkgconfig/check-engine-pkgconfig
+          make -C source/examples/libf3d/$lang/pkgconfig
+          source/examples/libf3d/$lang/pkgconfig/check-engine-pkgconfig
         done
 
     - name: Install optional component f3d plugins
