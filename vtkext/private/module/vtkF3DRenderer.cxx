@@ -2576,7 +2576,8 @@ void vtkF3DRenderer::ResetCameraClippingRange()
   else
   {
 #ifdef F3D_MODULE_OPENXR
-    // copyright: vtkF3DRenderer::ResetCameraClippingRange()
+    // Adapted from `vtkF3DRenderer::ResetCameraClippingRange()`
+    // Copyright (c) Kitware, Inc.
     double bounds[6];
 
     this->ComputeVisiblePropBounds(bounds);
@@ -2617,7 +2618,8 @@ void vtkF3DRenderer::ResetCameraClippingRange(const double bounds[6])
   else
   {
 #ifdef F3D_MODULE_OPENXR
-    // copyright: vtkF3DRenderer::ResetCameraClippingRange(const double bounds[6])
+    // adapted from `vtkF3DRenderer::ResetCameraClippingRange(const double bounds[6])`
+    // Copyright (c) Kitware, Inc.
     this->GetActiveCameraAndResetIfCreated();
     if (this->ActiveCamera == nullptr)
     {

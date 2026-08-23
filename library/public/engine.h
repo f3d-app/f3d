@@ -120,7 +120,7 @@ public:
 
   /**
    * Create an engine with an XR window, `F3D_MODULE_OPENXR` is required.
-   * Throws a engine::no_window_exception if XR is not supported
+   * Throws a engine::loading_exception if XR is not supported
    */
   [[nodiscard]] static engine createXR();
 

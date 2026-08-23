@@ -120,9 +120,9 @@ Scan standard directories for plugins and display their names, results may be in
 
 Filename to save [screenshots](04-INTERACTIONS.md#taking-screenshots) to. Can use [template variables](#filename-templating). Supports relative paths [as described](04-INTERACTIONS.md#taking-screenshots).
 
-### `--rendering-backend=<auto|egl|osmesa|glx|openxr|wgl>` (_string_, default: `auto`)
+### `--rendering-backend=<auto|egl|osmesa|glx|xr|wgl>` (_string_, default: `auto`)
 
-Rendering backend to load, `auto` means to let F3D pick the correct one for you depending on your system capabilities. Use `egl` or `osmesa` on linux to force headless rendering. Use `openxr` to launch F3D in XR mode.
+Rendering backend to load, `auto` means to let F3D pick the correct one for you depending on your system capabilities. Use `egl` or `osmesa` on linux to force headless rendering. Use `xr` to launch F3D with `xr` rendering backend.
 
 ### `-D`, `--define=<libf3d.option=value>` (_special_)
 
