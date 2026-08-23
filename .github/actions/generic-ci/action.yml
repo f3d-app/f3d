@@ -385,12 +385,10 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
-        F3D_PKGCONFIG_DIR=$(dirname "$(find $(pwd)/install -name 'f3d.pc')")
-        VTK_LIB_DIR=$(dirname "$(find $(pwd)/dependencies/install -name 'libvtkCommonCore.so*' | head -1)")
-        export PKG_CONFIG_PATH=$F3D_PKGCONFIG_DIR
+        export PKG_CONFIG_PATH=$(pwd)/install/lib/pkgconfig
         for lang in c cpp; do
-          make -C source/examples/libf3d/$lang/pkgconfig LDFLAGS="-Wl,-rpath-link,$VTK_LIB_DIR"
-          LD_LIBRARY_PATH=$VTK_LIB_DIR source/examples/libf3d/$lang/pkgconfig/check-engine-pkgconfig
+          make -C source/examples/libf3d/$lang/pkgconfig LDFLAGS="-Wl,-rpath-link,$(pwd)/dependencies/install/lib"
+          LD_LIBRARY_PATH=$(pwd)/dependencies/install/lib source/examples/libf3d/$lang/pkgconfig/check-engine-pkgconfig
         done
 
     - name: Install optional component f3d plugins
