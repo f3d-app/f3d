@@ -247,8 +247,7 @@ public:
   [[nodiscard]] DomainEnum<option_variant_t> getEnumDomain(std::string_view name) const;
 
   /**
-   * Return the index domain of the provided option as a `DomainIndex<option_variant_t>`.
-   * The values are provided as variants according to the variant API.
+   * Return the index domain of the provided option as a `DomainIndex`.
    * Throw options::incompatible_exception if option doesn't have an index domain.
    * Throws an options::inexistent_exception if option does not exist.
    */

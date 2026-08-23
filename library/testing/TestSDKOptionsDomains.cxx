@@ -4,13 +4,6 @@
 
 int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
-  auto enumDomainToStringVector = [](const f3d::options::DomainEnum<f3d::option_variant_t>& domain)
-  {
-    std::vector<std::string> enumeration(domain.enumeration.size());
-    std::ranges::transform(domain.enumeration,  enumeration.begin(), [](const auto& value) { return std::get<std::string>(value); });
-    return enumeration;
-  };
-
   PseudoUnitTest test;
 
   f3d::options opt;
@@ -32,15 +25,6 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
     opt.getDomainStyle("scene.camera.index") == f3d::options::domain_style::INDEX);
   test.expect<f3d::options::incompatible_exception>("getDomainStyle incompatible",
     [&]() { std::ignore = opt.getDomainStyle("model.scivis.cells"); });
-
-  // Test getEnumDomain
-  test("getEnumDomain", enumDomainToStringVector(opt.getEnumDomain("render.effect.blending.mode")),
-       { "none", "ddp", "sort", "sort_cpu", "stochastic" });
-
-  test.expect<f3d::options::incompatible_exception>(
-    "getEnumDomain incompatible", [&]() { std::ignore = opt.getEnumDomain("model.scivis.cells"); });
-  test.expect<f3d::options::inexistent_exception>(
-    "getEnumDomain inexistent", [&]() { std::ignore = opt.getEnumDomain("inexistent"); });
 
   // Test getRangeDomain
   f3d::options::DomainRange<f3d::option_variant_t> doubleRange =
@@ -70,6 +54,24 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
     [&]() { std::ignore = opt.getRangeDomain("model.scivis.cells"); });
   test.expect<f3d::options::inexistent_exception>(
     "getRangeDomain inexistent", [&]() { std::ignore = opt.getRangeDomain("inexistent"); });
+
+  // Test getEnumDomain
+  f3d::options::DomainEnum<f3d::option_variant_t> domain = opt.getEnumDomain("render.effect.blending.mode");
+  std::vector<std::string> enumeration(domain.enumeration.size());
+  std::ranges::transform(domain.enumeration,  enumeration.begin(), [](const auto& value) { return std::get<std::string>(value); });
+  test("getEnumDomain", enumeration, { "none", "ddp", "sort", "sort_cpu", "stochastic" });
+
+  test.expect<f3d::options::incompatible_exception>(
+    "getEnumDomain incompatible", [&]() { std::ignore = opt.getEnumDomain("model.scivis.cells"); });
+  test.expect<f3d::options::inexistent_exception>(
+    "getEnumDomain inexistent", [&]() { std::ignore = opt.getEnumDomain("inexistent"); });
+
+  // Test getIndexDomain
+  test("getEnumDomain", !opt.getIndexDomain("scene.camera.index").max.has_value());
+  test.expect<f3d::options::incompatible_exception>(
+    "getEnumDomain incompatible", [&]() { std::ignore = opt.getIndexDomain("model.scivis.cells"); });
+  test.expect<f3d::options::inexistent_exception>(
+    "getEnumDomain inexistent", [&]() { std::ignore = opt.getIndexDomain("inexistent"); });
 
   // Test increase/decrease
 
@@ -255,11 +257,11 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   test("ui.scale max", opt.domains.ui.scale.max, f3d::ratio_t(10));
   test("ui.scale increment", opt.domains.ui.scale.increment, f3d::ratio_t(0.1));
 
-  test("interactor.style enum", enumDomainToStringVector(opt.getEnumDomain("interactor.style")), {"default", "trackball", "2d"});
-  test("model.point_sprites.type enum", enumDomainToStringVector(opt.getEnumDomain("model.point_sprites.type")), {"none", "sphere", "gaussian", "circle", "stddev", "bound","cross"});
-  test("render.backface_type enum", enumDomainToStringVector(opt.getEnumDomain("render.backface_type")), {"visible", "hidden"});
-  test("render.effect.antialiasing.mode enum", enumDomainToStringVector(opt.getEnumDomain("render.effect.antialiasing.mode")), {"none", "fxaa", "ssaa", "taa"});
-  test("ui.animation_progress enum", enumDomainToStringVector(opt.getEnumDomain("ui.animation_progress")), {"none", "default", "advanced"});
+  test("interactor.style enum", opt.domains.interactor.style.enumeration, {"default", "trackball", "2d"});
+  test("model.point_sprites.type enum", opt.domains.model.point_sprites.type.enumeration, {"none", "sphere", "gaussian", "circle", "stddev", "bound","cross"});
+  test("render.backface_type enum", opt.domains.render.backface_type.enumeration, {"visible", "hidden"});
+  test("render.effect.antialiasing.mode enum", opt.domains.render.effect.antialiasing.mode.enumeration, {"none", "fxaa", "ssaa", "taa"});
+  test("ui.animation_progress enum", opt.domains.ui.animation_progress.enumeration, {"none", "default", "advanced"});
 
   test("scene.camera.index max index", !opt.domains.scene.camera.index.max.has_value());
   // clang-format on
