@@ -174,7 +174,7 @@ context::function context::xr()
     return reinterpret_cast<fptr>(fn);
   };
 #else
-  throw loading_exception("Cannot use a XR context on this platform");
+  throw loading_exception("OpenXR module is not enabled");
 #endif
 }
 
