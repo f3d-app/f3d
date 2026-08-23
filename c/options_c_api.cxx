@@ -641,52 +641,6 @@ f3d_domain_style_t f3d_options_get_domain_style(const f3d_options_t* options, co
 }
 
 //----------------------------------------------------------------------------
-char** f3d_options_get_enum_domain(const f3d_options_t* options, const char* name, int* count)
-{
-  if (!options || !name || !count)
-  {
-    if (count)
-    {
-      *count = 0;
-    }
-    return nullptr;
-  }
-
-  try
-  {
-    const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
-    std::vector<std::string> enumeration = cpp_options->getEnumDomain(name);
-
-    *count = static_cast<int>(enumeration.size());
-    if (enumeration.empty())
-    {
-      return nullptr;
-    }
-
-    char** result = new char*[enumeration.size()];
-
-    for (size_t i = 0; i < enumeration.size(); ++i)
-    {
-      result[i] = new char[enumeration[i].length() + 1];
-      std::strcpy(result[i], enumeration[i].c_str());
-    }
-
-    return result;
-  }
-
-  catch (const f3d::options::incompatible_exception& ex)
-  {
-    f3d::log::error(ex.what());
-    return nullptr;
-  }
-  catch (const f3d::options::inexistent_exception& ex)
-  {
-    f3d::log::error(ex.what());
-    return nullptr;
-  }
-}
-
-//----------------------------------------------------------------------------
 int f3d_options_get_range_domain_double(
   const f3d_options_t* options, const char* name, double range[3])
 {
@@ -743,6 +697,92 @@ int f3d_options_get_range_domain_int(const f3d_options_t* options, const char* n
     range[2] = std::get<int>(domain.increment);
     return 1;
   }
+  catch (const f3d::options::incompatible_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return 0;
+  }
+  catch (const f3d::options::inexistent_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return 0;
+  }
+}
+
+//----------------------------------------------------------------------------
+char** f3d_options_get_enum_domain_string(const f3d_options_t* options, const char* name, int* count)
+{
+  if (!options || !name || !count)
+  {
+    if (count)
+    {
+      *count = 0;
+    }
+    return nullptr;
+  }
+
+  try
+  {
+    const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
+    f3d::options::DomainEnum<f3d::option_variant_t> domain = cpp_options->getEnumDomain(name);
+    std::vector<std::string> enumeration(domain.enumeration.size());
+    std::ranges::transform(domain.enumeration, enumeration.begin(),
+          [](const auto& value) { return std::get<std::string>(value); });
+
+    *count = static_cast<int>(enumeration.size());
+    if (enumeration.empty())
+    {
+      return nullptr;
+    }
+
+    char** result = new char*[enumeration.size()];
+
+    for (size_t i = 0; i < enumeration.size(); ++i)
+    {
+      result[i] = new char[enumeration[i].length() + 1];
+      std::strcpy(result[i], enumeration[i].c_str());
+    }
+
+    return result;
+  }
+
+  catch (const f3d::options::incompatible_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return nullptr;
+  }
+  catch (const f3d::options::inexistent_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return nullptr;
+  }
+}
+
+//----------------------------------------------------------------------------
+int f3d_options_get_index_domain(const f3d_options_t* options, const char* name, unsigned int* max)
+{
+  if (!options || !name || !max)
+  {
+    return 0;
+  }
+
+  try
+  {
+    const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
+    f3d::options::DomainIndex domain = cpp_options->getIndexDomain(name);
+    if (domain.max.has_value())
+    {
+      *max = domain.max.value();
+    }
+    else
+    {
+      // Use a different return code when max value is not set
+      return 2;
+    }
+
+    return 1;
+  }
+
   catch (const f3d::options::incompatible_exception& ex)
   {
     f3d::log::error(ex.what());

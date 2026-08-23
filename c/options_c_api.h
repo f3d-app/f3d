@@ -341,17 +341,6 @@ extern "C"
     const f3d_options_t* options, const char* name);
 
   /**
-   * @brief Get an option enumeration domain if it has one
-   *
-   * @param options Options handle.
-   * @param name Option name.
-   * @return Array of enum strings. Caller must free the array with
-   *         f3d_options_free_string_array().
-   */
-  F3D_EXPORT char** f3d_options_get_enum_domain(
-    const f3d_options_t* options, const char* name, int* count);
-
-  /**
    * @brief Get an option double or ratio range domain if it has one
    *
    * @param options Options handle.
@@ -374,6 +363,29 @@ extern "C"
    */
   F3D_EXPORT int f3d_options_get_range_domain_int(
     const f3d_options_t* options, const char* name, int range[3]);
+
+  /**
+   * @brief Get an option enumeration string domain if it has one
+   *
+   * @param options Options handle.
+   * @param name Option name.
+   * @return Array of enum strings. Caller must free the array with
+   *         f3d_options_free_string_array().
+   */
+  F3D_EXPORT char** f3d_options_get_enum_domain_string(
+    const f3d_options_t* options, const char* name, int* count);
+
+  /**
+   * @brief Get an option index domain if it has one
+   *
+   * @param options Options handle.
+   * @param name Option name.
+   * @param[out] max max value of the index domain.
+   * @return 1 and set max when domain exist and is set, 2 and does not set max if domain is unset, 0 if the option doesn't exist, doesn't have an index
+   *         domain or if any of the parameters is null.
+   */
+  F3D_EXPORT int f3d_options_get_index_domain(
+    const f3d_options_t* options, const char* name, unsigned int* max);
 
   /**
    * @brief Increase an option value if it has a range or index domain
