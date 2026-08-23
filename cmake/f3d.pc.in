@@ -3,8 +3,8 @@ libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
 includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
 
 Name: f3d
-Description: @PROJECT_DESCRIPTION@
-URL: @PROJECT_HOMEPAGE_URL@
+Description: @F3D_DESCRIPTION@
+URL: @F3D_HOMEPAGE_URL@
 Version: @F3D_VERSION@
 Libs: -L${libdir} -lf3d
 Cflags: -I${includedir}
