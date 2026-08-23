@@ -943,7 +943,8 @@ f3d::options::DomainRange<f3d::option_variant_t> getRangeDomain(
  * Get provided domain_enum as a DomainEnum<option_variant_t>.
  * Only string is supported for now
  */
-f3d::options::DomainEnum<f3d::option_variant_t> getEnumDomain(const f3d::options::DomainEnum<std::string>& domain)
+f3d::options::DomainEnum<f3d::option_variant_t> getEnumDomain(
+  const f3d::options::DomainEnum<std::string>& domain)
 {
   f3d::options::DomainEnum<f3d::option_variant_t> ret;
   ret.enumeration.resize(domain.enumeration.size());

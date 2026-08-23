@@ -848,7 +848,8 @@ interactor& interactor_impl::initCommands()
         if (this->Internals->Options.hasDomain(args[0]) &&
           this->Internals->Options.getDomainStyle(args[0]) == f3d::options::domain_style::ENUM)
         {
-          f3d::options::DomainEnum<f3d::option_variant_t> domain = this->Internals->Options.getEnumDomain(args[0]);
+          f3d::options::DomainEnum<f3d::option_variant_t> domain =
+            this->Internals->Options.getEnumDomain(args[0]);
 
           // Transform potential values into found option
           // Only string is supported for now
@@ -875,9 +876,11 @@ interactor& interactor_impl::initCommands()
         this->Internals->Options.getDomainStyle(args[0]) == f3d::options::domain_style::ENUM)
       {
         // recover the enumeration, only strings are supported for now
-        f3d::options::DomainEnum<f3d::option_variant_t> domain = this->Internals->Options.getEnumDomain(args[0]);
+        f3d::options::DomainEnum<f3d::option_variant_t> domain =
+          this->Internals->Options.getEnumDomain(args[0]);
         std::vector<std::string> enumeration(domain.enumeration.size());
-        std::ranges::transform(domain.enumeration,  enumeration.begin(), [](const auto& value) { return std::get<std::string>(value); });
+        std::ranges::transform(domain.enumeration, enumeration.begin(),
+          [](const auto& value) { return std::get<std::string>(value); });
 
         // Complete the option value if possible
         return complNames(args, enumeration, 1);

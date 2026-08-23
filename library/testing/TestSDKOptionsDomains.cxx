@@ -56,9 +56,11 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
     "getRangeDomain inexistent", [&]() { std::ignore = opt.getRangeDomain("inexistent"); });
 
   // Test getEnumDomain
-  f3d::options::DomainEnum<f3d::option_variant_t> domain = opt.getEnumDomain("render.effect.blending.mode");
+  f3d::options::DomainEnum<f3d::option_variant_t> domain =
+    opt.getEnumDomain("render.effect.blending.mode");
   std::vector<std::string> enumeration(domain.enumeration.size());
-  std::ranges::transform(domain.enumeration,  enumeration.begin(), [](const auto& value) { return std::get<std::string>(value); });
+  std::ranges::transform(domain.enumeration, enumeration.begin(),
+    [](const auto& value) { return std::get<std::string>(value); });
   test("getEnumDomain", enumeration, { "none", "ddp", "sort", "sort_cpu", "stochastic" });
 
   test.expect<f3d::options::incompatible_exception>(
@@ -68,8 +70,8 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
 
   // Test getIndexDomain
   test("getEnumDomain", !opt.getIndexDomain("scene.camera.index").max.has_value());
-  test.expect<f3d::options::incompatible_exception>(
-    "getEnumDomain incompatible", [&]() { std::ignore = opt.getIndexDomain("model.scivis.cells"); });
+  test.expect<f3d::options::incompatible_exception>("getEnumDomain incompatible",
+    [&]() { std::ignore = opt.getIndexDomain("model.scivis.cells"); });
   test.expect<f3d::options::inexistent_exception>(
     "getEnumDomain inexistent", [&]() { std::ignore = opt.getIndexDomain("inexistent"); });
 

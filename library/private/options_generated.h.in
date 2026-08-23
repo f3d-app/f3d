@@ -165,7 +165,8 @@ f3d::options::DomainRange<f3d::option_variant_t> getRangeDomain(
 /**
  * Generated method, see `options::getEnumDomain`
  */
-f3d::options::DomainEnum<f3d::option_variant_t> getEnumDomain(const f3d::options& opt, std::string_view name)
+f3d::options::DomainEnum<f3d::option_variant_t> getEnumDomain(
+  const f3d::options& opt, std::string_view name)
 {
   // clang-format off
   ${_options_get_enum_domain};
