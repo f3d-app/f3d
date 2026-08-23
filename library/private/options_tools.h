@@ -946,6 +946,7 @@ f3d::options::DomainRange<f3d::option_variant_t> getRangeDomain(
 f3d::options::DomainEnum<f3d::option_variant_t> getEnumDomain(const f3d::options::DomainEnum<std::string>& domain)
 {
   f3d::options::DomainEnum<f3d::option_variant_t> ret;
+  ret.enumeration.resize(domain.enumeration.size());
   std::ranges::copy(domain.enumeration, ret.enumeration.begin());
   return ret;
 }
