@@ -4,7 +4,7 @@ includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
 
 Name: f3d
 Description: @F3D_DESCRIPTION@
-URL: @F3D_HOMEPAGE_URL@
+URL: https://f3d.app
 Version: @F3D_VERSION@
 Libs: -L${libdir} -lf3d
 Cflags: -I${includedir}
