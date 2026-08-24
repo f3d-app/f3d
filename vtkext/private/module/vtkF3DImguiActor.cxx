@@ -379,6 +379,7 @@ struct vtkF3DImguiActor::Internals
   SearchMode CurrentSearchMode = SearchMode::Description;
   bool SearchFocusRequested = false;
   float CheatSheetWidth = 0.f;
+  float HierarchyPosX = -1.f;
   std::map<std::string, ImFont*> ExtraFonts;
 };
 
@@ -546,7 +547,17 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
     posX += this->Pimpl->CheatSheetWidth + margin;
   }
 
-  ImGui::SetNextWindowPos(ImVec2(posX, margin));
+  // Only force the window position when it actually needs to move (e.g. the cheat
+  // sheet visibility just toggled). Forcing it every frame would fight ImGui's own
+  // left-border drag-resize, which also adjusts Pos.x to track the mouse: doing both
+  // every frame compounds the width change every frame instead of once per drag.
+  std::optional<ImVec2> position;
+  if (posX != this->Pimpl->HierarchyPosX)
+  {
+    position = ImVec2(posX, margin);
+    this->Pimpl->HierarchyPosX = posX;
+  }
+  ::SetupNextWindow(position, std::nullopt);
   ImGui::SetNextWindowSize(ImVec2(defaultWidth, winHeight), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSizeConstraints(
     ImVec2(10.f, winHeight), ImVec2(std::numeric_limits<float>::max(), winHeight));
@@ -556,7 +567,7 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
     ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoSavedSettings |
-    ImGuiWindowFlags_HorizontalScrollbar;
+    ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NoMove;
 
   ImGui::Begin("Scene Hierarchy", nullptr, flags);
 
