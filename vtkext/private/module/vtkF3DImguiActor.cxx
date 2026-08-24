@@ -547,10 +547,6 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
     posX += this->Pimpl->CheatSheetWidth + margin;
   }
 
-  // Only force the window position when it actually needs to move (e.g. the cheat
-  // sheet visibility just toggled). Forcing it every frame would fight ImGui's own
-  // left-border drag-resize, which also adjusts Pos.x to track the mouse: doing both
-  // every frame compounds the width change every frame instead of once per drag.
   std::optional<ImVec2> position;
   if (posX != this->Pimpl->HierarchyPosX)
   {
