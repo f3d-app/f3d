@@ -24,6 +24,7 @@ endforeach()
 
 set(classes
   F3DUtils
+  vtkF3DCatmullClarkSubdivisionFilter
   vtkF3DFaceVaryingPointDispatcher
   vtkF3DGLTFImporter
   vtkF3DImporter
