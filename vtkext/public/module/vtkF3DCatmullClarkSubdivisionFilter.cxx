@@ -86,10 +86,10 @@ bool SubdivideOnce(vtkPolyData* input, vtkPolyData* output)
   for (vtkIdType faceId = 0; faceId < numFaces; faceId++)
   {
     inPolys->GetCellAtId(faceId, cellSize, cellPoints);
-    for (vtkIdType j = 0; j < cellSize; j++)
+    for (vtkIdType vertexId = 0; vertexId < cellSize; vertexId++)
     {
-      vtkIdType v0 = cellPoints[j];
-      vtkIdType v1 = cellPoints[(j + 1) % cellSize];
+      vtkIdType v0 = cellPoints[vertexId];
+      vtkIdType v1 = cellPoints[(vertexId + 1) % cellSize];
       EdgeInfo& info = edges[MakeEdgeKey(v0, v1)];
       if (info.PointId < 0)
       {
@@ -198,16 +198,16 @@ bool SubdivideOnce(vtkPolyData* input, vtkPolyData* output)
   for (vtkIdType faceId = 0; faceId < numFaces; faceId++)
   {
     inPolys->GetCellAtId(faceId, cellSize, cellPoints);
-    for (vtkIdType j = 0; j < cellSize; j++)
+    for (vtkIdType vertexId = 0; vertexId < cellSize; vertexId++)
     {
-      vtkIdType vPrev = cellPoints[(j + cellSize - 1) % cellSize];
-      vtkIdType v = cellPoints[j];
-      vtkIdType vNext = cellPoints[(j + 1) % cellSize];
+      vtkIdType vPrev = cellPoints[(vertexId + cellSize - 1) % cellSize];
+      vtkIdType vCurrent = cellPoints[vertexId];
+      vtkIdType vNext = cellPoints[(vertexId + 1) % cellSize];
 
-      vtkIdType ePrev = edges[MakeEdgeKey(vPrev, v)].PointId;
-      vtkIdType eNext = edges[MakeEdgeKey(v, vNext)].PointId;
+      vtkIdType ePrev = edges[MakeEdgeKey(vPrev, vCurrent)].PointId;
+      vtkIdType eNext = edges[MakeEdgeKey(vCurrent, vNext)].PointId;
 
-      vtkIdType quad[4] = { v, eNext, facePointOffset + faceId, ePrev };
+      vtkIdType quad[4] = { vCurrent, eNext, facePointOffset + faceId, ePrev };
       outPolys->InsertNextCell(4, quad);
     }
   }
