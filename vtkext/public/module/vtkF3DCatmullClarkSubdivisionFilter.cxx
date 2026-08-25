@@ -72,9 +72,9 @@ bool SubdivideOnce(vtkPolyData* input, vtkPolyData* output)
     Point3 sum = { 0.0, 0.0, 0.0 };
     for (vtkIdType vertexId = 0; vertexId < cellSize; vertexId++)
     {
-      double p[3];
-      inPoints->GetPoint(cellPoints[vertexId], p);
-      sum = sum + Point3{ p[0], p[1], p[2] };
+      double pt[3];
+      inPoints->GetPoint(cellPoints[vertexId], pt);
+      sum = sum + Point3{ pt[0], pt[1], pt[2] };
     }
     facePoints[faceId] = sum / static_cast<double>(cellSize);
   }
