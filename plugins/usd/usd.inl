@@ -12,9 +12,13 @@ void applyCustomImporter(
     {
       usdImporter->SetSubdivisionLevel(std::stoi(subdivisionLevelStr));
     }
-    catch (...)
+    catch (std::invalid_argument& e)
     {
-      vtkWarningWithObjectMacro(nullptr, "Invalid subdivision level: " << subdivisionLevelStr);
+      vtkWarningWithObjectMacro(importer, "Invalid subdivision level: " << subdivisionLevelStr << " (" << e.what() << ")");
+    }
+    catch (std::out_of_range& e)
+    {
+      vtkWarningWithObjectMacro(importer, "Subdivision level out of range: " << subdivisionLevelStr << " (" << e.what() << ")");
     }
   }
 }

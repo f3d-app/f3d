@@ -14,12 +14,6 @@
 
 vtkStandardNewMacro(vtkF3DCatmullClarkSubdivisionFilter);
 
-//------------------------------------------------------------------------------
-vtkF3DCatmullClarkSubdivisionFilter::vtkF3DCatmullClarkSubdivisionFilter() = default;
-
-//------------------------------------------------------------------------------
-vtkF3DCatmullClarkSubdivisionFilter::~vtkF3DCatmullClarkSubdivisionFilter() = default;
-
 namespace
 {
 // 3D point helpers
@@ -224,6 +218,12 @@ bool SubdivideOnce(vtkPolyData* input, vtkPolyData* output)
 }
 
 //------------------------------------------------------------------------------
+vtkF3DCatmullClarkSubdivisionFilter::vtkF3DCatmullClarkSubdivisionFilter() = default;
+
+//------------------------------------------------------------------------------
+vtkF3DCatmullClarkSubdivisionFilter::~vtkF3DCatmullClarkSubdivisionFilter() = default;
+
+//------------------------------------------------------------------------------
 int vtkF3DCatmullClarkSubdivisionFilter::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
@@ -233,7 +233,7 @@ int vtkF3DCatmullClarkSubdivisionFilter::RequestData(vtkInformation* vtkNotUsed(
   vtkSmartPointer<vtkPolyData> current = vtkSmartPointer<vtkPolyData>::New();
   current->ShallowCopy(input);
 
-  for (unsigned char i = 0; i < this->NumberOfSubdivisions; i++)
+  for (int i = 0; i < this->NumberOfSubdivisions; i++)
   {
     vtkNew<vtkPolyData> next;
     if (!::SubdivideOnce(current, next))
