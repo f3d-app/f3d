@@ -651,6 +651,12 @@ public:
                     genNormals->Update();
                     newPolyData->ShallowCopy(genNormals->GetOutput());
                   }
+                  else
+                  {
+                    vtkWarningWithObjectMacro(nullptr,
+                      "Subdivision failed for mesh " << meshPrim.GetPath().GetString()
+                                                     << ", using original mesh");
+                  }
                 }
               }
             }
