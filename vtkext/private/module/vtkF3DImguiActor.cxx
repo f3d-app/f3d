@@ -379,7 +379,6 @@ struct vtkF3DImguiActor::Internals
   SearchMode CurrentSearchMode = SearchMode::Description;
   bool SearchFocusRequested = false;
   float CheatSheetWidth = 0.f;
-  float HierarchyPosX = -1.f;
   std::map<std::string, ImFont*> ExtraFonts;
 };
 
@@ -548,15 +547,14 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
   }
 
   std::optional<ImVec2> position;
-  if (posX != this->Pimpl->HierarchyPosX)
+  if (!ImGui::IsMouseDown(ImGuiMouseButton_Left))
   {
     position = ImVec2(posX, margin);
-    this->Pimpl->HierarchyPosX = posX;
   }
+  float maxWidth = std::max(10.f, viewport->WorkSize.x - posX - margin);
   ::SetupNextWindow(position, std::nullopt);
   ImGui::SetNextWindowSize(ImVec2(defaultWidth, winHeight), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSizeConstraints(
-    ImVec2(10.f, winHeight), ImVec2(std::numeric_limits<float>::max(), winHeight));
+  ImGui::SetNextWindowSizeConstraints(ImVec2(10.f, winHeight), ImVec2(maxWidth, winHeight));
   ImGuiStyle& style = ImGui::GetStyle();
   style.Colors[ImGuiCol_WindowBg] = ImVec4(
     this->BackdropColor[0], this->BackdropColor[1], this->BackdropColor[2], this->BackdropOpacity);
