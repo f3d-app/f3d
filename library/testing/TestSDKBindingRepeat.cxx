@@ -6,6 +6,7 @@
 #include <scene.h>
 #include <window.h>
 
+#include <format>
 #include <functional>
 #include <string>
 
