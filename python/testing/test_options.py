@@ -232,16 +232,22 @@ def test_get_domain_style():
     )
 
 
+def test_get_range_domain():
+    options = f3d.Options()
+    assert options.get_range_domain("render.line_width") == (0.0, 10.0, 0.1)
+    assert options.get_range_domain("render.raytracing.samples") == (1, 50, 1)
+
+
 def test_get_enum_domain():
     options = f3d.Options()
     enum = options.get_enum_domain("render.effect.blending.mode")
     assert len(enum) == 5
 
 
-def test_get_range_domain():
+def test_get_index_domain():
     options = f3d.Options()
-    assert options.get_range_domain("render.line_width") == (0.0, 10.0, 0.1)
-    assert options.get_range_domain("render.raytracing.samples") == (1, 50, 1)
+    max = options.get_index_domain("scene.camera.index")
+    assert max == None
 
 
 def test_increase_decrease():

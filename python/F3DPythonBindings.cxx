@@ -325,7 +325,6 @@ PYBIND11_MODULE(pyf3d, module)
     .def("remove_value", &f3d::options::removeValue)
     .def("has_domain", &f3d::options::hasDomain)
     .def("get_domain_style", &f3d::options::getDomainStyle)
-    .def("get_enum_domain", &f3d::options::getEnumDomain)
     .def("get_range_domain",
       [](const f3d::options& opts, std::string_view name) -> py::tuple
       {
@@ -338,6 +337,24 @@ PYBIND11_MODULE(pyf3d, module)
             return py::make_tuple(min, std::get<T>(domain.max), std::get<T>(domain.increment));
           },
           domain.min);
+      })
+    .def("get_enum_domain",
+      [](const f3d::options& opts, std::string_view name) -> py::list
+      {
+        f3d::options::DomainEnum<f3d::option_variant_t> domain = opts.getEnumDomain(name);
+
+        // only string is supported for now
+        std::list<std::string> list;
+        list.resize(domain.enumeration.size());
+        std::ranges::transform(domain.enumeration, list.begin(),
+          [](const auto& value) { return std::get<std::string>(value); });
+        return py::cast(list);
+      })
+    .def("get_index_domain",
+      [](const f3d::options& opts, std::string_view name)
+      {
+        f3d::options::DomainIndex domain = opts.getIndexDomain(name);
+        return domain.max;
       })
     .def("increase", &f3d::options::increase)
     .def("decrease", &f3d::options::decrease)
