@@ -710,7 +710,8 @@ int f3d_options_get_range_domain_int(const f3d_options_t* options, const char* n
 }
 
 //----------------------------------------------------------------------------
-char** f3d_options_get_enum_domain_string(const f3d_options_t* options, const char* name, int* count)
+char** f3d_options_get_enum_domain_string(
+  const f3d_options_t* options, const char* name, int* count)
 {
   if (!options || !name || !count)
   {
@@ -727,7 +728,7 @@ char** f3d_options_get_enum_domain_string(const f3d_options_t* options, const ch
     f3d::options::DomainEnum<f3d::option_variant_t> domain = cpp_options->getEnumDomain(name);
     std::vector<std::string> enumeration(domain.enumeration.size());
     std::ranges::transform(domain.enumeration, enumeration.begin(),
-          [](const auto& value) { return std::get<std::string>(value); });
+      [](const auto& value) { return std::get<std::string>(value); });
 
     *count = static_cast<int>(enumeration.size());
     if (enumeration.empty())

@@ -355,11 +355,11 @@ EMSCRIPTEN_BINDINGS(f3d)
         f3d::options::DomainIndex domain = o.getIndexDomain(str);
         if (domain.max.hasValue())
         {
-        return emscripten::val(domain.max.value());
+          return emscripten::val(domain.max.value());
         }
         else
         {
-        return emscripten::val::undefined();
+          return emscripten::val::undefined();
         }
       })
     .function(

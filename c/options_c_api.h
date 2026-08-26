@@ -381,8 +381,9 @@ extern "C"
    * @param options Options handle.
    * @param name Option name.
    * @param[out] max max value of the index domain.
-   * @return 1 and set max when domain exist and is set, 2 and does not set max if domain is unset, 0 if the option doesn't exist, doesn't have an index
-   *         domain or if any of the parameters is null.
+   * @return 1 and set max when domain exist and is set, 2 and does not set max if domain is unset,
+   * 0 if the option doesn't exist, doesn't have an index domain or if any of the parameters is
+   * null.
    */
   F3D_EXPORT int f3d_options_get_index_domain(
     const f3d_options_t* options, const char* name, unsigned int* max);

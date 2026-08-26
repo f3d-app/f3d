@@ -655,7 +655,8 @@ extern "C"
     return result;
   }
 
-  JNIEXPORT jobject JAVA_BIND(Options, getEnumDomainAsString)(JNIEnv* env, jobject self, jstring name)
+  JNIEXPORT jobject JAVA_BIND(Options, getEnumDomainAsString)(
+    JNIEnv* env, jobject self, jstring name)
   {
     JniUTFString str(env, name);
     const std::string nameStr = str.c_str();
