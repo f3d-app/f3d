@@ -658,11 +658,12 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Options, getEnumDomainAsString)(JNIEnv* env, jobject self, jstring name)
   {
     JniUTFString str(env, name);
+    const std::string nameStr = str.c_str();
     jobject result = nullptr;
     try
     {
       f3d::options::DomainEnum<f3d::option_variant_t> domain =
-        GetOptionsFromEngine(env, self).getEnumDomain(str);
+        GetOptionsFromEngine(env, self).getEnumDomain(nameStr);
       std::vector<std::string> enumeration(domain.enumeration.size());
       std::transform(domain.enumeration.begin(), domain.enumeration.end(), enumeration.begin(),
         [](const auto& value) { return std::get<std::string>(value); });
@@ -682,10 +683,11 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Options, getIndexDomain)(JNIEnv* env, jobject self, jstring name)
   {
     JniUTFString str(env, name);
+    const std::string nameStr = str.c_str();
     jobject result = nullptr;
     try
     {
-      f3d::options::DomainIndex domain = GetOptionsFromEngine(env, self).getIndexDomain(str);
+      f3d::options::DomainIndex domain = GetOptionsFromEngine(env, self).getIndexDomain(nameStr);
 
       jclass integerClass = env->FindClass("java/lang/Integer");
       jmethodID valueOf = env->GetStaticMethodID(integerClass, "valueOf", "(I)Ljava/lang/Integer;");
