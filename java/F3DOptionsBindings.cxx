@@ -575,25 +575,6 @@ extern "C"
     return result;
   }
 
-  JNIEXPORT jobject JAVA_BIND(Options, getEnumDomain)(JNIEnv* env, jobject self, jstring name)
-  {
-    JniUTFString str(env, name);
-    jobject result = nullptr;
-    try
-    {
-      result = CreateStringList(env, GetOptionsFromEngine(env, self).getEnumDomain(str.c_str()));
-    }
-    catch (const f3d::options::inexistent_exception& e)
-    {
-      F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
-    }
-    catch (const f3d::options::incompatible_exception& e)
-    {
-      F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
-    }
-    return result;
-  }
-
   JNIEXPORT jobject JAVA_BIND(Options, getRangeDomainAsDouble)(
     JNIEnv* env, jobject self, jstring name)
   {
@@ -626,8 +607,7 @@ extern "C"
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      F3DThrowJavaException(env, "java/lang/IllegalArgumentException", e.what());
-      return nullptr;
+      F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
     }
     catch (const f3d::options::incompatible_exception& e)
     {
@@ -666,8 +646,7 @@ extern "C"
     }
     catch (const f3d::options::inexistent_exception& e)
     {
-      F3DThrowJavaException(env, "java/lang/IllegalArgumentException", e.what());
-      return nullptr;
+      F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
     }
     catch (const f3d::options::incompatible_exception& e)
     {
@@ -678,7 +657,7 @@ extern "C"
 
   JNIEXPORT jobject JAVA_BIND(Options, getEnumDomainAsString)(JNIEnv* env, jobject self, jstring name)
   {
-    const char* str = env->GetStringUTFChars(name, nullptr);
+    JniUTFString str(env, name);
     jobject result = nullptr;
     try
     {
@@ -697,13 +676,12 @@ extern "C"
     {
       F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
     }
-    env->ReleaseStringUTFChars(name, str);
     return result;
   }
 
   JNIEXPORT jobject JAVA_BIND(Options, getIndexDomain)(JNIEnv* env, jobject self, jstring name)
   {
-    const char* str = env->GetStringUTFChars(name, nullptr);
+    JniUTFString str(env, name);
     jobject result = nullptr;
     try
     {
@@ -729,7 +707,6 @@ extern "C"
     {
       F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
     }
-    env->ReleaseStringUTFChars(name, str);
     return result;
   }
 
