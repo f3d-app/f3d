@@ -751,7 +751,7 @@ private:
 
   // Does vtk version support GridAxesActor
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
-  vtkNew<vtkGridAxesActor3D> GridAxesActor;
+  vtkSmartPointer<vtkGridAxesActor3D> GridAxesActor;
 #endif
 
   vtkNew<vtkActor> GridActor;

@@ -9,7 +9,6 @@
 
 #include <vtkMath.h>
 #include <vtkMathUtilities.h>
-#include <vtkSmartPointer.h>
 
 #include <algorithm>
 #include <cassert>
@@ -217,106 +216,120 @@ color_t parse(const std::string& str)
 
   try
   {
-    /* Short hex format search */
-    const std::regex shortHexRegex("#([0-9a-f])([0-9a-f])([0-9a-f])", std::regex_constants::icase);
-    std::smatch shortHexMatch;
-    if (std::regex_match(strCompact, shortHexMatch, shortHexRegex))
+    if (strCompact.starts_with("#"))
     {
-      return color_t(
-        std::stoul(shortHexMatch[1].str() + shortHexMatch[1].str(), nullptr, 16) / 255.0,
-        std::stoul(shortHexMatch[2].str() + shortHexMatch[2].str(), nullptr, 16) / 255.0,
-        std::stoul(shortHexMatch[3].str() + shortHexMatch[3].str(), nullptr, 16) / 255.0);
+      /* Short hex format search */
+      const std::regex shortHexRegex(
+        "#([0-9a-f])([0-9a-f])([0-9a-f])", std::regex_constants::icase);
+      std::smatch shortHexMatch;
+      if (std::regex_match(strCompact, shortHexMatch, shortHexRegex))
+      {
+        return color_t(
+          std::stoul(shortHexMatch[1].str() + shortHexMatch[1].str(), nullptr, 16) / 255.0,
+          std::stoul(shortHexMatch[2].str() + shortHexMatch[2].str(), nullptr, 16) / 255.0,
+          std::stoul(shortHexMatch[3].str() + shortHexMatch[3].str(), nullptr, 16) / 255.0);
+      }
+
+      /* Hex format search */
+      const std::regex hexRegex(
+        "#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})", std::regex_constants::icase);
+      std::smatch hexMatch;
+      if (std::regex_match(strCompact, hexMatch, hexRegex))
+      {
+        return color_t(                                  //
+          std::stoul(hexMatch[1], nullptr, 16) / 255.0,  //
+          std::stoul(hexMatch[2], nullptr, 16) / 255.0,  //
+          std::stoul(hexMatch[3], nullptr, 16) / 255.0); //
+      }
     }
 
-    /* Hex format search */
-    const std::regex hexRegex(
-      "#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})", std::regex_constants::icase);
-    std::smatch hexMatch;
-    if (std::regex_match(strCompact, hexMatch, hexRegex))
+    if (strCompact.starts_with("rgb("))
     {
-      return color_t(                                  //
-        std::stoul(hexMatch[1], nullptr, 16) / 255.0,  //
-        std::stoul(hexMatch[2], nullptr, 16) / 255.0,  //
-        std::stoul(hexMatch[3], nullptr, 16) / 255.0); //
-    }
-
-    /* RGB format search */
-    const std::regex rgbRegex(
-      "rgb\\((\\d{1,3}),(\\d{1,3}),(\\d{1,3})\\)", std::regex_constants::icase);
-    std::smatch rgbMatch;
-    if (std::regex_match(strCompact, rgbMatch, rgbRegex))
-    {
-      rgb[0] = std::stod(rgbMatch[1]) / 255.0;
-      rgb[1] = std::stod(rgbMatch[2]) / 255.0;
-      rgb[2] = std::stod(rgbMatch[3]) / 255.0;
-      if (rgb[0] > 1.0 || rgb[1] > 1.0 || rgb[2] > 1.0)
+      /* RGB format search */
+      const std::regex rgbRegex(
+        "rgb\\((\\d{1,3}),(\\d{1,3}),(\\d{1,3})\\)", std::regex_constants::icase);
+      std::smatch rgbMatch;
+      if (std::regex_match(strCompact, rgbMatch, rgbRegex))
       {
-        throw options::parsing_exception("Cannot parse " + str + " into a color_t");
-      }
-      return color_t(rgb[0], rgb[1], rgb[2]);
-    }
-
-    /* Hue-based format search: hsl, hsv, hwb */
-    const std::regex hueRegex(
-      "(hsl|hsv|hwb)\\((\\d{1,3}),(\\d{1,3})%?,(\\d{1,3})%?\\)", std::regex_constants::icase);
-    std::smatch hueMatch;
-    if (std::regex_match(strCompact, hueMatch, hueRegex))
-    {
-      const double h = std::stod(hueMatch[2]) / 360.0;
-      double s = std::stod(hueMatch[3]) / 100.0;
-      double v = std::stod(hueMatch[4]) / 100.0;
-      if (h > 1.0 || s > 1.0 || v > 1.0)
-      {
-        throw options::parsing_exception("Cannot parse " + str + " into a color_t");
-      }
-
-      std::string hueFormat = hueMatch[1].str();
-      std::ranges::transform(
-        hueFormat, hueFormat.begin(), [](unsigned char c) { return std::tolower(c); });
-      if (hueFormat == "hsl")
-      {
-        const double l = v;
-        v = l + s * std::min(l, 1.0 - l);
-        s = (v == 0.0) ? 0.0 : (2.0 * (1.0 - l / v));
-        vtkMath::HSVToRGB(h, s, v, &rgb[0], &rgb[1], &rgb[2]);
-        return color_t(rgb[0], rgb[1], rgb[2]);
-      }
-      if (hueFormat == "hsv")
-      {
-        vtkMath::HSVToRGB(h, s, v, &rgb[0], &rgb[1], &rgb[2]);
-        return color_t(rgb[0], rgb[1], rgb[2]);
-      }
-      if (hueFormat == "hwb")
-      {
-        v = 1 - v;
-        s = 1 - (s / v);
-        vtkMath::HSVToRGB(h, s, v, &rgb[0], &rgb[1], &rgb[2]);
+        rgb[0] = std::stod(rgbMatch[1]) / 255.0;
+        rgb[1] = std::stod(rgbMatch[2]) / 255.0;
+        rgb[2] = std::stod(rgbMatch[3]) / 255.0;
+        if (rgb[0] > 1.0 || rgb[1] > 1.0 || rgb[2] > 1.0)
+        {
+          throw options::parsing_exception("Cannot parse " + str + " into a color_t");
+        }
         return color_t(rgb[0], rgb[1], rgb[2]);
       }
     }
 
-    /* CMYK format search */
-    const std::regex cmykRegex(
-      "cmyk\\((\\d{1,3})%?,(\\d{1,3})%?,(\\d{1,3})%?,(\\d{1,3})%?\\)", std::regex_constants::icase);
-    std::smatch cmykMatch;
-    if (std::regex_match(strCompact, cmykMatch, cmykRegex))
+    if (strCompact.starts_with("hsl(") || strCompact.starts_with("hsv(") ||
+      strCompact.starts_with("hwb("))
     {
-      const double c = std::stod(cmykMatch[1]) / 100.0;
-      const double m = std::stod(cmykMatch[2]) / 100.0;
-      const double y = std::stod(cmykMatch[3]) / 100.0;
-      const double k = std::stod(cmykMatch[4]) / 100.0;
-      if (c > 1.0 || m > 1.0 || y > 1.0 || k > 1.0)
+      /* Hue-based format search: hsl, hsv, hwb */
+      const std::regex hueRegex(
+        "(hsl|hsv|hwb)\\((\\d{1,3}),(\\d{1,3})%?,(\\d{1,3})%?\\)", std::regex_constants::icase);
+      std::smatch hueMatch;
+      if (std::regex_match(strCompact, hueMatch, hueRegex))
       {
-        throw options::parsing_exception("Cannot parse " + str + " into a color_t");
+        const double h = std::stod(hueMatch[2]) / 360.0;
+        double s = std::stod(hueMatch[3]) / 100.0;
+        double v = std::stod(hueMatch[4]) / 100.0;
+        if (h > 1.0 || s > 1.0 || v > 1.0)
+        {
+          throw options::parsing_exception("Cannot parse " + str + " into a color_t");
+        }
+
+        std::string hueFormat = hueMatch[1].str();
+        std::ranges::transform(
+          hueFormat, hueFormat.begin(), [](unsigned char c) { return std::tolower(c); });
+        if (hueFormat == "hsl")
+        {
+          const double l = v;
+          v = l + s * std::min(l, 1.0 - l);
+          s = (v == 0.0) ? 0.0 : (2.0 * (1.0 - l / v));
+          vtkMath::HSVToRGB(h, s, v, &rgb[0], &rgb[1], &rgb[2]);
+          return color_t(rgb[0], rgb[1], rgb[2]);
+        }
+        if (hueFormat == "hsv")
+        {
+          vtkMath::HSVToRGB(h, s, v, &rgb[0], &rgb[1], &rgb[2]);
+          return color_t(rgb[0], rgb[1], rgb[2]);
+        }
+        if (hueFormat == "hwb")
+        {
+          v = 1 - v;
+          s = 1 - (s / v);
+          vtkMath::HSVToRGB(h, s, v, &rgb[0], &rgb[1], &rgb[2]);
+          return color_t(rgb[0], rgb[1], rgb[2]);
+        }
       }
-      return color_t(           //
-        (1.0 - c) * (1.0 - k),  //
-        (1.0 - m) * (1.0 - k),  //
-        (1.0 - y) * (1.0 - k)); //
+    }
+
+    if (strCompact.starts_with("cmyk("))
+    {
+      /* CMYK format search */
+      const std::regex cmykRegex("cmyk\\((\\d{1,3})%?,(\\d{1,3})%?,(\\d{1,3})%?,(\\d{1,3})%?\\)",
+        std::regex_constants::icase);
+      std::smatch cmykMatch;
+      if (std::regex_match(strCompact, cmykMatch, cmykRegex))
+      {
+        const double c = std::stod(cmykMatch[1]) / 100.0;
+        const double m = std::stod(cmykMatch[2]) / 100.0;
+        const double y = std::stod(cmykMatch[3]) / 100.0;
+        const double k = std::stod(cmykMatch[4]) / 100.0;
+        if (c > 1.0 || m > 1.0 || y > 1.0 || k > 1.0)
+        {
+          throw options::parsing_exception("Cannot parse " + str + " into a color_t");
+        }
+        return color_t(           //
+          (1.0 - c) * (1.0 - k),  //
+          (1.0 - m) * (1.0 - k),  //
+          (1.0 - y) * (1.0 - k)); //
+      }
     }
 
     /* Named colors search */
-    vtkNew<vtkF3DNamedColors> color;
+    static vtkNew<vtkF3DNamedColors> color;
     if (color->ColorExists(strCompact))
     {
       double rgba[4];
