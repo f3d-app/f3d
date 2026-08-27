@@ -69,6 +69,13 @@ public class Window {
     }
 
     /**
+     * Get the current video frame of the window.
+     *
+     * @return video frame
+     */
+    public native VideoFrame getVideoFrame();
+
+    /**
      * Set the size of the window.
      *
      * @param width window width

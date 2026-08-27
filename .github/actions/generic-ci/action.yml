@@ -185,6 +185,7 @@ runs:
         -DF3D_MACOS_BUNDLE=${{ inputs.bundle_label == 'bundle' && 'ON' || 'OFF' }}
         -DF3D_MODULE_CLIP=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_EXR=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_FFMPEG=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_WEBP=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_RAYTRACING=${{ (inputs.optdeps_label == 'optdeps' && inputs.gles_label == 'no-gles') && 'ON' || 'OFF' }}
         -DF3D_MODULE_UI=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}

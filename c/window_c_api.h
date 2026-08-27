@@ -5,6 +5,7 @@
 #include "export.h"
 #include "image_c_api.h"
 #include "types_c_api.h"
+#include "video_c_api.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -199,6 +200,16 @@ extern "C"
    * @return DPI scale.
    */
   F3D_EXPORT double f3d_window_get_dpi_scale(f3d_window_t* window);
+
+  /**
+   * @brief Get the current video frame of the window.
+   *
+   * The returned frame must be deleted with f3d_video_frame_delete().
+   *
+   * @param window Window handle.
+   * @return Video frame handle, or NULL on failure.
+   */
+  F3D_EXPORT f3d_video_frame_t* f3d_window_get_video_frame(f3d_window_t* window);
 
 #ifdef __cplusplus
 }

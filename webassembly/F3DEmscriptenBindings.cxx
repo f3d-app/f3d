@@ -10,6 +10,7 @@
 #include "interactor.h"
 #include "options.h"
 #include "scene.h"
+#include "video_encoder.h"
 #include "window.h"
 
 // This is needed to avoid compilation issues because the destructors are protected
@@ -635,6 +636,7 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("getCamera", &f3d::window::getCamera, emscripten::return_value_policy::reference())
     .function("render", &f3d::window::render)
     .function("renderToImage", &f3d::window::renderToImage)
+    .function("getVideoFrame", &f3d::window::getVideoFrame)
     .function("setSize", &f3d::window::setSize, emscripten::return_value_policy::reference())
     .property(
       "size",
@@ -658,6 +660,77 @@ EMSCRIPTEN_BINDINGS(f3d)
           { jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() }));
       })
     .function("getDPIScale", &f3d::window::getDPIScale);
+
+  // f3d::video_frame
+  emscripten::class_<f3d::video_frame>("VideoFrame")
+    .smart_ptr<std::shared_ptr<f3d::video_frame>>("VideoFrame")
+    .function("setTimestamp", &f3d::video_frame::setTimestamp,
+      emscripten::return_value_policy::reference());
+
+  // f3d::video_packet
+  emscripten::class_<f3d::video_packet>("VideoPacket")
+    .smart_ptr<std::shared_ptr<f3d::video_packet>>("VideoPacket")
+    .function(
+      "getPacketData",
+      +[](const f3d::video_packet& packet) -> emscripten::val
+      {
+        return emscripten::val(emscripten::typed_memory_view(
+          packet.getPacketSize(), reinterpret_cast<const uint8_t*>(packet.getPacketData())));
+      },
+      emscripten::allow_raw_pointers())
+    .function("getTimestamp", &f3d::video_packet::getTimestamp)
+    .function("isKeyFrame", &f3d::video_packet::isKeyFrame);
+
+  // f3d::video_encoder
+  emscripten::enum_<f3d::video_encoder::codec>("VideoEncoderCodec")
+    .value("H264", f3d::video_encoder::codec::H264)
+    .value("HEVC", f3d::video_encoder::codec::HEVC)
+    .value("VP8", f3d::video_encoder::codec::VP8)
+    .value("VP9", f3d::video_encoder::codec::VP9)
+    .value("AV1", f3d::video_encoder::codec::AV1)
+    .value("EXPLICIT", f3d::video_encoder::codec::EXPLICIT);
+
+  emscripten::value_object<f3d::video_encoder::params>("VideoEncoderParams")
+    .field("codec", &f3d::video_encoder::params::Codec)
+    .field("width", &f3d::video_encoder::params::Width)
+    .field("height", &f3d::video_encoder::params::Height)
+    .field("frameRate", &f3d::video_encoder::params::FrameRate)
+    .field("bitrate", &f3d::video_encoder::params::Bitrate)
+    .field("lowLatency", &f3d::video_encoder::params::LowLatency);
+
+  emscripten::class_<f3d::video_encoder>("VideoEncoder")
+    .smart_ptr<std::shared_ptr<f3d::video_encoder>>("VideoEncoder")
+    .property("width", &f3d::video_encoder::getWidth)
+    .property("height", &f3d::video_encoder::getHeight)
+    .class_function(
+      "create", +[](const f3d::video_encoder::params& params) -> std::shared_ptr<f3d::video_encoder>
+      { return f3d::video_encoder::create(params); })
+    .class_function(
+      "getAvailableEncoders",
+      +[]() -> emscripten::val
+      {
+        auto encoders = f3d::video_encoder::getAvailableEncoders();
+        std::vector<emscripten::val> result;
+        for (const auto& encoder : encoders)
+        {
+          // create a JS object of the form { name: <encoder.first>, description: <encoder.second> }
+          emscripten::val js_encoder = emscripten::val::object();
+          js_encoder.set("name", encoder.first);
+          js_encoder.set("description", encoder.second);
+          result.emplace_back(std::move(js_encoder));
+        }
+        return emscripten::val::array(std::move(result));
+      })
+    .function(
+      "listen",
+      +[](f3d::video_encoder& encoder, const emscripten::val& callback) -> f3d::video_encoder&
+      {
+        return encoder.listen(
+          [=](const std::shared_ptr<f3d::video_packet>& packet) { callback(packet); });
+      },
+      emscripten::return_value_policy::reference())
+    .function("submit", &f3d::video_encoder::submit)
+    .function("flush", &f3d::video_encoder::flush, emscripten::return_value_policy::reference());
 
   // f3d::interaction_bind_t
   emscripten::enum_<f3d::interaction_bind_t::ModifierKeys>("InteractionBindModifierKeys")

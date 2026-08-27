@@ -39,6 +39,8 @@ F3D animation behavior can be fully controlled from the command line using the f
 
 ## Exporting animation frames
 
+### Images sequence
+
 F3D can export multiple frames from an animation to image files. To do this, include `{frame}` in the output filename template:
 
 ```bash
@@ -60,6 +62,26 @@ f3d example.file --output=frame_{frame}.png --frame-rate=10 --animation-time=1.5
 ```
 
 See [Filename templating](03-OPTIONS.md#filename-templating) for more template variables.
+
+### Video
+
+It's also possible to save the animation to a video raw x264 stream:
+
+```bash
+f3d example.file --output-video=video.h264
+```
+
+The raw video file can be added to a container using FFmpeg:
+
+```bash
+ffmpeg -f h264 -i video.h264 video.mp4
+```
+
+It can be done more efficiently in one line using piping:
+
+```bash
+f3d example.file --output-video=- | ffmpeg -f h264 -i - video.mp4
+```
 
 ## Animation Interactions
 

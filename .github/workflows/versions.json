@@ -10,7 +10,8 @@
     "sqlite is using a common-superbuild hash as it is not a CMake project",
     "OpenEXR v3.0.1 is actually not using OpenJPH",
     "zlib is fixed at v1.3.1 until https://github.com/madler/zlib/issues/1181 is fixed",
-    "mesa is fixed at 25.0.7 because OSMesa has been removed from 25.1.0"
+    "mesa is fixed at 25.0.7 because OSMesa has been removed from 25.1.0",
+    "libx264 is using git hash because there are no proper releases"
   ],
   "alembic": {
     "version": "1.8.11",
@@ -31,6 +32,10 @@
   "draco": {
     "version": "1.5.7",
     "min_version": "1.5.6"
+  },
+  "ffmpeg": {
+    "version": "n9.0.1",
+    "min_version": "n8.0.1"
   },
   "gdal": {
     "version": "v3.13.0",
@@ -115,6 +120,10 @@
   "webp": {
     "version": "v1.6.0",
     "min_version": "v1.2.4"
+  },
+  "x264": {
+    "version": "b35605ace3ddf7c1a5d67a2eb553f034aef41d55",
+    "min_version": "b35605ace3ddf7c1a5d67a2eb553f034aef41d55"
   },
   "zlib": {
     "version": "v1.3.1",

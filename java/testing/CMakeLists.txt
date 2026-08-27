@@ -11,6 +11,12 @@ list(APPEND javaf3dTests_list
   ${CMAKE_CURRENT_SOURCE_DIR}/TestWindow.java
     )
 
+if(F3D_MODULE_FFMPEG)
+  list(APPEND javaf3dTests_list
+    ${CMAKE_CURRENT_SOURCE_DIR}/TestVideo.java
+    )
+endif()
+
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
   list(APPEND javaf3dTests_list
     ${CMAKE_CURRENT_SOURCE_DIR}/TestSceneBuffer.java

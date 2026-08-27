@@ -29,6 +29,10 @@ using OptionsEntries = std::vector<OptionsEntry>;
 static inline const OptionsDict DefaultAppOptions = {
   { "input", "" },
   { "output", "" },
+  { "output-video", "" },
+  { "video-encoder", "" },
+  { "video-bitrate", "5" },
+  { "video-low-latency", "false" },
   { "list-bindings", "false" },
   { "no-background", "false" },
   { "config", "" },

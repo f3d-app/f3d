@@ -45,6 +45,25 @@ List available _bindings_ and exit. Ignore `--verbose`.
 
 List available _rendering backends_ and exit. Ignore `--verbose`.
 
+### `--list-video-encoders`
+
+List available _video encoders_ and exit. Ignore `--verbose`.
+
+### `--video-encoder` (_string_)
+
+Specify the encoder to use when using `--output-video`.
+Use `--list-video-encoders` to list encoders available on your system.
+
+### `--video-bitrate` (_double_, default: `5.0`)
+
+Specify the video encoder bitrate in Mbps.
+Higher means better quality but larger video stream.
+
+### `--video-low-latency` (_bool_, default: `false`)
+
+Specify if the video encoder should reduce latency by emitting packets as soon as possible.
+Set this to true in case of real time streaming, otherwise leave it to false to have the best quality possible.
+
 ### `--config=<config file path/name/stem>` (_string_, default: `config`)
 
 Specify the [configuration file](06-CONFIGURATION_FILE.md) to use. Supports absolute/relative path but also filename/filestem to search for in standard configuration file locations.
@@ -1096,6 +1115,12 @@ export_brep(obj, sys.stdout.buffer)
 
 ```
 python script.py | f3d - --output=- | display
+```
+
+It's also possible to output animations to a video using piping with FFmpeg:
+
+```
+f3d path/to/file.glb --output-video=- | ffmpeg -f h264 -i - path/to/video.mp4
 ```
 
 While piping is more common on Linux, F3D supports it perfectly on Windows and MacOS as well.
