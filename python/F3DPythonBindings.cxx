@@ -14,6 +14,7 @@
 #include "scene.h"
 #include "types.h"
 #include "utils.h"
+#include "video_encoder.h"
 #include "window.h"
 
 namespace py = pybind11;
@@ -222,6 +223,57 @@ PYBIND11_MODULE(pyf3d, module)
       })
     .def("all_metadata", &f3d::image::allMetadata)
     .def("normalized_pixel", &f3d::image::getNormalizedPixel);
+
+  // f3d::video_frame
+  py::class_<f3d::video_frame, std::shared_ptr<f3d::video_frame>> video_frame(module, "VideoFrame");
+  video_frame.def("set_timestamp", &f3d::video_frame::setTimestamp, py::arg("timestamp"));
+
+  // f3d::video_packet
+  py::class_<f3d::video_packet, std::shared_ptr<f3d::video_packet>> video_packet(
+    module, "VideoPacket");
+  video_packet
+    .def("get_packet_data",
+      [](const f3d::video_packet& packet) -> py::bytes
+      {
+        const auto* data = packet.getPacketData();
+        if (!data || packet.getPacketSize() == 0)
+        {
+          return py::bytes();
+        }
+        return py::bytes(reinterpret_cast<const char*>(data), packet.getPacketSize());
+      })
+    .def("get_timestamp", &f3d::video_packet::getTimestamp)
+    .def("is_keyframe", &f3d::video_packet::isKeyFrame);
+
+  // f3d::video_encoder
+  py::enum_<f3d::video_encoder::codec>(module, "VideoEncoderCodec")
+    .value("H264", f3d::video_encoder::codec::H264)
+    .value("HEVC", f3d::video_encoder::codec::HEVC)
+    .value("VP8", f3d::video_encoder::codec::VP8)
+    .value("VP9", f3d::video_encoder::codec::VP9)
+    .value("AV1", f3d::video_encoder::codec::AV1)
+    .value("EXPLICIT", f3d::video_encoder::codec::EXPLICIT)
+    .export_values();
+
+  py::class_<f3d::video_encoder::params> video_encoder_params(module, "VideoEncoderParams");
+  video_encoder_params.def(py::init<>())
+    .def_readwrite("codec", &f3d::video_encoder::params::Codec)
+    .def_readwrite("explicit_codec_name", &f3d::video_encoder::params::ExplicitCodecName)
+    .def_readwrite("width", &f3d::video_encoder::params::Width)
+    .def_readwrite("height", &f3d::video_encoder::params::Height)
+    .def_readwrite("frame_rate", &f3d::video_encoder::params::FrameRate)
+    .def_readwrite("bitrate", &f3d::video_encoder::params::Bitrate)
+    .def_readwrite("low_latency", &f3d::video_encoder::params::LowLatency);
+
+  py::class_<f3d::video_encoder, std::shared_ptr<f3d::video_encoder>> video_encoder(
+    module, "VideoEncoder");
+  video_encoder.def_static("create", &f3d::video_encoder::create, py::arg("params"))
+    .def_static("get_available_encoders", &f3d::video_encoder::getAvailableEncoders)
+    .def_property_readonly("width", &f3d::video_encoder::getWidth)
+    .def_property_readonly("height", &f3d::video_encoder::getHeight)
+    .def("listen", &f3d::video_encoder::listen, py::arg("callback"))
+    .def("submit", &f3d::video_encoder::submit, py::arg("frame"))
+    .def("flush", &f3d::video_encoder::flush, py::call_guard<py::gil_scoped_release>());
 
   // f3d::options
   py::class_<f3d::options> options(module, "Options");
@@ -965,6 +1017,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def("render", &f3d::window::render, "Render the window")
     .def("render_to_image", &f3d::window::renderToImage, "Render the window to an image",
       py::arg("no_background") = false)
+    .def(
+      "get_video_frame", &f3d::window::getVideoFrame, "Get the current video frame of the window")
     .def("set_icon", &f3d::window::setIcon,
       "Set the icon of the window using a memory buffer representing a PNG file")
     .def("set_window_name", &f3d::window::setWindowName, "Set the window name")

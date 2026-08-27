@@ -52,6 +52,7 @@ public:
   camera& getCamera() override;
   bool render() override;
   image renderToImage(bool noBackground = false) override;
+  std::shared_ptr<video_frame> getVideoFrame() override;
   int getWidth() const override;
   int getHeight() const override;
   window& setSize(int width, int height) override;

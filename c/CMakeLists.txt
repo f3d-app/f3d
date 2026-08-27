@@ -16,6 +16,7 @@ set(F3D_C_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/scene_c_api.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/types_c_api.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/utils_c_api.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/video_c_api.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/window_c_api.cxx
 )
 
@@ -31,6 +32,7 @@ set(F3D_C_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/scene_c_api.h
   ${CMAKE_CURRENT_SOURCE_DIR}/types_c_api.h
   ${CMAKE_CURRENT_SOURCE_DIR}/utils_c_api.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/video_c_api.h
   ${CMAKE_CURRENT_SOURCE_DIR}/window_c_api.h
 )
 

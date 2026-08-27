@@ -3,6 +3,7 @@
 #include <app_f3d_F3D_Window.h>
 
 #include <types.h>
+#include <video_frame.h>
 #include <window.h>
 
 extern "C"

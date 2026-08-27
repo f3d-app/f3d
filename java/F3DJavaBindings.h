@@ -5,6 +5,7 @@
 
 #include <engine.h>
 #include <image.h>
+#include <video_encoder.h>
 
 #include <map>
 #include <string>

@@ -65,6 +65,10 @@ Provided by the window, this class lets you control the camera. You can either s
 
 A generic image class that can either be created from a window, from an image filepath or even from a data buffer. It supports comparison making it very practical in testing context.
 
+## Video Encoder class
+
+It's possible to encode rendering result into a video stream. The frames should be sent to the encoder and x264 packets are received.
+
 ## Log class
 
 A class to control logging in the libf3d. Simple using the different dedicated methods (`print`, `debug`, `info`, `warn`, `error`) and `setVerboseLevel`, you can easily control what to display. Please note that, on windows, a dedicated output window may be created.
