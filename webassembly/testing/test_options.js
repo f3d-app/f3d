@@ -129,11 +129,15 @@ const settings = {
       "option getDomainStyle",
     );
 
-    // TODO better testing
-    const range = options.getRangeDomainAsNumber("render.line_width");
+    const doubleRange = options.getRangeDomainAsNumber("render.line_width");
     utils.assert(
-      range[0] === 0.0 && range[1] === 10.0 && range[2] === 0.1,
-      "options getRangeDomain",
+      doubleRange[0] === 0.0 && doubleRange[1] === 10.0 && doubleRange[2] === 0.1,
+      "options getRangeDomain double",
+    );
+    const intRange = options.getRangeDomainAsNumber("render.raytracing.samples");
+    utils.assert(
+      intRange[0] === 1.0 && intRange[1] === 50.0 && intRange[2] === 1.0,
+      "options getRangeDomain int",
     );
 
     utils.assert(

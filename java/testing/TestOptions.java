@@ -59,7 +59,6 @@ public class TestOptions {
     options.reset("render.line_width");
     options.removeValue("model.color.texture");
 
-    // TODO proper testing
     options.hasDomain("scene.camera.index");
     options.getDomainStyle("scene.camera.index");
     options.getRangeDomainAsDouble("render.line_width");
