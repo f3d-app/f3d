@@ -696,11 +696,6 @@ extern "C"
       {
         result = env->CallStaticObjectMethod(integerClass, valueOf, domain.max.value());
       }
-      else
-      {
-        // TODO print as `0` in the test, why ?
-        result = env->CallStaticObjectMethod(integerClass, valueOf, nullptr);
-      }
     }
     catch (const f3d::options::inexistent_exception& e)
     {
