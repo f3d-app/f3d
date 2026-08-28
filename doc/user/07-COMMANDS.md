@@ -199,7 +199,7 @@ An enum domain is used through `cycle` command, it just list possible values of 
 
 An index domain can be used through both `cycle` and `increase`/`decrease` commands.
 For `increase`/`decrease`, it behaves like a range domain [0, max] with an increment of 1.
-For `cycle`, it behave like an enum domain containing all possible values between o and max.
+For `cycle`, it behave like an enum domain containing all possible values between 0 and max.
 
 ## Command Script (`--command-script`)
 

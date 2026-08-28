@@ -638,7 +638,8 @@ Enum domains are intended for options that have a finite set of possible value.
 Index domains are intended for integer options that are between 0 and a maximum.
 
 If an option has a `dynamic` domains, it means the libf3d can change the domain.
-It is possible to directly change a domain using the [struct API](#struct-api).
+It is possible to directly read/write a domain using the [struct API](#struct-api).
+It is possible to read a domain using the [variant API](#variant-api).
 
 ## APIs
 
@@ -739,6 +740,33 @@ An API that is similar to the F3D 2.0 options API thanks to std::variant.
   opt.set("render.grid.enable", true);
   opt.set("ui.metadata", true);
   opt.set("model.material.roughness", 0.6);
+```
+
+This API can read domains using `hasDomain`, `getDomainStyle`, `getRangeDomain`, `getEnumDomain` and `getIndexDomain`.
+
+```cpp
+  f3d::engine eng = f3d::engine::create();
+  f3d::options& opt = eng.getOptions();
+
+  std::string optionName = "option.name";
+  if (opt.hasDomain(optionName))
+  {
+    switch (opt.getDomainStyle(optionName))
+    {
+      case f3d::domain_style::RANGE:
+        DomainRange<option_variant_t> domain = opt.getRangeDomain("optionName");
+        ...
+        break;
+      case f3d::domain_style::ENUM:
+        DomainEnum<option_variant_t> domain = opt.getEnumDomain("optionName");
+        ...
+        break;
+      case f3d::domain_style::INDEX:
+        DomainIndex domain = opt.getIndexDomain("optionName");
+        ...
+        break;
+    }
+  }
 ```
 
 When using this API make sure to catch exception shown above with the string API.
