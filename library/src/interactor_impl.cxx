@@ -497,7 +497,13 @@ public:
       // invalidating any references/iterators into it.
       const BindingCommands binding = commandsIt->second;
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20260828)
       if (binding.Repeat || rwi->GetRepeatCount() == 0)
+#else
+      // Older VTK versions have different repeat counts per platform
+      // Account for both starting at 0 and 1
+      if (binding.Repeat || rwi->GetRepeatCount() < 2)
+#endif
       {
         for (const std::string& command : binding.CommandVector)
         {
