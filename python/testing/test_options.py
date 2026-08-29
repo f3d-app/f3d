@@ -246,8 +246,7 @@ def test_get_enum_domain():
 
 def test_get_index_domain():
     options = f3d.Options()
-    max = options.get_index_domain("scene.camera.index")
-    assert max == None
+    assert options.get_index_domain("scene.camera.index") is None
 
 
 def test_increase_decrease():
