@@ -145,7 +145,9 @@ const settings = {
     );
 
     utils.assert(
-      options.getEnumDomainAsString("render.effect.blending.mode").includes("ddp"),
+      options
+        .getEnumDomainAsString("render.effect.blending.mode")
+        .includes("ddp"),
       "options getEnumDomain",
     );
 
