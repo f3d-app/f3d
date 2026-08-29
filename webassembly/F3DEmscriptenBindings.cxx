@@ -3,7 +3,6 @@
 #include <array>
 #include <memory>
 #include <optional>
-#include <ranges>
 #include <stdexcept>
 
 #include "camera.h"
@@ -346,7 +345,7 @@ EMSCRIPTEN_BINDINGS(f3d)
         // Only string is supported for now
         f3d::options::DomainEnum<f3d::option_variant_t> domain = o.getEnumDomain(name);
         std::vector<std::string> enumeration(domain.enumeration.size());
-        std::ranges::transform(domain.enumeration, enumeration.begin(),
+        std::transform(domain.enumeration.begin(), domain.enumeration.end(), enumeration.begin(),
           [](const auto& value) { return std::get<std::string>(value); });
         return containerToJSArray(enumeration);
       })
