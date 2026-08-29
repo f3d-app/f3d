@@ -152,9 +152,9 @@ context::function context::xr()
   XrInstanceCreateInfo createInfo{};
   createInfo.type = XR_TYPE_INSTANCE_CREATE_INFO;
   createInfo.applicationInfo.apiVersion = XR_CURRENT_API_VERSION;
-  strcpy(createInfo.applicationInfo.applicationName, "F3D");
+  strncpy(createInfo.applicationInfo.applicationName, "F3D", XR_MAX_APPLICATION_NAME_SIZE);
   createInfo.applicationInfo.applicationVersion = 1;
-  strcpy(createInfo.applicationInfo.engineName, "F3D");
+  strncpy(createInfo.applicationInfo.engineName, "F3D", XR_MAX_ENGINE_NAME_SIZE);
   createInfo.applicationInfo.engineVersion = 1;
   createInfo.applicationInfo.apiVersion = XR_CURRENT_API_VERSION;
 
