@@ -233,6 +233,12 @@ public:
   engine& setResourcesPath(const std::filesystem::path& resourcesPath);
 
   /**
+   * Get the resource path currently in use, see setResourcesPath.
+   * Returns an empty path if no resource path has been set.
+   */
+  [[nodiscard]] std::filesystem::path getResourcesPath() const;
+
+  /**
    * Engine provide a default options that you can use using engine::getOptions().
    * But you can use this setter to use other options directly.
    * It will copy options into engine.

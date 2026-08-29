@@ -394,7 +394,8 @@ void vtkF3DRenderer::Initialize()
           outlineMapper->SetInputConnection(outlineSource->GetOutputPort());
 
           self->XRBBoxActor->SetMapper(outlineMapper);
-          self->XRBBoxActor->GetProperty()->SetColor(1.0, 0.2, 0.2);
+          std::apply([&](auto r, auto g, auto b)
+            { self->XRBBoxActor->GetProperty()->SetColor(r, g, b); }, F3DStyle::GetF3DRed());
           self->XRBBoxActor->GetProperty()->SetLineWidth(2.0);
           self->XRBBoxActor->GetProperty()->LightingOff();
         }
@@ -936,7 +937,6 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       }
 
       double* gridPos = upMatrixInv->MultiplyDoublePoint(center);
-
       double delta[3];
       this->GetEnvironmentUp(delta);
       vtkMath::MultiplyScalar(delta, downShift);
@@ -962,7 +962,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       double orientation[3];
       vtkTransform::GetOrientation(orientation, upMatrixInv);
       this->GridActor->SetOrientation(orientation);
-      this->GridActor->SetPosition(gridPos[0], this->UseXR ? 0 : gridPos[1], gridPos[2]);
+      this->GridActor->SetPosition(gridPos);
 
       this->GridActor->GetProperty()->SetColor(this->GridColor);
 
@@ -1266,10 +1266,14 @@ void vtkF3DRenderer::AlignSceneToBounds(const vtkBoundingBox& bounds)
 
   vtkNew<vtkMatrix4x4> upMatrix;
   const double m[16] = {
-    right[0], right[1], right[2], 0, //
-    up[0], up[1], up[2], 0,          //
-    front[0], front[1], front[2], 0, //
-    0, 0, 0, 1,                      //
+    right[0], right[1], right[2],
+    0, //
+    up[0], up[1], up[2],
+    0, //
+    front[0], front[1], front[2],
+    0, //
+    0, 0, 0,
+    1, //
   };
   upMatrix->DeepCopy(m);
   vtkNew<vtkMatrix4x4> upMatrixInv;
@@ -2576,7 +2580,7 @@ void vtkF3DRenderer::ResetCameraClippingRange()
   else
   {
 #ifdef F3D_MODULE_OPENXR
-    // Adapted from `vtkF3DRenderer::ResetCameraClippingRange()`
+    // Adapted from `vtkOpenXRRenderer::ResetCameraClippingRange()`
     // Copyright (c) Kitware, Inc.
     double bounds[6];
 

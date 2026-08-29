@@ -796,6 +796,12 @@ engine& engine::setResourcesPath(const fs::path& resourcesPath)
 }
 
 //----------------------------------------------------------------------------
+fs::path engine::getResourcesPath() const
+{
+  return this->Internals->Window->GetResourcesPath();
+}
+
+//----------------------------------------------------------------------------
 engine::no_window_exception::no_window_exception(const std::string& what)
   : exception(what)
 {

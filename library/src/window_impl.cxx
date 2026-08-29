@@ -128,7 +128,7 @@ public:
   const options& Options;
   interactor_impl* Interactor = nullptr;
   fs::path CachePath;
-  fs::path ResourcesPath;
+  fs::path ResourcesPath{};
   context::function GetProcAddress;
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 7, 20260724)
   bool PositionWarningEmitted = false;
@@ -968,6 +968,12 @@ void window_impl::SetResourcesPath(const fs::path& resourcesPath)
   {
     throw engine::resource_exception(std::string("Could not use resources: ") + ex.what());
   }
+}
+
+//----------------------------------------------------------------------------
+std::filesystem::path window_impl::GetResourcesPath() const
+{
+  return this->Internals->ResourcesPath;
 }
 
 //----------------------------------------------------------------------------
