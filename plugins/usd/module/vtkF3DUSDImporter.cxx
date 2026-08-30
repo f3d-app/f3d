@@ -1,5 +1,6 @@
 #include "vtkF3DUSDImporter.h"
 
+#include "vtkF3DCatmullClarkSubdivisionFilter.h"
 #include "vtkF3DFaceVaryingPointDispatcher.h"
 
 #include <vtkActor.h>
@@ -10,6 +11,7 @@
 #include <vtkCylinderSource.h>
 #include <vtkDataAssembly.h>
 #include <vtkDoubleArray.h>
+#include <vtkExecutive.h>
 #include <vtkFloatArray.h>
 #include <vtkIdTypeArray.h>
 #include <vtkImageAppendComponents.h>
@@ -20,6 +22,7 @@
 #include <vtkImageResize.h>
 #include <vtkInformation.h>
 #include <vtkInformationStringKey.h>
+#include <vtkLoopSubdivisionFilter.h>
 #include <vtkMatrix4x4.h>
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
@@ -617,6 +620,46 @@ public:
             }
 
             newPolyData->SetPolys(cells);
+
+            if (this->SubdivisionLevel > 0)
+            {
+              pxr::TfToken subdivisionScheme;
+              pxr::UsdAttribute subdivisionSchemeAttr = meshPrim.GetSubdivisionSchemeAttr();
+              if (subdivisionSchemeAttr && subdivisionSchemeAttr.Get(&subdivisionScheme, timeCode))
+              {
+                vtkSmartPointer<vtkSubdivisionFilter> subdivisionFilter;
+                if (subdivisionScheme == pxr::UsdGeomTokens->loop)
+                {
+                  subdivisionFilter = vtkSmartPointer<vtkLoopSubdivisionFilter>::New();
+                }
+                else if (subdivisionScheme == pxr::UsdGeomTokens->catmullClark)
+                {
+                  subdivisionFilter = vtkSmartPointer<vtkF3DCatmullClarkSubdivisionFilter>::New();
+                }
+
+                if (subdivisionFilter)
+                {
+                  subdivisionFilter->SetNumberOfSubdivisions(this->SubdivisionLevel);
+                  subdivisionFilter->SetInputData(newPolyData);
+
+                  // can fail if mesh is invalid (non-manifold for CC, non-triangular for Loop)
+                  if (subdivisionFilter->GetExecutive()->Update())
+                  {
+                    vtkNew<vtkPolyDataNormals> genNormals;
+                    genNormals->SetInputConnection(subdivisionFilter->GetOutputPort());
+                    genNormals->SplittingOff();
+                    genNormals->Update();
+                    newPolyData->ShallowCopy(genNormals->GetOutput());
+                  }
+                  else
+                  {
+                    vtkWarningWithObjectMacro(nullptr,
+                      "Subdivision failed for mesh " << meshPrim.GetPath().GetString()
+                                                     << ", using original mesh");
+                  }
+                }
+              }
+            }
 
             if (pxr::UsdSkelSkinningQuery skinningQuery = this->SkelCache.GetSkinningQuery(prim))
             {
@@ -1735,6 +1778,7 @@ public:
 
   pxr::UsdStageRefPtr Stage = nullptr;
   F3DUSDMemoryResolverContext MemoryResolverContext;
+  int SubdivisionLevel = 0;
 
 private:
   struct MorphingInfo
@@ -1819,6 +1863,7 @@ vtkF3DUSDImporter::~vtkF3DUSDImporter() = default;
 //----------------------------------------------------------------------------
 int vtkF3DUSDImporter::ImportBegin()
 {
+  this->Internals->SubdivisionLevel = this->SubdivisionLevel;
   try
   {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)

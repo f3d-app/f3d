@@ -185,6 +185,14 @@ public class Scene {
     public native Scene setNodeVisibility(int nodeId, boolean visible);
 
     /**
+     * Get information about the contents of the scene, eg. its number of points and cells.
+     * All the counters are zero when the scene is empty.
+     *
+     * @return the scene information
+     */
+    public native Types.SceneInfo getSceneInfo();
+
+    /**
      * Check if a file path is supported by the scene.
      *
      * @param filePath file path to check

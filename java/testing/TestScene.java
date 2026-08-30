@@ -155,6 +155,36 @@ public class TestScene {
     } catch (Scene.NodeException e) {
     }
 
+    // Test the scene info
+    scene.clear();
+    Types.SceneInfo info = scene.getSceneInfo();
+    if (info.numberOfFiles != 0 || info.numberOfActors != 0 || info.numberOfPoints != 0
+        || info.numberOfCells != 0) {
+      throw new RuntimeException("a cleared scene should have zeroed scene info");
+    }
+
+    scene.add(sphere);
+    info = scene.getSceneInfo();
+    if (info.numberOfFiles != 1 || info.numberOfActors <= 0 || info.numberOfPoints <= 0
+        || info.numberOfCells <= 0) {
+      throw new RuntimeException("unexpected scene info after adding a file");
+    }
+
+    scene.add(world);
+    Types.SceneInfo appendedInfo = scene.getSceneInfo();
+    if (appendedInfo.numberOfFiles != 2 || appendedInfo.numberOfActors <= info.numberOfActors
+        || appendedInfo.numberOfPoints <= info.numberOfPoints
+        || appendedInfo.numberOfCells <= info.numberOfCells) {
+      throw new RuntimeException("scene info should increase when adding a file");
+    }
+
+    scene.clear();
+    info = scene.getSceneInfo();
+    if (info.numberOfFiles != 0 || info.numberOfActors != 0 || info.numberOfPoints != 0
+        || info.numberOfCells != 0) {
+      throw new RuntimeException("scene info should be cleared with the scene");
+    }
+
     engine.close();
 
     // --- Exception handling tests ---

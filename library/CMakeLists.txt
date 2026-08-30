@@ -314,6 +314,20 @@ if(BUILD_SHARED_LIBS)
     COMPONENT sdk
     EXCLUDE_FROM_ALL)
 
+  # Install a pkg-config file for libf3d
+  # CMAKE_INSTALL_PREFIX may be a relative path (e.g. resolved against the build
+  # directory by `cmake --install`), so resolve it to an absolute path here since
+  # the .pc file may be read from a different working directory than the build.
+  get_filename_component(F3D_PKGCONFIG_PREFIX "${CMAKE_INSTALL_PREFIX}" ABSOLUTE BASE_DIR "${CMAKE_BINARY_DIR}")
+  configure_file(
+    "${F3D_SOURCE_DIR}/cmake/f3d.pc.in"
+    "${CMAKE_BINARY_DIR}/cmake/f3d.pc"
+    @ONLY)
+  install(FILES "${CMAKE_BINARY_DIR}/cmake/f3d.pc"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
+    COMPONENT sdk
+    EXCLUDE_FROM_ALL)
+
   # Install plugin headers
   install(FILES ${F3D_PLUGIN_HEADERS}
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/f3d"

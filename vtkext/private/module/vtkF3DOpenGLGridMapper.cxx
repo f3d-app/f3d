@@ -68,6 +68,7 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
     "in vec3 normalVC;\n"
     "uniform vec2 gridOffset;\n"
     "uniform vec2 pixelSize;\n"
+    "uniform float lineOpacity;\n"
     "//VTK::Reflection::Dec\n"
 
     "float antialias(float dist, float linewidth){\n"
@@ -101,12 +102,12 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
     "  float majorAlpha = antialias(min(majorGrid.x, majorGrid.y), gridLineWidth);\n"
     "  float minorAlpha = antialias(min(minorGrid.x, minorGrid.y), gridLineWidth);\n"
     "  float zoomFadeFactor = 1.0 - clamp(fwidth(majorCoord.x / unitSquare * fadeDist), 0.0, 1.0);\n"
-    "  float alpha = max(majorAlpha, minorAlpha * minorOpacity * zoomFadeFactor);\n"
+    "  float alpha = max(majorAlpha, minorAlpha * minorOpacity * zoomFadeFactor) * lineOpacity;\n"
 
     "  vec4 color = vec4(diffuseColorUniform, alpha);\n"
 
-    "  float axis1Weight = abs(majorCoord.y) < 0.5 ? antialias(majorGrid.y, axesLineWidth) : 0.0;\n"
-    "  float axis2Weight = abs(majorCoord.x) < 0.5 ? antialias(majorGrid.x, axesLineWidth) : 0.0;\n"
+    "  float axis1Weight = abs(majorCoord.y) < 0.5 ? antialias(majorGrid.y, axesLineWidth) * lineOpacity : 0.0;\n"
+    "  float axis2Weight = abs(majorCoord.x) < 0.5 ? antialias(majorGrid.x, axesLineWidth) * lineOpacity : 0.0;\n"
     "  color = mix(color, axis2Color, axis2Weight);\n"
     "  color = mix(color, axis1Color, axis1Weight);\n"
     "  //VTK::Reflection::Impl\n"
@@ -204,6 +205,7 @@ void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
   cellBO.Program->SetUniformf("lineAntialias", scaling);
   cellBO.Program->SetUniform4f("axis1Color", this->Axis1Color);
   cellBO.Program->SetUniform4f("axis2Color", this->Axis2Color);
+  cellBO.Program->SetUniformf("lineOpacity", this->LineOpacity);
 
   if (this->ReflectionStrength > 0.0)
   {

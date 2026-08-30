@@ -378,6 +378,20 @@ runs:
       working-directory: ${{github.workspace}}
       run: ctest --test-dir build_examples --no-tests=error -C Release -VV
 
+    # These use pkg-config directly instead of find_package(f3d), so they are built
+    # separately from the other examples with a plain Makefile instead of CMake.
+    - name: Build and run pkg-config examples
+      if: runner.os == 'Linux' && inputs.static_label == 'no-static'
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        export PKG_CONFIG_PATH=$(pwd)/install/lib/pkgconfig
+        export LD_LIBRARY_PATH=$(pwd)/dependencies/install/lib
+        for lang in c cpp; do
+          make -C source/examples/libf3d/$lang/pkgconfig
+          source/examples/libf3d/$lang/pkgconfig/check-engine-pkgconfig
+        done
+
     - name: Install optional component f3d plugins
       shell: bash
       working-directory: ${{github.workspace}}/build

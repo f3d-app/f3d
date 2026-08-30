@@ -11,7 +11,7 @@ extern "C"
   {
     f3d::window::Type type = GetEngine(env, self)->getWindow().getType();
 
-    jclass enumClass = env->FindClass("app/f3d/F3D/Window$Type");
+    JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Window$Type"));
     jfieldID fieldID;
 
     switch (type)
@@ -63,7 +63,7 @@ extern "C"
   {
     f3d::image* img = new f3d::image(GetEngine(env, self)->getWindow().renderToImage(noBackground));
 
-    jclass imageClass = env->FindClass("app/f3d/F3D/Image");
+    JniLocalRef<jclass> imageClass(env, env->FindClass("app/f3d/F3D/Image"));
     jmethodID constructor = env->GetMethodID(imageClass, "<init>", "(J)V");
 
     jobject result = env->NewObject(imageClass, constructor, reinterpret_cast<jlong>(img));
@@ -134,9 +134,8 @@ extern "C"
 
   JNIEXPORT jobject JAVA_BIND(Window, setWindowName)(JNIEnv* env, jobject self, jstring windowName)
   {
-    const char* name = env->GetStringUTFChars(windowName, nullptr);
-    GetEngine(env, self)->getWindow().setWindowName(name);
-    env->ReleaseStringUTFChars(windowName, name);
+    JniUTFString name(env, windowName);
+    GetEngine(env, self)->getWindow().setWindowName(name.c_str());
     return self;
   }
 

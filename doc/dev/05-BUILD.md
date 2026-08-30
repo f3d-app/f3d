@@ -2,7 +2,7 @@
 
 > [!NOTE]
 > For WebAssembly cross-compilation, follow the dedicated guide [here](14-BUILD_WASM.md).
-> For other dedicated tools and builds setupo, see [this doc](07-TOOLING.md).
+> For other dedicated tools and build setups, see [this doc](07-TOOLING.md).
 
 F3D uses a CMake based build system, so building F3D just requires installing
 needed dependencies, configuring and building. If you are not used to such processes
@@ -11,7 +11,7 @@ please take a look at our [getting started guide](04-GETTING_STARTED.md).
 ## Dependencies
 
 - [CMake](https://cmake.org) >= 3.1.
-- [VTK](https://vtk.org) >= 9.4.0 (9.6.2 recommended).
+- [VTK](https://vtk.org) >= 9.4.0 (9.7.0 recommended).
 - A C++20 compiler.
 - A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
 - Optionally, [Assimp](https://www.assimp.org/) >= 5.4.0 (6.0.2 recommended).
@@ -32,7 +32,7 @@ F3D is tested continuously against versions recommended by the [VFX reference pl
 
 ## VTK compatibility
 
-As stated in the dependencies, F3D is compatible with VTK >= 9.4.0, however, some features may not be available. We suggest using VTK 9.6.2 with RenderingRayTracing, IOExodus, IOHDF, IONetCDF, IOPDAL and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
+As stated in the dependencies, F3D is compatible with VTK >= 9.4.0, however, some features may not be available. We suggest using VTK 9.7.0 with RenderingRayTracing, IOExodus, IOHDF, IONetCDF, IOPDAL and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
 
 > NOTE: When VTK is compiled for GLES (usually the case for Android and WebAssembly only), F3D is only compatible with the VTK version specified in `.github/workflows/versions.json` file.
 
@@ -161,7 +161,7 @@ Here is the list of all the components:
 | `library`       | YES                  | ALL              | libf3d library binaries.                                                                                                    |
 | `plugin`        | YES                  | ALL              | libf3d plugins.                                                                                                             |
 | `dependencies`  | NO                   | ALL              | libf3d runtime dependencies. Can be used to create a self-contained and relocatable package. System libraries are excluded. |
-| `sdk`           | NO                   | ALL              | libf3d SDK (headers and CMake config files) for `library` and `application` find_package components.                        |
+| `sdk`           | NO                   | ALL              | libf3d SDK (headers, CMake config files and pkg-config files) for `library` and `application` find_package components.      |
 | `plugin_sdk`    | NO                   | ALL              | libf3d plugin SDK (headers and CMake config files including macros) for `pluginsdk` find_package components.                |
 | `licenses`      | YES                  | ALL              | F3D and third party licenses.                                                                                               |
 | `documentation` | YES                  | Linux            | `man` documentation.                                                                                                        |

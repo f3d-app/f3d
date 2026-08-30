@@ -1303,7 +1303,18 @@ public:
     return geometry;
   }
 
-  /* Store the current window geometry in the cache so that the next run can restore it */
+  /* Record the current window geometry, which can only be queried while the window is still
+   * alive.
+   */
+  void RecordWindowGeometry()
+  {
+    const f3d::window& window = this->Engine->getWindow();
+    const auto [width, height] = window.getSize();
+    const auto [left, top] = window.getPosition();
+    this->LastWindowGeometry = { width, height, left, top };
+  }
+
+  /* Store the last recorded window geometry in the cache so that the next run can restore it */
   void CacheWindowGeometry() const
   {
     const fs::path cachePath = this->CacheFilePath();
@@ -1318,13 +1329,11 @@ public:
       // LCOV_EXCL_STOP
     }
 
-    const f3d::window& window = this->Engine->getWindow();
     nlohmann::ordered_json windowJson;
-    const auto [posX, posY] = window.getPosition();
-    windowJson["width"] = window.getWidth();
-    windowJson["height"] = window.getHeight();
-    windowJson["left"] = posX;
-    windowJson["top"] = posY;
+    windowJson["width"] = this->LastWindowGeometry.Width;
+    windowJson["height"] = this->LastWindowGeometry.Height;
+    windowJson["left"] = this->LastWindowGeometry.Left;
+    windowJson["top"] = this->LastWindowGeometry.Top;
 
     nlohmann::ordered_json root;
     root["window"] = windowJson;
@@ -1332,6 +1341,15 @@ public:
     stream << root.dump(2);
     f3d::log::debug("Window geometry cached in ", cachePath.string());
   }
+
+  struct WindowGeometry
+  {
+    int Width = 0;
+    int Height = 0;
+    int Left = 0;
+    int Top = 0;
+  };
+  WindowGeometry LastWindowGeometry;
 
   F3DOptionsTools::OptionsEntries CachedOptionsEntries;
   F3DOptionsTools::OptionsEntries StatefileOptionsEntries;
@@ -1930,6 +1948,8 @@ int F3DStarter::Start(int argc, char** argv)
         GlobalInteractor = &interactor;
         std::signal(SIGTERM, F3DInternals::SigCallback);
         std::signal(SIGINT, F3DInternals::SigCallback);
+
+        this->Internals->RecordWindowGeometry();
 
         interactor.setEventLoopUserCallback([this](f3d::interactor_state_t) { this->EventLoop(); });
         interactor.start(deltaTime);
@@ -2753,6 +2773,8 @@ bool F3DStarter::LoadRelativeFileGroup(int index, bool restoreCamera, bool force
 //----------------------------------------------------------------------------
 void F3DStarter::EventLoop()
 {
+  this->Internals->RecordWindowGeometry();
+
   if (this->Internals->ReloadFileRequested)
   {
     this->LoadRelativeFileGroup(0, true, true);

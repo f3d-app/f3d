@@ -238,6 +238,11 @@
           "valueHelper": "<color>"
         },
         {
+          "longName": "grid-opacity",
+          "helpText": "Opacity of the grid lines",
+          "valueHelper": "<value>"
+        },
+        {
           "longName": "grid-reflection",
           "helpText": "Reflection strength of the grid",
           "valueHelper": "<value>"

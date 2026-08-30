@@ -161,15 +161,14 @@ extern "C"
 
     jobject globalRef = env->NewGlobalRef(getProcAddress);
 
-    jclass contextFunctionClass = env->GetObjectClass(getProcAddress);
+    JniLocalRef<jclass> contextFunctionClass(env, env->GetObjectClass(getProcAddress));
     jmethodID methodID =
       env->GetMethodID(contextFunctionClass, "getProcAddress", "(Ljava/lang/String;)J");
 
     f3d::context::function func = [env, globalRef, methodID](const char* name) -> f3d::context::fptr
     {
-      jstring jname = env->NewStringUTF(name);
-      jlong addr = env->CallLongMethod(globalRef, methodID, jname);
-      env->DeleteLocalRef(jname);
+      JniLocalRef<jstring> jname(env, env->NewStringUTF(name));
+      jlong addr = env->CallLongMethod(globalRef, methodID, jname.get());
       return reinterpret_cast<f3d::context::fptr>(addr);
     };
 
@@ -320,16 +319,15 @@ extern "C"
 
   JNIEXPORT void JAVA_BIND(Engine, loadPlugin)(JNIEnv* env, jclass, jstring str)
   {
-    const char* plugin = env->GetStringUTFChars(str, nullptr);
+    JniUTFString plugin(env, str);
     try
     {
-      f3d::engine::loadPlugin(plugin);
+      f3d::engine::loadPlugin(plugin.c_str());
     }
     catch (const f3d::engine::plugin_exception& e)
     {
       F3DThrowJavaException(env, "app/f3d/F3D/Engine$PluginException", e.what());
     }
-    env->ReleaseStringUTFChars(str, plugin);
   }
 
   JNIEXPORT void JAVA_BIND(Engine, autoloadPlugins)(JNIEnv*, jclass)
@@ -339,16 +337,15 @@ extern "C"
 
   JNIEXPORT void JAVA_BIND(Engine, setCachePath)(JNIEnv* env, jobject self, jstring path)
   {
-    const char* str = env->GetStringUTFChars(path, nullptr);
+    JniUTFString str(env, path);
     try
     {
-      GetEngine(env, self)->setCachePath(fs::path(str));
+      GetEngine(env, self)->setCachePath(fs::path(str.c_str()));
     }
     catch (const f3d::engine::cache_exception& e)
     {
       F3DThrowJavaException(env, "app/f3d/F3D/Engine$CacheException", e.what());
     }
-    env->ReleaseStringUTFChars(path, str);
   }
 
   JNIEXPORT jstring JAVA_BIND(Engine, getCachePath)(JNIEnv* env, jobject self)
@@ -364,7 +361,7 @@ extern "C"
     }
     catch (const f3d::engine::statefile_exception& e)
     {
-      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+      F3DThrowJavaException(env, "java/lang/RuntimeException", e.what());
       return 0;
     }
   }
@@ -377,45 +374,44 @@ extern "C"
     }
     catch (const f3d::engine::statefile_exception& e)
     {
-      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+      F3DThrowJavaException(env, "java/lang/RuntimeException", e.what());
     }
     catch (const f3d::scene::load_failure_exception& e)
     {
-      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+      F3DThrowJavaException(env, "java/lang/RuntimeException", e.what());
     }
   }
 
   JNIEXPORT jlong JAVA_SCOPED_BIND(Engine, State, nativeFromString)(
     JNIEnv* env, jclass, jstring content)
   {
-    const char* str = env->GetStringUTFChars(content, nullptr);
+    JniUTFString str(env, content);
     jlong ptr = 0;
     try
     {
-      ptr = reinterpret_cast<jlong>(new f3d::engine::state(f3d::engine::state::fromString(str)));
+      ptr = reinterpret_cast<jlong>(
+        new f3d::engine::state(f3d::engine::state::fromString(str.c_str())));
     }
     catch (const f3d::engine::statefile_exception& e)
     {
-      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+      F3DThrowJavaException(env, "java/lang/RuntimeException", e.what());
     }
-    env->ReleaseStringUTFChars(content, str);
     return ptr;
   }
 
   JNIEXPORT jlong JAVA_SCOPED_BIND(Engine, State, nativeFromFile)(JNIEnv* env, jclass, jstring path)
   {
-    const char* str = env->GetStringUTFChars(path, nullptr);
+    JniUTFString str(env, path);
     jlong ptr = 0;
     try
     {
       ptr = reinterpret_cast<jlong>(
-        new f3d::engine::state(f3d::engine::state::fromFile(fs::path(str))));
+        new f3d::engine::state(f3d::engine::state::fromFile(fs::path(str.c_str()))));
     }
     catch (const f3d::engine::statefile_exception& e)
     {
-      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+      F3DThrowJavaException(env, "java/lang/RuntimeException", e.what());
     }
-    env->ReleaseStringUTFChars(path, str);
     return ptr;
   }
 
@@ -427,7 +423,7 @@ extern "C"
     }
     catch (const f3d::engine::statefile_exception& e)
     {
-      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+      F3DThrowJavaException(env, "java/lang/RuntimeException", e.what());
       return 0;
     }
   }
@@ -439,16 +435,15 @@ extern "C"
 
   JNIEXPORT void JAVA_SCOPED_BIND(Engine, State, toFile)(JNIEnv* env, jobject self, jstring path)
   {
-    const char* str = env->GetStringUTFChars(path, nullptr);
+    JniUTFString str(env, path);
     try
     {
-      GetState(env, self)->toFile(fs::path(str));
+      GetState(env, self)->toFile(fs::path(str.c_str()));
     }
     catch (const f3d::engine::statefile_exception& e)
     {
-      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+      F3DThrowJavaException(env, "java/lang/RuntimeException", e.what());
     }
-    env->ReleaseStringUTFChars(path, str);
   }
 
   JNIEXPORT void JAVA_SCOPED_BIND(Engine, State, toClipboard)(JNIEnv* env, jobject self)
@@ -459,7 +454,7 @@ extern "C"
     }
     catch (const f3d::engine::statefile_exception& e)
     {
-      env->ThrowNew(env->FindClass("java/lang/RuntimeException"), e.what());
+      F3DThrowJavaException(env, "java/lang/RuntimeException", e.what());
     }
   }
 
@@ -470,7 +465,7 @@ extern "C"
 
   JNIEXPORT void JAVA_BIND(Engine, setOptions)(JNIEnv* env, jobject self, jobject options)
   {
-    jclass optionsClass = env->GetObjectClass(options);
+    JniLocalRef<jclass> optionsClass(env, env->GetObjectClass(options));
     jfieldID fid = env->GetFieldID(optionsClass, "mNativeAddress", "J");
     jlong optionsPtr = env->GetLongField(options, fid);
 
@@ -483,7 +478,7 @@ extern "C"
     {
       f3d::interactor& interactor = GetEngine(env, self)->getInteractor();
 
-      jclass interactorClass = env->FindClass("app/f3d/F3D/Interactor");
+      JniLocalRef<jclass> interactorClass(env, env->FindClass("app/f3d/F3D/Interactor"));
       jmethodID constructor = env->GetMethodID(interactorClass, "<init>", "(J)V");
 
       return env->NewObject(interactorClass, constructor, reinterpret_cast<jlong>(&interactor));
@@ -497,9 +492,8 @@ extern "C"
 
   JNIEXPORT jobject JAVA_BIND(Engine, getPluginsList)(JNIEnv* env, jclass, jstring path)
   {
-    const char* str = env->GetStringUTFChars(path, nullptr);
-    std::vector<std::string> plugins = f3d::engine::getPluginsList(fs::path(str));
-    env->ReleaseStringUTFChars(path, str);
+    JniUTFString str(env, path);
+    std::vector<std::string> plugins = f3d::engine::getPluginsList(fs::path(str.c_str()));
 
     return CreateStringList(env, plugins);
   }
@@ -508,33 +502,24 @@ extern "C"
   {
     const f3d::engine::libInformation& info = f3d::engine::getLibInfo();
 
-    jclass libInfoClass = env->FindClass("app/f3d/F3D/Engine$LibInfo");
+    JniLocalRef<jclass> libInfoClass(env, env->FindClass("app/f3d/F3D/Engine$LibInfo"));
     jmethodID constructor = env->GetMethodID(libInfoClass, "<init>",
       "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;"
       "Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;Ljava/util/List;Ljava/lang/String;)V");
 
-    jstring version = env->NewStringUTF(info.Version.c_str());
-    jstring versionFull = env->NewStringUTF(info.VersionFull.c_str());
-    jstring buildDate = env->NewStringUTF(info.BuildDate.c_str());
-    jstring buildSystem = env->NewStringUTF(info.BuildSystem.c_str());
-    jstring compiler = env->NewStringUTF(info.Compiler.c_str());
-    jobject modules = CreateStringBooleanMap(env, info.Modules);
-    jstring vtkVersion = env->NewStringUTF(info.VTKVersion.c_str());
-    jobject copyrights = CreateStringList(env, info.Copyrights);
-    jstring license = env->NewStringUTF(info.License.c_str());
+    JniLocalRef<jstring> version(env, env->NewStringUTF(info.Version.c_str()));
+    JniLocalRef<jstring> versionFull(env, env->NewStringUTF(info.VersionFull.c_str()));
+    JniLocalRef<jstring> buildDate(env, env->NewStringUTF(info.BuildDate.c_str()));
+    JniLocalRef<jstring> buildSystem(env, env->NewStringUTF(info.BuildSystem.c_str()));
+    JniLocalRef<jstring> compiler(env, env->NewStringUTF(info.Compiler.c_str()));
+    JniLocalRef<jobject> modules(env, CreateStringBooleanMap(env, info.Modules));
+    JniLocalRef<jstring> vtkVersion(env, env->NewStringUTF(info.VTKVersion.c_str()));
+    JniLocalRef<jobject> copyrights(env, CreateStringList(env, info.Copyrights));
+    JniLocalRef<jstring> license(env, env->NewStringUTF(info.License.c_str()));
 
-    jobject libInfo = env->NewObject(libInfoClass, constructor, version, versionFull, buildDate,
-      buildSystem, compiler, modules, vtkVersion, copyrights, license);
-
-    env->DeleteLocalRef(version);
-    env->DeleteLocalRef(versionFull);
-    env->DeleteLocalRef(buildDate);
-    env->DeleteLocalRef(buildSystem);
-    env->DeleteLocalRef(compiler);
-    env->DeleteLocalRef(modules);
-    env->DeleteLocalRef(vtkVersion);
-    env->DeleteLocalRef(copyrights);
-    env->DeleteLocalRef(license);
+    jobject libInfo = env->NewObject(libInfoClass, constructor, version.get(), versionFull.get(),
+      buildDate.get(), buildSystem.get(), compiler.get(), modules.get(), vtkVersion.get(),
+      copyrights.get(), license.get());
 
     return libInfo;
   }
@@ -543,38 +528,32 @@ extern "C"
   {
     const std::vector<f3d::engine::readerInformation>& readers = f3d::engine::getReadersInfo();
 
-    jclass arrayListClass = env->FindClass("java/util/ArrayList");
+    JniLocalRef<jclass> arrayListClass(env, env->FindClass("java/util/ArrayList"));
     jmethodID arrayListConstructor = env->GetMethodID(arrayListClass, "<init>", "()V");
     jmethodID addMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
 
     jobject list = env->NewObject(arrayListClass, arrayListConstructor);
 
-    jclass readerInfoClass = env->FindClass("app/f3d/F3D/Engine$ReaderInfo");
+    JniLocalRef<jclass> readerInfoClass(env, env->FindClass("app/f3d/F3D/Engine$ReaderInfo"));
     jmethodID readerInfoConstructor = env->GetMethodID(readerInfoClass, "<init>",
       "(Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Ljava/lang/"
       "String;ZZ)V");
 
     for (const auto& reader : readers)
     {
-      jstring name = env->NewStringUTF(reader.Name.c_str());
-      jstring description = env->NewStringUTF(reader.Description.c_str());
-      jobject extensions = CreateStringList(env, reader.Extensions);
-      jobject mimeTypes = CreateStringList(env, reader.MimeTypes);
-      jstring pluginName = env->NewStringUTF(reader.PluginName.c_str());
+      JniLocalRef<jstring> name(env, env->NewStringUTF(reader.Name.c_str()));
+      JniLocalRef<jstring> description(env, env->NewStringUTF(reader.Description.c_str()));
+      JniLocalRef<jobject> extensions(env, CreateStringList(env, reader.Extensions));
+      JniLocalRef<jobject> mimeTypes(env, CreateStringList(env, reader.MimeTypes));
+      JniLocalRef<jstring> pluginName(env, env->NewStringUTF(reader.PluginName.c_str()));
       jboolean hasSceneReader = reader.HasSceneReader;
       jboolean hasGeometryReader = reader.HasGeometryReader;
 
-      jobject readerInfo = env->NewObject(readerInfoClass, readerInfoConstructor, name, description,
-        extensions, mimeTypes, pluginName, hasSceneReader, hasGeometryReader);
+      JniLocalRef<jobject> readerInfo(env,
+        env->NewObject(readerInfoClass, readerInfoConstructor, name.get(), description.get(),
+          extensions.get(), mimeTypes.get(), pluginName.get(), hasSceneReader, hasGeometryReader));
 
-      env->CallBooleanMethod(list, addMethod, readerInfo);
-
-      env->DeleteLocalRef(name);
-      env->DeleteLocalRef(description);
-      env->DeleteLocalRef(extensions);
-      env->DeleteLocalRef(mimeTypes);
-      env->DeleteLocalRef(pluginName);
-      env->DeleteLocalRef(readerInfo);
+      env->CallBooleanMethod(list, addMethod, readerInfo.get());
     }
 
     return list;
@@ -589,20 +568,17 @@ extern "C"
   JNIEXPORT void JAVA_BIND(Engine, setReaderOption)(
     JNIEnv* env, jclass, jstring name, jstring value)
   {
-    const char* nameStr = env->GetStringUTFChars(name, nullptr);
-    const char* valueStr = env->GetStringUTFChars(value, nullptr);
+    JniUTFString nameStr(env, name);
+    JniUTFString valueStr(env, value);
 
     try
     {
-      f3d::engine::setReaderOption(nameStr, valueStr);
+      f3d::engine::setReaderOption(nameStr.c_str(), valueStr.c_str());
     }
     catch (const f3d::options::inexistent_exception& e)
     {
       F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
     }
-
-    env->ReleaseStringUTFChars(name, nameStr);
-    env->ReleaseStringUTFChars(value, valueStr);
   }
 
   JNIEXPORT jobject JAVA_BIND(Engine, getAllReaderOptionNames)(JNIEnv* env, jclass)

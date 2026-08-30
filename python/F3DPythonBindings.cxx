@@ -801,6 +801,14 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readonly("has_children", &f3d::node_state_t::hasChildren)
     .def_readonly("collapsed", &f3d::node_state_t::collapsed);
 
+  // f3d::scene_info_t
+  py::class_<f3d::scene_info_t>(module, "SceneInfo")
+    .def(py::init<>())
+    .def_readonly("number_of_files", &f3d::scene_info_t::numberOfFiles)
+    .def_readonly("number_of_actors", &f3d::scene_info_t::numberOfActors)
+    .def_readonly("number_of_points", &f3d::scene_info_t::numberOfPoints)
+    .def_readonly("number_of_cells", &f3d::scene_info_t::numberOfCells);
+
   // f3d::scene
   py::class_<f3d::scene, std::unique_ptr<f3d::scene, py::nodelete>> scene(module, "Scene");
   scene //
@@ -855,7 +863,9 @@ PYBIND11_MODULE(pyf3d, module)
       "Return the scene hierarchy of all added files, in depth-first pre-order")
     .def("set_node_visibility", &f3d::scene::setNodeVisibility,
       "Set the visibility of a scene hierarchy node and of its subtree", py::arg("node_id"),
-      py::arg("visible"));
+      py::arg("visible"))
+    .def("get_scene_info", &f3d::scene::getSceneInfo,
+      "Return information about the contents of the scene");
 
   // f3d::camera_state_t
   py::class_<f3d::camera_state_t>(module, "CameraState")

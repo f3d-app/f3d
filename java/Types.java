@@ -108,6 +108,22 @@ public class Types {
     }
 
     /**
+     * Structure describing the contents of the scene.
+     *
+     * numberOfFiles counts every file added with Scene.add as well as every mesh and buffer
+     * added with it.
+     */
+    public static class SceneInfo {
+        public int numberOfFiles = 0;
+        public int numberOfActors = 0;
+        public long numberOfPoints = 0;
+        public long numberOfCells = 0;
+
+        public SceneInfo() {
+        }
+    }
+
+    /**
      * Describes a 3D surfacic mesh.
      */
     public static class Mesh {

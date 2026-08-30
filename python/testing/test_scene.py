@@ -159,3 +159,37 @@ def test_scene_hierarchy():
 
     engine.scene.clear()
     assert engine.scene.get_scene_hierarchy() == []
+
+
+def test_scene_info():
+    testing_dir = Path(__file__).parent.parent.parent / "testing"
+    cube = testing_dir / "data/mb/recursive/mb_0_0.vtu"
+    sphere = testing_dir / "data/mb/recursive/mb_1_0.vtp"
+
+    engine = f3d.Engine.create_none()
+    info = engine.scene.get_scene_info()
+    assert info.number_of_files == 0
+    assert info.number_of_actors == 0
+    assert info.number_of_points == 0
+    assert info.number_of_cells == 0
+
+    engine.scene.add(cube)
+    info = engine.scene.get_scene_info()
+    assert info.number_of_files == 1
+    assert info.number_of_actors > 0
+    assert info.number_of_points > 0
+    assert info.number_of_cells > 0
+
+    engine.scene.add(sphere)
+    appended = engine.scene.get_scene_info()
+    assert appended.number_of_files == 2
+    assert appended.number_of_actors > info.number_of_actors
+    assert appended.number_of_points > info.number_of_points
+    assert appended.number_of_cells > info.number_of_cells
+
+    engine.scene.clear()
+    info = engine.scene.get_scene_info()
+    assert info.number_of_files == 0
+    assert info.number_of_actors == 0
+    assert info.number_of_points == 0
+    assert info.number_of_cells == 0

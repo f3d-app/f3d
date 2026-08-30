@@ -181,6 +181,13 @@ public:
   virtual scene& setNodeVisibility(int nodeId, bool visible) = 0;
 
   /**
+   * Return information about the contents of the scene, eg. its number of points and cells.
+   * See types::scene_info_t documentation for more information.
+   * Returns zeroed counters if the scene is empty.
+   */
+  [[nodiscard]] virtual scene_info_t getSceneInfo() const = 0;
+
+  /**
    * Return true if provided file in path uses a supported extension, exists and its content
    * correspond to a supported file format, false otherwise.
    * content validation is only performed with VTK >= 9.6.20260228
