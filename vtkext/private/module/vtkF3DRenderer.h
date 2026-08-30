@@ -84,6 +84,16 @@ public:
     CROSS
   };
 
+  /**
+   * Enum listing backface culling types.
+   */
+  enum class BackfaceCullingType : unsigned char
+  {
+    DEFAULT,
+    VISIBLE,
+    HIDDEN
+  };
+
   ///@{
   /**
    * Set visibility of different actors
@@ -162,7 +172,7 @@ public:
   void SetUseBlurBackground(bool use);
   void SetBlurCircleOfConfusionRadius(double radius);
   void SetRaytracingSamples(int samples);
-  void SetBackfaceType(const std::string& backfaceType);
+  void SetBackfaceType(BackfaceCullingType type);
   void SetFinalShader(const std::optional<std::string>& finalShader);
   ///@}
 
@@ -850,7 +860,7 @@ private:
 
   std::string CachePath;
 
-  std::string BackfaceType = "default";
+  BackfaceCullingType BackfaceType = BackfaceCullingType::DEFAULT;
   std::optional<std::string> FinalShader;
 
   vtkF3DMetaImporter* Importer = nullptr;

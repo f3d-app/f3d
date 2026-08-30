@@ -1768,11 +1768,11 @@ void vtkF3DRenderer::SetUseBlurBackground(bool use)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetBackfaceType(const std::string& backfaceType)
+void vtkF3DRenderer::SetBackfaceType(BackfaceCullingType type)
 {
-  if (this->BackfaceType != backfaceType)
+  if (this->BackfaceType != type)
   {
-    this->BackfaceType = backfaceType;
+    this->BackfaceType = type;
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
     this->ActorsPropertiesConfigured = false;
@@ -2601,23 +2601,11 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 
   bool setBackfaceCulling = false;
   bool backfaceCulling = true;
-  if (this->BackfaceType != "default")
+  
+  if (this->BackfaceType != BackfaceCullingType::DEFAULT)
   {
     setBackfaceCulling = true;
-    if (this->BackfaceType == "visible")
-    {
-      backfaceCulling = false;
-    }
-    else if (this->BackfaceType == "hidden")
-    {
-      backfaceCulling = true;
-    }
-    else
-    {
-      setBackfaceCulling = false;
-      F3DLog::Print(F3DLog::Severity::Warning,
-        this->BackfaceType + " is not a valid backface type, assuming it is not set");
-    }
+    backfaceCulling = (this->BackfaceType == BackfaceCullingType::HIDDEN);
   }
 
   for (const auto& coloring : this->Importer->GetColoringActorsAndMappers())

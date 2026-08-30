@@ -660,12 +660,27 @@ void window_impl::UpdateDynamicOptions()
       R"( is an invalid blending mode. Valid modes are: "none", "ddp", "sort", "sort_cpu", "stochastic")");
   }
 
+  vtkF3DRenderer::BackfaceCullingType backfaceType = vtkF3DRenderer::BackfaceCullingType::DEFAULT;
+  if (opt.render.backface_type == "visible")
+  {
+    backfaceType = vtkF3DRenderer::BackfaceCullingType::VISIBLE;
+  }
+  else if (opt.render.backface_type == "hidden")
+  {
+    backfaceType = vtkF3DRenderer::BackfaceCullingType::HIDDEN;
+  }
+  else if (opt.render.backface_type != "default")
+  {
+    log::warn(opt.render.backface_type,
+      R"( is an invalid backface type. Valid modes are: "default", "visible", "hidden")");
+  }
+
   renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
   renderer->SetAntiAliasingMode(aaMode);
   renderer->SetUseToneMappingPass(opt.render.effect.tone_mapping);
   renderer->SetDisplayDepth(opt.render.effect.display_depth);
   renderer->SetBlendingMode(blendMode);
-  renderer->SetBackfaceType(opt.render.backface_type);
+  renderer->SetBackfaceType(backfaceType);
   renderer->SetFinalShader(opt.render.effect.final_shader);
 
   renderer->SetBackground(opt.render.background.color.data());
