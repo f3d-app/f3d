@@ -30,12 +30,20 @@ vtkF3DLYSReader::vtkF3DLYSReader()
 //----------------------------------------------------------------------------
 namespace
 {
-inline uint32_t ReadU32LE(const unsigned char* buf, size_t offset)
+struct ContainerHeader
 {
-  uint32_t val;
-  std::memcpy(&val, buf + offset, sizeof(val));
-  return val;
-}
+  uint32_t version;
+  uint32_t jsonBlockSize;
+  uint32_t secondarySize;
+  uint32_t jsonLen;
+};
+
+struct MeshHeader
+{
+  uint32_t indexCount;
+  uint32_t coordCount;
+  uint32_t reserved;
+};
 }
 //----------------------------------------------------------------------------
 int vtkF3DLYSReader::RequestData(
@@ -60,18 +68,14 @@ int vtkF3DLYSReader::RequestData(
   // Seek to the beginning in case the stream was already read (e.g. by CanReadFile).
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
   // Read the 16-byte container header
-  // bytes  0- 3 : container format version (uint32 LE); observed value: 4
-  // bytes  4- 7 : padded JSON block size (uint32 LE) - includes trailing alignment bytes
-  // bytes  8-11 : secondary size field (uint32 LE); not used by this reader
-  // bytes 12-15 : actual JSON content length (uint32 LE)
-  unsigned char header[16];
-  if (stream->Read(header, 16) != 16)
+  ContainerHeader header;
+  if (stream->Read(&header, sizeof(ContainerHeader)) != sizeof(ContainerHeader))
   {
     vtkErrorMacro("Failed to read LYS container header");
     return 0;
   }
-  const uint32_t jsonBlockSize = ::ReadU32LE(header, 4); // padded size used to seek past the block
-  const uint32_t jsonLen = ::ReadU32LE(header, 12);      // actual JSON content length
+  const uint32_t jsonBlockSize = header.jsonBlockSize; // padded size used to seek past the block
+  const uint32_t jsonLen = header.jsonLen;             // actual JSON content length
   // Read and parse the JSON manifest (jsonLen bytes, padded to jsonBlockSize in the file)
   std::vector<char> jsonBuf(jsonLen);
   if (stream->Read(jsonBuf.data(), jsonLen) != jsonLen)
@@ -143,13 +147,14 @@ int vtkF3DLYSReader::RequestData(
   //   bytes  8-11: reserved    (uint32 LE) - padding/flags, ignored
   // The index buffer follows immediately at byte 12.
   // The vertex buffer follows the index buffer.
-  if (geomSize < 12)
+  if (geomSize < sizeof(MeshHeader))
   {
     vtkErrorMacro("LYS geometry blob is too small to contain a mesh header");
     return 0;
   }
 
-  const uint32_t rawIndexCount = ::ReadU32LE(geomBuf.data(), 0);
+  const auto* meshHeader = reinterpret_cast<const MeshHeader*>(geomBuf.data());
+  const uint32_t rawIndexCount = meshHeader->indexCount;
   if (rawIndexCount % 3 != 0)
   {
     vtkErrorMacro("LYS index count "
@@ -157,7 +162,7 @@ int vtkF3DLYSReader::RequestData(
     return 0;
   }
   const uint32_t indexCount = rawIndexCount;
-  const uint32_t coordCount = ::ReadU32LE(geomBuf.data(), 4);
+  const uint32_t coordCount = meshHeader->coordCount;
 
   const size_t indexBufSize = static_cast<size_t>(indexCount) * sizeof(uint32_t);
   const size_t coordBufSize = static_cast<size_t>(coordCount) * sizeof(float);
@@ -234,13 +239,13 @@ bool vtkF3DLYSReader::CanReadFile(vtkResourceStream* stream)
   }
   // Read the 16-byte container header
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
-  unsigned char header[16];
-  if (stream->Read(header, 16) != 16)
+  ContainerHeader header;
+  if (stream->Read(&header, sizeof(ContainerHeader)) != sizeof(ContainerHeader))
   {
     return false;
   }
-  const uint32_t jsonBlockSize = ::ReadU32LE(header, 4); // padded block size
-  const uint32_t jsonLen = ::ReadU32LE(header, 12);      // actual JSON content length
+  const uint32_t jsonBlockSize = header.jsonBlockSize; // padded block size
+  const uint32_t jsonLen = header.jsonLen;             // actual JSON content length
   if (jsonBlockSize < 2 || jsonLen < 2 || jsonLen > jsonBlockSize)
   {
     return false;
