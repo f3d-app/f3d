@@ -30,7 +30,7 @@ int TestF3DAlembicReaderRequestInformation(int vtkNotUsed(argc), char* argv[])
   reader->SetFileName(filename);
   reader->UpdateInformation();
   vtkInformation* readerInfo = reader->GetOutputInformation(0);
-  double* readerTimeSteps = nullptr;
+  const double* readerTimeSteps = nullptr;
   if (readerInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
   {
     readerTimeSteps = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
