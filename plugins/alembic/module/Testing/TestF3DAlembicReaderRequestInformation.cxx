@@ -39,7 +39,7 @@ int TestF3DAlembicReaderRequestInformation(int vtkNotUsed(argc), char* argv[])
   {
     return EXIT_FAILURE;
   }
-  double* readerTimeRange = nullptr;
+  const double* readerTimeRange = nullptr;
   if (readerInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()))
   {
     readerTimeRange = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
