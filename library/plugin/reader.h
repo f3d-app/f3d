@@ -76,7 +76,8 @@ public:
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
     const std::vector<std::string>& extensions = this->getExtensions();
     if (std::any_of(
-          extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; }) || forceReader)
+          extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; }) ||
+      forceReader)
     {
       vtkNew<vtkFileResourceStream> stream;
       if (stream->Open(fileName.c_str()))
