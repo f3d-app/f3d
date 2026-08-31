@@ -28,7 +28,7 @@ reader* pickReader(const std::vector<plugin*>& plugins, std::optional<std::strin
       {
         if (reader->getName() == *forceReader)
         {
-          availability = file_availability::SUPPORTED;
+          availability = isValid(reader.get());
           return reader.get();
         }
       }
@@ -89,8 +89,9 @@ factory::plugin_initializer_t factory::getStaticInitializer(const std::string& p
 reader* factory::getReader(const std::string& fileName, std::optional<std::string> forceReader,
   const bool skipContentCheck, file_availability& availability)
 {
+  bool isForce = forceReader.has_value();
   return f3d::pickReader(this->Plugins, forceReader, availability,
-    [&](const reader* reader) { return reader->canRead(fileName, skipContentCheck); });
+    [&](const reader* reader) { return reader->canRead(fileName, skipContentCheck, isForce); });
 }
 
 //----------------------------------------------------------------------------

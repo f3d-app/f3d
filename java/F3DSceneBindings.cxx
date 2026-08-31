@@ -443,7 +443,7 @@ extern "C"
 
     JniUTFString str(env, filePath);
     f3d::file_availability result = GetEngine(env, self)->getScene().supports(str.c_str());
-    return result != f3d::reader_types::file_availability::AVAILABLE;
+    return result == f3d::file_availability::SUPPORTED;
   }
 
   JNIEXPORT jobject JAVA_BIND(Scene, loadAnimationTime)(

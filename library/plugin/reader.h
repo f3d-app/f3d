@@ -70,13 +70,13 @@ public:
    * Check if this reader can read the given filename - according to its extension and file content
    */
   virtual f3d::file_availability canRead(
-    const std::string& fileName, const bool skipContentCheck) const
+    const std::string& fileName, const bool skipContentCheck, bool forceReader = false) const
   {
     std::string ext = fileName.substr(fileName.find_last_of(".") + 1);
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
     const std::vector<std::string>& extensions = this->getExtensions();
     if (std::any_of(
-          extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; }))
+          extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; }) || forceReader)
     {
       vtkNew<vtkFileResourceStream> stream;
       if (stream->Open(fileName.c_str()))

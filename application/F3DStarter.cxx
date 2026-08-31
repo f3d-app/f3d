@@ -2178,10 +2178,21 @@ void F3DStarter::LoadFileGroupInternal(
           }
           else if (availability == f3d::file_availability::UNSUPPORTED_CONTENT)
           {
-            f3d::log::warn(tmpPath.string(),
-              " contains unsupported contents, use "
-              "--skip-content-check to try reading it anyway or --force-reader to select a "
-              "specific reader");
+            auto forceReader = this->Internals->LibOptions.scene.force_reader;
+            if (forceReader)
+            {
+              f3d::log::warn(tmpPath.string(),
+                " contains unsupported contents for "
+                "a selected forced reader ",
+                *forceReader, ", use --skip-content-check to try reading it anyway");
+            }
+            else
+            {
+              f3d::log::warn(tmpPath.string(),
+                " contains unsupported contents, use "
+                "--skip-content-check to try reading it anyway or --force-reader to select a "
+                "specific reader");
+            }
             unsupported = true;
           }
         }
