@@ -497,13 +497,15 @@ public:
       // invalidating any references/iterators into it.
       const BindingCommands binding = commandsIt->second;
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20260828)
-      if (binding.Repeat || rwi->GetRepeatCount() == 0)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20260828) || defined(_WIN32)
+      const bool shouldTriggerBinding = binding.Repeat || rwi->GetRepeatCount() == 0;
 #else
-      // Older VTK versions have different repeat counts per platform
-      // Account for both starting at 0 and 1
-      if (binding.Repeat || rwi->GetRepeatCount() < 2)
+      // Old VTK versions on non-Windows platforms hard coded the repeat count to 1
+      // Just trigger the binding as there's no reliable way to evaluate repeat count
+      const bool shouldTriggerBinding = true;
 #endif
+
+      if (shouldTriggerBinding)
       {
         for (const std::string& command : binding.CommandVector)
         {
