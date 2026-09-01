@@ -39,7 +39,7 @@ class vtkF3DLYSReader : public vtkAbstractPolyDataReader
 {
 public:
   static vtkF3DLYSReader* New();
-  vtkTypeMacro(vtkF3DLYSReader, vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkF3DLYSReader, vtkAbstractPolyDataReader);
 
   /**
    * Return true if the stream looks like a valid LYS container.

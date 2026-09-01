@@ -179,12 +179,10 @@ int vtkF3DLYSReader::RequestData(
   const float* coords = reinterpret_cast<const float*>(geomBuf.data() + 12 + indexBufSize);
   const vtkIdType nPoints = static_cast<vtkIdType>(coordCount / 3);
 
-  // SetArray with save=0 transfers ownership to VTK (freed with delete[]).
-  float* coordsCopy = new float[coordCount];
-  std::memcpy(coordsCopy, coords, coordCount * sizeof(float));
   vtkNew<vtkFloatArray> pointArray;
   pointArray->SetNumberOfComponents(3);
-  pointArray->SetArray(coordsCopy, static_cast<vtkIdType>(coordCount), 0);
+  pointArray->SetNumberOfTuples(nPoints);
+  std::memcpy(pointArray->GetPointer(0), coords, coordCount * sizeof(float));
 
   vtkNew<vtkPoints> points;
   points->SetDataTypeToFloat();
