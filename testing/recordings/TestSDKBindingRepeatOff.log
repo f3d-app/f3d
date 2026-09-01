@@ -1,4 +1,5 @@
 # StreamVersion 1.2
+KeyPressEvent 1591 863 1 80 0 P 0
 KeyPressEvent 1591 863 1 80 1 P 0
 KeyPressEvent 1591 863 1 80 2 P 0
 KeyPressEvent 1591 863 1 80 3 P 0
@@ -8,5 +9,4 @@ KeyPressEvent 1591 863 1 80 6 P 0
 KeyPressEvent 1591 863 1 80 7 P 0
 KeyPressEvent 1591 863 1 80 8 P 0
 KeyPressEvent 1591 863 1 80 9 P 0
-KeyPressEvent 1591 863 1 80 10 P 0
 KeyReleaseEvent 1591 863 1 80 1 P 0
