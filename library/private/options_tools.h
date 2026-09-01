@@ -36,17 +36,14 @@ struct cache
     return *instance;
   }
 
-  cache():
-    ShortHexRegex(
-      "#([0-9a-f])([0-9a-f])([0-9a-f])", std::regex_constants::icase),
-    HexRegex(
-      "#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})", std::regex_constants::icase),
-    RgbRegex(
-      "rgb\\((\\d{1,3}),(\\d{1,3}),(\\d{1,3})\\)", std::regex_constants::icase),
-    HueRegex(
-      "(hsl|hsv|hwb)\\((\\d{1,3}),(\\d{1,3})%?,(\\d{1,3})%?\\)", std::regex_constants::icase),
-    CmykRegex(
-      "cmyk\\((\\d{1,3})%?,(\\d{1,3})%?,(\\d{1,3})%?,(\\d{1,3})%?\\)", std::regex_constants::icase)
+  cache()
+    : ShortHexRegex("#([0-9a-f])([0-9a-f])([0-9a-f])", std::regex_constants::icase)
+    , HexRegex("#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})", std::regex_constants::icase)
+    , RgbRegex("rgb\\((\\d{1,3}),(\\d{1,3}),(\\d{1,3})\\)", std::regex_constants::icase)
+    , HueRegex(
+        "(hsl|hsv|hwb)\\((\\d{1,3}),(\\d{1,3})%?,(\\d{1,3})%?\\)", std::regex_constants::icase)
+    , CmykRegex("cmyk\\((\\d{1,3})%?,(\\d{1,3})%?,(\\d{1,3})%?,(\\d{1,3})%?\\)",
+        std::regex_constants::icase)
   {
   }
 
