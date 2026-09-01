@@ -24,6 +24,20 @@ constexpr unsigned int INT_MAX_UINT = static_cast<unsigned int>(std::numeric_lim
 
 namespace options_tools
 {
+struct cache
+{
+  static cache& getInstance()
+  {
+    static std::unique_ptr<cache> instance;
+    if (!instance)
+    {
+      instance = std::make_unique<cache>();
+    }
+    return *instance;
+  }
+
+  vtkNew<vtkF3DNamedColors> NamedColors;
+};
 
 //----------------------------------------------------------------------------
 /**
@@ -329,7 +343,7 @@ color_t parse(const std::string& str)
     }
 
     /* Named colors search */
-    static vtkNew<vtkF3DNamedColors> color;
+    vtkF3DNamedColors* color = cache::getInstance().NamedColors;
     if (color->ColorExists(strCompact))
     {
       double rgba[4];
