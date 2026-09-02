@@ -79,6 +79,8 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "animation-indices", "scene.animation.indices" },
   { "animation-progress", "ui.animation_progress" },
   { "animation-speed-factor", "scene.animation.speed_factor" },
+  { "animation-mode", "scene.animation.mode" },
+  { "animation-repeat", "scene.animation.repeat" },
   { "anti-aliasing", "render.effect.antialiasing.mode" },
   { "armature", "render.armature.enable" },
   { "axes-grid", "render.axes_grid.enable" },

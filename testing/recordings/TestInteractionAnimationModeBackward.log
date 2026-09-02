@@ -1,0 +1,34 @@
+# StreamVersion 1.2
+# Start animation mode backward
+KeyPressEvent 989 6 0 32 1 space 0
+CharEvent 989 6 0 32 1 space 0
+KeyReleaseEvent 989 6 0 32 1 space 0
+
+# Time for moving
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+TimerEvent 989 6 0 32 1 space 0
+
+# Stop animation mode backward
+KeyPressEvent 989 6 0 32 1 space 0
+CharEvent 989 6 0 32 1 space 0
+KeyReleaseEvent 989 6 0 32 1 space 0
