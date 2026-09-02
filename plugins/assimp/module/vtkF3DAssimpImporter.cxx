@@ -1479,13 +1479,13 @@ bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream, std::string& h
   {
 
     line1.erase(line1.begin(),
-      std::find_if(line1.begin(),line1.end(), [] (unsigned char ch) {return !std::isspace(ch);}));
+      std::find_if(line1.begin(),line1.end(), [] (unsigned char ch) { return !std::isspace(ch); }));
     line2.erase(line2.begin(),
-      std::find_if(line2.begin(),line2.end(), [] (unsigned char ch) {return !std::isspace(ch);}));
+      std::find_if(line2.begin(),line2.end(), [] (unsigned char ch) { return !std::isspace(ch); }));
     line3.erase(line3.begin(),
-      std::find_if(line3.begin(),line3.end(), [] (unsigned char ch) {return !std::isspace(ch);}));
+      std::find_if(line3.begin(),line3.end(), [] (unsigned char ch) { return !std::isspace(ch); }));
     line4.erase(line4.begin(),
-      std::find_if(line4.begin(),line4.end(), [] (unsigned char ch) {return !std::isspace(ch);}));
+      std::find_if(line4.begin(),line4.end(), [] (unsigned char ch) { return !std::isspace(ch); }));
 
     if (line1.starts_with("0") && line2.starts_with("SECTION") && line3.starts_with("2") &&
       ((line4.starts_with("HEADER")) || line4.starts_with("ENTITIES")))
