@@ -991,7 +991,7 @@ interactor& interactor_impl::initCommands()
     [&](const std::vector<std::string>&) { this->Internals->AnimationManager->CycleAnimation(); },
     command_documentation_t{
       "cycle_animation", "cycle scene.animation.index option using model information" });
-
+  
   std::vector<std::string> cycleColoringValidArgs = { "field", "array", "component" };
   this->addCommand(
     "cycle_coloring",
@@ -1647,6 +1647,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "P"}, "cycle render.effect.blending.mode", "Scene", std::bind(docStr, "Blending", std::cref(opts.render.effect.blending.mode)), f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "Q"}, "toggle render.effect.ambient_occlusion","Scene", std::bind(docTgl, "Ambient occlusion", std::cref(opts.render.effect.ambient_occlusion)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "A"}, "cycle render.effect.antialiasing.mode","Scene", std::bind(docStr, "Anti-aliasing", std::cref(opts.render.effect.antialiasing.mode)), f3d::interactor::BindingType::CYCLIC);
+  this->addBinding({mod_t::CTRL, "B"}, "cycle render.backface_type", "Scene", std::bind(docStr, "Backface type", std::cref(opts.render.backface_type)), f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "T"}, "toggle render.effect.tone_mapping","Scene", std::bind(docTgl, "Toggle tone mapping", std::cref(opts.render.effect.tone_mapping)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "E"}, "toggle render.show_edges","Scene", std::bind(docTglOpt, "Toggle edges display", std::cref(opts.render.show_edges)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "X"}, "toggle ui.axis","Scene", std::bind(docTgl, "Toggle axes display", std::cref(opts.ui.axis)), f3d::interactor::BindingType::TOGGLE);

@@ -68,9 +68,10 @@
     },
     "backface_type": {
       "type": "string",
+      "default_value": "default",
       "domain": {
         "style": "enum",
-        "enum": ["visible", "hidden"]
+        "enum": ["default", "visible", "hidden"]
       }
     },
     "grid": {
