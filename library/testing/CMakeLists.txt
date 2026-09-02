@@ -1,7 +1,6 @@
 list(APPEND libf3dSDKTests_list
      TestPseudoUnitTest.cxx
      TestSDKAnimation.cxx
-     TestSDKBindingRepeat.cxx
      TestSDKCamera.cxx
      TestSDKCompareWithFile.cxx
      TestSDKDynamicLightIntensity.cxx
@@ -72,6 +71,12 @@ endif()
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
   list(APPEND libf3dSDKTests_list
     TestSDKSceneInvalidHeader.cxx
+    )
+endif()
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20260828)
+  list(APPEND libf3dSDKTests_list
+    TestSDKBindingRepeat.cxx
     )
 endif()
 
