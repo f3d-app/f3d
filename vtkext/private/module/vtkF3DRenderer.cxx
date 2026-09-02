@@ -290,11 +290,13 @@ void vtkF3DRenderer::Initialize()
   this->AddActor(this->SkyboxActor);
   this->AddActor(this->UIActor);
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513) && !defined(F3D_USE_GLES)
   // Add the grid axes actor if already initialized
   if (this->GridAxesActor != nullptr)
   {
     this->AddActor(this->GridAxesActor);
   }
+#endif
 
   this->GridConfigured = false;
   this->CheatSheetConfigured = false;
