@@ -290,6 +290,12 @@ void vtkF3DRenderer::Initialize()
   this->AddActor(this->SkyboxActor);
   this->AddActor(this->UIActor);
 
+  // Add the grid axes actor if already initialized
+  if (this->GridAxesActor != nullptr)
+  {
+    this->AddActor(this->GridAxesActor);
+  }
+
   this->GridConfigured = false;
   this->CheatSheetConfigured = false;
   this->ActorsPropertiesConfigured = false;
