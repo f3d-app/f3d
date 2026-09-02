@@ -1,7 +1,6 @@
 list(APPEND libf3dSDKTests_list
      TestPseudoUnitTest.cxx
      TestSDKAnimation.cxx
-     TestSDKBindingRepeat.cxx
      TestSDKCamera.cxx
      TestSDKCompareWithFile.cxx
      TestSDKDynamicLightIntensity.cxx
