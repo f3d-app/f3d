@@ -131,7 +131,7 @@ public:
     scene_impl::internals::ProgressDataStruct callbackData;
     callbackData.timer = timer;
     callbackData.widget = progressWidget;
-    if (this->Interactor)
+    if (this->Interactor && !this->Window.isOffscreen())
     {
       f3d::color_t color = this->Options.ui.loader_progress_color;
       scene_impl::internals::CreateProgressRepresentationAndCallback(
