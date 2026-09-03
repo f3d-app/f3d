@@ -1478,14 +1478,15 @@ bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream, std::string& h
     parser->ReadLine(line4) == vtkParseResult::EndOfLine)
   {
 
-    line1.erase(line1.begin(),
-      std::find_if(line1.begin(), line1.end(), [](unsigned char ch) { return !std::isspace(ch); }));
-    line2.erase(line2.begin(),
-      std::find_if(line2.begin(), line2.end(), [](unsigned char ch) { return !std::isspace(ch); }));
-    line3.erase(line3.begin(),
-      std::find_if(line3.begin(), line3.end(), [](unsigned char ch) { return !std::isspace(ch); }));
-    line4.erase(line4.begin(),
-      std::find_if(line4.begin(), line4.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+    auto ltrim = [](std::string &line){
+      line.erase(line.begin(),
+        std::find_if(line.begin(), line.end(), [] (unsigned char ch) { return !std::isspace(ch); }));
+    };
+
+    ltrim(line1);
+    ltrim(line2);
+    ltrim(line3);
+    ltrim(line4);
 
     if (line1.starts_with("0") && line2.starts_with("SECTION") && line3.starts_with("2") &&
       ((line4.starts_with("HEADER")) || line4.starts_with("ENTITIES")))
