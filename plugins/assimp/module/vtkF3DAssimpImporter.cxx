@@ -1478,7 +1478,7 @@ bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream, std::string& h
     parser->ReadLine(line4) == vtkParseResult::EndOfLine)
   {
 
-    auto ltrim = [](std::string &line)
+    auto ltrim = [](std::string& line)
     {
       line.erase(line.begin(),
         std::find_if(line.begin(), line.end(), [](unsigned char ch) { return !std::isspace(ch); }));
