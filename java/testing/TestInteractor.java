@@ -46,6 +46,9 @@ public class TestInteractor {
     repeatBind.mod = Interactor.ModifierKeys.NONE;
     repeatBind.inter = "R";
 
+    // Remove any binds from previous CI before testing repeat to avoid error
+    interactor.removeBinding(repeatBind);
+
     interactor.addBinding(repeatBind, "test_command", "test_group", Interactor.BindingType.NUMERICAL, false, true);
 
     List<Interactor.InteractionBind> testBindings = interactor.getBindsForGroup("test_group");
