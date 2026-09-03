@@ -166,14 +166,25 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
                   break;
                 }
 
+#ifdef F3D_USE_GLES
+                // with GLES, we append all morphing targets into a single texture
+                polyMapper->MapDataArrayToVertexAttribute(
+                  "target_position", namePosition.c_str(), vtkDataObject::FIELD_ASSOCIATION_POINTS);
+#else
                 polyMapper->MapDataArrayToVertexAttribute(namePosition.c_str(),
                   namePosition.c_str(), vtkDataObject::FIELD_ASSOCIATION_POINTS);
+#endif
 
                 std::string nameNormal = "target" + std::to_string(j) + "_normal";
                 if (input->GetPointData()->GetArray(nameNormal.c_str()) != nullptr)
                 {
+#ifdef F3D_USE_GLES
+                  polyMapper->MapDataArrayToVertexAttribute(
+                    "target_normal", nameNormal.c_str(), vtkDataObject::FIELD_ASSOCIATION_POINTS);
+#else
                   polyMapper->MapDataArrayToVertexAttribute(nameNormal.c_str(), nameNormal.c_str(),
                     vtkDataObject::FIELD_ASSOCIATION_POINTS);
+#endif
                 }
               }
             }
@@ -460,6 +471,11 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(
       // morphing
       if (hasMorphing)
       {
+#ifdef F3D_USE_GLES
+        customDecl += "uniform sampler2D target_position;\n";
+        customDecl += "uniform sampler2D target_normal;\n";
+#endif
+
         for (int i = 0; i < 4; i++)
         {
           std::string name = "target" + std::to_string(i) + "_position";
@@ -468,15 +484,11 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(
           if (polyData->GetPointData()->GetArray(name.c_str()) != nullptr)
           {
 #ifdef F3D_USE_GLES
-            customDecl += "uniform sampler2D ";
-            customDecl += name;
-            customDecl += ";\n";
-
             posImpl += " posMC += morphWeights[";
             posImpl += std::to_string(i);
-            posImpl += "] * vec4(texelFetchBuffer(";
-            posImpl += name;
-            posImpl += ", pointId).xyz, 0);\n";
+            posImpl += "] * vec4(texelFetchBuffer(target_position, ";
+            posImpl += std::to_string(i);
+            posImpl += " * pointCount + pointId).xyz, 0);\n";
 #else
             customDecl += "in vec3 ";
             customDecl += name;
@@ -496,17 +508,13 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(
           if (polyData->GetPointData()->GetArray(name.c_str()) != nullptr)
           {
 #ifdef F3D_USE_GLES
-            customDecl += "uniform sampler2D ";
-            customDecl += name;
-            customDecl += ";\n";
-
             if (hasNormals)
             {
               normalImpl += " normalVCVSOutput += morphWeights[";
               normalImpl += std::to_string(i);
-              normalImpl += "] * texelFetchBuffer(";
-              normalImpl += name;
-              normalImpl += ", pointId).xyz;\n";
+              normalImpl += "] * texelFetchBuffer(target_normal, ";
+              normalImpl += std::to_string(i);
+              normalImpl += " * pointCount + pointId).xyz;\n";
             }
 #else
             customDecl += "in vec3 ";
@@ -695,7 +703,8 @@ bool vtkF3DRenderPass::PostReplaceShaderValues([[maybe_unused]] std::string& ver
           }
 
           replacementLines += "  p" + index + "MC += morphWeights[" + std::to_string(j) +
-            "] * vec4(texelFetchBuffer(" + namePosition + ", p" + index + ").xyz, 0);\n";
+            "] * vec4(texelFetchBuffer(target_position, " + std::to_string(j) +
+            " * pointCount + p" + index + ").xyz, 0);\n";
         }
       }
 

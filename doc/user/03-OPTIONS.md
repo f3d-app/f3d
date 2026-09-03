@@ -223,6 +223,16 @@ Set the color grid lines.
 | ------------------------------------ | --------------------------------- |
 | ![](./images/grid_color_default.png) | ![](./images/grid_color_cyan.png) |
 
+### `--grid-opacity=<opacity>` (_double_, default: `1`)
+
+Set the opacity for grid lines. Can be set to `0` to show reflection only.
+
+#### compare
+
+| 100% (default)                       | 0%                                         |
+| ------------------------------------ | ------------------------------------------ |
+| ![](./images/grid_reflection_on.png) | ![](./images/grid_reflection_no_lines.png) |
+
 ### `--grid-reflection=<strength>` (_double_, default: `0`)
 
 Set the reflection strength on the grid.

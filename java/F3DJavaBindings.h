@@ -4,6 +4,7 @@
 #include <jni.h>
 
 #include <engine.h>
+#include <image.h>
 
 #include <map>
 #include <string>
@@ -18,6 +19,98 @@
 namespace fs = std::filesystem;
 
 /**
+ * RAII helper wrapping GetStringUTFChars/ReleaseStringUTFChars.
+ * The underlying C string is released automatically when the wrapper goes
+ * out of scope, including on early returns or exceptions, so call sites can
+ * no longer leak a UTF-8 string by forgetting (or being unable, due to an
+ * exception) to call ReleaseStringUTFChars.
+ *
+ * A null jstring is handled gracefully: c_str() returns nullptr and no JNI
+ * call is made.
+ */
+class JniUTFString
+{
+public:
+  JniUTFString(JNIEnv* env, jstring jstr)
+    : Env(env)
+    , JStr(jstr)
+    , CStr(jstr ? env->GetStringUTFChars(jstr, nullptr) : nullptr)
+  {
+  }
+
+  ~JniUTFString()
+  {
+    if (this->CStr)
+    {
+      this->Env->ReleaseStringUTFChars(this->JStr, this->CStr);
+    }
+  }
+
+  JniUTFString(const JniUTFString&) = delete;
+  JniUTFString& operator=(const JniUTFString&) = delete;
+  JniUTFString(JniUTFString&&) = delete;
+  JniUTFString& operator=(JniUTFString&&) = delete;
+
+  operator const char*() const
+  {
+    return this->CStr;
+  }
+  const char* c_str() const
+  {
+    return this->CStr;
+  }
+
+private:
+  JNIEnv* Env;
+  jstring JStr;
+  const char* CStr;
+};
+
+/**
+ * RAII helper for a local JNI reference (jclass, jobject, jstring, ...)
+ * that must eventually be released with DeleteLocalRef. Deletes the local
+ * reference automatically when the wrapper goes out of scope.
+ *
+ * A null reference is handled gracefully: no JNI call is made on destruction.
+ */
+template<typename T>
+class JniLocalRef
+{
+public:
+  JniLocalRef(JNIEnv* env, T ref)
+    : Env(env)
+    , Ref(ref)
+  {
+  }
+
+  ~JniLocalRef()
+  {
+    if (this->Ref)
+    {
+      this->Env->DeleteLocalRef(this->Ref);
+    }
+  }
+
+  JniLocalRef(const JniLocalRef&) = delete;
+  JniLocalRef& operator=(const JniLocalRef&) = delete;
+  JniLocalRef(JniLocalRef&&) = delete;
+  JniLocalRef& operator=(JniLocalRef&&) = delete;
+
+  operator T() const
+  {
+    return this->Ref;
+  }
+  T get() const
+  {
+    return this->Ref;
+  }
+
+private:
+  JNIEnv* Env;
+  T Ref;
+};
+
+/**
  * Throw a Java exception of the given class name with the given message.
  * Call this from a catch block, then immediately return from the JNI function
  * so that the pending Java exception is delivered to the caller.
@@ -28,11 +121,10 @@ namespace fs = std::filesystem;
  */
 inline void F3DThrowJavaException(JNIEnv* env, const char* className, const char* msg)
 {
-  jclass cls = env->FindClass(className);
-  if (cls)
+  JniLocalRef<jclass> cls(env, env->FindClass(className));
+  if (cls.get())
   {
     env->ThrowNew(cls, msg);
-    env->DeleteLocalRef(cls);
   }
 }
 
@@ -56,6 +148,16 @@ inline f3d::engine::state* GetState(JNIEnv* env, jobject self)
   return reinterpret_cast<f3d::engine::state*>(ptr);
 }
 
+// Helper function to get the f3d::image pointer from a Java object
+inline f3d::image* GetImage(JNIEnv* env, jobject self)
+{
+  JniLocalRef<jclass> cls(env, env->GetObjectClass(self));
+  jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
+  jlong ptr = env->GetLongField(self, fid);
+
+  return reinterpret_cast<f3d::image*>(ptr);
+}
+
 // Helper function to convert std::vector<std::string> to Java List
 inline jobject CreateStringList(JNIEnv* env, const std::vector<std::string>& vec)
 {
@@ -67,9 +169,8 @@ inline jobject CreateStringList(JNIEnv* env, const std::vector<std::string>& vec
 
   for (const auto& str : vec)
   {
-    jstring jstr = env->NewStringUTF(str.c_str());
-    env->CallBooleanMethod(list, addMethod, jstr);
-    env->DeleteLocalRef(jstr);
+    JniLocalRef<jstring> jstr(env, env->NewStringUTF(str.c_str()));
+    env->CallBooleanMethod(list, addMethod, jstr.get());
   }
 
   return list;
@@ -90,11 +191,9 @@ inline jobject CreateStringBooleanMap(JNIEnv* env, const std::map<std::string, b
 
   for (const auto& [key, value] : map)
   {
-    jstring jkey = env->NewStringUTF(key.c_str());
-    jobject jvalue = env->NewObject(booleanClass, booleanConstructor, value);
-    env->CallObjectMethod(jmap, putMethod, jkey, jvalue);
-    env->DeleteLocalRef(jkey);
-    env->DeleteLocalRef(jvalue);
+    JniLocalRef<jstring> jkey(env, env->NewStringUTF(key.c_str()));
+    JniLocalRef<jobject> jvalue(env, env->NewObject(booleanClass, booleanConstructor, value));
+    env->CallObjectMethod(jmap, putMethod, jkey.get(), jvalue.get());
   }
 
   return jmap;

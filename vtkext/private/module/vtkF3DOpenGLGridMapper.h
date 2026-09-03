@@ -49,6 +49,10 @@ public:
   vtkSetVector4Macro(Axis2Color, float);
 
   /**
+   * Set the opacity of the lines
+   */
+  vtkSetMacro(LineOpacity, float);
+  /**
    * Set the strength of the reflection
    */
   vtkSetMacro(ReflectionStrength, float);
@@ -89,6 +93,7 @@ protected:
   int Subdivisions = 10;
   float Axis1Color[4] = { 0.0, 0.0, 0.0, 1.0 };
   float Axis2Color[4] = { 0.0, 0.0, 0.0, 1.0 };
+  float LineOpacity = 1.0f;
   float ReflectionStrength = 0.0f;
   bool ShaderBuiltWithReflection = false;
   vtkSmartPointer<vtkTextureObject> ReflectionColorTexture;

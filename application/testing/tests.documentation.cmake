@@ -143,6 +143,7 @@ f3d_test_doc(NAME TestDocGridColorCyan DATA DamagedHelmet.glb REF_IMAGE grid_col
 ## --grid-reflection
 f3d_test_doc(NAME TestDocGridReflectionOFF DATA DamagedHelmet.glb REF_IMAGE grid_reflection_off.png ROTATE ARGS -gf)
 f3d_test_doc(NAME TestDocGridReflectionON DATA DamagedHelmet.glb REF_IMAGE grid_reflection_on.png ROTATE ARGS -gf --grid-reflection=0.5)
+f3d_test_doc(NAME TestDocGridReflectionNoLines DATA DamagedHelmet.glb REF_IMAGE grid_reflection_no_lines.png ROTATE ARGS -gf --grid-reflection=0.5 --grid-opacity=0)
 
 ## --grid-absolute
 f3d_test_doc(NAME TestDocGridAbsoluteOFF DATA DamagedHelmet.glb REF_IMAGE grid_absolute_off.png ROTATE ARGS -gf)

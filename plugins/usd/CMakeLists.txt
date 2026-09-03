@@ -37,7 +37,7 @@ f3d_plugin_declare_reader(
   ${_SUPPORTS_STREAM}
   CAN_READ STATIC
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/usd.inl"
-  OPTIONS resources_path
+  OPTIONS resources_path subdivision_level
 )
 
 set(_additional_rpath "")

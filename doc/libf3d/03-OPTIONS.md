@@ -364,6 +364,12 @@ Set the color of grid lines.
 
 CLI: `--grid-color`.
 
+### `render.grid.opacity` (_ratio_, default: `1.0`)
+
+Set the opacity for the grid lines. Can be set to `0` to show reflection only.
+
+CLI: `--grid-opacity`.
+
 ### `render.grid.reflection` (_ratio_, default: `0.0`)
 
 Set the reflection strength on the grid.

@@ -93,6 +93,10 @@
         "type": "color",
         "default_value": "0.0, 0.0, 0.0"
       },
+      "opacity": {
+        "type": "ratio",
+        "default_value": "1.0"
+      },
       "reflection": {
         "type": "ratio",
         "default_value": "0.0"

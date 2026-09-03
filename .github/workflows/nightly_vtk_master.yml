@@ -71,12 +71,20 @@ jobs:
         os: [ubuntu-24.04, windows-2022, macos-15, macos-15-intel]
         include:
           - rendering_backend: auto
+          - gles_label: no-gles
           - build_type: egl
             os: ubuntu-24.04
             rendering_backend: egl
+            gles_label: no-gles
           - build_type: osmesa
             os: ubuntu-24.04
             rendering_backend: osmesa
+            gles_label: no-gles
+          - build_type: gles
+            os: ubuntu-24.04
+            rendering_backend: auto
+            gles_label: gles
+
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-24.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
@@ -98,6 +106,7 @@ jobs:
           build_type: ${{matrix.build_type}}
           vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
           rendering_backend: ${{matrix.rendering_backend}}
+          gles_label: ${{matrix.gles_label}}
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           versions_file: ./source/.github/workflows/versions.json
           cpu: ${{ matrix.os == 'macos-15' && 'arm64' || 'x86_64' }}

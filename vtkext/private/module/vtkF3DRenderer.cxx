@@ -765,6 +765,17 @@ void vtkF3DRenderer::SetGridColor(const std::vector<double>& color)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetGridOpacity(const double opacity)
+{
+  if (this->GridOpacity != opacity)
+  {
+    this->GridOpacity = opacity;
+    this->GridConfigured = false;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetGridReflection(const double strength)
 {
   if (this->GridReflection != strength)
@@ -883,6 +894,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       this->GridMapper->SetFadeDistance(diag);
       this->GridMapper->SetUnitSquare(tmpUnitSquare);
       this->GridMapper->SetSubdivisions(this->GridSubdivisions);
+      this->GridMapper->SetLineOpacity(this->GridOpacity);
       this->GridMapper->SetReflectionStrength(this->GridReflection);
 
       if (this->GridAbsolute)

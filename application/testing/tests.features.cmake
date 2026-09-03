@@ -15,7 +15,9 @@ f3d_test(NAME TestGridColor DATA suzanne.ply ARGS -g --grid-color=1,1,1)
 f3d_test(NAME TestGridWithDepthPeeling DATA suzanne.ply ARGS -gp --opacity=0.2)
 f3d_test(NAME TestGridReflection DATA suzanne.ply ARGS -g --grid-reflection=0.8)
 f3d_test(NAME TestGridAbsoluteReflection DATA suzanne.ply ARGS -g --grid-absolute --grid-reflection=0.8 --camera-elevation-angle=40)
+f3d_test(NAME TestGridOpacity DATA suzanne.ply ARGS -g --grid-opacity=.25 --anti-aliasing=ssaa)
 f3d_test(NAME TestGridSSAAReflection DATA suzanne.ply ARGS -g --grid-reflection=0.8 --anti-aliasing=ssaa)
+f3d_test(NAME TestGridReflectionOnly DATA suzanne.ply ARGS -g --grid-reflection=0.5 --grid-opacity=0 --anti-aliasing=ssaa)
 
 # Backface
 f3d_test(NAME TestBackfaceVisible DATA backface.vtp ARGS --backface-type=visible)

@@ -13,17 +13,16 @@ extern "C"
 
   JNIEXPORT jlong JAVA_BIND(Image, nativeCreateFromFile)(JNIEnv* env, jclass, jstring filePath)
   {
-    const char* path = env->GetStringUTFChars(filePath, nullptr);
+    JniUTFString path(env, filePath);
     jlong result = 0;
     try
     {
-      result = reinterpret_cast<jlong>(new f3d::image(path));
+      result = reinterpret_cast<jlong>(new f3d::image(path.c_str()));
     }
     catch (const f3d::image::read_exception& e)
     {
       F3DThrowJavaException(env, "app/f3d/F3D/Image$ReadException", e.what());
     }
-    env->ReleaseStringUTFChars(filePath, path);
     return result;
   }
 
@@ -43,41 +42,24 @@ extern "C"
 
   JNIEXPORT jint JAVA_BIND(Image, getWidth)(JNIEnv* env, jobject self)
   {
-    jclass cls = env->GetObjectClass(self);
-    jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
-    jlong ptr = env->GetLongField(self, fid);
-    f3d::image* img = reinterpret_cast<f3d::image*>(ptr);
-    return img->getWidth();
+    return GetImage(env, self)->getWidth();
   }
 
   JNIEXPORT jint JAVA_BIND(Image, getHeight)(JNIEnv* env, jobject self)
   {
-    jclass cls = env->GetObjectClass(self);
-    jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
-    jlong ptr = env->GetLongField(self, fid);
-    f3d::image* img = reinterpret_cast<f3d::image*>(ptr);
-    return img->getHeight();
+    return GetImage(env, self)->getHeight();
   }
 
   JNIEXPORT jint JAVA_BIND(Image, getChannelCount)(JNIEnv* env, jobject self)
   {
-    jclass cls = env->GetObjectClass(self);
-    jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
-    jlong ptr = env->GetLongField(self, fid);
-    f3d::image* img = reinterpret_cast<f3d::image*>(ptr);
-    return img->getChannelCount();
+    return GetImage(env, self)->getChannelCount();
   }
 
   JNIEXPORT jobject JAVA_BIND(Image, getChannelType)(JNIEnv* env, jobject self)
   {
-    jclass cls = env->GetObjectClass(self);
-    jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
-    jlong ptr = env->GetLongField(self, fid);
-    f3d::image* img = reinterpret_cast<f3d::image*>(ptr);
+    f3d::image::ChannelType type = GetImage(env, self)->getChannelType();
 
-    f3d::image::ChannelType type = img->getChannelType();
-
-    jclass enumClass = env->FindClass("app/f3d/F3D/Image$ChannelType");
+    JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Image$ChannelType"));
     jfieldID fieldID;
 
     switch (type)
@@ -101,19 +83,12 @@ extern "C"
 
   JNIEXPORT jint JAVA_BIND(Image, getChannelTypeSize)(JNIEnv* env, jobject self)
   {
-    jclass cls = env->GetObjectClass(self);
-    jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
-    jlong ptr = env->GetLongField(self, fid);
-    f3d::image* img = reinterpret_cast<f3d::image*>(ptr);
-    return img->getChannelTypeSize();
+    return GetImage(env, self)->getChannelTypeSize();
   }
 
   JNIEXPORT jobject JAVA_BIND(Image, setContent)(JNIEnv* env, jobject self, jbyteArray buffer)
   {
-    jclass cls = env->GetObjectClass(self);
-    jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
-    jlong ptr = env->GetLongField(self, fid);
-    f3d::image* img = reinterpret_cast<f3d::image*>(ptr);
+    f3d::image* img = GetImage(env, self);
 
     jbyte* bufferData = env->GetByteArrayElements(buffer, nullptr);
     img->setContent(bufferData);
@@ -124,10 +99,7 @@ extern "C"
 
   JNIEXPORT jbyteArray JAVA_BIND(Image, getContent)(JNIEnv* env, jobject self)
   {
-    jclass cls = env->GetObjectClass(self);
-    jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
-    jlong ptr = env->GetLongField(self, fid);
-    f3d::image* img = reinterpret_cast<f3d::image*>(ptr);
+    f3d::image* img = GetImage(env, self);
 
     void* content = img->getContent();
     unsigned int size =
@@ -142,12 +114,7 @@ extern "C"
   JNIEXPORT jdoubleArray JAVA_BIND(Image, getNormalizedPixel)(
     JNIEnv* env, jobject self, jint x, jint y)
   {
-    jclass cls = env->GetObjectClass(self);
-    jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
-    jlong ptr = env->GetLongField(self, fid);
-    f3d::image* img = reinterpret_cast<f3d::image*>(ptr);
-
-    std::vector<double> pixel = img->getNormalizedPixel({ x, y });
+    std::vector<double> pixel = GetImage(env, self)->getNormalizedPixel({ x, y });
 
     jdoubleArray result = env->NewDoubleArray(pixel.size());
     env->SetDoubleArrayRegion(result, 0, pixel.size(), pixel.data());
@@ -157,55 +124,38 @@ extern "C"
 
   JNIEXPORT jdouble JAVA_BIND(Image, compare)(JNIEnv* env, jobject self, jobject reference)
   {
-    jclass cls = env->GetObjectClass(self);
-    jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
-    jlong ptr = env->GetLongField(self, fid);
-    f3d::image* img = reinterpret_cast<f3d::image*>(ptr);
-
-    jclass refCls = env->GetObjectClass(reference);
-    jfieldID refFid = env->GetFieldID(refCls, "mNativeAddress", "J");
-    jlong refPtr = env->GetLongField(reference, refFid);
-    f3d::image* refImg = reinterpret_cast<f3d::image*>(refPtr);
-
-    return img->compare(*refImg);
+    return GetImage(env, self)->compare(*GetImage(env, reference));
   }
 
   JNIEXPORT jobject JAVA_BIND(Image, save)(
     JNIEnv* env, jobject self, jstring filePath, jobject format)
   {
-    jclass cls = env->GetObjectClass(self);
-    jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
-    jlong ptr = env->GetLongField(self, fid);
-    f3d::image* img = reinterpret_cast<f3d::image*>(ptr);
+    f3d::image* img = GetImage(env, self);
 
-    const char* path = env->GetStringUTFChars(filePath, nullptr);
+    JniUTFString path(env, filePath);
 
-    jclass formatEnum = env->GetObjectClass(format);
+    JniLocalRef<jclass> formatEnum(env, env->GetObjectClass(format));
     jmethodID ordinalMethod = env->GetMethodID(formatEnum, "ordinal", "()I");
     jint formatOrdinal = env->CallIntMethod(format, ordinalMethod);
 
     f3d::image::SaveFormat saveFormat = static_cast<f3d::image::SaveFormat>(formatOrdinal);
     try
     {
-      img->save(path, saveFormat);
+      img->save(path.c_str(), saveFormat);
     }
     catch (const f3d::image::write_exception& e)
     {
       F3DThrowJavaException(env, "app/f3d/F3D/Image$WriteException", e.what());
     }
 
-    env->ReleaseStringUTFChars(filePath, path);
     return self;
   }
 
   JNIEXPORT jbyteArray JAVA_BIND(Image, saveBuffer)(JNIEnv* env, jobject self, jobject format)
   {
-    jclass cls = env->GetObjectClass(self);
-    jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
-    jlong ptr = env->GetLongField(self, fid);
-    f3d::image* img = reinterpret_cast<f3d::image*>(ptr);
+    f3d::image* img = GetImage(env, self);
 
-    jclass formatEnum = env->GetObjectClass(format);
+    JniLocalRef<jclass> formatEnum(env, env->GetObjectClass(format));
     jmethodID ordinalMethod = env->GetMethodID(formatEnum, "ordinal", "()I");
     jint formatOrdinal = env->CallIntMethod(format, ordinalMethod);
 
@@ -228,62 +178,42 @@ extern "C"
 
   JNIEXPORT jstring JAVA_BIND(Image, toTerminalText)(JNIEnv* env, jobject self)
   {
-    jclass cls = env->GetObjectClass(self);
-    jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
-    jlong ptr = env->GetLongField(self, fid);
-    f3d::image* img = reinterpret_cast<f3d::image*>(ptr);
-
-    std::string text = img->toTerminalText();
+    std::string text = GetImage(env, self)->toTerminalText();
     return env->NewStringUTF(text.c_str());
   }
 
   JNIEXPORT jobject JAVA_BIND(Image, setMetadata)(
     JNIEnv* env, jobject self, jstring key, jstring value)
   {
-    jclass cls = env->GetObjectClass(self);
-    jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
-    jlong ptr = env->GetLongField(self, fid);
-    f3d::image* img = reinterpret_cast<f3d::image*>(ptr);
+    f3d::image* img = GetImage(env, self);
 
-    const char* keyStr = env->GetStringUTFChars(key, nullptr);
-    const char* valueStr = env->GetStringUTFChars(value, nullptr);
+    JniUTFString keyStr(env, key);
+    JniUTFString valueStr(env, value);
 
-    img->setMetadata(keyStr, valueStr);
-
-    env->ReleaseStringUTFChars(key, keyStr);
-    env->ReleaseStringUTFChars(value, valueStr);
+    img->setMetadata(keyStr.c_str(), valueStr.c_str());
 
     return self;
   }
 
   JNIEXPORT jstring JAVA_BIND(Image, getMetadata)(JNIEnv* env, jobject self, jstring key)
   {
-    jclass cls = env->GetObjectClass(self);
-    jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
-    jlong ptr = env->GetLongField(self, fid);
-    f3d::image* img = reinterpret_cast<f3d::image*>(ptr);
+    f3d::image* img = GetImage(env, self);
 
-    const char* keyStr = env->GetStringUTFChars(key, nullptr);
+    JniUTFString keyStr(env, key);
     std::string value;
     try
     {
-      value = img->getMetadata(keyStr);
+      value = img->getMetadata(keyStr.c_str());
     }
     catch (const f3d::image::metadata_exception& e)
     {
       F3DThrowJavaException(env, "app/f3d/F3D/Image$MetadataException", e.what());
     }
-    env->ReleaseStringUTFChars(key, keyStr);
     return env->ExceptionCheck() ? nullptr : env->NewStringUTF(value.c_str());
   }
 
   JNIEXPORT jobject JAVA_BIND(Image, allMetadata)(JNIEnv* env, jobject self)
   {
-    jclass cls = env->GetObjectClass(self);
-    jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
-    jlong ptr = env->GetLongField(self, fid);
-    f3d::image* img = reinterpret_cast<f3d::image*>(ptr);
-
-    return CreateStringList(env, img->allMetadata());
+    return CreateStringList(env, GetImage(env, self)->allMetadata());
   }
 }
