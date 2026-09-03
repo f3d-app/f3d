@@ -81,3 +81,11 @@ The following WebAssembly methods have been removed in favor of new properties, 
 ```cpp
 if (scene.supports("some.obj") == f3d::file_availability::SUPPORTED)
 ```
+
+Other languages API behavior changed accordingly:
+
+- C API: `f3d_scene_supports()` used to return 1 if the file was supported and 0 otherwise. It now returns an int: 0 if supported, 1 for unsupported extension, 2 for unsupported content, -1 if the scene or file path is NULL.
+- Java API: `Scene.supports()` used to return a boolean. It now returns the `Scene.FileAvailability` enum and throws `IllegalArgumentException` if the file path is null.
+- Python API: `scene.supports()` used to return bool. Now returns f3d.FileAvailability.
+- Webassembly API: `scene.supports()` used to return bool. Now returns enum FileAvailability.
+

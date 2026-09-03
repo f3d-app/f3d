@@ -434,16 +434,21 @@ extern "C"
     return jsceneInfo;
   }
 
-  JNIEXPORT jboolean JAVA_BIND(Scene, supports)(JNIEnv* env, jobject self, jstring filePath)
+  JNIEXPORT jobject JAVA_BIND(Scene, supports)(JNIEnv* env, jobject self, jstring filePath)
   {
     if (!filePath)
     {
-      return false;
+      F3DThrowJavaException(env, "java/lang/IllegalArgumentException", "filePath must not be null");
+      return nullptr;
     }
 
     JniUTFString str(env, filePath);
     f3d::file_availability result = GetEngine(env, self)->getScene().supports(str.c_str());
-    return result == f3d::file_availability::SUPPORTED;
+
+    JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Scene$FileAvailability"));
+    jmethodID fromValueMethod =
+      env->GetStaticMethodID(enumClass, "fromValue", "(I)Lapp/f3d/F3D/Scene$FileAvailability;");
+    return env->CallStaticObjectMethod(enumClass, fromValueMethod, static_cast<int>(result));
   }
 
   JNIEXPORT jobject JAVA_BIND(Scene, loadAnimationTime)(

@@ -792,7 +792,7 @@ PYBIND11_MODULE(pyf3d, module)
 
   // f3d::file_availability
   py::enum_<f3d::file_availability>(module, "FileAvailability")
-    .value("AVAILABLE", f3d::file_availability::SUPPORTED)
+    .value("SUPPORTED", f3d::file_availability::SUPPORTED)
     .value("UNSUPPORTED_EXTENSION", f3d::file_availability::UNSUPPORTED_EXTENSION)
     .value("UNSUPPORTED_CONTENT", f3d::file_availability::UNSUPPORTED_CONTENT)
     .export_values();

@@ -19,6 +19,34 @@ public class Scene {
         public NodeException(String message) { super(message); }
     }
 
+    /**
+     * Enumeration of file availability levels.
+     */
+    public enum FileAvailability {
+        SUPPORTED(0),
+        UNSUPPORTED_EXTENSION(1),
+        UNSUPPORTED_CONTENT(2);
+
+        private final int value;
+
+        FileAvailability(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public static FileAvailability fromValue(int value) {
+            for (FileAvailability availability : FileAvailability.values()) {
+                if (availability.value == value) {
+                    return availability;
+                }
+            }
+            throw new IllegalArgumentException("Invalid FileAvailability value: " + value);
+        }
+    }
+
     public Scene(long nativeAddress) {
         mNativeAddress = nativeAddress;
     }
@@ -196,9 +224,10 @@ public class Scene {
      * Check if a file path is supported by the scene.
      *
      * @param filePath file path to check
-     * @return true if supported, false otherwise
+     * @throws IllegalArgumentException if filePath is null
+     * @return file availability
      */
-    public native boolean supports(String filePath);
+    public native FileAvailability supports(String filePath);
 
     /**
      * Load added files at provided time value if they contain any animation.
