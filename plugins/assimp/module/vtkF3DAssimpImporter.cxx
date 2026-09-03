@@ -1490,7 +1490,7 @@ bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream, std::string& h
     ltrim(line4);
 
     if (line1.starts_with("0") && line2.starts_with("SECTION") && line3.starts_with("2") &&
-      ((line4.starts_with("HEADER")) || line4.starts_with("ENTITIES")))
+      (line4.starts_with("HEADER") || line4.starts_with("ENTITIES")))
     {
       hint = "dxf";
       return true;
