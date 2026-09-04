@@ -642,8 +642,8 @@ int vtkF3DAlembicReader::RequestInformation(vtkInformation* vtkNotUsed(request),
   }
   if (timeSteps.size() > 0)
   {
-    outInfo->Set(
-      vtkStreamingDemandDrivenPipeline::TIME_STEPS(), timeSteps.data(), static_cast<int>(timeSteps.size()));
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), timeSteps.data(),
+      static_cast<int>(timeSteps.size()));
   }
 
   return 1;
