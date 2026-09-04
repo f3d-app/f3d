@@ -1,3 +1,10 @@
+/**
+ * @file vtkF3DOpenXRFramebufferPass.h
+ * @brief Framebuffer pass for rendering in XR mode.
+ *
+ * Required as vtkFramebufferPass does not adapt the camera when rendering in XR mode.
+ *
+ */
 #ifndef vtkF3DOpenXRFramebufferPass_h
 #define vtkF3DOpenXRFramebufferPass_h
 
