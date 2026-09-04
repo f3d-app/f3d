@@ -548,7 +548,7 @@ public:
       }
       else
       {
-        const auto& times = ts->getStoredTimes();
+        const std::vector<double> times = ts->getStoredTimes();
         for (auto& timeStep : times)
         {
           timeStepSet.insert(timeStep);
@@ -559,7 +559,8 @@ public:
     {
       start = *timeStepSet.begin();
       end = *timeStepSet.rbegin();
-      timeSteps = std::vector<double>(timeStepSet.begin(), timeStepSet.end());
+      timeSteps.resize(timeStepSet.size());
+      std::ranges::copy(timeStepSet, timeSteps.begin());
     }
   }
 
@@ -642,7 +643,7 @@ int vtkF3DAlembicReader::RequestInformation(vtkInformation* vtkNotUsed(request),
   if (timeSteps.size() > 0)
   {
     outInfo->Set(
-      vtkStreamingDemandDrivenPipeline::TIME_STEPS(), timeSteps.data(), (int)timeSteps.size());
+      vtkStreamingDemandDrivenPipeline::TIME_STEPS(), timeSteps.data(), static_cast<int>(timeSteps.size()));
   }
 
   return 1;
