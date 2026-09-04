@@ -1481,7 +1481,8 @@ bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream, std::string& h
     auto ltrim = [](std::string& dxfLine)
     {
       dxfLine.erase(dxfLine.begin(),
-        std::find_if(dxfLine.begin(), dxfLine.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+        std::find_if(
++          dxfLine.begin(), dxfLine.end(), [](unsigned char ch) { return !std::isspace(ch); }));
     };
 
     ltrim(line1);
