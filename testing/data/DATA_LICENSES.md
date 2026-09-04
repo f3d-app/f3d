@@ -20,6 +20,7 @@
 - bot2.wrl: VTK Data: BSD-3-Clause
 - Box_draco\*: glTF-Sample-Models/Cesium: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - BoxAnimated\*: glTF-Sample-Models/Cesium: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- bridge.dxf: GNU LGPL license (https://people.math.sc.edu/Burkardt/data/dxf/dxf.html)
 - Cameras.gltf: glTF-Sample-Models: Public Domain
 - cow.vtk: VTK Data: BSD-3-Clause
 - cow.vtp: VTK Data: BSD-3-Clause
