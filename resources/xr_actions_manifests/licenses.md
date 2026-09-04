@@ -1,4 +1,4 @@
 # VTK OpenXR Action Manifest
 
-Sourced from VTK's vtk_openxr_actions.json:
+Sourced from VTK's action manifests:
 Copyright © Kitware SAS

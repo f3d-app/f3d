@@ -225,7 +225,10 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
 #if F3D_MODULE_OPENXR
       return vtkSmartPointer<vtkF3DOpenXRFramebufferPass>::New();
 #else
-      assert(false); // Unreachable
+      // LCOV_EXCL_START
+      // unreachable
+      assert(false);
+      // LCOV_EXCL_STOP
 #endif
     }
     return vtkSmartPointer<vtkFramebufferPass>::New();

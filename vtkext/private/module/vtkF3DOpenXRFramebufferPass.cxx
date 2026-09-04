@@ -57,6 +57,9 @@ void vtkF3DOpenXRFramebufferPass::RenderDelegate(const vtkRenderState* s, int wi
 
   this->NumberOfRenderedProps += this->DelegatePass->GetNumberOfRenderedProps();
 #else
-  assert(false); // Unreachable
+  // LCOV_EXCL_START
+  // unreachable
+  assert(false);
+  // LCOV_EXCL_STOP
 #endif
 }
