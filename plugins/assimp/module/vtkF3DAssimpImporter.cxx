@@ -41,9 +41,12 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
+#include <algorithm>
+#include <cctype>
 #include <memory>
 #include <regex>
 #include <set>
+#include <string>
 #include <unordered_map>
 
 vtkStandardNewMacro(vtkF3DAssimpImporter);
@@ -1474,8 +1477,21 @@ bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream, std::string& h
     parser->ReadLine(line3) == vtkParseResult::EndOfLine &&
     parser->ReadLine(line4) == vtkParseResult::EndOfLine)
   {
+
+    auto ltrim = [](std::string& dxfLine)
+    {
+      dxfLine.erase(dxfLine.begin(),
+        std::find_if(
+          dxfLine.begin(), dxfLine.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+    };
+
+    ltrim(line1);
+    ltrim(line2);
+    ltrim(line3);
+    ltrim(line4);
+
     if (line1.starts_with("0") && line2.starts_with("SECTION") && line3.starts_with("2") &&
-      line4.starts_with("HEADER"))
+      (line4.starts_with("HEADER") || line4.starts_with("ENTITIES")))
     {
       hint = "dxf";
       return true;

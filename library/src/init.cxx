@@ -12,9 +12,11 @@
 #include "vtkF3DWebPReader.h"
 #endif
 
+#include <vtkCellArray.h>
 #include <vtkImageReader2Factory.h>
 #include <vtkLogger.h>
 #include <vtkNew.h>
+#include <vtkOpenGLVertexBufferObject.h>
 #include <vtkVersion.h>
 
 #include <memory>
@@ -41,6 +43,9 @@ init::init()
   // Disable vtkLogger in case VTK was built with log support
   vtkLogger::SetStderrVerbosity(vtkLogger::VERBOSITY_OFF);
   vtkLogger::SetInternalVerbosityLevel(vtkLogger::VERBOSITY_OFF);
+
+  vtkOpenGLVertexBufferObject::SetGlobalCoordShiftAndScaleEnabled(0);
+  vtkCellArray::SetDefaultStorageIs64Bit(false);
 
   // instantiate our own polydata mapper and output windows
   vtkNew<vtkF3DObjectFactory> factory;

@@ -9,7 +9,6 @@
 
 #include <vtkMath.h>
 #include <vtkMathUtilities.h>
-#include <vtkSmartPointer.h>
 
 #include <algorithm>
 #include <cassert>
@@ -25,6 +24,36 @@ constexpr unsigned int INT_MAX_UINT = static_cast<unsigned int>(std::numeric_lim
 
 namespace options_tools
 {
+struct cache
+{
+  static cache& getInstance()
+  {
+    static std::unique_ptr<cache> instance;
+    if (!instance)
+    {
+      instance = std::make_unique<cache>();
+    }
+    return *instance;
+  }
+
+  cache()
+    : ShortHexRegex("#([0-9a-f])([0-9a-f])([0-9a-f])", std::regex_constants::icase)
+    , HexRegex("#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})", std::regex_constants::icase)
+    , RgbRegex("rgb\\((\\d{1,3}),(\\d{1,3}),(\\d{1,3})\\)", std::regex_constants::icase)
+    , HueRegex(
+        "(hsl|hsv|hwb)\\((\\d{1,3}),(\\d{1,3})%?,(\\d{1,3})%?\\)", std::regex_constants::icase)
+    , CmykRegex("cmyk\\((\\d{1,3})%?,(\\d{1,3})%?,(\\d{1,3})%?,(\\d{1,3})%?\\)",
+        std::regex_constants::icase)
+  {
+  }
+
+  vtkNew<vtkF3DNamedColors> NamedColors;
+  const std::regex ShortHexRegex;
+  const std::regex HexRegex;
+  const std::regex RgbRegex;
+  const std::regex HueRegex;
+  const std::regex CmykRegex;
+};
 
 //----------------------------------------------------------------------------
 /**
@@ -218,9 +247,8 @@ color_t parse(const std::string& str)
   try
   {
     /* Short hex format search */
-    const std::regex shortHexRegex("#([0-9a-f])([0-9a-f])([0-9a-f])", std::regex_constants::icase);
     std::smatch shortHexMatch;
-    if (std::regex_match(strCompact, shortHexMatch, shortHexRegex))
+    if (std::regex_match(strCompact, shortHexMatch, cache::getInstance().ShortHexRegex))
     {
       return color_t(
         std::stoul(shortHexMatch[1].str() + shortHexMatch[1].str(), nullptr, 16) / 255.0,
@@ -229,10 +257,8 @@ color_t parse(const std::string& str)
     }
 
     /* Hex format search */
-    const std::regex hexRegex(
-      "#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})", std::regex_constants::icase);
     std::smatch hexMatch;
-    if (std::regex_match(strCompact, hexMatch, hexRegex))
+    if (std::regex_match(strCompact, hexMatch, cache::getInstance().HexRegex))
     {
       return color_t(                                  //
         std::stoul(hexMatch[1], nullptr, 16) / 255.0,  //
@@ -241,10 +267,8 @@ color_t parse(const std::string& str)
     }
 
     /* RGB format search */
-    const std::regex rgbRegex(
-      "rgb\\((\\d{1,3}),(\\d{1,3}),(\\d{1,3})\\)", std::regex_constants::icase);
     std::smatch rgbMatch;
-    if (std::regex_match(strCompact, rgbMatch, rgbRegex))
+    if (std::regex_match(strCompact, rgbMatch, cache::getInstance().RgbRegex))
     {
       rgb[0] = std::stod(rgbMatch[1]) / 255.0;
       rgb[1] = std::stod(rgbMatch[2]) / 255.0;
@@ -257,10 +281,8 @@ color_t parse(const std::string& str)
     }
 
     /* Hue-based format search: hsl, hsv, hwb */
-    const std::regex hueRegex(
-      "(hsl|hsv|hwb)\\((\\d{1,3}),(\\d{1,3})%?,(\\d{1,3})%?\\)", std::regex_constants::icase);
     std::smatch hueMatch;
-    if (std::regex_match(strCompact, hueMatch, hueRegex))
+    if (std::regex_match(strCompact, hueMatch, cache::getInstance().HueRegex))
     {
       const double h = std::stod(hueMatch[2]) / 360.0;
       double s = std::stod(hueMatch[3]) / 100.0;
@@ -296,10 +318,8 @@ color_t parse(const std::string& str)
     }
 
     /* CMYK format search */
-    const std::regex cmykRegex(
-      "cmyk\\((\\d{1,3})%?,(\\d{1,3})%?,(\\d{1,3})%?,(\\d{1,3})%?\\)", std::regex_constants::icase);
     std::smatch cmykMatch;
-    if (std::regex_match(strCompact, cmykMatch, cmykRegex))
+    if (std::regex_match(strCompact, cmykMatch, cache::getInstance().CmykRegex))
     {
       const double c = std::stod(cmykMatch[1]) / 100.0;
       const double m = std::stod(cmykMatch[2]) / 100.0;
@@ -316,7 +336,7 @@ color_t parse(const std::string& str)
     }
 
     /* Named colors search */
-    vtkNew<vtkF3DNamedColors> color;
+    vtkF3DNamedColors* color = cache::getInstance().NamedColors;
     if (color->ColorExists(strCompact))
     {
       double rgba[4];

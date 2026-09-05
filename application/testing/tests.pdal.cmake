@@ -1,10 +1,10 @@
 ## Tests that needs pdal plugin
 ## This file is only added if pdal is enabled
-f3d_test(NAME TestLAS DATA warsaw_small.las PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1)
+f3d_test(NAME TestLAS DATA warsaw_small.las PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1 THRESHOLD 0.09) # Threshold needed for GLES
 f3d_test(NAME TestLAZ DATA simple.laz PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1)
 f3d_test(NAME TestBPF DATA simple-extra.bpf PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1)
-f3d_test(NAME TestTerraScanBin DATA 20020715-time-color.bin PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1)
-f3d_test(NAME TestPCD DATA autzen-utm.pcd PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1)
+f3d_test(NAME TestTerraScanBin DATA 20020715-time-color.bin PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1 THRESHOLD 0.05) # Threshold needed for GLES
+f3d_test(NAME TestPCD DATA autzen-utm.pcd PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1 THRESHOLD 0.06) # Threshold needed for GLES
 f3d_test(NAME TestPTX DATA 1.2-with-color.ptx PLUGIN pdal ARGS --scalar-coloring --coloring-array=Color --coloring-component=-1)
 f3d_test(NAME TestSBET DATA autzen_trim.sbet PLUGIN pdal ARGS --scalar-coloring --coloring-array=GpsTime)
 

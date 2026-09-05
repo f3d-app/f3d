@@ -1304,14 +1304,17 @@ public:
   }
 
   /* Record the current window geometry, which can only be queried while the window is still
-   * alive.
+   * alive. The size is recorded in the same unit as the resolution option, which is scaled by the
+   * DPI when applied, so that restoring it does not scale it a second time.
    */
   void RecordWindowGeometry()
   {
-    const f3d::window& window = this->Engine->getWindow();
+    f3d::window& window = this->Engine->getWindow();
     const auto [width, height] = window.getSize();
     const auto [left, top] = window.getPosition();
-    this->LastWindowGeometry = { width, height, left, top };
+    const double dpiScale = window.getDPIScale();
+    this->LastWindowGeometry = { static_cast<int>(std::lround(width / dpiScale)),
+      static_cast<int>(std::lround(height / dpiScale)), left, top };
   }
 
   /* Store the last recorded window geometry in the cache so that the next run can restore it */
@@ -1339,7 +1342,9 @@ public:
     root["window"] = windowJson;
 
     stream << root.dump(2);
-    f3d::log::debug("Window geometry cached in ", cachePath.string());
+    f3d::log::debug("Window geometry ", this->LastWindowGeometry.Width, "x",
+      this->LastWindowGeometry.Height, " at ", this->LastWindowGeometry.Left, ",",
+      this->LastWindowGeometry.Top, " cached in ", cachePath.string());
   }
 
   struct WindowGeometry

@@ -81,8 +81,15 @@ public:
           widget->On();
           vtkProgressBarRepresentation* rep =
             vtkProgressBarRepresentation::SafeDownCast(widget->GetRepresentation());
-          rep->SetProgressRate(*static_cast<double*>(callData));
-          widget->Render();
+
+          double progress = *static_cast<double*>(callData);
+
+          // Skipping progress update if the difference is too small to avoid too many renders
+          if (progress - rep->GetProgressRate() > 0.02)
+          {
+            rep->SetProgressRate(progress);
+            widget->Render();
+          }
         }
       });
     importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
@@ -131,7 +138,7 @@ public:
     scene_impl::internals::ProgressDataStruct callbackData;
     callbackData.timer = timer;
     callbackData.widget = progressWidget;
-    if (this->Interactor)
+    if (this->Interactor && !this->Window.isOffscreen())
     {
       f3d::color_t color = this->Options.ui.loader_progress_color;
       scene_impl::internals::CreateProgressRepresentationAndCallback(

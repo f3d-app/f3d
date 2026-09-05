@@ -291,8 +291,11 @@ void vtkF3DRenderer::Initialize()
   this->AddActor(this->UIActor);
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513) && !defined(F3D_USE_GLES)
-  this->AddActor(this->GridAxesActor);
-  this->GridAxesActor->SetUseBounds(false);
+  // Add the grid axes actor if already initialized
+  if (this->GridAxesActor != nullptr)
+  {
+    this->AddActor(this->GridAxesActor);
+  }
 #endif
 
   this->GridConfigured = false;
@@ -543,8 +546,6 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   {
     vtkNew<vtkOpenGLFXAAPass> fxaaP;
     fxaaP->SetDelegatePass(renderingPass);
-
-    this->SetPass(fxaaP);
     renderingPass = fxaaP;
   }
 
@@ -1002,6 +1003,13 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
     }
     else
     {
+      if (this->GridAxesActor == nullptr)
+      {
+        this->GridAxesActor = vtkSmartPointer<vtkGridAxesActor3D>::New();
+        this->GridAxesActor->SetUseBounds(false);
+        this->AddActor(this->GridAxesActor);
+      }
+
       this->GridAxesActor->SetOrientation(orientation);
       this->GridAxesActor->SetVisibility(true);
 
@@ -1022,7 +1030,11 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
       this->GridAxesConfigured = true;
     }
   }
-  this->GridAxesActor->SetVisibility(show);
+
+  if (this->GridAxesActor != nullptr)
+  {
+    this->GridAxesActor->SetVisibility(show);
+  }
 #endif
 #endif
 }
