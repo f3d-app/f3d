@@ -5,6 +5,7 @@
 #include <vtkMemoryResourceStream.h>
 #include <vtkNew.h>
 #include <vtkPolyData.h>
+#include <vtkStringOutputWindow.h>
 
 #include "vtkF3DLYSReader.h"
 
@@ -77,6 +78,8 @@ bool TestReaderUpdateFails(const std::vector<uint8_t>& data)
 int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
 {
   vtkLogger::SetStderrVerbosity(vtkLogger::VERBOSITY_OFF);
+  vtkNew<vtkStringOutputWindow> outputWindow;
+  vtkOutputWindow::SetInstance(outputWindow);
 
   if (vtkF3DLYSReader::CanReadFile(nullptr))
   {
@@ -194,7 +197,7 @@ int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
   // Test RequestData error branches
   // 1. Short container header
   {
-    std::vector<uint8_t> shortData = { 1, 2, 3, 4 };
+    const std::vector<uint8_t> shortData = { 1, 2, 3, 4 };
     if (!TestReaderUpdateFails(shortData))
     {
       std::cerr << "Unexpected success on short container header\n";
@@ -220,7 +223,7 @@ int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
 
   // 3. Malformed JSON manifest
   {
-    auto data = BuildLysData("not a json");
+    const auto data = BuildLysData("not a json");
     if (!TestReaderUpdateFails(data))
     {
       std::cerr << "Unexpected success on malformed JSON\n";
@@ -230,7 +233,7 @@ int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
 
   // 4. Missing mangoFiles key
   {
-    auto data = BuildLysData("{\"version\": 1}");
+    const auto data = BuildLysData("{\"version\": 1}");
     if (!TestReaderUpdateFails(data))
     {
       std::cerr << "Unexpected success on missing mangoFiles\n";
@@ -240,8 +243,9 @@ int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
 
   // 5. Missing geometry .bin entry (only scene.bin or non-.bin entries)
   {
-    auto data = BuildLysData("{\"mangoFiles\": {\"scene.bin\": {\"offset\": \"0\", \"size\": 0}, "
-                             "\"other.txt\": {\"offset\": \"0\", \"size\": 0}}}");
+    const auto data =
+      BuildLysData("{\"mangoFiles\": {\"scene.bin\": {\"offset\": \"0\", \"size\": 0}, "
+                   "\"other.txt\": {\"offset\": \"0\", \"size\": 0}}}");
     if (!TestReaderUpdateFails(data))
     {
       std::cerr << "Unexpected success on missing geometry bin\n";
@@ -251,7 +255,7 @@ int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
 
   // 6. Geometry blob read fails (stream truncated before geomSize)
   {
-    auto data =
+    const auto data =
       BuildLysData("{\"mangoFiles\": {\"mesh.bin\": {\"offset\": \"0\", \"size\": 100}}}");
     if (!TestReaderUpdateFails(data))
     {
@@ -262,8 +266,8 @@ int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
 
   // 7. Geometry blob too small for MeshHeader (< 12 bytes)
   {
-    std::vector<uint8_t> smallGeom(8, 0);
-    auto data =
+    const std::vector<uint8_t> smallGeom(8, 0);
+    const auto data =
       BuildLysData("{\"mangoFiles\": {\"mesh.bin\": {\"offset\": \"0\", \"size\": 8}}}", smallGeom);
     if (!TestReaderUpdateFails(data))
     {
@@ -280,7 +284,7 @@ int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
     meshHeader.reserved = 0;
     std::vector<uint8_t> geom(sizeof(MeshHeader));
     std::memcpy(geom.data(), &meshHeader, sizeof(MeshHeader));
-    auto data =
+    const auto data =
       BuildLysData("{\"mangoFiles\": {\"mesh.bin\": {\"offset\": \"0\", \"size\": 12}}}", geom);
     if (!TestReaderUpdateFails(data))
     {
@@ -297,7 +301,7 @@ int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
     meshHeader.reserved = 0;
     std::vector<uint8_t> geom(sizeof(MeshHeader));
     std::memcpy(geom.data(), &meshHeader, sizeof(MeshHeader));
-    auto data =
+    const auto data =
       BuildLysData("{\"mangoFiles\": {\"mesh.bin\": {\"offset\": \"0\", \"size\": 12}}}", geom);
     if (!TestReaderUpdateFails(data))
     {
@@ -314,11 +318,11 @@ int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
     meshHeader.reserved = 0;
     std::vector<uint8_t> geom(sizeof(MeshHeader) + 3 * sizeof(uint32_t) + 3 * sizeof(float));
     std::memcpy(geom.data(), &meshHeader, sizeof(MeshHeader));
-    uint32_t indices[3] = { 0, 5, 0 }; // 5 >= 1 is out of bounds
+    const uint32_t indices[3] = { 0, 5, 0 }; // 5 >= 1 is out of bounds
     std::memcpy(geom.data() + sizeof(MeshHeader), indices, sizeof(indices));
-    float coords[3] = { 0.0f, 0.0f, 0.0f };
+    const float coords[3] = { 0.0f, 0.0f, 0.0f };
     std::memcpy(geom.data() + sizeof(MeshHeader) + sizeof(indices), coords, sizeof(coords));
-    auto data =
+    const auto data =
       BuildLysData("{\"mangoFiles\": {\"mesh.bin\": {\"offset\": \"0\", \"size\": 36}}}", geom);
     if (!TestReaderUpdateFails(data))
     {
@@ -372,7 +376,7 @@ int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
   }
   {
     // Invalid JSON in CanReadFile
-    auto data = BuildLysData("not json");
+    const auto data = BuildLysData("not json");
     vtkNew<vtkMemoryResourceStream> stream;
     stream->SetBuffer(data.data(), data.size(), true);
     if (vtkF3DLYSReader::CanReadFile(stream))

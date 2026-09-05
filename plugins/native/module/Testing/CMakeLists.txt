@@ -30,6 +30,9 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
   set_tests_properties(f3d::vtkextNativeCxx-TestF3DPLYReader
     PROPERTIES
     FAIL_REGULAR_EXPRESSION "")
+  set_tests_properties(f3d::vtkextNativeCxx-TestF3DLYSReader
+    PROPERTIES
+    FAIL_REGULAR_EXPRESSION "")
   set_tests_properties(f3d::vtkextNativeCxx-TestF3DQuakeMDLImporterInexistent
     PROPERTIES
     FAIL_REGULAR_EXPRESSION "")
