@@ -233,7 +233,7 @@ int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
 
   // 4. Missing mangoFiles key
   {
-    const auto data = BuildLysData("{\"version\": 1}");
+    const auto data = BuildLysData(R"({"version": 1})");
     if (!TestReaderUpdateFails(data))
     {
       std::cerr << "Unexpected success on missing mangoFiles\n";
@@ -243,9 +243,8 @@ int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
 
   // 5. Missing geometry .bin entry (only scene.bin or non-.bin entries)
   {
-    const auto data =
-      BuildLysData("{\"mangoFiles\": {\"scene.bin\": {\"offset\": \"0\", \"size\": 0}, "
-                   "\"other.txt\": {\"offset\": \"0\", \"size\": 0}}}");
+    const auto data = BuildLysData(
+      R"({"mangoFiles": {"scene.bin": {"offset": "0", "size": 0}, "other.txt": {"offset": "0", "size": 0}}})");
     if (!TestReaderUpdateFails(data))
     {
       std::cerr << "Unexpected success on missing geometry bin\n";
@@ -255,8 +254,7 @@ int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
 
   // 6. Geometry blob read fails (stream truncated before geomSize)
   {
-    const auto data =
-      BuildLysData("{\"mangoFiles\": {\"mesh.bin\": {\"offset\": \"0\", \"size\": 100}}}");
+    const auto data = BuildLysData(R"({"mangoFiles": {"mesh.bin": {"offset": "0", "size": 100}}})");
     if (!TestReaderUpdateFails(data))
     {
       std::cerr << "Unexpected success on truncated geometry blob\n";
@@ -268,7 +266,7 @@ int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
   {
     const std::vector<uint8_t> smallGeom(8, 0);
     const auto data =
-      BuildLysData("{\"mangoFiles\": {\"mesh.bin\": {\"offset\": \"0\", \"size\": 8}}}", smallGeom);
+      BuildLysData(R"({"mangoFiles": {"mesh.bin": {"offset": "0", "size": 8}}})", smallGeom);
     if (!TestReaderUpdateFails(data))
     {
       std::cerr << "Unexpected success on geometry blob smaller than MeshHeader\n";
@@ -285,7 +283,7 @@ int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
     std::vector<uint8_t> geom(sizeof(MeshHeader));
     std::memcpy(geom.data(), &meshHeader, sizeof(MeshHeader));
     const auto data =
-      BuildLysData("{\"mangoFiles\": {\"mesh.bin\": {\"offset\": \"0\", \"size\": 12}}}", geom);
+      BuildLysData(R"({"mangoFiles": {"mesh.bin": {"offset": "0", "size": 12}}})", geom);
     if (!TestReaderUpdateFails(data))
     {
       std::cerr << "Unexpected success on indexCount not multiple of 3\n";
@@ -302,7 +300,7 @@ int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
     std::vector<uint8_t> geom(sizeof(MeshHeader));
     std::memcpy(geom.data(), &meshHeader, sizeof(MeshHeader));
     const auto data =
-      BuildLysData("{\"mangoFiles\": {\"mesh.bin\": {\"offset\": \"0\", \"size\": 12}}}", geom);
+      BuildLysData(R"({"mangoFiles": {"mesh.bin": {"offset": "0", "size": 12}}})", geom);
     if (!TestReaderUpdateFails(data))
     {
       std::cerr << "Unexpected success on truncated mesh data\n";
@@ -323,7 +321,7 @@ int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
     const float coords[3] = { 0.0f, 0.0f, 0.0f };
     std::memcpy(geom.data() + sizeof(MeshHeader) + sizeof(indices), coords, sizeof(coords));
     const auto data =
-      BuildLysData("{\"mangoFiles\": {\"mesh.bin\": {\"offset\": \"0\", \"size\": 36}}}", geom);
+      BuildLysData(R"({"mangoFiles": {"mesh.bin": {"offset": "0", "size": 36}}})", geom);
     if (!TestReaderUpdateFails(data))
     {
       std::cerr << "Unexpected success on out-of-bounds vertex index\n";

@@ -110,7 +110,7 @@ int vtkF3DLYSReader::RequestData(
   for (auto it = mangoFiles.begin(); it != mangoFiles.end(); ++it)
   {
     const std::string& key = it.key();
-    if (key.size() > 4 && key.substr(key.size() - 4) == ".bin" && key != "scene.bin")
+    if (key.size() > 4 && key.ends_with(".bin") && key != "scene.bin")
     {
       geomKey = key;
       // offset field is a JSON string (e.g. "offset": "0"), verified across multiple .lys files.
