@@ -27,8 +27,35 @@ int test_scene()
 
   // Test adding files
 
-  int supported = f3d_scene_supports(scene, "test.obj");
-  (void)supported;
+  if (f3d_scene_supports(NULL, "test.obj") != -1 || f3d_scene_supports(scene, NULL) != -1)
+  {
+    puts("[ERROR] f3d_scene_supports should return -1 with NULL arguments");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  if (f3d_scene_supports(scene, F3D_TESTING_DATA_DIR "cow.vtp") != 0)
+  {
+    puts("[ERROR] a vtp file should be supported");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  if (f3d_scene_supports(scene, F3D_TESTING_DATA_DIR "unsupportedFile.dummy") != 1)
+  {
+    puts("[ERROR] an unknown extension should be reported as unsupported");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+#ifdef F3D_TESTING_CONTENT_CHECK
+  if (f3d_scene_supports(scene, F3D_TESTING_DATA_DIR "invalid.mdl") != 2)
+  {
+    puts("[ERROR] a file with an invalid header should be reported as unsupported content");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+#endif
 
   int add_result = f3d_scene_add(scene, F3D_TESTING_DATA_DIR "cow.vtp");
   (void)add_result;

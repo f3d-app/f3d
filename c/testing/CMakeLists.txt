@@ -31,6 +31,11 @@ target_link_libraries(f3d_c_api_tests PRIVATE c_api)
 target_compile_definitions(f3d_c_api_tests PRIVATE F3D_TESTING_DATA_DIR="${F3D_SOURCE_DIR}/testing/data/")
 target_compile_definitions(f3d_c_api_tests PRIVATE F3D_TESTING_TEMP_DIR="${CMAKE_BINARY_DIR}/Testing/Temporary/")
 
+# Content validation (unsupported content detection) needs proper CanReadFile support from VTK streams
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  target_compile_definitions(f3d_c_api_tests PRIVATE F3D_TESTING_CONTENT_CHECK=1)
+endif()
+
 # Add all the ADD_TEST for each test
 foreach (test ${f3d_c_api_tests_list})
   get_filename_component (TName ${test} NAME_WE)

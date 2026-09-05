@@ -88,4 +88,3 @@ Other languages API behavior changed accordingly:
 - Java API: `Scene.supports()` used to return a boolean. It now returns the `Scene.FileAvailability` enum and throws `IllegalArgumentException` if the file path is null.
 - Python API: `scene.supports()` used to return bool. Now returns f3d.FileAvailability.
 - Webassembly API: `scene.supports()` used to return bool. Now returns enum FileAvailability.
-
