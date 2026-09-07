@@ -143,6 +143,48 @@ const settings = {
       info.numberOfPoints > 0n && info.numberOfCells > 0n,
       "scene info should count points and cells",
     );
+
+    // add a custom mesh
+    let mesh = new Module.Mesh();
+    mesh.points = new Float32Array([0, 0, 0, 30, 0, 0, 0, 30, 0]);
+    mesh.normals = new Float32Array([0, 0, 1, 0, 0, 1, 0, 0, 1]);
+    mesh.textureCoordinates = new Float32Array([0, 0, 1, 0, 0, 1]);
+    mesh.faceSides = new Uint32Array([3]);
+    mesh.faceIndices = new Uint32Array([0, 1, 2]);
+    scene.addMesh(mesh);
+
+    const newInfo = scene.getSceneInfo();
+
+    utils.assert(
+      newInfo.numberOfFiles === 2 && newInfo.numberOfActors > 0,
+      "scene info should count the added file and its actors",
+    );
+
+    // check lights
+    utils.assert(scene.getLightCount() === 5, "scene should have five lights");
+
+    let light0 = scene.getLight(0);
+    utils.assert(
+      light0.type === Module.LightType.HEADLIGHT,
+      "first light should be headlight",
+    );
+
+    // modify first light color / intensity
+    light0.color = new Module.Color(1.0, 0.0, 0.0);
+    light0.intensity *= 3.0;
+    scene.updateLight(0, light0);
+
+    // remove last light
+    scene.removeLight(4);
+    utils.assert(scene.getLightCount() === 4, "scene should have four lights");
+
+    // remove all lights
+    scene.removeAllLights();
+    utils.assert(scene.getLightCount() === 0, "scene should have no lights");
+
+    // restore first headlight
+    scene.addLight(light0);
+    utils.assert(scene.getLightCount() === 1, "scene should have one light");
   },
 };
 

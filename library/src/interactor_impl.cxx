@@ -613,6 +613,7 @@ public:
       this->CommandBuffer.reset();
     }
 
+    this->AnimationManager->UpdateDynamicOptions();
     this->AnimationManager->SetDeltaTime(deltaTime);
     this->AnimationManager->Tick();
 
