@@ -13,6 +13,12 @@ endif()
 
 find_package(OpenCASCADE REQUIRED)
 
+option(F3D_USE_EXTERNAL_MINIZ "Use external miniz dependency" OFF)
+mark_as_advanced(F3D_USE_EXTERNAL_MINIZ)
+if(F3D_USE_EXTERNAL_MINIZ)
+  find_package(miniz REQUIRED)
+endif()
+
 if("${OpenCASCADE_VERSION}" VERSION_LESS "7.6.3")
   message(FATAL_ERROR "Plugin: OpenCASCADE: ${OpenCASCADE_VERSION} is not supported by F3D, please update your OpenCASCADE installation.")
 endif()
@@ -119,6 +125,18 @@ if (F3D_PLUGIN_OCCT_COLORING_SUPPORT)
     OPTIONS linear_deflection angular_deflection read_wire relative_deflection
   )
 endif()
+
+f3d_plugin_declare_reader(
+  NAME FCStd
+  EXTENSIONS fcstd
+  MIMETYPES application/x-extension-fcstd
+  VTK_READER vtkF3DFCStdReader
+  FORMAT_DESCRIPTION "FreeCAD Standard"
+  ${_SUPPORTS_STREAM}
+  CAN_READ STATIC
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/FCStd.inl"
+  OPTIONS linear_deflection angular_deflection read_wire relative_deflection
+)
 
 set(rpaths "")
 get_target_property(target_type TKernel TYPE)

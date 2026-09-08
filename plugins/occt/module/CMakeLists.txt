@@ -1,15 +1,30 @@
 set(classes
   vtkF3DOCCTReader
+  vtkF3DFCStdReader
   )
+
+set(_miniz_sources)
+if(NOT F3D_USE_EXTERNAL_MINIZ)
+  set(_miniz_sources "${F3D_SOURCE_DIR}/external/miniz/miniz.c")
+endif()
 
 vtk_module_add_module(f3d::vtkextOCCT
   NO_INSTALL
   FORCE_STATIC
-  CLASSES ${classes})
+  CLASSES ${classes}
+  SOURCES ${_miniz_sources})
 
 vtk_module_include(f3d::vtkextOCCT
   PRIVATE
     $<BUILD_INTERFACE:${OpenCASCADE_INCLUDE_DIR}>)
+
+if(F3D_USE_EXTERNAL_MINIZ)
+  vtk_module_link(f3d::vtkextOCCT PRIVATE miniz::miniz)
+else()
+  vtk_module_include(f3d::vtkextOCCT
+    PRIVATE
+      $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/miniz>)
+endif()
 
 set(_occt_link_libs "${OpenCASCADE_LIBRARIES}")
 if(CMAKE_LINK_GROUP_USING_RESCAN_SUPPORTED)

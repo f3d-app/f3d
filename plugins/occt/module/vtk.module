@@ -4,7 +4,9 @@ DESCRIPTION
   A VTK module for the OCCT plugin
 DEPENDS
   VTK::IOCore
+  VTK::IOXMLParser
   VTK::CommonCore
+  VTK::CommonDataModel
   VTK::CommonExecutionModel
   VTK::FiltersGeneral
 TEST_DEPENDS

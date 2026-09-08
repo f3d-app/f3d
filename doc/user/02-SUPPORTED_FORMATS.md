@@ -29,6 +29,7 @@ F3D supports the following file formats:
 | Initial Graphics Exchange Specification   | `.iges`, `.igs`                                | No         | NONE              | NO                | `occt`    | `IGES`                  |
 | Open CASCADE Technology BRep format       | `.brep`                                        | No         | NONE              | YES (VTK 9.6)     | `occt`    | `BREP`                  |
 | Open CASCADE Technology XBF format        | `.xbf`                                         | No         | NONE              | YES (VTK 9.6)     | `occt`    | `XBF`                   |
+| FreeCAD Standard                          | `.fcstd`                                       | No         | NONE              | YES (VTK 9.6)     | `occt`    | `FCStd`                 |
 | Alembic                                   | `.abc`                                         | No         | UNIQUE            | YES (VTK 9.6)     | `alembic` | `Alembic`               |
 | Wavefront OBJ                             | `.obj`                                         | Yes        | NONE              | PARTIAL (VTK 9.7) | `native`  | `OBJ`                   |
 | GL Transmission Format                    | `.gltf`                                        | Yes        | MULTI             | PARTIAL (VTK 9.6) | `native`  | `GLTF`, `GLTFDraco`     |
@@ -71,31 +72,35 @@ eg: `-DVDB.downsampling_factor=0.5` or using the `set_reader_option` [command](0
 
 For booleans, 0 means false, not 0 means true. Unsigned int will interpret anything that is not a non-negative integer as the default value.
 
-| Plugin   | Option Name                | Argument Type  | Description                                                                          |
-| -------- | -------------------------- | -------------- | ------------------------------------------------------------------------------------ |
-| `mdl`    | `QuakeMDL.skin_index`      | `unsigned int` | Select a particular skin from a `mdl` file. Uses 0-indexing, default is 0.           |
-| `occt`   | `STEP.linear_deflection`   | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
-| `occt`   | `STEP.angular_deflection`  | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
-| `occt`   | `STEP.relative_deflection` | `bool`         | Control if the deflection values are relative to object size, default is false.      |
-| `occt`   | `STEP.read_wire`           | `bool`         | Control if lines should be read, default is true.                                    |
-| `occt`   | `IGES.linear_deflection`   | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
-| `occt`   | `IGES.angular_deflection`  | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
-| `occt`   | `IGES.relative_deflection` | `bool`         | Control if the deflection values are relative to object size, default is false.      |
-| `occt`   | `IGES.read_wire`           | `bool`         | Control if lines should be read, default is true.                                    |
-| `occt`   | `BREP.linear_deflection`   | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
-| `occt`   | `BREP.angular_deflection`  | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
-| `occt`   | `BREP.relative_deflection` | `bool`         | Control if the deflection values are relative to object size, default is false.      |
-| `occt`   | `BREP.read_wire`           | `bool`         | Control if lines should be read, default is true.                                    |
-| `occt`   | `XBF.linear_deflection`    | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
-| `occt`   | `XBF.angular_deflection`   | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
-| `occt`   | `XBF.relative_deflection`  | `bool`         | Control if the deflection values are relative to object size, default is false.      |
-| `occt`   | `XBF.read_wire`            | `bool`         | Control if lines should be read, default is true.                                    |
-| `usd`    | `USD.resources_path`       | `string`       | Additional path to find USD plugInfo.json resources                                  |
-| `usd`    | `USD.subdivision_level`    | `unsigned int` | Specify the subdivision level to apply when specified. Default is 0 (no subdivision) |
-| `vdb`    | `VDB.downsampling_factor`  | `double`       | Control the level of downsampling when reading a volume, default is 0.1.             |
-| `webifc` | `IFC.circle_segments`      | `int`          | Number of segments for circular geometry, default is 12.                             |
-| `webifc` | `IFC.read_openings`        | `bool`         | Read IfcOpeningElement entities (doors/windows cutouts), default is false.           |
-| `webifc` | `IFC.read_spaces`          | `bool`         | Read IfcSpace entities (room volumes), default is false.                             |
+| Plugin   | Option Name                 | Argument Type  | Description                                                                          |
+| -------- | --------------------------- | -------------- | ------------------------------------------------------------------------------------ |
+| `mdl`    | `QuakeMDL.skin_index`       | `unsigned int` | Select a particular skin from a `mdl` file. Uses 0-indexing, default is 0.           |
+| `occt`   | `STEP.linear_deflection`    | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
+| `occt`   | `STEP.angular_deflection`   | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
+| `occt`   | `STEP.relative_deflection`  | `bool`         | Control if the deflection values are relative to object size, default is false.      |
+| `occt`   | `STEP.read_wire`            | `bool`         | Control if lines should be read, default is true.                                    |
+| `occt`   | `IGES.linear_deflection`    | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
+| `occt`   | `IGES.angular_deflection`   | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
+| `occt`   | `IGES.relative_deflection`  | `bool`         | Control if the deflection values are relative to object size, default is false.      |
+| `occt`   | `IGES.read_wire`            | `bool`         | Control if lines should be read, default is true.                                    |
+| `occt`   | `BREP.linear_deflection`    | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
+| `occt`   | `BREP.angular_deflection`   | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
+| `occt`   | `BREP.relative_deflection`  | `bool`         | Control if the deflection values are relative to object size, default is false.      |
+| `occt`   | `BREP.read_wire`            | `bool`         | Control if lines should be read, default is true.                                    |
+| `occt`   | `XBF.linear_deflection`     | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
+| `occt`   | `XBF.angular_deflection`    | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
+| `occt`   | `XBF.relative_deflection`   | `bool`         | Control if the deflection values are relative to object size, default is false.      |
+| `occt`   | `XBF.read_wire`             | `bool`         | Control if lines should be read, default is true.                                    |
+| `occt`   | `FCStd.linear_deflection`   | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
+| `occt`   | `FCStd.angular_deflection`  | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
+| `occt`   | `FCStd.relative_deflection` | `bool`         | Control if the deflection values are relative to object size, default is false.      |
+| `occt`   | `FCStd.read_wire`           | `bool`         | Control if lines should be read, default is true.                                    |
+| `usd`    | `USD.resources_path`        | `string`       | Additional path to find USD plugInfo.json resources                                  |
+| `usd`    | `USD.subdivision_level`     | `unsigned int` | Specify the subdivision level to apply when specified. Default is 0 (no subdivision) |
+| `vdb`    | `VDB.downsampling_factor`   | `double`       | Control the level of downsampling when reading a volume, default is 0.1.             |
+| `webifc` | `IFC.circle_segments`       | `int`          | Number of segments for circular geometry, default is 12.                             |
+| `webifc` | `IFC.read_openings`         | `bool`         | Read IfcOpeningElement entities (doors/windows cutouts), default is false.           |
+| `webifc` | `IFC.read_spaces`           | `bool`         | Read IfcSpace entities (room volumes), default is false.                             |
 
 ## Format details
 
