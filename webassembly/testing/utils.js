@@ -68,11 +68,13 @@ const utils = {
     f3d(settings)
       .then(async (Module) => {
         // write in the wasm filesystem
-        await utils.copyLocalFileToWasmFS(
-          Module,
-          "/src/testing/data/" + args.data,
-          args.data,
-        );
+        if (args.data) {
+          await utils.copyLocalFileToWasmFS(
+            Module,
+            "/src/testing/data/" + args.data,
+            args.data,
+          );
+        }
 
         for (const extraData of args.extraData ?? []) {
           await utils.copyLocalFileToWasmFS(
@@ -121,14 +123,18 @@ const utils = {
 
         const scene = Module.engineInstance.getScene();
 
-        utils.assert(
-          scene.supports(args.data) === Module.FileAvailability.SUPPORTED,
-          args.data + " is not supported",
-        );
+        if (args.data) {
+          utils.assert(
+            scene.supports(args.data) === Module.FileAvailability.SUPPORTED,
+            args.data + " is not supported",
+          );
+        }
 
         Module.runBefore?.(Module);
 
-        scene.add(args.data);
+        if (args.data) {
+          scene.add(args.data);
+        }
 
         Module.runAfter?.(Module);
 
