@@ -132,6 +132,7 @@ public:
   void SetGridColor(const std::vector<double>& color);
   void SetGridOpacity(const double strength);
   void SetGridReflection(const double strength);
+  void SetShadows(bool use);
   void SetAxesColor(const std::vector<double>& colorXAxis, const std::vector<double>& colorYAxis,
     const std::vector<double>& colorZAxis);
   ///@}
@@ -822,6 +823,7 @@ private:
   double GridColor[3] = { 0.0, 0.0, 0.0 };
   double GridOpacity = 1.0;
   double GridReflection = 0.0;
+  bool UseShadows = true;
 
   double ColorAxisX[3] = { 0.0, 0.0, 0.0 };
   double ColorAxisY[3] = { 0.0, 0.0, 0.0 };
