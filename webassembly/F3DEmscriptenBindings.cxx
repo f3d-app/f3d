@@ -1,6 +1,7 @@
 #include <emscripten/bind.h>
 
 #include <array>
+#include <memory>
 #include <stdexcept>
 
 #include "camera.h"
@@ -53,6 +54,77 @@ emscripten::val pairToJSArray(const std::pair<U, V>& p)
   jsArray.call<void>("push", p.second);
   return jsArray;
 }
+
+struct wasm_mesh_view : public f3d::mesh_view
+{
+  // not time support with wasm
+  std::array<double, 2> getTimeRange() const override
+  {
+    return { 0.0, 0.0 };
+  }
+
+  std::string getName() const override
+  {
+    return this->Name;
+  }
+
+  memory_view_t getMemoryView(double) const override
+  {
+    memory_view_t view;
+
+    view.pointCount = this->PointCount;
+
+    view.points.name = "points";
+    view.points.type = data_type::F32;
+    view.points.data = this->Points.empty() ? nullptr : this->Points.data();
+    view.points.components = 3;
+    view.points.stride = 3;
+    view.points.timeDependent = false;
+
+    view.normals.name = "normals";
+    view.normals.type = data_type::F32;
+    view.normals.data = this->Normals.empty() ? nullptr : this->Normals.data();
+    view.normals.components = 3;
+    view.normals.stride = 3;
+    view.normals.timeDependent = false;
+
+    view.textureCoordinates.name = "textureCoordinates";
+    view.textureCoordinates.type = data_type::F32;
+    view.textureCoordinates.data =
+      this->TextureCoordinates.empty() ? nullptr : this->TextureCoordinates.data();
+    view.textureCoordinates.components = 2;
+    view.textureCoordinates.stride = 2;
+    view.textureCoordinates.timeDependent = false;
+
+    view.polygons.offsetCount = this->PolygonOffsets.empty() ? 1 : this->PolygonOffsets.size();
+    view.polygons.offsets.name = "polygonOffsets";
+    view.polygons.offsets.type = data_type::U32;
+    view.polygons.offsets.data =
+      this->PolygonOffsets.empty() ? nullptr : this->PolygonOffsets.data();
+    view.polygons.offsets.components = 1;
+    view.polygons.offsets.stride = 1;
+    view.polygons.offsets.timeDependent = false;
+
+    view.polygons.indexCount = this->PolygonIndices.size();
+    view.polygons.indices.name = "polygonIndices";
+    view.polygons.indices.type = data_type::U32;
+    view.polygons.indices.data =
+      this->PolygonIndices.empty() ? nullptr : this->PolygonIndices.data();
+    view.polygons.indices.components = 1;
+    view.polygons.indices.stride = 1;
+    view.polygons.indices.timeDependent = false;
+
+    return view;
+  }
+
+  std::string Name;
+  size_t PointCount = 0;
+  std::vector<float> Points;
+  std::vector<float> Normals;
+  std::vector<float> TextureCoordinates;
+  std::vector<unsigned int> PolygonOffsets;
+  std::vector<unsigned int> PolygonIndices;
+};
 
 EMSCRIPTEN_BINDINGS(f3d)
 {
@@ -305,6 +377,45 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function(
       "addMesh", +[](f3d::scene& scene, f3d::mesh_t& mesh) -> f3d::scene&
       { return scene.add(mesh); }, emscripten::return_value_policy::reference())
+    .function(
+      "addMeshView",
+      +[](f3d::scene& scene, emscripten::val mesh) -> f3d::scene&
+      {
+        auto wrapped = std::make_shared<wasm_mesh_view>();
+        if (mesh.hasOwnProperty("name"))
+        {
+          wrapped->Name = mesh["name"].as<std::string>();
+        }
+        if (mesh.hasOwnProperty("pointCount"))
+        {
+          wrapped->PointCount = mesh["pointCount"].as<size_t>();
+        }
+        if (mesh.hasOwnProperty("points"))
+        {
+          wrapped->Points = emscripten::vecFromJSArray<float>(mesh["points"]);
+        }
+        if (mesh.hasOwnProperty("normals"))
+        {
+          wrapped->Normals = emscripten::vecFromJSArray<float>(mesh["normals"]);
+        }
+        if (mesh.hasOwnProperty("textureCoordinates"))
+        {
+          wrapped->TextureCoordinates =
+            emscripten::vecFromJSArray<float>(mesh["textureCoordinates"]);
+        }
+        if (mesh.hasOwnProperty("polygonOffsets"))
+        {
+          wrapped->PolygonOffsets =
+            emscripten::vecFromJSArray<unsigned int>(mesh["polygonOffsets"]);
+        }
+        if (mesh.hasOwnProperty("polygonIndices"))
+        {
+          wrapped->PolygonIndices =
+            emscripten::vecFromJSArray<unsigned int>(mesh["polygonIndices"]);
+        }
+        return scene.add(wrapped);
+      },
+      emscripten::return_value_policy::reference())
     .function(
       "addBuffer",
       +[](f3d::scene& scene, emscripten::val jsbuf) -> f3d::scene&
