@@ -13,6 +13,3 @@ vtk_module_add_module(f3d::vtkextNative
   CLASSES ${classes})
 
 vtk_module_set_properties(f3d::vtkextNative CXX_STANDARD 20)
-
-target_include_directories(vtkextNative PRIVATE
-  $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/nlohmann_json>)

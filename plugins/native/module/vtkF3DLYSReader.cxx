@@ -1,5 +1,6 @@
 #include "vtkF3DLYSReader.h"
 
+#include "vtk_nlohmannjson.h"
 #include <vtkCellArray.h>
 #include <vtkFileResourceStream.h>
 #include <vtkFloatArray.h>
@@ -12,8 +13,7 @@
 #include <vtkPolyData.h>
 #include <vtkResourceStream.h>
 #include <vtkVersion.h>
-
-#include <nlohmann/json.hpp>
+#include VTK_NLOHMANN_JSON(json.hpp)
 
 #include <cstdint>
 #include <cstring>

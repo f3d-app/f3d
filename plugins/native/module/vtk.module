@@ -10,6 +10,7 @@ PRIVATE_DEPENDS
   VTK::IOPLY
   VTK::RenderingOpenGL2
   VTK::zlib
+  VTK::nlohmannjson
 TEST_DEPENDS
   VTK::IOPLY
   VTK::TestingCore
