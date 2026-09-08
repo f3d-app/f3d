@@ -74,6 +74,14 @@ const utils = {
           args.data,
         );
 
+        for (const extraData of args.extraData ?? []) {
+          await utils.copyLocalFileToWasmFS(
+            Module,
+            "/src/testing/data/" + extraData,
+            extraData,
+          );
+        }
+
         await utils.copyLocalFileToWasmFS(
           Module,
           "/src/testing/baselines/" + args.baseline,
@@ -114,7 +122,7 @@ const utils = {
         const scene = Module.engineInstance.getScene();
 
         utils.assert(
-          scene.supports(args.data),
+          scene.supports(args.data) === Module.FileAvailability.SUPPORTED,
           args.data + " is not supported",
         );
 

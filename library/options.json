@@ -42,6 +42,10 @@
     },
     "force_reader": {
       "type": "string"
+    },
+    "skip_content_check": {
+      "type": "bool",
+      "default_value": "false"
     }
   },
   "render": {

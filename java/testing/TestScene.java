@@ -32,7 +32,23 @@ public class TestScene {
     Engine engine = Engine.createNone();
     Scene scene = engine.getScene();
 
-    scene.supports("test.obj");
+    if (scene.supports(sphere) != Scene.FileAvailability.SUPPORTED) {
+      throw new RuntimeException("a vtp file should be supported");
+    }
+    if (scene.supports(testDataPath + "data/unsupportedFile.dummy") != Scene.FileAvailability.UNSUPPORTED_EXTENSION) {
+      throw new RuntimeException("an unknown extension should not be supported");
+    }
+    // Content validation needs proper CanReadFile support from VTK
+    if (Boolean.getBoolean("f3d.testing.contentCheck")) {
+      if (scene.supports(testDataPath + "data/invalid.mdl") != Scene.FileAvailability.UNSUPPORTED_CONTENT) {
+        throw new RuntimeException("a file with an invalid header should have unsupported content");
+      }
+    }
+    try {
+      scene.supports(null);
+      throw new RuntimeException("Expected IllegalArgumentException was not thrown");
+    } catch (IllegalArgumentException e) {
+    }
 
     scene.add(sphere);
     scene.add(new ArrayList<>(Arrays.asList(world, logo)));

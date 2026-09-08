@@ -41,13 +41,20 @@ list(APPEND pyf3dTestsNoRender_list
      test_utils.py
     )
 
+set(pyf3d_test_env "PYTHONPATH=${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG>>")
+
+# Content validation needs proper CanReadFile support
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  list(APPEND pyf3d_test_env "F3D_TESTING_CONTENT_CHECK=1")
+endif()
+
 # Add all the ADD_TEST for each test
 foreach(test ${pyf3dTests_list})
   get_filename_component (TName ${test} NAME_WE)
   add_test(NAME libf3d_bindings_py::${TName} COMMAND ${Python_EXECUTABLE} -m pytest ${CMAKE_CURRENT_LIST_DIR}/${test})
   set_tests_properties(libf3d_bindings_py::${TName} PROPERTIES
     LABELS "libf3d;bindings;python"
-    ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG>>"
+    ENVIRONMENT "${pyf3d_test_env}"
     FAIL_REGULAR_EXPRESSION "[^X]FAILURES"
     TIMEOUT 180
   )

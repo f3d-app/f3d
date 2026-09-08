@@ -125,11 +125,12 @@ int f3d_scene_supports(f3d_scene_t* scene, const char* file_path)
 {
   if (!scene || !file_path)
   {
-    return 0;
+    return -1;
   }
 
   f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
-  return cpp_scene->supports(std::filesystem::path(file_path)) ? 1 : 0;
+  auto availability = cpp_scene->supports(std::filesystem::path(file_path));
+  return static_cast<int>(availability);
 }
 
 //----------------------------------------------------------------------------

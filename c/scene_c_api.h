@@ -189,7 +189,8 @@ extern "C"
    *
    * @param scene Scene handle.
    * @param file_path File path to check.
-   * @return 1 if supported, 0 otherwise.
+   * @return 0 if supported, 1 for unsupported extension, 2 for unsupported content, -1 if file path
+   * or scene is NULL.
    */
   F3D_EXPORT int f3d_scene_supports(f3d_scene_t* scene, const char* file_path);
 

@@ -2,12 +2,14 @@ import utils from "./utils.js";
 
 const settings = {
   runBefore: (Module) => {
+    const scene = Module.engineInstance.getScene();
+
     // does nothing but called for coverage
-    Module.engineInstance.getScene().addBuffer(new Array());
-    Module.engineInstance.getScene().clear();
+    scene.addBuffer(new Array());
+    scene.clear();
 
     utils.assert(
-      Module.engineInstance.getScene().getSceneHierarchy().length === 0,
+      scene.getSceneHierarchy().length === 0,
       "a cleared scene should have an empty scene hierarchy",
     );
 
@@ -18,6 +20,18 @@ const settings = {
         clearedInfo.numberOfPoints === 0n &&
         clearedInfo.numberOfCells === 0n,
       "a cleared scene should have zeroed scene info",
+    );
+
+    utils.assert(
+      scene.supports("unsupportedFile.dummy") ===
+        Module.FileAvailability.UNSUPPORTED_EXTENSION,
+      "an unknown extension should be reported as unsupported",
+    );
+
+    utils.assert(
+      scene.supports("invalid.mdl") ===
+        Module.FileAvailability.UNSUPPORTED_CONTENT,
+      "a file with an invalid header should be reported as unsupported content",
     );
 
     const options = Module.engineInstance.getOptions();
@@ -134,5 +148,6 @@ const settings = {
 
 utils.runRenderTest(settings, {
   data: "soldier_animations.mdl",
+  extraData: ["invalid.mdl", "unsupportedFile.dummy"],
   baseline: "TestWasmAnimation.png",
 });

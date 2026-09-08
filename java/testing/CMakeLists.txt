@@ -18,6 +18,12 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
 endif()
 
 set(java_test_args "-ea") # enable assertions
+
+# Content validation needs proper CanReadFile support
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  list(APPEND java_test_args "-Df3d.testing.contentCheck=true")
+endif()
+
 if (WIN32)
   list(APPEND java_test_args "--enable-native-access=ALL-UNNAMED")
 endif()

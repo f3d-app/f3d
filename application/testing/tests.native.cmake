@@ -51,7 +51,14 @@ f3d_test(NAME TestQuakeMDLSkinIndexOverflow DATA armor.mdl ARGS -DQuakeMDL.skin_
 f3d_test(NAME TestQuakeMDLGroupSkin DATA groupskin.mdl ARGS --animation-indices=1 --animation-time=0.3)
 f3d_test(NAME TestVerboseQuakeMDLAnimationNoNamingScheme ARGS --verbose DATA v_rock2.mdl REGEXP "0: flame" NO_BASELINE)
 f3d_test(NAME TestVerboseQuakeMDLGroupSkin ARGS --verbose DATA groupskin.mdl REGEXP "0: group_skin" NO_BASELINE)
-f3d_test(NAME TestVerboseQuakeMDLInvalid ARGS --verbose --force-reader=QuakeMDL DATA invalid_version.mdl REGEXP "Unsupported MDL version" NO_BASELINE)
+# Forcing the QuakeMDL reader on a file with an unsupported version: with VTK CanReadFile support the
+# file is rejected up front as unsupported content, otherwise the failure only surfaces at load time
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  set(_FORCE_READER_MDL_REGEXP "contains unsupported contents for a selected forced reader QuakeMDL")
+else()
+  set(_FORCE_READER_MDL_REGEXP "Unsupported MDL version")
+endif()
+f3d_test(NAME TestVerboseQuakeMDLInvalid ARGS --verbose --force-reader=QuakeMDL DATA invalid_version.mdl REGEXP ${_FORCE_READER_MDL_REGEXP} NO_BASELINE)
 
 f3d_test(NAME TestSPLAT DATA small.splat ARGS -osy --up=-Y --point-sprites-absolute-size --point-sprites-size=1)
 

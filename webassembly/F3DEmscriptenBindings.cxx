@@ -203,10 +203,15 @@ EMSCRIPTEN_BINDINGS(f3d)
   // TODO:
   // - add lights support
   // - add f3d::mesh_t support
+  emscripten::enum_<f3d::file_availability>("FileAvailability")
+    .value("SUPPORTED", f3d::file_availability::SUPPORTED)
+    .value("UNSUPPORTED_EXTENSION", f3d::file_availability::UNSUPPORTED_EXTENSION)
+    .value("UNSUPPORTED_CONTENT", f3d::file_availability::UNSUPPORTED_CONTENT);
+
   emscripten::class_<f3d::scene>("Scene")
     .function(
-      "supports",
-      +[](f3d::scene& scene, const std::string& path) -> bool { return scene.supports(path); })
+      "supports", +[](f3d::scene& scene, const std::string& path) -> f3d::file_availability
+      { return scene.supports(path); })
     .function(
       "add",
       +[](f3d::scene& scene, emscripten::val arg) -> f3d::scene&
