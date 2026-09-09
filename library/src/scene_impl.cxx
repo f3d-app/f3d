@@ -113,7 +113,21 @@ public:
 
   void CreateCLIProgressBarAndCallback(ProgressDataStruct* data,
     vtkImporter* importer, interactor_impl* interactor) {
-
+    vtkNew<vtkCallbackCommand> progressCallback;
+    progressCallback->SetClientData(data);
+    progressCallback->SetCallback(
+      [](vtkObject*, unsigned long, void* clientData, void* callData)
+      {
+        auto progressData = static_cast<ProgressDataStruct*>(clientData);
+        progressData->timer->StopTimer();
+        if(progressData->timer->GetElapsedTime() > 0.15 ||
+          vtksys::SystemTools::HasEnv("CTEST_F3D_PROGRESS_BAR")) {
+            // ... Progress bar logic
+        }
+        double progress = *static_cast<double*>(callData);
+      });
+    importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
+    data->timer->StartTimer();
   }
 
   void Load(const std::vector<std::pair<std::string, vtkSmartPointer<vtkImporter>>>& importers)
