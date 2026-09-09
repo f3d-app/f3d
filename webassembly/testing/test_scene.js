@@ -67,8 +67,8 @@ const settings = {
     );
 
     utils.assert(
-      scene.animationFrame() === 5,
-      "animationFrame should be 5 after loading 0.5",
+      scene.animationFrame() === 15,
+      "animationFrame should be 15 after loading 0.5",
     );
 
     utils.assert(

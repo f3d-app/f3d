@@ -513,6 +513,8 @@ EMSCRIPTEN_BINDINGS(f3d)
       "requestStop", &f3d::interactor::requestStop, emscripten::return_value_policy::reference())
     .function("triggerNotification", &f3d::interactor::triggerNotification,
       emscripten::return_value_policy::reference())
+    .function("triggerEventLoop", &f3d::interactor::triggerEventLoop,
+      emscripten::return_value_policy::reference())
     .function(
       "setNotificationCallback",
       +[](f3d::interactor& interactor, const emscripten::val& callback)
