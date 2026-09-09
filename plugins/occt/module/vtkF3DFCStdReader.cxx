@@ -1,5 +1,7 @@
 #include "vtkF3DFCStdReader.h"
 
+#include "vtkF3DArchiveReader.h"
+
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkCompositeDataSet.h>
@@ -43,8 +45,6 @@
 #include <gp_Quaternion.hxx>
 #include <gp_Trsf.hxx>
 
-#include <miniz.h>
-
 #include <algorithm>
 #include <array>
 #include <cstdio>
@@ -58,73 +58,6 @@
 namespace
 {
 constexpr std::array<unsigned char, 3> DEFAULT_COLOR = { 204, 204, 204 };
-
-//----------------------------------------------------------------------------
-class ArchiveReader
-{
-public:
-  ~ArchiveReader()
-  {
-    if (this->Opened)
-    {
-      mz_zip_reader_end(&this->Archive);
-    }
-  }
-
-  bool Open(vtkResourceStream* stream)
-  {
-    if (!stream || !stream->SupportSeek())
-    {
-      return false;
-    }
-    this->Stream = stream;
-    stream->Seek(0, vtkResourceStream::SeekDirection::End);
-    const mz_uint64 size = static_cast<mz_uint64>(stream->Tell());
-
-    mz_zip_zero_struct(&this->Archive);
-    this->Archive.m_pRead = &ArchiveReader::ReadCallback;
-    this->Archive.m_pIO_opaque = this;
-    this->Opened = mz_zip_reader_init(&this->Archive, size, 0);
-    return this->Opened;
-  }
-
-  bool Has(const std::string& name)
-  {
-    return this->Opened && mz_zip_reader_locate_file(&this->Archive, name.c_str(), nullptr, 0) >= 0;
-  }
-
-  bool Extract(const std::string& name, std::vector<char>& out)
-  {
-    if (!this->Opened)
-    {
-      return false;
-    }
-    const int index = mz_zip_reader_locate_file(&this->Archive, name.c_str(), nullptr, 0);
-    if (index < 0)
-    {
-      return false;
-    }
-    mz_zip_archive_file_stat stat;
-    if (!mz_zip_reader_file_stat(&this->Archive, index, &stat))
-    {
-      return false;
-    }
-    out.resize(static_cast<size_t>(stat.m_uncomp_size));
-    return mz_zip_reader_extract_to_mem(&this->Archive, index, out.data(), out.size(), 0);
-  }
-
-private:
-  static size_t ReadCallback(void* opaque, mz_uint64 fileOfs, void* buf, size_t n)
-  {
-    ArchiveReader* self = static_cast<ArchiveReader*>(opaque);
-    self->Stream->Seek(static_cast<vtkTypeInt64>(fileOfs), vtkResourceStream::SeekDirection::Begin);
-    return self->Stream->Read(buf, n);
-  }
-
-  mz_zip_archive Archive = {};
-  vtkResourceStream* Stream = nullptr;
-  bool Opened = false;
-};
 
 //----------------------------------------------------------------------------
 struct FCObject
@@ -459,7 +392,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  void ParseGuiDocument(const std::vector<char>& content, ArchiveReader& archive)
+  void ParseGuiDocument(const std::vector<char>& content, vtkF3DArchiveReader& archive)
   {
     vtkNew<vtkXMLDataParser> parser;
     if (!this->ParseXML(content, parser))
@@ -494,7 +427,8 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  void ParseViewProviderProperties(vtkXMLDataElement* props, FCObject& obj, ArchiveReader& archive)
+  void ParseViewProviderProperties(
+    vtkXMLDataElement* props, FCObject& obj, vtkF3DArchiveReader& archive)
   {
     for (int i = 0; i < props->GetNumberOfNestedElements(); i++)
     {
@@ -572,7 +506,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  void ReadColorList(const std::string& file, ArchiveReader& archive, FCObject& obj)
+  void ReadColorList(const std::string& file, vtkF3DArchiveReader& archive, FCObject& obj)
   {
     std::vector<char> data;
     if (!archive.Extract(file, data) || data.size() < sizeof(uint32_t))
@@ -604,7 +538,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  void ReadMaterialList(const std::string& file, ArchiveReader& archive, FCObject& obj)
+  void ReadMaterialList(const std::string& file, vtkF3DArchiveReader& archive, FCObject& obj)
   {
     std::vector<char> data;
     if (!archive.Extract(file, data) || data.size() < sizeof(uint32_t))
@@ -736,7 +670,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  std::vector<gp_Trsf> ReadPlacements(const std::string& file, ArchiveReader& archive)
+  std::vector<gp_Trsf> ReadPlacements(const std::string& file, vtkF3DArchiveReader& archive)
   {
     std::vector<gp_Trsf> placements;
     std::vector<char> data;
@@ -770,7 +704,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  std::optional<TopoDS_Shape> ReadShape(const std::string& file, ArchiveReader& archive)
+  std::optional<TopoDS_Shape> ReadShape(const std::string& file, vtkF3DArchiveReader& archive)
   {
     auto cached = this->ShapeCache.find(file);
     if (cached != this->ShapeCache.end())
@@ -979,7 +913,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  bool BuildOutput(ArchiveReader& archive, vtkPartitionedDataSetCollection* output)
+  bool BuildOutput(vtkF3DArchiveReader& archive, vtkPartitionedDataSetCollection* output)
   {
     vtkNew<vtkDataAssembly> assembly;
     assembly->SetRootNodeName("FCStd");
@@ -1188,8 +1122,8 @@ bool vtkF3DFCStdReader::CanReadFile(vtkResourceStream* stream)
   {
     return false;
   }
-  ArchiveReader archive;
-  return archive.Open(stream) && archive.Has("Document.xml");
+  vtkNew<vtkF3DArchiveReader> archive;
+  return archive->Open(stream) && archive->Has("Document.xml");
 }
 
 //----------------------------------------------------------------------------
@@ -1210,8 +1144,8 @@ int vtkF3DFCStdReader::RequestData(
     stream = fileStream;
   }
 
-  ArchiveReader archive;
-  if (!archive.Open(stream))
+  vtkNew<vtkF3DArchiveReader> archive;
+  if (!archive->Open(stream))
   {
     vtkErrorMacro("Cannot open FCStd archive");
     return 0;
@@ -1220,19 +1154,19 @@ int vtkF3DFCStdReader::RequestData(
   this->Internals = std::make_unique<vtkInternals>(this);
 
   std::vector<char> document;
-  if (!archive.Extract("Document.xml", document) || !this->Internals->ParseDocument(document))
+  if (!archive->Extract("Document.xml", document) || !this->Internals->ParseDocument(document))
   {
     vtkErrorMacro("Cannot parse Document.xml");
     return 0;
   }
 
   std::vector<char> guiDocument;
-  if (archive.Extract("GuiDocument.xml", guiDocument))
+  if (archive->Extract("GuiDocument.xml", guiDocument))
   {
-    this->Internals->ParseGuiDocument(guiDocument, archive);
+    this->Internals->ParseGuiDocument(guiDocument, *archive);
   }
 
-  if (!this->Internals->BuildOutput(archive, output))
+  if (!this->Internals->BuildOutput(*archive, output))
   {
     vtkWarningMacro("No visible geometry found in FCStd file");
   }

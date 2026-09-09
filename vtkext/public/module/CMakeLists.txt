@@ -24,11 +24,16 @@ endforeach()
 
 set(classes
   F3DUtils
+  vtkF3DArchiveReader
   vtkF3DCatmullClarkSubdivisionFilter
   vtkF3DFaceVaryingPointDispatcher
   vtkF3DGLTFImporter
   vtkF3DImporter
   )
+
+if(NOT F3D_USE_EXTERNAL_MINIZ)
+  list(APPEND sources "${F3D_SOURCE_DIR}/external/miniz/miniz.c")
+endif()
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
 if(NOT F3D_USE_GLES)
@@ -42,3 +47,11 @@ vtk_module_add_module(f3d::vtkext
   SOURCES ${sources}
   PRIVATE_HEADERS ${private_headers}
   )
+
+if(F3D_USE_EXTERNAL_MINIZ)
+  vtk_module_link(f3d::vtkext PRIVATE miniz::miniz)
+else()
+  vtk_module_include(f3d::vtkext
+    PRIVATE
+      $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/miniz>)
+endif()

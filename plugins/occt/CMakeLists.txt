@@ -13,12 +13,6 @@ endif()
 
 find_package(OpenCASCADE REQUIRED)
 
-option(F3D_USE_EXTERNAL_MINIZ "Use external miniz dependency" OFF)
-mark_as_advanced(F3D_USE_EXTERNAL_MINIZ)
-if(F3D_USE_EXTERNAL_MINIZ)
-  find_package(miniz REQUIRED)
-endif()
-
 if("${OpenCASCADE_VERSION}" VERSION_LESS "7.6.3")
   message(FATAL_ERROR "Plugin: OpenCASCADE: ${OpenCASCADE_VERSION} is not supported by F3D, please update your OpenCASCADE installation.")
 endif()
