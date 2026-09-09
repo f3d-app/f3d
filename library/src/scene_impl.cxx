@@ -122,9 +122,9 @@ public:
         progressData->timer->StopTimer();
         if(progressData->timer->GetElapsedTime() > 0.15 ||
           vtksys::SystemTools::HasEnv("CTEST_F3D_PROGRESS_BAR")) {
-            // ... Progress bar logic
+            double progress = *static_cast<double*>(callData);
+            f3d::log::info("Loading Test : ", progress);
         }
-        double progress = *static_cast<double*>(callData);
       });
     importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
     data->timer->StartTimer();
