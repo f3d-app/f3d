@@ -112,8 +112,10 @@ public:
   }
 
   void CreateCLIProgressBarAndCallback(ProgressDataStruct* data,
-    vtkImporter* importer, interactor_impl* interactor) {
+    vtkImporter* importer) {
     vtkNew<vtkCallbackCommand> progressCallback;
+    f3d::log::info("TESTING : ", importer->GetFileName());
+    f3d::log::info("TESTING : ", importer->GetObjectName());
     progressCallback->SetClientData(data);
     progressCallback->SetCallback(
       [](vtkObject*, unsigned long, void* clientData, void* callData)
@@ -123,7 +125,7 @@ public:
         if(progressData->timer->GetElapsedTime() > 0.15 ||
           vtksys::SystemTools::HasEnv("CTEST_F3D_PROGRESS_BAR")) {
             double progress = *static_cast<double*>(callData);
-            f3d::log::info("Loading Test : ", progress);
+
         }
       });
     importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
@@ -159,9 +161,9 @@ public:
     callbackData.widget = progressWidget;
     if (this->Interactor )
     {
-        if(!this->Window.isOffscreen())
+        if(this->Window.isOffscreen())
         {
-            scene_impl::internals::CreateCLIProgressBarAndCallback(&callbackData, this->MetaImporter, this->Interactor);
+            scene_impl::internals::CreateCLIProgressBarAndCallback(&callbackData, this->MetaImporter);
         }
         else
         {
