@@ -2,9 +2,9 @@
 #if @_has_supports_stream@
 bool canRead(vtkResourceStream* stream) const override
 {
-  vtkF3DOCCTReader::FILE_FORMAT format;
-  bool ret = vtkF3DOCCTReader::CanReadFile(stream, format);
-  ret &= (format == vtkF3DOCCTReader::FILE_FORMAT::@_occt_format@);
+  vtkOCCTPDCReader::Format format;
+  bool ret = vtkOCCTPDCReader::CanReadFile(stream, format);
+  ret &= (format == vtkOCCTPDCReader::Format::@_occt_format@);
   return ret;
 }
 #endif
@@ -27,14 +27,15 @@ void applyCustomReader(
   optName = "@_occt_format@.read_wire";
   str = this->ReaderOptions.at(optName);
   bool readWire = (F3DUtils::ParseToDouble(str, 1, optName) != 0);
+  std::cout<<readWire<<std::endl;
 
-  vtkF3DOCCTReader* occtReader = vtkF3DOCCTReader::SafeDownCast(algo);
+  vtkOCCTPDCReader* occtReader = vtkOCCTPDCReader::SafeDownCast(algo);
   occtReader->RelativeDeflectionOn();
   occtReader->SetLinearDeflection(linearDeflect);
   occtReader->SetAngularDeflection(angularDeflect);
   occtReader->SetRelativeDeflection(relativeDeflect);
   occtReader->SetReadWire(readWire);
 
-  occtReader->SetFileFormat(vtkF3DOCCTReader::FILE_FORMAT::@_occt_format@);
+  occtReader->SetFileFormat(vtkOCCTPDCReader::Format::@_occt_format@);
 }
 // clang-format on
