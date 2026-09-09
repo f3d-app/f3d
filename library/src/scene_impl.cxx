@@ -111,6 +111,11 @@ public:
     data->timer->StartTimer();
   }
 
+  void CreateCLIProgressBarAndCallback(ProgressDataStruct* data,
+    vtkImporter* importer, interactor_impl* interactor) {
+
+  }
+
   void Load(const std::vector<std::pair<std::string, vtkSmartPointer<vtkImporter>>>& importers)
   {
     for (const auto& importer : importers)
