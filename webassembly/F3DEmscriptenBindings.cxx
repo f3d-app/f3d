@@ -2,6 +2,8 @@
 
 #include <array>
 #include <memory>
+#include <optional>
+#include <range>
 #include <stdexcept>
 
 #include "camera.h"
@@ -342,7 +344,7 @@ EMSCRIPTEN_BINDINGS(f3d)
       +[](const f3d::options& o, const std::string& name) -> emscripten::val
       {
         // Only string is supported for now
-        f3d::options::DomainEnum<f3d::option_variant_t> domain = o.getEnumDomain(str);
+        f3d::options::DomainEnum<f3d::option_variant_t> domain = o.getEnumDomain(name);
         std::vector<std::string> enumeration(domain.enumeration.size());
         std::ranges::transform(domain.enumeration, enumeration.begin(),
           [](const auto& value) { return std::get<std::string>(value); });
@@ -352,8 +354,8 @@ EMSCRIPTEN_BINDINGS(f3d)
       "getIndexDomain",
       +[](const f3d::options& o, const std::string& name) -> emscripten::val
       {
-        f3d::options::DomainIndex domain = o.getIndexDomain(str);
-        if (domain.max.hasValue())
+        f3d::options::DomainIndex domain = o.getIndexDomain(name);
+        if (domain.max.has_value())
         {
           return emscripten::val(domain.max.value());
         }
