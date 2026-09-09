@@ -157,11 +157,18 @@ public:
     scene_impl::internals::ProgressDataStruct callbackData;
     callbackData.timer = timer;
     callbackData.widget = progressWidget;
-    if (this->Interactor && !this->Window.isOffscreen())
+    if (this->Interactor )
     {
-      f3d::color_t color = this->Options.ui.loader_progress_color;
-      scene_impl::internals::CreateProgressRepresentationAndCallback(
-        &callbackData, this->MetaImporter, this->Interactor, color);
+        if(!this->Window.isOffscreen())
+        {
+            scene_impl::internals::CreateCLIProgressBarAndCallback(&callbackData, this->MetaImporter, this->Interactor);
+        }
+        else
+        {
+          f3d::color_t color = this->Options.ui.loader_progress_color;
+          scene_impl::internals::CreateProgressRepresentationAndCallback(
+            &callbackData, this->MetaImporter, this->Interactor, color);
+        }
     }
 
     // Update the meta importer, the will only update importers that have not been updated before
