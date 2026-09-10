@@ -37,7 +37,7 @@ Control F3D animation behavior from the command line with these options.
 | \-\-frame\-rate              | 60 FPS              | Adjust animation (and others components) frame rate. |
 | \-\-animation\-time          |                     | Load a specific time value on start.                 |
 
-## Exporting animation frames
+## Export animation frames
 
 ### Images sequence
 
@@ -83,7 +83,7 @@ It can be done more efficiently in one line using piping:
 f3d example.file --output-video=- | ffmpeg -f h264 -i - video.mp4
 ```
 
-## Animation Interactions
+## Animation interactions
 
 - Press <kbd>W</kbd> to cycle through animations.
 - Press <kbd>Space</kbd> to play or pause animation.
@@ -91,7 +91,7 @@ f3d example.file --output-video=- | ffmpeg -f h264 -i - video.mp4
 
 See [COMMANDS](07-COMMANDS.md) for commands like `jump_to_frame`, `jump_to_key_frame` and `jump_to_time`.
 
-## Cycling Animations
+## Cycle animations
 
 Press <kbd>W</kbd> to cycle the animation to show.
 
@@ -108,7 +108,7 @@ When cycling, F3D uses this order:
 If you selected multiple animation indices, F3D does not cycle back to that selection.
 F3D cycles all animations only when the currently loaded files support it.
 
-## Time Units
+## Time units
 
 F3D assumes animation time uses seconds.
 
@@ -117,7 +117,7 @@ F3D assumes animation time uses seconds.
 When coloring while loading a time value or playing the animation, F3D automatically expands the coloring range from previously loaded time values.
 This includes `--animation-time`, which first loads the initial time before loading the provided time value.
 
-## Animation Support Level
+## Animation support level
 
 The supported file formats page lists the animation support level for each reader [here](02-SUPPORTED_FORMATS.md).
 

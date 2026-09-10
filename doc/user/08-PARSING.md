@@ -1,4 +1,4 @@
-# Parsing Options
+# Parsing options
 
 When you set options from the [CLI Options](03-OPTIONS.md), the [commands](07-COMMANDS.md), or the [libf3d options string API](../libf3d/03-OPTIONS.md#string-api), F3D parses the values according to their type. If parsing fails, the value is not changed.
 
