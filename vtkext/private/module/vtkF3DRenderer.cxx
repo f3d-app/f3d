@@ -378,30 +378,28 @@ void vtkF3DRenderer::Initialize()
       const vtkBoundingBox bbox = self->CreateCameraFacingBoundingBox(cam, 1.0f, 0.5f);
       if (bbox.IsValid())
       {
-        {
-          double bounds[6];
-          bbox.GetBounds(bounds);
+        double bounds[6];
+        bbox.GetBounds(bounds);
 
-          vtkNew<vtkOutlineSource> outlineSource;
-          outlineSource->SetBounds(bounds);
+        vtkNew<vtkOutlineSource> outlineSource;
+        outlineSource->SetBounds(bounds);
 
-          vtkNew<vtkPolyDataMapper> outlineMapper;
-          outlineMapper->SetInputConnection(outlineSource->GetOutputPort());
+        vtkNew<vtkPolyDataMapper> outlineMapper;
+        outlineMapper->SetInputConnection(outlineSource->GetOutputPort());
 
-          self->XRBBoxActor->SetMapper(outlineMapper);
-          std::apply([&](auto r, auto g, auto b)
-            { self->XRBBoxActor->GetProperty()->SetColor(r, g, b); }, F3DStyle::GetF3DRed());
-          self->XRBBoxActor->GetProperty()->SetLineWidth(2.0);
-          self->XRBBoxActor->GetProperty()->LightingOff();
-        }
-
-        self->XrBoundingBoxConfigured = true;
-        self->AlignSceneToBounds(bbox);
-
-        self->AxesActorConfigured = false;
-        self->GridConfigured = false;
-        self->UpdateActors();
+        self->XRBBoxActor->SetMapper(outlineMapper);
+        std::apply([&](auto r, auto g, auto b)
+          { self->XRBBoxActor->GetProperty()->SetColor(r, g, b); }, F3DStyle::GetF3DRed());
+        self->XRBBoxActor->GetProperty()->SetLineWidth(2.0);
+        self->XRBBoxActor->GetProperty()->LightingOff();
       }
+
+      self->XrBoundingBoxConfigured = true;
+      self->AlignSceneToBounds(bbox);
+
+      self->AxesActorConfigured = false;
+      self->GridConfigured = false;
+      self->UpdateActors();
     });
   this->RenderWindow->AddObserver(vtkCommand::StartEvent, startEventCallback);
 }

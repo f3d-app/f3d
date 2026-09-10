@@ -102,6 +102,7 @@ set(classes
   vtkF3DUserRenderPass
   vtkF3DDisplayDepthRenderPass
   vtkF3DTAAPass
+  vtkF3DPreserveCameraFramebufferPass
   )
 
 if (F3D_MODULE_UI)
@@ -141,10 +142,6 @@ if(F3D_MODULE_UI AND NOT F3D_USE_EXTERNAL_IMGUI)
     "${F3D_SOURCE_DIR}/external/imgui/imgui_draw.cpp"
     "${F3D_SOURCE_DIR}/external/imgui/imgui_tables.cpp"
     "${F3D_SOURCE_DIR}/external/imgui/imgui_widgets.cpp")
-endif()
-
-if (F3D_MODULE_OPENXR)
-  list(APPEND classes vtkF3DOpenXRFramebufferPass)
 endif()
 
 vtk_module_add_module(f3d::vtkextPrivate
