@@ -58,18 +58,18 @@ F3D supports the following file formats:
 | Smoothed Best Estimate of Trajectory      | `.sbet`                                        | No         | NONE              | NO                | `pdal`    | `SBET`                  |
 | Esri Scene Layer Package                  | `.slpk`                                        | No         | NONE              | NO                | `pdal`    | `SLPK`                  |
 
-Streaming support refers to the ability to read from stdin and requires specifying the reader name, see [the examples](03-OPTIONS.md#piping).
+Streaming support means that F3D can read from stdin when you specify the reader name. See [the examples](03-OPTIONS.md#piping).
 
-If a format supports streaming, then its header content will be checked before trying to open it. Use `--force-reader` to ignore the header content check.
+If a format supports streaming, F3D checks its header content before trying to open it. Use `--force-reader` to ignore the header content check.
 
-To get accurate information for your own build of F3D, using the [dedicated option](03-OPTIONS.md), `--list-readers`.
+To get accurate information for your own build of F3D, use the [dedicated option](03-OPTIONS.md), `--list-readers`.
 
 ## Reader options
 
-Readers can provide option that can be set using the `-D/--define` [command line option](03-OPTIONS.md).
+Readers can provide options. Set them using the `-D/--define` [command line option](03-OPTIONS.md).
 eg: `-DVDB.downsampling_factor=0.5` or using the `set_reader_option` [command](07-COMMANDS.md).
 
-For booleans, 0 means false, not 0 means true. Unsigned int will interpret anything that is not a non-negative integer as the default value.
+For booleans, 0 means false and any other value means true. Unsigned int interprets anything that is not a non-negative integer as the default value.
 
 | Plugin   | Option Name                | Argument Type  | Description                                                                          |
 | -------- | -------------------------- | -------------- | ------------------------------------------------------------------------------------ |
@@ -77,19 +77,19 @@ For booleans, 0 means false, not 0 means true. Unsigned int will interpret anyth
 | `occt`   | `STEP.linear_deflection`   | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
 | `occt`   | `STEP.angular_deflection`  | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
 | `occt`   | `STEP.relative_deflection` | `bool`         | Control if the deflection values are relative to object size, default is false.      |
-| `occt`   | `STEP.read_wire`           | `bool`         | Control if lines should be read, default is true.                                    |
+| `occt`   | `STEP.read_wire`           | `bool`         | Control whether lines are read, default is true.                                     |
 | `occt`   | `IGES.linear_deflection`   | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
 | `occt`   | `IGES.angular_deflection`  | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
 | `occt`   | `IGES.relative_deflection` | `bool`         | Control if the deflection values are relative to object size, default is false.      |
-| `occt`   | `IGES.read_wire`           | `bool`         | Control if lines should be read, default is true.                                    |
+| `occt`   | `IGES.read_wire`           | `bool`         | Control whether lines are read, default is true.                                     |
 | `occt`   | `BREP.linear_deflection`   | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
 | `occt`   | `BREP.angular_deflection`  | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
 | `occt`   | `BREP.relative_deflection` | `bool`         | Control if the deflection values are relative to object size, default is false.      |
-| `occt`   | `BREP.read_wire`           | `bool`         | Control if lines should be read, default is true.                                    |
+| `occt`   | `BREP.read_wire`           | `bool`         | Control whether lines are read, default is true.                                     |
 | `occt`   | `XBF.linear_deflection`    | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
 | `occt`   | `XBF.angular_deflection`   | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
 | `occt`   | `XBF.relative_deflection`  | `bool`         | Control if the deflection values are relative to object size, default is false.      |
-| `occt`   | `XBF.read_wire`            | `bool`         | Control if lines should be read, default is true.                                    |
+| `occt`   | `XBF.read_wire`            | `bool`         | Control whether lines are read, default is true.                                     |
 | `usd`    | `USD.resources_path`       | `string`       | Additional path to find USD plugInfo.json resources                                  |
 | `usd`    | `USD.subdivision_level`    | `unsigned int` | Specify the subdivision level to apply when specified. Default is 0 (no subdivision) |
 | `vdb`    | `VDB.downsampling_factor`  | `double`       | Control the level of downsampling when reading a volume, default is 0.1.             |
@@ -101,18 +101,18 @@ For booleans, 0 means false, not 0 means true. Unsigned int will interpret anyth
 
 ### QuakeMDL
 
-- Models texture are loaded with a simple PBR lighting (diffuse color only, no specular, index of refraction set to 1.0).
+- F3D loads model textures with a simple PBR lighting (diffuse color only, no specular, index of refraction set to 1.0).
 - Selecting `skin` is not supported.
 - Animation frames are split based on their names, eg: `stand1`, `stand2`, `stand3`, `run1`, `run2`, `run3`.
 
 ### 3D Gaussian splatting
 
-Currently, 3 different formats are supported by F3D:
+F3D supports 3 different formats:
 
 - `.ply`: Original 3DGS format
 - `.splat`: Format specified by https://github.com/antimatter15/splat. Does not support spherical harmonics.
 - `.spz`: Niantic's format specified by https://github.com/nianticlabs/spz (v2 and v3)
 
-Note that no config files come with the `.ply` format because this format isn't dedicated to 3DGS only so we cannot generalize.
-If you are using `.ply` for 3DGS only, you can set up a config file similar to what is done for `.splat` or `.spz`.
+No config files come with the `.ply` format because this format is not dedicated to 3DGS only.
+If you use `.ply` for 3DGS only, set up a config file similar to what is done for `.splat` or `.spz`.
 See configuration file [documentation](./06-CONFIGURATION_FILE.md)

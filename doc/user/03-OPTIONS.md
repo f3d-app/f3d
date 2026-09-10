@@ -1,17 +1,17 @@
 # Command line options
 
-F3D behavior can be fully controlled from the command line using the following options.
+Control F3D behavior from the command line using the following options.
 
 ## Application Options
 
 ### `--input=<input file>` (_string_)
 
 The input file or files to read, can also be provided as a positional argument. Support directories as well.
-If `-` is specified instead of a filename, the file will be streamed from the stdin, which will hang until a stream is provided.
+If `-` is specified instead of a filename, F3D streams the file from stdin and waits until a stream is provided.
 
 ### `--output=<png file>` (_string_)
 
-Instead of showing a render view and render into it, _render directly into a png file_. When used with --ref option, only outputs on failure. If `-` is specified instead of a filename, the PNG file is streamed to the stdout. Can use [template variables](#filename-templating). When using the `{frame}` variable, multiple animation frames are exported (see [Exporting animation frames](05-ANIMATIONS.md#exporting-animation-frames)).
+Instead of showing a render view and render into it, _render directly into a png file_. When used with --ref option, only outputs on failure. If `-` is specified instead of a filename, F3D streams the PNG file to stdout. You can also use [template variables](#filename-templating). When using the `{frame}` variable, F3D exports multiple animation frames (see [Exporting animation frames](05-ANIMATIONS.md#exporting-animation-frames)).
 
 ### `--no-background` (_bool_, default: `false`)
 
@@ -59,15 +59,15 @@ Do not render anything and quit just after loading the first file, use with --ve
 
 ### `--load-statefile=<file path>` (_string_)
 
-Restore the application state from a statefile right after starting, then continue running. The statefile is applied above configuration files but below command line options. The restored window size is overridden by an explicit `--resolution`, and the restored window position by an explicit `--position`. If `-` is specified instead of a filename, the statefile is read from the standard input. If the file does not exist, it is skipped with a warning.
+Restore the application state from a statefile right after starting, then continue running. F3D applies the statefile above configuration files but below command line options. An explicit `--resolution` overrides the restored window size, and an explicit `--position` overrides the restored window position. If `-` is specified instead of a filename, F3D reads the statefile from the standard input. If the file does not exist, F3D skips it with a warning.
 
 ### `--save-statefile=<file path>` (_string_)
 
-Save the application state to a statefile right after loading, then continue running. The saved state includes the options, camera, window size and all file groups, including the ones not currently loaded. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, the statefile is written to the standard output.
+Save the application state to a statefile right after loading, then continue running. The saved state includes the options, camera, window size and all file groups, including the ones not currently loaded. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, F3D writes the statefile to the standard output.
 
 ### `--statefile-filename=<file path>` (_string_, default: empty)
 
-Default filename used by the `save_statefile` and `load_statefile` [commands](07-COMMANDS.md) when none is provided, resolved relative to the current working directory. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, the statefile is written to the standard output (save) or read from the standard input (load). When left empty, the `save_statefile` and `load_statefile` commands fall back to a default filename; picking a file through a dialog is instead available with the dedicated `save_statefile_dialog` and `load_statefile_dialog` commands (requires a build with the `tinyfiledialogs` module).
+Default filename used by the `save_statefile` and `load_statefile` [commands](07-COMMANDS.md) when none is provided, resolved relative to the current working directory. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, F3D writes the statefile to the standard output (save) or reads from the standard input (load). When left empty, the `save_statefile` and `load_statefile` commands fall back to a default filename; picking a file through a dialog is instead available with the dedicated `save_statefile_dialog` and `load_statefile_dialog` commands (requires a build with the `tinyfiledialogs` module).
 
 ### `--max-size=<size in MiB>` (_int_, default: `-1`)
 
@@ -91,7 +91,7 @@ Supplementary path to specify where to load plugins from, on top of [default pat
 
 ### `--scan-plugins`
 
-Scan standard directories for plugins and display their names, results may be incomplete. See [plugins](13-PLUGINS.md) for more info.
+Scan standard directories for plugins and display their names. Results may be incomplete. See [plugins](13-PLUGINS.md) for more info.
 
 ### `--screenshot-filename=<png file>` (_string_, default: `{app}/{model}_{n}.png`)
 
@@ -113,7 +113,7 @@ A repeatable option to reset [libf3d options](../libf3d/03-OPTIONS.md) manually.
 
 ### `--verbose=<[debug|info|warning|error|quiet]>` (_string_, default: `info`, implicit: `debug`)
 
-Set _verbose_ level, in order to provide more information about the loaded data in the output. Error reporting during option parsing may ignore this flag.
+Set _verbose_ level to provide more information about the loaded data in the output. Error reporting during option parsing may ignore this flag.
 
 ### `--loading-progress` (_bool_, default: `false`)
 
@@ -121,11 +121,11 @@ Show a _progress bar_ when loading the file.
 
 ### `--animation-progress=<none|default|advanced>` (_string_, default: `none`, implicit: `default`)
 
-Control the _progress bar_ shown when playing the animation. Can be `none` (hidden), `default` (only the progress bar, which can be clicked or dragged to jump to a time) or `advanced` (the progress bar plus time range, animation name and current time labels, with a marker for each keyframe).
+Control the _progress bar_ shown when playing the animation. Use `none` (hidden), `default` (only the progress bar, which can be clicked or dragged to jump to a time) or `advanced` (the progress bar plus time range, animation name and current time labels, with a marker for each keyframe).
 
 ### `--multi-file-mode=<single|all| dir>` (_string_, default: `single`)
 
-When opening multiple files, select if they should be shown all at once (`all`), one by one (`single`), or by directory (`dir`). Configuration files for all loaded files will be used in the order they are provided.
+When opening multiple files, select if F3D shows them all at once (`all`), one by one (`single`), or by directory (`dir`). F3D uses configuration files for all loaded files in the order they are provided.
 
 ### `--multi-file-regex=<regex>` (_string_)
 
@@ -133,7 +133,7 @@ Regular expression pattern to group files. Captured groups are replaced with `*`
 
 ### `--recursive-dir-add` (_bool_, default: `false`)
 
-When opening a directory, choose if they should be recursively added or not. If not, only the files in the provided directory will be added.
+When opening a directory, choose if F3D adds files recursively. If not, F3D adds only the files in the provided directory.
 
 ### `--remove-empty-file-groups` (_bool_, default: `false`)
 
@@ -199,7 +199,7 @@ Show _a grid_ aligned with the horizontal (orthogonal to the Up direction) plane
 
 ### `--grid-unit=<length>` (_double_)
 
-Set the size of the _unit square_ for the grid. If not set (the default) a suitable value will be automatically computed.
+Set the size of the _unit square_ for the grid. If not set (the default), F3D automatically computes a suitable value.
 
 #### compare
 
@@ -504,7 +504,7 @@ Set the _index of refraction of the base layer_ (1.0-2.5). Model-specified by de
 
 ### `--hdri-file=<HDRI file>` (_path_)
 
-Set the _HDRI_ image that can be used as ambient lighting and skybox.
+Set the _HDRI_ image to use as ambient lighting and skybox.
 Valid file format are `.hdr`, `.exr`, `.png`, `.jpg`, `.pnm`, `.tiff`, `.bmp`.
 If not set, a default is provided.
 
@@ -532,8 +532,8 @@ Model-specified by default.
 
 ### `--texture-base-color=<texture file>` (_path_)
 
-Set the texture file to control the color of the object. Please note this will be multiplied with the color and opacity options. Must be in sRGB color space.
-Model-specified by default. An empty path can be set to remove the model-specified texture.
+Set the texture file to control the color of the object. F3D multiplies this texture with the color and opacity options. Must be in sRGB color space.
+Model-specified by default. Set an empty path to remove the model-specified texture.
 
 #### compare
 
@@ -543,8 +543,8 @@ Model-specified by default. An empty path can be set to remove the model-specifi
 
 ### `--texture-material=<texture file>` (_path_)
 
-Set the texture file to control the occlusion, roughness and metallic values of the object. Please note this will be multiplied with the roughness and metallic options, which have impactful default values. To obtain true results, use `--roughness=1` and `--metallic=1`. Must be in linear color space.
-Model-specified by default. An empty path can be set to remove the model-specified texture.
+Set the texture file to control the occlusion, roughness and metallic values of the object. F3D multiplies this texture with the roughness and metallic options, which have impactful default values. To obtain true results, use `--roughness=1` and `--metallic=1`. Must be in linear color space.
+Model-specified by default. Set an empty path to remove the model-specified texture.
 
 #### compare
 
@@ -554,8 +554,8 @@ Model-specified by default. An empty path can be set to remove the model-specifi
 
 ### `--texture-emissive=<texture file>` (_path_)
 
-Set the texture file to control the emitted light of the object. Please note this will be multiplied with the emissive factor. Must be in sRGB color space.
-Model-specified by default. An empty path can be set to remove the model-specified texture.
+Set the texture file to control the emitted light of the object. F3D multiplies this texture with the emissive factor. Must be in sRGB color space.
+Model-specified by default. Set an empty path to remove the model-specified texture.
 
 #### compare
 
@@ -577,7 +577,7 @@ Model-specified by default.
 ### `--texture-normal=<texture file>` (_path_)
 
 Set the texture file to control the normal map of the object. Must be in sRGB color space.
-Model-specified by default. An empty path can be set to remove the model-specified texture.
+Model-specified by default. Set an empty path to remove the model-specified texture.
 
 #### compare
 
@@ -599,7 +599,7 @@ Model-specified by default.
 ### `--textures-transform=<transform2d>` (_transform2d_)
 
 Set the 2d transform to use for all textures applied to the model.
-Importer may set a default value depending on file type. If a default value exists, the default value is multiplied by the provided transform.
+Importer may set a default value depending on file type. If a default value exists, F3D multiplies it by the provided transform.
 
 #### compare
 
@@ -620,7 +620,7 @@ Override model's texture with a checkerboard texture. Anti-aliasing is recommend
 ### `--unlit` (_bool_)
 
 Override model's lighting configuration.
-If the value is true, no shading is applied and the model will be unlit.
+If the value is true, F3D applies no shading and the model is unlit.
 
 #### compare
 
@@ -682,7 +682,7 @@ Display the _metadata_.
 ### `--scene-hierarchy` (_bool_, default: `false`)
 
 Display the _scene hierarchy_ as a tree representing the internal structure of the model, with checkboxes allowing to hide or show individual parts.
-By default the tree is only expanded enough to show nodes that have meaningful names, but all nodes can be fully expanded manually.
+By default the tree expands only enough to show nodes that have meaningful names, but you can fully expand all nodes manually.
 
 #### compare
 
@@ -749,7 +749,7 @@ _Adjust the intensity_ of every light in the scene, including HDRI image-based l
 
 ### `-s`, `--scalar-coloring` (_bool_, default: `false`)
 
-Enable scalar coloring if present in the file. If `--coloring-array` is not set, the first in alphabetical order will be picked if any are available.
+Enable scalar coloring if present in the file. If `--coloring-array` is not set, F3D picks the first in alphabetical order if any are available.
 
 #### compare
 
@@ -833,7 +833,7 @@ Use with the scalar option.
 
 ### `--colormap-discretization=<colors>` (_int_)
 
-Set the number of distinct colors from [1, N] will be used in the colormap. Any values outside the valid range will result in smooth shading.
+Set the number of distinct colors from [1, N] used in the colormap. Any values outside the valid range result in smooth shading.
 
 #### compare
 
@@ -843,7 +843,7 @@ Set the number of distinct colors from [1, N] will be used in the colormap. Any 
 
 ### `-v`, `--volume` (_bool_, default: `false`)
 
-Enable _volume rendering_. It is only functional for 3D image data (VTKXMLVTI, DICOM, NRRD, MetaImage files) and will display nothing with other formats. It forces coloring.
+Enable _volume rendering_. It is only functional for 3D image data (VTKXMLVTI, DICOM, NRRD, MetaImage files) and displays nothing with other formats. It forces coloring.
 
 #### compare
 
@@ -958,7 +958,7 @@ This is a technique used to correctly render translucent objects (`ddp`: dual de
 > `stochastic` is introducing a lot of noise with strong translucency.
 > It works better when combined with temporal anti-aliasing (when using `--anti-aliasing=taa` option)
 > `sort` is only working for 3D gaussians and requires compute shaders support.
-> Alternatively, `sort_cpu` will give the same result and work everywhere but it's much slower.
+> Alternatively, `sort_cpu` gives the same result and works everywhere but it's much slower.
 
 #### compare
 
@@ -981,7 +981,7 @@ Enable _ambient occlusion_. This is a technique used to improve the depth percep
 Anti-aliasing method (`fxaa`: fast, `ssaa`: quality, `taa`: balanced, `none`: no anti aliasing)
 
 > [!WARNING]
-> `taa` forces rendering of the scene at regular interval and will introduce ghosting artifacts on animated scenes.
+> `taa` forces rendering of the scene at regular interval and introduces ghosting artifacts on animated scenes.
 > It also doesn't work with offscreen rendering (when using `--output` option)
 
 #### compare: Notice how edges are smoother with SSAA.
@@ -992,7 +992,7 @@ Anti-aliasing method (`fxaa`: fast, `ssaa`: quality, `taa`: balanced, `none`: no
 
 ### `-t`, `--tone-mapping` (_bool_, default: `false`)
 
-Enable neutral _Tone Mapping_. This technique is used to map colors properly to the monitor colors.
+Enable neutral _Tone Mapping_. This technique maps colors properly to the monitor colors.
 
 #### compare
 
@@ -1053,19 +1053,19 @@ All options of type _color_ must be expressed in [sRGB](https://en.wikipedia.org
 
 ## Options syntax
 
-To turn on/off boolean options, it is possible to write `--option=true` and `--option=false`, eg `--points-sprites=false`.
+To turn on/off boolean options, write `--option=true` and `--option=false`, eg `--points-sprites=false`.
 
-If an option has an "implicit" value, it means that the options can be used without specifying the value to use the implicit value.
+If an option has an "implicit" value, use the option without specifying the value to use the implicit value.
 
-The default correspond to the value without any [configuration file](06-CONFIGURATION_FILE.md), which F3D is usually distributed with.
+The default corresponds to the value without any [configuration file](06-CONFIGURATION_FILE.md).
 
-As documented, the `--option=value` syntax should be preferred. The syntax `--option value` can have unintended effect with positional arguments.
+Prefer the `--option=value` syntax. The syntax `--option value` can have unintended effect with positional arguments.
 
 The `-R` short option has a special syntax: `-Rlibf3d.option` but can also be used with `--reset=libf3d.option`
 
 The `-D/--define` option has a special syntax: `-Dlibf3d.option=value` or `--define=libf3d.option=value`.
 
-All options are parsed according to their type, see the [parsing documentation](08-PARSING.md) for more details.
+F3D parses all options according to their type, see the [parsing documentation](08-PARSING.md) for more details.
 
 ## Piping
 
@@ -1122,20 +1122,20 @@ The destination filename used by `--output`, to save screenshots using `--screen
 - `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique (up to 1000000)
 - `{frame}`: frame number when outputting animation frames (see [Animations](05-ANIMATIONS.md))
 - `{frame:4}`, `{frame:5}`, ...: zero-padded frame number when outputting animation frames
-- variable names can be escaped by doubling the braces (eg. use `{{model}}.png` to output `{model}.png` without the model name being substituted)
+- escape variable names by doubling the braces (eg. use `{{model}}.png` to output `{model}.png` without the model name being substituted)
 
 For example the screenshot filename is configured as `{app}/{model}_{n}.png` by default, meaning that, assuming the model `hello.glb` is being viewed,
 consecutive screenshots are going to be saved as `F3D/hello_1.png`, `F3D/hello_2.png`, `F3D/hello_3.png`, ...
 
-Model related variables will be replaced by `no_file` if no file is loaded and `multi_file` if multiple files are loaded using the `multi-file-mode` option.
+F3D replaces model related variables by `no_file` if no file is loaded and `multi_file` if multiple files are loaded using the `multi-file-mode` option.
 
 When loading a statefile (`--load-statefile`/`load_statefile`), the `{n}` variable resolves to the most recent existing file, instead of the next available one used when saving. This means that, with the default `{n}` template, saving then loading a statefile round-trips to the same file.
 
 ## Caches
 
-When using HDRI related options, F3D will create and use a cache directory to store related data in order to speed up rendering.
+When using HDRI related options, F3D creates and uses a cache directory to store related data to speed up rendering.
 
-F3D also stores the geometry of the last closed interactive window in a `cache.json` file, in the same directory, so that it can be restored on the next start, see `--resolution` and `--position`. Its `window` entry uses the same layout as in [statefiles](#statefiles):
+F3D also stores the geometry of the last closed interactive window in a `cache.json` file, in the same directory, so it can restore that geometry on the next start, see `--resolution` and `--position`. Its `window` entry uses the same layout as in [statefiles](#statefiles):
 
 ```json
 {
@@ -1148,7 +1148,7 @@ F3D also stores the geometry of the last closed interactive window in a `cache.j
 }
 ```
 
-These cache files can be safely removed, at the cost of recomputing the HDRI data on next use and of losing the cached window geometry.
+You can safely remove these cache files, at the cost of recomputing the HDRI data on next use and losing the cached window geometry.
 
 The cache directory location is as follows, in order, using the first defined environment variables:
 
@@ -1158,12 +1158,12 @@ The cache directory location is as follows, in order, using the first defined en
 
 ## Statefiles
 
-A statefile is a JSON file that captures a session so it can be restored later, using `--save-statefile`/`--load-statefile`
+A statefile is a JSON file that captures a session to restore later, using `--save-statefile`/`--load-statefile`
 or the `save_statefile`/`load_statefile` [commands](07-COMMANDS.md).
 
 A libf3d statefile (`engine::dump`/`engine::load`) contains the added `files`, the `camera` and the `options`.
-File paths are stored relatively to the statefile directory when possible, and resolved on load.
+F3D stores file paths relatively to the statefile directory when possible, and resolves them on load.
 Content added from memory (meshes, buffers) is not captured.
 
 The F3D application adds a `file_groups` entry storing all file groups, including the ones not currently loaded,
-so it can restore the whole navigation state. This entry is ignored when a libf3d statefile is loaded by the library.
+so it can restore the whole navigation state. The library ignores this entry when loading a libf3d statefile.

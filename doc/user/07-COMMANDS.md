@@ -1,8 +1,8 @@
 # Commands
 
 F3D provides access to commands through [interactive console](#interactive-console), [command script](#command-script---command-script) and [bindings configuration](06-CONFIGURATION_FILE.md#bindings).
-Commands let you trigger specific behavior that may not be available otherwise.
-Please note commands are currently experimental and the behaviors, actions may be added or removed without deprecation.
+Use commands to trigger specific behavior that may not be available otherwise.
+Commands are currently experimental. Behaviors and actions may be added or removed without deprecation.
 Action names and arguments may also change without deprecation.
 
 Commands have the following syntax:
@@ -85,7 +85,7 @@ eg:
 - `jump_to_frame_relative -1` jump to previous frame.
 
 `jump_to_keyframe`: A specific command to load an animation at a specific keyframe, takes a keyframe index as argument.
-When jumping to a keyframe, the target keyframe index is adjusted to stay within the total number of available keyframes, avoiding invalid keyframe access.
+When jumping to a keyframe, F3D adjusts the target keyframe index to stay within the total number of available keyframes, avoiding invalid keyframe access.
 eg:
 
 - `jump_to_keyframe 0` jump to animation start frame.
@@ -93,7 +93,7 @@ eg:
 - `jump_to_keyframe 10` jump to keyframe 10.
 
 `jump_to_keyframe_relative`: A specific command to move the animation by a number of keyframes relative to the current keyframe, takes a keyframe offset as argument.
-When jumping between keyframes, the target keyframe index is adjusted to stay within the total number of available keyframes, avoiding invalid keyframe access.
+When jumping between keyframes, F3D adjusts the target keyframe index to stay within the total number of available keyframes, avoiding invalid keyframe access.
 eg:
 
 - `jump_to_keyframe_relative 0` jump to closest keyframe.
@@ -122,20 +122,20 @@ eg:
 
 `cycle_verbose_level` : A specific command to cycle between the verbose levels (`Debug`, `Info`, `Warning`, `Error`, `Quiet`).
 
-`add_files [path/to/file1] [path/to/file2]`: A specific command to add files to the scene (overridden by a F3D specific command, see below). Take one or more files as arguments.
+`add_files [path/to/file1] [path/to/file2]`: A specific command to add files to the scene (overridden by a F3D specific command, see below). Takes one or more files as arguments.
 eg: `add_files /path/to/dragon.vtu`.
 
-`save_statefile [path/to/file]`: A specific command to save the current state into the provided statefile (overridden by a F3D specific command, see below). Take a file as argument.
+`save_statefile [path/to/file]`: A specific command to save the current state into the provided statefile (overridden by a F3D specific command, see below). Takes a file as argument.
 eg: `save_statefile /path/to/state.json`.
 
-`load_statefile [path/to/file]`: A specific command to restore the state from the provided statefile (overridden by a F3D specific command, see below). Take a file as argument.
+`load_statefile [path/to/file]`: A specific command to restore the state from the provided statefile (overridden by a F3D specific command, see below). Takes a file as argument.
 eg: `load_statefile /path/to/state.json`.
 
 `save_statefile_to_clipboard`: A specific command to save the current state into the system clipboard (overridden by a F3D specific command, see below). Requires a build with the `clip` module. No argument.
 
 `load_statefile_from_clipboard`: A specific command to restore the state from the system clipboard (overridden by a F3D specific command, see below). Requires a build with the `clip` module. No argument.
 
-`alias [alias_name] [command]`: A specific command to create an alias for a command. Take an alias name and a command as arguments.
+`alias [alias_name] [command]`: A specific command to create an alias for a command. Takes an alias name and a command as arguments.
 eg: `alias myrotate roll_camera 90`.
 
 `help [command]: A specific command to print help about a specific command. eg: `help set_camera`.
@@ -160,20 +160,20 @@ rely on the `--screenshot-filename` CLI option. eg: `take_screenshot path/to/fil
 `take_minimal_screenshot [filename]`: A specific command to [take a minimal screenshot](04-INTERACTIONS.md#taking-screenshots). If filename is not specified,
 rely on the `--screenshot-filename` CLI option. eg: `take_screenshot path/to/file.png`.
 
-`add_files [path/to/file1] [path/to/file2]`: A specific command to add files to the scene according to the current grouping logic. Take one or more files as arguments.
+`add_files [path/to/file1] [path/to/file2]`: A specific command to add files to the scene according to the current grouping logic. Takes one or more files as arguments.
 eg: `add_files /path/to/dragon.vtu`.
 
-`set_hdri [path/to/hdri]`: A specific command to set and use an HDRI image. Take a HDRI file as an argument.
+`set_hdri [path/to/hdri]`: A specific command to set and use an HDRI image. Takes a HDRI file as an argument.
 eg: `set_hdri /path/to/file.hdr`.
 
-`add_files_or_set_hdri [path/to/file1] [path/to/file2]`: A specific command that will process each files and either, `set_hdri` if the provided file uses a recognised HDR extension or `add_files` otherwise. Take one or more files as arguments.
+`add_files_or_set_hdri [path/to/file1] [path/to/file2]`: A specific command that processes each file and uses either `set_hdri` if the provided file uses a recognised HDR extension, or `add_files` otherwise. Takes one or more files as arguments.
 eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 
 `remove_current_file_group`: A specific command to remove current file group and load the next file group if any. No argument.
 
 `remove_file_groups`: A specific command to remove all files. No argument.
 
-`open_file_dialog`: A specific command to open a file dialog to selected a file to load. No argument.
+`open_file_dialog`: A specific command to open a file dialog to select a file to load. No argument.
 
 `save_statefile [filename]`: A specific command to save the current state into a statefile, including all file groups (also the ones not currently loaded). If filename is not specified, rely on the `--statefile-filename` CLI option, or a default filename when it is empty too. Use `-` for the standard output. eg: `save_statefile path/to/state.json`.
 
@@ -189,23 +189,23 @@ eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 
 ## Domains
 
-Certain libf3d (options)[../libf3d/03-OPTIONS.md] have domains which can be interacted with using commands.
+Certain libf3d (options)[../libf3d/03-OPTIONS.md] have domains that commands can interact with.
 
-A range domain is used through `increase` and `decrease` commands, it has inclusive minimum and maximum, as well as an increment.
-`increase` and `decrease` use increment to increase/decrease and cap at maximum/minimum respectively.
+A range domain uses `increase` and `decrease` commands. It has inclusive minimum and maximum values, as well as an increment.
+`increase` and `decrease` use the increment to increase or decrease and cap at maximum or minimum respectively.
 
-An enum domain is used through `cycle` command, it just list possible values of the option.
-`cycle` just iterate over the different possible values and loops when reaching the end.
+An enum domain uses the `cycle` command. It lists possible values of the option.
+`cycle` iterates over the different possible values and loops when reaching the end.
 
-An index domain can be used through both `cycle` and `increase`/`decrease` commands.
+Use an index domain through both `cycle` and `increase`/`decrease` commands.
 For `increase`/`decrease`, it behaves like a range domain [0, max] with an increment of 1.
-For `cycle`, it behave like an enum domain containing all possible values between o and max.
+For `cycle`, it behaves like an enum domain containing all possible values between o and max.
 
 ## Command Script (`--command-script`)
 
-F3D provides a feature to execute commands from a script file using the `--command-script` [CLI option](03-OPTIONS.md). This allows users to automate a sequence of commands by listing them in a plain text file, eg: `f3d --command-script path/to/command_script.txt`.
+F3D can execute commands from a script file using the `--command-script` [CLI option](03-OPTIONS.md). You can automate a sequence of commands by listing them in a plain text file, eg: `f3d --command-script path/to/command_script.txt`.
 
-Example Command Script, commands are separated by new lines, comments are supported:
+Example Command Script, with commands separated by new lines and comments supported:
 
 ```shell
 # A comment
@@ -217,7 +217,7 @@ increase_light_intensity
 
 ## Interactive Console
 
-If F3D is built with `F3D_MODULE_UI` support, pressing <kbd>Esc</kbd> will open the console. It's possible to type any command in the input field and pressing <kbd>Enter</kbd> will trigger the command instantly.
+If F3D is built with `F3D_MODULE_UI` support, pressing <kbd>Esc</kbd> opens the console. Type any command in the input field and press <kbd>Enter</kbd> to trigger the command instantly.
 
 Press <kbd>Tab</kbd> to autocomplete the command and display suggestions.
 
@@ -227,21 +227,21 @@ Press <kbd>Esc</kbd> to close the console.
 
 ## Command syntax
 
-Command syntax is similar to bash, as in they will be split by "token" to be processed.
+Command syntax is similar to bash: commands are split by token before processing.
 
 - Tokens are spaces separated, eg: `set scene.up.direction +Z`.
 - Tokens can also be quoted to support spaces inside, eg: `set render.hdri.file "/path/to/file with spaces.png"`.
 - Supported quotes are `` `'" ``, eg: `set render.hdri.file '/path/to/file with spaces.png'`.
-- Quotes inside quotes are supported as well, eg: `set render.hdri.file "/path/to/file'with'quotes.png"`.
-- Quotes and spaces can be escaped, eg: `set render.hdri.file /path/to/file\ with\ spaces\ and\ \'quotes\".png`.
-- Comment are supported using `#`, Any character after will be ignored. Use `\#` to add it verbatim.
+- Use quotes inside quotes as well, eg: `set render.hdri.file "/path/to/file'with'quotes.png"`.
+- Escape quotes and spaces with `\`, eg: `set render.hdri.file /path/to/file\ with\ spaces\ and\ \'quotes\".png`.
+- Use `#` for comments. F3D ignores any character after it. Use `\#` to add it verbatim.
 
 > [!NOTE]
-> Comments are only supported in command script, in interactive console `#` and all characters after will be handled
+> Comments are only supported in command script. In interactive console, `#` and all characters after are handled
 > as standard character.
 
-- Escapes can be escaped too: eg: `set render.hdri.file C:\\path\\to\\windows\\file.png`.
-- Other escaped character will be processed as if the escape was not present, eg: `set scene.up.direction +\Z`
+- Escape `\` with another `\`, eg: `set render.hdri.file C:\\path\\to\\windows\\file.png`.
+- F3D processes other escaped character as if the escape was not present, eg: `set scene.up.direction +\Z`
 - Unfinished quoted section is invalid, eg: `set scene.up.direction "+Z`
 - A escape at the end is also invalid, eg: `set scene.up.direction +Z\`
 - Options values are [parsed](08-PARSING.md) according to their types.

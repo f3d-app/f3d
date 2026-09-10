@@ -2,7 +2,7 @@
 
 ## 3D Mouse Interactions
 
-Simple interaction with the displayed data is possible directly within the window. It is as follows:
+Interact with the displayed data directly in the window:
 
 - _Click and drag_ with the _left_ mouse button to rotate around the focal point of the camera.
 - Hold <kbd>Shift</kbd> then _Click and drag_ with the _left_ mouse button to translate the camera.
@@ -32,7 +32,7 @@ Select 2D interaction styles by pressing <kbd>K</kbd> or through the `--interact
 
 ## Bindings
 
-The coloring can be controlled directly by pressing the following hotkeys:
+Control coloring directly with these hotkeys:
 
 - <kbd>A</kbd>: cycle between anti-aliasing modes.
 - <kbd>C</kbd>: cycle between coloring with array from point data and from cell data.
@@ -41,7 +41,7 @@ The coloring can be controlled directly by pressing the following hotkeys:
 
 See the [coloring cycle](#cycling-coloring) section for more info.
 
-Other options can be toggled or cycled directly by pressing the following hotkeys:
+Toggle or cycle other options directly with these hotkeys:
 
 - <kbd>W</kbd>: [cycle animations](05-ANIMATIONS.md#cycling-animations).
 - <kbd>B</kbd>: display of the scalar bar, only when coloring and not using direct scalars.
@@ -74,7 +74,7 @@ Other options can be toggled or cycled directly by pressing the following hotkey
 - <kbd>Ctrl</kbd>+<kbd>Y</kbd>: Scene up direction to +Y
 - <kbd>Ctrl</kbd>+<kbd>Z</kbd>: Scene up direction to +Z
 
-Note that the raytracing hotkeys are only available if F3D is build with raytracing enabled.
+Raytracing hotkeys are only available if F3D is build with raytracing enabled.
 
 Camera Hotkeys:
 
@@ -94,7 +94,7 @@ Scene Hotkeys:
 - <kbd>Ctrl</kbd>+<kbd>Y</kbd>: set scene up direction to +Y.
 - <kbd>Ctrl</kbd>+<kbd>Z</kbd>: set scene up direction to +Z.
 
-Other hotkeys and interactions are available:
+Use these other hotkeys and interactions:
 
 - <kbd>H</kbd>: key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
 - <kbd>CTRL</kbd>+<kbd>Q</kbd>: close the window and quit F3D.
@@ -122,7 +122,7 @@ Other hotkeys and interactions are available:
 - <kbd>Ctrl</kbd> + _Drop_ a file, directory and load it.
 - <kbd>Shift</kbd> + _Drop_ a HDRI and use it, no extensions checks performed.
 
-When loading another file or reloading, options that have been changed interactively are kept as is, except when using [imperative options](06-CONFIGURATION_FILE.md#imperative-options) in configuration files.
+When loading another file or reloading, F3D keeps options that have been changed interactively, except when using [imperative options](06-CONFIGURATION_FILE.md#imperative-options) in configuration files.
 
 ## Cycling Coloring
 
@@ -130,26 +130,26 @@ The following hotkeys let you cycle the coloring of the data:
 
 - <kbd>C</kbd>: cycle between point data and cell data - field data is not supported.
 - <kbd>S</kbd>: cycle the array available on the currently selected data in alphabetical order,
-  skipping array not containing numeric data. It will loop back to not coloring unless using volume rendering.
+  skipping array not containing numeric data. It loops back to not coloring unless using volume rendering.
 - <kbd>Y</kbd>: cycle the component available on the currently selected array, looping to -2 for direct scalars rendering.
 
-When changing the array, the component in use will be kept if valid with the new array, if not it will be cycled until a valid
+When changing the array, F3D keeps the component in use if it is valid with the new array. Otherwise, it cycles until a valid
 component is found.
-When changing the type of data to color with, the index of the array within the data will be kept if valid
-with the new data. If not, it will cycle until a valid array is found. After that, the component will be checked
+When changing the type of data to color with, F3D keeps the index of the array within the data if it is valid
+with the new data. Otherwise, it cycles until a valid array is found. After that, F3D checks the component
 as specified above.
 
 ## Taking Screenshots
 
-The destination filename used to save the screenshots (created by pressing <kbd>F12</kbd> or <kbd>Ctrl</kbd>+<kbd>F12</kbd>) is configurable (using the `screenshot-filename` option) and can use template variables as described [on the options page](03-OPTIONS.md#filename-templating).
+Configure the destination filename used to save screenshots with the `screenshot-filename` option. Screenshots are created by pressing <kbd>F12</kbd> or <kbd>Ctrl</kbd>+<kbd>F12</kbd>. The filename can use template variables as described [on the options page](03-OPTIONS.md#filename-templating).
 
-Unless the configured filename template is an absolute path, images will be saved in dedicated directories:
+Unless the configured filename template is an absolute path, F3D saves images in dedicated directories:
 
 - Windows: `%USERPROFILE%\Pictures`
 - Linux: `${XDG_PICTURES_DIR}`,`${HOME}`
 - macOS: `${HOME}`
 
-So with default options, which are using [templates](03-OPTIONS.md#filename-templating), the screenshots will be saved as:
+With default options, which use [templates](03-OPTIONS.md#filename-templating), F3D saves screenshots as:
 
 - Windows: `%USERPROFILE%\Pictures\F3D\{model}_{n}.png`
 - Linux: `${XDG_PICTURES_DIR}/F3D/{model}_{n}.png`,`${HOME}/F3D/{model}_{n}.png`
@@ -157,7 +157,7 @@ So with default options, which are using [templates](03-OPTIONS.md#filename-temp
 
 ## Configuring bindings
 
-It is supported to change all bindings above using a specific syntax in the [configuration file](06-CONFIGURATION_FILE.md) using [commands](07-COMMANDS.md).
+Change the bindings above with a specific syntax in the [configuration file](06-CONFIGURATION_FILE.md) using [commands](07-COMMANDS.md).
 
 ## MacOS Bindings
 
