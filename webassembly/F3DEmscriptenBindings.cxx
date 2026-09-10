@@ -761,6 +761,26 @@ EMSCRIPTEN_BINDINGS(f3d)
         return interactor.addBinding(bind, commandList, group, wrapCallback, type, notify);
       },
       emscripten::return_value_policy::reference())
+    .function(
+      "addBinding",
+      +[](f3d::interactor& interactor, const f3d::interaction_bind_t& bind,
+         const emscripten::val& commands, std::string group, const emscripten::val& callback,
+         f3d::interactor::BindingType type, bool notify, bool repeat) -> f3d::interactor&
+      {
+        auto wrapCallback = [=]() -> std::pair<std::string, std::string>
+        {
+          emscripten::val result = callback();
+          if (!result.isArray() || result["length"].as<unsigned int>() != 2)
+          {
+            throw std::runtime_error("Callback must return an array of two strings");
+          }
+          return { result[0].as<std::string>(), result[1].as<std::string>() };
+        };
+        const std::vector<std::string> commandList =
+          emscripten::vecFromJSArray<std::string>(commands);
+        return interactor.addBinding(bind, commandList, group, wrapCallback, type, notify, repeat);
+      },
+      emscripten::return_value_policy::reference())
     .function("removeBinding", &f3d::interactor::removeBinding,
       emscripten::return_value_policy::reference())
     .function(

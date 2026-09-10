@@ -74,6 +74,12 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
     )
 endif()
 
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20260828)
+  list(APPEND libf3dSDKTests_list
+    TestSDKBindingRepeat.cxx
+    )
+endif()
+
 # Configure the log file for dropfile test
 configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorCallBack.log.in"
                "${CMAKE_BINARY_DIR}/TestSDKInteractorCallBack.log") # Dragon.vtu; S

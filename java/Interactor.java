@@ -259,9 +259,10 @@ public class Interactor {
      * @param group optional group name for organization
      * @param type optional binding type
      * @param notify notify when the binding is triggered
+     * @param repeat repeatedly apply binding when holding down key
      * @return this interactor for method chaining
      */
-    private native Interactor addBindingCommands(InteractionBind bind, List<String> commands, String group, BindingType type, boolean notify);
+    private native Interactor addBindingCommands(InteractionBind bind, List<String> commands, String group, BindingType type, boolean notify, boolean repeat);
 
     /**
      * Add binding to trigger commands for a specific bind.
@@ -271,10 +272,11 @@ public class Interactor {
      * @param group optional group name for organization
      * @param type optional binding type
      * @param notify notify when the binding is triggered
+     * @param repeat repeatedly apply binding when holding down key
      * @return this interactor for method chaining
      */
-    public Interactor addBinding(InteractionBind bind, List<String> commands, String group, BindingType type, boolean notify) {
-        return addBindingCommands(bind, commands, group, type, notify);
+    public Interactor addBinding(InteractionBind bind, List<String> commands, String group, BindingType type, boolean notify, boolean repeat) {
+        return addBindingCommands(bind, commands, group, type, notify, repeat);
     }
 
     /**
@@ -285,7 +287,7 @@ public class Interactor {
      * @return this interactor for method chaining
      */
     public Interactor addBinding(InteractionBind bind, List<String> commands) {
-        return addBindingCommands(bind, commands, "", BindingType.OTHER, true);
+        return addBindingCommands(bind, commands, "", BindingType.OTHER, true, false);
     }
 
     /**
@@ -296,9 +298,10 @@ public class Interactor {
      * @param group optional group name for organization
      * @param type optional binding type
      * @param notify notify when the binding is triggered
+     * @param repeat repeatedly apply binding when holding down key
      * @return this interactor for method chaining
      */
-    private native Interactor addBindingCommand(InteractionBind bind, String command, String group, BindingType type, boolean notify);
+    private native Interactor addBindingCommand(InteractionBind bind, String command, String group, BindingType type, boolean notify, boolean repeat);
 
     /**
      * Add binding to trigger a single command for a specific bind.
@@ -308,10 +311,11 @@ public class Interactor {
      * @param group optional group name for organization
      * @param type optional binding type
      * @param notify notify when the binding is triggered
+     * @param repeat repeatedly apply binding when holding down key
      * @return this interactor for method chaining
      */
-    public Interactor addBinding(InteractionBind bind, String command, String group, BindingType type, boolean notify) {
-        return addBindingCommand(bind, command, group, type, notify);
+    public Interactor addBinding(InteractionBind bind, String command, String group, BindingType type, boolean notify, boolean repeat) {
+        return addBindingCommand(bind, command, group, type, notify, repeat);
     }
 
     /**
@@ -322,7 +326,7 @@ public class Interactor {
      * @return this interactor for method chaining
      */
     public Interactor addBinding(InteractionBind bind, String command) {
-        return addBindingCommand(bind, command, "", BindingType.OTHER, true);
+        return addBindingCommand(bind, command, "", BindingType.OTHER, true, false);
     }
 
     /**

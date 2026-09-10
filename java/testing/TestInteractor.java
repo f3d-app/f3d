@@ -1,4 +1,5 @@
 import app.f3d.F3D.*;
+import java.util.List;
 
 public class TestInteractor {
 
@@ -40,6 +41,20 @@ public class TestInteractor {
     bind.equals(parsed);
     parsed.compareTo(parsed2);
     parsed2.hashCode();
+
+    Interactor.InteractionBind repeatBind = new Interactor.InteractionBind();
+    repeatBind.mod = Interactor.ModifierKeys.NONE;
+    repeatBind.inter = "R";
+
+    // Remove any binds from previous CI before testing repeat to avoid error
+    interactor.removeBinding(repeatBind);
+
+    interactor.addBinding(repeatBind, "test_command", "test_group", Interactor.BindingType.NUMERICAL, false, true);
+
+    List<Interactor.InteractionBind> testBindings = interactor.getBindsForGroup("test_group");
+    testBindings.stream().allMatch((binding) -> binding.equals(repeatBind));
+
+    interactor.removeBinding(repeatBind);
 
     interactor.toggleAnimation();
     interactor.toggleAnimation(Interactor.AnimationDirection.FORWARD);
