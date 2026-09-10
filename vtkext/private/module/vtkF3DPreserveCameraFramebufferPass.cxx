@@ -1,4 +1,4 @@
-#include "vtkF3DOpenXRFramebufferPass.h"
+#include "vtkF3DPreserveCameraFramebufferPass.h"
 
 #include <vtkCamera.h>
 #include <vtkDepthImageProcessingPass.h>
@@ -12,19 +12,12 @@
 #include <vtkRenderer.h>
 #include <vtkTextureObject.h>
 
-#if F3D_MODULE_OPENXR
-#include <vtkOpenXRCamera.h>
-#endif
+vtkStandardNewMacro(vtkF3DPreserveCameraFramebufferPass);
 
-#include <cassert>
-
-vtkStandardNewMacro(vtkF3DOpenXRFramebufferPass);
-
-void vtkF3DOpenXRFramebufferPass::RenderDelegate(const vtkRenderState* s, int width, int height,
-  int vtkNotUsed(newWidth), int vtkNotUsed(newHeight), vtkOpenGLFramebufferObject* fbo,
+void vtkF3DPreserveCameraFramebufferPass::RenderDelegate(const vtkRenderState* s, int width,
+  int height, int vtkNotUsed(newWidth), int vtkNotUsed(newHeight), vtkOpenGLFramebufferObject* fbo,
   vtkTextureObject* colortarget, vtkTextureObject* depthtarget)
 {
-#if F3D_MODULE_OPENXR
   // Adapted from `vtkFramebufferPass::RenderDelegate`
   // Copyright (c) Kitware, Inc.
   assert("pre: s_exists" && s != nullptr);
@@ -56,10 +49,4 @@ void vtkF3DOpenXRFramebufferPass::RenderDelegate(const vtkRenderState* s, int wi
   this->DelegatePass->Render(&s2);
 
   this->NumberOfRenderedProps += this->DelegatePass->GetNumberOfRenderedProps();
-#else
-  // LCOV_EXCL_START
-  // unreachable
-  assert(false);
-  // LCOV_EXCL_STOP
-#endif
 }
