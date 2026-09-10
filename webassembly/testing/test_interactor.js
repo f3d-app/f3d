@@ -122,7 +122,7 @@ const settings = {
       () => ["repeat", "binding"],
       Module.InteractorBindingType.NUMERICAL,
       false,
-      true
+      true,
     );
 
     const updatedBinds = interactor.getBinds();
@@ -145,8 +145,10 @@ const settings = {
 
     const repeatDocs = interactor.getBindingDocumentation(bindRepeat);
     utils.assert(
-      Array.isArray(repeatDocs) && repeatDocs[0] === "repeat" && repeatDocs[1] === "binding",
-      "repeat binding documentation should be returned"
+      Array.isArray(repeatDocs) &&
+        repeatDocs[0] === "repeat" &&
+        repeatDocs[1] === "binding",
+      "repeat binding documentation should be returned",
     );
 
     const bindingType = interactor.getBindingType(bind);
@@ -204,9 +206,18 @@ const settings = {
     interactor.triggerKeyboardKey(Module.InteractorInputAction.RELEASE, "R");
 
     // trigger "increase render.light.intensity .1"
-    interactor.triggerKeyboardKey(Module.InteractorInputAction.PRESS, "Ctrl+Shift+L");
-    interactor.triggerKeyboardKey(Module.InteractorInputAction.PRESS, "Ctrl+Shift+L");
-    interactor.triggerKeyboardKey(Module.InteractorInputAction.RELEASE, "Ctrl+Shift+L");
+    interactor.triggerKeyboardKey(
+      Module.InteractorInputAction.PRESS,
+      "Ctrl+Shift+L",
+    );
+    interactor.triggerKeyboardKey(
+      Module.InteractorInputAction.PRESS,
+      "Ctrl+Shift+L",
+    );
+    interactor.triggerKeyboardKey(
+      Module.InteractorInputAction.RELEASE,
+      "Ctrl+Shift+L",
+    );
 
     let bindingRemoved = false;
     try {
