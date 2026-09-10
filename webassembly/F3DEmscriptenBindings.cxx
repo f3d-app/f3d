@@ -468,6 +468,8 @@ EMSCRIPTEN_BINDINGS(f3d)
       "removeAllLights", &f3d::scene::removeAllLights, emscripten::return_value_policy::reference())
     .function("loadAnimationTime", &f3d::scene::loadAnimationTime,
       emscripten::return_value_policy::reference())
+    .function("animationTime", &f3d::scene::animationTime)
+    .function("animationFrame", &f3d::scene::animationFrame)
     .function(
       "animationTimeRange", +[](f3d::scene& scene) -> emscripten::val
       { return pairToJSArray(scene.animationTimeRange()); })
@@ -800,6 +802,15 @@ EMSCRIPTEN_BINDINGS(f3d)
       emscripten::return_value_policy::reference())
     .function("isPlayingAnimation", &f3d::interactor::isPlayingAnimation)
     .function("getAnimationDirection", &f3d::interactor::getAnimationDirection)
+    .function("getDeltaTime", &f3d::interactor::getDeltaTime)
+    .function(
+      "jumpToFrame", &f3d::interactor::jumpToFrame, emscripten::return_value_policy::reference())
+    .function("jumpToFrameRelative", &f3d::interactor::jumpToFrameRelative,
+      emscripten::return_value_policy::reference())
+    .function("jumpToKeyframe", &f3d::interactor::jumpToKeyframe,
+      emscripten::return_value_policy::reference())
+    .function("jumpToKeyframeRelative", &f3d::interactor::jumpToKeyframeRelative,
+      emscripten::return_value_policy::reference())
     .function("enableCameraMovement", &f3d::interactor::enableCameraMovement,
       emscripten::return_value_policy::reference())
     .function("disableCameraMovement", &f3d::interactor::disableCameraMovement,
@@ -824,6 +835,8 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("triggerEventLoop", &f3d::interactor::triggerEventLoop,
       emscripten::return_value_policy::reference())
     .function("triggerNotification", &f3d::interactor::triggerNotification,
+      emscripten::return_value_policy::reference())
+    .function("triggerEventLoop", &f3d::interactor::triggerEventLoop,
       emscripten::return_value_policy::reference())
     .function(
       "setNotificationCallback",

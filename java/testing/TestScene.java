@@ -29,8 +29,11 @@ public class TestScene {
     String logo = testDataPath +  "data/f3d.glb";
     String sphere = testDataPath + "data/mb/recursive/mb_1_0.vtp";
 
-    Engine engine = Engine.createNone();
+    Engine engine = Engine.create(true);
     Scene scene = engine.getScene();
+    Interactor interactor = engine.getInteractor();
+
+    System.out.println(interactor);
 
     if (scene.supports(sphere) != Scene.FileAvailability.SUPPORTED) {
       throw new RuntimeException("a vtp file should be supported");
@@ -76,6 +79,8 @@ public class TestScene {
     scene.add(mesh);
 
     scene.loadAnimationTime(0.5);
+    scene.animationTime();
+    scene.animationFrame();
     scene.animationTimeRange();
     scene.getAnimationKeyFrames();
     scene.availableAnimations();
