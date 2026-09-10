@@ -1,29 +1,29 @@
 # Quickstart Guide
 
-This guide will help you get started using F3D.
+Use this guide to get started with F3D.
 
-As an overview, you'll learn how to run F3D and open files, configure basic scene constructions, interact with them, and play animations.
+Learn how to run F3D, open files, configure basic scene constructions, interact with them, and play animations.
 
 ## Prerequisites
 
-To use F3D, you'll need to install F3D. See the download page for the latest release package supported by your system.
+Install F3D first. See the download page for the latest release package supported by your system.
 
 ## Running F3D
 
-Once F3D has been installed, you should be able to open a file in any of the following ways:
+After installing F3D, open a file in one of these ways:
 
 - Open a file directly from your file manager.
 - Open the F3D application directly, then drag and drop a file into the application window.
 - Run F3D from the terminal with a set of command-line [options](03-OPTIONS.md).
 - Configure F3D as a [thumbnailer](12-DESKTOP_INTEGRATION.md) for supported file formats with certain file managers.
 
-If you choose to run F3D from the terminal, you can open your file by running the following:
+To run F3D from the terminal, open your file with:
 
 ```
 f3d /path/to/file.ext
 ```
 
-Optionally, you can also save the rendering into an image file:
+Optionally, save the rendering into an image file:
 
 ```
 f3d /path/to/file.ext --output=/path/to/img.png
@@ -36,16 +36,16 @@ f3d --help
 man f3d # Linux only
 ```
 
-Once you've opened your file in F3D, you're all set to start visualizing! Press <kbd>H</kbd> to open a list of shortcuts to help you interact with your scene.
+After opening your file in F3D, press <kbd>H</kbd> to open a list of shortcuts.
 
 See the [supported file formats](02-SUPPORTED_FORMATS.md) page for the full list of file types that F3D can open.
 
 ## Constructing scenes
 
-Certain [formats](02-SUPPORTED_FORMATS.md) are listed as **full scene** formats (.gltf/.glb, .3ds, .wrl, .obj, .fbx, .dae, .off, .x, .3mf, .usd)
-which means these files contain not only _geometry_ but also some scene information like _lights_, _cameras_, _actors_ in the scene,
-as well as _texture_ properties. By default, all this information will be loaded from the file and displayed.
-For file formats that are not **full scene**, **a default scene** is created.
+The [supported file formats](02-SUPPORTED_FORMATS.md) page lists certain formats as **full scene** formats (.gltf/.glb, .3ds, .wrl, .obj, .fbx, .dae, .off, .x, .3mf, .usd).
+These files contain _geometry_ as well as scene information such as _lights_, _cameras_, _actors_,
+and _texture_ properties. By default, F3D loads this information from the file and displays it.
+For file formats that are not **full scene**, F3D creates **a default scene**.
 
 For **default scene** formats, certain default values are set automatically:
 
@@ -62,11 +62,11 @@ For **default scene** formats, certain default values are set automatically:
 - camera-orthographic: false
 - unlit: false
 
-They will be overridden when using corresponding [options](03-OPTIONS.md), either from command line or [configuration file](06-CONFIGURATION_FILE.md).
+Corresponding [options](03-OPTIONS.md) override these defaults, either from command line or from the [configuration file](06-CONFIGURATION_FILE.md).
 
 ## Interacting with your scene
 
-Once you've loaded your scene in F3D, you can interact with it by using your mouse and certain hotkeys.
+After loading your scene in F3D, interact with it using your mouse and hotkeys.
 
 ### Moving the camera
 
@@ -87,9 +87,9 @@ For more information, see the [Interactions](04-INTERACTIONS.md) page.
 
 F3D can play [animations](05-ANIMATIONS.md) for any [supported files](02-SUPPORTED_FORMATS.md) that contain them.
 
-With your file loaded into F3D, press the <kbd>W</kbd> hotkey to cycle through available animations. Then, press <kbd>Space</kbd> to play your selected animation.
+With your file loaded in F3D, press the <kbd>W</kbd> hotkey to cycle through available animations. Then press <kbd>Space</kbd> to play your selected animation.
 
-Alternatively, you can use the command line to play animations. Use the `--animation-indices` [option](03-OPTIONS.md) to specify which animation you want to play. To play all animations at once, use `--animation-indices=-1`.
+Alternatively, use the command line to play animations. Use the `--animation-indices` [option](03-OPTIONS.md) to specify which animation to play. To play all animations at once, use `--animation-indices=-1`.
 
 For more information, see the [Animations](05-ANIMATIONS.md) page.
 

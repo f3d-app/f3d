@@ -1,6 +1,6 @@
 # Parsing Options
 
-When setting options from the [CLI Options](03-OPTIONS.md), the [commands](07-COMMANDS.md) or using the [libf3d options string API](../libf3d/03-OPTIONS.md#string-api), the values are parsed according to their type. If parsing fails, the value is not changed.
+When you set options from the [CLI Options](03-OPTIONS.md), the [commands](07-COMMANDS.md), or the [libf3d options string API](../libf3d/03-OPTIONS.md#string-api), F3D parses the values according to their type. If parsing fails, the value is not changed.
 
 The following types are supported:
 
@@ -14,39 +14,39 @@ The following types are supported:
 - direction: A 3D vector representing a direction.
 - transform2d: A 9D vector representing a 3x3 matrix.
 
-As well as a list for bool, int, double, ratio, string, noted as
+F3D also supports lists for bool, int, double, ratio, and string, noted as:
 
 - vector\<type\>
 
 ## Bool
 
-The following formats are supported when parsing a bool, case insensitive:
+F3D supports the following formats when parsing a bool, case insensitive:
 
 - true/false
 - yes/no
 - on/off
 - 1/0
 
-When formatting a bool into a string, true/false is used.
+When formatting a bool into a string, F3D uses true/false.
 
 ## Int
 
-Int parsing is supported using [std::stoi](https://en.cppreference.com/w/cpp/string/basic_string/stol) and check
+F3D parses ints using [std::stoi](https://en.cppreference.com/w/cpp/string/basic_string/stol) and checks
 that the whole string is parsed.
 
-When formatting an int into a string, [std::to_string](https://en.cppreference.com/w/cpp/string/basic_string/to_string) is used.
+When formatting an int into a string, F3D uses [std::to_string](https://en.cppreference.com/w/cpp/string/basic_string/to_string).
 
 ## Double
 
-Double parsing is supported using [std::stod](https://en.cppreference.com/w/cpp/string/basic_string/stol) and check
+F3D parses doubles using [std::stod](https://en.cppreference.com/w/cpp/string/basic_string/stol) and checks
 that the whole string is parsed.
 
-When formatting a double into a string, [std::ostringstream](https://en.cppreference.com/w/cpp/io/basic_ostringstream) is used
+When formatting a double into a string, F3D uses [std::ostringstream](https://en.cppreference.com/w/cpp/io/basic_ostringstream)
 with removing the point and precision when the value is exactly an integer.
 
 ## Ratio
 
-The following formats are supported when parsing a string into a ratio:
+F3D supports the following formats when parsing a string into a ratio:
 
 - percent% where percent is a double
 - dividend:divisor where both are doubles
@@ -55,26 +55,26 @@ The following formats are supported when parsing a string into a ratio:
 
 Percent, dividend, divisor are then parsed as double.
 
-When formatting a ratio into a string, it is formatted as a double.
+When formatting a ratio into a string, F3D formats it as a double.
 
 ## String
 
-String are trimmed of leading and trailing space when parsed.
-String are formatted as is.
+F3D trims strings of leading and trailing space when parsing them.
+F3D formats strings as is.
 
 ## Path
 
-Path are collapsed and tilda (`~`) is supported.
+F3D collapses paths and supports tilda (`~`).
 
 ## Vectors
 
-Vector tokens are separated by `,`, tokens are then parsed using their respective types.
+Vector tokens are separated by `,`. F3D then parses tokens using their respective types.
 
-When formatting a vector into a string, individual token are formatted according to their type and separated using `,`.
+When formatting a vector into a string, F3D formats individual tokens according to their type and separates them using `,`.
 
 ## Color
 
-The following formats are supported when parsing a color, case insensitive:
+F3D supports the following formats when parsing a color, case insensitive:
 
 - R,G,B where R, G, B are doubles >= 0
 - #RRGGBB where RR, GG, BB are hexadecimal values. Shortened format #RGB is also valid.
@@ -87,35 +87,35 @@ The following formats are supported when parsing a color, case insensitive:
 
 See [W3C](https://www.w3.org/TR/css-color-3/#rgb-color) doc for more details on these formats.
 
-When formatting a color into a string, it is formatted as `#RRGGBB` if values are multiple of 255. Otherwise, it is formatted as vector of doubles.
+When formatting a color into a string, F3D formats it as `#RRGGBB` if values are multiple of 255. Otherwise, F3D formats it as vector of doubles.
 
-When using parenthesis in a command line arg, you may need to quote the entire option, eg: `"--background-color=rgb(84, 84, 84)"`.
+Quote the entire option when your shell treats parenthesis specially, eg: `"--background-color=rgb(84, 84, 84)"`.
 
 All colors are expressed in sRGB color space.
 
 ## Direction
 
-The following formats are supported when parsing a string into a direction:
+F3D supports the following formats when parsing a string into a direction:
 
 - `[[+|-]X][[+|-]Y][[+|-]Z]` (case insensitive), for example `+X` or `X` for `1,0,0`, `-y+z` for `0,-1,1`
 - vector of three doubles, for example `1,2,3.4`
 
-When formatting a direction into a string, it is formatted in the `±XYZ` form if possible or as a vector of doubles otherwise.
+When formatting a direction into a string, F3D formats it in the `±XYZ` form if possible or as a vector of doubles otherwise.
 
 ## Colormap
 
-The following formats are supported when parsing a string into a colormap:
+F3D supports the following formats when parsing a string into a colormap:
 
 - `val, red, green, blue, ...`
 - `val, color, ...`
 
-When formatting a colormap into a string, it is formatted as `val, color, ...`.
+When formatting a colormap into a string, F3D formats it as `val, color, ...`.
 
 ## Transform2D
 
-The following formats are supported when parsing a string into a transform2D:
+F3D supports the following formats when parsing a string into a transform2D:
 
 - A 9D double vector
-- At least one of the following: `scale: val, val`, `translation: val, val`, `angle: val` in any order, semicolon-separated. `scale` may be given one value, which will apply to both the x and y axes of the matrix. `angle` is expressed in degrees.
+- At least one of the following: `scale: val, val`, `translation: val, val`, `angle: val` in any order, semicolon-separated. Use one `scale` value to apply it to both the x and y axes of the matrix. `angle` is expressed in degrees.
 
-When formatting a transform2d into a string, it is formatted as a 9D double vector
+When formatting a transform2d into a string, F3D formats it as a 9D double vector.
