@@ -4,6 +4,7 @@
 #include "vtkF3DHexagonalBokehBlurPass.h"
 #include "vtkF3DImporter.h"
 #include "vtkF3DOpenGLGridMapper.h"
+#include "vtkF3DPreserveCameraFramebufferPass.h"
 #include "vtkF3DRenderer.h"
 #include "vtkF3DStochasticTransparentPass.h"
 #include "vtkF3DTAAPass.h"
@@ -218,28 +219,12 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
 
   this->ReleaseGraphicsResources(glRenderer->GetRenderWindow());
 
-  auto createFramebufferPass = [](bool xrMode) -> vtkSmartPointer<vtkFramebufferPass>
-  {
-    if (xrMode)
-    {
-#if F3D_MODULE_OPENXR
-      return vtkSmartPointer<vtkF3DOpenXRFramebufferPass>::New();
-#else
-      // LCOV_EXCL_START
-      // unreachable
-      assert(false);
-      // LCOV_EXCL_STOP
-#endif
-    }
-    return vtkSmartPointer<vtkFramebufferPass>::New();
-  };
-
   // background pass, setup framebuffer, clear and draw skybox
   vtkNew<vtkOpaquePass> bgP;
   vtkNew<vtkCameraPass> bgCamP;
   bgCamP->SetDelegatePass(bgP);
 
-  this->BackgroundPass = createFramebufferPass(this->XRMode);
+  this->BackgroundPass = vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass>::New();
   this->BackgroundPass->SetColorFormat(vtkTextureObject::Float16);
 
   if (this->UseBlurBackground)
@@ -336,7 +321,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     vtkNew<vtkCameraPass> camP;
     camP->SetDelegatePass(sequence);
 
-    this->MainPass = createFramebufferPass(this->XRMode);
+    this->MainPass = vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass>::New();
     this->MainPass->SetColorFormat(vtkTextureObject::Float32);
 
     // Needed because VTK can pick the wrong format with certain drivers
@@ -366,7 +351,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     }
 
     // reflection baking pass, same as main pass but with reflected camera
-    this->BakeReflectionPass = createFramebufferPass(this->XRMode);
+    this->BakeReflectionPass = vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass>::New();
     this->BakeReflectionPass->SetColorFormat(vtkTextureObject::Float16);
     this->BakeReflectionPass->SetDelegatePass(camP);
 
@@ -400,7 +385,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     vtkNew<vtkCameraPass> camP;
     camP->SetDelegatePass(sequence);
 
-    this->MainOnTopPass = createFramebufferPass(this->XRMode);
+    this->MainOnTopPass = vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass>::New();
     this->MainOnTopPass->SetDelegatePass(camP);
 
     // Needed because VTK can pick the wrong format with certain drivers
