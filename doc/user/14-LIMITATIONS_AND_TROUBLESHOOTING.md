@@ -1,4 +1,4 @@
-# Limitations & Troubleshooting
+# Limitations and troubleshooting
 
 ## Limitations
 
@@ -153,7 +153,7 @@ This is a limitation from the Windows "subsystem". Use `f3d-console.exe` instead
 
 This is a limitation of older VTK version before VTK 9.5.0. Use F3D binaries or compile a recent version of VTK.
 
-### MacOS
+### macOS
 
 > I'm unable to use the binary release, macOS complains the file is invalid or corrupted
 

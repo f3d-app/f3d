@@ -1,6 +1,6 @@
 # Interactions
 
-## 3D Mouse Interactions
+## 3D mouse interactions
 
 Interact with the displayed data directly in the window:
 
@@ -18,7 +18,7 @@ Interact with the displayed data directly in the window:
 > [!NOTE]
 > When playing an animation with a scene camera, camera interactions are locked.
 
-## 2D Mode
+## 2D mode
 
 F3D supports a 2D interaction mode designed for viewing images and flat content. In 2D mode:
 
@@ -39,11 +39,11 @@ Control coloring directly with these hotkeys:
 - <kbd>S</kbd>: cycle the array to color with.
 - <kbd>Y</kbd>: cycle the component of the array to color with.
 
-See the [coloring cycle](#cycling-coloring) section for more info.
+See the [coloring cycle](#cycle-coloring) section for more info.
 
 Toggle or cycle other options directly with these hotkeys:
 
-- <kbd>W</kbd>: [cycle animations](05-ANIMATIONS.md#cycling-animations).
+- <kbd>W</kbd>: [cycle animations](05-ANIMATIONS.md#cycle-animations).
 - <kbd>B</kbd>: display of the scalar bar, only when coloring and not using direct scalars.
 - <kbd>V</kbd>: volume rendering, forces coloring.
 - <kbd>I</kbd>: opacity function inversion during volume rendering.
@@ -124,7 +124,7 @@ Use these other hotkeys and interactions:
 
 When loading another file or reloading, F3D keeps options that have been changed interactively, except when using [imperative options](06-CONFIGURATION_FILE.md#imperative-options) in configuration files.
 
-## Cycling Coloring
+## Cycle coloring
 
 The following hotkeys let you cycle the coloring of the data:
 
@@ -139,7 +139,7 @@ When changing the type of data to color with, F3D keeps the index of the array w
 with the new data. Otherwise, it cycles until a valid array is found. After that, F3D checks the component
 as specified above.
 
-## Taking Screenshots
+## Take screenshots
 
 Configure the destination filename used to save screenshots with the `screenshot-filename` option. Screenshots are created by pressing <kbd>F12</kbd> or <kbd>Ctrl</kbd>+<kbd>F12</kbd>. The filename can use template variables as described [on the options page](03-OPTIONS.md#filename-templating).
 
@@ -155,10 +155,10 @@ With default options, which use [templates](03-OPTIONS.md#filename-templating), 
 - Linux: `${XDG_PICTURES_DIR}/F3D/{model}_{n}.png`,`${HOME}/F3D/{model}_{n}.png`
 - macOS: `${HOME}/F3D/{model}_{n}.png`
 
-## Configuring bindings
+## Configure bindings
 
 Change the bindings above with a specific syntax in the [configuration file](06-CONFIGURATION_FILE.md) using [commands](07-COMMANDS.md).
 
-## MacOS Bindings
+## macOS bindings
 
 When using F3D on MacOS, all bindings that specify <kbd>Ctrl</kbd> and <kbd>Ctrl</kbd>+<kbd>Shift</kbd> use <kbd>Cmd</kbd> and <kbd>Cmd</kbd>+<kbd>Shift</kbd> respectively instead.

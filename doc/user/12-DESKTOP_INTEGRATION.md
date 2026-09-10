@@ -1,4 +1,4 @@
-# Desktop Integration
+# Desktop integration
 
 F3D integrates with the desktop experience.
 
@@ -43,7 +43,7 @@ cd C:\path\to\f3d\bin\
 regsvr32 /u F3DShellExtension.dll
 ```
 
-## MacOS
+## macOS
 
 F3D does not support thumbnails on MacOS. The .dmg binary release provides automatic file openings.
 

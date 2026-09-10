@@ -2,7 +2,7 @@
 
 Control F3D behavior from the command line using the following options.
 
-## Application Options
+## Application options
 
 ### `--input=<input file>` (_string_)
 
@@ -11,7 +11,7 @@ If `-` is specified instead of a filename, F3D streams the file from stdin and w
 
 ### `--output=<png file>` (_string_)
 
-Instead of showing a render view and render into it, _render directly into a png file_. When used with --ref option, only outputs on failure. If `-` is specified instead of a filename, F3D streams the PNG file to stdout. You can also use [template variables](#filename-templating). When using the `{frame}` variable, F3D exports multiple animation frames (see [Exporting animation frames](05-ANIMATIONS.md#exporting-animation-frames)).
+Instead of showing a render view and render into it, _render directly into a png file_. When used with --ref option, only outputs on failure. If `-` is specified instead of a filename, F3D streams the PNG file to stdout. You can also use [template variables](#filename-templating). When using the `{frame}` variable, F3D exports multiple animation frames (see [Export animation frames](05-ANIMATIONS.md#export-animation-frames)).
 
 ### `--no-background` (_bool_, default: `false`)
 
@@ -95,7 +95,7 @@ Scan standard directories for plugins and display their names. Results may be in
 
 ### `--screenshot-filename=<png file>` (_string_, default: `{app}/{model}_{n}.png`)
 
-Filename to save [screenshots](04-INTERACTIONS.md#taking-screenshots) to. Can use [template variables](#filename-templating). Supports relative paths [as described](04-INTERACTIONS.md#taking-screenshots).
+Filename to save [screenshots](04-INTERACTIONS.md#take-screenshots) to. Can use [template variables](#filename-templating). Supports relative paths [as described](04-INTERACTIONS.md#take-screenshots).
 
 ### `--rendering-backend=<auto|egl|osmesa|glx|wgl>` (_string_, default: `auto`)
 
@@ -109,7 +109,7 @@ A repeatable option to set [libf3d](../libf3d/03-OPTIONS.md) and [reader](02-SUP
 
 A repeatable option to reset [libf3d options](../libf3d/03-OPTIONS.md) manually. Useful when overidding option set in [configuration files](06-CONFIGURATION_FILE.md).
 
-## General Options
+## General options
 
 ### `--verbose=<[debug|info|warning|error|quiet]>` (_string_, default: `info`, implicit: `debug`)
 

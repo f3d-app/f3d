@@ -1,4 +1,4 @@
-# Quickstart Guide
+# Quickstart guide
 
 Use this guide to get started with F3D.
 
@@ -8,7 +8,7 @@ Learn how to run F3D, open files, configure basic scene constructions, interact 
 
 Install F3D first. See the download page for the latest release package supported by your system.
 
-## Running F3D
+## Run F3D
 
 After installing F3D, open a file in one of these ways:
 
@@ -40,7 +40,7 @@ After opening your file in F3D, press <kbd>H</kbd> to open a list of shortcuts.
 
 See the [supported file formats](02-SUPPORTED_FORMATS.md) page for the full list of file types that F3D can open.
 
-## Constructing scenes
+## Construct scenes
 
 The [supported file formats](02-SUPPORTED_FORMATS.md) page lists certain formats as **full scene** formats (.gltf/.glb, .3ds, .wrl, .obj, .fbx, .dae, .off, .x, .3mf, .usd).
 These files contain _geometry_ as well as scene information such as _lights_, _cameras_, _actors_,
@@ -64,7 +64,7 @@ For **default scene** formats, certain default values are set automatically:
 
 Corresponding [options](03-OPTIONS.md) override these defaults, either from command line or from the [configuration file](06-CONFIGURATION_FILE.md).
 
-## Interacting with your scene
+## Interact with your scene
 
 After loading your scene in F3D, interact with it using your mouse and hotkeys.
 
@@ -83,7 +83,7 @@ After loading your scene in F3D, interact with it using your mouse and hotkeys.
 
 For more information, see the [Interactions](04-INTERACTIONS.md) page.
 
-## Playing animations
+## Play animations
 
 F3D can play [animations](05-ANIMATIONS.md) for any [supported files](02-SUPPORTED_FORMATS.md) that contain them.
 
@@ -93,7 +93,7 @@ Alternatively, use the command line to play animations. Use the `--animation-ind
 
 For more information, see the [Animations](05-ANIMATIONS.md) page.
 
-## Further Reading
+## Further reading
 
 - [A list of all F3D command-line options.](03-OPTIONS.md)
 - [How to interact with scenes in F3D.](04-INTERACTIONS.md)

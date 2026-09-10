@@ -9,7 +9,7 @@ Commands have the following syntax:
 
 `action [args]`
 
-## libf3d provided commands
+## libf3d commands
 
 The libf3d provides a few commands, many related to manipulating libf3d (options)[../libf3d/03-OPTIONS.md].
 
@@ -34,7 +34,7 @@ The libf3d provides a few commands, many related to manipulating libf3d (options
 `cycle_animation`: A specific command to cycle `scene.animation.index` option using model information. No argument.
 
 `cycle_coloring field/array/component`: A specific command to manipulate scivis options using model information.
-Supports `field`, `array` or `component` arguments, see [documentation](04-INTERACTIONS.md#cycling-coloring).
+Supports `field`, `array` or `component` arguments, see [documentation](04-INTERACTIONS.md#cycle-coloring).
 eg: `cycle_coloring array`.
 
 `roll_camera value`: A specific command to roll the camera on its side, takes an angle in degrees as an argument.
@@ -140,7 +140,7 @@ eg: `alias myrotate roll_camera 90`.
 
 `help [command]: A specific command to print help about a specific command. eg: `help set_camera`.
 
-## F3D provided specific commands
+## F3D commands
 
 The F3D application provides a few more commands.
 
@@ -154,10 +154,10 @@ The F3D application provides a few more commands.
 
 `add_current_directories`: A specific command to add all files from the current file or file group directories. No argument.
 
-`take_screenshot [filename]`: A specific command to [take a screenshot](04-INTERACTIONS.md#taking-screenshots). If filename is not specified,
+`take_screenshot [filename]`: A specific command to [take a screenshot](04-INTERACTIONS.md#take-screenshots). If filename is not specified,
 rely on the `--screenshot-filename` CLI option. eg: `take_screenshot path/to/file.png`.
 
-`take_minimal_screenshot [filename]`: A specific command to [take a minimal screenshot](04-INTERACTIONS.md#taking-screenshots). If filename is not specified,
+`take_minimal_screenshot [filename]`: A specific command to [take a minimal screenshot](04-INTERACTIONS.md#take-screenshots). If filename is not specified,
 rely on the `--screenshot-filename` CLI option. eg: `take_screenshot path/to/file.png`.
 
 `add_files [path/to/file1] [path/to/file2]`: A specific command to add files to the scene according to the current grouping logic. Takes one or more files as arguments.
@@ -201,7 +201,7 @@ Use an index domain through both `cycle` and `increase`/`decrease` commands.
 For `increase`/`decrease`, it behaves like a range domain [0, max] with an increment of 1.
 For `cycle`, it behaves like an enum domain containing all possible values between o and max.
 
-## Command Script (`--command-script`)
+## Command script (`--command-script`)
 
 F3D can execute commands from a script file using the `--command-script` [CLI option](03-OPTIONS.md). You can automate a sequence of commands by listing them in a plain text file, eg: `f3d --command-script path/to/command_script.txt`.
 
@@ -215,7 +215,7 @@ print_scene_info # Another comment
 increase_light_intensity
 ```
 
-## Interactive Console
+## Interactive console
 
 If F3D is built with `F3D_MODULE_UI` support, pressing <kbd>Esc</kbd> opens the console. Type any command in the input field and press <kbd>Enter</kbd> to trigger the command instantly.
 

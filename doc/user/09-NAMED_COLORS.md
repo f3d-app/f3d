@@ -133,7 +133,7 @@ The list is split by color tone.
 | DarkCyan          | rgb(0, 139, 139)   |
 | Teal              | rgb(0, 128, 128)   |
 
-### Blue/Cyan colors
+### Blue/cyan colors
 
 | Name            | RGB                |
 | --------------- | ------------------ |
