@@ -79,6 +79,7 @@ set(classes
   vtkF3DCachedSpecularTexture
   vtkF3DConsoleOutputWindow
   vtkF3DExternalRenderWindow
+  vtkF3DFrameCapture
   vtkF3DGenericImporter
   vtkF3DHexagonalBokehBlurPass
   vtkF3DInteractorEventRecorder

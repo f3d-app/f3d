@@ -271,6 +271,7 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
   }
 
   this->UIActor->ReleaseGraphicsResources(w);
+  this->FrameCapture->ReleaseGraphicsResources(w);
 
   this->Superclass::ReleaseGraphicsResources(w);
 }
@@ -2285,6 +2286,24 @@ void vtkF3DRenderer::UpdateActors()
   {
     this->ConfigureGridUsingCurrentActors();
   }
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::CaptureVideoFrame(std::byte* yPlane, std::byte* uPlane, std::byte* vPlane)
+{
+  // Use the final rendered texture as input for the frame capture
+  vtkF3DOverlayRenderPass* overlayPass = vtkF3DOverlayRenderPass::SafeDownCast(this->GetPass());
+
+  if (overlayPass == nullptr)
+  {
+    F3DLog::Print(
+      F3DLog::Severity::Error, "Cannot capture video frame: renderer is not initialized");
+    return false;
+  }
+
+  this->FrameCapture->SetInputTexture(overlayPass->GetColorTexture());
+  this->FrameCapture->Capture(this, yPlane, uPlane, vPlane);
+  return true;
 }
 
 //----------------------------------------------------------------------------

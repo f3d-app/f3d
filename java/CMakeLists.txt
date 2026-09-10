@@ -21,6 +21,9 @@ set(F3D_JAVA_SOURCES
   Transform2D.java
   Types.java
   Utils.java
+  VideoEncoder.java
+  VideoFrame.java
+  VideoPacket.java
   Window.java)
 
 # Generate JNI headers, and builds a JAR package
@@ -40,6 +43,7 @@ set(F3D_JAVA_BINDINGS_SOURCES
   F3DSceneBindings.cxx
   F3DTypesBindings.cxx
   F3DUtilsBindings.cxx
+  F3DVideoBindings.cxx
   F3DWindowBindings.cxx)
 
 add_library(javaf3d SHARED ${F3D_JAVA_BINDINGS_SOURCES})

@@ -17,3 +17,6 @@ race:libpdalcpp
 # Mesa
 race:libOSMesa
 race:libgallium
+
+# FFmpeg
+race:libavcodec

@@ -38,6 +38,7 @@
 #include "log.h"
 #include "options.h"
 #include "utils.h"
+#include "video_encoder.h"
 #include "window.h"
 
 #include <nlohmann/json.hpp>
@@ -59,6 +60,7 @@
 #include <regex>
 #include <set>
 #include <sstream>
+#include <thread>
 
 #ifdef _WIN32
 #include <fcntl.h>
@@ -101,6 +103,10 @@ public:
   struct F3DAppOptions
   {
     std::string Output;
+    std::string OutputVideo;
+    std::string VideoEncoder;
+    double VideoBitrate;
+    bool VideoLowLatency;
     std::string LoadStatefile;
     std::string SaveStatefile;
     std::string StatefileFilename;
@@ -1004,6 +1010,10 @@ public:
   {
     // Update typed app options from app options
     this->ParseOption(appOptions, "output", this->AppOptions.Output);
+    this->ParseOption(appOptions, "output-video", this->AppOptions.OutputVideo);
+    this->ParseOption(appOptions, "video-encoder", this->AppOptions.VideoEncoder);
+    this->ParseOption(appOptions, "video-bitrate", this->AppOptions.VideoBitrate);
+    this->ParseOption(appOptions, "video-low-latency", this->AppOptions.VideoLowLatency);
     this->ParseOption(appOptions, "load-statefile", this->AppOptions.LoadStatefile);
     this->ParseOption(appOptions, "save-statefile", this->AppOptions.SaveStatefile);
     this->ParseOption(appOptions, "statefile-filename", this->AppOptions.StatefileFilename);
@@ -1455,6 +1465,15 @@ int F3DStarter::Start(int argc, char** argv)
     renderToStdout = localOutput == F3D_PIPED;
   }
 
+  iter = cliOptionsDict.find("output-video");
+  if (iter != cliOptionsDict.end())
+  {
+    std::string localOutput;
+    // XXX: Discarding bool return because this cannot return false with a string
+    F3DOptionsTools::Parse(iter->second, localOutput);
+    renderToStdout = localOutput == F3D_PIPED;
+  }
+
   // The statefile is written to stdout when piped, just like the output image
   bool statefileToStdout = false;
   iter = cliOptionsDict.find("save-statefile");
@@ -1565,7 +1584,8 @@ int F3DStarter::Start(int argc, char** argv)
   else
   {
     bool offscreen = !this->Internals->AppOptions.Reference.empty() ||
-      !this->Internals->AppOptions.Output.empty() || this->Internals->AppOptions.BindingsList;
+      !this->Internals->AppOptions.Output.empty() ||
+      !this->Internals->AppOptions.OutputVideo.empty() || this->Internals->AppOptions.BindingsList;
 
     try
     {
@@ -1618,6 +1638,7 @@ int F3DStarter::Start(int argc, char** argv)
     this->ResetWindowName();
 
     if (!this->Internals->AppOptions.NoRender && this->Internals->AppOptions.Output.empty() &&
+      this->Internals->AppOptions.OutputVideo.empty() &&
       this->Internals->AppOptions.Reference.empty())
     {
       const F3DOptionsTools::OptionsDict cachedGeometry =
@@ -1933,13 +1954,123 @@ int F3DStarter::Start(int argc, char** argv)
                        "files were ignored.");
       }
     }
+    else if (!this->Internals->AppOptions.OutputVideo.empty())
+    {
+#ifndef F3D_MODULE_FFMPEG
+      f3d::log::error(
+        "Video output is not supported in this build of F3D, please rebuild with FFMPEG support");
+      return EXIT_FAILURE;
+#else
+      if (this->Internals->LoadedFiles.empty() && !noDataForceRender.has_value())
+      {
+        f3d::log::error("No files loaded, no rendering performed");
+        return EXIT_FAILURE;
+      }
+
+      f3d::video_encoder::params encoderParams = {
+        .Width = window.getWidth(),
+        .Height = window.getHeight(),
+        .FrameRate = this->Internals->AppOptions.FrameRate,
+        .Bitrate = this->Internals->AppOptions.VideoBitrate,
+        .LowLatency = this->Internals->AppOptions.VideoLowLatency,
+      };
+
+      if (!this->Internals->AppOptions.VideoEncoder.empty())
+      {
+        encoderParams.Codec = f3d::video_encoder::codec::EXPLICIT;
+        encoderParams.ExplicitCodecName = this->Internals->AppOptions.VideoEncoder;
+      }
+
+      std::shared_ptr<f3d::video_encoder> encoder;
+
+      try
+      {
+        encoder = f3d::video_encoder::create(encoderParams);
+      }
+      catch (const f3d::video_encoder::codec_exception& e)
+      {
+        f3d::log::error("Failed to create video encoder: ", e.what());
+        return EXIT_FAILURE;
+      }
+
+      std::ofstream outputFile;
+      std::ostream& stream = renderToStdout ? std::cout : outputFile;
+
+      if (!renderToStdout)
+      {
+        outputFile.open(this->Internals->AppOptions.OutputVideo, std::ios::binary);
+        if (!outputFile.is_open())
+        {
+          f3d::log::error(
+            "Could not open output video file: ", this->Internals->AppOptions.OutputVideo);
+          return EXIT_FAILURE;
+        }
+      }
+
+      encoder->listen(
+        [&](const std::shared_ptr<f3d::video_packet>& packet)
+        {
+          stream.write(
+            reinterpret_cast<const char*>(packet->getPacketData()), packet->getPacketSize());
+          f3d::log::debug("Video packet received, size: ", packet->getPacketSize());
+        });
+
+      f3d::scene& animScene = this->Internals->Engine->getScene();
+      const auto [minTime, maxTime] = animScene.animationTimeRange();
+
+      const double startTime = this->Internals->AppOptions.AnimationTime.value_or(minTime);
+      const double endTime = maxTime;
+      const double duration = endTime - startTime;
+      const int count = duration > 0
+        ? static_cast<int>(std::ceil(duration * this->Internals->AppOptions.FrameRate)) + 1
+        : 1;
+
+      if (count == 1)
+      {
+        f3d::log::warn("No animation available or animation has zero duration, outputting single "
+                       "frame");
+      }
+
+      const double timeStep = 1.0 / this->Internals->AppOptions.FrameRate;
+
+      f3d::log::info(
+        "Saving ", count, " animation frame(s) from time ", startTime, " to ", endTime);
+
+      for (int frame = 0; frame < count; ++frame)
+      {
+        const double currentTime = startTime + frame * timeStep;
+        animScene.loadAnimationTime(currentTime);
+
+        window.render();
+
+        auto videoFrame = window.getVideoFrame();
+        videoFrame->setTimestamp(frame);
+
+        while (!encoder->submit(videoFrame))
+        {
+          // If submit returns false, it's not an error, it means the encoder is not ready
+          // to accept a new frame yet, so we wait a bit
+          // It's not deterministic so we cannot cover it in the CI
+          // LCOV_EXCL_START
+          std::this_thread::sleep_for(std::chrono::milliseconds(10));
+          // LCOV_EXCL_STOP
+        }
+      }
+
+      encoder->flush();
+
+      f3d::log::info("Saved ", count, " animation frame(s)");
+
+      if (this->Internals->FilesGroups.size() > 1)
+      {
+        f3d::log::warn("An output video was saved using a single 3D file, other provided 3D "
+                       "files were ignored.");
+      }
+#endif
+    }
     // Start interaction
     else
     {
-#ifdef F3D_HEADLESS_BUILD
-      f3d::log::error("This is a headless build of F3D, interactive rendering is not supported");
-      return EXIT_FAILURE;
-#else
       if (this->Internals->Engine->getWindow().isOffscreen())
       {
         f3d::log::warn(
@@ -1963,7 +2094,6 @@ int F3DStarter::Start(int argc, char** argv)
 
         this->Internals->CacheWindowGeometry();
       }
-#endif
     }
   }
   return EXIT_SUCCESS;
