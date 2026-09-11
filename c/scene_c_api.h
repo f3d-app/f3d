@@ -45,6 +45,18 @@ extern "C"
   F3D_EXPORT int f3d_scene_add_mesh(f3d_scene_t* scene, const f3d_mesh_t* mesh);
 
   /**
+   * @brief Add a zero-copy in-memory mesh view into the scene.
+   *
+   * Unlike f3d_scene_add_mesh (which copies all arrays into F3D), this keeps references
+   * to the caller-owned arrays described by the memory views, no data is copied.
+   *
+   * @param scene Scene handle.
+   * @param mesh_view Mesh view describing caller-owned arrays.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_scene_add_mesh_view(f3d_scene_t* scene, const f3d_mesh_view_t* mesh_view);
+
+  /**
    * @brief Add and load a memory buffer into the scene.
    *
    * @param scene Scene handle.
