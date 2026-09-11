@@ -19,6 +19,9 @@ f3d_test(NAME TestFCStdReadWire DATA colored_visibility.FCStd PLUGIN occt ARGS -
 f3d_test(NAME TestFCStd1x DATA bracket_1x.FCStd PLUGIN occt ARGS -csy --up=+Z --camera-direction=-1,1,-1)
 f3d_test(NAME TestFCStdTransparency DATA transparency.FCStd PLUGIN occt ARGS -csy --up=+Z --camera-direction=0,1,-0.3)
 f3d_test(NAME TestInvalidFCStd DATA invalid_content.FCStd PLUGIN occt ARGS --verbose REGEXP "failed to load scene" NO_BASELINE)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
+  f3d_test(NAME TestFCStdSceneHierarchy DATA part_container.FCStd PLUGIN occt ARGS --scene-hierarchy --up=+Z UI)
+endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251223)
   f3d_test(NAME TestPipedSTEP DATA f3d.stp PLUGIN occt ARGS --up=+Z PIPED_READER STEP PIPED)

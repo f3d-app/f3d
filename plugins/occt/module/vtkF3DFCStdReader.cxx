@@ -42,6 +42,8 @@
 namespace
 {
 constexpr std::array<unsigned char, 3> DEFAULT_COLOR = { 204, 204, 204 };
+// guard against cyclic containers when walking the FreeCAD tree
+constexpr int MAX_HIERARCHY_DEPTH = 16;
 
 //----------------------------------------------------------------------------
 struct FCObject
@@ -583,8 +585,7 @@ public:
   // "Walls" and "Slabs" groups of an Arch BuildingPart floor
   bool HasVisibleGeometryInSubtree(const FCObject& obj, int depth)
   {
-    constexpr int maxDepth = 16;
-    if (depth >= maxDepth)
+    if (depth >= MAX_HIERARCHY_DEPTH)
     {
       return false;
     }
@@ -750,10 +751,33 @@ public:
   }
 
   //----------------------------------------------------------------------------
+  int AddAssemblyNode(vtkDataAssembly* assembly, const std::string& name,
+    std::map<std::string, int>& nodes, int depth = 0)
+  {
+    auto existing = nodes.find(name);
+    if (existing != nodes.end())
+    {
+      return existing->second;
+    }
+    const FCObject& obj = this->Objects[name];
+    int parent = assembly->GetRootNode();
+    if (!obj.Parent.empty() && depth < MAX_HIERARCHY_DEPTH && this->Objects.count(obj.Parent) > 0)
+    {
+      parent = this->AddAssemblyNode(assembly, obj.Parent, nodes, depth + 1);
+    }
+    const int node =
+      assembly->AddNode(vtkDataAssembly::MakeValidNodeName(obj.Label.c_str()).c_str(), parent);
+    assembly->SetAttribute(node, "label", obj.Label.c_str());
+    nodes[name] = node;
+    return node;
+  }
+
+  //----------------------------------------------------------------------------
   bool BuildOutput(vtkF3DArchiveReader& archive, vtkPartitionedDataSetCollection* output)
   {
     vtkNew<vtkDataAssembly> assembly;
     assembly->SetRootNodeName("FCStd");
+    std::map<std::string, int> nodes;
     unsigned int index = 0;
 
     for (const std::string& name : this->ObjectOrder)
@@ -888,10 +912,7 @@ public:
 
       output->SetPartition(index, 0, polydata);
       output->GetMetaData(index)->Set(vtkCompositeDataSet::NAME(), obj.Label);
-      const int node =
-        assembly->AddNode(vtkDataAssembly::MakeValidNodeName(obj.Label.c_str()).c_str());
-      assembly->SetAttribute(node, "label", obj.Label.c_str());
-      assembly->AddDataSetIndex(node, index);
+      assembly->AddDataSetIndex(this->AddAssemblyNode(assembly, name, nodes), index);
       index++;
     }
 
