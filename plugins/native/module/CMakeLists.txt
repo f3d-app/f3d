@@ -4,6 +4,7 @@ set(classes
   vtkF3DSPZReader
   vtkF3DSplatReader
   vtkF3DPLYReader
+  vtkF3DLYSReader
   )
 
 vtk_module_add_module(f3d::vtkextNative
