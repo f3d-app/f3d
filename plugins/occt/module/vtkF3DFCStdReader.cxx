@@ -117,8 +117,9 @@ double ReadLEDouble(const char* data)
 }
 
 //----------------------------------------------------------------------------
-// FreeCAD packs colors as 0xRRGGBBAA
-std::array<unsigned char, 3> UnpackColor(uint32_t packed)
+// FreeCAD packs colors as 0xRRGGBBAA. The last byte is ignored: the opacity of an object
+// comes from its Transparency property and the opacity of a face from the color lists.
+std::array<unsigned char, 3> UnpackRGB(uint32_t packed)
 {
   return { static_cast<unsigned char>((packed >> 24) & 0xFF),
     static_cast<unsigned char>((packed >> 16) & 0xFF),
@@ -449,7 +450,7 @@ public:
         unsigned long packed = 0;
         if (color && color->GetScalarAttribute("value", packed))
         {
-          obj.Color = UnpackColor(static_cast<uint32_t>(packed));
+          obj.Color = UnpackRGB(static_cast<uint32_t>(packed));
         }
       }
       else if (std::strcmp(propName, "Transparency") == 0)
@@ -506,7 +507,7 @@ public:
     }
     if (count == 1)
     {
-      obj.Color = UnpackColor(ReadLEUint32(data.data() + sizeof(uint32_t)));
+      obj.Color = UnpackRGB(ReadLEUint32(data.data() + sizeof(uint32_t)));
     }
     else
     {
@@ -514,7 +515,7 @@ public:
       for (uint32_t i = 0; i < count; i++)
       {
         const uint32_t packed = ReadLEUint32(data.data() + sizeof(uint32_t) * (1 + i));
-        const std::array<unsigned char, 3> rgb = UnpackColor(packed);
+        const std::array<unsigned char, 3> rgb = UnpackRGB(packed);
         const unsigned char lastByte = static_cast<unsigned char>(packed & 0xFF);
         const unsigned char alpha =
           this->LegacyAlpha ? static_cast<unsigned char>(255 - lastByte) : lastByte;
@@ -542,8 +543,7 @@ public:
     for (uint32_t i = 0; i < count; i++)
     {
       const char* material = data.data() + sizeof(uint32_t) + materialSize * i;
-      const std::array<unsigned char, 3> rgb =
-        UnpackColor(ReadLEUint32(material + sizeof(uint32_t)));
+      const std::array<unsigned char, 3> rgb = UnpackRGB(ReadLEUint32(material + sizeof(uint32_t)));
       float transparency;
       const uint32_t transparencyBits =
         ReadLEUint32(material + 4 * sizeof(uint32_t) + sizeof(float));
