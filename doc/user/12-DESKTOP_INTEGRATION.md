@@ -27,7 +27,7 @@ If you use the portable archive, extract it somewhere the sandboxing system has 
 
 For Windows desktop integration, F3D relies on a registered shell extension.
 
-Using the F3D NSIS installer (.exe) is the simplest way to enable thumbnails and integrate F3D on windows.
+Using the F3D NSIS installer (.exe) is the simplest way to enable thumbnails and integrate F3D on Windows.
 
 Alternatively, when using the zipped binary release archive, register it manually on installation:
 
@@ -45,7 +45,7 @@ regsvr32 /u F3DShellExtension.dll
 
 ## macOS
 
-F3D does not support thumbnails on MacOS. The .dmg binary release provides automatic file openings.
+F3D does not support thumbnails on macOS. The .dmg binary release provides automatic file openings.
 
 ## Rendering backends
 

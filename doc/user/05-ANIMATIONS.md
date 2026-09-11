@@ -25,7 +25,7 @@ Note: A blue bar runs along the bottom of screen to indicate the current time in
 <img width="1024" alt="5" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_4.png" />
 "All Animations" plays all animations at the same time when the file format supports it.
 
-## Command line options
+## Command-line options
 
 Control F3D animation behavior from the command line with these options.
 
