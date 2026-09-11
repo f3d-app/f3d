@@ -115,7 +115,6 @@ public:
 
   struct CLIProgressBarDataStruct {
       vtkTimerLog* timer;
-      vtkF3DMetaImporter* metaImporter;
       std::array<char, 50> fileName;
       int importerCount;
   };
@@ -131,6 +130,7 @@ public:
         int barCount = 8;
         char filledFormat = '#';
         char emptyFormat = ' ';
+
         auto progressData = static_cast<CLIProgressBarDataStruct*>(clientData);
         double progress = *static_cast<double*>(callData);
         int filledAmount = barCount * progress;
@@ -141,13 +141,19 @@ public:
         progressData->timer->StopTimer();
         if(progressData->timer->GetElapsedTime() > 0.15 ||
           vtksys::SystemTools::HasEnv("CTEST_F3D_PROGRESS_BAR")) {
-            f3d::log::info("Loading ",
+            f3d::log::setAppendNewLine(false);
+            f3d::log::info(
+                    "\rLoading ",
                     (progressData->importerCount > 1)
                         ? std::to_string(progressData->importerCount) + " files"
                         : progressData->fileName.data(),
                     " : |",
                     result,
                     "|");
+            f3d::log::setAppendNewLine(true);
+        }
+        if(progress == 1.0) {
+            f3d::log::info("\n");
         }
 
       });
@@ -191,6 +197,7 @@ public:
             // passing filename string to the char array
             const std::string& fileName = this->MetaImporter->GetImporterInfo(0).Name;
             fileName.copy(callbackData.fileName.begin(), callbackData.fileName.size() - 1);
+
             callbackData.fileName[std::min(fileName.size(), callbackData.fileName.max_size() - 1)] = '\0';
 
             scene_impl::internals::CreateCLIProgressBarAndCallback(&callbackData, this->MetaImporter);
