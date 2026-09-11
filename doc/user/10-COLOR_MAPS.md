@@ -10,7 +10,7 @@ If it is not an absolute path, F3D uses these directories to find the file (in t
 - Windows: `%APPDATA%\f3d\colormaps`, `[install_dir]\share\f3d\configs\colormaps`
 - macOS: `${XDG_CONFIG_HOME}/f3d/colormaps`, `~/.config/f3d/colormaps`, `/usr/local/etc/f3d/colormaps`, `f3d.app/Contents/Resources/configs/colormaps`
   F3D uses the first existing file found.
-  If it is a filestem, F3D tries all [supported image](#supported-formats) extensions.
+  If it is a filestem, F3D tries all [supported image formats](#supported-formats).
 
 F3D provides some ready to use color maps files, listed in the table below:
 

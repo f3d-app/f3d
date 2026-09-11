@@ -13,7 +13,7 @@ Install F3D first. See the download page for the latest release package supporte
 After installing F3D, open a file in one of these ways:
 
 - Open a file directly from your file manager.
-- Open the F3D application directly, then drag and drop a file into the application window.
+- Open F3D directly, then drag and drop a file into the F3D window.
 - Run F3D from the terminal with a set of command-line [options](03-OPTIONS.md).
 - Configure F3D as a [thumbnailer](12-DESKTOP_INTEGRATION.md) for supported file formats with certain file managers.
 
@@ -38,7 +38,7 @@ man f3d # Linux only
 
 After opening your file in F3D, press <kbd>H</kbd> to open a list of shortcuts.
 
-See the [supported file formats](02-SUPPORTED_FORMATS.md) page for the full list of file types that F3D can open.
+See the [supported file formats](02-SUPPORTED_FORMATS.md) page for the full list of file formats that F3D can open.
 
 ## Construct scenes
 
@@ -62,7 +62,7 @@ For **default scene** formats, certain default values are set automatically:
 - camera-orthographic: false
 - unlit: false
 
-Corresponding [options](03-OPTIONS.md) override these defaults, either from command line or from the [configuration file](06-CONFIGURATION_FILE.md).
+Corresponding [options](03-OPTIONS.md) override these defaults, either from command-line options or from the [configuration file](06-CONFIGURATION_FILE.md).
 
 ## Interact with your scene
 
@@ -89,7 +89,7 @@ F3D can play [animations](05-ANIMATIONS.md) for any [supported files](02-SUPPORT
 
 With your file loaded in F3D, press the <kbd>W</kbd> hotkey to cycle through available animations. Then press <kbd>Space</kbd> to play your selected animation.
 
-Alternatively, use the command line to play animations. Use the `--animation-indices` [option](03-OPTIONS.md) to specify which animation to play. To play all animations at once, use `--animation-indices=-1`.
+Alternatively, use the command line to play animations. Use the `--animation-indices` [command-line option](03-OPTIONS.md) to specify which animation to play. To play all animations at once, use `--animation-indices=-1`.
 
 For more information, see the [Animations](05-ANIMATIONS.md) page.
 
