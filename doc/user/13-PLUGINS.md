@@ -1,7 +1,7 @@
 # Plugins
 
-F3D officially supports plugins for certain file formats. If you installed F3D using the binary
-release, you do not need to load these plugins manually when opening your file.
+An F3D plugin is an optional component that adds support for one or more file readers.
+If you installed F3D using the binary release, you do not need to load these plugins manually when opening your file.
 F3D loads them automatically.
 
 However, if you installed F3D using a package manager,

@@ -2,6 +2,7 @@
 
 F3D provides access to commands through [interactive console](#interactive-console), [command script](#command-script---command-script) and [bindings configuration](06-CONFIGURATION_FILE.md#bindings).
 Use commands to trigger specific behavior that may not be available otherwise.
+Commands are different from command-line options. Command-line options configure F3D at startup, while commands change or query state after F3D is running.
 Commands are currently experimental. Behaviors and actions may be added or removed without deprecation.
 Action names and arguments may also change without deprecation.
 
@@ -11,7 +12,9 @@ Commands have the following syntax:
 
 ## libf3d commands
 
-libf3d provides a few commands, many related to manipulating libf3d (options)[../libf3d/03-OPTIONS.md].
+libf3d commands manipulate libf3d options.
+libf3d option names use dotted namespaces such as `scene.up_direction`, which differ from command-line option names such as `--up`.
+See the [libf3d options reference](../libf3d/03-OPTIONS.md).
 
 `set option.name values`: A command to set a libf3d option, eg: `set scene.up_direction +Z` or `set render.hdri.file "/path/to/file with spaces.png"`
 
@@ -189,7 +192,7 @@ eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 
 ## Domains
 
-Certain libf3d (options)[../libf3d/03-OPTIONS.md] have domains that commands can interact with.
+Some [libf3d options](../libf3d/03-OPTIONS.md) define a domain, which is the set of values that commands can safely use.
 
 A range domain uses `increase` and `decrease` commands. It has inclusive minimum and maximum values, as well as an increment.
 `increase` and `decrease` use the increment to increase or decrease and cap at maximum or minimum respectively.

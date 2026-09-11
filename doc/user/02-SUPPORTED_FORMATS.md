@@ -68,6 +68,7 @@ To get accurate information for your own build of F3D, use the [dedicated option
 
 Readers can provide options. Set them using the `-D/--define` [command-line option](03-OPTIONS.md).
 eg: `-DVDB.downsampling_factor=0.5` or using the [`set_reader_option` command](07-COMMANDS.md).
+Reader option names start with the reader name from the table above, followed by the option name.
 
 For booleans, 0 means false and any other value means true. Unsigned int interprets anything that is not a non-negative integer as the default value.
 
