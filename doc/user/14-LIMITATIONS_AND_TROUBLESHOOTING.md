@@ -57,7 +57,7 @@ Build VTK with _OpenImageDenoise_ support (`VTKOSPRAY_ENABLE_DENOISER` option).
 
 > My model shows up all wrong, with inverted surfaces everywhere.
 
-Your data probably contains translucent data. Turn on translucency support by pressing `P` or using the `-p` command-line option.
+Your data probably contains translucent data. Turn on translucency support by pressing <kbd>P</kbd> or using the `-p` command-line option.
 
 > My 3D Gaussian Splatting data in .ply format isn't opened properly.
 
@@ -66,7 +66,7 @@ Use these options: `--point-sprites-size=1 --point-sprites=gaussian -syk`. You c
 
 > I can't use hotkeys/bindings with F row keys
 
-Some keyboards have layered multimedia keys, so F keys (F12 for example) don't use the normal function code by default. To use the F code, press <kbd>Fn</kbd> in combination with the F key. For example, to take a minimal screenshot, the hotkey combination on macOS is <kbd>Cmd</kbd>+<kbd>Fn</kbd>+<kbd>F12</kbd>.
+Some keyboards have layered multimedia keys, so F keys, such as <kbd>F12</kbd>, don't use the normal function code by default. To use the F key code, press <kbd>Fn</kbd> with the F key. For example, to take a minimal screenshot, the hotkey combination on macOS is <kbd>Cmd</kbd>+<kbd>Fn</kbd>+<kbd>F12</kbd>.
 
 > My step file doesn't respect the `--color` option
 
@@ -112,7 +112,7 @@ Install VTK on your system or add the VTK install lib directory to `LD_LIBRARY_P
 
 > Using the portable binary release, I'm unable to run F3D because Windows warns about a security risk
 
-F3D is not signed by Microsoft yet, so Windows shows this warning. Click on the "more" button to run F3D.
+F3D is not signed by Microsoft yet, so Windows shows this warning. Click **More info**, then **Run anyway** to run F3D.
 
 > After installing F3D or registering the shell extension, my explorer is broken.
 
@@ -163,7 +163,7 @@ The macOS binary package are not signed. To work around this, run the following 
 xattr -cr /Applications/F3D.app
 ```
 
-Then F3D works as expected.
+Then F3D should work as expected.
 
 ### Python
 

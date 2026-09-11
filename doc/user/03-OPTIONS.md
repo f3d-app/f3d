@@ -11,7 +11,7 @@ If `-` is specified instead of a filename, F3D streams the file from stdin and w
 
 ### `--output=<png file>` (_string_)
 
-Instead of showing a render view and render into it, _render directly into a png file_. When used with --ref option, only outputs on failure. If `-` is specified instead of a filename, F3D streams the PNG file to stdout. You can also use [template variables](#filename-templating). When using the `{frame}` variable, F3D exports multiple animation frames (see [Export animation frames](05-ANIMATIONS.md#export-animation-frames)).
+Instead of showing a render view and render into it, _render directly into a png file_. When used with the `--ref` option, only outputs on failure. If `-` is specified instead of a filename, F3D streams the PNG file to stdout. You can also use [template variables](#filename-templating). When using the `{frame}` variable, F3D exports multiple animation frames (see [Export animation frames](05-ANIMATIONS.md#export-animation-frames)).
 
 ### `--no-background` (_bool_, default: `false`)
 
@@ -771,7 +771,7 @@ Use `--verbose` to recover the usable array names.
 ### `-y`, `--coloring-component=<comp_index>` (_int_, default: `-1`, implicit: `-2`)
 
 Specify the _component from the scalar_ array to color with.
-Use with the scalar option. -1 means _magnitude_. -2 means _direct values_.
+Use with the `--scalar-coloring` option. -1 means _magnitude_. -2 means _direct values_.
 When using _direct values_, components are used as L, LA, RGB, RGBA values depending on the number of components.
 
 #### compare
@@ -783,7 +783,7 @@ When using _direct values_, components are used as L, LA, RGB, RGBA values depen
 ### `-c`, `--coloring-by-cells` (_bool_, default: `false`)
 
 Specify that the scalar array is to be found _on the cells_ instead of on the points.
-Use with the scalar option.
+Use with the `--scalar-coloring` option.
 
 #### compare
 
@@ -794,7 +794,7 @@ Use with the scalar option.
 ### `--coloring-range=<min,max>` (_vector\<double\>_)
 
 Set the _coloring range_. Automatically computed by default.
-Use with the scalar option.
+Use with the `--scalar-coloring` option.
 
 #### compare
 
@@ -805,7 +805,7 @@ Use with the scalar option.
 ### `-b`, `--coloring-scalar-bar` (_bool_, default: `false`)
 
 Show _Scalar bar_ of the coloring by array.
-Use with the scalar option.
+Use with the `--scalar-coloring` option.
 
 #### compare
 
@@ -817,7 +817,7 @@ Use with the scalar option.
 
 Set a _colormap file for the coloring_.
 See [color maps](10-COLOR_MAPS.md).
-Use with the scalar option.
+Use with the `--scalar-coloring` option.
 
 #### compare
 
@@ -829,7 +829,7 @@ Use with the scalar option.
 
 Set a _custom colormap for the coloring_.See [colormap parsing](08-PARSING.md#colormap) for details.
 Ignored if `--colormap-file` option is specified.
-Use with the scalar option.
+Use with the `--scalar-coloring` option.
 
 ### `--colormap-discretization=<colors>` (_int_)
 
@@ -956,7 +956,7 @@ This is a technique used to correctly render translucent objects (`ddp`: dual de
 
 > [!WARNING]
 > `stochastic` is introducing a lot of noise with strong translucency.
-> It works better when combined with temporal anti-aliasing (when using `--anti-aliasing=taa` option)
+> It works better when combined with temporal anti-aliasing (when using the `--anti-aliasing=taa` option)
 > `sort` is only working for 3D gaussians and requires compute shaders support.
 > Alternatively, `sort_cpu` gives the same result and works everywhere but it's much slower.
 
@@ -982,7 +982,7 @@ Anti-aliasing method (`fxaa`: fast, `ssaa`: quality, `taa`: balanced, `none`: no
 
 > [!WARNING]
 > `taa` forces rendering of the scene at regular interval and introduces ghosting artifacts on animated scenes.
-> It also doesn't work with offscreen rendering (when using `--output` option)
+> It also doesn't work with offscreen rendering (when using the `--output` option)
 
 #### compare: Notice how edges are smoother with SSAA.
 

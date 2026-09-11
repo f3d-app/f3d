@@ -13,7 +13,7 @@ Commands have the following syntax:
 
 libf3d provides a few commands, many related to manipulating libf3d (options)[../libf3d/03-OPTIONS.md].
 
-`set option.name values`: A command to set a libf3d option, eg: `set scene.up.direction +Z` or `set render.hdri.file "/path/to/file with spaces.png"`
+`set option.name values`: A command to set a libf3d option, eg: `set scene.up_direction +Z` or `set render.hdri.file "/path/to/file with spaces.png"`
 
 `toggle option.name`: A command to toggle a boolean libf3d option, eg: `toggle ui.scalar_bar`.
 
@@ -21,9 +21,9 @@ libf3d provides a few commands, many related to manipulating libf3d (options)[..
 
 `clear`: A command to clear console. No argument.
 
-`print option.name`: A command to print the value of an libf3d option, eg: `print scene.up.direction`.
+`print option.name`: A command to print the value of an libf3d option, eg: `print scene.up_direction`.
 
-`set_reader_option Reader.option_name value`: A specific command to set a [reader option](02-SUPPORTED_FORMATS.md#reader-options), eg: `set_reader_option QuakeMDL.skin_index 1`
+`set_reader_option ReaderName.option_name value`: A specific command to set a [reader option](02-SUPPORTED_FORMATS.md#reader-options), eg: `set_reader_option QuakeMDL.skin_index 1`
 
 `increase option.name`: A command to increase a libf3d option according to its range domain, if it has one, eg: `increase render.light.intensity`.
 
@@ -120,7 +120,7 @@ eg:
 - `jump_to_time_relative 0.5` jump 0.5 seconds forward.
 - `jump_to_time_relative -0.5` jump 0.5 seconds backward.
 
-`cycle_verbose_level` : A specific command to cycle between the verbose levels (`Debug`, `Info`, `Warning`, `Error`, `Quiet`).
+`cycle_verbose_level`: A specific command to cycle between the verbose levels (`Debug`, `Info`, `Warning`, `Error`, `Quiet`).
 
 `add_files [path/to/file1] [path/to/file2]`: A specific command to add files to the scene (overridden by a F3D specific command, see below). Takes one or more files as arguments.
 eg: `add_files /path/to/dragon.vtu`.
@@ -138,7 +138,7 @@ eg: `load_statefile /path/to/state.json`.
 `alias [alias_name] [command]`: A specific command to create an alias for a command. Takes an alias name and a command as arguments.
 eg: `alias myrotate roll_camera 90`.
 
-`help [command]: A specific command to print help about a specific command. eg: `help set_camera`.
+`help action`: A specific command to print help about a specific command action. eg: `help set_camera`.
 
 ## F3D commands
 
@@ -148,7 +148,7 @@ F3D provides a few more commands.
 
 `load_previous_file_group [keep_camera]`: A specific command to load the previous file or file group. Camera state is kept if `keep_camera` is true (default: false).
 
-`load_next_file_group [keep_camera]`: A specific command to load the next file or file group. No argument. Camera state is kept if `keep_camera` is true (default: false).
+`load_next_file_group [keep_camera]`: A specific command to load the next file or file group. Camera state is kept if `keep_camera` is true (default: false).
 
 `reload_current_file_group`: A specific command to reload the current file or file group. No argument.
 
@@ -158,7 +158,7 @@ F3D provides a few more commands.
 rely on the `--screenshot-filename` CLI option. eg: `take_screenshot path/to/file.png`.
 
 `take_minimal_screenshot [filename]`: A specific command to [take a minimal screenshot](04-INTERACTIONS.md#take-screenshots). If filename is not specified,
-rely on the `--screenshot-filename` CLI option. eg: `take_screenshot path/to/file.png`.
+rely on the `--screenshot-filename` CLI option. eg: `take_minimal_screenshot path/to/file.png`.
 
 `add_files [path/to/file1] [path/to/file2]`: A specific command to add files to the scene according to the current grouping logic. Takes one or more files as arguments.
 eg: `add_files /path/to/dragon.vtu`.
@@ -212,7 +212,7 @@ Example Command Script, with commands separated by new lines and comments suppor
 roll_camera 90
 toggle ui.scalar_bar
 print_scene_info # Another comment
-increase_light_intensity
+increase render.light.intensity
 ```
 
 ## Interactive console
@@ -229,7 +229,7 @@ Press <kbd>Esc</kbd> to close the console.
 
 Command syntax is similar to bash: commands are split by token before processing.
 
-- Tokens are spaces separated, eg: `set scene.up.direction +Z`.
+- Tokens are spaces separated, eg: `set scene.up_direction +Z`.
 - Tokens can also be quoted to support spaces inside, eg: `set render.hdri.file "/path/to/file with spaces.png"`.
 - Supported quotes are `` `'" ``, eg: `set render.hdri.file '/path/to/file with spaces.png'`.
 - Use quotes inside quotes as well, eg: `set render.hdri.file "/path/to/file'with'quotes.png"`.
@@ -241,7 +241,7 @@ Command syntax is similar to bash: commands are split by token before processing
 > as standard character.
 
 - Escape `\` with another `\`, eg: `set render.hdri.file C:\\path\\to\\windows\\file.png`.
-- F3D processes other escaped character as if the escape was not present, eg: `set scene.up.direction +\Z`
-- Unfinished quoted section is invalid, eg: `set scene.up.direction "+Z`
-- A escape at the end is also invalid, eg: `set scene.up.direction +Z\`
+- F3D processes other escaped character as if the escape was not present, eg: `set scene.up_direction +\Z`
+- Unfinished quoted section is invalid, eg: `set scene.up_direction "+Z`
+- A escape at the end is also invalid, eg: `set scene.up_direction +Z\`
 - Options values are [parsed](08-PARSING.md) according to their types.
