@@ -207,7 +207,7 @@ F3D can execute commands from a script file using the `--command-script` [CLI op
 
 Example Command Script, with commands separated by new lines and comments supported:
 
-```shell
+```text
 # A comment
 roll_camera 90
 toggle ui.scalar_bar

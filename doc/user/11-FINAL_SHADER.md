@@ -6,7 +6,7 @@ F3D executes it as the last shader in the rendering pipeline.
 Pass the shader code directly as a single code line.
 Alternatively, pass the content of a shader file using the following command:
 
-```sh
+```bash
 f3d model.obj --final-shader "$(cat final.glsl)"
 ```
 

@@ -354,7 +354,7 @@ Allows automation of multiple commands or pre-defined tasks.
 
 ### `--backdrop-color=<color>` (_color_, default: `f3d_black`)
 
-Set the color of the backdrop behind text information such as FPS, filename, metadata or cheatsheet.
+Set the color of the backdrop behind text information such as FPS Counter, Filename, Metadata, or Cheatsheet.
 
 #### compare
 
@@ -364,7 +364,7 @@ Set the color of the backdrop behind text information such as FPS, filename, met
 
 ### `--backdrop-opacity=<opacity>` (_double_, default: `0.9`)
 
-Set the opacity of the backdrop behind text information such as FPS, filename, metadata or cheatsheet.
+Set the opacity of the backdrop behind text information such as FPS Counter, Filename, Metadata, or Cheatsheet.
 
 #### compare
 
@@ -651,7 +651,7 @@ Set the _window position_ (top left corner) , in pixels, starting from the top l
 
 ### `-z`, `--fps` (_bool_, default: `false`)
 
-Display a rendering _frame per second counter_.
+Display the _FPS Counter_.
 
 #### compare
 
@@ -661,7 +661,7 @@ Display a rendering _frame per second counter_.
 
 ### `-n`, `--filename` (_bool_, default: `false`)
 
-Display the _name of the file_ on top of the window.
+Display the _Filename_ on top of the window.
 
 #### compare
 
@@ -671,7 +671,7 @@ Display the _name of the file_ on top of the window.
 
 ### `-m`, `--metadata` (_bool_, default: `false`)
 
-Display the _metadata_.
+Display the _Metadata_.
 
 #### compare
 
@@ -681,7 +681,7 @@ Display the _metadata_.
 
 ### `--scene-hierarchy` (_bool_, default: `false`)
 
-Display the _scene hierarchy_ as a tree representing the internal structure of the model, with checkboxes allowing to hide or show individual parts.
+Display the _Scene hierarchy_ as a tree representing the internal structure of the model, with checkboxes allowing to hide or show individual parts.
 By default the tree expands only enough to show nodes that have meaningful names, but you can fully expand all nodes manually.
 
 #### compare
@@ -692,11 +692,11 @@ By default the tree expands only enough to show nodes that have meaningful names
 
 ### `--notifications` (_bool_, default: `false`)
 
-Display the notifications at the bottom left of the window.
+Display the _Notifications_ at the bottom left of the window.
 
 ### `--hdri-filename` (_bool_, default: `false`)
 
-Display the _hdri-filename_.
+Display the _HDRI filename_.
 
 #### compare
 
@@ -804,7 +804,7 @@ Use with the scalar option.
 
 ### `-b`, `--coloring-scalar-bar` (_bool_, default: `false`)
 
-Show _scalar bar_ of the coloring by array.
+Show _Scalar bar_ of the coloring by array.
 Use with the scalar option.
 
 #### compare
@@ -1071,13 +1071,13 @@ F3D parses all options according to their type, see the [parsing documentation](
 
 F3D supports piping in and out for [most formats](02-SUPPORTED_FORMATS.md), using the `-` char, eg:
 
-```
+```bash
 f3d - --output=- < path/to/file.glb > path/to/img.png
 ```
 
 or, using [display](https://imagemagick.org/script/display.php#gsc.tab=0):
 
-```
+```bash
 cat path/to/file.glb | f3d - --output=- | display
 ```
 
@@ -1085,7 +1085,7 @@ and even, using [build123d](https://github.com/gumyr/build123d):
 
 `script.py`:
 
-```py
+```python
 import sys
 
 from build123d import Box, Cylinder, export_brep
@@ -1094,7 +1094,7 @@ obj = Box(2, 2, 1) - Cylinder(0.5, 2)
 export_brep(obj, sys.stdout.buffer)
 ```
 
-```
+```bash
 python script.py | f3d - --output=- | display
 ```
 
@@ -1102,8 +1102,8 @@ While piping is more common on Linux, F3D supports it perfectly on Windows and m
 
 With versions of VTK < v9.6.20260128, specifying the [reader](02-SUPPORTED_FORMATS.md) to use is required, like this:
 
-```
-cat path/to/file.glb --force-reader=GLB | f3d - --output=- | display
+```bash
+cat path/to/file.glb | f3d - --force-reader=GLB --output=- | display
 ```
 
 ## Filename templating

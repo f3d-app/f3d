@@ -44,83 +44,83 @@ See the [coloring cycle](#cycle-coloring) section for more info.
 Toggle or cycle other options directly with these hotkeys:
 
 - <kbd>W</kbd>: [cycle animations](05-ANIMATIONS.md#cycle-animations).
-- <kbd>B</kbd>: display of the scalar bar, only when coloring and not using direct scalars.
-- <kbd>V</kbd>: volume rendering, forces coloring.
-- <kbd>I</kbd>: opacity function inversion during volume rendering.
-- <kbd>O</kbd>: cycle point sprites type.
-- <kbd>P</kbd>: cycle blending mode for translucency support.
-- <kbd>Q</kbd>: ambient occlusion.
-- <kbd>T</kbd>: tone mapping.
-- <kbd>E</kbd>: the display of cell edges.
-- <kbd>X</kbd>: the trihedral axes display.
-- <kbd>G</kbd>: the horizontal grid display.
-- <kbd>Shift</kbd>+<kbd>x</kbd>: show/hide axes grid
-- <kbd>N</kbd>: the display of the file name.
-- <kbd>Shift</kbd>+<kbd>N</kbd>: the display of the HDRI file name.
-- <kbd>M</kbd>: the display of the metadata if exists.
-- <kbd>Shift</kbd>+<kbd>H</kbd>: the display of the scene hierarchy.
-- <kbd>Z</kbd>: the display of the FPS counter.
-- <kbd>R</kbd>: raytracing.
-- <kbd>D</kbd>: the denoiser when raytracing.
-- <kbd>U</kbd>: background blur, useful with an HDRI skybox.
-- <kbd>K</kbd>: Cycle interaction modes.
-- <kbd>F</kbd>: HDRI ambient lighting.
-- <kbd>J</kbd>: the display of the HDRI skybox.
+- <kbd>B</kbd>: display the Scalar bar, only when coloring and not using direct scalars.
+- <kbd>V</kbd>: toggle Volume rendering, which forces coloring.
+- <kbd>I</kbd>: toggle Inverse volume opacity during volume rendering.
+- <kbd>O</kbd>: cycle Point sprites.
+- <kbd>P</kbd>: cycle the Blending mode for translucency support.
+- <kbd>Q</kbd>: toggle Ambient occlusion.
+- <kbd>T</kbd>: toggle tone mapping.
+- <kbd>E</kbd>: toggle edges display.
+- <kbd>X</kbd>: toggle axes display.
+- <kbd>G</kbd>: toggle grid display.
+- <kbd>Shift</kbd>+<kbd>X</kbd>: toggle axes grid display.
+- <kbd>N</kbd>: toggle Filename.
+- <kbd>Shift</kbd>+<kbd>N</kbd>: toggle HDRI filename.
+- <kbd>M</kbd>: toggle Metadata, if it exists.
+- <kbd>Shift</kbd>+<kbd>H</kbd>: toggle Scene hierarchy.
+- <kbd>Z</kbd>: toggle FPS Counter.
+- <kbd>R</kbd>: toggle Raytracing rendering.
+- <kbd>D</kbd>: toggle Denoising when raytracing.
+- <kbd>U</kbd>: toggle Blur background, useful with an HDRI skybox.
+- <kbd>K</kbd>: cycle Interaction style.
+- <kbd>F</kbd>: toggle HDRI ambient lighting.
+- <kbd>J</kbd>: toggle HDRI skybox.
 - <kbd>L</kbd>: increase lights intensity.
 - <kbd>Shift</kbd>+<kbd>L</kbd>: decrease lights intensity.
 - <kbd>Ctrl</kbd>+<kbd>P</kbd>: increase opacity.
 - <kbd>Shift</kbd>+<kbd>P</kbd>: decrease opacity.
-- <kbd>Shift</kbd>+<kbd>A</kbd>: toggle armature.
-- <kbd>Ctrl</kbd>+<kbd>Y</kbd>: Scene up direction to +Y
-- <kbd>Ctrl</kbd>+<kbd>Z</kbd>: Scene up direction to +Z
+- <kbd>Shift</kbd>+<kbd>A</kbd>: toggle Armature.
+- <kbd>Ctrl</kbd>+<kbd>Y</kbd>: set scene up direction to +Y.
+- <kbd>Ctrl</kbd>+<kbd>Z</kbd>: set scene up direction to +Z.
 
 Raytracing hotkeys are only available if F3D is build with raytracing enabled.
 
-Camera Hotkeys:
+Camera hotkeys:
 
-- <kbd>1</kbd>: front view camera.
-- <kbd>2</kbd>: roll the camera up (elevation) by 90 degrees.
-- <kbd>3</kbd>: right view camera.
-- <kbd>4</kbd>: roll the camera left by 90 degrees.
-- <kbd>5</kbd>: toggle orthographic projection.
-- <kbd>6</kbd>: roll the camera right by 90 degrees.
-- <kbd>7</kbd>: top view camera.
-- <kbd>8</kbd>: roll the camera down (elevation) by 90 degrees.
-- <kbd>9</kbd>: isometric view camera.
-- <kbd>Enter</kbd>: reset the camera to its initial parameters.
+- <kbd>1</kbd>: set Front View camera.
+- <kbd>2</kbd>: rotate camera down by 90 degrees.
+- <kbd>3</kbd>: set Right View camera.
+- <kbd>4</kbd>: rotate camera right by 90 degrees.
+- <kbd>5</kbd>: toggle Orthographic Projection.
+- <kbd>6</kbd>: rotate camera left by 90 degrees.
+- <kbd>7</kbd>: set Top View camera.
+- <kbd>8</kbd>: rotate camera up by 90 degrees.
+- <kbd>9</kbd>: set Isometric View camera.
+- <kbd>Enter</kbd>: reset camera to initial parameters.
 
-Scene Hotkeys:
+Scene hotkeys:
 
 - <kbd>Ctrl</kbd>+<kbd>Y</kbd>: set scene up direction to +Y.
 - <kbd>Ctrl</kbd>+<kbd>Z</kbd>: set scene up direction to +Z.
 
 Use these other hotkeys and interactions:
 
-- <kbd>H</kbd>: key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
-- <kbd>CTRL</kbd>+<kbd>Q</kbd>: close the window and quit F3D.
-- <kbd>Esc</kbd>: display the console or hide console/minimal console.
-- <kbd>:</kbd>: display the minimal console.
-- <kbd>CTRL</kbd>+<kbd>K</kbd>: toggle notifications.
-- <kbd>Space</kbd>: play the animation if any.
-- <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbd>: play the animation backward if any.
-- <kbd>Shift</kbd>+<kbd>V</kbd>: cycle between verbosity levels.
-- <kbd>&larr;</kbd>: load the previous file if any and reset the camera.
-- <kbd>Ctrl</kbd>+<kbd>&larr;</kbd>: load the previous file if any and keep the camera.
-- <kbd>&rarr;</kbd>: load the next file if any and reset the camera.
-- <kbd>Ctrl</kbd>+<kbd>&rarr;</kbd>: load the next file if any and keep the camera.
-- <kbd>&uarr;</kbd>: reload the currently loaded files.
-- <kbd>&darr;</kbd>: add all current files parent directories to the list of files, reload the currently loaded files and reset the camera, respect the `--recursive-dir-add` CLI option.
+- <kbd>H</kbd>: toggle Cheatsheet.
+- <kbd>Ctrl</kbd>+<kbd>Q</kbd>: quit F3D.
+- <kbd>Esc</kbd>: toggle Console, or hide Console/Minimal console.
+- <kbd>:</kbd>: toggle Minimal console.
+- <kbd>Ctrl</kbd>+<kbd>K</kbd>: toggle Notifications.
+- <kbd>Space</kbd>: play/pause animation if any.
+- <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbd>: play/pause animation backward if any.
+- <kbd>Shift</kbd>+<kbd>V</kbd>: cycle Verbose level.
+- <kbd>&larr;</kbd>: load previous file group, if any, and reset the camera.
+- <kbd>Ctrl</kbd>+<kbd>&larr;</kbd>: load previous file group, if any, keeping camera.
+- <kbd>&rarr;</kbd>: load next file group, if any, and reset the camera.
+- <kbd>Ctrl</kbd>+<kbd>&rarr;</kbd>: load next file group, if any, keeping camera.
+- <kbd>&uarr;</kbd>: reload current file group.
+- <kbd>&darr;</kbd>: add files from dir of current file, reload the current file group, and reset the camera. The `--recursive-dir-add` CLI option controls recursive directory loading.
 - <kbd>F12</kbd>: take a screenshot, ie. render the current view to an image file.
-- <kbd>Ctrl</kbd>+<kbd>F12</kbd>: take a "minimal" screenshot, ie. render the current view with no grid and no overlays to an image file with a transparent background.
-- <kbd>Ctrl</kbd>+<kbd>S</kbd>: save the current state into a statefile picked with a file dialog (requires a build with the `tinyfiledialogs` module).
-- <kbd>Ctrl</kbd>+<kbd>L</kbd>: load the state from a statefile picked with a file dialog (requires a build with the `tinyfiledialogs` module). Does nothing but warn if the file does not exist.
-- <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd>: save the current state into the statefile set by the `--statefile-filename` CLI option, or an automatic filename (`{app}/{model}_{n}.json`) when it is not set.
-- <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd>: load the state from the `--statefile-filename` CLI option, or the most recent statefile saved with the automatic filename when it is not set.
-- <kbd>Ctrl</kbd>+<kbd>C</kbd>: save the current state into the system clipboard (requires a build with the `clip` module).
-- <kbd>Ctrl</kbd>+<kbd>V</kbd>: load the state from the system clipboard (requires a build with the `clip` module).
-- _Drop_ a file, directory or HDRI into the F3D window to load it. F3D relies on the extension (`.hdr` or `.exr`) to detect if the dropped file is an HDRI.
-- <kbd>Ctrl</kbd> + _Drop_ a file, directory and load it.
-- <kbd>Shift</kbd> + _Drop_ a HDRI and use it, no extensions checks performed.
+- <kbd>Ctrl</kbd>+<kbd>F12</kbd>: take a minimal screenshot, ie. render the current view with no grid and no overlays to an image file with a transparent background.
+- <kbd>Ctrl</kbd>+<kbd>S</kbd>: save a statefile (file dialog). Requires a build with the `tinyfiledialogs` module.
+- <kbd>Ctrl</kbd>+<kbd>L</kbd>: load a statefile (file dialog). Requires a build with the `tinyfiledialogs` module. Does nothing but warn if the file does not exist.
+- <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd>: save a statefile (auto filename). Uses the statefile set by the `--statefile-filename` CLI option, or an automatic filename (`{app}/{model}_{n}.json`) when it is not set.
+- <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd>: load the last auto-filename statefile. Uses the statefile set by the `--statefile-filename` CLI option, or the most recent statefile saved with the automatic filename when it is not set.
+- <kbd>Ctrl</kbd>+<kbd>C</kbd>: save a statefile to the clipboard. Requires a build with the `clip` module.
+- <kbd>Ctrl</kbd>+<kbd>V</kbd>: load a statefile from the clipboard. Requires a build with the `clip` module.
+- <kbd>Drop</kbd>: load dropped files, folder or HDRI. F3D relies on the extension (`.hdr` or `.exr`) to detect if the dropped file is an HDRI.
+- <kbd>Ctrl</kbd>+<kbd>Drop</kbd>: load dropped files or folder.
+- <kbd>Shift</kbd>+<kbd>Drop</kbd>: set HDRI and use it. No extension checks are performed.
 
 When loading another file or reloading, F3D keeps options that have been changed interactively, except when using [imperative options](06-CONFIGURATION_FILE.md#imperative-options) in configuration files.
 

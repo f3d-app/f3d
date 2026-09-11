@@ -74,7 +74,7 @@ When rendering step files, F3D does not respect the `--color` option because the
 
 Alternatively, add the following in your configuration file:
 
-```
+```json
 {
   "match-type": "glob",
   "match": "*.{step,stp,iges,igs,brep,xbf}",
@@ -118,7 +118,7 @@ F3D is not signed by Microsoft yet, so Windows shows this warning. Click on the 
 
 Unregister the shell extension:
 
-```
+```bat
 cd C:\path\to\f3d\bin\
 regsvr32 /u F3DShellExtension.dll
 ```
@@ -159,7 +159,7 @@ This is a limitation of older VTK version before VTK 9.5.0. Use F3D binaries or 
 
 The macOS binary package are not signed. To work around this, run the following command:
 
-```
+```bash
 xattr -cr /Applications/F3D.app
 ```
 
