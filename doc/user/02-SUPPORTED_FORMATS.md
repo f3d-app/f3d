@@ -31,8 +31,8 @@ F3D supports the following file formats:
 | Open CASCADE Technology XBF format        | `.xbf`                                         | No         | NONE              | YES (VTK 9.6)     | `occt`    | `XBF`                   |
 | Alembic                                   | `.abc`                                         | No         | UNIQUE            | YES (VTK 9.6)     | `alembic` | `Alembic`               |
 | Wavefront OBJ                             | `.obj`                                         | Yes        | NONE              | PARTIAL (VTK 9.7) | `native`  | `OBJ`                   |
-| GL Transmission Format                    | `.gltf`                                        | Yes        | MULTI             | PARTIAL (VTK 9.6) | `native`  | `GLTF`, `GLTFDraco`     |
-| GL Transmission Format (binary)           | `.glb`                                         | Yes        | MULTI             | YES (VTK 9.6)     | `native`  | `GLB`, `GLBDraco`       |
+| glTF                                      | `.gltf`                                        | Yes        | MULTI             | PARTIAL (VTK 9.6) | `native`  | `GLTF`, `GLTFDraco`     |
+| glTF binary                               | `.glb`                                         | Yes        | MULTI             | YES (VTK 9.6)     | `native`  | `GLB`, `GLBDraco`       |
 | Draco                                     | `.drc`                                         | No         | NONE              | YES               | `draco`   | `Draco`                 |
 | Autodesk 3D Studio                        | `.3ds`                                         | Yes        | NONE              | YES (VTK 9.6)     | `native`  | `3DS`                   |
 | Virtual Reality Modeling Language         | `.wrl`, `.vrml`                                | Yes        | NONE              | NO                | `native`  | `VRMLReader`            |
@@ -66,7 +66,7 @@ To get accurate information for your own build of F3D, use the [dedicated option
 
 ## Reader options
 
-Readers can provide options. Set them using the `-D/--define` [command line option](03-OPTIONS.md).
+Readers can provide options. Set them using the `-D/--define` [command-line option](03-OPTIONS.md).
 eg: `-DVDB.downsampling_factor=0.5` or using the `set_reader_option` [command](07-COMMANDS.md).
 
 For booleans, 0 means false and any other value means true. Unsigned int interprets anything that is not a non-negative integer as the default value.

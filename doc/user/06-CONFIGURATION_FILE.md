@@ -8,7 +8,7 @@ formatted file to provide values for these options. You can also use
 the [libf3d options](../libf3d/03-OPTIONS.md) syntax.
 
 Organize these options by block using a regular expression, glob, or exact match
-for each block to provide different default values for the different filetypes. For
+for each block to provide different default values for the different file formats. For
 more on glob and exact matching see the [Glob and exact matching section](#glob-and-exact-matching).
 
 A command-line option overrides similar options set in any config files.
@@ -72,8 +72,8 @@ Turn off boolean options from the command line when needed, eg: `--point-sprites
 
 ### Imperative options
 
-Command line options and interactive changes override options that are set in configuration files.
-When a configuration option must override command line options and interactive changes, use an imperative option by adding `!` in front of the option name, eg:
+Command-line options and interactive changes override options that are set in configuration files.
+When a configuration option must override command-line options and interactive changes, use an imperative option by adding `!` in front of the option name, eg:
 
 ```json
 [
@@ -136,7 +136,7 @@ interaction on the `Any+3` bind and defines a binding that has multiple commands
 on the `Ctrl+O` bind.
 
 This configuration feature is available only through config file and not through the command line.
-Check your current binding configuration by using the `--list-bindings` CLI options.
+Check your current binding configuration by using the `--list-bindings` CLI option.
 
 ### Bind
 
@@ -151,7 +151,7 @@ Supported modifiers are:
 - `Any` : A special modifier that does not consider modifiers keys but can only be reached
   if there is no bind with the same interaction.
 
-On MacOS, define bindings in configuration files using `Ctrl` and `Ctrl+Shift`. F3D maps them to `Cmd` and `Cmd+Shift` respectively. The cheatsheet displays the correct binding combination regardless.
+On macOS, define bindings in configuration files using `Ctrl` and `Ctrl+Shift`. F3D maps them to `Cmd` and `Cmd+Shift` respectively. The cheatsheet displays the correct binding combination regardless.
 
 Supported interactions are legion, eg:
 
@@ -238,7 +238,7 @@ You can edit the files contained in these directories or add your own in specifi
 
 F3D looks for configuration files in different locations depending on your operating system.
 F3D reads existing configuration files in order and combines them with later entries potentially overriding previously read entries with the same names.
-For thumbnails, replace `config` by `thumbnail`, as f3d receives the thumbnails configuration using the `--config` [CLI option](03-OPTIONS.md).
+For thumbnails, replace `config` by `thumbnail`, as the `f3d` command receives the thumbnails configuration using the `--config` [CLI option](03-OPTIONS.md).
 
 - Linux: `/etc/f3d/config(.json,.d)`, `/usr/share/f3d/configs/config(.json,.d)`, `[install_dir]/share/f3d/configs/config(.json,.d)`, `${XDG_CONFIG_HOME}/f3d/config(.json,.d)`
 - Windows: `[install_dir]\share\f3d\configs\(config.json,.d)`, `%APPDATA%\f3d\(config.json,.d)`
@@ -249,7 +249,7 @@ On Linux, `XDG_CONFIG_HOME` implementation can fallback on `HOME` environment va
 The binary release installs the default config directory.
 On Linux, it installs files in `[install_dir]/share/f3d/configs/`. On Windows, it installs files in `[install_dir]\share\f3d\configs\`. On macOS, it installs files in the bundle.
 
-Use the command line option to control the configuration file to read. Specify an absolute or relative path for the configuration path, or
+Use the command-line option to control the configuration file to read. Specify an absolute or relative path for the configuration path, or
 only the filename or filestem (F3D adds `.json` and `.d`) to look for in the locations listed above, , eg: `f3d --config=custom_config` looks
 for `custom_config.json` and `custom_config.d` in locations listed above.
 When you specify an absolute or relative path for the configuration file, F3D reads a single file. Otherwise, F3D reads all files from the locations listed above, with the overriding logic specified above.

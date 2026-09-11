@@ -60,7 +60,7 @@ F3D searches for plugins in this order:
 1. Search the static plugins.
 2. Use the `load-plugins` option when it is a full path.
 3. Search the paths specified in the `--plugins-path` CLI option.
-4. Search a directory relative to the F3D application: `../lib`.
+4. Search a directory relative to F3D: `../lib`.
 5. Rely on OS-specific paths (e.g. `LD_LIBRARY_PATH` on Linux or `DYLD_LIBRARY_PATH` on macOS).
 
 You can also try plugins maintained by the community. If you have created a plugin and want it listed here, submit a pull request.

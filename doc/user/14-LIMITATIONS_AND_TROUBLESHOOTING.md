@@ -8,7 +8,7 @@ This is a non exhaustive list of F3D limitations:
 - Drag and drop interaction cannot be recorded or played back.
 - Volume rendering and HDRI support require a decent GPU.
 - Streaming requires different VTK versions depending upon the format to read.
-- Options `ui.dpi_aware` and CLI `--dpi-aware` are only supported on Windows platform.
+- The `ui.dpi_aware` option and CLI `--dpi-aware` are only supported on Windows platform.
 
 ### Assimp
 
@@ -35,13 +35,13 @@ USD file formats rely on [OpenUSD](https://github.com/PixarAnimationStudios/Open
 
 - Skinning is slow and baked on the CPU.
 - Does not support Face-varying attributes.
-- The `usd` plugin is not shipped in the python wheels yet.
+- The `usd` plugin is not shipped in the Python wheels yet.
 
 ### VDB
 
 VDB file formats rely on [OpenVDB](https://github.com/AcademySoftwareFoundation/openvdb) and VTK libraries. They have some known limitations:
 
-- The `vdb` plugin is not shipped in the python wheels yet.
+- The `vdb` plugin is not shipped in the Python wheels yet.
 
 ### Gaussian splatting
 
@@ -57,7 +57,7 @@ Build VTK with _OpenImageDenoise_ support (`VTKOSPRAY_ENABLE_DENOISER` option).
 
 > My model shows up all wrong, with inverted surfaces everywhere.
 
-Your data probably contains translucent data. Turn on translucency support by pressing `P` or using the `-p` command line option.
+Your data probably contains translucent data. Turn on translucency support by pressing `P` or using the `-p` command-line option.
 
 > My 3D Gaussian Splatting data in .ply format isn't opened properly.
 
@@ -66,7 +66,7 @@ Use these options: `--point-sprites-size=1 --point-sprites=gaussian -syk`. You c
 
 > I can't use hotkeys/bindings with F row keys
 
-Some keyboards have layered multimedia keys, so F keys (F12 for example) don't use the normal function code by default. To use the F code, press <kbd>Fn</kbd> in combination with the F key. For example, to take a minimal screenshot, the hotkey combination on MacOS is <kbd>Cmd</kbd>+<kbd>Fn</kbd>+<kbd>F12</kbd>.
+Some keyboards have layered multimedia keys, so F keys (F12 for example) don't use the normal function code by default. To use the F code, press <kbd>Fn</kbd> in combination with the F key. For example, to take a minimal screenshot, the hotkey combination on macOS is <kbd>Cmd</kbd>+<kbd>Fn</kbd>+<kbd>F12</kbd>.
 
 > My step file doesn't respect the `--color` option
 
@@ -169,8 +169,8 @@ Then F3D works as expected.
 
 > I can't find `usd` and `vdb` plugins after installing f3d with pip
 
-The `usd` and `vdb` plugins are not shipped in the python wheels for now. You can compile F3D yourself with them.
+The `usd` and `vdb` plugins are not shipped in the Python wheels for now. You can compile F3D yourself with them.
 
 > Raytracing does not work after installing f3d with pip
 
-F3D raytracing feature is not shipped in the python wheels for now. You can compile F3D yourself with it.
+F3D raytracing feature is not shipped in the Python wheels for now. You can compile F3D yourself with it.

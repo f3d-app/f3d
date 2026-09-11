@@ -11,7 +11,7 @@ Commands have the following syntax:
 
 ## libf3d commands
 
-The libf3d provides a few commands, many related to manipulating libf3d (options)[../libf3d/03-OPTIONS.md].
+libf3d provides a few commands, many related to manipulating libf3d (options)[../libf3d/03-OPTIONS.md].
 
 `set option.name values`: A command to set a libf3d option, eg: `set scene.up.direction +Z` or `set render.hdri.file "/path/to/file with spaces.png"`
 
@@ -50,7 +50,7 @@ eg: `azimuth_camera 120`.
 
 `print_coloring_info`: A specific command to print information about coloring settings. No argument.
 
-`print_mesh_info`: A specific command to print information from the mesh importer. No argument.
+`print_mesh_info`: A specific command to print information from the mesh reader. No argument.
 
 `print_options_info`: A specific command to print libf3d options that have a value. No argument.
 
@@ -61,7 +61,7 @@ Supports `front`, `top`, `right`, `back`, `bottom`, `left`, `isometric` argument
 
 `toggle_volume_rendering`: A specific command to toggle `model.volume.enable` and print coloring information. No argument.
 
-`stop_interactor`: A specific command to stop the interactor hence quitting the application. No argument.
+`stop_interactor`: A specific command to stop the interactor hence quitting F3D. No argument.
 
 `reset_camera`: A specific command to reset the camera to its original location. No argument.
 
@@ -142,9 +142,9 @@ eg: `alias myrotate roll_camera 90`.
 
 ## F3D commands
 
-The F3D application provides a few more commands.
+F3D provides a few more commands.
 
-`exit`: A specific command to quit the application. No argument.
+`exit`: A specific command to quit F3D. No argument.
 
 `load_previous_file_group [keep_camera]`: A specific command to load the previous file or file group. Camera state is kept if `keep_camera` is true (default: false).
 

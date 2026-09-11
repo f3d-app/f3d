@@ -1,4 +1,4 @@
-# Command line options
+# Command-line options
 
 Control F3D behavior from the command line using the following options.
 
@@ -51,7 +51,7 @@ Specify the [configuration file](06-CONFIGURATION_FILE.md) to use. Supports abso
 
 ### `--no-config` (_bool_, default: `false`)
 
-Do not read any configuration file and consider only the command line options.
+Do not read any configuration file and consider only the command-line options.
 
 ### `--no-render` (_bool_, default: `false`)
 
@@ -59,11 +59,11 @@ Do not render anything and quit just after loading the first file, use with --ve
 
 ### `--load-statefile=<file path>` (_string_)
 
-Restore the application state from a statefile right after starting, then continue running. F3D applies the statefile above configuration files but below command line options. An explicit `--resolution` overrides the restored window size, and an explicit `--position` overrides the restored window position. If `-` is specified instead of a filename, F3D reads the statefile from the standard input. If the file does not exist, F3D skips it with a warning.
+Restore the F3D state from a statefile right after starting, then continue running. F3D applies the statefile above configuration files but below command-line options. An explicit `--resolution` overrides the restored window size, and an explicit `--position` overrides the restored window position. If `-` is specified instead of a filename, F3D reads the statefile from the standard input. If the file does not exist, F3D skips it with a warning.
 
 ### `--save-statefile=<file path>` (_string_)
 
-Save the application state to a statefile right after loading, then continue running. The saved state includes the options, camera, window size and all file groups, including the ones not currently loaded. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, F3D writes the statefile to the standard output.
+Save the F3D state to a statefile right after loading, then continue running. The saved state includes the options, camera, window size and all file groups, including the ones not currently loaded. Supports the same [template variables](#filename-templating) as `--output`. If `-` is specified instead of a filename, F3D writes the statefile to the standard output.
 
 ### `--statefile-filename=<file path>` (_string_, default: empty)
 
@@ -99,7 +99,7 @@ Filename to save [screenshots](04-INTERACTIONS.md#take-screenshots) to. Can use 
 
 ### `--rendering-backend=<auto|egl|osmesa|glx|wgl>` (_string_, default: `auto`)
 
-Rendering backend to load, `auto` means to let F3D pick the correct one for you depending on your system capabilities. Use `egl` or `osmesa` on linux to force headless rendering.
+Rendering backend to load, `auto` means to let F3D pick the correct one for you depending on your system capabilities. Use `egl` or `osmesa` on Linux to force headless rendering.
 
 ### `-D`, `--define=<libf3d.option=value>` (_special_)
 
@@ -599,7 +599,7 @@ Model-specified by default.
 ### `--textures-transform=<transform2d>` (_transform2d_)
 
 Set the 2d transform to use for all textures applied to the model.
-Importer may set a default value depending on file type. If a default value exists, F3D multiplies it by the provided transform.
+The reader may set a default value depending on the file format. If a default value exists, F3D multiplies it by the provided transform.
 
 #### compare
 
@@ -1098,7 +1098,7 @@ export_brep(obj, sys.stdout.buffer)
 python script.py | f3d - --output=- | display
 ```
 
-While piping is more common on Linux, F3D supports it perfectly on Windows and MacOS as well.
+While piping is more common on Linux, F3D supports it perfectly on Windows and macOS as well.
 
 With versions of VTK < v9.6.20260128, specifying the [reader](02-SUPPORTED_FORMATS.md) to use is required, like this:
 
@@ -1165,5 +1165,5 @@ A libf3d statefile (`engine::dump`/`engine::load`) contains the added `files`, t
 F3D stores file paths relatively to the statefile directory when possible, and resolves them on load.
 Content added from memory (meshes, buffers) is not captured.
 
-The F3D application adds a `file_groups` entry storing all file groups, including the ones not currently loaded,
+F3D adds a `file_groups` entry storing all file groups, including the ones not currently loaded,
 so it can restore the whole navigation state. The library ignores this entry when loading a libf3d statefile.
