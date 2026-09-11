@@ -90,6 +90,12 @@ void log::setUseColoring(bool use)
 }
 
 //----------------------------------------------------------------------------
+void log::setAppendNewLine(bool append) {
+    detail::init::initialize();
+    F3DLog::SetAppendNewLine(append);
+}
+
+//----------------------------------------------------------------------------
 void log::setVerboseLevel(log::VerboseLevel level, bool forceStdErr)
 {
   detail::init::initialize();
