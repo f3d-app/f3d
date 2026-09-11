@@ -16,4 +16,9 @@
     <comment>Open CASCADE XBF</comment>
     <glob pattern="*.xbf"/>
   </mime-type>
+  <mime-type type="application/x-extension-fcstd">
+    <comment>FreeCAD Standard</comment>
+    <glob pattern="*.FCStd"/>
+    <glob pattern="*.fcstd"/>
+  </mime-type>
 </mime-info>

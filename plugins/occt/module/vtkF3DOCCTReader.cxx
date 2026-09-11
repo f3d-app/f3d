@@ -1,28 +1,25 @@
 #include "vtkF3DOCCTReader.h"
 
+#include "F3DOCCTPolyData.h"
+
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"
 #endif
 
 #include <BRepAdaptor_Surface.hxx>
-#include <BRepMesh_IncrementalMesh.hxx>
 #include <BRepTools.hxx>
 #include <BRep_Builder.hxx>
-#include <BRep_Tool.hxx>
 #include <BinTools.hxx>
 #include <IGESControl_Reader.hxx>
 #include <Message.hxx>
 #include <Message_PrinterOStream.hxx>
 #include <Message_ProgressIndicator.hxx>
-#include <Poly.hxx>
-#include <Poly_Triangulation.hxx>
 #include <Quantity_Color.hxx>
 #include <STEPControl_Reader.hxx>
 #include <Standard_Handle.hxx>
 #include <Storage_StreamTypeMismatchError.hxx>
 #include <TopExp_Explorer.hxx>
-#include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Solid.hxx>
 
@@ -48,29 +45,22 @@
 #pragma GCC diagnostic pop
 #endif
 
-#include <vtkCellArray.h>
-#include <vtkCellData.h>
 #include <vtkCommand.h>
 #include <vtkDemandDrivenPipeline.h>
-#include <vtkFloatArray.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
 #include <vtkMatrix4x4.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkNew.h>
-#include <vtkPointData.h>
-#include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkResourceParser.h>
 #include <vtkResourceStream.h>
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
-#include <vtkUnsignedCharArray.h>
 #include <vtkUnsignedIntArray.h>
 #include <vtksys/SystemTools.hxx>
 
 #include <array>
-#include <numeric>
 #include <unordered_map>
 #include <vector>
 
@@ -96,229 +86,63 @@ public:
   vtkSmartPointer<vtkPolyData> CreateShape(const TopoDS_Shape& shape)
 #endif
   {
-    vtkNew<vtkPoints> points;
-    vtkNew<vtkFloatArray> normals;
-    normals->SetNumberOfComponents(3);
-    normals->SetName("Normal");
-    vtkNew<vtkFloatArray> uvs;
-    uvs->SetNumberOfComponents(2);
-    uvs->SetName("UV");
-#if F3D_PLUGIN_OCCT_XCAF
-    vtkNew<vtkUnsignedCharArray> colors;
-    colors->SetNumberOfComponents(3);
-    colors->SetName("Colors");
-#endif
-    vtkNew<vtkCellArray> trianglesCells;
-    vtkNew<vtkCellArray> linesCells;
+    F3DOCCTPolyData::MeshingOptions options;
+    options.LinearDeflection = this->Parent->GetLinearDeflection();
+    options.AngularDeflection = this->Parent->GetAngularDeflection();
+    options.RelativeDeflection = this->Parent->GetRelativeDeflection();
+    options.ReadWire = this->Parent->GetReadWire();
 
-    int shift = 0;
-
+    F3DOCCTPolyData::ColorProviders colors;
 #if F3D_PLUGIN_OCCT_XCAF
     const StyleMap inheritedStyles = this->CollectInheritedStyles(label, shape);
-#endif
-
-    /* Mesh the whole shape. This only affect faces, edges have to be handled separately. */
-    BRepMesh_IncrementalMesh(shape, this->Parent->GetLinearDeflection(),
-      this->Parent->GetRelativeDeflection(), this->Parent->GetAngularDeflection(), true);
-
-    if (this->Parent->GetReadWire())
+    colors.Face = [&inheritedStyles](const TopoDS_Face& face)
     {
-      std::vector<TopoDS_Edge> edges;
-      {
-        /* add all edges to a compound to remesh them all at once */
-        TopoDS_Builder builder;
-        TopoDS_Compound compound;
-        builder.MakeCompound(compound);
-        for (TopExp_Explorer exEdge(shape, TopAbs_EDGE); exEdge.More(); exEdge.Next())
-        {
-          const TopoDS_Edge edge = TopoDS::Edge(exEdge.Current());
-          builder.Add(compound, edge);
-          edges.push_back(edge);
-        }
-        BRepMesh_IncrementalMesh(compound, this->Parent->GetLinearDeflection(),
-          this->Parent->GetRelativeDeflection(), this->Parent->GetAngularDeflection(), true);
-      }
-
-      // Add all edges to polydata
-      for (const TopoDS_Edge& edge : edges)
-      {
-        TopLoc_Location location;
-        const auto& poly = BRep_Tool::Polygon3D(edge, location);
-
-        if (poly.IsNull())
-        {
-          continue;
-        }
-
-        int nbV = poly->NbNodes();
-
-        // Points
-        const NCollection_Array1<gp_Pnt>& aNodes = poly->Nodes();
-        for (int i = 1; i <= nbV; i++)
-        {
-          gp_Pnt pt = aNodes(i).Transformed(location);
-          points->InsertNextPoint(pt.X(), pt.Y(), pt.Z());
-
-          // normals and uvs make no sense for lines
-          float fn[3] = { 0.0, 0.0, 1.0 };
-          normals->InsertNextTypedTuple(fn);
-          uvs->InsertNextTypedTuple(fn);
-        }
-
-        std::vector<vtkIdType> polyline(nbV);
-        std::iota(polyline.begin(), polyline.end(), shift);
-        linesCells->InsertNextCell(polyline.size(), polyline.data());
-
-#if F3D_PLUGIN_OCCT_XCAF
-        std::array<unsigned char, 3> rgb = { 0, 0, 0 };
-        try
-        {
-          const auto& style = inheritedStyles.FindFromKey(edge);
-          if (style.IsSetColorCurv())
-          {
-            Quantity_Color color = style.GetColorCurv();
-            double fRGB[3];
-            color.Values(fRGB[0], fRGB[1], fRGB[2], Quantity_TOC_sRGB);
-            rgb[0] = static_cast<unsigned char>(255.0 * fRGB[0]);
-            rgb[1] = static_cast<unsigned char>(255.0 * fRGB[1]);
-            rgb[2] = static_cast<unsigned char>(255.0 * fRGB[2]);
-          }
-        }
-        catch (Standard_NoSuchObject&)
-        {
-          /* edge has no style, safe to ignore */
-        }
-
-        colors->InsertNextTypedTuple(rgb.data());
-#endif
-
-        shift += nbV;
-      }
-    }
-
-    // Add all faces to polydata
-    for (TopExp_Explorer exFace(shape, TopAbs_FACE); exFace.More(); exFace.Next())
-    {
-      TopoDS_Face face = TopoDS::Face(exFace.Current());
-
-      TopLoc_Location location;
-      const auto& poly = BRep_Tool::Triangulation(face, location);
-
-      if (poly.IsNull())
-      {
-        continue;
-      }
-
-      Poly::ComputeNormals(poly);
-      TopAbs_Orientation faceOrientation = face.Orientation();
-
-      int nbT = poly->NbTriangles();
-      int nbV = poly->NbNodes();
-
-      // Points
-      for (int i = 1; i <= nbV; i++)
-      {
-        gp_Pnt pt = poly->Node(i).Transformed(location);
-        points->InsertNextPoint(pt.X(), pt.Y(), pt.Z());
-      }
-
-      // Normals
-      if (poly->HasNormals())
-      {
-        for (int i = 1; i <= nbV; i++)
-        {
-          gp_Dir n = poly->Normal(i);
-          float fn[3] = { static_cast<float>(n.X()), static_cast<float>(n.Y()),
-            static_cast<float>(n.Z()) };
-          if (faceOrientation == TopAbs_Orientation::TopAbs_REVERSED)
-          {
-            vtkMath::MultiplyScalar(fn, -1.f);
-          }
-          normals->InsertNextTypedTuple(fn);
-        }
-      }
-      else
-      {
-        // just in case a face does not have normals, add a dummy normal
-        float fn[3] = { 0.0, 0.0, 1.0 };
-        for (int i = 1; i <= nbV; i++)
-        {
-          normals->InsertNextTypedTuple(fn);
-        }
-      }
-
-      // UVs
-      if (poly->HasUVNodes())
-      {
-        for (int i = 1; i <= nbV; i++)
-        {
-          gp_Pnt2d uv = poly->UVNode(i);
-          float fn[2] = { static_cast<float>(uv.X()), static_cast<float>(uv.Y()) };
-          uvs->InsertNextTypedTuple(fn);
-        }
-      }
-      else
-      {
-        uvs->SetNumberOfTuples(nbV);
-        uvs->Fill(0.0);
-      }
-
-      for (int i = 1; i <= nbT; i++)
-      {
-        int n1, n2, n3;
-        poly->Triangle(i).Get(n1, n2, n3);
-
-        vtkIdType cell[3] = { shift + n1 - 1, shift + n2 - 1, shift + n3 - 1 };
-        if (faceOrientation != TopAbs_Orientation::TopAbs_FORWARD)
-        {
-          std::swap(cell[0], cell[2]);
-        }
-        trianglesCells->InsertNextCell(3, cell);
-      }
-
-#if F3D_PLUGIN_OCCT_XCAF
-      std::array<unsigned char, 3> rgb = { 255, 255, 255 };
+      F3DOCCTPolyData::Color rgba = { 255, 255, 255, 255 };
       try
       {
         const auto& style = inheritedStyles.FindFromKey(face);
         if (style.IsSetColorSurf())
         {
-          Quantity_Color color = style.GetColorSurf();
-          double fRGB[3];
-          color.Values(fRGB[0], fRGB[1], fRGB[2], Quantity_TOC_sRGB);
-          rgb[0] = static_cast<unsigned char>(255.0 * fRGB[0]);
-          rgb[1] = static_cast<unsigned char>(255.0 * fRGB[1]);
-          rgb[2] = static_cast<unsigned char>(255.0 * fRGB[2]);
+          rgba = ToColor(style.GetColorSurf());
         }
       }
       catch (Standard_NoSuchObject&)
       {
         /* face has no style, safe to ignore */
       }
-
-      for (int i = 1; i <= nbT; i++)
+      return rgba;
+    };
+    colors.Edge = [&inheritedStyles](const TopoDS_Edge& edge)
+    {
+      F3DOCCTPolyData::Color rgba = { 0, 0, 0, 255 };
+      try
       {
-        colors->InsertNextTypedTuple(rgb.data());
+        const auto& style = inheritedStyles.FindFromKey(edge);
+        if (style.IsSetColorCurv())
+        {
+          rgba = ToColor(style.GetColorCurv());
+        }
       }
+      catch (Standard_NoSuchObject&)
+      {
+        /* edge has no style, safe to ignore */
+      }
+      return rgba;
+    };
 #endif
-
-      shift += nbV;
-    }
-
-    vtkNew<vtkPolyData> polydata;
-    polydata->SetPoints(points);
-    polydata->GetPointData()->SetNormals(normals);
-    polydata->GetPointData()->SetTCoords(uvs);
-    polydata->SetPolys(trianglesCells);
-    polydata->SetLines(linesCells);
+    return F3DOCCTPolyData::Create(shape, options, colors);
+  }
 
 #if F3D_PLUGIN_OCCT_XCAF
-    polydata->GetCellData()->SetScalars(colors);
-#endif
-
-    polydata->Squeeze();
-    return polydata;
+  //----------------------------------------------------------------------------
+  static F3DOCCTPolyData::Color ToColor(const Quantity_Color& color)
+  {
+    double rgb[3];
+    color.Values(rgb[0], rgb[1], rgb[2], Quantity_TOC_sRGB);
+    return { static_cast<unsigned char>(255.0 * rgb[0]), static_cast<unsigned char>(255.0 * rgb[1]),
+      static_cast<unsigned char>(255.0 * rgb[2]), 255 };
   }
+#endif
 
 #if F3D_PLUGIN_OCCT_XCAF
   StyleMap CollectInheritedStyles(const TDF_Label& rootLabel, const TopoDS_Shape& rootShape)

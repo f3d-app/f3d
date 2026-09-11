@@ -234,7 +234,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   }
   else if (pds)
   {
-    this->ImportPartitionedDataSet(pds, ren);
+    this->ImportPartitionedDataSet(vtkDataAssembly::GetRootNode(), pds, ren);
   }
 #if VTK_VERSION_NUMBER <= VTK_VERSION_CHECK(9, 5, 2)
   // Handle other composite types (e.g., AMR) using generic iterator
@@ -550,60 +550,89 @@ void vtkF3DGenericImporter::ImportMultiBlock(int nodeid, vtkMultiBlockDataSet* m
 void vtkF3DGenericImporter::ImportPartitionedDataSetCollection(
   vtkPartitionedDataSetCollection* pdc, vtkRenderer* ren)
 {
-  std::map<unsigned int, std::string> datasetIndexToName;
+  std::vector<bool> imported(pdc->GetNumberOfPartitionedDataSets(), false);
   vtkDataAssembly* assembly = pdc->GetDataAssembly();
   if (assembly)
   {
-    const std::vector<int> childNodes = assembly->GetChildNodes(assembly->GetRootNode());
-    for (int nodeId : childNodes)
-    {
-      const char* nodeName = assembly->GetNodeName(nodeId);
-      if (nodeName)
-      {
-        std::vector<unsigned int> indices = assembly->GetDataSetIndices(nodeId, false);
-        for (unsigned int idx : indices)
-        {
-          datasetIndexToName[idx] = nodeName;
-        }
-      }
-    }
+    this->ImportAssemblyNode(
+      vtkDataAssembly::GetRootNode(), assembly, assembly->GetRootNode(), pdc, ren, imported);
   }
 
+  // datasets the assembly does not reference are attached to the root
   for (unsigned int i = 0; i < pdc->GetNumberOfPartitionedDataSets(); i++)
   {
-    vtkPartitionedDataSet* pds = pdc->GetPartitionedDataSet(i);
-    if (!pds)
+    if (!imported[i])
     {
-      continue;
+      this->ImportPartitionedDataSet(vtkDataAssembly::GetRootNode(), pdc, i, ren, "");
     }
-
-    std::string pdsName;
-
-    auto it = datasetIndexToName.find(i);
-    if (it != datasetIndexToName.end())
-    {
-      pdsName = it->second;
-    }
-    else if (pdc->HasMetaData(i))
-    {
-      const char* name = pdc->GetMetaData(i)->Get(vtkCompositeDataSet::NAME());
-      if (name)
-      {
-        pdsName = name;
-      }
-    }
-    if (pdsName.empty())
-    {
-      pdsName = "PartitionedDataSet_" + std::to_string(i);
-    }
-
-    this->ImportPartitionedDataSet(pds, ren, pdsName);
   }
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DGenericImporter::ImportAssemblyNode(int nodeid, vtkDataAssembly* assembly,
+  int assemblyNodeId, vtkPartitionedDataSetCollection* pdc, vtkRenderer* ren,
+  std::vector<bool>& imported)
+{
+  for (const int child : assembly->GetChildNodes(assemblyNodeId, false))
+  {
+    const char* nodeName = assembly->GetNodeName(child);
+    const std::string label = assembly->GetAttributeOrDefault(child, "label", nodeName);
+    const std::vector<unsigned int> indices = assembly->GetDataSetIndices(child, false);
+
+    // a node with children or several datasets is a group, a node with a single dataset is the
+    // dataset itself
+    int childNodeId = nodeid;
+    const bool isGroup = assembly->GetNumberOfChildren(child) > 0 || indices.size() > 1;
+    if (isGroup)
+    {
+      childNodeId = this->SceneHierarchy->AddNode(nodeName, nodeid);
+      this->SceneHierarchy->SetAttribute(childNodeId, "label", label.c_str());
+    }
+
+    for (const unsigned int index : indices)
+    {
+      if (index < imported.size() && !imported[index])
+      {
+        imported[index] = true;
+        this->ImportPartitionedDataSet(childNodeId, pdc, index, ren, isGroup ? "" : label);
+      }
+    }
+
+    this->ImportAssemblyNode(childNodeId, assembly, child, pdc, ren, imported);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DGenericImporter::ImportPartitionedDataSet(int nodeid,
+  vtkPartitionedDataSetCollection* pdc, unsigned int index, vtkRenderer* ren,
+  const std::string& pdsName)
+{
+  vtkPartitionedDataSet* pds = pdc->GetPartitionedDataSet(index);
+  if (!pds)
+  {
+    return;
+  }
+
+  std::string name = pdsName;
+  if (name.empty() && pdc->HasMetaData(index))
+  {
+    const char* metaName = pdc->GetMetaData(index)->Get(vtkCompositeDataSet::NAME());
+    if (metaName)
+    {
+      name = metaName;
+    }
+  }
+  if (name.empty())
+  {
+    name = "PartitionedDataSet_" + std::to_string(index);
+  }
+
+  this->ImportPartitionedDataSet(nodeid, pds, ren, name);
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DGenericImporter::ImportPartitionedDataSet(
-  vtkPartitionedDataSet* pds, vtkRenderer* ren, const std::string& pdsName)
+  int nodeid, vtkPartitionedDataSet* pds, vtkRenderer* ren, const std::string& pdsName)
 {
   std::string baseName = pdsName;
   if (baseName.empty())
@@ -641,6 +670,6 @@ void vtkF3DGenericImporter::ImportPartitionedDataSet(
       blockName += std::to_string(j);
     }
 
-    this->CreateActorForBlock(vtkDataAssembly::GetRootNode(), ds, ren, blockName);
+    this->CreateActorForBlock(nodeid, ds, ren, blockName);
   }
 }

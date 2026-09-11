@@ -18,6 +18,8 @@
 #include "vtkF3DGenericImporter.h"
 
 #include <iostream>
+#include <string>
+#include <vector>
 
 int TestF3DGenericImporter(int argc, char* argv[])
 {
@@ -411,6 +413,74 @@ int TestF3DGenericImporter(int argc, char* argv[])
       importer->GetBlockName(1) != "ConeFromAssembly")
     {
       std::cerr << "PDC with assembly: Expected assembly names\n";
+      return EXIT_FAILURE;
+    }
+  }
+
+  // Test PartitionedDataSetCollection with a nested assembly
+  {
+    vtkNew<vtkPartitionedDataSet> pds0;
+    pds0->SetNumberOfPartitions(1);
+    pds0->SetPartition(0, sphere->GetOutput());
+
+    vtkNew<vtkPartitionedDataSet> pds1;
+    pds1->SetNumberOfPartitions(1);
+    pds1->SetPartition(0, cone->GetOutput());
+
+    vtkNew<vtkPartitionedDataSet> pds2;
+    pds2->SetNumberOfPartitions(1);
+    pds2->SetPartition(0, sphere->GetOutput());
+
+    vtkNew<vtkPartitionedDataSetCollection> pdc;
+    pdc->SetNumberOfPartitionedDataSets(3);
+    pdc->SetPartitionedDataSet(0, pds0);
+    pdc->SetPartitionedDataSet(1, pds1);
+    pdc->SetPartitionedDataSet(2, pds2);
+    pdc->GetMetaData(2u)->Set(vtkCompositeDataSet::NAME(), "Unreferenced");
+
+    // root > Group > Sphere, root > Cone, dataset 2 is not referenced by the assembly
+    vtkNew<vtkDataAssembly> assembly;
+    assembly->Initialize();
+    int groupNode = assembly->AddNode("Group", assembly->GetRootNode());
+    assembly->SetAttribute(groupNode, "label", "Group Label");
+    int sphereNode = assembly->AddNode("Sphere", groupNode);
+    assembly->SetAttribute(sphereNode, "label", "Sphere Label");
+    int coneNode = assembly->AddNode("Cone", assembly->GetRootNode());
+    assembly->AddDataSetIndex(sphereNode, 0);
+    assembly->AddDataSetIndex(coneNode, 1);
+    pdc->SetDataAssembly(assembly);
+
+    vtkNew<vtkTrivialProducer> producer;
+    producer->SetOutput(pdc);
+
+    vtkNew<vtkF3DGenericImporter> importer;
+    importer->SetInternalReader(producer);
+    importer->Update();
+
+    if (importer->GetBlockName(0) != "Group Label/Sphere Label" ||
+      importer->GetBlockName(1) != "Cone" || importer->GetBlockName(2) != "Unreferenced")
+    {
+      std::cerr << "PDC with nested assembly: Unexpected block names\n";
+      return EXIT_FAILURE;
+    }
+
+    vtkDataAssembly* hierarchy = importer->GetSceneHierarchy();
+    const std::vector<int> rootChildren = hierarchy->GetChildNodes(hierarchy->GetRootNode(), false);
+    if (rootChildren.size() != 3)
+    {
+      std::cerr << "PDC with nested assembly: Expected 3 root children, got " << rootChildren.size()
+                << "\n";
+      return EXIT_FAILURE;
+    }
+    const int group = rootChildren[0];
+    const std::vector<int> groupChildren = hierarchy->GetChildNodes(group, false);
+    if (std::string(hierarchy->GetAttributeOrDefault(group, "label", "")) != "Group Label" ||
+      groupChildren.size() != 1 ||
+      hierarchy->GetAttributeOrDefault(groupChildren[0], "flat_actor_id", -1) != 0 ||
+      hierarchy->GetAttributeOrDefault(rootChildren[1], "flat_actor_id", -1) != 1 ||
+      hierarchy->GetAttributeOrDefault(rootChildren[2], "flat_actor_id", -1) != 2)
+    {
+      std::cerr << "PDC with nested assembly: Unexpected scene hierarchy\n";
       return EXIT_FAILURE;
     }
   }

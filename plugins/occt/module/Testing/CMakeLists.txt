@@ -1,6 +1,8 @@
 list(APPEND vtkextOCCT_list
      TestF3DOCCTReader.cxx
      TestF3DOCCTReaderCanReadFile.cxx
+     TestF3DFCStdReader.cxx
+     TestF3DFCStdReaderCanReadFile.cxx
     )
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251223)

@@ -120,6 +120,18 @@ if (F3D_PLUGIN_OCCT_COLORING_SUPPORT)
   )
 endif()
 
+f3d_plugin_declare_reader(
+  NAME FCStd
+  EXTENSIONS fcstd
+  MIMETYPES application/x-extension-fcstd
+  VTK_READER vtkF3DFCStdReader
+  FORMAT_DESCRIPTION "FreeCAD Standard"
+  ${_SUPPORTS_STREAM}
+  CAN_READ STATIC
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/FCStd.inl"
+  OPTIONS linear_deflection angular_deflection read_wire relative_deflection
+)
+
 set(rpaths "")
 get_target_property(target_type TKernel TYPE)
 if (target_type STREQUAL SHARED_LIBRARY)

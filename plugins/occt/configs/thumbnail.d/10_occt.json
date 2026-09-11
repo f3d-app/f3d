@@ -1,7 +1,7 @@
 [
   {
     "match-type": "glob",
-    "match": "*.{step,stp,iges,igs,brep,xbf}",
+    "match": "*.{step,stp,iges,igs,brep,xbf,fcstd,FCStd}",
     "options": {
       "scalar-coloring": true,
       "load-plugins": "occt",
