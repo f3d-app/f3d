@@ -145,7 +145,7 @@ Define the Up direction.
 
 | +Y                     | +Z                     |
 | ---------------------- | ---------------------- |
-| ![](./images/up_y.png) | ![](./images/up_z.png) |
+| ![up direction Y](./images/up_y.png) | ![up direction Z](./images/up_z.png) |
 
 ### `-x`, `--axis` (_bool_, default: `false`)
 
@@ -155,7 +155,7 @@ Show _axes_ as a trihedron in the scene.
 
 | OFF                                       | ON                        |
 | ----------------------------------------- | ------------------------- |
-| ![](./images/damaged_helmet_baseline.png) | ![](./images/axis_on.png) |
+| ![Damaged Helmet baseline render](./images/damaged_helmet_baseline.png) | ![axis on](./images/axis_on.png) |
 
 ### `--x-color` (_color_, default: `f3d_red`)
 
@@ -165,7 +165,7 @@ Set the X axis color in both widget and grid.
 
 | Default                           | Yellow                           |
 | --------------------------------- | -------------------------------- |
-| ![](./images/x_color_default.png) | ![](./images/x_color_yellow.png) |
+| ![X color default](./images/x_color_default.png) | ![X color yellow](./images/x_color_yellow.png) |
 
 ### `--y-color` (_color_, default: `f3d_green`)
 
@@ -175,7 +175,7 @@ Set the Y axis color in both widget and grid.
 
 | Default                           | Yellow                           |
 | --------------------------------- | -------------------------------- |
-| ![](./images/x_color_default.png) | ![](./images/y_color_yellow.png) |
+| ![X color default](./images/x_color_default.png) | ![Y color yellow](./images/y_color_yellow.png) |
 
 ### `--z-color` (_color_, default: `f3d_blue`)
 
@@ -185,7 +185,7 @@ Set the Z axis color in both widget and grid.
 
 | Default                           | Yellow                           |
 | --------------------------------- | -------------------------------- |
-| ![](./images/x_color_default.png) | ![](./images/z_color_yellow.png) |
+| ![X color default](./images/x_color_default.png) | ![Z color yellow](./images/z_color_yellow.png) |
 
 ### `-g`, `--grid` (_bool_, default: `false`)
 
@@ -195,7 +195,7 @@ Show _a grid_ aligned with the horizontal (orthogonal to the Up direction) plane
 
 | OFF                                       | ON                        |
 | ----------------------------------------- | ------------------------- |
-| ![](./images/damaged_helmet_baseline.png) | ![](./images/grid_on.png) |
+| ![Damaged Helmet baseline render](./images/damaged_helmet_baseline.png) | ![grid on](./images/grid_on.png) |
 
 ### `--grid-unit=<length>` (_double_)
 
@@ -205,7 +205,7 @@ Set the size of the _unit square_ for the grid. If not set (the default), F3D au
 
 | Auto                                | 2                             |
 | ----------------------------------- | ----------------------------- |
-| ![](./images/grid_unit_default.png) | ![](./images/grid_unit_2.png) |
+| ![grid unit default](./images/grid_unit_default.png) | ![grid unit 2](./images/grid_unit_2.png) |
 
 ### `--grid-subdivisions=<count>` (_int_, default: `10`)
 
@@ -215,7 +215,7 @@ Set the number of subdivisions for the grid.
 
 | 10 (default)                                | 4                                     |
 | ------------------------------------------- | ------------------------------------- |
-| ![](./images/grid_subdivisions_default.png) | ![](./images/grid_subdivisions_4.png) |
+| ![grid subdivisions default](./images/grid_subdivisions_default.png) | ![grid subdivisions 4](./images/grid_subdivisions_4.png) |
 
 ### `--grid-color=<color>` (_color_, default: `0,0,0`)
 
@@ -225,7 +225,7 @@ Set the color grid lines.
 
 | Black (default)                      | Cyan                              |
 | ------------------------------------ | --------------------------------- |
-| ![](./images/grid_color_default.png) | ![](./images/grid_color_cyan.png) |
+| ![grid color default](./images/grid_color_default.png) | ![grid color cyan](./images/grid_color_cyan.png) |
 
 ### `--grid-opacity=<opacity>` (_double_, default: `1`)
 
@@ -235,7 +235,7 @@ Set the opacity for grid lines. Can be set to `0` to show reflection only.
 
 | 100% (default)                       | 0%                                         |
 | ------------------------------------ | ------------------------------------------ |
-| ![](./images/grid_reflection_on.png) | ![](./images/grid_reflection_no_lines.png) |
+| ![grid reflection on](./images/grid_reflection_on.png) | ![grid reflection no lines](./images/grid_reflection_no_lines.png) |
 
 ### `--grid-reflection=<strength>` (_double_, default: `0`)
 
@@ -245,7 +245,7 @@ Set the reflection strength on the grid.
 
 | 0 (OFF)                               | 0.5                                  |
 | ------------------------------------- | ------------------------------------ |
-| ![](./images/grid_reflection_off.png) | ![](./images/grid_reflection_on.png) |
+| ![grid reflection off](./images/grid_reflection_off.png) | ![grid reflection on](./images/grid_reflection_on.png) |
 
 ### `--grid-absolute` (_bool_, default: `false`)
 
@@ -255,7 +255,7 @@ Position the grid at absolute origin instead of below the model.
 
 | OFF                                 | ON                                 |
 | ----------------------------------- | ---------------------------------- |
-| ![](./images/grid_absolute_off.png) | ![](./images/grid_absolute_on.png) |
+| ![grid absolute off](./images/grid_absolute_off.png) | ![grid absolute on](./images/grid_absolute_on.png) |
 
 ### `--axes-grid` (_bool_, default: `false`)
 
@@ -265,7 +265,7 @@ Show _axes grid_ in the scene.
 
 | OFF                                       | ON                             |
 | ----------------------------------------- | ------------------------------ |
-| ![](./images/damaged_helmet_baseline.png) | ![](./images/axes_grid_on.png) |
+| ![Damaged Helmet baseline render](./images/damaged_helmet_baseline.png) | ![axes grid on](./images/axes_grid_on.png) |
 
 ### `-e`, `--edges` (_bool_, default: `false`)
 
@@ -275,7 +275,7 @@ Show the _cell edges_.
 
 | OFF                                       | ON                         |
 | ----------------------------------------- | -------------------------- |
-| ![](./images/damaged_helmet_baseline.png) | ![](./images/edges_on.png) |
+| ![Damaged Helmet baseline render](./images/damaged_helmet_baseline.png) | ![edges on](./images/edges_on.png) |
 
 ### `--armature` (_bool_, default: `false`)
 
@@ -285,7 +285,7 @@ Show armature if present.
 
 | Disabled                       | Enable                        |
 | ------------------------------ | ----------------------------- |
-| ![](./images/armature_off.png) | ![](./images/armature_on.png) |
+| ![armature off](./images/armature_off.png) | ![armature on](./images/armature_on.png) |
 
 ### `--camera-index=<idx>` (_int_)
 
@@ -330,7 +330,7 @@ Scale fonts. Useful for HiDPI displays.
 
 | 1                              | 2                              |
 | ------------------------------ | ------------------------------ |
-| ![](./images/font_scale_1.png) | ![](./images/font_scale_2.png) |
+| ![font scale 1](./images/font_scale_1.png) | ![font scale 2](./images/font_scale_2.png) |
 
 ### `--font-color=<color>` (_color_, default: `0.957,0.957,0.957`)
 
@@ -340,7 +340,7 @@ Set font color. Defaults to #F4F4F4(F3DWhite).
 
 | Default                              | Red (1,0,0)                      |
 | ------------------------------------ | -------------------------------- |
-| ![](./images/font_color_default.png) | ![](./images/font_color_red.png) |
+| ![font color default](./images/font_color_default.png) | ![font color red](./images/font_color_red.png) |
 
 ### `--dpi-aware` (_bool_, default: `false`)
 
@@ -360,7 +360,7 @@ Set the color of the backdrop behind text information such as FPS Counter, Filen
 
 | Default (black)                          | Navy                                  |
 | ---------------------------------------- | ------------------------------------- |
-| ![](./images/backdrop_color_default.png) | ![](./images/backdrop_color_navy.png) |
+| ![backdrop color default](./images/backdrop_color_default.png) | ![backdrop color navy](./images/backdrop_color_navy.png) |
 
 ### `--backdrop-opacity=<opacity>` (_double_, default: `0.9`)
 
@@ -370,7 +370,7 @@ Set the opacity of the backdrop behind text information such as FPS Counter, Fil
 
 | Default (0.9)                              | 0.2                                    |
 | ------------------------------------------ | -------------------------------------- |
-| ![](./images/backdrop_opacity_default.png) | ![](./images/backdrop_opacity_0.2.png) |
+| ![backdrop opacity default](./images/backdrop_opacity_default.png) | ![backdrop opacity 0.2](./images/backdrop_opacity_0.2.png) |
 
 ## Material options
 
@@ -382,7 +382,7 @@ Display arrows that show vertex normals.
 
 | OFF                                       | ON                                 |
 | ----------------------------------------- | ---------------------------------- |
-| ![](./images/damaged_helmet_baseline.png) | ![](./images/normal_glyphs_on.png) |
+| ![Damaged Helmet baseline render](./images/damaged_helmet_baseline.png) | ![normal glyphs on](./images/normal_glyphs_on.png) |
 
 ### `--normal-glyphs-scale` (_ratio_, default: `1.0`)
 
@@ -392,7 +392,7 @@ Adjusts the scales of normal glyphs.
 
 | 0.3                                       | 0.7                                       |
 | ----------------------------------------- | ----------------------------------------- |
-| ![](./images/normal_glyphs_scale_0.3.png) | ![](./images/normal_glyphs_scale_0.7.png) |
+| ![normal glyphs scale 0.3](./images/normal_glyphs_scale_0.3.png) | ![normal glyphs scale 0.7](./images/normal_glyphs_scale_0.7.png) |
 
 ### `-o`, `--point-sprites=<none|sphere|gaussian|circle|stddev|bound|cross>` (_string_, default: `none`, implicit: `sphere`)
 
@@ -402,7 +402,7 @@ Select _points sprites_ types to show instead of the geometry.
 
 | none                                      | sphere                                 |
 | ----------------------------------------- | -------------------------------------- |
-| ![](./images/damaged_helmet_baseline.png) | ![](./images/point_sprites_sphere.png) |
+| ![Damaged Helmet baseline render](./images/damaged_helmet_baseline.png) | ![point sprites sphere](./images/point_sprites_sphere.png) |
 
 ### `--point-sprites-size=<size>` (_double_, default: `10.0`)
 
@@ -412,7 +412,7 @@ Set the _size_ of point sprites.
 
 | 5                                      | 2                                      |
 | -------------------------------------- | -------------------------------------- |
-| ![](./images/point_sprites_sphere.png) | ![](./images/point_sprites_size_2.png) |
+| ![point sprites sphere](./images/point_sprites_sphere.png) | ![point sprites size 2](./images/point_sprites_size_2.png) |
 
 ### `--point-sprites-absolute-size` (_bool_, default: `false`)
 
@@ -426,7 +426,7 @@ Set the _size_ of points when showing vertices. Model-specified by default.
 
 | Default (10)                    | 3                              |
 | ------------------------------- | ------------------------------ |
-| ![](./images/point_size_10.png) | ![](./images/point_size_3.png) |
+| ![point size 10](./images/point_size_10.png) | ![point size 3](./images/point_size_3.png) |
 
 ### `--line-width=<size>` (_double_)
 
@@ -436,7 +436,7 @@ Set the _width_ of lines when showing edges. Model-specified by default.
 
 | 1                              | 4                              |
 | ------------------------------ | ------------------------------ |
-| ![](./images/line_width_1.png) | ![](./images/line_width_4.png) |
+| ![line width 1](./images/line_width_1.png) | ![line width 4](./images/line_width_4.png) |
 
 ### `--backface-type=<visible|hidden>` (_string_)
 
@@ -446,7 +446,7 @@ Set the Backface type. Model-specified by default.
 
 | visible                                 | hidden                                 |
 | --------------------------------------- | -------------------------------------- |
-| ![](./images/backface_type_visible.png) | ![](./images/backface_type_hidden.png) |
+| ![backface type visible](./images/backface_type_visible.png) | ![backface type hidden](./images/backface_type_hidden.png) |
 
 ### `--color=<color>` (_color_)
 
@@ -457,7 +457,7 @@ Model-specified by default. Overridden by `--scalar-coloring`.
 
 | red                         | blue                         |
 | --------------------------- | ---------------------------- |
-| ![](./images/color_red.png) | ![](./images/color_blue.png) |
+| ![color red](./images/color_red.png) | ![color blue](./images/color_blue.png) |
 
 ### `--opacity=<opacity>` (_double_)
 
@@ -468,7 +468,7 @@ Model-specified by default. Usually used with `--blending`.
 
 | 1                           | 0.2                           |
 | --------------------------- | ----------------------------- |
-| ![](./images/opacity_1.png) | ![](./images/opacity_0.2.png) |
+| ![opacity 1](./images/opacity_1.png) | ![opacity 0.2](./images/opacity_0.2.png) |
 
 ### `--roughness=<roughness>` (_double_)
 
@@ -479,7 +479,7 @@ Model-specified by default.
 
 | 0.2                             | 0.8                             |
 | ------------------------------- | ------------------------------- |
-| ![](./images/roughness_0.2.png) | ![](./images/roughness_0.8.png) |
+| ![roughness 0.2](./images/roughness_0.2.png) | ![roughness 0.8](./images/roughness_0.8.png) |
 
 ### `--metallic=<metallic>` (_double_)
 
@@ -490,7 +490,7 @@ Model-specified by default.
 
 | 0                            | 1                            |
 | ---------------------------- | ---------------------------- |
-| ![](./images/metallic_0.png) | ![](./images/metallic_1.png) |
+| ![metallic 0](./images/metallic_0.png) | ![metallic 1](./images/metallic_1.png) |
 
 ### `--base-ior=<base-ior>` (_double_)
 
@@ -500,7 +500,7 @@ Set the _index of refraction of the base layer_ (1.0-2.5). Model-specified by de
 
 | 1.5 (default)                      | 2.5                            |
 | ---------------------------------- | ------------------------------ |
-| ![](./images/base_ior_default.png) | ![](./images/base_ior_2.5.png) |
+| ![base IOR default](./images/base_ior_default.png) | ![base IOR 2.5](./images/base_ior_2.5.png) |
 
 ### `--hdri-file=<HDRI file>` (_path_)
 
@@ -517,7 +517,7 @@ The environment act as a light source and is reflected on the material.
 
 | OFF                                | ON                                |
 | ---------------------------------- | --------------------------------- |
-| ![](./images/hdri_ambient_off.png) | ![](./images/hdri_ambient_on.png) |
+| ![HDRI ambient off](./images/hdri_ambient_off.png) | ![HDRI ambient on](./images/hdri_ambient_on.png) |
 
 ### `--texture-matcap=<texture file>` (_path_)
 
@@ -528,7 +528,7 @@ Model-specified by default.
 
 | OFF                                       | ON (skin.png)               |
 | ----------------------------------------- | --------------------------- |
-| ![](./images/damaged_helmet_baseline.png) | ![](./images/matcap_on.png) |
+| ![Damaged Helmet baseline render](./images/damaged_helmet_baseline.png) | ![matcap on](./images/matcap_on.png) |
 
 ### `--texture-base-color=<texture file>` (_path_)
 
@@ -539,7 +539,7 @@ Model-specified by default. Set an empty path to remove the model-specified text
 
 | OFF                                      | ON                                      |
 | ---------------------------------------- | --------------------------------------- |
-| ![](./images/texture_base_color_off.png) | ![](./images/texture_base_color_on.png) |
+| ![texture base color off](./images/texture_base_color_off.png) | ![texture base color on](./images/texture_base_color_on.png) |
 
 ### `--texture-material=<texture file>` (_path_)
 
@@ -550,7 +550,7 @@ Model-specified by default. Set an empty path to remove the model-specified text
 
 | OFF                                    | ON                                    |
 | -------------------------------------- | ------------------------------------- |
-| ![](./images/texture_material_off.png) | ![](./images/texture_material_on.png) |
+| ![texture material off](./images/texture_material_off.png) | ![texture material on](./images/texture_material_on.png) |
 
 ### `--texture-emissive=<texture file>` (_path_)
 
@@ -561,7 +561,7 @@ Model-specified by default. Set an empty path to remove the model-specified text
 
 | OFF                                    | ON                                    |
 | -------------------------------------- | ------------------------------------- |
-| ![](./images/texture_emissive_off.png) | ![](./images/texture_emissive_on.png) |
+| ![texture emissive off](./images/texture_emissive_off.png) | ![texture emissive on](./images/texture_emissive_on.png) |
 
 ### `--emissive-factor=<color>` (_color_)
 
@@ -572,7 +572,7 @@ Model-specified by default.
 
 | OFF                                       | Red (2.0, 0.1, 0.1)                   |
 | ----------------------------------------- | ------------------------------------- |
-| ![](./images/damaged_helmet_baseline.png) | ![](./images/emissive_factor_red.png) |
+| ![Damaged Helmet baseline render](./images/damaged_helmet_baseline.png) | ![emissive factor red](./images/emissive_factor_red.png) |
 
 ### `--texture-normal=<texture file>` (_path_)
 
@@ -583,7 +583,7 @@ Model-specified by default. Set an empty path to remove the model-specified text
 
 | OFF                                  | ON                                  |
 | ------------------------------------ | ----------------------------------- |
-| ![](./images/texture_normal_off.png) | ![](./images/texture_normal_on.png) |
+| ![texture normal off](./images/texture_normal_off.png) | ![texture normal on](./images/texture_normal_on.png) |
 
 ### `--normal-scale=<factor>` (_double_)
 
@@ -594,7 +594,7 @@ Model-specified by default.
 
 | 1                                         | 2                                |
 | ----------------------------------------- | -------------------------------- |
-| ![](./images/damaged_helmet_baseline.png) | ![](./images/normal_scale_2.png) |
+| ![Damaged Helmet baseline render](./images/damaged_helmet_baseline.png) | ![normal scale 2](./images/normal_scale_2.png) |
 
 ### `--textures-transform=<transform2d>` (_transform2d_)
 
@@ -605,7 +605,7 @@ The reader may set a default value depending on the file format. If a default va
 
 | None                                        | Rotated by 10˚                               |
 | ------------------------------------------- | -------------------------------------------- |
-| ![](./images/texture_transform_default.png) | ![](./images/texture_transform_rotation.png) |
+| ![texture transform default](./images/texture_transform_default.png) | ![texture transform rotation](./images/texture_transform_rotation.png) |
 
 ### `--checkerboard` (_bool_, default: `false`)
 
@@ -615,7 +615,7 @@ Override model's texture with a checkerboard texture. Anti-aliasing is recommend
 
 | OFF                                       | ON                                |
 | ----------------------------------------- | --------------------------------- |
-| ![](./images/damaged_helmet_baseline.png) | ![](./images/checkerboard_on.png) |
+| ![Damaged Helmet baseline render](./images/damaged_helmet_baseline.png) | ![checkerboard on](./images/checkerboard_on.png) |
 
 ### `--unlit` (_bool_)
 
@@ -626,7 +626,7 @@ If the value is true, F3D applies no shading and the model is unlit.
 
 | OFF                                       | ON                         |
 | ----------------------------------------- | -------------------------- |
-| ![](./images/damaged_helmet_baseline.png) | ![](./images/unlit_on.png) |
+| ![Damaged Helmet baseline render](./images/damaged_helmet_baseline.png) | ![unlit on](./images/unlit_on.png) |
 
 ## Window options
 
@@ -639,7 +639,7 @@ Ignored if `--hdri-skybox` is enabled.
 
 | Default                                    | Orange                                    |
 | ------------------------------------------ | ----------------------------------------- |
-| ![](./images/background_color_default.png) | ![](./images/background_color_orange.png) |
+| ![background color default](./images/background_color_default.png) | ![background color orange](./images/background_color_orange.png) |
 
 ### `--resolution=<width,height>` (_vector\<double\>_, default: `1000, 600`)
 
@@ -657,7 +657,7 @@ Display the _FPS Counter_.
 
 | OFF                                       | ON                       |
 | ----------------------------------------- | ------------------------ |
-| ![](./images/damaged_helmet_baseline.png) | ![](./images/fps_on.png) |
+| ![Damaged Helmet baseline render](./images/damaged_helmet_baseline.png) | ![FPS on](./images/fps_on.png) |
 
 ### `-n`, `--filename` (_bool_, default: `false`)
 
@@ -667,7 +667,7 @@ Display the _Filename_ on top of the window.
 
 | OFF                                       | ON                            |
 | ----------------------------------------- | ----------------------------- |
-| ![](./images/damaged_helmet_baseline.png) | ![](./images/filename_on.png) |
+| ![Damaged Helmet baseline render](./images/damaged_helmet_baseline.png) | ![filename on](./images/filename_on.png) |
 
 ### `-m`, `--metadata` (_bool_, default: `false`)
 
@@ -677,7 +677,7 @@ Display the _Metadata_.
 
 | OFF                                       | ON                            |
 | ----------------------------------------- | ----------------------------- |
-| ![](./images/damaged_helmet_baseline.png) | ![](./images/metadata_on.png) |
+| ![Damaged Helmet baseline render](./images/damaged_helmet_baseline.png) | ![metadata on](./images/metadata_on.png) |
 
 ### `--scene-hierarchy` (_bool_, default: `false`)
 
@@ -688,7 +688,7 @@ By default the tree expands only enough to show nodes that have meaningful names
 
 | OFF                                       | ON                                   |
 | ----------------------------------------- | ------------------------------------ |
-| ![](./images/damaged_helmet_baseline.png) | ![](./images/scene_hierarchy_on.png) |
+| ![Damaged Helmet baseline render](./images/damaged_helmet_baseline.png) | ![scene hierarchy on](./images/scene_hierarchy_on.png) |
 
 ### `--notifications` (_bool_, default: `false`)
 
@@ -702,7 +702,7 @@ Display the _HDRI filename_.
 
 | OFF                                       | ON                                 |
 | ----------------------------------------- | ---------------------------------- |
-| ![](./images/damaged_helmet_baseline.png) | ![](./images/hdri_filename_on.png) |
+| ![Damaged Helmet baseline render](./images/damaged_helmet_baseline.png) | ![HDRI filename on](./images/hdri_filename_on.png) |
 
 ### `--hdri-skybox` (_bool_, default: `false`)
 
@@ -712,7 +712,7 @@ Show the HDRI as a skybox. Overrides `--background-color` and `--no-background`.
 
 | OFF                                       | ON                               |
 | ----------------------------------------- | -------------------------------- |
-| ![](./images/damaged_helmet_baseline.png) | ![](./images/hdri_skybox_on.png) |
+| ![Damaged Helmet baseline render](./images/damaged_helmet_baseline.png) | ![HDRI skybox on](./images/hdri_skybox_on.png) |
 
 ### `-u`, `--blur-background` (_bool_, default: `false`)
 
@@ -723,7 +723,7 @@ Useful with a HDRI skybox.
 
 | OFF                             | ON                             |
 | ------------------------------- | ------------------------------ |
-| ![](./images/hdri_blur_off.png) | ![](./images/hdri_blur_on.png) |
+| ![HDRI blur off](./images/hdri_blur_off.png) | ![HDRI blur on](./images/hdri_blur_on.png) |
 
 ### `--blur-coc` (_double_, default: `20`)
 
@@ -733,7 +733,7 @@ Blur circle of confusion radius.
 
 | 20 (default)                       | 50                            |
 | ---------------------------------- | ----------------------------- |
-| ![](./images/hdri_coc_default.png) | ![](./images/hdri_coc_50.png) |
+| ![HDRI blur circle of confusion default](./images/hdri_coc_default.png) | ![HDRI blur circle of confusion 50](./images/hdri_coc_50.png) |
 
 ### `--light-intensity` (_double_, default: `1.0`)
 
@@ -743,7 +743,7 @@ _Adjust the intensity_ of every light in the scene, including HDRI image-based l
 
 | 1 (default)                         | 2                                   |
 | ----------------------------------- | ----------------------------------- |
-| ![](./images/light_intensity_1.png) | ![](./images/light_intensity_2.png) |
+| ![light intensity 1](./images/light_intensity_1.png) | ![light intensity 2](./images/light_intensity_2.png) |
 
 ## Scientific visualization options
 
@@ -755,7 +755,7 @@ Enable scalar coloring if present in the file. If `--coloring-array` is not set,
 
 | OFF                                   | ON                                   |
 | ------------------------------------- | ------------------------------------ |
-| ![](./images/scalar_coloring_off.png) | ![](./images/scalar_coloring_on.png) |
+| ![scalar coloring off](./images/scalar_coloring_off.png) | ![scalar coloring on](./images/scalar_coloring_on.png) |
 
 ### `--coloring-array=<array_name>` (_string_)
 
@@ -766,7 +766,7 @@ Use `--verbose` to recover the usable array names.
 
 | Normals (Z)                             | Height                                  |
 | --------------------------------------- | --------------------------------------- |
-| ![](./images/coloring_array_normal.png) | ![](./images/coloring_array_height.png) |
+| ![coloring array normals](./images/coloring_array_normal.png) | ![coloring array height](./images/coloring_array_height.png) |
 
 ### `-y`, `--coloring-component=<comp_index>` (_int_, default: `-1`, implicit: `-2`)
 
@@ -778,7 +778,7 @@ When using _direct values_, components are used as L, LA, RGB, RGBA values depen
 
 | Normals (X)                            | Normals (Y)                            |
 | -------------------------------------- | -------------------------------------- |
-| ![](./images/coloring_component_x.png) | ![](./images/coloring_component_y.png) |
+| ![coloring component X](./images/coloring_component_x.png) | ![coloring component Y](./images/coloring_component_y.png) |
 
 ### `-c`, `--coloring-by-cells` (_bool_, default: `false`)
 
@@ -789,7 +789,7 @@ Use with the `--scalar-coloring` option.
 
 | OFF                                     | ON                                     |
 | --------------------------------------- | -------------------------------------- |
-| ![](./images/coloring_by_cells_off.png) | ![](./images/coloring_by_cells_on.png) |
+| ![coloring by cells off](./images/coloring_by_cells_off.png) | ![coloring by cells on](./images/coloring_by_cells_on.png) |
 
 ### `--coloring-range=<min,max>` (_vector\<double\>_)
 
@@ -800,7 +800,7 @@ Use with the `--scalar-coloring` option.
 
 | Auto                                  | 40,200                           |
 | ------------------------------------- | -------------------------------- |
-| ![](./images/coloring_range_auto.png) | ![](./images/skull_baseline.png) |
+| ![coloring range auto](./images/coloring_range_auto.png) | ![skull baseline render](./images/skull_baseline.png) |
 
 ### `-b`, `--coloring-scalar-bar` (_bool_, default: `false`)
 
@@ -811,7 +811,7 @@ Use with the `--scalar-coloring` option.
 
 | OFF                              | ON                              |
 | -------------------------------- | ------------------------------- |
-| ![](./images/skull_baseline.png) | ![](./images/scalar_bar_on.png) |
+| ![skull baseline render](./images/skull_baseline.png) | ![scalar bar on](./images/scalar_bar_on.png) |
 
 ### `--colormap-file=<name>` (_string_)
 
@@ -823,7 +823,7 @@ Use with the `--scalar-coloring` option.
 
 | Default (inferno)                | Viridis                            |
 | -------------------------------- | ---------------------------------- |
-| ![](./images/skull_baseline.png) | ![](./images/colormap_viridis.png) |
+| ![skull baseline render](./images/skull_baseline.png) | ![viridis color map](./images/colormap_viridis.png) |
 
 ### `--colormap=<colormap>` (_colormap_)
 
@@ -839,7 +839,7 @@ Set the number of distinct colors from [1, N] used in the colormap. Any values o
 
 | Default                                           | 8                                           |
 | ------------------------------------------------- | ------------------------------------------- |
-| ![](./images/colormap_discretization_default.png) | ![](./images/colormap_discretization_8.png) |
+| ![color map discretization default](./images/colormap_discretization_default.png) | ![color map discretization 8](./images/colormap_discretization_8.png) |
 
 ### `-v`, `--volume` (_bool_, default: `false`)
 
@@ -849,7 +849,7 @@ Enable _volume rendering_. It is only functional for 3D image data (VTKXMLVTI, D
 
 | OFF                          | ON                               |
 | ---------------------------- | -------------------------------- |
-| ![](./images/volume_off.png) | ![](./images/skull_baseline.png) |
+| ![volume off](./images/volume_off.png) | ![skull baseline render](./images/skull_baseline.png) |
 
 ### `--volume-opacity-file=<name>` (_string_)
 
@@ -859,7 +859,7 @@ Set an _opacity map file for the coloring_.
 
 | Default (linear)                         | Gaussian                                  |
 | ---------------------------------------- | ----------------------------------------- |
-| ![](./images/volume_opacity_default.png) | ![](./images/volume_opacity_gaussian.png) |
+| ![volume opacity default](./images/volume_opacity_default.png) | ![volume opacity gaussian](./images/volume_opacity_gaussian.png) |
 
 ### `--volume-opacity-map=<value, opacity>` (_vector\<double\>_, default: `0.0,0.0,1.0,1.0`)
 
@@ -875,7 +875,7 @@ Inverse the linear opacity function used for volume rendering.
 
 | OFF                                  | ON                                  |
 | ------------------------------------ | ----------------------------------- |
-| ![](./images/volume_inverse_off.png) | ![](./images/volume_inverse_on.png) |
+| ![volume inverse off](./images/volume_inverse_off.png) | ![volume inverse on](./images/volume_inverse_on.png) |
 
 ## Camera configuration options
 
@@ -925,7 +925,7 @@ Enable _OSPRay raytracing_. Requires OSPRay raytracing to be enabled in the link
 
 | OFF                              | ON                              |
 | -------------------------------- | ------------------------------- |
-| ![](./images/raytracing_off.png) | ![](./images/raytracing_on.png) |
+| ![raytracing off](./images/raytracing_off.png) | ![raytracing on](./images/raytracing_on.png) |
 
 ### `--raytracing-samples=<samples>` (_int_, default: `5`)
 
@@ -935,7 +935,7 @@ Set the number of _samples per pixel_ when using raytracing.
 
 | 2                                      | 6                                      |
 | -------------------------------------- | -------------------------------------- |
-| ![](./images/raytracing_samples_2.png) | ![](./images/raytracing_samples_6.png) |
+| ![raytracing samples 2](./images/raytracing_samples_2.png) | ![raytracing samples 6](./images/raytracing_samples_6.png) |
 
 ### `-d`, `--raytracing-denoise` (_bool_, default: `false`)
 
@@ -945,7 +945,7 @@ _Denoise_ the image when using raytracing.
 
 | OFF (2 samples)                          | ON                                      |
 | ---------------------------------------- | --------------------------------------- |
-| ![](./images/raytracing_denoise_off.png) | ![](./images/raytracing_denoise_on.png) |
+| ![raytracing denoise off](./images/raytracing_denoise_off.png) | ![raytracing denoise on](./images/raytracing_denoise_on.png) |
 
 ## PostFX (OpenGL) options
 
@@ -964,7 +964,7 @@ This is a technique used to correctly render translucent objects (`ddp`: dual de
 
 | none                           | ddp                           |
 | ------------------------------ | ----------------------------- |
-| ![](./images/blending_off.png) | ![](./images/blending_on.png) |
+| ![blending off](./images/blending_off.png) | ![blending on](./images/blending_on.png) |
 
 ### `-q`, `--ambient-occlusion` (_bool_, default: `false`)
 
@@ -974,7 +974,7 @@ Enable _ambient occlusion_. This is a technique used to improve the depth percep
 
 | OFF                                     | ON                                     |
 | --------------------------------------- | -------------------------------------- |
-| ![](./images/ambient_occlusion_off.png) | ![](./images/ambient_occlusion_on.png) |
+| ![ambient occlusion off](./images/ambient_occlusion_off.png) | ![ambient occlusion on](./images/ambient_occlusion_on.png) |
 
 ### `-a`, `--anti-aliasing` (_string_, default: `none`, implicit: `fxaa`)
 
@@ -988,7 +988,7 @@ Anti-aliasing method (`fxaa`: fast, `ssaa`: quality, `taa`: balanced, `none`: no
 
 | OFF                                 | ON (SSAA)                          |
 | ----------------------------------- | ---------------------------------- |
-| ![](./images/anti_aliasing_off.png) | ![](./images/anti_aliasing_on.png) |
+| ![anti-aliasing off](./images/anti_aliasing_off.png) | ![anti-aliasing on](./images/anti_aliasing_on.png) |
 
 ### `-t`, `--tone-mapping` (_bool_, default: `false`)
 
@@ -998,7 +998,7 @@ Enable neutral _Tone Mapping_. This technique maps colors properly to the monito
 
 | OFF                                       | ON                                |
 | ----------------------------------------- | --------------------------------- |
-| ![](./images/damaged_helmet_baseline.png) | ![](./images/tone_mapping_on.png) |
+| ![Damaged Helmet baseline render](./images/damaged_helmet_baseline.png) | ![tone mapping on](./images/tone_mapping_on.png) |
 
 ### `--final-shader` (_string_)
 
@@ -1008,7 +1008,7 @@ Add a final shader to the output image. See the [final shader documentation](11-
 
 | OFF                                       | ON (grayscale shader)               |
 | ----------------------------------------- | ----------------------------------- |
-| ![](./images/damaged_helmet_baseline.png) | ![](./images/final_shader_gray.png) |
+| ![Damaged Helmet baseline render](./images/damaged_helmet_baseline.png) | ![final shader gray](./images/final_shader_gray.png) |
 
 ### `--display-depth` (_bool_, default: `false`)
 
@@ -1019,7 +1019,7 @@ Only opaque objects are displayed, the grid and translucent/volumetric objects a
 
 | OFF                                 | ON                                 |
 | ----------------------------------- | ---------------------------------- |
-| ![](./images/display_depth_off.png) | ![](./images/display_depth_on.png) |
+| ![display depth off](./images/display_depth_off.png) | ![display depth on](./images/display_depth_on.png) |
 
 ## Testing options
 

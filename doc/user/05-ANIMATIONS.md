@@ -8,23 +8,23 @@ When a file contains multiple animations, either play each animation separately 
 
 This specific example uses the [InterpolationTest.glb animation file](https://github.com/f3d-app/f3d/blob/606089959c9520085a9cbf70660fb0ffc68fb934/testing/data/InterpolationTest.glb).
 
-<img width="1024" alt="1" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_0.png" />
+<img width="1024" alt="F3D window showing the InterpolationTest animation file" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_0.png" />
 
 Load the example animation file from the command line: `f3d InterpolationTest.glb`
 
-<img width="1024" alt="2" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_1.png" />
+<img width="1024" alt="F3D Cheatsheet showing the current animation name" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_1.png" />
 To view the current animation name, press <kbd>H</kbd> to open the Cheatsheet.
 
-<img width="1024" alt="3" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_2.png" />
+<img width="1024" alt="F3D window after cycling to another animation" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_2.png" />
 Press <kbd>W</kbd> to cycle through available animations.
 
-<img width="1024" alt="4" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_3.png" />
+<img width="1024" alt="F3D animation progress bar while playing an animation" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_3.png" />
 Press <kbd>Space</kbd> to play or pause the current animation.
 
 > [!NOTE]
 > A blue bar runs along the bottom of screen to indicate the current time interval of the animation sequence if `--animation-progress` is set to `default` or `advanced`. The `advanced` mode additionally shows the time range, animation name and current time, and marks each keyframe with a vertical line on the bar; both modes let you click or drag the bar to jump to a given time. While hovering the `advanced` bar near a keyframe marker, the tooltip reports that keyframe's time.
 
-<img width="1024" alt="5" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_4.png" />
+<img width="1024" alt="F3D window with all animations selected" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_4.png" />
 "All animations" plays all animations at the same time when the file format supports it.
 
 ## Command-line options
