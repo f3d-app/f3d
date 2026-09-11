@@ -1,7 +1,7 @@
 # Plugins
 
-F3D officially supports plugins for certain file formats. If you installed F3D using the binary
-release, you do not need to load these plugins manually when opening your file.
+An F3D plugin is an optional component that adds support for one or more file readers.
+If you installed F3D using the binary release, you do not need to load these plugins manually when opening your file.
 F3D loads them automatically.
 
 However, if you installed F3D using a package manager,
@@ -12,7 +12,7 @@ To open a file that requires a plugin, first install all necessary
 dependencies. Then load the plugin with the `--load-plugins=<path or name>`
 [command-line option](03-OPTIONS.md).
 
-Alternatively, you can add your plugin directly in the
+Alternatively, add your plugin directly in the
 [configuration file](06-CONFIGURATION_FILE.md) if it isn't there already. You can specify one or
 multiple plugins in a single comma-separated list, like in the example below:
 
@@ -32,7 +32,7 @@ multiple plugins in a single comma-separated list, like in the example below:
 F3D supports loading plugins and contains the following plugins:
 `native`, `alembic`, `assimp`, `draco`, `hdf`, `occt`, `pdal`, `usd`, `vdb`, `webifc`.
 
-See [the format list](02-SUPPORTED_FORMATS.md) for more details.
+See the [supported file formats](02-SUPPORTED_FORMATS.md) page for more details.
 
 > [!NOTE]
 > The `native` plugin is always loaded automatically.
@@ -60,9 +60,9 @@ F3D searches for plugins in this order:
 1. Search the static plugins.
 2. Use the `load-plugins` option when it is a full path.
 3. Search the paths specified in the `--plugins-path` CLI option.
-4. Search a directory relative to the F3D application: `../lib`.
+4. Search a directory relative to F3D: `../lib`.
 5. Rely on OS-specific paths (e.g. `LD_LIBRARY_PATH` on Linux or `DYLD_LIBRARY_PATH` on macOS).
 
-You can also try plugins maintained by the community. If you have created a plugin and would like it to be listed here, please submit a pull request.
+You can also try plugins maintained by the community. If you have created a plugin and want it listed here, submit a pull request.
 
-- **Abaqus**: ODB support by @YangShen398 ([repository](https://github.com/YangShen398/F3D-ODB-Reader-Plugin))
+- **Abaqus**: ODB support by @YangShen398 ([F3D ODB Reader Plugin repository](https://github.com/YangShen398/F3D-ODB-Reader-Plugin))
