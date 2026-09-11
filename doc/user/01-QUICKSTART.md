@@ -14,7 +14,7 @@ After installing F3D, open a file in one of these ways:
 
 - Open a file directly from your file manager.
 - Open F3D directly, then drag and drop a file into the F3D window.
-- Run F3D from the terminal with a set of command-line [options](03-OPTIONS.md).
+- Run F3D from the terminal with a set of [command-line options](03-OPTIONS.md).
 - Configure F3D as a [thumbnailer](12-DESKTOP_INTEGRATION.md) for supported file formats with certain file managers.
 
 To run F3D from the terminal, open your file with:
@@ -29,7 +29,7 @@ Optionally, save the rendering into an image file:
 f3d /path/to/file.ext --output=/path/to/img.png
 ```
 
-If you need help, specify the `--help` [option](03-OPTIONS.md):
+If you need help, specify the [`--help` option](03-OPTIONS.md):
 
 ```bash
 f3d --help
@@ -62,7 +62,7 @@ For **default scene** formats, certain default values are set automatically:
 - camera-orthographic: false
 - unlit: false
 
-Corresponding [options](03-OPTIONS.md) override these defaults, either from command-line options or from the [configuration file](06-CONFIGURATION_FILE.md).
+Corresponding [command-line options](03-OPTIONS.md) override these defaults, either from command-line options or from the [configuration file](06-CONFIGURATION_FILE.md).
 
 ## Interact with your scene
 

@@ -83,7 +83,7 @@ Frame rate used to refresh animation and other repeated tasks (watch, UI). Does 
 
 ### `--load-plugins=<paths or names>` (_string_)
 
-List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `hdf`, `occt`, `pdal`, `usd`, `vdb`, `webifc`. See [plugins](13-PLUGINS.md) for more info.
+List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `hdf`, `occt`, `pdal`, `usd`, `vdb`, `webifc`. See the [plugin documentation](13-PLUGINS.md) for more info.
 
 ### `--plugins-path=<path>` (_string_)
 
@@ -91,11 +91,11 @@ Supplementary path to specify where to load plugins from, on top of [default pat
 
 ### `--scan-plugins`
 
-Scan standard directories for plugins and display their names. Results may be incomplete. See [plugins](13-PLUGINS.md) for more info.
+Scan standard directories for plugins and display their names. Results may be incomplete. See the [plugin documentation](13-PLUGINS.md) for more info.
 
 ### `--screenshot-filename=<png file>` (_string_, default: `{app}/{model}_{n}.png`)
 
-Filename to save [screenshots](04-INTERACTIONS.md#take-screenshots) to. Can use [template variables](#filename-templating). Supports relative paths [as described](04-INTERACTIONS.md#take-screenshots).
+Filename to save [screenshots](04-INTERACTIONS.md#take-screenshots) to. Can use [template variables](#filename-templating). Supports [relative screenshot paths](04-INTERACTIONS.md#take-screenshots).
 
 ### `--rendering-backend=<auto|egl|osmesa|glx|wgl>` (_string_, default: `auto`)
 
@@ -1002,7 +1002,7 @@ Enable neutral _Tone Mapping_. This technique maps colors properly to the monito
 
 ### `--final-shader` (_string_)
 
-Add a final shader to the output image. See the [dedicated documentation](11-FINAL_SHADER.md) for more details.
+Add a final shader to the output image. See the [final shader documentation](11-FINAL_SHADER.md) for more details.
 
 #### compare
 

@@ -85,7 +85,7 @@ F3D supports the following formats when parsing a color, case insensitive:
 - cmyk(C%, M%, Y%, K%) where C, M, Y, K are integer [0, 100]
 - [color name](./09-NAMED_COLORS.md)
 
-See [W3C](https://www.w3.org/TR/css-color-3/#rgb-color) doc for more details on these formats.
+See the [W3C RGB color format documentation](https://www.w3.org/TR/css-color-3/#rgb-color) for more details on these formats.
 
 When formatting a color into a string, F3D formats it as `#RRGGBB` if values are multiple of 255. Otherwise, F3D formats it as vector of doubles.
 

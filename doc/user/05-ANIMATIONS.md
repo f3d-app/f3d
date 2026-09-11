@@ -6,7 +6,7 @@ When a file contains multiple animations, either play each animation separately 
 
 ## Demonstration
 
-This specific example uses an animation file available [here](https://github.com/f3d-app/f3d/blob/606089959c9520085a9cbf70660fb0ffc68fb934/testing/data/InterpolationTest.glb).
+This specific example uses the [InterpolationTest.glb animation file](https://github.com/f3d-app/f3d/blob/606089959c9520085a9cbf70660fb0ffc68fb934/testing/data/InterpolationTest.glb).
 
 <img width="1024" alt="1" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_0.png" />
 
@@ -69,7 +69,7 @@ See [Filename templating](03-OPTIONS.md#filename-templating) for more template v
 - Press <kbd>Space</kbd> to play or pause animation.
 - Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbd> to play or pause animation backward.
 
-See [COMMANDS](07-COMMANDS.md) for commands like `jump_to_frame`, `jump_to_keyframe` and `jump_to_time`.
+See the [commands reference](07-COMMANDS.md) for commands like `jump_to_frame`, `jump_to_keyframe` and `jump_to_time`.
 
 ## Cycle animations
 
@@ -99,7 +99,7 @@ This includes `--animation-time`, which first loads the initial time before load
 
 ## Animation support level
 
-The supported file formats page lists the animation support level for each reader [here](02-SUPPORTED_FORMATS.md).
+The [supported file formats](02-SUPPORTED_FORMATS.md) page lists the animation support level for each reader.
 
 - NONE: Animation is not supported, either by the file format or the implementation.
 - UNIQUE: No more than one animation exists.
@@ -111,7 +111,7 @@ F3D may warn when combining SINGLE and non SINGLE files, but it still tries to r
 
 ## Animation keyframes
 
-Use the `jump_to_keyframe` command to load an animation at a specific keyframe. See [COMMANDS](07-COMMANDS.md) for more information and examples on how to use this command.
+Use the `jump_to_keyframe` command to load an animation at a specific keyframe. See the [commands reference](07-COMMANDS.md) for more information and examples on how to use this command.
 
 This command is currently supported only by the following readers:
 

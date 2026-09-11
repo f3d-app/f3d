@@ -58,7 +58,7 @@ F3D supports the following file formats:
 | Smoothed Best Estimate of Trajectory      | `.sbet`                                        | No         | NONE              | NO                | `pdal`    | `SBET`                  |
 | Esri Scene Layer Package                  | `.slpk`                                        | No         | NONE              | NO                | `pdal`    | `SLPK`                  |
 
-Streaming support means that F3D can read from stdin when you specify the reader name. See [the examples](03-OPTIONS.md#piping).
+Streaming support means that F3D can read from stdin when you specify the reader name. See the [piping examples](03-OPTIONS.md#piping).
 
 If a format supports streaming, F3D checks its header content before trying to open it. Use `--force-reader` to ignore the header content check.
 
@@ -67,7 +67,7 @@ To get accurate information for your own build of F3D, use the [dedicated option
 ## Reader options
 
 Readers can provide options. Set them using the `-D/--define` [command-line option](03-OPTIONS.md).
-eg: `-DVDB.downsampling_factor=0.5` or using the `set_reader_option` [command](07-COMMANDS.md).
+eg: `-DVDB.downsampling_factor=0.5` or using the [`set_reader_option` command](07-COMMANDS.md).
 
 For booleans, 0 means false and any other value means true. Unsigned int interprets anything that is not a non-negative integer as the default value.
 
@@ -110,9 +110,9 @@ For booleans, 0 means false and any other value means true. Unsigned int interpr
 F3D supports 3 different formats:
 
 - `.ply`: Original 3DGS format
-- `.splat`: Format specified by https://github.com/antimatter15/splat. Does not support spherical harmonics.
-- `.spz`: Niantic's format specified by https://github.com/nianticlabs/spz (v2 and v3)
+- `.splat`: Format specified by the [splat repository](https://github.com/antimatter15/splat). Does not support spherical harmonics.
+- `.spz`: Niantic's [SPZ format](https://github.com/nianticlabs/spz) (v2 and v3)
 
 No config files come with the `.ply` format because this format is not dedicated to 3DGS only.
 If you use `.ply` for 3DGS only, set up a config file similar to what is done for `.splat` or `.spz`.
-See configuration file [documentation](./06-CONFIGURATION_FILE.md)
+See the [configuration file documentation](06-CONFIGURATION_FILE.md).
