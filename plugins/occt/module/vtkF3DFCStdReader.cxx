@@ -20,10 +20,11 @@
 
 #include <BRepTools.hxx>
 #include <BRep_Builder.hxx>
+#include <NCollection_IndexedMap.hxx>
 #include <Standard_Failure.hxx>
 #include <TopExp.hxx>
 #include <TopLoc_Location.hxx>
-#include <TopTools_IndexedMapOfShape.hxx>
+#include <TopTools_ShapeMapHasher.hxx>
 #include <TopoDS_Builder.hxx>
 #include <TopoDS_Compound.hxx>
 #include <TopoDS_Face.hxx>
@@ -721,7 +722,7 @@ public:
     options.ReadWire = this->Parent->GetReadWire();
     options.ReadFaces = !obj.IsWireframeOnly();
 
-    TopTools_IndexedMapOfShape faceMap;
+    NCollection_IndexedMap<TopoDS_Shape, TopTools_ShapeMapHasher> faceMap;
     TopExp::MapShapes(shape, TopAbs_FACE, faceMap);
     const unsigned char alpha = static_cast<unsigned char>(255 * (100 - obj.Transparency) / 100);
 
