@@ -3,6 +3,7 @@
 #include "F3DOCCTPolyData.h"
 #include "vtkF3DArchiveReader.h"
 
+#include <vtkByteSwap.h>
 #include <vtkCompositeDataSet.h>
 #include <vtkDataAssembly.h>
 #include <vtkFileResourceStream.h>
@@ -93,26 +94,16 @@ uint32_t ReadLEUint32(const char* data)
 {
   uint32_t value;
   std::memcpy(&value, data, sizeof(uint32_t));
-#ifdef VTK_WORDS_BIGENDIAN
-  value = ((value & 0xFF000000) >> 24) | ((value & 0x00FF0000) >> 8) | ((value & 0x0000FF00) << 8) |
-    ((value & 0x000000FF) << 24);
-#endif
+  vtkByteSwap::Swap4LE(&value);
   return value;
 }
 
 //----------------------------------------------------------------------------
 double ReadLEDouble(const char* data)
 {
-#ifdef VTK_WORDS_BIGENDIAN
-  char swapped[sizeof(double)];
-  for (size_t i = 0; i < sizeof(double); i++)
-  {
-    swapped[i] = data[sizeof(double) - 1 - i];
-  }
-  data = swapped;
-#endif
   double value;
   std::memcpy(&value, data, sizeof(double));
+  vtkByteSwap::Swap8LE(&value);
   return value;
 }
 
