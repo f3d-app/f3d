@@ -181,14 +181,11 @@ public:
     }
     vtkXMLDataElement* root = parser->GetRootElement();
 
-    // in files written before FreeCAD 1.1, the last byte of packed colors is a
-    // transparency, not an alpha
     const char* version = root->GetAttribute("ProgramVersion");
-    if (version)
+    if (!version || std::sscanf(version, "%d.%d", &this->MajorVersion, &this->MinorVersion) != 2)
     {
-      int major = 0, minor = 0;
-      std::sscanf(version, "%d.%d", &major, &minor);
-      this->LegacyAlpha = major < 1 || (major == 1 && minor < 1);
+      vtkWarningWithObjectMacro(
+        this->Parent, "Unknown FreeCAD version, colors may be read incorrectly");
     }
 
     vtkXMLDataElement* objects = FindNested(root, "Objects");
@@ -503,6 +500,10 @@ public:
     }
     else
     {
+      // in files written before FreeCAD 1.1, the last byte of packed colors is a
+      // transparency, not an alpha
+      const bool legacyAlpha =
+        this->MajorVersion < 1 || (this->MajorVersion == 1 && this->MinorVersion < 1);
       obj.FaceColors.resize(count, { 0, 0, 0, 255 });
       for (uint32_t i = 0; i < count; i++)
       {
@@ -510,7 +511,7 @@ public:
         const std::array<unsigned char, 3> rgb = UnpackRGB(packed);
         const unsigned char lastByte = static_cast<unsigned char>(packed & 0xFF);
         const unsigned char alpha =
-          this->LegacyAlpha ? static_cast<unsigned char>(255 - lastByte) : lastByte;
+          legacyAlpha ? static_cast<unsigned char>(255 - lastByte) : lastByte;
         obj.FaceColors[i] = { rgb[0], rgb[1], rgb[2], alpha };
       }
     }
@@ -912,7 +913,8 @@ public:
     return index > 0;
   }
 
-  bool LegacyAlpha = true;
+  int MajorVersion = 0;
+  int MinorVersion = 0;
   std::map<std::string, FCObject> Objects;
   std::vector<std::string> ObjectOrder;
   std::map<std::string, TopoDS_Shape> ShapeCache;
