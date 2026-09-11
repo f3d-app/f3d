@@ -104,6 +104,14 @@ int test_options()
     return 1;
   }
 
+  f3d_options_reset(options, "model.scivis.cells");
+  f3d_options_remove_value(options, "render.show_edges");
+
+  f3d_options_has_domain(options, "scene.animation.speed_factor");
+  f3d_options_get_domain_style(options, "scene.animation.speed_factor");
+
+  // Test get_range_domain
+
   double range[3];
   if (!f3d_options_get_range_domain_double(options, "render.line_width", range))
   {
@@ -134,6 +142,8 @@ int test_options()
     return 1;
   }
 
+  // Test get_range_domain error code path
+
   if (f3d_options_get_range_domain_double(options, "render.raytracing.samples", range))
   {
     puts("[ERROR] f3d_options_get_range_domain_double should fail for an int range domain");
@@ -146,18 +156,99 @@ int test_options()
     f3d_engine_delete(engine);
     return 1;
   }
+  if (f3d_options_get_range_domain_double(NULL, NULL, NULL))
+  {
+    puts("[ERROR] f3d_options_get_range_domain_double should fail with NULL params");
+    f3d_engine_delete(engine);
+    return 1;
+  }
 
-  f3d_options_reset(options, "model.scivis.cells");
-  f3d_options_remove_value(options, "render.show_edges");
+  if (f3d_options_get_range_domain_int(options, "render.line_width", int_range))
+  {
+    puts("[ERROR] f3d_options_get_range_domain_int should fail for a double range domain");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  if (f3d_options_get_range_domain_int(options, "dummy", int_range))
+  {
+    puts("[ERROR] f3d_options_get_range_domain_int should fail for a non-existent option");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  if (f3d_options_get_range_domain_int(NULL, NULL, NULL))
+  {
+    puts("[ERROR] f3d_options_get_range_domain_int should fail with NULL params");
+    f3d_engine_delete(engine);
+    return 1;
+  }
 
-  f3d_options_has_domain(options, "scene.animation.speed_factor");
-  f3d_options_get_domain_style(options, "scene.animation.speed_factor");
+  // Test get_enum_domain
 
   int enum_count = 0;
-  char** enumeration = f3d_options_get_enum_domain(options, "interactor.style", &enum_count);
+  char** enumeration = f3d_options_get_enum_domain_string(options, "interactor.style", &enum_count);
   if (enumeration)
   {
     f3d_options_free_string_array(enumeration, enum_count);
+  }
+  else
+  {
+    puts("[ERROR] f3d_options_get_enum_domain_string failed to recover an existing domain");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  // Test get_enum_domain error code path
+
+  enumeration = f3d_options_get_enum_domain_string(options, "scene.animation.speed_factor", &enum_count);
+  if (enumeration)
+  {
+    puts("[ERROR] f3d_options_get_enum_domain_string should fail to recover a domain for an incompatible option");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  enumeration = f3d_options_get_enum_domain_string(options, "inexistent", &enum_count);
+  if (enumeration)
+  {
+    puts("[ERROR] f3d_options_get_enum_domain_string should fail to recover a domain for an inexistent option");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  enumeration = f3d_options_get_enum_domain_string(NULL, NULL, &enum_count);
+  if (enumeration)
+  {
+    puts("[ERROR] f3d_options_get_enum_domain_string should fail to recover a domain with invalid parameters");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+
+  // Test get_index_domain
+  unsigned int max;
+  // Cannot test the == 1 code path with complex manipulation of the engine
+  if (f3d_options_get_index_domain(options, "scene.camera.index", &max) != 2)
+  {
+    puts("[ERROR] f3d_options_get_index_domain should return 2 for scene.camera.index");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  if (f3d_options_get_index_domain(options, "render.raytracing.samples", &max))
+  {
+    puts("[ERROR] f3d_options_get_index_domain should fail for an incompatible option");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  if (f3d_options_get_index_domain(options, "dummy", &max))
+  {
+    puts("[ERROR] f3d_options_get_index_domain should fail for a non-existent option");
+    f3d_engine_delete(engine);
+    return 1;
+  }
+  if (f3d_options_get_index_domain(NULL, NULL, NULL))
+  {
+    puts("[ERROR] f3d_options_get_index_domain should fail for a non-existent option");
+    f3d_engine_delete(engine);
+    return 1;
   }
 
   f3d_options_increase(options, "scene.animation.speed_factor");

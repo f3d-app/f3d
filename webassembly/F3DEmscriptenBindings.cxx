@@ -2,6 +2,7 @@
 
 #include <array>
 #include <memory>
+#include <optional>
 #include <stdexcept>
 
 #include "camera.h"
@@ -316,10 +317,7 @@ EMSCRIPTEN_BINDINGS(f3d)
       +[](const f3d::options& o, const std::string& name) -> f3d::options::domain_style
       { return o.getDomainStyle(name); })
     .function(
-      "getEnumDomain", +[](const f3d::options& o, const std::string& name) -> emscripten::val
-      { return containerToJSArray(o.getEnumDomain(name)); })
-    .function(
-      "getRangeDomain",
+      "getRangeDomainAsNumber",
       +[](const f3d::options& o, const std::string& name) -> emscripten::val
       {
         f3d::options::DomainRange<f3d::option_variant_t> domain = o.getRangeDomain(name);
@@ -339,6 +337,31 @@ EMSCRIPTEN_BINDINGS(f3d)
         std::array<double, 3> values = { toDouble(domain.min), toDouble(domain.max),
           toDouble(domain.increment) };
         return containerToJSArray(values);
+      })
+    .function(
+      "getEnumDomainAsString",
+      +[](const f3d::options& o, const std::string& name) -> emscripten::val
+      {
+        // Only string is supported for now
+        f3d::options::DomainEnum<f3d::option_variant_t> domain = o.getEnumDomain(name);
+        std::vector<std::string> enumeration(domain.enumeration.size());
+        std::transform(domain.enumeration.begin(), domain.enumeration.end(), enumeration.begin(),
+          [](const auto& value) { return std::get<std::string>(value); });
+        return containerToJSArray(enumeration);
+      })
+    .function(
+      "getIndexDomain",
+      +[](const f3d::options& o, const std::string& name) -> emscripten::val
+      {
+        f3d::options::DomainIndex domain = o.getIndexDomain(name);
+        if (domain.max.has_value())
+        {
+          return emscripten::val(domain.max.value());
+        }
+        else
+        {
+          return emscripten::val::undefined();
+        }
       })
     .function(
       "increase", +[](f3d::options& o, const std::string& name) -> f3d::options&

@@ -575,25 +575,6 @@ extern "C"
     return result;
   }
 
-  JNIEXPORT jobject JAVA_BIND(Options, getEnumDomain)(JNIEnv* env, jobject self, jstring name)
-  {
-    JniUTFString str(env, name);
-    jobject result = nullptr;
-    try
-    {
-      result = CreateStringList(env, GetOptionsFromEngine(env, self).getEnumDomain(str.c_str()));
-    }
-    catch (const f3d::options::inexistent_exception& e)
-    {
-      F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
-    }
-    catch (const f3d::options::incompatible_exception& e)
-    {
-      F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
-    }
-    return result;
-  }
-
   JNIEXPORT jobject JAVA_BIND(Options, getRangeDomainAsDouble)(
     JNIEnv* env, jobject self, jstring name)
   {
@@ -603,6 +584,7 @@ extern "C"
     JniLocalRef<jclass> rangeClass(env, env->FindClass("app/f3d/F3D/Options$DomainRange"));
     jmethodID rangeCtor = env->GetMethodID(
       rangeClass, "<init>", "(Ljava/lang/Number;Ljava/lang/Number;Ljava/lang/Number;)V");
+    jobject result = nullptr;
 
     try
     {
@@ -618,16 +600,20 @@ extern "C"
 
       JniLocalRef<jclass> doubleClass(env, env->FindClass("java/lang/Double"));
       jmethodID valueOf = env->GetStaticMethodID(doubleClass, "valueOf", "(D)Ljava/lang/Double;");
-      return env->NewObject(rangeClass, rangeCtor,
+      result = env->NewObject(rangeClass, rangeCtor,
         env->CallStaticObjectMethod(doubleClass, valueOf, std::get<double>(range.min)),
         env->CallStaticObjectMethod(doubleClass, valueOf, std::get<double>(range.max)),
         env->CallStaticObjectMethod(doubleClass, valueOf, std::get<double>(range.increment)));
     }
-    catch (const std::exception& e)
+    catch (const f3d::options::inexistent_exception& e)
     {
-      F3DThrowJavaException(env, "java/lang/IllegalArgumentException", e.what());
-      return nullptr;
+      F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
     }
+    catch (const f3d::options::incompatible_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
+    }
+    return result;
   }
 
   JNIEXPORT jobject JAVA_BIND(Options, getRangeDomainAsInt)(JNIEnv* env, jobject self, jstring name)
@@ -638,6 +624,7 @@ extern "C"
     JniLocalRef<jclass> rangeClass(env, env->FindClass("app/f3d/F3D/Options$DomainRange"));
     jmethodID rangeCtor = env->GetMethodID(
       rangeClass, "<init>", "(Ljava/lang/Number;Ljava/lang/Number;Ljava/lang/Number;)V");
+    jobject result = nullptr;
 
     try
     {
@@ -652,16 +639,73 @@ extern "C"
 
       JniLocalRef<jclass> integerClass(env, env->FindClass("java/lang/Integer"));
       jmethodID valueOf = env->GetStaticMethodID(integerClass, "valueOf", "(I)Ljava/lang/Integer;");
-      return env->NewObject(rangeClass, rangeCtor,
+      result = env->NewObject(rangeClass, rangeCtor,
         env->CallStaticObjectMethod(integerClass, valueOf, std::get<int>(range.min)),
         env->CallStaticObjectMethod(integerClass, valueOf, std::get<int>(range.max)),
         env->CallStaticObjectMethod(integerClass, valueOf, std::get<int>(range.increment)));
     }
-    catch (const std::exception& e)
+    catch (const f3d::options::inexistent_exception& e)
     {
-      F3DThrowJavaException(env, "java/lang/IllegalArgumentException", e.what());
-      return nullptr;
+      F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
     }
+    catch (const f3d::options::incompatible_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
+    }
+    return result;
+  }
+
+  JNIEXPORT jobject JAVA_BIND(Options, getEnumDomainAsString)(
+    JNIEnv* env, jobject self, jstring name)
+  {
+    JniUTFString str(env, name);
+    const std::string nameStr = str.c_str();
+    jobject result = nullptr;
+    try
+    {
+      f3d::options::DomainEnum<f3d::option_variant_t> domain =
+        GetOptionsFromEngine(env, self).getEnumDomain(nameStr);
+      std::vector<std::string> enumeration(domain.enumeration.size());
+      std::transform(domain.enumeration.begin(), domain.enumeration.end(), enumeration.begin(),
+        [](const auto& value) { return std::get<std::string>(value); });
+      result = CreateStringList(env, enumeration);
+    }
+    catch (const f3d::options::inexistent_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
+    }
+    catch (const f3d::options::incompatible_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
+    }
+    return result;
+  }
+
+  JNIEXPORT jobject JAVA_BIND(Options, getIndexDomain)(JNIEnv* env, jobject self, jstring name)
+  {
+    JniUTFString str(env, name);
+    const std::string nameStr = str.c_str();
+    jobject result = nullptr;
+    try
+    {
+      f3d::options::DomainIndex domain = GetOptionsFromEngine(env, self).getIndexDomain(nameStr);
+
+      jclass integerClass = env->FindClass("java/lang/Integer");
+      jmethodID valueOf = env->GetStaticMethodID(integerClass, "valueOf", "(I)Ljava/lang/Integer;");
+      if (domain.max.has_value())
+      {
+        result = env->CallStaticObjectMethod(integerClass, valueOf, domain.max.value());
+      }
+    }
+    catch (const f3d::options::inexistent_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Options$InexistentException", e.what());
+    }
+    catch (const f3d::options::incompatible_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Options$IncompatibleException", e.what());
+    }
+    return result;
   }
 
   JNIEXPORT void JAVA_BIND(Options, increase)(JNIEnv* env, jobject self, jstring name)
