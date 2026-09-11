@@ -33,7 +33,12 @@ If you need help, specify the [`--help` option](03-OPTIONS.md):
 
 ```bash
 f3d --help
-man f3d # Linux only
+```
+
+On Linux, you can also open the manual page:
+
+```bash
+man f3d
 ```
 
 After opening your file in F3D, press <kbd>H</kbd> to open the Cheatsheet.

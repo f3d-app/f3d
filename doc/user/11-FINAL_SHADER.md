@@ -4,13 +4,13 @@ Specify a final full screen shader with the option `--final-shader`.
 F3D executes it as the last shader in the rendering pipeline.
 
 Pass the shader code directly as a single code line.
-Alternatively, pass the content of a shader file using the following command:
+On Linux with bash, you can pass the content of a shader file using the following command:
 
 ```bash
 f3d model.obj --final-shader "$(cat final.glsl)"
 ```
 
-The command above works on Linux and bash. Adapt it depending on the operating system and the shell/terminal used.
+For other operating systems and shells, adapt the command.
 
 ## Requirements
 
