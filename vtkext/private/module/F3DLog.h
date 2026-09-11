@@ -50,6 +50,13 @@ void Print(Severity sev, const std::string& msg);
 void SetUseColoring(bool use);
 
 /**
+ * If output window is a vtkF3DConsoleOutputWindow,
+ * set the new line usage.
+ */
+void SetAppendNewLine(bool append);
+
+
+/**
  * Determine how standard stream should be used.
  * If mode is None, then no message is written at all (including errors).
  * If mode is AlwaysStdErr, then all messages are written to stderr.
