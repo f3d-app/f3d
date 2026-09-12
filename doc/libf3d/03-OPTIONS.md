@@ -348,7 +348,7 @@ CLI: `--grid`.
 
 ### `render.grid.absolute` (_bool_, default: `false`)
 
-Position the grid at the _absolute origin_ of the model's coordinate system instead of below the model.
+Position the grid at the _absolute origin_ of the model's coordinate system instead of below the model. Forced to true with `xr` rendering backend.
 
 CLI: `--grid-absolute`.
 

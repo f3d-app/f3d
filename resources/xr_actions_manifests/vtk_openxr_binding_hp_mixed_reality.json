@@ -1,0 +1,77 @@
+{
+  "interaction_profile": "/interaction_profiles/hp/mixed_reality_controller",
+
+  "bindings": {
+    "vtk-actions": {
+      "sources": [
+        {
+          "inputs": {
+            "pose": {
+              "output": "handpose"
+            }
+          },
+          "path": "/user/hand/left/input/aim"
+        },
+        {
+          "inputs": {
+            "pose": {
+              "output": "handpose"
+            }
+          },
+          "path": "/user/hand/right/input/aim"
+        },
+
+        {
+          "inputs": {
+            "position": {
+              "output": "movement"
+            }
+          },
+          "path": "/user/hand/right/input/thumbstick"
+        },
+
+        {
+          "inputs": {
+            "click": {
+              "output": "triggeraction"
+            }
+          },
+          "path": "/user/hand/right/input/a"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "nextcamerapose"
+            }
+          },
+          "path": "/user/hand/left/input/menu"
+        },
+
+        {
+          "inputs": {
+            "click": {
+              "output": "showmenu"
+            }
+          },
+          "path": "/user/hand/right/input/b"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "forwardthickcrop"
+            }
+          },
+          "path": "/user/hand/left/input/y"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "backthickcrop"
+            }
+          },
+          "path": "/user/hand/left/input/x"
+        }
+      ]
+    }
+  }
+}

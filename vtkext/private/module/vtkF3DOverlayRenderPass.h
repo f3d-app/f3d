@@ -11,7 +11,7 @@
 #ifndef vtkF3DOverlayRenderPass_h
 #define vtkF3DOverlayRenderPass_h
 
-#include <vtkFramebufferPass.h>
+#include <vtkF3DPreserveCameraFramebufferPass.h>
 #include <vtkImageProcessingPass.h>
 #include <vtkOpenGLQuadHelper.h>
 #include <vtkSmartPointer.h>
@@ -48,7 +48,7 @@ protected:
    */
   void CompositeOverlay(const vtkRenderState* s);
 
-  vtkSmartPointer<vtkFramebufferPass> OverlayPass;
+  vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass> OverlayPass;
   vtkSmartPointer<vtkOpenGLFramebufferObject> FrameBufferObject;
   vtkSmartPointer<vtkTextureObject> ColorTexture;
 

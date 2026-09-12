@@ -1,0 +1,46 @@
+{
+  "interaction_profile": "/interaction_profiles/khr/simple_controller",
+
+  "bindings": {
+    "vtk-actions": {
+      "sources": [
+        {
+          "path": "/user/hand/left/input/select",
+          "inputs": {
+            "click": {
+              "output": "triggeraction"
+            }
+          }
+        },
+
+        {
+          "path": "/user/hand/right/input/select",
+          "inputs": {
+            "click": {
+              "output": "triggeraction"
+            }
+          }
+        }
+      ],
+      "pose": [
+        {
+          "path": "/user/hand/left/input/aim/pose",
+          "output": "handpose"
+        },
+        {
+          "path": "/user/hand/left/input/grip/pose",
+          "output": "handposegrip"
+        },
+
+        {
+          "path": "/user/hand/right/input/aim/pose",
+          "output": "handpose"
+        },
+        {
+          "path": "/user/hand/right/input/grip/pose",
+          "output": "handposegrip"
+        }
+      ]
+    }
+  }
+}

@@ -96,7 +96,7 @@ void vtkF3DOverlayRenderPass::Initialize(const vtkRenderState* s)
   vtkNew<vtkCameraPass> overlayCamP;
   overlayCamP->SetDelegatePass(overlayP);
 
-  this->OverlayPass = vtkSmartPointer<vtkFramebufferPass>::New();
+  this->OverlayPass = vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass>::New();
   this->OverlayPass->SetDelegatePass(overlayCamP);
 }
 
