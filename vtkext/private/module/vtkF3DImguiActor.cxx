@@ -546,17 +546,22 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
     posX += this->Pimpl->CheatSheetWidth + margin;
   }
 
-  ImGui::SetNextWindowPos(ImVec2(posX, margin));
+  std::optional<ImVec2> position;
+  if (!ImGui::IsMouseDown(ImGuiMouseButton_Left))
+  {
+    position = ImVec2(posX, margin);
+  }
+  float maxWidth = std::max(10.f, viewport->WorkSize.x - posX - margin);
+  ::SetupNextWindow(position, std::nullopt);
   ImGui::SetNextWindowSize(ImVec2(defaultWidth, winHeight), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSizeConstraints(
-    ImVec2(10.f, winHeight), ImVec2(std::numeric_limits<float>::max(), winHeight));
+  ImGui::SetNextWindowSizeConstraints(ImVec2(10.f, winHeight), ImVec2(maxWidth, winHeight));
   ImGuiStyle& style = ImGui::GetStyle();
   style.Colors[ImGuiCol_WindowBg] = ImVec4(
     this->BackdropColor[0], this->BackdropColor[1], this->BackdropColor[2], this->BackdropOpacity);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
     ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoSavedSettings |
-    ImGuiWindowFlags_HorizontalScrollbar;
+    ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NoMove;
 
   ImGui::Begin("Scene Hierarchy", nullptr, flags);
 

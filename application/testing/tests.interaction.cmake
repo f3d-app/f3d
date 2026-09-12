@@ -199,6 +199,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
   f3d_test(NAME TestInteractionSceneHierarchyAndCheatsheet DATA cow.vtp RESOLUTION 1200,200 INTERACTION UI) #H;Shift+H
   f3d_test(NAME TestInteractionSceneHierarchyCollapsed DATA vtk-dasm-test.glb INTERACTION UI) #Shift+H;Resize widget;Click checkbox
   f3d_test(NAME TestInteractionSceneHierarchyScroll DATA vtk-dasm-test.glb INTERACTION UI) #Shift+H;Scroll to bottom
+  f3d_test(NAME TestInteractionSceneHierarchyResizeLeft DATA vtk-dasm-test.glb INTERACTION UI) #Shift+H;Resize widget from left border multiple times
 endif()
 
 ## Console
