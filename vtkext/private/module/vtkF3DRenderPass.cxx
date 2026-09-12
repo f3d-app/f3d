@@ -50,10 +50,6 @@
 #include <vtkOSPRayPass.h>
 #endif
 
-#if F3D_MODULE_OPENXR
-#include "vtkF3DOpenXRFramebufferPass.h"
-#endif
-
 #include <sstream>
 
 vtkStandardNewMacro(vtkF3DRenderPass);
@@ -233,7 +229,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   if (this->UseRaytracing)
   {
     vtkNew<vtkOSPRayPass> ospP;
-    this->MainPass = vtkSmartPointer<vtkFramebufferPass>::New();
+    this->MainPass = vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass>::New();
     this->MainPass->SetDelegatePass(ospP);
     this->MainPass->SetColorFormat(vtkTextureObject::Float32);
   }

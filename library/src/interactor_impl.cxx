@@ -87,11 +87,6 @@ public:
     {
 #ifdef F3D_MODULE_OPENXR
       this->VTKInteractor = vtkSmartPointer<vtkOpenXRRenderWindowInteractor>::New();
-#else
-      // LCOV_EXCL_START
-      // unreachable
-      assert(false);
-      // LCOV_EXCL_STOP
 #endif
     }
     else if (type == window::Type::GLX || type == window::Type::WGL ||

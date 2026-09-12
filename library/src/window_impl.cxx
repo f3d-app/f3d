@@ -226,11 +226,6 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
     xrRenWin->vtkOpenGLRenderWindow::AddRenderer(this->Internals->Renderer);
     vtkNew<vtkOpenXRCamera> xrCamera;
     this->Internals->Renderer->SetActiveCamera(xrCamera);
-#else
-    // LCOV_EXCL_START
-    // unreachable
-    assert(false);
-    // LCOV_EXCL_STOP
 #endif
   }
   else
@@ -942,11 +937,6 @@ void window_impl::SetResourcesPath(const fs::path& resourcesPath)
       }
       std::string manifestsDir = xrActionsManifestsFolder.string() + fs::path::preferred_separator;
       this->Internals->Interactor->SetXRResourcesDirectory(manifestsDir);
-#else
-      // LCOV_EXCL_START
-      // unreachable
-      assert(false);
-      // LCOV_EXCL_STOP
 #endif
     }
   }
