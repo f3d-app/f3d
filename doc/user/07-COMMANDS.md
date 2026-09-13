@@ -3,7 +3,6 @@
 F3D provides access to commands through [interactive console](#interactive-console), [command script](#command-script---command-script) and [bindings configuration](06-CONFIGURATION_FILE.md#bindings).
 Use commands to trigger specific behavior that may not be available otherwise.
 Commands are different from command-line options. Command-line options configure F3D at startup, while commands change or query state after F3D is running.
-Commands are currently experimental. Behaviors and actions may be added or removed without deprecation.
 Action names and arguments may also change without deprecation.
 
 Commands have the following syntax:

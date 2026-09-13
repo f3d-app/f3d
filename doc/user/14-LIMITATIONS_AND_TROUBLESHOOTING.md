@@ -43,10 +43,6 @@ VDB file formats rely on [OpenVDB](https://github.com/AcademySoftwareFoundation/
 
 - The `vdb` plugin is not shipped in the Python wheels yet.
 
-### Gaussian splatting
-
-Gaussian splatting (option `--point-sprites=gaussian`) needs depth sorting, which F3D does internally using a compute shader. This requires support for OpenGL 4.3, which is not supported by macOS and old GPUs/drivers.
-
 ## Troubleshooting
 
 ### General
