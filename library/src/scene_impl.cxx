@@ -119,6 +119,7 @@ public:
       int importerCount;
   };
 
+
   void CreateCLIProgressBarAndCallback(CLIProgressBarDataStruct* data,
     vtkF3DMetaImporter* importer) {
 
@@ -138,19 +139,39 @@ public:
         std::string result(barCount, emptyFormat);
         std::fill(result.begin(), result.begin() + filledAmount, filledFormat);
 
+        std::string filename = (progressData->importerCount > 1)
+                ? std::to_string(progressData->importerCount)
+                + " files" : progressData->fileName.data();
+
+        int percentage = 100 * progress;
+
         progressData->timer->StopTimer();
         if(progressData->timer->GetElapsedTime() > 0.15 ||
           vtksys::SystemTools::HasEnv("CTEST_F3D_PROGRESS_BAR")) {
-            f3d::log::setAppendNewLine(false);
-            f3d::log::info(
+
+            double estimatedTime = progressData->timer->GetElapsedTime() / progress;
+            int estimatedMin = estimatedTime / 60;
+            int estimatedSec = static_cast<int>(estimatedTime) % 60;
+            int elapsedMin = progressData->timer->GetElapsedTime() / 60;
+            int elapsedSec = static_cast<int>(progressData->timer->GetElapsedTime()) % 60;
+
+
+            f3d::log::progress(
                     "\rLoading ",
-                    (progressData->importerCount > 1)
-                        ? std::to_string(progressData->importerCount) + " files"
-                        : progressData->fileName.data(),
-                    " : |",
+                    filename,
+                    " : ",
+                    percentage,
+                    "% |",
                     result,
-                    "|");
-            f3d::log::setAppendNewLine(true);
+                    "| [",
+                    elapsedMin,
+                    ":",
+                    elapsedSec,
+                    " / ",
+                    estimatedMin,
+                    ":",
+                    estimatedSec,
+                    "]");
         }
         if(progress == 1.0) {
             f3d::log::info("\n");
