@@ -74,6 +74,26 @@ The following options <b>are only taken on the first load</b>:
 Boolean options that have been turned on in the configuration file can be turned
 off on the command line if needed, eg: `--point-sprites=false`.
 
+### Persist window geometry
+
+When an interactive window closes, F3D saves its last size and position in `cache.json` and restores them on the next start. F3D uses this cache only if nothing else sets the window geometry. If `resolution` or `position` is set in a configuration file, a [statefile](03-OPTIONS.md#statefiles), or on the command line, that value is used instead.
+
+Use `resolution` and `position` in your config when you want F3D to always start with the same window geometry:
+
+```json
+[
+  {
+    "options": {
+      "resolution": "1280,720",
+      "position": "100,50"
+    }
+  }
+]
+```
+
+`position` sets the top-left corner of the window, in pixels, starting from the top left of your screens.
+`resolution` and `position` are only applied on the first load. If you want to save and restore a specific session, including loaded files and the camera, use [statefiles](03-OPTIONS.md#statefiles).
+
 ### Imperative Options
 
 Command line options and options that are changed interactively overrides options that are set in configuration files.
