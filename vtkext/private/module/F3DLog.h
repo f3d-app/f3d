@@ -60,7 +60,6 @@ void SetAppendNewLine(bool append);
  */
 bool GetAppendNewLine();
 
-
 /**
  * Determine how standard stream should be used.
  * If mode is None, then no message is written at all (including errors).
