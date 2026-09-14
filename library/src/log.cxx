@@ -96,6 +96,12 @@ void log::setAppendNewLine(bool append) {
 }
 
 //----------------------------------------------------------------------------
+bool log::getAppendNewLine() {
+    detail::init::initialize();
+    return F3DLog::GetAppendNewLine();
+}
+
+//----------------------------------------------------------------------------
 void log::setVerboseLevel(log::VerboseLevel level, bool forceStdErr)
 {
   detail::init::initialize();

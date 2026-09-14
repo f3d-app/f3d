@@ -1,7 +1,6 @@
 #ifndef f3d_log_h
 #define f3d_log_h
 
-#include "F3DLog.h"
 #include "export.h"
 
 /// @cond
@@ -99,7 +98,7 @@ public:
   template<typename... Args>
   static void progress(Args... args)
   {
-      bool prevNewLineState = F3DLog::GetAppendNewLine();
+      bool prevNewLineState = getAppendNewLine();
       setAppendNewLine(false);
       log::info(args...);
       setAppendNewLine(prevNewLineState);
@@ -114,6 +113,12 @@ public:
    * Set the new line usage, if applicable (eg: console output).
    */
   static void setAppendNewLine(bool append);
+
+  /**
+   * Get the new line usage, if applicable (eg: console output).
+   */
+  static bool getAppendNewLine();
+
 
   /**
    * Set the verbose level.
