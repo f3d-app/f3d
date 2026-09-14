@@ -7,6 +7,9 @@ Configuration files uses the "long" version of the command-line options in a JSO
 formatted file to provide values for these options. It is also possible to use
 the [libf3d options](../libf3d/03-OPTIONS.md) syntax.
 
+> [!NOTE]
+> Config files written for F3D 2.5.1 or older may need updates for F3D 3.0.0, including renamed options. See the [F3D 3.0.0 migration guide](https://github.com/f3d-app/f3d/issues/1925).
+
 These options can be organized by block using a regular expression, glob, or exact match
 for each block in order to provide different default values for the different filetypes. For
 more on glob and exact matching see the [Glob and Exact Matching section](#glob-and-exact-matching).
