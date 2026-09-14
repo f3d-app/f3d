@@ -1,6 +1,7 @@
 #ifndef f3d_log_h
 #define f3d_log_h
 
+#include "F3DLog.h"
 #include "export.h"
 
 /// @cond
@@ -98,9 +99,10 @@ public:
   template<typename... Args>
   static void progress(Args... args)
   {
-      std::stringstream ss;
-      log::appendArg(ss, args...);
-      log::progressInternal(ss.str());
+      bool prevNewLineState = F3DLog::GetAppendNewLine();
+      setAppendNewLine(false);
+      log::info(args...);
+      setAppendNewLine(prevNewLineState);
   }
 
   /**
@@ -156,7 +158,6 @@ protected:
   static void warnInternal(const std::string& msg);
   static void infoInternal(const std::string& msg);
   static void debugInternal(const std::string& msg);
-  static void progressInternal(const std::string& msg);
   //! @endcond
 };
 }
