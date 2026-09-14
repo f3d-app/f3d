@@ -121,57 +121,57 @@ f3d::mesh_t to_cpp_mesh(const f3d_mesh_t* c_mesh)
 }
 
 //----------------------------------------------------------------------------
-f3d::mesh_view::data_array_t to_cpp_data_array(const f3d_data_array_t& c)
+f3d::mesh_view::data_array_t to_cpp_data_array(const f3d_data_array_t& cDataArray)
 {
-  f3d::mesh_view::data_array_t a;
-  if (c.name)
+  f3d::mesh_view::data_array_t dataArray;
+  if (cDataArray.name)
   {
-    a.name = c.name;
+    dataArray.name = cDataArray.name;
   }
-  a.type = static_cast<f3d::mesh_view::data_type>(c.type);
-  a.data = c.data;
-  a.components = c.components ? c.components : 1;
-  a.stride = c.stride ? c.stride : 1;
-  a.timeDependent = c.time_dependent != 0;
-  return a;
+  dataArray.type = static_cast<f3d::mesh_view::data_type>(cDataArray.type);
+  dataArray.data = cDataArray.data;
+  dataArray.components = cDataArray.components ? cDataArray.components : 1;
+  dataArray.stride = cDataArray.stride ? cDataArray.stride : 1;
+  dataArray.timeDependent = cDataArray.time_dependent != 0;
+  return dataArray;
 }
 
 //----------------------------------------------------------------------------
-f3d::mesh_view::cell_array_t to_cpp_cell_array(const f3d_cell_array_t& c)
+f3d::mesh_view::cell_array_t to_cpp_cell_array(const f3d_cell_array_t& cDataArray)
 {
-  f3d::mesh_view::cell_array_t a;
-  a.offsetCount = c.offset_count ? c.offset_count : 1;
-  a.offsets = to_cpp_data_array(c.offsets);
-  a.indexCount = c.index_count;
-  a.indices = to_cpp_data_array(c.indices);
-  return a;
+  f3d::mesh_view::cell_array_t dataArray;
+  dataArray.offsetCount = cDataArray.offset_count ? cDataArray.offset_count : 1;
+  dataArray.offsets = to_cpp_data_array(cDataArray.offsets);
+  dataArray.indexCount = cDataArray.index_count;
+  dataArray.indices = to_cpp_data_array(cDataArray.indices);
+  return dataArray;
 }
 
 //----------------------------------------------------------------------------
-f3d::mesh_view::memory_view_t to_cpp_memory_view(const f3d_memory_view_t* c)
+f3d::mesh_view::memory_view_t to_cpp_memory_view(const f3d_memory_view_t* cMemView)
 {
-  f3d::mesh_view::memory_view_t v;
-  v.pointCount = c->point_count;
-  v.points = to_cpp_data_array(c->points);
-  v.normals = to_cpp_data_array(c->normals);
-  v.textureCoordinates = to_cpp_data_array(c->texture_coordinates);
-  v.vertices = to_cpp_cell_array(c->vertices);
-  v.lines = to_cpp_cell_array(c->lines);
-  v.polygons = to_cpp_cell_array(c->polygons);
+  f3d::mesh_view::memory_view_t memView;
+  memView.pointCount = cMemView->point_count;
+  memView.points = to_cpp_data_array(cMemView->points);
+  memView.normals = to_cpp_data_array(cMemView->normals);
+  memView.textureCoordinates = to_cpp_data_array(cMemView->texture_coordinates);
+  memView.vertices = to_cpp_cell_array(cMemView->vertices);
+  memView.lines = to_cpp_cell_array(cMemView->lines);
+  memView.polygons = to_cpp_cell_array(cMemView->polygons);
 
-  v.pointScalars.reserve(c->point_scalars_count);
-  for (size_t i = 0; i < c->point_scalars_count; ++i)
+  memView.pointScalars.reserve(cMemView->point_scalars_count);
+  for (size_t i = 0; i < cMemView->point_scalars_count; ++i)
   {
-    v.pointScalars.push_back(to_cpp_data_array(c->point_scalars[i]));
+    memView.pointScalars.push_back(to_cpp_data_array(cMemView->point_scalars[i]));
   }
 
-  v.cellScalars.reserve(c->cell_scalars_count);
-  for (size_t i = 0; i < c->cell_scalars_count; ++i)
+  memView.cellScalars.reserve(cMemView->cell_scalars_count);
+  for (size_t i = 0; i < cMemView->cell_scalars_count; ++i)
   {
-    v.cellScalars.push_back(to_cpp_data_array(c->cell_scalars[i]));
+    memView.cellScalars.push_back(to_cpp_data_array(cMemView->cell_scalars[i]));
   }
 
-  return v;
+  return memView;
 }
 
 //----------------------------------------------------------------------------
