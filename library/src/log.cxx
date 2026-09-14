@@ -90,15 +90,17 @@ void log::setUseColoring(bool use)
 }
 
 //----------------------------------------------------------------------------
-void log::setAppendNewLine(bool append) {
-    detail::init::initialize();
-    F3DLog::SetAppendNewLine(append);
+void log::setAppendNewLine(bool append)
+{
+  detail::init::initialize();
+  F3DLog::SetAppendNewLine(append);
 }
 
 //----------------------------------------------------------------------------
-bool log::getAppendNewLine() {
-    detail::init::initialize();
-    return F3DLog::GetAppendNewLine();
+bool log::getAppendNewLine()
+{
+  detail::init::initialize();
+  return F3DLog::GetAppendNewLine();
 }
 
 //----------------------------------------------------------------------------

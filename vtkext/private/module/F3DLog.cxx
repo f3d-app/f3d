@@ -61,27 +61,27 @@ void F3DLog::SetUseColoring(bool use)
 
 //----------------------------------------------------------------------------
 
-void F3DLog::SetAppendNewLine(bool append) {
+void F3DLog::SetAppendNewLine(bool append)
+{
   vtkOutputWindow* win = vtkOutputWindow::GetInstance();
   vtkF3DConsoleOutputWindow* consoleWin = vtkF3DConsoleOutputWindow::SafeDownCast(win);
-  if(consoleWin)
+  if (consoleWin)
   {
-      consoleWin->SetAppendNewLine(append);
+    consoleWin->SetAppendNewLine(append);
   }
 }
 
 //----------------------------------------------------------------------------
-bool F3DLog::GetAppendNewLine() {
+bool F3DLog::GetAppendNewLine()
+{
   vtkOutputWindow* win = vtkOutputWindow::GetInstance();
   vtkF3DConsoleOutputWindow* consoleWin = vtkF3DConsoleOutputWindow::SafeDownCast(win);
-  if(!consoleWin)
+  if (!consoleWin)
   {
-      return false;
+    return false;
   }
   return consoleWin->GetAppendNewLine();
-
 }
-
 
 //----------------------------------------------------------------------------
 void F3DLog::SetStandardStream(StandardStream mode)

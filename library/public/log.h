@@ -98,10 +98,10 @@ public:
   template<typename... Args>
   static void progress(Args... args)
   {
-      bool prevNewLineState = getAppendNewLine();
-      setAppendNewLine(false);
-      log::info(args...);
-      setAppendNewLine(prevNewLineState);
+    bool prevNewLineState = getAppendNewLine();
+    setAppendNewLine(false);
+    log::info(args...);
+    setAppendNewLine(prevNewLineState);
   }
 
   /**
@@ -118,7 +118,6 @@ public:
    * Get the new line usage, if applicable (eg: console output).
    */
   static bool getAppendNewLine();
-
 
   /**
    * Set the verbose level.
