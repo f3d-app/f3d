@@ -77,7 +77,9 @@ vtkSmartPointer<vtkPolyData> Create(
       if (poly.IsNull())
       {
         // Unreachable in testing: needs an edge BRepMesh fails to mesh
+        // LCOV_EXCL_START
         continue;
+        // LCOV_EXCL_STOP
       }
 
       const int nbV = poly->NbNodes();
@@ -116,7 +118,9 @@ vtkSmartPointer<vtkPolyData> Create(
     if (poly.IsNull())
     {
       // Unreachable in testing: needs a face BRepMesh fails to mesh
+      // LCOV_EXCL_START
       continue;
+      // LCOV_EXCL_STOP
     }
 
     Poly::ComputeNormals(poly);
@@ -157,11 +161,13 @@ vtkSmartPointer<vtkPolyData> Create(
     else
     {
       // Unreachable in testing: needs a stored triangulation without UV nodes
+      // LCOV_EXCL_START
       const float fuv[2] = { 0.f, 0.f };
       for (int i = 1; i <= nbV; i++)
       {
         uvs->InsertNextTypedTuple(fuv);
       }
+      // LCOV_EXCL_STOP
     }
 
     const Color rgba = colors.Face ? colors.Face(face) : Color{ 255, 255, 255, 255 };

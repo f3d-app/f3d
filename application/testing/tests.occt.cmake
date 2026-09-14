@@ -16,8 +16,8 @@ f3d_test(NAME TestFCStdLink DATA link.FCStd PLUGIN occt ARGS -csy --up=+Z)
 f3d_test(NAME TestFCStdPartContainer DATA part_container.FCStd PLUGIN occt ARGS --up=+Z)
 f3d_test(NAME TestFCStdHeadless DATA headless.FCStd PLUGIN occt ARGS --up=+Z)
 f3d_test(NAME TestFCStdReadWire DATA colored_visibility.FCStd PLUGIN occt ARGS -csy -DFCStd.read_wire=1 --line-width=3 --up=+Z)
-f3d_test(NAME TestFCStd1x DATA bracket_1x.FCStd PLUGIN occt ARGS -csy --up=+Z --camera-direction=-1,1,-1 THRESHOLD 0.06) # fillet tessellation differs between OCCT versions
-f3d_test(NAME TestFCStdTransparency DATA transparency.FCStd PLUGIN occt ARGS -csy --up=+Z --camera-direction=0,1,-0.3)
+f3d_test(NAME TestFCStd1x DATA bracket_1x.FCStd PLUGIN occt ARGS -csy --up=+Z --camera-direction=-1,1,-1 -p THRESHOLD 0.06 SKIP_GLES) # fillet tessellation differs between OCCT versions, GLES doesn't support depth peeling
+f3d_test(NAME TestFCStdTransparency DATA transparency.FCStd PLUGIN occt ARGS -csy --up=+Z --camera-direction=0,1,-0.3 -p SKIP_GLES) # GLES doesn't support depth peeling
 f3d_test(NAME TestInvalidFCStd DATA invalid_content.FCStd PLUGIN occt ARGS --verbose REGEXP "failed to load scene" NO_BASELINE)
 f3d_test(NAME TestFCStdPartDesign DATA partdesign_body.FCStd PLUGIN occt ARGS -csy --up=+Z --camera-direction=-1,1,-1)
 f3d_test(NAME TestFCStdMalformedGui DATA malformed_gui.FCStd PLUGIN occt ARGS --verbose REGEXP "Error parsing XML" NO_BASELINE)

@@ -73,6 +73,7 @@ find_package(VTK 9.4.0 REQUIRED
     IOImport
     IOPLY
     IOXML
+    IOXMLParser
     RenderingAnnotation
     RenderingCore
     RenderingOpenGL2

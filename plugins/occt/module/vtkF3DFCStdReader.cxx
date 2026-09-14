@@ -43,7 +43,8 @@
 
 namespace
 {
-constexpr std::array<unsigned char, 3> DEFAULT_COLOR = { 204, 204, 204 };
+// default shape color of FreeCAD 1.x, used when the file does not store any color
+constexpr std::array<unsigned char, 3> DEFAULT_COLOR = { 173, 181, 189 };
 // guard against cyclic containers when walking the FreeCAD tree
 constexpr int MAX_HIERARCHY_DEPTH = 16;
 
@@ -691,11 +692,13 @@ public:
     {
       BRepTools::Read(shape, stream, builder);
     }
+    // Unreachable in testing: OCCT only raises on range checked builds
+    // LCOV_EXCL_START
     catch (const Standard_Failure&)
     {
-      // Unreachable in testing: OCCT only raises on range checked builds
       return std::nullopt;
     }
+    // LCOV_EXCL_STOP
     if (shape.IsNull())
     {
       return std::nullopt;
@@ -884,12 +887,14 @@ public:
       {
         polydata = this->CreatePolyData(placedShape, *shapeOwner);
       }
+      // Unreachable in testing: needs a geometry BRepMesh fails to mesh
+      // LCOV_EXCL_START
       catch (const Standard_Failure&)
       {
-        // Unreachable in testing: needs a geometry BRepMesh fails to mesh
         vtkWarningWithObjectMacro(this->Parent, "Failed to mesh object: " << obj.Label);
         continue;
       }
+      // LCOV_EXCL_STOP
       if (polydata->GetNumberOfCells() == 0)
       {
         continue;

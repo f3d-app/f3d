@@ -355,11 +355,34 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
   }
 
   {
-    // foreign elements, nameless properties, unknown objects, a dangling child
-    // and missing or truncated binary lists: all ignored, the box is still read
+    // foreign elements, nameless properties, unknown objects, a container with
+    // a shape and a dangling child, an object whose shape file is missing from
+    // the archive and missing or truncated binary lists: all ignored, the box
+    // is still read
     vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
       ReadFile(data + "/malformed_elements.FCStd");
     ret &= CheckPartitionCount(pdc, 1, "malformed_elements");
+  }
+
+  {
+    // a visible 10x10x10 box inside a hidden App::Part and a visible box
+    // placed at (20, 0, 0) outside of it: the hidden container hides its child
+    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+      ReadFile(data + "/hidden_container.FCStd");
+    ret &= CheckPartitionCount(pdc, 1, "hidden_container");
+    if (pdc->GetNumberOfPartitionedDataSets() == 1)
+    {
+      ret &=
+        CheckBounds(pdc->GetPartition(0, 0), { 20., 30., 0., 10., 0., 10. }, "hidden_container");
+    }
+  }
+
+  {
+    // headless.FCStd with a GuiDocument.xml without any view provider: the
+    // Document.xml properties are used, both objects are read
+    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+      ReadFile(data + "/gui_without_view_providers.FCStd");
+    ret &= CheckPartitionCount(pdc, 2, "gui_without_view_providers");
   }
 
   return ret ? EXIT_SUCCESS : EXIT_FAILURE;
