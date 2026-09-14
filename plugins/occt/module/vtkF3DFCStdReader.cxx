@@ -719,11 +719,11 @@ public:
 
     NCollection_IndexedMap<TopoDS_Shape, TopTools_ShapeMapHasher> faceMap;
     TopExp::MapShapes(shape, TopAbs_FACE, faceMap);
-    const unsigned char alpha = static_cast<unsigned char>(255 * (100 - obj.Transparency) / 100);
 
     F3DOCCTPolyData::ColorProviders colors;
-    colors.Face = [&faceMap, &obj, alpha](const TopoDS_Face& face)
+    colors.Face = [&faceMap, &obj](const TopoDS_Face& face)
     {
+      const unsigned char alpha = static_cast<unsigned char>(255 * (100 - obj.Transparency) / 100);
       const int faceIndex = faceMap.FindIndex(face) - 1;
       if (faceIndex >= 0 && static_cast<size_t>(faceIndex) < obj.FaceColors.size())
       {
