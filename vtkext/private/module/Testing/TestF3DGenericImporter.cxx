@@ -491,8 +491,9 @@ int TestF3DGenericImporter(int argc, char* argv[])
     pds0->SetNumberOfPartitions(1);
     pds0->SetPartition(0, sphere->GetOutput());
 
+    // the second slot of the collection is left empty and must be skipped
     vtkNew<vtkPartitionedDataSetCollection> pdc;
-    pdc->SetNumberOfPartitionedDataSets(1);
+    pdc->SetNumberOfPartitionedDataSets(2);
     pdc->SetPartitionedDataSet(0, pds0);
     pdc->GetMetaData(0u)->Set(vtkCompositeDataSet::NAME(), "MetadataName");
 
@@ -507,6 +508,13 @@ int TestF3DGenericImporter(int argc, char* argv[])
     {
       std::cerr << "PDC with metadata: Expected 'MetadataName', got '" << importer->GetBlockName(0)
                 << "'\n";
+      return EXIT_FAILURE;
+    }
+    if (importer->GetSceneHierarchy()
+          ->GetChildNodes(importer->GetSceneHierarchy()->GetRootNode(), false)
+          .size() != 1)
+    {
+      std::cerr << "PDC with metadata: Expected a single actor\n";
       return EXIT_FAILURE;
     }
   }

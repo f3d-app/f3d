@@ -61,10 +61,11 @@ public:
     return mz_zip_reader_locate_file(&this->Archive, name.c_str(), nullptr, 0);
   }
 
-  bool Extract(int index, std::vector<char>& out)
+  bool Extract(const std::string& name, std::vector<char>& out)
   {
+    const int index = this->Locate(name);
     mz_zip_archive_file_stat stat;
-    if (!mz_zip_reader_file_stat(&this->Archive, index, &stat))
+    if (index < 0 || !mz_zip_reader_file_stat(&this->Archive, index, &stat))
     {
       return false;
     }
@@ -117,12 +118,7 @@ bool vtkF3DArchiveReader::Has(const std::string& name)
 //----------------------------------------------------------------------------
 bool vtkF3DArchiveReader::Extract(const std::string& name, std::vector<char>& out)
 {
-  const int index = this->Internals->Locate(name);
-  if (index < 0)
-  {
-    return false;
-  }
-  return this->Internals->Extract(index, out);
+  return this->Internals->Extract(name, out);
 }
 
 //----------------------------------------------------------------------------

@@ -76,6 +76,7 @@ vtkSmartPointer<vtkPolyData> Create(
       const auto& poly = BRep_Tool::Polygon3D(edge, location);
       if (poly.IsNull())
       {
+        // Unreachable in testing: needs an edge BRepMesh fails to mesh
         continue;
       }
 
@@ -114,6 +115,7 @@ vtkSmartPointer<vtkPolyData> Create(
     const auto& poly = BRep_Tool::Triangulation(face, location);
     if (poly.IsNull())
     {
+      // Unreachable in testing: needs a face BRepMesh fails to mesh
       continue;
     }
 
@@ -135,24 +137,12 @@ vtkSmartPointer<vtkPolyData> Create(
       points->InsertNextPoint(pt.X(), pt.Y(), pt.Z());
     }
 
-    if (poly->HasNormals())
+    for (int i = 1; i <= nbV; i++)
     {
-      for (int i = 1; i <= nbV; i++)
-      {
-        const gp_Dir n = poly->Normal(i).Transformed(trsf);
-        const float fn[3] = { normalSign * static_cast<float>(n.X()),
-          normalSign * static_cast<float>(n.Y()), normalSign * static_cast<float>(n.Z()) };
-        normals->InsertNextTypedTuple(fn);
-      }
-    }
-    else
-    {
-      /* just in case a face does not have normals, add a dummy normal */
-      const float fn[3] = { 0.0, 0.0, 1.0 };
-      for (int i = 1; i <= nbV; i++)
-      {
-        normals->InsertNextTypedTuple(fn);
-      }
+      const gp_Dir n = poly->Normal(i).Transformed(trsf);
+      const float fn[3] = { normalSign * static_cast<float>(n.X()),
+        normalSign * static_cast<float>(n.Y()), normalSign * static_cast<float>(n.Z()) };
+      normals->InsertNextTypedTuple(fn);
     }
 
     if (poly->HasUVNodes())
@@ -166,6 +156,7 @@ vtkSmartPointer<vtkPolyData> Create(
     }
     else
     {
+      // Unreachable in testing: needs a stored triangulation without UV nodes
       const float fuv[2] = { 0.f, 0.f };
       for (int i = 1; i <= nbV; i++)
       {

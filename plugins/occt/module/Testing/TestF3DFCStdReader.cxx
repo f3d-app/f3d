@@ -288,5 +288,79 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     }
   }
 
+  {
+    // a PartDesign body (hidden box, cylinder tip) and a box in an App::Part:
+    // only the tip and the box are read, under the same container node
+    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+      ReadFile(data + "/partdesign_body.FCStd");
+    ret &= CheckPartitionCount(pdc, 2, "partdesign_body");
+    if (pdc->GetNumberOfPartitionedDataSets() == 2)
+    {
+      ret &=
+        CheckBounds(pdc->GetPartition(0, 0), { -3., 10., -3., 10., 0., 20. }, "partdesign_body");
+      ret &= CheckBounds(pdc->GetPartition(1, 0), { 20., 24., 0., 4., 0., 4. }, "partdesign_body");
+      vtkDataAssembly* assembly = pdc->GetDataAssembly();
+      const int container = assembly->FindFirstNodeWithName("Assembly");
+      const int body = assembly->FindFirstNodeWithName("Body");
+      const int side = assembly->FindFirstNodeWithName("Side");
+      if (container < 0 || body < 0 || side < 0 || assembly->GetParent(body) != container ||
+        assembly->GetParent(side) != container)
+      {
+        std::cerr << "partdesign_body: unexpected hierarchy\n";
+        ret = false;
+      }
+    }
+  }
+
+  {
+    // an Arch BuildingPart aggregating a slab through a group: only the slab is read
+    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc = ReadFile(data + "/arch_floor.FCStd");
+    ret &= CheckPartitionCount(pdc, 1, "arch_floor");
+    if (pdc->GetNumberOfPartitionedDataSets() == 1)
+    {
+      ret &= CheckBounds(pdc->GetPartition(0, 0), { 0., 30., 0., 30., 0., 2. }, "arch_floor");
+    }
+  }
+
+  {
+    // a link array with LinkTransform on a hidden 2x12x3 base rotated 90 degrees
+    // at (5, 0, 0): the base placement is composed again with the Draft
+    // placements, like FreeCAD displays it
+    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+      ReadFile(data + "/link_array_transform.FCStd");
+    ret &= CheckPartitionCount(pdc, 1, "link_array_transform");
+    if (pdc->GetNumberOfPartitionedDataSets() == 1)
+    {
+      ret &=
+        CheckBounds(pdc->GetPartition(0, 0), { 3., 25., -7., 5., 0., 3. }, "link_array_transform");
+    }
+  }
+
+  {
+    // a link to a group and arrays with a missing base, a corrupt shape, no
+    // placement list or a truncated one: all skipped, only the 5x5x5 box remains
+    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc = ReadFile(data + "/broken_links.FCStd");
+    ret &= CheckPartitionCount(pdc, 1, "broken_links");
+    if (pdc->GetNumberOfPartitionedDataSets() == 1)
+    {
+      ret &= CheckBounds(pdc->GetPartition(0, 0), { 0., 5., 0., 5., 0., 5. }, "broken_links");
+    }
+  }
+
+  {
+    // the box lists two groups referencing each other and its own container as
+    // children: the reader must not loop, nothing is read
+    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc = ReadFile(data + "/cyclic_groups.FCStd");
+    ret &= CheckPartitionCount(pdc, 0, "cyclic_groups");
+  }
+
+  {
+    // foreign elements, nameless properties, unknown objects, a dangling child
+    // and missing or truncated binary lists: all ignored, the box is still read
+    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+      ReadFile(data + "/malformed_elements.FCStd");
+    ret &= CheckPartitionCount(pdc, 1, "malformed_elements");
+  }
+
   return ret ? EXIT_SUCCESS : EXIT_FAILURE;
 }

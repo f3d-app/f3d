@@ -610,14 +610,9 @@ public:
     }
     // a hidden GeoFeatureGroup ancestor hides its whole subtree
     const FCObject* current = &obj;
-    while (!current->Parent.empty())
+    for (int depth = 0; !current->Parent.empty() && depth < MAX_HIERARCHY_DEPTH; depth++)
     {
-      auto it = this->Objects.find(current->Parent);
-      if (it == this->Objects.end())
-      {
-        break;
-      }
-      current = &it->second;
+      current = &this->Objects.at(current->Parent);
       if (current->IsGeoFeatureGroup() && !current->Visible.value_or(true))
       {
         return false;
@@ -631,14 +626,9 @@ public:
   {
     gp_Trsf trsf;
     const FCObject* current = &obj;
-    while (!current->Parent.empty())
+    for (int depth = 0; !current->Parent.empty() && depth < MAX_HIERARCHY_DEPTH; depth++)
     {
-      auto it = this->Objects.find(current->Parent);
-      if (it == this->Objects.end())
-      {
-        break;
-      }
-      current = &it->second;
+      current = &this->Objects.at(current->Parent);
       if (current->IsGeoFeatureGroup())
       {
         trsf = current->Placement * trsf;
@@ -703,6 +693,7 @@ public:
     }
     catch (const Standard_Failure&)
     {
+      // Unreachable in testing: OCCT only raises on range checked builds
       return std::nullopt;
     }
     if (shape.IsNull())
@@ -895,6 +886,7 @@ public:
       }
       catch (const Standard_Failure&)
       {
+        // Unreachable in testing: needs a geometry BRepMesh fails to mesh
         vtkWarningWithObjectMacro(this->Parent, "Failed to mesh object: " << obj.Label);
         continue;
       }
