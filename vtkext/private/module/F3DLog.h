@@ -55,6 +55,11 @@ void SetUseColoring(bool use);
  */
 void SetAppendNewLine(bool append);
 
+/**
+ * get the new line usage.
+ */
+bool GetAppendNewLine();
+
 
 /**
  * Determine how standard stream should be used.

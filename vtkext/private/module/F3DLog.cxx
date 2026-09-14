@@ -70,6 +70,18 @@ void F3DLog::SetAppendNewLine(bool append) {
   }
 }
 
+//----------------------------------------------------------------------------
+bool F3DLog::GetAppendNewLine() {
+  vtkOutputWindow* win = vtkOutputWindow::GetInstance();
+  vtkF3DConsoleOutputWindow* consoleWin = vtkF3DConsoleOutputWindow::SafeDownCast(win);
+  if(!consoleWin)
+  {
+      return false;
+  }
+  return consoleWin->GetAppendNewLine();
+
+}
+
 
 //----------------------------------------------------------------------------
 void F3DLog::SetStandardStream(StandardStream mode)
