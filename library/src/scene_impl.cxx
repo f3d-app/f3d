@@ -146,7 +146,7 @@ public:
 
         progressData->timer->StopTimer();
 
-        double estimatedTime = progressData->timer->GetElapsedTime() / progress;
+        double estimatedTime = (progress <= 1e-4)? 0 :progressData->timer->GetElapsedTime() / progress;
         int estimatedMin = estimatedTime / 60;
         int estimatedSec = static_cast<int>(estimatedTime) % 60;
         int elapsedMin = progressData->timer->GetElapsedTime() / 60;
