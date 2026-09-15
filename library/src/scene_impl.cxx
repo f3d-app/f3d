@@ -230,7 +230,8 @@ public:
         cliCallbackData.importerCount = this->MetaImporter->GetImporterInfoCount();
         cliCallbackData.fileName = this->MetaImporter->GetImporterInfo(0).Name.substr(0, 51);
 
-        scene_impl::internals::CreateCLIProgressBarAndCallback(&cliCallbackData, this->MetaImporter);
+        scene_impl::internals::CreateCLIProgressBarAndCallback(
+          &cliCallbackData, this->MetaImporter);
       }
       else
       {
