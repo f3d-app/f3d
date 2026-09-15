@@ -158,7 +158,8 @@ public:
         constexpr int barCount = 16;
         constexpr char filledFormat = '#';
         constexpr char emptyFormat = ' ';
-        const std::vector<std::string> charRamp{ " ", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█" };
+        const std::vector<std::string> charRamp{ " ", "\u258f", "\u258e", "\u258d", "\u258c",
+          "\u258b", "\u258a", "\u2589", "\u2588" };
 
         auto progressData = static_cast<CLIProgressBarDataStruct*>(clientData);
         double progress = *static_cast<double*>(callData);
