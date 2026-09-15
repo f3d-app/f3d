@@ -120,28 +120,32 @@ public:
     int importerCount;
   };
 
-  static std::string GenerateCLIBarString(double progress,int barCount, const std::vector<std::string> &strRamp) {
-      std::string bar;
-      int filledBars = barCount * progress;
-      int totalFilled = 0;
-      for(int i =0;i < filledBars;i++)
-      {
-          bar += strRamp.back();
-          totalFilled++;
-      }
-      if(filledBars < barCount)
-      {
-          double lastBarProgression =   (progress - static_cast<double>(filledBars) / barCount) * barCount;
-          int charRampIdx = std::min(strRamp.size() - 1, static_cast<size_t>(lastBarProgression * strRamp.size()));
-          bar += strRamp[charRampIdx];
-          totalFilled++;
-      }
-      while(totalFilled < barCount)
-      {
-          bar += strRamp.front();
-          totalFilled++;
-      }
-      return bar;
+  static std::string GenerateCLIBarString(
+    double progress, int barCount, const std::vector<std::string>& strRamp)
+  {
+    std::string bar;
+    int filledBars = barCount * progress;
+    int totalFilled = 0;
+    for (int i = 0; i < filledBars; i++)
+    {
+      bar += strRamp.back();
+      totalFilled++;
+    }
+    if (filledBars < barCount)
+    {
+      double lastBarProgression =
+        (progress - static_cast<double>(filledBars) / barCount) * barCount;
+      int charRampIdx =
+        std::min(strRamp.size() - 1, static_cast<size_t>(lastBarProgression * strRamp.size()));
+      bar += strRamp[charRampIdx];
+      totalFilled++;
+    }
+    while (totalFilled < barCount)
+    {
+      bar += strRamp.front();
+      totalFilled++;
+    }
+    return bar;
   }
 
   void CreateCLIProgressBarAndCallback(CLIProgressBarDataStruct* data, vtkF3DMetaImporter* importer)
@@ -154,7 +158,7 @@ public:
         constexpr int barCount = 16;
         constexpr char filledFormat = '#';
         constexpr char emptyFormat = ' ';
-        const std::vector<std::string> charRamp {" ", "▏","▎", "▍", "▌", "▋", "▊", "▉", "█"};
+        const std::vector<std::string> charRamp{ " ", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█" };
 
         auto progressData = static_cast<CLIProgressBarDataStruct*>(clientData);
         double progress = *static_cast<double*>(callData);
@@ -170,7 +174,8 @@ public:
 
         progressData->timer->StopTimer();
 
-        double estimatedTime = (progress <= 1e-4)? 0 :progressData->timer->GetElapsedTime() / progress;
+        double estimatedTime =
+          (progress <= 1e-4) ? 0 : progressData->timer->GetElapsedTime() / progress;
         int estimatedMin = estimatedTime / 60;
         int estimatedSec = static_cast<int>(estimatedTime) % 60;
         int elapsedMin = progressData->timer->GetElapsedTime() / 60;
@@ -179,8 +184,7 @@ public:
         std::string time = std::format(
           "{:02}:{:02}/{:02}:{:02}", elapsedMin, elapsedSec, estimatedMin, estimatedSec);
 
-        f3d::log::progress(
-          "\rLoading ", filename, " : ", percentage, "% |", bar, "| [", time, "]");
+        f3d::log::progress("\rLoading ", filename, " : ", percentage, "% |", bar, "| [", time, "]");
 
         if (progress >= 1.0)
         {
