@@ -78,7 +78,7 @@ struct FCObject
 
   [[nodiscard]] bool IsWireframeOnly() const
   {
-    return this->DisplayMode == 1 && this->Type.rfind("Part::Part2DObject", 0) == 0;
+    return this->DisplayMode == 1 && this->Type.starts_with("Part::Part2DObject");
   }
 
   [[nodiscard]] bool IsLink() const

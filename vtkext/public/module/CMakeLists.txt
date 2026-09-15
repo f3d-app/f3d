@@ -33,6 +33,10 @@ set(classes
 
 if(NOT F3D_USE_EXTERNAL_MINIZ)
   list(APPEND sources "${F3D_SOURCE_DIR}/external/miniz/miniz.c")
+  if(MSVC)
+    set_source_files_properties("${F3D_SOURCE_DIR}/external/miniz/miniz.c"
+      PROPERTIES COMPILE_OPTIONS "/wd4127")
+  endif()
 endif()
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
