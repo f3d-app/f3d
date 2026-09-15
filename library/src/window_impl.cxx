@@ -350,7 +350,7 @@ std::pair<int, int> window_impl::getPosition() const
   if (!this->Internals->PositionWarningEmitted &&
     this->Internals->RenWin->IsA("vtkXOpenGLRenderWindow"))
   {
-    log::warn("Window position may be inaccurate with VTK older than 9.7.20260724, "
+    log::info("Window position may be inaccurate with VTK older than 9.7.20260724, "
               "consider updating VTK.");
     this->Internals->PositionWarningEmitted = true;
   }
