@@ -199,9 +199,7 @@ public:
         scene_impl::internals::CLIProgressBarDataStruct callbackData;
         callbackData.timer = timer;
         callbackData.importerCount = this->MetaImporter->GetImporterInfoCount();
-
-        // passing filename string to the char array
-        const std::string& fileName = this->MetaImporter->GetImporterInfo(0).Name.substr(0, 51);
+        callbackData.fileName = this->MetaImporter->GetImporterInfo(0).Name.substr(0, 51);
 
         scene_impl::internals::CreateCLIProgressBarAndCallback(&callbackData, this->MetaImporter);
       }
