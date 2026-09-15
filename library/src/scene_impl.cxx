@@ -122,15 +122,14 @@ public:
 
   void CreateCLIProgressBarAndCallback(CLIProgressBarDataStruct* data, vtkF3DMetaImporter* importer)
   {
-
     vtkNew<vtkCallbackCommand> progressCallback;
     progressCallback->SetClientData(data);
     progressCallback->SetCallback(
       [](vtkObject*, unsigned long, void* clientData, void* callData)
       {
-        int barCount = 8;
-        char filledFormat = '#';
-        char emptyFormat = ' ';
+        constexpr int barCount = 16;
+        constexpr char filledFormat = '#';
+        constexpr char emptyFormat = ' ';
 
         auto progressData = static_cast<CLIProgressBarDataStruct*>(clientData);
         double progress = *static_cast<double*>(callData);
