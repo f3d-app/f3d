@@ -120,6 +120,30 @@ public:
     int importerCount;
   };
 
+  static std::string GenerateCLIBarString(double progress,int barCount, const std::vector<std::string> &strRamp) {
+      std::string bar;
+      int filledBars = barCount * progress;
+      int totalFilled = 0;
+      for(int i =0;i < filledBars;i++)
+      {
+          bar += strRamp.back();
+          totalFilled++;
+      }
+      if(filledBars < barCount)
+      {
+          double lastBarProgression =   (progress - static_cast<double>(filledBars) / barCount) * barCount;
+          int charRampIdx = std::min(strRamp.size() - 1, static_cast<size_t>(lastBarProgression * strRamp.size()));
+          bar += strRamp[charRampIdx];
+          totalFilled++;
+      }
+      while(totalFilled < barCount)
+      {
+          bar += strRamp.front();
+          totalFilled++;
+      }
+      return bar;
+  }
+
   void CreateCLIProgressBarAndCallback(CLIProgressBarDataStruct* data, vtkF3DMetaImporter* importer)
   {
     vtkNew<vtkCallbackCommand> progressCallback;
@@ -130,13 +154,13 @@ public:
         constexpr int barCount = 16;
         constexpr char filledFormat = '#';
         constexpr char emptyFormat = ' ';
+        const std::vector<std::string> charRamp {" ", "▏","▎", "▍", "▌", "▋", "▊", "▉", "█"};
 
         auto progressData = static_cast<CLIProgressBarDataStruct*>(clientData);
         double progress = *static_cast<double*>(callData);
         int filledAmount = barCount * progress;
 
-        std::string result(barCount, emptyFormat);
-        std::fill(result.begin(), result.begin() + filledAmount, filledFormat);
+        std::string bar = scene_impl::internals::GenerateCLIBarString(progress, barCount, charRamp);
 
         std::string filename = (progressData->importerCount > 1)
           ? std::to_string(progressData->importerCount) + " files"
@@ -156,7 +180,8 @@ public:
           "{:02}:{:02}/{:02}:{:02}", elapsedMin, elapsedSec, estimatedMin, estimatedSec);
 
         f3d::log::progress(
-          "\rLoading ", filename, " : ", percentage, "% |", result, "| [", time, "]");
+          "\rLoading ", filename, " : ", percentage, "% |", bar, "| [", time, "]");
+        std::cout << bar;
 
         if (progress >= 1.0)
         {
