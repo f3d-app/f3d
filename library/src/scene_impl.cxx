@@ -121,7 +121,7 @@ public:
   };
 
   static std::string GenerateCLIBarString(
-    double progress, int barCount, const std::vector<std::string>& strRamp)
+    double progress, int barCount, std::span<const std::string_view> strRamp)
   {
     std::string bar;
     int filledBars = barCount * progress;
@@ -156,10 +156,8 @@ public:
       [](vtkObject*, unsigned long, void* clientData, void* callData)
       {
         constexpr int barCount = 16;
-        constexpr char filledFormat = '#';
-        constexpr char emptyFormat = ' ';
-        const std::vector<std::string> charRamp{ " ", "\u258f", "\u258e", "\u258d", "\u258c",
-          "\u258b", "\u258a", "\u2589", "\u2588" };
+        constexpr std::array charRamp = std::to_array<std::string_view>(
+          { " ", "\u258f", "\u258e", "\u258d", "\u258c", "\u258b", "\u258a", "\u2589", "\u2588" });
 
         auto progressData = static_cast<CLIProgressBarDataStruct*>(clientData);
         double progress = *static_cast<double*>(callData);
