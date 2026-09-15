@@ -98,10 +98,10 @@ public:
   template<typename... Args>
   static void progress(Args... args)
   {
-    bool prevNewLineState = getAppendNewLine();
-    setAppendNewLine(false);
+    bool prevNewLineState = log::getAppendNewLine();
+    log::setAppendNewLine(false);
     log::info(args...);
-    setAppendNewLine(prevNewLineState);
+    log::setAppendNewLine(prevNewLineState);
   }
 
   /**
