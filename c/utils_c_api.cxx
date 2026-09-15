@@ -18,7 +18,7 @@ char* f3d_utils_strdup(const std::string& s)
 }
 
 //----------------------------------------------------------------------------
-void f3d_utils_internal_tokens_free(char** tokens, size_t count)
+void f3d_utils_internal_tokens_destroy(char** tokens, size_t count)
 {
   if (!tokens)
   {
@@ -81,9 +81,9 @@ char** f3d_utils_tokenize(const char* str, int keep_comments, size_t* out_count)
 }
 
 //----------------------------------------------------------------------------
-void f3d_utils_tokens_free(char** tokens, size_t count)
+void f3d_utils_tokens_destroy(char** tokens, size_t count)
 {
-  f3d_utils_internal_tokens_free(tokens, count);
+  f3d_utils_internal_tokens_destroy(tokens, count);
 }
 
 //----------------------------------------------------------------------------
@@ -149,7 +149,7 @@ char* f3d_utils_get_known_folder(f3d_utils_known_folder_t known_folder)
 }
 
 //----------------------------------------------------------------------------
-void f3d_utils_string_free(char* str)
+void f3d_utils_string_destroy(char* str)
 {
   delete[] str;
 }

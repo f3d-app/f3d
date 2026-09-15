@@ -71,7 +71,7 @@ extern "C"
    *
    * The image is of ChannelType BYTE and 3 or 4 components (RGB or RGBA).
    * Set no_background to non-zero to have a transparent background.
-   * The caller must free the returned image with f3d_image_delete().
+   * The caller must free the returned image with f3d_image_destroy().
    *
    * @param window Window handle.
    * @param no_background If non-zero, renders with a transparent background.

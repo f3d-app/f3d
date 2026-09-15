@@ -260,7 +260,7 @@ char** f3d_scene_get_added_files(const f3d_scene_t* scene, unsigned int* count)
 }
 
 //----------------------------------------------------------------------------
-void f3d_scene_free_added_files(char** files, unsigned int count)
+void f3d_scene_destroy_added_files(char** files, unsigned int count)
 {
   if (!files)
   {
@@ -309,7 +309,7 @@ f3d_node_state_t* f3d_scene_get_scene_hierarchy(const f3d_scene_t* scene, unsign
 }
 
 //----------------------------------------------------------------------------
-void f3d_scene_free_scene_hierarchy(f3d_node_state_t* nodes, unsigned int count)
+void f3d_scene_destroy_scene_hierarchy(f3d_node_state_t* nodes, unsigned int count)
 {
   if (!nodes)
   {
@@ -513,7 +513,7 @@ double* f3d_scene_get_animation_keyframes(f3d_scene_t* scene, unsigned int* coun
 }
 
 //----------------------------------------------------------------------------
-void f3d_scene_free_animation_keyframes(double* keyframes)
+void f3d_scene_destroy_animation_keyframes(double* keyframes)
 {
   delete[] keyframes;
 }

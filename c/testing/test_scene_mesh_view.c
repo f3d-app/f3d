@@ -21,7 +21,7 @@ int test_scene_mesh_view()
   if (!scene)
   {
     puts("[ERROR] Failed to get scene");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return 1;
   }
 
@@ -65,7 +65,7 @@ int test_scene_mesh_view()
   if (f3d_scene_add_mesh_view(scene, &mesh_view) != 1)
   {
     puts("[ERROR] f3d_scene_add_mesh_view failed");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return 1;
   }
 
@@ -73,7 +73,7 @@ int test_scene_mesh_view()
   if (f3d_scene_get_scene_info(scene, &info) != 1)
   {
     puts("[ERROR] f3d_scene_get_scene_info failed");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return 1;
   }
 
@@ -81,10 +81,10 @@ int test_scene_mesh_view()
     info.number_of_cells != 1)
   {
     puts("[ERROR] Scene info is incorrect");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return 1;
   }
 
-  f3d_engine_delete(engine);
+  f3d_engine_destroy(engine);
   return 0;
 }

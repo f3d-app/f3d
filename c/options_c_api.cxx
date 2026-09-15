@@ -15,7 +15,7 @@ f3d_options_t* f3d_options_create()
 }
 
 //----------------------------------------------------------------------------
-void f3d_options_delete(f3d_options_t* options)
+void f3d_options_destroy(f3d_options_t* options)
 {
   if (!options)
   {
@@ -459,7 +459,7 @@ char** f3d_options_get_names(const f3d_options_t* options, size_t* count)
 }
 
 //----------------------------------------------------------------------------
-void f3d_options_free_names(char** names, size_t count)
+void f3d_options_destroy_names(char** names, size_t count)
 {
   if (!names)
   {
@@ -918,7 +918,7 @@ void f3d_options_set_as_string_representation(
 }
 
 //----------------------------------------------------------------------------
-void f3d_options_free_string(const char* str)
+void f3d_options_destroy_string(const char* str)
 {
   if (!str)
   {
@@ -929,7 +929,7 @@ void f3d_options_free_string(const char* str)
 }
 
 //----------------------------------------------------------------------------
-void f3d_options_free_string_array(char** array, int count)
+void f3d_options_destroy_string_array(char** array, int count)
 {
   if (!array)
   {
