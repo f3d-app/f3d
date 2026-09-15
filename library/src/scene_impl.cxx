@@ -160,7 +160,7 @@ public:
 
         if (progress >= 1.0)
         {
-          f3d::log::info("\n");
+          f3d::log::info("");
         }
       });
     importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
