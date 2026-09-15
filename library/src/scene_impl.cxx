@@ -116,7 +116,7 @@ public:
   struct CLIProgressBarDataStruct
   {
     vtkTimerLog* timer;
-    std::array<char, 50> fileName;
+    std::string fileName;
     int importerCount;
   };
 
@@ -140,7 +140,7 @@ public:
 
         std::string filename = (progressData->importerCount > 1)
           ? std::to_string(progressData->importerCount) + " files"
-          : progressData->fileName.data();
+          : progressData->fileName;
 
         int percentage = 100 * progress;
 
@@ -201,11 +201,7 @@ public:
         callbackData.importerCount = this->MetaImporter->GetImporterInfoCount();
 
         // passing filename string to the char array
-        const std::string& fileName = this->MetaImporter->GetImporterInfo(0).Name;
-        fileName.copy(callbackData.fileName.begin(), callbackData.fileName.size() - 1);
-
-        callbackData.fileName[std::min(fileName.size(), callbackData.fileName.max_size() - 1)] =
-          '\0';
+        const std::string& fileName = this->MetaImporter->GetImporterInfo(0).Name.substr(0, 51);
 
         scene_impl::internals::CreateCLIProgressBarAndCallback(&callbackData, this->MetaImporter);
       }
