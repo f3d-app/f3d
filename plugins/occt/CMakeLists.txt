@@ -85,7 +85,7 @@ endforeach()
 f3d_plugin_declare_reader(
   NAME STEP
   EXTENSIONS stp step stpnc p21 210
-  MIMETYPES application/vnd.step
+  MIMETYPES application/vnd.step model/step
   VTK_READER vtkF3DOCCTReader
   FORMAT_DESCRIPTION "STEP ISO 10303"
   ${_SUPPORTS_STREAM}
