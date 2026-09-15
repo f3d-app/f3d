@@ -35,7 +35,7 @@ int TestSDKBindingRepeat([[maybe_unused]] int argc, [[maybe_unused]] char* argv[
   inter.removeBinding({ mod_t::SHIFT, "P" });
   inter.addBinding({ mod_t::SHIFT, "P" }, "decrease model.color.opacity", {}, nullptr,
     f3d::interactor::BindingType::NUMERICAL, true, false);
-
+  
   const std::string filename = "TestSDKBindingRepeat";
   const std::string interactionFilePath =
     std::format("{}../recordings/{}.log", baselinePath, filename);
