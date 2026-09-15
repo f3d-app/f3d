@@ -161,7 +161,6 @@ public:
 
         auto progressData = static_cast<CLIProgressBarDataStruct*>(clientData);
         double progress = *static_cast<double*>(callData);
-        int filledAmount = barCount * progress;
 
         std::string bar = scene_impl::internals::GenerateCLIBarString(progress, barCount, charRamp);
 
