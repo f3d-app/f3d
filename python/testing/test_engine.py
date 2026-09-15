@@ -67,7 +67,7 @@ def test_get_readers_info():
 def test_get_rendering_backend_list():
     backends = f3d.Engine.get_rendering_backend_list()
 
-    assert isinstance(backends, dict) and len(backends) == 5
+    assert isinstance(backends, dict) and len(backends) == 6
 
 
 def test_reader_options():
