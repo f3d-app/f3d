@@ -37,7 +37,8 @@ int TestSDKBindingRepeat([[maybe_unused]] int argc, [[maybe_unused]] char* argv[
     f3d::interactor::BindingType::NUMERICAL, true, false);
 
   constexpr std::string filename = "TestSDKBindingRepeat";
-  const std::string interactionFilePath = std::format("{}../recordings/{}.log", baselinePath, filename);
+  const std::string interactionFilePath =
+    std::format("{}../recordings/{}.log", baselinePath, filename);
   test("play binding repeat off interaction", inter.playInteraction(interactionFilePath));
 
   test("trigger binding no repeat",

@@ -116,10 +116,10 @@ if (scene.supports("some.obj") == f3d::file_availability::SUPPORTED)
 
 Other languages API behavior changed accordingly:
 
-- C API: 
+- C API:
   - `f3d_scene_supports()` used to return 1 if the file was supported and 0 otherwise. It now returns an int: 0 if supported, 1 for unsupported extension, 2 for unsupported content, -1 if the scene or file path is NULL.
   - `f3d_interactor_add_binding` now requires a `repeat` argument, which specifies that the binding is repeatedly applied when holding down the key.
-- Java API: 
+- Java API:
   - `Scene.supports()` used to return a boolean. It now returns the `Scene.FileAvailability` enum and throws `IllegalArgumentException` if the file path is null.
   - `Interactor.addBinding()` now requires a `repeat` argument which specifies that the binding is repeatedly applied when holding down the key.
 - Python API: `scene.supports()` used to return bool. Now returns f3d.FileAvailability.
