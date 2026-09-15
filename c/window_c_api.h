@@ -204,7 +204,8 @@ extern "C"
   /**
    * @brief Get the current video frame of the window.
    *
-   * The returned frame must be deleted with f3d_video_frame_delete().
+   * If the provided window is NULL, returns NULL.
+   * The returned frame must be deleted with f3d_video_frame_destroy().
    *
    * @param window Window handle.
    * @return Video frame handle, or NULL on failure.

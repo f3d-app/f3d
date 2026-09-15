@@ -67,7 +67,7 @@ A generic image class that can either be created from a window, from an image fi
 
 ## Video Encoder class
 
-It's possible to encode rendering result into a video stream. The frames should be sent to the encoder and x264 packets are received.
+The libf3d can encode rendering result into a video stream. The frames should be sent to the encoder and x264 packets are received.
 
 ## Log class
 

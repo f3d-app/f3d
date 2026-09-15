@@ -53,7 +53,7 @@ int test_video()
   params.bitrate = 5.0;
   params.low_latency = 0;
 
-  f3d_video_encoder_t* encoder = f3d_video_encoder_new(&params);
+  f3d_video_encoder_t* encoder = f3d_video_encoder_create(&params);
   if (!encoder)
   {
     puts("[ERROR] Failed to create video encoder");
@@ -75,10 +75,10 @@ int test_video()
   f3d_video_frame_set_timestamp(video_frame, 42);
 
   f3d_video_encoder_submit(encoder, video_frame);
-  f3d_video_frame_delete(video_frame);
+  f3d_video_frame_destroy(video_frame);
 
   f3d_video_encoder_flush(encoder);
-  f3d_video_encoder_delete(encoder);
+  f3d_video_encoder_destroy(encoder);
 
   if (ts != 42)
   {

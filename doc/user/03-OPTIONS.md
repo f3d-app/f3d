@@ -1117,7 +1117,7 @@ export_brep(obj, sys.stdout.buffer)
 python script.py | f3d - --output=- | display
 ```
 
-It's also possible to output animations to a video using piping with FFmpeg:
+F3D can also output animations to a video using piping with FFmpeg:
 
 ```
 f3d path/to/file.glb --output-video=- | ffmpeg -f h264 -i - path/to/video.mp4

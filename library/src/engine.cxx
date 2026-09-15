@@ -715,6 +715,12 @@ engine::libInformation engine::getLibInfo()
   libInfo.Modules["ImGui"] = false;
 #endif
 
+#if F3D_MODULE_FFMPEG
+  libInfo.Modules["FFmpeg"] = true;
+#else
+  libInfo.Modules["FFmpeg"] = false;
+#endif
+
   std::string vtkVersion = std::string(vtkVersion::GetVTKVersionFull());
   if (!vtkVersion.empty())
   {

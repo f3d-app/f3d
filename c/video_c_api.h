@@ -34,10 +34,12 @@ extern "C"
    *
    * @param frame Video frame handle to delete.
    */
-  F3D_EXPORT void f3d_video_frame_delete(f3d_video_frame_t* frame);
+  F3D_EXPORT void f3d_video_frame_destroy(f3d_video_frame_t* frame);
 
   /**
    * @brief Set the timestamp of the video frame.
+   *
+   * If the provided frame is NULL, do nothing.
    *
    * @param frame Video frame handle.
    * @param timestamp Timestamp value.
@@ -47,6 +49,8 @@ extern "C"
   /**
    * @brief Get the size of the video packet in bytes.
    *
+   * If the provided packet is NULL, returns 0.
+   *
    * @param packet Video packet handle.
    * @return Packet size in bytes, or 0 if packet is NULL.
    */
@@ -54,6 +58,8 @@ extern "C"
 
   /**
    * @brief Get the data of the video packet.
+   *
+   * If the provided packet is NULL, returns NULL.
    *
    * @param packet Video packet handle.
    * @return Pointer to the packet data, or NULL if packet is NULL.
@@ -64,6 +70,8 @@ extern "C"
   /**
    * @brief Get the timestamp of the video packet.
    *
+   * If the provided packet is NULL, returns 0.
+   *
    * @param packet Video packet handle.
    * @return Timestamp value, or 0 if packet is NULL.
    */
@@ -71,6 +79,8 @@ extern "C"
 
   /**
    * @brief Get the packet type of the video packet.
+   *
+   * If the provided packet is NULL, returns 0.
    *
    * @param packet Video packet handle.
    * @return 1 if the packet is a key frame, 0 if not
@@ -118,6 +128,8 @@ extern "C"
   /**
    * @brief Get the list of available video encoders.
    *
+   * If any of the input pointers are NULL, do nothing.
+   *
    * @param names Array to be filled with encoder names. Must be deleted using
    * f3d_video_encoder_free_available_encoders.
    * @param descriptions Array to be filled with encoder descriptions. Must be deleted using
@@ -129,6 +141,8 @@ extern "C"
 
   /**
    * @brief Free the memory allocated by f3d_video_encoder_get_available_encoders.
+   *
+   * If any of the input pointers are NULL, do nothing.
    *
    * @param names Array of encoder names to free.
    * @param descriptions Array of encoder descriptions to free.
@@ -142,21 +156,22 @@ extern "C"
    *
    * Returns NULL if the codec could not be initialized, for example if F3D_MODULE_FFMPEG is
    * disabled or no valid codec is available.
-   * The encoder handle must be deleted with f3d_video_encoder_delete().
+   * The encoder handle must be deleted with f3d_video_encoder_destroy().
    *
    * @param params Encoder parameters.
    * @return Video encoder handle, or NULL on failure.
    */
-  F3D_EXPORT f3d_video_encoder_t* f3d_video_encoder_new(const f3d_video_encoder_params_t* params);
+  F3D_EXPORT f3d_video_encoder_t* f3d_video_encoder_create(
+    const f3d_video_encoder_params_t* params);
 
   /**
    * @brief Delete a video encoder object.
    *
-   * If provided encoder is NULL, do nothing.
+   * If the provided encoder is NULL, do nothing.
    *
    * @param encoder Video encoder handle to delete.
    */
-  F3D_EXPORT void f3d_video_encoder_delete(f3d_video_encoder_t* encoder);
+  F3D_EXPORT void f3d_video_encoder_destroy(f3d_video_encoder_t* encoder);
 
   /**
    * @brief Get the width of the video encoder.

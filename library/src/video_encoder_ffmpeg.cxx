@@ -53,17 +53,17 @@ public:
 };
 
 //----------------------------------------------------------------------------
-video_encoder_ffmpeg::video_encoder_ffmpeg(const params& p)
+video_encoder_ffmpeg::video_encoder_ffmpeg(const params& parameters)
 {
   const AVCodec* currentCodec = nullptr;
 
-  if (p.Codec == codec::EXPLICIT)
+  if (parameters.Codec == codec::EXPLICIT)
   {
-    if (p.ExplicitCodecName.empty())
+    if (parameters.ExplicitCodecName.empty())
     {
       throw codec_exception("Explicit codec name must be provided for EXPLICIT codec");
     }
-    currentCodec = avcodec_find_encoder_by_name(p.ExplicitCodecName.c_str());
+    currentCodec = avcodec_find_encoder_by_name(parameters.ExplicitCodecName.c_str());
   }
   else
   {
@@ -75,7 +75,7 @@ video_encoder_ffmpeg::video_encoder_ffmpeg(const params& p)
       { codec::AV1, AV_CODEC_ID_AV1 },
     };
 
-    currentCodec = avcodec_find_encoder(codecMap.at(p.Codec));
+    currentCodec = avcodec_find_encoder(codecMap.at(parameters.Codec));
   }
 
   if (currentCodec)
@@ -97,17 +97,17 @@ video_encoder_ffmpeg::video_encoder_ffmpeg(const params& p)
     // LCOV_EXCL_STOP
   }
 
-  this->Internals->CodecContext->width = p.Width;
-  this->Internals->CodecContext->height = p.Height;
+  this->Internals->CodecContext->width = parameters.Width;
+  this->Internals->CodecContext->height = parameters.Height;
   this->Internals->CodecContext->pix_fmt = AV_PIX_FMT_YUV420P;
   this->Internals->CodecContext->color_range = AVCOL_RANGE_MPEG;
-  this->Internals->CodecContext->time_base = av_d2q(1.0 / p.FrameRate, 1000000);
-  this->Internals->CodecContext->framerate = av_d2q(p.FrameRate, 1000000);
-  this->Internals->CodecContext->bit_rate = static_cast<int64_t>(p.Bitrate * 1000000);
+  this->Internals->CodecContext->time_base = av_d2q(1.0 / parameters.FrameRate, 1000000);
+  this->Internals->CodecContext->framerate = av_d2q(parameters.FrameRate, 1000000);
+  this->Internals->CodecContext->bit_rate = static_cast<int64_t>(parameters.Bitrate * 1000000);
 
   AVDictionary* opts = nullptr;
 
-  if (p.LowLatency)
+  if (parameters.LowLatency)
   {
     this->Internals->CodecContext->max_b_frames = 0;
   }

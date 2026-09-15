@@ -65,7 +65,7 @@ See [Filename templating](03-OPTIONS.md#filename-templating) for more template v
 
 ### Video
 
-It's also possible to save the animation to a video raw x264 stream:
+F3D can save the animation to a video raw x264 stream:
 
 ```bash
 f3d example.file --output-video=video.h264

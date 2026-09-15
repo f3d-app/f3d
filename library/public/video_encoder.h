@@ -20,7 +20,7 @@ namespace f3d
  * A class to represent a video stream, used to encode frames
  * to video packets.
  * It supports a variety of codecs (H264, HEVC, VP8, VP9, AV1) as long as the encoder supports
- * yuv420p pixel format.
+ * YUV420p pixel format.
  */
 class F3D_EXPORT video_encoder
 {

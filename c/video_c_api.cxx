@@ -25,11 +25,10 @@ struct f3d_video_frame_t : public SmartPointerWrapper<f3d::video_frame>
 };
 
 //----------------------------------------------------------------------------
-void f3d_video_frame_delete(f3d_video_frame_t* frame)
+void f3d_video_frame_destroy(f3d_video_frame_t* frame)
 {
   if (!frame)
   {
-    f3d::log::warn("Video frame is null, cannot delete video frame");
     return;
   }
 
@@ -99,6 +98,10 @@ F3D_EXPORT int f3d_video_packet_is_key_frame(const f3d_video_packet_t* packet)
 //----------------------------------------------------------------------------
 void f3d_video_encoder_get_available_encoders(char*** names, char*** descriptions, int* count)
 {
+  if (names == nullptr || descriptions == nullptr || count == nullptr)
+  {
+    return;
+  }
   auto encoders = f3d::video_encoder::getAvailableEncoders();
   *count = static_cast<int>(encoders.size());
   *names = static_cast<char**>(malloc(sizeof(char*) * (*count)));
@@ -113,6 +116,10 @@ void f3d_video_encoder_get_available_encoders(char*** names, char*** description
 //----------------------------------------------------------------------------
 void f3d_video_encoder_free_available_encoders(char** names, char** descriptions, int count)
 {
+  if (names == nullptr || descriptions == nullptr)
+  {
+    return;
+  }
   for (int i = 0; i < count; ++i)
   {
     free(names[i]);
@@ -123,7 +130,7 @@ void f3d_video_encoder_free_available_encoders(char** names, char** descriptions
 }
 
 //----------------------------------------------------------------------------
-f3d_video_encoder_t* f3d_video_encoder_new(const f3d_video_encoder_params_t* params)
+f3d_video_encoder_t* f3d_video_encoder_create(const f3d_video_encoder_params_t* params)
 {
   if (!params)
   {
@@ -152,11 +159,10 @@ f3d_video_encoder_t* f3d_video_encoder_new(const f3d_video_encoder_params_t* par
 }
 
 //----------------------------------------------------------------------------
-void f3d_video_encoder_delete(f3d_video_encoder_t* encoder)
+void f3d_video_encoder_destroy(f3d_video_encoder_t* encoder)
 {
   if (!encoder)
   {
-    f3d::log::warn("Video encoder is null, cannot delete video encoder");
     return;
   }
 

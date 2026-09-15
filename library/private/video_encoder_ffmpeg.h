@@ -22,7 +22,7 @@ public:
    * Default/copy/move constructors/operators.
    * The constructor throws a codec_exception if the codec cannot be initialized.
    */
-  explicit video_encoder_ffmpeg(const params& p);
+  explicit video_encoder_ffmpeg(const params& parameters);
   ~video_encoder_ffmpeg() override;
   video_encoder_ffmpeg(const video_encoder_ffmpeg& stream) = delete;
   video_encoder_ffmpeg& operator=(const video_encoder_ffmpeg& stream) = delete;
