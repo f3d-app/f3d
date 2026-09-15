@@ -152,8 +152,11 @@ public:
         int elapsedMin = progressData->timer->GetElapsedTime() / 60;
         int elapsedSec = static_cast<int>(progressData->timer->GetElapsedTime()) % 60;
 
-        f3d::log::progress("\rLoading ", filename, " : ", percentage, "% |", result, "| [",
-                elapsedMin, ":", elapsedSec, " / ", estimatedMin, ":", estimatedSec, "]");
+        std::string time = std::format(
+          "{:02}:{:02}/{:02}:{:02}", elapsedMin, elapsedSec, estimatedMin, estimatedSec);
+
+        f3d::log::progress(
+          "\rLoading ", filename, " : ", percentage, "% |", result, "| [", time, "]");
 
         if (progress >= 1.0)
         {
