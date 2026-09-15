@@ -36,8 +36,8 @@ int TestSDKBindingRepeat([[maybe_unused]] int argc, [[maybe_unused]] char* argv[
   inter.addBinding({ mod_t::SHIFT, "P" }, "decrease model.color.opacity", {}, nullptr,
     f3d::interactor::BindingType::NUMERICAL, true, false);
 
-  std::string filename = "TestSDKBindingRepeatOff";
-  std::string interactionFilePath = std::format("{}../recordings/{}.log", baselinePath, filename);
+  constexpr std::string filename = "TestSDKBindingRepeat";
+  const std::string interactionFilePath = std::format("{}../recordings/{}.log", baselinePath, filename);
   test("play binding repeat off interaction", inter.playInteraction(interactionFilePath));
 
   test("trigger binding no repeat",
@@ -47,10 +47,6 @@ int TestSDKBindingRepeat([[maybe_unused]] int argc, [[maybe_unused]] char* argv[
   inter.addBinding({ mod_t::SHIFT, "P" }, "decrease model.color.opacity", {}, nullptr,
     f3d::interactor::BindingType::NUMERICAL, true, true);
 
-  // Uses a different file to add extra interaction as the render state will already have the axis
-  // on
-  filename = "TestSDKBindingRepeatOn";
-  interactionFilePath = std::format("{}../recordings/{}.log", baselinePath, filename);
   test("play binding repeat interaction", inter.playInteraction(interactionFilePath));
 
   test("trigger binding repeat",
