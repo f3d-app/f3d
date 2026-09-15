@@ -220,20 +220,20 @@ public:
     vtkNew<vtkProgressBarWidget> progressWidget;
     vtkNew<vtkTimerLog> timer;
 
+    scene_impl::internals::ProgressDataStruct callbackData;
+    scene_impl::internals::CLIProgressBarDataStruct cliCallbackData;
     if (this->Interactor)
     {
       if (this->Window.isOffscreen())
       {
-        scene_impl::internals::CLIProgressBarDataStruct callbackData;
-        callbackData.timer = timer;
-        callbackData.importerCount = this->MetaImporter->GetImporterInfoCount();
-        callbackData.fileName = this->MetaImporter->GetImporterInfo(0).Name.substr(0, 51);
+        cliCallbackData.timer = timer;
+        cliCallbackData.importerCount = this->MetaImporter->GetImporterInfoCount();
+        cliCallbackData.fileName = this->MetaImporter->GetImporterInfo(0).Name.substr(0, 51);
 
-        scene_impl::internals::CreateCLIProgressBarAndCallback(&callbackData, this->MetaImporter);
+        scene_impl::internals::CreateCLIProgressBarAndCallback(&cliCallbackData, this->MetaImporter);
       }
       else
       {
-        scene_impl::internals::ProgressDataStruct callbackData;
         callbackData.timer = timer;
         callbackData.widget = progressWidget;
         f3d::color_t color = this->Options.ui.loader_progress_color;
