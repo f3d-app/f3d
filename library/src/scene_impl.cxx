@@ -181,7 +181,6 @@ public:
 
         f3d::log::progress(
           "\rLoading ", filename, " : ", percentage, "% |", bar, "| [", time, "]");
-        std::cout << bar;
 
         if (progress >= 1.0)
         {
