@@ -145,20 +145,17 @@ public:
         int percentage = 100 * progress;
 
         progressData->timer->StopTimer();
-        if (progressData->timer->GetElapsedTime() > 0.15 ||
-          vtksys::SystemTools::HasEnv("CTEST_F3D_PROGRESS_BAR"))
-        {
 
-          double estimatedTime = progressData->timer->GetElapsedTime() / progress;
-          int estimatedMin = estimatedTime / 60;
-          int estimatedSec = static_cast<int>(estimatedTime) % 60;
-          int elapsedMin = progressData->timer->GetElapsedTime() / 60;
-          int elapsedSec = static_cast<int>(progressData->timer->GetElapsedTime()) % 60;
+        double estimatedTime = progressData->timer->GetElapsedTime() / progress;
+        int estimatedMin = estimatedTime / 60;
+        int estimatedSec = static_cast<int>(estimatedTime) % 60;
+        int elapsedMin = progressData->timer->GetElapsedTime() / 60;
+        int elapsedSec = static_cast<int>(progressData->timer->GetElapsedTime()) % 60;
 
-          f3d::log::progress("\rLoading ", filename, " : ", percentage, "% |", result, "| [",
-            elapsedMin, ":", elapsedSec, " / ", estimatedMin, ":", estimatedSec, "]");
-        }
-        if (progress == 1.0)
+        f3d::log::progress("\rLoading ", filename, " : ", percentage, "% |", result, "| [",
+                elapsedMin, ":", elapsedSec, " / ", estimatedMin, ":", estimatedSec, "]");
+
+        if (progress >= 1.0)
         {
           f3d::log::info("\n");
         }
