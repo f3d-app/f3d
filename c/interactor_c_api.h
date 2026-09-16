@@ -182,7 +182,7 @@ extern "C"
    * @param interactor Interactor handle.
    * @param count Output parameter for number of actions.
    * @return Array of action strings. Caller must free the array with
-   *         f3d_interactor_free_string_array().
+   *         f3d_interactor_destroy_string_array().
    */
   F3D_EXPORT char** f3d_interactor_get_command_actions(f3d_interactor_t* interactor, int* count);
 
@@ -236,7 +236,7 @@ extern "C"
    * @param interactor Interactor handle.
    * @param count Output parameter for number of groups.
    * @return Array of group strings. Caller must free the array with
-   *         f3d_interactor_free_string_array().
+   *         f3d_interactor_destroy_string_array().
    */
   F3D_EXPORT char** f3d_interactor_get_bind_groups(f3d_interactor_t* interactor, int* count);
 
@@ -247,7 +247,7 @@ extern "C"
    * @param group Group name.
    * @param count Output parameter for number of binds.
    * @return Array of binds. Caller must free the array with
-   *         f3d_interactor_free_bind_array(). NULL if group does not exist.
+   *         f3d_interactor_destroy_bind_array(). NULL if group does not exist.
    */
   F3D_EXPORT f3d_interaction_bind_t* f3d_interactor_get_binds_for_group(
     f3d_interactor_t* interactor, const char* group, int* count);
@@ -258,7 +258,7 @@ extern "C"
    * @param interactor Interactor handle.
    * @param count Output parameter for number of binds.
    * @return Array of binds. Caller must free the array with
-   *         f3d_interactor_free_bind_array().
+   *         f3d_interactor_destroy_bind_array().
    */
   F3D_EXPORT f3d_interaction_bind_t* f3d_interactor_get_binds(
     f3d_interactor_t* interactor, int* count);
@@ -521,14 +521,14 @@ extern "C"
    * @param array String array to free.
    * @param count Number of strings in the array.
    */
-  F3D_EXPORT void f3d_interactor_free_string_array(char** array, int count);
+  F3D_EXPORT void f3d_interactor_destroy_string_array(char** array, int count);
 
   /**
    * @brief Free a bind array returned by interactor functions.
    *
    * @param array Bind array to free.
    */
-  F3D_EXPORT void f3d_interactor_free_bind_array(f3d_interaction_bind_t* array);
+  F3D_EXPORT void f3d_interactor_destroy_bind_array(f3d_interaction_bind_t* array);
 
 #ifdef __cplusplus
 }

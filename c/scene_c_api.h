@@ -77,7 +77,7 @@ extern "C"
    * @brief Get the list of files currently added to the scene.
    *
    * The returned array and its strings must be freed using
-   * f3d_scene_free_added_files().
+   * f3d_scene_destroy_added_files().
    *
    * @param scene Scene handle.
    * @param count Output pointer that receives the number of files.
@@ -91,7 +91,7 @@ extern "C"
    * @param files Array to free.
    * @param count Number of files in the array.
    */
-  F3D_EXPORT void f3d_scene_free_added_files(char** files, unsigned int count);
+  F3D_EXPORT void f3d_scene_destroy_added_files(char** files, unsigned int count);
 
   /**
    * @brief Add a light based on a light state.
@@ -115,7 +115,7 @@ extern "C"
    * @brief Get the light state at provided index.
    *
    * The returned light_state is heap-allocated and must be freed with
-   * f3d_light_state_free().
+   * f3d_light_state_destroy().
    *
    * @param scene Scene handle.
    * @param index Index of the light.
@@ -157,7 +157,7 @@ extern "C"
    * children.
    *
    * The returned array and the labels it contains must be freed with
-   * f3d_scene_free_scene_hierarchy().
+   * f3d_scene_destroy_scene_hierarchy().
    *
    * @param scene Scene handle.
    * @param count Output pointer that receives the number of nodes.
@@ -172,7 +172,7 @@ extern "C"
    * @param nodes Array to free.
    * @param count Number of nodes in the array.
    */
-  F3D_EXPORT void f3d_scene_free_scene_hierarchy(f3d_node_state_t* nodes, unsigned int count);
+  F3D_EXPORT void f3d_scene_destroy_scene_hierarchy(f3d_node_state_t* nodes, unsigned int count);
 
   /**
    * @brief Set the visibility of a scene hierarchy node and of its whole subtree.
@@ -218,7 +218,7 @@ extern "C"
    * @brief Get keyframes times of loaded files
    *
    * The returned keyframes is heap-allocated and must be freed with
-   * f3d_scene_free_animation_keyframes().
+   * f3d_scene_destroy_animation_keyframes().
    *
    * @param scene Scene handle.
    * @param count Pointer to store the count of keyframes
@@ -231,7 +231,7 @@ extern "C"
    *
    * @param keyframes Pointer to the keyframes array to free.
    */
-  F3D_EXPORT void f3d_scene_free_animation_keyframes(double* keyframes);
+  F3D_EXPORT void f3d_scene_destroy_animation_keyframes(double* keyframes);
 
   /**
    * @brief Get animation time range of currently added files.

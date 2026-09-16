@@ -15,7 +15,7 @@ extern "C"
   /**
    * @brief Create a new options object.
    *
-   * The returned options object must be freed with f3d_options_delete().
+   * The returned options object must be freed with f3d_options_destroy().
    *
    * @return Options handle.
    */
@@ -26,7 +26,7 @@ extern "C"
    *
    * @param options Options handle to delete.
    */
-  F3D_EXPORT void f3d_options_delete(f3d_options_t* options);
+  F3D_EXPORT void f3d_options_destroy(f3d_options_t* options);
   ///@}
 
   ///@{ @name Option setters
@@ -122,7 +122,7 @@ extern "C"
   /**
    * @brief Get an option value as a string.
    *
-   * The returned string is heap-allocated and must be freed with f3d_options_free_string().
+   * The returned string is heap-allocated and must be freed with f3d_options_destroy_string().
    *
    * @param options Options handle.
    * @param name Option name.
@@ -133,7 +133,7 @@ extern "C"
   /**
    * @brief Get an option value as a string representation.
    *
-   * The returned string is heap-allocated and must be freed with f3d_options_free_string().
+   * The returned string is heap-allocated and must be freed with f3d_options_destroy_string().
    *
    * @param options Options handle.
    * @param name Option name.
@@ -163,7 +163,7 @@ extern "C"
    *
    * @param str String to free.
    */
-  F3D_EXPORT void f3d_options_free_string(const char* str);
+  F3D_EXPORT void f3d_options_destroy_string(const char* str);
 
   /**
    * @brief Free a string array returned by options functions.
@@ -171,7 +171,7 @@ extern "C"
    * @param array String array to free.
    * @param count Number of strings in the array.
    */
-  F3D_EXPORT void f3d_options_free_string_array(char** array, int count);
+  F3D_EXPORT void f3d_options_destroy_string_array(char** array, int count);
 
   /**
    * @brief Get an option value as a double vector.
@@ -245,7 +245,7 @@ extern "C"
   /**
    * @brief Get all option names.
    *
-   * The returned array is heap-allocated and must be freed with f3d_options_free_names().
+   * The returned array is heap-allocated and must be freed with f3d_options_destroy_names().
    *
    * @param count Pointer to store the count of names.
    * @return Array of option names.
@@ -255,7 +255,7 @@ extern "C"
   /**
    * @brief Get option names that have values.
    *
-   * The returned array is heap-allocated and must be freed with f3d_options_free_names().
+   * The returned array is heap-allocated and must be freed with f3d_options_destroy_names().
    *
    * @param options Options handle.
    * @param count Pointer to store the count of names.
@@ -269,7 +269,7 @@ extern "C"
    * @param options Options handle.
    * @param option Option name to match.
    * @param closest Output parameter for the closest option name. Caller must free with
-   *                f3d_options_free_string().
+   *                f3d_options_destroy_string().
    * @param distance Output parameter for the Levenshtein distance.
    */
   F3D_EXPORT void f3d_options_get_closest_option(
@@ -281,7 +281,7 @@ extern "C"
    * @param names Array of names to free.
    * @param count Number of names in the array.
    */
-  F3D_EXPORT void f3d_options_free_names(char** names, size_t count);
+  F3D_EXPORT void f3d_options_destroy_names(char** names, size_t count);
 
   /**
    * @brief Check if an option is optional.
@@ -370,7 +370,7 @@ extern "C"
    * @param options Options handle.
    * @param name Option name.
    * @return Array of enum strings. Caller must free the array with
-   *         f3d_options_free_string_array().
+   *         f3d_options_destroy_string_array().
    */
   F3D_EXPORT char** f3d_options_get_enum_domain_string(
     const f3d_options_t* options, const char* name, int* count);
@@ -470,7 +470,7 @@ extern "C"
    * @brief Parse a string as a string (returns a copy).
    *
    * @param str String to parse.
-   * @return Parsed string. Caller must free with f3d_options_free_string(). NULL if the option
+   * @return Parsed string. Caller must free with f3d_options_destroy_string(). NULL if the option
    * cannot be parsed.
    */
   F3D_EXPORT const char* f3d_options_parse_string(const char* str);
@@ -497,7 +497,7 @@ extern "C"
    * @brief Format a boolean as a string.
    *
    * @param value Boolean value.
-   * @return Formatted string. Caller must free with f3d_options_free_string().
+   * @return Formatted string. Caller must free with f3d_options_destroy_string().
    */
   F3D_EXPORT const char* f3d_options_format_bool(int value);
 
@@ -505,7 +505,7 @@ extern "C"
    * @brief Format an integer as a string.
    *
    * @param value Integer value.
-   * @return Formatted string. Caller must free with f3d_options_free_string().
+   * @return Formatted string. Caller must free with f3d_options_destroy_string().
    */
   F3D_EXPORT const char* f3d_options_format_int(int value);
 
@@ -513,7 +513,7 @@ extern "C"
    * @brief Format a double as a string.
    *
    * @param value Double value.
-   * @return Formatted string. Caller must free with f3d_options_free_string().
+   * @return Formatted string. Caller must free with f3d_options_destroy_string().
    */
   F3D_EXPORT const char* f3d_options_format_double(double value);
 
@@ -521,7 +521,7 @@ extern "C"
    * @brief Format a string (returns a copy).
    *
    * @param value String value.
-   * @return Formatted string. Caller must free with f3d_options_free_string().
+   * @return Formatted string. Caller must free with f3d_options_destroy_string().
    */
   F3D_EXPORT const char* f3d_options_format_string(const char* value);
 
@@ -530,7 +530,7 @@ extern "C"
    *
    * @param values Array of double values.
    * @param count Number of values in the array.
-   * @return Formatted string. Caller must free with f3d_options_free_string().
+   * @return Formatted string. Caller must free with f3d_options_destroy_string().
    */
   F3D_EXPORT const char* f3d_options_format_double_vector(const double* values, size_t count);
 
@@ -539,7 +539,7 @@ extern "C"
    *
    * @param values Array of integer values.
    * @param count Number of values in the array.
-   * @return Formatted string. Caller must free with f3d_options_free_string().
+   * @return Formatted string. Caller must free with f3d_options_destroy_string().
    */
   F3D_EXPORT const char* f3d_options_format_int_vector(const int* values, size_t count);
   ///@}

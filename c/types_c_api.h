@@ -125,7 +125,7 @@ extern "C"
    *
    * @param colormap Colormap to free.
    */
-  F3D_EXPORT void f3d_colormap_free(f3d_colormap_t* colormap);
+  F3D_EXPORT void f3d_colormap_destroy(f3d_colormap_t* colormap);
 
   /**
    * @brief Describe a 3D surfacic mesh.
@@ -152,7 +152,7 @@ extern "C"
    * @brief Check validity of a mesh.
    *
    * The returned error message string is heap-allocated and must be freed with
-   * f3d_utils_string_free().
+   * f3d_utils_string_destroy().
    *
    * @param mesh Mesh to validate.
    * @param error_message Pointer to receive error message if invalid.
@@ -285,7 +285,7 @@ extern "C"
    *
    * @param light_state Light state to free.
    */
-  F3D_EXPORT void f3d_light_state_free(f3d_light_state_t* light_state);
+  F3D_EXPORT void f3d_light_state_destroy(f3d_light_state_t* light_state);
 
   /**
    * @brief Compare two light states for equality.

@@ -74,7 +74,7 @@ extern "C"
   /**
    * @brief Create an engine with an automatic window.
    *
-   * The returned engine must be deleted with f3d_engine_delete().
+   * The returned engine must be deleted with f3d_engine_destroy().
    *
    * @param offscreen If non-zero, the window will be hidden.
    * @return Engine handle, NULL on failure.
@@ -84,7 +84,7 @@ extern "C"
   /**
    * @brief Create an engine with no window.
    *
-   * The returned engine must be deleted with f3d_engine_delete().
+   * The returned engine must be deleted with f3d_engine_destroy().
    *
    * @return Engine handle, NULL on failure.
    */
@@ -93,7 +93,7 @@ extern "C"
   /**
    * @brief Create an engine with a GLX window (Linux only).
    *
-   * The returned engine must be deleted with f3d_engine_delete().
+   * The returned engine must be deleted with f3d_engine_destroy().
    *
    * @param offscreen If non-zero, the window will be hidden.
    * @return Engine handle, NULL on failure.
@@ -103,7 +103,7 @@ extern "C"
   /**
    * @brief Create an engine with a WGL window (Windows only).
    *
-   * The returned engine must be deleted with f3d_engine_delete().
+   * The returned engine must be deleted with f3d_engine_destroy().
    *
    * @param offscreen If non-zero, the window will be hidden.
    * @return Engine handle, NULL on failure.
@@ -113,7 +113,7 @@ extern "C"
   /**
    * @brief Create an engine with an offscreen EGL window.
    *
-   * The returned engine must be deleted with f3d_engine_delete().
+   * The returned engine must be deleted with f3d_engine_destroy().
    *
    * @return Engine handle, NULL on failure.
    */
@@ -122,7 +122,7 @@ extern "C"
   /**
    * @brief Create an engine with an offscreen OSMesa window.
    *
-   * The returned engine must be deleted with f3d_engine_delete().
+   * The returned engine must be deleted with f3d_engine_destroy().
    *
    * @return Engine handle, NULL on failure.
    */
@@ -132,7 +132,7 @@ extern "C"
    * @brief Create an engine with an external window.
    *
    * A context to retrieve OpenGL symbols is required.
-   * The returned engine must be deleted with f3d_engine_delete().
+   * The returned engine must be deleted with f3d_engine_destroy().
    *
    * @param get_proc_address Function pointer for OpenGL symbol resolution.
    * @return Engine handle, NULL on failure.
@@ -142,7 +142,7 @@ extern "C"
   /**
    * @brief Create an engine with an external GLX context (Linux only).
    *
-   * The returned engine must be deleted with f3d_engine_delete().
+   * The returned engine must be deleted with f3d_engine_destroy().
    *
    * @return Engine handle, NULL on failure.
    */
@@ -151,7 +151,7 @@ extern "C"
   /**
    * @brief Create an engine with an external WGL context (Windows only).
    *
-   * The returned engine must be deleted with f3d_engine_delete().
+   * The returned engine must be deleted with f3d_engine_destroy().
    *
    * @return Engine handle, NULL on failure.
    */
@@ -160,7 +160,7 @@ extern "C"
   /**
    * @brief Create an engine with an external COCOA context (macOS only).
    *
-   * The returned engine must be deleted with f3d_engine_delete().
+   * The returned engine must be deleted with f3d_engine_destroy().
    *
    * @return Engine handle, NULL on failure.
    */
@@ -169,7 +169,7 @@ extern "C"
   /**
    * @brief Create an engine with an external EGL context.
    *
-   * The returned engine must be deleted with f3d_engine_delete().
+   * The returned engine must be deleted with f3d_engine_destroy().
    *
    * @return Engine handle, NULL on failure.
    */
@@ -178,7 +178,7 @@ extern "C"
   /**
    * @brief Create an engine with an external OSMesa context.
    *
-   * The returned engine must be deleted with f3d_engine_delete().
+   * The returned engine must be deleted with f3d_engine_destroy().
    *
    * @return Engine handle, NULL on failure.
    */
@@ -190,7 +190,7 @@ extern "C"
    *
    * @param engine Engine handle.
    */
-  F3D_EXPORT void f3d_engine_delete(f3d_engine_t* engine);
+  F3D_EXPORT void f3d_engine_destroy(f3d_engine_t* engine);
 
   /**
    * @brief Set the cache path directory.
@@ -204,7 +204,7 @@ extern "C"
   /**
    * @brief Get the cache path directory.
    *
-   * The returned string must be freed with f3d_engine_free_string().
+   * The returned string must be freed with f3d_engine_destroy_string().
    *
    * @param engine Engine handle.
    * @return Cache path string, or NULL on failure.
@@ -228,7 +228,7 @@ extern "C"
    *
    * @param engine Engine handle.
    * @return Heap-allocated JSON string on success, NULL on failure.
-   *         The caller must free it using f3d_engine_free_string().
+   *         The caller must free it using f3d_engine_destroy_string().
    */
   F3D_EXPORT const char* f3d_engine_dump_to_string(f3d_engine_t* engine);
 
@@ -284,7 +284,7 @@ extern "C"
    *
    * @param str String to free.
    */
-  F3D_EXPORT void f3d_engine_free_string(const char* str);
+  F3D_EXPORT void f3d_engine_destroy_string(const char* str);
 
   /**
    * @brief Get the options object from the engine.
@@ -324,7 +324,7 @@ extern "C"
    *
    * Returns a map of backend names with boolean flags indicating availability.
    * The returned array of key-value pairs is NULL-terminated and must be freed
-   * by the caller using f3d_engine_free_backend_list().
+   * by the caller using f3d_engine_destroy_backend_list().
    *
    * @param count Pointer to store the number of backends (optional, can be NULL).
    * @return NULL-terminated array of backend name/availability pairs.
@@ -350,7 +350,7 @@ extern "C"
    *
    * Listed plugins can be loaded using f3d_engine_load_plugin function.
    * The returned array is NULL-terminated and must be freed by the caller using
-   * f3d_engine_free_string_array().
+   * f3d_engine_destroy_string_array().
    *
    * @param plugin_path Path to the directory containing plugin json files.
    * @return NULL-terminated array of plugin name strings, or NULL if the directory doesn't exist.
@@ -364,7 +364,7 @@ extern "C"
    *
    * This vector can be expanded when loading plugins using f3d_engine_load_plugin.
    * The returned array is NULL-terminated and must be freed by the caller using
-   * f3d_engine_free_string_array().
+   * f3d_engine_destroy_string_array().
    *
    * @return NULL-terminated array of option name strings.
    */
@@ -385,14 +385,14 @@ extern "C"
    *
    * @param backends Backend list to free.
    */
-  F3D_EXPORT void f3d_engine_free_backend_list(f3d_backend_info_t* backends);
+  F3D_EXPORT void f3d_engine_destroy_backend_list(f3d_backend_info_t* backends);
   ///@}
 
   ///@{ @name Library information
   /**
    * @brief Get information about the libf3d.
    *
-   * The returned structure must be freed by the caller using f3d_engine_free_lib_info().
+   * The returned structure must be freed by the caller using f3d_engine_destroy_lib_info().
    *
    * @return Library information structure.
    */
@@ -403,13 +403,13 @@ extern "C"
    *
    * @param info Lib info structure to free.
    */
-  F3D_EXPORT void f3d_engine_free_lib_info(f3d_lib_info_t* info);
+  F3D_EXPORT void f3d_engine_destroy_lib_info(f3d_lib_info_t* info);
 
   /**
    * @brief Get information about the supported readers.
    *
    * The returned array is NULL-terminated and must be freed by the caller using
-   * f3d_engine_free_readers_info().
+   * f3d_engine_destroy_readers_info().
    *
    * @param count Pointer to store the number of readers (optional, can be NULL).
    * @return NULL-terminated array of reader information structures.
@@ -421,7 +421,7 @@ extern "C"
    *
    * @param readers Readers info array to free.
    */
-  F3D_EXPORT void f3d_engine_free_readers_info(f3d_reader_info_t* readers);
+  F3D_EXPORT void f3d_engine_destroy_readers_info(f3d_reader_info_t* readers);
   ///@}
 
   ///@{ @name Utility functions
@@ -430,7 +430,7 @@ extern "C"
    *
    * @param array String array to free.
    */
-  F3D_EXPORT void f3d_engine_free_string_array(char** array);
+  F3D_EXPORT void f3d_engine_destroy_string_array(char** array);
   ///@}
 
 #ifdef __cplusplus

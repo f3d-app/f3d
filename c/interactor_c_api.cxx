@@ -719,7 +719,7 @@ void f3d_interactor_trigger_notification(
 }
 
 //----------------------------------------------------------------------------
-void f3d_interactor_free_string_array(char** array, int count)
+void f3d_interactor_destroy_string_array(char** array, int count)
 {
   if (!array)
   {
@@ -734,7 +734,7 @@ void f3d_interactor_free_string_array(char** array, int count)
 }
 
 //----------------------------------------------------------------------------
-void f3d_interactor_free_bind_array(f3d_interaction_bind_t* array)
+void f3d_interactor_destroy_bind_array(f3d_interaction_bind_t* array)
 {
   delete[] array;
 }
