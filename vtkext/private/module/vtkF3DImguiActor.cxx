@@ -254,8 +254,8 @@ struct vtkF3DImguiActor::Internals
       {
         if (tex->RefCount == 1)
         {
-          vtkTextureObject* textureObject = reinterpret_cast<vtkTextureObject*>(tex->GetTexID());
-          textureObject->Delete();
+          tex->SetStatus(ImTextureStatus_WantDestroy);
+          this->UpdateTexture(renWin, tex);
         }
       }
 
@@ -301,7 +301,7 @@ struct vtkF3DImguiActor::Internals
 
       tex->SetStatus(ImTextureStatus_OK);
     }
-    else if (tex->Status == ImTextureStatus_WantDestroy && tex->UnusedFrames > 0)
+    else if (tex->Status == ImTextureStatus_WantDestroy)
     {
       vtkTextureObject* textureObject = reinterpret_cast<vtkTextureObject*>(tex->GetTexID());
       textureObject->Delete();
