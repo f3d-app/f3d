@@ -201,3 +201,35 @@ fs::path F3DSystemTools::GetBinaryResourceDirectory()
 
   return dirPath;
 }
+
+//----------------------------------------------------------------------------
+fs::path F3DSystemTools::GetBinarySysConfDirectory()
+{
+  fs::path dirPath;
+  try
+  {
+    dirPath = F3DSystemTools::GetApplicationPath();
+
+    // transform path to exe to path to install
+    // /install/bin/f3d -> /install
+    dirPath = fs::canonical(dirPath).parent_path().parent_path();
+
+    // See
+    // https://web.archive.org/web/20260729001435/https://www.gnu.org/prep/standards/html_node/Directory-Variables.html/
+    // and https://microos.opensuse.org/blog/2024-08-14-usr-etc/
+    // some distribution may install config files in [install_dir]/etc/f3d
+    // so provide a way to recover this directory easily
+    dirPath /= "etc/f3d";
+  }
+  // LCOV_EXCL_START
+  // Unreachable in testing
+  // but could be reached in a faulty system
+  catch (const fs::filesystem_error&)
+  {
+    f3d::log::debug("Cannot recover binary sys conf directory: ", dirPath.string());
+    return {};
+  }
+  // LCOV_EXCL_STOP
+
+  return dirPath;
+}
