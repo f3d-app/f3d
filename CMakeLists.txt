@@ -235,8 +235,8 @@ mark_as_advanced(F3D_TESTING_FORCE_RENDERING_BACKEND)
 
 # Figure out F3D configuration directory
 if(UNIX AND NOT APPLE)
-  option(F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX "Install the default configuration at the prefix root instead of system wide" OFF)
-  mark_as_advanced(F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
+  option(F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_SYSCONFDIR "Install the default configuration in SYSCONFDIR instead of share/f3d" OFF)
+  mark_as_advanced(F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_SYSCONFDIR)
 endif()
 
 set(f3d_resources_dir "share/f3d")
@@ -247,7 +247,7 @@ endif()
 ## Will be stored in f3dConfig.cmake
 set(f3d_config_dir "${f3d_resources_dir}/configs")
 if (UNIX AND NOT APPLE)
-  if (NOT F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
+  if (F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_SYSCONFDIR)
     set(f3d_config_dir "${CMAKE_INSTALL_FULL_SYSCONFDIR}/f3d")
   endif()
 endif()
