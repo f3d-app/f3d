@@ -7,9 +7,23 @@ This guide explains how to migrate the libf3d code base from v3.5 to v4.0.
 
 ## Packagers
 
+### CMake variables change
+
 `F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX` has been removed in favor of
 `F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_SYSCONFDIR`, which default to `OFF`.
 The default installation location for configuration files is now `/usr/share/f3d/configs`.
+
+### Install components
+
+These components are now installed by default:
+
+- `configuration`
+- `sdk`
+- `plugin_sdk`
+- `mimetypes`
+- `colormaps`
+
+See building documentation for more information.
 
 ## Enable options
 
@@ -69,20 +83,20 @@ The library prefix and extension is not appended automatically anymore.
 
 ## Bindings
 
-## Python
+### Python
 
 The following Python setter methods have been removed in favor of new properties, which can also be read.
 
 - `window.set_position(x, y)` -> `window.position = (x, y)`
 - `engine.set_cache_path(path)` -> `engine.cache_path = path`
 
-## WebAssembly
+### WebAssembly
 
 The following WebAssembly methods have been removed in favor of new properties, which can also be read.
 
 - `engine.setCachePath(path)` -> `engine.cachePath = path`
 
-## C
+### C
 
 Some functions has been renamed for consistency. All functions allocating an object have the word `create` and all functions deleting an object have the word `destroy`.
 
@@ -106,3 +120,7 @@ Other languages API behavior changed accordingly:
 - Java API: `Scene.supports()` used to return a boolean. It now returns the `Scene.FileAvailability` enum and throws `IllegalArgumentException` if the file path is null.
 - Python API: `scene.supports()` used to return bool. Now returns f3d.FileAvailability.
 - Webassembly API: `scene.supports()` used to return bool. Now returns enum FileAvailability.
+
+## Plugin developers
+
+If you were using the VTK extension module with your plugin, headers are now located in `f3d/vtk_ext/` folder instead of `f3d/` directly.

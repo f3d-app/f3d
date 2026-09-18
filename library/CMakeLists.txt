@@ -268,8 +268,7 @@ install(
     "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
   DESTINATION
     "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-  COMPONENT sdk
-  EXCLUDE_FROM_ALL)
+  COMPONENT sdk)
 
 ## Install the rest of the libraries and SDK parts
 if(BUILD_SHARED_LIBS)
@@ -278,7 +277,7 @@ if(BUILD_SHARED_LIBS)
   install(TARGETS libf3d
     EXPORT f3dLibraryTargets
     RUNTIME_DEPENDENCY_SET libf3dDeps
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT sdk EXCLUDE_FROM_ALL
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT sdk
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT library
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library)
 
@@ -294,15 +293,13 @@ if(BUILD_SHARED_LIBS)
   # Install the public headers
   install(FILES ${F3D_PUBLIC_HEADERS}
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/f3d"
-    COMPONENT sdk
-    EXCLUDE_FROM_ALL)
+    COMPONENT sdk)
 
   # Install the library exported targets
   install(EXPORT f3dLibraryTargets
     NAMESPACE f3d::
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-    COMPONENT sdk
-    EXCLUDE_FROM_ALL)
+    COMPONENT sdk)
 
   # Install library cmake files
   install(
@@ -311,8 +308,7 @@ if(BUILD_SHARED_LIBS)
       "${F3D_SOURCE_DIR}/cmake/f3dEmbed.cmake"
     DESTINATION
       "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-    COMPONENT sdk
-    EXCLUDE_FROM_ALL)
+    COMPONENT sdk)
 
   # Install a pkg-config file for libf3d
   # CMAKE_INSTALL_PREFIX may be a relative path (e.g. resolved against the build
@@ -325,14 +321,12 @@ if(BUILD_SHARED_LIBS)
     @ONLY)
   install(FILES "${CMAKE_BINARY_DIR}/cmake/f3d.pc"
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
-    COMPONENT sdk
-    EXCLUDE_FROM_ALL)
+    COMPONENT sdk)
 
   # Install plugin headers
   install(FILES ${F3D_PLUGIN_HEADERS}
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/f3d"
-    COMPONENT plugin_sdk
-    EXCLUDE_FROM_ALL)
+    COMPONENT plugin_sdk)
 
   # Install pluginsdk cmake and source files
   install(
@@ -346,7 +340,6 @@ if(BUILD_SHARED_LIBS)
       "${F3D_SOURCE_DIR}/cmake/readerBoilerPlate.h.in"
     DESTINATION
       "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-    COMPONENT plugin_sdk
-    EXCLUDE_FROM_ALL)
+    COMPONENT plugin_sdk)
 
 endif()

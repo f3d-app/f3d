@@ -96,8 +96,7 @@ if (BUILD_SHARED_LIBS)
     NAMESPACE f3d::
     FILE f3dCApiTargets.cmake
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-    COMPONENT sdk EXCLUDE_FROM_ALL
-  )
+    COMPONENT sdk)
 
   file(COPY "${F3D_SOURCE_DIR}/cmake/c_api-config.cmake"
     DESTINATION "${CMAKE_BINARY_DIR}/cmake")
@@ -107,7 +106,7 @@ if (BUILD_SHARED_LIBS)
     "${F3D_SOURCE_DIR}/cmake/c_api-config.cmake"
     DESTINATION
     "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-    COMPONENT sdk EXCLUDE_FROM_ALL)
+    COMPONENT sdk)
 
   # pkg-config
   # CMAKE_INSTALL_PREFIX may be a relative path (e.g. resolved against the build
@@ -120,5 +119,5 @@ if (BUILD_SHARED_LIBS)
     @ONLY)
   install(FILES "${CMAKE_BINARY_DIR}/cmake/f3d_c_api.pc"
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
-    COMPONENT sdk EXCLUDE_FROM_ALL)
+    COMPONENT sdk)
 endif ()
