@@ -130,6 +130,12 @@ public:
   void ResetTemporaryUp();
 
   /**
+   * Implementation only API.
+   * Set the directory for XR resources
+   */
+  void SetXRResourcesDirectory(const std::string& actionsManifestDirectory);
+
+  /**
    * Event loop being called automatically once the interactor is started
    * First call the EventLoopUserCallback, then call render if requested.
    */

@@ -86,6 +86,7 @@ find_package(VTK 9.4.0 REQUIRED
     IOOpenVDB
     IOPDAL
     RenderingGridAxes
+    RenderingOpenXR
     RenderingRayTracing)
 message(STATUS "VTK ${VTK_VERSION} found")
 
@@ -99,6 +100,7 @@ endif()
 
 # Modules
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
+option(F3D_MODULE_OPENXR "OpenXR module" OFF)
 option(F3D_MODULE_EXR "OpenEXR images module" OFF)
 option(F3D_MODULE_WEBP "WebP images module" OFF)
 option(F3D_MODULE_UI "ImGui widgets module" ON)
@@ -344,6 +346,7 @@ f3d_report_variable(F3D_BINDINGS_PYTHON)
 f3d_report_variable(F3D_BUILD_APPLICATION)
 f3d_report_variable(F3D_MODULE_EXR)
 f3d_report_variable(F3D_MODULE_RAYTRACING)
+f3d_report_variable(F3D_MODULE_OPENXR)
 f3d_report_variable(F3D_MODULE_UI)
 f3d_report_variable(F3D_MODULE_WEBP)
 f3d_report_variable(F3D_PLUGIN_BUILD_ALEMBIC)
