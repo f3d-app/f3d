@@ -24,7 +24,7 @@ int test_video()
   if (!window)
   {
     puts("[ERROR] Failed to get window");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return 1;
   }
 
@@ -57,7 +57,7 @@ int test_video()
   if (!encoder)
   {
     puts("[ERROR] Failed to create video encoder");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return 1;
   }
 
@@ -68,7 +68,7 @@ int test_video()
   if (!video_frame)
   {
     puts("[ERROR] Failed to get video frame");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return 1;
   }
 
@@ -83,10 +83,10 @@ int test_video()
   if (ts != 42)
   {
     puts("[ERROR] Video packet callback was not called with the expected timestamp");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return 1;
   }
 
-  f3d_engine_delete(engine);
+  f3d_engine_destroy(engine);
   return 0;
 }

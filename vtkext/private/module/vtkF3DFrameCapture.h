@@ -38,7 +38,7 @@ public:
    * - U plane: (width / 2) * (height / 2) bytes
    * - V plane: (width / 2) * (height / 2) bytes
    */
-  void Capture(vtkOpenGLRenderer* ren, std::byte* y, std::byte* u, std::byte* v);
+  void Capture(vtkOpenGLRenderer* ren, std::byte* yPlane, std::byte* uPlane, std::byte* vPlane);
 
   /**
    * Release graphics resources.

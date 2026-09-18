@@ -13,6 +13,10 @@ If `-` is specified instead of a filename, the file will be streamed from the st
 
 Instead of showing a render view and render into it, _render directly into a png file_. When used with --ref option, only outputs on failure. If `-` is specified instead of a filename, the PNG file is streamed to the stdout. Can use [template variables](#filename-templating). When using the `{frame}` variable, multiple animation frames are exported (see [Exporting animation frames](05-ANIMATIONS.md#exporting-animation-frames)).
 
+### `--out-video=<video file>` (_string_)
+
+Instead of showing a render view and render to it, _render directly into a video file_. If `-` is specified instead of a filename, the video file is streamed to the stdout. The resulting file contains raw video frames and can be converted to a video container (e.g. MP4) using FFmpeg for example.
+
 ### `--no-background` (_bool_, default: `false`)
 
 Use with --output to output a png file with a transparent background.
