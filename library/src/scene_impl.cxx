@@ -168,7 +168,7 @@ public:
           ? std::to_string(progressData->importerCount) + " files"
           : progressData->fileName;
 
-        int percentage = 100 * progress;
+        int percentage = std::round(100 * progress);
 
         progressData->timer->StopTimer();
 
