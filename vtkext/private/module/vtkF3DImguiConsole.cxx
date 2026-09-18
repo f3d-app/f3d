@@ -299,8 +299,11 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
           "LogRegion", ImVec2(0, -reservedHeight), 0, ImGuiWindowFlags_HorizontalScrollbar))
     {
       ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1)); // Tighten spacing
-      for (const auto& [severity, msg] : this->Pimpl->Logs)
+      ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+
+      for (int logId = 0; logId < static_cast<int>(this->Pimpl->Logs.size()); ++logId)
       {
+        const auto& [severity, msg] = this->Pimpl->Logs[logId];
         bool hasColor = true;
 
         if (this->GetUseColoring())
@@ -328,7 +331,21 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
           hasColor = false;
         }
 
-        ImGui::TextUnformatted(msg.c_str());
+        std::string id = "##log" + std::to_string(logId);
+
+        ImVec2 textSize = ImGui::CalcTextSize(msg.c_str());
+
+        size_t trailingNewlines = 0;
+        for (auto it = msg.rbegin(); it != msg.rend() && *it == '\n'; ++it)
+        {
+          ++trailingNewlines;
+        }
+
+        textSize.y += trailingNewlines * ImGui::GetTextLineHeightWithSpacing();
+
+        ImGui::InputTextMultiline(id.c_str(), const_cast<char*>(msg.c_str()), msg.size() + 1,
+          textSize, ImGuiInputTextFlags_ReadOnly);
+
         if (hasColor)
         {
           ImGui::PopStyleColor();
@@ -346,7 +363,7 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
         ImGui::SetScrollHereY(1.0f);
       }
 
-      ImGui::PopStyleVar();
+      ImGui::PopStyleVar(2);
     }
     ImGui::EndChild();
 

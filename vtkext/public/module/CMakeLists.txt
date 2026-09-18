@@ -42,3 +42,14 @@ vtk_module_add_module(f3d::vtkext
   SOURCES ${sources}
   PRIVATE_HEADERS ${private_headers}
   )
+
+if (F3D_MODULE_CLIP)
+  if (F3D_USE_EXTERNAL_CLIP)
+    vtk_module_link(f3d::vtkext PRIVATE clip::clip)
+  else ()
+    vtk_module_link(f3d::vtkext PRIVATE clip)
+    vtk_module_include(f3d::vtkext PRIVATE $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external>)
+  endif ()
+
+  vtk_module_definitions(f3d::vtkext PRIVATE F3D_MODULE_CLIP)
+endif ()
