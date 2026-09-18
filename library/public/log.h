@@ -98,9 +98,9 @@ public:
   template<typename... Args>
   static void progress(Args... args)
   {
-      std::stringstream ss;
-      log::appendArg(ss, args...);
-      log::progressInternal(ss.str());
+    std::stringstream ss;
+    log::appendArg(ss, args...);
+    log::progressInternal(ss.str());
   }
 
   /**
