@@ -10,6 +10,10 @@
 #include <charconv>
 #include <stdexcept>
 
+#ifdef F3D_MODULE_CLIP
+#include "clip/clip.h"
+#endif
+
 //----------------------------------------------------------------------------
 double F3DUtils::ParseToDouble(const std::string& str, double def, const std::string& nameError)
 {
@@ -56,4 +60,25 @@ int F3DUtils::ParseToInt(const std::string& str, int def, const std::string& nam
     }
   }
   return value;
+}
+
+//----------------------------------------------------------------------------
+bool F3DUtils::CopyToClipboard(const std::string& text)
+{
+#ifdef F3D_MODULE_CLIP
+  return clip::set_text(text);
+#else
+  return false;
+#endif
+}
+
+//----------------------------------------------------------------------------
+bool F3DUtils::GetFromClipboard(std::string& text)
+{
+#ifdef F3D_MODULE_CLIP
+  return clip::get_text(text);
+#else
+  text.clear();
+  return false;
+#endif
 }

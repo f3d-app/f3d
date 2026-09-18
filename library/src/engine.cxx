@@ -10,6 +10,7 @@
 #include "utils.h"
 #include "window_impl.h"
 
+#include "F3DUtils.h"
 #include "vtkF3DNoRenderWindow.h"
 
 #include <vtkVersion.h>
@@ -22,10 +23,6 @@
 #include <vtksys/SystemTools.hxx>
 
 #include <nlohmann/json.hpp>
-
-#if F3D_MODULE_CLIP
-#include "clip/clip.h"
-#endif
 
 #include <algorithm>
 #include <fstream>
@@ -392,23 +389,13 @@ engine::state engine::state::fromClipboard()
 {
 #if F3D_MODULE_CLIP
   std::string content;
-  try
+  if (!F3DUtils::GetFromClipboard(content))
   {
-    if (!clip::get_text(content))
-    {
-      // Cannot test clipboard failure in the CI
-      // LCOV_EXCL_START
-      throw engine::statefile_exception("Could not read a state from the clipboard");
-      // LCOV_EXCL_STOP
-    }
+    // Cannot test clipboard failure in the CI
+    // LCOV_EXCL_START
+    throw engine::statefile_exception("Could not read a state from the clipboard");
+    // LCOV_EXCL_STOP
   }
-  // Cannot test clipboard failure in the CI
-  // LCOV_EXCL_START
-  catch (const clip::clip_exception& ex)
-  {
-    throw engine::statefile_exception(std::string("Could not use clip: ") + ex.what());
-  }
-  // LCOV_EXCL_STOP
   return engine::state::fromString(content);
 #else
   throw engine::statefile_exception(
@@ -448,21 +435,11 @@ void engine::state::toFile(const fs::path& filePath) const
 void engine::state::toClipboard() const
 {
 #if F3D_MODULE_CLIP
-  try
-  {
-    if (!clip::set_text(this->Content))
-    {
-      // Cannot test clipboard failure in the CI
-      // LCOV_EXCL_START
-      throw engine::statefile_exception("Could not copy the state to the clipboard");
-      // LCOV_EXCL_STOP
-    }
-  }
-  catch (const clip::clip_exception& ex)
+  if (!F3DUtils::CopyToClipboard(this->Content))
   {
     // Cannot test clipboard failure in the CI
     // LCOV_EXCL_START
-    throw engine::statefile_exception(std::string("Could not use clip: ") + ex.what());
+    throw engine::statefile_exception("Could not copy the state to the clipboard");
     // LCOV_EXCL_STOP
   }
 
