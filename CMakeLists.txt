@@ -314,13 +314,8 @@ if (UNIX AND NOT APPLE AND NOT ANDROID)
   set(F3D_LIC_DIR ${CMAKE_INSTALL_DOCDIR})
 endif()
 
-install(FILES LICENSE.md
+install(FILES LICENSE.md THIRD_PARTY_LICENSES.md
   DESTINATION ${F3D_LIC_DIR} COMPONENT licenses)
-
-if (F3D_BUILD_APPLICATION)
-  install(FILES THIRD_PARTY_LICENSES.md
-    DESTINATION ${F3D_LIC_DIR} COMPONENT licenses)
-endif ()
 
 # Check that a LFS data file is big enough to be an actual file
 file(SIZE "${F3D_SOURCE_DIR}/testing/data/dragon.vtu" f3d_lfs_file_size)

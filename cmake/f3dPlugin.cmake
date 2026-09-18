@@ -380,8 +380,7 @@ macro(f3d_plugin_build)
     install(
       DIRECTORY "${config_dir}"
       DESTINATION "${_f3d_config_dir}"
-      COMPONENT configuration
-      EXCLUDE_FROM_ALL)
+      COMPONENT configuration)
   endforeach()
 
   # Install resource files and copy them into the build directory
@@ -403,8 +402,7 @@ macro(f3d_plugin_build)
     foreach(mimetype_xml ${F3D_PLUGIN_MIMETYPE_XML_FILES})
       install(FILES "${mimetype_xml}"
         DESTINATION "share/mime/packages"
-        COMPONENT mimetypes
-        EXCLUDE_FROM_ALL)
+        COMPONENT mimetypes)
     endforeach()
 
     if(F3D_PLUGIN_FREEDESKTOP AND "${_f3d_has_application}")

@@ -30,8 +30,7 @@ vtk_module_build(
   INSTALL_EXPORT ${export_name}
   INSTALL_HEADERS ON
   HEADERS_COMPONENT ${headers_component}
-  HEADERS_EXCLUDE_FROM_ALL ON
-  HEADERS_DESTINATION "include/f3d"
+  HEADERS_DESTINATION "include/f3d/vtk_ext"
   TARGETS_COMPONENT library
   PACKAGE "f3d_vtkext")
 

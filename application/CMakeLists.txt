@@ -248,7 +248,7 @@ if(UNIX AND NOT APPLE)
       add_custom_target(man ALL DEPENDS ${MAN_OUTPUT_FILE})
 
       install(FILES "${CMAKE_BINARY_DIR}/f3d.1.gz"
-        DESTINATION "share/man/man1/" COMPONENT documentation)
+        DESTINATION "${CMAKE_INSTALL_MANDIR}/man1/" COMPONENT documentation)
     else()
       message(FATAL_ERROR "help2man or gzip not found, cannot create man entry, please disable F3D_LINUX_GENERATE_MAN or install them")
     endif()
@@ -277,30 +277,26 @@ endif()
 install(EXPORT f3dTargets
   NAMESPACE f3d::
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-  COMPONENT sdk
-  EXCLUDE_FROM_ALL)
+  COMPONENT sdk)
 
 install(
   FILES
     "${F3D_SOURCE_DIR}/cmake/application-config.cmake"
   DESTINATION
     "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-  COMPONENT sdk
-  EXCLUDE_FROM_ALL)
+  COMPONENT sdk)
 
 # Default config files
 install(
   DIRECTORY "${F3D_SOURCE_DIR}/resources/configs/"
   DESTINATION "${f3d_config_dir}"
-  COMPONENT configuration
-  EXCLUDE_FROM_ALL)
+  COMPONENT configuration)
 
 # Default color maps
 install(
   DIRECTORY "${F3D_SOURCE_DIR}/resources/colormaps/"
   DESTINATION "${f3d_resources_dir}/colormaps"
-  COMPONENT colormaps
-  EXCLUDE_FROM_ALL)
+  COMPONENT colormaps)
 
 # Other ressoure files
 if(UNIX AND NOT APPLE AND NOT ANDROID)
