@@ -169,6 +169,7 @@ public:
           : progressData->fileName;
 
         int percentage = std::round(100 * progress);
+        std::string percentageStr = std::format("{:3}", percentage);
 
         progressData->timer->StopTimer();
 
@@ -182,7 +183,7 @@ public:
         std::string time = std::format(
           "{:02}:{:02}/{:02}:{:02}", elapsedMin, elapsedSec, estimatedMin, estimatedSec);
 
-        f3d::log::progress("\rLoading ", filename, " : ", percentage, "% |", bar, "| [", time, "]");
+        f3d::log::progress("\rLoading ", filename, " : ", percentageStr, "% |", bar, "| [", time, "]");
 
         if (progress >= 1.0)
         {
