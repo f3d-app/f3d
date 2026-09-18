@@ -48,7 +48,7 @@ Not every binary ships every plugin, so a file may open in one binary but not an
 | `alembic` |   Yes   |     Yes      |        No         |        Yes         |
 | `assimp`  |   Yes   |     Yes      |        Yes        |        Yes         |
 | `draco`   |   Yes   |     Yes      |        Yes        |        Yes         |
-| `hdf`     |   Yes   |     Yes      |        No         |        Yes         |
+| `hdf`     |   Yes   |     Yes      |        Yes        |        Yes         |
 | `occt`    |   Yes   |     Yes      |        Yes        |        Yes         |
 | `pdal`    |   Yes   |      No      |        No         |         No         |
 | `usd`     |   Yes   |      No      |        No         | Yes (64-bits only) |
