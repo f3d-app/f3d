@@ -5,7 +5,7 @@ This guide explains how to migrate the libf3d code base from v3.5 to v4.0.
 > [!WARNING]
 > This guide assumes all deprecation warnings have been addressed, since the deprecated APIs have been removed.
 
-## Build
+## Packagers
 
 `F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX` has been removed in favor of
 `F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_SYSCONFDIR`, which default to `OFF`.
