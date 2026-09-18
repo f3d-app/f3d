@@ -358,6 +358,11 @@
           "longName": "normal-glyphs-scale",
           "helpText": "Scale normal glyphs",
           "valueHelper": "<ratio>"
+        },
+        {
+          "longName": "normal-glyphs-color",
+          "helpText": "Color of normal glyphs",
+          "valueHelper": "<color>"
         }
       ]
     },
