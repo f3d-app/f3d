@@ -420,6 +420,16 @@ f3d_plugin_declare_reader(
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/ply.inl"
 )
 
+f3d_plugin_declare_reader(
+  NAME LYS
+  EXTENSIONS lys
+  MIMETYPES application/vnd.lys
+  VTK_READER vtkF3DLYSReader
+  FORMAT_DESCRIPTION "Lychee Slicer"
+  ${_SUPPORTS_STREAM}
+  CAN_READ STATIC
+)
+
 f3d_plugin_build(
   NAME native
   VERSION 1.0
