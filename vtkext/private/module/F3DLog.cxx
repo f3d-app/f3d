@@ -48,19 +48,19 @@ void F3DLog::Print(Severity sev, const std::string& str)
   }
 }
 //----------------------------------------------------------------------------
-void F3DLog::Progress(const std::string &str)
+void F3DLog::Progress(const std::string& str)
 {
-    if(F3DLog::VerboseLevel > F3DLog::Severity::Info)
-    {
-        return;
-    }
+  if (F3DLog::VerboseLevel > F3DLog::Severity::Info)
+  {
+    return;
+  }
 
-    vtkOutputWindow* win = vtkOutputWindow::GetInstance();
-    vtkF3DConsoleOutputWindow* consoleWin = vtkF3DConsoleOutputWindow::SafeDownCast(win);
-    if(consoleWin)
-    {
-        consoleWin->DisplayText(str.c_str());
-    }
+  vtkOutputWindow* win = vtkOutputWindow::GetInstance();
+  vtkF3DConsoleOutputWindow* consoleWin = vtkF3DConsoleOutputWindow::SafeDownCast(win);
+  if (consoleWin)
+  {
+    consoleWin->DisplayText(str.c_str());
+  }
 }
 
 //----------------------------------------------------------------------------

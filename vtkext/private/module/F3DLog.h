@@ -43,7 +43,6 @@ extern Severity VerboseLevel;
  */
 void Print(Severity sev, const std::string& msg);
 
-
 /**
  * Prints progression bar output
  */
