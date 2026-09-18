@@ -81,6 +81,15 @@ void log::errorInternal(const std::string& str)
   detail::init::initialize();
   F3DLog::Print(F3DLog::Severity::Error, str);
 }
+//----------------------------------------------------------------------------
+void log::progressInternal(const std::string& str)
+{
+  detail::init::initialize();
+  bool prevNewLineState = log::getAppendNewLine();
+  log::setAppendNewLine(false);
+  F3DLog::Progress(str);
+  log::setAppendNewLine(prevNewLineState);
+}
 
 //----------------------------------------------------------------------------
 void log::setUseColoring(bool use)
