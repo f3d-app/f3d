@@ -182,6 +182,11 @@ if (MSVC)
   vtk_module_compile_options(f3d::vtkextPrivate PRIVATE /utf-8)
 endif()
 
+# anari
+if (F3D_MODULE_ANARI)
+  vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_ANARI)
+endif ()
+
 # raytracing
 if (F3D_MODULE_RAYTRACING)
   vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_RAYTRACING)

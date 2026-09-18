@@ -29,6 +29,15 @@ if(F3D_MODULE_RAYTRACING)
   endif()
 endif()
 
+if(F3D_MODULE_ANARI)
+  if(TARGET VTK::RenderingAnari)
+    message(STATUS "VTK::RenderingAnari module found")
+    set(F3D_VTK_MODULES ${F3D_VTK_MODULES} VTK::RenderingAnari)
+  else()
+    message(FATAL_ERROR "F3D_MODULE_ANARI option is enabled but VTK::RenderingAnari is not found")
+  endif()
+endif()
+
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/src/config.cxx.in"
   "${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx"
@@ -211,6 +220,11 @@ endif ()
 # clip
 if (F3D_MODULE_CLIP)
   target_compile_definitions(libf3d PRIVATE F3D_MODULE_CLIP)
+endif ()
+
+# anari
+if (F3D_MODULE_ANARI)
+  target_compile_definitions(libf3d PRIVATE F3D_MODULE_ANARI)
 endif ()
 
 # raytracing
