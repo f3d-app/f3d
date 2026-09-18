@@ -1,5 +1,5 @@
 /**
- * @class   F3DOCCTPolyData
+ * @class   F3DOCCTShapeConverter
  * @brief   Namespace converting a meshed OCCT shape into a vtkPolyData
  *
  * Shared by the OCCT based readers: the shape is meshed with the provided
@@ -8,8 +8,8 @@
  * given, RGBA cell colors.
  */
 
-#ifndef F3DOCCTPolyData_h
-#define F3DOCCTPolyData_h
+#ifndef F3DOCCTShapeConverter_h
+#define F3DOCCTShapeConverter_h
 
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
@@ -21,7 +21,7 @@
 #include <array>
 #include <functional>
 
-namespace F3DOCCTPolyData
+namespace F3DOCCTShapeConverter
 {
 using Color = std::array<unsigned char, 4>;
 
@@ -49,7 +49,7 @@ struct ColorProviders
  * Mesh the shape and convert it into a polydata.
  * Point coordinates and normals are expressed in the shape location.
  */
-vtkSmartPointer<vtkPolyData> Create(
+vtkSmartPointer<vtkPolyData> ToPolyData(
   const TopoDS_Shape& shape, const MeshingOptions& options, const ColorProviders& colors = {});
 }
 

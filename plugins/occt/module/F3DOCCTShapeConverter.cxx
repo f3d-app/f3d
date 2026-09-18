@@ -1,4 +1,4 @@
-#include "F3DOCCTPolyData.h"
+#include "F3DOCCTShapeConverter.h"
 
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
@@ -25,10 +25,10 @@
 #include <numeric>
 #include <vector>
 
-namespace F3DOCCTPolyData
+namespace F3DOCCTShapeConverter
 {
 //----------------------------------------------------------------------------
-vtkSmartPointer<vtkPolyData> Create(
+vtkSmartPointer<vtkPolyData> ToPolyData(
   const TopoDS_Shape& shape, const MeshingOptions& options, const ColorProviders& colors)
 {
   vtkNew<vtkPoints> points;

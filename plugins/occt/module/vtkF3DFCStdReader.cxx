@@ -1,6 +1,6 @@
 #include "vtkF3DFCStdReader.h"
 
-#include "F3DOCCTPolyData.h"
+#include "F3DOCCTShapeConverter.h"
 #include "vtkF3DArchiveReader.h"
 
 #include <vtkByteSwap.h>
@@ -710,7 +710,7 @@ public:
   //----------------------------------------------------------------------------
   vtkSmartPointer<vtkPolyData> CreatePolyData(const TopoDS_Shape& shape, const FCObject& obj)
   {
-    F3DOCCTPolyData::MeshingOptions options;
+    F3DOCCTShapeConverter::MeshingOptions options;
     options.LinearDeflection = this->Parent->GetLinearDeflection();
     options.AngularDeflection = this->Parent->GetAngularDeflection();
     options.RelativeDeflection = this->Parent->GetRelativeDeflection();
@@ -720,21 +720,21 @@ public:
     NCollection_IndexedMap<TopoDS_Shape, TopTools_ShapeMapHasher> faceMap;
     TopExp::MapShapes(shape, TopAbs_FACE, faceMap);
 
-    F3DOCCTPolyData::ColorProviders colors;
+    F3DOCCTShapeConverter::ColorProviders colors;
     colors.Face = [&faceMap, &obj](const TopoDS_Face& face)
     {
       const unsigned char alpha = static_cast<unsigned char>(255 * (100 - obj.Transparency) / 100);
       const int faceIndex = faceMap.FindIndex(face) - 1;
       if (faceIndex >= 0 && static_cast<size_t>(faceIndex) < obj.FaceColors.size())
       {
-        F3DOCCTPolyData::Color rgba = obj.FaceColors[faceIndex];
+        F3DOCCTShapeConverter::Color rgba = obj.FaceColors[faceIndex];
         rgba[3] = std::min(rgba[3], alpha);
         return rgba;
       }
       const std::array<unsigned char, 3> objColor = obj.Color.value_or(DEFAULT_COLOR);
-      return F3DOCCTPolyData::Color{ objColor[0], objColor[1], objColor[2], alpha };
+      return F3DOCCTShapeConverter::Color{ objColor[0], objColor[1], objColor[2], alpha };
     };
-    return F3DOCCTPolyData::Create(shape, options, colors);
+    return F3DOCCTShapeConverter::ToPolyData(shape, options, colors);
   }
 
   //----------------------------------------------------------------------------

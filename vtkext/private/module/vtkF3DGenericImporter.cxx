@@ -608,13 +608,7 @@ void vtkF3DGenericImporter::ImportPartitionedDataSet(int nodeid,
   const std::string& pdsName)
 {
   vtkPartitionedDataSet* pds = pdc->GetPartitionedDataSet(index);
-  if (!pds)
-  {
-    // Unreachable in testing: the vtkPartitionedDataSetCollection API never stores a null dataset
-    // LCOV_EXCL_START
-    return;
-    // LCOV_EXCL_STOP
-  }
+  assert(pds);
 
   std::string name = pdsName;
   if (name.empty() && pdc->HasMetaData(index))

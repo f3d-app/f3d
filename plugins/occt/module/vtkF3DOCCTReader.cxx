@@ -1,6 +1,6 @@
 #include "vtkF3DOCCTReader.h"
 
-#include "F3DOCCTPolyData.h"
+#include "F3DOCCTShapeConverter.h"
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
@@ -86,18 +86,18 @@ public:
   vtkSmartPointer<vtkPolyData> CreateShape(const TopoDS_Shape& shape)
 #endif
   {
-    F3DOCCTPolyData::MeshingOptions options;
+    F3DOCCTShapeConverter::MeshingOptions options;
     options.LinearDeflection = this->Parent->GetLinearDeflection();
     options.AngularDeflection = this->Parent->GetAngularDeflection();
     options.RelativeDeflection = this->Parent->GetRelativeDeflection();
     options.ReadWire = this->Parent->GetReadWire();
 
-    F3DOCCTPolyData::ColorProviders colors;
+    F3DOCCTShapeConverter::ColorProviders colors;
 #if F3D_PLUGIN_OCCT_XCAF
     const StyleMap inheritedStyles = this->CollectInheritedStyles(label, shape);
     colors.Face = [&inheritedStyles](const TopoDS_Face& face)
     {
-      F3DOCCTPolyData::Color rgba = { 255, 255, 255, 255 };
+      F3DOCCTShapeConverter::Color rgba = { 255, 255, 255, 255 };
       try
       {
         const auto& style = inheritedStyles.FindFromKey(face);
@@ -114,7 +114,7 @@ public:
     };
     colors.Edge = [&inheritedStyles](const TopoDS_Edge& edge)
     {
-      F3DOCCTPolyData::Color rgba = { 0, 0, 0, 255 };
+      F3DOCCTShapeConverter::Color rgba = { 0, 0, 0, 255 };
       try
       {
         const auto& style = inheritedStyles.FindFromKey(edge);
@@ -130,12 +130,12 @@ public:
       return rgba;
     };
 #endif
-    return F3DOCCTPolyData::Create(shape, options, colors);
+    return F3DOCCTShapeConverter::ToPolyData(shape, options, colors);
   }
 
 #if F3D_PLUGIN_OCCT_XCAF
   //----------------------------------------------------------------------------
-  static F3DOCCTPolyData::Color ToColor(const Quantity_Color& color)
+  static F3DOCCTShapeConverter::Color ToColor(const Quantity_Color& color)
   {
     double rgb[3];
     color.Values(rgb[0], rgb[1], rgb[2], Quantity_TOC_sRGB);
