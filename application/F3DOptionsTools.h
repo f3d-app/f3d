@@ -34,6 +34,7 @@ static inline const OptionsDict DefaultAppOptions = {
   { "config", "" },
   { "no-config", "false" },
   { "no-render", "false" },
+  { "no-cache", "false" },
   { "load-statefile", "" },
   { "save-statefile", "" },
   { "statefile-filename", "" },

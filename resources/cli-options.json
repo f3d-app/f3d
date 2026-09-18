@@ -31,6 +31,12 @@
           "implicitValue": "1"
         },
         {
+          "longName": "no-cache",
+          "helpText": "No window geometry cache read/write",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
           "longName": "help",
           "shortName": "h",
           "helpText": "Print help"
