@@ -50,7 +50,7 @@ void F3DLog::Print(Severity sev, const std::string& str)
 //----------------------------------------------------------------------------
 void F3DLog::Progress(const std::string& str)
 {
-  if (F3DLog::VerboseLevel > F3DLog::Severity::Info)
+  if (F3DLog::VerboseLevel > F3DLog::Severity::Debug)
   {
     return;
   }
