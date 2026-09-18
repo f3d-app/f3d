@@ -30,6 +30,20 @@ VTKEXT_EXPORT double ParseToDouble(
  * Use nameError in the log for easier debugging.
  */
 VTKEXT_EXPORT int ParseToInt(const std::string& str, int def, const std::string& nameError);
+
+/**
+ * Copy the text to clipboard.
+ * Returns true if the text was successfully copied, false otherwise.
+ * Does nothing if F3D_MODULE_CLIP is not enabled.
+ */
+VTKEXT_EXPORT bool CopyToClipboard(const std::string& text);
+
+/**
+ * Get the text from the clipboard.
+ * Returns false if F3D_MODULE_CLIP is not enabled, true otherwise.
+ * The text parameter will contain the clipboard content if available.
+ */
+VTKEXT_EXPORT bool GetFromClipboard(std::string& text);
 };
 
 #endif

@@ -1,6 +1,7 @@
 #include "vtkF3DImguiConsole.h"
 
 #include "F3DStyle.h"
+#include "F3DUtils.h"
 #include "vtkF3DUserEvents.h"
 
 #include <vtkCallbackCommand.h>
@@ -12,6 +13,7 @@
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <cstdint>
 
 struct vtkF3DImguiConsole::Internals
@@ -37,6 +39,7 @@ struct vtkF3DImguiConsole::Internals
   std::pair<std::string, int> LastInput; // Last input before navigating history
   int CommandHistoryIndexInv = -1;       // Current inverted index in command history navigation
   bool ScrollToBottom = false;
+  std::chrono::system_clock::time_point LastCopyTime;
 
   /**
    * Clear completions from the logs
@@ -298,9 +301,24 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
     if (ImGui::BeginChild(
           "LogRegion", ImVec2(0, -reservedHeight), 0, ImGuiWindowFlags_HorizontalScrollbar))
     {
-      ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1)); // Tighten spacing
-      for (const auto& [severity, msg] : this->Pimpl->Logs)
+      // tighten spacing for log entries
+      ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+      ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+
+      std::string currentText;
+
+      for (size_t logId = 0; logId < this->Pimpl->Logs.size(); ++logId)
       {
+        const auto& [severity, msg] = this->Pimpl->Logs[logId];
+
+        currentText += msg;
+
+        if (logId != this->Pimpl->Logs.size() - 1 && severity == this->Pimpl->Logs[logId + 1].first)
+        {
+          currentText += '\n';
+          continue;
+        }
+
         bool hasColor = true;
 
         if (this->GetUseColoring())
@@ -328,11 +346,22 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
           hasColor = false;
         }
 
-        ImGui::TextUnformatted(msg.c_str());
+        std::string id = "##log" + std::to_string(logId);
+
+        ImVec2 textSize = ImGui::CalcTextSize(currentText.c_str());
+
+        const size_t lineCount = std::ranges::count(currentText, '\n') + 1;
+        textSize.y = static_cast<float>(lineCount) * ImGui::GetTextLineHeightWithSpacing();
+
+        ImGui::InputTextMultiline(id.c_str(), const_cast<char*>(currentText.c_str()),
+          currentText.size() + 1, textSize, ImGuiInputTextFlags_ReadOnly);
+
         if (hasColor)
         {
           ImGui::PopStyleColor();
         }
+
+        currentText.clear();
       }
 
       if (this->Pimpl->ScrollToBottom)
@@ -346,7 +375,61 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
         ImGui::SetScrollHereY(1.0f);
       }
 
-      ImGui::PopStyleVar();
+      ImGui::PopStyleVar(2);
+
+      // copy button
+#ifdef F3D_MODULE_CLIP
+      ImVec2 old = ImGui::GetCursorScreenPos();
+
+      ImVec2 winPos = ImGui::GetWindowPos();
+      ImVec2 winSize = ImGui::GetWindowSize();
+
+      ImVec2 btnSize(48, 48);
+      ImVec2 btnPos(winPos.x + winSize.x - btnSize.x - 10, winPos.y + 10);
+      ImGui::SetCursorScreenPos(btnPos);
+
+      bool hovered =
+        ImGui::IsMouseHoveringRect(btnPos, ImVec2(btnPos.x + btnSize.x, btnPos.y + btnSize.y));
+
+      ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
+      ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+      ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+      ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+      ImGui::SetWindowFontScale(48.0f / ImGui::GetFontSize());
+
+      std::string buttonIcon = "\uebcc";
+
+      auto currentTime = std::chrono::system_clock::now();
+      if (currentTime - this->Pimpl->LastCopyTime < std::chrono::seconds(1))
+      {
+        buttonIcon = "\ueab2";
+        ImGui::PushStyleColor(ImGuiCol_Text, F3DStyle::imgui::GetCompletionColor());
+      }
+      else
+      {
+        ImGui::PushStyleColor(ImGuiCol_Text,
+          hovered ? F3DStyle::imgui::GetHighlightColor() : ImGui::GetStyleColorVec4(ImGuiCol_Text));
+      }
+
+      if (ImGui::Button(buttonIcon.c_str(), btnSize))
+      {
+        std::string logs;
+        for (const auto& [_, text] : this->Pimpl->Logs)
+        {
+          logs += text;
+          logs += '\n';
+        }
+        F3DUtils::CopyToClipboard(logs);
+        this->Pimpl->LastCopyTime = currentTime;
+      }
+
+      ImGui::SetWindowFontScale(1.0f);
+      ImGui::PopStyleColor(4);
+      ImGui::PopStyleVar(2);
+
+      ImGui::SetCursorScreenPos(old);
+#endif
     }
     ImGui::EndChild();
 
