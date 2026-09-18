@@ -104,7 +104,7 @@
     "match-type": "glob",
     "match": "*.lys",
     "options": {
-      "up": "+Z"
+      "up": "+Y"
     }
   }
 ]

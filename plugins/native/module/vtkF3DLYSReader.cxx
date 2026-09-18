@@ -1,6 +1,5 @@
 #include "vtkF3DLYSReader.h"
 
-#include "vtk_nlohmannjson.h"
 #include <vtkCellArray.h>
 #include <vtkFileResourceStream.h>
 #include <vtkFloatArray.h>
@@ -13,6 +12,7 @@
 #include <vtkPolyData.h>
 #include <vtkResourceStream.h>
 #include <vtkVersion.h>
+#include <vtk_nlohmannjson.h>
 #include VTK_NLOHMANN_JSON(json.hpp)
 
 #include <cstdint>
@@ -142,9 +142,9 @@ int vtkF3DLYSReader::RequestData(
     return 0;
   }
   // Parse the 12-byte mesh header:
-  //   bytes  0- 3: indexCount  (uint32 LE) - number of uint32 indices
-  //   bytes  4- 7: coordCount  (uint32 LE) - number of float32 values (nVertices * 3)
-  //   bytes  8-11: reserved    (uint32 LE) - padding/flags, ignored
+  //   bytes  0-3: indexCount  (uint32 LE) - number of uint32 indices
+  //   bytes  4-7: coordCount  (uint32 LE) - number of float32 values (nVertices * 3)
+  //   bytes 8-11: reserved    (uint32 LE) - padding/flags, ignored
   // The index buffer follows immediately at byte 12.
   // The vertex buffer follows the index buffer.
   if (geomSize < sizeof(MeshHeader))

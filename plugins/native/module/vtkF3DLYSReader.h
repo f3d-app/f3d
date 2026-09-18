@@ -5,8 +5,8 @@
  * The LYS format is a custom binary container with the following structure:
  *
  * Container header (16 bytes, all fields uint32 little-endian):
- *   bytes  0- 3 : container format version (observed value: 4)
- *   bytes  4- 7 : padded JSON block size (includes trailing alignment padding)
+ *   bytes  0-3 : container format version (observed value: 4)
+ *   bytes  4-7 : padded JSON block size (includes trailing alignment padding)
  *   bytes  8-11 : secondary size field (not used by this reader)
  *   bytes 12-15 : actual JSON content length
  *
@@ -19,8 +19,8 @@
  *   in ".bin" (with at least one character before the extension) and is not "scene.bin".
  *
  * Geometry blob header (12 bytes, all fields uint32 little-endian):
- *   bytes 0- 3 : indexCount  - number of uint32 triangle indices
- *   bytes 4- 7 : coordCount  - number of float32 values (nVertices * 3)
+ *   bytes 0-3 : indexCount  - number of uint32 triangle indices
+ *   bytes 4-7 : coordCount  - number of float32 values (nVertices * 3)
  *   bytes 8-11 : reserved    - ignored
  *
  * Index buffer: indexCount x uint32 immediately after the 12-byte mesh header.
