@@ -7,6 +7,9 @@ Configuration files uses the "long" version of the command-line options in a JSO
 formatted file to provide values for these options. It is also possible to use
 the [libf3d options](../libf3d/03-OPTIONS.md) syntax.
 
+> [!NOTE]
+> Config files written for F3D 2.5.1 or older may need updates for F3D 3.0.0, including renamed options. See the [F3D 3.0.0 migration guide](https://github.com/f3d-app/f3d/issues/1925).
+
 These options can be organized by block using a regular expression, glob, or exact match
 for each block in order to provide different default values for the different filetypes. For
 more on glob and exact matching see the [Glob and Exact Matching section](#glob-and-exact-matching).
@@ -70,6 +73,26 @@ The following options <b>are only taken on the first load</b>:
 
 Boolean options that have been turned on in the configuration file can be turned
 off on the command line if needed, eg: `--point-sprites=false`.
+
+### Persist window geometry
+
+When an interactive window closes, F3D saves its last size and position in `cache.json` and restores them on the next start. F3D uses this cache only if nothing else sets the window geometry. If `resolution` or `position` is set in a configuration file, a [statefile](03-OPTIONS.md#statefiles), or on the command line, that value is used instead.
+
+Use `resolution` and `position` in your config when you want F3D to always start with the same window geometry:
+
+```json
+[
+  {
+    "options": {
+      "resolution": "1280,720",
+      "position": "100,50"
+    }
+  }
+]
+```
+
+`position` sets the top-left corner of the window, in pixels, starting from the top left of your screens.
+`resolution` and `position` are only applied on the first load. If you want to save and restore a specific session, including loaded files and the camera, use [statefiles](03-OPTIONS.md#statefiles).
 
 ### Imperative Options
 
