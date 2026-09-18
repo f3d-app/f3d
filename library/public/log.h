@@ -98,10 +98,9 @@ public:
   template<typename... Args>
   static void progress(Args... args)
   {
-    bool prevNewLineState = log::getAppendNewLine();
-    log::setAppendNewLine(false);
-    log::info(args...);
-    log::setAppendNewLine(prevNewLineState);
+      std::stringstream ss;
+      log::appendArg(ss, args...);
+      log::progressInternal(ss.str());
   }
 
   /**
@@ -162,6 +161,7 @@ protected:
   static void warnInternal(const std::string& msg);
   static void infoInternal(const std::string& msg);
   static void debugInternal(const std::string& msg);
+  static void progressInternal(const std::string& msg);
   //! @endcond
 };
 }
