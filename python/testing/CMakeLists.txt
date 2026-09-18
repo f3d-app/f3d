@@ -21,6 +21,12 @@ list(APPEND pyf3dTests_list
      test_window.py
     )
 
+if(F3D_MODULE_FFMPEG)
+  list(APPEND pyf3dTests_list
+    test_video.py
+    )
+endif()
+
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
   list(APPEND pyf3dTests_list
      test_scene_buffer.py

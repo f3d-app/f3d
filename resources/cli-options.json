@@ -25,6 +25,11 @@
           "valueHelper": "<png file>"
         },
         {
+          "longName": "output-video",
+          "helpText": "Render to video",
+          "valueHelper": "<h264 file>"
+        },
+        {
           "longName": "no-background",
           "helpText": "No background when render to file",
           "valueHelper": "<bool>",
@@ -100,6 +105,26 @@
         {
           "longName": "list-rendering-backends",
           "helpText": "Print the list of rendering backends available on this system"
+        },
+        {
+          "longName": "list-video-encoders",
+          "helpText": "Print the list of video encoders available on this system"
+        },
+        {
+          "longName": "video-encoder",
+          "helpText": "Select the video encoder to use for output",
+          "valueHelper": "<name>"
+        },
+        {
+          "longName": "video-bitrate",
+          "helpText": "Select the video bitrate in Mbps to use for output",
+          "valueHelper": "<bitrate>"
+        },
+        {
+          "longName": "video-low-latency",
+          "helpText": "Enable low latency mode for video encoding",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
         },
         {
           "longName": "max-size",

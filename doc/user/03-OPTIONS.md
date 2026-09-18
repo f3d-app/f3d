@@ -13,6 +13,10 @@ If `-` is specified instead of a filename, the file will be streamed from the st
 
 Instead of showing a render view and render into it, _render directly into a png file_. When used with --ref option, only outputs on failure. If `-` is specified instead of a filename, the PNG file is streamed to the stdout. Can use [template variables](#filename-templating). When using the `{frame}` variable, multiple animation frames are exported (see [Exporting animation frames](05-ANIMATIONS.md#exporting-animation-frames)).
 
+### `--output-video=<video file>` (_string_)
+
+Instead of showing a render view and render to it, _render directly into a video file_. If `-` is specified instead of a filename, the video file is streamed to the stdout. The resulting file contains raw video frames and can be converted to a video container (e.g. MP4) using FFmpeg for example.
+
 ### `--no-background` (_bool_, default: `false`)
 
 Use with --output to output a png file with a transparent background.
@@ -44,6 +48,25 @@ List available _bindings_ and exit. Ignore `--verbose`.
 ### `--list-rendering-backends`
 
 List available _rendering backends_ and exit. Ignore `--verbose`.
+
+### `--list-video-encoders`
+
+List available _video encoders_ and exit. Ignore `--verbose`.
+
+### `--video-encoder` (_string_)
+
+Specify the encoder to use when using `--output-video`.
+Use `--list-video-encoders` to list encoders available on your system.
+
+### `--video-bitrate` (_double_, default: `5.0`)
+
+Specify the video encoder bitrate in Mbps.
+Higher means better quality but larger video stream.
+
+### `--video-low-latency` (_bool_, default: `false`)
+
+Specify if the video encoder should reduce latency by emitting packets as soon as possible.
+Set this to true in case of real time streaming, otherwise leave it to false to have the best quality possible.
 
 ### `--config=<config file path/name/stem>` (_string_, default: `config`)
 
@@ -1096,6 +1119,12 @@ export_brep(obj, sys.stdout.buffer)
 
 ```
 python script.py | f3d - --output=- | display
+```
+
+F3D can also output animations to a video using piping with FFmpeg:
+
+```
+f3d path/to/file.glb --output-video=- | ffmpeg -f h264 -i - path/to/video.mp4
 ```
 
 While piping is more common on Linux, F3D supports it perfectly on Windows and MacOS as well.

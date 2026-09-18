@@ -28,6 +28,12 @@ list(APPEND libf3dSDKTests_list
      TestTestSDKHelpers.cxx
 )
 
+if(F3D_MODULE_FFMPEG)
+  list(APPEND libf3dSDKTests_list
+    TestSDKVideo.cxx
+    )
+endif()
+
 # Tests having UI widgets
 if(F3D_MODULE_UI)
   list(APPEND libf3dSDKTests_list

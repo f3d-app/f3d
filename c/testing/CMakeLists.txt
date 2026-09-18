@@ -12,6 +12,12 @@ list(APPEND f3d_c_api_tests_list
   test_window.c
 )
 
+if(F3D_MODULE_FFMPEG)
+  list(APPEND f3d_c_api_tests_list
+    test_video.c
+  )
+endif()
+
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
   list(APPEND f3d_c_api_tests_list
     test_scene_buffer.c
