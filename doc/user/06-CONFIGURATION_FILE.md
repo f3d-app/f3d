@@ -1,22 +1,22 @@
-# Configuration File
+# Configuration file
 
 ## Options
 
-Almost all the command-line [options](03-OPTIONS.md) can be controlled using configuration files.
-Configuration files uses the "long" version of the command-line options in a JSON
-formatted file to provide values for these options. It is also possible to use
+You can control almost all [command-line options](03-OPTIONS.md) using configuration files.
+Configuration files use the "long" version of the command-line options in a JSON
+formatted file to provide values for these options. You can also use
 the [libf3d options](../libf3d/03-OPTIONS.md) syntax.
 
-These options can be organized by block using a regular expression, glob, or exact match
-for each block in order to provide different default values for the different filetypes. For
-more on glob and exact matching see the [Glob and Exact Matching section](#glob-and-exact-matching).
+Each configuration file is a JSON array of blocks. Each block can define `options`, `bindings`, and an optional `match` rule.
+Use a regular expression, glob, or exact match for each block to provide different default values for different file formats.
+For more on glob and exact matching see the [Glob and exact matching section](#glob-and-exact-matching).
 
-Using a command-line option will override similar option set in any config files.
+A command-line option overrides similar options set in any config files.
 
-Some options are only taken into account on the first load and not on subsequent loads,
+Some options apply only on the first load and not on subsequent loads,
 when switching between files.
 
-A typical config file with options may look like this:
+A typical config file with options looks like this:
 
 ```json
 [
@@ -58,9 +58,9 @@ A typical config file with options may look like this:
 ```
 
 Here, the first block defines a basic configuration with many desired options for all files.
-The second block specifies that all files ending with vt., eg: vtk, vtp, vtu, ... will be shown with edges visibility turned on.
+The second block shows all files ending with vt., eg: vtk, vtp, vtu, ... with edges visibility turned on.
 The third block specifies raytracing usage for .gltf and .glb files.
-The last block specifies that volume rendering should be used with .mhd files.
+The last block uses volume rendering with .mhd files.
 
 The following options <b> cannot </b> be set via config file:
 `help`, `version`, `list-readers`, `list-rendering-backends`, `scan-plugins`, `config`, `no-config`, `define`, `reset` and `input`.
@@ -68,13 +68,12 @@ The following options <b> cannot </b> be set via config file:
 The following options <b>are only taken on the first load</b>:
 `no-render`, `output`, `position`, `resolution`, `frame-rate` and all testing options.
 
-Boolean options that have been turned on in the configuration file can be turned
-off on the command line if needed, eg: `--point-sprites=false`.
+Turn off boolean options from the command line when needed, eg: `--point-sprites=false`.
 
-### Imperative Options
+### Imperative options
 
-Command line options and options that are changed interactively overrides options that are set in configuration files.
-This is not always a desired behavior, so in order to force an option to always be taken into account even if set in command line or changed interactively, it is possible to use imperative options, by adding a `!` in front of the option name, eg:
+Command-line options and interactive changes override options that are set in configuration files.
+When a configuration option must override command-line options and interactive changes, use an imperative option by adding `!` in front of the option name, eg:
 
 ```json
 [
@@ -92,15 +91,15 @@ This is not always a desired behavior, so in order to force an option to always 
 ]
 ```
 
-In the above example, when loading or reloading a file, the axis is always turned on and when loading a .stl file, the edges are always turned on.
+In the above example, F3D always turns on the axis when loading or reloading a file. It also always turns on edges when loading a .stl file.
 
 ## Bindings
 
-All interaction bindings can be configured using configuration files.
-The logic is the same as with options, where configuration blocks are used depending on the filename being loaded using regular expression.
-A `bindings` block can be added to specify associations between binds (eg : `Ctrl+O`) and one or multiple commands.
+Configure all interaction bindings using configuration files.
+The logic is the same as with options: configuration blocks apply depending on the filename being loaded using regular expression.
+Add a `bindings` block to associate binds (e.g `Ctrl+O`) with one or multiple commands.
 
-A typical config file with bindings may look like this:
+A typical config file with bindings looks like this:
 
 ```json
 [
@@ -126,18 +125,18 @@ A typical config file with bindings may look like this:
 ]
 ```
 
-Here, the first block define new bindings for all and any files.
-It even replace an existing default [interaction](04-INTERACTIONS.md) on the `O` key with its own.
-Each bind is associated to the [command](07-COMMANDS.md) to execute when it is pressed.
+Here, the first block defines new bindings for all files.
+It even replaces an existing default [interaction](04-INTERACTIONS.md) on the <kbd>O</kbd> key with its own.
+Each bind associates to the [command](07-COMMANDS.md) to execute when it is pressed.
 
-In the second block, new bindings are defined for files ending in `.vtu`, and there bindings
-will only be available when loading such a file.
-In the first config block, we define bindings for all and any files. It also replace an existing default
-interaction on the `Any+3` bind and even define a bindings that have multiple commands using a json array
+The second block defines new bindings for files ending in `.vtu`, and these bindings
+are available only when loading such a file.
+In the first config block, we define bindings for all files. It also replaces an existing default
+interaction on the `Any+3` bind and defines a binding that has multiple commands using a json array
 on the `Ctrl+O` bind.
 
-Please note this configuration feature is only available through config file and not through the command line.
-However, it is possible to check your current binding configuration by using the `--list-bindings` CLI options.
+This configuration feature is available only through config file and not through the command line.
+Check your current binding configuration by using the `--list-bindings` CLI option.
 
 ### Bind
 
@@ -145,14 +144,14 @@ A bind is the association of a modifier and an interaction.
 
 Supported modifiers are:
 
-- `None` : No modifiers is pressed, can be omitted completely.
-- `Ctrl` : Control key is pressed, no distinction between left and right.
-- `Shift` : Shift key is pressed, no distinction between left and right.
-- `Ctrl+Shift` : Control and Shift keys are pressed, no distinction between left and right.
+- `None` : No modifier is pressed. You can omit this modifier completely.
+- `Ctrl` : Control key is pressed. F3D does not distinguish left and right keys.
+- `Shift` : Shift key is pressed. F3D does not distinguish left and right keys.
+- `Ctrl+Shift` : Control and Shift keys are pressed. F3D does not distinguish left and right keys.
 - `Any` : A special modifier that does not consider modifiers keys but can only be reached
   if there is no bind with the same interaction.
 
-On MacOS, bindings specified via configuration will be defined using `Ctrl` and `Ctrl+Shift` but will be toggled in F3D using `Cmd` and `Cmd+Shift` respectively. The cheatsheet will display the correct binding combination regardless.
+On macOS, define bindings in configuration files using `Ctrl` and `Ctrl+Shift`. F3D maps them to `Cmd` and `Cmd+Shift` respectively. The Cheatsheet displays the correct binding combination regardless.
 
 Supported interactions are legion, eg:
 
@@ -168,18 +167,18 @@ Supported interactions are legion, eg:
 - Other interactions, eg:
   - `Drop` when files or directories are dropped on F3D window
 
-To identify the interaction to use, just use `f3d --verbose` and perform the interaction, F3D will log it like this:
+To identify the interaction to use, run `f3d --verbose` and perform the interaction. F3D logs it like this:
 
-```
+```text
 Interaction: KeyPress Ctrl+Shift+Insert
 ```
 
-Please note that the interaction itself can be modified by the modifiers, hence some binds may be unreachable depending on your
+The modifiers can change the interaction itself, so some binds may be unreachable depending on your
 keyboard layout, eg. on a `QWERTY` layout, the bind `Exclam` is unreachable while `Shift+Exclam` is reachable.
-We tried to make the default bindings of F3D to be a keyboard layout independent as possible, but feel free to redefined them
+F3D default bindings are as keyboard-layout independent as possible, but you can redefine them
 for your needs.
 
-## Glob and Exact Matching
+## Glob and exact matching
 
 While regex is the default match type, glob and exact match types are also supported. Below is an example using glob and exact matching.
 
@@ -225,40 +224,39 @@ While regex is the default match type, glob and exact match types are also suppo
 ]
 ```
 
-For glob patterns, globstar (`**`) is supported.
+Glob patterns support globstar (`**`).
 
-Glob and exact matching can be used for bindings as well.
+Use glob and exact matching for bindings as well.
 
 ## Locations
 
-Single .json file for configuration is supported, as well a config directory containing multiple .json config files.
-In the case of config directory, .json file are read in alphabetical order and an option or binding in a block can be overridden
-by the same option or bind being set in another block in another .json file read after.
+F3D supports a single .json configuration file, as well as a config directory containing multiple .json config files.
+In a config directory, F3D reads .json files in alphabetical order. The same option or bind in a later block can override an earlier one.
 
 F3D provides a default config directory for generic usage (`config.d`) and a thumbnail specific config directory (`thumbnail.d`).
-You can edit the file contained in these directory or add your own in specific directories (see below).
+You can edit the files contained in these directories or add your own in specific directories (see below).
 
 F3D looks for configuration files in different locations depending on your operating system.
-Existing configuration files are read in order and combined with later entries, potentially overriding previously read entry with the same names.
-For thumbnails, just replace `config` by `thumbnail`, as the thumbnails configuration is just passed to f3d using the `--config` [CLI option](03-OPTIONS.md).
+F3D reads existing configuration files in order and combines them with later entries potentially overriding previously read entries with the same names.
+For thumbnails, replace `config` by `thumbnail`, as the `f3d` command receives the thumbnails configuration using the `--config` [CLI option](03-OPTIONS.md).
 
 - Linux: `/etc/f3d/config(.json,.d)`, `/usr/share/f3d/configs/config(.json,.d)`, `[install_dir]/share/f3d/configs/config(.json,.d)`, `${XDG_CONFIG_HOME}/f3d/config(.json,.d)`
 - Windows: `[install_dir]\share\f3d\configs\(config.json,.d)`, `%APPDATA%\f3d\(config.json,.d)`
 - macOS: `/usr/local/etc/f3d/config(.json,.d)`, `f3d.app/Contents/Resources/configs/config(.json,.d)`, `${HOME}/Library/Application Support/f3d/config(.json,.d)`
 
-Please note that, on Linux, `XDG_CONFIG_HOME` implementation can fallback on `HOME` environment variables as specified [here](https://specifications.freedesktop.org/basedir/latest/).
+On Linux, `XDG_CONFIG_HOME` implementation can fallback on `HOME` environment variables as specified by the [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir/latest/).
 
-The binary release will install the default config directory.
-On Linux, they will be installed in `[install_dir]/share/f3d/configs/`, on Windows, they will be installed in `[install_dir]\share\f3d\configs\`, on macOS, it will be installed in the bundle.
+The binary release installs the default config directory.
+On Linux, it installs files in `[install_dir]/share/f3d/configs/`. On Windows, it installs files in `[install_dir]\share\f3d\configs\`. On macOS, it installs files in the bundle.
 
-Please note there is a command line option to control the configuration file to read. Using it, one can specify an absolute/relative path for the configuration path, but also
-only the filename or filestem (`.json` and `.d` will be added) to look for in the locations listed above, , eg: `f3d --config=custom_config` will look
+Use the command-line option to control the configuration file to read. Specify an absolute or relative path for the configuration path, or
+only the filename or filestem (F3D adds `.json` and `.d`) to look for in the locations listed above, , eg: `f3d --config=custom_config` looks
 for `custom_config.json` and `custom_config.d` in locations listed above.
-When specifying an absolute/relative path for the configuration file, a single file is read. If not, all files from locations listed above, with the overriding logic specified above.
+When you specify an absolute or relative path for the configuration file, F3D reads a single file. Otherwise, F3D reads all files from the locations listed above, with the overriding logic specified above.
 
-To check which config file is found and used, you can check the verbose output, eg. for thumbnails config: `f3d --config=thumbnail --verbose` (or `f3d-console.exe --config=thumbnail --verbose` on Windows) :
+To check which config file is found and used, check the verbose output, eg. for thumbnails config: `f3d --config=thumbnail --verbose` (or `f3d-console.exe --config=thumbnail --verbose` on Windows) :
 
-```
+```text
 ========== Initializing Options ==========
 Found available config path
 Candidate config file not found: "/etc/f3d/thumbnail.json"
