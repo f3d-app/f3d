@@ -50,7 +50,7 @@ void F3DLog::Print(Severity sev, const std::string& str)
 //----------------------------------------------------------------------------
 void F3DLog::Progress(const std::string& str)
 {
-  if (F3DLog::VerboseLevel > F3DLog::Severity::Debug)
+  if (F3DLog::VerboseLevel > F3DLog::Severity::Info)
   {
     return;
   }
@@ -59,7 +59,7 @@ void F3DLog::Progress(const std::string& str)
   vtkF3DConsoleOutputWindow* consoleWin = vtkF3DConsoleOutputWindow::SafeDownCast(win);
   if (consoleWin)
   {
-    consoleWin->DisplayText(str.c_str());
+    consoleWin->DisplayProgress(str.c_str());
   }
 }
 

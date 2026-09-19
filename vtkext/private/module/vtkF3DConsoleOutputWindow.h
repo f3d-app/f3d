@@ -21,6 +21,8 @@ public:
    */
   void DisplayText(const char*) override;
 
+  void DisplayProgress(const char*);
+
   //@{
   /**
    * Set/Get the coloring usage.
