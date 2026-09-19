@@ -76,6 +76,11 @@ public:
   interactor& stopAnimation() override;
   bool isPlayingAnimation() override;
   interactor::AnimationDirection getAnimationDirection() override;
+  double getDeltaTime() const override;
+  interactor& jumpToFrame(int index) override;
+  interactor& jumpToFrameRelative(int offset) override;
+  interactor& jumpToKeyframe(int index) override;
+  interactor& jumpToKeyframeRelative(int offset) override;
 
   interactor& enableCameraMovement() override;
   interactor& disableCameraMovement() override;

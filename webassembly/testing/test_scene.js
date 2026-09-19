@@ -76,6 +76,16 @@ const settings = {
     scene.loadAnimationTime(0.5);
 
     utils.assert(
+      scene.animationTime() === 0.5,
+      "animationTime should be 0.5 after loading",
+    );
+
+    utils.assert(
+      scene.animationFrame() === 15,
+      "animationFrame should be 15 after loading 0.5",
+    );
+
+    utils.assert(
       scene.getAnimationName(-1) == "stand",
       "getAnimationName returns name",
     );

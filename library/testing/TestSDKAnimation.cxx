@@ -63,6 +63,38 @@ int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
   test("check first keyframes", keyframes[0], 0.0);
   test("check last keyframes", keyframes[8], 0.7999999999999999);
 
+  sce.loadAnimationTime(0.0);
+  test("animationTime after loading start", sce.animationTime(), 0.0);
+
+  sce.loadAnimationTime(0.5);
+  test("animationTime after loading 0.5", sce.animationTime(), 0.5);
+
+  sce.loadAnimationTime(0.0);
+  test("animationFrame after load 0.0", sce.animationFrame(), static_cast<size_t>(0));
+
+  sce.loadAnimationTime(0.5);
+  test("animationFrame after load 0.5", sce.animationFrame(), static_cast<size_t>(15));
+
+  inter.jumpToFrame(10);
+  test("jumpToFrame absolute index 10", sce.animationFrame(), static_cast<size_t>(10));
+
+  inter.jumpToFrameRelative(1);
+  test("jumpToFrameRelative +1", sce.animationFrame(), static_cast<size_t>(11));
+
+  inter.jumpToFrame(0);
+  test("jumpToFrame absolute index 0", sce.animationFrame(), static_cast<size_t>(0));
+
+  sce.loadAnimationTime(0.0);
+  inter.jumpToKeyframe(4);
+  test("jumpToKeyframe absolute index 4", sce.animationTime(), keyframes[4]);
+
+  sce.loadAnimationTime(0.0);
+  inter.jumpToKeyframeRelative(1);
+  test("jumpToKeyframeRelative +1", sce.animationTime(), keyframes[1]);
+
+  inter.jumpToKeyframe(0);
+  test("jumpToKeyframe absolute index 0", sce.animationTime(), keyframes[0]);
+
   inter.startAnimation(f3d::interactor::AnimationDirection::FORWARD);
   test("isPlaying backward after forward start",
     inter.getAnimationDirection() == f3d::interactor::AnimationDirection::FORWARD);
