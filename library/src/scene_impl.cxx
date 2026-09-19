@@ -15,8 +15,10 @@
 #include "vtkF3DRenderer.h"
 
 #include <algorithm>
+#include <array>
 #include <iterator>
 #include <optional>
+#include <string>
 #include <vtkCallbackCommand.h>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
@@ -111,6 +113,88 @@ public:
     data->timer->StartTimer();
   }
 
+  struct CLIProgressBarDataStruct
+  {
+    vtkTimerLog* timer;
+    std::string fileName;
+    int importerCount;
+  };
+
+  static std::string GenerateCLIBarString(
+    double progress, int barCount, std::span<const std::string_view> strRamp)
+  {
+    std::string bar;
+    int filledBars = barCount * progress;
+    int totalFilled = 0;
+    for (int i = 0; i < filledBars; i++)
+    {
+      bar += strRamp.back();
+      totalFilled++;
+    }
+    if (filledBars < barCount)
+    {
+      double lastBarProgression =
+        (progress - static_cast<double>(filledBars) / barCount) * barCount;
+      int charRampIdx =
+        std::min(strRamp.size() - 1, static_cast<size_t>(lastBarProgression * strRamp.size()));
+      bar += strRamp[charRampIdx];
+      totalFilled++;
+    }
+    while (totalFilled < barCount)
+    {
+      bar += strRamp.front();
+      totalFilled++;
+    }
+    return bar;
+  }
+
+  void CreateCLIProgressBarAndCallback(CLIProgressBarDataStruct* data, vtkF3DMetaImporter* importer)
+  {
+    vtkNew<vtkCallbackCommand> progressCallback;
+    progressCallback->SetClientData(data);
+    progressCallback->SetCallback(
+      [](vtkObject*, unsigned long, void* clientData, void* callData)
+      {
+        constexpr int barCount = 16;
+        constexpr std::array charRamp = std::to_array<std::string_view>(
+          { " ", "\u258f", "\u258e", "\u258d", "\u258c", "\u258b", "\u258a", "\u2589", "\u2588" });
+
+        auto progressData = static_cast<CLIProgressBarDataStruct*>(clientData);
+        double progress = *static_cast<double*>(callData);
+
+        std::string bar = scene_impl::internals::GenerateCLIBarString(progress, barCount, charRamp);
+
+        std::string filename = (progressData->importerCount > 1)
+          ? std::to_string(progressData->importerCount) + " files"
+          : progressData->fileName;
+
+        int percentage = std::round(100 * progress);
+        std::string percentageStr = std::format("{:3}", percentage);
+
+        progressData->timer->StopTimer();
+
+        double estimatedTime =
+          (progress <= 1e-4) ? 0 : progressData->timer->GetElapsedTime() / progress;
+        int estimatedMin = estimatedTime / 60;
+        int estimatedSec = static_cast<int>(estimatedTime) % 60;
+        int elapsedMin = progressData->timer->GetElapsedTime() / 60;
+        int elapsedSec = static_cast<int>(progressData->timer->GetElapsedTime()) % 60;
+
+        std::string time = std::format(
+          "{:02}:{:02}/{:02}:{:02}", elapsedMin, elapsedSec, estimatedMin, estimatedSec);
+
+        f3d::log::progress(
+          "\rLoading ", filename, " : ", percentageStr, "% |", bar, "| [", time, "]");
+
+        if (progress >= 1.0)
+        {
+          f3d::log::progress("\n");
+        }
+      });
+    importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
+    data->timer->StartTimer();
+  }
+
   void Load(const std::vector<std::pair<std::string, vtkSmartPointer<vtkImporter>>>& importers)
   {
     for (const auto& importer : importers)
@@ -135,11 +219,19 @@ public:
     // Manage progress bar
     vtkNew<vtkProgressBarWidget> progressWidget;
     vtkNew<vtkTimerLog> timer;
+
     scene_impl::internals::ProgressDataStruct callbackData;
-    callbackData.timer = timer;
-    callbackData.widget = progressWidget;
+    scene_impl::internals::CLIProgressBarDataStruct cliCallbackData;
+
+    cliCallbackData.timer = timer;
+    cliCallbackData.importerCount = this->MetaImporter->GetImporterInfoCount();
+    cliCallbackData.fileName = this->MetaImporter->GetImporterInfo(0).Name.substr(0, 51);
+    scene_impl::internals::CreateCLIProgressBarAndCallback(&cliCallbackData, this->MetaImporter);
+
     if (this->Interactor && !this->Window.isOffscreen())
     {
+      callbackData.timer = timer;
+      callbackData.widget = progressWidget;
       f3d::color_t color = this->Options.ui.loader_progress_color;
       scene_impl::internals::CreateProgressRepresentationAndCallback(
         &callbackData, this->MetaImporter, this->Interactor, color);

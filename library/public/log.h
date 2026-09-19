@@ -95,6 +95,14 @@ public:
     log::errorInternal(ss.str());
   }
 
+  template<typename... Args>
+  static void progress(Args... args)
+  {
+    std::stringstream ss;
+    log::appendArg(ss, args...);
+    log::progressInternal(ss.str());
+  }
+
   /**
    * Set the coloring usage, if applicable (eg: console output).
    */
@@ -143,6 +151,7 @@ protected:
   static void warnInternal(const std::string& msg);
   static void infoInternal(const std::string& msg);
   static void debugInternal(const std::string& msg);
+  static void progressInternal(const std::string& msg);
   //! @endcond
 };
 }

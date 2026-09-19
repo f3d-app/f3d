@@ -44,6 +44,11 @@ extern Severity VerboseLevel;
 void Print(Severity sev, const std::string& msg);
 
 /**
+ * Prints progression bar output
+ */
+void Progress(const std::string& str);
+
+/**
  * If output window is a vtkF3DConsoleOutputWindow,
  * set the coloring usage.
  */

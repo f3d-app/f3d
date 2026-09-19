@@ -81,6 +81,12 @@ void log::errorInternal(const std::string& str)
   detail::init::initialize();
   F3DLog::Print(F3DLog::Severity::Error, str);
 }
+//----------------------------------------------------------------------------
+void log::progressInternal(const std::string& str)
+{
+  detail::init::initialize();
+  F3DLog::Progress(str);
+}
 
 //----------------------------------------------------------------------------
 void log::setUseColoring(bool use)
@@ -88,6 +94,7 @@ void log::setUseColoring(bool use)
   detail::init::initialize();
   F3DLog::SetUseColoring(use);
 }
+
 
 //----------------------------------------------------------------------------
 void log::setVerboseLevel(log::VerboseLevel level, bool forceStdErr)

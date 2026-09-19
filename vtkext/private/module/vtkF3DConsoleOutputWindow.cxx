@@ -40,6 +40,7 @@ void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)
   }
 
   fmtText += "\n";
+
   this->Superclass::DisplayText(fmtText.c_str());
 
   switch (this->GetDisplayStream(this->GetCurrentMessageType()))
@@ -50,6 +51,22 @@ void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)
     case StreamType::StdError:
       std::cerr.flush();
       break;
+    default:
+      break;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DConsoleOutputWindow::DisplayProgress(const char* str)
+{
+  this->Superclass::DisplayText(str);
+
+  switch (this->GetDisplayStream(this->GetCurrentMessageType()))
+  {
+    case vtkOutputWindow::StreamType::StdOutput:
+      std::cout.flush();
+    case vtkOutputWindow::StreamType::StdError:
+      std::cerr.flush();
     default:
       break;
   }
