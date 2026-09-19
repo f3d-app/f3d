@@ -1,11 +1,14 @@
 set(classes
   vtkF3DOCCTReader
+  vtkF3DFCStdReader
   )
 
 vtk_module_add_module(f3d::vtkextOCCT
   NO_INSTALL
   FORCE_STATIC
-  CLASSES ${classes})
+  CLASSES ${classes}
+  SOURCES F3DOCCTShapeConverter.cxx
+  PRIVATE_HEADERS F3DOCCTShapeConverter.h)
 
 vtk_module_include(f3d::vtkextOCCT
   PRIVATE

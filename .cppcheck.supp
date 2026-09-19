@@ -12,6 +12,8 @@ unknownMacro
 *:external/dmon/dmon.h
 *:external/imgui/*.cpp
 *:external/imgui/*.h
+*:external/miniz/miniz.c
+*:external/miniz/miniz.h
 *:external/nlohmann_json/nlohmann/json.hpp
 *:external/tinyfiledialogs/tinyfiledialogs.cxx
 *:external/tinyfiledialogs/tinyfiledialogs.h

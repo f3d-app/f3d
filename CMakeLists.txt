@@ -73,6 +73,7 @@ find_package(VTK 9.4.0 REQUIRED
     IOImport
     IOPLY
     IOXML
+    IOXMLParser
     RenderingAnnotation
     RenderingCore
     RenderingOpenGL2
@@ -111,6 +112,7 @@ option(F3D_MODULE_FFMPEG "ffmpeg module" OFF)
 option(F3D_USE_EXTERNAL_CXXOPTS "Use external cxxopts dependency" OFF)
 option(F3D_USE_EXTERNAL_NLOHMANN_JSON "Use external nlohmann_json dependency" OFF)
 option(F3D_USE_EXTERNAL_CLIP "Use external clip dependency" OFF)
+option(F3D_USE_EXTERNAL_MINIZ "Use external miniz dependency" OFF)
 cmake_dependent_option(F3D_USE_EXTERNAL_DMON "Use external dmon dependency" OFF "F3D_MODULE_DMON" OFF)
 cmake_dependent_option(F3D_USE_EXTERNAL_IMGUI "Use external imgui dependency" OFF "F3D_MODULE_UI" OFF)
 cmake_dependent_option(F3D_USE_EXTERNAL_CLIP "Use external clip dependency" OFF "F3D_MODULE_CLIP" OFF)
@@ -129,6 +131,9 @@ if (F3D_USE_EXTERNAL_IMGUI)
 endif ()
 if (F3D_USE_EXTERNAL_CLIP)
   find_package(clip REQUIRED)
+endif ()
+if (F3D_USE_EXTERNAL_MINIZ)
+  find_package(miniz REQUIRED)
 endif ()
 
 # Shared options between application and library
@@ -154,9 +159,9 @@ if(F3D_STRICT_BUILD)
     set(f3d_strict_build_compile_options /W4 /WX)
     set(f3d_strict_build_link_options /WX)
   else()
-    set(f3d_strict_build_compile_options -Wall -Wextra -Wshadow -Woverloaded-virtual -Wno-deprecated -Wno-strict-overflow -Wno-array-bounds -Wunreachable-code -Wno-missing-field-initializers -Wno-unused-parameter -Wredundant-decls -Wpointer-arith -Werror)
+    set(f3d_strict_build_compile_options -Wall -Wextra -Wshadow $<$<COMPILE_LANGUAGE:CXX>:-Woverloaded-virtual> -Wno-deprecated -Wno-strict-overflow -Wno-array-bounds -Wunreachable-code -Wno-missing-field-initializers -Wno-unused-parameter -Wredundant-decls -Wpointer-arith -Werror)
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-      list(APPEND f3d_strict_build_compile_options -Wsuggest-override)
+      list(APPEND f3d_strict_build_compile_options $<$<COMPILE_LANGUAGE:CXX>:-Wsuggest-override>)
     endif()
   endif()
 endif()
