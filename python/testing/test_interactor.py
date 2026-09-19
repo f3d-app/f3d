@@ -117,8 +117,17 @@ def test_binding():
         f3d.Interactor.BindingType.OTHER,
         False,
     )
+    inter.add_binding(
+        f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "R"),
+        ["dummy command", "dummy command"],
+        "DummyGroup",
+        doc_fn,
+        f3d.Interactor.BindingType.OTHER,
+        False,
+        True,
+    )
     assert len(inter.get_bind_groups()) == 1
-    assert len(inter.get_binds()) == 5
+    assert len(inter.get_binds()) == 6
     assert (
         inter.get_binding_documentation(
             f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "P")
