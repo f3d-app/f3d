@@ -52,7 +52,13 @@ void vtkF3DImageImporter::ImportActors(vtkRenderer* renderer)
     reader->SetFileName(fileName);
   }
 
-  reader->UpdateInformation();
+  // If UpdateInformation() returns false or the error code is set, we assume there was an error reading the image
+  if (!reader->UpdateInformation() || reader->GetErrorCode() != 0)
+  {
+    vtkErrorMacro("Reader failed to read the image");
+    this->SetFailureStatus();
+    return;
+  }
 
   int extent[6];
   reader->GetDataExtent(extent);
