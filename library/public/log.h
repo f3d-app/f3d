@@ -109,16 +109,6 @@ public:
   static void setUseColoring(bool use);
 
   /**
-   * Set the new line usage, if applicable (eg: console output).
-   */
-  static void setAppendNewLine(bool append);
-
-  /**
-   * Get the new line usage, if applicable (eg: console output).
-   */
-  static bool getAppendNewLine();
-
-  /**
    * Set the verbose level.
    * By default, only warnings and errors are written to stderr, debug and info are written to
    * stdout. If forceStdErr is true, all messages including debug and info are written to stderr.

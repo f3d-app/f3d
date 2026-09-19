@@ -55,17 +55,6 @@ void Progress(const std::string& str);
 void SetUseColoring(bool use);
 
 /**
- * If output window is a vtkF3DConsoleOutputWindow,
- * set the new line usage.
- */
-void SetAppendNewLine(bool append);
-
-/**
- * get the new line usage.
- */
-bool GetAppendNewLine();
-
-/**
  * Determine how standard stream should be used.
  * If mode is None, then no message is written at all (including errors).
  * If mode is AlwaysStdErr, then all messages are written to stderr.

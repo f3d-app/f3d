@@ -85,10 +85,7 @@ void log::errorInternal(const std::string& str)
 void log::progressInternal(const std::string& str)
 {
   detail::init::initialize();
-  bool prevNewLineState = log::getAppendNewLine();
-  log::setAppendNewLine(false);
   F3DLog::Progress(str);
-  log::setAppendNewLine(prevNewLineState);
 }
 
 //----------------------------------------------------------------------------
@@ -98,19 +95,6 @@ void log::setUseColoring(bool use)
   F3DLog::SetUseColoring(use);
 }
 
-//----------------------------------------------------------------------------
-void log::setAppendNewLine(bool append)
-{
-  detail::init::initialize();
-  F3DLog::SetAppendNewLine(append);
-}
-
-//----------------------------------------------------------------------------
-bool log::getAppendNewLine()
-{
-  detail::init::initialize();
-  return F3DLog::GetAppendNewLine();
-}
 
 //----------------------------------------------------------------------------
 void log::setVerboseLevel(log::VerboseLevel level, bool forceStdErr)
