@@ -22,7 +22,7 @@ public:
   void DisplayText(const char*) override;
 
   /**
-   * Show progress without loging to IMGuiConsole
+   * Display a progress message in the console output window.
    */
   void DisplayProgress(const char*);
 
