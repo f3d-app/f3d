@@ -39,10 +39,7 @@ void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)
     fmtText = txt;
   }
 
-  if (this->AppendNewLine)
-  {
-    fmtText += "\n";
-  }
+  fmtText += "\n";
 
   this->Superclass::DisplayText(fmtText.c_str());
 

@@ -21,6 +21,9 @@ public:
    */
   void DisplayText(const char*) override;
 
+  /**
+   * Show progress without loging to IMGuiConsole
+   */
   void DisplayProgress(const char*);
 
   //@{
@@ -32,15 +35,6 @@ public:
   vtkGetMacro(UseColoring, bool);
   //@}
 
-  //@{
-  /**
-   * Set/Get the new line usage.
-   * Default is true.
-   */
-  vtkSetMacro(AppendNewLine, bool);
-  vtkGetMacro(AppendNewLine, bool);
-  //@}
-
   vtkF3DConsoleOutputWindow(const vtkF3DConsoleOutputWindow&) = delete;
   void operator=(const vtkF3DConsoleOutputWindow&) = delete;
 
@@ -50,7 +44,6 @@ protected:
 
 private:
   bool UseColoring = true;
-  bool AppendNewLine = true;
 };
 
 #endif
