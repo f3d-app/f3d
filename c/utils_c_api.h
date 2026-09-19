@@ -33,7 +33,7 @@ extern "C"
    * @brief Tokenize a string using the same logic as bash.
    *
    * The returned array and strings are heap-allocated and must be freed by calling
-   * f3d_utils_tokens_free().
+   * f3d_utils_tokens_destroy().
    *
    * @param str Input string to tokenize.
    * @param keep_comments Non-zero to keep comments, zero to treat '#' as a normal character.
@@ -48,7 +48,7 @@ extern "C"
    * @param tokens Array of tokens.
    * @param count Number of tokens in the array.
    */
-  F3D_EXPORT void f3d_utils_tokens_free(char** tokens, size_t count);
+  F3D_EXPORT void f3d_utils_tokens_destroy(char** tokens, size_t count);
 
   /**
    * @brief Collapse a filesystem path.
@@ -56,7 +56,7 @@ extern "C"
    * Expands '~' to the home directory, makes the path absolute using base_directory
    * or the current directory, and normalizes '..' components.
    *
-   * The returned string is heap-allocated and must be freed with f3d_utils_string_free().
+   * The returned string is heap-allocated and must be freed with f3d_utils_string_destroy().
    *
    * @param path Input path.
    * @param base_directory Base directory for relative paths.
@@ -67,7 +67,7 @@ extern "C"
   /**
    * @brief Converts a glob expression to a regular expression.
    *
-   * The returned string is heap-allocated and must be freed with f3d_utils_string_free().
+   * The returned string is heap-allocated and must be freed with f3d_utils_string_destroy().
    *
    * @param glob Glob expression.
    * @param path_separator Path separator character.
@@ -78,7 +78,7 @@ extern "C"
   /**
    * @brief Get the value of an environment variable.
    *
-   * The returned string is heap-allocated and must be freed with f3d_utils_string_free().
+   * The returned string is heap-allocated and must be freed with f3d_utils_string_destroy().
    *
    * @param env Environment variable name.
    * @return Value of the environment variable.
@@ -88,7 +88,7 @@ extern "C"
   /**
    * @brief Get a Windows known folder.
    *
-   * The returned string is heap-allocated and must be freed with f3d_utils_string_free().
+   * The returned string is heap-allocated and must be freed with f3d_utils_string_destroy().
    *
    * @param known_folder Known folder identifier.
    * @return Folder path.
@@ -100,7 +100,7 @@ extern "C"
    *
    * @param str String to free.
    */
-  F3D_EXPORT void f3d_utils_string_free(char* str);
+  F3D_EXPORT void f3d_utils_string_destroy(char* str);
 
 #ifdef __cplusplus
 }

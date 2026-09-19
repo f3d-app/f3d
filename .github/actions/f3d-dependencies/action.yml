@@ -16,6 +16,20 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Install x264 dependency
+      uses: ./source/.github/actions/x264-install-dep
+      with:
+        versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
+        cpu: ${{inputs.cpu}}
+
+    - name: Install FFmpeg dependency
+      uses: ./source/.github/actions/ffmpeg-install-dep
+      with:
+        versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
+        cpu: ${{inputs.cpu}}
+
     - name: Install LLVM dependency
       uses: ./source/.github/actions/llvm-install-dep
       with:

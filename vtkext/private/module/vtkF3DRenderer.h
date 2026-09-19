@@ -13,6 +13,7 @@
 
 #include "F3DStyle.h"
 
+#include "vtkF3DFrameCapture.h"
 #include "vtkF3DMetaImporter.h"
 #include "vtkF3DUIActor.h"
 
@@ -601,6 +602,17 @@ public:
    */
   double GetDPIScale();
 
+  /**
+   * Fill the provided buffers with Y, U, and V planes of the current rendered frame.
+   * The buffers must be allocated with the correct size:
+   * - Y plane: width * height bytes
+   * - U plane: (width / 2) * (height / 2) bytes
+   * - V plane: (width / 2) * (height / 2) bytes
+   *
+   * Returns true if the frame was captured successfully, false otherwise.
+   */
+  bool CaptureVideoFrame(std::byte* yPlane, std::byte* uPlane, std::byte* vPlane);
+
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;
@@ -751,13 +763,14 @@ private:
 
   // Does vtk version support GridAxesActor
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
-  vtkNew<vtkGridAxesActor3D> GridAxesActor;
+  vtkSmartPointer<vtkGridAxesActor3D> GridAxesActor;
 #endif
 
   vtkNew<vtkActor> GridActor;
   vtkNew<vtkF3DOpenGLGridMapper> GridMapper;
   vtkNew<vtkSkybox> SkyboxActor;
   vtkNew<vtkF3DUIActor> UIActor;
+  vtkNew<vtkF3DFrameCapture> FrameCapture;
 
   unsigned int Timer = 0; // Timer OpenGL query
 

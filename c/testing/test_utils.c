@@ -30,7 +30,7 @@ int test_utils()
     failed++;
   }
 
-  f3d_utils_tokens_free(tokens, tok_count);
+  f3d_utils_tokens_destroy(tokens, tok_count);
 
   char* collapsed = f3d_utils_collapse_path(".", NULL);
   if (!collapsed || collapsed[0] == '\0')
@@ -38,7 +38,7 @@ int test_utils()
     puts("[ERROR] collapse_path returned NULL/empty");
     failed++;
   }
-  f3d_utils_string_free(collapsed);
+  f3d_utils_string_destroy(collapsed);
 
   char* regex = f3d_utils_glob_to_regex("*.txt", '/');
   if (!regex || regex[0] == '\0')
@@ -46,7 +46,7 @@ int test_utils()
     puts("[ERROR] glob_to_regex returned NULL/empty");
     failed++;
   }
-  f3d_utils_string_free(regex);
+  f3d_utils_string_destroy(regex);
 
   char* env_val = f3d_utils_get_env("PATH");
   if (!env_val)
@@ -54,7 +54,7 @@ int test_utils()
     puts("[ERROR] get_env(\"PATH\") returned NULL");
     failed++;
   }
-  f3d_utils_string_free(env_val);
+  f3d_utils_string_destroy(env_val);
 
 #ifdef _WIN32
   char* kf = f3d_utils_get_known_folder(F3D_UTILS_KNOWN_FOLDER_ROAMINGAPPDATA);
@@ -63,13 +63,13 @@ int test_utils()
     puts("[ERROR] get_known_folder returned NULL/empty on Windows");
     failed++;
   }
-  f3d_utils_string_free(kf);
+  f3d_utils_string_destroy(kf);
 #else
   char* kf = f3d_utils_get_known_folder(F3D_UTILS_KNOWN_FOLDER_ROAMINGAPPDATA);
   if (kf != NULL)
   {
     puts("[ERROR] get_known_folder should return NULL on non-Windows");
-    f3d_utils_string_free(kf);
+    f3d_utils_string_destroy(kf);
     failed++;
   }
 #endif

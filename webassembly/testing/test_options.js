@@ -110,12 +110,6 @@ const settings = {
       "options getType",
     );
 
-    const range = options.getRangeDomain("render.line_width");
-    utils.assert(
-      range[0] === 0.0 && range[1] === 10.0 && range[2] === 0.1,
-      "options getRangeDomain",
-    );
-
     options.removeValue("model.scivis.array_name");
     utils.assert(
       !options.hasValue("model.scivis.array_name"),
@@ -134,10 +128,35 @@ const settings = {
         Module.OptionsDomainStyle.INDEX,
       "option getDomainStyle",
     );
+
+    const doubleRange = options.getRangeDomainAsNumber("render.line_width");
     utils.assert(
-      options.getEnumDomain("render.effect.blending.mode").includes("ddp"),
+      doubleRange[0] === 0.0 &&
+        doubleRange[1] === 10.0 &&
+        doubleRange[2] === 0.1,
+      "options getRangeDomain double",
+    );
+    const intRange = options.getRangeDomainAsNumber(
+      "render.raytracing.samples",
+    );
+    utils.assert(
+      intRange[0] === 1.0 && intRange[1] === 50.0 && intRange[2] === 1.0,
+      "options getRangeDomain int",
+    );
+
+    utils.assert(
+      options
+        .getEnumDomainAsString("render.effect.blending.mode")
+        .includes("ddp"),
       "options getEnumDomain",
     );
+
+    // Cannot check anything but `undefined` without complex engine manipulation
+    utils.assert(
+      options.getIndexDomain("scene.camera.index") == undefined,
+      "options getIndexDomain",
+    );
+
     options.increase("render.raytracing.samples");
     options.increase("render.raytracing.samples");
     options.decrease("render.raytracing.samples");

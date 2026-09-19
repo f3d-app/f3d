@@ -142,14 +142,6 @@ f3d(settings)
   });
 ```
 
-Some advanced libf3d API are not bound yet, here's the exhaustive list:
-
-- `f3d::scene`: light related functions
-- `f3d::scene`: `scene& add(const mesh_t& mesh)`
-- `f3d::camera`: state management
-- `f3d::interactor`: bindings related functions
-- `f3d::interactor`: `playInteraction` and `recordInteraction`
-
 ## Java
 
 If the Java bindings have been generated using the `F3D_BINDINGS_JAVA` CMake option, the libf3d can be used directly from Java >= 17.

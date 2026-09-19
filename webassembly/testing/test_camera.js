@@ -15,6 +15,8 @@ const settings = {
   runAfter: (Module) => {
     const camera = Module.engineInstance.getWindow().getCamera();
 
+    const state = camera.state;
+
     utils.assert(
       utils.numArrayEquals(camera.position, [0, -0.016, 7.059], 0.01),
     );
@@ -48,6 +50,12 @@ const settings = {
       .yaw(-20)
       .elevation(25)
       .pitch(-30);
+
+    camera.state = state;
+
+    utils.assert(
+      utils.numArrayEquals(camera.position, [0, -0.016, 7.059], 0.01),
+    );
 
     camera.resetToDefault();
   },

@@ -30,7 +30,7 @@ int test_types()
   f3d_colormap_t colormap;
   colormap.data = NULL;
   colormap.count = 0;
-  f3d_colormap_free(&colormap);
+  f3d_colormap_destroy(&colormap);
 
   return 0;
 }

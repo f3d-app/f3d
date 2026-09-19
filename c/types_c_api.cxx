@@ -113,7 +113,7 @@ void f3d_transform2d_create(f3d_transform2d_t* transform, double scale_x, double
 
 // f3d_colormap_t functions
 //----------------------------------------------------------------------------
-void f3d_colormap_free(f3d_colormap_t* colormap)
+void f3d_colormap_destroy(f3d_colormap_t* colormap)
 {
   if (!colormap)
   {
@@ -195,7 +195,7 @@ int f3d_mesh_is_valid(const f3d_mesh_t* mesh, char** error_message)
 
 // f3d_light_state_t functions
 //----------------------------------------------------------------------------
-void f3d_light_state_free(f3d_light_state_t* light_state)
+void f3d_light_state_destroy(f3d_light_state_t* light_state)
 {
   delete light_state;
 }

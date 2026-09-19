@@ -48,7 +48,7 @@ public:
   std::vector<node_state_t> getSceneHierarchy() const override;
   scene& setNodeVisibility(int nodeId, bool visible) override;
   scene_info_t getSceneInfo() const override;
-  bool supports(const std::filesystem::path& filePath) override;
+  file_availability supports(const std::filesystem::path& filePath) override;
   scene& loadAnimationTime(double timeValue) override;
   double animationTime() override;
   size_t animationFrame() override;

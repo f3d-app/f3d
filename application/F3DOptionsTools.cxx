@@ -10,6 +10,7 @@
 #include "interactor.h"
 #include "log.h"
 #include "utils.h"
+#include "video_encoder.h"
 
 #include <cassert>
 #include <filesystem>
@@ -30,7 +31,7 @@ namespace
  * This is the easiest, compile time way to do it
  */
 constexpr std::array CLIBooleans = { "version", "help", "list-readers", "scan-plugins",
-  "list-rendering-backends", "define", "reset" };
+  "list-rendering-backends", "list-video-encoders", "define", "reset" };
 
 //----------------------------------------------------------------------------
 /**
@@ -130,6 +131,22 @@ void PrintRenderingBackendList()
   for (const auto& [name, available] : backends)
   {
     f3d::log::info(name + ": " + (available ? "available" : "unavailable"));
+  }
+}
+
+//----------------------------------------------------------------------------
+void PrintVideoEncodersList()
+{
+  auto encoders = f3d::video_encoder::getAvailableEncoders();
+
+  f3d::log::setUseColoring(false);
+  f3d::log::info("Video encoders:");
+  for (const auto& [name, longName] : encoders)
+  {
+    std::string line = name;
+    line += ": ";
+    line += longName;
+    f3d::log::info(line);
   }
 }
 
@@ -373,6 +390,11 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
     {
       ::PrintRenderingBackendList();
       throw F3DExNoProcess("rendering backend list requested");
+    }
+    if (result.count("list-video-encoders") > 0)
+    {
+      ::PrintVideoEncodersList();
+      throw F3DExNoProcess("video encoders list requested");
     }
     if (result.count("scan-plugins") > 0)
     {

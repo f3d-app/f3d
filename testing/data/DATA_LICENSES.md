@@ -3,6 +3,7 @@
 # Copyrights and Licenses
 
 - (ノಠ益ಠ )ノ.vtp: VTK Data: BSD-3-Clause
+- şΞβЦй€±©.vtp: VTK Data: BSD-3-Clause
 - 1.2-with-color.ptx: PDAL: Copyright (c) 2025, Hobu, Inc.
 - 10-word.qi: PDAL: Copyright (c) 2025, Hobu, Inc.
 - 16bits.\*: @bisechen: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
@@ -20,6 +21,7 @@
 - bot2.wrl: VTK Data: BSD-3-Clause
 - Box_draco\*: glTF-Sample-Models/Cesium: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - BoxAnimated\*: glTF-Sample-Models/Cesium: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- bridge.dxf: GNU LGPL license (https://people.math.sc.edu/Burkardt/data/dxf/dxf.html)
 - Cameras.gltf: glTF-Sample-Models: Public Domain
 - cow.vtk: VTK Data: BSD-3-Clause
 - cow.vtp: VTK Data: BSD-3-Clause

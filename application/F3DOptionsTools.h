@@ -29,6 +29,10 @@ using OptionsEntries = std::vector<OptionsEntry>;
 static inline const OptionsDict DefaultAppOptions = {
   { "input", "" },
   { "output", "" },
+  { "output-video", "" },
+  { "video-encoder", "" },
+  { "video-bitrate", "5" },
+  { "video-low-latency", "false" },
   { "list-bindings", "false" },
   { "no-background", "false" },
   { "config", "" },
@@ -146,6 +150,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "roughness", "model.material.roughness" },
   { "scalar-coloring", "model.scivis.enable" },
   { "scene-hierarchy", "ui.scene_hierarchy" },
+  { "skip-content-check", "scene.skip_content_check" },
   { "texture-base-color", "model.color.texture" },
   { "texture-emissive", "model.emissive.texture" },
   { "texture-matcap", "model.matcap.texture" },

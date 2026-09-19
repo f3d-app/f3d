@@ -1,3 +1,4 @@
+import os
 import tempfile
 from pathlib import Path
 
@@ -193,3 +194,19 @@ def test_scene_info():
     assert info.number_of_actors == 0
     assert info.number_of_points == 0
     assert info.number_of_cells == 0
+
+
+def test_scene_supports():
+    testing_dir = Path(__file__).parent.parent.parent / "testing"
+    cow = testing_dir / "data/cow.vtp"
+    invalid_mdl = testing_dir / "data/invalid.mdl"
+    unsupported = testing_dir / "data/unsupportedFile.dummy"
+
+    engine = f3d.Engine.create_none()
+    scene = engine.scene
+
+    assert scene.supports(cow) == f3d.FileAvailability.SUPPORTED
+    assert scene.supports(unsupported) == f3d.FileAvailability.UNSUPPORTED_EXTENSION
+
+    if os.environ.get("F3D_TESTING_CONTENT_CHECK") == "1":
+        assert scene.supports(invalid_mdl) == f3d.FileAvailability.UNSUPPORTED_CONTENT

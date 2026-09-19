@@ -169,21 +169,8 @@ struct vtkF3DImguiActor::Internals
 
   void Initialize(vtkOpenGLRenderWindow* renWin)
   {
-    if (this->FontTexture == nullptr)
+    if (this->VertexBuffer == nullptr)
     {
-      // Build texture atlas
-      ImGuiIO& io = ImGui::GetIO();
-      unsigned char* pixels;
-      int width, height;
-      io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
-
-      this->FontTexture = vtkSmartPointer<vtkTextureObject>::New();
-      this->FontTexture->SetContext(renWin);
-      this->FontTexture->Create2DFromRaw(width, height, 4, VTK_UNSIGNED_CHAR, pixels);
-
-      // Store our identifier
-      io.Fonts->SetTexID((ImTextureID)this->FontTexture.Get());
-
       // Create VBO
       this->VertexBuffer = vtkSmartPointer<vtkOpenGLBufferObject>::New();
 
@@ -241,12 +228,6 @@ struct vtkF3DImguiActor::Internals
     {
       ImGuiIO& io = ImGui::GetIO();
 
-      if (this->FontTexture)
-      {
-        io.Fonts->SetTexID(0);
-        this->FontTexture->ReleaseGraphicsResources(renWin);
-        this->FontTexture = nullptr;
-      }
       if (this->LogoTexture)
       {
         this->LogoTexture->ReleaseGraphicsResources(renWin);
@@ -268,10 +249,64 @@ struct vtkF3DImguiActor::Internals
         this->Program = nullptr;
       }
 
+      // Destroy all textures
+      for (ImTextureData* tex : ImGui::GetPlatformIO().Textures)
+      {
+        if (tex->RefCount == 1)
+        {
+          tex->SetStatus(ImTextureStatus_WantDestroy);
+          this->UpdateTexture(renWin, tex);
+        }
+      }
+
       io.Fonts->Clear();
 
       io.BackendPlatformName = io.BackendRendererName = nullptr;
       ImGui::DestroyContext();
+    }
+  }
+
+  void UpdateTexture(vtkOpenGLRenderWindow* renWin, ImTextureData* tex)
+  {
+    if (tex->Status == ImTextureStatus_WantCreate)
+    {
+      vtkTextureObject* textureObject = vtkTextureObject::New();
+      textureObject->SetContext(renWin);
+      textureObject->Create2DFromRaw(
+        tex->Width, tex->Height, 4, VTK_UNSIGNED_CHAR, tex->GetPixels());
+
+      tex->SetTexID(reinterpret_cast<ImTextureID>(textureObject));
+      tex->SetStatus(ImTextureStatus_OK);
+    }
+    else if (tex->Status == ImTextureStatus_WantUpdates)
+    {
+      vtkTextureObject* textureObject = reinterpret_cast<vtkTextureObject*>(tex->GetTexID());
+      textureObject->Bind();
+
+      vtkOpenGLState* ostate = renWin->GetState();
+      ostate->vtkglPixelStorei(GL_UNPACK_ROW_LENGTH, tex->Width); // stride
+
+      for (ImTextureRect& r : tex->Updates)
+      {
+        ostate->vtkglPixelStorei(GL_UNPACK_SKIP_PIXELS, r.x);
+        ostate->vtkglPixelStorei(GL_UNPACK_SKIP_ROWS, r.y);
+
+        glTexSubImage2D(
+          GL_TEXTURE_2D, 0, r.x, r.y, r.w, r.h, GL_RGBA, GL_UNSIGNED_BYTE, tex->GetPixels());
+      }
+
+      ostate->vtkglPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+      ostate->vtkglPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+      ostate->vtkglPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
+
+      tex->SetStatus(ImTextureStatus_OK);
+    }
+    else if (tex->Status == ImTextureStatus_WantDestroy)
+    {
+      vtkTextureObject* textureObject = reinterpret_cast<vtkTextureObject*>(tex->GetTexID());
+      textureObject->Delete();
+      tex->SetTexID(ImTextureID_Invalid);
+      tex->SetStatus(ImTextureStatus_Destroyed);
     }
   }
 
@@ -296,6 +331,14 @@ struct vtkF3DImguiActor::Internals
     state->vtkglDisable(GL_DEPTH_TEST);
     state->vtkglDisable(GL_STENCIL_TEST);
     state->vtkglEnable(GL_SCISSOR_TEST);
+
+    if (drawData->Textures != nullptr)
+    {
+      for (ImTextureData* tex : *drawData->Textures)
+      {
+        this->UpdateTexture(renWin, tex);
+      }
+    }
 
     renWin->GetShaderCache()->ReadyShaderProgram(this->Program);
 
@@ -358,11 +401,9 @@ struct vtkF3DImguiActor::Internals
     this->VertexBuffer->Release();
     this->IndexBuffer->Release();
 
-    this->FontTexture->Deactivate();
     this->LogoTexture->Deactivate();
   }
 
-  vtkSmartPointer<vtkTextureObject> FontTexture;
   vtkSmartPointer<vtkOpenGLVertexArrayObject> VertexArray;
   vtkSmartPointer<vtkOpenGLBufferObject> VertexBuffer;
   vtkSmartPointer<vtkOpenGLBufferObject> IndexBuffer;
@@ -455,13 +496,15 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   io.IniFilename = nullptr;
   io.LogFilename = nullptr;
 
-  ImFontConfig fontConfig;
+  // Setup backend name
+  io.BackendPlatformName = io.BackendRendererName = "F3D/VTK";
+  io.BackendFlags |= ImGuiBackendFlags_RendererHasTextures;
 
-  ImVector<ImWchar> ranges;
-  ImFontGlyphRangesBuilder builder;
-  builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
-  builder.AddChar(0x2264); // Less-Than or Equal To
-  builder.BuildRanges(&ranges);
+  ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
+  platformIO.Renderer_TextureMaxWidth = platformIO.Renderer_TextureMaxHeight =
+    vtkTextureObject::GetMaximumTextureSize(renWin);
+
+  ImFontConfig fontConfig;
 
   ImFont* font = nullptr;
   if (this->FontFile.empty())
@@ -470,18 +513,18 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
     fontConfig.FontDataOwnedByAtlas = false;
     font = io.Fonts->AddFontFromMemoryTTF(
       const_cast<void*>(reinterpret_cast<const void*>(F3DFontBuffer)), sizeof(F3DFontBuffer),
-      F3DStyle::FontSizeBase * this->FontScale, &fontConfig, ranges.Data);
+      F3DStyle::FontSizeBase * this->FontScale, &fontConfig);
     ImFont* notiFont = io.Fonts->AddFontFromMemoryTTF(
       const_cast<void*>(reinterpret_cast<const void*>(F3DFontBuffer)), sizeof(F3DFontBuffer),
-      F3DStyle::FontSizeBase * this->FontScale * .8f, &fontConfig, ranges.Data);
+      F3DStyle::FontSizeBase * this->FontScale * .8f, &fontConfig);
     Pimpl->ExtraFonts["notiFont"] = notiFont;
   }
   else
   {
     font = io.Fonts->AddFontFromFileTTF(
-      this->FontFile.c_str(), F3DStyle::FontSizeBase * this->FontScale, &fontConfig, ranges.Data);
-    ImFont* notiFont = io.Fonts->AddFontFromFileTTF(this->FontFile.c_str(),
-      F3DStyle::FontSizeBase * this->FontScale * .8f, &fontConfig, ranges.Data);
+      this->FontFile.c_str(), F3DStyle::FontSizeBase * this->FontScale, &fontConfig);
+    ImFont* notiFont = io.Fonts->AddFontFromFileTTF(
+      this->FontFile.c_str(), F3DStyle::FontSizeBase * this->FontScale * .8f, &fontConfig);
     Pimpl->ExtraFonts["notiFont"] = notiFont;
   }
 
@@ -514,9 +557,6 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   style->Colors[ImGuiCol_ResizeGrip] = F3DStyle::imgui::GetMidColor();
   style->Colors[ImGuiCol_ResizeGripHovered] = F3DStyle::imgui::GetHighlightColor();
   style->Colors[ImGuiCol_ResizeGripActive] = F3DStyle::imgui::GetHighlightColor();
-
-  // Setup backend name
-  io.BackendPlatformName = io.BackendRendererName = "F3D/VTK";
 }
 
 //----------------------------------------------------------------------------

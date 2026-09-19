@@ -11,6 +11,8 @@ f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --background-color=1,1,1 -p PL
 f3d_test(NAME TestAssimpInvalid DATA invalid_truncated.fbx PLUGIN assimp REGEXP "Some of these files could not be loaded" NO_BASELINE)
 f3d_test(NAME TestAssimpMetaDataImporter DATA duck.fbx PLUGIN assimp ARGS -m UI)
 
+f3d_test(NAME TestDXFr12 DATA bridge.dxf PLUGIN assimp)
+
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251016)
   f3d_test(NAME TestPipedOFF DATA teapot.off ARGS --up=+Z PLUGIN assimp PIPED_READER OFF PIPED)
   f3d_test(NAME TestPiped3MF DATA cube_gears.3mf PLUGIN assimp PIPED_READER 3MF PIPED)

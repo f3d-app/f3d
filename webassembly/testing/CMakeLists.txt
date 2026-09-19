@@ -4,6 +4,7 @@ set(f3djsTests_list
   "test_engine"
   "test_image"
   "test_interactor"
+  "test_memory_view"
   "test_options"
   "test_render"
   "test_scene"

@@ -613,6 +613,7 @@ public:
       this->CommandBuffer.reset();
     }
 
+    this->AnimationManager->UpdateDynamicOptions();
     this->AnimationManager->SetDeltaTime(deltaTime);
     this->AnimationManager->Tick();
 
@@ -847,12 +848,14 @@ interactor& interactor_impl::initCommands()
         if (this->Internals->Options.hasDomain(args[0]) &&
           this->Internals->Options.getDomainStyle(args[0]) == f3d::options::domain_style::ENUM)
         {
-          // recover the enumeration
-          std::vector<std::string> enumeration = this->Internals->Options.getEnumDomain(args[0]);
+          f3d::options::DomainEnum<f3d::option_variant_t> domain =
+            this->Internals->Options.getEnumDomain(args[0]);
 
           // Transform potential values into found option
-          std::ranges::transform(enumeration, std::back_inserter(candidates),
-            [&](const auto& value) { return args[0] + " " + value; });
+          // Only string is supported for now
+          candidates.resize(domain.enumeration.size());
+          std::ranges::transform(domain.enumeration, candidates.begin(),
+            [&](const auto& value) { return args[0] + " " + std::get<std::string>(value); });
         }
         else
         {
@@ -872,8 +875,12 @@ interactor& interactor_impl::initCommands()
       if (this->Internals->Options.hasDomain(args[0]) &&
         this->Internals->Options.getDomainStyle(args[0]) == f3d::options::domain_style::ENUM)
       {
-        // recover the enumeration
-        std::vector<std::string> enumeration = this->Internals->Options.getEnumDomain(args[0]);
+        // recover the enumeration, only strings are supported for now
+        f3d::options::DomainEnum<f3d::option_variant_t> domain =
+          this->Internals->Options.getEnumDomain(args[0]);
+        std::vector<std::string> enumeration(domain.enumeration.size());
+        std::ranges::transform(domain.enumeration, enumeration.begin(),
+          [](const auto& value) { return std::get<std::string>(value); });
 
         // Complete the option value if possible
         return complNames(args, enumeration, 1);
@@ -1361,11 +1368,13 @@ interactor& interactor_impl::initCommands()
         f3d::engine::state::fromString(content).toClipboard();
         log::info("Statefile copied to the clipboard");
       }
+      // Cannot test clipboard failure in the CI
+      // LCOV_EXCL_START
       catch (const f3d::engine::statefile_exception& ex)
       {
-        // Unreachable in testing
         log::error(ex.what());
       }
+      // LCOV_EXCL_STOP
     },
     command_documentation_t{
       "save_statefile_to_clipboard", "save the current state into the system clipboard" });
@@ -1382,11 +1391,13 @@ interactor& interactor_impl::initCommands()
           this->Internals->Scene, this->Internals->Window, this->Internals->Options, st.toString());
         log::info("Statefile loaded from the clipboard");
       }
+      // Cannot test clipboard failure in the CI
+      // LCOV_EXCL_START
       catch (const f3d::engine::statefile_exception& ex)
       {
-        // Unreachable in testing
         log::error(ex.what());
       }
+      // LCOV_EXCL_STOP
     },
     command_documentation_t{
       "load_statefile_from_clipboard", "restore the state from the system clipboard" });

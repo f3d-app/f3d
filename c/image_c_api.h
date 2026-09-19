@@ -32,31 +32,31 @@ extern "C"
   /**
    * @brief Create a new empty image object
    *
-   * The returned image must be deleted with f3d_image_delete().
+   * The returned image must be deleted with f3d_image_destroy().
    *
    * @return Pointer to the newly created image object
    */
-  F3D_EXPORT f3d_image_t* f3d_image_new_empty();
+  F3D_EXPORT f3d_image_t* f3d_image_create_empty();
 
   /**
    * @brief Create a new image object with the given parameters
    *
-   * The returned image must be deleted with f3d_image_delete().
+   * The returned image must be deleted with f3d_image_destroy().
    *
    * @return Pointer to the newly created image object
    */
-  F3D_EXPORT f3d_image_t* f3d_image_new_params(unsigned int width, unsigned int height,
+  F3D_EXPORT f3d_image_t* f3d_image_create_params(unsigned int width, unsigned int height,
     unsigned int channelCount, f3d_image_channel_type_t channelType);
 
   /**
    * @brief Create a new image object from a file path
    *
-   * The returned image must be deleted with f3d_image_delete().
+   * The returned image must be deleted with f3d_image_destroy().
    * If provided path is NULL, return NULL.
    *
    * @return Pointer to the newly created image object, NULL on failure
    */
-  F3D_EXPORT f3d_image_t* f3d_image_new_path(const char* path);
+  F3D_EXPORT f3d_image_t* f3d_image_create_path(const char* path);
 
   /**
    * @brief Delete an image object
@@ -64,7 +64,7 @@ extern "C"
    *
    * If provided img is NULL, do nothing.
    */
-  F3D_EXPORT void f3d_image_delete(f3d_image_t* img);
+  F3D_EXPORT void f3d_image_destroy(f3d_image_t* img);
 
   /**
    * @brief Test if two images are equal
@@ -219,7 +219,7 @@ extern "C"
   /**
    * @brief Save an image to a buffer
    *
-   * The returned buffer is heap-allocated and must be freed with f3d_image_free_buffer().
+   * The returned buffer is heap-allocated and must be freed with f3d_image_destroy_buffer().
    *
    * @param img Pointer to the image object
    * @param format Format in which the image will be saved
@@ -237,7 +237,7 @@ extern "C"
    * @brief Free a buffer returned by f3d_image_save_buffer
    * @param buffer Pointer to the buffer to free
    */
-  F3D_EXPORT void f3d_image_free_buffer(unsigned char* buffer);
+  F3D_EXPORT void f3d_image_destroy_buffer(unsigned char* buffer);
 
   /**
    * @brief Convert an image to colored text using ANSI escape sequences for terminal output
@@ -293,7 +293,7 @@ extern "C"
   /**
    * @brief Get all metadata keys from an image
    *
-   * The returned keys must be freed with f3d_image_free_metadata_keys.
+   * The returned keys must be freed with f3d_image_destroy_metadata_keys.
    * If provided img is NULL, return NULL.
    * If provided count is NULL, set count to zero and return NULL.
    *
@@ -312,7 +312,7 @@ extern "C"
    * @param keys Pointer to the array of metadata keys
    * @param count Count of metadata keys
    */
-  F3D_EXPORT void f3d_image_free_metadata_keys(char** keys, unsigned int count);
+  F3D_EXPORT void f3d_image_destroy_metadata_keys(char** keys, unsigned int count);
 
 #ifdef __cplusplus
 }

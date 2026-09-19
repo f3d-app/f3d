@@ -173,6 +173,7 @@ f3d_test(NAME TestLightIntensityDarkerFullScene DATA WaterBottle.glb ARGS --ligh
 
 ## Other UI
 f3d_test(NAME TestUTF8 DATA "(ノಠ益ಠ )ノ.vtp")
+f3d_test(NAME TestGlyphsRangeFilename DATA "şΞβЦй€±©.vtp" ARGS -n UI)
 f3d_test(NAME TestFilenameCommasSpaces DATA "tetrahedron, with commas & spaces.stl")
 f3d_test(NAME TestFilename DATA suzanne.ply ARGS -n UI)
 f3d_test(NAME TestHDRIFilename DATA dragon.vtu ARGS --hdri-filename HDRI shanghai_bund_1k.hdr UI LONG_TIMEOUT THRESHOLD 0.05) # Small rendering differences on GLES
@@ -236,6 +237,11 @@ f3d_test(NAME TestInvalidFileFileNameEmpty DATA invalid_body.vtp ARGS --filename
 f3d_test(NAME TestMultiFileInvalid DATA cow.vtp invalid_body.vtp dragon.vtu ARGS --multi-file-mode=all NO_DATA_FORCE_RENDER UI)
 f3d_test(NAME TestMultiFileUnsupportedFilesFileName DATA unsupportedFile.dummy cow.vtp ARGS --multi-file-mode=all --filename NO_DATA_FORCE_RENDER UI)
 f3d_test(NAME TestMultiFileCameraIndex DATA Cameras.gltf CameraAnimated.glb ARGS --multi-file-mode=all --camera-index=2 --opacity=0.5 --blending)
+f3d_test(NAME TestSkipContentCheck DATA invalid.mdl ARGS --skip-content-check REGEXP "Invalid MDL file" NO_RENDER)
+# Test file with a supported extension but unsupported content (needs VTK CanReadFile support)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  f3d_test(NAME TestUnsupportedContent DATA invalid.mdl REGEXP ".*invalid.mdl contains unsupported contents" NO_RENDER)
+endif()
 
 ## Font
 f3d_test(NAME TestFont DATA suzanne.ply ARGS -n --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf UI)

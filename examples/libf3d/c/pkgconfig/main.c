@@ -9,7 +9,7 @@ int main(void)
 
   f3d_log_info("F3D engine is loaded");
 
-  f3d_engine_delete(engine);
+  f3d_engine_destroy(engine);
 
   return 0;
 }

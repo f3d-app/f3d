@@ -6,7 +6,7 @@
 int test_options()
 {
   f3d_options_t* standalone_options = f3d_options_create();
-  f3d_options_delete(standalone_options);
+  f3d_options_destroy(standalone_options);
 
   f3d_engine_t* engine = f3d_engine_create_none();
   if (!engine)
@@ -19,7 +19,7 @@ int test_options()
   if (!options)
   {
     puts("[ERROR] Failed to get options");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return 1;
   }
 
@@ -46,7 +46,7 @@ int test_options()
   const char* str_val = f3d_options_get_as_string(options, "render.effect.final_shader");
   if (str_val)
   {
-    f3d_options_free_string(str_val);
+    f3d_options_destroy_string(str_val);
   }
 
   double out_vec[3];
@@ -70,7 +70,7 @@ int test_options()
 
       f3d_options_copy(options2, options, "model.scivis.cells");
     }
-    f3d_engine_delete(engine2);
+    f3d_engine_destroy(engine2);
   }
 
   int has_value = f3d_options_has_value(options, "model.scivis.cells");
@@ -80,14 +80,14 @@ int test_options()
   char** all_names = f3d_options_get_all_names(&all_count);
   if (all_names)
   {
-    f3d_options_free_names(all_names, all_count);
+    f3d_options_destroy_names(all_names, all_count);
   }
 
   size_t names_count;
   char** names = f3d_options_get_names(options, &names_count);
   if (names)
   {
-    f3d_options_free_names(names, names_count);
+    f3d_options_destroy_names(names, names_count);
   }
 
   int is_optional = f3d_options_is_optional(options, "render.show_edges");
@@ -100,50 +100,7 @@ int test_options()
   {
     puts("[ERROR] f3d_options_get_type should return F3D_OPTION_TYPE_INVALID for a "
          "non-existent option");
-    f3d_engine_delete(engine);
-    return 1;
-  }
-
-  double range[3];
-  if (!f3d_options_get_range_domain_double(options, "render.line_width", range))
-  {
-    puts("[ERROR] f3d_options_get_range_domain_double should succeed for render.line_width");
-    f3d_engine_delete(engine);
-    return 1;
-  }
-  if (range[0] != 0.0 || range[1] != 10.0 || range[2] != 0.1)
-  {
-    puts("[ERROR] f3d_options_get_range_domain_double returned unexpected values for "
-         "render.line_width");
-    f3d_engine_delete(engine);
-    return 1;
-  }
-
-  int int_range[3];
-  if (!f3d_options_get_range_domain_int(options, "render.raytracing.samples", int_range))
-  {
-    puts("[ERROR] f3d_options_get_range_domain_int should succeed for render.raytracing.samples");
-    f3d_engine_delete(engine);
-    return 1;
-  }
-  if (int_range[0] != 1 || int_range[1] != 50 || int_range[2] != 1)
-  {
-    puts("[ERROR] f3d_options_get_range_domain_int returned unexpected values for "
-         "render.raytracing.samples");
-    f3d_engine_delete(engine);
-    return 1;
-  }
-
-  if (f3d_options_get_range_domain_double(options, "render.raytracing.samples", range))
-  {
-    puts("[ERROR] f3d_options_get_range_domain_double should fail for an int range domain");
-    f3d_engine_delete(engine);
-    return 1;
-  }
-  if (f3d_options_get_range_domain_double(options, "dummy", range))
-  {
-    puts("[ERROR] f3d_options_get_range_domain_double should fail for a non-existent option");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return 1;
   }
 
@@ -153,11 +110,145 @@ int test_options()
   f3d_options_has_domain(options, "scene.animation.speed_factor");
   f3d_options_get_domain_style(options, "scene.animation.speed_factor");
 
+  // Test get_range_domain
+
+  double range[3];
+  if (!f3d_options_get_range_domain_double(options, "render.line_width", range))
+  {
+    puts("[ERROR] f3d_options_get_range_domain_double should succeed for render.line_width");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+  if (range[0] != 0.0 || range[1] != 10.0 || range[2] != 0.1)
+  {
+    puts("[ERROR] f3d_options_get_range_domain_double returned unexpected values for "
+         "render.line_width");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  int int_range[3];
+  if (!f3d_options_get_range_domain_int(options, "render.raytracing.samples", int_range))
+  {
+    puts("[ERROR] f3d_options_get_range_domain_int should succeed for render.raytracing.samples");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+  if (int_range[0] != 1 || int_range[1] != 50 || int_range[2] != 1)
+  {
+    puts("[ERROR] f3d_options_get_range_domain_int returned unexpected values for "
+         "render.raytracing.samples");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  // Test get_range_domain error code path
+
+  if (f3d_options_get_range_domain_double(options, "render.raytracing.samples", range))
+  {
+    puts("[ERROR] f3d_options_get_range_domain_double should fail for an int range domain");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+  if (f3d_options_get_range_domain_double(options, "dummy", range))
+  {
+    puts("[ERROR] f3d_options_get_range_domain_double should fail for a non-existent option");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+  if (f3d_options_get_range_domain_double(NULL, NULL, NULL))
+  {
+    puts("[ERROR] f3d_options_get_range_domain_double should fail with NULL params");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  if (f3d_options_get_range_domain_int(options, "render.line_width", int_range))
+  {
+    puts("[ERROR] f3d_options_get_range_domain_int should fail for a double range domain");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+  if (f3d_options_get_range_domain_int(options, "dummy", int_range))
+  {
+    puts("[ERROR] f3d_options_get_range_domain_int should fail for a non-existent option");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+  if (f3d_options_get_range_domain_int(NULL, NULL, NULL))
+  {
+    puts("[ERROR] f3d_options_get_range_domain_int should fail with NULL params");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  // Test get_enum_domain
+
   int enum_count = 0;
-  char** enumeration = f3d_options_get_enum_domain(options, "interactor.style", &enum_count);
+  char** enumeration = f3d_options_get_enum_domain_string(options, "interactor.style", &enum_count);
   if (enumeration)
   {
-    f3d_options_free_string_array(enumeration, enum_count);
+    f3d_options_destroy_string_array(enumeration, enum_count);
+  }
+  else
+  {
+    puts("[ERROR] f3d_options_get_enum_domain_string failed to recover an existing domain");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  // Test get_enum_domain error code path
+
+  enumeration = f3d_options_get_enum_domain_string(options, "scene.animation.speed_factor", &enum_count);
+  if (enumeration)
+  {
+    puts("[ERROR] f3d_options_get_enum_domain_string should fail to recover a domain for an incompatible option");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  enumeration = f3d_options_get_enum_domain_string(options, "inexistent", &enum_count);
+  if (enumeration)
+  {
+    puts("[ERROR] f3d_options_get_enum_domain_string should fail to recover a domain for an inexistent option");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  enumeration = f3d_options_get_enum_domain_string(NULL, NULL, &enum_count);
+  if (enumeration)
+  {
+    puts("[ERROR] f3d_options_get_enum_domain_string should fail to recover a domain with invalid parameters");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  // Test get_index_domain
+  unsigned int max;
+  // Cannot test the == 1 code path with complex manipulation of the engine
+  if (f3d_options_get_index_domain(options, "scene.camera.index", &max) != 2)
+  {
+    puts("[ERROR] f3d_options_get_index_domain should return 2 for scene.camera.index");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+  if (f3d_options_get_index_domain(options, "render.raytracing.samples", &max))
+  {
+    puts("[ERROR] f3d_options_get_index_domain should fail for an incompatible option");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+  if (f3d_options_get_index_domain(options, "dummy", &max))
+  {
+    puts("[ERROR] f3d_options_get_index_domain should fail for a non-existent option");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+  if (f3d_options_get_index_domain(NULL, NULL, NULL))
+  {
+    puts("[ERROR] f3d_options_get_index_domain should fail for a non-existent option");
+    f3d_engine_destroy(engine);
+    return 1;
   }
 
   f3d_options_increase(options, "scene.animation.speed_factor");
@@ -167,7 +258,7 @@ int test_options()
   const char* str_repr = f3d_options_get_as_string_representation(options, "render.line_width");
   if (str_repr)
   {
-    f3d_options_free_string(str_repr);
+    f3d_options_destroy_string(str_repr);
   }
 
   f3d_options_set_as_string_representation(options, "render.line_width", "5.0");
@@ -177,7 +268,7 @@ int test_options()
   f3d_options_get_closest_option(options, "render.line_wdth", &closest, &distance);
   if (closest)
   {
-    f3d_options_free_string(closest);
+    f3d_options_destroy_string(closest);
   }
 
   int parsed_bool = f3d_options_parse_bool("true");
@@ -192,7 +283,7 @@ int test_options()
   const char* parsed_string = f3d_options_parse_string("test");
   if (parsed_string)
   {
-    f3d_options_free_string(parsed_string);
+    f3d_options_destroy_string(parsed_string);
   }
 
   double parsed_dvec[3];
@@ -206,41 +297,41 @@ int test_options()
   const char* fmt_bool = f3d_options_format_bool(1);
   if (fmt_bool)
   {
-    f3d_options_free_string(fmt_bool);
+    f3d_options_destroy_string(fmt_bool);
   }
 
   const char* fmt_int = f3d_options_format_int(42);
   if (fmt_int)
   {
-    f3d_options_free_string(fmt_int);
+    f3d_options_destroy_string(fmt_int);
   }
 
   const char* fmt_double = f3d_options_format_double(3.14);
   if (fmt_double)
   {
-    f3d_options_free_string(fmt_double);
+    f3d_options_destroy_string(fmt_double);
   }
 
   const char* fmt_string = f3d_options_format_string("test");
   if (fmt_string)
   {
-    f3d_options_free_string(fmt_string);
+    f3d_options_destroy_string(fmt_string);
   }
 
   const double fmt_dvec[] = { 1.0, 2.0, 3.0 };
   const char* fmt_dvec_str = f3d_options_format_double_vector(fmt_dvec, 3);
   if (fmt_dvec_str)
   {
-    f3d_options_free_string(fmt_dvec_str);
+    f3d_options_destroy_string(fmt_dvec_str);
   }
 
   const int fmt_ivec[] = { 1, 2, 3 };
   const char* fmt_ivec_str = f3d_options_format_int_vector(fmt_ivec, 3);
   if (fmt_ivec_str)
   {
-    f3d_options_free_string(fmt_ivec_str);
+    f3d_options_destroy_string(fmt_ivec_str);
   }
 
-  f3d_engine_delete(engine);
+  f3d_engine_destroy(engine);
   return 0;
 }

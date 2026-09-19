@@ -28,6 +28,9 @@ std::vector<fs::path> F3DConfigFileTools::GetConfigPaths(const std::string& conf
     "/usr/share/f3d/configs",
 #endif
     F3DSystemTools::GetBinaryResourceDirectory() / "configs",
+#if defined(__linux__) || defined(__FreeBSD__)
+    F3DSystemTools::GetBinarySysConfDirectory(),
+#endif
     F3DSystemTools::GetUserConfigFileDirectory(),
   };
 

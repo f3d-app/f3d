@@ -4,13 +4,13 @@
 
 int test_image()
 {
-  f3d_image_t* img_empty = f3d_image_new_empty();
+  f3d_image_t* img_empty = f3d_image_create_empty();
   if (img_empty)
   {
-    f3d_image_delete(img_empty);
+    f3d_image_destroy(img_empty);
   }
 
-  f3d_image_t* img = f3d_image_new_params(800, 600, 3, BYTE);
+  f3d_image_t* img = f3d_image_create_params(800, 600, 3, BYTE);
   if (!img)
   {
     puts("[ERROR] Failed to create image");
@@ -18,7 +18,7 @@ int test_image()
   }
 
   // this shouldn't crash
-  f3d_image_t* img_wrong_path = f3d_image_new_path("/non/existent/path/image.png");
+  f3d_image_t* img_wrong_path = f3d_image_create_path("/non/existent/path/image.png");
 
   unsigned int width = f3d_image_get_width(img);
   (void)width;
@@ -48,10 +48,10 @@ int test_image()
   char** metadata_keys = f3d_image_all_metadata(img, &count);
   if (metadata_keys)
   {
-    f3d_image_free_metadata_keys(metadata_keys, count);
+    f3d_image_destroy_metadata_keys(metadata_keys, count);
   }
 
-  f3d_image_t* ref_img = f3d_image_new_params(800, 600, 3, BYTE);
+  f3d_image_t* ref_img = f3d_image_create_params(800, 600, 3, BYTE);
   if (ref_img)
   {
     double error = f3d_image_compare(img, ref_img);
@@ -63,7 +63,7 @@ int test_image()
     int is_not_equal = f3d_image_not_equals(img, ref_img);
     (void)is_not_equal;
 
-    f3d_image_delete(ref_img);
+    f3d_image_destroy(ref_img);
   }
 
   unsigned char* tempBuffer = f3d_image_save_buffer(NULL, PNG, &count); // this shouldn't crash
@@ -76,7 +76,7 @@ int test_image()
   unsigned char* buffer = f3d_image_save_buffer(img, PNG, &buffer_size);
   if (buffer)
   {
-    f3d_image_free_buffer(buffer);
+    f3d_image_destroy_buffer(buffer);
   }
 
   const char* tmp_path = "/tmp/f3d_test_image.png";
@@ -90,10 +90,10 @@ int test_image()
     return 1;
   }
 
-  f3d_image_t* img_from_file = f3d_image_new_path(tmp_path);
+  f3d_image_t* img_from_file = f3d_image_create_path(tmp_path);
   if (img_from_file)
   {
-    f3d_image_delete(img_from_file);
+    f3d_image_destroy(img_from_file);
   }
 
   const char* text = f3d_image_to_terminal_text_string(img);
@@ -106,12 +106,12 @@ int test_image()
   const char** formats = f3d_image_get_supported_formats();
   (void)formats;
 
-  f3d_image_t* img2 = f3d_image_new_params(100, 100, 4, BYTE);
+  f3d_image_t* img2 = f3d_image_create_params(100, 100, 4, BYTE);
   if (img2)
   {
-    f3d_image_delete(img2);
+    f3d_image_destroy(img2);
   }
 
-  f3d_image_delete(img);
+  f3d_image_destroy(img);
   return 0;
 }

@@ -36,7 +36,7 @@ int main(int argc, char** argv)
   if (!options)
   {
     fprintf(stderr, "Failed to get options\n");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return EXIT_FAILURE;
   }
 
@@ -51,14 +51,14 @@ int main(int argc, char** argv)
   if (!scene)
   {
     fprintf(stderr, "Failed to get scene\n");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return EXIT_FAILURE;
   }
 
   if (!f3d_scene_add(scene, file))
   {
     fprintf(stderr, "Failed to load file: %s\n", file);
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return EXIT_FAILURE;
   }
 
@@ -66,7 +66,7 @@ int main(int argc, char** argv)
   if (!window)
   {
     fprintf(stderr, "Failed to get window\n");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return EXIT_FAILURE;
   }
 
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
   if (!interactor)
   {
     fprintf(stderr, "Failed to get interactor\n");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return EXIT_FAILURE;
   }
 
@@ -92,7 +92,7 @@ int main(int argc, char** argv)
     f3d_interactor_start(interactor, 1.0 / 30.0);
   }
 
-  f3d_engine_delete(engine);
+  f3d_engine_destroy(engine);
 
   return EXIT_SUCCESS;
 }

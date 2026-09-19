@@ -21,7 +21,7 @@ target_link_options(f3djs PRIVATE
   "SHELL:-sSTACK_SIZE=1048576"
   "SHELL:-sWASM=1"
   "SHELL:-sFORCE_FILESYSTEM"
-  "SHELL:-sEXPORTED_RUNTIME_METHODS=FS"
+  "SHELL:-sEXPORTED_RUNTIME_METHODS=['getExceptionMessage','decrementExceptionRefcount','FS']"
   "SHELL:-sWASM_BIGINT"
 )
 

@@ -12,9 +12,23 @@ list(APPEND f3d_c_api_tests_list
   test_window.c
 )
 
+if(F3D_MODULE_FFMPEG)
+  list(APPEND f3d_c_api_tests_list
+    test_video.c
+  )
+endif()
+
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
   list(APPEND f3d_c_api_tests_list
     test_scene_buffer.c
+    )
+endif()
+
+# Zero-copy mesh_view C API (f3d_scene_add_mesh_view). Needs strided arrays
+# https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12411
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20251110)
+  list(APPEND f3d_c_api_tests_list
+    test_scene_mesh_view.c
     )
 endif()
 
@@ -30,6 +44,11 @@ add_executable(f3d_c_api_tests ${_f3d_c_api_driver_src})
 target_link_libraries(f3d_c_api_tests PRIVATE c_api)
 target_compile_definitions(f3d_c_api_tests PRIVATE F3D_TESTING_DATA_DIR="${F3D_SOURCE_DIR}/testing/data/")
 target_compile_definitions(f3d_c_api_tests PRIVATE F3D_TESTING_TEMP_DIR="${CMAKE_BINARY_DIR}/Testing/Temporary/")
+
+# Content validation (unsupported content detection) needs proper CanReadFile support from VTK streams
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  target_compile_definitions(f3d_c_api_tests PRIVATE F3D_TESTING_CONTENT_CHECK=1)
+endif()
 
 # Add all the ADD_TEST for each test
 foreach (test ${f3d_c_api_tests_list})

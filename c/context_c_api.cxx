@@ -140,7 +140,7 @@ f3d_context_t* f3d_context_get_symbol(const char* lib, const char* func)
 }
 
 //----------------------------------------------------------------------------
-void f3d_context_delete(f3d_context_t* ctx)
+void f3d_context_destroy(f3d_context_t* ctx)
 {
   delete ctx;
 }

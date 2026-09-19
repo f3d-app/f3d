@@ -271,6 +271,7 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
   }
 
   this->UIActor->ReleaseGraphicsResources(w);
+  this->FrameCapture->ReleaseGraphicsResources(w);
 
   this->Superclass::ReleaseGraphicsResources(w);
 }
@@ -291,8 +292,11 @@ void vtkF3DRenderer::Initialize()
   this->AddActor(this->UIActor);
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513) && !defined(F3D_USE_GLES)
-  this->AddActor(this->GridAxesActor);
-  this->GridAxesActor->SetUseBounds(false);
+  // Add the grid axes actor if already initialized
+  if (this->GridAxesActor != nullptr)
+  {
+    this->AddActor(this->GridAxesActor);
+  }
 #endif
 
   this->GridConfigured = false;
@@ -543,8 +547,6 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   {
     vtkNew<vtkOpenGLFXAAPass> fxaaP;
     fxaaP->SetDelegatePass(renderingPass);
-
-    this->SetPass(fxaaP);
     renderingPass = fxaaP;
   }
 
@@ -1002,6 +1004,13 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
     }
     else
     {
+      if (this->GridAxesActor == nullptr)
+      {
+        this->GridAxesActor = vtkSmartPointer<vtkGridAxesActor3D>::New();
+        this->GridAxesActor->SetUseBounds(false);
+        this->AddActor(this->GridAxesActor);
+      }
+
       this->GridAxesActor->SetOrientation(orientation);
       this->GridAxesActor->SetVisibility(true);
 
@@ -1022,7 +1031,11 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
       this->GridAxesConfigured = true;
     }
   }
-  this->GridAxesActor->SetVisibility(show);
+
+  if (this->GridAxesActor != nullptr)
+  {
+    this->GridAxesActor->SetVisibility(show);
+  }
 #endif
 #endif
 }
@@ -2273,6 +2286,24 @@ void vtkF3DRenderer::UpdateActors()
   {
     this->ConfigureGridUsingCurrentActors();
   }
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::CaptureVideoFrame(std::byte* yPlane, std::byte* uPlane, std::byte* vPlane)
+{
+  // Use the final rendered texture as input for the frame capture
+  vtkF3DOverlayRenderPass* overlayPass = vtkF3DOverlayRenderPass::SafeDownCast(this->GetPass());
+
+  if (overlayPass == nullptr)
+  {
+    F3DLog::Print(
+      F3DLog::Severity::Error, "Cannot capture video frame: renderer is not initialized");
+    return false;
+  }
+
+  this->FrameCapture->SetInputTexture(overlayPass->GetColorTexture());
+  this->FrameCapture->Capture(this, yPlane, uPlane, vPlane);
+  return true;
 }
 
 //----------------------------------------------------------------------------

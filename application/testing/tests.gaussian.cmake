@@ -13,6 +13,7 @@ if(NOT APPLE) # MacOS does not support compute shaders
   f3d_test(NAME TestThumbnailConfigFileSPLAT DATA small.splat CONFIG thumbnail_build LONG_TIMEOUT SKIP_GLES)
 
   f3d_test(NAME Test3DGSPLY DATA bonsai_small.ply ARGS -sy --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-2.6,0.5,-3.2 SKIP_GLES)
+  f3d_test(NAME Test3DGSPLYNoSH DATA bonsai_small_no_sh.ply ARGS -sy --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-2.6,0.5,-3.2 SKIP_GLES)
   f3d_test(NAME Test3DGSPLYHDRI DATA bonsai_small.ply HDRI shanghai_bund_1k.hdr ARGS -sy --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-2.6,0.5,-3.2 SKIP_GLES)
   f3d_test(NAME TestInteractionPointSpritesCycle DATA bonsai_small.ply ARGS -sy --point-sprites-absolute-size --up=-Y --blending=sort --camera-position=-2.6,0.5,-3.2 INTERACTION SKIP_GLES) #OOOOO
 

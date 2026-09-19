@@ -92,7 +92,7 @@ function(f3d_create_exec target_name)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_DMON)
   endif ()
 
-  #ui
+  # ui
   if (F3D_MODULE_UI)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_UI)
   endif()
@@ -101,6 +101,11 @@ function(f3d_create_exec target_name)
   if (F3D_MODULE_TINYFILEDIALOGS)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_TINYFILEDIALOGS)
   endif ()
+
+  # ffmpeg
+  if (F3D_MODULE_FFMPEG)
+    target_compile_definitions(${target_name} PRIVATE F3D_MODULE_FFMPEG)
+  endif()
 
   # F3D_STRICT_BUILD
   list(APPEND f3d_compile_options_private ${f3d_strict_build_compile_options})

@@ -5,6 +5,7 @@
 #include "export.h"
 #include "image_c_api.h"
 #include "types_c_api.h"
+#include "video_c_api.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -71,7 +72,7 @@ extern "C"
    *
    * The image is of ChannelType BYTE and 3 or 4 components (RGB or RGBA).
    * Set no_background to non-zero to have a transparent background.
-   * The caller must free the returned image with f3d_image_delete().
+   * The caller must free the returned image with f3d_image_destroy().
    *
    * @param window Window handle.
    * @param no_background If non-zero, renders with a transparent background.
@@ -199,6 +200,17 @@ extern "C"
    * @return DPI scale.
    */
   F3D_EXPORT double f3d_window_get_dpi_scale(f3d_window_t* window);
+
+  /**
+   * @brief Get the current video frame of the window.
+   *
+   * If the provided window is NULL, returns NULL.
+   * The returned frame must be deleted with f3d_video_frame_destroy().
+   *
+   * @param window Window handle.
+   * @return Video frame handle, or NULL on failure.
+   */
+  F3D_EXPORT f3d_video_frame_t* f3d_window_get_video_frame(f3d_window_t* window);
 
 #ifdef __cplusplus
 }

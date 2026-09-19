@@ -62,8 +62,18 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/statefile.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/types.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/utils.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/video_encoder.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/video_frame.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/window_impl.cxx
   )
+
+if (F3D_MODULE_FFMPEG)
+  list(APPEND F3D_SOURCE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/video_encoder_ffmpeg.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/video_frame_ffmpeg.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/video_packet_ffmpeg.cxx
+    )
+endif()
 
 if(APPLE)
   list(APPEND F3D_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/context_cocoa.mm)
@@ -86,6 +96,9 @@ set(F3D_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/public/scene.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/types.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/utils.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/video_encoder.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/video_frame.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/video_packet.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/window.h
   )
 
@@ -123,6 +136,12 @@ if (F3D_MODULE_CLIP)
     target_include_directories(libf3d PRIVATE $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external>)
   endif ()
 endif ()
+
+if (F3D_MODULE_FFMPEG)
+  find_package(FFmpeg REQUIRED)
+  target_link_libraries(libf3d PRIVATE FFmpeg::avcodec)
+  message(STATUS "FFmpeg libraries: ${FFmpeg_LIBRARIES}")
+endif()
 
 if (WIN32)
   target_link_libraries(libf3d PRIVATE Dwmapi)
@@ -216,6 +235,11 @@ endif ()
 # raytracing
 if (F3D_MODULE_RAYTRACING)
   target_compile_definitions(libf3d PRIVATE F3D_MODULE_RAYTRACING)
+endif ()
+
+# ffmpeg
+if (F3D_MODULE_FFMPEG)
+  target_compile_definitions(libf3d PRIVATE F3D_MODULE_FFMPEG)
 endif ()
 
 if(F3D_STRICT_BUILD AND MSVC)

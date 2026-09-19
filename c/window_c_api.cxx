@@ -1,5 +1,7 @@
 #include "window_c_api.h"
 #include "image.h"
+#include "video_c_api.h"
+#include "video_frame.h"
 #include "window.h"
 
 //----------------------------------------------------------------------------
