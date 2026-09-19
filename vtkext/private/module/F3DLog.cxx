@@ -74,7 +74,6 @@ void F3DLog::SetUseColoring(bool use)
   }
 }
 
-
 //----------------------------------------------------------------------------
 void F3DLog::SetStandardStream(StandardStream mode)
 {
