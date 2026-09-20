@@ -15,6 +15,7 @@
 #include "vtkF3DRenderer.h"
 
 #include <algorithm>
+#include <iterator>
 #include <optional>
 #include <vtkCallbackCommand.h>
 #include <vtkCellArray.h>
@@ -80,8 +81,15 @@ public:
           widget->On();
           vtkProgressBarRepresentation* rep =
             vtkProgressBarRepresentation::SafeDownCast(widget->GetRepresentation());
-          rep->SetProgressRate(*static_cast<double*>(callData));
-          widget->Render();
+
+          double progress = *static_cast<double*>(callData);
+
+          // Skipping progress update if the difference is too small to avoid too many renders
+          if (progress - rep->GetProgressRate() > 0.02)
+          {
+            rep->SetProgressRate(progress);
+            widget->Render();
+          }
         }
       });
     importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
@@ -130,7 +138,7 @@ public:
     scene_impl::internals::ProgressDataStruct callbackData;
     callbackData.timer = timer;
     callbackData.widget = progressWidget;
-    if (this->Interactor)
+    if (this->Interactor && !this->Window.isOffscreen())
     {
       f3d::color_t color = this->Options.ui.loader_progress_color;
       scene_impl::internals::CreateProgressRepresentationAndCallback(
@@ -257,28 +265,44 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       throw scene::load_failure_exception(filePath.string() + " does not exists");
     }
     std::optional<std::string> forceReader = this->Internals->Options.scene.force_reader;
+    file_availability availability = f3d::file_availability::UNSUPPORTED_EXTENSION;
     // Recover the importer for the provided file path
-    const f3d::reader* reader = f3d::factory::instance()->getReader(filePath.string(), forceReader);
-    if (reader)
-    {
-      if (forceReader)
-      {
-        log::debug("Forcing reader ", (*forceReader), " for ", filePath.string());
-      }
-      else
-      {
-        log::debug("Found a reader for \"", filePath.string(), "\" : \"", reader->getName(), "\"");
-      }
-    }
-    else
+    const f3d::reader* reader = f3d::factory::instance()->getReader(filePath.string(), forceReader,
+      this->Internals->Options.scene.skip_content_check, availability);
+    auto fail = [&](const std::string& message)
     {
       if (forceReader)
       {
         throw scene::load_failure_exception(*forceReader + " is not a valid force reader");
       }
-      throw scene::load_failure_exception(filePath.string() +
-        " is not a file of a supported 3D scene file format, use force reader to force a specific "
-        "reader");
+      else
+      {
+        throw scene::load_failure_exception(filePath.string() + message);
+      }
+    };
+
+    switch (availability)
+    {
+      case file_availability::SUPPORTED:
+        if (forceReader)
+        {
+          log::debug("Forcing reader ", (*forceReader), " for ", filePath.string());
+        }
+        else
+        {
+          log::debug(
+            "Found a reader for \"", filePath.string(), "\" : \"", reader->getName(), "\"");
+        }
+        break;
+      case file_availability::UNSUPPORTED_EXTENSION:
+        fail(" does not have an extension corresponding to a supported file format, use force "
+             "reader to force a specific reader");
+        break;
+      case file_availability::UNSUPPORTED_CONTENT:
+        fail(" contains unsupported content and no reader have been selected, use skip content "
+             "check to skip content validation or force reader to "
+             "force a specific reader");
+        break;
     }
 
     vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(filePath.string());
@@ -867,10 +891,52 @@ scene& scene_impl::removeAllLights()
 }
 
 //----------------------------------------------------------------------------
-bool scene_impl::supports(const fs::path& filePath)
+std::vector<node_state_t> scene_impl::getSceneHierarchy() const
 {
-  return f3d::factory::instance()->getReader(
-           filePath.string(), this->Internals->Options.scene.force_reader) != nullptr;
+  std::vector<vtkF3DMetaImporter::NodeInfo> hierarchy =
+    this->Internals->MetaImporter->GetSceneHierarchyNodes();
+
+  std::vector<node_state_t> nodeStates;
+  nodeStates.reserve(hierarchy.size());
+  std::ranges::transform(hierarchy, std::back_inserter(nodeStates),
+    [](const vtkF3DMetaImporter::NodeInfo& node)
+    {
+      return node_state_t{ node.Id, node.ParentId, node.Level, node.Label, node.Visible,
+        node.HasChildren, node.Collapsed };
+    });
+  return nodeStates;
+}
+
+//----------------------------------------------------------------------------
+scene& scene_impl::setNodeVisibility(int nodeId, bool visible)
+{
+  if (!this->Internals->MetaImporter->SetNodeVisibility(nodeId, visible))
+  {
+    throw scene::node_exception(
+      "No scene hierarchy node at index " + std::to_string(nodeId) + " to update");
+  }
+
+  this->Internals->Window.UpdateActorsVisibility();
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+scene_info_t scene_impl::getSceneInfo() const
+{
+  const vtkF3DMetaImporter::SceneInfo info = this->Internals->MetaImporter->GetSceneInfo();
+
+  return scene_info_t{ info.NumberOfImporters, info.NumberOfActors,
+    static_cast<std::int64_t>(info.NumberOfPoints), static_cast<std::int64_t>(info.NumberOfCells) };
+}
+
+//----------------------------------------------------------------------------
+f3d::file_availability scene_impl::supports(const fs::path& filePath)
+{
+  f3d::file_availability availability = f3d::file_availability::UNSUPPORTED_EXTENSION;
+  f3d::factory::instance()->getReader(filePath.string(),
+    this->Internals->Options.scene.force_reader, this->Internals->Options.scene.skip_content_check,
+    availability);
+  return availability;
 }
 
 //----------------------------------------------------------------------------

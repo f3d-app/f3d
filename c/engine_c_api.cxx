@@ -196,7 +196,7 @@ f3d_engine_t* f3d_engine_create_external_osmesa()
 }
 
 //----------------------------------------------------------------------------
-void f3d_engine_delete(f3d_engine_t* engine)
+void f3d_engine_destroy(f3d_engine_t* engine)
 {
   if (!engine)
   {
@@ -227,6 +227,21 @@ int f3d_engine_set_cache_path(f3d_engine_t* engine, const char* cache_path)
   }
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+const char* f3d_engine_get_cache_path(f3d_engine_t* engine)
+{
+  if (!engine)
+  {
+    return nullptr;
+  }
+
+  const f3d::engine* cpp_engine = reinterpret_cast<const f3d::engine*>(engine);
+  const std::string str = cpp_engine->getCachePath().string();
+  char* result = new char[str.length() + 1];
+  std::strcpy(result, str.c_str());
+  return result;
 }
 
 //----------------------------------------------------------------------------
@@ -378,7 +393,7 @@ int f3d_engine_load_from_clipboard(f3d_engine_t* engine)
 }
 
 //----------------------------------------------------------------------------
-void f3d_engine_free_string(const char* str)
+void f3d_engine_destroy_string(const char* str)
 {
   delete[] str;
 }
@@ -586,7 +601,7 @@ f3d_backend_info_t* f3d_engine_get_rendering_backend_list(int* count)
 }
 
 //----------------------------------------------------------------------------
-void f3d_engine_free_backend_list(f3d_backend_info_t* backends)
+void f3d_engine_destroy_backend_list(f3d_backend_info_t* backends)
 {
   if (!backends)
   {
@@ -602,7 +617,7 @@ void f3d_engine_free_backend_list(f3d_backend_info_t* backends)
 }
 
 //----------------------------------------------------------------------------
-void f3d_engine_free_string_array(char** array)
+void f3d_engine_destroy_string_array(char** array)
 {
   if (!array)
   {
@@ -669,7 +684,7 @@ f3d_lib_info_t* f3d_engine_get_lib_info()
 }
 
 //----------------------------------------------------------------------------
-void f3d_engine_free_lib_info(f3d_lib_info_t* info)
+void f3d_engine_destroy_lib_info(f3d_lib_info_t* info)
 {
   if (!info)
   {
@@ -762,7 +777,7 @@ f3d_reader_info_t* f3d_engine_get_readers_info(int* count)
 }
 
 //----------------------------------------------------------------------------
-void f3d_engine_free_readers_info(f3d_reader_info_t* readers)
+void f3d_engine_destroy_readers_info(f3d_reader_info_t* readers)
 {
   if (!readers)
   {

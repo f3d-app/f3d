@@ -38,14 +38,14 @@ private:
 };
 
 //----------------------------------------------------------------------------
-f3d_image_t* f3d_image_new_empty()
+f3d_image_t* f3d_image_create_empty()
 {
   f3d::image* img = new f3d::image();
   return reinterpret_cast<f3d_image_t*>(img);
 }
 
 //----------------------------------------------------------------------------
-f3d_image_t* f3d_image_new_params(unsigned int width, unsigned int height,
+f3d_image_t* f3d_image_create_params(unsigned int width, unsigned int height,
   unsigned int channelCount, f3d_image_channel_type_t channelType)
 {
   f3d::image* img =
@@ -54,7 +54,7 @@ f3d_image_t* f3d_image_new_params(unsigned int width, unsigned int height,
 }
 
 //----------------------------------------------------------------------------
-f3d_image_t* f3d_image_new_path(const char* path)
+f3d_image_t* f3d_image_create_path(const char* path)
 {
   if (!path)
   {
@@ -79,7 +79,7 @@ f3d_image_t* f3d_image_new_path(const char* path)
 }
 
 //----------------------------------------------------------------------------
-void f3d_image_delete(f3d_image_t* img)
+void f3d_image_destroy(f3d_image_t* img)
 {
   if (!img)
   {
@@ -344,7 +344,7 @@ unsigned char* f3d_image_save_buffer(
 }
 
 //----------------------------------------------------------------------------
-void f3d_image_free_buffer(unsigned char* buffer)
+void f3d_image_destroy_buffer(unsigned char* buffer)
 {
   delete[] buffer;
 }
@@ -457,7 +457,7 @@ char** f3d_image_all_metadata(f3d_image_t* img, unsigned int* count)
 }
 
 //----------------------------------------------------------------------------
-void f3d_image_free_metadata_keys(char** keys, unsigned int count)
+void f3d_image_destroy_metadata_keys(char** keys, unsigned int count)
 {
   if (!keys)
   {

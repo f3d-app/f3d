@@ -1,6 +1,6 @@
-# Security Policy
+# Security policy
 
-## How To Report a Vulnerability
+## How to report a vulnerability
 
 If you think you have found a vulnerability in this repository, please report it to us through coordinated disclosure.
 
@@ -8,6 +8,7 @@ If you think you have found a vulnerability in this repository, please report it
 
 Instead, report it using one of the following ways:
 
+- Use GitHub private vulnerability reporting from the repository Security tab, if available
 - Contact the [F3D maintainers](mailto:contact@f3d.app) via email
 
 Please include as much of the information listed below as you can to help us better understand and resolve the issue:
@@ -24,12 +25,12 @@ Please include as much of the information listed below as you can to help us bet
 
 This information will help us triage your report more quickly.
 
-## Supported Versions
+## Supported versions
 
-The only supported version is the last full release.
-It can be found in [github release page](https://github.com/f3d-app/f3d/releases).
+The only supported version is the latest full release.
+It can be found on the [GitHub releases page](https://github.com/f3d-app/f3d/releases).
 
-## Acknowledgements
+## Acknowledgments
 
-This file was copied and modified from eclipse-csi\security-handbook.
+This file was copied and modified from [eclipse-csi/security-handbook](https://github.com/eclipse-csi/security-handbook).
 Copyright 2024 the Eclipse Foundation and others. Code released under the Eclipse Public License Version 2.0 (EPL-2.0).

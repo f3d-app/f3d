@@ -95,10 +95,21 @@ int vtkF3DPLYReader::RequestData(
     float rot_3;
   };
 
-  PlyProperty vertProps[] = {
+  PlyProperty mandatoryVertProps[] = {
     { "f_dc_0", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, f_dc_0)), 0, 0, 0, 0 },
     { "f_dc_1", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, f_dc_1)), 0, 0, 0, 0 },
     { "f_dc_2", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, f_dc_2)), 0, 0, 0, 0 },
+    { "opacity", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, opacity)), 0, 0, 0, 0 },
+    { "scale_0", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, scale_0)), 0, 0, 0, 0 },
+    { "scale_1", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, scale_1)), 0, 0, 0, 0 },
+    { "scale_2", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, scale_2)), 0, 0, 0, 0 },
+    { "rot_0", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, rot_0)), 0, 0, 0, 0 },
+    { "rot_1", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, rot_1)), 0, 0, 0, 0 },
+    { "rot_2", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, rot_2)), 0, 0, 0, 0 },
+    { "rot_3", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, rot_3)), 0, 0, 0, 0 },
+  };
+
+  PlyProperty shVertProps[] = {
     { "f_rest_0", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, f_rest_0)), 0, 0, 0,
       0 },
     { "f_rest_1", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, f_rest_1)), 0, 0, 0,
@@ -189,14 +200,6 @@ int vtkF3DPLYReader::RequestData(
       0 },
     { "f_rest_44", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, f_rest_44)), 0, 0, 0,
       0 },
-    { "opacity", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, opacity)), 0, 0, 0, 0 },
-    { "scale_0", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, scale_0)), 0, 0, 0, 0 },
-    { "scale_1", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, scale_1)), 0, 0, 0, 0 },
-    { "scale_2", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, scale_2)), 0, 0, 0, 0 },
-    { "rot_0", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, rot_0)), 0, 0, 0, 0 },
-    { "rot_1", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, rot_1)), 0, 0, 0, 0 },
-    { "rot_2", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, rot_2)), 0, 0, 0, 0 },
-    { "rot_3", PLY_FLOAT, PLY_FLOAT, static_cast<int>(offsetof(Gaussian, rot_3)), 0, 0, 0, 0 },
   };
 
   // open a PLY file for reading
@@ -235,7 +238,7 @@ int vtkF3DPLYReader::RequestData(
   std::string elemName = "vertex";
   vtkPLY::ply_get_element_description(ply, elemName.data(), &numPts, &numProps);
 
-  for (PlyProperty& prop : vertProps)
+  for (PlyProperty& prop : mandatoryVertProps)
   {
     int index;
     if (vtkPLY::find_property(elem, prop.name, &index) == nullptr)
@@ -245,6 +248,20 @@ int vtkF3DPLYReader::RequestData(
     }
 
     vtkPLY::ply_get_property(ply, "vertex", &prop);
+  }
+
+  bool hasSH = true;
+  for (PlyProperty& prop : shVertProps)
+  {
+    int index;
+    if (vtkPLY::find_property(elem, prop.name, &index) == nullptr)
+    {
+      hasSH = false;
+    }
+    else
+    {
+      vtkPLY::ply_get_property(ply, "vertex", &prop);
+    }
   }
 
   vtkNew<vtkUnsignedCharArray> rgb;
@@ -265,31 +282,35 @@ int vtkF3DPLYReader::RequestData(
   rotation->SetNumberOfTuples(numPts);
   output->GetPointData()->AddArray(rotation);
 
-  auto initArray = [&](vtkUnsignedCharArray* shArray, const char* name)
-  {
-    shArray->SetName(name);
-    shArray->SetNumberOfComponents(3);
-    shArray->SetNumberOfTuples(numPts);
-    output->GetPointData()->AddArray(shArray);
-  };
-
   vtkNew<vtkUnsignedCharArray> sh1m1, sh10, sh1p1, sh2m2, sh2m1, sh20, sh2p1, sh2p2, sh3m3, sh3m2,
     sh3m1, sh30, sh3p1, sh3p2, sh3p3;
-  initArray(sh1m1, "sh1m1");
-  initArray(sh10, "sh10");
-  initArray(sh1p1, "sh1p1");
-  initArray(sh2m2, "sh2m2");
-  initArray(sh2m1, "sh2m1");
-  initArray(sh20, "sh20");
-  initArray(sh2p1, "sh2p1");
-  initArray(sh2p2, "sh2p2");
-  initArray(sh3m3, "sh3m3");
-  initArray(sh3m2, "sh3m2");
-  initArray(sh3m1, "sh3m1");
-  initArray(sh30, "sh30");
-  initArray(sh3p1, "sh3p1");
-  initArray(sh3p2, "sh3p2");
-  initArray(sh3p3, "sh3p3");
+
+  if (hasSH)
+  {
+    auto initArray = [&](vtkUnsignedCharArray* shArray, const char* name)
+    {
+      shArray->SetName(name);
+      shArray->SetNumberOfComponents(3);
+      shArray->SetNumberOfTuples(numPts);
+      output->GetPointData()->AddArray(shArray);
+    };
+
+    initArray(sh1m1, "sh1m1");
+    initArray(sh10, "sh10");
+    initArray(sh1p1, "sh1p1");
+    initArray(sh2m2, "sh2m2");
+    initArray(sh2m1, "sh2m1");
+    initArray(sh20, "sh20");
+    initArray(sh2p1, "sh2p1");
+    initArray(sh2p2, "sh2p2");
+    initArray(sh3m3, "sh3m3");
+    initArray(sh3m2, "sh3m2");
+    initArray(sh3m1, "sh3m1");
+    initArray(sh30, "sh30");
+    initArray(sh3p1, "sh3p1");
+    initArray(sh3p2, "sh3p2");
+    initArray(sh3p3, "sh3p3");
+  }
 
   Gaussian gaussian;
   for (int j = 0; j < numPts; j++)
@@ -321,28 +342,36 @@ int vtkF3DPLYReader::RequestData(
     rotation->SetTypedComponent(j, 3, gaussian.rot_3);
 
     // sherical harmonics
-    auto setSHComponents = [&](vtkUnsignedCharArray* shArray, float shR, float shG, float shB)
+    if (hasSH)
     {
-      shArray->SetTypedComponent(j, 0, quantizeSH(shR));
-      shArray->SetTypedComponent(j, 1, quantizeSH(shG));
-      shArray->SetTypedComponent(j, 2, quantizeSH(shB));
-    };
+      auto setSHComponents = [&](vtkUnsignedCharArray* shArray, float shR, float shG, float shB)
+      {
+        shArray->SetTypedComponent(j, 0, quantizeSH(shR));
+        shArray->SetTypedComponent(j, 1, quantizeSH(shG));
+        shArray->SetTypedComponent(j, 2, quantizeSH(shB));
+      };
 
-    setSHComponents(sh1m1, gaussian.f_rest_0, gaussian.f_rest_15, gaussian.f_rest_30);
-    setSHComponents(sh10, gaussian.f_rest_1, gaussian.f_rest_16, gaussian.f_rest_31);
-    setSHComponents(sh1p1, gaussian.f_rest_2, gaussian.f_rest_17, gaussian.f_rest_32);
-    setSHComponents(sh2m2, gaussian.f_rest_3, gaussian.f_rest_18, gaussian.f_rest_33);
-    setSHComponents(sh2m1, gaussian.f_rest_4, gaussian.f_rest_19, gaussian.f_rest_34);
-    setSHComponents(sh20, gaussian.f_rest_5, gaussian.f_rest_20, gaussian.f_rest_35);
-    setSHComponents(sh2p1, gaussian.f_rest_6, gaussian.f_rest_21, gaussian.f_rest_36);
-    setSHComponents(sh2p2, gaussian.f_rest_7, gaussian.f_rest_22, gaussian.f_rest_37);
-    setSHComponents(sh3m3, gaussian.f_rest_8, gaussian.f_rest_23, gaussian.f_rest_38);
-    setSHComponents(sh3m2, gaussian.f_rest_9, gaussian.f_rest_24, gaussian.f_rest_39);
-    setSHComponents(sh3m1, gaussian.f_rest_10, gaussian.f_rest_25, gaussian.f_rest_40);
-    setSHComponents(sh30, gaussian.f_rest_11, gaussian.f_rest_26, gaussian.f_rest_41);
-    setSHComponents(sh3p1, gaussian.f_rest_12, gaussian.f_rest_27, gaussian.f_rest_42);
-    setSHComponents(sh3p2, gaussian.f_rest_13, gaussian.f_rest_28, gaussian.f_rest_43);
-    setSHComponents(sh3p3, gaussian.f_rest_14, gaussian.f_rest_29, gaussian.f_rest_44);
+      setSHComponents(sh1m1, gaussian.f_rest_0, gaussian.f_rest_15, gaussian.f_rest_30);
+      setSHComponents(sh10, gaussian.f_rest_1, gaussian.f_rest_16, gaussian.f_rest_31);
+      setSHComponents(sh1p1, gaussian.f_rest_2, gaussian.f_rest_17, gaussian.f_rest_32);
+      setSHComponents(sh2m2, gaussian.f_rest_3, gaussian.f_rest_18, gaussian.f_rest_33);
+      setSHComponents(sh2m1, gaussian.f_rest_4, gaussian.f_rest_19, gaussian.f_rest_34);
+      setSHComponents(sh20, gaussian.f_rest_5, gaussian.f_rest_20, gaussian.f_rest_35);
+      setSHComponents(sh2p1, gaussian.f_rest_6, gaussian.f_rest_21, gaussian.f_rest_36);
+      setSHComponents(sh2p2, gaussian.f_rest_7, gaussian.f_rest_22, gaussian.f_rest_37);
+      setSHComponents(sh3m3, gaussian.f_rest_8, gaussian.f_rest_23, gaussian.f_rest_38);
+      setSHComponents(sh3m2, gaussian.f_rest_9, gaussian.f_rest_24, gaussian.f_rest_39);
+      setSHComponents(sh3m1, gaussian.f_rest_10, gaussian.f_rest_25, gaussian.f_rest_40);
+      setSHComponents(sh30, gaussian.f_rest_11, gaussian.f_rest_26, gaussian.f_rest_41);
+      setSHComponents(sh3p1, gaussian.f_rest_12, gaussian.f_rest_27, gaussian.f_rest_42);
+      setSHComponents(sh3p2, gaussian.f_rest_13, gaussian.f_rest_28, gaussian.f_rest_43);
+      setSHComponents(sh3p3, gaussian.f_rest_14, gaussian.f_rest_29, gaussian.f_rest_44);
+    }
+
+    if (j % 1000 == 0)
+    {
+      this->UpdateProgress(static_cast<double>(j) / static_cast<double>(numPts));
+    }
   }
 
   vtkPLY::ply_close(ply);

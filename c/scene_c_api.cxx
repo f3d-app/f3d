@@ -1,10 +1,11 @@
 #include "scene_c_api.h"
+
+#include "log.h"
 #include "scene.h"
 #include "types.h"
 
 #include <cstring>
 #include <filesystem>
-#include <log.h>
 #include <string>
 #include <vector>
 
@@ -118,6 +119,89 @@ f3d::mesh_t to_cpp_mesh(const f3d_mesh_t* c_mesh)
 
   return cpp_mesh;
 }
+
+//----------------------------------------------------------------------------
+f3d::mesh_view::data_array_t to_cpp_data_array(const f3d_data_array_t& cDataArray)
+{
+  f3d::mesh_view::data_array_t dataArray;
+  if (cDataArray.name)
+  {
+    dataArray.name = cDataArray.name;
+  }
+  dataArray.type = static_cast<f3d::mesh_view::data_type>(cDataArray.type);
+  dataArray.data = cDataArray.data;
+  dataArray.components = cDataArray.components ? cDataArray.components : 1;
+  dataArray.stride = cDataArray.stride ? cDataArray.stride : 1;
+  dataArray.timeDependent = cDataArray.time_dependent != 0;
+  return dataArray;
+}
+
+//----------------------------------------------------------------------------
+f3d::mesh_view::cell_array_t to_cpp_cell_array(const f3d_cell_array_t& cDataArray)
+{
+  f3d::mesh_view::cell_array_t dataArray;
+  dataArray.offsetCount = cDataArray.offset_count ? cDataArray.offset_count : 1;
+  dataArray.offsets = to_cpp_data_array(cDataArray.offsets);
+  dataArray.indexCount = cDataArray.index_count;
+  dataArray.indices = to_cpp_data_array(cDataArray.indices);
+  return dataArray;
+}
+
+//----------------------------------------------------------------------------
+f3d::mesh_view::memory_view_t to_cpp_memory_view(const f3d_memory_view_t* cMemView)
+{
+  f3d::mesh_view::memory_view_t memView;
+  memView.pointCount = cMemView->point_count;
+  memView.points = to_cpp_data_array(cMemView->points);
+  memView.normals = to_cpp_data_array(cMemView->normals);
+  memView.textureCoordinates = to_cpp_data_array(cMemView->texture_coordinates);
+  memView.vertices = to_cpp_cell_array(cMemView->vertices);
+  memView.lines = to_cpp_cell_array(cMemView->lines);
+  memView.polygons = to_cpp_cell_array(cMemView->polygons);
+
+  memView.pointScalars.reserve(cMemView->point_scalars_count);
+  for (size_t i = 0; i < cMemView->point_scalars_count; ++i)
+  {
+    memView.pointScalars.push_back(to_cpp_data_array(cMemView->point_scalars[i]));
+  }
+
+  memView.cellScalars.reserve(cMemView->cell_scalars_count);
+  for (size_t i = 0; i < cMemView->cell_scalars_count; ++i)
+  {
+    memView.cellScalars.push_back(to_cpp_data_array(cMemView->cell_scalars[i]));
+  }
+
+  return memView;
+}
+
+//----------------------------------------------------------------------------
+// Concrete mesh_view holding a zero-copy snapshot of the caller's arrays.
+class c_mesh_view : public f3d::mesh_view
+{
+public:
+  c_mesh_view(const f3d_mesh_view_t* mesh_view)
+    : MeshView(mesh_view)
+  {
+  }
+
+  std::string getName() const override
+  {
+    return this->MeshView->name ? this->MeshView->name : "";
+  }
+
+  std::array<double, 2> getTimeRange() const override
+  {
+    return { this->MeshView->time_min, this->MeshView->time_max };
+  }
+
+  f3d::mesh_view::memory_view_t getMemoryView(double time) const override
+  {
+    return to_cpp_memory_view(this->MeshView->get_memory_view(time, this->MeshView->opaque));
+  }
+
+private:
+  const f3d_mesh_view_t* MeshView;
+};
 }
 
 //----------------------------------------------------------------------------
@@ -125,11 +209,12 @@ int f3d_scene_supports(f3d_scene_t* scene, const char* file_path)
 {
   if (!scene || !file_path)
   {
-    return 0;
+    return -1;
   }
 
   f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
-  return cpp_scene->supports(std::filesystem::path(file_path)) ? 1 : 0;
+  auto availability = cpp_scene->supports(std::filesystem::path(file_path));
+  return static_cast<int>(availability);
 }
 
 //----------------------------------------------------------------------------
@@ -175,7 +260,7 @@ char** f3d_scene_get_added_files(const f3d_scene_t* scene, unsigned int* count)
 }
 
 //----------------------------------------------------------------------------
-void f3d_scene_free_added_files(char** files, unsigned int count)
+void f3d_scene_destroy_added_files(char** files, unsigned int count)
 {
   if (!files)
   {
@@ -186,6 +271,94 @@ void f3d_scene_free_added_files(char** files, unsigned int count)
     delete[] files[i];
   }
   delete[] files;
+}
+
+//----------------------------------------------------------------------------
+f3d_node_state_t* f3d_scene_get_scene_hierarchy(const f3d_scene_t* scene, unsigned int* count)
+{
+  if (!scene || !count)
+  {
+    if (count)
+    {
+      *count = 0;
+    }
+    return nullptr;
+  }
+
+  const f3d::scene* cpp_scene = reinterpret_cast<const f3d::scene*>(scene);
+  std::vector<f3d::node_state_t> nodes = cpp_scene->getSceneHierarchy();
+  *count = static_cast<unsigned int>(nodes.size());
+  if (nodes.empty())
+  {
+    return nullptr;
+  }
+
+  f3d_node_state_t* result = new f3d_node_state_t[nodes.size()];
+  for (size_t i = 0; i < nodes.size(); ++i)
+  {
+    result[i].id = nodes[i].id;
+    result[i].parent_id = nodes[i].parentId;
+    result[i].level = nodes[i].level;
+    result[i].label = new char[nodes[i].label.size() + 1];
+    std::strcpy(result[i].label, nodes[i].label.c_str());
+    result[i].visible = nodes[i].visible ? 1 : 0;
+    result[i].has_children = nodes[i].hasChildren ? 1 : 0;
+    result[i].collapsed = nodes[i].collapsed ? 1 : 0;
+  }
+  return result;
+}
+
+//----------------------------------------------------------------------------
+void f3d_scene_destroy_scene_hierarchy(f3d_node_state_t* nodes, unsigned int count)
+{
+  if (!nodes)
+  {
+    return;
+  }
+  for (unsigned int i = 0; i < count; ++i)
+  {
+    delete[] nodes[i].label;
+  }
+  delete[] nodes;
+}
+
+//----------------------------------------------------------------------------
+int f3d_scene_set_node_visibility(f3d_scene_t* scene, int node_id, int visible)
+{
+  if (!scene)
+  {
+    return 0;
+  }
+
+  f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
+  try
+  {
+    cpp_scene->setNodeVisibility(node_id, visible != 0);
+  }
+  catch (const f3d::scene::node_exception& e)
+  {
+    f3d::log::error("Failed to set visibility of node at index ", node_id, ": ", e.what());
+    return 0;
+  }
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int f3d_scene_get_scene_info(const f3d_scene_t* scene, f3d_scene_info_t* info)
+{
+  if (!scene || !info)
+  {
+    return 0;
+  }
+
+  const f3d::scene* cpp_scene = reinterpret_cast<const f3d::scene*>(scene);
+  const f3d::scene_info_t cpp_info = cpp_scene->getSceneInfo();
+
+  info->number_of_files = cpp_info.numberOfFiles;
+  info->number_of_actors = cpp_info.numberOfActors;
+  info->number_of_points = cpp_info.numberOfPoints;
+  info->number_of_cells = cpp_info.numberOfCells;
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -203,7 +376,7 @@ int f3d_scene_add(f3d_scene_t* scene, const char* file_path)
   }
   catch (const f3d::scene::load_failure_exception& e)
   {
-    f3d::log::error("Failed to add file to scene: {}", file_path);
+    f3d::log::error("Failed to add file to scene: ", file_path);
     return 0;
   }
 
@@ -268,6 +441,29 @@ int f3d_scene_add_mesh(f3d_scene_t* scene, const f3d_mesh_t* mesh)
 }
 
 //----------------------------------------------------------------------------
+int f3d_scene_add_mesh_view(f3d_scene_t* scene, const f3d_mesh_view_t* mesh_view)
+{
+  if (!scene || !mesh_view)
+  {
+    return 0;
+  }
+
+  f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
+
+  try
+  {
+    cpp_scene->add(std::make_shared<c_mesh_view>(mesh_view));
+  }
+  catch (const f3d::scene::load_failure_exception& e)
+  {
+    f3d::log::error("Failed to add mesh view to scene: {}", e.what());
+    return 0;
+  }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
 int f3d_scene_add_buffer(f3d_scene_t* scene, void* buffer, size_t size)
 {
   if (!scene || !buffer || size == 0)
@@ -317,7 +513,7 @@ double* f3d_scene_get_animation_keyframes(f3d_scene_t* scene, unsigned int* coun
 }
 
 //----------------------------------------------------------------------------
-void f3d_scene_free_animation_keyframes(double* keyframes)
+void f3d_scene_destroy_animation_keyframes(double* keyframes)
 {
   delete[] keyframes;
 }
@@ -384,7 +580,7 @@ int f3d_scene_remove_light(f3d_scene_t* scene, int index)
   }
   catch (const f3d::scene::light_exception& e)
   {
-    f3d::log::error("Failed to remove light at index {}: {}", index, e.what());
+    f3d::log::error("Failed to remove light at index ", index, ": ", e.what());
     return 0;
   }
 
@@ -408,7 +604,7 @@ int f3d_scene_update_light(f3d_scene_t* scene, int index, const f3d_light_state_
   }
   catch (const f3d::scene::light_exception& e)
   {
-    f3d::log::error("Failed to update light at index {}: {}", index, e.what());
+    f3d::log::error("Failed to update light at index ", index, ": ", e.what());
     return 0;
   }
 
@@ -432,7 +628,7 @@ f3d_light_state_t* f3d_scene_get_light(const f3d_scene_t* scene, int index)
   }
   catch (const f3d::scene::light_exception& e)
   {
-    f3d::log::error("Failed to get light at index {}: {}", index, e.what());
+    f3d::log::error("Failed to get light at index ", index, ": ", e.what());
     return nullptr;
   }
 }

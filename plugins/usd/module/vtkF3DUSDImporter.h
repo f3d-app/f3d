@@ -108,6 +108,12 @@ public:
    */
   void SetResourcesPath(const std::string& path);
 
+  /**
+   * Set subdivision level for meshes with subdivision scheme.
+   * Default is 0, which means no subdivision.
+   */
+  vtkSetMacro(SubdivisionLevel, int);
+
 protected:
   vtkF3DUSDImporter();
   ~vtkF3DUSDImporter() override;
@@ -120,6 +126,7 @@ private:
   void operator=(const vtkF3DUSDImporter&) = delete;
 
   bool AnimationEnabled = false;
+  int SubdivisionLevel = 0;
 
   class vtkInternals;
   std::unique_ptr<vtkInternals> Internals;

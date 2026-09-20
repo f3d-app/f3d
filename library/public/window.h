@@ -4,9 +4,11 @@
 #include "camera.h"
 #include "export.h"
 #include "image.h"
+#include "video_frame.h"
 
 /// @cond
 #include <string>
+#include <utility>
 /// @endcond
 
 namespace f3d
@@ -58,6 +60,12 @@ public:
   [[nodiscard]] virtual bool isOffscreen() = 0;
 
   /**
+   * Get the DPI scale value of the window.
+   * Returns 1.0 on platforms where DPI scaling is not supported.
+   */
+  [[nodiscard]] virtual double getDPIScale() = 0;
+
+  /**
    * Get the camera provided by the window.
    */
   [[nodiscard]] virtual camera& getCamera() = 0;
@@ -78,17 +86,33 @@ public:
   [[nodiscard]] virtual image renderToImage(bool noBackground = false) = 0;
 
   /**
+   * Get the current video frame of the window.
+   * This construct the video frame, allocates and fills the Y and UV planes with the current window
+   * content in the expected layout.
+   * Requires F3D_MODULE_FFMPEG to be enabled.
+   * Throws a video_frame::invalid_frame_exception if F3D_MODULE_FFMPEG is disabled or
+   * if the resolution is not even or positive.
+   * Returns the resulting f3d::video_frame.
+   */
+  [[nodiscard]] virtual std::shared_ptr<video_frame> getVideoFrame() = 0;
+
+  /**
    * Set the size of the window.
    */
   virtual window& setSize(int width, int height) = 0;
 
   /**
-   * Get the width of the window.
+   * Get the size of the window as a (width, height) pair.
+   */
+  [[nodiscard]] virtual std::pair<int, int> getSize() const = 0;
+
+  /**
+   * Get the width of the window, see getSize.
    */
   [[nodiscard]] virtual int getWidth() const = 0;
 
   /**
-   * Get the height of the window.
+   * Get the height of the window, see getSize.
    */
   [[nodiscard]] virtual int getHeight() const = 0;
 
@@ -96,6 +120,21 @@ public:
    * Set the position of the window.
    */
   virtual window& setPosition(int x, int y) = 0;
+
+  /**
+   * Get the position of the window as an (x, y) pair.
+   */
+  [[nodiscard]] virtual std::pair<int, int> getPosition() const = 0;
+
+  /**
+   * Get the position of the left border of the window, see getPosition.
+   */
+  [[nodiscard]] virtual int getLeft() const = 0;
+
+  /**
+   * Get the position of the top border of the window, see getPosition.
+   */
+  [[nodiscard]] virtual int getTop() const = 0;
 
   /**
    * Set the icon to be shown by a window manager.

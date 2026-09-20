@@ -45,7 +45,10 @@ public:
   scene& updateLight(int index, const light_state_t& lightState) override;
   scene& removeLight(int index) override;
   scene& removeAllLights() override;
-  bool supports(const std::filesystem::path& filePath) override;
+  std::vector<node_state_t> getSceneHierarchy() const override;
+  scene& setNodeVisibility(int nodeId, bool visible) override;
+  scene_info_t getSceneInfo() const override;
+  file_availability supports(const std::filesystem::path& filePath) override;
   scene& loadAnimationTime(double timeValue) override;
   std::pair<double, double> animationTimeRange() override;
   std::vector<double> getAnimationKeyFrames() override;

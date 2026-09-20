@@ -2,7 +2,7 @@
 
 > [!NOTE]
 > For WebAssembly cross-compilation, follow the dedicated guide [here](14-BUILD_WASM.md).
-> For other dedicated tools and builds setupo, see [this doc](07-TOOLING.md).
+> For other dedicated tools and build setups, see [this doc](07-TOOLING.md).
 
 F3D uses a CMake based build system, so building F3D just requires installing
 needed dependencies, configuring and building. If you are not used to such processes
@@ -11,7 +11,7 @@ please take a look at our [getting started guide](04-GETTING_STARTED.md).
 ## Dependencies
 
 - [CMake](https://cmake.org) >= 3.1.
-- [VTK](https://vtk.org) >= 9.4.0 (9.6.2 recommended).
+- [VTK](https://vtk.org) >= 9.4.0 (9.7.0 recommended).
 - A C++20 compiler.
 - A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
 - Optionally, [Assimp](https://www.assimp.org/) >= 5.4.0 (6.0.2 recommended).
@@ -32,7 +32,9 @@ F3D is tested continuously against versions recommended by the [VFX reference pl
 
 ## VTK compatibility
 
-As stated in the dependencies, F3D is compatible with VTK >= 9.4.0, however, some features may not be available. We suggest using VTK 9.6.2 with RenderingRayTracing, IOExodus, IOHDF, IONetCDF, IOPDAL and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
+As stated in the dependencies, F3D is compatible with VTK >= 9.4.0, however, some features may not be available. We suggest using VTK 9.7.0 with RenderingRayTracing, IOExodus, IOHDF, IONetCDF, IOPDAL and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
+
+> NOTE: When VTK is compiled for GLES (usually the case for Android and WebAssembly only), F3D is only compatible with the VTK version specified in `.github/workflows/versions.json` file.
 
 ## Configuration and building
 
@@ -58,7 +60,7 @@ Some modules, plugins and language bindings depending on external libraries can 
 - `F3D_MODULE_CLIP`: Support for clipboard interaction in libf3d, used by `engine::state` and by the application to save/load statefiles to/from the system clipboard. Uses provided clip. Enabled by default.
 - `F3D_PLUGIN_BUILD_HDF`: Support for VTKHDF (.vtkhdf), ExodusII (.ex2), and NetCDF (.nc) file formats. Requires that VTK has been built with `IOHDF`, `IOExodus`, and `IONetCDF` modules (and `hdf5`). Enabled by default.
 - `F3D_PLUGIN_BUILD_OCCT`: Support for STEP, IGES, BREP, and XBF file formats. Requires `OpenCASCADE`. Disabled by default.
-- `F3D_PLUGIN_BUILD_ASSIMP`: Support for FBX, DAE, OFF, DXF, X and 3MF file formats. Requires `Assimp`. Disabled by default.
+- `F3D_PLUGIN_BUILD_ASSIMP`: Support for FBX, DAE, OFF, DXF, X, 3MF and AMF file formats. Requires `Assimp`. Disabled by default.
 - `F3D_PLUGIN_BUILD_ALEMBIC`: Support for ABC file format. Requires `Alembic`. Disabled by default.
 - `F3D_PLUGIN_BUILD_DRACO`: Support for DRC file format. Requires `Draco`. Disabled by default.
 - `F3D_PLUGIN_BUILD_USD`: Support for USD file format. Requires `OpenUSD`. Disabled by default.
@@ -71,6 +73,9 @@ Some modules, plugins and language bindings depending on external libraries can 
 - `F3D_BINDINGS_C`: Generate C bindings. Disabled by default.
 
 Some dependencies are provided internally, eg: ImGui, dmon and others. Use `F3D_USE_EXTERNAL_*` to use an external version of these libraries.
+
+VTK can be built with OpenGL ES support, which is mostly the case when targeting mobile or web platforms.
+The CMake variable `F3D_USE_GLES` is automatically defined accordingly and reported during the configuration step.
 
 ## Building for contribution
 
@@ -156,7 +161,7 @@ Here is the list of all the components:
 | `library`       | YES                  | ALL              | libf3d library binaries.                                                                                                    |
 | `plugin`        | YES                  | ALL              | libf3d plugins.                                                                                                             |
 | `dependencies`  | NO                   | ALL              | libf3d runtime dependencies. Can be used to create a self-contained and relocatable package. System libraries are excluded. |
-| `sdk`           | NO                   | ALL              | libf3d SDK (headers and CMake config files) for `library` and `application` find_package components.                        |
+| `sdk`           | NO                   | ALL              | libf3d SDK (headers, CMake config files and pkg-config files) for `library` and `application` find_package components.      |
 | `plugin_sdk`    | NO                   | ALL              | libf3d plugin SDK (headers and CMake config files including macros) for `pluginsdk` find_package components.                |
 | `licenses`      | YES                  | ALL              | F3D and third party licenses.                                                                                               |
 | `documentation` | YES                  | Linux            | `man` documentation.                                                                                                        |

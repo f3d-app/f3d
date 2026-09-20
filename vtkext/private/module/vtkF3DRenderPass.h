@@ -51,9 +51,11 @@ public:
   vtkSetMacro(RenderReflection, bool);
 
   /**
-   * Modify shader code for jittering
+   * Modify shader code for matcap/gamma/skinning
    */
   bool PreReplaceShaderValues(std::string& vertexShader, std::string& geometryShader,
+    std::string& fragmentShader, vtkAbstractMapper* mapper, vtkProp* prop) override;
+  bool PostReplaceShaderValues(std::string& vertexShader, std::string& geometryShader,
     std::string& fragmentShader, vtkAbstractMapper* mapper, vtkProp* prop) override;
 
   vtkF3DRenderPass(const vtkF3DRenderPass&) = delete;

@@ -5,6 +5,12 @@ This guide explains how to migrate the libf3d code base from v3.5 to v4.0.
 > [!WARNING]
 > This guide assumes all deprecation warnings have been addressed, since the deprecated APIs have been removed.
 
+## Packagers
+
+`F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX` has been removed in favor of
+`F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_SYSCONFDIR`, which default to `OFF`.
+The default installation location for configuration files is now `/usr/share/f3d/configs`.
+
 ## Enable options
 
 Many `enable` libf3d options have been removed in favor of extending possible values on the `mode`/`type` related libf3d options.
@@ -56,3 +62,47 @@ The `ui.animation_progress` option (CLI `--animation-progress`) was a boolean to
 
 The function `f3d::context::getSymbol` function is now expecting a library full path or a filename.
 The library prefix and extension is not appended automatically anymore.
+
+## DPI scaling
+
+`f3d::window::getDPIScale()` should now be used instead of the static `f3d::utils::getDPIScale()` API to get the DPI scaling value.
+
+## Bindings
+
+## Python
+
+The following Python setter methods have been removed in favor of new properties, which can also be read.
+
+- `window.set_position(x, y)` -> `window.position = (x, y)`
+- `engine.set_cache_path(path)` -> `engine.cache_path = path`
+
+## WebAssembly
+
+The following WebAssembly methods have been removed in favor of new properties, which can also be read.
+
+- `engine.setCachePath(path)` -> `engine.cachePath = path`
+
+## C
+
+Some functions has been renamed for consistency. All functions allocating an object have the word `create` and all functions deleting an object have the word `destroy`.
+
+| 3.5             | 4.0              |
+| --------------- | ---------------- |
+| `f3d_*_new*`    | `f3d_*_create*`  |
+| `f3d_*_free*`   | `f3d_*_destroy*` |
+| `f3d_*_delete*` | `f3d_*_destroy*` |
+
+## scene.supports method
+
+`scene::supports()` method signature changed, it now returns `f3d::file_availability` enum instead of `bool`. Here is how you can check if a file is supported now:
+
+```cpp
+if (scene.supports("some.obj") == f3d::file_availability::SUPPORTED)
+```
+
+Other languages API behavior changed accordingly:
+
+- C API: `f3d_scene_supports()` used to return 1 if the file was supported and 0 otherwise. It now returns an int: 0 if supported, 1 for unsupported extension, 2 for unsupported content, -1 if the scene or file path is NULL.
+- Java API: `Scene.supports()` used to return a boolean. It now returns the `Scene.FileAvailability` enum and throws `IllegalArgumentException` if the file path is null.
+- Python API: `scene.supports()` used to return bool. Now returns f3d.FileAvailability.
+- Webassembly API: `scene.supports()` used to return bool. Now returns enum FileAvailability.

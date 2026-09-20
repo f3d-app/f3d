@@ -10,5 +10,8 @@
   ],
   "dependencies": {
     "f3d": "file:../../.."
+  },
+  "allowScripts": {
+    "file:../../../..": true
   }
 }

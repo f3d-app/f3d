@@ -32,7 +32,23 @@ public class TestScene {
     Engine engine = Engine.createNone();
     Scene scene = engine.getScene();
 
-    scene.supports("test.obj");
+    if (scene.supports(sphere) != Scene.FileAvailability.SUPPORTED) {
+      throw new RuntimeException("a vtp file should be supported");
+    }
+    if (scene.supports(testDataPath + "data/unsupportedFile.dummy") != Scene.FileAvailability.UNSUPPORTED_EXTENSION) {
+      throw new RuntimeException("an unknown extension should not be supported");
+    }
+    // Content validation needs proper CanReadFile support from VTK
+    if (Boolean.getBoolean("f3d.testing.contentCheck")) {
+      if (scene.supports(testDataPath + "data/invalid.mdl") != Scene.FileAvailability.UNSUPPORTED_CONTENT) {
+        throw new RuntimeException("a file with an invalid header should have unsupported content");
+      }
+    }
+    try {
+      scene.supports(null);
+      throw new RuntimeException("Expected IllegalArgumentException was not thrown");
+    } catch (IllegalArgumentException e) {
+    }
 
     scene.add(sphere);
     scene.add(new ArrayList<>(Arrays.asList(world, logo)));
@@ -102,6 +118,98 @@ public class TestScene {
 
     scene.removeAllLights();
 
+    // Test the scene hierarchy
+    scene.clear();
+    if (!scene.getSceneHierarchy().isEmpty()) {
+      throw new RuntimeException("a cleared scene should have an empty scene hierarchy");
+    }
+
+    try {
+      scene.setNodeVisibility(0, false);
+      throw new RuntimeException(
+          "Expected Scene.NodeException was not thrown with an empty scene hierarchy");
+    } catch (Scene.NodeException e) {
+    }
+
+    scene.add(sphere);
+    List<Types.NodeState> hierarchy = scene.getSceneHierarchy();
+    if (hierarchy.isEmpty()) {
+      throw new RuntimeException("scene hierarchy should not be empty");
+    }
+
+    Types.NodeState root = hierarchy.get(0);
+    if (root.id != 0 || root.parentId != -1 || root.level != 0 || !root.visible
+        || !root.label.contains("mb_1_0.vtp")) {
+      throw new RuntimeException("unexpected scene hierarchy root node");
+    }
+
+    for (Types.NodeState node : hierarchy) {
+      int expectedLevel = node.parentId < 0 ? 0 : hierarchy.get(node.parentId).level + 1;
+      if (node.level != expectedLevel) {
+        throw new RuntimeException("unexpected scene hierarchy node level");
+      }
+    }
+
+    scene.setNodeVisibility(0, false);
+    for (Types.NodeState node : scene.getSceneHierarchy()) {
+      if (node.visible) {
+        throw new RuntimeException("the whole subtree should be hidden");
+      }
+    }
+
+    scene.setNodeVisibility(0, true);
+    for (Types.NodeState node : scene.getSceneHierarchy()) {
+      if (!node.visible) {
+        throw new RuntimeException("the whole subtree should be visible");
+      }
+    }
+
+    try {
+      scene.setNodeVisibility(hierarchy.size(), false);
+      throw new RuntimeException(
+          "Expected Scene.NodeException was not thrown with an out of range index");
+    } catch (Scene.NodeException e) {
+    }
+
+    // Test the scene info
+    scene.clear();
+    Types.SceneInfo info = scene.getSceneInfo();
+    if (info.numberOfFiles != 0 || info.numberOfActors != 0 || info.numberOfPoints != 0
+        || info.numberOfCells != 0) {
+      throw new RuntimeException("a cleared scene should have zeroed scene info");
+    }
+
+    scene.add(sphere);
+    info = scene.getSceneInfo();
+    if (info.numberOfFiles != 1 || info.numberOfActors <= 0 || info.numberOfPoints <= 0
+        || info.numberOfCells <= 0) {
+      throw new RuntimeException("unexpected scene info after adding a file");
+    }
+
+    scene.add(world);
+    Types.SceneInfo appendedInfo = scene.getSceneInfo();
+    if (appendedInfo.numberOfFiles != 2 || appendedInfo.numberOfActors <= info.numberOfActors
+        || appendedInfo.numberOfPoints <= info.numberOfPoints
+        || appendedInfo.numberOfCells <= info.numberOfCells) {
+      throw new RuntimeException("scene info should increase when adding a file");
+    }
+
+    scene.clear();
+    info = scene.getSceneInfo();
+    if (info.numberOfFiles != 0 || info.numberOfActors != 0 || info.numberOfPoints != 0
+        || info.numberOfCells != 0) {
+      throw new RuntimeException("scene info should be cleared with the scene");
+    }
+
     engine.close();
+
+    // --- Exception handling tests ---
+
+    // Adding a nonexistent file must throw LoadFailureException instead of crashing the JVM.
+    try (Engine tmpEngine = Engine.createNone()) {
+      tmpEngine.getScene().add("/absolutely_nonexistent_file_f3d_test.xyz");
+      throw new RuntimeException("Expected Scene.LoadFailureException was not thrown");
+    } catch (Scene.LoadFailureException e) {
+    }
   }
 }

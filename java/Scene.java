@@ -4,6 +4,49 @@ import java.util.List;
 
 public class Scene {
 
+    /** Thrown when a file or mesh cannot be loaded into the scene. */
+    public static class LoadFailureException extends F3DException {
+        public LoadFailureException(String message) { super(message); }
+    }
+
+    /** Thrown when a light operation fails (e.g. invalid index). */
+    public static class LightException extends F3DException {
+        public LightException(String message) { super(message); }
+    }
+
+    /** Thrown when a scene hierarchy node operation fails (e.g. invalid index). */
+    public static class NodeException extends F3DException {
+        public NodeException(String message) { super(message); }
+    }
+
+    /**
+     * Enumeration of file availability levels.
+     */
+    public enum FileAvailability {
+        SUPPORTED(0),
+        UNSUPPORTED_EXTENSION(1),
+        UNSUPPORTED_CONTENT(2);
+
+        private final int value;
+
+        FileAvailability(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public static FileAvailability fromValue(int value) {
+            for (FileAvailability availability : FileAvailability.values()) {
+                if (availability.value == value) {
+                    return availability;
+                }
+            }
+            throw new IllegalArgumentException("Invalid FileAvailability value: " + value);
+        }
+    }
+
     public Scene(long nativeAddress) {
         mNativeAddress = nativeAddress;
     }
@@ -153,12 +196,38 @@ public class Scene {
     public native Scene removeAllLights();
 
     /**
+     * Get the scene hierarchy of all added files, in depth-first pre-order, so that a parent
+     * node always precedes its children.
+     *
+     * @return the list of scene hierarchy nodes
+     */
+    public native List<Types.NodeState> getSceneHierarchy();
+
+    /**
+     * Set the visibility of a scene hierarchy node and of all the nodes in its subtree.
+     *
+     * @param nodeId index of the node
+     * @param visible visibility to set
+     * @return this scene for method chaining
+     */
+    public native Scene setNodeVisibility(int nodeId, boolean visible);
+
+    /**
+     * Get information about the contents of the scene, eg. its number of points and cells.
+     * All the counters are zero when the scene is empty.
+     *
+     * @return the scene information
+     */
+    public native Types.SceneInfo getSceneInfo();
+
+    /**
      * Check if a file path is supported by the scene.
      *
      * @param filePath file path to check
-     * @return true if supported, false otherwise
+     * @throws IllegalArgumentException if filePath is null
+     * @return file availability
      */
-    public native boolean supports(String filePath);
+    public native FileAvailability supports(String filePath);
 
     /**
      * Load added files at provided time value if they contain any animation.

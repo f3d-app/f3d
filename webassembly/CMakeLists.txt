@@ -11,17 +11,17 @@ target_link_libraries(f3djs PRIVATE libf3d embind)
 target_link_options(f3djs PRIVATE
   "$<IF:$<CONFIG:Release>,-Oz,-O0>"
   "--emit-tsd=f3d.d.ts"
+  "SHELL:-sASSERTIONS=1"
   "SHELL:-sEXPORT_NAME=f3d"
   "SHELL:-sALLOW_MEMORY_GROWTH=1"
   "SHELL:-sEMULATE_FUNCTION_POINTER_CASTS=0"
   "SHELL:-sMODULARIZE=1"
   "SHELL:-sEXPORT_ES6=1"
   "SHELL:-sENVIRONMENT=web"
-  "SHELL:-sUSE_PTHREADS=0"
   "SHELL:-sSTACK_SIZE=1048576"
   "SHELL:-sWASM=1"
   "SHELL:-sFORCE_FILESYSTEM"
-  "SHELL:-sEXPORTED_RUNTIME_METHODS=FS"
+  "SHELL:-sEXPORTED_RUNTIME_METHODS=['getExceptionMessage','decrementExceptionRefcount','FS']"
   "SHELL:-sWASM_BIGINT"
 )
 

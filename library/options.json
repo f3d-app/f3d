@@ -42,6 +42,10 @@
     },
     "force_reader": {
       "type": "string"
+    },
+    "skip_content_check": {
+      "type": "bool",
+      "default_value": "false"
     }
   },
   "render": {
@@ -92,6 +96,10 @@
       "color": {
         "type": "color",
         "default_value": "0.0, 0.0, 0.0"
+      },
+      "opacity": {
+        "type": "ratio",
+        "default_value": "1.0"
       },
       "reflection": {
         "type": "ratio",

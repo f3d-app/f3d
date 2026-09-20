@@ -5,6 +5,7 @@
 #include "export.h"
 #include "image_c_api.h"
 #include "types_c_api.h"
+#include "video_c_api.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -71,7 +72,7 @@ extern "C"
    *
    * The image is of ChannelType BYTE and 3 or 4 components (RGB or RGBA).
    * Set no_background to non-zero to have a transparent background.
-   * The caller must free the returned image with f3d_image_delete().
+   * The caller must free the returned image with f3d_image_destroy().
    *
    * @param window Window handle.
    * @param no_background If non-zero, renders with a transparent background.
@@ -87,6 +88,18 @@ extern "C"
    * @param height Window height in pixels.
    */
   F3D_EXPORT void f3d_window_set_size(f3d_window_t* window, int width, int height);
+
+  /**
+   * @brief Get the size of the window.
+   *
+   * If provided window is NULL, do nothing.
+   * If provided width or height is NULL, the corresponding size is not written.
+   *
+   * @param window Window handle.
+   * @param width Output pointer receiving the window width in pixels.
+   * @param height Output pointer receiving the window height in pixels.
+   */
+  F3D_EXPORT void f3d_window_get_size(const f3d_window_t* window, int* width, int* height);
 
   /**
    * @brief Get the width of the window.
@@ -112,6 +125,34 @@ extern "C"
    * @param y Y position in pixels.
    */
   F3D_EXPORT void f3d_window_set_position(f3d_window_t* window, int x, int y);
+
+  /**
+   * @brief Get the position of the window.
+   *
+   * If provided window is NULL, do nothing.
+   * If provided x or y is NULL, the corresponding position is not written.
+   *
+   * @param window Window handle.
+   * @param x Output pointer receiving the x position in pixels.
+   * @param y Output pointer receiving the y position in pixels.
+   */
+  F3D_EXPORT void f3d_window_get_position(const f3d_window_t* window, int* x, int* y);
+
+  /**
+   * @brief Get the position of the left border of the window.
+   *
+   * @param window Window handle.
+   * @return Left border position in pixels.
+   */
+  F3D_EXPORT int f3d_window_get_left(const f3d_window_t* window);
+
+  /**
+   * @brief Get the position of the top border of the window.
+   *
+   * @param window Window handle.
+   * @return Top border position in pixels.
+   */
+  F3D_EXPORT int f3d_window_get_top(const f3d_window_t* window);
 
   /**
    * @brief Set the icon to be shown by a window manager.
@@ -150,6 +191,26 @@ extern "C"
    */
   F3D_EXPORT void f3d_window_get_display_from_world(
     const f3d_window_t* window, const f3d_point3_t world_point, f3d_point3_t display_point);
+
+  /**
+   * @brief Get the DPI scale value of the window.
+   *
+   * Returns 1.0 on platforms where DPI scaling is not supported.
+   *
+   * @return DPI scale.
+   */
+  F3D_EXPORT double f3d_window_get_dpi_scale(f3d_window_t* window);
+
+  /**
+   * @brief Get the current video frame of the window.
+   *
+   * If the provided window is NULL, returns NULL.
+   * The returned frame must be deleted with f3d_video_frame_destroy().
+   *
+   * @param window Window handle.
+   * @return Video frame handle, or NULL on failure.
+   */
+  F3D_EXPORT f3d_video_frame_t* f3d_window_get_video_frame(f3d_window_t* window);
 
 #ifdef __cplusplus
 }

@@ -69,6 +69,13 @@ public class Window {
     }
 
     /**
+     * Get the current video frame of the window.
+     *
+     * @return video frame
+     */
+    public native VideoFrame getVideoFrame();
+
+    /**
      * Set the size of the window.
      *
      * @param width window width
@@ -76,6 +83,13 @@ public class Window {
      * @return this window for method chaining
      */
     public native Window setSize(int width, int height);
+
+    /**
+     * Get the size of the window as an array {width, height}.
+     *
+     * @return window size as {width, height}
+     */
+    public native int[] getSize();
 
     /**
      * Get the width of the window.
@@ -99,6 +113,27 @@ public class Window {
      * @return this window for method chaining
      */
     public native Window setPosition(int x, int y);
+
+    /**
+     * Get the position of the window as an array {x, y}.
+     *
+     * @return window position as {x, y}
+     */
+    public native int[] getPosition();
+
+    /**
+     * Get the position of the left border of the window.
+     *
+     * @return window left border position
+     */
+    public native int getLeft();
+
+    /**
+     * Get the position of the top border of the window.
+     *
+     * @return window top border position
+     */
+    public native int getTop();
 
     /**
      * Set the icon to be shown by a window manager.
@@ -131,6 +166,14 @@ public class Window {
      * @return array of 3 doubles [x, y, z] in display coordinates
      */
     public native double[] getDisplayFromWorld(double[] worldPoint);
+
+    /**
+    * Get the DPI scale value of the window.
+    * Returns 1.0 on platforms where DPI scaling is not supported.
+    * 
+    * @return DPI scale.
+    */
+    public native double getDPIScale();
 
     private long mNativeAddress;
     private Camera mCamera;

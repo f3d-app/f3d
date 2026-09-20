@@ -21,4 +21,7 @@ foreach (module IN LISTS modules)
     # There are warnings in VTK related to deprecated features in C++17
     vtk_module_definitions(${module} PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
   endif()
+  if(F3D_USE_GLES)
+    vtk_module_definitions(${module} PUBLIC F3D_USE_GLES)
+  endif()
 endforeach ()

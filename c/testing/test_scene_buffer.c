@@ -20,7 +20,7 @@ int test_scene_buffer()
   if (!scene)
   {
     puts("[ERROR] Failed to get scene");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return 1;
   }
 
@@ -39,6 +39,6 @@ int test_scene_buffer()
   f3d_scene_add_buffer(scene, source, readLength);
   f3d_options_reset(options, "scene.force_reader");
 
-  f3d_engine_delete(engine);
+  f3d_engine_destroy(engine);
   return 0;
 }

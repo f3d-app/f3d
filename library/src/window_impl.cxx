@@ -7,6 +7,7 @@
 #include "macros.h"
 #include "options.h"
 #include "utils.h"
+#include "video_frame_ffmpeg.h"
 
 #include "F3DStyle.h"
 #include "vtkF3DExternalRenderWindow.h"
@@ -122,6 +123,9 @@ public:
   interactor_impl* Interactor = nullptr;
   fs::path CachePath;
   context::function GetProcAddress;
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 7, 20260724)
+  bool PositionWarningEmitted = false;
+#endif
 };
 
 //----------------------------------------------------------------------------
@@ -280,6 +284,13 @@ bool window_impl::isOffscreen()
 }
 
 //----------------------------------------------------------------------------
+double window_impl::getDPIScale()
+{
+  this->Internals->Renderer->SetDPIAware(this->Internals->Options.ui.dpi_aware);
+  return this->Internals->Renderer->GetDPIScale();
+}
+
+//----------------------------------------------------------------------------
 camera& window_impl::getCamera()
 {
   return *this->Internals->Camera;
@@ -306,8 +317,16 @@ window& window_impl::setSize(int width, int height)
 }
 
 //----------------------------------------------------------------------------
+std::pair<int, int> window_impl::getSize() const
+{
+  const int* size = this->Internals->RenWin->GetSize();
+  return { size[0], size[1] };
+}
+
+//----------------------------------------------------------------------------
 window& window_impl::setPosition(int x, int y)
 {
+#ifdef __APPLE__
   if (this->Internals->RenWin->IsA("vtkCocoaRenderWindow"))
   {
     // vtkCocoaRenderWindow has a different behavior than other render windows
@@ -315,12 +334,52 @@ window& window_impl::setPosition(int x, int y)
     const int* screenSize = this->Internals->RenWin->GetScreenSize();
     const int* winSize = this->Internals->RenWin->GetSize();
     this->Internals->RenWin->SetPosition(x, screenSize[1] - winSize[1] - y);
+    return *this;
   }
-  else
-  {
-    this->Internals->RenWin->SetPosition(x, y);
-  }
+#endif
+  this->Internals->RenWin->SetPosition(x, y);
   return *this;
+}
+
+//----------------------------------------------------------------------------
+std::pair<int, int> window_impl::getPosition() const
+{
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 7, 20260724)
+  // Warn once if the render window is an X11 window predating the VTK fix that made
+  // vtkXOpenGLRenderWindow::GetPosition() reliable (VTK 9.7.20260724), in which case the reported
+  // position may be inaccurate.
+  if (!this->Internals->PositionWarningEmitted &&
+    this->Internals->RenWin->IsA("vtkXOpenGLRenderWindow"))
+  {
+    log::info("Window position may be inaccurate with VTK older than 9.7.20260724, "
+              "consider updating VTK.");
+    this->Internals->PositionWarningEmitted = true;
+  }
+#endif
+  const int* pos = this->Internals->RenWin->GetPosition();
+#ifdef __APPLE__
+  if (this->Internals->RenWin->IsA("vtkCocoaRenderWindow"))
+  {
+    // vtkCocoaRenderWindow positions are expressed from the bottom left of the screen, convert
+    // back to a top left origin, mirroring what setPosition does
+    const int* screenSize = this->Internals->RenWin->GetScreenSize();
+    const int* winSize = this->Internals->RenWin->GetSize();
+    return { pos[0], screenSize[1] - winSize[1] - pos[1] };
+  }
+#endif
+  return { pos[0], pos[1] };
+}
+
+//----------------------------------------------------------------------------
+int window_impl::getLeft() const
+{
+  return this->getPosition().first;
+}
+
+//----------------------------------------------------------------------------
+int window_impl::getTop() const
+{
+  return this->getPosition().second;
 }
 
 //----------------------------------------------------------------------------
@@ -645,6 +704,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetGridUnitSquare(opt.render.grid.unit);
   renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
   renderer->SetGridAbsolute(opt.render.grid.absolute);
+  renderer->SetGridOpacity(opt.render.grid.opacity);
   renderer->SetGridReflection(opt.render.grid.reflection);
   renderer->ShowGrid(opt.render.grid.enable);
   renderer->SetGridColor(opt.render.grid.color);
@@ -778,6 +838,26 @@ image window_impl::renderToImage(bool noBackground)
 }
 
 //----------------------------------------------------------------------------
+std::shared_ptr<video_frame> window_impl::getVideoFrame()
+{
+#ifdef F3D_MODULE_FFMPEG
+  std::shared_ptr<video_frame_ffmpeg> frame =
+    std::make_shared<video_frame_ffmpeg>(this->getWidth(), this->getHeight());
+
+  if (!this->Internals->Renderer->CaptureVideoFrame(
+        frame->GetYPlane(), frame->GetUPlane(), frame->GetVPlane()))
+  {
+    throw video_frame::invalid_frame_exception("Failed to capture video frame");
+  }
+
+  return std::static_pointer_cast<video_frame>(frame);
+#else
+  throw video_frame::invalid_frame_exception(
+    "Video frame capture is not supported, please build f3d with FFMPEG support");
+#endif
+}
+
+//----------------------------------------------------------------------------
 void window_impl::SetImporter(vtkF3DMetaImporter* importer)
 {
   this->Internals->Renderer->SetImporter(importer);
@@ -802,6 +882,12 @@ void window_impl::SetCachePath(const fs::path& cachePath)
   }
 
   this->Internals->CachePath = cachePath;
+}
+
+//----------------------------------------------------------------------------
+fs::path window_impl::GetCachePath() const
+{
+  return this->Internals->CachePath;
 }
 
 //----------------------------------------------------------------------------

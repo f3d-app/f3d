@@ -216,15 +216,21 @@ f3d::options::domain_style options::getDomainStyle(std::string_view name) const
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> options::getEnumDomain(std::string_view name) const
+options::DomainRange<option_variant_t> options::getRangeDomain(std::string_view name) const
+{
+  return options_generated::getRangeDomain(*this, name);
+}
+
+//----------------------------------------------------------------------------
+options::DomainEnum<option_variant_t> options::getEnumDomain(std::string_view name) const
 {
   return options_generated::getEnumDomain(*this, name);
 }
 
 //----------------------------------------------------------------------------
-options::DomainRange<option_variant_t> options::getRangeDomain(std::string_view name) const
+options::DomainIndex options::getIndexDomain(std::string_view name) const
 {
-  return options_generated::getRangeDomain(*this, name);
+  return options_generated::getIndexDomain(*this, name);
 }
 
 //----------------------------------------------------------------------------

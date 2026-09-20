@@ -13,6 +13,10 @@ If `-` is specified instead of a filename, the file will be streamed from the st
 
 Instead of showing a render view and render into it, _render directly into a png file_. When used with --ref option, only outputs on failure. If `-` is specified instead of a filename, the PNG file is streamed to the stdout. Can use [template variables](#filename-templating). When using the `{frame}` variable, multiple animation frames are exported (see [Exporting animation frames](05-ANIMATIONS.md#exporting-animation-frames)).
 
+### `--output-video=<video file>` (_string_)
+
+Instead of showing a render view and render to it, _render directly into a video file_. If `-` is specified instead of a filename, the video file is streamed to the stdout. The resulting file contains raw video frames and can be converted to a video container (e.g. MP4) using FFmpeg for example.
+
 ### `--no-background` (_bool_, default: `false`)
 
 Use with --output to output a png file with a transparent background.
@@ -33,6 +37,10 @@ List available _readers_ and exit. Ignore `--verbose`.
 
 Force a specific [reader](02-SUPPORTED_FORMATS.md) to be used, disregarding the file extension and file content.
 
+### `--skip-content-check` (_bool_, default: `false`)
+
+Select reader to read file without checking its header content, but only based on the file extension.
+
 ### `--list-bindings`
 
 List available _bindings_ and exit. Ignore `--verbose`.
@@ -40,6 +48,25 @@ List available _bindings_ and exit. Ignore `--verbose`.
 ### `--list-rendering-backends`
 
 List available _rendering backends_ and exit. Ignore `--verbose`.
+
+### `--list-video-encoders`
+
+List available _video encoders_ and exit. Ignore `--verbose`.
+
+### `--video-encoder` (_string_)
+
+Specify the encoder to use when using `--output-video`.
+Use `--list-video-encoders` to list encoders available on your system.
+
+### `--video-bitrate` (_double_, default: `5.0`)
+
+Specify the video encoder bitrate in Mbps.
+Higher means better quality but larger video stream.
+
+### `--video-low-latency` (_bool_, default: `false`)
+
+Specify if the video encoder should reduce latency by emitting packets as soon as possible.
+Set this to true in case of real time streaming, otherwise leave it to false to have the best quality possible.
 
 ### `--config=<config file path/name/stem>` (_string_, default: `config`)
 
@@ -55,7 +82,7 @@ Do not render anything and quit just after loading the first file, use with --ve
 
 ### `--load-statefile=<file path>` (_string_)
 
-Restore the application state from a statefile right after starting, then continue running. The statefile is applied above configuration files but below command line options. The restored window size is overridden by an explicit `--resolution`. If `-` is specified instead of a filename, the statefile is read from the standard input. If the file does not exist, it is skipped with a warning.
+Restore the application state from a statefile right after starting, then continue running. The statefile is applied above configuration files but below command line options. The restored window size is overridden by an explicit `--resolution`, and the restored window position by an explicit `--position`. If `-` is specified instead of a filename, the statefile is read from the standard input. If the file does not exist, it is skipped with a warning.
 
 ### `--save-statefile=<file path>` (_string_)
 
@@ -222,6 +249,16 @@ Set the color grid lines.
 | Black (default)                      | Cyan                              |
 | ------------------------------------ | --------------------------------- |
 | ![](./images/grid_color_default.png) | ![](./images/grid_color_cyan.png) |
+
+### `--grid-opacity=<opacity>` (_double_, default: `1`)
+
+Set the opacity for grid lines. Can be set to `0` to show reflection only.
+
+#### compare
+
+| 100% (default)                       | 0%                                         |
+| ------------------------------------ | ------------------------------------------ |
+| ![](./images/grid_reflection_on.png) | ![](./images/grid_reflection_no_lines.png) |
 
 ### `--grid-reflection=<strength>` (_double_, default: `0`)
 
@@ -629,11 +666,11 @@ Ignored if `--hdri-skybox` is enabled.
 
 ### `--resolution=<width,height>` (_vector\<double\>_, default: `1000, 600`)
 
-Set the _window resolution_.
+Set the _window resolution_. When closing an interactive window, its resolution is remembered in a [cache file](#caches), and restored on the next start, unless it is set in a configuration file, a statefile or on the command line. Rendering to a file with `--output` or `--reference` is unaffected.
 
 ### `--position=<x,y>` (_vector\<double\>_)
 
-Set the _window position_ (top left corner) , in pixels, starting from the top left of your screens.
+Set the _window position_ (top left corner) , in pixels, starting from the top left of your screens. When closing an interactive window, its position is remembered in a [cache file](#caches), and restored on the next start, unless it is set in a configuration file, a statefile or on the command line. Rendering to a file with `--output` or `--reference` is unaffected.
 
 ### `-z`, `--fps` (_bool_, default: `false`)
 
@@ -723,7 +760,7 @@ Blur circle of confusion radius.
 
 ### `--light-intensity` (_double_, default: `1.0`)
 
-_Adjust the intensity_ of every light in the scene (except HDRI).
+_Adjust the intensity_ of every light in the scene, including HDRI image-based lighting.
 
 #### compare
 
@@ -1084,6 +1121,12 @@ export_brep(obj, sys.stdout.buffer)
 python script.py | f3d - --output=- | display
 ```
 
+F3D can also output animations to a video using piping with FFmpeg:
+
+```
+f3d path/to/file.glb --output-video=- | ffmpeg -f h264 -i - path/to/video.mp4
+```
+
 While piping is more common on Linux, F3D supports it perfectly on Windows and MacOS as well.
 
 With versions of VTK < v9.6.20260128, specifying the [reader](02-SUPPORTED_FORMATS.md) to use is required, like this:
@@ -1117,10 +1160,24 @@ Model related variables will be replaced by `no_file` if no file is loaded and `
 
 When loading a statefile (`--load-statefile`/`load_statefile`), the `{n}` variable resolves to the most recent existing file, instead of the next available one used when saving. This means that, with the default `{n}` template, saving then loading a statefile round-trips to the same file.
 
-## HDRI Caches
+## Caches
 
 When using HDRI related options, F3D will create and use a cache directory to store related data in order to speed up rendering.
-These cache files can be safely removed at the cost of recomputing them on next use.
+
+F3D also stores the geometry of the last closed interactive window in a `cache.json` file, in the same directory, so that it can be restored on the next start, see `--resolution` and `--position`. Its `window` entry uses the same layout as in [statefiles](#statefiles):
+
+```json
+{
+  "window": {
+    "width": 1000,
+    "height": 600,
+    "left": 100,
+    "top": 50
+  }
+}
+```
+
+These cache files can be safely removed, at the cost of recomputing the HDRI data on next use and of losing the cached window geometry.
 
 The cache directory location is as follows, in order, using the first defined environment variables:
 

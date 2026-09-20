@@ -41,9 +41,12 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
+#include <algorithm>
+#include <cctype>
 #include <memory>
 #include <regex>
 #include <set>
+#include <string>
 #include <unordered_map>
 
 vtkStandardNewMacro(vtkF3DAssimpImporter);
@@ -1427,21 +1430,37 @@ bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream, std::string& h
     }
   }
 
-  /* COLLADA:
-  <?xml version="1.0"...
-  <COLLADA ...
-  */
+  // both COLLADA and AMF are XML-based
+  // check if the first line starts with <?xml version="1.0"
+  // skip comments
+  // then check if the next line starts with <COLLADA> or <amf> tags
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
   vtkNew<vtkResourceParser> parser;
   parser->SetStream(stream);
-  std::string line1, line2;
-  if (parser->ReadLine(line1) == vtkParseResult::EndOfLine &&
-    parser->ReadLine(line2) == vtkParseResult::EndOfLine)
+  std::string line;
+  if (parser->ReadLine(line) == vtkParseResult::EndOfLine)
   {
-    if (line1.starts_with(R"(<?xml version="1.0")") && line2.starts_with("<COLLADA "))
+    if (line.starts_with(R"(<?xml version="1.0")"))
     {
-      hint = "dae";
-      return true;
+      // skip comments
+      while (parser->ReadLine(line) == vtkParseResult::EndOfLine)
+      {
+        if (line.starts_with("<!--"))
+        {
+          continue;
+        }
+        if (line.starts_with("<COLLADA"))
+        {
+          hint = "dae";
+          return true;
+        }
+        if (line.starts_with("<amf"))
+        {
+          hint = "amf";
+          return true;
+        }
+        break;
+      }
     }
   }
 
@@ -1452,14 +1471,27 @@ bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream, std::string& h
    * HEADER
    */
   parser->Seek(0, vtkResourceStream::SeekDirection::Begin);
-  std::string line3, line4;
+  std::string line1, line2, line3, line4;
   if (parser->ReadLine(line1) == vtkParseResult::EndOfLine &&
     parser->ReadLine(line2) == vtkParseResult::EndOfLine &&
     parser->ReadLine(line3) == vtkParseResult::EndOfLine &&
     parser->ReadLine(line4) == vtkParseResult::EndOfLine)
   {
+
+    auto ltrim = [](std::string& dxfLine)
+    {
+      dxfLine.erase(dxfLine.begin(),
+        std::find_if(
+          dxfLine.begin(), dxfLine.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+    };
+
+    ltrim(line1);
+    ltrim(line2);
+    ltrim(line3);
+    ltrim(line4);
+
     if (line1.starts_with("0") && line2.starts_with("SECTION") && line3.starts_with("2") &&
-      line4.starts_with("HEADER"))
+      (line4.starts_with("HEADER") || line4.starts_with("ENTITIES")))
     {
       hint = "dxf";
       return true;

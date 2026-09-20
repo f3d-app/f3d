@@ -14,6 +14,7 @@
 #include "scene.h"
 #include "types.h"
 #include "utils.h"
+#include "video_encoder.h"
 #include "window.h"
 
 namespace py = pybind11;
@@ -223,6 +224,57 @@ PYBIND11_MODULE(pyf3d, module)
     .def("all_metadata", &f3d::image::allMetadata)
     .def("normalized_pixel", &f3d::image::getNormalizedPixel);
 
+  // f3d::video_frame
+  py::class_<f3d::video_frame, std::shared_ptr<f3d::video_frame>> video_frame(module, "VideoFrame");
+  video_frame.def("set_timestamp", &f3d::video_frame::setTimestamp, py::arg("timestamp"));
+
+  // f3d::video_packet
+  py::class_<f3d::video_packet, std::shared_ptr<f3d::video_packet>> video_packet(
+    module, "VideoPacket");
+  video_packet
+    .def("get_packet_data",
+      [](const f3d::video_packet& packet) -> py::bytes
+      {
+        const auto* data = packet.getPacketData();
+        if (!data || packet.getPacketSize() == 0)
+        {
+          return py::bytes();
+        }
+        return py::bytes(reinterpret_cast<const char*>(data), packet.getPacketSize());
+      })
+    .def("get_timestamp", &f3d::video_packet::getTimestamp)
+    .def("is_keyframe", &f3d::video_packet::isKeyFrame);
+
+  // f3d::video_encoder
+  py::enum_<f3d::video_encoder::codec>(module, "VideoEncoderCodec")
+    .value("H264", f3d::video_encoder::codec::H264)
+    .value("HEVC", f3d::video_encoder::codec::HEVC)
+    .value("VP8", f3d::video_encoder::codec::VP8)
+    .value("VP9", f3d::video_encoder::codec::VP9)
+    .value("AV1", f3d::video_encoder::codec::AV1)
+    .value("EXPLICIT", f3d::video_encoder::codec::EXPLICIT)
+    .export_values();
+
+  py::class_<f3d::video_encoder::params> video_encoder_params(module, "VideoEncoderParams");
+  video_encoder_params.def(py::init<>())
+    .def_readwrite("codec", &f3d::video_encoder::params::Codec)
+    .def_readwrite("explicit_codec_name", &f3d::video_encoder::params::ExplicitCodecName)
+    .def_readwrite("width", &f3d::video_encoder::params::Width)
+    .def_readwrite("height", &f3d::video_encoder::params::Height)
+    .def_readwrite("frame_rate", &f3d::video_encoder::params::FrameRate)
+    .def_readwrite("bitrate", &f3d::video_encoder::params::Bitrate)
+    .def_readwrite("low_latency", &f3d::video_encoder::params::LowLatency);
+
+  py::class_<f3d::video_encoder, std::shared_ptr<f3d::video_encoder>> video_encoder(
+    module, "VideoEncoder");
+  video_encoder.def_static("create", &f3d::video_encoder::create, py::arg("params"))
+    .def_static("get_available_encoders", &f3d::video_encoder::getAvailableEncoders)
+    .def_property_readonly("width", &f3d::video_encoder::getWidth)
+    .def_property_readonly("height", &f3d::video_encoder::getHeight)
+    .def("listen", &f3d::video_encoder::listen, py::arg("callback"))
+    .def("submit", &f3d::video_encoder::submit, py::arg("frame"))
+    .def("flush", &f3d::video_encoder::flush, py::call_guard<py::gil_scoped_release>());
+
   // f3d::options
   py::class_<f3d::options> options(module, "Options");
 
@@ -325,7 +377,6 @@ PYBIND11_MODULE(pyf3d, module)
     .def("remove_value", &f3d::options::removeValue)
     .def("has_domain", &f3d::options::hasDomain)
     .def("get_domain_style", &f3d::options::getDomainStyle)
-    .def("get_enum_domain", &f3d::options::getEnumDomain)
     .def("get_range_domain",
       [](const f3d::options& opts, std::string_view name) -> py::tuple
       {
@@ -338,6 +389,24 @@ PYBIND11_MODULE(pyf3d, module)
             return py::make_tuple(min, std::get<T>(domain.max), std::get<T>(domain.increment));
           },
           domain.min);
+      })
+    .def("get_enum_domain",
+      [](const f3d::options& opts, std::string_view name) -> py::list
+      {
+        f3d::options::DomainEnum<f3d::option_variant_t> domain = opts.getEnumDomain(name);
+
+        // only string is supported for now
+        std::list<std::string> list;
+        list.resize(domain.enumeration.size());
+        std::ranges::transform(domain.enumeration, list.begin(),
+          [](const auto& value) { return std::get<std::string>(value); });
+        return py::cast(list);
+      })
+    .def("get_index_domain",
+      [](const f3d::options& opts, std::string_view name)
+      {
+        f3d::options::DomainIndex domain = opts.getIndexDomain(name);
+        return domain.max;
       })
     .def("increase", &f3d::options::increase)
     .def("decrease", &f3d::options::decrease)
@@ -359,7 +428,6 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("tokenize", &f3d::utils::tokenize, py::arg("str"), py::arg("keep_comments") = true)
     .def_static(
       "glob_to_regex", &f3d::utils::globToRegex, py::arg("glob"), py::arg("path_separator") = '/')
-    .def_static("get_dpi_scale", &f3d::utils::getDPIScale)
     .def_static("get_env", &f3d::utils::getEnv)
     .def_static("get_known_folder", &f3d::utils::getKnownFolder);
 
@@ -791,6 +859,32 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("intensity", &f3d::light_state_t::intensity)
     .def_readwrite("switch_state", &f3d::light_state_t::switchState);
 
+  // f3d::file_availability
+  py::enum_<f3d::file_availability>(module, "FileAvailability")
+    .value("SUPPORTED", f3d::file_availability::SUPPORTED)
+    .value("UNSUPPORTED_EXTENSION", f3d::file_availability::UNSUPPORTED_EXTENSION)
+    .value("UNSUPPORTED_CONTENT", f3d::file_availability::UNSUPPORTED_CONTENT)
+    .export_values();
+
+  // f3d::node_state_t
+  py::class_<f3d::node_state_t>(module, "NodeState")
+    .def(py::init<>())
+    .def_readonly("id", &f3d::node_state_t::id)
+    .def_readonly("parent_id", &f3d::node_state_t::parentId)
+    .def_readonly("level", &f3d::node_state_t::level)
+    .def_readonly("label", &f3d::node_state_t::label)
+    .def_readonly("visible", &f3d::node_state_t::visible)
+    .def_readonly("has_children", &f3d::node_state_t::hasChildren)
+    .def_readonly("collapsed", &f3d::node_state_t::collapsed);
+
+  // f3d::scene_info_t
+  py::class_<f3d::scene_info_t>(module, "SceneInfo")
+    .def(py::init<>())
+    .def_readonly("number_of_files", &f3d::scene_info_t::numberOfFiles)
+    .def_readonly("number_of_actors", &f3d::scene_info_t::numberOfActors)
+    .def_readonly("number_of_points", &f3d::scene_info_t::numberOfPoints)
+    .def_readonly("number_of_cells", &f3d::scene_info_t::numberOfCells);
+
   // f3d::scene
   py::class_<f3d::scene, std::unique_ptr<f3d::scene, py::nodelete>> scene(module, "Scene");
   scene //
@@ -840,7 +934,14 @@ PYBIND11_MODULE(pyf3d, module)
       py::arg("light_state"))
     .def("get_light", &f3d::scene::getLight, "Get a light from the scene", py::arg("index"))
     .def("get_light_count", &f3d::scene::getLightCount, "Get the number of lights in the scene")
-    .def("remove_all_lights", &f3d::scene::removeAllLights, "Remove all lights from the scene");
+    .def("remove_all_lights", &f3d::scene::removeAllLights, "Remove all lights from the scene")
+    .def("get_scene_hierarchy", &f3d::scene::getSceneHierarchy,
+      "Return the scene hierarchy of all added files, in depth-first pre-order")
+    .def("set_node_visibility", &f3d::scene::setNodeVisibility,
+      "Set the visibility of a scene hierarchy node and of its subtree", py::arg("node_id"),
+      py::arg("visible"))
+    .def("get_scene_info", &f3d::scene::getSceneInfo,
+      "Return information about the contents of the scene");
 
   // f3d::camera_state_t
   py::class_<f3d::camera_state_t>(module, "CameraState")
@@ -900,24 +1001,32 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property_readonly("offscreen", &f3d::window::isOffscreen)
     .def_property_readonly("camera", &f3d::window::getCamera, py::return_value_policy::reference)
     .def_property(
-      "size",
-      [](const f3d::window& win) { return std::make_pair(win.getWidth(), win.getHeight()); },
+      "size", [](const f3d::window& win) { return win.getSize(); },
       [](f3d::window& win, std::pair<int, int> wh) { win.setSize(wh.first, wh.second); })
     .def_property("width", &f3d::window::getWidth,
       [](f3d::window& win, int w) { win.setSize(w, win.getHeight()); })
     .def_property("height", &f3d::window::getHeight,
       [](f3d::window& win, int h) { win.setSize(win.getWidth(), h); })
+    .def_property(
+      "position", [](const f3d::window& win) { return win.getPosition(); },
+      [](f3d::window& win, std::pair<int, int> xy) { win.setPosition(xy.first, xy.second); })
+    .def_property("left", &f3d::window::getLeft,
+      [](f3d::window& win, int x) { win.setPosition(x, win.getTop()); })
+    .def_property("top", &f3d::window::getTop,
+      [](f3d::window& win, int y) { win.setPosition(win.getLeft(), y); })
     .def("render", &f3d::window::render, "Render the window")
     .def("render_to_image", &f3d::window::renderToImage, "Render the window to an image",
       py::arg("no_background") = false)
-    .def("set_position", &f3d::window::setPosition)
+    .def(
+      "get_video_frame", &f3d::window::getVideoFrame, "Get the current video frame of the window")
     .def("set_icon", &f3d::window::setIcon,
       "Set the icon of the window using a memory buffer representing a PNG file")
     .def("set_window_name", &f3d::window::setWindowName, "Set the window name")
     .def("get_world_from_display", &f3d::window::getWorldFromDisplay,
       "Get world coordinate point from display coordinate")
     .def("get_display_from_world", &f3d::window::getDisplayFromWorld,
-      "Get display coordinate point from world coordinate");
+      "Get display coordinate point from world coordinate")
+    .def("get_dpi_scale", &f3d::window::getDPIScale, "Get the DPI scale of the window");
 
   // libInformation
   py::class_<f3d::engine::libInformation>(module, "LibInformation")
@@ -992,7 +1101,8 @@ PYBIND11_MODULE(pyf3d, module)
       "Create an engine with an existing EGL context (Windows/Linux only)")
     .def_static("create_external_osmesa", &f3d::engine::createExternalOSMesa,
       "Create an engine with an existing OSMesa context (Windows/Linux only)")
-    .def("set_cache_path", &f3d::engine::setCachePath, "Set the cache path directory")
+    .def_property("cache_path", &f3d::engine::getCachePath,
+      [](f3d::engine& eng, const std::filesystem::path& path) { eng.setCachePath(path); })
     .def_property("options", &f3d::engine::getOptions,
       py::overload_cast<const f3d::options&>(&f3d::engine::setOptions),
       py::return_value_policy::reference)

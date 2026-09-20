@@ -20,7 +20,32 @@ int TestSDKSceneInvalidHeader([[maybe_unused]] int argc, char* argv[])
   std::string invalidHeader = std::string(argv[1]) + "data/" + invalidHeaderFilename;
 
   // supports method
-  test("not supported with invalid header", !sce.supports(invalidHeader));
+  test("not supported with invalid header",
+    sce.supports(invalidHeader) == f3d::file_availability::UNSUPPORTED_CONTENT);
+  eng.getOptions().scene.skip_content_check = true;
+  test("skip content check", sce.supports(invalidHeader) == f3d::file_availability::SUPPORTED);
+
+  // add method with content check on (default)
+  {
+    f3d::engine engine = f3d::engine::create(true);
+    f3d::scene& scene = engine.getScene();
+    test.expect<f3d::scene::load_failure_exception>(
+      "add with invalid header, exception type check", [&]() { scene.add(invalidHeader); });
+    try
+    {
+      scene.add(invalidHeader);
+    }
+    catch (f3d::scene::load_failure_exception& E)
+    {
+      std::string expectedMsg =
+        "contains unsupported content and no reader have been selected, use skip content check to "
+        "skip content validation or force reader to force a specific reader";
+      std::string exceptMsg = E.what();
+      test("Check exception message size", exceptMsg.size() >= expectedMsg.size());
+      test("Check exception message",
+        exceptMsg.substr(exceptMsg.size() - expectedMsg.size(), expectedMsg.size()) == expectedMsg);
+    }
+  }
 
   return test.result();
 }

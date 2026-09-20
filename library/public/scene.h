@@ -27,13 +27,21 @@ namespace f3d
  *  f3d::engine eng(f3d::window::Type::NATIVE);
  *  f3d::scene& load = eng.getScene();
  *
- *  if (load.supports(path)
+ *  if (load.supports(path) == file_availability::SUPPORTED)
  *  {
  *    load.add(path);
  *  }
  * \endcode
  *
  */
+
+enum class file_availability : unsigned char
+{
+  SUPPORTED = 0,
+  UNSUPPORTED_EXTENSION = 1,
+  UNSUPPORTED_CONTENT = 2,
+};
+
 class F3D_EXPORT scene
 {
 public:
@@ -157,13 +165,45 @@ public:
   virtual scene& removeAllLights() = 0;
 
   /**
-   * Return true if provided file in path uses a supported extension, exists and its content
-   * correspond to a supported file format, false otherwise.
-   * content validation is only performed with VTK >= 9.6.20260228
+   * An exception that can be thrown by the scene
+   * when it fails to index a scene hierarchy node
+   */
+  struct node_exception : public exception
+  {
+    explicit node_exception(const std::string& what = "")
+      : f3d::exception(what) {};
+  };
+
+  /**
+   * Return the scene hierarchy of all added files as a flat vector, in depth-first pre-order,
+   * so that a parent node always precedes its children.
+   * Returns an empty vector if the scene is empty.
+   */
+  [[nodiscard]] virtual std::vector<node_state_t> getSceneHierarchy() const = 0;
+
+  /**
+   * Set the visibility of the node at provided index and of all the nodes in its subtree.
+   * See types::node_state_t documentation for more information.
+   * node_exception is thrown if the index is invalid.
+   */
+  virtual scene& setNodeVisibility(int nodeId, bool visible) = 0;
+
+  /**
+   * Return information about the contents of the scene, eg. its number of points and cells.
+   * See types::scene_info_t documentation for more information.
+   * Returns zeroed counters if the scene is empty.
+   */
+  [[nodiscard]] virtual scene_info_t getSceneInfo() const = 0;
+
+  /**
+   * Return enum file_availability which indicates if the file at the specified path has
+   * supported extension, unsupported extension or unsupported content.
+   * content validation is only performed with VTK >= 9.6.20260228.
+   * Setting scene.skip_content_check to true disables content validation.
    * scene.force_reader is taken into account and plugin should be loaded for their readers to be
    * found.
    */
-  [[nodiscard]] virtual bool supports(const std::filesystem::path& filePath) = 0;
+  [[nodiscard]] virtual file_availability supports(const std::filesystem::path& filePath) = 0;
 
   /**
    * Load added files at provided time value if they contain any animation

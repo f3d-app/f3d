@@ -13,6 +13,7 @@
 
 #include "F3DStyle.h"
 
+#include "vtkF3DFrameCapture.h"
 #include "vtkF3DMetaImporter.h"
 #include "vtkF3DUIActor.h"
 
@@ -130,6 +131,7 @@ public:
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
   void SetGridColor(const std::vector<double>& color);
+  void SetGridOpacity(const double strength);
   void SetGridReflection(const double strength);
   void SetAxesColor(const std::vector<double>& colorXAxis, const std::vector<double>& colorYAxis,
     const std::vector<double>& colorZAxis);
@@ -595,6 +597,22 @@ public:
    */
   void UpdateAnimationTime(double currentTime);
 
+  /**
+   * Get the DPI scale based on the current render window
+   */
+  double GetDPIScale();
+
+  /**
+   * Fill the provided buffers with Y, U, and V planes of the current rendered frame.
+   * The buffers must be allocated with the correct size:
+   * - Y plane: width * height bytes
+   * - U plane: (width / 2) * (height / 2) bytes
+   * - V plane: (width / 2) * (height / 2) bytes
+   *
+   * Returns true if the frame was captured successfully, false otherwise.
+   */
+  bool CaptureVideoFrame(std::byte* yPlane, std::byte* uPlane, std::byte* vPlane);
+
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;
@@ -737,7 +755,6 @@ private:
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
   vtkSmartPointer<vtkCameraOrientationWidget> ModernAxisWidget;
   vtkSmartPointer<vtkCameraOrientationRepresentation> ModernAxisRepresentation;
-  vtkSmartPointer<vtkCallbackCommand> ModernAxisWidgetResizeCallback;
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
   int ModernAxisBasePadding[2] = { 0, 0 };
 #endif
@@ -746,13 +763,14 @@ private:
 
   // Does vtk version support GridAxesActor
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
-  vtkNew<vtkGridAxesActor3D> GridAxesActor;
+  vtkSmartPointer<vtkGridAxesActor3D> GridAxesActor;
 #endif
 
   vtkNew<vtkActor> GridActor;
   vtkNew<vtkF3DOpenGLGridMapper> GridMapper;
   vtkNew<vtkSkybox> SkyboxActor;
   vtkNew<vtkF3DUIActor> UIActor;
+  vtkNew<vtkF3DFrameCapture> FrameCapture;
 
   unsigned int Timer = 0; // Timer OpenGL query
 
@@ -815,6 +833,7 @@ private:
   std::optional<double> GridUnitSquare;
   int GridSubdivisions = 10;
   double GridColor[3] = { 0.0, 0.0, 0.0 };
+  double GridOpacity = 1.0;
   double GridReflection = 0.0;
 
   double ColorAxisX[3] = { 0.0, 0.0, 0.0 };

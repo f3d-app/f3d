@@ -22,3 +22,7 @@ _wasm_build
 
 # testing related
 .cache
+
+# pkg-config examples build in-tree
+examples/libf3d/c/pkgconfig/check-engine-pkgconfig
+examples/libf3d/cpp/pkgconfig/check-engine-pkgconfig

@@ -16,42 +16,111 @@ struct f3d_java_context
 
 extern "C"
 {
-  JNIEXPORT jlong JAVA_BIND(Context, glx)(JNIEnv*, jclass)
+  JNIEXPORT jlong JAVA_BIND(Context, glx)(JNIEnv* env, jclass)
   {
-    return reinterpret_cast<jlong>(new f3d_java_context(f3d::context::glx()));
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d_java_context(f3d::context::glx()));
+    }
+    catch (const f3d::context::loading_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$LoadingException", e.what());
+    }
+    catch (const f3d::context::symbol_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$SymbolException", e.what());
+    }
+    return 0;
   }
 
-  JNIEXPORT jlong JAVA_BIND(Context, wgl)(JNIEnv*, jclass)
+  JNIEXPORT jlong JAVA_BIND(Context, wgl)(JNIEnv* env, jclass)
   {
-    return reinterpret_cast<jlong>(new f3d_java_context(f3d::context::wgl()));
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d_java_context(f3d::context::wgl()));
+    }
+    catch (const f3d::context::loading_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$LoadingException", e.what());
+    }
+    catch (const f3d::context::symbol_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$SymbolException", e.what());
+    }
+    return 0;
   }
 
-  JNIEXPORT jlong JAVA_BIND(Context, cocoa)(JNIEnv*, jclass)
+  JNIEXPORT jlong JAVA_BIND(Context, cocoa)(JNIEnv* env, jclass)
   {
-    return reinterpret_cast<jlong>(new f3d_java_context(f3d::context::cocoa()));
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d_java_context(f3d::context::cocoa()));
+    }
+    catch (const f3d::context::loading_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$LoadingException", e.what());
+    }
+    catch (const f3d::context::symbol_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$SymbolException", e.what());
+    }
+    return 0;
   }
 
-  JNIEXPORT jlong JAVA_BIND(Context, egl)(JNIEnv*, jclass)
+  JNIEXPORT jlong JAVA_BIND(Context, egl)(JNIEnv* env, jclass)
   {
-    return reinterpret_cast<jlong>(new f3d_java_context(f3d::context::egl()));
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d_java_context(f3d::context::egl()));
+    }
+    catch (const f3d::context::loading_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$LoadingException", e.what());
+    }
+    catch (const f3d::context::symbol_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$SymbolException", e.what());
+    }
+    return 0;
   }
 
-  JNIEXPORT jlong JAVA_BIND(Context, osmesa)(JNIEnv*, jclass)
+  JNIEXPORT jlong JAVA_BIND(Context, osmesa)(JNIEnv* env, jclass)
   {
-    return reinterpret_cast<jlong>(new f3d_java_context(f3d::context::osmesa()));
+    try
+    {
+      return reinterpret_cast<jlong>(new f3d_java_context(f3d::context::osmesa()));
+    }
+    catch (const f3d::context::loading_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$LoadingException", e.what());
+    }
+    catch (const f3d::context::symbol_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$SymbolException", e.what());
+    }
+    return 0;
   }
 
   JNIEXPORT jlong JAVA_BIND(Context, getSymbol)(JNIEnv* env, jclass, jstring lib, jstring func)
   {
-    const char* libStr = env->GetStringUTFChars(lib, nullptr);
-    const char* funcStr = env->GetStringUTFChars(func, nullptr);
+    JniUTFString libStr(env, lib);
+    JniUTFString funcStr(env, func);
 
-    f3d_java_context* ctx = new f3d_java_context(f3d::context::getSymbol(libStr, funcStr));
-
-    env->ReleaseStringUTFChars(lib, libStr);
-    env->ReleaseStringUTFChars(func, funcStr);
-
-    return reinterpret_cast<jlong>(ctx);
+    jlong result = 0;
+    try
+    {
+      result = reinterpret_cast<jlong>(
+        new f3d_java_context(f3d::context::getSymbol(libStr.c_str(), funcStr.c_str())));
+    }
+    catch (const f3d::context::loading_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$LoadingException", e.what());
+    }
+    catch (const f3d::context::symbol_exception& e)
+    {
+      F3DThrowJavaException(env, "app/f3d/F3D/Context$SymbolException", e.what());
+    }
+    return result;
   }
 
   JNIEXPORT void JAVA_BIND(Context, delete)(JNIEnv*, jclass, jlong contextHandle)

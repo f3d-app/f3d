@@ -21,14 +21,41 @@ int test_scene()
   if (!scene)
   {
     puts("[ERROR] Failed to get scene");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return 1;
   }
 
   // Test adding files
 
-  int supported = f3d_scene_supports(scene, "test.obj");
-  (void)supported;
+  if (f3d_scene_supports(NULL, "test.obj") != -1 || f3d_scene_supports(scene, NULL) != -1)
+  {
+    puts("[ERROR] f3d_scene_supports should return -1 with NULL arguments");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  if (f3d_scene_supports(scene, F3D_TESTING_DATA_DIR "cow.vtp") != 0)
+  {
+    puts("[ERROR] a vtp file should be supported");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  if (f3d_scene_supports(scene, F3D_TESTING_DATA_DIR "unsupportedFile.dummy") != 1)
+  {
+    puts("[ERROR] an unknown extension should be reported as unsupported");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+#ifdef F3D_TESTING_CONTENT_CHECK
+  if (f3d_scene_supports(scene, F3D_TESTING_DATA_DIR "invalid.mdl") != 2)
+  {
+    puts("[ERROR] a file with an invalid header should be reported as unsupported content");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+#endif
 
   int add_result = f3d_scene_add(scene, F3D_TESTING_DATA_DIR "cow.vtp");
   (void)add_result;
@@ -46,22 +73,22 @@ int test_scene()
   if (added_count != 0)
   {
     puts("[ERROR] a cleared scene should have no added file");
-    f3d_scene_free_added_files(added_files, added_count);
-    f3d_engine_delete(engine);
+    f3d_scene_destroy_added_files(added_files, added_count);
+    f3d_engine_destroy(engine);
     return 1;
   }
-  f3d_scene_free_added_files(added_files, added_count);
+  f3d_scene_destroy_added_files(added_files, added_count);
 
   f3d_scene_add(scene, F3D_TESTING_DATA_DIR "cow.vtp");
   added_files = f3d_scene_get_added_files(scene, &added_count);
   if (added_count != 1 || !added_files || !strstr(added_files[0], "cow.vtp"))
   {
     puts("[ERROR] scene should track the added file");
-    f3d_scene_free_added_files(added_files, added_count);
-    f3d_engine_delete(engine);
+    f3d_scene_destroy_added_files(added_files, added_count);
+    f3d_engine_destroy(engine);
     return 1;
   }
-  f3d_scene_free_added_files(added_files, added_count);
+  f3d_scene_destroy_added_files(added_files, added_count);
 
   f3d_scene_clear(scene);
 
@@ -84,7 +111,7 @@ int test_scene()
   (void)valid;
   if (error_msg)
   {
-    f3d_utils_string_free(error_msg);
+    f3d_utils_string_destroy(error_msg);
   }
 
   f3d_scene_add_mesh(scene, &mesh);
@@ -111,7 +138,7 @@ int test_scene()
   (void)anim_count;
   unsigned int keyframes_number;
   double* keyframes = f3d_scene_get_animation_keyframes(scene, &keyframes_number);
-  f3d_scene_free_animation_keyframes(keyframes);
+  f3d_scene_destroy_animation_keyframes(keyframes);
   (void)keyframes;
 
   f3d_light_state_t light_state = { 0 };
@@ -130,7 +157,7 @@ int test_scene()
     f3d_light_state_t* get_light = f3d_scene_get_light(scene, light_idx);
     if (get_light)
     {
-      f3d_light_state_free(get_light);
+      f3d_light_state_destroy(get_light);
     }
 
     f3d_light_state_t update_light = light_state;
@@ -153,6 +180,135 @@ int test_scene()
 
   f3d_scene_remove_all_lights(scene);
 
-  f3d_engine_delete(engine);
+  // Test the scene hierarchy
+
+  f3d_scene_clear(scene);
+
+  unsigned int null_count = 42;
+  if (f3d_scene_get_scene_hierarchy(NULL, &null_count) || null_count != 0 ||
+    f3d_scene_get_scene_hierarchy(scene, NULL) || f3d_scene_set_node_visibility(NULL, 0, 1))
+  {
+    puts("[ERROR] scene hierarchy API should handle NULL arguments");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  unsigned int node_count = 0;
+  f3d_node_state_t* nodes = f3d_scene_get_scene_hierarchy(scene, &node_count);
+  if (node_count != 0 || nodes)
+  {
+    puts("[ERROR] a cleared scene should have an empty scene hierarchy");
+    f3d_scene_destroy_scene_hierarchy(nodes, node_count);
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  if (f3d_scene_set_node_visibility(scene, 0, 0) != 0)
+  {
+    puts("[ERROR] setting node visibility should fail with an empty scene hierarchy");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  f3d_scene_add(scene, F3D_TESTING_DATA_DIR "mb/recursive/mb_0_0.vtu");
+  nodes = f3d_scene_get_scene_hierarchy(scene, &node_count);
+  if (node_count == 0 || !nodes)
+  {
+    puts("[ERROR] scene hierarchy should not be empty");
+    f3d_scene_destroy_scene_hierarchy(nodes, node_count);
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  if (nodes[0].id != 0 || nodes[0].parent_id != -1 || nodes[0].level != 0 || !nodes[0].visible ||
+    !strstr(nodes[0].label, "mb_0_0.vtu"))
+  {
+    puts("[ERROR] unexpected scene hierarchy root node");
+    f3d_scene_destroy_scene_hierarchy(nodes, node_count);
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  if (f3d_scene_set_node_visibility(scene, 0, 0) != 1)
+  {
+    puts("[ERROR] failed to hide the scene hierarchy root node");
+    f3d_scene_destroy_scene_hierarchy(nodes, node_count);
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+  f3d_scene_destroy_scene_hierarchy(nodes, node_count);
+
+  nodes = f3d_scene_get_scene_hierarchy(scene, &node_count);
+  for (unsigned int i = 0; i < node_count; ++i)
+  {
+    if (nodes[i].visible)
+    {
+      puts("[ERROR] the whole subtree should be hidden");
+      f3d_scene_destroy_scene_hierarchy(nodes, node_count);
+      f3d_engine_destroy(engine);
+      return 1;
+    }
+  }
+
+  if (f3d_scene_set_node_visibility(scene, (int)node_count, 1) != 0)
+  {
+    puts("[ERROR] setting node visibility should fail with an out of range index");
+    f3d_scene_destroy_scene_hierarchy(nodes, node_count);
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+  f3d_scene_destroy_scene_hierarchy(nodes, node_count);
+
+  // Test the scene info
+
+  f3d_scene_clear(scene);
+
+  f3d_scene_info_t info;
+  if (f3d_scene_get_scene_info(NULL, &info) || f3d_scene_get_scene_info(scene, NULL))
+  {
+    puts("[ERROR] scene info API should handle NULL arguments");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  if (!f3d_scene_get_scene_info(scene, &info) || info.number_of_files != 0 ||
+    info.number_of_actors != 0 || info.number_of_points != 0 || info.number_of_cells != 0)
+  {
+    puts("[ERROR] a cleared scene should have zeroed scene info");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  f3d_scene_add(scene, F3D_TESTING_DATA_DIR "mb/recursive/mb_0_0.vtu");
+  if (!f3d_scene_get_scene_info(scene, &info) || info.number_of_files != 1 ||
+    info.number_of_actors <= 0 || info.number_of_points <= 0 || info.number_of_cells <= 0)
+  {
+    puts("[ERROR] unexpected scene info after adding a file");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  f3d_scene_info_t appended_info;
+  f3d_scene_add(scene, F3D_TESTING_DATA_DIR "mb/recursive/mb_1_0.vtp");
+  if (!f3d_scene_get_scene_info(scene, &appended_info) || appended_info.number_of_files != 2 ||
+    appended_info.number_of_actors <= info.number_of_actors ||
+    appended_info.number_of_points <= info.number_of_points ||
+    appended_info.number_of_cells <= info.number_of_cells)
+  {
+    puts("[ERROR] scene info should increase when adding a file");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  f3d_scene_clear(scene);
+  if (!f3d_scene_get_scene_info(scene, &info) || info.number_of_files != 0 ||
+    info.number_of_actors != 0 || info.number_of_points != 0 || info.number_of_cells != 0)
+  {
+    puts("[ERROR] scene info should be cleared with the scene");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  f3d_engine_destroy(engine);
   return 0;
 }

@@ -28,10 +28,11 @@ f3d({})
       engine.getOptions().toggle("render.effect.tone_mapping");
       engine.getOptions().toggle("render.effect.ambient_occlusion");
       engine.getOptions().toggle("render.hdri.ambient");
+      engine.getOptions().toggle("ui.dpi_aware");
 
       // setup the window size based on the canvas size
       const canvas = document.getElementById(id);
-      const scale = window.devicePixelRatio;
+      const scale = engine.getWindow().getDPIScale();
       engine
         .getWindow()
         .setSize(scale * canvas.clientWidth, scale * canvas.clientHeight);

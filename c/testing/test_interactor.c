@@ -30,7 +30,7 @@ int test_interactor()
   if (!interactor)
   {
     puts("[ERROR] Failed to get interactor");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return 1;
   }
 
@@ -81,7 +81,7 @@ int test_interactor()
   char** actions = f3d_interactor_get_command_actions(interactor, &action_count);
   if (actions)
   {
-    f3d_interactor_free_string_array(actions, action_count);
+    f3d_interactor_destroy_string_array(actions, action_count);
   }
 
   f3d_interaction_bind_t bind;
@@ -112,7 +112,7 @@ int test_interactor()
   char** groups = f3d_interactor_get_bind_groups(interactor, &group_count);
   if (groups)
   {
-    f3d_interactor_free_string_array(groups, group_count);
+    f3d_interactor_destroy_string_array(groups, group_count);
   }
 
   int bind_count = 0;
@@ -120,14 +120,14 @@ int test_interactor()
     f3d_interactor_get_binds_for_group(interactor, "test_group", &bind_count);
   if (binds_for_group)
   {
-    f3d_interactor_free_bind_array(binds_for_group);
+    f3d_interactor_destroy_bind_array(binds_for_group);
   }
 
   int all_bind_count = 0;
   f3d_interaction_bind_t* all_binds = f3d_interactor_get_binds(interactor, &all_bind_count);
   if (all_binds)
   {
-    f3d_interactor_free_bind_array(all_binds);
+    f3d_interactor_destroy_bind_array(all_binds);
   }
 
   f3d_binding_documentation_t doc;
@@ -141,6 +141,6 @@ int test_interactor()
   f3d_interactor_set_event_loop_user_callback(interactor, stop_callback, interactor);
   f3d_interactor_start(interactor, 0.01);
 
-  f3d_engine_delete(engine);
+  f3d_engine_destroy(engine);
   return 0;
 }

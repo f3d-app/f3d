@@ -66,6 +66,12 @@ Force a specific reader to be used, disregarding the file extension and file con
 
 CLI: `--force-reader`.
 
+### `scene.skip_content_check` (_bool_, default: `false`)
+
+Select reader to read file without checking its header content but only based on the file extension.
+
+CLI: `--skip-content-check`.
+
 ### `scene.camera.orthographic` (_bool_, optional)
 
 Set to true to force orthographic projection. Model-specified by default, which is false if not specified.
@@ -273,6 +279,9 @@ CLI: `--textures-transform`.
 Enable and set the _blending_ technique. This is a technique used to correctly render translucent objects.
 Valid options are: `ddp` (dual depth peeling, quality), `sort` (only for gaussians), `sort_cpu` (only for gaussians, slow), `stochastic` (fast), `none` (disabled).
 
+> [!WARNING]
+> `ddp`, `sort` and `sort_cpu` are not compatible with OpenGL ES (WebAssembly and Android)
+
 CLI: `--blending`.
 
 ### `render.effect.antialiasing.mode` (_string_, default: `none`, enum domain: `none, fxaa, ssaa, taa`)
@@ -361,6 +370,12 @@ Set the color of grid lines.
 
 CLI: `--grid-color`.
 
+### `render.grid.opacity` (_ratio_, default: `1.0`)
+
+Set the opacity for the grid lines. Can be set to `0` to show reflection only.
+
+CLI: `--grid-opacity`.
+
 ### `render.grid.reflection` (_ratio_, default: `0.0`)
 
 Set the reflection strength on the grid.
@@ -370,6 +385,9 @@ CLI: `--grid-reflection`.
 ### `render.axes_grid` (_bool_, default: `false`)
 
 Show _axes grid_ in the scene.
+
+> [!WARNING]
+> this option is not compatible with OpenGL ES (WebAssembly and Android)
 
 CLI: `--axes-grid`.
 
@@ -434,7 +452,7 @@ CLI: `--blur-coc`.
 
 ### `render.light.intensity` (_double_, default: `1.0`, range domain: `[0, 5]`, increment: `0.02`)
 
-Adjust the intensity of every light in the scene (except HDRI).
+Adjust the intensity of every light in the scene, including HDRI image-based lighting.
 
 CLI: `--light-intensity`.
 
@@ -532,6 +550,9 @@ CLI: `--dpi-aware`.
 
 Display a _frame per second counter_.
 
+> [!WARNING]
+> this option is not compatible with OpenGL ES (WebAssembly and Android)
+
 CLI: `--fps`.
 
 ### `ui.loader_progress` (_bool_, default: `false`, **on load**)
@@ -617,7 +638,8 @@ Enum domains are intended for options that have a finite set of possible value.
 Index domains are intended for integer options that are between 0 and a maximum.
 
 If an option has a `dynamic` domains, it means the libf3d can change the domain.
-It is possible to directly change a domain using the [struct API](#struct-api).
+It is possible to directly read/write a domain using the [struct API](#struct-api).
+It is possible to read a domain using the [variant API](#variant-api).
 
 ## APIs
 
@@ -718,6 +740,33 @@ An API that is similar to the F3D 2.0 options API thanks to std::variant.
   opt.set("render.grid.enable", true);
   opt.set("ui.metadata", true);
   opt.set("model.material.roughness", 0.6);
+```
+
+This API can read domains using `hasDomain`, `getDomainStyle`, `getRangeDomain`, `getEnumDomain` and `getIndexDomain`.
+
+```cpp
+  f3d::engine eng = f3d::engine::create();
+  f3d::options& opt = eng.getOptions();
+
+  std::string optionName = "option.name";
+  if (opt.hasDomain(optionName))
+  {
+    switch (opt.getDomainStyle(optionName))
+    {
+      case f3d::domain_style::RANGE:
+        DomainRange<option_variant_t> domain = opt.getRangeDomain("optionName");
+        ...
+        break;
+      case f3d::domain_style::ENUM:
+        DomainEnum<option_variant_t> domain = opt.getEnumDomain("optionName");
+        ...
+        break;
+      case f3d::domain_style::INDEX:
+        DomainIndex domain = opt.getIndexDomain("optionName");
+        ...
+        break;
+    }
+  }
 ```
 
 When using this API make sure to catch exception shown above with the string API.

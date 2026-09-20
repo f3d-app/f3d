@@ -35,21 +35,19 @@ static void cpp_log_forwarder(f3d::log::VerboseLevel level, const std::string& m
     return;
   }
 
-  jclass enumClass = env->FindClass("app/f3d/F3D/Log$VerboseLevel");
+  JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Log$VerboseLevel"));
   jmethodID fromValueMethod =
     env->GetStaticMethodID(enumClass, "fromValue", "(I)Lapp/f3d/F3D/Log$VerboseLevel;");
-  jobject jLevel = env->CallStaticObjectMethod(enumClass, fromValueMethod, static_cast<int>(level));
+  JniLocalRef<jobject> jLevel(
+    env, env->CallStaticObjectMethod(enumClass, fromValueMethod, static_cast<int>(level)));
 
-  jstring jMessage = env->NewStringUTF(message.c_str());
+  JniLocalRef<jstring> jMessage(env, env->NewStringUTF(message.c_str()));
 
-  jclass callbackClass = env->GetObjectClass(g_callback_ref);
+  JniLocalRef<jclass> callbackClass(env, env->GetObjectClass(g_callback_ref));
   jmethodID onLogMessageMethod = env->GetMethodID(
     callbackClass, "onLogMessage", "(Lapp/f3d/F3D/Log$VerboseLevel;Ljava/lang/String;)V");
 
-  env->CallVoidMethod(g_callback_ref, onLogMessageMethod, jLevel, jMessage);
-
-  env->DeleteLocalRef(jLevel);
-  env->DeleteLocalRef(jMessage);
+  env->CallVoidMethod(g_callback_ref, onLogMessageMethod, jLevel.get(), jMessage.get());
 
   if (needsDetach)
   {
@@ -66,16 +64,14 @@ extern "C"
       return;
     }
 
-    jclass enumClass = env->GetObjectClass(level);
+    JniLocalRef<jclass> enumClass(env, env->GetObjectClass(level));
     jmethodID getValueMethod = env->GetMethodID(enumClass, "getValue", "()I");
     jint levelValue = env->CallIntMethod(level, getValueMethod);
 
-    const char* messageStr = env->GetStringUTFChars(message, nullptr);
+    JniUTFString messageStr(env, message);
 
     f3d::log::VerboseLevel cppLevel = static_cast<f3d::log::VerboseLevel>(levelValue);
-    f3d::log::print(cppLevel, messageStr);
-
-    env->ReleaseStringUTFChars(message, messageStr);
+    f3d::log::print(cppLevel, messageStr.c_str());
   }
 
   JNIEXPORT void JAVA_BIND(Log, debug)(JNIEnv* env, jclass, jstring message)
@@ -85,9 +81,8 @@ extern "C"
       return;
     }
 
-    const char* messageStr = env->GetStringUTFChars(message, nullptr);
-    f3d::log::debug(messageStr);
-    env->ReleaseStringUTFChars(message, messageStr);
+    JniUTFString messageStr(env, message);
+    f3d::log::debug(messageStr.c_str());
   }
 
   JNIEXPORT void JAVA_BIND(Log, info)(JNIEnv* env, jclass, jstring message)
@@ -97,9 +92,8 @@ extern "C"
       return;
     }
 
-    const char* messageStr = env->GetStringUTFChars(message, nullptr);
-    f3d::log::info(messageStr);
-    env->ReleaseStringUTFChars(message, messageStr);
+    JniUTFString messageStr(env, message);
+    f3d::log::info(messageStr.c_str());
   }
 
   JNIEXPORT void JAVA_BIND(Log, warn)(JNIEnv* env, jclass, jstring message)
@@ -109,9 +103,8 @@ extern "C"
       return;
     }
 
-    const char* messageStr = env->GetStringUTFChars(message, nullptr);
-    f3d::log::warn(messageStr);
-    env->ReleaseStringUTFChars(message, messageStr);
+    JniUTFString messageStr(env, message);
+    f3d::log::warn(messageStr.c_str());
   }
 
   JNIEXPORT void JAVA_BIND(Log, error)(JNIEnv* env, jclass, jstring message)
@@ -121,9 +114,8 @@ extern "C"
       return;
     }
 
-    const char* messageStr = env->GetStringUTFChars(message, nullptr);
-    f3d::log::error(messageStr);
-    env->ReleaseStringUTFChars(message, messageStr);
+    JniUTFString messageStr(env, message);
+    f3d::log::error(messageStr.c_str());
   }
 
   JNIEXPORT void JAVA_BIND(Log, setUseColoring)(JNIEnv*, jclass, jboolean use)
@@ -139,7 +131,7 @@ extern "C"
       return;
     }
 
-    jclass enumClass = env->GetObjectClass(level);
+    JniLocalRef<jclass> enumClass(env, env->GetObjectClass(level));
     jmethodID getValueMethod = env->GetMethodID(enumClass, "getValue", "()I");
     jint levelValue = env->CallIntMethod(level, getValueMethod);
 
@@ -151,7 +143,7 @@ extern "C"
   {
     f3d::log::VerboseLevel cppLevel = f3d::log::getVerboseLevel();
 
-    jclass enumClass = env->FindClass("app/f3d/F3D/Log$VerboseLevel");
+    JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Log$VerboseLevel"));
     jmethodID fromValueMethod =
       env->GetStaticMethodID(enumClass, "fromValue", "(I)Lapp/f3d/F3D/Log$VerboseLevel;");
 

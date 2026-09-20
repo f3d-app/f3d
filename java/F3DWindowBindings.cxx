@@ -3,6 +3,7 @@
 #include <app_f3d_F3D_Window.h>
 
 #include <types.h>
+#include <video_frame.h>
 #include <window.h>
 
 extern "C"
@@ -11,7 +12,7 @@ extern "C"
   {
     f3d::window::Type type = GetEngine(env, self)->getWindow().getType();
 
-    jclass enumClass = env->FindClass("app/f3d/F3D/Window$Type");
+    JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Window$Type"));
     jfieldID fieldID;
 
     switch (type)
@@ -63,7 +64,7 @@ extern "C"
   {
     f3d::image* img = new f3d::image(GetEngine(env, self)->getWindow().renderToImage(noBackground));
 
-    jclass imageClass = env->FindClass("app/f3d/F3D/Image");
+    JniLocalRef<jclass> imageClass(env, env->FindClass("app/f3d/F3D/Image"));
     jmethodID constructor = env->GetMethodID(imageClass, "<init>", "(J)V");
 
     jobject result = env->NewObject(imageClass, constructor, reinterpret_cast<jlong>(img));
@@ -75,6 +76,15 @@ extern "C"
   {
     GetEngine(env, self)->getWindow().setSize(width, height);
     return self;
+  }
+
+  JNIEXPORT jintArray JAVA_BIND(Window, getSize)(JNIEnv* env, jobject self)
+  {
+    const auto [width, height] = GetEngine(env, self)->getWindow().getSize();
+    const jint size[2] = { width, height };
+    jintArray result = env->NewIntArray(2);
+    env->SetIntArrayRegion(result, 0, 2, size);
+    return result;
   }
 
   JNIEXPORT jint JAVA_BIND(Window, getWidth)(JNIEnv* env, jobject self)
@@ -93,6 +103,25 @@ extern "C"
     return self;
   }
 
+  JNIEXPORT jintArray JAVA_BIND(Window, getPosition)(JNIEnv* env, jobject self)
+  {
+    const auto [posX, posY] = GetEngine(env, self)->getWindow().getPosition();
+    const jint position[2] = { posX, posY };
+    jintArray result = env->NewIntArray(2);
+    env->SetIntArrayRegion(result, 0, 2, position);
+    return result;
+  }
+
+  JNIEXPORT jint JAVA_BIND(Window, getLeft)(JNIEnv* env, jobject self)
+  {
+    return GetEngine(env, self)->getWindow().getLeft();
+  }
+
+  JNIEXPORT jint JAVA_BIND(Window, getTop)(JNIEnv* env, jobject self)
+  {
+    return GetEngine(env, self)->getWindow().getTop();
+  }
+
   JNIEXPORT jobject JAVA_BIND(Window, setIcon)(JNIEnv* env, jobject self, jbyteArray icon)
   {
     jsize iconSize = env->GetArrayLength(icon);
@@ -106,9 +135,8 @@ extern "C"
 
   JNIEXPORT jobject JAVA_BIND(Window, setWindowName)(JNIEnv* env, jobject self, jstring windowName)
   {
-    const char* name = env->GetStringUTFChars(windowName, nullptr);
-    GetEngine(env, self)->getWindow().setWindowName(name);
-    env->ReleaseStringUTFChars(windowName, name);
+    JniUTFString name(env, windowName);
+    GetEngine(env, self)->getWindow().setWindowName(name.c_str());
     return self;
   }
 
@@ -137,4 +165,9 @@ extern "C"
     env->SetDoubleArrayRegion(ret, 0, 3, displayPoint.data());
     return ret;
   }
+}
+
+JNIEXPORT jdouble JAVA_BIND(Window, getDPIScale)(JNIEnv* env, jobject self)
+{
+  return static_cast<jdouble>(GetEngine(env, self)->getWindow().getDPIScale());
 }

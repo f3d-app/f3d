@@ -1,7 +1,9 @@
+import os
 import tempfile
 from pathlib import Path
 
 import f3d
+import pytest
 
 
 def test_scene_memory():
@@ -43,6 +45,8 @@ def test_scene():
     engine.scene.add([world, logo])
     engine.scene.add(sphere1)
     engine.scene.add([sphere2, cube])
+
+    assert engine.window.get_dpi_scale() >= 1.0
 
     assert engine.scene.animation_time_range() == (0.0, 4.0)
     engine.scene.load_animation_time(2)
@@ -107,3 +111,102 @@ def test_scene_added_files():
 
     engine.scene.clear()
     assert engine.scene.get_added_files() == []
+
+
+def test_scene_hierarchy():
+    testing_dir = Path(__file__).parent.parent.parent / "testing"
+    cube = testing_dir / "data/mb/recursive/mb_0_0.vtu"
+    sphere = testing_dir / "data/mb/recursive/mb_1_0.vtp"
+
+    engine = f3d.Engine.create_none()
+    assert engine.scene.get_scene_hierarchy() == []
+
+    with pytest.raises(RuntimeError):
+        engine.scene.set_node_visibility(0, False)
+
+    engine.scene.add(cube)
+    hierarchy = engine.scene.get_scene_hierarchy()
+    assert len(hierarchy) > 0
+    assert hierarchy[0].id == 0
+    assert hierarchy[0].parent_id == -1
+    assert hierarchy[0].label == "mb_0_0.vtu"
+    assert all(node.visible for node in hierarchy)
+
+    assert all(node.id == i for i, node in enumerate(hierarchy))
+    assert all(node.parent_id < node.id for node in hierarchy)
+
+    assert all(
+        node.level == (0 if node.parent_id < 0 else hierarchy[node.parent_id].level + 1)
+        for node in hierarchy
+    )
+
+    with pytest.raises(RuntimeError):
+        engine.scene.set_node_visibility(-1, False)
+    with pytest.raises(RuntimeError):
+        engine.scene.set_node_visibility(len(hierarchy), False)
+
+    engine.scene.set_node_visibility(0, False)
+    assert not any(node.visible for node in engine.scene.get_scene_hierarchy())
+    engine.scene.set_node_visibility(0, True)
+    assert all(node.visible for node in engine.scene.get_scene_hierarchy())
+
+    engine.scene.add(sphere)
+    appended = engine.scene.get_scene_hierarchy()
+    assert len(appended) > len(hierarchy)
+    assert [node.id for node in appended[: len(hierarchy)]] == [
+        node.id for node in hierarchy
+    ]
+    assert len([node for node in appended if node.parent_id == -1]) == 2
+
+    engine.scene.clear()
+    assert engine.scene.get_scene_hierarchy() == []
+
+
+def test_scene_info():
+    testing_dir = Path(__file__).parent.parent.parent / "testing"
+    cube = testing_dir / "data/mb/recursive/mb_0_0.vtu"
+    sphere = testing_dir / "data/mb/recursive/mb_1_0.vtp"
+
+    engine = f3d.Engine.create_none()
+    info = engine.scene.get_scene_info()
+    assert info.number_of_files == 0
+    assert info.number_of_actors == 0
+    assert info.number_of_points == 0
+    assert info.number_of_cells == 0
+
+    engine.scene.add(cube)
+    info = engine.scene.get_scene_info()
+    assert info.number_of_files == 1
+    assert info.number_of_actors > 0
+    assert info.number_of_points > 0
+    assert info.number_of_cells > 0
+
+    engine.scene.add(sphere)
+    appended = engine.scene.get_scene_info()
+    assert appended.number_of_files == 2
+    assert appended.number_of_actors > info.number_of_actors
+    assert appended.number_of_points > info.number_of_points
+    assert appended.number_of_cells > info.number_of_cells
+
+    engine.scene.clear()
+    info = engine.scene.get_scene_info()
+    assert info.number_of_files == 0
+    assert info.number_of_actors == 0
+    assert info.number_of_points == 0
+    assert info.number_of_cells == 0
+
+
+def test_scene_supports():
+    testing_dir = Path(__file__).parent.parent.parent / "testing"
+    cow = testing_dir / "data/cow.vtp"
+    invalid_mdl = testing_dir / "data/invalid.mdl"
+    unsupported = testing_dir / "data/unsupportedFile.dummy"
+
+    engine = f3d.Engine.create_none()
+    scene = engine.scene
+
+    assert scene.supports(cow) == f3d.FileAvailability.SUPPORTED
+    assert scene.supports(unsupported) == f3d.FileAvailability.UNSUPPORTED_EXTENSION
+
+    if os.environ.get("F3D_TESTING_CONTENT_CHECK") == "1":
+        assert scene.supports(invalid_mdl) == f3d.FileAvailability.UNSUPPORTED_CONTENT

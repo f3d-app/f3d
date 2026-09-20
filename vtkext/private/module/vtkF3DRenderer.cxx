@@ -18,6 +18,8 @@
 #include "vtkF3DSolidBackgroundPass.h"
 #include "vtkF3DUserRenderPass.h"
 
+#include <vtkActor.h>
+#include <vtkActorCollection.h>
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -30,6 +32,7 @@
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkFloatArray.h>
 #include <vtkHDRReader.h>
+#include <vtkImageAppendComponents.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
@@ -229,21 +232,6 @@ vtkSmartPointer<vtkTexture> GetTexture(const fs::path& filePath, bool isSRGB = f
 
   return texture;
 }
-
-template<typename F>
-void ExecFuncOnAllPolyDataUniforms(vtkActorCollection* actors, F&& func)
-{
-  actors->InitTraversal();
-  vtkActor* actor = nullptr;
-
-  while ((actor = actors->GetNextActor()))
-  {
-    if (actor->GetMapper() && actor->GetMapper()->IsA("vtkPolyDataMapper"))
-    {
-      func(actor->GetShaderProperty()->GetVertexCustomUniforms());
-    }
-  }
-}
 }
 
 //----------------------------------------------------------------------------
@@ -283,6 +271,7 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
   }
 
   this->UIActor->ReleaseGraphicsResources(w);
+  this->FrameCapture->ReleaseGraphicsResources(w);
 
   this->Superclass::ReleaseGraphicsResources(w);
 }
@@ -302,9 +291,12 @@ void vtkF3DRenderer::Initialize()
   this->AddActor(this->SkyboxActor);
   this->AddActor(this->UIActor);
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
-  this->AddActor(this->GridAxesActor);
-  this->GridAxesActor->SetUseBounds(false);
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513) && !defined(F3D_USE_GLES)
+  // Add the grid axes actor if already initialized
+  if (this->GridAxesActor != nullptr)
+  {
+    this->AddActor(this->GridAxesActor);
+  }
 #endif
 
   this->GridConfigured = false;
@@ -341,16 +333,31 @@ void vtkF3DRenderer::Initialize()
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
   // create a window resize callback for axis
-  this->ModernAxisWidgetResizeCallback = vtkSmartPointer<vtkCallbackCommand>::New();
-  this->ModernAxisWidgetResizeCallback->SetClientData(this);
-  this->ModernAxisWidgetResizeCallback->SetCallback(
+  vtkNew<vtkCallbackCommand> modernAxisWidgetResizeCallback;
+  modernAxisWidgetResizeCallback->SetClientData(this);
+  modernAxisWidgetResizeCallback->SetCallback(
     [](vtkObject* const, unsigned long, void* clientData, void*)
     {
       vtkF3DRenderer* self = static_cast<vtkF3DRenderer*>(clientData);
       self->UpdateAxisWidgetSize();
     });
-  this->RenderWindow->AddObserver(
-    vtkCommand::WindowResizeEvent, this->ModernAxisWidgetResizeCallback);
+  this->RenderWindow->AddObserver(vtkCommand::WindowResizeEvent, modernAxisWidgetResizeCallback);
+#endif
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20260729)
+  // create a dpi changed callback to rebuild UI with proper size
+  vtkNew<vtkCallbackCommand> dpiChangedCallback;
+  dpiChangedCallback->SetClientData(this);
+  dpiChangedCallback->SetCallback(
+    [](vtkObject* const, unsigned long, void* clientData, void* callData)
+    {
+      vtkF3DRenderer* self = static_cast<vtkF3DRenderer*>(clientData);
+      self->TextActorsConfigured = false;
+      self->ConfigureTextActors();
+      F3DLog::Print(
+        F3DLog::Severity::Info, "DPI changed to " + std::to_string(*static_cast<int*>(callData)));
+    });
+  this->RenderWindow->AddObserver(vtkCommand::DPIChangedEvent, dpiChangedCallback);
 #endif
 }
 
@@ -540,8 +547,6 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   {
     vtkNew<vtkOpenGLFXAAPass> fxaaP;
     fxaaP->SetDelegatePass(renderingPass);
-
-    this->SetPass(fxaaP);
     renderingPass = fxaaP;
   }
 
@@ -762,6 +767,17 @@ void vtkF3DRenderer::SetGridColor(const std::vector<double>& color)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetGridOpacity(const double opacity)
+{
+  if (this->GridOpacity != opacity)
+  {
+    this->GridOpacity = opacity;
+    this->GridConfigured = false;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetGridReflection(const double strength)
 {
   if (this->GridReflection != strength)
@@ -816,12 +832,14 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
     vtkMath::Cross(right, up, front);
 
     vtkNew<vtkMatrix4x4> upMatrix;
+    // clang-format off
     const double m[16] = {
-      right[0], right[1], right[2], 0, //
-      up[0], up[1], up[2], 0,          //
-      front[0], front[1], front[2], 0, //
-      0, 0, 0, 1,                      //
+      right[0], right[1], right[2], 0,
+      up[0], up[1], up[2], 0,
+      front[0], front[1], front[2], 0,
+      0, 0, 0, 1,
     };
+    // clang-format on
     upMatrix->DeepCopy(m);
     vtkNew<vtkMatrix4x4> upMatrixInv;
     upMatrixInv->DeepCopy(upMatrix);
@@ -878,6 +896,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       this->GridMapper->SetFadeDistance(diag);
       this->GridMapper->SetUnitSquare(tmpUnitSquare);
       this->GridMapper->SetSubdivisions(this->GridSubdivisions);
+      this->GridMapper->SetLineOpacity(this->GridOpacity);
       this->GridMapper->SetReflectionStrength(this->GridReflection);
 
       if (this->GridAbsolute)
@@ -946,6 +965,12 @@ void vtkF3DRenderer::ShowAxesGrid([[maybe_unused]] bool show)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
 {
+#ifdef F3D_USE_GLES
+  if (this->AxesGridVisible)
+  {
+    F3DLog::Print(F3DLog::Severity::Warning, "Grid axes are not supported on OpenGL ES, ignoring.");
+  }
+#else
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   bool show = this->AxesGridVisible;
   if (show)
@@ -956,12 +981,14 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
     vtkMath::Cross(right, up, front);
 
     vtkNew<vtkMatrix4x4> upMatrix;
+    // clang-format off
     const double m[16] = {
-      right[0], right[1], right[2], 0, //
-      up[0], up[1], up[2], 0,          //
-      front[0], front[1], front[2], 0, //
-      0, 0, 0, 1,                      //
+      right[0], right[1], right[2], 0,
+      up[0], up[1], up[2], 0,
+      front[0], front[1], front[2], 0,
+      0, 0, 0, 1,
     };
+    // clang-format on
     upMatrix->DeepCopy(m);
     vtkNew<vtkMatrix4x4> upMatrixInv;
     upMatrixInv->DeepCopy(upMatrix);
@@ -977,6 +1004,13 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
     }
     else
     {
+      if (this->GridAxesActor == nullptr)
+      {
+        this->GridAxesActor = vtkSmartPointer<vtkGridAxesActor3D>::New();
+        this->GridAxesActor->SetUseBounds(false);
+        this->AddActor(this->GridAxesActor);
+      }
+
       this->GridAxesActor->SetOrientation(orientation);
       this->GridAxesActor->SetVisibility(true);
 
@@ -997,8 +1031,12 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
       this->GridAxesConfigured = true;
     }
   }
-  this->GridAxesActor->SetVisibility(show);
 
+  if (this->GridAxesActor != nullptr)
+  {
+    this->GridAxesActor->SetVisibility(show);
+  }
+#endif
 #endif
 }
 
@@ -1332,7 +1370,32 @@ void vtkF3DRenderer::ConfigureHDRITexture()
       this->HDRITexture->SetColorModeToDirectScalars();
       this->HDRITexture->MipmapOn();
       this->HDRITexture->InterpolateOn();
+
+#ifdef F3D_USE_GLES
+      // with OpenGL ES, we need to add an alpha channel because RGB32F is not filterable
+      vtkImageData* rgb = this->HDRIReader->GetOutput();
+
+      if (rgb->GetNumberOfScalarComponents() == 3 && rgb->GetScalarType() == VTK_FLOAT)
+      {
+        vtkNew<vtkImageData> alpha;
+        alpha->SetDimensions(rgb->GetDimensions());
+        alpha->AllocateScalars(VTK_FLOAT, 1);
+        std::fill_n(
+          static_cast<float*>(alpha->GetScalarPointer()), alpha->GetNumberOfPoints(), 1.0f);
+
+        vtkNew<vtkImageAppendComponents> append;
+        append->AddInputData(rgb);
+        append->AddInputData(alpha);
+        append->Update();
+        this->HDRITexture->SetInputConnection(append->GetOutputPort());
+      }
+      else
+      {
+        this->HDRITexture->SetInputConnection(this->HDRIReader->GetOutputPort());
+      }
+#else
       this->HDRITexture->SetInputConnection(this->HDRIReader->GetOutputPort());
+#endif
 
       // 8-bit textures are usually gamma-corrected
       if (this->HDRIReader->GetOutput() &&
@@ -1533,6 +1596,37 @@ void vtkF3DRenderer::ConfigureHDRISkybox()
 }
 
 //----------------------------------------------------------------------------
+double vtkF3DRenderer::GetDPIScale()
+{
+  std::string forceDpiStr;
+  if (vtksys::SystemTools::GetEnv("CTEST_F3D_FORCE_DPI_SCALE", forceDpiStr))
+  {
+    try
+    {
+      return std::stod(forceDpiStr);
+    }
+    catch (const std::exception&)
+    {
+      // silently ignore invalid values
+    }
+  }
+
+#ifdef __APPLE__
+  constexpr int baseDPI = 72;
+#else
+  constexpr int baseDPI = 96;
+#endif
+
+  if (this->DPIAware && this->GetRenderWindow()->DetectDPI())
+  {
+    // In the CI, DetectDPI() returns 0, even if .Xresources contains Xft.dpi
+    // xvfb seems to ignore it, so we cannot cover this line
+    return static_cast<double>(this->GetRenderWindow()->GetDPI()) / baseDPI; // LCOV_EXCL_LINE
+  }
+  return 1.0;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureTextActors()
 {
   // Font
@@ -1555,11 +1649,8 @@ void vtkF3DRenderer::ConfigureTextActors()
     }
   }
 
-  this->UIActor->SetFontColor(FontColor);
-
-  double scaleFactor = this->DPIAware ? F3DUtils::getDPIScale() : 1.0;
-
-  this->UIActor->SetFontScale(this->FontScale * scaleFactor);
+  this->UIActor->SetFontColor(this->FontColor);
+  this->UIActor->SetFontScale(this->FontScale * this->GetDPIScale());
 
   this->TextActorsConfigured = true;
 }
@@ -2198,6 +2289,24 @@ void vtkF3DRenderer::UpdateActors()
 }
 
 //----------------------------------------------------------------------------
+bool vtkF3DRenderer::CaptureVideoFrame(std::byte* yPlane, std::byte* uPlane, std::byte* vPlane)
+{
+  // Use the final rendered texture as input for the frame capture
+  vtkF3DOverlayRenderPass* overlayPass = vtkF3DOverlayRenderPass::SafeDownCast(this->GetPass());
+
+  if (overlayPass == nullptr)
+  {
+    F3DLog::Print(
+      F3DLog::Severity::Error, "Cannot capture video frame: renderer is not initialized");
+    return false;
+  }
+
+  this->FrameCapture->SetInputTexture(overlayPass->GetColorTexture());
+  this->FrameCapture->Capture(this, yPlane, uPlane, vPlane);
+  return true;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
   if (this->UseNormalGlyphs)
@@ -2220,7 +2329,7 @@ void vtkF3DRenderer::Render()
   vtkInformation* info = this->GetInformation();
   bool uiOnly = info->Get(vtkF3DRenderPass::RENDER_UI_ONLY());
 
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+#ifndef F3D_USE_GLES
   if (!uiOnly)
   {
     glBeginQuery(GL_TIME_ELAPSED, this->Timer);
@@ -2237,7 +2346,7 @@ void vtkF3DRenderer::Render()
     double elapsedTime =
       std::chrono::duration_cast<std::chrono::microseconds>(cpuElapsed).count() * 1e-6;
 
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+#ifndef F3D_USE_GLES
     glEndQuery(GL_TIME_ELAPSED);
     GLint elapsed;
     glGetQueryObjectiv(this->Timer, GL_QUERY_RESULT, &elapsed);
@@ -2304,7 +2413,27 @@ int vtkF3DRenderer::UpdateLights()
 
       light->SetIntensity(originalIntensity * this->LightIntensity);
     }
+
     this->LightIntensitiesConfigured = true;
+  }
+
+  // Push IBLIntensity to every actor's custom uniforms so the HDRI ambient
+  // contribution (iblDiffuse + iblSpecular) scales with the same factor.
+  // This runs every frame (not just when intensity changes) to ensure that newly
+  // added actors always have the uniform set before their shader is compiled.
+  // VTK's //VTK::CustomUniforms::Dec mechanism then declares the uniform in the
+  // GLSL shader source. The actual GPU upload (glUniform1f) is already performed
+  // each frame by VTK's SetCustomUniforms, so this dict update is negligible.
+  // see https://github.com/f3d-app/f3d/issues/3312
+  {
+    vtkActorCollection* actors = this->GetActors();
+    vtkCollectionSimpleIterator ait;
+    vtkActor* actor;
+    for (actors->InitTraversal(ait); (actor = actors->GetNextActor(ait));)
+    {
+      actor->GetShaderProperty()->GetFragmentCustomUniforms()->SetUniformf(
+        "IBLIntensity", static_cast<float>(this->LightIntensity));
+    }
   }
 
   return lightCount;

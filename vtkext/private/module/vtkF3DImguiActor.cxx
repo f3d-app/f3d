@@ -6,6 +6,7 @@
 #include "vtkF3DImguiConsole.h"
 #include "vtkF3DImguiFS.h"
 #include "vtkF3DImguiVS.h"
+#include "vtkF3DMetaImporter.h"
 #include "vtkF3DRenderer.h"
 #include "vtkF3DUserEvents.h"
 
@@ -14,7 +15,6 @@
 #include <vtkDataAssembly.h>
 #include <vtkDataAssemblyVisitor.h>
 #include <vtkImageData.h>
-#include <vtkInformation.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLBufferObject.h>
 #include <vtkOpenGLRenderWindow.h>
@@ -78,70 +78,6 @@ static std::vector<std::string> SplitBindings(const std::string& s, const char d
 }
 
 /**
- * Visitor used to traverse a subtree when a checkbox is toggled.
- * It will add an attribute `f3d_visible` on each node to the value of the checkbox.
- * It will also add (or remove) a `ACTOR_HIDDEN()` information key on nodes associated with actors.
- */
-class vtkF3DVisibilityDataAssemblyVisitor : public vtkDataAssemblyVisitor
-{
-public:
-  static vtkF3DVisibilityDataAssemblyVisitor* New();
-  vtkTypeMacro(vtkF3DVisibilityDataAssemblyVisitor, vtkDataAssemblyVisitor);
-
-  void SetVisibleAttribute(int visible)
-  {
-    this->Visible = visible;
-  }
-
-  void SetImporter(vtkImporter* importer)
-  {
-    this->Importer = importer;
-  }
-
-protected:
-  void Visit(int nodeid) override
-  {
-    // add the visibility state in the current node
-    // `GetAssembly()` is a const method, but we need to modify it, so the cast is needed
-    vtkDataAssembly* mutableAssembly = const_cast<vtkDataAssembly*>(this->GetAssembly());
-    mutableAssembly->SetAttribute(nodeid, "f3d_visible", this->Visible);
-
-    const int flatActorIndex =
-      this->GetAssembly()->GetAttributeOrDefault(nodeid, "flat_actor_id", -1);
-
-    if (flatActorIndex >= 0)
-    {
-      vtkActorCollection* actors = this->Importer->GetImportedActors();
-      vtkActor* actor = vtkActor::SafeDownCast(actors->GetItemAsObject(flatActorIndex));
-
-      vtkSmartPointer<vtkInformation> keys = actor->GetPropertyKeys();
-
-      // if there's no property keys yet, create one
-      if (!keys)
-      {
-        keys = vtkSmartPointer<vtkInformation>::New();
-        actor->SetPropertyKeys(keys);
-      }
-
-      // this key will be used in the renderer to know if the actor rendering should be skipped
-      if (this->Visible == 1)
-      {
-        keys->Remove(vtkF3DMetaImporter::ACTOR_HIDDEN());
-      }
-      else
-      {
-        keys->Set(vtkF3DMetaImporter::ACTOR_HIDDEN(), 1);
-      }
-    }
-  }
-
-private:
-  int Visible = 0;
-  vtkImporter* Importer = nullptr;
-};
-vtkStandardNewMacro(vtkF3DVisibilityDataAssemblyVisitor);
-
-/**
  * Visitor used to traverse a full tree (one per importer).
  * It will take care of rendering the tree with imgui.
  * If a checkbox is toggled, it triggers another traversal of a subtree to change the internal
@@ -158,9 +94,9 @@ public:
     this->RenderWindow = renWin;
   }
 
-  void SetImporter(vtkImporter* importer)
+  void SetMetaImporter(vtkF3DMetaImporter* importer)
   {
-    this->Importer = importer;
+    this->MetaImporter = importer;
   }
 
   void SetImporterIndex(int index)
@@ -204,18 +140,11 @@ protected:
     // get the current visibility state
     bool visible = (this->GetAssembly()->GetAttributeOrDefault(nodeid, "f3d_visible", 1) != 0);
 
-    const char* defaultLabel =
-      this->GetAssembly()->GetNumberOfChildren(nodeid) > 0 ? "<group>" : "<object>";
-
     ImGui::PushID(uuid);
-    if (ImGui::Checkbox(
-          this->GetAssembly()->GetAttributeOrDefault(nodeid, "label", defaultLabel), &visible))
+    if (ImGui::Checkbox(vtkF3DMetaImporter::GetNodeLabel(this->GetAssembly(), nodeid), &visible))
     {
-      // if the checkbox is toggled, trigger a traversal of the subtree to change each node state
-      vtkNew<vtkF3DVisibilityDataAssemblyVisitor> attrVisitor;
-      attrVisitor->SetImporter(this->Importer);
-      attrVisitor->SetVisibleAttribute(visible ? 1 : 0);
-      this->GetAssembly()->Visit(nodeid, attrVisitor);
+      // if the checkbox is toggled, the whole subtree is updated
+      this->MetaImporter->SetAssemblyNodeVisibility(this->ImporterId, nodeid, visible);
 
       this->RenderWindow->GetInteractor()->InvokeEvent(
         vtkF3DUserEvents::SceneHierarchyChangedEvent, nullptr);
@@ -228,7 +157,7 @@ protected:
 private:
   bool CurrentNodeOpened = true;
   vtkOpenGLRenderWindow* RenderWindow = nullptr;
-  vtkImporter* Importer = nullptr;
+  vtkF3DMetaImporter* MetaImporter = nullptr;
   int ImporterId = -1;
 };
 vtkStandardNewMacro(vtkF3DRenderDataAssemblyVisitor);
@@ -240,21 +169,8 @@ struct vtkF3DImguiActor::Internals
 
   void Initialize(vtkOpenGLRenderWindow* renWin)
   {
-    if (this->FontTexture == nullptr)
+    if (this->VertexBuffer == nullptr)
     {
-      // Build texture atlas
-      ImGuiIO& io = ImGui::GetIO();
-      unsigned char* pixels;
-      int width, height;
-      io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
-
-      this->FontTexture = vtkSmartPointer<vtkTextureObject>::New();
-      this->FontTexture->SetContext(renWin);
-      this->FontTexture->Create2DFromRaw(width, height, 4, VTK_UNSIGNED_CHAR, pixels);
-
-      // Store our identifier
-      io.Fonts->SetTexID((ImTextureID)this->FontTexture.Get());
-
       // Create VBO
       this->VertexBuffer = vtkSmartPointer<vtkOpenGLBufferObject>::New();
 
@@ -312,12 +228,6 @@ struct vtkF3DImguiActor::Internals
     {
       ImGuiIO& io = ImGui::GetIO();
 
-      if (this->FontTexture)
-      {
-        io.Fonts->SetTexID(0);
-        this->FontTexture->ReleaseGraphicsResources(renWin);
-        this->FontTexture = nullptr;
-      }
       if (this->LogoTexture)
       {
         this->LogoTexture->ReleaseGraphicsResources(renWin);
@@ -339,10 +249,64 @@ struct vtkF3DImguiActor::Internals
         this->Program = nullptr;
       }
 
+      // Destroy all textures
+      for (ImTextureData* tex : ImGui::GetPlatformIO().Textures)
+      {
+        if (tex->RefCount == 1)
+        {
+          tex->SetStatus(ImTextureStatus_WantDestroy);
+          this->UpdateTexture(renWin, tex);
+        }
+      }
+
       io.Fonts->Clear();
 
       io.BackendPlatformName = io.BackendRendererName = nullptr;
       ImGui::DestroyContext();
+    }
+  }
+
+  void UpdateTexture(vtkOpenGLRenderWindow* renWin, ImTextureData* tex)
+  {
+    if (tex->Status == ImTextureStatus_WantCreate)
+    {
+      vtkTextureObject* textureObject = vtkTextureObject::New();
+      textureObject->SetContext(renWin);
+      textureObject->Create2DFromRaw(
+        tex->Width, tex->Height, 4, VTK_UNSIGNED_CHAR, tex->GetPixels());
+
+      tex->SetTexID(reinterpret_cast<ImTextureID>(textureObject));
+      tex->SetStatus(ImTextureStatus_OK);
+    }
+    else if (tex->Status == ImTextureStatus_WantUpdates)
+    {
+      vtkTextureObject* textureObject = reinterpret_cast<vtkTextureObject*>(tex->GetTexID());
+      textureObject->Bind();
+
+      vtkOpenGLState* ostate = renWin->GetState();
+      ostate->vtkglPixelStorei(GL_UNPACK_ROW_LENGTH, tex->Width); // stride
+
+      for (ImTextureRect& r : tex->Updates)
+      {
+        ostate->vtkglPixelStorei(GL_UNPACK_SKIP_PIXELS, r.x);
+        ostate->vtkglPixelStorei(GL_UNPACK_SKIP_ROWS, r.y);
+
+        glTexSubImage2D(
+          GL_TEXTURE_2D, 0, r.x, r.y, r.w, r.h, GL_RGBA, GL_UNSIGNED_BYTE, tex->GetPixels());
+      }
+
+      ostate->vtkglPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+      ostate->vtkglPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+      ostate->vtkglPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
+
+      tex->SetStatus(ImTextureStatus_OK);
+    }
+    else if (tex->Status == ImTextureStatus_WantDestroy)
+    {
+      vtkTextureObject* textureObject = reinterpret_cast<vtkTextureObject*>(tex->GetTexID());
+      textureObject->Delete();
+      tex->SetTexID(ImTextureID_Invalid);
+      tex->SetStatus(ImTextureStatus_Destroyed);
     }
   }
 
@@ -367,6 +331,14 @@ struct vtkF3DImguiActor::Internals
     state->vtkglDisable(GL_DEPTH_TEST);
     state->vtkglDisable(GL_STENCIL_TEST);
     state->vtkglEnable(GL_SCISSOR_TEST);
+
+    if (drawData->Textures != nullptr)
+    {
+      for (ImTextureData* tex : *drawData->Textures)
+      {
+        this->UpdateTexture(renWin, tex);
+      }
+    }
 
     renWin->GetShaderCache()->ReadyShaderProgram(this->Program);
 
@@ -429,11 +401,9 @@ struct vtkF3DImguiActor::Internals
     this->VertexBuffer->Release();
     this->IndexBuffer->Release();
 
-    this->FontTexture->Deactivate();
     this->LogoTexture->Deactivate();
   }
 
-  vtkSmartPointer<vtkTextureObject> FontTexture;
   vtkSmartPointer<vtkOpenGLVertexArrayObject> VertexArray;
   vtkSmartPointer<vtkOpenGLBufferObject> VertexBuffer;
   vtkSmartPointer<vtkOpenGLBufferObject> IndexBuffer;
@@ -526,13 +496,15 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   io.IniFilename = nullptr;
   io.LogFilename = nullptr;
 
-  ImFontConfig fontConfig;
+  // Setup backend name
+  io.BackendPlatformName = io.BackendRendererName = "F3D/VTK";
+  io.BackendFlags |= ImGuiBackendFlags_RendererHasTextures;
 
-  ImVector<ImWchar> ranges;
-  ImFontGlyphRangesBuilder builder;
-  builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
-  builder.AddChar(0x2264); // Less-Than or Equal To
-  builder.BuildRanges(&ranges);
+  ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
+  platformIO.Renderer_TextureMaxWidth = platformIO.Renderer_TextureMaxHeight =
+    vtkTextureObject::GetMaximumTextureSize(renWin);
+
+  ImFontConfig fontConfig;
 
   ImFont* font = nullptr;
   if (this->FontFile.empty())
@@ -541,18 +513,18 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
     fontConfig.FontDataOwnedByAtlas = false;
     font = io.Fonts->AddFontFromMemoryTTF(
       const_cast<void*>(reinterpret_cast<const void*>(F3DFontBuffer)), sizeof(F3DFontBuffer),
-      F3DStyle::FontSizeBase * this->FontScale, &fontConfig, ranges.Data);
+      F3DStyle::FontSizeBase * this->FontScale, &fontConfig);
     ImFont* notiFont = io.Fonts->AddFontFromMemoryTTF(
       const_cast<void*>(reinterpret_cast<const void*>(F3DFontBuffer)), sizeof(F3DFontBuffer),
-      F3DStyle::FontSizeBase * this->FontScale * .8f, &fontConfig, ranges.Data);
+      F3DStyle::FontSizeBase * this->FontScale * .8f, &fontConfig);
     Pimpl->ExtraFonts["notiFont"] = notiFont;
   }
   else
   {
     font = io.Fonts->AddFontFromFileTTF(
-      this->FontFile.c_str(), F3DStyle::FontSizeBase * this->FontScale, &fontConfig, ranges.Data);
-    ImFont* notiFont = io.Fonts->AddFontFromFileTTF(this->FontFile.c_str(),
-      F3DStyle::FontSizeBase * this->FontScale * .8f, &fontConfig, ranges.Data);
+      this->FontFile.c_str(), F3DStyle::FontSizeBase * this->FontScale, &fontConfig);
+    ImFont* notiFont = io.Fonts->AddFontFromFileTTF(
+      this->FontFile.c_str(), F3DStyle::FontSizeBase * this->FontScale * .8f, &fontConfig);
     Pimpl->ExtraFonts["notiFont"] = notiFont;
   }
 
@@ -585,9 +557,6 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   style->Colors[ImGuiCol_ResizeGrip] = F3DStyle::imgui::GetMidColor();
   style->Colors[ImGuiCol_ResizeGripHovered] = F3DStyle::imgui::GetHighlightColor();
   style->Colors[ImGuiCol_ResizeGripActive] = F3DStyle::imgui::GetHighlightColor();
-
-  // Setup backend name
-  io.BackendPlatformName = io.BackendRendererName = "F3D/VTK";
 }
 
 //----------------------------------------------------------------------------
@@ -639,11 +608,11 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
 
   for (int i = 0; i < importer->GetImporterInfoCount(); i++)
   {
-    vtkF3DMetaImporter::ImporterInfo info = importer->GetImporterInfo(i);
+    const vtkF3DMetaImporter::ImporterInfo& info = importer->GetImporterInfo(i);
 
     vtkNew<::vtkF3DRenderDataAssemblyVisitor> visitor;
     visitor->SetRenderWindow(renWin);
-    visitor->SetImporter(info.Importer);
+    visitor->SetMetaImporter(importer);
     visitor->SetImporterIndex(i);
 
     info.DataAssembly->Visit(vtkDataAssembly::GetRootNode(), visitor);

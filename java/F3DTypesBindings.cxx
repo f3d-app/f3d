@@ -20,8 +20,8 @@ extern "C"
 
     if (scaleLen != 2 || translateLen != 2)
     {
-      jclass exceptionClass = env->FindClass("java/lang/IllegalArgumentException");
-      env->ThrowNew(exceptionClass, "Scale and translate arrays must have exactly 2 elements");
+      F3DThrowJavaException(env, "java/lang/IllegalArgumentException",
+        "Scale and translate arrays must have exactly 2 elements");
       return nullptr;
     }
 
@@ -35,12 +35,14 @@ extern "C"
     env->ReleaseDoubleArrayElements(scale, scaleData, 0);
     env->ReleaseDoubleArrayElements(translate, translateData, 0);
 
-    jclass transform2DClass = env->FindClass("app/f3d/F3D/Transform2D");
+    JniLocalRef<jclass> transform2DClass(env, env->FindClass("app/f3d/F3D/Transform2D"));
     jmethodID constructor = env->GetMethodID(transform2DClass, "<init>", "()V");
+    // Not wrapped in JniLocalRef: this is the return value, and its local reference
+    // must remain valid until it crosses back into the JVM after this function returns.
     jobject result = env->NewObject(transform2DClass, constructor);
 
     jfieldID dataField = env->GetFieldID(transform2DClass, "data", "[D");
-    jdoubleArray dataArray = env->NewDoubleArray(9);
+    JniLocalRef<jdoubleArray> dataArray(env, env->NewDoubleArray(9));
     std::vector<double> vec = cppTransform;
     env->SetDoubleArrayRegion(dataArray, 0, 9, vec.data());
     env->SetObjectField(result, dataField, dataArray);
@@ -49,7 +51,7 @@ extern "C"
   }
   JNIEXPORT jobject JAVA_BIND(Types_00024Mesh, isValid)(JNIEnv* env, jobject self)
   {
-    jclass meshClass = env->GetObjectClass(self);
+    JniLocalRef<jclass> meshClass(env, env->GetObjectClass(self));
 
     jfieldID pointsField = env->GetFieldID(meshClass, "points", "[F");
     jfieldID normalsField = env->GetFieldID(meshClass, "normals", "[F");
@@ -120,14 +122,13 @@ extern "C"
 
     auto [valid, errorMessage] = cppMesh.isValid();
 
-    jclass validationResultClass = env->FindClass("app/f3d/F3D/Types$Mesh$ValidationResult");
+    JniLocalRef<jclass> validationResultClass(
+      env, env->FindClass("app/f3d/F3D/Types$Mesh$ValidationResult"));
     jmethodID constructor =
       env->GetMethodID(validationResultClass, "<init>", "(ZLjava/lang/String;)V");
 
-    jstring jErrorMessage = env->NewStringUTF(errorMessage.c_str());
-    jobject result = env->NewObject(validationResultClass, constructor, valid, jErrorMessage);
-
-    env->DeleteLocalRef(jErrorMessage);
+    JniLocalRef<jstring> jErrorMessage(env, env->NewStringUTF(errorMessage.c_str()));
+    jobject result = env->NewObject(validationResultClass, constructor, valid, jErrorMessage.get());
 
     return result;
   }

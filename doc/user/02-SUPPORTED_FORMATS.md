@@ -42,6 +42,7 @@ F3D supports the following file formats:
 | Drawing Exchange Format                   | `.dxf`                                         | Yes        | NONE              | YES (VTK 9.6)     | `assimp`  | `DXF`                   |
 | DirectX                                   | `.x`                                           | Yes        | MULTI             | YES (VTK 9.6)     | `assimp`  | `DirectX`               |
 | 3D Manufacturing Format                   | `.3mf`                                         | Yes        | NONE              | YES (VTK 9.6)     | `assimp`  | `3MF`                   |
+| Additive Manufacturing Format             | `.amf`                                         | Yes        | NONE              | YES (VTK 9.6)     | `assimp`  | `AMF`                   |
 | Universal Scene Description               | `.usd`, `.usda`, `.usdc`, `.usdz`              | Yes        | SINGLE            | YES (VTK 9.6)     | `usd`     | `USD`                   |
 | VDB                                       | `.vdb`                                         | No         | NONE              | YES (VTK 9.6)     | `vdb`     | `VDB`                   |
 | Industry Foundation Classes               | `.ifc`                                         | No         | NONE              | YES               | `webifc`  | `IFC`                   |
@@ -90,6 +91,7 @@ For booleans, 0 means false, not 0 means true. Unsigned int will interpret anyth
 | `occt`   | `XBF.relative_deflection`  | `bool`         | Control if the deflection values are relative to object size, default is false.      |
 | `occt`   | `XBF.read_wire`            | `bool`         | Control if lines should be read, default is true.                                    |
 | `usd`    | `USD.resources_path`       | `string`       | Additional path to find USD plugInfo.json resources                                  |
+| `usd`    | `USD.subdivision_level`    | `unsigned int` | Specify the subdivision level to apply when specified. Default is 0 (no subdivision) |
 | `vdb`    | `VDB.downsampling_factor`  | `double`       | Control the level of downsampling when reading a volume, default is 0.1.             |
 | `webifc` | `IFC.circle_segments`      | `int`          | Number of segments for circular geometry, default is 12.                             |
 | `webifc` | `IFC.read_openings`        | `bool`         | Read IfcOpeningElement entities (doors/windows cutouts), default is false.           |
