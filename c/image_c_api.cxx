@@ -90,8 +90,7 @@ f3d_image_t* f3d_image_new_stream(unsigned char* buffer, unsigned int size)
 
   try
   {
-
-    img = new f3d::image(buffer, size);
+    img = new f3d::image(reinterpret_cast<std::byte*>(buffer), size);
   }
   catch (const f3d::image::read_exception& e)
   {
