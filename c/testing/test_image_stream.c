@@ -4,7 +4,7 @@
 
 int test_image_stream()
 {
-  f3d_image_t* img = f3d_image_new_params(800, 600, 3, BYTE);
+  f3d_image_t* img = f3d_image_create_params(800, 600, 3, BYTE);
   if (!img)
   {
     puts("[ERROR] Failed to create image");
@@ -15,14 +15,14 @@ int test_image_stream()
   unsigned char* tempBuffer = f3d_image_save_buffer(NULL, PNG, &count); // this shouldn't crash
   if (tempBuffer != NULL)
   {
-    f3d_image_delete(img);
+    f3d_image_destroy(img);
     return 1;
   }
 
   f3d_image_t* temp_image_stream = f3d_image_new_stream(tempBuffer, 0);
   if (temp_image_stream != NULL)
   {
-    f3d_image_delete(img);
+    f3d_image_destroy(img);
     return 1;
   }
 
@@ -35,23 +35,23 @@ int test_image_stream()
     if (image_stream)
     {
       double compare_error = f3d_image_compare(img, image_stream);
-      f3d_image_free_buffer(buffer);
-      f3d_image_delete(image_stream);
+      f3d_image_destroy_buffer(buffer);
+      f3d_image_destroy(image_stream);
 
       if (compare_error != 0)
       {
-        f3d_image_delete(img);
+        f3d_image_destroy(img);
         return 1;
       }
     }
     else
     {
-      f3d_image_delete(img);
-      f3d_image_delete(image_stream);
+      f3d_image_destroy(img);
+      f3d_image_destroy(image_stream);
       return 1;
     }
   }
 
-  f3d_image_delete(img);
+  f3d_image_destroy(img);
   return 0;
 }
