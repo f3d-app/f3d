@@ -78,6 +78,30 @@ f3d_image_t* f3d_image_create_path(const char* path)
   return reinterpret_cast<f3d_image_t*>(img);
 }
 
+f3d_image_t* f3d_image_new_stream(unsigned char* buffer, unsigned int size)
+{
+  if (!buffer)
+  {
+    f3d::log::warn("Buffer is null, cannot create image");
+    return nullptr;
+  }
+
+  f3d::image* img = nullptr;
+
+  try
+  {
+
+    img = new f3d::image(buffer, size);
+  }
+  catch (const f3d::image::read_exception& e)
+  {
+    std::cerr << "Error loading image: " << e.what() << "\n";
+    return nullptr;
+  }
+
+  return reinterpret_cast<f3d_image_t*>(img);
+}
+
 //----------------------------------------------------------------------------
 f3d_image_t* f3d_image_new_stream(unsigned char* byte, unsigned int size)
 {
