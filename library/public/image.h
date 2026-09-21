@@ -51,7 +51,7 @@ public:
    * Read provided file path (used as is) into a new image instance, the following formats are
    * supported: PNG, PNM, TIFF, BMP, HDR, JPEG, GESigna, MetaImage, TGA. EXR files are also
    * supported if the associated module is built. The complete list can be retrieved at runtime by
-   * calling getSupportedFormats().
+   * calling getSupportedFormats(). The format is identified using the file extension.
    *
    * Throws an image::read_exception in case of failure.
    */
@@ -60,7 +60,8 @@ public:
   /**
    * Read provided buffer into a new image instance, the following formats are
    * supported: PNG, PNM , BMP, HDR, JPEG, TGA, WebP. EXR files are also
-   * supported if the associated module is built.
+   * supported if the associated module is built. calling getSupportedFormats(). The complete list can be retrieved at runtime by 
+   * calling getSupportedFormats(). The format is identified by parsing the stream header.
    * VTK >= 9.6.20260128 required.
    *
    * Throws an image::read_exception in case of failure.
