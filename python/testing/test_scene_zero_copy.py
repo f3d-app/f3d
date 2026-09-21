@@ -2,10 +2,16 @@ import tempfile
 from pathlib import Path
 import numpy as np
 import math
+import pytest
 
 import f3d
 
+needs_ImGui = pytest.mark.skipif(
+    not f3d.Engine.get_lib_info().modules.get("ImGui"), reason="no ImGui module"
+)
 
+
+@needs_ImGui
 def test_scene_zero_copy():
     testing_dir = Path(__file__).parent.parent.parent / "testing"
     reference = Path(testing_dir) / "baselines/TestPythonSceneZeroCopy.png"

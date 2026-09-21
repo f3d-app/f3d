@@ -395,17 +395,26 @@ jobs:
       matrix:
         os: [ubuntu-24.04, windows-2022, macos-15]
         python_version: ["3.14"]
+        optdeps_label: [optdeps]
         include:
           - os: ubuntu-24.04
             python_version: "3.10"
+            optdeps_label: optdeps
           - os: ubuntu-24.04
             python_version: "3.11"
+            optdeps_label: optdeps
           - os: ubuntu-24.04
             python_version: "3.12"
+            optdeps_label: optdeps
           - os: ubuntu-24.04
             python_version: "3.13"
+            optdeps_label: optdeps
           - os: ubuntu-24.04
             python_version: "3.14"
+            optdeps_label: optdeps
+          - os: ubuntu-24.04
+            python_version: "3.14"
+            optdeps_label: no-optdeps
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-24.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -429,6 +438,7 @@ jobs:
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           cpu: ${{ matrix.os == 'macos-15' && 'arm64' || 'x86_64' }}
           python_version: ${{matrix.python_version}}
+          optdeps_label: ${{matrix.optdeps_label}}
 
   #----------------------------------------------------------------------------
   # Coverage: Build and test on linux with last VTK with coverage option

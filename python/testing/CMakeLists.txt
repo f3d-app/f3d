@@ -2,50 +2,41 @@ list(APPEND pyf3dTests_list
      test_animation.py
      test_camera.py
      test_interactor.py
+     test_interactor_start.py
      test_image.py
+     test_image_compare.py
      test_log.py
      test_options.py
+     test_scene.py
      test_utils.py
-    )
+     test_video.py
+     test_window.py
+)
 
 if(NOT F3D_MACOS_BUNDLE)
   list(APPEND pyf3dTests_list
        test_engine.py
-      )
+  )
 endif()
 
-list(APPEND pyf3dTests_list
-     test_image_compare.py
-     test_scene.py
-     test_interactor_start.py
-     test_window.py
-    )
-
-if(F3D_MODULE_FFMPEG)
-  list(APPEND pyf3dTests_list
-    test_video.py
-    )
-endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
   list(APPEND pyf3dTests_list
-     test_scene_buffer.py
-    )
+       test_scene_buffer.py
+  )
 endif()
 
-if(F3D_MODULE_UI)
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251110)
-    list(APPEND pyf3dTests_list
-      test_scene_zero_copy.py
-      )
-  endif()
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251110)
+  list(APPEND pyf3dTests_list
+       test_scene_zero_copy.py
+  )
 endif()
 
 list(APPEND pyf3dTestsNoRender_list
      test_options.py
      test_engine.py
      test_utils.py
-    )
+)
 
 set(pyf3d_test_env "PYTHONPATH=${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG>>")
 
