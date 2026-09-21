@@ -114,9 +114,6 @@ constexpr double ScalarBarPositionX = 0.1;
 constexpr double ScalarBarPositionY = 0.01;
 constexpr double ScalarBarHeight = 0.07;
 
-// Expand nearly degenerate automatic ranges to val +/- epsilon
-constexpr double DegenerateColoringRangeEpsilon = 1e-4;
-
 std::string DeprecatedCollapsePath(const fs::path& path)
 {
   std::string collapsed;
@@ -3666,11 +3663,13 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
   // Only adjust automatic ranges. Respect an explicit --coloring-range as-is.
   if (this->UsingExpandingRange)
   {
-    const double width = std::abs(this->ColorRange[1] - this->ColorRange[0]);
-    if (width < ::DegenerateColoringRangeEpsilon)
+    constexpr double degenerateColoringRangeEpsilon = 1e-4;
+
+    if (vtkMathUtilities::NearlyEqual(
+          this->ColorRange[0], this->ColorRange[1], degenerateColoringRangeEpsilon))
     {
-      this->ColorRange[0] -= ::DegenerateColoringRangeEpsilon;
-      this->ColorRange[1] += ::DegenerateColoringRangeEpsilon;
+      this->ColorRange[0] -= degenerateColoringRangeEpsilon;
+      this->ColorRange[1] += degenerateColoringRangeEpsilon;
     }
   }
 
