@@ -12,6 +12,7 @@
 #include <vtkImageReader2Factory.h>
 #include <vtkImageSSIM.h>
 #include <vtkJPEGWriter.h>
+#include <vtkMemoryResourceStream.h>
 #include <vtkPNGReader.h>
 #include <vtkPNGWriter.h>
 #include <vtkPointData.h>
@@ -28,6 +29,7 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include <iostream> //debug
 
 namespace fs = std::filesystem;
 
@@ -251,6 +253,72 @@ image& image::operator=(image&& img) noexcept
 {
   std::swap(this->Internals, img.Internals);
   return *this;
+}
+
+image::image(std::byte* buffer, std::size_t size)
+  : Internals(new image::internals())
+{
+  detail::init::initialize();
+
+  try
+  {
+    if (buffer == nullptr)
+    {
+      delete this->Internals;
+      throw read_exception("Cannot read image from buffer: Buffer is empty");
+    }
+
+    vtkNew<vtkMemoryResourceStream> stream;
+    stream->SetBuffer(buffer, size);
+
+    vtkNew<vtkImageReader2Collection> collection;
+    vtkImageReader2Factory::GetRegisteredReaders(collection);
+    collection->InitTraversal();
+    vtkImageReader2* reader = collection->GetNextItem();
+
+    int bestScore = -1;
+    vtkImageReader2* bestReader = nullptr;
+
+    while (reader != nullptr)
+    {
+      int score = reader->CanReadFile(stream);
+      if (score > bestScore)
+      {
+        bestReader = reader;
+        bestScore = score;
+      }
+
+      reader = collection->GetNextItem();
+    }
+
+    if (bestScore <= 0)
+    {
+      delete this->Internals;
+      throw read_exception("Cannot read image from buffer");
+    }
+
+    bestReader->SetStream(stream);
+    bestReader->Update();
+    this->Internals->Image = bestReader->GetOutput();
+
+    vtkPNGReader* pngReader = vtkPNGReader::SafeDownCast(bestReader);
+    if (pngReader != nullptr)
+    {
+      this->Internals->ReadPngMetadata(pngReader);
+    }
+
+    if (!this->Internals->Image)
+    {
+      delete this->Internals;
+      throw read_exception("Cannot read image from buffer");
+    }
+  }
+
+  catch (const fs::filesystem_error& ex)
+  {
+    delete this->Internals;
+    throw read_exception(std::string("Cannot read image from buffer: ") + ex.what());
+  }
 }
 
 //----------------------------------------------------------------------------
