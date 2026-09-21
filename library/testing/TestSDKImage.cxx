@@ -180,8 +180,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
       [&]() { std::ignore = f3d::image(3, 3, 1, f3d::image::ChannelType::BYTE).toTerminalText(); });
 
     test.expect<f3d::image::write_exception>("invalid toTerminalText with SHORT", [&]() {
-      std::ignore = f3d::image(3, 3, 4, f3d::image::ChannelType::SHORT).toTerminalText();
-    });
+      std::ignore = f3d::image(3, 3, 4, f3d::image::ChannelType::SHORT).toTerminalText(); });
 
     const auto fileToString = [](const std::string& path) {
       std::ifstream file(path);
