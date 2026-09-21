@@ -1,6 +1,13 @@
+import pytest
+
 import f3d
 
+needs_FFmpeg = pytest.mark.skipif(
+    not f3d.Engine.get_lib_info().modules.get("FFmpeg"), reason="no FFmpeg module"
+)
 
+
+@needs_FFmpeg
 def test_video_api():
     engine = f3d.Engine.create(True)
     engine.window.size = 256, 256

@@ -7,6 +7,10 @@ inputs:
   python_version:
     description: "Python version"
     required: true
+  optdeps_label:
+    description: "Label to flag for optional dependencies"
+    required: false
+    default: "optdeps"
   lfs_sha:
     description: "Cache LFS sha"
     required: true
@@ -77,6 +81,7 @@ runs:
 
     # VDB has some linking issue on macOS, disabling for now
     - name: Set SKBUILD_CMAKE_ARGS
+      if: inputs.optdeps_label == 'optdeps'
       shell: bash
       run: >
         echo "SKBUILD_CMAKE_ARGS=
@@ -96,6 +101,16 @@ runs:
         -DF3D_MODULE_FFMPEG=ON;
         -DF3D_MODULE_UI=ON;
         -DF3D_MODULE_WEBP=ON;
+        -DF3D_BUILD_APPLICATION=OFF" >> $GITHUB_ENV
+
+    - name: Set SKBUILD_CMAKE_ARGS
+      if: inputs.optdeps_label == 'no-optdeps'
+      shell: bash
+      run: >
+        echo "SKBUILD_CMAKE_ARGS=
+        -DF3D_DEPENDENCIES_DIR=${{ env.WORKSPACE }}/dependencies/install/bin;
+        -DF3D_MODULE_CLIP=OFF;
+        -DF3D_MODULE_UI=OFF;
         -DF3D_BUILD_APPLICATION=OFF" >> $GITHUB_ENV
 
     - name: Build wheel
