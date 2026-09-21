@@ -817,6 +817,7 @@ Use with the scalar option.
 ### `--coloring-range=<min,max>` (_vector\<double\>_)
 
 Set the _coloring range_. Automatically computed by default.
+When automatically computed and minimum and maximum values are nearly equal, the object is colored with the mid value.
 Use with the scalar option.
 
 #### compare

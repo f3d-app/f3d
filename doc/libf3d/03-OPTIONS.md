@@ -233,6 +233,7 @@ CLI: `--coloring-array`.
 ### `model.scivis.range` (_vector\<double\>_, optional)
 
 Set the _coloring range_. Automatically computed by default.
+When automatically computed and minimum and maximum values are nearly equal, the object is colored with the mid value.
 
 CLI: `--coloring-range`.
 
