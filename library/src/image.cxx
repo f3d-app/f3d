@@ -264,12 +264,6 @@ image::image([[maybe_unused]] std::byte* buffer, [[maybe_unused]] std::size_t si
     this->Internals->ReadPngMetadata(pngReader);
   }
 
-  if (!this->Internals->Image)
-  {
-    delete this->Internals;
-    throw read_exception("Cannot read image from buffer");
-  }
-
 #else
   delete this->Internals;
   throw read_exception("VTK >= v9.6.20260128 is required for streaming images");
