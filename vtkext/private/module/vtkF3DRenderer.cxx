@@ -103,6 +103,7 @@
 
 #include <cctype>
 #include <chrono>
+#include <cmath>
 #include <numbers>
 #include <sstream>
 
@@ -3657,6 +3658,19 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
       this->ColorRange[1] = maxRange;
     }
     this->ExpandingRangeSet = true;
+  }
+
+  // Only adjust automatic ranges. Respect an explicit --coloring-range as-is.
+  if (this->UsingExpandingRange)
+  {
+    constexpr double degenerateColoringRangeEpsilon = 1e-4;
+
+    if (vtkMathUtilities::NearlyEqual(
+          this->ColorRange[0], this->ColorRange[1], degenerateColoringRangeEpsilon))
+    {
+      this->ColorRange[0] -= degenerateColoringRangeEpsilon;
+      this->ColorRange[1] += degenerateColoringRangeEpsilon;
+    }
   }
 
   // Create lookup table
