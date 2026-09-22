@@ -71,8 +71,6 @@ Other options can be toggled or cycled directly by pressing the following hotkey
 - <kbd>Ctrl</kbd>+<kbd>P</kbd>: increase opacity.
 - <kbd>Shift</kbd>+<kbd>P</kbd>: decrease opacity.
 - <kbd>Shift</kbd>+<kbd>A</kbd>: toggle armature.
-- <kbd>Ctrl</kbd>+<kbd>Y</kbd>: Scene up direction to +Y
-- <kbd>Ctrl</kbd>+<kbd>Z</kbd>: Scene up direction to +Z
 
 Note that the raytracing hotkeys are only available if F3D is build with raytracing enabled.
 
