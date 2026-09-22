@@ -50,6 +50,13 @@ public class TestInteractor {
     interactor.stopAnimation();
     interactor.isPlayingAnimation();
     interactor.getAnimationDirection();
+    interactor.getDeltaTime();
+    interactor.jumpToFrame(24);
+    interactor.jumpToFrameRelative(1);
+    interactor.jumpToFrame(0);
+    interactor.jumpToKeyframe(4);
+    interactor.jumpToKeyframeRelative(1);
+    interactor.jumpToKeyframe(0);
 
     interactor.setNotificationCallback((desc, value, bindStr, duration) -> {
       System.out.println("Notification: " + desc + " " + value + " " + bindStr + " " + duration);
