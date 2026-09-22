@@ -27,8 +27,6 @@ endif()
 # Zero-copy mesh_view C API (f3d_scene_add_mesh_view). Needs strided arrays
 # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12411
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20251110)
-  # Zero-copy mesh_view C API (f3d_scene_add_mesh_view). Needs strided arrays
-  # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12411
   list(APPEND f3d_c_api_tests_list
     test_scene_mesh_view.c
     )
@@ -37,7 +35,7 @@ endif()
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
   list(APPEND f3d_c_api_tests_list
     test_image_stream.c
-  )
+    )
 endif()
 
 set(CMAKE_TESTDRIVER_EXTRA_INCLUDES "")
