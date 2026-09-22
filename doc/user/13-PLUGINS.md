@@ -50,10 +50,10 @@ Not every binary ships every plugin, so a file may open in one binary but not an
 | `draco`   |   Yes   |     Yes      |        Yes        |        Yes         |
 | `hdf`     |   Yes   |     Yes      |        Yes        |        Yes         |
 | `occt`    |   Yes   |     Yes      |        Yes        |        Yes         |
-| `pdal`    |   Yes   |      No      |        No         |         No         |
+| `pdal`    |   Yes   |     Yes      |        No         |         No         |
 | `usd`     |   Yes   |      No      |        No         | Yes (64-bits only) |
 | `vdb`     |   Yes   |      No      |        No         |        Yes         |
-| `webifc`  |   Yes   |      No      |        Yes        |        Yes         |
+| `webifc`  |   Yes   |     Yes      |        Yes        |        Yes         |
 
 F3D searches for plugins in this order:
 
