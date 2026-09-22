@@ -965,6 +965,7 @@ bool vtkF3DFCStdReader::CanReadFile(vtkResourceStream* stream)
     return false;
   }
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  // FCStd files are zip archives: check the "PK\x03\x04" local file header signature
   unsigned char magic[4];
   if (stream->Read(magic, sizeof(magic)) != sizeof(magic) || magic[0] != 'P' || magic[1] != 'K' ||
     magic[2] != 0x03 || magic[3] != 0x04)
