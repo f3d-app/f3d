@@ -242,7 +242,7 @@ F3D looks for configuration files in different locations depending on your opera
 Existing configuration files are read in order and combined with later entries, potentially overriding previously read entry with the same names.
 For thumbnails, just replace `config` by `thumbnail`, as the thumbnails configuration is just passed to f3d using the `--config` [CLI option](03-OPTIONS.md).
 
-- Linux: `/etc/f3d/config(.json,.d)`, `/usr/share/f3d/configs/config(.json,.d)`, `[install_dir]/share/f3d/configs/config(.json,.d)`, [install_dir]/etc/f3d/config(.json,.d), `${XDG_CONFIG_HOME}/f3d/config(.json,.d)`
+- Linux: `/etc/f3d/config(.json,.d)`, `/usr/share/f3d/configs/config(.json,.d)`, `[install_dir]/share/f3d/configs/config(.json,.d)`, `[install_dir]/etc/f3d/config(.json,.d)`, `${XDG_CONFIG_HOME}/f3d/config(.json,.d)`
 - Windows: `[install_dir]\share\f3d\configs\(config.json,.d)`, `%APPDATA%\f3d\(config.json,.d)`
 - macOS: `/usr/local/etc/f3d/config(.json,.d)`, `f3d.app/Contents/Resources/configs/config(.json,.d)`, `${HOME}/Library/Application Support/f3d/config(.json,.d)`
 
