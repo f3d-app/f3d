@@ -19,7 +19,7 @@ int test_image_stream()
     return 1;
   }
 
-  f3d_image_t* temp_image_stream = f3d_image_new_stream(tempBuffer, 0);
+  f3d_image_t* temp_image_stream = f3d_image_create_stream(tempBuffer, 0);
   if (temp_image_stream != NULL)
   {
     f3d_image_destroy(img);
@@ -30,7 +30,7 @@ int test_image_stream()
   unsigned char* buffer = f3d_image_save_buffer(img, PNG, &buffer_size);
   if (buffer)
   {
-    f3d_image_t* image_stream = f3d_image_new_stream(buffer, buffer_size);
+    f3d_image_t* image_stream = f3d_image_create_stream(buffer, buffer_size);
 
     if (image_stream)
     {

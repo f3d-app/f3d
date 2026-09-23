@@ -79,7 +79,7 @@ f3d_image_t* f3d_image_create_path(const char* path)
 }
 
 //----------------------------------------------------------------------------
-f3d_image_t* f3d_image_new_stream(unsigned char* buffer, unsigned int size)
+f3d_image_t* f3d_image_create_stream(unsigned char* buffer, unsigned int size)
 {
   if (!buffer)
   {
