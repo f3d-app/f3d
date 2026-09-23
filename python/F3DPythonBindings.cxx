@@ -378,20 +378,25 @@ PYBIND11_MODULE(pyf3d, module)
     .def("has_domain", &f3d::options::hasDomain)
     .def("get_domain_style", &f3d::options::getDomainStyle)
     .def("get_range_domain",
-      [](const f3d::options& opts, std::string_view name) -> py::tuple
+      [](const f3d::options& opts, std::string_view name)
+        -> std::variant<std::tuple<int, int, int>, std::tuple<double, double, double>>
       {
         f3d::options::DomainRange<f3d::option_variant_t> domain = opts.getRangeDomain(name);
         // min, max and increment all hold the same alternative (int or double)
-        return std::visit(
-          [&domain](const auto& min) -> py::tuple
-          {
-            using T = std::decay_t<decltype(min)>;
-            return py::make_tuple(min, std::get<T>(domain.max), std::get<T>(domain.increment));
-          },
-          domain.min);
+        if (std::holds_alternative<int>(domain.min))
+        {
+          return std::make_tuple(
+            std::get<int>(domain.min), std::get<int>(domain.max), std::get<int>(domain.increment));
+        }
+        if (std::holds_alternative<double>(domain.min))
+        {
+          return std::make_tuple(std::get<double>(domain.min), std::get<double>(domain.max),
+            std::get<double>(domain.increment));
+        }
+        assert(false); // opts.getRangeDomain(name) would have thrown on anything not int or double
       })
     .def("get_enum_domain",
-      [](const f3d::options& opts, std::string_view name) -> py::list
+      [](const f3d::options& opts, std::string_view name)
       {
         f3d::options::DomainEnum<f3d::option_variant_t> domain = opts.getEnumDomain(name);
 
@@ -400,7 +405,7 @@ PYBIND11_MODULE(pyf3d, module)
         list.resize(domain.enumeration.size());
         std::ranges::transform(domain.enumeration, list.begin(),
           [](const auto& value) { return std::get<std::string>(value); });
-        return py::cast(list);
+        return list;
       })
     .def("get_index_domain",
       [](const f3d::options& opts, std::string_view name)
