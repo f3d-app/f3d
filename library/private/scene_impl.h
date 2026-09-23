@@ -49,6 +49,7 @@ public:
   scene& setNodeVisibility(int nodeId, bool visible) override;
   scene_info_t getSceneInfo() const override;
   file_availability supports(const std::filesystem::path& filePath) override;
+  animation& getAnimation() override;
   scene& loadAnimationTime(double timeValue) override;
   std::pair<double, double> animationTimeRange() override;
   std::vector<double> getAnimationKeyFrames() override;
@@ -64,6 +65,7 @@ public:
   void SetInteractor(interactor_impl* interactor);
 
   /**
+   * Implementation only API.
    * Display available cameras in the log
    */
   void PrintImporterDescription(log::VerboseLevel level);

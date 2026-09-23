@@ -1,6 +1,7 @@
 #ifndef f3d_scene_h
 #define f3d_scene_h
 
+#include "animation.h"
 #include "exception.h"
 #include "export.h"
 #include "mesh_view.h"
@@ -204,6 +205,11 @@ public:
    * found.
    */
   [[nodiscard]] virtual file_availability supports(const std::filesystem::path& filePath) = 0;
+
+  /**
+   * Get the animation available on the scene.
+   */
+  [[nodiscard]] virtual animation& getAnimation() = 0;
 
   /**
    * Load added files at provided time value if they contain any animation
