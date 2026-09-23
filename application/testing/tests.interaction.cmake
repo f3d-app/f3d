@@ -41,13 +41,13 @@ f3d_test(NAME TestInteractionNotificationsUpdate DATA cow.vtp ARGS --notificatio
 f3d_test(NAME TestInteractionNotificationsBindings DATA cow.vtp ARGS --notifications -Dui.notifications.show_bindings=ON INTERACTION UI) #E;
 f3d_test(NAME TestInteractionNotificationsBindingsModifier DATA cow.vtp ARGS --notifications -Dui.notifications.show_bindings=ON RESOLUTION 400,300 INTERACTION UI) #SHIFT+L;
 f3d_test(NAME TestInteractionToggleNotifications DATA cow.vtp INTERACTION UI) #CTRL+K;
-f3d_test(NAME TestInteractionSelectLog DATA f3d.glb ARGS --verbose INTERACTION UI THRESHOLD 0.06) #Esc;Select text # Threshold increased to account different number of readers thus scrollbar height
+f3d_test(NAME TestInteractionSelectLog DATA f3d.glb SCRIPT SCRIPT_PATH "${F3D_SOURCE_DIR}/testing/scripts/TestCommandScriptPrintMesh.txt" INTERACTION UI THRESHOLD 0.06) #Esc;Select text
 f3d_test(NAME TestInteractionHoverCopyLog DATA f3d.glb INTERACTION UI) #Mouse move to copy log button
 f3d_test(NAME TestInteractionClickCopyLog DATA f3d.glb ARGS -Dfoo INTERACTION UI) #Mouse move to copy log button;Click # -Dfoo is used to add a random log line to copy
 
 # OSMesa and EGL do not support clipboard operations, so we skip the copy-paste test for these backends.
-if (F3D_MODULE_CLIP AND NOT F3D_TESTING_FORCE_RENDERING_BACKEND STREQUAL "osmesa" AND NOT F3D_TESTING_FORCE_RENDERING_BACKEND STREQUAL "egl")
-  f3d_test(NAME TestInteractionCopyPaste DATA f3d.glb ARGS --verbose INTERACTION UI THRESHOLD 0.06) #Esc;Select text;CTRL+C;CTRL+V in input;Enter # Threshold increased to account different number of readers thus scrollbar height
+if (F3D_MODULE_CLIP AND NOT F3D_TESTING_FORCE_RENDERING_BACKEND MATCHES "osmesa|egl")
+  f3d_test(NAME TestInteractionCopyPaste DATA f3d.glb  SCRIPT SCRIPT_PATH "${F3D_SOURCE_DIR}/testing/scripts/TestCommandScriptPrintMesh.txt" INTERACTION UI THRESHOLD 0.06) #Esc;Select text;CTRL+C;CTRL+V in input;Enter
 endif()
 
 # Test reflection strength change to validate shader recompilation

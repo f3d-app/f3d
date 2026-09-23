@@ -313,6 +313,8 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
 
         currentText += msg;
 
+        // Merge consecutive log entries with the same severity into a single block to allow
+        // selection of multiple log entries at once
         if (logId != this->Pimpl->Logs.size() - 1 && severity == this->Pimpl->Logs[logId + 1].first)
         {
           currentText += '\n';
@@ -346,6 +348,7 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
           hasColor = false;
         }
 
+        // Generate a unique ID for the log entry based on its index
         std::string id = "##log" + std::to_string(logId);
 
         ImVec2 textSize = ImGui::CalcTextSize(currentText.c_str());
@@ -384,35 +387,42 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
       ImVec2 winPos = ImGui::GetWindowPos();
       ImVec2 winSize = ImGui::GetWindowSize();
 
-      ImVec2 btnSize(48, 48);
-      ImVec2 btnPos(winPos.x + winSize.x - btnSize.x - 10, winPos.y + 10);
+      constexpr float btnFontScale = 2.0f;
+      float btnSize = btnFontScale * ImGui::GetFontSize();
+
+      float scrollbarWidth =
+        ImGui::GetScrollMaxY() > 0.0f ? ImGui::GetStyle().ScrollbarSize * btnFontScale : 0.0f;
+
+      ImVec2 btnPos(winPos.x + winSize.x - scrollbarWidth - btnSize, winPos.y);
       ImGui::SetCursorScreenPos(btnPos);
 
       bool hovered =
-        ImGui::IsMouseHoveringRect(btnPos, ImVec2(btnPos.x + btnSize.x, btnPos.y + btnSize.y));
+        ImGui::IsMouseHoveringRect(btnPos, ImVec2(btnPos.x + btnSize, btnPos.y + btnSize));
 
       ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
       ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
       ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
       ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
       ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-      ImGui::SetWindowFontScale(48.0f / ImGui::GetFontSize());
+      ImGui::SetWindowFontScale(btnFontScale);
 
-      std::string buttonIcon = "\uebcc";
-
+      // change the button icon for 1 second when pressed to provide visual feedback
       auto currentTime = std::chrono::system_clock::now();
       if (currentTime - this->Pimpl->LastCopyTime < std::chrono::seconds(1))
       {
-        buttonIcon = "\ueab2";
         ImGui::PushStyleColor(ImGuiCol_Text, F3DStyle::imgui::GetCompletionColor());
+        ImGui::Button("\ueab2", ImVec2(btnSize, btnSize));
       }
       else
       {
         ImGui::PushStyleColor(ImGuiCol_Text,
           hovered ? F3DStyle::imgui::GetHighlightColor() : ImGui::GetStyleColorVec4(ImGuiCol_Text));
+        ImGui::Button("\uebcc", ImVec2(btnSize, btnSize));
       }
 
-      if (ImGui::Button(buttonIcon.c_str(), btnSize))
+      // InputTextMultiline spawns its own child window, which wins hover/click
+      // so detect the click from raw mouse state instead
+      if (hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
       {
         std::string logs;
         for (const auto& [_, text] : this->Pimpl->Logs)

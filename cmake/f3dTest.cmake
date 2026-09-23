@@ -40,10 +40,11 @@ f3d_test(<NAME> [ARGS...])
   - `PIPED_ARG` Prepend the provided string to the `-` standard input marker of a `PIPED` test, so the piped
     data is consumed by an option (e.g. pass `--load-statefile=` to load a statefile from `--load-statefile=-`)
     instead of as the input model.
-  - `SCRIPT` Mark the test to use a `--script` of the same name as the test
+  - `SCRIPT` Mark the test to use a `--command-script` of the same name as the test
   - `NAME` Provide the name of the test, mandatory and must be unique
   - `BASELINE_PATH` Provide the path to the baseline to use, instead of the default
   - `OUTPUT_PATH` Provide the path to the output to use, instead of the default
+  - `SCRIPT_PATH` Provide the path to the command script to use, instead of the default
   - `CONFIG` Provide the `--config` to use, instead of `--no-config`
   - `RESOLUTION` Provide the `--resolution` to use, instead of `300,300`
   - `PLUGIN` Provide the `--load-plugins` to use, also set test labels accordingly
@@ -62,7 +63,7 @@ f3d_test(<NAME> [ARGS...])
 
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "LONG_TIMEOUT;DEFAULT_HDRI;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT;PIPED;SKIP_GLES" "NAME;BASELINE_PATH;OUTPUT_PATH;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED_READER;PIPED_ARG;PLUGIN" "DATA;DEPENDS;LABELS;ENV;ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "LONG_TIMEOUT;DEFAULT_HDRI;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;SCRIPT;PIPED;SKIP_GLES" "NAME;BASELINE_PATH;OUTPUT_PATH;SCRIPT_PATH;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE;PIPED_READER;PIPED_ARG;PLUGIN" "DATA;DEPENDS;LABELS;ENV;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -102,7 +103,11 @@ function(f3d_test)
   endif()
 
   if (F3D_TEST_SCRIPT)
-    list(APPEND F3D_TEST_ARGS "--command-script=${F3D_SOURCE_DIR}/testing/scripts/${F3D_TEST_NAME}.txt")
+    if(DEFINED F3D_TEST_SCRIPT_PATH)
+      list(APPEND F3D_TEST_ARGS "--command-script=${F3D_TEST_SCRIPT_PATH}")
+    else()
+      list(APPEND F3D_TEST_ARGS "--command-script=${F3D_SOURCE_DIR}/testing/scripts/${F3D_TEST_NAME}.txt")
+    endif()
   endif()
 
   if(F3D_TEST_NO_RENDER)

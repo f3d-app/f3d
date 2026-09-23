@@ -4,7 +4,7 @@ RenderEvent 0 299 0 0 0 0 0
 KeyPressEvent 159 167 0 27 0 Escape 0
 CharEvent 159 167 0 27 0 Escape 0
 KeyReleaseEvent 159 167 0 27 0 Escape 0
-MouseMoveEvent 265 236 0 0 0 Escape 0
-LeftButtonPressEvent 258 251 0 0 0 Escape 0
-LeftButtonReleaseEvent 258 251 0 0 0 Escape 0
-TimerEvent 258 251 0 0 0 Escape 0
+MouseMoveEvent 260 260 0 0 0 Escape 0
+LeftButtonPressEvent 260 260 0 0 0 Escape 0
+LeftButtonReleaseEvent 260 260 0 0 0 Escape 0
+TimerEvent 260 260 0 0 0 Escape 0
