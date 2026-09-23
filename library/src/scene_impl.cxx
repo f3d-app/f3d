@@ -1,6 +1,7 @@
 #include "scene_impl.h"
 
 #include "animationManager.h"
+#include "animation_impl.h"
 #include "interactor_impl.h"
 #include "log.h"
 #include "options.h"
@@ -54,6 +55,8 @@ public:
     , Window(window)
     , AnimationManager(options, window)
   {
+    this->Animation = std::make_unique<f3d::detail::animation_impl>(options, window);
+
     this->MetaImporter->SetRenderWindow(this->Window.GetRenderWindow());
     this->Window.SetImporter(this->MetaImporter);
     this->AnimationManager.SetImporter(this->MetaImporter);
@@ -306,6 +309,7 @@ public:
     window.PrintSceneDescription(log::VerboseLevel::DEBUG);
   }
 
+  std::unique_ptr<detail::animation_impl> Animation;
   options& Options;
   window_impl& Window;
   interactor_impl* Interactor = nullptr;
@@ -1034,6 +1038,12 @@ f3d::file_availability scene_impl::supports(const fs::path& filePath)
     this->Internals->Options.scene.force_reader, this->Internals->Options.scene.skip_content_check,
     availability);
   return availability;
+}
+
+//----------------------------------------------------------------------------
+animation& scene_impl::getAnimation()
+{
+  return *this->Internals->Animation;
 }
 
 //----------------------------------------------------------------------------

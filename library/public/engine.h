@@ -246,7 +246,7 @@ public:
   [[nodiscard]] window& getWindow();
 
   /**
-   * Get the loaded provided by the engine.
+   * Get the scene provided by the engine.
    */
   [[nodiscard]] scene& getScene();
 
