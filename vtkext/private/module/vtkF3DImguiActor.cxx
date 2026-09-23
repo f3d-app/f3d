@@ -171,6 +171,11 @@ struct vtkF3DImguiActor::Internals
   {
     if (this->VertexBuffer == nullptr)
     {
+      // Update the maximum texture size for the renderer
+      ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
+      platformIO.Renderer_TextureMaxWidth = platformIO.Renderer_TextureMaxHeight =
+        vtkTextureObject::GetMaximumTextureSize(renWin);
+
       // Create VBO
       this->VertexBuffer = vtkSmartPointer<vtkOpenGLBufferObject>::New();
 
@@ -499,10 +504,6 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   // Setup backend name
   io.BackendPlatformName = io.BackendRendererName = "F3D/VTK";
   io.BackendFlags |= ImGuiBackendFlags_RendererHasTextures;
-
-  ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
-  platformIO.Renderer_TextureMaxWidth = platformIO.Renderer_TextureMaxHeight =
-    vtkTextureObject::GetMaximumTextureSize(renWin);
 
   ImFontConfig fontConfig;
 
