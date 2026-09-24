@@ -7,6 +7,8 @@
 
 #include "vtkF3DOCCTReader.h"
 
+#include <Standard_Version.hxx>
+
 #include <iostream>
 
 class ErrorEventCallback : public vtkCommand
@@ -36,7 +38,8 @@ private:
   std::vector<std::string> Messages;
 };
 
-bool testReaderStreamError(const std::string& filename, const vtkF3DOCCTReader::FILE_FORMAT& format)
+bool testReaderStreamError(
+  const std::string& filename, const vtkF3DOCCTReader::FILE_FORMAT& format, bool useStream = true)
 {
   vtkNew<ErrorEventCallback> errorEventCallback;
   vtkNew<vtkCallbackCommand> nullEventCallback;
@@ -52,7 +55,14 @@ bool testReaderStreamError(const std::string& filename, const vtkF3DOCCTReader::
   reader->SetLinearDeflection(0.1);
   reader->SetAngularDeflection(0.5);
   reader->ReadWireOn();
-  reader->SetStream(fileStream);
+  if (useStream)
+  {
+    reader->SetStream(fileStream);
+  }
+  else
+  {
+    reader->SetFileName(filename);
+  }
   reader->SetFileFormat(format);
   reader->Update();
 
@@ -82,6 +92,12 @@ int TestF3DOCCTReaderStreamError(int vtkNotUsed(argc), char* argv[])
   // https://dev.opencascade.org/content/reading-iges-stream-seems-broken-770
   ret &= testReaderStreamError(data + "/f3d.igs", vtkF3DOCCTReader::FILE_FORMAT::IGES);
   ret &= testReaderStreamError(data + "/invalid.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP);
+#if OCC_VERSION_HEX >= 0x070900
+  // OCCT >= 7.9 loops forever on this infinite line range if stream errors are not caught
+  ret &= testReaderStreamError(data + "/infinite_line.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP);
+  ret &=
+    testReaderStreamError(data + "/infinite_line.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP, false);
+#endif
 #if F3D_PLUGIN_OCCT_XCAF
   ret &= testReaderStreamError(data + "/invalid.xbf", vtkF3DOCCTReader::FILE_FORMAT::XBF);
 #endif

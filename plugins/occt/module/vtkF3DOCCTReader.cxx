@@ -58,9 +58,11 @@
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
 #include <vtkUnsignedIntArray.h>
+#include <vtksys/FStream.hxx>
 #include <vtksys/SystemTools.hxx>
 
 #include <array>
+#include <ios>
 #include <unordered_map>
 #include <vector>
 
@@ -458,6 +460,23 @@ bool TransferToDocument(vtkF3DOCCTReader* that, T& reader, Handle(TDocStd_Docume
 #endif
 
 //----------------------------------------------------------------------------
+static bool ReadASCIIBRep(
+  TopoDS_Shape& shape, std::istream& stream, const Message_ProgressRange& range)
+{
+  stream.exceptions(std::istream::failbit | std::istream::badbit);
+  try
+  {
+    const BRep_Builder builder;
+    BRepTools::Read(shape, stream, builder, range);
+  }
+  catch (const std::ios_base::failure&)
+  {
+    return false;
+  }
+  return !shape.IsNull();
+}
+
+//----------------------------------------------------------------------------
 int vtkF3DOCCTReader::RequestData(
   vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
@@ -490,10 +509,9 @@ int vtkF3DOCCTReader::RequestData(
         stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
         this->Streambuf = stream->ToStreambuf();
         this->Buffer = std::make_unique<std::istream>(this->Streambuf.get());
-        const BRep_Builder builder;
-        BRepTools::Read(shape, *this->Buffer, builder, pRange);
+        success = ReadASCIIBRep(shape, *this->Buffer, pRange);
       }
-      success = !shape.IsNull();
+      success = success && !shape.IsNull();
 #else
       vtkErrorMacro("This version of VTK doesn't support reading memory stream with OCCT");
       return 0;
@@ -507,8 +525,8 @@ int vtkF3DOCCTReader::RequestData(
       }
       catch (Storage_StreamTypeMismatchError&)
       {
-        const BRep_Builder builder;
-        success = BRepTools::Read(shape, this->GetFileName().c_str(), builder, pRange);
+        vtksys::ifstream file(this->GetFileName().c_str());
+        success = file.is_open() && ReadASCIIBRep(shape, file, pRange);
       }
     }
 
