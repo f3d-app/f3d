@@ -72,6 +72,6 @@ void vtkF3DConsoleOutputWindow::DisplayProgress(const char* str)
     // LCOV_EXCL_START
     default:
       break;
-    // LCOV_EXCL_STOP
+      // LCOV_EXCL_STOP
   }
 }
