@@ -65,8 +65,10 @@ void vtkF3DConsoleOutputWindow::DisplayProgress(const char* str)
   {
     case vtkOutputWindow::StreamType::StdOutput:
       std::cout.flush();
+      break;
     case vtkOutputWindow::StreamType::StdError:
       std::cerr.flush();
+      break;
     default:
       break;
   }
