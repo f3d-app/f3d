@@ -124,16 +124,15 @@ public:
     double progress, int barCount, std::span<const std::string_view> strRamp)
   {
     std::string bar;
-    int filledBars = barCount * progress;
-    int totalFilled = filledBars;
+    double filledBars;
+    double lastBarProgression = std::modf(progress * barCount, &filledBars);
+    int totalFilled = static_cast<int>(filledBars);
     for (int i = 0; i < filledBars; i++)
     {
       bar += strRamp.back();
     }
     if (filledBars < barCount)
     {
-      double lastBarProgression =
-        (progress - static_cast<double>(filledBars) / barCount) * barCount;
       int charRampIdx =
         std::min(strRamp.size() - 1, static_cast<size_t>(lastBarProgression * strRamp.size()));
       bar += strRamp[charRampIdx];
