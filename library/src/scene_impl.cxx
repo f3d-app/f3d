@@ -224,7 +224,9 @@ public:
 
     cliCallbackData.timer = timer;
     cliCallbackData.importerCount = this->MetaImporter->GetImporterInfoCount();
-    cliCallbackData.fileName = this->MetaImporter->GetImporterInfo(0).Name.substr(0, 51);
+    cliCallbackData.fileName = (cliCallbackData.importerCount > 0)
+      ? this->MetaImporter->GetImporterInfo(0).Name.substr(0, 51)
+      : "";
     scene_impl::internals::CreateCLIProgressBarAndCallback(&cliCallbackData, this->MetaImporter);
 
     if (this->Interactor && !this->Window.isOffscreen())
