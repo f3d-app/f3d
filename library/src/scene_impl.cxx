@@ -125,11 +125,10 @@ public:
   {
     std::string bar;
     int filledBars = barCount * progress;
-    int totalFilled = 0;
+    int totalFilled = filledBars;
     for (int i = 0; i < filledBars; i++)
     {
       bar += strRamp.back();
-      totalFilled++;
     }
     if (filledBars < barCount)
     {

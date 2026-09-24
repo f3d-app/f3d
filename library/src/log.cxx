@@ -95,7 +95,6 @@ void log::setUseColoring(bool use)
   F3DLog::SetUseColoring(use);
 }
 
-
 //----------------------------------------------------------------------------
 void log::setVerboseLevel(log::VerboseLevel level, bool forceStdErr)
 {
