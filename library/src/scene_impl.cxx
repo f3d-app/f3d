@@ -120,8 +120,9 @@ public:
     int importerCount;
   };
 
+  template<std::size_t N>
   static std::string GenerateCLIBarString(
-    double progress, int barCount, std::span<const std::string_view> strRamp)
+    double progress, int barCount, const std::array<std::string_view, N>& strRamp)
   {
     std::string bar;
     double filledBars;
