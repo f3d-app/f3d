@@ -50,11 +50,8 @@ void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)
     case StreamType::StdError:
       std::cerr.flush();
       break;
-    // Other values cannot be hit
-    // LCOV_EXCL_START
     default:
       break;
-    // LCOV_EXCL_STOP
   }
 }
 
@@ -71,7 +68,10 @@ void vtkF3DConsoleOutputWindow::DisplayProgress(const char* str)
     case vtkOutputWindow::StreamType::StdError:
       std::cerr.flush();
       break;
+    // Other value that cannot be hit
+    // LCOV_EXCL_START
     default:
       break;
+    // LCOV_EXCL_STOP
   }
 }
