@@ -134,8 +134,7 @@ public:
     }
     if (filledBars < barCount)
     {
-      size_t charRampIdx =
-        std::min(strRamp.size() - 1, static_cast<size_t>(lastBarProgression * strRamp.size()));
+      size_t charRampIdx = static_cast<size_t>(std::round(progress * (strRamp.size() - 1)));
       bar += strRamp[charRampIdx];
       totalFilled++;
     }
