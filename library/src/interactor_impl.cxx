@@ -2048,6 +2048,10 @@ bool interactor_impl::playInteraction(const fs::path& file, double loopTime)
 
     bool loop = this->Internals->StartEventLoop(loopTime);
     this->Internals->Recorder->SetFileName(file.string().c_str());
+
+    // Tell the VTK event recorder to handle stream versions < 1.3 for old repeat count behavior
+    // compatibility
+    this->Internals->Recorder->OldRepeatCountWorkAroundOn();
     this->Internals->Recorder->Play();
 
     if (loop)
