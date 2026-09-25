@@ -40,8 +40,12 @@ list(APPEND pyf3dTestsNoRender_list
 
 set(pyf3d_test_env "PYTHONPATH=${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG>>")
 
-# Content validation needs proper CanReadFile support
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  list(APPEND pyf3dTests_list
+     test_image_stream.py
+    )
+
+  # Content validation needs proper CanReadFile support
   list(APPEND pyf3d_test_env "F3D_TESTING_CONTENT_CHECK=1")
 endif()
 
