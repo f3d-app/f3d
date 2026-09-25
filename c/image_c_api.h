@@ -61,7 +61,7 @@ extern "C"
   /**
    * @brief Create a new image object from a stream
    *
-   * The returned image must be deleted with f3d_image_delete().
+   * The returned image must be deleted with f3d_image_destroy().
    *
    * @return Pointer to the newly created image object, NULL on failure
    */
