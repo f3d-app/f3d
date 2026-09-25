@@ -96,7 +96,7 @@ public:
   }
 
   /**
-   * Log provided args to update progress.
+   * Log provided args to update progress bar.
    */
   template<typename... Args>
   static void progress(Args... args)
