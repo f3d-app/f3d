@@ -47,6 +47,7 @@
 
 #include <vtkCommand.h>
 #include <vtkDemandDrivenPipeline.h>
+#include <vtkFileResourceStream.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
 #include <vtkMatrix4x4.h>
@@ -491,10 +492,19 @@ int vtkF3DOCCTReader::RequestData(
     const Message_ProgressRange pRange = pIndicator.Start();
 
     bool success = true;
-    vtkResourceStream* stream = this->GetStream();
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251223)
+    vtkSmartPointer<vtkResourceStream> stream = this->GetStream();
+    if (!stream)
+    {
+      vtkNew<vtkFileResourceStream> fileStream;
+      if (fileStream->Open(this->GetFileName().c_str()))
+      {
+        stream = fileStream;
+      }
+    }
+
     if (stream)
     {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251223)
       // Encapsulate resource stream into an istream
       stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
       this->Streambuf = stream->ToStreambuf();
@@ -512,23 +522,28 @@ int vtkF3DOCCTReader::RequestData(
         success = ReadASCIIBRep(shape, *this->Buffer, pRange);
       }
       success = success && !shape.IsNull();
-#else
-      vtkErrorMacro("This version of VTK doesn't support reading memory stream with OCCT");
-      return 0;
-#endif
     }
     else
     {
-      try
-      {
-        success = BinTools::Read(shape, this->GetFileName().c_str(), pRange);
-      }
-      catch (Storage_StreamTypeMismatchError&)
-      {
-        vtksys::ifstream file(this->GetFileName().c_str());
-        success = file.is_open() && ReadASCIIBRep(shape, file, pRange);
-      }
+      success = false;
     }
+#else
+    if (this->GetStream())
+    {
+      vtkErrorMacro("This version of VTK doesn't support reading memory stream with OCCT");
+      return 0;
+    }
+
+    try
+    {
+      success = BinTools::Read(shape, this->GetFileName().c_str(), pRange);
+    }
+    catch (Storage_StreamTypeMismatchError&)
+    {
+      vtksys::ifstream file(this->GetFileName().c_str());
+      success = file.is_open() && ReadASCIIBRep(shape, file, pRange);
+    }
+#endif
 
     if (success)
     {
