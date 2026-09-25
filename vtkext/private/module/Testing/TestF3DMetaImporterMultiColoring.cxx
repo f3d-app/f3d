@@ -47,7 +47,7 @@ int TestF3DMetaImporterMultiColoring(int argc, char* argv[])
   // Test coloring handler
   F3DColoringInfoHandler& coloringHandler = importer->GetColoringInfoHandler();
 
-  auto info = coloringHandler.SetCurrentColoring(true, false, "Momentum", false);
+  auto info = coloringHandler.SetCurrentColoring(false, "Momentum", false);
   if (!info.has_value())
   {
     std::cerr << "Coloring handler unable to set coloring as expected\n";

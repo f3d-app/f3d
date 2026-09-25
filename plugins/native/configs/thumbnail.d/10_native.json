@@ -3,7 +3,7 @@
     "match-type": "glob",
     "match": "*.{dcm,nrrd,mhd,mha,vti}",
     "options": {
-      "scalar-coloring": true,
+      "coloring-mode": "scivis",
       "volume": true
     }
   },
@@ -19,15 +19,14 @@
     "match-type": "glob",
     "match": "*.{stl,gml,pts,vtp,vtu,vtr,vti,vts,vtm}",
     "options": {
-      "scalar-coloring": true
+      "coloring-mode": "scivis"
     }
   },
   {
     "match-type": "glob",
     "match": "*.ply",
     "options": {
-      "scalar-coloring": true,
-      "coloring-component": "-2",
+      "coloring-mode": "direct",
       "blending": "ddp"
     }
   },
@@ -38,9 +37,8 @@
       "point-sprites": "gaussian",
       "point-sprites-absolute-size": true,
       "point-sprites-size": 1,
-      "scalar-coloring": true,
+      "coloring-mode": "direct",
       "coloring-array": "color",
-      "coloring-component": "-2",
       "tone-mapping": false,
       "grid": false,
       "anti-aliasing": "none",

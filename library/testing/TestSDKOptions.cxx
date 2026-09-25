@@ -369,7 +369,7 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // Test isOptional non-optional values
   test("isOptional with non-optional value", opt6.isOptional("model.scivis.cells") == false);
-  test("isOptional with non-optional value", opt6.isOptional("model.scivis.enable") == false);
+  test("isOptional with non-optional value", opt6.isOptional("model.coloring") == false);
 
   // Test isOptional non-existent options
   test.expect<f3d::options::inexistent_exception>(

@@ -8,20 +8,19 @@ const settings = {
 
     // set a bunch of options of each type
     options.setAsString("render.background.color", "#000000");
-    options.toggle("model.scivis.enable");
     options.setAsString("model.scivis.array_name", "Colors");
-    options.setAsString("model.scivis.component", "-2");
+    options.setAsString("model.coloring", "direct");
     options.setAsString("model.scivis.range", "0.7,1.4"); // not used for the baseline, only for coverage
 
     utils.assert(options.getAsString("model.scivis.array_name") === "Colors");
 
     // check that the getter works
     utils.assert(
-      options.get("model.scivis.enable") === true,
+      options.get("model.grid.enable") === false,
       "options getter for boolean failed",
     );
     utils.assert(
-      options.get("model.scivis.component") === -2,
+      options.get("render.grid.subdivisions") === 10,
       "options getter for int failed",
     );
     utils.assert(
@@ -57,10 +56,10 @@ const settings = {
     );
 
     const options2 = new Module.Options();
-    options2.toggle("model.scivis.enable");
+    options2.toggle("model.grid.enable");
 
     utils.assert(
-      options.isSame(options2, "model.scivis.enable"),
+      options.isSame(options2, "model.grid.enable"),
       "options isSame",
     );
     utils.assert(
@@ -116,9 +115,9 @@ const settings = {
       "options !hasValue after removal",
     );
 
-    options.reset("model.scivis.enable");
+    options.reset("model.grid.enable");
     utils.assert(
-      options.get("model.scivis.enable") === false,
+      options.get("model.grid.enable") === false,
       "options getter after reset",
     );
 

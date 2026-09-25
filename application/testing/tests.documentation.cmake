@@ -317,7 +317,7 @@ f3d_test_doc(NAME TestDocHDRICOC50 DATA DamagedHelmet.glb REF_IMAGE hdri_coc_50.
 f3d_test_doc(NAME TestDocLightIntensity1 DATA DamagedHelmet.glb REF_IMAGE light_intensity_1.png ROTATE)
 f3d_test_doc(NAME TestDocLightIntensity2 DATA DamagedHelmet.glb REF_IMAGE light_intensity_2.png ROTATE ARGS --light-intensity=2)
 
-## --scalar-coloring
+## --coloring-mode
 f3d_test_doc(NAME TestDocScalarColoringOFF DATA dragon.vtu REF_IMAGE scalar_coloring_off.png ROTATE ARGS)
 f3d_test_doc(NAME TestDocScalarColoringON DATA dragon.vtu REF_IMAGE scalar_coloring_on.png ROTATE ARGS -s --coloring-component=2)
 

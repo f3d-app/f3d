@@ -31,7 +31,7 @@ A typical config file with options may look like this:
       "bar": true,
       "roughness": 0.2,
       "grid": true,
-      "scalar-coloring": true
+      "coloring-mode": "scivis"
     }
   },
   {
@@ -196,7 +196,7 @@ While regex is the default match type, glob and exact match types are also suppo
       "bar": true,
       "roughness": 0.2,
       "grid": true,
-      "scalar-coloring": true
+      "coloring-mode": "scivis"
     }
   },
   {

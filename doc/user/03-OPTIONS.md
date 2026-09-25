@@ -474,7 +474,7 @@ Set the Backface type. Model-specified by default.
 ### `--color=<color>` (_color_)
 
 Set a _color_ on the geometry. Multiplied with the base color texture when present.
-Model-specified by default. Overridden by `--scalar-coloring`.
+Model-specified by default. Ignored if `--coloring-mode` is not `material`.
 
 #### compare
 
@@ -770,9 +770,13 @@ _Adjust the intensity_ of every light in the scene, including HDRI image-based l
 
 ## Scientific visualization options
 
-### `-s`, `--scalar-coloring` (_bool_, default: `false`)
+### `-s`, `--coloring-mode` (_bool_, default: `scivis`)
 
-Enable scalar coloring if present in the file. If `--coloring-array` is not set, the first in alphabetical order will be picked if any are available.
+Specify the coloring mode.
+_material_ means default file materials (textured or solid color)
+_scivis_ and _direct_ mean the array specified with option `--coloring-array` will be used for coloring (or the first available if not set)
+In the case of _scivis_, the array is mapped to a color using the colormap defined in `--colormap`
+In the case of _direct_, it is assumed that the array defines colors directly as L, LA, RGB, RGBA values depending on the number of components.
 
 #### compare
 
@@ -791,11 +795,10 @@ Use `--verbose` to recover the usable array names.
 | --------------------------------------- | --------------------------------------- |
 | ![](./images/coloring_array_normal.png) | ![](./images/coloring_array_height.png) |
 
-### `-y`, `--coloring-component=<comp_index>` (_int_, default: `-1`, implicit: `-2`)
+### `-y`, `--coloring-component=<comp_index>` (_int_, implicit: `0`)
 
 Specify the _component from the scalar_ array to color with.
-Use with the scalar option. -1 means _magnitude_. -2 means _direct values_.
-When using _direct values_, components are used as L, LA, RGB, RGBA values depending on the number of components.
+If the option is not specified, uses the _magnitude_ of the array.
 
 #### compare
 
@@ -1036,7 +1039,7 @@ Add a final shader to the output image. See the [dedicated documentation](11-FIN
 
 ### `--display-depth` (_bool_, default: `false`)
 
-Display the depth buffer as a grayscale image or with a colormap if `--scalar-coloring` is specified.
+Display the depth buffer as a grayscale image or with a colormap if `--coloring-mode` is `scivis`.
 Only opaque objects are displayed, the grid and translucent/volumetric objects are ignored.
 
 #### compare

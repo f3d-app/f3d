@@ -62,7 +62,7 @@ Your data probably contains some translucent data for some reason, turn on trans
 > My 3D Gaussian Splatting data in .ply format isn't opened properly.
 
 .ply is a generic file format, we cannot assumes it's a 3DGS, thus we do not give good presets for this specific use case.
-It's recommended to use these options: `--point-sprites-size=1 --point-sprites=gaussian -syk`, but you can also add them in your [config file](06-CONFIGURATION_FILE.md).
+It's recommended to use these options: `--point-sprites-size=1 --point-sprites=gaussian --coloring-mode=direct -k`, but you can also add them in your [config file](06-CONFIGURATION_FILE.md).
 
 > I can't use hotkeys/bindings with F row keys
 
@@ -70,7 +70,7 @@ Because some keyboards have layered multimedia keys, F keys (F12 for example) do
 
 > My step file doesn't respect the `--color` option
 
-When rendering step files, the `--color` option is not respected because scalar coloring is used by default in the configuration file. To override this behavior, you have to disable scalar coloring when specifying the color option. For example: `--color=Blue --scalar-coloring=no`.
+When rendering step files, the `--color` option is not respected because scalar coloring is used by default in the configuration file. To override this behavior, you have to disable scalar coloring when specifying the color option. For example: `--color=Blue --coloring-mode=material`.
 
 Alternatively, add the following in your configuration file:
 
@@ -79,7 +79,7 @@ Alternatively, add the following in your configuration file:
   "match-type": "glob",
   "match": "*.{step,stp,iges,igs,brep,xbf}",
   "options": {
-    "scalar-coloring": false
+    "coloring-mode": "material"
   }
 }
 ```

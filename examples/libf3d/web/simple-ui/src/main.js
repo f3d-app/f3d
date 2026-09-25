@@ -9,9 +9,8 @@ const settings = {
     options.setAsString("render.background.color", "#000000");
 
     // setup coloring
-    options.toggle("model.scivis.enable");
     options.setAsString("model.scivis.array_name", "Colors");
-    options.setAsString("model.scivis.component", "-2");
+    options.setAsString("model.coloring", "direct");
     options.toggle("model.scivis.cells");
 
     // make it look nice

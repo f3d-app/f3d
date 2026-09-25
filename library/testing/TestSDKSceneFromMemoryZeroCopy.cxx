@@ -324,7 +324,7 @@ int TestSDKSceneFromMemoryZeroCopy([[maybe_unused]] int argc, char* argv[])
 
   eng.getOptions().ui.animation_progress = "default";
   eng.getOptions().render.show_edges = true;
-  eng.getOptions().model.scivis.enable = true;
+  eng.getOptions().model.coloring = "scivis";
   eng.getOptions().model.scivis.cells = true;
   eng.getOptions().ui.scalar_bar = true;
   eng.getOptions().ui.scene_hierarchy = true;
