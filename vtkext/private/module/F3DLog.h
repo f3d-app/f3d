@@ -45,7 +45,7 @@ void Print(Severity sev, const std::string& msg);
 
 /**
  * Prints progression bar output
- * If severity is above Info, then it will not print
+ * If current VerboseLevel is above Info, then it will not print
  */
 void Progress(const std::string& str);
 
