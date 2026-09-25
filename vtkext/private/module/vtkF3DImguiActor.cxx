@@ -3,6 +3,7 @@
 #include "F3DDefaultLogo.h"
 #include "F3DFontBuffer.h"
 #include "F3DStyle.h"
+#include "F3DUtils.h"
 #include "vtkF3DImguiConsole.h"
 #include "vtkF3DImguiFS.h"
 #include "vtkF3DImguiVS.h"
@@ -426,6 +427,7 @@ struct vtkF3DImguiActor::Internals
   bool SearchFocusRequested = false;
   float CheatSheetWidth = 0.f;
   std::map<std::string, ImFont*> ExtraFonts;
+  std::string ClipboardText;
 };
 
 namespace
@@ -504,6 +506,22 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   // Setup backend name
   io.BackendPlatformName = io.BackendRendererName = "F3D/VTK";
   io.BackendFlags |= ImGuiBackendFlags_RendererHasTextures;
+
+#if F3D_MODULE_CLIP
+  ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
+  platformIO.Platform_SetClipboardTextFn = [](ImGuiContext*, const char* text)
+  { F3DUtils::CopyToClipboard(text); };
+
+  platformIO.Platform_GetClipboardTextFn = [](ImGuiContext*)
+  {
+    std::string& text =
+      *static_cast<std::string*>(ImGui::GetPlatformIO().Platform_ClipboardUserData);
+    F3DUtils::GetFromClipboard(text);
+    return text.c_str();
+  };
+
+  platformIO.Platform_ClipboardUserData = &this->Pimpl->ClipboardText;
+#endif
 
   ImFontConfig fontConfig;
 
