@@ -969,8 +969,7 @@ void vtkF3DMetaImporter::UpdateInfoForColoring()
             datasetForColoring = genericImporter->GetImportedPoints(actorIndex);
           }
         }
-        this->Pimpl->ColoringInfoHandler.UpdateColoringInfo(datasetForColoring, false);
-        this->Pimpl->ColoringInfoHandler.UpdateColoringInfo(datasetForColoring, true);
+        this->Pimpl->ColoringInfoHandler.UpdateColoringInfo(datasetForColoring);
 
         actorIndex++;
       }

@@ -10,8 +10,7 @@ f3d({})
     // background must be set to black for proper blending with transparent canvas
     engine.getOptions().setAsString("render.background.color", "black");
     engine.getOptions().setAsString("scene.up_direction", "-y");
-    engine.getOptions().toggle("model.scivis.enable");
-    engine.getOptions().setAsString("model.scivis.component", "-2");
+    engine.getOptions().setAsString("model.coloring", "direct");
     engine.getOptions().setAsString("model.point_sprites.type", "gaussian");
     engine.getOptions().setAsString("model.point_sprites.size", "1.0");
     engine.getOptions().toggle("model.point_sprites.absolute_size");

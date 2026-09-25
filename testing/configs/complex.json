@@ -1,7 +1,7 @@
 [
   {
     "options": {
-      "scalar-coloring": true,
+      "coloring-mode": "scivis",
       "ui.axis": true,
       "grid": true
     }

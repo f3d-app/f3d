@@ -244,8 +244,20 @@ public:
   static void SynchronizeScivisOptions(f3d::options& opt, vtkF3DRenderer* ren)
   {
     // Synchronize renderer coloring status with scivis options
-    opt.model.scivis.enable = ren->GetEnableColoring();
-    opt.model.scivis.cells = ren->GetUseCellColoring();
+    switch (ren->GetColoring())
+    {
+      case vtkF3DRenderer::ColoringMode::MATERIAL:
+        opt.model.coloring = "material";
+        break;
+      case vtkF3DRenderer::ColoringMode::SCIVIS:
+        opt.model.coloring = "scivis";
+        break;
+      case vtkF3DRenderer::ColoringMode::DIRECT:
+        opt.model.coloring = "direct";
+        break;
+    }
+
+    opt.model.scivis.cells = ren->GetForceUseCellColoring();
     opt.model.scivis.array_name = ren->GetArrayNameForColoring();
     opt.model.scivis.component = ren->GetComponentForColoring();
   }
@@ -1011,7 +1023,7 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{
       "cycle_animation", "cycle scene.animation.indices option using model information" });
 
-  const std::vector<std::string> cycleColoringValidArgs = { "field", "array", "component" };
+  const std::vector<std::string> cycleColoringValidArgs = { "mode", "array", "component" };
   this->addCommand(
     "cycle_coloring",
     [&](const std::vector<std::string>& args)
@@ -1021,9 +1033,9 @@ interactor& interactor_impl::initCommands()
       vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
       vtkF3DRenderer* ren =
         vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-      if (type == "field")
+      if (type == "mode")
       {
-        ren->CycleFieldForColoring();
+        ren->CycleModeForColoring();
       }
       else if (type == "array")
       {
@@ -1042,9 +1054,9 @@ interactor& interactor_impl::initCommands()
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
     },
     command_documentation_t{
-      "cycle_coloring field/array/component", "cycle scivis options using model information" },
-    std::bind(complNames, std::placeholders::_1,
-      std::vector<std::string>{ "field", "array", "component" }));
+      "cycle_coloring mode/array/component", "cycle scivis options using model information" },
+    std::bind(
+      complNames, std::placeholders::_1, std::vector<std::string>{ "mode", "array", "component" }));
 
   this->addCommand(
     "roll_camera",
@@ -1589,22 +1601,14 @@ interactor& interactor_impl::initBindings()
   { return std::pair("Animation", this->Internals->AnimationManager->GetAnimationName()); };
 
   // "Cycle point/cell data coloring" , "POINT/CELL"
-  auto docField = [&]()
-  { return std::pair(std::string("Data coloring"), (opts.model.scivis.cells ? "CELL" : "POINT")); };
+  auto docMode = [&]() { return std::pair(std::string("Color mode"), opts.model.coloring); };
 
   // "Cycle array to color with" , "arrayName"
   auto docArray = [&]()
   {
-    // enable + no array : ON
-    // enable + array : array
-    // no enable + array : array (forced)
-    // no enable + no array : OFF
-    return std::pair("Color array",
-      (opts.model.scivis.array_name.has_value()
-          ? shortName(opts.model.scivis.array_name.value(), 15) +
-            (opts.model.scivis.enable ? "" : " (forced)")
-          : opts.model.scivis.enable ? "ON"
-                                     : "OFF"));
+    vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
+    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    return std::pair("Color array", shortName(ren->ArrayToString(), 15));
   };
 
   // "Cycle component to color with" , "component"
@@ -1612,7 +1616,7 @@ interactor& interactor_impl::initBindings()
   {
     vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-    return std::pair("Color component", ren->ComponentToString(opts.model.scivis.component));
+    return std::pair("Color component", ren->ComponentToString());
   };
 
   // "doc", "value"
@@ -1663,9 +1667,9 @@ interactor& interactor_impl::initBindings()
 
   // clang-format off
   this->addBinding({mod_t::NONE, "W"}, "cycle_animation", "Scene", docAnim, f3d::interactor::BindingType::CYCLIC);
-  this->addBinding({mod_t::NONE, "C"}, "cycle_coloring field", "Scene", docField, f3d::interactor::BindingType::CYCLIC);
-  this->addBinding({mod_t::NONE, "S"}, "cycle_coloring array", "Scene", docArray, f3d::interactor::BindingType::CYCLIC);
-  this->addBinding({mod_t::NONE, "Y"}, "cycle_coloring component", "Scene", docComp, f3d::interactor::BindingType::CYCLIC);
+  this->addBinding({mod_t::NONE, "S"}, "cycle_coloring mode", "Scene", docMode, f3d::interactor::BindingType::CYCLIC);
+  this->addBinding({mod_t::NONE, "Y"}, "cycle_coloring array", "Scene", docArray, f3d::interactor::BindingType::CYCLIC);
+  this->addBinding({mod_t::SHIFT, "Y"}, "cycle_coloring component", "Scene", docComp, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "B"}, "toggle ui.scalar_bar", "Scene", std::bind(docTgl, "Scalar bar", std::cref(opts.ui.scalar_bar)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "P"}, "cycle render.effect.blending.mode", "Scene", std::bind(docStr, "Blending", std::cref(opts.render.effect.blending.mode)), f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "Q"}, "toggle render.effect.ambient_occlusion","Scene", std::bind(docTgl, "Ambient occlusion", std::cref(opts.render.effect.ambient_occlusion)), f3d::interactor::BindingType::TOGGLE);

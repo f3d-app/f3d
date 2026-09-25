@@ -30,7 +30,7 @@ int TestSDKMultiColoring([[maybe_unused]] int argc, char* argv[])
   // Multiple geometries
   sce.add(std::vector<std::string>{ cube, left, right });
 
-  opt.model.scivis.enable = true;
+  opt.model.coloring = "scivis";
   opt.model.scivis.array_name = "Normals";
 
   test("render with multiple colored data",

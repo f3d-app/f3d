@@ -452,11 +452,15 @@
     "textures_transform": {
       "type": "transform2d"
     },
+    "coloring": {
+      "type": "string",
+      "default_value": "material",
+      "domain": {
+        "style": "enum",
+        "enum": ["material", "scivis", "direct"]
+      }
+    },
     "scivis": {
-      "enable": {
-        "type": "bool",
-        "default_value": "false"
-      },
       "cells": {
         "type": "bool",
         "default_value": "false"
@@ -474,8 +478,7 @@
         "type": "string"
       },
       "component": {
-        "type": "int",
-        "default_value": "-1"
+        "type": "int"
       },
       "colormap": {
         "type": "colormap",
