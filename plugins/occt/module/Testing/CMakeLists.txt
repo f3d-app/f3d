@@ -21,6 +21,11 @@ vtk_add_test_cxx(vtkextOCCTTests tests
 vtk_test_cxx_executable(vtkextOCCTTests tests)
 set_target_properties(vtkextOCCTTests PROPERTIES CXX_STANDARD 20)
 
+if(OpenCASCADE_VERSION VERSION_GREATER_EQUAL 7.9.0)
+  target_compile_definitions(vtkextOCCTTests
+    PRIVATE F3D_PLUGIN_OCCT_TEST_STREAM_THROW)
+endif()
+
 if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
   target_compile_definitions(vtkextOCCTTests
     PRIVATE F3D_PLUGIN_OCCT_XCAF)

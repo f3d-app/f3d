@@ -686,6 +686,7 @@ public:
       return std::nullopt;
     }
     std::istringstream stream(std::string(data.data(), data.size()));
+    stream.exceptions(std::istream::failbit | std::istream::badbit);
     TopoDS_Shape shape;
     BRep_Builder builder;
     try
@@ -699,6 +700,11 @@ public:
       return std::nullopt;
     }
     // LCOV_EXCL_STOP
+    catch (const std::ios_base::failure&)
+    {
+      vtkErrorWithObjectMacro(this->Parent, "Failed to read BRep file " << file);
+      return std::nullopt;
+    }
     if (shape.IsNull())
     {
       return std::nullopt;
