@@ -1,8 +1,12 @@
 # StreamVersion 1.2
 ExposeEvent 0 299 0 0 0 0 0
 RenderEvent 0 299 0 0 0 0 0
+
+# Open console
 KeyPressEvent 135 204 0 27 0 Escape 0
 CharEvent 135 204 0 27 0 Escape 0
 KeyReleaseEvent 135 204 0 27 0 Escape 0
+
+# Move to copy icon
 MouseMoveEvent 260 273 0 0 0 Escape 0
 TimerEvent 260 273 0 0 0 Escape 0
