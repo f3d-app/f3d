@@ -95,6 +95,9 @@ public:
     log::errorInternal(ss.str());
   }
 
+  /**
+   * Log provided args to update progress.
+   */
   template<typename... Args>
   static void progress(Args... args)
   {

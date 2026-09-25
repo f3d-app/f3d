@@ -155,6 +155,8 @@ public:
       [](vtkObject*, unsigned long, void* clientData, void* callData)
       {
         constexpr int barCount = 16;
+        // hex characters correspond to the filled progression bars.
+        // sorted from least filled to mostly filled.
         constexpr std::array charRamp = std::to_array<std::string_view>(
           { " ", "\u258f", "\u258e", "\u258d", "\u258c", "\u258b", "\u258a", "\u2589", "\u2588" });
 
