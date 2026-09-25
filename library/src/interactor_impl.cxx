@@ -2049,7 +2049,7 @@ bool interactor_impl::playInteraction(const fs::path& file, double loopTime)
     bool loop = this->Internals->StartEventLoop(loopTime);
     this->Internals->Recorder->SetFileName(file.string().c_str());
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20260921)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20260925)
     // Tell the VTK event recorder to handle stream versions < 1.3 for old repeat count behavior
     // compatibility
     this->Internals->Recorder->OldRepeatCountWorkAroundOn();
