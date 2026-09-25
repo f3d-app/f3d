@@ -782,7 +782,8 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
 
         this->BakeReflectionPass->Render(&reflState);
 
-        // restore camera
+        // restore camera and mark it dirty to ensure headlights are recomputed
+        originalCam->Modified();
         r->SetActiveCamera(originalCam);
       }
     }
