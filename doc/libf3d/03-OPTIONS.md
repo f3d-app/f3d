@@ -108,7 +108,7 @@ CLI: `--opacity`.
 
 ### `model.color.rgb` (_color_, optional)
 
-Set a _color_ on the geometry. Multiplied with the `model.color.texture` when present. Model-specified by default. Overridden by `model.scivis.enable`.
+Set a _color_ on the geometry. Multiplied with the `model.color.texture` when present. Model-specified by default. Ignored if `model.coloring` is not `material`.
 
 CLI: `--color`.
 
@@ -187,11 +187,15 @@ If the value is true, no shading is applied and the model will be unlit.
 
 CLI: `--unlit`.
 
-### `model.scivis.enable` (_bool_, default: `false`)
+### `model.coloring` (_string_, default: `material`, enum domain: `material, scivis, direct`)
 
-_Color by an array_ present in on the data. If `model.scivis.array_name` is not set, the first available array will be used.
+Specify the coloring mode.
+_material_ means default file materials (textured or solid color)
+_scivis_ and _direct_ mean the array specified with option `model.scivis.array_name` will be used for coloring (or the first available if not set)
+In the case of _scivis_, the array is mapped to a color using the colormap defined in `model.scivis.colormap`
+In the case of _direct_, it is assumed that the array defines colors directly as L, LA, RGB, RGBA values depending on the number of components.
 
-CLI: `--scalar-coloring`.
+CLI: `--coloring-mode`.
 
 ### `model.scivis.cells` (_bool_, default: `false`)
 
@@ -218,9 +222,9 @@ It is only used for volume rendering currently.
 
 CLI: `--volume-opacity-map`.
 
-### `model.scivis.component` (_int_, default: `-1`)
+### `model.scivis.component` (_int_, optional)
 
-Specify the component to color with. `-1` means _magnitude_. `-2` means _direct values_.
+Specify the component to color with. If not set, it means _magnitude_.
 
 CLI: `--coloring-component`.
 
@@ -312,7 +316,7 @@ CLI: `--final-shader`
 
 ### `render.effect.display_depth` (_bool_, default: `false`)
 
-Display the depth buffer as a grayscale image or with a colormap if `model.scivis.enable` is specified.
+Display the depth buffer as a grayscale image or with a colormap if `model.coloring` is `scivis`.
 Only opaque objects are displayed, the grid and translucent/volumetric objects are ignored.
 
 CLI: `--display-depth`

@@ -22,8 +22,7 @@ def test_scene_zero_copy():
 
     engine.options.update(
         {
-            "model.scivis.enable": True,
-            "model.scivis.component": -2,
+            "model.coloring": "direct",
             "model.scivis.array_name": "Color",
             "model.material.base_ior": 1.0,
             "scene.animation.autoplay": True,
