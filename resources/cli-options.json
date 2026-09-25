@@ -600,11 +600,11 @@
       "name": "Scientific visualization",
       "options": [
         {
-          "longName": "scalar-coloring",
+          "longName": "coloring-mode",
           "shortName": "s",
-          "helpText": "Color by a scalar array",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
+          "helpText": "Change the color mode",
+          "valueHelper": "<material|scivis|direct>",
+          "implicitValue": "scivis"
         },
         {
           "longName": "coloring-array",
@@ -614,14 +614,14 @@
         {
           "longName": "coloring-component",
           "shortName": "y",
-          "helpText": "Component from the array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars",
+          "helpText": "Component from the array to color with. Use magnitude if not specified",
           "valueHelper": "<comp_index>",
-          "implicitValue": "-2"
+          "implicitValue": "0"
         },
         {
           "longName": "coloring-by-cells",
           "shortName": "c",
-          "helpText": "Use an array from the cells",
+          "helpText": "Force usage of an array from the cells",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },

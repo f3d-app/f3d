@@ -8,8 +8,7 @@ const settings = {
     options.setAsString("render.background.color", "#000000");
 
     // setup coloring
-    options.toggle("model.scivis.enable");
-    options.setAsString("model.scivis.component", "-2");
+    options.setAsString("model.coloring", "direct");
 
     // splats
     options.toggle("model.point_sprites.absolute_size");

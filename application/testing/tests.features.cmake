@@ -59,26 +59,26 @@ f3d_test(NAME TestUnlit DATA cow.vtp ARGS --unlit --color=0.9,0.1,0.1)
 
 # Scalar coloring
 f3d_test(NAME TestScalars DATA suzanne.ply ARGS -s --coloring-array=Normals --coloring-component=1)
-f3d_test(NAME TestScalarsCell DATA f3d.vtp ARGS --scalar-coloring --coloring-by-cells --coloring-component=-2 --up=+Z)
+f3d_test(NAME TestScalarsCell DATA f3d.vtp ARGS --coloring-mode=direct --coloring-by-cells --up=+Z)
 f3d_test(NAME TestScalarsRange DATA suzanne.ply ARGS -s --coloring-array=Normals --coloring-component=1 --coloring-range=0,1)
 f3d_test(NAME TestScalarsWithBar DATA suzanne.ply ARGS -b -s --coloring-array=Normals --coloring-component=0)
 f3d_test(NAME TestScalarsWithBarContinuity DATA suzanne.ply ARGS -b -s --coloring-array=Normals --coloring-component=0)
 f3d_test(NAME TestScalarsDegenerateRange DATA suzanne.ply ARGS --no-config -sb)
-f3d_test(NAME TestComponentName DATA from_abq.vtu ARGS --scalar-coloring --coloring-scalar-bar --coloring-component=2)
-f3d_test(NAME TestUserMatrixColoring DATA InterpolationTest.glb ARGS --scalar-coloring --coloring-array=TEXCOORD_0)
-f3d_test(NAME TestSkinColoring DATA SimpleSkin.gltf ARGS --scalar-coloring --coloring-array=WEIGHTS_0)
+f3d_test(NAME TestComponentName DATA from_abq.vtu ARGS --coloring-mode=scivis --coloring-scalar-bar --coloring-component=2)
+f3d_test(NAME TestUserMatrixColoring DATA InterpolationTest.glb ARGS --coloring-mode=scivis --coloring-array=TEXCOORD_0)
+f3d_test(NAME TestSkinColoring DATA SimpleSkin.gltf ARGS --coloring-mode=scivis --coloring-array=WEIGHTS_0)
 f3d_test(NAME TestSkinEdges DATA RiggedFigure.glb ARGS --animation-time=1 --edges --line-width=5)
-f3d_test(NAME TestMorphColoring DATA SimpleMorph.gltf ARGS --scalar-coloring)
+f3d_test(NAME TestMorphColoring DATA SimpleMorph.gltf ARGS --coloring-mode=scivis)
 f3d_test(NAME TestMorphEdges DATA SimpleMorph.gltf ARGS --edges --line-width=5)
-f3d_test(NAME TestAnimationUserMatrixColoring DATA InterpolationTest.glb ARGS --scalar-coloring --coloring-array=TEXCOORD_0 --animation-time=0.5)
-f3d_test(NAME TestAnimationSkinColoring DATA SimpleSkin.gltf ARGS --scalar-coloring --coloring-array=WEIGHTS_0 --animation-time=2)
-f3d_test(NAME TestAnimationMorphColoring DATA SimpleMorph.gltf ARGS --scalar-coloring --animation-time=0.5)
-f3d_test(NAME TestAnimationInputChangeColoring DATA v_rock2.mdl ARGS --scalar-coloring --animation-time=0.01 --animation-indices=1)
+f3d_test(NAME TestAnimationUserMatrixColoring DATA InterpolationTest.glb ARGS --coloring-mode=scivis --coloring-array=TEXCOORD_0 --animation-time=0.5)
+f3d_test(NAME TestAnimationSkinColoring DATA SimpleSkin.gltf ARGS --coloring-mode=scivis --coloring-array=WEIGHTS_0 --animation-time=2)
+f3d_test(NAME TestAnimationMorphColoring DATA SimpleMorph.gltf ARGS --coloring-mode=scivis --animation-time=0.5)
+f3d_test(NAME TestAnimationInputChangeColoring DATA v_rock2.mdl ARGS --coloring-mode=scivis --animation-time=0.01 --animation-indices=1)
 
 # Depth
 f3d_test(NAME TestDisplayDepth DATA dragon.vtu ARGS --display-depth)
-f3d_test(NAME TestDisplayDepthColorMap DATA dragon.vtu ARGS --display-depth --scalar-coloring=True --coloring-scalar-bar=True)
-f3d_test(NAME TestDisplayDepthCustomColorMap DATA dragon.vtu ARGS --display-depth --scalar-coloring --colormap=0,red,1,blue)
+f3d_test(NAME TestDisplayDepthColorMap DATA dragon.vtu ARGS --display-depth --coloring-mode=scivis --coloring-scalar-bar=True)
+f3d_test(NAME TestDisplayDepthCustomColorMap DATA dragon.vtu ARGS --display-depth --coloring-mode=scivis --colormap=0,red,1,blue)
 f3d_test(NAME TestDisplayDepthWithGrid DATA cow.vtp ARGS --display-depth -g)
 
 # DPI scaling
@@ -87,24 +87,24 @@ f3d_test(NAME TestDPI150 DATA dragon.vtu ARGS -nm --dpi-aware DPI_SCALE 1.5 UI)
 f3d_test(NAME TestDPIInvalid DATA dragon.vtu ARGS -nm --dpi-aware DPI_SCALE invalid UI NO_BASELINE)
 
 ## Color/opacity map
-f3d_test(NAME TestColormap DATA IM-0001-1983.dcm ARGS --scalar-coloring --roughness=1 --colormap=0,1,0,0,1,0,1,0)
+f3d_test(NAME TestColormap DATA IM-0001-1983.dcm ARGS --coloring-mode=scivis --roughness=1 --colormap=0,1,0,0,1,0,1,0)
 f3d_test(NAME TestOpacityMap DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-map=0.0,0.0,0.5,1.0,1.0,0.0)
 f3d_test(NAME TestOpacityMapFile DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/gaussian_opacity_map.png)
 f3d_test(NAME TestOpacityMapFileNonExistent DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/nonexistent_opacity_map.png)
 f3d_test(NAME TestOpacityMapFileInvalid DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/invalid.png)
-f3d_test(NAME TestColorMapFileFullPath DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis8.png --scalar-coloring --coloring-component=1)
-f3d_test(NAME TestColorMapInvalid DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/invalid.png --scalar-coloring REGEXP "Cannot read colormap at" NO_BASELINE)
-f3d_test(NAME TestColorMapNonExistent DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/non_existent.png --scalar-coloring REGEXP "Cannot find the colormap" NO_BASELINE)
-f3d_test(NAME TestColorMapGrayscale DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/white_grayscale.png --scalar-coloring REGEXP "The specified color map must have at least 3 channels" NO_BASELINE)
-f3d_test(NAME TestColorMapMore1pxWarning DATA dragon.vtu ARGS --verbose=warning --colormap-file=${F3D_SOURCE_DIR}/testing/data/16bit.png --scalar-coloring REGEXP "The specified color map height is not equal to 1" NO_BASELINE)
-f3d_test(NAME TestColorMap16bits DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis16.png --scalar-coloring --coloring-component=1)
-f3d_test(NAME TestColorMap32bits DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis32.hdr --scalar-coloring --coloring-component=1)
-f3d_test(NAME TestColorDiscretization DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis32.hdr --scalar-coloring --coloring-component=1 --colormap-discretization=4)
+f3d_test(NAME TestColorMapFileFullPath DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis8.png --coloring-mode=scivis --coloring-component=1)
+f3d_test(NAME TestColorMapInvalid DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/invalid.png --coloring-mode=scivis REGEXP "Cannot read colormap at" NO_BASELINE)
+f3d_test(NAME TestColorMapNonExistent DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/non_existent.png --coloring-mode=scivis REGEXP "Cannot find the colormap" NO_BASELINE)
+f3d_test(NAME TestColorMapGrayscale DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/white_grayscale.png --coloring-mode=scivis REGEXP "The specified color map must have at least 3 channels" NO_BASELINE)
+f3d_test(NAME TestColorMapMore1pxWarning DATA dragon.vtu ARGS --verbose=warning --colormap-file=${F3D_SOURCE_DIR}/testing/data/16bit.png --coloring-mode=scivis REGEXP "The specified color map height is not equal to 1" NO_BASELINE)
+f3d_test(NAME TestColorMap16bits DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis16.png --coloring-mode=scivis --coloring-component=1)
+f3d_test(NAME TestColorMap32bits DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis32.hdr --coloring-mode=scivis --coloring-component=1)
+f3d_test(NAME TestColorDiscretization DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis32.hdr --coloring-mode=scivis --coloring-component=1 --colormap-discretization=4)
 
 if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/resources/colormaps/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/colormaps")
-  f3d_test(NAME TestColorMapStem DATA dragon.vtu ARGS --colormap-file=magma --scalar-coloring --coloring-component=1)
-  f3d_test(NAME TestColorMapFile DATA dragon.vtu ARGS --colormap-file=magma.png --scalar-coloring --coloring-component=1)
+  f3d_test(NAME TestColorMapStem DATA dragon.vtu ARGS --colormap-file=magma --coloring-mode=scivis --coloring-component=1)
+  f3d_test(NAME TestColorMapFile DATA dragon.vtu ARGS --colormap-file=magma.png --coloring-mode=scivis --coloring-component=1)
 endif()
 
 ## Axes grid
@@ -140,7 +140,7 @@ f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -v --camera-position=127.5,-
 f3d_test(NAME TestVolumeInverse DATA HeadMRVolume.mhd ARGS -vi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 THRESHOLD 0.11) # Small rendering differences on macOS OSMesa
 f3d_test(NAME TestVolumeMag DATA vase_4comp.vti ARGS -vb)
 f3d_test(NAME TestVolumeComp DATA vase_4comp.vti ARGS -vb --coloring-component=3 LONG_TIMEOUT)
-f3d_test(NAME TestVolumeDirect DATA vase_4comp.vti ARGS -vb --coloring-component=-2)
+f3d_test(NAME TestVolumeDirect DATA vase_4comp.vti ARGS -vb --coloring-mode=direct)
 f3d_test(NAME TestVolumeCells DATA waveletArrays.vti ARGS -vb --coloring-by-cells)
 f3d_test(NAME TestVolumeColoringArray DATA waveletArrays.vti ARGS -vb --coloring-array=Result LONG_TIMEOUT)
 
@@ -231,7 +231,7 @@ f3d_test(NAME TestMultiFileColoring DATA mb/recursive ARGS --multi-file-mode=all
 f3d_test(NAME TestMultiFileVolume DATA multi ARGS --multi-file-mode=all -vsb --coloring-array=Scalars_)
 f3d_test(NAME TestMultiFileColoringTexture DATA mb/recursive/mb_1_0.vtp mb/recursive/mb_2_0.vtp world.obj ARGS --multi-file-mode=all -sb --coloring-array=Normals --coloring-component=1)
 f3d_test(NAME TestMultiFilePositionals DATA mb/recursive/mb_0_0.vtu mb/recursive/mb_1_0.vtp ARGS --multi-file-mode=all -s --coloring-array=Polynomial -b)
-f3d_test(NAME TestMultiFileNonCoherentComponentNames DATA bluntfin.vts bluntfin_t.vtu ARGS --multi-file-mode=all --scalar-coloring --coloring-array=Momentum --coloring-component=2 --coloring-scalar-bar)
+f3d_test(NAME TestMultiFileNonCoherentComponentNames DATA bluntfin.vts bluntfin_t.vtu ARGS --multi-file-mode=all --coloring-mode=scivis --coloring-array=Momentum --coloring-component=2 --coloring-scalar-bar)
 f3d_test(NAME TestMultiInputArg ARGS --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_0_0.vtu ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_1_0.vtp --multi-file-mode=all -s --coloring-array=Polynomial -b)
 f3d_test(NAME TestMultiInputMultiArgs ARGS --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_0_0.vtu --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_1_0.vtp --multi-file-mode=all -s --coloring-array=Polynomial -b)
 f3d_test(NAME TestInvalidFileFileNameEmpty DATA invalid_body.vtp ARGS --filename NO_DATA_FORCE_RENDER UI)
@@ -271,7 +271,7 @@ f3d_test(NAME TestAnimationIndicesSingle DATA soldier_animations.mdl ARGS --anim
 f3d_test(NAME TestAnimationIndicesMulti DATA InterpolationTest.glb ARGS --animation-indices=7,6 --animation-time=0.5 --animation-progress UI)
 f3d_test(NAME TestAnimationIndexDeprecated DATA InterpolationTest.glb ARGS --animation-index=7 --animation-time=0.5 --animation-progress UI)
 f3d_test(NAME TestMultiFileAnimationIndices DATA InterpolationTest.glb BoxAnimated.gltf ARGS --animation-indices=9 --animation-time=0.85 --animation-progress --multi-file-mode=all UI)
-f3d_test(NAME TestAnimationProgressBarWithScalarBar DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress=advanced --scalar-coloring --coloring-scalar-bar UI)
+f3d_test(NAME TestAnimationProgressBarWithScalarBar DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress=advanced --coloring-mode=scivis --coloring-scalar-bar UI)
 f3d_test(NAME TestAnimationProgressBarSpeedFactor DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress=advanced --animation-speed-factor=1.5 RESOLUTION 400,300 UI)
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12688
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251006)
@@ -496,7 +496,7 @@ f3d_test(NAME TestCommandScriptInvalid SCRIPT DATA dragon.vtu REGEXP "Command: \
 f3d_test(NAME TestCommandScriptMissingFile SCRIPT DATA dragon.vtu REGEXP "Unable to open command script file" NO_BASELINE)
 f3d_test(NAME TestCommandScriptPrintScene SCRIPT DATA dragon.vtu REGEXP "Camera position: 2.23745, 3.83305, 507.598" NO_BASELINE) # print_scene_info
 f3d_test(NAME TestCommandScriptPrintConfig SCRIPT DATA dragon.vtu REGEXP "Found available config path" NO_BASELINE) # print_config_info
-f3d_test(NAME TestCommandScriptPrintColoring SCRIPT DATA dragon.vtu REGEXP "Not coloring" NO_BASELINE) # print_coloring_info
+f3d_test(NAME TestCommandScriptPrintColoring SCRIPT DATA dragon.vtu REGEXP "Material" NO_BASELINE) # print_coloring_info
 f3d_test(NAME TestCommandScriptPrintMesh SCRIPT DATA dragon.vtu REGEXP "Number of points: 13268" NO_BASELINE) # print_mesh_info
 f3d_test(NAME TestCommandScriptPrintOptions SCRIPT DATA dragon.vtu REGEXP "interactor.invert_zoom: false" NO_BASELINE) # print_options_info
 f3d_test(NAME TestCommandScriptAlias SCRIPT DATA dragon.vtu --reference=${F3D_SOURCE_DIR}/testing/baselines/TestCommandScriptAlias.png) # alias myrotate roll_camera 90;myrotate
@@ -633,7 +633,7 @@ f3d_test(NAME TestIncorrectComponent DATA dragon.vtu ARGS -s --coloring-componen
 f3d_test(NAME TestIncorrectMultiFileVolume DATA multi ARGS -sv --coloring-array=Normals --multi-file-mode=all REGEXP "Cannot find the array \"Normals\" to display volume with" NO_BASELINE LONG_TIMEOUT)
 
 # Incorrect color map
-f3d_test(NAME TestIncorrectColormap DATA IM-0001-1983.dcm ARGS --scalar-coloring --roughness=1 --colormap=0,1,0,0,1,0,1 REGEXP "Incorrect number of tokens in provided colormap" NO_BASELINE)
+f3d_test(NAME TestIncorrectColormap DATA IM-0001-1983.dcm ARGS --coloring-mode=scivis --roughness=1 --colormap=0,1,0,0,1,0,1 REGEXP "Incorrect number of tokens in provided colormap" NO_BASELINE)
 
 # Test opening a directory
 f3d_test(NAME TestVerboseDirectory DATA mb REGEXP "mb_0_0.vtu" NO_RENDER)
@@ -667,10 +667,10 @@ f3d_test(NAME TestNoRenderBBox DATA suzanne.ply NO_RENDER REGEXP "Scene bounding
 f3d_test(NAME TestVerboseScalars DATA suzanne.ply ARGS -s --verbose REGEXP "Coloring using point array named Normals, Magnitude." NO_BASELINE)
 
 # Test direct scalars surface rendering with a 9 comp array
-f3d_test(NAME TestTensorsDirect DATA tensors.vti ARGS -s --coloring-array=tensors1 --coloring-component=-2 REGEXP "Direct scalars rendering not supported by array with more than 4 components" NO_BASELINE)
+f3d_test(NAME TestTensorsDirect DATA tensors.vti ARGS --coloring-array=tensors1 --coloring-mode=direct REGEXP "Direct scalars rendering not supported by array with more than 4 components" NO_BASELINE)
 
 # Test direct scalars volume rendering with a 9 comp array
-f3d_test(NAME TestTensorsVolumeDirect DATA tensors.vti ARGS -v -s --coloring-array=tensors1 --coloring-component=-2 REGEXP "Direct scalars rendering not supported by array with more than 4 components" NO_BASELINE)
+f3d_test(NAME TestTensorsVolumeDirect DATA tensors.vti ARGS -v --coloring-array=tensors1 --coloring-mode=direct REGEXP "Direct scalars rendering not supported by array with more than 4 components" NO_BASELINE)
 
 # Test volume rendering without any array
 f3d_test(NAME TestVerboseVolumeNoArray DATA cow.vtp ARGS -v REGEXP "Cannot use volume with this data" NO_BASELINE)
@@ -867,7 +867,7 @@ endif()
 ## Filesystem error code path
 if(NOT WIN32)
   STRING(RANDOM LENGTH 257 ALPHABET "x" _f3d_test_invalid_folder)
-  f3d_test(NAME TestColorMapTooLong DATA dragon.vtu ARGS --colormap-file=${_f3d_test_invalid_folder}/file.ext --scalar-coloring REGEXP "File name too long" NO_BASELINE)
+  f3d_test(NAME TestColorMapTooLong DATA dragon.vtu ARGS --colormap-file=${_f3d_test_invalid_folder}/file.ext --coloring-mode=scivis REGEXP "File name too long" NO_BASELINE)
   f3d_test(NAME TestScreenshotTooLong DATA suzanne.ply ARGS --screenshot-filename=${_f3d_test_invalid_folder}/file.ext --interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/TestScreenshot.log REGEXP "File name too long" NO_BASELINE)
   f3d_test(NAME TestInputTooLong ARGS --input=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE)
   f3d_test(NAME TestReferenceTooLong DATA suzanne.ply ARGS --output=file.png --reference=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE NO_OUTPUT)

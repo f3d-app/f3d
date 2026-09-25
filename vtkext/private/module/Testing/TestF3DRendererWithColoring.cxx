@@ -38,7 +38,7 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   importer->Update();
 
   // Check invalid array code path
-  renderer->SetEnableColoring(true);
+  renderer->SetColoring(vtkF3DRenderer::ColoringMode::SCIVIS);
   renderer->SetArrayNameForColoring("Invalid");
   renderer->SetUseVolume(false);
   renderer->UpdateActors();
@@ -46,7 +46,8 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   renderer->SetUseVolume(true);
   renderer->UpdateActors();
 
-  if (renderer->GetArrayNameForColoring() != "Invalid" || renderer->GetComponentForColoring() != -1)
+  if (renderer->GetArrayNameForColoring() != "Invalid" ||
+    renderer->GetComponentForColoring().has_value())
   {
     std::cerr << "Unexpected coloring information with invalid array\n";
     return EXIT_FAILURE;
@@ -66,7 +67,8 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   }
 
   renderer->CycleComponentForColoring();
-  if (renderer->GetArrayNameForColoring() != "Momentum" || renderer->GetComponentForColoring() != 1)
+  if (renderer->GetArrayNameForColoring() != "Momentum" ||
+    !renderer->GetComponentForColoring().has_value())
   {
     std::cerr << "Unexpected coloring information after cycling component\n";
     return EXIT_FAILURE;
