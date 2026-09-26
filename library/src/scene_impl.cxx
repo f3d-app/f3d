@@ -160,28 +160,29 @@ public:
         constexpr std::array charRamp = std::to_array<std::string_view>(
           { " ", "\u258f", "\u258e", "\u258d", "\u258c", "\u258b", "\u258a", "\u2589", "\u2588" });
 
-        auto progressData = static_cast<CLIProgressBarDataStruct*>(clientData);
-        double progress = *static_cast<double*>(callData);
+        const auto progressData = static_cast<CLIProgressBarDataStruct*>(clientData);
+        const double progress = *static_cast<double*>(callData);
 
-        std::string bar = scene_impl::internals::GenerateCLIBarString(progress, barCount, charRamp);
+        const std::string bar =
+          scene_impl::internals::GenerateCLIBarString(progress, barCount, charRamp);
 
-        std::string filename = (progressData->importerCount > 1)
+        const std::string filename = (progressData->importerCount > 1)
           ? std::to_string(progressData->importerCount) + " files"
           : progressData->fileName;
 
-        int percentage = std::round(100 * progress);
-        std::string percentageStr = std::format("{:3}", percentage);
+        const int percentage = std::round(100 * progress);
+        const std::string percentageStr = std::format("{:3}", percentage);
 
         progressData->timer->StopTimer();
 
-        double estimatedTime =
+        const double estimatedTime =
           (progress <= 1e-4) ? 0 : progressData->timer->GetElapsedTime() / progress;
-        int estimatedMin = estimatedTime / 60;
-        int estimatedSec = static_cast<int>(estimatedTime) % 60;
-        int elapsedMin = progressData->timer->GetElapsedTime() / 60;
-        int elapsedSec = static_cast<int>(progressData->timer->GetElapsedTime()) % 60;
+        const int estimatedMin = estimatedTime / 60;
+        const int estimatedSec = static_cast<int>(estimatedTime) % 60;
+        const int elapsedMin = progressData->timer->GetElapsedTime() / 60;
+        const int elapsedSec = static_cast<int>(progressData->timer->GetElapsedTime()) % 60;
 
-        std::string time = std::format(
+        const std::string time = std::format(
           "{:02}:{:02}/{:02}:{:02}", elapsedMin, elapsedSec, estimatedMin, estimatedSec);
 
         f3d::log::progress(
