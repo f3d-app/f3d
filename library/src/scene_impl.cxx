@@ -224,10 +224,12 @@ public:
     scene_impl::internals::ProgressDataStruct callbackData;
     scene_impl::internals::CLIProgressBarDataStruct cliCallbackData;
 
+
+    constexpr size_t maxFileNameLength= 51;
     cliCallbackData.timer = timer;
     cliCallbackData.importerCount = this->MetaImporter->GetImporterInfoCount();
     cliCallbackData.fileName = (cliCallbackData.importerCount > 0)
-      ? this->MetaImporter->GetImporterInfo(0).Name.substr(0, 51)
+      ? this->MetaImporter->GetImporterInfo(0).Name.substr(0, maxFileNameLength)
       : "";
     scene_impl::internals::CreateCLIProgressBarAndCallback(&cliCallbackData, this->MetaImporter);
 
