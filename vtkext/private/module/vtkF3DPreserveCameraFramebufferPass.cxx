@@ -20,14 +20,6 @@ void vtkF3DPreserveCameraFramebufferPass::RenderDelegate(const vtkRenderState* s
 {
   // Adapted from `vtkFramebufferPass::RenderDelegate`
   // Copyright (c) Kitware, Inc.
-  assert("pre: s_exists" && s != nullptr);
-  assert("pre: fbo_exists" && fbo != nullptr);
-  assert("pre: fbo_has_context" && fbo->GetContext() != nullptr);
-  assert("pre: colortarget_exists" && colortarget != nullptr);
-  assert("pre: colortarget_has_context" && colortarget->GetContext() != nullptr);
-  assert("pre: depthtarget_exists" && depthtarget != nullptr);
-  assert("pre: depthtarget_has_context" && depthtarget->GetContext() != nullptr);
-
   vtkRenderer* r = s->GetRenderer();
   vtkRenderState s2(r);
   s2.SetPropArrayAndCount(s->GetPropArray(), s->GetPropArrayCount());
@@ -45,7 +37,6 @@ void vtkF3DPreserveCameraFramebufferPass::RenderDelegate(const vtkRenderState* s
   fbo->StartNonOrtho(width, height);
 
   // 2. Delegate render in FBO
-  // glEnable(GL_DEPTH_TEST);
   this->DelegatePass->Render(&s2);
 
   this->NumberOfRenderedProps += this->DelegatePass->GetNumberOfRenderedProps();
