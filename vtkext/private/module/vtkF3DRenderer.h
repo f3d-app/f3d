@@ -617,6 +617,8 @@ public:
    * Returns true if the frame was captured successfully, false otherwise.
    */
   bool CaptureVideoFrame(std::byte* yPlane, std::byte* uPlane, std::byte* vPlane);
+
+  /**
    * Set XR mode
    */
   void SetXRMode(bool enable, bool showBbox = false);
