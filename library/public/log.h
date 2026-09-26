@@ -96,7 +96,9 @@ public:
   }
 
   /**
-   * Log provided args to update progress bar.
+   * Prints provided args to update progress bar.
+   * if VerboseLevel is above Info, then it will not print
+   * otherwise, it will print the provided args.
    */
   template<typename... Args>
   static void progress(Args... args)
