@@ -1,5 +1,6 @@
 #include "engine.h"
 
+#include "animation_impl.h"
 #include "config.h"
 #include "factory.h"
 #include "init.h"
@@ -157,7 +158,7 @@ engine::engine(const std::optional<window::Type>& windowType, bool offscreen,
   if (windowType != window::Type::NONE)
   {
     this->Internals->Interactor = std::make_unique<detail::interactor_impl>(
-      *this->Internals->Options, *this->Internals->Window, *this->Internals->Scene);
+      *this->Internals->Options, *this->Internals->Window, *this->Internals->Scene, this->Internals->Scene->GetAnimationImpl());
   }
 
 #ifdef __EMSCRIPTEN__

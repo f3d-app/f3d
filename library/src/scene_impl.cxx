@@ -1,6 +1,5 @@
 #include "scene_impl.h"
 
-#include "animationManager.h"
 #include "animation_impl.h"
 #include "interactor_impl.h"
 #include "log.h"
@@ -53,13 +52,12 @@ public:
   internals(options& options, window_impl& window)
     : Options(options)
     , Window(window)
-    , AnimationManager(options, window)
   {
     this->Animation = std::make_unique<f3d::detail::animation_impl>(options, window);
 
     this->MetaImporter->SetRenderWindow(this->Window.GetRenderWindow());
     this->Window.SetImporter(this->MetaImporter);
-    this->AnimationManager.SetImporter(this->MetaImporter);
+    this->Animation->SetImporter(this->MetaImporter);
   }
 
   struct ProgressDataStruct
@@ -261,8 +259,8 @@ public:
     progressWidget->Off();
 
     // Initialize the animation using temporal information from the importer
-    this->AnimationManager.UpdateDynamicOptions();
-    this->AnimationManager.Initialize();
+    this->Animation->UpdateDynamicOptions();
+    this->Animation->Initialize();
 
     // Update all window options and reset camera to bounds if needed
     this->Window.UpdateDynamicOptions();
@@ -313,7 +311,6 @@ public:
   options& Options;
   window_impl& Window;
   interactor_impl* Interactor = nullptr;
-  animationManager AnimationManager;
 
   vtkNew<vtkF3DMetaImporter> MetaImporter;
   std::vector<fs::path> AddedFiles;
@@ -886,7 +883,7 @@ scene& scene_impl::clear()
   this->Internals->AddedFiles.clear();
 
   // Clear animation state
-  this->Internals->AnimationManager.Reset();
+  this->Internals->Animation->Reset();
 
   return *this;
 }
@@ -1047,49 +1044,16 @@ animation& scene_impl::getAnimation()
 }
 
 //----------------------------------------------------------------------------
-scene& scene_impl::loadAnimationTime(double timeValue)
+animation_impl& scene_impl::GetAnimationImpl()
 {
-  this->Internals->AnimationManager.LoadAtTime(timeValue);
-  scene_impl::internals::DisplayAllInfo(this->Internals->MetaImporter, this->Internals->Window);
-  return *this;
-}
-
-//----------------------------------------------------------------------------
-std::pair<double, double> scene_impl::animationTimeRange()
-{
-  return this->Internals->AnimationManager.GetTimeRange();
-}
-
-//----------------------------------------------------------------------------
-std::vector<double> scene_impl::getAnimationKeyFrames()
-{
-  return this->Internals->AnimationManager.GetKeyFrames();
-}
-
-//----------------------------------------------------------------------------
-unsigned int scene_impl::availableAnimations() const
-{
-  return this->Internals->AnimationManager.GetNumberOfAvailableAnimations();
-}
-
-//----------------------------------------------------------------------------
-std::string scene_impl::getAnimationName(int index)
-{
-  return this->Internals->AnimationManager.GetAnimationName(index);
-}
-
-//----------------------------------------------------------------------------
-std::vector<std::string> scene_impl::getAnimationNames()
-{
-  return this->Internals->AnimationManager.GetAnimationNames();
+  return *this->Internals->Animation;
 }
 
 //----------------------------------------------------------------------------
 void scene_impl::SetInteractor(interactor_impl* interactor)
 {
   this->Internals->Interactor = interactor;
-  this->Internals->AnimationManager.SetInteractor(interactor);
-  this->Internals->Interactor->SetAnimationManager(&this->Internals->AnimationManager);
+  this->Internals->Animation->SetInteractor(interactor);
 }
 
 void scene_impl::PrintImporterDescription(log::VerboseLevel level)

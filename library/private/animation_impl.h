@@ -66,7 +66,7 @@ public:
 
   /**
    * Implementation only API
-   * Initialize the animation manager, required before playing the animation.
+   * Initialize the animation, required before playing the animation.
    * Can be used to reset animation to the initial state.
    * Importer must be set before use.
    * Interactor should be set before use if any.
@@ -76,7 +76,7 @@ public:
 
   /**
    * Implementation only API
-   * Reset the animation manager to a no-animation state.
+   * Reset the animation to a no-animation state.
    */
   void Reset();
 
@@ -133,7 +133,7 @@ public:
 
   /**
    * Implementation only API
-   * Return true if the animation manager is playing the animation
+   * Return true if the animation is being played
    */
   bool IsPlaying() const
   {

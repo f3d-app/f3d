@@ -45,7 +45,6 @@ f3d_generate_options(
 
 # Define libf3d target
 set(F3D_SOURCE_FILES
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/animationManager.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/animation_impl.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/camera_impl.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx
