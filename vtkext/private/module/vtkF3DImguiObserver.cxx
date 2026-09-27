@@ -41,11 +41,19 @@ ImGuiKey GetImGuiKeyFromKeySym(std::string_view&& keySym)
       { "space", ImGuiKey_Space },
       { "Return", ImGuiKey_Enter },
       { "Escape", ImGuiKey_Escape },
+#ifdef __APPLE__
+      { "Control_L", ImGuiKey_LeftSuper },
+#else
       { "Control_L", ImGuiKey_LeftCtrl },
+#endif
       { "Shift_L", ImGuiKey_LeftShift },
       { "Alt_L", ImGuiKey_LeftAlt },
       { "Super_L", ImGuiKey_LeftSuper },
+#ifdef __APPLE__
+      { "Control_R", ImGuiKey_RightSuper },
+#else
       { "Control_R", ImGuiKey_RightCtrl },
+#endif
       { "Shift_R", ImGuiKey_RightShift },
       { "Alt_R", ImGuiKey_RightAlt },
       { "Super_R", ImGuiKey_RightSuper },
@@ -332,8 +340,20 @@ bool vtkF3DImguiObserver::KeyPress(vtkObject* caller, unsigned long, void*)
     vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
     ImGuiIO& io = ImGui::GetIO();
     this->UpdateModifiers(that);
-    io.AddKeyEvent(::GetImGuiKeyFromKeySym(that->GetKeySym()), true);
+    ImGuiKey key = ::GetImGuiKeyFromKeySym(that->GetKeySym());
+    io.AddKeyEvent(key, true);
     this->RenderUI(that);
+
+#ifdef __APPLE__
+    // When Cmd is held, the release of the key is never sent by Cocoa, so we need to fake it to
+    // avoid keys getting stuck down forever
+    // https://stackoverflow.com/questions/16604056/nsresponder-not-receiving-keyup-event-when-cmd-key-held-down
+    if (that->GetControlKey())
+    {
+      io.AddKeyEvent(key, false);
+    }
+#endif
+
     return io.WantCaptureKeyboard;
   }
   return false;
@@ -380,7 +400,11 @@ void vtkF3DImguiObserver::InstallObservers(vtkRenderWindowInteractor* interactor
 void vtkF3DImguiObserver::UpdateModifiers(vtkRenderWindowInteractor* interactor)
 {
   ImGuiIO& io = ImGui::GetIO();
+#if defined(__APPLE__)
+  io.AddKeyEvent(ImGuiMod_Super, interactor->GetControlKey() == 1);
+#else
   io.AddKeyEvent(ImGuiMod_Ctrl, interactor->GetControlKey() == 1);
+#endif
   io.AddKeyEvent(ImGuiMod_Shift, interactor->GetShiftKey() == 1);
   io.AddKeyEvent(ImGuiMod_Alt, interactor->GetAltKey() == 1);
 }

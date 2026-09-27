@@ -1,0 +1,12 @@
+# StreamVersion 1.2
+ExposeEvent 0 449 0 0 0 0 0
+RenderEvent 0 449 0 0 0 0 0
+
+# Open console
+KeyPressEvent 171 80 0 27 1 Escape 0
+CharEvent 171 80 0 27 1 Escape 0
+KeyReleaseEvent 171 80 0 27 1 Escape 0
+
+# Move to copy icon
+MouseMoveEvent 403 386 0 0 0 Escape 0
+TimerEvent 403 386 0 0 0 Escape 0

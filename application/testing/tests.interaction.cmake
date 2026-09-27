@@ -41,6 +41,15 @@ f3d_test(NAME TestInteractionNotificationsUpdate DATA cow.vtp ARGS --notificatio
 f3d_test(NAME TestInteractionNotificationsBindings DATA cow.vtp ARGS --notifications -Dui.notifications.show_bindings=ON INTERACTION UI) #E;
 f3d_test(NAME TestInteractionNotificationsBindingsModifier DATA cow.vtp ARGS --notifications -Dui.notifications.show_bindings=ON RESOLUTION 400,300 INTERACTION UI) #SHIFT+L;
 f3d_test(NAME TestInteractionToggleNotifications DATA cow.vtp INTERACTION UI) #CTRL+K;
+f3d_test(NAME TestInteractionSelectLog DATA f3d.glb SCRIPT INTERACTION UI THRESHOLD 0.06) #Esc;Select text
+f3d_test(NAME TestInteractionHoverCopyLog DATA f3d.glb INTERACTION UI) #Mouse move to copy log button
+f3d_test(NAME TestInteractionHoverCopyLogDPI DATA f3d.glb ARGS --dpi-aware DPI_SCALE 1.5 INTERACTION UI) #Mouse move to copy log button
+f3d_test(NAME TestInteractionClickCopyLog DATA f3d.glb ARGS -Dfoo INTERACTION UI) #Mouse move to copy log button;Click # -Dfoo is used to add a random log line to copy
+
+# OSMesa and EGL do not support clipboard operations, so we skip the copy-paste test for these backends.
+if (F3D_MODULE_CLIP AND NOT F3D_TESTING_FORCE_RENDERING_BACKEND MATCHES "osmesa|egl")
+  f3d_test(NAME TestInteractionCopyPaste DATA f3d.glb  SCRIPT INTERACTION UI THRESHOLD 0.06) #Esc;Select text;CTRL+C;CTRL+V in input;Enter
+endif()
 
 # Test reflection strength change to validate shader recompilation
 f3d_test(NAME TestInteractionGridReflectionChanged DATA suzanne.ply ARGS -g INTERACTION UI) #Escape;"set render.grid.reflection=0.8";Escape

@@ -10,6 +10,10 @@
 #include <charconv>
 #include <stdexcept>
 
+#ifdef F3D_MODULE_CLIP
+#include "clip/clip.h"
+#endif
+
 //----------------------------------------------------------------------------
 double F3DUtils::ParseToDouble(const std::string& str, double def, const std::string& nameError)
 {
@@ -56,4 +60,49 @@ int F3DUtils::ParseToInt(const std::string& str, int def, const std::string& nam
     }
   }
   return value;
+}
+
+//----------------------------------------------------------------------------
+bool F3DUtils::CopyToClipboard(const std::string& text)
+{
+#ifdef F3D_MODULE_CLIP
+  clip::set_x11_wait_timeout(50);
+  try
+  {
+    return clip::set_text(text);
+  }
+  // Cannot cover clip failure
+  // LCOV_EXCL_START
+  catch (const clip::clip_exception& e)
+  {
+    vtkWarningWithObjectMacro(nullptr, "Clipboard error: " << e.what());
+    return false;
+  }
+  // LCOV_EXCL_STOP
+#else
+  return false;
+#endif
+}
+
+//----------------------------------------------------------------------------
+bool F3DUtils::GetFromClipboard(std::string& text)
+{
+#ifdef F3D_MODULE_CLIP
+  clip::set_x11_wait_timeout(50);
+  try
+  {
+    return clip::get_text(text);
+  }
+  // Cannot cover clip failure
+  // LCOV_EXCL_START
+  catch (const clip::clip_exception& e)
+  {
+    vtkWarningWithObjectMacro(nullptr, "Clipboard error: " << e.what());
+    return false;
+  }
+  // LCOV_EXCL_STOP
+#else
+  text.clear();
+  return false;
+#endif
 }

@@ -1750,30 +1750,6 @@ int F3DStarter::Start(int argc, char** argv)
       throw F3DExNoProcess("bindings list requested");
     }
 
-    // Play recording if any
-    fs::path interactionTestPlayFile =
-      f3d::utils::collapsePath(this->Internals->AppOptions.InteractionTestPlayFile);
-    if (!interactionTestPlayFile.empty())
-    {
-      // For better testing, render once before the interaction
-      window.render();
-      if (!interactor.playInteraction(interactionTestPlayFile, deltaTime))
-      {
-        return EXIT_FAILURE;
-      }
-    }
-
-    // Start recording if needed
-    fs::path interactionTestRecordFile =
-      f3d::utils::collapsePath(this->Internals->AppOptions.InteractionTestRecordFile);
-    if (!interactionTestRecordFile.empty())
-    {
-      if (!interactor.recordInteraction(interactionTestRecordFile))
-      {
-        return EXIT_FAILURE;
-      }
-    }
-
     // Process Command Script file
     fs::path commandScriptFile =
       f3d::utils::collapsePath(this->Internals->AppOptions.CommandScriptFile);
@@ -1801,6 +1777,30 @@ int F3DStarter::Start(int argc, char** argv)
       else
       {
         f3d::log::error("Unable to open command script file");
+        return EXIT_FAILURE;
+      }
+    }
+
+    // Play recording if any
+    fs::path interactionTestPlayFile =
+      f3d::utils::collapsePath(this->Internals->AppOptions.InteractionTestPlayFile);
+    if (!interactionTestPlayFile.empty())
+    {
+      // For better testing, render once before the interaction
+      window.render();
+      if (!interactor.playInteraction(interactionTestPlayFile, deltaTime))
+      {
+        return EXIT_FAILURE;
+      }
+    }
+
+    // Start recording if needed
+    fs::path interactionTestRecordFile =
+      f3d::utils::collapsePath(this->Internals->AppOptions.InteractionTestRecordFile);
+    if (!interactionTestRecordFile.empty())
+    {
+      if (!interactor.recordInteraction(interactionTestRecordFile))
+      {
         return EXIT_FAILURE;
       }
     }

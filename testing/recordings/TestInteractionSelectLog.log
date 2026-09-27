@@ -1,0 +1,14 @@
+# StreamVersion 1.2
+ExposeEvent 0 299 0 0 0 0 0
+RenderEvent 0 299 0 0 0 0 0
+
+# Open console
+KeyPressEvent 188 54 0 27 0 Escape 0
+KeyReleaseEvent 188 54 0 27 0 Escape 0
+
+# Move to a log line and select
+MouseMoveEvent 48 150 0 0 0 Escape 0
+LeftButtonPressEvent 48 150 0 0 0 Escape 0
+MouseMoveEvent 216 130 0 0 0 Escape 0
+TimerEvent 216 130 0 0 0 Escape 0
+LeftButtonReleaseEvent 216 130 0 0 0 Escape 0

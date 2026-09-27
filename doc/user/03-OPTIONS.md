@@ -374,6 +374,7 @@ Only supported on Windows platform.
 
 Provide a script file containing a list of [commands](07-COMMANDS.md) to be executed sequentially.
 Allows automation of multiple commands or pre-defined tasks.
+Run before `--interaction-test-play`.
 
 ### `--backdrop-color=<color>` (_color_, default: `f3d_black`)
 
@@ -1062,6 +1063,7 @@ Path to an interaction log file to _record interaction events_ to.
 ### `--interaction-test-play=<log file>` (_string_)
 
 Path to an interaction log file to _play interactions events_ from when loading a file.
+Run after `--command-script`.
 
 ## Rendering options precedence
 

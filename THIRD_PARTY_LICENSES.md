@@ -137,7 +137,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 The MIT License (MIT)
 ```
 
-## MonaspaceNeon-Regular.otf
+## MonaspaceNeonNF-Regular.otf
 
 ```
 Copyright (c) 2023, GitHub https://github.com/githubnext/monaspace
