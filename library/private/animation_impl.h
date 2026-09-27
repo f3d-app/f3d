@@ -102,28 +102,19 @@ public:
    * 1 for forward animation
    * -1 for backward animation
    */
-  int GetAnimationDirection() const
-  {
-    return this->AnimationDirection;
-  }
+  int GetAnimationDirection() const;
 
   /**
    * Implementation only API
    * Return true if the animation is being played
    */
-  bool IsPlaying() const
-  {
-    return this->Playing;
-  }
+  bool IsPlaying() const;
 
   /**
    * Implementation only API
    * Return the current animation time in seconds
    */
-  double GetCurrentTime() const
-  {
-    return this->CurrentTime;
-  }
+  double GetCurrentTime() const;
 
   /**
    * Implementation only API
@@ -199,30 +190,9 @@ private:
    */
   void SetCheatSheetConfigured(bool configured);
 
-  // TODO move to Internals
-  options& Options;
-  window_impl& Window;
-  vtkF3DMetaImporter* Importer = nullptr;
-  interactor_impl* Interactor = nullptr;
-
-  int AvailAnimations = 0;
-  int AnimationDirection = 1;
-
-  std::optional<std::vector<int>> PreparedAnimationIndices;
-  vtkNew<vtkDoubleArray> AnimationTimeSteps;
-  double TimeRange[2] = { 0.0, 0.0 };
-  bool Playing = false;
-  double CurrentTime = 0;
-  double DeltaTime = 0;
-  bool CurrentTimeSet = false;
-
-  // Dynamic options
-  bool Autoplay = false;
-  double SpeedFactor = 1.0;
-
 private:
-//  class internals;
-//  std::unique_ptr<internals> Internals;
+  class internals;
+  std::unique_ptr<internals> Internals;
 };
 }
 }
