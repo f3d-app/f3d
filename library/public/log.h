@@ -96,7 +96,8 @@ public:
   }
 
   /**
-   * Prints provided args to update progress bar.
+   * Prints provided args to update progress bar in the terminal/console output.
+   * Does NOT print in the f3d internal command log.
    * if VerboseLevel is above Info, then it will not print
    * otherwise, it will print the provided args.
    */
