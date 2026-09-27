@@ -145,6 +145,51 @@ public:
   };
 
   /**
+   * Parameter shape for calls to addBinding(...).
+   *
+   * Bind modifiers is a binary flag from the dedicated enum that represent KeyModifiers.
+   * Bind interaction can be a pressed key symbol, eg: "C",
+   * or a dedicated key symbol for special keys:
+   * "Left", "Right", "Up", "Down", "Space", "Enter", "Escape", "Question".
+   *
+   * Command is the action to perform when this binding is triggered.
+   *
+   * Group is an optional arg to group bindings together for better display of the documentation.
+   *
+   * DocumentationCallback is an optional function that returns a pair of string,
+   * the first is the doc itself, the second is the current value as a string, if any.
+   *
+   * Type is an optional type of binding to provide, it can be used for presenting the
+   * binding in a coherent way in logs and cheatsheet.
+   *
+   * If notify is true, a notification is triggered when pressing the binding.
+   *
+   * If repeat is true, the binding is applied repeatedly when holding down the key.
+   */
+  struct BindingParam
+  {
+    interaction_bind_t Bind;
+    std::vector<std::string> Commands;
+    std::string Group = {};
+    documentation_callback_t DocCallback = nullptr;
+    BindingType Type = BindingType::OTHER;
+    bool Notify = false;
+    bool Repeat = true;
+
+    BindingParam(interaction_bind_t bind, std::string command,
+    std::string group = {}, documentation_callback_t docCallback = nullptr,
+    BindingType type = BindingType::OTHER, bool notify = true, bool repeat = false) : Bind(std::move(bind)), Commands{std::move(command)}, Group(std::move(group)), DocCallback(std::move(docCallback)), Type(type), Notify(notify), Repeat(repeat) {}
+
+    BindingParam(interaction_bind_t bind, std::vector<std::string> commands,
+    std::string group = {}, documentation_callback_t docCallback = nullptr,
+    BindingType type = BindingType::OTHER, bool notify = true, bool repeat = false) : Bind(std::move(bind)), Commands(std::move(commands)), Group(std::move(group)), DocCallback(std::move(docCallback)), Type(type), Notify(notify), Repeat(repeat) {}
+
+    BindingParam(interaction_bind_t bind, std::initializer_list<std::string> list,
+    std::string group = {}, documentation_callback_t docCallback = nullptr,
+    BindingType type = BindingType::OTHER, bool notify = true, bool repeat = false) : Bind(std::move(bind)), Commands(list), Group(std::move(group)), DocCallback(std::move(docCallback)), Type(type), Notify(notify), Repeat(repeat) {}
+  };
+
+  /**
    * Remove all existing interaction commands and add all default bindings
    * see INTERACTIONS.md for details.
    */
@@ -153,21 +198,10 @@ public:
   /**
    * Use this method to add binding, in order to trigger commands for a specific bind
    *
-   * Bind modifiers is a binary flag from the dedicated enum that represent KeyModifiers.
-   * Bind interaction can be a pressed key symbol, eg: "C",
-   * or a dedicated key symbol for special keys:
-   * "Left", "Right", "Up", "Down", "Space", "Enter", "Escape", "Question".
-   *
-   * group is an optional arg to group bindings together for better display of the documentation.
    * Groups are kept in order of addition when recovered using getBindGroups().
    * Bindings are kept in order of addition when recovered using getBindsForGroup().
    *
-   * documentationCallback is an optional function that returns a pair of string,
-   * the first is the doc itself, the second is the current value as a string, if any.
-   * Use getBindingDocumentation() to access this doc.
-   *
-   * type is an optional type of binding to provide, it can be used for presenting the
-   * binding in a coherent way in logs and cheatsheet.
+   * Use getBindingDocumentation() to access the documentation specified for this binding.
    *
    * When the corresponding bind happens, the provided commands will be triggered using
    * triggerCommand. Considering checking if an interaction exists or removing it before adding it
@@ -176,37 +210,9 @@ public:
    * ANY modifier interactions will only be triggered if no other interaction bind with modifier
    * is found.
    *
-   * If notify is true, a notification is triggered when pressing the binding
-   *
-   * If repeat is true, the binding is applied repeatedly when holding down the key
-   *
    * Adding commands for an existing bind will throw a interactor::already_exists_exception.
    */
-  virtual interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool notify = true, bool repeat = false) = 0;
-
-  /**
-   * See addBinding
-   * Convenience method to add a single command for an interaction,
-   * similar as `addBinding(bind, {command})`.
-   *
-   * Adding command for an existing bind will throw a interactor::already_exists_exception.
-   */
-  virtual interactor& addBinding(const interaction_bind_t& bind, std::string command,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool notify = true, bool repeat = false) = 0;
-
-  /**
-   * Convenience initializer list signature for add binding method
-   */
-  interactor& addBinding(const interaction_bind_t& bind, std::initializer_list<std::string> list,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool notify = true, bool repeat = false)
-  {
-    return this->addBinding(bind, std::vector<std::string>(list), std::move(group),
-      std::move(documentationCallback), type, notify, repeat);
-  }
+  virtual interactor& addBinding(BindingParam binding) = 0;
 
   /**
    * Remove binding corresponding to provided bind.
