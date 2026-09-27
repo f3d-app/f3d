@@ -44,7 +44,8 @@ extern Severity VerboseLevel;
 void Print(Severity sev, const std::string& msg);
 
 /**
- * Prints progression bar output
+ * Prints progression bar output in the terminal/console output.
+ * Does NOT print in the f3d internal command log.
  * If current VerboseLevel is above Info, then it will not print
  */
 void Progress(const std::string& str);
