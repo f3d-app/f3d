@@ -35,12 +35,12 @@ public:
    */
   animation_impl(options& options, window_impl& window);
   ~animation_impl() override;
-  animation& loadAnimationTime(double timeValue) override;
-  std::pair<double, double> animationTimeRange() override;
-  std::vector<double> getAnimationKeyFrames() override;
-  unsigned int availableAnimations() const override;
-  std::string getAnimationName(int index = -1) override;
-  std::vector<std::string> getAnimationNames() override;
+  animation& loadTime(double timeValue) override;
+  std::pair<double, double> timeRange() override;
+  std::vector<double> keyFrames() override;
+  unsigned int count() const override;
+  std::string getName(int index = -1) override;
+  std::vector<std::string> getNames() override;
   ///@}
 
   /**
@@ -95,30 +95,6 @@ public:
    * This modifies the scene.animation.index option
    */
   void CycleAnimation();
-
-  /**
-   * Implementation only API
-   * Return the animation name of a given animation index, if any.
-   *
-   * Specific animation (0..availableAnimations): Returns the name of the animation at that index
-   * Current animation (-1):
-   *   - Returns the name of the current animation
-   *   - Returns "Multi animations" if more than one animation is current
-   *   - Returns "All animations" if all animations are current
-   *   - Returns "No animations" if no animations are current
-   * Fallback: Returns "No animation" for out-of-bounds requests.
-   *
-   * Can be called before initialization safely
-   */
-  std::string GetAnimationName(int index = -1);
-
-  /**
-   * Implementation only API
-   * Return all of the animation names, if any.
-   * Returns a vector of length 0 if none.
-   * Can be called before initialization safely
-   */
-  std::vector<std::string> GetAnimationNames();
 
   /**
    * Implementation only API
@@ -189,24 +165,6 @@ public:
    * When relative is false, a negative time is counted from the end of the animation
    */
   void JumpToTime(double timeValue, bool relative);
-
-  /**
-   * Implementation only API
-   * Return a pair containing the current time range values
-   */
-  std::pair<double, double> GetTimeRange();
-
-  /**
-   * Implementation only API
-   * Return a vector containing current animation keyframe's times
-   */
-  std::vector<double> GetKeyFrames();
-
-  /**
-   * Implementation only API
-   * Get the number of available animations
-   */
-  unsigned int GetNumberOfAvailableAnimations() const;
 
   /**
    * Implementation only API

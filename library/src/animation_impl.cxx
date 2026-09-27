@@ -33,42 +33,106 @@ animation_impl::animation_impl(options& options, window_impl& window)
 animation_impl::~animation_impl() = default;
 
 //----------------------------------------------------------------------------
-animation& animation_impl::loadAnimationTime(double timeValue)
+animation& animation_impl::loadTime(double timeValue)
 {
-  this->LoadAtTime(timeValue);
-  //TODO
-  //scene_impl::internals::DisplayAllInfo(this->Internals->MetaImporter, this->Internals->Window);
+  if (this->LoadAtTime(timeValue))
+  {
+    //TODO
+    //scene_impl::internals::DisplayAllInfo(this->Internals->MetaImporter, this->Internals->Window);
+  }
   return *this;
 }
 
 //----------------------------------------------------------------------------
-std::pair<double, double> animation_impl::animationTimeRange()
+std::pair<double, double> animation_impl::timeRange()
 {
-  return this->GetTimeRange();
+  // Make sure TimeRange is updated
+  this->PrepareForAnimationIndices();
+
+  // Return updated data
+  return std::make_pair(this->TimeRange[0], this->TimeRange[1]);
 }
 
 //----------------------------------------------------------------------------
-std::vector<double> animation_impl::getAnimationKeyFrames()
+std::vector<double> animation_impl::keyFrames()
 {
-  return this->GetKeyFrames();
+  this->PrepareForAnimationIndices();
+
+  std::vector<double> keyFrames;
+  keyFrames.reserve(this->AnimationTimeSteps->GetNumberOfTuples());
+
+  for (vtkIdType i = 0; i < this->AnimationTimeSteps->GetNumberOfTuples(); ++i)
+  {
+    keyFrames.push_back(this->AnimationTimeSteps->GetValue(i));
+  }
+
+  return keyFrames;
 }
 
 //----------------------------------------------------------------------------
-unsigned int animation_impl::availableAnimations() const
+unsigned int animation_impl::count() const
 {
-  return this->GetNumberOfAvailableAnimations();
+  assert(this->AvailAnimations >= 0);
+  return static_cast<unsigned int>(this->AvailAnimations);
 }
 
 //----------------------------------------------------------------------------
-std::string animation_impl::getAnimationName(int index)
+std::string animation_impl::getName(int index)
 {
-  return this->GetAnimationName(index);
+  assert(this->Importer);
+  if (index == -1)
+  {
+    if (this->PreparedAnimationIndices.has_value() &&
+      this->PreparedAnimationIndices.value().size() > 1)
+    {
+      std::vector<bool> animCheck(this->AvailAnimations, false);
+      for (int idx : this->PreparedAnimationIndices.value())
+      {
+        if (idx < this->AvailAnimations)
+        {
+          animCheck[idx] = true;
+        }
+      }
+      return std::ranges::none_of(animCheck, std::logical_not<>()) ? "All animations"
+                                                                   : "Multi animations";
+    }
+
+    if (this->AvailAnimations == 0 || !this->PreparedAnimationIndices.has_value() ||
+      this->PreparedAnimationIndices.value().empty() ||
+      this->PreparedAnimationIndices.value()[0] >= this->AvailAnimations)
+    {
+      return "No animation";
+    }
+
+    return this->Importer->GetAnimationName(this->PreparedAnimationIndices.value()[0]);
+  }
+
+  if (this->AvailAnimations == 0 || index < 0 || index > this->AvailAnimations)
+  {
+    return "No animation";
+  }
+
+  return this->Importer->GetAnimationName(index);
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> animation_impl::getAnimationNames()
+std::vector<std::string> animation_impl::getNames()
 {
-  return this->GetAnimationNames();
+  assert(this->Importer);
+
+  if (this->AvailAnimations == 0)
+  {
+    return {};
+  }
+
+  std::vector<std::string> animations(this->AvailAnimations);
+
+  for (int index = 0; index < this->AvailAnimations; index++)
+  {
+    animations[index] = this->Importer->GetAnimationName(index);
+  }
+
+  return animations;
 }
 
 //----------------------------------------------------------------------------
@@ -424,73 +488,15 @@ void animation_impl::CycleAnimation()
   }
 
   this->PrepareForAnimationIndices();
-  this->LoadAtTime(this->TimeRange[0]);
-
-  // The loaded animation changed: refresh the progress bar's time range and name
-  this->PushAnimationProgress();
-
-  vtkRenderWindow* renWin = this->Window.GetRenderWindow();
-  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-  ren->SetCheatSheetConfigured(false);
-}
-
-// ---------------------------------------------------------------------------------
-std::string animation_impl::GetAnimationName(int index)
-{
-  assert(this->Importer);
-  if (index == -1)
+  if (this->LoadAtTime(this->TimeRange[0]))
   {
-    if (this->PreparedAnimationIndices.has_value() &&
-      this->PreparedAnimationIndices.value().size() > 1)
-    {
-      std::vector<bool> animCheck(this->AvailAnimations, false);
-      for (int idx : this->PreparedAnimationIndices.value())
-      {
-        if (idx < this->AvailAnimations)
-        {
-          animCheck[idx] = true;
-        }
-      }
-      return std::ranges::none_of(animCheck, std::logical_not<>()) ? "All animations"
-                                                                   : "Multi animations";
-    }
+    // The loaded animation changed: refresh the progress bar's time range and name
+    this->PushAnimationProgress();
 
-    if (this->AvailAnimations == 0 || !this->PreparedAnimationIndices.has_value() ||
-      this->PreparedAnimationIndices.value().empty() ||
-      this->PreparedAnimationIndices.value()[0] >= this->AvailAnimations)
-    {
-      return "No animation";
-    }
-
-    return this->Importer->GetAnimationName(this->PreparedAnimationIndices.value()[0]);
+    vtkRenderWindow* renWin = this->Window.GetRenderWindow();
+    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    ren->SetCheatSheetConfigured(false);
   }
-
-  if (this->AvailAnimations == 0 || index < 0 || index > this->AvailAnimations)
-  {
-    return "No animation";
-  }
-
-  return this->Importer->GetAnimationName(index);
-}
-
-// ---------------------------------------------------------------------------------
-std::vector<std::string> animation_impl::GetAnimationNames()
-{
-  assert(this->Importer);
-
-  if (this->AvailAnimations == 0)
-  {
-    return {};
-  }
-
-  std::vector<std::string> animations(this->AvailAnimations);
-
-  for (int index = 0; index < this->AvailAnimations; index++)
-  {
-    animations[index] = this->Importer->GetAnimationName(index);
-  }
-
-  return animations;
 }
 
 //----------------------------------------------------------------------------
@@ -504,7 +510,7 @@ void animation_impl::PushAnimationProgress()
   else
   {
     this->Window.GetRenderer()->SetAnimationProgress(
-      this->GetTimeRange(), this->GetAnimationName(), this->GetKeyFrames());
+      this->timeRange(), this->getName(), this->keyFrames());
   }
 }
 
@@ -610,7 +616,7 @@ void animation_impl::PrepareForAnimationIndices()
   }
 
   // Display currently selected animation
-  log::debug("Current animation is: ", this->GetAnimationName());
+  log::debug("Current animation is: ", this->getName());
 
   // Recover time ranges for all enabled animations
   bool foundAnimation = false;
@@ -665,39 +671,6 @@ void animation_impl::PrepareForAnimationIndices()
   }
 
   log::debug("");
-}
-
-//----------------------------------------------------------------------------
-std::pair<double, double> animation_impl::GetTimeRange()
-{
-  // Make sure TimeRange is updated
-  this->PrepareForAnimationIndices();
-
-  // Return updated data
-  return std::make_pair(this->TimeRange[0], this->TimeRange[1]);
-}
-
-//----------------------------------------------------------------------------
-std::vector<double> animation_impl::GetKeyFrames()
-{
-  this->PrepareForAnimationIndices();
-
-  std::vector<double> keyFrames;
-  keyFrames.reserve(this->AnimationTimeSteps->GetNumberOfTuples());
-
-  for (vtkIdType i = 0; i < this->AnimationTimeSteps->GetNumberOfTuples(); ++i)
-  {
-    keyFrames.push_back(this->AnimationTimeSteps->GetValue(i));
-  }
-
-  return keyFrames;
-}
-
-//----------------------------------------------------------------------------
-unsigned int animation_impl::GetNumberOfAvailableAnimations() const
-{
-  assert(this->AvailAnimations >= 0);
-  return static_cast<unsigned int>(this->AvailAnimations);
 }
 
 //----------------------------------------------------------------------------

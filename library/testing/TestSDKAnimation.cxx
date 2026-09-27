@@ -16,19 +16,19 @@ int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
   f3d::animation& anim = sce.getAnimation();
   f3d::interactor& inter = eng.getInteractor();
 
-  test("availableAnimations for empty scene", anim.availableAnimations() == 0);
+  test("availableAnimations for empty scene", anim.count() == 0);
 
-  test("getAnimationName returns for empty scene", anim.getAnimationName(), "No animation"s);
+  test("getAnimationName returns for empty scene", anim.getName(), "No animation"s);
 
-  test("getAnimationNames returns 0 len vec for empty scene", anim.getAnimationNames().size() == 0);
+  test("getAnimationNames returns 0 len vec for empty scene", anim.getNames().size() == 0);
 
   sce.add(std::string(argv[1]) + "/data/soldier_animations.mdl");
 
-  test("availableAnimations", anim.availableAnimations() == 10);
+  test("availableAnimations", anim.count() == 10);
 
-  anim.loadAnimationTime(0.5);
+  anim.loadTime(0.5);
   test("recover animationTimeRange",
-    anim.animationTimeRange() == std::make_pair(0.0, 0.7999999999999999));
+    anim.timeRange() == std::make_pair(0.0, 0.7999999999999999));
 
   inter.startAnimation();
   test("isPlaying after start", inter.isPlayingAnimation());
@@ -49,17 +49,17 @@ int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
   inter.stopAnimation();
   test("isPlaying after stop", !inter.isPlayingAnimation());
 
-  test("getAnimationName returns name at index", anim.getAnimationName(0), "stand"s);
+  test("getAnimationName returns name at index", anim.getName(0), "stand"s);
 
-  test("getAnimationName returns for out of range", anim.getAnimationName(9999), "No animation"s);
+  test("getAnimationName returns for out of range", anim.getName(9999), "No animation"s);
 
-  test("getAnimationName returns current name", anim.getAnimationName(), "stand"s);
+  test("getAnimationName returns current name", anim.getName(), "stand"s);
 
-  test("getAnimationNames returns names", anim.getAnimationNames(),
+  test("getAnimationNames returns names", anim.getNames(),
     std::vector<std::string>{
       "stand", "dead", "dead_right", "reload", "hit", "down", "stumble", "run", "shoot", "walk" });
 
-  auto keyframes = anim.getAnimationKeyFrames();
+  auto keyframes = anim.keyFrames();
   test("check keyframes size", static_cast<int>(keyframes.size()), 9);
   test("check first keyframes", keyframes[0], 0.0);
   test("check last keyframes", keyframes[8], 0.7999999999999999);

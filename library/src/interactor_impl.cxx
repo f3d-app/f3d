@@ -1587,7 +1587,7 @@ interactor& interactor_impl::initBindings()
 
   // "Cycle animation" , "animationName"
   auto docAnim = [&]()
-  { return std::pair("Animation", this->Internals->Anim.GetAnimationName()); };
+  { return std::pair("Animation", this->Internals->Anim.getName()); };
 
   // "Cycle point/cell data coloring" , "POINT/CELL"
   auto docField = [&]()
