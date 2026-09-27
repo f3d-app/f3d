@@ -272,7 +272,7 @@ public:
     // Set the camera index domain
     this->Options.domains.scene.camera.index.max = this->MetaImporter->GetNumberOfCameras();
 
-    scene_impl::internals::DisplayAllInfo(this->MetaImporter, this->Window);
+    scene_impl::DisplayAllInfo(this->MetaImporter, this->Window);
   }
 
   static void DisplayImporterDescription(log::VerboseLevel level, vtkImporter* importer)
@@ -292,19 +292,6 @@ public:
     }
     log::print(level, "");
     log::print(level, importer->GetOutputsDescription(), "\n");
-  }
-
-  static void DisplayAllInfo(vtkImporter* importer, window_impl& window)
-  {
-    // Display output description
-    scene_impl::internals::DisplayImporterDescription(log::VerboseLevel::DEBUG, importer);
-
-    // Display coloring information
-    window.PrintColoringDescription(log::VerboseLevel::DEBUG);
-    log::debug("");
-
-    // Print scene description
-    window.PrintSceneDescription(log::VerboseLevel::DEBUG);
   }
 
   std::unique_ptr<detail::animation_impl> Animation;
@@ -1056,8 +1043,23 @@ void scene_impl::SetInteractor(interactor_impl* interactor)
   this->Internals->Animation->SetInteractor(interactor);
 }
 
+//----------------------------------------------------------------------------
 void scene_impl::PrintImporterDescription(log::VerboseLevel level)
 {
   scene_impl::internals::DisplayImporterDescription(level, this->Internals->MetaImporter);
+}
+
+//----------------------------------------------------------------------------
+void scene_impl::DisplayAllInfo(vtkImporter* importer, window_impl& window)
+{
+  // Display output description
+  scene_impl::internals::DisplayImporterDescription(log::VerboseLevel::DEBUG, importer);
+
+  // Display coloring information
+  window.PrintColoringDescription(log::VerboseLevel::DEBUG);
+  log::debug("");
+
+  // Print scene description
+  window.PrintSceneDescription(log::VerboseLevel::DEBUG);
 }
 }

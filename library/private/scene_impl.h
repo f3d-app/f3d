@@ -14,6 +14,8 @@
 
 #include <memory>
 
+class vtkImporter;
+
 namespace f3d
 {
 class options;
@@ -70,6 +72,12 @@ public:
    * Display available cameras in the log
    */
   void PrintImporterDescription(log::VerboseLevel level);
+
+  /**
+   * Display output description, coloring information and scene description
+   * from provider importer and window.
+   */
+  static void DisplayAllInfo(vtkImporter* importer, window_impl& window);
 
 private:
   class internals;

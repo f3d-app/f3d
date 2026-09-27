@@ -4,6 +4,7 @@
 #include "log.h"
 #include "macros.h"
 #include "options.h"
+#include "scene_impl.h"
 #include "window_impl.h"
 
 #include "F3DStyle.h"
@@ -35,10 +36,10 @@ animation_impl::~animation_impl() = default;
 //----------------------------------------------------------------------------
 animation& animation_impl::loadTime(double timeValue)
 {
+  assert(this->Importer);
   if (this->LoadAtTime(timeValue))
   {
-    //TODO
-    //scene_impl::internals::DisplayAllInfo(this->Internals->MetaImporter, this->Internals->Window);
+    scene_impl::DisplayAllInfo(this->Importer, this->Window);
   }
   return *this;
 }
