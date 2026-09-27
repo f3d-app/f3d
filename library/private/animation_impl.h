@@ -35,6 +35,12 @@ public:
    */
   animation_impl(options& options, window_impl& window);
   ~animation_impl() override;
+  animation& loadAnimationTime(double timeValue) override;
+  std::pair<double, double> animationTimeRange() override;
+  std::vector<double> getAnimationKeyFrames() override;
+  unsigned int availableAnimations() const override;
+  std::string getAnimationName(int index = -1) override;
+  std::vector<std::string> getAnimationNames() override;
   ///@}
 
   /**

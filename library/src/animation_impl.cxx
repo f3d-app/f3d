@@ -33,6 +33,45 @@ animation_impl::animation_impl(options& options, window_impl& window)
 animation_impl::~animation_impl() = default;
 
 //----------------------------------------------------------------------------
+animation& animation_impl::loadAnimationTime(double timeValue)
+{
+  this->LoadAtTime(timeValue);
+  //TODO
+  //scene_impl::internals::DisplayAllInfo(this->Internals->MetaImporter, this->Internals->Window);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+std::pair<double, double> animation_impl::animationTimeRange()
+{
+  return this->GetTimeRange();
+}
+
+//----------------------------------------------------------------------------
+std::vector<double> animation_impl::getAnimationKeyFrames()
+{
+  return this->GetKeyFrames();
+}
+
+//----------------------------------------------------------------------------
+unsigned int animation_impl::availableAnimations() const
+{
+  return this->GetNumberOfAvailableAnimations();
+}
+
+//----------------------------------------------------------------------------
+std::string animation_impl::getAnimationName(int index)
+{
+  return this->GetAnimationName(index);
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> animation_impl::getAnimationNames()
+{
+  return this->GetAnimationNames();
+}
+
+//----------------------------------------------------------------------------
 void animation_impl::SetImporter(vtkF3DMetaImporter* importer)
 {
   this->Importer = importer;
