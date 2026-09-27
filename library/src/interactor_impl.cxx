@@ -1662,7 +1662,7 @@ interactor& interactor_impl::initBindings()
   };
 
   // clang-format off
-  this->addBinding({mod_t::NONE, "W"}, "cycle_animation", "Scene", docAnim, f3d::interactor::BindingType::CYCLIC);
+  this->addBinding({ .Bind = {mod_t::NONE, "W"}, .Command = "cycle_animation", .Group = "Scene", .DocCallback = docAnim, .type = f3d::interactor::BindingType::CYCLIC});
   this->addBinding({mod_t::NONE, "C"}, "cycle_coloring field", "Scene", docField, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "S"}, "cycle_coloring array", "Scene", docArray, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "Y"}, "cycle_coloring component", "Scene", docComp, f3d::interactor::BindingType::CYCLIC);
@@ -1728,22 +1728,20 @@ interactor& interactor_impl::initBindings()
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
-  std::vector<std::string> commands, std::string group,
-  documentation_callback_t documentationCallback, BindingType type, bool notify, bool repeat)
+interactor& interactor_impl::addBinding(BindingParam binding)
 {
   const auto [it, success] = this->Internals->Bindings.insert(
-    { bind, { std::move(commands), std::move(documentationCallback), type, notify, repeat } });
+    { binding.Bind, { .CommandVector = std::move(binding.Commands), .DocumentationCallback = std::move(binding.DocCallback), .Type = binding.Type, .Notify = binding.Notify, .Repeat = binding.Repeat } });
   if (!success)
   {
     throw interactor::already_exists_exception(
-      "Could not add interaction commands for interaction: " + bind.format() +
+      "Could not add interaction commands for interaction: " + binding.Bind.format() +
       " as it already exists.");
   }
   else
   {
     // Add the bind to the group
-    auto groupIt = this->Internals->GroupedBinds.emplace(std::move(group), bind);
+    auto groupIt = this->Internals->GroupedBinds.emplace(std::move(binding.Group), binding.Bind);
     if (this->Internals->GroupedBinds.count(groupIt->first) == 1)
     {
       // Add the group in order if first addition
@@ -1751,15 +1749,6 @@ interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
     }
   }
   return *this;
-}
-
-//----------------------------------------------------------------------------
-interactor& interactor_impl::addBinding(const interaction_bind_t& bind, std::string command,
-  std::string group, documentation_callback_t documentationCallback, BindingType type, bool notify,
-  bool repeat)
-{
-  return this->addBinding(bind, std::vector<std::string>{ std::move(command) }, std::move(group),
-    std::move(documentationCallback), type, notify, repeat);
 }
 
 //----------------------------------------------------------------------------
