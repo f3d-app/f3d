@@ -16,18 +16,18 @@ int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
   f3d::animation& anim = sce.getAnimation();
   f3d::interactor& inter = eng.getInteractor();
 
-  test("availableAnimations for empty scene", anim.count() == 0);
+  test("animations count for empty scene", anim.count() == 0);
 
-  test("getAnimationName returns for empty scene", anim.getName(), "No animation"s);
+  test("getName returns for empty scene", anim.getName(), "No animation"s);
 
-  test("getAnimationNames returns 0 len vec for empty scene", anim.getNames().size() == 0);
+  test("getNames returns 0 len vec for empty scene", anim.getNames().size() == 0);
 
   sce.add(std::string(argv[1]) + "/data/soldier_animations.mdl");
 
-  test("availableAnimations", anim.count() == 10);
+  test("animations count", anim.count() == 10);
 
   anim.loadTime(0.5);
-  test("recover animationTimeRange",
+  test("recover timeRange",
     anim.timeRange() == std::make_pair(0.0, 0.7999999999999999));
 
   inter.startAnimation();
@@ -49,13 +49,13 @@ int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
   inter.stopAnimation();
   test("isPlaying after stop", !inter.isPlayingAnimation());
 
-  test("getAnimationName returns name at index", anim.getName(0), "stand"s);
+  test("getName returns name at index", anim.getName(0), "stand"s);
 
-  test("getAnimationName returns for out of range", anim.getName(9999), "No animation"s);
+  test("getName returns for out of range", anim.getName(9999), "No animation"s);
 
-  test("getAnimationName returns current name", anim.getName(), "stand"s);
+  test("getName returns current name", anim.getName(), "stand"s);
 
-  test("getAnimationNames returns names", anim.getNames(),
+  test("getNames returns names", anim.getNames(),
     std::vector<std::string>{
       "stand", "dead", "dead_right", "reload", "hit", "down", "stumble", "run", "shoot", "walk" });
 

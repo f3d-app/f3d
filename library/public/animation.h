@@ -46,7 +46,7 @@ public:
   /**
    * Return the animation name of a given animation index, if any.
    *
-   * Specific animation (0..availableAnimations): Returns the name of the animation at that index
+   * Specific animation (0..count): Returns the name of the animation at that index
    * Current animation (-1):
    *   - Returns the name of the current animation
    *   - Returns "Multi animations" if more than one animation is current
