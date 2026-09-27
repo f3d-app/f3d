@@ -46,7 +46,26 @@ vtkSmartPointer<vtkPolyData> ToPolyData(
   vtkNew<vtkCellArray> triangles;
   vtkNew<vtkCellArray> lines;
 
-  vtkIdType shift = 0;
+  vtkIdType totalNodes = 0;
+  vtkIdType totalLines = 0;
+  vtkIdType totalLineConnectivitySize = 0;
+  vtkIdType totalTriangles = 0;
+
+  struct ValidEdgeData
+  {
+    TopoDS_Edge Edge;
+    Handle(Poly_Polygon3D) Poly;
+    TopLoc_Location Location;
+  };
+  std::vector<ValidEdgeData> validEdges;
+
+  struct ValidFaceData
+  {
+    TopoDS_Face Face;
+    Handle(Poly_Triangulation) Poly;
+    TopLoc_Location Location;
+  };
+  std::vector<ValidFaceData> validFaces;
 
   /* Mesh the whole shape. This only affect faces, edges have to be handled separately. */
   BRepMesh_IncrementalMesh(
@@ -83,29 +102,10 @@ vtkSmartPointer<vtkPolyData> ToPolyData(
       }
 
       const int nbV = poly->NbNodes();
-      const NCollection_Array1<gp_Pnt>& nodes = poly->Nodes();
-      for (int i = 1; i <= nbV; i++)
-      {
-        const gp_Pnt pt = nodes(i).Transformed(location);
-        points->InsertNextPoint(pt.X(), pt.Y(), pt.Z());
-
-        /* normals and uvs make no sense for lines */
-        const float fn[3] = { 0.0, 0.0, 1.0 };
-        normals->InsertNextTypedTuple(fn);
-        uvs->InsertNextTypedTuple(fn);
-      }
-
-      std::vector<vtkIdType> polyline(nbV);
-      std::iota(polyline.begin(), polyline.end(), shift);
-      lines->InsertNextCell(static_cast<vtkIdType>(polyline.size()), polyline.data());
-
-      if (hasColors)
-      {
-        const Color rgba = colors.Edge ? colors.Edge(edge) : Color{ 0, 0, 0, 255 };
-        cellColors->InsertNextTypedTuple(rgba.data());
-      }
-
-      shift += nbV;
+      totalNodes += nbV;
+      totalLines++;
+      totalLineConnectivitySize += nbV;
+      validEdges.push_back({ edge, poly, location });
     }
   }
 
@@ -122,6 +122,64 @@ vtkSmartPointer<vtkPolyData> ToPolyData(
       continue;
       // LCOV_EXCL_STOP
     }
+
+    const int nbV = poly->NbNodes();
+    const int nbT = poly->NbTriangles();
+    totalNodes += nbV;
+    totalTriangles += nbT;
+    validFaces.push_back({ face, poly, location });
+  }
+
+  points->Allocate(totalNodes);
+  normals->Allocate(totalNodes * 3);
+  uvs->Allocate(totalNodes * 2);
+  if (hasColors)
+  {
+    cellColors->Allocate((totalLines + totalTriangles) * 4);
+  }
+
+  lines->AllocateExact(totalLines, totalLineConnectivitySize);
+  triangles->AllocateExact(totalTriangles, totalTriangles * 3);
+
+  vtkIdType shift = 0;
+
+  for (const auto& validEdge : validEdges)
+  {
+    const TopoDS_Edge& edge = validEdge.Edge;
+    const auto& poly = validEdge.Poly;
+    const TopLoc_Location& location = validEdge.Location;
+
+    const int nbV = poly->NbNodes();
+    const NCollection_Array1<gp_Pnt>& nodes = poly->Nodes();
+    for (int i = 1; i <= nbV; i++)
+    {
+      const gp_Pnt pt = nodes(i).Transformed(location);
+      points->InsertNextPoint(pt.X(), pt.Y(), pt.Z());
+
+      /* normals and uvs make no sense for lines */
+      const float fn[3] = { 0.0, 0.0, 1.0 };
+      normals->InsertNextTypedTuple(fn);
+      uvs->InsertNextTypedTuple(fn);
+    }
+
+    std::vector<vtkIdType> polyline(nbV);
+    std::iota(polyline.begin(), polyline.end(), shift);
+    lines->InsertNextCell(static_cast<vtkIdType>(polyline.size()), polyline.data());
+
+    if (hasColors)
+    {
+      const Color rgba = colors.Edge ? colors.Edge(edge) : Color{ 0, 0, 0, 255 };
+      cellColors->InsertNextTypedTuple(rgba.data());
+    }
+
+    shift += nbV;
+  }
+
+  for (const auto& validFace : validFaces)
+  {
+    const TopoDS_Face& face = validFace.Face;
+    const auto& poly = validFace.Poly;
+    const TopLoc_Location& location = validFace.Location;
 
     Poly::ComputeNormals(poly);
     const TopAbs_Orientation faceOrientation = face.Orientation();
