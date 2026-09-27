@@ -144,7 +144,7 @@ int vtkF3DLYSReader::RequestData(
   // Parse the 12-byte mesh header:
   //   bytes  0-3: indexCount  (uint32 LE) - number of uint32 indices
   // bytes 4-7: coordCount (uint32 LE) - number of float32 values (nVertices * 3)
-  //   bytes 8-11: reserved    (uint32 LE) - padding/flags, ignored
+  // bytes 8-11: reserved (uint32 LE) - padding/flags, ignored
   // The index buffer follows immediately at byte 12.
   // The vertex buffer follows the index buffer.
   if (geomSize < sizeof(MeshHeader))
