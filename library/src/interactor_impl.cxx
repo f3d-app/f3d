@@ -497,7 +497,7 @@ public:
       // invalidating any references/iterators into it.
       const BindingCommands binding = commandsIt->second;
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20260828) || defined(_WIN32)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20260828)
       const bool shouldTriggerBinding = binding.Repeat || rwi->GetRepeatCount() == 0;
 #else
       // Old VTK versions on non-Windows platforms hard coded the repeat count to 1
