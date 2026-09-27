@@ -90,6 +90,8 @@ int TestF3DOCCTReaderStreamError(int vtkNotUsed(argc), char* argv[])
   // https://dev.opencascade.org/content/reading-iges-stream-seems-broken-770
   ret &= testReaderStreamError(data + "/f3d.igs", vtkF3DOCCTReader::FILE_FORMAT::IGES);
   ret &= testReaderStreamError(data + "/invalid.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP);
+  ret &=
+    testReaderStreamError(data + "/non_existent.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP, false);
 #if F3D_PLUGIN_OCCT_TEST_STREAM_THROW
   // OCCT >= 7.9 loops forever on this infinite line range if stream errors are not caught
   ret &= testReaderStreamError(data + "/infinite_line.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP);
