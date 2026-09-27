@@ -130,18 +130,19 @@ vtkSmartPointer<vtkPolyData> ToPolyData(
     validFaces.push_back({ face, poly, location });
   }
 
-  points->Reserve(totalNodes);
-  normals->ReserveValues(totalNodes * 3);
-  uvs->ReserveValues(totalNodes * 2);
+  points->SetNumberOfPoints(totalNodes);
+  normals->SetNumberOfTuples(totalNodes);
+  uvs->SetNumberOfTuples(totalNodes);
   if (hasColors)
   {
-    cellColors->ReserveValues((totalLines + totalTriangles) * 4);
+    cellColors->SetNumberOfTuples(totalLines + totalTriangles);
   }
 
   lines->AllocateExact(totalLines, totalLineConnectivitySize);
   triangles->AllocateExact(totalTriangles, totalTriangles * 3);
 
   vtkIdType shift = 0;
+  vtkIdType colorIndex = 0;
 
   for (const auto& validEdge : validEdges)
   {
@@ -154,12 +155,12 @@ vtkSmartPointer<vtkPolyData> ToPolyData(
     for (int i = 1; i <= nbV; i++)
     {
       const gp_Pnt pt = nodes(i).Transformed(location);
-      points->InsertNextPoint(pt.X(), pt.Y(), pt.Z());
+      points->SetPoint(shift + i - 1, pt.X(), pt.Y(), pt.Z());
 
       /* normals and uvs make no sense for lines */
       const float fn[3] = { 0.0, 0.0, 1.0 };
-      normals->InsertNextTypedTuple(fn);
-      uvs->InsertNextTypedTuple(fn);
+      normals->SetTypedTuple(shift + i - 1, fn);
+      uvs->SetTypedTuple(shift + i - 1, fn);
     }
 
     std::vector<vtkIdType> polyline(nbV);
@@ -169,7 +170,7 @@ vtkSmartPointer<vtkPolyData> ToPolyData(
     if (hasColors)
     {
       const Color rgba = colors.Edge ? colors.Edge(edge) : Color{ 0, 0, 0, 255 };
-      cellColors->InsertNextTypedTuple(rgba.data());
+      cellColors->SetTypedTuple(colorIndex++, rgba.data());
     }
 
     shift += nbV;
@@ -196,7 +197,7 @@ vtkSmartPointer<vtkPolyData> ToPolyData(
     for (int i = 1; i <= nbV; i++)
     {
       const gp_Pnt pt = poly->Node(i).Transformed(location);
-      points->InsertNextPoint(pt.X(), pt.Y(), pt.Z());
+      points->SetPoint(shift + i - 1, pt.X(), pt.Y(), pt.Z());
     }
 
     for (int i = 1; i <= nbV; i++)
@@ -204,7 +205,7 @@ vtkSmartPointer<vtkPolyData> ToPolyData(
       const gp_Dir n = poly->Normal(i).Transformed(trsf);
       const float fn[3] = { normalSign * static_cast<float>(n.X()),
         normalSign * static_cast<float>(n.Y()), normalSign * static_cast<float>(n.Z()) };
-      normals->InsertNextTypedTuple(fn);
+      normals->SetTypedTuple(shift + i - 1, fn);
     }
 
     if (poly->HasUVNodes())
@@ -213,7 +214,7 @@ vtkSmartPointer<vtkPolyData> ToPolyData(
       {
         const gp_Pnt2d uv = poly->UVNode(i);
         const float fuv[2] = { static_cast<float>(uv.X()), static_cast<float>(uv.Y()) };
-        uvs->InsertNextTypedTuple(fuv);
+        uvs->SetTypedTuple(shift + i - 1, fuv);
       }
     }
     else
@@ -223,7 +224,7 @@ vtkSmartPointer<vtkPolyData> ToPolyData(
       const float fuv[2] = { 0.f, 0.f };
       for (int i = 1; i <= nbV; i++)
       {
-        uvs->InsertNextTypedTuple(fuv);
+        uvs->SetTypedTuple(shift + i - 1, fuv);
       }
       // LCOV_EXCL_STOP
     }
@@ -241,7 +242,7 @@ vtkSmartPointer<vtkPolyData> ToPolyData(
       triangles->InsertNextCell(3, cell);
       if (hasColors)
       {
-        cellColors->InsertNextTypedTuple(rgba.data());
+        cellColors->SetTypedTuple(colorIndex++, rgba.data());
       }
     }
 
