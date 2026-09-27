@@ -241,10 +241,11 @@ int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
     }
   }
 
-  // 5. Missing geometry .bin entry (only scene.bin or non-.bin entries)
+  // 5. Missing geometry .bin entry (only scene.bin, non-.bin entries, or exact ".bin" without
+  // prefix)
   {
     const auto data = BuildLysData(
-      R"({"mangoFiles": {"scene.bin": {"offset": "0", "size": 0}, "other.txt": {"offset": "0", "size": 0}}})");
+      R"({"mangoFiles": {".bin": {"offset": "0", "size": 0}, "scene.bin": {"offset": "0", "size": 0}, "other.txt": {"offset": "0", "size": 0}}})");
     if (!TestReaderUpdateFails(data))
     {
       std::cerr << "Unexpected success on missing geometry bin\n";
@@ -373,6 +374,20 @@ int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
     }
   }
   {
+    // jsonLen < 2 with jsonBlockSize >= 2
+    ContainerHeader header;
+    header.version = 4;
+    header.jsonBlockSize = 10;
+    header.jsonLen = 1;
+    vtkNew<vtkMemoryResourceStream> stream;
+    stream->SetBuffer(&header, sizeof(header), true);
+    if (vtkF3DLYSReader::CanReadFile(stream))
+    {
+      std::cerr << "Unexpected CanReadFile success with jsonLen < 2\n";
+      return EXIT_FAILURE;
+    }
+  }
+  {
     // Invalid JSON in CanReadFile
     const auto data = BuildLysData("not json");
     vtkNew<vtkMemoryResourceStream> stream;
@@ -380,6 +395,17 @@ int TestF3DLYSReader(int vtkNotUsed(argc), char* argv[])
     if (vtkF3DLYSReader::CanReadFile(stream))
     {
       std::cerr << "Unexpected CanReadFile success with bad JSON\n";
+      return EXIT_FAILURE;
+    }
+  }
+  {
+    // Valid JSON but missing "mangoFiles" key in CanReadFile
+    const auto data = BuildLysData(R"({"version": 1})");
+    vtkNew<vtkMemoryResourceStream> stream;
+    stream->SetBuffer(data.data(), data.size(), true);
+    if (vtkF3DLYSReader::CanReadFile(stream))
+    {
+      std::cerr << "Unexpected CanReadFile success with valid JSON missing mangoFiles\n";
       return EXIT_FAILURE;
     }
   }

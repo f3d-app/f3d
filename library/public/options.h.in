@@ -98,7 +98,7 @@ public:
    * Default/Copy/move constructors/operators.
    */
   options();
-  ~options();
+  ~options() = default;
   options(const options& opt);
   options& operator=(const options& opt);
   options(options&& other) noexcept;
