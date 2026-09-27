@@ -130,12 +130,12 @@ vtkSmartPointer<vtkPolyData> ToPolyData(
     validFaces.push_back({ face, poly, location });
   }
 
-  points->Allocate(totalNodes);
-  normals->Allocate(totalNodes * 3);
-  uvs->Allocate(totalNodes * 2);
+  points->Reserve(totalNodes);
+  normals->ReserveValues(totalNodes * 3);
+  uvs->ReserveValues(totalNodes * 2);
   if (hasColors)
   {
-    cellColors->Allocate((totalLines + totalTriangles) * 4);
+    cellColors->ReserveValues((totalLines + totalTriangles) * 4);
   }
 
   lines->AllocateExact(totalLines, totalLineConnectivitySize);
