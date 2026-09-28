@@ -65,8 +65,6 @@ public:
 
   void WritePngMetadata(vtkPNGWriter* pngWriter)
   {
-    // cppcheck-suppress unassignedVariable
-    // (false positive, fixed in cppcheck 2.8)
     for (const auto& [key, value] : this->Metadata)
     {
       if (!value.empty())
