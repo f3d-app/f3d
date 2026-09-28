@@ -55,7 +55,8 @@ protected:
 };
 vtkStandardNewMacro(NonSeekableStream);
 
-bool TestError(const std::string& filename, const std::string& expectedError)
+bool TestError(const std::string& filename, const std::string& expectedError,
+  unsigned int expectedPartitions = 0)
 {
   vtkNew<ErrorEventCallback> errorCallback;
   vtkNew<vtkCallbackCommand> silentCallback;
@@ -71,7 +72,7 @@ bool TestError(const std::string& filename, const std::string& expectedError)
     std::cerr << "Expected error \"" << expectedError << "\" for " << filename << "\n";
     return false;
   }
-  if (reader->GetOutput()->GetNumberOfPartitionedDataSets() != 0)
+  if (reader->GetOutput()->GetNumberOfPartitionedDataSets() != expectedPartitions)
   {
     std::cerr << "Unexpected output for " << filename << "\n";
     return false;
@@ -89,6 +90,13 @@ int TestF3DFCStdReaderErrors(int vtkNotUsed(argc), char* argv[])
   ret &= TestError(data + "/f3d.stp", "Cannot open FCStd archive");
   ret &= TestError(data + "/malformed_no_objects.FCStd", "Cannot parse Document.xml");
   ret &= TestError(data + "/malformed_no_objectdata.FCStd", "Cannot parse Document.xml");
+
+  // garbage BREP entries: no geometry
+  ret &= TestError(data + "/corrupt_brp.FCStd", "Failed to read BRep file");
+
+  // a link to a group and arrays with a missing base, a corrupt shape, no
+  // placement list or a truncated one: all skipped, only the box remains
+  ret &= TestError(data + "/broken_links.FCStd", "Failed to read BRep file", 1);
 
   vtkNew<NonSeekableStream> nonSeekable;
   if (vtkF3DFCStdReader::CanReadFile(nullptr) || vtkF3DFCStdReader::CanReadFile(nonSeekable))

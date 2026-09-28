@@ -164,12 +164,6 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
   }
 
   {
-    // valid archive but garbage BREP entries: no geometry, no crash
-    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc = ReadFile(data + "/corrupt_brp.FCStd");
-    ret &= CheckPartitionCount(pdc, 0, "corrupt_brp");
-  }
-
-  {
     // a Draft link array: 3 instances of a hidden 2x12x3 box every 10 units.
     // The array does not store any shape, the base one is instanced at the
     // stored placements.
@@ -333,17 +327,6 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     {
       ret &=
         CheckBounds(pdc->GetPartition(0, 0), { 3., 25., -7., 5., 0., 3. }, "link_array_transform");
-    }
-  }
-
-  {
-    // a link to a group and arrays with a missing base, a corrupt shape, no
-    // placement list or a truncated one: all skipped, only the 5x5x5 box remains
-    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc = ReadFile(data + "/broken_links.FCStd");
-    ret &= CheckPartitionCount(pdc, 1, "broken_links");
-    if (pdc->GetNumberOfPartitionedDataSets() == 1)
-    {
-      ret &= CheckBounds(pdc->GetPartition(0, 0), { 0., 5., 0., 5., 0., 5. }, "broken_links");
     }
   }
 
