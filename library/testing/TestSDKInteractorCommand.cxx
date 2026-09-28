@@ -61,11 +61,11 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, char* argv[])
 
   // triggerCommand error codepaths
   test("triggerCommand toggle incompatible",
-    inter.triggerCommand("toggle scene.animation.index") == false);
+    inter.triggerCommand("toggle scene.animation.indices") == false);
   test("triggerCommand reset inexistent", inter.triggerCommand("reset inexistent") == false);
   test("triggerCommand print not set", inter.triggerCommand("print render.hdri.file") == false);
   test("triggerCommand set unparsable",
-    inter.triggerCommand("set scene.animation.index invalid") == false);
+    inter.triggerCommand("set scene.animation.indices invalid") == false);
 
   // Add/Remove command
   inter.addCommand(

@@ -997,7 +997,7 @@ interactor& interactor_impl::initCommands()
     "cycle_animation",
     [&](const std::vector<std::string>&) { this->Internals->AnimationManager->CycleAnimation(); },
     command_documentation_t{
-      "cycle_animation", "cycle scene.animation.index option using model information" });
+      "cycle_animation", "cycle scene.animation.indices option using model information" });
 
   std::vector<std::string> cycleColoringValidArgs = { "field", "array", "component" };
   this->addCommand(

@@ -137,10 +137,7 @@ public:
     std::string InteractionTestPlayFile;
     std::string CommandScriptFile;
     std::string AntiAliasing;
-    std::string AntiAliasingMode; // Deprecated
     std::string PointSprites;
-    std::string PointSpritesType; // Deprecated
-    bool TranslucencySupport;     // Deprecated
     std::string Blending;
   };
 
@@ -860,12 +857,6 @@ public:
                   loggingMap[key] = std::tuple(key, source, matchType, match, value);
                 }
                 continue;
-              }
-
-              // Handle CLI options deprecation simple warnings
-              if (key == "animation-index")
-              {
-                f3d::log::warn("animation-index is deprecated, please use animation-indices");
               }
 
               // Convert key into a libf3d option name if possible

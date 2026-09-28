@@ -2,8 +2,6 @@
 
 F3D provides access to commands through [interactive console](#interactive-console), [command script](#command-script---command-script) and [bindings configuration](06-CONFIGURATION_FILE.md#bindings).
 Commands let you trigger specific behavior that may not be available otherwise.
-Please note commands are currently experimental and the behaviors, actions may be added or removed without deprecation.
-Action names and arguments may also change without deprecation.
 
 Commands have the following syntax:
 
@@ -31,7 +29,7 @@ The libf3d provides a few commands, many related to manipulating libf3d (options
 
 `cycle option.name`: A command to cycle a libf3d option according to its enumeration domain, if it has one, eg: `cycle render.effect.blending.mode`.
 
-`cycle_animation`: A specific command to cycle `scene.animation.index` option using model information. No argument.
+`cycle_animation`: A specific command to cycle `scene.animation.indices` option using model information. No argument.
 
 `cycle_coloring field/array/component`: A specific command to manipulate scivis options using model information.
 Supports `field`, `array` or `component` arguments, see [documentation](04-INTERACTIONS.md#cycling-coloring).

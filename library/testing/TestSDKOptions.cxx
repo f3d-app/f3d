@@ -377,7 +377,7 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // Test getType
   test("getType bool", opt6.getType("render.grid.enable") == f3d::options::option_type::BOOL);
-  test("getType int", opt6.getType("scene.animation.index") == f3d::options::option_type::INT);
+  test("getType int", opt6.getType("model.scivis.component") == f3d::options::option_type::INT);
   test("getType double", opt6.getType("render.point_size") == f3d::options::option_type::DOUBLE);
   test("getType ratio",
     opt6.getType("scene.animation.speed_factor") == f3d::options::option_type::RATIO);

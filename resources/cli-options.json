@@ -322,11 +322,6 @@
           "implicitValue": "1"
         },
         {
-          "longName": "animation-index",
-          "helpText": "Select animation to show (deprecated)",
-          "valueHelper": "<index>"
-        },
-        {
           "longName": "animation-indices",
           "helpText": "Select animations to show",
           "valueHelper": "<index,index,index>"

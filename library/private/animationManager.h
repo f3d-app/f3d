@@ -75,7 +75,7 @@ public:
 
   /**
    * Cycle onto and play the next available animation
-   * This modifies the scene.animation.index option
+   * This modifies the scene.animation.indices option
    */
   void CycleAnimation();
 

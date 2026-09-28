@@ -76,10 +76,6 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   renderer->SetColormap({ 0, 0, 0 });
   renderer->UpdateActors();
 
-  // Smoke test for deprecated HDRI collapse codepath
-  // F3D_DEPRECATED
-  renderer->SetHDRIFile("path/not/valid/../../to/file.ext");
-
   // Check SetInteractionStyle without interactor (early return)
   renderer->SetInteractionStyle("default");
 

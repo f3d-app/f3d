@@ -269,7 +269,6 @@ endif()
 ## Animation
 f3d_test(NAME TestAnimationIndicesSingle DATA soldier_animations.mdl ARGS --animation-indices=7 --animation-time=0.5 --animation-progress UI)
 f3d_test(NAME TestAnimationIndicesMulti DATA InterpolationTest.glb ARGS --animation-indices=7,6 --animation-time=0.5 --animation-progress UI)
-f3d_test(NAME TestAnimationIndexDeprecated DATA InterpolationTest.glb ARGS --animation-index=7 --animation-time=0.5 --animation-progress UI)
 f3d_test(NAME TestMultiFileAnimationIndices DATA InterpolationTest.glb BoxAnimated.gltf ARGS --animation-indices=9 --animation-time=0.85 --animation-progress --multi-file-mode=all UI)
 f3d_test(NAME TestAnimationProgressBarWithScalarBar DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress=advanced --scalar-coloring --coloring-scalar-bar UI)
 f3d_test(NAME TestAnimationProgressBarSpeedFactor DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress=advanced --animation-speed-factor=1.5 RESOLUTION 400,300 UI)

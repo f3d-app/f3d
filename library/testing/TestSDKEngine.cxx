@@ -23,7 +23,6 @@ int TestSDKEngine([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   try { f3d::engine::loadPlugin("alembic", {argv[3]}); } catch (...) {}
   try { f3d::engine::loadPlugin("assimp", {argv[3]}); } catch (...) {}
   try { f3d::engine::loadPlugin("draco", {argv[3]}); } catch (...) {}
-  try { f3d::engine::loadPlugin("exodus", {argv[3]}); } catch (...) {} // F3D_DEPRECATED
   try { f3d::engine::loadPlugin("hdf", {argv[3]}); } catch (...) {}
   try { f3d::engine::loadPlugin("occt", {argv[3]}); } catch (...) {}
   try { f3d::engine::loadPlugin("usd", {argv[3]}); } catch (...) {}
