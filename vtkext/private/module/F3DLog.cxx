@@ -47,6 +47,21 @@ void F3DLog::Print(Severity sev, const std::string& str)
       break;
   }
 }
+//----------------------------------------------------------------------------
+void F3DLog::Progress(const std::string& str)
+{
+  if (F3DLog::VerboseLevel > F3DLog::Severity::Info)
+  {
+    return;
+  }
+
+  vtkOutputWindow* win = vtkOutputWindow::GetInstance();
+  vtkF3DConsoleOutputWindow* consoleWin = vtkF3DConsoleOutputWindow::SafeDownCast(win);
+  if (consoleWin)
+  {
+    consoleWin->DisplayProgress(str.c_str());
+  }
+}
 
 //----------------------------------------------------------------------------
 void F3DLog::SetUseColoring(bool use)
