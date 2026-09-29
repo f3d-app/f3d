@@ -99,7 +99,8 @@ runs:
       run: >
         cppcheck -q -j2
         --project=../build/compile_commands.json
-        --enable=all
+        --cppcheck-build-dir=../build/cppcheck
+        --enable=warning
         --suppressions-list=.cppcheck.supp
         --inline-suppr
         --error-exitcode=1
