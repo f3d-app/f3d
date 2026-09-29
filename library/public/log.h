@@ -146,7 +146,7 @@ protected:
   }
 
   template<typename T, typename... Args>
-  static void appendArg(std::stringstream& ss, T value, Args... args)
+  static void appendArg(std::stringstream& ss, const T& value, Args... args)
   {
     ss << value;
     log::appendArg(ss, args...);

@@ -486,7 +486,7 @@ public:
     dmon_watch_id, dmon_action, const char*, const char* filename, const char*, void* userData)
   {
     F3DStarter* self = reinterpret_cast<F3DStarter*>(userData);
-    const std::lock_guard<std::mutex> lock(self->Internals->FilesToWatchMutex);
+    const std::scoped_lock lock(self->Internals->FilesToWatchMutex);
     if (std::ranges::find_if(self->Internals->FilesToWatch, [&](const auto& path)
           { return path.filename() == filename; }) != self->Internals->FilesToWatch.end())
     {
@@ -530,7 +530,7 @@ public:
     if (toStdout)
     {
       const auto buffer = img.saveBuffer();
-      std::copy(buffer.begin(), buffer.end(), std::ostreambuf_iterator(std::cout));
+      std::ranges::copy(buffer, std::ostreambuf_iterator(std::cout));
       f3d::log::debug("Output image saved to stdout");
     }
     else
@@ -2213,7 +2213,7 @@ void F3DStarter::LoadFileGroupInternal(
 
 #if F3D_MODULE_DMON
   // In the main thread, we only need to guard writing
-  const std::lock_guard<std::mutex> lock(this->Internals->FilesToWatchMutex);
+  const std::scoped_lock lock(this->Internals->FilesToWatchMutex);
 #endif
 
   if (clear)
@@ -2245,7 +2245,7 @@ void F3DStarter::LoadFileGroupInternal(
     // loaded at startup stays below the command line so explicit launch options win.
     // Options must be updated before checking the supported files in order to load plugins
     std::vector<fs::path> configPaths = this->Internals->LoadedFiles;
-    std::copy(paths.begin(), paths.end(), std::back_inserter(configPaths));
+    std::ranges::copy(paths, std::back_inserter(configPaths));
     this->Internals->UpdateOptions(
       { this->Internals->CachedOptionsEntries, this->Internals->ConfigOptionsEntries,
         this->Internals->StatefileOptionsEntries, this->Internals->CLIOptionsEntries,
@@ -2406,8 +2406,8 @@ void F3DStarter::LoadFileGroupInternal(
           }
 
           // Update loaded files
-          std::copy(
-            localPaths.begin(), localPaths.end(), std::back_inserter(this->Internals->LoadedFiles));
+          std::ranges::copy(
+            localPaths, std::back_inserter(this->Internals->LoadedFiles));
         }
         catch (const f3d::scene::load_failure_exception& ex)
         {

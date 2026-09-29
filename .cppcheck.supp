@@ -1,35 +1,9 @@
 // remove some checks
 duplInheritedMember  // VTK design
-missingIncludeSystem // cppcheck seems confused about this
-missingInclude
-unusedFunction
 unknownMacro
 
 // external libraries
-*:external/clip/*.cpp
-*:external/clip/*.h
-*:external/cxxopts/cxxopts.hpp
-*:external/dmon/dmon.h
-*:external/imgui/*.cpp
-*:external/imgui/*.h
-*:external/miniz/miniz.c
-*:external/miniz/miniz.h
-*:external/nlohmann_json/nlohmann/json.hpp
-*:external/tinyfiledialogs/tinyfiledialogs.cxx
-*:external/tinyfiledialogs/tinyfiledialogs.h
-
-// generated files
-*:*libf3dSDKTests.cxx
-*:*vtkextAlembicTests.cxx
-*:*vtkextAssimpTests.cxx
-*:*vtkextDracoTests.cxx
-*:*vtkextNativeTests.cxx
-*:*vtkextOCCTTests.cxx
-*:*vtkextPrivateTests.cxx
-*:*vtkextTests.cxx
-*:*vtkextUSDTests.cxx
-*:*vtkextWebIFCTests.cxx
-*:*options_generated.h
+*:external/*
 
 // specific checks
 preprocessorErrorDirective:plugins/draco/module/vtkF3DDracoReader.cxx

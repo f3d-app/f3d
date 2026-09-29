@@ -458,7 +458,7 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
 
   auto TextEditCallbackStub = [](ImGuiInputTextCallbackData* data) -> int
   {
-    vtkF3DImguiConsole::Internals* internals = (vtkF3DImguiConsole::Internals*)data->UserData;
+    vtkF3DImguiConsole::Internals* internals = static_cast<vtkF3DImguiConsole::Internals*>(data->UserData);
     return internals->TextEditCallback(data);
   };
 

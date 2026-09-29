@@ -66,7 +66,7 @@ int TestF3DAlembicReaderStreamError(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  auto firstMessage = errorMessages.front();
+  const auto& firstMessage = errorMessages.front();
   if (firstMessage.find("Error reading stream") == std::string::npos)
   {
     std::cerr << "No stream error triggered!\n";

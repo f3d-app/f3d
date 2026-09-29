@@ -281,8 +281,8 @@ void vtkF3DInteractorStyle::DollyToPosition(double factor, int* position, vtkRen
   vtkF3DInteractorStyle::ComputeWorldToDisplay(
     renderer, viewFocus[0], viewFocus[1], viewFocus[2], viewFocus);
 
-  vtkF3DInteractorStyle::ComputeDisplayToWorld(
-    renderer, double(position[0]), double(position[1]), viewFocus[2], newFocalPoint);
+  vtkF3DInteractorStyle::ComputeDisplayToWorld(renderer, static_cast<double>(position[0]),
+    static_cast<double>(position[1]), viewFocus[2], newFocalPoint);
 
   cam->SetFocalPoint(newFocalPoint);
 

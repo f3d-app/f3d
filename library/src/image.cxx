@@ -49,7 +49,7 @@ public:
   std::unordered_map<std::string, std::string> Metadata;
 
   template<typename WriterType>
-  std::vector<unsigned char> SaveBuffer(vtkSmartPointer<WriterType> writer)
+  std::vector<unsigned char> SaveBuffer(const vtkSmartPointer<WriterType>& writer)
   {
     writer->WriteToMemoryOn();
     writer->SetInputData(this->Image);

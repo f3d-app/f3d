@@ -81,8 +81,7 @@ class vtkF3DAlembicReader::vtkInternals
       if (doReverseRotate)
       {
         std::ranges::reverse(thisFaceIndices);
-        std::rotate(thisFaceIndices.begin(), thisFaceIndices.begin() + thisFaceIndices.size() - 1,
-          thisFaceIndices.end());
+        std::ranges::rotate(thisFaceIndices, thisFaceIndices.end() - 1);
       }
 
       // Now update the mesh's indices
@@ -119,7 +118,7 @@ class vtkF3DAlembicReader::vtkInternals
 
     vtkIdType numCells = static_cast<vtkIdType>(data.Indices.size());
     vtkIdType totalConnectivitySize =
-      std::accumulate(data.Indices.begin(), data.Indices.end(), vtkIdType(0),
+      std::accumulate(data.Indices.begin(), data.Indices.end(), static_cast<vtkIdType>(0),
         [](vtkIdType sum, const auto& face) { return sum + static_cast<vtkIdType>(face.size()); });
 
     vtkNew<vtkIdTypeArray> offsets;

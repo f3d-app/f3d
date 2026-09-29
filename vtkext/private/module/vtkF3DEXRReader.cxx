@@ -102,7 +102,7 @@ void vtkF3DEXRReader::ExecuteInformation()
 
   auto checkChannels = [&](Imf::RgbaInputFile& file)
   {
-    Imath::Box2i dw = file.dataWindow();
+    const Imath::Box2i& dw = file.dataWindow();
     this->DataExtent[0] = dw.min.x;
     this->DataExtent[1] = dw.max.x;
     this->DataExtent[2] = dw.min.y;

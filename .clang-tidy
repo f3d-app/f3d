@@ -1,4 +1,4 @@
-Checks: '-*,performance-*,modernize-*,-modernize-use-trailing-return-type,-modernize-use-nodiscard,-modernize-avoid-c-arrays,-modernize-use-auto,-modernize-avoid-bind,-performance-no-int-to-ptr,-modernize-use-emplace'
+Checks: '-*,performance-*,modernize-*,-modernize-use-trailing-return-type,-modernize-use-nodiscard,-modernize-avoid-c-arrays,-modernize-use-auto,-modernize-avoid-bind,-performance-no-int-to-ptr,-modernize-use-emplace,-modernize-use-integer-sign-comparison,-modernize-use-designated-initializers,-modernize-use-equals-delete'
 WarningsAsErrors: '*'
 UseColor: true
 FormatStyle: none

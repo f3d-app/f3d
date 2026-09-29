@@ -71,7 +71,7 @@ bool testReaderStreamError(
     return false;
   }
 
-  auto firstMessage = errorMessages.front();
+  const auto& firstMessage = errorMessages.front();
   if (firstMessage.find("Failed to read ") == std::string::npos)
   {
     std::cerr << "No stream error reported ";

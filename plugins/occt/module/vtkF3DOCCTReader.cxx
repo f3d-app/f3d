@@ -419,7 +419,7 @@ private:
 #if F3D_PLUGIN_OCCT_XCAF
 //----------------------------------------------------------------------------
 template<typename T>
-bool TransferToDocument(vtkF3DOCCTReader* that, T& reader, Handle(TDocStd_Document) doc)
+bool TransferToDocument(vtkF3DOCCTReader* that, T& reader, const Handle(TDocStd_Document)& doc)
 {
   reader.SetColorMode(true);
   reader.SetNameMode(true);

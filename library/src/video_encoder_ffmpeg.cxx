@@ -181,7 +181,7 @@ video_encoder_ffmpeg& video_encoder_ffmpeg::flush()
 {
   if (this->Internals->CodecContext)
   {
-    std::lock_guard lock(this->Internals->Mutex);
+    std::scoped_lock lock(this->Internals->Mutex);
     avcodec_send_frame(this->Internals->CodecContext, nullptr);
   }
 
@@ -213,7 +213,7 @@ video_encoder_ffmpeg& video_encoder_ffmpeg::listen(
       {
         AVPacket* avPacket = static_cast<AVPacket*>(packet->GetHandle());
 
-        std::lock_guard lock(this->Internals->Mutex);
+        std::scoped_lock lock(this->Internals->Mutex);
 
         // Release the previous packet if there was one.
         av_packet_unref(avPacket);
@@ -256,7 +256,7 @@ bool video_encoder_ffmpeg::submit(const std::shared_ptr<video_frame>& frame)
   std::shared_ptr<video_frame_ffmpeg> ffmpegFrame =
     std::dynamic_pointer_cast<video_frame_ffmpeg>(frame);
 
-  std::lock_guard lock(this->Internals->Mutex);
+  std::scoped_lock lock(this->Internals->Mutex);
   const int sendResult = avcodec_send_frame(
     this->Internals->CodecContext, static_cast<const AVFrame*>(ffmpegFrame->GetHandle()));
 
