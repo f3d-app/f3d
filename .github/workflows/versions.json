@@ -43,7 +43,7 @@
   },
   "geotiff": {
     "version": "1.7.4",
-    "min_version": "1.6.0"
+    "min_version": "1.7.1"
   },
   "imath": {
     "version": "v3.2.2",
