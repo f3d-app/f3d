@@ -216,13 +216,6 @@ runs:
       shell: bash
       run: echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
 
-    # https://gitlab.freedesktop.org/mesa/mesa/-/work_items/15660
-    - name: Set driver to softpipe because of llvmpipe regression
-      if: |
-        runner.os == 'Linux'
-      shell: bash
-      run: echo "GALLIUM_DRIVER=softpipe" >> $GITHUB_ENV
-
     - name: Build
       shell: bash
       working-directory: ${{github.workspace}}/build
