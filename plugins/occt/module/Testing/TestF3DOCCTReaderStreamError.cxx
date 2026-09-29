@@ -9,6 +9,8 @@
 
 #include <iostream>
 
+namespace
+{
 class ErrorEventCallback : public vtkCommand
 {
 public:
@@ -35,11 +37,12 @@ public:
 private:
   std::vector<std::string> Messages;
 };
+}
 
 bool testReaderStreamError(
   const std::string& filename, const vtkF3DOCCTReader::FILE_FORMAT& format, bool useStream = true)
 {
-  vtkNew<ErrorEventCallback> errorEventCallback;
+  vtkNew<::ErrorEventCallback> errorEventCallback;
   vtkNew<vtkCallbackCommand> nullEventCallback;
 
   vtkNew<vtkFileResourceStream> fileStream;

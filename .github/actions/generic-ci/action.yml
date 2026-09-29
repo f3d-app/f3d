@@ -296,6 +296,17 @@ runs:
       shell: bash
       run: echo "F3D_CTEST_EXCEPTIONS=(test_scene_zero_copy)" >> $GITHUB_ENV
 
+    # Regression in Mesa without VTK workaround
+    # https://gitlab.freedesktop.org/mesa/mesa/-/work_items/15660
+    # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13207
+    - name: Set CI test exception for Linux
+      if: |
+        runner.os == 'Linux' &&
+        inputs.vtk_version != 'commit' &&
+        inputs.rendering_backend != 'osmesa'
+      shell: bash
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestVTICell)|(TestDefaultConfigFilePipedSTL)|(TestPipedVTICell)|(TestDefaultConfigFileVTI)|(TestDefaultConfigFilePLY)|(TestDefaultConfigTranslucent)|(TestScalarsCell)|(TestRaytracingDefaultConfigFile)|(TestInteractionCycleCellInvalidIndex)|(TestInteractionStochasticTAA)|(TestInteractionAndCLIBlending)|(TestInteractionConfigFileBindings)|(TestDefaultConfigFileAlembic)|(TestDefaultConfigFileDraco)|(TestDefaultConfigFileExodus)|(TestDefaultConfigFileVTKHDF)|(TestDefaultConfigFileWebIFC)|(TestThumbnailConfigFileWebIFC)|(TestFCStd)|(TestFCStdFaceColors)|(TestFCStdLink)|(TestFCStdReadWire)|(TestFCStd1x)|(TestFCStdTransparency)|(TestFCStdPartDesign)|(TestXCAFColors)|(TestXCAFColorsXBF)|(TestDefaultConfigFileOCCT)|(TestThumbnailConfigFileOCCT)|(TestDefaultConfigFileUSD)|(TestDefaultConfigFileSBET)|(TestDefaultConfigFileSLPK)" >> $GITHUB_ENV
+
     # Certain tests are failing on macOS software rendering
     # OSMesa is used for VTK > 9.7.20260706, remove when it's dropped
     - name: Set CI test exception for macOS x86_64

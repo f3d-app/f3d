@@ -8,6 +8,8 @@
 
 #include <iostream>
 
+namespace
+{
 class ErrorEventCallback : public vtkCommand
 {
 public:
@@ -34,10 +36,11 @@ public:
 private:
   std::vector<std::string> Messages;
 };
+}
 
 int TestF3DAlembicReaderStreamError(int vtkNotUsed(argc), char* argv[])
 {
-  vtkNew<ErrorEventCallback> errorEventCallback;
+  vtkNew<::ErrorEventCallback> errorEventCallback;
   vtkNew<vtkCallbackCommand> nullEventCallback;
 
   std::string filename = std::string(argv[1]) + "data/invalid.abc";
