@@ -92,6 +92,7 @@ runs:
       shell: bash
       run: |
         patch -p1 < $GITHUB_ACTION_PATH/usd-install-bin-mindep.patch
+        patch -p1 < $GITHUB_ACTION_PATH/usd-missing-cstdint.patch
         patch -p1 < $GITHUB_ACTION_PATH/usd-recent-compiler-fix.patch
 
     # Upstream issue: https://github.com/PixarAnimationStudios/OpenUSD/issues/2490
