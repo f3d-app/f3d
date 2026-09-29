@@ -2406,8 +2406,7 @@ void F3DStarter::LoadFileGroupInternal(
           }
 
           // Update loaded files
-          std::ranges::copy(
-            localPaths, std::back_inserter(this->Internals->LoadedFiles));
+          std::ranges::copy(localPaths, std::back_inserter(this->Internals->LoadedFiles));
         }
         catch (const f3d::scene::load_failure_exception& ex)
         {

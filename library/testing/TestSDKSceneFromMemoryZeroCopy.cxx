@@ -74,7 +74,7 @@ struct WavyGridMesh
 
     // Only quads
     this->FaceOffsets.resize(this->Quads.size() / 4 + 1);
-    std::generate(this->FaceOffsets.begin(), this->FaceOffsets.end(), [n = 0]() mutable {
+    std::ranges::generate(this->FaceOffsets, [n = 0]() mutable {
       const unsigned int offset = n;
       n += 4;
       return offset;
