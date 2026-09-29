@@ -111,7 +111,7 @@
   },
   "usd": {
     "version": "v26.05",
-    "min_version": "v24.08"
+    "min_version": "v25.02a"
   },
   "webifc": {
     "version": "0.77",

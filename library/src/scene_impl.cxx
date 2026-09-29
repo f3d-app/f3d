@@ -115,9 +115,9 @@ public:
 
   struct CLIProgressBarDataStruct
   {
-    vtkTimerLog* timer;
+    vtkTimerLog* timer = nullptr;
     std::string fileName;
-    int importerCount;
+    int importerCount = 0;
   };
 
   template<std::size_t N>

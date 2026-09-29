@@ -420,9 +420,9 @@ public:
     std::vector<std::string> Extensions;
     std::vector<std::string> MimeTypes;
     std::string PluginName;
-    bool HasSceneReader;
-    bool HasGeometryReader;
-    bool SupportsStream;
+    bool HasSceneReader = false;
+    bool HasGeometryReader = false;
+    bool SupportsStream = false;
   };
 
   /**

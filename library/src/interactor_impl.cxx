@@ -60,8 +60,8 @@ public:
   {
     std::vector<std::string> CommandVector;
     documentation_callback_t DocumentationCallback;
-    BindingType Type;
-    bool Notify;
+    BindingType Type = BindingType::OTHER;
+    bool Notify = false;
   };
 
   struct CommandCallbacks

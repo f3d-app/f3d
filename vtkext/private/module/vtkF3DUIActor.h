@@ -56,8 +56,8 @@ public:
     std::string desc;
     std::string value;
     std::string bind;
-    double startTime;
-    double stopTime;
+    double startTime = 0.0;
+    double stopTime = 0.0;
   };
 
   /**
