@@ -39,6 +39,10 @@ public:
    */
   void SetCustomUniforms(vtkOpenGLHelper& cellBO, vtkActor* actor) override;
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20260730)
+  bool FragmentShaderUsesPrimitiveID(vtkRenderer*, vtkActor*) override;
+#endif
+
 protected:
   vtkF3DPolyDataMapper() = default;
   ~vtkF3DPolyDataMapper() override = default;
