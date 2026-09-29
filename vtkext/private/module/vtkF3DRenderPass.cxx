@@ -4,6 +4,7 @@
 #include "vtkF3DHexagonalBokehBlurPass.h"
 #include "vtkF3DImporter.h"
 #include "vtkF3DOpenGLGridMapper.h"
+#include "vtkF3DPolyDataMapper.h"
 #include "vtkF3DRenderer.h"
 #include "vtkF3DStochasticTransparentPass.h"
 #include "vtkF3DTAAPass.h"
@@ -127,6 +128,13 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
           vtkPolyDataMapper* polyMapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
           if (polyMapper)
           {
+#if F3D_MODULE_RAYTRACING
+            if (auto* mapper = vtkF3DPolyDataMapper::SafeDownCast(polyMapper))
+            {
+              mapper->SetUseLinearColorSpace(
+                this->UseRaytracing && actor->GetProperty()->GetInterpolation() == VTK_PBR);
+            }
+#endif
             polyMapper->SetVBOShiftScaleMethod(
               vtkPolyDataMapper::ShiftScaleMethodType::DISABLE_SHIFT_SCALE);
 

@@ -9,10 +9,15 @@ set(test_sources
   TestF3DNamedColors.cxx
   TestF3DObjectFactory.cxx
   TestF3DOpenGLGridMapper.cxx
+  TestF3DPolyDataMapperColorSpace.cxx
   TestF3DRenderPass.cxx
   TestF3DRendererWithColoring.cxx
   TestF3DFpsCounter.cxx
   )
+
+if(F3D_MODULE_RAYTRACING)
+  list(APPEND test_sources TestF3DRaytracingColorSpace.cxx)
+endif()
 
 if(F3D_MODULE_EXR)
   list(APPEND test_sources
