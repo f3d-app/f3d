@@ -27,7 +27,7 @@
   },
   "curl": {
     "version": "curl-8_20_0",
-    "min_version": "curl-7_74_0"
+    "min_version": "curl-7_77_0"
   },
   "draco": {
     "version": "1.5.7",
