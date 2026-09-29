@@ -1,5 +1,7 @@
 // remove some checks
 duplInheritedMember  // VTK design
+missingIncludeSystem // cppcheck seems confused about this
+missingInclude
 unknownMacro
 
 // external libraries

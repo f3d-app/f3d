@@ -400,6 +400,7 @@ PYBIND11_MODULE(pyf3d, module)
             std::get<double>(domain.increment));
         }
         assert(false); // opts.getRangeDomain(name) would have thrown on anything not int or double
+        return {};
       })
     .def("get_enum_domain",
       [](const f3d::options& opts, std::string_view name)
