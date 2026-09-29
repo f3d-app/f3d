@@ -1,5 +1,6 @@
 # False positive with Qt test
 race:libQt6Core
+race:libQt6DBus
 race:libQt6XcbQpa
 
 # Issue in mesa sw_rast
