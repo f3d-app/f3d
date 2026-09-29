@@ -2,7 +2,6 @@
 duplInheritedMember  // VTK design
 missingIncludeSystem // cppcheck seems confused about this
 missingInclude
-unknownMacro
 syntaxError
 
 // external libraries
@@ -10,4 +9,3 @@ syntaxError
 
 // specific checks
 preprocessorErrorDirective:plugins/draco/module/vtkF3DDracoReader.cxx
-nullPointerRedundantCheck:library/src/engine.cxx
