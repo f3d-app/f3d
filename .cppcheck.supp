@@ -3,6 +3,7 @@ duplInheritedMember  // VTK design
 missingIncludeSystem // cppcheck seems confused about this
 missingInclude
 unknownMacro
+syntaxError
 
 // external libraries
 *:external/*
