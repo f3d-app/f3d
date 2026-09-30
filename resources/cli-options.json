@@ -614,11 +614,10 @@
           "implicitValue": "0"
         },
         {
-          "longName": "coloring-by-cells",
-          "shortName": "c",
-          "helpText": "Force usage of an array from the cells",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
+          "longName": "coloring-field",
+          "helpText": "Use the specified field for coloring (e.g., \"cells\" or \"points\")",
+          "valueHelper": "<string>",
+          "implicitValue": "cells"
         },
         {
           "longName": "coloring-range",

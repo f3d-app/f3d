@@ -7,6 +7,7 @@
 #include <vtkDataSet.h>
 #include <vtkPointData.h>
 
+#include <algorithm>
 #include <cassert>
 #include <set>
 
@@ -99,30 +100,46 @@ void F3DColoringInfoHandler::UpdateColoringInfo(vtkDataSet* dataset)
       }
     }
   }
+
+  this->CurrentColoringIter = this->ColoringInfoMap.end();
+}
+
+void F3DColoringInfoHandler::SelectFirstArray(bool forceUsePointData, bool forceUseCellData)
+{
+  if (forceUseCellData)
+  {
+    this->CurrentColoringIter = std::ranges::find_if(
+      this->ColoringInfoMap, [](const auto& pair) { return pair.first.second == true; });
+  }
+  else if (forceUsePointData)
+  {
+    this->CurrentColoringIter = std::ranges::find_if(
+      this->ColoringInfoMap, [](const auto& pair) { return pair.first.second == false; });
+  }
+  else
+  {
+    this->CurrentColoringIter = this->ColoringInfoMap.begin();
+  }
 }
 
 //----------------------------------------------------------------------------
 std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetCurrentColoring(
-  bool forceUseCellData, const std::optional<std::string>& arrayName, bool quiet)
+  bool forceUsePointData, bool forceUseCellData, const std::optional<std::string>& arrayName,
+  bool quiet)
 {
   const int nIndices = static_cast<int>(this->ColoringInfoMap.size());
 
   if (nIndices == 0)
   {
     // No array available
-    this->CurrentColoringIter.reset();
+    this->CurrentColoringIter = this->ColoringInfoMap.end();
 
     if (!quiet)
     {
       F3DLog::Print(F3DLog::Severity::Debug, "No array to color with");
     }
   }
-  else if (!arrayName.has_value())
-  {
-    // Coloring with first array
-    this->CurrentColoringIter = this->ColoringInfoMap.begin();
-  }
-  else
+  else if (arrayName.has_value())
   {
     // Coloring with named array
 
@@ -131,21 +148,30 @@ std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetC
       this->CurrentColoringIter = this->ColoringInfoMap.find({ arrayName.value(), false });
     }
 
-    if (this->CurrentColoringIter.value() == this->ColoringInfoMap.end())
+    if (this->CurrentColoringIter == this->ColoringInfoMap.end() && !forceUsePointData)
     {
       this->CurrentColoringIter = this->ColoringInfoMap.find({ arrayName.value(), true });
     }
 
-    if (this->CurrentColoringIter.value() == this->ColoringInfoMap.end())
+    if (this->CurrentColoringIter == this->ColoringInfoMap.end())
     {
       // Could not find named array
-      this->CurrentColoringIter.reset();
       if (!quiet)
       {
-        F3DLog::Print(
-          F3DLog::Severity::Warning, "Unknown scalar array: \"" + arrayName.value() + "\"");
+        F3DLog::Print(F3DLog::Severity::Warning,
+          "Unknown scalar array: \"" + arrayName.value() + "\"" +
+            (forceUsePointData     ? " (point data)"
+                : forceUseCellData ? " (cell data)"
+                                   : ""));
       }
+
+      this->SelectFirstArray(forceUsePointData, forceUseCellData);
     }
+  }
+  else
+  {
+    // Default to the first available array if no array name is provided
+    this->SelectFirstArray(forceUsePointData, forceUseCellData);
   }
   return this->GetCurrentColoringInfo();
 }
@@ -154,28 +180,36 @@ std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetC
 std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::GetCurrentColoringInfo()
   const
 {
-  if (this->CurrentColoringIter.has_value())
+  if (this->CurrentColoringIter != this->ColoringInfoMap.end())
   {
-    return this->CurrentColoringIter.value()->second;
+    return this->CurrentColoringIter->second;
   }
   return std::nullopt;
 }
 
 //----------------------------------------------------------------------------
-void F3DColoringInfoHandler::CycleColoringArray()
+void F3DColoringInfoHandler::CycleColoringArray(bool forceUsePointData, bool forceUseCellData)
 {
-  if (!this->CurrentColoringIter.has_value())
+  if (this->CurrentColoringIter != this->ColoringInfoMap.end())
   {
-    if (!this->ColoringInfoMap.empty())
+    if (forceUseCellData)
     {
-      this->CurrentColoringIter = this->ColoringInfoMap.begin();
+      this->CurrentColoringIter = std::find_if(std::next(this->CurrentColoringIter),
+        this->ColoringInfoMap.cend(), [](const auto& pair) { return pair.first.second == true; });
+    }
+    else if (forceUsePointData)
+    {
+      this->CurrentColoringIter = std::find_if(std::next(this->CurrentColoringIter),
+        this->ColoringInfoMap.cend(), [](const auto& pair) { return pair.first.second == false; });
+    }
+    else
+    {
+      this->CurrentColoringIter++;
     }
   }
-  else
+
+  if (this->CurrentColoringIter == this->ColoringInfoMap.end())
   {
-    if (++this->CurrentColoringIter.value() == this->ColoringInfoMap.end())
-    {
-      this->CurrentColoringIter = this->ColoringInfoMap.begin();
-    }
+    this->SelectFirstArray(forceUsePointData, forceUseCellData);
   }
 }

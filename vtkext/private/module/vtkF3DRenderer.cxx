@@ -3210,11 +3210,11 @@ void vtkF3DRenderer::SetColoring(ColoringMode mode)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetForceUseCellColoring(bool useCell)
+void vtkF3DRenderer::SetDataFieldForColoring(const DataField& dataField)
 {
-  if (useCell != this->ForceUseCellColoring)
+  if (dataField != this->DataFieldForColoring)
   {
-    this->ForceUseCellColoring = useCell;
+    this->DataFieldForColoring = dataField;
     this->ColorTransferFunctionConfigured = false;
     this->OpacityTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
@@ -3246,7 +3246,7 @@ void vtkF3DRenderer::SetArrayNameForColoring(const std::optional<std::string>& a
 }
 
 //----------------------------------------------------------------------------
-std::optional<std::string> vtkF3DRenderer::GetArrayNameForColoring()
+std::optional<std::string> vtkF3DRenderer::GetArrayNameForColoring() const
 {
   return this->ArrayNameForColoring;
 }
@@ -3258,6 +3258,7 @@ void vtkF3DRenderer::SetComponentForColoring(const std::optional<int>& component
   {
     this->ComponentForColoring = component;
     this->ColorTransferFunctionConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
     this->ColoringPointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
@@ -3275,8 +3276,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
 
   // Recover coloring information and update handler
   F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
-  const auto info = coloringHandler.SetCurrentColoring(
-    this->ForceUseCellColoring, this->ArrayNameForColoring, false);
+  const auto info = coloringHandler.SetCurrentColoring(this->DataFieldForColoring == DataField::POINTS,
+    this->DataFieldForColoring == DataField::CELLS, this->ArrayNameForColoring, false);
   const bool hasColoring = info.has_value() && this->Coloring != vtkF3DRenderer::ColoringMode::MATERIAL;
   if (hasColoring && !this->ColorTransferFunctionConfigured)
   {
@@ -3791,7 +3792,9 @@ void vtkF3DRenderer::ConfigureActorTextureTransform(vtkActor* actorBase, const d
 void vtkF3DRenderer::CycleArrayForColoring()
 {
   assert(this->Importer);
-  this->Importer->GetColoringInfoHandler().CycleColoringArray();
+  this->Importer->GetColoringInfoHandler().CycleColoringArray(
+    this->DataFieldForColoring == DataField::POINTS,
+    this->DataFieldForColoring == DataField::CELLS);
   auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
 
   if (info.has_value())
@@ -3879,7 +3882,7 @@ std::string vtkF3DRenderer::ArrayToString()
   auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
   if (!info.has_value())
   {
-    return "OFF";
+    return "No array";
   }
 
   // Unicode symbols represent a triangle for cell data and a circle for point data

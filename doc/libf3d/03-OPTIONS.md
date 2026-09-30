@@ -197,11 +197,11 @@ In the case of _direct_, it is assumed that the array defines colors directly as
 
 CLI: `--coloring-mode`.
 
-### `model.scivis.cells` (_bool_, default: `false`)
+### `model.scivis.field` (_string_, default: `any`, enum domain: `any, points, cells`)
 
-Color the data with value found _on the cells_ instead of points
+Specify which array field must be used.
 
-CLI: `--coloring-by-cells`.
+CLI: `--coloring-field`.
 
 ### `model.scivis.discretization` (_int_, optional, range domain: `[1, 1024]`, increment: `5`)
 

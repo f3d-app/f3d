@@ -6,7 +6,7 @@
       "load-plugins": "webifc",
       "coloring-mode": "direct",
       "coloring-array": "Colors",
-      "coloring-by-cells": true
+      "coloring-field": "cells"
     }
   }
 ]

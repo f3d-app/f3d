@@ -455,9 +455,13 @@
       }
     },
     "scivis": {
-      "cells": {
-        "type": "bool",
-        "default_value": "false"
+      "field": {
+        "type": "string",
+        "default_value": "any",
+        "domain": {
+          "style": "enum",
+          "enum": ["any", "points", "cells"]
+        }
       },
       "discretization": {
         "type": "int",

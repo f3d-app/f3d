@@ -95,6 +95,16 @@ public:
     DIRECT
   };
 
+  /**
+   * Enum listing possible data fields modes.
+   */
+  enum class DataField : unsigned char
+  {
+    POINTS,
+    CELLS,
+    ANY
+  };
+
   ///@{
   /**
    * Set visibility of different actors
@@ -459,10 +469,13 @@ public:
 
   ///@{
   /**
-   * Set/Get if using point or cell data coloring
+   * Set/Get if using point or cell data coloring (or all)
    */
-  void SetForceUseCellColoring(bool useCell);
-  vtkGetMacro(ForceUseCellColoring, bool);
+  void SetDataFieldForColoring(const DataField& dataField);
+  inline DataField GetDataFieldForColoring() const
+  {
+    return this->DataFieldForColoring;
+  }
   ///@}
 
   ///@{
@@ -470,7 +483,7 @@ public:
    * Set/Get the name of the array to use for coloring
    */
   void SetArrayNameForColoring(const std::optional<std::string>& arrayName);
-  std::optional<std::string> GetArrayNameForColoring();
+  std::optional<std::string> GetArrayNameForColoring() const;
   ///@}
 
   ///@{
@@ -934,7 +947,7 @@ private:
   bool OpacityTransferFunctionConfigured = false;
 
   ColoringMode Coloring = ColoringMode::MATERIAL;
-  bool ForceUseCellColoring = false;
+  DataField DataFieldForColoring = DataField::ANY;
   std::optional<int> ComponentForColoring = std::nullopt;
   std::optional<std::string> ArrayNameForColoring;
 

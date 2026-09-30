@@ -68,7 +68,7 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
 
   renderer->CycleComponentForColoring();
   if (renderer->GetArrayNameForColoring() != "Momentum" ||
-    !renderer->GetComponentForColoring().has_value())
+    renderer->GetComponentForColoring().has_value())
   {
     std::cerr << "Unexpected coloring information after cycling component\n";
     return EXIT_FAILURE;

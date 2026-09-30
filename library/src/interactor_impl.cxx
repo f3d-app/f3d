@@ -257,7 +257,19 @@ public:
         break;
     }
 
-    opt.model.scivis.cells = ren->GetForceUseCellColoring();
+    switch (ren->GetDataFieldForColoring())
+    {
+      case vtkF3DRenderer::DataField::POINTS:
+        opt.model.scivis.field = "points";
+        break;
+      case vtkF3DRenderer::DataField::CELLS:
+        opt.model.scivis.field = "cells";
+        break;
+      case vtkF3DRenderer::DataField::ANY:
+        opt.model.scivis.field = "any";
+        break;
+    }
+
     opt.model.scivis.array_name = ren->GetArrayNameForColoring();
     opt.model.scivis.component = ren->GetComponentForColoring();
   }

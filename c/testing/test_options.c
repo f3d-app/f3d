@@ -23,7 +23,7 @@ int test_options()
     return 1;
   }
 
-  f3d_options_set_as_bool(options, "model.scivis.cells", 1);
+  f3d_options_set_as_bool(options, "scene.camera.orthographic", 1);
   f3d_options_set_as_int(options, "model.scivis.component", 2);
   f3d_options_set_as_double(options, "render.line_width", 3.5);
   f3d_options_set_as_string(options, "render.effect.final_shader", "test.glsl");
@@ -34,7 +34,7 @@ int test_options()
   const int int_vec_values[] = { 1, 2 };
   f3d_options_set_as_int_vector(options, "scene.animation.indices", int_vec_values, 2);
 
-  int bool_val = f3d_options_get_as_bool(options, "model.scivis.cells");
+  int bool_val = f3d_options_get_as_bool(options, "scene.camera.orthographic");
   (void)bool_val;
 
   int int_val = f3d_options_get_as_int(options, "model.scivis.component");
@@ -57,7 +57,7 @@ int test_options()
   size_t out_int_count;
   f3d_options_get_as_int_vector(options, "scene.animation.indices", out_int_vec, &out_int_count);
 
-  f3d_options_toggle(options, "model.scivis.cells");
+  f3d_options_toggle(options, "scene.camera.orthographic");
 
   f3d_engine_t* engine2 = f3d_engine_create_none();
   if (engine2)
@@ -65,15 +65,15 @@ int test_options()
     f3d_options_t* options2 = f3d_engine_get_options(engine2);
     if (options2)
     {
-      int same = f3d_options_is_same(options, options2, "model.scivis.cells");
+      int same = f3d_options_is_same(options, options2, "scene.camera.orthographic");
       (void)same;
 
-      f3d_options_copy(options2, options, "model.scivis.cells");
+      f3d_options_copy(options2, options, "scene.camera.orthographic");
     }
     f3d_engine_destroy(engine2);
   }
 
-  int has_value = f3d_options_has_value(options, "model.scivis.cells");
+  int has_value = f3d_options_has_value(options, "scene.camera.orthographic");
   (void)has_value;
 
   size_t all_count;
@@ -104,7 +104,7 @@ int test_options()
     return 1;
   }
 
-  f3d_options_reset(options, "model.scivis.cells");
+  f3d_options_reset(options, "scene.camera.orthographic");
   f3d_options_remove_value(options, "render.show_edges");
 
   f3d_options_has_domain(options, "scene.animation.speed_factor");

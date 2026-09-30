@@ -722,7 +722,19 @@ void window_impl::UpdateDynamicOptions()
     renderer->SetColoring(vtkF3DRenderer::ColoringMode::DIRECT);
   }
 
-  renderer->SetForceUseCellColoring(opt.model.scivis.cells);
+  if (opt.model.scivis.field == "points")
+  {
+    renderer->SetDataFieldForColoring(vtkF3DRenderer::DataField::POINTS);
+  }
+  else if (opt.model.scivis.field == "cells")
+  {
+    renderer->SetDataFieldForColoring(vtkF3DRenderer::DataField::CELLS);
+  }
+  else
+  {
+    renderer->SetDataFieldForColoring(vtkF3DRenderer::DataField::ANY);
+  }
+
   renderer->SetArrayNameForColoring(opt.model.scivis.array_name);
   renderer->SetComponentForColoring(opt.model.scivis.component);
 

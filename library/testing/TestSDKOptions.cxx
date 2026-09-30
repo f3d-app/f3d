@@ -19,21 +19,21 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   f3d::options opt;
 
   // Test bool
-  opt.setAsString("model.scivis.cells", "false");
-  test("setAsString bool", opt.getAsString("model.scivis.cells") == "false");
+  opt.setAsString("scene.camera.orthographic", "false");
+  test("setAsString bool", opt.getAsString("scene.camera.orthographic") == "false");
 
-  opt.setAsString("model.scivis.cells", "1");
-  test("setAsString bool", opt.getAsString("model.scivis.cells") == "true");
+  opt.setAsString("scene.camera.orthographic", "1");
+  test("setAsString bool", opt.getAsString("scene.camera.orthographic") == "true");
 
-  opt.model.scivis.cells = false;
-  test("getAsString bool", opt.getAsString("model.scivis.cells") == "false");
+  opt.scene.camera.orthographic = false;
+  test("getAsString bool", opt.getAsString("scene.camera.orthographic") == "false");
 
-  opt.set("model.scivis.cells", true);
-  test("set/get bool", std::get<bool>(opt.get("model.scivis.cells")) == true);
+  opt.set("scene.camera.orthographic", true);
+  test("set/get bool", std::get<bool>(opt.get("scene.camera.orthographic")) == true);
 
-  opt.set("model.scivis.cells", false);
-  opt.toggle("model.scivis.cells");
-  test("toggle", opt.getAsString("model.scivis.cells") == "true");
+  opt.set("scene.camera.orthographic", false);
+  opt.toggle("scene.camera.orthographic");
+  test("toggle", opt.getAsString("scene.camera.orthographic") == "true");
   opt.toggle("render.show_edges");
   test("toggle optional", opt.getAsString("render.show_edges") == "true");
 
@@ -248,18 +248,18 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     "NaN values transform2d", opt.getAsString("model.textures_transform") == "1,0,0,0,1,0,0,0,1");
 
   // Test closest option
-  auto closest = opt.getClosestOption("modle.sciivs.cell");
-  test("closest option", closest.first == "model.scivis.cells" && closest.second == 5);
+  auto closest = opt.getClosestOption("modle.sciivs.fiels");
+  test("closest option", closest.first == "model.scivis.field" && closest.second == 5);
 
-  closest = opt.getClosestOption("model.scivis.cells");
-  test("closest option exact", closest.first == "model.scivis.cells" && closest.second == 0);
+  closest = opt.getClosestOption("model.scivis.field");
+  test("closest option exact", closest.first == "model.scivis.field" && closest.second == 0);
 
   // Test chaining options
-  opt.setAsString("model.scivis.cells", "false").setAsString("model.scivis.cells", "true");
-  test("chaining setAsString calls", opt.getAsString("model.scivis.cells") == "true");
+  opt.setAsString("model.scivis.field", "points").setAsString("model.scivis.field", "cells");
+  test("chaining setAsString calls", opt.getAsString("model.scivis.field") == "cells");
 
-  opt.set("model.scivis.cells", true).set("model.scivis.cells", false);
-  test("chaining set calls", std::get<bool>(opt.get("model.scivis.cells")) == false);
+  opt.set("scene.camera.orthographic", true).set("scene.camera.orthographic", false);
+  test("chaining set calls", std::get<bool>(opt.get("scene.camera.orthographic")) == false);
 
   // Test toggle error paths
   test.expect<f3d::options::incompatible_exception>(
@@ -340,7 +340,7 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // Test set/get error paths
   test.expect<f3d::options::incompatible_exception>(
-    "incompatible_exception exception on set", [&]() { opt.set("model.scivis.cells", 2.13); });
+    "incompatible_exception exception on set", [&]() { opt.set("model.scivis.field", 2.13); });
 
   test.expect<f3d::options::inexistent_exception>(
     "inexistent_exception exception on set", [&]() { opt.set("dummy", 2.13); });
@@ -368,7 +368,7 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("isOptional with optional value", opt6.isOptional("model.scivis.range"));
 
   // Test isOptional non-optional values
-  test("isOptional with non-optional value", opt6.isOptional("model.scivis.cells") == false);
+  test("isOptional with non-optional value", opt6.isOptional("model.scivis.field") == false);
   test("isOptional with non-optional value", opt6.isOptional("model.coloring") == false);
 
   // Test isOptional non-existent options
@@ -427,7 +427,7 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // Test removeValue non-optional values
   test.expect<f3d::options::incompatible_exception>(
-    "removeValue non-optional values", [&]() { opt8.removeValue("model.scivis.cells"); });
+    "removeValue non-optional values", [&]() { opt8.removeValue("model.scivis.field"); });
 
   // Test removeValue non-optional values
   test.expect<f3d::options::inexistent_exception>(
