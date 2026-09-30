@@ -2,6 +2,7 @@
 race:libQt6Core
 race:libQt6DBus
 race:libQt6XcbQpa
+thread:libQt6Core
 
 # Issue in mesa sw_rast
 race:swrast_dri

@@ -112,7 +112,7 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}/source
       run: |
-        lcov --base-directory . --directory . -c -o coverage.info --gcov-tool /usr/bin/gcov
+        lcov --ignore-errors inconsistent --base-directory . --directory . -c -o coverage.info --gcov-tool /usr/bin/gcov
         lcov --remove coverage.info "*/external/*" -o coverage.info
         lcov --remove coverage.info "TestF3D" -o coverage.info
 
