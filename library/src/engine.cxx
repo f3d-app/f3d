@@ -157,8 +157,9 @@ engine::engine(const std::optional<window::Type>& windowType, bool offscreen,
   // Do not create an interactor for NONE
   if (windowType != window::Type::NONE)
   {
-    this->Internals->Interactor = std::make_unique<detail::interactor_impl>(
-      *this->Internals->Options, *this->Internals->Window, *this->Internals->Scene, this->Internals->Scene->GetAnimationImpl());
+    this->Internals->Interactor =
+      std::make_unique<detail::interactor_impl>(*this->Internals->Options, *this->Internals->Window,
+        *this->Internals->Scene, this->Internals->Scene->GetAnimationImpl());
   }
 
 #ifdef __EMSCRIPTEN__

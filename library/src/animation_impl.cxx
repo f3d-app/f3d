@@ -128,17 +128,20 @@ std::string animation_impl::getName(int index)
                                                                    : "Multi animations";
     }
 
-    if (this->Internals->AvailAnimations == 0 || !this->Internals->PreparedAnimationIndices.has_value() ||
+    if (this->Internals->AvailAnimations == 0 ||
+      !this->Internals->PreparedAnimationIndices.has_value() ||
       this->Internals->PreparedAnimationIndices.value().empty() ||
       this->Internals->PreparedAnimationIndices.value()[0] >= this->Internals->AvailAnimations)
     {
       return "No animation";
     }
 
-    return this->Internals->Importer->GetAnimationName(this->Internals->PreparedAnimationIndices.value()[0]);
+    return this->Internals->Importer->GetAnimationName(
+      this->Internals->PreparedAnimationIndices.value()[0]);
   }
 
-  if (this->Internals->AvailAnimations == 0 || index < 0 || index > this->Internals->AvailAnimations)
+  if (this->Internals->AvailAnimations == 0 || index < 0 ||
+    index > this->Internals->AvailAnimations)
   {
     return "No animation";
   }
@@ -292,10 +295,12 @@ void animation_impl::Tick()
   assert(this->Internals->DeltaTime > 0);
   if (this->Internals->Playing)
   {
-    this->Internals->CurrentTime += (this->Internals->DeltaTime * this->Internals->SpeedFactor) * this->Internals->AnimationDirection;
+    this->Internals->CurrentTime += (this->Internals->DeltaTime * this->Internals->SpeedFactor) *
+      this->Internals->AnimationDirection;
 
     // Modulo computation, compute CurrentTime in the time range.
-    if (this->Internals->CurrentTime < this->Internals->TimeRange[0] || this->Internals->CurrentTime > this->Internals->TimeRange[1])
+    if (this->Internals->CurrentTime < this->Internals->TimeRange[0] ||
+      this->Internals->CurrentTime > this->Internals->TimeRange[1])
     {
       auto modulo = [](double val, double mod)
       {
@@ -303,7 +308,8 @@ void animation_impl::Tick()
         return remainder < 0 ? remainder + mod : remainder;
       };
       this->Internals->CurrentTime = this->Internals->TimeRange[0] +
-        modulo(this->Internals->CurrentTime - this->Internals->TimeRange[0], this->Internals->TimeRange[1] - this->Internals->TimeRange[0]);
+        modulo(this->Internals->CurrentTime - this->Internals->TimeRange[0],
+          this->Internals->TimeRange[1] - this->Internals->TimeRange[0]);
     }
 
     if (this->LoadAtTime(this->Internals->CurrentTime))
@@ -318,7 +324,8 @@ void animation_impl::JumpToFrame(int frame, bool relative)
 {
   assert(this->Internals->DeltaTime > 0);
   const double frameDuration = (this->Internals->DeltaTime * this->Internals->SpeedFactor);
-  const double currentFrame = (this->Internals->CurrentTime - this->Internals->TimeRange[0]) / frameDuration;
+  const double currentFrame =
+    (this->Internals->CurrentTime - this->Internals->TimeRange[0]) / frameDuration;
 
   double nextFrame = 0;
   if (relative)
@@ -334,7 +341,8 @@ void animation_impl::JumpToFrame(int frame, bool relative)
     nextFrame = (this->Internals->TimeRange[1] - this->Internals->TimeRange[0]) / frameDuration;
   }
 
-  this->Internals->CurrentTime = this->Internals->TimeRange[0] + (nextFrame * this->Internals->DeltaTime * this->Internals->SpeedFactor);
+  this->Internals->CurrentTime = this->Internals->TimeRange[0] +
+    (nextFrame * this->Internals->DeltaTime * this->Internals->SpeedFactor);
 
   if (this->LoadAtTime(this->Internals->CurrentTime))
   {
@@ -363,8 +371,8 @@ void animation_impl::JumpToKeyFrame(int keyframe, bool relative)
 
   const int timeStepsAvailable = this->Internals->AnimationTimeSteps->GetNumberOfTuples();
 
-  auto it = std::lower_bound(
-    this->Internals->AnimationTimeSteps->Begin(), this->Internals->AnimationTimeSteps->End(), this->Internals->CurrentTime);
+  auto it = std::lower_bound(this->Internals->AnimationTimeSteps->Begin(),
+    this->Internals->AnimationTimeSteps->End(), this->Internals->CurrentTime);
   const int closestKeyFrame = (it != this->Internals->AnimationTimeSteps->End())
     ? static_cast<int>(std::distance(this->Internals->AnimationTimeSteps->Begin(), it))
     : timeStepsAvailable - 1;
@@ -418,8 +426,9 @@ bool animation_impl::LoadAtTime(double timeValue)
   {
     if (this->Internals->TimeRange[0] - timeValue > epsilon)
     {
-      log::warn("Animation time ", timeValue, " is outside of range [", this->Internals->TimeRange[0], ", ",
-        this->Internals->TimeRange[1], "], using ", this->Internals->TimeRange[0], ".");
+      log::warn("Animation time ", timeValue, " is outside of range [",
+        this->Internals->TimeRange[0], ", ", this->Internals->TimeRange[1], "], using ",
+        this->Internals->TimeRange[0], ".");
     }
     timeValue = this->Internals->TimeRange[0];
   }
@@ -427,8 +436,9 @@ bool animation_impl::LoadAtTime(double timeValue)
   {
     if (timeValue - this->Internals->TimeRange[1] > epsilon)
     {
-      log::warn("Animation time ", timeValue, " is outside of range [", this->Internals->TimeRange[0], ", ",
-        this->Internals->TimeRange[1], "], using ", this->Internals->TimeRange[1], ".");
+      log::warn("Animation time ", timeValue, " is outside of range [",
+        this->Internals->TimeRange[0], ", ", this->Internals->TimeRange[1], "], using ",
+        this->Internals->TimeRange[1], ".");
     }
     timeValue = this->Internals->TimeRange[1];
   }
@@ -468,14 +478,16 @@ void animation_impl::CycleAnimation()
   {
     log::warn("scene.animation.index is deprecated, please use "
               "scene.animation.indices instead");
-    this->Internals->Options.scene.animation.indices = { this->Internals->Options.scene.animation.index };
+    this->Internals->Options.scene.animation.indices = {
+      this->Internals->Options.scene.animation.index
+    };
     this->Internals->Options.scene.animation.index = 0;
   }
   F3D_SILENT_WARNING_POP()
 
   // If we started with multi animation or all animations (any negative value means all animations)
-  bool negative =
-    std::ranges::any_of(this->Internals->Options.scene.animation.indices, [](int idx) { return idx < 0; });
+  bool negative = std::ranges::any_of(
+    this->Internals->Options.scene.animation.indices, [](int idx) { return idx < 0; });
   if (this->Internals->Options.scene.animation.indices.size() > 1 || negative)
   {
     // Then select no animation
@@ -497,7 +509,8 @@ void animation_impl::CycleAnimation()
     {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250507)
       // If importer support multi animations and there are multiple animations
-      if (this->Internals->Importer->GetAnimationSupportLevel() == vtkImporter::AnimationSupportLevel::MULTI &&
+      if (this->Internals->Importer->GetAnimationSupportLevel() ==
+          vtkImporter::AnimationSupportLevel::MULTI &&
         this->Internals->AvailAnimations > 1)
 #else
       if (this->Internals->AvailAnimations > 1)
@@ -664,8 +677,8 @@ void animation_impl::PrepareForAnimationIndices()
         animIndex, timeRange, nbTimeSteps, this->Internals->AnimationTimeSteps);
 
       // Accumulate timesteps to avoid overwrite
-      for (vtkIdType stepIndex = 0; stepIndex < this->Internals->AnimationTimeSteps->GetNumberOfTuples();
-           stepIndex++)
+      for (vtkIdType stepIndex = 0;
+           stepIndex < this->Internals->AnimationTimeSteps->GetNumberOfTuples(); stepIndex++)
       {
         accumulatedTimeSteps.emplace(this->Internals->AnimationTimeSteps->GetValue(stepIndex));
       }
@@ -697,8 +710,8 @@ void animation_impl::PrepareForAnimationIndices()
         this->Internals->TimeRange[1], "]. Swapping range.");
       std::swap(this->Internals->TimeRange[0], this->Internals->TimeRange[1]);
     }
-    log::debug(
-      "Current animation time range is: [", this->Internals->TimeRange[0], ", ", this->Internals->TimeRange[1], "].");
+    log::debug("Current animation time range is: [", this->Internals->TimeRange[0], ", ",
+      this->Internals->TimeRange[1], "].");
   }
 
   log::debug("");

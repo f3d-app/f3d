@@ -72,7 +72,8 @@ public:
     std::function<std::vector<std::string>(const std::vector<std::string>&)> CompletionCallback;
   };
 
-  internals(options& options, window_impl& window, scene_impl& scene, animation_impl& anim, interactor_impl& inter)
+  internals(options& options, window_impl& window, scene_impl& scene, animation_impl& anim,
+    interactor_impl& inter)
     : Options(options)
     , Window(window)
     , Scene(scene)
@@ -655,8 +656,8 @@ public:
   options& Options;
   window_impl& Window;
   scene_impl& Scene;
-  interactor_impl& Interactor;
   animation_impl& Anim;
+  interactor_impl& Interactor;
 
   vtkSmartPointer<vtkRenderWindowInteractor> VTKInteractor;
   vtkNew<vtkF3DInteractorStyle> Style;
@@ -693,7 +694,8 @@ public:
 };
 
 //----------------------------------------------------------------------------
-interactor_impl::interactor_impl(options& options, window_impl& window, scene_impl& scene, animation_impl& anim)
+interactor_impl::interactor_impl(
+  options& options, window_impl& window, scene_impl& scene, animation_impl& anim)
   : Internals(std::make_unique<interactor_impl::internals>(options, window, scene, anim, *this))
 {
   // scene need the interactor
@@ -1586,8 +1588,7 @@ interactor& interactor_impl::initBindings()
   };
 
   // "Cycle animation" , "animationName"
-  auto docAnim = [&]()
-  { return std::pair("Animation", this->Internals->Anim.getName()); };
+  auto docAnim = [&]() { return std::pair("Animation", this->Internals->Anim.getName()); };
 
   // "Cycle point/cell data coloring" , "POINT/CELL"
   auto docField = [&]()
@@ -1963,8 +1964,7 @@ interactor& interactor_impl::triggerTextCharacter(unsigned int codepoint)
 //----------------------------------------------------------------------------
 interactor& interactor_impl::toggleAnimation(AnimationDirection direction)
 {
-  this->Internals->Anim.SetAnimationDirection(
-    direction == AnimationDirection::FORWARD ? 1 : -1);
+  this->Internals->Anim.SetAnimationDirection(direction == AnimationDirection::FORWARD ? 1 : -1);
   this->Internals->Anim.ToggleAnimation();
   return *this;
 }
@@ -1972,8 +1972,7 @@ interactor& interactor_impl::toggleAnimation(AnimationDirection direction)
 //----------------------------------------------------------------------------
 interactor& interactor_impl::startAnimation(AnimationDirection direction)
 {
-  this->Internals->Anim.SetAnimationDirection(
-    direction == AnimationDirection::FORWARD ? 1 : -1);
+  this->Internals->Anim.SetAnimationDirection(direction == AnimationDirection::FORWARD ? 1 : -1);
   this->Internals->Anim.StartAnimation();
   return *this;
 }
@@ -1994,9 +1993,8 @@ bool interactor_impl::isPlayingAnimation()
 //----------------------------------------------------------------------------
 interactor::AnimationDirection interactor_impl::getAnimationDirection()
 {
-  return this->Internals->Anim.GetAnimationDirection() == 1
-    ? AnimationDirection::FORWARD
-    : AnimationDirection::BACKWARD;
+  return this->Internals->Anim.GetAnimationDirection() == 1 ? AnimationDirection::FORWARD
+                                                            : AnimationDirection::BACKWARD;
 }
 
 //----------------------------------------------------------------------------

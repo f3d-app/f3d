@@ -16,7 +16,6 @@ namespace f3d
 class F3D_EXPORT animation
 {
 public:
-
   /**
    * Load files in the scene at provided time value if they contain any animation
    * Providing a time value outside of the current animation time range will clamp

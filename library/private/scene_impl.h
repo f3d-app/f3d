@@ -57,7 +57,7 @@ public:
 
   /**
    * Implementation only API.
-   * Convienence method to get animatiom impl directly
+   * Convenience method to get animatiom impl directly
    */
   animation_impl& GetAnimationImpl();
 
