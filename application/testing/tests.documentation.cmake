@@ -329,9 +329,9 @@ f3d_test_doc(NAME TestDocColoringArrayHeight DATA dragon.vtu REF_IMAGE coloring_
 f3d_test_doc(NAME TestDocColoringComponentX DATA dragon.vtu REF_IMAGE coloring_component_x.png ROTATE ARGS -s --coloring-array=Normals --coloring-component=0)
 f3d_test_doc(NAME TestDocColoringComponentY DATA dragon.vtu REF_IMAGE coloring_component_y.png ROTATE ARGS -s --coloring-array=Normals --coloring-component=1)
 
-## --coloring-by-cells
+## --coloring-field
 f3d_test_doc(NAME TestDocColoringByCellsOFF DATA ${F3D_SOURCE_DIR}/testing/data/waveletArrays.vti REF_IMAGE coloring_by_cells_off.png ROTATE ARGS -fes --line-width=4)
-f3d_test_doc(NAME TestDocColoringByCellsON DATA ${F3D_SOURCE_DIR}/testing/data/waveletArrays.vti REF_IMAGE coloring_by_cells_on.png ROTATE ARGS -fesc  --line-width=4)
+f3d_test_doc(NAME TestDocColoringByCellsON DATA ${F3D_SOURCE_DIR}/testing/data/waveletArrays.vti REF_IMAGE coloring_by_cells_on.png ROTATE ARGS -fes --coloring-field=cells --line-width=4)
 
 ## --coloring-range
 f3d_test_doc(NAME TestDocColoringRangeAuto DATA skull.vti REF_IMAGE coloring_range_auto.png ARGS -sv --up=z)

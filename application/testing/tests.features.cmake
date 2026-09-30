@@ -59,7 +59,7 @@ f3d_test(NAME TestUnlit DATA cow.vtp ARGS --unlit --color=0.9,0.1,0.1)
 
 # Scalar coloring
 f3d_test(NAME TestScalars DATA suzanne.ply ARGS -s --coloring-array=Normals --coloring-component=1)
-f3d_test(NAME TestScalarsCell DATA f3d.vtp ARGS --coloring-mode=direct --coloring-by-cells --up=+Z)
+f3d_test(NAME TestScalarsCell DATA f3d.vtp ARGS --coloring-mode=direct --coloring-field=cells --up=+Z)
 f3d_test(NAME TestScalarsRange DATA suzanne.ply ARGS -s --coloring-array=Normals --coloring-component=1 --coloring-range=0,1)
 f3d_test(NAME TestScalarsWithBar DATA suzanne.ply ARGS -b -s --coloring-array=Normals --coloring-component=0)
 f3d_test(NAME TestScalarsWithBarContinuity DATA suzanne.ply ARGS -b -s --coloring-array=Normals --coloring-component=0)
@@ -88,10 +88,10 @@ f3d_test(NAME TestDPIInvalid DATA dragon.vtu ARGS -nm --dpi-aware DPI_SCALE inva
 
 ## Color/opacity map
 f3d_test(NAME TestColormap DATA IM-0001-1983.dcm ARGS --coloring-mode=scivis --roughness=1 --colormap=0,1,0,0,1,0,1,0)
-f3d_test(NAME TestOpacityMap DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-map=0.0,0.0,0.5,1.0,1.0,0.0)
-f3d_test(NAME TestOpacityMapFile DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/gaussian_opacity_map.png)
-f3d_test(NAME TestOpacityMapFileNonExistent DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/nonexistent_opacity_map.png)
-f3d_test(NAME TestOpacityMapFileInvalid DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/invalid.png)
+f3d_test(NAME TestOpacityMap DATA waveletArrays.vti ARGS -vsb --coloring-array=Result --volume-opacity-map=0.0,0.0,0.5,1.0,1.0,0.0)
+f3d_test(NAME TestOpacityMapFile DATA waveletArrays.vti ARGS -vsb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/gaussian_opacity_map.png)
+f3d_test(NAME TestOpacityMapFileNonExistent DATA waveletArrays.vti ARGS -vsb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/nonexistent_opacity_map.png)
+f3d_test(NAME TestOpacityMapFileInvalid DATA waveletArrays.vti ARGS -vsb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/invalid.png)
 f3d_test(NAME TestColorMapFileFullPath DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis8.png --coloring-mode=scivis --coloring-component=1)
 f3d_test(NAME TestColorMapInvalid DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/invalid.png --coloring-mode=scivis REGEXP "Cannot read colormap at" NO_BASELINE)
 f3d_test(NAME TestColorMapNonExistent DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/non_existent.png --coloring-mode=scivis REGEXP "Cannot find the colormap" NO_BASELINE)
@@ -136,13 +136,13 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
 endif()
 
 ## Volume
-f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 THRESHOLD 0.08) # Small rendering differences on macOS OSMesa
-f3d_test(NAME TestVolumeInverse DATA HeadMRVolume.mhd ARGS -vi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 THRESHOLD 0.11) # Small rendering differences on macOS OSMesa
-f3d_test(NAME TestVolumeMag DATA vase_4comp.vti ARGS -vb)
-f3d_test(NAME TestVolumeComp DATA vase_4comp.vti ARGS -vb --coloring-component=3 LONG_TIMEOUT)
+f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -vs --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 THRESHOLD 0.08) # Small rendering differences on macOS OSMesa
+f3d_test(NAME TestVolumeInverse DATA HeadMRVolume.mhd ARGS -vsi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 THRESHOLD 0.11) # Small rendering differences on macOS OSMesa
+f3d_test(NAME TestVolumeMag DATA vase_4comp.vti ARGS -vsb)
+f3d_test(NAME TestVolumeComp DATA vase_4comp.vti ARGS -vsb --coloring-component=3 LONG_TIMEOUT)
 f3d_test(NAME TestVolumeDirect DATA vase_4comp.vti ARGS -vb --coloring-mode=direct)
-f3d_test(NAME TestVolumeCells DATA waveletArrays.vti ARGS -vb --coloring-by-cells)
-f3d_test(NAME TestVolumeColoringArray DATA waveletArrays.vti ARGS -vb --coloring-array=Result LONG_TIMEOUT)
+f3d_test(NAME TestVolumeCells DATA waveletArrays.vti ARGS -vsb --coloring-field=cells)
+f3d_test(NAME TestVolumeColoringArray DATA waveletArrays.vti ARGS -vsb --coloring-array=Result LONG_TIMEOUT)
 
 ## Normal Glyphs
 f3d_test(NAME TestNormalGlyphsPerspectiveEnable DATA suzanne.obj ARGS --normal-glyphs LONG_TIMEOUT)
@@ -535,7 +535,7 @@ f3d_test(NAME TestCommandScriptSetCameraBottom SCRIPT DATA dragon.vtu) # set_cam
 f3d_test(NAME TestCommandScriptSetCameraLeft SCRIPT DATA dragon.vtu) # set_camera left
 f3d_test(NAME TestCommandScriptCycleCameraIndex SCRIPT DATA Cameras.gltf) # cycle scene.camera.index;cycle scene.camera.index;reload_current_file_group
 f3d_test(NAME TestCommandScriptIncreaseDecreaseCameraIndex SCRIPT DATA Cameras.gltf) # increase scene.camera.index;increase scene.camera.index;increase.camera.index;decrease.camera.index;reload_current_file_group
-f3d_test(NAME TestCommandScriptOpacityMap SCRIPT DATA vase_4comp.vti ARGS -v) # set model.scivis.opacity_map 0,0.03,1,1
+f3d_test(NAME TestCommandScriptOpacityMap SCRIPT DATA vase_4comp.vti ARGS -vs) # set model.scivis.opacity_map 0,0.03,1,1
 
 # Statefile interactor command load_statefile, each test covers a distinct behavior. The save_statefile
 # command shares its implementation with the --save-statefile option covered above, the tests below
@@ -624,7 +624,7 @@ f3d_test(NAME TestVerboseWrongArray DATA dragon.vtu ARGS -s --coloring-array=dum
 f3d_test(NAME TestVerboseDefaultScalar DATA HeadMRVolume.mhd ARGS -s --verbose REGEXP "Coloring using point array named MetaImage, Magnitude" NO_BASELINE)
 
 # Volume array verbosity test
-f3d_test(NAME TestVerboseVolume DATA HeadMRVolume.mhd ARGS -v --verbose REGEXP "Coloring using point array named MetaImage .forced., Magnitude" NO_BASELINE)
+f3d_test(NAME TestVerboseVolume DATA HeadMRVolume.mhd ARGS -vs --verbose REGEXP "Coloring using point array named MetaImage .forced., Magnitude" NO_BASELINE)
 
 # Incorrect component test
 f3d_test(NAME TestIncorrectComponent DATA dragon.vtu ARGS -s --coloring-component=4 REGEXP "Invalid component index: 4" NO_BASELINE)

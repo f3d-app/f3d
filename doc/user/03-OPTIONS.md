@@ -807,9 +807,9 @@ If the option is not specified, uses the _magnitude_ of the array.
 | -------------------------------------- | -------------------------------------- |
 | ![](./images/coloring_component_x.png) | ![](./images/coloring_component_y.png) |
 
-### `-c`, `--coloring-by-cells` (_bool_, default: `false`)
+### `--coloring-field` (_string_, default: `any`)
 
-Specify that the scalar array is to be found _on the cells_ instead of on the points.
+Specify that the scalar array field to color with (`any`, `points`, or `cells`).
 Use with the scalar option.
 
 #### compare

@@ -11,7 +11,7 @@ const settings = {
     // setup coloring
     options.setAsString("model.scivis.array_name", "Colors");
     options.setAsString("model.coloring", "direct");
-    options.toggle("model.scivis.cells");
+    options.toggle("scene.camera.orthographic");
 
     // make it look nice
     options.setAsString("render.effect.antialiasing.mode", "fxaa");

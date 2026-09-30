@@ -10,7 +10,7 @@ const settings = {
     // setup coloring
     options.setAsString("model.scivis.array_name", "Colors");
     options.setAsString("model.coloring", "direct");
-    options.toggle("model.scivis.cells");
+    options.setAsString("model.scivis.field", "cells");
 
     // default to +Z
     options.setAsString("scene.up_direction", "+Z");

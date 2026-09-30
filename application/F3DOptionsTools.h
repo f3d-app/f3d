@@ -99,7 +99,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "checkerboard", "model.checkerboard.enable" },
   { "color", "model.color.rgb" },
   { "coloring-array", "model.scivis.array_name" },
-  { "coloring-by-cells", "model.scivis.cells" },
+  { "coloring-field", "model.scivis.field" },
   { "coloring-component", "model.scivis.component" },
   { "coloring-mode", "model.coloring" },
   { "coloring-range", "model.scivis.range" },
