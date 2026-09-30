@@ -84,7 +84,7 @@ runs:
         path: "./dependencies/usd"
         ref: ${{steps.usd_ver.outputs.extract}}
 
-    # Upstream issues/PRs: 
+    # Upstream issues/PRs:
     # - mindep: https://github.com/PixarAnimationStudios/OpenUSD/issues/2490
     # - cstdint: zipFile.cpp removed in v25.08
     # - recent compiler: https://github.com/PixarAnimationStudios/OpenUSD/pull/3434
