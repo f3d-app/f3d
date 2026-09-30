@@ -49,7 +49,7 @@ public:
   std::unordered_map<std::string, std::string> Metadata;
 
   template<typename WriterType>
-  std::vector<unsigned char> SaveBuffer(vtkSmartPointer<WriterType> writer)
+  std::vector<unsigned char> SaveBuffer(const vtkSmartPointer<WriterType>& writer)
   {
     writer->WriteToMemoryOn();
     writer->SetInputData(this->Image);
@@ -65,8 +65,6 @@ public:
 
   void WritePngMetadata(vtkPNGWriter* pngWriter)
   {
-    // cppcheck-suppress unassignedVariable
-    // (false positive, fixed in cppcheck 2.8)
     for (const auto& [key, value] : this->Metadata)
     {
       if (!value.empty())

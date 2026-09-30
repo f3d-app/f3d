@@ -140,7 +140,7 @@ struct PackedRotationV3
         float mag = comp & compMask;
         uint32_t isNegative = (comp >> 9u) & 0x1u;
         comp = comp >> 10u;
-        rotation[i] = sqrt12 * (mag / float(compMask));
+        rotation[i] = sqrt12 * (mag / static_cast<float>(compMask));
         if (isNegative == 1)
         {
           rotation[i] = -rotation[i];

@@ -115,9 +115,9 @@ public:
 
   struct CLIProgressBarDataStruct
   {
-    vtkTimerLog* timer;
+    vtkTimerLog* timer = nullptr;
     std::string fileName;
-    int importerCount;
+    int importerCount = 0;
   };
 
   template<std::size_t N>
@@ -335,7 +335,7 @@ scene& scene_impl::add(const fs::path& filePath)
 scene& scene_impl::add(const std::vector<std::string>& filePathStrings)
 {
   std::vector<fs::path> paths(filePathStrings.size());
-  std::copy(filePathStrings.begin(), filePathStrings.end(), paths.begin());
+  std::ranges::copy(filePathStrings, paths.begin());
   return this->add(paths);
 }
 

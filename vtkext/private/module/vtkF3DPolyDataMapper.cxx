@@ -1,6 +1,7 @@
 #include "vtkF3DPolyDataMapper.h"
 
 #include "F3DLog.h"
+#include "vtkF3DRenderer.h"
 
 #include <vtkActor.h>
 #include <vtkDoubleArray.h>
@@ -145,3 +146,22 @@ void vtkF3DPolyDataMapper::ReplaceShaderLight(
 
   this->Superclass::ReplaceShaderLight(shaders, ren, actor);
 }
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20260730)
+//-----------------------------------------------------------------------------
+bool vtkF3DPolyDataMapper::FragmentShaderUsesPrimitiveID(vtkRenderer* renderer, vtkActor* actor)
+{
+  bool usesPrimitiveID = this->Superclass::FragmentShaderUsesPrimitiveID(renderer, actor);
+
+  // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13207
+  // Enable Mesa workaround when using Stochastic blending because it uses gl_PrimitiveID
+  // see vtkext/private/module/vtkF3DStochasticTransparentPass.cxx
+  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renderer);
+  if (ren)
+  {
+    usesPrimitiveID =
+      usesPrimitiveID || ren->GetBlendingMode() == vtkF3DRenderer::BlendingMode::STOCHASTIC;
+  }
+  return usesPrimitiveID;
+}
+#endif

@@ -2,48 +2,10 @@
 duplInheritedMember  // VTK design
 missingIncludeSystem // cppcheck seems confused about this
 missingInclude
-unusedFunction
-unknownMacro
+syntaxError
 
 // external libraries
-*:external/clip/*.cpp
-*:external/clip/*.h
-*:external/cxxopts/cxxopts.hpp
-*:external/dmon/dmon.h
-*:external/imgui/*.cpp
-*:external/imgui/*.h
-*:external/miniz/miniz.c
-*:external/miniz/miniz.h
-*:external/nlohmann_json/nlohmann/json.hpp
-*:external/tinyfiledialogs/tinyfiledialogs.cxx
-*:external/tinyfiledialogs/tinyfiledialogs.h
-
-// generated files
-*:*libf3dSDKTests.cxx
-*:*vtkextAlembicTests.cxx
-*:*vtkextAssimpTests.cxx
-*:*vtkextDracoTests.cxx
-*:*vtkextNativeTests.cxx
-*:*vtkextOCCTTests.cxx
-*:*vtkextPrivateTests.cxx
-*:*vtkextTests.cxx
-*:*vtkextUSDTests.cxx
-*:*vtkextWebIFCTests.cxx
-*:*options_generated.h
+*:external/*
 
 // specific checks
-knownConditionTrueFalse:vtkext/private/module/vtkF3DPointSplatMapper.cxx
-knownConditionTrueFalse:library/testing/TestSDKImage.cxx
-knownConditionTrueFalse:library/testing/TestSDKImageDeprecated.cxx
-noExplicitConstructor:library/public/types.h
-preprocessorErrorDirective:library/src/engine.cxx
 preprocessorErrorDirective:plugins/draco/module/vtkF3DDracoReader.cxx
-unknownMacro:library/VTKExtensions/Applicative/vtkF3DObjectFactory.cxx
-constParameter:library/src/image.cxx
-invalidPointerCast:plugins/native/module/vtkF3DSplatReader.cxx
-invalidPointerCast:plugins/draco/module/vtkF3DGLTFDocumentLoader.cxx
-unusedStructMember:plugins/native/module/vtkF3DQuakeMDLImporter.cxx
-unusedStructMember:plugins/native/module/vtkF3DSPZReader.cxx
-constParameterPointer:vtkext/private/module/vtkF3DMetaImporter.cxx
-constParameterPointer:plugins/assimp/module/vtkF3DAssimpImporter.cxx
-constParameterPointer:plugins/alembic/module/vtkF3DAlembicReader.cxx

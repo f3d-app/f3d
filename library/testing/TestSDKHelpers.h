@@ -8,6 +8,7 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <numbers>
 
 namespace TestSDKHelpers
 {
@@ -81,7 +82,7 @@ inline bool RenderTest(f3d::window& win, const std::string& baselinePath,
 
 constexpr double Degrees2Radians(double degrees)
 {
-  return (3.14159265358979323846 * degrees / 180.0);
+  return (std::numbers::pi * degrees / 180.0);
 }
 }
 #endif

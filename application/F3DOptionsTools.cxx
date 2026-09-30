@@ -432,7 +432,7 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       foundUnknownOption = true;
 
       // check if it's a long option
-      if (unknownOption.substr(0, 2) == "--")
+      if (unknownOption.starts_with("--"))
       {
         const size_t equalPos = unknownOption.find('=');
 

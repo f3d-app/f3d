@@ -51,7 +51,7 @@ int TestF3DAssimpImportError(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
     return EXIT_FAILURE;
   }
 
-  auto lastMessage = errorMessages.back();
+  const auto& lastMessage = errorMessages.back();
   if (lastMessage.find("Assimp error") == std::string::npos)
   {
     std::cerr << "No Assimp error triggered!\n";

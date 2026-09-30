@@ -44,7 +44,7 @@ struct vtkF3DGenericImporter::Internals
 
   bool HasAnimation = false;
   bool AnimationEnabled = false;
-  std::array<double, 2> TimeRange;
+  std::array<double, 2> TimeRange = { 0.0, 0.0 };
   vtkNew<vtkDoubleArray> TimeSteps;
 
   void UpdateBlock(BlockData& bd, vtkDataSet* dataset)

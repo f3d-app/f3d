@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+namespace
+{
 class ErrorEventCallback : public vtkCommand
 {
 public:
@@ -33,10 +35,11 @@ public:
 private:
   std::vector<std::string> Messages;
 };
+}
 
 int TestF3DDracoReaderError(int vtkNotUsed(argc), char* argv[])
 {
-  vtkNew<ErrorEventCallback> errorEventCallback;
+  vtkNew<::ErrorEventCallback> errorEventCallback;
   vtkNew<vtkCallbackCommand> nullEventCallback;
 
   std::string filename = std::string(argv[1]) + "data/nonexistent.drc";
@@ -53,7 +56,7 @@ int TestF3DDracoReaderError(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  auto lastMessage = errorMessages.back();
+  const auto& lastMessage = errorMessages.back();
   if (lastMessage.find("Cannot read file") == std::string::npos)
   {
     std::cerr << "No draco error triggered!\n";

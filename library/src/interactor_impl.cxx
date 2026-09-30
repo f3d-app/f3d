@@ -60,8 +60,8 @@ public:
   {
     std::vector<std::string> CommandVector;
     documentation_callback_t DocumentationCallback;
-    BindingType Type;
-    bool Notify;
+    BindingType Type = BindingType::OTHER;
+    bool Notify = false;
   };
 
   struct CommandCallbacks
@@ -803,7 +803,7 @@ interactor& interactor_impl::initCommands()
     }
 
     // Recover all names that starts with args[indexToCheck]
-    std::copy_if(names.begin(), names.end(), std::back_inserter(candidates),
+    std::ranges::copy_if(names, std::back_inserter(candidates),
       [&](const std::string& name) { return name.starts_with(args[indexToCheck]); });
 
     // Create an arg pattern before the indexToCheck
