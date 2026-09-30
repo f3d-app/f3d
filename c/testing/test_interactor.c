@@ -102,10 +102,26 @@ int test_interactor()
   (void)less1;
 
   const char* test_commands[] = { "test_action" };
-  f3d_interactor_add_binding(interactor, &bind, test_commands, 1, "test_group", F3D_INTERACTOR_BINDING_CYCLIC, 1, 0);
+  f3d_binding_params_t bind_params;
+  bind_params.bind = bind;
+  bind_params.commands = test_commands;
+  bind_params.command_count = 1;
+  bind_params.group = "test_group";
+  bind_params.type = F3D_INTERACTOR_BINDING_CYCLIC;
+  bind_params.notify = 1;
+  bind_params.repeat = 0;
+  f3d_interactor_add_binding(interactor, bind_params);
 
   const char* test_commands_repeat[] = { "test_action_repeat" };
-  f3d_interactor_add_binding(interactor, &repeat_bind, test_commands_repeat, 1, "test_group", F3D_INTERACTOR_BINDING_NUMERICAL, 1, 1);
+  f3d_binding_params_t repeat_bind_params;
+  repeat_bind_params.bind = repeat_bind;
+  repeat_bind_params.commands = test_commands_repeat;
+  repeat_bind_params.command_count = 1;
+  repeat_bind_params.group = "test_group";
+  repeat_bind_params.type = F3D_INTERACTOR_BINDING_NUMERICAL;
+  repeat_bind_params.notify = 1;
+  repeat_bind_params.repeat = 1;
+  f3d_interactor_add_binding(interactor, repeat_bind_params);
 
   int group_count = 0;
   char** groups = f3d_interactor_get_bind_groups(interactor, &group_count);

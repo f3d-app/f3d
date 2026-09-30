@@ -76,10 +76,10 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
     return std::pair(doc, (value ? "ON" : "OFF"));
   };
 
-  inter.addBinding({ f3d::interaction_bind_t::ModifierKeys::ANY, "Exclam" },
-    "toggle ui.notifications.show_bindings", "Custom",
-    std::bind(docTgl, "Show Bind Keys", std::cref(opt.ui.notifications.show_bindings)),
-    f3d::interactor::BindingType::TOGGLE);
+  inter.addBinding({.Bind = { f3d::interaction_bind_t::ModifierKeys::ANY, "Exclam" },
+    .Commands = {"toggle ui.notifications.show_bindings"}, .Group = "Custom",
+    .DocCallback = std::bind(docTgl, "Show Bind Keys", std::cref(opt.ui.notifications.show_bindings)),
+    .Type = f3d::interactor::BindingType::TOGGLE});
 
   inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "Exclam");
   inter.triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "Exclam");

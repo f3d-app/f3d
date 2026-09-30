@@ -1160,36 +1160,36 @@ public:
       interactor.initBindings();
 
       // clang-format off
-      interactor.addBinding({ mod_t::NONE, "Left" }, "load_previous_file_group", "Others", std::bind(docString, "Load previous file group"));
-      interactor.addBinding({ mod_t::NONE, "Right" }, "load_next_file_group", "Others", std::bind(docString, "Load next file group"));
-      interactor.addBinding({ mod_t::CTRL, "Left" }, "load_previous_file_group true", "Others", std::bind(docString, "Load previous file group, keeping camera"));
-      interactor.addBinding({ mod_t::CTRL, "Right" }, "load_next_file_group true", "Others", std::bind(docString, "Load next file group, keeping camera"));
-      interactor.addBinding({ mod_t::NONE, "Up" }, "reload_current_file_group", "Others", std::bind(docString, "Reload current file group"));
-      interactor.addBinding({ mod_t::NONE, "Down" }, "add_current_directories", "Others", std::bind(docString, "Add files from dir of current file"));
-      interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others", std::bind(docString, "Take a screenshot"));
+      interactor.addBinding({.Bind = { mod_t::NONE, "Left" }, .Commands = {"load_previous_file_group"}, .Group = "Others", .DocCallback = std::bind(docString, "Load previous file group")});
+      interactor.addBinding({.Bind = { mod_t::NONE, "Right" }, .Commands = {"load_next_file_group"}, .Group = "Others", .DocCallback = std::bind(docString, "Load next file group")});
+      interactor.addBinding({.Bind = { mod_t::CTRL, "Left" }, .Commands = {"load_previous_file_group true"}, .Group = "Others", .DocCallback = std::bind(docString, "Load previous file group, keeping camera")});
+      interactor.addBinding({.Bind = { mod_t::CTRL, "Right" }, .Commands = {"load_next_file_group true"}, .Group = "Others", .DocCallback = std::bind(docString, "Load next file group, keeping camera")});
+      interactor.addBinding({.Bind = { mod_t::NONE, "Up" }, .Commands = {"reload_current_file_group"}, .Group = "Others", .DocCallback = std::bind(docString, "Reload current file group")});
+      interactor.addBinding({.Bind = { mod_t::NONE, "Down" }, .Commands = {"add_current_directories"}, .Group = "Others", .DocCallback = std::bind(docString, "Add files from dir of current file")});
+      interactor.addBinding({.Bind = { mod_t::NONE, "F12" }, .Commands = {"take_screenshot"}, .Group = "Others", .DocCallback = std::bind(docString, "Take a screenshot")});
 #if F3D_MODULE_TINYFILEDIALOGS
-      interactor.addBinding({ mod_t::CTRL, "S" }, "save_statefile_dialog", "Others", std::bind(docString, "Save a statefile (file dialog)"));
-      interactor.addBinding({ mod_t::CTRL, "L" }, "load_statefile_dialog", "Others", std::bind(docString, "Load a statefile (file dialog)"));
+      interactor.addBinding({.Bind = { mod_t::CTRL, "S" }, .Commands = {"save_statefile_dialog"}, .Group = "Others", .DocCallback = std::bind(docString, "Save a statefile (file dialog)")});
+      interactor.addBinding({.Bind = { mod_t::CTRL, "L" }, .Commands = {"load_statefile_dialog"}, .Group = "Others", .DocCallback = std::bind(docString, "Load a statefile (file dialog)")});
 #endif
-      interactor.addBinding({ mod_t::CTRL_SHIFT, "S" }, "save_statefile", "Others", std::bind(docString, "Save a statefile (auto filename)"));
-      interactor.addBinding({ mod_t::CTRL_SHIFT, "L" }, "load_statefile", "Others", std::bind(docString, "Load the last auto-filename statefile"));
+      interactor.addBinding({.Bind = { mod_t::CTRL_SHIFT, "S" }, .Commands = {"save_statefile"}, .Group = "Others", .DocCallback = std::bind(docString, "Save a statefile (auto filename)")});
+      interactor.addBinding({.Bind = { mod_t::CTRL_SHIFT, "L" }, .Commands = {"load_statefile"}, .Group = "Others", .DocCallback = std::bind(docString, "Load the last auto-filename statefile")});
 #if F3D_MODULE_CLIP
-      interactor.addBinding({ mod_t::CTRL, "C" }, "save_statefile_to_clipboard", "Others", std::bind(docString, "Save a statefile to the clipboard"));
-      interactor.addBinding({ mod_t::CTRL, "V" }, "load_statefile_from_clipboard", "Others", std::bind(docString, "Load a statefile from the clipboard"));
+      interactor.addBinding({.Bind = { mod_t::CTRL, "C" }, .Commands = {"save_statefile_to_clipboard"}, .Group = "Others", .DocCallback = std::bind(docString, "Save a statefile to the clipboard")});
+      interactor.addBinding({.Bind = { mod_t::CTRL, "V" }, .Commands = {"load_statefile_from_clipboard"}, .Group = "Others", .DocCallback = std::bind(docString, "Load a statefile from the clipboard")});
 #endif
 #if F3D_MODULE_TINYFILEDIALOGS
-      interactor.addBinding({ mod_t::CTRL, "O" }, "open_file_dialog", "Others", std::bind(docString, "Open File Dialog"), f3d::interactor::BindingType::OTHER, true);
+      interactor.addBinding({.Bind = { mod_t::CTRL, "O" }, .Commands = {"open_file_dialog"}, .Group = "Others", .DocCallback = std::bind(docString, "Open File Dialog"), .Type = f3d::interactor::BindingType::OTHER, .Notify = true});
 #endif
-      interactor.addBinding({ mod_t::CTRL, "F12" }, "take_minimal_screenshot", "Others", std::bind(docString, "Take a minimal screenshot"));
+      interactor.addBinding({.Bind = { mod_t::CTRL, "F12" }, .Commands = {"take_minimal_screenshot"}, .Group = "Others", .DocCallback = std::bind(docString, "Take a minimal screenshot")});
 
       // This replace an existing default binding command in the libf3d
       interactor.removeBinding({ mod_t::NONE, "Drop" });
-      interactor.addBinding({ mod_t::NONE, "Drop" }, "add_files_or_set_hdri", "Others", std::bind(docString, "Load dropped files, folder or HDRI"), f3d::interactor::BindingType::OTHER, true);
-      interactor.addBinding({ mod_t::CTRL, "Drop" }, "add_files", "Others", std::bind(docString, "Load dropped files or folder"), f3d::interactor::BindingType::OTHER, true);
-      interactor.addBinding({ mod_t::SHIFT, "Drop" }, "set_hdri", "Others", std::bind(docString, "Set HDRI and use it"), f3d::interactor::BindingType::OTHER, true);
+      interactor.addBinding({.Bind = { mod_t::NONE, "Drop" }, .Commands = {"add_files_or_set_hdri"}, .Group = "Others", .DocCallback = std::bind(docString, "Load dropped files, folder or HDRI"), .Type = f3d::interactor::BindingType::OTHER, .Notify = true});
+      interactor.addBinding({.Bind = { mod_t::CTRL, "Drop" }, .Commands = {"add_files"}, .Group = "Others", .DocCallback = std::bind(docString, "Load dropped files or folder"), .Type = f3d::interactor::BindingType::OTHER, .Notify = true});
+      interactor.addBinding({.Bind = { mod_t::SHIFT, "Drop" }, .Commands = {"set_hdri"}, .Group = "Others", .DocCallback = std::bind(docString, "Set HDRI and use it"), .Type = f3d::interactor::BindingType::OTHER, .Notify = true});
 
       interactor.removeBinding({mod_t::CTRL, "Q"});
-      interactor.addBinding({mod_t::CTRL, "Q"}, "exit", "Others", std::bind(docString, "Quit"), f3d::interactor::BindingType::OTHER, true);
+      interactor.addBinding({.Bind = {mod_t::CTRL, "Q"}, .Commands = {"exit"}, .Group = "Others", .DocCallback = std::bind(docString, "Quit"), .Type = f3d::interactor::BindingType::OTHER, .Notify = true});
       // clang-format on
 
       f3d::log::debug("Adding config defined bindings if any: ");
@@ -1218,7 +1218,7 @@ public:
 
               const f3d::interaction_bind_t bind = f3d::interaction_bind_t::parse(bindStr);
               interactor.removeBinding(bind);
-              interactor.addBinding(bind, commands, "Config", std::bind(docStringVec, commands));
+              interactor.addBinding({.Bind = bind, .Commands = commands, .Group = "Config", .DocCallback = std::bind(docStringVec, commands)});
             }
           }
         }

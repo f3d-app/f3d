@@ -425,11 +425,9 @@ void f3d_interactor_init_bindings(f3d_interactor_t* interactor)
 }
 
 //----------------------------------------------------------------------------
-void f3d_interactor_add_binding(f3d_interactor_t* interactor, const f3d_interaction_bind_t* bind,
-  const char** commands, int command_count, const char* group, f3d_interactor_binding_type_t type,
-  int notify, int repeat)
+void f3d_interactor_add_binding(f3d_interactor_t* interactor, f3d_binding_params_t binding)
 {
-  if (!interactor || !bind || !commands || command_count <= 0)
+  if (!interactor || !binding.commands || binding.command_count <= 0)
   {
     return;
   }
@@ -437,22 +435,22 @@ void f3d_interactor_add_binding(f3d_interactor_t* interactor, const f3d_interact
   f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
 
   f3d::interaction_bind_t cpp_bind;
-  cpp_bind.mod = static_cast<f3d::interaction_bind_t::ModifierKeys>(bind->mod);
-  cpp_bind.inter = bind->inter;
+  cpp_bind.mod = static_cast<f3d::interaction_bind_t::ModifierKeys>(binding.bind.mod);
+  cpp_bind.inter = binding.bind.inter;
 
   std::vector<std::string> cpp_commands;
-  cpp_commands.reserve(command_count);
-  for (int i = 0; i < command_count; ++i)
+  cpp_commands.reserve(binding.command_count);
+  for (int i = 0; i < binding.command_count; ++i)
   {
-    cpp_commands.push_back(commands[i]);
+    cpp_commands.push_back(binding.commands[i]);
   }
 
-  const std::string cpp_group = group ? group : "";
+  std::string cpp_group = binding.group ? binding.group : "";
 
   try
   {
-    cpp_interactor->addBinding(cpp_bind, cpp_commands, cpp_group, nullptr,
-      static_cast<f3d::interactor::BindingType>(type), notify != 0, repeat != 0);
+    cpp_interactor->addBinding({.Bind = cpp_bind, .Commands = cpp_commands, .Group = cpp_group, .DocCallback = nullptr,
+      .Type = static_cast<f3d::interactor::BindingType>(binding.type), .Notify = binding.notify != 0, .Repeat = binding.repeat != 0});
   }
   catch (const f3d::interactor::already_exists_exception& ex)
   {
