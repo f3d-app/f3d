@@ -86,8 +86,9 @@ factory::plugin_initializer_t factory::getStaticInitializer(const std::string& p
 }
 
 //----------------------------------------------------------------------------
-reader* factory::getReader(const std::string& fileName, std::optional<std::string> forceReader,
-  const bool skipContentCheck, file_availability& availability)
+reader* factory::getReader(const std::string& fileName,
+  const std::optional<std::string>& forceReader, const bool skipContentCheck,
+  file_availability& availability)
 {
   bool isForced = forceReader.has_value();
   return f3d::pickReader(this->Plugins, forceReader, availability,
@@ -102,7 +103,7 @@ reader* factory::getReader(
   stream->SetBuffer(buffer, size);
   file_availability availability = file_availability::UNSUPPORTED_EXTENSION;
 
-  return f3d::pickReader(this->Plugins, forceReader, availability,
+  return f3d::pickReader(this->Plugins, std::move(forceReader), availability,
     [&](const reader* reader)
     {
       if (reader->supportsStream() && reader->canRead(stream))
@@ -117,12 +118,12 @@ reader* factory::getReader(
 bool factory::setReaderOption(const std::string& name, const std::string& value)
 {
   // Set the reader option on the first reader that accepts it
-  return std::any_of(this->Plugins.begin(), this->Plugins.end(),
+  return std::ranges::any_of(this->Plugins,
     [&](const f3d::plugin* plugin)
     {
       const auto& readers = plugin->getReaders();
-      return std::any_of(readers.begin(), readers.end(),
-        [&](const auto& reader) { return reader->setReaderOption(name, value); });
+      return std::ranges::any_of(
+        readers, [&](const auto& reader) { return reader->setReaderOption(name, value); });
     });
 }
 
@@ -162,7 +163,7 @@ void factory::autoload()
 //----------------------------------------------------------------------------
 bool factory::registerOnce(plugin* plug)
 {
-  if (std::find(this->Plugins.begin(), this->Plugins.end(), plug) == this->Plugins.end())
+  if (std::ranges::find(this->Plugins, plug) == this->Plugins.end())
   {
     this->Plugins.push_back(plug);
 
