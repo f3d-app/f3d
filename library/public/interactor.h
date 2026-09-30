@@ -184,18 +184,6 @@ public:
     BindingType Type = BindingType::OTHER;
     bool Notify = false;
     bool Repeat = true;
-
-    BindingParam(interaction_bind_t bind, std::string command,
-    std::string group = {}, documentation_callback_t docCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool notify = true, bool repeat = false) : Bind(std::move(bind)), Commands{std::move(command)}, Group(std::move(group)), DocCallback(std::move(docCallback)), Type(type), Notify(notify), Repeat(repeat) {}
-
-    BindingParam(interaction_bind_t bind, std::vector<std::string> commands,
-    std::string group = {}, documentation_callback_t docCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool notify = true, bool repeat = false) : Bind(std::move(bind)), Commands(std::move(commands)), Group(std::move(group)), DocCallback(std::move(docCallback)), Type(type), Notify(notify), Repeat(repeat) {}
-
-    BindingParam(interaction_bind_t bind, std::initializer_list<std::string> list,
-    std::string group = {}, documentation_callback_t docCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool notify = true, bool repeat = false) : Bind(std::move(bind)), Commands(list), Group(std::move(group)), DocCallback(std::move(docCallback)), Type(type), Notify(notify), Repeat(repeat) {}
   };
 
   /**

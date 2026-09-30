@@ -65,9 +65,9 @@ int TestSDKInteractorDocumentation([[maybe_unused]] int argc, char* argv[])
 
   // Add a dummy binding
   inter.addBinding(
-    { mod_t::ANY, "DummyBind" }, "DummyCommand", "DummyGroup",
-    []() -> std::pair<std::string, std::string> { return std::pair("DummyDoc", "DummyVal"); },
-    f3d::interactor::BindingType::CYCLIC);
+    {.Bind = { mod_t::ANY, "DummyBind" }, .Commands = {"DummyCommand"}, .Group = "DummyGroup",
+    .DocCallback = []() -> std::pair<std::string, std::string> { return std::pair("DummyDoc", "DummyVal"); },
+    .Type = f3d::interactor::BindingType::CYCLIC});
 
   {
     // Test dummy binding
