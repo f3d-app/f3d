@@ -206,51 +206,6 @@ extern "C"
    */
   F3D_EXPORT int f3d_scene_supports(f3d_scene_t* scene, const char* file_path);
 
-  /**
-   * @brief Load added files at provided time value if they contain any animation.
-   *
-   * @param scene Scene handle.
-   * @param time_value Time value to load.
-   */
-  F3D_EXPORT void f3d_scene_load_animation_time(f3d_scene_t* scene, double time_value);
-
-  /**
-   * @brief Get keyframes times of loaded files
-   *
-   * The returned keyframes is heap-allocated and must be freed with
-   * f3d_scene_destroy_animation_keyframes().
-   *
-   * @param scene Scene handle.
-   * @param count Pointer to store the count of keyframes
-   * @return Pointer to the array of keyframe time keys
-   */
-  F3D_EXPORT double* f3d_scene_get_animation_keyframes(f3d_scene_t* scene, unsigned int* count);
-
-  /**
-   * @brief Free the animation keyframes array.
-   *
-   * @param keyframes Pointer to the keyframes array to free.
-   */
-  F3D_EXPORT void f3d_scene_destroy_animation_keyframes(double* keyframes);
-
-  /**
-   * @brief Get animation time range of currently added files.
-   *
-   * @param scene Scene handle.
-   * @param min_time Pointer to store minimum time.
-   * @param max_time Pointer to store maximum time.
-   */
-  F3D_EXPORT void f3d_scene_animation_time_range(
-    f3d_scene_t* scene, double* min_time, double* max_time);
-
-  /**
-   * @brief Return the number of animations available in the currently loaded files.
-   *
-   * @param scene Scene handle.
-   * @return Number of available animations.
-   */
-  F3D_EXPORT unsigned int f3d_scene_available_animations(const f3d_scene_t* scene);
-
 #ifdef __cplusplus
 }
 #endif
