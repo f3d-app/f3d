@@ -147,7 +147,6 @@ f3d_test(NAME TestInteractionProgressReload DATA cow.vtp ARGS --loading-progress
 ## Animation
 f3d_test(NAME TestInteractionAnimationNotStopped DATA InterpolationTest.glb NO_BASELINE INTERACTION) #Space;
 f3d_test(NAME TestInteractionAnimationCycleAnimation DATA InterpolationTest.glb INTERACTION) #WWWWWWWWWWWW;Space;Space;
-f3d_test(NAME TestInteractionAnimationIndexDeprecatedCycleAnimation DATA InterpolationTest.glb ARGS --animation-index=2 INTERACTION) #WWWWWWWWWWWW;Space;Space;
 f3d_test(NAME TestInteractionCycleAnimationNoAnimation DATA cow.vtp INTERACTION NO_BASELINE) #W
 f3d_test(NAME TestInteractionCycleAnimationOneAnimation DATA f3d.glb ARGS --verbose INTERACTION NO_BASELINE REGEXP "Current animation is: No animation") #W
 

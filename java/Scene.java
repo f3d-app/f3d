@@ -59,17 +59,7 @@ public class Scene {
      */
     public native Scene add(String filePath);
 
-    /**
-     * Add and load multiple files into the scene.
-     *
-     * @param filePaths list of file paths to add
-     * @return this scene for method chaining
-     *
-     * @deprecated use `add(List<String> filePaths)` instead.
-     * This function will be private in 4.0
-     */
-    @Deprecated
-    public native Scene addAll(List<String> filePaths);
+    private native Scene addAll(List<String> filePaths);
 
     /**
      * Add and load multiple files into the scene.
@@ -82,17 +72,7 @@ public class Scene {
         return this.addAll(filePaths);
     }
 
-    /**
-     * Add and load a mesh into the scene.
-     *
-     * @param mesh mesh to add
-     * @return this scene for method chaining
-     *
-     * @deprecated use `add(Types.Mesh mesh)` instead.
-     * This function will be private in 4.0
-     */
-    @Deprecated
-    public native Scene addMesh(Types.Mesh mesh);
+    private native Scene addMesh(Types.Mesh mesh);
 
     /**
      * Add and load a mesh into the scene.
@@ -103,22 +83,6 @@ public class Scene {
     public Scene add(Types.Mesh mesh)
     {
         return this.addMesh(mesh);
-    }
-
-    /**
-     * Add and load a buffer containing a file into the scene.
-     *
-     * @param buffer Memory buffer to load
-     * @param size Size of memory buffer to load
-     * @return this scene for method chaining
-     *
-     * @deprecated use `add(byte[] buffer)` instead.
-     * This function will be removed in 4.0
-     */
-    @Deprecated
-    public Scene addBuffer(byte[] buffer, int size)
-    {
-        return this.addBuffer(buffer);
     }
 
     private native Scene addBuffer(byte[] buffer);

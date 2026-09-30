@@ -916,16 +916,6 @@ PYBIND11_MODULE(pyf3d, module)
       "Add a surfacic mesh view from memory into the scene", py::arg("mesh"))
     .def(
       "add",
-      [](f3d::scene& scene, py::bytes buffer, std::size_t size)
-      {
-        PyErr_WarnEx(
-          PyExc_DeprecationWarning, "add(buffer, size) is deprecated, use add(buffer) instead.", 1);
-        std::string_view sv(buffer);
-        scene.add(reinterpret_cast<const std::byte*>(sv.data()), size);
-      },
-      "Add a memory buffer containing a file the scene", py::arg("buffer"), py::arg("size"))
-    .def(
-      "add",
       [](f3d::scene& scene, py::bytes buffer)
       {
         std::string_view sv(buffer);

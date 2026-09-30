@@ -9,11 +9,6 @@
         "type": "bool",
         "default_value": "false"
       },
-      "index": {
-        "type": "int",
-        "default_value": "0",
-        "deprecated": "use scene.animation.indices instead"
-      },
       "indices": {
         "type": "int_vector",
         "default_value": "0"
@@ -284,25 +279,10 @@
       "type": "bool",
       "default_value": "false"
     },
-    "dropzone": {
-      "type": "bool",
-      "default_value": "false",
-      "deprecated": "use ui.drop_zone.enable instead"
-    },
-    "dropzone_info": {
-      "type": "string",
-      "default_value": "",
-      "deprecated": "use ui.drop_zone.custom_binds instead"
-    },
     "drop_zone": {
       "enable": {
         "type": "bool",
         "default_value": "false"
-      },
-      "info": {
-        "type": "string",
-        "default_value": "",
-        "deprecated": "use ui.drop_zone.custom_binds instead"
       },
       "show_logo": {
         "type": "bool",
@@ -570,11 +550,6 @@
         "style": "enum",
         "enum": ["default", "trackball", "2d"]
       }
-    },
-    "trackball": {
-      "type": "bool",
-      "default_value": "false",
-      "deprecated": "use interactor.style instead"
     },
     "invert_zoom": {
       "type": "bool",

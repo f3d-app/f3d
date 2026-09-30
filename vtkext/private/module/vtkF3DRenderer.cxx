@@ -114,26 +114,6 @@ constexpr double ScalarBarPositionX = 0.1;
 constexpr double ScalarBarPositionY = 0.01;
 constexpr double ScalarBarHeight = 0.07;
 
-std::string DeprecatedCollapsePath(const fs::path& path)
-{
-  std::string collapsed;
-  std::string origin = path.string();
-
-  // Handle retro-compatibility but warn for deprecation
-  // For easier removal when removing deprecation: F3D_DEPRECATED
-  if (!origin.empty())
-  {
-    collapsed = vtksys::SystemTools::CollapseFullPath(origin);
-    if (collapsed != origin)
-    {
-      F3DLog::Print(F3DLog::Severity::Warning,
-        std::string("Collapsing path inside the libf3d is now deprecated, use "
-                    "utils::collapsePath manually."));
-    }
-  }
-  return collapsed;
-}
-
 //----------------------------------------------------------------------------
 // Compute the MD5 hash of an existing file on disk
 std::string ComputeFileHash(const std::string& filepath)
@@ -199,7 +179,7 @@ vtkSmartPointer<vtkImageData> SaveTextureToImage(
 vtkSmartPointer<vtkTexture> GetTexture(const fs::path& filePath, bool isSRGB = false)
 {
   vtkSmartPointer<vtkTexture> texture;
-  std::string fullPath = ::DeprecatedCollapsePath(filePath);
+  std::string fullPath = filePath.string();
   if (!fullPath.empty())
   {
     if (!vtksys::SystemTools::FileExists(fullPath))
@@ -1151,7 +1131,7 @@ void vtkF3DRenderer::SetHDRIFile(const std::optional<fs::path>& hdriFile)
   std::string hdriFileStr;
   if (hdriFile.has_value())
   {
-    hdriFileStr = ::DeprecatedCollapsePath(hdriFile.value());
+    hdriFileStr = hdriFile.value().string();
   }
 
   // Check HDRI is different than current one
@@ -1634,7 +1614,7 @@ void vtkF3DRenderer::ConfigureTextActors()
   std::string fontFileStr;
   if (this->FontFile.has_value())
   {
-    fontFileStr = ::DeprecatedCollapsePath(this->FontFile.value());
+    fontFileStr = this->FontFile.value().string();
   }
 
   if (!fontFileStr.empty())

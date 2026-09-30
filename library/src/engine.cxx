@@ -487,13 +487,6 @@ void engine::loadPlugin(const std::string& pathOrName, const std::vector<fs::pat
     return;
   }
 
-  // For easier removal when removing deprecation: F3D_DEPRECATED
-  if (pathOrName == "exodus")
-  {
-    f3d::log::warn("The 'exodus' plugin is deprecated, load 'hdf' instead");
-    return f3d::engine::loadPlugin("hdf", searchPaths);
-  }
-
   std::string pluginOrigin = "static";
   factory* factory = factory::instance();
 
@@ -715,7 +708,7 @@ engine::libInformation engine::getLibInfo()
 
   libInfo.Copyrights.emplace_back("2019-2021 Kitware SAS");
   libInfo.Copyrights.emplace_back("2021-2025 Michael Migliore, Mathieu Westphal");
-  libInfo.Copyrights.emplace_back("2025 F3D-APP Foundation");
+  libInfo.Copyrights.emplace_back("2025-2026 F3D-APP Foundation");
   libInfo.License = "BSD-3-Clause";
 
   return libInfo;

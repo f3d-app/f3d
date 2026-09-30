@@ -79,7 +79,6 @@ static inline const OptionsDict DefaultAppOptions = {
 static inline const std::map<std::string_view, std::string_view> LibOptionsNames = {
   { "ambient-occlusion", "render.effect.ambient_occlusion" },
   { "animation-autoplay", "scene.animation.autoplay" },
-  { "animation-index", "scene.animation.index" },
   { "animation-indices", "scene.animation.indices" },
   { "animation-progress", "ui.animation_progress" },
   { "animation-speed-factor", "scene.animation.speed_factor" },

@@ -322,20 +322,6 @@ void animationManager::CycleAnimation()
     return;
   }
 
-  // F3D_DEPRECATED
-  // Remove this in the next major release
-  F3D_SILENT_WARNING_PUSH()
-  F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
-  if (this->Options.scene.animation.indices == std::vector<int>{ 0 } &&
-    this->Options.scene.animation.index != 0)
-  {
-    log::warn("scene.animation.index is deprecated, please use "
-              "scene.animation.indices instead");
-    this->Options.scene.animation.indices = { this->Options.scene.animation.index };
-    this->Options.scene.animation.index = 0;
-  }
-  F3D_SILENT_WARNING_POP()
-
   // If we started with multi animation or all animations (any negative value means all animations)
   bool negative =
     std::ranges::any_of(this->Options.scene.animation.indices, [](int idx) { return idx < 0; });
@@ -472,18 +458,6 @@ void animationManager::PrepareForAnimationIndices()
   assert(this->Importer);
 
   std::vector<int> animIndices = this->Options.scene.animation.indices;
-
-  // F3D_DEPRECATED
-  // Remove this in the next major release
-  F3D_SILENT_WARNING_PUSH()
-  F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
-  if (animIndices == std::vector<int>{ 0 } && this->Options.scene.animation.index != 0)
-  {
-    log::warn("scene.animation.index is deprecated, please use "
-              "scene.animation.indices instead");
-    animIndices = { this->Options.scene.animation.index };
-  }
-  F3D_SILENT_WARNING_POP()
 
   // If it contains a negative value, all animations should be selected
   if (std::ranges::any_of(animIndices, [](int idx) { return idx < 0; }))
