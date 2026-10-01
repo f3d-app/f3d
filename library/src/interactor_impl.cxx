@@ -514,7 +514,7 @@ public:
           {
             commandWithArgs.push_back(' ');
             commandWithArgs.append(argsString);
-          };
+          }
           try
           {
             // XXX: Ignore the boolean return of triggerCommand,
