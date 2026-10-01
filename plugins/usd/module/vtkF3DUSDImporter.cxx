@@ -120,7 +120,8 @@ public:
     if (pxr::ArchGetAddressInfo(
           reinterpret_cast<void*>(&vtkF3DUSDImporter::New), &libPath, nullptr, nullptr, nullptr))
     {
-      const std::string plugInfoDir = pxr::TfGetPathName(libPath) + "../lib/usd/f3d/resources/";
+      // NOLINTNEXTLINE(misc-const-correctness)
+      std::string plugInfoDir = pxr::TfGetPathName(libPath) + "../lib/usd/f3d/resources/";
 
 #ifdef _WIN32
       // On Windows, we can get a Universal Naming Convention prefix. Strip it if that's the case.
