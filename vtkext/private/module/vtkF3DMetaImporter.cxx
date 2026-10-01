@@ -496,30 +496,29 @@ bool vtkF3DMetaImporter::Update()
           diffuseTex->SetColorModeToDirectScalars();
         }
 
-        if (actor->GetProperty()->GetLighting())
+        // if (actor->GetProperty()->GetLighting())
+        
+        actor->GetProperty()->SetInterpolationToPBR();
+
+        // Convert to linear space
+        auto toLinear = [](double c) { return std::pow(c, 2.2); };
+        double diffuseColor[3];
+        actor->GetProperty()->GetDiffuseColor(diffuseColor);
+        actor->GetProperty()->SetDiffuseColor(
+          toLinear(diffuseColor[0]), toLinear(diffuseColor[1]), toLinear(diffuseColor[2]));
+
+        // restore diffuse/specular to 1 and ambient to 0
+        actor->GetProperty()->SetSpecular(1.0);
+        actor->GetProperty()->SetDiffuse(1.0);
+        actor->GetProperty()->SetAmbient(0.0);
+
+        if (diffuseTex)
         {
-          actor->GetProperty()->SetInterpolationToPBR();
-
-          // Convert to linear space
-          auto toLinear = [](double c) { return std::pow(c, 2.2); };
-          double diffuseColor[3];
-          actor->GetProperty()->GetDiffuseColor(diffuseColor);
-          actor->GetProperty()->SetDiffuseColor(
-            toLinear(diffuseColor[0]), toLinear(diffuseColor[1]), toLinear(diffuseColor[2]));
-
-          // restore diffuse/specular to 1 and ambient to 0
-          actor->GetProperty()->SetSpecular(1.0);
-          actor->GetProperty()->SetDiffuse(1.0);
-          actor->GetProperty()->SetAmbient(0.0);
-
-          if (diffuseTex)
-          {
-            actor->SetTexture(nullptr);
-            actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-            actor->GetProperty()->SetBaseColorTexture(diffuseTex);
-            actor->GetProperty()->SetTexture("diffuseTex", nullptr);
-          }
+          actor->SetTexture(nullptr);
+          actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+          actor->GetProperty()->SetBaseColorTexture(diffuseTex);
         }
+        
       }
 
       // Increase bounding box size if needed
