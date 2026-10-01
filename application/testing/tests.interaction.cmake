@@ -20,7 +20,7 @@ f3d_test(NAME TestInteractionDirectoryLoop DATA mb/recursive INTERACTION ARGS --
 f3d_test(NAME TestInteractionDirectoryEmpty DATA mb INTERACTION NO_DATA_FORCE_RENDER UI) #Right;Right;Right;
 f3d_test(NAME TestInteractionDirectoryEmptyVerbose DATA mb ARGS --verbose NO_BASELINE INTERACTION REGEXP "is of an unknown format") #Right;Right;Right;HMCSY
 f3d_test(NAME TestInteractionTensorsCycleComp DATA tensors.vti ARGS --coloring-mode=direct INTERACTION) #SYYYYYYYYYY
-f3d_test(NAME TestInteractionCycleScalarsCompCheck DATA dragon.vtu ARGS -b --coloring-mode=scivis --coloring-component=2 INTERACTION) #S
+f3d_test(NAME TestInteractionCycleScalarsCompCheck DATA dragon.vtu ARGS -b --coloring-component=2 INTERACTION) #S
 f3d_test(NAME TestInteractionTAA DATA suzanne.ply ARGS --anti-aliasing=taa INTERACTION) #Render;Render...
 f3d_test(NAME TestInteractionTAAMiddleClick DATA suzanne.ply ARGS --anti-aliasing=taa INTERACTION) #Render;Render...;MiddleClick;Render;Render...
 f3d_test(NAME TestInteractionTextureCheckerBoardTAA DATA WaterBottle.glb ARGS --checkerboard --anti-aliasing=taa INTERACTION) #Render;Render...
@@ -222,7 +222,7 @@ f3d_test(NAME TestInteractionConsoleClear DATA dragon.vtu INTERACTION UI) #Escap
 f3d_test(NAME TestInteractionConsoleTypingSceneInfo RESOLUTION 400,300 DATA f3d.glb INTERACTION UI) #Escape;e;Escape;printt;BackSpace;_scee;Left;Right;_info;Return
 f3d_test(NAME TestInteractionConsoleReload DATA f3d.glb INTERACTION UI) #Escape;reload_current_file_group;Return
 f3d_test(NAME TestInteractionConsoleLoadNext DATA f3d.glb cow.vtp INTERACTION UI) #Escape;load_next_file_group;Return
-f3d_test(NAME TestInteractionConsoleRender ARGS --coloring-field=cells DATA waveletMaterial.vti INTERACTION UI) #Escape;toggle_volume_rendering;Return
+f3d_test(NAME TestInteractionConsoleRender ARGS -s --coloring-field=cells DATA waveletMaterial.vti INTERACTION UI) #Escape;toggle_volume_rendering;Return
 f3d_test(NAME TestInteractionConsoleCamera DATA f3d.glb INTERACTION UI) #Escape;set_camera top;Return
 f3d_test(NAME TestInteractionConsoleScrollbar DATA f3d.glb INTERACTION UI) #Escape;a;Enter;Grab scrollbar
 f3d_test(NAME TestInteractionConsoleEmptyCommand DATA f3d.glb INTERACTION UI) #Escape;Enter
@@ -235,7 +235,7 @@ f3d_test(NAME TestInteractionConsoleAutoCompleteToggleOptions DATA cow.vtp INTER
 f3d_test(NAME TestInteractionConsoleAutoCompleteSetOptions ARGS --point-sprites=gaussian DATA cow.vtp INTERACTION UI RESOLUTION 400,300) #Escape;se;Tab;space;m;Tab;p;Tab;t;Tab;Tab;s;p;Tab;Enter
 f3d_test(NAME TestInteractionConsoleAutoCompleteSetDisplayCompl DATA cow.vtp INTERACTION UI RESOLUTION 400,300) #Escape;se;Tab;space;m;Tab;p;Tab;t;Tab;Tab;Tab
 f3d_test(NAME TestInteractionConsoleAutoCompleteReaderOptions DATA BoxAnimated.gltf INTERACTION UI) #Escape;set_r;Tab;Q;Tab;Enter
-f3d_test(NAME TestInteractionConsoleAutoCompleteColoring DATA BoxAnimated.gltf INTERACTION UI) #Escape;cy;Tab;;c;Tab;a;Tab;Enter
+f3d_test(NAME TestInteractionConsoleAutoCompleteColoring DATA BoxAnimated.gltf ARGS -s INTERACTION UI) #Escape;cy;Tab;;c;Tab;a;Tab;Enter
 f3d_test(NAME TestInteractionConsoleAutoCompleteCamera DATA BoxAnimated.gltf INTERACTION UI) #Escape;se;Tab;_c;Tab;i;Tab;Enter
 f3d_test(NAME TestInteractionConsoleAutoCompleteHelp DATA BoxAnimated.gltf INTERACTION UI) #Escape;h;Tab;h;Tab;Enter
 f3d_test(NAME TestInteractionConsoleAutoCompleteTokenizeError DATA BoxAnimated.gltf INTERACTION UI NO_BASELINE REGEXP "unable to tokenize") #Escape;";Tab;
@@ -328,7 +328,7 @@ endif()
 
 # Test modified drops, this test rendering is impacted by https://github.com/f3d-app/f3d/issues/1558
 # Empty drop is for coverage
-f3d_test(NAME TestInteractionDropHDRIModifiers INTERACTION_CONFIGURE LONG_TIMEOUT) #CTRL+DropEvent f3d.tif;SHIFT+DropEvent;SHIFT+DropEvent palermo.tif;SYYYY
+f3d_test(NAME TestInteractionDropHDRIModifiers ARGS --coloring-mode=direct INTERACTION_CONFIGURE LONG_TIMEOUT) #CTRL+DropEvent f3d.tif;SHIFT+DropEvent;SHIFT+DropEvent palermo.tif;SYYYY
 
 if(F3D_MODULE_EXR)
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
