@@ -14,7 +14,7 @@ int TestF3DAssimpImporterStreamError(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  std::string filename = std::string(argv[1]) + "data/animatedWorld.fbx";
+  const std::string filename = std::string(argv[1]) + "data/animatedWorld.fbx";
   vtkNew<vtkFileResourceStream> stream;
   if (!stream->Open(filename.c_str()))
   {

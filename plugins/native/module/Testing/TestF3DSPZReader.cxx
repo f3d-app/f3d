@@ -34,7 +34,7 @@ int TestF3DSPZReader(int vtkNotUsed(argc), char* argv[])
   reader->SetStream(stream);
   reader->Update();
 
-  vtkIdType nbGaussians = reader->GetOutput()->GetNumberOfPoints();
+  const vtkIdType nbGaussians = reader->GetOutput()->GetNumberOfPoints();
 
   if (nbGaussians != 13296)
   {

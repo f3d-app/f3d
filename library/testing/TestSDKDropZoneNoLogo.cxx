@@ -9,7 +9,7 @@ int TestSDKDropZoneNoLogo([[maybe_unused]] int argc, char* argv[])
 {
   PseudoUnitTest test;
 
-  std::string renderingBackend = std::string(argv[4]);
+  const std::string renderingBackend = std::string(argv[4]);
   f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();

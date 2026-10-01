@@ -172,7 +172,7 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   opt.setAsString("scene.up_direction", "+X");
   test("setAsString direction", opt.getAsString("scene.up_direction"), "+X"s);
 
-  f3d::direction_t dir({ 0.707, -0.707, 0 });
+  const f3d::direction_t dir({ 0.707, -0.707, 0 });
   test("direction x", dir.x() == 0.707);
   test("direction y", dir.y() == -0.707);
   test("direction z", dir.z() == 0);
@@ -306,7 +306,7 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   std::vector<std::string> names = f3d::options::getAllNames();
   test("getAllNames find", std::ranges::find(names, "render.point_size") != names.end());
 
-  std::vector<std::string> setNames = opt.getNames();
+  const std::vector<std::string> setNames = opt.getNames();
   test("getNames count", setNames.size() != 0);
 
   // Test isSame/copy/hasValue

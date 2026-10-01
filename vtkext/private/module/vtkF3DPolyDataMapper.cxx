@@ -32,10 +32,10 @@ void vtkF3DPolyDataMapper::ReplaceShaderValues(
   this->Superclass::ReplaceShaderValues(shaders, ren, actor);
 
   vtkUniforms* uniforms = actor->GetShaderProperty()->GetVertexCustomUniforms();
-  vtkUniforms::TupleType type = uniforms->GetUniformTupleType("jointMatrices");
+  const vtkUniforms::TupleType type = uniforms->GetUniformTupleType("jointMatrices");
   if (type != vtkUniforms::TupleTypeInvalid)
   {
-    int nbJoints = uniforms->GetUniformNumberOfTuples("jointMatrices");
+    const int nbJoints = uniforms->GetUniformNumberOfTuples("jointMatrices");
 
     // The number of uniform values required by OpenGL is 4096
     // Since a mat4 is 16 values, it means we can only support 256 bones
@@ -57,7 +57,7 @@ void vtkF3DPolyDataMapper::ReplaceShaderValues(
         auto vertexShader = shaders[vtkShader::Vertex];
         auto VSSource = vertexShader->GetSource();
 
-        std::regex regex("uniform mat4 jointMatrices\\[[0-9]+\\];");
+        const std::regex regex("uniform mat4 jointMatrices\\[[0-9]+\\];");
         VSSource = std::regex_replace(VSSource, regex,
           "layout(std430, binding = 0) buffer JointMatrices { mat4 jointMatrices[]; };");
 
@@ -68,7 +68,7 @@ void vtkF3DPolyDataMapper::ReplaceShaderValues(
       }
       else
       {
-        std::string msg = "A mesh is associated with more than 250 bones (" +
+        const std::string msg = "A mesh is associated with more than 250 bones (" +
           std::to_string(nbJoints) + "), which requires OpenGL >= 4.3";
         F3DLog::Print(F3DLog::Severity::Warning, msg);
 
@@ -156,7 +156,7 @@ bool vtkF3DPolyDataMapper::FragmentShaderUsesPrimitiveID(vtkRenderer* renderer, 
   // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13207
   // Enable Mesa workaround when using Stochastic blending because it uses gl_PrimitiveID
   // see vtkext/private/module/vtkF3DStochasticTransparentPass.cxx
-  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renderer);
+  const vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renderer);
   if (ren)
   {
     usesPrimitiveID =

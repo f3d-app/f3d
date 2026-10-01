@@ -28,7 +28,7 @@ void vtkF3DSolidBackgroundPass::Render(const vtkRenderState* state)
 
   ren->Clear();
 
-  vtkOpenGLState::ScopedglEnableDisable bsaver(ostate, GL_BLEND);
+  const vtkOpenGLState::ScopedglEnableDisable bsaver(ostate, GL_BLEND);
 
   assert(this->DelegatePass != nullptr);
 

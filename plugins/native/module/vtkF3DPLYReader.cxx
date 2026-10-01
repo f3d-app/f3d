@@ -282,8 +282,8 @@ int vtkF3DPLYReader::RequestData(
   rotation->SetNumberOfTuples(numPts);
   output->GetPointData()->AddArray(rotation);
 
-  vtkNew<vtkUnsignedCharArray> sh1m1, sh10, sh1p1, sh2m2, sh2m1, sh20, sh2p1, sh2p2, sh3m3, sh3m2,
-    sh3m1, sh30, sh3p1, sh3p2, sh3p3;
+  const vtkNew<vtkUnsignedCharArray> sh1m1, sh10, sh1p1, sh2m2, sh2m1, sh20, sh2p1, sh2p2, sh3m3,
+    sh3m2, sh3m1, sh30, sh3p1, sh3p2, sh3p3;
 
   if (hasSH)
   {

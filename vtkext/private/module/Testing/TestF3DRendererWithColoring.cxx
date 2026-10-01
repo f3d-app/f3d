@@ -29,7 +29,7 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   renderer->UpdateActors();
 
   vtkNew<vtkXMLUnstructuredGridReader> readerVTU;
-  std::string filename = std::string(argv[1]) + "data/bluntfin_t.vtu";
+  const std::string filename = std::string(argv[1]) + "data/bluntfin_t.vtu";
   readerVTU->SetFileName(filename.c_str());
   vtkNew<vtkF3DGenericImporter> importerVTU;
   importerVTU->SetInternalReader(readerVTU);
@@ -82,7 +82,7 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   // Check SetInteractionStyle with invalid style
   vtkNew<vtkRenderWindowInteractor> interactor;
   window->SetInteractor(interactor);
-  vtkNew<vtkF3DInteractorStyle> style;
+  const vtkNew<vtkF3DInteractorStyle> style;
   interactor->SetInteractorStyle(style);
   renderer->SetInteractionStyle("invalid");
 

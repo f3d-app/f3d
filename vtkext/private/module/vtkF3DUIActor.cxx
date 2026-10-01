@@ -173,13 +173,13 @@ void vtkF3DUIActor::UpdateFpsValue(const double elapsedFrameTime)
 
   while (this->TotalFrameTimes > 1.0)
   {
-    double oldestFrameTime = this->FrameTimes.front();
+    const double oldestFrameTime = this->FrameTimes.front();
 
     this->FrameTimes.pop_front();
     this->TotalFrameTimes -= oldestFrameTime;
   }
 
-  double averageFrameTime = this->TotalFrameTimes / this->FrameTimes.size();
+  const double averageFrameTime = this->TotalFrameTimes / this->FrameTimes.size();
   this->FpsValue = static_cast<int>(std::round(1.0 / averageFrameTime));
 }
 
@@ -310,7 +310,7 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
   vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
   assert(ren != nullptr);
 
-  double currentTime = ren->GetTotalTime();
+  const double currentTime = ren->GetTotalTime();
 
   // clear outdated notifications
   while (!this->Notifications.empty() && currentTime >= this->Notifications.back().stopTime)

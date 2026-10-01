@@ -64,16 +64,16 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   generated32.save(tmpDir + "/TestSDKImage32.tif", f3d::image::SaveFormat::TIF);
 
   // test saveBuffer in different formats
-  std::vector<unsigned char> bufferPNG = generated.saveBuffer();
+  const std::vector<unsigned char> bufferPNG = generated.saveBuffer();
   test("generated buffer not empty", bufferPNG.size() > 0);
 
-  std::vector<unsigned char> bufferJPG = generated.saveBuffer(f3d::image::SaveFormat::JPG);
+  const std::vector<unsigned char> bufferJPG = generated.saveBuffer(f3d::image::SaveFormat::JPG);
   test("generated JPG buffer not empty", bufferJPG.size() > 0);
 
   test.expect<f3d::image::write_exception>("save incompatible buffer to TIF format",
     [&]() { std::ignore = generated.saveBuffer(f3d::image::SaveFormat::TIF); });
 
-  std::vector<unsigned char> bufferBMP = generated.saveBuffer(f3d::image::SaveFormat::BMP);
+  const std::vector<unsigned char> bufferBMP = generated.saveBuffer(f3d::image::SaveFormat::BMP);
   test("generated BMP buffer not empty", bufferBMP.size() > 0);
 
   // test constructor with different channel sizes
@@ -98,13 +98,13 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     [&]() { img2Ch.save(testingDir + std::string(257, 'x') + ".ext"); });
 
   // check 16-bits image code paths
-  f3d::image shortImg(testingDir + "/data/16bit.png");
+  const f3d::image shortImg(testingDir + "/data/16bit.png");
   test("check 16-bits image channel type",
     shortImg.getChannelType() == f3d::image::ChannelType::SHORT);
   test("check 16-bits image channel type size", shortImg.getChannelTypeSize(), 2u);
 
   // check reading a 32-bits image
-  f3d::image hdrImg(testingDir + "/data/shanghai_bund_1k.hdr");
+  const f3d::image hdrImg(testingDir + "/data/shanghai_bund_1k.hdr");
   test("check 32-bits HDR image channel type",
     hdrImg.getChannelType() == f3d::image::ChannelType::FLOAT);
   test("check 32-bits HDR image channel type size", hdrImg.getChannelTypeSize(), 4u);
@@ -112,28 +112,28 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
 #if F3D_MODULE_EXR
   // check reading EXR
-  f3d::image exrImg(testingDir + "/data/small_rural_road_1k.exr");
+  const f3d::image exrImg(testingDir + "/data/small_rural_road_1k.exr");
   test("check 32-bits EXR image channel type",
     exrImg.getChannelType() == f3d::image::ChannelType::FLOAT);
 #endif
 
 #if F3D_MODULE_WEBP
   // check reading WebP
-  f3d::image webpImg(testingDir + "/data/image.webp");
+  const f3d::image webpImg(testingDir + "/data/image.webp");
   test("check width WebP image channel type", webpImg.getWidth(), 1024u);
 #endif
 
   // check reading invalid image
   test.expect<f3d::image::read_exception>(
-    "read invalid image", [&]() { f3d::image invalidImg(testingDir + "/data/invalid.png"); });
+    "read invalid image", [&]() { const f3d::image invalidImg(testingDir + "/data/invalid.png"); });
 
   // check reading inexistent image, do not create a "/dummy/folder/img.png"
   test.expect<f3d::image::read_exception>(
-    "read image from incorrect path", [&]() { f3d::image img("/dummy/folder/img.png"); });
+    "read image from incorrect path", [&]() { const f3d::image img("/dummy/folder/img.png"); });
 
   // check reading image with invalid path
   test.expect<f3d::image::read_exception>("read image from invalid path",
-    [&]() { f3d::image img("/" + std::string(257, 'x') + "/file.ext"); });
+    [&]() { const f3d::image img("/" + std::string(257, 'x') + "/file.ext"); });
 
   // check generated image with baseline
   test("check generated image width", generated.getWidth(), width);
@@ -144,7 +144,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("check generated image not empty", generated.getContent() != nullptr);
 
   // XXX: PseudoUnitTest could be improved for native image testing
-  f3d::image baseline(testingDir + "/baselines/TestSDKImage.png");
+  const f3d::image baseline(testingDir + "/baselines/TestSDKImage.png");
   test("check generated image is the same as png baseline", generated == baseline);
 
   // XXX: enable following code once https://github.com/f3d-app/f3d/issues/1558 is fixed
@@ -179,7 +179,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     });
 
     const auto fileToString = [](const std::string& path) {
-      std::ifstream file(path);
+      const std::ifstream file(path);
       std::stringstream ss;
       ss << file.rdbuf();
       return ss.str();
@@ -224,7 +224,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     img1.setMetadata("hello", "world");
     img1.save(tmpDir + "/metadata.png");
 
-    f3d::image img2(tmpDir + "/metadata.png");
+    const f3d::image img2(tmpDir + "/metadata.png");
     test("saving/loading file metadata",
       img2.getMetadata("foo") == "bar" && img2.getMetadata("hello") == "world");
   }
@@ -239,7 +239,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
       outfile.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
     }
 
-    f3d::image img2(tmpDir + "/metadata-buffer.png");
+    const f3d::image img2(tmpDir + "/metadata-buffer.png");
     test("saving/loading buffer metadata",
       img2.getMetadata("foo") == "bar" && img2.getMetadata("hello") == "world");
   }
@@ -247,13 +247,13 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   // Test image::compare dedicated code paths
   test("compare images with different channel types", generated.compare(generated16), 1.);
 
-  f3d::image generatedCount(width, height, channels + 1);
+  const f3d::image generatedCount(width, height, channels + 1);
   test("compare images with different channel count", generated.compare(generatedCount), 1.);
 
-  f3d::image generatedSize(width + 1, height, channels);
+  const f3d::image generatedSize(width + 1, height, channels);
   test("compare images with different size", generated.compare(generatedSize), 1.);
 
-  f3d::image empty(0, 0, 0);
+  const f3d::image empty(0, 0, 0);
   test("compare empty images", empty.compare(empty), 0.);
 
   return test.result();

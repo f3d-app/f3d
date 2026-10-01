@@ -122,7 +122,7 @@ std::string ComputeFileHash(const std::string& filepath)
   char md5Hash[33];
   md5Hash[32] = '\0';
 
-  std::size_t length = vtksys::SystemTools::FileLength(filepath);
+  const std::size_t length = vtksys::SystemTools::FileLength(filepath);
   std::vector<char> buffer(length);
 
   vtksys::ifstream file;
@@ -145,8 +145,8 @@ std::string ComputeFileHash(const std::string& filepath)
 vtkSmartPointer<vtkImageData> SaveTextureToImage(
   vtkTextureObject* tex, unsigned int target, unsigned int level, unsigned int size)
 {
-  unsigned int nbFaces = tex->GetTarget() == GL_TEXTURE_CUBE_MAP ? 6 : 1;
-  int type = tex->GetVTKDataType();
+  const unsigned int nbFaces = tex->GetTarget() == GL_TEXTURE_CUBE_MAP ? 6 : 1;
+  const int type = tex->GetVTKDataType();
 
   vtkNew<vtkImageData> img;
   img->SetDimensions(size, size, nbFaces);
@@ -179,7 +179,7 @@ vtkSmartPointer<vtkImageData> SaveTextureToImage(
 vtkSmartPointer<vtkTexture> GetTexture(const fs::path& filePath, bool isSRGB = false)
 {
   vtkSmartPointer<vtkTexture> texture;
-  std::string fullPath = filePath.string();
+  const std::string fullPath = filePath.string();
   if (!fullPath.empty())
   {
     if (!vtksys::SystemTools::FileExists(fullPath))
@@ -424,9 +424,9 @@ void vtkF3DRenderer::ConfigureUpDirection()
 
   std::array<double, 3> axis;
   vtkMath::Cross(oldUp.data(), newUp.data(), axis.data());
-  double sinAngle = vtkMath::Normalize(axis.data());
-  double cosAngle = vtkMath::Dot(oldUp.data(), newUp.data());
-  double angle = std::atan2(sinAngle, cosAngle) * 180.0 / std::numbers::pi;
+  const double sinAngle = vtkMath::Normalize(axis.data());
+  const double cosAngle = vtkMath::Dot(oldUp.data(), newUp.data());
+  const double angle = std::atan2(sinAngle, cosAngle) * 180.0 / std::numbers::pi;
 
   vtkCamera* cam = this->GetActiveCamera();
   double foc[3];
@@ -484,7 +484,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   if (this->DisplayDepth)
   {
     // discard vtkF3DRenderPass if displaying depth
-    vtkNew<vtkOpaquePass> opaqueP;
+    const vtkNew<vtkOpaquePass> opaqueP;
     vtkNew<vtkCameraPass> camP;
     vtkNew<vtkF3DDisplayDepthRenderPass> depthP;
     camP->SetDelegatePass(opaqueP);
@@ -621,9 +621,9 @@ void vtkF3DRenderer::UpdateAxisWidgetSize()
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
   if (this->ModernAxisRepresentation)
   {
-    int* size = this->GetSize();
+    const int* size = this->GetSize();
     // Maintain the axis widget size proportional (15%) to the shortest viewport dimension.
-    int widgetSize = static_cast<int>(std::min(size[0], size[1]) * 0.15);
+    const int widgetSize = static_cast<int>(std::min(size[0], size[1]) * 0.15);
     this->ModernAxisRepresentation->SetSize(widgetSize, widgetSize);
   }
 #endif
@@ -807,8 +807,8 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
   bool show = this->GridVisible;
   if (show)
   {
-    double* up = this->GetEnvironmentUp();
-    double* right = this->GetEnvironmentRight();
+    const double* up = this->GetEnvironmentUp();
+    const double* right = this->GetEnvironmentRight();
     double front[3];
     vtkMath::Cross(right, up, front);
 
@@ -834,7 +834,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
     }
     else
     {
-      double diag = bbox.GetDiagonalLength();
+      const double diag = bbox.GetDiagonalLength();
 
       double tmpUnitSquare;
       if (this->GridUnitSquare.has_value())
@@ -956,8 +956,8 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
   bool show = this->AxesGridVisible;
   if (show)
   {
-    double* up = this->GetEnvironmentUp();
-    double* right = this->GetEnvironmentRight();
+    const double* up = this->GetEnvironmentUp();
+    const double* right = this->GetEnvironmentRight();
     double front[3];
     vtkMath::Cross(right, up, front);
 
@@ -1053,7 +1053,7 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
    * Only gives the thightest bounds if the transformation is axis-aligned. */
   const auto extendBoxAxisAligned = [&](vtkProp3D* prop3d, vtkBoundingBox& box)
   {
-    vtkNew<vtkMatrix4x4> tmpMatrix;
+    const vtkNew<vtkMatrix4x4> tmpMatrix;
     vtkMatrix4x4::Multiply4x4(matrix, prop3d->GetMatrix(), tmpMatrix);
     prop3d->PokeMatrix(tmpMatrix);
 
@@ -1275,7 +1275,7 @@ void vtkF3DRenderer::ConfigureHDRIReader()
         if (this->HDRIReader)
         {
           this->HDRIReader->SetFileName(this->HDRIFile.c_str());
-          std::filesystem::path hdriPath(this->HDRIFile);
+          const std::filesystem::path hdriPath(this->HDRIFile);
           this->UIActor->SetHDRIFileName(hdriPath.filename().string().c_str());
         }
         else
@@ -1416,8 +1416,8 @@ void vtkF3DRenderer::ConfigureHDRILUT()
     assert(lut);
 
     // Check LUT cache
-    std::string lutCachePath = this->CachePath + "/lut.vti";
-    bool lutCacheExists = vtksys::SystemTools::FileExists(lutCachePath, true);
+    const std::string lutCachePath = this->CachePath + "/lut.vti";
+    const bool lutCacheExists = vtksys::SystemTools::FileExists(lutCachePath, true);
     if (lutCacheExists)
     {
       lut->SetFileName(lutCachePath.c_str());
@@ -1435,7 +1435,7 @@ void vtkF3DRenderer::ConfigureHDRILUT()
 
       if (!this->CachePath.empty())
       {
-        vtkSmartPointer<vtkImageData> img =
+        const vtkSmartPointer<vtkImageData> img =
           ::SaveTextureToImage(lut->GetTextureObject(), GL_TEXTURE_2D, 0, lut->GetLUTSize());
         assert(img);
 
@@ -1533,15 +1533,15 @@ void vtkF3DRenderer::ConfigureHDRISpecular()
 
       if (!this->CachePath.empty())
       {
-        unsigned int nbLevels = spec->GetPrefilterLevels();
-        unsigned int size = spec->GetPrefilterSize();
+        const unsigned int nbLevels = spec->GetPrefilterLevels();
+        const unsigned int size = spec->GetPrefilterSize();
 
         vtkNew<vtkMultiBlockDataSet> mb;
         mb->SetNumberOfBlocks(nbLevels);
 
         for (unsigned int i = 0; i < nbLevels; i++)
         {
-          vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
+          const vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
             spec->GetTextureObject(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, i, size >> i);
           assert(img);
           mb->SetBlock(i, img);
@@ -2154,7 +2154,7 @@ void vtkF3DRenderer::UpdateActors()
   // Handle importer changes
   // XXX: Importer only modify itself when adding a new importer,
   // not when updating at a time step
-  vtkMTimeType importerMTime = this->Importer->GetMTime();
+  const vtkMTimeType importerMTime = this->Importer->GetMTime();
   if (importerMTime > this->ImporterTimeStamp)
   {
     this->ActorsPropertiesConfigured = false;
@@ -2165,7 +2165,7 @@ void vtkF3DRenderer::UpdateActors()
 
   // XXX: Handle animation update in importer, which may have an impact on the colormap
   // We assume animation change do not change the number of actors
-  vtkMTimeType importerUpdateMTime = this->Importer->GetUpdateMTime();
+  const vtkMTimeType importerUpdateMTime = this->Importer->GetUpdateMTime();
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   if (this->AxesGridVisible && importerUpdateMTime > this->ImporterUpdateTimeStamp)
@@ -2308,7 +2308,7 @@ void vtkF3DRenderer::Render()
   }
 
   vtkInformation* info = this->GetInformation();
-  bool uiOnly = info->Get(vtkF3DRenderPass::RENDER_UI_ONLY());
+  const bool uiOnly = info->Get(vtkF3DRenderPass::RENDER_UI_ONLY());
 
 #ifndef F3D_USE_GLES
   if (!uiOnly)
@@ -2428,7 +2428,7 @@ void vtkF3DRenderer::CreateCacheDirectory()
   if (!this->CachePath.empty())
   {
     // Cache folder for this HDRI
-    std::string currentCachePath = this->CachePath + "/" + this->HDRIHash;
+    const std::string currentCachePath = this->CachePath + "/" + this->HDRIHash;
 
     // Create the folder if it does not exists
     vtksys::SystemTools::MakeDirectory(currentCachePath);
@@ -2905,7 +2905,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
     vtkShaderProperty* sp = sprites.Actor->GetShaderProperty();
     sp->ClearAllFragmentShaderReplacements();
 
-    std::string sdfFunctions = vtkF3DPointSplatUtilsSDF;
+    const std::string sdfFunctions = vtkF3DPointSplatUtilsSDF;
     sp->AddFragmentShaderReplacement(
       "//VTK::PositionVC::Dec\n", true, sdfFunctions + "//VTK::PositionVC::Dec\n", true);
 
@@ -3011,7 +3011,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureNormalGlyphs()
 {
-  bool normalGlyphsVisible = !this->UseRaytracing && this->UseNormalGlyphs;
+  const bool normalGlyphsVisible = !this->UseRaytracing && this->UseNormalGlyphs;
   for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
   {
     if (normalGlyphsVisible && !normalGlyph.InputDataHasNormals)
@@ -3267,11 +3267,11 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   assert(this->Importer);
 
   // Recover coloring information and update handler
-  bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
+  const bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
   F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
   auto info = coloringHandler.SetCurrentColoring(
     enableColoring, this->UseCellColoring, this->ArrayNameForColoring, false);
-  bool hasColoring = info.has_value();
+  const bool hasColoring = info.has_value();
   if (hasColoring && !this->ColorTransferFunctionConfigured)
   {
     this->ConfigureRangeAndCTFForColoring(info.value());
@@ -3279,7 +3279,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle surface geometry
-  bool geometriesVisible = this->UseRaytracing || (!this->UseVolume && !this->UsePointSprites);
+  const bool geometriesVisible =
+    this->UseRaytracing || (!this->UseVolume && !this->UsePointSprites);
   for (const auto& coloring : this->Importer->GetColoringActorsAndMappers())
   {
     if (geometriesVisible &&
@@ -3314,7 +3315,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle point sprites
-  bool pointSpritesVisible = !this->UseRaytracing && !this->UseVolume && this->UsePointSprites;
+  const bool pointSpritesVisible =
+    !this->UseRaytracing && !this->UseVolume && this->UsePointSprites;
   for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
   {
     if (pointSpritesVisible &&
@@ -3344,7 +3346,7 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle Volume prop
-  bool volumeVisible = !this->UseRaytracing && this->UseVolume;
+  const bool volumeVisible = !this->UseRaytracing && this->UseVolume;
   const auto& volPropsAndMappers = this->Importer->GetVolumePropsAndMappers();
   for (const auto& volume : volPropsAndMappers)
   {
@@ -3387,7 +3389,7 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle scalar bar
-  bool barVisible = this->ScalarBarVisible && hasColoring && this->ComponentForColoring >= -1;
+  const bool barVisible = this->ScalarBarVisible && hasColoring && this->ComponentForColoring >= -1;
   this->ScalarBarActor->SetVisibility(barVisible);
   if (barVisible && !this->ScalarBarActorConfigured)
   {
@@ -3427,7 +3429,7 @@ bool vtkF3DRenderer::ConfigureMapperForColoring(vtkPolyDataMapper* mapper, const
   vtkDataSetAttributes* data = cellFlag
     ? static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetCellData())
     : static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetPointData());
-  vtkDataArray* array = data->GetArray(name.c_str());
+  const vtkDataArray* array = data->GetArray(name.c_str());
   if (!array || component >= array->GetNumberOfComponents())
   {
     mapper->ScalarVisibilityOff();
@@ -3472,7 +3474,7 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
   vtkDataSetAttributes* data = cellFlag
     ? static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetCellData())
     : static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetPointData());
-  vtkDataArray* array = data->GetArray(name.c_str());
+  const vtkDataArray* array = data->GetArray(name.c_str());
   if (!array || component >= array->GetNumberOfComponents())
   {
     // We rely on the selected scalar array to check if this mapper can be shown or not
@@ -3547,7 +3549,7 @@ void vtkF3DRenderer::ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf,
   {
     for (size_t i = 0; i + 1 < opacityMap.size(); i += 2)
     {
-      double value = inverseOpacityFlag ? 1.0 - opacityMap[i + 1] : opacityMap[i + 1];
+      const double value = inverseOpacityFlag ? 1.0 - opacityMap[i + 1] : opacityMap[i + 1];
       otf->AddPoint(range[0] + (range[1] - range[0]) * opacityMap[i], value);
     }
   }
@@ -3662,10 +3664,10 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
     {
       for (size_t i = 0; i < this->Colormap.size(); i += 4)
       {
-        double val = this->Colormap[i];
-        double r = this->Colormap[i + 1];
-        double g = this->Colormap[i + 2];
-        double b = this->Colormap[i + 3];
+        const double val = this->Colormap[i];
+        const double r = this->Colormap[i + 1];
+        const double g = this->Colormap[i + 2];
+        const double b = this->Colormap[i + 3];
         this->ColorTransferFunction->AddRGBPoint(
           this->ColorRange[0] + val * (this->ColorRange[1] - this->ColorRange[0]), r, g, b);
       }
@@ -3702,7 +3704,7 @@ void vtkF3DRenderer::CycleFieldForColoring()
 {
   // XXX: A generic approach will be better when adding categorical field data coloring
   this->SetUseCellColoring(!this->UseCellColoring);
-  bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
+  const bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
   F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
   auto info = coloringHandler.SetCurrentColoring(
     enableColoring, this->UseCellColoring, this->ArrayNameForColoring, true);
@@ -3763,7 +3765,7 @@ void vtkF3DRenderer::CycleArrayForColoring()
   this->Importer->GetColoringInfoHandler().CycleColoringArray(
     !this->UseVolume); // TODO check this cond
   auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
-  bool enable = info.has_value();
+  const bool enable = info.has_value();
 
   this->SetEnableColoring(enable);
   if (this->EnableColoring)

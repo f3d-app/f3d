@@ -63,14 +63,14 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
 
   {
     // a red 10x5x3 box and a hidden box that must not be read
-    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+    const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
       ReadFile(data + "/colored_visibility.FCStd");
     ret &= CheckPartitionCount(pdc, 1, "colored_visibility");
     if (pdc->GetNumberOfPartitionedDataSets() == 1)
     {
       vtkDataSet* dataset = pdc->GetPartition(0, 0);
       ret &= CheckBounds(dataset, { 0., 10., 0., 5., 0., 3. }, "colored_visibility");
-      vtkUnsignedCharArray* colors =
+      const vtkUnsignedCharArray* colors =
         vtkUnsignedCharArray::SafeDownCast(dataset->GetCellData()->GetScalars());
       if (!colors || colors->GetTypedComponent(0, 0) != 204 ||
         colors->GetTypedComponent(0, 1) != 26)
@@ -83,11 +83,12 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
 
   {
     // a box with a different color on each face
-    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc = ReadFile(data + "/face_colors.FCStd");
+    const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+      ReadFile(data + "/face_colors.FCStd");
     ret &= CheckPartitionCount(pdc, 1, "face_colors");
     if (pdc->GetNumberOfPartitionedDataSets() == 1)
     {
-      vtkUnsignedCharArray* colors =
+      const vtkUnsignedCharArray* colors =
         vtkUnsignedCharArray::SafeDownCast(pdc->GetPartition(0, 0)->GetCellData()->GetScalars());
       std::set<std::array<unsigned char, 3>> uniqueColors;
       for (vtkIdType i = 0; colors && i < colors->GetNumberOfTuples(); i++)
@@ -107,7 +108,7 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     // a hidden 2x8x2 box placed and rotated, referenced by a link placed at
     // (0, 20, 0). LinkTransform is disabled so the source placement must be
     // discarded: the box must be axis aligned at the link placement.
-    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc = ReadFile(data + "/link.FCStd");
+    const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc = ReadFile(data + "/link.FCStd");
     ret &= CheckPartitionCount(pdc, 1, "link");
     if (pdc->GetNumberOfPartitionedDataSets() == 1)
     {
@@ -119,7 +120,8 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     // a 10x10x10 box placed at (3, 0, 0) inside an App::Part placed at
     // (0, 0, 10) and rotated 90 degrees around X. The container placement is
     // not baked in the stored BREP and must be composed by the reader.
-    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc = ReadFile(data + "/part_container.FCStd");
+    const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+      ReadFile(data + "/part_container.FCStd");
     ret &= CheckPartitionCount(pdc, 1, "part_container");
     if (pdc->GetNumberOfPartitionedDataSets() == 1)
     {
@@ -131,14 +133,15 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
   {
     // saved without the FreeCAD GUI: no GuiDocument.xml, a box and a link to
     // it, both visible
-    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc = ReadFile(data + "/headless.FCStd");
+    const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc = ReadFile(data + "/headless.FCStd");
     ret &= CheckPartitionCount(pdc, 2, "headless");
   }
 
   {
     // same as link.FCStd but with LinkTransform enabled: the source placement
     // (translation and 30 degrees rotation) must be composed with the link one
-    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc = ReadFile(data + "/link_transform.FCStd");
+    const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+      ReadFile(data + "/link_transform.FCStd");
     ret &= CheckPartitionCount(pdc, 1, "link_transform");
     if (pdc->GetNumberOfPartitionedDataSets() == 1)
     {
@@ -150,7 +153,8 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
   {
     // a link to an object from another document: skipped with a warning,
     // only the local box remains
-    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc = ReadFile(data + "/link_external.FCStd");
+    const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+      ReadFile(data + "/link_external.FCStd");
     ret &= CheckPartitionCount(pdc, 1, "link_external");
   }
 
@@ -158,7 +162,7 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     // colored_visibility.FCStd without the App side Visibility properties,
     // like files written before FreeCAD 0.19: the GuiDocument.xml fallback
     // must still hide the hidden box
-    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+    const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
       ReadFile(data + "/legacy_visibility.FCStd");
     ret &= CheckPartitionCount(pdc, 1, "legacy_visibility");
   }
@@ -167,7 +171,8 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     // a Draft link array: 3 instances of a hidden 2x12x3 box every 10 units.
     // The array does not store any shape, the base one is instanced at the
     // stored placements.
-    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc = ReadFile(data + "/link_array.FCStd");
+    const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+      ReadFile(data + "/link_array.FCStd");
     ret &= CheckPartitionCount(pdc, 1, "link_array");
     if (pdc->GetNumberOfPartitionedDataSets() == 1)
     {
@@ -197,14 +202,15 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     // an opaque box, a box with 60% object transparency and a box with a 80%
     // transparent face stored with the pre-1.1 packed color semantics where
     // the last byte is a transparency, not an alpha
-    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc = ReadFile(data + "/transparency.FCStd");
+    const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+      ReadFile(data + "/transparency.FCStd");
     ret &= CheckPartitionCount(pdc, 3, "transparency");
     if (pdc->GetNumberOfPartitionedDataSets() == 3)
     {
       const std::array<unsigned char, 3> expectedAlpha = { 255, 102, 51 };
       for (unsigned int part = 0; part < 3; part++)
       {
-        vtkUnsignedCharArray* colors = vtkUnsignedCharArray::SafeDownCast(
+        const vtkUnsignedCharArray* colors = vtkUnsignedCharArray::SafeDownCast(
           pdc->GetPartition(part, 0)->GetCellData()->GetScalars());
         if (!colors || colors->GetNumberOfComponents() != 4)
         {
@@ -232,7 +238,8 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     // a file saved with FreeCAD 1.1, which stores colors differently from
     // older versions: two parts with curved surfaces, one with a single
     // color, one with a color per face
-    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc = ReadFile(data + "/bracket_1x.FCStd");
+    const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+      ReadFile(data + "/bracket_1x.FCStd");
     ret &= CheckPartitionCount(pdc, 2, "bracket_1x");
     if (pdc->GetNumberOfPartitionedDataSets() == 2)
     {
@@ -249,7 +256,7 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
       const std::array<size_t, 2> expectedColors = { 1, 4 };
       for (unsigned int part = 0; part < 2; part++)
       {
-        vtkUnsignedCharArray* colors = vtkUnsignedCharArray::SafeDownCast(
+        const vtkUnsignedCharArray* colors = vtkUnsignedCharArray::SafeDownCast(
           pdc->GetPartition(part, 0)->GetCellData()->GetScalars());
         std::set<std::array<unsigned char, 3>> uniqueColors;
         for (vtkIdType i = 0; colors && i < colors->GetNumberOfTuples(); i++)
@@ -285,7 +292,7 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
   {
     // a PartDesign body (hidden box, cylinder tip) and a box in an App::Part:
     // only the tip and the box are read, under the same container node
-    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+    const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
       ReadFile(data + "/partdesign_body.FCStd");
     ret &= CheckPartitionCount(pdc, 2, "partdesign_body");
     if (pdc->GetNumberOfPartitionedDataSets() == 2)
@@ -293,7 +300,7 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
       ret &=
         CheckBounds(pdc->GetPartition(0, 0), { -3., 10., -3., 10., 0., 20. }, "partdesign_body");
       ret &= CheckBounds(pdc->GetPartition(1, 0), { 20., 24., 0., 4., 0., 4. }, "partdesign_body");
-      vtkDataAssembly* assembly = pdc->GetDataAssembly();
+      const vtkDataAssembly* assembly = pdc->GetDataAssembly();
       const int container = assembly->FindFirstNodeWithName("Assembly");
       const int body = assembly->FindFirstNodeWithName("Body");
       const int side = assembly->FindFirstNodeWithName("Side");
@@ -308,7 +315,8 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
 
   {
     // an Arch BuildingPart aggregating a slab through a group: only the slab is read
-    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc = ReadFile(data + "/arch_floor.FCStd");
+    const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+      ReadFile(data + "/arch_floor.FCStd");
     ret &= CheckPartitionCount(pdc, 1, "arch_floor");
     if (pdc->GetNumberOfPartitionedDataSets() == 1)
     {
@@ -320,7 +328,7 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     // a link array with LinkTransform on a hidden 2x12x3 base rotated 90 degrees
     // at (5, 0, 0): the base placement is composed again with the Draft
     // placements, like FreeCAD displays it
-    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+    const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
       ReadFile(data + "/link_array_transform.FCStd");
     ret &= CheckPartitionCount(pdc, 1, "link_array_transform");
     if (pdc->GetNumberOfPartitionedDataSets() == 1)
@@ -333,7 +341,8 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
   {
     // the box lists two groups referencing each other and its own container as
     // children: the reader must not loop, nothing is read
-    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc = ReadFile(data + "/cyclic_groups.FCStd");
+    const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+      ReadFile(data + "/cyclic_groups.FCStd");
     ret &= CheckPartitionCount(pdc, 0, "cyclic_groups");
   }
 
@@ -342,7 +351,7 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     // a shape and a dangling child, an object whose shape file is missing from
     // the archive and missing or truncated binary lists: all ignored, the box
     // is still read
-    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+    const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
       ReadFile(data + "/malformed_elements.FCStd");
     ret &= CheckPartitionCount(pdc, 1, "malformed_elements");
   }
@@ -350,7 +359,7 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
   {
     // a visible 10x10x10 box inside a hidden App::Part and a visible box
     // placed at (20, 0, 0) outside of it: the hidden container hides its child
-    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+    const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
       ReadFile(data + "/hidden_container.FCStd");
     ret &= CheckPartitionCount(pdc, 1, "hidden_container");
     if (pdc->GetNumberOfPartitionedDataSets() == 1)
@@ -363,7 +372,7 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
   {
     // headless.FCStd with a GuiDocument.xml without any view provider: the
     // Document.xml properties are used, both objects are read
-    vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
+    const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
       ReadFile(data + "/gui_without_view_providers.FCStd");
     ret &= CheckPartitionCount(pdc, 2, "gui_without_view_providers");
   }

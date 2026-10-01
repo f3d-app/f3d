@@ -151,11 +151,11 @@ int parse(const std::string& str)
   {
     return stoiStrict(str);
   }
-  catch (std::invalid_argument const&)
+  catch (const std::invalid_argument&)
   {
     throw options::parsing_exception("Cannot parse " + str + " into an int");
   }
-  catch (std::out_of_range const&)
+  catch (const std::out_of_range&)
   {
     throw options::parsing_exception(
       "Cannot parse " + str + " into an int as it would go out of range");
@@ -175,11 +175,11 @@ double parse(const std::string& str)
   {
     return stodStrict(str);
   }
-  catch (std::invalid_argument const&)
+  catch (const std::invalid_argument&)
   {
     throw options::parsing_exception("Cannot parse " + str + " into a double");
   }
-  catch (std::out_of_range const&)
+  catch (const std::out_of_range&)
   {
     throw options::parsing_exception(
       "Cannot parse " + str + " into a double as it would go out of range");
@@ -210,11 +210,11 @@ ratio_t parse(const std::string& str)
 
     return f3d::ratio_t(stodStrict(str));
   }
-  catch (std::invalid_argument const&)
+  catch (const std::invalid_argument&)
   {
     throw options::parsing_exception("Cannot parse " + str + " into a ratio_t");
   }
-  catch (std::out_of_range const&)
+  catch (const std::out_of_range&)
   {
     throw options::parsing_exception(
       "Cannot parse " + str + " into a ratio_t as it would go out of range");

@@ -34,7 +34,7 @@ reader* pickReader(const std::vector<plugin*>& plugins, std::optional<std::strin
       }
       else if (reader->getScore() > bestScore)
       {
-        file_availability availabilityByReader = isValid(reader.get());
+        const file_availability availabilityByReader = isValid(reader.get());
         if (availabilityByReader == file_availability::SUPPORTED)
         {
           bestScore = reader->getScore();

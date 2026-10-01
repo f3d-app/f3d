@@ -98,8 +98,8 @@ public:
 
   static void checkSaveFormatCompatibility(const image& self, SaveFormat format)
   {
-    ChannelType type = self.getChannelType();
-    int count = self.getChannelCount();
+    const ChannelType type = self.getChannelType();
+    const int count = self.getChannelCount();
 
     switch (format)
     {
@@ -322,8 +322,8 @@ std::vector<std::string> image::getSupportedFormats()
   {
     std::string extensions = reader->GetFileExtensions();
 
-    std::regex re("\\s+");
-    std::sregex_token_iterator first{ extensions.begin(), extensions.end(), re, -1 }, last;
+    const std::regex re("\\s+");
+    const std::sregex_token_iterator first{ extensions.begin(), extensions.end(), re, -1 }, last;
 
     std::copy(first, last, std::back_inserter(formats));
 
@@ -381,8 +381,8 @@ unsigned int image::getChannelTypeSize() const
 //----------------------------------------------------------------------------
 image& image::setContent(void* buffer)
 {
-  unsigned int scalarSize = this->Internals->Image->GetScalarSize();
-  unsigned int totalSize =
+  const unsigned int scalarSize = this->Internals->Image->GetScalarSize();
+  const unsigned int totalSize =
     this->getWidth() * this->getHeight() * this->getChannelCount() * scalarSize;
   uint8_t* internalBuffer = static_cast<uint8_t*>(this->Internals->Image->GetScalarPointer());
   std::copy_n(static_cast<uint8_t*>(buffer), totalSize, internalBuffer);
@@ -398,13 +398,13 @@ void* image::getContent() const
 //----------------------------------------------------------------------------
 double image::compare(const image& reference) const
 {
-  ChannelType type = this->getChannelType();
+  const ChannelType type = this->getChannelType();
   if (type != reference.getChannelType())
   {
     return 1.0;
   }
 
-  unsigned int count = this->getChannelCount();
+  const unsigned int count = this->getChannelCount();
   if (count != reference.getChannelCount())
   {
     return 1.0;
@@ -440,8 +440,9 @@ double image::compare(const image& reference) const
   ssim->SetInputData(this->Internals->Image);
   ssim->SetInputData(1, reference.Internals->Image);
   ssim->Update();
-  vtkSmartPointer<vtkDoubleArray> scalars = vtkArrayDownCast<vtkDoubleArray>(
-    vtkDataSet::SafeDownCast(ssim->GetOutputDataObject(0))->GetPointData()->GetScalars());
+  vtkSmartPointer<vtkDoubleArray> scalars = // NOLINT(misc-const-correctness)
+    vtkArrayDownCast<vtkDoubleArray>(
+      vtkDataSet::SafeDownCast(ssim->GetOutputDataObject(0))->GetPointData()->GetScalars());
 
   // Thanks to the checks above, this is always true
   assert(scalars != nullptr);
@@ -490,7 +491,7 @@ std::vector<double> image::getNormalizedPixel(const std::pair<int, int>& xy) con
 
   for (size_t i = 0; i < pixel.size(); i++)
   {
-    double v = this->Internals->Image->GetScalarComponentAsDouble(
+    const double v = this->Internals->Image->GetScalarComponentAsDouble(
       xy.first, xy.second, 0, static_cast<int>(i));
 
     switch (this->getChannelType())
@@ -520,7 +521,7 @@ const image& image::save(const fs::path& filePath, SaveFormat format) const
   {
     case SaveFormat::PNG:
     {
-      vtkNew<vtkPNGWriter> pngWriter;
+      const vtkNew<vtkPNGWriter> pngWriter;
       this->Internals->WritePngMetadata(pngWriter);
       writer = pngWriter;
     }
@@ -539,7 +540,7 @@ const image& image::save(const fs::path& filePath, SaveFormat format) const
   try
   {
     // Ensure the directories exists if not empty
-    fs::path parent = filePath.parent_path();
+    const fs::path parent = filePath.parent_path();
     if (!parent.empty())
     {
       fs::create_directories(parent);
@@ -571,7 +572,7 @@ std::vector<unsigned char> image::saveBuffer(SaveFormat format) const
   {
     case SaveFormat::PNG:
     {
-      vtkSmartPointer<vtkPNGWriter> writer = vtkSmartPointer<vtkPNGWriter>::New();
+      const vtkSmartPointer<vtkPNGWriter> writer = vtkSmartPointer<vtkPNGWriter>::New();
       this->Internals->WritePngMetadata(writer);
       return this->Internals->SaveBuffer(writer);
     }

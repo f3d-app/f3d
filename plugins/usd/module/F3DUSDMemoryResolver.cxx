@@ -49,7 +49,7 @@ std::shared_ptr<pxr::ArAsset> F3DUSDMemoryResolver::_OpenAsset(const pxr::ArReso
   const std::size_t size = stream->Tell();
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
 
-  std::shared_ptr<char> buffer(new char[size], std::default_delete<char[]>());
+  const std::shared_ptr<char> buffer(new char[size], std::default_delete<char[]>());
 
   stream->Read(buffer.get(), size);
 

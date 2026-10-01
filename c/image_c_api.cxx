@@ -111,7 +111,7 @@ void f3d_image_destroy(f3d_image_t* img)
     return;
   }
 
-  f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
+  const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
   delete cpp_img;
 }
 
@@ -129,7 +129,7 @@ int f3d_image_get_normalized_pixel(f3d_image_t* img, int x, int y, double* pixel
   try
   {
     std::vector<double> d = cpp_img->getNormalizedPixel({ x, y });
-    std::copy(d.begin(), d.end(), pixel);
+    std::ranges::copy(d, pixel);
   }
   catch (const f3d::image::read_exception& e)
   {
@@ -192,7 +192,7 @@ int f3d_image_get_channel_type(f3d_image_t* img)
 
   try
   {
-    f3d::image::ChannelType type = cpp_img->getChannelType();
+    const f3d::image::ChannelType type = cpp_img->getChannelType();
     return static_cast<f3d_image_channel_type_t>(type);
   }
   catch (const f3d::image::read_exception& e)
@@ -349,7 +349,7 @@ unsigned char* f3d_image_save_buffer(
     std::vector<unsigned char> buffer =
       cpp_img->saveBuffer(static_cast<f3d::image::SaveFormat>(format));
     c_buffer = new unsigned char[buffer.size()];
-    std::copy(buffer.begin(), buffer.end(), c_buffer);
+    std::ranges::copy(buffer, c_buffer);
     *size = buffer.size();
   }
   catch (const f3d::image::write_exception& e)
@@ -499,7 +499,7 @@ void f3d_image_destroy_metadata_keys(char** keys, unsigned int count)
 //----------------------------------------------------------------------------
 unsigned int f3d_image_get_supported_formats_count()
 {
-  std::vector<std::string> formats = f3d::image::getSupportedFormats();
+  const std::vector<std::string> formats = f3d::image::getSupportedFormats();
   return formats.size();
 }
 

@@ -14,7 +14,7 @@ int TestSDKConsole([[maybe_unused]] int argc, char* argv[])
   f3d::log::setUseColoring(false);
   f3d::log::warn("Message in console");
 
-  std::string renderingBackend = std::string(argv[4]);
+  const std::string renderingBackend = std::string(argv[4]);
   f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
 
   f3d::options& opt = eng.getOptions();

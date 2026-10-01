@@ -107,7 +107,7 @@ std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetC
   this->CurrentUsingCellData = useCellData;
   auto& data =
     this->CurrentUsingCellData ? this->CellDataColoringInfo : this->PointDataColoringInfo;
-  int nIndices = static_cast<int>(data.size());
+  const int nIndices = static_cast<int>(data.size());
 
   if (!enable)
   {

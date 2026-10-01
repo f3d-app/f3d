@@ -103,8 +103,8 @@ extern "C"
 
   JNIEXPORT jlong JAVA_BIND(Context, getSymbol)(JNIEnv* env, jclass, jstring lib, jstring func)
   {
-    JniUTFString libStr(env, lib);
-    JniUTFString funcStr(env, func);
+    const JniUTFString libStr(env, lib);
+    const JniUTFString funcStr(env, func);
 
     jlong result = 0;
     try

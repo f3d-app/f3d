@@ -15,8 +15,8 @@ extern "C"
       return nullptr;
     }
 
-    jsize scaleLen = env->GetArrayLength(scale);
-    jsize translateLen = env->GetArrayLength(translate);
+    const jsize scaleLen = env->GetArrayLength(scale);
+    const jsize translateLen = env->GetArrayLength(translate);
 
     if (scaleLen != 2 || translateLen != 2)
     {
@@ -28,21 +28,21 @@ extern "C"
     double* scaleData = env->GetDoubleArrayElements(scale, nullptr);
     double* translateData = env->GetDoubleArrayElements(translate, nullptr);
 
-    f3d::double_array_t<2> cppScale({ scaleData[0], scaleData[1] });
-    f3d::double_array_t<2> cppTranslate({ translateData[0], translateData[1] });
-    f3d::transform2d_t cppTransform(cppScale, cppTranslate, angleDeg);
+    const f3d::double_array_t<2> cppScale({ scaleData[0], scaleData[1] });
+    const f3d::double_array_t<2> cppTranslate({ translateData[0], translateData[1] });
+    const f3d::transform2d_t cppTransform(cppScale, cppTranslate, angleDeg);
 
     env->ReleaseDoubleArrayElements(scale, scaleData, 0);
     env->ReleaseDoubleArrayElements(translate, translateData, 0);
 
-    JniLocalRef<jclass> transform2DClass(env, env->FindClass("app/f3d/F3D/Transform2D"));
+    const JniLocalRef<jclass> transform2DClass(env, env->FindClass("app/f3d/F3D/Transform2D"));
     jmethodID constructor = env->GetMethodID(transform2DClass, "<init>", "()V");
     // Not wrapped in JniLocalRef: this is the return value, and its local reference
     // must remain valid until it crosses back into the JVM after this function returns.
     jobject result = env->NewObject(transform2DClass, constructor);
 
     jfieldID dataField = env->GetFieldID(transform2DClass, "data", "[D");
-    JniLocalRef<jdoubleArray> dataArray(env, env->NewDoubleArray(9));
+    const JniLocalRef<jdoubleArray> dataArray(env, env->NewDoubleArray(9));
     std::vector<double> vec = cppTransform;
     env->SetDoubleArrayRegion(dataArray, 0, 9, vec.data());
     env->SetObjectField(result, dataField, dataArray);
@@ -51,7 +51,7 @@ extern "C"
   }
   JNIEXPORT jobject JAVA_BIND(Types_00024Mesh, isValid)(JNIEnv* env, jobject self)
   {
-    JniLocalRef<jclass> meshClass(env, env->GetObjectClass(self));
+    const JniLocalRef<jclass> meshClass(env, env->GetObjectClass(self));
 
     jfieldID pointsField = env->GetFieldID(meshClass, "points", "[F");
     jfieldID normalsField = env->GetFieldID(meshClass, "normals", "[F");
@@ -70,7 +70,7 @@ extern "C"
 
     if (pointsArray)
     {
-      jsize pointsLen = env->GetArrayLength(pointsArray);
+      const jsize pointsLen = env->GetArrayLength(pointsArray);
       float* pointsData = env->GetFloatArrayElements(pointsArray, nullptr);
       cppMesh.points.assign(pointsData, pointsData + pointsLen);
       env->ReleaseFloatArrayElements(pointsArray, pointsData, 0);
@@ -78,7 +78,7 @@ extern "C"
 
     if (normalsArray)
     {
-      jsize normalsLen = env->GetArrayLength(normalsArray);
+      const jsize normalsLen = env->GetArrayLength(normalsArray);
       if (normalsLen > 0)
       {
         float* normalsData = env->GetFloatArrayElements(normalsArray, nullptr);
@@ -89,7 +89,7 @@ extern "C"
 
     if (textureCoordinatesArray)
     {
-      jsize texCoordsLen = env->GetArrayLength(textureCoordinatesArray);
+      const jsize texCoordsLen = env->GetArrayLength(textureCoordinatesArray);
       if (texCoordsLen > 0)
       {
         float* texCoordsData = env->GetFloatArrayElements(textureCoordinatesArray, nullptr);
@@ -100,7 +100,7 @@ extern "C"
 
     if (faceSidesArray)
     {
-      jsize faceSidesLen = env->GetArrayLength(faceSidesArray);
+      const jsize faceSidesLen = env->GetArrayLength(faceSidesArray);
       if (faceSidesLen > 0)
       {
         int* faceSidesData = env->GetIntArrayElements(faceSidesArray, nullptr);
@@ -111,7 +111,7 @@ extern "C"
 
     if (faceIndicesArray)
     {
-      jsize faceIndicesLen = env->GetArrayLength(faceIndicesArray);
+      const jsize faceIndicesLen = env->GetArrayLength(faceIndicesArray);
       if (faceIndicesLen > 0)
       {
         int* faceIndicesData = env->GetIntArrayElements(faceIndicesArray, nullptr);
@@ -122,12 +122,12 @@ extern "C"
 
     auto [valid, errorMessage] = cppMesh.isValid();
 
-    JniLocalRef<jclass> validationResultClass(
+    const JniLocalRef<jclass> validationResultClass(
       env, env->FindClass("app/f3d/F3D/Types$Mesh$ValidationResult"));
     jmethodID constructor =
       env->GetMethodID(validationResultClass, "<init>", "(ZLjava/lang/String;)V");
 
-    JniLocalRef<jstring> jErrorMessage(env, env->NewStringUTF(errorMessage.c_str()));
+    const JniLocalRef<jstring> jErrorMessage(env, env->NewStringUTF(errorMessage.c_str()));
     jobject result = env->NewObject(validationResultClass, constructor, valid, jErrorMessage.get());
 
     return result;

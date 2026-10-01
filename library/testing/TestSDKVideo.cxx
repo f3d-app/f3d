@@ -67,15 +67,15 @@ int TestSDKVideo([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   f3d::window& win = eng.getWindow();
 
   test.expect<f3d::video_frame::invalid_frame_exception>("Uninitialized window",
-    [&]() { std::shared_ptr<f3d::video_frame> uninitFrame = win.getVideoFrame(); });
+    [&]() { const std::shared_ptr<f3d::video_frame> uninitFrame = win.getVideoFrame(); });
 
   win.setSize(100, 101);
   test.expect<f3d::video_frame::invalid_frame_exception>("Size not even",
-    [&]() { std::shared_ptr<f3d::video_frame> oddDimFrame = win.getVideoFrame(); });
+    [&]() { const std::shared_ptr<f3d::video_frame> oddDimFrame = win.getVideoFrame(); });
 
   win.setSize(1500000000, 1500000000);
   test.expect<f3d::video_frame::invalid_frame_exception>("Size too big",
-    [&]() { std::shared_ptr<f3d::video_frame> wrongDimFrame = win.getVideoFrame(); });
+    [&]() { const std::shared_ptr<f3d::video_frame> wrongDimFrame = win.getVideoFrame(); });
 
   // use auto for the actual test
   auto encoder = f3d::video_encoder::create(

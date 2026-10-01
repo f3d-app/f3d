@@ -204,8 +204,8 @@ bool vtkF3DImguiObserver::MouseMove(vtkObject* caller, unsigned long, void*)
   if (ImGui::GetCurrentContext() != nullptr)
   {
     vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
-    int* p = that->GetEventPosition();
-    int* sz = that->GetRenderWindow()->GetSize();
+    const int* p = that->GetEventPosition();
+    const int* sz = that->GetRenderWindow()->GetSize();
     ImGuiIO& io = ImGui::GetIO();
     io.AddMousePosEvent(static_cast<float>(p[0]), static_cast<float>(sz[1] - p[1] - 1));
     // RenderUI is not called here on purpose to avoid too frequent UI draw
@@ -340,7 +340,7 @@ bool vtkF3DImguiObserver::KeyPress(vtkObject* caller, unsigned long, void*)
     vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
     ImGuiIO& io = ImGui::GetIO();
     this->UpdateModifiers(that);
-    ImGuiKey key = ::GetImGuiKeyFromKeySym(that->GetKeySym());
+    const ImGuiKey key = ::GetImGuiKeyFromKeySym(that->GetKeySym());
     io.AddKeyEvent(key, true);
     this->RenderUI(that);
 

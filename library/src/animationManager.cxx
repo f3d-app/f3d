@@ -323,7 +323,7 @@ void animationManager::CycleAnimation()
   }
 
   // If we started with multi animation or all animations (any negative value means all animations)
-  bool negative =
+  const bool negative =
     std::ranges::any_of(this->Options.scene.animation.indices, [](int idx) { return idx < 0; });
   if (this->Options.scene.animation.indices.size() > 1 || negative)
   {
@@ -388,7 +388,7 @@ std::string animationManager::GetAnimationName(int index)
       this->PreparedAnimationIndices.value().size() > 1)
     {
       std::vector<bool> animCheck(this->AvailAnimations, false);
-      for (int idx : this->PreparedAnimationIndices.value())
+      for (const int idx : this->PreparedAnimationIndices.value())
       {
         if (idx < this->AvailAnimations)
         {
@@ -531,7 +531,7 @@ void animationManager::PrepareForAnimationIndices()
   }
 
   // Enable the selected ones
-  for (int idx : this->PreparedAnimationIndices.value())
+  for (const int idx : this->PreparedAnimationIndices.value())
   {
     if (idx >= this->AvailAnimations)
     {
@@ -576,10 +576,10 @@ void animationManager::PrepareForAnimationIndices()
   {
     // Populate AnimationTimeSteps with accumulated values
     this->AnimationTimeSteps->Reset();
-    int nbAccumulatedTimeSteps = static_cast<int>(accumulatedTimeSteps.size());
+    const int nbAccumulatedTimeSteps = static_cast<int>(accumulatedTimeSteps.size());
     this->AnimationTimeSteps->SetNumberOfTuples(nbAccumulatedTimeSteps);
     int index = 0;
-    for (double timeStep : accumulatedTimeSteps)
+    for (const double timeStep : accumulatedTimeSteps)
     {
       this->AnimationTimeSteps->SetValue(index, timeStep);
       index++;

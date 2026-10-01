@@ -252,7 +252,7 @@ char** f3d_scene_get_added_files(const f3d_scene_t* scene, unsigned int* count)
   char** result = new char*[files.size()];
   for (size_t i = 0; i < files.size(); ++i)
   {
-    std::string str = files[i].string();
+    const std::string str = files[i].string();
     result[i] = new char[str.size() + 1];
     std::strcpy(result[i], str.c_str());
   }
@@ -425,7 +425,7 @@ int f3d_scene_add_mesh(f3d_scene_t* scene, const f3d_mesh_t* mesh)
   }
 
   f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
-  f3d::mesh_t cpp_mesh = to_cpp_mesh(mesh);
+  const f3d::mesh_t cpp_mesh = to_cpp_mesh(mesh);
 
   try
   {
@@ -560,7 +560,7 @@ int f3d_scene_add_light(const f3d_scene_t* scene, const f3d_light_state_t* light
   }
 
   const f3d::scene* cpp_scene = reinterpret_cast<const f3d::scene*>(scene);
-  f3d::light_state_t cpp_state = to_cpp_light_state(light_state);
+  const f3d::light_state_t cpp_state = to_cpp_light_state(light_state);
   return cpp_scene->addLight(cpp_state);
 }
 
@@ -596,7 +596,7 @@ int f3d_scene_update_light(f3d_scene_t* scene, int index, const f3d_light_state_
   }
 
   f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
-  f3d::light_state_t cpp_state = to_cpp_light_state(light_state);
+  const f3d::light_state_t cpp_state = to_cpp_light_state(light_state);
 
   try
   {
@@ -623,7 +623,7 @@ f3d_light_state_t* f3d_scene_get_light(const f3d_scene_t* scene, int index)
 
   try
   {
-    f3d::light_state_t cpp_state = cpp_scene->getLight(index);
+    const f3d::light_state_t cpp_state = cpp_scene->getLight(index);
     return to_c_light_state(cpp_state);
   }
   catch (const f3d::scene::light_exception& e)

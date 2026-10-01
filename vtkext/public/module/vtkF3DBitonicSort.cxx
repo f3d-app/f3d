@@ -45,14 +45,14 @@ bool vtkF3DBitonicSort::Initialize(int workgroupSize, int keyType, int valueType
     return "";
   };
 
-  std::string keyTypeShader = GetStringShaderType(keyType);
+  const std::string keyTypeShader = GetStringShaderType(keyType);
   if (keyTypeShader.empty())
   {
     vtkErrorMacro("Invalid keyType");
     return false;
   }
 
-  std::string valueTypeShader = GetStringShaderType(valueType);
+  const std::string valueTypeShader = GetStringShaderType(valueType);
   if (valueTypeShader.empty())
   {
     vtkErrorMacro("Invalid valueType");
@@ -120,7 +120,7 @@ bool vtkF3DBitonicSort::Run(vtkOpenGLRenderWindow* context, int nbPairs,
   vtkOpenGLShaderCache* shaderCache = context->GetShaderCache();
 
   // compute next power of two
-  unsigned int nbPairsExt = vtkMath::NearestPowerOfTwo(nbPairs);
+  const unsigned int nbPairsExt = vtkMath::NearestPowerOfTwo(nbPairs);
 
   const int workgroupCount = std::max(nbPairsExt / (this->WorkgroupSize * 2), 1U);
 

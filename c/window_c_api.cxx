@@ -13,7 +13,7 @@ f3d_window_type_t f3d_window_get_type(f3d_window_t* window)
   }
 
   f3d::window* cpp_window = reinterpret_cast<f3d::window*>(window);
-  f3d::window::Type type = cpp_window->getType();
+  const f3d::window::Type type = cpp_window->getType();
   return static_cast<f3d_window_type_t>(type);
 }
 
@@ -215,7 +215,7 @@ void f3d_window_get_world_from_display(
   }
 
   const f3d::window* cpp_window = reinterpret_cast<const f3d::window*>(window);
-  f3d::point3_t cpp_display_point = { display_point[0], display_point[1], display_point[2] };
+  const f3d::point3_t cpp_display_point = { display_point[0], display_point[1], display_point[2] };
   f3d::point3_t cpp_world_point = cpp_window->getWorldFromDisplay(cpp_display_point);
   world_point[0] = cpp_world_point[0];
   world_point[1] = cpp_world_point[1];
@@ -232,7 +232,7 @@ void f3d_window_get_display_from_world(
   }
 
   const f3d::window* cpp_window = reinterpret_cast<const f3d::window*>(window);
-  f3d::point3_t cpp_world_point = { world_point[0], world_point[1], world_point[2] };
+  const f3d::point3_t cpp_world_point = { world_point[0], world_point[1], world_point[2] };
   f3d::point3_t cpp_display_point = cpp_window->getDisplayFromWorld(cpp_world_point);
   display_point[0] = cpp_display_point[0];
   display_point[1] = cpp_display_point[1];

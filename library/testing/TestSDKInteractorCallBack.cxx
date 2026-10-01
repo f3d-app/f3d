@@ -15,7 +15,7 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, char* argv[])
 {
   PseudoUnitTest test;
 
-  std::string renderingBackend = std::string(argv[4]);
+  const std::string renderingBackend = std::string(argv[4]);
   f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::scene& sce = eng.getScene();
   f3d::window& win = eng.getWindow();
@@ -29,8 +29,8 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, char* argv[])
   test("record empty interaction", !inter.recordInteraction(""));
 
   // Test callbacks with default interactions
-  std::string filename = "TestSDKInteractorCallBack";
-  std::string interactionFilePath = std::string(argv[2]) + "../../" + filename + ".log";
+  const std::string filename = "TestSDKInteractorCallBack";
+  const std::string interactionFilePath = std::string(argv[2]) + "../../" + filename + ".log";
 
   // Dragon.vtu; SZZYB; CTRL+S; SHIFT+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   test("play some interactions", inter.playInteraction(interactionFilePath));
@@ -75,7 +75,7 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, char* argv[])
   inter.removeCommand("add_files");
   inter.addCommand("add_files", [&](const std::vector<std::string>& filesVec) {
     const std::string& path = filesVec[0];
-    size_t found = path.find_last_of("/\\");
+    const size_t found = path.find_last_of("/\\");
     sce.clear();
     sce.add(path.substr(0, found + 1) + "f3d.vtp");
   });

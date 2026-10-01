@@ -255,7 +255,7 @@ public:
         transfoFilter->SetInputData(polydata);
         transfoFilter->Update();
 
-        vtkIdType blockId = mb->GetNumberOfBlocks();
+        const vtkIdType blockId = mb->GetNumberOfBlocks();
         mb->SetBlock(blockId, transfoFilter->GetOutput());
 
         vtkInformation* info = mb->GetMetaData(blockId);
@@ -266,15 +266,15 @@ public:
     {
       for (TDF_ChildIterator it(label); it.More(); it.Next())
       {
-        TDF_Label child = it.Value();
+        const TDF_Label child = it.Value();
 
-        vtkNew<vtkMatrix4x4> mat;
+        const vtkNew<vtkMatrix4x4> mat;
         this->GetLocation(child, mat);
         vtkMatrix4x4::Multiply4x4(position, mat, mat);
 
-        vtkNew<vtkMultiBlockDataSet> childMb;
+        const vtkNew<vtkMultiBlockDataSet> childMb;
 
-        vtkIdType blockId = mb->GetNumberOfBlocks();
+        const vtkIdType blockId = mb->GetNumberOfBlocks();
         mb->SetBlock(blockId, childMb);
 
         vtkInformation* info = mb->GetMetaData(blockId);
@@ -285,7 +285,7 @@ public:
           TDF_Label ref;
           this->ShapeTool->GetReferredShape(child, ref);
 
-          vtkNew<vtkMatrix4x4> refMat;
+          const vtkNew<vtkMatrix4x4> refMat;
           this->GetLocation(ref, refMat);
           vtkMatrix4x4::Multiply4x4(mat, refMat, mat);
           this->AddLabel(ref, mat, childMb);
@@ -305,9 +305,9 @@ public:
     std::string part_name = "Unnamed";
     if (label.FindAttribute(TDataStd_Name::GetID(), name))
     {
-      TCollection_ExtendedString extstr = name->Get();
+      const TCollection_ExtendedString extstr = name->Get();
 
-      char* str = new char[extstr.LengthOfCString() + 1];
+      char* str = new char[extstr.LengthOfCString() + 1]; // NOLINT(misc-const-correctness)
       extstr.ToUTF8CString(str);
       part_name = str;
       delete[] str;
@@ -338,7 +338,7 @@ public:
   {
     const gp_Trsf& transfo = loc.Transformation();
     gp_Mat vecto = transfo.VectorialPart();
-    gp_XYZ trans = transfo.TranslationPart();
+    const gp_XYZ trans = transfo.TranslationPart();
 
     mat->Identity();
 
@@ -402,7 +402,7 @@ public:
 protected:
   void Show(const Message_ProgressScope&, bool) override
   {
-    double currentPosition = this->GetPosition();
+    const double currentPosition = this->GetPosition();
     if (currentPosition - this->LastPosition > 0.01)
     {
       double localProgress = 0.5 * currentPosition;
@@ -628,7 +628,7 @@ int vtkF3DOCCTReader::RequestData(
 
   for (int iLabel = 1; iLabel <= topLevelShapes.Length(); ++iLabel)
   {
-    TDF_Label label = topLevelShapes.Value(iLabel);
+    const TDF_Label label = topLevelShapes.Value(iLabel);
 
     TopoDS_Shape shape;
     this->Internals->ShapeTool->GetShape(label, shape);
@@ -831,7 +831,7 @@ bool vtkF3DOCCTReader::CanReadFile(vtkResourceStream* stream, vtkF3DOCCTReader::
     }
 
     // line1 should contain many spaces followed by a `S`
-    std::size_t nonSpaceIdx = line1.find_first_not_of(' ');
+    const std::size_t nonSpaceIdx = line1.find_first_not_of(' ');
     if (nonSpaceIdx == std::string::npos || line1[nonSpaceIdx] != 'S')
     {
       iges = false;

@@ -15,9 +15,9 @@ JavaVM* g_jvm = nullptr;
 
 f3d::interactor& GetInteractor(JNIEnv* env, jobject self)
 {
-  JniLocalRef<jclass> cls(env, env->GetObjectClass(self));
+  const JniLocalRef<jclass> cls(env, env->GetObjectClass(self));
   jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
-  jlong ptr = env->GetLongField(self, fid);
+  const jlong ptr = env->GetLongField(self, fid);
 
   if (g_jvm == nullptr)
   {
@@ -68,18 +68,19 @@ jint NativeModToJava(f3d::interaction_bind_t::ModifierKeys mod)
 f3d::interaction_bind_t JavaBindToNative(JNIEnv* env, jobject bind)
 {
   f3d::interaction_bind_t nativeBind;
-  JniLocalRef<jclass> bindClass(env, env->GetObjectClass(bind));
+  const JniLocalRef<jclass> bindClass(env, env->GetObjectClass(bind));
 
   jfieldID modField = env->GetFieldID(bindClass, "mod", "Lapp/f3d/F3D/Interactor$ModifierKeys;");
-  JniLocalRef<jobject> modObj(env, env->GetObjectField(bind, modField));
-  JniLocalRef<jclass> modEnum(env, env->GetObjectClass(modObj));
+  const JniLocalRef<jobject> modObj(env, env->GetObjectField(bind, modField));
+  const JniLocalRef<jclass> modEnum(env, env->GetObjectClass(modObj));
   jmethodID ordinalMethod = env->GetMethodID(modEnum, "ordinal", "()I");
-  jint modOrdinal = env->CallIntMethod(modObj, ordinalMethod);
+  const jint modOrdinal = env->CallIntMethod(modObj, ordinalMethod);
   nativeBind.mod = JavaModToNative(modOrdinal);
 
   jfieldID interField = env->GetFieldID(bindClass, "inter", "Ljava/lang/String;");
-  JniLocalRef<jstring> interStr(env, static_cast<jstring>(env->GetObjectField(bind, interField)));
-  JniUTFString interCStr(env, interStr);
+  const JniLocalRef<jstring> interStr(
+    env, static_cast<jstring>(env->GetObjectField(bind, interField)));
+  const JniUTFString interCStr(env, interStr);
   nativeBind.inter = interCStr.c_str();
 
   return nativeBind;
@@ -87,25 +88,26 @@ f3d::interaction_bind_t JavaBindToNative(JNIEnv* env, jobject bind)
 
 jobject NativeBindToJava(JNIEnv* env, const f3d::interaction_bind_t& bind)
 {
-  JniLocalRef<jclass> bindClass(env, env->FindClass("app/f3d/F3D/Interactor$InteractionBind"));
+  const JniLocalRef<jclass> bindClass(
+    env, env->FindClass("app/f3d/F3D/Interactor$InteractionBind"));
   jmethodID constructor = env->GetMethodID(bindClass, "<init>", "()V");
   // Not wrapped in JniLocalRef: this is the return value, and its local reference
   // must remain valid until it crosses back into the JVM after this function returns.
   jobject bindObj = env->NewObject(bindClass, constructor);
 
-  JniLocalRef<jclass> modEnum(env, env->FindClass("app/f3d/F3D/Interactor$ModifierKeys"));
+  const JniLocalRef<jclass> modEnum(env, env->FindClass("app/f3d/F3D/Interactor$ModifierKeys"));
   jmethodID valuesMethod =
     env->GetStaticMethodID(modEnum, "values", "()[Lapp/f3d/F3D/Interactor$ModifierKeys;");
-  JniLocalRef<jobjectArray> modsArray(
+  const JniLocalRef<jobjectArray> modsArray(
     env, static_cast<jobjectArray>(env->CallStaticObjectMethod(modEnum, valuesMethod)));
-  JniLocalRef<jobject> modObj(
+  const JniLocalRef<jobject> modObj(
     env, env->GetObjectArrayElement(modsArray, NativeModToJava(bind.mod)));
 
   jfieldID modField = env->GetFieldID(bindClass, "mod", "Lapp/f3d/F3D/Interactor$ModifierKeys;");
   env->SetObjectField(bindObj, modField, modObj);
 
   jfieldID interField = env->GetFieldID(bindClass, "inter", "Ljava/lang/String;");
-  JniLocalRef<jstring> interStr(env, env->NewStringUTF(bind.inter.c_str()));
+  const JniLocalRef<jstring> interStr(env, env->NewStringUTF(bind.inter.c_str()));
   env->SetObjectField(bindObj, interField, interStr);
 
   return bindObj;
@@ -123,8 +125,8 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Interactor, addCommand)(
     JNIEnv* env, jobject self, jstring action, jobject callback)
   {
-    JniUTFString actionStr(env, action);
-    std::string actionCpp = actionStr.c_str();
+    const JniUTFString actionStr(env, action);
+    const std::string actionCpp = actionStr.c_str();
 
     g_commandCallbacks[actionCpp] = env->NewGlobalRef(callback);
 
@@ -148,18 +150,19 @@ extern "C"
         return;
       }
 
-      JniLocalRef<jclass> arrayListClass(env, env->FindClass("java/util/ArrayList"));
+      const JniLocalRef<jclass> arrayListClass(env, env->FindClass("java/util/ArrayList"));
       jmethodID arrayListConstructor = env->GetMethodID(arrayListClass, "<init>", "()V");
       jmethodID addMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-      JniLocalRef<jobject> argsList(env, env->NewObject(arrayListClass, arrayListConstructor));
+      const JniLocalRef<jobject> argsList(
+        env, env->NewObject(arrayListClass, arrayListConstructor));
 
       for (const auto& arg : args)
       {
-        JniLocalRef<jstring> jstr(env, env->NewStringUTF(arg.c_str()));
+        const JniLocalRef<jstring> jstr(env, env->NewStringUTF(arg.c_str()));
         env->CallBooleanMethod(argsList, addMethod, jstr.get());
       }
 
-      JniLocalRef<jclass> callbackClass(env, env->GetObjectClass(callback));
+      const JniLocalRef<jclass> callbackClass(env, env->GetObjectClass(callback));
       jmethodID executeMethod = env->GetMethodID(callbackClass, "execute", "(Ljava/util/List;)V");
       env->CallVoidMethod(callback, executeMethod, argsList.get());
 
@@ -179,8 +182,8 @@ extern "C"
 
   JNIEXPORT jobject JAVA_BIND(Interactor, removeCommand)(JNIEnv* env, jobject self, jstring action)
   {
-    JniUTFString actionStr(env, action);
-    std::string actionCpp = actionStr.c_str();
+    const JniUTFString actionStr(env, action);
+    const std::string actionCpp = actionStr.c_str();
 
     auto it = g_commandCallbacks.find(actionCpp);
     if (it != g_commandCallbacks.end())
@@ -201,7 +204,7 @@ extern "C"
   JNIEXPORT jboolean JAVA_BIND(Interactor, triggerCommand)(
     JNIEnv* env, jobject self, jstring command, jboolean keepComments)
   {
-    JniUTFString commandStr(env, command);
+    const JniUTFString commandStr(env, command);
     bool result = false;
     try
     {
@@ -227,28 +230,28 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Interactor, addBindingCommands)(JNIEnv* env, jobject self,
     jobject bind, jobject commands, jstring group, jobject type, jboolean notify, jboolean repeat)
   {
-    f3d::interaction_bind_t nativeBind = JavaBindToNative(env, bind);
+    const f3d::interaction_bind_t nativeBind = JavaBindToNative(env, bind);
 
-    JniLocalRef<jclass> listClass(env, env->GetObjectClass(commands));
+    const JniLocalRef<jclass> listClass(env, env->GetObjectClass(commands));
     jmethodID sizeMethod = env->GetMethodID(listClass, "size", "()I");
     jmethodID getMethod = env->GetMethodID(listClass, "get", "(I)Ljava/lang/Object;");
-    jint size = env->CallIntMethod(commands, sizeMethod);
+    const jint size = env->CallIntMethod(commands, sizeMethod);
 
     std::vector<std::string> commandsVec;
     for (jint i = 0; i < size; i++)
     {
-      JniLocalRef<jstring> cmdStr(
+      const JniLocalRef<jstring> cmdStr(
         env, static_cast<jstring>(env->CallObjectMethod(commands, getMethod, i)));
-      JniUTFString cmdCStr(env, cmdStr);
+      const JniUTFString cmdCStr(env, cmdStr);
       commandsVec.push_back(cmdCStr.c_str());
     }
 
-    JniUTFString groupStr(env, group);
-    std::string groupCpp = groupStr.c_str();
+    const JniUTFString groupStr(env, group);
+    const std::string groupCpp = groupStr.c_str();
 
-    JniLocalRef<jclass> typeEnum(env, env->GetObjectClass(type));
+    const JniLocalRef<jclass> typeEnum(env, env->GetObjectClass(type));
     jmethodID ordinalMethod = env->GetMethodID(typeEnum, "ordinal", "()I");
-    jint typeOrdinal = env->CallIntMethod(type, ordinalMethod);
+    const jint typeOrdinal = env->CallIntMethod(type, ordinalMethod);
 
     f3d::interactor::BindingType nativeType;
     switch (typeOrdinal)
@@ -283,17 +286,17 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Interactor, addBindingCommand)(JNIEnv* env, jobject self,
     jobject bind, jstring command, jstring group, jobject type, jboolean notify, jboolean repeat)
   {
-    f3d::interaction_bind_t nativeBind = JavaBindToNative(env, bind);
+    const f3d::interaction_bind_t nativeBind = JavaBindToNative(env, bind);
 
-    JniUTFString commandStr(env, command);
-    std::string commandCpp = commandStr.c_str();
+    const JniUTFString commandStr(env, command);
+    const std::string commandCpp = commandStr.c_str();
 
-    JniUTFString groupStr(env, group);
-    std::string groupCpp = groupStr.c_str();
+    const JniUTFString groupStr(env, group);
+    const std::string groupCpp = groupStr.c_str();
 
-    JniLocalRef<jclass> typeEnum(env, env->GetObjectClass(type));
+    const JniLocalRef<jclass> typeEnum(env, env->GetObjectClass(type));
     jmethodID ordinalMethod = env->GetMethodID(typeEnum, "ordinal", "()I");
-    jint typeOrdinal = env->CallIntMethod(type, ordinalMethod);
+    const jint typeOrdinal = env->CallIntMethod(type, ordinalMethod);
 
     f3d::interactor::BindingType nativeType;
     switch (typeOrdinal)
@@ -327,7 +330,7 @@ extern "C"
 
   JNIEXPORT jobject JAVA_BIND(Interactor, removeBinding)(JNIEnv* env, jobject self, jobject bind)
   {
-    f3d::interaction_bind_t nativeBind = JavaBindToNative(env, bind);
+    const f3d::interaction_bind_t nativeBind = JavaBindToNative(env, bind);
     try
     {
       GetInteractor(env, self).removeBinding(nativeBind);
@@ -347,18 +350,18 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Interactor, getBindsForGroup)(
     JNIEnv* env, jobject self, jstring group)
   {
-    JniUTFString groupStr(env, group);
-    std::vector<f3d::interaction_bind_t> binds =
+    const JniUTFString groupStr(env, group);
+    const std::vector<f3d::interaction_bind_t> binds =
       GetInteractor(env, self).getBindsForGroup(groupStr.c_str());
 
-    JniLocalRef<jclass> arrayListClass(env, env->FindClass("java/util/ArrayList"));
+    const JniLocalRef<jclass> arrayListClass(env, env->FindClass("java/util/ArrayList"));
     jmethodID arrayListConstructor = env->GetMethodID(arrayListClass, "<init>", "()V");
     jmethodID addMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
     jobject list = env->NewObject(arrayListClass, arrayListConstructor);
 
     for (const auto& bind : binds)
     {
-      JniLocalRef<jobject> bindObj(env, NativeBindToJava(env, bind));
+      const JniLocalRef<jobject> bindObj(env, NativeBindToJava(env, bind));
       env->CallBooleanMethod(list, addMethod, bindObj.get());
     }
 
@@ -367,16 +370,16 @@ extern "C"
 
   JNIEXPORT jobject JAVA_BIND(Interactor, getBinds)(JNIEnv* env, jobject self)
   {
-    std::vector<f3d::interaction_bind_t> binds = GetInteractor(env, self).getBinds();
+    const std::vector<f3d::interaction_bind_t> binds = GetInteractor(env, self).getBinds();
 
-    JniLocalRef<jclass> arrayListClass(env, env->FindClass("java/util/ArrayList"));
+    const JniLocalRef<jclass> arrayListClass(env, env->FindClass("java/util/ArrayList"));
     jmethodID arrayListConstructor = env->GetMethodID(arrayListClass, "<init>", "()V");
     jmethodID addMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
     jobject list = env->NewObject(arrayListClass, arrayListConstructor);
 
     for (const auto& bind : binds)
     {
-      JniLocalRef<jobject> bindObj(env, NativeBindToJava(env, bind));
+      const JniLocalRef<jobject> bindObj(env, NativeBindToJava(env, bind));
       env->CallBooleanMethod(list, addMethod, bindObj.get());
     }
 
@@ -386,16 +389,16 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Interactor, getBindingDocumentation)(
     JNIEnv* env, jobject self, jobject bind)
   {
-    f3d::interaction_bind_t nativeBind = JavaBindToNative(env, bind);
+    const f3d::interaction_bind_t nativeBind = JavaBindToNative(env, bind);
     auto doc = GetInteractor(env, self).getBindingDocumentation(nativeBind);
 
-    JniLocalRef<jclass> docClass(
+    const JniLocalRef<jclass> docClass(
       env, env->FindClass("app/f3d/F3D/Interactor$BindingDocumentation"));
     jmethodID constructor =
       env->GetMethodID(docClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
 
-    JniLocalRef<jstring> docStr(env, env->NewStringUTF(doc.first.c_str()));
-    JniLocalRef<jstring> valueStr(env, env->NewStringUTF(doc.second.c_str()));
+    const JniLocalRef<jstring> docStr(env, env->NewStringUTF(doc.first.c_str()));
+    const JniLocalRef<jstring> valueStr(env, env->NewStringUTF(doc.second.c_str()));
 
     jobject docObj = env->NewObject(docClass, constructor, docStr.get(), valueStr.get());
 
@@ -404,10 +407,10 @@ extern "C"
 
   JNIEXPORT jobject JAVA_BIND(Interactor, getBindingType)(JNIEnv* env, jobject self, jobject bind)
   {
-    f3d::interaction_bind_t nativeBind = JavaBindToNative(env, bind);
-    f3d::interactor::BindingType type = GetInteractor(env, self).getBindingType(nativeBind);
+    const f3d::interaction_bind_t nativeBind = JavaBindToNative(env, bind);
+    const f3d::interactor::BindingType type = GetInteractor(env, self).getBindingType(nativeBind);
 
-    JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Interactor$BindingType"));
+    const JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Interactor$BindingType"));
     jfieldID fieldID;
 
     switch (type)
@@ -436,11 +439,11 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Interactor, toggleAnimation)(
     JNIEnv* env, jobject self, jobject direction)
   {
-    JniLocalRef<jclass> directionEnum(env, env->GetObjectClass(direction));
+    const JniLocalRef<jclass> directionEnum(env, env->GetObjectClass(direction));
     jmethodID getValueMethod = env->GetMethodID(directionEnum, "getValue", "()I");
-    jint directionValue = env->CallIntMethod(direction, getValueMethod);
+    const jint directionValue = env->CallIntMethod(direction, getValueMethod);
 
-    f3d::interactor::AnimationDirection nativeDirection =
+    const f3d::interactor::AnimationDirection nativeDirection =
       static_cast<f3d::interactor::AnimationDirection>(directionValue);
 
     GetInteractor(env, self).toggleAnimation(nativeDirection);
@@ -450,11 +453,11 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Interactor, startAnimation)(
     JNIEnv* env, jobject self, jobject direction)
   {
-    JniLocalRef<jclass> directionEnum(env, env->GetObjectClass(direction));
+    const JniLocalRef<jclass> directionEnum(env, env->GetObjectClass(direction));
     jmethodID getValueMethod = env->GetMethodID(directionEnum, "getValue", "()I");
-    jint directionValue = env->CallIntMethod(direction, getValueMethod);
+    const jint directionValue = env->CallIntMethod(direction, getValueMethod);
 
-    f3d::interactor::AnimationDirection nativeDirection =
+    const f3d::interactor::AnimationDirection nativeDirection =
       static_cast<f3d::interactor::AnimationDirection>(directionValue);
 
     GetInteractor(env, self).startAnimation(nativeDirection);
@@ -474,10 +477,11 @@ extern "C"
 
   JNIEXPORT jobject JAVA_BIND(Interactor, getAnimationDirection)(JNIEnv* env, jobject self)
   {
-    f3d::interactor::AnimationDirection nativeDirection =
+    const f3d::interactor::AnimationDirection nativeDirection =
       GetInteractor(env, self).getAnimationDirection();
 
-    JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Interactor$AnimationDirection"));
+    const JniLocalRef<jclass> enumClass(
+      env, env->FindClass("app/f3d/F3D/Interactor$AnimationDirection"));
     jmethodID fromValueMethod = env->GetStaticMethodID(
       enumClass, "fromValue", "(I)Lapp/f3d/F3D/Interactor$AnimationDirection;");
 
@@ -499,9 +503,9 @@ extern "C"
 
   JNIEXPORT jobject JAVA_BIND(Interactor, triggerModUpdate)(JNIEnv* env, jobject self, jobject mod)
   {
-    JniLocalRef<jclass> modEnum(env, env->GetObjectClass(mod));
+    const JniLocalRef<jclass> modEnum(env, env->GetObjectClass(mod));
     jmethodID ordinalMethod = env->GetMethodID(modEnum, "ordinal", "()I");
-    jint modOrdinal = env->CallIntMethod(mod, ordinalMethod);
+    const jint modOrdinal = env->CallIntMethod(mod, ordinalMethod);
 
     f3d::interactor::InputModifier nativeMod;
     switch (modOrdinal)
@@ -530,15 +534,15 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Interactor, triggerMouseButton)(
     JNIEnv* env, jobject self, jobject action, jobject button)
   {
-    JniLocalRef<jclass> actionEnum(env, env->GetObjectClass(action));
+    const JniLocalRef<jclass> actionEnum(env, env->GetObjectClass(action));
     jmethodID actionOrdinalMethod = env->GetMethodID(actionEnum, "ordinal", "()I");
-    jint actionOrdinal = env->CallIntMethod(action, actionOrdinalMethod);
+    const jint actionOrdinal = env->CallIntMethod(action, actionOrdinalMethod);
 
-    JniLocalRef<jclass> buttonEnum(env, env->GetObjectClass(button));
+    const JniLocalRef<jclass> buttonEnum(env, env->GetObjectClass(button));
     jmethodID buttonOrdinalMethod = env->GetMethodID(buttonEnum, "ordinal", "()I");
-    jint buttonOrdinal = env->CallIntMethod(button, buttonOrdinalMethod);
+    const jint buttonOrdinal = env->CallIntMethod(button, buttonOrdinalMethod);
 
-    f3d::interactor::InputAction nativeAction = actionOrdinal == 0
+    const f3d::interactor::InputAction nativeAction = actionOrdinal == 0
       ? f3d::interactor::InputAction::PRESS
       : f3d::interactor::InputAction::RELEASE;
 
@@ -573,9 +577,9 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Interactor, triggerMouseWheel)(
     JNIEnv* env, jobject self, jobject direction)
   {
-    JniLocalRef<jclass> directionEnum(env, env->GetObjectClass(direction));
+    const JniLocalRef<jclass> directionEnum(env, env->GetObjectClass(direction));
     jmethodID ordinalMethod = env->GetMethodID(directionEnum, "ordinal", "()I");
-    jint directionOrdinal = env->CallIntMethod(direction, ordinalMethod);
+    const jint directionOrdinal = env->CallIntMethod(direction, ordinalMethod);
 
     f3d::interactor::WheelDirection nativeDirection;
     switch (directionOrdinal)
@@ -604,15 +608,15 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Interactor, triggerKeyboardKey)(
     JNIEnv* env, jobject self, jobject action, jstring keySym)
   {
-    JniLocalRef<jclass> actionEnum(env, env->GetObjectClass(action));
+    const JniLocalRef<jclass> actionEnum(env, env->GetObjectClass(action));
     jmethodID ordinalMethod = env->GetMethodID(actionEnum, "ordinal", "()I");
-    jint actionOrdinal = env->CallIntMethod(action, ordinalMethod);
+    const jint actionOrdinal = env->CallIntMethod(action, ordinalMethod);
 
-    f3d::interactor::InputAction nativeAction = actionOrdinal == 0
+    const f3d::interactor::InputAction nativeAction = actionOrdinal == 0
       ? f3d::interactor::InputAction::PRESS
       : f3d::interactor::InputAction::RELEASE;
 
-    JniUTFString keySymStr(env, keySym);
+    const JniUTFString keySymStr(env, keySym);
     GetInteractor(env, self).triggerKeyboardKey(nativeAction, keySymStr.c_str());
 
     return self;
@@ -662,14 +666,14 @@ extern "C"
           return;
         }
 
-        JniLocalRef<jclass> callbackClass(env, env->GetObjectClass(g_eventLoopCallback));
+        const JniLocalRef<jclass> callbackClass(env, env->GetObjectClass(g_eventLoopCallback));
         jmethodID executeMethod =
           env->GetMethodID(callbackClass, "execute", "(Lapp/f3d/F3D/Interactor$InteractorState;)V");
 
-        JniLocalRef<jclass> stateClass(
+        const JniLocalRef<jclass> stateClass(
           env, env->FindClass("app/f3d/F3D/Interactor$InteractorState"));
         jmethodID stateConstructor = env->GetMethodID(stateClass, "<init>", "()V");
-        JniLocalRef<jobject> stateObj(env, env->NewObject(stateClass, stateConstructor));
+        const JniLocalRef<jobject> stateObj(env, env->NewObject(stateClass, stateConstructor));
         jfieldID animationTimeField = env->GetFieldID(stateClass, "animationTime", "D");
         env->SetDoubleField(stateObj, animationTimeField, state.animationTime);
 
@@ -683,14 +687,14 @@ extern "C"
   JNIEXPORT jboolean JAVA_BIND(Interactor, playInteraction)(
     JNIEnv* env, jobject self, jstring file, jdouble deltaTime)
   {
-    JniUTFString fileStr(env, file);
+    const JniUTFString fileStr(env, file);
     return GetInteractor(env, self).playInteraction(fileStr.c_str(), deltaTime);
   }
 
   JNIEXPORT jboolean JAVA_BIND(Interactor, recordInteraction)(
     JNIEnv* env, jobject self, jstring file)
   {
-    JniUTFString fileStr(env, file);
+    const JniUTFString fileStr(env, file);
     return GetInteractor(env, self).recordInteraction(fileStr.c_str());
   }
 
@@ -721,11 +725,11 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Interactor, triggerNotification)(
     JNIEnv* env, jobject self, jstring desc, jstring value, jdouble duration)
   {
-    JniUTFString descStr(env, desc);
-    std::string descCpp = descStr.c_str();
+    const JniUTFString descStr(env, desc);
+    const std::string descCpp = descStr.c_str();
 
-    JniUTFString valueStr(env, value);
-    std::string valueCpp = valueStr.c_str();
+    const JniUTFString valueStr(env, value);
+    const std::string valueCpp = valueStr.c_str();
 
     GetInteractor(env, self).triggerNotification(valueCpp, valueCpp, duration);
     return self;
@@ -762,15 +766,15 @@ extern "C"
           return true;
         }
 
-        JniLocalRef<jclass> callbackClass(env, env->GetObjectClass(g_notificationCallback));
+        const JniLocalRef<jclass> callbackClass(env, env->GetObjectClass(g_notificationCallback));
         jmethodID callMethod = env->GetMethodID(
           callbackClass, "execute", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;D)Z");
 
-        JniLocalRef<jstring> jdesc(env, env->NewStringUTF(desc.c_str()));
-        JniLocalRef<jstring> jvalue(env, env->NewStringUTF(value.c_str()));
-        JniLocalRef<jstring> jbind(env, env->NewStringUTF(bind.c_str()));
+        const JniLocalRef<jstring> jdesc(env, env->NewStringUTF(desc.c_str()));
+        const JniLocalRef<jstring> jvalue(env, env->NewStringUTF(value.c_str()));
+        const JniLocalRef<jstring> jbind(env, env->NewStringUTF(bind.c_str()));
 
-        jboolean result = env->CallBooleanMethod(
+        const jboolean result = env->CallBooleanMethod(
           g_notificationCallback, callMethod, jdesc.get(), jvalue.get(), jbind.get(), duration);
 
         g_jvm->DetachCurrentThread();
