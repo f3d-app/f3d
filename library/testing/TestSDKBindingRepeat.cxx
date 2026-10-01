@@ -33,10 +33,16 @@ int TestSDKBindingRepeat([[maybe_unused]] int argc, [[maybe_unused]] char* argv[
   win.render();
 
   inter.removeBinding({ mod_t::SHIFT, "P" });
-  
+
   const std::string filename = "TestSDKBindingRepeat";
-  inter.addBinding({.Bind = { mod_t::SHIFT, "P" }, .Commands = {"decrease model.color.opacity"}, .Group = {}, .DocCallback = nullptr,
-    .Type = f3d::interactor::BindingType::NUMERICAL, .Notify = true, .Repeat = false});
+
+  inter.addBinding({ .Bind = { mod_t::SHIFT, "P" },
+    .Commands = { "decrease model.color.opacity" },
+    .Group = {},
+    .DocCallback = nullptr,
+    .Type = f3d::interactor::BindingType::NUMERICAL,
+    .Notify = true,
+    .Repeat = false });
   const std::string interactionFilePath =
     std::format("{}../recordings/{}.log", baselinePath, filename);
   test("play binding repeat off interaction", inter.playInteraction(interactionFilePath));
@@ -45,8 +51,13 @@ int TestSDKBindingRepeat([[maybe_unused]] int argc, [[maybe_unused]] char* argv[
     TestSDKHelpers::RenderTest(win, baselinePath, outputPath, "TestSDKBindingRepeatOff"));
 
   inter.removeBinding({ mod_t::SHIFT, "P" });
-  inter.addBinding({.Bind = { mod_t::SHIFT, "P" }, .Commands = {"decrease model.color.opacity"}, .Group = {}, .DocCallback = nullptr,
-    .Type = f3d::interactor::BindingType::NUMERICAL, .Notify = true, .Repeat = true});
+  inter.addBinding({ .Bind = { mod_t::SHIFT, "P" },
+    .Commands = { "decrease model.color.opacity" },
+    .Group = {},
+    .DocCallback = nullptr,
+    .Type = f3d::interactor::BindingType::NUMERICAL,
+    .Notify = true,
+    .Repeat = true });
 
   test("play binding repeat interaction", inter.playInteraction(interactionFilePath));
 

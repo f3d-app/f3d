@@ -46,8 +46,8 @@ extern "C"
   } f3d_interactor_binding_type_t;
 
   /**
-  * @brief Enumeration of supported mouse buttons.
-  */
+   * @brief Enumeration of supported mouse buttons.
+   */
   typedef enum f3d_interactor_mouse_button_t
   {
     F3D_INTERACTOR_MOUSE_LEFT,
@@ -56,8 +56,8 @@ extern "C"
   } f3d_interactor_mouse_button_t;
 
   /**
-  * @brief Enumeration of supported mouse wheel directions.
-  */
+   * @brief Enumeration of supported mouse wheel directions.
+   */
   typedef enum f3d_interactor_wheel_direction_t
   {
     F3D_INTERACTOR_WHEEL_FORWARD,
@@ -67,8 +67,8 @@ extern "C"
   } f3d_interactor_wheel_direction_t;
 
   /**
-  * @brief Enumeration of supported input actions.
-  */
+   * @brief Enumeration of supported input actions.
+   */
   typedef enum f3d_interactor_input_action_t
   {
     F3D_INTERACTOR_INPUT_PRESS,
@@ -76,8 +76,8 @@ extern "C"
   } f3d_interactor_input_action_t;
 
   /**
-  * @brief Enumeration of supported input modifiers.
-  */
+   * @brief Enumeration of supported input modifiers.
+   */
   typedef enum f3d_interactor_input_modifier_t
   {
     F3D_INTERACTOR_INPUT_NONE,
@@ -87,8 +87,8 @@ extern "C"
   } f3d_interactor_input_modifier_t;
 
   /**
-  * @brief Enumeration of animation direction.
-  */
+   * @brief Enumeration of animation direction.
+   */
   typedef enum f3d_interactor_animation_direction_t
   {
     F3D_INTERACTOR_ANIMATION_FORWARD,
@@ -96,17 +96,17 @@ extern "C"
   } f3d_interactor_animation_direction_t;
 
   /**
-  * @brief Structure representing an interaction binding.
-  */
+   * @brief Structure representing an interaction binding.
+   */
   typedef struct f3d_binding_params_t
   {
-    f3d_interaction_bind_t bind; // Interaction bind
-    char** commands; // Array of command strings.
-    int command_count; // Number of commands.
-    char* group; // Optional group name (can be NULL).
+    f3d_interaction_bind_t bind;        // Interaction bind
+    char** commands;                    // Array of command strings.
+    int command_count;                  // Number of commands.
+    char* group;                        // Optional group name (can be NULL).
     f3d_interactor_binding_type_t type; // Optional binding type.
-    int notify; // Notify when the binding is triggered.
-    int repeat; // Binding is repeatedly applied when holding down the key.
+    int notify;                         // Notify when the binding is triggered.
+    int repeat;                         // Binding is repeatedly applied when holding down the key.
   } f3d_binding_params_t;
 
   /**
@@ -226,8 +226,8 @@ extern "C"
    * @param interactor Interactor handle.
    * @param binding Binding definition, see f3d_binding_params_t for details.
    */
-  F3D_EXPORT void f3d_interactor_add_binding(f3d_interactor_t* interactor,
-    f3d_binding_params_t binding);
+  F3D_EXPORT void f3d_interactor_add_binding(
+    f3d_interactor_t* interactor, f3d_binding_params_t binding);
 
   /**
    * @brief Remove a binding for the provided bind.

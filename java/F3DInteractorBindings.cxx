@@ -273,8 +273,13 @@ extern "C"
 
     try
     {
-      GetInteractor(env, self).addBinding({
-        .Bind = nativeBind, .Commands = commandsVec, .Group = groupCpp, .DocCallback = nullptr, .Type = nativeType, .Notify = notify != JNI_FALSE, .Repeat = repeat != JNI_FALSE });
+      GetInteractor(env, self).addBinding({ .Bind = nativeBind,
+        .Commands = commandsVec,
+        .Group = groupCpp,
+        .DocCallback = nullptr,
+        .Type = nativeType,
+        .Notify = notify != JNI_FALSE,
+        .Repeat = repeat != JNI_FALSE });
     }
     catch (const f3d::interactor::already_exists_exception& e)
     {

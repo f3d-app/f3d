@@ -449,8 +449,13 @@ void f3d_interactor_add_binding(f3d_interactor_t* interactor, f3d_binding_params
 
   try
   {
-    cpp_interactor->addBinding({.Bind = cpp_bind, .Commands = cpp_commands, .Group = cpp_group, .DocCallback = nullptr,
-      .Type = static_cast<f3d::interactor::BindingType>(binding.type), .Notify = binding.notify != 0, .Repeat = binding.repeat != 0});
+    cpp_interactor->addBinding({ .Bind = cpp_bind,
+      .Commands = cpp_commands,
+      .Group = cpp_group,
+      .DocCallback = nullptr,
+      .Type = static_cast<f3d::interactor::BindingType>(binding.type),
+      .Notify = binding.notify != 0,
+      .Repeat = binding.repeat != 0 });
   }
   catch (const f3d::interactor::already_exists_exception& ex)
   {
