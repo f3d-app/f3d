@@ -15,6 +15,7 @@
 void F3DColoringInfoHandler::ClearColoringInfo()
 {
   this->ColoringInfoMap.clear();
+  this->CurrentColoringIter = this->ColoringInfoMap.end();
 }
 
 //----------------------------------------------------------------------------
@@ -129,11 +130,11 @@ std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetC
 {
   const int nIndices = static_cast<int>(this->ColoringInfoMap.size());
 
+  this->CurrentColoringIter = this->ColoringInfoMap.end();
+
   if (nIndices == 0)
   {
     // No array available
-    this->CurrentColoringIter = this->ColoringInfoMap.end();
-
     if (!quiet)
     {
       F3DLog::Print(F3DLog::Severity::Debug, "No array to color with");
@@ -142,7 +143,6 @@ std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetC
   else if (arrayName.has_value())
   {
     // Coloring with named array
-
     if (!forceUseCellData)
     {
       this->CurrentColoringIter = this->ColoringInfoMap.find({ arrayName.value(), false });

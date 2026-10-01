@@ -248,7 +248,7 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     "NaN values transform2d", opt.getAsString("model.textures_transform") == "1,0,0,0,1,0,0,0,1");
 
   // Test closest option
-  auto closest = opt.getClosestOption("modle.sciivs.fiels");
+  auto closest = opt.getClosestOption("modle.sciivs.fields");
   test("closest option", closest.first == "model.scivis.field" && closest.second == 5);
 
   closest = opt.getClosestOption("model.scivis.field");

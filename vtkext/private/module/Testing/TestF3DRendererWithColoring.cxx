@@ -46,8 +46,7 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   renderer->SetUseVolume(true);
   renderer->UpdateActors();
 
-  if (renderer->GetArrayNameForColoring() != "Invalid" ||
-    renderer->GetComponentForColoring().has_value())
+  if (renderer->GetArrayNameForColoring() == "Invalid")
   {
     std::cerr << "Unexpected coloring information with invalid array\n";
     return EXIT_FAILURE;
