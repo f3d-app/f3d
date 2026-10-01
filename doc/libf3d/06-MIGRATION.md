@@ -81,6 +81,10 @@ The library prefix and extension is not appended automatically anymore.
 
 `f3d::window::getDPIScale()` should now be used instead of the static `f3d::utils::getDPIScale()` API to get the DPI scaling value.
 
+## Add Binding API
+
+The `f3d::interactor::addBinding` API has been refactored to take a struct with all parameters to reduce complexity calling the API. The arguments themselves have not been changed.
+
 ## Bindings
 
 ### Python
@@ -118,11 +122,13 @@ Other languages API behavior changed accordingly:
 
 - C API:
   - `f3d_scene_supports()` used to return 1 if the file was supported and 0 otherwise. It now returns an int: 0 if supported, 1 for unsupported extension, 2 for unsupported content, -1 if the scene or file path is NULL.
-  - `f3d_interactor_add_binding` now requires a `repeat` argument, which specifies that the binding is repeatedly applied when holding down the key.
+  - `f3d_interactor_add_binding` now requires a struct parameter over a list of arguments. This includes a `repeat` member, which specifies that the binding is repeatedly applied when holding down the key.
 - Java API:
   - `Scene.supports()` used to return a boolean. It now returns the `Scene.FileAvailability` enum and throws `IllegalArgumentException` if the file path is null.
-  - `Interactor.addBinding()` now requires a `repeat` argument which specifies that the binding is repeatedly applied when holding down the key.
-- Python API: `scene.supports()` used to return bool. Now returns f3d.FileAvailability.
+  - `Interactor.addBinding()` now requires a class instance parameter over a list of arguments. This includes a `repeat` argument which specifies that the binding is repeatedly applied when holding down the key.
+- Python API: 
+  - `scene.supports()` used to return bool. Now returns f3d.FileAvailability.
+  - `interactor.addBinding()` now requires a class parameter over a list of arguments. This includes a `repeat` argument which specifies that the binding is repeatedly applied when holding down the key.
 - Webassembly API: `scene.supports()` used to return bool. Now returns enum FileAvailability.
 
 ## Plugin developers
