@@ -238,8 +238,8 @@ int vtkF3DWebIFCReader::RequestData(
           const auto& p1 = localPositions[i1];
           const auto& p2 = localPositions[i2];
 
-          double e1x = p1[0] - p0[0], e1y = p1[1] - p0[1], e1z = p1[2] - p0[2];
-          double e2x = p2[0] - p0[0], e2y = p2[1] - p0[1], e2z = p2[2] - p0[2];
+          const double e1x = p1[0] - p0[0], e1y = p1[1] - p0[1], e1z = p1[2] - p0[2];
+          const double e2x = p2[0] - p0[0], e2y = p2[1] - p0[1], e2z = p2[2] - p0[2];
           const double gnx = e1y * e2z - e1z * e2y;
           const double gny = e1z * e2x - e1x * e2z;
           const double gnz = e1x * e2y - e1y * e2x;
