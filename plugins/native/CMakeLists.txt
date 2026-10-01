@@ -379,7 +379,7 @@ f3d_plugin_declare_reader(
   NAME QuakeMDL
   EXTENSIONS mdl
   MIMETYPES application/vnd.mdl
-  OPTIONS skin_index
+  OPTIONS skin_index animation_interpolation
   VTK_IMPORTER vtkF3DQuakeMDLImporter
   FORMAT_DESCRIPTION "Quake 1 MDL model"
   ${_SUPPORTS_STREAM}
