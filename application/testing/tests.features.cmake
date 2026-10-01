@@ -624,7 +624,7 @@ f3d_test(NAME TestVerboseWrongArray DATA dragon.vtu ARGS -s --coloring-array=dum
 f3d_test(NAME TestVerboseDefaultScalar DATA HeadMRVolume.mhd ARGS -s --verbose REGEXP "Coloring using point array named MetaImage, Magnitude" NO_BASELINE)
 
 # Volume array verbosity test
-f3d_test(NAME TestVerboseVolume DATA HeadMRVolume.mhd ARGS -vs --verbose REGEXP "Coloring using point array named MetaImage .forced., Magnitude" NO_BASELINE)
+f3d_test(NAME TestVerboseVolume DATA HeadMRVolume.mhd ARGS -vs --verbose REGEXP "Coloring using point array named MetaImage, Magnitude" NO_BASELINE)
 
 # Incorrect component test
 f3d_test(NAME TestIncorrectComponent DATA dragon.vtu ARGS -s --coloring-component=4 REGEXP "Invalid component index: 4" NO_BASELINE)

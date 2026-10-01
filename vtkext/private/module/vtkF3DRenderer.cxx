@@ -3264,6 +3264,12 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
   const auto info = coloringHandler.SetCurrentColoring(this->DataFieldForColoring == DataField::POINTS,
     this->DataFieldForColoring == DataField::CELLS, this->ArrayNameForColoring, false);
+
+  if (info.has_value())
+  {
+    this->ArrayNameForColoring = info.value().Name;
+  }
+
   const bool hasColoring = info.has_value() && this->Coloring != vtkF3DRenderer::ColoringMode::MATERIAL;
   if (hasColoring && !this->ColorTransferFunctionConfigured)
   {

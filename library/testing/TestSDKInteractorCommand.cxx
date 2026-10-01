@@ -150,7 +150,7 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, char* argv[])
   // Initialize default two times and check they work
   inter.initCommands();
   inter.initCommands();
-  inter.triggerCommand("toggle model.scivis.field");
+  inter.triggerCommand("set model.scivis.field cells");
   test("triggerCommand after defaults creation", options.model.scivis.field == "cells");
 
   // check exception
