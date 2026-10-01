@@ -3892,11 +3892,11 @@ std::string vtkF3DRenderer::ArrayToString()
   }
 
   // Unicode symbols represent a triangle for cell data and a circle for point data
-  std::string arrayName = info.value().IsCellData ? "\u25B3 " : "\u25CB ";
+  std::string arrayName = info.value().IsCellData ? "\uea72 " : "\uf4c3 ";
   if (info.value().Name.empty())
   {
     arrayName += "Array #";
-    arrayName += "??"; // todo: get index?
+    arrayName += "??"; // todo: get index? can it happen?
   }
   else
   {
