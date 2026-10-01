@@ -10,8 +10,8 @@ f3d_test(NAME TestInteractionCycleScalars DATA dragon.vtu INTERACTION) #BSSSS
 f3d_test(NAME TestInteractionCycleCellInvalidIndex DATA waveletArrays.vti ARGS -s --coloring-field=cells INTERACTION) #YY
 f3d_test(NAME TestInteractionCycleBlending DATA suzanne.ply ARGS --opacity=0.8 INTERACTION LONG_TIMEOUT SKIP_GLES) #PPPPP # Cycle to ddp
 f3d_test(NAME TestInteractionVolumeCycle DATA waveletArrays.vti ARGS INTERACTION) #VSS
-f3d_test(NAME TestInteractionVolumeAfterColoring DATA waveletArrays.vti ARGS INTERACTION) #SSSV
-f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 INTERACTION THRESHOLD 0.11) #VI #Small rendering differences on macOS OSMesa
+f3d_test(NAME TestInteractionVolumeAfterColoring DATA waveletArrays.vti ARGS INTERACTION) #SYV
+f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS -s --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 INTERACTION THRESHOLD 0.11) #VI #Small rendering differences on macOS OSMesa
 f3d_test(NAME TestInteractionCorrectCameraForVolumeSwitch ARGS --no-config -v DATA dragon.vtu INTERACTION UI) #v
 f3d_test(NAME TestInteractionMultiFileVolume DATA multi ARGS --multi-file-mode=all INTERACTION LONG_TIMEOUT) #SYVB
 f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-sprites-size=20 INTERACTION) #O
@@ -203,7 +203,7 @@ endif()
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
   f3d_test(NAME TestInteractionSceneHierarchy DATA BoxAnimated.gltf INTERACTION UI) #Shift+H;Resize widget;Click checkbox
   f3d_test(NAME TestInteractionSceneHierarchyManyClick DATA cow.vtp INTERACTION UI) #Shift+H;Click checkbox;Click checkbox;Click checkbox
-  f3d_test(NAME TestInteractionSceneHierarchyVolume DATA tensors.vti INTERACTION UI) #Shift+H;V;Click checkbox
+  f3d_test(NAME TestInteractionSceneHierarchyVolume DATA tensors.vti ARGS -s INTERACTION UI) #Shift+H;V;Click checkbox
   f3d_test(NAME TestInteractionSceneHierarchyAndCheatsheet DATA cow.vtp RESOLUTION 1200,200 INTERACTION UI) #H;Shift+H
   f3d_test(NAME TestInteractionSceneHierarchyCollapsed DATA vtk-dasm-test.glb INTERACTION UI) #Shift+H;Resize widget;Click checkbox
   f3d_test(NAME TestInteractionSceneHierarchyScroll DATA vtk-dasm-test.glb INTERACTION UI) #Shift+H;Scroll to bottom
