@@ -65,7 +65,7 @@ private:
   vtkNew<vtkOpenGLBufferObject> JointMatrices;
   bool HasSSBOSkinning = false;
 
-  // Our cached linear colors and texure map, used as vtkMapper::Colors and
+  // Our cached linear colors and texture map, used as vtkMapper::Colors and
   // vtkMapper::ColorTextureMap respectively while linear colorspace conversion.
   bool UseLinearColorSpace = false;
   vtkSmartPointer<vtkUnsignedCharArray> LinearColors;
