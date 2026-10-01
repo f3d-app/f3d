@@ -363,6 +363,11 @@ public:
   void SetNormalGlyphScaleMultiplier(double multiplier);
 
   /**
+   * Sets the color of the normal glyphs
+   */
+  void SetNormalGlyphColor(const std::optional<std::vector<double>>& color);
+
+  /**
    * Set the visibility of the point sprites actor.
    * It will only be shown if raytracing and volume are not enabled
    */
@@ -915,6 +920,7 @@ private:
   bool ScalarBarVisible = false;
   bool UseNormalGlyphs = false;
   double NormalGlyphScaleMultiplier = 1.0;
+  std::optional<std::vector<double>> NormalGlyphColor;
   bool UsePointSprites = false;
   bool UseVolume = false;
   bool UseInverseOpacityFunction = false;
