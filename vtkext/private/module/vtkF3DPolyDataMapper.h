@@ -44,11 +44,17 @@ public:
 #endif
 
   /**
-   * Decode scalar colors for raytracing, which expects linear RGB.
+   * Changes flags dictating the decode scalar colors for raytracing,
+   * which expects linear RGB.
    * OpenGL performs this conversion in its PBR shader instead.
    */
   void SetUseLinearColorSpace(bool use);
+
   using Superclass::MapScalars;
+  /**
+   * Our vtkPolyDataMapper::MapScalar() override which computes linear RGB from sRGB
+   * if needed.
+   */
   vtkUnsignedCharArray* MapScalars(vtkDataSet* input, double alpha, int& cellFlag) override;
 
 protected:
@@ -58,6 +64,9 @@ protected:
 private:
   vtkNew<vtkOpenGLBufferObject> JointMatrices;
   bool HasSSBOSkinning = false;
+
+  // Our cached linear colors and texure map, used as vtkMapper::Colors and
+  // vtkMapper::ColorTextureMap respectively while linear colorspace conversion.
   bool UseLinearColorSpace = false;
   vtkSmartPointer<vtkUnsignedCharArray> LinearColors;
   vtkSmartPointer<vtkImageData> LinearColorTextureMap;

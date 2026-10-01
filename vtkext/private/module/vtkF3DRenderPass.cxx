@@ -129,6 +129,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
           if (polyMapper)
           {
 #if F3D_MODULE_RAYTRACING
+            // Enable linear colorspace conversion during raytracing on PBR actors.
             if (auto* mapper = vtkF3DPolyDataMapper::SafeDownCast(polyMapper))
             {
               mapper->SetUseLinearColorSpace(

@@ -46,14 +46,17 @@ void vtkF3DPolyDataMapper::SetUseLinearColorSpace(bool use)
 vtkUnsignedCharArray* vtkF3DPolyDataMapper::MapScalars(
   vtkDataSet* input, double alpha, int& cellFlag)
 {
+  // Populates the vtkMapper::Colors with gamma corrected sRGB.
   this->Superclass::MapScalars(input, alpha, cellFlag);
   if (!this->UseLinearColorSpace)
   {
     return this->Colors;
   }
 
+  // Not cached, linear convert.
   if (this->Colors && this->Colors != this->LinearColors)
   {
+    // Approx. linear RGB precomputation for every possible channel value from 0-255.
     static const std::array<unsigned char, 256> toLinear = []
     {
       std::array<unsigned char, 256> values{};
@@ -73,7 +76,7 @@ vtkUnsignedCharArray* vtkF3DPolyDataMapper::MapScalars(
         this->LinearColors->GetPointer(i * this->LinearColors->GetNumberOfComponents());
       for (int component = 0; component < 3; ++component)
       {
-        color[component] = toLinear[color[component]];
+        color[component] = toLinear[color[component]];  // Lookup
       }
     }
     this->Colors->UnRegister(this);
@@ -98,6 +101,7 @@ vtkUnsignedCharArray* vtkF3DPolyDataMapper::MapScalars(
       for (int component = 0; component < 4; ++component)
       {
         double value = source->GetComponent(i, component) / 255.0;
+        // Approx. color components converted to linear except alpha channel.
         destination->SetComponent(i, component, component < 3 ? std::pow(value, 2.2) : value);
       }
     }
