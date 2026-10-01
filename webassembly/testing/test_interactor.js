@@ -111,10 +111,24 @@ const settings = {
       false,
     );
 
+    const bindRepeat = new Module.InteractionBind();
+    bindRepeat.mod = Module.InteractionBindModifierKeys.CTRL_SHIFT;
+    bindRepeat.inter = "L";
+
+    interactor.addBinding(
+      bindRepeat,
+      ["increase render.light.intensity .1"],
+      "test-group",
+      () => ["repeat", "binding"],
+      Module.InteractorBindingType.NUMERICAL,
+      false,
+      true,
+    );
+
     const updatedBinds = interactor.getBinds();
     utils.assert(
-      updatedBinds.length === initialBinds.length + 1,
-      "new binding should be registered",
+      updatedBinds.length === initialBinds.length + 2,
+      "new bindings should be registered",
     );
 
     const bindGroups = interactor.getBindGroups();
@@ -129,10 +143,24 @@ const settings = {
       "binding documentation should be returned",
     );
 
+    const repeatDocs = interactor.getBindingDocumentation(bindRepeat);
+    utils.assert(
+      Array.isArray(repeatDocs) &&
+        repeatDocs[0] === "repeat" &&
+        repeatDocs[1] === "binding",
+      "repeat binding documentation should be returned",
+    );
+
     const bindingType = interactor.getBindingType(bind);
     utils.assert(
       bindingType === Module.InteractorBindingType.OTHER,
       "binding type should round-trip",
+    );
+
+    const repeatBindingType = interactor.getBindingType(bindRepeat);
+    utils.assert(
+      repeatBindingType === Module.InteractorBindingType.NUMERICAL,
+      "repeat binding type should round-trip",
     );
 
     // start recording
@@ -177,6 +205,20 @@ const settings = {
     interactor.triggerKeyboardKey(Module.InteractorInputAction.PRESS, "R");
     interactor.triggerKeyboardKey(Module.InteractorInputAction.RELEASE, "R");
 
+    // trigger "increase render.light.intensity .1"
+    interactor.triggerKeyboardKey(
+      Module.InteractorInputAction.PRESS,
+      "Ctrl+Shift+L",
+    );
+    interactor.triggerKeyboardKey(
+      Module.InteractorInputAction.PRESS,
+      "Ctrl+Shift+L",
+    );
+    interactor.triggerKeyboardKey(
+      Module.InteractorInputAction.RELEASE,
+      "Ctrl+Shift+L",
+    );
+
     let bindingRemoved = false;
     try {
       interactor.removeBinding(bind);
@@ -184,6 +226,14 @@ const settings = {
       bindingRemoved = true;
     }
     utils.assert(!bindingRemoved, "binding should be removable");
+
+    bindingRemoved = false;
+    try {
+      interactor.removeBinding(bindRepeat);
+    } catch {
+      bindingRemoved = true;
+    }
+    utils.assert(!bindingRemoved, "repeat binding should be removable");
 
     // notifications
     let notifCount = 0;
