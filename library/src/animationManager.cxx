@@ -206,6 +206,18 @@ void animationManager::JumpToFrame(int frame, bool relative)
 }
 
 //----------------------------------------------------------------------------
+size_t animationManager::GetCurrentFrame() const
+{
+  assert(this->DeltaTime != 0.0);
+  const double frameDuration = (this->DeltaTime * this->SpeedFactor);
+  if (frameDuration == 0.0)
+  {
+    return 0;
+  }
+  return static_cast<size_t>((this->CurrentTime - this->TimeRange[0]) / frameDuration);
+}
+
+//----------------------------------------------------------------------------
 void animationManager::JumpToTime(double timeValue, bool relative)
 {
   const double target = relative ? this->CurrentTime + timeValue : timeValue;
