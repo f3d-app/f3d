@@ -15,6 +15,7 @@
 #include <array>
 #include <chrono>
 #include <cstdint>
+#include <sstream>
 
 struct vtkF3DImguiConsole::Internals
 {
@@ -498,6 +499,29 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
       this->InvokeEvent(vtkF3DUserEvents::HideEvent);
     }
   }
+
+#ifdef F3D_MODULE_CLIP
+  if (!minimal)
+  {
+    ImGui::SetCursorPos(ImVec2{ windowWidth - ImGui::CalcTextSize("Copy").x - padding * 2,
+      viewport->WorkSize.y - ImGui::CalcTextSize("Copy").y * 5 });
+    ImGui::BeginChild("Copy button");
+    const auto [r, g, b] = F3DStyle::GetF3DGrey();
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(r, g, b, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(r, g, b, 0.8f));
+    if (ImGui::Button("Copy"))
+    {
+      std::ostringstream oss;
+      for (const auto& [severity, msg] : this->Pimpl->Logs)
+      {
+        oss << msg << '\n';
+      }
+      ImGui::SetClipboardText(oss.str().c_str());
+    }
+    ImGui::PopStyleColor(2);
+    ImGui::EndChild();
+  }
+#endif
 
   ImGui::End();
 }
