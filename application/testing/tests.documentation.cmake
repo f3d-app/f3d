@@ -330,7 +330,7 @@ f3d_test_doc(NAME TestDocColoringComponentX DATA dragon.vtu REF_IMAGE coloring_c
 f3d_test_doc(NAME TestDocColoringComponentY DATA dragon.vtu REF_IMAGE coloring_component_y.png ROTATE ARGS -s --coloring-array=Normals --coloring-component=1)
 
 ## --coloring-field
-f3d_test_doc(NAME TestDocColoringByCellsOFF DATA ${F3D_SOURCE_DIR}/testing/data/waveletArrays.vti REF_IMAGE coloring_by_cells_off.png ROTATE ARGS -fes --line-width=4)
+f3d_test_doc(NAME TestDocColoringByCellsOFF DATA ${F3D_SOURCE_DIR}/testing/data/waveletArrays.vti REF_IMAGE coloring_by_cells_off.png ROTATE ARGS -fes --coloring-field=points --line-width=4)
 f3d_test_doc(NAME TestDocColoringByCellsON DATA ${F3D_SOURCE_DIR}/testing/data/waveletArrays.vti REF_IMAGE coloring_by_cells_on.png ROTATE ARGS -fes --coloring-field=cells --line-width=4)
 
 ## --coloring-range

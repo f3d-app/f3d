@@ -63,8 +63,8 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
     [](const auto& value) { return std::get<std::string>(value); });
   test("getEnumDomain", enumeration, { "none", "ddp", "sort", "sort_cpu", "stochastic" });
 
-  test.expect<f3d::options::incompatible_exception>(
-    "getEnumDomain incompatible", [&]() { std::ignore = opt.getEnumDomain("scene.camera.orthographic"); });
+  test.expect<f3d::options::incompatible_exception>("getEnumDomain incompatible",
+    [&]() { std::ignore = opt.getEnumDomain("scene.camera.orthographic"); });
   test.expect<f3d::options::inexistent_exception>(
     "getEnumDomain inexistent", [&]() { std::ignore = opt.getEnumDomain("inexistent"); });
 

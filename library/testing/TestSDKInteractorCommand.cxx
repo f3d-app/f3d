@@ -68,8 +68,8 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, char* argv[])
     inter.triggerCommand("set scene.animation.indices invalid") == false);
 
   // Add/Remove command
-  inter.addCommand(
-    "test_toggle", [&](const std::vector<std::string>&) { options.toggle("scene.camera.orthographic"); });
+  inter.addCommand("test_toggle",
+    [&](const std::vector<std::string>&) { options.toggle("scene.camera.orthographic"); });
   inter.triggerCommand("test_toggle");
   test("addCommand", options.scene.camera.orthographic == false);
 
@@ -155,8 +155,8 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, char* argv[])
 
   // check exception
   test.expect<f3d::interactor::already_exists_exception>("add already existing command", [&]() {
-    inter.addCommand(
-      "toggle", [&](const std::vector<std::string>&) { options.toggle("scene.camera.orthographic"); });
+    inter.addCommand("toggle",
+      [&](const std::vector<std::string>&) { options.toggle("scene.camera.orthographic"); });
   });
 
   // Args check

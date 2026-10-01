@@ -50,8 +50,8 @@ public:
    * to color with
    * @return: current coloring info if any, unset optional otherwise
    */
-  std::optional<ColoringInfo> SetCurrentColoring(
-    bool forceUsePointData, bool forceUseCellData, const std::optional<std::string>& arrayName, bool quiet);
+  std::optional<ColoringInfo> SetCurrentColoring(bool forceUsePointData, bool forceUseCellData,
+    const std::optional<std::string>& arrayName, bool quiet);
 
   /**
    * Get the current coloring state
