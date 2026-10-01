@@ -3216,7 +3216,7 @@ void vtkF3DRenderer::SetDataFieldForColoring(const DataField& dataField)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetArrayNameForColoring(const std::optional<std::string>& arrayName)
 {
-  if (arrayName != this->ArrayNameForColoring)
+  if (arrayName.has_value() && arrayName != this->ArrayNameForColoring)
   {
     this->ArrayNameForColoring = arrayName;
     this->ColorTransferFunctionConfigured = false;
