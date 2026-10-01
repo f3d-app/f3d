@@ -13,7 +13,7 @@ f3d_test(NAME TestInteractionVolumeCycle DATA waveletArrays.vti ARGS INTERACTION
 f3d_test(NAME TestInteractionVolumeAfterColoring DATA waveletArrays.vti ARGS INTERACTION) #SSSV
 f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 INTERACTION THRESHOLD 0.11) #VI #Small rendering differences on macOS OSMesa
 f3d_test(NAME TestInteractionCorrectCameraForVolumeSwitch ARGS --no-config -v DATA dragon.vtu INTERACTION UI) #v
-f3d_test(NAME TestInteractionMultiFileVolume DATA multi ARGS --multi-file-mode=all INTERACTION LONG_TIMEOUT) #SSVB
+f3d_test(NAME TestInteractionMultiFileVolume DATA multi ARGS --multi-file-mode=all INTERACTION LONG_TIMEOUT) #SYVB
 f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-sprites-size=20 INTERACTION) #O
 f3d_test(NAME TestInteractionDirectory DATA mb INTERACTION ARGS --coloring-mode=scivis) #Right;Right;Right;Left;Up;
 f3d_test(NAME TestInteractionDirectoryLoop DATA mb/recursive INTERACTION ARGS --coloring-mode=scivis --filename UI) #Left;Left;Left;Left;Left;
@@ -28,7 +28,7 @@ f3d_test(NAME TestInteractionCycleVerbose DATA dragon.vtu ARGS --verbose -s NO_B
 f3d_test(NAME TestInteractionCycleVerboseLevelsUsingBinding DATA dragon.vtu ARGS --verbose=info NO_BASELINE INTERACTION REGEXP "Verbose level changed to: Debug") #Shift+V;Shift+V;Shift+V;Shift+V;Shift+V
 f3d_test(NAME TestInteractionVerboseLevelPreservedOnReload DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Material") #Shift+V;Shift+V;Shift+V;Shift+V;Up
 f3d_test(NAME TestInteractionLightIntensity DATA dragon.vtu INTERACTION LONG_TIMEOUT)
-f3d_test(NAME TestInteractionMultiFileColoring DATA mb/recursive ARGS --multi-file-mode=all INTERACTION) #SSSB
+f3d_test(NAME TestInteractionMultiFileColoring DATA mb/recursive ARGS --multi-file-mode=all INTERACTION) #SYYB
 f3d_test(NAME TestInteractionOpacity DATA dragon.vtu INTERACTION) # Shift+P * 21; Ctrl+P * 5
 f3d_test(NAME TestInteractionReload DATA dragon.vtu ARGS -e INTERACTION) #Up;
 f3d_test(NAME TestInteractionLoadParentDirectory DATA multi/dragon.vtu ARGS --filename INTERACTION UI) #Down;
