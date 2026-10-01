@@ -575,10 +575,9 @@ PYBIND11_MODULE(pyf3d, module)
       "Trigger a single text line notification at the bottom left of viewport", py::arg("desc"),
       py::arg("value") = "", py::arg("duration") = 3.0);
 
-  interactor
-    .def("add_binding",
-      py::overload_cast<f3d::interactor::BindingParam>(&f3d::interactor::addBinding),
-      "Add a binding command", py::arg("binding"));
+  interactor.def("add_binding",
+    py::overload_cast<f3d::interactor::BindingParam>(&f3d::interactor::addBinding),
+    "Add a binding command", py::arg("binding"));
 
   // f3d::mesh_t
   py::class_<f3d::mesh_t>(module, "Mesh")

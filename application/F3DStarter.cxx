@@ -1216,7 +1216,10 @@ public:
 
               f3d::interaction_bind_t bind = f3d::interaction_bind_t::parse(bindStr);
               interactor.removeBinding(bind);
-              interactor.addBinding({.Bind = bind, .Commands = commands, .Group = "Config", .DocCallback = std::bind(docStringVec, commands)});
+              interactor.addBinding({ .Bind = bind,
+                .Commands = commands,
+                .Group = "Config",
+                .DocCallback = std::bind(docStringVec, commands) });
             }
           }
         }

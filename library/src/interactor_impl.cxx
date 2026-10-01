@@ -1730,8 +1730,12 @@ interactor& interactor_impl::initBindings()
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addBinding(BindingParam binding)
 {
-  const auto [it, success] = this->Internals->Bindings.insert(
-    { binding.Bind, { .CommandVector = std::move(binding.Commands), .DocumentationCallback = std::move(binding.DocCallback), .Type = binding.Type, .Notify = binding.Notify, .Repeat = binding.Repeat } });
+  const auto [it, success] = this->Internals->Bindings.insert({ binding.Bind,
+    { .CommandVector = std::move(binding.Commands),
+      .DocumentationCallback = std::move(binding.DocCallback),
+      .Type = binding.Type,
+      .Notify = binding.Notify,
+      .Repeat = binding.Repeat } });
   if (!success)
   {
     throw interactor::already_exists_exception(
