@@ -76,7 +76,7 @@ vtkUnsignedCharArray* vtkF3DPolyDataMapper::MapScalars(
         this->LinearColors->GetPointer(i * this->LinearColors->GetNumberOfComponents());
       for (int component = 0; component < 3; ++component)
       {
-        color[component] = toLinear[color[component]];  // Lookup
+        color[component] = toLinear[color[component]]; // Lookup
       }
     }
     this->Colors->UnRegister(this);
