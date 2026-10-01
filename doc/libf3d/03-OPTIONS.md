@@ -40,6 +40,21 @@ Set the animation speed factor to slow, speed up or even invert animation.
 
 CLI: `--animation-speed-factor`.
 
+### `scene.animation.mode` (_string_, default: `forward`, enum domain: `forward, backward, pingpong`)
+
+Defines the playback direction and loop behavior:
+- `forward`: Plays the animation from start to end (normally).
+- `backward`: Plays the animation from end to start (in reverse).
+- `pingpong`: Alternating playback direction, moving forward to the end, then backward to the start.
+
+CLI: `--animation-mode`.
+
+### `scene.animation.repeat` (_int_, default: `-1`)
+
+Specifies the number of animation repeat cycles. A value of `-1` means unlimited, while any integer sets a specific number of repeats.
+
+CLI: `--animation-repeat`.
+
 ### `scene.animation.time` (_double_, optional, **on load**)
 
 Set the animation time to load.

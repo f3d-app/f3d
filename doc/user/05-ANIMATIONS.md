@@ -34,6 +34,8 @@ F3D animation behavior can be fully controlled from the command line using the f
 | \-\-animation\-indices       |                     | Select the animations to play.                       |
 | \-\-animation\-indices=-1    |                     | Play all animations at once (only if supported)      |
 | \-\-animation\-speed\-factor | Time Unit = Seconds | Adjust time unit.                                    |
+| \-\-animation\-mode          | forward             | Set playback behavior.                               |
+| \-\-animation\-repeat        | -1                  | Set repeat cycles.                                   |
 | \-\-frame\-rate              | 60 FPS              | Adjust animation (and others components) frame rate. |
 | \-\-animation\-time          |                     | Load a specific time value on start.                 |
 
