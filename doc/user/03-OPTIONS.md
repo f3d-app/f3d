@@ -814,7 +814,7 @@ Use with the scalar option.
 
 #### compare
 
-| OFF                                     | ON                                     |
+| points                                  | cells                                  |
 | --------------------------------------- | -------------------------------------- |
 | ![](./images/coloring_by_cells_off.png) | ![](./images/coloring_by_cells_on.png) |
 
