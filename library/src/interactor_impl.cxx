@@ -2164,6 +2164,8 @@ void interactor_impl::SetXRResourcesDirectory(const std::string& actionsManifest
   vtkOpenXRRenderWindowInteractor* xrInteractor =
     vtkOpenXRRenderWindowInteractor::SafeDownCast(this->Internals->VTKInteractor);
   xrInteractor->SetActionManifestDirectory(actionsManifestDirectory);
+#else
+  (void)actionsManifestDirectory; // do nothing if OpenXR is not enabled
 #endif
 }
 
