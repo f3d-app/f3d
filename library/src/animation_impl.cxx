@@ -117,7 +117,7 @@ std::string animation_impl::getName(int index)
       this->Internals->PreparedAnimationIndices.value().size() > 1)
     {
       std::vector<bool> animCheck(this->Internals->AvailAnimations, false);
-      for (int idx : this->Internals->PreparedAnimationIndices.value())
+      for (const int idx : this->Internals->PreparedAnimationIndices.value())
       {
         if (idx < this->Internals->AvailAnimations)
         {
@@ -469,24 +469,8 @@ void animation_impl::CycleAnimation()
     return;
   }
 
-  // F3D_DEPRECATED
-  // Remove this in the next major release
-  F3D_SILENT_WARNING_PUSH()
-  F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
-  if (this->Internals->Options.scene.animation.indices == std::vector<int>{ 0 } &&
-    this->Internals->Options.scene.animation.index != 0)
-  {
-    log::warn("scene.animation.index is deprecated, please use "
-              "scene.animation.indices instead");
-    this->Internals->Options.scene.animation.indices = {
-      this->Internals->Options.scene.animation.index
-    };
-    this->Internals->Options.scene.animation.index = 0;
-  }
-  F3D_SILENT_WARNING_POP()
-
   // If we started with multi animation or all animations (any negative value means all animations)
-  bool negative = std::ranges::any_of(
+  const bool negative = std::ranges::any_of(
     this->Internals->Options.scene.animation.indices, [](int idx) { return idx < 0; });
   if (this->Internals->Options.scene.animation.indices.size() > 1 || negative)
   {
@@ -565,18 +549,6 @@ void animation_impl::PrepareForAnimationIndices()
 
   std::vector<int> animIndices = this->Internals->Options.scene.animation.indices;
 
-  // F3D_DEPRECATED
-  // Remove this in the next major release
-  F3D_SILENT_WARNING_PUSH()
-  F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
-  if (animIndices == std::vector<int>{ 0 } && this->Internals->Options.scene.animation.index != 0)
-  {
-    log::warn("scene.animation.index is deprecated, please use "
-              "scene.animation.indices instead");
-    animIndices = { this->Internals->Options.scene.animation.index };
-  }
-  F3D_SILENT_WARNING_POP()
-
   // If it contains a negative value, all animations should be selected
   if (std::ranges::any_of(animIndices, [](int idx) { return idx < 0; }))
   {
@@ -649,7 +621,7 @@ void animation_impl::PrepareForAnimationIndices()
   }
 
   // Enable the selected ones
-  for (int idx : this->Internals->PreparedAnimationIndices.value())
+  for (const int idx : this->Internals->PreparedAnimationIndices.value())
   {
     if (idx >= this->Internals->AvailAnimations)
     {
@@ -694,10 +666,10 @@ void animation_impl::PrepareForAnimationIndices()
   {
     // Populate AnimationTimeSteps with accumulated values
     this->Internals->AnimationTimeSteps->Reset();
-    int nbAccumulatedTimeSteps = static_cast<int>(accumulatedTimeSteps.size());
+    const int nbAccumulatedTimeSteps = static_cast<int>(accumulatedTimeSteps.size());
     this->Internals->AnimationTimeSteps->SetNumberOfTuples(nbAccumulatedTimeSteps);
     int index = 0;
-    for (double timeStep : accumulatedTimeSteps)
+    for (const double timeStep : accumulatedTimeSteps)
     {
       this->Internals->AnimationTimeSteps->SetValue(index, timeStep);
       index++;
