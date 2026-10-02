@@ -4,6 +4,7 @@
     "match": "*.vdb",
     "options": {
       "load-plugins": "vdb",
+      "coloring-mode": "scivis",
       "volume": true,
       "volume-inverse": true
     }
