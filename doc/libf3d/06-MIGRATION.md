@@ -25,7 +25,9 @@ These components are now installed by default:
 
 See building documentation for more information.
 
-## Enable options
+## Options
+
+### Enable options
 
 Many `enable` libf3d options have been removed in favor of extending possible values on the `mode`/`type` related libf3d options.
 
@@ -39,6 +41,22 @@ So to enable anti-aliasing, just set the mode to the value that used to be the d
 So to enable point sprites, just set the type to the value that used to be the default, `sphere`.
 
 `ui.scene_hierarchy` have been removed in favor of `ui.scene_hierarchy.enable`.
+
+### Scientific visualization
+
+Scivis options have been revamped entirely.
+
+`model.scivis.enable` has been removed in favor of the new `model.coloring` option.
+So to enable scivis, just set `model.coloring` to the value `scivis`.
+
+`model.scivis.cells` has been removed in favor of the new `model.scivis.field` option.
+By default, all arrays are active but if you need cell arrays only, just set `model.scivis.field` to `cells`.
+
+`model.scivis.component` is now optional and doesn't accept negative values anymore.
+If you need coloring by magnitude (old value `-1`), just leave this option empty, that's the default.
+If you need direct coloring (old value `-2`), set `model.coloring` to the value `direct`.
+
+`model.coloring` must be set to `scivis` or `direct` if `model.volume.enable` is true.
 
 ## User callback
 
