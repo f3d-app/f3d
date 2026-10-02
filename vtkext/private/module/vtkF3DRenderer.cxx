@@ -3386,7 +3386,7 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
       else
       {
         F3DLog::Print(
-          F3DLog::Severity::Warning, "Volume rendering is material color mode is invalid");
+          F3DLog::Severity::Warning, "Volume rendering in material color mode is invalid");
       }
       volume.Prop->SetVisibility(visible);
     }
@@ -3410,8 +3410,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   this->ScalarBarActor->SetVisibility(barVisible);
   if (barVisible && !this->ScalarBarActorConfigured)
   {
-    vtkF3DRenderer::ConfigureScalarBarActorForColoring(this->ScalarBarActor, info.value().Name,
-      this->ColorTransferFunction);
+    vtkF3DRenderer::ConfigureScalarBarActorForColoring(
+      this->ScalarBarActor, info.value().Name, this->ColorTransferFunction);
     this->ScalarBarActorConfigured = true;
   }
 
@@ -3583,8 +3583,8 @@ void vtkF3DRenderer::ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf,
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar,
-  std::string arrayName, vtkColorTransferFunction* ctf)
+void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
+  vtkScalarBarActor* scalarBar, std::string arrayName, vtkColorTransferFunction* ctf)
 {
   if (this->DisplayDepth)
   {
@@ -3890,15 +3890,7 @@ std::string vtkF3DRenderer::ArrayToString()
 
   // Unicode symbols represent a triangle for cell data and a circle for point data
   std::string arrayName = info.value().IsCellData ? "\uea72 " : "\uf4c3 ";
-  if (info.value().Name.empty())
-  {
-    arrayName += "Array #";
-    arrayName += "??"; // todo: get index? can it happen?
-  }
-  else
-  {
-    arrayName += info.value().Name;
-  }
+  arrayName += info.value().Name;
 
   return arrayName;
 }

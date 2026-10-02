@@ -16,7 +16,7 @@ const settings = {
 
     // check that the getter works
     utils.assert(
-      options.get("model.grid.enable") === false,
+      options.get("render.grid.enable") === false,
       "options getter for boolean failed",
     );
     utils.assert(
@@ -56,10 +56,10 @@ const settings = {
     );
 
     const options2 = new Module.Options();
-    options2.toggle("model.grid.enable");
+    options2.toggle("render.grid.enable");
 
     utils.assert(
-      options.isSame(options2, "model.grid.enable"),
+      options.isSame(options2, "render.grid.enable"),
       "options isSame",
     );
     utils.assert(
@@ -115,9 +115,9 @@ const settings = {
       "options !hasValue after removal",
     );
 
-    options.reset("model.grid.enable");
+    options.reset("render.grid.enable");
     utils.assert(
-      options.get("model.grid.enable") === false,
+      options.get("render.grid.enable") === false,
       "options getter after reset",
     );
 

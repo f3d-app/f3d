@@ -757,8 +757,8 @@ private:
   /**
    * Convenience method for configuring a scalar bar actor for coloring
    */
-  void ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar, std::string arrayName,
-    vtkColorTransferFunction* ctf);
+  void ConfigureScalarBarActorForColoring(
+    vtkScalarBarActor* scalarBar, std::string arrayName, vtkColorTransferFunction* ctf);
 
   /**
    * Configure internal range and color transfer function according to provided
