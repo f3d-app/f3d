@@ -270,53 +270,13 @@ extern "C"
 
     try
     {
-      GetInteractor(env, self).addBinding(
-        nativeBind, commandsVec, groupCpp, nullptr, nativeType, notify, repeat);
-    }
-    catch (const f3d::interactor::already_exists_exception& e)
-    {
-      F3DThrowJavaException(env, "app/f3d/F3D/Interactor$AlreadyExistsException", e.what());
-    }
-    return self;
-  }
-
-  JNIEXPORT jobject JAVA_BIND(Interactor, addBindingCommand)(JNIEnv* env, jobject self,
-    jobject bind, jstring command, jstring group, jobject type, jboolean notify, jboolean repeat)
-  {
-    f3d::interaction_bind_t nativeBind = JavaBindToNative(env, bind);
-
-    JniUTFString commandStr(env, command);
-    std::string commandCpp = commandStr.c_str();
-
-    JniUTFString groupStr(env, group);
-    std::string groupCpp = groupStr.c_str();
-
-    JniLocalRef<jclass> typeEnum(env, env->GetObjectClass(type));
-    jmethodID ordinalMethod = env->GetMethodID(typeEnum, "ordinal", "()I");
-    jint typeOrdinal = env->CallIntMethod(type, ordinalMethod);
-
-    f3d::interactor::BindingType nativeType;
-    switch (typeOrdinal)
-    {
-      case 0:
-        nativeType = f3d::interactor::BindingType::CYCLIC;
-        break;
-      case 1:
-        nativeType = f3d::interactor::BindingType::NUMERICAL;
-        break;
-      case 2:
-        nativeType = f3d::interactor::BindingType::TOGGLE;
-        break;
-      case 3:
-      default:
-        nativeType = f3d::interactor::BindingType::OTHER;
-        break;
-    }
-
-    try
-    {
-      GetInteractor(env, self).addBinding(
-        nativeBind, commandCpp, groupCpp, nullptr, nativeType, notify, repeat);
+      GetInteractor(env, self).addBinding({ .Bind = nativeBind,
+        .Commands = commandsVec,
+        .Group = groupCpp,
+        .DocCallback = nullptr,
+        .Type = nativeType,
+        .Notify = notify != JNI_FALSE,
+        .Repeat = repeat != JNI_FALSE });
     }
     catch (const f3d::interactor::already_exists_exception& e)
     {

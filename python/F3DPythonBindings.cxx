@@ -458,6 +458,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("inter", &f3d::interaction_bind_t::inter)
     .def("format", &f3d::interaction_bind_t::format);
 
+  py::class_<f3d::interactor::BindingParam> binding_param(module, "BindingParam");
+
   py::class_<f3d::interactor_state_t> interactor_state(module, "InteractorState");
 
   interactor_state.def(py::init<>())
@@ -573,23 +575,9 @@ PYBIND11_MODULE(pyf3d, module)
       "Trigger a single text line notification at the bottom left of viewport", py::arg("desc"),
       py::arg("value") = "", py::arg("duration") = 3.0);
 
-  interactor
-    .def("add_binding",
-      py::overload_cast<const f3d::interaction_bind_t&, std::string, std::string,
-        std::function<std::pair<std::string, std::string>()>, f3d::interactor::BindingType, bool,
-        bool>(&f3d::interactor::addBinding),
-      "Add a binding command", py::arg("bind"), py::arg("command"), py::arg("group"),
-      py::arg("documentationCallback") = nullptr,
-      py::arg("type") = f3d::interactor::BindingType::OTHER, py::arg("notify") = true,
-      py::arg("repeat") = false)
-    .def("add_binding",
-      py::overload_cast<const f3d::interaction_bind_t&, std::vector<std::string>, std::string,
-        std::function<std::pair<std::string, std::string>()>, f3d::interactor::BindingType, bool,
-        bool>(&f3d::interactor::addBinding),
-      "Add binding commands", py::arg("bind"), py::arg("command"), py::arg("group"),
-      py::arg("documentationCallback") = nullptr,
-      py::arg("type") = f3d::interactor::BindingType::OTHER, py::arg("notify") = true,
-      py::arg("repeat") = false);
+  interactor.def("add_binding",
+    py::overload_cast<f3d::interactor::BindingParam>(&f3d::interactor::addBinding),
+    "Add a binding command", py::arg("binding"));
 
   // f3d::mesh_t
   py::class_<f3d::mesh_t>(module, "Mesh")
