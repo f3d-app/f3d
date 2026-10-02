@@ -3874,7 +3874,7 @@ std::string vtkF3DRenderer::ArrayToString()
     return "No array";
   }
 
-  // Unicode symbols represent a triangle for cell data and a circle for point data
+  // Unicode symbols represent a square for cell data and a dot for point data
   std::string arrayName = info.value().IsCellData ? "\uea72 " : "\uf4c3 ";
   arrayName += info.value().Name;
 
