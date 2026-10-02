@@ -234,14 +234,14 @@ image::image([[maybe_unused]] std::byte* buffer, [[maybe_unused]] std::size_t si
 
   vtkCollectionSimpleIterator iterator;
   vtkImageReader2* currentReader;
-  vtkImageReader2* reader = nullptr;
+  vtkSmartPointer<vtkImageReader2> reader;
 
   for (availableReaders->InitTraversal(iterator);
        (currentReader = availableReaders->GetNextImageReader2(iterator));)
   {
     if (currentReader->CanReadFile(stream) > 0)
     {
-      reader = currentReader;
+      reader.TakeReference(currentReader->NewInstance());
       break;
     }
   }
