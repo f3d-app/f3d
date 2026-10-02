@@ -143,6 +143,7 @@ f3d_test(NAME TestVolumeComp DATA vase_4comp.vti ARGS -vsb --coloring-component=
 f3d_test(NAME TestVolumeDirect DATA vase_4comp.vti ARGS -vb --coloring-mode=direct)
 f3d_test(NAME TestVolumeCells DATA waveletArrays.vti ARGS -vsb --coloring-field=cells)
 f3d_test(NAME TestVolumeColoringArray DATA waveletArrays.vti ARGS -vsb --coloring-array=Result LONG_TIMEOUT)
+f3d_test(NAME TestVolumeMaterialError DATA HeadMRVolume.mhd ARGS -v NO_BASELINE REGEXP "Volume rendering in material color mode is invalid")
 
 ## Normal Glyphs
 f3d_test(NAME TestNormalGlyphsPerspectiveEnable DATA suzanne.obj ARGS --normal-glyphs LONG_TIMEOUT)
