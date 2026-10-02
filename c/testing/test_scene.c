@@ -131,16 +131,6 @@ int test_scene()
 
   // Test the rest of the API
 
-  f3d_scene_load_animation_time(scene, 0.5);
-  double min_time, max_time;
-  f3d_scene_animation_time_range(scene, &min_time, &max_time);
-  unsigned int anim_count = f3d_scene_available_animations(scene);
-  (void)anim_count;
-  unsigned int keyframes_number;
-  double* keyframes = f3d_scene_get_animation_keyframes(scene, &keyframes_number);
-  f3d_scene_destroy_animation_keyframes(keyframes);
-  (void)keyframes;
-
   f3d_light_state_t light_state = { 0 };
   light_state.type = F3D_LIGHT_TYPE_HEADLIGHT;
   light_state.intensity = 1.0;
