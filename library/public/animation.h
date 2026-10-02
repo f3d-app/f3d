@@ -53,13 +53,13 @@ public:
    *   - Returns "No animations" if no animations are current
    * Fallback: Returns "No animation" for out-of-bounds requests.
    */
-  [[nodiscard]] virtual std::string getName(int index = -1) = 0;
+  [[nodiscard]] virtual std::string getName(int index = -1) const = 0;
 
   /**
    * Return all of the animation names, if any.
    * Returns a vector of length 0 if none.
    */
-  [[nodiscard]] virtual std::vector<std::string> getNames() = 0;
+  [[nodiscard]] virtual std::vector<std::string> getNames() const = 0;
 
 protected:
   //! @cond

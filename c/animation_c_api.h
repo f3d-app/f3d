@@ -58,6 +58,49 @@ extern "C"
    */
   F3D_EXPORT unsigned int f3d_animation_count(const f3d_animation_t* animation);
 
+  /**
+   * @brief Return the number of animations available in the current files in the scene.
+   *
+   * @param animation Animation handle.
+   * @return Number of available animations.
+   */
+
+  /**
+   * @brief Get the animation name at provided index.
+   *
+   * The returned string must be freed with f3d_animation_destroy_string().
+   *
+   * @param animation Animation handle.
+   * @param index Index of animation, -1 means current.
+   * @return animation name, or NULL on failure.
+   */
+  F3D_EXPORT char* f3d_animation_get_name(const f3d_animation_t* animation, int index);
+
+  /**
+   * @brief Get all animation names
+   *
+   * @param animation animation handle.
+   * @param count Output parameter for number of actions.
+   * @return Array of action strings. Caller must free the array with
+   *         f3d_animation_destroy_string_array().
+   */
+  F3D_EXPORT char** f3d_animation_get_names(const f3d_animation_t* animation, int* count);
+
+  /**
+   * @brief Free a single string returned by the animation C API.
+   *
+   * @param str String to free.
+   */
+  F3D_EXPORT void f3d_animation_destroy_string(const char* str);
+
+  /**
+   * @brief Free a string array returned by animation functions.
+   *
+   * @param array String array to free.
+   * @param count Number of strings in the array.
+   */
+  F3D_EXPORT void f3d_animation_destroy_string_array(char** array, int count);
+
 #ifdef __cplusplus
 }
 #endif

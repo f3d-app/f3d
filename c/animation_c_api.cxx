@@ -2,6 +2,8 @@
 
 #include "animation.h"
 
+#include <cstring>
+
 //----------------------------------------------------------------------------
 void f3d_animation_load_time(f3d_animation_t* animation, double time_value)
 {
@@ -65,4 +67,72 @@ unsigned int f3d_animation_count(const f3d_animation_t* animation)
 
   const f3d::animation* cpp_animation = reinterpret_cast<const f3d::animation*>(animation);
   return cpp_animation->count();
+}
+
+//----------------------------------------------------------------------------
+char* f3d_animation_get_name(const f3d_animation_t* animation, int index)
+{
+  if (!animation)
+  {
+    return nullptr;
+  }
+
+  const f3d::animation* cpp_animation = reinterpret_cast<const f3d::animation*>(animation);
+  const std::string str = cpp_animation->getName(index);
+  char* result = new char[str.length() + 1];
+  std::strcpy(result, str.c_str());
+  return result;
+}
+
+//----------------------------------------------------------------------------
+char** f3d_animation_get_names(const f3d_animation_t* animation, int* count)
+{
+  if (!animation || !count)
+  {
+    if (count)
+    {
+      *count = 0;
+    }
+    return nullptr;
+  }
+
+  const f3d::animation* cpp_animation = reinterpret_cast<const f3d::animation*>(animation);
+  std::vector<std::string> names = cpp_animation->getNames();
+
+  *count = static_cast<int>(names.size());
+  if (names.empty())
+  {
+    return nullptr;
+  }
+
+  char** result = new char*[names.size()];
+
+  for (size_t i = 0; i < names.size(); ++i)
+  {
+    result[i] = new char[names[i].length() + 1];
+    std::strcpy(result[i], names[i].c_str());
+  }
+
+  return result;
+}
+
+//----------------------------------------------------------------------------
+void f3d_animation_destroy_string(const char* str)
+{
+  delete[] str;
+}
+
+//----------------------------------------------------------------------------
+void f3d_animation_destroy_string_array(char** array, int count)
+{
+  if (!array)
+  {
+    return;
+  }
+
+  for (int i = 0; i < count; ++i)
+  {
+    delete[] array[i];
+  }
+  delete[] array;
 }

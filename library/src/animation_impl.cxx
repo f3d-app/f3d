@@ -108,7 +108,7 @@ unsigned int animation_impl::count() const
 }
 
 //----------------------------------------------------------------------------
-std::string animation_impl::getName(int index)
+std::string animation_impl::getName(int index) const
 {
   assert(this->Internals->Importer);
   if (index == -1)
@@ -150,7 +150,7 @@ std::string animation_impl::getName(int index)
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> animation_impl::getNames()
+std::vector<std::string> animation_impl::getNames() const
 {
   assert(this->Internals->Importer);
 

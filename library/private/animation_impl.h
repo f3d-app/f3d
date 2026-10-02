@@ -39,8 +39,8 @@ public:
   std::pair<double, double> timeRange() override;
   std::vector<double> keyFrames() override;
   unsigned int count() const override;
-  std::string getName(int index = -1) override;
-  std::vector<std::string> getNames() override;
+  std::string getName(int index = -1) const override;
+  std::vector<std::string> getNames() const override;
   ///@}
 
   /**
