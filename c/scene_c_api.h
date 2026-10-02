@@ -215,7 +215,6 @@ extern "C"
    */
   F3D_EXPORT f3d_animation_t* f3d_scene_get_animation(f3d_scene_t* scene);
 
-
 #ifdef __cplusplus
 }
 #endif

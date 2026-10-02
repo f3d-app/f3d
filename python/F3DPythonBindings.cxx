@@ -902,7 +902,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readonly("number_of_cells", &f3d::scene_info_t::numberOfCells);
 
   // f3d::animation
-  py::class_<f3d::animation, std::unique_ptr<f3d::animation, py::nodelete>> animation(module, "animation");
+  py::class_<f3d::animation, std::unique_ptr<f3d::animation, py::nodelete>> animation(
+    module, "animation");
   animation //
     .def("load_time", &f3d::animation::loadTime)
     .def("time_range", &f3d::animation::timeRange)
@@ -915,7 +916,8 @@ PYBIND11_MODULE(pyf3d, module)
   // f3d::scene
   py::class_<f3d::scene, std::unique_ptr<f3d::scene, py::nodelete>> scene(module, "Scene");
   scene //
-    .def_property_readonly("animation", &f3d::scene::getAnimation, py::return_value_policy::reference)
+    .def_property_readonly(
+      "animation", &f3d::scene::getAnimation, py::return_value_policy::reference)
     .def("supports", &f3d::scene::supports)
     .def("clear", &f3d::scene::clear)
     .def("get_added_files", &f3d::scene::getAddedFiles,
