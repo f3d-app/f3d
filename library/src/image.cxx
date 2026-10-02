@@ -440,9 +440,9 @@ double image::compare(const image& reference) const
   ssim->SetInputData(this->Internals->Image);
   ssim->SetInputData(1, reference.Internals->Image);
   ssim->Update();
-  vtkSmartPointer<vtkDoubleArray> scalars = // NOLINT(misc-const-correctness)
-    vtkArrayDownCast<vtkDoubleArray>(
-      vtkDataSet::SafeDownCast(ssim->GetOutputDataObject(0))->GetPointData()->GetScalars());
+  // NOLINTNEXTLINE(misc-const-correctness) not const on older VTK
+  vtkSmartPointer<vtkDoubleArray> scalars = vtkArrayDownCast<vtkDoubleArray>(
+    vtkDataSet::SafeDownCast(ssim->GetOutputDataObject(0))->GetPointData()->GetScalars());
 
   // Thanks to the checks above, this is always true
   assert(scalars != nullptr);

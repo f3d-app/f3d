@@ -120,7 +120,7 @@ public:
     if (pxr::ArchGetAddressInfo(
           reinterpret_cast<void*>(&vtkF3DUSDImporter::New), &libPath, nullptr, nullptr, nullptr))
     {
-      // NOLINTNEXTLINE(misc-const-correctness)
+      // NOLINTNEXTLINE(misc-const-correctness) not const on Windows
       std::string plugInfoDir = pxr::TfGetPathName(libPath) + "../lib/usd/f3d/resources/";
 
 #ifdef _WIN32

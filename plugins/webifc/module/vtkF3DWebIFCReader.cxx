@@ -265,20 +265,20 @@ int vtkF3DWebIFCReader::RequestData(
 #else
         for (size_t i = 0; i < vertexData.size(); i += vertexSize)
         {
-          double x = vertexData[i];
-          double y = vertexData[i + 1];
-          double z = vertexData[i + 2];
-          double nx = vertexData[i + 3];
-          double ny = vertexData[i + 4];
-          double nz = vertexData[i + 5];
+          const double x = vertexData[i];
+          const double y = vertexData[i + 1];
+          const double z = vertexData[i + 2];
+          const double nx = vertexData[i + 3];
+          const double ny = vertexData[i + 4];
+          const double nz = vertexData[i + 5];
 
-          double tx = transform[0] * x + transform[4] * y + transform[8] * z + transform[12];
-          double ty = transform[1] * x + transform[5] * y + transform[9] * z + transform[13];
-          double tz = transform[2] * x + transform[6] * y + transform[10] * z + transform[14];
+          const double tx = transform[0] * x + transform[4] * y + transform[8] * z + transform[12];
+          const double ty = transform[1] * x + transform[5] * y + transform[9] * z + transform[13];
+          const double tz = transform[2] * x + transform[6] * y + transform[10] * z + transform[14];
 
-          double tnx = transform[0] * nx + transform[4] * ny + transform[8] * nz;
-          double tny = transform[1] * nx + transform[5] * ny + transform[9] * nz;
-          double tnz = transform[2] * nx + transform[6] * ny + transform[10] * nz;
+          const double tnx = transform[0] * nx + transform[4] * ny + transform[8] * nz;
+          const double tny = transform[1] * nx + transform[5] * ny + transform[9] * nz;
+          const double tnz = transform[2] * nx + transform[6] * ny + transform[10] * nz;
 
           allPoints->InsertNextPoint(tx, ty, tz);
           normals->InsertNextTuple3(tnx, tny, tnz);

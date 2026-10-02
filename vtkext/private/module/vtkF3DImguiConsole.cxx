@@ -77,7 +77,8 @@ struct vtkF3DImguiConsole::Internals
         }
         else if (candidates.size() > 1)
         {
-          std::string_view bestCandidate = candidates[0]; // NOLINT(misc-const-correctness)
+          // NOLINTNEXTLINE(misc-const-correctness) not const on Windows/Mac
+          std::string_view bestCandidate = candidates[0];
 #if defined(_WIN32) || defined(__APPLE__)
           // Find which candidate matches the casing of the pattern the best
           int bestPatternMatchLen = 0;
