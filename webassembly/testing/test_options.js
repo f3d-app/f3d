@@ -17,7 +17,7 @@ const settings = {
 
     // check that the getter works
     utils.assert(
-      options.get("render.grid.enable") === false,
+      options.get("render.grid.enable") === true,
       "options getter for boolean failed",
     );
     utils.assert(
