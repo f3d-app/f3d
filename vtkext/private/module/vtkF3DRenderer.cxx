@@ -3397,7 +3397,7 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   if (barVisible && !this->ScalarBarActorConfigured)
   {
     vtkF3DRenderer::ConfigureScalarBarActorForColoring(this->ScalarBarActor, info.value().Name,
-      this->ComponentForColoring, this->ColorTransferFunction);
+      this->ColorTransferFunction);
     this->ScalarBarActorConfigured = true;
   }
 
@@ -3570,7 +3570,7 @@ void vtkF3DRenderer::ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf,
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar,
-  std::string arrayName, const std::optional<int>& component, vtkColorTransferFunction* ctf)
+  std::string arrayName, vtkColorTransferFunction* ctf)
 {
   if (this->DisplayDepth)
   {
