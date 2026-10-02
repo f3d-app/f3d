@@ -4,10 +4,12 @@ f3d_test(NAME TestInteractionPostFX DATA cow.vtp INTERACTION LONG_TIMEOUT) #PQAA
 f3d_test(NAME TestInteractionTimer DATA cow.vtp NO_BASELINE INTERACTION UI LONG_TIMEOUT) #Z
 f3d_test(NAME TestInteractionTrackball DATA cow.vtp ARGS --interaction-style=trackball INTERACTION LONG_TIMEOUT) #Mouse movements;
 f3d_test(NAME TestInteractionTrackballBind DATA cow.vtp INTERACTION LONG_TIMEOUT) #K#Mouse movements;
-f3d_test(NAME TestInteractionCycleCell DATA waveletArrays.vti INTERACTION LONG_TIMEOUT) #VCCC
-f3d_test(NAME TestInteractionCycleComp DATA dragon.vtu INTERACTION) #SYYYY
-f3d_test(NAME TestInteractionCycleScalars DATA dragon.vtu INTERACTION) #BSSSS
-f3d_test(NAME TestInteractionCycleCellInvalidIndex DATA waveletArrays.vti ARGS -s --coloring-field=cells INTERACTION) #YY
+f3d_test(NAME TestInteractionCycleModeToScivis DATA dragon.vtu INTERACTION) #S
+f3d_test(NAME TestInteractionCycleModeToDirect DATA dragon.vtu INTERACTION) #SS
+f3d_test(NAME TestInteractionCycleModeBackToMaterial DATA dragon.vtu INTERACTION) #SSS
+f3d_test(NAME TestInteractionCycleCompX DATA dragon.vtu INTERACTION) #S SHIFT+Y
+f3d_test(NAME TestInteractionCycleCompBackToMag DATA dragon.vtu INTERACTION) #S SHIFT+Y SHIFT+Y SHIFT+Y SHIFT+Y
+f3d_test(NAME TestInteractionCycleArrays DATA dragon.vtu INTERACTION) #SY
 f3d_test(NAME TestInteractionCycleBlending DATA suzanne.ply ARGS --opacity=0.8 INTERACTION LONG_TIMEOUT SKIP_GLES) #PPPPP # Cycle to ddp
 f3d_test(NAME TestInteractionVolumeCycle DATA waveletArrays.vti ARGS INTERACTION) #VSS
 f3d_test(NAME TestInteractionVolumeAfterColoring DATA waveletArrays.vti ARGS INTERACTION) #SYV
