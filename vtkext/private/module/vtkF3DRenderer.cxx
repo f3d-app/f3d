@@ -3262,15 +3262,17 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
 
   // Recover coloring information and update handler
   F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
-  const auto info = coloringHandler.SetCurrentColoring(this->DataFieldForColoring == DataField::POINTS,
-    this->DataFieldForColoring == DataField::CELLS, this->ArrayNameForColoring, false);
+  const auto info =
+    coloringHandler.SetCurrentColoring(this->DataFieldForColoring == DataField::POINTS,
+      this->DataFieldForColoring == DataField::CELLS, this->ArrayNameForColoring, false);
 
   if (info.has_value())
   {
     this->ArrayNameForColoring = info.value().Name;
   }
 
-  const bool hasColoring = info.has_value() && this->Coloring != vtkF3DRenderer::ColoringMode::MATERIAL;
+  const bool hasColoring =
+    info.has_value() && this->Coloring != vtkF3DRenderer::ColoringMode::MATERIAL;
   if (hasColoring && !this->ColorTransferFunctionConfigured)
   {
     this->ConfigureRangeAndCTFForColoring(info.value());
