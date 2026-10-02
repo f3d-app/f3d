@@ -591,3 +591,16 @@ void f3d_scene_remove_all_lights(f3d_scene_t* scene)
   f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
   cpp_scene->removeAllLights();
 }
+
+//----------------------------------------------------------------------------
+f3d_animation_t* f3d_scene_get_animation(f3d_scene_t* scene)
+{
+  if (!scene)
+  {
+    return nullptr;
+  }
+
+  f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
+  f3d::animation& sce = cpp_scene->getAnimation();
+  return reinterpret_cast<f3d_animation_t*>(&sce);
+}

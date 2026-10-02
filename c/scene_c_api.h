@@ -1,6 +1,7 @@
 #ifndef F3D_SCENE_C_API_H
 #define F3D_SCENE_C_API_H
 
+#include "animation_c_api.h"
 #include "export.h"
 #include "types_c_api.h"
 
@@ -205,6 +206,15 @@ extern "C"
    * or scene is NULL.
    */
   F3D_EXPORT int f3d_scene_supports(f3d_scene_t* scene, const char* file_path);
+
+  /**
+   * @brief Get the animation from the scene.
+   *
+   * @param scene Scene handle.
+   * @return Animation handle (not owned by caller).
+   */
+  F3D_EXPORT f3d_animation_t* f3d_scene_get_animation(f3d_scene_t* scene);
+
 
 #ifdef __cplusplus
 }
