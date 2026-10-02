@@ -11,7 +11,7 @@
 
 int TestSDKInteractorCommand([[maybe_unused]] int argc, char* argv[])
 {
-  std::string renderingBackend = std::string(argv[4]);
+  const std::string renderingBackend = std::string(argv[4]);
   f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::options& options = eng.getOptions();
   f3d::interactor& inter = eng.getInteractor();
@@ -81,8 +81,8 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, char* argv[])
 
   // Test camera commands are no-op in 2D mode
   options.interactor.style = "2d";
-  f3d::camera& cam = eng.getWindow().getCamera();
-  f3d::point3_t posBefore = cam.getPosition();
+  const f3d::camera& cam = eng.getWindow().getCamera();
+  const f3d::point3_t posBefore = cam.getPosition();
   inter.triggerCommand("set_camera front");
   inter.triggerCommand("roll_camera 90");
   inter.triggerCommand("elevation_camera 90");

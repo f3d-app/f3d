@@ -161,7 +161,7 @@ void PrintReadersList()
   constexpr std::string_view streamStr = "Supports Stream";
   size_t streamColSize = streamStr.size();
 
-  std::vector<f3d::engine::readerInformation> readersInfo = f3d::engine::getReadersInfo();
+  const std::vector<f3d::engine::readerInformation> readersInfo = f3d::engine::getReadersInfo();
   if (readersInfo.empty())
   {
     f3d::log::warn("No registered reader found!");
@@ -190,7 +190,7 @@ void PrintReadersList()
   plugColSize += colGap;
   streamColSize += colGap;
 
-  std::string separator = std::string(
+  const std::string separator = std::string(
     nameColSize + extsColSize + descColSize + mimeColSize + plugColSize + streamColSize - colGap,
     '-');
 
@@ -232,7 +232,7 @@ std::pair<std::string, int> F3DOptionsTools::GetClosestOption(
   auto checkDistance =
     [](const std::string& key, const std::string& name, std::pair<std::string, int>& ref)
   {
-    int distance = f3d::utils::textDistance(key, name);
+    const int distance = f3d::utils::textDistance(key, name);
     if (distance < ref.second)
     {
       ref = { key, distance };
@@ -243,7 +243,7 @@ std::pair<std::string, int> F3DOptionsTools::GetClosestOption(
   checkDistance("input", option, ret);
 
   // Check true boolean options
-  for (std::string_view key : ::CLIBooleans)
+  for (const std::string_view key : ::CLIBooleans)
   {
     checkDistance(std::string(key), option, ret);
   }
@@ -280,7 +280,8 @@ std::pair<std::string, int> F3DOptionsTools::GetClosestOption(
 F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
   int argc, char** argv, std::vector<std::string>& positionals)
 {
-  std::string execName = argc > 0 && argv[0][0] ? fs::path(argv[0]).filename().string() : "f3d";
+  const std::string execName =
+    argc > 0 && argv[0][0] ? fs::path(argv[0]).filename().string() : "f3d";
 
   // cxxopts values need to live somewhere until parsing is done
   std::vector<std::shared_ptr<cxxopts::Value>> cxxoptsValues;
@@ -323,7 +324,7 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
           // Add the default value to the help text if any
           std::string defaultValue;
           std::string helpText(cliOption.HelpText);
-          std::string longName(cliOption.LongName);
+          const std::string longName(cliOption.LongName);
 
           // Recover default value from app options
           auto appIter = F3DOptionsTools::DefaultAppOptions.find(longName);
@@ -337,8 +338,8 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
             auto libIter = F3DOptionsTools::LibOptionsNames.find(cliOption.LongName);
             if (libIter != F3DOptionsTools::LibOptionsNames.end())
             {
-              f3d::options opt;
-              std::string name = std::string(libIter->second);
+              const f3d::options opt;
+              const std::string name = std::string(libIter->second);
               // let default value empty for unset options
               defaultValue = opt.hasValue(name) ? opt.getAsString(name) : "";
             }
@@ -467,7 +468,7 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
     // Handle defines and add them as proper options
     for (const std::string& define : defines)
     {
-      std::string::size_type sepIdx = define.find_first_of('=');
+      const std::string::size_type sepIdx = define.find_first_of('=');
       if (sepIdx == std::string::npos)
       {
         f3d::log::warn("Could not parse a define '", define, "'");

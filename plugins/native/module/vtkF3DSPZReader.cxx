@@ -112,7 +112,7 @@ struct PackedRotationV2
     float xyz[3] = { static_cast<float>(packed[0]) / 127.5f - 1.f,
       static_cast<float>(packed[1]) / 127.5f - 1.f, static_cast<float>(packed[2]) / 127.5f - 1.f };
 
-    float w = std::sqrt(std::max(0.0f, 1.0f - vtkMath::Dot(xyz, xyz)));
+    const float w = std::sqrt(std::max(0.0f, 1.0f - vtkMath::Dot(xyz, xyz)));
 
     return { w, xyz[0], xyz[1], xyz[2] };
   }
@@ -137,8 +137,8 @@ struct PackedRotationV3
     {
       if (i != largestCompIndex)
       {
-        float mag = comp & compMask;
-        uint32_t isNegative = (comp >> 9u) & 0x1u;
+        const float mag = comp & compMask;
+        const uint32_t isNegative = (comp >> 9u) & 0x1u;
         comp = comp >> 10u;
         rotation[i] = sqrt12 * (mag / static_cast<float>(compMask));
         if (isNegative == 1)
@@ -181,7 +181,7 @@ struct SphericalHarmonics
 template<int Degree>
 void AddSphericalHarmonics(int nbSplats, unsigned char* buffer, vtkPointData* pointData)
 {
-  SphericalHarmonics<Degree>* begin =
+  const SphericalHarmonics<Degree>* begin =
     reinterpret_cast<SphericalHarmonics<Degree>*>(buffer + 16 + (9 + 4 + 3 + 3) * nbSplats);
 
   auto getSuffix = [](int m) -> std::string
@@ -207,7 +207,7 @@ void AddSphericalHarmonics(int nbSplats, unsigned char* buffer, vtkPointData* po
     pointData->AddArray(sh1Array[i]);
   }
 
-  SphericalHarmonics<Degree>* sh = begin;
+  const SphericalHarmonics<Degree>* sh = begin;
 
   for (int splatIndex = 0; splatIndex < nbSplats; splatIndex++, sh++)
   {
@@ -298,7 +298,7 @@ int vtkF3DSPZReader::RequestData(
   }
 
   stream->Seek(0, vtkResourceStream::SeekDirection::End);
-  size_t compressedLength = stream->Tell();
+  const size_t compressedLength = stream->Tell();
 
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
 
@@ -307,7 +307,7 @@ int vtkF3DSPZReader::RequestData(
   stream->Read(compressed.data(), compressedLength);
 
   // get the buffer size in order to pre-allocate
-  uint32_t uncompressedLength = static_cast<uint32_t>(compressed[compressedLength - 4]) |
+  const uint32_t uncompressedLength = static_cast<uint32_t>(compressed[compressedLength - 4]) |
     (static_cast<uint32_t>(compressed[compressedLength - 3]) << 8) |
     (static_cast<uint32_t>(compressed[compressedLength - 2]) << 16) |
     (static_cast<uint32_t>(compressed[compressedLength - 1]) << 24);
@@ -335,7 +335,7 @@ int vtkF3DSPZReader::RequestData(
     return 0;
   }
 
-  uint32_t nbSplats = header->numPoints;
+  const uint32_t nbSplats = header->numPoints;
 
   vtkNew<vtkFloatArray> positionArray;
   positionArray->SetNumberOfComponents(3);
@@ -343,9 +343,9 @@ int vtkF3DSPZReader::RequestData(
   positionArray->SetName("position");
 
   // position is stored just after the 16-bytes header
-  PackedCoordinate* position = reinterpret_cast<PackedCoordinate*>(uncompressed.data() + 16);
+  const PackedCoordinate* position = reinterpret_cast<PackedCoordinate*>(uncompressed.data() + 16);
 
-  float positionScale = 1.0 / (1 << header->fractionalBits);
+  const float positionScale = 1.0 / (1 << header->fractionalBits);
 
   for (vtkIdType splatIndex = 0; splatIndex < static_cast<vtkIdType>(nbSplats); splatIndex++)
   {
@@ -363,10 +363,10 @@ int vtkF3DSPZReader::RequestData(
   colorArray->SetName("color");
 
   // alpha is stored just after the 16-bytes header and the positions
-  unsigned char* alpha = uncompressed.data() + 16 + 9 * nbSplats;
+  const unsigned char* alpha = uncompressed.data() + 16 + 9 * nbSplats;
 
   // color is stored just after the 16-bytes header and alphas
-  ColorChannel* color =
+  const ColorChannel* color =
     reinterpret_cast<ColorChannel*>(uncompressed.data() + 16 + (9 + 1) * nbSplats);
 
   for (vtkIdType splatIndex = 0; splatIndex < static_cast<vtkIdType>(nbSplats); splatIndex++)
@@ -387,7 +387,8 @@ int vtkF3DSPZReader::RequestData(
   scaleArray->SetName("scale");
 
   // scale is stored just after the 16-bytes header, positions, colors and alphas
-  LogScale* scale = reinterpret_cast<LogScale*>(uncompressed.data() + 16 + (9 + 4) * nbSplats);
+  const LogScale* scale =
+    reinterpret_cast<LogScale*>(uncompressed.data() + 16 + (9 + 4) * nbSplats);
 
   for (vtkIdType splatIndex = 0; splatIndex < static_cast<vtkIdType>(nbSplats); splatIndex++)
   {
@@ -405,11 +406,11 @@ int vtkF3DSPZReader::RequestData(
   rotationArray->SetName("rotation");
 
   // rotation is stored just after the 16-bytes header, positions, colors, alphas and scales
-  int rotationShift = 16 + (9 + 4 + 3) * nbSplats;
+  const int rotationShift = 16 + (9 + 4 + 3) * nbSplats;
 
   if (header->version == 2)
   {
-    PackedRotationV2* rotation =
+    const PackedRotationV2* rotation =
       reinterpret_cast<PackedRotationV2*>(uncompressed.data() + rotationShift);
     for (vtkIdType splatIndex = 0; splatIndex < static_cast<vtkIdType>(nbSplats); splatIndex++)
     {
@@ -418,7 +419,7 @@ int vtkF3DSPZReader::RequestData(
   }
   else if (header->version == 3)
   {
-    PackedRotationV3* rotation =
+    const PackedRotationV3* rotation =
       reinterpret_cast<PackedRotationV3*>(uncompressed.data() + rotationShift);
     for (vtkIdType splatIndex = 0; splatIndex < static_cast<vtkIdType>(nbSplats); splatIndex++)
     {

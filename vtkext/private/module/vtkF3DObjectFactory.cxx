@@ -22,7 +22,7 @@ namespace
 template<typename T>
 vtkObject* Factory()
 {
-  vtkObject* obj = T::New();
+  vtkObject* obj = T::New(); // NOLINT(misc-const-correctness)
   return obj;
 }
 }

@@ -48,7 +48,7 @@ init::init()
   vtkCellArray::SetDefaultStorageIs64Bit(false);
 
   // instantiate our own polydata mapper and output windows
-  vtkNew<vtkF3DObjectFactory> factory;
+  const vtkNew<vtkF3DObjectFactory> factory;
   vtkObjectFactory::RegisterFactory(factory);
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPointGaussianMapper", "vtkOpenGLPointGaussianMapper");
@@ -60,12 +60,12 @@ init::init()
 #endif
 
 #if F3D_MODULE_EXR
-  vtkNew<vtkF3DEXRReader> exrReader;
+  const vtkNew<vtkF3DEXRReader> exrReader;
   vtkImageReader2Factory::RegisterReader(exrReader);
 #endif
 
 #if F3D_MODULE_WEBP
-  vtkNew<vtkF3DWebPReader> webpReader;
+  const vtkNew<vtkF3DWebPReader> webpReader;
   vtkImageReader2Factory::RegisterReader(webpReader);
 #endif
 }

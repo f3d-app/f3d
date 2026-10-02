@@ -107,7 +107,8 @@ public:
 #endif
 
     // OSMesa
-    vtkSmartPointer<vtkRenderWindow> osmesaRenWin = vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
+    const vtkSmartPointer<vtkRenderWindow> osmesaRenWin =
+      vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
     osmesaRenWin->Initialize();
     return osmesaRenWin->GetInitialized() ? osmesaRenWin : nullptr;
 #else
@@ -557,7 +558,7 @@ void window_impl::UpdateDynamicOptions()
     renderer->SetInteractionStyle(opt.interactor.style);
 
 #if F3D_MODULE_UI
-    std::string bindsStr = opt.ui.drop_zone.custom_binds;
+    const std::string bindsStr = opt.ui.drop_zone.custom_binds;
     std::vector<std::pair<std::string, std::string>> dropZoneBinds;
 
     for (const std::string& token : utils::tokenize(bindsStr))
@@ -734,7 +735,7 @@ void window_impl::UpdateDynamicOptions()
       for (const interaction_bind_t& bind : this->Internals->Interactor->getBindsForGroup(group))
       {
         auto [doc, val] = this->Internals->Interactor->getBindingDocumentation(bind);
-        f3d::interactor::BindingType type = this->Internals->Interactor->getBindingType(bind);
+        const f3d::interactor::BindingType type = this->Internals->Interactor->getBindingType(bind);
         if (!doc.empty())
         {
           groupList.emplace_back(
@@ -756,7 +757,7 @@ void window_impl::PrintSceneDescription(log::VerboseLevel level)
 //----------------------------------------------------------------------------
 void window_impl::PrintColoringDescription(log::VerboseLevel level)
 {
-  std::string descr = this->Internals->Renderer->GetColoringDescription();
+  const std::string descr = this->Internals->Renderer->GetColoringDescription();
   if (!descr.empty())
   {
     log::print(level, descr);
@@ -805,7 +806,7 @@ image window_impl::renderToImage(bool noBackground)
   exporter->ImageLowerLeftOn();
 
   const int* dims = exporter->GetDataDimensions();
-  int cmp = exporter->GetDataNumberOfScalarComponents();
+  const int cmp = exporter->GetDataNumberOfScalarComponents();
 
   image output(dims[0], dims[1], cmp);
   exporter->Export(output.getContent());
@@ -817,7 +818,7 @@ image window_impl::renderToImage(bool noBackground)
 std::shared_ptr<video_frame> window_impl::getVideoFrame()
 {
 #ifdef F3D_MODULE_FFMPEG
-  std::shared_ptr<video_frame_ffmpeg> frame =
+  const std::shared_ptr<video_frame_ffmpeg> frame =
     std::make_shared<video_frame_ffmpeg>(this->getWidth(), this->getHeight());
 
   if (!this->Internals->Renderer->CaptureVideoFrame(

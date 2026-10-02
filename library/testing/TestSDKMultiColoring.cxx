@@ -14,18 +14,18 @@ int TestSDKMultiColoring([[maybe_unused]] int argc, char* argv[])
   PseudoUnitTest test;
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  std::string renderingBackend = std::string(argv[4]);
+  const std::string renderingBackend = std::string(argv[4]);
   f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::scene& sce = eng.getScene();
   f3d::options& opt = eng.getOptions();
 
   // Test file logic
-  std::string cubeFilename = "mb/mb_0_0.vtu";
-  std::string rightFilename = "mb/mb_1_0.vtp";
-  std::string leftFilename = "mb/mb_2_0.vtp";
-  std::string cube = std::string(argv[1]) + "data/" + cubeFilename;
-  std::string left = std::string(argv[1]) + "data/" + leftFilename;
-  std::string right = std::string(argv[1]) + "data/" + rightFilename;
+  const std::string cubeFilename = "mb/mb_0_0.vtu";
+  const std::string rightFilename = "mb/mb_1_0.vtp";
+  const std::string leftFilename = "mb/mb_2_0.vtp";
+  const std::string cube = std::string(argv[1]) + "data/" + cubeFilename;
+  const std::string left = std::string(argv[1]) + "data/" + leftFilename;
+  const std::string right = std::string(argv[1]) + "data/" + rightFilename;
 
   // Multiple geometries
   sce.add(std::vector<std::string>{ cube, left, right });

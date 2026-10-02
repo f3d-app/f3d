@@ -138,16 +138,16 @@ void vtkF3DInteractorStyle::Rotate()
   vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(this->CurrentRenderer);
   vtkRenderWindowInteractor* rwi = this->Interactor;
 
-  int dx = rwi->GetEventPosition()[0] - rwi->GetLastEventPosition()[0];
-  int dy = rwi->GetEventPosition()[1] - rwi->GetLastEventPosition()[1];
+  const int dx = rwi->GetEventPosition()[0] - rwi->GetLastEventPosition()[0];
+  const int dy = rwi->GetEventPosition()[1] - rwi->GetLastEventPosition()[1];
 
   const int* size = ren->GetRenderWindow()->GetSize();
 
-  double delta_elevation = -20.0 / size[1];
-  double delta_azimuth = -20.0 / size[0];
+  const double delta_elevation = -20.0 / size[1];
+  const double delta_azimuth = -20.0 / size[0];
 
-  double rxf = dx * delta_azimuth * this->MotionFactor;
-  double ryf = dy * delta_elevation * this->MotionFactor;
+  const double rxf = dx * delta_azimuth * this->MotionFactor;
+  const double ryf = dy * delta_elevation * this->MotionFactor;
 
   vtkCamera* camera = ren->GetActiveCamera();
 
@@ -309,8 +309,8 @@ void vtkF3DInteractorStyle::EnvironmentRotate()
   if (ren)
   {
     // update skybox orientation
-    double* up = ren->GetEnvironmentUp();
-    double* right = ren->GetEnvironmentRight();
+    const double* up = ren->GetEnvironmentUp();
+    const double* right = ren->GetEnvironmentRight();
 
     double front[3];
     vtkMath::Cross(right, up, front);

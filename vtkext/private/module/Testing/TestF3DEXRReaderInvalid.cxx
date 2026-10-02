@@ -30,7 +30,7 @@ int TestF3DEXRReaderInvalid(int argc, char* argv[])
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260106)
   reader->CanReadFile(static_cast<vtkResourceStream*>(nullptr));
 
-  vtkNew<vtkMemoryResourceStream> emptyStream;
+  const vtkNew<vtkMemoryResourceStream> emptyStream;
   reader->CanReadFile(emptyStream);
 
   vtkNew<vtkMemoryResourceStream> invalidStream;

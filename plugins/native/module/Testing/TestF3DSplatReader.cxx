@@ -28,7 +28,7 @@ int TestF3DSplatReader(int vtkNotUsed(argc), char* argv[])
   reader->SetStream(stream);
   reader->Update();
 
-  vtkIdType nbPoints = reader->GetOutput()->GetNumberOfPoints();
+  const vtkIdType nbPoints = reader->GetOutput()->GetNumberOfPoints();
 
   if (nbPoints != 52293)
   {

@@ -15,29 +15,29 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   PseudoUnitTest test;
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  std::string renderingBackend = argv[4];
+  const std::string renderingBackend = argv[4];
   f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::scene& sce = eng.getScene();
   f3d::window& win = eng.getWindow().setSize(300, 300);
 
   // Test file logic
   std::string empty;
-  std::string dummyFilename = "dummy.foo";
-  std::string nonExistentFilename = "nonExistent.vtp";
-  std::string unsupportedFilename = "unsupportedFile.dummy";
-  std::string invalidBodyFilename = "invalid_body.vtp";
-  std::string logoFilename = "mb/recursive/f3d.glb";
-  std::string sphere1Filename = "mb/recursive/mb_1_0.vtp";
-  std::string sphere2Filename = "mb/recursive/mb_2_0.vtp";
-  std::string cubeFilename = "mb/recursive/mb_0_0.vtu";
-  std::string worldFilename = "world.obj";
+  const std::string dummyFilename = "dummy.foo";
+  const std::string nonExistentFilename = "nonExistent.vtp";
+  const std::string unsupportedFilename = "unsupportedFile.dummy";
+  const std::string invalidBodyFilename = "invalid_body.vtp";
+  const std::string logoFilename = "mb/recursive/f3d.glb";
+  const std::string sphere1Filename = "mb/recursive/mb_1_0.vtp";
+  const std::string sphere2Filename = "mb/recursive/mb_2_0.vtp";
+  const std::string cubeFilename = "mb/recursive/mb_0_0.vtu";
+  const std::string worldFilename = "world.obj";
   std::string validFilename = "cow.vtp";
-  std::string invalidDefaultSceneFilename = "invalid_body.vtp";
-  std::string invalidFullSceneFilename = "invalid_body.gltf";
+  const std::string invalidDefaultSceneFilename = "invalid_body.vtp";
+  const std::string invalidFullSceneFilename = "invalid_body.gltf";
   std::string dummy = std::string(argv[1]) + "data/" + dummyFilename;
   std::string nonExistent = std::string(argv[1]) + "data/" + nonExistentFilename;
   std::string unsupported = std::string(argv[1]) + "data/" + unsupportedFilename;
-  std::string invalidBody = std::string(argv[1]) + "data/" + invalidBodyFilename;
+  const std::string invalidBody = std::string(argv[1]) + "data/" + invalidBodyFilename;
   std::string logo = std::string(argv[1]) + "data/" + logoFilename;
   std::string sphere1 = std::string(argv[1]) + "data/" + sphere1Filename;
   std::string sphere2 = std::string(argv[1]) + "data/" + sphere2Filename;
@@ -80,8 +80,8 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     }
     catch (f3d::scene::load_failure_exception& E)
     {
-      std::string expectedMsg = "is not a valid force reader";
-      std::string exceptMsg = E.what();
+      const std::string expectedMsg = "is not a valid force reader";
+      const std::string exceptMsg = E.what();
       test("Check exception message size", exceptMsg.size() >= expectedMsg.size());
       test("Check exception message",
         exceptMsg.substr(exceptMsg.size() - expectedMsg.size(), expectedMsg.size()) == expectedMsg);
@@ -115,20 +115,20 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     return sce.getLightCount() == 0;
   });
   test("add default light", [&]() {
-    int index = sce.addLight(defaultLight);
+    const int index = sce.addLight(defaultLight);
     return index == 0 && sce.getLightCount() == 1;
   });
   test("add red light", [&]() {
-    int index = sce.addLight(redLight);
+    const int index = sce.addLight(redLight);
     return index == 1 && sce.getLightCount() == 2;
   });
   test("light count after add", [&]() { return sce.getLightCount() == 2; });
   test("get light at index 0", [&]() {
-    f3d::light_state_t light = sce.getLight(0);
+    const f3d::light_state_t light = sce.getLight(0);
     return light == defaultLight;
   });
   test("get light at index 1", [&]() {
-    f3d::light_state_t light = sce.getLight(1);
+    const f3d::light_state_t light = sce.getLight(1);
     return light == redLight;
   });
   test.expect<f3d::scene::light_exception>(

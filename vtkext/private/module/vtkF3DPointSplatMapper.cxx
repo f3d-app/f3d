@@ -159,7 +159,8 @@ void vtkF3DSplatMapperHelper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act
       return false;
     }
 
-    bool isValid = array->GetNumberOfComponents() == 3 && array->GetNumberOfTuples() == splatCount;
+    const bool isValid =
+      array->GetNumberOfComponents() == 3 && array->GetNumberOfTuples() == splatCount;
 
     if (!isValid)
     {
@@ -193,8 +194,8 @@ void vtkF3DSplatMapperHelper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act
       return;
     }
 
-    int width = this->MaxTextureSize;
-    int height = 1 + (splatCount / this->MaxTextureSize);
+    const int width = this->MaxTextureSize;
+    const int height = 1 + (splatCount / this->MaxTextureSize);
 
     const int sliceSize = 3 * width * height;
     std::vector<unsigned char> packedData(sliceSize * 15, 0);
@@ -351,13 +352,13 @@ void vtkF3DSplatMapperHelper::SortSplats(vtkRenderer* ren)
     return;
   }
 
-  int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
+  const int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
 
   vtkOpenGLShaderCache* shaderCache =
     vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow())->GetShaderCache();
 
   // compute next power of two
-  unsigned int numVertsExt = vtkMath::NearestPowerOfTwo(numVerts);
+  const unsigned int numVertsExt = vtkMath::NearestPowerOfTwo(numVerts);
 
   // depth computation
   shaderCache->ReadyShaderProgram(this->DepthProgram);
@@ -385,7 +386,7 @@ void vtkF3DSplatMapperHelper::SortSplatsCPU(vtkRenderer* ren)
     return;
   }
 
-  int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
+  const int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
 
   if (numVerts != static_cast<int>(this->CPUSortedIndices.size()))
   {
@@ -442,7 +443,7 @@ void vtkF3DSplatMapperHelper::RenderPieceDraw(vtkRenderer* ren, vtkActor* actor)
 
   if (this->OwnerUseInstancing())
   {
-    int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
+    const int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
     if (numVerts)
     {
       this->UpdateShaders(this->Primitives[PrimitivePoints], ren, actor);

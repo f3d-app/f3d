@@ -247,7 +247,7 @@ void vtkF3DMetaImporter::AddImporter(
     [](vtkObject* const caller, unsigned long, void* clientData, void* callData)
     {
       vtkF3DMetaImporter* self = static_cast<vtkF3DMetaImporter*>(clientData);
-      double progress = *static_cast<double*>(callData);
+      const double progress = *static_cast<double*>(callData);
       double actualProgress = 0.0;
       for (size_t i = 0; i < self->Pimpl->Importers.size(); i++)
       {
@@ -423,7 +423,7 @@ bool vtkF3DMetaImporter::Update()
       // add one node per actor
       for (int actorIndex = 0; actorIndex < actorCollection->GetNumberOfItems(); actorIndex++)
       {
-        std::string actorName = "object" + std::to_string(actorIndex);
+        const std::string actorName = "object" + std::to_string(actorIndex);
         const int nodeid = importerInfo.DataAssembly->AddNode(
           actorName.c_str(), importerInfo.DataAssembly->GetRootNode());
         importerInfo.DataAssembly->SetAttribute(nodeid, "flat_actor_id", actorIndex);
@@ -433,7 +433,7 @@ bool vtkF3DMetaImporter::Update()
     importerInfo.DataAssembly->SetAttribute(
       vtkDataAssembly::GetRootNode(), "label", importerInfo.Name.c_str());
 
-    vtkNew<::vtkF3DCollapseOnLoadVisitor> visitor;
+    const vtkNew<::vtkF3DCollapseOnLoadVisitor> visitor;
     importerInfo.DataAssembly->Visit(vtkDataAssembly::GetRootNode(), visitor);
     // Unset the attr on all nodes which have an ancestor that has it already.
     // This avoids having to expand the collapsed levels one by one.
@@ -636,7 +636,7 @@ vtkF3DImporter::AnimationSupportLevel vtkF3DMetaImporter::GetAnimationSupportLev
   vtkImporter::AnimationSupportLevel levelAccum = vtkImporter::AnimationSupportLevel::NONE;
   for (const auto& importerInfo : this->Pimpl->Importers)
   {
-    AnimationSupportLevel level = importerInfo.Importer->GetAnimationSupportLevel();
+    const AnimationSupportLevel level = importerInfo.Importer->GetAnimationSupportLevel();
     switch (level)
     {
       case vtkImporter::AnimationSupportLevel::NONE:
@@ -683,7 +683,7 @@ vtkIdType vtkF3DMetaImporter::GetNumberOfAnimations()
   return std::accumulate(this->Pimpl->Importers.begin(), this->Pimpl->Importers.end(), 0,
     [](vtkIdType a, const auto& importerInfo)
     {
-      vtkIdType nAnim = importerInfo.Importer->GetNumberOfAnimations();
+      const vtkIdType nAnim = importerInfo.Importer->GetNumberOfAnimations();
       a += nAnim >= 0 ? nAnim : 0;
       return a;
     });
@@ -806,7 +806,7 @@ std::string vtkF3DMetaImporter::GetCameraName(vtkIdType camIndex)
   vtkIdType localCameraIndex = camIndex;
   for (const auto& importerInfo : this->Pimpl->Importers)
   {
-    vtkIdType nCam = importerInfo.Importer->GetNumberOfCameras();
+    const vtkIdType nCam = importerInfo.Importer->GetNumberOfCameras();
     if (localCameraIndex < nCam)
     {
       std::string name = importerInfo.Importer->GetCameraName(localCameraIndex);
@@ -885,7 +885,7 @@ bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
     cs.Mapper->SetInputData(
       vtkPolyDataMapper::SafeDownCast(cs.OriginalActor->GetMapper())->GetInput());
 
-    bool visi = cs.Actor->GetVisibility();
+    const bool visi = cs.Actor->GetVisibility();
     cs.Actor->vtkProp3D::ShallowCopy(cs.OriginalActor);
     cs.Actor->SetVisibility(visi);
   }
@@ -895,7 +895,7 @@ bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
     {
       pss.Mapper->SetInputData(
         vtkPolyDataMapper::SafeDownCast(pss.OriginalActor->GetMapper())->GetInput());
-      bool visi = pss.Actor->GetVisibility();
+      const bool visi = pss.Actor->GetVisibility();
       pss.Actor->vtkProp3D::ShallowCopy(pss.OriginalActor);
       pss.Actor->SetVisibility(visi);
     }

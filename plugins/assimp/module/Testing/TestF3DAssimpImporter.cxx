@@ -7,7 +7,7 @@
 
 int TestF3DAssimpImporter(int vtkNotUsed(argc), char* argv[])
 {
-  std::string filename = std::string(argv[1]) + "data/animatedWorld.fbx";
+  const std::string filename = std::string(argv[1]) + "data/animatedWorld.fbx";
   vtkNew<vtkF3DAssimpImporter> importer;
   importer->SetFileName(filename.c_str());
   importer->Update();

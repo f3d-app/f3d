@@ -105,7 +105,7 @@ f3d_engine_t* f3d_engine_create_external(f3d_context_function_t get_proc_address
     return nullptr;
   }
 
-  f3d::context::function func = [get_proc_address](const char* name) -> f3d::context::fptr
+  const f3d::context::function func = [get_proc_address](const char* name) -> f3d::context::fptr
   { return get_proc_address(name); };
 
   try
@@ -203,7 +203,7 @@ void f3d_engine_destroy(f3d_engine_t* engine)
     return;
   }
 
-  f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
+  const f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
   delete cpp_engine;
 }
 
@@ -407,7 +407,7 @@ void f3d_engine_set_options(f3d_engine_t* engine, f3d_options_t* options)
   }
 
   f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
-  f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
+  const f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
   cpp_engine->setOptions(*cpp_options);
 }
 
@@ -576,7 +576,7 @@ int f3d_engine_set_reader_option(const char* name, const char* value)
 //----------------------------------------------------------------------------
 f3d_backend_info_t* f3d_engine_get_rendering_backend_list(int* count)
 {
-  std::map<std::string, bool> backends = f3d::engine::getRenderingBackendList();
+  const std::map<std::string, bool> backends = f3d::engine::getRenderingBackendList();
 
   f3d_backend_info_t* result = new f3d_backend_info_t[backends.size() + 1];
 

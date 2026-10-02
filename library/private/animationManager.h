@@ -182,8 +182,8 @@ public:
    */
   void UpdateDynamicOptions();
 
-  animationManager(animationManager const&) = delete;
-  void operator=(animationManager const&) = delete;
+  animationManager(const animationManager&) = delete;
+  void operator=(const animationManager&) = delete;
 
 private:
   /**

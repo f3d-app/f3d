@@ -11,7 +11,7 @@
 
 int TestF3DUSDImporterStream(int vtkNotUsed(argc), char* argv[])
 {
-  std::string filename = std::string(argv[1]) + "data/primitives.usda";
+  const std::string filename = std::string(argv[1]) + "data/primitives.usda";
   vtkNew<vtkFileResourceStream> stream;
   if (!stream->Open(filename.c_str()))
   {

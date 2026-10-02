@@ -4,6 +4,8 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl/filesystem.h>
 
+#include <utility>
+
 #include "camera.h"
 #include "engine.h"
 #include "image.h"
@@ -74,7 +76,7 @@ public:
   PYBIND11_TYPE_CASTER(f3d::vector3_t, const_name("f3d.vector3_t"));
 };
 
-std::pair<size_t, f3d::mesh_view::data_array_t> fromBuffer(py::buffer buf)
+std::pair<size_t, f3d::mesh_view::data_array_t> fromBuffer(const py::buffer& buf)
 {
   py::buffer_info info = buf.request();
 
@@ -166,7 +168,7 @@ PYBIND11_MODULE(pyf3d, module)
   auto setImageBytes = [](f3d::image& img, const py::bytes& data)
   {
     const py::buffer_info info(py::buffer(data).request());
-    size_t expectedSize =
+    const size_t expectedSize =
       img.getChannelCount() * img.getWidth() * img.getHeight() * img.getChannelTypeSize();
     if (info.itemsize != 1 || info.size != expectedSize)
     {
@@ -177,7 +179,7 @@ PYBIND11_MODULE(pyf3d, module)
 
   auto getImageBytes = [](const f3d::image& img)
   {
-    size_t expectedSize =
+    const size_t expectedSize =
       img.getChannelCount() * img.getWidth() * img.getHeight() * img.getChannelTypeSize();
     return py::bytes(static_cast<char*>(img.getContent()), expectedSize);
   };
@@ -216,11 +218,11 @@ PYBIND11_MODULE(pyf3d, module)
     .def("to_terminal_text", [](const f3d::image& img) { return img.toTerminalText(); })
     .def("set_metadata", &f3d::image::setMetadata)
     .def("get_metadata",
-      [](const f3d::image& img, std::string key)
+      [](const f3d::image& img, const std::string& key)
       {
         try
         {
-          return img.getMetadata(std::move(key));
+          return img.getMetadata(key);
         }
         catch (const f3d::image::metadata_exception&)
         {
@@ -244,7 +246,7 @@ PYBIND11_MODULE(pyf3d, module)
         const auto* data = packet.getPacketData();
         if (!data || packet.getPacketSize() == 0)
         {
-          return py::bytes();
+          return {};
         }
         return py::bytes(reinterpret_cast<const char*>(data), packet.getPacketSize());
       })
@@ -417,7 +419,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def("get_index_domain",
       [](const f3d::options& opts, std::string_view name)
       {
-        f3d::options::DomainIndex domain = opts.getIndexDomain(name);
+        const f3d::options::DomainIndex domain = opts.getIndexDomain(name);
         return domain.max;
       })
     .def("increase", &f3d::options::increase)
@@ -520,7 +522,7 @@ PYBIND11_MODULE(pyf3d, module)
       "Set the user callback of the event loop", py::arg("user_callback") = nullptr)
     .def(
       "set_notification_callback",
-      [](f3d::interactor& interactor, py::object callback)
+      [](f3d::interactor& interactor, const py::object& callback)
       {
         if (callback.is_none())
         {
@@ -612,10 +614,10 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property("points", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [count, dataArray] = fromBuffer(b);
+        auto [count, dataArray] = fromBuffer(std::move(b));
 
         self.pointCount = count;
-        bool timeDependent = self.points.timeDependent;
+        const bool timeDependent = self.points.timeDependent;
         self.points = std::move(dataArray);
         self.points.timeDependent = timeDependent;
       })
@@ -625,14 +627,14 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property("normals", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [count, dataArray] = fromBuffer(b);
+        auto [count, dataArray] = fromBuffer(std::move(b));
 
         if (count != self.pointCount)
         {
           throw std::runtime_error("Incompatible buffer shape: point count does not match!");
         }
 
-        bool timeDependent = self.normals.timeDependent;
+        const bool timeDependent = self.normals.timeDependent;
         self.normals = std::move(dataArray);
         self.normals.timeDependent = timeDependent;
       })
@@ -642,14 +644,14 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property("texture_coordinates", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [count, dataArray] = fromBuffer(b);
+        auto [count, dataArray] = fromBuffer(std::move(b));
 
         if (count != self.pointCount)
         {
           throw std::runtime_error("Incompatible buffer shape: point count does not match!");
         }
 
-        bool timeDependent = self.textureCoordinates.timeDependent;
+        const bool timeDependent = self.textureCoordinates.timeDependent;
         self.textureCoordinates = std::move(dataArray);
         self.textureCoordinates.timeDependent = timeDependent;
       })
@@ -659,18 +661,18 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property("vertices_offsets", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [count, array] = fromBuffer(b);
+        auto [count, array] = fromBuffer(std::move(b));
         self.vertices.offsetCount = count;
-        bool timeDependent = self.vertices.offsets.timeDependent;
+        const bool timeDependent = self.vertices.offsets.timeDependent;
         self.vertices.offsets = std::move(array);
         self.vertices.offsets.timeDependent = timeDependent;
       })
     .def_property("vertices_indices", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [count, array] = fromBuffer(b);
+        auto [count, array] = fromBuffer(std::move(b));
         self.vertices.indexCount = count;
-        bool timeDependent = self.vertices.indices.timeDependent;
+        const bool timeDependent = self.vertices.indices.timeDependent;
         self.vertices.indices = std::move(array);
         self.vertices.indices.timeDependent = timeDependent;
       })
@@ -683,18 +685,18 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property("lines_offsets", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [count, array] = fromBuffer(b);
+        auto [count, array] = fromBuffer(std::move(b));
         self.lines.offsetCount = count;
-        bool timeDependent = self.lines.offsets.timeDependent;
+        const bool timeDependent = self.lines.offsets.timeDependent;
         self.lines.offsets = std::move(array);
         self.lines.offsets.timeDependent = timeDependent;
       })
     .def_property("lines_indices", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [count, array] = fromBuffer(b);
+        auto [count, array] = fromBuffer(std::move(b));
         self.lines.indexCount = count;
-        bool timeDependent = self.lines.indices.timeDependent;
+        const bool timeDependent = self.lines.indices.timeDependent;
         self.lines.indices = std::move(array);
         self.lines.indices.timeDependent = timeDependent;
       })
@@ -707,18 +709,18 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property("polygons_offsets", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [count, array] = fromBuffer(b);
+        auto [count, array] = fromBuffer(std::move(b));
         self.polygons.offsetCount = count;
-        bool timeDependent = self.polygons.offsets.timeDependent;
+        const bool timeDependent = self.polygons.offsets.timeDependent;
         self.polygons.offsets = std::move(array);
         self.polygons.offsets.timeDependent = timeDependent;
       })
     .def_property("polygons_indices", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [count, array] = fromBuffer(b);
+        auto [count, array] = fromBuffer(std::move(b));
         self.polygons.indexCount = count;
-        bool timeDependent = self.polygons.indices.timeDependent;
+        const bool timeDependent = self.polygons.indices.timeDependent;
         self.polygons.indices = std::move(array);
         self.polygons.indices.timeDependent = timeDependent;
       })
@@ -729,7 +731,7 @@ PYBIND11_MODULE(pyf3d, module)
         self.polygons.offsets.timeDependent = timeDependent;
       })
     .def_property("point_scalars", nullptr,
-      [](f3d::mesh_view::memory_view_t& self, py::dict d)
+      [](f3d::mesh_view::memory_view_t& self, const py::dict& d)
       {
         self.pointScalars.clear();
 
@@ -753,7 +755,7 @@ PYBIND11_MODULE(pyf3d, module)
         it->timeDependent = timeDependent;
       })
     .def_property("cell_scalars", nullptr,
-      [](f3d::mesh_view::memory_view_t& self, py::dict d)
+      [](f3d::mesh_view::memory_view_t& self, const py::dict& d)
       {
         self.cellScalars.clear();
 
@@ -784,8 +786,8 @@ PYBIND11_MODULE(pyf3d, module)
   public:
     std::array<double, 2> getTimeRange() const override
     {
-      py::gil_scoped_acquire gil;
-      py::function fn = py::get_override(this, "get_time_range");
+      const py::gil_scoped_acquire gil;
+      const py::function fn = py::get_override(this, "get_time_range");
       if (fn)
       {
         return fn().cast<std::array<double, 2>>();
@@ -795,8 +797,8 @@ PYBIND11_MODULE(pyf3d, module)
 
     std::string getName() const override
     {
-      py::gil_scoped_acquire gil;
-      py::function fn = py::get_override(this, "get_name");
+      const py::gil_scoped_acquire gil;
+      const py::function fn = py::get_override(this, "get_name");
       if (fn)
       {
         return fn().cast<std::string>();
@@ -806,8 +808,8 @@ PYBIND11_MODULE(pyf3d, module)
 
     memory_view_t getMemoryView(double time) const override
     {
-      py::gil_scoped_acquire gil;
-      py::function fn = py::get_override(this, "get_memory_view");
+      const py::gil_scoped_acquire gil;
+      const py::function fn = py::get_override(this, "get_memory_view");
       if (fn)
       {
         return fn(time).cast<memory_view_t>();
@@ -918,9 +920,9 @@ PYBIND11_MODULE(pyf3d, module)
       "Add a surfacic mesh view from memory into the scene", py::arg("mesh"))
     .def(
       "add",
-      [](f3d::scene& scene, py::bytes buffer)
+      [](f3d::scene& scene, const py::bytes& buffer)
       {
-        std::string_view sv(buffer);
+        const std::string_view sv(buffer);
         scene.add(reinterpret_cast<const std::byte*>(sv.data()), sv.size());
       },
       "Add a memory buffer containing a file the scene", py::arg("buffer"), py::prepend())
@@ -1084,11 +1086,11 @@ PYBIND11_MODULE(pyf3d, module)
       "Create an engine with an OSMesa window (Windows/Linux only)")
     .def_static(
       "create_external",
-      [](py::object py_get_proc)
+      [](const py::object& py_get_proc)
       {
-        f3d::context::function func = [py_get_proc](const char* name) -> f3d::context::fptr
+        const f3d::context::function func = [py_get_proc](const char* name) -> f3d::context::fptr
         {
-          uintptr_t addr = py::int_(py_get_proc(py::bytes(name)));
+          const uintptr_t addr = py::int_(py_get_proc(py::bytes(name)));
           return reinterpret_cast<f3d::context::fptr>(addr);
         };
         return f3d::engine::createExternal(func);
@@ -1149,7 +1151,7 @@ PYBIND11_MODULE(pyf3d, module)
     .value("QUIET", f3d::log::VerboseLevel::QUIET)
     .export_values();
 
-  auto forwardWrapper = [](f3d::log::forward_fn_t callback) { f3d::log::forward(callback); };
+  auto forwardWrapper = [](const f3d::log::forward_fn_t& callback) { f3d::log::forward(callback); };
 
   module.add_object("forwardcleanup",
     py::capsule(&forwardWrapper, nullptr, [](PyObject*) { f3d::log::forward(nullptr); }));

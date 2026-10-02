@@ -507,7 +507,7 @@ void engine::loadPlugin(const std::string& pathOrName, const std::vector<fs::pat
     vtksys::DynamicLoader::LibraryHandle handle = nullptr;
     try
     {
-      fs::path fullPath = utils::collapsePath(pathOrName);
+      const fs::path fullPath = utils::collapsePath(pathOrName);
       if (fs::exists(fullPath))
       {
         // plugin provided as full path
@@ -691,11 +691,11 @@ engine::libInformation engine::getLibInfo()
   libInfo.Modules["FFmpeg"] = false;
 #endif
 
-  std::string vtkVersion = std::string(vtkVersion::GetVTKVersionFull());
+  const std::string vtkVersion = std::string(vtkVersion::GetVTKVersionFull());
   if (!vtkVersion.empty())
   {
     libInfo.VTKVersion = vtkVersion;
-    std::string date = std::to_string(vtkVersion::GetVTKBuildVersion());
+    const std::string date = std::to_string(vtkVersion::GetVTKBuildVersion());
     if (date.size() == 8)
     {
       libInfo.VTKVersion += std::string(" (date: ") + date + ")";

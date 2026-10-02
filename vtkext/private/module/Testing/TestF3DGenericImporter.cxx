@@ -45,7 +45,7 @@ int TestF3DGenericImporter(int argc, char* argv[])
 
     int nbTimeSteps;
     double timeRange[2];
-    vtkNew<vtkDoubleArray> timeSteps;
+    const vtkNew<vtkDoubleArray> timeSteps;
     if (importer->GetTemporalInformation(0, timeRange, nbTimeSteps, timeSteps))
     {
       std::cerr << "Unexpected return value with GetTemporalInformation\n";
@@ -56,7 +56,7 @@ int TestF3DGenericImporter(int argc, char* argv[])
   // Test animation with GLTF reader
   {
     vtkNew<vtkGLTFReader> reader;
-    std::string filename = std::string(argv[1]) + "data/BoxAnimated.gltf";
+    const std::string filename = std::string(argv[1]) + "data/BoxAnimated.gltf";
     reader->SetFileName(filename.c_str());
     reader->UpdateInformation();
     reader->EnableAnimation(0);
@@ -90,7 +90,7 @@ int TestF3DGenericImporter(int argc, char* argv[])
   // Test UpdateAtTimeValue with invalid animation
   {
     vtkNew<vtkGLTFReader> reader;
-    std::string filename = std::string(argv[1]) + "data/BoxAnimated_invalid_animation.gltf";
+    const std::string filename = std::string(argv[1]) + "data/BoxAnimated_invalid_animation.gltf";
     reader->SetFileName(filename.c_str());
     reader->UpdateInformation();
     reader->EnableAnimation(0);
@@ -108,7 +108,7 @@ int TestF3DGenericImporter(int argc, char* argv[])
   // Test UpdateAtTimeValue failure path
   {
     vtkNew<vtkGLTFReader> reader;
-    std::string filename = std::string(argv[1]) + "data/BoxAnimated.gltf";
+    const std::string filename = std::string(argv[1]) + "data/BoxAnimated.gltf";
     reader->SetFileName(filename.c_str());
     reader->UpdateInformation();
     reader->EnableAnimation(0);
@@ -151,7 +151,7 @@ int TestF3DGenericImporter(int argc, char* argv[])
 
   // Test failure path with unsupported data type (vtkTable)
   {
-    vtkNew<vtkTable> table;
+    const vtkNew<vtkTable> table;
     vtkNew<vtkTrivialProducer> producer;
     producer->SetOutput(table);
 
@@ -169,7 +169,7 @@ int TestF3DGenericImporter(int argc, char* argv[])
   // Test MultiBlock from file (covers null blocks, nested structures)
   {
     vtkNew<vtkXMLMultiBlockDataReader> reader;
-    std::string filename = std::string(argv[1]) + "data/mb.vtm";
+    const std::string filename = std::string(argv[1]) + "data/mb.vtm";
     reader->SetFileName(filename.c_str());
 
     vtkNew<vtkF3DGenericImporter> importer;
@@ -294,8 +294,8 @@ int TestF3DGenericImporter(int argc, char* argv[])
       return EXIT_FAILURE;
     }
 
-    std::string name0 = importer->GetBlockName(0);
-    std::string name1 = importer->GetBlockName(1);
+    const std::string name0 = importer->GetBlockName(0);
+    const std::string name1 = importer->GetBlockName(1);
     if (name0.find("NestedMP") == std::string::npos ||
       name0.find("SpherePiece") == std::string::npos ||
       name1.find("NestedMP") == std::string::npos || name1.find("ConePiece") == std::string::npos)
@@ -321,8 +321,8 @@ int TestF3DGenericImporter(int argc, char* argv[])
     importer->SetInternalReader(producer);
     importer->Update();
 
-    std::string name0 = importer->GetBlockName(0);
-    std::string name1 = importer->GetBlockName(1);
+    const std::string name0 = importer->GetBlockName(0);
+    const std::string name1 = importer->GetBlockName(1);
     if (name0.find("SpherePartition") == std::string::npos ||
       name1.find("ConePartition") == std::string::npos)
     {
@@ -346,8 +346,8 @@ int TestF3DGenericImporter(int argc, char* argv[])
     importer->SetInternalReader(producer);
     importer->Update();
 
-    std::string name0 = importer->GetBlockName(0);
-    std::string name1 = importer->GetBlockName(1);
+    const std::string name0 = importer->GetBlockName(0);
+    const std::string name1 = importer->GetBlockName(1);
     if (name0.find("Partition_0") == std::string::npos ||
       name1.find("Partition_1") == std::string::npos)
     {
@@ -396,8 +396,8 @@ int TestF3DGenericImporter(int argc, char* argv[])
 
     vtkNew<vtkDataAssembly> assembly;
     assembly->Initialize();
-    int sphereNode = assembly->AddNode("SphereFromAssembly", assembly->GetRootNode());
-    int coneNode = assembly->AddNode("ConeFromAssembly", assembly->GetRootNode());
+    const int sphereNode = assembly->AddNode("SphereFromAssembly", assembly->GetRootNode());
+    const int coneNode = assembly->AddNode("ConeFromAssembly", assembly->GetRootNode());
     assembly->AddDataSetIndex(sphereNode, 0);
     assembly->AddDataSetIndex(coneNode, 1);
     pdc->SetDataAssembly(assembly);
@@ -441,11 +441,11 @@ int TestF3DGenericImporter(int argc, char* argv[])
     // root > Group > Sphere, root > Cone, dataset 2 is not referenced by the assembly
     vtkNew<vtkDataAssembly> assembly;
     assembly->Initialize();
-    int groupNode = assembly->AddNode("Group", assembly->GetRootNode());
+    const int groupNode = assembly->AddNode("Group", assembly->GetRootNode());
     assembly->SetAttribute(groupNode, "label", "Group Label");
-    int sphereNode = assembly->AddNode("Sphere", groupNode);
+    const int sphereNode = assembly->AddNode("Sphere", groupNode);
     assembly->SetAttribute(sphereNode, "label", "Sphere Label");
-    int coneNode = assembly->AddNode("Cone", assembly->GetRootNode());
+    const int coneNode = assembly->AddNode("Cone", assembly->GetRootNode());
     assembly->AddDataSetIndex(sphereNode, 0);
     assembly->AddDataSetIndex(coneNode, 1);
     pdc->SetDataAssembly(assembly);
@@ -464,7 +464,7 @@ int TestF3DGenericImporter(int argc, char* argv[])
       return EXIT_FAILURE;
     }
 
-    vtkDataAssembly* hierarchy = importer->GetSceneHierarchy();
+    const vtkDataAssembly* hierarchy = importer->GetSceneHierarchy();
     const std::vector<int> rootChildren = hierarchy->GetChildNodes(hierarchy->GetRootNode(), false);
     if (rootChildren.size() != 3)
     {

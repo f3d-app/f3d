@@ -6,7 +6,7 @@
 
 int TestF3DDracoReader(int vtkNotUsed(argc), char* argv[])
 {
-  std::string filename = std::string(argv[1]) + "data/suzanne.drc";
+  const std::string filename = std::string(argv[1]) + "data/suzanne.drc";
   vtkNew<vtkF3DDracoReader> reader;
   reader->SetFileName(filename);
   reader->Update();

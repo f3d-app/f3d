@@ -99,7 +99,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   this->ReflectionProps.clear();
 
   // assign props to the correct pass
-  vtkProp** props = s->GetPropArray();
+  vtkProp* const* props = s->GetPropArray();
   for (int i = 0; i < s->GetPropArrayCount(); i++)
   {
     vtkProp* prop = props[i];
@@ -159,7 +159,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
               // can support
               for (int j = 0; j < 4; j++)
               {
-                std::string namePosition = "target" + std::to_string(j) + "_position";
+                const std::string namePosition = "target" + std::to_string(j) + "_position";
 
                 if (input->GetPointData()->GetArray(namePosition.c_str()) == nullptr)
                 {
@@ -175,7 +175,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
                   namePosition.c_str(), vtkDataObject::FIELD_ASSOCIATION_POINTS);
 #endif
 
-                std::string nameNormal = "target" + std::to_string(j) + "_normal";
+                const std::string nameNormal = "target" + std::to_string(j) + "_normal";
                 if (input->GetPointData()->GetArray(nameNormal.c_str()) != nullptr)
                 {
 #ifdef F3D_USE_GLES
@@ -214,7 +214,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   this->ReleaseGraphicsResources(glRenderer->GetRenderWindow());
 
   // background pass, setup framebuffer, clear and draw skybox
-  vtkNew<vtkOpaquePass> bgP;
+  const vtkNew<vtkOpaquePass> bgP;
   vtkNew<vtkCameraPass> bgCamP;
   bgCamP->SetDelegatePass(bgP);
   this->BackgroundPass = vtkSmartPointer<vtkFramebufferPass>::New();
@@ -244,10 +244,10 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   else
 #endif
   {
-    vtkNew<vtkLightsPass> lightsP;
-    vtkNew<vtkOpaquePass> opaqueP;
-    vtkNew<vtkTranslucentPass> translucentP;
-    vtkNew<vtkVolumetricPass> volumeP;
+    const vtkNew<vtkLightsPass> lightsP;
+    const vtkNew<vtkOpaquePass> opaqueP;
+    const vtkNew<vtkTranslucentPass> translucentP;
+    const vtkNew<vtkVolumetricPass> volumeP;
 
     vtkNew<vtkRenderPassCollection> collection;
     collection->AddItem(lightsP);
@@ -255,7 +255,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     // opaque passes
     if (this->UseSSAOPass)
     {
-      vtkBoundingBox bbox(this->Bounds);
+      const vtkBoundingBox bbox(this->Bounds);
       if (bbox.IsValid())
       {
         vtkNew<vtkCameraPass> ssaoCamP;
@@ -365,8 +365,8 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   }
 
   {
-    vtkNew<vtkLightsPass> lightsP;
-    vtkNew<vtkOpaquePass> opaqueP;
+    const vtkNew<vtkLightsPass> lightsP;
+    const vtkNew<vtkOpaquePass> opaqueP;
 
     vtkNew<vtkRenderPassCollection> collection;
     collection->AddItem(lightsP);
@@ -401,24 +401,26 @@ void vtkF3DRenderPass::ReplaceMatCapShader(
   {
     auto textures = actor->GetProperty()->GetAllTextures();
     auto fn = [](const std::pair<std::string, vtkTexture*>& tex) { return tex.first == "matcap"; };
-    bool hasMatcap = std::ranges::find_if(textures, fn) != textures.end();
+    const bool hasMatcap = std::ranges::find_if(textures, fn) != textures.end();
 
     if (hasMatcap)
     {
       // disable PBR light, just sample matcap and set final color to gamma-corrected ambient color
 
-      std::string customColor = "  //VTK::Color::Impl\n"
+      const std::string customColor =
+        "  //VTK::Color::Impl\n"
 #ifdef F3D_USE_GLES
-                                "  vec2 uv = vec2(vertexNormalVCVS.xy) * 0.5 + vec2(0.5,0.5);\n"
+        "  vec2 uv = vec2(vertexNormalVCVS.xy) * 0.5 + vec2(0.5,0.5);\n"
 #else
-                                "  vec2 uv = vec2(normalVCVSOutput.xy) * 0.5 + vec2(0.5,0.5);\n"
+        "  vec2 uv = vec2(normalVCVSOutput.xy) * 0.5 + vec2(0.5,0.5);\n"
 #endif
-                                "  diffuseColor = vec3(0.0);\n"
-                                "  ambientColor = texture(matcap, uv).rgb;\n";
+        "  diffuseColor = vec3(0.0);\n"
+        "  ambientColor = texture(matcap, uv).rgb;\n";
 
       vtkShaderProgram::Substitute(fragmentShader, "  //VTK::Color::Impl", customColor);
 
-      std::string customLight = "  gl_FragData[0] = vec4(pow(ambientColor, vec3(1.0/2.2)), 1.0);\n";
+      const std::string customLight =
+        "  gl_FragData[0] = vec4(pow(ambientColor, vec3(1.0/2.2)), 1.0);\n";
 
       vtkShaderProgram::Substitute(fragmentShader, "  //VTK::Light::Impl", customLight);
 
@@ -435,16 +437,16 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(
   if (polyData)
   {
     vtkUniforms* uniforms = actor->GetShaderProperty()->GetVertexCustomUniforms();
-    bool hasMorphing =
+    const bool hasMorphing =
       uniforms->GetUniformTupleType("morphWeights") != vtkUniforms::TupleTypeInvalid;
-    bool hasSkinning =
+    const bool hasSkinning =
       uniforms->GetUniformTupleType("jointMatrices") != vtkUniforms::TupleTypeInvalid;
 
     if (hasMorphing || hasSkinning)
     {
       bool hasTangents =
         polyData->GetPointData()->GetTangents() && actor->GetProperty()->GetLighting();
-      bool hasNormals =
+      const bool hasNormals =
         polyData->GetPointData()->GetNormals() && actor->GetProperty()->GetLighting();
       hasTangents = hasTangents && (actor->GetProperty()->GetTexture("normalTex") != nullptr);
 
@@ -628,7 +630,7 @@ bool vtkF3DRenderPass::PreReplaceShaderValues(std::string& vertexShader, std::st
   if (!actor->GetProperty()->GetLighting() && actor->GetProperty()->GetInterpolation() != VTK_PBR)
   {
     // apply final gamma-correction
-    std::string customGamma =
+    const std::string customGamma =
       "//VTK::TCoord::Impl\n"
       "gl_FragData[0] = vec4(pow(gl_FragData[0].rgb, vec3(1.0/2.2)), gl_FragData[0].a);\n";
 
@@ -740,7 +742,7 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
 
   vtkRenderer* r = s->GetRenderer();
   vtkInformation* info = r->GetInformation();
-  bool uiOnly = info->Has(vtkF3DRenderPass::RENDER_UI_ONLY());
+  const bool uiOnly = info->Has(vtkF3DRenderPass::RENDER_UI_ONLY());
 
   r->GetBackground(bgColor);
 
@@ -758,7 +760,7 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
     this->BackgroundPass->Render(&backgroundState);
 
     // the reflection result is used in the main pass so it must be rendered before
-    vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(r);
+    const vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(r);
 
 #if F3D_MODULE_RAYTRACING
     if (!this->UseRaytracing)
@@ -774,7 +776,7 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
         vtkMatrix4x4* actorMatrix = renderer->GetGridMatrix();
 
         vtkCamera* originalCam = s->GetRenderer()->GetActiveCamera();
-        vtkNew<vtkCamera> reflectedCam;
+        const vtkNew<vtkCamera> reflectedCam;
 
         // reflect camera according to the grid plane
         this->ReflectCamera(originalCam, actorMatrix, reflectedCam);
@@ -820,8 +822,8 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
   vtkOpenGLRenderWindow* renWin = static_cast<vtkOpenGLRenderWindow*>(r->GetRenderWindow());
   vtkOpenGLState* ostate = renWin->GetState();
 
-  vtkOpenGLState::ScopedglEnableDisable bsaver(ostate, GL_BLEND);
-  vtkOpenGLState::ScopedglEnableDisable dsaver(ostate, GL_DEPTH_TEST);
+  const vtkOpenGLState::ScopedglEnableDisable bsaver(ostate, GL_BLEND);
+  const vtkOpenGLState::ScopedglEnableDisable dsaver(ostate, GL_DEPTH_TEST);
 
   if (this->BlendQuadHelper && this->BlendQuadHelper->ShaderChangeValue < this->GetMTime())
   {

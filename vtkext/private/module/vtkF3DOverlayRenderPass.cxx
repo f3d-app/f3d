@@ -72,7 +72,7 @@ void vtkF3DOverlayRenderPass::Initialize(const vtkRenderState* s)
   this->OverlayProps.clear();
 
   // assign props to the overlay pass
-  vtkProp** props = s->GetPropArray();
+  vtkProp* const* props = s->GetPropArray();
   for (int i = 0; i < s->GetPropArrayCount(); i++)
   {
     vtkProp* prop = props[i];
@@ -92,7 +92,7 @@ void vtkF3DOverlayRenderPass::Initialize(const vtkRenderState* s)
     this->FrameBufferObject->ReleaseGraphicsResources(s->GetRenderer()->GetRenderWindow());
   }
 
-  vtkNew<vtkDefaultPass> overlayP;
+  const vtkNew<vtkDefaultPass> overlayP;
   vtkNew<vtkCameraPass> overlayCamP;
   overlayCamP->SetDelegatePass(overlayP);
 
@@ -111,8 +111,8 @@ void vtkF3DOverlayRenderPass::CompositeOverlay(const vtkRenderState* s)
   vtkOpenGLRenderWindow* renWin = static_cast<vtkOpenGLRenderWindow*>(r->GetRenderWindow());
   vtkOpenGLState* ostate = renWin->GetState();
 
-  vtkOpenGLState::ScopedglEnableDisable bsaver(ostate, GL_BLEND);
-  vtkOpenGLState::ScopedglEnableDisable dsaver(ostate, GL_DEPTH_TEST);
+  const vtkOpenGLState::ScopedglEnableDisable bsaver(ostate, GL_BLEND);
+  const vtkOpenGLState::ScopedglEnableDisable dsaver(ostate, GL_DEPTH_TEST);
 
   assert(this->DelegatePass != nullptr);
 

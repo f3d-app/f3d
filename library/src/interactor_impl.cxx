@@ -78,7 +78,7 @@ public:
     , Scene(scene)
     , Interactor(inter)
   {
-    window::Type type = window.getType();
+    const window::Type type = window.getType();
     if (type == window::Type::GLX || type == window::Type::WGL || type == window::Type::COCOA ||
       type == window::Type::WASM)
     {
@@ -636,7 +636,7 @@ public:
 
     // Determine if we need a full render or just a UI render
     // At the moment, only TAA requires a full render each frame
-    bool forceRender = this->Options.render.effect.antialiasing.mode == "taa";
+    const bool forceRender = this->Options.render.effect.antialiasing.mode == "taa";
 
     if (this->RenderRequested || forceRender)
     {
@@ -730,7 +730,7 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
       }
 
       bool exact = false;
-      for (auto const& [action, callbacks] : this->Internals->Commands)
+      for (const auto& [action, callbacks] : this->Internals->Commands)
       {
         if (action.starts_with(actionPattern))
         {
@@ -1011,13 +1011,13 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{
       "cycle_animation", "cycle scene.animation.indices option using model information" });
 
-  std::vector<std::string> cycleColoringValidArgs = { "field", "array", "component" };
+  const std::vector<std::string> cycleColoringValidArgs = { "field", "array", "component" };
   this->addCommand(
     "cycle_coloring",
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "cycle_coloring");
-      std::string_view type = args[0];
+      const std::string_view type = args[0];
       vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
       vtkF3DRenderer* ren =
         vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
@@ -1173,7 +1173,7 @@ interactor& interactor_impl::initCommands()
         return;
       }
       check_args(args, 1, "set_camera");
-      std::string_view type = args[0];
+      const std::string_view type = args[0];
       if (type == "front")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_FRONT);
@@ -1310,8 +1310,8 @@ interactor& interactor_impl::initCommands()
     "cycle_verbose_level",
     [&](const std::vector<std::string>&)
     {
-      log::VerboseLevel currentLevel = log::getVerboseLevel();
-      log::VerboseLevel newLevel =
+      const log::VerboseLevel currentLevel = log::getVerboseLevel();
+      const log::VerboseLevel newLevel =
         static_cast<log::VerboseLevel>((static_cast<unsigned char>(currentLevel) + 1) % 5);
 
       log::setVerboseLevel(newLevel);
@@ -1472,7 +1472,7 @@ interactor& interactor_impl::removeCommand(const std::string& action)
 std::vector<std::string> interactor_impl::getCommandActions() const
 {
   std::vector<std::string> actions;
-  for (auto const& [action, callbacks] : this->Internals->Commands)
+  for (const auto& [action, callbacks] : this->Internals->Commands)
   {
     actions.emplace_back(action);
   }
@@ -1775,7 +1775,7 @@ interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
   {
     // Binds are unique
     // Erase the bind entry in the group
-    std::string group = it->first;
+    const std::string group = it->first;
     this->Internals->GroupedBinds.erase(it);
     if (this->Internals->GroupedBinds.count(group) == 0)
     {
@@ -2046,7 +2046,7 @@ bool interactor_impl::playInteraction(const fs::path& file, double loopTime)
     this->Internals->Recorder->Off();
     this->Internals->Recorder->Clear();
 
-    bool loop = this->Internals->StartEventLoop(loopTime);
+    const bool loop = this->Internals->StartEventLoop(loopTime);
     this->Internals->Recorder->SetFileName(file.string().c_str());
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20260925)
@@ -2089,7 +2089,7 @@ bool interactor_impl::recordInteraction(const fs::path& file)
   try
   {
     // Ensure parent directories exists if not empty
-    fs::path parent = file.parent_path();
+    const fs::path parent = file.parent_path();
     if (!parent.empty())
     {
       fs::create_directories(parent);

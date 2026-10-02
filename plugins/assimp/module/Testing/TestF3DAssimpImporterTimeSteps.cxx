@@ -8,7 +8,7 @@
 
 int TestF3DAssimpImporterTimeSteps(int vtkNotUsed(argc), char* argv[])
 {
-  std::string filename = std::string(argv[1]) + "data/anim_test.x";
+  const std::string filename = std::string(argv[1]) + "data/anim_test.x";
   vtkNew<vtkF3DAssimpImporter> importer;
   importer->SetFileName(filename.c_str());
   importer->Update();
@@ -26,7 +26,7 @@ int TestF3DAssimpImporterTimeSteps(int vtkNotUsed(argc), char* argv[])
 
   for (int i = 0; i < nbTimeSteps; i++)
   {
-    double currentTimeStep = timeSteps->GetValue(i);
+    const double currentTimeStep = timeSteps->GetValue(i);
     if (currentTimeStep > timeRange[1] || currentTimeStep < timeRange[0])
     {
       std::cerr << "Time step is out of boundary. \n";

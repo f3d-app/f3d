@@ -105,7 +105,7 @@ video_encoder_ffmpeg::video_encoder_ffmpeg(const params& parameters)
   this->Internals->CodecContext->framerate = av_d2q(parameters.FrameRate, 1000000);
   this->Internals->CodecContext->bit_rate = static_cast<int64_t>(parameters.Bitrate * 1000000);
 
-  AVDictionary* opts = nullptr;
+  AVDictionary* opts = nullptr; // NOLINT(misc-const-correctness)
 
   if (parameters.LowLatency)
   {
@@ -130,7 +130,7 @@ std::vector<std::pair<std::string, std::string>> video_encoder_ffmpeg::getAvaila
   std::vector<std::pair<std::string, std::string>> codecs;
 
   const AVCodec* itCodec = nullptr;
-  void* opaque = nullptr;
+  void* opaque = nullptr; // NOLINT(misc-const-correctness)
 
   constexpr std::array<AVCodecID, 5> usefulCodecs = { AV_CODEC_ID_H264, AV_CODEC_ID_HEVC,
     AV_CODEC_ID_AV1, AV_CODEC_ID_VP8, AV_CODEC_ID_VP9 };
@@ -150,7 +150,7 @@ std::vector<std::pair<std::string, std::string>> video_encoder_ffmpeg::getAvaila
         if (avcodec_get_supported_config(nullptr, itCodec, AV_CODEC_CONFIG_PIX_FORMAT, 0,
               reinterpret_cast<const void**>(&formats), &numFormats) == 0)
         {
-          std::span<const AVPixelFormat> formatsSpan(formats, numFormats);
+          const std::span<const AVPixelFormat> formatsSpan(formats, numFormats);
 
           if (std::ranges::find(formatsSpan, AV_PIX_FMT_YUV420P) != formatsSpan.end())
           {
@@ -181,7 +181,7 @@ video_encoder_ffmpeg& video_encoder_ffmpeg::flush()
 {
   if (this->Internals->CodecContext)
   {
-    std::scoped_lock lock(this->Internals->Mutex);
+    const std::scoped_lock lock(this->Internals->Mutex);
     avcodec_send_frame(this->Internals->CodecContext, nullptr);
   }
 
@@ -208,17 +208,17 @@ video_encoder_ffmpeg& video_encoder_ffmpeg::listen(
   this->Internals->ListenerWorker = std::thread(
     [this, callback = std::move(callback)]()
     {
-      std::shared_ptr<video_packet_ffmpeg> packet = std::make_shared<video_packet_ffmpeg>();
+      const std::shared_ptr<video_packet_ffmpeg> packet = std::make_shared<video_packet_ffmpeg>();
       while (!this->Internals->StopRequested.load())
       {
         AVPacket* avPacket = static_cast<AVPacket*>(packet->GetHandle());
 
-        std::scoped_lock lock(this->Internals->Mutex);
+        const std::scoped_lock lock(this->Internals->Mutex);
 
         // Release the previous packet if there was one.
         av_packet_unref(avPacket);
 
-        int ret = avcodec_receive_packet(this->Internals->CodecContext, avPacket);
+        const int ret = avcodec_receive_packet(this->Internals->CodecContext, avPacket);
 
         if (ret == AVERROR(EAGAIN))
         {
@@ -253,10 +253,10 @@ video_encoder_ffmpeg& video_encoder_ffmpeg::listen(
 //----------------------------------------------------------------------------
 bool video_encoder_ffmpeg::submit(const std::shared_ptr<video_frame>& frame)
 {
-  std::shared_ptr<video_frame_ffmpeg> ffmpegFrame =
+  const std::shared_ptr<video_frame_ffmpeg> ffmpegFrame =
     std::dynamic_pointer_cast<video_frame_ffmpeg>(frame);
 
-  std::scoped_lock lock(this->Internals->Mutex);
+  const std::scoped_lock lock(this->Internals->Mutex);
   const int sendResult = avcodec_send_frame(
     this->Internals->CodecContext, static_cast<const AVFrame*>(ffmpegFrame->GetHandle()));
 

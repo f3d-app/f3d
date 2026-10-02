@@ -39,7 +39,7 @@ int TestF3DMetaImporterMultiColoring(int argc, char* argv[])
   importer->AddImporter({ "foo", importerVTS });
 
   vtkNew<vtkRenderWindow> window;
-  vtkNew<vtkRenderer> renderer;
+  const vtkNew<vtkRenderer> renderer;
   window->AddRenderer(renderer);
   importer->SetRenderWindow(window);
   importer->Update();

@@ -89,7 +89,7 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}/source
       run: >
-        run-clang-tidy -quiet -j2 
+        run-clang-tidy -quiet -j2
         -p ../build
         -source-filter='(?!.*external.*)'
 

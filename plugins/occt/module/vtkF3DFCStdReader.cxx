@@ -688,7 +688,7 @@ public:
     std::istringstream stream(std::string(data.data(), data.size()));
     stream.exceptions(std::istream::failbit | std::istream::badbit);
     TopoDS_Shape shape;
-    BRep_Builder builder;
+    const BRep_Builder builder;
     try
     {
       BRepTools::Read(shape, stream, builder);
@@ -775,7 +775,7 @@ public:
 
     for (const std::string& name : this->ObjectOrder)
     {
-      FCObject& obj = this->Objects[name];
+      const FCObject& obj = this->Objects[name];
       if (!this->IsEffectivelyVisible(obj))
       {
         continue;
@@ -813,7 +813,7 @@ public:
         {
           continue;
         }
-        TopoDS_Builder builder;
+        const TopoDS_Builder builder;
         TopoDS_Compound compound;
         builder.MakeCompound(compound);
         for (const gp_Trsf& placement : arrayPlacements)

@@ -84,7 +84,7 @@ public:
           vtkProgressBarRepresentation* rep =
             vtkProgressBarRepresentation::SafeDownCast(widget->GetRepresentation());
 
-          double progress = *static_cast<double*>(callData);
+          const double progress = *static_cast<double*>(callData);
 
           // Skipping progress update if the difference is too small to avoid too many renders
           if (progress - rep->GetProgressRate() > 0.02)
@@ -126,7 +126,7 @@ public:
   {
     std::string bar;
     double filledBars;
-    double lastBarProgression = std::modf(progress * barCount, &filledBars);
+    const double lastBarProgression = std::modf(progress * barCount, &filledBars);
     int totalFilled = static_cast<int>(filledBars);
     for (int i = 0; i < filledBars; i++)
     {
@@ -134,7 +134,7 @@ public:
     }
     if (filledBars < barCount)
     {
-      size_t charRampIdx =
+      const size_t charRampIdx =
         static_cast<size_t>(std::round(lastBarProgression * (strRamp.size() - 1)));
       bar += strRamp[charRampIdx];
       totalFilled++;
@@ -220,7 +220,7 @@ public:
 
     // Manage progress bar
     vtkNew<vtkProgressBarWidget> progressWidget;
-    vtkNew<vtkTimerLog> timer;
+    const vtkNew<vtkTimerLog> timer;
 
     scene_impl::internals::ProgressDataStruct callbackData;
     scene_impl::internals::CLIProgressBarDataStruct cliCallbackData;
@@ -237,7 +237,7 @@ public:
     {
       callbackData.timer = timer;
       callbackData.widget = progressWidget;
-      f3d::color_t color = this->Options.ui.loader_progress_color;
+      const f3d::color_t color = this->Options.ui.loader_progress_color;
       scene_impl::internals::CreateProgressRepresentationAndCallback(
         &callbackData, this->MetaImporter, this->Interactor, color);
     }
@@ -276,7 +276,7 @@ public:
 
   static void DisplayImporterDescription(log::VerboseLevel level, vtkImporter* importer)
   {
-    vtkIdType availCameras = importer->GetNumberOfCameras();
+    const vtkIdType availCameras = importer->GetNumberOfCameras();
     if (availCameras <= 0)
     {
       log::print(level, "No camera available");
@@ -327,7 +327,7 @@ scene_impl::~scene_impl() = default;
 //----------------------------------------------------------------------------
 scene& scene_impl::add(const fs::path& filePath)
 {
-  std::vector<fs::path> paths = { filePath };
+  const std::vector<fs::path> paths = { filePath };
   return this->add(paths);
 }
 
@@ -408,7 +408,7 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       // XXX: F3D Plugin CMake logic ensure there is either a scene reader or a geometry reader
       auto vtkReader = reader->createGeometryReader(filePath.string());
       assert(vtkReader);
-      vtkSmartPointer<vtkF3DGenericImporter> genericImporter =
+      const vtkSmartPointer<vtkF3DGenericImporter> genericImporter =
         vtkSmartPointer<vtkF3DGenericImporter>::New();
       genericImporter->SetInternalReader(vtkReader);
       importer = genericImporter;
@@ -597,7 +597,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
     {
       const auto memoryView = mesh->getMemoryView(time);
 
-      bool firstTime = polydata->GetPoints() == nullptr;
+      const bool firstTime = polydata->GetPoints() == nullptr;
 
       f3d::log::debug(firstTime ? "Initializing" : "Updating", " mesh_view at time ", time);
 
@@ -859,7 +859,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
   vtkNew<vtkF3DGenericImporter> importer;
   importer->SetInternalReader(vtkSource);
 
-  std::string name = mesh->getName();
+  const std::string name = mesh->getName();
 
   log::debug("Loading 3D scene from memory");
   this->Internals->Load({ { name.empty() ? "<mesh_view>" : name, importer } });

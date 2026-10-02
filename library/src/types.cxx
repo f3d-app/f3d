@@ -25,7 +25,7 @@ std::pair<bool, std::string> mesh_t::isValid() const
     return { false, std::move(err) };
   }
 
-  size_t nbPoints = this->points.size() / 3;
+  const size_t nbPoints = this->points.size() / 3;
 
   if (this->normals.size() > 0 && this->normals.size() != nbPoints * 3)
   {
@@ -38,7 +38,8 @@ std::pair<bool, std::string> mesh_t::isValid() const
       "The texture_coordinates buffer must be empty or equal to 2 times the number of points." };
   }
 
-  unsigned int expectedSize = std::accumulate(this->face_sides.begin(), this->face_sides.end(), 0);
+  const unsigned int expectedSize =
+    std::accumulate(this->face_sides.begin(), this->face_sides.end(), 0);
 
   if (this->face_indices.size() != expectedSize)
   {
@@ -67,10 +68,10 @@ std::pair<bool, std::string> mesh_t::isValid() const
 F3D_EXPORT transform2d_t::transform2d_t(
   const double_array_t<2>& scale, const double_array_t<2>& translate, const angle_deg_t& angle)
 {
-  double angleRad = std::isnan(angle) ? 0.0 : vtkMath::RadiansFromDegrees(angle);
+  const double angleRad = std::isnan(angle) ? 0.0 : vtkMath::RadiansFromDegrees(angle);
 
-  double sinA = std::sin(angleRad);
-  double cosA = std::cos(angleRad);
+  const double sinA = std::sin(angleRad);
+  const double cosA = std::cos(angleRad);
 
   (*this)[0] = cosA * (std::isnan(scale[0]) ? 1.0 : scale[0]);
   (*this)[1] = -sinA * (std::isnan(scale[1]) ? 1.0 : scale[1]);
