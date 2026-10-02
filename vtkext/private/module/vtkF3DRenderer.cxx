@@ -1226,17 +1226,17 @@ vtkBoundingBox vtkF3DRenderer::CreateCameraFacingBoundingBox(
   vtkMath::Cross(forward, right, up);
   vtkMath::Normalize(up);
 
-  double center[3] = { position[0] + forward[0] * distance, position[1] - scale * 0.5,
+  const double center[3] = { position[0] + forward[0] * distance, position[1] - scale * 0.5,
     position[2] + forward[2] * distance };
 
   vtkBoundingBox bbox;
   const double halfScale = scale * 0.5;
 
-  for (double dx : { -halfScale, halfScale })
+  for (const double dx : { -halfScale, halfScale })
   {
-    for (double dy : { -halfScale, halfScale })
+    for (const double dy : { -halfScale, halfScale })
     {
-      for (double dz : { -halfScale, halfScale })
+      for (const double dz : { -halfScale, halfScale })
       {
         double point[3] = {
           center[0] + right[0] * dx + up[0] * dy + forward[0] * dz,
@@ -1259,8 +1259,8 @@ void vtkF3DRenderer::AlignSceneToBounds(const vtkBoundingBox& bounds)
     return;
   }
 
-  double* up = this->GetEnvironmentUp();
-  double* right = this->GetEnvironmentRight();
+  const double* up = this->GetEnvironmentUp();
+  const double* right = this->GetEnvironmentRight();
   double front[3];
   vtkMath::Cross(right, up, front);
 
@@ -1346,15 +1346,17 @@ void vtkF3DRenderer::AlignSceneToBounds(const vtkBoundingBox& bounds)
       continue;
     }
 
-    if (prop3D == this->GridActor || prop3D == this->XRBBoxActor ||
-      vtkSkybox::SafeDownCast(prop3D) ||
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
-      vtkGridAxesActor3D::SafeDownCast(prop3D)
-#endif
-    )
+    if (prop3D == this->GridActor || prop3D == this->XRBBoxActor || vtkSkybox::SafeDownCast(prop3D))
     {
       continue;
     }
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
+    if (vtkGridAxesActor3D::SafeDownCast(prop3D))
+    {
+      continue;
+    }
+#endif
 
     prop3D->SetPosition(targetCenter[0], targetCenter[1], targetCenter[2]);
     prop3D->SetScale(scale, scale, scale);
