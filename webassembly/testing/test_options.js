@@ -8,6 +8,7 @@ const settings = {
 
     // set a bunch of options of each type
     options.setAsString("render.background.color", "#000000");
+    options.toggle("render.grid.enable");
     options.setAsString("model.scivis.array_name", "Colors");
     options.setAsString("model.coloring", "direct");
     options.setAsString("model.scivis.range", "0.7,1.4"); // not used for the baseline, only for coverage
