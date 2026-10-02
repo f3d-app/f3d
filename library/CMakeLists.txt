@@ -81,6 +81,7 @@ endif()
 
 # List of headers that will be installed
 set(F3D_PUBLIC_HEADERS
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/animation.h
   ${CMAKE_CURRENT_BINARY_DIR}/public/export.h
   ${CMAKE_CURRENT_BINARY_DIR}/public/options.h
   ${CMAKE_CURRENT_SOURCE_DIR}/plugin/plugin.h
