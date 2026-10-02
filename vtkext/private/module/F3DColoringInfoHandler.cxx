@@ -24,7 +24,7 @@ void F3DColoringInfoHandler::UpdateColoringInfo(vtkDataSet* dataset)
   // XXX: This assumes importer do not import actors with an empty input
   assert(dataset);
 
-  for (bool useCellData : { false, true })
+  for (const bool useCellData : { false, true })
   {
     vtkDataSetAttributes* attr = useCellData
       ? static_cast<vtkDataSetAttributes*>(dataset->GetCellData())
