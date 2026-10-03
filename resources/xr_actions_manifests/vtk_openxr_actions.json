@@ -1,0 +1,104 @@
+{
+  "actions": [
+    {
+      "name": "elevation",
+      "type": "vector2"
+    },
+    {
+      "name": "handpose",
+      "type": "pose"
+    },
+    {
+      "name": "handposegrip",
+      "type": "pose"
+    },
+    {
+      "name": "haptic",
+      "type": "vibration"
+    },
+    {
+      "name": "complexgestureaction",
+      "type": "boolean"
+    },
+    {
+      "name": "movement",
+      "type": "vector2"
+    },
+    {
+      "name": "nextcamerapose",
+      "type": "boolean"
+    },
+    {
+      "name": "positionprop",
+      "type": "boolean"
+    },
+    {
+      "name": "showmenu",
+      "type": "boolean"
+    },
+    {
+      "name": "startelevation",
+      "type": "boolean"
+    },
+    {
+      "name": "startmovement",
+      "type": "boolean"
+    },
+    {
+      "name": "triggeraction",
+      "type": "boolean"
+    }
+  ],
+  "default_bindings": [
+    {
+      "binding_url": "vtk_openxr_binding_khr_simple_controller.json",
+      "controller_type": "khr_simple"
+    },
+    {
+      "binding_url": "vtk_openxr_binding_htc_vive_controller.json",
+      "controller_type": "vive_controller"
+    },
+    {
+      "binding_url": "vtk_openxr_binding_hp_mixed_reality.json",
+      "controller_type": "mixed_reality"
+    },
+    {
+      "binding_url": "vtk_openxr_binding_knuckles.json",
+      "controller_type": "knuckles"
+    },
+    {
+      "binding_url": "vtk_openxr_binding_microsoft_hand_interaction.json",
+      "controller_type": "microsoft_hand_interaction"
+    },
+    {
+      "binding_url": "vtk_openxr_binding_oculus_touch_controller.json",
+      "controller_type": "oculus_touch"
+    }
+  ],
+  "action_sets": [
+    {
+      "name": "vtk-actions",
+      "localizedName": "VTK actions"
+    }
+  ],
+  "localization": [
+    {
+      "backthickcrop": "Move Thick Crop Back",
+      "elevation": "Elevation",
+      "forwardthickcrop": "Move Thick Crop Forward",
+      "handpose": "Hand Pose",
+      "handposegrip": "Hand Pose Grip",
+      "haptic": "Haptic Vibration",
+      "complexgestureaction": "Complex Gesture Action",
+      "movement": "Trackpad Movement",
+      "nextcamerapose": "Next Camera Pose",
+      "positionprop": "Position Prop",
+      "showmenu": "Show Menu",
+      "shownavigationpanel": "Show Navigation Panel",
+      "startelevation": "Start Elevation",
+      "startmovement": "Start Movement",
+      "triggeraction": "Trigger Action",
+      "language_tag": "en_US"
+    }
+  ]
+}

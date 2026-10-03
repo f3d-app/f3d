@@ -15,11 +15,12 @@
 #ifndef vtkF3DRenderPass_h
 #define vtkF3DRenderPass_h
 
-#include <vtkFramebufferPass.h>
 #include <vtkOpenGLQuadHelper.h>
 #include <vtkOpenGLRenderPass.h>
 #include <vtkSmartPointer.h>
 #include <vtkTimeStamp.h>
+
+#include <vtkF3DPreserveCameraFramebufferPass.h>
 
 #include <memory>
 #include <vector>
@@ -49,6 +50,7 @@ public:
   vtkSetVector6Macro(Bounds, double);
   vtkSetMacro(CircleOfConfusionRadius, double);
   vtkSetMacro(RenderReflection, bool);
+  vtkSetMacro(XRMode, bool);
 
   /**
    * Modify shader code for matcap/gamma/skinning
@@ -81,13 +83,14 @@ protected:
   bool UseBlurBackground = false;
   bool ForceOpaqueBackground = false;
   bool RenderReflection = false;
+  bool XRMode = false;
 
   double CircleOfConfusionRadius = 20.0;
 
-  vtkSmartPointer<vtkFramebufferPass> BackgroundPass;
-  vtkSmartPointer<vtkFramebufferPass> BakeReflectionPass;
-  vtkSmartPointer<vtkFramebufferPass> MainPass;
-  vtkSmartPointer<vtkFramebufferPass> MainOnTopPass;
+  vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass> BackgroundPass;
+  vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass> BakeReflectionPass;
+  vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass> MainPass;
+  vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass> MainOnTopPass;
 
   double Bounds[6] = {};
 

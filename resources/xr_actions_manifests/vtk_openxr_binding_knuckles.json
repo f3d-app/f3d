@@ -1,0 +1,80 @@
+{
+  "interaction_profile": "/interaction_profiles/valve/index_controller",
+
+  "bindings": {
+    "vtk-actions": {
+      "sources": [
+        {
+          "inputs": {
+            "pose": {
+              "output": "handpose"
+            }
+          },
+          "path": "/user/hand/left/input/aim"
+        },
+        {
+          "inputs": {
+            "pose": {
+              "output": "handpose"
+            }
+          },
+          "path": "/user/hand/right/input/aim"
+        },
+        {
+          "inputs": {
+            "touch": {
+              "output": "startmovement"
+            },
+            "position": {
+              "output": "movement"
+            }
+          },
+          "path": "/user/hand/left/input/thumbstick"
+        },
+        {
+          "inputs": {
+            "touch": {
+              "output": "startelevation"
+            },
+            "position": {
+              "output": "elevation"
+            }
+          },
+          "path": "/user/hand/right/input/thumbstick"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "complexgestureaction"
+            }
+          },
+          "path": "/user/hand/left/input/a"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "complexgestureaction"
+            }
+          },
+          "path": "/user/hand/right/input/a"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "triggeraction"
+            }
+          },
+          "path": "/user/hand/right/input/trigger"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "showmenu"
+            }
+          },
+          "path": "/user/hand/right/input/b"
+        }
+      ]
+    }
+  }
+}
