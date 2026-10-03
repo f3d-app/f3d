@@ -31,8 +31,7 @@ static std::vector<std::string> JavaListToStringVector(JNIEnv* env, jobject list
 
 extern "C"
 {
-  JNIEXPORT jobject JAVA_BIND(Animation, loadTime)(
-    JNIEnv* env, jobject self, jdouble timeValue)
+  JNIEXPORT jobject JAVA_BIND(Animation, loadTime)(JNIEnv* env, jobject self, jdouble timeValue)
   {
     GetEngine(env, self)->getScene().getAnimation().loadTime(timeValue);
     return self;
@@ -65,7 +64,8 @@ extern "C"
 
   JNIEXPORT jstring JAVA_BIND(Animation, getName)(JNIEnv* env, jobject self, jint index)
   {
-    return env->NewStringUTF(GetEngine(env, self)->getScene().getAnimation().getName(index).c_str());
+    return env->NewStringUTF(
+      GetEngine(env, self)->getScene().getAnimation().getName(index).c_str());
   }
 
   JNIEXPORT jobject JAVA_BIND(Animation, getNames)(JNIEnv* env, jobject self)
