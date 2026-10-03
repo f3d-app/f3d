@@ -65,8 +65,8 @@ private:
   vtkNew<vtkOpenGLBufferObject> JointMatrices;
   bool HasSSBOSkinning = false;
 
-  // Our cached linear color texture map for PBR, used as vtkMapper::ColorTextureMap respectively while linear
-  // colorspace conversion.
+  // Our cached linear color texture map for PBR, used as vtkMapper::ColorTextureMap respectively
+  // while linear colorspace conversion.
   bool UseLinearColorSpace = false;
   vtkSmartPointer<vtkImageData> LinearColorTextureMap;
 };
