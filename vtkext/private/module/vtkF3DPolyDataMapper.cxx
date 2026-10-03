@@ -5,6 +5,7 @@
 
 #include <vtkActor.h>
 #include <vtkDoubleArray.h>
+#include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLRenderWindow.h>
@@ -19,11 +20,66 @@
 #include <vtkShaderProperty.h>
 #include <vtkTexture.h>
 #include <vtkUniforms.h>
+#include <vtkUnsignedCharArray.h>
 #include <vtkVersion.h>
 
+#include <array>
+#include <cmath>
 #include <regex>
 
 vtkStandardNewMacro(vtkF3DPolyDataMapper);
+
+//-----------------------------------------------------------------------------
+void vtkF3DPolyDataMapper::SetUseLinearColorSpace(bool use)
+{
+  if (this->UseLinearColorSpace != use)
+  {
+    this->UseLinearColorSpace = use;
+    this->ClearColorArrays();
+    this->LinearColorTextureMap = nullptr;
+    this->Modified();
+  }
+}
+
+//-----------------------------------------------------------------------------
+vtkUnsignedCharArray* vtkF3DPolyDataMapper::MapScalars(
+  vtkDataSet* input, double alpha, int& cellFlag)
+{
+  // Populates the vtkMapper::Colors with gamma corrected sRGB.
+  this->Superclass::MapScalars(input, alpha, cellFlag);
+  if (!this->UseLinearColorSpace)
+  {
+    return this->Colors;
+  }
+
+  if (this->ColorTextureMap && this->ColorTextureMap != this->LinearColorTextureMap)
+  {
+    // Use floats for the lookup texture to retain dark colors after decoding.
+    this->LinearColorTextureMap = vtkSmartPointer<vtkImageData>::New();
+    this->LinearColorTextureMap->CopyStructure(this->ColorTextureMap);
+    this->LinearColorTextureMap->AllocateScalars(VTK_FLOAT, 4);
+    vtkDataArray* source = this->ColorTextureMap->GetPointData()->GetScalars();
+    vtkDataArray* destination = this->LinearColorTextureMap->GetPointData()->GetScalars();
+    for (vtkIdType i = 0; i < source->GetNumberOfTuples(); ++i)
+    {
+      for (int component = 0; component < 4; ++component)
+      {
+        const double value = source->GetComponent(i, component) / 255.0;
+        // Approx. color components converted to linear except alpha channel.
+        destination->SetComponent(i, component, component < 3 ? std::pow(value, 2.2) : value);
+      }
+    }
+    this->ColorTextureMap->UnRegister(this);
+    this->ColorTextureMap = this->LinearColorTextureMap;
+    this->ColorTextureMap->Register(this);
+  }
+  else if (!this->ColorTextureMap)
+  {
+    this->LinearColorTextureMap = nullptr;
+  }
+
+  return this->Colors;
+}
 
 //-----------------------------------------------------------------------------
 void vtkF3DPolyDataMapper::ReplaceShaderValues(
