@@ -9,6 +9,7 @@ if (NOT ANDROID)
 endif()
 
 set(F3D_JAVA_SOURCES
+  Animation.java
   Camera.java
   Context.java
   Engine.java
@@ -33,6 +34,7 @@ add_jar(f3d-jar ${F3D_JAVA_SOURCES}
   OUTPUT_NAME f3d)
 
 set(F3D_JAVA_BINDINGS_SOURCES
+  F3DAnimationBindings.cxx
   F3DCameraBindings.cxx
   F3DContextBindings.cxx
   F3DEngineBindings.cxx
