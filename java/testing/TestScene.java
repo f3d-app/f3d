@@ -75,14 +75,6 @@ public class TestScene {
 
     scene.add(mesh);
 
-    scene.loadAnimationTime(0.5);
-    scene.animationTimeRange();
-    scene.getAnimationKeyFrames();
-    scene.availableAnimations();
-    scene.getAnimationName();
-    scene.getAnimationName(0);
-    scene.getAnimationNames();
-
     Types.LightState lightState = new Types.LightState();
     lightState.type = Types.LightType.HEADLIGHT;
     lightState.intensity = 1.0;

@@ -1,4 +1,5 @@
 list(APPEND javaf3dTests_list
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestAnimation.java
   ${CMAKE_CURRENT_SOURCE_DIR}/TestCamera.java
   ${CMAKE_CURRENT_SOURCE_DIR}/TestEngine.java
   ${CMAKE_CURRENT_SOURCE_DIR}/TestImage.java

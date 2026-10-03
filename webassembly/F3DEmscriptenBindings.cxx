@@ -17,6 +17,11 @@
 namespace emscripten::internal
 {
 template<>
+void raw_destructor(f3d::animation* ptr)
+{
+}
+
+template<>
 void raw_destructor(f3d::scene* ptr)
 {
 }
@@ -374,6 +379,21 @@ EMSCRIPTEN_BINDINGS(f3d)
       "cycle", +[](f3d::options& o, const std::string& name) -> f3d::options&
       { return o.cycle(name); }, emscripten::return_value_policy::reference());
 
+  // f3d::animation
+  emscripten::class_<f3d::animation>("Animation")
+    .function("loadTime", &f3d::animation::loadTime, emscripten::return_value_policy::reference())
+    .function(
+      "timeRange", +[](f3d::animation& animation) -> emscripten::val
+      { return pairToJSArray(animation.timeRange()); })
+    .function(
+      "keyFrames", +[](f3d::animation& animation) -> emscripten::val
+      { return containerToJSArray(animation.keyFrames()); })
+    .function("count", &f3d::animation::count)
+    .function("getName", &f3d::animation::getName)
+    .function(
+      "getNames",
+      +[](f3d::animation& animation) { return containerToJSArray(animation.getNames()); });
+
   // f3d::scene
   emscripten::enum_<f3d::file_availability>("FileAvailability")
     .value("SUPPORTED", f3d::file_availability::SUPPORTED)
@@ -467,19 +487,6 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("removeLight", &f3d::scene::removeLight, emscripten::return_value_policy::reference())
     .function(
       "removeAllLights", &f3d::scene::removeAllLights, emscripten::return_value_policy::reference())
-    .function("loadAnimationTime", &f3d::scene::loadAnimationTime,
-      emscripten::return_value_policy::reference())
-    .function(
-      "animationTimeRange", +[](f3d::scene& scene) -> emscripten::val
-      { return pairToJSArray(scene.animationTimeRange()); })
-    .function(
-      "getAnimationKeyFrames", +[](f3d::scene& scene) -> emscripten::val
-      { return containerToJSArray(scene.getAnimationKeyFrames()); })
-    .function("availableAnimations", &f3d::scene::availableAnimations)
-    .function("getAnimationName", &f3d::scene::getAnimationName)
-    .function(
-      "getAnimationNames",
-      +[](f3d::scene& scene) { return containerToJSArray(scene.getAnimationNames()); })
     .function(
       "getSceneHierarchy",
       +[](f3d::scene& scene) -> emscripten::val
@@ -513,7 +520,9 @@ EMSCRIPTEN_BINDINGS(f3d)
         jsInfo.set("numberOfPoints", info.numberOfPoints);
         jsInfo.set("numberOfCells", info.numberOfCells);
         return jsInfo;
-      });
+      })
+    .function(
+      "getAnimation", &f3d::scene::getAnimation, emscripten::return_value_policy::reference());
 
   // f3d::image
   emscripten::enum_<f3d::image::SaveFormat>("ImageSaveFormat")

@@ -1,6 +1,6 @@
 #include "interactor_impl.h"
 
-#include "animationManager.h"
+#include "animation_impl.h"
 #include "engine.h"
 #include "log.h"
 #include "scene_impl.h"
@@ -72,10 +72,12 @@ public:
     std::function<std::vector<std::string>(const std::vector<std::string>&)> CompletionCallback;
   };
 
-  internals(options& options, window_impl& window, scene_impl& scene, interactor_impl& inter)
+  internals(options& options, window_impl& window, scene_impl& scene, animation_impl& anim,
+    interactor_impl& inter)
     : Options(options)
     , Window(window)
     , Scene(scene)
+    , Anim(anim)
     , Interactor(inter)
   {
     const window::Type type = window.getType();
@@ -537,9 +539,9 @@ public:
       }
     }
 
-    // Update the dynamic options of the animation manager so check if the cheatsheet needs an
+    // Update the dynamic options of the animation so check if the cheatsheet needs an
     // update.
-    this->AnimationManager->UpdateDynamicOptions();
+    this->Anim.UpdateDynamicOptions();
     // Always render after interaction
     this->Window.render();
   }
@@ -604,9 +606,10 @@ public:
       this->Interactor.stop();
       return;
     }
+
     if (this->EventLoopUserCallback)
     {
-      this->EventLoopUserCallback({ .animationTime = this->AnimationManager->GetCurrentTime() });
+      this->EventLoopUserCallback({ .animationTime = this->Anim.GetCurrentTime() });
     }
 
     if (this->CommandBuffer.has_value())
@@ -625,9 +628,9 @@ public:
       this->CommandBuffer.reset();
     }
 
-    this->AnimationManager->UpdateDynamicOptions();
-    this->AnimationManager->SetDeltaTime(deltaTime);
-    this->AnimationManager->Tick();
+    this->Anim.UpdateDynamicOptions();
+    this->Anim.SetDeltaTime(deltaTime);
+    this->Anim.Tick();
 
     vtkRenderWindow* renWin = this->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
@@ -653,8 +656,8 @@ public:
   options& Options;
   window_impl& Window;
   scene_impl& Scene;
+  animation_impl& Anim;
   interactor_impl& Interactor;
-  animationManager* AnimationManager;
 
   vtkSmartPointer<vtkRenderWindowInteractor> VTKInteractor;
   vtkNew<vtkF3DInteractorStyle> Style;
@@ -691,13 +694,13 @@ public:
 };
 
 //----------------------------------------------------------------------------
-interactor_impl::interactor_impl(options& options, window_impl& window, scene_impl& scene)
-  : Internals(std::make_unique<interactor_impl::internals>(options, window, scene, *this))
+interactor_impl::interactor_impl(
+  options& options, window_impl& window, scene_impl& scene, animation_impl& anim)
+  : Internals(std::make_unique<interactor_impl::internals>(options, window, scene, anim, *this))
 {
-  // scene need the interactor, scene will set the AnimationManager on the interactor
+  // scene need the interactor
   this->Internals->Scene.SetInteractor(this);
   this->Internals->Window.SetInteractor(this);
-  assert(this->Internals->AnimationManager);
 
   this->initCommands();
   this->initBindings();
@@ -1007,7 +1010,7 @@ interactor& interactor_impl::initCommands()
 
   this->addCommand(
     "cycle_animation",
-    [&](const std::vector<std::string>&) { this->Internals->AnimationManager->CycleAnimation(); },
+    [&](const std::vector<std::string>&) { this->Internals->Anim.CycleAnimation(); },
     command_documentation_t{
       "cycle_animation", "cycle scene.animation.indices option using model information" });
 
@@ -1067,8 +1070,8 @@ interactor& interactor_impl::initCommands()
     {
       check_args(args, 1, "jump_to_frame");
       const int frame = options::parse<int>(args[0]);
-      this->Internals->AnimationManager->SetDeltaTime(this->Internals->CallbackDeltaTime);
-      this->Internals->AnimationManager->JumpToFrame(frame, false);
+      this->Internals->Anim.SetDeltaTime(this->Internals->CallbackDeltaTime);
+      this->Internals->Anim.JumpToFrame(frame, false);
     },
     command_documentation_t{ "jump_to_frame index", "load animation at a specific frame" });
 
@@ -1078,8 +1081,8 @@ interactor& interactor_impl::initCommands()
     {
       check_args(args, 1, "jump_to_frame_relative");
       const int frame = options::parse<int>(args[0]);
-      this->Internals->AnimationManager->SetDeltaTime(this->Internals->CallbackDeltaTime);
-      this->Internals->AnimationManager->JumpToFrame(frame, true);
+      this->Internals->Anim.SetDeltaTime(this->Internals->CallbackDeltaTime);
+      this->Internals->Anim.JumpToFrame(frame, true);
     },
     command_documentation_t{
       "jump_to_frame_relative offset", "move animation a number of frames forward or backward" });
@@ -1090,7 +1093,7 @@ interactor& interactor_impl::initCommands()
     {
       check_args(args, 1, "jump_to_time");
       const double time = options::parse<double>(args[0]);
-      this->Internals->AnimationManager->JumpToTime(time, false);
+      this->Internals->Anim.JumpToTime(time, false);
     },
     command_documentation_t{ "jump_to_time time", "load the animation at a specific time" });
 
@@ -1100,7 +1103,7 @@ interactor& interactor_impl::initCommands()
     {
       check_args(args, 1, "jump_to_time_relative");
       const double time = options::parse<double>(args[0]);
-      this->Internals->AnimationManager->JumpToTime(time, true);
+      this->Internals->Anim.JumpToTime(time, true);
     },
     command_documentation_t{ "jump_to_time_relative offset",
       "move the animation a number of seconds forward or backward" });
@@ -1250,7 +1253,7 @@ interactor& interactor_impl::initCommands()
     {
       check_args(args, 1, "jump_to_keyframe");
       const int keyframe = options::parse<int>(args[0]);
-      this->Internals->AnimationManager->JumpToKeyFrame(keyframe, false);
+      this->Internals->Anim.JumpToKeyFrame(keyframe, false);
     },
     command_documentation_t{ "jump_to_keyframe index", "jump to a specific animation keyframe" });
 
@@ -1260,7 +1263,7 @@ interactor& interactor_impl::initCommands()
     {
       check_args(args, 1, "jump_to_keyframe_relative");
       const int keyframe = options::parse<int>(args[0]);
-      this->Internals->AnimationManager->JumpToKeyFrame(keyframe, true);
+      this->Internals->Anim.JumpToKeyFrame(keyframe, true);
     },
     command_documentation_t{
       "jump_to_keyframe_relative offset", "move a number of keyframes forward or backward" });
@@ -1279,7 +1282,7 @@ interactor& interactor_impl::initCommands()
     "add_files",
     [&](const std::vector<std::string>& files)
     {
-      this->Internals->AnimationManager->StopAnimation();
+      this->Internals->Anim.StopAnimation();
       this->Internals->Scene.add(files);
     },
     command_documentation_t{ "add_files", "add files to the scene" });
@@ -1585,8 +1588,7 @@ interactor& interactor_impl::initBindings()
   };
 
   // "Cycle animation" , "animationName"
-  auto docAnim = [&]()
-  { return std::pair("Animation", this->Internals->AnimationManager->GetAnimationName()); };
+  auto docAnim = [&]() { return std::pair("Animation", this->Internals->Anim.getName()); };
 
   // "Cycle point/cell data coloring" , "POINT/CELL"
   auto docField = [&]()
@@ -1962,45 +1964,37 @@ interactor& interactor_impl::triggerTextCharacter(unsigned int codepoint)
 //----------------------------------------------------------------------------
 interactor& interactor_impl::toggleAnimation(AnimationDirection direction)
 {
-  assert(this->Internals->AnimationManager);
-  this->Internals->AnimationManager->SetAnimationDirection(
-    direction == AnimationDirection::FORWARD ? 1 : -1);
-  this->Internals->AnimationManager->ToggleAnimation();
+  this->Internals->Anim.SetAnimationDirection(direction == AnimationDirection::FORWARD ? 1 : -1);
+  this->Internals->Anim.ToggleAnimation();
   return *this;
 }
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::startAnimation(AnimationDirection direction)
 {
-  assert(this->Internals->AnimationManager);
-  this->Internals->AnimationManager->SetAnimationDirection(
-    direction == AnimationDirection::FORWARD ? 1 : -1);
-  this->Internals->AnimationManager->StartAnimation();
+  this->Internals->Anim.SetAnimationDirection(direction == AnimationDirection::FORWARD ? 1 : -1);
+  this->Internals->Anim.StartAnimation();
   return *this;
 }
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::stopAnimation()
 {
-  assert(this->Internals->AnimationManager);
-  this->Internals->AnimationManager->StopAnimation();
+  this->Internals->Anim.StopAnimation();
   return *this;
 }
 
 //----------------------------------------------------------------------------
 bool interactor_impl::isPlayingAnimation()
 {
-  assert(this->Internals->AnimationManager);
-  return this->Internals->AnimationManager->IsPlaying();
+  return this->Internals->Anim.IsPlaying();
 }
 
 //----------------------------------------------------------------------------
 interactor::AnimationDirection interactor_impl::getAnimationDirection()
 {
-  assert(this->Internals->AnimationManager);
-  return this->Internals->AnimationManager->GetAnimationDirection() == 1
-    ? AnimationDirection::FORWARD
-    : AnimationDirection::BACKWARD;
+  return this->Internals->Anim.GetAnimationDirection() == 1 ? AnimationDirection::FORWARD
+                                                            : AnimationDirection::BACKWARD;
 }
 
 //----------------------------------------------------------------------------
@@ -2144,12 +2138,6 @@ interactor& interactor_impl::requestStop()
 {
   this->Internals->StopRequested = true;
   return *this;
-}
-
-//----------------------------------------------------------------------------
-void interactor_impl::SetAnimationManager(animationManager* manager)
-{
-  this->Internals->AnimationManager = manager;
 }
 
 //----------------------------------------------------------------------------

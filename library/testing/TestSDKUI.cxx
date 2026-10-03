@@ -28,7 +28,7 @@ int TestSDKUI([[maybe_unused]] int argc, char* argv[])
 
   f3d::scene& sce = eng.getScene();
   sce.add(std::string(argv[1]) + "/data/BoxAnimated.gltf");
-  sce.loadAnimationTime(0.5);
+  sce.getAnimation().loadTime(0.5);
 
   win.render();
 

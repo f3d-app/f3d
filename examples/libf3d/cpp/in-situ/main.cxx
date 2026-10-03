@@ -121,7 +121,7 @@ int main(int argc, char** argv)
     [&](const std::vector<std::string>&)
     {
       solver.initialize();
-      eng.getScene().loadAnimationTime(0.0);
+      eng.getScene().getAnimation().loadTime(0.0);
     },
     f3d::interactor::command_documentation_t{ "reset_simulation", "Reset simulation" });
 

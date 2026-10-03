@@ -48,9 +48,6 @@ def test_scene():
 
     assert engine.window.get_dpi_scale() >= 1.0
 
-    assert engine.scene.animation_time_range() == (0.0, 4.0)
-    engine.scene.load_animation_time(2)
-
     img = engine.window.render_to_image()
     img.save(output)
 
