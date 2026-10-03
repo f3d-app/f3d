@@ -389,8 +389,8 @@ EMSCRIPTEN_BINDINGS(f3d)
       "getNames",
       +[](f3d::animation& animation) { return containerToJSArray(animation.getNames()); });
 
-    // f3d::scene
-    emscripten::enum_<f3d::file_availability>("FileAvailability")
+  // f3d::scene
+  emscripten::enum_<f3d::file_availability>("FileAvailability")
     .value("SUPPORTED", f3d::file_availability::SUPPORTED)
     .value("UNSUPPORTED_EXTENSION", f3d::file_availability::UNSUPPORTED_EXTENSION)
     .value("UNSUPPORTED_CONTENT", f3d::file_availability::UNSUPPORTED_CONTENT);
@@ -515,9 +515,9 @@ EMSCRIPTEN_BINDINGS(f3d)
         jsInfo.set("numberOfPoints", info.numberOfPoints);
         jsInfo.set("numberOfCells", info.numberOfCells);
         return jsInfo;
-      });
+      })
   .function(
-    "getAnimation", &f3d::engine::getAnimation, emscripten::return_value_policy::reference())
+    "getAnimation", &f3d::engine::getAnimation, emscripten::return_value_policy::reference());
 
     // f3d::image
     emscripten::enum_<f3d::image::SaveFormat>("ImageSaveFormat")
