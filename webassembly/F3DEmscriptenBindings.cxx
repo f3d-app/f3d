@@ -516,15 +516,15 @@ EMSCRIPTEN_BINDINGS(f3d)
         jsInfo.set("numberOfCells", info.numberOfCells);
         return jsInfo;
       })
-  .function(
-    "getAnimation", &f3d::engine::getAnimation, emscripten::return_value_policy::reference());
+    .function(
+      "getAnimation", &f3d::scene::getAnimation, emscripten::return_value_policy::reference());
 
-    // f3d::image
-    emscripten::enum_<f3d::image::SaveFormat>("ImageSaveFormat")
-      .value("PNG", f3d::image::SaveFormat::PNG)
-      .value("JPG", f3d::image::SaveFormat::JPG)
-      .value("TIF", f3d::image::SaveFormat::TIF)
-      .value("BMP", f3d::image::SaveFormat::BMP);
+  // f3d::image
+  emscripten::enum_<f3d::image::SaveFormat>("ImageSaveFormat")
+    .value("PNG", f3d::image::SaveFormat::PNG)
+    .value("JPG", f3d::image::SaveFormat::JPG)
+    .value("TIF", f3d::image::SaveFormat::TIF)
+    .value("BMP", f3d::image::SaveFormat::BMP);
 
   emscripten::enum_<f3d::image::ChannelType>("ImageChannelType")
     .value("BYTE", f3d::image::ChannelType::BYTE)
