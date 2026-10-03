@@ -17,6 +17,11 @@
 namespace emscripten::internal
 {
 template<>
+void raw_destructor(f3d::animation* ptr)
+{
+}
+
+template<>
 void raw_destructor(f3d::scene* ptr)
 {
 }
