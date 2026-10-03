@@ -1,7 +1,7 @@
 ## Tests that needs draco plugin
 ## This file is only added if draco is enabled
 f3d_test(NAME TestDRACO DATA suzanne.drc PLUGIN draco)
-f3d_test(NAME TestDRACOColoring DATA suzanne.drc PLUGIN draco ARGS --scalar-coloring --coloring-component=0)
+f3d_test(NAME TestDRACOColoring DATA suzanne.drc PLUGIN draco ARGS --coloring-mode=scivis --coloring-component=0)
 f3d_test(NAME TestGLTFDracoImporter DATA Box_draco.glb PLUGIN draco ARGS --verbose)
 f3d_test(NAME TestGLTFDracoImporterWithoutCompression DATA BoxAnimated.gltf PLUGIN draco ARGS --animation-time=2 --animation-progress --force-reader=GLTFDraco UI)
 

@@ -475,7 +475,7 @@ Set the Backface type. Model-specified by default.
 ### `--color=<color>` (_color_)
 
 Set a _color_ on the geometry. Multiplied with the base color texture when present.
-Model-specified by default. Overridden by `--scalar-coloring`.
+Model-specified by default. Ignored if `--coloring-mode` is not `material`.
 
 #### compare
 
@@ -771,9 +771,14 @@ _Adjust the intensity_ of every light in the scene, including HDRI image-based l
 
 ## Scientific visualization options
 
-### `-s`, `--scalar-coloring` (_bool_, default: `false`)
+### `-s`, `--coloring-mode` (_bool_, default: `scivis`)
 
-Enable scalar coloring if present in the file. If `--coloring-array` is not set, the first in alphabetical order will be picked if any are available.
+Specify the coloring mode.
+_material_ means default file materials (textured or solid color)
+_scivis_ and _direct_ mean the array specified with option `--coloring-array` will be used for coloring (or the first available if not set)
+In the case of _scivis_, the array is mapped to a color using the colormap defined in `--colormap`
+In the case of _direct_, it is assumed that the array defines colors directly as L, LA, RGB, RGBA values depending on the number of components.
+Use <kbd>S</kbd> to cycle at runtime.
 
 #### compare
 
@@ -784,6 +789,8 @@ Enable scalar coloring if present in the file. If `--coloring-array` is not set,
 ### `--coloring-array=<array_name>` (_string_)
 
 The coloring array name to use when coloring.
+Use with `--coloring-mode=scivis` or Use with `--coloring-mode=direct`.
+Use <kbd>Y</kbd> to cycle at runtime.
 Use `--verbose` to recover the usable array names.
 
 #### compare
@@ -792,11 +799,12 @@ Use `--verbose` to recover the usable array names.
 | --------------------------------------- | --------------------------------------- |
 | ![](./images/coloring_array_normal.png) | ![](./images/coloring_array_height.png) |
 
-### `-y`, `--coloring-component=<comp_index>` (_int_, default: `-1`, implicit: `-2`)
+### `-y`, `--coloring-component=<comp_index>` (_int_, implicit: `0`)
 
 Specify the _component from the scalar_ array to color with.
-Use with the scalar option. -1 means _magnitude_. -2 means _direct values_.
-When using _direct values_, components are used as L, LA, RGB, RGBA values depending on the number of components.
+If the option is not specified, uses the _magnitude_ of the array.
+Use with `--coloring-mode=scivis`.
+Use <kbd>Shift</kbd>+<kbd>Y</kbd> to cycle at runtime.
 
 #### compare
 
@@ -804,14 +812,15 @@ When using _direct values_, components are used as L, LA, RGB, RGBA values depen
 | -------------------------------------- | -------------------------------------- |
 | ![](./images/coloring_component_x.png) | ![](./images/coloring_component_y.png) |
 
-### `-c`, `--coloring-by-cells` (_bool_, default: `false`)
+### `--coloring-field` (_string_, default: `any`)
 
-Specify that the scalar array is to be found _on the cells_ instead of on the points.
-Use with the scalar option.
+Specify that the scalar array field to color with (`any`, `points`, or `cells`).
+Use with `--coloring-mode=scivis` or `--coloring-mode=direct`.
+Use if a point array and a cell array have the same name or if you want to skip a field when cycling with <kbd>Y</kbd> at runtime.
 
 #### compare
 
-| OFF                                     | ON                                     |
+| points                                  | cells                                  |
 | --------------------------------------- | -------------------------------------- |
 | ![](./images/coloring_by_cells_off.png) | ![](./images/coloring_by_cells_on.png) |
 
@@ -819,7 +828,7 @@ Use with the scalar option.
 
 Set the _coloring range_. Automatically computed by default.
 When automatically computed and minimum and maximum values are nearly equal, the object is colored with the mid value.
-Use with the scalar option.
+Use with `--coloring-mode=scivis`.
 
 #### compare
 
@@ -830,7 +839,7 @@ Use with the scalar option.
 ### `-b`, `--coloring-scalar-bar` (_bool_, default: `false`)
 
 Show _scalar bar_ of the coloring by array.
-Use with the scalar option.
+Use with `--coloring-mode=scivis`.
 
 #### compare
 
@@ -842,7 +851,7 @@ Use with the scalar option.
 
 Set a _colormap file for the coloring_.
 See [color maps](10-COLOR_MAPS.md).
-Use with the scalar option.
+Use with `--coloring-mode=scivis`.
 
 #### compare
 
@@ -854,11 +863,12 @@ Use with the scalar option.
 
 Set a _custom colormap for the coloring_.See [colormap parsing](08-PARSING.md#colormap) for details.
 Ignored if `--colormap-file` option is specified.
-Use with the scalar option.
+Use with `--coloring-mode=scivis`.
 
 ### `--colormap-discretization=<colors>` (_int_)
 
 Set the number of distinct colors from [1, N] will be used in the colormap. Any values outside the valid range will result in smooth shading.
+Use with `--coloring-mode=scivis`.
 
 #### compare
 
@@ -869,6 +879,7 @@ Set the number of distinct colors from [1, N] will be used in the colormap. Any 
 ### `-v`, `--volume` (_bool_, default: `false`)
 
 Enable _volume rendering_. It is only functional for 3D image data (VTKXMLVTI, DICOM, NRRD, MetaImage files) and will display nothing with other formats. It forces coloring.
+Warn if not used with `--coloring-mode=scivis` or `--coloring-mode=scivis`.
 
 #### compare
 
@@ -1037,7 +1048,7 @@ Add a final shader to the output image. See the [dedicated documentation](11-FIN
 
 ### `--display-depth` (_bool_, default: `false`)
 
-Display the depth buffer as a grayscale image or with a colormap if `--scalar-coloring` is specified.
+Display the depth buffer as a grayscale image or with a colormap if `--coloring-mode` is `scivis`.
 Only opaque objects are displayed, the grid and translucent/volumetric objects are ignored.
 
 #### compare

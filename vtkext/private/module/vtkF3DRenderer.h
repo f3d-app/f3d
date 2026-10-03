@@ -85,6 +85,26 @@ public:
     CROSS
   };
 
+  /**
+   * Enum listing possible coloring modes.
+   */
+  enum class ColoringMode : unsigned char
+  {
+    MATERIAL,
+    SCIVIS,
+    DIRECT
+  };
+
+  /**
+   * Enum listing possible data fields modes.
+   */
+  enum class DataField : unsigned char
+  {
+    POINTS,
+    CELLS,
+    ANY
+  };
+
   ///@{
   /**
    * Set visibility of different actors
@@ -428,10 +448,13 @@ public:
 
   ///@{
   /**
-   * Set/Get if coloring is enabled
+   * Set/Get the coloring mode (MATERIAL, SCIVIS, DIRECT)
    */
-  void SetEnableColoring(bool enable);
-  vtkGetMacro(EnableColoring, bool);
+  void SetColoring(ColoringMode mode);
+  inline ColoringMode GetColoring() const
+  {
+    return this->Coloring;
+  };
   ///@}
 
   /**
@@ -446,10 +469,13 @@ public:
 
   ///@{
   /**
-   * Set/Get if using point or cell data coloring
+   * Set/Get if using point or cell data coloring (or all)
    */
-  void SetUseCellColoring(bool useCell);
-  vtkGetMacro(UseCellColoring, bool);
+  void SetDataFieldForColoring(const DataField& dataField);
+  inline DataField GetDataFieldForColoring() const
+  {
+    return this->DataFieldForColoring;
+  }
   ///@}
 
   ///@{
@@ -457,15 +483,18 @@ public:
    * Set/Get the name of the array to use for coloring
    */
   void SetArrayNameForColoring(const std::optional<std::string>& arrayName);
-  std::optional<std::string> GetArrayNameForColoring();
+  std::optional<std::string> GetArrayNameForColoring() const;
   ///@}
 
   ///@{
   /**
    * Set/Get the name of the component to use for coloring
    */
-  void SetComponentForColoring(int component);
-  vtkGetMacro(ComponentForColoring, int);
+  void SetComponentForColoring(const std::optional<int>& component);
+  inline std::optional<int> GetComponentForColoring() const
+  {
+    return this->ComponentForColoring;
+  }
   ///@}
 
   /**
@@ -482,10 +511,9 @@ public:
   virtual std::string GetColoringDescription();
 
   /**
-   * Switch between point data and cell data coloring, actually setting UseCellColoring member.
-   * This can trigger CycleArrayForColoring if current array is not valid.
+   * Switch between coloring mode.
    */
-  void CycleFieldForColoring();
+  void CycleModeForColoring();
 
   /**
    * Cycle the current array for coloring, actually setting EnableColoring and ArrayNameForColoring
@@ -501,11 +529,20 @@ public:
   void CycleComponentForColoring();
 
   /**
-   * Convert a component index into a string
-   * If there is a component name defined in the current coloring information, display it.
+   * Return a string representation of the component index.
+   * If component is not set, returns "Magnitude"
+   * Otherwise if there is a component name defined in the current coloring information, display it.
    * Otherwise, use component #index as the default value.
    */
-  std::string ComponentToString(int component);
+  std::string ComponentToString();
+
+  /**
+   * Return a string representation of the array name for coloring.
+   * If array is not set, returns "OFF"
+   * Otherwise if there is an array name defined in the current coloring information, display it.
+   * Otherwise, use the array #index as the default value.
+   */
+  std::string ArrayToString();
 
   /**
    * Return true if the cheatsheet info is potentially
@@ -698,16 +735,18 @@ private:
    * Return true if mapper was configured for coloring, false otherwise.
    */
   static bool ConfigureMapperForColoring(vtkPolyDataMapper* mapper, const std::string& name,
-    int component, vtkColorTransferFunction* ctf, double range[2], bool cellFlag = false);
+    bool directColor, const std::optional<int>& component, vtkColorTransferFunction* ctf,
+    double range[2], bool cellFlag = false);
 
   /**
    * Convenience method for configuring a volume mapper and volume prop for coloring
    * Return true if they were configured for coloring, false otherwise.
    */
   static bool ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vtkVolume* volume,
-    const std::string& name, int component, vtkColorTransferFunction* ctf,
-    const std::vector<double>& opacityMap, double range[2], bool& opacityTransferFunctionConfigured,
-    bool cellFlag = false, bool inverseOpacityFlag = false);
+    const std::string& name, bool directColor, const std::optional<int>& component,
+    vtkColorTransferFunction* ctf, const std::vector<double>& opacityMap, double range[2],
+    bool& opacityTransferFunctionConfigured, bool cellFlag = false,
+    bool inverseOpacityFlag = false);
 
   /**
    * Configure opacity transfer function for volume rendering
@@ -718,8 +757,8 @@ private:
   /**
    * Convenience method for configuring a scalar bar actor for coloring
    */
-  void ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar, std::string arrayName,
-    int component, vtkColorTransferFunction* ctf);
+  void ConfigureScalarBarActorForColoring(
+    vtkScalarBarActor* scalarBar, std::string arrayName, vtkColorTransferFunction* ctf);
 
   /**
    * Configure internal range and color transfer function according to provided
@@ -907,9 +946,9 @@ private:
   bool ColorTransferFunctionConfigured = false;
   bool OpacityTransferFunctionConfigured = false;
 
-  bool EnableColoring = false;
-  bool UseCellColoring = false;
-  int ComponentForColoring = -1;
+  ColoringMode Coloring = ColoringMode::MATERIAL;
+  DataField DataFieldForColoring = DataField::ANY;
+  std::optional<int> ComponentForColoring = std::nullopt;
   std::optional<std::string> ArrayNameForColoring;
 
   bool ScalarBarVisible = false;

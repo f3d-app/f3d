@@ -44,11 +44,11 @@ int TestSDKEngine([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // Test option setters
   f3d::options opt;
-  opt.model.scivis.cells = true;
+  opt.model.scivis.field = "cells";
 
   eng0.setOptions(opt);
   test("set options value using f3d::engine::setOptions(const options& opt)",
-    eng0.getOptions().model.scivis.cells);
+    eng0.getOptions().model.scivis.field == "cells");
 
   opt.render.line_width = 1.7;
   eng0.setOptions(std::move(opt));

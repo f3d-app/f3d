@@ -12,7 +12,7 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   test("hasDomain range", opt.hasDomain("scene.animation.speed_factor"));
   test("hasDomain enum", opt.hasDomain("render.effect.blending.mode"));
   test("hasDomain index", opt.hasDomain("scene.camera.index"));
-  test("hasDomain false", !opt.hasDomain("model.scivis.cells"));
+  test("hasDomain false", !opt.hasDomain("scene.camera.orthographic"));
   test.expect<f3d::options::inexistent_exception>(
     "hasDomain inexistent", [&]() { std::ignore = opt.hasDomain("inexistent"); });
 
@@ -24,7 +24,7 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   test("getDomainStyle index",
     opt.getDomainStyle("scene.camera.index") == f3d::options::domain_style::INDEX);
   test.expect<f3d::options::incompatible_exception>("getDomainStyle incompatible",
-    [&]() { std::ignore = opt.getDomainStyle("model.scivis.cells"); });
+    [&]() { std::ignore = opt.getDomainStyle("scene.camera.orthographic"); });
 
   // Test getRangeDomain
   f3d::options::DomainRange<f3d::option_variant_t> doubleRange =
@@ -51,7 +51,7 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   test.expect<f3d::options::incompatible_exception>("getRangeDomain incompatible enum",
     [&]() { std::ignore = opt.getRangeDomain("render.effect.blending.mode"); });
   test.expect<f3d::options::incompatible_exception>("getRangeDomain incompatible",
-    [&]() { std::ignore = opt.getRangeDomain("model.scivis.cells"); });
+    [&]() { std::ignore = opt.getRangeDomain("scene.camera.orthographic"); });
   test.expect<f3d::options::inexistent_exception>(
     "getRangeDomain inexistent", [&]() { std::ignore = opt.getRangeDomain("inexistent"); });
 
@@ -63,15 +63,15 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
     [](const auto& value) { return std::get<std::string>(value); });
   test("getEnumDomain", enumeration, { "none", "ddp", "sort", "sort_cpu", "stochastic" });
 
-  test.expect<f3d::options::incompatible_exception>(
-    "getEnumDomain incompatible", [&]() { std::ignore = opt.getEnumDomain("model.scivis.cells"); });
+  test.expect<f3d::options::incompatible_exception>("getEnumDomain incompatible",
+    [&]() { std::ignore = opt.getEnumDomain("scene.camera.orthographic"); });
   test.expect<f3d::options::inexistent_exception>(
     "getEnumDomain inexistent", [&]() { std::ignore = opt.getEnumDomain("inexistent"); });
 
   // Test getIndexDomain
   test("getEnumDomain", !opt.getIndexDomain("scene.camera.index").max.has_value());
   test.expect<f3d::options::incompatible_exception>("getEnumDomain incompatible",
-    [&]() { std::ignore = opt.getIndexDomain("model.scivis.cells"); });
+    [&]() { std::ignore = opt.getIndexDomain("scene.camera.orthographic"); });
   test.expect<f3d::options::inexistent_exception>(
     "getEnumDomain inexistent", [&]() { std::ignore = opt.getIndexDomain("inexistent"); });
 

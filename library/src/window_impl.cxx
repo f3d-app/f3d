@@ -709,8 +709,32 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetEnableCheckerBoard(opt.model.checkerboard.enable);
   renderer->SetUnlit(opt.model.unlit);
 
-  renderer->SetEnableColoring(opt.model.scivis.enable);
-  renderer->SetUseCellColoring(opt.model.scivis.cells);
+  if (opt.model.coloring == "scivis")
+  {
+    renderer->SetColoring(vtkF3DRenderer::ColoringMode::SCIVIS);
+  }
+  else if (opt.model.coloring == "material")
+  {
+    renderer->SetColoring(vtkF3DRenderer::ColoringMode::MATERIAL);
+  }
+  else if (opt.model.coloring == "direct")
+  {
+    renderer->SetColoring(vtkF3DRenderer::ColoringMode::DIRECT);
+  }
+
+  if (opt.model.scivis.field == "points")
+  {
+    renderer->SetDataFieldForColoring(vtkF3DRenderer::DataField::POINTS);
+  }
+  else if (opt.model.scivis.field == "cells")
+  {
+    renderer->SetDataFieldForColoring(vtkF3DRenderer::DataField::CELLS);
+  }
+  else
+  {
+    renderer->SetDataFieldForColoring(vtkF3DRenderer::DataField::ANY);
+  }
+
   renderer->SetArrayNameForColoring(opt.model.scivis.array_name);
   renderer->SetComponentForColoring(opt.model.scivis.component);
 

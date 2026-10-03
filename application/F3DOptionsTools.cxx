@@ -56,7 +56,7 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
       "View a unstructured mesh in a typical nice looking sciviz style" },
     { execName + " file.glb -tuqap --hdri-file=file.hdr --hdri-ambient --hdri-skybox",
       "View a gltf file in a realistic environment" },
-    { execName + " file.ply -so --point-size=0 --coloring-component=-2",
+    { execName + " file.ply -o --point-size=0 --coloring-mode=direct",
       "View a point cloud file with direct scalars rendering" },
     { execName + " folder", "View all files in folder" },
   } };

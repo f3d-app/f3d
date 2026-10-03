@@ -3,7 +3,7 @@
     "match-type": "glob",
     "match": "*.{dcm,nrrd,nhdr,mhd,mha,vtp,vtu,vtr,vti,vts,vtm}",
     "options": {
-      "scalar-coloring": true,
+      "coloring-mode": "scivis",
       "coloring-scalar-bar": true
     }
   },
@@ -26,16 +26,15 @@
     "match-type": "glob",
     "match": "*.{stl,gml,pts}",
     "options": {
-      "scalar-coloring": true
+      "coloring-mode": "scivis"
     }
   },
   {
     "match-type": "glob",
     "match": "*.{tif,tiff}",
     "options": {
-      "scalar-coloring": true,
+      "coloring-mode": "direct",
       "up": "-Y",
-      "coloring-component": "-2",
       "camera-direction": "-1,0.5,1"
     }
   },
@@ -53,8 +52,7 @@
     "match-type": "glob",
     "match": "*.ply",
     "options": {
-      "scalar-coloring": true,
-      "coloring-component": "-2",
+      "coloring-mode": "direct",
       "blending": "ddp"
     }
   },
@@ -65,9 +63,8 @@
       "point-sprites": "gaussian",
       "point-sprites-absolute-size": true,
       "point-sprites-size": 1,
-      "scalar-coloring": true,
+      "coloring-mode": "direct",
       "coloring-array": "color",
-      "coloring-component": "-2",
       "background-color": "0, 0, 0",
       "interaction-style": "trackball",
       "tone-mapping": false,

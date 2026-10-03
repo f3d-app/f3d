@@ -317,7 +317,7 @@ f3d_test_doc(NAME TestDocHDRICOC50 DATA DamagedHelmet.glb REF_IMAGE hdri_coc_50.
 f3d_test_doc(NAME TestDocLightIntensity1 DATA DamagedHelmet.glb REF_IMAGE light_intensity_1.png ROTATE)
 f3d_test_doc(NAME TestDocLightIntensity2 DATA DamagedHelmet.glb REF_IMAGE light_intensity_2.png ROTATE ARGS --light-intensity=2)
 
-## --scalar-coloring
+## --coloring-mode
 f3d_test_doc(NAME TestDocScalarColoringOFF DATA dragon.vtu REF_IMAGE scalar_coloring_off.png ROTATE ARGS)
 f3d_test_doc(NAME TestDocScalarColoringON DATA dragon.vtu REF_IMAGE scalar_coloring_on.png ROTATE ARGS -s --coloring-component=2)
 
@@ -329,9 +329,9 @@ f3d_test_doc(NAME TestDocColoringArrayHeight DATA dragon.vtu REF_IMAGE coloring_
 f3d_test_doc(NAME TestDocColoringComponentX DATA dragon.vtu REF_IMAGE coloring_component_x.png ROTATE ARGS -s --coloring-array=Normals --coloring-component=0)
 f3d_test_doc(NAME TestDocColoringComponentY DATA dragon.vtu REF_IMAGE coloring_component_y.png ROTATE ARGS -s --coloring-array=Normals --coloring-component=1)
 
-## --coloring-by-cells
-f3d_test_doc(NAME TestDocColoringByCellsOFF DATA ${F3D_SOURCE_DIR}/testing/data/waveletArrays.vti REF_IMAGE coloring_by_cells_off.png ROTATE ARGS -fes --line-width=4)
-f3d_test_doc(NAME TestDocColoringByCellsON DATA ${F3D_SOURCE_DIR}/testing/data/waveletArrays.vti REF_IMAGE coloring_by_cells_on.png ROTATE ARGS -fesc  --line-width=4)
+## --coloring-field
+f3d_test_doc(NAME TestDocColoringByCellsOFF DATA ${F3D_SOURCE_DIR}/testing/data/waveletArrays.vti REF_IMAGE coloring_by_cells_off.png ROTATE ARGS -fes --coloring-field=points --line-width=4)
+f3d_test_doc(NAME TestDocColoringByCellsON DATA ${F3D_SOURCE_DIR}/testing/data/waveletArrays.vti REF_IMAGE coloring_by_cells_on.png ROTATE ARGS -fes --coloring-field=cells --line-width=4)
 
 ## --coloring-range
 f3d_test_doc(NAME TestDocColoringRangeAuto DATA skull.vti REF_IMAGE coloring_range_auto.png ARGS -sv --up=z)

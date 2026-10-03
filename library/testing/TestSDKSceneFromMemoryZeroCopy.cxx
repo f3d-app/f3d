@@ -324,8 +324,8 @@ int TestSDKSceneFromMemoryZeroCopy([[maybe_unused]] int argc, char* argv[])
 
   eng.getOptions().ui.animation_progress = "default";
   eng.getOptions().render.show_edges = true;
-  eng.getOptions().model.scivis.enable = true;
-  eng.getOptions().model.scivis.cells = true;
+  eng.getOptions().model.coloring = "scivis";
+  eng.getOptions().model.scivis.field = "cells";
   eng.getOptions().ui.scalar_bar = true;
   eng.getOptions().ui.scene_hierarchy = true;
 
@@ -402,7 +402,7 @@ int TestSDKSceneFromMemoryZeroCopy([[maybe_unused]] int argc, char* argv[])
   inter.triggerEventLoop(1.0); // advance animation by 1 second
 
   eng.getOptions().model.scivis.array_name = "velocity";
-  eng.getOptions().model.scivis.cells = false;
+  eng.getOptions().model.scivis.field = "points";
 
   // Render test
   test("render mesh at time 1.0",
@@ -412,7 +412,7 @@ int TestSDKSceneFromMemoryZeroCopy([[maybe_unused]] int argc, char* argv[])
   inter.triggerEventLoop(1.0); // advance animation by 1 second
 
   eng.getOptions().model.scivis.array_name = "quad_coords";
-  eng.getOptions().model.scivis.cells = true;
+  eng.getOptions().model.scivis.field = "cells";
   eng.getOptions().model.scivis.component = 0;
 
   // Render test
