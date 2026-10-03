@@ -36,7 +36,6 @@ void vtkF3DPolyDataMapper::SetUseLinearColorSpace(bool use)
   {
     this->UseLinearColorSpace = use;
     this->ClearColorArrays();
-    this->LinearColors = nullptr;
     this->LinearColorTextureMap = nullptr;
     this->Modified();
   }
@@ -53,41 +52,6 @@ vtkUnsignedCharArray* vtkF3DPolyDataMapper::MapScalars(
     return this->Colors;
   }
 
-  // Not cached, linear convert.
-  if (this->Colors && this->Colors != this->LinearColors)
-  {
-    // Approx. linear RGB precomputation for every possible channel value from 0-255.
-    static const std::array<unsigned char, 256> toLinear = []
-    {
-      std::array<unsigned char, 256> values{};
-      for (std::size_t i = 0; i < values.size(); ++i)
-      {
-        values[i] = static_cast<unsigned char>(std::round(std::pow(i / 255.0, 2.2) * 255.0));
-      }
-      return values;
-    }();
-
-    // Direct RGBA colors can alias the input array. Decode a copy, keeping alpha unchanged.
-    this->LinearColors = vtkSmartPointer<vtkUnsignedCharArray>::New();
-    this->LinearColors->DeepCopy(this->Colors);
-    for (vtkIdType i = 0; i < this->LinearColors->GetNumberOfTuples(); ++i)
-    {
-      unsigned char* color =
-        this->LinearColors->GetPointer(i * this->LinearColors->GetNumberOfComponents());
-      for (int component = 0; component < 3; ++component)
-      {
-        color[component] = toLinear[color[component]]; // Lookup
-      }
-    }
-    this->Colors->UnRegister(this);
-    this->Colors = this->LinearColors;
-    this->Colors->Register(this);
-  }
-  else if (!this->Colors)
-  {
-    this->LinearColors = nullptr;
-  }
-
   if (this->ColorTextureMap && this->ColorTextureMap != this->LinearColorTextureMap)
   {
     // Use floats for the lookup texture to retain dark colors after decoding.
@@ -100,7 +64,7 @@ vtkUnsignedCharArray* vtkF3DPolyDataMapper::MapScalars(
     {
       for (int component = 0; component < 4; ++component)
       {
-        double value = source->GetComponent(i, component) / 255.0;
+        const double value = source->GetComponent(i, component) / 255.0;
         // Approx. color components converted to linear except alpha channel.
         destination->SetComponent(i, component, component < 3 ? std::pow(value, 2.2) : value);
       }
