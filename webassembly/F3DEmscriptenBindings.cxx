@@ -376,8 +376,7 @@ EMSCRIPTEN_BINDINGS(f3d)
 
   // f3d::animation
   emscripten::class_<f3d::animation>("Animation")
-    .function("loadTime", &f3d::animation::loadTime,
-      emscripten::return_value_policy::reference())
+    .function("loadTime", &f3d::animation::loadTime, emscripten::return_value_policy::reference())
     .function(
       "timeRange", +[](f3d::animation& animation) -> emscripten::val
       { return pairToJSArray(animation.timeRange()); })
@@ -388,10 +387,10 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("getName", &f3d::animation::getName)
     .function(
       "getNames",
-      +[](f3d::animation& animation) { return containerToJSArray(animation.getNames()); })
+      +[](f3d::animation& animation) { return containerToJSArray(animation.getNames()); });
 
-  // f3d::scene
-  emscripten::enum_<f3d::file_availability>("FileAvailability")
+    // f3d::scene
+    emscripten::enum_<f3d::file_availability>("FileAvailability")
     .value("SUPPORTED", f3d::file_availability::SUPPORTED)
     .value("UNSUPPORTED_EXTENSION", f3d::file_availability::UNSUPPORTED_EXTENSION)
     .value("UNSUPPORTED_CONTENT", f3d::file_availability::UNSUPPORTED_CONTENT);
@@ -517,14 +516,15 @@ EMSCRIPTEN_BINDINGS(f3d)
         jsInfo.set("numberOfCells", info.numberOfCells);
         return jsInfo;
       });
-    .function("getAnimation", &f3d::engine::getAnimation, emscripten::return_value_policy::reference())
+  .function(
+    "getAnimation", &f3d::engine::getAnimation, emscripten::return_value_policy::reference())
 
-  // f3d::image
-  emscripten::enum_<f3d::image::SaveFormat>("ImageSaveFormat")
-    .value("PNG", f3d::image::SaveFormat::PNG)
-    .value("JPG", f3d::image::SaveFormat::JPG)
-    .value("TIF", f3d::image::SaveFormat::TIF)
-    .value("BMP", f3d::image::SaveFormat::BMP);
+    // f3d::image
+    emscripten::enum_<f3d::image::SaveFormat>("ImageSaveFormat")
+      .value("PNG", f3d::image::SaveFormat::PNG)
+      .value("JPG", f3d::image::SaveFormat::JPG)
+      .value("TIF", f3d::image::SaveFormat::TIF)
+      .value("BMP", f3d::image::SaveFormat::BMP);
 
   emscripten::enum_<f3d::image::ChannelType>("ImageChannelType")
     .value("BYTE", f3d::image::ChannelType::BYTE)

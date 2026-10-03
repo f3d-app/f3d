@@ -1,7 +1,6 @@
 import utils from "./utils.js";
 
 const settings = {
-
   runAfter: (Module) => {
     const anim = Module.engineInstance.getScene().getAnimation();
 
