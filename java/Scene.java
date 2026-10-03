@@ -49,6 +49,7 @@ public class Scene {
 
     public Scene(long nativeAddress) {
         mNativeAddress = nativeAddress;
+        mAnimation = new Animation(mNativeAddress);
     }
 
     /**
@@ -197,7 +198,8 @@ public class Scene {
      * Get the animation
      * @return Animation instance
      */
-    public native Animation getAnimation();
+    public Animation getAnimation() { return mAnimation; }
 
     private long mNativeAddress;
+    private Animation mAnimation;
 }

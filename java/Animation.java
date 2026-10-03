@@ -4,6 +4,10 @@ import java.util.List;
 
 public class Animation {
 
+    public Animation(long nativeAddress) {
+        mNativeAddress = nativeAddress;
+    }
+
     /**
      * Load files in the scene at provided time value if they contain any animation.
      *

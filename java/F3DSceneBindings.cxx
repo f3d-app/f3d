@@ -466,14 +466,4 @@ extern "C"
       env->GetStaticMethodID(enumClass, "fromValue", "(I)Lapp/f3d/F3D/Scene$FileAvailability;");
     return env->CallStaticObjectMethod(enumClass, fromValueMethod, static_cast<int>(result));
   }
-
-  JNIEXPORT jobject JAVA_BIND(Scene, getAnimation)(JNIEnv* env, jobject self)
-  {
-    f3d::animation& animation = GetEngine(env, self)->getScene().getAnimation();
-
-    const JniLocalRef<jclass> animationClass(env, env->FindClass("app/f3d/F3D/Animation"));
-    jmethodID constructor = env->GetMethodID(animationClass, "<init>", "(J)V");
-
-    return env->NewObject(animationClass, constructor, reinterpret_cast<jlong>(&animation));
-  }
 }
