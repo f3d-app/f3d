@@ -46,6 +46,8 @@ def test_scene():
     engine.scene.add(sphere1)
     engine.scene.add([sphere2, cube])
 
+    engine.scene.animation.load_time(2)
+
     assert engine.window.get_dpi_scale() >= 1.0
 
     img = engine.window.render_to_image()

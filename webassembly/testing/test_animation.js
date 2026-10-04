@@ -5,11 +5,11 @@ const settings = {
     const anim = Module.engineInstance.getScene().getAnimation();
 
     utils.assert(
-      anim.availableAnimations() == 10,
+      anim.count() == 10,
       "There should be a single animation",
     );
 
-    const [start, end] = anim.animationTimeRange();
+    const [start, end] = anim.timeRange();
 
     utils.assert(start === 0, "Start value should be 0");
     utils.assert(
@@ -18,28 +18,28 @@ const settings = {
     );
 
     utils.assert(
-      anim.getAnimationKeyFrames().length === 9,
+      anim.keyFrames().length === 9,
       "KeyFrames length should be 9",
     );
     utils.assert(
-      anim.getAnimationKeyFrames()[0] === 0,
+      anim.keyFrames()[0] === 0,
       "First KeyFrame should be 0",
     );
     utils.assert(
-      anim.getAnimationKeyFrames()[8] === 0.7999999999999999,
+      anim.keyFrames()[8] === 0.7999999999999999,
       "First KeyFrame should be 0.7999999999999999",
     );
 
-    anim.loadAnimationTime(0.5);
+    anim.loadTime(0.5);
 
     utils.assert(
-      anim.getAnimationName(-1) == "stand",
+      anim.getName(-1) == "stand",
       "getAnimationName returns name",
     );
 
     // array comparison in JS is a little annoying so we just compare the 0th element
     utils.assert(
-      anim.getAnimationNames()[0] == "stand",
+      anim.getNames()[0] == "stand",
       "getAnimationNames returns names",
     );
   },

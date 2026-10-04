@@ -12,7 +12,7 @@ const settings = {
   },
 
   runAfter: (Module) => {
-    Module.engineInstance.getScene().loadAnimationTime(0.5);
+    Module.engineInstance.getScene().getAnimation().loadTime(0.5);
   },
 };
 

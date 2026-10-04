@@ -47,7 +47,7 @@ const settings = {
   runAfter: (Module) => {
     const scene = Module.engineInstance.getScene();
 
-    scene.getAnimation().loadAnimationTime(0.5);
+    scene.getAnimation().loadTime(0.5);
 
     const hierarchy = scene.getSceneHierarchy();
 

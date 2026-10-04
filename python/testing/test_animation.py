@@ -15,7 +15,7 @@ def test_animation():
 
     # Tests
 
-    # availableAnimations
+    # animation count
     assert engine.scene.animation.count() == 10
 
     keyframes = engine.scene.animation.key_frames()
