@@ -108,10 +108,10 @@ unsigned int animation_impl::count() const
 }
 
 //----------------------------------------------------------------------------
-std::string animation_impl::getName(int index) const
+std::string animation_impl::getName(std::optional<int> index) const
 {
   assert(this->Internals->Importer);
-  if (index == -1)
+  if (index == std::nullopt)
   {
     if (this->Internals->PreparedAnimationIndices.has_value() &&
       this->Internals->PreparedAnimationIndices.value().size() > 1)
@@ -140,13 +140,13 @@ std::string animation_impl::getName(int index) const
       this->Internals->PreparedAnimationIndices.value()[0]);
   }
 
-  if (this->Internals->AvailAnimations == 0 || index < 0 ||
-    index > this->Internals->AvailAnimations)
+  if (this->Internals->AvailAnimations == 0 || index.value() < 0 ||
+    index.value() > this->Internals->AvailAnimations)
   {
     return "No animation";
   }
 
-  return this->Internals->Importer->GetAnimationName(index);
+  return this->Internals->Importer->GetAnimationName(index.value());
 }
 
 //----------------------------------------------------------------------------

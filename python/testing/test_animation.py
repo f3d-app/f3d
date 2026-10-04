@@ -47,8 +47,11 @@ def test_animation():
     engine.interactor.stop_animation()
     assert engine.interactor.is_playing_animation() == 0
 
+    # getAnimationName current
+    assert engine.scene.animation.get_name() == "stand"
+
     # getAnimationName returns name at index
-    assert engine.scene.animation.get_name(0) == "stand"
+    assert engine.scene.animation.get_name(1) == "dead"
 
     # getAnimationName returns for out of range
     assert engine.scene.animation.get_name(9999) == "No animation"

@@ -62,6 +62,12 @@ extern "C"
     return GetEngine(env, self)->getScene().getAnimation().count();
   }
 
+  JNIEXPORT jstring JAVA_BIND(Animation, getCurrentName)(JNIEnv* env, jobject self)
+  {
+    return env->NewStringUTF(
+      GetEngine(env, self)->getScene().getAnimation().getName().c_str());
+  }
+
   JNIEXPORT jstring JAVA_BIND(Animation, getName)(JNIEnv* env, jobject self, jint index)
   {
     return env->NewStringUTF(

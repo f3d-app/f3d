@@ -40,7 +40,7 @@ public class TestAnimation {
     anim.timeRange();
     anim.keyFrames();
     anim.count();
-    anim.getName();
+    anim.getCurrentName();
     anim.getName(0);
     anim.getNames();
 

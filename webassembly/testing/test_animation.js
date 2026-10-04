@@ -23,7 +23,8 @@ const settings = {
 
     anim.loadTime(0.5);
 
-    utils.assert(anim.getName(-1) == "stand", "getAnimationName returns name");
+    utils.assert(anim.getName() == "stand", "getAnimationName returns name");
+    utils.assert(anim.getName(1) == "dead", "getAnimationName returns name");
 
     // array comparison in JS is a little annoying so we just compare the 0th element
     utils.assert(

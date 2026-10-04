@@ -42,10 +42,7 @@ public class Animation {
      *
      * @return animation names or string error
      */
-    public String getName() {
-        // note : -1 gets the current animation
-        return getName(-1);
-    }
+    public native String getCurrentName();
 
     /**
      * Get the animation name of a given animation index, if any.

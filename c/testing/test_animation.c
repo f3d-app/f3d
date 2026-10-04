@@ -59,8 +59,16 @@ int test_animation()
   }
   f3d_animation_destroy_keyframes(keyframes);
 
-  char* name = f3d_animation_get_name(anim, 0);
+  char* name = f3d_animation_get_current_name(anim);
   if (strcmp(name, "stand") != 0)
+  {
+    puts("[ERROR] Failed to recover expected current animation name");
+    return 1;
+  }
+  f3d_animation_destroy_string(name);
+
+  name = f3d_animation_get_name(anim, 1);
+  if (strcmp(name, "dead") != 0)
   {
     puts("[ERROR] Failed to recover expected animation name");
     return 1;

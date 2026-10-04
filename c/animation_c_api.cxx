@@ -70,6 +70,21 @@ unsigned int f3d_animation_count(const f3d_animation_t* animation)
 }
 
 //----------------------------------------------------------------------------
+char* f3d_animation_get_current_name(const f3d_animation_t* animation)
+{
+  if (!animation)
+  {
+    return nullptr;
+  }
+
+  const f3d::animation* cpp_animation = reinterpret_cast<const f3d::animation*>(animation);
+  const std::string str = cpp_animation->getName();
+  char* result = new char[str.length() + 1];
+  std::strcpy(result, str.c_str());
+  return result;
+}
+
+//----------------------------------------------------------------------------
 char* f3d_animation_get_name(const f3d_animation_t* animation, int index)
 {
   if (!animation)

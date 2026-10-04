@@ -47,15 +47,15 @@ public:
   /**
    * Return the animation name of a given animation index, if any.
    *
-   * Specific animation (0..count): Returns the name of the animation at that index
-   * Current animation (-1):
+   * Specific animation (0..count): Returns the name of the animation at that index, or
+   * or current animation name if no index is provided.
    *   - Returns the name of the current animation
    *   - Returns "Multi animations" if more than one animation is current
    *   - Returns "All animations" if all animations are current
    *   - Returns "No animations" if no animations are current
    * Fallback: Returns "No animation" for out-of-bounds requests.
    */
-  [[nodiscard]] virtual std::string getName(int index = -1) const = 0;
+  [[nodiscard]] virtual std::string getName(std::optional<int> index = std::nullopt) const = 0;
 
   /**
    * Return all of the animation names, if any.

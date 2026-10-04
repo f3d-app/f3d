@@ -66,12 +66,22 @@ extern "C"
    */
 
   /**
+   * @brief Get the current animation name.
+   *
+   * The returned string must be freed with f3d_animation_destroy_string().
+   *
+   * @param animation Animation handle.
+   * @return animation name, or NULL on failure.
+   */
+  F3D_EXPORT char* f3d_animation_get_current_name(const f3d_animation_t* animation);
+
+  /**
    * @brief Get the animation name at provided index.
    *
    * The returned string must be freed with f3d_animation_destroy_string().
    *
    * @param animation Animation handle.
-   * @param index Index of animation, -1 means current.
+   * @param index Index of animation.
    * @return animation name, or NULL on failure.
    */
   F3D_EXPORT char* f3d_animation_get_name(const f3d_animation_t* animation, int index);
