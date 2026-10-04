@@ -132,6 +132,74 @@ char** f3d_animation_get_names(const f3d_animation_t* animation, int* count)
 }
 
 //----------------------------------------------------------------------------
+void f3d_animation_toggle(
+  f3d_animation_t* animation, f3d_animation_direction_t direction)
+{
+  if (!animation)
+  {
+    return;
+  }
+
+  f3d::animation* cpp_animation = reinterpret_cast<f3d::animation*>(animation);
+  const f3d::animation::Direction cpp_direction =
+    static_cast<f3d::animation::Direction>(direction);
+  cpp_animation->toggle(cpp_direction);
+}
+
+//----------------------------------------------------------------------------
+void f3d_animation_start(
+  f3d_animation_t* animation, f3d_animation_direction_t direction)
+{
+  if (!animation)
+  {
+    return;
+  }
+
+  f3d::animation* cpp_animation = reinterpret_cast<f3d::animation*>(animation);
+  const f3d::animation::Direction cpp_direction =
+    static_cast<f3d::animation::Direction>(direction);
+  cpp_animation->start(cpp_direction);
+}
+
+//----------------------------------------------------------------------------
+void f3d_animation_stop(f3d_animation_t* animation)
+{
+  if (!animation)
+  {
+    return;
+  }
+
+  f3d::animation* cpp_animation = reinterpret_cast<f3d::animation*>(animation);
+  cpp_animation->stop();
+}
+
+//----------------------------------------------------------------------------
+int f3d_animation_playing(f3d_animation_t* animation)
+{
+  if (!animation)
+  {
+    return 0;
+  }
+
+  f3d::animation* cpp_animation = reinterpret_cast<f3d::animation*>(animation);
+  return cpp_animation->playing() ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
+f3d_animation_direction_t f3d_animation_direction(
+  f3d_animation_t* animation)
+{
+  if (!animation)
+  {
+    return F3D_ANIMATION_FORWARD;
+  }
+
+  f3d::animation* cpp_animation = reinterpret_cast<f3d::animation*>(animation);
+  const f3d::animation::Direction cpp_direction = cpp_animation->direction();
+  return static_cast<f3d_animation_direction_t>(cpp_direction);
+}
+
+//----------------------------------------------------------------------------
 void f3d_animation_destroy_string(const char* str)
 {
   delete[] str;

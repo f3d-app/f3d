@@ -14,6 +14,15 @@ extern "C"
   typedef struct f3d_animation_t f3d_animation_t;
 
   /**
+   * @brief Enumeration of animation direction.
+   */
+  typedef enum f3d_animation_direction_t
+  {
+    F3D_ANIMATION_FORWARD,
+    F3D_ANIMATION_BACKWARD
+  } f3d_animation_direction_t;
+
+  /**
    * @brief Load files in the scene at provided time value if they contain any animation.
    *
    * @param animation Animation handle.
@@ -88,6 +97,49 @@ extern "C"
    *         f3d_animation_destroy_string_array().
    */
   F3D_EXPORT char** f3d_animation_get_names(const f3d_animation_t* animation, int* count);
+
+  /**
+   * @brief Toggle the animation.
+   *
+   * @param animation Animation handle.
+   * @param direction Animation direction.
+   */
+  F3D_EXPORT void f3d_animation_toggle(
+    f3d_animation_t* animation, f3d_animation_direction_t direction);
+
+  /**
+   * @brief Start the animation.
+   *
+   * @param animation Animation handle.
+   * @param direction Animation direction.
+   */
+  F3D_EXPORT void f3d_animation_start(
+    f3d_animation_t* animation, f3d_animation_direction_t direction);
+
+  /**
+   * @brief Stop the animation.
+   *
+   * @param animation Animation handle.
+   */
+  F3D_EXPORT void f3d_animation_stop(f3d_animation_t* animation);
+
+  /**
+   * @brief Check if animation is currently playing.
+   *
+   * @param animation Animation handle.
+   * @return 1 if animation is playing, 0 otherwise.
+   */
+  F3D_EXPORT int f3d_animation_playing(f3d_animation_t* animation);
+
+  /**
+   * @brief Get the current animation direction.
+   *
+   * @param animation Animation handle.
+   * @return Current animation direction.
+   */
+  F3D_EXPORT f3d_animation_direction_t f3d_animation_direction(
+    f3d_animation_t* animation);
+  ///@}
 
   /**
    * @brief Free a single string returned by the animation C API.
