@@ -1282,7 +1282,7 @@ interactor& interactor_impl::initCommands()
     "add_files",
     [&](const std::vector<std::string>& files)
     {
-      this->Internals->Anim.StopAnimation();
+      this->Internals->Anim.stopAnimation();
       this->Internals->Scene.add(files);
     },
     command_documentation_t{ "add_files", "add files to the scene" });
@@ -1965,7 +1965,7 @@ interactor& interactor_impl::triggerTextCharacter(unsigned int codepoint)
 interactor& interactor_impl::toggleAnimation(AnimationDirection direction)
 {
   this->Internals->Anim.SetAnimationDirection(direction == AnimationDirection::FORWARD ? 1 : -1);
-  this->Internals->Anim.ToggleAnimation();
+  this->Internals->Anim.toggleAnimation();
   return *this;
 }
 
@@ -1973,28 +1973,28 @@ interactor& interactor_impl::toggleAnimation(AnimationDirection direction)
 interactor& interactor_impl::startAnimation(AnimationDirection direction)
 {
   this->Internals->Anim.SetAnimationDirection(direction == AnimationDirection::FORWARD ? 1 : -1);
-  this->Internals->Anim.StartAnimation();
+  this->Internals->Anim.startAnimation();
   return *this;
 }
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::stopAnimation()
 {
-  this->Internals->Anim.StopAnimation();
+  this->Internals->Anim.stopAnimation();
   return *this;
 }
 
 //----------------------------------------------------------------------------
 bool interactor_impl::isPlayingAnimation()
 {
-  return this->Internals->Anim.IsPlaying();
+  return this->Internals->Anim.isPlayingAnimation();
 }
 
 //----------------------------------------------------------------------------
 interactor::AnimationDirection interactor_impl::getAnimationDirection()
 {
-  return this->Internals->Anim.GetAnimationDirection() == 1 ? AnimationDirection::FORWARD
-                                                            : AnimationDirection::BACKWARD;
+  // TODO
+  return AnimationDirection::FORWARD;
 }
 
 //----------------------------------------------------------------------------

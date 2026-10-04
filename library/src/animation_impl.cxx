@@ -170,6 +170,74 @@ std::vector<std::string> animation_impl::getNames() const
 }
 
 //----------------------------------------------------------------------------
+animation& animation_impl::toggleAnimation(AnimationDirection direction)
+{
+  this->Internals->AnimationDirection = (direction == AnimationDirection::FORWARD ? 1 : -1);
+
+  this->PrepareForAnimationIndices();
+  if (!this->Internals->PreparedAnimationIndices.value().empty() && this->Internals->Interactor)
+  {
+    this->Internals->Playing = !this->Internals->Playing;
+
+    if (this->Internals->Playing)
+    {
+      // Initialize time if not already
+      if (!this->Internals->CurrentTimeSet)
+      {
+        this->Internals->CurrentTime = this->Internals->TimeRange[0];
+        this->Internals->CurrentTimeSet = true;
+      }
+    }
+
+    if (this->Internals->Playing && this->Internals->Options.scene.camera.index.has_value())
+    {
+      this->Internals->Interactor->disableCameraMovement();
+    }
+    else
+    {
+      this->Internals->Interactor->enableCameraMovement();
+    }
+  }
+
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+animation& animation_impl::startAnimation(AnimationDirection direction)
+{
+  if (!this->isPlayingAnimation())
+  {
+    this->toggleAnimation(direction);
+  }
+
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+animation& animation_impl::stopAnimation()
+{
+  if (this->isPlayingAnimation())
+  {
+    this->toggleAnimation();
+  }
+
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+bool animation_impl::isPlayingAnimation()
+{
+  return this->Internals->Playing;
+}
+
+//----------------------------------------------------------------------------
+animation::AnimationDirection animation_impl::getAnimationDirection()
+{
+  return this->Internals->AnimationDirection == 1 ? AnimationDirection::FORWARD
+    : AnimationDirection::BACKWARD;
+}
+
+//----------------------------------------------------------------------------
 void animation_impl::SetImporter(vtkF3DMetaImporter* importer)
 {
   this->Internals->Importer = importer;
@@ -222,7 +290,7 @@ void animation_impl::Initialize()
 
   if (this->Internals->Autoplay)
   {
-    this->StartAnimation();
+    this->startAnimation();
   }
 }
 
@@ -240,53 +308,6 @@ void animation_impl::Reset()
 
   // No animation is loaded: hide the progress bar
   this->PushAnimationProgress();
-}
-
-//----------------------------------------------------------------------------
-void animation_impl::StartAnimation()
-{
-  if (!this->IsPlaying())
-  {
-    this->ToggleAnimation();
-  }
-}
-
-//----------------------------------------------------------------------------
-void animation_impl::StopAnimation()
-{
-  if (this->IsPlaying())
-  {
-    this->ToggleAnimation();
-  }
-}
-
-//----------------------------------------------------------------------------
-void animation_impl::ToggleAnimation()
-{
-  this->PrepareForAnimationIndices();
-  if (!this->Internals->PreparedAnimationIndices.value().empty() && this->Internals->Interactor)
-  {
-    this->Internals->Playing = !this->Internals->Playing;
-
-    if (this->Internals->Playing)
-    {
-      // Initialize time if not already
-      if (!this->Internals->CurrentTimeSet)
-      {
-        this->Internals->CurrentTime = this->Internals->TimeRange[0];
-        this->Internals->CurrentTimeSet = true;
-      }
-    }
-
-    if (this->Internals->Playing && this->Internals->Options.scene.camera.index.has_value())
-    {
-      this->Internals->Interactor->disableCameraMovement();
-    }
-    else
-    {
-      this->Internals->Interactor->enableCameraMovement();
-    }
-  }
 }
 
 //----------------------------------------------------------------------------
@@ -711,29 +732,10 @@ void animation_impl::SetSpeedFactor(double speedFactor)
 }
 
 //----------------------------------------------------------------------------
-void animation_impl::SetAnimationDirection(int direction)
-{
-  assert(direction == 1 || direction == -1);
-  this->Internals->AnimationDirection = direction;
-}
-
-//----------------------------------------------------------------------------
 void animation_impl::UpdateDynamicOptions()
 {
   this->SetAutoplay(this->Internals->Options.scene.animation.autoplay);
   this->SetSpeedFactor(this->Internals->Options.scene.animation.speed_factor);
-}
-
-//----------------------------------------------------------------------------
-int animation_impl::GetAnimationDirection() const
-{
-  return this->Internals->AnimationDirection;
-}
-
-//----------------------------------------------------------------------------
-bool animation_impl::IsPlaying() const
-{
-  return this->Internals->Playing;
 }
 
 //----------------------------------------------------------------------------
