@@ -1269,12 +1269,12 @@ interactor& interactor_impl::initCommands()
       "jump_to_keyframe_relative offset", "move a number of keyframes forward or backward" });
 
   this->addCommand(
-    "toggle_animation", [&](const std::vector<std::string>&) { this->toggleAnimation(); },
+    "toggle_animation", [&](const std::vector<std::string>&) { this->Internals->Anim.toggle(); },
     command_documentation_t{ "toggle_animation", "start/stop the animation" });
 
   this->addCommand(
     "toggle_animation_backward",
-    [&](const std::vector<std::string>&) { this->toggleAnimation(AnimationDirection::BACKWARD); },
+    [&](const std::vector<std::string>&) { this->Internals->Anim.toggle(animation::Direction::BACKWARD); },
     command_documentation_t{ "toggle_animation_backward", "start/stop the animation backward" });
 
   // XXX: No filesystem completion, F3DStarter add its own command anyway
@@ -1282,7 +1282,7 @@ interactor& interactor_impl::initCommands()
     "add_files",
     [&](const std::vector<std::string>& files)
     {
-      this->Internals->Anim.stopAnimation();
+      this->Internals->Anim.stop();
       this->Internals->Scene.add(files);
     },
     command_documentation_t{ "add_files", "add files to the scene" });
@@ -1959,42 +1959,6 @@ interactor& interactor_impl::triggerTextCharacter(unsigned int codepoint)
   this->Internals->VTKInteractor->InvokeEvent(vtkCommand::CharEvent, nullptr);
 
   return *this;
-}
-
-//----------------------------------------------------------------------------
-interactor& interactor_impl::toggleAnimation(AnimationDirection direction)
-{
-  this->Internals->Anim.SetAnimationDirection(direction == AnimationDirection::FORWARD ? 1 : -1);
-  this->Internals->Anim.toggleAnimation();
-  return *this;
-}
-
-//----------------------------------------------------------------------------
-interactor& interactor_impl::startAnimation(AnimationDirection direction)
-{
-  this->Internals->Anim.SetAnimationDirection(direction == AnimationDirection::FORWARD ? 1 : -1);
-  this->Internals->Anim.startAnimation();
-  return *this;
-}
-
-//----------------------------------------------------------------------------
-interactor& interactor_impl::stopAnimation()
-{
-  this->Internals->Anim.stopAnimation();
-  return *this;
-}
-
-//----------------------------------------------------------------------------
-bool interactor_impl::isPlayingAnimation()
-{
-  return this->Internals->Anim.isPlayingAnimation();
-}
-
-//----------------------------------------------------------------------------
-interactor::AnimationDirection interactor_impl::getAnimationDirection()
-{
-  // TODO
-  return AnimationDirection::FORWARD;
 }
 
 //----------------------------------------------------------------------------

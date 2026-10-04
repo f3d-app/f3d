@@ -71,12 +71,6 @@ public:
   interactor& triggerKeyboardKey(InputAction action, std::string_view keySym) override;
   interactor& triggerTextCharacter(unsigned int codepoint) override;
 
-  interactor& toggleAnimation(AnimationDirection direction = AnimationDirection::FORWARD) override;
-  interactor& startAnimation(AnimationDirection direction = AnimationDirection::FORWARD) override;
-  interactor& stopAnimation() override;
-  bool isPlayingAnimation() override;
-  interactor::AnimationDirection getAnimationDirection() override;
-
   interactor& enableCameraMovement() override;
   interactor& disableCameraMovement() override;
 

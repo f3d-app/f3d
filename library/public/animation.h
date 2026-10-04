@@ -66,7 +66,7 @@ public:
   /**
    * Enumeration of animation direction.
    */
-  enum class AnimationDirection : std::uint8_t
+  enum class Direction : std::uint8_t
   {
     FORWARD,
     BACKWARD
@@ -76,30 +76,30 @@ public:
    * Set the animation direction in the provided direction then
    * toggle (start if stopped or stop is started) the animation.
    */
-  virtual animation& toggleAnimation(
-    AnimationDirection direction = AnimationDirection::FORWARD) = 0;
+  virtual animation& toggle(
+    Direction direction = Direction::FORWARD) = 0;
 
   /**
    * Set the animation direction in the provided direction then
    * start the animation if not already started. 
    */
-  virtual animation& startAnimation(
-    AnimationDirection direction = AnimationDirection::FORWARD) = 0;
+  virtual animation& start(
+    Direction direction = Direction::FORWARD) = 0;
 
   /**
    * Stop the animation if playing.
    */
-  virtual animation& stopAnimation() = 0;
+  virtual animation& stop() = 0;
 
   /**
    * Return if the animation is currently playing or not
    */
-  [[nodiscard]] virtual bool isPlayingAnimation() = 0;
+  [[nodiscard]] virtual bool isPlaying() = 0;
 
   /**
-   * Return the animation direction, default is AnimationDirection::FORWARD
+   * Return the animation direction, default is Direction::FORWARD
    */
-  [[nodiscard]] virtual animation::AnimationDirection getAnimationDirection() = 0;
+  [[nodiscard]] virtual animation::Direction getDirection() = 0;
 
 protected:
   //! @cond

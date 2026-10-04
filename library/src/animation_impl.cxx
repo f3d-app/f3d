@@ -39,7 +39,7 @@ public:
   interactor_impl* Interactor = nullptr;
 
   int AvailAnimations = 0;
-  int AnimationDirection = 1;
+  int Direction = 1;
 
   std::optional<std::vector<int>> PreparedAnimationIndices;
   vtkNew<vtkDoubleArray> AnimationTimeSteps;
@@ -170,9 +170,9 @@ std::vector<std::string> animation_impl::getNames() const
 }
 
 //----------------------------------------------------------------------------
-animation& animation_impl::toggleAnimation(AnimationDirection direction)
+animation& animation_impl::toggle(Direction direction)
 {
-  this->Internals->AnimationDirection = (direction == AnimationDirection::FORWARD ? 1 : -1);
+  this->Internals->Direction = (direction == Direction::FORWARD ? 1 : -1);
 
   this->PrepareForAnimationIndices();
   if (!this->Internals->PreparedAnimationIndices.value().empty() && this->Internals->Interactor)
@@ -203,38 +203,38 @@ animation& animation_impl::toggleAnimation(AnimationDirection direction)
 }
 
 //----------------------------------------------------------------------------
-animation& animation_impl::startAnimation(AnimationDirection direction)
+animation& animation_impl::start(Direction direction)
 {
-  if (!this->isPlayingAnimation())
+  if (!this->isPlaying())
   {
-    this->toggleAnimation(direction);
+    this->toggle(direction);
   }
 
   return *this;
 }
 
 //----------------------------------------------------------------------------
-animation& animation_impl::stopAnimation()
+animation& animation_impl::stop()
 {
-  if (this->isPlayingAnimation())
+  if (this->isPlaying())
   {
-    this->toggleAnimation();
+    this->toggle();
   }
 
   return *this;
 }
 
 //----------------------------------------------------------------------------
-bool animation_impl::isPlayingAnimation()
+bool animation_impl::isPlaying()
 {
   return this->Internals->Playing;
 }
 
 //----------------------------------------------------------------------------
-animation::AnimationDirection animation_impl::getAnimationDirection()
+animation::Direction animation_impl::getDirection()
 {
-  return this->Internals->AnimationDirection == 1 ? AnimationDirection::FORWARD
-    : AnimationDirection::BACKWARD;
+  return this->Internals->Direction == 1 ? Direction::FORWARD
+    : Direction::BACKWARD;
 }
 
 //----------------------------------------------------------------------------
@@ -290,7 +290,7 @@ void animation_impl::Initialize()
 
   if (this->Internals->Autoplay)
   {
-    this->startAnimation();
+    this->start();
   }
 }
 
@@ -317,7 +317,7 @@ void animation_impl::Tick()
   if (this->Internals->Playing)
   {
     this->Internals->CurrentTime += (this->Internals->DeltaTime * this->Internals->SpeedFactor) *
-      this->Internals->AnimationDirection;
+      this->Internals->Direction;
 
     // Modulo computation, compute CurrentTime in the time range.
     if (this->Internals->CurrentTime < this->Internals->TimeRange[0] ||
