@@ -909,7 +909,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def("time_range", &f3d::animation::timeRange)
     .def("key_frames", &f3d::animation::keyFrames)
     .def("count", &f3d::animation::count)
-    .def("get_name", &f3d::animation::getName,  py::arg("index") = std::nullopt,
+    .def("get_name", &f3d::animation::getName, py::arg("index") = std::nullopt,
       "Returns the animation at an index (defaults to current)")
     .def("get_names", &f3d::animation::getNames, "Returns all animation names");
 
