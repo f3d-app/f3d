@@ -170,7 +170,7 @@ Other languages API behavior changed accordingly:
 - Java API:
   - `Scene.supports()` used to return a boolean. It now returns the `Scene.FileAvailability` enum and throws `IllegalArgumentException` if the file path is null.
   - `Interactor.addBinding()` now requires a class instance parameter over a list of arguments. This includes a `repeat` argument which specifies that the binding is repeatedly applied when holding down the key.
-- Python API: 
+- Python API:
   - `scene.supports()` used to return bool. Now returns f3d.FileAvailability.
   - `interactor.addBinding()` now requires a class parameter over a list of arguments. This includes a `repeat` argument which specifies that the binding is repeatedly applied when holding down the key.
 - Webassembly API: `scene.supports()` used to return bool. Now returns enum FileAvailability.

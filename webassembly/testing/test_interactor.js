@@ -56,28 +56,36 @@ const settings = {
     bind.mod = Module.InteractionBindModifierKeys.NONE;
     bind.inter = "R";
 
-    interactor.addBinding(
-      bind,
-      ["set render.grid.reflection .8"],
-      "test-group",
-      () => ["foo", "bar"],
-      Module.InteractorBindingType.OTHER,
-      false,
-    );
+    const bindCommands = new Module.InteractorBindCommands();
+    bindCommands.push_back("set render.grid.reflection .8");
+
+    const bindParam = new Module.InteractorBindingParam();
+    bindParam.bind = bind;
+    bindParam.commands = bindCommands;
+    bindParam.group = "test-group";
+    bindParam.setDocCallback(() => ["foo", "bar"]);
+    bindParam.type = Module.InteractorBindingType.OTHER;
+    bindParam.notify = false;
+
+    interactor.addBinding(bindParam);
+
+    const repeatCommands = new Module.InteractorBindCommands();
+    repeatCommands.push_back("increase render.light.intensity .1")
 
     const bindRepeat = new Module.InteractionBind();
     bindRepeat.mod = Module.InteractionBindModifierKeys.CTRL_SHIFT;
     bindRepeat.inter = "L";
 
-    interactor.addBinding(
-      bindRepeat,
-      ["increase render.light.intensity .1"],
-      "test-group",
-      () => ["repeat", "binding"],
-      Module.InteractorBindingType.NUMERICAL,
-      false,
-      true,
-    );
+    const repeatBindParam = new Module.InteractorBindingParam();
+    repeatBindParam.bind = bindRepeat;
+    repeatBindParam.commands = repeatCommands;
+    repeatBindParam.group = "test-group";
+    repeatBindParam.setDocCallback(() => ["repeat", "binding"]);
+    repeatBindParam.type = Module.InteractorBindingType.NUMERICAL;
+    repeatBindParam.notify = false;
+    repeatBindParam.repeat = true;
+
+    interactor.addBinding(repeatBindParam);
 
     const updatedBinds = interactor.getBinds();
     utils.assert(
@@ -188,6 +196,9 @@ const settings = {
       bindingRemoved = true;
     }
     utils.assert(!bindingRemoved, "repeat binding should be removable");
+
+    bindCommands.delete();
+    repeatCommands.delete();
 
     // notifications
     let notifCount = 0;

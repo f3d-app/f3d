@@ -62,6 +62,39 @@ emscripten::val pairToJSArray(const std::pair<U, V>& p)
   return jsArray;
 }
 
+emscripten::val getBindingDocCallback(const f3d::interactor::BindingParam& binding)
+{
+  if (!binding.DocCallback) {
+    return emscripten::val::null();
+  }
+
+  const auto [first, second] = binding.DocCallback();
+
+  emscripten::val result = emscripten::val::array();
+  result.set(0, first);
+  result.set(1, second);
+  return result;
+}
+
+void setBindingDocCallback(f3d::interactor::BindingParam& binding, emscripten::val callback)
+{
+  if (callback.isNull() || callback.isUndefined()) {
+    binding.DocCallback = nullptr;
+    return;
+  }
+
+  binding.DocCallback = [callback]
+  {
+    emscripten::val result = callback();
+
+    return std::make_pair(
+      result[0].as<std::string>(),
+      result[1].as<std::string>()
+    );
+  };
+}
+
+
 struct wasm_mesh_view : public f3d::mesh_view
 {
   // not time support with wasm
@@ -819,6 +852,19 @@ EMSCRIPTEN_BINDINGS(f3d)
   emscripten::class_<f3d::interactor_state_t>("InteractorState")
     .property("animationTime", &f3d::interactor_state_t::animationTime);
 
+  emscripten::register_vector<std::string>("InteractorBindCommands");
+
+  emscripten::class_<f3d::interactor::BindingParam>("InteractorBindingParam")
+    .constructor<>()
+    .property("bind", &f3d::interactor::BindingParam::Bind)
+    .property("commands", &f3d::interactor::BindingParam::Commands)
+    .property("group", &f3d::interactor::BindingParam::Group)
+    .function("setDocCallback", &setBindingDocCallback)
+    .function("getDocCallback", &getBindingDocCallback)
+    .property("type", &f3d::interactor::BindingParam::Type)
+    .property("notify", &f3d::interactor::BindingParam::Notify)
+    .property("repeat", &f3d::interactor::BindingParam::Repeat);
+
   emscripten::class_<f3d::interactor>("Interactor")
     .function(
       "initCommands", &f3d::interactor::initCommands, emscripten::return_value_policy::reference())
@@ -845,52 +891,9 @@ EMSCRIPTEN_BINDINGS(f3d)
       "initBindings", &f3d::interactor::initBindings, emscripten::return_value_policy::reference())
     .function(
       "addBinding",
-      +[](f3d::interactor& interactor, const f3d::interaction_bind_t& bind,
-         const emscripten::val& commands) -> f3d::interactor&
+      +[](f3d::interactor& interactor, f3d::interactor::BindingParam binding) -> f3d::interactor&
       {
-        const std::vector<std::string> commandList =
-          emscripten::vecFromJSArray<std::string>(commands);
-        return interactor.addBinding(bind, commandList);
-      },
-      emscripten::return_value_policy::reference())
-    .function(
-      "addBinding",
-      +[](f3d::interactor& interactor, const f3d::interaction_bind_t& bind,
-         const emscripten::val& commands, std::string group, const emscripten::val& callback,
-         f3d::interactor::BindingType type, bool notify) -> f3d::interactor&
-      {
-        auto wrapCallback = [=]() -> std::pair<std::string, std::string>
-        {
-          emscripten::val result = callback();
-          if (!result.isArray() || result["length"].as<unsigned int>() != 2)
-          {
-            throw std::runtime_error("Callback must return an array of two strings");
-          }
-          return { result[0].as<std::string>(), result[1].as<std::string>() };
-        };
-        const std::vector<std::string> commandList =
-          emscripten::vecFromJSArray<std::string>(commands);
-        return interactor.addBinding(bind, commandList, group, wrapCallback, type, notify);
-      },
-      emscripten::return_value_policy::reference())
-    .function(
-      "addBinding",
-      +[](f3d::interactor& interactor, const f3d::interaction_bind_t& bind,
-         const emscripten::val& commands, std::string group, const emscripten::val& callback,
-         f3d::interactor::BindingType type, bool notify, bool repeat) -> f3d::interactor&
-      {
-        auto wrapCallback = [=]() -> std::pair<std::string, std::string>
-        {
-          emscripten::val result = callback();
-          if (!result.isArray() || result["length"].as<unsigned int>() != 2)
-          {
-            throw std::runtime_error("Callback must return an array of two strings");
-          }
-          return { result[0].as<std::string>(), result[1].as<std::string>() };
-        };
-        const std::vector<std::string> commandList =
-          emscripten::vecFromJSArray<std::string>(commands);
-        return interactor.addBinding(bind, commandList, group, wrapCallback, type, notify, repeat);
+        return interactor.addBinding(binding);
       },
       emscripten::return_value_policy::reference())
     .function("removeBinding", &f3d::interactor::removeBinding,
