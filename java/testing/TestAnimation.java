@@ -35,7 +35,6 @@ public class TestAnimation {
     
     Animation anim = scene.getAnimation();
 
-    /*
     // XXX: Only smoke tests for now
     anim.loadTime(0.5);
     anim.timeRange();
@@ -44,7 +43,6 @@ public class TestAnimation {
     anim.getName();
     anim.getName(0);
     anim.getNames();
-    */
 
     engine.close();
   }

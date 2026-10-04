@@ -9,9 +9,11 @@ namespace f3d
 {
 /**
  * @class   animation
- * @brief   TODO
+ * @brief   abstract to handle animation control in the libf3d
  *
- * TODO
+ * A class to control everything related to animation
+ * in the libf3d. It recovers informations from the currently loaded
+ * files in the scene.
  */
 class F3D_EXPORT animation
 {
