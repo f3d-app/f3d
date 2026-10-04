@@ -154,5 +154,5 @@ const settings = {
 utils.runRenderTest(settings, {
   data: "soldier_animations.mdl",
   extraData: ["invalid.mdl", "unsupportedFile.dummy"],
-  baseline: "TestWasmAnimation.png",
+  baseline: "TestWasmScene.png",
 });
