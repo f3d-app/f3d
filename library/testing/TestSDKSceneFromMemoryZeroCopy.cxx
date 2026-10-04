@@ -318,6 +318,7 @@ int TestSDKSceneFromMemoryZeroCopy([[maybe_unused]] int argc, char* argv[])
   const std::string renderingBackend = std::string(argv[4]);
   f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::scene& sce = eng.getScene();
+  f3d::animation& anim = sce.getAnimation();
   f3d::interactor& inter = eng.getInteractor();
   f3d::window& win = eng.getWindow().setSize(500, 500);
   win.setWindowName("Zero-copy animated mesh");
@@ -398,7 +399,7 @@ int TestSDKSceneFromMemoryZeroCopy([[maybe_unused]] int argc, char* argv[])
       win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKSceneFromMemoryZeroCopyDummyF64"));
 
   // Start animation
-  inter.startAnimation();
+  anim.start();
   inter.triggerEventLoop(1.0); // advance animation by 1 second
 
   eng.getOptions().model.scivis.array_name = "velocity";

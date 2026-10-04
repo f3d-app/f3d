@@ -44,8 +44,8 @@ public:
   animation& toggle(Direction direction = Direction::FORWARD) override;
   animation& start(Direction direction = Direction::FORWARD) override;
   animation& stop() override;
-  bool isPlaying() override;
-  animation::Direction getDirection() override;
+  bool playing() override;
+  animation::Direction direction() override;
   ///@}
 
   /**

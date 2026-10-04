@@ -205,7 +205,7 @@ animation& animation_impl::toggle(Direction direction)
 //----------------------------------------------------------------------------
 animation& animation_impl::start(Direction direction)
 {
-  if (!this->isPlaying())
+  if (!this->playing())
   {
     this->toggle(direction);
   }
@@ -216,7 +216,7 @@ animation& animation_impl::start(Direction direction)
 //----------------------------------------------------------------------------
 animation& animation_impl::stop()
 {
-  if (this->isPlaying())
+  if (this->playing())
   {
     this->toggle();
   }
@@ -225,13 +225,13 @@ animation& animation_impl::stop()
 }
 
 //----------------------------------------------------------------------------
-bool animation_impl::isPlaying()
+bool animation_impl::playing()
 {
   return this->Internals->Playing;
 }
 
 //----------------------------------------------------------------------------
-animation::Direction animation_impl::getDirection()
+animation::Direction animation_impl::direction()
 {
   return this->Internals->Direction == 1 ? Direction::FORWARD
     : Direction::BACKWARD;
