@@ -12,7 +12,7 @@ namespace f3d
  * @brief   abstract to handle animation control in the libf3d
  *
  * A class to control everything related to animation
- * in the libf3d. It recovers informations from the currently loaded
+ * in the libf3d. It recovers information from the currently loaded
  * files in the scene.
  */
 class F3D_EXPORT animation
