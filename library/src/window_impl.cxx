@@ -724,7 +724,7 @@ void window_impl::UpdateDynamicOptions()
   }
   else
   {
-    log::warn("Unknown coloring mode: \"", opt.model.coloring, "\" using \"material\" as fallback");
+    log::warn("Unknown coloring mode: \"", opt.model.coloring, R"(" using "material" as fallback)");
     renderer->SetColoring(vtkF3DRenderer::ColoringMode::MATERIAL);
   }
 
@@ -742,7 +742,7 @@ void window_impl::UpdateDynamicOptions()
   }
   else
   {
-    log::warn("Unknown scivis field: \"", opt.model.scivis.field, "\" using \"any\" as fallback");
+    log::warn("Unknown scivis field: \"", opt.model.scivis.field, R"(" using "any" as fallback)");
     renderer->SetDataFieldForColoring(vtkF3DRenderer::DataField::ANY);
   }
 
