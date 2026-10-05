@@ -489,14 +489,6 @@ public:
 
   ///@{
   /**
-   * Set/Get whether the array used for coloring is cell data.
-   */
-  void SetArrayIsCellData(const std::optional<bool>& arrayIsCellData);
-  std::optional<bool> GetArrayIsCellData() const;
-  ///@}
-
-  ///@{
-  /**
    * Set/Get the name of the component to use for coloring
    */
   void SetComponentForColoring(const std::optional<int>& component);
@@ -799,6 +791,11 @@ private:
    * Updates the axis widget size based on the window size
    */
   void UpdateAxisWidgetSize();
+
+  /**
+   * Set whether the array used for coloring is cell data.
+   */
+  void SetArrayIsCellData(const std::optional<bool>& arrayIsCellData);
 
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
   vtkSmartPointer<vtkCameraOrientationWidget> ModernAxisWidget;

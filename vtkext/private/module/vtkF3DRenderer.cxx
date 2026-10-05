@@ -3256,12 +3256,6 @@ void vtkF3DRenderer::SetArrayIsCellData(const std::optional<bool>& arrayIsCellDa
 }
 
 //----------------------------------------------------------------------------
-std::optional<bool> vtkF3DRenderer::GetArrayIsCellData() const
-{
-  return this->ArrayIsCellData;
-}
-
-//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetComponentForColoring(const std::optional<int>& component)
 {
   if (component != this->ComponentForColoring)
