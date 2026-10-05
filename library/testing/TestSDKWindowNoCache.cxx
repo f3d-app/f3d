@@ -15,7 +15,7 @@ int TestSDKWindowNoCache([[maybe_unused]] int argc, [[maybe_unused]] char* argv[
   eng.setCachePath(std::string(argv[1]) + "/data/corrupted_cache");
   f3d::window& win = eng.getWindow();
   win.setSize(300, 300);
-  
+
   eng.getScene().add(std::string(argv[1]) + "/data/suzanne.ply");
 
   eng.getOptions().model.material.roughness = 0.0;
@@ -24,15 +24,15 @@ int TestSDKWindowNoCache([[maybe_unused]] int argc, [[maybe_unused]] char* argv[
 
   // render with the corrupted cache (redish spherical harmonics and low-res LUT/specular)
   test("render with corrupted cache",
-    TestSDKHelpers::RenderTest(
-      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKWindowStandardCorrupted"));
+    TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
+      "TestSDKWindowStandardCorrupted"));
 
   win.setUseHDRICache(false);
 
   // render with the cache disabled
   test("render with corrupted cache",
-    TestSDKHelpers::RenderTest(
-      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKWindowStandardNoCache"));
+    TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
+      "TestSDKWindowStandardNoCache"));
 
   return test.result();
 }

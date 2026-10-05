@@ -1448,7 +1448,8 @@ void vtkF3DRenderer::ConfigureHDRILUT()
 
     // Check LUT cache
     const std::string lutCachePath = this->CachePath + "/lut.vti";
-    const bool lutCacheExists = this->UseCache && vtksys::SystemTools::FileExists(lutCachePath, true);
+    const bool lutCacheExists =
+      this->UseCache && vtksys::SystemTools::FileExists(lutCachePath, true);
     if (lutCacheExists)
     {
       lut->SetFileName(lutCachePath.c_str());
