@@ -835,6 +835,13 @@ std::shared_ptr<video_frame> window_impl::getVideoFrame()
 }
 
 //----------------------------------------------------------------------------
+window& window_impl::setUseHDRICache(bool use)
+{
+  this->Internals->Renderer->SetUseCache(use);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 void window_impl::SetImporter(vtkF3DMetaImporter* importer)
 {
   this->Internals->Renderer->SetImporter(importer);

@@ -656,6 +656,9 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250507)
   endif()
 endif()
 
+# Smoke test for --no-cache
+f3d_test(NAME TestNoCache DATA suzanne.ply ARGS -f --no-cache)
+
 # Test Grid verbose output
 f3d_test(NAME TestVerboseGrid DATA suzanne.ply ARGS -g --verbose REGEXP "Grid origin set to" NO_BASELINE)
 

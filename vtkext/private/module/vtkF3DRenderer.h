@@ -261,6 +261,11 @@ public:
   void SetCachePath(const std::string& cachePath);
 
   /**
+   * Set whether to use the cache or not.
+   */
+  void SetUseCache(bool useCache);
+
+  /**
    * Set the roughness on all actors
    */
   void SetRoughness(const std::optional<double>& roughness);
@@ -864,6 +869,7 @@ private:
   std::string GridInfo;
 
   std::string CachePath;
+  bool UseCache = true;
 
   std::optional<std::string> BackfaceType;
   std::optional<std::string> FinalShader;

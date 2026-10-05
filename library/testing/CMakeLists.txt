@@ -25,6 +25,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKStatefileCamera.cxx
      TestSDKUtils.cxx
      TestSDKWindowAuto.cxx
+     TestSDKWindowNoCache.cxx
      TestTestSDKHelpers.cxx
 )
 

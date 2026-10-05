@@ -1630,6 +1630,8 @@ int F3DStarter::Start(int argc, char** argv)
 
     this->ResetWindowName();
 
+    this->Internals->Engine->getWindow().setUseHDRICache(!this->Internals->AppOptions.NoCache);
+
     if (!this->Internals->AppOptions.NoRender && this->Internals->AppOptions.Output.empty() &&
       this->Internals->AppOptions.OutputVideo.empty() &&
       this->Internals->AppOptions.Reference.empty() && !this->Internals->AppOptions.NoCache)

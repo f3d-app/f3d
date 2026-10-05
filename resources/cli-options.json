@@ -37,7 +37,7 @@
         },
         {
           "longName": "no-cache",
-          "helpText": "No window geometry cache read/write",
+          "helpText": "No cache is used (both reading and writing)",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
