@@ -23,7 +23,7 @@ Use with --output to output a png file with a transparent background.
 
 ### `--no-cache` (_bool_, default: `false`)
 
-No cache is used (both readin and writing).
+No cache is used (both reading and writing).
 Cache is currently used to save and restore last window size and position.
 It's also used to save and restore HDRI related information.
 

@@ -172,3 +172,9 @@ JNIEXPORT jdouble JAVA_BIND(Window, getDPIScale)(JNIEnv* env, jobject self)
 {
   return static_cast<jdouble>(GetEngine(env, self)->getWindow().getDPIScale());
 }
+
+JNIEXPORT jobject JAVA_BIND(Window, setUseHDRICache)(JNIEnv* env, jobject self, jboolean useHDRICache)
+{
+  GetEngine(env, self)->getWindow().setUseHDRICache(static_cast<bool>(useHDRICache));
+  return self;
+}

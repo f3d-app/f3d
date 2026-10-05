@@ -20,3 +20,11 @@ def test_window_position():
     assert isinstance(pos, tuple) and len(pos) == 2
     assert engine.window.left == pos[0]
     assert engine.window.top == pos[1]
+
+
+def test_window_use_hdri_cache():
+    engine = f3d.Engine.create(True)
+    engine.window.set_use_hdri_cache(True)
+    engine.window.render()
+    engine.window.set_use_hdri_cache(False)
+    engine.window.render()

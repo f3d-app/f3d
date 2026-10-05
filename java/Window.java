@@ -175,6 +175,14 @@ public class Window {
     */
     public native double getDPIScale();
 
+    /**
+     * Enable or disable the use of HDRI cache for the window.
+     *
+     * @param useHDRICache true to enable HDRI cache, false to disable
+     * @return this window for method chaining
+     */
+    public native Window setUseHDRICache(boolean useHDRICache);
+
     private long mNativeAddress;
     private Camera mCamera;
 }

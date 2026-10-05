@@ -250,3 +250,15 @@ double f3d_window_get_dpi_scale(f3d_window_t* window)
   f3d::window* cpp_window = reinterpret_cast<f3d::window*>(window);
   return cpp_window->getDPIScale();
 }
+
+//----------------------------------------------------------------------------
+void f3d_window_set_use_hdri_cache(f3d_window_t* window, int use_hdri_cache)
+{
+  if (!window)
+  {
+    return;
+  }
+
+  f3d::window* cpp_window = reinterpret_cast<f3d::window*>(window);
+  cpp_window->setUseHDRICache(use_hdri_cache != 0);
+}

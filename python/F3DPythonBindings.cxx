@@ -1032,7 +1032,8 @@ PYBIND11_MODULE(pyf3d, module)
       "Get world coordinate point from display coordinate")
     .def("get_display_from_world", &f3d::window::getDisplayFromWorld,
       "Get display coordinate point from world coordinate")
-    .def("get_dpi_scale", &f3d::window::getDPIScale, "Get the DPI scale of the window");
+    .def("get_dpi_scale", &f3d::window::getDPIScale, "Get the DPI scale of the window")
+    .def("set_use_hdri_cache", &f3d::window::setUseHDRICache, "Enable or disable the use of HDRI cache");
 
   // libInformation
   py::class_<f3d::engine::libInformation>(module, "LibInformation")
