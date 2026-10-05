@@ -25,7 +25,6 @@ list(APPEND libf3dSDKTests_list
      TestSDKStatefileCamera.cxx
      TestSDKUtils.cxx
      TestSDKWindowAuto.cxx
-     TestSDKWindowNoCache.cxx
      TestTestSDKHelpers.cxx
 )
 
@@ -59,6 +58,7 @@ if(F3D_MODULE_UI)
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001 AND NOT F3D_USE_GLES)
     list(APPEND libf3dSDKTests_list
       TestSDKInteractorCallBack.cxx
+      TestSDKWindowNoCache.cxx
       )
   endif()
 

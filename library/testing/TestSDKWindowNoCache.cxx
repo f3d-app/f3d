@@ -11,7 +11,7 @@ int TestSDKWindowNoCache([[maybe_unused]] int argc, [[maybe_unused]] char* argv[
   PseudoUnitTest test;
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  f3d::engine eng = f3d::engine::create(/* true */);
+  f3d::engine eng = f3d::engine::create(true);
   eng.setCachePath(std::string(argv[1]) + "/data/corrupted_cache");
   f3d::window& win = eng.getWindow();
   win.setSize(300, 300);
@@ -25,14 +25,14 @@ int TestSDKWindowNoCache([[maybe_unused]] int argc, [[maybe_unused]] char* argv[
   // render with the corrupted cache (redish spherical harmonics and low-res LUT/specular)
   test("render with corrupted cache",
     TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
-      "TestSDKWindowStandardCorrupted"));
+      "TestSDKWindowCacheCorrupted"));
 
   win.setUseHDRICache(false);
 
   // render with the cache disabled
-  test("render with corrupted cache",
+  test("render with no cache",
     TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
-      "TestSDKWindowStandardNoCache"));
+      "TestSDKWindowNoCache"));
 
   return test.result();
 }
