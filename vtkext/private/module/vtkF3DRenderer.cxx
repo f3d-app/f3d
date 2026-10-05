@@ -3216,7 +3216,7 @@ void vtkF3DRenderer::SetDataFieldForColoring(const DataField& dataField)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetArrayNameForColoring(const std::optional<std::string>& arrayName)
 {
-  if (arrayName.has_value() && arrayName != this->ArrayNameForColoring)
+  if (arrayName != this->ArrayNameForColoring)
   {
     this->ArrayNameForColoring = arrayName;
     this->ColorTransferFunctionConfigured = false;
@@ -3235,6 +3235,30 @@ void vtkF3DRenderer::SetArrayNameForColoring(const std::optional<std::string>& a
 std::optional<std::string> vtkF3DRenderer::GetArrayNameForColoring() const
 {
   return this->ArrayNameForColoring;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetArrayIsCellData(const std::optional<bool>& arrayIsCellData)
+{
+  if (arrayIsCellData != this->ArrayIsCellData)
+  {
+    this->ArrayIsCellData = arrayIsCellData;
+    this->ColorTransferFunctionConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
+    this->ColoringMappersConfigured = false;
+    this->ColoringPointSpritesMappersConfigured = false;
+    this->VolumePropsAndMappersConfigured = false;
+    this->ScalarBarActorConfigured = false;
+    this->CheatSheetConfigured = false;
+    this->ColoringConfigured = false;
+    this->ExpandingRangeSet = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+std::optional<bool> vtkF3DRenderer::GetArrayIsCellData() const
+{
+  return this->ArrayIsCellData;
 }
 
 //----------------------------------------------------------------------------
@@ -3262,9 +3286,14 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
 
   // Recover coloring information and update handler
   F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
+
+  bool forcePoints =
+    this->DataFieldForColoring == DataField::POINTS || !this->ArrayIsCellData.value_or(true);
+  bool forceCells =
+    this->DataFieldForColoring == DataField::CELLS || this->ArrayIsCellData.value_or(false);
+
   const auto info =
-    coloringHandler.SetCurrentColoring(this->DataFieldForColoring == DataField::POINTS,
-      this->DataFieldForColoring == DataField::CELLS, this->ArrayNameForColoring, false);
+    coloringHandler.SetCurrentColoring(forcePoints, forceCells, this->ArrayNameForColoring, false);
 
   const bool hasColoring =
     info.has_value() && this->Coloring != vtkF3DRenderer::ColoringMode::MATERIAL;
@@ -3789,6 +3818,7 @@ void vtkF3DRenderer::CycleArrayForColoring()
   if (info.has_value())
   {
     this->SetArrayNameForColoring(info.value().Name);
+    this->SetArrayIsCellData(info.value().IsCellData);
     if (this->ComponentForColoring >= info.value().MaximumNumberOfComponents)
     {
       // Cycle component if the current one is not valid
@@ -3798,6 +3828,7 @@ void vtkF3DRenderer::CycleArrayForColoring()
   else
   {
     this->SetArrayNameForColoring(std::nullopt);
+    this->SetArrayIsCellData(std::nullopt);
   }
 }
 

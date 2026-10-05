@@ -489,6 +489,14 @@ public:
 
   ///@{
   /**
+   * Set/Get whether the array used for coloring is cell data.
+   */
+  void SetArrayIsCellData(const std::optional<bool>& arrayIsCellData);
+  std::optional<bool> GetArrayIsCellData() const;
+  ///@}
+
+  ///@{
+  /**
    * Set/Get the name of the component to use for coloring
    */
   void SetComponentForColoring(const std::optional<int>& component);
@@ -949,8 +957,9 @@ private:
 
   ColoringMode Coloring = ColoringMode::MATERIAL;
   DataField DataFieldForColoring = DataField::ANY;
-  std::optional<int> ComponentForColoring = std::nullopt;
+  std::optional<int> ComponentForColoring;
   std::optional<std::string> ArrayNameForColoring;
+  std::optional<bool> ArrayIsCellData;
 
   bool ScalarBarVisible = false;
   bool UseNormalGlyphs = false;

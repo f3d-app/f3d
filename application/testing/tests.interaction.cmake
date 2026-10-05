@@ -13,6 +13,7 @@ f3d_test(NAME TestInteractionCycleCompNoArray DATA suzanne.stl INTERACTION) #S S
 f3d_test(NAME TestInteractionCycleArrays DATA dragon.vtu INTERACTION) #SY
 f3d_test(NAME TestInteractionCycleArraysPointsField DATA waveletArrays.vti ARGS --coloring-field=points INTERACTION) #SY
 f3d_test(NAME TestInteractionCycleArraysCellsField DATA waveletArrays.vti ARGS --coloring-field=cells INTERACTION) #SY
+f3d_test(NAME TestInteractionCycleArraysSameName DATA waveletSameName.vti INTERACTION) #SYYY
 f3d_test(NAME TestInteractionCycleBlending DATA suzanne.ply ARGS --opacity=0.8 INTERACTION LONG_TIMEOUT SKIP_GLES) #PPPPP # Cycle to ddp
 f3d_test(NAME TestInteractionVolumeCycle DATA waveletArrays.vti ARGS INTERACTION) #VSS
 f3d_test(NAME TestInteractionVolumeAfterColoring DATA waveletArrays.vti ARGS INTERACTION) #SYV
