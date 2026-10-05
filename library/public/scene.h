@@ -213,8 +213,7 @@ public:
    * scene.force_reader is taken into account and plugin should be loaded for their readers to be
    * found.
    */
-  [[nodiscard]] virtual file_availability supports(
-    const std::byte* buffer, std::size_t size) = 0;
+  [[nodiscard]] virtual file_availability supports(const std::byte* buffer, std::size_t size) = 0;
 
   /**
    * Get the animation available on the scene.

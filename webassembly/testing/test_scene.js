@@ -35,7 +35,8 @@ const settings = {
     );
 
     utils.assert(
-      scene.supportsBuffer(new Array()) === Module.FileAvailability.UNSUPPORTED_EXTENSION,
+      scene.supportsBuffer(new Array()) ===
+        Module.FileAvailability.UNSUPPORTED_EXTENSION,
       "an empty buffer should not be supported",
     );
 
