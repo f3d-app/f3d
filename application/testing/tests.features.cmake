@@ -259,6 +259,10 @@ f3d_test(NAME TestDefinesInexistent DATA dragon.vtu ARGS -Dscene.up_director=+Z 
 f3d_test(NAME TestAlternativeOptionSyntax DATA WaterBottle.glb ARGS --max-size 0.2 REGEXP "file is bigger than max size" NO_BASELINE)
 f3d_test(NAME TestCustomOptionsNone DATA red_translucent_monkey.gltf ARGS --blending=none --anti-aliasing=none --point-sprites=none)
 
+## Cover incorrect coloring enum libf3d options
+f3d_test(NAME TestIncorrectColoringMode DATA dragon.vtu ARGS -Dmodel.coloring=foo NO_BASELINE REGEXP "Unknown coloring mode")
+f3d_test(NAME TestIncorrectScivisField DATA dragon.vtu ARGS -Dmodel.scivis.field=foo NO_BASELINE REGEXP "Unknown scivis field")
+
 ## Config
 f3d_test(NAME TestConfigReset DATA suzanne.stl ARGS -Rrender.grid.enable --reset=ui.axis CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json)
 f3d_test(NAME TestConfigResetInexistent DATA suzanne.stl ARGS -Rrender.glid.enable REGEXP "option from CLI options does not exists" NO_BASELINE)

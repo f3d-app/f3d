@@ -722,6 +722,11 @@ void window_impl::UpdateDynamicOptions()
   {
     renderer->SetColoring(vtkF3DRenderer::ColoringMode::DIRECT);
   }
+  else
+  {
+    log::warn("Unknown coloring mode: \"", opt.model.coloring, "\" using \"material\" as fallback");
+    renderer->SetColoring(vtkF3DRenderer::ColoringMode::MATERIAL);
+  }
 
   if (opt.model.scivis.field == "points")
   {
@@ -731,8 +736,13 @@ void window_impl::UpdateDynamicOptions()
   {
     renderer->SetDataFieldForColoring(vtkF3DRenderer::DataField::CELLS);
   }
+  else if (opt.model.scivis.field == "any")
+  {
+    renderer->SetDataFieldForColoring(vtkF3DRenderer::DataField::ANY);
+  }
   else
   {
+    log::warn("Unknown scivis field: \"", opt.model.scivis.field, "\" using \"any\" as fallback");
     renderer->SetDataFieldForColoring(vtkF3DRenderer::DataField::ANY);
   }
 
