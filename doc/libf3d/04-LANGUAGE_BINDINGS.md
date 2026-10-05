@@ -142,6 +142,8 @@ f3d(settings)
   });
 ```
 
+If you want to preload the WASM file, once loaded you can provide it in the `wasmBinary` option in the settings object:
+
 ## Java
 
 If the Java bindings have been generated using the `F3D_BINDINGS_JAVA` CMake option, the libf3d can be used directly from Java >= 17.

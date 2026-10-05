@@ -12,6 +12,7 @@ set(f3djsTests_list
   "test_splats"
   "test_custom_canvas"
   "test_statefile"
+  "test_wasm_binary"
 )
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)

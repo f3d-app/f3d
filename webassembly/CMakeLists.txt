@@ -22,6 +22,7 @@ target_link_options(f3djs PRIVATE
   "SHELL:-sWASM=1"
   "SHELL:-sFORCE_FILESYSTEM"
   "SHELL:-sEXPORTED_RUNTIME_METHODS=['getExceptionMessage','decrementExceptionRefcount','FS']"
+  "SHELL:-sINCOMING_MODULE_JS_API=wasmBinary"
   "SHELL:-sWASM_BIGINT"
 )
 
