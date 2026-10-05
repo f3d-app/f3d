@@ -113,6 +113,7 @@ public:
     bool BindingsList;
     bool NoBackground;
     bool NoRender;
+    bool NoCache;
     std::string RenderingBackend;
     std::optional<double> MaxSize;
     std::optional<double> AnimationTime;
@@ -1011,6 +1012,7 @@ public:
     this->ParseOption(appOptions, "list-bindings", this->AppOptions.BindingsList);
     this->ParseOption(appOptions, "no-background", this->AppOptions.NoBackground);
     this->ParseOption(appOptions, "no-render", this->AppOptions.NoRender);
+    this->ParseOption(appOptions, "no-cache", this->AppOptions.NoCache);
     this->ParseOption(appOptions, "rendering-backend", this->AppOptions.RenderingBackend);
     this->ParseOption(appOptions, "max-size", this->AppOptions.MaxSize);
     this->ParseOption(appOptions, "animation-time", this->AppOptions.AnimationTime);
@@ -1630,7 +1632,7 @@ int F3DStarter::Start(int argc, char** argv)
 
     if (!this->Internals->AppOptions.NoRender && this->Internals->AppOptions.Output.empty() &&
       this->Internals->AppOptions.OutputVideo.empty() &&
-      this->Internals->AppOptions.Reference.empty())
+      this->Internals->AppOptions.Reference.empty() && !this->Internals->AppOptions.NoCache)
     {
       const F3DOptionsTools::OptionsDict cachedGeometry =
         this->Internals->ReadCachedWindowGeometry();
@@ -2082,8 +2084,10 @@ int F3DStarter::Start(int argc, char** argv)
 
         interactor.setEventLoopUserCallback([this](f3d::interactor_state_t) { this->EventLoop(); });
         interactor.start(deltaTime);
-
-        this->Internals->CacheWindowGeometry();
+        if (!this->Internals->AppOptions.NoCache)
+        {
+          this->Internals->CacheWindowGeometry();
+        }
       }
     }
   }
