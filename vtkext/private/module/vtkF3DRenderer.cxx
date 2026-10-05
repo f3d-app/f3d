@@ -3287,9 +3287,9 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   // Recover coloring information and update handler
   F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
 
-  bool forcePoints =
+  const bool forcePoints =
     this->DataFieldForColoring == DataField::POINTS || !this->ArrayIsCellData.value_or(true);
-  bool forceCells =
+  const bool forceCells =
     this->DataFieldForColoring == DataField::CELLS || this->ArrayIsCellData.value_or(false);
 
   const auto info =

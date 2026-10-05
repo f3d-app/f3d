@@ -25,7 +25,20 @@ These components are now installed by default:
 
 See building documentation for more information.
 
-## Options
+## Application CLI options
+
+### Coloring mode
+
+`-s/--scalar-coloring` has been replaced by `-s/--coloring-mode`. `--coloring-mode` is a string taking `material`, `scivis` or `direct` value.  
+If not defined, `material` is used. If defined but no value is specified, `scivis` is used.
+
+`-y/--coloring-component` doesn't accept negative values anymore. Do not define if you want to use the magnitude, and use `--coloring-mode=direct` instead of `--coloring-component=-2`
+
+`--coloring-by-cells` has been replaced by `--coloring-field`. `--coloring-field` is a string taking `any`, `points` or `cells` value.
+
+Refer to [CLI options](../user/03-OPTIONS.md) for more details.
+
+## Library options
 
 ### Enable options
 
@@ -42,7 +55,7 @@ So to enable point sprites, just set the type to the value that used to be the d
 
 `ui.scene_hierarchy` have been removed in favor of `ui.scene_hierarchy.enable`.
 
-### Scientific visualization
+### Coloring mode
 
 Scivis options have been revamped entirely.
 
