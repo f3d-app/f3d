@@ -122,6 +122,7 @@ int test_animation()
     return 1;
   }
 
+  direction = f3d_animation_direction(anim);
   if (direction != 1)
   {
     puts("[ERROR] Failed to recover expected direction value after toggle backward");
