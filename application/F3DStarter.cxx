@@ -1603,7 +1603,9 @@ int F3DStarter::Start(int argc, char** argv)
       }
       else if (this->Internals->AppOptions.RenderingBackend == "xr")
       {
+        // LCOV_EXCL_START
         this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createXR());
+        // LCOV_EXCL_STOP
       }
       else
       {

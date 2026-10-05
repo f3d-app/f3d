@@ -348,6 +348,7 @@ void vtkF3DRenderer::Initialize()
 
   // camera only gets updated by openxr on the first render, so we have to create the bounding box
   // and align the scene on the first render as well.
+  // LCOV_EXCL_START
   vtkNew<vtkCallbackCommand> startEventCallback;
   startEventCallback->SetClientData(this);
   startEventCallback->SetCallback(
@@ -386,6 +387,7 @@ void vtkF3DRenderer::Initialize()
       self->UpdateActors();
     });
   this->RenderWindow->AddObserver(vtkCommand::StartEvent, startEventCallback);
+  // LCOV_EXCL_STOP
 }
 
 //----------------------------------------------------------------------------
@@ -1203,6 +1205,7 @@ void vtkF3DRenderer::SetUseCache(bool useCache)
 vtkBoundingBox vtkF3DRenderer::CreateCameraFacingBoundingBox(
   vtkCamera* camera, double scale, double distance)
 {
+  // LCOV_EXCL_START
   if (this->XrBoundingBoxConfigured)
   {
     return {};
@@ -1249,11 +1252,13 @@ vtkBoundingBox vtkF3DRenderer::CreateCameraFacingBoundingBox(
   }
 
   return bbox;
+  // LCOV_EXCL_STOP
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::AlignSceneToBounds(const vtkBoundingBox& bounds)
 {
+  // LCOV_EXCL_START
   if (!bounds.IsValid() || !this->Importer)
   {
     return;
@@ -1361,6 +1366,7 @@ void vtkF3DRenderer::AlignSceneToBounds(const vtkBoundingBox& bounds)
     prop3D->SetPosition(targetCenter[0], targetCenter[1], targetCenter[2]);
     prop3D->SetScale(scale, scale, scale);
   }
+  // LCOV_EXCL_STOP
 }
 
 //----------------------------------------------------------------------------
@@ -3661,6 +3667,7 @@ void vtkF3DRenderer::SetComponentForColoring(const std::optional<int>& component
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetXRMode(bool enable, bool showBbox)
 {
+  // LCOV_EXCL_START
   if (enable != this->UseXR)
   {
     this->UseXR = enable;
@@ -3680,6 +3687,7 @@ void vtkF3DRenderer::SetXRMode(bool enable, bool showBbox)
       this->RemoveActor(this->XRBBoxActor);
     }
   }
+  // LCOV_EXCL_STOP
 }
 
 //----------------------------------------------------------------------------
