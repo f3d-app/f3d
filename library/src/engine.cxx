@@ -214,7 +214,9 @@ engine engine::createOSMesa()
 //----------------------------------------------------------------------------
 engine engine::createXR()
 {
+  // LCOV_EXCL_START
   return { window::Type::XR, false, nullptr };
+  // LCOV_EXCL_STOP
 }
 
 //----------------------------------------------------------------------------

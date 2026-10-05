@@ -2127,6 +2127,7 @@ interactor& interactor_impl::requestStop()
 //----------------------------------------------------------------------------
 void interactor_impl::SetXRResourcesDirectory(const std::string& actionsManifestDirectory)
 {
+  // LCOV_EXCL_START
 #if F3D_MODULE_OPENXR
   vtkOpenXRRenderWindowInteractor* xrInteractor =
     vtkOpenXRRenderWindowInteractor::SafeDownCast(this->Internals->VTKInteractor);
@@ -2134,6 +2135,7 @@ void interactor_impl::SetXRResourcesDirectory(const std::string& actionsManifest
 #else
   (void)actionsManifestDirectory; // do nothing if OpenXR is not enabled
 #endif
+  // LCOV_EXCL_STOP
 }
 
 //----------------------------------------------------------------------------

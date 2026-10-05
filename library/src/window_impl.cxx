@@ -188,12 +188,14 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   }
   else if (type == Type::XR)
   {
+    // LCOV_EXCL_START
 #ifdef F3D_MODULE_OPENXR
     this->Internals->RenWin = vtkSmartPointer<vtkOpenXRRenderWindow>::New();
 #else
     throw engine::no_window_exception(
       "Cannot create a window of type XR as F3D_MODULE_OPENXR is not enabled");
 #endif
+    // LCOV_EXCL_STOP
   }
   else if (!type.has_value())
   {
@@ -224,10 +226,12 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   if (type == Type::XR)
   {
 #ifdef F3D_MODULE_OPENXR
+    // LCOV_EXCL_START
     vtkOpenXRRenderWindow* xrRenWin = vtkOpenXRRenderWindow::SafeDownCast(this->Internals->RenWin);
     xrRenWin->vtkOpenGLRenderWindow::AddRenderer(this->Internals->Renderer);
     vtkNew<vtkOpenXRCamera> xrCamera;
     this->Internals->Renderer->SetActiveCamera(xrCamera);
+    // LCOV_EXCL_STOP
 #endif
   }
   else
@@ -980,10 +984,12 @@ void window_impl::SetResourcesPath(const fs::path& resourcesPath)
 #endif
     }
   }
+  // LCOV_EXCL_START
   catch (const fs::filesystem_error& ex)
   {
     throw engine::resource_exception(std::string("Could not use resources: ") + ex.what());
   }
+  // LCOV_EXCL_STOP
 }
 
 //----------------------------------------------------------------------------
