@@ -21,6 +21,12 @@ Instead of showing a render view and render to it, _render directly into a video
 
 Use with --output to output a png file with a transparent background.
 
+### `--no-cache` (_bool_, default: `false`)
+
+No cache is used (both readin and writing).
+Cache is currently used to save and restore last window size and position.
+It's also used to save and restore HDRI related information.
+
 ### `-h`, `--help`
 
 Print _help_ and exit. Ignore `--verbose`.
