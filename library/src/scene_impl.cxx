@@ -444,7 +444,9 @@ scene& scene_impl::add(const std::byte* buffer, std::size_t size)
   }
 #endif
 
-  const f3d::reader* reader = f3d::factory::instance()->getReader(buffer, size, forceReader);
+  f3d::file_availability availability = f3d::file_availability::UNSUPPORTED_EXTENSION;
+  const f3d::reader* reader =
+    f3d::factory::instance()->getReader(buffer, size, forceReader, availability);
   if (reader)
   {
     if (forceReader)
@@ -1021,6 +1023,20 @@ f3d::file_availability scene_impl::supports(const fs::path& filePath)
   f3d::factory::instance()->getReader(filePath.string(),
     this->Internals->Options.scene.force_reader, this->Internals->Options.scene.skip_content_check,
     availability);
+  return availability;
+}
+
+//----------------------------------------------------------------------------
+f3d::file_availability scene_impl::supports(const std::byte* buffer, std::size_t size)
+{
+  f3d::file_availability availability = f3d::file_availability::UNSUPPORTED_EXTENSION;
+  if (buffer == nullptr || size == 0)
+  {
+    return availability;
+  }
+
+  f3d::factory::instance()->getReader(
+    buffer, size, this->Internals->Options.scene.force_reader, availability);
   return availability;
 }
 

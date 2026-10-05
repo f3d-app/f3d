@@ -2,6 +2,7 @@ import app.f3d.F3D.*;
 
 import java.io.*;
 import java.lang.String;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,6 +47,19 @@ public class TestScene {
     }
     try {
       scene.supports(null);
+      throw new RuntimeException("Expected IllegalArgumentException was not thrown");
+    } catch (IllegalArgumentException e) {
+    }
+
+    byte[] sphereBuffer = Files.readAllBytes(new File(sphere).toPath());
+    if (scene.supports(sphereBuffer) != Scene.FileAvailability.SUPPORTED) {
+      throw new RuntimeException("a vtp buffer should be supported");
+    }
+    if (scene.supports(new byte[0]) != Scene.FileAvailability.UNSUPPORTED_EXTENSION) {
+      throw new RuntimeException("an empty buffer should not be supported");
+    }
+    try {
+      scene.supports((byte[]) null);
       throw new RuntimeException("Expected IllegalArgumentException was not thrown");
     } catch (IllegalArgumentException e) {
     }

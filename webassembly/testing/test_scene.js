@@ -34,6 +34,11 @@ const settings = {
       "a file with an invalid header should be reported as unsupported content",
     );
 
+    utils.assert(
+      scene.supportsBuffer(new Array()) === Module.FileAvailability.UNSUPPORTED_EXTENSION,
+      "an empty buffer should not be supported",
+    );
+
     const options = Module.engineInstance.getOptions();
 
     // background must be set to black for proper blending with transparent canvas

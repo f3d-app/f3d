@@ -194,6 +194,23 @@ public class Scene {
      */
     public native FileAvailability supports(String filePath);
 
+    private native FileAvailability supportsBuffer(byte[] buffer);
+
+    /**
+     * Check if a memory buffer is supported by the scene.
+     *
+     * @param buffer memory buffer to check
+     * @throws IllegalArgumentException if buffer is null
+     * @return file availability
+     */
+    public FileAvailability supports(byte[] buffer)
+    {
+        if (buffer == null) {
+            throw new IllegalArgumentException("buffer must not be null");
+        }
+        return this.supportsBuffer(buffer);
+    }
+
     /**
      * Get the animation
      * @return Animation instance

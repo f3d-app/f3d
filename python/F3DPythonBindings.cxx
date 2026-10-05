@@ -922,7 +922,16 @@ PYBIND11_MODULE(pyf3d, module)
   scene //
     .def_property_readonly(
       "animation", &f3d::scene::getAnimation, py::return_value_policy::reference)
-    .def("supports", &f3d::scene::supports)
+    .def("supports", py::overload_cast<const std::filesystem::path&>(&f3d::scene::supports),
+      "Check if the provided file path is supported", py::arg("file_path"))
+    .def(
+      "supports",
+      [](f3d::scene& scene, py::bytes buffer) -> f3d::file_availability
+      {
+        std::string_view sv(buffer);
+        return scene.supports(reinterpret_cast<const std::byte*>(sv.data()), sv.size());
+      },
+      "Check if the provided memory buffer is supported", py::arg("buffer"))
     .def("clear", &f3d::scene::clear)
     .def("get_added_files", &f3d::scene::getAddedFiles,
       "Return the list of files currently added to the scene")

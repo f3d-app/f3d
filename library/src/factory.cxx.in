@@ -96,12 +96,11 @@ reader* factory::getReader(const std::string& fileName,
 }
 
 //----------------------------------------------------------------------------
-reader* factory::getReader(
-  const std::byte* buffer, std::size_t size, std::optional<std::string> forceReader)
+reader* factory::getReader(const std::byte* buffer, std::size_t size,
+  std::optional<std::string> forceReader, file_availability& availability)
 {
   vtkNew<vtkMemoryResourceStream> stream;
   stream->SetBuffer(buffer, size);
-  file_availability availability = file_availability::UNSUPPORTED_EXTENSION;
 
   return f3d::pickReader(this->Plugins, std::move(forceReader), availability,
     [&](const reader* reader)

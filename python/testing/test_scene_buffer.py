@@ -16,6 +16,10 @@ def test_scene_buffer():
     buf = Path(points).read_bytes()
     options = engine.options
     options["scene.force_reader"] = "PLYReader"
+
+    assert engine.scene.supports(buf) == f3d.FileAvailability.SUPPORTED
+    assert engine.scene.supports(b"") == f3d.FileAvailability.UNSUPPORTED_EXTENSION
+
     engine.scene.add(buf)
 
     img = engine.window.render_to_image()
