@@ -355,6 +355,7 @@ endif()
 ## HDRI
 f3d_test(NAME TestHDRI DATA suzanne.ply HDRI shanghai_bund_1k.hdr THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
 f3d_test(NAME TestHDRICache DATA suzanne.ply HDRI shanghai_bund_1k.hdr DEPENDS TestHDRI THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
+f3d_test(NAME TestHDRINoCache DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --no-cache DEPENDS TestHDRI)
 # HDRI ambient lighting must follow render.light.intensity (see https://github.com/f3d-app/f3d/issues/3312)
 f3d_test(NAME TestHDRILightIntensityDimmer DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --light-intensity=0.1 DEPENDS TestHDRI THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
 f3d_test(NAME TestHDRILightIntensityBrighter DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --light-intensity=2.0 DEPENDS TestHDRI THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
@@ -655,9 +656,6 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250507)
     f3d_test(NAME TestAnimationIndicesWarningUniqueMulti DATA blob.vtkhdf ARGS --animation-indices=0,2 --load-plugins=hdf REGEXP "Non-zero or multiple animation indices have been specified but currently loaded file does not support it." NO_BASELINE)
   endif()
 endif()
-
-# Smoke test for --no-cache
-f3d_test(NAME TestNoCache DATA suzanne.ply ARGS -f --no-cache)
 
 # Test Grid verbose output
 f3d_test(NAME TestVerboseGrid DATA suzanne.ply ARGS -g --verbose REGEXP "Grid origin set to" NO_BASELINE)
