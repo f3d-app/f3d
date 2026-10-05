@@ -389,7 +389,8 @@ EMSCRIPTEN_BINDINGS(f3d)
       "keyFrames", +[](f3d::animation& animation) -> emscripten::val
       { return containerToJSArray(animation.keyFrames()); })
     .function("count", &f3d::animation::count)
-    .function("getName", &f3d::animation::getName)
+    .function("getName", +[](f3d::animation& anim) -> std::string { return anim.getName(); })
+    .function("getName", +[](f3d::animation& anim, int index) -> std::string { return anim.getName(index); })
     .function(
       "getNames",
       +[](f3d::animation& animation) { return containerToJSArray(animation.getNames()); });
