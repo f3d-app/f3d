@@ -612,6 +612,8 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
   const float maxWidth = std::min(
     static_cast<float>(this->SceneHierarchyMaxWidth), viewport->WorkSize.x - posX - margin);
   ::SetupNextWindow(position, std::nullopt);
+
+  // 0.f means auto-fit to content
   ImGui::SetNextWindowSize(ImVec2(0.f, winHeight), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSizeConstraints(ImVec2(10.f, winHeight), ImVec2(maxWidth, winHeight));
   ImGuiStyle& style = ImGui::GetStyle();
