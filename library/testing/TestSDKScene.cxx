@@ -148,6 +148,15 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     TestSDKHelpers::RenderTest(
       win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKSceneRedLight"));
 
+  redLight.switchState = false;
+  sce.updateLight(0, redLight);
+  eng.getWindow().render();
+  test("turn all lights off and render", sce.getLightCount(), 1);
+
+  sce.removeAllLights();
+  eng.getWindow().render();
+  test("remove all lights and render", sce.getLightCount(), 0);
+
   // scene hierarchy test, using a dedicated engine to avoid impacting the renders above
   {
     f3d::engine engine = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);

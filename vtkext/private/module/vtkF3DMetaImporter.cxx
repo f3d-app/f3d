@@ -14,6 +14,9 @@
 #include <vtkImageData.h>
 #include <vtkInformation.h>
 #include <vtkInformationIntegerKey.h>
+#include <vtkLight.h>
+#include <vtkLightCollection.h>
+#include <vtkLightKit.h>
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
@@ -591,6 +594,27 @@ bool vtkF3DMetaImporter::Update()
     }
 
     importerInfo.Updated = true;
+  }
+
+  // Add a light kit if there's no light
+  // Recover the number of lights that are on
+  vtkLightCollection* lc = this->Renderer->GetLights();
+  vtkLight* light;
+  int lightCount = 0;
+  vtkCollectionSimpleIterator it;
+  for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
+  {
+    if (light->GetSwitch())
+    {
+      lightCount++;
+    }
+  }
+
+  // If no lights are turned on, add a light kit, even when using a HDRI
+  if (lightCount == 0)
+  {
+    vtkNew<vtkLightKit> lightKit;
+    lightKit->AddLightsToRenderer(this->Renderer);
   }
 
   if (localCameraIndex > 0)
