@@ -1612,7 +1612,7 @@ interactor& interactor_impl::initBindings()
   auto docAnim = [&]()
   { return std::pair("Animation", this->Internals->AnimationManager->GetAnimationName()); };
 
-  // "Cycle point/cell data coloring" , "POINT/CELL"
+  // "Cycle coloring mode" , "material/scivis/direct"
   auto docMode = [&]() { return std::pair(std::string("Color mode"), opts.model.coloring); };
 
   // "Cycle array to color with" , "arrayName"

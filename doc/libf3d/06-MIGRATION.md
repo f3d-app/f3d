@@ -38,6 +38,16 @@ If not defined, `material` is used. If defined but no value is specified, `scivi
 
 Refer to [CLI options](../user/03-OPTIONS.md) for more details.
 
+## Application bindings
+
+### Coloring mode
+
+Some default bindings have changed or removed:
+
+<kbd>S</kbd> now cycles the coloring mode (`material`/`scivis`/`direct`) instead of cycling the arrays
+<kbd>Y</kbd> now cycles the arrays instead of cycling the components (<kbd>SHIFT</kbd>+<kbd>Y</kbd> can be used now to cycle the compoents)
+<kbd>C</kbd> has been removed because <kbd>Y</kbd> cycles all the arrays (points and cells)
+
 ## Library options
 
 ### Enable options

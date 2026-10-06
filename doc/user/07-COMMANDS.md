@@ -31,8 +31,8 @@ The libf3d provides a few commands, many related to manipulating libf3d (options
 
 `cycle_animation`: A specific command to cycle `scene.animation.indices` option using model information. No argument.
 
-`cycle_coloring field/array/component`: A specific command to manipulate scivis options using model information.
-Supports `field`, `array` or `component` arguments, see [documentation](04-INTERACTIONS.md#cycling-coloring).
+`cycle_coloring mode/array/component`: A specific command to manipulate coloring options using model information.
+Supports `mode`, `array` or `component` arguments, see [documentation](04-INTERACTIONS.md#cycling-coloring).
 eg: `cycle_coloring array`.
 
 `roll_camera value`: A specific command to roll the camera on its side, takes an angle in degrees as an argument.

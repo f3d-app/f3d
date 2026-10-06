@@ -199,7 +199,7 @@ CLI: `--coloring-mode`.
 
 ### `model.scivis.field` (_string_, default: `any`, enum domain: `any, points, cells`)
 
-Specify which array field must be used.
+Specify which array field must be used in `scivis` or `direct` coloring mode..
 
 CLI: `--coloring-field`.
 
@@ -224,7 +224,7 @@ CLI: `--volume-opacity-map`.
 
 ### `model.scivis.component` (_int_, optional)
 
-Specify the component to color with. If not set, it means _magnitude_.
+Specify the component to color with in `scivis` or `direct` coloring mode. If not set, it means _magnitude_.
 
 CLI: `--coloring-component`.
 
