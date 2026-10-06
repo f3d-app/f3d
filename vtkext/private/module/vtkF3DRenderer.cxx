@@ -1202,10 +1202,10 @@ void vtkF3DRenderer::SetUseCache(bool useCache)
 }
 
 //----------------------------------------------------------------------------
+// LCOV_EXCL_START
 vtkBoundingBox vtkF3DRenderer::CreateCameraFacingBoundingBox(
   vtkCamera* camera, double scale, double distance)
 {
-  // LCOV_EXCL_START
   if (this->XrBoundingBoxConfigured)
   {
     return {};
@@ -1252,13 +1252,13 @@ vtkBoundingBox vtkF3DRenderer::CreateCameraFacingBoundingBox(
   }
 
   return bbox;
-  // LCOV_EXCL_STOP
 }
+// LCOV_EXCL_STOP
 
 //----------------------------------------------------------------------------
+// LCOV_EXCL_START
 void vtkF3DRenderer::AlignSceneToBounds(const vtkBoundingBox& bounds)
 {
-  // LCOV_EXCL_START
   if (!bounds.IsValid() || !this->Importer)
   {
     return;
@@ -1271,21 +1271,13 @@ void vtkF3DRenderer::AlignSceneToBounds(const vtkBoundingBox& bounds)
 
   vtkNew<vtkMatrix4x4> upMatrix;
   const double m[16] = {
-    right[0],
-    right[1],
-    right[2],
+    right[0], right[1], right[2],
     0, //
-    up[0],
-    up[1],
-    up[2],
+    up[0], up[1], up[2],
     0, //
-    front[0],
-    front[1],
-    front[2],
+    front[0], front[1], front[2],
     0, //
-    0,
-    0,
-    0,
+    0, 0, 0,
     1, //
   };
   upMatrix->DeepCopy(m);
@@ -1366,8 +1358,8 @@ void vtkF3DRenderer::AlignSceneToBounds(const vtkBoundingBox& bounds)
     prop3D->SetPosition(targetCenter[0], targetCenter[1], targetCenter[2]);
     prop3D->SetScale(scale, scale, scale);
   }
-  // LCOV_EXCL_STOP
 }
+// LCOV_EXCL_STOP
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetHDRIFile(const std::optional<fs::path>& hdriFile)
@@ -2728,27 +2720,6 @@ void vtkF3DRenderer::ResetCameraClippingRange(const double bounds[6])
 //----------------------------------------------------------------------------
 int vtkF3DRenderer::UpdateLights()
 {
-  // Recover the number of lights that are on
-  vtkLightCollection* lc = this->GetLights();
-  vtkLight* light;
-  int lightCount = 0;
-  vtkCollectionSimpleIterator it;
-  for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
-  {
-    if (light->GetSwitch())
-    {
-      lightCount++;
-    }
-  }
-
-  // If no lights are turned on, add a light kit, even when using a HDRI
-  if (lightCount == 0)
-  {
-    vtkNew<vtkLightKit> lightKit;
-    lightKit->AddLightsToRenderer(this);
-    this->LightIntensitiesConfigured = false;
-  }
-
   // Update light shaders
   const int lightCount = this->Superclass::UpdateLights();
 

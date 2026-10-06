@@ -142,8 +142,16 @@ engine::engine(const std::optional<window::Type>& windowType, bool offscreen,
 
   this->Internals->Options = std::make_unique<options>();
 
-  this->Internals->Window = std::make_unique<detail::window_impl>(
-    *this->Internals->Options, windowType, offscreen, loader, id);
+  try
+  {
+    this->Internals->Window = std::make_unique<detail::window_impl>(
+      *this->Internals->Options, windowType, offscreen, loader, id);
+  }
+  catch (const engine::no_window_exception& ex)
+  {
+    delete this->Internals;
+    throw ex;
+  }
 
   if (!cachePath.empty())
   {
@@ -214,9 +222,7 @@ engine engine::createOSMesa()
 //----------------------------------------------------------------------------
 engine engine::createXR()
 {
-  // LCOV_EXCL_START
   return { window::Type::XR, false, nullptr };
-  // LCOV_EXCL_STOP
 }
 
 //----------------------------------------------------------------------------
