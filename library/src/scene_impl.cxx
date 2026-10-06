@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <iterator>
 #include <optional>
 #include <string>
@@ -387,6 +388,9 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
         fail(" contains unsupported content and no reader have been selected, use skip content "
              "check to skip content validation or force reader to "
              "force a specific reader");
+        break;
+      case file_availability::EMPTY_STREAM:
+        assert(false); // Unreachable
         break;
     }
 
