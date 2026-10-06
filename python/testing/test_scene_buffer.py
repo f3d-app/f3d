@@ -18,7 +18,7 @@ def test_scene_buffer():
     options["scene.force_reader"] = "PLYReader"
 
     assert engine.scene.supports(buf) == f3d.FileAvailability.SUPPORTED
-    assert engine.scene.supports(b"") == f3d.FileAvailability.UNSUPPORTED_EXTENSION
+    assert engine.scene.supports(b"") == f3d.FileAvailability.EMPTY_STREAM
 
     engine.scene.add(buf)
 

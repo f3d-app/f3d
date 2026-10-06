@@ -870,6 +870,7 @@ PYBIND11_MODULE(pyf3d, module)
     .value("SUPPORTED", f3d::file_availability::SUPPORTED)
     .value("UNSUPPORTED_EXTENSION", f3d::file_availability::UNSUPPORTED_EXTENSION)
     .value("UNSUPPORTED_CONTENT", f3d::file_availability::UNSUPPORTED_CONTENT)
+    .value("EMPTY_STREAM", f3d::file_availability::EMPTY_STREAM)
     .export_values();
 
   // f3d::node_state_t

@@ -213,8 +213,8 @@ extern "C"
    * @param scene Scene handle.
    * @param buffer Memory buffer containing a file.
    * @param size Size of the buffer in bytes.
-   * @return 0 if supported, 1 for unsupported extension, 2 for unsupported content, -1 if buffer
-   * is NULL, size is 0 or scene is NULL.
+   * @return 0 if supported, 1 for unsupported extension, 2 for unsupported content, 3 if buffer
+   * is NULL or size is 0, -1 if scene is NULL.
    */
   F3D_EXPORT int f3d_scene_supports_buffer(f3d_scene_t* scene, const void* buffer, size_t size);
 

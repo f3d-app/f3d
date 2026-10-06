@@ -454,7 +454,8 @@ EMSCRIPTEN_BINDINGS(f3d)
   emscripten::enum_<f3d::file_availability>("FileAvailability")
     .value("SUPPORTED", f3d::file_availability::SUPPORTED)
     .value("UNSUPPORTED_EXTENSION", f3d::file_availability::UNSUPPORTED_EXTENSION)
-    .value("UNSUPPORTED_CONTENT", f3d::file_availability::UNSUPPORTED_CONTENT);
+    .value("UNSUPPORTED_CONTENT", f3d::file_availability::UNSUPPORTED_CONTENT)
+    .value("EMPTY_STREAM", f3d::file_availability::EMPTY_STREAM);
 
   emscripten::class_<f3d::scene>("Scene")
     .function(

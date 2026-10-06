@@ -45,9 +45,9 @@ int test_scene_buffer()
     return 1;
   }
 
-  if (f3d_scene_supports_buffer(scene, NULL, 0) != -1)
+  if (f3d_scene_supports_buffer(scene, NULL, 0) != 3)
   {
-    puts("[ERROR] Expected null buffer to return -1");
+    puts("[ERROR] Expected null buffer to return 3 (EMPTY_STREAM)");
     f3d_engine_destroy(engine);
     return 1;
   }

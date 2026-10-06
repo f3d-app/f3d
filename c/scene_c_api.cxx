@@ -220,7 +220,7 @@ int f3d_scene_supports(f3d_scene_t* scene, const char* file_path)
 //----------------------------------------------------------------------------
 int f3d_scene_supports_buffer(f3d_scene_t* scene, const void* buffer, size_t size)
 {
-  if (!scene || !buffer || size == 0)
+  if (!scene)
   {
     return -1;
   }

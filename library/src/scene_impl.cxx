@@ -1029,12 +1029,12 @@ f3d::file_availability scene_impl::supports(const fs::path& filePath)
 //----------------------------------------------------------------------------
 f3d::file_availability scene_impl::supports(const std::byte* buffer, std::size_t size)
 {
-  f3d::file_availability availability = f3d::file_availability::UNSUPPORTED_EXTENSION;
   if (buffer == nullptr || size == 0)
   {
-    return availability;
+    return f3d::file_availability::EMPTY_STREAM;
   }
 
+  f3d::file_availability availability = f3d::file_availability::UNSUPPORTED_EXTENSION;
   f3d::factory::instance()->getReader(
     buffer, size, this->Internals->Options.scene.force_reader, availability);
   return availability;

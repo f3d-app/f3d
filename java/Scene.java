@@ -25,7 +25,8 @@ public class Scene {
     public enum FileAvailability {
         SUPPORTED(0),
         UNSUPPORTED_EXTENSION(1),
-        UNSUPPORTED_CONTENT(2);
+        UNSUPPORTED_CONTENT(2),
+        EMPTY_STREAM(3);
 
         private final int value;
 

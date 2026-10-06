@@ -55,7 +55,7 @@ public class TestScene {
     if (scene.supports(sphereBuffer) != Scene.FileAvailability.SUPPORTED) {
       throw new RuntimeException("a vtp buffer should be supported");
     }
-    if (scene.supports(new byte[0]) != Scene.FileAvailability.UNSUPPORTED_EXTENSION) {
+    if (scene.supports(new byte[0]) != Scene.FileAvailability.EMPTY_STREAM) {
       throw new RuntimeException("an empty buffer should not be supported");
     }
     try {
