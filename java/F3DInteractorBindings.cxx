@@ -9,6 +9,7 @@
 namespace
 {
 std::map<std::string, jobject> g_commandCallbacks;
+std::map<std::string, jobject> g_bindingCallbacks;
 jobject g_eventLoopCallback = nullptr;
 jobject g_notificationCallback = nullptr;
 JavaVM* g_jvm = nullptr;
@@ -25,6 +26,11 @@ f3d::interactor& GetInteractor(JNIEnv* env, jobject self)
   }
 
   return *reinterpret_cast<f3d::interactor*>(ptr);
+}
+
+std::string GetBindingCallbackMapKey(const f3d::interaction_bind_t& bind)
+{
+  return std::to_string(static_cast<int>(bind.mod)) + "|" + bind.inter;
 }
 
 f3d::interaction_bind_t::ModifierKeys JavaModToNative(jint mod)
@@ -111,6 +117,195 @@ jobject NativeBindToJava(JNIEnv* env, const f3d::interaction_bind_t& bind)
   env->SetObjectField(bindObj, interField, interStr);
 
   return bindObj;
+}
+
+f3d::interactor::documentation_callback_t JavaDocCallbackToNative(JNIEnv* env, jobject callback, const f3d::interaction_bind_t& bind)
+{
+  if (!callback)
+  {
+    return nullptr;
+  }
+
+  jobject callbackGlobal = env->NewGlobalRef(callback);
+  g_bindingCallbacks[GetBindingCallbackMapKey(bind)] = callbackGlobal;
+
+  JniLocalRef<jclass> callbackClass(env, env->GetObjectClass(callback));
+
+  jmethodID executeMethod = env->GetMethodID(
+    callbackClass,
+    "execute",
+    "()Lapp/f3d/F3D/Interactor$Documentation;");
+
+  return [callbackGlobal, executeMethod]() -> std::pair<std::string, std::string>
+  {
+    JNIEnv* env = nullptr;
+
+#ifdef __ANDROID__
+    if (g_jvm->AttachCurrentThread(&env, nullptr) != JNI_OK)
+#else
+    if (g_jvm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) != JNI_OK)
+#endif
+    {
+      return { "", "" };
+    }
+
+    JniLocalRef<jobject> documentation(
+      env,
+      env->CallObjectMethod(callbackGlobal, executeMethod));
+
+    JniLocalRef<jclass> documentationClass(
+      env, env->GetObjectClass(documentation));
+
+    jfieldID firstField =
+      env->GetFieldID(
+        documentationClass, "first", "Ljava/lang/String;");
+
+    jfieldID secondField =
+      env->GetFieldID(
+        documentationClass, "second", "Ljava/lang/String;");
+
+    JniLocalRef<jstring> first(
+      env,
+      static_cast<jstring>(
+        env->GetObjectField(documentation, firstField)));
+
+    JniLocalRef<jstring> second(
+      env,
+      static_cast<jstring>(
+        env->GetObjectField(documentation, secondField)));
+
+    JniUTFString firstStr(env, first);
+    JniUTFString secondStr(env, second);
+
+    return { firstStr.c_str(), secondStr.c_str() };
+  };
+}
+
+
+f3d::interactor::BindingParam JavaBindingParamToNative(JNIEnv* env, jobject binding)
+{
+  f3d::interactor::BindingParam nativeBinding;
+
+  JniLocalRef<jclass> bindingClass(env, env->GetObjectClass(binding));
+
+  // bind
+  jfieldID bindField =
+    env->GetFieldID(bindingClass, "bind",
+      "Lapp/f3d/F3D/Interactor$InteractionBind;");
+  JniLocalRef<jobject> bindObj(
+    env, env->GetObjectField(binding, bindField));
+
+  f3d::interaction_bind_t bind = JavaBindToNative(env, bindObj);
+  nativeBinding.Bind = bind;
+
+  // commands
+  jfieldID commandsField =
+    env->GetFieldID(
+      bindingClass,
+      "commands",
+      "Ljava/util/List;");
+
+  JniLocalRef<jobject> commandsObj(
+    env,
+    env->GetObjectField(binding, commandsField));
+
+  JniLocalRef<jclass> listClass(
+    env,
+    env->GetObjectClass(commandsObj));
+
+  jmethodID sizeMethod =
+    env->GetMethodID(listClass, "size", "()I");
+
+  jmethodID getMethod =
+    env->GetMethodID(
+      listClass,
+      "get",
+      "(I)Ljava/lang/Object;");
+
+  jint size = env->CallIntMethod(commandsObj, sizeMethod);
+
+  for (jint i = 0; i < size; ++i)
+  {
+    JniLocalRef<jstring> command(
+      env,
+      static_cast<jstring>(
+        env->CallObjectMethod(commandsObj, getMethod, i)));
+
+    JniUTFString commandStr(env, command);
+    nativeBinding.Commands.emplace_back(commandStr.c_str());
+  }
+
+  // group
+  jfieldID groupField =
+    env->GetFieldID(
+      bindingClass,
+      "group",
+      "Ljava/lang/String;");
+
+  JniLocalRef<jstring> group(
+    env,
+    static_cast<jstring>(
+      env->GetObjectField(binding, groupField)));
+
+  if (group)
+  {
+    JniUTFString groupStr(env, group);
+    nativeBinding.Group = groupStr.c_str();
+  }
+
+  // docCallback
+  jfieldID callbackField =
+    env->GetFieldID(
+      bindingClass,
+      "docCallback",
+      "Lapp/f3d/F3D/Interactor$DocCallback;");
+
+  JniLocalRef<jobject> callback(
+    env,
+    env->GetObjectField(binding, callbackField));
+
+  nativeBinding.DocCallback =
+    JavaDocCallbackToNative(env, callback, bind);
+
+  // type
+  jfieldID typeField =
+    env->GetFieldID(
+      bindingClass,
+      "type",
+      "Lapp/f3d/F3D/Interactor$BindingType;");
+
+  JniLocalRef<jobject> typeObj(
+    env,
+    env->GetObjectField(binding, typeField));
+
+  JniLocalRef<jclass> typeClass(
+    env,
+    env->GetObjectClass(typeObj));
+
+  jmethodID ordinalMethod =
+    env->GetMethodID(typeClass, "ordinal", "()I");
+
+  jint typeOrdinal =
+    env->CallIntMethod(typeObj, ordinalMethod);
+
+  nativeBinding.Type =
+    static_cast<f3d::interactor::BindingType>(typeOrdinal);
+
+  // notify
+  jfieldID notifyField =
+    env->GetFieldID(bindingClass, "notify", "Z");
+
+  nativeBinding.Notify =
+    env->GetBooleanField(binding, notifyField) == JNI_TRUE;
+
+  // repeat
+  jfieldID repeatField =
+    env->GetFieldID(bindingClass, "repeat", "Z");
+
+  nativeBinding.Repeat =
+    env->GetBooleanField(binding, repeatField) == JNI_TRUE;
+
+  return nativeBinding;
 }
 }
 
@@ -227,59 +422,13 @@ extern "C"
     return self;
   }
 
-  JNIEXPORT jobject JAVA_BIND(Interactor, addBindingCommands)(JNIEnv* env, jobject self,
-    jobject bind, jobject commands, jstring group, jobject type, jboolean notify, jboolean repeat)
+  JNIEXPORT jobject JAVA_BIND(Interactor, addBindingCommands)(JNIEnv* env, jobject self, jobject binding)
   {
-    const f3d::interaction_bind_t nativeBind = JavaBindToNative(env, bind);
-
-    const JniLocalRef<jclass> listClass(env, env->GetObjectClass(commands));
-    jmethodID sizeMethod = env->GetMethodID(listClass, "size", "()I");
-    jmethodID getMethod = env->GetMethodID(listClass, "get", "(I)Ljava/lang/Object;");
-    const jint size = env->CallIntMethod(commands, sizeMethod);
-
-    std::vector<std::string> commandsVec;
-    for (jint i = 0; i < size; i++)
-    {
-      const JniLocalRef<jstring> cmdStr(
-        env, static_cast<jstring>(env->CallObjectMethod(commands, getMethod, i)));
-      const JniUTFString cmdCStr(env, cmdStr);
-      commandsVec.push_back(cmdCStr.c_str());
-    }
-
-    const JniUTFString groupStr(env, group);
-    const std::string groupCpp = groupStr.c_str();
-
-    const JniLocalRef<jclass> typeEnum(env, env->GetObjectClass(type));
-    jmethodID ordinalMethod = env->GetMethodID(typeEnum, "ordinal", "()I");
-    const jint typeOrdinal = env->CallIntMethod(type, ordinalMethod);
-
-    f3d::interactor::BindingType nativeType;
-    switch (typeOrdinal)
-    {
-      case 0:
-        nativeType = f3d::interactor::BindingType::CYCLIC;
-        break;
-      case 1:
-        nativeType = f3d::interactor::BindingType::NUMERICAL;
-        break;
-      case 2:
-        nativeType = f3d::interactor::BindingType::TOGGLE;
-        break;
-      case 3:
-      default:
-        nativeType = f3d::interactor::BindingType::OTHER;
-        break;
-    }
+    f3d::interactor::BindingParam bindingParam = JavaBindingParamToNative(env, binding);
 
     try
     {
-      GetInteractor(env, self).addBinding({ .Bind = nativeBind,
-        .Commands = commandsVec,
-        .Group = groupCpp,
-        .DocCallback = nullptr,
-        .Type = nativeType,
-        .Notify = notify != JNI_FALSE,
-        .Repeat = repeat != JNI_FALSE });
+      GetInteractor(env, self).addBinding(bindingParam);
     }
     catch (const f3d::interactor::already_exists_exception& e)
     {
@@ -294,6 +443,13 @@ extern "C"
     try
     {
       GetInteractor(env, self).removeBinding(nativeBind);
+
+      if (const jobject callback = g_bindingCallbacks[GetBindingCallbackMapKey(nativeBind)];
+        callback != nullptr)
+      {
+        env->DeleteGlobalRef(callback);
+        g_bindingCallbacks[GetBindingCallbackMapKey(nativeBind)] = nullptr;
+      }
     }
     catch (const f3d::interactor::does_not_exists_exception& e)
     {
