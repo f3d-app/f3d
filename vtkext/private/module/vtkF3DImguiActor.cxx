@@ -594,12 +594,6 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
   assert(viewport);
 
-  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-  assert(ren != nullptr);
-
-  vtkF3DMetaImporter* importer = ren->GetMetaImporter();
-  assert(importer != nullptr);
-
   constexpr float margin = F3DStyle::GetDefaultMargin();
   const float winHeight = viewport->WorkSize.y - 2.0f * margin;
 
@@ -629,6 +623,12 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
     ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NoMove;
 
   ImGui::Begin("Scene Hierarchy", nullptr, flags);
+
+  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+  assert(ren != nullptr);
+
+  vtkF3DMetaImporter* importer = ren->GetMetaImporter();
+  assert(importer != nullptr);
 
   for (int i = 0; i < importer->GetImporterInfoCount(); i++)
   {
