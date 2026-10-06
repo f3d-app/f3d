@@ -596,22 +596,21 @@ bool vtkF3DMetaImporter::Update()
     importerInfo.Updated = true;
   }
 
-  // Add a light kit if there's no light
-  // Recover the number of lights that are on
+  // Add a light kit if there's no active light
   vtkLightCollection* lc = this->Renderer->GetLights();
   vtkLight* light;
-  int lightCount = 0;
+  bool hasActiveLight = false;
   vtkCollectionSimpleIterator it;
   for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
   {
     if (light->GetSwitch())
     {
-      lightCount++;
+      hasActiveLight = true;
+      break;
     }
   }
 
-  // If no lights are turned on, add a light kit, even when using a HDRI
-  if (lightCount == 0)
+  if (!hasActiveLight)
   {
     vtkNew<vtkLightKit> lightKit;
     lightKit->AddLightsToRenderer(this->Renderer);
