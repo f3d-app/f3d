@@ -445,7 +445,7 @@ void f3d_interactor_add_binding(f3d_interactor_t* interactor, f3d_binding_params
     cpp_commands.push_back(binding.commands[i]);
   }
 
-  std::string cpp_group = binding.group ? binding.group : "";
+  const std::string cpp_group = binding.group ? binding.group : "";
 
   try
   {
