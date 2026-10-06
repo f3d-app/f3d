@@ -64,7 +64,8 @@ emscripten::val pairToJSArray(const std::pair<U, V>& p)
 
 emscripten::val getBindingDocCallback(const f3d::interactor::BindingParam& binding)
 {
-  if (!binding.DocCallback) {
+  if (!binding.DocCallback)
+  {
     return emscripten::val::null();
   }
 
@@ -78,7 +79,8 @@ emscripten::val getBindingDocCallback(const f3d::interactor::BindingParam& bindi
 
 void setBindingDocCallback(f3d::interactor::BindingParam& binding, emscripten::val callback)
 {
-  if (callback.isNull() || callback.isUndefined()) {
+  if (callback.isNull() || callback.isUndefined())
+  {
     binding.DocCallback = nullptr;
     return;
   }
@@ -87,13 +89,9 @@ void setBindingDocCallback(f3d::interactor::BindingParam& binding, emscripten::v
   {
     emscripten::val result = callback();
 
-    return std::make_pair(
-      result[0].as<std::string>(),
-      result[1].as<std::string>()
-    );
+    return std::make_pair(result[0].as<std::string>(), result[1].as<std::string>());
   };
 }
-
 
 struct wasm_mesh_view : public f3d::mesh_view
 {
@@ -892,10 +890,7 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function(
       "addBinding",
       +[](f3d::interactor& interactor, f3d::interactor::BindingParam binding) -> f3d::interactor&
-      {
-        return interactor.addBinding(binding);
-      },
-      emscripten::return_value_policy::reference())
+      { return interactor.addBinding(binding); }, emscripten::return_value_policy::reference())
     .function("removeBinding", &f3d::interactor::removeBinding,
       emscripten::return_value_policy::reference())
     .function(

@@ -70,7 +70,7 @@ const settings = {
     interactor.addBinding(bindParam);
 
     const repeatCommands = new Module.InteractorBindCommands();
-    repeatCommands.push_back("increase render.light.intensity .1")
+    repeatCommands.push_back("increase render.light.intensity .1");
 
     const bindRepeat = new Module.InteractionBind();
     bindRepeat.mod = Module.InteractionBindModifierKeys.CTRL_SHIFT;

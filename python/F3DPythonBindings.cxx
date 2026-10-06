@@ -464,12 +464,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def(py::init<>())
     .def(py::init<f3d::interaction_bind_t, std::vector<std::string>, std::string,
            f3d::interactor::documentation_callback_t, f3d::interactor::BindingType, bool, bool>(),
-      py::arg("Bind"),
-      py::arg("Commands"),
-      py::arg("Group") = "",
-      py::arg("DocCallback") = nullptr,
-      py::arg("Type") = f3d::interactor::BindingType::OTHER,
-      py::arg("Notify") = false,
+      py::arg("Bind"), py::arg("Commands"), py::arg("Group") = "", py::arg("DocCallback") = nullptr,
+      py::arg("Type") = f3d::interactor::BindingType::OTHER, py::arg("Notify") = false,
       py::arg("Repeat") = false)
     .def_readwrite("Bind", &f3d::interactor::BindingParam::Bind)
     .def_readwrite("Commands", &f3d::interactor::BindingParam::Commands)
