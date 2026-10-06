@@ -183,15 +183,9 @@ public:
     double fwd[3];
     vtkMath::Cross(right, up, fwd);
     const double m[9] = {
-      right[0],
-      right[1],
-      right[2], //
-      fwd[0],
-      fwd[1],
-      fwd[2], //
-      up[0],
-      up[1],
-      up[2], //
+      right[0], right[1], right[2], //
+      fwd[0], fwd[1], fwd[2],       //
+      up[0], up[1], up[2],          //
     };
     transform->DeepCopy(m);
   }
@@ -2131,9 +2125,9 @@ interactor& interactor_impl::requestStop()
 }
 
 //----------------------------------------------------------------------------
+// LCOV_EXCL_START
 void interactor_impl::SetXRResourcesDirectory(const std::string& actionsManifestDirectory)
 {
-  // LCOV_EXCL_START
 #if F3D_MODULE_OPENXR
   vtkOpenXRRenderWindowInteractor* xrInteractor =
     vtkOpenXRRenderWindowInteractor::SafeDownCast(this->Internals->VTKInteractor);
@@ -2141,14 +2135,8 @@ void interactor_impl::SetXRResourcesDirectory(const std::string& actionsManifest
 #else
   (void)actionsManifestDirectory; // do nothing if OpenXR is not enabled
 #endif
-  // LCOV_EXCL_STOP
 }
-
-//----------------------------------------------------------------------------
-void interactor_impl::SetAnimationManager(animationManager* manager)
-{
-  this->Internals->AnimationManager = manager;
-}
+// LCOV_EXCL_STOP
 
 //----------------------------------------------------------------------------
 void interactor_impl::SetInteractorOn(vtkInteractorObserver* observer)
