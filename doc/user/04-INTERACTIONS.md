@@ -127,8 +127,8 @@ When loading another file or reloading, options that have been changed interacti
 The following hotkeys let you cycle the coloring of the data:
 
 - <kbd>S</kbd>: cycle the coloring modes (material, scivis, direct).
-- <kbd>Y</kbd>: cycle on all arrays on point and cells.
-- <kbd>SHIFT+Y</kbd>: cycle the component available on the currently selected array, including magnitude.
+- <kbd>Y</kbd>: cycle on all arrays on point and cells, visible in scivis and direct mode.
+- <kbd>SHIFT+Y</kbd>: cycle the component available on the currently selected array, visible in scivis and direct mode, including magnitude.
 
 When changing the array, the component in use will be kept if valid with the new array, if not it will be cycled until a valid
 component is found.
