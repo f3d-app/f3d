@@ -163,61 +163,6 @@ private:
 };
 vtkStandardNewMacro(vtkF3DRenderDataAssemblyVisitor);
 
-/**
- * Visitor used to traverse a full tree (one per importer).
- * It will take care of estimate the maximum width of the tree nodes in order to set the width of
- * the scene hierarchy UI widget.
- */
-class vtkF3DMaxWidthAssemblyVisitor : public vtkDataAssemblyVisitor
-{
-public:
-  static vtkF3DMaxWidthAssemblyVisitor* New();
-  vtkTypeMacro(vtkF3DMaxWidthAssemblyVisitor, vtkDataAssemblyVisitor);
-
-  float GetMaxWidth() const
-  {
-    return this->MaxWidth;
-  }
-
-protected:
-  bool GetTraverseSubtree(int nodeid) override
-  {
-    return this->GetAssembly()->GetAttributeOrDefault(nodeid, "f3d_collapsed", 0) == 0;
-  }
-
-  void Visit(int nodeid) override
-  {
-    const char* defaultLabel =
-      this->GetAssembly()->GetNumberOfChildren(nodeid) > 0 ? "<group>" : "<object>";
-
-    float width =
-      ImGui::CalcTextSize(this->GetAssembly()->GetAttributeOrDefault(nodeid, "label", defaultLabel))
-        .x;
-
-    // arrow or bullet
-    width += ImGui::GetFontSize();
-
-    // spacing between arrow/bullet and checkbox
-    width += ImGui::GetStyle().ItemSpacing.x;
-
-    // checkbox
-    width += ImGui::GetFontSize() + ImGui::GetStyle().ItemInnerSpacing.x;
-
-    // indentation for parent nodes
-    while (nodeid != vtkDataAssembly::GetRootNode())
-    {
-      width += ImGui::GetStyle().IndentSpacing;
-      nodeid = this->GetAssembly()->GetParent(nodeid);
-    }
-
-    this->MaxWidth = std::max(this->MaxWidth, width);
-  }
-
-private:
-  float MaxWidth = 0.f;
-};
-vtkStandardNewMacro(vtkF3DMaxWidthAssemblyVisitor);
-
 }
 
 struct vtkF3DImguiActor::Internals
@@ -656,7 +601,6 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
   assert(importer != nullptr);
 
   constexpr float margin = F3DStyle::GetDefaultMargin();
-  const float defaultWidth = this->CalculateHierarchyWidth(importer);
   const float winHeight = viewport->WorkSize.y - 2.0f * margin;
 
   float posX = margin;
@@ -671,9 +615,10 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
   {
     position = ImVec2(posX, margin);
   }
-  const float maxWidth = std::max(10.f, viewport->WorkSize.x - posX - margin);
+  const float maxWidth = std::min(
+    static_cast<float>(this->SceneHierarchyMaxWidth), viewport->WorkSize.x - posX - margin);
   ::SetupNextWindow(position, std::nullopt);
-  ImGui::SetNextWindowSize(ImVec2(defaultWidth, winHeight), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(0.f, winHeight), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSizeConstraints(ImVec2(10.f, winHeight), ImVec2(maxWidth, winHeight));
   ImGuiStyle& style = ImGui::GetStyle();
   style.Colors[ImGuiCol_WindowBg] = ImVec4(
@@ -698,30 +643,6 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
   }
 
   ImGui::End();
-}
-
-//----------------------------------------------------------------------------
-float vtkF3DImguiActor::CalculateHierarchyWidth(vtkF3DMetaImporter* importer)
-{
-  float maxWidth = 0.0f;
-  const float indentPerLevel = ImGui::GetStyle().IndentSpacing;
-  const float treeArrowWidth = ImGui::GetFontSize();
-  const float checkboxWidth = ImGui::GetFrameHeight() + ImGui::GetStyle().ItemInnerSpacing.x;
-
-  for (int i = 0; i < importer->GetImporterInfoCount(); i++)
-  {
-    vtkF3DMetaImporter::ImporterInfo info = importer->GetImporterInfo(i);
-
-    vtkNew<::vtkF3DMaxWidthAssemblyVisitor> visitor;
-    info.DataAssembly->Visit(vtkDataAssembly::GetRootNode(), visitor);
-
-    maxWidth = std::max(maxWidth, visitor->GetMaxWidth());
-  }
-
-  float totalWidth =
-    maxWidth + 2.0f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize;
-
-  return std::min(totalWidth, static_cast<float>(this->SceneHierarchyMaxWidth));
 }
 
 //----------------------------------------------------------------------------

@@ -131,11 +131,6 @@ private:
    * Compute the width of a badge
    */
   float CalcBadgeWidth(const std::string& text);
-
-  /**
-   * Calculate the default width of the scene hierarchy UI widget
-   */
-  float CalculateHierarchyWidth(vtkF3DMetaImporter* importer);
 };
 
 #endif

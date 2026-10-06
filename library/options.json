@@ -344,8 +344,8 @@
     },
     "scene_hierarchy": {
       "enable": {
-         "type": "bool",
-         "default_value": "false"
+        "type": "bool",
+        "default_value": "false"
       },
       "max_width": {
         "type": "int",
