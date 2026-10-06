@@ -618,7 +618,7 @@ CLI: `--scene-hierarchy`.
 
 ### `ui.scene_hierarchy.max_width` (_int_, default: `600`)
 
-Maximum initial width of the _scene hierarchy_ widget.
+Maximum width of the _scene hierarchy_ widget in pixels.
 
 ### `ui.notifications.enable` (_bool_, default: `false`)
 

@@ -12,7 +12,6 @@
 
 #include <memory>
 
-class vtkF3DMetaImporter;
 class vtkOpenGLRenderWindow;
 class vtkWindow;
 
