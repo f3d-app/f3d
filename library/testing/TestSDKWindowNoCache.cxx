@@ -31,8 +31,8 @@ int TestSDKWindowNoCache([[maybe_unused]] int argc, [[maybe_unused]] char* argv[
 
   // render with the cache disabled
   test("render with no cache",
-    TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
-      "TestSDKWindowNoCache"));
+    TestSDKHelpers::RenderTest(
+      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKWindowNoCache"));
 
   return test.result();
 }

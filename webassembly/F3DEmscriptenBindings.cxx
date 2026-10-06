@@ -667,7 +667,8 @@ EMSCRIPTEN_BINDINGS(f3d)
           { jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() }));
       })
     .function("getDPIScale", &f3d::window::getDPIScale)
-    .function("setUseHDRICache", &f3d::window::setUseHDRICache);
+    .function("setUseHDRICache", &f3d::window::setUseHDRICache,
+      emscripten::return_value_policy::reference());
 
   // f3d::video_frame
   emscripten::class_<f3d::video_frame>("VideoFrame")
