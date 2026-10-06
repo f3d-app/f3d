@@ -43,8 +43,7 @@ int TestSDKSceneFromBuffer([[maybe_unused]] int argc, char* argv[])
   // supports method
   test("not supported with null buffer",
     sce.supports(nullptr, 0) == f3d::file_availability::EMPTY_STREAM);
-  test("not supported with zero size",
-    sce.supports(&y, 0) == f3d::file_availability::EMPTY_STREAM);
+  test("not supported with zero size", sce.supports(&y, 0) == f3d::file_availability::EMPTY_STREAM);
   test("not supported with unrecognized buffer content",
     sce.supports(&y, 1) == f3d::file_availability::UNSUPPORTED_CONTENT);
 

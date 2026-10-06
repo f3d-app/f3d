@@ -35,7 +35,8 @@ const settings = {
     );
 
     utils.assert(
-      scene.supportsBuffer(new Array()) === Module.FileAvailability.EMPTY_STREAM,
+      scene.supportsBuffer(new Array()) ===
+        Module.FileAvailability.EMPTY_STREAM,
       "an empty buffer should not be supported",
     );
 
