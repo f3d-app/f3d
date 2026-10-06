@@ -38,7 +38,6 @@
 #include <vtkImageReader2Factory.h>
 #include <vtkLight.h>
 #include <vtkLightCollection.h>
-#include <vtkLightKit.h>
 #include <vtkMath.h>
 #include <vtkMathUtilities.h>
 #include <vtkMatrix4x4.h>
@@ -2352,33 +2351,14 @@ void vtkF3DRenderer::ResetCameraClippingRange()
 //----------------------------------------------------------------------------
 int vtkF3DRenderer::UpdateLights()
 {
-  // Recover the number of lights that are on
-  vtkLightCollection* lc = this->GetLights();
-  vtkLight* light;
-  int lightCount = 0;
-  vtkCollectionSimpleIterator it;
-  for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
-  {
-    if (light->GetSwitch())
-    {
-      lightCount++;
-    }
-  }
-
-  // If no lights are turned on, add a light kit, even when using a HDRI
-  if (lightCount == 0)
-  {
-    vtkNew<vtkLightKit> lightKit;
-    lightKit->AddLightsToRenderer(this);
-    this->LightIntensitiesConfigured = false;
-  }
-
   // Update light shaders
-  lightCount = this->Superclass::UpdateLights();
+  const int lightCount = this->Superclass::UpdateLights();
 
   if (!this->LightIntensitiesConfigured)
   {
-    lc = this->GetLights();
+    vtkCollectionSimpleIterator it;
+    vtkLightCollection* lc = this->GetLights();
+    vtkLight* light = nullptr;
     for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
     {
       double originalIntensity;
