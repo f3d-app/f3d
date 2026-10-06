@@ -47,7 +47,7 @@ public class Animation {
     /**
      * Get the animation name of a given animation index, if any.
      *
-     * @param index animation index, -1 for current animation
+     * @param index animation index
      * @return animation name or string error
      */
     public native String getName(int index);

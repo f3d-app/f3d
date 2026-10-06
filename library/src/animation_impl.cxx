@@ -675,13 +675,7 @@ void animation_impl::PrepareForAnimationIndices()
       index++;
     }
 
-    // Check time range is valid
-    if (this->Internals->TimeRange[0] > this->Internals->TimeRange[1])
-    {
-      log::warn("Animation(s) time range delta is invalid: [", this->Internals->TimeRange[0], ", ",
-        this->Internals->TimeRange[1], "]. Swapping range.");
-      std::swap(this->Internals->TimeRange[0], this->Internals->TimeRange[1]);
-    }
+    assert(this->Internals->TimeRange[0] > this->Internals->TimeRange[1]);
     log::debug("Current animation time range is: [", this->Internals->TimeRange[0], ", ",
       this->Internals->TimeRange[1], "].");
   }

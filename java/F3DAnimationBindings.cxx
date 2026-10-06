@@ -42,7 +42,7 @@ extern "C"
     auto [minTime, maxTime] = GetEngine(env, self)->getScene().getAnimation().timeRange();
 
     jdoubleArray result = env->NewDoubleArray(2);
-    double timeRange[] = { minTime, maxTime };
+    jdouble timeRange[] = { minTime, maxTime };
     env->SetDoubleArrayRegion(result, 0, 2, timeRange);
 
     return result;

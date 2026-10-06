@@ -40,6 +40,7 @@ int test_animation()
   if (min_time != 0 || max_time - 0.8 > 1e-10)
   {
     puts("[ERROR] Failed to recover expected time range");
+    f3d_engine_destroy(engine);
     return 1;
   }
 
@@ -47,6 +48,7 @@ int test_animation()
   if (anim_count != 10)
   {
     puts("[ERROR] Failed to recover expected animation count");
+    f3d_engine_destroy(engine);
     return 1;
   }
 
@@ -55,6 +57,7 @@ int test_animation()
   if (keyframes_number != 9 || keyframes[1] != 0.1)
   {
     puts("[ERROR] Failed to recover expected animation keyframes");
+    f3d_engine_destroy(engine);
     return 1;
   }
   f3d_animation_destroy_keyframes(keyframes);
@@ -63,6 +66,7 @@ int test_animation()
   if (strcmp(name, "stand") != 0)
   {
     puts("[ERROR] Failed to recover expected current animation name");
+    f3d_engine_destroy(engine);
     return 1;
   }
   f3d_animation_destroy_string(name);
@@ -71,6 +75,7 @@ int test_animation()
   if (strcmp(name, "dead") != 0)
   {
     puts("[ERROR] Failed to recover expected animation name");
+    f3d_engine_destroy(engine);
     return 1;
   }
   f3d_animation_destroy_string(name);
@@ -80,6 +85,7 @@ int test_animation()
   if (count != 10 || strcmp(names[1], "dead") != 0)
   {
     puts("[ERROR] Failed to recover expected animation names");
+    f3d_engine_destroy(engine);
     return 1;
   }
   f3d_animation_destroy_string_array(names, count);
