@@ -191,7 +191,9 @@ def add_custom_bindings(eng: f3d.Engine):
             f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.SHIFT, "S"),
             "increase_animation_speed_factor",
             "Example",
-            lambda: docDblOpt("Increase animation speed", "scene.animation.speed_factor"),
+            lambda: docDblOpt(
+                "Increase animation speed", "scene.animation.speed_factor"
+            ),
             f3d.Interactor.BindingType.NUMERICAL,
         )
     )
@@ -202,7 +204,9 @@ def add_custom_bindings(eng: f3d.Engine):
             f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "S"),
             "decrease_animation_speed_factor",
             "Example",
-            lambda: docDblOpt("Decrease animation speed", "scene.animation.speed_factor"),
+            lambda: docDblOpt(
+                "Decrease animation speed", "scene.animation.speed_factor"
+            ),
             f3d.Interactor.BindingType.NUMERICAL,
         )
     )
