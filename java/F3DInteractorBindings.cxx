@@ -436,59 +436,6 @@ extern "C"
     return env->GetStaticObjectField(enumClass, fieldID);
   }
 
-  JNIEXPORT jobject JAVA_BIND(Interactor, toggleAnimation)(
-    JNIEnv* env, jobject self, jobject direction)
-  {
-    const JniLocalRef<jclass> directionEnum(env, env->GetObjectClass(direction));
-    jmethodID getValueMethod = env->GetMethodID(directionEnum, "getValue", "()I");
-    const jint directionValue = env->CallIntMethod(direction, getValueMethod);
-
-    const f3d::interactor::AnimationDirection nativeDirection =
-      static_cast<f3d::interactor::AnimationDirection>(directionValue);
-
-    GetInteractor(env, self).toggleAnimation(nativeDirection);
-    return self;
-  }
-
-  JNIEXPORT jobject JAVA_BIND(Interactor, startAnimation)(
-    JNIEnv* env, jobject self, jobject direction)
-  {
-    const JniLocalRef<jclass> directionEnum(env, env->GetObjectClass(direction));
-    jmethodID getValueMethod = env->GetMethodID(directionEnum, "getValue", "()I");
-    const jint directionValue = env->CallIntMethod(direction, getValueMethod);
-
-    const f3d::interactor::AnimationDirection nativeDirection =
-      static_cast<f3d::interactor::AnimationDirection>(directionValue);
-
-    GetInteractor(env, self).startAnimation(nativeDirection);
-    return self;
-  }
-
-  JNIEXPORT jobject JAVA_BIND(Interactor, stopAnimation)(JNIEnv* env, jobject self)
-  {
-    GetInteractor(env, self).stopAnimation();
-    return self;
-  }
-
-  JNIEXPORT jboolean JAVA_BIND(Interactor, isPlayingAnimation)(JNIEnv* env, jobject self)
-  {
-    return GetInteractor(env, self).isPlayingAnimation();
-  }
-
-  JNIEXPORT jobject JAVA_BIND(Interactor, getAnimationDirection)(JNIEnv* env, jobject self)
-  {
-    const f3d::interactor::AnimationDirection nativeDirection =
-      GetInteractor(env, self).getAnimationDirection();
-
-    const JniLocalRef<jclass> enumClass(
-      env, env->FindClass("app/f3d/F3D/Interactor$AnimationDirection"));
-    jmethodID fromValueMethod = env->GetStaticMethodID(
-      enumClass, "fromValue", "(I)Lapp/f3d/F3D/Interactor$AnimationDirection;");
-
-    return env->CallStaticObjectMethod(
-      enumClass, fromValueMethod, static_cast<int>(nativeDirection));
-  }
-
   JNIEXPORT jobject JAVA_BIND(Interactor, enableCameraMovement)(JNIEnv* env, jobject self)
   {
     GetInteractor(env, self).enableCameraMovement();

@@ -66,30 +66,6 @@ public class Interactor {
         CTRL_SHIFT
     }
 
-    public enum AnimationDirection {
-        FORWARD(0),
-        BACKWARD(1);
-
-        private final int value;
-
-        AnimationDirection(int value) {
-            this.value = value;
-        }
-
-        public int getValue() {
-            return value;
-        }
-
-        public static AnimationDirection fromValue(int value) {
-            for (AnimationDirection dir : AnimationDirection.values()) {
-                if (dir.value == value) {
-                    return dir;
-                }
-            }
-            throw new IllegalArgumentException("Invalid AnimationDirection value: " + value);
-        }
-    }
-
     public static class InteractionBind implements Comparable<InteractionBind> {
         public ModifierKeys mod;
         public String inter;
@@ -374,61 +350,6 @@ public class Interactor {
      * @return binding type
      */
     public native BindingType getBindingType(InteractionBind bind);
-
-    /**
-     * Toggle animation state.
-     *
-     * @param direction animation direction
-     * @return this interactor for method chaining
-     */
-    public native Interactor toggleAnimation(AnimationDirection direction);
-
-    /**
-     * Toggle animation state with default forward direction.
-     *
-     * @return this interactor for method chaining
-     */
-    public Interactor toggleAnimation() {
-        return toggleAnimation(AnimationDirection.FORWARD);
-    }
-
-    /**
-     * Start animation.
-     *
-     * @param direction animation direction
-     * @return this interactor for method chaining
-     */
-    public native Interactor startAnimation(AnimationDirection direction);
-
-    /**
-     * Start animation with default forward direction.
-     *
-     * @return this interactor for method chaining
-     */
-    public Interactor startAnimation() {
-        return startAnimation(AnimationDirection.FORWARD);
-    }
-
-    /**
-     * Stop animation.
-     *
-     * @return this interactor for method chaining
-     */
-    public native Interactor stopAnimation();
-
-    /**
-     * Check if animation is playing.
-     *
-     * @return true if playing, false otherwise
-     */
-    public native boolean isPlayingAnimation();
-
-    /**
-     * Get the current animation direction.
-     *
-     * @return animation direction
-     */
-    public native AnimationDirection getAnimationDirection();
 
     /**
      * Enable camera movement.
