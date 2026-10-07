@@ -18,7 +18,7 @@ def test_animation():
     # animation count
     assert engine.scene.animation.count() == 10
 
-    keyframes = engine.scene.animation.key_frames()
+    keyframes = engine.scene.animation.get_key_frames()
     assert len(keyframes) == 9
     assert keyframes[0] == 0
     assert keyframes[8] == 0.7999999999999999

@@ -20,7 +20,7 @@ const settings = {
     );
     utils.assert(anim.getKeyFrames()[0] === 0, "First KeyFrame should be 0");
     utils.assert(
-      anim.keyFrames()[8] === 0.7999999999999999,
+      anim.getKeyFrames()[8] === 0.7999999999999999,
       "First KeyFrame should be 0.7999999999999999",
     );
 
