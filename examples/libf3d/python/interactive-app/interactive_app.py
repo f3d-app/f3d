@@ -176,29 +176,35 @@ def add_custom_bindings(eng: f3d.Engine):
 
     # R: reset options
     inter.add_binding(
-        f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "R"),
-        "reset_options",
-        "Example",
-        lambda: docStr("Reset Options"),
-        f3d.Interactor.BindingType.OTHER,
+        f3d.BindingParam(
+            f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "R"),
+            "reset_options",
+            "Example",
+            lambda: docStr("Reset Options"),
+            f3d.Interactor.BindingType.OTHER,
+        )
     )
 
     # SHIFT + S: Increase animation speed
     inter.add_binding(
-        f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.SHIFT, "S"),
-        "increase_animation_speed_factor",
-        "Example",
-        lambda: docDblOpt("Increase animation speed", "scene.animation.speed_factor"),
-        f3d.Interactor.BindingType.NUMERICAL,
+        f3d.BindingParam(
+            f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.SHIFT, "S"),
+            "increase_animation_speed_factor",
+            "Example",
+            lambda: docDblOpt("Increase animation speed", "scene.animation.speed_factor"),
+            f3d.Interactor.BindingType.NUMERICAL,
+        )
     )
 
     # SHIFT + S: Increase animation speed
     inter.add_binding(
-        f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "S"),
-        "decrease_animation_speed_factor",
-        "Example",
-        lambda: docDblOpt("Decrease animation speed", "scene.animation.speed_factor"),
-        f3d.Interactor.BindingType.NUMERICAL,
+        f3d.BindingParam(
+            f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "S"),
+            "decrease_animation_speed_factor",
+            "Example",
+            lambda: docDblOpt("Decrease animation speed", "scene.animation.speed_factor"),
+            f3d.Interactor.BindingType.NUMERICAL,
+        )
     )
 
     # G: toggle grid
@@ -207,11 +213,13 @@ def add_custom_bindings(eng: f3d.Engine):
     )
 
     inter.add_binding(
-        f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "G"),
-        "toggle_grid",
-        "Example",
-        lambda: docTgl("Toggle grid", "render.grid.enable"),
-        f3d.Interactor.BindingType.TOGGLE,
+        f3d.BindingParam(
+            f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "G"),
+            "toggle_grid",
+            "Example",
+            lambda: docTgl("Toggle grid", "render.grid.enable"),
+            f3d.Interactor.BindingType.TOGGLE,
+        )
     )
 
     # X: toggle axis
@@ -220,11 +228,13 @@ def add_custom_bindings(eng: f3d.Engine):
     )
 
     inter.add_binding(
-        f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "X"),
-        "toggle_axis",
-        "Example",
-        lambda: docTgl("Toggle axis", "ui.axis"),
-        f3d.Interactor.BindingType.TOGGLE,
+        f3d.BindingParam(
+            f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "X"),
+            "toggle_axis",
+            "Example",
+            lambda: docTgl("Toggle axis", "ui.axis"),
+            f3d.Interactor.BindingType.TOGGLE,
+        )
     )
 
     # F: toggle FXAA
@@ -233,11 +243,13 @@ def add_custom_bindings(eng: f3d.Engine):
     )
 
     inter.add_binding(
-        f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "F"),
-        "toggle_fxaa",
-        "Example",
-        lambda: docStr("Toggle FXAA", "render.effect.antialiasing.mode"),
-        f3d.Interactor.BindingType.TOGGLE,
+        f3d.BindingParam(
+            f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "F"),
+            "toggle_fxaa",
+            "Example",
+            lambda: docStr("Toggle FXAA", "render.effect.antialiasing.mode"),
+            f3d.Interactor.BindingType.TOGGLE,
+        )
     )
 
 

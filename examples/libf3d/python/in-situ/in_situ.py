@@ -297,34 +297,44 @@ def main(argv=None):
 
     # Bindings
     inter.add_binding(
-        f3d.InteractionBind(NONE, "W"),
-        "reset_simulation",
-        "Simulation",
-        lambda: ("Reset simulation", ""),
+        f3d.BindingParam(
+            f3d.InteractionBind(NONE, "W"),
+            "reset_simulation",
+            "Simulation",
+            lambda: ("Reset simulation", ""),
+        )
     )
     inter.add_binding(
-        f3d.InteractionBind(NONE, "N"),
-        ["set_cloth_resolution 10", "reset_simulation"],
-        "Simulation",
-        lambda: ("10x10", ""),
+        f3d.BindingParam(
+            f3d.InteractionBind(NONE, "N"),
+            ["set_cloth_resolution 10", "reset_simulation"],
+            "Simulation",
+            lambda: ("10x10", ""),
+        )
     )
     inter.add_binding(
-        f3d.InteractionBind(SHIFT, "N"),
-        ["set_cloth_resolution 20", "reset_simulation"],
-        "Simulation",
-        lambda: ("20x20", ""),
+        f3d.BindingParam(
+            f3d.InteractionBind(SHIFT, "N"),
+            ["set_cloth_resolution 20", "reset_simulation"],
+            "Simulation",
+            lambda: ("20x20", ""),
+        )
     )
     inter.add_binding(
-        f3d.InteractionBind(NONE, "I"),
-        "set_cloth_iterations 10",
-        "Simulation",
-        lambda: ("10 iterations", ""),
+        f3d.BindingParam(
+            f3d.InteractionBind(NONE, "I"),
+            "set_cloth_iterations 10",
+            "Simulation",
+            lambda: ("10 iterations", ""),
+        )
     )
     inter.add_binding(
-        f3d.InteractionBind(NONE, "O"),
-        "set_cloth_iterations 20",
-        "Simulation",
-        lambda: ("20 iterations", ""),
+        f3d.BindingParam(
+            f3d.InteractionBind(NONE, "O"),
+            "set_cloth_iterations 20",
+            "Simulation",
+            lambda: ("20 iterations", ""),
+        )
     )
 
     # Add the cloth mesh to the scene

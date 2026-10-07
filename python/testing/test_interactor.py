@@ -83,7 +83,7 @@ def test_binding():
 
     # Smoke test
     inter.add_binding(
-        f3d.Interactor.BindingParam(
+        f3d.BindingParam(
             f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.ANY, "P"),
             "dummy command",
             "DummyGroup",
@@ -91,7 +91,7 @@ def test_binding():
         )
     )
     inter.add_binding(
-        f3d.Interactor.BindingParam(
+        f3d.BindingParam(
             f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "P"),
             "dummy command",
             "DummyGroup",
@@ -100,7 +100,7 @@ def test_binding():
         )
     )
     inter.add_binding(
-        f3d.Interactor.BindingParam(
+        f3d.BindingParam(
             f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "P"),
             "dummy command",
             "DummyGroup",
@@ -109,7 +109,7 @@ def test_binding():
         )
     )
     inter.add_binding(
-        f3d.Interactor.BindingParam(
+        f3d.BindingParam(
             f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.SHIFT, "P"),
             "dummy command",
             "DummyGroup",
@@ -118,7 +118,7 @@ def test_binding():
         )
     )
     inter.add_binding(
-        f3d.Interactor.BindingParam(
+        f3d.BindingParam(
             f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL_SHIFT, "P"),
             ["dummy command", "dummy command"],
             "DummyGroup",
@@ -128,7 +128,7 @@ def test_binding():
         )
     )
     inter.add_binding(
-        f3d.Interactor.BindingParam(
+        f3d.BindingParam(
             f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "R"),
             ["dummy command", "dummy command"],
             "DummyGroup",

@@ -101,7 +101,7 @@ extern "C"
   typedef struct f3d_binding_params_t
   {
     f3d_interaction_bind_t bind;        // Interaction bind
-    const char** commands;                    // Array of command strings.
+    const char** commands;              // Array of command strings.
     int command_count;                  // Number of commands.
     char* group;                        // Optional group name (can be NULL).
     f3d_interactor_binding_type_t type; // Optional binding type.
