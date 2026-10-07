@@ -59,13 +59,6 @@ extern "C"
   F3D_EXPORT unsigned int f3d_animation_count(const f3d_animation_t* animation);
 
   /**
-   * @brief Return the number of animations available in the current files in the scene.
-   *
-   * @param animation Animation handle.
-   * @return Number of available animations.
-   */
-
-  /**
    * @brief Get the current animation name.
    *
    * The returned string must be freed with f3d_animation_destroy_string().
