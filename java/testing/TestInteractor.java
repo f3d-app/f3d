@@ -68,9 +68,6 @@ public class TestInteractor {
 
     interactor.requestRender();
 
-    interactor.toggleAnimation()
-             .enableCameraMovement();
-
     engine.close();
   }
 }
