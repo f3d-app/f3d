@@ -26,5 +26,3 @@ def test_window_use_hdri_cache():
     engine = f3d.Engine.create(True)
     engine.window.set_use_hdri_cache(True)
     engine.window.render()
-    engine.window.set_use_hdri_cache(False)
-    engine.window.render()

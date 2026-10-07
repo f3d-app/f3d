@@ -21,7 +21,7 @@ public class TestWindow {
     Engine engine = Engine.create(true);
     Window window = engine.getWindow();
 
-    window.setUseHDRICache(false);
+    window.setUseHDRICache(true);
     window.getType();
     window.isOffscreen();
     window.getCamera();
