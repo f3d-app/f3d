@@ -30,14 +30,14 @@ public:
    * Get animation time range of currently added files in the scene.
    * Returns [0, 0] if there is no animations.
    */
-  [[nodiscard]] virtual std::pair<double, double> timeRange() = 0;
+  [[nodiscard]] virtual std::pair<double, double> getTimeRange() = 0;
 
   /**
    * Get animation keyframe's time of currently added files.
    * Can be used in loadTime to request a specific keyframe.
    * Returns empty vector if there is no animations.
    */
-  [[nodiscard]] virtual std::vector<double> keyFrames() = 0;
+  [[nodiscard]] virtual std::vector<double> getKeyFrames() = 0;
 
   /**
    * Return the number of animations available in the currently loaded files.

@@ -75,7 +75,7 @@ animation& animation_impl::loadTime(double timeValue)
 }
 
 //----------------------------------------------------------------------------
-std::pair<double, double> animation_impl::timeRange()
+std::pair<double, double> animation_impl::getTimeRange()
 {
   // Make sure TimeRange is updated
   this->PrepareForAnimationIndices();
@@ -85,7 +85,7 @@ std::pair<double, double> animation_impl::timeRange()
 }
 
 //----------------------------------------------------------------------------
-std::vector<double> animation_impl::keyFrames()
+std::vector<double> animation_impl::getKeyFrames()
 {
   this->PrepareForAnimationIndices();
 
@@ -538,7 +538,7 @@ void animation_impl::PushAnimationProgress()
   else
   {
     this->Internals->Window.GetRenderer()->SetAnimationProgress(
-      this->timeRange(), this->getName(), this->keyFrames());
+      this->getTimeRange(), this->getName(), this->getKeyFrames());
   }
 }
 

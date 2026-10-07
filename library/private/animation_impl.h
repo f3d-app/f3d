@@ -36,8 +36,8 @@ public:
   animation_impl(options& options, window_impl& window);
   ~animation_impl() override;
   animation& loadTime(double timeValue) override;
-  std::pair<double, double> timeRange() override;
-  std::vector<double> keyFrames() override;
+  std::pair<double, double> getTimeRange() override;
+  std::vector<double> getKeyFrames() override;
   unsigned int count() const override;
   std::string getName(std::optional<int> index = std::nullopt) const override;
   std::vector<std::string> getNames() const override;

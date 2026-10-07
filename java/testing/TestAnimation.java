@@ -37,8 +37,8 @@ public class TestAnimation {
 
     // XXX: Only smoke tests for now
     anim.loadTime(0.5);
-    anim.timeRange();
-    anim.keyFrames();
+    anim.getTimeRange();
+    anim.getKeyFrames();
     anim.count();
     anim.getCurrentName();
     anim.getName(0);

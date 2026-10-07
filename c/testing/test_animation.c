@@ -36,7 +36,7 @@ int test_animation()
   f3d_animation_load_time(anim, 0.5);
 
   double min_time, max_time;
-  f3d_animation_time_range(anim, &min_time, &max_time);
+  f3d_animation_get_time_range(anim, &min_time, &max_time);
   if (min_time != 0 || max_time - 0.8 > 1e-10)
   {
     puts("[ERROR] Failed to recover expected time range");
@@ -52,15 +52,15 @@ int test_animation()
     return 1;
   }
 
-  unsigned int keyframes_number;
-  double* keyframes = f3d_animation_keyframes(anim, &keyframes_number);
-  if (keyframes_number != 9 || keyframes[1] != 0.1)
+  unsigned int key_frames_number;
+  double* key_frames = f3d_animation_get_key_frames(anim, &key_frames_number);
+  if (key_frames_number != 9 || key_frames[1] != 0.1)
   {
-    puts("[ERROR] Failed to recover expected animation keyframes");
+    puts("[ERROR] Failed to recover expected animation key_frames");
     f3d_engine_destroy(engine);
     return 1;
   }
-  f3d_animation_destroy_keyframes(keyframes);
+  f3d_animation_destroy_key_frames(key_frames);
 
   char* name = f3d_animation_get_current_name(anim);
   if (strcmp(name, "stand") != 0)

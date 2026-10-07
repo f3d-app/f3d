@@ -27,7 +27,7 @@ int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
   test("animations count", anim.count() == 10);
 
   anim.loadTime(0.5);
-  test("recover timeRange", anim.timeRange() == std::make_pair(0.0, 0.7999999999999999));
+  test("recover timeRange", anim.getTimeRange() == std::make_pair(0.0, 0.7999999999999999));
 
   inter.startAnimation();
   test("isPlaying after start", inter.isPlayingAnimation());
@@ -58,7 +58,7 @@ int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
     std::vector<std::string>{
       "stand", "dead", "dead_right", "reload", "hit", "down", "stumble", "run", "shoot", "walk" });
 
-  auto keyframes = anim.keyFrames();
+  auto keyframes = anim.getKeyFrames();
   test("check keyframes size", static_cast<int>(keyframes.size()), 9);
   test("check first keyframes", keyframes[0], 0.0);
   test("check last keyframes", keyframes[8], 0.7999999999999999);

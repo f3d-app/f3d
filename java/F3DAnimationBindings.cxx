@@ -37,9 +37,9 @@ extern "C"
     return self;
   }
 
-  JNIEXPORT jdoubleArray JAVA_BIND(Animation, timeRange)(JNIEnv* env, jobject self)
+  JNIEXPORT jdoubleArray JAVA_BIND(Animation, getTimeRange)(JNIEnv* env, jobject self)
   {
-    auto [minTime, maxTime] = GetEngine(env, self)->getScene().getAnimation().timeRange();
+    auto [minTime, maxTime] = GetEngine(env, self)->getScene().getAnimation().getTimeRange();
 
     jdoubleArray result = env->NewDoubleArray(2);
     jdouble timeRange[] = { minTime, maxTime };
@@ -48,9 +48,9 @@ extern "C"
     return result;
   }
 
-  JNIEXPORT jdoubleArray JAVA_BIND(Animation, keyFrames)(JNIEnv* env, jobject self)
+  JNIEXPORT jdoubleArray JAVA_BIND(Animation, getKeyFrames)(JNIEnv* env, jobject self)
   {
-    auto keyframeVec = GetEngine(env, self)->getScene().getAnimation().keyFrames();
+    auto keyframeVec = GetEngine(env, self)->getScene().getAnimation().getKeyFrames();
     jdoubleArray result = env->NewDoubleArray(keyframeVec.size());
     const jdouble* keyframes = keyframeVec.data();
     env->SetDoubleArrayRegion(result, 0, keyframeVec.size(), keyframes);

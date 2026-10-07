@@ -21,14 +21,14 @@ public class Animation {
      *
      * @return array of 2 doubles [min_time, max_time]
      */
-    public native double[] timeRange();
+    public native double[] getTimeRange();
 
     /**
      * Get animation keyframe's time of files currently in the scene.
      *
      * @return list of double
      */
-    public native double[] keyFrames();
+    public native double[] getKeyFrames();
 
     /**
      * Return the number of animations available in the files currently in the scene.

@@ -17,27 +17,27 @@ void f3d_animation_load_time(f3d_animation_t* animation, double time_value)
 }
 
 //----------------------------------------------------------------------------
-double* f3d_animation_keyframes(f3d_animation_t* animation, unsigned int* count)
+double* f3d_animation_get_key_frames(f3d_animation_t* animation, unsigned int* count)
 {
   f3d::animation* cpp_animation = reinterpret_cast<f3d::animation*>(animation);
-  std::vector<double> keyframes = cpp_animation->keyFrames();
-  *count = keyframes.size();
-  double* times = new double[keyframes.size()];
-  for (size_t i = 0; i < keyframes.size(); ++i)
+  std::vector<double> key_frames = cpp_animation->getKeyFrames();
+  *count = key_frames.size();
+  double* times = new double[key_frames.size()];
+  for (size_t i = 0; i < key_frames.size(); ++i)
   {
-    times[i] = keyframes[i];
+    times[i] = key_frames[i];
   }
   return times;
 }
 
 //----------------------------------------------------------------------------
-void f3d_animation_destroy_keyframes(double* keyframes)
+void f3d_animation_destroy_key_frames(double* key_frames)
 {
-  delete[] keyframes;
+  delete[] key_frames;
 }
 
 //----------------------------------------------------------------------------
-void f3d_animation_time_range(f3d_animation_t* animation, double* min_time, double* max_time)
+void f3d_animation_get_time_range(f3d_animation_t* animation, double* min_time, double* max_time)
 {
   if (!animation)
   {
@@ -45,7 +45,7 @@ void f3d_animation_time_range(f3d_animation_t* animation, double* min_time, doub
   }
 
   f3d::animation* cpp_animation = reinterpret_cast<f3d::animation*>(animation);
-  auto range = cpp_animation->timeRange();
+  auto range = cpp_animation->getTimeRange();
 
   if (min_time)
   {

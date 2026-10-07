@@ -383,11 +383,11 @@ EMSCRIPTEN_BINDINGS(f3d)
   emscripten::class_<f3d::animation>("Animation")
     .function("loadTime", &f3d::animation::loadTime, emscripten::return_value_policy::reference())
     .function(
-      "timeRange", +[](f3d::animation& animation) -> emscripten::val
-      { return pairToJSArray(animation.timeRange()); })
+      "getTimeRange", +[](f3d::animation& animation) -> emscripten::val
+      { return pairToJSArray(animation.getTimeRange()); })
     .function(
-      "keyFrames", +[](f3d::animation& animation) -> emscripten::val
-      { return containerToJSArray(animation.keyFrames()); })
+      "getKeyFrames", +[](f3d::animation& animation) -> emscripten::val
+      { return containerToJSArray(animation.getKeyFrames()); })
     .function("count", &f3d::animation::count)
     .function(
       "getName", +[](f3d::animation& anim) -> std::string { return anim.getName(); })

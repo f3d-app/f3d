@@ -1899,7 +1899,7 @@ int F3DStarter::Start(int argc, char** argv)
       {
         f3d::animation& anim = this->Internals->Engine->getScene().getAnimation();
 
-        const auto [minTime, maxTime] = anim.timeRange();
+        const auto [minTime, maxTime] = anim.getTimeRange();
 
         const double startTime = this->Internals->AppOptions.AnimationTime.value_or(minTime);
         const double endTime = maxTime;
@@ -2008,7 +2008,7 @@ int F3DStarter::Start(int argc, char** argv)
         });
 
       f3d::animation& anim = this->Internals->Engine->getScene().getAnimation();
-      const auto [minTime, maxTime] = anim.timeRange();
+      const auto [minTime, maxTime] = anim.getTimeRange();
 
       const double startTime = this->Internals->AppOptions.AnimationTime.value_or(minTime);
       const double endTime = maxTime;

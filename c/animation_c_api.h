@@ -22,23 +22,23 @@ extern "C"
   F3D_EXPORT void f3d_animation_load_time(f3d_animation_t* animation, double time_value);
 
   /**
-   * @brief Get keyframes times of files in the scene
+   * @brief Get key frames times of files in the scene
    *
-   * The returned keyframes is heap-allocated and must be freed with
-   * f3d_animation_destroy_keyframes().
+   * The returned key frames is heap-allocated and must be freed with
+   * f3d_animation_destroy_key_frames().
    *
    * @param animation Animation handle.
-   * @param count Pointer to store the count of keyframes
-   * @return Pointer to the array of keyframe time keys
+   * @param count Pointer to store the count of key frames
+   * @return Pointer to the array of key frame time keys
    */
-  F3D_EXPORT double* f3d_animation_keyframes(f3d_animation_t* animation, unsigned int* count);
+  F3D_EXPORT double* f3d_animation_get_key_frames(f3d_animation_t* animation, unsigned int* count);
 
   /**
-   * @brief Free the animation keyframes array.
+   * @brief Free the animation key frames array.
    *
-   * @param keyframes Pointer to the keyframes array to free.
+   * @param key_frames Pointer to the key_frames array to free.
    */
-  F3D_EXPORT void f3d_animation_destroy_keyframes(double* keyframes);
+  F3D_EXPORT void f3d_animation_destroy_key_frames(double* key_frames);
 
   /**
    * @brief Get animation time range of current files in the scene.
@@ -47,7 +47,7 @@ extern "C"
    * @param min_time Pointer to store minimum time.
    * @param max_time Pointer to store maximum time.
    */
-  F3D_EXPORT void f3d_animation_time_range(
+  F3D_EXPORT void f3d_animation_get_time_range(
     f3d_animation_t* animation, double* min_time, double* max_time);
 
   /**
