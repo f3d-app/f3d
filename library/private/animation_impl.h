@@ -1,10 +1,16 @@
 /**
- * @class   animationManager
- * @brief   A private class managing animation
+ * @class   animation_impl
+ * @brief   A concrete implementation of animation
+ *
+ * A concrete implementation of animation that hides the private API
+ * See animation.h for the class documentation
  */
 
-#ifndef f3d_animationManager_h
-#define f3d_animationManager_h
+#ifndef f3d_animation_impl_h
+#define f3d_animation_impl_h
+
+#include "animation.h"
+#include "window_impl.h"
 
 #include <vtkDoubleArray.h>
 #include <vtkNew.h>
@@ -14,36 +20,43 @@
 #include <optional>
 #include <set>
 
-class vtkF3DRenderer;
-class vtkF3DMetaImporter;
-class vtkRenderWindow;
-
 namespace f3d
 {
-class options;
 
 namespace detail
 {
-class interactor_impl;
-class window_impl;
 
-class animationManager
+class animation_impl : public animation
 {
 public:
-  animationManager(options& options, window_impl& window);
-  ~animationManager() = default;
+  ///@{
+  /**
+   * Documented public API
+   */
+  animation_impl(options& options, window_impl& window);
+  ~animation_impl() override;
+  animation& loadTime(double timeValue) override;
+  std::pair<double, double> getTimeRange() override;
+  std::vector<double> getKeyFrames() override;
+  unsigned int count() const override;
+  std::string getName(std::optional<int> index = std::nullopt) const override;
+  std::vector<std::string> getNames() const override;
+  ///@}
 
   /**
+   * Implementation only API
    * Set the interactor to use in the animation_manager, should be set before initializing if any
    */
   void SetInteractor(interactor_impl* interactor);
 
   /**
+   * Implementation only API
    * Set the importer to use in the animation_manager, must be set before initializing
    */
   void SetImporter(vtkF3DMetaImporter* importer);
 
   /**
+   * Implementation only API
    * Set animation direction,
    * Only following values are correct :
    * 1 for forward animation
@@ -52,7 +65,8 @@ public:
   void SetAnimationDirection(int direction);
 
   /**
-   * Initialize the animation manager, required before playing the animation.
+   * Implementation only API
+   * Initialize the animation, required before playing the animation.
    * Can be used to reset animation to the initial state.
    * Importer must be set before use.
    * Interactor should be set before use if any.
@@ -61,11 +75,13 @@ public:
   void Initialize();
 
   /**
-   * Reset the animation manager to a no-animation state.
+   * Implementation only API
+   * Reset the animation to a no-animation state.
    */
   void Reset();
 
   /**
+   * Implementation only API
    * Start/Stop playing the animation
    * Direction must always be equal to 1 (forward) or -1 (backward)
    */
@@ -74,88 +90,67 @@ public:
   void StopAnimation();
 
   /**
+   * Implementation only API
    * Cycle onto and play the next available animation
-   * This modifies the scene.animation.indices option
+   * This modifies the scene.animation.index option
    */
   void CycleAnimation();
 
   /**
-   * Return the animation name of a given animation index, if any.
-   *
-   * Specific animation (0..availableAnimations): Returns the name of the animation at that index
-   * Current animation (-1):
-   *   - Returns the name of the current animation
-   *   - Returns "Multi animations" if more than one animation is current
-   *   - Returns "All animations" if all animations are current
-   *   - Returns "No animations" if no animations are current
-   * Fallback: Returns "No animation" for out-of-bounds requests.
-   *
-   * Can be called before initialization safely
-   */
-  std::string GetAnimationName(int index = -1);
-
-  /**
-   * Return all of the animation names, if any.
-   * Returns a vector of length 0 if none.
-   * Can be called before initialization safely
-   */
-  std::vector<std::string> GetAnimationNames();
-
-  /**
+   * Implementation only API
    * Return animation direction
    * 1 for forward animation
    * -1 for backward animation
    */
-  int GetAnimationDirection() const
-  {
-    return this->AnimationDirection;
-  }
+  int GetAnimationDirection() const;
 
   /**
-   * Return true if the animation manager is playing the animation
+   * Implementation only API
+   * Return true if the animation is being played
    */
-  bool IsPlaying() const
-  {
-    return this->Playing;
-  }
+  bool IsPlaying() const;
 
   /**
+   * Implementation only API
    * Return the current animation time in seconds
    */
-  double GetCurrentTime() const
-  {
-    return this->CurrentTime;
-  }
+  double GetCurrentTime() const;
 
   /**
+   * Implementation only API
    *Set the animation in delta time in seconds
    */
   void SetDeltaTime(double deltaTime);
 
   /**
+   * Implementation only API
    * Advance animationTime of deltaTime and call loadAtTime accordingly
    * Do nothing if IsPlaying is false
    */
   void Tick();
 
   /**
+   * Implementation only API
    * Load animation at provided time value
    */
   bool LoadAtTime(double timeValue);
 
   /**
+   * Implementation only API
    * Load animation at provided frame value
    * When relative is false frame -1 is equal to last frame
    */
   void JumpToFrame(int frame, bool relative);
 
   /**
+   * Implementation only API
    * Load animation at a specific keyframe
    * When relative is false keyframe -1 is equal to last keyframe
    */
   void JumpToKeyFrame(int keyframe, bool relative);
 
   /**
+   * Implementation only API
    * Load animation at provided time value and render
    * When relative is true, time is added to the current animation time
    * When relative is false, a negative time is counted from the end of the animation
@@ -163,27 +158,10 @@ public:
   void JumpToTime(double timeValue, bool relative);
 
   /**
-   * Return a pair containing the current time range values
-   */
-  std::pair<double, double> GetTimeRange();
-
-  /**
-   * Return a vector containing current animation keyframe's times
-   */
-  std::vector<double> GetKeyFrames();
-
-  /**
-   * Get the number of available animations
-   */
-  unsigned int GetNumberOfAvailableAnimations() const;
-
-  /**
+   * Implementation only API
    * Update the dynamic options value to trigger cheatsheet update if needed.
    */
   void UpdateDynamicOptions();
-
-  animationManager(const animationManager&) = delete;
-  void operator=(const animationManager&) = delete;
 
 private:
   /**
@@ -212,26 +190,11 @@ private:
    */
   void SetCheatSheetConfigured(bool configured);
 
-  options& Options;
-  window_impl& Window;
-  vtkF3DMetaImporter* Importer = nullptr;
-  interactor_impl* Interactor = nullptr;
-
-  int AvailAnimations = 0;
-  int AnimationDirection = 1;
-
-  std::optional<std::vector<int>> PreparedAnimationIndices;
-  vtkNew<vtkDoubleArray> AnimationTimeSteps;
-  double TimeRange[2] = { 0.0, 0.0 };
-  bool Playing = false;
-  double CurrentTime = 0;
-  double DeltaTime = 0;
-  bool CurrentTimeSet = false;
-
-  // Dynamic options
-  bool Autoplay = false;
-  double SpeedFactor = 1.0;
+private:
+  class internals;
+  std::unique_ptr<internals> Internals;
 };
 }
 }
+
 #endif

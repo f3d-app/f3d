@@ -47,44 +47,7 @@ const settings = {
   runAfter: (Module) => {
     const scene = Module.engineInstance.getScene();
 
-    utils.assert(
-      scene.availableAnimations() == 10,
-      "There should be a single animation",
-    );
-
-    const [start, end] = scene.animationTimeRange();
-
-    utils.assert(start === 0, "Start value should be 0");
-    utils.assert(
-      end === 0.7999999999999999,
-      "End value should be 0.7999999999999999",
-    );
-
-    utils.assert(
-      scene.getAnimationKeyFrames().length === 9,
-      "KeyFrames length should be 9",
-    );
-    utils.assert(
-      scene.getAnimationKeyFrames()[0] === 0,
-      "First KeyFrame should be 0",
-    );
-    utils.assert(
-      scene.getAnimationKeyFrames()[8] === 0.7999999999999999,
-      "First KeyFrame should be 0.7999999999999999",
-    );
-
-    scene.loadAnimationTime(0.5);
-
-    utils.assert(
-      scene.getAnimationName(-1) == "stand",
-      "getAnimationName returns name",
-    );
-
-    // array comparison in JS is a little annoying so we just compare the 0th element
-    utils.assert(
-      scene.getAnimationNames()[0] == "stand",
-      "getAnimationNames returns names",
-    );
+    scene.getAnimation().loadTime(0.5);
 
     const hierarchy = scene.getSceneHierarchy();
 
@@ -191,5 +154,5 @@ const settings = {
 utils.runRenderTest(settings, {
   data: "soldier_animations.mdl",
   extraData: ["invalid.mdl", "unsupportedFile.dummy"],
-  baseline: "TestWasmAnimation.png",
+  baseline: "TestWasmScene.png",
 });

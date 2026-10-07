@@ -234,6 +234,19 @@ extern "C"
     return self;
   }
 
+  JNIEXPORT jobject JAVA_BIND(Scene, getAddedFiles)(JNIEnv* env, jobject self)
+  {
+    const std::vector<std::filesystem::path> files =
+      GetEngine(env, self)->getScene().getAddedFiles();
+    std::vector<std::string> fileStrings;
+    fileStrings.reserve(files.size());
+    for (const std::filesystem::path& file : files)
+    {
+      fileStrings.push_back(file.string());
+    }
+    return CreateStringList(env, fileStrings);
+  }
+
   JNIEXPORT jint JAVA_BIND(Scene, addLight)(JNIEnv* env, jobject self, jobject lightState)
   {
     if (!lightState)
@@ -452,60 +465,5 @@ extern "C"
     jmethodID fromValueMethod =
       env->GetStaticMethodID(enumClass, "fromValue", "(I)Lapp/f3d/F3D/Scene$FileAvailability;");
     return env->CallStaticObjectMethod(enumClass, fromValueMethod, static_cast<int>(result));
-  }
-
-  JNIEXPORT jobject JAVA_BIND(Scene, loadAnimationTime)(
-    JNIEnv* env, jobject self, jdouble timeValue)
-  {
-    GetEngine(env, self)->getScene().loadAnimationTime(timeValue);
-    return self;
-  }
-
-  JNIEXPORT jdoubleArray JAVA_BIND(Scene, animationTimeRange)(JNIEnv* env, jobject self)
-  {
-    auto [minTime, maxTime] = GetEngine(env, self)->getScene().animationTimeRange();
-
-    jdoubleArray result = env->NewDoubleArray(2);
-    double timeRange[] = { minTime, maxTime };
-    env->SetDoubleArrayRegion(result, 0, 2, timeRange);
-
-    return result;
-  }
-
-  JNIEXPORT jdoubleArray JAVA_BIND(Scene, getAnimationKeyFrames)(JNIEnv* env, jobject self)
-  {
-    auto keyframeVec = GetEngine(env, self)->getScene().getAnimationKeyFrames();
-    jdoubleArray result = env->NewDoubleArray(keyframeVec.size());
-    const jdouble* keyframes = keyframeVec.data();
-    env->SetDoubleArrayRegion(result, 0, keyframeVec.size(), keyframes);
-    return result;
-  }
-
-  JNIEXPORT jint JAVA_BIND(Scene, availableAnimations)(JNIEnv* env, jobject self)
-  {
-    return GetEngine(env, self)->getScene().availableAnimations();
-  }
-
-  JNIEXPORT jstring JAVA_BIND(Scene, getAnimationName)(JNIEnv* env, jobject self, jint index)
-  {
-    return env->NewStringUTF(GetEngine(env, self)->getScene().getAnimationName(index).c_str());
-  }
-
-  JNIEXPORT jobject JAVA_BIND(Scene, getAnimationNames)(JNIEnv* env, jobject self)
-  {
-    return CreateStringList(env, GetEngine(env, self)->getScene().getAnimationNames());
-  }
-
-  JNIEXPORT jobject JAVA_BIND(Scene, getAddedFiles)(JNIEnv* env, jobject self)
-  {
-    const std::vector<std::filesystem::path> files =
-      GetEngine(env, self)->getScene().getAddedFiles();
-    std::vector<std::string> fileStrings;
-    fileStrings.reserve(files.size());
-    for (const std::filesystem::path& file : files)
-    {
-      fileStrings.push_back(file.string());
-    }
-    return CreateStringList(env, fileStrings);
   }
 }

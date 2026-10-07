@@ -127,6 +127,21 @@ Other languages API behavior changed accordingly:
 - Python API: `scene.supports()` used to return bool. Now returns f3d.FileAvailability.
 - Webassembly API: `scene.supports()` used to return bool. Now returns enum FileAvailability.
 
+## scene animation API
+
+The whole scene animation API is now available in a new dedicated `f3d::animation` class.
+
+First recover the `animation` instance (always available) from the scene: `scene::getAnimation()`, then use the following:
+
+- `scene::loadAnimationTime(double timeValue) ` -> `animation::loadTime(timeValue)`
+- `std::pair<double, double> scene::animationTimeRange()` -> `std::pair<double, double> animation::getTimeRange()`
+- `std::vector<double> scene::getAnimationKeyFrames()` -> `std::vector<double> animation::getKeyFrames()`
+- `unsigned int scene::availableAnimations() const` -> `unsigned int animation::count() const`
+- `std::string scene::getAnimationName(int index = -1)` -> `std::string animation::getName(int index = -1)`
+- `std::vector<std::string> scenegetAnimationNames()` -> `std::vector<std::string> animation::getNames()`
+
+All bindings have been updated accordingly.
+
 ## Plugin developers
 
 If you were using the VTK extension module with your plugin, headers are now located in `f3d/vtk_ext/` folder instead of `f3d/` directly.

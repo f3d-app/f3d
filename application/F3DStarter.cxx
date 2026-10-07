@@ -1901,8 +1901,9 @@ int F3DStarter::Start(int argc, char** argv)
 
       if (outputTemplate.hasVariable(std::regex("frame(:.*)?")))
       {
-        f3d::scene& animScene = this->Internals->Engine->getScene();
-        const auto [minTime, maxTime] = animScene.animationTimeRange();
+        f3d::animation& anim = this->Internals->Engine->getScene().getAnimation();
+
+        const auto [minTime, maxTime] = anim.getTimeRange();
 
         const double startTime = this->Internals->AppOptions.AnimationTime.value_or(minTime);
         const double endTime = maxTime;
@@ -1925,7 +1926,7 @@ int F3DStarter::Start(int argc, char** argv)
         for (int frame = 0; frame < count; ++frame)
         {
           const double currentTime = startTime + frame * timeStep;
-          animScene.loadAnimationTime(currentTime);
+          anim.loadTime(currentTime);
 
           if (!this->Internals->renderAndSave(window, outputTemplate, renderToStdout, frame))
           {
@@ -2010,8 +2011,8 @@ int F3DStarter::Start(int argc, char** argv)
           f3d::log::debug("Video packet received, size: ", packet->getPacketSize());
         });
 
-      f3d::scene& animScene = this->Internals->Engine->getScene();
-      const auto [minTime, maxTime] = animScene.animationTimeRange();
+      f3d::animation& anim = this->Internals->Engine->getScene().getAnimation();
+      const auto [minTime, maxTime] = anim.getTimeRange();
 
       const double startTime = this->Internals->AppOptions.AnimationTime.value_or(minTime);
       const double endTime = maxTime;
@@ -2034,7 +2035,7 @@ int F3DStarter::Start(int argc, char** argv)
       for (int frame = 0; frame < count; ++frame)
       {
         const double currentTime = startTime + frame * timeStep;
-        animScene.loadAnimationTime(currentTime);
+        anim.loadTime(currentTime);
 
         window.render();
 
@@ -2400,7 +2401,7 @@ void F3DStarter::LoadFileGroupInternal(
           {
             f3d::log::debug(
               "Loading animation time: ", this->Internals->AppOptions.AnimationTime.value());
-            scene.loadAnimationTime(this->Internals->AppOptions.AnimationTime.value());
+            scene.getAnimation().loadTime(this->Internals->AppOptions.AnimationTime.value());
           }
 
           // Update loaded files
