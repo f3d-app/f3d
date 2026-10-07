@@ -460,21 +460,6 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("inter", &f3d::interaction_bind_t::inter)
     .def("format", &f3d::interaction_bind_t::format);
 
-  py::class_<f3d::interactor::BindingParam>(module, "BindingParam")
-    .def(py::init<>())
-    .def(py::init<f3d::interaction_bind_t, std::vector<std::string>, std::string,
-           f3d::interactor::documentation_callback_t, f3d::interactor::BindingType, bool, bool>(),
-      py::arg("Bind"), py::arg("Commands"), py::arg("Group") = "", py::arg("DocCallback") = nullptr,
-      py::arg("Type") = f3d::interactor::BindingType::OTHER, py::arg("Notify") = false,
-      py::arg("Repeat") = false)
-    .def_readwrite("Bind", &f3d::interactor::BindingParam::Bind)
-    .def_readwrite("Commands", &f3d::interactor::BindingParam::Commands)
-    .def_readwrite("Group", &f3d::interactor::BindingParam::Group)
-    .def_readwrite("DocCallback", &f3d::interactor::BindingParam::DocCallback)
-    .def_readwrite("Type", &f3d::interactor::BindingParam::Type)
-    .def_readwrite("Notify", &f3d::interactor::BindingParam::Notify)
-    .def_readwrite("Repeat", &f3d::interactor::BindingParam::Repeat);
-
   py::class_<f3d::interactor_state_t> interactor_state(module, "InteractorState");
 
   interactor_state.def(py::init<>())
@@ -577,8 +562,27 @@ PYBIND11_MODULE(pyf3d, module)
       py::arg("value") = "", py::arg("duration") = 3.0);
 
   interactor.def("add_binding",
-    py::overload_cast<f3d::interactor::BindingParam>(&f3d::interactor::addBinding),
-    "Add a binding command", py::arg("binding"));
+    [](f3d::interactor& interactor, const f3d::interaction_bind_t& bind, std::vector<std::string> commands, std::string group,
+   std::function<std::pair<std::string, std::string>()> docCb, f3d::interactor::BindingType type, bool notify, bool repeat)
+  {
+    interactor.addBinding({
+      .Bind = bind,
+      .Commands = commands,
+      .Group = group,
+      .DocCallback = docCb,
+      .Type = type,
+      .Notify = notify,
+      .Repeat = repeat,
+    });
+  }, "Add binding commands",
+    py::kw_only(),
+    py::arg("bind"),
+    py::arg("command"),
+    py::arg("group"),
+    py::arg("documentationCallback") = nullptr,
+    py::arg("type") = f3d::interactor::BindingType::OTHER,
+    py::arg("notify") = true,
+    py::arg("repeat") = false);
 
   // f3d::mesh_t
   py::class_<f3d::mesh_t>(module, "Mesh")
