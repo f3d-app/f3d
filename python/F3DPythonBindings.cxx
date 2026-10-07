@@ -910,9 +910,9 @@ PYBIND11_MODULE(pyf3d, module)
     .def("start", &f3d::animation::start, "Start the animation",
       py::arg("direction") = f3d::animation::Direction::FORWARD)
     .def("stop", &f3d::animation::stop, "Stop the animation")
-    .def("playing", &f3d::animation::playing,
+    .def("is_playing", &f3d::animation::isPlaying,
       "Returns True if the animation is currently playing")
-    .def("direction", &f3d::animation::direction,
+    .def("get_direction", &f3d::animation::getDirection,
       "Returns the current animation direction");
 
   // f3d::scene

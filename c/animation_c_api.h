@@ -129,7 +129,7 @@ extern "C"
    * @param animation Animation handle.
    * @return 1 if animation is playing, 0 otherwise.
    */
-  F3D_EXPORT int f3d_animation_playing(f3d_animation_t* animation);
+  F3D_EXPORT int f3d_animation_is_playing(f3d_animation_t* animation);
 
   /**
    * @brief Get the current animation direction.
@@ -137,7 +137,7 @@ extern "C"
    * @param animation Animation handle.
    * @return Current animation direction.
    */
-  F3D_EXPORT f3d_animation_direction_t f3d_animation_direction(
+  F3D_EXPORT f3d_animation_direction_t f3d_animation_get_direction(
     f3d_animation_t* animation);
   ///@}
 

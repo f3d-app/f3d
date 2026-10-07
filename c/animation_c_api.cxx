@@ -174,7 +174,7 @@ void f3d_animation_stop(f3d_animation_t* animation)
 }
 
 //----------------------------------------------------------------------------
-int f3d_animation_playing(f3d_animation_t* animation)
+int f3d_animation_is_playing(f3d_animation_t* animation)
 {
   if (!animation)
   {
@@ -182,11 +182,11 @@ int f3d_animation_playing(f3d_animation_t* animation)
   }
 
   f3d::animation* cpp_animation = reinterpret_cast<f3d::animation*>(animation);
-  return cpp_animation->playing() ? 1 : 0;
+  return cpp_animation->isPlaying() ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
-f3d_animation_direction_t f3d_animation_direction(
+f3d_animation_direction_t f3d_animation_get_direction(
   f3d_animation_t* animation)
 {
   if (!animation)
@@ -195,7 +195,7 @@ f3d_animation_direction_t f3d_animation_direction(
   }
 
   f3d::animation* cpp_animation = reinterpret_cast<f3d::animation*>(animation);
-  const f3d::animation::Direction cpp_direction = cpp_animation->direction();
+  const f3d::animation::Direction cpp_direction = cpp_animation->getDirection();
   return static_cast<f3d_animation_direction_t>(cpp_direction);
 }
 

@@ -94,12 +94,12 @@ public:
   /**
    * Return if the animation is currently playing or not
    */
-  [[nodiscard]] virtual bool playing() = 0;
+  [[nodiscard]] virtual bool isPlaying() = 0;
 
   /**
    * Return the animation direction, default is Direction::FORWARD
    */
-  [[nodiscard]] virtual animation::Direction direction() = 0;
+  [[nodiscard]] virtual animation::Direction getDirection() = 0;
 
 protected:
   //! @cond
