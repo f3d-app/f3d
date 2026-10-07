@@ -14,7 +14,10 @@ const settings = {
       "End value should be 0.7999999999999999",
     );
 
-    utils.assert(anim.getKeyFrames().length === 9, "KeyFrames length should be 9");
+    utils.assert(
+      anim.getKeyFrames().length === 9,
+      "KeyFrames length should be 9",
+    );
     utils.assert(anim.getKeyFrames()[0] === 0, "First KeyFrame should be 0");
     utils.assert(
       anim.keyFrames()[8] === 0.7999999999999999,
