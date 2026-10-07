@@ -56,16 +56,6 @@ public class TestInteractor {
 
     interactor.removeBinding(repeatBind);
 
-    interactor.toggleAnimation();
-    interactor.toggleAnimation(Interactor.AnimationDirection.FORWARD);
-    interactor.toggleAnimation(Interactor.AnimationDirection.BACKWARD);
-    interactor.startAnimation();
-    interactor.startAnimation(Interactor.AnimationDirection.FORWARD);
-    interactor.startAnimation(Interactor.AnimationDirection.BACKWARD);
-    interactor.stopAnimation();
-    interactor.isPlayingAnimation();
-    interactor.getAnimationDirection();
-
     interactor.setNotificationCallback((desc, value, bindStr, duration) -> {
       System.out.println("Notification: " + desc + " " + value + " " + bindStr + " " + duration);
       return true;

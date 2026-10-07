@@ -42,6 +42,15 @@ public class TestAnimation {
     anim.getCurrentName();
     anim.getName(0);
     anim.getNames();
+    anim.toggle();
+    anim.toggle(Animation.Direction.FORWARD);
+    anim.toggle(Animation.Direction.BACKWARD);
+    anim.start();
+    anim.start(Animation.Direction.FORWARD);
+    anim.start(Animation.Direction.BACKWARD);
+    anim.stop();
+    anim.isPlaying();
+    anim.getDirection();
 
     engine.close();
   }
