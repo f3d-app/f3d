@@ -148,7 +148,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "raytracing-samples", "render.raytracing.samples" },
   { "roughness", "model.material.roughness" },
   { "scalar-coloring", "model.scivis.enable" },
-  { "scene-hierarchy", "ui.scene_hierarchy" },
+  { "scene-hierarchy", "ui.scene_hierarchy.enable" },
   { "skip-content-check", "scene.skip_content_check" },
   { "texture-base-color", "model.color.texture" },
   { "texture-emissive", "model.emissive.texture" },

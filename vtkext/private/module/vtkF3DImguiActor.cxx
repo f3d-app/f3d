@@ -595,7 +595,6 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
   assert(viewport);
 
   constexpr float margin = F3DStyle::GetDefaultMargin();
-  constexpr float defaultWidth = 200.f;
   const float winHeight = viewport->WorkSize.y - 2.0f * margin;
 
   float posX = margin;
@@ -610,9 +609,12 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
   {
     position = ImVec2(posX, margin);
   }
-  const float maxWidth = std::max(10.f, viewport->WorkSize.x - posX - margin);
+  const float maxWidth = std::min(
+    static_cast<float>(this->SceneHierarchyMaxWidth), viewport->WorkSize.x - posX - margin);
   ::SetupNextWindow(position, std::nullopt);
-  ImGui::SetNextWindowSize(ImVec2(defaultWidth, winHeight), ImGuiCond_FirstUseEver);
+
+  // 0.f means auto-fit to content
+  ImGui::SetNextWindowSize(ImVec2(0.f, winHeight), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSizeConstraints(ImVec2(10.f, winHeight), ImVec2(maxWidth, winHeight));
   ImGuiStyle& style = ImGui::GetStyle();
   style.Colors[ImGuiCol_WindowBg] = ImVec4(

@@ -38,6 +38,8 @@ So to enable anti-aliasing, just set the mode to the value that used to be the d
 `model.point_sprites.enable` have been removed in favor of setting `model.point_sprites.type` to `none`, which is its new default.
 So to enable point sprites, just set the type to the value that used to be the default, `sphere`.
 
+`ui.scene_hierarchy` have been removed in favor of `ui.scene_hierarchy.enable`.
+
 ## User callback
 
 When calling `f3d::interactor::start()` or `f3d::interactor::playInteraction()`, it was possible to set a user callback automatically called at each event loop.

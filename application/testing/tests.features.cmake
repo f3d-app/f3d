@@ -208,6 +208,7 @@ endif()
 f3d_test(NAME TestSceneHierarchyNonGLTF DATA cow.vtp ARGS --scene-hierarchy UI)
 f3d_test(NAME TestSceneHierarchyMultipleFiles DATA cow.vtp suzanne.obj ARGS --scene-hierarchy --multi-file-mode=all --opacity=0.3 UI)
 f3d_test(NAME TestSceneHierarchyMultiBlock DATA mb.vtm ARGS --scene-hierarchy UI)
+f3d_test(NAME TestSceneHierarchyMaxWidth DATA cow.vtp ARGS --scene-hierarchy -Dui.scene_hierarchy.max_width=30 UI)
 
 ## Special files handling
 f3d_test(NAME TestRemoveEmptyFileGroups DATA mb/mb_3_0.vtt mb/mb_0_0.vtu ARGS -n --remove-empty-file-groups UI)

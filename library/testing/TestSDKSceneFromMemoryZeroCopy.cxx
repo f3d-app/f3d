@@ -327,7 +327,7 @@ int TestSDKSceneFromMemoryZeroCopy([[maybe_unused]] int argc, char* argv[])
   eng.getOptions().model.scivis.enable = true;
   eng.getOptions().model.scivis.cells = true;
   eng.getOptions().ui.scalar_bar = true;
-  eng.getOptions().ui.scene_hierarchy = true;
+  eng.getOptions().ui.scene_hierarchy.enable = true;
 
   WavyGridMesh grid(20, 20);
 
@@ -343,7 +343,7 @@ int TestSDKSceneFromMemoryZeroCopy([[maybe_unused]] int argc, char* argv[])
       "TestSDKSceneFromMemoryZeroCopyTexturedStaticMesh", 0.06));
 
   eng.getOptions().model.color.texture = std::nullopt;
-  eng.getOptions().ui.scene_hierarchy = false;
+  eng.getOptions().ui.scene_hierarchy.enable = false;
 
   test("clear the scene", [&]() { sce.clear(); });
 
