@@ -27,26 +27,6 @@ def test_animation():
     engine.scene.animation.load_time(0.5)
     assert engine.scene.animation.get_time_range() == (0.0, 0.7999999999999999)
 
-    # isPlaying after start
-    engine.interactor.start_animation()
-    assert engine.interactor.is_playing_animation() == 1
-
-    # isPlaying after toggle off
-    engine.interactor.toggle_animation()
-    assert engine.interactor.is_playing_animation() == 0
-
-    # isPlaying after toggle on
-    engine.interactor.toggle_animation()
-    assert engine.interactor.is_playing_animation() == 1
-
-    # triggerEventLoop returns self
-    inter_ref = engine.interactor.trigger_event_loop(0.1)
-    assert inter_ref == engine.interactor
-
-    # isPlaying after stop
-    engine.interactor.stop_animation()
-    assert engine.interactor.is_playing_animation() == 0
-
     # getAnimationName current
     assert engine.scene.animation.get_name() == "stand"
 
@@ -72,3 +52,66 @@ def test_animation():
         "shoot",
         "walk",
     ]
+
+
+def test_animation_start_stop(capfd: pytest.CaptureFixture[str]):
+    engine = f3d.Engine.create(True)
+    engine.window.render()
+
+    engine.scene.animation.start()  # Play Forward
+    assert (
+        engine.scene.animation.playing()
+        and engine.scene.animation.direction()
+        == f3d.animation.Direction.FORWARD
+    )
+    engine.scene.animation.toggle()  # Pause
+    assert not engine.scene.animation.playing()
+
+    engine.scene.animation.start(
+        f3d.animation.Direction.FORWARD
+    )  # Play Forward
+    assert (
+        engine.scene.animation.playing()
+        and engine.scene.animation.direction()
+        == f3d.animation.Direction.FORWARD
+    )
+    engine.scene.animation.stop()  # Pause
+    assert not engine.scene.animation.playing()
+
+    engine.scene.animation.start(
+        f3d.animation.Direction.BACKWARD
+    )  # Play Backward
+    assert (
+        engine.scene.animation.playing()
+        and engine.scene.animation.direction()
+        == f3d.animation.Direction.BACKWARD
+    )
+    engine.scene.animation.stop()  # Pause
+
+    engine.scene.animation.toggle()
+    assert (
+        engine.scene.animation.playing()
+        and engine.scene.animation.direction()
+        == f3d.animation.Direction.FORWARD
+    )
+    engine.scene.animation.stop()  # Pause
+
+    engine.scene.animation.toggle(
+        f3d.animation.Direction.FORWARD
+    )  # Play Forward
+    assert (
+        engine.scene.animation.playing()
+        and engine.scene.animation.direction()
+        == f3d.animation.Direction.FORWARD
+    )
+    engine.scene.animation.stop()
+
+    engine.scene.animation.toggle(
+        f3d.animation.Direction.BACKWARD
+    )  # Play Backward
+    assert (
+        engine.scene.animation.playing()
+        and engine.scene.animation.direction()
+        == f3d.animation.Direction.BACKWARD
+    )
+    engine.scene.animation.stop()
