@@ -12,7 +12,6 @@
 #include <f3d/scene.h>
 
 #include "ClothSolver.h"
-#include "interactor.h"
 
 /**
  * This class implements a f3d::mesh_view that wraps the cloth simulation data provided by
