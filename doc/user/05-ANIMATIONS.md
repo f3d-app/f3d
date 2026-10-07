@@ -89,7 +89,7 @@ f3d example.file --output-video=- | ffmpeg -f h264 -i - video.mp4
 - Press <kbd>Space</kbd> to play/pause animation
 - Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbd> to play/pause animation backward
 
-See [COMMANDS](07-COMMANDS.md) for commands like `jump_to_frame`, `jump_to_keyframe` and `jump_to_time`
+See [COMMANDS](07-COMMANDS.md) for commands like `jump_to_frame`, `jump_to_key_frame` and `jump_to_time`
 
 ## Cycling Animations
 
@@ -131,7 +131,7 @@ F3D may warn when combining SINGLE and non SINGLE files, but will still try to r
 
 ## Animation keyframes
 
-The `jump_to_keyframe` command allows you to load an animation at a specific keyframe. See [COMMANDS](07-COMMANDS.md) for more information and examples on how to use this command.
+The `jump_to_key_frame` command allows you to load an animation at a specific keyframe. See [COMMANDS](07-COMMANDS.md) for more information and examples on how to use this command.
 
 This command is currently supported only by the following readers:
 
