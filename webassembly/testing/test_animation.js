@@ -36,29 +36,21 @@ const settings = {
     );
 
     // animations
-    utils.assert(
-      !anim.isPlaying(),
-      "animation should not be playing",
-    );
+    utils.assert(!anim.isPlaying(), "animation should not be playing");
 
     anim.start(Module.AnimationDirection.FORWARD);
     utils.assert(
       anim.isPlaying() &&
-        anim.getDirection() ==
-          Module.AnimationDirection.FORWARD,
+        anim.getDirection() == Module.AnimationDirection.FORWARD,
       "animation should be playing forward",
     );
     anim.stop();
-    utils.assert(
-      !anim.isPlaying(),
-      "animation should not be playing",
-    );
+    utils.assert(!anim.isPlaying(), "animation should not be playing");
 
     anim.start(Module.AnimationDirection.BACKWARD);
     utils.assert(
       anim.isPlaying() &&
-        anim.getDirection() ==
-          Module.AnimationDirection.BACKWARD,
+        anim.getDirection() == Module.AnimationDirection.BACKWARD,
       "animation should be playing backward",
     );
     anim.stop();
@@ -66,8 +58,7 @@ const settings = {
     anim.toggle(Module.AnimationDirection.FORWARD);
     utils.assert(
       anim.isPlaying() &&
-        anim.getDirection() ==
-          Module.AnimationDirection.FORWARD,
+        anim.getDirection() == Module.AnimationDirection.FORWARD,
       "animation should be playing forward",
     );
     anim.stop();
@@ -75,8 +66,7 @@ const settings = {
     anim.toggle(Module.AnimationDirection.BACKWARD);
     utils.assert(
       anim.isPlaying() &&
-        anim.getDirection() ==
-          Module.AnimationDirection.BACKWARD,
+        anim.getDirection() == Module.AnimationDirection.BACKWARD,
       "animation should be playing backward",
     );
     anim.stop();

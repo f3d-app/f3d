@@ -31,16 +31,14 @@ int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
 
   anim.start();
   test("isPlaying after start", anim.isPlaying());
-  test("isPlaying forward after start",
-    anim.getDirection() == f3d::animation::Direction::FORWARD);
+  test("isPlaying forward after start", anim.getDirection() == f3d::animation::Direction::FORWARD);
 
   anim.toggle();
   test("isPlaying after toggle off", !anim.isPlaying());
 
   anim.toggle();
   test("isPlaying after toggle on", anim.isPlaying());
-  test("isPlaying forward toggle on",
-    anim.getDirection() == f3d::animation::Direction::FORWARD);
+  test("isPlaying forward toggle on", anim.getDirection() == f3d::animation::Direction::FORWARD);
 
   f3d::interactor& interRef = inter.triggerEventLoop(0.1);
   test("triggerEventLoop returns self", &interRef == &inter);

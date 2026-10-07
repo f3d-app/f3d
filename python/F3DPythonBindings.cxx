@@ -897,8 +897,7 @@ PYBIND11_MODULE(pyf3d, module)
     .value("BACKWARD", f3d::animation::Direction::BACKWARD)
     .export_values();
 
-  animation
-    .def("load_time", &f3d::animation::loadTime)
+  animation.def("load_time", &f3d::animation::loadTime)
     .def("get_time_range", &f3d::animation::getTimeRange)
     .def("get_key_frames", &f3d::animation::getKeyFrames)
     .def("count", &f3d::animation::count)
@@ -912,8 +911,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def("stop", &f3d::animation::stop, "Stop the animation")
     .def("is_playing", &f3d::animation::isPlaying,
       "Returns True if the animation is currently playing")
-    .def("get_direction", &f3d::animation::getDirection,
-      "Returns the current animation direction");
+    .def("get_direction", &f3d::animation::getDirection, "Returns the current animation direction");
 
   // f3d::scene
   py::class_<f3d::scene, std::unique_ptr<f3d::scene, py::nodelete>> scene(module, "Scene");

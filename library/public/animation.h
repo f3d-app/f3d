@@ -76,15 +76,13 @@ public:
    * Set the animation direction in the provided direction then
    * toggle (start if stopped or stop is started) the animation.
    */
-  virtual animation& toggle(
-    Direction direction = Direction::FORWARD) = 0;
+  virtual animation& toggle(Direction direction = Direction::FORWARD) = 0;
 
   /**
    * Set the animation direction in the provided direction then
-   * start the animation if not already started. 
+   * start the animation if not already started.
    */
-  virtual animation& start(
-    Direction direction = Direction::FORWARD) = 0;
+  virtual animation& start(Direction direction = Direction::FORWARD) = 0;
 
   /**
    * Stop the animation if playing.

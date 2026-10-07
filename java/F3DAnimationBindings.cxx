@@ -78,8 +78,7 @@ extern "C"
     return CreateStringList(env, GetEngine(env, self)->getScene().getAnimation().getNames());
   }
 
-  JNIEXPORT jobject JAVA_BIND(Animation, toggle)(
-    JNIEnv* env, jobject self, jobject direction)
+  JNIEXPORT jobject JAVA_BIND(Animation, toggle)(JNIEnv* env, jobject self, jobject direction)
   {
     const JniLocalRef<jclass> directionEnum(env, env->GetObjectClass(direction));
     jmethodID getValueMethod = env->GetMethodID(directionEnum, "getValue", "()I");
@@ -92,8 +91,7 @@ extern "C"
     return self;
   }
 
-  JNIEXPORT jobject JAVA_BIND(Animation, start)(
-    JNIEnv* env, jobject self, jobject direction)
+  JNIEXPORT jobject JAVA_BIND(Animation, start)(JNIEnv* env, jobject self, jobject direction)
   {
     const JniLocalRef<jclass> directionEnum(env, env->GetObjectClass(direction));
     jmethodID getValueMethod = env->GetMethodID(directionEnum, "getValue", "()I");
@@ -122,10 +120,9 @@ extern "C"
     const f3d::animation::Direction nativeDirection =
       GetEngine(env, self)->getScene().getAnimation().getDirection();
 
-    const JniLocalRef<jclass> enumClass(
-      env, env->FindClass("app/f3d/F3D/Animation$Direction"));
-    jmethodID fromValueMethod = env->GetStaticMethodID(
-      enumClass, "fromValue", "(I)Lapp/f3d/F3D/Animation$Direction;");
+    const JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Animation$Direction"));
+    jmethodID fromValueMethod =
+      env->GetStaticMethodID(enumClass, "fromValue", "(I)Lapp/f3d/F3D/Animation$Direction;");
 
     return env->CallStaticObjectMethod(
       enumClass, fromValueMethod, static_cast<int>(nativeDirection));

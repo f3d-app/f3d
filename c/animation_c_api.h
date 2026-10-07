@@ -137,8 +137,7 @@ extern "C"
    * @param animation Animation handle.
    * @return Current animation direction.
    */
-  F3D_EXPORT f3d_animation_direction_t f3d_animation_get_direction(
-    f3d_animation_t* animation);
+  F3D_EXPORT f3d_animation_direction_t f3d_animation_get_direction(f3d_animation_t* animation);
   ///@}
 
   /**

@@ -402,23 +402,20 @@ EMSCRIPTEN_BINDINGS(f3d)
       "getNames",
       +[](f3d::animation& animation) { return containerToJSArray(animation.getNames()); })
     .function(
-      "toggle", +[](f3d::animation& animation) -> f3d::animation&
-      { return animation.toggle(); }, emscripten::return_value_policy::reference())
+      "toggle", +[](f3d::animation& animation) -> f3d::animation& { return animation.toggle(); },
+      emscripten::return_value_policy::reference())
     .function(
-      "toggle",
-      +[](f3d::animation& animation, emscripten::val direction) -> f3d::animation&
+      "toggle", +[](f3d::animation& animation, emscripten::val direction) -> f3d::animation&
       { return animation.toggle(direction.as<f3d::animation::Direction>()); },
       emscripten::return_value_policy::reference())
     .function(
-      "start", +[](f3d::animation& animation) -> f3d::animation&
-      { return animation.start(); }, emscripten::return_value_policy::reference())
+      "start", +[](f3d::animation& animation) -> f3d::animation& { return animation.start(); },
+      emscripten::return_value_policy::reference())
     .function(
-      "start",
-      +[](f3d::animation& animation, emscripten::val direction) -> f3d::animation&
+      "start", +[](f3d::animation& animation, emscripten::val direction) -> f3d::animation&
       { return animation.start(direction.as<f3d::animation::Direction>()); },
       emscripten::return_value_policy::reference())
-    .function("stop", &f3d::animation::stop,
-      emscripten::return_value_policy::reference())
+    .function("stop", &f3d::animation::stop, emscripten::return_value_policy::reference())
     .function("isPlaying", &f3d::animation::isPlaying)
     .function("getDirection", &f3d::animation::getDirection);
 

@@ -233,8 +233,7 @@ bool animation_impl::isPlaying()
 //----------------------------------------------------------------------------
 animation::Direction animation_impl::getDirection()
 {
-  return this->Internals->Direction == 1 ? Direction::FORWARD
-    : Direction::BACKWARD;
+  return this->Internals->Direction == 1 ? Direction::FORWARD : Direction::BACKWARD;
 }
 
 //----------------------------------------------------------------------------
@@ -316,8 +315,8 @@ void animation_impl::Tick()
   assert(this->Internals->DeltaTime > 0);
   if (this->Internals->Playing)
   {
-    this->Internals->CurrentTime += (this->Internals->DeltaTime * this->Internals->SpeedFactor) *
-      this->Internals->Direction;
+    this->Internals->CurrentTime +=
+      (this->Internals->DeltaTime * this->Internals->SpeedFactor) * this->Internals->Direction;
 
     // Modulo computation, compute CurrentTime in the time range.
     if (this->Internals->CurrentTime < this->Internals->TimeRange[0] ||
