@@ -63,11 +63,6 @@ public class TestInteractor {
 
     interactor.triggerNotification("foo", "bar", 3.0);
 
-    Interactor.AnimationDirection.FORWARD.getValue();
-    Interactor.AnimationDirection.BACKWARD.getValue();
-    Interactor.AnimationDirection.fromValue(0);
-    Interactor.AnimationDirection.fromValue(1);
-
     interactor.enableCameraMovement();
     interactor.disableCameraMovement();
 

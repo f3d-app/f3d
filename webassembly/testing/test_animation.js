@@ -34,6 +34,52 @@ const settings = {
       anim.getNames()[0] == "stand",
       "getAnimationNames returns names",
     );
+
+    // animations
+    utils.assert(
+      !anim.isPlaying(),
+      "animation should not be playing",
+    );
+
+    anim.start(Module.AnimationDirection.FORWARD);
+    utils.assert(
+      anim.isPlaying() &&
+        anim.getDirection() ==
+          Module.AnimationDirection.FORWARD,
+      "animation should be playing forward",
+    );
+    anim.stop();
+    utils.assert(
+      !anim.isPlaying(),
+      "animation should not be playing",
+    );
+
+    anim.start(Module.AnimationDirection.BACKWARD);
+    utils.assert(
+      anim.isPlaying() &&
+        anim.getDirection() ==
+          Module.AnimationDirection.BACKWARD,
+      "animation should be playing backward",
+    );
+    anim.stop();
+
+    anim.toggle(Module.AnimationDirection.FORWARD);
+    utils.assert(
+      anim.isPlaying() &&
+        anim.getDirection() ==
+          Module.AnimationDirection.FORWARD,
+      "animation should be playing forward",
+    );
+    anim.stop();
+
+    anim.toggle(Module.AnimationDirection.BACKWARD);
+    utils.assert(
+      anim.isPlaying() &&
+        anim.getDirection() ==
+          Module.AnimationDirection.BACKWARD,
+      "animation should be playing backward",
+    );
+    anim.stop();
   },
 };
 
