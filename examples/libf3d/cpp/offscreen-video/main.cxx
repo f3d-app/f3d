@@ -132,7 +132,7 @@ int main(int argc, char** argv)
           reinterpret_cast<const char*>(packet->getPacketData()), packet->getPacketSize());
       });
 
-    auto [startTime, endTime] = eng.getScene().getAnimation().timeRange();
+    auto [startTime, endTime] = eng.getScene().getAnimation().getTimeRange();
 
     int frameCount = static_cast<int>((endTime - startTime) * framerate) + 1;
 
