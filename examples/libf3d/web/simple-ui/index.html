@@ -7,6 +7,7 @@
     <style>
       #main {
         min-height: 70vh;
+        height: 100%;
       }
     </style>
   </head>
@@ -112,7 +113,10 @@
           </aside>
           <div class="column">
             <div class="container" id="main">
-              <canvas id="canvas"></canvas>
+              <f3d-viewer
+                id="viewer"
+                src="https://f3d.app/data/f3d.vtp"
+              ></f3d-viewer>
             </div>
           </div>
         </div>

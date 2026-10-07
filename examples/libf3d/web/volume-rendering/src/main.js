@@ -142,78 +142,45 @@ document
   .getElementById("colormap")
   .addEventListener("change", (e) => onColormapChange(e.target.value));
 
-f3d({})
-  .then(async (Module) => {
-    Module.Log.setVerboseLevel(Module.LogVerboseLevel.QUIET, false);
-    Module.Log.forward((level, message) => {
-      if (level === Module.LogVerboseLevel.ERROR) console.error(message);
-      else if (level === Module.LogVerboseLevel.WARN) console.warn(message);
-      else if (level === Module.LogVerboseLevel.INFO) console.info(message);
-    });
+const viewer = document.getElementById("viewer");
+viewer.addEventListener("ready", () => {
+  viewer.options = {
+    "model.volume.enable": true,
+    "ui.scalar_bar": true,
+  };
 
-    // automatically load all supported file format readers
-    Module.Engine.autoloadPlugins();
+  const options = viewer.engine.getOptions();
 
-    const engine = Module.Engine.create();
+  onTFChange = () => {
+    const sorted = tfPoints.sort((a, b) => a.x - b.x);
 
-    // background must be set to black for proper blending with transparent canvas
-    engine.getOptions().setAsString("render.background.color", "#000000");
-    engine.getOptions().setAsString("scene.up_direction", "+z");
-    engine.getOptions().toggle("model.volume.enable");
-    engine.getOptions().toggle("ui.scalar_bar");
+    // update opacity_map
+    options.setAsString(
+      "model.scivis.opacity_map",
+      sorted.map((p) => `${p.x},${p.y}`).join(","),
+    );
 
-    // setup the window size based on the canvas size
-    const canvas = document.getElementById("canvas");
-    const scale = window.devicePixelRatio;
-    engine
-      .getWindow()
-      .setSize(scale * canvas.clientWidth, scale * canvas.clientHeight);
+    // update range
+    options.setAsString(
+      "model.scivis.range",
+      `${255 * sorted[0].x},${255 * sorted[sorted.length - 1].x}`,
+    );
+    viewer.engine.getWindow().render();
+  };
 
-    // read file and display it
-    const response = await fetch(`https://f3d.app/data/skull.vti`);
-    const arrayBuffer = await response.arrayBuffer();
-    const scene = engine.getScene();
-    try {
-      scene.addBuffer(new Uint8Array(arrayBuffer));
-    } catch (e) {
-      console.error("Unsupported file");
+  onColormapChange = (name) => {
+    currentColormap = name;
+    const cm = buildColormapString(name);
+    if (cm) {
+      options.setAsString("model.scivis.colormap", cm);
+      updateTFBackground(name);
+      viewer.engine.getWindow().render();
     }
+  };
 
-    const options = engine.getOptions();
+  // apply initial values
+  onTFChange();
+  onColormapChange(document.getElementById("colormap").value);
+});
 
-    onTFChange = () => {
-      const sorted = tfPoints.sort((a, b) => a.x - b.x);
-
-      // update opacity_map
-      options.setAsString(
-        "model.scivis.opacity_map",
-        sorted.map((p) => `${p.x},${p.y}`).join(","),
-      );
-
-      // update range
-      options.setAsString(
-        "model.scivis.range",
-        `${255 * sorted[0].x},${255 * sorted[sorted.length - 1].x}`,
-      );
-      engine.getWindow().render();
-    };
-
-    onColormapChange = (name) => {
-      currentColormap = name;
-      const cm = buildColormapString(name);
-      if (cm) {
-        options.setAsString("model.scivis.colormap", cm);
-        updateTFBackground(name);
-        engine.getWindow().render();
-      }
-    };
-
-    // apply initial values
-    onTFChange();
-    onColormapChange(document.getElementById("colormap").value);
-
-    // do a first render and start the interactor
-    engine.getWindow().render();
-    engine.getInteractor().start();
-  })
-  .catch((error) => console.error("Internal exception: " + error));
+await f3d();
