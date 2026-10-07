@@ -25,7 +25,7 @@ def test_animation():
 
     # recover animationTimeRange
     engine.scene.animation.load_time(0.5)
-    assert engine.scene.animation.time_range() == (0.0, 0.7999999999999999)
+    assert engine.scene.animation.get_time_range() == (0.0, 0.7999999999999999)
 
     # isPlaying after start
     engine.interactor.start_animation()
