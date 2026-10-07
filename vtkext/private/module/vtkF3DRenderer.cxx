@@ -3284,8 +3284,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   const bool forcePoints = this->DataFieldForColoring == DataField::POINTS;
   const bool forceCells = this->DataFieldForColoring == DataField::CELLS;
 
-  const auto info =
-    coloringHandler.SetCurrentColoring(forcePoints, forceCells, this->ArrayIsCellData, this->ArrayNameForColoring, false);
+  const auto info = coloringHandler.SetCurrentColoring(
+    forcePoints, forceCells, this->ArrayIsCellData, this->ArrayNameForColoring, false);
 
   const bool hasColoring =
     info.has_value() && this->Coloring != vtkF3DRenderer::ColoringMode::MATERIAL;

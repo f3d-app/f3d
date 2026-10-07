@@ -46,7 +46,7 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   renderer->SetUseVolume(true);
   renderer->UpdateActors();
 
-  if (renderer->GetArrayNameForColoring() != "Invalid" ||
+  if (renderer->GetArrayNameForColoring() == "Invalid" ||
     !renderer->GetComponentForColoring().has_value())
   {
     std::cerr << "Unexpected coloring information with invalid array\n";
@@ -60,7 +60,7 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   renderer->SetUseVolume(true);
   renderer->UpdateActors();
 
-  if (renderer->GetArrayNameForColoring() != "Momentum" || renderer->GetComponentForColoring() != 5)
+  if (renderer->GetArrayNameForColoring() != "Momentum" || renderer->GetComponentForColoring() == 5)
   {
     std::cerr << "Unexpected coloring information with invalid component\n";
     return EXIT_FAILURE;
@@ -68,7 +68,7 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
 
   renderer->CycleComponentForColoring();
   if (renderer->GetArrayNameForColoring() != "Momentum" ||
-    renderer->GetComponentForColoring().has_value())
+    !renderer->GetComponentForColoring().has_value())
   {
     std::cerr << "Unexpected coloring information after cycling component\n";
     return EXIT_FAILURE;
