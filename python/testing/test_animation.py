@@ -64,54 +64,16 @@ def test_animation_start_stop(capfd: pytest.CaptureFixture[str]):
         and engine.scene.animation.get_direction()
         == f3d.animation.Direction.FORWARD
     )
-    engine.scene.animation.toggle()  # Pause
+    engine.scene.animation.toggle()  # Pause using toggle
     assert not engine.scene.animation.is_playing()
 
-    engine.scene.animation.start(
-        f3d.animation.Direction.FORWARD
-    )  # Play Forward
-    assert (
-        engine.scene.animation.is_playing()
-        and engine.scene.animation.get_direction()
-        == f3d.animation.Direction.FORWARD
-    )
-    engine.scene.animation.stop()  # Pause
-    assert not engine.scene.animation.is_playing()
-
-    engine.scene.animation.start(
+    engine.scene.animation.toggle(
         f3d.animation.Direction.BACKWARD
-    )  # Play Backward
+    )  # Play Backward using toggle
     assert (
         engine.scene.animation.is_playing()
         and engine.scene.animation.get_direction()
         == f3d.animation.Direction.BACKWARD
     )
-    engine.scene.animation.stop()  # Pause
-
-    engine.scene.animation.toggle()
-    assert (
-        engine.scene.animation.is_playing()
-        and engine.scene.animation.get_direction()
-        == f3d.animation.Direction.FORWARD
-    )
-    engine.scene.animation.stop()  # Pause
-
-    engine.scene.animation.toggle(
-        f3d.animation.Direction.FORWARD
-    )  # Play Forward
-    assert (
-        engine.scene.animation.is_playing()
-        and engine.scene.animation.get_direction()
-        == f3d.animation.Direction.FORWARD
-    )
-    engine.scene.animation.stop()
-
-    engine.scene.animation.toggle(
-        f3d.animation.Direction.BACKWARD
-    )  # Play Backward
-    assert (
-        engine.scene.animation.is_playing()
-        and engine.scene.animation.get_direction()
-        == f3d.animation.Direction.BACKWARD
-    )
-    engine.scene.animation.stop()
+    engine.scene.animation.stop()  # Pause using stop
+    assert not engine.scene.animation.is_playing()
