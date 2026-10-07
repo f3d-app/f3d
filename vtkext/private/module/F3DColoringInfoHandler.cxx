@@ -125,7 +125,7 @@ void F3DColoringInfoHandler::SelectFirstArray(bool forceUsePointData, bool force
 
 //----------------------------------------------------------------------------
 std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetCurrentColoring(
-  bool forceUsePointData, bool forceUseCellData, const std::optional<std::string>& arrayName,
+  bool forceUsePointData, bool forceUseCellData, std::optional<bool>& arrayIsCellData, std::optional<std::string>& arrayName,
   bool quiet)
 {
   const int nIndices = static_cast<int>(this->ColoringInfoMap.size());
@@ -143,12 +143,12 @@ std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetC
   else if (arrayName.has_value())
   {
     // Coloring with named array
-    if (!forceUseCellData)
+    if (!forceUseCellData && !arrayIsCellData.value_or(false))
     {
       this->CurrentColoringIter = this->ColoringInfoMap.find({ arrayName.value(), false });
     }
 
-    if (this->CurrentColoringIter == this->ColoringInfoMap.end() && !forceUsePointData)
+    if (this->CurrentColoringIter == this->ColoringInfoMap.end() && !forceUsePointData && arrayIsCellData.value_or(true))
     {
       this->CurrentColoringIter = this->ColoringInfoMap.find({ arrayName.value(), true });
     }
@@ -158,13 +158,21 @@ std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetC
       // Could not find named array
       if (!quiet)
       {
+        std::string fieldDesc;
+        if (forceUseCellData)
+        {
+          fieldDesc = " (cell data)";
+        }
+        else if (forceUsePointData)
+        {
+          fieldDesc = " (point data)";
+        }
         F3DLog::Print(F3DLog::Severity::Warning,
-          "Unknown scalar array: \"" + arrayName.value() + "\"" +
-            (forceUsePointData     ? " (point data)"
-                : forceUseCellData ? " (cell data)"
-                                   : ""));
+          "Unknown scalar array: \"" + arrayName.value() + "\"" + fieldDesc);
       }
 
+      arrayIsCellData.reset();
+      arrayName.reset();
       this->SelectFirstArray(forceUsePointData, forceUseCellData);
     }
   }

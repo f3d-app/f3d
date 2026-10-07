@@ -3281,13 +3281,11 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   // Recover coloring information and update handler
   F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
 
-  const bool forcePoints =
-    this->DataFieldForColoring == DataField::POINTS || !this->ArrayIsCellData.value_or(true);
-  const bool forceCells =
-    this->DataFieldForColoring == DataField::CELLS || this->ArrayIsCellData.value_or(false);
+  const bool forcePoints = this->DataFieldForColoring == DataField::POINTS;
+  const bool forceCells = this->DataFieldForColoring == DataField::CELLS;
 
   const auto info =
-    coloringHandler.SetCurrentColoring(forcePoints, forceCells, this->ArrayNameForColoring, false);
+    coloringHandler.SetCurrentColoring(forcePoints, forceCells, this->ArrayIsCellData, this->ArrayNameForColoring, false);
 
   const bool hasColoring =
     info.has_value() && this->Coloring != vtkF3DRenderer::ColoringMode::MATERIAL;
@@ -3631,7 +3629,7 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
     F3DLog::Print(F3DLog::Severity::Warning,
       std::string("Invalid component index: ") +
         std::to_string(this->ComponentForColoring.value()));
-    return;
+    this->ComponentForColoring.reset();
   }
 
   // Set range

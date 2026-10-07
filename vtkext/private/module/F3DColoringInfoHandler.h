@@ -45,13 +45,14 @@ public:
    * Set the current coloring state
    * @param forceUsePointData: Only point data should be used, cell data will be ignored if true
    * @param forceUseCellData: Only cell data should be used, point data will be ignored if true
+   * @param arrayIsCellData: An optional flag indicating if the array is cell data
    * @param arrayName: An optional arrayName to color with
    * @param quiet: If true, no log will be done by this method, even when failing to find an array
    * to color with
    * @return: current coloring info if any, unset optional otherwise
    */
   std::optional<ColoringInfo> SetCurrentColoring(bool forceUsePointData, bool forceUseCellData,
-    const std::optional<std::string>& arrayName, bool quiet);
+    std::optional<bool>& arrayIsCellData, std::optional<std::string>& arrayName, bool quiet);
 
   /**
    * Get the current coloring state
