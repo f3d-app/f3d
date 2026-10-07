@@ -31,7 +31,6 @@ public class TestAnimation {
     Scene scene = engine.getScene();
 
     scene.add(data);
-
     
     Animation anim = scene.getAnimation();
 
