@@ -212,6 +212,14 @@ extern "C"
    */
   F3D_EXPORT f3d_video_frame_t* f3d_window_get_video_frame(f3d_window_t* window);
 
+  /**
+   * @brief Enable or disable the use of HDRI cache for the window.
+   *
+   * @param window Window handle.
+   * @param use_hdri_cache non-zero to enable HDRI cache
+   */
+  F3D_EXPORT void f3d_window_set_use_hdri_cache(f3d_window_t* window, int use_hdri_cache);
+
 #ifdef __cplusplus
 }
 #endif

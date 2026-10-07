@@ -30,6 +30,7 @@ const settings = {
   runAfter: (Module) => {
     // check that space conversion works
     const window = Module.engineInstance.getWindow();
+    window.setUseHDRICache(true);
 
     const ptWorld = window.getWorldFromDisplay([0, 0, 0]);
 

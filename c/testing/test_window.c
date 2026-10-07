@@ -21,6 +21,8 @@ int test_window()
     return 1;
   }
 
+  f3d_window_set_use_hdri_cache(window, 1);
+
   double dpi_scale = f3d_window_get_dpi_scale(window);
   if (dpi_scale < 1.0)
   {

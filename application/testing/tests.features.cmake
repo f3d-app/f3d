@@ -356,6 +356,7 @@ endif()
 ## HDRI
 f3d_test(NAME TestHDRI DATA suzanne.ply HDRI shanghai_bund_1k.hdr THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
 f3d_test(NAME TestHDRICache DATA suzanne.ply HDRI shanghai_bund_1k.hdr DEPENDS TestHDRI THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
+f3d_test(NAME TestHDRINoCache DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --no-cache DEPENDS TestHDRI THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
 # HDRI ambient lighting must follow render.light.intensity (see https://github.com/f3d-app/f3d/issues/3312)
 f3d_test(NAME TestHDRILightIntensityDimmer DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --light-intensity=0.1 DEPENDS TestHDRI THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
 f3d_test(NAME TestHDRILightIntensityBrighter DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --light-intensity=2.0 DEPENDS TestHDRI THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision

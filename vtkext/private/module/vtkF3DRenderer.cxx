@@ -1125,6 +1125,29 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUseCache(bool useCache)
+{
+  if (this->UseCache != useCache)
+  {
+    this->UseCache = useCache;
+
+    this->HasValidHDRIReader = false;
+    this->HasValidHDRIHash = false;
+    this->HasValidHDRITexture = false;
+    this->HasValidHDRILUT = false;
+    this->HasValidHDRISH = false;
+    this->HasValidHDRISpec = false;
+
+    this->HDRIReaderConfigured = false;
+    this->HDRIHashConfigured = false;
+    this->HDRITextureConfigured = false;
+    this->HDRILUTConfigured = false;
+    this->HDRISphericalHarmonicsConfigured = false;
+    this->HDRISpecularConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetHDRIFile(const std::optional<fs::path>& hdriFile)
 {
   std::string hdriFileStr;
@@ -1202,6 +1225,10 @@ void vtkF3DRenderer::SetCachePath(const std::string& cachePath)
 //----------------------------------------------------------------------------
 bool vtkF3DRenderer::CheckForSHCache(std::string& path)
 {
+  if (!this->UseCache)
+  {
+    return false;
+  }
   assert(this->HasValidHDRIHash);
   path = this->CachePath + "/" + this->HDRIHash + "/sh.vtt";
   return vtksys::SystemTools::FileExists(path, true);
@@ -1210,6 +1237,10 @@ bool vtkF3DRenderer::CheckForSHCache(std::string& path)
 //----------------------------------------------------------------------------
 bool vtkF3DRenderer::CheckForSpecCache(std::string& path)
 {
+  if (!this->UseCache)
+  {
+    return false;
+  }
   assert(this->HasValidHDRIHash);
   path = this->CachePath + "/" + this->HDRIHash + "/specular.vtm";
   return vtksys::SystemTools::FileExists(path, true);
@@ -1416,7 +1447,8 @@ void vtkF3DRenderer::ConfigureHDRILUT()
 
     // Check LUT cache
     const std::string lutCachePath = this->CachePath + "/lut.vti";
-    const bool lutCacheExists = vtksys::SystemTools::FileExists(lutCachePath, true);
+    const bool lutCacheExists =
+      this->UseCache && vtksys::SystemTools::FileExists(lutCachePath, true);
     if (lutCacheExists)
     {
       lut->SetFileName(lutCachePath.c_str());
@@ -1434,14 +1466,17 @@ void vtkF3DRenderer::ConfigureHDRILUT()
 
       if (!this->CachePath.empty())
       {
-        const vtkSmartPointer<vtkImageData> img =
-          ::SaveTextureToImage(lut->GetTextureObject(), GL_TEXTURE_2D, 0, lut->GetLUTSize());
-        assert(img);
+        if (this->UseCache)
+        {
+          const vtkSmartPointer<vtkImageData> img =
+            ::SaveTextureToImage(lut->GetTextureObject(), GL_TEXTURE_2D, 0, lut->GetLUTSize());
+          assert(img);
 
-        vtkNew<vtkXMLImageDataWriter> writer;
-        writer->SetFileName(lutCachePath.c_str());
-        writer->SetInputData(img);
-        writer->Write();
+          vtkNew<vtkXMLImageDataWriter> writer;
+          writer->SetFileName(lutCachePath.c_str());
+          writer->SetInputData(img);
+          writer->Write();
+        }
       }
       else
       {
@@ -1484,14 +1519,17 @@ void vtkF3DRenderer::ConfigureHDRISphericalHarmonics()
 
       if (!this->CachePath.empty())
       {
-        // Create spherical harmonics cache file
-        vtkNew<vtkTable> table;
-        table->AddColumn(this->SphericalHarmonics);
+        if (this->UseCache)
+        {
+          // Create spherical harmonics cache file
+          vtkNew<vtkTable> table;
+          table->AddColumn(this->SphericalHarmonics);
 
-        vtkNew<vtkXMLTableWriter> writer;
-        writer->SetInputData(table);
-        writer->SetFileName(shCachePath.c_str());
-        writer->Write();
+          vtkNew<vtkXMLTableWriter> writer;
+          writer->SetInputData(table);
+          writer->SetFileName(shCachePath.c_str());
+          writer->Write();
+        }
       }
       else
       {
@@ -1532,28 +1570,31 @@ void vtkF3DRenderer::ConfigureHDRISpecular()
 
       if (!this->CachePath.empty())
       {
-        const unsigned int nbLevels = spec->GetPrefilterLevels();
-        const unsigned int size = spec->GetPrefilterSize();
-
-        vtkNew<vtkMultiBlockDataSet> mb;
-        mb->SetNumberOfBlocks(nbLevels);
-
-        for (unsigned int i = 0; i < nbLevels; i++)
+        if (this->UseCache)
         {
-          const vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
-            spec->GetTextureObject(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, i, size >> i);
-          assert(img);
-          mb->SetBlock(i, img);
-        }
+          const unsigned int nbLevels = spec->GetPrefilterLevels();
+          const unsigned int size = spec->GetPrefilterSize();
 
-        vtkNew<vtkXMLMultiBlockDataWriter> writer;
-        writer->SetCompressorTypeToNone();
-        writer->SetDataModeToAppended();
-        writer->EncodeAppendedDataOff();
-        writer->SetHeaderTypeToUInt64();
-        writer->SetFileName(specCachePath.c_str());
-        writer->SetInputData(mb);
-        writer->Write();
+          vtkNew<vtkMultiBlockDataSet> mb;
+          mb->SetNumberOfBlocks(nbLevels);
+
+          for (unsigned int i = 0; i < nbLevels; i++)
+          {
+            const vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
+              spec->GetTextureObject(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, i, size >> i);
+            assert(img);
+            mb->SetBlock(i, img);
+          }
+
+          vtkNew<vtkXMLMultiBlockDataWriter> writer;
+          writer->SetCompressorTypeToNone();
+          writer->SetDataModeToAppended();
+          writer->EncodeAppendedDataOff();
+          writer->SetHeaderTypeToUInt64();
+          writer->SetFileName(specCachePath.c_str());
+          writer->SetInputData(mb);
+          writer->Write();
+        }
       }
       else
       {
@@ -2411,7 +2452,7 @@ void vtkF3DRenderer::CreateCacheDirectory()
 {
   assert(this->HasValidHDRIHash);
 
-  if (!this->CachePath.empty())
+  if (!this->CachePath.empty() && this->UseCache)
   {
     // Cache folder for this HDRI
     const std::string currentCachePath = this->CachePath + "/" + this->HDRIHash;

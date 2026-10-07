@@ -36,6 +36,12 @@
           "implicitValue": "1"
         },
         {
+          "longName": "no-cache",
+          "helpText": "No cache is used (both reading and writing)",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
           "longName": "help",
           "shortName": "h",
           "helpText": "Print help"
