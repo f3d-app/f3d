@@ -3284,8 +3284,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   const bool forcePoints = this->DataFieldForColoring == DataField::POINTS;
   const bool forceCells = this->DataFieldForColoring == DataField::CELLS;
 
-  const auto info = coloringHandler.SetCurrentColoring(forcePoints, forceCells,
-    this->ArrayIsCellData, this->ArrayNameForColoring, false);
+  const auto info = coloringHandler.SetCurrentColoring(
+    forcePoints, forceCells, this->ArrayIsCellData, this->ArrayNameForColoring, false);
 
   const bool hasColoring =
     info.has_value() && this->Coloring != vtkF3DRenderer::ColoringMode::MATERIAL;
@@ -3625,12 +3625,10 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
 
   std::optional<int> componentIndex = this->ComponentForColoring;
 
-  if (componentIndex.has_value() &&
-    (componentIndex.value() >= info.MaximumNumberOfComponents))
+  if (componentIndex.has_value() && (componentIndex.value() >= info.MaximumNumberOfComponents))
   {
     F3DLog::Print(F3DLog::Severity::Warning,
-      std::string("Invalid component index: ") +
-        std::to_string(componentIndex.value()));
+      std::string("Invalid component index: ") + std::to_string(componentIndex.value()));
     componentIndex.reset();
   }
 
@@ -3866,7 +3864,8 @@ std::string vtkF3DRenderer::ComponentToString()
     return "No Array";
   }
 
-  if (!this->ComponentForColoring.has_value() || this->ComponentForColoring.value() >= info.value().MaximumNumberOfComponents)
+  if (!this->ComponentForColoring.has_value() ||
+    this->ComponentForColoring.value() >= info.value().MaximumNumberOfComponents)
   {
     return "Magnitude";
   }
