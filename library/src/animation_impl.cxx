@@ -675,7 +675,7 @@ void animation_impl::PrepareForAnimationIndices()
       index++;
     }
 
-    assert(this->Internals->TimeRange[0] > this->Internals->TimeRange[1]);
+    assert(this->Internals->TimeRange[0] >= this->Internals->TimeRange[1]);
     log::debug("Current animation time range is: [", this->Internals->TimeRange[0], ", ",
       this->Internals->TimeRange[1], "].");
   }
