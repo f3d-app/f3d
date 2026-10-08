@@ -188,6 +188,7 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   }
   else if (type == Type::XR)
   {
+    // OpenXR not tested yet
     // LCOV_EXCL_START
 #ifdef F3D_MODULE_OPENXR
     this->Internals->RenWin = vtkSmartPointer<vtkOpenXRRenderWindow>::New();
@@ -226,6 +227,7 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   if (type == Type::XR)
   {
 #ifdef F3D_MODULE_OPENXR
+    // OpenXR not tested yet
     // LCOV_EXCL_START
     vtkOpenXRRenderWindow* xrRenWin = vtkOpenXRRenderWindow::SafeDownCast(this->Internals->RenWin);
     xrRenWin->vtkOpenGLRenderWindow::AddRenderer(this->Internals->Renderer);
@@ -984,6 +986,7 @@ void window_impl::SetResourcesPath(const fs::path& resourcesPath)
 #endif
     }
   }
+  // OpenXR not tested yet
   // LCOV_EXCL_START
   catch (const fs::filesystem_error& ex)
   {

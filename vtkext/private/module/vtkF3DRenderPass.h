@@ -20,7 +20,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkTimeStamp.h>
 
-#include <vtkF3DPreserveCameraFramebufferPass.h>
+#include "vtkF3DPreserveCameraFramebufferPass.h"
 
 #include <memory>
 #include <vector>
