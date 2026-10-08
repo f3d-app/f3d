@@ -298,7 +298,7 @@ def main(argv=None):
     # Bindings
     inter.add_binding(
         bind=f3d.InteractionBind(NONE, "W"),
-        command="reset_simulation",
+        command=["reset_simulation"],
         group="Simulation",
         documentationCallback=lambda: ("Reset simulation", ""),
     )
@@ -316,13 +316,13 @@ def main(argv=None):
     )
     inter.add_binding(
         bind=f3d.InteractionBind(NONE, "I"),
-        command="set_cloth_iterations 10",
+        command=["set_cloth_iterations 10"],
         group="Simulation",
         documentationCallback=lambda: ("10 iterations", ""),
     )
     inter.add_binding(
         bind=f3d.InteractionBind(NONE, "O"),
-        command="set_cloth_iterations 20",
+        command=["set_cloth_iterations 20"],
         group="Simulation",
         documentationCallback=lambda: ("20 iterations", ""),
     )
