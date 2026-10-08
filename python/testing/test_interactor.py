@@ -181,6 +181,7 @@ def test_trigger_key(capfd: pytest.CaptureFixture[str]):
 
 def test_trigger_event_loop(capfd: pytest.CaptureFixture[str]):
     engine = f3d.Engine.create(True)
+    engine.window.render()
 
     # triggerEventLoop returns self
     inter_ref = engine.interactor.trigger_event_loop(0.1)
