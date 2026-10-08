@@ -49,7 +49,9 @@ int TestF3DMetaImporterMultiColoring(int argc, char* argv[])
 
   std::optional<bool> arrayIsCellData;
   std::optional<std::string> arrayName = "Momentum";
-  auto info = coloringHandler.SetCurrentColoring(false, false, arrayIsCellData, arrayName, false);
+  std::optional<int> arrayComponent;
+  auto info = coloringHandler.SetCurrentColoring(
+    false, false, arrayIsCellData, arrayName, arrayComponent, false);
   if (!info.has_value())
   {
     std::cerr << "Coloring handler unable to set coloring as expected\n";
