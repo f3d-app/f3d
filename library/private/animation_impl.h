@@ -144,10 +144,10 @@ public:
 
   /**
    * Implementation only API
-   * Load animation at a specific keyframe
-   * When relative is false keyframe -1 is equal to last keyframe
+   * Load animation at a specific key frame
+   * When relative is false key frame -1 is equal to last key frame
    */
-  void JumpToKeyFrame(int keyframe, bool relative);
+  void JumpToKeyFrame(int keyFrame, bool relative);
 
   /**
    * Implementation only API

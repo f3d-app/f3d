@@ -1252,21 +1252,21 @@ interactor& interactor_impl::initCommands()
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "jump_to_key_frame");
-      const int keyframe = options::parse<int>(args[0]);
-      this->Internals->Anim.JumpToKeyFrame(keyframe, false);
+      const int keyFrame = options::parse<int>(args[0]);
+      this->Internals->Anim.JumpToKeyFrame(keyFrame, false);
     },
-    command_documentation_t{ "jump_to_key_frame index", "jump to a specific animation keyframe" });
+    command_documentation_t{ "jump_to_key_frame index", "jump to a specific animation key frame" });
 
   this->addCommand(
     "jump_to_key_frame_relative",
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "jump_to_key_frame_relative");
-      const int keyframe = options::parse<int>(args[0]);
-      this->Internals->Anim.JumpToKeyFrame(keyframe, true);
+      const int keyFrame = options::parse<int>(args[0]);
+      this->Internals->Anim.JumpToKeyFrame(keyFrame, true);
     },
     command_documentation_t{
-      "jump_to_key_frame_relative offset", "move a number of keyframes forward or backward" });
+      "jump_to_key_frame_relative offset", "move a number of key frames forward or backward" });
 
   this->addCommand(
     "toggle_animation", [&](const std::vector<std::string>&) { this->toggleAnimation(); },

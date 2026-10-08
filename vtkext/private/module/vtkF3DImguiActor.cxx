@@ -452,7 +452,7 @@ void SetupNextWindow(std::optional<ImVec2> position, std::optional<ImVec2> size)
 constexpr float PROGRESS_BAR_THICKNESS = 5.f;
 
 // Unscaled reach of the pointer around the bar: sizes the click/drag row and the
-// distance at which the tooltip snaps to a keyframe.
+// distance at which the tooltip snaps to a key frame.
 constexpr float PROGRESS_BAR_GRAB_RADIUS = 6.f;
 
 std::string FormatSpeedFactor(double speedFactor)
@@ -1214,7 +1214,7 @@ void vtkF3DImguiActor::RenderAnimationProgressBar()
   constexpr float margin = F3DStyle::GetDefaultMargin();
 
   // The progress bar itself looks the same in both modes.
-  // "advanced" mode additionally draws keyframe markers and a text
+  // "advanced" mode additionally draws key frame markers and a text
   // row (start/end/current times and the animation name) above the bar.
   const bool advanced = (this->AnimationProgressMode == AnimationProgressBarMode::ADVANCED);
 
@@ -1286,10 +1286,10 @@ void vtkF3DImguiActor::RenderAnimationProgressBar()
   drawList->AddRectFilled(
     barMin, ImVec2(timeToX(this->AnimationCurrentTime), barMax.y), fillColor, 0.f);
 
-  // Advanced mode only: keyframe markers, then time/name labels and the hover tooltip
+  // Advanced mode only: key frame markers, then time/name labels and the hover tooltip
   if (advanced)
   {
-    // Keyframe markers
+    // Key frame markers
     for (const double kf : this->AnimationKeyFrames)
     {
       const float kfX = timeToX(kf);
@@ -1335,7 +1335,7 @@ void vtkF3DImguiActor::RenderAnimationProgressBar()
     drawList->AddText(ImVec2(cursorX, contentTop), textColor, currentLabel.c_str());
 
     // Hover tooltip showing the time we would jump to. If the cursor is near a
-    // keyframe marker, show keyframe time.
+    // key frame marker, show key frame time.
     if (hovered)
     {
       bool onKeyFrame = false;
@@ -1353,7 +1353,7 @@ void vtkF3DImguiActor::RenderAnimationProgressBar()
       }
 
       const std::string tooltipText =
-        onKeyFrame ? "Keyframe\n" + label(keyFrameTime) : label(mouseTime);
+        onKeyFrame ? "Key frame\n" + label(keyFrameTime) : label(mouseTime);
 
       // Restore padding for tooltip
       const float tooltipPadding = margin * this->FontScale;
@@ -1401,7 +1401,7 @@ double vtkF3DImguiActor::GetAnimationProgressBarHeight() const
     ::ComputeProgressBarLayout(this->FontScale, advanced, lineHeight);
 
   // Lift the scalar bar by what's actually drawn. Advanced mode always draws the text row and
-  // keyframe markers, so clear the whole window plus a margin.
+  // key frame markers, so clear the whole window plus a margin.
   if (advanced)
   {
     return layout.windowHeight + F3DStyle::GetDefaultMargin();

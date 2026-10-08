@@ -248,9 +248,9 @@ public:
   void SetAnimationProgressMode(AnimationProgressBarMode mode);
 
   /**
-   * Set the time range, name and keyframe times of the current animation. Meant
+   * Set the time range, name and key frame times of the current animation. Meant
    * to be pushed when the loaded animation changes.
-   * Empty range, name and keyframes by default
+   * Empty range, name and key frames by default
    */
   void SetAnimationProgress(const std::pair<double, double>& timeRange, const std::string& name,
     const std::vector<double>& keyFrames);

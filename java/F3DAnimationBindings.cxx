@@ -50,10 +50,10 @@ extern "C"
 
   JNIEXPORT jdoubleArray JAVA_BIND(Animation, getKeyFrames)(JNIEnv* env, jobject self)
   {
-    auto keyframeVec = GetEngine(env, self)->getScene().getAnimation().getKeyFrames();
-    jdoubleArray result = env->NewDoubleArray(keyframeVec.size());
-    const jdouble* keyframes = keyframeVec.data();
-    env->SetDoubleArrayRegion(result, 0, keyframeVec.size(), keyframes);
+    auto keyFrameVec = GetEngine(env, self)->getScene().getAnimation().getKeyFrames();
+    jdoubleArray result = env->NewDoubleArray(keyFrameVec.size());
+    const jdouble* keyFrames = keyFrameVec.data();
+    env->SetDoubleArrayRegion(result, 0, keyFrameVec.size(), keyFrames);
     return result;
   }
 

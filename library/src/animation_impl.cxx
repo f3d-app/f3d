@@ -362,7 +362,7 @@ void animation_impl::JumpToTime(double timeValue, bool relative)
 }
 
 //----------------------------------------------------------------------------
-void animation_impl::JumpToKeyFrame(int keyframe, bool relative)
+void animation_impl::JumpToKeyFrame(int keyFrame, bool relative)
 {
   if (this->Internals->AnimationTimeSteps->GetNumberOfTuples() == 0)
   {
@@ -380,15 +380,15 @@ void animation_impl::JumpToKeyFrame(int keyframe, bool relative)
   int nextKeyFrame = closestKeyFrame;
   if (relative)
   {
-    nextKeyFrame += keyframe;
+    nextKeyFrame += keyFrame;
     nextKeyFrame = ((nextKeyFrame % timeStepsAvailable) + timeStepsAvailable) % timeStepsAvailable;
   }
   else
   {
-    nextKeyFrame = keyframe > 0 ? std::min(keyframe, timeStepsAvailable - 1) : 0;
-    if (0 > keyframe || keyframe > timeStepsAvailable)
+    nextKeyFrame = keyFrame > 0 ? std::min(keyFrame, timeStepsAvailable - 1) : 0;
+    if (0 > keyFrame || keyFrame > timeStepsAvailable)
     {
-      log::warn("Keyframe index ", keyframe, " is outside of range [0-", timeStepsAvailable - 1,
+      log::warn("Key frame index ", keyFrame, " is outside of range [0-", timeStepsAvailable - 1,
         "], converting to ", nextKeyFrame, " instead.");
     }
   }
