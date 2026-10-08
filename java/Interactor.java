@@ -180,7 +180,7 @@ public class Interactor {
         private String group = "";
         private DocCallback docCallback = null;
         private BindingType type = BindingType.OTHER;
-        private boolean notify = false;
+        private boolean notify = true;
         private boolean repeat = false;
 
         public BindingParam(InteractionBind bind, List<String> commands) {
