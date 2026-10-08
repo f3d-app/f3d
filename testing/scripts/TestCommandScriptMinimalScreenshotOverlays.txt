@@ -1,0 +1,3 @@
+toggle ui.scene_hierarchy.enable
+print_error "This is a test error notification"
+take_minimal_screenshot
