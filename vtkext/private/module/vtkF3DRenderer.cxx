@@ -348,6 +348,7 @@ void vtkF3DRenderer::Initialize()
 
   // camera only gets updated by openxr on the first render, so we have to create the bounding box
   // and align the scene on the first render as well.
+  // OpenXR not tested yet
   // LCOV_EXCL_START
   vtkNew<vtkCallbackCommand> startEventCallback;
   startEventCallback->SetClientData(this);
@@ -1202,6 +1203,7 @@ void vtkF3DRenderer::SetUseCache(bool useCache)
 }
 
 //----------------------------------------------------------------------------
+// OpenXR not tested yet
 // LCOV_EXCL_START
 vtkBoundingBox vtkF3DRenderer::CreateCameraFacingBoundingBox(
   vtkCamera* camera, double scale, double distance)
@@ -1256,6 +1258,7 @@ vtkBoundingBox vtkF3DRenderer::CreateCameraFacingBoundingBox(
 // LCOV_EXCL_STOP
 
 //----------------------------------------------------------------------------
+// OpenXR not tested yet
 // LCOV_EXCL_START
 void vtkF3DRenderer::AlignSceneToBounds(const vtkBoundingBox& bounds)
 {
@@ -3638,6 +3641,7 @@ void vtkF3DRenderer::SetComponentForColoring(const std::optional<int>& component
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetXRMode(bool enable, bool showBbox)
 {
+  // OpenXR not tested yet
   // LCOV_EXCL_START
   if (enable != this->UseXR)
   {

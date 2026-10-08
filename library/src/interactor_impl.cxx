@@ -2125,6 +2125,7 @@ interactor& interactor_impl::requestStop()
 }
 
 //----------------------------------------------------------------------------
+// OpenXR not tested yet
 // LCOV_EXCL_START
 void interactor_impl::SetXRResourcesDirectory(const std::string& actionsManifestDirectory)
 {

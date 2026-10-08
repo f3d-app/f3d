@@ -41,13 +41,15 @@ Please note the search bar is not working locally, this is expected.
 5. Rebuild the website: `npm run start`
 6. Refresh the website to see the new versioned doc
 
-## How to run the XR mode
+## How to use F3D in XR mode
 
-1. VTK should already be built with the `F3D_MODULE_OPENXR` option enabled. See [Build](./05-BUILD.md) for more information.
+Note: XR mode is experimental and not available in our binaries.
 
-2. Set up an OpenXR runtime. Choose one of the following:
+1. Install or build VTK with `RenderingOpenXR` module enabled.
+2. Build F3D with `F3D_MODULE_OPENXR` option enabled. See [Build](./05-BUILD.md) for more information.
+3. Set up an OpenXR runtime. Choose one of the following:
    - **Physical HMD:** Attach an HMD and start SteamVR.
-   - **Monado:** Install Monado (installation from source is recommended: [Monado installation guide](https://monado.freedesktop.org/getting-started.html#installation-from-source)) and use the following script to start it in simulation mode:
+   - **Monado (Linux only):** Install Monado (installation from source is recommended: [Monado installation guide](https://monado.freedesktop.org/getting-started.html#installation-from-source)) and use the following script to start it in simulation mode:
 
    ```bash
    #!/bin/bash
@@ -68,4 +70,4 @@ Please note the search bar is not working locally, this is expected.
 
    In simulation mode, use the right mouse button to move around or adjust the HMD's position and orientation in the Monado UI.
 
-3. Run F3D: `f3d ../testing/data/<data>.<datatype> --rendering-backend=xr`
+4. Run F3D: `f3d path/to/file.ext --rendering-backend=xr`
