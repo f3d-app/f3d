@@ -173,7 +173,7 @@ public:
     std::string Group = {};
     documentation_callback_t DocCallback = nullptr;
     BindingType Type = BindingType::OTHER;
-    bool Notify = false;
+    bool Notify = true;
     bool Repeat = false;
   };
 
