@@ -50,7 +50,9 @@ public:
    */
   void SetUseLinearColorSpace(bool use);
 
+  // vtkMapper class has MapScalars() overloads. Make them visible because we are overriding.
   using Superclass::MapScalars;
+
   /**
    * Our vtkPolyDataMapper::MapScalar() override which computes linear RGB from sRGB
    * if needed.

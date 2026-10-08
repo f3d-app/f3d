@@ -54,19 +54,21 @@ vtkUnsignedCharArray* vtkF3DPolyDataMapper::MapScalars(
 
   if (this->ColorTextureMap && this->ColorTextureMap != this->LinearColorTextureMap)
   {
-    // Use floats for the lookup texture to retain dark colors after decoding.
+    vtkUnsignedCharArray* source =
+      vtkUnsignedCharArray::SafeDownCast(this->ColorTextureMap->GetPointData()->GetScalars());
     this->LinearColorTextureMap = vtkSmartPointer<vtkImageData>::New();
     this->LinearColorTextureMap->CopyStructure(this->ColorTextureMap);
-    this->LinearColorTextureMap->AllocateScalars(VTK_FLOAT, 4);
-    vtkDataArray* source = this->ColorTextureMap->GetPointData()->GetScalars();
-    vtkDataArray* destination = this->LinearColorTextureMap->GetPointData()->GetScalars();
+    this->LinearColorTextureMap->AllocateScalars(source->GetDataType(), 4);
+    vtkUnsignedCharArray* destination =
+      vtkUnsignedCharArray::SafeDownCast(this->LinearColorTextureMap->GetPointData()->GetScalars());
     for (vtkIdType i = 0; i < source->GetNumberOfTuples(); ++i)
     {
       for (int component = 0; component < 4; ++component)
       {
-        const double value = source->GetComponent(i, component) / 255.0;
+        const unsigned char value = source->GetTypedComponent(i, component);
         // Approx. color components converted to linear except alpha channel.
-        destination->SetComponent(i, component, component < 3 ? std::pow(value, 2.2) : value);
+        destination->SetTypedComponent(i, component,
+          component < 3 ? static_cast<unsigned char>(std::pow(value / 255.0, 2.2) * 255.0) : value);
       }
     }
     this->ColorTextureMap->UnRegister(this);
