@@ -889,7 +889,7 @@ PYBIND11_MODULE(pyf3d, module)
 
   // f3d::animation
   py::class_<f3d::animation, std::unique_ptr<f3d::animation, py::nodelete>> animation(
-    module, "animation");
+    module, "Animation");
 
   // f3d::animation::Direction
   py::enum_<f3d::animation::Direction>(animation, "Direction")
