@@ -128,16 +128,14 @@ void AddCustomBindings(f3d::engine& eng)
   };
 
   // R: reset options
-  inter.addBinding(
-    f3d::interactor::BindingParam{ .Bind = { f3d::interaction_bind_t::ModifierKeys::SHIFT, "R" },
+  inter.addBinding({ .Bind = { f3d::interaction_bind_t::ModifierKeys::SHIFT, "R" },
       .Commands = { "reset_options" },
       .Group = "Example",
       .DocCallback = std::bind(docStr, "Reset Options"),
       .Type = f3d::interactor::BindingType::OTHER });
 
   // SHIFT + S: Increase animation speed
-  inter.addBinding(
-    f3d::interactor::BindingParam{ .Bind = { f3d::interaction_bind_t::ModifierKeys::SHIFT, "S" },
+  inter.addBinding({ .Bind = { f3d::interaction_bind_t::ModifierKeys::SHIFT, "S" },
       .Commands = { "increase_animation_speed_factor" },
       .Group = { "Example" },
       .DocCallback = std::bind(
@@ -145,8 +143,7 @@ void AddCustomBindings(f3d::engine& eng)
       .Type = f3d::interactor::BindingType::NUMERICAL });
 
   // CTRL + S: Decrease animation speed
-  inter.addBinding(
-    f3d::interactor::BindingParam{ .Bind = { f3d::interaction_bind_t::ModifierKeys::CTRL, "S" },
+  inter.addBinding({ .Bind = { f3d::interaction_bind_t::ModifierKeys::CTRL, "S" },
       .Commands = { "decrease_animation_speed_factor" },
       .Group = "Example",
       .DocCallback = std::bind(
@@ -155,7 +152,7 @@ void AddCustomBindings(f3d::engine& eng)
 
   // G: toggle grid
   inter.removeBinding({ f3d::interaction_bind_t::ModifierKeys::NONE, "G" });
-  inter.addBinding(f3d::interactor::BindingParam{ .Bind = f3d::interaction_bind_t::parse("G"),
+  inter.addBinding({ .Bind = f3d::interaction_bind_t::parse("G"),
     .Commands = { "toggle_grid" },
     .Group = "Example",
     .DocCallback = std::bind(docTgl, "Toggle grid", std::cref(opt.render.grid.enable)),
@@ -163,7 +160,7 @@ void AddCustomBindings(f3d::engine& eng)
 
   // X: toggle axis
   inter.removeBinding({ f3d::interaction_bind_t::ModifierKeys::NONE, "X" });
-  inter.addBinding(f3d::interactor::BindingParam{ .Bind = f3d::interaction_bind_t::parse("X"),
+  inter.addBinding({ .Bind = f3d::interaction_bind_t::parse("X"),
     .Commands = { "toggle_axis" },
     .Group = "Example",
     .DocCallback = std::bind(docTgl, "Toggle axis", std::cref(opt.ui.axis)),
@@ -171,7 +168,7 @@ void AddCustomBindings(f3d::engine& eng)
 
   // F: toggle FXAA
   inter.removeBinding({ f3d::interaction_bind_t::ModifierKeys::NONE, "F" });
-  inter.addBinding(f3d::interactor::BindingParam{ .Bind = f3d::interaction_bind_t::parse("F"),
+  inter.addBinding({ .Bind = f3d::interaction_bind_t::parse("F"),
     .Commands = { "toggle_fxaa" },
     .Group = "Example",
     .DocCallback = std::bind(docStr, "Toggle FXAA", std::cref(opt.render.effect.antialiasing.mode)),
@@ -179,7 +176,7 @@ void AddCustomBindings(f3d::engine& eng)
 
   // T: toggle tone mapping
   inter.removeBinding({ f3d::interaction_bind_t::ModifierKeys::NONE, "T" });
-  inter.addBinding(f3d::interactor::BindingParam{ .Bind = f3d::interaction_bind_t::parse("T"),
+  inter.addBinding({ .Bind = f3d::interaction_bind_t::parse("T"),
     .Commands = { "toggle_tonemapping" },
     .Group = "Example",
     .DocCallback =

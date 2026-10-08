@@ -172,7 +172,7 @@ Other languages API behavior changed accordingly:
   - `Interactor.addBinding()` now requires a class instance parameter over a list of arguments. This includes a `repeat` argument which specifies that the binding is repeatedly applied when holding down the key.
 - Python API:
   - `scene.supports()` used to return bool. Now returns f3d.FileAvailability.
-  - `interactor.addBinding()` now requires a class parameter over a list of arguments. This includes a `repeat` argument which specifies that the binding is repeatedly applied when holding down the key.
+  - `interactor.addBinding()` now requires keyword arguments. This includes a `repeat` argument which specifies that the binding is repeatedly applied when holding down the key.
 - Webassembly API: `scene.supports()` used to return bool. Now returns enum FileAvailability.
 
 ## scene animation API
