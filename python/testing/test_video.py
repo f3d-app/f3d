@@ -35,7 +35,7 @@ def test_video_api():
     def test_packet(packet):
         received_timestamps.append(packet.get_timestamp())
         assert packet.is_key_frame() == True
-        packet.get_packet_data() # smoke test
+        packet.get_packet_data()  # smoke test
 
     encoder.listen(test_packet)
 
