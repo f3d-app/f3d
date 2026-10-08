@@ -86,7 +86,7 @@ def test_binding():
         bind=f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.ANY, "P"),
         command=["dummy command"],
         group="DummyGroup",
-        documentationCallback=cdoc_fn,
+        documentationCallback=doc_fn,
     )
     inter.add_binding(
         bind=f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "P"),
