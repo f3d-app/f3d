@@ -302,7 +302,7 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
     }
   }
 
-  if (this->ConsoleBadgeEnabled)
+  if (this->ConsoleBadgeEnabled && this->NotificationVisible)
   {
     this->RenderConsoleBadge();
   }
