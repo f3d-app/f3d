@@ -43,7 +43,7 @@ f3d_ss_template_test(NAME InvalidFormats TEMPLATE ${_screenshot_dir}/{model}_{da
 f3d_ss_test(NAME Esc TEMPLATE ${_screenshot_dir}/{model}_{{model}}_{}.png EXPECTED ${_screenshot_dir}/suzanne_{model}_{}.png)
 f3d_ss_test(NAME Minimal MINIMAL TEMPLATE ${_screenshot_dir}/minimal.png EXPECTED ${_screenshot_dir}/minimal.png)
 
-f3d_test(NAME TestCommandScriptMinimalScreenshotOverlays SCRIPT DATA suzanne.ply ARGS --screenshot-filename=${_screenshot_dir}/minimal_overlays.png NO_BASELINE DEPENDS TestSetupScreenshots UI)
+f3d_test(NAME TestCommandScriptMinimalScreenshotOverlays SCRIPT DATA suzanne.ply ARGS invalid_file.ply --screenshot-filename=${_screenshot_dir}/minimal_overlays.png NO_BASELINE DEPENDS TestSetupScreenshots UI)
 f3d_test(NAME TestScreenshotMinimalOverlaysFile DATA suzanne.ply ARGS --no-background --reference=${_screenshot_dir}/minimal_overlays.png DEPENDS TestCommandScriptMinimalScreenshotOverlays NO_BASELINE)
 
 if(WIN32)
