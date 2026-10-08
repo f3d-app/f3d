@@ -125,8 +125,8 @@ void F3DColoringInfoHandler::SelectFirstArray(bool forceUsePointData, bool force
 
 //----------------------------------------------------------------------------
 std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetCurrentColoring(
-  bool forceUsePointData, bool forceUseCellData, std::optional<bool>& arrayIsCellData,
-  std::optional<std::string>& arrayName, std::optional<int>& arrayComponent, bool quiet)
+  bool forceUsePointData, bool forceUseCellData, const std::optional<bool>& arrayIsCellData,
+  const std::optional<std::string>& arrayName, bool quiet)
 {
   const int nIndices = static_cast<int>(this->ColoringInfoMap.size());
 
@@ -172,9 +172,6 @@ std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetC
           "Unknown scalar array: \"" + arrayName.value() + "\"" + fieldDesc);
       }
 
-      arrayIsCellData.reset();
-      arrayName.reset();
-      arrayComponent.reset();
       this->SelectFirstArray(forceUsePointData, forceUseCellData);
     }
   }

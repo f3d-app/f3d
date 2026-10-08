@@ -3285,7 +3285,7 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   const bool forceCells = this->DataFieldForColoring == DataField::CELLS;
 
   const auto info = coloringHandler.SetCurrentColoring(forcePoints, forceCells,
-    this->ArrayIsCellData, this->ArrayNameForColoring, this->ComponentForColoring, false);
+    this->ArrayIsCellData, this->ArrayNameForColoring, false);
 
   const bool hasColoring =
     info.has_value() && this->Coloring != vtkF3DRenderer::ColoringMode::MATERIAL;
@@ -3623,13 +3623,15 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
     return;
   }
 
-  if (this->ComponentForColoring.has_value() &&
-    (this->ComponentForColoring.value() >= info.MaximumNumberOfComponents))
+  std::optional<int> componentIndex = this->ComponentForColoring;
+
+  if (componentIndex.has_value() &&
+    (componentIndex.value() >= info.MaximumNumberOfComponents))
   {
     F3DLog::Print(F3DLog::Severity::Warning,
       std::string("Invalid component index: ") +
-        std::to_string(this->ComponentForColoring.value()));
-    this->ComponentForColoring.reset();
+        std::to_string(componentIndex.value()));
+    componentIndex.reset();
   }
 
   // Set range
@@ -3654,10 +3656,10 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
   {
     double minRange;
     double maxRange;
-    if (this->ComponentForColoring.has_value())
+    if (componentIndex.has_value())
     {
-      minRange = info.ComponentRanges[this->ComponentForColoring.value()][0];
-      maxRange = info.ComponentRanges[this->ComponentForColoring.value()][1];
+      minRange = info.ComponentRanges[componentIndex.value()][0];
+      maxRange = info.ComponentRanges[componentIndex.value()][1];
     }
     else
     {
@@ -3858,19 +3860,15 @@ std::string vtkF3DRenderer::ComponentToString()
 {
   assert(this->Importer);
 
-  if (!this->ComponentForColoring.has_value())
-  {
-    return "Magnitude";
-  }
-
   auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
   if (!info.has_value())
   {
-    return "";
+    return "No Array";
   }
-  if (this->ComponentForColoring.value() >= info.value().MaximumNumberOfComponents)
+
+  if (!this->ComponentForColoring.has_value() || this->ComponentForColoring.value() >= info.value().MaximumNumberOfComponents)
   {
-    return "";
+    return "Magnitude";
   }
 
   std::string componentName;
