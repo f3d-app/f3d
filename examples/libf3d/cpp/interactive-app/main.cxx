@@ -129,26 +129,26 @@ void AddCustomBindings(f3d::engine& eng)
 
   // R: reset options
   inter.addBinding({ .Bind = { f3d::interaction_bind_t::ModifierKeys::SHIFT, "R" },
-      .Commands = { "reset_options" },
-      .Group = "Example",
-      .DocCallback = std::bind(docStr, "Reset Options"),
-      .Type = f3d::interactor::BindingType::OTHER });
+    .Commands = { "reset_options" },
+    .Group = "Example",
+    .DocCallback = std::bind(docStr, "Reset Options"),
+    .Type = f3d::interactor::BindingType::OTHER });
 
   // SHIFT + S: Increase animation speed
   inter.addBinding({ .Bind = { f3d::interaction_bind_t::ModifierKeys::SHIFT, "S" },
-      .Commands = { "increase_animation_speed_factor" },
-      .Group = { "Example" },
-      .DocCallback = std::bind(
-        docDblOpt, "Increase animation speed", std::cref(opt.scene.animation.speed_factor)),
-      .Type = f3d::interactor::BindingType::NUMERICAL });
+    .Commands = { "increase_animation_speed_factor" },
+    .Group = { "Example" },
+    .DocCallback =
+      std::bind(docDblOpt, "Increase animation speed", std::cref(opt.scene.animation.speed_factor)),
+    .Type = f3d::interactor::BindingType::NUMERICAL });
 
   // CTRL + S: Decrease animation speed
   inter.addBinding({ .Bind = { f3d::interaction_bind_t::ModifierKeys::CTRL, "S" },
-      .Commands = { "decrease_animation_speed_factor" },
-      .Group = "Example",
-      .DocCallback = std::bind(
-        docDblOpt, "Decrease animation speed", std::cref(opt.scene.animation.speed_factor)),
-      .Type = f3d::interactor::BindingType::NUMERICAL });
+    .Commands = { "decrease_animation_speed_factor" },
+    .Group = "Example",
+    .DocCallback =
+      std::bind(docDblOpt, "Decrease animation speed", std::cref(opt.scene.animation.speed_factor)),
+    .Type = f3d::interactor::BindingType::NUMERICAL });
 
   // G: toggle grid
   inter.removeBinding({ f3d::interaction_bind_t::ModifierKeys::NONE, "G" });
