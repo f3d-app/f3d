@@ -46,10 +46,18 @@ public class TestInteractor {
     repeatBind.mod = Interactor.ModifierKeys.NONE;
     repeatBind.inter = "R";
 
+    List<String> repeatBindCommands = List.of("test_command");
+
     // Remove any binds from previous CI before testing repeat to avoid error
     interactor.removeBinding(repeatBind);
 
-    interactor.addBinding(repeatBind, "test_command", "test_group", Interactor.BindingType.NUMERICAL, false, true);
+    Interactor.BindingParam bindingParam = new Interactor.BindingParam(repeatBind, repeatBindCommands);
+    bindingParam.group("test_group");
+    bindingParam.type(Interactor.BindingType.NUMERICAL);
+    bindingParam.notify(false);
+    bindingParam.repeat(false);
+
+    interactor.addBinding(bindingParam);
 
     List<Interactor.InteractionBind> testBindings = interactor.getBindsForGroup("test_group");
     testBindings.stream().allMatch((binding) -> binding.equals(repeatBind));

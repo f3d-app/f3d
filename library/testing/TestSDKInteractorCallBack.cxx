@@ -40,8 +40,8 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, char* argv[])
 
   // Check that adding an existing interaction command trigger an exception
 
-  test.expect<f3d::interactor::already_exists_exception>(
-    "add existing interaction", [&]() { inter.addBinding({ mod_t::ANY, "7" }, "exception"); });
+  test.expect<f3d::interactor::already_exists_exception>("add existing interaction",
+    [&]() { inter.addBinding({ .Bind = { mod_t::ANY, "7" }, .Commands = { "exception" } }); });
 
   // Remove bindings that will be triggered later and should not have any effect
   inter.removeBinding({ mod_t::ANY, "7" });
@@ -53,24 +53,25 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, char* argv[])
   inter.removeBinding({ mod_t::SHIFT, "Y" });
 
   // Check that an binding can be added
-  inter.addBinding({ mod_t::NONE, "S" }, "toggle ui.axis");
+  inter.addBinding({ .Bind = { mod_t::NONE, "S" }, .Commands = { "toggle ui.axis" } });
 
   // Check CTRL modifier and that another interaction can be added on the same key with another
   // modifier
-  inter.addBinding({ mod_t::CTRL, "S" }, "toggle render.grid.enable");
+  inter.addBinding({ .Bind = { mod_t::CTRL, "S" }, .Commands = { "toggle render.grid.enable" } });
 
   // Check invalid command for coverage
-  inter.addBinding({ mod_t::SHIFT, "P" }, "invalid command");
+  inter.addBinding({ .Bind = { mod_t::SHIFT, "P" }, .Commands = { "invalid command" } });
 
   // Check SHIFT modifier
-  inter.addBinding({ mod_t::SHIFT, "Y" }, R"(set ui.filename_info "My Own Filename")");
+  inter.addBinding(
+    { .Bind = { mod_t::SHIFT, "Y" }, .Commands = { R"(set ui.filename_info "My Own Filename")" } });
 
   // Check CTRL_SHIFT modifier
-  inter.addBinding(
-    { mod_t::CTRL_SHIFT, "B" }, { "set ui.filename true", "set render.show_edges true" });
+  inter.addBinding({ .Bind = { mod_t::CTRL_SHIFT, "B" },
+    .Commands = { "set ui.filename true", "set render.show_edges true" } });
 
   // Check ANY modifier
-  inter.addBinding({ mod_t::ANY, "A" }, "toggle ui.metadata");
+  inter.addBinding({ .Bind = { mod_t::ANY, "A" }, .Commands = { "toggle ui.metadata" } });
 
   // Replace the add_files command
   inter.removeCommand("add_files");
@@ -85,7 +86,7 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, char* argv[])
   inter.addCommand("exception", [&](const std::vector<std::string>&) {
     throw std::runtime_error("testing runtime exception");
   });
-  inter.addBinding({ mod_t::NONE, "Z" }, "exception");
+  inter.addBinding({ .Bind = { mod_t::NONE, "Z" }, .Commands = { "exception" } });
 
   // This time the interaction should result in a different rendering
   // Dragon.vtu; SZZYB; CTRL+S; SHIFT+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7

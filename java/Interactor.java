@@ -1,6 +1,7 @@
 package app.f3d.F3D;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Interactor {
 
@@ -166,6 +167,81 @@ public class Interactor {
         void execute(List<String> args);
     }
 
+    public static record Documentation(String first, String second) {}
+
+    public interface DocCallback {
+        Documentation execute();
+    }
+
+    public static class BindingParam {
+        private final InteractionBind bind;
+        private final List<String> commands;
+
+        private String group = "";
+        private DocCallback docCallback = null;
+        private BindingType type = BindingType.OTHER;
+        private boolean notify = true;
+        private boolean repeat = false;
+
+        public BindingParam(InteractionBind bind, List<String> commands) {
+            this.bind = Objects.requireNonNull(bind);
+            this.commands = List.copyOf(commands);
+        }
+
+        public BindingParam group(String group) {
+            this.group = group;
+            return this;
+        }
+
+        public BindingParam docCallback(DocCallback docCallback) {
+            this.docCallback = docCallback;
+            return this;
+        }
+
+        public BindingParam type(BindingType type) {
+            this.type = type;
+            return this;
+        }
+
+        public BindingParam notify(boolean notify) {
+            this.notify = notify;
+            return this;
+        }
+
+        public BindingParam repeat(boolean repeat) {
+            this.repeat = repeat;
+            return this;
+        }
+
+        public InteractionBind getBind() {
+            return bind;
+        }
+
+        public List<String> getCommands() {
+            return commands;
+        }
+
+        public String getGroup() {
+            return group;
+        }
+
+        public DocCallback getDocCallback() {
+            return docCallback;
+        }
+
+        public BindingType getType() {
+            return type;
+        }
+
+        public boolean getNotify() {
+            return notify;
+        }
+
+        public boolean getRepeat() {
+            return repeat;
+        }
+    }
+
     Interactor(long nativeAddress) {
         mNativeAddress = nativeAddress;
     }
@@ -228,81 +304,21 @@ public class Interactor {
     public native Interactor initBindings();
 
     /**
-     * Add binding to trigger commands for a specific bind.
+     * Add binding to trigger a command or commands for a specific bind.
      *
-     * @param bind interaction bind (key combination)
-     * @param commands list of commands to trigger
-     * @param group optional group name for organization
-     * @param type optional binding type
-     * @param notify notify when the binding is triggered
-     * @param repeat repeatedly apply binding when holding down key
+     * @param binding The binding definition to register with the interactor.
      * @return this interactor for method chaining
      */
-    private native Interactor addBindingCommands(InteractionBind bind, List<String> commands, String group, BindingType type, boolean notify, boolean repeat);
+    private native Interactor addBindingCommands(BindingParam binding);
 
     /**
      * Add binding to trigger commands for a specific bind.
      *
-     * @param bind interaction bind (key combination)
-     * @param commands list of commands to trigger
-     * @param group optional group name for organization
-     * @param type optional binding type
-     * @param notify notify when the binding is triggered
-     * @param repeat repeatedly apply binding when holding down key
+     * @param binding The binding definition to register with the interactor.
      * @return this interactor for method chaining
      */
-    public Interactor addBinding(InteractionBind bind, List<String> commands, String group, BindingType type, boolean notify, boolean repeat) {
-        return addBindingCommands(bind, commands, group, type, notify, repeat);
-    }
-
-    /**
-     * Add binding to trigger commands for a specific bind with default group and type.
-     *
-     * @param bind interaction bind (key combination)
-     * @param commands list of commands to trigger
-     * @return this interactor for method chaining
-     */
-    public Interactor addBinding(InteractionBind bind, List<String> commands) {
-        return addBindingCommands(bind, commands, "", BindingType.OTHER, true, false);
-    }
-
-    /**
-     * Add binding to trigger a single command for a specific bind.
-     *
-     * @param bind interaction bind (key combination)
-     * @param command command to trigger
-     * @param group optional group name for organization
-     * @param type optional binding type
-     * @param notify notify when the binding is triggered
-     * @param repeat repeatedly apply binding when holding down key
-     * @return this interactor for method chaining
-     */
-    private native Interactor addBindingCommand(InteractionBind bind, String command, String group, BindingType type, boolean notify, boolean repeat);
-
-    /**
-     * Add binding to trigger a single command for a specific bind.
-     *
-     * @param bind interaction bind (key combination)
-     * @param command command to trigger
-     * @param group optional group name for organization
-     * @param type optional binding type
-     * @param notify notify when the binding is triggered
-     * @param repeat repeatedly apply binding when holding down key
-     * @return this interactor for method chaining
-     */
-    public Interactor addBinding(InteractionBind bind, String command, String group, BindingType type, boolean notify, boolean repeat) {
-        return addBindingCommand(bind, command, group, type, notify, repeat);
-    }
-
-    /**
-     * Add binding to trigger a single command for a specific bind with default group and type.
-     *
-     * @param bind interaction bind (key combination)
-     * @param command command to trigger
-     * @return this interactor for method chaining
-     */
-    public Interactor addBinding(InteractionBind bind, String command) {
-        return addBindingCommand(bind, command, "", BindingType.OTHER, true, false);
+    public Interactor addBinding(BindingParam binding) {
+        return addBindingCommands(binding);
     }
 
     /**

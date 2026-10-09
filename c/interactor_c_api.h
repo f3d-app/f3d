@@ -35,54 +35,6 @@ extern "C"
   } f3d_interaction_bind_t;
 
   /**
-   * @brief Format an interaction bind into a string.
-   *
-   * Formats the bind into a string like "A", "Any+Question", "Shift+L", etc.
-   * The output buffer must be at least 512 bytes.
-   *
-   * @param bind Interaction bind to format.
-   * @param output Output buffer to store the formatted string.
-   * @param output_size Size of the output buffer.
-   */
-  F3D_EXPORT void f3d_interaction_bind_format(
-    const f3d_interaction_bind_t* bind, char* output, int output_size);
-
-  /**
-   * @brief Parse a string into an interaction bind.
-   *
-   * Creates an interaction bind from a string like "A", "Ctrl+A", "Shift+B", etc.
-   *
-   * @param str String to parse.
-   * @param bind Output parameter for the parsed bind.
-   */
-  F3D_EXPORT void f3d_interaction_bind_parse(const char* str, f3d_interaction_bind_t* bind);
-
-  /**
-   * @brief Compare two interaction binds for less-than ordering.
-   *
-   * Compares modifier and interaction string for ordering.
-   * Useful for storing binds in sorted data structures.
-   *
-   * @param lhs Left-hand side bind.
-   * @param rhs Right-hand side bind.
-   * @return 1 if lhs < rhs, 0 otherwise.
-   */
-  F3D_EXPORT int f3d_interaction_bind_less_than(
-    const f3d_interaction_bind_t* lhs, const f3d_interaction_bind_t* rhs);
-
-  /**
-   * @brief Compare two interaction binds for equality.
-   *
-   * Compares both modifier and interaction string for equality.
-   *
-   * @param lhs Left-hand side bind.
-   * @param rhs Right-hand side bind.
-   * @return 1 if binds are equal, 0 otherwise.
-   */
-  F3D_EXPORT int f3d_interaction_bind_equals(
-    const f3d_interaction_bind_t* lhs, const f3d_interaction_bind_t* rhs);
-
-  /**
    * @brief Enumeration of binding types.
    */
   typedef enum f3d_interactor_binding_type_t
@@ -133,6 +85,77 @@ extern "C"
     F3D_INTERACTOR_INPUT_SHIFT,
     F3D_INTERACTOR_INPUT_CTRL_SHIFT
   } f3d_interactor_input_modifier_t;
+
+  /**
+   * @brief Enumeration of animation direction.
+   */
+  typedef enum f3d_interactor_animation_direction_t
+  {
+    F3D_INTERACTOR_ANIMATION_FORWARD,
+    F3D_INTERACTOR_ANIMATION_BACKWARD
+  } f3d_interactor_animation_direction_t;
+
+  /**
+   * @brief Structure representing an interaction binding.
+   */
+  typedef struct f3d_binding_params_t
+  {
+    f3d_interaction_bind_t bind;        // Interaction bind
+    const char** commands;              // Array of command strings.
+    int command_count;                  // Number of commands.
+    char* group;                        // Optional group name (can be NULL).
+    f3d_interactor_binding_type_t type; // Optional binding type.
+    int notify;                         // Notify when the binding is triggered.
+    int repeat;                         // Binding is repeatedly applied when holding down the key.
+  } f3d_binding_params_t;
+
+  /**
+   * @brief Format an interaction bind into a string.
+   *
+   * Formats the bind into a string like "A", "Any+Question", "Shift+L", etc.
+   * The output buffer must be at least 512 bytes.
+   *
+   * @param bind Interaction bind to format.
+   * @param output Output buffer to store the formatted string.
+   * @param output_size Size of the output buffer.
+   */
+  F3D_EXPORT void f3d_interaction_bind_format(
+    const f3d_interaction_bind_t* bind, char* output, int output_size);
+
+  /**
+   * @brief Parse a string into an interaction bind.
+   *
+   * Creates an interaction bind from a string like "A", "Ctrl+A", "Shift+B", etc.
+   *
+   * @param str String to parse.
+   * @param bind Output parameter for the parsed bind.
+   */
+  F3D_EXPORT void f3d_interaction_bind_parse(const char* str, f3d_interaction_bind_t* bind);
+
+  /**
+   * @brief Compare two interaction binds for less-than ordering.
+   *
+   * Compares modifier and interaction string for ordering.
+   * Useful for storing binds in sorted data structures.
+   *
+   * @param lhs Left-hand side bind.
+   * @param rhs Right-hand side bind.
+   * @return 1 if lhs < rhs, 0 otherwise.
+   */
+  F3D_EXPORT int f3d_interaction_bind_less_than(
+    const f3d_interaction_bind_t* lhs, const f3d_interaction_bind_t* rhs);
+
+  /**
+   * @brief Compare two interaction binds for equality.
+   *
+   * Compares both modifier and interaction string for equality.
+   *
+   * @param lhs Left-hand side bind.
+   * @param rhs Right-hand side bind.
+   * @return 1 if binds are equal, 0 otherwise.
+   */
+  F3D_EXPORT int f3d_interaction_bind_equals(
+    const f3d_interaction_bind_t* lhs, const f3d_interaction_bind_t* rhs);
 
   ///@{ @name Commands
   /**
@@ -201,17 +224,10 @@ extern "C"
    * @brief Add a binding for the provided bind.
    *
    * @param interactor Interactor handle.
-   * @param bind Interaction bind.
-   * @param commands Array of command strings.
-   * @param command_count Number of commands.
-   * @param group Optional group name (can be NULL).
-   * @param type Optional binding type.
-   * @param notify Notify when the binding is triggered.
-   * @param repeat Binding is repeatedly applied when holding down the key.
+   * @param binding Binding definition, see f3d_binding_params_t for details.
    */
-  F3D_EXPORT void f3d_interactor_add_binding(f3d_interactor_t* interactor,
-    const f3d_interaction_bind_t* bind, const char** commands, int command_count, const char* group,
-    f3d_interactor_binding_type_t type, int notify, int repeat);
+  F3D_EXPORT void f3d_interactor_add_binding(
+    f3d_interactor_t* interactor, f3d_binding_params_t binding);
 
   /**
    * @brief Remove a binding for the provided bind.
