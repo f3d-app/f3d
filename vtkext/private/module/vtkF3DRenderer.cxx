@@ -3291,7 +3291,10 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
     info.has_value() && this->Coloring != vtkF3DRenderer::ColoringMode::MATERIAL;
   if (hasColoring && !this->ColorTransferFunctionConfigured)
   {
-    this->ConfigureRangeAndCTFForColoring(info.value());
+    if (this->Coloring == vtkF3DRenderer::ColoringMode::SCIVIS)
+    {
+      this->ConfigureRangeAndCTFForColoring(info.value());
+    }
     this->ColorTransferFunctionConfigured = true;
   }
 
@@ -3618,11 +3621,6 @@ void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
 void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
   const F3DColoringInfoHandler::ColoringInfo& info)
 {
-  if (this->Coloring == vtkF3DRenderer::ColoringMode::DIRECT)
-  {
-    return;
-  }
-
   std::optional<int> componentIndex = this->ComponentForColoring;
 
   if (componentIndex.has_value() && (componentIndex.value() >= info.MaximumNumberOfComponents))

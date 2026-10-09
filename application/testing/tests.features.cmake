@@ -686,6 +686,10 @@ f3d_test(NAME TestVerboseNoArray DATA cow.vtp ARGS -s --verbose=debug REGEXP "No
 # Test invalid scalar range
 f3d_test(NAME TestInvalidScalarsRange DATA suzanne.ply ARGS -s --coloring-array=Normals --coloring-component=1 --coloring-range=0,1,2 REGEXP "Invalid scalar range provided, using automatic range" NO_BASELINE)
 
+# Test invalid color array names
+f3d_test(NAME TestInvalidScalarsNamePoints DATA suzanne.ply ARGS -s --coloring-array=foo --coloring-field=points REGEXP "Unknown scalar array: \"foo\" \\(point data\\)" NO_BASELINE)
+f3d_test(NAME TestInvalidScalarsNameCells DATA suzanne.ply ARGS -s --coloring-array=foo --coloring-field=cells REGEXP "Unknown scalar array: \"foo\" \\(cell data\\)" NO_BASELINE)
+
 # Test invalid backface type
 f3d_test(NAME TestInvalidBackface DATA backface.vtp ARGS --backface-type=invalid REGEXP "is not a valid backface type, assuming it is not set" NO_BASELINE)
 
