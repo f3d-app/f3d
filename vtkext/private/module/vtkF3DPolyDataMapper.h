@@ -43,6 +43,22 @@ public:
   bool FragmentShaderUsesPrimitiveID(vtkRenderer*, vtkActor*) override;
 #endif
 
+  /**
+   * Changes flags dictating the decode scalar colors for raytracing,
+   * which expects linear RGB.
+   * OpenGL performs this conversion in its PBR shader instead.
+   */
+  void SetUseLinearColorSpace(bool use);
+
+  // vtkMapper class has MapScalars() overloads. Make them visible because we are overriding.
+  using Superclass::MapScalars;
+
+  /**
+   * Our vtkPolyDataMapper::MapScalar() override which computes linear RGB from sRGB
+   * if needed.
+   */
+  vtkUnsignedCharArray* MapScalars(vtkDataSet* input, double alpha, int& cellFlag) override;
+
 protected:
   vtkF3DPolyDataMapper() = default;
   ~vtkF3DPolyDataMapper() override = default;
@@ -50,6 +66,11 @@ protected:
 private:
   vtkNew<vtkOpenGLBufferObject> JointMatrices;
   bool HasSSBOSkinning = false;
+
+  // Our cached linear color texture map for PBR, used as vtkMapper::ColorTextureMap respectively
+  // while linear colorspace conversion.
+  bool UseLinearColorSpace = false;
+  vtkSmartPointer<vtkImageData> LinearColorTextureMap;
 };
 
 #endif
