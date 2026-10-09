@@ -64,12 +64,12 @@ The following commands have been removed and should be replaced:
 - `cycle_interactor_style` -> `cycle interactor.style`
 - `jump_to_keyframe*` -> ``jump_to_key_frame*`
 
-The `jump_to_frame` and `jump_to_key_frame` commands no longer take a second boolean argument and now always perform an absolute jump. To perform a relative jump, use the new `jump_to_frame_relative` and `jump_to_key_frame_relative` commands:
+The `jump_to_frame` and `jump_to_keyframe` commands no longer take a second boolean argument and now always perform an absolute jump. To perform a relative jump, use the new `jump_to_frame_relative` and `jump_to_key_frame_relative` commands:
 
 - `jump_to_frame 10 false` -> `jump_to_frame 10`
 - `jump_to_frame 1 true` -> `jump_to_frame_relative 1`
-- `jump_to_key_frame 4 false` -> `jump_to_key_frame 4`
-- `jump_to_key_frame 1 true` -> `jump_to_key_frame_relative 1`
+- `jump_tokey_frame 4 false` -> `jump_to_key_frame 4`
+- `jump_tokey_frame 1 true` -> `jump_to_key_frame_relative 1`
 
 ## ui.animation_progress
 
