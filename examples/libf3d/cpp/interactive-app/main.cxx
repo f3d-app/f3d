@@ -128,60 +128,57 @@ void AddCustomBindings(f3d::engine& eng)
   };
 
   // R: reset options
-  inter.addBinding({ .Bind = { f3d::interaction_bind_t::ModifierKeys::SHIFT, "R" },
-    .Commands = { "reset_options" },
-    .Group = "Example",
-    .DocCallback = std::bind(docStr, "Reset Options"),
-    .Type = f3d::interactor::BindingType::OTHER });
+  inter.addBinding({ { f3d::interaction_bind_t::ModifierKeys::SHIFT, "R" },
+    { "reset_options" },
+    "Example",
+    std::bind(docStr, "Reset Options"),
+    f3d::interactor::BindingType::OTHER });
 
   // SHIFT + S: Increase animation speed
-  inter.addBinding({ .Bind = { f3d::interaction_bind_t::ModifierKeys::SHIFT, "S" },
-    .Commands = { "increase_animation_speed_factor" },
-    .Group = { "Example" },
-    .DocCallback =
-      std::bind(docDblOpt, "Increase animation speed", std::cref(opt.scene.animation.speed_factor)),
-    .Type = f3d::interactor::BindingType::NUMERICAL });
+  inter.addBinding({ { f3d::interaction_bind_t::ModifierKeys::SHIFT, "S" },
+    { "increase_animation_speed_factor" },
+    { "Example" },
+    std::bind(docDblOpt, "Increase animation speed", std::cref(opt.scene.animation.speed_factor)),
+    f3d::interactor::BindingType::NUMERICAL });
 
   // CTRL + S: Decrease animation speed
-  inter.addBinding({ .Bind = { f3d::interaction_bind_t::ModifierKeys::CTRL, "S" },
-    .Commands = { "decrease_animation_speed_factor" },
-    .Group = "Example",
-    .DocCallback =
-      std::bind(docDblOpt, "Decrease animation speed", std::cref(opt.scene.animation.speed_factor)),
-    .Type = f3d::interactor::BindingType::NUMERICAL });
+  inter.addBinding({ { f3d::interaction_bind_t::ModifierKeys::CTRL, "S" },
+    { "decrease_animation_speed_factor" },
+    "Example",
+    std::bind(docDblOpt, "Decrease animation speed", std::cref(opt.scene.animation.speed_factor)),
+    f3d::interactor::BindingType::NUMERICAL });
 
   // G: toggle grid
   inter.removeBinding({ f3d::interaction_bind_t::ModifierKeys::NONE, "G" });
-  inter.addBinding({ .Bind = f3d::interaction_bind_t::parse("G"),
-    .Commands = { "toggle_grid" },
-    .Group = "Example",
-    .DocCallback = std::bind(docTgl, "Toggle grid", std::cref(opt.render.grid.enable)),
-    .Type = f3d::interactor::BindingType::TOGGLE });
+  inter.addBinding({ f3d::interaction_bind_t::parse("G"),
+    { "toggle_grid" },
+    "Example",
+    std::bind(docTgl, "Toggle grid", std::cref(opt.render.grid.enable)),
+    f3d::interactor::BindingType::TOGGLE });
 
   // X: toggle axis
   inter.removeBinding({ f3d::interaction_bind_t::ModifierKeys::NONE, "X" });
-  inter.addBinding({ .Bind = f3d::interaction_bind_t::parse("X"),
-    .Commands = { "toggle_axis" },
-    .Group = "Example",
-    .DocCallback = std::bind(docTgl, "Toggle axis", std::cref(opt.ui.axis)),
-    .Type = f3d::interactor::BindingType::TOGGLE });
+  inter.addBinding({ f3d::interaction_bind_t::parse("X"),
+    { "toggle_axis" },
+    "Example",
+    std::bind(docTgl, "Toggle axis", std::cref(opt.ui.axis)),
+    f3d::interactor::BindingType::TOGGLE });
 
   // F: toggle FXAA
   inter.removeBinding({ f3d::interaction_bind_t::ModifierKeys::NONE, "F" });
-  inter.addBinding({ .Bind = f3d::interaction_bind_t::parse("F"),
-    .Commands = { "toggle_fxaa" },
-    .Group = "Example",
-    .DocCallback = std::bind(docStr, "Toggle FXAA", std::cref(opt.render.effect.antialiasing.mode)),
-    .Type = f3d::interactor::BindingType::TOGGLE });
+  inter.addBinding({ f3d::interaction_bind_t::parse("F"),
+    { "toggle_fxaa" },
+    "Example",
+    std::bind(docStr, "Toggle FXAA", std::cref(opt.render.effect.antialiasing.mode)),
+    f3d::interactor::BindingType::TOGGLE });
 
   // T: toggle tone mapping
   inter.removeBinding({ f3d::interaction_bind_t::ModifierKeys::NONE, "T" });
-  inter.addBinding({ .Bind = f3d::interaction_bind_t::parse("T"),
-    .Commands = { "toggle_tonemapping" },
-    .Group = "Example",
-    .DocCallback =
-      std::bind(docTgl, "Toggle Tone Mapping", std::cref(opt.render.effect.tone_mapping)),
-    .Type = f3d::interactor::BindingType::TOGGLE });
+  inter.addBinding({ f3d::interaction_bind_t::parse("T"),
+    { "toggle_tonemapping" },
+    "Example",
+    std::bind(docTgl, "Toggle Tone Mapping", std::cref(opt.render.effect.tone_mapping)),
+    f3d::interactor::BindingType::TOGGLE });
 }
 }
 

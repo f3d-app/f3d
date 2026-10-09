@@ -164,32 +164,32 @@ int main(int argc, char** argv)
     f3d::interactor::command_documentation_t{ "set_cloth_iterations", "Set cloth iterations" });
 
   // Bindings
-  inter.addBinding({ .Bind = f3d::interaction_bind_t::parse("W"),
-    .Commands = { "reset_simulation" },
-    .Group = "Simulation",
-    .DocCallback = []()
+  inter.addBinding({ f3d::interaction_bind_t::parse("W"),
+    { "reset_simulation" },
+    "Simulation",
+    []()
     { return std::make_pair<std::string, std::string>("Reset simulation", ""); } });
 
-  inter.addBinding({ .Bind = f3d::interaction_bind_t::parse("N"),
-    .Commands = { "set_cloth_resolution 10", "reset_simulation" },
-    .Group = "Simulation",
-    .DocCallback = []() { return std::make_pair<std::string, std::string>("10x10", ""); } });
+  inter.addBinding({ f3d::interaction_bind_t::parse("N"),
+    { "set_cloth_resolution 10", "reset_simulation" },
+    "Simulation",
+    []() { return std::make_pair<std::string, std::string>("10x10", ""); } });
 
-  inter.addBinding({ .Bind = f3d::interaction_bind_t::parse("Shift+N"),
-    .Commands = { "set_cloth_resolution 50", "reset_simulation" },
-    .Group = "Simulation",
-    .DocCallback = []() { return std::make_pair<std::string, std::string>("50x50", ""); } });
+  inter.addBinding({ f3d::interaction_bind_t::parse("Shift+N"),
+    { "set_cloth_resolution 50", "reset_simulation" },
+    "Simulation",
+    []() { return std::make_pair<std::string, std::string>("50x50", ""); } });
 
-  inter.addBinding({ .Bind = f3d::interaction_bind_t::parse("I"),
-    .Commands = { "set_cloth_iterations 10" },
-    .Group = "Simulation",
-    .DocCallback = []()
+  inter.addBinding({ f3d::interaction_bind_t::parse("I"),
+    { "set_cloth_iterations 10" },
+    "Simulation",
+    []()
     { return std::make_pair<std::string, std::string>("10 iterations", ""); } });
 
-  inter.addBinding({ .Bind = f3d::interaction_bind_t::parse("O"),
-    .Commands = { "set_cloth_iterations 100" },
-    .Group = "Simulation",
-    .DocCallback = []()
+  inter.addBinding({ f3d::interaction_bind_t::parse("O"),
+    { "set_cloth_iterations 100" },
+    "Simulation",
+    []()
     { return std::make_pair<std::string, std::string>("100 iterations", ""); } });
 
   try
