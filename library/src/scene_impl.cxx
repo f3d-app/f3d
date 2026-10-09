@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <iterator>
 #include <optional>
 #include <string>
@@ -388,6 +389,9 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
              "check to skip content validation or force reader to "
              "force a specific reader");
         break;
+      case file_availability::EMPTY_STREAM:
+        assert(false); // Unreachable
+        break;
     }
 
     vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(filePath.string());
@@ -444,7 +448,9 @@ scene& scene_impl::add(const std::byte* buffer, std::size_t size)
   }
 #endif
 
-  const f3d::reader* reader = f3d::factory::instance()->getReader(buffer, size, forceReader);
+  f3d::file_availability availability = f3d::file_availability::UNSUPPORTED_EXTENSION;
+  const f3d::reader* reader =
+    f3d::factory::instance()->getReader(buffer, size, forceReader, availability);
   if (reader)
   {
     if (forceReader)
@@ -1021,6 +1027,20 @@ f3d::file_availability scene_impl::supports(const fs::path& filePath)
   f3d::factory::instance()->getReader(filePath.string(),
     this->Internals->Options.scene.force_reader, this->Internals->Options.scene.skip_content_check,
     availability);
+  return availability;
+}
+
+//----------------------------------------------------------------------------
+f3d::file_availability scene_impl::supports(const std::byte* buffer, std::size_t size)
+{
+  if (buffer == nullptr || size == 0)
+  {
+    return f3d::file_availability::EMPTY_STREAM;
+  }
+
+  f3d::file_availability availability = f3d::file_availability::UNSUPPORTED_EXTENSION;
+  f3d::factory::instance()->getReader(
+    buffer, size, this->Internals->Options.scene.force_reader, availability);
   return availability;
 }
 

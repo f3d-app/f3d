@@ -41,6 +41,7 @@ enum class file_availability : unsigned char
   SUPPORTED = 0,
   UNSUPPORTED_EXTENSION = 1,
   UNSUPPORTED_CONTENT = 2,
+  EMPTY_STREAM = 3,
 };
 
 class F3D_EXPORT scene
@@ -205,6 +206,15 @@ public:
    * found.
    */
   [[nodiscard]] virtual file_availability supports(const std::filesystem::path& filePath) = 0;
+
+  /**
+   * Return enum file_availability which indicates if the provided buffer is supported.
+   * As a buffer has no extension, this never returns UNSUPPORTED_EXTENSION.
+   * Returns EMPTY_STREAM if buffer is null or size is zero.
+   * scene.force_reader is taken into account and plugin should be loaded for their readers to be
+   * found.
+   */
+  [[nodiscard]] virtual file_availability supports(const std::byte* buffer, std::size_t size) = 0;
 
   /**
    * Get the animation available on the scene.

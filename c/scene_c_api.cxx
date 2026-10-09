@@ -218,6 +218,19 @@ int f3d_scene_supports(f3d_scene_t* scene, const char* file_path)
 }
 
 //----------------------------------------------------------------------------
+int f3d_scene_supports_buffer(f3d_scene_t* scene, const void* buffer, size_t size)
+{
+  if (!scene)
+  {
+    return -1;
+  }
+
+  f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
+  auto availability = cpp_scene->supports(reinterpret_cast<const std::byte*>(buffer), size);
+  return static_cast<int>(availability);
+}
+
+//----------------------------------------------------------------------------
 void f3d_scene_clear(f3d_scene_t* scene)
 {
   if (!scene)
