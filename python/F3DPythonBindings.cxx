@@ -932,7 +932,7 @@ PYBIND11_MODULE(pyf3d, module)
         std::string_view sv(buffer);
         return scene.supports(reinterpret_cast<const std::byte*>(sv.data()), sv.size());
       },
-      "Check if the provided memory buffer is supported", py::arg("buffer"))
+      "Check if the provided memory buffer is supported", py::arg("buffer"), py::prepend())
     .def("clear", &f3d::scene::clear)
     .def("get_added_files", &f3d::scene::getAddedFiles,
       "Return the list of files currently added to the scene")

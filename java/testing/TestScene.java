@@ -46,7 +46,7 @@ public class TestScene {
       }
     }
     try {
-      scene.supports(null);
+      scene.supports((String) null);
       throw new RuntimeException("Expected IllegalArgumentException was not thrown");
     } catch (IllegalArgumentException e) {
     }
