@@ -2,149 +2,105 @@ import "bulma/css/bulma.min.css";
 import "bulma-switch/dist/css/bulma-switch.min.css";
 import f3d from "f3d";
 
-const settings = {
-  canvas: document.getElementById("canvas"),
-  setupOptions: (options) => {
-    // background must be set to black for proper blending with transparent canvas
-    options.setAsString("render.background.color", "#000000");
+const viewer = document.getElementById("viewer");
+viewer.addEventListener("ready", () => {
+  // setup options
+  viewer.options = {
+    "render.effect.antialiasing.mode": "fxaa",
+    "render.effect.tone_mapping": true,
+    "render.effect.ambient_occlusion": true,
+    "render.hdri.ambient": true,
+    "model.coloring": "direct",
+    "model.scivis.array_name": "Colors",
+    "ui.axis": true,
+    "render.grid.enable": true,
+    "scene.up_direction": "+Z",
+  };
 
-    // setup coloring
-    options.setAsString("model.scivis.array_name", "Colors");
-    options.setAsString("model.coloring", "direct");
-    options.toggle("scene.camera.orthographic");
+  const openFile = (name, stream) => {
+    document.getElementById("file-name").innerHTML = name;
 
-    // make it look nice
-    options.setAsString("render.effect.antialiasing.mode", "fxaa");
-    options.toggle("render.effect.tone_mapping");
-    options.toggle("render.effect.ambient_occlusion");
-    options.toggle("render.hdri.ambient");
-
-    // display widgets
-    options.toggle("ui.axis");
-    options.toggle("render.grid.enable");
-
-    // default to +Z
-    options.setAsString("scene.up_direction", "+Z");
-  },
-};
-
-f3d(settings)
-  .then(async (Module) => {
-    // automatically load all supported file format readers
-    Module.Engine.autoloadPlugins();
-
-    Module.engineInstance = Module.Engine.create();
-
-    const openFile = (name, stream) => {
-      document.getElementById("file-name").innerHTML = name;
-      const scene = Module.engineInstance.getScene();
-      scene.clear();
-      try {
-        scene.addBuffer(stream);
-      } catch (e) {
-        document.getElementById("file-name").innerHTML =
-          '<strong class="has-text-danger">Unsupported file</strong>';
-      }
-      Module.engineInstance.getWindow().getCamera().resetToBounds(0.9);
-      Module.engineInstance.getWindow().render();
-    };
-
-    // setup file open event
-    const progressEl = document.querySelector("#progressEl");
-    const fileSelector = document.querySelector("#file-selector");
-    fileSelector.addEventListener("change", (evt) => {
-      for (const file of evt.target.files) {
-        const reader = new FileReader();
-        reader.addEventListener("loadend", (e) => {
-          openFile(file.name, new Uint8Array(reader.result));
-        });
-        reader.readAsArrayBuffer(file);
-      }
-    });
-
-    Module.setupOptions(Module.engineInstance.getOptions());
-
-    // Storing DOM element ids to f3d option mappings since also useful for url-param parsing
-    const idOptionMappings = [
-      ["grid", "render.grid.enable"],
-      ["axis", "ui.axis"],
-      ["tone", "render.effect.tone_mapping"],
-      ["ssao", "render.effect.ambient_occlusion"],
-      ["ambient", "render.hdri.ambient"],
-    ];
-
-    // toggle callback
-    const mapToggleIdToOption = (id, option) => {
-      document.querySelector("#" + id).addEventListener("change", (evt) => {
-        Module.engineInstance.getOptions().toggle(option);
-        Module.engineInstance.getWindow().render();
-      });
-    };
-
-    // This assumes all toggles are 'on' before mapping their state to options
-    // Ok after f3d(settings) where settings = {..., setupOptions} which toggles some options
-    for (let [id, option] of idOptionMappings) {
-      mapToggleIdToOption(id, option);
+    try {
+      viewer.load(stream);
+    } catch (e) {
+      document.getElementById("file-name").innerHTML =
+        '<strong class="has-text-danger">Unsupported file</strong>';
     }
+  };
 
-    const switchDark = () => {
-      document.documentElement.classList.add("theme-dark");
-      document.documentElement.classList.remove("theme-light");
-      Module.engineInstance
-        .getOptions()
-        .setAsString("render.grid.color", "0.25, 0.27, 0.33");
-      Module.engineInstance.getWindow().render();
-    };
+  // setup file open event
+  const fileSelector = document.querySelector("#file-selector");
+  fileSelector.addEventListener("change", (evt) => {
+    for (const file of evt.target.files) {
+      const reader = new FileReader();
+      reader.addEventListener("loadend", (e) => {
+        openFile(file.name, new Uint8Array(reader.result));
+      });
+      reader.readAsArrayBuffer(file);
+    }
+  });
 
-    const switchLight = () => {
-      document.documentElement.classList.add("theme-light");
-      document.documentElement.classList.remove("theme-dark");
-      Module.engineInstance
-        .getOptions()
-        .setAsString("render.grid.color", "0.67, 0.69, 0.75");
-      Module.engineInstance.getWindow().render();
-    };
+  // Storing DOM element ids to f3d option mappings since also useful for url-param parsing
+  const idOptionMappings = [
+    ["grid", "render.grid.enable"],
+    ["axis", "ui.axis"],
+    ["tone", "render.effect.tone_mapping"],
+    ["ssao", "render.effect.ambient_occlusion"],
+    ["ambient", "render.hdri.ambient"],
+  ];
 
-    // theme switch
-    document.querySelector("#dark").addEventListener("change", (evt) => {
-      if (evt.target.checked) switchDark();
-      else switchLight();
+  // toggle callback
+  const mapToggleIdToOption = (id, option) => {
+    document.querySelector("#" + id).addEventListener("change", (evt) => {
+      viewer.engine.getOptions().toggle(option);
+      viewer.engine.getWindow().render();
     });
+  };
 
-    switchDark();
+  // This assumes all toggles are 'on' before mapping their state to options
+  // Ok after f3d(settings) where settings = {..., setupOptions} which toggles some options
+  for (let [id, option] of idOptionMappings) {
+    mapToggleIdToOption(id, option);
+  }
 
-    // up callback
-    document.querySelector("#z-up").addEventListener("click", (evt) => {
-      Module.engineInstance
-        .getOptions()
-        .setAsString("scene.up_direction", "+Z");
-      document.getElementById("z-up").classList.add("is-active");
-      document.getElementById("y-up").classList.remove("is-active");
-      openFile(document.getElementById("file-name").innerHTML);
-    });
+  const switchDark = () => {
+    document.documentElement.classList.add("theme-dark");
+    document.documentElement.classList.remove("theme-light");
+    viewer.engine
+      .getOptions()
+      .setAsString("render.grid.color", "0.25, 0.27, 0.33");
+    viewer.engine.getWindow().render();
+  };
 
-    document.querySelector("#y-up").addEventListener("click", (evt) => {
-      Module.engineInstance
-        .getOptions()
-        .setAsString("scene.up_direction", "+Y");
-      document.getElementById("y-up").classList.add("is-active");
-      document.getElementById("z-up").classList.remove("is-active");
-      openFile(document.getElementById("file-name").innerHTML);
-    });
+  const switchLight = () => {
+    document.documentElement.classList.add("theme-light");
+    document.documentElement.classList.remove("theme-dark");
+    viewer.engine
+      .getOptions()
+      .setAsString("render.grid.color", "0.67, 0.69, 0.75");
+    viewer.engine.getWindow().render();
+  };
 
-    // setup the window size based on the canvas size
-    const main = document.getElementById("main");
-    const scale = window.devicePixelRatio;
-    Module.engineInstance
-      .getWindow()
-      .setSize(scale * main.clientWidth, scale * main.clientHeight);
+  // theme switch
+  document.querySelector("#dark").addEventListener("change", (evt) => {
+    if (evt.target.checked) switchDark();
+    else switchLight();
+  });
 
-    const response = await fetch(`https://f3d.app/data/f3d.vtp`);
-    const arrayBuffer = await response.arrayBuffer();
-    openFile("f3d.vtp", new Uint8Array(arrayBuffer));
+  switchDark();
 
-    // do a first render and start the interactor
-    Module.engineInstance.getWindow().render();
-    Module.engineInstance.getInteractor().start();
-  })
-  .catch((error) => console.error("Internal exception: " + error));
+  // up callback
+  document.querySelector("#z-up").addEventListener("click", (evt) => {
+    viewer.engine.getOptions().setAsString("scene.up_direction", "+Z");
+    document.getElementById("z-up").classList.add("is-active");
+    document.getElementById("y-up").classList.remove("is-active");
+  });
+
+  document.querySelector("#y-up").addEventListener("click", (evt) => {
+    viewer.engine.getOptions().setAsString("scene.up_direction", "+Y");
+    document.getElementById("y-up").classList.add("is-active");
+    document.getElementById("z-up").classList.remove("is-active");
+  });
+});
+
+await f3d();

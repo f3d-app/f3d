@@ -83,63 +83,26 @@ The package can be installed using npm, by running the following command:
 npm install f3d
 ```
 
-Create the target DOM element `<canvas id="canvas"></canvas>` in your app, then use the following javascript code:
+Create the target DOM element `<f3d-viewer id="viewer" src="/path/to/data.glb"></f3d-viewer>` in your app, then use the following javascript code:
 
 ```javascript
 // import the module
 import f3d from "f3d";
 
-// setup a setting object
-const settings = {
-  canvas: document.getElementById("canvas"),
-  setupOptions: (options) => {
-    // background must be set to black for proper blending with transparent canvas
-    options.setAsString("render.background.color", "#000000");
+const viewer = document.getElementById("viewer");
+viewer.addEventListener("ready", () => {
+  // change some options when the viewer is ready
+  viewer.options = {
+    "render.effect.antialiasing.mode": "fxaa",
+    "render.effect.tone_mapping": true,
+    "render.hdri.ambient": true,
+    "ui.axis": true,
+    "render.grid.enable": true,
+  };
+});
 
-    // make it look nice
-    options.setAsString("render.effect.antialiasing.mode", "fxaa");
-    options.toggle("render.effect.tone_mapping");
-    options.toggle("render.hdri.ambient");
-
-    // display widgets
-    options.toggle("ui.axis");
-    options.toggle("render.grid.enable");
-  },
-};
-
-f3d(settings)
-  .then(async (Module) => {
-    // automatically load all supported file format readers
-    Module.Engine.autoloadPlugins();
-
-    // create an engine (specify canvas ID)
-    Module.engineInstance = Module.Engine.create("#canvas");
-
-    Module.setupOptions(Module.engineInstance.getOptions());
-
-    // setup the window size based on the canvas size
-    const scale = window.devicePixelRatio;
-    Module.engineInstance
-      .getWindow()
-      .setSize(Module.canvas.clientWidth, scale * Module.canvas.clientHeight);
-
-    // download file and add stream
-    const response = await fetch("https://f3d.app/data/DamagedHelmet.glb");
-    const arrayBuffer = await response.arrayBuffer();
-    const scene = engine.getScene();
-    try {
-      scene.addBuffer(new Uint8Array(arrayBuffer));
-    } catch (e) {
-      console.error("Unsupported file");
-    }
-
-    // do a first render and start the interactor
-    Module.engineInstance.getWindow().render();
-    Module.engineInstance.getInteractor().start();
-  })
-  .catch((error) => {
-    console.error("Internal exception: " + error);
-  });
+// load f3d module
+await f3d();
 ```
 
 ## Java

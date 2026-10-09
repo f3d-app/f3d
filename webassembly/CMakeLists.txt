@@ -23,6 +23,7 @@ target_link_options(f3djs PRIVATE
   "SHELL:-sFORCE_FILESYSTEM"
   "SHELL:-sEXPORTED_RUNTIME_METHODS=['getExceptionMessage','decrementExceptionRefcount','FS']"
   "SHELL:-sWASM_BIGINT"
+  "SHELL:--post-js=${CMAKE_CURRENT_SOURCE_DIR}/f3d-utils.js"
 )
 
 # The tests rely on the presence of chromium

@@ -167,6 +167,42 @@ const utils = {
         window.close();
       });
   },
+
+  runElementRenderTest: async (settings, args) => {
+    const viewer = document.getElementById("viewer");
+    viewer.addEventListener("ready", async () => {
+      // copy baseline
+      await utils.copyLocalFileToWasmFS(
+        viewer.module,
+        "/src/testing/baselines/" + args.baseline,
+        "baseline.png",
+      );
+
+      settings.runReady(viewer);
+
+      // compare images
+      const result = viewer.engine.getWindow().renderToImage(true);
+
+      try {
+        const baseline = new viewer.module.Image("/baseline.png");
+        const ssim = result.compare(baseline);
+
+        if (ssim <= 0.05) {
+          console.log("Passed with SSIM = " + ssim);
+        } else {
+          console.log("F3D_ERROR: Comparison failed with SSIM " + ssim);
+        }
+      } catch (error) {
+        console.error("F3D_ERROR: Cannot read baseline image");
+      }
+
+      utils.printImageBase64(viewer.module, result);
+
+      window.close();
+    });
+
+    await f3d();
+  },
 };
 
 export default utils;
