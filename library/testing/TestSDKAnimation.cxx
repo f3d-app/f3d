@@ -29,24 +29,22 @@ int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
   anim.loadTime(0.5);
   test("recover timeRange", anim.getTimeRange() == std::make_pair(0.0, 0.7999999999999999));
 
-  inter.startAnimation();
-  test("isPlaying after start", inter.isPlayingAnimation());
-  test("isPlaying forward after start",
-    inter.getAnimationDirection() == f3d::interactor::AnimationDirection::FORWARD);
+  anim.start();
+  test("isPlaying after start", anim.isPlaying());
+  test("isPlaying forward after start", anim.getDirection() == f3d::animation::Direction::FORWARD);
 
-  inter.toggleAnimation();
-  test("isPlaying after toggle off", !inter.isPlayingAnimation());
+  anim.toggle();
+  test("isPlaying after toggle off", !anim.isPlaying());
 
-  inter.toggleAnimation();
-  test("isPlaying after toggle on", inter.isPlayingAnimation());
-  test("isPlaying forward toggle on",
-    inter.getAnimationDirection() == f3d::interactor::AnimationDirection::FORWARD);
+  anim.toggle();
+  test("isPlaying after toggle on", anim.isPlaying());
+  test("isPlaying forward toggle on", anim.getDirection() == f3d::animation::Direction::FORWARD);
 
   f3d::interactor& interRef = inter.triggerEventLoop(0.1);
   test("triggerEventLoop returns self", &interRef == &inter);
 
-  inter.stopAnimation();
-  test("isPlaying after stop", !inter.isPlayingAnimation());
+  anim.stop();
+  test("isPlaying after stop", !anim.isPlaying());
 
   test("getName returns name at index", anim.getName(0), "stand"s);
 
@@ -63,25 +61,25 @@ int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
   test("check first keyframes", keyframes[0], 0.0);
   test("check last keyframes", keyframes[8], 0.7999999999999999);
 
-  inter.startAnimation(f3d::interactor::AnimationDirection::FORWARD);
+  anim.start(f3d::animation::Direction::FORWARD);
   test("isPlaying backward after forward start",
-    inter.getAnimationDirection() == f3d::interactor::AnimationDirection::FORWARD);
-  inter.stopAnimation();
+    anim.getDirection() == f3d::animation::Direction::FORWARD);
+  anim.stop();
 
-  inter.startAnimation(f3d::interactor::AnimationDirection::BACKWARD);
+  anim.start(f3d::animation::Direction::BACKWARD);
   test("isPlaying backward after backward start",
-    inter.getAnimationDirection() == f3d::interactor::AnimationDirection::BACKWARD);
-  inter.stopAnimation();
+    anim.getDirection() == f3d::animation::Direction::BACKWARD);
+  anim.stop();
 
-  inter.toggleAnimation(f3d::interactor::AnimationDirection::FORWARD);
+  anim.toggle(f3d::animation::Direction::FORWARD);
   test("isPlaying backward after forward toggle on",
-    inter.getAnimationDirection() == f3d::interactor::AnimationDirection::FORWARD);
-  inter.stopAnimation();
+    anim.getDirection() == f3d::animation::Direction::FORWARD);
+  anim.stop();
 
-  inter.toggleAnimation(f3d::interactor::AnimationDirection::BACKWARD);
+  anim.toggle(f3d::animation::Direction::BACKWARD);
   test("isPlaying backward after backward toggle on",
-    inter.getAnimationDirection() == f3d::interactor::AnimationDirection::BACKWARD);
-  inter.stopAnimation();
+    anim.getDirection() == f3d::animation::Direction::BACKWARD);
+  anim.stop();
 
   return test.result();
 }

@@ -2155,7 +2155,7 @@ void F3DStarter::LoadFileGroupInternal(
   // Make sure the animation is stopped before trying to load any file
   if (!this->Internals->AppOptions.NoRender)
   {
-    this->Internals->Engine->getInteractor().stopAnimation();
+    this->Internals->Engine->getScene().getAnimation().stop();
   }
 
   f3d::log::debug("========== Loading 3D files ==========");
@@ -2782,7 +2782,7 @@ void F3DStarter::ApplyStatefile(const std::map<std::string, std::string>& statef
 
   if (!this->Internals->AppOptions.NoRender)
   {
-    this->Internals->Engine->getInteractor().stopAnimation();
+    this->Internals->Engine->getScene().getAnimation().stop();
   }
 
   this->Internals->FilesGroups.clear();
@@ -3152,7 +3152,7 @@ void F3DStarter::AddCommands()
       {
         if (!this->Internals->AppOptions.NoRender)
         {
-          this->Internals->Engine->getInteractor().stopAnimation();
+          this->Internals->Engine->getScene().getAnimation().stop();
         }
         this->Internals->FilesGroups.erase(
           this->Internals->FilesGroups.begin() + this->Internals->CurrentFilesGroupIndex);
@@ -3168,7 +3168,7 @@ void F3DStarter::AddCommands()
     {
       if (!this->Internals->AppOptions.NoRender)
       {
-        this->Internals->Engine->getInteractor().stopAnimation();
+        this->Internals->Engine->getScene().getAnimation().stop();
       }
       this->Internals->FilesGroups.clear();
       this->LoadFileGroup(0, false, true);

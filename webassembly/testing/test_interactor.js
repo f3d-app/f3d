@@ -43,52 +43,6 @@ const settings = {
       "command not removed",
     );
 
-    // animations
-    utils.assert(
-      !interactor.isPlayingAnimation(),
-      "animation should not be playing",
-    );
-
-    interactor.startAnimation(Module.InteractorAnimationDirection.FORWARD);
-    utils.assert(
-      interactor.isPlayingAnimation() &&
-        interactor.getAnimationDirection() ==
-          Module.InteractorAnimationDirection.FORWARD,
-      "animation should be playing forward",
-    );
-    interactor.stopAnimation();
-    utils.assert(
-      !interactor.isPlayingAnimation(),
-      "animation should not be playing",
-    );
-
-    interactor.startAnimation(Module.InteractorAnimationDirection.BACKWARD);
-    utils.assert(
-      interactor.isPlayingAnimation() &&
-        interactor.getAnimationDirection() ==
-          Module.InteractorAnimationDirection.BACKWARD,
-      "animation should be playing backward",
-    );
-    interactor.stopAnimation();
-
-    interactor.toggleAnimation(Module.InteractorAnimationDirection.FORWARD);
-    utils.assert(
-      interactor.isPlayingAnimation() &&
-        interactor.getAnimationDirection() ==
-          Module.InteractorAnimationDirection.FORWARD,
-      "animation should be playing forward",
-    );
-    interactor.stopAnimation();
-
-    interactor.toggleAnimation(Module.InteractorAnimationDirection.BACKWARD);
-    utils.assert(
-      interactor.isPlayingAnimation() &&
-        interactor.getAnimationDirection() ==
-          Module.InteractorAnimationDirection.BACKWARD,
-      "animation should be playing backward",
-    );
-    interactor.stopAnimation();
-
     // bindings
     interactor.initBindings();
 

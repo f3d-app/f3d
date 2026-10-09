@@ -8,6 +8,31 @@ public class Animation {
         mNativeAddress = nativeAddress;
     }
 
+    public enum Direction {
+        FORWARD(0),
+        BACKWARD(1);
+
+        private final int value;
+
+        Direction(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public static Direction fromValue(int value) {
+            for (Direction dir : Direction.values()) {
+                if (dir.value == value) {
+                    return dir;
+                }
+            }
+            throw new IllegalArgumentException("Invalid Direction value: " + value);
+        }
+    }
+
+
     /**
      * Load files in the scene at provided time value if they contain any animation.
      *
@@ -58,6 +83,61 @@ public class Animation {
      * @return list of animation names
      */
     public native List<String> getNames();
+
+    /**
+     * Toggle animation state.
+     *
+     * @param direction animation direction
+     * @return this interactor for method chaining
+     */
+    public native Interactor toggle(Direction direction);
+
+    /**
+     * Toggle animation state with default forward direction.
+     *
+     * @return this interactor for method chaining
+     */
+    public Interactor toggle() {
+        return toggle(Direction.FORWARD);
+    }
+
+    /**
+     * Start animation.
+     *
+     * @param direction animation direction
+     * @return this interactor for method chaining
+     */
+    public native Interactor start(Direction direction);
+
+    /**
+     * Start animation with default forward direction.
+     *
+     * @return this interactor for method chaining
+     */
+    public Interactor start() {
+        return start(Direction.FORWARD);
+    }
+
+    /**
+     * Stop animation.
+     *
+     * @return this interactor for method chaining
+     */
+    public native Interactor stop();
+
+    /**
+     * Check if animation is playing.
+     *
+     * @return true if playing, false otherwise
+     */
+    public native boolean isPlaying();
+
+    /**
+     * Get the current animation direction.
+     *
+     * @return animation direction
+     */
+    public native Direction getDirection();
 
     private long mNativeAddress;
 }

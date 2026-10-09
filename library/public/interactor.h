@@ -145,15 +145,6 @@ public:
   };
 
   /**
-   * Enumeration of animation direction.
-   */
-  enum class AnimationDirection : std::uint8_t
-  {
-    FORWARD,
-    BACKWARD
-  };
-
-  /**
    * Remove all existing interaction commands and add all default bindings
    * see INTERACTIONS.md for details.
    */
@@ -264,19 +255,6 @@ public:
    * Getting type for a bind that does not exists will throw a does_not_exists_exception.
    */
   [[nodiscard]] virtual BindingType getBindingType(const interaction_bind_t& bind) const = 0;
-  ///@}
-
-  ///@{ @name Animation
-  /**
-   * Control the animation.
-   */
-  virtual interactor& toggleAnimation(
-    AnimationDirection direction = AnimationDirection::FORWARD) = 0;
-  virtual interactor& startAnimation(
-    AnimationDirection direction = AnimationDirection::FORWARD) = 0;
-  virtual interactor& stopAnimation() = 0;
-  [[nodiscard]] virtual bool isPlayingAnimation() = 0;
-  [[nodiscard]] virtual interactor::AnimationDirection getAnimationDirection() = 0;
   ///@}
 
   ///@{ @name Movement

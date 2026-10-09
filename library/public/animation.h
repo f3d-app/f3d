@@ -63,6 +63,42 @@ public:
    */
   [[nodiscard]] virtual std::vector<std::string> getNames() const = 0;
 
+  /**
+   * Enumeration of animation direction.
+   */
+  enum class Direction : std::uint8_t
+  {
+    FORWARD,
+    BACKWARD
+  };
+
+  /**
+   * Set the animation direction in the provided direction then
+   * toggle (start if stopped or stop is started) the animation.
+   */
+  virtual animation& toggle(Direction direction = Direction::FORWARD) = 0;
+
+  /**
+   * Set the animation direction in the provided direction then
+   * start the animation if not already started.
+   */
+  virtual animation& start(Direction direction = Direction::FORWARD) = 0;
+
+  /**
+   * Stop the animation if playing.
+   */
+  virtual animation& stop() = 0;
+
+  /**
+   * Return if the animation is currently playing or not
+   */
+  [[nodiscard]] virtual bool isPlaying() = 0;
+
+  /**
+   * Return the animation direction, default is Direction::FORWARD
+   */
+  [[nodiscard]] virtual animation::Direction getDirection() = 0;
+
 protected:
   //! @cond
   animation() = default;

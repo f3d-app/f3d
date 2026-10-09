@@ -41,6 +41,11 @@ public:
   unsigned int count() const override;
   std::string getName(std::optional<int> index = std::nullopt) const override;
   std::vector<std::string> getNames() const override;
+  animation& toggle(Direction direction = Direction::FORWARD) override;
+  animation& start(Direction direction = Direction::FORWARD) override;
+  animation& stop() override;
+  bool isPlaying() override;
+  animation::Direction getDirection() override;
   ///@}
 
   /**
@@ -54,15 +59,6 @@ public:
    * Set the importer to use in the animation_manager, must be set before initializing
    */
   void SetImporter(vtkF3DMetaImporter* importer);
-
-  /**
-   * Implementation only API
-   * Set animation direction,
-   * Only following values are correct :
-   * 1 for forward animation
-   * -1 for backward animation
-   */
-  void SetAnimationDirection(int direction);
 
   /**
    * Implementation only API
@@ -82,33 +78,10 @@ public:
 
   /**
    * Implementation only API
-   * Start/Stop playing the animation
-   * Direction must always be equal to 1 (forward) or -1 (backward)
-   */
-  void ToggleAnimation();
-  void StartAnimation();
-  void StopAnimation();
-
-  /**
-   * Implementation only API
    * Cycle onto and play the next available animation
    * This modifies the scene.animation.index option
    */
   void CycleAnimation();
-
-  /**
-   * Implementation only API
-   * Return animation direction
-   * 1 for forward animation
-   * -1 for backward animation
-   */
-  int GetAnimationDirection() const;
-
-  /**
-   * Implementation only API
-   * Return true if the animation is being played
-   */
-  bool IsPlaying() const;
 
   /**
    * Implementation only API

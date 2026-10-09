@@ -90,6 +90,46 @@ int test_animation()
   }
   f3d_animation_destroy_string_array(names, count);
 
+  f3d_animation_toggle(anim, F3D_ANIMATION_FORWARD);
+  int playing = f3d_animation_is_playing(anim);
+  if (playing != 1)
+  {
+    puts("[ERROR] Failed to recover expected playing value after toggle");
+    return 1;
+  }
+
+  f3d_animation_direction_t direction =
+    f3d_animation_get_direction(anim);
+  if (direction != 0)
+  {
+    puts("[ERROR] Failed to recover expected direction value after toggle forward");
+    return 1;
+  }
+
+  f3d_animation_stop(anim);
+  playing = f3d_animation_is_playing(anim);
+  if (playing != 0)
+  {
+    puts("[ERROR] Failed to recover expected playing value after stop");
+    return 1;
+  }
+
+  f3d_animation_start(anim, F3D_ANIMATION_BACKWARD);
+  playing = f3d_animation_is_playing(anim);
+  if (playing != 1)
+  {
+    puts("[ERROR] Failed to recover expected playing value after start");
+    return 1;
+  }
+
+  direction = f3d_animation_get_direction(anim);
+  if (direction != 1)
+  {
+    puts("[ERROR] Failed to recover expected direction value after toggle backward");
+    printf("%i", direction);
+    return 1;
+  }
+
   f3d_engine_destroy(engine);
   return 0;
 }

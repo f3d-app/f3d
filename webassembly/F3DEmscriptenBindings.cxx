@@ -380,6 +380,10 @@ EMSCRIPTEN_BINDINGS(f3d)
       { return o.cycle(name); }, emscripten::return_value_policy::reference());
 
   // f3d::animation
+  emscripten::enum_<f3d::animation::Direction>("AnimationDirection")
+    .value("FORWARD", f3d::animation::Direction::FORWARD)
+    .value("BACKWARD", f3d::animation::Direction::BACKWARD);
+
   emscripten::class_<f3d::animation>("Animation")
     .function("loadTime", &f3d::animation::loadTime, emscripten::return_value_policy::reference())
     .function(
@@ -396,7 +400,24 @@ EMSCRIPTEN_BINDINGS(f3d)
       +[](f3d::animation& anim, int index) -> std::string { return anim.getName(index); })
     .function(
       "getNames",
-      +[](f3d::animation& animation) { return containerToJSArray(animation.getNames()); });
+      +[](f3d::animation& animation) { return containerToJSArray(animation.getNames()); })
+    .function(
+      "toggle", +[](f3d::animation& animation) -> f3d::animation& { return animation.toggle(); },
+      emscripten::return_value_policy::reference())
+    .function(
+      "toggle", +[](f3d::animation& animation, emscripten::val direction) -> f3d::animation&
+      { return animation.toggle(direction.as<f3d::animation::Direction>()); },
+      emscripten::return_value_policy::reference())
+    .function(
+      "start", +[](f3d::animation& animation) -> f3d::animation& { return animation.start(); },
+      emscripten::return_value_policy::reference())
+    .function(
+      "start", +[](f3d::animation& animation, emscripten::val direction) -> f3d::animation&
+      { return animation.start(direction.as<f3d::animation::Direction>()); },
+      emscripten::return_value_policy::reference())
+    .function("stop", &f3d::animation::stop, emscripten::return_value_policy::reference())
+    .function("isPlaying", &f3d::animation::isPlaying)
+    .function("getDirection", &f3d::animation::getDirection);
 
   // f3d::scene
   emscripten::enum_<f3d::file_availability>("FileAvailability")
@@ -768,10 +789,6 @@ EMSCRIPTEN_BINDINGS(f3d)
     .property("inter", &f3d::interaction_bind_t::inter);
 
   // f3d::interactor
-  emscripten::enum_<f3d::interactor::AnimationDirection>("InteractorAnimationDirection")
-    .value("FORWARD", f3d::interactor::AnimationDirection::FORWARD)
-    .value("BACKWARD", f3d::interactor::AnimationDirection::BACKWARD);
-
   emscripten::enum_<f3d::interactor::BindingType>("InteractorBindingType")
     .value("CYCLIC", f3d::interactor::BindingType::CYCLIC)
     .value("NUMERICAL", f3d::interactor::BindingType::NUMERICAL)
@@ -895,26 +912,6 @@ EMSCRIPTEN_BINDINGS(f3d)
         return containerToJSArray(docStrings);
       })
     .function("getBindingType", &f3d::interactor::getBindingType)
-    .function(
-      "toggleAnimation", +[](f3d::interactor& interactor) -> f3d::interactor&
-      { return interactor.toggleAnimation(); }, emscripten::return_value_policy::reference())
-    .function(
-      "toggleAnimation",
-      +[](f3d::interactor& interactor, emscripten::val direction) -> f3d::interactor&
-      { return interactor.toggleAnimation(direction.as<f3d::interactor::AnimationDirection>()); },
-      emscripten::return_value_policy::reference())
-    .function(
-      "startAnimation", +[](f3d::interactor& interactor) -> f3d::interactor&
-      { return interactor.startAnimation(); }, emscripten::return_value_policy::reference())
-    .function(
-      "startAnimation",
-      +[](f3d::interactor& interactor, emscripten::val direction) -> f3d::interactor&
-      { return interactor.startAnimation(direction.as<f3d::interactor::AnimationDirection>()); },
-      emscripten::return_value_policy::reference())
-    .function("stopAnimation", &f3d::interactor::stopAnimation,
-      emscripten::return_value_policy::reference())
-    .function("isPlayingAnimation", &f3d::interactor::isPlayingAnimation)
-    .function("getAnimationDirection", &f3d::interactor::getAnimationDirection)
     .function("enableCameraMovement", &f3d::interactor::enableCameraMovement,
       emscripten::return_value_policy::reference())
     .function("disableCameraMovement", &f3d::interactor::disableCameraMovement,

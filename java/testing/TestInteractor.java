@@ -56,16 +56,6 @@ public class TestInteractor {
 
     interactor.removeBinding(repeatBind);
 
-    interactor.toggleAnimation();
-    interactor.toggleAnimation(Interactor.AnimationDirection.FORWARD);
-    interactor.toggleAnimation(Interactor.AnimationDirection.BACKWARD);
-    interactor.startAnimation();
-    interactor.startAnimation(Interactor.AnimationDirection.FORWARD);
-    interactor.startAnimation(Interactor.AnimationDirection.BACKWARD);
-    interactor.stopAnimation();
-    interactor.isPlayingAnimation();
-    interactor.getAnimationDirection();
-
     interactor.setNotificationCallback((desc, value, bindStr, duration) -> {
       System.out.println("Notification: " + desc + " " + value + " " + bindStr + " " + duration);
       return true;
@@ -73,18 +63,10 @@ public class TestInteractor {
 
     interactor.triggerNotification("foo", "bar", 3.0);
 
-    Interactor.AnimationDirection.FORWARD.getValue();
-    Interactor.AnimationDirection.BACKWARD.getValue();
-    Interactor.AnimationDirection.fromValue(0);
-    Interactor.AnimationDirection.fromValue(1);
-
     interactor.enableCameraMovement();
     interactor.disableCameraMovement();
 
     interactor.requestRender();
-
-    interactor.toggleAnimation()
-             .enableCameraMovement();
 
     engine.close();
   }
