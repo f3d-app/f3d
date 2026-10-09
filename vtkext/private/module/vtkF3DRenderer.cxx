@@ -488,7 +488,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
     vtkNew<vtkF3DDisplayDepthRenderPass> depthP;
     camP->SetDelegatePass(opaqueP);
     depthP->SetDelegatePass(camP);
-    if (this->EnableColoring)
+    if (this->Coloring == vtkF3DRenderer::ColoringMode::SCIVIS)
     {
       this->ConfigureColoringAndVisibilities();
       depthP->SetColorMap(this->ColorTransferFunction);
@@ -2221,7 +2221,8 @@ void vtkF3DRenderer::UpdateActors()
 #endif
 
   if (this->UsingExpandingRange && (importerUpdateMTime > this->ImporterUpdateTimeStamp) &&
-    (this->EnableColoring || (!this->UseRaytracing && this->UseVolume)))
+    (this->Coloring != vtkF3DRenderer::ColoringMode::MATERIAL ||
+      (!this->UseRaytracing && this->UseVolume)))
   {
     // XXX: This could be improved further to only configure mappers and actors
     // when the coloring range actually change
@@ -3218,23 +3219,29 @@ void vtkF3DRenderer::SetOpacityMap(const std::vector<double>& opacityMap)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetEnableColoring(bool enable)
+void vtkF3DRenderer::SetColoring(ColoringMode mode)
 {
-  if (enable != this->EnableColoring)
+  if (mode != this->Coloring)
   {
-    this->EnableColoring = enable;
+    this->Coloring = mode;
+    this->ColorTransferFunctionConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
+    this->ColoringMappersConfigured = false;
+    this->ColoringPointSpritesMappersConfigured = false;
+    this->VolumePropsAndMappersConfigured = false;
+    this->ScalarBarActorConfigured = false;
     this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
-    this->RenderPassesConfigured = false;
+    this->ExpandingRangeSet = false;
   }
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetUseCellColoring(bool useCell)
+void vtkF3DRenderer::SetDataFieldForColoring(const DataField& dataField)
 {
-  if (useCell != this->UseCellColoring)
+  if (dataField != this->DataFieldForColoring)
   {
-    this->UseCellColoring = useCell;
+    this->DataFieldForColoring = dataField;
     this->ColorTransferFunctionConfigured = false;
     this->OpacityTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
@@ -3266,18 +3273,37 @@ void vtkF3DRenderer::SetArrayNameForColoring(const std::optional<std::string>& a
 }
 
 //----------------------------------------------------------------------------
-std::optional<std::string> vtkF3DRenderer::GetArrayNameForColoring()
+std::optional<std::string> vtkF3DRenderer::GetArrayNameForColoring() const
 {
   return this->ArrayNameForColoring;
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetComponentForColoring(int component)
+void vtkF3DRenderer::SetArrayIsCellData(const std::optional<bool>& arrayIsCellData)
+{
+  if (arrayIsCellData != this->ArrayIsCellData)
+  {
+    this->ArrayIsCellData = arrayIsCellData;
+    this->ColorTransferFunctionConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
+    this->ColoringMappersConfigured = false;
+    this->ColoringPointSpritesMappersConfigured = false;
+    this->VolumePropsAndMappersConfigured = false;
+    this->ScalarBarActorConfigured = false;
+    this->CheatSheetConfigured = false;
+    this->ColoringConfigured = false;
+    this->ExpandingRangeSet = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetComponentForColoring(const std::optional<int>& component)
 {
   if (component != this->ComponentForColoring)
   {
     this->ComponentForColoring = component;
     this->ColorTransferFunctionConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
     this->ColoringPointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
@@ -3294,14 +3320,22 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   assert(this->Importer);
 
   // Recover coloring information and update handler
-  const bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
   F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
-  auto info = coloringHandler.SetCurrentColoring(
-    enableColoring, this->UseCellColoring, this->ArrayNameForColoring, false);
-  const bool hasColoring = info.has_value();
+
+  const bool forcePoints = this->DataFieldForColoring == DataField::POINTS;
+  const bool forceCells = this->DataFieldForColoring == DataField::CELLS;
+
+  const auto info = coloringHandler.SetCurrentColoring(
+    forcePoints, forceCells, this->ArrayIsCellData, this->ArrayNameForColoring, false);
+
+  const bool hasColoring =
+    info.has_value() && this->Coloring != vtkF3DRenderer::ColoringMode::MATERIAL;
   if (hasColoring && !this->ColorTransferFunctionConfigured)
   {
-    this->ConfigureRangeAndCTFForColoring(info.value());
+    if (this->Coloring == vtkF3DRenderer::ColoringMode::SCIVIS)
+    {
+      this->ConfigureRangeAndCTFForColoring(info.value());
+    }
     this->ColorTransferFunctionConfigured = true;
   }
 
@@ -3323,8 +3357,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
         if (!this->ColoringMappersConfigured)
         {
           visible = vtkF3DRenderer::ConfigureMapperForColoring(coloring.Mapper, info.value().Name,
-            this->ComponentForColoring, this->ColorTransferFunction, this->ColorRange,
-            this->UseCellColoring);
+            this->Coloring == vtkF3DRenderer::ColoringMode::DIRECT, this->ComponentForColoring,
+            this->ColorTransferFunction, this->ColorRange, info.value().IsCellData);
         }
       }
       coloring.Actor->SetVisibility(visible);
@@ -3356,8 +3390,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
         if (!this->ColoringPointSpritesMappersConfigured)
         {
           vtkF3DRenderer::ConfigureMapperForColoring(sprites.Mapper, info.value().Name,
-            this->ComponentForColoring, this->ColorTransferFunction, this->ColorRange,
-            this->UseCellColoring);
+            this->Coloring == vtkF3DRenderer::ColoringMode::DIRECT, this->ComponentForColoring,
+            this->ColorTransferFunction, this->ColorRange, info.value().IsCellData);
         }
       }
       sprites.Mapper->SetScalarVisibility(hasColoring);
@@ -3389,15 +3423,21 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
         if (!this->VolumePropsAndMappersConfigured)
         {
           visible = vtkF3DRenderer::ConfigureVolumeForColoring(volume.Mapper, volume.Prop,
-            info.value().Name, this->ComponentForColoring, this->ColorTransferFunction,
-            this->OpacityMap, this->ColorRange, this->OpacityTransferFunctionConfigured,
-            this->UseCellColoring, this->UseInverseOpacityFunction);
+            info.value().Name, this->Coloring == vtkF3DRenderer::ColoringMode::DIRECT,
+            this->ComponentForColoring, this->ColorTransferFunction, this->OpacityMap,
+            this->ColorRange, this->OpacityTransferFunctionConfigured, info.value().IsCellData,
+            this->UseInverseOpacityFunction);
           if (!visible)
           {
             F3DLog::Print(F3DLog::Severity::Warning,
               "Cannot find the array \"" + info.value().Name + "\" to display volume with");
           }
         }
+      }
+      else
+      {
+        F3DLog::Print(
+          F3DLog::Severity::Warning, "Volume rendering in material color mode is invalid");
       }
       volume.Prop->SetVisibility(visible);
     }
@@ -3416,12 +3456,13 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle scalar bar
-  const bool barVisible = this->ScalarBarVisible && hasColoring && this->ComponentForColoring >= -1;
+  const bool barVisible =
+    this->ScalarBarVisible && hasColoring && this->Coloring == vtkF3DRenderer::ColoringMode::SCIVIS;
   this->ScalarBarActor->SetVisibility(barVisible);
   if (barVisible && !this->ScalarBarActorConfigured)
   {
-    vtkF3DRenderer::ConfigureScalarBarActorForColoring(this->ScalarBarActor, info.value().Name,
-      this->ComponentForColoring, this->ColorTransferFunction);
+    vtkF3DRenderer::ConfigureScalarBarActorForColoring(
+      this->ScalarBarActor, info.value().Name, this->ColorTransferFunction);
     this->ScalarBarActorConfigured = true;
   }
 
@@ -3435,29 +3476,35 @@ std::string vtkF3DRenderer::GetColoringDescription()
   assert(this->Importer);
 
   std::stringstream stream;
+
+  if (this->Coloring == vtkF3DRenderer::ColoringMode::MATERIAL)
+  {
+    return "Material";
+  }
+
   auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
   if (info.has_value())
   {
-    stream << "Coloring using " << (this->UseCellColoring ? "cell" : "point") << " array named "
-           << info.value().Name << (this->EnableColoring ? ", " : " (forced), ")
-           << vtkF3DRenderer::ComponentToString(this->ComponentForColoring);
+    stream << "Coloring using " << (info.value().IsCellData ? "cell" : "point") << " array named "
+           << info.value().Name << ", " << vtkF3DRenderer::ComponentToString();
   }
   else
   {
-    stream << "Not coloring";
+    stream << "No coloring array";
   }
   return stream.str();
 }
 
 //----------------------------------------------------------------------------
 bool vtkF3DRenderer::ConfigureMapperForColoring(vtkPolyDataMapper* mapper, const std::string& name,
-  int component, vtkColorTransferFunction* ctf, double range[2], bool cellFlag)
+  bool directColor, const std::optional<int>& component, vtkColorTransferFunction* ctf,
+  double range[2], bool cellFlag)
 {
   vtkDataSetAttributes* data = cellFlag
     ? static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetCellData())
     : static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetPointData());
   const vtkDataArray* array = data->GetArray(name.c_str());
-  if (!array || component >= array->GetNumberOfComponents())
+  if (!array || (component.has_value() && (component.value() >= array->GetNumberOfComponents())))
   {
     mapper->ScalarVisibilityOff();
     return false;
@@ -3469,7 +3516,7 @@ bool vtkF3DRenderer::ConfigureMapperForColoring(vtkPolyDataMapper* mapper, const
     cellFlag ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
   mapper->ScalarVisibilityOn();
 
-  if (component == -2)
+  if (directColor)
   {
     if (array->GetNumberOfComponents() > 4)
     {
@@ -3494,15 +3541,15 @@ bool vtkF3DRenderer::ConfigureMapperForColoring(vtkPolyDataMapper* mapper, const
 
 //----------------------------------------------------------------------------
 bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vtkVolume* volume,
-  const std::string& name, int component, vtkColorTransferFunction* ctf,
-  const std::vector<double>& opacityMap, double range[2], bool& opacityTransferFunctionConfigured,
-  bool cellFlag, bool inverseOpacityFlag)
+  const std::string& name, bool directColor, const std::optional<int>& component,
+  vtkColorTransferFunction* ctf, const std::vector<double>& opacityMap, double range[2],
+  bool& opacityTransferFunctionConfigured, bool cellFlag, bool inverseOpacityFlag)
 {
   vtkDataSetAttributes* data = cellFlag
     ? static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetCellData())
     : static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetPointData());
   const vtkDataArray* array = data->GetArray(name.c_str());
-  if (!array || component >= array->GetNumberOfComponents())
+  if (!array || (component.has_value() && (component.value() >= array->GetNumberOfComponents())))
   {
     // We rely on the selected scalar array to check if this mapper can be shown or not
     mapper->SelectScalarArray("");
@@ -3513,16 +3560,7 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
     cellFlag ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
   mapper->SelectScalarArray(name.c_str());
 
-  if (component >= 0)
-  {
-    mapper->SetVectorMode(vtkSmartVolumeMapper::COMPONENT);
-    mapper->SetVectorComponent(component);
-  }
-  else if (component == -1)
-  {
-    mapper->SetVectorMode(vtkSmartVolumeMapper::MAGNITUDE);
-  }
-  else if (component == -2)
+  if (directColor)
   {
     if (array->GetNumberOfComponents() > 4)
     {
@@ -3536,20 +3574,33 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
       mapper->SetVectorMode(vtkSmartVolumeMapper::DISABLED);
     }
   }
-
-  vtkPiecewiseFunction* otf = volume->GetProperty()->GetScalarOpacity();
-  if (!opacityTransferFunctionConfigured)
+  else if (!component.has_value())
   {
-    otf->RemoveAllPoints();
-    vtkF3DRenderer::ConfigureOpacityTransferFunction(otf, range, opacityMap, inverseOpacityFlag);
-    opacityTransferFunctionConfigured = true;
+    mapper->SetVectorMode(vtkSmartVolumeMapper::MAGNITUDE);
+  }
+  else if (component.value() >= 0)
+  {
+    mapper->SetVectorMode(vtkSmartVolumeMapper::COMPONENT);
+    mapper->SetVectorComponent(component.value());
   }
 
   vtkNew<vtkVolumeProperty> property;
-  property->SetColor(ctf);
-  property->SetScalarOpacity(otf);
   property->ShadeOff();
   property->SetInterpolationTypeToLinear();
+
+  if (!directColor)
+  {
+    vtkPiecewiseFunction* otf = volume->GetProperty()->GetScalarOpacity();
+    if (!opacityTransferFunctionConfigured)
+    {
+      otf->RemoveAllPoints();
+      vtkF3DRenderer::ConfigureOpacityTransferFunction(otf, range, opacityMap, inverseOpacityFlag);
+      opacityTransferFunctionConfigured = true;
+    }
+
+    property->SetColor(ctf);
+    property->SetScalarOpacity(otf);
+  }
 
   volume->SetProperty(property);
   return true;
@@ -3584,7 +3635,7 @@ void vtkF3DRenderer::ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf,
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
-  vtkScalarBarActor* scalarBar, std::string arrayName, int component, vtkColorTransferFunction* ctf)
+  vtkScalarBarActor* scalarBar, std::string arrayName, vtkColorTransferFunction* ctf)
 {
   if (this->DisplayDepth)
   {
@@ -3593,7 +3644,7 @@ void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
   else
   {
     arrayName += " (";
-    arrayName += this->ComponentToString(component);
+    arrayName += this->ComponentToString();
     arrayName += ")";
   }
 
@@ -3611,16 +3662,13 @@ void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
 void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
   const F3DColoringInfoHandler::ColoringInfo& info)
 {
-  if (this->ComponentForColoring == -2)
-  {
-    return;
-  }
+  std::optional<int> componentIndex = this->ComponentForColoring;
 
-  if (this->ComponentForColoring >= info.MaximumNumberOfComponents)
+  if (componentIndex.has_value() && (componentIndex.value() >= info.MaximumNumberOfComponents))
   {
     F3DLog::Print(F3DLog::Severity::Warning,
-      std::string("Invalid component index: ") + std::to_string(this->ComponentForColoring));
-    return;
+      std::string("Invalid component index: ") + std::to_string(componentIndex.value()));
+    componentIndex.reset();
   }
 
   // Set range
@@ -3645,10 +3693,10 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
   {
     double minRange;
     double maxRange;
-    if (this->ComponentForColoring >= 0)
+    if (componentIndex.has_value())
     {
-      minRange = info.ComponentRanges[this->ComponentForColoring][0];
-      maxRange = info.ComponentRanges[this->ComponentForColoring][1];
+      minRange = info.ComponentRanges[componentIndex.value()][0];
+      maxRange = info.ComponentRanges[componentIndex.value()][1];
     }
     else
     {
@@ -3698,7 +3746,7 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
         this->ColorTransferFunction->AddRGBPoint(
           this->ColorRange[0] + val * (this->ColorRange[1] - this->ColorRange[0]), r, g, b);
       }
-      if (this->ColormapDiscretization.has_value() && this->ColormapDiscretization.value() > 0)
+      if (this->ColormapDiscretization.has_value() && (this->ColormapDiscretization.value() > 0))
       {
         this->ColorTransferFunction->DiscretizeOn();
         this->ColorTransferFunction->SetNumberOfValues(this->ColormapDiscretization.value());
@@ -3715,10 +3763,10 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
     }
   }
 
-  if (this->ComponentForColoring >= 0)
+  if (this->ComponentForColoring.has_value())
   {
     this->ColorTransferFunction->SetVectorModeToComponent();
-    this->ColorTransferFunction->SetVectorComponent(this->ComponentForColoring);
+    this->ColorTransferFunction->SetVectorComponent(this->ComponentForColoring.value());
   }
   else
   {
@@ -3727,19 +3775,23 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::CycleFieldForColoring()
+void vtkF3DRenderer::CycleModeForColoring()
 {
-  // XXX: A generic approach will be better when adding categorical field data coloring
-  this->SetUseCellColoring(!this->UseCellColoring);
-  const bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
-  F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
-  auto info = coloringHandler.SetCurrentColoring(
-    enableColoring, this->UseCellColoring, this->ArrayNameForColoring, true);
-  if (!info.has_value())
+  ColoringMode nextColoring;
+  if (this->Coloring == ColoringMode::MATERIAL)
   {
-    // Cycle array if the current one is not valid
-    this->CycleArrayForColoring();
+    nextColoring = ColoringMode::SCIVIS;
   }
+  else if (this->Coloring == ColoringMode::SCIVIS)
+  {
+    nextColoring = ColoringMode::DIRECT;
+  }
+  else
+  {
+    nextColoring = ColoringMode::MATERIAL;
+  }
+
+  this->SetColoring(nextColoring);
 }
 
 //----------------------------------------------------------------------------
@@ -3790,14 +3842,14 @@ void vtkF3DRenderer::CycleArrayForColoring()
 {
   assert(this->Importer);
   this->Importer->GetColoringInfoHandler().CycleColoringArray(
-    !this->UseVolume); // TODO check this cond
+    this->DataFieldForColoring == DataField::POINTS,
+    this->DataFieldForColoring == DataField::CELLS);
   auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
-  const bool enable = info.has_value();
 
-  this->SetEnableColoring(enable);
-  if (this->EnableColoring)
+  if (info.has_value())
   {
     this->SetArrayNameForColoring(info.value().Name);
+    this->SetArrayIsCellData(info.value().IsCellData);
     if (this->ComponentForColoring >= info.value().MaximumNumberOfComponents)
     {
       // Cycle component if the current one is not valid
@@ -3807,6 +3859,7 @@ void vtkF3DRenderer::CycleArrayForColoring()
   else
   {
     this->SetArrayNameForColoring(std::nullopt);
+    this->SetArrayIsCellData(std::nullopt);
   }
 }
 
@@ -3818,51 +3871,73 @@ void vtkF3DRenderer::CycleComponentForColoring()
   auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
   if (!info.has_value())
   {
+    this->SetComponentForColoring(std::nullopt);
     return;
   }
 
-  // -2 -1 0 1 2 3 4
-  this->SetComponentForColoring(
-    (this->ComponentForColoring + 3) % (info.value().MaximumNumberOfComponents + 2) - 2);
-}
-
-//----------------------------------------------------------------------------
-std::string vtkF3DRenderer::ComponentToString(int component)
-{
-  assert(this->Importer);
-
-  if (component == -2)
+  if (this->ComponentForColoring.has_value())
   {
-    return "Direct Scalars";
-  }
-  else if (component == -1)
-  {
-    return "Magnitude";
+    if (this->ComponentForColoring.value() >= info.value().MaximumNumberOfComponents - 1)
+    {
+      this->SetComponentForColoring(std::nullopt);
+    }
+    else
+    {
+      this->SetComponentForColoring(this->ComponentForColoring.value() + 1);
+    }
   }
   else
   {
-    auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
-    if (!info.has_value())
-    {
-      return "";
-    }
-    if (component >= info.value().MaximumNumberOfComponents)
-    {
-      return "";
-    }
-
-    std::string componentName;
-    if (component < static_cast<int>(info.value().ComponentNames.size()))
-    {
-      componentName = info.value().ComponentNames[component];
-    }
-    if (componentName.empty())
-    {
-      componentName = "Component #";
-      componentName += std::to_string(component);
-    }
-    return componentName;
+    this->SetComponentForColoring(0);
   }
+}
+
+//----------------------------------------------------------------------------
+std::string vtkF3DRenderer::ComponentToString()
+{
+  assert(this->Importer);
+
+  auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
+  if (!info.has_value())
+  {
+    return "No Array";
+  }
+
+  if (!this->ComponentForColoring.has_value() ||
+    this->ComponentForColoring.value() >= info.value().MaximumNumberOfComponents)
+  {
+    return "Magnitude";
+  }
+
+  std::string componentName;
+  if (this->ComponentForColoring.value() < static_cast<int>(info.value().ComponentNames.size()))
+  {
+    componentName = info.value().ComponentNames[this->ComponentForColoring.value()];
+  }
+  if (componentName.empty())
+  {
+    componentName = "Component #";
+    componentName += std::to_string(this->ComponentForColoring.value());
+  }
+  return componentName;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkF3DRenderer::ArrayToString()
+{
+  assert(this->Importer);
+
+  auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
+  if (!info.has_value())
+  {
+    return "No array";
+  }
+
+  // Unicode symbols represent a square for cell data and a dot for point data
+  std::string arrayName = info.value().IsCellData ? "\uea72 " : "\uf4c3 ";
+  arrayName += info.value().Name;
+
+  return arrayName;
 }
 
 //----------------------------------------------------------------------------

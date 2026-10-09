@@ -4,31 +4,36 @@ f3d_test(NAME TestInteractionPostFX DATA cow.vtp INTERACTION LONG_TIMEOUT) #PQAA
 f3d_test(NAME TestInteractionTimer DATA cow.vtp NO_BASELINE INTERACTION UI LONG_TIMEOUT) #Z
 f3d_test(NAME TestInteractionTrackball DATA cow.vtp ARGS --interaction-style=trackball INTERACTION LONG_TIMEOUT) #Mouse movements;
 f3d_test(NAME TestInteractionTrackballBind DATA cow.vtp INTERACTION LONG_TIMEOUT) #K#Mouse movements;
-f3d_test(NAME TestInteractionCycleCell DATA waveletArrays.vti INTERACTION LONG_TIMEOUT) #VCCC
-f3d_test(NAME TestInteractionCycleComp DATA dragon.vtu INTERACTION) #SYYYY
-f3d_test(NAME TestInteractionCycleScalars DATA dragon.vtu INTERACTION) #BSSSS
-f3d_test(NAME TestInteractionCycleCellInvalidIndex DATA waveletArrays.vti INTERACTION) #SSC
+f3d_test(NAME TestInteractionCycleModeToScivis DATA dragon.vtu INTERACTION) #S
+f3d_test(NAME TestInteractionCycleModeToDirect DATA dragon.vtu INTERACTION) #SS
+f3d_test(NAME TestInteractionCycleModeBackToMaterial DATA dragon.vtu INTERACTION) #SSS
+f3d_test(NAME TestInteractionCycleCompX DATA dragon.vtu INTERACTION) #S SHIFT+Y
+f3d_test(NAME TestInteractionCycleCompBackToMag DATA dragon.vtu INTERACTION) #S SHIFT+Y SHIFT+Y SHIFT+Y SHIFT+Y
+f3d_test(NAME TestInteractionCycleCompNoArray DATA suzanne.stl INTERACTION) #S SHIFT+Y
+f3d_test(NAME TestInteractionCycleArrays DATA dragon.vtu INTERACTION) #SY
+f3d_test(NAME TestInteractionCycleArraysPointsField DATA waveletArrays.vti ARGS --coloring-field=points INTERACTION) #SY
+f3d_test(NAME TestInteractionCycleArraysCellsField DATA waveletArrays.vti ARGS --coloring-field=cells INTERACTION) #SY
+f3d_test(NAME TestInteractionCycleArraysSameName DATA waveletSameName.vti INTERACTION) #SYYY
 f3d_test(NAME TestInteractionCycleBlending DATA suzanne.ply ARGS --opacity=0.8 INTERACTION LONG_TIMEOUT SKIP_GLES) #PPPPP # Cycle to ddp
 f3d_test(NAME TestInteractionVolumeCycle DATA waveletArrays.vti ARGS INTERACTION) #VSS
-f3d_test(NAME TestInteractionVolumeAfterColoring DATA waveletArrays.vti ARGS INTERACTION) #SSSV
-f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 INTERACTION THRESHOLD 0.11) #VI #Small rendering differences on macOS OSMesa
+f3d_test(NAME TestInteractionVolumeAfterColoring DATA waveletArrays.vti ARGS INTERACTION) #SYV
+f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS -s --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 INTERACTION THRESHOLD 0.11) #VI #Small rendering differences on macOS OSMesa
 f3d_test(NAME TestInteractionCorrectCameraForVolumeSwitch ARGS --no-config -v DATA dragon.vtu INTERACTION UI) #v
-f3d_test(NAME TestInteractionMultiFileVolume DATA multi ARGS --multi-file-mode=all INTERACTION LONG_TIMEOUT) #SSVB
+f3d_test(NAME TestInteractionMultiFileVolume DATA multi ARGS --multi-file-mode=all INTERACTION LONG_TIMEOUT) #SYVB
 f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-sprites-size=20 INTERACTION) #O
-f3d_test(NAME TestInteractionDirectory DATA mb INTERACTION ARGS --scalar-coloring) #Right;Right;Right;Left;Up;
-f3d_test(NAME TestInteractionDirectoryLoop DATA mb/recursive INTERACTION ARGS --scalar-coloring --filename UI) #Left;Left;Left;Left;Left;
+f3d_test(NAME TestInteractionDirectory DATA mb INTERACTION ARGS --coloring-mode=scivis) #Right;Right;Right;Left;Up;
+f3d_test(NAME TestInteractionDirectoryLoop DATA mb/recursive INTERACTION ARGS --coloring-mode=scivis --filename UI) #Left;Left;Left;Left;Left;
 f3d_test(NAME TestInteractionDirectoryEmpty DATA mb INTERACTION NO_DATA_FORCE_RENDER UI) #Right;Right;Right;
 f3d_test(NAME TestInteractionDirectoryEmptyVerbose DATA mb ARGS --verbose NO_BASELINE INTERACTION REGEXP "is of an unknown format") #Right;Right;Right;HMCSY
-f3d_test(NAME TestInteractionTensorsCycleComp DATA tensors.vti ARGS --scalar-coloring --coloring-component=-2 INTERACTION) #SYYYYYYYYYY
-f3d_test(NAME TestInteractionCycleScalarsCompCheck DATA dragon.vtu ARGS -b --scalar-coloring --coloring-component=2 INTERACTION) #S
+f3d_test(NAME TestInteractionCycleScalarsCompCheck DATA dragon.vtu ARGS -b --coloring-component=2 INTERACTION) #S
 f3d_test(NAME TestInteractionTAA DATA suzanne.ply ARGS --anti-aliasing=taa INTERACTION) #Render;Render...
 f3d_test(NAME TestInteractionTAAMiddleClick DATA suzanne.ply ARGS --anti-aliasing=taa INTERACTION) #Render;Render...;MiddleClick;Render;Render...
 f3d_test(NAME TestInteractionTextureCheckerBoardTAA DATA WaterBottle.glb ARGS --checkerboard --anti-aliasing=taa INTERACTION) #Render;Render...
-f3d_test(NAME TestInteractionCycleVerbose DATA dragon.vtu ARGS --verbose -s NO_BASELINE INTERACTION REGEXP "Not coloring") #SSSSYC
+f3d_test(NAME TestInteractionCycleVerbose DATA dragon.vtu ARGS --verbose -s NO_BASELINE INTERACTION REGEXP "Material") #SSSSYC
 f3d_test(NAME TestInteractionCycleVerboseLevelsUsingBinding DATA dragon.vtu ARGS --verbose=info NO_BASELINE INTERACTION REGEXP "Verbose level changed to: Debug") #Shift+V;Shift+V;Shift+V;Shift+V;Shift+V
-f3d_test(NAME TestInteractionVerboseLevelPreservedOnReload DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Not coloring") #Shift+V;Shift+V;Shift+V;Shift+V;Up
+f3d_test(NAME TestInteractionVerboseLevelPreservedOnReload DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Material") #Shift+V;Shift+V;Shift+V;Shift+V;Up
 f3d_test(NAME TestInteractionLightIntensity DATA dragon.vtu INTERACTION LONG_TIMEOUT)
-f3d_test(NAME TestInteractionMultiFileColoring DATA mb/recursive ARGS --multi-file-mode=all INTERACTION) #SSSB
+f3d_test(NAME TestInteractionMultiFileColoring DATA mb/recursive ARGS --multi-file-mode=all INTERACTION) #SYYB
 f3d_test(NAME TestInteractionOpacity DATA dragon.vtu INTERACTION) # Shift+P * 21; Ctrl+P * 5
 f3d_test(NAME TestInteractionReload DATA dragon.vtu ARGS -e INTERACTION) #Up;
 f3d_test(NAME TestInteractionLoadParentDirectory DATA multi/dragon.vtu ARGS --filename INTERACTION UI) #Down;
@@ -71,7 +76,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250504)
   # Random values are different on GLES so the result is different, but still converges
   # It's not a bug but we should find a solution to have the exact same result
   f3d_test(NAME TestInteractionStochasticTAA DATA alpha.glb ARGS --anti-aliasing=taa --blending=stochastic INTERACTION SKIP_GLES) #Render;Render...
-  f3d_test(NAME TestInteractionGaussianStochasticTAA DATA small.splat ARGS -sy --point-sprites=gaussian --point-sprites-absolute-size --point-sprites-size=1 --blending=stochastic --anti-aliasing=taa --camera-position=-1.65,-0.06,1.96 --camera-focal-point=-1.65,1.24,1.96 --camera-view-up=0.9954,0,0.0955 INTERACTION LONG_TIMEOUT SKIP_GLES) #Render;Render...
+  f3d_test(NAME TestInteractionGaussianStochasticTAA DATA small.splat ARGS --coloring-mode=direct --point-sprites=gaussian --point-sprites-absolute-size --point-sprites-size=1 --blending=stochastic --anti-aliasing=taa --camera-position=-1.65,-0.06,1.96 --camera-focal-point=-1.65,1.24,1.96 --camera-view-up=0.9954,0,0.0955 INTERACTION LONG_TIMEOUT SKIP_GLES) #Render;Render...
   f3d_test(NAME TestInteractionAndCLIBlending ARGS --blending DATA suzanne.stl alpha.glb INTERACTION SKIP_GLES) #PP;Right
 endif()
 
@@ -175,8 +180,8 @@ endif()
 ## Cheatsheet
 f3d_test(NAME TestInteractionCheatsheetWhiteBG DATA cow.vtp ARGS --background-color=1,1,1 INTERACTION UI) #H
 f3d_test(NAME TestInteractionCheatsheetBlackBG DATA cow.vtp ARGS --background-color=0,0,0 INTERACTION UI) #H
-f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --scalar-coloring --coloring-component=-2 INTERACTION UI LONG_TIMEOUT) #HSSS
-f3d_test(NAME TestInteractionCheatsheetScalarsNoArray DATA dragon.vtu ARGS --scalar-coloring INTERACTION UI RESOLUTION 500,300) #H
+f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --coloring-mode=direct INTERACTION UI LONG_TIMEOUT) #HSSS
+f3d_test(NAME TestInteractionCheatsheetScalarsNoArray DATA dragon.vtu ARGS --coloring-mode=scivis INTERACTION UI RESOLUTION 500,300) #H
 f3d_test(NAME TestInteractionCheatsheetAnimationName DATA InterpolationTest.glb ARGS --animation-indices=6 INTERACTION UI) #HWWW
 f3d_test(NAME TestInteractionCheatsheetConfigFile DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #H;ScrollDown
 f3d_test(NAME TestInteractionCheatsheetMultiModifierBinding DATA dragon.vtu RESOLUTION 1200,300 CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #H;ScrollDown
@@ -203,7 +208,7 @@ endif()
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
   f3d_test(NAME TestInteractionSceneHierarchy DATA BoxAnimated.gltf INTERACTION UI) #Shift+H;Resize widget;Click checkbox
   f3d_test(NAME TestInteractionSceneHierarchyManyClick DATA cow.vtp INTERACTION UI) #Shift+H;Click checkbox;Click checkbox;Click checkbox
-  f3d_test(NAME TestInteractionSceneHierarchyVolume DATA tensors.vti INTERACTION UI) #Shift+H;V;Click checkbox
+  f3d_test(NAME TestInteractionSceneHierarchyVolume DATA tensors.vti ARGS -s INTERACTION UI) #Shift+H;V;Click checkbox
   f3d_test(NAME TestInteractionSceneHierarchyAndCheatsheet DATA cow.vtp RESOLUTION 1200,200 INTERACTION UI) #H;Shift+H
   f3d_test(NAME TestInteractionSceneHierarchyCollapsed DATA vtk-dasm-test.glb INTERACTION UI) #Shift+H;Resize widget;Click checkbox
   f3d_test(NAME TestInteractionSceneHierarchyScroll DATA vtk-dasm-test.glb INTERACTION UI) #Shift+H;Scroll to bottom
@@ -222,7 +227,7 @@ f3d_test(NAME TestInteractionConsoleClear DATA dragon.vtu INTERACTION UI) #Escap
 f3d_test(NAME TestInteractionConsoleTypingSceneInfo RESOLUTION 400,300 DATA f3d.glb INTERACTION UI) #Escape;e;Escape;printt;BackSpace;_scee;Left;Right;_info;Return
 f3d_test(NAME TestInteractionConsoleReload DATA f3d.glb INTERACTION UI) #Escape;reload_current_file_group;Return
 f3d_test(NAME TestInteractionConsoleLoadNext DATA f3d.glb cow.vtp INTERACTION UI) #Escape;load_next_file_group;Return
-f3d_test(NAME TestInteractionConsoleRender ARGS --coloring-by-cells DATA waveletMaterial.vti INTERACTION UI) #Escape;toggle_volume_rendering;Return
+f3d_test(NAME TestInteractionConsoleRender ARGS -s --coloring-field=cells DATA waveletMaterial.vti INTERACTION UI) #Escape;toggle_volume_rendering;Return
 f3d_test(NAME TestInteractionConsoleCamera DATA f3d.glb INTERACTION UI) #Escape;set_camera top;Return
 f3d_test(NAME TestInteractionConsoleScrollbar DATA f3d.glb INTERACTION UI) #Escape;a;Enter;Grab scrollbar
 f3d_test(NAME TestInteractionConsoleEmptyCommand DATA f3d.glb INTERACTION UI) #Escape;Enter
@@ -235,7 +240,7 @@ f3d_test(NAME TestInteractionConsoleAutoCompleteToggleOptions DATA cow.vtp INTER
 f3d_test(NAME TestInteractionConsoleAutoCompleteSetOptions ARGS --point-sprites=gaussian DATA cow.vtp INTERACTION UI RESOLUTION 400,300) #Escape;se;Tab;space;m;Tab;p;Tab;t;Tab;Tab;s;p;Tab;Enter
 f3d_test(NAME TestInteractionConsoleAutoCompleteSetDisplayCompl DATA cow.vtp INTERACTION UI RESOLUTION 400,300) #Escape;se;Tab;space;m;Tab;p;Tab;t;Tab;Tab;Tab
 f3d_test(NAME TestInteractionConsoleAutoCompleteReaderOptions DATA BoxAnimated.gltf INTERACTION UI) #Escape;set_r;Tab;Q;Tab;Enter
-f3d_test(NAME TestInteractionConsoleAutoCompleteColoring DATA BoxAnimated.gltf INTERACTION UI) #Escape;cy;Tab;;c;Tab;a;Tab;Enter
+f3d_test(NAME TestInteractionConsoleAutoCompleteColoring DATA BoxAnimated.gltf ARGS -s INTERACTION UI) #Escape;cy;Tab;;c;Tab;a;Tab;Enter
 f3d_test(NAME TestInteractionConsoleAutoCompleteCamera DATA BoxAnimated.gltf INTERACTION UI) #Escape;se;Tab;_c;Tab;i;Tab;Enter
 f3d_test(NAME TestInteractionConsoleAutoCompleteHelp DATA BoxAnimated.gltf INTERACTION UI) #Escape;h;Tab;h;Tab;Enter
 f3d_test(NAME TestInteractionConsoleAutoCompleteTokenizeError DATA BoxAnimated.gltf INTERACTION UI NO_BASELINE REGEXP "unable to tokenize") #Escape;";Tab;
@@ -328,7 +333,7 @@ endif()
 
 # Test modified drops, this test rendering is impacted by https://github.com/f3d-app/f3d/issues/1558
 # Empty drop is for coverage
-f3d_test(NAME TestInteractionDropHDRIModifiers INTERACTION_CONFIGURE LONG_TIMEOUT) #CTRL+DropEvent f3d.tif;SHIFT+DropEvent;SHIFT+DropEvent palermo.tif;SYYYY
+f3d_test(NAME TestInteractionDropHDRIModifiers ARGS --coloring-mode=direct INTERACTION_CONFIGURE LONG_TIMEOUT) #CTRL+DropEvent f3d.tif;SHIFT+DropEvent;SHIFT+DropEvent palermo.tif;SYYYY
 
 if(F3D_MODULE_EXR)
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489

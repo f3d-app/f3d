@@ -298,7 +298,7 @@ runs:
         inputs.vtk_version != 'commit' &&
         inputs.rendering_backend != 'osmesa'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestVTICell|TestDefaultConfigFilePipedSTL|TestPipedVTICell|TestDefaultConfigFileVTI|TestDefaultConfigFilePLY|TestDefaultConfigTranslucent|TestScalarsCell|TestRaytracingDefaultConfigFile|TestInteractionCycleCellInvalidIndex|TestInteractionStochasticTAA|TestInteractionAndCLIBlending|TestInteractionConfigFileBindings|TestDefaultConfigFileAlembic|TestDefaultConfigFileDraco|TestDefaultConfigFileExodus|TestDefaultConfigFileVTKHDF|TestDefaultConfigFileWebIFC|TestThumbnailConfigFileWebIFC|TestFCStd|TestFCStdFaceColors|TestFCStdLink|TestFCStdReadWire|TestFCStd1x|TestFCStdTransparency|TestFCStdPartDesign|TestXCAFColors|TestXCAFColorsXBF|TestDefaultConfigFileOCCT|TestThumbnailConfigFileOCCT|TestDefaultConfigFileUSD|TestDefaultConfigFileSBET|TestDefaultConfigFileSLPK)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestVTICell|TestDefaultConfigFilePipedSTL|TestPipedVTICell|TestDefaultConfigFileVTI|TestDefaultConfigFilePLY|TestDefaultConfigTranslucent|TestScalarsCell|TestRaytracingDefaultConfigFile|TestInteractionCycleCellInvalidIndex|TestInteractionStochasticTAA|TestInteractionAndCLIBlending|TestInteractionConfigFileBindings|TestDefaultConfigFileAlembic|TestDefaultConfigFileDraco|TestDefaultConfigFileExodus|TestDefaultConfigFileVTKHDF|TestDefaultConfigFileWebIFC|TestThumbnailConfigFileWebIFC|TestFCStd|TestFCStdFaceColors|TestFCStdLink|TestFCStdReadWire|TestFCStd1x|TestFCStdTransparency|TestFCStdPartDesign|TestXCAFColors|TestXCAFColorsXBF|TestDefaultConfigFileOCCT|TestThumbnailConfigFileOCCT|TestDefaultConfigFileUSD|TestDefaultConfigFileSBET|TestDefaultConfigFileSLPK|TestInteractionCycleArraysCellsField|TestInteractionCycleArraysSameName)" >> $GITHUB_ENV
 
     # Certain tests are failing on macOS software rendering
     # OSMesa is used for VTK > 9.7.20260706, remove when it's dropped
@@ -308,7 +308,7 @@ runs:
         inputs.cpu == 'x86_64' &&
         inputs.rendering_backend == 'auto'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestFCStdFaceColors|TestFCStd1x|TestFCStdTransparency|TestFCStdPartDesign)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionCycleComp)|(TestGLTFRigArmature)|(TestInteractionNoModelScrollWheel)|(TestInteractionNoModelScrollBar)|(TestInteractionTAA)|(TestInteractionPointCloudTAA)|(TestInteractionStochasticTAA)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestFCStdFaceColors|TestFCStd1x|TestFCStdTransparency|TestFCStdPartDesign)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionCycleComp)|(TestGLTFRigArmature)|(TestInteractionNoModelScrollWheel)|(TestInteractionNoModelScrollBar)|(TestInteractionTAA)|(TestInteractionPointCloudTAA)|(TestInteractionStochasticTAA)|(TestInteractionCycleModeToDirect)" >> $GITHUB_ENV
 
     # Certain tests are failing on macOS software rendering
     # OSMesa is used for VTK > 9.7.20260706, remove when it's dropped

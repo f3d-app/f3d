@@ -8,7 +8,7 @@ const settings = {
     options.setAsString("render.background.color", "#000000");
 
     // setup coloring
-    options.toggle("model.scivis.enable");
+    options.setAsString("model.coloring", "scivis");
     options.toggle("render.effect.display_depth");
 
     // default to +Z

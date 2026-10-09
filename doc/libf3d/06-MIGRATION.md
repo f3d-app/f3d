@@ -25,7 +25,32 @@ These components are now installed by default:
 
 See building documentation for more information.
 
-## Enable options
+## Application CLI options
+
+### Coloring mode
+
+`-s/--scalar-coloring` has been replaced by `-s/--coloring-mode`. `--coloring-mode` is a string taking `material`, `scivis` or `direct` value.  
+If not defined, `material` is used. If defined but no value is specified, `scivis` is used.
+
+`-y/--coloring-component` doesn't accept negative values anymore. Do not define if you want to use the magnitude, and use `--coloring-mode=direct` instead of `--coloring-component=-2`
+
+`--coloring-by-cells` has been replaced by `--coloring-field`. `--coloring-field` is a string taking `any`, `points` or `cells` value.
+
+Refer to [CLI options](../user/03-OPTIONS.md) for more details.
+
+## Application bindings
+
+### Coloring mode
+
+Some default bindings have changed or removed:
+
+<kbd>S</kbd> now cycles the coloring mode (`material`/`scivis`/`direct`) instead of cycling the arrays
+<kbd>Y</kbd> now cycles the arrays instead of cycling the components (<kbd>SHIFT</kbd>+<kbd>Y</kbd> can be used now to cycle the components)
+<kbd>C</kbd> has been removed because <kbd>Y</kbd> cycles all the arrays (points and cells)
+
+## Library options
+
+### Enable options
 
 Many `enable` libf3d options have been removed in favor of extending possible values on the `mode`/`type` related libf3d options.
 
@@ -39,6 +64,22 @@ So to enable anti-aliasing, just set the mode to the value that used to be the d
 So to enable point sprites, just set the type to the value that used to be the default, `sphere`.
 
 `ui.scene_hierarchy` have been removed in favor of `ui.scene_hierarchy.enable`.
+
+### Coloring mode
+
+Scivis options have been revamped entirely.
+
+`model.scivis.enable` has been removed in favor of the new `model.coloring` option.
+So to enable scivis, just set `model.coloring` to the value `scivis`.
+
+`model.scivis.cells` has been removed in favor of the new `model.scivis.field` option.
+By default, all arrays are active but if you need cell arrays only, just set `model.scivis.field` to `cells`.
+
+`model.scivis.component` is now optional and doesn't accept negative values anymore.
+If you need coloring by magnitude (old value `-1`), just leave this option empty, that's the default.
+If you need direct coloring (old value `-2`), set `model.coloring` to the value `direct`.
+
+`model.coloring` must be set to `scivis` or `direct` if `model.volume.enable` is true.
 
 ## User callback
 
