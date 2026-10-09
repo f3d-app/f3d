@@ -618,7 +618,7 @@ public:
   void SetAnimationProgressMode(vtkF3DUIActor::AnimationProgressBarMode mode);
 
   /**
-   * Set the time range, name and keyframe times of the current animation.
+   * Set the time range, name and key frame times of the current animation.
    * Meant to be pushed when the loaded animation changes.
    */
   void SetAnimationProgress(const std::pair<double, double>& timeRange, const std::string& name,

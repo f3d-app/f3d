@@ -82,24 +82,24 @@ eg:
 - `jump_to_frame_relative 1` jump to next frame.
 - `jump_to_frame_relative -1` jump to previous frame.
 
-`jump_to_keyframe`: A specific command to load an animation at a specific keyframe, takes a keyframe index as argument.
-When jumping to a keyframe, the target keyframe index is adjusted to stay within the total number of available keyframes, avoiding invalid keyframe access.
+`jump_to_key_frame`: A specific command to load an animation at a specific key frame, takes a key frame index as argument.
+When jumping to a key frame, the target key frame index is adjusted to stay within the total number of available key frames, avoiding invalid key frame access.
 eg:
 
-- `jump_to_keyframe 0` jump to animation start frame.
-- `jump_to_keyframe 1` jump to keyframe 1.
-- `jump_to_keyframe 10` jump to keyframe 10.
+- `jump_to_key_frame 0` jump to animation start frame.
+- `jump_to_key_frame 1` jump to key frame 1.
+- `jump_to_key_frame 10` jump to key frame 10.
 
-`jump_to_keyframe_relative`: A specific command to move the animation by a number of keyframes relative to the current keyframe, takes a keyframe offset as argument.
-When jumping between keyframes, the target keyframe index is adjusted to stay within the total number of available keyframes, avoiding invalid keyframe access.
+`jump_to_key_frame_relative`: A specific command to move the animation by a number of key frames relative to the current key frame, takes a key frame offset as argument.
+When jumping between key frames, the target key frame index is adjusted to stay within the total number of available key frames, avoiding invalid key frame access.
 eg:
 
-- `jump_to_keyframe_relative 0` jump to closest keyframe.
-- `jump_to_keyframe_relative 1` jump to next keyframe.
-- `jump_to_keyframe_relative -1` jump to previous keyframe.
-- `jump_to_keyframe_relative 10` jump 10 keyframes ahead.
+- `jump_to_key_frame_relative 0` jump to closest key frame.
+- `jump_to_key_frame_relative 1` jump to next key frame.
+- `jump_to_key_frame_relative -1` jump to previous key frame.
+- `jump_to_key_frame_relative 10` jump 10 key frames ahead.
 
-The jump_to_keyframe* commands are currently supported only by the following readers :
+The jump_to_key_frame* commands are currently supported only by the following readers :
 
 - `vtkF3DGLTFImporter`
 - `vtkF3DQuakeMDLImporter`

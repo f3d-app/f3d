@@ -33,8 +33,8 @@ public:
   [[nodiscard]] virtual std::pair<double, double> getTimeRange() = 0;
 
   /**
-   * Get animation keyframe's time of currently added files.
-   * Can be used in loadTime to request a specific keyframe.
+   * Get animation key frame's time of currently added files.
+   * Can be used in loadTime to request a specific key frame.
    * Returns empty vector if there is no animations.
    */
   [[nodiscard]] virtual std::vector<double> getKeyFrames() = 0;

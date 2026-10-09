@@ -56,10 +56,10 @@ int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
     std::vector<std::string>{
       "stand", "dead", "dead_right", "reload", "hit", "down", "stumble", "run", "shoot", "walk" });
 
-  auto keyframes = anim.getKeyFrames();
-  test("check keyframes size", static_cast<int>(keyframes.size()), 9);
-  test("check first keyframes", keyframes[0], 0.0);
-  test("check last keyframes", keyframes[8], 0.7999999999999999);
+  auto keyFrames = anim.getKeyFrames();
+  test("check key frames size", static_cast<int>(keyFrames.size()), 9);
+  test("check first key frames", keyFrames[0], 0.0);
+  test("check last key frames", keyFrames[8], 0.7999999999999999);
 
   anim.start(f3d::animation::Direction::FORWARD);
   test("isPlaying backward after forward start",

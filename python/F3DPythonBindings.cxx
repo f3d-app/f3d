@@ -251,7 +251,7 @@ PYBIND11_MODULE(pyf3d, module)
         return py::bytes(reinterpret_cast<const char*>(data), packet.getPacketSize());
       })
     .def("get_timestamp", &f3d::video_packet::getTimestamp)
-    .def("is_keyframe", &f3d::video_packet::isKeyFrame);
+    .def("is_key_frame", &f3d::video_packet::isKeyFrame);
 
   // f3d::video_encoder
   py::enum_<f3d::video_encoder::codec>(module, "VideoEncoderCodec")

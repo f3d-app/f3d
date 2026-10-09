@@ -49,7 +49,7 @@ public class Animation {
     public native double[] getTimeRange();
 
     /**
-     * Get animation keyframe's time of files currently in the scene.
+     * Get animation key frame's time of files currently in the scene.
      *
      * @return list of double
      */

@@ -168,13 +168,13 @@ f3d_test(NAME TestInteractionAnimationCameraMovement DATA CameraAnimated.glb ARG
 f3d_test(NAME TestInteractionAnimationInvert DATA f3d.glb ARGS --animation-speed-factor=-1 --animation-progress INTERACTION UI) #Space;Wait;Space;
 f3d_test(NAME TestInteractionAnimationBackward DATA f3d.glb ARGS --animation-progress INTERACTION UI) #Ctrl+Shift+Space;Wait;Space;
 
-f3d_test(NAME TestInteractionAnimationProgressBarJumpToKeyFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress=advanced INTERACTION UI) #Left click on a keyframe marker
-f3d_test(NAME TestInteractionAnimationProgressBarJumpToTime DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress=advanced INTERACTION UI) #Left click between keyframe markers
+f3d_test(NAME TestInteractionAnimationProgressBarJumpToKeyFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress=advanced INTERACTION UI) #Left click on a key frame marker
+f3d_test(NAME TestInteractionAnimationProgressBarJumpToTime DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress=advanced INTERACTION UI) #Left click between key frame markers
 f3d_test(NAME TestInteractionAnimationProgressBarHover DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress=advanced INTERACTION UI) #Hover mouse over the progress bar
 f3d_test(NAME TestInteractionAnimationProgressBarHoverLeave DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress=advanced INTERACTION UI) #Hover then leave the window, the tooltip must disappear
-f3d_test(NAME TestInteractionAnimationProgressBarNotifications DATA soldier_animations.mdl ARGS --animation-indices=2 --notifications --animation-progress=advanced INTERACTION UI) #Space twice then hover the first keyframe
+f3d_test(NAME TestInteractionAnimationProgressBarNotifications DATA soldier_animations.mdl ARGS --animation-indices=2 --notifications --animation-progress=advanced INTERACTION UI) #Space twice then hover the first key frame
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-  f3d_test(NAME TestInteractionAnimationProgressBarAxis DATA soldier_animations.mdl ARGS --animation-indices=2 -x --animation-progress=advanced INTERACTION UI) #Hover the last keyframe
+  f3d_test(NAME TestInteractionAnimationProgressBarAxis DATA soldier_animations.mdl ARGS --animation-indices=2 -x --animation-progress=advanced INTERACTION UI) #Hover the last key frame
 endif()
 
 ## Cheatsheet

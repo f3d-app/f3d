@@ -18,7 +18,7 @@ TimerEvent 150 150 0 0 0 0 0
 TimerEvent 150 150 0 0 0 0 0
 RenderEvent 150 150 0 0 0 0 0
 
-# Hover the first keyframe to show its tooltip at the bottom-left.
+# Hover the first key frame to show its tooltip at the bottom-left.
 MouseMoveEvent 3 8 0 0 0 0 0
 TimerEvent 3 8 0 0 0 0 0
 RenderEvent 3 8 0 0 0 0 0

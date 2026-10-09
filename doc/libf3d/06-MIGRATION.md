@@ -103,17 +103,18 @@ The following commands have been removed and should be replaced:
 - `increase_opacity` -> `increase model.color.opacity`
 - `decrease_opacity` -> `decrease model.color.opacity`
 - `cycle_interactor_style` -> `cycle interactor.style`
+- `jump_to_keyframe*` -> ``jump_to_key_frame*`
 
-The `jump_to_frame` and `jump_to_keyframe` commands no longer take a second boolean argument and now always perform an absolute jump. To perform a relative jump, use the new `jump_to_frame_relative` and `jump_to_keyframe_relative` commands:
+The `jump_to_frame` and `jump_to_keyframe` commands no longer take a second boolean argument and now always perform an absolute jump. To perform a relative jump, use the new `jump_to_frame_relative` and `jump_to_key_frame_relative` commands:
 
 - `jump_to_frame 10 false` -> `jump_to_frame 10`
 - `jump_to_frame 1 true` -> `jump_to_frame_relative 1`
-- `jump_to_keyframe 4 false` -> `jump_to_keyframe 4`
-- `jump_to_keyframe 1 true` -> `jump_to_keyframe_relative 1`
+- `jump_to_keyframe 4 false` -> `jump_to_key_frame 4`
+- `jump_to_keyframe 1 true` -> `jump_to_key_frame_relative 1`
 
 ## ui.animation_progress
 
-The `ui.animation_progress` option (CLI `--animation-progress`) was a boolean toggling a progress bar during animation playback. It is now a string selecting the progress bar mode: `none` (hidden), `default` (the progress bar alone) or `advanced` (the progress bar with time range, animation name, current time labels and keyframe markers). Replace `true` with `default` (or `advanced`) and `false` with `none`.
+The `ui.animation_progress` option (CLI `--animation-progress`) was a boolean toggling a progress bar during animation playback. It is now a string selecting the progress bar mode: `none` (hidden), `default` (the progress bar alone) or `advanced` (the progress bar with time range, animation name, current time labels and key frame markers). Replace `true` with `default` (or `advanced`) and `false` with `none`.
 
 ## Context symbol
 

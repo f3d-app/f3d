@@ -20,7 +20,7 @@ Press <kbd>W</kbd> to cycle through available animations
 
 <img width="1024" alt="4" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_3.png" />
 Press <kbd>space</kbd> to play/pause current animation.
-Note: A blue bar runs along the bottom of screen to indicate the current time interval of the animation sequence if `--animation-progress` is set to `default` or `advanced`. The `advanced` mode additionally shows the time range, animation name and current time, and marks each keyframe with a vertical line on the bar; both modes let you click or drag the bar to jump to a given time. While hovering the `advanced` bar near a keyframe marker, the tooltip reports that keyframe's time.
+Note: A blue bar runs along the bottom of screen to indicate the current time interval of the animation sequence if `--animation-progress` is set to `default` or `advanced`. The `advanced` mode additionally shows the time range, animation name and current time, and marks each key frame with a vertical line on the bar; both modes let you click or drag the bar to jump to a given time. While hovering the `advanced` bar near a key frame marker, the tooltip reports that key frame's time.
 
 <img width="1024" alt="5" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_4.png" />
 "All Animations" will play all animations at the same time if supported by the file format.
@@ -89,7 +89,7 @@ f3d example.file --output-video=- | ffmpeg -f h264 -i - video.mp4
 - Press <kbd>Space</kbd> to play/pause animation
 - Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbd> to play/pause animation backward
 
-See [COMMANDS](07-COMMANDS.md) for commands like `jump_to_frame`, `jump_to_keyframe` and `jump_to_time`
+See [COMMANDS](07-COMMANDS.md) for commands like `jump_to_frame`, `jump_to_key_frame` and `jump_to_time`
 
 ## Cycling Animations
 
@@ -129,9 +129,9 @@ The animation support level is listed for each reader [here](02-SUPPORTED_FORMAT
 When opening multiple files at the same time using the `--multi-file-mode` option and selecting multiple animations to show,
 F3D may warn when combining SINGLE and non SINGLE files, but will still try to respect the chosen animation indices.
 
-## Animation keyframes
+## Animation key frames
 
-The `jump_to_keyframe` command allows you to load an animation at a specific keyframe. See [COMMANDS](07-COMMANDS.md) for more information and examples on how to use this command.
+The `jump_to_key_frame` command allows you to load an animation at a specific key frame. See [COMMANDS](07-COMMANDS.md) for more information and examples on how to use this command.
 
 This command is currently supported only by the following readers:
 
