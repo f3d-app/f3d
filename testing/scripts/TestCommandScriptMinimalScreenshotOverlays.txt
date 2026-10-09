@@ -1,0 +1,2 @@
+toggle ui.scene_hierarchy.enable
+take_minimal_screenshot

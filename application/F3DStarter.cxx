@@ -2542,11 +2542,16 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
     options.ui.scalar_bar = false;
     options.ui.cheatsheet = false;
     options.ui.console = false;
+    options.ui.minimal_console = false;
     options.ui.filename = false;
     options.ui.fps = false;
     options.ui.metadata = false;
     options.ui.animation_progress = "none";
     options.ui.axis = false;
+    options.ui.notifications.enable = false;
+    options.ui.scene_hierarchy.enable = false;
+    options.ui.loader_progress = false;
+    options.ui.drop_zone.enable = false;
     options.render.grid.enable = false;
     noBackground = true;
   }
