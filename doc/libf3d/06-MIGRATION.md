@@ -44,9 +44,24 @@ Refer to [CLI options](../user/03-OPTIONS.md) for more details.
 
 Some default bindings have changed or removed:
 
-<kbd>S</kbd> now cycles the coloring mode (`material`/`scivis`/`direct`) instead of cycling the arrays
-<kbd>Y</kbd> now cycles the arrays instead of cycling the components (<kbd>SHIFT</kbd>+<kbd>Y</kbd> can be used now to cycle the components)
-<kbd>C</kbd> has been removed because <kbd>Y</kbd> cycles all the arrays (points and cells)
+- <kbd>S</kbd> now cycles the coloring mode (`material`/`scivis`/`direct`) instead of cycling the arrays
+- <kbd>Y</kbd> now cycles the arrays instead of cycling the components (<kbd>SHIFT</kbd>+<kbd>Y</kbd> can be used now to cycle the components)
+- <kbd>C</kbd> has been removed because <kbd>Y</kbd> cycles all the arrays (points and cells)
+- <kbd>D</kbd> (raytracing denoiser) has been removed
+- <kbd>B</kbd> (scalar bar) has been removed
+- <kbd>I</kbd> (volume inversion) has been removed
+- <kbd>Z</kbd> (fps counter) has been removed
+- <kbd>U</kbd> (skybox blur) has been removed if favor of the new skybox mode cycle binding <kbd>J</kbd>
+- <kbd>CTRL</kbd>+<kbd>K</kbd> (notifications) has been removed
+- <kbd>J</kbd> now cycles between skybox modes (enabled, disabled, blurred)
+- <kbd>H</kbd> (cheatsheet) has been moved to <kbd>F1</kbd>
+- <kbd>SHIFT</kbd>+<kbd>H</kbd> (scene hierarchy) has been moved to <kbd>H</kbd>
+- <kbd>&uarrow</kbd> has been moved to <kbd>F5</kbd>
+- <kbd>&darrow</kbd> has been moved to <kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>R</kbd>
+- <kbd>&larrow</kbd> has been moved to <kbd>&uarrow</kbd>
+- <kbd>&rarrow</kbd> has been moved to <kbd>&darrow</kbd>
+- <kbd>CTRL</kbd>+<kbd>&larrow</kbd> has been moved to <kbd>CTRL</kbd>+<kbd>&uarrow</kbd>
+- <kbd>CTRL</kbd>+<kbd>&rarrow</kbd> has been moved to <kbd>CTRL</kbd>+<kbd>&darrow</kbd>
 
 ## Library options
 

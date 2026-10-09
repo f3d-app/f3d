@@ -1353,6 +1353,31 @@ interactor& interactor_impl::initCommands()
     },
     command_documentation_t{ "cycle_verbose_level", "cycle between verbose levels" });
 
+  this->addCommand(
+    "cycle_skybox_mode",
+    [&](const std::vector<std::string>&)
+    {
+      // cycle between no skybox, skybox, and blurred skybox
+      if (!this->Internals->Options.render.background.skybox)
+      {
+        this->Internals->Options.render.background.skybox = true;
+        this->Internals->Options.render.background.blur.enable = false;
+      }
+      else
+      {
+        if (this->Internals->Options.render.background.blur.enable)
+        {
+          this->Internals->Options.render.background.skybox = false;
+          this->Internals->Options.render.background.blur.enable = false;
+        }
+        else
+        {
+          this->Internals->Options.render.background.blur.enable = true;
+        }
+      }
+    },
+    command_documentation_t{ "cycle_skybox_mode", "cycle through different skybox modes" });
+
   // XXX: Basic statefile commands, F3DStarter overrides them to also handle its file groups,
   // filename templating and file dialogs
   this->addCommand(
@@ -1679,12 +1704,20 @@ interactor& interactor_impl::initBindings()
       "Verbose level", this->Internals->VerboseLevelToString(log::getVerboseLevel()));
   };
 
+  // "cycle skybox mode", "enabled/blurred/disabled"
+  auto docSkybox = [&]()
+  {
+    return std::pair("Skybox mode",
+      this->Internals->Options.render.background.skybox
+        ? (this->Internals->Options.render.background.blur.enable ? "blurred" : "enabled")
+        : "disabled");
+  };
+
   // clang-format off
   this->addBinding(BindingParam{.Bind = {mod_t::NONE, "W"}, .Commands = {"cycle_animation"}, .Group = "Scene", .DocCallback = docAnim, .Type = f3d::interactor::BindingType::CYCLIC });
   this->addBinding(BindingParam{.Bind = {mod_t::NONE, "S"}, .Commands = {"cycle_coloring mode"}, .Group = "Scene", .DocCallback = docMode, .Type = f3d::interactor::BindingType::CYCLIC});
   this->addBinding(BindingParam{.Bind = {mod_t::NONE, "Y"}, .Commands = {"cycle_coloring array"}, .Group = "Scene", .DocCallback = docArray, .Type = f3d::interactor::BindingType::CYCLIC});
   this->addBinding(BindingParam{.Bind = {mod_t::SHIFT, "Y"}, .Commands = {"cycle_coloring component"}, .Group = "Scene", .DocCallback = docComp, .Type = f3d::interactor::BindingType::CYCLIC});
-  this->addBinding(BindingParam{.Bind = {mod_t::NONE, "B"}, .Commands = {"toggle ui.scalar_bar"}, .Group = "Scene", .DocCallback = std::bind(docTgl, "Scalar bar", std::cref(opts.ui.scalar_bar)), .Type = f3d::interactor::BindingType::TOGGLE});
   this->addBinding(BindingParam{.Bind = {mod_t::NONE, "P"}, .Commands = {"cycle render.effect.blending.mode"}, .Group = "Scene", .DocCallback = std::bind(docStr, "Blending", std::cref(opts.render.effect.blending.mode)), .Type = f3d::interactor::BindingType::CYCLIC});
   this->addBinding(BindingParam{.Bind = {mod_t::NONE, "Q"}, .Commands = {"toggle render.effect.ambient_occlusion"},.Group = "Scene", .DocCallback = std::bind(docTgl, "Ambient occlusion", std::cref(opts.render.effect.ambient_occlusion)), .Type = f3d::interactor::BindingType::TOGGLE});
   this->addBinding(BindingParam{.Bind = {mod_t::NONE, "A"}, .Commands = {"cycle render.effect.antialiasing.mode"},.Group = "Scene", .DocCallback = std::bind(docStr, "Anti-aliasing", std::cref(opts.render.effect.antialiasing.mode)), .Type = f3d::interactor::BindingType::CYCLIC});
@@ -1697,18 +1730,14 @@ interactor& interactor_impl::initBindings()
   this->addBinding({.Bind = {mod_t::NONE, "N"}, .Commands = {"toggle ui.filename"},.Group = "Scene", .DocCallback = std::bind(docTgl, "Filename", std::cref(opts.ui.filename)), .Type = f3d::interactor::BindingType::TOGGLE});
   this->addBinding({.Bind = {mod_t::NONE, "M"}, .Commands = {"toggle ui.metadata"},.Group = "Scene", .DocCallback = std::bind(docTgl, "Metadata", std::cref(opts.ui.metadata)), .Type = f3d::interactor::BindingType::TOGGLE});
   this->addBinding({.Bind = {mod_t::SHIFT, "N"}, .Commands = {"toggle ui.hdri_filename"},.Group = "Scene", .DocCallback = std::bind(docTgl, "HDRI filename", std::cref(opts.ui.hdri_filename)), .Type = f3d::interactor::BindingType::TOGGLE});
-  this->addBinding({.Bind = {mod_t::SHIFT, "H"}, .Commands = {"toggle ui.scene_hierarchy.enable"},.Group = "Scene", .DocCallback = std::bind(docTgl, "Scene hierarchy", std::cref(opts.ui.scene_hierarchy.enable)), .Type = f3d::interactor::BindingType::TOGGLE});
-  this->addBinding({.Bind = {mod_t::NONE, "Z"}, .Commands = {"toggle ui.fps"},.Group = "Scene", .DocCallback = std::bind(docTgl, "FPS Counter", std::cref(opts.ui.fps)), .Type = f3d::interactor::BindingType::TOGGLE});
+  this->addBinding({.Bind = {mod_t::NONE, "H"}, .Commands = {"toggle ui.scene_hierarchy.enable"},.Group = "Scene", .DocCallback = std::bind(docTgl, "Scene hierarchy", std::cref(opts.ui.scene_hierarchy.enable)), .Type = f3d::interactor::BindingType::TOGGLE});
 #endif
 #if F3D_MODULE_RAYTRACING
   this->addBinding({.Bind = {mod_t::NONE, "R"}, .Commands = {"toggle render.raytracing.enable"},.Group = "Scene", .DocCallback = std::bind(docTgl, "Raytracing rendering", std::cref(opts.render.raytracing.enable)), .Type = f3d::interactor::BindingType::TOGGLE});
-  this->addBinding({.Bind = {mod_t::NONE, "D"}, .Commands = {"toggle render.raytracing.denoise"},.Group = "Scene", .DocCallback = std::bind(docTgl, "Denoising when raytracing", std::cref(opts.render.raytracing.denoise)), .Type = f3d::interactor::BindingType::TOGGLE});
 #endif
   this->addBinding({.Bind = {mod_t::NONE, "V"}, .Commands = {"toggle_volume_rendering"},.Group = "Scene", .DocCallback = std::bind(docTgl, "Volume rendering", std::cref(opts.model.volume.enable)), .Type = f3d::interactor::BindingType::TOGGLE});
-  this->addBinding({.Bind = {mod_t::NONE, "I"}, .Commands = {"toggle model.volume.inverse"},.Group = "Scene", .DocCallback = std::bind(docTgl, "Inverse volume opacity", std::cref(opts.model.volume.inverse)), .Type = f3d::interactor::BindingType::TOGGLE});
   this->addBinding({.Bind = {mod_t::CTRL, "N"}, .Commands = {"toggle model.normal_glyphs.enable"},.Group = "Scene", .DocCallback = std::bind(docTgl, "Normal glyphs", std::cref(opts.model.normal_glyphs.enable)), .Type = f3d::interactor::BindingType::TOGGLE});
   this->addBinding({.Bind = {mod_t::NONE, "O"}, .Commands = {"cycle model.point_sprites.type"},.Group = "Scene", .DocCallback = std::bind(docStr, "Point sprites", std::cref(opts.model.point_sprites.type)), .Type = f3d::interactor::BindingType::CYCLIC});
-  this->addBinding({.Bind = {mod_t::NONE, "U"}, .Commands = {"toggle render.background.blur.enable"},.Group = "Scene", .DocCallback = std::bind(docTgl, "Blur background", std::cref(opts.render.background.blur.enable)), .Type = f3d::interactor::BindingType::TOGGLE});
   this->addBinding({.Bind = {mod_t::NONE, "K"}, .Commands = {"cycle interactor.style"},.Group = "Scene", .DocCallback = std::bind(docStr, "Interaction style", std::cref(opts.interactor.style)), .Type = f3d::interactor::BindingType::CYCLIC});
   this->addBinding({.Bind = {mod_t::NONE, "F"}, .Commands = {"toggle render.hdri.ambient"},.Group = "Scene", .DocCallback = std::bind(docTgl, "HDRI ambient lighting", std::cref(opts.render.hdri.ambient)), .Type = f3d::interactor::BindingType::TOGGLE});
   this->addBinding({.Bind = {mod_t::NONE, "J"}, .Commands = {"toggle render.background.skybox"},.Group = "Scene", .DocCallback = std::bind(docTgl, "HDRI skybox", std::cref(opts.render.background.skybox)), .Type = f3d::interactor::BindingType::TOGGLE});
@@ -1729,10 +1758,9 @@ interactor& interactor_impl::initBindings()
   this->addBinding({.Bind = {mod_t::CTRL, "Y"}, .Commands = {"set scene.up_direction +Y"}, .Group = "Scene", .DocCallback = std::bind(docStr, "Set scene up direction to +Y")});
   this->addBinding({.Bind = {mod_t::CTRL, "Z"}, .Commands = {"set scene.up_direction +Z"}, .Group = "Scene", .DocCallback = std::bind(docStr, "Set scene up direction to +Z")});
 #if F3D_MODULE_UI
-  this->addBinding({.Bind = {mod_t::NONE, "H"}, .Commands = {"toggle ui.cheatsheet"}, .Group = "Others", .DocCallback = std::bind(docStr, "Cheatsheet"), .Type = f3d::interactor::BindingType::OTHER, .Notify = true});
+  this->addBinding({.Bind = {mod_t::NONE, "F1"}, .Commands = {"toggle ui.cheatsheet"}, .Group = "Others", .DocCallback = std::bind(docStr, "Cheatsheet"), .Type = f3d::interactor::BindingType::OTHER, .Notify = true});
   this->addBinding({.Bind = {mod_t::NONE, "Escape"}, .Commands = {"toggle ui.console"}, .Group = "Others", .DocCallback = std::bind(docStr, "Console"), .Type = f3d::interactor::BindingType::OTHER, .Notify = true});
   this->addBinding({.Bind = {mod_t::ANY, "Colon"}, .Commands = {"toggle ui.minimal_console"}, .Group = "Others", .DocCallback = std::bind(docStr, "Minimal console"), .Type = f3d::interactor::BindingType::OTHER, .Notify = true});
-  this->addBinding({.Bind = {mod_t::CTRL, "K"}, .Commands = {"toggle ui.notifications.enable"}, .Group = "Others", .DocCallback = std::bind(docTgl, "Notifications", std::cref(opts.ui.notifications.enable)), .Type = f3d::interactor::BindingType::TOGGLE});
 #endif
   this->addBinding({.Bind = {mod_t::CTRL, "Q"}, .Commands = {"stop_interactor"}, .Group = "Others", .DocCallback = std::bind(docStr, "Stop the interactor"), .Type = f3d::interactor::BindingType::OTHER, .Notify = true});
   this->addBinding({.Bind = {mod_t::NONE, "Return"}, .Commands = {"reset_camera"}, .Group = "Others", .DocCallback = std::bind(docStr, "Reset camera to initial parameters")});

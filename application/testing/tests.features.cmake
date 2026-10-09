@@ -423,7 +423,7 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestRaytracingDenoise DATA suzanne.ply ARGS -rd --raytracing-samples=4)
   f3d_test(NAME TestRaytracingNoDenoise DATA suzanne.stl ARGS -r --raytracing-samples=20)
   f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Module Raytracing: ON")
-  f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply ARGS --raytracing-samples=4 INTERACTION) #RD
+  f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply ARGS --raytracing-samples=4 -d INTERACTION) #R
   f3d_test(NAME TestRaytracingScalarBar DATA dragon.vtu ARGS -rsbd --raytracing-samples=4)
 
   if(NOT F3D_MACOS_BUNDLE)
@@ -838,10 +838,10 @@ f3d_test(NAME TestVersion ARGS --version REGEXP "Version:")
 f3d_test(NAME TestReadersList ARGS --list-readers REGEXP_FAIL "No registered reader found")
 
 # Test invalid component string coverage
-f3d_test(NAME TestInteractionInvalidComponent INTERACTION UI DATA cow.vtp ARGS --coloring-component=1 NO_BASELINE) #H
+f3d_test(NAME TestInteractionInvalidComponent INTERACTION UI DATA cow.vtp ARGS --coloring-component=1 NO_BASELINE) #F1
 
 # Test opening invalid file then switching to another file
-f3d_test(NAME TestInteractionInvalidFile INTERACTION DATA invalid_body.vtp cow.vtp ARGS --loading-progress) #Right
+f3d_test(NAME TestInteractionInvalidFile INTERACTION DATA invalid_body.vtp cow.vtp ARGS --loading-progress) #Down
 
 # Test bindings-list display
 f3d_test(NAME TestBindingsList ARGS --list-bindings REGEXP "Any.5        Orthographic Projection")
