@@ -138,7 +138,7 @@ First recover the `animation` instance (always available) from the scene: `scene
 - `std::vector<double> scene::getAnimationKeyFrames()` -> `std::vector<double> animation::getKeyFrames()`
 - `unsigned int scene::availableAnimations() const` -> `unsigned int animation::count() const`
 - `std::string scene::getAnimationName(int index = -1)` -> `std::string animation::getName(std::optional<int> index = std::nullopt)`
-- `std::vector<std::string> scenegetAnimationNames()` -> `std::vector<std::string> animation::getNames()`
+- `std::vector<std::string> scene::getAnimationNames()` -> `std::vector<std::string> animation::getNames()`
 - `toggleAnimation(AnimationDirection direction)` -> `toggle(Direction direction)`
 - `startAnimation(AnimationDirection direction)` -> `start(Direction direction)`
 - `stopAnimation()` -> `stop()`

@@ -1,4 +1,3 @@
-import pytest
 import tempfile
 from pathlib import Path
 
@@ -55,7 +54,7 @@ def test_animation():
     ]
 
 
-def test_animation_start_stop(capfd: pytest.CaptureFixture[str]):
+def test_animation_start_stop():
     engine = f3d.Engine.create(True)
     engine.window.render()
 

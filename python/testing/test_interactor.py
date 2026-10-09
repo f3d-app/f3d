@@ -179,7 +179,7 @@ def test_trigger_key(capfd: pytest.CaptureFixture[str]):
     assert counter_notif == 1
 
 
-def test_trigger_event_loop(capfd: pytest.CaptureFixture[str]):
+def test_trigger_event_loop():
     engine = f3d.Engine.create(True)
     engine.window.render()
 

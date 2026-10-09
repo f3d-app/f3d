@@ -39,7 +39,7 @@ public:
   interactor_impl* Interactor = nullptr;
 
   int AvailAnimations = 0;
-  int Direction = 1;
+  int AnimDir = 1;
 
   std::optional<std::vector<int>> PreparedAnimationIndices;
   vtkNew<vtkDoubleArray> AnimationTimeSteps;
@@ -172,7 +172,7 @@ std::vector<std::string> animation_impl::getNames() const
 //----------------------------------------------------------------------------
 animation& animation_impl::toggle(Direction direction)
 {
-  this->Internals->Direction = (direction == Direction::FORWARD ? 1 : -1);
+  this->Internals->AnimDir = (direction == Direction::FORWARD ? 1 : -1);
 
   this->PrepareForAnimationIndices();
   if (!this->Internals->PreparedAnimationIndices.value().empty() && this->Internals->Interactor)
@@ -233,7 +233,7 @@ bool animation_impl::isPlaying()
 //----------------------------------------------------------------------------
 animation::Direction animation_impl::getDirection()
 {
-  return this->Internals->Direction == 1 ? Direction::FORWARD : Direction::BACKWARD;
+  return this->Internals->AnimDir == 1 ? Direction::FORWARD : Direction::BACKWARD;
 }
 
 //----------------------------------------------------------------------------
@@ -316,7 +316,7 @@ void animation_impl::Tick()
   if (this->Internals->Playing)
   {
     this->Internals->CurrentTime +=
-      (this->Internals->DeltaTime * this->Internals->SpeedFactor) * this->Internals->Direction;
+      (this->Internals->DeltaTime * this->Internals->SpeedFactor) * this->Internals->AnimDir;
 
     // Modulo computation, compute CurrentTime in the time range.
     if (this->Internals->CurrentTime < this->Internals->TimeRange[0] ||
