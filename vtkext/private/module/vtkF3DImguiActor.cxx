@@ -1459,8 +1459,11 @@ void vtkF3DImguiActor::EndFrame(vtkOpenGLRenderWindow* renWin)
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::SetDeltaTime(double time)
 {
-  ImGuiIO& io = ImGui::GetIO();
-  io.DeltaTime = time;
+  if (ImGui::GetCurrentContext() != nullptr)
+  {
+    ImGuiIO& io = ImGui::GetIO();
+    io.DeltaTime = time;
+  }
 }
 
 //----------------------------------------------------------------------------
