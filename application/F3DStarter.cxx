@@ -818,9 +818,9 @@ public:
     f3d::options libOptions;
 #if F3D_MODULE_UI
 #if F3D_MODULE_TINYFILEDIALOGS
-    libOptions.ui.drop_zone.custom_binds = "None+Drop Ctrl+O None+H";
+    libOptions.ui.drop_zone.custom_binds = "None+Drop Ctrl+O None+F1";
 #else
-    libOptions.ui.drop_zone.custom_binds = "None+Drop None+H";
+    libOptions.ui.drop_zone.custom_binds = "None+Drop None+F1";
 #endif
 #endif
 
