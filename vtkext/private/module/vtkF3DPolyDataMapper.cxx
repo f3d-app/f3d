@@ -54,7 +54,7 @@ vtkUnsignedCharArray* vtkF3DPolyDataMapper::MapScalars(
 
   if (this->ColorTextureMap && this->ColorTextureMap != this->LinearColorTextureMap)
   {
-    vtkUnsignedCharArray* source =
+    const vtkUnsignedCharArray* source =
       vtkUnsignedCharArray::SafeDownCast(this->ColorTextureMap->GetPointData()->GetScalars());
     this->LinearColorTextureMap = vtkSmartPointer<vtkImageData>::New();
     this->LinearColorTextureMap->CopyStructure(this->ColorTextureMap);
