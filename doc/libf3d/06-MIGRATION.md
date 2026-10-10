@@ -36,6 +36,8 @@ If not defined, `material` is used. If defined but no value is specified, `scivi
 
 `--coloring-by-cells` has been replaced by `--coloring-field`. `--coloring-field` is a string taking `any`, `points` or `cells` value.
 
+`-u/--blur-background` has been removed. Use `--hdri-skybox=blurred` instead.
+
 Refer to [CLI options](../user/03-OPTIONS.md) for more details.
 
 ## Application bindings
@@ -79,6 +81,10 @@ So to enable anti-aliasing, just set the mode to the value that used to be the d
 So to enable point sprites, just set the type to the value that used to be the default, `sphere`.
 
 `ui.scene_hierarchy` have been removed in favor of `ui.scene_hierarchy.enable`.
+
+`render.background.skybox` is now a enum domain with valid values `disabled` (default), `enabled` and `blurred`.
+`render.background.blur.enable` has been removed (use `render.background.skybox` option to `blurred`).
+`render.background.blur.coc` have been replaced by `render.background.blur_coc`.
 
 ### Coloring mode
 
