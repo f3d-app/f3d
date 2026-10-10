@@ -11,7 +11,7 @@ If `-` is specified instead of a filename, F3D streams the file from stdin and w
 
 ### `--output=<png file>` (_string_)
 
-Instead of showing a render view and render into it, _render directly into a png file_. When used with --ref option, only outputs on failure. If `-` is specified instead of a filename, F3D streams the PNG file to stdout. You can also use [template variables](#filename-templating). When using the `{frame}` variable, F3D exports multiple animation frames (see [Export animation frames](05-ANIMATIONS.md#export-animation-frames)).
+Instead of showing a render view and render into it, _render directly into a png file_. When used with the `--ref` option, only outputs on failure. If `-` is specified instead of a filename, F3D streams the PNG file to stdout. You can also use [template variables](#filename-templating). When using the `{frame}` variable, F3D exports multiple animation frames (see [Export animation frames](05-ANIMATIONS.md#export-animation-frames)).
 
 ### `--output-video=<video file>` (_string_)
 
@@ -998,7 +998,7 @@ This is a technique used to correctly render translucent objects (`ddp`: dual de
 
 > [!WARNING]
 > `stochastic` is introducing a lot of noise with strong translucency.
-> It works better when combined with temporal anti-aliasing (when using `--anti-aliasing=taa` option)
+> It works better when combined with temporal anti-aliasing (when using the `--anti-aliasing=taa` option)
 > `sort` is only working for 3D gaussians and requires compute shaders support.
 > Alternatively, `sort_cpu` gives the same result and works everywhere but it's much slower.
 
@@ -1024,7 +1024,7 @@ Anti-aliasing method (`fxaa`: fast, `ssaa`: quality, `taa`: balanced, `none`: no
 
 > [!WARNING]
 > `taa` forces rendering of the scene at regular interval and introduces ghosting artifacts on animated scenes.
-> It also doesn't work with offscreen rendering (when using `--output` option)
+> It also doesn't work with offscreen rendering (when using the `--output` option)
 
 #### compare: Notice how edges are smoother with SSAA.
 
