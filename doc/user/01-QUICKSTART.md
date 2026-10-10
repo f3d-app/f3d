@@ -29,7 +29,7 @@ Optionally, save the rendering into an image file:
 f3d /path/to/file.ext --output=/path/to/img.png
 ```
 
-If you need help, specify the [`--help` option](https://f3d.app/docs/next/user/OPTIONS#--help):
+If you need help, specify the [`--help` option](03-OPTIONS.md):
 
 ```bash
 f3d --help

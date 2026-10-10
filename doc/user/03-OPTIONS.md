@@ -13,7 +13,7 @@ If `-` is specified instead of a filename, F3D streams the file from stdin and w
 
 ### `--output=<png file>` (_string_)
 
-Instead of showing a render view and render into it, _render directly into a png file_. When used with the `--ref` option, only outputs on failure. If `-` is specified instead of a filename, F3D streams the PNG file to stdout. You can also use [template variables](#filename-templating). When using the `{frame}` variable, F3D exports multiple animation frames (see [Export animation frames](05-ANIMATIONS.md#export-animation-frames)).
+Instead of showing a render view and render into it, _render directly into a png file_. When used with the `--reference` option, only outputs on failure. If `-` is specified instead of a filename, F3D streams the PNG file to stdout. You can also use [template variables](#filename-templating). When using the `{frame}` variable, F3D exports multiple animation frames (see [Export animation frames](05-ANIMATIONS.md#export-animation-frames)).
 
 ### `--output-video=<video file>` (_string_)
 
@@ -86,7 +86,7 @@ Do not read any configuration file and consider only the command-line options.
 
 ### `--no-render` (_bool_, default: `false`)
 
-Do not render anything and quit just after loading the first file, use with --verbose to recover information about a file.
+Do not render anything and quit just after loading the first file, use with `--verbose` to recover information about a file.
 
 ### `--load-statefile=<file path>` (_string_)
 
@@ -540,7 +540,7 @@ Set the _HDRI_ image to use as ambient lighting and skybox.
 Valid file format are `.hdr`, `.exr`, `.png`, `.jpg`, `.pnm`, `.tiff`, `.bmp`.
 If not set, a default is provided.
 
-### `--hdri-ambient` (_bool_, default: `false`)
+### `-f`, `--hdri-ambient` (_bool_, default: `false`)
 
 Light the scene using the _HDRI_ image as ambient lighting.
 The environment act as a light source and is reflected on the material.
@@ -680,7 +680,7 @@ To always start with the same window size, set it in a [configuration file](06-C
 
 ### `--position=<x,y>` (_vector\<double\>_)
 
-Set the _window position_ (top left corner) , in pixels, starting from the top left of your screens. When closing an interactive window, its position is remembered in a [cache file](#caches), and restored on the next start, unless it is set in a configuration file, a statefile or on the command-line. Rendering to a file with `--output` or `--reference` is unaffected.
+Set the _window position_ (top left corner), in pixels, starting from the top left of your screens. When closing an interactive window, its position is remembered in a [cache file](#caches), and restored on the next start, unless it is set in a configuration file, a statefile or on the command-line. Rendering to a file with `--output` or `--reference` is unaffected.
 To always start with the same window position, set it in a [configuration file](06-CONFIGURATION_FILE.md), eg: `"position": "100,50"`. It is only applied on the first load.
 To save and restore a whole session, including loaded files and the camera, use [statefiles](#statefiles).
 
@@ -739,7 +739,7 @@ Display the _HDRI filename_.
 | ----------------------------------------------------------------------- | -------------------------------------------------- |
 | ![Damaged Helmet baseline render](./images/damaged_helmet_baseline.png) | ![HDRI filename on](./images/hdri_filename_on.png) |
 
-### `--hdri-skybox` (_bool_, default: `false`)
+### `-j`, `--hdri-skybox` (_bool_, default: `false`)
 
 Show the HDRI as a skybox. Overrides `--background-color` and `--no-background`.
 
@@ -782,7 +782,7 @@ _Adjust the intensity_ of every light in the scene, including HDRI image-based l
 
 ## Scientific visualization options
 
-### `-s`, `--coloring-mode` (_bool_, default: `scivis`)
+### `-s`, `--coloring-mode` (_string_, default: `material`)
 
 Specify the coloring mode.
 _material_ means default file materials (textured or solid color)
@@ -912,7 +912,7 @@ Set an _opacity map file for the coloring_.
 
 Set a _custom opacity map for the coloring_.
 Only used with volume rendering for now.
-Ignored if `--opacity-map-file` option is specified.
+Ignored if `--volume-opacity-file` option is specified.
 
 ### `-i`, `--volume-inverse` (_bool_, default: `false`)
 
@@ -1101,7 +1101,7 @@ All options of type _color_ must be expressed in [sRGB](https://en.wikipedia.org
 
 ## Options syntax
 
-To turn on/off boolean options, write `--option=true` and `--option=false`, eg `--points-sprites=false`.
+To turn on/off boolean options, write `--option=true` and `--option=false`, eg `--point-sprites=false`.
 
 If an option has an "implicit" value, use the option without specifying the value to use the implicit value.
 

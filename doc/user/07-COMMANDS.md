@@ -123,18 +123,18 @@ eg:
 
 `cycle_verbose_level`: A specific command to cycle between the verbose levels (`Debug`, `Info`, `Warning`, `Error`, `Quiet`).
 
-`add_files [path/to/file1] [path/to/file2]`: A specific command to add files to the scene (overridden by a F3D specific command, see below). Takes one or more files as arguments.
+`add_files [path/to/file1] [path/to/file2]`: A specific command to add files to the scene (overridden by an F3D specific command, see below). Takes one or more files as arguments.
 eg: `add_files /path/to/dragon.vtu`.
 
-`save_statefile [path/to/file]`: A specific command to save the current state into the provided statefile (overridden by a F3D specific command, see below). Takes a file as argument.
+`save_statefile [path/to/file]`: A specific command to save the current state into the provided statefile (overridden by an F3D specific command, see below). Takes a file as argument.
 eg: `save_statefile /path/to/state.json`.
 
-`load_statefile [path/to/file]`: A specific command to restore the state from the provided statefile (overridden by a F3D specific command, see below). Takes a file as argument.
+`load_statefile [path/to/file]`: A specific command to restore the state from the provided statefile (overridden by an F3D specific command, see below). Takes a file as argument.
 eg: `load_statefile /path/to/state.json`.
 
-`save_statefile_to_clipboard`: A specific command to save the current state into the system clipboard (overridden by a F3D specific command, see below). Requires a build with the `clip` module. No argument.
+`save_statefile_to_clipboard`: A specific command to save the current state into the system clipboard (overridden by an F3D specific command, see below). Requires a build with the `clip` module. No argument.
 
-`load_statefile_from_clipboard`: A specific command to restore the state from the system clipboard (overridden by a F3D specific command, see below). Requires a build with the `clip` module. No argument.
+`load_statefile_from_clipboard`: A specific command to restore the state from the system clipboard (overridden by an F3D specific command, see below). Requires a build with the `clip` module. No argument.
 
 `alias [alias_name] [command]`: A specific command to create an alias for a command. Takes an alias name and a command as arguments.
 eg: `alias myrotate roll_camera 90`.

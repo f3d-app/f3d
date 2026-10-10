@@ -35,9 +35,9 @@ Select 2D interaction styles by pressing <kbd>K</kbd> or through the `--interact
 Control coloring directly with these hotkeys:
 
 - <kbd>A</kbd>: cycle between anti-aliasing modes.
-- <kbd>C</kbd>: cycle between coloring with array from point data and from cell data.
-- <kbd>S</kbd>: cycle the array to color with.
-- <kbd>Y</kbd>: cycle the component of the array to color with.
+- <kbd>S</kbd>: cycle between the coloring modes (material, scivis, direct).
+- <kbd>Y</kbd>: cycle the array to color with.
+- <kbd>Shift</kbd>+<kbd>Y</kbd>: cycle the component of the array to color with.
 
 See the [coloring cycle](#cycle-coloring) section for more info.
 
@@ -71,8 +71,9 @@ Toggle or cycle other options directly with these hotkeys:
 - <kbd>Ctrl</kbd>+<kbd>P</kbd>: increase opacity.
 - <kbd>Shift</kbd>+<kbd>P</kbd>: decrease opacity.
 - <kbd>Shift</kbd>+<kbd>A</kbd>: toggle armature.
+- <kbd>Ctrl</kbd>+<kbd>N</kbd>: toggle normal glyphs.
 
-Raytracing hotkeys are only available if F3D is build with raytracing enabled.
+Raytracing hotkeys are only available if F3D is built with raytracing enabled.
 
 Camera hotkeys:
 
@@ -128,7 +129,7 @@ The following hotkeys let you cycle the coloring of the data:
 
 - <kbd>S</kbd>: cycle the coloring modes (material, scivis, direct).
 - <kbd>Y</kbd>: cycle on all arrays on point and cells, visible in scivis and direct mode.
-- <kbd>SHIFT+Y</kbd>: cycle the component available on the currently selected array, visible in scivis and direct mode, including magnitude.
+- <kbd>Shift</kbd>+<kbd>Y</kbd>: cycle the component available on the currently selected array, visible in scivis and direct mode, including magnitude.
 
 When changing the array, F3D keeps the component in use if it is valid with the new array. Otherwise, it cycles until a valid
 component is found.
