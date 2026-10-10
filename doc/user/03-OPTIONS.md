@@ -1,6 +1,8 @@
 # Command-line options
 
 Control F3D behavior from the command line using the following options.
+Option headings use command-line spelling and show the accepted value type, default value, and implicit value when those exist.
+In configuration files, use command-line option names without the leading `--`, or use the libf3d option names documented in the [libf3d options reference](../libf3d/03-OPTIONS.md).
 
 ## Application options
 
