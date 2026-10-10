@@ -53,7 +53,7 @@ runs:
       shell: bash
       run: |
         python -m pip install pytest
-        python -m pip install pyopengltk
+        python -m pip install pyopengltk==0.0.4
         python -m pip install PySide6
         python -m pip install numpy
 
