@@ -112,7 +112,7 @@ int main(int argc, char** argv)
 
     // Neutral background, no grid or skybox
     opt.render.grid.enable = false;
-    opt.render.background.skybox = false;
+    opt.render.background.skybox = "disabled";
     opt.render.background.color = { 0.15, 0.15, 0.15 }; // dark neutral gray
 
     // Slightly stronger lighting so assets read well at small sizes

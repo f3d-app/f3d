@@ -16,6 +16,3 @@ CharEvent 237 552 0 118 1 v 0
 KeyReleaseEvent 237 552 0 118 1 v 0
 TimerEvent 237 552 0 118 1 v 0
 TimerEvent 237 552 0 118 1 v 0
-KeyPressEvent 237 552 0 98 1 b 0
-CharEvent 237 552 0 98 1 b 0
-KeyReleaseEvent 237 552 0 98 1 b 0

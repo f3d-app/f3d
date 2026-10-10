@@ -36,6 +36,8 @@ If not defined, `material` is used. If defined but no value is specified, `scivi
 
 `--coloring-by-cells` has been replaced by `--coloring-field`. `--coloring-field` is a string taking `any`, `points` or `cells` value.
 
+`-u/--blur-background` has been removed. Use `--hdri-skybox=blurred` instead.
+
 Refer to [CLI options](../user/03-OPTIONS.md) for more details.
 
 ## Application bindings
@@ -44,9 +46,24 @@ Refer to [CLI options](../user/03-OPTIONS.md) for more details.
 
 Some default bindings have changed or removed:
 
-<kbd>S</kbd> now cycles the coloring mode (`material`/`scivis`/`direct`) instead of cycling the arrays
-<kbd>Y</kbd> now cycles the arrays instead of cycling the components (<kbd>SHIFT</kbd>+<kbd>Y</kbd> can be used now to cycle the components)
-<kbd>C</kbd> has been removed because <kbd>Y</kbd> cycles all the arrays (points and cells)
+- <kbd>S</kbd> now cycles the coloring mode (`material`/`scivis`/`direct`) instead of cycling the arrays
+- <kbd>Y</kbd> now cycles the arrays instead of cycling the components (<kbd>SHIFT</kbd>+<kbd>Y</kbd> can be used now to cycle the components)
+- <kbd>C</kbd> has been removed because <kbd>Y</kbd> cycles all the arrays (points and cells)
+- <kbd>D</kbd> (raytracing denoiser) has been removed, you can use the command `toggle render.raytracing.denoise`
+- <kbd>B</kbd> (scalar bar) has been removed, you can use the command `toggle ui.bar`
+- <kbd>I</kbd> (volume inversion) has been removed, you can use the command `toggle model.volume.inverse`
+- <kbd>Z</kbd> (fps counter) has been removed, you can use the command `toggle ui.fps`
+- <kbd>U</kbd> (skybox blur) has been removed if favor of the new skybox mode cycle binding <kbd>J</kbd>
+- <kbd>CTRL</kbd>+<kbd>K</kbd> (notifications) has been removed, you can use the command `toggle ui.notifications.enable`
+- <kbd>J</kbd> now cycles between skybox modes (enabled, disabled, blurred)
+- <kbd>H</kbd> (cheatsheet) has been moved to <kbd>F1</kbd>
+- <kbd>SHIFT</kbd>+<kbd>H</kbd> (scene hierarchy) has been moved to <kbd>H</kbd>
+- <kbd>&uarrow</kbd> has been moved to <kbd>F5</kbd>
+- <kbd>&darrow</kbd> has been moved to <kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>R</kbd>
+- <kbd>&larrow</kbd> has been moved to <kbd>&uarrow</kbd>
+- <kbd>&rarrow</kbd> has been moved to <kbd>&darrow</kbd>
+- <kbd>CTRL</kbd>+<kbd>&larrow</kbd> has been moved to <kbd>CTRL</kbd>+<kbd>&uarrow</kbd>
+- <kbd>CTRL</kbd>+<kbd>&rarrow</kbd> has been moved to <kbd>CTRL</kbd>+<kbd>&darrow</kbd>
 
 ## Library options
 
@@ -64,6 +81,10 @@ So to enable anti-aliasing, just set the mode to the value that used to be the d
 So to enable point sprites, just set the type to the value that used to be the default, `sphere`.
 
 `ui.scene_hierarchy` have been removed in favor of `ui.scene_hierarchy.enable`.
+
+`render.background.skybox` is now a enum domain with valid values `disabled` (default), `enabled` and `blurred`.
+`render.background.blur.enable` has been removed (use `render.background.skybox` option to `blurred`).
+`render.background.blur.coc` have been replaced by `render.background.blur_coc`.
 
 ### Coloring mode
 

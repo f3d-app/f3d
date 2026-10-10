@@ -2,16 +2,16 @@
 ExposeEvent 0 289 0 0 0 0 0
 RenderEvent 0 289 0 0 0 0 0
 
-# H
-KeyPressEvent 411 310 0 104 1 h 0
-CharEvent 411 310 0 104 1 h 0
-KeyReleaseEvent 411 310 0 104 1 h 0
+# F1
+KeyPressEvent 411 310 0 104 1 F1 0
+CharEvent 411 310 0 104 1 F1 0
+KeyReleaseEvent 411 310 0 104 1 F1 0
 
 # Drag scrollbar to bottom
-MouseMoveEvent 815 550 0 0 0 h 0
-TimerEvent 815 550 0 0 0 h 0
-LeftButtonPressEvent 815 550 0 0 0 h 0
-MouseMoveEvent 801 -3 0 0 0 h 0
-TimerEvent 801 -3 0 0 0 h 0
-LeftButtonReleaseEvent 801 -3 0 0 0 h 0
-LeaveEvent 765 -60 0 0 0 h 0
+MouseMoveEvent 815 550 0 0 0 F1 0
+TimerEvent 815 550 0 0 0 F1 0
+LeftButtonPressEvent 815 550 0 0 0 F1 0
+MouseMoveEvent 801 -3 0 0 0 F1 0
+TimerEvent 801 -3 0 0 0 F1 0
+LeftButtonReleaseEvent 801 -3 0 0 0 F1 0
+LeaveEvent 765 -60 0 0 0 F1 0

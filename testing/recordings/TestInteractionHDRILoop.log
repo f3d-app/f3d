@@ -13,3 +13,6 @@ KeyReleaseEvent 1967 390 0 102 1 f 0
 KeyPressEvent 1967 390 0 106 1 j 0
 CharEvent 1967 390 0 106 1 j 0
 KeyReleaseEvent 1967 390 0 106 1 j 0
+KeyPressEvent 1967 390 0 106 1 j 0
+CharEvent 1967 390 0 106 1 j 0
+KeyReleaseEvent 1967 390 0 106 1 j 0

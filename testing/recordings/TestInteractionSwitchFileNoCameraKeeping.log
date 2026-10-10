@@ -36,10 +36,10 @@ MouseMoveEvent 69 307 0 0 0 0 0
 LeftButtonReleaseEvent 69 307 0 0 0 0 0
 EndInteractionEvent 69 307 0 0 0 0 0
 MouseMoveEvent 227 303 0 0 0 0 0
-KeyPressEvent 227 303 0 0 1 Right 0
-CharEvent 227 303 0 0 1 Right 0
-MouseMoveEvent 241 302 0 0 0 Right 0
-MouseMoveEvent 242 302 0 0 0 Right 0
-MouseMoveEvent 243 302 0 0 0 Right 0
-MouseMoveEvent 244 302 0 0 0 Right 0
-KeyReleaseEvent 244 302 0 0 1 Right 0
+KeyPressEvent 227 303 0 0 1 Down 0
+CharEvent 227 303 0 0 1 Down 0
+MouseMoveEvent 241 302 0 0 0 Down 0
+MouseMoveEvent 242 302 0 0 0 Down 0
+MouseMoveEvent 243 302 0 0 0 Down 0
+MouseMoveEvent 244 302 0 0 0 Down 0
+KeyReleaseEvent 244 302 0 0 1 Down 0

@@ -125,8 +125,8 @@ int TestSDKTriggerInteractions([[maybe_unused]] int argc, char* argv[])
 
     // Trigger cheatsheet search filtering
     helper("TestSDKTriggerInteractionsCheatSheetSearch", [](f3d::engine& engine) {
-      engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "H");
-      engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "H");
+      engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "F1");
+      engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "F1");
       engine.getInteractor().triggerMousePosition(80, 30);
       engine.getInteractor().triggerMouseButton(
         f3d::interactor::InputAction::PRESS, f3d::interactor::MouseButton::LEFT);
@@ -140,8 +140,8 @@ int TestSDKTriggerInteractions([[maybe_unused]] int argc, char* argv[])
 
     // Trigger cheatsheet keybind search mode
     helper("TestSDKTriggerInteractionsCheatSheetKeybindSearch", [](f3d::engine& engine) {
-      engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "H");
-      engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "H");
+      engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "F1");
+      engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "F1");
       engine.getWindow().render();
       engine.getInteractor().triggerMousePosition(200, 55);
       engine.getWindow().render();
