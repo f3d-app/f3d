@@ -285,6 +285,7 @@ f3d_test(NAME TestInteractionHDRICache DATA suzanne.ply HDRI shanghai_bund_1k.hd
 f3d_test(NAME TestInteractionHDRIRemoveSkybox DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION THRESHOLD 0.06) #JJ
 f3d_test(NAME TestInteractionHDRIRemoveAmbient DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION) #F
 f3d_test(NAME TestInteractionHDRIRemoveBoth DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION) #FJJ
+f3d_test(NAME TestInteractionHDRICycleBlur DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION THRESHOLD 0.07) #FJ
 f3d_test(NAME TestInteractionHDRILoop DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION THRESHOLD 0.07) #FJFJJ
 f3d_test(NAME TestInteractionHDRIFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr LONG_TIMEOUT INTERACTION THRESHOLD 0.07) #FJ
 
