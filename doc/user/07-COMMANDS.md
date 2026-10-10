@@ -86,7 +86,7 @@ eg:
 - `jump_to_frame_relative -1` jump to previous frame.
 
 `jump_to_key_frame`: A specific command to load an animation at a specific key frame, takes a key frame index as argument.
-When jumping to a key frame, F3D adjusts the target key frame index to stay within the total number of available key frames, avoiding invalid key frame access.
+When jumping to a key frame, libf3d adjusts the target key frame index to stay within the total number of available key frames, avoiding invalid key frame access.
 eg:
 
 - `jump_to_key_frame 0` jump to animation start frame.
@@ -94,7 +94,7 @@ eg:
 - `jump_to_key_frame 10` jump to key frame 10.
 
 `jump_to_key_frame_relative`: A specific command to move the animation by a number of key frames relative to the current key frame, takes a key frame offset as argument.
-When jumping between key frames, F3D adjusts the target key frame index to stay within the total number of available key frames, avoiding invalid key frame access.
+When jumping between key frames, libf3d adjusts the target key frame index to stay within the total number of available key frames, avoiding invalid key frame access.
 eg:
 
 - `jump_to_key_frame_relative 0` jump to closest key frame.
@@ -233,7 +233,7 @@ Command syntax is similar to bash: commands are split by token before processing
 - Tokens are spaces separated, eg: `set scene.up_direction +Z`.
 - Tokens can also be quoted to support spaces inside, eg: `set render.hdri.file "/path/to/file with spaces.png"`.
 - Supported quotes are `` `'" ``, eg: `set render.hdri.file '/path/to/file with spaces.png'`.
-- Use quotes inside quotes as well, eg: `set render.hdri.file "/path/to/file'with'quotes.png"`.
+- Put one type of quote inside another, eg: `set render.hdri.file "/path/to/file'with'quotes.png"`.
 - Escape quotes and spaces with `\`, eg: `set render.hdri.file /path/to/file\ with\ spaces\ and\ \'quotes\".png`.
 - Use `#` for comments. F3D ignores any character after it. Use `\#` to add it verbatim.
 
@@ -242,7 +242,7 @@ Command syntax is similar to bash: commands are split by token before processing
 > as standard character.
 
 - Escape `\` with another `\`, eg: `set render.hdri.file C:\\path\\to\\windows\\file.png`.
-- F3D processes other escaped character as if the escape was not present, eg: `set scene.up_direction +\Z`
+- Escaping any other character has no effect, eg: `set scene.up_direction +\Z` is the same as `+Z`.
 - Unfinished quoted section is invalid, eg: `set scene.up_direction "+Z`
-- A escape at the end is also invalid, eg: `set scene.up_direction +Z\`
+- An escape at the end is also invalid, eg: `set scene.up_direction +Z\`
 - Option values follow the [option parsing rules](08-PARSING.md).
