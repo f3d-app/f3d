@@ -61,7 +61,7 @@ F3D supports the following file formats:
 
 Streaming support means that F3D can read from stdin when you specify the reader name. See the [piping examples](03-OPTIONS.md#piping).
 
-If a format supports streaming, F3D checks its header content before trying to open it. Use `--force-reader` to ignore the header content check.
+If a format supports streaming, F3D checks its header content before trying to open it. Use [`--skip-content-check`](https://f3d.app/docs/next/user/OPTIONS#--skip-content-check) to skip this check and rely on the file extension only.
 
 To get accurate information for your own build of F3D, use the [dedicated option](03-OPTIONS.md), `--list-readers`.
 

@@ -62,7 +62,7 @@ Supports `front`, `top`, `right`, `back`, `bottom`, `left`, `isometric` argument
 
 `toggle_volume_rendering`: A specific command to toggle `model.volume.enable` and print coloring information. No argument.
 
-`stop_interactor`: A specific command to stop the interactor hence quitting F3D. No argument.
+`stop_interactor`: A specific command to stop the interactor hence quitting the application. No argument.
 
 `reset_camera`: A specific command to reset the camera to its original location. No argument.
 

@@ -68,7 +68,7 @@ The following options <b> cannot </b> be set via config file:
 The following options <b>are only taken on the first load</b>:
 `no-render`, `output`, `position`, `resolution`, `frame-rate` and all testing options.
 
-Turn off boolean options from the command line when needed, eg: `--point-sprites=false`.
+Turn off boolean options from the command-line when needed, eg: `--point-sprites=false`.
 
 ### Imperative options
 
@@ -135,7 +135,7 @@ In the first config block, we define bindings for all files. It also replaces an
 interaction on the `Any+3` bind and defines a binding that has multiple commands using a json array
 on the `Ctrl+O` bind.
 
-This configuration feature is available only through config file and not through the command line.
+This configuration feature is available only through config file and not through the command-line.
 Check your current binding configuration by using the `--list-bindings` CLI option.
 
 ### Bind

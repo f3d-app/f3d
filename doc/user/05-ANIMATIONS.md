@@ -10,7 +10,7 @@ This specific example uses the [InterpolationTest.glb animation file](https://gi
 
 <img width="1024" alt="F3D window showing the InterpolationTest animation file" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_0.png" />
 
-Load the example animation file from the command line: `f3d InterpolationTest.glb`
+Load the example animation file from the command-line: `f3d InterpolationTest.glb`
 
 <img width="1024" alt="F3D Cheatsheet showing the current animation name" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_1.png" />
 To view the current animation name, press <kbd>H</kbd> to open the Cheatsheet.
@@ -29,7 +29,7 @@ Press <kbd>Space</kbd> to play or pause the current animation.
 
 ## Command-line options
 
-Control F3D animation behavior from the command line with these options.
+Control F3D animation behavior from the command-line with these options.
 
 | Options                      | Default             | Description                                          |
 | ---------------------------- | ------------------- | ---------------------------------------------------- |
@@ -124,7 +124,7 @@ This includes `--animation-time`, which first loads the initial time before load
 The [supported file formats](02-SUPPORTED_FORMATS.md) page lists the animation support level for each reader.
 
 - NONE: Animation is not supported, either by the file format or the implementation.
-- UNIQUE: No more than one animation exists.
+- UNIQUE: The file format or the F3D implementation supports at most one animation, whatever file is loaded.
 - SINGLE: Multiple animations can exist, but F3D selects only one at a time.
 - MULTI: F3D can select multiple animations at a time.
 

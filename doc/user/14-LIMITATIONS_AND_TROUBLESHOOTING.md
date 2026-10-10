@@ -29,20 +29,6 @@ ABC file formats rely on [Alembic](https://github.com/alembic/alembic) library. 
 - Does not support Subdivision Meshes.
 - Does not support Materials.
 
-### USD
-
-USD file formats rely on [OpenUSD](https://github.com/PixarAnimationStudios/OpenUSD) library. They have some known limitations:
-
-- Skinning is slow and baked on the CPU.
-- Does not support Face-varying attributes.
-- The `usd` plugin is not shipped in the Python wheels yet.
-
-### VDB
-
-VDB file formats rely on [OpenVDB](https://github.com/AcademySoftwareFoundation/openvdb) and VTK libraries. They have some known limitations:
-
-- The `vdb` plugin is not shipped in the Python wheels yet.
-
 ### OpenCASCADE
 
 STEP, IGES, BREP, XBF and FCStd file formats rely on [OpenCASCADE](https://github.com/Open-Cascade-SAS/OCCT) library. It comes with some known limitations:
@@ -168,10 +154,6 @@ xattr -cr /Applications/F3D.app
 Then F3D should work as expected.
 
 ### Python
-
-> I can't find `usd` and `vdb` plugins after installing f3d with pip
-
-The `usd` and `vdb` plugins are not shipped in the Python wheels for now. You can compile F3D yourself with them.
 
 > Raytracing does not work after installing f3d with pip
 

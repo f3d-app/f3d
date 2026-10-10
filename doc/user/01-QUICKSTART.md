@@ -29,7 +29,7 @@ Optionally, save the rendering into an image file:
 f3d /path/to/file.ext --output=/path/to/img.png
 ```
 
-If you need help, specify the [`--help` option](03-OPTIONS.md):
+If you need help, specify the [`--help` option](https://f3d.app/docs/next/user/OPTIONS#--help):
 
 ```bash
 f3d --help
@@ -94,7 +94,7 @@ F3D can play [animations](05-ANIMATIONS.md) for any [supported files](02-SUPPORT
 
 With your file loaded in F3D, press the <kbd>W</kbd> hotkey to cycle through available animations. Then press <kbd>Space</kbd> to play your selected animation.
 
-Alternatively, use the command line to play animations. Use the `--animation-indices` [command-line option](03-OPTIONS.md) to specify which animation to play. To play all animations at once, use `--animation-indices=-1`.
+Alternatively, use the command-line to play animations. Use the `--animation-indices` [command-line option](03-OPTIONS.md) to specify which animation to play. To play all animations at once, use `--animation-indices=-1`.
 
 For more information, see the [Animations](05-ANIMATIONS.md) page.
 

@@ -44,33 +44,33 @@ See the [coloring cycle](#cycle-coloring) section for more info.
 Toggle or cycle other options directly with these hotkeys:
 
 - <kbd>W</kbd>: [cycle animations](05-ANIMATIONS.md#cycle-animations).
-- <kbd>B</kbd>: display the Scalar bar, only when coloring and not using direct scalars.
-- <kbd>V</kbd>: toggle Volume rendering, which forces coloring.
-- <kbd>I</kbd>: toggle Inverse volume opacity during volume rendering.
-- <kbd>O</kbd>: cycle Point sprites.
-- <kbd>P</kbd>: cycle the Blending mode for translucency support.
-- <kbd>Q</kbd>: toggle Ambient occlusion.
+- <kbd>B</kbd>: display the scalar bar, only when coloring and not using direct scalars.
+- <kbd>V</kbd>: toggle volume rendering, which forces coloring.
+- <kbd>I</kbd>: toggle inverse volume opacity during volume rendering.
+- <kbd>O</kbd>: cycle point sprites.
+- <kbd>P</kbd>: cycle the blending mode for translucency support.
+- <kbd>Q</kbd>: toggle ambient occlusion.
 - <kbd>T</kbd>: toggle tone mapping.
 - <kbd>E</kbd>: toggle edges display.
 - <kbd>X</kbd>: toggle axes display.
 - <kbd>G</kbd>: toggle grid display.
 - <kbd>Shift</kbd>+<kbd>X</kbd>: toggle axes grid display.
-- <kbd>N</kbd>: toggle Filename.
+- <kbd>N</kbd>: toggle filename.
 - <kbd>Shift</kbd>+<kbd>N</kbd>: toggle HDRI filename.
-- <kbd>M</kbd>: toggle Metadata, if it exists.
-- <kbd>Shift</kbd>+<kbd>H</kbd>: toggle Scene hierarchy.
-- <kbd>Z</kbd>: toggle FPS Counter.
-- <kbd>R</kbd>: toggle Raytracing rendering.
-- <kbd>D</kbd>: toggle Denoising when raytracing.
-- <kbd>U</kbd>: toggle Blur background, useful with an HDRI skybox.
-- <kbd>K</kbd>: cycle Interaction style.
+- <kbd>M</kbd>: toggle metadata, if it exists.
+- <kbd>Shift</kbd>+<kbd>H</kbd>: toggle scene hierarchy.
+- <kbd>Z</kbd>: toggle FPS counter.
+- <kbd>R</kbd>: toggle raytracing rendering.
+- <kbd>D</kbd>: toggle denoising when raytracing.
+- <kbd>U</kbd>: toggle blur background, useful with an HDRI skybox.
+- <kbd>K</kbd>: cycle interaction style.
 - <kbd>F</kbd>: toggle HDRI ambient lighting.
 - <kbd>J</kbd>: toggle HDRI skybox.
 - <kbd>L</kbd>: increase lights intensity.
 - <kbd>Shift</kbd>+<kbd>L</kbd>: decrease lights intensity.
 - <kbd>Ctrl</kbd>+<kbd>P</kbd>: increase opacity.
 - <kbd>Shift</kbd>+<kbd>P</kbd>: decrease opacity.
-- <kbd>Shift</kbd>+<kbd>A</kbd>: toggle Armature.
+- <kbd>Shift</kbd>+<kbd>A</kbd>: toggle armature.
 
 Raytracing hotkeys are only available if F3D is build with raytracing enabled.
 
