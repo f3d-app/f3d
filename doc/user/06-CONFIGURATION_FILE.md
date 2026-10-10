@@ -126,7 +126,7 @@ A typical config file with bindings looks like this:
 ```
 
 Here, the first block defines new bindings for all files.
-It even replaces an existing default [interaction](04-INTERACTIONS.md) on the `O` key with its own.
+It even replaces an existing default [interaction](04-INTERACTIONS.md) on the <kbd>O</kbd> key with its own.
 Each bind associates to the [command](07-COMMANDS.md) to execute when it is pressed.
 
 The second block defines new bindings for files ending in `.vtu`, and these bindings
