@@ -3330,7 +3330,7 @@ void F3DStarter::AddCommands()
         f3d::options& options = this->Internals->Engine->getOptions();
         options.render.hdri.file = f3d::utils::collapsePath(files[0]);
         options.render.hdri.ambient = true;
-        options.render.background.skybox = true;
+        options.render.background.skybox = "enabled";
 
         // Rendering now is needed for correct lighting
         this->Render();
@@ -3355,7 +3355,7 @@ void F3DStarter::AddCommands()
           f3d::options& options = this->Internals->Engine->getOptions();
           options.render.hdri.file = f3d::utils::collapsePath(file);
           options.render.hdri.ambient = true;
-          options.render.background.skybox = true;
+          options.render.background.skybox = "enabled";
 
           // Rendering now is needed for correct lighting
           this->Render();

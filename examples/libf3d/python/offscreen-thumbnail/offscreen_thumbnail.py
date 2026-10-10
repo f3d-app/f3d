@@ -31,7 +31,7 @@ def main(argv: list[str] | None = None):
 
     # Neutral background, no grid or skybox
     opt["render.grid.enable"] = False
-    opt["render.background.skybox"] = False
+    opt["render.background.skybox"] = "disabled"
     opt["render.background.color"] = [0.15, 0.15, 0.15]  # dark neutral gray
 
     # Slightly stronger lighting so assets read well at small sizes

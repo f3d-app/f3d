@@ -235,9 +235,9 @@ int TestSDKOptionsDomains([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   test("model.scivis.discretization max", opt.domains.model.scivis.discretization.max, 1024);
   test("model.scivis.discretization increment", opt.domains.model.scivis.discretization.increment, 5);
 
-  test("render.background.blur.coc min", opt.domains.render.background.blur.coc.min, 0.);
-  test("render.background.blur.coc max", opt.domains.render.background.blur.coc.max, 100.);
-  test("render.background.blur.coc increment", opt.domains.render.background.blur.coc.increment, 5.);
+  test("render.background.blur_coc min", opt.domains.render.background.blur_coc.min, 0.);
+  test("render.background.blur_coc max", opt.domains.render.background.blur_coc.max, 100.);
+  test("render.background.blur_coc increment", opt.domains.render.background.blur_coc.increment, 5.);
 
   test("render.light.intensity min", opt.domains.render.light.intensity.min, 0.);
   test("render.light.intensity max", opt.domains.render.light.intensity.max, 5.);

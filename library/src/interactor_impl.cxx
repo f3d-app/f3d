@@ -1353,31 +1353,6 @@ interactor& interactor_impl::initCommands()
     },
     command_documentation_t{ "cycle_verbose_level", "cycle between verbose levels" });
 
-  this->addCommand(
-    "cycle_skybox_mode",
-    [&](const std::vector<std::string>&)
-    {
-      // cycle between no skybox, skybox, and blurred skybox
-      if (!this->Internals->Options.render.background.skybox)
-      {
-        this->Internals->Options.render.background.skybox = true;
-        this->Internals->Options.render.background.blur.enable = false;
-      }
-      else
-      {
-        if (this->Internals->Options.render.background.blur.enable)
-        {
-          this->Internals->Options.render.background.skybox = false;
-          this->Internals->Options.render.background.blur.enable = false;
-        }
-        else
-        {
-          this->Internals->Options.render.background.blur.enable = true;
-        }
-      }
-    },
-    command_documentation_t{ "cycle_skybox_mode", "cycle through different skybox modes" });
-
   // XXX: Basic statefile commands, F3DStarter overrides them to also handle its file groups,
   // filename templating and file dialogs
   this->addCommand(
@@ -1704,15 +1679,6 @@ interactor& interactor_impl::initBindings()
       "Verbose level", this->Internals->VerboseLevelToString(log::getVerboseLevel()));
   };
 
-  // "cycle skybox mode", "enabled/blurred/disabled"
-  auto docSkybox = [&]()
-  {
-    return std::pair("Skybox mode",
-      this->Internals->Options.render.background.skybox
-        ? (this->Internals->Options.render.background.blur.enable ? "blurred" : "enabled")
-        : "disabled");
-  };
-
   // clang-format off
   this->addBinding(BindingParam{.Bind = {mod_t::NONE, "W"}, .Commands = {"cycle_animation"}, .Group = "Scene", .DocCallback = docAnim, .Type = f3d::interactor::BindingType::CYCLIC });
   this->addBinding(BindingParam{.Bind = {mod_t::NONE, "S"}, .Commands = {"cycle_coloring mode"}, .Group = "Scene", .DocCallback = docMode, .Type = f3d::interactor::BindingType::CYCLIC});
@@ -1740,7 +1706,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({.Bind = {mod_t::NONE, "O"}, .Commands = {"cycle model.point_sprites.type"},.Group = "Scene", .DocCallback = std::bind(docStr, "Point sprites", std::cref(opts.model.point_sprites.type)), .Type = f3d::interactor::BindingType::CYCLIC});
   this->addBinding({.Bind = {mod_t::NONE, "K"}, .Commands = {"cycle interactor.style"},.Group = "Scene", .DocCallback = std::bind(docStr, "Interaction style", std::cref(opts.interactor.style)), .Type = f3d::interactor::BindingType::CYCLIC});
   this->addBinding({.Bind = {mod_t::NONE, "F"}, .Commands = {"toggle render.hdri.ambient"},.Group = "Scene", .DocCallback = std::bind(docTgl, "HDRI ambient lighting", std::cref(opts.render.hdri.ambient)), .Type = f3d::interactor::BindingType::TOGGLE});
-  this->addBinding({.Bind = {mod_t::NONE, "J"}, .Commands = {"cycle_skybox_mode"},.Group = "Scene", .DocCallback = docSkybox, .Type = f3d::interactor::BindingType::CYCLIC});
+  this->addBinding({.Bind = {mod_t::NONE, "J"}, .Commands = {"cycle render.skybox"},.Group = "Scene", .DocCallback = std::bind(docStr, "Skybox mode", std::cref(opts.render.background.skybox)), .Type = f3d::interactor::BindingType::CYCLIC});
   this->addBinding({.Bind = {mod_t::NONE, "L"}, .Commands = {"increase render.light.intensity"}, .Group = "Scene", .DocCallback = std::bind(docDbl, "Increase lights intensity", std::cref(opts.render.light.intensity)), .Type = f3d::interactor::BindingType::NUMERICAL});
   this->addBinding({.Bind = {mod_t::SHIFT, "L"}, .Commands = {"decrease render.light.intensity"}, .Group = "Scene", .DocCallback = std::bind(docDbl, "Decrease lights intensity", std::cref(opts.render.light.intensity)), .Type = f3d::interactor::BindingType::NUMERICAL});
   this->addBinding({.Bind = {mod_t::CTRL, "P"}, .Commands = {"increase model.color.opacity"}, .Group = "Scene", .DocCallback = std::bind(docDblOpt, "Increase opacity", std::cref(opts.model.color.opacity)), .Type = f3d::interactor::BindingType::NUMERICAL});
