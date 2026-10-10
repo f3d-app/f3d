@@ -676,10 +676,13 @@ Ignored if `--hdri-skybox` is enabled.
 ### `--resolution=<width,height>` (_vector\<double\>_, default: `1000, 600`)
 
 Set the _window resolution_. When closing an interactive window, its resolution is remembered in a [cache file](#caches), and restored on the next start, unless it is set in a configuration file, a statefile or on the command line. Rendering to a file with `--output` or `--reference` is unaffected.
+To always start with the same window size, set it in a [configuration file](06-CONFIGURATION_FILE.md), eg: `"resolution": "1280,720"`. It is only applied on the first load.
 
 ### `--position=<x,y>` (_vector\<double\>_)
 
 Set the _window position_ (top left corner) , in pixels, starting from the top left of your screens. When closing an interactive window, its position is remembered in a [cache file](#caches), and restored on the next start, unless it is set in a configuration file, a statefile or on the command line. Rendering to a file with `--output` or `--reference` is unaffected.
+To always start with the same window position, set it in a [configuration file](06-CONFIGURATION_FILE.md), eg: `"position": "100,50"`. It is only applied on the first load.
+To save and restore a whole session, including loaded files and the camera, use [statefiles](#statefiles).
 
 ### `-z`, `--fps` (_bool_, default: `false`)
 
