@@ -17,7 +17,7 @@ FBX, DAE, OFF, DXF, X, 3MF and AMF file formats rely on [Assimp](https://github.
 - PBR materials are not supported for FBX file format.
 - Some files can be empty, crash, or show artifacts.
 - DXF support is very limited: F3D displays only files with polylines and 3D faces.
-- 3MF files may crash at exit (issue in Assimp: https://github.com/assimp/assimp/issues/5328)
+- 3MF files may crash at exit ([Assimp issue #5328](https://github.com/assimp/assimp/issues/5328))
 - They support only RBGA 8-bits embedded textures.
 
 ### Alembic

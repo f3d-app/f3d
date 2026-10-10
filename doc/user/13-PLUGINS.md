@@ -32,7 +32,7 @@ multiple plugins in a single comma-separated list, like in the example below:
 F3D supports loading plugins and contains the following plugins:
 `native`, `alembic`, `assimp`, `draco`, `hdf`, `occt`, `pdal`, `usd`, `vdb`, `webifc`.
 
-See [the format list](02-SUPPORTED_FORMATS.md) for more details.
+See the [supported file formats](02-SUPPORTED_FORMATS.md) page for more details.
 
 > [!NOTE]
 > The `native` plugin is always loaded automatically.
@@ -65,4 +65,4 @@ F3D searches for plugins in this order:
 
 You can also try plugins maintained by the community. If you have created a plugin and want it listed here, submit a pull request.
 
-- **Abaqus**: ODB support by @YangShen398 ([repository](https://github.com/YangShen398/F3D-ODB-Reader-Plugin))
+- **Abaqus**: ODB support by @YangShen398 ([F3D ODB Reader Plugin repository](https://github.com/YangShen398/F3D-ODB-Reader-Plugin))
