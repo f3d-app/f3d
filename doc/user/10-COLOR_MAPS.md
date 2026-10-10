@@ -52,6 +52,6 @@ F3D supports these image formats as color maps:
 
 ## Custom values
 
-Alternatively, set values manually using the `--colormap` option with a dedicated [parsing](08-PARSING.md#colormap).
+Alternatively, set values manually using the `--colormap` option with the dedicated [colormap parsing](08-PARSING.md#colormap) syntax.
 For example, the default value corresponds to the `hot` preset. Define it manually with `--colormap=0.0,rgb(0,0,0),0.4,rgb(230,0,0),0.8,rgb(230,230,0),1.0,rgb(255,255,255)`.
 It consists of 4 pairs of increasing scalar values ranging from 0 to 1, and corresponding colors. F3D interpolates values in between.

@@ -32,7 +32,7 @@ libf3d provides a few commands, many related to manipulating libf3d (options)[..
 `cycle_animation`: A specific command to cycle `scene.animation.indices` option using model information. No argument.
 
 `cycle_coloring mode/array/component`: A specific command to manipulate coloring options using model information.
-Supports `mode`, `array` or `component` arguments, see [documentation](04-INTERACTIONS.md#cycle-coloring).
+Supports `mode`, `array` or `component` arguments, see [cycle coloring interactions](04-INTERACTIONS.md#cycle-coloring).
 eg: `cycle_coloring array`.
 
 `roll_camera value`: A specific command to roll the camera on its side, takes an angle in degrees as an argument.
@@ -242,4 +242,4 @@ Command syntax is similar to bash: commands are split by token before processing
 - F3D processes other escaped character as if the escape was not present, eg: `set scene.up_direction +\Z`
 - Unfinished quoted section is invalid, eg: `set scene.up_direction "+Z`
 - A escape at the end is also invalid, eg: `set scene.up_direction +Z\`
-- Options values are [parsed](08-PARSING.md) according to their types.
+- Option values follow the [option parsing rules](08-PARSING.md).

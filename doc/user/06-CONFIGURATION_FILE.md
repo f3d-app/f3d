@@ -2,7 +2,7 @@
 
 ## Options
 
-You can control almost all command-line [options](03-OPTIONS.md) using configuration files.
+You can control almost all [command-line options](03-OPTIONS.md) using configuration files.
 Configuration files use the "long" version of the command-line options in a JSON
 formatted file to provide values for these options. You can also use
 the [libf3d options](../libf3d/03-OPTIONS.md) syntax.
@@ -244,7 +244,7 @@ For thumbnails, replace `config` by `thumbnail`, as the `f3d` command receives t
 - Windows: `[install_dir]\share\f3d\configs\(config.json,.d)`, `%APPDATA%\f3d\(config.json,.d)`
 - macOS: `/usr/local/etc/f3d/config(.json,.d)`, `f3d.app/Contents/Resources/configs/config(.json,.d)`, `${HOME}/Library/Application Support/f3d/config(.json,.d)`
 
-On Linux, `XDG_CONFIG_HOME` implementation can fallback on `HOME` environment variables as specified [here](https://specifications.freedesktop.org/basedir/latest/).
+On Linux, `XDG_CONFIG_HOME` implementation can fallback on `HOME` environment variables as specified by the [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir/latest/).
 
 The binary release installs the default config directory.
 On Linux, it installs files in `[install_dir]/share/f3d/configs/`. On Windows, it installs files in `[install_dir]\share\f3d\configs\`. On macOS, it installs files in the bundle.
