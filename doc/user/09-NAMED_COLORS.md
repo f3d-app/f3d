@@ -1,8 +1,8 @@
 # Named colors
 
-When colors are [parsed](./08-PARSING.md#color), it's possible to use predefined named colors.
+When colors are [parsed](./08-PARSING.md#color), you can use predefined named colors.
 
-The list of colors that can be used in F3D is given below and is separated in four categories:
+The list below separates F3D named colors into four categories:
 
 - [F3D colors](#f3d-colors) listing the color palette used in F3D
 - [Web colors](#web-colors) listing the basic and extended of standard [HTML colors](https://en.wikipedia.org/wiki/Web_colors)
@@ -27,7 +27,7 @@ The following table shows the 7 colors defining F3D palette.
 
 ## Web colors
 
-The following tables shows all the basic and extended colors of the standard [web colors](https://en.wikipedia.org/wiki/Web_colors).
+The following tables show all the basic and extended colors of the standard [web colors](https://en.wikipedia.org/wiki/Web_colors).
 The list is split by color tone.
 
 ### Red colors
@@ -133,7 +133,7 @@ The list is split by color tone.
 | DarkCyan          | rgb(0, 139, 139)   |
 | Teal              | rgb(0, 128, 128)   |
 
-### Blue/Cyan colors
+### Blue/cyan colors
 
 | Name            | RGB                |
 | --------------- | ------------------ |
