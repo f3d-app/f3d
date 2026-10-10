@@ -376,7 +376,6 @@ Set font color. Defaults to #F4F4F4(F3DWhite).
 ### `--dpi-aware` (_bool_, default: `false`)
 
 Scale the _font scale_ and _resolution_ by the display scaling factor.
-Only supported on Windows platform.
 
 ### `--command-script=<command script>` (_script_)
 

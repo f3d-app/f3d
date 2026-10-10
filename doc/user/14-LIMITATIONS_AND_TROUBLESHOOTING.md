@@ -8,7 +8,6 @@ This is a non exhaustive list of F3D limitations:
 - Drag and drop interaction cannot be recorded or played back.
 - Volume rendering and HDRI support require a decent GPU.
 - Streaming requires different VTK versions depending upon the format to read.
-- The `ui.dpi_aware` option and CLI `--dpi-aware` are only supported on Windows platform.
 
 ### Assimp
 
