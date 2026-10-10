@@ -49,10 +49,6 @@ STEP, IGES, BREP, XBF and FCStd file formats rely on [OpenCASCADE](https://githu
 
 - With OpenCASCADE 7.9 and above, BREP shapes containing a number longer than 31 characters cannot be read and are skipped. FreeCAD writes such numbers for infinite lines, in FCStd files (issue in OpenCASCADE: https://github.com/Open-Cascade-SAS/OCCT/issues/1560)
 
-### Gaussian splatting
-
-Gaussian splatting (option `--point-sprites=gaussian`) needs depth sorting, which F3D does internally using a compute shader. This requires support for OpenGL 4.3, which is not supported by macOS and old GPUs/drivers.
-
 ## Troubleshooting
 
 ### General
