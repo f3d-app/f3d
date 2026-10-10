@@ -19,24 +19,24 @@ After installing F3D, open a file in one of these ways:
 
 To run F3D from the terminal, open your file with:
 
-```
+```bash
 f3d /path/to/file.ext
 ```
 
 Optionally, save the rendering into an image file:
 
-```
+```bash
 f3d /path/to/file.ext --output=/path/to/img.png
 ```
 
 If you need help, specify the `--help` [option](03-OPTIONS.md):
 
-```
+```bash
 f3d --help
 man f3d # Linux only
 ```
 
-After opening your file in F3D, press <kbd>H</kbd> to open a list of shortcuts.
+After opening your file in F3D, press <kbd>H</kbd> to open the Cheatsheet.
 
 See the [supported file formats](02-SUPPORTED_FORMATS.md) page for the full list of file formats that F3D can open.
 
@@ -79,7 +79,7 @@ After loading your scene in F3D, interact with it using your mouse and hotkeys.
 - Press <kbd>Enter</kbd> to reset the camera.
 - Press <kbd>Space</kbd> to play animation, if any.
 - Press <kbd>G</kbd> to toggle the horizontal grid.
-- Press <kbd>H</kbd> to display a cheatsheet of hotkey interactions.
+- Press <kbd>H</kbd> to display the Cheatsheet.
 
 For more information, see the [Interactions](04-INTERACTIONS.md) page.
 

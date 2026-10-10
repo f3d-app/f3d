@@ -151,7 +151,7 @@ Supported modifiers are:
 - `Any` : A special modifier that does not consider modifiers keys but can only be reached
   if there is no bind with the same interaction.
 
-On macOS, define bindings in configuration files using `Ctrl` and `Ctrl+Shift`. F3D maps them to `Cmd` and `Cmd+Shift` respectively. The cheatsheet displays the correct binding combination regardless.
+On macOS, define bindings in configuration files using `Ctrl` and `Ctrl+Shift`. F3D maps them to `Cmd` and `Cmd+Shift` respectively. The Cheatsheet displays the correct binding combination regardless.
 
 Supported interactions are legion, eg:
 
@@ -169,7 +169,7 @@ Supported interactions are legion, eg:
 
 To identify the interaction to use, run `f3d --verbose` and perform the interaction. F3D logs it like this:
 
-```
+```text
 Interaction: KeyPress Ctrl+Shift+Insert
 ```
 
@@ -256,7 +256,7 @@ When you specify an absolute or relative path for the configuration file, F3D re
 
 To check which config file is found and used, check the verbose output, eg. for thumbnails config: `f3d --config=thumbnail --verbose` (or `f3d-console.exe --config=thumbnail --verbose` on Windows) :
 
-```
+```text
 ========== Initializing Options ==========
 Found available config path
 Candidate config file not found: "/etc/f3d/thumbnail.json"
