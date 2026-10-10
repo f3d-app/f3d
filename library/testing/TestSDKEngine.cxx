@@ -60,6 +60,12 @@ int TestSDKEngine([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   eng0.setCachePath(cachePath);
   test("get cache path using f3d::engine::getCachePath()", eng0.getCachePath().string(), cachePath);
 
+  // Test resource path
+  const std::string resourcePath = std::string(argv[2]) + "engine_resources";
+  eng0.setResourcesPath(resourcePath);
+  test("get resource path using f3d::engine::getResourcePath()", eng0.getResourcesPath().string(),
+    resourcePath);
+
   // Test static information methods
   auto libInfo = f3d::engine::getLibInfo();
   test("check libInfo output", libInfo.License, "BSD-3-Clause"s);

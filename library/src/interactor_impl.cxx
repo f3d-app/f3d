@@ -36,6 +36,11 @@
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
+#ifdef F3D_MODULE_OPENXR
+#include <vtkOpenXRRenderWindow.h>
+#include <vtkOpenXRRenderWindowInteractor.h>
+#endif
+
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -81,8 +86,14 @@ public:
     , Interactor(inter)
   {
     const window::Type type = window.getType();
-    if (type == window::Type::GLX || type == window::Type::WGL || type == window::Type::COCOA ||
-      type == window::Type::WASM)
+    if (type == window::Type::XR)
+    {
+#ifdef F3D_MODULE_OPENXR
+      this->VTKInteractor = vtkSmartPointer<vtkOpenXRRenderWindowInteractor>::New();
+#endif
+    }
+    else if (type == window::Type::GLX || type == window::Type::WGL ||
+      type == window::Type::COCOA || type == window::Type::WASM)
     {
       this->VTKInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
     }
@@ -2112,6 +2123,21 @@ interactor& interactor_impl::requestStop()
   this->Internals->StopRequested = true;
   return *this;
 }
+
+//----------------------------------------------------------------------------
+// OpenXR not tested yet
+// LCOV_EXCL_START
+void interactor_impl::SetXRResourcesDirectory(const std::string& actionsManifestDirectory)
+{
+#if F3D_MODULE_OPENXR
+  vtkOpenXRRenderWindowInteractor* xrInteractor =
+    vtkOpenXRRenderWindowInteractor::SafeDownCast(this->Internals->VTKInteractor);
+  xrInteractor->SetActionManifestDirectory(actionsManifestDirectory);
+#else
+  (void)actionsManifestDirectory; // do nothing if OpenXR is not enabled
+#endif
+}
+// LCOV_EXCL_STOP
 
 //----------------------------------------------------------------------------
 void interactor_impl::SetInteractorOn(vtkInteractorObserver* observer)
