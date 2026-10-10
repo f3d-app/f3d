@@ -15,12 +15,12 @@
 #ifndef vtkF3DRenderPass_h
 #define vtkF3DRenderPass_h
 
+#include "vtkF3DPreserveCameraFramebufferPass.h"
+
 #include <vtkOpenGLQuadHelper.h>
 #include <vtkOpenGLRenderPass.h>
 #include <vtkSmartPointer.h>
 #include <vtkTimeStamp.h>
-
-#include "vtkF3DPreserveCameraFramebufferPass.h"
 
 #include <memory>
 #include <vector>

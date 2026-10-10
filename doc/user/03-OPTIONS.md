@@ -128,7 +128,7 @@ Filename to save [screenshots](04-INTERACTIONS.md#taking-screenshots) to. Can us
 
 ### `--rendering-backend=<auto|egl|osmesa|glx|xr|wgl>` (_string_, default: `auto`)
 
-Rendering backend to load, `auto` means to let F3D pick the correct one for you depending on your system capabilities. Use `egl` or `osmesa` to force headless rendering. Use `rendering-backend=xr` to specify F3D should use the xr rendering backend, referred in this doc as "XR mode". [See how to use F3D in XR mode](../dev/07-TOOLING.md#how-to-use-f3d-in-xr-mode).
+Rendering backend to load, `auto` means to let F3D pick the correct one for you depending on your system capabilities. Use `egl` or `osmesa` to force headless rendering. Use `rendering-backend=xr` to specify F3D should use the xr rendering backend, referred in this doc as "XR mode".
 
 ### `-D`, `--define=<libf3d.option=value>` (_special_)
 
