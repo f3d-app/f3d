@@ -7,9 +7,9 @@ Configuration files use the "long" version of the command-line options in a JSON
 formatted file to provide values for these options. You can also use
 the [libf3d options](../libf3d/03-OPTIONS.md) syntax.
 
-Organize these options by block using a regular expression, glob, or exact match
-for each block to provide different default values for the different file formats. For
-more on glob and exact matching see the [Glob and exact matching section](#glob-and-exact-matching).
+Each configuration file is a JSON array of blocks. Each block can define `options`, `bindings`, and an optional `match` rule.
+Use a regular expression, glob, or exact match for each block to provide different default values for different file formats.
+For more on glob and exact matching see the [Glob and exact matching section](#glob-and-exact-matching).
 
 A command-line option overrides similar options set in any config files.
 
@@ -97,7 +97,7 @@ In the above example, F3D always turns on the axis when loading or reloading a f
 
 Configure all interaction bindings using configuration files.
 The logic is the same as with options: configuration blocks apply depending on the filename being loaded using regular expression.
-Add a `bindings` block to specify associations between binds (eg : `Ctrl+O`) and one or multiple commands.
+Add a `bindings` block to associate binds (e.g `Ctrl+O`) with one or multiple commands.
 
 A typical config file with bindings looks like this:
 
