@@ -66,3 +66,4 @@ F3D searches for plugins in this order:
 You can also try plugins maintained by the community. If you have created a plugin and want it listed here, submit a pull request.
 
 - **Abaqus**: ODB support by @YangShen398 ([F3D ODB Reader Plugin repository](https://github.com/YangShen398/F3D-ODB-Reader-Plugin))
+- **Davilex**: Davilex file format support ([f3d-davilex repository](https://github.com/Davilex-Reverse-Engineering/f3d-davilex))
