@@ -18,7 +18,7 @@ f3d_test(NAME TestInteractionCycleBlending DATA suzanne.ply ARGS --opacity=0.8 I
 f3d_test(NAME TestInteractionVolumeCycle DATA waveletArrays.vti ARGS INTERACTION) #VSS
 f3d_test(NAME TestInteractionVolumeAfterColoring DATA waveletArrays.vti ARGS INTERACTION) #SYV
 f3d_test(NAME TestInteractionCorrectCameraForVolumeSwitch ARGS --no-config -v DATA dragon.vtu INTERACTION UI) #v
-f3d_test(NAME TestInteractionMultiFileVolume DATA multi ARGS -b --multi-file-mode=all INTERACTION LONG_TIMEOUT) #SYVB
+f3d_test(NAME TestInteractionMultiFileVolume DATA multi ARGS -b --multi-file-mode=all INTERACTION LONG_TIMEOUT) #SYV
 f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-sprites-size=20 INTERACTION) #O
 f3d_test(NAME TestInteractionDirectory DATA mb INTERACTION ARGS --coloring-mode=scivis) #Down;Down;Down;Up;F5;
 f3d_test(NAME TestInteractionDirectoryLoop DATA mb/recursive INTERACTION ARGS --coloring-mode=scivis --filename UI) #Up;Up;Up;Up;Up;
@@ -32,7 +32,7 @@ f3d_test(NAME TestInteractionCycleVerbose DATA dragon.vtu ARGS --verbose -s NO_B
 f3d_test(NAME TestInteractionCycleVerboseLevelsUsingBinding DATA dragon.vtu ARGS --verbose=info NO_BASELINE INTERACTION REGEXP "Verbose level changed to: Debug") #Shift+V;Shift+V;Shift+V;Shift+V;Shift+V
 f3d_test(NAME TestInteractionVerboseLevelPreservedOnReload DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Material") #Shift+V;Shift+V;Shift+V;Shift+V;F5
 f3d_test(NAME TestInteractionLightIntensity DATA dragon.vtu INTERACTION LONG_TIMEOUT)
-f3d_test(NAME TestInteractionMultiFileColoring DATA mb/recursive ARGS -b --multi-file-mode=all INTERACTION) #SYYB
+f3d_test(NAME TestInteractionMultiFileColoring DATA mb/recursive ARGS -b --multi-file-mode=all INTERACTION) #SYY
 f3d_test(NAME TestInteractionOpacity DATA dragon.vtu INTERACTION) # Shift+P * 21; Ctrl+P * 5
 f3d_test(NAME TestInteractionReload DATA dragon.vtu ARGS -e INTERACTION) #F5;
 f3d_test(NAME TestInteractionLoadParentDirectory DATA multi/dragon.vtu ARGS --filename INTERACTION UI) #CTRL+SHIFT+R;
