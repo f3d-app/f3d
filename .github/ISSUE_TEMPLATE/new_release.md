@@ -24,7 +24,7 @@ Release Split :
 
 Release Candidates :
 
-- [ ] Commit, review and merge a `vX.Y.Z-RCN` version change in https://github.com/f3d-app/f3d `CMakeLists.txt`, `pyproject.toml` and `package.json` in the `release` branch
+- [ ] Commit, review and merge a `vX.Y.Z-RCN` version change in https://github.com/f3d-app/f3d `CMakeLists.txt`, `pyproject.toml`, `package.json` and `examples/libf3d/web/package.json` in the `release` branch
 - [ ] Tag and push to https://github.com/f3d-app/f3d: `git tag vX.Y.Z-RCN -m vX.Y.Z-RCN`
 - [ ] Trigger a release build using https://github.com/f3d-app/f3d-superbuild actions with `vX.Y.Z-RCN` F3D version, superbuild `main` branch and prerelease publish `true`
 - [ ] Download the prerelease from https://github.com/f3d-app/f3d/releases
