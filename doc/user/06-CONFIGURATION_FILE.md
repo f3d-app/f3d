@@ -1,4 +1,4 @@
-# Configuration File
+# Configuration file
 
 ## Options
 
@@ -9,7 +9,7 @@ the [libf3d options](../libf3d/03-OPTIONS.md) syntax.
 
 Organize these options by block using a regular expression, glob, or exact match
 for each block to provide different default values for the different filetypes. For
-more on glob and exact matching see the [Glob and Exact Matching section](#glob-and-exact-matching).
+more on glob and exact matching see the [Glob and exact matching section](#glob-and-exact-matching).
 
 A command-line option overrides similar options set in any config files.
 
@@ -70,7 +70,7 @@ The following options <b>are only taken on the first load</b>:
 
 Turn off boolean options from the command line when needed, eg: `--point-sprites=false`.
 
-### Imperative Options
+### Imperative options
 
 Command line options and interactive changes override options that are set in configuration files.
 When a configuration option must override command line options and interactive changes, use an imperative option by adding `!` in front of the option name, eg:
@@ -178,7 +178,7 @@ keyboard layout, eg. on a `QWERTY` layout, the bind `Exclam` is unreachable whil
 F3D default bindings are as keyboard-layout independent as possible, but you can redefine them
 for your needs.
 
-## Glob and Exact Matching
+## Glob and exact matching
 
 While regex is the default match type, glob and exact match types are also supported. Below is an example using glob and exact matching.
 

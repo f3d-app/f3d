@@ -1,4 +1,4 @@
-# Color Maps
+# Color maps
 
 ## Image files
 

@@ -1,4 +1,4 @@
-# Final Shaders
+# Final shaders
 
 Specify a final full screen shader with the option `--final-shader`.
 F3D executes it as the last shader in the rendering pipeline.
@@ -76,7 +76,7 @@ vec4 pixel(vec2 uv)
 }
 ```
 
-### Oscillating Colors
+### Oscillating colors
 
 ```glsl
 vec4 pixel(vec2 uv)
