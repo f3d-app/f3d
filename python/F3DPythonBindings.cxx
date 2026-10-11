@@ -812,7 +812,9 @@ PYBIND11_MODULE(pyf3d, module)
     .def(py::init<>())
     .def("get_time_range", &f3d::mesh_view::getTimeRange)
     .def("get_name", &f3d::mesh_view::getName)
-    .def("get_memory_view", &f3d::mesh_view::getMemoryView);
+    .def("get_memory_view", &f3d::mesh_view::getMemoryView,
+      py::arg("time").noconvert() // keep `float` not `SupportsFloat` for subclassing
+    );
 
   // f3d::color_t
   py::class_<f3d::color_t>(module, "Color")
