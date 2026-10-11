@@ -19,8 +19,6 @@ Refer to [CLI options](../03-OPTIONS.md) for more details.
 
 ## Application bindings
 
-### Coloring mode
-
 Some default bindings have changed or removed:
 
 - <kbd>S</kbd> now cycles the coloring mode (`material`/`scivis`/`direct`) instead of cycling the arrays
