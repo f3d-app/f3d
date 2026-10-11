@@ -131,6 +131,7 @@ Filename to save [screenshots](04-INTERACTIONS.md#take-screenshots) to. Can use 
 ### `--rendering-backend=<auto|egl|osmesa|glx|xr|wgl>` (_string_, default: `auto`)
 
 Rendering backend to load, `auto` means to let F3D pick the correct one for you depending on your system capabilities. Use `egl` or `osmesa` to force headless rendering. Use `rendering-backend=xr` to specify F3D should use the xr rendering backend, referred in this doc as "XR mode".
+See [rendering backends](12-DESKTOP_INTEGRATION.md#rendering-backends).
 
 ### `-D`, `--define=<libf3d.option=value>` (_special_)
 
@@ -674,7 +675,8 @@ Ignored if `--hdri-skybox` is enabled.
 
 ### `--resolution=<width,height>` (_vector\<double\>_, default: `1000, 600`)
 
-Set the _window resolution_. When closing an interactive window, its resolution is remembered in a [cache file](#caches), and restored on the next start, unless it is set in a configuration file, a statefile or on the command line. Rendering to a file with `--output` or `--reference` is unaffected. Ignored in XR mode.
+Set the _window resolution_. When closing an interactive window, its resolution is remembered in a [cache file](#caches), and restored on the next start, unless it is set in a configuration file, a statefile or on the command-line. Rendering to a file with `--output` or `--reference` is unaffected. Ignored in XR mode.
+To always start with the same window size, set it in a [configuration file](06-CONFIGURATION_FILE.md), eg: `"resolution": "1280,720"`. It is only applied on the first load.
 
 ### `--position=<x,y>` (_vector\<double\>_)
 

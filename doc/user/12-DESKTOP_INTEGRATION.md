@@ -64,6 +64,7 @@ Specify it using the `--rendering-backend` CLI option.
   - On Linux, check if a X server is running. In that case, F3D uses GLX. Otherwise, it tries to load EGL library and fallback on OSMesa if not available.
   - On Windows, check if the OpenGL driver supports OpenGL 3.2. In that case, F3D uses WGL. Otherwise, it tries to load EGL library and fallback on OSMesa if not available.
   - On macOS, always use COCOA. To use OSMesa, you must use `--rendering-backend=osmesa`.
+- If the system has openxr-runtime installed and configured, you can use: `--rendering-backend=xr` to launch F3D in XR mode.
 
 Use that feature for thumbnail generation whenever needed (e.g., Nautilus or other sandboxing file browser),
 by creating/modifying your [thumbnail config file](06-CONFIGURATION_FILE.md), eg:`~/.config/f3d/thumbnail.json`:
