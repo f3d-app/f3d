@@ -123,7 +123,7 @@ The following hotkeys let you cycle the coloring of the data:
 
 - <kbd>S</kbd>: cycle the coloring modes (material, scivis, direct).
 - <kbd>Y</kbd>: cycle on all arrays on point and cells, visible in scivis and direct mode.
-- <kbd>SHIFT+Y</kbd>: cycle the component available on the currently selected array, visible in scivis and direct mode, including magnitude.
+- <kbd>Shift</kbd>+<kbd>Y</kbd>: cycle the component available on the currently selected array, visible in scivis and direct mode, including magnitude.
 
 When changing the array, F3D keeps the component in use if it is valid with the new array. Otherwise, it cycles until a valid
 component is found.

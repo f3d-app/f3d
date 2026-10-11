@@ -250,7 +250,7 @@ The binary release installs the default config directory.
 On Linux, it installs files in `[install_dir]/share/f3d/configs/`. On Windows, it installs files in `[install_dir]\share\f3d\configs\`. On macOS, it installs files in the bundle.
 
 Use the command-line option to control the configuration file to read. Specify an absolute or relative path for the configuration path, or
-only the filename or filestem (F3D adds `.json` and `.d`) to look for in the locations listed above, , eg: `f3d --config=custom_config` looks
+only the filename or filestem (F3D adds `.json` and `.d`) to look for in the locations listed above, eg: `f3d --config=custom_config` looks
 for `custom_config.json` and `custom_config.d` in locations listed above.
 When you specify an absolute or relative path for the configuration file, F3D reads a single file. Otherwise, F3D reads all files from the locations listed above, with the overriding logic specified above.
 

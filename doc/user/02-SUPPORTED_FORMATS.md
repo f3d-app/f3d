@@ -61,7 +61,7 @@ F3D supports the following file formats:
 
 Streaming support means that F3D can read from stdin when you specify the reader name. See the [piping examples](03-OPTIONS.md#piping).
 
-If a format supports streaming, F3D checks its header content before trying to open it. Use [`--skip-content-check`](https://f3d.app/docs/next/user/OPTIONS#--skip-content-check) to skip this check and rely on the file extension only.
+If a format supports streaming, F3D checks its header content before trying to open it. Use the [`--skip-content-check` option](03-OPTIONS.md) to skip this check and rely on the file extension only.
 
 To get accurate information for your own build of F3D, use the [dedicated option](03-OPTIONS.md), `--list-readers`.
 
@@ -79,23 +79,23 @@ For booleans, 0 means false and any other value means true. Unsigned int interpr
 | `occt`   | `STEP.linear_deflection`    | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
 | `occt`   | `STEP.angular_deflection`   | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
 | `occt`   | `STEP.relative_deflection`  | `bool`         | Control if the deflection values are relative to object size, default is false.      |
-| `occt`   | `STEP.read_wire`            | `bool`         | Control whether lines are read, default is true.                                    |
+| `occt`   | `STEP.read_wire`            | `bool`         | Control whether lines are read, default is true.                                     |
 | `occt`   | `IGES.linear_deflection`    | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
 | `occt`   | `IGES.angular_deflection`   | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
 | `occt`   | `IGES.relative_deflection`  | `bool`         | Control if the deflection values are relative to object size, default is false.      |
-| `occt`   | `IGES.read_wire`            | `bool`         | Control whether lines are read, default is true.                                    |
+| `occt`   | `IGES.read_wire`            | `bool`         | Control whether lines are read, default is true.                                     |
 | `occt`   | `BREP.linear_deflection`    | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
 | `occt`   | `BREP.angular_deflection`   | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
 | `occt`   | `BREP.relative_deflection`  | `bool`         | Control if the deflection values are relative to object size, default is false.      |
-| `occt`   | `BREP.read_wire`            | `bool`         | Control whether lines are read, default is true.                                    |
+| `occt`   | `BREP.read_wire`            | `bool`         | Control whether lines are read, default is true.                                     |
 | `occt`   | `XBF.linear_deflection`     | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
 | `occt`   | `XBF.angular_deflection`    | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
 | `occt`   | `XBF.relative_deflection`   | `bool`         | Control if the deflection values are relative to object size, default is false.      |
-| `occt`   | `XBF.read_wire`             | `bool`         | Control whether lines are read, default is true.                                    |
+| `occt`   | `XBF.read_wire`             | `bool`         | Control whether lines are read, default is true.                                     |
 | `occt`   | `FCStd.linear_deflection`   | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
 | `occt`   | `FCStd.angular_deflection`  | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
 | `occt`   | `FCStd.relative_deflection` | `bool`         | Control if the deflection values are relative to object size, default is false.      |
-| `occt`   | `FCStd.read_wire`           | `bool`         | Control whether lines are read, default is true.                                    |
+| `occt`   | `FCStd.read_wire`           | `bool`         | Control whether lines are read, default is true.                                     |
 | `usd`    | `USD.resources_path`        | `string`       | Additional path to find USD plugInfo.json resources                                  |
 | `usd`    | `USD.subdivision_level`     | `unsigned int` | Specify the subdivision level to apply when specified. Default is 0 (no subdivision) |
 | `vdb`    | `VDB.downsampling_factor`   | `double`       | Control the level of downsampling when reading a volume, default is 0.1.             |
