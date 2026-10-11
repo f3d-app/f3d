@@ -413,7 +413,7 @@ jobs:
             python_version: "3.14"
             optdeps_label: no-optdeps
           - os: ubuntu-24.04
-            python_version: "3.15"
+            python_version: "3.15.0-rc.3"
             optdeps_label: no-optdeps
 
     runs-on: ${{matrix.os}}
