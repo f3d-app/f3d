@@ -1,0 +1,24 @@
+import utils from "./utils.js";
+
+const settings = {
+  runBefore: (Module) => {
+    const options = Module.engineInstance.getOptions();
+
+    // background must be set to black for proper blending with transparent canvas
+    options.setAsString("render.background.color", "#000000");
+
+    // setup coloring
+    options.setAsString("model.scivis.array_name", "Colors");
+    options.setAsString("model.coloring", "direct");
+    options.setAsString("model.scivis.field", "cells");
+
+    // default to +Z
+    options.setAsString("scene.up_direction", "+Z");
+  },
+  canvasId: "custom_id",
+};
+
+utils.runRenderTest(settings, {
+  data: "f3d.vtp",
+  baseline: "TestWasmCustomCanvas.png",
+});

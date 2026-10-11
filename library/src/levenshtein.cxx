@@ -1,5 +1,6 @@
 #include "levenshtein.h"
 
+#include <algorithm>
 #include <limits>
 #include <vector>
 
@@ -44,8 +45,8 @@ public:
     {
       // different character, increase the distance and check with advancing only A, only B, or both
       dist = 1 +
-        std::min(std::min(this->run(indexA, indexB + 1), this->run(indexA + 1, indexB)),
-          this->run(indexA + 1, indexB + 1));
+        std::min({ this->run(indexA, indexB + 1), this->run(indexA + 1, indexB),
+          this->run(indexA + 1, indexB + 1) });
     }
 
     // cache the value for later

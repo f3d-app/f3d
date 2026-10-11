@@ -1,5 +1,5 @@
 // Clip Library
-// Copyright (c) 2015-2025  David Capello
+// Copyright (c) 2015-2026  David Capello
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -16,6 +16,8 @@
 
 #include <windows.h>
 
+#include "clip_base.h"
+
 namespace clip {
 
 class image;
@@ -23,7 +25,7 @@ struct image_spec;
 
 namespace win {
 
-struct BitmapInfo {
+struct CLIP_EXTERN BitmapInfo {
   BITMAPV5HEADER* b5 = nullptr;
   BITMAPINFO* bi = nullptr;
   int width = 0;
@@ -60,7 +62,7 @@ private:
 // Returns a handle to the HGLOBAL memory reserved to create a DIBV5
 // based on the image passed by parameter. Returns null if it cannot
 // create the handle.
-HGLOBAL create_dibv5(const image& image);
+CLIP_EXTERN HGLOBAL create_dibv5(const image& image);
 
 } // namespace win
 } // namespace clip

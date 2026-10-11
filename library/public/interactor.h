@@ -5,6 +5,7 @@
 #include "export.h"
 #include "log.h"
 #include "options.h"
+#include "utils.h"
 #include "window.h"
 
 /// @cond
@@ -56,6 +57,14 @@ struct interaction_bind_t
    * Create and return an interaction bind from provided string
    */
   [[nodiscard]] static interaction_bind_t parse(std::string_view str);
+};
+
+/**
+ * State of the interactor that can be used in the user callback of playInteraction and start.
+ */
+struct interactor_state_t
+{
+  double animationTime = 0.0;
 };
 
 /**
@@ -136,12 +145,36 @@ public:
   };
 
   /**
-   * Enumeration of animation direction.
+   * Parameter shape for calls to addBinding(...).
+   *
+   * Bind modifiers is a binary flag from the dedicated enum that represent KeyModifiers.
+   * Bind interaction can be a pressed key symbol, eg: "C",
+   * or a dedicated key symbol for special keys:
+   * "Left", "Right", "Up", "Down", "Space", "Enter", "Escape", "Question".
+   *
+   * Command is the action to perform when this binding is triggered.
+   *
+   * Group is an optional arg to group bindings together for better display of the documentation.
+   *
+   * DocumentationCallback is an optional function that returns a pair of string,
+   * the first is the doc itself, the second is the current value as a string, if any.
+   *
+   * Type is an optional type of binding to provide, it can be used for presenting the
+   * binding in a coherent way in logs and cheatsheet.
+   *
+   * If notify is true, a notification is triggered when pressing the binding.
+   *
+   * If repeat is true, the binding is applied repeatedly when holding down the key.
    */
-  enum class AnimationDirection : std::uint8_t
+  struct BindingParam
   {
-    FORWARD,
-    BACKWARD
+    interaction_bind_t Bind;
+    std::vector<std::string> Commands;
+    std::string Group = {};
+    documentation_callback_t DocCallback = nullptr;
+    BindingType Type = BindingType::OTHER;
+    bool Notify = true;
+    bool Repeat = false;
   };
 
   /**
@@ -153,21 +186,10 @@ public:
   /**
    * Use this method to add binding, in order to trigger commands for a specific bind
    *
-   * Bind modifiers is a binary flag from the dedicated enum that represent KeyModifiers.
-   * Bind interaction can be a pressed key symbol, eg: "C",
-   * or a dedicated key symbol for special keys:
-   * "Left", "Right", "Up", "Down", "Space", "Enter", "Escape", "Question".
-   *
-   * group is an optional arg to group bindings together for better display of the documentation.
    * Groups are kept in order of addition when recovered using getBindGroups().
    * Bindings are kept in order of addition when recovered using getBindsForGroup().
    *
-   * documentationCallback is an optional function that returns a pair of string,
-   * the first is the doc itself, the second is the current value as a string, if any.
-   * Use getBindingDocumentation() to access this doc.
-   *
-   * type is an optional type of binding to provide, it can be used for presenting the
-   * binding in a coherent way in logs and cheatsheet.
+   * Use getBindingDocumentation() to access the documentation specified for this binding.
    *
    * When the corresponding bind happens, the provided commands will be triggered using
    * triggerCommand. Considering checking if an interaction exists or removing it before adding it
@@ -176,35 +198,9 @@ public:
    * ANY modifier interactions will only be triggered if no other interaction bind with modifier
    * is found.
    *
-   * If notify is true, a notification is triggered when pressing the binding
-   *
    * Adding commands for an existing bind will throw a interactor::already_exists_exception.
    */
-  virtual interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool notify = true) = 0;
-
-  /**
-   * See addBinding
-   * Convenience method to add a single command for an interaction,
-   * similar as `addBinding(bind, {command})`.
-   *
-   * Adding command for an existing bind will throw a interactor::already_exists_exception.
-   */
-  virtual interactor& addBinding(const interaction_bind_t& bind, std::string command,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool notify = true) = 0;
-
-  /**
-   * Convenience initializer list signature for add binding method
-   */
-  interactor& addBinding(const interaction_bind_t& bind, std::initializer_list<std::string> list,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool notify = true)
-  {
-    return this->addBinding(bind, std::vector<std::string>(list), std::move(group),
-      std::move(documentationCallback), type, notify);
-  }
+  virtual interactor& addBinding(BindingParam binding) = 0;
 
   /**
    * Remove binding corresponding to provided bind.
@@ -253,19 +249,6 @@ public:
    * Getting type for a bind that does not exists will throw a does_not_exists_exception.
    */
   [[nodiscard]] virtual BindingType getBindingType(const interaction_bind_t& bind) const = 0;
-  ///@}
-
-  ///@{ @name Animation
-  /**
-   * Control the animation.
-   */
-  virtual interactor& toggleAnimation(
-    AnimationDirection direction = AnimationDirection::FORWARD) = 0;
-  virtual interactor& startAnimation(
-    AnimationDirection direction = AnimationDirection::FORWARD) = 0;
-  virtual interactor& stopAnimation() = 0;
-  [[nodiscard]] virtual bool isPlayingAnimation() = 0;
-  [[nodiscard]] virtual interactor::AnimationDirection getAnimationDirection() = 0;
   ///@}
 
   ///@{ @name Movement
@@ -380,13 +363,21 @@ public:
     std::string desc, std::string value = "", double duration = 3.f) = 0;
 
   /**
+   * Set the notification callback, which is called when a notification is triggered.
+   * The callback should return true if the internal notification should be displayed, false
+   * otherwise. Arguments are the description, value, bindings, and duration of the notification. If
+   * the callback is set to nullptr, standard notifications will be displayed.
+   */
+  virtual interactor& setNotificationCallback(
+    std::function<bool(const std::string&, const std::string&, const std::string&, double)>
+      callback) = 0;
+
+  /**
    * Play a VTK interaction file.
    * Provided file path is used as is and file existence will be checked.
-   * If the event loop is not already running, it will be triggered every deltaTime in seconds,
-   * and userCallBack will be called at the start of the event loop.
+   * If the event loop is not already running, it will be triggered every deltaTime in seconds.
    */
-  virtual bool playInteraction(const std::filesystem::path& file, double deltaTime = 1.0 / 30,
-    std::function<void()> userCallBack = nullptr) = 0;
+  virtual bool playInteraction(const std::filesystem::path& file, double deltaTime = 1.0 / 30) = 0;
 
   /**
    * Start interaction and record it all in a VTK interaction file.
@@ -395,13 +386,18 @@ public:
   virtual bool recordInteraction(const std::filesystem::path& file) = 0;
 
   /**
+   * Set the user callback of the event loop, which is called right after the rendering.
+   */
+  virtual interactor& setEventLoopUserCallback(
+    std::function<void(interactor_state_t)> userCallback) = 0;
+
+  /**
    * Start the interactor event loop.
-   * The event loop will be triggered every deltaTime in seconds, and userCallBack will be called at
-   * the start of the event loop, deltaTime should be strictly positive.
+   * The event loop will be triggered every deltaTime in seconds.
+   * deltaTime should be strictly positive.
    * Safe to call multiple times but will log an info in that case.
    */
-  virtual interactor& start(
-    double deltaTime = 1.0 / 30, std::function<void()> userCallBack = nullptr) = 0;
+  virtual interactor& start(double deltaTime = 1.0 / 30) = 0;
 
   /**
    * Stop the interactor.
@@ -487,12 +483,24 @@ inline bool interaction_bind_t::operator==(const interaction_bind_t& bind) const
 //----------------------------------------------------------------------------
 inline std::string interaction_bind_t::format() const
 {
+  std::string ctrlMod = "Ctrl+";
+  std::string ctrlShiftMod = "Ctrl+Shift+";
+
+#ifdef __APPLE__
+  const std::optional<std::string> forceCtrl = f3d::utils::getEnv("F3D_TEST_APPLE_FORCE_CTRL");
+  if (!forceCtrl.has_value() || forceCtrl.value().empty() || forceCtrl != "true")
+  {
+    ctrlMod = "Cmd+";
+    ctrlShiftMod = "Cmd+Shift+";
+  }
+#endif
+
   switch (this->mod)
   {
     case ModifierKeys::CTRL_SHIFT:
-      return "Ctrl+Shift+" + this->inter;
+      return ctrlShiftMod + this->inter;
     case ModifierKeys::CTRL:
-      return "Ctrl+" + this->inter;
+      return ctrlMod + this->inter;
     case ModifierKeys::SHIFT:
       return "Shift+" + this->inter;
     case ModifierKeys::ANY:

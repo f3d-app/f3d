@@ -1,0 +1,10 @@
+prefix=@F3D_PKGCONFIG_PREFIX@
+libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+
+Name: f3d
+Description: @F3D_DESCRIPTION@
+URL: https://f3d.app
+Version: @F3D_VERSION@
+Libs: -L${libdir} -lf3d
+Cflags: -I${includedir}

@@ -35,54 +35,6 @@ extern "C"
   } f3d_interaction_bind_t;
 
   /**
-   * @brief Format an interaction bind into a string.
-   *
-   * Formats the bind into a string like "A", "Any+Question", "Shift+L", etc.
-   * The output buffer must be at least 512 bytes.
-   *
-   * @param bind Interaction bind to format.
-   * @param output Output buffer to store the formatted string.
-   * @param output_size Size of the output buffer.
-   */
-  F3D_EXPORT void f3d_interaction_bind_format(
-    const f3d_interaction_bind_t* bind, char* output, int output_size);
-
-  /**
-   * @brief Parse a string into an interaction bind.
-   *
-   * Creates an interaction bind from a string like "A", "Ctrl+A", "Shift+B", etc.
-   *
-   * @param str String to parse.
-   * @param bind Output parameter for the parsed bind.
-   */
-  F3D_EXPORT void f3d_interaction_bind_parse(const char* str, f3d_interaction_bind_t* bind);
-
-  /**
-   * @brief Compare two interaction binds for less-than ordering.
-   *
-   * Compares modifier and interaction string for ordering.
-   * Useful for storing binds in sorted data structures.
-   *
-   * @param lhs Left-hand side bind.
-   * @param rhs Right-hand side bind.
-   * @return 1 if lhs < rhs, 0 otherwise.
-   */
-  F3D_EXPORT int f3d_interaction_bind_less_than(
-    const f3d_interaction_bind_t* lhs, const f3d_interaction_bind_t* rhs);
-
-  /**
-   * @brief Compare two interaction binds for equality.
-   *
-   * Compares both modifier and interaction string for equality.
-   *
-   * @param lhs Left-hand side bind.
-   * @param rhs Right-hand side bind.
-   * @return 1 if binds are equal, 0 otherwise.
-   */
-  F3D_EXPORT int f3d_interaction_bind_equals(
-    const f3d_interaction_bind_t* lhs, const f3d_interaction_bind_t* rhs);
-
-  /**
    * @brief Enumeration of binding types.
    */
   typedef enum f3d_interactor_binding_type_t
@@ -143,6 +95,68 @@ extern "C"
     F3D_INTERACTOR_ANIMATION_BACKWARD
   } f3d_interactor_animation_direction_t;
 
+  /**
+   * @brief Structure representing an interaction binding.
+   */
+  typedef struct f3d_binding_params_t
+  {
+    f3d_interaction_bind_t bind;        // Interaction bind
+    const char** commands;              // Array of command strings.
+    int command_count;                  // Number of commands.
+    char* group;                        // Optional group name (can be NULL).
+    f3d_interactor_binding_type_t type; // Optional binding type.
+    int notify;                         // Notify when the binding is triggered.
+    int repeat;                         // Binding is repeatedly applied when holding down the key.
+  } f3d_binding_params_t;
+
+  /**
+   * @brief Format an interaction bind into a string.
+   *
+   * Formats the bind into a string like "A", "Any+Question", "Shift+L", etc.
+   * The output buffer must be at least 512 bytes.
+   *
+   * @param bind Interaction bind to format.
+   * @param output Output buffer to store the formatted string.
+   * @param output_size Size of the output buffer.
+   */
+  F3D_EXPORT void f3d_interaction_bind_format(
+    const f3d_interaction_bind_t* bind, char* output, int output_size);
+
+  /**
+   * @brief Parse a string into an interaction bind.
+   *
+   * Creates an interaction bind from a string like "A", "Ctrl+A", "Shift+B", etc.
+   *
+   * @param str String to parse.
+   * @param bind Output parameter for the parsed bind.
+   */
+  F3D_EXPORT void f3d_interaction_bind_parse(const char* str, f3d_interaction_bind_t* bind);
+
+  /**
+   * @brief Compare two interaction binds for less-than ordering.
+   *
+   * Compares modifier and interaction string for ordering.
+   * Useful for storing binds in sorted data structures.
+   *
+   * @param lhs Left-hand side bind.
+   * @param rhs Right-hand side bind.
+   * @return 1 if lhs < rhs, 0 otherwise.
+   */
+  F3D_EXPORT int f3d_interaction_bind_less_than(
+    const f3d_interaction_bind_t* lhs, const f3d_interaction_bind_t* rhs);
+
+  /**
+   * @brief Compare two interaction binds for equality.
+   *
+   * Compares both modifier and interaction string for equality.
+   *
+   * @param lhs Left-hand side bind.
+   * @param rhs Right-hand side bind.
+   * @return 1 if binds are equal, 0 otherwise.
+   */
+  F3D_EXPORT int f3d_interaction_bind_equals(
+    const f3d_interaction_bind_t* lhs, const f3d_interaction_bind_t* rhs);
+
   ///@{ @name Commands
   /**
    * @brief Initialize commands (remove existing and add defaults).
@@ -182,7 +196,7 @@ extern "C"
    * @param interactor Interactor handle.
    * @param count Output parameter for number of actions.
    * @return Array of action strings. Caller must free the array with
-   *         f3d_interactor_free_string_array().
+   *         f3d_interactor_destroy_string_array().
    */
   F3D_EXPORT char** f3d_interactor_get_command_actions(f3d_interactor_t* interactor, int* count);
 
@@ -210,16 +224,10 @@ extern "C"
    * @brief Add a binding for the provided bind.
    *
    * @param interactor Interactor handle.
-   * @param bind Interaction bind.
-   * @param commands Array of command strings.
-   * @param command_count Number of commands.
-   * @param group Optional group name (can be NULL).
-   * @param type Optional binding type.
-   * @param notify Notify when the binding is triggered.
+   * @param binding Binding definition, see f3d_binding_params_t for details.
    */
-  F3D_EXPORT void f3d_interactor_add_binding(f3d_interactor_t* interactor,
-    const f3d_interaction_bind_t* bind, const char** commands, int command_count, const char* group,
-    f3d_interactor_binding_type_t type, int notify);
+  F3D_EXPORT void f3d_interactor_add_binding(
+    f3d_interactor_t* interactor, f3d_binding_params_t binding);
 
   /**
    * @brief Remove a binding for the provided bind.
@@ -236,7 +244,7 @@ extern "C"
    * @param interactor Interactor handle.
    * @param count Output parameter for number of groups.
    * @return Array of group strings. Caller must free the array with
-   *         f3d_interactor_free_string_array().
+   *         f3d_interactor_destroy_string_array().
    */
   F3D_EXPORT char** f3d_interactor_get_bind_groups(f3d_interactor_t* interactor, int* count);
 
@@ -247,7 +255,7 @@ extern "C"
    * @param group Group name.
    * @param count Output parameter for number of binds.
    * @return Array of binds. Caller must free the array with
-   *         f3d_interactor_free_bind_array().
+   *         f3d_interactor_destroy_bind_array(). NULL if group does not exist.
    */
   F3D_EXPORT f3d_interaction_bind_t* f3d_interactor_get_binds_for_group(
     f3d_interactor_t* interactor, const char* group, int* count);
@@ -258,7 +266,7 @@ extern "C"
    * @param interactor Interactor handle.
    * @param count Output parameter for number of binds.
    * @return Array of binds. Caller must free the array with
-   *         f3d_interactor_free_bind_array().
+   *         f3d_interactor_destroy_bind_array().
    */
   F3D_EXPORT f3d_interaction_bind_t* f3d_interactor_get_binds(
     f3d_interactor_t* interactor, int* count);
@@ -287,54 +295,10 @@ extern "C"
    *
    * @param interactor Interactor handle.
    * @param bind Interaction bind.
-   * @return Binding type.
+   * @return Binding type. F3D_INTERACTOR_BINDING_OTHER if bind does not exist.
    */
   F3D_EXPORT f3d_interactor_binding_type_t f3d_interactor_get_binding_type(
     f3d_interactor_t* interactor, const f3d_interaction_bind_t* bind);
-  ///@}
-
-  ///@{ @name Animation
-  /**
-   * @brief Toggle the animation.
-   *
-   * @param interactor Interactor handle.
-   * @param direction Animation direction.
-   */
-  F3D_EXPORT void f3d_interactor_toggle_animation(
-    f3d_interactor_t* interactor, f3d_interactor_animation_direction_t direction);
-
-  /**
-   * @brief Start the animation.
-   *
-   * @param interactor Interactor handle.
-   * @param direction Animation direction.
-   */
-  F3D_EXPORT void f3d_interactor_start_animation(
-    f3d_interactor_t* interactor, f3d_interactor_animation_direction_t direction);
-
-  /**
-   * @brief Stop the animation.
-   *
-   * @param interactor Interactor handle.
-   */
-  F3D_EXPORT void f3d_interactor_stop_animation(f3d_interactor_t* interactor);
-
-  /**
-   * @brief Check if animation is currently playing.
-   *
-   * @param interactor Interactor handle.
-   * @return 1 if animation is playing, 0 otherwise.
-   */
-  F3D_EXPORT int f3d_interactor_is_playing_animation(f3d_interactor_t* interactor);
-
-  /**
-   * @brief Get the current animation direction.
-   *
-   * @param interactor Interactor handle.
-   * @return Current animation direction.
-   */
-  F3D_EXPORT f3d_interactor_animation_direction_t f3d_interactor_get_animation_direction(
-    f3d_interactor_t* interactor);
   ///@}
 
   ///@{ @name Movement
@@ -452,16 +416,36 @@ extern "C"
 
   typedef void (*f3d_interactor_callback_t)(void* user_data);
   /**
-   * @brief Start the interactor event loop.
+   * @brief Set the event loop user callback.
    *
    * @param interactor Interactor handle.
-   * @param delta_time Time step in seconds.
    * @param callback Optional user callback called at the start of each event-loop
-   *        iteration. May be NULL if no callback is desired.
+   *        iteration.
    * @param user_data Optional opaque pointer passed verbatim to callback.
    */
-  F3D_EXPORT void f3d_interactor_start_with_callback(f3d_interactor_t* interactor,
-    double delta_time, f3d_interactor_callback_t callback, void* user_data);
+  F3D_EXPORT void f3d_interactor_set_event_loop_user_callback(
+    f3d_interactor_t* interactor, f3d_interactor_callback_t callback, void* user_data);
+
+  /**
+   * @brief Notification callback signature.
+   *
+   * Return zero to prevent standard notification from being displayed.
+   * Arguments are the description, value, bindings, and duration of the notification.
+   */
+  typedef int (*f3d_interactor_notification_callback_t)(
+    const char* desc, const char* value, const char* bind, double duration, void* user_data);
+
+  /**
+   * @brief Set the notification callback.
+   *
+   * The callback is invoked when a notification is triggered.
+   *
+   * @param interactor Interactor handle.
+   * @param callback Notification callback, or NULL to clear.
+   * @param user_data Optional opaque pointer passed to callback.
+   */
+  F3D_EXPORT void f3d_interactor_set_notification_callback(
+    f3d_interactor_t* interactor, f3d_interactor_notification_callback_t callback, void* user_data);
 
   /**
    * @brief Stop the interactor.
@@ -501,14 +485,14 @@ extern "C"
    * @param array String array to free.
    * @param count Number of strings in the array.
    */
-  F3D_EXPORT void f3d_interactor_free_string_array(char** array, int count);
+  F3D_EXPORT void f3d_interactor_destroy_string_array(char** array, int count);
 
   /**
    * @brief Free a bind array returned by interactor functions.
    *
    * @param array Bind array to free.
    */
-  F3D_EXPORT void f3d_interactor_free_bind_array(f3d_interaction_bind_t* array);
+  F3D_EXPORT void f3d_interactor_destroy_bind_array(f3d_interaction_bind_t* array);
 
 #ifdef __cplusplus
 }

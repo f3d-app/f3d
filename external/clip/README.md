@@ -1,5 +1,5 @@
 # Clip Library
-*Copyright (c) 2015-2025 David Capello*
+*Copyright (c) 2015-2026 David Capello*
 
 [![build](https://github.com/dacap/clip/workflows/build/badge.svg)](https://github.com/dacap/clip/actions?query=workflow%3Abuild)
 [![MIT Licensed](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.txt)
@@ -57,7 +57,7 @@ int main() {
 * **Windows**:
   - [Limited number of clipboard formats on Windows](https://web.archive.org/web/20250126161802/https://devblogs.microsoft.com/oldnewthing/20080430-00/?p=22523)
 * **Linux**:
-  - To be able to copy/paste on Linux you need `libx11-dev`/`libX11-devel` package.
+  - To be able to copy/paste on Linux you need `libxcb1-dev`/`libxcb-devel` package during build and `libxcb1`/`libxcb` package during usage, please note this library is loaded dynamically and not linked.
   - To copy/paste images you will need `libpng-dev`/`libpng-devel` package.
 
 ## Compilation Flags

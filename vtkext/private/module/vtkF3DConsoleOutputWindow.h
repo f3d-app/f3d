@@ -21,6 +21,11 @@ public:
    */
   void DisplayText(const char*) override;
 
+  /**
+   * Display a progress message in the console output window.
+   */
+  void DisplayProgress(const char*);
+
   //@{
   /**
    * Set/Get the coloring usage.

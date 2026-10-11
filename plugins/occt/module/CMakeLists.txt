@@ -1,11 +1,14 @@
 set(classes
   vtkF3DOCCTReader
+  vtkF3DFCStdReader
   )
 
 vtk_module_add_module(f3d::vtkextOCCT
   NO_INSTALL
   FORCE_STATIC
-  CLASSES ${classes})
+  CLASSES ${classes}
+  SOURCES F3DOCCTShapeConverter.cxx
+  PRIVATE_HEADERS F3DOCCTShapeConverter.h)
 
 vtk_module_include(f3d::vtkextOCCT
   PRIVATE
@@ -18,6 +21,8 @@ if(CMAKE_LINK_GROUP_USING_RESCAN_SUPPORTED)
 endif()
 
 vtk_module_link(f3d::vtkextOCCT PRIVATE "${_occt_link_libs}")
+
+vtk_module_set_properties(f3d::vtkextOCCT CXX_STANDARD 20)
 
 if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
   vtk_module_definitions(f3d::vtkextOCCT

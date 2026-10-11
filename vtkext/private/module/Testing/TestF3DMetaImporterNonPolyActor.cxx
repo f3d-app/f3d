@@ -17,7 +17,7 @@ public:
   {
     // Create poly / non-poly containing actors
     vtkNew<vtkActor> actor1;
-    vtkNew<vtkActor> actor2;
+    const vtkNew<vtkActor> actor2;
     {
       vtkNew<vtkCubeSource> cube;
       vtkNew<vtkPolyDataMapper> pmap;
@@ -28,11 +28,9 @@ public:
     renderer->AddActor(actor1);
     renderer->AddActor(actor2);
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
     // Push to vtkImporter parent class
     this->ActorCollection->AddItem(actor1);
     this->ActorCollection->AddItem(actor2);
-#endif
   }
 };
 
@@ -44,12 +42,12 @@ int TestF3DMetaImporterNonPolyActor(int argc, char* argv[])
 {
   // Setup importers with testing class
   vtkNew<vtkF3DMetaImporter> importer;
-  vtkNew<NonPolyImporter> importerNP;
+  const vtkNew<NonPolyImporter> importerNP;
   importer->AddImporter({ "foo", importerNP });
 
   // Try and render image.
   vtkNew<vtkRenderWindow> window;
-  vtkNew<vtkRenderer> renderer;
+  const vtkNew<vtkRenderer> renderer;
   window->AddRenderer(renderer);
   importer->SetRenderWindow(window);
   // F3D will crash here if it cannot handle a non-poly containing actor.

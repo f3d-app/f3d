@@ -23,7 +23,6 @@ int TestSDKEngine([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   try { f3d::engine::loadPlugin("alembic", {argv[3]}); } catch (...) {}
   try { f3d::engine::loadPlugin("assimp", {argv[3]}); } catch (...) {}
   try { f3d::engine::loadPlugin("draco", {argv[3]}); } catch (...) {}
-  try { f3d::engine::loadPlugin("exodus", {argv[3]}); } catch (...) {} // F3D_DEPRECATED
   try { f3d::engine::loadPlugin("hdf", {argv[3]}); } catch (...) {}
   try { f3d::engine::loadPlugin("occt", {argv[3]}); } catch (...) {}
   try { f3d::engine::loadPlugin("usd", {argv[3]}); } catch (...) {}
@@ -45,16 +44,21 @@ int TestSDKEngine([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // Test option setters
   f3d::options opt;
-  opt.model.scivis.cells = true;
+  opt.model.scivis.field = "cells";
 
   eng0.setOptions(opt);
   test("set options value using f3d::engine::setOptions(const options& opt)",
-    eng0.getOptions().model.scivis.cells);
+    eng0.getOptions().model.scivis.field == "cells");
 
   opt.render.line_width = 1.7;
   eng0.setOptions(std::move(opt));
   test("set options value using f3d::engine::setOptions(options&& opt)",
     eng0.getOptions().render.line_width.value(), 1.7);
+
+  // Test cache path round-trip
+  const std::string cachePath = std::string(argv[2]) + "engine_cache";
+  eng0.setCachePath(cachePath);
+  test("get cache path using f3d::engine::getCachePath()", eng0.getCachePath().string(), cachePath);
 
   // Test static information methods
   auto libInfo = f3d::engine::getLibInfo();

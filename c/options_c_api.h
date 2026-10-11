@@ -15,7 +15,7 @@ extern "C"
   /**
    * @brief Create a new options object.
    *
-   * The returned options object must be freed with f3d_options_delete().
+   * The returned options object must be freed with f3d_options_destroy().
    *
    * @return Options handle.
    */
@@ -26,7 +26,7 @@ extern "C"
    *
    * @param options Options handle to delete.
    */
-  F3D_EXPORT void f3d_options_delete(f3d_options_t* options);
+  F3D_EXPORT void f3d_options_destroy(f3d_options_t* options);
   ///@}
 
   ///@{ @name Option setters
@@ -96,7 +96,8 @@ extern "C"
    *
    * @param options Options handle.
    * @param name Option name.
-   * @return Boolean value (0 for false, non-zero for true).
+   * @return Boolean value (0 for false or if the option hasn't been set or doesn't exist, non-zero
+   * for true).
    */
   F3D_EXPORT int f3d_options_get_as_bool(const f3d_options_t* options, const char* name);
 
@@ -105,7 +106,7 @@ extern "C"
    *
    * @param options Options handle.
    * @param name Option name.
-   * @return Integer value.
+   * @return Integer value. 0 if the option hasn't been set or doesn't exist.
    */
   F3D_EXPORT int f3d_options_get_as_int(const f3d_options_t* options, const char* name);
 
@@ -114,29 +115,30 @@ extern "C"
    *
    * @param options Options handle.
    * @param name Option name.
-   * @return Double value.
+   * @return Double value. 0.0 if the option hasn't been set or doesn't exist.
    */
   F3D_EXPORT double f3d_options_get_as_double(const f3d_options_t* options, const char* name);
 
   /**
    * @brief Get an option value as a string.
    *
-   * The returned string is heap-allocated and must be freed with f3d_options_free_string().
+   * The returned string is heap-allocated and must be freed with f3d_options_destroy_string().
    *
    * @param options Options handle.
    * @param name Option name.
-   * @return String value.
+   * @return String value. NULL if the option hasn't been set or doesn't exist.
    */
   F3D_EXPORT const char* f3d_options_get_as_string(const f3d_options_t* options, const char* name);
 
   /**
    * @brief Get an option value as a string representation.
    *
-   * The returned string is heap-allocated and must be freed with f3d_options_free_string().
+   * The returned string is heap-allocated and must be freed with f3d_options_destroy_string().
    *
    * @param options Options handle.
    * @param name Option name.
-   * @return String representation of the option value.
+   * @return String representation of the option value. NULL if the option hasn't been set or
+   * doesn't exist.
    */
   F3D_EXPORT const char* f3d_options_get_as_string_representation(
     const f3d_options_t* options, const char* name);
@@ -161,7 +163,15 @@ extern "C"
    *
    * @param str String to free.
    */
-  F3D_EXPORT void f3d_options_free_string(const char* str);
+  F3D_EXPORT void f3d_options_destroy_string(const char* str);
+
+  /**
+   * @brief Free a string array returned by options functions.
+   *
+   * @param array String array to free.
+   * @param count Number of strings in the array.
+   */
+  F3D_EXPORT void f3d_options_destroy_string_array(char** array, int count);
 
   /**
    * @brief Get an option value as a double vector.
@@ -171,7 +181,8 @@ extern "C"
    * @param options Options handle.
    * @param name Option name.
    * @param values Pre-allocated array to store the double values.
-   * @param count Pointer to store the number of values retrieved.
+   * @param count Pointer to store the number of values retrieved. Set to 0 if the option hasn't
+   * been set or doesn't exist.
    */
   F3D_EXPORT void f3d_options_get_as_double_vector(
     const f3d_options_t* options, const char* name, double* values, size_t* count);
@@ -184,7 +195,8 @@ extern "C"
    * @param options Options handle.
    * @param name Option name.
    * @param values Pre-allocated array to store the integer values.
-   * @param count Pointer to store the number of values retrieved.
+   * @param count Pointer to store the number of values retrieved. Set to 0 if the option hasn't
+   * been set or doesn't exist.
    */
   F3D_EXPORT void f3d_options_get_as_int_vector(
     const f3d_options_t* options, const char* name, int* values, size_t* count);
@@ -205,7 +217,7 @@ extern "C"
    * @param options Options handle.
    * @param other Other options handle to compare with.
    * @param name Option name.
-   * @return 1 if the values are the same, 0 otherwise.
+   * @return 1 if the values are the same, 0 otherwise or if the other option doesn't exist.
    */
   F3D_EXPORT int f3d_options_is_same(
     const f3d_options_t* options, const f3d_options_t* other, const char* name);
@@ -215,14 +227,14 @@ extern "C"
    *
    * @param options Options handle.
    * @param name Option name.
-   * @return 1 if the option has a value, 0 otherwise.
+   * @return 1 if the option has a value, 0 otherwise or if the option doesn't exist.
    */
   F3D_EXPORT int f3d_options_has_value(const f3d_options_t* options, const char* name);
 
   /**
    * @brief Copy an option value from another options object.
    *
-   * @param options Destination options handle.
+   * @param options Destination options handle. Will remain as-is if the option doesn't exist.
    * @param other Source options handle to copy from.
    * @param name Option name.
    */
@@ -233,7 +245,7 @@ extern "C"
   /**
    * @brief Get all option names.
    *
-   * The returned array is heap-allocated and must be freed with f3d_options_free_names().
+   * The returned array is heap-allocated and must be freed with f3d_options_destroy_names().
    *
    * @param count Pointer to store the count of names.
    * @return Array of option names.
@@ -243,7 +255,7 @@ extern "C"
   /**
    * @brief Get option names that have values.
    *
-   * The returned array is heap-allocated and must be freed with f3d_options_free_names().
+   * The returned array is heap-allocated and must be freed with f3d_options_destroy_names().
    *
    * @param options Options handle.
    * @param count Pointer to store the count of names.
@@ -257,7 +269,7 @@ extern "C"
    * @param options Options handle.
    * @param option Option name to match.
    * @param closest Output parameter for the closest option name. Caller must free with
-   *                f3d_options_free_string().
+   *                f3d_options_destroy_string().
    * @param distance Output parameter for the Levenshtein distance.
    */
   F3D_EXPORT void f3d_options_get_closest_option(
@@ -269,14 +281,14 @@ extern "C"
    * @param names Array of names to free.
    * @param count Number of names in the array.
    */
-  F3D_EXPORT void f3d_options_free_names(char** names, size_t count);
+  F3D_EXPORT void f3d_options_destroy_names(char** names, size_t count);
 
   /**
    * @brief Check if an option is optional.
    *
    * @param options Options handle.
    * @param name Option name.
-   * @return 1 if the option is optional, 0 otherwise.
+   * @return 1 if the option is optional, 0 otherwise or if the option doesn't exist.
    */
   F3D_EXPORT int f3d_options_is_optional(const f3d_options_t* options, const char* name);
 
@@ -296,12 +308,145 @@ extern "C"
    */
   F3D_EXPORT void f3d_options_remove_value(f3d_options_t* options, const char* name);
 
+  /**
+   * @brief Enumeration of domain types.
+   */
+  typedef enum f3d_domain_style_t
+  {
+    F3D_DOMAIN_STYLE_NONE = 0,
+    F3D_DOMAIN_STYLE_RANGE = 1,
+    F3D_DOMAIN_STYLE_ENUM = 2,
+    F3D_DOMAIN_STYLE_INDEX = 3,
+  } f3d_domain_style_t;
+
+  /**
+   * @brief Check if an option has a domain
+   *
+   * @param options Options handle.
+   * @param name Option name.
+   * @return 1 if the option has a domain, 0 otherwise or if the option doesn't exist or if any of
+   * the param is NULL.
+   */
+  F3D_EXPORT int f3d_options_has_domain(const f3d_options_t* options, const char* name);
+
+  /**
+   * @brief Return the domain style of provided option
+   *
+   * @param options Options handle.
+   * @param name Option name.
+   * @return the domain style, or if the option doesn't exist, doesn't have a domain or if any of
+   * the params is NULL, returns F3D_DOMAIN_STYLE_NONE.
+   */
+  F3D_EXPORT f3d_domain_style_t f3d_options_get_domain_style(
+    const f3d_options_t* options, const char* name);
+
+  /**
+   * @brief Get an option double or ratio range domain if it has one
+   *
+   * @param options Options handle.
+   * @param name Option name.
+   * @param[out] range Array of size 3 filled with min, max and increment.
+   * @return 1 on success, 0 if the option doesn't exist, doesn't have a double or ratio range
+   *         domain or if any of the parameters is null.
+   */
+  F3D_EXPORT int f3d_options_get_range_domain_double(
+    const f3d_options_t* options, const char* name, double range[3]);
+
+  /**
+   * @brief Get an option int range domain if it has one
+   *
+   * @param options Options handle.
+   * @param name Option name.
+   * @param[out] range Array of size 3 filled with min, max and increment.
+   * @return 1 on success, 0 if the option doesn't exist, doesn't have an int range domain or if
+   *         any of the parameters is null.
+   */
+  F3D_EXPORT int f3d_options_get_range_domain_int(
+    const f3d_options_t* options, const char* name, int range[3]);
+
+  /**
+   * @brief Get an option enumeration string domain if it has one
+   *
+   * @param options Options handle.
+   * @param name Option name.
+   * @return Array of enum strings. Caller must free the array with
+   *         f3d_options_destroy_string_array().
+   */
+  F3D_EXPORT char** f3d_options_get_enum_domain_string(
+    const f3d_options_t* options, const char* name, int* count);
+
+  /**
+   * @brief Get an option index domain if it has one
+   *
+   * @param options Options handle.
+   * @param name Option name.
+   * @param[out] max max value of the index domain.
+   * @return 1 and set max when domain exist and is set, 2 and does not set max if domain is unset,
+   * 0 if the option doesn't exist, doesn't have an index domain or if any of the parameters is
+   * null.
+   */
+  F3D_EXPORT int f3d_options_get_index_domain(
+    const f3d_options_t* options, const char* name, unsigned int* max);
+
+  /**
+   * @brief Increase an option value if it has a range or index domain
+   *
+   * @param options Options handle.
+   * @param name Option name.
+   */
+  F3D_EXPORT void f3d_options_increase(f3d_options_t* options, const char* name);
+
+  /**
+   * @brief Decrease an option value if it has a range or index domain
+   *
+   * @param options Options handle.
+   * @param name Option name.
+   */
+  F3D_EXPORT void f3d_options_decrease(f3d_options_t* options, const char* name);
+
+  /**
+   * @brief Cycle an option value if it has an enum or index domain
+   *
+   * @param options Options handle.
+   * @param name Option name.
+   */
+  F3D_EXPORT void f3d_options_cycle(f3d_options_t* options, const char* name);
+
+  /**
+   * @brief Enumeration of the possible types of an option.
+   */
+  typedef enum
+  {
+    F3D_OPTION_TYPE_INVALID,
+    F3D_OPTION_TYPE_BOOL,
+    F3D_OPTION_TYPE_INT,
+    F3D_OPTION_TYPE_DOUBLE,
+    F3D_OPTION_TYPE_RATIO,
+    F3D_OPTION_TYPE_STRING,
+    F3D_OPTION_TYPE_PATH,
+    F3D_OPTION_TYPE_COLOR,
+    F3D_OPTION_TYPE_DIRECTION,
+    F3D_OPTION_TYPE_COLORMAP,
+    F3D_OPTION_TYPE_TRANSFORM2D,
+    F3D_OPTION_TYPE_DOUBLE_VECTOR,
+    F3D_OPTION_TYPE_INT_VECTOR
+  } f3d_option_type_t;
+
+  /**
+   * @brief Get the type of an option.
+   *
+   * @param options Options handle.
+   * @param name Option name.
+   * @return The type of the option. Returns F3D_OPTION_TYPE_INVALID if the option does not exist.
+   */
+  F3D_EXPORT f3d_option_type_t f3d_options_get_type(const f3d_options_t* options, const char* name);
+
   ///@{ @name Parsing and formatting
   /**
    * @brief Parse a string as a boolean.
    *
    * @param str String to parse.
-   * @return 1 for true, 0 for false.
+   * @return 1 for true, 0 for false. 0 if the option cannot be parsed.
    */
   F3D_EXPORT int f3d_options_parse_bool(const char* str);
 
@@ -309,7 +454,7 @@ extern "C"
    * @brief Parse a string as an integer.
    *
    * @param str String to parse.
-   * @return Parsed integer value.
+   * @return Parsed integer value. 0 if the option cannot be parsed.
    */
   F3D_EXPORT int f3d_options_parse_int(const char* str);
 
@@ -317,7 +462,7 @@ extern "C"
    * @brief Parse a string as a double.
    *
    * @param str String to parse.
-   * @return Parsed double value.
+   * @return Parsed double value. 0.0 if the option cannot be parsed.
    */
   F3D_EXPORT double f3d_options_parse_double(const char* str);
 
@@ -325,7 +470,8 @@ extern "C"
    * @brief Parse a string as a string (returns a copy).
    *
    * @param str String to parse.
-   * @return Parsed string. Caller must free with f3d_options_free_string().
+   * @return Parsed string. Caller must free with f3d_options_destroy_string(). NULL if the option
+   * cannot be parsed.
    */
   F3D_EXPORT const char* f3d_options_parse_string(const char* str);
 
@@ -334,7 +480,7 @@ extern "C"
    *
    * @param str String to parse.
    * @param values Pre-allocated array to store the double values.
-   * @param count Pointer to store the number of values retrieved.
+   * @param count Pointer to store the number of values retrieved. 0 if the option cannot be parsed.
    */
   F3D_EXPORT void f3d_options_parse_double_vector(const char* str, double* values, size_t* count);
 
@@ -343,7 +489,7 @@ extern "C"
    *
    * @param str String to parse.
    * @param values Pre-allocated array to store the integer values.
-   * @param count Pointer to store the number of values retrieved.
+   * @param count Pointer to store the number of values retrieved. 0 if the option cannot be parsed.
    */
   F3D_EXPORT void f3d_options_parse_int_vector(const char* str, int* values, size_t* count);
 
@@ -351,7 +497,7 @@ extern "C"
    * @brief Format a boolean as a string.
    *
    * @param value Boolean value.
-   * @return Formatted string. Caller must free with f3d_options_free_string().
+   * @return Formatted string. Caller must free with f3d_options_destroy_string().
    */
   F3D_EXPORT const char* f3d_options_format_bool(int value);
 
@@ -359,7 +505,7 @@ extern "C"
    * @brief Format an integer as a string.
    *
    * @param value Integer value.
-   * @return Formatted string. Caller must free with f3d_options_free_string().
+   * @return Formatted string. Caller must free with f3d_options_destroy_string().
    */
   F3D_EXPORT const char* f3d_options_format_int(int value);
 
@@ -367,7 +513,7 @@ extern "C"
    * @brief Format a double as a string.
    *
    * @param value Double value.
-   * @return Formatted string. Caller must free with f3d_options_free_string().
+   * @return Formatted string. Caller must free with f3d_options_destroy_string().
    */
   F3D_EXPORT const char* f3d_options_format_double(double value);
 
@@ -375,7 +521,7 @@ extern "C"
    * @brief Format a string (returns a copy).
    *
    * @param value String value.
-   * @return Formatted string. Caller must free with f3d_options_free_string().
+   * @return Formatted string. Caller must free with f3d_options_destroy_string().
    */
   F3D_EXPORT const char* f3d_options_format_string(const char* value);
 
@@ -384,7 +530,7 @@ extern "C"
    *
    * @param values Array of double values.
    * @param count Number of values in the array.
-   * @return Formatted string. Caller must free with f3d_options_free_string().
+   * @return Formatted string. Caller must free with f3d_options_destroy_string().
    */
   F3D_EXPORT const char* f3d_options_format_double_vector(const double* values, size_t count);
 
@@ -393,7 +539,7 @@ extern "C"
    *
    * @param values Array of integer values.
    * @param count Number of values in the array.
-   * @return Formatted string. Caller must free with f3d_options_free_string().
+   * @return Formatted string. Caller must free with f3d_options_destroy_string().
    */
   F3D_EXPORT const char* f3d_options_format_int_vector(const int* values, size_t count);
   ///@}

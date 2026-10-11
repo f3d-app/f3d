@@ -11,14 +11,16 @@
 
 using mod_t = f3d::interaction_bind_t::ModifierKeys;
 
-int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
+int TestSDKInteractorCallBack([[maybe_unused]] int argc, char* argv[])
 {
   PseudoUnitTest test;
 
-  f3d::engine eng = f3d::engine::create(true);
+  const std::string renderingBackend = std::string(argv[4]);
+  f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::scene& sce = eng.getScene();
   f3d::window& win = eng.getWindow();
   f3d::interactor& inter = eng.getInteractor();
+  eng.getOptions().render.effect.blending.mode = "ddp"; // Opacity used during this test
   win.setSize(300, 300);
   win.render();
 
@@ -27,10 +29,10 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
   test("record empty interaction", !inter.recordInteraction(""));
 
   // Test callbacks with default interactions
-  std::string filename = "TestSDKInteractorCallBack";
-  std::string interactionFilePath = std::string(argv[2]) + "../../" + filename + ".log";
+  const std::string filename = "TestSDKInteractorCallBack";
+  const std::string interactionFilePath = std::string(argv[2]) + "../../" + filename + ".log";
 
-  // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
+  // Dragon.vtu; SZZYB; CTRL+S; SHIFT+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   test("play some interactions", inter.playInteraction(interactionFilePath));
   test("render interaction result",
     TestSDKHelpers::RenderTest(
@@ -38,8 +40,8 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
 
   // Check that adding an existing interaction command trigger an exception
 
-  test.expect<f3d::interactor::already_exists_exception>(
-    "add existing interaction", [&]() { inter.addBinding({ mod_t::ANY, "7" }, "exception"); });
+  test.expect<f3d::interactor::already_exists_exception>("add existing interaction",
+    [&]() { inter.addBinding({ .Bind = { mod_t::ANY, "7" }, .Commands = { "exception" } }); });
 
   // Remove bindings that will be triggered later and should not have any effect
   inter.removeBinding({ mod_t::ANY, "7" });
@@ -47,33 +49,35 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
   inter.removeBinding({ mod_t::NONE, "B" });
   inter.removeBinding({ mod_t::NONE, "S" });
   inter.removeBinding({ mod_t::NONE, "Z" });
-  inter.removeBinding({ mod_t::CTRL, "P" });
+  inter.removeBinding({ mod_t::SHIFT, "P" });
+  inter.removeBinding({ mod_t::SHIFT, "Y" });
 
   // Check that an binding can be added
-  inter.addBinding({ mod_t::NONE, "S" }, "toggle ui.axis");
+  inter.addBinding({ .Bind = { mod_t::NONE, "S" }, .Commands = { "toggle ui.axis" } });
 
   // Check CTRL modifier and that another interaction can be added on the same key with another
   // modifier
-  inter.addBinding({ mod_t::CTRL, "S" }, "toggle render.grid.enable");
+  inter.addBinding({ .Bind = { mod_t::CTRL, "S" }, .Commands = { "toggle render.grid.enable" } });
 
   // Check invalid command for coverage
-  inter.addBinding({ mod_t::CTRL, "P" }, "invalid command");
+  inter.addBinding({ .Bind = { mod_t::SHIFT, "P" }, .Commands = { "invalid command" } });
 
   // Check SHIFT modifier
-  inter.addBinding({ mod_t::SHIFT, "Y" }, R"(set ui.filename_info "My Own Filename")");
+  inter.addBinding(
+    { .Bind = { mod_t::SHIFT, "Y" }, .Commands = { R"(set ui.filename_info "My Own Filename")" } });
 
   // Check CTRL_SHIFT modifier
-  inter.addBinding(
-    { mod_t::CTRL_SHIFT, "B" }, { "set ui.filename true", "set render.show_edges true" });
+  inter.addBinding({ .Bind = { mod_t::CTRL_SHIFT, "B" },
+    .Commands = { "set ui.filename true", "set render.show_edges true" } });
 
   // Check ANY modifier
-  inter.addBinding({ mod_t::ANY, "A" }, "toggle ui.metadata");
+  inter.addBinding({ .Bind = { mod_t::ANY, "A" }, .Commands = { "toggle ui.metadata" } });
 
   // Replace the add_files command
   inter.removeCommand("add_files");
   inter.addCommand("add_files", [&](const std::vector<std::string>& filesVec) {
     const std::string& path = filesVec[0];
-    size_t found = path.find_last_of("/\\");
+    const size_t found = path.find_last_of("/\\");
     sce.clear();
     sce.add(path.substr(0, found + 1) + "f3d.vtp");
   });
@@ -82,16 +86,15 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
   inter.addCommand("exception", [&](const std::vector<std::string>&) {
     throw std::runtime_error("testing runtime exception");
   });
-  inter.addBinding({ mod_t::NONE, "Z" }, "exception");
+  inter.addBinding({ .Bind = { mod_t::NONE, "Z" }, .Commands = { "exception" } });
 
   // This time the interaction should result in a different rendering
-  // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
+  // Dragon.vtu; SZZYB; CTRL+S; SHIFT+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   test("play interactions after modifications", inter.playInteraction(interactionFilePath));
 
-  // With VTK 9.3.0, rendering is slightly different
   test("render modified interaction result",
     TestSDKHelpers::RenderTest(
-      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "Modified", 0.11));
+      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "Modified"));
 
   // Remove a non-existing interaction command
   inter.removeBinding({ mod_t::ANY, "Invalid" });
@@ -106,24 +109,23 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
   }
 
   // Play interaction again, which should not have any effect
-  // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
+  // Dragon.vtu; SZZYB; CTRL+S; SHIFT+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   test(
     "play interaction after removing all interactions", inter.playInteraction(interactionFilePath));
 
-  // With VTK 9.3.0, rendering is slightly different
   test("render after interaction that should have had no effect",
-    TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
-      filename + "ModifiedAgain", 0.11));
+    TestSDKHelpers::RenderTest(
+      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "ModifiedAgain"));
 
   // initialize default bindings again, two times, and check rendering
   inter.initBindings();
   inter.initBindings();
 
-  // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
+  // Dragon.vtu; SZZYB; CTRL+S; SHIFT+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   test("play interactions after initialization", inter.playInteraction(interactionFilePath));
   test("render after playing defaulted interactions",
-    TestSDKHelpers::RenderTest(
-      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "DefaultAgain"));
+    TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
+      filename + "DefaultAgain", 0.06));
 
   // Check error handling
   test("record to an invalid path",

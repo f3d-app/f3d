@@ -1,0 +1,12 @@
+diff --git a/pxr/usd/usd/zipFile.h b/pxr/usd/usd/zipFile.h
+index 4356be7ec..8f2242096 100644
+--- a/pxr/usd/usd/zipFile.h
++++ b/pxr/usd/usd/zipFile.h
+@@ -10,6 +10,7 @@
+ #include "pxr/pxr.h"
+ #include "pxr/usd/usd/api.h"
+ 
++#include <cstdint>
+ #include <memory>
+ #include <string>
+ #include <utility>

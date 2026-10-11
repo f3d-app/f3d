@@ -34,7 +34,7 @@ The default scene always has at most one animation.
 
 CLI: `--animation-indices`.
 
-### `scene.animation.speed_factor` (_ratio_, default: `1`)
+### `scene.animation.speed_factor` (_ratio_, default: `1`, range domain: `[0, 2]`, increment: `0.1` )
 
 Set the animation speed factor to slow, speed up or even invert animation.
 
@@ -46,10 +46,11 @@ Set the animation time to load.
 
 CLI: `--animation-time`.
 
-### `scene.camera.index` (_int_, optional, **on load**)
+### `scene.camera.index` (_int_, optional, **on load**, index domain: dynamic )
 
 Select the scene camera to use when available in the file.
 The default scene always uses automatic camera.
+The domain is updated when loading the file to contain the number of cameras in the file.
 
 CLI: `--camera-index`.
 
@@ -65,6 +66,12 @@ Force a specific reader to be used, disregarding the file extension and file con
 
 CLI: `--force-reader`.
 
+### `scene.skip_content_check` (_bool_, default: `false`)
+
+Select reader to read file without checking its header content but only based on the file extension.
+
+CLI: `--skip-content-check`.
+
 ### `scene.camera.orthographic` (_bool_, optional)
 
 Set to true to force orthographic projection. Model-specified by default, which is false if not specified.
@@ -73,7 +80,7 @@ CLI: `--camera-orthographic`.
 
 ## Interactor Options
 
-### `interactor.style` (_string_, default: `default`)
+### `interactor.style` (_string_, default: `default`, enum domain: `default, trackball, 2d`)
 
 Set the interaction style. `default` uses standard 3D interaction, `trackball` enables trackball interaction, `2d` enables 2D interaction mode (pan/zoom only, no rotation). In `2d` mode, camera commands (`set_camera`, `roll_camera`, `elevation_camera`, `azimuth_camera`) are disabled.
 
@@ -93,7 +100,7 @@ Path to a texture file containing a material capture. All other model options fo
 
 CLI: `--texture-matcap`.
 
-### `model.color.opacity` (_double_, optional)
+### `model.color.opacity` (_double_, optional, range domain: `[0, 1]`, increment: `0.05`)
 
 Set _opacity_ on the geometry. Usually used with Depth Peeling option. Multiplied with the `model.color.texture` when present. Model-specified by default.
 
@@ -101,7 +108,7 @@ CLI: `--opacity`.
 
 ### `model.color.rgb` (_color_, optional)
 
-Set a _color_ on the geometry. Multiplied with the `model.color.texture` when present. Model-specified by default.
+Set a _color_ on the geometry. Multiplied with the `model.color.texture` when present. Model-specified by default. Ignored if `model.coloring` is not `material`.
 
 CLI: `--color`.
 
@@ -123,19 +130,19 @@ Path to a texture file that sets the emitted light of the object. Multiplied wit
 
 CLI: `--texture-emissive`.
 
-### `model.material.metallic` (_double_, optional)
+### `model.material.metallic` (_double_, optional, range domain: `[0, 1]`, increment: `0.05`)
 
 Set the _metallic coefficient_ on the geometry (between `0.0` and `1.0`). Multiplied with the `model.material.texture` when present. Model-specified by default.
 
 CLI: `--metallic`.
 
-### `model.material.roughness` (_double_, optional)
+### `model.material.roughness` (_double_, optional, range domain: `[0, 1]`, increment: `0.05`)
 
 Set the _roughness coefficient_ on the geometry (between `0.0` and `1.0`). Multiplied with the `model.material.texture` when present. Model-specified by default.
 
 CLI: `--roughness`.
 
-### `model.material.base_ior` (_double_, optional)
+### `model.material.base_ior` (_double_, optional, range domain: `[1, 2.5]`, increment: `0.1`)
 
 Set the _index of refraction of the base layer_ (between `1.0` and `2.5`). Model-specified by default.
 
@@ -151,7 +158,11 @@ CLI: `--texture-material`.
 
 Render vertex normals as arrows on top of the geometry.
 
-### `model.normal.scale` (_double_, optional)
+### `model.normal_glyphs.scale` (_ratio_, default: `1.0`, range domain: `[0, 10]`, increment: `0.1`)
+
+Scales the normal glyphs
+
+### `model.normal.scale` (_double_, optional, range domain: `[0, 3]`, increment: `0.1`)
 
 Normal scale affects the strength of the normal deviation from the normal texture. Model-specified by default.
 
@@ -165,7 +176,7 @@ CLI: `--texture-normal`.
 
 ### `model.checkerboard.enable` (_bool_, default: `false`, **on load**)
 
-Override model's texture with a checkerboard texture.
+Override model's texture with a checkerboard texture. Anti-aliasing is recommended.
 
 CLI: `--checkerboard`.
 
@@ -176,19 +187,23 @@ If the value is true, no shading is applied and the model will be unlit.
 
 CLI: `--unlit`.
 
-### `model.scivis.enable` (_bool_, default: `false`)
+### `model.coloring` (_string_, default: `material`, enum domain: `material, scivis, direct`)
 
-_Color by an array_ present in on the data. If `model.scivis.array_name` is not set, the first available array will be used.
+Specify the coloring mode.
+_material_ means default file materials (textured or solid color)
+_scivis_ and _direct_ mean the array specified with option `model.scivis.array_name` will be used for coloring (or the first available if not set)
+In the case of _scivis_, the array is mapped to a color using the colormap defined in `model.scivis.colormap`
+In the case of _direct_, it is assumed that the array defines colors directly as L, LA, RGB, RGBA values depending on the number of components.
 
-CLI: `--scalar-coloring`.
+CLI: `--coloring-mode`.
 
-### `model.scivis.cells` (_bool_, default: `false`)
+### `model.scivis.field` (_string_, default: `any`, enum domain: `any, points, cells`)
 
-Color the data with value found _on the cells_ instead of points
+Specify which array field must be used in `scivis` or `direct` coloring mode..
 
-CLI: `--coloring-by-cells`.
+CLI: `--coloring-field`.
 
-### `model.scivis.discretization` (_int_, optional)
+### `model.scivis.discretization` (_int_, optional, range domain: `[1, 1024]`, increment: `5`)
 
 Set how many distinct colors will be used from the colormap. Should be `>=1`.
 
@@ -200,16 +215,16 @@ Set a _custom colormap for the coloring_.See [colormap parsing](../user/08-PARSI
 
 CLI: `--colormap`.
 
-### `model.scivis.opacity_map` (_opacity_map_, default: "0.0,0.0,1.0,1.0")
+### `model.scivis.opacity_map` (_vector\<double\>_, default: `0.0,0.0,1.0,1.0`)
 
 Set a _custom opacity map for the coloring_. The format of the opacity map should be `val, opacity, ...`.
 It is only used for volume rendering currently.
 
 CLI: `--volume-opacity-map`.
 
-### `model.scivis.component` (_int_, default: `-1`)
+### `model.scivis.component` (_int_, optional)
 
-Specify the component to color with. `-1` means _magnitude_. `-2` means _direct values_.
+Specify the component to color with in `scivis` or `direct` coloring mode. If not set, it means _magnitude_.
 
 CLI: `--coloring-component`.
 
@@ -222,22 +237,17 @@ CLI: `--coloring-array`.
 ### `model.scivis.range` (_vector\<double\>_, optional)
 
 Set the _coloring range_. Automatically computed by default.
+When automatically computed and minimum and maximum values are nearly equal, the object is colored with the mid value.
 
 CLI: `--coloring-range`.
 
-### `model.point_sprites.enable` (_bool_, default: `false`)
+### `model.point_sprites.type` (_string_, default: `none`, enum domain: `none, sphere, gaussian, circle, stddev, bound, cross`)
 
-Show sphere _points sprites_ instead of the geometry.
-
-CLI: `--point-sprites`.
-
-### `model.point_sprites.type` (_string_, default: `sphere`)
-
-Set the sprites type when showing point sprites (can be `sphere`, `gaussian`, `circle`, `stddev`, `bound` or `cross`).
+Enable and set the point sprites type. This allows to show sprites instead of points.
 
 CLI: `--point-sprites`.
 
-### `model.point_sprites.size` (_double_, default: `10.0`)
+### `model.point_sprites.size` (_double_, default: `10.0`, range domain: `[1, 100]`, increment: `1`)
 
 Set the _size_ of point sprites.
 
@@ -269,27 +279,20 @@ CLI: `--textures-transform`.
 
 ## Render Options
 
-### `render.effect.blending.enable` (_bool_, default: `false`)
+### `render.effect.blending.mode` (_string_, default: `none`, enum domain: `none, ddp, sort, sort_cpu, stochastic`)
 
-Enable _blending support_. This is a technique used to correctly render translucent objects.
+Enable and set the _blending_ technique. This is a technique used to correctly render translucent objects.
+Valid options are: `ddp` (dual depth peeling, quality), `sort` (only for gaussians), `sort_cpu` (only for gaussians, slow), `stochastic` (fast), `none` (disabled).
 
-CLI: `--blending`.
-
-### `render.effect.blending.mode` (_string_, default: `ddp`)
-
-Set the blending technique. Valid options are: `ddp` (dual depth peeling, quality), `sort` (only for gaussians), `sort_cpu` (only for gaussians, slow), `stochastic` (fast)
+> [!WARNING]
+> `ddp`, `sort` and `sort_cpu` are not compatible with OpenGL ES (WebAssembly and Android)
 
 CLI: `--blending`.
 
-### `render.effect.antialiasing.enable` (_string_, default: `false`)
+### `render.effect.antialiasing.mode` (_string_, default: `none`, enum domain: `none, fxaa, ssaa, taa`)
 
-Enable _anti-aliasing_. This technique is used to reduce aliasing.
-
-CLI: `--anti-aliasing`.
-
-### `render.effect.antialiasing.mode` (_string_, default: `fxaa`)
-
-Set the anti-aliasing technique. Valid options are: `fxaa` (fast), `ssaa` (quality), `taa` (balanced)
+Enable and set the anti-aliasing technique. This technique is used to reduce aliasing.
+Valid options are: `fxaa` (fast), `ssaa` (quality), `taa` (balanced), `none` (disabled).
 
 CLI: `--anti-aliasing`.
 
@@ -301,24 +304,24 @@ CLI: `--ambient-occlusion`.
 
 ### `render.effect.tone_mapping` (_bool_, default: `false`)
 
-Enable generic filmic _Tone Mapping Pass_. This technique is used to map colors properly to the monitor colors.
+Enable neutral _Tone Mapping_. This technique is used to map colors properly to the monitor colors.
 
 CLI: `--tone-mapping`.
 
 ### `render.effect.final_shader` (_string_, optional)
 
-Add a final shader to the output image. See [user documentation](../user/10-FINAL_SHADER.md).
+Add a final shader to the output image. See [user documentation](../user/11-FINAL_SHADER.md).
 
 CLI: `--final-shader`
 
 ### `render.effect.display_depth` (_bool_, default: `false`)
 
-Display the depth buffer as a grayscale image or with a colormap if `model.scivis.enable` is specified.
+Display the depth buffer as a grayscale image or with a colormap if `model.coloring` is `scivis`.
 Only opaque objects are displayed, the grid and translucent/volumetric objects are ignored.
 
 CLI: `--display-depth`
 
-### `render.line_width` (_double_, optional)
+### `render.line_width` (_double_, optional, range domain: `[0, 10]`, increment: `0.1`)
 
 Set the _width_ of lines when showing edges. Model-specified by default.
 
@@ -330,13 +333,13 @@ Set to true to show the _cell edges_. Model-specified by default.
 
 CLI: `--edges`.
 
-### `render.point_size` (_double_, optional)
+### `render.point_size` (_double_, optional, range domain: `[0, 10]`, increment: `0.1`)
 
 Set the _size_ of points when showing vertices. Model-specified by default.
 
 CLI: `--point-size`.
 
-### `render.backface_type` (_string_, optional, **on load**)
+### `render.backface_type` (_string_, optional, **on load**, enumeration domain: `visible, hidden`)
 
 Set the Backface type, can be `visible` or `hidden`, Model-specified by default.
 
@@ -372,9 +375,24 @@ Set the color of grid lines.
 
 CLI: `--grid-color`.
 
+### `render.grid.opacity` (_ratio_, default: `1.0`)
+
+Set the opacity for the grid lines. Can be set to `0` to show reflection only.
+
+CLI: `--grid-opacity`.
+
+### `render.grid.reflection` (_ratio_, default: `0.0`)
+
+Set the reflection strength on the grid.
+
+CLI: `--grid-reflection`.
+
 ### `render.axes_grid` (_bool_, default: `false`)
 
 Show _axes grid_ in the scene.
+
+> [!WARNING]
+> this option is not compatible with OpenGL ES (WebAssembly and Android)
 
 CLI: `--axes-grid`.
 
@@ -384,7 +402,7 @@ Enable _raytracing_. Requires the raytracing module to be enabled.
 
 CLI: `--raytracing`.
 
-### `render.raytracing.samples` (_int_, default: `5`)
+### `render.raytracing.samples` (_int_, default: `5`, range domain: `[1, 50]`, increment: `1`)
 
 The number of _samples per pixel_.
 
@@ -418,28 +436,22 @@ Ignored if a _hdri_ skybox is used.
 
 CLI: `--background-color`.
 
-### `render.background.skybox` (_bool_, default: `false`)
+### `render.background.skybox` (_string_, default: `disabled`, enum domain: `disabled`, `enabled`, `blurred`)
 
-Show the _HDRI_ image as a skybox
+Define how to show the _HDRI_ image as a skybox
 Overrides the the background color if any
 
 CLI: `--hdri-skybox`.
 
-### `render.background.blur.enable` (_bool_, default: `false`)
-
-Blur background, useful with a skybox.
-
-CLI: `--blur-background`.
-
-### `render.background.blur.coc` (_double_, default: `20.0`)
+### `render.background.blur_coc` (_double_, default: `20.0`, range domain: `[0, 100]`, increment: `5`)
 
 Blur background circle of confusion radius.
 
 CLI: `--blur-coc`.
 
-### `render.light.intensity` (_double_, default: `1.0`)
+### `render.light.intensity` (_double_, default: `1.0`, range domain: `[0, 5]`, increment: `0.02`)
 
-Adjust the intensity of every light in the scene.
+Adjust the intensity of every light in the scene, including HDRI image-based lighting.
 
 CLI: `--light-intensity`.
 
@@ -457,19 +469,19 @@ Show _axes_ as a trihedron in the scene. Requires an interactor.
 
 CLI: `--axis`.
 
-### `ui.x_color` (_color_, default: `#f94306`)
+### `ui.x_color` (_color_, default: `f3d_red`)
 
 Set the X axis color in both widget and grid.
 
 CLI: `--x-color`.
 
-### `ui.y_color` (_color_, default: `#7aff7a`)
+### `ui.y_color` (_color_, default: `f3d_green`)
 
 Set the Y axis color in both widget and grid.
 
 CLI: `--y-color`.
 
-### `ui.z_color` (_color_, default: `#788bff`)
+### `ui.z_color` (_color_, default: `f3d_blue`)
 
 Set the Z axis color in both widget and grid.
 
@@ -514,13 +526,13 @@ Can be useful to display non-ASCII filenames.
 
 CLI: `--font-file`.
 
-### `ui.scale` (_ratio_, default: `1.0`)
+### `ui.scale` (_ratio_, default: `1.0`, range domain: `[0, 10]`, increment: `0.1`)
 
 Scale fonts. Useful for HiDPI displays.
 
 CLI: `--font-scale`.
 
-### `ui.font_color` (_color_, default: `0.957,0.957,0.957`)
+### `ui.font_color` (_color_, default: `f3d_white`)
 
 Set font color.
 
@@ -537,6 +549,9 @@ CLI: `--dpi-aware`.
 
 Display a _frame per second counter_.
 
+> [!WARNING]
+> this option is not compatible with OpenGL ES (WebAssembly and Android)
+
 CLI: `--fps`.
 
 ### `ui.loader_progress` (_bool_, default: `false`, **on load**)
@@ -545,19 +560,22 @@ Show a _progress bar_ when loading the file.
 
 CLI: `--loading-progress`.
 
-### `ui.loader_progress_color` (_color_, optional, **on load**)
+### `ui.loader_progress_color` (_color_, default: `f3d_yellow`)
 
-Set loader progress bar color or use default one #FFFFFF if not set.
+Set loader progress bar color.
 
-### `ui.animation_progress` (_bool_, default: `false`, **on load**)
+### `ui.animation_progress` (_string_, default: `none`, enum domain: `none`, `default`, `advanced`)
 
-Show a _progress bar_ when playing the animation.
+Control the _progress bar_ shown when playing the animation. Can be `none` (hidden),
+`default` (only the progress bar, which can be clicked or dragged to jump to a
+time) or `advanced` (the progress bar plus time range, animation name and current
+time labels, with a marker for each key frame).
 
 CLI: `--animation-progress`.
 
-### `ui.animation_progress_color` (_color_, optional, **on load**)
+### `ui.animation_progress_color` (_color_, default: `f3d_blue`)
 
-Set animation progress bar color or use default one #788BFF if not set.
+Set animation progress bar color.
 
 ### `ui.metadata` (_bool_, default: `false`)
 
@@ -577,18 +595,28 @@ Space separated custom key bindings to display in the drop zone.
 
 Display the logo. Needs ui.drop_zone.enable to be true.
 
-### `ui.backdrop.opacity` (_double_, default: `0.9`)
+### `ui.backdrop.color` (_color_, default: `f3d_black`)
+
+Set the color of the backdrop behind the UI elements.
+
+CLI: `--backdrop-color`.
+
+### `ui.backdrop.opacity` (_double_, default: `0.9`, range domain: `[0, 1]`, increment: `0.05`)
 
 Set the opacity of the backdrop behind the UI elements. Value is between 0.0 (fully transparent) and 1.0 (fully opaque).
 
 CLI: `--backdrop-opacity`.
 
-### `ui.scene_hierarchy` (_bool_, default: `false`)
+### `ui.scene_hierarchy.enable` (_bool_, default: `false`)
 
 Display the _scene hierarchy_ as a tree representing the internal structure of the model, with checkboxes allowing to hide or show individual parts.
 By default the tree is only expanded enough to show nodes that have meaningful names, but all nodes can be fully expanded manually.
 
 CLI: `--scene-hierarchy`.
+
+### `ui.scene_hierarchy.max_width` (_int_, default: `600`)
+
+Maximum width of the _scene hierarchy_ widget in pixels.
 
 ### `ui.notifications.enable` (_bool_, default: `false`)
 
@@ -600,11 +628,27 @@ CLI: `--notifications`.
 
 Show corresponding keys when notifications are triggered by bindings key press events.
 
-# APIs
+## Domains
+
+Certains options have domains that helps user pick valid values.
+Options with domains are documented as such above.
+Domains are never enforced but are indicative.
+Domains are taken into account when using the dedicated [string API](#string-api)
+or [related commands](../user/07-COMMANDS.md).
+
+Range domains are intended for numeric options that have minimum, a maximum and an increment.
+Enum domains are intended for options that have a finite set of possible value.
+Index domains are intended for integer options that are between 0 and a maximum.
+
+If an option has a `dynamic` domains, it means the libf3d can change the domain.
+It is possible to directly read/write a domain using the [struct API](#struct-api).
+It is possible to read a domain using the [variant API](#variant-api).
+
+## APIs
 
 There are three APIs to access the options
 
-## Struct API
+### Struct API
 
 The most straightforward and easy to use API, just access it through the structs available in the options instance, eg:
 
@@ -634,7 +678,16 @@ Please note that when accessing optional options, special care must be used, eg:
 
 It's even more true with the few optional boolean options as std::optional has an implicit boolean cast operator.
 
-## String API
+Domains are accessible through the dedicated struct:
+
+```cpp
+  f3d::engine eng = f3d::engine::create();
+  f3d::options& opt = eng.getOptions();
+  std::cout << opt.domains.render.raytracing.samples.range[1] << "\n";
+  std::cout << opt.domains.render.effect.blending.mode.enum[0] << "\n";
+```
+
+### String API
 
 The most generic and flexible API, as it rely on parsing and string generation.
 See the [parsing documentation](../user/08-PARSING.md) for more details.
@@ -668,7 +721,18 @@ When using this API make sure to catch exceptions has needed, eg:
   }
 ```
 
-## Variant API
+This API can interact directly with domains using `increase`/`decrease` and `cycle`:
+
+```cpp
+  f3d::engine eng = f3d::engine::create();
+  f3d::options& opt = eng.getOptions();
+  opt.increase("render.raytracing.samples").increase("render.raytracing.samples").decrease("render.raytracing.samples");
+  opt.cycle("render.effect.blending.mode").cycle("render.effect.blending.mode");
+```
+
+When using this API make sure to catch exceptions as documented in the `option.h` header.
+
+### Variant API
 
 An API that is similar to the F3D 2.0 options API thanks to std::variant.
 
@@ -679,6 +743,33 @@ An API that is similar to the F3D 2.0 options API thanks to std::variant.
   opt.set("render.grid.enable", true);
   opt.set("ui.metadata", true);
   opt.set("model.material.roughness", 0.6);
+```
+
+This API can read domains using `hasDomain`, `getDomainStyle`, `getRangeDomain`, `getEnumDomain` and `getIndexDomain`.
+
+```cpp
+  f3d::engine eng = f3d::engine::create();
+  f3d::options& opt = eng.getOptions();
+
+  std::string optionName = "option.name";
+  if (opt.hasDomain(optionName))
+  {
+    switch (opt.getDomainStyle(optionName))
+    {
+      case f3d::domain_style::RANGE:
+        DomainRange<option_variant_t> domain = opt.getRangeDomain("optionName");
+        ...
+        break;
+      case f3d::domain_style::ENUM:
+        DomainEnum<option_variant_t> domain = opt.getEnumDomain("optionName");
+        ...
+        break;
+      case f3d::domain_style::INDEX:
+        DomainIndex domain = opt.getIndexDomain("optionName");
+        ...
+        break;
+    }
+  }
 ```
 
 When using this API make sure to catch exception shown above with the string API.

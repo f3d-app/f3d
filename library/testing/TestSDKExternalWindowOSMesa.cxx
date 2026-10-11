@@ -3,6 +3,13 @@
 
 #include "engine.h"
 
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#define GLAPI extern
+#include <windows.h>
+#endif
+
 #include <GL/osmesa.h>
 
 int TestSDKExternalWindowOSMesa([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
@@ -13,7 +20,10 @@ int TestSDKExternalWindowOSMesa([[maybe_unused]] int argc, [[maybe_unused]] char
   std::vector<unsigned char> buffer(size[0] * size[1] * 4);
 
   // Create an OSMesa context
-  OSMesaContext ctx = OSMesaCreateContext(OSMESA_RGBA, nullptr);
+  static const int attribs[] = { OSMESA_FORMAT, OSMESA_RGBA, OSMESA_DEPTH_BITS, 32, OSMESA_PROFILE,
+    OSMESA_CORE_PROFILE, OSMESA_CONTEXT_MAJOR_VERSION, 3, OSMESA_CONTEXT_MINOR_VERSION, 2, 0 };
+
+  OSMesaContext ctx = OSMesaCreateContextAttribs(attribs, nullptr);
   if (!ctx)
   {
     std::cerr << "OSMesa context creation failed!\n";

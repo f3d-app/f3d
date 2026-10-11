@@ -5,17 +5,18 @@
 #include <interactor.h>
 #include <window.h>
 
-int TestSDKDropZoneNoLogo([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
+int TestSDKDropZoneNoLogo([[maybe_unused]] int argc, char* argv[])
 {
   PseudoUnitTest test;
 
-  f3d::engine eng = f3d::engine::create(true);
+  const std::string renderingBackend = std::string(argv[4]);
+  f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();
   win.setSize(300, 300);
   opt.ui.drop_zone.enable = true;
   opt.ui.drop_zone.show_logo = false;
-  opt.ui.drop_zone.custom_binds = "None+Drop Ctrl+O None+H";
+  opt.ui.drop_zone.custom_binds = "None+Drop Ctrl+O F1";
 
   win.render();
 

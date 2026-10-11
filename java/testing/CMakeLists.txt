@@ -1,4 +1,5 @@
 list(APPEND javaf3dTests_list
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestAnimation.java
   ${CMAKE_CURRENT_SOURCE_DIR}/TestCamera.java
   ${CMAKE_CURRENT_SOURCE_DIR}/TestEngine.java
   ${CMAKE_CURRENT_SOURCE_DIR}/TestImage.java
@@ -11,13 +12,31 @@ list(APPEND javaf3dTests_list
   ${CMAKE_CURRENT_SOURCE_DIR}/TestWindow.java
     )
 
+if(F3D_MODULE_FFMPEG)
+  list(APPEND javaf3dTests_list
+    ${CMAKE_CURRENT_SOURCE_DIR}/TestVideo.java
+    )
+endif()
+
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
   list(APPEND javaf3dTests_list
     ${CMAKE_CURRENT_SOURCE_DIR}/TestSceneBuffer.java
     )
 endif()
 
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  list(APPEND javaf3dTests_list
+    ${CMAKE_CURRENT_SOURCE_DIR}/TestImageStream.java
+    )
+endif()
+
 set(java_test_args "-ea") # enable assertions
+
+# Content validation needs proper CanReadFile support
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  list(APPEND java_test_args "-Df3d.testing.contentCheck=true")
+endif()
+
 if (WIN32)
   list(APPEND java_test_args "--enable-native-access=ALL-UNNAMED")
 endif()
@@ -49,5 +68,6 @@ foreach(test_file ${javaf3dTests_list})
   set_tests_properties(libf3d_bindings_java::${TName} PROPERTIES
     LABELS "libf3d;bindings;java"
     DISABLED ${java_test_disabled}
+    TIMEOUT 180
   )
 endforeach()

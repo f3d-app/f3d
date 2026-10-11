@@ -1,5 +1,5 @@
 // Clip Library
-// Copyright (c) 2025 David Capello
+// Copyright (c) 2025-2026 David Capello
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -12,11 +12,13 @@
 
 #include <algorithm>
 
+#include "clip_base.h"
+
 namespace clip {
 namespace win {
 
 // Scoped GlobalLock / GlobalUnlock wrapper
-class HglobalLock {
+class CLIP_EXTERN HglobalLock {
 public:
   HglobalLock() = delete;
   HglobalLock(const HglobalLock& other) = delete;
@@ -53,7 +55,7 @@ private:
 };
 
 // Scoped GlobalAlloc / GlobalFree wrapper
-class Hglobal {
+class CLIP_EXTERN Hglobal {
 public:
   Hglobal() : m_handle(nullptr) {
   }

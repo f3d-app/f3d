@@ -38,7 +38,7 @@ struct mdl_header_t
 template<typename TYPE>
 static TYPE* PeekFromVector(const std::vector<uint8_t>& buffer, const size_t& offset)
 {
-  static_assert(std::is_pod<TYPE>::value, "Vector typecast requires POD input");
+  static_assert(std::is_standard_layout_v<TYPE>, "Vector typecast requires POD input");
 
   if (offset + sizeof(TYPE) > buffer.size())
   {
@@ -59,7 +59,7 @@ struct Error
 Error ErrorCodeParser(const std::string& errorStr)
 {
   Error err;
-  std::regex errorRegex(R"(ERROR: In (.+?), line (\d+)\n.+: (.+))");
+  const std::regex errorRegex(R"(ERROR: In (.+?), line (\d+)\n.+: (.+))");
   std::smatch matches;
   if (std::regex_search(errorStr, matches, errorRegex))
   {
@@ -84,9 +84,9 @@ void ErrorCallbackFunc(
 int TestF3DQuakeMDLParser(int vtkNotUsed(argc), char* argv[])
 {
   // Read in example file, can theoretically be any mdl file
-  std::string path = std::string(argv[1]) + "data/armor.mdl";
+  const std::string path = std::string(argv[1]) + "data/armor.mdl";
   std::ifstream file(path, std::ios::binary);
-  std::vector<uint8_t> defaultFile(
+  const std::vector<uint8_t> defaultFile(
     (std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
   // setup vectors

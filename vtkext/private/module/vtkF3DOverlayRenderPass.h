@@ -40,6 +40,11 @@ public:
   vtkF3DOverlayRenderPass(const vtkF3DOverlayRenderPass&) = delete;
   void operator=(const vtkF3DOverlayRenderPass&) = delete;
 
+  /**
+   * Get color texture object used to render the overlay.
+   */
+  vtkGetObjectMacro(ColorTexture, vtkTextureObject);
+
 protected:
   void Initialize(const vtkRenderState* s);
 

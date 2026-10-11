@@ -25,8 +25,19 @@
           "valueHelper": "<png file>"
         },
         {
+          "longName": "output-video",
+          "helpText": "Render to video",
+          "valueHelper": "<h264 file>"
+        },
+        {
           "longName": "no-background",
           "helpText": "No background when render to file",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
+          "longName": "no-cache",
+          "helpText": "No cache is used (both reading and writing)",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
@@ -47,6 +58,12 @@
           "longName": "force-reader",
           "helpText": "Force a specific reader to be used, disregarding the file extension",
           "valueHelper": "<reader>"
+        },
+        {
+          "longName": "skip-content-check",
+          "helpText": "Select reader to read file without checking its header content, but only based on the file extension.",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
         },
         {
           "longName": "list-bindings",
@@ -72,6 +89,21 @@
           "implicitValue": "1"
         },
         {
+          "longName": "load-statefile",
+          "helpText": "Restore the application state from a statefile, applied above config files but below command line options. Use `-` for the standard input",
+          "valueHelper": "<file path>"
+        },
+        {
+          "longName": "save-statefile",
+          "helpText": "Save the application state to a statefile right after loading then continue, supports the same template variables as --output. Use `-` for the standard output",
+          "valueHelper": "<file path>"
+        },
+        {
+          "longName": "statefile-filename",
+          "helpText": "Default filename used by the statefile save and load interactions when no file is provided, supports the same template variables as --output. Use `-` for the standard output (save) or standard input (load)",
+          "valueHelper": "<file path>"
+        },
+        {
           "longName": "rendering-backend",
           "helpText": "Backend to use when rendering (auto|glx|wgl|egl|osmesa)",
           "valueHelper": "<string>"
@@ -79,6 +111,26 @@
         {
           "longName": "list-rendering-backends",
           "helpText": "Print the list of rendering backends available on this system"
+        },
+        {
+          "longName": "list-video-encoders",
+          "helpText": "Print the list of video encoders available on this system"
+        },
+        {
+          "longName": "video-encoder",
+          "helpText": "Select the video encoder to use for output",
+          "valueHelper": "<name>"
+        },
+        {
+          "longName": "video-bitrate",
+          "helpText": "Select the video bitrate in Mbps to use for output",
+          "valueHelper": "<bitrate>"
+        },
+        {
+          "longName": "video-low-latency",
+          "helpText": "Enable low latency mode for video encoding",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
         },
         {
           "longName": "max-size",
@@ -109,6 +161,11 @@
           "valueHelper": "<paths or names>"
         },
         {
+          "longName": "plugins-path",
+          "helpText": "Path specifying where to load plugins from",
+          "valueHelper": "<path>"
+        },
+        {
           "longName": "scan-plugins",
           "helpText": "Scan standard directories for plugins and display available plugins (result can be incomplete)"
         },
@@ -136,9 +193,9 @@
         },
         {
           "longName": "animation-progress",
-          "helpText": "Show animation progress bar",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
+          "helpText": "Animation progress bar mode (\"none\", \"default\" or \"advanced\")",
+          "valueHelper": "<string>",
+          "implicitValue": "default"
         },
         {
           "longName": "multi-file-mode",
@@ -218,6 +275,16 @@
           "valueHelper": "<color>"
         },
         {
+          "longName": "grid-opacity",
+          "helpText": "Opacity of the grid lines",
+          "valueHelper": "<value>"
+        },
+        {
+          "longName": "grid-reflection",
+          "helpText": "Reflection strength of the grid",
+          "valueHelper": "<value>"
+        },
+        {
           "longName": "axes-grid",
           "helpText": "Enable grid axis",
           "valueHelper": "<bool>",
@@ -249,12 +316,6 @@
           "implicitValue": "2d"
         },
         {
-          "longName": "interaction-trackball",
-          "helpText": "Enable trackball interaction (deprecated, use --interaction-style=trackball)",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
-        },
-        {
           "longName": "invert-zoom",
           "helpText": "Invert zoom direction with right mouse click",
           "valueHelper": "<bool>",
@@ -265,11 +326,6 @@
           "helpText": "Automatically start animation",
           "valueHelper": "<bool>",
           "implicitValue": "1"
-        },
-        {
-          "longName": "animation-index",
-          "helpText": "Select animation to show (deprecated)",
-          "valueHelper": "<index>"
         },
         {
           "longName": "animation-indices",
@@ -308,6 +364,12 @@
           "conditional": "F3D_MODULE_UI"
         },
         {
+          "longName": "backdrop-color",
+          "helpText": "UI backdrop color",
+          "valueHelper": "<color>",
+          "conditional": "F3D_MODULE_UI"
+        },
+        {
           "longName": "command-script",
           "helpText": "Path to a script file containing commands to execute",
           "valueHelper": "<file_path>"
@@ -317,6 +379,11 @@
           "helpText": "Enable normal glyphs",
           "valueHelper": "<bool>",
           "implicitValue": "1"
+        },
+        {
+          "longName": "normal-glyphs-scale",
+          "helpText": "Scale normal glyphs",
+          "valueHelper": "<ratio>"
         }
       ]
     },
@@ -329,11 +396,6 @@
           "helpText": "Select point sprites type (\"none\", \"sphere\", \"gaussian\", \"circle\", \"stddev\", \"bound\")",
           "valueHelper": "<string>",
           "implicitValue": "sphere"
-        },
-        {
-          "longName": "point-sprites-type",
-          "helpText": "Point sprites type (deprecated)",
-          "valueHelper": "<sphere|gaussian>"
         },
         {
           "longName": "point-sprites-size",
@@ -402,8 +464,8 @@
           "longName": "hdri-skybox",
           "shortName": "j",
           "helpText": "Enable HDRI skybox background",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
+          "valueHelper": "<string>",
+          "implicitValue": "enabled"
         },
         {
           "longName": "texture-matcap",
@@ -517,13 +579,6 @@
           "implicitValue": "1"
         },
         {
-          "longName": "blur-background",
-          "shortName": "u",
-          "helpText": "Blur background",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
-        },
-        {
           "longName": "blur-coc",
           "helpText": "Blur circle of confusion radius",
           "valueHelper": "<value>"
@@ -539,11 +594,11 @@
       "name": "Scientific visualization",
       "options": [
         {
-          "longName": "scalar-coloring",
+          "longName": "coloring-mode",
           "shortName": "s",
-          "helpText": "Color by a scalar array",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
+          "helpText": "Change the color mode",
+          "valueHelper": "<material|scivis|direct>",
+          "implicitValue": "scivis"
         },
         {
           "longName": "coloring-array",
@@ -553,16 +608,15 @@
         {
           "longName": "coloring-component",
           "shortName": "y",
-          "helpText": "Component from the array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars",
+          "helpText": "Component from the array to color with. Use magnitude if not specified",
           "valueHelper": "<comp_index>",
-          "implicitValue": "-2"
+          "implicitValue": "0"
         },
         {
-          "longName": "coloring-by-cells",
-          "shortName": "c",
-          "helpText": "Use an array from the cells",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
+          "longName": "coloring-field",
+          "helpText": "Use the specified field for coloring (e.g., \"cells\" or \"points\")",
+          "valueHelper": "<string>",
+          "implicitValue": "cells"
         },
         {
           "longName": "coloring-range",
@@ -704,12 +758,6 @@
           "implicitValue": "ddp"
         },
         {
-          "longName": "translucency-support",
-          "helpText": "Enable translucency blending (deprecated)",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
-        },
-        {
           "longName": "ambient-occlusion",
           "shortName": "q",
           "helpText": "Enable ambient occlusion providing approximate shadows for better depth perception, implemented using SSAO",
@@ -720,12 +768,6 @@
           "longName": "anti-aliasing",
           "shortName": "a",
           "helpText": "Select anti-aliasing method (\"none\", \"fxaa\", \"ssaa\" or \"taa\")",
-          "valueHelper": "<string>",
-          "implicitValue": "fxaa"
-        },
-        {
-          "longName": "anti-aliasing-mode",
-          "helpText": "Select anti-aliasing method (\"fxaa\", \"ssaa\" or \"taa\") (deprecated)",
           "valueHelper": "<string>",
           "implicitValue": "fxaa"
         },

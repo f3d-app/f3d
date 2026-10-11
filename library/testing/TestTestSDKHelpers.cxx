@@ -12,6 +12,18 @@ int TestTestSDKHelpers([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
 
+  // Coverage of CreateOffscreenEngine
+  for (auto backend : { "osmesa", "egl", "auto" })
+  {
+    try
+    {
+      std::ignore = TestSDKHelpers::CreateOffscreenEngine(backend);
+    }
+    catch (...)
+    {
+    }
+  }
+
   f3d::engine eng = f3d::engine::create(true);
   f3d::scene& scene = eng.getScene();
   f3d::window& win = eng.getWindow();

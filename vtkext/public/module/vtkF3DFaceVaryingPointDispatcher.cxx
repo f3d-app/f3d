@@ -1,6 +1,7 @@
 #include "vtkF3DFaceVaryingPointDispatcher.h"
 
 #include "vtkFloatArray.h"
+#include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationIntegerKey.h"
 #include "vtkInformationVector.h"
@@ -26,7 +27,7 @@ int vtkF3DFaceVaryingPointDispatcher::RequestData(vtkInformation* vtkNotUsed(req
   // early exit if all interpolations are "vertex"
   vtkPointData* inputPointData = input->GetPointData();
 
-  vtkIdType nbArrays = inputPointData->GetNumberOfArrays();
+  const vtkIdType nbArrays = inputPointData->GetNumberOfArrays();
 
   bool earlyExit = true;
 
@@ -35,7 +36,7 @@ int vtkF3DFaceVaryingPointDispatcher::RequestData(vtkInformation* vtkNotUsed(req
     vtkDataArray* inputArray = inputPointData->GetArray(i);
 
     vtkInformation* info = inputArray->GetInformation();
-    int interpType = info->Get(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE());
+    const int interpType = info->Get(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE());
 
     if (interpType != 0) // vertex
     {
@@ -54,8 +55,8 @@ int vtkF3DFaceVaryingPointDispatcher::RequestData(vtkInformation* vtkNotUsed(req
   vtkPoints* inputPoints = input->GetPoints();
   vtkCellArray* inputFaces = input->GetPolys();
 
-  vtkIdType nbCells = inputFaces->GetNumberOfCells();
-  vtkIdType nbConnectivity = inputFaces->GetNumberOfConnectivityIds();
+  const vtkIdType nbCells = inputFaces->GetNumberOfCells();
+  const vtkIdType nbConnectivity = inputFaces->GetNumberOfConnectivityIds();
 
   // the number of output points is the number of total cells connectivity
   vtkNew<vtkPoints> outputPoints;
@@ -74,7 +75,7 @@ int vtkF3DFaceVaryingPointDispatcher::RequestData(vtkInformation* vtkNotUsed(req
     vtkDataArray* inputArray = inputPointData->GetArray(i);
 
     vtkInformation* info = inputArray->GetInformation();
-    int interpType = info->Get(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE());
+    const int interpType = info->Get(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE());
 
     if (interpType == 0) // vertex
     {
@@ -89,6 +90,11 @@ int vtkF3DFaceVaryingPointDispatcher::RequestData(vtkInformation* vtkNotUsed(req
   }
 
   vtkNew<vtkCellArray> outputFaces;
+  vtkNew<vtkIdTypeArray> sourceIds;
+  sourceIds->SetName("SourceIds");
+  sourceIds->SetNumberOfTuples(nbConnectivity);
+
+  outputPointData->AddArray(sourceIds);
 
   std::vector<vtkIdType> cell;
   cell.resize(inputFaces->GetMaxCellSize());
@@ -105,13 +111,14 @@ int vtkF3DFaceVaryingPointDispatcher::RequestData(vtkInformation* vtkNotUsed(req
     {
       cell[j] = currentVertexIndex + j;
       outputPoints->SetPoint(currentVertexIndex + j, inputPoints->GetPoint(cellPoints[j]));
+      sourceIds->SetValue(currentVertexIndex + j, cellPoints[j]);
 
       for (vtkIdType k = 0; k < nbArrays; k++)
       {
         vtkDataArray* inputArray = inputPointData->GetArray(k);
 
         vtkInformation* info = inputArray->GetInformation();
-        int interpType = info->Get(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE());
+        const int interpType = info->Get(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE());
 
         if (interpType == 0) // vertex
         {

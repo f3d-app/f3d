@@ -14,12 +14,15 @@
 
 #include <memory>
 
+class vtkImporter;
+
 namespace f3d
 {
 class options;
 
 namespace detail
 {
+class animation_impl;
 class interactor_impl;
 class window_impl;
 class scene_impl : public scene
@@ -35,33 +38,46 @@ public:
   scene& add(const std::vector<std::filesystem::path>& filePath) override;
   scene& add(const std::vector<std::string>& filePathStrings) override;
   scene& add(const mesh_t& mesh) override;
+  scene& add(std::shared_ptr<mesh_view> mesh) override;
   scene& add(const std::byte* buffer, std::size_t size) override;
   scene& clear() override;
+  std::vector<std::filesystem::path> getAddedFiles() const override;
   int addLight(const light_state_t& lightState) const override;
   int getLightCount() const override;
   light_state_t getLight(int index) const override;
   scene& updateLight(int index, const light_state_t& lightState) override;
   scene& removeLight(int index) override;
   scene& removeAllLights() override;
-  bool supports(const std::filesystem::path& filePath) override;
-  scene& loadAnimationTime(double timeValue) override;
-  std::pair<double, double> animationTimeRange() override;
-  std::vector<double> getAnimationKeyFrames() override;
-  unsigned int availableAnimations() const override;
-  std::string getAnimationName(int index = -1) override;
-  std::vector<std::string> getAnimationNames() override;
+  std::vector<node_state_t> getSceneHierarchy() const override;
+  scene& setNodeVisibility(int nodeId, bool visible) override;
+  scene_info_t getSceneInfo() const override;
+  file_availability supports(const std::filesystem::path& filePath) override;
+  animation& getAnimation() override;
   ///@}
 
   /**
    * Implementation only API.
-   * Set the interactor to use when interacting and set the AnimationManager on the interactor.
+   * Convenience method to get animatiom impl directly
+   */
+  animation_impl& GetAnimationImpl();
+
+  /**
+   * Implementation only API.
+   * Set the interactor to use when interacting.
    */
   void SetInteractor(interactor_impl* interactor);
 
   /**
+   * Implementation only API.
    * Display available cameras in the log
    */
   void PrintImporterDescription(log::VerboseLevel level);
+
+  /**
+   * Display output description, coloring information and scene description
+   * from provider importer and window.
+   */
+  static void DisplayAllInfo(vtkImporter* importer, window_impl& window);
 
 private:
   class internals;

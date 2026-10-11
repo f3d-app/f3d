@@ -1,24 +1,79 @@
 #include "engine.h"
 
+#include "animation_impl.h"
 #include "config.h"
 #include "factory.h"
 #include "init.h"
 #include "interactor_impl.h"
 #include "log.h"
 #include "scene_impl.h"
+#include "statefile.h"
 #include "utils.h"
 #include "window_impl.h"
 
+#include "F3DUtils.h"
 #include "vtkF3DNoRenderWindow.h"
 
 #include <vtkVersion.h>
+
+#ifdef __EMSCRIPTEN__
+#include <vtkWebAssemblyRenderWindowInteractor.h>
+#endif
 
 #include <vtksys/DynamicLoader.hxx>
 #include <vtksys/SystemTools.hxx>
 
 #include <nlohmann/json.hpp>
 
+#include <algorithm>
+#include <fstream>
+#include <istream>
+#include <iterator>
+#include <ostream>
+
 namespace fs = std::filesystem;
+
+namespace
+{
+//----------------------------------------------------------------------------
+// Make the stored file paths relative to baseDir when contained by it, so a statefile stays
+// portable alongside its files. Paths outside baseDir are kept absolute.
+void RelativizeFiles(nlohmann::ordered_json& root, const fs::path& baseDir)
+{
+  if (!root.contains("files"))
+  {
+    return;
+  }
+  for (auto& file : root.at("files"))
+  {
+    const fs::path abs = fs::absolute(file.get<std::string>());
+    const fs::path rel = fs::relative(abs, fs::absolute(baseDir));
+    if (!rel.empty() && *rel.begin() != "..")
+    {
+      file = rel.generic_string();
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+// Resolve relative file paths against baseDir so the state holds absolute paths, undoing
+// RelativizeFiles.
+void ResolveFiles(nlohmann::ordered_json& root, const fs::path& baseDir)
+{
+  if (!root.contains("files"))
+  {
+    return;
+  }
+  for (auto& file : root.at("files"))
+  {
+    const fs::path path = file.get<std::string>();
+    if (path.is_relative())
+    {
+      file = (baseDir / path).lexically_normal().generic_string();
+    }
+  }
+}
+}
 
 namespace f3d
 {
@@ -45,8 +100,8 @@ public:
 };
 
 //----------------------------------------------------------------------------
-engine::engine(
-  const std::optional<window::Type>& windowType, bool offscreen, const context::function& loader)
+engine::engine(const std::optional<window::Type>& windowType, bool offscreen,
+  const context::function& loader, std::string_view id)
   : Internals(new engine::internals)
 {
   // Ensure all lib initialization is done (once)
@@ -87,8 +142,8 @@ engine::engine(
 
   this->Internals->Options = std::make_unique<options>();
 
-  this->Internals->Window =
-    std::make_unique<detail::window_impl>(*this->Internals->Options, windowType, offscreen, loader);
+  this->Internals->Window = std::make_unique<detail::window_impl>(
+    *this->Internals->Options, windowType, offscreen, loader, id);
 
   if (!cachePath.empty())
   {
@@ -102,9 +157,22 @@ engine::engine(
   // Do not create an interactor for NONE
   if (windowType != window::Type::NONE)
   {
-    this->Internals->Interactor = std::make_unique<detail::interactor_impl>(
-      *this->Internals->Options, *this->Internals->Window, *this->Internals->Scene);
+    this->Internals->Interactor =
+      std::make_unique<detail::interactor_impl>(*this->Internals->Options, *this->Internals->Window,
+        *this->Internals->Scene, this->Internals->Scene->GetAnimationImpl());
   }
+
+#ifdef __EMSCRIPTEN__
+  // Set canvas selector for wasm window
+  if (windowType == window::Type::WASM)
+  {
+    vtkRenderWindowInteractor* interactor =
+      this->Internals->Window->GetRenderWindow()->GetInteractor();
+    vtkWebAssemblyRenderWindowInteractor* wasmInteractor =
+      vtkWebAssemblyRenderWindowInteractor::SafeDownCast(interactor);
+    wasmInteractor->SetCanvasSelector(id.empty() ? "#canvas" : id.data());
+  }
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -146,16 +214,12 @@ engine engine::createOSMesa()
 //----------------------------------------------------------------------------
 engine engine::createExternal([[maybe_unused]] const context::function& getProcAddress)
 {
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 20240914)
-  throw engine::no_window_exception("VTK version < 9.4 does not support external windows");
-#else
   if (getProcAddress == nullptr)
   {
     throw engine::no_window_exception(
       "Cannot create an external window without a context function");
   }
   return { window::Type::EXTERNAL, false, getProcAddress };
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -186,6 +250,15 @@ engine engine::createExternalEGL()
 engine engine::createExternalOSMesa()
 {
   return { window::Type::EXTERNAL, false, context::osmesa() };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createWasm(std::string_view canvasSelector)
+{
+#ifndef __EMSCRIPTEN__
+  throw engine::no_window_exception("Cannot create a WebAssembly window on this platform");
+#endif
+  return { window::Type::WASM, false, nullptr, canvasSelector };
 }
 
 //----------------------------------------------------------------------------
@@ -257,6 +330,144 @@ interactor& engine::getInteractor()
 }
 
 //----------------------------------------------------------------------------
+engine::state engine::dump()
+{
+  engine::state st;
+  st.Content = detail::captureStateContent(
+    *this->Internals->Scene, *this->Internals->Window, *this->Internals->Options);
+  return st;
+}
+
+//----------------------------------------------------------------------------
+engine& engine::load(const engine::state& st)
+{
+  detail::restoreStateContent(
+    *this->Internals->Scene, *this->Internals->Window, *this->Internals->Options, st.Content);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+engine::state engine::state::fromString(const std::string& content)
+{
+  engine::state st;
+  try
+  {
+    st.Content = nlohmann::ordered_json::parse(content).dump(2);
+  }
+  catch (const nlohmann::json::exception& ex)
+  {
+    throw engine::statefile_exception(std::string("Could not parse state content: ") + ex.what());
+  }
+  return st;
+}
+
+//----------------------------------------------------------------------------
+engine::state engine::state::fromFile(const fs::path& filePath)
+{
+  engine::state st;
+  try
+  {
+    std::ifstream stream(filePath);
+    if (!stream.is_open())
+    {
+      throw engine::statefile_exception(
+        "Could not open statefile for reading: " + filePath.string());
+    }
+    nlohmann::ordered_json root = nlohmann::ordered_json::parse(stream);
+    // parent_path is lexical and cannot throw a filesystem_error here
+    ::ResolveFiles(root, filePath.parent_path());
+    st.Content = root.dump(2);
+  }
+  catch (const nlohmann::json::exception& ex)
+  {
+    throw engine::statefile_exception(
+      "Could not parse statefile " + filePath.string() + ": " + ex.what());
+  }
+  return st;
+}
+
+//----------------------------------------------------------------------------
+engine::state engine::state::fromClipboard()
+{
+#if F3D_MODULE_CLIP
+  std::string content;
+  if (!F3DUtils::GetFromClipboard(content))
+  {
+    // Cannot test clipboard failure in the CI
+    // LCOV_EXCL_START
+    throw engine::statefile_exception("Could not read a state from the clipboard");
+    // LCOV_EXCL_STOP
+  }
+  return engine::state::fromString(content);
+#else
+  throw engine::statefile_exception(
+    "Clipboard support is not available in this build, cannot read a state from the clipboard");
+#endif
+}
+
+//----------------------------------------------------------------------------
+std::string engine::state::toString() const
+{
+  return this->Content;
+}
+
+//----------------------------------------------------------------------------
+void engine::state::toFile(const fs::path& filePath) const
+{
+  try
+  {
+    std::ofstream stream(filePath);
+    if (!stream.is_open())
+    {
+      throw engine::statefile_exception(
+        "Could not open statefile for writing: " + filePath.string());
+    }
+    nlohmann::ordered_json root = nlohmann::ordered_json::parse(this->Content);
+    ::RelativizeFiles(root, filePath.parent_path());
+    stream << root.dump(2) << '\n';
+  }
+  catch (const fs::filesystem_error& ex)
+  {
+    throw engine::statefile_exception(
+      "Could not save statefile " + filePath.string() + ": " + ex.what());
+  }
+}
+
+//----------------------------------------------------------------------------
+void engine::state::toClipboard() const
+{
+#if F3D_MODULE_CLIP
+  if (!F3DUtils::CopyToClipboard(this->Content))
+  {
+    // Cannot test clipboard failure in the CI
+    // LCOV_EXCL_START
+    throw engine::statefile_exception("Could not copy the state to the clipboard");
+    // LCOV_EXCL_STOP
+  }
+
+#else
+  throw engine::statefile_exception(
+    "Clipboard support is not available in this build, cannot copy the state to the clipboard");
+#endif
+}
+
+//----------------------------------------------------------------------------
+std::ostream& operator<<(std::ostream& stream, const engine::state& st)
+{
+  stream << st.Content;
+  return stream;
+}
+
+//----------------------------------------------------------------------------
+std::istream& operator>>(std::istream& stream, engine::state& st)
+{
+  const std::string content{ std::istreambuf_iterator<char>(stream),
+    std::istreambuf_iterator<char>() };
+  st = engine::state::fromString(content);
+  return stream;
+}
+
+//----------------------------------------------------------------------------
 std::map<std::string, bool> engine::getRenderingBackendList()
 {
   std::map<std::string, bool> backends;
@@ -278,19 +489,12 @@ void engine::loadPlugin(const std::string& pathOrName, const std::vector<fs::pat
     return;
   }
 
-  // For easier removal when removing deprecation: F3D_DEPRECATED
-  if (pathOrName == "exodus")
-  {
-    f3d::log::warn("The 'exodus' plugin is deprecated, load 'hdf' instead");
-    return f3d::engine::loadPlugin("hdf", searchPaths);
-  }
-
   std::string pluginOrigin = "static";
   factory* factory = factory::instance();
 
   // check if the plugin is already loaded
   auto plugs = factory->getPlugins();
-  if (std::any_of(plugs.cbegin(), plugs.cend(), [pathOrName](const plugin* plug)
+  if (std::ranges::any_of(plugs, [pathOrName](const plugin* plug)
         { return (plug->getName() == pathOrName || plug->getOrigin() == pathOrName); }))
   {
     log::debug("Plugin \"", pathOrName, "\" already loaded");
@@ -305,7 +509,7 @@ void engine::loadPlugin(const std::string& pathOrName, const std::vector<fs::pat
     vtksys::DynamicLoader::LibraryHandle handle = nullptr;
     try
     {
-      fs::path fullPath = utils::collapsePath(pathOrName);
+      const fs::path fullPath = utils::collapsePath(pathOrName);
       if (fs::exists(fullPath))
       {
         // plugin provided as full path
@@ -483,11 +687,17 @@ engine::libInformation engine::getLibInfo()
   libInfo.Modules["ImGui"] = false;
 #endif
 
-  std::string vtkVersion = std::string(vtkVersion::GetVTKVersionFull());
+#if F3D_MODULE_FFMPEG
+  libInfo.Modules["FFmpeg"] = true;
+#else
+  libInfo.Modules["FFmpeg"] = false;
+#endif
+
+  const std::string vtkVersion = std::string(vtkVersion::GetVTKVersionFull());
   if (!vtkVersion.empty())
   {
     libInfo.VTKVersion = vtkVersion;
-    std::string date = std::to_string(vtkVersion::GetVTKBuildVersion());
+    const std::string date = std::to_string(vtkVersion::GetVTKBuildVersion());
     if (date.size() == 8)
     {
       libInfo.VTKVersion += std::string(" (date: ") + date + ")";
@@ -500,7 +710,7 @@ engine::libInformation engine::getLibInfo()
 
   libInfo.Copyrights.emplace_back("2019-2021 Kitware SAS");
   libInfo.Copyrights.emplace_back("2021-2025 Michael Migliore, Mathieu Westphal");
-  libInfo.Copyrights.emplace_back("2025 F3D-APP Foundation");
+  libInfo.Copyrights.emplace_back("2025-2026 F3D-APP Foundation");
   libInfo.License = "BSD-3-Clause";
 
   return libInfo;
@@ -538,6 +748,12 @@ engine& engine::setCachePath(const fs::path& cachePath)
 }
 
 //----------------------------------------------------------------------------
+fs::path engine::getCachePath() const
+{
+  return this->Internals->Window->GetCachePath();
+}
+
+//----------------------------------------------------------------------------
 engine::no_window_exception::no_window_exception(const std::string& what)
   : exception(what)
 {
@@ -557,6 +773,12 @@ engine::plugin_exception::plugin_exception(const std::string& what)
 
 //----------------------------------------------------------------------------
 engine::cache_exception::cache_exception(const std::string& what)
+  : exception(what)
+{
+}
+
+//----------------------------------------------------------------------------
+engine::statefile_exception::statefile_exception(const std::string& what)
   : exception(what)
 {
 }

@@ -9,20 +9,21 @@
 
 #include <iostream>
 
-int TestSDKMultiOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
+int TestSDKMultiOptions([[maybe_unused]] int argc, char* argv[])
 {
   PseudoUnitTest test;
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  f3d::engine eng = f3d::engine::create(true);
+  const std::string renderingBackend = std::string(argv[4]);
+  f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::scene& sce = eng.getScene();
   f3d::options& opt = eng.getOptions();
   f3d::window& win = eng.getWindow();
 
-  std::string rightFilename = "mb/mb_1_0.vtp";
-  std::string leftFilename = "mb/mb_2_0.vtp";
-  std::string left = std::string(argv[1]) + "data/" + leftFilename;
-  std::string right = std::string(argv[1]) + "data/" + rightFilename;
+  const std::string rightFilename = "mb/mb_1_0.vtp";
+  const std::string leftFilename = "mb/mb_2_0.vtp";
+  const std::string left = std::string(argv[1]) + "data/" + leftFilename;
+  const std::string right = std::string(argv[1]) + "data/" + rightFilename;
 
   // Render one geometry with a render option
   sce.add(left);

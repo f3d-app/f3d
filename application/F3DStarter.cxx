@@ -38,7 +38,10 @@
 #include "log.h"
 #include "options.h"
 #include "utils.h"
+#include "video_encoder.h"
 #include "window.h"
+
+#include <nlohmann/json.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -46,13 +49,18 @@
 #include <cmath>
 #include <csignal>
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <iterator>
 #include <mutex>
 #include <numeric>
+#include <optional>
 #include <regex>
 #include <set>
+#include <sstream>
+#include <thread>
 
 #ifdef _WIN32
 #include <fcntl.h>
@@ -95,15 +103,24 @@ public:
   struct F3DAppOptions
   {
     std::string Output;
+    std::string OutputVideo;
+    std::string VideoEncoder;
+    double VideoBitrate;
+    bool VideoLowLatency;
+    std::string LoadStatefile;
+    std::string SaveStatefile;
+    std::string StatefileFilename;
     bool BindingsList;
     bool NoBackground;
     bool NoRender;
+    bool NoCache;
     std::string RenderingBackend;
     std::optional<double> MaxSize;
     std::optional<double> AnimationTime;
     bool Watch;
     double FrameRate;
     std::vector<std::string> Plugins;
+    std::string PluginsPath;
     std::string ScreenshotFilename;
     std::string VerboseLevel;
     std::string MultiFileMode;
@@ -121,16 +138,33 @@ public:
     std::string InteractionTestPlayFile;
     std::string CommandScriptFile;
     std::string AntiAliasing;
-    std::string AntiAliasingMode; // Deprecated
     std::string PointSprites;
-    std::string PointSpritesType; // Deprecated
-    bool TranslucencySupport;     // Deprecated
     std::string Blending;
   };
 
   void SetupCamera(const CameraConfiguration& camConf)
   {
     f3d::camera& cam = this->Engine->getWindow().getCamera();
+
+    // Handle direction first as it needs reset for proper positions
+    if (camConf.CameraPosition.size() != 3 && camConf.CameraDirection.has_value())
+    {
+      f3d::vector3_t dir = camConf.CameraDirection.value();
+      f3d::point3_t foc;
+      f3d::point3_t pos;
+      cam.getFocalPoint(foc);
+      for (int i = 0; i < 3; i++)
+      {
+        pos[i] = foc[i] - dir[i];
+      }
+      cam.setPosition(pos);
+    }
+
+    // Reset position using bounds
+    const double defaultZoom = this->LibOptions.interactor.style == "2d" ? 1.0 : 0.9;
+    cam.resetToBounds(camConf.CameraZoomFactor > 0 ? camConf.CameraZoomFactor : defaultZoom);
+
+    // Take hard coded camera parameters into account
     if (camConf.CameraPosition.size() == 3)
     {
       f3d::point3_t pos;
@@ -152,28 +186,220 @@ public:
       cam.setViewAngle(camConf.CameraViewAngle);
     }
 
-    if (camConf.CameraPosition.size() != 3 && camConf.CameraDirection.has_value())
-    {
-      f3d::vector3_t dir = camConf.CameraDirection.value();
-      f3d::point3_t foc;
-      f3d::point3_t pos;
-      cam.getFocalPoint(foc);
-      for (int i = 0; i < 3; i++)
-      {
-        pos[i] = foc[i] - dir[i];
-      }
-      cam.setPosition(pos);
-    }
-
     cam.azimuth(camConf.CameraAzimuthAngle).elevation(camConf.CameraElevationAngle);
+    cam.setCurrentAsDefault();
+  }
 
-    if (camConf.CameraPosition.size() != 3)
+  /**
+   * Drop the camera options carried by a loaded statefile from the persistent statefile options
+   * layer. The statefile camera is a one-shot restore hint: it must only apply to the initial group
+   * load so that switching file groups reframes normally afterwards, instead of keeping the
+   * restored camera pinned like a `--camera-position` command line option.
+   */
+  void ConsumeStatefileCameraOptions()
+  {
+    for (F3DOptionsTools::OptionsEntries* entries :
+      { &this->StatefileOptionsEntries, &this->RuntimeStatefileOptionsEntries })
     {
-      double defaultZoom = this->LibOptions.interactor.style == "2d" ? 1.0 : 0.9;
-      cam.resetToBounds(camConf.CameraZoomFactor > 0 ? camConf.CameraZoomFactor : defaultZoom);
+      for (F3DOptionsTools::OptionsEntry& entry : *entries)
+      {
+        F3DOptionsTools::OptionsDict& dict = std::get<0>(entry);
+        for (const char* key :
+          { "camera-position", "camera-focal-point", "camera-view-up", "camera-view-angle" })
+        {
+          dict.erase(key);
+        }
+      }
+    }
+  }
+
+  static bool ParseStatefile(const fs::path& statefilePath,
+    F3DOptionsTools::OptionsDict& outOptions, std::vector<std::string>& outFiles,
+    std::optional<F3DStarter::StatefileFileGroups>& outFileGroups,
+    std::optional<std::pair<int, int>>& outWindowSize,
+    std::optional<std::pair<int, int>>& outWindowPosition)
+  {
+    std::ifstream stream(statefilePath);
+    if (!stream.is_open())
+    {
+      f3d::log::warn("Could not open statefile, skipping: ", statefilePath.string());
+      return false;
+    }
+    return F3DInternals::ParseStatefileContent(stream, statefilePath.parent_path(), outOptions,
+      outFiles, outFileGroups, outWindowSize, outWindowPosition);
+  }
+
+  static bool ParseStatefileContent(std::istream& stream, const fs::path& baseDir,
+    F3DOptionsTools::OptionsDict& outOptions, std::vector<std::string>& outFiles,
+    std::optional<F3DStarter::StatefileFileGroups>& outFileGroups,
+    std::optional<std::pair<int, int>>& outWindowSize,
+    std::optional<std::pair<int, int>>& outWindowPosition)
+  {
+    /* Resolve a path stored in a statefile against the statefile directory (baseDir), mirroring how
+     * the file paths were stored */
+    const auto resolvePath = [&baseDir](const std::string& stored)
+    {
+      fs::path path = stored;
+      if (path.is_relative() && !baseDir.empty())
+      {
+        path = (baseDir / path).lexically_normal();
+      }
+      return fs::absolute(path);
+    };
+
+    try
+    {
+      const nlohmann::ordered_json root = nlohmann::ordered_json::parse(stream);
+
+      if (root.contains("files"))
+      {
+        for (const auto& file : root.at("files"))
+        {
+          outFiles.emplace_back(resolvePath(file.get<std::string>()).string());
+        }
+      }
+
+      // Optional app-specific file groups (including the ones not currently loaded), added by
+      // AugmentStatefileContent. Absent from statefiles produced by libf3d alone.
+      if (root.contains("file_groups"))
+      {
+        const nlohmann::ordered_json& fileGroups = root.at("file_groups");
+        F3DStarter::StatefileFileGroups groups;
+        groups.Current = fileGroups.at("current").get<int>();
+        for (const auto& group : fileGroups.at("groups"))
+        {
+          std::vector<fs::path> paths;
+          for (const auto& file : group.at("files"))
+          {
+            paths.emplace_back(resolvePath(file.get<std::string>()));
+          }
+          groups.Groups.emplace_back(group.at("key").get<std::string>(), std::move(paths));
+        }
+        outFileGroups = std::move(groups);
+      }
+
+      if (root.contains("options"))
+      {
+        for (const auto& [name, value] : root.at("options").items())
+        {
+          outOptions[name] = value.get<std::string>();
+        }
+      }
+
+      if (root.contains("camera"))
+      {
+        const nlohmann::ordered_json& camera = root.at("camera");
+        const auto vecToStr = [](const nlohmann::ordered_json& arr)
+        {
+          return std::format(
+            "{}, {}, {}", arr[0].get<double>(), arr[1].get<double>(), arr[2].get<double>());
+        };
+        outOptions["camera-position"] = vecToStr(camera.at("position"));
+        outOptions["camera-focal-point"] = vecToStr(camera.at("focal_point"));
+        outOptions["camera-view-up"] = vecToStr(camera.at("view_up"));
+        outOptions["camera-view-angle"] = std::format("{}", camera.at("view_angle").get<double>());
+      }
+
+      if (root.contains("window"))
+      {
+        const nlohmann::ordered_json& window = root.at("window");
+        outWindowSize =
+          std::make_pair(window.at("width").get<int>(), window.at("height").get<int>());
+
+        if (window.contains("left") && window.contains("top"))
+        {
+          outWindowPosition =
+            std::make_pair(window.at("left").get<int>(), window.at("top").get<int>());
+        }
+      }
+    }
+    catch (const nlohmann::json::exception& ex)
+    {
+      f3d::log::error("Could not parse statefile content: ", ex.what());
+      return false;
     }
 
-    cam.setCurrentAsDefault();
+    return true;
+  }
+
+  static bool ReadStatefileSource(const std::string& source,
+    F3DOptionsTools::OptionsDict& outOptions, std::vector<std::string>& outFiles,
+    std::optional<F3DStarter::StatefileFileGroups>& outFileGroups,
+    std::optional<std::pair<int, int>>& outWindowSize,
+    std::optional<std::pair<int, int>>& outWindowPosition)
+  {
+    if (source == F3D_PIPED)
+    {
+      return F3DInternals::ParseStatefileContent(
+        std::cin, {}, outOptions, outFiles, outFileGroups, outWindowSize, outWindowPosition);
+    }
+
+    return F3DInternals::ParseStatefile(f3d::utils::collapsePath(source), outOptions, outFiles,
+      outFileGroups, outWindowSize, outWindowPosition);
+  }
+
+  static bool ReadStatefileFromClipboard(F3DOptionsTools::OptionsDict& outOptions,
+    std::vector<std::string>& outFiles,
+    std::optional<F3DStarter::StatefileFileGroups>& outFileGroups,
+    std::optional<std::pair<int, int>>& outWindowSize,
+    std::optional<std::pair<int, int>>& outWindowPosition)
+  {
+    try
+    {
+      // Read the clipboard through libf3d, which owns clipboard support
+      std::istringstream stream(f3d::engine::state::fromClipboard().toString());
+      return F3DInternals::ParseStatefileContent(
+        stream, {}, outOptions, outFiles, outFileGroups, outWindowSize, outWindowPosition);
+    }
+    // Cannot test clipboard failure in the CI
+    // LCOV_EXCL_START
+    catch (const f3d::engine::statefile_exception& ex)
+    {
+      f3d::log::error(ex.what());
+      return false;
+    }
+    // LCOV_EXCL_STOP
+  }
+
+  /* Add the app-specific `file_groups` entry (all file groups, including the ones not currently
+   * loaded) to a statefile content produced by libf3d. baseDir is the statefile directory, used to
+   * store paths relative to it when contained by it (empty to always store absolute paths) */
+  std::string AugmentStatefileContent(const std::string& content, const fs::path& baseDir) const
+  {
+    const auto storedPath = [&baseDir](const fs::path& file)
+    {
+      fs::path stored = fs::absolute(file);
+      if (!baseDir.empty())
+      {
+        const fs::path rel = fs::relative(fs::absolute(file), fs::absolute(baseDir));
+        if (!rel.empty() && *rel.begin() != "..")
+        {
+          stored = rel;
+        }
+      }
+      return stored.generic_string();
+    };
+
+    nlohmann::ordered_json groups = nlohmann::ordered_json::array();
+    for (const auto& [key, paths] : this->FilesGroups)
+    {
+      nlohmann::ordered_json files = nlohmann::ordered_json::array();
+      for (const fs::path& path : paths)
+      {
+        files.push_back(storedPath(path));
+      }
+      nlohmann::ordered_json group;
+      group["key"] = key;
+      group["files"] = files;
+      groups.push_back(group);
+    }
+
+    nlohmann::ordered_json root = nlohmann::ordered_json::parse(content);
+    nlohmann::ordered_json fileGroups;
+    fileGroups["current"] = this->CurrentFilesGroupIndex;
+    fileGroups["groups"] = groups;
+    root["file_groups"] = fileGroups;
+    return root.dump(2);
   }
 
   static bool HasHDRIExtension(const std::string& file)
@@ -247,8 +473,9 @@ public:
 
     if (forceStdErr)
     {
-      f3d::log::info("Output image will be saved to stdout, all log types including debug and info "
-                     "levels are redirected to stderr");
+      f3d::log::info(
+        "Standard output is reserved for piped data, all log types including debug and "
+        "info levels are redirected to stderr");
     }
   }
 
@@ -257,9 +484,8 @@ public:
     dmon_watch_id, dmon_action, const char*, const char* filename, const char*, void* userData)
   {
     F3DStarter* self = reinterpret_cast<F3DStarter*>(userData);
-    const std::lock_guard<std::mutex> lock(self->Internals->FilesToWatchMutex);
-    if (std::find_if(self->Internals->FilesToWatch.begin(), self->Internals->FilesToWatch.end(),
-          [&](const auto& path)
+    const std::scoped_lock lock(self->Internals->FilesToWatchMutex);
+    if (std::ranges::find_if(self->Internals->FilesToWatch, [&](const auto& path)
           { return path.filename() == filename; }) != self->Internals->FilesToWatch.end())
     {
       self->Internals->ReloadFileRequested = true;
@@ -302,7 +528,7 @@ public:
     if (toStdout)
     {
       const auto buffer = img.saveBuffer();
-      std::copy(buffer.begin(), buffer.end(), std::ostreambuf_iterator(std::cout));
+      std::ranges::copy(buffer, std::ostreambuf_iterator(std::cout));
       f3d::log::debug("Output image saved to stdout");
     }
     else
@@ -404,7 +630,7 @@ public:
         {
           fmt = "%Y%m%d";
         }
-        std::time_t t = std::time(nullptr);
+        const std::time_t t = std::time(nullptr);
         std::stringstream ss;
         ss << std::put_time(std::localtime(&t), fmt.c_str());
         std::string formatted = ss.str();
@@ -431,8 +657,8 @@ public:
    * - `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique
    *   (up to 1000000)
    */
-  fs::path finalizeFilenameTemplate(
-    f3d::utils::string_template stringTemplate, std::optional<int> frame = std::nullopt)
+  fs::path finalizeFilenameTemplate(f3d::utils::string_template stringTemplate,
+    std::optional<int> frame = std::nullopt, bool existing = false)
   {
     const std::regex frameRe("frame(:(.*))?");
     const std::regex numberingRe("n(:(.*))?");
@@ -500,14 +726,17 @@ public:
       };
     };
 
-    /* try substituting incrementing number until file doesn't exist already */
+    /* Substitute an incrementing number: when saving, stop at the first free filename; when loading
+     * (existing), return the last existing filename instead so the most recent save is reloaded
+     */
+    const auto makeCandidate = [&](size_t i)
+    { return f3d::utils::string_template(stringTemplate).substitute(numberingLookup(i)).str(); };
     for (size_t i = 1; i <= maxNumberingAttempts; ++i)
     {
-      const std::string candidate =
-        f3d::utils::string_template(stringTemplate).substitute(numberingLookup(i)).str();
+      const std::string candidate = makeCandidate(i);
       if (!fs::exists(candidate))
       {
-        return { candidate };
+        return { existing && i > 1 ? makeCandidate(i - 1) : candidate };
       }
     }
     throw std::runtime_error("could not find available unique filename after " +
@@ -526,7 +755,7 @@ public:
     {
       try
       {
-        std::regex re(matchType == "glob"
+        const std::regex re(matchType == "glob"
             ? f3d::utils::globToRegex(match, fs::path::preferred_separator)
             : match,
           std::regex_constants::icase);
@@ -553,26 +782,23 @@ public:
     }
   }
 
+  static std::string FormatOrigin(
+    const std::string& source, const std::string& matchType, const std::string& match)
+  {
+    if (source.empty())
+    {
+      return match;
+    }
+
+    return std::format("{}:`{}` ({})", source, match, matchType);
+  }
+
   static void PrintLoggingMap(const std::map<std::string, log_entry_t>& loggingMap, char sep)
   {
     for (const auto& [key, tuple] : loggingMap)
     {
       const auto& [bindStr, source, matchType, match, commands] = tuple;
-      std::string origin;
-      if (source.empty())
-      {
-        origin = match;
-      }
-      else
-      {
-        // TODO: Use std::format once C++20 is supported
-        origin = source;
-        origin += ":`";
-        origin += match;
-        origin += "` (";
-        origin += matchType;
-        origin += ")";
-      }
+      const std::string origin = F3DInternals::FormatOrigin(source, matchType, match);
       f3d::log::debug(" '", bindStr, "' ", sep, " '", commands, "' from ", origin);
     }
     f3d::log::debug("");
@@ -592,9 +818,9 @@ public:
     f3d::options libOptions;
 #if F3D_MODULE_UI
 #if F3D_MODULE_TINYFILEDIALOGS
-    libOptions.ui.drop_zone.custom_binds = "None+Drop Ctrl+O None+H";
+    libOptions.ui.drop_zone.custom_binds = "None+Drop Ctrl+O None+F1";
 #else
-    libOptions.ui.drop_zone.custom_binds = "None+Drop None+H";
+    libOptions.ui.drop_zone.custom_binds = "None+Drop None+F1";
 #endif
 #endif
 
@@ -602,25 +828,25 @@ public:
     F3DOptionsTools::OptionsDict appOptions = F3DOptionsTools::DefaultAppOptions;
 
     // Logging specific map
-    bool logOptions = this->AppOptions.VerboseLevel == "debug" && !quiet;
+    const bool logOptions = this->AppOptions.VerboseLevel == "debug" && !quiet;
     std::map<std::string, log_entry_t> loggingMap;
 
     // For each input file, order matters
     for (const auto& tmpPath : paths)
     {
-      std::string inputFile = tmpPath.string();
+      const std::string inputFile = tmpPath.string();
       // For each config entries, ordered by priority
       for (const auto& entries : entriesVector)
       {
         // For each entry (eg: different config files)
-        for (auto const& [conf, source, matchType, match] : entries)
+        for (const auto& [conf, source, matchType, match] : entries)
         {
           // If the source is empty, there is no pattern, all options applies
           // Note: An empty inputFile matches with ".*"
           if (source.empty() || F3DInternals::PatternMatched(source, matchType, match, inputFile))
           {
             // For each option key/value
-            for (auto const& [key, value] : conf)
+            for (const auto& [key, value] : conf)
             {
               // Check in appOptions first
               auto appIter = appOptions.find(key);
@@ -634,12 +860,6 @@ public:
                 continue;
               }
 
-              // Handle CLI options deprecation simple warnings
-              if (key == "animation-index")
-              {
-                f3d::log::warn("animation-index is deprecated, please use animation-indices");
-              }
-
               // Convert key into a libf3d option name if possible
               std::string keyForLog = key;
               for (const auto& libf3dOption : F3DOptionsTools::ConvertToLibf3dOptions(key, value))
@@ -649,8 +869,7 @@ public:
                 bool reset = false;
 
                 // Handle options reset
-                // XXX: Use starts_with once C++20 is supported
-                if (libf3dOptionName.rfind("reset-", 0) == 0)
+                if (libf3dOptionName.starts_with("reset-"))
                 {
                   if (libf3dOptionName.size() > 6)
                   {
@@ -669,8 +888,8 @@ public:
 
                 // Handle reader options
                 std::vector<std::string> readerOptionNames = f3d::engine::getAllReaderOptionNames();
-                if (std::find(readerOptionNames.begin(), readerOptionNames.end(),
-                      libf3dOptionName) != readerOptionNames.end())
+                if (std::ranges::find(readerOptionNames, libf3dOptionName) !=
+                  readerOptionNames.end())
                 {
                   f3d::engine::setReaderOption(libf3dOptionName, libf3dOptionValue);
                   continue;
@@ -699,21 +918,7 @@ public:
                 {
                   if (!quiet)
                   {
-                    std::string origin;
-                    if (source.empty())
-                    {
-                      origin = match;
-                    }
-                    else
-                    {
-                      // TODO: Use std::format once C++20 is supported
-                      origin = source;
-                      origin += ":`";
-                      origin += match;
-                      origin += "` (";
-                      origin += matchType;
-                      origin += ")";
-                    }
+                    const std::string origin = F3DInternals::FormatOrigin(source, matchType, match);
                     f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue,
                       "' from ", origin, " because: ", ex.what());
                   }
@@ -722,21 +927,7 @@ public:
                 {
                   if (!quiet)
                   {
-                    std::string origin;
-                    if (source.empty())
-                    {
-                      origin = match;
-                    }
-                    else
-                    {
-                      // TODO: Use std::format once C++20 is supported
-                      origin = source;
-                      origin += ":`";
-                      origin += match;
-                      origin += "` (";
-                      origin += matchType;
-                      origin += ")";
-                    }
+                    const std::string origin = F3DInternals::FormatOrigin(source, matchType, match);
                     auto [closestName, dist] =
                       F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
                     f3d::log::warn("'", keyForLog, "' option from ", origin,
@@ -755,12 +946,13 @@ public:
     // Update typed app options from the string version
     this->UpdateTypedAppOptions(appOptions);
 
-    // Update Verbose level as soon as possible
-    F3DInternals::SetVerboseLevel(
-      this->AppOptions.VerboseLevel, this->AppOptions.Output == F3D_PIPED);
+    // Update Verbose level as soon as possible, redirecting logs to stderr whenever data is
+    // written to stdout so it stays usable when piped
+    F3DInternals::SetVerboseLevel(this->AppOptions.VerboseLevel,
+      this->AppOptions.Output == F3D_PIPED || this->AppOptions.SaveStatefile == F3D_PIPED);
 
     // Load any new plugins
-    F3DPluginsTools::LoadPlugins(this->AppOptions.Plugins);
+    F3DPluginsTools::LoadPlugins(this->AppOptions.Plugins, this->AppOptions.PluginsPath);
 
     // Update libf3d options
     this->LibOptions = libOptions;
@@ -810,15 +1002,24 @@ public:
   {
     // Update typed app options from app options
     this->ParseOption(appOptions, "output", this->AppOptions.Output);
+    this->ParseOption(appOptions, "output-video", this->AppOptions.OutputVideo);
+    this->ParseOption(appOptions, "video-encoder", this->AppOptions.VideoEncoder);
+    this->ParseOption(appOptions, "video-bitrate", this->AppOptions.VideoBitrate);
+    this->ParseOption(appOptions, "video-low-latency", this->AppOptions.VideoLowLatency);
+    this->ParseOption(appOptions, "load-statefile", this->AppOptions.LoadStatefile);
+    this->ParseOption(appOptions, "save-statefile", this->AppOptions.SaveStatefile);
+    this->ParseOption(appOptions, "statefile-filename", this->AppOptions.StatefileFilename);
     this->ParseOption(appOptions, "list-bindings", this->AppOptions.BindingsList);
     this->ParseOption(appOptions, "no-background", this->AppOptions.NoBackground);
     this->ParseOption(appOptions, "no-render", this->AppOptions.NoRender);
+    this->ParseOption(appOptions, "no-cache", this->AppOptions.NoCache);
     this->ParseOption(appOptions, "rendering-backend", this->AppOptions.RenderingBackend);
     this->ParseOption(appOptions, "max-size", this->AppOptions.MaxSize);
     this->ParseOption(appOptions, "animation-time", this->AppOptions.AnimationTime);
     this->ParseOption(appOptions, "frame-rate", this->AppOptions.FrameRate);
     this->ParseOption(appOptions, "watch", this->AppOptions.Watch);
     this->ParseOption(appOptions, "load-plugins", this->AppOptions.Plugins);
+    this->ParseOption(appOptions, "plugins-path", this->AppOptions.PluginsPath);
     this->ParseOption(appOptions, "screenshot-filename", this->AppOptions.ScreenshotFilename);
     this->ParseOption(appOptions, "verbose", this->AppOptions.VerboseLevel);
     this->ParseOption(appOptions, "multi-file-mode", this->AppOptions.MultiFileMode);
@@ -857,7 +1058,7 @@ public:
     const std::string& colorMapFile = this->AppOptions.ColorMapFile;
     if (!colorMapFile.empty())
     {
-      fs::path fullPath = F3DColorMapTools::Find(colorMapFile);
+      const fs::path fullPath = F3DColorMapTools::Find(colorMapFile);
 
       if (!fullPath.empty())
       {
@@ -875,10 +1076,10 @@ public:
     if (!opacityMapFile.empty() && std::filesystem::exists(opacityMapFile) &&
       std::filesystem::is_regular_file(opacityMapFile))
     {
-      fs::path fullPath(f3d::utils::collapsePath(opacityMapFile));
+      const fs::path fullPath(f3d::utils::collapsePath(opacityMapFile));
       this->LibOptions.model.scivis.opacity_map = F3DColorMapTools::ReadOpacity(fullPath);
 
-      std::vector<double>& opacityMap = this->LibOptions.model.scivis.opacity_map;
+      const std::vector<double>& opacityMap = this->LibOptions.model.scivis.opacity_map;
       if (opacityMap.empty())
       {
         f3d::log::error("Cannot read the opacity map ", opacityMapFile);
@@ -894,10 +1095,14 @@ public:
       f3d::window& window = this->Engine->getWindow();
       if (this->AppOptions.Resolution.size() == 2)
       {
-        double dpiScale = this->LibOptions.ui.dpi_aware ? f3d::utils::getDPIScale() : 1.0;
+        const double dpiScale = window.getDPIScale();
+        const int width = static_cast<int>(this->AppOptions.Resolution[0] * dpiScale);
+        const int height = static_cast<int>(this->AppOptions.Resolution[1] * dpiScale);
 
-        window.setSize(static_cast<int>(this->AppOptions.Resolution[0] * dpiScale),
-          static_cast<int>(this->AppOptions.Resolution[1] * dpiScale));
+        f3d::log::debug(
+          "Applying window resolution ", width, "x", height, " with a DPI scale of ", dpiScale);
+
+        window.setSize(width, height);
       }
       else if (!this->AppOptions.Resolution.empty())
       {
@@ -955,44 +1160,54 @@ public:
       interactor.initBindings();
 
       // clang-format off
-      interactor.addBinding({ mod_t::NONE, "Left" }, "load_previous_file_group", "Others", std::bind(docString, "Load previous file group"));
-      interactor.addBinding({ mod_t::NONE, "Right" }, "load_next_file_group", "Others", std::bind(docString, "Load next file group"));
-      interactor.addBinding({ mod_t::CTRL, "Left" }, "load_previous_file_group true", "Others", std::bind(docString, "Load previous file group, keeping camera"));
-      interactor.addBinding({ mod_t::CTRL, "Right" }, "load_next_file_group true", "Others", std::bind(docString, "Load next file group, keeping camera"));
-      interactor.addBinding({ mod_t::NONE, "Up" }, "reload_current_file_group", "Others", std::bind(docString, "Reload current file group"));
-      interactor.addBinding({ mod_t::NONE, "Down" }, "add_current_directories", "Others", std::bind(docString, "Add files from dir of current file"));
-      interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others", std::bind(docString, "Take a screenshot"));
+      interactor.addBinding({.Bind = { mod_t::NONE, "Up" }, .Commands = {"load_previous_file_group"}, .Group = "Others", .DocCallback = std::bind(docString, "Load previous file group")});
+      interactor.addBinding({.Bind = { mod_t::NONE, "Down" }, .Commands = {"load_next_file_group"}, .Group = "Others", .DocCallback = std::bind(docString, "Load next file group")});
+      interactor.addBinding({.Bind = { mod_t::CTRL, "Up" }, .Commands = {"load_previous_file_group true"}, .Group = "Others", .DocCallback = std::bind(docString, "Load previous file group, keeping camera")});
+      interactor.addBinding({.Bind = { mod_t::CTRL, "Down" }, .Commands = {"load_next_file_group true"}, .Group = "Others", .DocCallback = std::bind(docString, "Load next file group, keeping camera")});
+      interactor.addBinding({.Bind = { mod_t::NONE, "F5" }, .Commands = {"reload_current_file_group"}, .Group = "Others", .DocCallback = std::bind(docString, "Reload current file group")});
+      interactor.addBinding({.Bind = { mod_t::CTRL_SHIFT, "R" }, .Commands = {"add_current_directories"}, .Group = "Others", .DocCallback = std::bind(docString, "Add files from dir of current file")});
+      interactor.addBinding({.Bind = { mod_t::NONE, "F12" }, .Commands = {"take_screenshot"}, .Group = "Others", .DocCallback = std::bind(docString, "Take a screenshot")});
 #if F3D_MODULE_TINYFILEDIALOGS
-      interactor.addBinding({ mod_t::CTRL, "O" }, "open_file_dialog", "Others", std::bind(docString, "Open File Dialog"), f3d::interactor::BindingType::OTHER, true);
+      interactor.addBinding({.Bind = { mod_t::CTRL, "S" }, .Commands = {"save_statefile_dialog"}, .Group = "Others", .DocCallback = std::bind(docString, "Save a statefile (file dialog)")});
+      interactor.addBinding({.Bind = { mod_t::CTRL, "L" }, .Commands = {"load_statefile_dialog"}, .Group = "Others", .DocCallback = std::bind(docString, "Load a statefile (file dialog)")});
 #endif
-      interactor.addBinding({ mod_t::CTRL, "F12" }, "take_minimal_screenshot", "Others", std::bind(docString, "Take a minimal screenshot"));
+      interactor.addBinding({.Bind = { mod_t::CTRL_SHIFT, "S" }, .Commands = {"save_statefile"}, .Group = "Others", .DocCallback = std::bind(docString, "Save a statefile (auto filename)")});
+      interactor.addBinding({.Bind = { mod_t::CTRL_SHIFT, "L" }, .Commands = {"load_statefile"}, .Group = "Others", .DocCallback = std::bind(docString, "Load the last auto-filename statefile")});
+#if F3D_MODULE_CLIP
+      interactor.addBinding({.Bind = { mod_t::CTRL, "C" }, .Commands = {"save_statefile_to_clipboard"}, .Group = "Others", .DocCallback = std::bind(docString, "Save a statefile to the clipboard")});
+      interactor.addBinding({.Bind = { mod_t::CTRL, "V" }, .Commands = {"load_statefile_from_clipboard"}, .Group = "Others", .DocCallback = std::bind(docString, "Load a statefile from the clipboard")});
+#endif
+#if F3D_MODULE_TINYFILEDIALOGS
+      interactor.addBinding({.Bind = { mod_t::CTRL, "O" }, .Commands = {"open_file_dialog"}, .Group = "Others", .DocCallback = std::bind(docString, "Open File Dialog"), .Type = f3d::interactor::BindingType::OTHER, .Notify = true});
+#endif
+      interactor.addBinding({.Bind = { mod_t::CTRL, "F12" }, .Commands = {"take_minimal_screenshot"}, .Group = "Others", .DocCallback = std::bind(docString, "Take a minimal screenshot")});
 
       // This replace an existing default binding command in the libf3d
       interactor.removeBinding({ mod_t::NONE, "Drop" });
-      interactor.addBinding({ mod_t::NONE, "Drop" }, "add_files_or_set_hdri", "Others", std::bind(docString, "Load dropped files, folder or HDRI"), f3d::interactor::BindingType::OTHER, true);
-      interactor.addBinding({ mod_t::CTRL, "Drop" }, "add_files", "Others", std::bind(docString, "Load dropped files or folder"), f3d::interactor::BindingType::OTHER, true);
-      interactor.addBinding({ mod_t::SHIFT, "Drop" }, "set_hdri", "Others", std::bind(docString, "Set HDRI and use it"), f3d::interactor::BindingType::OTHER, true);
+      interactor.addBinding({.Bind = { mod_t::NONE, "Drop" }, .Commands = {"add_files_or_set_hdri"}, .Group = "Others", .DocCallback = std::bind(docString, "Load dropped files, folder or HDRI"), .Type = f3d::interactor::BindingType::OTHER, .Notify = true});
+      interactor.addBinding({.Bind = { mod_t::CTRL, "Drop" }, .Commands = {"add_files"}, .Group = "Others", .DocCallback = std::bind(docString, "Load dropped files or folder"), .Type = f3d::interactor::BindingType::OTHER, .Notify = true});
+      interactor.addBinding({.Bind = { mod_t::SHIFT, "Drop" }, .Commands = {"set_hdri"}, .Group = "Others", .DocCallback = std::bind(docString, "Set HDRI and use it"), .Type = f3d::interactor::BindingType::OTHER, .Notify = true});
 
       interactor.removeBinding({mod_t::CTRL, "Q"});
-      interactor.addBinding({mod_t::CTRL, "Q"}, "exit", "Others", std::bind(docString, "Quit"), f3d::interactor::BindingType::OTHER, true);
+      interactor.addBinding({.Bind = {mod_t::CTRL, "Q"}, .Commands = {"exit"}, .Group = "Others", .DocCallback = std::bind(docString, "Quit"), .Type = f3d::interactor::BindingType::OTHER, .Notify = true});
       // clang-format on
 
       f3d::log::debug("Adding config defined bindings if any: ");
-      bool logBindings = this->AppOptions.VerboseLevel == "debug";
+      const bool logBindings = this->AppOptions.VerboseLevel == "debug";
       std::map<std::string, log_entry_t> loggingMap;
 
       // For each input file, order matters
       for (const auto& tmpPath : paths)
       {
-        std::string inputFile = tmpPath.string();
-        for (auto const& [bindings, source, matchType, match] : this->ConfigBindingsEntries)
+        const std::string inputFile = tmpPath.string();
+        for (const auto& [bindings, source, matchType, match] : this->ConfigBindingsEntries)
         {
           // If the source is empty, there is no pattern, all bindings applies
           // Note: An empty inputFile matches with ".*"
           if (source.empty() || F3DInternals::PatternMatched(source, matchType, match, inputFile))
           {
             // For each interaction bindings
-            for (auto const& [bindStr, commands] : bindings)
+            for (const auto& [bindStr, commands] : bindings)
             {
               if (logBindings)
               {
@@ -1001,9 +1216,12 @@ public:
                   bindStr, std::tuple(bindStr, source, matchType, match, vecToString(commands)));
               }
 
-              f3d::interaction_bind_t bind = f3d::interaction_bind_t::parse(bindStr);
+              const f3d::interaction_bind_t bind = f3d::interaction_bind_t::parse(bindStr);
               interactor.removeBinding(bind);
-              interactor.addBinding(bind, commands, "Config", std::bind(docStringVec, commands));
+              interactor.addBinding({ .Bind = bind,
+                .Commands = commands,
+                .Group = "Config",
+                .DocCallback = std::bind(docStringVec, commands) });
             }
           }
         }
@@ -1035,6 +1253,120 @@ public:
 
   F3DAppOptions AppOptions;
   f3d::options LibOptions;
+
+  fs::path CacheFilePath() const
+  {
+    const fs::path cacheDir = this->Engine->getCachePath();
+    return cacheDir.empty() ? fs::path() : cacheDir / "cache.json";
+  }
+
+  /* Recover the cached window geometry as app options, so that it goes through the regular
+   * options precedence as the weakest source. Empty when there is nothing usable to restore. */
+  F3DOptionsTools::OptionsDict ReadCachedWindowGeometry() const
+  {
+    F3DOptionsTools::OptionsDict geometry;
+    const fs::path cachePath = this->CacheFilePath();
+    if (cachePath.empty())
+    {
+      return geometry;
+    }
+
+    try
+    {
+      std::ifstream stream(cachePath);
+      if (!stream.is_open())
+      {
+        return geometry;
+      }
+
+      std::stringstream buffer;
+      buffer << stream.rdbuf();
+
+      const nlohmann::ordered_json root = nlohmann::ordered_json::parse(buffer.str());
+      if (root.contains("window"))
+      {
+        const nlohmann::ordered_json& windowJson = root.at("window");
+        if (windowJson.contains("width") && windowJson.contains("height"))
+        {
+          geometry["resolution"] = std::format(
+            "{}, {}", windowJson.at("width").get<int>(), windowJson.at("height").get<int>());
+        }
+        if (windowJson.contains("left") && windowJson.contains("top"))
+        {
+          geometry["position"] = std::format(
+            "{}, {}", windowJson.at("left").get<int>(), windowJson.at("top").get<int>());
+        }
+      }
+    }
+    catch (const nlohmann::json::exception& ex)
+    {
+      f3d::log::debug("Could not parse the cached window geometry: ", ex.what());
+      geometry.clear();
+    }
+
+    for (const auto& [name, value] : geometry)
+    {
+      f3d::log::debug("Recovered window ", name, " from cache: ", value);
+    }
+    return geometry;
+  }
+
+  /* Record the current window geometry, which can only be queried while the window is still
+   * alive. The size is recorded in the same unit as the resolution option, which is scaled by the
+   * DPI when applied, so that restoring it does not scale it a second time.
+   */
+  void RecordWindowGeometry()
+  {
+    f3d::window& window = this->Engine->getWindow();
+    const auto [width, height] = window.getSize();
+    const auto [left, top] = window.getPosition();
+    const double dpiScale = window.getDPIScale();
+    this->LastWindowGeometry = { static_cast<int>(std::lround(width / dpiScale)),
+      static_cast<int>(std::lround(height / dpiScale)), left, top };
+  }
+
+  /* Store the last recorded window geometry in the cache so that the next run can restore it */
+  void CacheWindowGeometry() const
+  {
+    const fs::path cachePath = this->CacheFilePath();
+    std::ofstream stream(cachePath);
+    if (!stream.is_open())
+    {
+      // Only reached when there is no cache path or when it is not writable, and only once an
+      // interactive window has been closed, which the coverage CI never does with such a path
+      // LCOV_EXCL_START
+      f3d::log::debug("Could not open ", cachePath.string(), " to cache the window geometry");
+      return;
+      // LCOV_EXCL_STOP
+    }
+
+    nlohmann::ordered_json windowJson;
+    windowJson["width"] = this->LastWindowGeometry.Width;
+    windowJson["height"] = this->LastWindowGeometry.Height;
+    windowJson["left"] = this->LastWindowGeometry.Left;
+    windowJson["top"] = this->LastWindowGeometry.Top;
+
+    nlohmann::ordered_json root;
+    root["window"] = windowJson;
+
+    stream << root.dump(2);
+    f3d::log::debug("Window geometry ", this->LastWindowGeometry.Width, "x",
+      this->LastWindowGeometry.Height, " at ", this->LastWindowGeometry.Left, ",",
+      this->LastWindowGeometry.Top, " cached in ", cachePath.string());
+  }
+
+  struct WindowGeometry
+  {
+    int Width = 0;
+    int Height = 0;
+    int Left = 0;
+    int Top = 0;
+  };
+  WindowGeometry LastWindowGeometry;
+
+  F3DOptionsTools::OptionsEntries CachedOptionsEntries;
+  F3DOptionsTools::OptionsEntries StatefileOptionsEntries;
+  F3DOptionsTools::OptionsEntries RuntimeStatefileOptionsEntries;
   F3DOptionsTools::OptionsEntries ConfigOptionsEntries;
   F3DOptionsTools::OptionsEntries CLIOptionsEntries;
   F3DOptionsTools::OptionsEntries DynamicOptionsEntries;
@@ -1129,6 +1461,26 @@ int F3DStarter::Start(int argc, char** argv)
     renderToStdout = localOutput == F3D_PIPED;
   }
 
+  iter = cliOptionsDict.find("output-video");
+  if (iter != cliOptionsDict.end())
+  {
+    std::string localOutput;
+    // XXX: Discarding bool return because this cannot return false with a string
+    F3DOptionsTools::Parse(iter->second, localOutput);
+    renderToStdout = localOutput == F3D_PIPED;
+  }
+
+  // The statefile is written to stdout when piped, just like the output image
+  bool statefileToStdout = false;
+  iter = cliOptionsDict.find("save-statefile");
+  if (iter != cliOptionsDict.end())
+  {
+    std::string localSaveStatefile;
+    // XXX: Discarding bool return because this cannot return false with a string
+    F3DOptionsTools::Parse(iter->second, localSaveStatefile);
+    statefileToStdout = localSaveStatefile == F3D_PIPED;
+  }
+
   this->Internals->AppOptions.VerboseLevel = "info";
   iter = cliOptionsDict.find("verbose");
   if (iter != cliOptionsDict.end())
@@ -1137,15 +1489,17 @@ int F3DStarter::Start(int argc, char** argv)
     F3DOptionsTools::Parse(iter->second, this->Internals->AppOptions.VerboseLevel);
   }
 
-  // Set verbosity level early from command line
-  F3DInternals::SetVerboseLevel(this->Internals->AppOptions.VerboseLevel, renderToStdout);
+  // Set verbosity level early from command line, redirecting logs to stderr whenever data is
+  // written to stdout so it stays usable when piped
+  F3DInternals::SetVerboseLevel(
+    this->Internals->AppOptions.VerboseLevel, renderToStdout || statefileToStdout);
 
   f3d::log::debug("========== Initializing Options ==========");
 
   // Read config files
   if (!noConfig)
   {
-    F3DConfigFileTools::ParsedConfigFiles parsedConfigFiles =
+    const F3DConfigFileTools::ParsedConfigFiles parsedConfigFiles =
       F3DConfigFileTools::ReadConfigFiles(config);
     this->Internals->ConfigPaths = parsedConfigFiles.ConfigPaths;
     this->Internals->ConfigOptionsEntries = parsedConfigFiles.Options;
@@ -1153,12 +1507,40 @@ int F3DStarter::Start(int argc, char** argv)
     this->Internals->ConfigBindingsEntries = parsedConfigFiles.Bindings;
   }
 
+  std::string loadStatefile;
+  iter = cliOptionsDict.find("load-statefile");
+  if (iter != cliOptionsDict.end())
+  {
+    F3DOptionsTools::Parse(iter->second, loadStatefile);
+  }
+  std::optional<StatefileFileGroups> statefileFileGroups;
+  std::optional<std::pair<int, int>> statefileWindowSize;
+  std::optional<std::pair<int, int>> statefileWindowPosition;
+  if (!loadStatefile.empty())
+  {
+    F3DOptionsTools::OptionsDict statefileOptions;
+    std::vector<std::string> statefileFiles;
+    if (F3DInternals::ReadStatefileSource(loadStatefile, statefileOptions, statefileFiles,
+          statefileFileGroups, statefileWindowSize, statefileWindowPosition))
+    {
+      this->Internals->StatefileOptionsEntries.emplace_back(
+        statefileOptions, "", "", "statefile options");
+      // When the statefile carries explicit file groups, they are restored as-is below; otherwise
+      // fall back to loading the flat file list through the normal file group system, before input
+      // files
+      if (!statefileFileGroups.has_value())
+      {
+        inputFiles.insert(inputFiles.begin(), statefileFiles.begin(), statefileFiles.end());
+      }
+    }
+  }
+
   // Update app and libf3d options based on config entries, with an empty input file
-  // config < cli.
+  // config < statefile < cli.
   // Force it to be quiet has another options update happens later.
   this->Internals->UpdateOptions(
-    { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
-      this->Internals->ImperativeConfigOptionsEntries },
+    { this->Internals->ConfigOptionsEntries, this->Internals->StatefileOptionsEntries,
+      this->Internals->CLIOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
     { "" }, true);
 
   const auto& mode = this->Internals->AppOptions.MultiFileMode;
@@ -1172,7 +1554,7 @@ int F3DStarter::Start(int argc, char** argv)
   {
     try
     {
-      std::regex regex(this->Internals->AppOptions.MultiFileRegex);
+      const std::regex regex(this->Internals->AppOptions.MultiFileRegex);
     }
     catch (const std::regex_error&)
     {
@@ -1189,7 +1571,7 @@ int F3DStarter::Start(int argc, char** argv)
 
   f3d::log::debug("========== Configuring engine ==========");
 
-  double deltaTime = 1.0 / this->Internals->AppOptions.FrameRate;
+  const double deltaTime = 1.0 / this->Internals->AppOptions.FrameRate;
 
   if (this->Internals->AppOptions.NoRender)
   {
@@ -1197,8 +1579,9 @@ int F3DStarter::Start(int argc, char** argv)
   }
   else
   {
-    bool offscreen = !this->Internals->AppOptions.Reference.empty() ||
-      !this->Internals->AppOptions.Output.empty() || this->Internals->AppOptions.BindingsList;
+    const bool offscreen = !this->Internals->AppOptions.Reference.empty() ||
+      !this->Internals->AppOptions.Output.empty() ||
+      !this->Internals->AppOptions.OutputVideo.empty() || this->Internals->AppOptions.BindingsList;
 
     try
     {
@@ -1249,6 +1632,27 @@ int F3DStarter::Start(int argc, char** argv)
     }
 
     this->ResetWindowName();
+
+    this->Internals->Engine->getWindow().setUseHDRICache(!this->Internals->AppOptions.NoCache);
+
+    if (!this->Internals->AppOptions.NoRender && this->Internals->AppOptions.Output.empty() &&
+      this->Internals->AppOptions.OutputVideo.empty() &&
+      this->Internals->AppOptions.Reference.empty() && !this->Internals->AppOptions.NoCache)
+    {
+      const F3DOptionsTools::OptionsDict cachedGeometry =
+        this->Internals->ReadCachedWindowGeometry();
+      if (!cachedGeometry.empty())
+      {
+        this->Internals->CachedOptionsEntries.emplace_back(
+          cachedGeometry, "", "", "cached options");
+        this->Internals->UpdateOptions(
+          { this->Internals->CachedOptionsEntries, this->Internals->ConfigOptionsEntries,
+            this->Internals->StatefileOptionsEntries, this->Internals->CLIOptionsEntries,
+            this->Internals->ImperativeConfigOptionsEntries },
+          { "" }, true);
+      }
+    }
+
     this->Internals->ApplyPositionAndResolution();
     this->AddCommands();
     this->Internals->UpdateBindings({ "" });
@@ -1257,18 +1661,72 @@ int F3DStarter::Start(int argc, char** argv)
   this->Internals->Engine->setOptions(this->Internals->LibOptions);
   f3d::log::debug("Engine configured");
 
+  // Restore explicit statefile file groups first, so command-line input files append after them
+  int statefileCurrentGroup = 0;
+  if (statefileFileGroups.has_value())
+  {
+    this->Internals->FilesGroups = statefileFileGroups->Groups;
+    statefileCurrentGroup = statefileFileGroups->Current;
+  }
+
   // Add all input files
   for (auto& file : inputFiles)
   {
     this->AddFile(file == F3D_PIPED ? fs::path(file) : f3d::utils::collapsePath(file));
   }
 
-  // Load a file
-  this->LoadFileGroup();
+  // Load a file, the statefile current group when one was restored
+  if (statefileFileGroups.has_value())
+  {
+    const int size = static_cast<int>(this->Internals->FilesGroups.size());
+    this->LoadFileGroup(
+      statefileCurrentGroup >= 0 && statefileCurrentGroup < size ? statefileCurrentGroup : 0);
+  }
+  else
+  {
+    this->LoadFileGroup();
+  }
+
+  this->Internals->ConsumeStatefileCameraOptions();
+
+  // Save a statefile if requested
+  if (!this->Internals->AppOptions.SaveStatefile.empty())
+  {
+    if (!this->Internals->AppOptions.NoRender)
+    {
+      // Render once so that the camera is finalized before saving the state
+      this->Internals->Engine->getWindow().render();
+    }
+    this->SaveStatefile(this->Internals->AppOptions.SaveStatefile);
+  }
 
   if (!this->Internals->AppOptions.NoRender)
   {
     this->Internals->ApplyPositionAndResolution();
+    // Apply the statefile window size and position, unless the user explicitly set
+    // --resolution/--position: those take precedence and were already applied by
+    // ApplyPositionAndResolution
+    const bool explicitResolution = std::ranges::any_of(this->Internals->CLIOptionsEntries,
+      [](const F3DOptionsTools::OptionsEntry& entry)
+      { return std::get<0>(entry).contains("resolution"); });
+    if (statefileWindowSize.has_value() && !explicitResolution)
+    {
+      this->Internals->Engine->getWindow().setSize(
+        statefileWindowSize->first, statefileWindowSize->second);
+      f3d::log::debug("Window size set to ", statefileWindowSize->first, "x",
+        statefileWindowSize->second, " from statefile");
+    }
+
+    const bool explicitPosition = std::ranges::any_of(this->Internals->CLIOptionsEntries,
+      [](const F3DOptionsTools::OptionsEntry& entry)
+      { return std::get<0>(entry).contains("position"); });
+    if (statefileWindowPosition.has_value() && !explicitPosition)
+    {
+      this->Internals->Engine->getWindow().setPosition(
+        statefileWindowPosition->first, statefileWindowPosition->second);
+      f3d::log::debug("Window position set to ", statefileWindowPosition->first, ",",
+        statefileWindowPosition->second, " from statefile");
+    }
     f3d::window& window = this->Internals->Engine->getWindow();
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 
@@ -1290,32 +1748,8 @@ int F3DStarter::Start(int argc, char** argv)
       throw F3DExNoProcess("bindings list requested");
     }
 
-    // Play recording if any
-    fs::path interactionTestPlayFile =
-      f3d::utils::collapsePath(this->Internals->AppOptions.InteractionTestPlayFile);
-    if (!interactionTestPlayFile.empty())
-    {
-      // For better testing, render once before the interaction
-      window.render();
-      if (!interactor.playInteraction(interactionTestPlayFile, deltaTime))
-      {
-        return EXIT_FAILURE;
-      }
-    }
-
-    // Start recording if needed
-    fs::path interactionTestRecordFile =
-      f3d::utils::collapsePath(this->Internals->AppOptions.InteractionTestRecordFile);
-    if (!interactionTestRecordFile.empty())
-    {
-      if (!interactor.recordInteraction(interactionTestRecordFile))
-      {
-        return EXIT_FAILURE;
-      }
-    }
-
     // Process Command Script file
-    fs::path commandScriptFile =
+    const fs::path commandScriptFile =
       f3d::utils::collapsePath(this->Internals->AppOptions.CommandScriptFile);
     if (!commandScriptFile.empty())
     {
@@ -1345,13 +1779,37 @@ int F3DStarter::Start(int argc, char** argv)
       }
     }
 
-    std::optional<std::string> noDataForceRender =
+    // Play recording if any
+    const fs::path interactionTestPlayFile =
+      f3d::utils::collapsePath(this->Internals->AppOptions.InteractionTestPlayFile);
+    if (!interactionTestPlayFile.empty())
+    {
+      // For better testing, render once before the interaction
+      window.render();
+      if (!interactor.playInteraction(interactionTestPlayFile, deltaTime))
+      {
+        return EXIT_FAILURE;
+      }
+    }
+
+    // Start recording if needed
+    const fs::path interactionTestRecordFile =
+      f3d::utils::collapsePath(this->Internals->AppOptions.InteractionTestRecordFile);
+    if (!interactionTestRecordFile.empty())
+    {
+      if (!interactor.recordInteraction(interactionTestRecordFile))
+      {
+        return EXIT_FAILURE;
+      }
+    }
+
+    const std::optional<std::string> noDataForceRender =
       f3d::utils::getEnv("CTEST_F3D_NO_DATA_FORCE_RENDER");
 
     const f3d::utils::string_template outputTemplate = this->Internals->prepareFilenameTemplate(
       f3d::utils::collapsePath(this->Internals->AppOptions.Output));
 
-    fs::path reference = f3d::utils::collapsePath(this->Internals->AppOptions.Reference);
+    const fs::path reference = f3d::utils::collapsePath(this->Internals->AppOptions.Reference);
     // Render and compare with file if needed
     if (!reference.empty())
     {
@@ -1395,10 +1853,10 @@ int F3DStarter::Start(int argc, char** argv)
         return EXIT_FAILURE;
       }
 
-      f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
-      f3d::image ref(reference);
-      f3d::image diff;
-      double error = img.compare(ref);
+      const f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
+      const f3d::image ref(reference);
+      const f3d::image diff;
+      const double error = img.compare(ref);
       const double& threshold = this->Internals->AppOptions.RefThreshold;
       if (error > threshold)
       {
@@ -1446,8 +1904,9 @@ int F3DStarter::Start(int argc, char** argv)
 
       if (outputTemplate.hasVariable(std::regex("frame(:.*)?")))
       {
-        f3d::scene& animScene = this->Internals->Engine->getScene();
-        const auto [minTime, maxTime] = animScene.animationTimeRange();
+        f3d::animation& anim = this->Internals->Engine->getScene().getAnimation();
+
+        const auto [minTime, maxTime] = anim.getTimeRange();
 
         const double startTime = this->Internals->AppOptions.AnimationTime.value_or(minTime);
         const double endTime = maxTime;
@@ -1470,7 +1929,7 @@ int F3DStarter::Start(int argc, char** argv)
         for (int frame = 0; frame < count; ++frame)
         {
           const double currentTime = startTime + frame * timeStep;
-          animScene.loadAnimationTime(currentTime);
+          anim.loadTime(currentTime);
 
           if (!this->Internals->renderAndSave(window, outputTemplate, renderToStdout, frame))
           {
@@ -1494,13 +1953,123 @@ int F3DStarter::Start(int argc, char** argv)
                        "files were ignored.");
       }
     }
+    else if (!this->Internals->AppOptions.OutputVideo.empty())
+    {
+#ifndef F3D_MODULE_FFMPEG
+      f3d::log::error(
+        "Video output is not supported in this build of F3D, please rebuild with FFMPEG support");
+      return EXIT_FAILURE;
+#else
+      if (this->Internals->LoadedFiles.empty() && !noDataForceRender.has_value())
+      {
+        f3d::log::error("No files loaded, no rendering performed");
+        return EXIT_FAILURE;
+      }
+
+      f3d::video_encoder::params encoderParams = {
+        .Width = window.getWidth(),
+        .Height = window.getHeight(),
+        .FrameRate = this->Internals->AppOptions.FrameRate,
+        .Bitrate = this->Internals->AppOptions.VideoBitrate,
+        .LowLatency = this->Internals->AppOptions.VideoLowLatency,
+      };
+
+      if (!this->Internals->AppOptions.VideoEncoder.empty())
+      {
+        encoderParams.Codec = f3d::video_encoder::codec::EXPLICIT;
+        encoderParams.ExplicitCodecName = this->Internals->AppOptions.VideoEncoder;
+      }
+
+      std::shared_ptr<f3d::video_encoder> encoder;
+
+      try
+      {
+        encoder = f3d::video_encoder::create(encoderParams);
+      }
+      catch (const f3d::video_encoder::codec_exception& e)
+      {
+        f3d::log::error("Failed to create video encoder: ", e.what());
+        return EXIT_FAILURE;
+      }
+
+      std::ofstream outputFile;
+      std::ostream& stream = renderToStdout ? std::cout : outputFile;
+
+      if (!renderToStdout)
+      {
+        outputFile.open(this->Internals->AppOptions.OutputVideo, std::ios::binary);
+        if (!outputFile.is_open())
+        {
+          f3d::log::error(
+            "Could not open output video file: ", this->Internals->AppOptions.OutputVideo);
+          return EXIT_FAILURE;
+        }
+      }
+
+      encoder->listen(
+        [&](const std::shared_ptr<f3d::video_packet>& packet)
+        {
+          stream.write(
+            reinterpret_cast<const char*>(packet->getPacketData()), packet->getPacketSize());
+          f3d::log::debug("Video packet received, size: ", packet->getPacketSize());
+        });
+
+      f3d::animation& anim = this->Internals->Engine->getScene().getAnimation();
+      const auto [minTime, maxTime] = anim.getTimeRange();
+
+      const double startTime = this->Internals->AppOptions.AnimationTime.value_or(minTime);
+      const double endTime = maxTime;
+      const double duration = endTime - startTime;
+      const int count = duration > 0
+        ? static_cast<int>(std::ceil(duration * this->Internals->AppOptions.FrameRate)) + 1
+        : 1;
+
+      if (count == 1)
+      {
+        f3d::log::warn("No animation available or animation has zero duration, outputting single "
+                       "frame");
+      }
+
+      const double timeStep = 1.0 / this->Internals->AppOptions.FrameRate;
+
+      f3d::log::info(
+        "Saving ", count, " animation frame(s) from time ", startTime, " to ", endTime);
+
+      for (int frame = 0; frame < count; ++frame)
+      {
+        const double currentTime = startTime + frame * timeStep;
+        anim.loadTime(currentTime);
+
+        window.render();
+
+        auto videoFrame = window.getVideoFrame();
+        videoFrame->setTimestamp(frame);
+
+        while (!encoder->submit(videoFrame))
+        {
+          // If submit returns false, it's not an error, it means the encoder is not ready
+          // to accept a new frame yet, so we wait a bit
+          // It's not deterministic so we cannot cover it in the CI
+          // LCOV_EXCL_START
+          std::this_thread::sleep_for(std::chrono::milliseconds(10));
+          // LCOV_EXCL_STOP
+        }
+      }
+
+      encoder->flush();
+
+      f3d::log::info("Saved ", count, " animation frame(s)");
+
+      if (this->Internals->FilesGroups.size() > 1)
+      {
+        f3d::log::warn("An output video was saved using a single 3D file, other provided 3D "
+                       "files were ignored.");
+      }
+#endif
+    }
     // Start interaction
     else
     {
-#ifdef F3D_HEADLESS_BUILD
-      f3d::log::error("This is a headless build of F3D, interactive rendering is not supported");
-      return EXIT_FAILURE;
-#else
       if (this->Internals->Engine->getWindow().isOffscreen())
       {
         f3d::log::warn(
@@ -1517,9 +2086,15 @@ int F3DStarter::Start(int argc, char** argv)
         std::signal(SIGTERM, F3DInternals::SigCallback);
         std::signal(SIGINT, F3DInternals::SigCallback);
 
-        interactor.start(deltaTime, [this]() { this->EventLoop(); });
+        this->Internals->RecordWindowGeometry();
+
+        interactor.setEventLoopUserCallback([this](f3d::interactor_state_t) { this->EventLoop(); });
+        interactor.start(deltaTime);
+        if (!this->Internals->AppOptions.NoCache)
+        {
+          this->Internals->CacheWindowGeometry();
+        }
       }
-#endif
     }
   }
   return EXIT_SUCCESS;
@@ -1540,7 +2115,7 @@ void F3DStarter::LoadFileGroup(int index, bool relativeIndex, bool forceClear)
 
   // Compute a modulo to ensure 0 < groupIndex < size
   // XXX Do not work if groupIndex + size < 0
-  int size = static_cast<int>(this->Internals->FilesGroups.size());
+  const int size = static_cast<int>(this->Internals->FilesGroups.size());
   if (size != 0)
   {
     groupIndex = (groupIndex + size) % size;
@@ -1553,12 +2128,12 @@ void F3DStarter::LoadFileGroup(int index, bool relativeIndex, bool forceClear)
   if (groupIndex >= 0)
   {
     // Clear only if we change the group to load
-    bool clear = forceClear ? true : this->Internals->CurrentFilesGroupIndex != groupIndex;
+    const bool clear = forceClear ? true : this->Internals->CurrentFilesGroupIndex != groupIndex;
     this->Internals->CurrentFilesGroupIndex = groupIndex;
 
     // Create a nice looking group index eg: "(1/5)"
     // XXX: Each group contains at least one path
-    std::string groupIdx = "(" + std::to_string(groupIndex + 1) + "/" +
+    const std::string groupIdx = "(" + std::to_string(groupIndex + 1) + "/" +
       std::to_string(this->Internals->FilesGroups.size()) + ")";
     this->LoadFileGroupInternal(this->Internals->FilesGroups[groupIndex].second, clear, groupIdx);
 
@@ -1583,7 +2158,7 @@ void F3DStarter::LoadFileGroupInternal(
   // Make sure the animation is stopped before trying to load any file
   if (!this->Internals->AppOptions.NoRender)
   {
-    this->Internals->Engine->getInteractor().stopAnimation();
+    this->Internals->Engine->getScene().getAnimation().stop();
   }
 
   f3d::log::debug("========== Loading 3D files ==========");
@@ -1598,7 +2173,7 @@ void F3DStarter::LoadFileGroupInternal(
   // Detect interactively changed options and store them into the dynamic options dict
   // options names are shared between options instance
   F3DOptionsTools::OptionsDict dynamicOptionsDict;
-  std::vector<std::string> optionNames = dynamicOptions.getAllNames();
+  const std::vector<std::string> optionNames = dynamicOptions.getAllNames();
   for (const auto& name : optionNames)
   {
     if (!dynamicOptions.isSame(this->Internals->LibOptions, name))
@@ -1619,8 +2194,9 @@ void F3DStarter::LoadFileGroupInternal(
   }
 
   // Detect interactively changed verbose level and add it to dynamic options
-  f3d::log::VerboseLevel currentVerboseLevel = f3d::log::getVerboseLevel();
-  std::string currentVerboseLevelString = F3DInternals::GetVerboseLevelString(currentVerboseLevel);
+  const f3d::log::VerboseLevel currentVerboseLevel = f3d::log::getVerboseLevel();
+  const std::string currentVerboseLevelString =
+    F3DInternals::GetVerboseLevelString(currentVerboseLevel);
   if (currentVerboseLevelString != this->Internals->AppOptions.VerboseLevel)
   {
     dynamicOptionsDict["verbose"] = currentVerboseLevelString;
@@ -1639,7 +2215,7 @@ void F3DStarter::LoadFileGroupInternal(
 
 #if F3D_MODULE_DMON
   // In the main thread, we only need to guard writing
-  const std::lock_guard<std::mutex> lock(this->Internals->FilesToWatchMutex);
+  const std::scoped_lock lock(this->Internals->FilesToWatchMutex);
 #endif
 
   if (clear)
@@ -1654,8 +2230,10 @@ void F3DStarter::LoadFileGroupInternal(
     // Update options even when there is no file
     // as imperative options should override dynamic option even in that case
     this->Internals->UpdateOptions(
-      { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
-        this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
+      { this->Internals->CachedOptionsEntries, this->Internals->ConfigOptionsEntries,
+        this->Internals->StatefileOptionsEntries, this->Internals->CLIOptionsEntries,
+        this->Internals->RuntimeStatefileOptionsEntries, this->Internals->DynamicOptionsEntries,
+        this->Internals->ImperativeConfigOptionsEntries },
       { "" }, false);
     this->Internals->Engine->setOptions(this->Internals->LibOptions);
     f3d::log::debug("No files to load provided");
@@ -1663,13 +2241,18 @@ void F3DStarter::LoadFileGroupInternal(
   else
   {
     // Update app and libf3d options based on config entries, selecting block using the input file
-    // config < cli < dynamic
+    // cached < config < statefile < cli < runtime statefile < dynamic
+    // A statefile loaded interactively (runtime statefile) applies above the command line, like a
+    // dynamic option change, so it is not overridden by the now stale launch options. A statefile
+    // loaded at startup stays below the command line so explicit launch options win.
     // Options must be updated before checking the supported files in order to load plugins
     std::vector<fs::path> configPaths = this->Internals->LoadedFiles;
-    std::copy(paths.begin(), paths.end(), std::back_inserter(configPaths));
+    std::ranges::copy(paths, std::back_inserter(configPaths));
     this->Internals->UpdateOptions(
-      { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
-        this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
+      { this->Internals->CachedOptionsEntries, this->Internals->ConfigOptionsEntries,
+        this->Internals->StatefileOptionsEntries, this->Internals->CLIOptionsEntries,
+        this->Internals->RuntimeStatefileOptionsEntries, this->Internals->DynamicOptionsEntries,
+        this->Internals->ImperativeConfigOptionsEntries },
       configPaths, false);
     this->Internals->UpdateBindings(configPaths);
 
@@ -1678,8 +2261,8 @@ void F3DStarter::LoadFileGroupInternal(
     f3d::log::debug("Checking files:");
     for (const fs::path& tmpPath : paths)
     {
-      if (std::find(this->Internals->LoadedFiles.begin(), this->Internals->LoadedFiles.end(),
-            tmpPath) == this->Internals->LoadedFiles.end())
+      if (std::ranges::find(this->Internals->LoadedFiles, tmpPath) ==
+        this->Internals->LoadedFiles.end())
       {
         if (tmpPath == F3D_PIPED)
         {
@@ -1696,11 +2279,12 @@ void F3DStarter::LoadFileGroupInternal(
 
         try
         {
+          const f3d::file_availability availability = scene.supports(tmpPath);
           if (!fs::exists(tmpPath))
           {
             f3d::log::error(tmpPath.string(), " does not exist");
           }
-          else if (scene.supports(tmpPath))
+          else if (availability == f3d::file_availability::SUPPORTED)
           {
             // Check the size of the file before loading it
             static constexpr int BYTES_IN_MIB = 1048576;
@@ -1716,7 +2300,7 @@ void F3DStarter::LoadFileGroupInternal(
               localPaths.emplace_back(tmpPath);
             }
           }
-          else
+          else if (availability == f3d::file_availability::UNSUPPORTED_EXTENSION)
           {
             auto forceReader = this->Internals->LibOptions.scene.force_reader;
             if (forceReader)
@@ -1726,8 +2310,27 @@ void F3DStarter::LoadFileGroupInternal(
             else
             {
               f3d::log::warn(tmpPath.string(),
-                " is of an unknown format or contains unsupported contents, use "
+                " is of an unknown format, use "
                 "--force-reader to select a specific reader");
+            }
+            unsupported = true;
+          }
+          else if (availability == f3d::file_availability::UNSUPPORTED_CONTENT)
+          {
+            auto forceReader = this->Internals->LibOptions.scene.force_reader;
+            if (forceReader)
+            {
+              f3d::log::warn(tmpPath.string(),
+                " contains unsupported contents for "
+                "a selected forced reader ",
+                *forceReader, ", use --skip-content-check to try reading it anyway");
+            }
+            else
+            {
+              f3d::log::warn(tmpPath.string(),
+                " contains unsupported contents, use "
+                "--skip-content-check to try reading it anyway or --force-reader to select a "
+                "specific reader");
             }
             unsupported = true;
           }
@@ -1742,7 +2345,7 @@ void F3DStarter::LoadFileGroupInternal(
 
     if (!localPaths.empty())
     {
-      auto cinIt = std::find(localPaths.begin(), localPaths.end(), F3D_PIPED);
+      auto cinIt = std::ranges::find(localPaths, F3D_PIPED);
       if (cinIt != localPaths.end())
       {
         // Remove cin from path
@@ -1801,12 +2404,11 @@ void F3DStarter::LoadFileGroupInternal(
           {
             f3d::log::debug(
               "Loading animation time: ", this->Internals->AppOptions.AnimationTime.value());
-            scene.loadAnimationTime(this->Internals->AppOptions.AnimationTime.value());
+            scene.getAnimation().loadTime(this->Internals->AppOptions.AnimationTime.value());
           }
 
           // Update loaded files
-          std::copy(
-            localPaths.begin(), localPaths.end(), std::back_inserter(this->Internals->LoadedFiles));
+          std::ranges::copy(localPaths, std::back_inserter(this->Internals->LoadedFiles));
         }
         catch (const f3d::scene::load_failure_exception& ex)
         {
@@ -1847,7 +2449,7 @@ void F3DStarter::LoadFileGroupInternal(
   if (this->Internals->AppOptions.Watch)
   {
     // Recover all parents paths in a set
-    std::set<fs::path> parentPaths = F3DInternals::ParentPaths(this->Internals->FilesToWatch);
+    const std::set<fs::path> parentPaths = F3DInternals::ParentPaths(this->Internals->FilesToWatch);
 
     // Unwatch and erase paths that should not be watched anymore
     for (auto it = this->Internals->FolderWatchIds.begin();
@@ -1922,7 +2524,7 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
   fs::path path;
   try
   {
-    fs::path dir = F3DSystemTools::GetUserScreenshotDirectory();
+    const fs::path dir = F3DSystemTools::GetUserScreenshotDirectory();
     path = this->Internals->finalizeFilenameTemplate(
       this->Internals->prepareFilenameTemplate(f3d::utils::collapsePath(filenameTemplate, dir)));
     fs::create_directories(path.parent_path());
@@ -1935,7 +2537,7 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
   }
 
   f3d::options& options = this->Internals->Engine->getOptions();
-  f3d::options optionsCopy = this->Internals->Engine->getOptions();
+  const f3d::options optionsCopy = this->Internals->Engine->getOptions();
 
   bool noBackground = this->Internals->AppOptions.NoBackground;
   if (minimal)
@@ -1946,7 +2548,7 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
     options.ui.filename = false;
     options.ui.fps = false;
     options.ui.metadata = false;
-    options.ui.animation_progress = false;
+    options.ui.animation_progress = "none";
     options.ui.axis = false;
     options.render.grid.enable = false;
     noBackground = true;
@@ -1961,6 +2563,257 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
 
   this->Internals->Engine->setOptions(optionsCopy);
   this->Render();
+}
+
+//----------------------------------------------------------------------------
+void F3DStarter::SaveStatefile(const std::string& filenameTemplate)
+{
+  if (filenameTemplate.empty())
+  {
+#if F3D_MODULE_TINYFILEDIALOGS
+    // No location provided: let the user pick one with a file dialog
+    std::optional<std::string> file = f3d::utils::getEnv("CTEST_SAVE_STATEFILE_DIALOG_FILE");
+    if (!file.has_value())
+    {
+      // We cannot test dialogs in the CI
+      // LCOV_EXCL_START
+      const char* pattern = "*.json";
+      const char* ptr =
+        tinyfd_saveFileDialog("Save Statefile", "f3d_state.json", 1, &pattern, "Statefiles");
+      if (ptr)
+      {
+        file = ptr;
+      }
+      // LCOV_EXCL_STOP
+    }
+    if (file.has_value() && !file.value().empty())
+    {
+      // Ensure a .json extension, the dialog may return a name typed without one
+      fs::path path = file.value();
+      if (path.extension() != ".json")
+      {
+        path += ".json";
+      }
+      this->SaveStatefile(path.string());
+    }
+    return;
+#else
+    f3d::log::error(
+      "File dialog is not available, F3D was built without the tinyfiledialogs module");
+    return;
+#endif
+  }
+
+  if (filenameTemplate == F3D_PIPED)
+  {
+    // Write the statefile to the standard output, with absolute file group paths
+    std::cout << this->Internals->AugmentStatefileContent(
+                   this->Internals->Engine->dump().toString(), {})
+              << "\n";
+    return;
+  }
+
+  const f3d::utils::string_template statefileTemplate =
+    this->Internals->prepareFilenameTemplate(f3d::utils::collapsePath(filenameTemplate));
+  const fs::path statefilePath = this->Internals->finalizeFilenameTemplate(statefileTemplate);
+  try
+  {
+    if (!statefilePath.parent_path().empty())
+    {
+      fs::create_directories(statefilePath.parent_path());
+    }
+    this->Internals->Engine->dump().toFile(statefilePath);
+
+    // Read the libf3d statefile back to add the app file groups (including the ones not currently
+    // loaded), storing their paths relative to the statefile like libf3d does
+    std::ifstream readStream(statefilePath);
+    const std::string content{ std::istreambuf_iterator<char>(readStream),
+      std::istreambuf_iterator<char>() };
+    readStream.close();
+    std::ofstream writeStream(statefilePath);
+    writeStream << this->Internals->AugmentStatefileContent(content, statefilePath.parent_path())
+                << "\n";
+
+    f3d::log::info("Statefile saved to ", statefilePath.string());
+  }
+  catch (const f3d::engine::statefile_exception& ex)
+  {
+    f3d::log::error("Could not save statefile: ", ex.what());
+  }
+  catch (const fs::filesystem_error& ex)
+  {
+    f3d::log::error("Could not save statefile: ", ex.what());
+  }
+}
+
+//----------------------------------------------------------------------------
+void F3DStarter::SaveStatefileToClipboard()
+{
+  try
+  {
+    // Absolute file group paths since the clipboard has no associated directory
+    const f3d::engine::state state = f3d::engine::state::fromString(
+      this->Internals->AugmentStatefileContent(this->Internals->Engine->dump().toString(), {}));
+    state.toClipboard();
+    f3d::log::info("Statefile copied to the clipboard");
+  }
+  // Cannot test clipboard failure in the CI
+  // LCOV_EXCL_START
+  catch (const f3d::engine::statefile_exception& ex)
+  {
+    f3d::log::error(ex.what());
+  }
+  // LCOV_EXCL_STOP
+}
+
+//----------------------------------------------------------------------------
+void F3DStarter::LoadStatefile(const std::string& source)
+{
+  if (source.empty())
+  {
+#if F3D_MODULE_TINYFILEDIALOGS
+    // No location provided: let the user pick one with a file dialog
+    std::optional<std::string> file = f3d::utils::getEnv("CTEST_LOAD_STATEFILE_DIALOG_FILE");
+    if (!file.has_value())
+    {
+      // We cannot test dialogs in the CI
+      // LCOV_EXCL_START
+      const char* pattern = "*.json";
+      const char* ptr =
+        tinyfd_openFileDialog("Load Statefile", nullptr, 1, &pattern, "Statefiles", false);
+      if (ptr)
+      {
+        file = ptr;
+      }
+      // LCOV_EXCL_STOP
+    }
+    if (file.has_value() && !file.value().empty())
+    {
+      this->LoadStatefile(file.value());
+    }
+    return;
+#else
+    f3d::log::error(
+      "File dialog is not available, F3D was built without the tinyfiledialogs module");
+    return;
+#endif
+  }
+
+  // Resolve template variables ({model}, {date}, ...) like the save path does, so that the same
+  // --statefile-filename works for both saving and loading. The `{n}` number resolves to the most
+  // recent existing file (instead of the next free one as for saving), so loading picks up the last
+  // saved statefile.
+  std::string resolvedSource = source;
+  if (source != F3D_PIPED)
+  {
+    const f3d::utils::string_template sourceTemplate =
+      this->Internals->prepareFilenameTemplate(f3d::utils::collapsePath(source));
+    resolvedSource =
+      this->Internals->finalizeFilenameTemplate(sourceTemplate, std::nullopt, true).string();
+  }
+
+  F3DOptionsTools::OptionsDict statefileOptions;
+  std::vector<std::string> statefileFiles;
+  std::optional<StatefileFileGroups> statefileFileGroups;
+  std::optional<std::pair<int, int>> statefileWindowSize;
+  std::optional<std::pair<int, int>> statefileWindowPosition;
+  if (!F3DInternals::ReadStatefileSource(resolvedSource, statefileOptions, statefileFiles,
+        statefileFileGroups, statefileWindowSize, statefileWindowPosition))
+  {
+    return;
+  }
+
+  this->ApplyStatefile(statefileOptions, statefileFiles, statefileFileGroups, statefileWindowSize,
+    statefileWindowPosition);
+  f3d::log::info("Statefile loaded from ", resolvedSource);
+}
+
+//----------------------------------------------------------------------------
+void F3DStarter::LoadStatefileFromClipboard()
+{
+  F3DOptionsTools::OptionsDict statefileOptions;
+  std::vector<std::string> statefileFiles;
+  std::optional<StatefileFileGroups> statefileFileGroups;
+  std::optional<std::pair<int, int>> statefileWindowSize;
+  std::optional<std::pair<int, int>> statefileWindowPosition;
+  if (!F3DInternals::ReadStatefileFromClipboard(statefileOptions, statefileFiles,
+        statefileFileGroups, statefileWindowSize, statefileWindowPosition))
+  {
+    // Unreachable with testing
+    return;
+  }
+
+  this->ApplyStatefile(statefileOptions, statefileFiles, statefileFileGroups, statefileWindowSize,
+    statefileWindowPosition);
+  f3d::log::info("Statefile loaded from the clipboard");
+}
+
+//----------------------------------------------------------------------------
+void F3DStarter::ApplyStatefile(const std::map<std::string, std::string>& statefileOptions,
+  const std::vector<std::string>& statefileFiles,
+  const std::optional<StatefileFileGroups>& statefileFileGroups,
+  const std::optional<std::pair<int, int>>& statefileWindowSize,
+  const std::optional<std::pair<int, int>>& statefileWindowPosition)
+{
+  this->Internals->Engine->setOptions(this->Internals->LibOptions);
+  this->Internals->DynamicOptionsEntries.clear();
+
+  if (statefileWindowSize.has_value() && !this->Internals->AppOptions.NoRender)
+  {
+    this->Internals->Engine->getWindow().setSize(
+      statefileWindowSize->first, statefileWindowSize->second);
+    f3d::log::debug("Window size set to ", statefileWindowSize->first, "x",
+      statefileWindowSize->second, " from statefile");
+  }
+
+  if (statefileWindowPosition.has_value() && !this->Internals->AppOptions.NoRender)
+  {
+    this->Internals->Engine->getWindow().setPosition(
+      statefileWindowPosition->first, statefileWindowPosition->second);
+    f3d::log::debug("Window position set to ", statefileWindowPosition->first, ",",
+      statefileWindowPosition->second, " from statefile");
+  }
+
+  // Apply the statefile options in a dedicated tier above the command line: loading a statefile
+  // interactively behaves like setting these options dynamically, so it overrides the now stale
+  // launch options instead of being overridden by them. Also drop any startup statefile options so
+  // the interactive load is a clean, full replacement.
+  this->Internals->StatefileOptionsEntries.clear();
+  this->Internals->RuntimeStatefileOptionsEntries.clear();
+  this->Internals->RuntimeStatefileOptionsEntries.emplace_back(
+    statefileOptions, "", "", "statefile options");
+
+  if (!this->Internals->AppOptions.NoRender)
+  {
+    this->Internals->Engine->getScene().getAnimation().stop();
+  }
+
+  this->Internals->FilesGroups.clear();
+  if (statefileFileGroups.has_value())
+  {
+    // Restore the exact file group structure, including groups that were not loaded
+    this->Internals->FilesGroups = statefileFileGroups->Groups;
+    const int size = static_cast<int>(this->Internals->FilesGroups.size());
+    int current = statefileFileGroups->Current;
+    if (current < 0 || current >= size)
+    {
+      current = 0;
+    }
+    this->LoadFileGroup(current, false, true);
+  }
+  else
+  {
+    // Older or libf3d-only statefile without file groups: rebuild from the flat file list
+    for (const std::string& file : statefileFiles)
+    {
+      this->AddFile(f3d::utils::collapsePath(file));
+    }
+    this->LoadFileGroup(0, false, true);
+  }
+
+  this->Internals->ConsumeStatefileCameraOptions();
+
+  this->ResetWindowName();
 }
 
 //----------------------------------------------------------------------------
@@ -2037,7 +2890,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
         if (key == groupKey)
         {
           // Check if file has already been added
-          if (std::find(paths.begin(), paths.end(), tmpPath) == paths.end())
+          if (std::ranges::find(paths, tmpPath) == paths.end())
           {
             paths.emplace_back(tmpPath);
           }
@@ -2084,6 +2937,8 @@ bool F3DStarter::LoadRelativeFileGroup(int index, bool restoreCamera, bool force
 //----------------------------------------------------------------------------
 void F3DStarter::EventLoop()
 {
+  this->Internals->RecordWindowGeometry();
+
   if (this->Internals->ReloadFileRequested)
   {
     this->LoadRelativeFileGroup(0, true, true);
@@ -2180,7 +3035,7 @@ void F3DStarter::AddCommands()
         }
 
         // Copy the directory content as paths
-        fs::directory_iterator iter(parentPath);
+        const fs::directory_iterator iter(parentPath);
         std::transform(fs::begin(iter), fs::end(iter), std::back_inserter(dirContent),
           [&](const auto& entry) { return entry.path(); });
 
@@ -2188,7 +3043,7 @@ void F3DStarter::AddCommands()
         std::set<std::string> supportedExtensions;
         for (const auto& info : f3d::engine::getReadersInfo())
         {
-          std::transform(info.Extensions.begin(), info.Extensions.end(),
+          std::ranges::transform(info.Extensions,
             std::inserter(supportedExtensions, supportedExtensions.begin()),
             [&](const std::string& ext) { return "." + ext; });
         }
@@ -2212,8 +3067,7 @@ void F3DStarter::AddCommands()
 #else
           // Linux filesystems are typically case-sensitive
           // Perform a case sensitive search
-          // Using rfind to avoid dependency for C++20 starts_with
-          return filename.rfind(filePattern, 0) == 0;
+          return filename.starts_with(filePattern);
 #endif
         };
 
@@ -2236,7 +3090,7 @@ void F3DStarter::AddCommands()
       }
 
       // Sort for output readability and test reproducibility
-      std::sort(candidates.begin(), candidates.end());
+      std::ranges::sort(candidates);
 
       if (candidates.size() == 1 && fs::is_directory(candidates[0]))
       {
@@ -2255,11 +3109,10 @@ void F3DStarter::AddCommands()
       std::vector<std::string> originalCandidates = candidates;
       candidates.clear();
 
-      std::vector<std::string> multiArgsCandidate;
+      const std::vector<std::string> multiArgsCandidate;
       const std::string accum = std::accumulate(args.begin() + 1, args.end() - 1, args[0],
         [](const std::string& a, const std::string& b) { return a + " " + b; });
-      std::transform(originalCandidates.begin(), originalCandidates.end(),
-        std::back_inserter(candidates),
+      std::ranges::transform(originalCandidates, std::back_inserter(candidates),
         [&](const auto& candidate) { return accum + " " + candidate; });
     }
 
@@ -2269,8 +3122,7 @@ void F3DStarter::AddCommands()
       std::vector<std::string> originalCandidates = candidates;
       candidates.clear();
 
-      std::transform(originalCandidates.begin(), originalCandidates.end(),
-        std::back_inserter(candidates),
+      std::ranges::transform(originalCandidates, std::back_inserter(candidates),
         [&](std::string candidate)
         {
           for (size_t i = 0; i < candidate.size(); i++)
@@ -2303,7 +3155,7 @@ void F3DStarter::AddCommands()
       {
         if (!this->Internals->AppOptions.NoRender)
         {
-          this->Internals->Engine->getInteractor().stopAnimation();
+          this->Internals->Engine->getScene().getAnimation().stop();
         }
         this->Internals->FilesGroups.erase(
           this->Internals->FilesGroups.begin() + this->Internals->CurrentFilesGroupIndex);
@@ -2319,7 +3171,7 @@ void F3DStarter::AddCommands()
     {
       if (!this->Internals->AppOptions.NoRender)
       {
-        this->Internals->Engine->getInteractor().stopAnimation();
+        this->Internals->Engine->getScene().getAnimation().stop();
       }
       this->Internals->FilesGroups.clear();
       this->LoadFileGroup(0, false, true);
@@ -2373,7 +3225,7 @@ void F3DStarter::AddCommands()
     [this](const std::vector<std::string>& args)
     {
       // XXX: Add a test for this one this can be reached with a non empty filename
-      std::string filename =
+      const std::string filename =
         args.empty() ? this->Internals->AppOptions.ScreenshotFilename : args[0];
       this->SaveScreenshot(filename);
     },
@@ -2386,13 +3238,67 @@ void F3DStarter::AddCommands()
     [this](const std::vector<std::string>& args)
     {
       // XXX: Add a test for this one this can be reached with a non empty filename
-      std::string filename =
+      const std::string filename =
         args.empty() ? this->Internals->AppOptions.ScreenshotFilename : args[0];
       this->SaveScreenshot(filename, true);
     },
     f3d::interactor::command_documentation_t{ "take_minimal_screenshot [filename]",
       "take a minimal screenshot into provided file or --screenshot-filename" },
     complFilesystem);
+
+  const auto statefileFilenameOrDefault = [this]()
+  {
+    const std::string& filename = this->Internals->AppOptions.StatefileFilename;
+    return filename.empty() ? std::string("{app}/{model}_{n}.json") : filename;
+  };
+
+  // These replace the basic statefile commands from libf3d, to also handle the app file groups,
+  // filename templating (--statefile-filename, `-` for standard streams) and file dialogs
+  interactor.removeCommand("save_statefile");
+  interactor.addCommand(
+    "save_statefile", [this, statefileFilenameOrDefault](const std::vector<std::string>& args)
+    { this->SaveStatefile(args.empty() ? statefileFilenameOrDefault() : args[0]); },
+    f3d::interactor::command_documentation_t{ "save_statefile [filename]",
+      "save the current state into provided file, --statefile-filename or a default filename, `-` "
+      "for the standard output" },
+    complFilesystem);
+
+  interactor.addCommand(
+    "save_statefile_dialog", [this](const std::vector<std::string>&) { this->SaveStatefile(""); },
+    f3d::interactor::command_documentation_t{ "save_statefile_dialog",
+      "save the current state into a file picked with a file dialog (requires the tinyfiledialogs "
+      "module)" });
+
+  interactor.removeCommand("load_statefile");
+  interactor.addCommand(
+    "load_statefile", [this, statefileFilenameOrDefault](const std::vector<std::string>& args)
+    { this->LoadStatefile(args.empty() ? statefileFilenameOrDefault() : args[0]); },
+    f3d::interactor::command_documentation_t{ "load_statefile [filename]",
+      "restore the state from provided file, --statefile-filename or a default filename, `-` for "
+      "the standard input" },
+    complFilesystem);
+
+  interactor.addCommand(
+    "load_statefile_dialog", [this](const std::vector<std::string>&) { this->LoadStatefile(""); },
+    f3d::interactor::command_documentation_t{ "load_statefile_dialog",
+      "restore the state from a file picked with a file dialog (requires the tinyfiledialogs "
+      "module)" });
+
+#if F3D_MODULE_CLIP
+  interactor.removeCommand("save_statefile_to_clipboard");
+  interactor.addCommand(
+    "save_statefile_to_clipboard",
+    [this](const std::vector<std::string>&) { this->SaveStatefileToClipboard(); },
+    f3d::interactor::command_documentation_t{
+      "save_statefile_to_clipboard", "save the current state into the system clipboard" });
+
+  interactor.removeCommand("load_statefile_from_clipboard");
+  interactor.addCommand(
+    "load_statefile_from_clipboard",
+    [this](const std::vector<std::string>&) { this->LoadStatefileFromClipboard(); },
+    f3d::interactor::command_documentation_t{
+      "load_statefile_from_clipboard", "restore the state from the system clipboard" });
+#endif
 
   // This replace an existing command in libf3d
   interactor.removeCommand("add_files");
@@ -2424,7 +3330,7 @@ void F3DStarter::AddCommands()
         f3d::options& options = this->Internals->Engine->getOptions();
         options.render.hdri.file = f3d::utils::collapsePath(files[0]);
         options.render.hdri.ambient = true;
-        options.render.background.skybox = true;
+        options.render.background.skybox = "enabled";
 
         // Rendering now is needed for correct lighting
         this->Render();
@@ -2449,7 +3355,7 @@ void F3DStarter::AddCommands()
           f3d::options& options = this->Internals->Engine->getOptions();
           options.render.hdri.file = f3d::utils::collapsePath(file);
           options.render.hdri.ambient = true;
-          options.render.background.skybox = true;
+          options.render.background.skybox = "enabled";
 
           // Rendering now is needed for correct lighting
           this->Render();
@@ -2474,7 +3380,7 @@ void F3DStarter::AddCommands()
     "open_file_dialog",
     [this](const std::vector<std::string>&)
     {
-      std::vector<std::string> filters = F3DStarter::GetExtensions();
+      const std::vector<std::string> filters = F3DStarter::GetExtensions();
       std::vector<const char*> cstrings;
       cstrings.reserve(filters.size());
       for (const auto& filter : filters)
@@ -2488,8 +3394,8 @@ void F3DStarter::AddCommands()
 #ifdef __APPLE__
         F3DNSDelegate::ShowOpenFileDialog(cstrings.data(), cstrings.size());
 #else
-        char* ptr = tinyfd_openFileDialog("Open File", nullptr, static_cast<int>(cstrings.size()),
-          cstrings.data(), "Supported Files", false);
+        const char* ptr = tinyfd_openFileDialog("Open File", nullptr,
+          static_cast<int>(cstrings.size()), cstrings.data(), "Supported Files", false);
         if (ptr)
         {
           file = ptr;
@@ -2499,7 +3405,7 @@ void F3DStarter::AddCommands()
 
       if (file.has_value())
       {
-        int index = this->AddFile(file.value());
+        const int index = this->AddFile(file.value());
         if (index > -1)
         {
           this->LoadFileGroup(index);

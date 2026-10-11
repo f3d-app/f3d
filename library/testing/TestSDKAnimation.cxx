@@ -1,4 +1,5 @@
 #include "PseudoUnitTest.h"
+#include "TestSDKHelpers.h"
 
 #include <engine.h>
 #include <interactor.h>
@@ -6,80 +7,79 @@
 
 using namespace std::string_literals;
 
-int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
+int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
 {
   PseudoUnitTest test;
-  f3d::engine eng = f3d::engine::create(true);
+  const std::string renderingBackend = std::string(argv[4]);
+  f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::scene& sce = eng.getScene();
+  f3d::animation& anim = sce.getAnimation();
   f3d::interactor& inter = eng.getInteractor();
 
-  test("availableAnimations for empty scene", sce.availableAnimations() == 0);
+  test("animations count for empty scene", anim.count() == 0);
 
-  test("getAnimationName returns for empty scene", sce.getAnimationName(), "No animation"s);
+  test("getName returns for empty scene", anim.getName(), "No animation"s);
 
-  test("getAnimationNames returns 0 len vec for empty scene", sce.getAnimationNames().size() == 0);
+  test("getNames returns 0 len vec for empty scene", anim.getNames().size() == 0);
 
   sce.add(std::string(argv[1]) + "/data/soldier_animations.mdl");
 
-  test("availableAnimations", sce.availableAnimations() == 10);
+  test("animations count", anim.count() == 10);
 
-  sce.loadAnimationTime(0.5);
-  test("recover animationTimeRange",
-    sce.animationTimeRange() == std::make_pair(0.0, 0.7999999999999999));
+  anim.loadTime(0.5);
+  test("recover timeRange", anim.getTimeRange() == std::make_pair(0.0, 0.7999999999999999));
 
-  inter.startAnimation();
-  test("isPlaying after start", inter.isPlayingAnimation());
-  test("isPlaying forward after start",
-    inter.getAnimationDirection() == f3d::interactor::AnimationDirection::FORWARD);
+  anim.start();
+  test("isPlaying after start", anim.isPlaying());
+  test("isPlaying forward after start", anim.getDirection() == f3d::animation::Direction::FORWARD);
 
-  inter.toggleAnimation();
-  test("isPlaying after toggle off", !inter.isPlayingAnimation());
+  anim.toggle();
+  test("isPlaying after toggle off", !anim.isPlaying());
 
-  inter.toggleAnimation();
-  test("isPlaying after toggle on", inter.isPlayingAnimation());
-  test("isPlaying forward toggle on",
-    inter.getAnimationDirection() == f3d::interactor::AnimationDirection::FORWARD);
+  anim.toggle();
+  test("isPlaying after toggle on", anim.isPlaying());
+  test("isPlaying forward toggle on", anim.getDirection() == f3d::animation::Direction::FORWARD);
 
   f3d::interactor& interRef = inter.triggerEventLoop(0.1);
   test("triggerEventLoop returns self", &interRef == &inter);
 
-  inter.stopAnimation();
-  test("isPlaying after stop", !inter.isPlayingAnimation());
+  anim.stop();
+  test("isPlaying after stop", !anim.isPlaying());
 
-  test("getAnimationName returns name at index", sce.getAnimationName(0), "stand"s);
+  test("getName returns name at index", anim.getName(0), "stand"s);
 
-  test("getAnimationName returns for out of range", sce.getAnimationName(9999), "No animation"s);
+  test("getName returns for out of range", anim.getName(9999), "No animation"s);
 
-  test("getAnimationName returns current name", sce.getAnimationName(), "stand"s);
+  test("getName returns current name", anim.getName(), "stand"s);
 
-  test("getAnimationNames returns names", sce.getAnimationNames(),
+  test("getNames returns names", anim.getNames(),
     std::vector<std::string>{
       "stand", "dead", "dead_right", "reload", "hit", "down", "stumble", "run", "shoot", "walk" });
 
-  auto keyframes = sce.getAnimationKeyFrames();
-  test("check keyframes size", static_cast<int>(keyframes.size()), 9);
-  test("check first keyframes", keyframes[0], 0.0);
-  test("check last keyframes", keyframes[8], 0.7999999999999999);
+  auto keyFrames = anim.getKeyFrames();
+  test("check key frames size", static_cast<int>(keyFrames.size()), 9);
+  test("check first key frames", keyFrames[0], 0.0);
+  test("check last key frames", keyFrames[8], 0.7999999999999999);
 
-  inter.startAnimation(f3d::interactor::AnimationDirection::FORWARD);
+  anim.start(f3d::animation::Direction::FORWARD);
   test("isPlaying backward after forward start",
-    inter.getAnimationDirection() == f3d::interactor::AnimationDirection::FORWARD);
-  inter.stopAnimation();
+    anim.getDirection() == f3d::animation::Direction::FORWARD);
+  anim.stop();
 
-  inter.startAnimation(f3d::interactor::AnimationDirection::BACKWARD);
+  anim.start(f3d::animation::Direction::BACKWARD);
   test("isPlaying backward after backward start",
-    inter.getAnimationDirection() == f3d::interactor::AnimationDirection::BACKWARD);
-  inter.stopAnimation();
+    anim.getDirection() == f3d::animation::Direction::BACKWARD);
+  anim.stop();
 
-  inter.toggleAnimation(f3d::interactor::AnimationDirection::FORWARD);
+  anim.toggle(f3d::animation::Direction::FORWARD);
   test("isPlaying backward after forward toggle on",
-    inter.getAnimationDirection() == f3d::interactor::AnimationDirection::FORWARD);
-  inter.stopAnimation();
+    anim.getDirection() == f3d::animation::Direction::FORWARD);
+  anim.stop();
 
-  inter.toggleAnimation(f3d::interactor::AnimationDirection::BACKWARD);
+  anim.toggle(f3d::animation::Direction::BACKWARD);
   test("isPlaying backward after backward toggle on",
-    inter.getAnimationDirection() == f3d::interactor::AnimationDirection::BACKWARD);
-  inter.stopAnimation();
+    anim.getDirection() == f3d::animation::Direction::BACKWARD);
+  anim.stop();
 
   return test.result();
 }

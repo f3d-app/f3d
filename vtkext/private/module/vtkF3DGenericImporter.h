@@ -9,11 +9,14 @@
 #include "vtkF3DImporter.h"
 
 #include <memory>
+#include <string>
+#include <vector>
 
 class vtkAlgorithm;
 class vtkDataObject;
 class vtkImageData;
 class vtkMultiBlockDataSet;
+class vtkDataAssembly;
 class vtkPartitionedDataSet;
 class vtkPartitionedDataSetCollection;
 class vtkPolyData;
@@ -82,8 +85,7 @@ public:
 
   /**
    * Get temporal information for the currently enabled animations.
-   * Framerate is ignored in this implementation.
-   * Only timerange is defined in this implementation.
+   * Recover timeRange, nbTimeSteps and timeSteps.
    */
   bool GetTemporalInformation(vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps,
     vtkDoubleArray* timeSteps) override;
@@ -143,15 +145,30 @@ private:
   void ImportMultiBlock(int nodeid, vtkMultiBlockDataSet* mb, vtkRenderer* ren);
 
   /**
-   * Import blocks from a vtkPartitionedDataSetCollection with proper name extraction
+   * Import blocks from a vtkPartitionedDataSetCollection, following its data assembly when
+   * there is one to build the scene hierarchy
    */
   void ImportPartitionedDataSetCollection(vtkPartitionedDataSetCollection* pdc, vtkRenderer* ren);
 
   /**
-   * Import blocks from a vtkPartitionedDataSet with proper name extraction
+   * Import the children of an assembly node under the provided scene hierarchy node, recursively.
+   * Datasets referenced by the assembly are flagged in imported.
+   */
+  void ImportAssemblyNode(int nodeid, vtkDataAssembly* assembly, int assemblyNodeId,
+    vtkPartitionedDataSetCollection* pdc, vtkRenderer* ren, std::vector<bool>& imported);
+
+  /**
+   * Import a partitioned dataset of a collection under the provided scene hierarchy node, named
+   * after pdsName, or its metadata when pdsName is empty
+   */
+  void ImportPartitionedDataSet(int nodeid, vtkPartitionedDataSetCollection* pdc,
+    unsigned int index, vtkRenderer* ren, const std::string& pdsName);
+
+  /**
+   * Import blocks from a vtkPartitionedDataSet under the provided scene hierarchy node
    */
   void ImportPartitionedDataSet(
-    vtkPartitionedDataSet* pds, vtkRenderer* ren, const std::string& pdsName = "");
+    int nodeid, vtkPartitionedDataSet* pds, vtkRenderer* ren, const std::string& pdsName = "");
 
   struct Internals;
   std::unique_ptr<Internals> Pimpl;

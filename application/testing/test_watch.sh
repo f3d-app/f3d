@@ -26,12 +26,12 @@ function cleanup()
 }
 trap "cleanup" EXIT
 
-sleep 1
+sleep 3
 cp $hires_data $reloaded_data
-sleep 1
+sleep 3
 cp $invalid_data $reloaded_data
-sleep 1
+sleep 3
 cp $lowres_data $reloaded_data
-sleep 1
+sleep 3
 
 grep -q "Number of points: 634" $log

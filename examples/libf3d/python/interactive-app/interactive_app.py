@@ -29,10 +29,9 @@ def main(argv: list[str] | None = None):
             # UI overlays: axis + some HUD
             "ui.axis": True,
             "ui.fps": True,
-            "ui.animation_progress": True,
+            "ui.animation_progress": "default",
             "ui.filename": True,
             # FXAA + tone mapping
-            "render.effect.antialiasing.enable": True,
             "render.effect.antialiasing.mode": "fxaa",
             "render.effect.tone_mapping": True,
         }
@@ -54,7 +53,10 @@ def main(argv: list[str] | None = None):
 
     if args.timeout:
         # For testing purposes only, exit after `timeout` seconds
-        eng.interactor.start(args.timeout, eng.interactor.stop)
+        eng.interactor.set_event_loop_user_callback(
+            lambda _state: eng.interactor.request_stop()
+        )
+        eng.interactor.start(args.timeout)
     else:
         eng.interactor.start()
 
@@ -138,11 +140,11 @@ def add_custom_commands(eng: f3d.Engine):
     inter.remove_command("toggle_fxaa")
 
     def toggle_fxaa(_):
-        opt["render.effect.antialiasing.enable"] = not opt[
-            "render.effect.antialiasing.enable"
-        ]
-        # keep mode at fxaa in this example
-        opt["render.effect.antialiasing.mode"] = "fxaa"
+        if opt["render.effect.antialiasing.mode"] == "none":
+            # keep mode at fxaa in this example
+            opt["render.effect.antialiasing.mode"] = "fxaa"
+        elif opt["render.effect.antialiasing.mode"] == "fxaa":
+            opt["render.effect.antialiasing.mode"] = "none"
 
     inter.add_command(
         "toggle_fxaa",
@@ -162,8 +164,8 @@ def add_custom_bindings(eng: f3d.Engine):
     def docTgl(doc: str, key: str):
         return doc, "ON" if opt[key] else "OFF"
 
-    def docStr(doc: str):
-        return doc, ""
+    def docStr(doc: str, key: str = ""):
+        return doc, str(opt[key])
 
     def docDblOpt(doc: str, key: str):
         val = opt[key]
@@ -174,29 +176,33 @@ def add_custom_bindings(eng: f3d.Engine):
 
     # R: reset options
     inter.add_binding(
-        f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "R"),
-        "reset_options",
-        "Example",
-        lambda: docStr("Reset Options"),
-        f3d.Interactor.BindingType.OTHER,
+        bind=f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "R"),
+        command=["reset_options"],
+        group="Example",
+        documentation_callback=lambda: docStr("Reset Options"),
+        type=f3d.Interactor.BindingType.OTHER,
     )
 
     # SHIFT + S: Increase animation speed
     inter.add_binding(
-        f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.SHIFT, "S"),
-        "increase_animation_speed_factor",
-        "Example",
-        lambda: docDblOpt("Increase animation speed", "scene.animation.speed_factor"),
-        f3d.Interactor.BindingType.NUMERICAL,
+        bind=f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.SHIFT, "S"),
+        command=["increase_animation_speed_factor"],
+        group="Example",
+        documentation_callback=lambda: docDblOpt(
+            "Increase animation speed", "scene.animation.speed_factor"
+        ),
+        type=f3d.Interactor.BindingType.NUMERICAL,
     )
 
     # SHIFT + S: Increase animation speed
     inter.add_binding(
-        f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "S"),
-        "decrease_animation_speed_factor",
-        "Example",
-        lambda: docDblOpt("Decrease animation speed", "scene.animation.speed_factor"),
-        f3d.Interactor.BindingType.NUMERICAL,
+        bind=f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "S"),
+        command=["decrease_animation_speed_factor"],
+        group="Example",
+        documentation_callback=lambda: docDblOpt(
+            "Decrease animation speed", "scene.animation.speed_factor"
+        ),
+        type=f3d.Interactor.BindingType.NUMERICAL,
     )
 
     # G: toggle grid
@@ -205,11 +211,11 @@ def add_custom_bindings(eng: f3d.Engine):
     )
 
     inter.add_binding(
-        f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "G"),
-        "toggle_grid",
-        "Example",
-        lambda: docTgl("Toggle grid", "render.grid.enable"),
-        f3d.Interactor.BindingType.TOGGLE,
+        bind=f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "G"),
+        command=["toggle_grid"],
+        group="Example",
+        documentation_callback=lambda: docTgl("Toggle grid", "render.grid.enable"),
+        type=f3d.Interactor.BindingType.TOGGLE,
     )
 
     # X: toggle axis
@@ -218,11 +224,11 @@ def add_custom_bindings(eng: f3d.Engine):
     )
 
     inter.add_binding(
-        f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "X"),
-        "toggle_axis",
-        "Example",
-        lambda: docTgl("Toggle axis", "ui.axis"),
-        f3d.Interactor.BindingType.TOGGLE,
+        bind=f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "X"),
+        command=["toggle_axis"],
+        group="Example",
+        documentation_callback=lambda: docTgl("Toggle axis", "ui.axis"),
+        type=f3d.Interactor.BindingType.TOGGLE,
     )
 
     # F: toggle FXAA
@@ -231,11 +237,13 @@ def add_custom_bindings(eng: f3d.Engine):
     )
 
     inter.add_binding(
-        f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "F"),
-        "toggle_fxaa",
-        "Example",
-        lambda: docTgl("Toggle FXAA", "render.effect.antialiasing.enable"),
-        f3d.Interactor.BindingType.TOGGLE,
+        bind=f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "F"),
+        command=["toggle_fxaa"],
+        group="Example",
+        documentation_callback=lambda: docStr(
+            "Toggle FXAA", "render.effect.antialiasing.mode"
+        ),
+        type=f3d.Interactor.BindingType.TOGGLE,
     )
 
 

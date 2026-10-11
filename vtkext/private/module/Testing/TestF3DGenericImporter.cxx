@@ -18,6 +18,8 @@
 #include "vtkF3DGenericImporter.h"
 
 #include <iostream>
+#include <string>
+#include <vector>
 
 int TestF3DGenericImporter(int argc, char* argv[])
 {
@@ -43,7 +45,7 @@ int TestF3DGenericImporter(int argc, char* argv[])
 
     int nbTimeSteps;
     double timeRange[2];
-    vtkNew<vtkDoubleArray> timeSteps;
+    const vtkNew<vtkDoubleArray> timeSteps;
     if (importer->GetTemporalInformation(0, timeRange, nbTimeSteps, timeSteps))
     {
       std::cerr << "Unexpected return value with GetTemporalInformation\n";
@@ -54,7 +56,7 @@ int TestF3DGenericImporter(int argc, char* argv[])
   // Test animation with GLTF reader
   {
     vtkNew<vtkGLTFReader> reader;
-    std::string filename = std::string(argv[1]) + "data/BoxAnimated.gltf";
+    const std::string filename = std::string(argv[1]) + "data/BoxAnimated.gltf";
     reader->SetFileName(filename.c_str());
     reader->UpdateInformation();
     reader->EnableAnimation(0);
@@ -85,11 +87,10 @@ int TestF3DGenericImporter(int argc, char* argv[])
     }
   }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240910)
   // Test UpdateAtTimeValue with invalid animation
   {
     vtkNew<vtkGLTFReader> reader;
-    std::string filename = std::string(argv[1]) + "data/BoxAnimated_invalid_animation.gltf";
+    const std::string filename = std::string(argv[1]) + "data/BoxAnimated_invalid_animation.gltf";
     reader->SetFileName(filename.c_str());
     reader->UpdateInformation();
     reader->EnableAnimation(0);
@@ -103,12 +104,11 @@ int TestF3DGenericImporter(int argc, char* argv[])
       return EXIT_FAILURE;
     }
   }
-#endif
 
   // Test UpdateAtTimeValue failure path
   {
     vtkNew<vtkGLTFReader> reader;
-    std::string filename = std::string(argv[1]) + "data/BoxAnimated.gltf";
+    const std::string filename = std::string(argv[1]) + "data/BoxAnimated.gltf";
     reader->SetFileName(filename.c_str());
     reader->UpdateInformation();
     reader->EnableAnimation(0);
@@ -151,7 +151,7 @@ int TestF3DGenericImporter(int argc, char* argv[])
 
   // Test failure path with unsupported data type (vtkTable)
   {
-    vtkNew<vtkTable> table;
+    const vtkNew<vtkTable> table;
     vtkNew<vtkTrivialProducer> producer;
     producer->SetOutput(table);
 
@@ -169,7 +169,7 @@ int TestF3DGenericImporter(int argc, char* argv[])
   // Test MultiBlock from file (covers null blocks, nested structures)
   {
     vtkNew<vtkXMLMultiBlockDataReader> reader;
-    std::string filename = std::string(argv[1]) + "data/mb.vtm";
+    const std::string filename = std::string(argv[1]) + "data/mb.vtm";
     reader->SetFileName(filename.c_str());
 
     vtkNew<vtkF3DGenericImporter> importer;
@@ -294,8 +294,8 @@ int TestF3DGenericImporter(int argc, char* argv[])
       return EXIT_FAILURE;
     }
 
-    std::string name0 = importer->GetBlockName(0);
-    std::string name1 = importer->GetBlockName(1);
+    const std::string name0 = importer->GetBlockName(0);
+    const std::string name1 = importer->GetBlockName(1);
     if (name0.find("NestedMP") == std::string::npos ||
       name0.find("SpherePiece") == std::string::npos ||
       name1.find("NestedMP") == std::string::npos || name1.find("ConePiece") == std::string::npos)
@@ -321,8 +321,8 @@ int TestF3DGenericImporter(int argc, char* argv[])
     importer->SetInternalReader(producer);
     importer->Update();
 
-    std::string name0 = importer->GetBlockName(0);
-    std::string name1 = importer->GetBlockName(1);
+    const std::string name0 = importer->GetBlockName(0);
+    const std::string name1 = importer->GetBlockName(1);
     if (name0.find("SpherePartition") == std::string::npos ||
       name1.find("ConePartition") == std::string::npos)
     {
@@ -346,8 +346,8 @@ int TestF3DGenericImporter(int argc, char* argv[])
     importer->SetInternalReader(producer);
     importer->Update();
 
-    std::string name0 = importer->GetBlockName(0);
-    std::string name1 = importer->GetBlockName(1);
+    const std::string name0 = importer->GetBlockName(0);
+    const std::string name1 = importer->GetBlockName(1);
     if (name0.find("Partition_0") == std::string::npos ||
       name1.find("Partition_1") == std::string::npos)
     {
@@ -396,8 +396,8 @@ int TestF3DGenericImporter(int argc, char* argv[])
 
     vtkNew<vtkDataAssembly> assembly;
     assembly->Initialize();
-    int sphereNode = assembly->AddNode("SphereFromAssembly", assembly->GetRootNode());
-    int coneNode = assembly->AddNode("ConeFromAssembly", assembly->GetRootNode());
+    const int sphereNode = assembly->AddNode("SphereFromAssembly", assembly->GetRootNode());
+    const int coneNode = assembly->AddNode("ConeFromAssembly", assembly->GetRootNode());
     assembly->AddDataSetIndex(sphereNode, 0);
     assembly->AddDataSetIndex(coneNode, 1);
     pdc->SetDataAssembly(assembly);
@@ -417,14 +417,83 @@ int TestF3DGenericImporter(int argc, char* argv[])
     }
   }
 
+  // Test PartitionedDataSetCollection with a nested assembly
+  {
+    vtkNew<vtkPartitionedDataSet> pds0;
+    pds0->SetNumberOfPartitions(1);
+    pds0->SetPartition(0, sphere->GetOutput());
+
+    vtkNew<vtkPartitionedDataSet> pds1;
+    pds1->SetNumberOfPartitions(1);
+    pds1->SetPartition(0, cone->GetOutput());
+
+    vtkNew<vtkPartitionedDataSet> pds2;
+    pds2->SetNumberOfPartitions(1);
+    pds2->SetPartition(0, sphere->GetOutput());
+
+    vtkNew<vtkPartitionedDataSetCollection> pdc;
+    pdc->SetNumberOfPartitionedDataSets(3);
+    pdc->SetPartitionedDataSet(0, pds0);
+    pdc->SetPartitionedDataSet(1, pds1);
+    pdc->SetPartitionedDataSet(2, pds2);
+    pdc->GetMetaData(2u)->Set(vtkCompositeDataSet::NAME(), "Unreferenced");
+
+    // root > Group > Sphere, root > Cone, dataset 2 is not referenced by the assembly
+    vtkNew<vtkDataAssembly> assembly;
+    assembly->Initialize();
+    const int groupNode = assembly->AddNode("Group", assembly->GetRootNode());
+    assembly->SetAttribute(groupNode, "label", "Group Label");
+    const int sphereNode = assembly->AddNode("Sphere", groupNode);
+    assembly->SetAttribute(sphereNode, "label", "Sphere Label");
+    const int coneNode = assembly->AddNode("Cone", assembly->GetRootNode());
+    assembly->AddDataSetIndex(sphereNode, 0);
+    assembly->AddDataSetIndex(coneNode, 1);
+    pdc->SetDataAssembly(assembly);
+
+    vtkNew<vtkTrivialProducer> producer;
+    producer->SetOutput(pdc);
+
+    vtkNew<vtkF3DGenericImporter> importer;
+    importer->SetInternalReader(producer);
+    importer->Update();
+
+    if (importer->GetBlockName(0) != "Group Label/Sphere Label" ||
+      importer->GetBlockName(1) != "Cone" || importer->GetBlockName(2) != "Unreferenced")
+    {
+      std::cerr << "PDC with nested assembly: Unexpected block names\n";
+      return EXIT_FAILURE;
+    }
+
+    const vtkDataAssembly* hierarchy = importer->GetSceneHierarchy();
+    const std::vector<int> rootChildren = hierarchy->GetChildNodes(hierarchy->GetRootNode(), false);
+    if (rootChildren.size() != 3)
+    {
+      std::cerr << "PDC with nested assembly: Expected 3 root children, got " << rootChildren.size()
+                << "\n";
+      return EXIT_FAILURE;
+    }
+    const int group = rootChildren[0];
+    const std::vector<int> groupChildren = hierarchy->GetChildNodes(group, false);
+    if (std::string(hierarchy->GetAttributeOrDefault(group, "label", "")) != "Group Label" ||
+      groupChildren.size() != 1 ||
+      hierarchy->GetAttributeOrDefault(groupChildren[0], "flat_actor_id", -1) != 0 ||
+      hierarchy->GetAttributeOrDefault(rootChildren[1], "flat_actor_id", -1) != 1 ||
+      hierarchy->GetAttributeOrDefault(rootChildren[2], "flat_actor_id", -1) != 2)
+    {
+      std::cerr << "PDC with nested assembly: Unexpected scene hierarchy\n";
+      return EXIT_FAILURE;
+    }
+  }
+
   // Test PartitionedDataSetCollection with metadata (no assembly)
   {
     vtkNew<vtkPartitionedDataSet> pds0;
     pds0->SetNumberOfPartitions(1);
     pds0->SetPartition(0, sphere->GetOutput());
 
+    // the second slot of the collection is left empty and must be skipped
     vtkNew<vtkPartitionedDataSetCollection> pdc;
-    pdc->SetNumberOfPartitionedDataSets(1);
+    pdc->SetNumberOfPartitionedDataSets(2);
     pdc->SetPartitionedDataSet(0, pds0);
     pdc->GetMetaData(0u)->Set(vtkCompositeDataSet::NAME(), "MetadataName");
 
@@ -439,6 +508,13 @@ int TestF3DGenericImporter(int argc, char* argv[])
     {
       std::cerr << "PDC with metadata: Expected 'MetadataName', got '" << importer->GetBlockName(0)
                 << "'\n";
+      return EXIT_FAILURE;
+    }
+    if (importer->GetSceneHierarchy()
+          ->GetChildNodes(importer->GetSceneHierarchy()->GetRootNode(), false)
+          .size() != 1)
+    {
+      std::cerr << "PDC with metadata: Expected a single actor\n";
       return EXIT_FAILURE;
     }
   }

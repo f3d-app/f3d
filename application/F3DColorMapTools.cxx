@@ -33,7 +33,8 @@ fs::path Find(const std::string& str)
       }
     }
 
-    std::vector<fs::path> dirsToCheck{ F3DSystemTools::GetUserConfigFileDirectory() / "colormaps",
+    const std::vector<fs::path> dirsToCheck{ F3DSystemTools::GetUserConfigFileDirectory() /
+        "colormaps",
 #ifdef __APPLE__
       "/usr/local/etc/f3d/colormaps",
 #endif
@@ -79,7 +80,7 @@ std::vector<double> Read1DMap(const fs::path& path, MapType type)
 {
   try
   {
-    f3d::image img(path);
+    const f3d::image img(path);
 
     const int channels = img.getChannelCount();
     const int expectedChannels = (type == MapType::Color) ? 3 : 1;

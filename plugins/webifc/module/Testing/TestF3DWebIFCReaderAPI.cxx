@@ -13,7 +13,7 @@
 
 int TestF3DWebIFCReaderAPI(int vtkNotUsed(argc), char* argv[])
 {
-  std::string filename = std::string(argv[1]) + "data/IfcOpenHouse_IFC4.ifc";
+  const std::string filename = std::string(argv[1]) + "data/IfcOpenHouse_IFC4.ifc";
 
   // Test CanReadFile with valid IFC file
   vtkNew<vtkFileResourceStream> validStream;
@@ -29,7 +29,7 @@ int TestF3DWebIFCReaderAPI(int vtkNotUsed(argc), char* argv[])
   }
 
   // Test CanReadFile with invalid file
-  std::string invalidFilename = std::string(argv[1]) + "data/cow.vtp";
+  const std::string invalidFilename = std::string(argv[1]) + "data/cow.vtp";
   vtkNew<vtkFileResourceStream> invalidStream;
   if (invalidStream->Open(invalidFilename.c_str()))
   {
@@ -41,7 +41,7 @@ int TestF3DWebIFCReaderAPI(int vtkNotUsed(argc), char* argv[])
   }
 
   // Test CanReadFile with STEP file (same ISO-10303-21 header but different FILE_SCHEMA)
-  std::string stepFilename = std::string(argv[1]) + "data/f3d.stp";
+  const std::string stepFilename = std::string(argv[1]) + "data/f3d.stp";
   vtkNew<vtkFileResourceStream> stepStream;
   if (stepStream->Open(stepFilename.c_str()))
   {
@@ -115,7 +115,7 @@ int TestF3DWebIFCReaderAPI(int vtkNotUsed(argc), char* argv[])
   // Test PrintSelf
   std::ostringstream oss;
   reader->Print(oss);
-  std::string printOutput = oss.str();
+  const std::string printOutput = oss.str();
   if (printOutput.find("FileName") == std::string::npos ||
     printOutput.find("CircleSegments") == std::string::npos)
   {

@@ -12,9 +12,11 @@
 #include "vtkF3DWebPReader.h"
 #endif
 
+#include <vtkCellArray.h>
 #include <vtkImageReader2Factory.h>
 #include <vtkLogger.h>
 #include <vtkNew.h>
+#include <vtkOpenGLVertexBufferObject.h>
 #include <vtkVersion.h>
 
 #include <memory>
@@ -42,14 +44,14 @@ init::init()
   vtkLogger::SetStderrVerbosity(vtkLogger::VERBOSITY_OFF);
   vtkLogger::SetInternalVerbosityLevel(vtkLogger::VERBOSITY_OFF);
 
+  vtkOpenGLVertexBufferObject::SetGlobalCoordShiftAndScaleEnabled(0);
+  vtkCellArray::SetDefaultStorageIs64Bit(false);
+
   // instantiate our own polydata mapper and output windows
-  vtkNew<vtkF3DObjectFactory> factory;
+  const vtkNew<vtkF3DObjectFactory> factory;
   vtkObjectFactory::RegisterFactory(factory);
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPointGaussianMapper", "vtkOpenGLPointGaussianMapper");
-#endif
 
 #ifdef __EMSCRIPTEN__
   vtkObjectFactory::SetAllEnableFlags(0, "vtkRenderWindow", "vtkOpenGLRenderWindow");
@@ -58,12 +60,12 @@ init::init()
 #endif
 
 #if F3D_MODULE_EXR
-  vtkNew<vtkF3DEXRReader> exrReader;
+  const vtkNew<vtkF3DEXRReader> exrReader;
   vtkImageReader2Factory::RegisterReader(exrReader);
 #endif
 
 #if F3D_MODULE_WEBP
-  vtkNew<vtkF3DWebPReader> webpReader;
+  const vtkNew<vtkF3DWebPReader> webpReader;
   vtkImageReader2Factory::RegisterReader(webpReader);
 #endif
 }

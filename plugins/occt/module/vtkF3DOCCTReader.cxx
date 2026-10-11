@@ -1,30 +1,25 @@
 #include "vtkF3DOCCTReader.h"
 
+#include "F3DOCCTShapeConverter.h"
+
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"
 #endif
 
 #include <BRepAdaptor_Surface.hxx>
-#include <BRepMesh_IncrementalMesh.hxx>
 #include <BRepTools.hxx>
 #include <BRep_Builder.hxx>
-#include <BRep_Tool.hxx>
 #include <BinTools.hxx>
 #include <IGESControl_Reader.hxx>
 #include <Message.hxx>
 #include <Message_PrinterOStream.hxx>
 #include <Message_ProgressIndicator.hxx>
-#include <Poly.hxx>
-#include <Poly_Triangulation.hxx>
 #include <Quantity_Color.hxx>
 #include <STEPControl_Reader.hxx>
 #include <Standard_Handle.hxx>
-#include <Standard_PrimitiveTypes.hxx>
 #include <Storage_StreamTypeMismatchError.hxx>
-#include <TColgp_Array1OfVec.hxx>
 #include <TopExp_Explorer.hxx>
-#include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Solid.hxx>
 
@@ -50,29 +45,25 @@
 #pragma GCC diagnostic pop
 #endif
 
-#include <vtkCellArray.h>
-#include <vtkCellData.h>
 #include <vtkCommand.h>
 #include <vtkDemandDrivenPipeline.h>
-#include <vtkFloatArray.h>
+#include <vtkFileResourceStream.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
 #include <vtkMatrix4x4.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkNew.h>
-#include <vtkPointData.h>
-#include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkResourceParser.h>
 #include <vtkResourceStream.h>
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
-#include <vtkUnsignedCharArray.h>
 #include <vtkUnsignedIntArray.h>
+#include <vtksys/FStream.hxx>
 #include <vtksys/SystemTools.hxx>
 
 #include <array>
-#include <numeric>
+#include <ios>
 #include <unordered_map>
 #include <vector>
 
@@ -81,7 +72,7 @@ vtkCxxSetSmartPointerMacro(vtkF3DOCCTReader, Stream, vtkResourceStream);
 class vtkF3DOCCTReader::vtkInternals
 {
 #if F3D_PLUGIN_OCCT_XCAF
-  using StyleMap = XCAFPrs_IndexedDataMapOfShapeStyle;
+  using StyleMap = NCollection_IndexedDataMap<TopoDS_Shape, XCAFPrs_Style, TopTools_ShapeMapHasher>;
 #endif
 
 public:
@@ -98,226 +89,63 @@ public:
   vtkSmartPointer<vtkPolyData> CreateShape(const TopoDS_Shape& shape)
 #endif
   {
-    vtkNew<vtkPoints> points;
-    vtkNew<vtkFloatArray> normals;
-    normals->SetNumberOfComponents(3);
-    normals->SetName("Normal");
-    vtkNew<vtkFloatArray> uvs;
-    uvs->SetNumberOfComponents(2);
-    uvs->SetName("UV");
-#if F3D_PLUGIN_OCCT_XCAF
-    vtkNew<vtkUnsignedCharArray> colors;
-    colors->SetNumberOfComponents(3);
-    colors->SetName("Colors");
-#endif
-    vtkNew<vtkCellArray> trianglesCells;
-    vtkNew<vtkCellArray> linesCells;
+    F3DOCCTShapeConverter::MeshingOptions options;
+    options.LinearDeflection = this->Parent->GetLinearDeflection();
+    options.AngularDeflection = this->Parent->GetAngularDeflection();
+    options.RelativeDeflection = this->Parent->GetRelativeDeflection();
+    options.ReadWire = this->Parent->GetReadWire();
 
-    Standard_Integer shift = 0;
-
+    F3DOCCTShapeConverter::ColorProviders colors;
 #if F3D_PLUGIN_OCCT_XCAF
     const StyleMap inheritedStyles = this->CollectInheritedStyles(label, shape);
-#endif
-
-    /* Mesh the whole shape. This only affect faces, edges have to be handled separately. */
-    BRepMesh_IncrementalMesh(shape, this->Parent->GetLinearDeflection(),
-      this->Parent->GetRelativeDeflection(), this->Parent->GetAngularDeflection(), Standard_True);
-
-    if (this->Parent->GetReadWire())
+    colors.Face = [&inheritedStyles](const TopoDS_Face& face)
     {
-      std::vector<TopoDS_Edge> edges;
-      {
-        /* add all edges to a compound to remesh them all at once */
-        TopoDS_Builder builder;
-        TopoDS_Compound compound;
-        builder.MakeCompound(compound);
-        for (TopExp_Explorer exEdge(shape, TopAbs_EDGE); exEdge.More(); exEdge.Next())
-        {
-          const TopoDS_Edge edge = TopoDS::Edge(exEdge.Current());
-          builder.Add(compound, edge);
-          edges.push_back(edge);
-        }
-        BRepMesh_IncrementalMesh(compound, this->Parent->GetLinearDeflection(),
-          this->Parent->GetRelativeDeflection(), this->Parent->GetAngularDeflection(),
-          Standard_True);
-      }
-
-      // Add all edges to polydata
-      for (const TopoDS_Edge& edge : edges)
-      {
-        TopLoc_Location location;
-        const auto& poly = BRep_Tool::Polygon3D(edge, location);
-
-        if (poly.IsNull())
-        {
-          continue;
-        }
-
-        Standard_Integer nbV = poly->NbNodes();
-
-        // Points
-        const TColgp_Array1OfPnt& aNodes = poly->Nodes();
-        for (Standard_Integer i = 1; i <= nbV; i++)
-        {
-          gp_Pnt pt = aNodes(i).Transformed(location);
-          points->InsertNextPoint(pt.X(), pt.Y(), pt.Z());
-
-          // normals and uvs make no sense for lines
-          float fn[3] = { 0.0, 0.0, 1.0 };
-          normals->InsertNextTypedTuple(fn);
-          uvs->InsertNextTypedTuple(fn);
-        }
-
-        std::vector<vtkIdType> polyline(nbV);
-        std::iota(polyline.begin(), polyline.end(), shift);
-        linesCells->InsertNextCell(polyline.size(), polyline.data());
-
-#if F3D_PLUGIN_OCCT_XCAF
-        std::array<unsigned char, 3> rgb = { 0, 0, 0 };
-        try
-        {
-          const auto& style = inheritedStyles.FindFromKey(edge);
-          if (style.IsSetColorCurv())
-          {
-            Quantity_Color color = style.GetColorCurv();
-            rgb[0] = static_cast<unsigned char>(255.0 * color.Red());
-            rgb[1] = static_cast<unsigned char>(255.0 * color.Green());
-            rgb[2] = static_cast<unsigned char>(255.0 * color.Blue());
-          }
-        }
-        catch (Standard_NoSuchObject&)
-        {
-          /* edge has no style, safe to ignore */
-        }
-
-        colors->InsertNextTypedTuple(rgb.data());
-#endif
-
-        shift += nbV;
-      }
-    }
-
-    // Add all faces to polydata
-    for (TopExp_Explorer exFace(shape, TopAbs_FACE); exFace.More(); exFace.Next())
-    {
-      TopoDS_Face face = TopoDS::Face(exFace.Current());
-
-      TopLoc_Location location;
-      const auto& poly = BRep_Tool::Triangulation(face, location);
-
-      if (poly.IsNull())
-      {
-        continue;
-      }
-
-      Poly::ComputeNormals(poly);
-      TopAbs_Orientation faceOrientation = face.Orientation();
-
-      Standard_Integer nbT = poly->NbTriangles();
-      Standard_Integer nbV = poly->NbNodes();
-
-      // Points
-      for (Standard_Integer i = 1; i <= nbV; i++)
-      {
-        gp_Pnt pt = poly->Node(i).Transformed(location);
-        points->InsertNextPoint(pt.X(), pt.Y(), pt.Z());
-      }
-
-      // Normals
-      if (poly->HasNormals())
-      {
-        for (Standard_Integer i = 1; i <= nbV; i++)
-        {
-          gp_Dir n = poly->Normal(i);
-          float fn[3] = { static_cast<float>(n.X()), static_cast<float>(n.Y()),
-            static_cast<float>(n.Z()) };
-          if (faceOrientation == TopAbs_Orientation::TopAbs_REVERSED)
-          {
-            vtkMath::MultiplyScalar(fn, -1.f);
-          }
-          normals->InsertNextTypedTuple(fn);
-        }
-      }
-      else
-      {
-        // just in case a face does not have normals, add a dummy normal
-        float fn[3] = { 0.0, 0.0, 1.0 };
-        for (Standard_Integer i = 1; i <= nbV; i++)
-        {
-          normals->InsertNextTypedTuple(fn);
-        }
-      }
-
-      // UVs
-      if (poly->HasUVNodes())
-      {
-        for (Standard_Integer i = 1; i <= nbV; i++)
-        {
-          gp_Pnt2d uv = poly->UVNode(i);
-          float fn[2] = { static_cast<float>(uv.X()), static_cast<float>(uv.Y()) };
-          uvs->InsertNextTypedTuple(fn);
-        }
-      }
-      else
-      {
-        uvs->SetNumberOfTuples(nbV);
-        uvs->Fill(0.0);
-      }
-
-      for (int i = 1; i <= nbT; i++)
-      {
-        int n1, n2, n3;
-        poly->Triangle(i).Get(n1, n2, n3);
-
-        vtkIdType cell[3] = { shift + n1 - 1, shift + n2 - 1, shift + n3 - 1 };
-        if (faceOrientation != TopAbs_Orientation::TopAbs_FORWARD)
-        {
-          std::swap(cell[0], cell[2]);
-        }
-        trianglesCells->InsertNextCell(3, cell);
-      }
-
-#if F3D_PLUGIN_OCCT_XCAF
-      std::array<unsigned char, 3> rgb = { 255, 255, 255 };
+      F3DOCCTShapeConverter::Color rgba = { 255, 255, 255, 255 };
       try
       {
         const auto& style = inheritedStyles.FindFromKey(face);
         if (style.IsSetColorSurf())
         {
-          Quantity_Color color = style.GetColorSurf();
-          rgb[0] = static_cast<unsigned char>(255.0 * color.Red());
-          rgb[1] = static_cast<unsigned char>(255.0 * color.Green());
-          rgb[2] = static_cast<unsigned char>(255.0 * color.Blue());
+          rgba = ToColor(style.GetColorSurf());
         }
       }
       catch (Standard_NoSuchObject&)
       {
         /* face has no style, safe to ignore */
       }
-
-      for (int i = 1; i <= nbT; i++)
+      return rgba;
+    };
+    colors.Edge = [&inheritedStyles](const TopoDS_Edge& edge)
+    {
+      F3DOCCTShapeConverter::Color rgba = { 0, 0, 0, 255 };
+      try
       {
-        colors->InsertNextTypedTuple(rgb.data());
+        const auto& style = inheritedStyles.FindFromKey(edge);
+        if (style.IsSetColorCurv())
+        {
+          rgba = ToColor(style.GetColorCurv());
+        }
       }
+      catch (Standard_NoSuchObject&)
+      {
+        /* edge has no style, safe to ignore */
+      }
+      return rgba;
+    };
 #endif
-
-      shift += nbV;
-    }
-
-    vtkNew<vtkPolyData> polydata;
-    polydata->SetPoints(points);
-    polydata->GetPointData()->SetNormals(normals);
-    polydata->GetPointData()->SetTCoords(uvs);
-    polydata->SetPolys(trianglesCells);
-    polydata->SetLines(linesCells);
+    return F3DOCCTShapeConverter::ToPolyData(shape, options, colors);
+  }
 
 #if F3D_PLUGIN_OCCT_XCAF
-    polydata->GetCellData()->SetScalars(colors);
-#endif
-
-    polydata->Squeeze();
-    return polydata;
+  //----------------------------------------------------------------------------
+  static F3DOCCTShapeConverter::Color ToColor(const Quantity_Color& color)
+  {
+    double rgb[3];
+    color.Values(rgb[0], rgb[1], rgb[2], Quantity_TOC_sRGB);
+    return { static_cast<unsigned char>(255.0 * rgb[0]), static_cast<unsigned char>(255.0 * rgb[1]),
+      static_cast<unsigned char>(255.0 * rgb[2]), 255 };
   }
+#endif
 
 #if F3D_PLUGIN_OCCT_XCAF
   StyleMap CollectInheritedStyles(const TDF_Label& rootLabel, const TopoDS_Shape& rootShape)
@@ -427,7 +255,7 @@ public:
         transfoFilter->SetInputData(polydata);
         transfoFilter->Update();
 
-        vtkIdType blockId = mb->GetNumberOfBlocks();
+        const vtkIdType blockId = mb->GetNumberOfBlocks();
         mb->SetBlock(blockId, transfoFilter->GetOutput());
 
         vtkInformation* info = mb->GetMetaData(blockId);
@@ -438,15 +266,15 @@ public:
     {
       for (TDF_ChildIterator it(label); it.More(); it.Next())
       {
-        TDF_Label child = it.Value();
+        const TDF_Label child = it.Value();
 
-        vtkNew<vtkMatrix4x4> mat;
+        const vtkNew<vtkMatrix4x4> mat;
         this->GetLocation(child, mat);
         vtkMatrix4x4::Multiply4x4(position, mat, mat);
 
-        vtkNew<vtkMultiBlockDataSet> childMb;
+        const vtkNew<vtkMultiBlockDataSet> childMb;
 
-        vtkIdType blockId = mb->GetNumberOfBlocks();
+        const vtkIdType blockId = mb->GetNumberOfBlocks();
         mb->SetBlock(blockId, childMb);
 
         vtkInformation* info = mb->GetMetaData(blockId);
@@ -457,7 +285,7 @@ public:
           TDF_Label ref;
           this->ShapeTool->GetReferredShape(child, ref);
 
-          vtkNew<vtkMatrix4x4> refMat;
+          const vtkNew<vtkMatrix4x4> refMat;
           this->GetLocation(ref, refMat);
           vtkMatrix4x4::Multiply4x4(mat, refMat, mat);
           this->AddLabel(ref, mat, childMb);
@@ -477,9 +305,9 @@ public:
     std::string part_name = "Unnamed";
     if (label.FindAttribute(TDataStd_Name::GetID(), name))
     {
-      TCollection_ExtendedString extstr = name->Get();
+      const TCollection_ExtendedString extstr = name->Get();
 
-      char* str = new char[extstr.LengthOfCString() + 1];
+      char* str = new char[extstr.LengthOfCString() + 1]; // NOLINT(misc-const-correctness)
       extstr.ToUTF8CString(str);
       part_name = str;
       delete[] str;
@@ -510,7 +338,7 @@ public:
   {
     const gp_Trsf& transfo = loc.Transformation();
     gp_Mat vecto = transfo.VectorialPart();
-    gp_XYZ trans = transfo.TranslationPart();
+    const gp_XYZ trans = transfo.TranslationPart();
 
     mat->Identity();
 
@@ -572,9 +400,9 @@ public:
   }
 
 protected:
-  void Show(const Message_ProgressScope&, const Standard_Boolean) override
+  void Show(const Message_ProgressScope&, bool) override
   {
-    double currentPosition = this->GetPosition();
+    const double currentPosition = this->GetPosition();
     if (currentPosition - this->LastPosition > 0.01)
     {
       double localProgress = 0.5 * currentPosition;
@@ -591,7 +419,7 @@ private:
 #if F3D_PLUGIN_OCCT_XCAF
 //----------------------------------------------------------------------------
 template<typename T>
-bool TransferToDocument(vtkF3DOCCTReader* that, T& reader, Handle(TDocStd_Document) doc)
+bool TransferToDocument(vtkF3DOCCTReader* that, T& reader, const Handle(TDocStd_Document) & doc)
 {
   reader.SetColorMode(true);
   reader.SetNameMode(true);
@@ -633,6 +461,23 @@ bool TransferToDocument(vtkF3DOCCTReader* that, T& reader, Handle(TDocStd_Docume
 #endif
 
 //----------------------------------------------------------------------------
+static bool ReadASCIIBRep(
+  TopoDS_Shape& shape, std::istream& stream, const Message_ProgressRange& range)
+{
+  stream.exceptions(std::istream::failbit | std::istream::badbit);
+  try
+  {
+    const BRep_Builder builder;
+    BRepTools::Read(shape, stream, builder, range);
+  }
+  catch (const std::ios_base::failure&)
+  {
+    return false;
+  }
+  return !shape.IsNull();
+}
+
+//----------------------------------------------------------------------------
 int vtkF3DOCCTReader::RequestData(
   vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
@@ -647,10 +492,19 @@ int vtkF3DOCCTReader::RequestData(
     const Message_ProgressRange pRange = pIndicator.Start();
 
     bool success = true;
-    vtkResourceStream* stream = this->GetStream();
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251223)
+    vtkSmartPointer<vtkResourceStream> stream = this->GetStream();
+    if (!stream)
+    {
+      vtkNew<vtkFileResourceStream> fileStream;
+      if (fileStream->Open(this->GetFileName().c_str()))
+      {
+        stream = fileStream;
+      }
+    }
+
     if (stream)
     {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251223)
       // Encapsulate resource stream into an istream
       stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
       this->Streambuf = stream->ToStreambuf();
@@ -665,27 +519,31 @@ int vtkF3DOCCTReader::RequestData(
         stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
         this->Streambuf = stream->ToStreambuf();
         this->Buffer = std::make_unique<std::istream>(this->Streambuf.get());
-        const BRep_Builder builder;
-        BRepTools::Read(shape, *this->Buffer, builder, pRange);
+        success = ReadASCIIBRep(shape, *this->Buffer, pRange);
       }
-      success = !shape.IsNull();
-#else
-      vtkErrorMacro("This version of VTK doesn't support reading memory stream with OCCT");
-      return 0;
-#endif
+      success = success && !shape.IsNull();
     }
     else
     {
-      try
-      {
-        success = BinTools::Read(shape, this->GetFileName().c_str(), pRange);
-      }
-      catch (Storage_StreamTypeMismatchError&)
-      {
-        const BRep_Builder builder;
-        success = BRepTools::Read(shape, this->GetFileName().c_str(), builder, pRange);
-      }
+      success = false;
     }
+#else
+    if (this->GetStream())
+    {
+      vtkErrorMacro("This version of VTK doesn't support reading memory stream with OCCT");
+      return 0;
+    }
+
+    try
+    {
+      success = BinTools::Read(shape, this->GetFileName().c_str(), pRange);
+    }
+    catch (Storage_StreamTypeMismatchError&)
+    {
+      vtksys::ifstream file(this->GetFileName().c_str());
+      success = file.is_open() && ReadASCIIBRep(shape, file, pRange);
+    }
+#endif
 
     if (success)
     {
@@ -763,14 +621,14 @@ int vtkF3DOCCTReader::RequestData(
 
   this->Internals->ShapeTool = XCAFDoc_DocumentTool::ShapeTool(doc->Main());
 
-  TDF_LabelSequence topLevelShapes;
+  NCollection_Sequence<TDF_Label> topLevelShapes;
 
   // create polydata leaves
   this->Internals->ShapeTool->GetShapes(topLevelShapes);
 
-  for (Standard_Integer iLabel = 1; iLabel <= topLevelShapes.Length(); ++iLabel)
+  for (int iLabel = 1; iLabel <= topLevelShapes.Length(); ++iLabel)
   {
-    TDF_Label label = topLevelShapes.Value(iLabel);
+    const TDF_Label label = topLevelShapes.Value(iLabel);
 
     TopoDS_Shape shape;
     this->Internals->ShapeTool->GetShape(label, shape);
@@ -787,7 +645,7 @@ int vtkF3DOCCTReader::RequestData(
 
   vtkNew<vtkMatrix4x4> mat;
   mat->Identity();
-  for (Standard_Integer iLabel = 1; iLabel <= topLevelShapes.Length(); ++iLabel)
+  for (int iLabel = 1; iLabel <= topLevelShapes.Length(); ++iLabel)
   {
     this->Internals->AddLabel(topLevelShapes.Value(iLabel), mat, output);
   }
@@ -828,7 +686,7 @@ int vtkF3DOCCTReader::RequestData(
     ProgressIndicator pi(this);
     reader->TransferRoots(pi.Start());
 
-    Standard_Integer nbShapes = reader->NbShapes();
+    int nbShapes = reader->NbShapes();
 
     output->SetNumberOfBlocks(nbShapes);
 
@@ -939,7 +797,11 @@ bool vtkF3DOCCTReader::CanReadFile(vtkResourceStream* stream, vtkF3DOCCTReader::
       if (line.find("FILE_SCHEMA") != std::string::npos)
       {
         format = vtkF3DOCCTReader::FILE_FORMAT::STEP;
-        return line.find("AUTOMOTIVE_DESIGN") != std::string::npos;
+        // Exclude IFC schema as this reader is not able to read it.
+        // Other unsupported schema may need to be added if we stumble upon them.
+        std::array unsupportedSchemas = std::to_array<std::string_view>({ "IFC" });
+        return std::ranges::none_of(unsupportedSchemas, [line](const std::string_view& schema)
+          { return line.find(schema) != std::string::npos; });
       }
 
       if (line.find("ENDSEC") != std::string::npos)
@@ -969,7 +831,7 @@ bool vtkF3DOCCTReader::CanReadFile(vtkResourceStream* stream, vtkF3DOCCTReader::
     }
 
     // line1 should contain many spaces followed by a `S`
-    std::size_t nonSpaceIdx = line1.find_first_not_of(' ');
+    const std::size_t nonSpaceIdx = line1.find_first_not_of(' ');
     if (nonSpaceIdx == std::string::npos || line1[nonSpaceIdx] != 'S')
     {
       iges = false;
@@ -1006,8 +868,8 @@ bool vtkF3DOCCTReader::CanReadFile(vtkResourceStream* stream, vtkF3DOCCTReader::
     parser->ReadLine(line2) == vtkParseResult::EndOfLine &&
     parser->ReadLine(line3) == vtkParseResult::EndOfLine)
   {
-    if (line1.rfind("DBRep_DrawableShape", 0) == 0 && line2.empty() &&
-      (line3.rfind("CASCADE Topology", 0) == 0 || line3.rfind("Open CASCADE Topology", 0) == 0))
+    if (line1.starts_with("DBRep_DrawableShape") && line2.empty() &&
+      (line3.starts_with("CASCADE Topology") || line3.starts_with("Open CASCADE Topology")))
     {
       format = vtkF3DOCCTReader::FILE_FORMAT::BREP;
       return true;
@@ -1022,7 +884,7 @@ bool vtkF3DOCCTReader::CanReadFile(vtkResourceStream* stream, vtkF3DOCCTReader::
     parser->ReadLine(line2) == vtkParseResult::EndOfLine)
   {
     if (line1.empty() &&
-      (line2.rfind("CASCADE Topology", 0) == 0 || line2.rfind("Open CASCADE Topology", 0) == 0))
+      (line2.starts_with("CASCADE Topology") || line2.starts_with("Open CASCADE Topology")))
     {
       format = vtkF3DOCCTReader::FILE_FORMAT::BREP;
       return true;

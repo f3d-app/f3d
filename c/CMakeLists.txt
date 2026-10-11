@@ -6,6 +6,7 @@ include(GNUInstallDirs)
 
 # List of source files
 set(F3D_C_SOURCE_FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/animation_c_api.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/camera_c_api.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/context_c_api.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/engine_c_api.cxx
@@ -16,11 +17,13 @@ set(F3D_C_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/scene_c_api.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/types_c_api.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/utils_c_api.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/video_c_api.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/window_c_api.cxx
 )
 
 # List of headers that will be installed
 set(F3D_C_PUBLIC_HEADERS
+  ${CMAKE_CURRENT_SOURCE_DIR}/animation_c_api.h
   ${CMAKE_CURRENT_SOURCE_DIR}/camera_c_api.h
   ${CMAKE_CURRENT_SOURCE_DIR}/context_c_api.h
   ${CMAKE_CURRENT_SOURCE_DIR}/engine_c_api.h
@@ -31,6 +34,7 @@ set(F3D_C_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/scene_c_api.h
   ${CMAKE_CURRENT_SOURCE_DIR}/types_c_api.h
   ${CMAKE_CURRENT_SOURCE_DIR}/utils_c_api.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/video_c_api.h
   ${CMAKE_CURRENT_SOURCE_DIR}/window_c_api.h
 )
 
@@ -38,7 +42,7 @@ add_library(c_api ${F3D_C_SOURCE_FILES})
 set_target_properties(c_api PROPERTIES
   OUTPUT_NAME "f3d_c_api"
   CXX_VISIBILITY_PRESET hidden
-  CXX_STANDARD 17
+  CXX_STANDARD 20
   CXX_STANDARD_REQUIRED ON
   POSITION_INDEPENDENT_CODE ON
 )
@@ -96,8 +100,7 @@ if (BUILD_SHARED_LIBS)
     NAMESPACE f3d::
     FILE f3dCApiTargets.cmake
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-    COMPONENT sdk EXCLUDE_FROM_ALL
-  )
+    COMPONENT sdk)
 
   file(COPY "${F3D_SOURCE_DIR}/cmake/c_api-config.cmake"
     DESTINATION "${CMAKE_BINARY_DIR}/cmake")
@@ -107,5 +110,18 @@ if (BUILD_SHARED_LIBS)
     "${F3D_SOURCE_DIR}/cmake/c_api-config.cmake"
     DESTINATION
     "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-    COMPONENT sdk EXCLUDE_FROM_ALL)
+    COMPONENT sdk)
+
+  # pkg-config
+  # CMAKE_INSTALL_PREFIX may be a relative path (e.g. resolved against the build
+  # directory by `cmake --install`), so resolve it to an absolute path here since
+  # the .pc file may be read from a different working directory than the build.
+  get_filename_component(F3D_PKGCONFIG_PREFIX "${CMAKE_INSTALL_PREFIX}" ABSOLUTE BASE_DIR "${CMAKE_BINARY_DIR}")
+  configure_file(
+    "${F3D_SOURCE_DIR}/cmake/f3d_c_api.pc.in"
+    "${CMAKE_BINARY_DIR}/cmake/f3d_c_api.pc"
+    @ONLY)
+  install(FILES "${CMAKE_BINARY_DIR}/cmake/f3d_c_api.pc"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
+    COMPONENT sdk)
 endif ()

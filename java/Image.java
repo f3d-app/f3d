@@ -8,6 +8,21 @@ public class Image {
         System.loadLibrary("f3d-java");
     }
 
+    /** Thrown when an image file cannot be read (unsupported format, file not found, etc.). */
+    public static class ReadException extends F3DException {
+        public ReadException(String message) { super(message); }
+    }
+
+    /** Thrown when an image cannot be written/saved. */
+    public static class WriteException extends F3DException {
+        public WriteException(String message) { super(message); }
+    }
+
+    /** Thrown when a metadata key does not exist on the image. */
+    public static class MetadataException extends F3DException {
+        public MetadataException(String message) { super(message); }
+    }
+
     public enum SaveFormat {
         PNG,
         JPG,
@@ -53,6 +68,15 @@ public class Image {
      */
     public Image(int width, int height, int channelCount) {
         this(width, height, channelCount, ChannelType.BYTE);
+    }
+
+    /**
+     * Create an image from given stream buffer
+     *
+     * @param buffer stream buffer
+     */
+    public Image(byte[] buffer) {
+        mNativeAddress = nativeCreateFromStream(buffer);
     }
 
     Image(long nativeAddress) {
@@ -233,5 +257,6 @@ public class Image {
 
     private static native long nativeCreateFromFile(String filePath);
     private static native long nativeCreate(int width, int height, int channelCount, int type);
+    private static native long nativeCreateFromStream(byte[] buffer);
     private static native void nativeDestroy(long nativeAddress);
 }

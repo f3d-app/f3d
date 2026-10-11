@@ -8,13 +8,12 @@ const settings = {
     options.setAsString("render.background.color", "#000000");
 
     // setup coloring
-    options.toggle("model.scivis.enable");
     options.setAsString("model.scivis.array_name", "Colors");
-    options.setAsString("model.scivis.component", "-2");
-    options.toggle("model.scivis.cells");
+    options.setAsString("model.coloring", "direct");
+    options.setAsString("model.scivis.field", "cells");
 
     // make it look nice
-    options.toggle("render.effect.antialiasing.enable");
+    options.setAsString("render.effect.antialiasing.mode", "fxaa");
     options.toggle("render.effect.tone_mapping");
     options.toggle("render.effect.ambient_occlusion");
     options.toggle("render.hdri.ambient");
@@ -30,6 +29,7 @@ const settings = {
   runAfter: (Module) => {
     // check that space conversion works
     const window = Module.engineInstance.getWindow();
+    window.setUseHDRICache(true);
 
     const ptWorld = window.getWorldFromDisplay([0, 0, 0]);
 
@@ -45,8 +45,21 @@ const settings = {
       "point has no been restored to original value",
     );
 
-    // just for coverage
-    Module.engineInstance.setCachePath("/tmp");
+    utils.assert(
+      utils.numArrayEquals(window.size, [window.width, window.height], 0),
+      "size should return {width, height}",
+    );
+
+    Module.engineInstance.cachePath = "/tmp";
+
+    utils.assert(
+      window.getDPIScale() >= 1.0,
+      "DPI scale value unexpected: " + window.getDPIScale(),
+    );
+    utils.assert(
+      Module.engineInstance.cachePath === "/tmp",
+      "cachePath should return the path it was set to",
+    );
   },
 };
 

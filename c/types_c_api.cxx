@@ -99,30 +99,21 @@ void f3d_transform2d_create(f3d_transform2d_t* transform, double scale_x, double
     return;
   }
 
-  try
-  {
-    f3d::double_array_t<2> scale({ scale_x, scale_y });
-    f3d::double_array_t<2> translate({ translate_x, translate_y });
-    f3d::transform2d_t cpp_transform(scale, translate, angle_deg);
+  // double_array_t can throw if the size is wrong
+  // but this cannot happen here
+  const f3d::double_array_t<2> scale({ scale_x, scale_y });
+  const f3d::double_array_t<2> translate({ translate_x, translate_y });
+  f3d::transform2d_t cpp_transform(scale, translate, angle_deg);
 
-    for (int i = 0; i < 9; ++i)
-    {
-      transform->data[i] = cpp_transform[i];
-    }
-  }
-  catch (...)
+  for (int i = 0; i < 9; ++i)
   {
-    // Initialize to identity on error
-    for (int i = 0; i < 9; ++i)
-    {
-      transform->data[i] = (i % 4 == 0) ? 1.0 : 0.0;
-    }
+    transform->data[i] = cpp_transform[i];
   }
 }
 
 // f3d_colormap_t functions
 //----------------------------------------------------------------------------
-void f3d_colormap_free(f3d_colormap_t* colormap)
+void f3d_colormap_destroy(f3d_colormap_t* colormap)
 {
   if (!colormap)
   {
@@ -204,7 +195,7 @@ int f3d_mesh_is_valid(const f3d_mesh_t* mesh, char** error_message)
 
 // f3d_light_state_t functions
 //----------------------------------------------------------------------------
-void f3d_light_state_free(f3d_light_state_t* light_state)
+void f3d_light_state_destroy(f3d_light_state_t* light_state)
 {
   delete light_state;
 }

@@ -10,6 +10,7 @@
 #include "interactor.h"
 #include "log.h"
 #include "utils.h"
+#include "video_encoder.h"
 
 #include <cassert>
 #include <filesystem>
@@ -30,7 +31,7 @@ namespace
  * This is the easiest, compile time way to do it
  */
 constexpr std::array CLIBooleans = { "version", "help", "list-readers", "scan-plugins",
-  "list-rendering-backends", "define", "reset" };
+  "list-rendering-backends", "list-video-encoders", "define", "reset" };
 
 //----------------------------------------------------------------------------
 /**
@@ -55,14 +56,14 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
       "View a unstructured mesh in a typical nice looking sciviz style" },
     { execName + " file.glb -tuqap --hdri-file=file.hdr --hdri-ambient --hdri-skybox",
       "View a gltf file in a realistic environment" },
-    { execName + " file.ply -so --point-size=0 --coloring-component=-2",
+    { execName + " file.ply -o --point-size=0 --coloring-mode=direct",
       "View a point cloud file with direct scalars rendering" },
     { execName + " folder", "View all files in folder" },
   } };
 
   f3d::log::setUseColoring(false);
   std::vector<std::string> orderedCLIGroupNames(F3D::CLIOptions.size());
-  std::transform(F3D::CLIOptions.cbegin(), F3D::CLIOptions.cend(), orderedCLIGroupNames.begin(),
+  std::ranges::transform(F3D::CLIOptions, orderedCLIGroupNames.begin(),
     [](const F3D::CLIGroup& cliGroup) { return cliGroup.GroupName; });
   f3d::log::info(cxxOptions.help(orderedCLIGroupNames));
   f3d::log::info("\nExamples:");
@@ -134,6 +135,22 @@ void PrintRenderingBackendList()
 }
 
 //----------------------------------------------------------------------------
+void PrintVideoEncodersList()
+{
+  auto encoders = f3d::video_encoder::getAvailableEncoders();
+
+  f3d::log::setUseColoring(false);
+  f3d::log::info("Video encoders:");
+  for (const auto& [name, longName] : encoders)
+  {
+    std::string line = name;
+    line += ": ";
+    line += longName;
+    f3d::log::info(line);
+  }
+}
+
+//----------------------------------------------------------------------------
 void PrintReadersList()
 {
   size_t nameColSize = 0;
@@ -144,7 +161,7 @@ void PrintReadersList()
   constexpr std::string_view streamStr = "Supports Stream";
   size_t streamColSize = streamStr.size();
 
-  std::vector<f3d::engine::readerInformation> readersInfo = f3d::engine::getReadersInfo();
+  const std::vector<f3d::engine::readerInformation> readersInfo = f3d::engine::getReadersInfo();
   if (readersInfo.empty())
   {
     f3d::log::warn("No registered reader found!");
@@ -173,7 +190,7 @@ void PrintReadersList()
   plugColSize += colGap;
   streamColSize += colGap;
 
-  std::string separator = std::string(
+  const std::string separator = std::string(
     nameColSize + extsColSize + descColSize + mimeColSize + plugColSize + streamColSize - colGap,
     '-');
 
@@ -215,7 +232,7 @@ std::pair<std::string, int> F3DOptionsTools::GetClosestOption(
   auto checkDistance =
     [](const std::string& key, const std::string& name, std::pair<std::string, int>& ref)
   {
-    int distance = f3d::utils::textDistance(key, name);
+    const int distance = f3d::utils::textDistance(key, name);
     if (distance < ref.second)
     {
       ref = { key, distance };
@@ -226,7 +243,7 @@ std::pair<std::string, int> F3DOptionsTools::GetClosestOption(
   checkDistance("input", option, ret);
 
   // Check true boolean options
-  for (std::string_view key : ::CLIBooleans)
+  for (const std::string_view key : ::CLIBooleans)
   {
     checkDistance(std::string(key), option, ret);
   }
@@ -235,12 +252,6 @@ std::pair<std::string, int> F3DOptionsTools::GetClosestOption(
   for (const auto& [key, value] : F3DOptionsTools::DefaultAppOptions)
   {
     checkDistance(key, option, ret);
-  }
-
-  // Check cli names in custom mapping options
-  for (const auto& [key, value] : F3DOptionsTools::CustomMappingOptions)
-  {
-    checkDistance(std::string(key), option, ret);
   }
 
   // Check cli names for libf3d options
@@ -269,7 +280,8 @@ std::pair<std::string, int> F3DOptionsTools::GetClosestOption(
 F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
   int argc, char** argv, std::vector<std::string>& positionals)
 {
-  std::string execName = argc > 0 && argv[0][0] ? fs::path(argv[0]).filename().string() : "f3d";
+  const std::string execName =
+    argc > 0 && argv[0][0] ? fs::path(argv[0]).filename().string() : "f3d";
 
   // cxxopts values need to live somewhere until parsing is done
   std::vector<std::shared_ptr<cxxopts::Value>> cxxoptsValues;
@@ -312,7 +324,7 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
           // Add the default value to the help text if any
           std::string defaultValue;
           std::string helpText(cliOption.HelpText);
-          std::string longName(cliOption.LongName);
+          const std::string longName(cliOption.LongName);
 
           // Recover default value from app options
           auto appIter = F3DOptionsTools::DefaultAppOptions.find(longName);
@@ -322,22 +334,14 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
           }
           else
           {
-            auto customIter = F3DOptionsTools::CustomMappingOptions.find(longName);
-            if (customIter != F3DOptionsTools::CustomMappingOptions.end())
+            // Recover default value from lib options
+            auto libIter = F3DOptionsTools::LibOptionsNames.find(cliOption.LongName);
+            if (libIter != F3DOptionsTools::LibOptionsNames.end())
             {
-              defaultValue = customIter->second;
-            }
-            else
-            {
-              // Recover default value from lib options
-              auto libIter = F3DOptionsTools::LibOptionsNames.find(cliOption.LongName);
-              if (libIter != F3DOptionsTools::LibOptionsNames.end())
-              {
-                f3d::options opt;
-                std::string name = std::string(libIter->second);
-                // let default value empty for unset options
-                defaultValue = opt.hasValue(name) ? opt.getAsString(name) : "";
-              }
+              const f3d::options opt;
+              const std::string name = std::string(libIter->second);
+              // let default value empty for unset options
+              defaultValue = opt.hasValue(name) ? opt.getAsString(name) : "";
             }
           }
 
@@ -388,6 +392,11 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       ::PrintRenderingBackendList();
       throw F3DExNoProcess("rendering backend list requested");
     }
+    if (result.count("list-video-encoders") > 0)
+    {
+      ::PrintVideoEncodersList();
+      throw F3DExNoProcess("video encoders list requested");
+    }
     if (result.count("scan-plugins") > 0)
     {
       ::PrintPluginsScan();
@@ -398,12 +407,19 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       // `--list-readers` needs plugin to be loaded to be useful
       // Load them manually
       std::vector<std::string> plugins;
+      std::string pluginsPath;
       if (result.count("load-plugins") > 0)
       {
         plugins =
           f3d::options::parse<std::vector<std::string>>(result["load-plugins"].as<std::string>());
       }
-      F3DPluginsTools::LoadPlugins(plugins);
+
+      if (result.count("plugins-path") > 0)
+      {
+        pluginsPath = f3d::options::parse<std::string>(result["plugins-path"].as<std::string>());
+      }
+
+      F3DPluginsTools::LoadPlugins(plugins, pluginsPath);
       ::PrintReadersList();
       throw F3DExNoProcess("reader list requested");
     }
@@ -417,7 +433,7 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       foundUnknownOption = true;
 
       // check if it's a long option
-      if (unknownOption.substr(0, 2) == "--")
+      if (unknownOption.starts_with("--"))
       {
         const size_t equalPos = unknownOption.find('=');
 
@@ -443,7 +459,7 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
     for (const auto& res : result)
     {
       // Discard boolean option like `--version` or `--help`
-      if (std::find(::CLIBooleans.begin(), ::CLIBooleans.end(), res.key()) == ::CLIBooleans.end())
+      if (std::ranges::find(::CLIBooleans, res.key()) == ::CLIBooleans.end())
       {
         cliOptionsDict[res.key()] = res.value();
       }
@@ -452,7 +468,7 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
     // Handle defines and add them as proper options
     for (const std::string& define : defines)
     {
-      std::string::size_type sepIdx = define.find_first_of('=');
+      const std::string::size_type sepIdx = define.find_first_of('=');
       if (sepIdx == std::string::npos)
       {
         f3d::log::warn("Could not parse a define '", define, "'");
@@ -502,108 +518,6 @@ std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3
   {
     libf3dOptions.emplace_back(std::make_pair(libf3dIter->second, value));
   }
-
-  // anti-aliasing is handled in two options in the lib
-  else if (key == "anti-aliasing")
-  {
-    if (value != "none")
-    {
-      // Handle deprecated boolean option
-      bool deprecatedBooleanOption;
-      if (F3DOptionsTools::Parse(value, deprecatedBooleanOption))
-      {
-        f3d::log::warn("--anti-aliasing is a now a string, please specify the type of "
-                       "anti-aliasing or use the implicit default");
-        libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.enable", value));
-      }
-      else
-      {
-        libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.enable", "true"));
-        libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.mode", value));
-      }
-    }
-    else
-    {
-      libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.enable", "false"));
-    }
-  }
-
-  // handle deprecated anti-aliasing option
-  else if (key == "anti-aliasing-mode")
-  {
-    f3d::log::warn("--anti-aliasing-mode is deprecated");
-    libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.mode", value));
-  }
-
-  // blending is handled in two options in the lib
-  else if (key == "blending")
-  {
-    if (value != "none")
-    {
-      libf3dOptions.emplace_back(std::make_pair("render.effect.blending.enable", "true"));
-      libf3dOptions.emplace_back(std::make_pair("render.effect.blending.mode", value));
-    }
-    else
-    {
-      libf3dOptions.emplace_back(std::make_pair("render.effect.blending.enable", "false"));
-    }
-  }
-
-  // handle deprecated translucency support
-  else if (key == "translucency-support")
-  {
-    f3d::log::warn("--translucency-support is deprecated, please use --blending instead");
-    libf3dOptions.emplace_back(std::make_pair("render.effect.blending.enable", value));
-  }
-
-  // point sprites is handled in two options in the lib
-  else if (key == "point-sprites")
-  {
-    if (value != "none")
-    {
-      // Handle deprecated boolean option
-      bool deprecatedBooleanOption;
-      if (F3DOptionsTools::Parse(value, deprecatedBooleanOption))
-      {
-        f3d::log::warn("--point-sprites is a now a string, please specify the type of "
-                       "point sprites to use or use the implicit default");
-        libf3dOptions.emplace_back(std::make_pair("model.point_sprites.enable", value));
-      }
-      else
-      {
-        libf3dOptions.emplace_back(std::make_pair("model.point_sprites.enable", "true"));
-        libf3dOptions.emplace_back(std::make_pair("model.point_sprites.type", value));
-      }
-    }
-    else
-    {
-      libf3dOptions.emplace_back(std::make_pair("model.point_sprites.enable", "false"));
-    }
-  }
-
-  // handle deprecated point-sprites-type option
-  else if (key == "point-sprites-type")
-  {
-    f3d::log::warn("--point-sprites-type is deprecated");
-    libf3dOptions.emplace_back(std::make_pair("model.point_sprites.mode", value));
-  }
-
-  // handle deprecated interaction-trackball option
-  else if (key == "interaction-trackball")
-  {
-    f3d::log::warn(
-      "--interaction-trackball is deprecated, please use --interaction-style=trackball instead");
-    bool trackball;
-    if (!F3DOptionsTools::Parse(value, trackball))
-    {
-      f3d::log::error("Cannot parse --interaction-trackball value: " + value);
-    }
-    else if (trackball)
-    {
-      libf3dOptions.emplace_back(std::make_pair("interactor.style", "trackball"));
-    }
-  }
-
   else
   {
     // If nothing to convert, just return the input

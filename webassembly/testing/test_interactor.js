@@ -43,70 +43,183 @@ const settings = {
       "command not removed",
     );
 
-    // animations
+    // bindings
+    interactor.initBindings();
+
+    const initialBinds = interactor.getBinds();
     utils.assert(
-      !interactor.isPlayingAnimation(),
-      "animation should not be playing",
+      Array.isArray(initialBinds) && initialBinds.length > 0,
+      "bindings should be returned",
     );
 
-    interactor.startAnimation();
+    const bind = new Module.InteractionBind();
+    bind.mod = Module.InteractionBindModifierKeys.NONE;
+    bind.inter = "R";
+
+    const bindCommands = new Module.InteractorBindCommands();
+    bindCommands.push_back("set render.grid.reflection .8");
+
+    const bindParam = new Module.InteractorBindingParam();
+    bindParam.bind = bind;
+    bindParam.commands = bindCommands;
+    bindParam.group = "test-group";
+    bindParam.setDocCallback(() => ["foo", "bar"]);
+    bindParam.type = Module.InteractorBindingType.OTHER;
+    bindParam.notify = false;
+
+    interactor.addBinding(bindParam);
+
+    const repeatCommands = new Module.InteractorBindCommands();
+    repeatCommands.push_back("increase render.light.intensity .1");
+
+    const bindRepeat = new Module.InteractionBind();
+    bindRepeat.mod = Module.InteractionBindModifierKeys.CTRL_SHIFT;
+    bindRepeat.inter = "L";
+
+    const repeatBindParam = new Module.InteractorBindingParam();
+    repeatBindParam.bind = bindRepeat;
+    repeatBindParam.commands = repeatCommands;
+    repeatBindParam.group = "test-group";
+    repeatBindParam.setDocCallback(() => ["repeat", "binding"]);
+    repeatBindParam.type = Module.InteractorBindingType.NUMERICAL;
+    repeatBindParam.notify = false;
+    repeatBindParam.repeat = true;
+
+    interactor.addBinding(repeatBindParam);
+
+    const updatedBinds = interactor.getBinds();
     utils.assert(
-      interactor.isPlayingAnimation() &&
-        interactor.getAnimationDirection() ==
-          Module.InteractorAnimationDirection.FORWARD,
-      "animation should be playing",
+      updatedBinds.length === initialBinds.length + 2,
+      "new bindings should be registered",
     );
 
-    interactor.stopAnimation();
+    const bindGroups = interactor.getBindGroups();
     utils.assert(
-      !interactor.isPlayingAnimation(),
-      "animation should not be playing",
+      bindGroups.includes("test-group"),
+      "new bind group should be registered",
     );
 
-    interactor.startAnimation(Module.InteractorAnimationDirection.FORWARD);
+    const docs = interactor.getBindingDocumentation(bind);
     utils.assert(
-      interactor.isPlayingAnimation() &&
-        interactor.getAnimationDirection() ==
-          Module.InteractorAnimationDirection.FORWARD,
-      "animation should be playing forward",
+      Array.isArray(docs) && docs[0] === "foo" && docs[1] === "bar",
+      "binding documentation should be returned",
     );
-    interactor.stopAnimation();
 
-    interactor.startAnimation(Module.InteractorAnimationDirection.BACKWARD);
+    const repeatDocs = interactor.getBindingDocumentation(bindRepeat);
     utils.assert(
-      interactor.isPlayingAnimation() &&
-        interactor.getAnimationDirection() ==
-          Module.InteractorAnimationDirection.BACKWARD,
-      "animation should be playing backward",
+      Array.isArray(repeatDocs) &&
+        repeatDocs[0] === "repeat" &&
+        repeatDocs[1] === "binding",
+      "repeat binding documentation should be returned",
     );
-    interactor.stopAnimation();
 
-    interactor.toggleAnimation();
+    const bindingType = interactor.getBindingType(bind);
     utils.assert(
-      interactor.isPlayingAnimation() &&
-        interactor.getAnimationDirection() ==
-          Module.InteractorAnimationDirection.FORWARD,
-      "animation should be playing forward",
+      bindingType === Module.InteractorBindingType.OTHER,
+      "binding type should round-trip",
     );
-    interactor.stopAnimation();
 
-    interactor.toggleAnimation(Module.InteractorAnimationDirection.FORWARD);
+    const repeatBindingType = interactor.getBindingType(bindRepeat);
     utils.assert(
-      interactor.isPlayingAnimation() &&
-        interactor.getAnimationDirection() ==
-          Module.InteractorAnimationDirection.FORWARD,
-      "animation should be playing forward",
+      repeatBindingType === Module.InteractorBindingType.NUMERICAL,
+      "repeat binding type should round-trip",
     );
-    interactor.stopAnimation();
 
-    interactor.toggleAnimation(Module.InteractorAnimationDirection.BACKWARD);
+    // start recording
+    interactor.recordInteraction("/test_interaction.txt");
+
+    // input events coverage, just check we do not throw
+    // all these calls have no effect on the resulting image
+    let inputEventError = false;
+    try {
+      interactor.triggerModUpdate(Module.InteractionBindModifierKeys.NONE);
+      interactor.triggerMousePosition(0, 0);
+      interactor.triggerMouseButton(
+        Module.InteractorInputAction.PRESS,
+        Module.InteractorMouseButton.LEFT,
+      );
+      interactor.triggerMouseButton(
+        Module.InteractorInputAction.RELEASE,
+        Module.InteractorMouseButton.LEFT,
+      );
+      interactor.triggerTextCharacter(0x42);
+    } catch {
+      inputEventError = true;
+    }
+    utils.assert(!inputEventError, "input event bindings should not throw");
+
+    // check file content
+    const interactionFileContent = Module.FS.readFile("/test_interaction.txt", {
+      encoding: "utf8",
+    });
     utils.assert(
-      interactor.isPlayingAnimation() &&
-        interactor.getAnimationDirection() ==
-          Module.InteractorAnimationDirection.BACKWARD,
-      "animation should be playing backward",
+      interactionFileContent.includes("MouseMoveEvent 0 299 0 0 0 0 0"),
+      "interaction file should contain the expected command",
     );
-    interactor.stopAnimation();
+
+    // play it (no effect on the resulting image, just check we do not throw)
+    interactor.playInteraction("/test_interaction.txt", 0.1);
+
+    // zoom out
+    interactor.triggerMouseWheel(Module.InteractorWheelDirection.BACKWARD);
+
+    // trigger "set render.grid.reflection .8"
+    interactor.triggerKeyboardKey(Module.InteractorInputAction.PRESS, "R");
+    interactor.triggerKeyboardKey(Module.InteractorInputAction.RELEASE, "R");
+
+    // trigger "increase render.light.intensity .1"
+    interactor.triggerKeyboardKey(
+      Module.InteractorInputAction.PRESS,
+      "Ctrl+Shift+L",
+    );
+    interactor.triggerKeyboardKey(
+      Module.InteractorInputAction.PRESS,
+      "Ctrl+Shift+L",
+    );
+    interactor.triggerKeyboardKey(
+      Module.InteractorInputAction.RELEASE,
+      "Ctrl+Shift+L",
+    );
+
+    let bindingRemoved = false;
+    try {
+      interactor.removeBinding(bind);
+    } catch {
+      bindingRemoved = true;
+    }
+    utils.assert(!bindingRemoved, "binding should be removable");
+
+    bindingRemoved = false;
+    try {
+      interactor.removeBinding(bindRepeat);
+    } catch {
+      bindingRemoved = true;
+    }
+    utils.assert(!bindingRemoved, "repeat binding should be removable");
+
+    bindCommands.delete();
+    repeatCommands.delete();
+
+    // notifications
+    let notifCount = 0;
+
+    interactor.setNotificationCallback((desc, value, bind, duration) => {
+      notifCount++;
+      return true;
+    });
+
+    interactor.triggerNotification("Test notification", "value", 1.0);
+    utils.assert(notifCount === 1, "notification callback not called");
+
+    let eventLoopState = null;
+    interactor.setEventLoopUserCallback((state) => {
+      eventLoopState = state;
+    });
+    interactor.triggerEventLoop(0.1);
+    utils.assert(
+      eventLoopState && typeof eventLoopState.animationTime === "number",
+      "event loop state should expose animation time",
+    );
 
     // only for coverage, do not test the actual feature yet
     interactor.disableCameraMovement();

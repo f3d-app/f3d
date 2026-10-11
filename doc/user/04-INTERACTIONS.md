@@ -34,19 +34,17 @@ Select 2D interaction styles by pressing <kbd>K</kbd> or through the `--interact
 
 The coloring can be controlled directly by pressing the following hotkeys:
 
-- <kbd>A</kbd>: cycle between anti-aliasing modes.
-- <kbd>C</kbd>: cycle between coloring with array from point data and from cell data.
-- <kbd>S</kbd>: cycle the array to color with.
-- <kbd>Y</kbd>: cycle the component of the array to color with.
+- <kbd>S</kbd>: cycle the coloring modes (material, scivis, direct).
+- <kbd>Y</kbd>: cycle on all arrays on point and cells, visible in scivis and direct mode.
+- <kbd>SHIFT+Y</kbd>: cycle the component available on the currently selected array, visible in scivis and direct mode, including magnitude.
 
 See the [coloring cycle](#cycling-coloring) section for more info.
 
 Other options can be toggled or cycled directly by pressing the following hotkeys:
 
+- <kbd>A</kbd>: cycle between anti-aliasing modes.
 - <kbd>W</kbd>: [cycle animations](05-ANIMATIONS.md#cycling-animations).
-- <kbd>B</kbd>: display of the scalar bar, only when coloring and not using direct scalars.
 - <kbd>V</kbd>: volume rendering, forces coloring.
-- <kbd>I</kbd>: opacity function inversion during volume rendering.
 - <kbd>O</kbd>: cycle point sprites type.
 - <kbd>P</kbd>: cycle blending mode for translucency support.
 - <kbd>Q</kbd>: ambient occlusion.
@@ -58,21 +56,16 @@ Other options can be toggled or cycled directly by pressing the following hotkey
 - <kbd>N</kbd>: the display of the file name.
 - <kbd>Shift</kbd>+<kbd>N</kbd>: the display of the HDRI file name.
 - <kbd>M</kbd>: the display of the metadata if exists.
-- <kbd>Shift</kbd>+<kbd>H</kbd>: the display of the scene hierarchy.
-- <kbd>Z</kbd>: the display of the FPS counter.
+- <kbd>H</kbd>: the display of the scene hierarchy.
 - <kbd>R</kbd>: raytracing.
-- <kbd>D</kbd>: the denoiser when raytracing.
-- <kbd>U</kbd>: background blur, useful with an HDRI skybox.
 - <kbd>K</kbd>: Cycle interaction modes.
 - <kbd>F</kbd>: HDRI ambient lighting.
-- <kbd>J</kbd>: the display of the HDRI skybox.
+- <kbd>J</kbd>: Cycle HDRI skybox display modes.
 - <kbd>L</kbd>: increase lights intensity.
 - <kbd>Shift</kbd>+<kbd>L</kbd>: decrease lights intensity.
 - <kbd>Ctrl</kbd>+<kbd>P</kbd>: increase opacity.
 - <kbd>Shift</kbd>+<kbd>P</kbd>: decrease opacity.
 - <kbd>Shift</kbd>+<kbd>A</kbd>: toggle armature.
-- <kbd>Ctrl</kbd>+<kbd>Y</kbd>: Scene up direction to +Y
-- <kbd>Ctrl</kbd>+<kbd>Z</kbd>: Scene up direction to +Z
 
 Note that the raytracing hotkeys are only available if F3D is build with raytracing enabled.
 
@@ -96,22 +89,27 @@ Scene Hotkeys:
 
 Other hotkeys and interactions are available:
 
-- <kbd>H</kbd>: key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
+- <kbd>F1</kbd>: key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
 - <kbd>CTRL</kbd>+<kbd>Q</kbd>: close the window and quit F3D.
 - <kbd>Esc</kbd>: display the console or hide console/minimal console.
 - <kbd>:</kbd>: display the minimal console.
-- <kbd>CTRL</kbd>+<kbd>K</kbd>: toggle notifications.
 - <kbd>Space</kbd>: play the animation if any.
 - <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbd>: play the animation backward if any.
 - <kbd>Shift</kbd>+<kbd>V</kbd>: cycle between verbosity levels.
-- <kbd>&larr;</kbd>: load the previous file if any and reset the camera.
-- <kbd>Ctrl</kbd>+<kbd>&larr;</kbd>: load the previous file if any and keep the camera.
-- <kbd>&rarr;</kbd>: load the next file if any and reset the camera.
-- <kbd>Ctrl</kbd>+<kbd>&rarr;</kbd>: load the next file if any and keep the camera.
-- <kbd>&uarr;</kbd>: reload the currently loaded files.
-- <kbd>&darr;</kbd>: add all current files parent directories to the list of files, reload the currently loaded files and reset the camera, respect the `--recursive-dir-add` CLI option.
+- <kbd>&uarr;</kbd>: load the previous file if any and reset the camera.
+- <kbd>Ctrl</kbd>+<kbd>&uarr;</kbd>: load the previous file if any and keep the camera.
+- <kbd>&darr;</kbd>: load the next file if any and reset the camera.
+- <kbd>Ctrl</kbd>+<kbd>&darr;</kbd>: load the next file if any and keep the camera.
+- <kbd>F5</kbd>: reload the currently loaded files.
+- <kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>R</kbd>: add all current files parent directories to the list of files, reload the currently loaded files and reset the camera, respect the `--recursive-dir-add` CLI option.
 - <kbd>F12</kbd>: take a screenshot, ie. render the current view to an image file.
 - <kbd>Ctrl</kbd>+<kbd>F12</kbd>: take a "minimal" screenshot, ie. render the current view with no grid and no overlays to an image file with a transparent background.
+- <kbd>Ctrl</kbd>+<kbd>S</kbd>: save the current state into a statefile picked with a file dialog (requires a build with the `tinyfiledialogs` module).
+- <kbd>Ctrl</kbd>+<kbd>L</kbd>: load the state from a statefile picked with a file dialog (requires a build with the `tinyfiledialogs` module). Does nothing but warn if the file does not exist.
+- <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd>: save the current state into the statefile set by the `--statefile-filename` CLI option, or an automatic filename (`{app}/{model}_{n}.json`) when it is not set.
+- <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd>: load the state from the `--statefile-filename` CLI option, or the most recent statefile saved with the automatic filename when it is not set.
+- <kbd>Ctrl</kbd>+<kbd>C</kbd>: save the current state into the system clipboard (requires a build with the `clip` module).
+- <kbd>Ctrl</kbd>+<kbd>V</kbd>: load the state from the system clipboard (requires a build with the `clip` module).
 - _Drop_ a file, directory or HDRI into the F3D window to load it. F3D relies on the extension (`.hdr` or `.exr`) to detect if the dropped file is an HDRI.
 - <kbd>Ctrl</kbd> + _Drop_ a file, directory and load it.
 - <kbd>Shift</kbd> + _Drop_ a HDRI and use it, no extensions checks performed.
@@ -122,10 +120,9 @@ When loading another file or reloading, options that have been changed interacti
 
 The following hotkeys let you cycle the coloring of the data:
 
-- <kbd>C</kbd>: cycle between point data and cell data - field data is not supported.
-- <kbd>S</kbd>: cycle the array available on the currently selected data in alphabetical order,
-  skipping array not containing numeric data. It will loop back to not coloring unless using volume rendering.
-- <kbd>Y</kbd>: cycle the component available on the currently selected array, looping to -2 for direct scalars rendering.
+- <kbd>S</kbd>: cycle the coloring modes (material, scivis, direct).
+- <kbd>Y</kbd>: cycle on all arrays on point and cells, visible in scivis and direct mode.
+- <kbd>SHIFT+Y</kbd>: cycle the component available on the currently selected array, visible in scivis and direct mode, including magnitude.
 
 When changing the array, the component in use will be kept if valid with the new array, if not it will be cycled until a valid
 component is found.
@@ -152,3 +149,7 @@ So with default options, which are using [templates](03-OPTIONS.md#filename-temp
 ## Configuring bindings
 
 It is supported to change all bindings above using a specific syntax in the [configuration file](06-CONFIGURATION_FILE.md) using [commands](07-COMMANDS.md).
+
+## MacOS Bindings
+
+When using F3D on MacOS, all bindings that specify <kbd>Ctrl</kbd> and <kbd>Ctrl</kbd>+<kbd>Shift</kbd> use <kbd>Cmd</kbd> and <kbd>Cmd</kbd>+<kbd>Shift</kbd> respectively instead.

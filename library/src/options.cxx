@@ -84,7 +84,7 @@ options& options::toggle(std::string_view name)
   catch (const std::bad_variant_access&)
   {
     throw options::incompatible_exception(
-      "Trying to get toggle " + std::string(name) + " with incompatible type");
+      "Trying to toggle " + std::string(name) + " with incompatible type");
   }
 }
 
@@ -133,7 +133,7 @@ std::vector<std::string> options::getNames() const
 {
   const std::vector<std::string> names = options::getAllNames();
   std::vector<std::string> setNames;
-  std::copy_if(names.begin(), names.end(), std::back_inserter(setNames),
+  std::ranges::copy_if(names, std::back_inserter(setNames),
     [&](const std::string& name) { return this->hasValue(name); });
   return setNames;
 }
@@ -142,7 +142,7 @@ std::vector<std::string> options::getNames() const
 std::pair<std::string, unsigned int> options::getClosestOption(std::string_view option) const
 {
   std::vector<std::string> names = options_generated::getNames();
-  if (std::find(names.begin(), names.end(), option) != names.end())
+  if (std::ranges::find(names, option) != names.end())
   {
     return { std::string(option), 0 };
   }
@@ -151,7 +151,7 @@ std::pair<std::string, unsigned int> options::getClosestOption(std::string_view 
 
   for (const auto& name : names)
   {
-    int distance = utils::textDistance(name, option);
+    const int distance = utils::textDistance(name, option);
     if (distance < ret.second)
     {
       ret = { name, distance };
@@ -165,6 +165,12 @@ std::pair<std::string, unsigned int> options::getClosestOption(std::string_view 
 bool options::isOptional(std::string_view option) const
 {
   return options_generated::isOptional(option);
+}
+
+//----------------------------------------------------------------------------
+options::option_type options::getType(std::string_view name) const
+{
+  return options_generated::getType(name);
 }
 
 //----------------------------------------------------------------------------
@@ -185,6 +191,66 @@ options& options::removeValue(std::string_view name)
   {
     throw options::incompatible_exception("Option " + std::string(name) + " is not not optional");
   }
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+bool options::hasDomain(std::string_view name) const
+{
+  domain_style style;
+  return options_generated::hasDomain(name, style);
+}
+
+//----------------------------------------------------------------------------
+f3d::options::domain_style options::getDomainStyle(std::string_view name) const
+{
+  domain_style style;
+  if (options_generated::hasDomain(name, style))
+  {
+    return style;
+  }
+  else
+  {
+    throw options::incompatible_exception("Option " + std::string(name) + " doesn't have a domain");
+  }
+}
+
+//----------------------------------------------------------------------------
+options::DomainRange<option_variant_t> options::getRangeDomain(std::string_view name) const
+{
+  return options_generated::getRangeDomain(*this, name);
+}
+
+//----------------------------------------------------------------------------
+options::DomainEnum<option_variant_t> options::getEnumDomain(std::string_view name) const
+{
+  return options_generated::getEnumDomain(*this, name);
+}
+
+//----------------------------------------------------------------------------
+options::DomainIndex options::getIndexDomain(std::string_view name) const
+{
+  return options_generated::getIndexDomain(*this, name);
+}
+
+//----------------------------------------------------------------------------
+options& options::increase(std::string_view name)
+{
+  options_generated::increaseDecrease<true>(*this, name);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+options& options::decrease(std::string_view name)
+{
+  options_generated::increaseDecrease<false>(*this, name);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+options& options::cycle(std::string_view name)
+{
+  options_generated::cycle(*this, name);
   return *this;
 }
 

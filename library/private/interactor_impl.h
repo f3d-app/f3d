@@ -21,9 +21,9 @@ class options;
 
 namespace detail
 {
+class animation_impl;
 class scene_impl;
 class window_impl;
-class animationManager;
 
 class interactor_impl : public interactor
 {
@@ -32,7 +32,7 @@ public:
   /**
    * Documented public API
    */
-  interactor_impl(options& options, window_impl& window, scene_impl& scene);
+  interactor_impl(options& options, window_impl& window, scene_impl& scene, animation_impl& anim);
   ~interactor_impl() override;
 
   interactor& initCommands() override;
@@ -44,14 +44,12 @@ public:
   interactor& removeCommand(const std::string& action) override;
   std::vector<std::string> getCommandActions() const override;
   bool triggerCommand(std::string_view command, bool keepComments = true) override;
+  interactor& setNotificationCallback(
+    std::function<bool(const std::string&, const std::string&, const std::string&, double)>
+      callback) override;
 
   interactor& initBindings() override;
-  interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
-    std::string group = std::string(), documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool notify = true) override;
-  interactor& addBinding(const interaction_bind_t& bind, std::string command,
-    std::string group = std::string(), documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool notify = true) override;
+  interactor& addBinding(BindingParam binding) override;
   interactor& removeBinding(const interaction_bind_t& bind) override;
   std::vector<std::string> getBindGroups() const override;
   std::vector<interaction_bind_t> getBindsForGroup(std::string group) const override;
@@ -68,33 +66,23 @@ public:
   interactor& triggerKeyboardKey(InputAction action, std::string_view keySym) override;
   interactor& triggerTextCharacter(unsigned int codepoint) override;
 
-  interactor& toggleAnimation(AnimationDirection direction = AnimationDirection::FORWARD) override;
-  interactor& startAnimation(AnimationDirection direction = AnimationDirection::FORWARD) override;
-  interactor& stopAnimation() override;
-  bool isPlayingAnimation() override;
-  interactor::AnimationDirection getAnimationDirection() override;
-
   interactor& enableCameraMovement() override;
   interactor& disableCameraMovement() override;
 
-  bool playInteraction(const std::filesystem::path& file, double deltaTime,
-    std::function<void()> userCallBack) override;
+  interactor& setEventLoopUserCallback(
+    std::function<void(interactor_state_t)> userCallback) override;
+
+  bool playInteraction(const std::filesystem::path& file, double deltaTime) override;
   bool recordInteraction(const std::filesystem::path& file) override;
 
   interactor& triggerNotification(
     std::string desc, std::string value = "", double duration = 3.f) override;
 
-  interactor& start(double deltaTime, std::function<void()> userCallBack) override;
+  interactor& start(double deltaTime) override;
   interactor& stop() override;
   interactor& requestRender() override;
   interactor& requestStop() override;
   ///@}
-
-  /**
-   * Implementation only API.
-   * Set the internal AnimationManager to be used by the interactor
-   */
-  void SetAnimationManager(animationManager* manager);
 
   /**
    * Implementation only API.
@@ -104,7 +92,7 @@ public:
 
   /**
    * Implementation only API.
-   * Initialize the animation manager using interactor objects.
+   * Initialize the animation using interactor objects.
    * This is called by the scene after add a file.
    */
   void InitializeAnimation(vtkImporter* importer);
@@ -126,7 +114,7 @@ public:
 
   /**
    * Event loop being called automatically once the interactor is started
-   * First call the EventLoopUserCallBack, then call render if requested.
+   * First call the EventLoopUserCallback, then call render if requested.
    */
   void EventLoop();
 

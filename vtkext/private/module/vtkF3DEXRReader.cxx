@@ -102,13 +102,13 @@ void vtkF3DEXRReader::ExecuteInformation()
 
   auto checkChannels = [&](Imf::RgbaInputFile& file)
   {
-    Imath::Box2i dw = file.dataWindow();
+    const Imath::Box2i& dw = file.dataWindow();
     this->DataExtent[0] = dw.min.x;
     this->DataExtent[1] = dw.max.x;
     this->DataExtent[2] = dw.min.y;
     this->DataExtent[3] = dw.max.y;
 
-    Imf::RgbaChannels channels = file.channels();
+    const Imf::RgbaChannels channels = file.channels();
     if (channels != Imf::RgbaChannels::WRITE_RGBA && channels != Imf::RgbaChannels::WRITE_RGB)
     {
       throw std::runtime_error("only RGB and RGBA channels are supported");

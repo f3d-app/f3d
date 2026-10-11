@@ -2,15 +2,87 @@
 
 # Test that f3d can try to read a system config file
 add_test(NAME f3d::TestNoNoConfig COMMAND $<TARGET_FILE:f3d> --no-render)
-set_tests_properties(f3d::TestNoNoConfig PROPERTIES TIMEOUT 4)
-
-# Test that we can try loading a plugin without F3D_PLUGINS_PATH being defined
-add_test(NAME f3d::TestNoEnvInvalidPlugin COMMAND $<TARGET_FILE:f3d> --load-plugins=invalid --no-render)
-set_tests_properties(f3d::TestNoEnvInvalidPlugin PROPERTIES PASS_REGULAR_EXPRESSION "Cannot open the library")
+set_tests_properties(f3d::TestNoNoConfig PROPERTIES TIMEOUT 20)
 
 # Test invalid CLI args
 add_test(NAME f3d::TestInvalidCLIArgs COMMAND $<TARGET_FILE:f3d> --up)
 set_tests_properties(f3d::TestInvalidCLIArgs PROPERTIES PASS_REGULAR_EXPRESSION "Error parsing command line arguments")
+
+# Test trying to load a plugin without specifying --plugins-path
+add_test(NAME f3d::TestNoCliInvalidPlugin COMMAND $<TARGET_FILE:f3d> --load-plugins=invalid --no-render)
+set_tests_properties(f3d::TestNoCliInvalidPlugin PROPERTIES PASS_REGULAR_EXPRESSION "Cannot open the library")
+
+# Test --output-video
+if (F3D_MODULE_FFMPEG)
+  add_test(NAME f3d::TestVideoEncoders COMMAND $<TARGET_FILE:f3d> --list-video-encoders)
+  set_tests_properties(f3d::TestVideoEncoders PROPERTIES PASS_REGULAR_EXPRESSION "Video encoders:")
+
+  add_test(NAME f3d::TestOutputVideo COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/f3d.glb --output-video=${CMAKE_BINARY_DIR}/Testing/Temporary/TestOutputVideo.h264)
+  set_tests_properties(f3d::TestOutputVideo PROPERTIES PASS_REGULAR_EXPRESSION "Using video encoder")
+
+  add_test(NAME f3d::TestOutputVideoInvalidCodec COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/f3d.glb --output-video=${CMAKE_BINARY_DIR}/Testing/Temporary/TestOutputVideo.h264 --video-encoder=invalid_codec)
+  set_tests_properties(f3d::TestOutputVideoInvalidCodec PROPERTIES PASS_REGULAR_EXPRESSION "No valid encoder found")
+
+  add_test(NAME f3d::TestOutputVideoOptions COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/f3d.glb --output-video=${CMAKE_BINARY_DIR}/Testing/Temporary/TestOutputVideoOptions.h264 --video-bitrate=10 --video-low-latency=1)
+  set_tests_properties(f3d::TestOutputVideoOptions PROPERTIES PASS_REGULAR_EXPRESSION "Using video encoder")
+
+  add_test(NAME f3d::TestOutputVideoNoAnim COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/f3d.vtp --output-video=${CMAKE_BINARY_DIR}/Testing/Temporary/TestOutputVideoNoAnim.h264)
+  set_tests_properties(f3d::TestOutputVideoNoAnim PROPERTIES PASS_REGULAR_EXPRESSION "No animation available or animation has zero duration, outputting single")
+
+  add_test(NAME f3d::TestOutputVideoMulti COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/f3d.glb ${F3D_SOURCE_DIR}/testing/data/f3d.vtp --output-video=${CMAKE_BINARY_DIR}/Testing/Temporary/TestOutputVideoMulti.h264)
+  set_tests_properties(f3d::TestOutputVideoMulti PROPERTIES PASS_REGULAR_EXPRESSION "An output video was saved using a single 3D file")
+
+  add_test(NAME f3d::TestOutputVideoFailOpen COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/f3d.glb --output-video=..)
+  set_tests_properties(f3d::TestOutputVideoFailOpen PROPERTIES PASS_REGULAR_EXPRESSION "Could not open output video file")
+
+  add_test(NAME f3d::TestOutputVideoFailNoInput COMMAND $<TARGET_FILE:f3d> --output-video=${CMAKE_BINARY_DIR}/Testing/Temporary/TestOutputVideoFailNoInput.h264)
+  set_tests_properties(f3d::TestOutputVideoFailNoInput PROPERTIES PASS_REGULAR_EXPRESSION "No files loaded, no rendering performed")
+endif()
+
+# Exercise the app-side relative-path branch of AugmentStatefileContent: a file group whose file lives
+# in the statefile directory has its path stored relative to it. The file is copied next to the
+# statefile so the relative branch is taken. This only asserts that saving succeeds; the produced path
+# content is not inspected here (relative-path storage itself is asserted by the libf3d TestSDKStatefile
+# test).
+add_test(NAME f3d::TestStatefileRelativeAugmentSetup
+  COMMAND ${CMAKE_COMMAND} -E copy ${F3D_SOURCE_DIR}/testing/data/cow.vtp ${CMAKE_BINARY_DIR}/Testing/Temporary/statefile_relative/cow.vtp)
+set_tests_properties(f3d::TestStatefileRelativeAugmentSetup PROPERTIES FIXTURES_SETUP statefile_relative)
+add_test(NAME f3d::TestStatefileRelativeAugment COMMAND $<TARGET_FILE:f3d> --no-render --no-config ${CMAKE_BINARY_DIR}/Testing/Temporary/statefile_relative/cow.vtp --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/statefile_relative/state.json --verbose)
+set_tests_properties(f3d::TestStatefileRelativeAugment PROPERTIES FIXTURES_REQUIRED statefile_relative PASS_REGULAR_EXPRESSION "Statefile saved to")
+
+# Window size in statefiles: save a statefile at a chosen resolution (a window is needed for the size
+# to be captured), then load it back. These use add_test directly because f3d_test always injects
+# --resolution, which takes precedence over the statefile window size.
+add_test(NAME f3d::TestStatefileWindowSizeSave
+  COMMAND $<TARGET_FILE:f3d> --no-config ${F3D_SOURCE_DIR}/testing/data/cow.vtp --resolution=512,384 --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileWindowSizeSave.png --save-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileWindowSize.json)
+set_tests_properties(f3d::TestStatefileWindowSizeSave PROPERTIES PASS_REGULAR_EXPRESSION "Statefile saved to")
+
+# Loading without --resolution restores the window size from the statefile
+add_test(NAME f3d::TestStatefileWindowSizeLoad
+  COMMAND $<TARGET_FILE:f3d> --no-config --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileWindowSize.json --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileWindowSizeLoad.png --verbose)
+set_tests_properties(f3d::TestStatefileWindowSizeLoad PROPERTIES DEPENDS f3d::TestStatefileWindowSizeSave PASS_REGULAR_EXPRESSION "Window size set to 512x384")
+
+# An explicit --resolution takes precedence: the statefile window size is not applied
+add_test(NAME f3d::TestStatefileWindowSizeResolutionPrecedence
+  COMMAND $<TARGET_FILE:f3d> --no-config --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileWindowSize.json --resolution=256,192 --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileWindowSizeResolutionPrecedence.png --verbose)
+set_tests_properties(f3d::TestStatefileWindowSizeResolutionPrecedence PROPERTIES DEPENDS f3d::TestStatefileWindowSizeSave FAIL_REGULAR_EXPRESSION "Window size set to")
+
+# A statefile loaded interactively (at runtime) overrides the launch command line, like a dynamic
+# option change. The save step toggles edges off dynamically (via the `set` command in a command
+# script, which runs at runtime) then saves; the load step loads that state at runtime while
+# `--edges` is on the command line. Edges must stay off: the runtime statefile wins over the cli.
+file(WRITE ${CMAKE_BINARY_DIR}/Testing/Temporary/runtime_statefile_save.txt
+  "set render.show_edges false\nsave_statefile ${CMAKE_BINARY_DIR}/Testing/Temporary/RuntimeStatefile.json\n")
+file(WRITE ${CMAKE_BINARY_DIR}/Testing/Temporary/runtime_statefile_load.txt
+  "load_statefile ${CMAKE_BINARY_DIR}/Testing/Temporary/RuntimeStatefile.json\nprint render.show_edges\n")
+
+add_test(NAME f3d::TestStatefileRuntimeOverrideCliSave
+  COMMAND $<TARGET_FILE:f3d> --no-config --edges ${F3D_SOURCE_DIR}/testing/data/cow.vtp --command-script=${CMAKE_BINARY_DIR}/Testing/Temporary/runtime_statefile_save.txt --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileRuntimeOverrideCliSave.png)
+set_tests_properties(f3d::TestStatefileRuntimeOverrideCliSave PROPERTIES FIXTURES_SETUP statefile_runtime PASS_REGULAR_EXPRESSION "Statefile saved to")
+
+add_test(NAME f3d::TestStatefileRuntimeOverrideCliLoad
+  COMMAND $<TARGET_FILE:f3d> --no-config --edges ${F3D_SOURCE_DIR}/testing/data/cow.vtp --command-script=${CMAKE_BINARY_DIR}/Testing/Temporary/runtime_statefile_load.txt --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileRuntimeOverrideCliLoad.png)
+set_tests_properties(f3d::TestStatefileRuntimeOverrideCliLoad PROPERTIES FIXTURES_REQUIRED statefile_runtime PASS_REGULAR_EXPRESSION "false")
 
 # Test that f3d resolution can be controlled from config file
 add_test(NAME f3d::TestConfigResolution COMMAND $<TARGET_FILE:f3d> --config=${F3D_SOURCE_DIR}/testing/configs/resolution.json ${F3D_SOURCE_DIR}/testing/data/suzanne.stl --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestConfigResolution.png --reference=${F3D_SOURCE_DIR}/testing/baselines/TestConfigResolution.png)
@@ -26,3 +98,29 @@ set_tests_properties(f3d::TestNoFileFileNameTemplate PROPERTIES ENVIRONMENT "CTE
 
 # Test that f3d can read DPI scaling from system, note that this test has no reference baseline.
 add_test(NAME f3d::TestSystemDPIScaling COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/suzanne.stl --dpi-aware --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestSystemDPIScaling.png)
+
+if (APPLE)
+  add_test(NAME f3d::TestAppleCmdMod COMMAND $<TARGET_FILE:f3d> --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestAppleCmdMod.png --reference=${F3D_SOURCE_DIR}/testing/baselines/TestAppleCmdMod.png --resolution=400,400)
+  set_tests_properties(f3d::TestAppleCmdMod PROPERTIES ENVIRONMENT "CTEST_F3D_NO_DATA_FORCE_RENDER=1")
+endif ()
+
+# Test EGL/OSMesa load failure by loading fake libraries like libEGL.so located in ${F3D_SOURCE_DIR}/testing/data
+if (UNIX AND NOT APPLE)
+  add_test(NAME f3d::TestEGLLoadFailure COMMAND $<TARGET_FILE:f3d> --output=${CMAKE_BINARY_DIR}/Testing/Temporary/egl.png --rendering-backend=egl --verbose)
+  set_tests_properties(f3d::TestEGLLoadFailure PROPERTIES PASS_REGULAR_EXPRESSION "Cannot find EGL library")
+  set_tests_properties(f3d::TestEGLLoadFailure PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${F3D_SOURCE_DIR}/testing/data:$ENV{LD_LIBRARY_PATH}")
+
+  add_test(NAME f3d::TestOSMesaLoadFailure COMMAND $<TARGET_FILE:f3d> --output=${CMAKE_BINARY_DIR}/Testing/Temporary/osmesa.png --rendering-backend=osmesa --verbose)
+  set_tests_properties(f3d::TestOSMesaLoadFailure PROPERTIES PASS_REGULAR_EXPRESSION "Cannot find OSMesa library")
+  set_tests_properties(f3d::TestOSMesaLoadFailure PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${F3D_SOURCE_DIR}/testing/data:$ENV{LD_LIBRARY_PATH}")
+
+  if(F3D_TESTING_ENABLE_RENDERING_TESTS)
+    set(_geometry_cache "${CMAKE_BINARY_DIR}/Testing/Temporary/window_geometry_cache")
+    file(WRITE "${_geometry_cache}/f3d/cache.json" "{\"window\": {\"width\": 250, \"height\": 150, \"left\": 42, \"top\": 24}}")
+    add_test(NAME f3d::TestWindowGeometryRestore COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/cow.vtp --no-config --verbose=debug --list-bindings)
+    set_tests_properties(f3d::TestWindowGeometryRestore PROPERTIES
+      PASS_REGULAR_EXPRESSION "Applying window resolution 250x150"
+      FAIL_REGULAR_EXPRESSION "Applying window resolution 1000x600"
+      ENVIRONMENT "XDG_CACHE_HOME=${_geometry_cache};CTEST_F3D_FORCE_DPI_SCALE=1.0")
+  endif()
+endif ()

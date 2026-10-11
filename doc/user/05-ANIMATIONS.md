@@ -20,7 +20,7 @@ Press <kbd>W</kbd> to cycle through available animations
 
 <img width="1024" alt="4" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_3.png" />
 Press <kbd>space</kbd> to play/pause current animation.
-Note: A blue bar runs along the bottom of screen to indicate the current time interval of the animation sequence if animation-progress was turned on.
+Note: A blue bar runs along the bottom of screen to indicate the current time interval of the animation sequence if `--animation-progress` is set to `default` or `advanced`. The `advanced` mode additionally shows the time range, animation name and current time, and marks each key frame with a vertical line on the bar; both modes let you click or drag the bar to jump to a given time. While hovering the `advanced` bar near a key frame marker, the tooltip reports that key frame's time.
 
 <img width="1024" alt="5" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_4.png" />
 "All Animations" will play all animations at the same time if supported by the file format.
@@ -38,6 +38,8 @@ F3D animation behavior can be fully controlled from the command line using the f
 | \-\-animation\-time          |                     | Load a specific time value on start.                 |
 
 ## Exporting animation frames
+
+### Images sequence
 
 F3D can export multiple frames from an animation to image files. To do this, include `{frame}` in the output filename template:
 
@@ -61,13 +63,33 @@ f3d example.file --output=frame_{frame}.png --frame-rate=10 --animation-time=1.5
 
 See [Filename templating](03-OPTIONS.md#filename-templating) for more template variables.
 
+### Video
+
+F3D can save the animation to a video raw x264 stream:
+
+```bash
+f3d example.file --output-video=video.h264
+```
+
+The raw video file can be added to a container using FFmpeg:
+
+```bash
+ffmpeg -f h264 -i video.h264 video.mp4
+```
+
+It can be done more efficiently in one line using piping:
+
+```bash
+f3d example.file --output-video=- | ffmpeg -f h264 -i - video.mp4
+```
+
 ## Animation Interactions
 
 - Press <kbd>W</kbd> to cycle through animations
 - Press <kbd>Space</kbd> to play/pause animation
 - Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbd> to play/pause animation backward
 
-See [COMMANDS](07-COMMANDS.md) for commands like `jump_to_frame`
+See [COMMANDS](07-COMMANDS.md) for commands like `jump_to_frame`, `jump_to_key_frame` and `jump_to_time`
 
 ## Cycling Animations
 
@@ -107,9 +129,9 @@ The animation support level is listed for each reader [here](02-SUPPORTED_FORMAT
 When opening multiple files at the same time using the `--multi-file-mode` option and selecting multiple animations to show,
 F3D may warn when combining SINGLE and non SINGLE files, but will still try to respect the chosen animation indices.
 
-## Animation keyframes
+## Animation key frames
 
-The `jump_to_keyframe` command allows you to load an animation at a specific keyframe. See [COMMANDS](07-COMMANDS.md) for more information and examples on how to use this command.
+The `jump_to_key_frame` command allows you to load an animation at a specific key frame. See [COMMANDS](07-COMMANDS.md) for more information and examples on how to use this command.
 
 This command is currently supported only by the following readers:
 

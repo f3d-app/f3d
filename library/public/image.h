@@ -5,6 +5,7 @@
 #include "export.h"
 
 /// @cond
+#include <cstddef>
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -50,11 +51,22 @@ public:
    * Read provided file path (used as is) into a new image instance, the following formats are
    * supported: PNG, PNM, TIFF, BMP, HDR, JPEG, GESigna, MetaImage, TGA. EXR files are also
    * supported if the associated module is built. The complete list can be retrieved at runtime by
-   * calling getSupportedFormats().
+   * calling getSupportedFormats(). The format is identified using the file extension.
    *
    * Throws an image::read_exception in case of failure.
    */
   explicit image(const std::filesystem::path& filePath);
+
+  /**
+   * Read provided buffer into a new image instance, the following formats are
+   * supported: PNG, PNM , BMP, HDR, JPEG, TGA, WebP. EXR files are also
+   * supported if the associated module is built. The complete list
+   * can be retrieved at runtime by calling getSupportedFormats(). The format is identified by
+   * parsing the stream header. VTK >= 9.6.20260128 required.
+   *
+   * Throws an image::read_exception in case of failure.
+   */
+  image(std::byte* byte, std::size_t size);
 
   /**
    * Create an image from a given width, height, and channel count.
@@ -138,7 +150,6 @@ public:
    * on a SSIM computation, as specified in VTK.
    * Please note, due to possible arithmetic imprecision in the SSIM computation
    * a non-zero value can be returned with identical images.
-   * Depending on the VTK version, another comparison algorithm may be used.
    * Error value meaning is described below:
    *  - 1e-14: Pixel perfect comparison.
    *  - 0.04: Visually indistinguishable.

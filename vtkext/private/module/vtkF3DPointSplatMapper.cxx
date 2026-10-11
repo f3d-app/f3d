@@ -1,6 +1,6 @@
 #include "vtkF3DPointSplatMapper.h"
 
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+#ifndef F3D_USE_GLES
 #include "vtkF3DBitonicSort.h"
 #include "vtkF3DComputeDepthCS.h"
 #endif
@@ -27,14 +27,10 @@
 #include <vtkTextureObject.h>
 #include <vtkUniforms.h>
 #include <vtkVersion.h>
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
 #include <vtk_glad.h>
-#else
-#include <vtk_glew.h>
-#endif
 
 #include <algorithm>
+#include <numeric>
 #include <sstream>
 #include <vector>
 
@@ -77,7 +73,7 @@ protected:
     vtkOpenGLHelper& cellBO, vtkRenderer* ren, vtkActor* actor) override;
 
 private:
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+#ifndef F3D_USE_GLES
   vtkNew<vtkShader> DepthComputeShader;
   vtkNew<vtkShaderProgram> DepthProgram;
   vtkNew<vtkOpenGLBufferObject> DepthBuffer;
@@ -108,7 +104,7 @@ vtkStandardNewMacro(vtkF3DSplatMapperHelper);
 //----------------------------------------------------------------------------
 vtkF3DSplatMapperHelper::vtkF3DSplatMapperHelper()
 {
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+#ifndef F3D_USE_GLES
   this->DepthComputeShader->SetType(vtkShader::Compute);
   this->DepthComputeShader->SetSource(vtkF3DComputeDepthCS);
   this->DepthProgram->SetComputeShader(this->DepthComputeShader);
@@ -148,7 +144,7 @@ void vtkF3DSplatMapperHelper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act
 
   vtkOpenGLPointGaussianMapperHelper::BuildBufferObjects(ren, act);
 
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+#ifndef F3D_USE_GLES
   // allocate a buffer of depths used for sorting splats
   this->DepthBuffer->Allocate(splatCount * sizeof(float), vtkOpenGLBufferObject::ArrayBuffer,
     vtkOpenGLBufferObject::DynamicCopy);
@@ -163,7 +159,8 @@ void vtkF3DSplatMapperHelper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act
       return false;
     }
 
-    bool isValid = array->GetNumberOfComponents() == 3 && array->GetNumberOfTuples() == splatCount;
+    const bool isValid =
+      array->GetNumberOfComponents() == 3 && array->GetNumberOfTuples() == splatCount;
 
     if (!isValid)
     {
@@ -197,8 +194,8 @@ void vtkF3DSplatMapperHelper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act
       return;
     }
 
-    int width = this->MaxTextureSize;
-    int height = 1 + (splatCount / this->MaxTextureSize);
+    const int width = this->MaxTextureSize;
+    const int height = 1 + (splatCount / this->MaxTextureSize);
 
     const int sliceSize = 3 * width * height;
     std::vector<unsigned char> packedData(sliceSize * 15, 0);
@@ -348,20 +345,20 @@ bool vtkF3DSplatMapperHelper::SortNeeded(vtkRenderer* ren)
 //----------------------------------------------------------------------------
 void vtkF3DSplatMapperHelper::SortSplats(vtkRenderer* ren)
 {
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+#ifndef F3D_USE_GLES
 
   if (!this->SortNeeded(ren))
   {
     return;
   }
 
-  int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
+  const int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
 
   vtkOpenGLShaderCache* shaderCache =
     vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow())->GetShaderCache();
 
   // compute next power of two
-  unsigned int numVertsExt = vtkMath::NearestPowerOfTwo(numVerts);
+  const unsigned int numVertsExt = vtkMath::NearestPowerOfTwo(numVerts);
 
   // depth computation
   shaderCache->ReadyShaderProgram(this->DepthProgram);
@@ -389,14 +386,16 @@ void vtkF3DSplatMapperHelper::SortSplatsCPU(vtkRenderer* ren)
     return;
   }
 
-  int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
+  const int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
 
-  this->CPUSortedIndices.resize(static_cast<size_t>(numVerts));
+  if (numVerts != static_cast<int>(this->CPUSortedIndices.size()))
+  {
+    this->CPUSortedIndices.resize(static_cast<size_t>(numVerts));
+    this->CPUDepths.resize(static_cast<size_t>(numVerts));
 
-  this->Primitives[PrimitivePoints].IBO->Download(
-    this->CPUSortedIndices.data(), static_cast<size_t>(numVerts));
+    std::iota(this->CPUSortedIndices.begin(), this->CPUSortedIndices.end(), 0);
+  }
 
-  this->CPUDepths.resize(static_cast<size_t>(numVerts));
   // compute depth for each splat
   vtkPolyData* poly = this->CurrentInput;
 
@@ -410,7 +409,7 @@ void vtkF3DSplatMapperHelper::SortSplatsCPU(vtkRenderer* ren)
   }
 
   // Match bitonic sort ordering: sort ascending by depth (back-to-front given reversed direction)
-  std::sort(this->CPUSortedIndices.begin(), this->CPUSortedIndices.end(),
+  std::ranges::sort(this->CPUSortedIndices,
     [&](const GLuint& a, const GLuint& b) { return this->CPUDepths[a] < this->CPUDepths[b]; });
 
   this->Primitives[PrimitivePoints].IBO->Upload(this->CPUSortedIndices.data(),
@@ -444,7 +443,7 @@ void vtkF3DSplatMapperHelper::RenderPieceDraw(vtkRenderer* ren, vtkActor* actor)
 
   if (this->OwnerUseInstancing())
   {
-    int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
+    const int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
     if (numVerts)
     {
       this->UpdateShaders(this->Primitives[PrimitivePoints], ren, actor);
@@ -526,7 +525,7 @@ void vtkF3DSplatMapperHelper::ReplaceShaderColor(
     {
       vtkShaderProgram::Substitute(VSSource, "//VTK::Color::Dec",
         "//VTK::Color::Dec\n\n"
-        "uniform sampler2DArray sphericalHarmonics;\n"
+        "uniform mediump sampler2DArray sphericalHarmonics;\n"
         "uniform vec3 cameraDirection;\n"
         "vec3 decode(ivec3 texelIndex)\n"
         "{\n"

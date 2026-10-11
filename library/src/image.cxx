@@ -10,7 +10,9 @@
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Collection.h>
 #include <vtkImageReader2Factory.h>
+#include <vtkImageSSIM.h>
 #include <vtkJPEGWriter.h>
+#include <vtkMemoryResourceStream.h>
 #include <vtkPNGReader.h>
 #include <vtkPNGWriter.h>
 #include <vtkPointData.h>
@@ -20,12 +22,6 @@
 #include <vtkUnsignedCharArray.h>
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240729)
-#include <vtkImageSSIM.h>
-#else
-#include <vtkImageDifference.h>
-#endif
 
 #include <algorithm>
 #include <cassert>
@@ -53,7 +49,7 @@ public:
   std::unordered_map<std::string, std::string> Metadata;
 
   template<typename WriterType>
-  std::vector<unsigned char> SaveBuffer(vtkSmartPointer<WriterType> writer)
+  std::vector<unsigned char> SaveBuffer(const vtkSmartPointer<WriterType>& writer)
   {
     writer->WriteToMemoryOn();
     writer->SetInputData(this->Image);
@@ -69,8 +65,6 @@ public:
 
   void WritePngMetadata(vtkPNGWriter* pngWriter)
   {
-    // cppcheck-suppress unassignedVariable
-    // (false positive, fixed in cppcheck 2.8)
     for (const auto& [key, value] : this->Metadata)
     {
       if (!value.empty())
@@ -86,7 +80,7 @@ public:
     for (size_t i = 0; i < pngReader->GetNumberOfTextChunks(); ++i)
     {
       const vtkStdString key = pngReader->GetTextKey(static_cast<int>(i));
-      if (key.rfind(metadataKeyPrefix, 0) == 0)
+      if (key.starts_with(metadataKeyPrefix))
       {
         pngReader->GetTextChunks(key.c_str(), beginEndIndex);
         const int index = beginEndIndex[1] - 1; // only read the last key
@@ -104,8 +98,8 @@ public:
 
   static void checkSaveFormatCompatibility(const image& self, SaveFormat format)
   {
-    ChannelType type = self.getChannelType();
-    int count = self.getChannelCount();
+    const ChannelType type = self.getChannelType();
+    const int count = self.getChannelCount();
 
     switch (format)
     {
@@ -220,6 +214,61 @@ image::image(const fs::path& filePath)
 }
 
 //----------------------------------------------------------------------------
+image::image([[maybe_unused]] std::byte* buffer, [[maybe_unused]] std::size_t size)
+  : Internals(new image::internals())
+{
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260128)
+  detail::init::initialize();
+
+  if (buffer == nullptr)
+  {
+    delete this->Internals;
+    throw read_exception("Cannot read image from buffer: Buffer is empty");
+  }
+
+  vtkNew<vtkMemoryResourceStream> stream;
+  stream->SetBuffer(buffer, size);
+
+  vtkNew<vtkImageReader2Collection> availableReaders;
+  vtkImageReader2Factory::GetRegisteredReaders(availableReaders);
+
+  vtkCollectionSimpleIterator iterator;
+  vtkImageReader2* currentReader;
+  vtkSmartPointer<vtkImageReader2> reader;
+
+  for (availableReaders->InitTraversal(iterator);
+       (currentReader = availableReaders->GetNextImageReader2(iterator));)
+  {
+    if (currentReader->CanReadFile(stream) > 0)
+    {
+      reader.TakeReference(currentReader->NewInstance());
+      break;
+    }
+  }
+
+  if (reader == nullptr)
+  {
+    delete this->Internals;
+    throw read_exception("Cannot read image from buffer: No image reader supports this stream.");
+  }
+
+  reader->SetStream(stream);
+  reader->Update();
+  this->Internals->Image = reader->GetOutput();
+
+  vtkPNGReader* pngReader = vtkPNGReader::SafeDownCast(reader);
+  if (pngReader != nullptr)
+  {
+    this->Internals->ReadPngMetadata(pngReader);
+  }
+
+#else
+  delete this->Internals;
+  throw read_exception("VTK >= v9.6.20260128 is required for streaming images");
+#endif
+}
+
+//----------------------------------------------------------------------------
 image::~image()
 {
   delete this->Internals;
@@ -273,8 +322,8 @@ std::vector<std::string> image::getSupportedFormats()
   {
     std::string extensions = reader->GetFileExtensions();
 
-    std::regex re("\\s+");
-    std::sregex_token_iterator first{ extensions.begin(), extensions.end(), re, -1 }, last;
+    const std::regex re("\\s+");
+    const std::sregex_token_iterator first{ extensions.begin(), extensions.end(), re, -1 }, last;
 
     std::copy(first, last, std::back_inserter(formats));
 
@@ -332,8 +381,8 @@ unsigned int image::getChannelTypeSize() const
 //----------------------------------------------------------------------------
 image& image::setContent(void* buffer)
 {
-  unsigned int scalarSize = this->Internals->Image->GetScalarSize();
-  unsigned int totalSize =
+  const unsigned int scalarSize = this->Internals->Image->GetScalarSize();
+  const unsigned int totalSize =
     this->getWidth() * this->getHeight() * this->getChannelCount() * scalarSize;
   uint8_t* internalBuffer = static_cast<uint8_t*>(this->Internals->Image->GetScalarPointer());
   std::copy_n(static_cast<uint8_t*>(buffer), totalSize, internalBuffer);
@@ -349,13 +398,13 @@ void* image::getContent() const
 //----------------------------------------------------------------------------
 double image::compare(const image& reference) const
 {
-  ChannelType type = this->getChannelType();
+  const ChannelType type = this->getChannelType();
   if (type != reference.getChannelType())
   {
     return 1.0;
   }
 
-  unsigned int count = this->getChannelCount();
+  const unsigned int count = this->getChannelCount();
   if (count != reference.getChannelCount())
   {
     return 1.0;
@@ -371,17 +420,16 @@ double image::compare(const image& reference) const
     return 0.0;
   }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240729)
   vtkNew<vtkImageSSIM> ssim;
   std::vector<int> ranges(count);
   switch (type)
   {
     case ChannelType::BYTE:
-      std::fill(ranges.begin(), ranges.end(), 256);
+      std::ranges::fill(ranges, 256);
       ssim->SetInputRange(ranges);
       break;
     case ChannelType::SHORT:
-      std::fill(ranges.begin(), ranges.end(), 65535);
+      std::ranges::fill(ranges, 65535);
       ssim->SetInputRange(ranges);
       break;
     case ChannelType::FLOAT:
@@ -392,24 +440,33 @@ double image::compare(const image& reference) const
   ssim->SetInputData(this->Internals->Image);
   ssim->SetInputData(1, reference.Internals->Image);
   ssim->Update();
-  vtkDoubleArray* scalars = vtkArrayDownCast<vtkDoubleArray>(
+  // NOLINTNEXTLINE(misc-const-correctness) not const on older VTK
+  vtkSmartPointer<vtkDoubleArray> scalars = vtkArrayDownCast<vtkDoubleArray>(
     vtkDataSet::SafeDownCast(ssim->GetOutputDataObject(0))->GetPointData()->GetScalars());
 
   // Thanks to the checks above, this is always true
   assert(scalars != nullptr);
 
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260623)
+  // vtkImageSSIM::ComputeErrorMetrics didn't work for RGBA images,
+  // so we need to remove the alpha channel
+  if (count == 4)
+  {
+    vtkNew<vtkDoubleArray> scalarsWithoutAlpha;
+    scalarsWithoutAlpha->SetNumberOfComponents(3);
+    scalarsWithoutAlpha->SetNumberOfTuples(scalars->GetNumberOfTuples());
+    for (vtkIdType i = 0; i < scalars->GetNumberOfTuples(); ++i)
+    {
+      scalarsWithoutAlpha->SetTuple(i, scalars->GetTuple(i));
+    }
+
+    scalars = scalarsWithoutAlpha;
+  }
+#endif
+
   double error, unused;
   vtkImageSSIM::ComputeErrorMetrics(scalars, error, unused);
   return error;
-#else
-  vtkNew<vtkImageDifference> imDiff;
-  imDiff->SetThreshold(0);
-  imDiff->SetInputData(this->Internals->Image);
-  imDiff->SetImageData(reference.Internals->Image);
-  imDiff->Update();
-  double error = imDiff->GetThresholdedError();
-  return error / 1000.0;
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -434,7 +491,7 @@ std::vector<double> image::getNormalizedPixel(const std::pair<int, int>& xy) con
 
   for (size_t i = 0; i < pixel.size(); i++)
   {
-    double v = this->Internals->Image->GetScalarComponentAsDouble(
+    const double v = this->Internals->Image->GetScalarComponentAsDouble(
       xy.first, xy.second, 0, static_cast<int>(i));
 
     switch (this->getChannelType())
@@ -464,7 +521,7 @@ const image& image::save(const fs::path& filePath, SaveFormat format) const
   {
     case SaveFormat::PNG:
     {
-      vtkNew<vtkPNGWriter> pngWriter;
+      const vtkNew<vtkPNGWriter> pngWriter;
       this->Internals->WritePngMetadata(pngWriter);
       writer = pngWriter;
     }
@@ -483,7 +540,7 @@ const image& image::save(const fs::path& filePath, SaveFormat format) const
   try
   {
     // Ensure the directories exists if not empty
-    fs::path parent = filePath.parent_path();
+    const fs::path parent = filePath.parent_path();
     if (!parent.empty())
     {
       fs::create_directories(parent);
@@ -515,7 +572,7 @@ std::vector<unsigned char> image::saveBuffer(SaveFormat format) const
   {
     case SaveFormat::PNG:
     {
-      vtkSmartPointer<vtkPNGWriter> writer = vtkSmartPointer<vtkPNGWriter>::New();
+      const vtkSmartPointer<vtkPNGWriter> writer = vtkSmartPointer<vtkPNGWriter>::New();
       this->Internals->WritePngMetadata(writer);
       return this->Internals->SaveBuffer(writer);
     }
@@ -606,9 +663,9 @@ const image& image::toTerminalText(std::ostream& stream) const
   };
 
   constexpr std::string_view EMPTY_BLOCK = " ";
-  constexpr std::string_view TOP_BLOCK = u8"\u2580";
-  constexpr std::string_view BOTTOM_BLOCK = u8"\u2584";
-  constexpr std::string_view FULL_BLOCK = u8"\u2588";
+  constexpr std::string_view TOP_BLOCK = "\u2580";
+  constexpr std::string_view BOTTOM_BLOCK = "\u2584";
+  constexpr std::string_view FULL_BLOCK = "\u2588";
   constexpr std::string_view EOL = "\n";
 
   for (int y = 0; y < height; y += 2)
@@ -698,8 +755,8 @@ std::string image::getMetadata(const std::string& key) const
 std::vector<std::string> image::allMetadata() const
 {
   std::vector<std::string> keys;
-  std::transform(this->Internals->Metadata.begin(), this->Internals->Metadata.end(),
-    std::back_inserter(keys), [](const auto& kv) { return kv.first; });
+  std::ranges::transform(
+    this->Internals->Metadata, std::back_inserter(keys), [](const auto& kv) { return kv.first; });
   return keys;
 }
 

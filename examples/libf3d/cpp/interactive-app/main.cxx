@@ -75,9 +75,15 @@ void AddCustomCommands(f3d::engine& eng)
     [&eng](const std::vector<std::string>&)
     {
       auto& o = eng.getOptions();
-      o.render.effect.antialiasing.enable = !o.render.effect.antialiasing.enable;
-      // keep mode at fxaa in this example
-      o.render.effect.antialiasing.mode = "fxaa";
+      if (o.render.effect.antialiasing.mode == "none")
+      {
+        // keep mode at fxaa in this example
+        o.render.effect.antialiasing.mode = "fxaa";
+      }
+      else // if (o.render.effect.antialiasing == "fxaa")
+      {
+        o.render.effect.antialiasing.mode = "none";
+      }
     },
     f3d::interactor::command_documentation_t{ "toggle_fxaa", "Toggle FXAA anti-aliasing" });
 
@@ -93,7 +99,7 @@ void AddCustomCommands(f3d::engine& eng)
     f3d::interactor::command_documentation_t{ "toggle_tonemapping", "Toggle tone mapping" });
 }
 
-void AddCustomBindins(f3d::engine& eng)
+void AddCustomBindings(f3d::engine& eng)
 {
   // Get the interactor
   f3d::interactor& inter = eng.getInteractor();
@@ -103,7 +109,8 @@ void AddCustomBindins(f3d::engine& eng)
 
   auto docTgl = [](const std::string& doc, const bool& val)
   { return std::pair(doc, (val ? "ON" : "OFF")); };
-  auto docStr = [](const std::string& doc) { return std::pair(doc, ""); };
+  auto docStr = [](const std::string& doc, const std::string& val = "")
+  { return std::pair(doc, val); };
   auto docDblOpt = [](const std::string& doc, const std::optional<double>& val)
   {
     std::stringstream valStream;
@@ -121,43 +128,44 @@ void AddCustomBindins(f3d::engine& eng)
   };
 
   // R: reset options
-  inter.addBinding({ f3d::interaction_bind_t::ModifierKeys::SHIFT, "R" }, "reset_options",
-    "Example", std::bind(docStr, "Reset Options"), f3d::interactor::BindingType::OTHER);
+  inter.addBinding({ { f3d::interaction_bind_t::ModifierKeys::SHIFT, "R" }, { "reset_options" },
+    "Example", std::bind(docStr, "Reset Options"), f3d::interactor::BindingType::OTHER });
 
   // SHIFT + S: Increase animation speed
-  inter.addBinding({ f3d::interaction_bind_t::ModifierKeys::SHIFT, "S" },
-    "increase_animation_speed_factor", "Example",
+  inter.addBinding({ { f3d::interaction_bind_t::ModifierKeys::SHIFT, "S" },
+    { "increase_animation_speed_factor" }, { "Example" },
     std::bind(docDblOpt, "Increase animation speed", std::cref(opt.scene.animation.speed_factor)),
-    f3d::interactor::BindingType::NUMERICAL);
+    f3d::interactor::BindingType::NUMERICAL });
 
   // CTRL + S: Decrease animation speed
-  inter.addBinding({ f3d::interaction_bind_t::ModifierKeys::CTRL, "S" },
-    "decrease_animation_speed_factor", "Example",
+  inter.addBinding({ { f3d::interaction_bind_t::ModifierKeys::CTRL, "S" },
+    { "decrease_animation_speed_factor" }, "Example",
     std::bind(docDblOpt, "Decrease animation speed", std::cref(opt.scene.animation.speed_factor)),
-    f3d::interactor::BindingType::NUMERICAL);
+    f3d::interactor::BindingType::NUMERICAL });
 
   // G: toggle grid
   inter.removeBinding({ f3d::interaction_bind_t::ModifierKeys::NONE, "G" });
-  inter.addBinding(f3d::interaction_bind_t::parse("G"), "toggle_grid", "Example",
+  inter.addBinding({ f3d::interaction_bind_t::parse("G"), { "toggle_grid" }, "Example",
     std::bind(docTgl, "Toggle grid", std::cref(opt.render.grid.enable)),
-    f3d::interactor::BindingType::TOGGLE);
+    f3d::interactor::BindingType::TOGGLE });
 
   // X: toggle axis
   inter.removeBinding({ f3d::interaction_bind_t::ModifierKeys::NONE, "X" });
-  inter.addBinding(f3d::interaction_bind_t::parse("X"), "toggle_axis", "Example",
-    std::bind(docTgl, "Toggle axis", std::cref(opt.ui.axis)), f3d::interactor::BindingType::TOGGLE);
+  inter.addBinding({ f3d::interaction_bind_t::parse("X"), { "toggle_axis" }, "Example",
+    std::bind(docTgl, "Toggle axis", std::cref(opt.ui.axis)),
+    f3d::interactor::BindingType::TOGGLE });
 
   // F: toggle FXAA
   inter.removeBinding({ f3d::interaction_bind_t::ModifierKeys::NONE, "F" });
-  inter.addBinding(f3d::interaction_bind_t::parse("F"), "toggle_fxaa", "Example",
-    std::bind(docTgl, "Toggle FXAA", std::cref(opt.render.effect.antialiasing.enable)),
-    f3d::interactor::BindingType::TOGGLE);
+  inter.addBinding({ f3d::interaction_bind_t::parse("F"), { "toggle_fxaa" }, "Example",
+    std::bind(docStr, "Toggle FXAA", std::cref(opt.render.effect.antialiasing.mode)),
+    f3d::interactor::BindingType::TOGGLE });
 
   // T: toggle tone mapping
   inter.removeBinding({ f3d::interaction_bind_t::ModifierKeys::NONE, "T" });
-  inter.addBinding(f3d::interaction_bind_t::parse("T"), "toggle_tonemapping", "Example",
+  inter.addBinding({ f3d::interaction_bind_t::parse("T"), { "toggle_tonemapping" }, "Example",
     std::bind(docTgl, "Toggle Tone Mapping", std::cref(opt.render.effect.tone_mapping)),
-    f3d::interactor::BindingType::TOGGLE);
+    f3d::interactor::BindingType::TOGGLE });
 }
 }
 
@@ -185,16 +193,15 @@ int main(int argc, char** argv)
   // UI overlays: axis + some HUD
   opt.ui.axis = true;
   opt.ui.fps = true;
-  opt.ui.animation_progress = true;
+  opt.ui.animation_progress = "default";
   opt.ui.filename = true;
 
   // FXAA + tone mapping
-  opt.render.effect.antialiasing.enable = true;
   opt.render.effect.antialiasing.mode = "fxaa";
   opt.render.effect.tone_mapping = true;
 
   ::AddCustomCommands(eng);
-  ::AddCustomBindins(eng);
+  ::AddCustomBindings(eng);
 
   try
   {
@@ -218,7 +225,8 @@ int main(int argc, char** argv)
     try
     {
       int timeout = std::stoi(argv[2]);
-      inter.start(timeout, [&inter]() { inter.stop(); });
+      inter.setEventLoopUserCallback([&inter](f3d::interactor_state_t) { inter.stop(); });
+      inter.start(timeout);
     }
     catch (const std::exception& e)
     {

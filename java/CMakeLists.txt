@@ -9,9 +9,11 @@ if (NOT ANDROID)
 endif()
 
 set(F3D_JAVA_SOURCES
+  Animation.java
   Camera.java
   Context.java
   Engine.java
+  F3DException.java
   Image.java
   Interactor.java
   Log.java
@@ -20,6 +22,9 @@ set(F3D_JAVA_SOURCES
   Transform2D.java
   Types.java
   Utils.java
+  VideoEncoder.java
+  VideoFrame.java
+  VideoPacket.java
   Window.java)
 
 # Generate JNI headers, and builds a JAR package
@@ -29,6 +34,7 @@ add_jar(f3d-jar ${F3D_JAVA_SOURCES}
   OUTPUT_NAME f3d)
 
 set(F3D_JAVA_BINDINGS_SOURCES
+  F3DAnimationBindings.cxx
   F3DCameraBindings.cxx
   F3DContextBindings.cxx
   F3DEngineBindings.cxx
@@ -39,6 +45,7 @@ set(F3D_JAVA_BINDINGS_SOURCES
   F3DSceneBindings.cxx
   F3DTypesBindings.cxx
   F3DUtilsBindings.cxx
+  F3DVideoBindings.cxx
   F3DWindowBindings.cxx)
 
 add_library(javaf3d SHARED ${F3D_JAVA_BINDINGS_SOURCES})

@@ -18,7 +18,7 @@ public:
   void Execute(vtkObject* caller, unsigned long vtkNotUsed(evId), void* data) override
   {
     const vtkF3DAssimpImporter* importer = reinterpret_cast<vtkF3DAssimpImporter*>(caller);
-    char* message = static_cast<char*>(data);
+    const char* message = static_cast<char*>(data);
     if (importer && message)
     {
       this->Messages.emplace_back(message);
@@ -51,7 +51,7 @@ int TestF3DAssimpImportError(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
     return EXIT_FAILURE;
   }
 
-  auto lastMessage = errorMessages.back();
+  const auto& lastMessage = errorMessages.back();
   if (lastMessage.find("Assimp error") == std::string::npos)
   {
     std::cerr << "No Assimp error triggered!\n";

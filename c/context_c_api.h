@@ -21,7 +21,7 @@ extern "C"
   /**
    * @brief Create a GLX context.
    *
-   * The returned context must be deleted with f3d_context_delete().
+   * The returned context must be deleted with f3d_context_destroy().
    *
    * @return Context handle. NULL if the context cannot be created.
    */
@@ -30,7 +30,7 @@ extern "C"
   /**
    * @brief Create a WGL context.
    *
-   * The returned context must be deleted with f3d_context_delete().
+   * The returned context must be deleted with f3d_context_destroy().
    *
    * @return Context handle. NULL if the context cannot be created.
    */
@@ -39,7 +39,7 @@ extern "C"
   /**
    * @brief Create a COCOA context.
    *
-   * The returned context must be deleted with f3d_context_delete().
+   * The returned context must be deleted with f3d_context_destroy().
    *
    * @return Context handle. NULL if the context cannot be created.
    */
@@ -48,7 +48,7 @@ extern "C"
   /**
    * @brief Create an EGL context.
    *
-   * The returned context must be deleted with f3d_context_delete().
+   * The returned context must be deleted with f3d_context_destroy().
    *
    * @return Context handle. NULL if the context cannot be created.
    */
@@ -57,7 +57,7 @@ extern "C"
   /**
    * @brief Create an OSMesa context.
    *
-   * The returned context must be deleted with f3d_context_delete().
+   * The returned context must be deleted with f3d_context_destroy().
    *
    * @return Context handle. NULL if the context cannot be created.
    */
@@ -66,7 +66,7 @@ extern "C"
   /**
    * @brief Create a context from a library name and function name.
    *
-   * The returned context must be deleted with f3d_context_delete().
+   * The returned context must be deleted with f3d_context_destroy().
    *
    * @param lib Library name.
    * @param func Function name to resolve.
@@ -79,7 +79,7 @@ extern "C"
    *
    * @param ctx Context handle.
    */
-  F3D_EXPORT void f3d_context_delete(f3d_context_t* ctx);
+  F3D_EXPORT void f3d_context_destroy(f3d_context_t* ctx);
 
 #ifdef __cplusplus
 }

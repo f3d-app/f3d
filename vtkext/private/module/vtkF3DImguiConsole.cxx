@@ -1,6 +1,7 @@
 #include "vtkF3DImguiConsole.h"
 
 #include "F3DStyle.h"
+#include "F3DUtils.h"
 #include "vtkF3DUserEvents.h"
 
 #include <vtkCallbackCommand.h>
@@ -12,6 +13,7 @@
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <cstdint>
 
 struct vtkF3DImguiConsole::Internals
@@ -36,6 +38,8 @@ struct vtkF3DImguiConsole::Internals
   std::vector<std::string> CommandHistory;
   std::pair<std::string, int> LastInput; // Last input before navigating history
   int CommandHistoryIndexInv = -1;       // Current inverted index in command history navigation
+  bool ScrollToBottom = false;
+  std::chrono::system_clock::time_point LastCopyTime;
 
   /**
    * Clear completions from the logs
@@ -60,7 +64,7 @@ struct vtkF3DImguiConsole::Internals
       case ImGuiInputTextFlags_CallbackCompletion:
       {
         assert(this->CompletionCallback);
-        std::string pattern{ data->Buf };
+        const std::string pattern{ data->Buf };
         std::vector<std::string> candidates =
           this->CompletionCallback(pattern); // List of candidates completion
 
@@ -73,6 +77,7 @@ struct vtkF3DImguiConsole::Internals
         }
         else if (candidates.size() > 1)
         {
+          // NOLINTNEXTLINE(misc-const-correctness) not const on Windows/Mac
           std::string_view bestCandidate = candidates[0];
 #if defined(_WIN32) || defined(__APPLE__)
           // Find which candidate matches the casing of the pattern the best
@@ -116,7 +121,7 @@ struct vtkF3DImguiConsole::Internals
             {
               // Check if all candidates match the current character
               const char target = bestCandidate[matchLen];
-              allCandidatesMatches = std::all_of(candidates.begin(), candidates.end(),
+              allCandidatesMatches = std::ranges::all_of(candidates,
                 [matchLen, target](const std::string& s)
                 {
                   return s.size() > matchLen &&
@@ -151,10 +156,11 @@ struct vtkF3DImguiConsole::Internals
           // Add all candidates to the logs
           this->Logs.emplace_back(
             std::make_pair(Internals::LogType::Completion, "Possible matches:"));
-          std::transform(candidates.begin(), candidates.end(), std::back_inserter(this->Logs),
+          std::ranges::transform(candidates, std::back_inserter(this->Logs),
             [](const std::string& candidate)
             { return std::make_pair(Internals::LogType::Completion, candidate); });
         }
+        this->ScrollToBottom = true;
         break;
       }
       case ImGuiInputTextFlags_CallbackHistory:
@@ -192,7 +198,7 @@ struct vtkF3DImguiConsole::Internals
           {
             /* We should not be able to have negative index here */
             /* Retrieve the command from history */
-            std::string historyStr =
+            const std::string historyStr =
               this->CommandHistory[histSize - this->CommandHistoryIndexInv - 1];
             data->DeleteChars(0, data->BufTextLen);
             data->InsertChars(0, historyStr.c_str());
@@ -219,7 +225,7 @@ vtkF3DImguiConsole::~vtkF3DImguiConsole() = default;
 //----------------------------------------------------------------------------
 void vtkF3DImguiConsole::DisplayText(const char* text)
 {
-  MessageTypes type = this->GetCurrentMessageType();
+  const MessageTypes type = this->GetCurrentMessageType();
   if (this->GetDisplayStream(type) != StreamType::Null)
   {
     switch (type)
@@ -274,8 +280,9 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
 
   ImGui::SetNextWindowBgAlpha(0.9f);
 
-  ImGuiWindowFlags winFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
-    ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+  const ImGuiWindowFlags winFlags = ImGuiWindowFlags_NoDecoration |
+    ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing |
+    ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
 
   // Since imgui has focus, it won't propagate the "Escape" key event to VTK
   // So let's handle the console visibility here
@@ -296,9 +303,26 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
     if (ImGui::BeginChild(
           "LogRegion", ImVec2(0, -reservedHeight), 0, ImGuiWindowFlags_HorizontalScrollbar))
     {
-      ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1)); // Tighten spacing
-      for (const auto& [severity, msg] : this->Pimpl->Logs)
+      // tighten spacing for log entries
+      ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+      ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+
+      std::string currentText;
+
+      for (size_t logId = 0; logId < this->Pimpl->Logs.size(); ++logId)
       {
+        const auto& [severity, msg] = this->Pimpl->Logs[logId];
+
+        currentText += msg;
+
+        // Merge consecutive log entries with the same severity into a single block to allow
+        // selection of multiple log entries at once
+        if (logId != this->Pimpl->Logs.size() - 1 && severity == this->Pimpl->Logs[logId + 1].first)
+        {
+          currentText += '\n';
+          continue;
+        }
+
         bool hasColor = true;
 
         if (this->GetUseColoring())
@@ -326,11 +350,29 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
           hasColor = false;
         }
 
-        ImGui::TextUnformatted(msg.c_str());
+        // Generate a unique ID for the log entry based on its index
+        const std::string id = "##log" + std::to_string(logId);
+
+        ImVec2 textSize = ImGui::CalcTextSize(currentText.c_str());
+
+        const size_t lineCount = std::ranges::count(currentText, '\n') + 1;
+        textSize.y = static_cast<float>(lineCount) * ImGui::GetTextLineHeightWithSpacing();
+
+        ImGui::InputTextMultiline(id.c_str(), const_cast<char*>(currentText.c_str()),
+          currentText.size() + 1, textSize, ImGuiInputTextFlags_ReadOnly);
+
         if (hasColor)
         {
           ImGui::PopStyleColor();
         }
+
+        currentText.clear();
+      }
+
+      if (this->Pimpl->ScrollToBottom)
+      {
+        ImGui::SetScrollHereY(1.0f);
+        this->Pimpl->ScrollToBottom = false;
       }
 
       if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
@@ -338,7 +380,68 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
         ImGui::SetScrollHereY(1.0f);
       }
 
-      ImGui::PopStyleVar();
+      ImGui::PopStyleVar(2);
+
+      // copy button
+#ifdef F3D_MODULE_CLIP
+      const ImVec2 old = ImGui::GetCursorScreenPos();
+
+      const ImVec2 winPos = ImGui::GetWindowPos();
+      const ImVec2 winSize = ImGui::GetWindowSize();
+
+      constexpr float btnFontScale = 2.0f;
+      const float btnSize = btnFontScale * ImGui::GetFontSize();
+
+      const float scrollbarWidth =
+        ImGui::GetScrollMaxY() > 0.0f ? ImGui::GetStyle().ScrollbarSize * btnFontScale : 0.0f;
+
+      const ImVec2 btnPos(winPos.x + winSize.x - scrollbarWidth - btnSize, winPos.y);
+      ImGui::SetCursorScreenPos(btnPos);
+
+      const bool hovered =
+        ImGui::IsMouseHoveringRect(btnPos, ImVec2(btnPos.x + btnSize, btnPos.y + btnSize));
+
+      ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
+      ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+      ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+      ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+      ImGui::SetWindowFontScale(btnFontScale);
+
+      // change the button icon for 1 second when pressed to provide visual feedback
+      auto currentTime = std::chrono::system_clock::now();
+      if (currentTime - this->Pimpl->LastCopyTime < std::chrono::seconds(1))
+      {
+        ImGui::PushStyleColor(ImGuiCol_Text, F3DStyle::imgui::GetCompletionColor());
+        ImGui::Button("\ueab2", ImVec2(btnSize, btnSize));
+      }
+      else
+      {
+        ImGui::PushStyleColor(ImGuiCol_Text,
+          hovered ? F3DStyle::imgui::GetHighlightColor() : ImGui::GetStyleColorVec4(ImGuiCol_Text));
+        ImGui::Button("\uebcc", ImVec2(btnSize, btnSize));
+      }
+
+      // InputTextMultiline spawns its own child window, which wins hover/click
+      // so detect the click from raw mouse state instead
+      if (hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+      {
+        std::string logs;
+        for (const auto& [_, text] : this->Pimpl->Logs)
+        {
+          logs += text;
+          logs += '\n';
+        }
+        F3DUtils::CopyToClipboard(logs);
+        this->Pimpl->LastCopyTime = currentTime;
+      }
+
+      ImGui::SetWindowFontScale(1.0f);
+      ImGui::PopStyleColor(4);
+      ImGui::PopStyleVar(2);
+
+      ImGui::SetCursorScreenPos(old);
+#endif
     }
     ImGui::EndChild();
 
@@ -346,7 +449,7 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
   }
 
   // input
-  ImGuiInputTextFlags inputFlags = ImGuiInputTextFlags_EnterReturnsTrue |
+  const ImGuiInputTextFlags inputFlags = ImGuiInputTextFlags_EnterReturnsTrue |
     ImGuiInputTextFlags_EscapeClearsAll | ImGuiInputTextFlags_CallbackCompletion |
     ImGuiInputTextFlags_CallbackHistory;
 
@@ -357,11 +460,12 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
 
   auto TextEditCallbackStub = [](ImGuiInputTextCallbackData* data) -> int
   {
-    vtkF3DImguiConsole::Internals* internals = (vtkF3DImguiConsole::Internals*)data->UserData;
+    vtkF3DImguiConsole::Internals* internals =
+      static_cast<vtkF3DImguiConsole::Internals*>(data->UserData);
     return internals->TextEditCallback(data);
   };
 
-  bool runCommand = ImGui::InputTextWithHint("##ConsoleInput", "Type a command...",
+  const bool runCommand = ImGui::InputTextWithHint("##ConsoleInput", "Type a command...",
     this->Pimpl->CurrentInput.data(), sizeof(this->Pimpl->CurrentInput), inputFlags,
     TextEditCallbackStub, this->Pimpl.get());
   ImGui::PopItemWidth();
@@ -408,14 +512,14 @@ void vtkF3DImguiConsole::ShowBadge()
   if (this->Pimpl->NewError || this->Pimpl->NewWarning)
   {
     constexpr float margin = F3DStyle::GetDefaultMargin();
-    ImVec2 badgeSize = this->GetBadgeSize();
+    const ImVec2 badgeSize = this->GetBadgeSize();
 
     ImGui::SetNextWindowPos(ImVec2(viewport->WorkSize.x - badgeSize.x - margin, margin));
     ImGui::SetNextWindowSize(badgeSize);
     ImGui::SetNextWindowBgAlpha(0.9f);
 
-    ImGuiWindowFlags winFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
-      ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+    const ImGuiWindowFlags winFlags = ImGuiWindowFlags_NoDecoration |
+      ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
 
     ImGui::Begin("ConsoleAlert", nullptr, winFlags);
 
@@ -435,6 +539,12 @@ void vtkF3DImguiConsole::ShowBadge()
 
     ImGui::End();
   }
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DImguiConsole::IsBadgeVisible() const
+{
+  return this->Pimpl->NewError || this->Pimpl->NewWarning;
 }
 
 //----------------------------------------------------------------------------

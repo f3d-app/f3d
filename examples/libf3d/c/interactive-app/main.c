@@ -36,7 +36,7 @@ int main(int argc, char** argv)
   if (!options)
   {
     fprintf(stderr, "Failed to get options\n");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return EXIT_FAILURE;
   }
 
@@ -44,21 +44,21 @@ int main(int argc, char** argv)
   f3d_options_set_as_bool(options, "render.show_edges", 1);
   f3d_options_set_as_bool(options, "ui.axis", 1);
   f3d_options_set_as_bool(options, "ui.fps", 1);
-  f3d_options_set_as_bool(options, "ui.animation_progress", 1);
+  f3d_options_set_as_string(options, "ui.animation_progress", "default");
   f3d_options_set_as_bool(options, "ui.filename", 1);
 
   f3d_scene_t* scene = f3d_engine_get_scene(engine);
   if (!scene)
   {
     fprintf(stderr, "Failed to get scene\n");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return EXIT_FAILURE;
   }
 
   if (!f3d_scene_add(scene, file))
   {
     fprintf(stderr, "Failed to load file: %s\n", file);
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return EXIT_FAILURE;
   }
 
@@ -66,7 +66,7 @@ int main(int argc, char** argv)
   if (!window)
   {
     fprintf(stderr, "Failed to get window\n");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return EXIT_FAILURE;
   }
 
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
   if (!interactor)
   {
     fprintf(stderr, "Failed to get interactor\n");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return EXIT_FAILURE;
   }
 
@@ -84,14 +84,15 @@ int main(int argc, char** argv)
   {
     // For testing purposes only, shutdown the example after `timeout` seconds
     int timeout = atoi(argv[2]);
-    f3d_interactor_start_with_callback(interactor, timeout, timeout_callback, interactor);
+    f3d_interactor_set_event_loop_user_callback(interactor, timeout_callback, interactor);
+    f3d_interactor_start(interactor, timeout);
   }
   else
   {
     f3d_interactor_start(interactor, 1.0 / 30.0);
   }
 
-  f3d_engine_delete(engine);
+  f3d_engine_destroy(engine);
 
   return EXIT_SUCCESS;
 }

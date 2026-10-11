@@ -4,12 +4,44 @@
 #include "engine.h"
 
 #include <EGL/egl.h>
+#include <EGL/eglext.h>
 
 int TestSDKExternalWindowEGL([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
 
   EGLDisplay eglDpy = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+
+  PFNEGLQUERYDEVICESEXTPROC eglQueryDevicesEXT =
+    reinterpret_cast<PFNEGLQUERYDEVICESEXTPROC>(eglGetProcAddress("eglQueryDevicesEXT"));
+  PFNEGLGETPLATFORMDISPLAYEXTPROC eglGetPlatformDisplayEXT =
+    reinterpret_cast<PFNEGLGETPLATFORMDISPLAYEXTPROC>(
+      eglGetProcAddress("eglGetPlatformDisplayEXT"));
+  PFNEGLQUERYDEVICESTRINGEXTPROC eglQueryDeviceStringEXT =
+    reinterpret_cast<PFNEGLQUERYDEVICESTRINGEXTPROC>(eglGetProcAddress("eglQueryDeviceStringEXT"));
+
+  EGLDeviceEXT devices[16];
+  EGLint numDev = 0;
+
+  if (eglQueryDevicesEXT)
+  {
+    eglQueryDevicesEXT(16, devices, &numDev);
+
+    if (eglQueryDeviceStringEXT)
+    {
+      for (int i = 0; i < numDev; ++i)
+      {
+        const char* deviceExts = eglQueryDeviceStringEXT(devices[i], EGL_EXTENSIONS);
+        std::cout << "EGL device " << i << " extensions: " << (deviceExts ? deviceExts : "(none)")
+                  << '\n';
+      }
+    }
+
+    if (numDev > 0 && eglGetPlatformDisplayEXT)
+    {
+      eglDpy = eglGetPlatformDisplayEXT(EGL_PLATFORM_DEVICE_EXT, devices[0], nullptr);
+    }
+  }
 
   // initialize
   EGLint major, minor;
@@ -45,6 +77,8 @@ int TestSDKExternalWindowEGL([[maybe_unused]] int argc, [[maybe_unused]] char* a
       eng.getWindow(), std::string(argv[1]) + "baselines/", argv[2], "TestSDKExternalWindowEGL"));
 
   // terminate EGL when finished
+  eglDestroyContext(eglDpy, eglCtx);
+  eglDestroySurface(eglDpy, eglSurf);
   eglTerminate(eglDpy);
 
   return test.result();

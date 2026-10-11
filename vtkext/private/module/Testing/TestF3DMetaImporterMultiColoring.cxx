@@ -39,7 +39,7 @@ int TestF3DMetaImporterMultiColoring(int argc, char* argv[])
   importer->AddImporter({ "foo", importerVTS });
 
   vtkNew<vtkRenderWindow> window;
-  vtkNew<vtkRenderer> renderer;
+  const vtkNew<vtkRenderer> renderer;
   window->AddRenderer(renderer);
   importer->SetRenderWindow(window);
   importer->Update();
@@ -47,7 +47,7 @@ int TestF3DMetaImporterMultiColoring(int argc, char* argv[])
   // Test coloring handler
   F3DColoringInfoHandler& coloringHandler = importer->GetColoringInfoHandler();
 
-  auto info = coloringHandler.SetCurrentColoring(true, false, "Momentum", false);
+  auto info = coloringHandler.SetCurrentColoring(false, false, std::nullopt, "Momentum", false);
   if (!info.has_value())
   {
     std::cerr << "Coloring handler unable to set coloring as expected\n";

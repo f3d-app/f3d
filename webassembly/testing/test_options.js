@@ -8,20 +8,20 @@ const settings = {
 
     // set a bunch of options of each type
     options.setAsString("render.background.color", "#000000");
-    options.toggle("model.scivis.enable");
+    options.toggle("render.grid.enable");
     options.setAsString("model.scivis.array_name", "Colors");
-    options.setAsString("model.scivis.component", "-2");
+    options.setAsString("model.coloring", "direct");
     options.setAsString("model.scivis.range", "0.7,1.4"); // not used for the baseline, only for coverage
 
     utils.assert(options.getAsString("model.scivis.array_name") === "Colors");
 
     // check that the getter works
     utils.assert(
-      options.get("model.scivis.enable") === true,
+      options.get("render.grid.enable") === true,
       "options getter for boolean failed",
     );
     utils.assert(
-      options.get("model.scivis.component") === -2,
+      options.get("render.grid.subdivisions") === 10,
       "options getter for int failed",
     );
     utils.assert(
@@ -29,7 +29,7 @@ const settings = {
       "options getter for double failed",
     );
     utils.assert(
-      options.get("model.point_sprites.type") === "sphere",
+      options.get("model.point_sprites.type") === "none",
       "options getter for string failed",
     );
 
@@ -57,10 +57,10 @@ const settings = {
     );
 
     const options2 = new Module.Options();
-    options2.toggle("model.scivis.enable");
+    options2.toggle("render.grid.enable");
 
     utils.assert(
-      options.isSame(options2, "model.scivis.enable"),
+      options.isSame(options2, "render.grid.enable"),
       "options isSame",
     );
     utils.assert(
@@ -105,16 +105,69 @@ const settings = {
       "options !isOptional",
     );
 
+    utils.assert(
+      options.getType("model.point_sprites.size") === Module.OptionType.DOUBLE,
+      "options getType",
+    );
+
     options.removeValue("model.scivis.array_name");
     utils.assert(
       !options.hasValue("model.scivis.array_name"),
       "options !hasValue after removal",
     );
 
-    options.reset("model.scivis.enable");
+    options.reset("render.grid.enable");
     utils.assert(
-      options.get("model.scivis.enable") === false,
+      options.get("render.grid.enable") === false,
       "options getter after reset",
+    );
+
+    utils.assert(options.hasDomain("scene.camera.index"), "options hasDomain");
+    utils.assert(
+      options.getDomainStyle("scene.camera.index") ==
+        Module.OptionsDomainStyle.INDEX,
+      "option getDomainStyle",
+    );
+
+    const doubleRange = options.getRangeDomainAsNumber("render.line_width");
+    utils.assert(
+      doubleRange[0] === 0.0 &&
+        doubleRange[1] === 10.0 &&
+        doubleRange[2] === 0.1,
+      "options getRangeDomain double",
+    );
+    const intRange = options.getRangeDomainAsNumber(
+      "render.raytracing.samples",
+    );
+    utils.assert(
+      intRange[0] === 1.0 && intRange[1] === 50.0 && intRange[2] === 1.0,
+      "options getRangeDomain int",
+    );
+
+    utils.assert(
+      options
+        .getEnumDomainAsString("render.effect.blending.mode")
+        .includes("ddp"),
+      "options getEnumDomain",
+    );
+
+    // Cannot check anything but `undefined` without complex engine manipulation
+    utils.assert(
+      options.getIndexDomain("scene.camera.index") == undefined,
+      "options getIndexDomain",
+    );
+
+    options.increase("render.raytracing.samples");
+    options.increase("render.raytracing.samples");
+    options.decrease("render.raytracing.samples");
+    utils.assert(
+      options.get("render.raytracing.samples") == 6,
+      "options increase/decrease",
+    );
+    options.cycle("render.effect.blending.mode");
+    utils.assert(
+      options.get("render.effect.blending.mode") == "ddp",
+      "options cycle",
     );
   },
 };

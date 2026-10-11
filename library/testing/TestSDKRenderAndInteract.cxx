@@ -18,7 +18,8 @@ int TestSDKRenderAndInteract([[maybe_unused]] int argc, [[maybe_unused]] char* a
   win.render();
 
   f3d::interactor& inter = eng.getInteractor();
-  inter.start(1, [&inter]() { inter.stop(); });
+  inter.setEventLoopUserCallback([&inter](f3d::interactor_state_t) { inter.requestStop(); });
+  inter.start(1);
 
   return EXIT_SUCCESS;
 }

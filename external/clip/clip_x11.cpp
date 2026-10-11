@@ -6,8 +6,7 @@
 
 #include "clip.h"
 #include "clip_lock_impl.h"
-
-#include <xcb/xcb.h>
+#include "clip_xcb_functions.h"
 
 #include <atomic>
 #include <algorithm>
@@ -75,17 +74,27 @@ public:
 
   Manager()
     : m_lock(m_mutex, std::defer_lock)
-    , m_connection(xcb_connect(nullptr, nullptr))
     , m_window(0)
     , m_incr_process(false) {
+
+    try
+    {
+      clip_xcb_functions_initialize();
+    }
+    catch (const xcb_load_failure_exception& ex)
+    {
+      throw clip_exception(ex.what()); 
+    }
+
+    m_connection = clip_xcb_connect(nullptr, nullptr);
     if (!m_connection)
       return;
 
-    const xcb_setup_t* setup = xcb_get_setup(m_connection);
+    const xcb_setup_t* setup = clip_xcb_get_setup(m_connection);
     if (!setup)
       return;
 
-    xcb_screen_t* screen = xcb_setup_roots_iterator(setup).data;
+    xcb_screen_t* screen = clip_xcb_setup_roots_iterator(setup).data;
     if (!screen)
       return;
 
@@ -96,8 +105,8 @@ public:
       // To receive DestroyNotify event and stop the message loop.
       XCB_EVENT_MASK_STRUCTURE_NOTIFY;
 
-    m_window = xcb_generate_id(m_connection);
-    xcb_create_window(m_connection, 0,
+    m_window = clip_xcb_generate_id(m_connection);
+    clip_xcb_create_window(m_connection, 0,
                       m_window,
                       screen->root,
                       0, 0, 1, 1, 0,
@@ -137,15 +146,17 @@ public:
 #endif
 
     if (m_window) {
-      xcb_destroy_window(m_connection, m_window);
-      xcb_flush(m_connection);
+      clip_xcb_destroy_window(m_connection, m_window);
+      clip_xcb_flush(m_connection);
     }
 
     if (m_thread.joinable())
       m_thread.join();
 
     if (m_connection)
-      xcb_disconnect(m_connection);
+      clip_xcb_disconnect(m_connection);
+
+    clip_xcb_functions_finalize();
   }
 
   bool try_lock() {
@@ -194,12 +205,12 @@ public:
       event.owner         = owner;
       event.selection     = get_atom(CLIPBOARD);
 
-      xcb_send_event(m_connection, false,
+      clip_xcb_send_event(m_connection, false,
                      owner,
                      XCB_EVENT_MASK_NO_EVENT,
                      (const char*)&event);
 
-      xcb_flush(m_connection);
+      clip_xcb_flush(m_connection);
     }
   }
 
@@ -411,7 +422,7 @@ private:
   void process_x11_events() {
     bool stop = false;
     xcb_generic_event_t* event;
-    while (!stop && (event = xcb_wait_for_event(m_connection))) {
+    while (!stop && (event = clip_xcb_wait_for_event(m_connection))) {
       int type = (event->response_type & ~0x80);
 
       switch (type) {
@@ -474,7 +485,7 @@ private:
 
       // Set the "property" of "requestor" with the clipboard
       // formats ("targets", atoms) that we provide.
-      xcb_change_property(
+      clip_xcb_change_property(
         m_connection,
         XCB_PROP_MODE_REPLACE,
         event->requestor,
@@ -496,8 +507,8 @@ private:
                                 false);
       if (reply) {
         for (xcb_atom_t
-               *ptr=(xcb_atom_t*)xcb_get_property_value(reply),
-               *end=ptr + (xcb_get_property_value_length(reply)/sizeof(xcb_atom_t));
+               *ptr=(xcb_atom_t*)clip_xcb_get_property_value(reply),
+               *end=ptr + (clip_xcb_get_property_value_length(reply)/sizeof(xcb_atom_t));
              ptr<end; ) {
           xcb_atom_t target = *ptr++;
           xcb_atom_t property = *ptr++;
@@ -506,7 +517,7 @@ private:
                 event->requestor,
                 property,
                 target)) {
-            xcb_change_property(
+            clip_xcb_change_property(
               m_connection,
               XCB_PROP_MODE_REPLACE,
               event->requestor,
@@ -548,12 +559,12 @@ private:
     notify.target        = event->target;
     notify.property      = event->property;
 
-    xcb_send_event(m_connection, false,
+    clip_xcb_send_event(m_connection, false,
                    event->requestor,
                    XCB_EVENT_MASK_NO_EVENT, // SelectionNotify events go without mask
                    (const char*)&notify);
 
-    xcb_flush(m_connection);
+    clip_xcb_flush(m_connection);
   }
 
   bool set_requestor_property_with_clipboard_content(const xcb_atom_t requestor,
@@ -578,7 +589,7 @@ private:
 
     // Set the "property" of "requestor" with the
     // clipboard content in the requested format ("target").
-    xcb_change_property(
+    clip_xcb_change_property(
       m_connection,
       XCB_PROP_MODE_REPLACE,
       requestor,
@@ -612,8 +623,8 @@ private:
                                         event->property,
                                         get_atom(INCR));
         if (reply) {
-          if (xcb_get_property_value_length(reply) == 4) {
-            uint32_t n = *(uint32_t*)xcb_get_property_value(reply);
+          if (clip_xcb_get_property_value_length(reply) == 4) {
+            uint32_t n = *(uint32_t*)clip_xcb_get_property_value(reply);
             m_reply_data = std::make_shared<std::vector<uint8_t>>(n);
             m_reply_offset = 0;
             m_incr_process = true;
@@ -649,7 +660,7 @@ private:
 
         // When the length is 0 it means that the content was
         // completely sent by the selection owner.
-        if (xcb_get_property_value_length(reply) > 0) {
+        if (clip_xcb_get_property_value_length(reply) > 0) {
           copy_reply_data(reply);
         }
         else {
@@ -668,7 +679,7 @@ private:
                                                     xcb_atom_t atom,
                                                     bool delete_prop = true) {
     xcb_get_property_cookie_t cookie =
-      xcb_get_property(m_connection,
+      clip_xcb_get_property(m_connection,
                        delete_prop,
                        window,
                        property,
@@ -677,7 +688,7 @@ private:
 
     xcb_generic_error_t* err = nullptr;
     xcb_get_property_reply_t* reply =
-      xcb_get_property_reply(m_connection, cookie, &err);
+      clip_xcb_get_property_reply(m_connection, cookie, &err);
     if (err) {
       // TODO report error
       free(err);
@@ -688,9 +699,9 @@ private:
   // Concatenates the new data received in "reply" into "m_reply_data"
   // buffer.
   void copy_reply_data(xcb_get_property_reply_t* reply) {
-    const uint8_t* src = (const uint8_t*)xcb_get_property_value(reply);
+    const uint8_t* src = (const uint8_t*)clip_xcb_get_property_value(reply);
     // n = length of "src" in bytes
-    size_t n = xcb_get_property_value_length(reply);
+    size_t n = clip_xcb_get_property_value_length(reply);
 
     size_t req = m_reply_offset+n;
     if (!m_reply_data) {
@@ -735,14 +746,14 @@ private:
     // Ask to the selection owner for its content on each known
     // text format/atom.
     for (xcb_atom_t atom : atoms) {
-      xcb_convert_selection(m_connection,
+      clip_xcb_convert_selection(m_connection,
                             m_window, // Send us the result
                             selection, // Clipboard selection
                             atom, // The clipboard format that we're requesting
                             get_atom(CLIPBOARD), // Leave result in this window's property
                             XCB_CURRENT_TIME);
 
-      xcb_flush(m_connection);
+      clip_xcb_flush(m_connection);
 
       // We use the "m_incr_received" to wait several timeouts in case
       // that we've received the INCR SelectionNotify or
@@ -777,7 +788,7 @@ private:
       if (it != m_atoms.end())
         result[i] = it->second;
       else
-        cookies[i] = xcb_intern_atom(
+        cookies[i] = clip_xcb_intern_atom(
           m_connection, 0,
           std::strlen(names[i]), names[i]);
     }
@@ -785,7 +796,7 @@ private:
     for (int i=0; i<n; ++i) {
       if (result[i] == 0) {
         xcb_intern_atom_reply_t* reply =
-          xcb_intern_atom_reply(m_connection,
+          clip_xcb_intern_atom_reply(m_connection,
                                 cookies[i],
                                 nullptr);
         if (reply) {
@@ -805,11 +816,11 @@ private:
 
     xcb_atom_t result = 0;
     xcb_intern_atom_cookie_t cookie =
-      xcb_intern_atom(m_connection, 0,
+      clip_xcb_intern_atom(m_connection, 0,
                       std::strlen(name), name);
 
     xcb_intern_atom_reply_t* reply =
-      xcb_intern_atom_reply(m_connection,
+      clip_xcb_intern_atom_reply(m_connection,
                             cookie,
                             nullptr);
     if (reply) {
@@ -905,12 +916,12 @@ private:
 
   bool set_x11_selection_owner() const {
     xcb_void_cookie_t cookie =
-      xcb_set_selection_owner_checked(m_connection,
+      clip_xcb_set_selection_owner_checked(m_connection,
                                       m_window,
                                       get_atom(CLIPBOARD),
                                       XCB_CURRENT_TIME);
     xcb_generic_error_t* err =
-      xcb_request_check(m_connection,
+      clip_xcb_request_check(m_connection,
                         cookie);
     if (err) {
       free(err);
@@ -922,11 +933,11 @@ private:
   xcb_window_t get_x11_selection_owner() const {
     xcb_window_t result = 0;
     xcb_get_selection_owner_cookie_t cookie =
-      xcb_get_selection_owner(m_connection,
+      clip_xcb_get_selection_owner(m_connection,
                               get_atom(CLIPBOARD));
 
     xcb_get_selection_owner_reply_t* reply =
-      xcb_get_selection_owner_reply(m_connection, cookie, nullptr);
+      clip_xcb_get_selection_owner_reply(m_connection, cookie, nullptr);
     if (reply) {
       result = reply->owner;
       free(reply);

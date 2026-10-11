@@ -3,9 +3,11 @@
 #include "F3DDefaultLogo.h"
 #include "F3DFontBuffer.h"
 #include "F3DStyle.h"
+#include "F3DUtils.h"
 #include "vtkF3DImguiConsole.h"
 #include "vtkF3DImguiFS.h"
 #include "vtkF3DImguiVS.h"
+#include "vtkF3DMetaImporter.h"
 #include "vtkF3DRenderer.h"
 #include "vtkF3DUserEvents.h"
 
@@ -14,7 +16,6 @@
 #include <vtkDataAssembly.h>
 #include <vtkDataAssemblyVisitor.h>
 #include <vtkImageData.h>
-#include <vtkInformation.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLBufferObject.h>
 #include <vtkOpenGLRenderWindow.h>
@@ -30,15 +31,10 @@
 #include <vtkSmartPointer.h>
 #include <vtkTextureObject.h>
 #include <vtkVersion.h>
+#include <vtk_glad.h>
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
 #include <vtkMemoryResourceStream.h>
-#endif
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
-#include <vtk_glad.h>
-#else
-#include <vtk_glew.h>
 #endif
 
 #include <imgui.h>
@@ -47,6 +43,7 @@
 #include <array>
 #include <cstdint>
 #include <functional>
+#include <iomanip>
 #include <numeric>
 #include <optional>
 #include <sstream>
@@ -82,72 +79,6 @@ static std::vector<std::string> SplitBindings(const std::string& s, const char d
 }
 
 /**
- * Visitor used to traverse a subtree when a checkbox is toggled.
- * It will add an attribute `f3d_visible` on each node to the value of the checkbox.
- * It will also add (or remove) a `ACTOR_HIDDEN()` information key on nodes associated with actors.
- */
-class vtkF3DVisibilityDataAssemblyVisitor : public vtkDataAssemblyVisitor
-{
-public:
-  static vtkF3DVisibilityDataAssemblyVisitor* New();
-  vtkTypeMacro(vtkF3DVisibilityDataAssemblyVisitor, vtkDataAssemblyVisitor);
-
-  void SetVisibleAttribute(int visible)
-  {
-    this->Visible = visible;
-  }
-
-  void SetImporter(vtkImporter* importer)
-  {
-    this->Importer = importer;
-  }
-
-protected:
-  void Visit(int nodeid) override
-  {
-    // add the visibility state in the current node
-    // `GetAssembly()` is a const method, but we need to modify it, so the cast is needed
-    vtkDataAssembly* mutableAssembly = const_cast<vtkDataAssembly*>(this->GetAssembly());
-    mutableAssembly->SetAttribute(nodeid, "f3d_visible", this->Visible);
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
-    const int flatActorIndex =
-      this->GetAssembly()->GetAttributeOrDefault(nodeid, "flat_actor_id", -1);
-
-    if (flatActorIndex >= 0)
-    {
-      vtkActorCollection* actors = this->Importer->GetImportedActors();
-      vtkActor* actor = vtkActor::SafeDownCast(actors->GetItemAsObject(flatActorIndex));
-
-      vtkSmartPointer<vtkInformation> keys = actor->GetPropertyKeys();
-
-      // if there's no property keys yet, create one
-      if (!keys)
-      {
-        keys = vtkSmartPointer<vtkInformation>::New();
-        actor->SetPropertyKeys(keys);
-      }
-
-      // this key will be used in the renderer to know if the actor rendering should be skipped
-      if (this->Visible == 1)
-      {
-        keys->Remove(vtkF3DMetaImporter::ACTOR_HIDDEN());
-      }
-      else
-      {
-        keys->Set(vtkF3DMetaImporter::ACTOR_HIDDEN(), 1);
-      }
-    }
-#endif
-  }
-
-private:
-  int Visible = 0;
-  vtkImporter* Importer = nullptr;
-};
-vtkStandardNewMacro(vtkF3DVisibilityDataAssemblyVisitor);
-
-/**
  * Visitor used to traverse a full tree (one per importer).
  * It will take care of rendering the tree with imgui.
  * If a checkbox is toggled, it triggers another traversal of a subtree to change the internal
@@ -164,9 +95,9 @@ public:
     this->RenderWindow = renWin;
   }
 
-  void SetImporter(vtkImporter* importer)
+  void SetMetaImporter(vtkF3DMetaImporter* importer)
   {
-    this->Importer = importer;
+    this->MetaImporter = importer;
   }
 
   void SetImporterIndex(int index)
@@ -210,18 +141,11 @@ protected:
     // get the current visibility state
     bool visible = (this->GetAssembly()->GetAttributeOrDefault(nodeid, "f3d_visible", 1) != 0);
 
-    const char* defaultLabel =
-      this->GetAssembly()->GetNumberOfChildren(nodeid) > 0 ? "<group>" : "<object>";
-
     ImGui::PushID(uuid);
-    if (ImGui::Checkbox(
-          this->GetAssembly()->GetAttributeOrDefault(nodeid, "label", defaultLabel), &visible))
+    if (ImGui::Checkbox(vtkF3DMetaImporter::GetNodeLabel(this->GetAssembly(), nodeid), &visible))
     {
-      // if the checkbox is toggled, trigger a traversal of the subtree to change each node state
-      vtkNew<vtkF3DVisibilityDataAssemblyVisitor> attrVisitor;
-      attrVisitor->SetImporter(this->Importer);
-      attrVisitor->SetVisibleAttribute(visible ? 1 : 0);
-      this->GetAssembly()->Visit(nodeid, attrVisitor);
+      // if the checkbox is toggled, the whole subtree is updated
+      this->MetaImporter->SetAssemblyNodeVisibility(this->ImporterId, nodeid, visible);
 
       this->RenderWindow->GetInteractor()->InvokeEvent(
         vtkF3DUserEvents::SceneHierarchyChangedEvent, nullptr);
@@ -234,7 +158,7 @@ protected:
 private:
   bool CurrentNodeOpened = true;
   vtkOpenGLRenderWindow* RenderWindow = nullptr;
-  vtkImporter* Importer = nullptr;
+  vtkF3DMetaImporter* MetaImporter = nullptr;
   int ImporterId = -1;
 };
 vtkStandardNewMacro(vtkF3DRenderDataAssemblyVisitor);
@@ -246,20 +170,12 @@ struct vtkF3DImguiActor::Internals
 
   void Initialize(vtkOpenGLRenderWindow* renWin)
   {
-    if (this->FontTexture == nullptr)
+    if (this->VertexBuffer == nullptr)
     {
-      // Build texture atlas
-      ImGuiIO& io = ImGui::GetIO();
-      unsigned char* pixels;
-      int width, height;
-      io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
-
-      this->FontTexture = vtkSmartPointer<vtkTextureObject>::New();
-      this->FontTexture->SetContext(renWin);
-      this->FontTexture->Create2DFromRaw(width, height, 4, VTK_UNSIGNED_CHAR, pixels);
-
-      // Store our identifier
-      io.Fonts->SetTexID((ImTextureID)this->FontTexture.Get());
+      // Update the maximum texture size for the renderer
+      ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
+      platformIO.Renderer_TextureMaxWidth = platformIO.Renderer_TextureMaxHeight =
+        vtkTextureObject::GetMaximumTextureSize(renWin);
 
       // Create VBO
       this->VertexBuffer = vtkSmartPointer<vtkOpenGLBufferObject>::New();
@@ -277,7 +193,7 @@ struct vtkF3DImguiActor::Internals
       iconReader->Update();
 
       vtkImageData* imageData = iconReader->GetOutput();
-      int* dims = imageData->GetDimensions();
+      const int* dims = imageData->GetDimensions();
 
       unsigned char* logoPixels = static_cast<unsigned char*>(imageData->GetScalarPointer());
       if (logoPixels)
@@ -287,23 +203,16 @@ struct vtkF3DImguiActor::Internals
         this->LogoTexture->Create2DFromRaw(dims[0], dims[1], 4, VTK_UNSIGNED_CHAR, logoPixels);
       }
 
-      // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10589
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231016)
       this->VertexBuffer->SetUsage(vtkOpenGLBufferObject::StreamDraw);
-#endif
       this->VertexBuffer->GenerateBuffer(vtkOpenGLBufferObject::ArrayBuffer);
 
       // Create IBO
       this->IndexBuffer = vtkSmartPointer<vtkOpenGLBufferObject>::New();
-
-      // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10589
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231016)
       this->IndexBuffer->SetUsage(vtkOpenGLBufferObject::StreamDraw);
-#endif
       this->IndexBuffer->GenerateBuffer(vtkOpenGLBufferObject::ElementArrayBuffer);
 
       // Create shader program
-      std::string emptyGeom; // no geometry shader
+      const std::string emptyGeom; // no geometry shader
       this->Program = renWin->GetShaderCache()->ReadyShaderProgram(
         vtkF3DImguiVS, vtkF3DImguiFS, emptyGeom.c_str());
 
@@ -325,12 +234,6 @@ struct vtkF3DImguiActor::Internals
     {
       ImGuiIO& io = ImGui::GetIO();
 
-      if (this->FontTexture)
-      {
-        io.Fonts->SetTexID(0);
-        this->FontTexture->ReleaseGraphicsResources(renWin);
-        this->FontTexture = nullptr;
-      }
       if (this->LogoTexture)
       {
         this->LogoTexture->ReleaseGraphicsResources(renWin);
@@ -352,6 +255,16 @@ struct vtkF3DImguiActor::Internals
         this->Program = nullptr;
       }
 
+      // Destroy all textures
+      for (ImTextureData* tex : ImGui::GetPlatformIO().Textures)
+      {
+        if (tex->RefCount == 1)
+        {
+          tex->SetStatus(ImTextureStatus_WantDestroy);
+          this->UpdateTexture(renWin, tex);
+        }
+      }
+
       io.Fonts->Clear();
 
       io.BackendPlatformName = io.BackendRendererName = nullptr;
@@ -359,17 +272,61 @@ struct vtkF3DImguiActor::Internals
     }
   }
 
+  void UpdateTexture(vtkOpenGLRenderWindow* renWin, ImTextureData* tex)
+  {
+    if (tex->Status == ImTextureStatus_WantCreate)
+    {
+      vtkTextureObject* textureObject = vtkTextureObject::New();
+      textureObject->SetContext(renWin);
+      textureObject->Create2DFromRaw(
+        tex->Width, tex->Height, 4, VTK_UNSIGNED_CHAR, tex->GetPixels());
+
+      tex->SetTexID(reinterpret_cast<ImTextureID>(textureObject));
+      tex->SetStatus(ImTextureStatus_OK);
+    }
+    else if (tex->Status == ImTextureStatus_WantUpdates)
+    {
+      vtkTextureObject* textureObject = reinterpret_cast<vtkTextureObject*>(tex->GetTexID());
+      textureObject->Bind();
+
+      vtkOpenGLState* ostate = renWin->GetState();
+      ostate->vtkglPixelStorei(GL_UNPACK_ROW_LENGTH, tex->Width); // stride
+
+      for (const ImTextureRect& r : tex->Updates)
+      {
+        ostate->vtkglPixelStorei(GL_UNPACK_SKIP_PIXELS, r.x);
+        ostate->vtkglPixelStorei(GL_UNPACK_SKIP_ROWS, r.y);
+
+        glTexSubImage2D(
+          GL_TEXTURE_2D, 0, r.x, r.y, r.w, r.h, GL_RGBA, GL_UNSIGNED_BYTE, tex->GetPixels());
+      }
+
+      ostate->vtkglPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+      ostate->vtkglPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+      ostate->vtkglPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
+
+      tex->SetStatus(ImTextureStatus_OK);
+    }
+    else if (tex->Status == ImTextureStatus_WantDestroy)
+    {
+      vtkTextureObject* textureObject = reinterpret_cast<vtkTextureObject*>(tex->GetTexID());
+      textureObject->Delete();
+      tex->SetTexID(ImTextureID_Invalid);
+      tex->SetStatus(ImTextureStatus_Destroyed);
+    }
+  }
+
   void RenderDrawData(vtkOpenGLRenderWindow* renWin, ImDrawData* drawData)
   {
     vtkOpenGLState* state = renWin->GetState();
 
-    vtkOpenGLState::ScopedglScissor save_scissorbox(state);
-    vtkOpenGLState::ScopedglBlendFuncSeparate save_blendfunc(state);
-    vtkOpenGLState::ScopedglEnableDisable save_blend(state, GL_BLEND);
-    vtkOpenGLState::ScopedglEnableDisable save_cull(state, GL_CULL_FACE);
-    vtkOpenGLState::ScopedglEnableDisable save_depth(state, GL_DEPTH_TEST);
-    vtkOpenGLState::ScopedglEnableDisable save_stencil(state, GL_STENCIL_TEST);
-    vtkOpenGLState::ScopedglEnableDisable save_scissor(state, GL_SCISSOR_TEST);
+    const vtkOpenGLState::ScopedglScissor save_scissorbox(state);
+    const vtkOpenGLState::ScopedglBlendFuncSeparate save_blendfunc(state);
+    const vtkOpenGLState::ScopedglEnableDisable save_blend(state, GL_BLEND);
+    const vtkOpenGLState::ScopedglEnableDisable save_cull(state, GL_CULL_FACE);
+    const vtkOpenGLState::ScopedglEnableDisable save_depth(state, GL_DEPTH_TEST);
+    const vtkOpenGLState::ScopedglEnableDisable save_stencil(state, GL_STENCIL_TEST);
+    const vtkOpenGLState::ScopedglEnableDisable save_scissor(state, GL_SCISSOR_TEST);
 
     // Change require OpenGL state for proper rendering
     state->vtkglEnable(GL_BLEND);
@@ -380,6 +337,14 @@ struct vtkF3DImguiActor::Internals
     state->vtkglDisable(GL_DEPTH_TEST);
     state->vtkglDisable(GL_STENCIL_TEST);
     state->vtkglEnable(GL_SCISSOR_TEST);
+
+    if (drawData->Textures != nullptr)
+    {
+      for (ImTextureData* tex : *drawData->Textures)
+      {
+        this->UpdateTexture(renWin, tex);
+      }
+    }
 
     renWin->GetShaderCache()->ReadyShaderProgram(this->Program);
 
@@ -395,8 +360,8 @@ struct vtkF3DImguiActor::Internals
     this->VertexBuffer->Bind();
     this->IndexBuffer->Bind();
 
-    ImVec2 clipOff = drawData->DisplayPos;
-    ImVec2 clipScale = drawData->FramebufferScale;
+    const ImVec2 clipOff = drawData->DisplayPos;
+    const ImVec2 clipScale = drawData->FramebufferScale;
 
     for (int n = 0; n < drawData->CmdListsCount; n++)
     {
@@ -419,14 +384,14 @@ struct vtkF3DImguiActor::Internals
         this->Program->SetUniformi("Texture", texObj->GetTextureUnit());
 
         // Project scissor/clipping rectangles into framebuffer space
-        ImVec2 clipMin(
+        const ImVec2 clipMin(
           (cmd->ClipRect.x - clipOff.x) * clipScale.x, (cmd->ClipRect.y - clipOff.y) * clipScale.y);
-        ImVec2 clipMax(
+        const ImVec2 clipMax(
           (cmd->ClipRect.z - clipOff.x) * clipScale.x, (cmd->ClipRect.w - clipOff.y) * clipScale.y);
         if (clipMax.x > clipMin.x && clipMax.y > clipMin.y)
         {
           // Apply scissor/clipping rectangle (Y is inverted in OpenGL)
-          float fbHeight = drawData->DisplaySize.y * drawData->FramebufferScale.y;
+          const float fbHeight = drawData->DisplaySize.y * drawData->FramebufferScale.y;
           state->vtkglScissor(static_cast<GLint>(clipMin.x),
             static_cast<GLint>(fbHeight - clipMax.y), static_cast<GLsizei>(clipMax.x - clipMin.x),
             static_cast<GLsizei>(clipMax.y - clipMin.y));
@@ -442,11 +407,9 @@ struct vtkF3DImguiActor::Internals
     this->VertexBuffer->Release();
     this->IndexBuffer->Release();
 
-    this->FontTexture->Deactivate();
     this->LogoTexture->Deactivate();
   }
 
-  vtkSmartPointer<vtkTextureObject> FontTexture;
   vtkSmartPointer<vtkOpenGLVertexArrayObject> VertexArray;
   vtkSmartPointer<vtkOpenGLBufferObject> VertexBuffer;
   vtkSmartPointer<vtkOpenGLBufferObject> IndexBuffer;
@@ -464,6 +427,7 @@ struct vtkF3DImguiActor::Internals
   bool SearchFocusRequested = false;
   float CheatSheetWidth = 0.f;
   std::map<std::string, ImFont*> ExtraFonts;
+  std::string ClipboardText;
 };
 
 namespace
@@ -482,6 +446,39 @@ void SetupNextWindow(std::optional<ImVec2> position, std::optional<ImVec2> size)
   {
     ImGui::SetNextWindowPos(position.value());
   }
+}
+
+// Painted thickness of the progress bar itself, independent of font scale.
+constexpr float PROGRESS_BAR_THICKNESS = 5.f;
+
+// Unscaled reach of the pointer around the bar: sizes the click/drag row and the
+// distance at which the tooltip snaps to a key frame.
+constexpr float PROGRESS_BAR_GRAB_RADIUS = 6.f;
+
+std::string FormatSpeedFactor(double speedFactor)
+{
+  std::ostringstream oss;
+  oss << std::noshowpoint << speedFactor;
+  return oss.str();
+}
+
+// Vertical layout of the animation progress bar window: just the bar row in
+// "default" mode, plus a text row above it in "advanced" mode.
+struct ProgressBarLayout
+{
+  float barRowHeight; ///< Height of the click/drag target row containing the bar
+  float windowHeight; ///< Total height of the ImGui window
+  float padding;      ///< Space above the text row and between it and the bar
+};
+
+ProgressBarLayout ComputeProgressBarLayout(double fontScale, bool advanced, float lineHeight)
+{
+  const float barRowHeight = 2.f * (PROGRESS_BAR_GRAB_RADIUS * static_cast<float>(fontScale)) + 2.f;
+  const float padding =
+    advanced ? F3DStyle::GetDefaultMargin() * static_cast<float>(fontScale) : 0.f;
+  const float windowHeight =
+    advanced ? (padding + lineHeight + padding + PROGRESS_BAR_THICKNESS) : barRowHeight;
+  return { barRowHeight, windowHeight, padding };
 }
 }
 
@@ -506,13 +503,27 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   io.IniFilename = nullptr;
   io.LogFilename = nullptr;
 
-  ImFontConfig fontConfig;
+  // Setup backend name
+  io.BackendPlatformName = io.BackendRendererName = "F3D/VTK";
+  io.BackendFlags |= ImGuiBackendFlags_RendererHasTextures;
 
-  ImVector<ImWchar> ranges;
-  ImFontGlyphRangesBuilder builder;
-  builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
-  builder.AddChar(0x2264); // Less-Than or Equal To
-  builder.BuildRanges(&ranges);
+#if F3D_MODULE_CLIP
+  ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
+  platformIO.Platform_SetClipboardTextFn = [](ImGuiContext*, const char* text)
+  { F3DUtils::CopyToClipboard(text); };
+
+  platformIO.Platform_GetClipboardTextFn = [](ImGuiContext*)
+  {
+    std::string& text =
+      *static_cast<std::string*>(ImGui::GetPlatformIO().Platform_ClipboardUserData);
+    F3DUtils::GetFromClipboard(text);
+    return text.c_str();
+  };
+
+  platformIO.Platform_ClipboardUserData = &this->Pimpl->ClipboardText;
+#endif
+
+  ImFontConfig fontConfig;
 
   ImFont* font = nullptr;
   if (this->FontFile.empty())
@@ -521,25 +532,25 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
     fontConfig.FontDataOwnedByAtlas = false;
     font = io.Fonts->AddFontFromMemoryTTF(
       const_cast<void*>(reinterpret_cast<const void*>(F3DFontBuffer)), sizeof(F3DFontBuffer),
-      18 * this->FontScale, &fontConfig, ranges.Data);
+      F3DStyle::FontSizeBase * this->FontScale, &fontConfig);
     ImFont* notiFont = io.Fonts->AddFontFromMemoryTTF(
       const_cast<void*>(reinterpret_cast<const void*>(F3DFontBuffer)), sizeof(F3DFontBuffer),
-      18 * this->FontScale * .8f, &fontConfig, ranges.Data);
+      F3DStyle::FontSizeBase * this->FontScale * .8f, &fontConfig);
     Pimpl->ExtraFonts["notiFont"] = notiFont;
   }
   else
   {
     font = io.Fonts->AddFontFromFileTTF(
-      this->FontFile.c_str(), 18 * this->FontScale, &fontConfig, ranges.Data);
+      this->FontFile.c_str(), F3DStyle::FontSizeBase * this->FontScale, &fontConfig);
     ImFont* notiFont = io.Fonts->AddFontFromFileTTF(
-      this->FontFile.c_str(), 18 * this->FontScale * .8f, &fontConfig, ranges.Data);
+      this->FontFile.c_str(), F3DStyle::FontSizeBase * this->FontScale * .8f, &fontConfig);
     Pimpl->ExtraFonts["notiFont"] = notiFont;
   }
 
   io.Fonts->Build();
   io.FontDefault = font;
 
-  ImVec4 colTransparent = ImVec4(0.0f, 0.0f, 0.0f, 0.0f); // #000000
+  const ImVec4 colTransparent = ImVec4(0.0f, 0.0f, 0.0f, 0.0f); // #000000
 
   ImGuiStyle* style = &ImGui::GetStyle();
   style->AntiAliasedLines = false;
@@ -565,9 +576,6 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   style->Colors[ImGuiCol_ResizeGrip] = F3DStyle::imgui::GetMidColor();
   style->Colors[ImGuiCol_ResizeGripHovered] = F3DStyle::imgui::GetHighlightColor();
   style->Colors[ImGuiCol_ResizeGripActive] = F3DStyle::imgui::GetHighlightColor();
-
-  // Setup backend name
-  io.BackendPlatformName = io.BackendRendererName = "F3D/VTK";
 }
 
 //----------------------------------------------------------------------------
@@ -587,8 +595,7 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
   assert(viewport);
 
   constexpr float margin = F3DStyle::GetDefaultMargin();
-  constexpr float defaultWidth = 200.f;
-  float winHeight = viewport->WorkSize.y - 2.0f * margin;
+  const float winHeight = viewport->WorkSize.y - 2.0f * margin;
 
   float posX = margin;
 
@@ -597,15 +604,25 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
     posX += this->Pimpl->CheatSheetWidth + margin;
   }
 
-  ImGui::SetNextWindowPos(ImVec2(posX, margin));
-  ImGui::SetNextWindowSize(ImVec2(defaultWidth, winHeight), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSizeConstraints(
-    ImVec2(10.f, winHeight), ImVec2(std::numeric_limits<float>::max(), winHeight));
-  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+  std::optional<ImVec2> position;
+  if (!ImGui::IsMouseDown(ImGuiMouseButton_Left))
+  {
+    position = ImVec2(posX, margin);
+  }
+  const float maxWidth = std::min(
+    static_cast<float>(this->SceneHierarchyMaxWidth), viewport->WorkSize.x - posX - margin);
+  ::SetupNextWindow(position, std::nullopt);
 
-  ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
+  // 0.f means auto-fit to content
+  ImGui::SetNextWindowSize(ImVec2(0.f, winHeight), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSizeConstraints(ImVec2(10.f, winHeight), ImVec2(maxWidth, winHeight));
+  ImGuiStyle& style = ImGui::GetStyle();
+  style.Colors[ImGuiCol_WindowBg] = ImVec4(
+    this->BackdropColor[0], this->BackdropColor[1], this->BackdropColor[2], this->BackdropOpacity);
+
+  const ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
     ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoSavedSettings |
-    ImGuiWindowFlags_HorizontalScrollbar;
+    ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NoMove;
 
   ImGui::Begin("Scene Hierarchy", nullptr, flags);
 
@@ -617,11 +634,11 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
 
   for (int i = 0; i < importer->GetImporterInfoCount(); i++)
   {
-    vtkF3DMetaImporter::ImporterInfo info = importer->GetImporterInfo(i);
+    const vtkF3DMetaImporter::ImporterInfo& info = importer->GetImporterInfo(i);
 
     vtkNew<::vtkF3DRenderDataAssemblyVisitor> visitor;
     visitor->SetRenderWindow(renWin);
-    visitor->SetImporter(info.Importer);
+    visitor->SetMetaImporter(importer);
     visitor->SetImporterIndex(i);
 
     info.DataAssembly->Visit(vtkDataAssembly::GetRootNode(), visitor);
@@ -666,9 +683,10 @@ void vtkF3DImguiActor::RenderDropZone()
     ::SetupNextWindow(ImVec2(0, 0), viewport->WorkSize);
     ImGui::SetNextWindowBgAlpha(0.f);
 
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
-      ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove |
-      ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoMouseInputs;
+    const ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration |
+      ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing |
+      ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus |
+      ImGuiWindowFlags_NoMouseInputs;
 
     ImGui::Begin("DropZoneText", nullptr, flags);
     /* Use background draw list to prevent "ignoring" NoBringToFrontOnFocus */
@@ -677,14 +695,14 @@ void vtkF3DImguiActor::RenderDropZone()
     // Logo rendering
     if (this->DropZoneLogoVisible && this->Pimpl->LogoTexture)
     {
-      float logoDisplayWidth = ::LOGO_DISPLAY_WIDTH;
-      float logoDisplayHeight = ::LOGO_DISPLAY_HEIGHT;
-      ImVec2 center = viewport->GetWorkCenter();
-      ImVec2 logoPos(center.x - logoDisplayWidth * ::DROPZONE_MARGIN,
+      const float logoDisplayWidth = ::LOGO_DISPLAY_WIDTH;
+      const float logoDisplayHeight = ::LOGO_DISPLAY_HEIGHT;
+      const ImVec2 center = viewport->GetWorkCenter();
+      const ImVec2 logoPos(center.x - logoDisplayWidth * ::DROPZONE_MARGIN,
         center.y - logoDisplayHeight * ::DROPZONE_MARGIN);
 
       // VTK texture pointer to ImTextureID cast (void*)
-      ImTextureID texID = reinterpret_cast<ImTextureID>(this->Pimpl->LogoTexture.Get());
+      const ImTextureID texID = reinterpret_cast<ImTextureID>(this->Pimpl->LogoTexture.Get());
 
       drawList->AddImage(texID, logoPos,
         ImVec2(logoPos.x + logoDisplayWidth, logoPos.y + logoDisplayHeight), ImVec2(0, 1),
@@ -717,8 +735,8 @@ void vtkF3DImguiActor::RenderDropZone()
     // If DropText is provided, render and skip binds
     if (!this->DropText.empty())
     {
-      ImVec2 textSize = ImGui::CalcTextSize(this->DropText.c_str());
-      ImVec2 textPos(viewport->GetWorkCenter().x - textSize.x * ::DROPZONE_MARGIN,
+      const ImVec2 textSize = ImGui::CalcTextSize(this->DropText.c_str());
+      const ImVec2 textPos(viewport->GetWorkCenter().x - textSize.x * ::DROPZONE_MARGIN,
         viewport->GetWorkCenter().y - ::DROPZONE_MARGIN * textSize.y + ::LOGO_DISPLAY_HEIGHT / 2 +
           ::DROPZONE_LOGO_TEXT_PADDING);
       drawList->AddText(textPos, ImColor(::ColorToImVec4(this->FontColor)), this->DropText.c_str());
@@ -736,7 +754,7 @@ void vtkF3DImguiActor::RenderDropZone()
       const auto& desc = pair.first;
       const auto& bind = pair.second;
 
-      ImVec2 descSize = ImGui::CalcTextSize(desc.c_str());
+      const ImVec2 descSize = ImGui::CalcTextSize(desc.c_str());
       maxDescTextWidth = std::max(maxDescTextWidth, descSize.x);
 
       auto keys = ::SplitBindings(bind, '+');
@@ -760,7 +778,7 @@ void vtkF3DImguiActor::RenderDropZone()
     const ImColor bindingRectColor = F3DStyle::imgui::GetMidColor();
     const ImColor bindingTextColor = ::ColorToImVec4(this->FontColor);
 
-    float tableWidth =
+    const float tableWidth =
       maxDescTextWidth + maxBindingsTextWidth + ::DROPZONE_LOGO_TEXT_PADDING + spacingX;
 
     // Position table below logo if needed
@@ -784,21 +802,21 @@ void vtkF3DImguiActor::RenderDropZone()
       const auto& bind = pair.second;
 
       drawList->AddText(cursor, descTextColor, desc.c_str());
-      float rowHeight =
+      const float rowHeight =
         ImGui::GetTextLineHeightWithSpacing() + ::DROPZONE_MARGIN * ::DROPZONE_LOGO_TEXT_PADDING;
 
-      float xBindings = cursor.x + maxDescTextWidth + ::DROPZONE_LOGO_TEXT_PADDING;
+      const float xBindings = cursor.x + maxDescTextWidth + ::DROPZONE_LOGO_TEXT_PADDING;
       ImVec2 bindingPos(xBindings, cursor.y);
 
       auto keys = ::SplitBindings(bind, '+');
       for (size_t k = 0; k < keys.size(); ++k)
       {
         const std::string& key = keys[k];
-        ImVec2 textSize = ImGui::CalcTextSize(key.c_str());
-        ImVec2 padding(::DROPZONE_PADDING_X, ::DROPZONE_PADDING_Y);
+        const ImVec2 textSize = ImGui::CalcTextSize(key.c_str());
+        const ImVec2 padding(::DROPZONE_PADDING_X, ::DROPZONE_PADDING_Y);
 
-        ImVec2 rectMin = ImVec2(bindingPos.x, bindingPos.y);
-        ImVec2 rectMax =
+        const ImVec2 rectMin = ImVec2(bindingPos.x, bindingPos.y);
+        const ImVec2 rectMax =
           ImVec2(rectMin.x + textSize.x + padding.x * 2, rectMin.y + textSize.y + padding.y * 2);
 
         drawList->AddRectFilled(rectMin, rectMax, bindingRectColor, 4.0f);
@@ -840,10 +858,13 @@ void vtkF3DImguiActor::RenderFileName()
     }
 
     ::SetupNextWindow(ImVec2(viewport->GetWorkCenter().x - 0.5f * totalWidth, margin), winSize);
-    ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.Colors[ImGuiCol_WindowBg] = ImVec4(this->BackdropColor[0], this->BackdropColor[1],
+      this->BackdropColor[2], this->BackdropOpacity);
 
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
-      ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+    const ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration |
+      ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing |
+      ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
 
     ImGui::Begin("FileName", nullptr, flags);
     ImGui::TextUnformatted(this->FileName.c_str());
@@ -865,9 +886,11 @@ void vtkF3DImguiActor::RenderMetaData()
   ::SetupNextWindow(ImVec2(viewport->WorkSize.x - winSize.x - margin,
                       viewport->GetWorkCenter().y - 0.5f * winSize.y),
     winSize);
-  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+  ImGuiStyle& style = ImGui::GetStyle();
+  style.Colors[ImGuiCol_WindowBg] = ImVec4(
+    this->BackdropColor[0], this->BackdropColor[1], this->BackdropColor[2], this->BackdropOpacity);
 
-  ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
+  const ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
 
   ImGui::Begin("MetaData", nullptr, flags);
@@ -900,10 +923,13 @@ void vtkF3DImguiActor::RenderHDRIFileName()
 
     ::SetupNextWindow(
       ImVec2(viewport->GetWorkCenter().x - 0.5f * totalWidth + winOffsetX, margin), winSize);
-    ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.Colors[ImGuiCol_WindowBg] = ImVec4(this->BackdropColor[0], this->BackdropColor[1],
+      this->BackdropColor[2], this->BackdropOpacity);
 
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
-      ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+    const ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration |
+      ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing |
+      ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
 
     ImGui::Begin("HDRIFileName", nullptr, flags);
     ImGui::TextUnformatted(this->HDRIFileName.c_str());
@@ -925,8 +951,8 @@ void vtkF3DImguiActor::RenderCheatSheet()
   {
     std::string lowerHaystack = haystack;
     std::string lowerNeedle = needle;
-    std::transform(lowerHaystack.begin(), lowerHaystack.end(), lowerHaystack.begin(), ::tolower);
-    std::transform(lowerNeedle.begin(), lowerNeedle.end(), lowerNeedle.begin(), ::tolower);
+    std::ranges::transform(lowerHaystack, lowerHaystack.begin(), ::tolower);
+    std::ranges::transform(lowerNeedle, lowerNeedle.begin(), ::tolower);
     return lowerHaystack.find(lowerNeedle) != std::string::npos;
   };
 
@@ -978,11 +1004,11 @@ void vtkF3DImguiActor::RenderCheatSheet()
       }
       maxBindingTextWidth = std::max(maxBindingTextWidth, bindingLineWidth);
 
-      ImVec2 descriptionLineSize = ImGui::CalcTextSize(desc.c_str());
+      const ImVec2 descriptionLineSize = ImGui::CalcTextSize(desc.c_str());
       maxDescTextWidth = std::max(maxDescTextWidth, descriptionLineSize.x);
 
-      std::string cyclingValue = "< " + val + " >";
-      ImVec2 valueLineSize = ImGui::CalcTextSize(cyclingValue.c_str());
+      const std::string cyclingValue = "< " + val + " >";
+      const ImVec2 valueLineSize = ImGui::CalcTextSize(cyclingValue.c_str());
       maxValueTextWidth = std::max(maxValueTextWidth, valueLineSize.x);
 
       this->Pimpl->CheatSheetWidth = maxBindingTextWidth + maxDescTextWidth + maxValueTextWidth;
@@ -999,9 +1025,11 @@ void vtkF3DImguiActor::RenderCheatSheet()
   ::SetupNextWindow(ImVec2(margin, winTop),
     ImVec2(
       this->Pimpl->CheatSheetWidth, std::min(viewport->WorkSize.y - (2 * margin), textHeight)));
-  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+  ImGuiStyle& style = ImGui::GetStyle();
+  style.Colors[ImGuiCol_WindowBg] = ImVec4(
+    this->BackdropColor[0], this->BackdropColor[1], this->BackdropColor[2], this->BackdropOpacity);
 
-  ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+  const ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
     ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings |
     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove |
     ImGuiWindowFlags_NoBringToFrontOnFocus;
@@ -1099,7 +1127,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
       ImVec2 topBindingCorner, bottomBindingCorner;
       std::vector<std::string> splittedBinding = ::SplitBindings(bind, '+');
       const float maxCursorPosX = ImGui::GetCursorPosX() + ImGui::GetColumnWidth();
-      float posX = maxCursorPosX - ImGui::CalcTextSize(bind.c_str()).x - ImGui::GetScrollX() -
+      const float posX = maxCursorPosX - ImGui::CalcTextSize(bind.c_str()).x - ImGui::GetScrollX() -
         ((splittedBinding.size() * 2) - 1) * spacingX;
       ImGui::SetCursorPosX(posX);
       for (const std::string& key : splittedBinding)
@@ -1146,18 +1174,247 @@ void vtkF3DImguiActor::RenderFpsCounter()
   winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
   winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-  ImVec2 position(
-    viewport->WorkSize.x - winSize.x - margin, viewport->WorkSize.y - winSize.y - margin);
+  float posX = viewport->WorkSize.x - winSize.x - margin;
+  if (this->ConsoleBadgeEnabled)
+  {
+    vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+    if (console && console->IsBadgeVisible())
+    {
+      const ImVec2 badgeSize = console->GetBadgeSize();
+      posX = viewport->WorkSize.x - winSize.x - badgeSize.x - 2.f * margin;
+    }
+  }
+  ImVec2 position(posX, margin);
 
   ::SetupNextWindow(position, winSize);
-  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+  ImGuiStyle& style = ImGui::GetStyle();
+  style.Colors[ImGuiCol_WindowBg] = ImVec4(
+    this->BackdropColor[0], this->BackdropColor[1], this->BackdropColor[2], this->BackdropOpacity);
 
-  ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
+  const ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
 
   ImGui::Begin("FpsCounter", nullptr, flags);
   ImGui::TextUnformatted(fpsString.c_str());
   ImGui::End();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderAnimationProgressBar()
+{
+  const double rangeMin = this->AnimationTimeRange.first;
+  const double rangeMax = this->AnimationTimeRange.second;
+  const double span = rangeMax - rangeMin;
+  if (span <= 0.0)
+  {
+    return;
+  }
+
+  const ImGuiViewport* viewport = ImGui::GetMainViewport();
+  constexpr float margin = F3DStyle::GetDefaultMargin();
+
+  // The progress bar itself looks the same in both modes.
+  // "advanced" mode additionally draws key frame markers and a text
+  // row (start/end/current times and the animation name) above the bar.
+  const bool advanced = (this->AnimationProgressMode == AnimationProgressBarMode::ADVANCED);
+
+  const float grabRadius = ::PROGRESS_BAR_GRAB_RADIUS * this->FontScale;
+  const float lineHeight = ImGui::GetTextLineHeight();
+  const float barWidth = viewport->WorkSize.x;
+
+  const ::ProgressBarLayout layout =
+    ::ComputeProgressBarLayout(this->FontScale, advanced, lineHeight);
+  const float winY = viewport->WorkSize.y - layout.windowHeight;
+
+  ::SetupNextWindow(ImVec2(0.f, winY), ImVec2(barWidth, layout.windowHeight));
+  ImGui::SetNextWindowBgAlpha(0.f);
+
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.f, 0.f));
+  ImGui::Begin("AnimationProgress", nullptr,
+    ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
+      ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove |
+      ImGuiWindowFlags_NoBringToFrontOnFocus);
+
+  // Submitted before other overlays (see vtkF3DUIActor::RenderOverlay) so it stays bottom-most;
+  // NoBringToFrontOnFocus keeps it there when its seek button is clicked.
+
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+  const ImVec2 origin = ImGui::GetCursorScreenPos();
+  const float contentTop = origin.y + layout.padding;
+  const float barBottom = origin.y + layout.windowHeight;
+  const float barTop = barBottom - layout.barRowHeight;
+  const ImVec2 barMin(origin.x, barBottom - ::PROGRESS_BAR_THICKNESS);
+  const ImVec2 barMax(origin.x + barWidth, barBottom);
+
+  // Map an animation time to its horizontal position on the bar
+  const auto timeToX = [&](double time)
+  {
+    const float frac = std::clamp(static_cast<float>((time - rangeMin) / span), 0.f, 1.f);
+    return barMin.x + frac * barWidth;
+  };
+
+  const ImColor fillColor = ::ColorToImVec4(this->AnimationProgressColor);
+  const ImColor textColor = ImColor(F3DStyle::imgui::GetHighlightColor());
+  const ImColor fontColor = ::ColorToImVec4(this->FontColor);
+
+  if (advanced)
+  {
+    const ImColor backdropColor = ImColor(ImVec4(this->BackdropColor[0], this->BackdropColor[1],
+      this->BackdropColor[2], this->BackdropOpacity));
+    drawList->AddRectFilled(origin, ImVec2(origin.x + barWidth, barBottom), backdropColor, 0.f);
+  }
+
+  // Invisible button over the bar row captures click/drag
+  ImGui::SetCursorScreenPos(ImVec2(origin.x, barTop));
+  ImGui::InvisibleButton("##animSeek", ImVec2(barWidth, layout.barRowHeight));
+  const bool active = ImGui::IsItemActive();
+  const bool hovered = ImGui::IsItemHovered();
+
+  const float mouseFrac = std::clamp((ImGui::GetIO().MousePos.x - barMin.x) / barWidth, 0.f, 1.f);
+  const double mouseTime = rangeMin + static_cast<double>(mouseFrac) * span;
+
+  if (active)
+  {
+    // Jump to the exact time under the cursor
+    const std::string command = "jump_to_time " + std::to_string(mouseTime);
+    vtkOutputWindow::GetInstance()->InvokeEvent(
+      vtkF3DUserEvents::TriggerEvent, const_cast<char*>(command.c_str()));
+  }
+
+  // Filled portion of progress bar up to the current time
+  drawList->AddRectFilled(
+    barMin, ImVec2(timeToX(this->AnimationCurrentTime), barMax.y), fillColor, 0.f);
+
+  // Advanced mode only: key frame markers, then time/name labels and the hover tooltip
+  if (advanced)
+  {
+    // Key frame markers
+    for (const double kf : this->AnimationKeyFrames)
+    {
+      const float kfX = timeToX(kf);
+      drawList->AddLine(
+        ImVec2(kfX, barMin.y - 2.f), ImVec2(kfX, barMax.y), fontColor, 1.f * this->FontScale);
+    }
+
+    // Time/name labels above the bar and the hover tooltip
+    auto label = [](double t) -> std::string
+    {
+      std::ostringstream oss;
+      oss << std::fixed << std::setprecision(2) << t << "s";
+      return oss.str();
+    };
+
+    const std::string startLabel = label(rangeMin);
+    const std::string endLabel = label(rangeMax);
+    const std::string currentLabel = label(this->AnimationCurrentTime);
+
+    drawList->AddText(ImVec2(origin.x + margin, contentTop), textColor, startLabel.c_str());
+    const float endWidth = ImGui::CalcTextSize(endLabel.c_str()).x;
+    drawList->AddText(
+      ImVec2(origin.x + barWidth - margin - endWidth, contentTop), textColor, endLabel.c_str());
+
+    std::string nameLabel = this->AnimationName;
+    if (this->AnimationSpeedFactor != 1.0)
+    {
+      const std::string speedLabel = "(x" + ::FormatSpeedFactor(this->AnimationSpeedFactor) + ")";
+      nameLabel += nameLabel.empty() ? speedLabel : " " + speedLabel;
+    }
+
+    // Animation name and current time.
+    const bool hasName = !nameLabel.empty();
+    const float nameWidth = hasName ? ImGui::CalcTextSize(nameLabel.c_str()).x : 0.f;
+    const float gapWidth = hasName ? ImGui::CalcTextSize("  ").x : 0.f;
+    const float curWidth = ImGui::CalcTextSize(currentLabel.c_str()).x;
+    float cursorX = origin.x + (barWidth - (nameWidth + gapWidth + curWidth)) * 0.5f;
+    if (hasName)
+    {
+      drawList->AddText(ImVec2(cursorX, contentTop), fontColor, nameLabel.c_str());
+      cursorX += nameWidth + gapWidth;
+    }
+    drawList->AddText(ImVec2(cursorX, contentTop), textColor, currentLabel.c_str());
+
+    // Hover tooltip showing the time we would jump to. If the cursor is near a
+    // key frame marker, show key frame time.
+    if (hovered)
+    {
+      bool onKeyFrame = false;
+      double keyFrameTime = 0.0;
+      float nearestDist = grabRadius;
+      for (const double kf : this->AnimationKeyFrames)
+      {
+        const float dist = std::fabs(ImGui::GetIO().MousePos.x - timeToX(kf));
+        if (dist <= nearestDist)
+        {
+          nearestDist = dist;
+          keyFrameTime = kf;
+          onKeyFrame = true;
+        }
+      }
+
+      const std::string tooltipText =
+        onKeyFrame ? "Key frame\n" + label(keyFrameTime) : label(mouseTime);
+
+      // Restore padding for tooltip
+      const float tooltipPadding = margin * this->FontScale;
+      ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(tooltipPadding, tooltipPadding));
+
+      // The tooltip tracks the cursor horizontally but stays at a fixed height
+      const float tooltipTextWidth = ImGui::CalcTextSize(tooltipText.c_str()).x;
+      const float tooltipHalfWidth = 0.5f * (tooltipTextWidth + 2.f * tooltipPadding);
+      const float tooltipX = std::clamp(
+        ImGui::GetIO().MousePos.x, barMin.x + tooltipHalfWidth, barMax.x - tooltipHalfWidth);
+      ImGui::SetNextWindowPos(
+        ImVec2(tooltipX, barMin.y - 2.f * this->FontScale), ImGuiCond_Always, ImVec2(0.5f, 1.f));
+      ImGui::BeginTooltip();
+      // Center each line within the auto-sized tooltip borders.
+      std::istringstream tooltipLines(tooltipText);
+      std::string tooltipLine;
+      while (std::getline(tooltipLines, tooltipLine))
+      {
+        const float lineWidth = ImGui::CalcTextSize(tooltipLine.c_str()).x;
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 0.5f * (tooltipTextWidth - lineWidth));
+        ImGui::TextUnformatted(tooltipLine.c_str());
+      }
+      ImGui::EndTooltip();
+
+      ImGui::PopStyleVar();
+    }
+  }
+
+  ImGui::End();
+  ImGui::PopStyleVar();
+}
+
+//----------------------------------------------------------------------------
+double vtkF3DImguiActor::GetAnimationProgressBarHeight() const
+{
+  const double span = this->AnimationTimeRange.second - this->AnimationTimeRange.first;
+  if (this->AnimationProgressMode == AnimationProgressBarMode::NONE || span <= 0.0)
+  {
+    return 0.0;
+  }
+
+  const bool advanced = (this->AnimationProgressMode == AnimationProgressBarMode::ADVANCED);
+  const float lineHeight = F3DStyle::FontSizeBase * this->FontScale;
+  const ::ProgressBarLayout layout =
+    ::ComputeProgressBarLayout(this->FontScale, advanced, lineHeight);
+
+  // Lift the scalar bar by what's actually drawn. Advanced mode always draws the text row and
+  // key frame markers, so clear the whole window plus a margin.
+  if (advanced)
+  {
+    return layout.windowHeight + F3DStyle::GetDefaultMargin();
+  }
+
+  // Default mode paints only the filled portion, which is invisible until playback passes the start
+  // of the range. Reserve no space while it is hidden, else the scalar bar floats above an empty
+  // gap.
+  if (this->AnimationCurrentTime <= this->AnimationTimeRange.first)
+  {
+    return 0.0;
+  }
+  return ::PROGRESS_BAR_THICKNESS;
 }
 
 //----------------------------------------------------------------------------
@@ -1182,7 +1439,7 @@ void vtkF3DImguiActor::StartFrame(vtkOpenGLRenderWindow* renWin)
     this->Initialize(renWin);
   }
 
-  int* size = renWin->GetSize();
+  const int* size = renWin->GetSize();
 
   ImGuiIO& io = ImGui::GetIO();
   io.DisplaySize = ImVec2(static_cast<float>(size[0]), static_cast<float>(size[1]));
@@ -1214,7 +1471,8 @@ void vtkF3DImguiActor::RenderNotifications(double currentTime)
   constexpr double fadingOutTime = .5;
 
   int index = 0;
-  float yOffset = 0.0f;
+  // Start the stack above the progress bar to avoid overlapping it.
+  float yOffset = static_cast<float>(this->GetAnimationProgressBarHeight());
 
   for (const auto& [desc, value, bind, startTime, stopTime] : this->Notifications)
   {
@@ -1229,9 +1487,9 @@ void vtkF3DImguiActor::RenderNotifications(double currentTime)
     // Mimic the style format in cheatsheet
     ImGui::PushFont(Pimpl->ExtraFonts["notiFont"]);
     constexpr float margin = F3DStyle::GetDefaultMargin();
-    ImVec2 descLineSize = ImGui::CalcTextSize(description.c_str());
-    ImVec2 valueLineSize = ImGui::CalcTextSize(value.c_str());
-    ImVec2 windowPadding = ImGui::GetStyle().WindowPadding;
+    const ImVec2 descLineSize = ImGui::CalcTextSize(description.c_str());
+    const ImVec2 valueLineSize = ImGui::CalcTextSize(value.c_str());
+    const ImVec2 windowPadding = ImGui::GetStyle().WindowPadding;
     const float itemSpacingX = ImGui::GetStyle().ItemSpacing.x;
     // Increase line spacing a bit
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(itemSpacingX, 10.0f * this->FontScale));
@@ -1248,7 +1506,7 @@ void vtkF3DImguiActor::RenderNotifications(double currentTime)
           { return sum + this->CalcBadgeWidth(key) + itemSpacingX; });
     }
 
-    float windowHeight = descLineSize.y + windowPadding.y * 2.f;
+    const float windowHeight = descLineSize.y + windowPadding.y * 2.f;
 
     ImVec4 descTextColor = ::ColorToImVec4(this->FontColor);
     ImVec4 valueTextColor = F3DStyle::imgui::GetHighlightColor(); // Blue
@@ -1271,7 +1529,7 @@ void vtkF3DImguiActor::RenderNotifications(double currentTime)
     valueTextColor.w = alpha;
     ImGui::SetNextWindowBgAlpha(alpha * this->BackdropOpacity);
 
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
+    const ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
       ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing |
       ImGuiWindowFlags_NoNav;
 
@@ -1311,7 +1569,7 @@ void vtkF3DImguiActor::RenderNotifications(double currentTime)
 //----------------------------------------------------------------------------
 float vtkF3DImguiActor::CalcBadgeWidth(const std::string& text)
 {
-  ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
+  const ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
   const float paddingX = F3DStyle::GetDefaultMargin() * this->FontScale;
   return textSize.x + paddingX * 2.f;
 }
@@ -1322,20 +1580,20 @@ void vtkF3DImguiActor::RenderBadge(const std::string& text, float alpha)
   ImDrawList* drawList = ImGui::GetWindowDrawList();
 
   ImVec2 pos = ImGui::GetCursorScreenPos();
-  ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
+  const ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
 
   const float paddingX = F3DStyle::GetDefaultMargin() * this->FontScale;
   const float paddingY = F3DStyle::GetDefaultMargin() * this->FontScale * 0.5f;
 
-  ImVec2 badgeSize = ImVec2(textSize.x + paddingX * 2.f, textSize.y + paddingY * 2.f);
+  const ImVec2 badgeSize = ImVec2(textSize.x + paddingX * 2.f, textSize.y + paddingY * 2.f);
 
   // Align badge vertically
   pos.y += (ImGui::GetTextLineHeight() - badgeSize.y) * 0.5f;
 
-  ImVec2 rectMin = pos;
-  ImVec2 rectMax = ImVec2(pos.x + badgeSize.x, pos.y + badgeSize.y);
+  const ImVec2 rectMin = pos;
+  const ImVec2 rectMax = ImVec2(pos.x + badgeSize.x, pos.y + badgeSize.y);
 
-  float rounding = 4.f * this->FontScale;
+  const float rounding = 4.f * this->FontScale;
 
   ImVec4 bindingTextColor = ::ColorToImVec4(this->FontColor);
   ImVec4 bindingRectColor = F3DStyle::imgui::GetMidColor();
@@ -1347,7 +1605,7 @@ void vtkF3DImguiActor::RenderBadge(const std::string& text, float alpha)
     rectMin, rectMax, ImGui::ColorConvertFloat4ToU32(bindingRectColor), rounding);
 
   // Text
-  ImVec2 textPos = ImVec2(pos.x + paddingX, pos.y + paddingY);
+  const ImVec2 textPos = ImVec2(pos.x + paddingX, pos.y + paddingY);
 
   drawList->AddText(textPos, ImGui::ColorConvertFloat4ToU32(bindingTextColor), text.c_str());
 

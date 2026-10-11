@@ -1,4 +1,5 @@
 #include "PseudoUnitTest.h"
+#include "TestSDKHelpers.h"
 
 #include <camera.h>
 #include <engine.h>
@@ -6,24 +7,27 @@
 #include <options.h>
 #include <window.h>
 
-int TestSDKInteractorCommand([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
+#include <filesystem>
+
+int TestSDKInteractorCommand([[maybe_unused]] int argc, char* argv[])
 {
-  f3d::engine eng = f3d::engine::create(true);
+  const std::string renderingBackend = std::string(argv[4]);
+  f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::options& options = eng.getOptions();
   f3d::interactor& inter = eng.getInteractor();
 
   PseudoUnitTest test;
 
   // Test `set`
-  inter.triggerCommand("set model.scivis.cells true");
-  test("triggerCommand set", options.model.scivis.cells == true);
+  inter.triggerCommand("set model.scivis.field cells");
+  test("triggerCommand set", options.model.scivis.field == "cells");
   inter.triggerCommand("set render.hdri.file \"/path/to/file with spaces.ext\"");
   test("triggerCommand set double quotes",
     options.render.hdri.file.value() == "/path/to/file with spaces.ext");
 
   // Test reset
-  inter.triggerCommand("reset model.scivis.cells");
-  test("triggerCommand reset", options.model.scivis.cells == false);
+  inter.triggerCommand("reset model.scivis.field");
+  test("triggerCommand reset", options.model.scivis.field == "any");
   inter.triggerCommand("reset render.hdri.file");
   test("triggerCommand reset optional", options.render.hdri.file.has_value() == false);
 
@@ -34,8 +38,18 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, [[maybe_unused]] char* a
 #endif
 
   // Test toggle
-  inter.triggerCommand("toggle model.scivis.cells");
-  test("triggerCommand toggle", options.model.scivis.cells == true);
+  inter.triggerCommand("toggle scene.camera.orthographic");
+  test("triggerCommand toggle", options.scene.camera.orthographic == true);
+
+  // Test increase/decrease
+  inter.triggerCommand("increase render.light.intensity");
+  inter.triggerCommand("increase render.light.intensity");
+  inter.triggerCommand("decrease render.light.intensity");
+  test("triggerCommand increase/decrease", options.render.light.intensity, 1.02);
+
+  // Test cycle
+  inter.triggerCommand("cycle render.effect.blending.mode");
+  test("triggerCommand cycle", options.render.effect.blending.mode == "ddp");
 
   // Test alias command
   inter.triggerCommand("alias axis_on set ui.axis on");
@@ -47,17 +61,17 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, [[maybe_unused]] char* a
 
   // triggerCommand error codepaths
   test("triggerCommand toggle incompatible",
-    inter.triggerCommand("toggle scene.animation.index") == false);
+    inter.triggerCommand("toggle scene.animation.indices") == false);
   test("triggerCommand reset inexistent", inter.triggerCommand("reset inexistent") == false);
   test("triggerCommand print not set", inter.triggerCommand("print render.hdri.file") == false);
   test("triggerCommand set unparsable",
-    inter.triggerCommand("set scene.animation.index invalid") == false);
+    inter.triggerCommand("set scene.animation.indices invalid") == false);
 
   // Add/Remove command
-  inter.addCommand(
-    "test_toggle", [&](const std::vector<std::string>&) { options.toggle("model.scivis.cells"); });
+  inter.addCommand("test_toggle",
+    [&](const std::vector<std::string>&) { options.toggle("scene.camera.orthographic"); });
   inter.triggerCommand("test_toggle");
-  test("addCommand", options.model.scivis.cells == false);
+  test("addCommand", options.scene.camera.orthographic == false);
 
   // Coverage help with no doc
   test("help test_toggle", inter.triggerCommand("help test_toggle") == true);
@@ -65,18 +79,10 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, [[maybe_unused]] char* a
   inter.removeCommand("test_toggle");
   test("removeCommand", inter.triggerCommand("test_toggle") == false);
 
-  // Test cycle_interactor_style
-  inter.triggerCommand("cycle_interactor_style");
-  test("cycle_interactor_style to trackball", options.interactor.style == "trackball");
-  inter.triggerCommand("cycle_interactor_style");
-  test("cycle_interactor_style to 2d", options.interactor.style == "2d");
-  inter.triggerCommand("cycle_interactor_style");
-  test("cycle_interactor_style to default", options.interactor.style == "default");
-
   // Test camera commands are no-op in 2D mode
   options.interactor.style = "2d";
-  f3d::camera& cam = eng.getWindow().getCamera();
-  f3d::point3_t posBefore = cam.getPosition();
+  const f3d::camera& cam = eng.getWindow().getCamera();
+  const f3d::point3_t posBefore = cam.getPosition();
   inter.triggerCommand("set_camera front");
   inter.triggerCommand("roll_camera 90");
   inter.triggerCommand("elevation_camera 90");
@@ -85,7 +91,7 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, [[maybe_unused]] char* a
   options.interactor.style = "default";
 
   // Coverage print
-  inter.triggerCommand("print model.scivis.cells");
+  inter.triggerCommand("print model.scivis.field");
 
   // Coverage cycle_coloring
   test("triggerCommand cycle_coloring invalid arg",
@@ -99,23 +105,58 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, [[maybe_unused]] char* a
   test("triggerCommand exception handling",
     inter.triggerCommand(R"(print "render.hdri.file)") == false);
 
+  // Test save_statefile / load_statefile libf3d commands (file based, deterministic)
+  const std::string statePath = std::string(argv[2]) + "interactor_command_statefile.json";
+  options.model.scivis.field = "cells";
+  test("save_statefile command", inter.triggerCommand("save_statefile " + statePath) == true);
+  test("save_statefile wrote a file", std::filesystem::exists(statePath), true);
+  options.model.scivis.field = "any";
+  test("load_statefile command", inter.triggerCommand("load_statefile " + statePath) == true);
+  test("load_statefile restored option", options.model.scivis.field == "cells");
+  test("save_statefile invalid args", inter.triggerCommand("save_statefile") == false);
+  test("load_statefile invalid args", inter.triggerCommand("load_statefile one two") == false);
+  // The statefile_exception is caught and logged, the command still returns true
+  test("save_statefile to unwritable path",
+    inter.triggerCommand("save_statefile " + std::string(argv[2]) + "no_such_dir/state.json") ==
+      true);
+  test("load_statefile from missing file",
+    inter.triggerCommand("load_statefile " + std::string(argv[2]) + "no_such_statefile.json") ==
+      true);
+
+#if F3D_MODULE_CLIP
+  // Clipboard commands: round-trip through the system clipboard. When the clipboard is unavailable
+  // the statefile_exception is caught and logged, the command still returns true.
+  options.model.scivis.field = "cells";
+  test("save_statefile_to_clipboard command",
+    inter.triggerCommand("save_statefile_to_clipboard") == true);
+  test("save_statefile_to_clipboard invalid args",
+    inter.triggerCommand("save_statefile_to_clipboard extra") == false);
+  test("load_statefile_from_clipboard command",
+    inter.triggerCommand("load_statefile_from_clipboard") == true);
+  test("load_statefile_from_clipboard invalid args",
+    inter.triggerCommand("load_statefile_from_clipboard extra") == false);
+#endif
+
+  // Restore the option to the state the rest of the test expects
+  options.model.scivis.field = "any";
+
   // remove all commands
   for (const std::string& action : inter.getCommandActions())
   {
     inter.removeCommand(action);
   }
-  test("removeAllCommands", inter.triggerCommand("print model.scivis.cells") == false);
+  test("removeAllCommands", inter.triggerCommand("print model.scivis.field") == false);
 
   // Initialize default two times and check they work
   inter.initCommands();
   inter.initCommands();
-  inter.triggerCommand("toggle model.scivis.cells");
-  test("triggerCommand after defaults creation", options.model.scivis.cells == true);
+  inter.triggerCommand("set model.scivis.field cells");
+  test("triggerCommand after defaults creation", options.model.scivis.field == "cells");
 
   // check exception
   test.expect<f3d::interactor::already_exists_exception>("add already existing command", [&]() {
-    inter.addCommand(
-      "toggle", [&](const std::vector<std::string>&) { options.toggle("model.scivis.cells"); });
+    inter.addCommand("toggle",
+      [&](const std::vector<std::string>&) { options.toggle("scene.camera.orthographic"); });
   });
 
   // Args check

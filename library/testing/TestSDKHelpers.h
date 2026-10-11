@@ -1,15 +1,31 @@
 #ifndef TestSDKHelpers_h
 #define TestSDKHelpers_h
 
+#include <engine.h>
 #include <image.h>
 #include <window.h>
 
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <numbers>
 
 namespace TestSDKHelpers
 {
+inline f3d::engine CreateOffscreenEngine(const std::string& renderingBackend)
+{
+  if (renderingBackend == "osmesa")
+  {
+    return f3d::engine::createOSMesa();
+  }
+
+  if (renderingBackend == "egl")
+  {
+    return f3d::engine::createEGL();
+  }
+
+  return f3d::engine::create(true);
+}
 
 inline bool RenderTest(const f3d::image& img, const std::string& baselinePath,
   const std::string& outputPath, const std::string& name, double threshold = 0.05)
@@ -66,7 +82,7 @@ inline bool RenderTest(f3d::window& win, const std::string& baselinePath,
 
 constexpr double Degrees2Radians(double degrees)
 {
-  return (3.14159265358979323846 * degrees / 180.0);
+  return (std::numbers::pi * degrees / 180.0);
 }
 }
 #endif

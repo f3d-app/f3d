@@ -6,6 +6,8 @@
 #include <scene.h>
 #include <window.h>
 
+#include <algorithm>
+
 namespace fs = std::filesystem;
 
 int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
@@ -13,38 +15,78 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   PseudoUnitTest test;
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  f3d::engine eng = f3d::engine::create(true);
+  const std::string renderingBackend = argv[4];
+  f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::scene& sce = eng.getScene();
   f3d::window& win = eng.getWindow().setSize(300, 300);
 
   // Test file logic
   std::string empty;
-  std::string dummyFilename = "dummy.foo";
-  std::string nonExistentFilename = "nonExistent.vtp";
-  std::string unsupportedFilename = "unsupportedFile.dummy";
-  std::string invalidBodyFilename = "invalid_body.vtp";
-  std::string logoFilename = "mb/recursive/f3d.glb";
-  std::string sphere1Filename = "mb/recursive/mb_1_0.vtp";
-  std::string sphere2Filename = "mb/recursive/mb_2_0.vtp";
-  std::string cubeFilename = "mb/recursive/mb_0_0.vtu";
-  std::string worldFilename = "world.obj";
+  const std::string dummyFilename = "dummy.foo";
+  const std::string nonExistentFilename = "nonExistent.vtp";
+  const std::string unsupportedFilename = "unsupportedFile.dummy";
+  const std::string invalidBodyFilename = "invalid_body.vtp";
+  const std::string logoFilename = "mb/recursive/f3d.glb";
+  const std::string sphere1Filename = "mb/recursive/mb_1_0.vtp";
+  const std::string sphere2Filename = "mb/recursive/mb_2_0.vtp";
+  const std::string cubeFilename = "mb/recursive/mb_0_0.vtu";
+  const std::string worldFilename = "world.obj";
+  std::string validFilename = "cow.vtp";
+  const std::string invalidDefaultSceneFilename = "invalid_body.vtp";
+  const std::string invalidFullSceneFilename = "invalid_body.gltf";
   std::string dummy = std::string(argv[1]) + "data/" + dummyFilename;
   std::string nonExistent = std::string(argv[1]) + "data/" + nonExistentFilename;
   std::string unsupported = std::string(argv[1]) + "data/" + unsupportedFilename;
-  std::string invalidBody = std::string(argv[1]) + "data/" + invalidBodyFilename;
+  const std::string invalidBody = std::string(argv[1]) + "data/" + invalidBodyFilename;
   std::string logo = std::string(argv[1]) + "data/" + logoFilename;
   std::string sphere1 = std::string(argv[1]) + "data/" + sphere1Filename;
   std::string sphere2 = std::string(argv[1]) + "data/" + sphere2Filename;
   std::string cube = std::string(argv[1]) + "data/" + cubeFilename;
   std::string world = std::string(argv[1]) + "data/" + worldFilename;
+  std::string monkey = std::string(argv[1]) + "data/red_translucent_monkey.gltf";
+  std::string invalidDefaultScene = std::string(argv[1]) + "data/" + invalidDefaultSceneFilename;
+  std::string invalidFullScene = std::string(argv[1]) + "data/" + invalidFullSceneFilename;
 
   // supports method
-  test("not supported with empty filename", !sce.supports(empty));
-  test("not supported with dummy filename", !sce.supports(dummy));
-  test("not supported with non existent filename", !sce.supports(nonExistent));
-  test("supported with invalid body", sce.supports(invalidBody));
-  test("supported with default scene format", sce.supports(cube));
-  test("supported with full scene format", sce.supports(logo));
+  test("not supported with empty filename",
+    sce.supports(empty) == f3d::file_availability::UNSUPPORTED_EXTENSION);
+  test("not supported with dummy filename",
+    sce.supports(dummy) == f3d::file_availability::UNSUPPORTED_EXTENSION);
+  test("not supported with non existent filename",
+    sce.supports(nonExistent) == f3d::file_availability::UNSUPPORTED_EXTENSION);
+  test(
+    "supported with invalid body", sce.supports(invalidBody) == f3d::file_availability::SUPPORTED);
+  test(
+    "supported with default scene format", sce.supports(cube) == f3d::file_availability::SUPPORTED);
+  test("supported with full scene format", sce.supports(logo) == f3d::file_availability::SUPPORTED);
+  // invalid
+  test.expect<f3d::scene::load_failure_exception>(
+    "add with invalid default scene file", [&]() { sce.add(invalidDefaultScene); });
+  test.expect<f3d::scene::load_failure_exception>(
+    "add with invalid full scene file", [&]() { sce.add(invalidFullScene); });
+  test.expect<f3d::scene::load_failure_exception>("add with invalid multiple files",
+    [&]() { sce.add({ validFilename, invalidFullScene, invalidDefaultScene }); });
+
+  // invalid reader
+  {
+    f3d::engine engine = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
+    engine.getOptions().scene.force_reader = "INVALID";
+    f3d::scene& scene = engine.getScene();
+    test.expect<f3d::scene::load_failure_exception>(
+      "Handling wrong force reader, exception type check", [&]() { scene.add(fs::path(monkey)); });
+    try
+    {
+      scene.add(fs::path(monkey));
+    }
+    catch (f3d::scene::load_failure_exception& E)
+    {
+      const std::string expectedMsg = "is not a valid force reader";
+      const std::string exceptMsg = E.what();
+      test("Check exception message size", exceptMsg.size() >= expectedMsg.size());
+      test("Check exception message",
+        exceptMsg.substr(exceptMsg.size() - expectedMsg.size(), expectedMsg.size()) == expectedMsg);
+    }
+  }
 
   // add error code paths
   test.expect<f3d::scene::load_failure_exception>("add with dummy file", [&]() { sce.add(dummy); });
@@ -73,20 +115,20 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     return sce.getLightCount() == 0;
   });
   test("add default light", [&]() {
-    int index = sce.addLight(defaultLight);
+    const int index = sce.addLight(defaultLight);
     return index == 0 && sce.getLightCount() == 1;
   });
   test("add red light", [&]() {
-    int index = sce.addLight(redLight);
+    const int index = sce.addLight(redLight);
     return index == 1 && sce.getLightCount() == 2;
   });
   test("light count after add", [&]() { return sce.getLightCount() == 2; });
   test("get light at index 0", [&]() {
-    f3d::light_state_t light = sce.getLight(0);
+    const f3d::light_state_t light = sce.getLight(0);
     return light == defaultLight;
   });
   test("get light at index 1", [&]() {
-    f3d::light_state_t light = sce.getLight(1);
+    const f3d::light_state_t light = sce.getLight(1);
     return light == redLight;
   });
   test.expect<f3d::scene::light_exception>(
@@ -105,6 +147,122 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("render after light",
     TestSDKHelpers::RenderTest(
       win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKSceneRedLight"));
+
+  redLight.switchState = false;
+  sce.updateLight(0, redLight);
+  eng.getWindow().render();
+  test("turn all lights off and render", sce.getLightCount(), 1);
+
+  sce.removeAllLights();
+  eng.getWindow().render();
+  test("remove all lights and render", sce.getLightCount(), 0);
+
+  // scene hierarchy test, using a dedicated engine to avoid impacting the renders above
+  {
+    f3d::engine engine = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
+    f3d::scene& scene = engine.getScene();
+
+    test("empty scene hierarchy", scene.getSceneHierarchy().empty());
+    test.expect<f3d::scene::node_exception>(
+      "set node visibility with an empty scene", [&]() { scene.setNodeVisibility(0, false); });
+
+    scene.add(fs::path(logo));
+    const std::vector<f3d::node_state_t> hierarchy = scene.getSceneHierarchy();
+    test("scene hierarchy is not empty", !hierarchy.empty());
+    test("scene hierarchy root is the added file",
+      hierarchy[0].id == 0 && hierarchy[0].parentId == -1 && hierarchy[0].level == 0 &&
+        hierarchy[0].label == fs::path(logo).filename().string());
+    test("scene hierarchy levels", [&]() {
+      return std::ranges::all_of(hierarchy,
+               [&](const f3d::node_state_t& node) {
+                 return node.level == (node.parentId < 0 ? 0 : hierarchy[node.parentId].level + 1);
+               }) &&
+        std::ranges::any_of(
+          hierarchy, [](const f3d::node_state_t& node) { return node.level > 0; });
+    });
+    test("scene hierarchy nodes are visible by default",
+      std::ranges::all_of(hierarchy, [](const f3d::node_state_t& node) { return node.visible; }));
+    test("scene hierarchy is in depth-first pre-order", [&]() {
+      int expectedId = 0;
+      return std::ranges::all_of(hierarchy, [&expectedId](const f3d::node_state_t& node) {
+        return node.id == expectedId++ && node.parentId < node.id;
+      });
+    });
+    test("scene hierarchy contains a group node and a leaf node",
+      std::ranges::any_of(
+        hierarchy, [](const f3d::node_state_t& node) { return node.hasChildren; }) &&
+        std::ranges::any_of(
+          hierarchy, [](const f3d::node_state_t& node) { return !node.hasChildren; }));
+
+    test.expect<f3d::scene::node_exception>(
+      "set node visibility with a negative index", [&]() { scene.setNodeVisibility(-1, false); });
+    test.expect<f3d::scene::node_exception>("set node visibility with an out of range index",
+      [&]() { scene.setNodeVisibility(static_cast<int>(hierarchy.size()), false); });
+
+    test("hide the whole hierarchy from its root", [&]() {
+      scene.setNodeVisibility(0, false);
+      const std::vector<f3d::node_state_t> hidden = scene.getSceneHierarchy();
+      return std::ranges::none_of(
+        hidden, [](const f3d::node_state_t& node) { return node.visible; });
+    });
+    test("show the whole hierarchy from its root", [&]() {
+      scene.setNodeVisibility(0, true);
+      const std::vector<f3d::node_state_t> shown = scene.getSceneHierarchy();
+      return std::ranges::all_of(shown, [](const f3d::node_state_t& node) { return node.visible; });
+    });
+
+    scene.add(fs::path(cube));
+    const std::vector<f3d::node_state_t> appended = scene.getSceneHierarchy();
+    test("scene hierarchy is appended when adding a file",
+      appended.size() > hierarchy.size() &&
+        std::equal(hierarchy.begin(), hierarchy.end(), appended.begin()));
+    test("each added file provides a root node",
+      std::ranges::count_if(
+        appended, [](const f3d::node_state_t& node) { return node.parentId == -1; }) == 2);
+
+    // the cube is read by the generic importer, whose actors have no property keys yet
+    test("hide the hierarchy of a single added file", [&]() {
+      const auto appendedBegin = static_cast<std::ptrdiff_t>(hierarchy.size());
+      scene.setNodeVisibility(static_cast<int>(hierarchy.size()), false);
+      const std::vector<f3d::node_state_t> hidden = scene.getSceneHierarchy();
+      return std::all_of(hidden.begin(), hidden.begin() + appendedBegin,
+               [](const f3d::node_state_t& node) { return node.visible; }) &&
+        std::none_of(hidden.begin() + appendedBegin, hidden.end(),
+          [](const f3d::node_state_t& node) { return node.visible; });
+    });
+
+    test("scene hierarchy is cleared with the scene", [&]() {
+      scene.clear();
+      return scene.getSceneHierarchy().empty();
+    });
+  }
+
+  // scene info test, using a dedicated engine to avoid impacting the renders above
+  {
+    f3d::engine engine = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
+    f3d::scene& scene = engine.getScene();
+
+    test("empty scene info", scene.getSceneInfo() == f3d::scene_info_t{});
+
+    scene.add(fs::path(logo));
+    const f3d::scene_info_t info = scene.getSceneInfo();
+    test("scene info counts the added file", info.numberOfFiles == 1);
+    test("scene info counts actors, points and cells",
+      info.numberOfActors > 0 && info.numberOfPoints > 0 && info.numberOfCells > 0);
+
+    scene.add(fs::path(cube));
+    const f3d::scene_info_t appended = scene.getSceneInfo();
+    test("scene info counts both added files", appended.numberOfFiles == 2);
+    test("scene info counters increase when adding a file",
+      appended.numberOfActors > info.numberOfActors &&
+        appended.numberOfPoints > info.numberOfPoints &&
+        appended.numberOfCells > info.numberOfCells);
+
+    test("scene info is cleared with the scene", [&]() {
+      scene.clear();
+      return scene.getSceneInfo() == f3d::scene_info_t{};
+    });
+  }
 
   return test.result();
 }

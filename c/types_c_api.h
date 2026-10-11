@@ -125,7 +125,7 @@ extern "C"
    *
    * @param colormap Colormap to free.
    */
-  F3D_EXPORT void f3d_colormap_free(f3d_colormap_t* colormap);
+  F3D_EXPORT void f3d_colormap_destroy(f3d_colormap_t* colormap);
 
   /**
    * @brief Describe a 3D surfacic mesh.
@@ -152,13 +152,109 @@ extern "C"
    * @brief Check validity of a mesh.
    *
    * The returned error message string is heap-allocated and must be freed with
-   * f3d_utils_string_free().
+   * f3d_utils_string_destroy().
    *
    * @param mesh Mesh to validate.
    * @param error_message Pointer to receive error message if invalid.
    * @return 1 if valid, 0 if invalid.
    */
   F3D_EXPORT int f3d_mesh_is_valid(const f3d_mesh_t* mesh, char** error_message);
+
+  /**
+   * @brief Scalar data types supported by a zero-copy mesh view.
+   *
+   * Values mirror f3d::mesh_view::data_type and MUST stay in the same order.
+   */
+  typedef enum f3d_mesh_data_type_t
+  {
+    F3D_MESH_DATA_U8 = 0,
+    F3D_MESH_DATA_I8,
+    F3D_MESH_DATA_U16,
+    F3D_MESH_DATA_I16,
+    F3D_MESH_DATA_U32,
+    F3D_MESH_DATA_I32,
+    F3D_MESH_DATA_U64,
+    F3D_MESH_DATA_I64,
+    F3D_MESH_DATA_F32,
+    F3D_MESH_DATA_F64
+  } f3d_mesh_data_type_t;
+
+  /**
+   * @brief Zero-copy view of an existing data array (mirrors f3d::mesh_view::data_array_t).
+   *
+   * `data` is NOT copied: it must stay valid and allocated for as long as the mesh view
+   * stays in the scene. `name` may be NULL. `components` and `stride` default to 1 when
+   * left at 0. `stride` is counted in elements (not bytes). Set `time_dependent` to 0 for
+   * arrays whose contents never change to help performance.
+   */
+  typedef struct f3d_data_array_t
+  {
+    const char* name;
+    f3d_mesh_data_type_t type;
+    const void* data;
+    size_t components;
+    size_t stride;
+    int time_dependent;
+  } f3d_data_array_t;
+
+  /**
+   * @brief Zero-copy view of a cell array (mirrors f3d::mesh_view::cell_array_t).
+   *
+   * `offset_count` must equal the number of cells + 1 (1 means no cell). The last offset
+   * value must equal `index_count`. `offsets`/`indices` must use an integer type
+   * (I32/U32/I64/U64) and share the same type.
+   */
+  typedef struct f3d_cell_array_t
+  {
+    size_t offset_count;
+    f3d_data_array_t offsets;
+    size_t index_count;
+    f3d_data_array_t indices;
+  } f3d_cell_array_t;
+
+  /**
+   * @brief Zero-copy view of a mesh in memory (mirrors f3d::mesh_view::memory_view_t).
+   *
+   * Every pointer referenced here must stay valid while the mesh view is in the scene.
+   * `points` must have 3 components and type F32 or F64. `normals` (3 comps) and
+   * `texture_coordinates` (2 comps) are optional (leave `.data` NULL to skip). The
+   * `*_scalars` arrays may be NULL when their count is 0.
+   */
+  typedef struct f3d_memory_view_t
+  {
+    size_t point_count;
+    f3d_data_array_t points;
+    f3d_data_array_t normals;
+    f3d_data_array_t texture_coordinates;
+
+    f3d_cell_array_t vertices;
+    f3d_cell_array_t lines;
+    f3d_cell_array_t polygons;
+
+    const f3d_data_array_t* point_scalars;
+    size_t point_scalars_count;
+    const f3d_data_array_t* cell_scalars;
+    size_t cell_scalars_count;
+  } f3d_memory_view_t;
+
+  /**
+   * @brief Structure describing a mesh view in the scene.
+   *
+   * This structure holds the time range, name, and a callback function to retrieve the memory view
+   * at a specific time. time_min and time_max define the valid time range for the mesh view. If
+   * equal, the mesh view is considered static. `name` is the identifier for the mesh view and can
+   * be NULL. `get_memory_view` is a callback function to retrieve the memory view at a specific
+   * time and must be specified. `opaque` is a user-defined pointer that will be passed to the
+   * `get_memory_view` callback.
+   */
+  typedef struct f3d_mesh_view_t
+  {
+    double time_min;
+    double time_max;
+    const char* name;
+    const f3d_memory_view_t* (*get_memory_view)(double time, void* opaque);
+    void* opaque;
+  } f3d_mesh_view_t;
 
   /**
    * @brief Enumeration of light types.
@@ -189,7 +285,7 @@ extern "C"
    *
    * @param light_state Light state to free.
    */
-  F3D_EXPORT void f3d_light_state_free(f3d_light_state_t* light_state);
+  F3D_EXPORT void f3d_light_state_destroy(f3d_light_state_t* light_state);
 
   /**
    * @brief Compare two light states for equality.
@@ -199,6 +295,34 @@ extern "C"
    * @return 1 if equal, 0 otherwise.
    */
   F3D_EXPORT int f3d_light_state_equal(const f3d_light_state_t* a, const f3d_light_state_t* b);
+
+  /**
+   * @brief Structure describing a single node of the scene hierarchy.
+   */
+  typedef struct f3d_node_state_t
+  {
+    int id;
+    int parent_id;
+    int level;
+    char* label;
+    int visible;
+    int has_children;
+    int collapsed;
+  } f3d_node_state_t;
+
+  /**
+   * @brief Structure describing the contents of the scene.
+   *
+   * number_of_files counts every file added with f3d_scene_add() as well as every mesh and buffer
+   * added with f3d_scene_add_mesh() and f3d_scene_add_buffer().
+   */
+  typedef struct f3d_scene_info_t
+  {
+    int number_of_files;
+    int number_of_actors;
+    int64_t number_of_points;
+    int64_t number_of_cells;
+  } f3d_scene_info_t;
 
 #ifdef __cplusplus
 }

@@ -19,21 +19,21 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   f3d::options opt;
 
   // Test bool
-  opt.setAsString("model.scivis.cells", "false");
-  test("setAsString bool", opt.getAsString("model.scivis.cells") == "false");
+  opt.setAsString("scene.camera.orthographic", "false");
+  test("setAsString bool", opt.getAsString("scene.camera.orthographic") == "false");
 
-  opt.setAsString("model.scivis.cells", "1");
-  test("setAsString bool", opt.getAsString("model.scivis.cells") == "true");
+  opt.setAsString("scene.camera.orthographic", "1");
+  test("setAsString bool", opt.getAsString("scene.camera.orthographic") == "true");
 
-  opt.model.scivis.cells = false;
-  test("getAsString bool", opt.getAsString("model.scivis.cells") == "false");
+  opt.scene.camera.orthographic = false;
+  test("getAsString bool", opt.getAsString("scene.camera.orthographic") == "false");
 
-  opt.set("model.scivis.cells", true);
-  test("set/get bool", std::get<bool>(opt.get("model.scivis.cells")) == true);
+  opt.set("scene.camera.orthographic", true);
+  test("set/get bool", std::get<bool>(opt.get("scene.camera.orthographic")) == true);
 
-  opt.set("model.scivis.cells", false);
-  opt.toggle("model.scivis.cells");
-  test("toggle", opt.getAsString("model.scivis.cells") == "true");
+  opt.set("scene.camera.orthographic", false);
+  opt.toggle("scene.camera.orthographic");
+  test("toggle", opt.getAsString("scene.camera.orthographic") == "true");
   opt.toggle("render.show_edges");
   test("toggle optional", opt.getAsString("render.show_edges") == "true");
 
@@ -63,6 +63,9 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   opt.scene.animation.speed_factor = f3d::ratio_t(3.18);
   test("getAsString ratio_t", opt.getAsString("scene.animation.speed_factor") == "3.18");
+
+  opt.scene.animation.speed_factor = 3.19;
+  test("set double ratio_t", opt.getAsString("scene.animation.speed_factor") == "3.19");
 
   opt.set("scene.animation.speed_factor", 3.17);
   test("set/get ratio_t", std::get<double>(opt.get("scene.animation.speed_factor")) == 3.17);
@@ -169,7 +172,7 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   opt.setAsString("scene.up_direction", "+X");
   test("setAsString direction", opt.getAsString("scene.up_direction"), "+X"s);
 
-  f3d::direction_t dir({ 0.707, -0.707, 0 });
+  const f3d::direction_t dir({ 0.707, -0.707, 0 });
   test("direction x", dir.x() == 0.707);
   test("direction y", dir.y() == -0.707);
   test("direction z", dir.z() == 0);
@@ -245,18 +248,18 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     "NaN values transform2d", opt.getAsString("model.textures_transform") == "1,0,0,0,1,0,0,0,1");
 
   // Test closest option
-  auto closest = opt.getClosestOption("modle.sciivs.cell");
-  test("closest option", closest.first == "model.scivis.cells" && closest.second == 5);
+  auto closest = opt.getClosestOption("modle.sciivs.fields");
+  test("closest option", closest.first == "model.scivis.field" && closest.second == 5);
 
-  closest = opt.getClosestOption("model.scivis.cells");
-  test("closest option exact", closest.first == "model.scivis.cells" && closest.second == 0);
+  closest = opt.getClosestOption("model.scivis.field");
+  test("closest option exact", closest.first == "model.scivis.field" && closest.second == 0);
 
   // Test chaining options
-  opt.setAsString("model.scivis.cells", "false").setAsString("model.scivis.cells", "true");
-  test("chaining setAsString calls", opt.getAsString("model.scivis.cells") == "true");
+  opt.setAsString("model.scivis.field", "points").setAsString("model.scivis.field", "cells");
+  test("chaining setAsString calls", opt.getAsString("model.scivis.field") == "cells");
 
-  opt.set("model.scivis.cells", true).set("model.scivis.cells", false);
-  test("chaining set calls", std::get<bool>(opt.get("model.scivis.cells")) == false);
+  opt.set("scene.camera.orthographic", true).set("scene.camera.orthographic", false);
+  test("chaining set calls", std::get<bool>(opt.get("scene.camera.orthographic")) == false);
 
   // Test toggle error paths
   test.expect<f3d::options::incompatible_exception>(
@@ -301,10 +304,9 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // Test getNames
   std::vector<std::string> names = f3d::options::getAllNames();
-  test(
-    "getAllNames find", std::find(names.begin(), names.end(), "render.point_size") != names.end());
+  test("getAllNames find", std::ranges::find(names, "render.point_size") != names.end());
 
-  std::vector<std::string> setNames = opt.getNames();
+  const std::vector<std::string> setNames = opt.getNames();
   test("getNames count", setNames.size() != 0);
 
   // Test isSame/copy/hasValue
@@ -338,7 +340,7 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // Test set/get error paths
   test.expect<f3d::options::incompatible_exception>(
-    "incompatible_exception exception on set", [&]() { opt.set("model.scivis.cells", 2.13); });
+    "incompatible_exception exception on set", [&]() { opt.set("model.scivis.field", 2.13); });
 
   test.expect<f3d::options::inexistent_exception>(
     "inexistent_exception exception on set", [&]() { opt.set("dummy", 2.13); });
@@ -366,12 +368,37 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("isOptional with optional value", opt6.isOptional("model.scivis.range"));
 
   // Test isOptional non-optional values
-  test("isOptional with non-optional value", opt6.isOptional("model.scivis.cells") == false);
-  test("isOptional with non-optional value", opt6.isOptional("model.scivis.enable") == false);
+  test("isOptional with non-optional value", opt6.isOptional("model.scivis.field") == false);
+  test("isOptional with non-optional value", opt6.isOptional("model.coloring") == false);
 
   // Test isOptional non-existent options
   test.expect<f3d::options::inexistent_exception>(
     "isOptional with non-existent option", [&]() { std::ignore = opt6.isOptional("dummy"); });
+
+  // Test getType
+  test("getType bool", opt6.getType("render.grid.enable") == f3d::options::option_type::BOOL);
+  test("getType int", opt6.getType("model.scivis.component") == f3d::options::option_type::INT);
+  test("getType double", opt6.getType("render.point_size") == f3d::options::option_type::DOUBLE);
+  test("getType ratio",
+    opt6.getType("scene.animation.speed_factor") == f3d::options::option_type::RATIO);
+  test("getType string", opt6.getType("interactor.style") == f3d::options::option_type::STRING);
+  test("getType path", opt6.getType("render.hdri.file") == f3d::options::option_type::PATH);
+  test(
+    "getType color", opt6.getType("render.background.color") == f3d::options::option_type::COLOR);
+  test("getType direction",
+    opt6.getType("scene.up_direction") == f3d::options::option_type::DIRECTION);
+  test("getType colormap",
+    opt6.getType("model.scivis.colormap") == f3d::options::option_type::COLORMAP);
+  test("getType transform2d",
+    opt6.getType("model.textures_transform") == f3d::options::option_type::TRANSFORM2D);
+  test("getType double_vector",
+    opt6.getType("model.scivis.opacity_map") == f3d::options::option_type::DOUBLE_VECTOR);
+  test("getType int_vector",
+    opt6.getType("scene.animation.indices") == f3d::options::option_type::INT_VECTOR);
+
+  // Test getType non-existent option
+  test.expect<f3d::options::inexistent_exception>(
+    "getType with non-existent option", [&]() { std::ignore = opt6.getType("dummy"); });
 
   f3d::options opt7{};
 
@@ -400,7 +427,7 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // Test removeValue non-optional values
   test.expect<f3d::options::incompatible_exception>(
-    "removeValue non-optional values", [&]() { opt8.removeValue("model.scivis.cells"); });
+    "removeValue non-optional values", [&]() { opt8.removeValue("model.scivis.field"); });
 
   // Test removeValue non-optional values
   test.expect<f3d::options::inexistent_exception>(

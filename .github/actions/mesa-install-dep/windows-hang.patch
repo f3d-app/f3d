@@ -1,0 +1,22 @@
+diff --git a/src/gallium/drivers/llvmpipe/lp_rast.c b/src/gallium/drivers/llvmpipe/lp_rast.c
+index 4f493c6..4cc1f7f 100644
+--- a/src/gallium/drivers/llvmpipe/lp_rast.c
++++ b/src/gallium/drivers/llvmpipe/lp_rast.c
+@@ -1324,16 +1324,7 @@ lp_rast_destroy(struct lp_rasterizer *rast)
+     * We don't actually call pipe_thread_wait to avoid dead lock on Windows
+     * per https://bugs.freedesktop.org/show_bug.cgi?id=76252 */
+    for (unsigned i = 0; i < rast->num_threads; i++) {
+-#ifdef _WIN32
+-      /* Threads might already be dead - Windows apparently terminates
+-       * other threads when returning from main.
+-       */
+-      DWORD exit_code = STILL_ACTIVE;
+-      if (GetExitCodeThread(rast->threads[i].handle, &exit_code) &&
+-          exit_code == STILL_ACTIVE) {
+-         util_semaphore_wait(&rast->tasks[i].exited);
+-      }
+-#else
++#ifndef _WIN32
+       thrd_join(rast->threads[i], NULL);
+ #endif
+    }

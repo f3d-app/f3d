@@ -133,6 +133,39 @@ void vtkF3DUIActor::SetBindingsVisibility(bool show)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetAnimationProgressMode(AnimationProgressBarMode mode)
+{
+  this->AnimationProgressMode = mode;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetAnimationProgress(const std::pair<double, double>& timeRange,
+  const std::string& name, const std::vector<double>& keyFrames)
+{
+  this->AnimationTimeRange = timeRange;
+  this->AnimationName = name;
+  this->AnimationKeyFrames = keyFrames;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetAnimationProgressColor(const std::array<double, 3>& color)
+{
+  this->AnimationProgressColor = color;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetAnimationSpeedFactor(double speedFactor)
+{
+  this->AnimationSpeedFactor = speedFactor;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::UpdateAnimationTime(double currentTime)
+{
+  this->AnimationCurrentTime = currentTime;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::UpdateFpsValue(const double elapsedFrameTime)
 {
   this->TotalFrameTimes += elapsedFrameTime;
@@ -140,13 +173,13 @@ void vtkF3DUIActor::UpdateFpsValue(const double elapsedFrameTime)
 
   while (this->TotalFrameTimes > 1.0)
   {
-    double oldestFrameTime = this->FrameTimes.front();
+    const double oldestFrameTime = this->FrameTimes.front();
 
     this->FrameTimes.pop_front();
     this->TotalFrameTimes -= oldestFrameTime;
   }
 
-  double averageFrameTime = this->TotalFrameTimes / this->FrameTimes.size();
+  const double averageFrameTime = this->TotalFrameTimes / this->FrameTimes.size();
   this->FpsValue = static_cast<int>(std::round(1.0 / averageFrameTime));
 }
 
@@ -181,11 +214,31 @@ void vtkF3DUIActor::SetFontColor(const std::array<double, 3>& color)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetBackdropColor(const std::array<double, 3>& color)
+{
+  if (this->BackdropColor != color)
+  {
+    this->BackdropColor = color;
+    this->Initialized = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::SetBackdropOpacity(const double backdropOpacity)
 {
   if (this->BackdropOpacity != backdropOpacity)
   {
     this->BackdropOpacity = backdropOpacity;
+    this->Initialized = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetSceneHierarchyMaxWidth(const int width)
+{
+  if (this->SceneHierarchyMaxWidth != width)
+  {
+    this->SceneHierarchyMaxWidth = width;
     this->Initialized = false;
   }
 }
@@ -214,6 +267,12 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
     this->RenderConsole(false);
     this->EndFrame(renWin);
     return 1;
+  }
+
+  // Drawn first so later overlays stack in front, keeping the bar bottom-most.
+  if (this->AnimationProgressMode != AnimationProgressBarMode::NONE)
+  {
+    this->RenderAnimationProgressBar();
   }
 
   if (this->MinimalConsoleVisible)
@@ -261,7 +320,7 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
   vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
   assert(ren != nullptr);
 
-  double currentTime = ren->GetTotalTime();
+  const double currentTime = ren->GetTotalTime();
 
   // clear outdated notifications
   while (!this->Notifications.empty() && currentTime >= this->Notifications.back().stopTime)

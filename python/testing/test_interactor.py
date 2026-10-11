@@ -83,42 +83,51 @@ def test_binding():
 
     # Smoke test
     inter.add_binding(
-        f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.ANY, "P"),
-        "dummy command",
-        "DummyGroup",
-        doc_fn,
+        bind=f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.ANY, "P"),
+        command=["dummy command"],
+        group="DummyGroup",
+        documentation_callback=doc_fn,
     )
     inter.add_binding(
-        f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "P"),
-        "dummy command",
-        "DummyGroup",
-        doc_fn,
-        f3d.Interactor.BindingType.CYCLIC,
+        bind=f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "P"),
+        command=["dummy command"],
+        group="DummyGroup",
+        documentation_callback=doc_fn,
+        type=f3d.Interactor.BindingType.CYCLIC,
     )
     inter.add_binding(
-        f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "P"),
-        "dummy command",
-        "DummyGroup",
-        doc_fn,
-        f3d.Interactor.BindingType.NUMERICAL,
+        bind=f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "P"),
+        command=["dummy command"],
+        group="DummyGroup",
+        documentation_callback=doc_fn,
+        type=f3d.Interactor.BindingType.NUMERICAL,
     )
     inter.add_binding(
-        f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.SHIFT, "P"),
-        "dummy command",
-        "DummyGroup",
-        doc_fn,
-        f3d.Interactor.BindingType.TOGGLE,
+        bind=f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.SHIFT, "P"),
+        command=["dummy command"],
+        group="DummyGroup",
+        documentation_callback=doc_fn,
+        type=f3d.Interactor.BindingType.TOGGLE,
     )
     inter.add_binding(
-        f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL_SHIFT, "P"),
-        ["dummy command", "dummy command"],
-        "DummyGroup",
-        doc_fn,
-        f3d.Interactor.BindingType.OTHER,
-        False,
+        bind=f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL_SHIFT, "P"),
+        command=["dummy command", "dummy command"],
+        group="DummyGroup",
+        documentation_callback=doc_fn,
+        type=f3d.Interactor.BindingType.OTHER,
+        notify=False,
+    )
+    inter.add_binding(
+        bind=f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "R"),
+        command=["dummy command", "dummy command"],
+        group="DummyGroup",
+        documentation_callback=doc_fn,
+        type=f3d.Interactor.BindingType.OTHER,
+        notify=False,
+        repeat=True,
     )
     assert len(inter.get_bind_groups()) == 1
-    assert len(inter.get_binds()) == 5
+    assert len(inter.get_binds()) == 6
     assert (
         inter.get_binding_documentation(
             f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "P")
@@ -156,67 +165,24 @@ def test_trigger_key(capfd: pytest.CaptureFixture[str]):
     engine.interactor.trigger_mouse_wheel(f3d.Interactor.WheelDirection.FORWARD)
     engine.interactor.trigger_text_character(0)
 
+    counter_notif = 0
+
+    def notif_fn(desc, value, bind, duration):
+        nonlocal counter_notif
+        counter_notif += 1
+        return True
+
+    engine.interactor.set_notification_callback(notif_fn)
+    assert counter_notif == 0
+
     engine.interactor.trigger_notification("foo", "bar", 3.0)
+    assert counter_notif == 1
 
 
-def test_interactor_animation(capfd: pytest.CaptureFixture[str]):
+def test_trigger_event_loop():
     engine = f3d.Engine.create(True)
     engine.window.render()
 
-    engine.interactor.start_animation()  # Play Forward
-    assert (
-        engine.interactor.is_playing_animation()
-        and engine.interactor.get_animation_direction()
-        == f3d.Interactor.AnimationDirection.FORWARD
-    )
-    engine.interactor.toggle_animation()  # Pause
-    assert not engine.interactor.is_playing_animation()
-
-    engine.interactor.start_animation(
-        f3d.Interactor.AnimationDirection.FORWARD
-    )  # Play Forward
-    assert (
-        engine.interactor.is_playing_animation()
-        and engine.interactor.get_animation_direction()
-        == f3d.Interactor.AnimationDirection.FORWARD
-    )
-    engine.interactor.stop_animation()  # Pause
-    assert not engine.interactor.is_playing_animation()
-
-    engine.interactor.start_animation(
-        f3d.Interactor.AnimationDirection.BACKWARD
-    )  # Play Backward
-    assert (
-        engine.interactor.is_playing_animation()
-        and engine.interactor.get_animation_direction()
-        == f3d.Interactor.AnimationDirection.BACKWARD
-    )
-    engine.interactor.stop_animation()  # Pause
-
-    engine.interactor.toggle_animation()
-    assert (
-        engine.interactor.is_playing_animation()
-        and engine.interactor.get_animation_direction()
-        == f3d.Interactor.AnimationDirection.FORWARD
-    )
-    engine.interactor.stop_animation()  # Pause
-
-    engine.interactor.toggle_animation(
-        f3d.Interactor.AnimationDirection.FORWARD
-    )  # Play Forward
-    assert (
-        engine.interactor.is_playing_animation()
-        and engine.interactor.get_animation_direction()
-        == f3d.Interactor.AnimationDirection.FORWARD
-    )
-    engine.interactor.stop_animation()
-
-    engine.interactor.toggle_animation(
-        f3d.Interactor.AnimationDirection.BACKWARD
-    )  # Play Backward
-    assert (
-        engine.interactor.is_playing_animation()
-        and engine.interactor.get_animation_direction()
-        == f3d.Interactor.AnimationDirection.BACKWARD
-    )
-    engine.interactor.stop_animation()
+    # triggerEventLoop returns self
+    inter_ref = engine.interactor.trigger_event_loop(0.1)
+    assert inter_ref == engine.interactor

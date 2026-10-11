@@ -118,8 +118,8 @@ int vtkF3DWebPReader::CanReadFile(vtkResourceStream* stream)
     return 0;
   }
 
-  std::string_view sv(header, 12);
-  return sv.substr(0, 4) == "RIFF" && sv.substr(8, 4) == "WEBP";
+  const std::string_view sv(header, 12);
+  return sv.starts_with("RIFF") && sv.substr(8, 4) == "WEBP";
 }
 
 //------------------------------------------------------------------------------

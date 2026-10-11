@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+namespace
+{
 class ErrorEventCallback : public vtkCommand
 {
 public:
@@ -18,7 +20,7 @@ public:
   void Execute(vtkObject* caller, unsigned long vtkNotUsed(evId), void* data) override
   {
     const vtkF3DDracoReader* reader = reinterpret_cast<vtkF3DDracoReader*>(caller);
-    char* message = static_cast<char*>(data);
+    const char* message = static_cast<char*>(data);
     if (reader && message)
     {
       this->Messages.emplace_back(message);
@@ -33,13 +35,14 @@ public:
 private:
   std::vector<std::string> Messages;
 };
+}
 
 int TestF3DDracoReaderError(int vtkNotUsed(argc), char* argv[])
 {
-  vtkNew<ErrorEventCallback> errorEventCallback;
-  vtkNew<vtkCallbackCommand> nullEventCallback;
+  vtkNew<::ErrorEventCallback> errorEventCallback;
+  const vtkNew<vtkCallbackCommand> nullEventCallback;
 
-  std::string filename = std::string(argv[1]) + "data/nonexistent.drc";
+  const std::string filename = std::string(argv[1]) + "data/nonexistent.drc";
   vtkNew<vtkF3DDracoReader> reader;
   reader->AddObserver(vtkCommand::ErrorEvent, errorEventCallback);
   reader->GetExecutive()->AddObserver(vtkCommand::ErrorEvent, nullEventCallback);
@@ -53,7 +56,7 @@ int TestF3DDracoReaderError(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  auto lastMessage = errorMessages.back();
+  const auto& lastMessage = errorMessages.back();
   if (lastMessage.find("Cannot read file") == std::string::npos)
   {
     std::cerr << "No draco error triggered!\n";

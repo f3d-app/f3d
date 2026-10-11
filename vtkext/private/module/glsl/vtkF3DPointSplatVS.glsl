@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 uniform float scaleFactor;
-uniform int cameraParallel;
+uniform mediump int cameraParallel;
 
 // low-pass filtering matrix
 // stored as a vector since it's a 2x2 symmetric matrix

@@ -1,6 +1,8 @@
 set(shader_files "")
+set(sources "")
+set(private_headers "")
 
-if(NOT ANDROID AND NOT EMSCRIPTEN)
+if(NOT F3D_USE_GLES)
   set(shader_files ${shader_files}
     glsl/vtkF3DBitonicSortGlobalDisperseCS.glsl
     glsl/vtkF3DBitonicSortGlobalFlipCS.glsl
@@ -22,13 +24,23 @@ endforeach()
 
 set(classes
   F3DUtils
+  vtkF3DArchiveReader
+  vtkF3DCatmullClarkSubdivisionFilter
   vtkF3DFaceVaryingPointDispatcher
   vtkF3DGLTFImporter
   vtkF3DImporter
   )
 
+if(NOT F3D_USE_EXTERNAL_MINIZ)
+  list(APPEND sources "${F3D_SOURCE_DIR}/external/miniz/miniz.c")
+  if(MSVC)
+    set_source_files_properties("${F3D_SOURCE_DIR}/external/miniz/miniz.c"
+      PROPERTIES COMPILE_OPTIONS "/wd4127")
+  endif()
+endif()
+
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
-if(NOT ANDROID AND NOT EMSCRIPTEN AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
+if(NOT F3D_USE_GLES)
   set(classes ${classes} vtkF3DBitonicSort)
 endif()
 
@@ -39,3 +51,22 @@ vtk_module_add_module(f3d::vtkext
   SOURCES ${sources}
   PRIVATE_HEADERS ${private_headers}
   )
+
+if(F3D_USE_EXTERNAL_MINIZ)
+  vtk_module_link(f3d::vtkext PRIVATE miniz::miniz)
+else()
+  vtk_module_include(f3d::vtkext
+    PRIVATE
+      $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/miniz>)
+endif()
+
+if (F3D_MODULE_CLIP)
+  if (F3D_USE_EXTERNAL_CLIP)
+    vtk_module_link(f3d::vtkext PRIVATE clip::clip)
+  else ()
+    vtk_module_link(f3d::vtkext PRIVATE clip)
+    vtk_module_include(f3d::vtkext PRIVATE $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external>)
+  endif ()
+
+  vtk_module_definitions(f3d::vtkext PRIVATE F3D_MODULE_CLIP)
+endif ()

@@ -1,0 +1,3 @@
+cycle scene.camera.index
+cycle scene.camera.index
+reload_current_file_group

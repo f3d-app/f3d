@@ -16,7 +16,7 @@ void f3d_interaction_bind_format(const f3d_interaction_bind_t* bind, char* outpu
   cpp_bind.mod = static_cast<f3d::interaction_bind_t::ModifierKeys>(bind->mod);
   cpp_bind.inter = bind->inter;
 
-  std::string formatted = cpp_bind.format();
+  const std::string formatted = cpp_bind.format();
   std::strncpy(output, formatted.c_str(), output_size - 1);
   output[output_size - 1] = '\0';
 }
@@ -29,7 +29,7 @@ void f3d_interaction_bind_parse(const char* str, f3d_interaction_bind_t* bind)
     return;
   }
 
-  f3d::interaction_bind_t cpp_bind = f3d::interaction_bind_t::parse(str);
+  const f3d::interaction_bind_t cpp_bind = f3d::interaction_bind_t::parse(str);
 
   bind->mod = static_cast<f3d_interaction_bind_modifier_keys_t>(cpp_bind.mod);
   std::strncpy(bind->inter, cpp_bind.inter.c_str(), sizeof(bind->inter) - 1);
@@ -77,74 +77,6 @@ int f3d_interaction_bind_equals(
 }
 
 //----------------------------------------------------------------------------
-void f3d_interactor_toggle_animation(
-  f3d_interactor_t* interactor, f3d_interactor_animation_direction_t direction)
-{
-  if (!interactor)
-  {
-    return;
-  }
-
-  f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  f3d::interactor::AnimationDirection cpp_direction =
-    static_cast<f3d::interactor::AnimationDirection>(direction);
-  cpp_interactor->toggleAnimation(cpp_direction);
-}
-
-//----------------------------------------------------------------------------
-void f3d_interactor_start_animation(
-  f3d_interactor_t* interactor, f3d_interactor_animation_direction_t direction)
-{
-  if (!interactor)
-  {
-    return;
-  }
-
-  f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  f3d::interactor::AnimationDirection cpp_direction =
-    static_cast<f3d::interactor::AnimationDirection>(direction);
-  cpp_interactor->startAnimation(cpp_direction);
-}
-
-//----------------------------------------------------------------------------
-void f3d_interactor_stop_animation(f3d_interactor_t* interactor)
-{
-  if (!interactor)
-  {
-    return;
-  }
-
-  f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  cpp_interactor->stopAnimation();
-}
-
-//----------------------------------------------------------------------------
-int f3d_interactor_is_playing_animation(f3d_interactor_t* interactor)
-{
-  if (!interactor)
-  {
-    return 0;
-  }
-
-  f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  return cpp_interactor->isPlayingAnimation() ? 1 : 0;
-}
-
-//----------------------------------------------------------------------------
-f3d_interactor_animation_direction_t f3d_interactor_get_animation_direction(
-  f3d_interactor_t* interactor)
-{
-  if (!interactor)
-  {
-    return F3D_INTERACTOR_ANIMATION_FORWARD;
-  }
-
-  f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  f3d::interactor::AnimationDirection cpp_direction = cpp_interactor->getAnimationDirection();
-  return static_cast<f3d_interactor_animation_direction_t>(cpp_direction);
-}
-
-//----------------------------------------------------------------------------
 void f3d_interactor_enable_camera_movement(f3d_interactor_t* interactor)
 {
   if (!interactor)
@@ -178,7 +110,7 @@ void f3d_interactor_trigger_mod_update(
   }
 
   f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  f3d::interactor::InputModifier cpp_mod = static_cast<f3d::interactor::InputModifier>(mod);
+  const f3d::interactor::InputModifier cpp_mod = static_cast<f3d::interactor::InputModifier>(mod);
   cpp_interactor->triggerModUpdate(cpp_mod);
 }
 
@@ -192,8 +124,8 @@ void f3d_interactor_trigger_mouse_button(f3d_interactor_t* interactor,
   }
 
   f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  f3d::interactor::InputAction cpp_action = static_cast<f3d::interactor::InputAction>(action);
-  f3d::interactor::MouseButton cpp_button = static_cast<f3d::interactor::MouseButton>(button);
+  const f3d::interactor::InputAction cpp_action = static_cast<f3d::interactor::InputAction>(action);
+  const f3d::interactor::MouseButton cpp_button = static_cast<f3d::interactor::MouseButton>(button);
   cpp_interactor->triggerMouseButton(cpp_action, cpp_button);
 }
 
@@ -219,7 +151,7 @@ void f3d_interactor_trigger_mouse_wheel(
   }
 
   f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  f3d::interactor::WheelDirection cpp_direction =
+  const f3d::interactor::WheelDirection cpp_direction =
     static_cast<f3d::interactor::WheelDirection>(direction);
   cpp_interactor->triggerMouseWheel(cpp_direction);
 }
@@ -234,7 +166,7 @@ void f3d_interactor_trigger_keyboard_key(
   }
 
   f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  f3d::interactor::InputAction cpp_action = static_cast<f3d::interactor::InputAction>(action);
+  const f3d::interactor::InputAction cpp_action = static_cast<f3d::interactor::InputAction>(action);
   cpp_interactor->triggerKeyboardKey(cpp_action, key_sym);
 }
 
@@ -288,8 +220,8 @@ int f3d_interactor_record_interaction(f3d_interactor_t* interactor, const char* 
 }
 
 //----------------------------------------------------------------------------
-void f3d_interactor_start_with_callback(f3d_interactor_t* interactor, double delta_time,
-  f3d_interactor_callback_t callback, void* user_data)
+void f3d_interactor_set_event_loop_user_callback(
+  f3d_interactor_t* interactor, f3d_interactor_callback_t callback, void* user_data)
 {
   if (!interactor)
   {
@@ -297,21 +229,45 @@ void f3d_interactor_start_with_callback(f3d_interactor_t* interactor, double del
   }
 
   f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
+  cpp_interactor->setEventLoopUserCallback(
+    [callback, user_data](f3d::interactor_state_t) { callback(user_data); });
+}
 
-  if (callback)
+//----------------------------------------------------------------------------
+void f3d_interactor_set_notification_callback(
+  f3d_interactor_t* interactor, f3d_interactor_notification_callback_t callback, void* user_data)
+{
+  if (!interactor)
   {
-    cpp_interactor->start(delta_time, [callback, user_data]() { callback(user_data); });
+    return;
   }
-  else
+
+  f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
+  if (!callback)
   {
-    cpp_interactor->start(delta_time, nullptr);
+    cpp_interactor->setNotificationCallback(nullptr);
+    return;
   }
+
+  cpp_interactor->setNotificationCallback(
+    [=](const std::string& desc, const std::string& value, const std::string& bind,
+      double duration) -> bool
+    {
+      const int res = callback(desc.c_str(), value.c_str(), bind.c_str(), duration, user_data);
+      return res != 0;
+    });
 }
 
 //----------------------------------------------------------------------------
 void f3d_interactor_start(f3d_interactor_t* interactor, double delta_time)
 {
-  f3d_interactor_start_with_callback(interactor, delta_time, nullptr, nullptr);
+  if (!interactor)
+  {
+    return;
+  }
+
+  f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
+  cpp_interactor->start(delta_time);
 }
 
 //----------------------------------------------------------------------------
@@ -377,12 +333,18 @@ void f3d_interactor_add_command(f3d_interactor_t* interactor, const char* action
   {
     std::vector<const char*> c_args;
     c_args.resize(args.size());
-    std::transform(
-      args.begin(), args.end(), c_args.begin(), [](const std::string& s) { return s.c_str(); });
+    std::ranges::transform(args, c_args.begin(), [](const std::string& s) { return s.c_str(); });
     callback(c_args.data(), static_cast<int>(c_args.size()), user_data);
   };
 
-  cpp_interactor->addCommand(action, cpp_callback);
+  try
+  {
+    cpp_interactor->addCommand(action, cpp_callback);
+  }
+  catch (const f3d::interactor::already_exists_exception& ex)
+  {
+    f3d::log::error(ex.what());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -439,7 +401,15 @@ int f3d_interactor_trigger_command(
   }
 
   f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  return cpp_interactor->triggerCommand(command, keep_comments != 0) ? 1 : 0;
+  try
+  {
+    return cpp_interactor->triggerCommand(command, keep_comments != 0) ? 1 : 0;
+  }
+  catch (const f3d::interactor::command_runtime_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return 0;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -455,11 +425,9 @@ void f3d_interactor_init_bindings(f3d_interactor_t* interactor)
 }
 
 //----------------------------------------------------------------------------
-void f3d_interactor_add_binding(f3d_interactor_t* interactor, const f3d_interaction_bind_t* bind,
-  const char** commands, int command_count, const char* group, f3d_interactor_binding_type_t type,
-  int notify)
+void f3d_interactor_add_binding(f3d_interactor_t* interactor, f3d_binding_params_t binding)
 {
-  if (!interactor || !bind || !commands || command_count <= 0)
+  if (!interactor || !binding.commands || binding.command_count <= 0)
   {
     return;
   }
@@ -467,20 +435,32 @@ void f3d_interactor_add_binding(f3d_interactor_t* interactor, const f3d_interact
   f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
 
   f3d::interaction_bind_t cpp_bind;
-  cpp_bind.mod = static_cast<f3d::interaction_bind_t::ModifierKeys>(bind->mod);
-  cpp_bind.inter = bind->inter;
+  cpp_bind.mod = static_cast<f3d::interaction_bind_t::ModifierKeys>(binding.bind.mod);
+  cpp_bind.inter = binding.bind.inter;
 
   std::vector<std::string> cpp_commands;
-  cpp_commands.reserve(command_count);
-  for (int i = 0; i < command_count; ++i)
+  cpp_commands.reserve(binding.command_count);
+  for (int i = 0; i < binding.command_count; ++i)
   {
-    cpp_commands.push_back(commands[i]);
+    cpp_commands.push_back(binding.commands[i]);
   }
 
-  std::string cpp_group = group ? group : "";
+  const std::string cpp_group = binding.group ? binding.group : "";
 
-  cpp_interactor->addBinding(cpp_bind, cpp_commands, cpp_group, nullptr,
-    static_cast<f3d::interactor::BindingType>(type), notify != 0);
+  try
+  {
+    cpp_interactor->addBinding({ .Bind = cpp_bind,
+      .Commands = cpp_commands,
+      .Group = cpp_group,
+      .DocCallback = nullptr,
+      .Type = static_cast<f3d::interactor::BindingType>(binding.type),
+      .Notify = binding.notify != 0,
+      .Repeat = binding.repeat != 0 });
+  }
+  catch (const f3d::interactor::already_exists_exception& ex)
+  {
+    f3d::log::error(ex.what());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -544,24 +524,32 @@ f3d_interaction_bind_t* f3d_interactor_get_binds_for_group(
   }
 
   const f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  std::vector<f3d::interaction_bind_t> binds = cpp_interactor->getBindsForGroup(group);
-
-  *count = static_cast<int>(binds.size());
-  if (binds.empty())
+  try
   {
+    std::vector<f3d::interaction_bind_t> binds = cpp_interactor->getBindsForGroup(group);
+
+    *count = static_cast<int>(binds.size());
+    if (binds.empty())
+    {
+      return nullptr;
+    }
+
+    f3d_interaction_bind_t* result = new f3d_interaction_bind_t[binds.size()];
+
+    for (size_t i = 0; i < binds.size(); ++i)
+    {
+      result[i].mod = static_cast<f3d_interaction_bind_modifier_keys_t>(binds[i].mod);
+      std::strncpy(result[i].inter, binds[i].inter.c_str(), sizeof(result[i].inter) - 1);
+      result[i].inter[sizeof(result[i].inter) - 1] = '\0';
+    }
+
+    return result;
+  }
+  catch (const f3d::interactor::does_not_exists_exception& ex)
+  {
+    f3d::log::error(ex.what());
     return nullptr;
   }
-
-  f3d_interaction_bind_t* result = new f3d_interaction_bind_t[binds.size()];
-
-  for (size_t i = 0; i < binds.size(); ++i)
-  {
-    result[i].mod = static_cast<f3d_interaction_bind_modifier_keys_t>(binds[i].mod);
-    std::strncpy(result[i].inter, binds[i].inter.c_str(), sizeof(result[i].inter) - 1);
-    result[i].inter[sizeof(result[i].inter) - 1] = '\0';
-  }
-
-  return result;
 }
 
 //----------------------------------------------------------------------------
@@ -611,13 +599,20 @@ void f3d_interactor_get_binding_documentation(f3d_interactor_t* interactor,
   cpp_bind.mod = static_cast<f3d::interaction_bind_t::ModifierKeys>(bind->mod);
   cpp_bind.inter = bind->inter;
 
-  auto [doc_str, value_str] = cpp_interactor->getBindingDocumentation(cpp_bind);
+  try
+  {
+    auto [doc_str, value_str] = cpp_interactor->getBindingDocumentation(cpp_bind);
 
-  std::strncpy(doc->doc, doc_str.c_str(), sizeof(doc->doc) - 1);
-  doc->doc[sizeof(doc->doc) - 1] = '\0';
+    std::strncpy(doc->doc, doc_str.c_str(), sizeof(doc->doc) - 1);
+    doc->doc[sizeof(doc->doc) - 1] = '\0';
 
-  std::strncpy(doc->value, value_str.c_str(), sizeof(doc->value) - 1);
-  doc->value[sizeof(doc->value) - 1] = '\0';
+    std::strncpy(doc->value, value_str.c_str(), sizeof(doc->value) - 1);
+    doc->value[sizeof(doc->value) - 1] = '\0';
+  }
+  catch (const f3d::interactor::does_not_exists_exception& ex)
+  {
+    f3d::log::error(ex.what());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -633,8 +628,16 @@ f3d_interactor_binding_type_t f3d_interactor_get_binding_type(
   f3d::interaction_bind_t cpp_bind;
   cpp_bind.mod = static_cast<f3d::interaction_bind_t::ModifierKeys>(bind->mod);
   cpp_bind.inter = bind->inter;
-  f3d::interactor::BindingType cpp_type = cpp_interactor->getBindingType(cpp_bind);
-  return static_cast<f3d_interactor_binding_type_t>(cpp_type);
+  try
+  {
+    const f3d::interactor::BindingType cpp_type = cpp_interactor->getBindingType(cpp_bind);
+    return static_cast<f3d_interactor_binding_type_t>(cpp_type);
+  }
+  catch (const f3d::interactor::does_not_exists_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return F3D_INTERACTOR_BINDING_OTHER;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -651,7 +654,7 @@ void f3d_interactor_trigger_notification(
 }
 
 //----------------------------------------------------------------------------
-void f3d_interactor_free_string_array(char** array, int count)
+void f3d_interactor_destroy_string_array(char** array, int count)
 {
   if (!array)
   {
@@ -666,7 +669,7 @@ void f3d_interactor_free_string_array(char** array, int count)
 }
 
 //----------------------------------------------------------------------------
-void f3d_interactor_free_bind_array(f3d_interaction_bind_t* array)
+void f3d_interactor_destroy_bind_array(f3d_interaction_bind_t* array)
 {
   delete[] array;
 }

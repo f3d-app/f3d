@@ -1,4 +1,5 @@
 #include "PseudoUnitTest.h"
+#include "TestSDKHelpers.h"
 
 #include <engine.h>
 #include <interactor.h>
@@ -10,13 +11,14 @@ constexpr int nBindsCamera = 9;
 constexpr std::string_view initDoc = "Orthographic Projection";
 constexpr std::string_view initVal = "Unset";
 
-int TestSDKInteractorDocumentation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
+int TestSDKInteractorDocumentation([[maybe_unused]] int argc, char* argv[])
 {
-  f3d::engine eng = f3d::engine::create(true);
+  const std::string renderingBackend = std::string(argv[4]);
+  f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::interactor& inter = eng.getInteractor();
 
   // Avoid testing something that changes often
-  size_t nBinds = inter.getBinds().size();
+  const size_t nBinds = inter.getBinds().size();
 
   PseudoUnitTest test;
 
@@ -62,10 +64,13 @@ int TestSDKInteractorDocumentation([[maybe_unused]] int argc, [[maybe_unused]] c
   }
 
   // Add a dummy binding
-  inter.addBinding(
-    { mod_t::ANY, "DummyBind" }, "DummyCommand", "DummyGroup",
-    []() -> std::pair<std::string, std::string> { return std::pair("DummyDoc", "DummyVal"); },
-    f3d::interactor::BindingType::CYCLIC);
+  inter.addBinding({ .Bind = { mod_t::ANY, "DummyBind" },
+    .Commands = { "DummyCommand" },
+    .Group = "DummyGroup",
+    .DocCallback = []() -> std::pair<std::string, std::string> {
+      return std::pair("DummyDoc", "DummyVal");
+    },
+    .Type = f3d::interactor::BindingType::CYCLIC });
 
   {
     // Test dummy binding

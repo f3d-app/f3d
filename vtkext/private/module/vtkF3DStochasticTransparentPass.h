@@ -52,7 +52,6 @@ private:
 
   vtkRenderPass* TranslucentPass = nullptr;
   vtkRenderPass* VolumetricPass = nullptr;
-  vtkOpenGLRenderWindow* RenWin = nullptr;
 
   int Seed = 0;
 

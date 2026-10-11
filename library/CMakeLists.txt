@@ -45,7 +45,7 @@ f3d_generate_options(
 
 # Define libf3d target
 set(F3D_SOURCE_FILES
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/animationManager.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/animation_impl.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/camera_impl.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/context.cxx
@@ -59,10 +59,21 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/log.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/options.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/scene_impl.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/statefile.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/types.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/utils.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/video_encoder.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/video_frame.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/window_impl.cxx
   )
+
+if (F3D_MODULE_FFMPEG)
+  list(APPEND F3D_SOURCE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/video_encoder_ffmpeg.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/video_frame_ffmpeg.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/video_packet_ffmpeg.cxx
+    )
+endif()
 
 if(APPLE)
   list(APPEND F3D_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/context_cocoa.mm)
@@ -70,6 +81,7 @@ endif()
 
 # List of headers that will be installed
 set(F3D_PUBLIC_HEADERS
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/animation.h
   ${CMAKE_CURRENT_BINARY_DIR}/public/export.h
   ${CMAKE_CURRENT_BINARY_DIR}/public/options.h
   ${CMAKE_CURRENT_SOURCE_DIR}/plugin/plugin.h
@@ -81,9 +93,13 @@ set(F3D_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/public/image.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/interactor.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/log.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/mesh_view.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/scene.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/types.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/utils.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/video_encoder.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/video_frame.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/video_packet.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/window.h
   )
 
@@ -113,13 +129,20 @@ else ()
     $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/nlohmann_json>)
 endif ()
 
+if (F3D_MODULE_FFMPEG)
+  find_package(FFmpeg REQUIRED)
+  target_link_libraries(libf3d PRIVATE FFmpeg::avcodec)
+  message(STATUS "FFmpeg libraries: ${FFmpeg_LIBRARIES}")
+endif()
+
 if (WIN32)
   target_link_libraries(libf3d PRIVATE Dwmapi)
+  target_compile_options(libf3d PRIVATE /utf-8)
 endif()
 
 set_target_properties(libf3d PROPERTIES
   CXX_VISIBILITY_PRESET hidden
-  CXX_STANDARD 17
+  CXX_STANDARD 20
   POSITION_INDEPENDENT_CODE ON
   OUTPUT_NAME "f3d"
   PDB_NAME "libf3d"
@@ -196,9 +219,19 @@ if (F3D_MODULE_UI)
   target_compile_definitions(libf3d PRIVATE F3D_MODULE_UI)
 endif ()
 
+# clip
+if (F3D_MODULE_CLIP)
+  target_compile_definitions(libf3d PRIVATE F3D_MODULE_CLIP)
+endif ()
+
 # raytracing
 if (F3D_MODULE_RAYTRACING)
   target_compile_definitions(libf3d PRIVATE F3D_MODULE_RAYTRACING)
+endif ()
+
+# ffmpeg
+if (F3D_MODULE_FFMPEG)
+  target_compile_definitions(libf3d PRIVATE F3D_MODULE_FFMPEG)
 endif ()
 
 if(F3D_STRICT_BUILD AND MSVC)
@@ -251,8 +284,7 @@ install(
     "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
   DESTINATION
     "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-  COMPONENT sdk
-  EXCLUDE_FROM_ALL)
+  COMPONENT sdk)
 
 ## Install the rest of the libraries and SDK parts
 if(BUILD_SHARED_LIBS)
@@ -261,7 +293,7 @@ if(BUILD_SHARED_LIBS)
   install(TARGETS libf3d
     EXPORT f3dLibraryTargets
     RUNTIME_DEPENDENCY_SET libf3dDeps
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT sdk EXCLUDE_FROM_ALL
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT sdk
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT library
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library)
 
@@ -277,15 +309,13 @@ if(BUILD_SHARED_LIBS)
   # Install the public headers
   install(FILES ${F3D_PUBLIC_HEADERS}
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/f3d"
-    COMPONENT sdk
-    EXCLUDE_FROM_ALL)
+    COMPONENT sdk)
 
   # Install the library exported targets
   install(EXPORT f3dLibraryTargets
     NAMESPACE f3d::
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-    COMPONENT sdk
-    EXCLUDE_FROM_ALL)
+    COMPONENT sdk)
 
   # Install library cmake files
   install(
@@ -294,14 +324,25 @@ if(BUILD_SHARED_LIBS)
       "${F3D_SOURCE_DIR}/cmake/f3dEmbed.cmake"
     DESTINATION
       "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-    COMPONENT sdk
-    EXCLUDE_FROM_ALL)
+    COMPONENT sdk)
+
+  # Install a pkg-config file for libf3d
+  # CMAKE_INSTALL_PREFIX may be a relative path (e.g. resolved against the build
+  # directory by `cmake --install`), so resolve it to an absolute path here since
+  # the .pc file may be read from a different working directory than the build.
+  get_filename_component(F3D_PKGCONFIG_PREFIX "${CMAKE_INSTALL_PREFIX}" ABSOLUTE BASE_DIR "${CMAKE_BINARY_DIR}")
+  configure_file(
+    "${F3D_SOURCE_DIR}/cmake/f3d.pc.in"
+    "${CMAKE_BINARY_DIR}/cmake/f3d.pc"
+    @ONLY)
+  install(FILES "${CMAKE_BINARY_DIR}/cmake/f3d.pc"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
+    COMPONENT sdk)
 
   # Install plugin headers
   install(FILES ${F3D_PLUGIN_HEADERS}
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/f3d"
-    COMPONENT plugin_sdk
-    EXCLUDE_FROM_ALL)
+    COMPONENT plugin_sdk)
 
   # Install pluginsdk cmake and source files
   install(
@@ -315,7 +356,6 @@ if(BUILD_SHARED_LIBS)
       "${F3D_SOURCE_DIR}/cmake/readerBoilerPlate.h.in"
     DESTINATION
       "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-    COMPONENT plugin_sdk
-    EXCLUDE_FROM_ALL)
+    COMPONENT plugin_sdk)
 
 endif()

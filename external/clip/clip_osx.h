@@ -1,5 +1,5 @@
 // Clip Library
-// Copyright (c) 2024 David Capello
+// Copyright (c) 2024-2026 David Capello
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -12,6 +12,8 @@
 
 #include <Cocoa/Cocoa.h>
 
+#include "clip_base.h"
+
 namespace clip {
 
 class image;
@@ -21,9 +23,9 @@ namespace osx {
 
 #if CLIP_ENABLE_IMAGE
 
-bool get_image_from_clipboard(NSPasteboard* pasteboard,
-                              image* output_img,
-                              image_spec* output_spec);
+CLIP_EXTERN bool get_image_from_clipboard(NSPasteboard* pasteboard,
+                                          image* output_img,
+                                          image_spec* output_spec);
 
 #endif // CLIP_ENABLE_IMAGE
 

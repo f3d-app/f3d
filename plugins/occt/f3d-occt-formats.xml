@@ -2,8 +2,6 @@
 <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
   <mime-type type="application/vnd.step">
     <comment>CAD STEP exchange ISO file</comment>
-    <glob pattern="*.step"/>
-    <glob pattern="*.stp"/>
     <glob pattern="*.stpnc"/>
     <glob pattern="*.p21"/>
     <glob pattern="*.210"/>
@@ -15,5 +13,10 @@
   <mime-type type="application/vnd.xbf">
     <comment>Open CASCADE XBF</comment>
     <glob pattern="*.xbf"/>
+  </mime-type>
+  <mime-type type="application/x-extension-fcstd">
+    <comment>FreeCAD Standard</comment>
+    <glob pattern="*.FCStd"/>
+    <glob pattern="*.fcstd"/>
   </mime-type>
 </mime-info>

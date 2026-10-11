@@ -1,5 +1,7 @@
 #include "window_c_api.h"
 #include "image.h"
+#include "video_c_api.h"
+#include "video_frame.h"
 #include "window.h"
 
 //----------------------------------------------------------------------------
@@ -11,7 +13,7 @@ f3d_window_type_t f3d_window_get_type(f3d_window_t* window)
   }
 
   f3d::window* cpp_window = reinterpret_cast<f3d::window*>(window);
-  f3d::window::Type type = cpp_window->getType();
+  const f3d::window::Type type = cpp_window->getType();
   return static_cast<f3d_window_type_t>(type);
 }
 
@@ -80,6 +82,26 @@ void f3d_window_set_size(f3d_window_t* window, int width, int height)
 }
 
 //----------------------------------------------------------------------------
+void f3d_window_get_size(const f3d_window_t* window, int* width, int* height)
+{
+  if (!window)
+  {
+    return;
+  }
+
+  const f3d::window* cpp_window = reinterpret_cast<const f3d::window*>(window);
+  const auto [winWidth, winHeight] = cpp_window->getSize();
+  if (width)
+  {
+    *width = winWidth;
+  }
+  if (height)
+  {
+    *height = winHeight;
+  }
+}
+
+//----------------------------------------------------------------------------
 int f3d_window_get_width(const f3d_window_t* window)
 {
   if (!window)
@@ -116,6 +138,50 @@ void f3d_window_set_position(f3d_window_t* window, int x, int y)
 }
 
 //----------------------------------------------------------------------------
+void f3d_window_get_position(const f3d_window_t* window, int* x, int* y)
+{
+  if (!window)
+  {
+    return;
+  }
+
+  const f3d::window* cpp_window = reinterpret_cast<const f3d::window*>(window);
+  const auto [posX, posY] = cpp_window->getPosition();
+  if (x)
+  {
+    *x = posX;
+  }
+  if (y)
+  {
+    *y = posY;
+  }
+}
+
+//----------------------------------------------------------------------------
+int f3d_window_get_left(const f3d_window_t* window)
+{
+  if (!window)
+  {
+    return 0;
+  }
+
+  const f3d::window* cpp_window = reinterpret_cast<const f3d::window*>(window);
+  return cpp_window->getLeft();
+}
+
+//----------------------------------------------------------------------------
+int f3d_window_get_top(const f3d_window_t* window)
+{
+  if (!window)
+  {
+    return 0;
+  }
+
+  const f3d::window* cpp_window = reinterpret_cast<const f3d::window*>(window);
+  return cpp_window->getTop();
+}
+
+//----------------------------------------------------------------------------
 void f3d_window_set_icon(f3d_window_t* window, const unsigned char* icon, size_t icon_size)
 {
   if (!window || !icon)
@@ -149,7 +215,7 @@ void f3d_window_get_world_from_display(
   }
 
   const f3d::window* cpp_window = reinterpret_cast<const f3d::window*>(window);
-  f3d::point3_t cpp_display_point = { display_point[0], display_point[1], display_point[2] };
+  const f3d::point3_t cpp_display_point = { display_point[0], display_point[1], display_point[2] };
   f3d::point3_t cpp_world_point = cpp_window->getWorldFromDisplay(cpp_display_point);
   world_point[0] = cpp_world_point[0];
   world_point[1] = cpp_world_point[1];
@@ -166,9 +232,33 @@ void f3d_window_get_display_from_world(
   }
 
   const f3d::window* cpp_window = reinterpret_cast<const f3d::window*>(window);
-  f3d::point3_t cpp_world_point = { world_point[0], world_point[1], world_point[2] };
+  const f3d::point3_t cpp_world_point = { world_point[0], world_point[1], world_point[2] };
   f3d::point3_t cpp_display_point = cpp_window->getDisplayFromWorld(cpp_world_point);
   display_point[0] = cpp_display_point[0];
   display_point[1] = cpp_display_point[1];
   display_point[2] = cpp_display_point[2];
+}
+
+//----------------------------------------------------------------------------
+double f3d_window_get_dpi_scale(f3d_window_t* window)
+{
+  if (!window)
+  {
+    return 1.0;
+  }
+
+  f3d::window* cpp_window = reinterpret_cast<f3d::window*>(window);
+  return cpp_window->getDPIScale();
+}
+
+//----------------------------------------------------------------------------
+void f3d_window_set_use_hdri_cache(f3d_window_t* window, int use_hdri_cache)
+{
+  if (!window)
+  {
+    return;
+  }
+
+  f3d::window* cpp_window = reinterpret_cast<f3d::window*>(window);
+  cpp_window->setUseHDRICache(use_hdri_cache != 0);
 }

@@ -11,7 +11,7 @@ Copyright (c) 2014 - 2025 Guillaume Vareille http://ysengrin.com
 
 ********* TINY FILE DIALOGS OFFICIAL WEBSITE IS ON SOURCEFORGE *********
   _________
- /         \ tinyfiledialogs.c v3.21.2 [Oct 25, 2025] zlib licence
+ /         \ tinyfiledialogs.c v3.21.3 [Feb 12, 2026] zlib licence
  |tiny file| Unique code file created [November 9, 2014]
  | dialogs |
  \____  ___/ http://tinyfiledialogs.sourceforge.net
@@ -115,7 +115,7 @@ misrepresented as being the original software.
 #endif
 #define LOW_MULTIPLE_FILES 32
 
-char tinyfd_version[8] = "3.21.2";
+char tinyfd_version[8] = "3.21.3";
 
 /******************************************************************************************************/
 /**************************************** UTF-8 on Windows ********************************************/
@@ -1955,9 +1955,9 @@ wchar_t * tinyfd_selectFolderDialogW(
 		static wchar_t lBuff[MAX_PATH_OR_CMD];
 		wchar_t * lRetval;
 
-		BROWSEINFOW bInfo;
 		LPITEMIDLIST lpItem;
 		HRESULT lHResult;
+		BROWSEINFOW bInfo = { 0 } ;
 
 		if (aTitle&&!wcscmp(aTitle, L"tinyfd_query")){ strcpy(tinyfd_response, "windows_wchar"); return (wchar_t *)1; }
 

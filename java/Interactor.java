@@ -1,8 +1,29 @@
 package app.f3d.F3D;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Interactor {
+
+    /** Thrown when adding a command or binding that already exists. */
+    public static class AlreadyExistsException extends F3DException {
+        public AlreadyExistsException(String message) { super(message); }
+    }
+
+    /** Thrown when removing a command or binding that does not exist. */
+    public static class DoesNotExistException extends F3DException {
+        public DoesNotExistException(String message) { super(message); }
+    }
+
+    /** Thrown when a triggered command fails at runtime. */
+    public static class CommandRuntimeException extends F3DException {
+        public CommandRuntimeException(String message) { super(message); }
+    }
+
+    /** Thrown when a command is invoked with invalid arguments. */
+    public static class InvalidArgsException extends F3DException {
+        public InvalidArgsException(String message) { super(message); }
+    }
 
     private long mNativeAddress;
 
@@ -44,30 +65,6 @@ public class Interactor {
         CTRL,
         SHIFT,
         CTRL_SHIFT
-    }
-
-    public enum AnimationDirection {
-        FORWARD(0),
-        BACKWARD(1);
-
-        private final int value;
-
-        AnimationDirection(int value) {
-            this.value = value;
-        }
-
-        public int getValue() {
-            return value;
-        }
-
-        public static AnimationDirection fromValue(int value) {
-            for (AnimationDirection dir : AnimationDirection.values()) {
-                if (dir.value == value) {
-                    return dir;
-                }
-            }
-            throw new IllegalArgumentException("Invalid AnimationDirection value: " + value);
-        }
     }
 
     public static class InteractionBind implements Comparable<InteractionBind> {
@@ -149,8 +146,100 @@ public class Interactor {
         }
     }
 
+    public static class InteractorState {
+        public double animationTime;
+    }
+
+    public interface EventLoopCallback {
+        void execute(InteractorState state);
+    }
+
+    /**
+     * Notification callback.
+     * Return false to prevent standard notification from being displayed, true to allow it.
+     * Arguments are the description, value, bindings, and duration of the notification.
+     */
+    public interface NotificationCallback {
+        boolean execute(String desc, String value, String bind, double duration);
+    }
+
     public interface CommandCallback {
         void execute(List<String> args);
+    }
+
+    public static record Documentation(String first, String second) {}
+
+    public interface DocCallback {
+        Documentation execute();
+    }
+
+    public static class BindingParam {
+        private final InteractionBind bind;
+        private final List<String> commands;
+
+        private String group = "";
+        private DocCallback docCallback = null;
+        private BindingType type = BindingType.OTHER;
+        private boolean notify = true;
+        private boolean repeat = false;
+
+        public BindingParam(InteractionBind bind, List<String> commands) {
+            this.bind = Objects.requireNonNull(bind);
+            this.commands = List.copyOf(commands);
+        }
+
+        public BindingParam group(String group) {
+            this.group = group;
+            return this;
+        }
+
+        public BindingParam docCallback(DocCallback docCallback) {
+            this.docCallback = docCallback;
+            return this;
+        }
+
+        public BindingParam type(BindingType type) {
+            this.type = type;
+            return this;
+        }
+
+        public BindingParam notify(boolean notify) {
+            this.notify = notify;
+            return this;
+        }
+
+        public BindingParam repeat(boolean repeat) {
+            this.repeat = repeat;
+            return this;
+        }
+
+        public InteractionBind getBind() {
+            return bind;
+        }
+
+        public List<String> getCommands() {
+            return commands;
+        }
+
+        public String getGroup() {
+            return group;
+        }
+
+        public DocCallback getDocCallback() {
+            return docCallback;
+        }
+
+        public BindingType getType() {
+            return type;
+        }
+
+        public boolean getNotify() {
+            return notify;
+        }
+
+        public boolean getRepeat() {
+            return repeat;
+        }
     }
 
     Interactor(long nativeAddress) {
@@ -215,77 +304,21 @@ public class Interactor {
     public native Interactor initBindings();
 
     /**
-     * Add binding to trigger commands for a specific bind.
+     * Add binding to trigger a command or commands for a specific bind.
      *
-     * @param bind interaction bind (key combination)
-     * @param commands list of commands to trigger
-     * @param group optional group name for organization
-     * @param type optional binding type
-     * @param notify notify when the binding is triggered
+     * @param binding The binding definition to register with the interactor.
      * @return this interactor for method chaining
      */
-    private native Interactor addBindingCommands(InteractionBind bind, List<String> commands, String group, BindingType type, boolean notify);
+    private native Interactor addBindingCommands(BindingParam binding);
 
     /**
      * Add binding to trigger commands for a specific bind.
      *
-     * @param bind interaction bind (key combination)
-     * @param commands list of commands to trigger
-     * @param group optional group name for organization
-     * @param type optional binding type
-     * @param notify notify when the binding is triggered
+     * @param binding The binding definition to register with the interactor.
      * @return this interactor for method chaining
      */
-    public Interactor addBinding(InteractionBind bind, List<String> commands, String group, BindingType type, boolean notify) {
-        return addBindingCommands(bind, commands, group, type, notify);
-    }
-
-    /**
-     * Add binding to trigger commands for a specific bind with default group and type.
-     *
-     * @param bind interaction bind (key combination)
-     * @param commands list of commands to trigger
-     * @return this interactor for method chaining
-     */
-    public Interactor addBinding(InteractionBind bind, List<String> commands) {
-        return addBindingCommands(bind, commands, "", BindingType.OTHER, true);
-    }
-
-    /**
-     * Add binding to trigger a single command for a specific bind.
-     *
-     * @param bind interaction bind (key combination)
-     * @param command command to trigger
-     * @param group optional group name for organization
-     * @param type optional binding type
-     * @param notify notify when the binding is triggered
-     * @return this interactor for method chaining
-     */
-    private native Interactor addBindingCommand(InteractionBind bind, String command, String group, BindingType type, boolean notify);
-
-    /**
-     * Add binding to trigger a single command for a specific bind.
-     *
-     * @param bind interaction bind (key combination)
-     * @param command command to trigger
-     * @param group optional group name for organization
-     * @param type optional binding type
-     * @param notify notify when the binding is triggered
-     * @return this interactor for method chaining
-     */
-    public Interactor addBinding(InteractionBind bind, String command, String group, BindingType type, boolean notify) {
-        return addBindingCommand(bind, command, group, type, notify);
-    }
-
-    /**
-     * Add binding to trigger a single command for a specific bind with default group and type.
-     *
-     * @param bind interaction bind (key combination)
-     * @param command command to trigger
-     * @return this interactor for method chaining
-     */
-    public Interactor addBinding(InteractionBind bind, String command) {
-        return addBindingCommand(bind, command, "", BindingType.OTHER, true);
+    public Interactor addBinding(BindingParam binding) {
+        return addBindingCommands(binding);
     }
 
     /**
@@ -333,61 +366,6 @@ public class Interactor {
      * @return binding type
      */
     public native BindingType getBindingType(InteractionBind bind);
-
-    /**
-     * Toggle animation state.
-     *
-     * @param direction animation direction
-     * @return this interactor for method chaining
-     */
-    public native Interactor toggleAnimation(AnimationDirection direction);
-
-    /**
-     * Toggle animation state with default forward direction.
-     *
-     * @return this interactor for method chaining
-     */
-    public Interactor toggleAnimation() {
-        return toggleAnimation(AnimationDirection.FORWARD);
-    }
-
-    /**
-     * Start animation.
-     *
-     * @param direction animation direction
-     * @return this interactor for method chaining
-     */
-    public native Interactor startAnimation(AnimationDirection direction);
-
-    /**
-     * Start animation with default forward direction.
-     *
-     * @return this interactor for method chaining
-     */
-    public Interactor startAnimation() {
-        return startAnimation(AnimationDirection.FORWARD);
-    }
-
-    /**
-     * Stop animation.
-     *
-     * @return this interactor for method chaining
-     */
-    public native Interactor stopAnimation();
-
-    /**
-     * Check if animation is playing.
-     *
-     * @return true if playing, false otherwise
-     */
-    public native boolean isPlayingAnimation();
-
-    /**
-     * Get the current animation direction.
-     *
-     * @return animation direction
-     */
-    public native AnimationDirection getAnimationDirection();
 
     /**
      * Enable camera movement.
@@ -463,6 +441,19 @@ public class Interactor {
     public native Interactor triggerEventLoop(double deltaTime);
 
     /**
+     * Set the event loop user callback called automatically on each event loop iteration.
+     *
+     * @param callback callback to be called on each event loop iteration
+     * @return this interactor for method chaining
+     */
+    public native Interactor setEventLoopUserCallback(EventLoopCallback callback);
+
+    /**
+     * Set notification callback. If null, only standard notifications will be displayed.
+     */
+    public native Interactor setNotificationCallback(NotificationCallback callback);
+
+    /**
      * Play a VTK interaction file.
      *
      * @param file path to interaction file
@@ -504,28 +495,6 @@ public class Interactor {
      */
     public Interactor start() {
         return start(1.0 / 30);
-    }
-
-    /**
-     * Start the interactor event loop with a callback.
-     * The callback is called on each event loop iteration.
-     *
-     * @param deltaTime time delta in seconds (must be positive)
-     * @param callback callback to execute on each iteration
-     * @return this interactor for method chaining
-     */
-    private native Interactor startWithCallback(double deltaTime, Runnable callback);
-
-    /**
-     * Start the interactor event loop with a callback.
-     * The callback is called on each event loop iteration.
-     *
-     * @param deltaTime time delta in seconds (must be positive)
-     * @param callback callback to execute on each iteration
-     * @return this interactor for method chaining
-     */
-    public Interactor start(double deltaTime, Runnable callback) {
-        return startWithCallback(deltaTime, callback);
     }
 
     /**

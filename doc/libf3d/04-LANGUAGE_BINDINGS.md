@@ -16,7 +16,7 @@ Here is an example showing how to use libf3d c bindings:
   f3d_options_set_as_bool(options, "render.show_edges", 1);
   f3d_options_set_as_bool(options, "ui.axis", 1);
   f3d_options_set_as_bool(options, "ui.fps", 1);
-  f3d_options_set_as_bool(options, "ui.animation_progress", 1);
+  f3d_options_set_as_string(options, "ui.animation_progress", "default");
   f3d_options_set_as_bool(options, "ui.filename", 1);
 
   f3d_scene_t* scene = f3d_engine_get_scene(engine);
@@ -83,72 +83,27 @@ The package can be installed using npm, by running the following command:
 npm install f3d
 ```
 
-Create the target DOM element `<canvas id="canvas"></canvas>` in your app, then use the following javascript code:
+Create the target DOM element `<f3d-viewer id="viewer" src="/path/to/data.glb"></f3d-viewer>` in your app, then use the following javascript code:
 
 ```javascript
 // import the module
 import f3d from "f3d";
 
-// setup a setting object
-const settings = {
-  canvas: document.getElementById("canvas"),
-  setupOptions: (options) => {
-    // background must be set to black for proper blending with transparent canvas
-    options.setAsString("render.background.color", "#000000");
+const viewer = document.getElementById("viewer");
+viewer.addEventListener("ready", () => {
+  // change some options when the viewer is ready
+  viewer.options = {
+    "render.effect.antialiasing.mode": "fxaa",
+    "render.effect.tone_mapping": true,
+    "render.hdri.ambient": true,
+    "ui.axis": true,
+    "render.grid.enable": true,
+  };
+});
 
-    // make it look nice
-    options.toggle("render.effect.antialiasing.enable");
-    options.toggle("render.effect.tone_mapping");
-    options.toggle("render.effect.ambient_occlusion");
-    options.toggle("render.hdri.ambient");
-
-    // display widgets
-    options.toggle("ui.axis");
-    options.toggle("render.grid.enable");
-  },
-};
-
-f3d(settings)
-  .then(async (Module) => {
-    // write a 3D file located on the server to the internal filesystem
-    const modelFile = await fetch("/assets/example.obj").then((b) =>
-      b.arrayBuffer(),
-    );
-    Module.FS.writeFile("example.obj", new Uint8Array(modelFile));
-
-    // automatically load all supported file format readers
-    Module.Engine.autoloadPlugins();
-
-    // create an engine
-    Module.engineInstance = Module.Engine.create();
-
-    Module.setupOptions(Module.engineInstance.getOptions());
-
-    // setup the window size based on the canvas size
-    const scale = window.devicePixelRatio;
-    Module.engineInstance
-      .getWindow()
-      .setSize(Module.canvas.clientWidth, scale * Module.canvas.clientHeight);
-
-    const scene = Module.engineInstance.getScene();
-    scene.add("/example.obj");
-
-    // do a first render and start the interactor
-    Module.engineInstance.getWindow().render();
-    Module.engineInstance.getInteractor().start();
-  })
-  .catch((error) => {
-    console.error("Internal exception: " + error);
-  });
+// load f3d module
+await f3d();
 ```
-
-Some advanced libf3d API are not bound yet, here's the exhaustive list:
-
-- `f3d::scene`: light related functions
-- `f3d::scene`: `scene& add(const mesh_t& mesh)`
-- `f3d::camera`: state management
-- `f3d::interactor`: bindings related functions
-- `f3d::interactor`: `playInteraction` and `recordInteraction`
 
 ## Java
 

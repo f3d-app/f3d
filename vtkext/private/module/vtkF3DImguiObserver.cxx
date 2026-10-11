@@ -12,6 +12,7 @@
 
 #include <imgui.h>
 
+#include <limits>
 #include <unordered_map>
 
 namespace
@@ -40,11 +41,19 @@ ImGuiKey GetImGuiKeyFromKeySym(std::string_view&& keySym)
       { "space", ImGuiKey_Space },
       { "Return", ImGuiKey_Enter },
       { "Escape", ImGuiKey_Escape },
+#ifdef __APPLE__
+      { "Control_L", ImGuiKey_LeftSuper },
+#else
       { "Control_L", ImGuiKey_LeftCtrl },
+#endif
       { "Shift_L", ImGuiKey_LeftShift },
       { "Alt_L", ImGuiKey_LeftAlt },
       { "Super_L", ImGuiKey_LeftSuper },
+#ifdef __APPLE__
+      { "Control_R", ImGuiKey_RightSuper },
+#else
       { "Control_R", ImGuiKey_RightCtrl },
+#endif
       { "Shift_R", ImGuiKey_RightShift },
       { "Alt_R", ImGuiKey_RightAlt },
       { "Super_R", ImGuiKey_RightSuper },
@@ -195,13 +204,26 @@ bool vtkF3DImguiObserver::MouseMove(vtkObject* caller, unsigned long, void*)
   if (ImGui::GetCurrentContext() != nullptr)
   {
     vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
-    int* p = that->GetEventPosition();
-    int* sz = that->GetRenderWindow()->GetSize();
+    const int* p = that->GetEventPosition();
+    const int* sz = that->GetRenderWindow()->GetSize();
     ImGuiIO& io = ImGui::GetIO();
     io.AddMousePosEvent(static_cast<float>(p[0]), static_cast<float>(sz[1] - p[1] - 1));
     // RenderUI is not called here on purpose to avoid too frequent UI draw
     // The event loop is taking care of it
     return io.WantCaptureMouse;
+  }
+  return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DImguiObserver::MouseLeave(vtkObject*, unsigned long, void*)
+{
+  if (ImGui::GetCurrentContext() != nullptr)
+  {
+    // Signal to ImGui that the cursor left the window so hovered state (and any
+    // hover tooltip) clears instead of sticking at the last in-window position.
+    constexpr float offscreen = -std::numeric_limits<float>::max();
+    ImGui::GetIO().AddMousePosEvent(offscreen, offscreen);
   }
   return false;
 }
@@ -318,8 +340,20 @@ bool vtkF3DImguiObserver::KeyPress(vtkObject* caller, unsigned long, void*)
     vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
     ImGuiIO& io = ImGui::GetIO();
     this->UpdateModifiers(that);
-    io.AddKeyEvent(::GetImGuiKeyFromKeySym(that->GetKeySym()), true);
+    const ImGuiKey key = ::GetImGuiKeyFromKeySym(that->GetKeySym());
+    io.AddKeyEvent(key, true);
     this->RenderUI(that);
+
+#ifdef __APPLE__
+    // When Cmd is held, the release of the key is never sent by Cocoa, so we need to fake it to
+    // avoid keys getting stuck down forever
+    // https://stackoverflow.com/questions/16604056/nsresponder-not-receiving-keyup-event-when-cmd-key-held-down
+    if (that->GetControlKey())
+    {
+      io.AddKeyEvent(key, false);
+    }
+#endif
+
     return io.WantCaptureKeyboard;
   }
   return false;
@@ -344,6 +378,7 @@ bool vtkF3DImguiObserver::KeyRelease(vtkObject* caller, unsigned long, void*)
 void vtkF3DImguiObserver::InstallObservers(vtkRenderWindowInteractor* interactor)
 {
   interactor->AddObserver(vtkCommand::MouseMoveEvent, this, &vtkF3DImguiObserver::MouseMove, 2.f);
+  interactor->AddObserver(vtkCommand::LeaveEvent, this, &vtkF3DImguiObserver::MouseLeave, 2.f);
   interactor->AddObserver(
     vtkCommand::LeftButtonPressEvent, this, &vtkF3DImguiObserver::MouseLeftPress, 2.f);
   interactor->AddObserver(
@@ -365,7 +400,11 @@ void vtkF3DImguiObserver::InstallObservers(vtkRenderWindowInteractor* interactor
 void vtkF3DImguiObserver::UpdateModifiers(vtkRenderWindowInteractor* interactor)
 {
   ImGuiIO& io = ImGui::GetIO();
+#if defined(__APPLE__)
+  io.AddKeyEvent(ImGuiMod_Super, interactor->GetControlKey() == 1);
+#else
   io.AddKeyEvent(ImGuiMod_Ctrl, interactor->GetControlKey() == 1);
+#endif
   io.AddKeyEvent(ImGuiMod_Shift, interactor->GetShiftKey() == 1);
   io.AddKeyEvent(ImGuiMod_Alt, interactor->GetAltKey() == 1);
 }

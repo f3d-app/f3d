@@ -7,7 +7,7 @@
 int TestF3DInteractorEventRecorder(int argc, char* argv[])
 {
   vtkNew<vtkF3DInteractorEventRecorder> record;
-  vtkNew<vtkRenderWindowInteractor> inter;
+  const vtkNew<vtkRenderWindowInteractor> inter;
 
   // Test Custom SetInteractorLogic
   record->SetInteractor(nullptr);

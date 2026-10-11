@@ -28,6 +28,7 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DF3D_BINDINGS_JAVA=ON
+        -DF3D_MODULE_CLIP=OFF
         -DF3D_MODULE_EXR=ON
         -DF3D_MODULE_UI=OFF
         -DF3D_MODULE_WEBP=ON
