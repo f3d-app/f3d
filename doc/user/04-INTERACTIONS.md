@@ -105,6 +105,7 @@ Use these other hotkeys and interactions:
 - <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>: add files from dir of current file, reload the current file group, and reset the camera. The `--recursive-dir-add` CLI option controls recursive directory loading.
 - <kbd>F12</kbd>: take a screenshot, ie. render the current view to an image file.
 - <kbd>Ctrl</kbd>+<kbd>F12</kbd>: take a minimal screenshot, ie. render the current view with no grid and no overlays to an image file with a transparent background.
+- <kbd>Ctrl</kbd>+<kbd>O</kbd>: open a file to load (file dialog). Requires a build with the `tinyfiledialogs` module.
 - <kbd>Ctrl</kbd>+<kbd>S</kbd>: save a statefile (file dialog). Requires a build with the `tinyfiledialogs` module.
 - <kbd>Ctrl</kbd>+<kbd>L</kbd>: load a statefile (file dialog). Requires a build with the `tinyfiledialogs` module. Does nothing but warn if the file does not exist.
 - <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd>: save a statefile (auto filename). Uses the statefile set by the `--statefile-filename` CLI option, or an automatic filename (`{app}/{model}_{n}.json`) when it is not set.

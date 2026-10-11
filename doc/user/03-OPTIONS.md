@@ -2,7 +2,7 @@
 
 Control F3D behavior from the command-line using the following options.
 Option headings use command-line spelling and show the accepted value type, default value, and implicit value when those exist.
-In configuration files, use command-line option names without the leading `--`, or use the libf3d option names documented in the [libf3d options reference](../libf3d/03-OPTIONS.md).
+In the [configuration files](06-CONFIGURATION_FILE.md), use command-line option names without the leading `--`, or use the libf3d option names documented in the [libf3d options reference](../libf3d/03-OPTIONS.md).
 
 ## Application options
 
@@ -130,7 +130,7 @@ Filename to save [screenshots](04-INTERACTIONS.md#take-screenshots) to. Can use 
 
 ### `--rendering-backend=<auto|egl|osmesa|glx|wgl>` (_string_, default: `auto`)
 
-Rendering backend to load, `auto` means to let F3D pick the correct one for you depending on your system capabilities. Use `egl` or `osmesa` on Linux to force headless rendering.
+Rendering backend to load, `auto` means to let F3D pick the correct one for you depending on your system capabilities. Use `egl` or `osmesa` to force headless rendering. See [rendering backends](12-DESKTOP_INTEGRATION.md#rendering-backends).
 
 ### `-D`, `--define=<libf3d.option=value>` (_special_)
 

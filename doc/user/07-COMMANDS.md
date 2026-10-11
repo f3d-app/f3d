@@ -190,7 +190,7 @@ eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 
 ## Domains
 
-Some [libf3d options](../libf3d/03-OPTIONS.md) define a domain, which is the set of values that commands can safely use.
+Some [libf3d options](../libf3d/03-OPTIONS.md) define a domain, which is the expected set of values for the option.
 
 A range domain uses `increase` and `decrease` commands. It has inclusive minimum and maximum values, as well as an increment.
 `increase` and `decrease` use the increment to increase or decrease and cap at maximum or minimum respectively.
