@@ -16,15 +16,15 @@ F3D provides some ready to use color maps files, listed in the table below:
 
 | Name       | Image                                                                                                                                   |
 | ---------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| cividis    | <img src="https://github.com/f3d-app/f3d/blob/master/resources/colormaps/cividis.png?raw=true" class="cm" width="256" height="10" />    |
-| cubehelix  | <img src="https://github.com/f3d-app/f3d/blob/master/resources/colormaps/cubehelix.png?raw=true" class="cm" width="256" height="10" />  |
-| gist_earth | <img src="https://github.com/f3d-app/f3d/blob/master/resources/colormaps/gist_earth.png?raw=true" class="cm" width="256" height="10" /> |
-| hot        | <img src="https://github.com/f3d-app/f3d/blob/master/resources/colormaps/hot.png?raw=true" class="cm" width="256" height="10" />        |
-| inferno    | <img src="https://github.com/f3d-app/f3d/blob/master/resources/colormaps/inferno.png?raw=true" class="cm" width="256" height="10" />    |
-| magma      | <img src="https://github.com/f3d-app/f3d/blob/master/resources/colormaps/magma.png?raw=true" class="cm" width="256" height="10" />      |
-| plasma     | <img src="https://github.com/f3d-app/f3d/blob/master/resources/colormaps/plasma.png?raw=true" class="cm" width="256" height="10" />     |
-| seismic    | <img src="https://github.com/f3d-app/f3d/blob/master/resources/colormaps/seismic.png?raw=true" class="cm" width="256" height="10" />    |
-| viridis    | <img src="https://github.com/f3d-app/f3d/blob/master/resources/colormaps/viridis.png?raw=true" class="cm" width="256" height="10" />    |
+| cividis    | <img src="https://github.com/f3d-app/f3d/blob/master/resources/colormaps/cividis.png?raw=true" alt="cividis color map" class="cm" width="256" height="10" />    |
+| cubehelix  | <img src="https://github.com/f3d-app/f3d/blob/master/resources/colormaps/cubehelix.png?raw=true" alt="cubehelix color map" class="cm" width="256" height="10" />  |
+| gist_earth | <img src="https://github.com/f3d-app/f3d/blob/master/resources/colormaps/gist_earth.png?raw=true" alt="gist_earth color map" class="cm" width="256" height="10" /> |
+| hot        | <img src="https://github.com/f3d-app/f3d/blob/master/resources/colormaps/hot.png?raw=true" alt="hot color map" class="cm" width="256" height="10" />        |
+| inferno    | <img src="https://github.com/f3d-app/f3d/blob/master/resources/colormaps/inferno.png?raw=true" alt="inferno color map" class="cm" width="256" height="10" />    |
+| magma      | <img src="https://github.com/f3d-app/f3d/blob/master/resources/colormaps/magma.png?raw=true" alt="magma color map" class="cm" width="256" height="10" />      |
+| plasma     | <img src="https://github.com/f3d-app/f3d/blob/master/resources/colormaps/plasma.png?raw=true" alt="plasma color map" class="cm" width="256" height="10" />     |
+| seismic    | <img src="https://github.com/f3d-app/f3d/blob/master/resources/colormaps/seismic.png?raw=true" alt="seismic color map" class="cm" width="256" height="10" />    |
+| viridis    | <img src="https://github.com/f3d-app/f3d/blob/master/resources/colormaps/viridis.png?raw=true" alt="viridis color map" class="cm" width="256" height="10" />    |
 
 Create a custom color map with a simple RGB image in any [supported formats](#supported-formats), and any resolution. If the height is more than 1 row, F3D uses only the first row. Copy the image in the user config directory:
 
