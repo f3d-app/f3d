@@ -6,6 +6,9 @@ on:
     paths-ignore:
       - "doc/**"
       - "_config.yml"
+    branches:
+      - master
+      - release
   push:
     branches:
       - master
