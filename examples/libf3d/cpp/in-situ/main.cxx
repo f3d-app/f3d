@@ -26,7 +26,7 @@ public:
   {
   }
 
-  std::array<double, 2> getTimeRange() const override
+  std::pair<double, double> getTimeRange() const override
   {
     return { 0.0, 10.0 };
   }
