@@ -300,31 +300,31 @@ def main(argv=None):
         bind=f3d.InteractionBind(NONE, "W"),
         command=["reset_simulation"],
         group="Simulation",
-        documentationCallback=lambda: ("Reset simulation", ""),
+        documentation_callback=lambda: ("Reset simulation", ""),
     )
     inter.add_binding(
         bind=f3d.InteractionBind(NONE, "N"),
         command=["set_cloth_resolution 10", "reset_simulation"],
         group="Simulation",
-        documentationCallback=lambda: ("10x10", ""),
+        documentation_callback=lambda: ("10x10", ""),
     )
     inter.add_binding(
         bind=f3d.InteractionBind(SHIFT, "N"),
         command=["set_cloth_resolution 20", "reset_simulation"],
         group="Simulation",
-        documentationCallback=lambda: ("20x20", ""),
+        documentation_callback=lambda: ("20x20", ""),
     )
     inter.add_binding(
         bind=f3d.InteractionBind(NONE, "I"),
         command=["set_cloth_iterations 10"],
         group="Simulation",
-        documentationCallback=lambda: ("10 iterations", ""),
+        documentation_callback=lambda: ("10 iterations", ""),
     )
     inter.add_binding(
         bind=f3d.InteractionBind(NONE, "O"),
         command=["set_cloth_iterations 20"],
         group="Simulation",
-        documentationCallback=lambda: ("20 iterations", ""),
+        documentation_callback=lambda: ("20 iterations", ""),
     )
 
     # Add the cloth mesh to the scene

@@ -86,34 +86,34 @@ def test_binding():
         bind=f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.ANY, "P"),
         command=["dummy command"],
         group="DummyGroup",
-        documentationCallback=doc_fn,
+        documentation_callback=doc_fn,
     )
     inter.add_binding(
         bind=f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "P"),
         command=["dummy command"],
         group="DummyGroup",
-        documentationCallback=doc_fn,
+        documentation_callback=doc_fn,
         type=f3d.Interactor.BindingType.CYCLIC,
     )
     inter.add_binding(
         bind=f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "P"),
         command=["dummy command"],
         group="DummyGroup",
-        documentationCallback=doc_fn,
+        documentation_callback=doc_fn,
         type=f3d.Interactor.BindingType.NUMERICAL,
     )
     inter.add_binding(
         bind=f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.SHIFT, "P"),
         command=["dummy command"],
         group="DummyGroup",
-        documentationCallback=doc_fn,
+        documentation_callback=doc_fn,
         type=f3d.Interactor.BindingType.TOGGLE,
     )
     inter.add_binding(
         bind=f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL_SHIFT, "P"),
         command=["dummy command", "dummy command"],
         group="DummyGroup",
-        documentationCallback=doc_fn,
+        documentation_callback=doc_fn,
         type=f3d.Interactor.BindingType.OTHER,
         notify=False,
     )
@@ -121,7 +121,7 @@ def test_binding():
         bind=f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "R"),
         command=["dummy command", "dummy command"],
         group="DummyGroup",
-        documentationCallback=doc_fn,
+        documentation_callback=doc_fn,
         type=f3d.Interactor.BindingType.OTHER,
         notify=False,
         repeat=True,
