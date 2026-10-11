@@ -97,6 +97,7 @@ runs:
       run: |
         python -m pip install pytest
         python -m pip install pybind11_stubgen
+        python -m pip install typing_extensions
         python -m pip install numpy
 
     - name: Extract java version
