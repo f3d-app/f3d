@@ -13,7 +13,7 @@ This specific example uses the [InterpolationTest.glb animation file](https://gi
 Load the example animation file from the command-line: `f3d InterpolationTest.glb`
 
 <img width="1024" alt="F3D Cheatsheet showing the current animation name" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_1.png" />
-To view the current animation name, press <kbd>H</kbd> to open the Cheatsheet.
+To view the current animation name, press <kbd>F1</kbd> to open the Cheatsheet.
 
 <img width="1024" alt="F3D window after cycling to another animation" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_2.png" />
 Press <kbd>W</kbd> to cycle through available animations.
