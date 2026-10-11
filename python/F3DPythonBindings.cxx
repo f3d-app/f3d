@@ -544,7 +544,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def("init_commands", &f3d::interactor::initCommands,
       "Remove all commands and add all default command callbacks")
     .def("add_command", &f3d::interactor::addCommand, "Add a command", py::arg("action"),
-      py::arg("callback"), py::arg("doc") = std::nullopt, py::arg("completionCallback") = nullptr)
+      py::arg("callback"), py::arg("doc") = std::nullopt, py::arg("completion_callback") = nullptr)
     .def("remove_command", &f3d::interactor::removeCommand, "Remove a command")
     .def("get_command_actions", &f3d::interactor::getCommandActions, "Get all command actions")
     .def("trigger_command", &f3d::interactor::triggerCommand, "Trigger a command",
@@ -579,7 +579,7 @@ PYBIND11_MODULE(pyf3d, module)
       });
     },
     "Add binding commands", py::kw_only(), py::arg("bind"), py::arg("command"), py::arg("group"),
-    py::arg("documentationCallback") = nullptr,
+    py::arg("documentation_callback") = nullptr,
     py::arg("type") = f3d::interactor::BindingType::OTHER, py::arg("notify") = true,
     py::arg("repeat") = false);
 
