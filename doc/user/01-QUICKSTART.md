@@ -41,7 +41,7 @@ On Linux, you can also open the manual page:
 man f3d
 ```
 
-After opening your file in F3D, press <kbd>H</kbd> to open the Cheatsheet.
+After opening your file in F3D, press <kbd>F1</kbd> to open the Cheatsheet.
 
 See the [supported file formats](02-SUPPORTED_FORMATS.md) page for the full list of file formats that F3D can open.
 
@@ -84,7 +84,7 @@ After loading your scene in F3D, interact with it using your mouse and hotkeys.
 - Press <kbd>Enter</kbd> to reset the camera.
 - Press <kbd>Space</kbd> to play animation, if any.
 - Press <kbd>G</kbd> to toggle the horizontal grid.
-- Press <kbd>H</kbd> to display the Cheatsheet.
+- Press <kbd>F1</kbd> to display the Cheatsheet.
 
 For more information, see the [Interactions](04-INTERACTIONS.md) page.
 
