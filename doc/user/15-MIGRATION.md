@@ -15,7 +15,7 @@ If not defined, `material` is used. If defined but no value is specified, `scivi
 
 `--animation-progress` was a boolean toggling a progress bar during animation playback. It is now a string selecting the progress bar mode: `none` (hidden), `default` (the progress bar alone) or `advanced` (the progress bar with time range, animation name, current time labels and key frame markers). Replace `true` with `default` (or `advanced`) and `false` with `none`.
 
-Refer to [CLI options](../03-OPTIONS.md) for more details.
+Refer to [CLI options](./03-OPTIONS.md) for more details.
 
 ## Application bindings
 
