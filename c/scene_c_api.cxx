@@ -189,7 +189,7 @@ public:
     return this->MeshView->name ? this->MeshView->name : "";
   }
 
-  std::array<double, 2> getTimeRange() const override
+  std::pair<double, double> getTimeRange() const override
   {
     return { this->MeshView->time_min, this->MeshView->time_max };
   }

@@ -774,13 +774,13 @@ PYBIND11_MODULE(pyf3d, module)
     , public py::trampoline_self_life_support
   {
   public:
-    std::array<double, 2> getTimeRange() const override
+    std::pair<double, double> getTimeRange() const override
     {
       const py::gil_scoped_acquire gil;
       const py::function fn = py::get_override(this, "get_time_range");
       if (fn)
       {
-        return fn().cast<std::array<double, 2>>();
+        return fn().cast<std::pair<double, double>>();
       }
       return f3d::mesh_view::getTimeRange();
     }

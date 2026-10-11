@@ -96,7 +96,7 @@ void setBindingDocCallback(f3d::interactor::BindingParam& binding, emscripten::v
 struct wasm_mesh_view : public f3d::mesh_view
 {
   // not time support with wasm
-  std::array<double, 2> getTimeRange() const override
+  std::pair<double, double> getTimeRange() const override
   {
     return { 0.0, 0.0 };
   }

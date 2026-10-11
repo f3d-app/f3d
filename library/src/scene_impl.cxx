@@ -578,7 +578,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
   // Only time range is supported at the moment but we should also add support
   // for time steps and simulated meshes in the future
   auto timeRange = mesh->getTimeRange();
-  vtkSource->SetTimeRange(timeRange[0], timeRange[1]);
+  vtkSource->SetTimeRange(timeRange.first, timeRange.second);
 
   vtkSource->SetUpdateFunction(
     [=](double time, vtkPolyData* polydata)

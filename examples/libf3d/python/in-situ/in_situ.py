@@ -148,8 +148,8 @@ class ClothMesh(f3d.MeshView):
         super().__init__()
         self._solver = solver
 
-    def get_time_range(self) -> list:
-        return [0.0, 10.0]
+    def get_time_range(self) -> tuple[float, float]:
+        return 0.0, 10.0
 
     def get_memory_view(self, time: float) -> f3d.MeshMemoryView:
         view = f3d.MeshMemoryView()
@@ -229,7 +229,7 @@ def main(argv=None):
     # Commands
     def reset_simulation(_args):
         solver.initialize()
-        scene.load_animation_time(0.0)
+        eng.scene.animation.load_time(0.0)
 
     inter.add_command(
         "reset_simulation",
