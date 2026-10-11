@@ -31,14 +31,14 @@ Using the F3D NSIS installer (.exe) is the simplest way to enable thumbnails and
 
 Alternatively, when using the zipped binary release archive, register it manually on installation:
 
-```
+```bat
 cd C:\path\to\f3d\bin\
 regsvr32 F3DShellExtension.dll
 ```
 
 To remove the shell extension, run:
 
-```
+```bat
 cd C:\path\to\f3d\bin\
 regsvr32 /u F3DShellExtension.dll
 ```
