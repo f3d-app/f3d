@@ -16,7 +16,7 @@ int TestSDKDropZoneNoLogo([[maybe_unused]] int argc, char* argv[])
   win.setSize(300, 300);
   opt.ui.drop_zone.enable = true;
   opt.ui.drop_zone.show_logo = false;
-  opt.ui.drop_zone.custom_binds = "None+Drop Ctrl+O None+H";
+  opt.ui.drop_zone.custom_binds = "None+Drop Ctrl+O F1";
 
   win.render();
 

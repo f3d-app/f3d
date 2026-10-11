@@ -1,17 +1,11 @@
 # StreamVersion 1.2
 ExposeEvent 0 299 0 0 0 0 0
 RenderEvent 0 299 0 0 0 0 0
-KeyPressEvent 154 91 0 0 0 Shift_L 0
-CharEvent 154 91 0 0 0 Shift_L 0
-MouseMoveEvent 154 92 1 0 0 Shift_L 0
-MouseMoveEvent 153 92 1 0 0 Shift_L 0
-MouseMoveEvent 153 94 1 0 0 Shift_L 0
-KeyPressEvent 153 94 1 72 0 H 0
-CharEvent 153 94 1 72 0 H 0
-MouseMoveEvent 151 94 1 0 0 H 0
-MouseMoveEvent 150 94 1 0 0 H 0
-KeyReleaseEvent 150 94 1 72 0 H 0
-KeyReleaseEvent 108 111 1 0 0 Shift_L 0
+KeyPressEvent 153 94 0 72 0 H 0
+CharEvent 153 94 0 72 0 H 0
+MouseMoveEvent 151 94 0 0 0 H 0
+MouseMoveEvent 150 94 0 0 0 H 0
+KeyReleaseEvent 150 94 0 72 0 H 0
 MouseMoveEvent 107 111 0 0 0 Shift_L 0
 MouseMoveEvent 106 111 0 0 0 Shift_L 0
 MouseMoveEvent 106 115 0 0 0 Shift_L 0

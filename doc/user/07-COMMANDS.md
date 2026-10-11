@@ -15,7 +15,7 @@ The libf3d provides a few commands, many related to manipulating libf3d (options
 
 `toggle option.name`: A command to toggle a boolean libf3d option, eg: `toggle ui.scalar_bar`.
 
-`reset option.name`: A command to reset a libf3d option to its default values, eg: `reset render.background.blur.coc`.
+`reset option.name`: A command to reset a libf3d option to its default values, eg: `reset render.background.blur_coc`.
 
 `clear`: A command to clear console. No argument.
 

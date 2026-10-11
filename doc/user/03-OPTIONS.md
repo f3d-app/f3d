@@ -734,26 +734,18 @@ Display the _hdri-filename_.
 | ----------------------------------------- | ---------------------------------- |
 | ![](./images/damaged_helmet_baseline.png) | ![](./images/hdri_filename_on.png) |
 
-### `--hdri-skybox` (_bool_, default: `false`)
+### `-j`, `--hdri-skybox` (_string_, default: `disabled`, implicit: `enabled`)
 
-Show the HDRI as a skybox. Overrides `--background-color` and `--no-background`.
-
-#### compare
-
-| OFF                                       | ON                               |
-| ----------------------------------------- | -------------------------------- |
-| ![](./images/damaged_helmet_baseline.png) | ![](./images/hdri_skybox_on.png) |
-
-### `-u`, `--blur-background` (_bool_, default: `false`)
-
-Blur background.
-Useful with a HDRI skybox.
+Define the HDRI skybox display mode.
+If value is `disabled`, `--background-color` and `--no-background` are used.
+If value is `enabled`, the skybox is visible.
+If value is `blurred`, the skybox is visible and blurred.
 
 #### compare
 
-| OFF                             | ON                             |
-| ------------------------------- | ------------------------------ |
-| ![](./images/hdri_blur_off.png) | ![](./images/hdri_blur_on.png) |
+| enabled                          | blurred                        |
+| -------------------------------- | ------------------------------ |
+| ![](./images/hdri_skybox_on.png) | ![](./images/hdri_blur_on.png) |
 
 ### `--blur-coc` (_double_, default: `20`)
 

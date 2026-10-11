@@ -307,11 +307,11 @@ f3d_test_doc(NAME TestDocHDRISkyboxON DATA DamagedHelmet.glb REF_IMAGE hdri_skyb
 
 ## --blur-background
 f3d_test_doc(NAME TestDocHDRIBlurOFF DATA DamagedHelmet.glb REF_IMAGE hdri_blur_off.png RESOLUTION 800,600 ROTATE ARGS -fj)
-f3d_test_doc(NAME TestDocHDRIBlurON DATA DamagedHelmet.glb REF_IMAGE hdri_blur_on.png RESOLUTION 800,600 ROTATE ARGS -fju)
+f3d_test_doc(NAME TestDocHDRIBlurON DATA DamagedHelmet.glb REF_IMAGE hdri_blur_on.png RESOLUTION 800,600 ROTATE ARGS -f --hdri-skybox=blurred)
 
 ## --blur-coc
-f3d_test_doc(NAME TestDocHDRICOCDefault DATA DamagedHelmet.glb REF_IMAGE hdri_coc_default.png RESOLUTION 800,600 ROTATE ARGS -fju)
-f3d_test_doc(NAME TestDocHDRICOC50 DATA DamagedHelmet.glb REF_IMAGE hdri_coc_50.png RESOLUTION 800,600 ROTATE ARGS -fju --blur-coc=50)
+f3d_test_doc(NAME TestDocHDRICOCDefault DATA DamagedHelmet.glb REF_IMAGE hdri_coc_default.png RESOLUTION 800,600 ROTATE ARGS -f --hdri-skybox=blurred)
+f3d_test_doc(NAME TestDocHDRICOC50 DATA DamagedHelmet.glb REF_IMAGE hdri_coc_50.png RESOLUTION 800,600 ROTATE ARGS -f --hdri-skybox=blurred --blur-coc=50)
 
 ## --light-intensity
 f3d_test_doc(NAME TestDocLightIntensity1 DATA DamagedHelmet.glb REF_IMAGE light_intensity_1.png ROTATE)

@@ -436,20 +436,14 @@ Ignored if a _hdri_ skybox is used.
 
 CLI: `--background-color`.
 
-### `render.background.skybox` (_bool_, default: `false`)
+### `render.background.skybox` (_string_, default: `disabled`, enum domain: `disabled`, `enabled`, `blurred`)
 
-Show the _HDRI_ image as a skybox
+Define how to show the _HDRI_ image as a skybox
 Overrides the the background color if any
 
 CLI: `--hdri-skybox`.
 
-### `render.background.blur.enable` (_bool_, default: `false`)
-
-Blur background, useful with a skybox.
-
-CLI: `--blur-background`.
-
-### `render.background.blur.coc` (_double_, default: `20.0`, range domain: `[0, 100]`, increment: `5`)
+### `render.background.blur_coc` (_double_, default: `20.0`, range domain: `[0, 100]`, increment: `5`)
 
 Blur background circle of confusion radius.
 

@@ -464,8 +464,8 @@
           "longName": "hdri-skybox",
           "shortName": "j",
           "helpText": "Enable HDRI skybox background",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
+          "valueHelper": "<string>",
+          "implicitValue": "enabled"
         },
         {
           "longName": "texture-matcap",
@@ -575,13 +575,6 @@
         {
           "longName": "hdri-filename",
           "helpText": "Display hdri filename",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
-        },
-        {
-          "longName": "blur-background",
-          "shortName": "u",
-          "helpText": "Blur background",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },

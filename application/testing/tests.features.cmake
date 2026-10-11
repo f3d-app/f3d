@@ -365,13 +365,13 @@ f3d_test(NAME TestHDRINoCache DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --
 # HDRI ambient lighting must follow render.light.intensity (see https://github.com/f3d-app/f3d/issues/3312)
 f3d_test(NAME TestHDRILightIntensityDimmer DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --light-intensity=0.1 DEPENDS TestHDRI THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
 f3d_test(NAME TestHDRILightIntensityBrighter DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --light-intensity=2.0 DEPENDS TestHDRI THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
-f3d_test(NAME TestHDRIBlur DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
-f3d_test(NAME TestHDRIBlurCoCSmall DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=10 --camera-position=-20,0,20)
-f3d_test(NAME TestHDRIBlurCoCMedium DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=50 --camera-position=-20,0,20)
-f3d_test(NAME TestHDRIBlurCoCLarge DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=100 --camera-position=-20,0,20 THRESHOLD 0.05) # Small rendering differences on GLES due to LUT precision
-f3d_test(NAME TestHDRIBlurCoCZero DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=0 --camera-position=-20,0,20)
-f3d_test(NAME TestHDRIBlurCoCNegative DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=-100 --camera-position=-20,0,20 THRESHOLD 0.05) # Small rendering differences on GLES due to LUT precision
-f3d_test(NAME TestHDRIBlurRatio DATA suzanne.ply HDRI shanghai_bund_1k.hdr RESOLUTION 600,100 ARGS -u)
+f3d_test(NAME TestHDRIBlur DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --hdri-skybox=blurred THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
+f3d_test(NAME TestHDRIBlurCoCSmall DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --hdri-skybox=blurred --blur-coc=10 --camera-position=-20,0,20)
+f3d_test(NAME TestHDRIBlurCoCMedium DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --hdri-skybox=blurred --blur-coc=50 --camera-position=-20,0,20)
+f3d_test(NAME TestHDRIBlurCoCLarge DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --hdri-skybox=blurred --blur-coc=100 --camera-position=-20,0,20 THRESHOLD 0.05) # Small rendering differences on GLES due to LUT precision
+f3d_test(NAME TestHDRIBlurCoCZero DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --hdri-skybox=blurred --blur-coc=0 --camera-position=-20,0,20)
+f3d_test(NAME TestHDRIBlurCoCNegative DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --hdri-skybox=blurred --blur-coc=-100 --camera-position=-20,0,20 THRESHOLD 0.05) # Small rendering differences on GLES due to LUT precision
+f3d_test(NAME TestHDRIBlurRatio DATA suzanne.ply HDRI shanghai_bund_1k.hdr RESOLUTION 600,100 ARGS --hdri-skybox=blurred)
 f3d_test(NAME TestHDRIEdges DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -e THRESHOLD 0.06 THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
 f3d_test(NAME TestHDRI8Bit DATA suzanne.ply HDRI f3d.tif ARGS --color=1.0,0.0,0.0 THRESHOLD 0.1) # Threshold is needed for IBL change after VTK 9.6
 f3d_test(NAME TestHDRIOrient DATA suzanne.stl HDRI shanghai_bund_1k.hdr ARGS --up=+Z THRESHOLD 0.05) # Small rendering differences on GLES due to LUT precision
@@ -423,7 +423,7 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestRaytracingDenoise DATA suzanne.ply ARGS -rd --raytracing-samples=4)
   f3d_test(NAME TestRaytracingNoDenoise DATA suzanne.stl ARGS -r --raytracing-samples=20)
   f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Module Raytracing: ON")
-  f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply ARGS --raytracing-samples=4 INTERACTION) #RD
+  f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply ARGS --raytracing-samples=4 -d INTERACTION) #R
   f3d_test(NAME TestRaytracingScalarBar DATA dragon.vtu ARGS -rsbd --raytracing-samples=4)
 
   if(NOT F3D_MACOS_BUNDLE)
@@ -838,10 +838,10 @@ f3d_test(NAME TestVersion ARGS --version REGEXP "Version:")
 f3d_test(NAME TestReadersList ARGS --list-readers REGEXP_FAIL "No registered reader found")
 
 # Test invalid component string coverage
-f3d_test(NAME TestInteractionInvalidComponent INTERACTION UI DATA cow.vtp ARGS --coloring-component=1 NO_BASELINE) #H
+f3d_test(NAME TestInteractionInvalidComponent INTERACTION UI DATA cow.vtp ARGS --coloring-component=1 NO_BASELINE) #F1
 
 # Test opening invalid file then switching to another file
-f3d_test(NAME TestInteractionInvalidFile INTERACTION DATA invalid_body.vtp cow.vtp ARGS --loading-progress) #Right
+f3d_test(NAME TestInteractionInvalidFile INTERACTION DATA invalid_body.vtp cow.vtp ARGS --loading-progress) #Down
 
 # Test bindings-list display
 f3d_test(NAME TestBindingsList ARGS --list-bindings REGEXP "Any.5        Orthographic Projection")

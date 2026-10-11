@@ -39,7 +39,7 @@ int TestSDKDynamicHDRI([[maybe_unused]] int argc, char* argv[])
 
   // Enable HDRI ambient and skybox and check the default HDRI
   opt.render.hdri.ambient = true;
-  opt.render.background.skybox = true;
+  opt.render.background.skybox = "enabled";
   test("render with default HDRI",
     TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
       std::string(argv[2]), "TestSDKDynamicHDRIDefault"));

@@ -179,23 +179,21 @@
         "default_value": "0.2, 0.2, 0.2"
       },
       "skybox": {
-        "type": "bool",
-        "default_value": "false"
+        "type": "string",
+        "default_value": "disabled",
+        "domain": {
+          "style": "enum",
+          "enum": ["disabled", "enabled", "blurred"]
+        }
       },
-      "blur": {
-        "enable": {
-          "type": "bool",
-          "default_value": "false"
-        },
-        "coc": {
-          "type": "double",
-          "default_value": "20.0",
-          "domain": {
-            "style": "range",
-            "min": "0.0",
-            "max": "100.0",
-            "increment": "5.0"
-          }
+      "blur_coc": {
+        "type": "double",
+        "default_value": "20.0",
+        "domain": {
+          "style": "range",
+          "min": "0.0",
+          "max": "100.0",
+          "increment": "5.0"
         }
       }
     },

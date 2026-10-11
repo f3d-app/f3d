@@ -17,35 +17,33 @@ f3d_test(NAME TestInteractionCycleArraysSameName DATA waveletSameName.vti INTERA
 f3d_test(NAME TestInteractionCycleBlending DATA suzanne.ply ARGS --opacity=0.8 INTERACTION LONG_TIMEOUT SKIP_GLES) #PPPPP # Cycle to ddp
 f3d_test(NAME TestInteractionVolumeCycle DATA waveletArrays.vti ARGS INTERACTION) #VSS
 f3d_test(NAME TestInteractionVolumeAfterColoring DATA waveletArrays.vti ARGS INTERACTION) #SYV
-f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS -s --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 INTERACTION THRESHOLD 0.11) #VI #Small rendering differences on macOS OSMesa
 f3d_test(NAME TestInteractionCorrectCameraForVolumeSwitch ARGS --no-config -v DATA dragon.vtu INTERACTION UI) #v
-f3d_test(NAME TestInteractionMultiFileVolume DATA multi ARGS --multi-file-mode=all INTERACTION LONG_TIMEOUT) #SYVB
+f3d_test(NAME TestInteractionMultiFileVolume DATA multi ARGS -b --multi-file-mode=all INTERACTION LONG_TIMEOUT) #SYV
 f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-sprites-size=20 INTERACTION) #O
-f3d_test(NAME TestInteractionDirectory DATA mb INTERACTION ARGS --coloring-mode=scivis) #Right;Right;Right;Left;Up;
-f3d_test(NAME TestInteractionDirectoryLoop DATA mb/recursive INTERACTION ARGS --coloring-mode=scivis --filename UI) #Left;Left;Left;Left;Left;
-f3d_test(NAME TestInteractionDirectoryEmpty DATA mb INTERACTION NO_DATA_FORCE_RENDER UI) #Right;Right;Right;
-f3d_test(NAME TestInteractionDirectoryEmptyVerbose DATA mb ARGS --verbose NO_BASELINE INTERACTION REGEXP "is of an unknown format") #Right;Right;Right;HMCSY
+f3d_test(NAME TestInteractionDirectory DATA mb INTERACTION ARGS --coloring-mode=scivis) #Down;Down;Down;Up;F5;
+f3d_test(NAME TestInteractionDirectoryLoop DATA mb/recursive INTERACTION ARGS --coloring-mode=scivis --filename UI) #Up;Up;Up;Up;Up;
+f3d_test(NAME TestInteractionDirectoryEmpty DATA mb INTERACTION NO_DATA_FORCE_RENDER UI) #Down;Down;Down;
+f3d_test(NAME TestInteractionDirectoryEmptyVerbose DATA mb ARGS --verbose NO_BASELINE INTERACTION REGEXP "is of an unknown format") #Down;Down;Down;HMCSY
 f3d_test(NAME TestInteractionCycleScalarsCompCheck DATA dragon.vtu ARGS -b --coloring-component=2 INTERACTION) #S
 f3d_test(NAME TestInteractionTAA DATA suzanne.ply ARGS --anti-aliasing=taa INTERACTION) #Render;Render...
 f3d_test(NAME TestInteractionTAAMiddleClick DATA suzanne.ply ARGS --anti-aliasing=taa INTERACTION) #Render;Render...;MiddleClick;Render;Render...
 f3d_test(NAME TestInteractionTextureCheckerBoardTAA DATA WaterBottle.glb ARGS --checkerboard --anti-aliasing=taa INTERACTION) #Render;Render...
 f3d_test(NAME TestInteractionCycleVerbose DATA dragon.vtu ARGS --verbose -s NO_BASELINE INTERACTION REGEXP "Material") #SSSSYC
 f3d_test(NAME TestInteractionCycleVerboseLevelsUsingBinding DATA dragon.vtu ARGS --verbose=info NO_BASELINE INTERACTION REGEXP "Verbose level changed to: Debug") #Shift+V;Shift+V;Shift+V;Shift+V;Shift+V
-f3d_test(NAME TestInteractionVerboseLevelPreservedOnReload DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Material") #Shift+V;Shift+V;Shift+V;Shift+V;Up
+f3d_test(NAME TestInteractionVerboseLevelPreservedOnReload DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Material") #Shift+V;Shift+V;Shift+V;Shift+V;F5
 f3d_test(NAME TestInteractionLightIntensity DATA dragon.vtu INTERACTION LONG_TIMEOUT)
-f3d_test(NAME TestInteractionMultiFileColoring DATA mb/recursive ARGS --multi-file-mode=all INTERACTION) #SYYB
+f3d_test(NAME TestInteractionMultiFileColoring DATA mb/recursive ARGS -b --multi-file-mode=all INTERACTION) #SYY
 f3d_test(NAME TestInteractionOpacity DATA dragon.vtu INTERACTION) # Shift+P * 21; Ctrl+P * 5
-f3d_test(NAME TestInteractionReload DATA dragon.vtu ARGS -e INTERACTION) #Up;
-f3d_test(NAME TestInteractionLoadParentDirectory DATA multi/dragon.vtu ARGS --filename INTERACTION UI) #Down;
-f3d_test(NAME TestInteractionEmptyLoadParentDirectory INTERACTION NO_BASELINE REGEXP "No files loaded, no rendering performed") #Down;
-f3d_test(NAME TestInteractionMultiFileLoadParentDirectory DATA mb/mb_0_0.vtu ARGS --multi-file-mode=all --filename INTERACTION UI) #Down;
+f3d_test(NAME TestInteractionReload DATA dragon.vtu ARGS -e INTERACTION) #F5;
+f3d_test(NAME TestInteractionLoadParentDirectory DATA multi/dragon.vtu ARGS --filename INTERACTION UI) #CTRL+SHIFT+R;
+f3d_test(NAME TestInteractionEmptyLoadParentDirectory INTERACTION NO_BASELINE REGEXP "No files loaded, no rendering performed") #CTRL+SHIFT+R;
+f3d_test(NAME TestInteractionMultiFileLoadParentDirectory DATA mb/mb_0_0.vtu ARGS --multi-file-mode=all --filename INTERACTION UI) #CTRL+SHIFT+R;
 f3d_test(NAME TestInteractionInvertZoom DATA suzanne.ply ARGS --invert-zoom INTERACTION)
 f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #CTRL+Q
 f3d_test(NAME TestInteractionNotifications DATA cow.vtp ARGS --notifications INTERACTION UI) #E;
 f3d_test(NAME TestInteractionNotificationsUpdate DATA cow.vtp ARGS --notifications INTERACTION UI) #E;E;Up;Up
 f3d_test(NAME TestInteractionNotificationsBindings DATA cow.vtp ARGS --notifications -Dui.notifications.show_bindings=ON INTERACTION UI) #E;
 f3d_test(NAME TestInteractionNotificationsBindingsModifier DATA cow.vtp ARGS --notifications -Dui.notifications.show_bindings=ON RESOLUTION 400,300 INTERACTION UI) #SHIFT+L;
-f3d_test(NAME TestInteractionToggleNotifications DATA cow.vtp INTERACTION UI) #CTRL+K;
 f3d_test(NAME TestInteractionSelectLog DATA f3d.glb SCRIPT INTERACTION UI THRESHOLD 0.06) #Esc;Select text
 f3d_test(NAME TestInteractionHoverCopyLog DATA f3d.glb INTERACTION UI) #Mouse move to copy log button
 f3d_test(NAME TestInteractionHoverCopyLogDPI DATA f3d.glb ARGS --dpi-aware DPI_SCALE 1.5 INTERACTION UI) #Mouse move to copy log button
@@ -61,7 +59,7 @@ f3d_test(NAME TestInteractionGridReflectionChanged DATA suzanne.ply ARGS -g INTE
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12987
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
-  f3d_test(NAME TestInteractionNotificationsAndSceneHierarchy DATA vtk-dasm-test.glb INTERACTION UI) #SHIFT+H;CTRL+K;E
+  f3d_test(NAME TestInteractionNotificationsAndSceneHierarchy DATA vtk-dasm-test.glb ARGS --notifications INTERACTION UI) #H;E
 endif()
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
@@ -77,15 +75,15 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250504)
   # It's not a bug but we should find a solution to have the exact same result
   f3d_test(NAME TestInteractionStochasticTAA DATA alpha.glb ARGS --anti-aliasing=taa --blending=stochastic INTERACTION SKIP_GLES) #Render;Render...
   f3d_test(NAME TestInteractionGaussianStochasticTAA DATA small.splat ARGS --coloring-mode=direct --point-sprites=gaussian --point-sprites-absolute-size --point-sprites-size=1 --blending=stochastic --anti-aliasing=taa --camera-position=-1.65,-0.06,1.96 --camera-focal-point=-1.65,1.24,1.96 --camera-view-up=0.9954,0,0.0955 INTERACTION LONG_TIMEOUT SKIP_GLES) #Render;Render...
-  f3d_test(NAME TestInteractionAndCLIBlending ARGS --blending DATA suzanne.stl alpha.glb INTERACTION SKIP_GLES) #PP;Right
+  f3d_test(NAME TestInteractionAndCLIBlending ARGS --blending DATA suzanne.stl alpha.glb INTERACTION SKIP_GLES) #PP;Down
 endif()
 
-f3d_test(NAME TestInteractionConfigFileAndCommand DATA multi ARGS -o CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI LONG_TIMEOUT) #OX;Right;N;Right;Right;Right
+f3d_test(NAME TestInteractionConfigFileAndCommand DATA multi ARGS -o CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI LONG_TIMEOUT) #OX;Down;N;Down;Down;Down
 
 # Axes grid actor not working with GLES
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260612)
   f3d_test(NAME TestInteractionAxesGridToggle INTERACTION DATA suzanne.ply THRESHOLD 0.08 SKIP_GLES) #Shift+x
-  f3d_test(NAME TestInteractionAxesGridFileSwitch INTERACTION DATA backface.vtp cow.vtp ARGS --axes-grid THRESHOLD 0.08 SKIP_GLES) #Right
+  f3d_test(NAME TestInteractionAxesGridFileSwitch INTERACTION DATA backface.vtp cow.vtp ARGS --axes-grid THRESHOLD 0.08 SKIP_GLES) #Down
 endif()
 
 if (F3D_MODULE_TINYFILEDIALOGS)
@@ -93,19 +91,19 @@ if (F3D_MODULE_TINYFILEDIALOGS)
 endif ()
 
 if(F3D_MODULE_DMON)
-  f3d_test(NAME TestInteractionVerboseWatchUnwatch ARGS --watch --verbose DATA cow.vtp multi/dragon.vtu NO_BASELINE INTERACTION REGEXP "Stopped watching") #Right
+  f3d_test(NAME TestInteractionVerboseWatchUnwatch ARGS --watch --verbose DATA cow.vtp multi/dragon.vtu NO_BASELINE INTERACTION REGEXP "Stopped watching") #Down
 endif()
 
 ## Config
-f3d_test(NAME TestInteractionConfigFileMulti DATA multi CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI) #SY;Right;XG;Right;N;Right;Right
+f3d_test(NAME TestInteractionConfigFileMulti DATA multi CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI) #SY;Down;XG;Down;N;Down;Down
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-  f3d_test(NAME TestInteractionConfigFileNoColorBar DATA multi CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI) #Right;Right;Left
+  f3d_test(NAME TestInteractionConfigFileNoColorBar DATA multi CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI) #Down;Down;Up
   f3d_test(NAME TestInteractionConfigFileBindings DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #Ctrl+Shift+O;Ctrl+O;Shift+O;O;3
-  f3d_test(NAME TestInteractionConfigFileImperative DATA dragon.vtu suzanne.stl ARGS --edges CONFIG ${F3D_SOURCE_DIR}/testing/configs/imperative.json INTERACTION UI) #E;Right
-  f3d_test(NAME TestInteractionConfigFileImperativeNoData CONFIG ${F3D_SOURCE_DIR}/testing/configs/imperative.json INTERACTION NO_DATA_FORCE_RENDER UI) #X;Up
-  f3d_test(NAME TestInteractionConfigFileOptional DATA zombie.mdl f3d.glb CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI) #Right
+  f3d_test(NAME TestInteractionConfigFileImperative DATA dragon.vtu suzanne.stl ARGS --edges CONFIG ${F3D_SOURCE_DIR}/testing/configs/imperative.json INTERACTION UI) #E;Down
+  f3d_test(NAME TestInteractionConfigFileImperativeNoData CONFIG ${F3D_SOURCE_DIR}/testing/configs/imperative.json INTERACTION NO_DATA_FORCE_RENDER UI) #X;F5
+  f3d_test(NAME TestInteractionConfigFileOptional DATA zombie.mdl f3d.glb CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI) #Down
 endif()
 
 ## 2D Mode
@@ -178,41 +176,41 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
 endif()
 
 ## Cheatsheet
-f3d_test(NAME TestInteractionCheatsheetWhiteBG DATA cow.vtp ARGS --background-color=1,1,1 INTERACTION UI) #H
-f3d_test(NAME TestInteractionCheatsheetBlackBG DATA cow.vtp ARGS --background-color=0,0,0 INTERACTION UI) #H
-f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --coloring-mode=direct INTERACTION UI LONG_TIMEOUT) #HSSS
-f3d_test(NAME TestInteractionCheatsheetScalarsNoArray DATA dragon.vtu ARGS --coloring-mode=scivis INTERACTION UI RESOLUTION 500,300) #H
-f3d_test(NAME TestInteractionCheatsheetAnimationName DATA InterpolationTest.glb ARGS --animation-indices=6 INTERACTION UI) #HWWW
-f3d_test(NAME TestInteractionCheatsheetConfigFile DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #H;ScrollDown
-f3d_test(NAME TestInteractionCheatsheetMultiModifierBinding DATA dragon.vtu RESOLUTION 1200,300 CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #H;ScrollDown
-f3d_test(NAME TestInteractionCheatsheetCycle DATA cow.vtp RESOLUTION 800,300 INTERACTION UI LONG_TIMEOUT SKIP_GLES) #HAAPO
+f3d_test(NAME TestInteractionCheatsheetWhiteBG DATA cow.vtp ARGS --background-color=1,1,1 INTERACTION UI) #F1
+f3d_test(NAME TestInteractionCheatsheetBlackBG DATA cow.vtp ARGS --background-color=0,0,0 INTERACTION UI) #F1
+f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --coloring-mode=direct INTERACTION UI LONG_TIMEOUT) #F1;SSS
+f3d_test(NAME TestInteractionCheatsheetScalarsNoArray DATA dragon.vtu ARGS --coloring-mode=scivis INTERACTION UI RESOLUTION 500,300) #F1
+f3d_test(NAME TestInteractionCheatsheetAnimationName DATA InterpolationTest.glb ARGS --animation-indices=6 INTERACTION UI) #F1;WWW
+f3d_test(NAME TestInteractionCheatsheetConfigFile DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #F1;ScrollDown
+f3d_test(NAME TestInteractionCheatsheetMultiModifierBinding DATA dragon.vtu RESOLUTION 1200,300 CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #F1;ScrollDown
+f3d_test(NAME TestInteractionCheatsheetCycle DATA cow.vtp RESOLUTION 800,300 INTERACTION UI LONG_TIMEOUT SKIP_GLES) #F1;AAPO
 
 # Clip interaction is visible in the bottom part of the cheatsheet
 if(F3D_MODULE_CLIP)
-  f3d_test(NAME TestInteractionCheatsheetOpacity DATA cow.vtp INTERACTION UI ARGS --opacity=0.5 RESOLUTION 300,700) #H;ScrollDown
+  f3d_test(NAME TestInteractionCheatsheetOpacity DATA cow.vtp INTERACTION UI ARGS --opacity=0.5 RESOLUTION 300,700) #F1;ScrollDown
   f3d_test(NAME TestInteractionNoModelScrollWheel RESOLUTION 1000,600 NO_DATA_FORCE_RENDER LONG_TIMEOUT INTERACTION UI)
   f3d_test(NAME TestInteractionNoModelScrollBar RESOLUTION 1000,600 NO_DATA_FORCE_RENDER LONG_TIMEOUT INTERACTION UI)
 endif()
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-  f3d_test(NAME TestInteractionCheatsheetNoFile INTERACTION UI NO_DATA_FORCE_RENDER) #HXM
+  f3d_test(NAME TestInteractionCheatsheetNoFile INTERACTION UI NO_DATA_FORCE_RENDER) #F1;XM
 endif()
 
 if(F3D_MODULE_RAYTRACING)
-  f3d_test(NAME TestInteractionCheatsheetCentered DATA cow.vtp RESOLUTION 500,1500 INTERACTION UI LONG_TIMEOUT) #H
+  f3d_test(NAME TestInteractionCheatsheetCentered DATA cow.vtp RESOLUTION 500,1500 INTERACTION UI LONG_TIMEOUT) #F1
 endif()
 
 ## Scene Hierarchy
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12987
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
-  f3d_test(NAME TestInteractionSceneHierarchy DATA BoxAnimated.gltf INTERACTION UI) #Shift+H;Resize widget;Click checkbox
-  f3d_test(NAME TestInteractionSceneHierarchyManyClick DATA cow.vtp INTERACTION UI) #Shift+H;Click checkbox;Click checkbox;Click checkbox
-  f3d_test(NAME TestInteractionSceneHierarchyVolume DATA tensors.vti ARGS -s INTERACTION UI) #Shift+H;V;Click checkbox
-  f3d_test(NAME TestInteractionSceneHierarchyAndCheatsheet DATA cow.vtp RESOLUTION 1200,200 INTERACTION UI) #H;Shift+H
-  f3d_test(NAME TestInteractionSceneHierarchyCollapsed DATA vtk-dasm-test.glb INTERACTION UI) #Shift+H;Resize widget;Click checkbox
-  f3d_test(NAME TestInteractionSceneHierarchyScroll DATA vtk-dasm-test.glb INTERACTION UI) #Shift+H;Scroll to bottom
-  f3d_test(NAME TestInteractionSceneHierarchyResizeLeft DATA vtk-dasm-test.glb INTERACTION UI) #Shift+H;Resize widget from left border multiple times
+  f3d_test(NAME TestInteractionSceneHierarchy DATA BoxAnimated.gltf INTERACTION UI) #H;Resize widget;Click checkbox
+  f3d_test(NAME TestInteractionSceneHierarchyManyClick DATA cow.vtp INTERACTION UI) #H;Click checkbox;Click checkbox;Click checkbox
+  f3d_test(NAME TestInteractionSceneHierarchyVolume DATA tensors.vti ARGS -s INTERACTION UI) #H;V;Click checkbox
+  f3d_test(NAME TestInteractionSceneHierarchyAndCheatsheet DATA cow.vtp RESOLUTION 1200,200 INTERACTION UI) #H;F1
+  f3d_test(NAME TestInteractionSceneHierarchyCollapsed DATA vtk-dasm-test.glb INTERACTION UI) #H;Resize widget;Click checkbox
+  f3d_test(NAME TestInteractionSceneHierarchyScroll DATA vtk-dasm-test.glb INTERACTION UI) #H;Scroll to bottom
+  f3d_test(NAME TestInteractionSceneHierarchyResizeLeft DATA vtk-dasm-test.glb INTERACTION UI) #H;Resize widget from left border multiple times
 endif()
 
 ## Console
@@ -275,21 +273,21 @@ f3d_test(NAME TestInteractionMinimalConsoleOverCheatSheet DATA f3d.glb INTERACTI
 f3d_test(NAME TestInteractionMinimalConsoleOverCheatSheetAndFilename DATA f3d.glb INTERACTION UI) #h;n;:
 
 ## HDRI
-f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION THRESHOLD 0.07) #U
 f3d_test(NAME TestInteractionHDRIReload DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION THRESHOLD 0.07) #Up
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION THRESHOLD 0.06) #Shift+MouseRight;
-  f3d_test(NAME TestInteractionHDRIChange DATA multi HDRI shanghai_bund_1k.hdr CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI THRESHOLD 0.08) #Left # Threshold needed for IBL change after 9.6
+  f3d_test(NAME TestInteractionHDRIChange DATA multi HDRI shanghai_bund_1k.hdr CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI THRESHOLD 0.08) #Up # Threshold needed for IBL change after 9.6
 endif()
 
-f3d_test(NAME TestInteractionHDRICache DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION DEPENDS TestHDRI THRESHOLD 0.07) #FFFFJJJJ
-f3d_test(NAME TestInteractionHDRIRemoveSkybox DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION THRESHOLD 0.06)
-f3d_test(NAME TestInteractionHDRIRemoveAmbient DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION)
-f3d_test(NAME TestInteractionHDRIRemoveBoth DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION)
-f3d_test(NAME TestInteractionHDRILoop DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION THRESHOLD 0.07)
-f3d_test(NAME TestInteractionHDRIFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr LONG_TIMEOUT INTERACTION THRESHOLD 0.07)
+f3d_test(NAME TestInteractionHDRICache DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION DEPENDS TestHDRI THRESHOLD 0.07) #FFFFJJJJJJ
+f3d_test(NAME TestInteractionHDRIRemoveSkybox DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION THRESHOLD 0.06) #JJ
+f3d_test(NAME TestInteractionHDRIRemoveAmbient DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION) #F
+f3d_test(NAME TestInteractionHDRIRemoveBoth DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION) #FJJ
+f3d_test(NAME TestInteractionHDRICycleBlur DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION THRESHOLD 0.07) #FJ
+f3d_test(NAME TestInteractionHDRILoop DATA suzanne.ply HDRI shanghai_bund_1k.hdr INTERACTION THRESHOLD 0.07) #FJFJJ
+f3d_test(NAME TestInteractionHDRIFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr LONG_TIMEOUT INTERACTION THRESHOLD 0.07) #FJ
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
@@ -300,11 +298,11 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
 endif()
 
 if(F3D_MODULE_RAYTRACING)
-  f3d_test(NAME TestInteractionHDRIRaytracingRemoveSkybox DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION)
-  f3d_test(NAME TestInteractionHDRIRaytracingRemoveAmbient DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION)
-  f3d_test(NAME TestInteractionHDRIRaytracingRemoveBoth DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION)
-  f3d_test(NAME TestInteractionHDRIRaytracingLoop DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION)
-  f3d_test(NAME TestInteractionHDRIRaytracingFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr -rd --raytracing-samples=4 INTERACTION LONG_TIMEOUT)
+  f3d_test(NAME TestInteractionHDRIRaytracingRemoveSkybox DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION) #JJ
+  f3d_test(NAME TestInteractionHDRIRaytracingRemoveAmbient DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION) #F
+  f3d_test(NAME TestInteractionHDRIRaytracingRemoveBoth DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION) #FJJ
+  f3d_test(NAME TestInteractionHDRIRaytracingLoop DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION) #FJFJJ
+  f3d_test(NAME TestInteractionHDRIRaytracingFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr -rd --raytracing-samples=4 INTERACTION LONG_TIMEOUT) #FJ
 endif()
 
 ## Drops

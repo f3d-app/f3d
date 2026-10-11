@@ -818,9 +818,9 @@ public:
     f3d::options libOptions;
 #if F3D_MODULE_UI
 #if F3D_MODULE_TINYFILEDIALOGS
-    libOptions.ui.drop_zone.custom_binds = "None+Drop Ctrl+O None+H";
+    libOptions.ui.drop_zone.custom_binds = "None+Drop Ctrl+O None+F1";
 #else
-    libOptions.ui.drop_zone.custom_binds = "None+Drop None+H";
+    libOptions.ui.drop_zone.custom_binds = "None+Drop None+F1";
 #endif
 #endif
 
@@ -1160,12 +1160,12 @@ public:
       interactor.initBindings();
 
       // clang-format off
-      interactor.addBinding({.Bind = { mod_t::NONE, "Left" }, .Commands = {"load_previous_file_group"}, .Group = "Others", .DocCallback = std::bind(docString, "Load previous file group")});
-      interactor.addBinding({.Bind = { mod_t::NONE, "Right" }, .Commands = {"load_next_file_group"}, .Group = "Others", .DocCallback = std::bind(docString, "Load next file group")});
-      interactor.addBinding({.Bind = { mod_t::CTRL, "Left" }, .Commands = {"load_previous_file_group true"}, .Group = "Others", .DocCallback = std::bind(docString, "Load previous file group, keeping camera")});
-      interactor.addBinding({.Bind = { mod_t::CTRL, "Right" }, .Commands = {"load_next_file_group true"}, .Group = "Others", .DocCallback = std::bind(docString, "Load next file group, keeping camera")});
-      interactor.addBinding({.Bind = { mod_t::NONE, "Up" }, .Commands = {"reload_current_file_group"}, .Group = "Others", .DocCallback = std::bind(docString, "Reload current file group")});
-      interactor.addBinding({.Bind = { mod_t::NONE, "Down" }, .Commands = {"add_current_directories"}, .Group = "Others", .DocCallback = std::bind(docString, "Add files from dir of current file")});
+      interactor.addBinding({.Bind = { mod_t::NONE, "Up" }, .Commands = {"load_previous_file_group"}, .Group = "Others", .DocCallback = std::bind(docString, "Load previous file group")});
+      interactor.addBinding({.Bind = { mod_t::NONE, "Down" }, .Commands = {"load_next_file_group"}, .Group = "Others", .DocCallback = std::bind(docString, "Load next file group")});
+      interactor.addBinding({.Bind = { mod_t::CTRL, "Up" }, .Commands = {"load_previous_file_group true"}, .Group = "Others", .DocCallback = std::bind(docString, "Load previous file group, keeping camera")});
+      interactor.addBinding({.Bind = { mod_t::CTRL, "Down" }, .Commands = {"load_next_file_group true"}, .Group = "Others", .DocCallback = std::bind(docString, "Load next file group, keeping camera")});
+      interactor.addBinding({.Bind = { mod_t::NONE, "F5" }, .Commands = {"reload_current_file_group"}, .Group = "Others", .DocCallback = std::bind(docString, "Reload current file group")});
+      interactor.addBinding({.Bind = { mod_t::CTRL_SHIFT, "R" }, .Commands = {"add_current_directories"}, .Group = "Others", .DocCallback = std::bind(docString, "Add files from dir of current file")});
       interactor.addBinding({.Bind = { mod_t::NONE, "F12" }, .Commands = {"take_screenshot"}, .Group = "Others", .DocCallback = std::bind(docString, "Take a screenshot")});
 #if F3D_MODULE_TINYFILEDIALOGS
       interactor.addBinding({.Bind = { mod_t::CTRL, "S" }, .Commands = {"save_statefile_dialog"}, .Group = "Others", .DocCallback = std::bind(docString, "Save a statefile (file dialog)")});
@@ -3330,7 +3330,7 @@ void F3DStarter::AddCommands()
         f3d::options& options = this->Internals->Engine->getOptions();
         options.render.hdri.file = f3d::utils::collapsePath(files[0]);
         options.render.hdri.ambient = true;
-        options.render.background.skybox = true;
+        options.render.background.skybox = "enabled";
 
         // Rendering now is needed for correct lighting
         this->Render();
@@ -3355,7 +3355,7 @@ void F3DStarter::AddCommands()
           f3d::options& options = this->Internals->Engine->getOptions();
           options.render.hdri.file = f3d::utils::collapsePath(file);
           options.render.hdri.ambient = true;
-          options.render.background.skybox = true;
+          options.render.background.skybox = "enabled";
 
           // Rendering now is needed for correct lighting
           this->Render();
