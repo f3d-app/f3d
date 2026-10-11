@@ -49,6 +49,8 @@ runs:
         versions_file: ${{inputs.versions_file}}
         cpu: ${{inputs.cpu}}
 
+    # pytest and pyopengltk version fixed
+    # to avoid an issue with tk
     - name: Install Python dependencies
       shell: bash
       run: |
