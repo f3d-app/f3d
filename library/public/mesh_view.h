@@ -43,6 +43,21 @@ public:
   }
 
   /**
+   * Signal that the buffers need to be updated. This can be used to indicate that the underlying
+   * data has changed and the mesh view should refresh its buffers accordingly.
+   */
+  virtual bool buffersNeedUpdate() const
+  {
+    return false;
+  }
+
+  /**
+   * Notify that the buffers have been updated. This can be used to trigger any necessary
+   * updates or recalculations in derived classes when the underlying data changes.
+   */
+  virtual void buffersUpdated() {}
+
+  /**
    * Enumeration of supported scalar types for point and face scalars
    */
   enum class data_type : uint8_t

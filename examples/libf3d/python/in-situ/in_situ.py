@@ -15,6 +15,8 @@ import f3d
 class ClothSolver:
     """Simple cloth solver based on the PBD method."""
 
+    buffers_need_update: bool = False
+
     def __init__(self, grid_size: int = 10, iterations: int = 20):
         self._grid_size = grid_size
         self._iterations = iterations
@@ -93,6 +95,8 @@ class ClothSolver:
         self.face_offsets = np.array(face_offsets_list, dtype=np.int32)
         self._constraints = constraints
 
+        self.buffers_need_update = True
+
     def update(self, new_time: float) -> None:
         if new_time == 0.0:
             if self._current_time != 0.0:
@@ -169,6 +173,12 @@ class ClothMesh(f3d.MeshView):
         view.set_point_scalars_time_dependent("Velocity", True)
         return view
 
+    def buffers_need_update(self) -> bool:
+        return self._solver.buffers_need_update
+
+    def buffers_updated(self) -> None:
+        self._solver.buffers_need_update = False
+
 
 def main(argv=None):
     parser = ArgumentParser()
@@ -205,6 +215,7 @@ def main(argv=None):
 
     solver = ClothSolver()
     inter = eng.interactor
+    scene = eng.scene
 
     # Remove bindings that conflict with our custom ones or are unused in this example
     NONE = f3d.InteractionBind.ModifierKeys.NONE
@@ -229,7 +240,7 @@ def main(argv=None):
     # Commands
     def reset_simulation(_args):
         solver.initialize()
-        scene.load_animation_time(0.0)
+        scene.animation.load_time(0.0)
 
     inter.add_command(
         "reset_simulation",
@@ -330,7 +341,7 @@ def main(argv=None):
     # Add the cloth mesh to the scene
     cloth_mesh = ClothMesh(solver)
     try:
-        eng.scene.add(cloth_mesh)
+        scene.add(cloth_mesh)
     except Exception as e:
         print(e)
         return 1

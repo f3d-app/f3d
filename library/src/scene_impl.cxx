@@ -585,9 +585,9 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
     {
       const auto memoryView = mesh->getMemoryView(time);
 
-      const bool firstTime = polydata->GetPoints() == nullptr;
+      const bool forceUpdate = polydata->GetPoints() == nullptr || mesh->buffersNeedUpdate();
 
-      f3d::log::debug(firstTime ? "Initializing" : "Updating", " mesh_view at time ", time);
+      f3d::log::debug(forceUpdate ? "Initializing" : "Updating", " mesh_view at time ", time);
 
       // handle points
       if (memoryView.pointCount == 0)
@@ -611,7 +611,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
         throw scene::load_failure_exception("Mesh view points must have 3 components");
       }
 
-      if (firstTime || memoryView.points.timeDependent)
+      if (forceUpdate || memoryView.points.timeDependent)
       {
         vtkNew<vtkPoints> points;
 
@@ -633,7 +633,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
       }
 
       // handle normals if provided
-      if (memoryView.normals.data != nullptr && (firstTime || memoryView.normals.timeDependent))
+      if (memoryView.normals.data != nullptr && (forceUpdate || memoryView.normals.timeDependent))
       {
         if (memoryView.normals.type != mesh_view::data_type::F32 &&
           memoryView.normals.type != mesh_view::data_type::F64)
@@ -663,7 +663,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
       }
 
       // handle texture coordinates if provided
-      if ((firstTime || memoryView.textureCoordinates.timeDependent) &&
+      if ((forceUpdate || memoryView.textureCoordinates.timeDependent) &&
         memoryView.textureCoordinates.data != nullptr)
       {
         if (memoryView.textureCoordinates.type != mesh_view::data_type::F32 &&
@@ -699,7 +699,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
       // handle scalars if provided
       for (const auto& scalar : memoryView.pointScalars)
       {
-        if (firstTime || scalar.timeDependent)
+        if (forceUpdate || scalar.timeDependent)
         {
           f3d::mesh_view::dataTypeDispatch(scalar.type,
             [&]<typename DataT>()
@@ -718,7 +718,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
 
       for (const auto& scalar : memoryView.cellScalars)
       {
-        if (firstTime || scalar.timeDependent)
+        if (forceUpdate || scalar.timeDependent)
         {
           f3d::mesh_view::dataTypeDispatch(scalar.type,
             [&]<typename DataT>()
@@ -817,21 +817,26 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
       };
 
       if (memoryView.vertices.indices.timeDependent || memoryView.vertices.offsets.timeDependent ||
-        firstTime)
+        forceUpdate)
       {
         polydata->SetVerts(handleCells(memoryView.vertices));
       }
 
       if (memoryView.lines.indices.timeDependent || memoryView.lines.offsets.timeDependent ||
-        firstTime)
+        forceUpdate)
       {
         polydata->SetLines(handleCells(memoryView.lines));
       }
 
       if (memoryView.polygons.indices.timeDependent || memoryView.polygons.offsets.timeDependent ||
-        firstTime)
+        forceUpdate)
       {
         polydata->SetPolys(handleCells(memoryView.polygons));
+      }
+
+      if (forceUpdate)
+      {
+        mesh->buffersUpdated();
       }
     });
 
