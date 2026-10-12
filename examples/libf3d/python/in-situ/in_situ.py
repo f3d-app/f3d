@@ -15,11 +15,10 @@ import f3d
 class ClothSolver:
     """Simple cloth solver based on the PBD method."""
 
-    buffers_need_update: bool = False
-
     def __init__(self, grid_size: int = 10, iterations: int = 20):
         self._grid_size = grid_size
         self._iterations = iterations
+        self.buffers_need_update = False
         self._current_time = 0.0
 
         self.initialize()
