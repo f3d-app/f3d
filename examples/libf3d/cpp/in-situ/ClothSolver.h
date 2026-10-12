@@ -91,10 +91,27 @@ public:
   }
   //@}
 
+  /**
+   * Get buffers update status
+   */
+  bool buffersNeedUpdate() const
+  {
+    return this->BuffersNeedUpdate;
+  }
+
+  /**
+   * Mark buffers as updated
+   */
+  void buffersUpdated()
+  {
+    this->BuffersNeedUpdate = false;
+  }
+
 private:
   double CurrentTime = 0.0;
   uint32_t GridSize = 40;
   uint32_t Iterations = 100;
+  bool BuffersNeedUpdate = false;
 
   std::vector<float> Positions;
 

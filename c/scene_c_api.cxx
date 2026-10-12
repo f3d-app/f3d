@@ -199,6 +199,21 @@ public:
     return to_cpp_memory_view(this->MeshView->get_memory_view(time, this->MeshView->opaque));
   }
 
+  bool buffersNeedUpdate() const override
+  {
+    return this->MeshView->buffers_need_update
+      ? this->MeshView->buffers_need_update(this->MeshView->opaque) != 0
+      : false;
+  }
+
+  void buffersUpdated() override
+  {
+    if (this->MeshView->buffers_updated)
+    {
+      this->MeshView->buffers_updated(this->MeshView->opaque);
+    }
+  }
+
 private:
   const f3d_mesh_view_t* MeshView;
 };
