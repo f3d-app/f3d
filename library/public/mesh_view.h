@@ -29,7 +29,7 @@ public:
   /**
    * Get the temporal range
    */
-  [[nodiscard]] virtual std::array<double, 2> getTimeRange() const
+  [[nodiscard]] virtual std::pair<double, double> getTimeRange() const
   {
     return { 0.0, 0.0 };
   }

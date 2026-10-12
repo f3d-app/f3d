@@ -774,13 +774,13 @@ PYBIND11_MODULE(pyf3d, module)
     , public py::trampoline_self_life_support
   {
   public:
-    std::array<double, 2> getTimeRange() const override
+    std::pair<double, double> getTimeRange() const override
     {
       const py::gil_scoped_acquire gil;
       const py::function fn = py::get_override(this, "get_time_range");
       if (fn)
       {
-        return fn().cast<std::array<double, 2>>();
+        return fn().cast<std::pair<double, double>>();
       }
       return f3d::mesh_view::getTimeRange();
     }
@@ -812,7 +812,9 @@ PYBIND11_MODULE(pyf3d, module)
     .def(py::init<>())
     .def("get_time_range", &f3d::mesh_view::getTimeRange)
     .def("get_name", &f3d::mesh_view::getName)
-    .def("get_memory_view", &f3d::mesh_view::getMemoryView);
+    .def("get_memory_view", &f3d::mesh_view::getMemoryView,
+      py::arg("time").noconvert() // keep `float` not `SupportsFloat` for subclassing
+    );
 
   // f3d::color_t
   py::class_<f3d::color_t>(module, "Color")
