@@ -65,6 +65,7 @@ public:
   window& setWindowName(std::string_view windowName) override;
   point3_t getWorldFromDisplay(const point3_t& displayPoint) const override;
   point3_t getDisplayFromWorld(const point3_t& worldPoint) const override;
+  window& setUseHDRICache(bool use) override;
   ///@}
 
   /**
@@ -130,6 +131,18 @@ public:
    * Get the cache path, empty if it could not be recovered.
    */
   [[nodiscard]] std::filesystem::path GetCachePath() const;
+
+  /**
+   * Implementation only API.
+   * Set the resources path.
+   */
+  void SetResourcesPath(const std::filesystem::path& resourcesPath);
+
+  /**
+   * Implementation only API.
+   * Get the resources path, empty if it has not been set.
+   */
+  [[nodiscard]] std::filesystem::path GetResourcesPath() const;
 
   /**
    * Implementation only API.

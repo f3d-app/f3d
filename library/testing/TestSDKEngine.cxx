@@ -44,11 +44,11 @@ int TestSDKEngine([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // Test option setters
   f3d::options opt;
-  opt.model.scivis.cells = true;
+  opt.model.scivis.field = "cells";
 
   eng0.setOptions(opt);
   test("set options value using f3d::engine::setOptions(const options& opt)",
-    eng0.getOptions().model.scivis.cells);
+    eng0.getOptions().model.scivis.field == "cells");
 
   opt.render.line_width = 1.7;
   eng0.setOptions(std::move(opt));
@@ -59,6 +59,12 @@ int TestSDKEngine([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   const std::string cachePath = std::string(argv[2]) + "engine_cache";
   eng0.setCachePath(cachePath);
   test("get cache path using f3d::engine::getCachePath()", eng0.getCachePath().string(), cachePath);
+
+  // Test resource path
+  const std::string resourcePath = std::string(argv[2]) + "engine_resources";
+  eng0.setResourcesPath(resourcePath);
+  test("get resource path using f3d::engine::getResourcePath()", eng0.getResourcesPath().string(),
+    resourcePath);
 
   // Test static information methods
   auto libInfo = f3d::engine::getLibInfo();

@@ -20,7 +20,7 @@ public:
   void Execute(vtkObject* caller, unsigned long vtkNotUsed(evId), void* data) override
   {
     const vtkF3DDracoReader* reader = reinterpret_cast<vtkF3DDracoReader*>(caller);
-    char* message = static_cast<char*>(data);
+    const char* message = static_cast<char*>(data);
     if (reader && message)
     {
       this->Messages.emplace_back(message);
@@ -40,9 +40,9 @@ private:
 int TestF3DDracoReaderError(int vtkNotUsed(argc), char* argv[])
 {
   vtkNew<::ErrorEventCallback> errorEventCallback;
-  vtkNew<vtkCallbackCommand> nullEventCallback;
+  const vtkNew<vtkCallbackCommand> nullEventCallback;
 
-  std::string filename = std::string(argv[1]) + "data/nonexistent.drc";
+  const std::string filename = std::string(argv[1]) + "data/nonexistent.drc";
   vtkNew<vtkF3DDracoReader> reader;
   reader->AddObserver(vtkCommand::ErrorEvent, errorEventCallback);
   reader->GetExecutive()->AddObserver(vtkCommand::ErrorEvent, nullEventCallback);

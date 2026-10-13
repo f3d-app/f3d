@@ -10,16 +10,16 @@ f3d_test(NAME TestBREPDefines DATA cheese.brep PLUGIN occt ARGS -DBREP.linear_de
 f3d_test(NAME TestSTEPAssembly DATA two-parts-transform.stp PLUGIN occt ARGS --up=+Z)
 f3d_test(NAME TestInvalidSTEP DATA invalid_truncated.stp PLUGIN occt ARGS --verbose REGEXP "failed to load scene" NO_BASELINE)
 f3d_test(NAME TestInvalidBREP DATA invalid_truncated.brep PLUGIN occt ARGS --verbose REGEXP "failed to load scene" NO_BASELINE)
-f3d_test(NAME TestFCStd DATA colored_visibility.FCStd PLUGIN occt ARGS -csy --up=+Z)
-f3d_test(NAME TestFCStdFaceColors DATA face_colors.FCStd PLUGIN occt ARGS -csy -DFCStd.read_wire=0 --up=+Z --camera-direction=-1,1,-1 THRESHOLD 0.1) # Small rendering differences on macOS OSMesa
-f3d_test(NAME TestFCStdLink DATA link.FCStd PLUGIN occt ARGS -csy --up=+Z)
+f3d_test(NAME TestFCStd DATA colored_visibility.FCStd PLUGIN occt ARGS --coloring-mode=direct --coloring-field=cells --up=+Z)
+f3d_test(NAME TestFCStdFaceColors DATA face_colors.FCStd PLUGIN occt ARGS --coloring-mode=direct --coloring-field=cells -DFCStd.read_wire=0 --up=+Z --camera-direction=-1,1,-1 THRESHOLD 0.1) # Small rendering differences on macOS OSMesa
+f3d_test(NAME TestFCStdLink DATA link.FCStd PLUGIN occt ARGS --coloring-mode=direct --coloring-field=cells --up=+Z)
 f3d_test(NAME TestFCStdPartContainer DATA part_container.FCStd PLUGIN occt ARGS --up=+Z)
 f3d_test(NAME TestFCStdHeadless DATA headless.FCStd PLUGIN occt ARGS --up=+Z)
-f3d_test(NAME TestFCStdReadWire DATA colored_visibility.FCStd PLUGIN occt ARGS -csy -DFCStd.read_wire=1 --line-width=3 --up=+Z)
-f3d_test(NAME TestFCStd1x DATA bracket_1x.FCStd PLUGIN occt ARGS -csy --up=+Z --camera-direction=-1,1,-1 -p THRESHOLD 0.06 SKIP_GLES) # fillet tessellation differs between OCCT versions, GLES doesn't support depth peeling
-f3d_test(NAME TestFCStdTransparency DATA transparency.FCStd PLUGIN occt ARGS -csy --up=+Z --camera-direction=0,1,-0.3 -p SKIP_GLES) # GLES doesn't support depth peeling
+f3d_test(NAME TestFCStdReadWire DATA colored_visibility.FCStd PLUGIN occt ARGS --coloring-mode=direct --coloring-field=cells -DFCStd.read_wire=1 --line-width=3 --up=+Z)
+f3d_test(NAME TestFCStd1x DATA bracket_1x.FCStd PLUGIN occt ARGS --coloring-mode=direct --coloring-field=cells --up=+Z --camera-direction=-1,1,-1 -p THRESHOLD 0.06 SKIP_GLES) # fillet tessellation differs between OCCT versions, GLES doesn't support depth peeling
+f3d_test(NAME TestFCStdTransparency DATA transparency.FCStd PLUGIN occt ARGS --coloring-mode=direct --coloring-field=cells --up=+Z --camera-direction=0,1,-0.3 -p SKIP_GLES) # GLES doesn't support depth peeling
 f3d_test(NAME TestInvalidFCStd DATA invalid_content.FCStd PLUGIN occt ARGS --verbose REGEXP "failed to load scene" NO_BASELINE)
-f3d_test(NAME TestFCStdPartDesign DATA partdesign_body.FCStd PLUGIN occt ARGS -csy -DFCStd.read_wire=0 --up=+Z --camera-direction=-1,1,-1 THRESHOLD 0.1) # Small rendering differences on macOS OSMesa
+f3d_test(NAME TestFCStdPartDesign DATA partdesign_body.FCStd PLUGIN occt ARGS --coloring-mode=direct --coloring-field=cells -DFCStd.read_wire=0 --up=+Z --camera-direction=-1,1,-1 THRESHOLD 0.1) # Small rendering differences on macOS OSMesa
 f3d_test(NAME TestFCStdMalformedGui DATA malformed_gui.FCStd PLUGIN occt ARGS --verbose REGEXP "Error parsing XML" NO_BASELINE)
 f3d_test(NAME TestFCStdNoVersion DATA no_version.FCStd PLUGIN occt ARGS --verbose REGEXP "Unknown FreeCAD version" NO_BASELINE)
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
@@ -39,8 +39,8 @@ if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
   endif()
   f3d_test(NAME TestXBF DATA f3d.xbf PLUGIN occt ARGS --up=+Z)
   f3d_test(NAME TestXBFDefines DATA cheese.xbf PLUGIN occt ARGS -DXBF.angular_deflection=1 -DXBF.relative_deflection=1 --up=+Z)
-  f3d_test(NAME TestXCAFColors DATA xcaf-colors.stp PLUGIN occt ARGS -csy --up=+Z --line-width=3 --camera-direction=-1,-1,-1 THRESHOLD ${_occt_xcaf_threshold})
-  f3d_test(NAME TestXCAFColorsXBF DATA xcaf-colors.xbf PLUGIN occt ARGS -csy --up=+Z --line-width=3 --camera-direction=-1,-1,-1 THRESHOLD ${_occt_xcaf_threshold})
+  f3d_test(NAME TestXCAFColors DATA xcaf-colors.stp PLUGIN occt ARGS --coloring-mode=direct --coloring-field=cells --up=+Z --line-width=3 --camera-direction=-1,-1,-1 THRESHOLD ${_occt_xcaf_threshold})
+  f3d_test(NAME TestXCAFColorsXBF DATA xcaf-colors.xbf PLUGIN occt ARGS --coloring-mode=direct --coloring-field=cells --up=+Z --line-width=3 --camera-direction=-1,-1,-1 THRESHOLD ${_occt_xcaf_threshold})
   f3d_test(NAME TestInvalidXBF DATA invalid_truncated.xbf PLUGIN occt ARGS --verbose REGEXP "failed to load scene" NO_BASELINE)
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251223)
     f3d_test(NAME TestPipedXBF DATA f3d.xbf PLUGIN occt ARGS --up=+Z PIPED_READER XBF PIPED)

@@ -9,7 +9,7 @@
 
 int TestF3DUSDImporter(int vtkNotUsed(argc), char* argv[])
 {
-  std::string filename = std::string(argv[1]) + "data/suzanne.usd";
+  const std::string filename = std::string(argv[1]) + "data/suzanne.usd";
   vtkNew<vtkF3DUSDImporter> importer;
   importer->SetFileName(filename.c_str());
   importer->DisableAnimation(0);

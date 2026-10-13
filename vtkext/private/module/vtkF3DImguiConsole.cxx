@@ -64,7 +64,7 @@ struct vtkF3DImguiConsole::Internals
       case ImGuiInputTextFlags_CallbackCompletion:
       {
         assert(this->CompletionCallback);
-        std::string pattern{ data->Buf };
+        const std::string pattern{ data->Buf };
         std::vector<std::string> candidates =
           this->CompletionCallback(pattern); // List of candidates completion
 
@@ -77,6 +77,7 @@ struct vtkF3DImguiConsole::Internals
         }
         else if (candidates.size() > 1)
         {
+          // NOLINTNEXTLINE(misc-const-correctness) not const on Windows/Mac
           std::string_view bestCandidate = candidates[0];
 #if defined(_WIN32) || defined(__APPLE__)
           // Find which candidate matches the casing of the pattern the best
@@ -197,7 +198,7 @@ struct vtkF3DImguiConsole::Internals
           {
             /* We should not be able to have negative index here */
             /* Retrieve the command from history */
-            std::string historyStr =
+            const std::string historyStr =
               this->CommandHistory[histSize - this->CommandHistoryIndexInv - 1];
             data->DeleteChars(0, data->BufTextLen);
             data->InsertChars(0, historyStr.c_str());
@@ -224,7 +225,7 @@ vtkF3DImguiConsole::~vtkF3DImguiConsole() = default;
 //----------------------------------------------------------------------------
 void vtkF3DImguiConsole::DisplayText(const char* text)
 {
-  MessageTypes type = this->GetCurrentMessageType();
+  const MessageTypes type = this->GetCurrentMessageType();
   if (this->GetDisplayStream(type) != StreamType::Null)
   {
     switch (type)
@@ -279,8 +280,9 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
 
   ImGui::SetNextWindowBgAlpha(0.9f);
 
-  ImGuiWindowFlags winFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
-    ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+  const ImGuiWindowFlags winFlags = ImGuiWindowFlags_NoDecoration |
+    ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing |
+    ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
 
   // Since imgui has focus, it won't propagate the "Escape" key event to VTK
   // So let's handle the console visibility here
@@ -349,7 +351,7 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
         }
 
         // Generate a unique ID for the log entry based on its index
-        std::string id = "##log" + std::to_string(logId);
+        const std::string id = "##log" + std::to_string(logId);
 
         ImVec2 textSize = ImGui::CalcTextSize(currentText.c_str());
 
@@ -382,21 +384,21 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
 
       // copy button
 #ifdef F3D_MODULE_CLIP
-      ImVec2 old = ImGui::GetCursorScreenPos();
+      const ImVec2 old = ImGui::GetCursorScreenPos();
 
-      ImVec2 winPos = ImGui::GetWindowPos();
-      ImVec2 winSize = ImGui::GetWindowSize();
+      const ImVec2 winPos = ImGui::GetWindowPos();
+      const ImVec2 winSize = ImGui::GetWindowSize();
 
       constexpr float btnFontScale = 2.0f;
-      float btnSize = btnFontScale * ImGui::GetFontSize();
+      const float btnSize = btnFontScale * ImGui::GetFontSize();
 
-      float scrollbarWidth =
+      const float scrollbarWidth =
         ImGui::GetScrollMaxY() > 0.0f ? ImGui::GetStyle().ScrollbarSize * btnFontScale : 0.0f;
 
-      ImVec2 btnPos(winPos.x + winSize.x - scrollbarWidth - btnSize, winPos.y);
+      const ImVec2 btnPos(winPos.x + winSize.x - scrollbarWidth - btnSize, winPos.y);
       ImGui::SetCursorScreenPos(btnPos);
 
-      bool hovered =
+      const bool hovered =
         ImGui::IsMouseHoveringRect(btnPos, ImVec2(btnPos.x + btnSize, btnPos.y + btnSize));
 
       ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
@@ -447,7 +449,7 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
   }
 
   // input
-  ImGuiInputTextFlags inputFlags = ImGuiInputTextFlags_EnterReturnsTrue |
+  const ImGuiInputTextFlags inputFlags = ImGuiInputTextFlags_EnterReturnsTrue |
     ImGuiInputTextFlags_EscapeClearsAll | ImGuiInputTextFlags_CallbackCompletion |
     ImGuiInputTextFlags_CallbackHistory;
 
@@ -463,7 +465,7 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
     return internals->TextEditCallback(data);
   };
 
-  bool runCommand = ImGui::InputTextWithHint("##ConsoleInput", "Type a command...",
+  const bool runCommand = ImGui::InputTextWithHint("##ConsoleInput", "Type a command...",
     this->Pimpl->CurrentInput.data(), sizeof(this->Pimpl->CurrentInput), inputFlags,
     TextEditCallbackStub, this->Pimpl.get());
   ImGui::PopItemWidth();
@@ -510,14 +512,14 @@ void vtkF3DImguiConsole::ShowBadge()
   if (this->Pimpl->NewError || this->Pimpl->NewWarning)
   {
     constexpr float margin = F3DStyle::GetDefaultMargin();
-    ImVec2 badgeSize = this->GetBadgeSize();
+    const ImVec2 badgeSize = this->GetBadgeSize();
 
     ImGui::SetNextWindowPos(ImVec2(viewport->WorkSize.x - badgeSize.x - margin, margin));
     ImGui::SetNextWindowSize(badgeSize);
     ImGui::SetNextWindowBgAlpha(0.9f);
 
-    ImGuiWindowFlags winFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
-      ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+    const ImGuiWindowFlags winFlags = ImGuiWindowFlags_NoDecoration |
+      ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
 
     ImGui::Begin("ConsoleAlert", nullptr, winFlags);
 

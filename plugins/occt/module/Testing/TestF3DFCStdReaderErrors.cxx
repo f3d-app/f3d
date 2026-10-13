@@ -59,7 +59,7 @@ bool TestError(const std::string& filename, const std::string& expectedError,
   unsigned int expectedPartitions = 0)
 {
   vtkNew<ErrorEventCallback> errorCallback;
-  vtkNew<vtkCallbackCommand> silentCallback;
+  const vtkNew<vtkCallbackCommand> silentCallback;
   vtkNew<vtkF3DFCStdReader> reader;
   reader->AddObserver(vtkCommand::ErrorEvent, errorCallback);
   reader->GetExecutive()->AddObserver(vtkCommand::ErrorEvent, silentCallback);
@@ -98,7 +98,7 @@ int TestF3DFCStdReaderErrors(int vtkNotUsed(argc), char* argv[])
   // placement list or a truncated one: all skipped, only the box remains
   ret &= TestError(data + "/broken_links.FCStd", "Failed to read BRep file", 1);
 
-  vtkNew<NonSeekableStream> nonSeekable;
+  const vtkNew<NonSeekableStream> nonSeekable;
   if (vtkF3DFCStdReader::CanReadFile(nullptr) || vtkF3DFCStdReader::CanReadFile(nonSeekable))
   {
     std::cerr << "Unexpectedly accepted a null or non seekable stream\n";

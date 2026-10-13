@@ -1,5 +1,6 @@
 #include "engine.h"
 
+#include "animation_impl.h"
 #include "config.h"
 #include "factory.h"
 #include "init.h"
@@ -141,8 +142,16 @@ engine::engine(const std::optional<window::Type>& windowType, bool offscreen,
 
   this->Internals->Options = std::make_unique<options>();
 
-  this->Internals->Window = std::make_unique<detail::window_impl>(
-    *this->Internals->Options, windowType, offscreen, loader, id);
+  try
+  {
+    this->Internals->Window = std::make_unique<detail::window_impl>(
+      *this->Internals->Options, windowType, offscreen, loader, id);
+  }
+  catch (const engine::no_window_exception& ex)
+  {
+    delete this->Internals;
+    throw ex;
+  }
 
   if (!cachePath.empty())
   {
@@ -156,8 +165,9 @@ engine::engine(const std::optional<window::Type>& windowType, bool offscreen,
   // Do not create an interactor for NONE
   if (windowType != window::Type::NONE)
   {
-    this->Internals->Interactor = std::make_unique<detail::interactor_impl>(
-      *this->Internals->Options, *this->Internals->Window, *this->Internals->Scene);
+    this->Internals->Interactor =
+      std::make_unique<detail::interactor_impl>(*this->Internals->Options, *this->Internals->Window,
+        *this->Internals->Scene, this->Internals->Scene->GetAnimationImpl());
   }
 
 #ifdef __EMSCRIPTEN__
@@ -207,6 +217,12 @@ engine engine::createEGL()
 engine engine::createOSMesa()
 {
   return { window::Type::OSMESA, true, context::osmesa() };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createXR()
+{
+  return { window::Type::XR, false, nullptr };
 }
 
 //----------------------------------------------------------------------------
@@ -475,6 +491,7 @@ std::map<std::string, bool> engine::getRenderingBackendList()
   backends["cocoa"] = engine::internals::BackendAvailable(context::cocoa);
   backends["egl"] = engine::internals::BackendAvailable(context::egl);
   backends["osmesa"] = engine::internals::BackendAvailable(context::osmesa);
+  backends["xr"] = engine::internals::BackendAvailable(context::xr);
 
   return backends;
 }
@@ -507,7 +524,7 @@ void engine::loadPlugin(const std::string& pathOrName, const std::vector<fs::pat
     vtksys::DynamicLoader::LibraryHandle handle = nullptr;
     try
     {
-      fs::path fullPath = utils::collapsePath(pathOrName);
+      const fs::path fullPath = utils::collapsePath(pathOrName);
       if (fs::exists(fullPath))
       {
         // plugin provided as full path
@@ -691,11 +708,11 @@ engine::libInformation engine::getLibInfo()
   libInfo.Modules["FFmpeg"] = false;
 #endif
 
-  std::string vtkVersion = std::string(vtkVersion::GetVTKVersionFull());
+  const std::string vtkVersion = std::string(vtkVersion::GetVTKVersionFull());
   if (!vtkVersion.empty())
   {
     libInfo.VTKVersion = vtkVersion;
-    std::string date = std::to_string(vtkVersion::GetVTKBuildVersion());
+    const std::string date = std::to_string(vtkVersion::GetVTKBuildVersion());
     if (date.size() == 8)
     {
       libInfo.VTKVersion += std::string(" (date: ") + date + ")";
@@ -752,6 +769,19 @@ fs::path engine::getCachePath() const
 }
 
 //----------------------------------------------------------------------------
+engine& engine::setResourcesPath(const fs::path& resourcesPath)
+{
+  this->Internals->Window->SetResourcesPath(resourcesPath);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+fs::path engine::getResourcesPath() const
+{
+  return this->Internals->Window->GetResourcesPath();
+}
+
+//----------------------------------------------------------------------------
 engine::no_window_exception::no_window_exception(const std::string& what)
   : exception(what)
 {
@@ -777,6 +807,12 @@ engine::cache_exception::cache_exception(const std::string& what)
 
 //----------------------------------------------------------------------------
 engine::statefile_exception::statefile_exception(const std::string& what)
+  : exception(what)
+{
+}
+
+//----------------------------------------------------------------------------
+engine::resource_exception::resource_exception(const std::string& what)
   : exception(what)
 {
 }

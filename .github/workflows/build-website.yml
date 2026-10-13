@@ -3,6 +3,7 @@ on:
     types: [opened, synchronize, reopened, labeled]
     branches:
       - master
+      - release
   push:
     branches:
       - master

@@ -148,8 +148,8 @@ class ClothMesh(f3d.MeshView):
         super().__init__()
         self._solver = solver
 
-    def get_time_range(self) -> list:
-        return [0.0, 10.0]
+    def get_time_range(self) -> tuple[float, float]:
+        return 0.0, 10.0
 
     def get_memory_view(self, time: float) -> f3d.MeshMemoryView:
         view = f3d.MeshMemoryView()
@@ -297,34 +297,34 @@ def main(argv=None):
 
     # Bindings
     inter.add_binding(
-        f3d.InteractionBind(NONE, "W"),
-        "reset_simulation",
-        "Simulation",
-        lambda: ("Reset simulation", ""),
+        bind=f3d.InteractionBind(NONE, "W"),
+        command=["reset_simulation"],
+        group="Simulation",
+        documentation_callback=lambda: ("Reset simulation", ""),
     )
     inter.add_binding(
-        f3d.InteractionBind(NONE, "N"),
-        ["set_cloth_resolution 10", "reset_simulation"],
-        "Simulation",
-        lambda: ("10x10", ""),
+        bind=f3d.InteractionBind(NONE, "N"),
+        command=["set_cloth_resolution 10", "reset_simulation"],
+        group="Simulation",
+        documentation_callback=lambda: ("10x10", ""),
     )
     inter.add_binding(
-        f3d.InteractionBind(SHIFT, "N"),
-        ["set_cloth_resolution 20", "reset_simulation"],
-        "Simulation",
-        lambda: ("20x20", ""),
+        bind=f3d.InteractionBind(SHIFT, "N"),
+        command=["set_cloth_resolution 20", "reset_simulation"],
+        group="Simulation",
+        documentation_callback=lambda: ("20x20", ""),
     )
     inter.add_binding(
-        f3d.InteractionBind(NONE, "I"),
-        "set_cloth_iterations 10",
-        "Simulation",
-        lambda: ("10 iterations", ""),
+        bind=f3d.InteractionBind(NONE, "I"),
+        command=["set_cloth_iterations 10"],
+        group="Simulation",
+        documentation_callback=lambda: ("10 iterations", ""),
     )
     inter.add_binding(
-        f3d.InteractionBind(NONE, "O"),
-        "set_cloth_iterations 20",
-        "Simulation",
-        lambda: ("20 iterations", ""),
+        bind=f3d.InteractionBind(NONE, "O"),
+        command=["set_cloth_iterations 20"],
+        group="Simulation",
+        documentation_callback=lambda: ("20 iterations", ""),
     )
 
     # Add the cloth mesh to the scene

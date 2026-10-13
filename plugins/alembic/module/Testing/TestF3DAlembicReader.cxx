@@ -7,7 +7,7 @@
 
 int TestF3DAlembicReader(int vtkNotUsed(argc), char* argv[])
 {
-  std::string filename = std::string(argv[1]) + "data/suzanne.abc";
+  const std::string filename = std::string(argv[1]) + "data/suzanne.abc";
   vtkNew<vtkF3DAlembicReader> reader;
   reader->SetFileName(filename);
   reader->Update();

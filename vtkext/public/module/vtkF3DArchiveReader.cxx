@@ -76,7 +76,7 @@ public:
 private:
   static size_t ReadCallback(void* opaque, mz_uint64 fileOfs, void* buf, size_t n)
   {
-    vtkInternals* self = static_cast<vtkInternals*>(opaque);
+    const vtkInternals* self = static_cast<vtkInternals*>(opaque);
     self->Stream->Seek(static_cast<vtkTypeInt64>(fileOfs), vtkResourceStream::SeekDirection::Begin);
     return self->Stream->Read(buf, n);
   }

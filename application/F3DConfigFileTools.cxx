@@ -18,7 +18,7 @@ std::vector<fs::path> F3DConfigFileTools::GetConfigPaths(const std::string& conf
 {
   std::vector<fs::path> paths;
 
-  std::vector<fs::path> dirsToCheck = {
+  const std::vector<fs::path> dirsToCheck = {
 
 #ifdef __APPLE__
     "/usr/local/etc/f3d",

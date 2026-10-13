@@ -5,10 +5,10 @@ RenderEvent 0 1055 0 0 0 0 0
 EnterEvent 477 494 0 0 0 0 0
 TimerEvent 477 494 0 0 0 0 0
 TimerEvent 477 494 0 0 0 0 0
-KeyPressEvent 477 494 0 0 1 Right 0
-CharEvent 477 494 0 0 1 Right 0
-TimerEvent 477 494 0 0 1 Right 0
-TimerEvent 477 494 0 0 1 Right 0
-KeyReleaseEvent 477 494 0 0 1 Right 0
-TimerEvent 477 494 0 0 1 Right 0
-TimerEvent 477 494 0 0 1 Right 0
+KeyPressEvent 477 494 0 0 1 Down 0
+CharEvent 477 494 0 0 1 Down 0
+TimerEvent 477 494 0 0 1 Down 0
+TimerEvent 477 494 0 0 1 Down 0
+KeyReleaseEvent 477 494 0 0 1 Down 0
+TimerEvent 477 494 0 0 1 Down 0
+TimerEvent 477 494 0 0 1 Down 0

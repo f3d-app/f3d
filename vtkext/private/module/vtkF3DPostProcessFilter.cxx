@@ -34,7 +34,7 @@ int vtkF3DPostProcessFilter::RequestData(vtkInformation* vtkNotUsed(request),
   vtkPolyData* outputPoints = vtkPolyData::GetData(outputVector, 1);
   vtkImageData* outputImage = vtkImageData::GetData(outputVector, 2);
 
-  vtkSmartPointer<vtkDataSet> dataset = vtkDataSet::SafeDownCast(dataObject);
+  const vtkSmartPointer<vtkDataSet> dataset = vtkDataSet::SafeDownCast(dataObject);
 
   // If the input is a polydata or an unstructured grid without cells, add a polyvertex cell
   vtkPolyData* pd = vtkPolyData::SafeDownCast(dataset);

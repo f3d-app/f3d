@@ -132,7 +132,7 @@ int main(int argc, char** argv)
           reinterpret_cast<const char*>(packet->getPacketData()), packet->getPacketSize());
       });
 
-    auto [startTime, endTime] = eng.getScene().animationTimeRange();
+    auto [startTime, endTime] = eng.getScene().getAnimation().getTimeRange();
 
     int frameCount = static_cast<int>((endTime - startTime) * framerate) + 1;
 
@@ -140,7 +140,7 @@ int main(int argc, char** argv)
     {
       const double t = startTime + static_cast<double>(frameIndex) / framerate;
 
-      eng.getScene().loadAnimationTime(t);
+      eng.getScene().getAnimation().loadTime(t);
       win.render();
 
       // submit the video frame to the encoder

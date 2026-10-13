@@ -3,8 +3,8 @@
 
 int TestSDKEngineRecreation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
-  std::string filename = "TestSDKEngineRecreation";
-  std::string interactionFilePath = std::string(argv[1]) + "/recordings/" + filename + ".log";
+  const std::string filename = "TestSDKEngineRecreation";
+  const std::string interactionFilePath = std::string(argv[1]) + "/recordings/" + filename + ".log";
   auto eng = std::make_unique<f3d::engine>(f3d::engine::create(false));
   eng = nullptr;
   for (int i = 0; i < 5; i++)

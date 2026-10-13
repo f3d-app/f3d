@@ -21,9 +21,9 @@ class options;
 
 namespace detail
 {
+class animation_impl;
 class scene_impl;
 class window_impl;
-class animationManager;
 
 class interactor_impl : public interactor
 {
@@ -32,7 +32,7 @@ public:
   /**
    * Documented public API
    */
-  interactor_impl(options& options, window_impl& window, scene_impl& scene);
+  interactor_impl(options& options, window_impl& window, scene_impl& scene, animation_impl& anim);
   ~interactor_impl() override;
 
   interactor& initCommands() override;
@@ -49,12 +49,7 @@ public:
       callback) override;
 
   interactor& initBindings() override;
-  interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
-    std::string group = std::string(), documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool notify = true, bool repeat = false) override;
-  interactor& addBinding(const interaction_bind_t& bind, std::string command,
-    std::string group = std::string(), documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool notify = true, bool repeat = false) override;
+  interactor& addBinding(BindingParam binding) override;
   interactor& removeBinding(const interaction_bind_t& bind) override;
   std::vector<std::string> getBindGroups() const override;
   std::vector<interaction_bind_t> getBindsForGroup(std::string group) const override;
@@ -70,12 +65,6 @@ public:
   interactor& triggerMouseWheel(WheelDirection direction) override;
   interactor& triggerKeyboardKey(InputAction action, std::string_view keySym) override;
   interactor& triggerTextCharacter(unsigned int codepoint) override;
-
-  interactor& toggleAnimation(AnimationDirection direction = AnimationDirection::FORWARD) override;
-  interactor& startAnimation(AnimationDirection direction = AnimationDirection::FORWARD) override;
-  interactor& stopAnimation() override;
-  bool isPlayingAnimation() override;
-  interactor::AnimationDirection getAnimationDirection() override;
 
   interactor& enableCameraMovement() override;
   interactor& disableCameraMovement() override;
@@ -97,19 +86,13 @@ public:
 
   /**
    * Implementation only API.
-   * Set the internal AnimationManager to be used by the interactor
-   */
-  void SetAnimationManager(animationManager* manager);
-
-  /**
-   * Implementation only API.
    * An utility method to set internal VTK interactor on a vtkInteractorObserver object.
    */
   void SetInteractorOn(vtkInteractorObserver* observer);
 
   /**
    * Implementation only API.
-   * Initialize the animation manager using interactor objects.
+   * Initialize the animation using interactor objects.
    * This is called by the scene after add a file.
    */
   void InitializeAnimation(vtkImporter* importer);
@@ -128,6 +111,12 @@ public:
    * This is called by the scene after initializing the up vector.
    */
   void ResetTemporaryUp();
+
+  /**
+   * Implementation only API.
+   * Set the directory for XR resources
+   */
+  void SetXRResourcesDirectory(const std::string& actionsManifestDirectory);
 
   /**
    * Event loop being called automatically once the interactor is started

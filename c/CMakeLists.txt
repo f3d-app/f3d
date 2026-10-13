@@ -6,6 +6,7 @@ include(GNUInstallDirs)
 
 # List of source files
 set(F3D_C_SOURCE_FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/animation_c_api.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/camera_c_api.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/context_c_api.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/engine_c_api.cxx
@@ -22,6 +23,7 @@ set(F3D_C_SOURCE_FILES
 
 # List of headers that will be installed
 set(F3D_C_PUBLIC_HEADERS
+  ${CMAKE_CURRENT_SOURCE_DIR}/animation_c_api.h
   ${CMAKE_CURRENT_SOURCE_DIR}/camera_c_api.h
   ${CMAKE_CURRENT_SOURCE_DIR}/context_c_api.h
   ${CMAKE_CURRENT_SOURCE_DIR}/engine_c_api.h

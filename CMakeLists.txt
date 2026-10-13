@@ -29,12 +29,12 @@ list(INSERT CMAKE_MODULE_PATH 0 "${f3d_cmake_dir}")
 include(f3dVersion)
 
 # Handle F3D_VERSION
-set(F3D_MAJOR_VERSION 3)
-set(F3D_MINOR_VERSION 5)
+set(F3D_MAJOR_VERSION 4)
+set(F3D_MINOR_VERSION 0)
 set(F3D_PATCH_VERSION 0)
 set(F3D_VERSION ${F3D_MAJOR_VERSION}.${F3D_MINOR_VERSION}.${F3D_PATCH_VERSION})
 
-set(F3D_PATCH_VERSION_EXTRA "")
+set(F3D_PATCH_VERSION_EXTRA "RC1")
 if(F3D_PATCH_VERSION_EXTRA STREQUAL "")
   set(F3D_VERSION_FULL ${F3D_VERSION})
 else()
@@ -87,6 +87,7 @@ find_package(VTK 9.4.0 REQUIRED
     IOOpenVDB
     IOPDAL
     RenderingGridAxes
+    RenderingOpenXR
     RenderingRayTracing)
 message(STATUS "VTK ${VTK_VERSION} found")
 
@@ -100,6 +101,7 @@ endif()
 
 # Modules
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
+option(F3D_MODULE_OPENXR "OpenXR module" OFF)
 option(F3D_MODULE_EXR "OpenEXR images module" OFF)
 option(F3D_MODULE_WEBP "WebP images module" OFF)
 option(F3D_MODULE_UI "ImGui widgets module" ON)
@@ -346,6 +348,7 @@ f3d_report_variable(F3D_BUILD_APPLICATION)
 f3d_report_variable(F3D_MODULE_EXR)
 f3d_report_variable(F3D_MODULE_FFMPEG)
 f3d_report_variable(F3D_MODULE_RAYTRACING)
+f3d_report_variable(F3D_MODULE_OPENXR)
 f3d_report_variable(F3D_MODULE_UI)
 f3d_report_variable(F3D_MODULE_WEBP)
 f3d_report_variable(F3D_PLUGIN_BUILD_ALEMBIC)

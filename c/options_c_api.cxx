@@ -2,6 +2,7 @@
 #include "log.h"
 #include "options.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstring>
 #include <string>
@@ -22,7 +23,7 @@ void f3d_options_destroy(f3d_options_t* options)
     return;
   }
 
-  f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
+  const f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
   delete cpp_options;
 }
 
@@ -285,7 +286,7 @@ void f3d_options_get_as_double_vector(
     const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
     const std::vector<double> vec = std::get<std::vector<double>>(cpp_options->get(name));
     *count = vec.size();
-    std::copy(vec.begin(), vec.end(), values);
+    std::ranges::copy(vec, values);
   }
   catch (f3d::options::inexistent_exception& ex)
   {
@@ -315,7 +316,7 @@ void f3d_options_get_as_int_vector(
     const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
     const std::vector<int> vec = std::get<std::vector<int>>(cpp_options->get(name));
     *count = vec.size();
-    std::copy(vec.begin(), vec.end(), values);
+    std::ranges::copy(vec, values);
   }
   catch (f3d::options::inexistent_exception& ex)
   {
@@ -616,7 +617,7 @@ f3d_domain_style_t f3d_options_get_domain_style(const f3d_options_t* options, co
   try
   {
     const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
-    f3d::options::domain_style ds = cpp_options->getDomainStyle(name);
+    const f3d::options::domain_style ds = cpp_options->getDomainStyle(name);
     switch (ds)
     {
       case f3d::options::domain_style::RANGE:
@@ -876,7 +877,7 @@ const char* f3d_options_get_as_string_representation(const f3d_options_t* option
   const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
   try
   {
-    std::string str = cpp_options->getAsString(name);
+    const std::string str = cpp_options->getAsString(name);
     char* result = new char[str.length() + 1];
     std::strcpy(result, str.c_str());
     return result;
@@ -1028,7 +1029,7 @@ const char* f3d_options_parse_string(const char* str)
 
   try
   {
-    std::string result = f3d::options::parse<std::string>(str);
+    const std::string result = f3d::options::parse<std::string>(str);
     char* result_str = new char[result.length() + 1];
     std::strcpy(result_str, result.c_str());
     return result_str;
@@ -1052,7 +1053,7 @@ void f3d_options_parse_double_vector(const char* str, double* values, size_t* co
   {
     std::vector<double> vec = f3d::options::parse<std::vector<double>>(str);
     *count = vec.size();
-    std::copy(vec.begin(), vec.end(), values);
+    std::ranges::copy(vec, values);
   }
   catch (const f3d::options::parsing_exception& ex)
   {
@@ -1073,7 +1074,7 @@ void f3d_options_parse_int_vector(const char* str, int* values, size_t* count)
   {
     std::vector<int> vec = f3d::options::parse<std::vector<int>>(str);
     *count = vec.size();
-    std::copy(vec.begin(), vec.end(), values);
+    std::ranges::copy(vec, values);
   }
   catch (const f3d::options::parsing_exception& ex)
   {
@@ -1085,7 +1086,7 @@ void f3d_options_parse_int_vector(const char* str, int* values, size_t* count)
 //----------------------------------------------------------------------------
 const char* f3d_options_format_bool(int value)
 {
-  std::string result = f3d::options::format(static_cast<bool>(value));
+  const std::string result = f3d::options::format(static_cast<bool>(value));
   char* result_str = new char[result.length() + 1];
   std::strcpy(result_str, result.c_str());
   return result_str;
@@ -1094,7 +1095,7 @@ const char* f3d_options_format_bool(int value)
 //----------------------------------------------------------------------------
 const char* f3d_options_format_int(int value)
 {
-  std::string result = f3d::options::format(value);
+  const std::string result = f3d::options::format(value);
   char* result_str = new char[result.length() + 1];
   std::strcpy(result_str, result.c_str());
   return result_str;
@@ -1103,7 +1104,7 @@ const char* f3d_options_format_int(int value)
 //----------------------------------------------------------------------------
 const char* f3d_options_format_double(double value)
 {
-  std::string result = f3d::options::format(value);
+  const std::string result = f3d::options::format(value);
   char* result_str = new char[result.length() + 1];
   std::strcpy(result_str, result.c_str());
   return result_str;
@@ -1117,7 +1118,7 @@ const char* f3d_options_format_string(const char* value)
     return nullptr;
   }
 
-  std::string result = f3d::options::format(std::string(value));
+  const std::string result = f3d::options::format(std::string(value));
   char* result_str = new char[result.length() + 1];
   std::strcpy(result_str, result.c_str());
   return result_str;
@@ -1131,8 +1132,8 @@ const char* f3d_options_format_double_vector(const double* values, size_t count)
     return nullptr;
   }
 
-  std::vector<double> vec(values, values + count);
-  std::string result = f3d::options::format(vec);
+  const std::vector<double> vec(values, values + count);
+  const std::string result = f3d::options::format(vec);
   char* result_str = new char[result.length() + 1];
   std::strcpy(result_str, result.c_str());
   return result_str;
@@ -1146,8 +1147,8 @@ const char* f3d_options_format_int_vector(const int* values, size_t count)
     return nullptr;
   }
 
-  std::vector<int> vec(values, values + count);
-  std::string result = f3d::options::format(vec);
+  const std::vector<int> vec(values, values + count);
+  const std::string result = f3d::options::format(vec);
   char* result_str = new char[result.length() + 1];
   std::strcpy(result_str, result.c_str());
   return result_str;

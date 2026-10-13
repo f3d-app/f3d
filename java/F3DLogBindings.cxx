@@ -16,7 +16,7 @@ static void cpp_log_forwarder(f3d::log::VerboseLevel level, const std::string& m
 
   JNIEnv* env;
   bool needsDetach = false;
-  int envStatus = g_jvm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6);
+  const int envStatus = g_jvm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6);
 
   if (envStatus == JNI_EDETACHED)
   {
@@ -35,15 +35,15 @@ static void cpp_log_forwarder(f3d::log::VerboseLevel level, const std::string& m
     return;
   }
 
-  JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Log$VerboseLevel"));
+  const JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Log$VerboseLevel"));
   jmethodID fromValueMethod =
     env->GetStaticMethodID(enumClass, "fromValue", "(I)Lapp/f3d/F3D/Log$VerboseLevel;");
-  JniLocalRef<jobject> jLevel(
+  const JniLocalRef<jobject> jLevel(
     env, env->CallStaticObjectMethod(enumClass, fromValueMethod, static_cast<int>(level)));
 
-  JniLocalRef<jstring> jMessage(env, env->NewStringUTF(message.c_str()));
+  const JniLocalRef<jstring> jMessage(env, env->NewStringUTF(message.c_str()));
 
-  JniLocalRef<jclass> callbackClass(env, env->GetObjectClass(g_callback_ref));
+  const JniLocalRef<jclass> callbackClass(env, env->GetObjectClass(g_callback_ref));
   jmethodID onLogMessageMethod = env->GetMethodID(
     callbackClass, "onLogMessage", "(Lapp/f3d/F3D/Log$VerboseLevel;Ljava/lang/String;)V");
 
@@ -64,13 +64,13 @@ extern "C"
       return;
     }
 
-    JniLocalRef<jclass> enumClass(env, env->GetObjectClass(level));
+    const JniLocalRef<jclass> enumClass(env, env->GetObjectClass(level));
     jmethodID getValueMethod = env->GetMethodID(enumClass, "getValue", "()I");
-    jint levelValue = env->CallIntMethod(level, getValueMethod);
+    const jint levelValue = env->CallIntMethod(level, getValueMethod);
 
-    JniUTFString messageStr(env, message);
+    const JniUTFString messageStr(env, message);
 
-    f3d::log::VerboseLevel cppLevel = static_cast<f3d::log::VerboseLevel>(levelValue);
+    const f3d::log::VerboseLevel cppLevel = static_cast<f3d::log::VerboseLevel>(levelValue);
     f3d::log::print(cppLevel, messageStr.c_str());
   }
 
@@ -81,7 +81,7 @@ extern "C"
       return;
     }
 
-    JniUTFString messageStr(env, message);
+    const JniUTFString messageStr(env, message);
     f3d::log::debug(messageStr.c_str());
   }
 
@@ -92,7 +92,7 @@ extern "C"
       return;
     }
 
-    JniUTFString messageStr(env, message);
+    const JniUTFString messageStr(env, message);
     f3d::log::info(messageStr.c_str());
   }
 
@@ -103,7 +103,7 @@ extern "C"
       return;
     }
 
-    JniUTFString messageStr(env, message);
+    const JniUTFString messageStr(env, message);
     f3d::log::warn(messageStr.c_str());
   }
 
@@ -114,7 +114,7 @@ extern "C"
       return;
     }
 
-    JniUTFString messageStr(env, message);
+    const JniUTFString messageStr(env, message);
     f3d::log::error(messageStr.c_str());
   }
 
@@ -131,19 +131,19 @@ extern "C"
       return;
     }
 
-    JniLocalRef<jclass> enumClass(env, env->GetObjectClass(level));
+    const JniLocalRef<jclass> enumClass(env, env->GetObjectClass(level));
     jmethodID getValueMethod = env->GetMethodID(enumClass, "getValue", "()I");
-    jint levelValue = env->CallIntMethod(level, getValueMethod);
+    const jint levelValue = env->CallIntMethod(level, getValueMethod);
 
-    f3d::log::VerboseLevel cppLevel = static_cast<f3d::log::VerboseLevel>(levelValue);
+    const f3d::log::VerboseLevel cppLevel = static_cast<f3d::log::VerboseLevel>(levelValue);
     f3d::log::setVerboseLevel(cppLevel, forceStdErr != 0);
   }
 
   JNIEXPORT jobject JAVA_BIND(Log, getVerboseLevel)(JNIEnv* env, jclass)
   {
-    f3d::log::VerboseLevel cppLevel = f3d::log::getVerboseLevel();
+    const f3d::log::VerboseLevel cppLevel = f3d::log::getVerboseLevel();
 
-    JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Log$VerboseLevel"));
+    const JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Log$VerboseLevel"));
     jmethodID fromValueMethod =
       env->GetStaticMethodID(enumClass, "fromValue", "(I)Lapp/f3d/F3D/Log$VerboseLevel;");
 

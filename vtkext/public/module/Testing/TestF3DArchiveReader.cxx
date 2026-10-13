@@ -58,7 +58,7 @@ int TestF3DArchiveReader(int vtkNotUsed(argc), char* argv[])
     ret = false;
   }
 
-  vtkNew<NonSeekableStream> nonSeekable;
+  const vtkNew<NonSeekableStream> nonSeekable;
   if (archive->Open(nonSeekable))
   {
     std::cerr << "Unexpectedly opened a non seekable stream\n";

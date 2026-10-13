@@ -46,25 +46,23 @@ public class TestInteractor {
     repeatBind.mod = Interactor.ModifierKeys.NONE;
     repeatBind.inter = "R";
 
+    List<String> repeatBindCommands = List.of("test_command");
+
     // Remove any binds from previous CI before testing repeat to avoid error
     interactor.removeBinding(repeatBind);
 
-    interactor.addBinding(repeatBind, "test_command", "test_group", Interactor.BindingType.NUMERICAL, false, true);
+    Interactor.BindingParam bindingParam = new Interactor.BindingParam(repeatBind, repeatBindCommands);
+    bindingParam.group("test_group");
+    bindingParam.type(Interactor.BindingType.NUMERICAL);
+    bindingParam.notify(false);
+    bindingParam.repeat(false);
+
+    interactor.addBinding(bindingParam);
 
     List<Interactor.InteractionBind> testBindings = interactor.getBindsForGroup("test_group");
     testBindings.stream().allMatch((binding) -> binding.equals(repeatBind));
 
     interactor.removeBinding(repeatBind);
-
-    interactor.toggleAnimation();
-    interactor.toggleAnimation(Interactor.AnimationDirection.FORWARD);
-    interactor.toggleAnimation(Interactor.AnimationDirection.BACKWARD);
-    interactor.startAnimation();
-    interactor.startAnimation(Interactor.AnimationDirection.FORWARD);
-    interactor.startAnimation(Interactor.AnimationDirection.BACKWARD);
-    interactor.stopAnimation();
-    interactor.isPlayingAnimation();
-    interactor.getAnimationDirection();
 
     interactor.setNotificationCallback((desc, value, bindStr, duration) -> {
       System.out.println("Notification: " + desc + " " + value + " " + bindStr + " " + duration);
@@ -73,18 +71,10 @@ public class TestInteractor {
 
     interactor.triggerNotification("foo", "bar", 3.0);
 
-    Interactor.AnimationDirection.FORWARD.getValue();
-    Interactor.AnimationDirection.BACKWARD.getValue();
-    Interactor.AnimationDirection.fromValue(0);
-    Interactor.AnimationDirection.fromValue(1);
-
     interactor.enableCameraMovement();
     interactor.disableCameraMovement();
 
     interactor.requestRender();
-
-    interactor.toggleAnimation()
-             .enableCameraMovement();
 
     engine.close();
   }

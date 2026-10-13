@@ -59,7 +59,7 @@ struct Error
 Error ErrorCodeParser(const std::string& errorStr)
 {
   Error err;
-  std::regex errorRegex(R"(ERROR: In (.+?), line (\d+)\n.+: (.+))");
+  const std::regex errorRegex(R"(ERROR: In (.+?), line (\d+)\n.+: (.+))");
   std::smatch matches;
   if (std::regex_search(errorStr, matches, errorRegex))
   {
@@ -84,9 +84,9 @@ void ErrorCallbackFunc(
 int TestF3DQuakeMDLParser(int vtkNotUsed(argc), char* argv[])
 {
   // Read in example file, can theoretically be any mdl file
-  std::string path = std::string(argv[1]) + "data/armor.mdl";
+  const std::string path = std::string(argv[1]) + "data/armor.mdl";
   std::ifstream file(path, std::ios::binary);
-  std::vector<uint8_t> defaultFile(
+  const std::vector<uint8_t> defaultFile(
     (std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
   // setup vectors

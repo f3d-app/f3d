@@ -29,6 +29,23 @@ if(F3D_MODULE_RAYTRACING)
   endif()
 endif()
 
+if (F3D_MODULE_OPENXR)
+  if(TARGET VTK::RenderingOpenXR)
+    message(STATUS "VTK::RenderingOpenXR module found")
+    set(F3D_VTK_MODULES ${F3D_VTK_MODULES} VTK::RenderingOpenXR)
+
+    file(COPY "${F3D_SOURCE_DIR}/resources/xr_actions_manifests/"
+        DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/xr_actions_manifests/")
+
+    install(
+      DIRECTORY "${F3D_SOURCE_DIR}/resources/xr_actions_manifests/"
+      DESTINATION "${f3d_resources_dir}/xr_actions_manifests/")
+  else()
+    message(FATAL_ERROR "F3D_MODULE_OPENXR option is enabled but VTK::RenderingOpenXR is not found")
+  endif()
+endif()
+
+
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/src/config.cxx.in"
   "${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx"
@@ -45,7 +62,7 @@ f3d_generate_options(
 
 # Define libf3d target
 set(F3D_SOURCE_FILES
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/animationManager.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/animation_impl.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/camera_impl.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/context.cxx
@@ -81,6 +98,7 @@ endif()
 
 # List of headers that will be installed
 set(F3D_PUBLIC_HEADERS
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/animation.h
   ${CMAKE_CURRENT_BINARY_DIR}/public/export.h
   ${CMAKE_CURRENT_BINARY_DIR}/public/options.h
   ${CMAKE_CURRENT_SOURCE_DIR}/plugin/plugin.h
@@ -232,6 +250,10 @@ endif ()
 if (F3D_MODULE_FFMPEG)
   target_compile_definitions(libf3d PRIVATE F3D_MODULE_FFMPEG)
 endif ()
+# XR
+if (F3D_MODULE_OPENXR)
+  target_compile_definitions(libf3d PRIVATE F3D_MODULE_OPENXR)
+endif()
 
 if(F3D_STRICT_BUILD AND MSVC)
   # There are warnings in VTK related to deprecated features in C++17

@@ -179,23 +179,21 @@
         "default_value": "0.2, 0.2, 0.2"
       },
       "skybox": {
-        "type": "bool",
-        "default_value": "false"
+        "type": "string",
+        "default_value": "disabled",
+        "domain": {
+          "style": "enum",
+          "enum": ["disabled", "enabled", "blurred"]
+        }
       },
-      "blur": {
-        "enable": {
-          "type": "bool",
-          "default_value": "false"
-        },
-        "coc": {
-          "type": "double",
-          "default_value": "20.0",
-          "domain": {
-            "style": "range",
-            "min": "0.0",
-            "max": "100.0",
-            "increment": "5.0"
-          }
+      "blur_coc": {
+        "type": "double",
+        "default_value": "20.0",
+        "domain": {
+          "style": "range",
+          "min": "0.0",
+          "max": "100.0",
+          "increment": "5.0"
         }
       }
     },
@@ -343,8 +341,14 @@
       "default_value": "false"
     },
     "scene_hierarchy": {
-      "type": "bool",
-      "default_value": "false"
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "max_width": {
+        "type": "int",
+        "default_value": "600"
+      }
     },
     "notifications": {
       "enable": {
@@ -446,14 +450,22 @@
     "textures_transform": {
       "type": "transform2d"
     },
+    "coloring": {
+      "type": "string",
+      "default_value": "material",
+      "domain": {
+        "style": "enum",
+        "enum": ["material", "scivis", "direct"]
+      }
+    },
     "scivis": {
-      "enable": {
-        "type": "bool",
-        "default_value": "false"
-      },
-      "cells": {
-        "type": "bool",
-        "default_value": "false"
+      "field": {
+        "type": "string",
+        "default_value": "any",
+        "domain": {
+          "style": "enum",
+          "enum": ["any", "points", "cells"]
+        }
       },
       "discretization": {
         "type": "int",
@@ -468,8 +480,7 @@
         "type": "string"
       },
       "component": {
-        "type": "int",
-        "default_value": "-1"
+        "type": "int"
       },
       "colormap": {
         "type": "colormap",

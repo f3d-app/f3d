@@ -108,7 +108,7 @@ CLI: `--opacity`.
 
 ### `model.color.rgb` (_color_, optional)
 
-Set a _color_ on the geometry. Multiplied with the `model.color.texture` when present. Model-specified by default. Overridden by `model.scivis.enable`.
+Set a _color_ on the geometry. Multiplied with the `model.color.texture` when present. Model-specified by default. Ignored if `model.coloring` is not `material`.
 
 CLI: `--color`.
 
@@ -187,17 +187,21 @@ If the value is true, no shading is applied and the model will be unlit.
 
 CLI: `--unlit`.
 
-### `model.scivis.enable` (_bool_, default: `false`)
+### `model.coloring` (_string_, default: `material`, enum domain: `material, scivis, direct`)
 
-_Color by an array_ present in on the data. If `model.scivis.array_name` is not set, the first available array will be used.
+Specify the coloring mode.
+_material_ means default file materials (textured or solid color)
+_scivis_ and _direct_ mean the array specified with option `model.scivis.array_name` will be used for coloring (or the first available if not set)
+In the case of _scivis_, the array is mapped to a color using the colormap defined in `model.scivis.colormap`
+In the case of _direct_, it is assumed that the array defines colors directly as L, LA, RGB, RGBA values depending on the number of components.
 
-CLI: `--scalar-coloring`.
+CLI: `--coloring-mode`.
 
-### `model.scivis.cells` (_bool_, default: `false`)
+### `model.scivis.field` (_string_, default: `any`, enum domain: `any, points, cells`)
 
-Color the data with value found _on the cells_ instead of points
+Specify which array field must be used in `scivis` or `direct` coloring mode..
 
-CLI: `--coloring-by-cells`.
+CLI: `--coloring-field`.
 
 ### `model.scivis.discretization` (_int_, optional, range domain: `[1, 1024]`, increment: `5`)
 
@@ -218,9 +222,9 @@ It is only used for volume rendering currently.
 
 CLI: `--volume-opacity-map`.
 
-### `model.scivis.component` (_int_, default: `-1`)
+### `model.scivis.component` (_int_, optional)
 
-Specify the component to color with. `-1` means _magnitude_. `-2` means _direct values_.
+Specify the component to color with in `scivis` or `direct` coloring mode. If not set, it means _magnitude_.
 
 CLI: `--coloring-component`.
 
@@ -312,7 +316,7 @@ CLI: `--final-shader`
 
 ### `render.effect.display_depth` (_bool_, default: `false`)
 
-Display the depth buffer as a grayscale image or with a colormap if `model.scivis.enable` is specified.
+Display the depth buffer as a grayscale image or with a colormap if `model.coloring` is `scivis`.
 Only opaque objects are displayed, the grid and translucent/volumetric objects are ignored.
 
 CLI: `--display-depth`
@@ -349,7 +353,7 @@ CLI: `--grid`.
 
 ### `render.grid.absolute` (_bool_, default: `false`)
 
-Position the grid at the _absolute origin_ of the model's coordinate system instead of below the model.
+Position the grid at the _absolute origin_ of the model's coordinate system instead of below the model. Forced to true with `xr` rendering backend.
 
 CLI: `--grid-absolute`.
 
@@ -432,20 +436,14 @@ Ignored if a _hdri_ skybox is used.
 
 CLI: `--background-color`.
 
-### `render.background.skybox` (_bool_, default: `false`)
+### `render.background.skybox` (_string_, default: `disabled`, enum domain: `disabled`, `enabled`, `blurred`)
 
-Show the _HDRI_ image as a skybox
+Define how to show the _HDRI_ image as a skybox
 Overrides the the background color if any
 
 CLI: `--hdri-skybox`.
 
-### `render.background.blur.enable` (_bool_, default: `false`)
-
-Blur background, useful with a skybox.
-
-CLI: `--blur-background`.
-
-### `render.background.blur.coc` (_double_, default: `20.0`, range domain: `[0, 100]`, increment: `5`)
+### `render.background.blur_coc` (_double_, default: `20.0`, range domain: `[0, 100]`, increment: `5`)
 
 Blur background circle of confusion radius.
 
@@ -571,7 +569,7 @@ Set loader progress bar color.
 Control the _progress bar_ shown when playing the animation. Can be `none` (hidden),
 `default` (only the progress bar, which can be clicked or dragged to jump to a
 time) or `advanced` (the progress bar plus time range, animation name and current
-time labels, with a marker for each keyframe).
+time labels, with a marker for each key frame).
 
 CLI: `--animation-progress`.
 
@@ -609,12 +607,16 @@ Set the opacity of the backdrop behind the UI elements. Value is between 0.0 (fu
 
 CLI: `--backdrop-opacity`.
 
-### `ui.scene_hierarchy` (_bool_, default: `false`)
+### `ui.scene_hierarchy.enable` (_bool_, default: `false`)
 
 Display the _scene hierarchy_ as a tree representing the internal structure of the model, with checkboxes allowing to hide or show individual parts.
 By default the tree is only expanded enough to show nodes that have meaningful names, but all nodes can be fully expanded manually.
 
 CLI: `--scene-hierarchy`.
+
+### `ui.scene_hierarchy.max_width` (_int_, default: `600`)
+
+Maximum width of the _scene hierarchy_ widget in pixels.
 
 ### `ui.notifications.enable` (_bool_, default: `false`)
 

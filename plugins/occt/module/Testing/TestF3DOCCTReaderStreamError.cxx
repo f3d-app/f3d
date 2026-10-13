@@ -22,7 +22,7 @@ public:
   void Execute(vtkObject* caller, unsigned long vtkNotUsed(evId), void* data) override
   {
     const vtkF3DOCCTReader* reader = reinterpret_cast<vtkF3DOCCTReader*>(caller);
-    char* message = static_cast<char*>(data);
+    const char* message = static_cast<char*>(data);
     if (reader && message)
     {
       this->Messages.emplace_back(message);
@@ -43,7 +43,7 @@ bool testReaderStreamError(
   const std::string& filename, const vtkF3DOCCTReader::FILE_FORMAT& format, bool useStream = true)
 {
   vtkNew<::ErrorEventCallback> errorEventCallback;
-  vtkNew<vtkCallbackCommand> nullEventCallback;
+  const vtkNew<vtkCallbackCommand> nullEventCallback;
 
   vtkNew<vtkFileResourceStream> fileStream;
   fileStream->Open(filename.c_str());

@@ -4,10 +4,9 @@
     "match": "*.ifc",
     "options": {
       "load-plugins": "webifc",
-      "scalar-coloring": true,
+      "coloring-mode": "direct",
       "coloring-array": "Colors",
-      "coloring-component": -2,
-      "coloring-by-cells": true
+      "coloring-field": "cells"
     }
   }
 ]

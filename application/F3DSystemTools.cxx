@@ -85,9 +85,9 @@ std::vector<std::string> GetVectorEnvironnementVariable(const std::string& envVa
 
   // split path with OS separator (':' on Linux/macOS and ';' on Windows)
 #ifdef _WIN32
-  char delimiter = ';';
+  constexpr char delimiter = ';';
 #else
-  char delimiter = ':';
+  constexpr char delimiter = ':';
 #endif
 
   while (std::getline(tokenStream, token, delimiter))
@@ -136,7 +136,7 @@ fs::path F3DSystemTools::GetUserScreenshotDirectory()
 //----------------------------------------------------------------------------
 fs::path F3DSystemTools::GetUserConfigFileDirectory()
 {
-  std::string applicationName = "f3d";
+  const std::string applicationName = "f3d";
   fs::path dirPath;
 #if defined(_WIN32)
   std::optional<std::string> appData =

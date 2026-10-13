@@ -78,7 +78,7 @@ public:
           aCam->mPosition[1] + aCam->mLookAt[1], aCam->mPosition[2] + aCam->mLookAt[2]);
 
         // Store the non transformed camera alongside another camera that will be initialized later
-        vtkNew<vtkCamera> transformedCam;
+        const vtkNew<vtkCamera> transformedCam;
         this->Cameras.push_back({ aCam->mName.data, { vCam, transformedCam } });
       }
 
@@ -101,7 +101,7 @@ public:
   {
     if (this->Scene)
     {
-      int nbLights = this->Scene->mNumLights;
+      const int nbLights = this->Scene->mNumLights;
 
       if (nbLights > 0)
       {
@@ -181,7 +181,7 @@ public:
 
     if (path[0] == '*')
     {
-      int texIndex = std::atoi(path + 1);
+      const int texIndex = std::atoi(path + 1);
 
       if (texIndex >= 0 && texIndex < static_cast<int>(this->EmbeddedTextures.size()))
       {
@@ -208,13 +208,13 @@ public:
           return nullptr;
         }
 
-        std::string dir = vtksys::SystemTools::GetParentDirectory(filename);
+        const std::string dir = vtksys::SystemTools::GetParentDirectory(filename);
         std::string texturePath = vtksys::SystemTools::CollapseFullPath(path, dir);
 
         // try to get the texture in the same dir as the model file
         if (!vtksys::SystemTools::FileExists(texturePath))
         {
-          std::string fileName = vtksys::SystemTools::GetFilenameName(path);
+          const std::string fileName = vtksys::SystemTools::GetFilenameName(path);
           texturePath = vtksys::SystemTools::CollapseFullPath(fileName, dir);
         }
 
@@ -261,7 +261,7 @@ public:
 
     if (aTexture->mHeight == 0)
     {
-      std::string fileType = aTexture->achFormatHint;
+      const std::string fileType = aTexture->achFormatHint;
 
       vtkSmartPointer<vtkImageReader2> reader;
       reader.TakeReference(
@@ -286,7 +286,7 @@ public:
       // Sometimes Assimp returns corrupted textures (encountered with 3MF)
       // Let's validate it before trying to read it
       // See https://github.com/assimp/assimp/issues/5328
-      std::regex validRegexp("[rgba]{4}[0-9]{4}");
+      const std::regex validRegexp("[rgba]{4}[0-9]{4}");
 
       if (std::regex_match(aTexture->achFormatHint, validRegexp))
       {
@@ -368,7 +368,7 @@ public:
     aiString texDiffuse;
     if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texDiffuse) == aiReturn_SUCCESS)
     {
-      vtkSmartPointer<vtkTexture> tex = this->CreateTexture(texDiffuse.C_Str());
+      const vtkSmartPointer<vtkTexture> tex = this->CreateTexture(texDiffuse.C_Str());
       if (tex)
       {
         property->SetTexture("diffuseTex", tex);
@@ -378,7 +378,7 @@ public:
     aiString texNormal;
     if (material->GetTexture(aiTextureType_NORMALS, 0, &texNormal) == aiReturn_SUCCESS)
     {
-      vtkSmartPointer<vtkTexture> tex = this->CreateTexture(texNormal.C_Str());
+      const vtkSmartPointer<vtkTexture> tex = this->CreateTexture(texNormal.C_Str());
       if (tex)
       {
         property->SetTexture("normalTex", tex);
@@ -388,7 +388,7 @@ public:
     aiString texAlbedo;
     if (material->GetTexture(aiTextureType_BASE_COLOR, 0, &texAlbedo) == aiReturn_SUCCESS)
     {
-      vtkSmartPointer<vtkTexture> tex = this->CreateTexture(texAlbedo.C_Str(), true);
+      const vtkSmartPointer<vtkTexture> tex = this->CreateTexture(texAlbedo.C_Str(), true);
       if (tex)
       {
         property->SetTexture("albedoTex", tex);
@@ -398,7 +398,7 @@ public:
     aiString texEmissive;
     if (material->GetTexture(aiTextureType_EMISSIVE, 0, &texEmissive) == aiReturn_SUCCESS)
     {
-      vtkSmartPointer<vtkTexture> tex = this->CreateTexture(texEmissive.C_Str(), true);
+      const vtkSmartPointer<vtkTexture> tex = this->CreateTexture(texEmissive.C_Str(), true);
       if (tex)
       {
         property->SetTexture("emissiveTex", tex);
@@ -497,7 +497,7 @@ public:
 
       if (face.mNumIndices == 1)
       {
-        vtkIdType vId = static_cast<vtkIdType>(face.mIndices[0]);
+        const vtkIdType vId = static_cast<vtkIdType>(face.mIndices[0]);
         verticesCells->InsertNextCell(1, &vId);
       }
       else if (face.mNumIndices == 2)
@@ -631,7 +631,7 @@ public:
         {
           // Copy to a mem stream if needed
           stream->Seek(0, vtkResourceStream::SeekDirection::End);
-          std::size_t size = stream->Tell();
+          const std::size_t size = stream->Tell();
           stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
           std::vector<std::byte> tempBuffer;
           tempBuffer.resize(size);
@@ -748,7 +748,7 @@ public:
 
     for (const std::string& boneName : this->ArmatureBoneNames)
     {
-      vtkMatrix4x4* globalMat = this->NodeGlobalMatrix[boneName];
+      const vtkMatrix4x4* globalMat = this->NodeGlobalMatrix[boneName];
       double p[3] = { 0.0, 0.0, 0.0 };
       if (globalMat)
       {
@@ -756,7 +756,7 @@ public:
         p[1] = globalMat->GetElement(1, 3);
         p[2] = globalMat->GetElement(2, 3);
       }
-      vtkIdType i = points->GetNumberOfPoints();
+      const vtkIdType i = points->GetNumberOfPoints();
       points->InsertNextPoint(p);
       vertices->InsertNextCell(1, &i);
       boneToPointId[boneName] = i;
@@ -770,7 +770,7 @@ public:
       {
         for (unsigned int child = 0; child < boneNode->mNumChildren; child++)
         {
-          std::string childName = boneNode->mChildren[child]->mName.data;
+          const std::string childName = boneNode->mChildren[child]->mName.data;
           auto it = boneToPointId.find(childName);
           if (it != boneToPointId.end())
           {
@@ -807,8 +807,8 @@ public:
    */
   void ImportNode(vtkRenderer* renderer, const aiNode* node, vtkMatrix4x4* parentMat, int level = 0)
   {
-    vtkNew<vtkMatrix4x4> mat;
-    vtkNew<vtkMatrix4x4> localMat;
+    const vtkNew<vtkMatrix4x4> mat;
+    const vtkNew<vtkMatrix4x4> localMat;
 
     this->ConvertMatrix(node->mTransformation, localMat);
 
@@ -873,7 +873,7 @@ public:
   {
     if (this->Scene)
     {
-      vtkNew<vtkMatrix4x4> identity;
+      const vtkNew<vtkMatrix4x4> identity;
       this->Description += "Scene Graph:\n------------\n";
       this->ImportNode(renderer, this->Scene->mRootNode, identity);
 
@@ -896,9 +896,9 @@ public:
    */
   void UpdateNodeTransform(const aiNode* node, const vtkMatrix4x4* parentMat)
   {
-    vtkSmartPointer<vtkMatrix4x4> localMat = this->NodeLocalMatrix[node->mName.data];
+    const vtkSmartPointer<vtkMatrix4x4> localMat = this->NodeLocalMatrix[node->mName.data];
 
-    vtkNew<vtkMatrix4x4> mat;
+    const vtkNew<vtkMatrix4x4> mat;
     vtkMatrix4x4::Multiply4x4(parentMat, localMat, mat);
 
     this->NodeGlobalMatrix[node->mName.data] = mat;
@@ -971,11 +971,11 @@ public:
           {
             vtkStringArray* bonesList =
               vtkStringArray::SafeDownCast(polyData->GetFieldData()->GetAbstractArray("Bones"));
-            vtkDoubleArray* bonesTransform = vtkDoubleArray::SafeDownCast(
+            const vtkDoubleArray* bonesTransform = vtkDoubleArray::SafeDownCast(
               polyData->GetFieldData()->GetArray("InverseBindMatrices"));
             if (bonesList && bonesTransform)
             {
-              vtkIdType nbBones = bonesList->GetNumberOfValues();
+              const vtkIdType nbBones = bonesList->GetNumberOfValues();
 
               if (nbBones > 0)
               {
@@ -988,7 +988,7 @@ public:
 
                 for (vtkIdType i = 0; i < nbBones; i++)
                 {
-                  std::string boneName = bonesList->GetValue(i);
+                  const std::string boneName = bonesList->GetValue(i);
 
                   vtkNew<vtkMatrix4x4> boneMat;
                   bonesTransform->GetTypedTuple(i, boneMat->GetData());
@@ -1035,7 +1035,7 @@ public:
       points->SetNumberOfPoints(static_cast<vtkIdType>(this->ArmatureBoneNames.size()));
       for (vtkIdType i = 0; i < static_cast<vtkIdType>(this->ArmatureBoneNames.size()); i++)
       {
-        vtkMatrix4x4* globalMat = this->NodeGlobalMatrix[this->ArmatureBoneNames[i]];
+        const vtkMatrix4x4* globalMat = this->NodeGlobalMatrix[this->ArmatureBoneNames[i]];
         double p[3] = { 0.0, 0.0, 0.0 };
         if (globalMat)
         {
@@ -1125,14 +1125,14 @@ bool vtkF3DAssimpImporter::UpdateAtTimeValue(double timeValue)
     return true;
   }
 
-  Assimp::Interpolator<aiVectorKey> vectorInterpolator;
-  Assimp::Interpolator<aiQuatKey> quaternionInterpolator;
+  const Assimp::Interpolator<aiVectorKey> vectorInterpolator;
+  const Assimp::Interpolator<aiQuatKey> quaternionInterpolator;
 
-  for (vtkIdType activeAnimation : this->Internals->EnabledAnimations)
+  for (const vtkIdType activeAnimation : this->Internals->EnabledAnimations)
   {
     assert(activeAnimation < this->GetNumberOfAnimations());
 
-    aiAnimation* anim = this->Internals->Scene->mAnimations[activeAnimation];
+    const aiAnimation* anim = this->Internals->Scene->mAnimations[activeAnimation];
 
     // get the animation tick
     double fps = anim->mTicksPerSecond;
@@ -1141,7 +1141,7 @@ bool vtkF3DAssimpImporter::UpdateAtTimeValue(double timeValue)
       fps = 1.0;
     }
 
-    double tick = timeValue * fps;
+    const double tick = timeValue * fps;
 
     for (unsigned int nodeChannelId = 0; nodeChannelId < anim->mNumChannels; nodeChannelId++)
     {
@@ -1151,7 +1151,7 @@ bool vtkF3DAssimpImporter::UpdateAtTimeValue(double timeValue)
       aiVector3D scaling;
       aiQuaternion quaternion;
 
-      aiVectorKey* positionKey = std::lower_bound(nodeAnim->mPositionKeys,
+      const aiVectorKey* positionKey = std::lower_bound(nodeAnim->mPositionKeys,
         nodeAnim->mPositionKeys + nodeAnim->mNumPositionKeys, tick,
         [](const aiVectorKey& key, const double& time) { return key.mTime < time; });
 
@@ -1165,12 +1165,12 @@ bool vtkF3DAssimpImporter::UpdateAtTimeValue(double timeValue)
       }
       else
       {
-        aiVectorKey* prev = positionKey - 1;
-        ai_real d = (tick - prev->mTime) / (positionKey->mTime - prev->mTime);
+        const aiVectorKey* prev = positionKey - 1;
+        const ai_real d = (tick - prev->mTime) / (positionKey->mTime - prev->mTime);
         vectorInterpolator(translation, *prev, *positionKey, d);
       }
 
-      aiQuatKey* rotationKey = std::lower_bound(nodeAnim->mRotationKeys,
+      const aiQuatKey* rotationKey = std::lower_bound(nodeAnim->mRotationKeys,
         nodeAnim->mRotationKeys + nodeAnim->mNumRotationKeys, tick,
         [](const aiQuatKey& key, const double& time) { return key.mTime < time; });
 
@@ -1184,12 +1184,12 @@ bool vtkF3DAssimpImporter::UpdateAtTimeValue(double timeValue)
       }
       else
       {
-        aiQuatKey* prev = rotationKey - 1;
-        ai_real d = (tick - prev->mTime) / (rotationKey->mTime - prev->mTime);
+        const aiQuatKey* prev = rotationKey - 1;
+        const ai_real d = (tick - prev->mTime) / (rotationKey->mTime - prev->mTime);
         quaternionInterpolator(quaternion, *prev, *rotationKey, d);
       }
 
-      aiVectorKey* scalingKey =
+      const aiVectorKey* scalingKey =
         std::lower_bound(nodeAnim->mScalingKeys, nodeAnim->mScalingKeys + nodeAnim->mNumScalingKeys,
           tick, [](const aiVectorKey& key, const double& time) { return key.mTime < time; });
 
@@ -1203,8 +1203,8 @@ bool vtkF3DAssimpImporter::UpdateAtTimeValue(double timeValue)
       }
       else
       {
-        aiVectorKey* prev = scalingKey - 1;
-        ai_real d = (tick - prev->mTime) / (scalingKey->mTime - prev->mTime);
+        const aiVectorKey* prev = scalingKey - 1;
+        const ai_real d = (tick - prev->mTime) / (scalingKey->mTime - prev->mTime);
         vectorInterpolator(scaling, *prev, *scalingKey, d);
       }
 
@@ -1233,7 +1233,7 @@ bool vtkF3DAssimpImporter::UpdateAtTimeValue(double timeValue)
     }
   }
 
-  vtkNew<vtkMatrix4x4> identity;
+  const vtkNew<vtkMatrix4x4> identity;
   this->Internals->UpdateNodeTransform(this->Internals->Scene->mRootNode, identity);
 
   this->Internals->UpdateBones();
@@ -1287,7 +1287,7 @@ bool vtkF3DAssimpImporter::GetTemporalInformation(
   assert(animationIndex < this->GetNumberOfAnimations());
   assert(animationIndex >= 0);
 
-  double duration = this->Internals->Scene->mAnimations[animationIndex]->mDuration;
+  const double duration = this->Internals->Scene->mAnimations[animationIndex]->mDuration;
   double fps = this->Internals->Scene->mAnimations[animationIndex]->mTicksPerSecond;
   if (fps == 0.0)
   {
@@ -1307,10 +1307,10 @@ bool vtkF3DAssimpImporter::GetTemporalInformation(
 
   std::set<double> timeStepSet;
 
-  aiAnimation* anim = this->Internals->Scene->mAnimations[animationIndex];
+  const aiAnimation* anim = this->Internals->Scene->mAnimations[animationIndex];
   for (unsigned int channel = 0; channel < anim->mNumChannels; channel++)
   {
-    aiNodeAnim* nodeAnim = anim->mChannels[channel];
+    const aiNodeAnim* nodeAnim = anim->mChannels[channel];
 
     for (unsigned int positionIndex = 0; positionIndex < nodeAnim->mNumPositionKeys;
          positionIndex++)
@@ -1336,7 +1336,7 @@ bool vtkF3DAssimpImporter::GetTemporalInformation(
   timeSteps->SetNumberOfTuples(nbTimeSteps);
 
   int index = 0;
-  for (double it : timeStepSet)
+  for (const double it : timeStepSet)
   {
     timeSteps->SetValue(index, it);
     index++;

@@ -10,8 +10,8 @@
 
 int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
 {
-  std::string pathGaussians = std::string(argv[1]) + "data/bonsai_small.ply";
-  std::string pathSimplePoints = std::string(argv[1]) + "data/points.ply";
+  const std::string pathGaussians = std::string(argv[1]) + "data/bonsai_small.ply";
+  const std::string pathSimplePoints = std::string(argv[1]) + "data/points.ply";
 
   // check open from stream
   {
@@ -28,7 +28,7 @@ int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
     reader->SetStream(stream);
     reader->Update();
 
-    vtkIdType nbGaussians = reader->GetOutput()->GetNumberOfPoints();
+    const vtkIdType nbGaussians = reader->GetOutput()->GetNumberOfPoints();
 
     if (nbGaussians != 2655)
     {
@@ -53,7 +53,7 @@ int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
       return EXIT_FAILURE;
     }
 
-    std::string inputString(
+    const std::string inputString(
       (std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
     vtkNew<vtkF3DPLYReader> reader;
@@ -61,7 +61,7 @@ int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
     reader->SetInputString(inputString);
     reader->Update();
 
-    vtkIdType nbGaussians = reader->GetOutput()->GetNumberOfPoints();
+    const vtkIdType nbGaussians = reader->GetOutput()->GetNumberOfPoints();
 
     if (nbGaussians != 2655)
     {
@@ -82,7 +82,7 @@ int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
     reader->SetFileName(pathSimplePoints.c_str());
     reader->Update();
 
-    vtkIdType nbPoints = reader->GetOutput()->GetNumberOfPoints();
+    const vtkIdType nbPoints = reader->GetOutput()->GetNumberOfPoints();
 
     if (nbPoints != 5)
     {
@@ -100,13 +100,13 @@ int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20250703) // a leak was fixed in this version
   // check invalid
   {
-    std::string pathInvalid = std::string(argv[1]) + "data/invalid.so";
+    const std::string pathInvalid = std::string(argv[1]) + "data/invalid.so";
 
     vtkNew<vtkF3DPLYReader> reader;
     reader->SetFileName(pathInvalid.c_str());
     reader->Update();
 
-    vtkIdType nbPoints = reader->GetOutput()->GetNumberOfPoints();
+    const vtkIdType nbPoints = reader->GetOutput()->GetNumberOfPoints();
 
     if (nbPoints != 0)
     {

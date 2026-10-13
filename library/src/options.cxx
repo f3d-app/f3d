@@ -151,7 +151,7 @@ std::pair<std::string, unsigned int> options::getClosestOption(std::string_view 
 
   for (const auto& name : names)
   {
-    int distance = utils::textDistance(name, option);
+    const int distance = utils::textDistance(name, option);
     if (distance < ret.second)
     {
       ret = { name, distance };

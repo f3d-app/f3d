@@ -1,1 +1,1 @@
-jump_to_keyframe_relative 0
+jump_to_key_frame_relative 0

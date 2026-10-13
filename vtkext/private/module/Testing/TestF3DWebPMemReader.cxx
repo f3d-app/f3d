@@ -33,7 +33,7 @@ int TestF3DWebPMemReader(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  std::streamsize size = file.tellg();
+  const std::streamsize size = file.tellg();
   file.seekg(0, std::ios::beg);
 
   std::vector<char> buff(size);

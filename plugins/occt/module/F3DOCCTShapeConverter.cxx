@@ -76,7 +76,7 @@ vtkSmartPointer<vtkPolyData> ToPolyData(
     std::vector<TopoDS_Edge> edges;
     {
       /* add all edges to a compound to remesh them all at once */
-      TopoDS_Builder builder;
+      const TopoDS_Builder builder;
       TopoDS_Compound compound;
       builder.MakeCompound(compound);
       for (TopExp_Explorer exEdge(shape, TopAbs_EDGE); exEdge.More(); exEdge.Next())

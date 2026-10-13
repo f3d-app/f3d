@@ -168,7 +168,7 @@ void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
   vtkInformation* info = actor->GetPropertyKeys();
   if (info && info->Has(vtkOpenGLRenderPass::RenderPasses()))
   {
-    int numRenderPasses = info->Length(vtkOpenGLRenderPass::RenderPasses());
+    const int numRenderPasses = info->Length(vtkOpenGLRenderPass::RenderPasses());
     for (int i = 0; i < numRenderPasses; ++i)
     {
       vtkObjectBase* rpBase = info->Get(vtkOpenGLRenderPass::RenderPasses(), i);
@@ -288,7 +288,7 @@ void vtkF3DOpenGLGridMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
 bool vtkF3DOpenGLGridMapper::GetNeedToRebuildShaders(
   vtkOpenGLHelper& cellBO, vtkRenderer* vtkNotUsed(ren), vtkActor* act)
 {
-  vtkMTimeType renderPassMTime = this->GetRenderPassStageMTime(act, &cellBO);
+  const vtkMTimeType renderPassMTime = this->GetRenderPassStageMTime(act, &cellBO);
   return cellBO.Program == nullptr || cellBO.ShaderSourceTime < renderPassMTime ||
     this->ShaderBuiltWithReflection != (this->ReflectionStrength > 0.0f);
 }

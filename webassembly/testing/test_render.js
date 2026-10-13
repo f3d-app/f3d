@@ -8,10 +8,9 @@ const settings = {
     options.setAsString("render.background.color", "#000000");
 
     // setup coloring
-    options.toggle("model.scivis.enable");
     options.setAsString("model.scivis.array_name", "Colors");
-    options.setAsString("model.scivis.component", "-2");
-    options.toggle("model.scivis.cells");
+    options.setAsString("model.coloring", "direct");
+    options.setAsString("model.scivis.field", "cells");
 
     // make it look nice
     options.setAsString("render.effect.antialiasing.mode", "fxaa");
@@ -30,6 +29,7 @@ const settings = {
   runAfter: (Module) => {
     // check that space conversion works
     const window = Module.engineInstance.getWindow();
+    window.setUseHDRICache(true);
 
     const ptWorld = window.getWorldFromDisplay([0, 0, 0]);
 

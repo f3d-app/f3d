@@ -35,8 +35,8 @@ void f3d_utils_internal_tokens_destroy(char** tokens, size_t count)
 //----------------------------------------------------------------------------
 unsigned int f3d_utils_text_distance(const char* str_a, const char* str_b)
 {
-  std::string a = str_a ? str_a : "";
-  std::string b = str_b ? str_b : "";
+  const std::string a = str_a ? str_a : "";
+  const std::string b = str_b ? str_b : "";
   return f3d::utils::textDistance(a, b);
 }
 
@@ -56,7 +56,7 @@ char** f3d_utils_tokenize(const char* str, int keep_comments, size_t* out_count)
   {
     std::vector<std::string> vec = f3d::utils::tokenize(str, keep_comments != 0);
 
-    size_t n = vec.size();
+    const size_t n = vec.size();
     char** out = new char*[n];
     for (size_t i = 0; i < n; ++i)
     {
@@ -89,8 +89,8 @@ void f3d_utils_tokens_destroy(char** tokens, size_t count)
 //----------------------------------------------------------------------------
 char* f3d_utils_collapse_path(const char* path, const char* base_directory)
 {
-  std::filesystem::path p(path);
-  std::filesystem::path base = base_directory ? base_directory : "";
+  const std::filesystem::path p(path);
+  const std::filesystem::path base = base_directory ? base_directory : "";
   auto collapsed = f3d::utils::collapsePath(p, base);
   return f3d_utils_strdup(collapsed.string());
 }
@@ -100,7 +100,7 @@ char* f3d_utils_glob_to_regex(const char* glob, char path_separator)
 {
   try
   {
-    std::string regex = f3d::utils::globToRegex(glob, path_separator);
+    const std::string regex = f3d::utils::globToRegex(glob, path_separator);
     return f3d_utils_strdup(regex);
   }
   catch (const f3d::utils::glob_exception& ex)

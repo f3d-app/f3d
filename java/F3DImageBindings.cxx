@@ -13,7 +13,7 @@ extern "C"
 
   JNIEXPORT jlong JAVA_BIND(Image, nativeCreateFromFile)(JNIEnv* env, jclass, jstring filePath)
   {
-    JniUTFString path(env, filePath);
+    const JniUTFString path(env, filePath);
     jlong result = 0;
     try
     {
@@ -29,23 +29,23 @@ extern "C"
   JNIEXPORT jlong JAVA_BIND(Image, nativeCreateFromStream)(JNIEnv* env, jclass, jbyteArray buffer)
   {
     jbyte* bufferData = env->GetByteArrayElements(buffer, nullptr);
-    size_t size = env->GetArrayLength(buffer);
+    const size_t size = env->GetArrayLength(buffer);
 
-    f3d::image* img = new f3d::image(reinterpret_cast<std::byte*>(bufferData), size);
+    const f3d::image* img = new f3d::image(reinterpret_cast<std::byte*>(bufferData), size);
     return reinterpret_cast<jlong>(img);
   }
 
   JNIEXPORT jlong JAVA_BIND(Image, nativeCreate)(
     JNIEnv* env, jclass, jint width, jint height, jint channelCount, jint type)
   {
-    f3d::image::ChannelType channelType = static_cast<f3d::image::ChannelType>(type);
-    f3d::image* img = new f3d::image(width, height, channelCount, channelType);
+    const f3d::image::ChannelType channelType = static_cast<f3d::image::ChannelType>(type);
+    const f3d::image* img = new f3d::image(width, height, channelCount, channelType);
     return reinterpret_cast<jlong>(img);
   }
 
   JNIEXPORT void JAVA_BIND(Image, nativeDestroy)(JNIEnv* env, jclass, jlong nativeAddress)
   {
-    f3d::image* img = reinterpret_cast<f3d::image*>(nativeAddress);
+    const f3d::image* img = reinterpret_cast<f3d::image*>(nativeAddress);
     delete img;
   }
 
@@ -66,9 +66,9 @@ extern "C"
 
   JNIEXPORT jobject JAVA_BIND(Image, getChannelType)(JNIEnv* env, jobject self)
   {
-    f3d::image::ChannelType type = GetImage(env, self)->getChannelType();
+    const f3d::image::ChannelType type = GetImage(env, self)->getChannelType();
 
-    JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Image$ChannelType"));
+    const JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Image$ChannelType"));
     jfieldID fieldID;
 
     switch (type)
@@ -108,10 +108,10 @@ extern "C"
 
   JNIEXPORT jbyteArray JAVA_BIND(Image, getContent)(JNIEnv* env, jobject self)
   {
-    f3d::image* img = GetImage(env, self);
+    const f3d::image* img = GetImage(env, self);
 
     void* content = img->getContent();
-    unsigned int size =
+    const unsigned int size =
       img->getWidth() * img->getHeight() * img->getChannelCount() * img->getChannelTypeSize();
 
     jbyteArray result = env->NewByteArray(size);
@@ -139,15 +139,15 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Image, save)(
     JNIEnv* env, jobject self, jstring filePath, jobject format)
   {
-    f3d::image* img = GetImage(env, self);
+    const f3d::image* img = GetImage(env, self);
 
-    JniUTFString path(env, filePath);
+    const JniUTFString path(env, filePath);
 
-    JniLocalRef<jclass> formatEnum(env, env->GetObjectClass(format));
+    const JniLocalRef<jclass> formatEnum(env, env->GetObjectClass(format));
     jmethodID ordinalMethod = env->GetMethodID(formatEnum, "ordinal", "()I");
-    jint formatOrdinal = env->CallIntMethod(format, ordinalMethod);
+    const jint formatOrdinal = env->CallIntMethod(format, ordinalMethod);
 
-    f3d::image::SaveFormat saveFormat = static_cast<f3d::image::SaveFormat>(formatOrdinal);
+    const f3d::image::SaveFormat saveFormat = static_cast<f3d::image::SaveFormat>(formatOrdinal);
     try
     {
       img->save(path.c_str(), saveFormat);
@@ -162,13 +162,13 @@ extern "C"
 
   JNIEXPORT jbyteArray JAVA_BIND(Image, saveBuffer)(JNIEnv* env, jobject self, jobject format)
   {
-    f3d::image* img = GetImage(env, self);
+    const f3d::image* img = GetImage(env, self);
 
-    JniLocalRef<jclass> formatEnum(env, env->GetObjectClass(format));
+    const JniLocalRef<jclass> formatEnum(env, env->GetObjectClass(format));
     jmethodID ordinalMethod = env->GetMethodID(formatEnum, "ordinal", "()I");
-    jint formatOrdinal = env->CallIntMethod(format, ordinalMethod);
+    const jint formatOrdinal = env->CallIntMethod(format, ordinalMethod);
 
-    f3d::image::SaveFormat saveFormat = static_cast<f3d::image::SaveFormat>(formatOrdinal);
+    const f3d::image::SaveFormat saveFormat = static_cast<f3d::image::SaveFormat>(formatOrdinal);
     try
     {
       std::vector<unsigned char> buffer = img->saveBuffer(saveFormat);
@@ -187,7 +187,7 @@ extern "C"
 
   JNIEXPORT jstring JAVA_BIND(Image, toTerminalText)(JNIEnv* env, jobject self)
   {
-    std::string text = GetImage(env, self)->toTerminalText();
+    const std::string text = GetImage(env, self)->toTerminalText();
     return env->NewStringUTF(text.c_str());
   }
 
@@ -196,8 +196,8 @@ extern "C"
   {
     f3d::image* img = GetImage(env, self);
 
-    JniUTFString keyStr(env, key);
-    JniUTFString valueStr(env, value);
+    const JniUTFString keyStr(env, key);
+    const JniUTFString valueStr(env, value);
 
     img->setMetadata(keyStr.c_str(), valueStr.c_str());
 
@@ -206,9 +206,9 @@ extern "C"
 
   JNIEXPORT jstring JAVA_BIND(Image, getMetadata)(JNIEnv* env, jobject self, jstring key)
   {
-    f3d::image* img = GetImage(env, self);
+    const f3d::image* img = GetImage(env, self);
 
-    JniUTFString keyStr(env, key);
+    const JniUTFString keyStr(env, key);
     std::string value;
     try
     {

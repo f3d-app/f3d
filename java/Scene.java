@@ -49,6 +49,7 @@ public class Scene {
 
     public Scene(long nativeAddress) {
         mNativeAddress = nativeAddress;
+        mAnimation = new Animation(mNativeAddress);
     }
 
     /**
@@ -194,58 +195,11 @@ public class Scene {
     public native FileAvailability supports(String filePath);
 
     /**
-     * Load added files at provided time value if they contain any animation.
-     *
-     * @param timeValue time value to load
-     * @return this scene for method chaining
+     * Get the animation
+     * @return Animation instance
      */
-    public native Scene loadAnimationTime(double timeValue);
-
-    /**
-     * Get animation time range of currently added files.
-     *
-     * @return array of 2 doubles [min_time, max_time]
-     */
-    public native double[] animationTimeRange();
-
-    /**
-     * Get animation keyframe's time of currently added files.
-     *
-     * @return list of double
-     */
-    public native double[] getAnimationKeyFrames();
-
-    /**
-     * Return the number of animations available in the currently loaded files.
-     *
-     * @return number of available animations
-     */
-    public native int availableAnimations();
-
-    /**
-     * Get the current animation name, if any.
-     *
-     * @return animation names or string error
-     */
-    public String getAnimationName() {
-        // note : -1 gets the current animation
-        return getAnimationName(-1);
-    }
-
-    /**
-     * Get the animation name of a given animation index, if any.
-     *
-     * @param index animation index, -1 for current animation
-     * @return animation name or string error
-     */
-    public native String getAnimationName(int index);
-
-    /**
-     * Get all of the animation names, if any.
-     *
-     * @return list of animation names
-     */
-    public native List<String> getAnimationNames();
+    public Animation getAnimation() { return mAnimation; }
 
     private long mNativeAddress;
+    private Animation mAnimation;
 }

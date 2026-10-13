@@ -36,6 +36,12 @@
           "implicitValue": "1"
         },
         {
+          "longName": "no-cache",
+          "helpText": "No cache is used (both reading and writing)",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
           "longName": "help",
           "shortName": "h",
           "helpText": "Print help"
@@ -458,8 +464,8 @@
           "longName": "hdri-skybox",
           "shortName": "j",
           "helpText": "Enable HDRI skybox background",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
+          "valueHelper": "<string>",
+          "implicitValue": "enabled"
         },
         {
           "longName": "texture-matcap",
@@ -573,13 +579,6 @@
           "implicitValue": "1"
         },
         {
-          "longName": "blur-background",
-          "shortName": "u",
-          "helpText": "Blur background",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
-        },
-        {
           "longName": "blur-coc",
           "helpText": "Blur circle of confusion radius",
           "valueHelper": "<value>"
@@ -595,11 +594,11 @@
       "name": "Scientific visualization",
       "options": [
         {
-          "longName": "scalar-coloring",
+          "longName": "coloring-mode",
           "shortName": "s",
-          "helpText": "Color by a scalar array",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
+          "helpText": "Change the color mode",
+          "valueHelper": "<material|scivis|direct>",
+          "implicitValue": "scivis"
         },
         {
           "longName": "coloring-array",
@@ -609,16 +608,15 @@
         {
           "longName": "coloring-component",
           "shortName": "y",
-          "helpText": "Component from the array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars",
+          "helpText": "Component from the array to color with. Use magnitude if not specified",
           "valueHelper": "<comp_index>",
-          "implicitValue": "-2"
+          "implicitValue": "0"
         },
         {
-          "longName": "coloring-by-cells",
-          "shortName": "c",
-          "helpText": "Use an array from the cells",
-          "valueHelper": "<bool>",
-          "implicitValue": "1"
+          "longName": "coloring-field",
+          "helpText": "Use the specified field for coloring (e.g., \"cells\" or \"points\")",
+          "valueHelper": "<string>",
+          "implicitValue": "cells"
         },
         {
           "longName": "coloring-range",

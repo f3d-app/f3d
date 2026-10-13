@@ -108,7 +108,7 @@ void vtkF3DEXRReader::ExecuteInformation()
     this->DataExtent[2] = dw.min.y;
     this->DataExtent[3] = dw.max.y;
 
-    Imf::RgbaChannels channels = file.channels();
+    const Imf::RgbaChannels channels = file.channels();
     if (channels != Imf::RgbaChannels::WRITE_RGBA && channels != Imf::RgbaChannels::WRITE_RGB)
     {
       throw std::runtime_error("only RGB and RGBA channels are supported");

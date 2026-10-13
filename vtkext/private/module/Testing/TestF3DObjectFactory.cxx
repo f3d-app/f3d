@@ -36,7 +36,7 @@ int TestF3DObjectFactory(int argc, char* argv[])
 
   // Check actual factory mechanism
 #ifndef F3D_USE_GLES
-  vtkNew<vtkPolyDataMapper> mapper;
+  const vtkNew<vtkPolyDataMapper> mapper;
   const vtkF3DPolyDataMapper* mapperPtr = vtkF3DPolyDataMapper::SafeDownCast(mapper);
   if (mapperPtr == nullptr)
   {
@@ -54,7 +54,7 @@ int TestF3DObjectFactory(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  vtkNew<vtkOutputWindow> window;
+  const vtkNew<vtkOutputWindow> window;
 #if F3D_MODULE_UI
   const vtkF3DImguiConsole* windowPtr = vtkF3DImguiConsole::SafeDownCast(window);
 #else
