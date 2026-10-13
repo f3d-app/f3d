@@ -1,0 +1,77 @@
+{
+  "interaction_profile": "/interaction_profiles/htc/vive_controller",
+
+  "bindings": {
+    "vtk-actions": {
+      "sources": [
+        {
+          "inputs": {
+            "pose": {
+              "output": "handpose"
+            }
+          },
+          "path": "/user/hand/left/input/aim"
+        },
+        {
+          "inputs": {
+            "pose": {
+              "output": "handpose"
+            }
+          },
+          "path": "/user/hand/right/input/aim"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "startmovement"
+            },
+            "position": {
+              "output": "movement"
+            }
+          },
+          "path": "/user/hand/right/input/trackpad"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "complexgestureaction"
+            }
+          },
+          "path": "/user/hand/right/input/squeeze"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "complexgestureaction"
+            }
+          },
+          "path": "/user/hand/left/input/squeeze"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "showmenu"
+            }
+          },
+          "path": "/user/hand/right/input/menu"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "nextcamerapose"
+            }
+          },
+          "path": "/user/hand/left/input/trigger"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "triggeraction"
+            }
+          },
+          "path": "/user/hand/right/input/trigger"
+        }
+      ]
+    }
+  }
+}
