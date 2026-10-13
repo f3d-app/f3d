@@ -160,11 +160,12 @@ npm install f3d --tag rc
 npm run start
 ```
 
-- Test examples manually (Docker required)
+- Clone https://github.com/f3d-app/f3d (on `vX.Y.Z-RCN`) and test examples manually
 
 ```bash
 cd examples/libf3d/web
-npm run install
+npm uninstall f3d
+npm install f3d --tag rc
 npm run dev --workspace simple-ui
 npm run dev --workspace volume-rendering
 npm run dev --workspace multiple-instances
