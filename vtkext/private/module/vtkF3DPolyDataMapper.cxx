@@ -23,7 +23,6 @@
 #include <vtkUnsignedCharArray.h>
 #include <vtkVersion.h>
 
-#include <array>
 #include <cmath>
 #include <regex>
 
@@ -36,7 +35,7 @@ void vtkF3DPolyDataMapper::SetUseLinearColorSpace(bool use)
   {
     this->UseLinearColorSpace = use;
     this->ClearColorArrays();
-    this->LinearColorTextureMap = nullptr;
+    this->LinearColorTextureScalars = nullptr;
     this->Modified();
   }
 }
@@ -52,32 +51,30 @@ vtkUnsignedCharArray* vtkF3DPolyDataMapper::MapScalars(
     return this->Colors;
   }
 
-  if (this->ColorTextureMap && this->ColorTextureMap != this->LinearColorTextureMap)
+  if (this->ColorTextureMap &&
+    this->ColorTextureMap->GetPointData()->GetScalars() != this->LinearColorTextureScalars)
   {
     const vtkUnsignedCharArray* source =
       vtkUnsignedCharArray::SafeDownCast(this->ColorTextureMap->GetPointData()->GetScalars());
-    this->LinearColorTextureMap = vtkSmartPointer<vtkImageData>::New();
-    this->LinearColorTextureMap->CopyStructure(this->ColorTextureMap);
-    this->LinearColorTextureMap->AllocateScalars(source->GetDataType(), 4);
-    vtkUnsignedCharArray* destination =
-      vtkUnsignedCharArray::SafeDownCast(this->LinearColorTextureMap->GetPointData()->GetScalars());
-    for (vtkIdType i = 0; i < source->GetNumberOfTuples(); ++i)
+    const vtkIdType numberOfTuples = source->GetNumberOfTuples();
+    this->LinearColorTextureScalars = vtkSmartPointer<vtkUnsignedCharArray>::New();
+    this->LinearColorTextureScalars->SetNumberOfComponents(4);
+    this->LinearColorTextureScalars->SetNumberOfTuples(numberOfTuples);
+    for (vtkIdType i = 0; i < numberOfTuples; ++i)
     {
       for (int component = 0; component < 4; ++component)
       {
         const unsigned char value = source->GetTypedComponent(i, component);
         // Approx. color components converted to linear except alpha channel.
-        destination->SetTypedComponent(i, component,
+        this->LinearColorTextureScalars->SetTypedComponent(i, component,
           component < 3 ? static_cast<unsigned char>(std::pow(value / 255.0, 2.2) * 255.0) : value);
       }
     }
-    this->ColorTextureMap->UnRegister(this);
-    this->ColorTextureMap = this->LinearColorTextureMap;
-    this->ColorTextureMap->Register(this);
+    this->ColorTextureMap->GetPointData()->SetScalars(this->LinearColorTextureScalars);
   }
   else if (!this->ColorTextureMap)
   {
-    this->LinearColorTextureMap = nullptr;
+    this->LinearColorTextureScalars = nullptr;
   }
 
   return this->Colors;

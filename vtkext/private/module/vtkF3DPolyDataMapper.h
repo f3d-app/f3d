@@ -50,9 +50,6 @@ public:
    */
   void SetUseLinearColorSpace(bool use);
 
-  // vtkMapper class has MapScalars() overloads. Make them visible because we are overriding.
-  using Superclass::MapScalars;
-
   /**
    * Our vtkPolyDataMapper::MapScalar() override which computes linear RGB from sRGB
    * if needed.
@@ -67,10 +64,9 @@ private:
   vtkNew<vtkOpenGLBufferObject> JointMatrices;
   bool HasSSBOSkinning = false;
 
-  // Our cached linear color texture map for PBR, used as vtkMapper::ColorTextureMap respectively
-  // while linear colorspace conversion.
+  // Cached linear color scalars used in vtkMapper::ColorTextureMap.
   bool UseLinearColorSpace = false;
-  vtkSmartPointer<vtkImageData> LinearColorTextureMap;
+  vtkSmartPointer<vtkUnsignedCharArray> LinearColorTextureScalars;
 };
 
 #endif
