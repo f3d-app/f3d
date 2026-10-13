@@ -3448,7 +3448,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
   if (volumeVisible)
   {
-    if (!this->VolumePropsAndMappersConfigured && volPropsAndMappers.size() == 0)
+    if (!this->VolumePropsAndMappersConfigured && volPropsAndMappers.size() == 0 &&
+      this->Importer->GetColoringActorsAndMappers().size() > 0)
     {
       F3DLog::Print(F3DLog::Severity::Error, "Cannot use volume with this data");
     }
