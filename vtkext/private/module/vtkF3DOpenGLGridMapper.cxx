@@ -46,12 +46,14 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
     "uniform mat3 normalMatrix;\n"
     "uniform float fadeDist;\n"
     "out vec2 gridCoord;\n"
+    "out vec4 vertexVCVSOutput;\n"
     "out vec3 normalVC;\n"
   );
-  vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Impl",
-    "gridCoord = vertexMC.xy * fadeDist;\n"
-    "normalVC = normalMatrix * vec3(0.0, 1.0, 0.0);\n"
-    "gl_Position = MCDCMatrix * vec4(vertexMC.xzy * fadeDist, 1.0);\n"
+  vtkShaderProgram::Substitute(VSSource, "  //VTK::PositionVC::Impl",
+    "  gridCoord = vertexMC.xy * fadeDist;\n"
+    "  vertexVCVSOutput = MCVCMatrix * vec4(vertexMC.xzy * fadeDist, 1.0);\n"
+    "  normalVC = normalMatrix * vec3(0.0, 1.0, 0.0);\n"
+    "  gl_Position = MCDCMatrix * vec4(vertexMC.xzy * fadeDist, 1.0);\n"
   );
   
   vtkShaderProgram::Substitute(FSSource, "//VTK::CustomUniforms::Dec",
@@ -98,7 +100,7 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
     "  vec2 majorGrid = abs(fract(majorCoord - 0.5) - 0.5) / fwidth(majorCoord);\n"
     "  vec2 minorGrid = abs(fract(minorCoord - 0.5) - 0.5) / fwidth(minorCoord);\n"
   );
-  vtkShaderProgram::Substitute(FSSource, "//VTK::Color::Impl",
+  vtkShaderProgram::Substitute(FSSource, "//VTK::Light::Impl",
     "  float majorAlpha = antialias(min(majorGrid.x, majorGrid.y), gridLineWidth);\n"
     "  float minorAlpha = antialias(min(minorGrid.x, minorGrid.y), gridLineWidth);\n"
     "  float zoomFadeFactor = 1.0 - clamp(fwidth(majorCoord.x / unitSquare * fadeDist), 0.0, 1.0);\n"
@@ -110,6 +112,7 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
     "  float axis2Weight = abs(majorCoord.x) < 0.5 ? antialias(majorGrid.x, axesLineWidth) * lineOpacity : 0.0;\n"
     "  color = mix(color, axis2Color, axis2Weight);\n"
     "  color = mix(color, axis1Color, axis1Weight);\n"
+    "  //VTK::Shadow::Impl\n"
     "  //VTK::Reflection::Impl\n"
     "  float sqDist = unitSquare * unitSquare * dot(fromCenter, fromCenter);\n"
     "  float radialFadeFactor = 1.0 - sqDist / (fadeDist * fadeDist);\n"
@@ -117,6 +120,31 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
 
     "  gl_FragData[0] = color;\n"
   );
+
+  if (true) // TODO
+  {
+    std::stringstream shadowCode;
+    shadowCode << "  if (gl_FrontFacing)\n"
+      "  {\n"
+      "    vec3 lostLight = vec3(0.0);\n";
+
+    for (int i = 0; i < this->PrimitiveInfo[this->LastBoundBO].LastLightCount; ++i)
+    {
+      shadowCode << "    lostLight += (1.0 - factor" << i << ".x) * lightColor" << i << ";\n";
+    }
+
+    shadowCode << "    float shadowAlpha = clamp(max(max(lostLight.r, lostLight.g), lostLight.b), 0.0, 1.0);\n"
+      "    color.rgb = color.a * color.rgb;\n"
+      "    color = color + vec4(0.0, 0.0, 0.0, shadowAlpha) * (1.0 - color.a);\n"
+      "    if (color.a > 0.0001) color.rgb = color.rgb / color.a;\n"
+      "  }\n";
+
+    vtkShaderProgram::Substitute(FSSource, "  //VTK::Shadow::Impl", shadowCode.str());
+
+    // get lighting declarations
+    vtkShaderProgram::Substitute(
+      FSSource, "//VTK::Light::Dec", static_cast<vtkOpenGLRenderer*>(ren)->GetLightingUniforms());
+  }
 
   if (this->ReflectionStrength > 0.0)
   {
@@ -273,7 +301,7 @@ void vtkF3DOpenGLGridMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
 
   // Update/build/etc the shader.
   this->UpdateBufferObjects(ren, actor);
-  this->UpdateShaders(this->Primitives[PrimitivePoints], ren, actor);
+  this->UpdateShaders(this->Primitives[PrimitiveTriStrips], ren, actor);
 
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -286,8 +314,21 @@ void vtkF3DOpenGLGridMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
 
 //-----------------------------------------------------------------------------
 bool vtkF3DOpenGLGridMapper::GetNeedToRebuildShaders(
-  vtkOpenGLHelper& cellBO, vtkRenderer* vtkNotUsed(ren), vtkActor* act)
+  vtkOpenGLHelper& cellBO, vtkRenderer* ren, vtkActor* act)
 {
+  vtkOpenGLRenderer* oren = static_cast<vtkOpenGLRenderer*>(ren);
+  primitiveInfo::LightingTypeEnum lightComplexity =
+    static_cast<primitiveInfo::LightingTypeEnum>(oren->GetLightingComplexity());
+  int numberOfLights = oren->GetLightingCount();
+
+  auto& primInfo = this->PrimitiveInfo[&cellBO];
+  if (primInfo.LastLightComplexity != lightComplexity || primInfo.LastLightCount != numberOfLights)
+  {
+    primInfo.LightComplexityChanged.Modified();
+    primInfo.LastLightComplexity = lightComplexity;
+    primInfo.LastLightCount = numberOfLights;
+  }
+
   const vtkMTimeType renderPassMTime = this->GetRenderPassStageMTime(act, &cellBO);
   return cellBO.Program == nullptr || cellBO.ShaderSourceTime < renderPassMTime ||
     this->ShaderBuiltWithReflection != (this->ReflectionStrength > 0.0f);

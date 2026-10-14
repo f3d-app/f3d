@@ -40,6 +40,8 @@
 #include <vtkShaderProgram.h>
 #include <vtkShaderProperty.h>
 #include <vtkShadowMapBakerPass.h>
+#include <vtkShadowMapPass.h>
+
 #include <vtkSkybox.h>
 #include <vtkTextureObject.h>
 #include <vtkToneMappingPass.h>
@@ -82,10 +84,6 @@ void vtkF3DRenderPass::ReleaseGraphicsResources(vtkWindow* w)
   if (this->BakeReflectionPass)
   {
     this->BakeReflectionPass->ReleaseGraphicsResources(w);
-  }
-  if (this->BakeShadowsPass)
-  {
-    this->BakeShadowsPass->ReleaseGraphicsResources(w);
   }
   if (this->MainPass)
   {
@@ -249,14 +247,6 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     this->BackgroundPass->SetDelegatePass(bgCamP);
   }
 
-  // bake reflection pass
-  vtkNew<vtkShadowMapBakerPass> shadowsBakeP;
-  vtkNew<vtkCameraPass> shadowsCamP;
-  shadowsCamP->SetDelegatePass(shadowsBakeP);
-  this->BakeShadowsPass = vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass>::New();
-  this->BakeShadowsPass->SetColorFormat(vtkTextureObject::Float16);
-  this->BakeShadowsPass->SetDelegatePass(shadowsBakeP);
-
   // main pass
 #if F3D_MODULE_RAYTRACING
   if (this->UseRaytracing)
@@ -339,6 +329,28 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     vtkNew<vtkCameraPass> camP;
     camP->SetDelegatePass(sequence);
 
+    vtkSmartPointer<vtkRenderPass> mainSequencePass = camP;
+
+    if (this->RenderShadows)
+    {
+      // shadows
+      const vtkNew<vtkShadowMapBakerPass> shadowBakeP;
+      shadowBakeP->SetDelegatePass(camP);
+
+      const vtkNew<vtkShadowMapPass> shadowP;
+      shadowP->SetDelegatePass(camP);
+      shadowP->SetShadowMapBakerPass(shadowBakeP);
+
+      vtkNew<vtkRenderPassCollection> collectionShadows;
+      collectionShadows->AddItem(shadowBakeP);
+      collectionShadows->AddItem(shadowP);
+
+      vtkNew<vtkSequencePass> sequenceShadows;
+      sequenceShadows->SetPasses(collectionShadows);
+
+      mainSequencePass = sequenceShadows;
+    }
+
     this->MainPass = vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass>::New();
     this->MainPass->SetColorFormat(vtkTextureObject::Float32);
 
@@ -354,7 +366,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     if (renderer && renderer->GetAntiAliasingMode() == vtkF3DRenderer::AntiAliasingMode::TAA)
     {
       vtkNew<vtkF3DTAAPass> taaP;
-      taaP->SetDelegatePass(camP);
+      taaP->SetDelegatePass(mainSequencePass);
 
       glRenderer->GetRenderWindow()->AddObserver(
         vtkCommand::WindowResizeEvent, taaP.Get(), &vtkF3DTAAPass::ResetIterations);
@@ -365,7 +377,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     }
     else
     {
-      this->MainPass->SetDelegatePass(camP);
+      this->MainPass->SetDelegatePass(mainSequencePass);
     }
 
     // reflection baking pass, same as main pass but with reflected camera
@@ -812,16 +824,6 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
         // restore camera and mark it dirty to ensure headlights are recomputed
         originalCam->Modified();
         r->SetActiveCamera(originalCam);
-      }
-
-      if (this->RenderShadows)
-      {
-        vtkRenderState shadowsState(s->GetRenderer());
-        shadowsState.SetPropArrayAndCount(
-          this->MainProps.data(), static_cast<int>(this->MainProps.size()));
-        shadowsState.SetFrameBuffer(s->GetFrameBuffer());
-
-        this->BakeShadowsPass->Render(&shadowsState);
       }
     }
 

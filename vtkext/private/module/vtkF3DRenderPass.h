@@ -91,7 +91,6 @@ protected:
 
   vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass> BackgroundPass;
   vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass> BakeReflectionPass;
-  vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass> BakeShadowsPass;
   vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass> MainPass;
   vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass> MainOnTopPass;
 
