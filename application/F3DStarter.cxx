@@ -2686,7 +2686,13 @@ void F3DStarter::LoadStatefile(const std::string& source)
     {
       // We cannot test dialogs in the CI
       // LCOV_EXCL_START
+#ifdef __APPLE__
+      // For some reason, tinyfiledialog requires public.json type identifier
+      // The prepended `*.` is stripped by tinyfiledialog on macOS
+      const char* pattern = "*.public.json";
+#else
       const char* pattern = "*.json";
+#endif
       const char* ptr =
         tinyfd_openFileDialog("Load Statefile", nullptr, 1, &pattern, "Statefiles", false);
       if (ptr)

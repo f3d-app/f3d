@@ -11,6 +11,7 @@ ClothSolver::ClothSolver()
 void ClothSolver::initialize()
 {
   this->CurrentTime = 0.f;
+  this->BuffersNeedUpdate = true;
 
   const float edgeLen = 2.0f / static_cast<float>(this->GridSize);
 

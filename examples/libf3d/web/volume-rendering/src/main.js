@@ -146,6 +146,7 @@ const viewer = document.getElementById("viewer");
 viewer.addEventListener("ready", () => {
   viewer.options = {
     "model.volume.enable": true,
+    "model.coloring": "scivis",
     "ui.scalar_bar": true,
   };
 

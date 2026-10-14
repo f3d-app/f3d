@@ -21,7 +21,7 @@
 class ClothMesh : public f3d::mesh_view
 {
 public:
-  explicit ClothMesh(const ClothSolver& solver)
+  explicit ClothMesh(ClothSolver& solver)
     : Solver(solver)
   {
   }
@@ -72,8 +72,24 @@ public:
     return view;
   }
 
+  /**
+   * Get buffers update status
+   */
+  bool buffersNeedUpdate() const override
+  {
+    return this->Solver.buffersNeedUpdate();
+  }
+
+  /**
+   * Mark buffers as updated
+   */
+  void buffersUpdated() override
+  {
+    this->Solver.buffersUpdated();
+  }
+
 private:
-  const ClothSolver& Solver;
+  ClothSolver& Solver;
 };
 
 int main(int argc, char** argv)

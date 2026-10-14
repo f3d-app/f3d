@@ -806,6 +806,27 @@ PYBIND11_MODULE(pyf3d, module)
       }
       throw std::domain_error("Tried to call pure virtual function getMemoryView");
     }
+
+    bool buffersNeedUpdate() const override
+    {
+      const py::gil_scoped_acquire gil;
+      const py::function fn = py::get_override(this, "buffers_need_update");
+      if (fn)
+      {
+        return fn().cast<bool>();
+      }
+      return false;
+    }
+
+    void buffersUpdated() override
+    {
+      const py::gil_scoped_acquire gil;
+      const py::function fn = py::get_override(this, "buffers_updated");
+      if (fn)
+      {
+        fn();
+      }
+    }
   };
 
   py::class_<f3d::mesh_view, PyMesh, py::smart_holder>(module, "MeshView")

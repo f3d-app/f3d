@@ -8,6 +8,16 @@ const f3d_memory_view_t* get_memory_view_callback(double time, void* opaque)
   return (const f3d_memory_view_t*)(opaque);
 }
 
+int buffers_need_update(void* opaque)
+{
+  return 1;
+}
+
+void buffers_updated(void* opaque)
+{
+  puts("[INFO] Buffers updated");
+}
+
 int test_scene_mesh_view()
 {
   f3d_engine_t* engine = f3d_engine_create(1); // offscreen
@@ -61,6 +71,8 @@ int test_scene_mesh_view()
   mesh_view.time_max = 0.0;
   mesh_view.get_memory_view = get_memory_view_callback;
   mesh_view.opaque = &view;
+  mesh_view.buffers_need_update = buffers_need_update;
+  mesh_view.buffers_updated = buffers_updated;
 
   if (f3d_scene_add_mesh_view(scene, &mesh_view) != 1)
   {
