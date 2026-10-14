@@ -331,11 +331,14 @@ void vtkF3DRenderer::Initialize()
   dpiChangedCallback->SetCallback(
     [](vtkObject* const, unsigned long, void* clientData, void* callData)
     {
+      // Unreachable in CI
+      // LCOV_EXCL_START
       vtkF3DRenderer* self = static_cast<vtkF3DRenderer*>(clientData);
       self->TextActorsConfigured = false;
       self->ConfigureTextActors();
       F3DLog::Print(
-        F3DLog::Severity::Info, "DPI changed to " + std::to_string(*static_cast<int*>(callData)));
+        F3DLog::Severity::Debug, "DPI changed to " + std::to_string(*static_cast<int*>(callData)));
+      // LCOV_EXCL_END
     });
   this->RenderWindow->AddObserver(vtkCommand::DPIChangedEvent, dpiChangedCallback);
 #endif
