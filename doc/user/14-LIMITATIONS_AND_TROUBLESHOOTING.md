@@ -122,7 +122,7 @@ If thumbnails still do not appear:
   - Click OK and confirm deletion.
 - Check that the file opens in F3D. A file that F3D cannot read cannot be thumbnailed by F3D.
 - For large files, edit the [thumbnail configuration](06-CONFIGURATION_FILE.md#locations) and raise `max-size`. The default thumbnail config sets it to `100` MiB.
-- It has been reported in [this issue](https://github.com/f3d-app/f3d/issues/3569) that UAC is required. Make sure it's enabled and reinstall F3D.
+- It has been reported in [this issue](https://github.com/f3d-app/f3d/issues/3569) that UAC may required. Try enabling it and reinstall F3D.
 
 > I want to stop F3D from generating thumbnails for a specific file type.
 
