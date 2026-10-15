@@ -131,6 +131,26 @@
       "enable": {
         "type": "bool",
         "default_value": "false"
+      },
+      "resolution": {
+        "type": "int",
+        "default_value": "1024",
+        "domain": {
+          "style": "range",
+          "min": "256",
+          "max": "4096",
+          "increment": "256"
+        }
+      },
+      "exponential_constant": {
+        "type": "double",
+        "default_value": "11.0",
+        "domain": {
+          "style": "range",
+          "min": "10.0",
+          "max": "80.0",
+          "increment": "1.0"
+        }
       }
     },
     "effect": {

@@ -335,6 +335,8 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     {
       // shadows
       const vtkNew<vtkShadowMapBakerPass> shadowBakeP;
+      shadowBakeP->SetExponentialConstant(this->ShadowExponentialConstant);
+      shadowBakeP->SetResolution(this->ShadowResolution);
       shadowBakeP->SetDelegatePass(camP);
 
       const vtkNew<vtkShadowMapPass> shadowP;

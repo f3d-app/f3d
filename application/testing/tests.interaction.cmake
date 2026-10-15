@@ -57,6 +57,9 @@ endif()
 # Test reflection strength change to validate shader recompilation
 f3d_test(NAME TestInteractionGridReflectionChanged DATA suzanne.ply ARGS -g INTERACTION UI) #Escape;"set render.grid.reflection=0.8";Escape
 
+# Test shadow change to validate shader recompilation
+f3d_test(NAME TestInteractionShadowsChanged DATA suzanne.ply ARGS -g --verbose INTERACTION UI) #Escape;"toggle render.shadows.enable";Escape
+
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12987
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
   f3d_test(NAME TestInteractionNotificationsAndSceneHierarchy DATA vtk-dasm-test.glb ARGS --notifications INTERACTION UI) #H;E

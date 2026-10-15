@@ -121,7 +121,7 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
     "  gl_FragData[0] = color;\n"
   );
 
-  if (true) // TODO
+  if (this->ShadowEnabled)
   {
     std::stringstream shadowCode;
     shadowCode << "  if (gl_FrontFacing)\n"
@@ -135,7 +135,7 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
 
     shadowCode << "    float shadowAlpha = clamp(max(max(lostLight.r, lostLight.g), lostLight.b), 0.0, 1.0);\n"
       "    color.rgb = color.a * color.rgb;\n"
-      "    color = color + vec4(0.0, 0.0, 0.0, shadowAlpha) * (1.0 - color.a);\n"
+      "    color.a += shadowAlpha * (1.0 - color.a);\n"
       "    if (color.a > 0.0001) color.rgb = color.rgb / color.a;\n"
       "  }\n";
 

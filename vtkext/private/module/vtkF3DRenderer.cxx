@@ -531,6 +531,8 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   newPass->SetRenderReflection(this->GridVisible && this->GridReflection > 0.0);
   newPass->SetXRMode(this->UseXR);
   newPass->SetRenderShadows(this->UseShadows);
+  newPass->SetShadowExponentialConstant(this->ShadowExponentialConstant);
+  newPass->SetShadowResolution(this->ShadowResolution);
 
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
@@ -838,6 +840,27 @@ void vtkF3DRenderer::SetShadows(bool use)
   {
     this->UseShadows = use;
     this->RenderPassesConfigured = false;
+    this->GridConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetShadowExponentialConstant(double constant)
+{
+  if (this->ShadowExponentialConstant != constant)
+  {
+    this->ShadowExponentialConstant = constant;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetShadowResolution(int resolution)
+{
+  if (this->ShadowResolution != resolution)
+  {
+    this->ShadowResolution = resolution;
+    this->RenderPassesConfigured = false;
   }
 }
 
@@ -951,6 +974,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       this->GridMapper->SetSubdivisions(this->GridSubdivisions);
       this->GridMapper->SetLineOpacity(this->GridOpacity);
       this->GridMapper->SetReflectionStrength(this->GridReflection);
+      this->GridMapper->SetShadowEnabled(this->UseShadows);
 
       if (this->GridAbsolute)
       {

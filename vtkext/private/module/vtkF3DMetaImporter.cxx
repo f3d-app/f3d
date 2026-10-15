@@ -628,9 +628,9 @@ bool vtkF3DMetaImporter::Update()
     // the first light is a headlight so it doesn't cast shadow, the key doesn't matter
     // the second light is the key light, that's the one that will cast shadows
     // the 3 last lights are minor lights, we don't want shadows for them
-    for (int i = 2; i < lights->GetNumberOfItems(); i++)
+    for (int i = offset + 2; i < lights->GetNumberOfItems(); i++)
     {
-      vtkLight* newLight = vtkLight::SafeDownCast(lights->GetItemAsObject(offset + i));
+      vtkLight* newLight = vtkLight::SafeDownCast(lights->GetItemAsObject(i));
       if (newLight)
       {
         vtkNew<vtkInformation> info;

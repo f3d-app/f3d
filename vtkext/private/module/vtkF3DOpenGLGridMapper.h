@@ -52,10 +52,16 @@ public:
    * Set the opacity of the lines
    */
   vtkSetMacro(LineOpacity, float);
+
   /**
    * Set the strength of the reflection
    */
   vtkSetMacro(ReflectionStrength, float);
+
+  /**
+   * Set whether shadows are enabled for the grid.
+   */
+  vtkSetMacro(ShadowEnabled, bool);
 
   //@{
   /**
@@ -96,6 +102,7 @@ protected:
   float LineOpacity = 1.0f;
   float ReflectionStrength = 0.0f;
   bool ShaderBuiltWithReflection = false;
+  bool ShadowEnabled = false;
   vtkSmartPointer<vtkTextureObject> ReflectionColorTexture;
   vtkSmartPointer<vtkTextureObject> ReflectionDepthTexture;
 };
