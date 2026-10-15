@@ -176,7 +176,7 @@ Once a release cycle:
 
 - Check that completions are still working with `fish` and `zsh` when tab is pressed
 - Check that F3D is added for extensions on a fresh Windows installation
-- Check that F3D binary on linux works on ubuntu with almost nothing installed (libosmesa6 should NOT install Xorg, check it)
+- Check that F3D binary on linux works on ubuntu with almost nothing installed
 
 ```
 docker run -it ubuntu:latest /bin/bash
