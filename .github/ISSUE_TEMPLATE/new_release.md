@@ -181,10 +181,10 @@ Once a release cycle:
 ```
 docker run -it ubuntu:latest /bin/bash
 apt update
-apt install wget xz-utils libosmesa6
+apt install wget xz-utils
 wget https://github.com/f3d-app/f3d/raw/refs/heads/master/testing/data/dragon.vtu
 wget https://github.com/f3d-app/f3d/releases/download/X.Y.Z/F3D-X.Y.Z-Linux-x86_64-raytracing.tar.xz
-tar -xzvf F3D-X.Y.Z-Linux-x86_64-raytracing.tar.xz
+tar -xvf F3D-X.Y.Z-Linux-x86_64-raytracing.tar.xz
 apt autoremove wget xz-utils
 ./F3D-X.Y.Z-Linux-x86_64-raytracing/bin/f3d dragon.vtu --output=img.png
 apt install catimg
