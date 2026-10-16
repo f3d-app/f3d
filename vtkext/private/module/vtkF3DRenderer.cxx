@@ -338,7 +338,7 @@ void vtkF3DRenderer::Initialize()
       self->ConfigureTextActors();
       F3DLog::Print(
         F3DLog::Severity::Debug, "DPI changed to " + std::to_string(*static_cast<int*>(callData)));
-      // LCOV_EXCL_END
+      // LCOV_EXCL_STOP
     });
   this->RenderWindow->AddObserver(vtkCommand::DPIChangedEvent, dpiChangedCallback);
 #endif
