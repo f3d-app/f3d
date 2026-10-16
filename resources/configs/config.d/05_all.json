@@ -15,7 +15,8 @@
       "animation-progress": "advanced",
       "remove-empty-file-groups": true,
       "dpi-aware": true,
-      "notifications": true
+      "notifications": true,
+      "shadows": true
     }
   }
 ]
