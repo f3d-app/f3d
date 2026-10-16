@@ -51,8 +51,8 @@ public class TestScene {
     } catch (IllegalArgumentException e) {
     }
 
-    String points = testDataPath + "data/points.ply";
-    byte[] pointsBuffer = Files.readAllBytes(new File(points).toPath());
+    String pointsPly = testDataPath + "data/points.ply";
+    byte[] pointsBuffer = Files.readAllBytes(new File(pointsPly).toPath());
     engine.getOptions().setAsString("scene.force_reader", "PLYReader");
     if (scene.supports(pointsBuffer) != Scene.FileAvailability.SUPPORTED) {
       throw new RuntimeException("a ply buffer should be supported");
