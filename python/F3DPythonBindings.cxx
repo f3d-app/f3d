@@ -886,7 +886,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("direction", &f3d::light_state_t::direction)
     .def_readwrite("positional_light", &f3d::light_state_t::positionalLight)
     .def_readwrite("intensity", &f3d::light_state_t::intensity)
-    .def_readwrite("switch_state", &f3d::light_state_t::switchState);
+    .def_readwrite("switch_state", &f3d::light_state_t::switchState)
+    .def_readwrite("cast_shadows", &f3d::light_state_t::castShadows);
 
   // f3d::file_availability
   py::enum_<f3d::file_availability>(module, "FileAvailability")
