@@ -106,7 +106,7 @@ static f3d::light_state_t JavaLightStateToCppLightState(JNIEnv* env, jobject jli
   jfieldID positionalLightField = env->GetFieldID(lightStateClass, "positionalLight", "Z");
   jfieldID intensityField = env->GetFieldID(lightStateClass, "intensity", "D");
   jfieldID switchStateField = env->GetFieldID(lightStateClass, "switchState", "Z");
-  jfieldID castShadowsField = env->GetFieldID(lightStateClass, "castShadows", "Z"); 
+  jfieldID castShadowsField = env->GetFieldID(lightStateClass, "castShadows", "Z");
 
   const JniLocalRef<jobject> jtype(env, env->GetObjectField(jlightState, typeField));
   const JniLocalRef<jclass> typeEnumClass(env, env->GetObjectClass(jtype));
