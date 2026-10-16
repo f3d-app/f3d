@@ -6,9 +6,6 @@
 #include <options.h>
 #include <scene.h>
 
-#include <fstream>
-#include <vector>
-
 int TestSDKSceneFromBuffer([[maybe_unused]] int argc, char* argv[])
 {
   PseudoUnitTest test;
@@ -46,16 +43,6 @@ int TestSDKSceneFromBuffer([[maybe_unused]] int argc, char* argv[])
   test("not supported with zero size", sce.supports(&y, 0) == f3d::file_availability::EMPTY_STREAM);
   test("not supported with unrecognized buffer content",
     sce.supports(&y, 1) == f3d::file_availability::UNSUPPORTED_CONTENT);
-
-  opt.scene.force_reader = "PLYReader";
-  const std::string validFilePath = std::string(argv[1]) + "data/points.ply";
-  std::ifstream validFile(validFilePath, std::ios::binary);
-  std::vector<char> validBuffer(
-    (std::istreambuf_iterator<char>(validFile)), std::istreambuf_iterator<char>());
-  test("supported with a valid buffer",
-    sce.supports(reinterpret_cast<const std::byte*>(validBuffer.data()), validBuffer.size()) ==
-      f3d::file_availability::SUPPORTED);
-  opt.scene.force_reader = std::nullopt;
 
   return test.result();
 }

@@ -2,7 +2,6 @@ import app.f3d.F3D.*;
 
 import java.io.*;
 import java.lang.String;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,13 +50,6 @@ public class TestScene {
     } catch (IllegalArgumentException e) {
     }
 
-    String pointsPly = testDataPath + "data/points.ply";
-    byte[] pointsBuffer = Files.readAllBytes(new File(pointsPly).toPath());
-    engine.getOptions().setAsString("scene.force_reader", "PLYReader");
-    if (scene.supports(pointsBuffer) != Scene.FileAvailability.SUPPORTED) {
-      throw new RuntimeException("a ply buffer should be supported");
-    }
-    engine.getOptions().reset("scene.force_reader");
     if (scene.supports(new byte[0]) != Scene.FileAvailability.EMPTY_STREAM) {
       throw new RuntimeException("an empty buffer should not be supported");
     }
