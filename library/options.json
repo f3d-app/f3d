@@ -99,6 +99,10 @@
       "reflection": {
         "type": "ratio",
         "default_value": "0.0"
+      },
+      "shadow": {
+        "type": "ratio",
+        "default_value": "0.4"
       }
     },
     "axes_grid": {

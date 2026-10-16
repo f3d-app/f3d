@@ -153,6 +153,7 @@ public:
   void SetGridColor(const std::vector<double>& color);
   void SetGridOpacity(const double strength);
   void SetGridReflection(const double strength);
+  void SetGridShadow(const double strength);
   void SetShadows(bool use);
   void SetShadowExponentialConstant(double constant);
   void SetShadowResolution(int resolution);
@@ -909,6 +910,7 @@ private:
   double GridColor[3] = { 0.0, 0.0, 0.0 };
   double GridOpacity = 1.0;
   double GridReflection = 0.0;
+  double GridShadow = 0.4;
   bool UseShadows = true;
   double ShadowExponentialConstant = 60.0;
   int ShadowResolution = 1024;

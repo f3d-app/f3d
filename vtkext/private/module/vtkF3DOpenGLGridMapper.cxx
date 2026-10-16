@@ -72,6 +72,7 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
     "uniform vec2 pixelSize;\n"
     "uniform float lineOpacity;\n"
     "//VTK::Reflection::Dec\n"
+    "//VTK::Shadow::Dec\n"
 
     "float antialias(float dist, float linewidth){\n"
     "  float aa = lineAntialias;\n"
@@ -90,6 +91,13 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
       "uniform sampler2D reflectionDepthTexture;\n"
       "uniform sampler2D reflectionColorTexture;\n"
       "uniform float reflectionStrength;\n"
+    );
+  }
+
+  if (this->ShadowStrength > 0.0)
+  {
+    vtkShaderProgram::Substitute(FSSource, "//VTK::Shadow::Dec",
+      "uniform float shadowStrength;\n"
     );
   }
 
@@ -121,7 +129,7 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
     "  gl_FragData[0] = color;\n"
   );
 
-  if (this->ShadowEnabled)
+  if (this->ShadowStrength > 0.0)
   {
     std::stringstream shadowCode;
     shadowCode << "  if (gl_FrontFacing)\n"
@@ -135,7 +143,7 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
 
     shadowCode << "    float shadowAlpha = clamp(max(max(lostLight.r, lostLight.g), lostLight.b), 0.0, 1.0);\n"
       "    color.rgb = color.a * color.rgb;\n"
-      "    color.a += shadowAlpha * (1.0 - color.a);\n"
+      "    color.a += shadowAlpha * shadowStrength * (1.0 - color.a);\n"
       "    if (color.a > 0.0001) color.rgb = color.rgb / color.a;\n"
       "  }\n";
 
@@ -247,6 +255,11 @@ void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
     const float pixelSize[2] = { 1.f / (viewportSize[0] * scaling),
       1.f / (viewportSize[1] * scaling) };
     cellBO.Program->SetUniform2f("pixelSize", pixelSize);
+  }
+
+  if (this->ShadowStrength > 0.0)
+  {
+    cellBO.Program->SetUniformf("shadowStrength", this->ShadowStrength);
   }
 }
 

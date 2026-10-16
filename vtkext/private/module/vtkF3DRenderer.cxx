@@ -834,6 +834,17 @@ void vtkF3DRenderer::SetGridReflection(const double strength)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetGridShadow(const double strength)
+{
+  if (this->GridShadow != strength)
+  {
+    this->GridShadow = strength;
+    this->GridConfigured = false;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetShadows(bool use)
 {
   if (this->UseShadows != use)
@@ -974,7 +985,8 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       this->GridMapper->SetSubdivisions(this->GridSubdivisions);
       this->GridMapper->SetLineOpacity(this->GridOpacity);
       this->GridMapper->SetReflectionStrength(this->GridReflection);
-      this->GridMapper->SetShadowEnabled(this->UseShadows);
+      this->GridMapper->SetReflectionStrength(this->GridReflection);
+      this->GridMapper->SetShadowStrength(this->UseShadows ? this->GridShadow : 0.0);
 
       if (this->GridAbsolute)
       {
