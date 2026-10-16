@@ -51,10 +51,13 @@ public class TestScene {
     } catch (IllegalArgumentException e) {
     }
 
-    byte[] sphereBuffer = Files.readAllBytes(new File(sphere).toPath());
-    if (scene.supports(sphereBuffer) != Scene.FileAvailability.SUPPORTED) {
-      throw new RuntimeException("a vtp buffer should be supported");
+    String points = testDataPath + "data/points.ply";
+    byte[] pointsBuffer = Files.readAllBytes(new File(points).toPath());
+    engine.getOptions().setAsString("scene.force_reader", "PLYReader");
+    if (scene.supports(pointsBuffer) != Scene.FileAvailability.SUPPORTED) {
+      throw new RuntimeException("a ply buffer should be supported");
     }
+    engine.getOptions().reset("scene.force_reader");
     if (scene.supports(new byte[0]) != Scene.FileAvailability.EMPTY_STREAM) {
       throw new RuntimeException("an empty buffer should not be supported");
     }
