@@ -910,7 +910,7 @@ private:
   double GridOpacity = 1.0;
   double GridReflection = 0.0;
   bool UseShadows = true;
-  double ShadowExponentialConstant = 11.0;
+  double ShadowExponentialConstant = 60.0;
   int ShadowResolution = 1024;
 
   double ColorAxisX[3] = { 0.0, 0.0, 0.0 };

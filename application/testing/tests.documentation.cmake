@@ -383,6 +383,11 @@ f3d_test_doc(NAME TestDocBlendingON DATA dragon.vtu REF_IMAGE blending_on.png RO
 f3d_test_doc(NAME TestDocAmbientOcclusionOFF DATA dragon.vtu REF_IMAGE ambient_occlusion_off.png ROTATE ARGS -f)
 f3d_test_doc(NAME TestDocAmbientOcclusionON DATA dragon.vtu REF_IMAGE ambient_occlusion_on.png ROTATE ARGS -f --ambient-occlusion)
 
+## --shadows
+### OFF: ambient_occlusion_off.png
+f3d_test_doc(NAME TestDocShadowsOFF DATA dragon.vtu REF_IMAGE shadows_off.png ROTATE ARGS -g)
+f3d_test_doc(NAME TestDocShadowsON DATA dragon.vtu REF_IMAGE shadows_on.png ROTATE ARGS -g --shadows)
+
 ## --anti-aliasing
 f3d_test_doc(NAME TestDocAntiAliasingOFF DATA dragon.vtu REF_IMAGE anti_aliasing_off.png ROTATE ARGS -f --anti-aliasing=none)
 f3d_test_doc(NAME TestDocAntiAliasingON DATA dragon.vtu REF_IMAGE anti_aliasing_on.png ROTATE ARGS -f --anti-aliasing=ssaa)

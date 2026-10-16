@@ -88,7 +88,7 @@ protected:
   bool RenderReflection = false;
   bool XRMode = false;
   bool RenderShadows = false;
-  double ShadowExponentialConstant = 11.0;
+  double ShadowExponentialConstant = 60.0;
   int ShadowResolution = 1024;
 
   double CircleOfConfusionRadius = 20.0;
