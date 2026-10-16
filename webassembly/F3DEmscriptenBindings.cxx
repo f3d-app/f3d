@@ -196,7 +196,8 @@ EMSCRIPTEN_BINDINGS(f3d)
     .property("direction", &f3d::light_state_t::direction)
     .property("positionalLight", &f3d::light_state_t::positionalLight)
     .property("intensity", &f3d::light_state_t::intensity)
-    .property("switchState", &f3d::light_state_t::switchState);
+    .property("switchState", &f3d::light_state_t::switchState)
+    .property("castShadows", &f3d::light_state_t::castShadows);
 
   emscripten::class_<f3d::mesh_t>("Mesh")
     .constructor<>()

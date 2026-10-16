@@ -39,6 +39,9 @@
 #include <vtkSequencePass.h>
 #include <vtkShaderProgram.h>
 #include <vtkShaderProperty.h>
+#include <vtkShadowMapBakerPass.h>
+#include <vtkShadowMapPass.h>
+
 #include <vtkSkybox.h>
 #include <vtkTextureObject.h>
 #include <vtkToneMappingPass.h>
@@ -326,6 +329,30 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     vtkNew<vtkCameraPass> camP;
     camP->SetDelegatePass(sequence);
 
+    vtkSmartPointer<vtkRenderPass> mainSequencePass = camP;
+
+    if (this->RenderShadows)
+    {
+      // shadows
+      const vtkNew<vtkShadowMapBakerPass> shadowBakeP;
+      shadowBakeP->SetExponentialConstant(this->ShadowExponentialConstant);
+      shadowBakeP->SetResolution(this->ShadowResolution);
+      shadowBakeP->SetDelegatePass(camP);
+
+      const vtkNew<vtkShadowMapPass> shadowP;
+      shadowP->SetDelegatePass(camP);
+      shadowP->SetShadowMapBakerPass(shadowBakeP);
+
+      vtkNew<vtkRenderPassCollection> collectionShadows;
+      collectionShadows->AddItem(shadowBakeP);
+      collectionShadows->AddItem(shadowP);
+
+      vtkNew<vtkSequencePass> sequenceShadows;
+      sequenceShadows->SetPasses(collectionShadows);
+
+      mainSequencePass = sequenceShadows;
+    }
+
     this->MainPass = vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass>::New();
     this->MainPass->SetColorFormat(vtkTextureObject::Float32);
 
@@ -341,7 +368,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     if (renderer && renderer->GetAntiAliasingMode() == vtkF3DRenderer::AntiAliasingMode::TAA)
     {
       vtkNew<vtkF3DTAAPass> taaP;
-      taaP->SetDelegatePass(camP);
+      taaP->SetDelegatePass(mainSequencePass);
 
       glRenderer->GetRenderWindow()->AddObserver(
         vtkCommand::WindowResizeEvent, taaP.Get(), &vtkF3DTAAPass::ResetIterations);
@@ -352,7 +379,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     }
     else
     {
-      this->MainPass->SetDelegatePass(camP);
+      this->MainPass->SetDelegatePass(mainSequencePass);
     }
 
     // reflection baking pass, same as main pass but with reflected camera

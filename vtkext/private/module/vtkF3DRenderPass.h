@@ -51,6 +51,9 @@ public:
   vtkSetMacro(CircleOfConfusionRadius, double);
   vtkSetMacro(RenderReflection, bool);
   vtkSetMacro(XRMode, bool);
+  vtkSetMacro(RenderShadows, bool);
+  vtkSetMacro(ShadowExponentialConstant, double);
+  vtkSetMacro(ShadowResolution, int);
 
   /**
    * Modify shader code for matcap/gamma/skinning
@@ -84,6 +87,9 @@ protected:
   bool ForceOpaqueBackground = false;
   bool RenderReflection = false;
   bool XRMode = false;
+  bool RenderShadows = false;
+  double ShadowExponentialConstant = 60.0;
+  int ShadowResolution = 1024;
 
   double CircleOfConfusionRadius = 20.0;
 

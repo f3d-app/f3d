@@ -99,6 +99,10 @@
       "reflection": {
         "type": "ratio",
         "default_value": "0.0"
+      },
+      "shadow": {
+        "type": "ratio",
+        "default_value": "0.4"
       }
     },
     "axes_grid": {
@@ -124,6 +128,32 @@
           "min": "1",
           "max": "50",
           "increment": "1"
+        }
+      }
+    },
+    "shadows": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "resolution": {
+        "type": "int",
+        "default_value": "1024",
+        "domain": {
+          "style": "range",
+          "min": "256",
+          "max": "4096",
+          "increment": "256"
+        }
+      },
+      "exponential_constant": {
+        "type": "double",
+        "default_value": "60.0",
+        "domain": {
+          "style": "range",
+          "min": "10.0",
+          "max": "200.0",
+          "increment": "5.0"
         }
       }
     },

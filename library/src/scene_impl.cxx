@@ -23,6 +23,7 @@
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkFloatArray.h>
+#include <vtkInformation.h>
 #include <vtkLightCollection.h>
 #include <vtkMemoryResourceStream.h>
 #include <vtkPointData.h>
@@ -30,6 +31,7 @@
 #include <vtkPolyData.h>
 #include <vtkProgressBarRepresentation.h>
 #include <vtkProgressBarWidget.h>
+#include <vtkShadowMapBakerPass.h>
 #include <vtkTimerLog.h>
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
@@ -899,6 +901,11 @@ int scene_impl::addLight(const light_state_t& lightState) const
     lightState.position[2] + lightState.direction[2]);
   newLight->SetIntensity(lightState.intensity);
   newLight->SetSwitch(lightState.switchState);
+
+  vtkNew<vtkInformation> lightInfo;
+  lightInfo->Set(vtkShadowMapBakerPass::CAST_SHADOWS(), lightState.castShadows ? 1 : 0);
+  newLight->SetInformation(lightInfo);
+
   this->Internals->Window.GetRenderer()->AddLight(newLight);
   return this->getLightCount() - 1;
 }
@@ -933,6 +940,13 @@ light_state_t scene_impl::getLight(int index) const
   lightState.positionalLight = light->GetPositional();
   lightState.intensity = light->GetIntensity();
   lightState.switchState = light->GetSwitch();
+
+  vtkInformation* lightInfo = light->GetInformation();
+  if (lightInfo && lightInfo->Has(vtkShadowMapBakerPass::CAST_SHADOWS()))
+  {
+    lightState.castShadows = lightInfo->Get(vtkShadowMapBakerPass::CAST_SHADOWS()) != 0;
+  }
+
   return lightState;
 }
 

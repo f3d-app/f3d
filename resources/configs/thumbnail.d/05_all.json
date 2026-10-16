@@ -8,7 +8,8 @@
       "no-background": true,
       "verbose": "quiet",
       "tone-mapping": true,
-      "blending": "ddp"
+      "blending": "ddp",
+      "shadows": true
     }
   }
 ]

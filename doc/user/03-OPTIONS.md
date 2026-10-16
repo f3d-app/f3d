@@ -1015,6 +1015,16 @@ Enable _ambient occlusion_. This is a technique used to improve the depth percep
 | ------------------------------------------------------------ | ---------------------------------------------------------- |
 | ![ambient occlusion off](./images/ambient_occlusion_off.png) | ![ambient occlusion on](./images/ambient_occlusion_on.png) |
 
+### `--shadows` (_bool_, default: `false`)
+
+Enable _shadows_. All lights from files cast shadows and only opaque objects are considered as occluder. Shadows are visible on the grid.
+
+#### compare
+
+| OFF                                      | ON                                     |
+| ---------------------------------------- | -------------------------------------- |
+| ![shadows off](./images/shadows_off.png) | ![shadows on](./images/shadows_on.png) |
+
 ### `-a`, `--anti-aliasing` (_string_, default: `none`, implicit: `fxaa`)
 
 Anti-aliasing method (`fxaa`: fast, `ssaa`: quality, `taa`: balanced, `none`: no anti aliasing)

@@ -415,6 +415,12 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250329)
   f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -t --anti-aliasing=ssaa)
 endif()
 
+## Shadows
+f3d_test(NAME TestShadows DATA suzanne.ply ARGS --shadows)
+f3d_test(NAME TestShadowsGrid DATA suzanne.ply ARGS --shadows -g)
+f3d_test(NAME TestShadowsGridLowRes DATA suzanne.ply ARGS --shadows -g -Drender.shadows.resolution=8)
+f3d_test(NAME TestShadowsGridLowExp DATA suzanne.ply ARGS --shadows -g -Drender.shadows.exponential_constant=1)
+
 ## Raytracing
 if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestRaytracingGLTF DATA WaterBottle.glb ARGS -rd --raytracing-samples=4)

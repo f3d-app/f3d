@@ -283,6 +283,7 @@ extern "C"
     int positional_light;
     double intensity;
     int switch_state;
+    int cast_shadows;
   } f3d_light_state_t;
 
   /**
