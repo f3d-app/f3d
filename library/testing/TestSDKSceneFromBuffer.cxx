@@ -35,5 +35,14 @@ int TestSDKSceneFromBuffer([[maybe_unused]] int argc, char* argv[])
   test.expect<f3d::scene::load_failure_exception>(
     "add buffer with reader that doesn't support streams", [&]() { sce.add(&y, 1); });
 
+  opt.scene.force_reader = std::nullopt;
+
+  // supports method
+  test("not supported with null buffer",
+    sce.supports(nullptr, 0) == f3d::file_availability::EMPTY_STREAM);
+  test("not supported with zero size", sce.supports(&y, 0) == f3d::file_availability::EMPTY_STREAM);
+  test("not supported with unrecognized buffer content",
+    sce.supports(&y, 1) == f3d::file_availability::UNSUPPORTED_CONTENT);
+
   return test.result();
 }

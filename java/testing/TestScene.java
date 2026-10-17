@@ -45,7 +45,16 @@ public class TestScene {
       }
     }
     try {
-      scene.supports(null);
+      scene.supports((String) null);
+      throw new RuntimeException("Expected IllegalArgumentException was not thrown");
+    } catch (IllegalArgumentException e) {
+    }
+
+    if (scene.supports(new byte[0]) != Scene.FileAvailability.EMPTY_STREAM) {
+      throw new RuntimeException("an empty buffer should not be supported");
+    }
+    try {
+      scene.supports((byte[]) null);
       throw new RuntimeException("Expected IllegalArgumentException was not thrown");
     } catch (IllegalArgumentException e) {
     }

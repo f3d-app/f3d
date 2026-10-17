@@ -87,6 +87,14 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
     )
 endif()
 
+# PLYReader only supports streams starting with this VTK version
+# Merge with TestSDKSceneFromBuffer.cxx when this VTK version is the minimum supported.
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
+  list(APPEND libf3dSDKTests_list
+    TestSDKSceneFromBufferSupported.cxx
+    )
+endif()
+
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20260828)
   list(APPEND libf3dSDKTests_list
     TestSDKBindingRepeat.cxx

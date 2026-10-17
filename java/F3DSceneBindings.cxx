@@ -466,4 +466,23 @@ extern "C"
       env->GetStaticMethodID(enumClass, "fromValue", "(I)Lapp/f3d/F3D/Scene$FileAvailability;");
     return env->CallStaticObjectMethod(enumClass, fromValueMethod, static_cast<int>(result));
   }
+
+  JNIEXPORT jobject JAVA_BIND(Scene, supportsBuffer)(JNIEnv* env, jobject self, jbyteArray buffer)
+  {
+    jsize bufferLen = env->GetArrayLength(buffer);
+    jbyte* bufferData = bufferLen > 0 ? env->GetByteArrayElements(buffer, nullptr) : nullptr;
+
+    f3d::file_availability result = GetEngine(env, self)->getScene().supports(
+      reinterpret_cast<std::byte*>(bufferData), static_cast<size_t>(bufferLen));
+
+    if (bufferData)
+    {
+      env->ReleaseByteArrayElements(buffer, bufferData, 0);
+    }
+
+    const JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Scene$FileAvailability"));
+    jmethodID fromValueMethod =
+      env->GetStaticMethodID(enumClass, "fromValue", "(I)Lapp/f3d/F3D/Scene$FileAvailability;");
+    return env->CallStaticObjectMethod(enumClass, fromValueMethod, static_cast<int>(result));
+  }
 }
