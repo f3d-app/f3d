@@ -44,7 +44,7 @@ that is definitely possible. Feel free to reach out for guidance by opening an i
 
 ## AI policy
 
-F3D has a dedicated [AI policy](AI_POLICY.md). If you are an AI user, make sure to read it and comply with it. If not, you are at risk of being banned.
+F3D is not an AI friendly project although AI can be used in dedicated tasks. Make sure to review our [AI policy](AI_POLICY.md) if you are a generative AI user and comply with it. If not, you are at risk of being banned.
 
 ## F3D development workflow
 
