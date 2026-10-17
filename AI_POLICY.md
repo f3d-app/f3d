@@ -49,7 +49,7 @@ As with any code that you write, the commit author should reflect that.
 You are expected to be able to answer any questions about what the code does and why it was written the way that it was.
 If not, you will be warned and then BANNED on repeated offenses.
 
-7. _I use AI to generate code, test, code comments, documentation or anything that is included in the contributed Git commits._
+7. _I use AI to generate parts of the code, test, code comments, documentation or anything that is included in the contributed Git commits._
 
 This is only authorized if you are a [returning contributor](doc/dev/12-MAINTAINERS_AND_CONTRIBUTORS.md).
 
@@ -61,7 +61,7 @@ Generated code will be considered to be written by you and under your own copyri
 You are expected to have reviewed and corrected the code thoroughly and should be able to answer any questions about
 what the code does and why it was written the way that it was. If not, you will be warned and then BANNED on repeated offenses.
 
-8. _I use agentic AI to generate my entire contributions, or I use agentic AI to generate pull requests and issues._
+8. _I use AI to generate my entire contributions, or I use agentic AI to generate pull requests and issues._
 
 This is NOT acceptable for any contributor, even if you review your code.
 If you do so, you will be warned and then BANNED on repeated offenses.
