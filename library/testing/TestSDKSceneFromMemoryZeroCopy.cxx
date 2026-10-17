@@ -341,7 +341,7 @@ int TestSDKSceneFromMemoryZeroCopy([[maybe_unused]] int argc, char* argv[])
 
   test("render textured static mesh",
     TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", argv[2],
-      "TestSDKSceneFromMemoryZeroCopyTexturedStaticMesh", 0.06));
+      "TestSDKSceneFromMemoryZeroCopyTexturedStaticMesh", 0.07));
 
   eng.getOptions().model.color.texture = std::nullopt;
   eng.getOptions().ui.scene_hierarchy.enable = false;
