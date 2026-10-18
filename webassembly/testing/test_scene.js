@@ -49,10 +49,7 @@ const settings = {
 
     const animation = scene.getAnimation();
 
-    utils.assert(
-      animation.count() == 10,
-      "There should be 10 animations",
-    );
+    utils.assert(animation.count() == 10, "There should be 10 animations");
 
     const [start, end] = animation.getTimeRange();
 
@@ -90,10 +87,7 @@ const settings = {
     utils.assert(animation.getName() == "stand", "getName returns name");
 
     // array comparison in JS is a little annoying so we just compare the 0th element
-    utils.assert(
-      animation.getNames()[0] == "stand",
-      "getNames returns names",
-    );
+    utils.assert(animation.getNames()[0] == "stand", "getNames returns names");
 
     const hierarchy = scene.getSceneHierarchy();
 
