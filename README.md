@@ -99,7 +99,8 @@ F3D is a community-driven, inclusive and beginner-friendly project. We love to s
   <img src="https://contrib.rocks/image?repo=f3d-app/f3d" />
 </a>
 
-Please note that F3D is not a AI friendly project although it can be used in specific case, please review carefully the [AI policy](AI_POLICY.md) if you use generative AI.
+Please note that F3D is not a AI friendly project in order to limit maintainer load.
+Note that it can be used in specific case, please review carefully the [AI policy](AI_POLICY.md) if you use generative AI.
 
 # Acknowledgments
 

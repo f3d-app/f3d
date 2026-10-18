@@ -13,14 +13,7 @@
 ### AI Disclosure
 
 - [ ] I have not used AI to generate any of the content of this pull request
-- [ ] I have used AI to generate code in this pull request:
-  - [ ] I have carefully read and understood the [AI policy](https://f3d.app/dev/AI_POLICY).
-  - [ ] I have used AI only as a smart auto-completer and reviewed each generated completion.
-  - [ ] I have used AI to generate complex part of the code or large part of comments, documentation or bindings, which I have carefully reviewed and completely understand every generated line.
-  - [ ] I have used AI to generate the whole contribution.
-  - [ ] I disclose below which parts of the code were generated and with which AI model:
-
-...
+- [ ] I have used AI to generate code in this pull request, understood the [AI policy](https://f3d.app/dev/AI_POLICY) and disclose usage below:
 
 ### Continuous integration
 

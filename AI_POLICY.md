@@ -37,8 +37,8 @@ This is acceptable and doesn't need to be disclosed as long as no AI code is cop
 
 6. _I use AI as a smart auto-completer in my IDE and review each generated auto-completed section before adding it._
 
-This must be disclosed in the pull request description, with details of which parts of the code were generated and
-which models were used. If you do not, you will be warned and the PR will be closed. You will be BANNED on repeated offenses.
+This must be disclosed in the pull request description, as well as which models were used.
+If you do not, you will be warned and the PR will be closed. You will be BANNED on repeated offenses.
 
 Generated code should be minimal and limited such as repeated boilerplate and other "dumb" code and should
 not concern complex algorithm or any "complex to review" code. You are expected to review and correct the auto-completed code as you write.
@@ -63,6 +63,6 @@ what the code does and why it was written the way that it was. If not, you will 
 
 8. _I use AI to generate my entire contributions, or I use agentic AI to generate pull requests and issues._
 
-This is NOT acceptable for any contributor, even if you review your code.
+This is NOT acceptable for any contributor, even if you review your code, because this is unsustainable for maintainers such code.
 If you do so, you will be warned and then BANNED on repeated offenses.
 You are not welcome in the F3D project.
