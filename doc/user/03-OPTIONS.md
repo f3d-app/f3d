@@ -239,6 +239,10 @@ Set the size of the _unit square_ for the grid. If not set (the default), F3D au
 | ---------------------------------------------------- | ---------------------------------------- |
 | ![grid unit default](./images/grid_unit_default.png) | ![grid unit 2](./images/grid_unit_2.png) |
 
+### `--grid-scale=<ratio>` (_ratio_, default: `1`, range: `[0, 10]`, increment: `0.1`)
+
+Scale the grid size derived from the model bounds. The default value of `1` preserves the automatically computed grid size.
+
 ### `--grid-subdivisions=<count>` (_int_, default: `10`)
 
 Set the number of subdivisions for the grid.

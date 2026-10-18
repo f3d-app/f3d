@@ -84,6 +84,16 @@
       "unit": {
         "type": "double"
       },
+      "scale": {
+        "type": "ratio",
+        "default_value": "1.0",
+        "domain": {
+          "style": "range",
+          "min": "0.0",
+          "max": "10.0",
+          "increment": "0.1"
+        }
+      },
       "subdivisions": {
         "type": "int",
         "default_value": "10"

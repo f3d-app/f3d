@@ -363,6 +363,12 @@ Set the size of the _unit square_ for the grid. Automatically computed by defaul
 
 CLI: `--grid-unit`.
 
+### `render.grid.scale` (_ratio_, default: `1.0`, range domain: `[0, 10]`, increment: `0.1`)
+
+Scale the grid size derived from the model bounds.
+
+CLI: `--grid-scale`.
+
 ### `render.grid.subdivisions` (_int_, default: `10`)
 
 Set the number of subdivisions for the grid.

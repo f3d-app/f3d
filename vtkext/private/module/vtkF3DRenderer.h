@@ -149,6 +149,7 @@ public:
   void SetDropZoneBinds(const std::vector<std::pair<std::string, std::string>>& dropZoneBinds);
   void SetGridAbsolute(bool absolute);
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
+  void SetGridScale(double scale);
   void SetGridSubdivisions(int subdivisions);
   void SetGridColor(const std::vector<double>& color);
   void SetGridOpacity(const double strength);
@@ -902,6 +903,7 @@ private:
   std::optional<double> PointSize;
   std::optional<double> LineWidth;
   std::optional<double> GridUnitSquare;
+  double GridScale = 1.0;
   int GridSubdivisions = 10;
   double GridColor[3] = { 0.0, 0.0, 0.0 };
   double GridOpacity = 1.0;

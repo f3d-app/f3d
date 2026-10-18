@@ -723,6 +723,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetDPIAware(opt.ui.dpi_aware);
 
   renderer->SetGridUnitSquare(opt.render.grid.unit);
+  renderer->SetGridScale(opt.render.grid.scale);
   renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
   renderer->SetGridAbsolute(opt.render.grid.absolute);
   renderer->SetGridOpacity(opt.render.grid.opacity);

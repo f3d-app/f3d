@@ -265,6 +265,11 @@
           "valueHelper": "<value>"
         },
         {
+          "longName": "grid-scale",
+          "helpText": "Scale the grid size derived from model bounds",
+          "valueHelper": "<ratio>"
+        },
+        {
           "longName": "grid-subdivisions",
           "helpText": "Number of grid subdivisions",
           "valueHelper": "<value>"
