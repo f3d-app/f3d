@@ -108,6 +108,33 @@ cd C:\path\to\f3d\bin\
 regsvr32 /u F3DShellExtension.dll
 ```
 
+> Thumbnails do not appear in File Explorer.
+
+Make sure F3D is registered as a thumbnail provider. If you used the `.exe` installer, rerun it and keep thumbnail support enabled. If you used the portable archive, register the shell extension manually from the [desktop integration page](12-DESKTOP_INTEGRATION.md#windows).
+
+If thumbnails still do not appear:
+
+- If the files are in a cloud-backed folder such as OneDrive, copy them to a local folder and check again.
+- Clear the Windows thumbnail cache, then let File Explorer generate the thumbnails again:
+  - Press <kbd>Win</kbd>+<kbd>R</kbd>, type `cleanmgr`, and press <kbd>Enter</kbd>.
+  - Select your Windows drive.
+  - Check Thumbnails.
+  - Click OK and confirm deletion.
+- Check that the file opens in F3D. A file that F3D cannot read cannot be thumbnailed by F3D.
+- For large files, edit the [thumbnail configuration](06-CONFIGURATION_FILE.md#locations) and raise `max-size`. The default thumbnail config sets it to `100` MiB.
+- It has been reported in [this issue](https://github.com/f3d-app/f3d/issues/3569) that UAC may required. Try enabling it and reinstall F3D.
+
+> I want to stop F3D from generating thumbnails for a specific file type.
+
+Windows file associations and thumbnail handlers are separate. Changing the default application for a file type does not necessarily change which thumbnail provider File Explorer uses.
+
+To stop F3D from generating thumbnails for a specific format:
+
+- Go to `C:\Program Files\F3D\share\f3d\plugins` folder.
+- Find the readers you want to disable in the JSON files.
+- Set the key `exclude_thumbnailer` to `true`.
+- Reboot
+
 > I use F3D in a VM, the application fails to launch.
 
 OpenGL applications like F3D can have issues on Windows Server or guest Windows because access to the GPU is restricted.

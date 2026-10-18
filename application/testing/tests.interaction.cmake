@@ -31,7 +31,7 @@ f3d_test(NAME TestInteractionTextureCheckerBoardTAA DATA WaterBottle.glb ARGS --
 f3d_test(NAME TestInteractionCycleVerbose DATA dragon.vtu ARGS --verbose -s NO_BASELINE INTERACTION REGEXP "Material") #SSSSYC
 f3d_test(NAME TestInteractionCycleVerboseLevelsUsingBinding DATA dragon.vtu ARGS --verbose=info NO_BASELINE INTERACTION REGEXP "Verbose level changed to: Debug") #Shift+V;Shift+V;Shift+V;Shift+V;Shift+V
 f3d_test(NAME TestInteractionVerboseLevelPreservedOnReload DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Material") #Shift+V;Shift+V;Shift+V;Shift+V;F5
-f3d_test(NAME TestInteractionLightIntensity DATA dragon.vtu INTERACTION LONG_TIMEOUT)
+f3d_test(NAME TestInteractionLightIntensity DATA dragon.vtu INTERACTION) # Shift + L * 50; L * 5
 f3d_test(NAME TestInteractionMultiFileColoring DATA mb/recursive ARGS -b --multi-file-mode=all INTERACTION) #SYY
 f3d_test(NAME TestInteractionOpacity DATA dragon.vtu INTERACTION) # Shift+P * 21; Ctrl+P * 5
 f3d_test(NAME TestInteractionReload DATA dragon.vtu ARGS -e INTERACTION) #F5;
