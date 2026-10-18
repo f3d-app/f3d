@@ -61,7 +61,7 @@ int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
   test("check first key frames", keyFrames[0], 0.0);
   test("check last key frames", keyFrames[8], 0.7999999999999999);
 
-anim.loadTime(0.0);
+  anim.loadTime(0.0);
   test("animationTime after loading start", sce.animationTime(), 0.0);
 
   anim.loadTime(0.5);

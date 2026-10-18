@@ -209,7 +209,7 @@ public:
   /**
    * Get the animation available on the scene.
    */
-[[nodiscard]] virtual animation& getAnimation() = 0;
+  [[nodiscard]] virtual animation& getAnimation() = 0;
 
   /**
    * Get current animation time of the loaded files.

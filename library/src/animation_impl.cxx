@@ -752,8 +752,8 @@ size_t animation_impl::GetCurrentFrame() const
   {
     return 0;
   }
-  return static_cast<size_t>((this->Internals->CurrentTime - this->Internals->TimeRange[0]) /
-    frameDuration);
+  return static_cast<size_t>(
+    (this->Internals->CurrentTime - this->Internals->TimeRange[0]) / frameDuration);
 }
 
 //----------------------------------------------------------------------------

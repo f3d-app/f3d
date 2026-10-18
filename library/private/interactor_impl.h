@@ -66,7 +66,7 @@ public:
   interactor& triggerKeyboardKey(InputAction action, std::string_view keySym) override;
   interactor& triggerTextCharacter(unsigned int codepoint) override;
 
-double getDeltaTime() const override;
+  double getDeltaTime() const override;
   interactor& jumpToFrame(int index) override;
   interactor& jumpToFrameRelative(int offset) override;
   interactor& jumpToKeyframe(int index) override;

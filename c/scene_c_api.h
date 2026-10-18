@@ -213,7 +213,7 @@ extern "C"
    * @param scene Scene handle.
    * @return Animation handle (not owned by caller).
    */
-F3D_EXPORT f3d_animation_t* f3d_scene_get_animation(f3d_scene_t* scene);
+  F3D_EXPORT f3d_animation_t* f3d_scene_get_animation(f3d_scene_t* scene);
 
   /**
    * @brief Get current animation time of the loaded files.

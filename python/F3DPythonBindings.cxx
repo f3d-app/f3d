@@ -499,7 +499,7 @@ PYBIND11_MODULE(pyf3d, module)
     .value("CTRL_SHIFT", f3d::interactor::InputModifier::CTRL_SHIFT)
     .export_values();
 
-interactor //
+  interactor //
     .def("get_delta_time", &f3d::interactor::getDeltaTime,
       "Returns the delta time used by the event loop")
     .def("jump_to_frame", &f3d::interactor::jumpToFrame, "Jump to a specific frame by index",

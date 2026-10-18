@@ -52,7 +52,7 @@ public:
   scene& setNodeVisibility(int nodeId, bool visible) override;
   scene_info_t getSceneInfo() const override;
   file_availability supports(const std::filesystem::path& filePath) override;
-animation& getAnimation() override;
+  animation& getAnimation() override;
   double animationTime() override;
   size_t animationFrame() override;
   ///@}
