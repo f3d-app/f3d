@@ -476,16 +476,4 @@ extern "C"
   {
     return static_cast<jlong>(GetEngine(env, self)->getScene().animationFrame());
   }
-
-  JNIEXPORT jobject JAVA_BIND(Scene, getAddedFiles)(JNIEnv* env, jobject self)
-  {
-    std::vector<std::filesystem::path> files = GetEngine(env, self)->getScene().getAddedFiles();
-    std::vector<std::string> fileStrings;
-    fileStrings.reserve(files.size());
-    for (const std::filesystem::path& file : files)
-    {
-      fileStrings.push_back(file.string());
-    }
-    return CreateStringList(env, fileStrings);
-  }
 }
