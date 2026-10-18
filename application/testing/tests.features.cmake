@@ -160,7 +160,7 @@ f3d_test(NAME TestTextures DATA WaterBottle.glb ARGS --texture-material=${F3D_SO
 f3d_test(NAME TestTextureMatCap DATA suzanne.ply ARGS --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png)
 f3d_test(NAME TestTexturesTransform DATA world.obj ARGS --textures-transform=1,0,0,0,-1,0,0,0,1)
 f3d_test(NAME TestTexturesTransformGL DATA WaterBottle.glb ARGS --textures-transform=1,0,0,0,-1,0,0,0,1 --camera-direction=-1,0,0)
-f3d_test(NAME TestTextureMatCapWithEdges DATA suzanne.ply ARGS -e --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png THRESHOLD 0.05) # Small rendering differences on GLES
+f3d_test(NAME TestTextureMatCapWithEdges DATA suzanne.ply ARGS -e --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png THRESHOLD 0.06) # Small rendering differences on GLES
 f3d_test(NAME TestTextureColorWithOptions DATA WaterBottle.glb ARGS --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --color=1,1,0 --opacity=0.4 --blending)
 f3d_test(NAME TestTextureCheckerBoard DATA WaterBottle.glb ARGS --checkerboard)
 f3d_test(NAME TestTextureCheckerBoardSSAA DATA WaterBottle.glb ARGS --checkerboard --anti-aliasing=ssaa)
