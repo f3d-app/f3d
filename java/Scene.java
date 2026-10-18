@@ -49,6 +49,7 @@ public class Scene {
 
     public Scene(long nativeAddress) {
         mNativeAddress = nativeAddress;
+        mAnimation = new Animation(mNativeAddress);
     }
 
     /**
@@ -59,17 +60,7 @@ public class Scene {
      */
     public native Scene add(String filePath);
 
-    /**
-     * Add and load multiple files into the scene.
-     *
-     * @param filePaths list of file paths to add
-     * @return this scene for method chaining
-     *
-     * @deprecated use `add(List<String> filePaths)` instead.
-     * This function will be private in 4.0
-     */
-    @Deprecated
-    public native Scene addAll(List<String> filePaths);
+    private native Scene addAll(List<String> filePaths);
 
     /**
      * Add and load multiple files into the scene.
@@ -82,17 +73,7 @@ public class Scene {
         return this.addAll(filePaths);
     }
 
-    /**
-     * Add and load a mesh into the scene.
-     *
-     * @param mesh mesh to add
-     * @return this scene for method chaining
-     *
-     * @deprecated use `add(Types.Mesh mesh)` instead.
-     * This function will be private in 4.0
-     */
-    @Deprecated
-    public native Scene addMesh(Types.Mesh mesh);
+    private native Scene addMesh(Types.Mesh mesh);
 
     /**
      * Add and load a mesh into the scene.
@@ -103,22 +84,6 @@ public class Scene {
     public Scene add(Types.Mesh mesh)
     {
         return this.addMesh(mesh);
-    }
-
-    /**
-     * Add and load a buffer containing a file into the scene.
-     *
-     * @param buffer Memory buffer to load
-     * @param size Size of memory buffer to load
-     * @return this scene for method chaining
-     *
-     * @deprecated use `add(byte[] buffer)` instead.
-     * This function will be removed in 4.0
-     */
-    @Deprecated
-    public Scene addBuffer(byte[] buffer, int size)
-    {
-        return this.addBuffer(buffer);
     }
 
     private native Scene addBuffer(byte[] buffer);
@@ -230,14 +195,6 @@ public class Scene {
     public native FileAvailability supports(String filePath);
 
     /**
-     * Load added files at provided time value if they contain any animation.
-     *
-     * @param timeValue time value to load
-     * @return this scene for method chaining
-     */
-    public native Scene loadAnimationTime(double timeValue);
-
-    /**
      * Get current animation time of the loaded files.
      *
      * @return current animation time
@@ -251,51 +208,8 @@ public class Scene {
      */
     public native long animationFrame();
 
-    /**
-     * Get animation time range of currently added files.
-     *
-     * @return array of 2 doubles [min_time, max_time]
-     */
-    public native double[] animationTimeRange();
-
-    /**
-     * Get animation keyframe's time of currently added files.
-     *
-     * @return list of double
-     */
-    public native double[] getAnimationKeyFrames();
-
-    /**
-     * Return the number of animations available in the currently loaded files.
-     *
-     * @return number of available animations
-     */
-    public native int availableAnimations();
-
-    /**
-     * Get the current animation name, if any.
-     *
-     * @return animation names or string error
-     */
-    public String getAnimationName() {
-        // note : -1 gets the current animation
-        return getAnimationName(-1);
-    }
-
-    /**
-     * Get the animation name of a given animation index, if any.
-     *
-     * @param index animation index, -1 for current animation
-     * @return animation name or string error
-     */
-    public native String getAnimationName(int index);
-
-    /**
-     * Get all of the animation names, if any.
-     *
-     * @return list of animation names
-     */
-    public native List<String> getAnimationNames();
+    public Animation getAnimation() { return mAnimation; }
 
     private long mNativeAddress;
+    private Animation mAnimation;
 }

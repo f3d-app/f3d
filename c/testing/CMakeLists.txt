@@ -1,4 +1,5 @@
 list(APPEND f3d_c_api_tests_list
+  test_animation.c
   test_camera.c
   test_context.c
   test_engine.c
@@ -29,6 +30,12 @@ endif()
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20251110)
   list(APPEND f3d_c_api_tests_list
     test_scene_mesh_view.c
+    )
+endif()
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  list(APPEND f3d_c_api_tests_list
+    test_image_stream.c
     )
 endif()
 

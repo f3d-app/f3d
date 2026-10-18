@@ -34,14 +34,14 @@ int TestF3DMetaImporterAnimation(int argc, char* argv[])
 
   // Read a OBJ to cover code paths for importers without animations support
   vtkNew<vtkOBJImporter> importerOBJ;
-  std::string filename = std::string(argv[1]) + "data/world.obj";
+  const std::string filename = std::string(argv[1]) + "data/world.obj";
   importerOBJ->SetFileName(filename.c_str());
-  std::string path = vtksys::SystemTools::GetFilenamePath(filename);
+  const std::string path = vtksys::SystemTools::GetFilenamePath(filename);
   importerOBJ->SetTexturePath(path.c_str());
   importer->AddImporter({ "foo", importerOBJ });
 
   vtkNew<vtkRenderWindow> window;
-  vtkNew<vtkRenderer> renderer;
+  const vtkNew<vtkRenderer> renderer;
   window->AddRenderer(renderer);
   importer->SetRenderWindow(window);
   importer->Update();

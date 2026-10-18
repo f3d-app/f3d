@@ -140,8 +140,8 @@ int TestSDKUtils([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   auto globMatchesText = [](std::string_view glob, const std::string& text,
                            char pathSeparator = '/') {
-    std::string regexPattern = f3d::utils::globToRegex(glob, pathSeparator);
-    std::regex regex(regexPattern);
+    const std::string regexPattern = f3d::utils::globToRegex(glob, pathSeparator);
+    const std::regex regex(regexPattern);
     return std::regex_match(text, regex);
   };
   test("globToRegex: exact match", globMatchesText("file.txt", "file.txt"));

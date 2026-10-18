@@ -17,16 +17,23 @@ This file is required because FFmpeg is pkg-config based and does not provide a 
 
 include(FindPackageHandleStandardArgs)
 
+set(_ffmpeg_lib_suffixes lib)
+if(MSVC)
+  list(PREPEND _ffmpeg_lib_suffixes bin)
+endif()
+
 find_path(FFmpeg_INCLUDE_DIR
   NAMES libavcodec/avcodec.h
 )
 
 find_library(FFmpeg_AVCODEC_LIBRARY
   NAMES avcodec libavcodec
+  PATH_SUFFIXES ${_ffmpeg_lib_suffixes}
 )
 
 find_library(FFmpeg_AVUTIL_LIBRARY
   NAMES avutil libavutil
+  PATH_SUFFIXES ${_ffmpeg_lib_suffixes}
 )
 
 find_package_handle_standard_args(FFmpeg

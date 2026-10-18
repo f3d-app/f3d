@@ -47,12 +47,14 @@ const settings = {
   runAfter: (Module) => {
     const scene = Module.engineInstance.getScene();
 
+    const animation = scene.getAnimation();
+
     utils.assert(
-      scene.availableAnimations() == 10,
-      "There should be a single animation",
+      animation.count() == 10,
+      "There should be 10 animations",
     );
 
-    const [start, end] = scene.animationTimeRange();
+    const [start, end] = animation.getTimeRange();
 
     utils.assert(start === 0, "Start value should be 0");
     utils.assert(
@@ -61,19 +63,19 @@ const settings = {
     );
 
     utils.assert(
-      scene.getAnimationKeyFrames().length === 9,
+      animation.getKeyFrames().length === 9,
       "KeyFrames length should be 9",
     );
     utils.assert(
-      scene.getAnimationKeyFrames()[0] === 0,
+      animation.getKeyFrames()[0] === 0,
       "First KeyFrame should be 0",
     );
     utils.assert(
-      scene.getAnimationKeyFrames()[8] === 0.7999999999999999,
+      animation.getKeyFrames()[8] === 0.7999999999999999,
       "First KeyFrame should be 0.7999999999999999",
     );
 
-    scene.loadAnimationTime(0.5);
+    animation.loadTime(0.5);
 
     utils.assert(
       scene.animationTime() === 0.5,
@@ -85,15 +87,12 @@ const settings = {
       "animationFrame should be 15 after loading 0.5",
     );
 
-    utils.assert(
-      scene.getAnimationName(-1) == "stand",
-      "getAnimationName returns name",
-    );
+    utils.assert(animation.getName() == "stand", "getName returns name");
 
     // array comparison in JS is a little annoying so we just compare the 0th element
     utils.assert(
-      scene.getAnimationNames()[0] == "stand",
-      "getAnimationNames returns names",
+      animation.getNames()[0] == "stand",
+      "getNames returns names",
     );
 
     const hierarchy = scene.getSceneHierarchy();
@@ -201,5 +200,5 @@ const settings = {
 utils.runRenderTest(settings, {
   data: "soldier_animations.mdl",
   extraData: ["invalid.mdl", "unsupportedFile.dummy"],
-  baseline: "TestWasmAnimation.png",
+  baseline: "TestWasmScene.png",
 });

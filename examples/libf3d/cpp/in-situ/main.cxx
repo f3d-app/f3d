@@ -21,12 +21,12 @@
 class ClothMesh : public f3d::mesh_view
 {
 public:
-  explicit ClothMesh(const ClothSolver& solver)
+  explicit ClothMesh(ClothSolver& solver)
     : Solver(solver)
   {
   }
 
-  std::array<double, 2> getTimeRange() const override
+  std::pair<double, double> getTimeRange() const override
   {
     return { 0.0, 10.0 };
   }
@@ -72,8 +72,24 @@ public:
     return view;
   }
 
+  /**
+   * Get buffers update status
+   */
+  bool buffersNeedUpdate() const override
+  {
+    return this->Solver.buffersNeedUpdate();
+  }
+
+  /**
+   * Mark buffers as updated
+   */
+  void buffersUpdated() override
+  {
+    this->Solver.buffersUpdated();
+  }
+
 private:
-  const ClothSolver& Solver;
+  ClothSolver& Solver;
 };
 
 int main(int argc, char** argv)
@@ -121,7 +137,7 @@ int main(int argc, char** argv)
     [&](const std::vector<std::string>&)
     {
       solver.initialize();
-      eng.getScene().loadAnimationTime(0.0);
+      eng.getScene().getAnimation().loadTime(0.0);
     },
     f3d::interactor::command_documentation_t{ "reset_simulation", "Reset simulation" });
 
@@ -164,22 +180,23 @@ int main(int argc, char** argv)
     f3d::interactor::command_documentation_t{ "set_cloth_iterations", "Set cloth iterations" });
 
   // Bindings
-  inter.addBinding(f3d::interaction_bind_t::parse("W"), "reset_simulation", "Simulation",
-    []() { return std::make_pair<std::string, std::string>("Reset simulation", ""); });
+  inter.addBinding({ f3d::interaction_bind_t::parse("W"), { "reset_simulation" }, "Simulation",
+    []() { return std::make_pair<std::string, std::string>("Reset simulation", ""); } });
 
-  inter.addBinding(f3d::interaction_bind_t::parse("N"),
-    { "set_cloth_resolution 10", "reset_simulation" }, "Simulation",
-    []() { return std::make_pair<std::string, std::string>("10x10", ""); });
+  inter.addBinding(
+    { f3d::interaction_bind_t::parse("N"), { "set_cloth_resolution 10", "reset_simulation" },
+      "Simulation", []() { return std::make_pair<std::string, std::string>("10x10", ""); } });
 
-  inter.addBinding(f3d::interaction_bind_t::parse("Shift+N"),
-    { "set_cloth_resolution 50", "reset_simulation" }, "Simulation",
-    []() { return std::make_pair<std::string, std::string>("50x50", ""); });
+  inter.addBinding(
+    { f3d::interaction_bind_t::parse("Shift+N"), { "set_cloth_resolution 50", "reset_simulation" },
+      "Simulation", []() { return std::make_pair<std::string, std::string>("50x50", ""); } });
 
-  inter.addBinding(f3d::interaction_bind_t::parse("I"), "set_cloth_iterations 10", "Simulation",
-    []() { return std::make_pair<std::string, std::string>("10 iterations", ""); });
+  inter.addBinding({ f3d::interaction_bind_t::parse("I"), { "set_cloth_iterations 10" },
+    "Simulation", []() { return std::make_pair<std::string, std::string>("10 iterations", ""); } });
 
-  inter.addBinding(f3d::interaction_bind_t::parse("O"), "set_cloth_iterations 100", "Simulation",
-    []() { return std::make_pair<std::string, std::string>("100 iterations", ""); });
+  inter.addBinding(
+    { f3d::interaction_bind_t::parse("O"), { "set_cloth_iterations 100" }, "Simulation",
+      []() { return std::make_pair<std::string, std::string>("100 iterations", ""); } });
 
   try
   {

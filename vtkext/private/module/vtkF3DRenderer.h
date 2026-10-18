@@ -85,6 +85,26 @@ public:
     CROSS
   };
 
+  /**
+   * Enum listing possible coloring modes.
+   */
+  enum class ColoringMode : unsigned char
+  {
+    MATERIAL,
+    SCIVIS,
+    DIRECT
+  };
+
+  /**
+   * Enum listing possible data fields modes.
+   */
+  enum class DataField : unsigned char
+  {
+    POINTS,
+    CELLS,
+    ANY
+  };
+
   ///@{
   /**
    * Set visibility of different actors
@@ -135,6 +155,7 @@ public:
   void SetGridReflection(const double strength);
   void SetAxesColor(const std::vector<double>& colorXAxis, const std::vector<double>& colorYAxis,
     const std::vector<double>& colorZAxis);
+  void SetSceneHierarchyMaxWidth(const int width);
   ///@}
 
   /**
@@ -196,9 +217,14 @@ public:
   void Render() override;
 
   /**
-   * Reimplemented to account for grid actor
+   * Reimplemented to account for grid actor and xr usage
    */
   void ResetCameraClippingRange() override;
+
+  /**
+   * Reset camera clipping range
+   */
+  void ResetCameraClippingRange(const double bounds[6]) override;
 
   /**
    * Set properties on each imported actors and also configure the coloring
@@ -259,6 +285,11 @@ public:
    * Set cache path, only used by the HDRI logic
    */
   void SetCachePath(const std::string& cachePath);
+
+  /**
+   * Set whether to use the cache or not.
+   */
+  void SetUseCache(bool useCache);
 
   /**
    * Set the roughness on all actors
@@ -428,10 +459,13 @@ public:
 
   ///@{
   /**
-   * Set/Get if coloring is enabled
+   * Set/Get the coloring mode (MATERIAL, SCIVIS, DIRECT)
    */
-  void SetEnableColoring(bool enable);
-  vtkGetMacro(EnableColoring, bool);
+  void SetColoring(ColoringMode mode);
+  inline ColoringMode GetColoring() const
+  {
+    return this->Coloring;
+  };
   ///@}
 
   /**
@@ -446,10 +480,13 @@ public:
 
   ///@{
   /**
-   * Set/Get if using point or cell data coloring
+   * Set/Get if using point or cell data coloring (or all)
    */
-  void SetUseCellColoring(bool useCell);
-  vtkGetMacro(UseCellColoring, bool);
+  void SetDataFieldForColoring(const DataField& dataField);
+  inline DataField GetDataFieldForColoring() const
+  {
+    return this->DataFieldForColoring;
+  }
   ///@}
 
   ///@{
@@ -457,15 +494,18 @@ public:
    * Set/Get the name of the array to use for coloring
    */
   void SetArrayNameForColoring(const std::optional<std::string>& arrayName);
-  std::optional<std::string> GetArrayNameForColoring();
+  std::optional<std::string> GetArrayNameForColoring() const;
   ///@}
 
   ///@{
   /**
    * Set/Get the name of the component to use for coloring
    */
-  void SetComponentForColoring(int component);
-  vtkGetMacro(ComponentForColoring, int);
+  void SetComponentForColoring(const std::optional<int>& component);
+  inline std::optional<int> GetComponentForColoring() const
+  {
+    return this->ComponentForColoring;
+  }
   ///@}
 
   /**
@@ -482,10 +522,9 @@ public:
   virtual std::string GetColoringDescription();
 
   /**
-   * Switch between point data and cell data coloring, actually setting UseCellColoring member.
-   * This can trigger CycleArrayForColoring if current array is not valid.
+   * Switch between coloring mode.
    */
-  void CycleFieldForColoring();
+  void CycleModeForColoring();
 
   /**
    * Cycle the current array for coloring, actually setting EnableColoring and ArrayNameForColoring
@@ -501,11 +540,20 @@ public:
   void CycleComponentForColoring();
 
   /**
-   * Convert a component index into a string
-   * If there is a component name defined in the current coloring information, display it.
+   * Return a string representation of the component index.
+   * If component is not set, returns "Magnitude"
+   * Otherwise if there is a component name defined in the current coloring information, display it.
    * Otherwise, use component #index as the default value.
    */
-  std::string ComponentToString(int component);
+  std::string ComponentToString();
+
+  /**
+   * Return a string representation of the array name for coloring.
+   * If array is not set, returns "OFF"
+   * Otherwise if there is an array name defined in the current coloring information, display it.
+   * Otherwise, use the array #index as the default value.
+   */
+  std::string ArrayToString();
 
   /**
    * Return true if the cheatsheet info is potentially
@@ -575,7 +623,7 @@ public:
   void SetAnimationProgressMode(vtkF3DUIActor::AnimationProgressBarMode mode);
 
   /**
-   * Set the time range, name and keyframe times of the current animation.
+   * Set the time range, name and key frame times of the current animation.
    * Meant to be pushed when the loaded animation changes.
    */
   void SetAnimationProgress(const std::pair<double, double>& timeRange, const std::string& name,
@@ -612,6 +660,11 @@ public:
    * Returns true if the frame was captured successfully, false otherwise.
    */
   bool CaptureVideoFrame(std::byte* yPlane, std::byte* uPlane, std::byte* vPlane);
+
+  /**
+   * Set XR mode
+   */
+  void SetXRMode(bool enable, bool showBbox = false);
 
 private:
   vtkF3DRenderer();
@@ -698,16 +751,18 @@ private:
    * Return true if mapper was configured for coloring, false otherwise.
    */
   static bool ConfigureMapperForColoring(vtkPolyDataMapper* mapper, const std::string& name,
-    int component, vtkColorTransferFunction* ctf, double range[2], bool cellFlag = false);
+    bool directColor, const std::optional<int>& component, vtkColorTransferFunction* ctf,
+    double range[2], bool cellFlag = false);
 
   /**
    * Convenience method for configuring a volume mapper and volume prop for coloring
    * Return true if they were configured for coloring, false otherwise.
    */
   static bool ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vtkVolume* volume,
-    const std::string& name, int component, vtkColorTransferFunction* ctf,
-    const std::vector<double>& opacityMap, double range[2], bool& opacityTransferFunctionConfigured,
-    bool cellFlag = false, bool inverseOpacityFlag = false);
+    const std::string& name, bool directColor, const std::optional<int>& component,
+    vtkColorTransferFunction* ctf, const std::vector<double>& opacityMap, double range[2],
+    bool& opacityTransferFunctionConfigured, bool cellFlag = false,
+    bool inverseOpacityFlag = false);
 
   /**
    * Configure opacity transfer function for volume rendering
@@ -718,8 +773,8 @@ private:
   /**
    * Convenience method for configuring a scalar bar actor for coloring
    */
-  void ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar, std::string arrayName,
-    int component, vtkColorTransferFunction* ctf);
+  void ConfigureScalarBarActorForColoring(
+    vtkScalarBarActor* scalarBar, std::string arrayName, vtkColorTransferFunction* ctf);
 
   /**
    * Configure internal range and color transfer function according to provided
@@ -751,6 +806,21 @@ private:
    * Updates the axis widget size based on the window size
    */
   void UpdateAxisWidgetSize();
+
+  /**
+   * Set whether the array used for coloring is cell data.
+   */
+  void SetArrayIsCellData(const std::optional<bool>& arrayIsCellData);
+
+  /**
+   * Create a camera-facing bounding box.
+   */
+  vtkBoundingBox CreateCameraFacingBoundingBox(vtkCamera* camera, double scale, double distance);
+
+  /**
+   * Align the scene to the given bounds.
+   */
+  void AlignSceneToBounds(const vtkBoundingBox& bounds);
 
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
   vtkSmartPointer<vtkCameraOrientationWidget> ModernAxisWidget;
@@ -792,6 +862,7 @@ private:
   bool HDRISphericalHarmonicsConfigured = false;
   bool HDRISpecularConfigured = false;
   bool HDRISkyboxConfigured = false;
+  bool XrBoundingBoxConfigured = false;
 
   bool GridVisible = false;
   bool GridAbsolute = false;
@@ -864,6 +935,7 @@ private:
   std::string GridInfo;
 
   std::string CachePath;
+  bool UseCache = true;
 
   std::optional<std::string> BackfaceType;
   std::optional<std::string> FinalShader;
@@ -907,10 +979,11 @@ private:
   bool ColorTransferFunctionConfigured = false;
   bool OpacityTransferFunctionConfigured = false;
 
-  bool EnableColoring = false;
-  bool UseCellColoring = false;
-  int ComponentForColoring = -1;
+  ColoringMode Coloring = ColoringMode::MATERIAL;
+  DataField DataFieldForColoring = DataField::ANY;
+  std::optional<int> ComponentForColoring;
   std::optional<std::string> ArrayNameForColoring;
+  std::optional<bool> ArrayIsCellData;
 
   bool ScalarBarVisible = false;
   bool UseNormalGlyphs = false;
@@ -931,6 +1004,9 @@ private:
   bool PointSpritesUseInstancing = false;
 
   std::optional<bool> Unlit;
+
+  bool UseXR = false;
+  vtkNew<vtkActor> XRBBoxActor;
 };
 
 #endif

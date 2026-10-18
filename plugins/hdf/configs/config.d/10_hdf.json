@@ -3,7 +3,7 @@
     "match-type": "glob",
     "match": "*.{exo,ex2,e,g,vtkhdf,nc,cdf,ncdf}",
     "options": {
-      "scalar-coloring": true,
+      "coloring-mode": "scivis",
       "load-plugins": "hdf",
       "coloring-scalar-bar": true
     }

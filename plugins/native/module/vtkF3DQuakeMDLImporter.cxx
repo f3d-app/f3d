@@ -222,9 +222,9 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     auto make_new_skin = [&](vtkNew<vtkImageData>& skin)
     {
       // check if all the data for this operation exists
-      uint64_t checkHeight = static_cast<uint64_t>(skinHeight) - 1;
-      uint64_t checkWidth = static_cast<uint64_t>(skinWidth) - 1;
-      uint64_t checkSize = static_cast<uint64_t>(offset) + (checkHeight * checkWidth);
+      const uint64_t checkHeight = static_cast<uint64_t>(skinHeight) - 1;
+      const uint64_t checkWidth = static_cast<uint64_t>(skinWidth) - 1;
+      const uint64_t checkSize = static_cast<uint64_t>(offset) + (checkHeight * checkWidth);
       if (skinHeight > 0 && skinWidth > 0 && (checkSize >= static_cast<uint64_t>(buffer.size())))
       {
         throw F3DRangeError("Skin dimensions out of bounds of file size");
@@ -256,11 +256,11 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         vtkWarningWithObjectMacro(
           this->Parent, "QuakeMDL.skin_index is out of bounds. Defaulting to 0.");
       }
-      int skinSize = skinWidth * skinHeight;
+      const int skinSize = skinWidth * skinHeight;
       int groupSkinCount = 0;
       for (unsigned int i = 0; i < nbSkins; i++)
       {
-        int skinGroup = *vtkInternals::ReadFromVector<int>(buffer, offset);
+        const int skinGroup = *vtkInternals::ReadFromVector<int>(buffer, offset);
         if (skinGroup == 0)
         {
           // Skip the skins that are not selected
@@ -274,7 +274,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         }
         else
         {
-          std::string skinAnimationName = "skin_" + std::to_string(groupSkinCount);
+          const std::string skinAnimationName = "skin_" + std::to_string(groupSkinCount);
           this->GroupSkinAnimationNames.emplace_back(skinAnimationName);
           auto nb = *vtkInternals::ReadFromVector<int>(buffer, offset);
           this->GroupSkins.emplace_back(nb);
@@ -344,7 +344,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         vertices->InsertPoint(i * 3 + j, xyz);
 
         // Normal vector
-        int normalIndex = frame->verts[vertexNum[j]].normalIndex;
+        const int normalIndex = frame->verts[vertexNum[j]].normalIndex;
         normals->SetTypedTuple(i * 3 + j, F3DMDLNormalVectors[normalIndex]);
       }
     }
@@ -462,7 +462,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
 #endif
       for (int i = 0; i < header->numTriangles; i++)
       {
-        for (int vertex : triangles[i].vertex)
+        for (const int vertex : triangles[i].vertex)
         {
           float coord_s = texcoords[vertex].coord_s;
           float coord_t = texcoords[vertex].coord_t;
@@ -519,14 +519,14 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       bool hasSingleFrameAnim = false;
       for (int frameNum = 0; frameNum < header->numFrames; frameNum++)
       {
-        plugin_frame_pointer pluginFramePtr = framePtr[frameNum];
+        const plugin_frame_pointer pluginFramePtr = framePtr[frameNum];
 
         if (*(pluginFramePtr.type) == SINGLE_FRAME)
         {
           // Recover pointer to the single frame
           const mdl_simpleframe_t* frame = pluginFramePtr.frames;
 
-          std::string animationName = extract_animation_name(frame->name);
+          const std::string animationName = extract_animation_name(frame->name);
           if (!hasSingleFrameAnim || animationName != this->AnimationNames[singleFrameAnimIdx])
           {
             // New animation, emplace it
@@ -544,7 +544,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           times.emplace_back(times.back() + 0.1);
 
           // Create the animation frame
-          vtkSmartPointer<vtkPolyData> mesh =
+          const vtkSmartPointer<vtkPolyData> mesh =
             this->CreateMeshForSimpleFrame(frame, header, triangles, cells, textureCoordinates);
           this->AnimationFrames[singleFrameAnimIdx].emplace_back(mesh);
         }
@@ -610,7 +610,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   {
     // Recover length of stream
     stream->Seek(0, vtkResourceStream::SeekDirection::End);
-    size_t length = stream->Tell();
+    const size_t length = stream->Tell();
     stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
 
     // Read stream into buffer
@@ -639,7 +639,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     }
 
     // Create animation frames
-    bool ret = this->CreateMesh(buffer, offset, header);
+    const bool ret = this->CreateMesh(buffer, offset, header);
     if (this->AnimationFrames.empty() || this->AnimationFrames.front().empty())
     {
       vtkErrorWithObjectMacro(
@@ -719,9 +719,9 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
 
     // Animation in AnimationFrames are mesh animations and at greater indices texture animations
     // are rendered
-    bool isMeshAnimation = this->Internals->ActiveAnimation <
+    const bool isMeshAnimation = this->Internals->ActiveAnimation <
       static_cast<vtkIdType>(this->Internals->AnimationNames.size());
-    size_t animIndex = isMeshAnimation
+    const size_t animIndex = isMeshAnimation
       ? this->Internals->ActiveAnimation
       : this->Internals->ActiveAnimation - this->Internals->AnimationNames.size();
     const std::vector<double>& times = isMeshAnimation
@@ -830,7 +830,7 @@ bool vtkF3DQuakeMDLImporter::CanReadFile(vtkResourceStream* stream)
   }
 
   // Read header into buffer
-  std::size_t headerSize = sizeof(vtkInternals::mdl_header_t);
+  const std::size_t headerSize = sizeof(vtkInternals::mdl_header_t);
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
   std::vector<uint8_t> buffer(headerSize);
   if (stream->Read(buffer.data(), headerSize) != headerSize)

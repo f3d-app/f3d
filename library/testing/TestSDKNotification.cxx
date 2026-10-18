@@ -14,10 +14,10 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
 {
   PseudoUnitTest test;
 
-  std::string dataPath = std::string(argv[1]) + "data/cow.vtp";
-  std::string baselinePath = std::string(argv[1]) + "baselines/";
-  std::string outputPath = std::string(argv[2]);
-  std::string renderingBackend = std::string(argv[4]);
+  const std::string dataPath = std::string(argv[1]) + "data/cow.vtp";
+  const std::string baselinePath = std::string(argv[1]) + "baselines/";
+  const std::string outputPath = std::string(argv[2]);
+  const std::string renderingBackend = std::string(argv[4]);
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
 
@@ -76,10 +76,12 @@ int TestSDKNotification([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
     return std::pair(doc, (value ? "ON" : "OFF"));
   };
 
-  inter.addBinding({ f3d::interaction_bind_t::ModifierKeys::ANY, "Exclam" },
-    "toggle ui.notifications.show_bindings", "Custom",
-    std::bind(docTgl, "Show Bind Keys", std::cref(opt.ui.notifications.show_bindings)),
-    f3d::interactor::BindingType::TOGGLE);
+  inter.addBinding({ .Bind = { f3d::interaction_bind_t::ModifierKeys::ANY, "Exclam" },
+    .Commands = { "toggle ui.notifications.show_bindings" },
+    .Group = "Custom",
+    .DocCallback =
+      std::bind(docTgl, "Show Bind Keys", std::cref(opt.ui.notifications.show_bindings)),
+    .Type = f3d::interactor::BindingType::TOGGLE });
 
   inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "Exclam");
   inter.triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "Exclam");

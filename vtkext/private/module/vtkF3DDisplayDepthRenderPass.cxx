@@ -27,8 +27,8 @@ void vtkF3DDisplayDepthRenderPass::Render(const vtkRenderState* state)
   vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(renderer->GetRenderWindow());
   vtkOpenGLState* ostate = renWin->GetState();
 
-  vtkOpenGLState::ScopedglEnableDisable bsaver(ostate, GL_BLEND);
-  vtkOpenGLState::ScopedglEnableDisable dsaver(ostate, GL_DEPTH_TEST);
+  const vtkOpenGLState::ScopedglEnableDisable bsaver(ostate, GL_BLEND);
+  const vtkOpenGLState::ScopedglEnableDisable dsaver(ostate, GL_DEPTH_TEST);
 
   assert(this->DelegatePass != nullptr);
 

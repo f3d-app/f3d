@@ -1,9 +1,11 @@
 #include "vtkF3DPolyDataMapper.h"
 
 #include "F3DLog.h"
+#include "vtkF3DRenderer.h"
 
 #include <vtkActor.h>
 #include <vtkDoubleArray.h>
+#include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLRenderWindow.h>
@@ -18,11 +20,65 @@
 #include <vtkShaderProperty.h>
 #include <vtkTexture.h>
 #include <vtkUniforms.h>
+#include <vtkUnsignedCharArray.h>
 #include <vtkVersion.h>
 
+#include <cmath>
 #include <regex>
 
 vtkStandardNewMacro(vtkF3DPolyDataMapper);
+
+//-----------------------------------------------------------------------------
+void vtkF3DPolyDataMapper::SetUseLinearColorSpace(bool use)
+{
+  if (this->UseLinearColorSpace != use)
+  {
+    this->UseLinearColorSpace = use;
+    this->ClearColorArrays();
+    this->LinearColorTextureScalars = nullptr;
+    this->Modified();
+  }
+}
+
+//-----------------------------------------------------------------------------
+vtkUnsignedCharArray* vtkF3DPolyDataMapper::MapScalars(
+  vtkDataSet* input, double alpha, int& cellFlag)
+{
+  // Populates the vtkMapper::Colors with gamma corrected sRGB.
+  this->Superclass::MapScalars(input, alpha, cellFlag);
+  if (!this->UseLinearColorSpace)
+  {
+    return this->Colors;
+  }
+
+  if (this->ColorTextureMap &&
+    this->ColorTextureMap->GetPointData()->GetScalars() != this->LinearColorTextureScalars)
+  {
+    const vtkUnsignedCharArray* source =
+      vtkUnsignedCharArray::SafeDownCast(this->ColorTextureMap->GetPointData()->GetScalars());
+    const vtkIdType numberOfTuples = source->GetNumberOfTuples();
+    this->LinearColorTextureScalars = vtkSmartPointer<vtkUnsignedCharArray>::New();
+    this->LinearColorTextureScalars->SetNumberOfComponents(4);
+    this->LinearColorTextureScalars->SetNumberOfTuples(numberOfTuples);
+    for (vtkIdType i = 0; i < numberOfTuples; ++i)
+    {
+      for (int component = 0; component < 4; ++component)
+      {
+        const unsigned char value = source->GetTypedComponent(i, component);
+        // Approx. color components converted to linear except alpha channel.
+        this->LinearColorTextureScalars->SetTypedComponent(i, component,
+          component < 3 ? static_cast<unsigned char>(std::pow(value / 255.0, 2.2) * 255.0) : value);
+      }
+    }
+    this->ColorTextureMap->GetPointData()->SetScalars(this->LinearColorTextureScalars);
+  }
+  else if (!this->ColorTextureMap)
+  {
+    this->LinearColorTextureScalars = nullptr;
+  }
+
+  return this->Colors;
+}
 
 //-----------------------------------------------------------------------------
 void vtkF3DPolyDataMapper::ReplaceShaderValues(
@@ -31,10 +87,10 @@ void vtkF3DPolyDataMapper::ReplaceShaderValues(
   this->Superclass::ReplaceShaderValues(shaders, ren, actor);
 
   vtkUniforms* uniforms = actor->GetShaderProperty()->GetVertexCustomUniforms();
-  vtkUniforms::TupleType type = uniforms->GetUniformTupleType("jointMatrices");
+  const vtkUniforms::TupleType type = uniforms->GetUniformTupleType("jointMatrices");
   if (type != vtkUniforms::TupleTypeInvalid)
   {
-    int nbJoints = uniforms->GetUniformNumberOfTuples("jointMatrices");
+    const int nbJoints = uniforms->GetUniformNumberOfTuples("jointMatrices");
 
     // The number of uniform values required by OpenGL is 4096
     // Since a mat4 is 16 values, it means we can only support 256 bones
@@ -56,7 +112,7 @@ void vtkF3DPolyDataMapper::ReplaceShaderValues(
         auto vertexShader = shaders[vtkShader::Vertex];
         auto VSSource = vertexShader->GetSource();
 
-        std::regex regex("uniform mat4 jointMatrices\\[[0-9]+\\];");
+        const std::regex regex("uniform mat4 jointMatrices\\[[0-9]+\\];");
         VSSource = std::regex_replace(VSSource, regex,
           "layout(std430, binding = 0) buffer JointMatrices { mat4 jointMatrices[]; };");
 
@@ -67,7 +123,7 @@ void vtkF3DPolyDataMapper::ReplaceShaderValues(
       }
       else
       {
-        std::string msg = "A mesh is associated with more than 250 bones (" +
+        const std::string msg = "A mesh is associated with more than 250 bones (" +
           std::to_string(nbJoints) + "), which requires OpenGL >= 4.3";
         F3DLog::Print(F3DLog::Severity::Warning, msg);
 
@@ -145,3 +201,22 @@ void vtkF3DPolyDataMapper::ReplaceShaderLight(
 
   this->Superclass::ReplaceShaderLight(shaders, ren, actor);
 }
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20260730)
+//-----------------------------------------------------------------------------
+bool vtkF3DPolyDataMapper::FragmentShaderUsesPrimitiveID(vtkRenderer* renderer, vtkActor* actor)
+{
+  bool usesPrimitiveID = this->Superclass::FragmentShaderUsesPrimitiveID(renderer, actor);
+
+  // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13207
+  // Enable Mesa workaround when using Stochastic blending because it uses gl_PrimitiveID
+  // see vtkext/private/module/vtkF3DStochasticTransparentPass.cxx
+  const vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renderer);
+  if (ren)
+  {
+    usesPrimitiveID =
+      usesPrimitiveID || ren->GetBlendingMode() == vtkF3DRenderer::BlendingMode::STOCHASTIC;
+  }
+  return usesPrimitiveID;
+}
+#endif

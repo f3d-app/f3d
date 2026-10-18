@@ -1,5 +1,6 @@
 #include "engine.h"
 
+#include "animation_impl.h"
 #include "config.h"
 #include "factory.h"
 #include "init.h"
@@ -10,6 +11,7 @@
 #include "utils.h"
 #include "window_impl.h"
 
+#include "F3DUtils.h"
 #include "vtkF3DNoRenderWindow.h"
 
 #include <vtkVersion.h>
@@ -22,10 +24,6 @@
 #include <vtksys/SystemTools.hxx>
 
 #include <nlohmann/json.hpp>
-
-#if F3D_MODULE_CLIP
-#include "clip/clip.h"
-#endif
 
 #include <algorithm>
 #include <fstream>
@@ -144,8 +142,16 @@ engine::engine(const std::optional<window::Type>& windowType, bool offscreen,
 
   this->Internals->Options = std::make_unique<options>();
 
-  this->Internals->Window = std::make_unique<detail::window_impl>(
-    *this->Internals->Options, windowType, offscreen, loader, id);
+  try
+  {
+    this->Internals->Window = std::make_unique<detail::window_impl>(
+      *this->Internals->Options, windowType, offscreen, loader, id);
+  }
+  catch (const engine::no_window_exception& ex)
+  {
+    delete this->Internals;
+    throw ex;
+  }
 
   if (!cachePath.empty())
   {
@@ -159,8 +165,9 @@ engine::engine(const std::optional<window::Type>& windowType, bool offscreen,
   // Do not create an interactor for NONE
   if (windowType != window::Type::NONE)
   {
-    this->Internals->Interactor = std::make_unique<detail::interactor_impl>(
-      *this->Internals->Options, *this->Internals->Window, *this->Internals->Scene);
+    this->Internals->Interactor =
+      std::make_unique<detail::interactor_impl>(*this->Internals->Options, *this->Internals->Window,
+        *this->Internals->Scene, this->Internals->Scene->GetAnimationImpl());
   }
 
 #ifdef __EMSCRIPTEN__
@@ -210,6 +217,12 @@ engine engine::createEGL()
 engine engine::createOSMesa()
 {
   return { window::Type::OSMESA, true, context::osmesa() };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createXR()
+{
+  return { window::Type::XR, false, nullptr };
 }
 
 //----------------------------------------------------------------------------
@@ -392,23 +405,13 @@ engine::state engine::state::fromClipboard()
 {
 #if F3D_MODULE_CLIP
   std::string content;
-  try
+  if (!F3DUtils::GetFromClipboard(content))
   {
-    if (!clip::get_text(content))
-    {
-      // Cannot test clipboard failure in the CI
-      // LCOV_EXCL_START
-      throw engine::statefile_exception("Could not read a state from the clipboard");
-      // LCOV_EXCL_STOP
-    }
+    // Cannot test clipboard failure in the CI
+    // LCOV_EXCL_START
+    throw engine::statefile_exception("Could not read a state from the clipboard");
+    // LCOV_EXCL_STOP
   }
-  // Cannot test clipboard failure in the CI
-  // LCOV_EXCL_START
-  catch (const clip::clip_exception& ex)
-  {
-    throw engine::statefile_exception(std::string("Could not use clip: ") + ex.what());
-  }
-  // LCOV_EXCL_STOP
   return engine::state::fromString(content);
 #else
   throw engine::statefile_exception(
@@ -448,21 +451,11 @@ void engine::state::toFile(const fs::path& filePath) const
 void engine::state::toClipboard() const
 {
 #if F3D_MODULE_CLIP
-  try
-  {
-    if (!clip::set_text(this->Content))
-    {
-      // Cannot test clipboard failure in the CI
-      // LCOV_EXCL_START
-      throw engine::statefile_exception("Could not copy the state to the clipboard");
-      // LCOV_EXCL_STOP
-    }
-  }
-  catch (const clip::clip_exception& ex)
+  if (!F3DUtils::CopyToClipboard(this->Content))
   {
     // Cannot test clipboard failure in the CI
     // LCOV_EXCL_START
-    throw engine::statefile_exception(std::string("Could not use clip: ") + ex.what());
+    throw engine::statefile_exception("Could not copy the state to the clipboard");
     // LCOV_EXCL_STOP
   }
 
@@ -498,6 +491,7 @@ std::map<std::string, bool> engine::getRenderingBackendList()
   backends["cocoa"] = engine::internals::BackendAvailable(context::cocoa);
   backends["egl"] = engine::internals::BackendAvailable(context::egl);
   backends["osmesa"] = engine::internals::BackendAvailable(context::osmesa);
+  backends["xr"] = engine::internals::BackendAvailable(context::xr);
 
   return backends;
 }
@@ -508,13 +502,6 @@ void engine::loadPlugin(const std::string& pathOrName, const std::vector<fs::pat
   if (pathOrName.empty())
   {
     return;
-  }
-
-  // For easier removal when removing deprecation: F3D_DEPRECATED
-  if (pathOrName == "exodus")
-  {
-    f3d::log::warn("The 'exodus' plugin is deprecated, load 'hdf' instead");
-    return f3d::engine::loadPlugin("hdf", searchPaths);
   }
 
   std::string pluginOrigin = "static";
@@ -537,7 +524,7 @@ void engine::loadPlugin(const std::string& pathOrName, const std::vector<fs::pat
     vtksys::DynamicLoader::LibraryHandle handle = nullptr;
     try
     {
-      fs::path fullPath = utils::collapsePath(pathOrName);
+      const fs::path fullPath = utils::collapsePath(pathOrName);
       if (fs::exists(fullPath))
       {
         // plugin provided as full path
@@ -721,11 +708,11 @@ engine::libInformation engine::getLibInfo()
   libInfo.Modules["FFmpeg"] = false;
 #endif
 
-  std::string vtkVersion = std::string(vtkVersion::GetVTKVersionFull());
+  const std::string vtkVersion = std::string(vtkVersion::GetVTKVersionFull());
   if (!vtkVersion.empty())
   {
     libInfo.VTKVersion = vtkVersion;
-    std::string date = std::to_string(vtkVersion::GetVTKBuildVersion());
+    const std::string date = std::to_string(vtkVersion::GetVTKBuildVersion());
     if (date.size() == 8)
     {
       libInfo.VTKVersion += std::string(" (date: ") + date + ")";
@@ -738,7 +725,7 @@ engine::libInformation engine::getLibInfo()
 
   libInfo.Copyrights.emplace_back("2019-2021 Kitware SAS");
   libInfo.Copyrights.emplace_back("2021-2025 Michael Migliore, Mathieu Westphal");
-  libInfo.Copyrights.emplace_back("2025 F3D-APP Foundation");
+  libInfo.Copyrights.emplace_back("2025-2026 F3D-APP Foundation");
   libInfo.License = "BSD-3-Clause";
 
   return libInfo;
@@ -782,6 +769,19 @@ fs::path engine::getCachePath() const
 }
 
 //----------------------------------------------------------------------------
+engine& engine::setResourcesPath(const fs::path& resourcesPath)
+{
+  this->Internals->Window->SetResourcesPath(resourcesPath);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+fs::path engine::getResourcesPath() const
+{
+  return this->Internals->Window->GetResourcesPath();
+}
+
+//----------------------------------------------------------------------------
 engine::no_window_exception::no_window_exception(const std::string& what)
   : exception(what)
 {
@@ -807,6 +807,12 @@ engine::cache_exception::cache_exception(const std::string& what)
 
 //----------------------------------------------------------------------------
 engine::statefile_exception::statefile_exception(const std::string& what)
+  : exception(what)
+{
+}
+
+//----------------------------------------------------------------------------
+engine::resource_exception::resource_exception(const std::string& what)
   : exception(what)
 {
 }

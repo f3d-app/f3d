@@ -8,6 +8,8 @@
 
 #include <iostream>
 
+namespace
+{
 class ErrorEventCallback : public vtkCommand
 {
 public:
@@ -19,7 +21,7 @@ public:
   void Execute(vtkObject* caller, unsigned long vtkNotUsed(evId), void* data) override
   {
     const vtkF3DAlembicReader* reader = reinterpret_cast<vtkF3DAlembicReader*>(caller);
-    char* message = static_cast<char*>(data);
+    const char* message = static_cast<char*>(data);
     if (reader && message)
     {
       this->Messages.emplace_back(message);
@@ -34,13 +36,14 @@ public:
 private:
   std::vector<std::string> Messages;
 };
+}
 
 int TestF3DAlembicReaderStreamError(int vtkNotUsed(argc), char* argv[])
 {
-  vtkNew<ErrorEventCallback> errorEventCallback;
-  vtkNew<vtkCallbackCommand> nullEventCallback;
+  vtkNew<::ErrorEventCallback> errorEventCallback;
+  const vtkNew<vtkCallbackCommand> nullEventCallback;
 
-  std::string filename = std::string(argv[1]) + "data/invalid.abc";
+  const std::string filename = std::string(argv[1]) + "data/invalid.abc";
 
   vtkNew<vtkFileResourceStream> fileStream;
   fileStream->Open(filename.c_str());
@@ -66,7 +69,7 @@ int TestF3DAlembicReaderStreamError(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  auto firstMessage = errorMessages.front();
+  const auto& firstMessage = errorMessages.front();
   if (firstMessage.find("Error reading stream") == std::string::npos)
   {
     std::cerr << "No stream error triggered!\n";

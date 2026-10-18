@@ -57,11 +57,11 @@ bool SubdivideOnce(vtkPolyData* input, vtkPolyData* output)
 {
   vtkPoints* inPoints = input->GetPoints();
   vtkCellArray* inPolys = input->GetPolys();
-  vtkIdType numPts = inPoints->GetNumberOfPoints();
-  vtkIdType numFaces = inPolys->GetNumberOfCells();
+  const vtkIdType numPts = inPoints->GetNumberOfPoints();
+  const vtkIdType numFaces = inPolys->GetNumberOfCells();
 
   vtkIdType cellSize = -1;
-  vtkIdType const* cellPoints = nullptr;
+  const vtkIdType* cellPoints = nullptr;
 
   // face point: average of the vertices of each face
   std::vector<Point3> facePoints(numFaces, Point3{ 0.0, 0.0, 0.0 });
@@ -88,8 +88,8 @@ bool SubdivideOnce(vtkPolyData* input, vtkPolyData* output)
     inPolys->GetCellAtId(faceId, cellSize, cellPoints);
     for (vtkIdType vertexId = 0; vertexId < cellSize; vertexId++)
     {
-      vtkIdType v0 = cellPoints[vertexId];
-      vtkIdType v1 = cellPoints[(vertexId + 1) % cellSize];
+      const vtkIdType v0 = cellPoints[vertexId];
+      const vtkIdType v1 = cellPoints[(vertexId + 1) % cellSize];
       EdgeInfo& info = edges[MakeEdgeKey(v0, v1)];
       if (info.PointId < 0)
       {
@@ -121,16 +121,16 @@ bool SubdivideOnce(vtkPolyData* input, vtkPolyData* output)
     double p0[3], p1[3];
     inPoints->GetPoint(key[0], p0);
     inPoints->GetPoint(key[1], p1);
-    Point3 v0 = { p0[0], p0[1], p0[2] };
-    Point3 v1 = { p1[0], p1[1], p1[2] };
-    Point3 midPoint = (v0 + v1) / 2.0;
-    bool isBoundary = info.NumFaces < 2;
+    const Point3 v0 = { p0[0], p0[1], p0[2] };
+    const Point3 v1 = { p1[0], p1[1], p1[2] };
+    const Point3 midPoint = (v0 + v1) / 2.0;
+    const bool isBoundary = info.NumFaces < 2;
 
     info.Point = isBoundary
       ? midPoint
       : (v0 + v1 + facePoints[info.FacePoints[0]] + facePoints[info.FacePoints[1]]) / 4.0;
 
-    for (vtkIdType pointId : key)
+    for (const vtkIdType pointId : key)
     {
       edgeAcc[pointId] = edgeAcc[pointId] + midPoint;
       edgeCount[pointId]++;
@@ -147,7 +147,7 @@ bool SubdivideOnce(vtkPolyData* input, vtkPolyData* output)
     inPolys->GetCellAtId(faceId, cellSize, cellPoints);
     for (vtkIdType vertexId = 0; vertexId < cellSize; vertexId++)
     {
-      vtkIdType pointId = cellPoints[vertexId];
+      const vtkIdType pointId = cellPoints[vertexId];
       faceAcc[pointId] = faceAcc[pointId] + facePoints[faceId];
       faceCount[pointId]++;
     }
@@ -155,14 +155,14 @@ bool SubdivideOnce(vtkPolyData* input, vtkPolyData* output)
 
   // new position of each original vertex
   vtkNew<vtkPoints> outPoints;
-  vtkIdType facePointOffset = numPts + numEdges;
+  const vtkIdType facePointOffset = numPts + numEdges;
   outPoints->SetNumberOfPoints(numPts + numEdges + numFaces);
 
   for (vtkIdType pointId = 0; pointId < numPts; pointId++)
   {
     double pt[3];
     inPoints->GetPoint(pointId, pt);
-    Point3 original = { pt[0], pt[1], pt[2] };
+    const Point3 original = { pt[0], pt[1], pt[2] };
 
     Point3 newPoint;
     if (boundaryCount[pointId] > 0)
@@ -174,9 +174,9 @@ bool SubdivideOnce(vtkPolyData* input, vtkPolyData* output)
     else
     {
       // interior rule
-      double n = faceCount[pointId];
-      Point3 F = faceAcc[pointId] / n;
-      Point3 R = edgeAcc[pointId] / edgeCount[pointId];
+      const double n = faceCount[pointId];
+      const Point3 F = faceAcc[pointId] / n;
+      const Point3 R = edgeAcc[pointId] / edgeCount[pointId];
       newPoint = (F + R * 2.0 + original * (n - 3.0)) / n;
     }
     outPoints->SetPoint(pointId, newPoint.data());
@@ -200,12 +200,12 @@ bool SubdivideOnce(vtkPolyData* input, vtkPolyData* output)
     inPolys->GetCellAtId(faceId, cellSize, cellPoints);
     for (vtkIdType vertexId = 0; vertexId < cellSize; vertexId++)
     {
-      vtkIdType vPrev = cellPoints[(vertexId + cellSize - 1) % cellSize];
-      vtkIdType vCurrent = cellPoints[vertexId];
-      vtkIdType vNext = cellPoints[(vertexId + 1) % cellSize];
+      const vtkIdType vPrev = cellPoints[(vertexId + cellSize - 1) % cellSize];
+      const vtkIdType vCurrent = cellPoints[vertexId];
+      const vtkIdType vNext = cellPoints[(vertexId + 1) % cellSize];
 
-      vtkIdType ePrev = edges[MakeEdgeKey(vPrev, vCurrent)].PointId;
-      vtkIdType eNext = edges[MakeEdgeKey(vCurrent, vNext)].PointId;
+      const vtkIdType ePrev = edges[MakeEdgeKey(vPrev, vCurrent)].PointId;
+      const vtkIdType eNext = edges[MakeEdgeKey(vCurrent, vNext)].PointId;
 
       vtkIdType quad[4] = { vCurrent, eNext, facePointOffset + faceId, ePrev };
       outPolys->InsertNextCell(4, quad);
@@ -237,7 +237,7 @@ int vtkF3DCatmullClarkSubdivisionFilter::RequestData(vtkInformation* vtkNotUsed(
 
   for (int i = 0; i < this->NumberOfSubdivisions; i++)
   {
-    vtkNew<vtkPolyData> next;
+    const vtkNew<vtkPolyData> next;
     if (!::SubdivideOnce(current, next))
     {
       vtkErrorMacro("Subdivision failed due to non-manifold geometry");

@@ -49,6 +49,12 @@
 #include <vtkMemoryResourceStream.h>
 #endif
 
+#if F3D_MODULE_OPENXR
+#include <vtkOpenXRCamera.h>
+#include <vtkOpenXRRenderWindow.h>
+#include <vtkOpenXRRenderer.h>
+#endif
+
 #include <vtkOSOpenGLRenderWindow.h>
 
 #include <sstream>
@@ -107,7 +113,8 @@ public:
 #endif
 
     // OSMesa
-    vtkSmartPointer<vtkRenderWindow> osmesaRenWin = vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
+    const vtkSmartPointer<vtkRenderWindow> osmesaRenWin =
+      vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
     osmesaRenWin->Initialize();
     return osmesaRenWin->GetInitialized() ? osmesaRenWin : nullptr;
 #else
@@ -122,6 +129,7 @@ public:
   const options& Options;
   interactor_impl* Interactor = nullptr;
   fs::path CachePath;
+  fs::path ResourcesPath{};
   context::function GetProcAddress;
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 7, 20260724)
   bool PositionWarningEmitted = false;
@@ -178,6 +186,18 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
     this->Internals->RenWin = wasmRenWin;
 #endif
   }
+  else if (type == Type::XR)
+  {
+    // OpenXR not tested yet
+    // LCOV_EXCL_START
+#ifdef F3D_MODULE_OPENXR
+    this->Internals->RenWin = vtkSmartPointer<vtkOpenXRRenderWindow>::New();
+#else
+    throw engine::no_window_exception(
+      "Cannot create a window of type XR as F3D_MODULE_OPENXR is not enabled");
+#endif
+    // LCOV_EXCL_STOP
+  }
   else if (!type.has_value())
   {
     this->Internals->RenWin = internals::AutoBackendWindow();
@@ -203,7 +223,24 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
   this->Internals->RenWin->SetOffScreenRendering(offscreen);
   this->Internals->RenWin->SetWindowName("f3d");
-  this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
+
+  if (type == Type::XR)
+  {
+#ifdef F3D_MODULE_OPENXR
+    // OpenXR not tested yet
+    // LCOV_EXCL_START
+    vtkOpenXRRenderWindow* xrRenWin = vtkOpenXRRenderWindow::SafeDownCast(this->Internals->RenWin);
+    xrRenWin->vtkOpenGLRenderWindow::AddRenderer(this->Internals->Renderer);
+    vtkNew<vtkOpenXRCamera> xrCamera;
+    this->Internals->Renderer->SetActiveCamera(xrCamera);
+    // LCOV_EXCL_STOP
+#endif
+  }
+  else
+  {
+    this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
+  }
+
   this->Internals->Camera = std::make_unique<detail::camera_impl>();
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
 
@@ -273,6 +310,13 @@ window_impl::Type window_impl::getType()
   {
     return Type::NONE;
   }
+
+#ifdef F3D_MODULE_OPENXR
+  if (this->Internals->RenWin->IsA("vtkOpenXRRenderWindow"))
+  {
+    return Type::XR;
+  }
+#endif
 
   return Type::UNKNOWN;
 }
@@ -351,8 +395,8 @@ std::pair<int, int> window_impl::getPosition() const
   if (!this->Internals->PositionWarningEmitted &&
     this->Internals->RenWin->IsA("vtkXOpenGLRenderWindow"))
   {
-    log::info("Window position may be inaccurate with VTK older than 9.7.20260724, "
-              "consider updating VTK.");
+    log::debug("Window position may be inaccurate with VTK older than 9.7.20260724, "
+               "consider updating VTK.");
     this->Internals->PositionWarningEmitted = true;
   }
 #endif
@@ -538,7 +582,8 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetFilenameInfo(opt.ui.filename_info);
   renderer->ShowMetaData(opt.ui.metadata);
   renderer->ShowHDRIFilename(opt.ui.hdri_filename);
-  renderer->ShowSceneHierarchy(opt.ui.scene_hierarchy);
+  renderer->ShowSceneHierarchy(opt.ui.scene_hierarchy.enable);
+  renderer->SetSceneHierarchyMaxWidth(opt.ui.scene_hierarchy.max_width);
   renderer->ShowCheatSheet(opt.ui.cheatsheet);
   renderer->ShowConsole(opt.ui.console);
   renderer->ShowMinimalConsole(opt.ui.minimal_console);
@@ -557,7 +602,7 @@ void window_impl::UpdateDynamicOptions()
     renderer->SetInteractionStyle(opt.interactor.style);
 
 #if F3D_MODULE_UI
-    std::string bindsStr = opt.ui.drop_zone.custom_binds;
+    const std::string bindsStr = opt.ui.drop_zone.custom_binds;
     std::vector<std::pair<std::string, std::string>> dropZoneBinds;
 
     for (const std::string& token : utils::tokenize(bindsStr))
@@ -580,30 +625,6 @@ void window_impl::UpdateDynamicOptions()
     renderer->SetDropZoneBinds(dropZoneBinds);
 #endif
   }
-
-  // F3D_DEPRECATED
-  // Remove this in the next major release
-  F3D_SILENT_WARNING_PUSH()
-  F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
-
-  if (!opt.ui.dropzone_info.empty())
-  {
-    log::warn("'ui.dropzone_info' is deprecated. Please Use 'ui.drop_zone.custom_binds' instead.");
-    renderer->SetDropZoneInfo(opt.ui.dropzone_info);
-  }
-  else if (!opt.ui.drop_zone.info.empty())
-  {
-    log::warn("'ui.drop_zone.info' is deprecated. Please Use 'ui.drop_zone.custom_binds' instead.");
-    renderer->SetDropZoneInfo(opt.ui.drop_zone.info);
-  }
-
-  if (opt.ui.dropzone)
-  {
-    log::warn("'ui.dropzone' is deprecated. Please Use 'ui.drop_zone.enable' instead.");
-    renderer->ShowDropZone(opt.ui.dropzone);
-    renderer->ShowDropZoneLogo(opt.ui.dropzone);
-  }
-  F3D_SILENT_WARNING_POP()
 
   renderer->ShowArmature(opt.render.armature.enable);
 
@@ -670,13 +691,13 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetFinalShader(opt.render.effect.final_shader);
 
   renderer->SetBackground(opt.render.background.color.data());
-  renderer->SetUseBlurBackground(opt.render.background.blur.enable);
-  renderer->SetBlurCircleOfConfusionRadius(opt.render.background.blur.coc);
+  renderer->SetUseBlurBackground(opt.render.background.skybox == "blurred");
+  renderer->SetBlurCircleOfConfusionRadius(opt.render.background.blur_coc);
   renderer->SetLightIntensity(opt.render.light.intensity);
 
   renderer->SetHDRIFile(opt.render.hdri.file);
   renderer->SetUseImageBasedLighting(opt.render.hdri.ambient);
-  renderer->ShowHDRISkybox(opt.render.background.skybox);
+  renderer->ShowHDRISkybox(opt.render.background.skybox != "disabled");
 
   renderer->SetFontFile(opt.ui.font_file);
   renderer->SetFontScale(opt.ui.scale);
@@ -705,6 +726,9 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
   renderer->SetGridAbsolute(opt.render.grid.absolute);
   renderer->SetGridOpacity(opt.render.grid.opacity);
+  renderer->SetGridAbsolute(this->getType() == Type::XR
+      ? true
+      : opt.render.grid.absolute); // In XR mode, the grid is absolute
   renderer->SetGridReflection(opt.render.grid.reflection);
   renderer->ShowGrid(opt.render.grid.enable);
   renderer->SetGridColor(opt.render.grid.color);
@@ -732,8 +756,42 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetEnableCheckerBoard(opt.model.checkerboard.enable);
   renderer->SetUnlit(opt.model.unlit);
 
-  renderer->SetEnableColoring(opt.model.scivis.enable);
-  renderer->SetUseCellColoring(opt.model.scivis.cells);
+  if (opt.model.coloring == "scivis")
+  {
+    renderer->SetColoring(vtkF3DRenderer::ColoringMode::SCIVIS);
+  }
+  else if (opt.model.coloring == "material")
+  {
+    renderer->SetColoring(vtkF3DRenderer::ColoringMode::MATERIAL);
+  }
+  else if (opt.model.coloring == "direct")
+  {
+    renderer->SetColoring(vtkF3DRenderer::ColoringMode::DIRECT);
+  }
+  else
+  {
+    log::warn("Unknown coloring mode: \"", opt.model.coloring, R"(" using "material" as fallback)");
+    renderer->SetColoring(vtkF3DRenderer::ColoringMode::MATERIAL);
+  }
+
+  if (opt.model.scivis.field == "points")
+  {
+    renderer->SetDataFieldForColoring(vtkF3DRenderer::DataField::POINTS);
+  }
+  else if (opt.model.scivis.field == "cells")
+  {
+    renderer->SetDataFieldForColoring(vtkF3DRenderer::DataField::CELLS);
+  }
+  else if (opt.model.scivis.field == "any")
+  {
+    renderer->SetDataFieldForColoring(vtkF3DRenderer::DataField::ANY);
+  }
+  else
+  {
+    log::warn("Unknown scivis field: \"", opt.model.scivis.field, R"(" using "any" as fallback)");
+    renderer->SetDataFieldForColoring(vtkF3DRenderer::DataField::ANY);
+  }
+
   renderer->SetArrayNameForColoring(opt.model.scivis.array_name);
   renderer->SetComponentForColoring(opt.model.scivis.component);
 
@@ -745,6 +803,8 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->SetUseVolume(opt.model.volume.enable);
   renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
+
+  renderer->SetXRMode(this->getType() == Type::XR);
 
   renderer->UpdateActors();
 
@@ -758,7 +818,7 @@ void window_impl::UpdateDynamicOptions()
       for (const interaction_bind_t& bind : this->Internals->Interactor->getBindsForGroup(group))
       {
         auto [doc, val] = this->Internals->Interactor->getBindingDocumentation(bind);
-        f3d::interactor::BindingType type = this->Internals->Interactor->getBindingType(bind);
+        const f3d::interactor::BindingType type = this->Internals->Interactor->getBindingType(bind);
         if (!doc.empty())
         {
           groupList.emplace_back(
@@ -780,7 +840,7 @@ void window_impl::PrintSceneDescription(log::VerboseLevel level)
 //----------------------------------------------------------------------------
 void window_impl::PrintColoringDescription(log::VerboseLevel level)
 {
-  std::string descr = this->Internals->Renderer->GetColoringDescription();
+  const std::string descr = this->Internals->Renderer->GetColoringDescription();
   if (!descr.empty())
   {
     log::print(level, descr);
@@ -829,7 +889,7 @@ image window_impl::renderToImage(bool noBackground)
   exporter->ImageLowerLeftOn();
 
   const int* dims = exporter->GetDataDimensions();
-  int cmp = exporter->GetDataNumberOfScalarComponents();
+  const int cmp = exporter->GetDataNumberOfScalarComponents();
 
   image output(dims[0], dims[1], cmp);
   exporter->Export(output.getContent());
@@ -841,7 +901,7 @@ image window_impl::renderToImage(bool noBackground)
 std::shared_ptr<video_frame> window_impl::getVideoFrame()
 {
 #ifdef F3D_MODULE_FFMPEG
-  std::shared_ptr<video_frame_ffmpeg> frame =
+  const std::shared_ptr<video_frame_ffmpeg> frame =
     std::make_shared<video_frame_ffmpeg>(this->getWidth(), this->getHeight());
 
   if (!this->Internals->Renderer->CaptureVideoFrame(
@@ -855,6 +915,13 @@ std::shared_ptr<video_frame> window_impl::getVideoFrame()
   throw video_frame::invalid_frame_exception(
     "Video frame capture is not supported, please build f3d with FFMPEG support");
 #endif
+}
+
+//----------------------------------------------------------------------------
+window& window_impl::setUseHDRICache(bool use)
+{
+  this->Internals->Renderer->SetUseCache(use);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -888,6 +955,50 @@ void window_impl::SetCachePath(const fs::path& cachePath)
 fs::path window_impl::GetCachePath() const
 {
   return this->Internals->CachePath;
+}
+
+//----------------------------------------------------------------------------
+void window_impl::SetResourcesPath(const fs::path& resourcesPath)
+{
+  try
+  {
+    if (resourcesPath.empty())
+    {
+      throw engine::resource_exception("Provided resources path is empty");
+    }
+
+    // create directories if they do not exist
+    fs::create_directories(resourcesPath);
+
+    this->Internals->ResourcesPath = resourcesPath;
+
+    if (this->getType() == Type::XR)
+    {
+#if F3D_MODULE_OPENXR
+      fs::path xrActionsManifestsFolder = this->Internals->ResourcesPath / "xr_actions_manifests";
+      if (!fs::exists(xrActionsManifestsFolder))
+      {
+        throw engine::resource_exception(
+          "XR actions manifests folder does not exist: " + xrActionsManifestsFolder.string());
+      }
+      std::string manifestsDir = xrActionsManifestsFolder.string() + fs::path::preferred_separator;
+      this->Internals->Interactor->SetXRResourcesDirectory(manifestsDir);
+#endif
+    }
+  }
+  // OpenXR not tested yet
+  // LCOV_EXCL_START
+  catch (const fs::filesystem_error& ex)
+  {
+    throw engine::resource_exception(std::string("Could not use resources: ") + ex.what());
+  }
+  // LCOV_EXCL_STOP
+}
+
+//----------------------------------------------------------------------------
+std::filesystem::path window_impl::GetResourcesPath() const
+{
+  return this->Internals->ResourcesPath;
 }
 
 //----------------------------------------------------------------------------

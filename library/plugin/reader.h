@@ -72,7 +72,7 @@ public:
   virtual f3d::file_availability canRead(
     const std::string& fileName, const bool skipContentCheck, bool forceReader = false) const
   {
-    std::string ext = fileName.substr(fileName.find_last_of(".") + 1);
+    std::string ext = fileName.substr(fileName.find_last_of('.') + 1);
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
     const std::vector<std::string>& extensions = this->getExtensions();
     if (std::any_of(

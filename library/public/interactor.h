@@ -145,12 +145,36 @@ public:
   };
 
   /**
-   * Enumeration of animation direction.
+   * Parameter shape for calls to addBinding(...).
+   *
+   * Bind modifiers is a binary flag from the dedicated enum that represent KeyModifiers.
+   * Bind interaction can be a pressed key symbol, eg: "C",
+   * or a dedicated key symbol for special keys:
+   * "Left", "Right", "Up", "Down", "Space", "Enter", "Escape", "Question".
+   *
+   * Command is the action to perform when this binding is triggered.
+   *
+   * Group is an optional arg to group bindings together for better display of the documentation.
+   *
+   * DocumentationCallback is an optional function that returns a pair of string,
+   * the first is the doc itself, the second is the current value as a string, if any.
+   *
+   * Type is an optional type of binding to provide, it can be used for presenting the
+   * binding in a coherent way in logs and cheatsheet.
+   *
+   * If notify is true, a notification is triggered when pressing the binding.
+   *
+   * If repeat is true, the binding is applied repeatedly when holding down the key.
    */
-  enum class AnimationDirection : std::uint8_t
+  struct BindingParam
   {
-    FORWARD,
-    BACKWARD
+    interaction_bind_t Bind;
+    std::vector<std::string> Commands;
+    std::string Group = {};
+    documentation_callback_t DocCallback = nullptr;
+    BindingType Type = BindingType::OTHER;
+    bool Notify = true;
+    bool Repeat = false;
   };
 
   /**
@@ -162,21 +186,10 @@ public:
   /**
    * Use this method to add binding, in order to trigger commands for a specific bind
    *
-   * Bind modifiers is a binary flag from the dedicated enum that represent KeyModifiers.
-   * Bind interaction can be a pressed key symbol, eg: "C",
-   * or a dedicated key symbol for special keys:
-   * "Left", "Right", "Up", "Down", "Space", "Enter", "Escape", "Question".
-   *
-   * group is an optional arg to group bindings together for better display of the documentation.
    * Groups are kept in order of addition when recovered using getBindGroups().
    * Bindings are kept in order of addition when recovered using getBindsForGroup().
    *
-   * documentationCallback is an optional function that returns a pair of string,
-   * the first is the doc itself, the second is the current value as a string, if any.
-   * Use getBindingDocumentation() to access this doc.
-   *
-   * type is an optional type of binding to provide, it can be used for presenting the
-   * binding in a coherent way in logs and cheatsheet.
+   * Use getBindingDocumentation() to access the documentation specified for this binding.
    *
    * When the corresponding bind happens, the provided commands will be triggered using
    * triggerCommand. Considering checking if an interaction exists or removing it before adding it
@@ -185,35 +198,9 @@ public:
    * ANY modifier interactions will only be triggered if no other interaction bind with modifier
    * is found.
    *
-   * If notify is true, a notification is triggered when pressing the binding
-   *
    * Adding commands for an existing bind will throw a interactor::already_exists_exception.
    */
-  virtual interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool notify = true) = 0;
-
-  /**
-   * See addBinding
-   * Convenience method to add a single command for an interaction,
-   * similar as `addBinding(bind, {command})`.
-   *
-   * Adding command for an existing bind will throw a interactor::already_exists_exception.
-   */
-  virtual interactor& addBinding(const interaction_bind_t& bind, std::string command,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool notify = true) = 0;
-
-  /**
-   * Convenience initializer list signature for add binding method
-   */
-  interactor& addBinding(const interaction_bind_t& bind, std::initializer_list<std::string> list,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::OTHER, bool notify = true)
-  {
-    return this->addBinding(bind, std::vector<std::string>(list), std::move(group),
-      std::move(documentationCallback), type, notify);
-  }
+  virtual interactor& addBinding(BindingParam binding) = 0;
 
   /**
    * Remove binding corresponding to provided bind.
@@ -265,17 +252,6 @@ public:
   ///@}
 
   ///@{ @name Animation
-  /**
-   * Control the animation.
-   */
-  virtual interactor& toggleAnimation(
-    AnimationDirection direction = AnimationDirection::FORWARD) = 0;
-  virtual interactor& startAnimation(
-    AnimationDirection direction = AnimationDirection::FORWARD) = 0;
-  virtual interactor& stopAnimation() = 0;
-  [[nodiscard]] virtual bool isPlayingAnimation() = 0;
-  [[nodiscard]] virtual interactor::AnimationDirection getAnimationDirection() = 0;
-
   /**
    * Get the delta time used by the event loop.
    * Returns 0 if the event loop has never been triggered.

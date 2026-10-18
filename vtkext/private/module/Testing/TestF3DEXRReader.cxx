@@ -9,7 +9,7 @@ int TestF3DEXRReader(int argc, char* argv[])
 {
   vtkNew<vtkF3DEXRReader> reader;
 
-  std::string filename = std::string(argv[1]) + "data/small_rural_road_1k.exr";
+  const std::string filename = std::string(argv[1]) + "data/small_rural_road_1k.exr";
 
   if (reader->CanReadFile(filename.c_str()) == 0)
   {

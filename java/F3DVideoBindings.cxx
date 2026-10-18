@@ -37,9 +37,9 @@ struct f3d_video_frame_t : public SmartPointerWrapper<f3d::video_frame>
 // Helper function to get the f3d::video_frame pointer from a Java object
 inline f3d::video_frame* GetVideoFrame(JNIEnv* env, jobject self)
 {
-  JniLocalRef<jclass> cls(env, env->GetObjectClass(self));
+  const JniLocalRef<jclass> cls(env, env->GetObjectClass(self));
   jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
-  jlong ptr = env->GetLongField(self, fid);
+  const jlong ptr = env->GetLongField(self, fid);
 
   return reinterpret_cast<f3d_video_frame_t*>(ptr)->impl.get();
 }
@@ -47,9 +47,9 @@ inline f3d::video_frame* GetVideoFrame(JNIEnv* env, jobject self)
 // Helper function to get the f3d::video_packet pointer from a Java object
 inline f3d::video_packet* GetVideoPacket(JNIEnv* env, jobject self)
 {
-  JniLocalRef<jclass> cls(env, env->GetObjectClass(self));
+  const JniLocalRef<jclass> cls(env, env->GetObjectClass(self));
   jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
-  jlong ptr = env->GetLongField(self, fid);
+  const jlong ptr = env->GetLongField(self, fid);
 
   return reinterpret_cast<f3d::video_packet*>(ptr);
 }
@@ -57,9 +57,9 @@ inline f3d::video_packet* GetVideoPacket(JNIEnv* env, jobject self)
 // Helper function to get the f3d::video_encoder pointer from a Java object
 inline f3d::video_encoder* GetVideoEncoder(JNIEnv* env, jobject self)
 {
-  JniLocalRef<jclass> cls(env, env->GetObjectClass(self));
+  const JniLocalRef<jclass> cls(env, env->GetObjectClass(self));
   jfieldID fid = env->GetFieldID(cls, "mNativeAddress", "J");
-  jlong ptr = env->GetLongField(self, fid);
+  const jlong ptr = env->GetLongField(self, fid);
 
   return reinterpret_cast<f3d_video_encoder_t*>(ptr)->impl.get();
 }
@@ -81,8 +81,8 @@ extern "C"
   // VideoPacket
   JNIEXPORT jbyteArray JAVA_BIND(VideoPacket, getPacketData)(JNIEnv* env, jobject self)
   {
-    f3d::video_packet* packet = GetVideoPacket(env, self);
-    jsize size = static_cast<jsize>(packet->getPacketSize());
+    const f3d::video_packet* packet = GetVideoPacket(env, self);
+    const jsize size = static_cast<jsize>(packet->getPacketSize());
 
     jbyteArray result = env->NewByteArray(size);
     if (size > 0)
@@ -107,7 +107,7 @@ extern "C"
     jstring explicitCodecName, jint width, jint height, jdouble frameRate, jdouble bitrate,
     jboolean lowLatency)
   {
-    JniUTFString jExplicitCodecName(env, explicitCodecName);
+    const JniUTFString jExplicitCodecName(env, explicitCodecName);
 
     f3d::video_encoder::params params;
     params.Codec = static_cast<f3d::video_encoder::codec>(codec);
@@ -180,8 +180,9 @@ extern "C"
   {
     f3d::video_encoder* encoder = GetVideoEncoder(env, self);
 
-    JniLocalRef<jclass> cls(env, env->GetObjectClass(self));
-    jlong nativeAddress = env->GetLongField(self, env->GetFieldID(cls, "mNativeAddress", "J"));
+    const JniLocalRef<jclass> cls(env, env->GetObjectClass(self));
+    const jlong nativeAddress =
+      env->GetLongField(self, env->GetFieldID(cls, "mNativeAddress", "J"));
 
     JavaVM* jvm = nullptr;
     env->GetJavaVM(&jvm);
@@ -216,13 +217,14 @@ extern "C"
 
         // Scoped so all JniLocalRef destructors run before DetachCurrentThread
         {
-          JniLocalRef<jclass> packetClass(
+          const JniLocalRef<jclass> packetClass(
             threadEnv, threadEnv->FindClass("app/f3d/F3D/VideoPacket"));
           jmethodID packetCtor = threadEnv->GetMethodID(packetClass, "<init>", "(J)V");
-          JniLocalRef<jobject> packetObj(threadEnv,
+          const JniLocalRef<jobject> packetObj(threadEnv,
             threadEnv->NewObject(packetClass, packetCtor, reinterpret_cast<jlong>(packet.get())));
 
-          JniLocalRef<jclass> listenerClass(threadEnv, threadEnv->GetObjectClass(listenerObj));
+          const JniLocalRef<jclass> listenerClass(
+            threadEnv, threadEnv->GetObjectClass(listenerObj));
           jmethodID executeMethod =
             threadEnv->GetMethodID(listenerClass, "execute", "(Lapp/f3d/F3D/VideoPacket;)V");
           threadEnv->CallVoidMethod(listenerObj, executeMethod, packetObj.get());
@@ -241,7 +243,8 @@ extern "C"
 
     try
     {
-      std::shared_ptr<f3d::video_frame> framePtr(cppFrame, [](f3d::video_frame*) {}); // non-owning
+      const std::shared_ptr<f3d::video_frame> framePtr(
+        cppFrame, [](f3d::video_frame*) {}); // non-owning
       return encoder->submit(framePtr) ? JNI_TRUE : JNI_FALSE;
     }
     catch (const f3d::video_encoder::transport_exception& e)
@@ -260,9 +263,9 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Window, getVideoFrame)(JNIEnv* env, jobject self)
   {
     f3d::window& win = GetEngine(env, self)->getWindow();
-    f3d_video_frame_t* frame = new f3d_video_frame_t(win.getVideoFrame());
+    const f3d_video_frame_t* frame = new f3d_video_frame_t(win.getVideoFrame());
 
-    JniLocalRef<jclass> frameClass(env, env->FindClass("app/f3d/F3D/VideoFrame"));
+    const JniLocalRef<jclass> frameClass(env, env->FindClass("app/f3d/F3D/VideoFrame"));
     jmethodID constructor = env->GetMethodID(frameClass, "<init>", "(J)V");
 
     jobject result = env->NewObject(frameClass, constructor, reinterpret_cast<jlong>(frame));

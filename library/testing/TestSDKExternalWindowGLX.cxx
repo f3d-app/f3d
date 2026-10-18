@@ -31,7 +31,8 @@ int TestSDKExternalWindowGLX([[maybe_unused]] int argc, [[maybe_unused]] char* a
 
   std::cout << "Getting framebuffer config\n";
   int fbcount;
-  GLXFBConfig* fbc = glXChooseFBConfig(display, DefaultScreen(display), visual_attribs, &fbcount);
+  const GLXFBConfig* fbc =
+    glXChooseFBConfig(display, DefaultScreen(display), visual_attribs, &fbcount);
   if (!fbc)
   {
     std::cerr << "Failed to retrieve a framebuffer config\n";
@@ -48,8 +49,8 @@ int TestSDKExternalWindowGLX([[maybe_unused]] int argc, [[maybe_unused]] char* a
   swa.event_mask = StructureNotifyMask;
 
   std::cout << "Creating window\n";
-  Window win = XCreateWindow(display, RootWindow(display, vi->screen), 0, 0, 100, 100, 0, vi->depth,
-    InputOutput, vi->visual, CWBorderPixel | CWColormap | CWEventMask, &swa);
+  const Window win = XCreateWindow(display, RootWindow(display, vi->screen), 0, 0, 100, 100, 0,
+    vi->depth, InputOutput, vi->visual, CWBorderPixel | CWColormap | CWEventMask, &swa);
   if (!win)
   {
     std::cerr << "Failed to create window.\n";

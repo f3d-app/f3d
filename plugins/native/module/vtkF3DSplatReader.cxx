@@ -62,7 +62,7 @@ int vtkF3DSplatReader::RequestData(
   }
 
   stream->Seek(0, vtkResourceStream::SeekDirection::End);
-  std::size_t nbSplats = stream->Tell() / sizeof(::splat_t);
+  const std::size_t nbSplats = stream->Tell() / sizeof(::splat_t);
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
 
   vtkNew<vtkFloatArray> positionArray;
@@ -123,7 +123,7 @@ bool vtkF3DSplatReader::CanReadFile(vtkResourceStream* stream)
 
   // Check the size of the file
   stream->Seek(0, vtkResourceStream::SeekDirection::End);
-  vtkTypeInt64 streamSize = stream->Tell();
+  const vtkTypeInt64 streamSize = stream->Tell();
   if (streamSize % sizeof(::splat_t) != 0)
   {
     return false;

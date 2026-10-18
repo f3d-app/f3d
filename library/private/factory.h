@@ -46,7 +46,7 @@ public:
   /**
    * Get the reader that can read the given file, nullptr if none
    */
-  reader* getReader(const std::string& fileName, std::optional<std::string> forceReader,
+  reader* getReader(const std::string& fileName, const std::optional<std::string>& forceReader,
     const bool skipContentCheck, file_availability& availability);
 
   /**

@@ -6,6 +6,7 @@ include(GNUInstallDirs)
 
 # List of source files
 set(F3D_C_SOURCE_FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/animation_c_api.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/camera_c_api.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/context_c_api.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/engine_c_api.cxx
@@ -22,6 +23,7 @@ set(F3D_C_SOURCE_FILES
 
 # List of headers that will be installed
 set(F3D_C_PUBLIC_HEADERS
+  ${CMAKE_CURRENT_SOURCE_DIR}/animation_c_api.h
   ${CMAKE_CURRENT_SOURCE_DIR}/camera_c_api.h
   ${CMAKE_CURRENT_SOURCE_DIR}/context_c_api.h
   ${CMAKE_CURRENT_SOURCE_DIR}/engine_c_api.h
@@ -98,8 +100,7 @@ if (BUILD_SHARED_LIBS)
     NAMESPACE f3d::
     FILE f3dCApiTargets.cmake
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-    COMPONENT sdk EXCLUDE_FROM_ALL
-  )
+    COMPONENT sdk)
 
   file(COPY "${F3D_SOURCE_DIR}/cmake/c_api-config.cmake"
     DESTINATION "${CMAKE_BINARY_DIR}/cmake")
@@ -109,7 +110,7 @@ if (BUILD_SHARED_LIBS)
     "${F3D_SOURCE_DIR}/cmake/c_api-config.cmake"
     DESTINATION
     "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-    COMPONENT sdk EXCLUDE_FROM_ALL)
+    COMPONENT sdk)
 
   # pkg-config
   # CMAKE_INSTALL_PREFIX may be a relative path (e.g. resolved against the build
@@ -122,5 +123,5 @@ if (BUILD_SHARED_LIBS)
     @ONLY)
   install(FILES "${CMAKE_BINARY_DIR}/cmake/f3d_c_api.pc"
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
-    COMPONENT sdk EXCLUDE_FROM_ALL)
+    COMPONENT sdk)
 endif ()

@@ -101,8 +101,8 @@ void f3d_transform2d_create(f3d_transform2d_t* transform, double scale_x, double
 
   // double_array_t can throw if the size is wrong
   // but this cannot happen here
-  f3d::double_array_t<2> scale({ scale_x, scale_y });
-  f3d::double_array_t<2> translate({ translate_x, translate_y });
+  const f3d::double_array_t<2> scale({ scale_x, scale_y });
+  const f3d::double_array_t<2> translate({ translate_x, translate_y });
   f3d::transform2d_t cpp_transform(scale, translate, angle_deg);
 
   for (int i = 0; i < 9; ++i)

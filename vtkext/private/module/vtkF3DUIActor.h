@@ -56,8 +56,8 @@ public:
     std::string desc;
     std::string value;
     std::string bind;
-    double startTime;
-    double stopTime;
+    double startTime = 0.0;
+    double stopTime = 0.0;
   };
 
   /**
@@ -229,6 +229,11 @@ public:
   }
 
   /**
+   * Set the maximum scene hierarchy width to display
+   */
+  void SetSceneHierarchyMaxWidth(const int width);
+
+  /**
    * Add notification info to deque
    */
   void AddNotification(const std::string& desc, const std::string& value, const std::string& bind,
@@ -243,9 +248,9 @@ public:
   void SetAnimationProgressMode(AnimationProgressBarMode mode);
 
   /**
-   * Set the time range, name and keyframe times of the current animation. Meant
+   * Set the time range, name and key frame times of the current animation. Meant
    * to be pushed when the loaded animation changes.
-   * Empty range, name and keyframes by default
+   * Empty range, name and key frames by default
    */
   void SetAnimationProgress(const std::pair<double, double>& timeRange, const std::string& name,
     const std::vector<double>& keyFrames);
@@ -389,7 +394,7 @@ protected:
   std::string MetaData = "";
 
   bool SceneHierarchyVisible = false;
-
+  int SceneHierarchyMaxWidth = 600;
   bool CheatSheetVisible = false;
   std::vector<CheatSheetGroup> CheatSheet;
 

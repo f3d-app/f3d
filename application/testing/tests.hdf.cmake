@@ -9,7 +9,7 @@ f3d_test(NAME TestExodusE DATA single_timestep.e PLUGIN hdf ARGS NO_RENDER NO_BA
 f3d_test(NAME TestExodusConfig DATA disk_out_ref.ex2 CONFIG ${F3D_SOURCE_DIR}/testing/configs/exodus.json ARGS -s --camera-position=-11,-2,-49 LABELS "plugin;hdf")
 f3d_test(NAME TestNetCDF DATA temperature_grid.nc PLUGIN hdf ARGS -s)
 f3d_test(NAME TestVTKHDF DATA blob.vtkhdf PLUGIN hdf ARGS -s)
-f3d_test(NAME TestAMRDataSet DATA amr.vtkhdf PLUGIN hdf ARGS -s)
+f3d_test(NAME TestAMRDataSet DATA amr.vtkhdf PLUGIN hdf ARGS -s --coloring-field=points)
 f3d_test(NAME TestVTKHDFPartitionedDataSetCollection DATA pdc_sphere_cone.vtkhdf PLUGIN hdf ARGS -s)
 
 if (VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251109)

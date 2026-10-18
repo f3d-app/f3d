@@ -25,8 +25,8 @@ public class TestOptions {
     options.getAsBool("ui.scalar_bar");
     options.toggle("ui.scalar_bar");
 
-    options.setAsInt("scene.animation.index", 5);
-    options.getAsInt("scene.animation.index");
+    options.setAsInt("model.scivis.component", 5);
+    options.getAsInt("model.scivis.component");
 
     options.setAsDouble("render.line_width", 2.0);
     options.getAsDouble("render.line_width");

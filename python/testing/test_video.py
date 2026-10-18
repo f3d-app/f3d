@@ -1,6 +1,13 @@
+import pytest
+
 import f3d
 
+needs_FFmpeg = pytest.mark.skipif(
+    not f3d.Engine.get_lib_info().modules.get("FFmpeg"), reason="no FFmpeg module"
+)
 
+
+@needs_FFmpeg
 def test_video_api():
     engine = f3d.Engine.create(True)
     engine.window.size = 256, 256
@@ -24,7 +31,13 @@ def test_video_api():
     assert isinstance(frame, f3d.VideoFrame)
 
     received_timestamps = []
-    encoder.listen(lambda packet: received_timestamps.append(packet.get_timestamp()))
+
+    def test_packet(packet):
+        received_timestamps.append(packet.get_timestamp())
+        assert packet.is_key_frame() == True
+        packet.get_packet_data()  # smoke test
+
+    encoder.listen(test_packet)
 
     frame.set_timestamp(42)
     encoder.submit(frame)

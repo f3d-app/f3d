@@ -40,7 +40,7 @@ f3d_test(<NAME> [ARGS...])
   - `PIPED_ARG` Prepend the provided string to the `-` standard input marker of a `PIPED` test, so the piped
     data is consumed by an option (e.g. pass `--load-statefile=` to load a statefile from `--load-statefile=-`)
     instead of as the input model.
-  - `SCRIPT` Mark the test to use a `--script` of the same name as the test
+  - `SCRIPT` Mark the test to use a `--command-script` of the same name as the test
   - `NAME` Provide the name of the test, mandatory and must be unique
   - `BASELINE_PATH` Provide the path to the baseline to use, instead of the default
   - `OUTPUT_PATH` Provide the path to the output to use, instead of the default
@@ -97,7 +97,7 @@ function(f3d_test)
 
   if (F3D_TEST_HDRI)
     list(PREPEND F3D_TEST_LABELS "hdri")
-    list(APPEND F3D_TEST_ARGS "--hdri-file=${F3D_SOURCE_DIR}/testing/data/${F3D_TEST_HDRI}" "--hdri-ambient" "--hdri-skybox")
+    list(PREPEND F3D_TEST_ARGS "--hdri-file=${F3D_SOURCE_DIR}/testing/data/${F3D_TEST_HDRI}" "--hdri-ambient" "--hdri-skybox")
     set(F3D_TEST_LONG_TIMEOUT ON)
   endif()
 

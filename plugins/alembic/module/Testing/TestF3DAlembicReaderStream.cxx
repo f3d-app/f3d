@@ -8,7 +8,7 @@
 
 int TestF3DAlembicReaderStream(int vtkNotUsed(argc), char* argv[])
 {
-  std::string filename = std::string(argv[1]) + "data/suzanne.abc";
+  const std::string filename = std::string(argv[1]) + "data/suzanne.abc";
 
   vtkNew<vtkFileResourceStream> fileStream;
   fileStream->Open(filename.c_str());

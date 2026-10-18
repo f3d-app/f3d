@@ -12,7 +12,7 @@ int TestSDKInteractorDropFullScene([[maybe_unused]] int argc, char* argv[])
 {
   PseudoUnitTest test;
 
-  std::string renderingBackend = std::string(argv[4]);
+  const std::string renderingBackend = std::string(argv[4]);
   f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   std::ignore = eng.getOptions();
   f3d::window& win = eng.getWindow();
@@ -20,8 +20,8 @@ int TestSDKInteractorDropFullScene([[maybe_unused]] int argc, char* argv[])
   win.setSize(300, 300);
   win.render();
 
-  std::string filename = "TestSDKInteractorDropFullScene";
-  std::string interactionFilePath = std::string(argv[2]) + "../../" + filename + ".log";
+  const std::string filename = "TestSDKInteractorDropFullScene";
+  const std::string interactionFilePath = std::string(argv[2]) + "../../" + filename + ".log";
   inter.playInteraction(interactionFilePath); // world.obj; S
 
   test("play a drop interaction",

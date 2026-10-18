@@ -42,7 +42,7 @@ std::vector<std::string> utils::tokenize(std::string_view str, bool keepComments
   bool escaped = false;
   char quoted = '\0';
   bool commented = false;
-  for (char c : str)
+  for (const char c : str)
   {
     switch (c)
     {
@@ -132,7 +132,7 @@ fs::path utils::collapsePath(const fs::path& path, const fs::path& baseDirectory
 //----------------------------------------------------------------------------
 std::string utils::globToRegex(std::string_view glob, char pathSeparator)
 {
-  bool supportGlobStars = [glob]()
+  const bool supportGlobStars = [glob]()
   {
     // find if the glob expression contains a globstar (**)
     if (glob.size() < 2)
@@ -142,7 +142,7 @@ std::string utils::globToRegex(std::string_view glob, char pathSeparator)
 
     bool escaped = false;
     int starCount = 0;
-    for (char c : glob)
+    for (const char c : glob)
     {
       if (c == '\\')
       {
@@ -173,7 +173,7 @@ std::string utils::globToRegex(std::string_view glob, char pathSeparator)
 
   for (size_t i = 0; i < glob.size(); i++)
   {
-    char c = glob[i];
+    const char c = glob[i];
 
     switch (c)
     {
@@ -184,7 +184,7 @@ std::string utils::globToRegex(std::string_view glob, char pathSeparator)
         }
         else
         {
-          bool prevTokenSepOrBeg = i == 0 ||
+          const bool prevTokenSepOrBeg = i == 0 ||
             (i >= globSeparator.size()
                 ? glob.substr(i - globSeparator.size(), globSeparator.size()) == globSeparator
                 : false);
@@ -194,7 +194,7 @@ std::string utils::globToRegex(std::string_view glob, char pathSeparator)
             starCount++;
             i++;
           }
-          bool nextTokenSepOrEnd =
+          const bool nextTokenSepOrEnd =
             i + 1 >= glob.size() || glob.substr(i + 1, globSeparator.size()) == globSeparator;
           if (supportGlobStars)
           {

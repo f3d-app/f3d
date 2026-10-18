@@ -59,8 +59,8 @@ void vtkF3DImageImporter::ImportActors(vtkRenderer* renderer)
 
   assert(extent[4] == extent[5]); // only support single slice
 
-  int w = extent[1] - extent[0] + 1;
-  int h = extent[3] - extent[2] + 1;
+  const int w = extent[1] - extent[0] + 1;
+  const int h = extent[3] - extent[2] + 1;
 
   vtkNew<vtkTexture> texture;
   texture->SetInputConnection(reader->GetOutputPort());
@@ -135,7 +135,7 @@ bool vtkF3DImageImporter::CanReadFile(vtkResourceStream* stream, [[maybe_unused]
     if (probe->CanReadFile(stream) > 0)
     {
       // Space separated list of supported extensions
-      std::string extensions = probe->GetFileExtensions();
+      const std::string extensions = probe->GetFileExtensions();
 
       // Extract the first as a hint
       hint = extensions.substr(1, extensions.find_first_of(' ') - 1);

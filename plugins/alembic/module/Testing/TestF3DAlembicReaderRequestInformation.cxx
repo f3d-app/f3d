@@ -11,7 +11,7 @@
 
 int TestF3DAlembicReaderRequestInformation(int vtkNotUsed(argc), char* argv[])
 {
-  static int NUMBER_OF_TIME_STEPS = 90;
+  static const int NUMBER_OF_TIME_STEPS = 90;
   static const double expectedTimeSteps[] = { 0.000000, 0.033333, 0.066667, 0.100000, 0.133333,
     0.166667, 0.200000, 0.233333, 0.266667, 0.300000, 0.333333, 0.366667, 0.400000, 0.433333,
     0.466667, 0.500000, 0.533333, 0.566667, 0.600000, 0.633333, 0.666667, 0.700000, 0.733333,
@@ -25,7 +25,7 @@ int TestF3DAlembicReaderRequestInformation(int vtkNotUsed(argc), char* argv[])
     2.866667, 2.900000, 2.933333, 2.966667 };
   static const double expectedTimeRange[] = { 0.000000, 2.966667 };
 
-  std::string filename = std::string(argv[1]) + "data/drop.abc";
+  const std::string filename = std::string(argv[1]) + "data/drop.abc";
   vtkNew<vtkF3DAlembicReader> reader;
   reader->SetFileName(filename);
   reader->UpdateInformation();

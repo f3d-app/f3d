@@ -189,7 +189,7 @@ public:
     return this->MeshView->name ? this->MeshView->name : "";
   }
 
-  std::array<double, 2> getTimeRange() const override
+  std::pair<double, double> getTimeRange() const override
   {
     return { this->MeshView->time_min, this->MeshView->time_max };
   }
@@ -197,6 +197,21 @@ public:
   f3d::mesh_view::memory_view_t getMemoryView(double time) const override
   {
     return to_cpp_memory_view(this->MeshView->get_memory_view(time, this->MeshView->opaque));
+  }
+
+  bool buffersNeedUpdate() const override
+  {
+    return this->MeshView->buffers_need_update
+      ? this->MeshView->buffers_need_update(this->MeshView->opaque) != 0
+      : false;
+  }
+
+  void buffersUpdated() override
+  {
+    if (this->MeshView->buffers_updated)
+    {
+      this->MeshView->buffers_updated(this->MeshView->opaque);
+    }
   }
 
 private:
@@ -252,7 +267,7 @@ char** f3d_scene_get_added_files(const f3d_scene_t* scene, unsigned int* count)
   char** result = new char*[files.size()];
   for (size_t i = 0; i < files.size(); ++i)
   {
-    std::string str = files[i].string();
+    const std::string str = files[i].string();
     result[i] = new char[str.size() + 1];
     std::strcpy(result[i], str.c_str());
   }
@@ -425,7 +440,7 @@ int f3d_scene_add_mesh(f3d_scene_t* scene, const f3d_mesh_t* mesh)
   }
 
   f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
-  f3d::mesh_t cpp_mesh = to_cpp_mesh(mesh);
+  const f3d::mesh_t cpp_mesh = to_cpp_mesh(mesh);
 
   try
   {
@@ -487,18 +502,6 @@ int f3d_scene_add_buffer(f3d_scene_t* scene, void* buffer, size_t size)
 }
 
 //----------------------------------------------------------------------------
-void f3d_scene_load_animation_time(f3d_scene_t* scene, double time_value)
-{
-  if (!scene)
-  {
-    return;
-  }
-
-  f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
-  cpp_scene->loadAnimationTime(time_value);
-}
-
-//----------------------------------------------------------------------------
 double f3d_scene_animation_time(f3d_scene_t* scene)
 {
   if (!scene)
@@ -523,59 +526,6 @@ size_t f3d_scene_animation_frame(f3d_scene_t* scene)
 }
 
 //----------------------------------------------------------------------------
-double* f3d_scene_get_animation_keyframes(f3d_scene_t* scene, unsigned int* count)
-{
-  f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
-  std::vector<double> keyframes = cpp_scene->getAnimationKeyFrames();
-  *count = keyframes.size();
-  double* times = new double[keyframes.size()];
-  for (size_t i = 0; i < keyframes.size(); ++i)
-  {
-    times[i] = keyframes[i];
-  }
-  return times;
-}
-
-//----------------------------------------------------------------------------
-void f3d_scene_destroy_animation_keyframes(double* keyframes)
-{
-  delete[] keyframes;
-}
-
-//----------------------------------------------------------------------------
-void f3d_scene_animation_time_range(f3d_scene_t* scene, double* min_time, double* max_time)
-{
-  if (!scene)
-  {
-    return;
-  }
-
-  f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
-  auto range = cpp_scene->animationTimeRange();
-
-  if (min_time)
-  {
-    *min_time = range.first;
-  }
-  if (max_time)
-  {
-    *max_time = range.second;
-  }
-}
-
-//----------------------------------------------------------------------------
-unsigned int f3d_scene_available_animations(const f3d_scene_t* scene)
-{
-  if (!scene)
-  {
-    return 0;
-  }
-
-  const f3d::scene* cpp_scene = reinterpret_cast<const f3d::scene*>(scene);
-  return cpp_scene->availableAnimations();
-}
-
-//----------------------------------------------------------------------------
 int f3d_scene_add_light(const f3d_scene_t* scene, const f3d_light_state_t* light_state)
 {
   if (!scene || !light_state)
@@ -584,7 +534,7 @@ int f3d_scene_add_light(const f3d_scene_t* scene, const f3d_light_state_t* light
   }
 
   const f3d::scene* cpp_scene = reinterpret_cast<const f3d::scene*>(scene);
-  f3d::light_state_t cpp_state = to_cpp_light_state(light_state);
+  const f3d::light_state_t cpp_state = to_cpp_light_state(light_state);
   return cpp_scene->addLight(cpp_state);
 }
 
@@ -620,7 +570,7 @@ int f3d_scene_update_light(f3d_scene_t* scene, int index, const f3d_light_state_
   }
 
   f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
-  f3d::light_state_t cpp_state = to_cpp_light_state(light_state);
+  const f3d::light_state_t cpp_state = to_cpp_light_state(light_state);
 
   try
   {
@@ -647,7 +597,7 @@ f3d_light_state_t* f3d_scene_get_light(const f3d_scene_t* scene, int index)
 
   try
   {
-    f3d::light_state_t cpp_state = cpp_scene->getLight(index);
+    const f3d::light_state_t cpp_state = cpp_scene->getLight(index);
     return to_c_light_state(cpp_state);
   }
   catch (const f3d::scene::light_exception& e)
@@ -679,4 +629,17 @@ void f3d_scene_remove_all_lights(f3d_scene_t* scene)
 
   f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
   cpp_scene->removeAllLights();
+}
+
+//----------------------------------------------------------------------------
+f3d_animation_t* f3d_scene_get_animation(f3d_scene_t* scene)
+{
+  if (!scene)
+  {
+    return nullptr;
+  }
+
+  f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
+  f3d::animation& sce = cpp_scene->getAnimation();
+  return reinterpret_cast<f3d_animation_t*>(&sce);
 }

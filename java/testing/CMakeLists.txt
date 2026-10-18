@@ -1,4 +1,5 @@
 list(APPEND javaf3dTests_list
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestAnimation.java
   ${CMAKE_CURRENT_SOURCE_DIR}/TestCamera.java
   ${CMAKE_CURRENT_SOURCE_DIR}/TestEngine.java
   ${CMAKE_CURRENT_SOURCE_DIR}/TestImage.java
@@ -20,6 +21,12 @@ endif()
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
   list(APPEND javaf3dTests_list
     ${CMAKE_CURRENT_SOURCE_DIR}/TestSceneBuffer.java
+    )
+endif()
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  list(APPEND javaf3dTests_list
+    ${CMAKE_CURRENT_SOURCE_DIR}/TestImageStream.java
     )
 endif()
 

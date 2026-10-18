@@ -246,6 +246,9 @@ extern "C"
    * be NULL. `get_memory_view` is a callback function to retrieve the memory view at a specific
    * time and must be specified. `opaque` is a user-defined pointer that will be passed to the
    * `get_memory_view` callback.
+   * `buffers_need_update` is a callback function to check if the buffers need to be updated.
+   * If `buffers_need_update` returns non-zero, it indicates that the buffers need to be updated.
+   * `buffers_updated` is a callback function to notify that the buffers have been updated.
    */
   typedef struct f3d_mesh_view_t
   {
@@ -253,6 +256,8 @@ extern "C"
     double time_max;
     const char* name;
     const f3d_memory_view_t* (*get_memory_view)(double time, void* opaque);
+    int (*buffers_need_update)(void* opaque);
+    void (*buffers_updated)(void* opaque);
     void* opaque;
   } f3d_mesh_view_t;
 

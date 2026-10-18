@@ -80,6 +80,14 @@ runs:
       shell: bash
       run: patch -p1 < $GITHUB_ACTION_PATH/windows-hang.patch
 
+    # Patch compilation with recent (C23) compilers
+    # https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/38298
+    - name: Patch compilation with C23 compilers
+      if: steps.cache-mesa.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/mesa
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/fix-c23-once_flag.patch
+
     - name: Setup mesa
       if: steps.cache-mesa.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies

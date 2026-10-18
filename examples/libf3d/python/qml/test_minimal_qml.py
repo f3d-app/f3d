@@ -1,11 +1,13 @@
 from pathlib import Path
 
-from minimal_qml import main
-
-from PySide6.QtWidgets import QApplication
+import pytest
 
 
 def test_minimal_qml():
+    pytest.importorskip("PySide6")
+    from minimal_qml import main
+    from PySide6.QtWidgets import QApplication
+
     example_script = Path(__file__).parent.parent / "qml" / "minimal_qml.py"
     file = Path(__file__).parent.parent / "tests" / "data" / "cow.vtp"
 

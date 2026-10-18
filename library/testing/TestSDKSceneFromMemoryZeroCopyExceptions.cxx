@@ -13,7 +13,7 @@ int TestSDKSceneFromMemoryZeroCopyExceptions([[maybe_unused]] int argc, char* ar
   PseudoUnitTest test;
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  std::string renderingBackend = std::string(argv[4]);
+  const std::string renderingBackend = std::string(argv[4]);
   f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::scene& sce = eng.getScene();
 

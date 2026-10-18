@@ -17,6 +17,11 @@
 namespace emscripten::internal
 {
 template<>
+void raw_destructor(f3d::animation* ptr)
+{
+}
+
+template<>
 void raw_destructor(f3d::scene* ptr)
 {
 }
@@ -57,10 +62,41 @@ emscripten::val pairToJSArray(const std::pair<U, V>& p)
   return jsArray;
 }
 
+emscripten::val getBindingDocCallback(const f3d::interactor::BindingParam& binding)
+{
+  if (!binding.DocCallback)
+  {
+    return emscripten::val::null();
+  }
+
+  const auto [first, second] = binding.DocCallback();
+
+  emscripten::val result = emscripten::val::array();
+  result.set(0, first);
+  result.set(1, second);
+  return result;
+}
+
+void setBindingDocCallback(f3d::interactor::BindingParam& binding, emscripten::val callback)
+{
+  if (callback.isNull() || callback.isUndefined())
+  {
+    binding.DocCallback = nullptr;
+    return;
+  }
+
+  binding.DocCallback = [callback]
+  {
+    emscripten::val result = callback();
+
+    return std::make_pair(result[0].as<std::string>(), result[1].as<std::string>());
+  };
+}
+
 struct wasm_mesh_view : public f3d::mesh_view
 {
   // not time support with wasm
-  std::array<double, 2> getTimeRange() const override
+  std::pair<double, double> getTimeRange() const override
   {
     return { 0.0, 0.0 };
   }
@@ -374,6 +410,46 @@ EMSCRIPTEN_BINDINGS(f3d)
       "cycle", +[](f3d::options& o, const std::string& name) -> f3d::options&
       { return o.cycle(name); }, emscripten::return_value_policy::reference());
 
+  // f3d::animation
+  emscripten::enum_<f3d::animation::Direction>("AnimationDirection")
+    .value("FORWARD", f3d::animation::Direction::FORWARD)
+    .value("BACKWARD", f3d::animation::Direction::BACKWARD);
+
+  emscripten::class_<f3d::animation>("Animation")
+    .function("loadTime", &f3d::animation::loadTime, emscripten::return_value_policy::reference())
+    .function(
+      "getTimeRange", +[](f3d::animation& animation) -> emscripten::val
+      { return pairToJSArray(animation.getTimeRange()); })
+    .function(
+      "getKeyFrames", +[](f3d::animation& animation) -> emscripten::val
+      { return containerToJSArray(animation.getKeyFrames()); })
+    .function("count", &f3d::animation::count)
+    .function(
+      "getName", +[](f3d::animation& anim) -> std::string { return anim.getName(); })
+    .function(
+      "getName",
+      +[](f3d::animation& anim, int index) -> std::string { return anim.getName(index); })
+    .function(
+      "getNames",
+      +[](f3d::animation& animation) { return containerToJSArray(animation.getNames()); })
+    .function(
+      "toggle", +[](f3d::animation& animation) -> f3d::animation& { return animation.toggle(); },
+      emscripten::return_value_policy::reference())
+    .function(
+      "toggle", +[](f3d::animation& animation, emscripten::val direction) -> f3d::animation&
+      { return animation.toggle(direction.as<f3d::animation::Direction>()); },
+      emscripten::return_value_policy::reference())
+    .function(
+      "start", +[](f3d::animation& animation) -> f3d::animation& { return animation.start(); },
+      emscripten::return_value_policy::reference())
+    .function(
+      "start", +[](f3d::animation& animation, emscripten::val direction) -> f3d::animation&
+      { return animation.start(direction.as<f3d::animation::Direction>()); },
+      emscripten::return_value_policy::reference())
+    .function("stop", &f3d::animation::stop, emscripten::return_value_policy::reference())
+    .function("isPlaying", &f3d::animation::isPlaying)
+    .function("getDirection", &f3d::animation::getDirection);
+
   // f3d::scene
   emscripten::enum_<f3d::file_availability>("FileAvailability")
     .value("SUPPORTED", f3d::file_availability::SUPPORTED)
@@ -467,21 +543,8 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("removeLight", &f3d::scene::removeLight, emscripten::return_value_policy::reference())
     .function(
       "removeAllLights", &f3d::scene::removeAllLights, emscripten::return_value_policy::reference())
-    .function("loadAnimationTime", &f3d::scene::loadAnimationTime,
-      emscripten::return_value_policy::reference())
     .function("animationTime", &f3d::scene::animationTime)
     .function("animationFrame", &f3d::scene::animationFrame)
-    .function(
-      "animationTimeRange", +[](f3d::scene& scene) -> emscripten::val
-      { return pairToJSArray(scene.animationTimeRange()); })
-    .function(
-      "getAnimationKeyFrames", +[](f3d::scene& scene) -> emscripten::val
-      { return containerToJSArray(scene.getAnimationKeyFrames()); })
-    .function("availableAnimations", &f3d::scene::availableAnimations)
-    .function("getAnimationName", &f3d::scene::getAnimationName)
-    .function(
-      "getAnimationNames",
-      +[](f3d::scene& scene) { return containerToJSArray(scene.getAnimationNames()); })
     .function(
       "getSceneHierarchy",
       +[](f3d::scene& scene) -> emscripten::val
@@ -515,7 +578,9 @@ EMSCRIPTEN_BINDINGS(f3d)
         jsInfo.set("numberOfPoints", info.numberOfPoints);
         jsInfo.set("numberOfCells", info.numberOfCells);
         return jsInfo;
-      });
+      })
+    .function(
+      "getAnimation", &f3d::scene::getAnimation, emscripten::return_value_policy::reference());
 
   // f3d::image
   emscripten::enum_<f3d::image::SaveFormat>("ImageSaveFormat")
@@ -537,6 +602,13 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function(
       "getNormalizedPixel", +[](const f3d::image& img, int x, int y) -> emscripten::val
       { return containerToJSArray(img.getNormalizedPixel({ x, y })); })
+    .class_function(
+      "createFromBuffer",
+      +[](emscripten::val jsbuf) -> f3d::image
+      {
+        std::vector<unsigned char> data = emscripten::vecFromJSArray<unsigned char>(jsbuf);
+        return f3d::image(reinterpret_cast<std::byte*>(data.data()), data.size());
+      })
     .class_function(
       "getSupportedFormats",
       +[]() -> emscripten::val { return containerToJSArray(f3d::image::getSupportedFormats()); })
@@ -661,7 +733,9 @@ EMSCRIPTEN_BINDINGS(f3d)
         return containerToJSArray(win.getDisplayFromWorld(
           { jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() }));
       })
-    .function("getDPIScale", &f3d::window::getDPIScale);
+    .function("getDPIScale", &f3d::window::getDPIScale)
+    .function("setUseHDRICache", &f3d::window::setUseHDRICache,
+      emscripten::return_value_policy::reference());
 
   // f3d::video_frame
   emscripten::class_<f3d::video_frame>("VideoFrame")
@@ -748,10 +822,6 @@ EMSCRIPTEN_BINDINGS(f3d)
     .property("inter", &f3d::interaction_bind_t::inter);
 
   // f3d::interactor
-  emscripten::enum_<f3d::interactor::AnimationDirection>("InteractorAnimationDirection")
-    .value("FORWARD", f3d::interactor::AnimationDirection::FORWARD)
-    .value("BACKWARD", f3d::interactor::AnimationDirection::BACKWARD);
-
   emscripten::enum_<f3d::interactor::BindingType>("InteractorBindingType")
     .value("CYCLIC", f3d::interactor::BindingType::CYCLIC)
     .value("NUMERICAL", f3d::interactor::BindingType::NUMERICAL)
@@ -782,6 +852,19 @@ EMSCRIPTEN_BINDINGS(f3d)
   emscripten::class_<f3d::interactor_state_t>("InteractorState")
     .property("animationTime", &f3d::interactor_state_t::animationTime);
 
+  emscripten::register_vector<std::string>("InteractorBindCommands");
+
+  emscripten::class_<f3d::interactor::BindingParam>("InteractorBindingParam")
+    .constructor<>()
+    .property("bind", &f3d::interactor::BindingParam::Bind)
+    .property("commands", &f3d::interactor::BindingParam::Commands)
+    .property("group", &f3d::interactor::BindingParam::Group)
+    .function("setDocCallback", &setBindingDocCallback)
+    .function("getDocCallback", &getBindingDocCallback)
+    .property("type", &f3d::interactor::BindingParam::Type)
+    .property("notify", &f3d::interactor::BindingParam::Notify)
+    .property("repeat", &f3d::interactor::BindingParam::Repeat);
+
   emscripten::class_<f3d::interactor>("Interactor")
     .function(
       "initCommands", &f3d::interactor::initCommands, emscripten::return_value_policy::reference())
@@ -808,34 +891,8 @@ EMSCRIPTEN_BINDINGS(f3d)
       "initBindings", &f3d::interactor::initBindings, emscripten::return_value_policy::reference())
     .function(
       "addBinding",
-      +[](f3d::interactor& interactor, const f3d::interaction_bind_t& bind,
-         const emscripten::val& commands) -> f3d::interactor&
-      {
-        const std::vector<std::string> commandList =
-          emscripten::vecFromJSArray<std::string>(commands);
-        return interactor.addBinding(bind, commandList);
-      },
-      emscripten::return_value_policy::reference())
-    .function(
-      "addBinding",
-      +[](f3d::interactor& interactor, const f3d::interaction_bind_t& bind,
-         const emscripten::val& commands, std::string group, const emscripten::val& callback,
-         f3d::interactor::BindingType type, bool notify) -> f3d::interactor&
-      {
-        auto wrapCallback = [=]() -> std::pair<std::string, std::string>
-        {
-          emscripten::val result = callback();
-          if (!result.isArray() || result["length"].as<unsigned int>() != 2)
-          {
-            throw std::runtime_error("Callback must return an array of two strings");
-          }
-          return { result[0].as<std::string>(), result[1].as<std::string>() };
-        };
-        const std::vector<std::string> commandList =
-          emscripten::vecFromJSArray<std::string>(commands);
-        return interactor.addBinding(bind, commandList, group, wrapCallback, type, notify);
-      },
-      emscripten::return_value_policy::reference())
+      +[](f3d::interactor& interactor, f3d::interactor::BindingParam binding) -> f3d::interactor&
+      { return interactor.addBinding(binding); }, emscripten::return_value_policy::reference())
     .function("removeBinding", &f3d::interactor::removeBinding,
       emscripten::return_value_policy::reference())
     .function(
@@ -855,26 +912,6 @@ EMSCRIPTEN_BINDINGS(f3d)
         return containerToJSArray(docStrings);
       })
     .function("getBindingType", &f3d::interactor::getBindingType)
-    .function(
-      "toggleAnimation", +[](f3d::interactor& interactor) -> f3d::interactor&
-      { return interactor.toggleAnimation(); }, emscripten::return_value_policy::reference())
-    .function(
-      "toggleAnimation",
-      +[](f3d::interactor& interactor, emscripten::val direction) -> f3d::interactor&
-      { return interactor.toggleAnimation(direction.as<f3d::interactor::AnimationDirection>()); },
-      emscripten::return_value_policy::reference())
-    .function(
-      "startAnimation", +[](f3d::interactor& interactor) -> f3d::interactor&
-      { return interactor.startAnimation(); }, emscripten::return_value_policy::reference())
-    .function(
-      "startAnimation",
-      +[](f3d::interactor& interactor, emscripten::val direction) -> f3d::interactor&
-      { return interactor.startAnimation(direction.as<f3d::interactor::AnimationDirection>()); },
-      emscripten::return_value_policy::reference())
-    .function("stopAnimation", &f3d::interactor::stopAnimation,
-      emscripten::return_value_policy::reference())
-    .function("isPlayingAnimation", &f3d::interactor::isPlayingAnimation)
-    .function("getAnimationDirection", &f3d::interactor::getAnimationDirection)
     .function("getDeltaTime", &f3d::interactor::getDeltaTime)
     .function(
       "jumpToFrame", &f3d::interactor::jumpToFrame, emscripten::return_value_policy::reference())

@@ -1,4 +1,5 @@
 import app.f3d.F3D.*;
+import java.util.List;
 
 public class TestInteractor {
 
@@ -41,15 +42,6 @@ public class TestInteractor {
     parsed.compareTo(parsed2);
     parsed2.hashCode();
 
-    interactor.toggleAnimation();
-    interactor.toggleAnimation(Interactor.AnimationDirection.FORWARD);
-    interactor.toggleAnimation(Interactor.AnimationDirection.BACKWARD);
-    interactor.startAnimation();
-    interactor.startAnimation(Interactor.AnimationDirection.FORWARD);
-    interactor.startAnimation(Interactor.AnimationDirection.BACKWARD);
-    interactor.stopAnimation();
-    interactor.isPlayingAnimation();
-    interactor.getAnimationDirection();
     interactor.getDeltaTime();
     interactor.jumpToFrame(24);
     interactor.jumpToFrameRelative(1);
@@ -58,6 +50,28 @@ public class TestInteractor {
     interactor.jumpToKeyframeRelative(1);
     interactor.jumpToKeyframe(0);
 
+    Interactor.InteractionBind repeatBind = new Interactor.InteractionBind();
+    repeatBind.mod = Interactor.ModifierKeys.NONE;
+    repeatBind.inter = "R";
+
+    List<String> repeatBindCommands = List.of("test_command");
+
+    // Remove any binds from previous CI before testing repeat to avoid error
+    interactor.removeBinding(repeatBind);
+
+    Interactor.BindingParam bindingParam = new Interactor.BindingParam(repeatBind, repeatBindCommands);
+    bindingParam.group("test_group");
+    bindingParam.type(Interactor.BindingType.NUMERICAL);
+    bindingParam.notify(false);
+    bindingParam.repeat(false);
+
+    interactor.addBinding(bindingParam);
+
+    List<Interactor.InteractionBind> testBindings = interactor.getBindsForGroup("test_group");
+    testBindings.stream().allMatch((binding) -> binding.equals(repeatBind));
+
+    interactor.removeBinding(repeatBind);
+
     interactor.setNotificationCallback((desc, value, bindStr, duration) -> {
       System.out.println("Notification: " + desc + " " + value + " " + bindStr + " " + duration);
       return true;
@@ -65,18 +79,10 @@ public class TestInteractor {
 
     interactor.triggerNotification("foo", "bar", 3.0);
 
-    Interactor.AnimationDirection.FORWARD.getValue();
-    Interactor.AnimationDirection.BACKWARD.getValue();
-    Interactor.AnimationDirection.fromValue(0);
-    Interactor.AnimationDirection.fromValue(1);
-
     interactor.enableCameraMovement();
     interactor.disableCameraMovement();
 
     interactor.requestRender();
-
-    interactor.toggleAnimation()
-             .enableCameraMovement();
 
     engine.close();
   }

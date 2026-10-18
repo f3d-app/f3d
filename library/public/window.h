@@ -46,6 +46,7 @@ public:
     EGL,
     OSMESA,
     WASM,
+    XR,
     UNKNOWN
   };
 
@@ -157,6 +158,13 @@ public:
    * Convert a point in world coordinate to display coordinate.
    */
   [[nodiscard]] virtual point3_t getDisplayFromWorld(const point3_t& worldPoint) const = 0;
+
+  /**
+   * Set whether to use HDRI caching or not. Enabled by default.
+   * HDRI caching can improve performance by storing precomputed data in cache path.
+   * Use engine::setCachePath for specifying the cache location.
+   */
+  virtual window& setUseHDRICache(bool use) = 0;
 
 protected:
   //! @cond

@@ -24,7 +24,7 @@ Release Split :
 
 Release Candidates :
 
-- [ ] Commit, review and merge a `vX.Y.Z-RCN` version change in https://github.com/f3d-app/f3d `CMakeLists.txt`, `pyproject.toml` and `package.json` in the `release` branch
+- [ ] Commit, review and merge a `vX.Y.Z-RCN` version change in https://github.com/f3d-app/f3d `CMakeLists.txt`, `pyproject.toml`, `package.json` and `examples/libf3d/web/package-lock.json` in the `release` branch
 - [ ] Tag and push to https://github.com/f3d-app/f3d: `git tag vX.Y.Z-RCN -m vX.Y.Z-RCN`
 - [ ] Trigger a release build using https://github.com/f3d-app/f3d-superbuild actions with `vX.Y.Z-RCN` F3D version, superbuild `main` branch and prerelease publish `true`
 - [ ] Download the prerelease from https://github.com/f3d-app/f3d/releases
@@ -160,11 +160,12 @@ npm install f3d --tag rc
 npm run start
 ```
 
-- Test examples manually (Docker required)
+- Clone https://github.com/f3d-app/f3d (on `vX.Y.Z-RCN`) and test examples manually
 
 ```bash
 cd examples/libf3d/web
-npm run install
+npm uninstall f3d
+npm install f3d --tag rc
 npm run dev --workspace simple-ui
 npm run dev --workspace volume-rendering
 npm run dev --workspace multiple-instances
@@ -175,15 +176,15 @@ Once a release cycle:
 
 - Check that completions are still working with `fish` and `zsh` when tab is pressed
 - Check that F3D is added for extensions on a fresh Windows installation
-- Check that F3D binary on linux works on ubuntu with almost nothing installed (libosmesa6 should NOT install Xorg, check it)
+- Check that F3D binary on linux works on ubuntu with almost nothing installed
 
 ```
 docker run -it ubuntu:latest /bin/bash
 apt update
-apt install wget xz-utils libosmesa6
+apt install wget xz-utils
 wget https://github.com/f3d-app/f3d/raw/refs/heads/master/testing/data/dragon.vtu
 wget https://github.com/f3d-app/f3d/releases/download/X.Y.Z/F3D-X.Y.Z-Linux-x86_64-raytracing.tar.xz
-tar -xzvf F3D-X.Y.Z-Linux-x86_64-raytracing.tar.xz
+tar -xvf F3D-X.Y.Z-Linux-x86_64-raytracing.tar.xz
 apt autoremove wget xz-utils
 ./F3D-X.Y.Z-Linux-x86_64-raytracing/bin/f3d dragon.vtu --output=img.png
 apt install catimg

@@ -133,7 +133,7 @@ std::vector<std::string> options::getNames() const
 {
   const std::vector<std::string> names = options::getAllNames();
   std::vector<std::string> setNames;
-  std::copy_if(names.begin(), names.end(), std::back_inserter(setNames),
+  std::ranges::copy_if(names, std::back_inserter(setNames),
     [&](const std::string& name) { return this->hasValue(name); });
   return setNames;
 }
@@ -151,7 +151,7 @@ std::pair<std::string, unsigned int> options::getClosestOption(std::string_view 
 
   for (const auto& name : names)
   {
-    int distance = utils::textDistance(name, option);
+    const int distance = utils::textDistance(name, option);
     if (distance < ret.second)
     {
       ret = { name, distance };

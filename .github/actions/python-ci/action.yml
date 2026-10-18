@@ -7,6 +7,10 @@ inputs:
   python_version:
     description: "Python version"
     required: true
+  optdeps_label:
+    description: "Label to flag for optional dependencies"
+    required: false
+    default: "optdeps"
   lfs_sha:
     description: "Cache LFS sha"
     required: true
@@ -45,14 +49,15 @@ runs:
         versions_file: ${{inputs.versions_file}}
         cpu: ${{inputs.cpu}}
 
-    # numpy pinned to 2.2.X until python 3.10 support is dropped
+    # pytest and pyopengltk version fixed
+    # to avoid an issue with tk
     - name: Install Python dependencies
       shell: bash
       run: |
         python -m pip install pytest==9.0.3
         python -m pip install pyopengltk==0.0.4
-        python -m pip install PySide6==6.11.1
-        python -m pip install "numpy>=2.2.6"
+        python -m pip install PySide6
+        python -m pip install numpy
 
     - name: Set PATH windows
       if: runner.os == 'Windows'
@@ -77,6 +82,7 @@ runs:
 
     # VDB has some linking issue on macOS, disabling for now
     - name: Set SKBUILD_CMAKE_ARGS
+      if: inputs.optdeps_label == 'optdeps'
       shell: bash
       run: >
         echo "SKBUILD_CMAKE_ARGS=
@@ -96,6 +102,16 @@ runs:
         -DF3D_MODULE_FFMPEG=ON;
         -DF3D_MODULE_UI=ON;
         -DF3D_MODULE_WEBP=ON;
+        -DF3D_BUILD_APPLICATION=OFF" >> $GITHUB_ENV
+
+    - name: Set SKBUILD_CMAKE_ARGS
+      if: inputs.optdeps_label == 'no-optdeps'
+      shell: bash
+      run: >
+        echo "SKBUILD_CMAKE_ARGS=
+        -DF3D_DEPENDENCIES_DIR=${{ env.WORKSPACE }}/dependencies/install/bin;
+        -DF3D_MODULE_CLIP=OFF;
+        -DF3D_MODULE_UI=OFF;
         -DF3D_BUILD_APPLICATION=OFF" >> $GITHUB_ENV
 
     - name: Build wheel

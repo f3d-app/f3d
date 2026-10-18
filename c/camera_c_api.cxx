@@ -10,7 +10,7 @@ void f3d_camera_set_position(f3d_camera_t* camera, const f3d_point3_t pos)
   }
 
   f3d::camera* cpp_camera = reinterpret_cast<f3d::camera*>(camera);
-  f3d::point3_t cpp_pos = { pos[0], pos[1], pos[2] };
+  const f3d::point3_t cpp_pos = { pos[0], pos[1], pos[2] };
   cpp_camera->setPosition(cpp_pos);
 }
 
@@ -39,7 +39,7 @@ void f3d_camera_set_focal_point(f3d_camera_t* camera, const f3d_point3_t focal_p
   }
 
   f3d::camera* cpp_camera = reinterpret_cast<f3d::camera*>(camera);
-  f3d::point3_t cpp_focal = { focal_point[0], focal_point[1], focal_point[2] };
+  const f3d::point3_t cpp_focal = { focal_point[0], focal_point[1], focal_point[2] };
   cpp_camera->setFocalPoint(cpp_focal);
 }
 
@@ -68,7 +68,7 @@ void f3d_camera_set_view_up(f3d_camera_t* camera, const f3d_vector3_t view_up)
   }
 
   f3d::camera* cpp_camera = reinterpret_cast<f3d::camera*>(camera);
-  f3d::vector3_t cpp_view_up = { view_up[0], view_up[1], view_up[2] };
+  const f3d::vector3_t cpp_view_up = { view_up[0], view_up[1], view_up[2] };
   cpp_camera->setViewUp(cpp_view_up);
 }
 

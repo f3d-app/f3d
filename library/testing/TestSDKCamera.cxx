@@ -16,34 +16,34 @@ int TestSDKCamera([[maybe_unused]] int argc, char* argv[])
   PseudoUnitTest test;
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  std::string renderingBackend = std::string(argv[4]);
+  const std::string renderingBackend = std::string(argv[4]);
   f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::window& win = eng.getWindow();
   f3d::camera& cam = win.getCamera();
 
   // check coordinates conversion
-  f3d::point3_t point = { 0.1, 0.1, 0.1 };
-  f3d::point3_t pointDC = win.getDisplayFromWorld(point);
+  const f3d::point3_t point = { 0.1, 0.1, 0.1 };
+  const f3d::point3_t pointDC = win.getDisplayFromWorld(point);
   test("coordinates conversion", point, approx(win.getWorldFromDisplay(pointDC)));
 
   // Test position
-  f3d::point3_t testPos = { 0., 0., 10. };
+  const f3d::point3_t testPos = { 0., 0., 10. };
   f3d::point3_t pos = cam.setPosition(testPos).getPosition();
   test("set/get position", pos, testPos);
 
   // Test focal point
-  f3d::point3_t testFoc = { 0., 0., -1. };
+  const f3d::point3_t testFoc = { 0., 0., -1. };
   f3d::point3_t foc = cam.setFocalPoint(testFoc).getFocalPoint();
   test("set/get focal point", foc, testFoc);
 
   // Test view up
-  f3d::vector3_t testUp = { 1., 0., 0. };
+  const f3d::vector3_t testUp = { 1., 0., 0. };
   f3d::vector3_t up = cam.setViewUp(testUp).getViewUp();
   test("set/get view up", up, testUp);
 
   // Test view angle
-  f3d::angle_deg_t testAngle = 20;
-  f3d::angle_deg_t angle = cam.setViewAngle(testAngle).getViewAngle();
+  const f3d::angle_deg_t testAngle = 20;
+  const f3d::angle_deg_t angle = cam.setViewAngle(testAngle).getViewAngle();
   test("set/get view angle", angle, testAngle);
 
   // Test azimuth

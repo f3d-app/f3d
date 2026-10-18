@@ -3,7 +3,7 @@
     "match-type": "glob",
     "match": "*.drc",
     "options": {
-      "scalar-coloring": true,
+      "coloring-mode": "scivis",
       "load-plugins": "draco"
     }
   }

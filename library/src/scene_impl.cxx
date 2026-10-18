@@ -1,6 +1,6 @@
 #include "scene_impl.h"
 
-#include "animationManager.h"
+#include "animation_impl.h"
 #include "interactor_impl.h"
 #include "log.h"
 #include "options.h"
@@ -15,8 +15,10 @@
 #include "vtkF3DRenderer.h"
 
 #include <algorithm>
+#include <array>
 #include <iterator>
 #include <optional>
+#include <string>
 #include <vtkCallbackCommand.h>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
@@ -50,11 +52,12 @@ public:
   internals(options& options, window_impl& window)
     : Options(options)
     , Window(window)
-    , AnimationManager(options, window)
   {
+    this->Animation = std::make_unique<f3d::detail::animation_impl>(options, window);
+
     this->MetaImporter->SetRenderWindow(this->Window.GetRenderWindow());
     this->Window.SetImporter(this->MetaImporter);
-    this->AnimationManager.SetImporter(this->MetaImporter);
+    this->Animation->SetImporter(this->MetaImporter);
   }
 
   struct ProgressDataStruct
@@ -82,7 +85,7 @@ public:
           vtkProgressBarRepresentation* rep =
             vtkProgressBarRepresentation::SafeDownCast(widget->GetRepresentation());
 
-          double progress = *static_cast<double*>(callData);
+          const double progress = *static_cast<double*>(callData);
 
           // Skipping progress update if the difference is too small to avoid too many renders
           if (progress - rep->GetProgressRate() > 0.02)
@@ -111,6 +114,90 @@ public:
     data->timer->StartTimer();
   }
 
+  struct CLIProgressBarDataStruct
+  {
+    vtkTimerLog* timer = nullptr;
+    std::string fileName;
+    int importerCount = 0;
+  };
+
+  template<std::size_t N>
+  static std::string GenerateCLIBarString(
+    double progress, int barCount, const std::array<std::string_view, N>& strRamp)
+  {
+    std::string bar;
+    double filledBars;
+    const double lastBarProgression = std::modf(progress * barCount, &filledBars);
+    int totalFilled = static_cast<int>(filledBars);
+    for (int i = 0; i < filledBars; i++)
+    {
+      bar += strRamp.back();
+    }
+    if (filledBars < barCount)
+    {
+      const size_t charRampIdx =
+        static_cast<size_t>(std::round(lastBarProgression * (strRamp.size() - 1)));
+      bar += strRamp[charRampIdx];
+      totalFilled++;
+    }
+    while (totalFilled < barCount)
+    {
+      bar += strRamp.front();
+      totalFilled++;
+    }
+    return bar;
+  }
+
+  void CreateCLIProgressBarAndCallback(CLIProgressBarDataStruct* data, vtkF3DMetaImporter* importer)
+  {
+    vtkNew<vtkCallbackCommand> progressCallback;
+    progressCallback->SetClientData(data);
+    progressCallback->SetCallback(
+      [](vtkObject*, unsigned long, void* clientData, void* callData)
+      {
+        constexpr int barCount = 16;
+        // hex characters correspond to the filled progression bars.
+        // sorted from least filled to mostly filled.
+        constexpr std::array charRamp = std::to_array<std::string_view>(
+          { " ", "\u258f", "\u258e", "\u258d", "\u258c", "\u258b", "\u258a", "\u2589", "\u2588" });
+
+        const auto progressData = static_cast<CLIProgressBarDataStruct*>(clientData);
+        const double progress = *static_cast<double*>(callData);
+
+        const std::string bar =
+          scene_impl::internals::GenerateCLIBarString(progress, barCount, charRamp);
+
+        const std::string filename = (progressData->importerCount > 1)
+          ? std::to_string(progressData->importerCount) + " files"
+          : progressData->fileName;
+
+        const int percentage = std::round(100 * progress);
+        const std::string percentageStr = std::format("{:3}", percentage);
+
+        progressData->timer->StopTimer();
+
+        const double estimatedTime =
+          (progress <= 1e-4) ? 0 : progressData->timer->GetElapsedTime() / progress;
+        const int estimatedMin = estimatedTime / 60;
+        const int estimatedSec = static_cast<int>(estimatedTime) % 60;
+        const int elapsedMin = progressData->timer->GetElapsedTime() / 60;
+        const int elapsedSec = static_cast<int>(progressData->timer->GetElapsedTime()) % 60;
+
+        const std::string time = std::format(
+          "{:02}:{:02}/{:02}:{:02}", elapsedMin, elapsedSec, estimatedMin, estimatedSec);
+
+        f3d::log::progress(
+          "\rLoading ", filename, " : ", percentageStr, "% |", bar, "| [", time, "]");
+
+        if (progress >= 1.0)
+        {
+          f3d::log::progress("\n");
+        }
+      });
+    importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
+    data->timer->StartTimer();
+  }
+
   void Load(const std::vector<std::pair<std::string, vtkSmartPointer<vtkImporter>>>& importers)
   {
     for (const auto& importer : importers)
@@ -134,13 +221,24 @@ public:
 
     // Manage progress bar
     vtkNew<vtkProgressBarWidget> progressWidget;
-    vtkNew<vtkTimerLog> timer;
+    const vtkNew<vtkTimerLog> timer;
+
     scene_impl::internals::ProgressDataStruct callbackData;
-    callbackData.timer = timer;
-    callbackData.widget = progressWidget;
+    scene_impl::internals::CLIProgressBarDataStruct cliCallbackData;
+
+    constexpr size_t maxFileNameLength = 51;
+    cliCallbackData.timer = timer;
+    cliCallbackData.importerCount = this->MetaImporter->GetImporterInfoCount();
+    cliCallbackData.fileName = (cliCallbackData.importerCount > 0)
+      ? this->MetaImporter->GetImporterInfo(0).Name.substr(0, maxFileNameLength)
+      : "";
+    scene_impl::internals::CreateCLIProgressBarAndCallback(&cliCallbackData, this->MetaImporter);
+
     if (this->Interactor && !this->Window.isOffscreen())
     {
-      f3d::color_t color = this->Options.ui.loader_progress_color;
+      callbackData.timer = timer;
+      callbackData.widget = progressWidget;
+      const f3d::color_t color = this->Options.ui.loader_progress_color;
       scene_impl::internals::CreateProgressRepresentationAndCallback(
         &callbackData, this->MetaImporter, this->Interactor, color);
     }
@@ -161,8 +259,8 @@ public:
     progressWidget->Off();
 
     // Initialize the animation using temporal information from the importer
-    this->AnimationManager.UpdateDynamicOptions();
-    this->AnimationManager.Initialize();
+    this->Animation->UpdateDynamicOptions();
+    this->Animation->Initialize();
 
     // Update all window options and reset camera to bounds if needed
     this->Window.UpdateDynamicOptions();
@@ -174,12 +272,12 @@ public:
     // Set the camera index domain
     this->Options.domains.scene.camera.index.max = this->MetaImporter->GetNumberOfCameras();
 
-    scene_impl::internals::DisplayAllInfo(this->MetaImporter, this->Window);
+    scene_impl::DisplayAllInfo(this->MetaImporter, this->Window);
   }
 
   static void DisplayImporterDescription(log::VerboseLevel level, vtkImporter* importer)
   {
-    vtkIdType availCameras = importer->GetNumberOfCameras();
+    const vtkIdType availCameras = importer->GetNumberOfCameras();
     if (availCameras <= 0)
     {
       log::print(level, "No camera available");
@@ -196,23 +294,10 @@ public:
     log::print(level, importer->GetOutputsDescription(), "\n");
   }
 
-  static void DisplayAllInfo(vtkImporter* importer, window_impl& window)
-  {
-    // Display output description
-    scene_impl::internals::DisplayImporterDescription(log::VerboseLevel::DEBUG, importer);
-
-    // Display coloring information
-    window.PrintColoringDescription(log::VerboseLevel::DEBUG);
-    log::debug("");
-
-    // Print scene description
-    window.PrintSceneDescription(log::VerboseLevel::DEBUG);
-  }
-
+  std::unique_ptr<detail::animation_impl> Animation;
   options& Options;
   window_impl& Window;
   interactor_impl* Interactor = nullptr;
-  animationManager AnimationManager;
 
   vtkNew<vtkF3DMetaImporter> MetaImporter;
   std::vector<fs::path> AddedFiles;
@@ -230,7 +315,7 @@ scene_impl::~scene_impl() = default;
 //----------------------------------------------------------------------------
 scene& scene_impl::add(const fs::path& filePath)
 {
-  std::vector<fs::path> paths = { filePath };
+  const std::vector<fs::path> paths = { filePath };
   return this->add(paths);
 }
 
@@ -238,7 +323,7 @@ scene& scene_impl::add(const fs::path& filePath)
 scene& scene_impl::add(const std::vector<std::string>& filePathStrings)
 {
   std::vector<fs::path> paths(filePathStrings.size());
-  std::copy(filePathStrings.begin(), filePathStrings.end(), paths.begin());
+  std::ranges::copy(filePathStrings, paths.begin());
   return this->add(paths);
 }
 
@@ -311,7 +396,7 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       // XXX: F3D Plugin CMake logic ensure there is either a scene reader or a geometry reader
       auto vtkReader = reader->createGeometryReader(filePath.string());
       assert(vtkReader);
-      vtkSmartPointer<vtkF3DGenericImporter> genericImporter =
+      const vtkSmartPointer<vtkF3DGenericImporter> genericImporter =
         vtkSmartPointer<vtkF3DGenericImporter>::New();
       genericImporter->SetInternalReader(vtkReader);
       importer = genericImporter;
@@ -493,16 +578,16 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
   // Only time range is supported at the moment but we should also add support
   // for time steps and simulated meshes in the future
   auto timeRange = mesh->getTimeRange();
-  vtkSource->SetTimeRange(timeRange[0], timeRange[1]);
+  vtkSource->SetTimeRange(timeRange.first, timeRange.second);
 
   vtkSource->SetUpdateFunction(
     [=](double time, vtkPolyData* polydata)
     {
       const auto memoryView = mesh->getMemoryView(time);
 
-      bool firstTime = polydata->GetPoints() == nullptr;
+      const bool forceUpdate = polydata->GetPoints() == nullptr || mesh->buffersNeedUpdate();
 
-      f3d::log::debug(firstTime ? "Initializing" : "Updating", " mesh_view at time ", time);
+      f3d::log::debug(forceUpdate ? "Initializing" : "Updating", " mesh_view at time ", time);
 
       // handle points
       if (memoryView.pointCount == 0)
@@ -526,7 +611,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
         throw scene::load_failure_exception("Mesh view points must have 3 components");
       }
 
-      if (firstTime || memoryView.points.timeDependent)
+      if (forceUpdate || memoryView.points.timeDependent)
       {
         vtkNew<vtkPoints> points;
 
@@ -548,7 +633,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
       }
 
       // handle normals if provided
-      if (memoryView.normals.data != nullptr && (firstTime || memoryView.normals.timeDependent))
+      if (memoryView.normals.data != nullptr && (forceUpdate || memoryView.normals.timeDependent))
       {
         if (memoryView.normals.type != mesh_view::data_type::F32 &&
           memoryView.normals.type != mesh_view::data_type::F64)
@@ -578,7 +663,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
       }
 
       // handle texture coordinates if provided
-      if ((firstTime || memoryView.textureCoordinates.timeDependent) &&
+      if ((forceUpdate || memoryView.textureCoordinates.timeDependent) &&
         memoryView.textureCoordinates.data != nullptr)
       {
         if (memoryView.textureCoordinates.type != mesh_view::data_type::F32 &&
@@ -614,7 +699,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
       // handle scalars if provided
       for (const auto& scalar : memoryView.pointScalars)
       {
-        if (firstTime || scalar.timeDependent)
+        if (forceUpdate || scalar.timeDependent)
         {
           f3d::mesh_view::dataTypeDispatch(scalar.type,
             [&]<typename DataT>()
@@ -633,7 +718,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
 
       for (const auto& scalar : memoryView.cellScalars)
       {
-        if (firstTime || scalar.timeDependent)
+        if (forceUpdate || scalar.timeDependent)
         {
           f3d::mesh_view::dataTypeDispatch(scalar.type,
             [&]<typename DataT>()
@@ -732,21 +817,26 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
       };
 
       if (memoryView.vertices.indices.timeDependent || memoryView.vertices.offsets.timeDependent ||
-        firstTime)
+        forceUpdate)
       {
         polydata->SetVerts(handleCells(memoryView.vertices));
       }
 
       if (memoryView.lines.indices.timeDependent || memoryView.lines.offsets.timeDependent ||
-        firstTime)
+        forceUpdate)
       {
         polydata->SetLines(handleCells(memoryView.lines));
       }
 
       if (memoryView.polygons.indices.timeDependent || memoryView.polygons.offsets.timeDependent ||
-        firstTime)
+        forceUpdate)
       {
         polydata->SetPolys(handleCells(memoryView.polygons));
+      }
+
+      if (forceUpdate)
+      {
+        mesh->buffersUpdated();
       }
     });
 
@@ -762,7 +852,7 @@ scene& scene_impl::add([[maybe_unused]] std::shared_ptr<mesh_view> mesh)
   vtkNew<vtkF3DGenericImporter> importer;
   importer->SetInternalReader(vtkSource);
 
-  std::string name = mesh->getName();
+  const std::string name = mesh->getName();
 
   log::debug("Loading 3D scene from memory");
   this->Internals->Load({ { name.empty() ? "<mesh_view>" : name, importer } });
@@ -785,7 +875,7 @@ scene& scene_impl::clear()
   this->Internals->AddedFiles.clear();
 
   // Clear animation state
-  this->Internals->AnimationManager.Reset();
+  this->Internals->Animation->Reset();
 
   return *this;
 }
@@ -940,69 +1030,57 @@ f3d::file_availability scene_impl::supports(const fs::path& filePath)
 }
 
 //----------------------------------------------------------------------------
-scene& scene_impl::loadAnimationTime(double timeValue)
+animation& scene_impl::getAnimation()
 {
-  this->Internals->AnimationManager.LoadAtTime(timeValue);
-  scene_impl::internals::DisplayAllInfo(this->Internals->MetaImporter, this->Internals->Window);
-  return *this;
+  return *this->Internals->Animation;
 }
 
 //----------------------------------------------------------------------------
 double scene_impl::animationTime()
 {
-  return this->Internals->AnimationManager.GetCurrentTime();
+  return this->Internals->Animation->GetCurrentTime();
 }
 
 //----------------------------------------------------------------------------
 size_t scene_impl::animationFrame()
 {
   assert(this->Internals->Interactor);
-  assert(this->Internals->AnimationManager);
+  assert(this->Internals->Animation);
 
-  this->Internals->AnimationManager.SetDeltaTime(this->Internals->Interactor->getDeltaTime());
-  return this->Internals->AnimationManager.GetCurrentFrame();
+  this->Internals->Animation->SetDeltaTime(this->Internals->Interactor->getDeltaTime());
+  return this->Internals->Animation->GetCurrentFrame();
 }
 
 //----------------------------------------------------------------------------
-std::pair<double, double> scene_impl::animationTimeRange()
+animation_impl& scene_impl::GetAnimationImpl()
 {
-  return this->Internals->AnimationManager.GetTimeRange();
-}
-
-//----------------------------------------------------------------------------
-std::vector<double> scene_impl::getAnimationKeyFrames()
-{
-  return this->Internals->AnimationManager.GetKeyFrames();
-}
-
-//----------------------------------------------------------------------------
-unsigned int scene_impl::availableAnimations() const
-{
-  return this->Internals->AnimationManager.GetNumberOfAvailableAnimations();
-}
-
-//----------------------------------------------------------------------------
-std::string scene_impl::getAnimationName(int index)
-{
-  return this->Internals->AnimationManager.GetAnimationName(index);
-}
-
-//----------------------------------------------------------------------------
-std::vector<std::string> scene_impl::getAnimationNames()
-{
-  return this->Internals->AnimationManager.GetAnimationNames();
+  return *this->Internals->Animation;
 }
 
 //----------------------------------------------------------------------------
 void scene_impl::SetInteractor(interactor_impl* interactor)
 {
   this->Internals->Interactor = interactor;
-  this->Internals->AnimationManager.SetInteractor(interactor);
-  this->Internals->Interactor->SetAnimationManager(&this->Internals->AnimationManager);
+  this->Internals->Animation->SetInteractor(interactor);
 }
 
+//----------------------------------------------------------------------------
 void scene_impl::PrintImporterDescription(log::VerboseLevel level)
 {
   scene_impl::internals::DisplayImporterDescription(level, this->Internals->MetaImporter);
+}
+
+//----------------------------------------------------------------------------
+void scene_impl::DisplayAllInfo(vtkImporter* importer, window_impl& window)
+{
+  // Display output description
+  scene_impl::internals::DisplayImporterDescription(log::VerboseLevel::DEBUG, importer);
+
+  // Display coloring information
+  window.PrintColoringDescription(log::VerboseLevel::DEBUG);
+  log::debug("");
+
+  // Print scene description
+  window.PrintSceneDescription(log::VerboseLevel::DEBUG);
 }
 }

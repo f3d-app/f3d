@@ -21,7 +21,7 @@ extern "C"
   JNIEXPORT void JAVA_BIND(Options, setAsBool)(
     JNIEnv* env, jobject self, jstring name, jboolean value)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     try
     {
       GetOptionsFromEngine(env, self).set(str.c_str(), static_cast<bool>(value));
@@ -38,7 +38,7 @@ extern "C"
 
   JNIEXPORT void JAVA_BIND(Options, setAsInt)(JNIEnv* env, jobject self, jstring name, jint value)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     try
     {
       GetOptionsFromEngine(env, self).set(str.c_str(), static_cast<int>(value));
@@ -56,7 +56,7 @@ extern "C"
   JNIEXPORT void JAVA_BIND(Options, setAsDouble)(
     JNIEnv* env, jobject self, jstring name, jdouble value)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     try
     {
       GetOptionsFromEngine(env, self).set(str.c_str(), static_cast<double>(value));
@@ -74,8 +74,8 @@ extern "C"
   JNIEXPORT void JAVA_BIND(Options, setAsString)(
     JNIEnv* env, jobject self, jstring name, jstring value)
   {
-    JniUTFString nameStr(env, name);
-    JniUTFString valueStr(env, value);
+    const JniUTFString nameStr(env, name);
+    const JniUTFString valueStr(env, value);
     try
     {
       GetOptionsFromEngine(env, self).set(nameStr.c_str(), std::string(valueStr.c_str()));
@@ -93,8 +93,8 @@ extern "C"
   JNIEXPORT void JAVA_BIND(Options, setAsDoubleVector)(
     JNIEnv* env, jobject self, jstring name, jdoubleArray values)
   {
-    JniUTFString str(env, name);
-    jsize len = env->GetArrayLength(values);
+    const JniUTFString str(env, name);
+    const jsize len = env->GetArrayLength(values);
     double* arr = env->GetDoubleArrayElements(values, nullptr);
     std::vector<double> vec(arr, arr + len);
     env->ReleaseDoubleArrayElements(values, arr, 0);
@@ -116,8 +116,8 @@ extern "C"
   JNIEXPORT void JAVA_BIND(Options, setAsIntVector)(
     JNIEnv* env, jobject self, jstring name, jintArray values)
   {
-    JniUTFString str(env, name);
-    jsize len = env->GetArrayLength(values);
+    const JniUTFString str(env, name);
+    const jsize len = env->GetArrayLength(values);
     int* arr = env->GetIntArrayElements(values, nullptr);
     std::vector<int> vec(arr, arr + len);
     env->ReleaseIntArrayElements(values, arr, 0);
@@ -138,7 +138,7 @@ extern "C"
 
   JNIEXPORT jboolean JAVA_BIND(Options, getAsBool)(JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     bool value = false;
     try
     {
@@ -161,7 +161,7 @@ extern "C"
 
   JNIEXPORT jint JAVA_BIND(Options, getAsInt)(JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     int value = 0;
     try
     {
@@ -184,7 +184,7 @@ extern "C"
 
   JNIEXPORT jdouble JAVA_BIND(Options, getAsDouble)(JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     double value = 0.0;
     try
     {
@@ -207,7 +207,7 @@ extern "C"
 
   JNIEXPORT jstring JAVA_BIND(Options, getAsString)(JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     std::string value;
     try
     {
@@ -231,7 +231,7 @@ extern "C"
   JNIEXPORT jstring JAVA_BIND(Options, getAsStringRepresentation)(
     JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     std::string value;
     try
     {
@@ -251,8 +251,8 @@ extern "C"
   JNIEXPORT void JAVA_BIND(Options, setAsStringRepresentation)(
     JNIEnv* env, jobject self, jstring name, jstring str)
   {
-    JniUTFString nameStr(env, name);
-    JniUTFString valueStr(env, str);
+    const JniUTFString nameStr(env, name);
+    const JniUTFString valueStr(env, str);
     try
     {
       GetOptionsFromEngine(env, self).setAsString(nameStr.c_str(), valueStr.c_str());
@@ -270,7 +270,7 @@ extern "C"
   JNIEXPORT jdoubleArray JAVA_BIND(Options, getAsDoubleVector)(
     JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     jdoubleArray result = nullptr;
     try
     {
@@ -296,7 +296,7 @@ extern "C"
 
   JNIEXPORT jintArray JAVA_BIND(Options, getAsIntVector)(JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     jintArray result = nullptr;
     try
     {
@@ -322,7 +322,7 @@ extern "C"
 
   JNIEXPORT void JAVA_BIND(Options, toggle)(JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     try
     {
       GetOptionsFromEngine(env, self).toggle(str.c_str());
@@ -340,11 +340,11 @@ extern "C"
   JNIEXPORT jboolean JAVA_BIND(Options, isSame)(
     JNIEnv* env, jobject self, jobject other, jstring name)
   {
-    JniLocalRef<jclass> otherClass(env, env->GetObjectClass(other));
+    const JniLocalRef<jclass> otherClass(env, env->GetObjectClass(other));
     jfieldID fid = env->GetFieldID(otherClass, "mNativeAddress", "J");
-    jlong otherPtr = env->GetLongField(other, fid);
+    const jlong otherPtr = env->GetLongField(other, fid);
 
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     bool result = false;
     try
     {
@@ -360,7 +360,7 @@ extern "C"
 
   JNIEXPORT jboolean JAVA_BIND(Options, hasValue)(JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     bool result = false;
     try
     {
@@ -375,11 +375,11 @@ extern "C"
 
   JNIEXPORT void JAVA_BIND(Options, copy)(JNIEnv* env, jobject self, jobject other, jstring name)
   {
-    JniLocalRef<jclass> otherClass(env, env->GetObjectClass(other));
+    const JniLocalRef<jclass> otherClass(env, env->GetObjectClass(other));
     jfieldID fid = env->GetFieldID(otherClass, "mNativeAddress", "J");
-    jlong otherPtr = env->GetLongField(other, fid);
+    const jlong otherPtr = env->GetLongField(other, fid);
 
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     try
     {
       GetOptionsFromEngine(env, self).copy(
@@ -393,26 +393,27 @@ extern "C"
 
   JNIEXPORT jobject JAVA_BIND(Options, getAllNames)(JNIEnv* env, jclass)
   {
-    std::vector<std::string> names = f3d::options::getAllNames();
+    const std::vector<std::string> names = f3d::options::getAllNames();
     return CreateStringList(env, names);
   }
 
   JNIEXPORT jobject JAVA_BIND(Options, getNames)(JNIEnv* env, jobject self)
   {
-    f3d::options& opts = GetOptionsFromEngine(env, self);
-    std::vector<std::string> names = opts.getNames();
+    const f3d::options& opts = GetOptionsFromEngine(env, self);
+    const std::vector<std::string> names = opts.getNames();
     return CreateStringList(env, names);
   }
 
   JNIEXPORT jobject JAVA_BIND(Options, getClosestOption)(JNIEnv* env, jobject self, jstring option)
   {
-    JniUTFString str(env, option);
+    const JniUTFString str(env, option);
     auto [name, distance] = GetOptionsFromEngine(env, self).getClosestOption(str.c_str());
 
-    JniLocalRef<jclass> resultClass(env, env->FindClass("app/f3d/F3D/Options$ClosestOptionResult"));
+    const JniLocalRef<jclass> resultClass(
+      env, env->FindClass("app/f3d/F3D/Options$ClosestOptionResult"));
     jmethodID constructor = env->GetMethodID(resultClass, "<init>", "(Ljava/lang/String;I)V");
 
-    JniLocalRef<jstring> jname(env, env->NewStringUTF(name.c_str()));
+    const JniLocalRef<jstring> jname(env, env->NewStringUTF(name.c_str()));
     jobject result =
       env->NewObject(resultClass, constructor, jname.get(), static_cast<jint>(distance));
 
@@ -421,7 +422,7 @@ extern "C"
 
   JNIEXPORT jboolean JAVA_BIND(Options, isOptional)(JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     bool result = false;
     try
     {
@@ -436,11 +437,11 @@ extern "C"
 
   JNIEXPORT jobject JAVA_BIND(Options, getType)(JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     jobject result = nullptr;
     try
     {
-      f3d::options::option_type type = GetOptionsFromEngine(env, self).getType(str.c_str());
+      const f3d::options::option_type type = GetOptionsFromEngine(env, self).getType(str.c_str());
 
       const char* enumName = nullptr;
       switch (type)
@@ -486,7 +487,7 @@ extern "C"
           assert(false);
       }
 
-      JniLocalRef<jclass> typeClass(env, env->FindClass("app/f3d/F3D/Options$OptionType"));
+      const JniLocalRef<jclass> typeClass(env, env->FindClass("app/f3d/F3D/Options$OptionType"));
       jfieldID fid = env->GetStaticFieldID(typeClass, enumName, "Lapp/f3d/F3D/Options$OptionType;");
       result = env->GetStaticObjectField(typeClass, fid);
     }
@@ -499,7 +500,7 @@ extern "C"
 
   JNIEXPORT void JAVA_BIND(Options, reset)(JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     try
     {
       GetOptionsFromEngine(env, self).reset(str.c_str());
@@ -512,7 +513,7 @@ extern "C"
 
   JNIEXPORT void JAVA_BIND(Options, removeValue)(JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     try
     {
       GetOptionsFromEngine(env, self).removeValue(str.c_str());
@@ -529,7 +530,7 @@ extern "C"
 
   JNIEXPORT jboolean JAVA_BIND(Options, hasDomain)(JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     bool result = false;
     try
     {
@@ -544,13 +545,14 @@ extern "C"
 
   JNIEXPORT jobject JAVA_BIND(Options, getDomainStyle)(JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     jobject result = nullptr;
     try
     {
-      f3d::options::domain_style ds = GetOptionsFromEngine(env, self).getDomainStyle(str.c_str());
+      const f3d::options::domain_style ds =
+        GetOptionsFromEngine(env, self).getDomainStyle(str.c_str());
 
-      JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Options$DomainStyle"));
+      const JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Options$DomainStyle"));
       jfieldID fieldID;
 
       switch (ds)
@@ -578,10 +580,10 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Options, getRangeDomainAsDouble)(
     JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     const std::string nameStr = str.c_str();
 
-    JniLocalRef<jclass> rangeClass(env, env->FindClass("app/f3d/F3D/Options$DomainRange"));
+    const JniLocalRef<jclass> rangeClass(env, env->FindClass("app/f3d/F3D/Options$DomainRange"));
     jmethodID rangeCtor = env->GetMethodID(
       rangeClass, "<init>", "(Ljava/lang/Number;Ljava/lang/Number;Ljava/lang/Number;)V");
     jobject result = nullptr;
@@ -598,7 +600,7 @@ extern "C"
           "Trying to get range domain of " + nameStr + " as a Double but it is an Integer domain");
       }
 
-      JniLocalRef<jclass> doubleClass(env, env->FindClass("java/lang/Double"));
+      const JniLocalRef<jclass> doubleClass(env, env->FindClass("java/lang/Double"));
       jmethodID valueOf = env->GetStaticMethodID(doubleClass, "valueOf", "(D)Ljava/lang/Double;");
       result = env->NewObject(rangeClass, rangeCtor,
         env->CallStaticObjectMethod(doubleClass, valueOf, std::get<double>(range.min)),
@@ -618,10 +620,10 @@ extern "C"
 
   JNIEXPORT jobject JAVA_BIND(Options, getRangeDomainAsInt)(JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     const std::string nameStr = str.c_str();
 
-    JniLocalRef<jclass> rangeClass(env, env->FindClass("app/f3d/F3D/Options$DomainRange"));
+    const JniLocalRef<jclass> rangeClass(env, env->FindClass("app/f3d/F3D/Options$DomainRange"));
     jmethodID rangeCtor = env->GetMethodID(
       rangeClass, "<init>", "(Ljava/lang/Number;Ljava/lang/Number;Ljava/lang/Number;)V");
     jobject result = nullptr;
@@ -637,7 +639,7 @@ extern "C"
           " as an Integer but it is not an Integer domain");
       }
 
-      JniLocalRef<jclass> integerClass(env, env->FindClass("java/lang/Integer"));
+      const JniLocalRef<jclass> integerClass(env, env->FindClass("java/lang/Integer"));
       jmethodID valueOf = env->GetStaticMethodID(integerClass, "valueOf", "(I)Ljava/lang/Integer;");
       result = env->NewObject(rangeClass, rangeCtor,
         env->CallStaticObjectMethod(integerClass, valueOf, std::get<int>(range.min)),
@@ -658,7 +660,7 @@ extern "C"
   JNIEXPORT jobject JAVA_BIND(Options, getEnumDomainAsString)(
     JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     const std::string nameStr = str.c_str();
     jobject result = nullptr;
     try
@@ -683,7 +685,7 @@ extern "C"
 
   JNIEXPORT jobject JAVA_BIND(Options, getIndexDomain)(JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     const std::string nameStr = str.c_str();
     jobject result = nullptr;
     try
@@ -710,7 +712,7 @@ extern "C"
 
   JNIEXPORT void JAVA_BIND(Options, increase)(JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     try
     {
       GetOptionsFromEngine(env, self).increase(str.c_str());
@@ -723,7 +725,7 @@ extern "C"
 
   JNIEXPORT void JAVA_BIND(Options, decrease)(JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     try
     {
       GetOptionsFromEngine(env, self).decrease(str.c_str());
@@ -736,7 +738,7 @@ extern "C"
 
   JNIEXPORT void JAVA_BIND(Options, cycle)(JNIEnv* env, jobject self, jstring name)
   {
-    JniUTFString str(env, name);
+    const JniUTFString str(env, name);
     try
     {
       GetOptionsFromEngine(env, self).cycle(str.c_str());

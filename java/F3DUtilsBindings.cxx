@@ -13,10 +13,10 @@ extern "C"
       return 0;
     }
 
-    JniUTFString strAChars(env, strA);
-    JniUTFString strBChars(env, strB);
+    const JniUTFString strAChars(env, strA);
+    const JniUTFString strBChars(env, strB);
 
-    unsigned int distance = f3d::utils::textDistance(strAChars.c_str(), strBChars.c_str());
+    const unsigned int distance = f3d::utils::textDistance(strAChars.c_str(), strBChars.c_str());
 
     return static_cast<jint>(distance);
   }
@@ -29,7 +29,7 @@ extern "C"
       return CreateStringList(env, std::vector<std::string>());
     }
 
-    JniUTFString strChars(env, str);
+    const JniUTFString strChars(env, str);
     jobject result = nullptr;
     try
     {
@@ -37,7 +37,7 @@ extern "C"
     }
     catch (const std::exception& e)
     {
-      JniLocalRef<jclass> exceptionClass(env, env->FindClass("java/lang/RuntimeException"));
+      const JniLocalRef<jclass> exceptionClass(env, env->FindClass("java/lang/RuntimeException"));
       env->ThrowNew(exceptionClass, e.what());
     }
     return result;
@@ -51,17 +51,17 @@ extern "C"
       return env->NewStringUTF("");
     }
 
-    JniUTFString pathChars(env, path);
-    std::string pathStr = pathChars.c_str();
+    const JniUTFString pathChars(env, path);
+    const std::string pathStr = pathChars.c_str();
 
     std::filesystem::path basePath;
     if (baseDirectory)
     {
-      JniUTFString baseDirChars(env, baseDirectory);
+      const JniUTFString baseDirChars(env, baseDirectory);
       basePath = baseDirChars.c_str();
     }
 
-    std::filesystem::path result = f3d::utils::collapsePath(pathStr, basePath);
+    const std::filesystem::path result = f3d::utils::collapsePath(pathStr, basePath);
     return env->NewStringUTF(result.string().c_str());
   }
 
@@ -73,7 +73,7 @@ extern "C"
       return env->NewStringUTF("");
     }
 
-    JniUTFString globChars(env, glob);
+    const JniUTFString globChars(env, glob);
     std::string result;
     try
     {
@@ -81,7 +81,7 @@ extern "C"
     }
     catch (const std::exception& e)
     {
-      JniLocalRef<jclass> exceptionClass(env, env->FindClass("java/lang/RuntimeException"));
+      const JniLocalRef<jclass> exceptionClass(env, env->FindClass("java/lang/RuntimeException"));
       env->ThrowNew(exceptionClass, e.what());
     }
     return env->ExceptionCheck() ? nullptr : env->NewStringUTF(result.c_str());
@@ -94,7 +94,7 @@ extern "C"
       return nullptr;
     }
 
-    JniUTFString envVarChars(env, envVar);
+    const JniUTFString envVarChars(env, envVar);
     std::optional<std::string> result = f3d::utils::getEnv(envVarChars.c_str());
 
     return result.has_value() ? env->NewStringUTF(result.value().c_str()) : nullptr;
@@ -107,11 +107,11 @@ extern "C"
       return nullptr;
     }
 
-    JniLocalRef<jclass> enumClass(env, env->GetObjectClass(knownFolder));
+    const JniLocalRef<jclass> enumClass(env, env->GetObjectClass(knownFolder));
     jmethodID getValueMethod = env->GetMethodID(enumClass, "getValue", "()I");
-    jint folderValue = env->CallIntMethod(knownFolder, getValueMethod);
+    const jint folderValue = env->CallIntMethod(knownFolder, getValueMethod);
 
-    f3d::utils::KnownFolder folder = static_cast<f3d::utils::KnownFolder>(folderValue);
+    const f3d::utils::KnownFolder folder = static_cast<f3d::utils::KnownFolder>(folderValue);
     std::optional<std::string> result = f3d::utils::getKnownFolder(folder);
 
     return result.has_value() ? env->NewStringUTF(result.value().c_str()) : nullptr;

@@ -34,15 +34,7 @@ int test_interactor()
     return 1;
   }
 
-  f3d_interactor_toggle_animation(interactor, F3D_INTERACTOR_ANIMATION_FORWARD);
-  f3d_interactor_start_animation(interactor, F3D_INTERACTOR_ANIMATION_BACKWARD);
-  int playing = f3d_interactor_is_playing_animation(interactor);
-  (void)playing;
-  f3d_interactor_animation_direction_t direction =
-    f3d_interactor_get_animation_direction(interactor);
-  (void)direction;
-  f3d_interactor_stop_animation(interactor);
-  f3d_interactor_jump_to_frame(interactor, 24);
+f3d_interactor_jump_to_frame(interactor, 24);
   f3d_interactor_jump_to_frame_relative(interactor, 1);
   f3d_interactor_jump_to_frame(interactor, 0);
   f3d_interactor_jump_to_keyframe(interactor, 4);
@@ -104,6 +96,11 @@ int test_interactor()
   snprintf(ctrl_bind.inter, sizeof(ctrl_bind.inter), "A");
   f3d_interaction_bind_format(&ctrl_bind, formatted, sizeof(formatted));
 
+  f3d_interaction_bind_t repeat_bind;
+  repeat_bind.mod = F3D_INTERACTION_BIND_NONE;
+  snprintf(repeat_bind.inter, sizeof(repeat_bind.inter), "r");
+  f3d_interaction_bind_format(&repeat_bind, formatted, sizeof(formatted));
+
   f3d_interaction_bind_t parsed_bind;
   f3d_interaction_bind_parse("Shift+B", &parsed_bind);
 
@@ -114,7 +111,26 @@ int test_interactor()
   (void)less1;
 
   const char* test_commands[] = { "test_action" };
-  f3d_interactor_add_binding(interactor, &bind, test_commands, 1, "test_group", F3D_INTERACTOR_BINDING_CYCLIC, 1);
+  f3d_binding_params_t bind_params;
+  bind_params.bind = bind;
+  bind_params.commands = test_commands;
+  bind_params.command_count = 1;
+  bind_params.group = "test_group";
+  bind_params.type = F3D_INTERACTOR_BINDING_CYCLIC;
+  bind_params.notify = 1;
+  bind_params.repeat = 0;
+  f3d_interactor_add_binding(interactor, bind_params);
+
+  const char* test_commands_repeat[] = { "test_action_repeat" };
+  f3d_binding_params_t repeat_bind_params;
+  repeat_bind_params.bind = repeat_bind;
+  repeat_bind_params.commands = test_commands_repeat;
+  repeat_bind_params.command_count = 1;
+  repeat_bind_params.group = "test_group";
+  repeat_bind_params.type = F3D_INTERACTOR_BINDING_NUMERICAL;
+  repeat_bind_params.notify = 1;
+  repeat_bind_params.repeat = 1;
+  f3d_interactor_add_binding(interactor, repeat_bind_params);
 
   int group_count = 0;
   char** groups = f3d_interactor_get_bind_groups(interactor, &group_count);
@@ -145,6 +161,14 @@ int test_interactor()
   (void)binding_type;
 
   f3d_interactor_remove_binding(interactor, &bind);
+
+  f3d_binding_documentation_t doc_repeat;
+  f3d_interactor_get_binding_documentation(interactor, &repeat_bind, &doc_repeat);
+
+  f3d_interactor_binding_type_t binding_type_repeat = f3d_interactor_get_binding_type(interactor, &repeat_bind);
+  (void)binding_type_repeat;
+
+  f3d_interactor_remove_binding(interactor, &repeat_bind);
 
   f3d_interactor_set_event_loop_user_callback(interactor, stop_callback, interactor);
   f3d_interactor_start(interactor, 0.01);

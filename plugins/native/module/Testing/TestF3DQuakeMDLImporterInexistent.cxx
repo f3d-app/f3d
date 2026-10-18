@@ -6,7 +6,7 @@
 
 int TestF3DQuakeMDLImporterInexistent(int vtkNotUsed(argc), char* argv[])
 {
-  std::string pathInexistent = std::string(argv[1]) + "data/inexistent.mdl";
+  const std::string pathInexistent = std::string(argv[1]) + "data/inexistent.mdl";
   vtkNew<vtkF3DQuakeMDLImporter> importer;
   importer->SetFileName(pathInexistent.c_str());
   if (importer->Update())

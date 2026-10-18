@@ -10,13 +10,13 @@ int TestSDKSceneInvalidHeader([[maybe_unused]] int argc, char* argv[])
   PseudoUnitTest test;
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  std::string renderingBackend = std::string(argv[4]);
+  const std::string renderingBackend = std::string(argv[4]);
   f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::scene& sce = eng.getScene();
 
   // Test file logic
   // To be merged in TestSDKScene after VTK v9.6 support is dropped
-  std::string invalidHeaderFilename = "invalid.mdl";
+  const std::string invalidHeaderFilename = "invalid.mdl";
   std::string invalidHeader = std::string(argv[1]) + "data/" + invalidHeaderFilename;
 
   // supports method
@@ -37,10 +37,10 @@ int TestSDKSceneInvalidHeader([[maybe_unused]] int argc, char* argv[])
     }
     catch (f3d::scene::load_failure_exception& E)
     {
-      std::string expectedMsg =
+      const std::string expectedMsg =
         "contains unsupported content and no reader have been selected, use skip content check to "
         "skip content validation or force reader to force a specific reader";
-      std::string exceptMsg = E.what();
+      const std::string exceptMsg = E.what();
       test("Check exception message size", exceptMsg.size() >= expectedMsg.size());
       test("Check exception message",
         exceptMsg.substr(exceptMsg.size() - expectedMsg.size(), expectedMsg.size()) == expectedMsg);

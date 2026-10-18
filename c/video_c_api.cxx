@@ -43,7 +43,7 @@ void f3d_video_frame_set_timestamp(f3d_video_frame_t* frame, int64_t timestamp)
     return;
   }
 
-  f3d_video_frame_t* cpp_frame = reinterpret_cast<f3d_video_frame_t*>(frame);
+  const f3d_video_frame_t* cpp_frame = reinterpret_cast<f3d_video_frame_t*>(frame);
   cpp_frame->impl->setTimestamp(timestamp);
 }
 
@@ -200,7 +200,7 @@ void f3d_video_encoder_listen(
     return;
   }
 
-  f3d_video_encoder_t* cpp_encoder = reinterpret_cast<f3d_video_encoder_t*>(encoder);
+  const f3d_video_encoder_t* cpp_encoder = reinterpret_cast<f3d_video_encoder_t*>(encoder);
   cpp_encoder->impl->listen([=](const std::shared_ptr<f3d::video_packet>& packet)
     { callback(reinterpret_cast<const f3d_video_packet_t*>(packet.get()), user_data); });
 }
@@ -213,8 +213,8 @@ int f3d_video_encoder_submit(f3d_video_encoder_t* encoder, f3d_video_frame_t* fr
     return 0;
   }
 
-  f3d_video_encoder_t* cpp_encoder = reinterpret_cast<f3d_video_encoder_t*>(encoder);
-  f3d_video_frame_t* cpp_frame = reinterpret_cast<f3d_video_frame_t*>(frame);
+  const f3d_video_encoder_t* cpp_encoder = reinterpret_cast<f3d_video_encoder_t*>(encoder);
+  const f3d_video_frame_t* cpp_frame = reinterpret_cast<f3d_video_frame_t*>(frame);
 
   try
   {

@@ -44,50 +44,6 @@ const settings = {
     );
 
     // animations
-    utils.assert(
-      !interactor.isPlayingAnimation(),
-      "animation should not be playing",
-    );
-
-    interactor.startAnimation(Module.InteractorAnimationDirection.FORWARD);
-    utils.assert(
-      interactor.isPlayingAnimation() &&
-        interactor.getAnimationDirection() ==
-          Module.InteractorAnimationDirection.FORWARD,
-      "animation should be playing forward",
-    );
-    interactor.stopAnimation();
-    utils.assert(
-      !interactor.isPlayingAnimation(),
-      "animation should not be playing",
-    );
-
-    interactor.startAnimation(Module.InteractorAnimationDirection.BACKWARD);
-    utils.assert(
-      interactor.isPlayingAnimation() &&
-        interactor.getAnimationDirection() ==
-          Module.InteractorAnimationDirection.BACKWARD,
-      "animation should be playing backward",
-    );
-    interactor.stopAnimation();
-
-    interactor.toggleAnimation(Module.InteractorAnimationDirection.FORWARD);
-    utils.assert(
-      interactor.isPlayingAnimation() &&
-        interactor.getAnimationDirection() ==
-          Module.InteractorAnimationDirection.FORWARD,
-      "animation should be playing forward",
-    );
-    interactor.stopAnimation();
-
-    interactor.toggleAnimation(Module.InteractorAnimationDirection.BACKWARD);
-    utils.assert(
-      interactor.isPlayingAnimation() &&
-        interactor.getAnimationDirection() ==
-          Module.InteractorAnimationDirection.BACKWARD,
-      "animation should be playing backward",
-    );
-    interactor.stopAnimation();
     interactor.jumpToFrame(24);
     interactor.jumpToFrameRelative(1);
     interactor.jumpToFrame(0);
@@ -114,19 +70,41 @@ const settings = {
     bind.mod = Module.InteractionBindModifierKeys.NONE;
     bind.inter = "R";
 
-    interactor.addBinding(
-      bind,
-      ["set render.grid.reflection .8"],
-      "test-group",
-      () => ["foo", "bar"],
-      Module.InteractorBindingType.OTHER,
-      false,
-    );
+    const bindCommands = new Module.InteractorBindCommands();
+    bindCommands.push_back("set render.grid.reflection .8");
+
+    const bindParam = new Module.InteractorBindingParam();
+    bindParam.bind = bind;
+    bindParam.commands = bindCommands;
+    bindParam.group = "test-group";
+    bindParam.setDocCallback(() => ["foo", "bar"]);
+    bindParam.type = Module.InteractorBindingType.OTHER;
+    bindParam.notify = false;
+
+    interactor.addBinding(bindParam);
+
+    const repeatCommands = new Module.InteractorBindCommands();
+    repeatCommands.push_back("increase render.light.intensity .1");
+
+    const bindRepeat = new Module.InteractionBind();
+    bindRepeat.mod = Module.InteractionBindModifierKeys.CTRL_SHIFT;
+    bindRepeat.inter = "L";
+
+    const repeatBindParam = new Module.InteractorBindingParam();
+    repeatBindParam.bind = bindRepeat;
+    repeatBindParam.commands = repeatCommands;
+    repeatBindParam.group = "test-group";
+    repeatBindParam.setDocCallback(() => ["repeat", "binding"]);
+    repeatBindParam.type = Module.InteractorBindingType.NUMERICAL;
+    repeatBindParam.notify = false;
+    repeatBindParam.repeat = true;
+
+    interactor.addBinding(repeatBindParam);
 
     const updatedBinds = interactor.getBinds();
     utils.assert(
-      updatedBinds.length === initialBinds.length + 1,
-      "new binding should be registered",
+      updatedBinds.length === initialBinds.length + 2,
+      "new bindings should be registered",
     );
 
     const bindGroups = interactor.getBindGroups();
@@ -141,10 +119,24 @@ const settings = {
       "binding documentation should be returned",
     );
 
+    const repeatDocs = interactor.getBindingDocumentation(bindRepeat);
+    utils.assert(
+      Array.isArray(repeatDocs) &&
+        repeatDocs[0] === "repeat" &&
+        repeatDocs[1] === "binding",
+      "repeat binding documentation should be returned",
+    );
+
     const bindingType = interactor.getBindingType(bind);
     utils.assert(
       bindingType === Module.InteractorBindingType.OTHER,
       "binding type should round-trip",
+    );
+
+    const repeatBindingType = interactor.getBindingType(bindRepeat);
+    utils.assert(
+      repeatBindingType === Module.InteractorBindingType.NUMERICAL,
+      "repeat binding type should round-trip",
     );
 
     // start recording
@@ -189,6 +181,20 @@ const settings = {
     interactor.triggerKeyboardKey(Module.InteractorInputAction.PRESS, "R");
     interactor.triggerKeyboardKey(Module.InteractorInputAction.RELEASE, "R");
 
+    // trigger "increase render.light.intensity .1"
+    interactor.triggerKeyboardKey(
+      Module.InteractorInputAction.PRESS,
+      "Ctrl+Shift+L",
+    );
+    interactor.triggerKeyboardKey(
+      Module.InteractorInputAction.PRESS,
+      "Ctrl+Shift+L",
+    );
+    interactor.triggerKeyboardKey(
+      Module.InteractorInputAction.RELEASE,
+      "Ctrl+Shift+L",
+    );
+
     let bindingRemoved = false;
     try {
       interactor.removeBinding(bind);
@@ -196,6 +202,17 @@ const settings = {
       bindingRemoved = true;
     }
     utils.assert(!bindingRemoved, "binding should be removable");
+
+    bindingRemoved = false;
+    try {
+      interactor.removeBinding(bindRepeat);
+    } catch {
+      bindingRemoved = true;
+    }
+    utils.assert(!bindingRemoved, "repeat binding should be removable");
+
+    bindCommands.delete();
+    repeatCommands.delete();
 
     // notifications
     let notifCount = 0;
