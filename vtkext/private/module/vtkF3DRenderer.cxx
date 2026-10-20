@@ -527,7 +527,11 @@ void vtkF3DRenderer::ConfigureRenderPasses()
 
   vtkNew<vtkF3DRenderPass> newPass;
 #if F3D_MODULE_RAYTRACING
-  newPass->SetUseRaytracing(this->UseRaytracing);
+  newPass->SetUseRaytracing(this->CurrentRenderingMode == RenderingMode::OSPRAY);
+#endif
+#if F3D_MODULE_ANARI
+  newPass->SetUseAnari(this->CurrentRenderingMode == RenderingMode::ANARI);
+  newPass->SetAnariLibrary(this->AnariLibrary);
 #endif
   newPass->SetUseSSAOPass(this->UseSSAOPass);
   newPass->SetUseBlurBackground(this->UseBlurBackground);
@@ -635,7 +639,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   }
   vtkOSPRayRendererNode::SetBackgroundMode(mode, this);
 #else
-  if (this->UseRaytracing || this->UseRaytracingDenoiser)
+  if ((this->CurrentRenderingMode == RenderingMode::OSPRAY) || this->UseRaytracingDenoiser)
   {
     F3DLog::Print(F3DLog::Severity::Warning,
       "Raytracing options can't be used if F3D has not been built with raytracing");
@@ -1644,7 +1648,7 @@ void vtkF3DRenderer::ConfigureHDRITexture()
       needHDRITexture = this->HDRISkyboxVisible ||
         (this->GetUseImageBasedLighting() &&
           (!this->CheckForSHCache(dummy) || !this->CheckForSpecCache(dummy) ||
-            this->UseRaytracing));
+            this->CurrentRenderingMode != RenderingMode::OPENGL));
     }
 
     if (needHDRITexture)
@@ -2196,13 +2200,23 @@ void vtkF3DRenderer::SetDisplayDepth(bool use)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetUseRaytracing(bool use)
+void vtkF3DRenderer::SetRenderingMode(RenderingMode mode)
 {
-  if (this->UseRaytracing != use)
+  if (this->CurrentRenderingMode != mode)
   {
-    this->UseRaytracing = use;
+    this->CurrentRenderingMode = mode;
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetAnariLibrary(const std::string& anariLibrary)
+{
+  if (this->AnariLibrary != anariLibrary)
+  {
+    this->AnariLibrary = anariLibrary;
+    this->RenderPassesConfigured = false;
   }
 }
 
@@ -2516,7 +2530,7 @@ void vtkF3DRenderer::UpdateActors()
 
   if (this->UsingExpandingRange && (importerUpdateMTime > this->ImporterUpdateTimeStamp) &&
     (this->Coloring != vtkF3DRenderer::ColoringMode::MATERIAL ||
-      (!this->UseRaytracing && this->UseVolume)))
+      (this->CurrentRenderingMode == RenderingMode::OPENGL && this->UseVolume)))
   {
     // XXX: This could be improved further to only configure mappers and actors
     // when the coloring range actually change
@@ -3451,7 +3465,8 @@ void vtkF3DRenderer::ConfigurePointSprites()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureNormalGlyphs()
 {
-  const bool normalGlyphsVisible = !this->UseRaytracing && this->UseNormalGlyphs;
+  const bool normalGlyphsVisible =
+    (this->CurrentRenderingMode == RenderingMode::OPENGL) && this->UseNormalGlyphs;
   for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
   {
     if (normalGlyphsVisible && !normalGlyph.InputDataHasNormals)
@@ -3836,8 +3851,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle surface geometry
-  const bool geometriesVisible =
-    this->UseRaytracing || (!this->UseVolume && !this->UsePointSprites);
+  const bool geometriesVisible = (this->CurrentRenderingMode != RenderingMode::OPENGL) ||
+    (!this->UseVolume && !this->UsePointSprites);
   for (const auto& coloring : this->Importer->GetColoringActorsAndMappers())
   {
     if (geometriesVisible &&
@@ -3872,8 +3887,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle point sprites
-  const bool pointSpritesVisible =
-    !this->UseRaytracing && !this->UseVolume && this->UsePointSprites;
+  const bool pointSpritesVisible = (this->CurrentRenderingMode == RenderingMode::OPENGL) &&
+    !this->UseVolume && this->UsePointSprites;
   for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
   {
     if (pointSpritesVisible &&
@@ -3903,7 +3918,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle Volume prop
-  const bool volumeVisible = !this->UseRaytracing && this->UseVolume;
+  const bool volumeVisible =
+    (this->CurrentRenderingMode == RenderingMode::OPENGL) && this->UseVolume;
   const auto& volPropsAndMappers = this->Importer->GetVolumePropsAndMappers();
   for (const auto& volume : volPropsAndMappers)
   {

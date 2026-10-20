@@ -109,6 +109,19 @@
           "valueHelper": "auto|glx|wgl|egl|osmesa|xr"
         },
         {
+          "longName": "rendering-mode",
+          "shortName": "r",
+          "helpText": "Rendering mode to use",
+          "valueHelper": "opengl|ospray|anari",
+          "implicitValue": "ospray"
+        },
+        {
+          "longName": "anari-library",
+          "helpText": "Specify the ANARI library to use",
+          "valueHelper": "<name>",
+          "conditional": "F3D_MODULE_ANARI"
+        },
+        {
           "longName": "list-rendering-backends",
           "helpText": "Print the list of rendering backends available on this system"
         },
@@ -744,8 +757,7 @@
       "options": [
         {
           "longName": "raytracing",
-          "shortName": "r",
-          "helpText": "Enable raytracing",
+          "helpText": "Enable raytracing (deprecated)",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },

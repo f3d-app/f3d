@@ -44,6 +44,7 @@ public:
 
   vtkSetMacro(ArmatureVisible, bool);
   vtkSetMacro(UseRaytracing, bool);
+  vtkSetMacro(UseAnari, bool);
   vtkSetMacro(UseSSAOPass, bool);
   vtkSetMacro(UseBlurBackground, bool);
   vtkSetMacro(ForceOpaqueBackground, bool);
@@ -54,6 +55,7 @@ public:
   vtkSetMacro(RenderShadows, bool);
   vtkSetMacro(ShadowExponentialConstant, double);
   vtkSetMacro(ShadowResolution, int);
+  vtkSetMacro(AnariLibrary, std::string);
 
   /**
    * Modify shader code for matcap/gamma/skinning
@@ -82,6 +84,8 @@ protected:
 
   bool ArmatureVisible = false;
   bool UseRaytracing = false;
+  bool UseAnari = false;
+  std::string AnariLibrary = "environment";
   bool UseSSAOPass = false;
   bool UseBlurBackground = false;
   bool ForceOpaqueBackground = false;

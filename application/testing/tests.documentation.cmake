@@ -370,17 +370,17 @@ f3d_test_doc(NAME TestDocVolumeInverseOFF DATA skull.vti REF_IMAGE volume_invers
 f3d_test_doc(NAME TestDocVolumeInverseON DATA skull.vti REF_IMAGE volume_inverse_on.png ARGS -vs --up=z --coloring-range=40,200 --volume-inverse)
 
 if(F3D_MODULE_RAYTRACING)
-  ## --raytracing
+  ## --rendering-mode=ospray
   f3d_test_doc(NAME TestDocRaytracingOFF DATA dragon.vtu REF_IMAGE raytracing_off.png ROTATE ARGS -f --color=0.5,0.5,0.5)
-  f3d_test_doc(NAME TestDocRaytracingON DATA dragon.vtu REF_IMAGE raytracing_on.png ROTATE ARGS -f --color=0.5,0.5,0.5 --raytracing --raytracing-samples=32)
+  f3d_test_doc(NAME TestDocRaytracingON DATA dragon.vtu REF_IMAGE raytracing_on.png ROTATE ARGS -f --color=0.5,0.5,0.5 -r --raytracing-samples=32)
 
   ## --raytracing-samples
-  f3d_test_doc(NAME TestDocRaytracingSamples2 DATA dragon.vtu REF_IMAGE raytracing_samples_2.png ROTATE ARGS -f --color=0.5,0.5,0.5 --raytracing --raytracing-samples=2)
-  f3d_test_doc(NAME TestDocRaytracingSamples6 DATA dragon.vtu REF_IMAGE raytracing_samples_6.png ROTATE ARGS -f --color=0.5,0.5,0.5 --raytracing --raytracing-samples=6)
+  f3d_test_doc(NAME TestDocRaytracingSamples2 DATA dragon.vtu REF_IMAGE raytracing_samples_2.png ROTATE ARGS -f --color=0.5,0.5,0.5 -r --raytracing-samples=2)
+  f3d_test_doc(NAME TestDocRaytracingSamples6 DATA dragon.vtu REF_IMAGE raytracing_samples_6.png ROTATE ARGS -f --color=0.5,0.5,0.5 -r --raytracing-samples=6)
 
   ## --raytracing-denoise
-  f3d_test_doc(NAME TestDocRaytracingDenoiseOFF DATA dragon.vtu REF_IMAGE raytracing_denoise_off.png ROTATE ARGS -f --color=0.5,0.5,0.5 --raytracing --raytracing-samples=2)
-  f3d_test_doc(NAME TestDocRaytracingDenoiseON DATA dragon.vtu REF_IMAGE raytracing_denoise_on.png ROTATE ARGS -f --color=0.5,0.5,0.5 --raytracing --raytracing-samples=2 --raytracing-denoise)
+  f3d_test_doc(NAME TestDocRaytracingDenoiseOFF DATA dragon.vtu REF_IMAGE raytracing_denoise_off.png ROTATE ARGS -f --color=0.5,0.5,0.5 -r --raytracing-samples=2)
+  f3d_test_doc(NAME TestDocRaytracingDenoiseON DATA dragon.vtu REF_IMAGE raytracing_denoise_on.png ROTATE ARGS -f --color=0.5,0.5,0.5 -r --raytracing-samples=2 --raytracing-denoise)
 endif()
 
 ## --blending

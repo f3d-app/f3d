@@ -860,6 +860,15 @@ public:
                 continue;
               }
 
+              // handle deprecated options
+              if (key == "raytracing")
+              {
+                f3d::log::warn(
+                  "Option 'raytracing' is deprecated, use 'rendering-mode=ospray' instead");
+                libOptions.render.mode = "ospray";
+                continue;
+              }
+
               // Convert key into a libf3d option name if possible
               std::string keyForLog = key;
               for (const auto& libf3dOption : F3DOptionsTools::ConvertToLibf3dOptions(key, value))

@@ -16,6 +16,7 @@ please take a look at our [getting started guide](04-GETTING_STARTED.md).
 - A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
 - Optionally, [Alembic](http://www.alembic.io/) >= 1.8.5.
 - Optionally, [Assimp](https://www.assimp.org/) >= 5.4.0 (>= 6.0.2 recommended).
+- Optionally, [ANARI](https://github.com/KhronosGroup/ANARI-SDK) >= 0.16.0.
 - Optionally, [Draco](https://google.github.io/draco/) >= 1.5.6.
 - Optionally, [Java](https://www.java.com) >= 17.
 - Optionally, [FFmpeg](https://code.ffmpeg.org/FFmpeg/FFmpeg) >= 8.0.1.
@@ -56,6 +57,7 @@ Here is some CMake options of interest:
 
 Some modules, plugins and language bindings depending on external libraries can be optionally enabled with the following CMake variables:
 
+- `F3D_MODULE_ANARI`: **Experimental** support for ANARI rendering. Requires that VTK has been built with `RenderingAnariOpenGL` turned on. Disabled by default.
 - `F3D_MODULE_RAYTRACING`: Support for raytracing rendering. Requires that VTK has been built with `OSPRay` and `RenderingRayTracing` turned on. Disabled by default.
 - `F3D_MODULE_EXR`: Support for OpenEXR images. Requires `OpenEXR`. Disabled by default.
 - `F3D_MODULE_UI`: Support for ImGui widgets. Uses provided ImGui. Enabled by default.

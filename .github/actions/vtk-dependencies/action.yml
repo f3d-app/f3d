@@ -46,6 +46,13 @@ runs:
         mkdir .actions
         cp -r ${{inputs.source_dir}}/.github/actions/* .actions/
 
+    - name: Install Anari dependency
+      uses: ./.actions/anari-install-dep
+      with:
+        versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
+        cpu: ${{inputs.cpu}}
+
     - name: Install sqlite
       if: inputs.optdeps_label == 'optdeps'
       uses: ./.actions/sqlite-install-dep
