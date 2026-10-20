@@ -273,10 +273,11 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   else
 #endif
 #ifdef F3D_MODULE_ANARI
-  if (this->UseAnari)
+    if (this->UseAnari)
   {
     vtkNew<vtkAnariPass> anariP;
-    anariP->GetAnariDevice()->SetupAnariDeviceFromLibrary(this->AnariLibrary.c_str(), "default", false);
+    anariP->GetAnariDevice()->SetupAnariDeviceFromLibrary(
+      this->AnariLibrary.c_str(), "default", false);
     this->MainPass->SetDelegatePass(anariP);
   }
   else

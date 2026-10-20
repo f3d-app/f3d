@@ -3463,7 +3463,8 @@ void vtkF3DRenderer::ConfigurePointSprites()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureNormalGlyphs()
 {
-  const bool normalGlyphsVisible = (this->CurrentRenderingMode == RenderingMode::OPENGL) && this->UseNormalGlyphs;
+  const bool normalGlyphsVisible =
+    (this->CurrentRenderingMode == RenderingMode::OPENGL) && this->UseNormalGlyphs;
   for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
   {
     if (normalGlyphsVisible && !normalGlyph.InputDataHasNormals)
@@ -3848,8 +3849,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle surface geometry
-  const bool geometriesVisible =
-    (this->CurrentRenderingMode == RenderingMode::OPENGL) || (!this->UseVolume && !this->UsePointSprites);
+  const bool geometriesVisible = (this->CurrentRenderingMode == RenderingMode::OPENGL) ||
+    (!this->UseVolume && !this->UsePointSprites);
   for (const auto& coloring : this->Importer->GetColoringActorsAndMappers())
   {
     if (geometriesVisible &&
@@ -3884,8 +3885,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle point sprites
-  const bool pointSpritesVisible =
-    (this->CurrentRenderingMode == RenderingMode::OPENGL) && !this->UseVolume && this->UsePointSprites;
+  const bool pointSpritesVisible = (this->CurrentRenderingMode == RenderingMode::OPENGL) &&
+    !this->UseVolume && this->UsePointSprites;
   for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
   {
     if (pointSpritesVisible &&
@@ -3915,7 +3916,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle Volume prop
-  const bool volumeVisible = (this->CurrentRenderingMode == RenderingMode::OPENGL) && this->UseVolume;
+  const bool volumeVisible =
+    (this->CurrentRenderingMode == RenderingMode::OPENGL) && this->UseVolume;
   const auto& volPropsAndMappers = this->Importer->GetVolumePropsAndMappers();
   for (const auto& volume : volPropsAndMappers)
   {

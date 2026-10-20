@@ -863,7 +863,8 @@ public:
               // handle deprecated options
               if (key == "raytracing")
               {
-                f3d::log::warn("Option 'raytracing' is deprecated, use 'rendering-mode=ospray' instead");
+                f3d::log::warn(
+                  "Option 'raytracing' is deprecated, use 'rendering-mode=ospray' instead");
                 continue;
               }
 
