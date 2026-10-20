@@ -45,4 +45,8 @@
     <comment>Compressed 3D gaussian splats</comment>
     <glob pattern="*.spz"/>
   </mime-type>
+  <mime-type type="application/vnd.lys">
+    <comment>Lychee Slicer file</comment>
+    <glob pattern="*.lys"/>
+  </mime-type>
 </mime-info>
