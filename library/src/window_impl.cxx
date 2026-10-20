@@ -662,14 +662,14 @@ void window_impl::UpdateDynamicOptions()
     renderer->SetRenderingMode(vtkF3DRenderer::RenderingMode::ANARI);
     renderer->SetAnariLibrary(opt.render.raytracing.anari_library);
   }
-  else if (opt.render.mode == "opengl")
-  {
-    renderer->SetRenderingMode(vtkF3DRenderer::RenderingMode::OPENGL);
-  }
   else
   {
-    log::warn("'render.mode' is set to an unknown value: ", opt.render.mode,
-      ". Valid modes are: 'opengl', 'ospray', 'anari'");
+    if (opt.render.mode != "opengl")
+    {
+      log::warn("'render.mode' is set to an unknown value: ", opt.render.mode,
+        ". Valid modes are: 'opengl', 'ospray', 'anari'");
+    }
+    renderer->SetRenderingMode(vtkF3DRenderer::RenderingMode::OPENGL);
   }
 
   // F3D_DEPRECATED

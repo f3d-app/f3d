@@ -1647,7 +1647,8 @@ void vtkF3DRenderer::ConfigureHDRITexture()
       std::string dummy;
       needHDRITexture = this->HDRISkyboxVisible ||
         (this->GetUseImageBasedLighting() &&
-          (!this->CheckForSHCache(dummy) || !this->CheckForSpecCache(dummy)));
+          (!this->CheckForSHCache(dummy) || !this->CheckForSpecCache(dummy) ||
+            this->CurrentRenderingMode != RenderingMode::OPENGL));
     }
 
     if (needHDRITexture)
@@ -2528,7 +2529,8 @@ void vtkF3DRenderer::UpdateActors()
   }
 
   if (this->UsingExpandingRange && (importerUpdateMTime > this->ImporterUpdateTimeStamp) &&
-    (this->Coloring != vtkF3DRenderer::ColoringMode::MATERIAL))
+    (this->Coloring != vtkF3DRenderer::ColoringMode::MATERIAL ||
+      (this->CurrentRenderingMode == RenderingMode::OPENGL && this->UseVolume)))
   {
     // XXX: This could be improved further to only configure mappers and actors
     // when the coloring range actually change
@@ -3849,7 +3851,7 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle surface geometry
-  const bool geometriesVisible = (this->CurrentRenderingMode == RenderingMode::OPENGL) ||
+  const bool geometriesVisible = (this->CurrentRenderingMode != RenderingMode::OPENGL) ||
     (!this->UseVolume && !this->UsePointSprites);
   for (const auto& coloring : this->Importer->GetColoringActorsAndMappers())
   {
