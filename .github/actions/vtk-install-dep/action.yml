@@ -244,6 +244,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_ImagingHybrid=YES
         -DVTK_MODULE_ENABLE_VTK_InteractionStyle=YES
         -DVTK_MODULE_ENABLE_VTK_InteractionWidgets=YES
+        -DVTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL=${{ inputs.optdeps_label == 'optdeps' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_RenderingAnnotation=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingCore=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingGridAxes=YES
