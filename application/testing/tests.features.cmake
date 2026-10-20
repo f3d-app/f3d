@@ -152,7 +152,10 @@ f3d_test(NAME TestNormalGlyphsScale DATA suzanne.obj ARGS --normal-glyphs --norm
 f3d_test(NAME TestNormalGlyphsColor DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-color=1,0,0)
 f3d_test(NAME TestNormalGlyphsCylinder DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-shape=cylinder)
 f3d_test(NAME TestNormalGlyphsCone DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-shape=cone)
-f3d_test(NAME TestNormalGlyphsLine DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-shape=line)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.0) # Line color is different before VTK 9.6 for unknown reason
+  f3d_test(NAME TestNormalGlyphsLine DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-shape=line)
+endif()
+f3d_test(NAME TestNormalGlyphsInvalidShape DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-shape=foo NO_BASELINE REGEXP "foo is an invalid normal glyphs shape")
 f3d_test(NAME TestNormalGlyphsNoNormalsAvailable DATA cow.vtp ARGS --normal-glyphs NO_BASELINE REGEXP "does not contain any normals")
 
 ## Textures
