@@ -93,13 +93,6 @@ runs:
         mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
-    - name: Install Anari dependency
-      uses: ./source/.github/actions/anari-install-dep
-      with:
-        versions_file: ${{inputs.versions_file}}
-        mindeps_label: ${{inputs.mindeps_label}}
-        cpu: ${{inputs.cpu}}
-
     - name: Install pybind11 dependency
       uses: ./source/.github/actions/pybind11-install-dep
       with:
