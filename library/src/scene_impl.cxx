@@ -389,11 +389,11 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
              "check to skip content validation or force reader to "
              "force a specific reader");
         break;
+      // LCOV_EXCL_START
       case file_availability::EMPTY_STREAM:
-        // LCOV_EXCL_START
         assert(false); // Unreachable
         break;
-        // LCOV_EXCL_STOP
+      // LCOV_EXCL_STOP
     }
 
     vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(filePath.string());
