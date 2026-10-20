@@ -111,10 +111,23 @@
         "default_value": "false"
       }
     },
+    "mode": {
+      "type": "string",
+      "default_value": "opengl",
+      "domain": {
+        "style": "enum",
+        "enum": ["opengl", "ospray", "anari"]
+      }
+    },
     "raytracing": {
       "enable": {
         "type": "bool",
-        "default_value": "false"
+        "default_value": "false",
+        "deprecated": "use render.backend=ospray instead"
+      },
+      "anari_library": {
+        "type": "string",
+        "default_value": "environment"
       },
       "denoise": {
         "type": "bool",

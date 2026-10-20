@@ -653,7 +653,38 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->ShowArmature(opt.render.armature.enable);
 
-  renderer->SetUseRaytracing(opt.render.raytracing.enable);
+  if (opt.render.mode == "ospray")
+  {
+    renderer->SetRenderingMode(vtkF3DRenderer::RenderingMode::OSPRAY);
+  }
+  else if (opt.render.mode == "anari")
+  {
+    renderer->SetRenderingMode(vtkF3DRenderer::RenderingMode::ANARI);
+    renderer->SetAnariLibrary(opt.render.raytracing.anari_library);
+  }
+  else if (opt.render.mode == "opengl")
+  {
+    renderer->SetRenderingMode(vtkF3DRenderer::RenderingMode::OPENGL);
+  }
+  else
+  {
+    log::warn("'render.mode' is set to an unknown value: ", opt.render.mode,
+      ". Valid modes are: 'opengl', 'ospray', 'anari'");
+  }
+
+  // F3D_DEPRECATED
+  // Remove this in the next major release
+  F3D_SILENT_WARNING_PUSH()
+  F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
+
+  if (opt.render.raytracing.enable)
+  {
+    log::warn("'render.raytracing.enable' is deprecated. Please Use 'render.mode=ospray' instead.");
+    renderer->SetRenderingMode(vtkF3DRenderer::RenderingMode::OSPRAY);
+  }
+
+  F3D_SILENT_WARNING_POP()
+
   renderer->SetRaytracingSamples(opt.render.raytracing.samples);
   renderer->SetUseRaytracingDenoiser(opt.render.raytracing.denoise);
 

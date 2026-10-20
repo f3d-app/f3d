@@ -298,11 +298,11 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
 endif()
 
 if(F3D_MODULE_RAYTRACING)
-  f3d_test(NAME TestInteractionHDRIRaytracingRemoveSkybox DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION) #JJ
-  f3d_test(NAME TestInteractionHDRIRaytracingRemoveAmbient DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION) #F
-  f3d_test(NAME TestInteractionHDRIRaytracingRemoveBoth DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION) #FJJ
-  f3d_test(NAME TestInteractionHDRIRaytracingLoop DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -rd --raytracing-samples=4 INTERACTION) #FJFJJ
-  f3d_test(NAME TestInteractionHDRIRaytracingFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr -rd --raytracing-samples=4 INTERACTION LONG_TIMEOUT) #FJ
+  f3d_test(NAME TestInteractionHDRIRaytracingRemoveSkybox DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --rendering-mode=ospray -d --raytracing-samples=4 INTERACTION) #JJ
+  f3d_test(NAME TestInteractionHDRIRaytracingRemoveAmbient DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --rendering-mode=ospray -d --raytracing-samples=4 INTERACTION) #F
+  f3d_test(NAME TestInteractionHDRIRaytracingRemoveBoth DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --rendering-mode=ospray -d --raytracing-samples=4 INTERACTION) #FJJ
+  f3d_test(NAME TestInteractionHDRIRaytracingLoop DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --rendering-mode=ospray -d --raytracing-samples=4 INTERACTION) #FJFJJ
+  f3d_test(NAME TestInteractionHDRIRaytracingFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --rendering-mode=ospray -d --raytracing-samples=4 INTERACTION LONG_TIMEOUT) #FJ
 endif()
 
 ## Drops

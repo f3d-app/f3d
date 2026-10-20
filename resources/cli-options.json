@@ -109,6 +109,11 @@
           "valueHelper": "<string>"
         },
         {
+          "longName": "rendering-mode",
+          "helpText": "Rendering mode to use (opengl|ospray|anari)",
+          "valueHelper": "<string>"
+        },
+        {
           "longName": "list-rendering-backends",
           "helpText": "Print the list of rendering backends available on this system"
         },
@@ -744,9 +749,14 @@
         {
           "longName": "raytracing",
           "shortName": "r",
-          "helpText": "Enable raytracing",
+          "helpText": "Enable raytracing (deprecated)",
           "valueHelper": "<bool>",
           "implicitValue": "1"
+        },
+        {
+          "longName": "anari-library",
+          "helpText": "Specify the ANARI library to use",
+          "valueHelper": "<library>"
         },
         {
           "longName": "raytracing-samples",

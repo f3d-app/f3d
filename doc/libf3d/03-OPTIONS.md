@@ -426,11 +426,12 @@ Show _axes grid_ in the scene.
 
 CLI: `--axes-grid`.
 
-### `render.raytracing.enable` (_bool_, default: `false`)
+### `render.mode` (_string_, default: `opengl`, enumeration domain: `opengl, ospray, anari`)
 
-Enable _raytracing_. Requires the raytracing module to be enabled.
+Select the rendering mode.
+`ospray` and `anari` require their associated VTK module to be enabled.
 
-CLI: `--raytracing`.
+CLI: `--rendering-mode`.
 
 ### `render.raytracing.samples` (_int_, default: `5`, range domain: `[1, 50]`, increment: `1`)
 

@@ -69,6 +69,7 @@ void vtkF3DRenderPass::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "UseRaytracing: " << this->UseRaytracing << "\n";
+  os << indent << "UseAnari: " << this->UseAnari << "\n";
   os << indent << "UseSSAOPass: " << this->UseSSAOPass << "\n";
   os << indent << "UseBlurBackground: " << this->UseBlurBackground << "\n";
   os << indent << "ForceOpaqueBackground: " << this->ForceOpaqueBackground << "\n";
@@ -252,18 +253,31 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   }
 
   // main pass
+  this->MainPass = vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass>::New();
+  this->MainPass->SetColorFormat(vtkTextureObject::Float32);
+
+  // Needed because VTK can pick the wrong format with certain drivers
+#ifdef F3D_USE_GLES
+  // Fixed32 not supported on GLES
+  this->MainPass->SetDepthFormat(vtkTextureObject::Fixed24);
+#else
+  this->MainPass->SetDepthFormat(vtkTextureObject::Fixed32);
+#endif
+
 #if F3D_MODULE_RAYTRACING
   if (this->UseRaytracing)
   {
-#if F3D_MODULE_ANARI
-    vtkNew<vtkAnariPass> ospP;
-    ospP->GetAnariDevice()->SetupAnariDeviceFromLibrary("visrtx", "default", false);
-#else
     vtkNew<vtkOSPRayPass> ospP;
-#endif
-    this->MainPass = vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass>::New();
     this->MainPass->SetDelegatePass(ospP);
-    this->MainPass->SetColorFormat(vtkTextureObject::Float32);
+  }
+  else
+#endif
+#ifdef F3D_MODULE_ANARI
+  if (this->UseAnari)
+  {
+    vtkNew<vtkAnariPass> anariP;
+    anariP->GetAnariDevice()->SetupAnariDeviceFromLibrary(this->AnariLibrary.c_str(), "default", false);
+    this->MainPass->SetDelegatePass(anariP);
   }
   else
 #endif
@@ -362,17 +376,6 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
 
       mainSequencePass = sequenceShadows;
     }
-#endif
-
-    this->MainPass = vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass>::New();
-    this->MainPass->SetColorFormat(vtkTextureObject::Float32);
-
-    // Needed because VTK can pick the wrong format with certain drivers
-#ifdef F3D_USE_GLES
-    // Fixed32 not supported on GLES
-    this->MainPass->SetDepthFormat(vtkTextureObject::Fixed24);
-#else
-    this->MainPass->SetDepthFormat(vtkTextureObject::Fixed32);
 #endif
 
     // TAA
