@@ -102,5 +102,12 @@
       "up": "+Z",
       "shadows": true
     }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.lys",
+    "options": {
+      "up": "+Z"
+    }
   }
 ]
