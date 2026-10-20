@@ -38,6 +38,14 @@ if (F3D_MODULE_OPENXR)
   endif()
 endif()
 
+if(F3D_MODULE_ANARI)
+  if(TARGET VTK::RenderingAnariOpenGL)
+    message(STATUS "VTK::RenderingAnariOpenGL module found")
+    set(F3D_VTK_MODULES ${F3D_VTK_MODULES} VTK::RenderingAnariOpenGL)
+  else()
+    message(FATAL_ERROR "F3D_MODULE_ANARI option is enabled but VTK::RenderingAnariOpenGL is not found")
+  endif()
+endif()
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/src/config.cxx.in"
@@ -232,6 +240,11 @@ endif ()
 # clip
 if (F3D_MODULE_CLIP)
   target_compile_definitions(libf3d PRIVATE F3D_MODULE_CLIP)
+endif ()
+
+# anari
+if (F3D_MODULE_ANARI)
+  target_compile_definitions(libf3d PRIVATE F3D_MODULE_ANARI)
 endif ()
 
 # raytracing

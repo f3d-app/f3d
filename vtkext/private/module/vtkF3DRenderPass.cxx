@@ -50,6 +50,10 @@
 #include <vtkVersion.h>
 #include <vtkVolumetricPass.h>
 
+#if F3D_MODULE_ANARI
+#include <vtkAnariPass.h>
+#endif
+
 #if F3D_MODULE_RAYTRACING
 #include <vtkOSPRayPass.h>
 #endif
@@ -251,7 +255,12 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
 #if F3D_MODULE_RAYTRACING
   if (this->UseRaytracing)
   {
+#if F3D_MODULE_ANARI
+    vtkNew<vtkAnariPass> ospP;
+    ospP->GetAnariDevice()->SetupAnariDeviceFromLibrary("visrtx", "default", false);
+#else
     vtkNew<vtkOSPRayPass> ospP;
+#endif
     this->MainPass = vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass>::New();
     this->MainPass->SetDelegatePass(ospP);
     this->MainPass->SetColorFormat(vtkTextureObject::Float32);

@@ -86,6 +86,7 @@ find_package(VTK 9.5.0 REQUIRED
     IONetCDF
     IOOpenVDB
     IOPDAL
+    RenderingAnariOpenGL
     RenderingGridAxes
     RenderingOpenXR
     RenderingRayTracing)
@@ -100,6 +101,7 @@ else()
 endif()
 
 # Modules
+option(F3D_MODULE_ANARI "ANARI module" OFF)
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
 option(F3D_MODULE_OPENXR "OpenXR module" OFF)
 option(F3D_MODULE_EXR "OpenEXR images module" OFF)
@@ -345,6 +347,7 @@ f3d_report_variable(F3D_BINDINGS_C)
 f3d_report_variable(F3D_BINDINGS_JAVA)
 f3d_report_variable(F3D_BINDINGS_PYTHON)
 f3d_report_variable(F3D_BUILD_APPLICATION)
+f3d_report_variable(F3D_MODULE_ANARI)
 f3d_report_variable(F3D_MODULE_EXR)
 f3d_report_variable(F3D_MODULE_FFMPEG)
 f3d_report_variable(F3D_MODULE_RAYTRACING)
