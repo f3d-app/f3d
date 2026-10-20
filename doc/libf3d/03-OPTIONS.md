@@ -172,6 +172,12 @@ Color of the normal glyphs.
 
 CLI: `--normal-glyphs-color`.
 
+### `model.normal_glyphs.shape` (_string_, default: `arrow`, enum domain: `arrow, cylinder, cone, line`)
+
+Shape of the normal glyphs.
+
+CLI: `--normal-glyphs-shape`.
+
 ### `model.normal.scale` (_double_, optional, range domain: `[0, 3]`, increment: `0.1`)
 
 Normal scale affects the strength of the normal deviation from the normal texture. Model-specified by default.
