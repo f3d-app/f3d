@@ -393,7 +393,7 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       case file_availability::EMPTY_STREAM:
         assert(false); // Unreachable
         break;
-      // LCOV_EXCL_STOP
+        // LCOV_EXCL_STOP
     }
 
     vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(filePath.string());
