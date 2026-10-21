@@ -4,7 +4,7 @@
 
 For F3D users:
 
-- BREAKING: Major release, deprecated CLI options have been removed, some CLI options and interactions have been reworked: MIGRATION DOC
+- BREAKING: Major release, deprecated CLI options have been removed, some CLI options and interactions have been reworked: https://f3d.app/docs/user/MIGRATION
 - BREAKING: Removed support for `F3D_PLUGINS_PATH` env var in favor of `--plugins-path` CLI option
 - BREAKING: Added an advanced animation bar which is shown by default
 - BREAKING: Removed all `cycle_*` commands in favor of the new `cycle` libf3d provided command
@@ -38,8 +38,8 @@ For F3D users:
 - Added headless rendering support on macOS
 - Added support for showing `cmd` instead of `Ctrl` in cheatsheet on macOS
 - Added support for repeated key binds
-- Added images in the [options doc](https://f3d.app/docs/next/user/OPTIONS)
-- Added proper [named color documentation](https://f3d.app/docs/next/user/NAMED_COLORS)
+- Added images in the [options doc](https://f3d.app/docs/user/OPTIONS)
+- Added proper [named color documentation](https://f3d.app/docs/user/NAMED_COLORS)
 - Added DPI support on all OSes
 - Added support for 16bits textures
 - Added progress bar in terminal
@@ -82,7 +82,7 @@ For F3D users:
 
 For libf3d users:
 
-- BREAKING: Major release, deprecated API have been removed, some APIs and options have been reworked: MIGRATION DOC
+- BREAKING: Major release, deprecated API have been removed, some APIs and options have been reworked: https://f3d.app/docs/libf3d/MIGRATION
 - BREAKING: Reworked deeply the coloring option logic
 - BREAKING: Reworked the interactor::addBinding API
 - Added a `model.normal_glyphs.scale` option to control the size of normal glyphs
