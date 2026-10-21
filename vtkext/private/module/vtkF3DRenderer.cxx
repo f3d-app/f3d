@@ -639,7 +639,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   }
   vtkOSPRayRendererNode::SetBackgroundMode(mode, this);
 #else
-  if (this->UseRaytracing || this->UseRaytracingDenoiser)
+  if ((this->CurrentRenderingMode == RenderingMode::OSPRAY) || this->UseRaytracingDenoiser)
   {
     F3DLog::Print(F3DLog::Severity::Warning,
       "Raytracing options can't be used if F3D has not been built with raytracing");
