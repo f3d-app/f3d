@@ -403,16 +403,27 @@ protected:
   void Show(const Message_ProgressScope&, bool) override
   {
     const double currentPosition = this->GetPosition();
+    // Prevent firing duplicate progress at 1.0 (end of multiple scopes during Transfer)
+    if (currentPosition >= 1.0 && this->ReportedComplete)
+    {
+      return;
+    }
+
     if (currentPosition - this->LastPosition > 0.01)
     {
       double localProgress = 0.5 * currentPosition;
       this->Reader->InvokeEvent(vtkCommand::ProgressEvent, &localProgress);
       this->LastPosition = currentPosition;
     }
+    if (currentPosition >= 1.0)
+    {
+      this->ReportedComplete = true;
+    }
   }
 
 private:
   double LastPosition = 0.0;
+  bool ReportedComplete = false;
   vtkF3DOCCTReader* Reader = nullptr;
 };
 
