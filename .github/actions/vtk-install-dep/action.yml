@@ -213,6 +213,7 @@ runs:
       # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160 and
       # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10393
       # CMAKE_MODULE_PATH is not used because OpenVDB_CMAKE_PATH seems to be the canonical way to handle this with VTK
+      # AnariOpenGL module only available since https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13561
     - name: Configure VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/vtk_build
@@ -253,7 +254,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_ImagingHybrid=YES
         -DVTK_MODULE_ENABLE_VTK_InteractionStyle=YES
         -DVTK_MODULE_ENABLE_VTK_InteractionWidgets=YES
-        -DVTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL=${{ inputs.optdeps_label == 'optdeps' && 'YES' || 'DEFAULT' }}
+        -DVTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL=${{ (inputs.optdeps_label == 'optdeps' && inputs.vtk_version == 'commit') && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_RenderingAnnotation=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingCore=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingGridAxes=YES
