@@ -2379,6 +2379,22 @@ void vtkF3DRenderer::SetUseOrthographicProjection(const std::optional<bool>& use
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetRotationAxis(const std::optional<std::array<double, 3>>& axis)
+{
+  if (this->RotationAxis != axis)
+  {
+    this->RotationAxis = axis;
+    this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+std::optional<std::array<double, 3>> vtkF3DRenderer::GetRotationAxis() const
+{
+  return this->RotationAxis;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetInteractionStyle(const std::string& style)
 {
   vtkRenderWindowInteractor* rwi =

@@ -599,6 +599,7 @@ void window_impl::UpdateDynamicOptions()
     renderer->SetAxesColor(opt.ui.x_color, opt.ui.y_color, opt.ui.z_color);
     renderer->ShowAxis(opt.ui.axis);
     renderer->SetInvertZoom(opt.interactor.invert_zoom);
+    renderer->SetRotationAxis(opt.interactor.axis_lock);
     renderer->SetInteractionStyle(opt.interactor.style);
 
 #if F3D_MODULE_UI
