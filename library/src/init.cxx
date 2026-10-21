@@ -53,6 +53,10 @@ init::init()
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPointGaussianMapper", "vtkOpenGLPointGaussianMapper");
 
+#if F3D_MODULE_ANARI
+  vtkObjectFactory::SetAllEnableFlags(0, "vtkGPUVolumeRayCastMapper", "vtkAnariGPUVolumeRayCastMapper");
+#endif
+
 #ifdef __EMSCRIPTEN__
   vtkObjectFactory::SetAllEnableFlags(0, "vtkRenderWindow", "vtkOpenGLRenderWindow");
   vtkObjectFactory::SetAllEnableFlags(
