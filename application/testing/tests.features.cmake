@@ -432,7 +432,7 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestRaytracingBackground DATA suzanne.ply ARGS --rendering-mode=ospray -d --raytracing-samples=4 --background-color=1,0,0)
   f3d_test(NAME TestRaytracingPointCloud DATA pointsCloud.vtp ARGS --rendering-mode=ospray -d --raytracing-samples=4 --point-size=20)
   f3d_test(NAME TestRaytracingDenoise DATA suzanne.ply ARGS --rendering-mode=ospray -d --raytracing-samples=4)
-  f3d_test(NAME TestRaytracingNoDenoise DATA suzanne.stl ARGS --rendering-mode=ospray -d --raytracing-samples=20)
+  f3d_test(NAME TestRaytracingNoDenoise DATA suzanne.stl ARGS --rendering-mode=ospray --raytracing-samples=20)
   f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Module Raytracing: ON")
   f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply ARGS --raytracing-samples=4 -d INTERACTION) #R
   f3d_test(NAME TestRaytracingScalarBar DATA dragon.vtu ARGS --rendering-mode=ospray -sbd --raytracing-samples=4)
