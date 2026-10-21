@@ -119,6 +119,7 @@ public:
     vtkTimerLog* timer = nullptr;
     std::string fileName;
     int importerCount = 0;
+    bool completed = false;
   };
 
   template<std::size_t N>
@@ -164,6 +165,11 @@ public:
         const auto progressData = static_cast<CLIProgressBarDataStruct*>(clientData);
         const double progress = *static_cast<double*>(callData);
 
+        if (progressData->completed)
+        {
+          return;
+        }
+
         const std::string bar =
           scene_impl::internals::GenerateCLIBarString(progress, barCount, charRamp);
 
@@ -191,6 +197,7 @@ public:
 
         if (progress >= 1.0)
         {
+          progressData->completed = true;
           f3d::log::progress("\n");
         }
       });
