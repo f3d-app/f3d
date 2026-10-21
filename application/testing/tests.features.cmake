@@ -436,6 +436,7 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Module Raytracing: ON")
   f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply ARGS --raytracing-samples=4 -d INTERACTION) #R
   f3d_test(NAME TestRaytracingScalarBar DATA dragon.vtu ARGS --rendering-mode=ospray -sbd --raytracing-samples=4)
+  f3d_test(NAME TestRaytracingDeprecated DATA dragon.vtu ARGS --raytracing NO_BASELINE REGEXP "Option 'raytracing' is deprecated, use 'rendering-mode=ospray' instead")
 
   if(NOT F3D_MACOS_BUNDLE)
     # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
@@ -447,8 +448,17 @@ if(F3D_MODULE_RAYTRACING)
   endif()
 
   f3d_test(NAME TestRaytracingNoBackground DATA suzanne.ply ARGS --rendering-mode=ospray -d --raytracing-samples=4 --no-background)
-else(F3D_MODULE_RAYTRACING)
+else()
   f3d_test(NAME TestCommandScriptRaytracing SCRIPT DATA suzanne.ply NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing")
+endif()
+
+f3d_test(NAME TestRenderModeInvalid DATA suzanne.ply ARGS --rendering-mode=invalid NO_BASELINE REGEXP "'render.mode' is set to an unknown value: invalid")
+
+## Anari
+# This render mode is experimental, it may not be fully stable and baselines will change in the future.
+# It is also assumed that "helide" is available as an Anari library, which is usually the case except if it's disabled explicitly when building AnariSDK.
+if(F3D_MODULE_ANARI)
+  f3d_test(NAME TestAnariGLTF DATA WaterBottle.glb ARGS --rendering-mode=anari --anari-library=helide LONG_TIMEOUT DEFAULT_HDRI)
 endif()
 
 if(F3D_MODULE_EXR)

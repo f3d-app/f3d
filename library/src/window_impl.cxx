@@ -672,19 +672,6 @@ void window_impl::UpdateDynamicOptions()
     renderer->SetRenderingMode(vtkF3DRenderer::RenderingMode::OPENGL);
   }
 
-  // F3D_DEPRECATED
-  // Remove this in the next major release
-  F3D_SILENT_WARNING_PUSH()
-  F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
-
-  if (opt.render.raytracing.enable)
-  {
-    log::warn("'render.raytracing.enable' is deprecated. Please Use 'render.mode=ospray' instead.");
-    renderer->SetRenderingMode(vtkF3DRenderer::RenderingMode::OSPRAY);
-  }
-
-  F3D_SILENT_WARNING_POP()
-
   renderer->SetRaytracingSamples(opt.render.raytracing.samples);
   renderer->SetUseRaytracingDenoiser(opt.render.raytracing.denoise);
 
