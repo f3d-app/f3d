@@ -157,17 +157,15 @@ void vtkF3DInteractorStyle::Rotate()
 
   constexpr double maxAbsElevation = 90 - 1e-10;
 
-  const auto rotationAxis = ren->GetRotationAxis();
-  if (rotationAxis.has_value())
+  if (ren->GetRotationAxis().has_value())
   {
-    const auto& axis = rotationAxis.value();
+    const auto& axis = ren->GetRotationAxis().value();
 
     double delta = this->InteractionMode == TRACKBALL
       ? std::hypot(rxf, ryf) * std::copysign(1.0, rxf + ryf)
       : (std::abs(rxf) > std::abs(ryf) ? rxf : ryf);
 
-    if (axis[0] == 1.0 && axis[1] == 0.0 && axis[2] == 0.0 &&
-      this->InteractionMode != TRACKBALL)
+    if (axis[0] == 1.0 && axis[1] == 0.0 && axis[2] == 0.0 && this->InteractionMode != TRACKBALL)
     {
       double elevation = vtkMath::DegreesFromRadians(
         vtkMath::AngleBetweenVectors(ren->GetUpDirection(), camera->GetDirectionOfProjection()) -

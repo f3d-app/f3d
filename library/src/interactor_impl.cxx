@@ -989,7 +989,8 @@ interactor& interactor_impl::initCommands()
     },
     command_documentation_t{ "clear", "clear console" });
 
-  this->addCommand("toggle_axis_lock",
+  this->addCommand(
+    "toggle_axis_lock",
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "toggle_axis_lock");
@@ -1743,9 +1744,9 @@ interactor& interactor_impl::initBindings()
         ? "ON"
         : "OFF");
   };
-  this->addBinding({.Bind = {mod_t::CTRL, "X"}, .Commands = {"toggle_axis_lock +X"},.Group = "Scene", .DocCallback = [=]() { return docAxisTgl("Toggle x axis lock", "+X"); }, .Type = f3d::interactor::BindingType::TOGGLE});
-  this->addBinding({.Bind = {mod_t::CTRL, "Y"}, .Commands = {"toggle_axis_lock +Y"},.Group = "Scene", .DocCallback = [=]() { return docAxisTgl("Toggle y axis lock", "+Y"); }, .Type = f3d::interactor::BindingType::TOGGLE});
-  this->addBinding({.Bind = {mod_t::CTRL, "Z"}, .Commands = {"toggle_axis_lock +Z"},.Group = "Scene", .DocCallback = [=]() { return docAxisTgl("Toggle z axis lock", "+Z"); }, .Type = f3d::interactor::BindingType::TOGGLE});
+  this->addBinding({.Bind = {mod_t::CTRL_SHIFT, "X"}, .Commands = {"toggle_axis_lock +X"},.Group = "Scene", .DocCallback = [=]() { return docAxisTgl("Toggle x axis lock", "+X"); }, .Type = f3d::interactor::BindingType::TOGGLE});
+  this->addBinding({.Bind = {mod_t::CTRL_SHIFT, "Y"}, .Commands = {"toggle_axis_lock +Y"},.Group = "Scene", .DocCallback = [=]() { return docAxisTgl("Toggle y axis lock", "+Y"); }, .Type = f3d::interactor::BindingType::TOGGLE});
+  this->addBinding({.Bind = {mod_t::CTRL_SHIFT, "Z"}, .Commands = {"toggle_axis_lock +Z"},.Group = "Scene", .DocCallback = [=]() { return docAxisTgl("Toggle z axis lock", "+Z"); }, .Type = f3d::interactor::BindingType::TOGGLE});
 
   this->addBinding({.Bind = {mod_t::NONE, "F"}, .Commands = {"toggle render.hdri.ambient"},.Group = "Scene", .DocCallback = std::bind(docTgl, "HDRI ambient lighting", std::cref(opts.render.hdri.ambient)), .Type = f3d::interactor::BindingType::TOGGLE});
   this->addBinding({.Bind = {mod_t::NONE, "J"}, .Commands = {"cycle render.background.skybox"},.Group = "Scene", .DocCallback = std::bind(docStr, "Skybox mode", std::cref(opts.render.background.skybox)), .Type = f3d::interactor::BindingType::CYCLIC});
