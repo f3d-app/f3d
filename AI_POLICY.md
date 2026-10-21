@@ -63,6 +63,6 @@ what the code does and why it was written the way that it was. If not, you will 
 
 8. _I use AI to generate my entire contributions, or I use agentic AI to generate pull requests and issues._
 
-This is NOT acceptable for any contributor, even if you review your code, because this is unsustainable for maintainers such code.
+This is NOT acceptable for any contributor, even if you review your code, because this is unsustainable for maintainers reviewing such code.
 If you do so, you will be warned and then BANNED on repeated offenses.
 You are not welcome in the F3D project.
