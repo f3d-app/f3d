@@ -5,7 +5,7 @@ This module parses resources/cli-options.json and generates F3DCLIOptions.h
 and shell completion scripts.
 #]==]
 
-# Policy CMP0057 needs to use the IN_LIST operator
+# Policy CMP0057 needed to use the IN_LIST operator
 cmake_policy(SET CMP0057 NEW)
 
 #[==[

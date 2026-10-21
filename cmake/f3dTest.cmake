@@ -55,7 +55,7 @@ f3d_test(<NAME> [ARGS...])
   - `WORKING_DIR` Provide a specific working directory to use for this test instead of current dir
   - `LABELS` Provide specific labels to identify and group tests
   - `DATA` Data to open, support multiple input, also set test labels accordingly
-  - `DEPENDS` Tests that this test depends on if any
+  - `DEPENDS` Tests this test depends on if any
   - `ENV` Environment variables to set for this test
   - `ARGS` Supplement arguments to add to the f3d command line
 #]==]
