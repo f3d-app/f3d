@@ -3413,6 +3413,15 @@ void vtkF3DRenderer::UpdateLightRepresentations()
     lightRep.representation->SetPositional(light->GetPositional());
     lightRep.representation->SetFocalPoint(light->GetFocalPoint());
     lightRep.representation->SetConeAngle(light->GetConeAngle());
+
+    if (LightRepresentationVisible)
+    {
+      lightRep.widget->On();
+    }
+    else
+    {
+      lightRep.widget->Off();
+    }
   }
 
   // remove unwanted light representations
@@ -3723,19 +3732,8 @@ void vtkF3DRenderer::SetXRMode(bool enable, bool showBbox)
 void vtkF3DRenderer::SetLightRepresentationVisibility(bool visible)
 {
   // Make sure all lights are being tracked by a representation
+  LightRepresentationVisible = visible;
   UpdateLightRepresentations();
-
-  for (auto& [light, bundle] : LightRepresentations)
-  {
-    if (visible)
-    {
-      bundle.widget->On();
-    }
-    else
-    {
-      bundle.widget->Off();
-    }
-  }
 }
 
 //----------------------------------------------------------------------------
