@@ -908,6 +908,7 @@ private:
   bool HDRISkyboxConfigured = false;
   bool XrBoundingBoxConfigured = false;
 
+  bool LightRepresentationVisible = false;
   bool GridVisible = false;
   bool GridAbsolute = false;
   bool AxisVisible = false;
