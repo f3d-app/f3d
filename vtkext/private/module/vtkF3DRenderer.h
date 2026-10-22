@@ -246,6 +246,11 @@ public:
   int UpdateLights() override;
 
   /**
+   * Configure all light representations
+   */
+  void UpdateLightRepresentations();
+
+  /**
    * Initialize the renderer actors and flags.
    * Should be called after being added to a vtkRenderWindow.
    */
@@ -805,11 +810,6 @@ private:
    * Configure Normal Glyphs for all actors
    */
   void ConfigureNormalGlyphs();
-
-  /**
-   * Configure all light representations
-   */
-  void UpdateLightRepresentations();
 
   /**
    * Updates the normal glyph scale aiming to keep a consistent screen size
