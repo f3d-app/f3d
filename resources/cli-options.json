@@ -463,7 +463,7 @@
         {
           "longName": "hdri-skybox",
           "shortName": "j",
-          "helpText": "Enable HDRI skybox background",
+          "helpText": "Enable HDRI skybox background (\"disabled\", \"enabled\", or \"blurred\")",
           "valueHelper": "<string>",
           "implicitValue": "enabled"
         },
