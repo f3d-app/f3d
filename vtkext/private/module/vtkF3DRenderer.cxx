@@ -3549,6 +3549,7 @@ void vtkF3DRenderer::UpdateLightRepresentations()
       lightRep.widget = vtkSmartPointer<vtkLightWidget>::New();
       lightRep.widget->SetRepresentation(lightRep.representation);
       lightRep.widget->SetInteractor(this->RenderWindow->GetInteractor());
+      lightRep.widget->SetProcessEvents(false);
     }
 
     lightRep.representation->SetLightPosition(light->GetPosition());
