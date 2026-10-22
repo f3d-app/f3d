@@ -343,20 +343,16 @@ endif()
 if(APPLE AND NOT F3D_TESTING_FORCE_RENDERING_BACKEND STREQUAL "osmesa") # MacOS driver does not support OpenGL 4.3
   f3d_test(NAME TestSkinningManyBonesFailure DATA tube_254bones.glb ARGS --verbose REGEXP "which requires OpenGL" NO_BASELINE)
 else()
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219) # The baseline changed with armature support
-    # Strictly speaking, this test can also fail if ran without OpenGL 4.3 support on Windows and Linux
-    # Instead of checking MacOS only, we should try to get OpenGL capabilities from CMake later instead
-    f3d_test(NAME TestSkinningManyBones DATA tube_254bones.glb SKIP_GLES)
-  endif()
+  # Strictly speaking, this test can also fail if ran without OpenGL 4.3 support on Windows and Linux
+  # Instead of checking MacOS only, we should try to get OpenGL capabilities from CMake later instead
+  f3d_test(NAME TestSkinningManyBones DATA tube_254bones.glb SKIP_GLES)
 endif()
 
 ## Armature
 f3d_test(NAME TestGLTFRigArmatureNoArmature DATA RiggedFigure.glb ARGS --animation-time=1 --opacity=0.5 -p SKIP_GLES) # GLES skipped because of depth peeling
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219)
-  f3d_test(NAME TestGLTFRigArmature DATA RiggedFigure.glb ARGS --animation-time=1 --armature)
-  f3d_test(NAME TestGLTFRigArmatureWithOpacity DATA RiggedFigure.glb ARGS --animation-time=1 --armature --opacity=0.5 -p SKIP_GLES) # GLES skipped because of depth peeling
-  f3d_test(NAME TestGLTFRigArmatureSphereTube DATA RiggedFigure.glb ARGS --animation-time=1 --armature --point-size=20 --line-width=5)
-endif()
+f3d_test(NAME TestGLTFRigArmature DATA RiggedFigure.glb ARGS --animation-time=1 --armature)
+f3d_test(NAME TestGLTFRigArmatureWithOpacity DATA RiggedFigure.glb ARGS --animation-time=1 --armature --opacity=0.5 -p SKIP_GLES) # GLES skipped because of depth peeling
+f3d_test(NAME TestGLTFRigArmatureSphereTube DATA RiggedFigure.glb ARGS --animation-time=1 --armature --point-size=20 --line-width=5)
 
 ## HDRI
 f3d_test(NAME TestHDRI DATA suzanne.ply HDRI shanghai_bund_1k.hdr THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
@@ -410,10 +406,7 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestHDRIRaytracingNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr -rd --raytracing-samples=4 LONG_TIMEOUT)
 endif()
 
-# SSAA with HDR framebuffer support in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12026
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250329)
-  f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -t --anti-aliasing=ssaa)
-endif()
+f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -t --anti-aliasing=ssaa)
 
 ## Raytracing
 if(F3D_MODULE_RAYTRACING)
@@ -446,10 +439,7 @@ endif()
 
 if(F3D_MODULE_WEBP)
   f3d_test(NAME TestVersionWebP ARGS --version REGEXP "Module WebP: ON")
-  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11922
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250220)
-    f3d_test(NAME TestOBJWebP DATA cube_webp.obj)
-  endif()
+  f3d_test(NAME TestOBJWebP DATA cube_webp.obj)
 endif()
 
 ## Final shader
@@ -654,13 +644,10 @@ f3d_test(NAME TestAnimationIndicesWarningNone DATA cow.vtp ARGS --animation-indi
 f3d_test(NAME TestAnimationIndicesWarningAllAnimations DATA InterpolationTest.glb ARGS --animation-indices=-1,2,3 REGEXP "Multiple animation indices have been specified include a negative one, all animations will be selected" NO_BASELINE)
 f3d_test(NAME TestVerboseAnimationNoAnimationTime DATA cow.vtp ARGS --animation-time=2 --verbose REGEXP "No animation available, cannot load a specific animation time" NO_BASELINE)
 f3d_test(NAME TestInvalidAnimationProgressMode DATA cow.vtp ARGS --animation-progress=foo REGEXP "foo is an invalid animation progress mode" NO_BASELINE)
-
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250507)
-  f3d_test(NAME TestAnimationIndicesWarningSingle DATA soldier_animations.mdl ARGS --animation-indices=1,2 REGEXP "Multiple animation indices have been specified but currently loaded files may not support enabling multiple animations" NO_BASELINE)
-  if(F3D_PLUGIN_BUILD_HDF)
-    f3d_test(NAME TestAnimationIndicesWarningUniqueNonZero DATA blob.vtkhdf ARGS --animation-indices=1 --load-plugins=hdf REGEXP "Non-zero or multiple animation indices have been specified but currently loaded file does not support it." NO_BASELINE)
-    f3d_test(NAME TestAnimationIndicesWarningUniqueMulti DATA blob.vtkhdf ARGS --animation-indices=0,2 --load-plugins=hdf REGEXP "Non-zero or multiple animation indices have been specified but currently loaded file does not support it." NO_BASELINE)
-  endif()
+f3d_test(NAME TestAnimationIndicesWarningSingle DATA soldier_animations.mdl ARGS --animation-indices=1,2 REGEXP "Multiple animation indices have been specified but currently loaded files may not support enabling multiple animations" NO_BASELINE)
+if(F3D_PLUGIN_BUILD_HDF)
+  f3d_test(NAME TestAnimationIndicesWarningUniqueNonZero DATA blob.vtkhdf ARGS --animation-indices=1 --load-plugins=hdf REGEXP "Non-zero or multiple animation indices have been specified but currently loaded file does not support it." NO_BASELINE)
+  f3d_test(NAME TestAnimationIndicesWarningUniqueMulti DATA blob.vtkhdf ARGS --animation-indices=0,2 --load-plugins=hdf REGEXP "Non-zero or multiple animation indices have been specified but currently loaded file does not support it." NO_BASELINE)
 endif()
 
 # Test Grid verbose output
@@ -868,11 +855,9 @@ f3d_test(NAME TestHelpPrecedenceWithUnknownOption ARGS --help --unknown REGEXP "
 f3d_test(NAME TestVersionPrecedenceWithUnknownOption ARGS --version --unknown REGEXP "Version:" NO_BASELINE)
 
 # PIPED error code path
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
-  f3d_test(NAME TestPipedForced DATA suzanne.ply ARGS --force-reader=PLYReader --verbose PIPED_READER PLYReader REGEXP "Forcing reader" NO_BASELINE PIPED)
-  f3d_test(NAME TestPipedForcedInvalid DATA suzanne.ply ARGS --force-reader=invalid PIPED_READER invalid REGEXP "is not a valid force reader" NO_BASELINE PIPED)
-  f3d_test(NAME TestPipedForcedInvalidStream DATA beach.nrrd ARGS --force-reader=Nrrd PIPED_READER Nrrd REGEXP "does not support reading streams" NO_BASELINE PIPED)
-endif()
+f3d_test(NAME TestPipedForced DATA suzanne.ply ARGS --force-reader=PLYReader --verbose PIPED_READER PLYReader REGEXP "Forcing reader" NO_BASELINE PIPED)
+f3d_test(NAME TestPipedForcedInvalid DATA suzanne.ply ARGS --force-reader=invalid PIPED_READER invalid REGEXP "is not a valid force reader" NO_BASELINE PIPED)
+f3d_test(NAME TestPipedForcedInvalidStream DATA beach.nrrd ARGS --force-reader=Nrrd PIPED_READER Nrrd REGEXP "does not support reading streams" NO_BASELINE PIPED)
 
 ## Filesystem error code path
 if(NOT WIN32)

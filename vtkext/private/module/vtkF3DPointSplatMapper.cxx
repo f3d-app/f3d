@@ -180,9 +180,6 @@ void vtkF3DSplatMapperHelper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act
 
   if (arrayValid(sh1m1) && arrayValid(sh10) && arrayValid(sh1p1))
   {
-    // Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12112
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
-
     // we store each spherical harmonics packed in a RGB 8-bits texture.
     // we use the GPU maximum texture size to set the width of the texture.
     // the height will depends on the number of gaussians.
@@ -278,9 +275,6 @@ void vtkF3DSplatMapperHelper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act
       static_cast<vtkOpenGLRenderWindow*>(ren->GetRenderWindow()));
     this->SphericalHarmonicsTexture->Create2DArrayFromRaw(
       width, height, 3, VTK_UNSIGNED_CHAR, layers, packedData.data());
-#else
-    vtkWarningMacro("VTK < 9.5.0 does not support gaussian spherical harmonics");
-#endif
   }
 }
 

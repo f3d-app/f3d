@@ -55,7 +55,7 @@ mark_as_advanced(F3D_EXCLUDE_DEPRECATED)
 # VTK dependency
 # Optional components should list VTK modules
 # needed by plugins and optional modules
-find_package(VTK 9.4.0 REQUIRED
+find_package(VTK 9.5.0 REQUIRED
   COMPONENTS
     CommonCore
     CommonDataModel

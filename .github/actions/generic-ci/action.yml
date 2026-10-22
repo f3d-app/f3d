@@ -455,8 +455,7 @@ runs:
 
     - name: Check Install Windows Console Executable
       if: |
-        inputs.vtk_version != 'v9.4.2' && inputs.vtk_version != 'v9.5.2'
-        && runner.os == 'Windows'
+        inputs.vtk_version != 'v9.5.2' && runner.os == 'Windows'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |

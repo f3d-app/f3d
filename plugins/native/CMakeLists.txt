@@ -370,11 +370,6 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "VTK XML MultiBlock"
 )
 
-set(_SUPPORTS_STREAM)
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
-  set(_SUPPORTS_STREAM SUPPORTS_STREAM)
-endif()
-
 f3d_plugin_declare_reader(
   NAME QuakeMDL
   EXTENSIONS mdl
@@ -382,7 +377,7 @@ f3d_plugin_declare_reader(
   OPTIONS skin_index
   VTK_IMPORTER vtkF3DQuakeMDLImporter
   FORMAT_DESCRIPTION "Quake 1 MDL model"
-  ${_SUPPORTS_STREAM}
+  SUPPORTS_STREAM
   CAN_READ STATIC
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/mdl.inl"
 )
@@ -394,7 +389,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkF3DSPZReader
   FORMAT_DESCRIPTION "Compressed 3D gaussian splats"
   SCORE 40 # CanReadFile is just a gunzip check
-  ${_SUPPORTS_STREAM}
+  SUPPORTS_STREAM
   CAN_READ STATIC
 )
 
@@ -405,7 +400,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkF3DSplatReader
   FORMAT_DESCRIPTION "3D Gaussian splats"
   SCORE 40 # Any random correctly sized file is a false positive
-  ${_SUPPORTS_STREAM}
+  SUPPORTS_STREAM
   CAN_READ STATIC
 )
 
@@ -415,7 +410,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.ply
   VTK_READER vtkF3DPLYReader
   FORMAT_DESCRIPTION "Polygon"
-  ${_SUPPORTS_STREAM}
+  SUPPORTS_STREAM
   CAN_READ STATIC
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/ply.inl"
 )

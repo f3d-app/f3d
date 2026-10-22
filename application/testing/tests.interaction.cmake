@@ -69,14 +69,11 @@ endif()
 
 f3d_test(NAME TestInteractionPointCloudTAA DATA pointsCloud.vtp ARGS --anti-aliasing=taa -o --point-sprites-size=20 INTERACTION) #Render;Render...
 
-# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12098
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250504)
-  # Random values are different on GLES so the result is different, but still converges
-  # It's not a bug but we should find a solution to have the exact same result
-  f3d_test(NAME TestInteractionStochasticTAA DATA alpha.glb ARGS --anti-aliasing=taa --blending=stochastic INTERACTION SKIP_GLES) #Render;Render...
-  f3d_test(NAME TestInteractionGaussianStochasticTAA DATA small.splat ARGS --coloring-mode=direct --point-sprites=gaussian --point-sprites-absolute-size --point-sprites-size=1 --blending=stochastic --anti-aliasing=taa --camera-position=-1.65,-0.06,1.96 --camera-focal-point=-1.65,1.24,1.96 --camera-view-up=0.9954,0,0.0955 INTERACTION LONG_TIMEOUT SKIP_GLES) #Render;Render...
-  f3d_test(NAME TestInteractionAndCLIBlending ARGS --blending DATA suzanne.stl alpha.glb INTERACTION SKIP_GLES) #PP;Down
-endif()
+# Random values are different on GLES so the result is different, but still converges
+# It's not a bug but we should find a solution to have the exact same result
+f3d_test(NAME TestInteractionStochasticTAA DATA alpha.glb ARGS --anti-aliasing=taa --blending=stochastic INTERACTION SKIP_GLES) #Render;Render...
+f3d_test(NAME TestInteractionGaussianStochasticTAA DATA small.splat ARGS --coloring-mode=direct --point-sprites=gaussian --point-sprites-absolute-size --point-sprites-size=1 --blending=stochastic --anti-aliasing=taa --camera-position=-1.65,-0.06,1.96 --camera-focal-point=-1.65,1.24,1.96 --camera-view-up=0.9954,0,0.0955 INTERACTION LONG_TIMEOUT SKIP_GLES) #Render;Render...
+f3d_test(NAME TestInteractionAndCLIBlending ARGS --blending DATA suzanne.stl alpha.glb INTERACTION SKIP_GLES) #PP;Down
 
 f3d_test(NAME TestInteractionConfigFileAndCommand DATA multi ARGS -o CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI LONG_TIMEOUT) #OX;Down;N;Down;Down;Down
 
@@ -152,10 +149,7 @@ f3d_test(NAME TestInteractionAnimationNotStopped DATA InterpolationTest.glb NO_B
 f3d_test(NAME TestInteractionAnimationCycleAnimation DATA InterpolationTest.glb INTERACTION) #WWWWWWWWWWWW;Space;Space;
 f3d_test(NAME TestInteractionCycleAnimationNoAnimation DATA cow.vtp INTERACTION NO_BASELINE) #W
 f3d_test(NAME TestInteractionCycleAnimationOneAnimation DATA f3d.glb ARGS --verbose INTERACTION NO_BASELINE REGEXP "Current animation is: No animation") #W
-
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250507)
-  f3d_test(NAME TestInteractionAnimationCycleAnimationSingle DATA soldier_animations.mdl INTERACTION) #WWWWWWWWWWWW;Space;Space;
-endif()
+f3d_test(NAME TestInteractionAnimationCycleAnimationSingle DATA soldier_animations.mdl INTERACTION) #WWWWWWWWWWWW;Space;Space;
 
 # Test interactive animation and speed factor
 f3d_test(NAME TestInteractionAnimation DATA f3d.glb ARGS --animation-progress INTERACTION UI) #Space;Wait;Space;

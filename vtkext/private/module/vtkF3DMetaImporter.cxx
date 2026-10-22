@@ -653,9 +653,6 @@ std::string vtkF3DMetaImporter::GetOutputsDescription()
 //----------------------------------------------------------------------------
 vtkF3DImporter::AnimationSupportLevel vtkF3DMetaImporter::GetAnimationSupportLevel()
 {
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 4, 20250507)
-  vtkF3DImporter::AnimationSupportLevel levelAccum = vtkF3DImporter::AnimationSupportLevel::MULTI;
-#else
   vtkImporter::AnimationSupportLevel levelAccum = vtkImporter::AnimationSupportLevel::NONE;
   for (const auto& importerInfo : this->Pimpl->Importers)
   {
@@ -694,7 +691,6 @@ vtkF3DImporter::AnimationSupportLevel vtkF3DMetaImporter::GetAnimationSupportLev
         break;
     }
   }
-#endif
   return levelAccum;
 }
 

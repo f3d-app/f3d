@@ -831,10 +831,7 @@ private:
   double ModernAxisBackdropOpacity = 0.0;
   double TotalTime = 0.0;
 
-  // Does vtk version support GridAxesActor
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   vtkSmartPointer<vtkGridAxesActor3D> GridAxesActor;
-#endif
 
   vtkNew<vtkActor> GridActor;
   vtkNew<vtkF3DOpenGLGridMapper> GridMapper;
@@ -867,9 +864,7 @@ private:
   bool GridVisible = false;
   bool GridAbsolute = false;
   bool AxisVisible = false;
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   bool AxesGridVisible = false;
-#endif
   std::optional<bool> EdgeVisible;
   bool TimerVisible = false;
   bool FilenameVisible = false;
