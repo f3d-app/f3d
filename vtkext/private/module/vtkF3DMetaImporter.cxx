@@ -17,6 +17,7 @@
 #include <vtkLight.h>
 #include <vtkLightCollection.h>
 #include <vtkLightKit.h>
+#include <vtkMatrix4x4.h>
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
@@ -211,6 +212,11 @@ struct vtkF3DMetaImporter::Internals
   bool CoordinateNormalize = false;
   bool HasAppliedNormalization = false;
   vtkNew<vtkTransform> NormalizeTransform;
+  // The matrix of NormalizeTransform as of the last time it was applied to cameras and lights.
+  // Cameras and lights store absolute positions, not a transform, so going from one normalization
+  // state to another (including back to identity) requires undoing this previously applied
+  // transform before applying the new one.
+  vtkNew<vtkMatrix4x4> PreviousNormalizeMatrix;
 
   F3DColoringInfoHandler ColoringInfoHandler;
 };
@@ -243,6 +249,7 @@ void vtkF3DMetaImporter::Clear()
   this->Pimpl->RawGeometryBoundingBox.Reset();
   this->Pimpl->GeometryBoundingBox.Reset();
   this->Pimpl->NormalizeTransform->Identity();
+  this->Pimpl->PreviousNormalizeMatrix->Identity();
   this->Pimpl->HasAppliedNormalization = false;
   this->ActorCollection->RemoveAllItems();
   this->Pimpl->ColoringActorsAndMappers.clear();
@@ -1123,6 +1130,19 @@ void vtkF3DMetaImporter::ApplyCoordinateNormalization()
     volume.Prop->SetUserTransform(this->Pimpl->NormalizeTransform);
   }
 
+  // Cameras and lights store absolute positions rather than going through a transform like
+  // actors do, so applying NormalizeTransform directly on top of a previously applied transform
+  // would compose rather than replace it. Instead, compute the delta that goes from the
+  // previously applied state to the new one (undoing the old transform, then applying the new
+  // one) and apply that delta to their current, already-transformed positions.
+  vtkNew<vtkMatrix4x4> previousInverse;
+  vtkMatrix4x4::Invert(this->Pimpl->PreviousNormalizeMatrix, previousInverse);
+  vtkNew<vtkMatrix4x4> deltaMatrix;
+  vtkMatrix4x4::Multiply4x4(
+    this->Pimpl->NormalizeTransform->GetMatrix(), previousInverse, deltaMatrix);
+  vtkNew<vtkTransform> deltaTransform;
+  deltaTransform->SetMatrix(deltaMatrix);
+
   // Transform all imported cameras, plus the renderer's active camera if already created, as it
   // may be a default camera not part of any importer
   std::set<vtkCamera*> camerasToTransform;
@@ -1151,12 +1171,12 @@ void vtkF3DMetaImporter::ApplyCoordinateNormalization()
   {
     double position[3];
     camera->GetPosition(position);
-    this->Pimpl->NormalizeTransform->TransformPoint(position, position);
+    deltaTransform->TransformPoint(position, position);
     camera->SetPosition(position);
 
     double focalPoint[3];
     camera->GetFocalPoint(focalPoint);
-    this->Pimpl->NormalizeTransform->TransformPoint(focalPoint, focalPoint);
+    deltaTransform->TransformPoint(focalPoint, focalPoint);
     camera->SetFocalPoint(focalPoint);
   }
 
@@ -1179,14 +1199,17 @@ void vtkF3DMetaImporter::ApplyCoordinateNormalization()
   {
     double position[3];
     light->GetPosition(position);
-    this->Pimpl->NormalizeTransform->TransformPoint(position, position);
+    deltaTransform->TransformPoint(position, position);
     light->SetPosition(position);
 
     double focalPoint[3];
     light->GetFocalPoint(focalPoint);
-    this->Pimpl->NormalizeTransform->TransformPoint(focalPoint, focalPoint);
+    deltaTransform->TransformPoint(focalPoint, focalPoint);
     light->SetFocalPoint(focalPoint);
   }
+
+  // Record the now-applied transform so the next call can correctly undo it if needed.
+  this->Pimpl->PreviousNormalizeMatrix->DeepCopy(this->Pimpl->NormalizeTransform->GetMatrix());
 
   if (shouldNormalize && maxLength > 0.0)
   {
