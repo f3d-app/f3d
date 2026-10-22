@@ -94,7 +94,7 @@ function (f3d_generate_options)
 endfunction()
 
 #[==[
-@brief internal recursive method use to parse json structure and generate variables
+@brief internal recursive method used to parse json structure and generate variables
 #]==]
 function(_parse_json_option _top_json)
   string(JSON _options_length LENGTH ${_top_json})
