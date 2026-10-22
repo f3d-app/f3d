@@ -119,8 +119,18 @@ public:
   /**
    * Get the bounding box of all geometry actors
    * Should be called after actors have been imported
+   * If coordinate normalization is enabled, this returns the bounding box after normalization
    */
   const vtkBoundingBox& GetGeometryBoundingBox();
+
+  /**
+   * Set whether to normalize the scene coordinates, by shifting the whole scene to the origin
+   * and isotropically scaling it so that its bounding box has a unit maximum extent.
+   * The same transform is applied to all geometry, cameras and lights so that the scene as a
+   * whole is normalized, not each actor individually.
+   * Takes effect on the next Update() call.
+   */
+  void SetCoordinateNormalize(bool normalize);
 
   struct SceneInfo
   {
@@ -272,6 +282,14 @@ private:
    * and store result in internal fields
    */
   void UpdateInfoForColoring();
+
+  /**
+   * Compute the coordinate normalization transform from the raw geometry bounding box, if
+   * enabled, and apply it (or reset to identity if previously applied but no longer enabled) to
+   * all actors, cameras and lights. Also keeps GeometryBoundingBox in sync.
+   * A no-op if coordinate normalization has never been enabled.
+   */
+  void ApplyCoordinateNormalization();
 
   struct Internals;
   std::unique_ptr<Internals> Pimpl;

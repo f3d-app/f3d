@@ -24,12 +24,14 @@
 #include <vtkRendererCollection.h>
 #include <vtkSmartPointer.h>
 #include <vtkTexture.h>
+#include <vtkTransform.h>
 #include <vtkUnsignedIntArray.h>
 #include <vtkVersion.h>
 
 #include <cassert>
 #include <iostream>
 #include <numeric>
+#include <set>
 #include <vector>
 
 namespace
@@ -194,9 +196,21 @@ struct vtkF3DMetaImporter::Internals
   std::vector<::FlatNode> FlatNodes;
 
   std::optional<vtkIdType> CameraIndex;
+
+  // Accumulated from the raw, untransformed geometry of every imported actor. Never mutated by
+  // coordinate normalization, used as the single source of truth to (re)compute the
+  // normalization transform.
+  vtkBoundingBox RawGeometryBoundingBox;
+  // Publicly reported bounding box, kept in sync with RawGeometryBoundingBox, transformed by
+  // NormalizeTransform when coordinate normalization is enabled.
   vtkBoundingBox GeometryBoundingBox;
+
   vtkTimeStamp ColoringInfoTime;
   vtkTimeStamp UpdateTime;
+
+  bool CoordinateNormalize = false;
+  bool HasAppliedNormalization = false;
+  vtkNew<vtkTransform> NormalizeTransform;
 
   F3DColoringInfoHandler ColoringInfoHandler;
 };
@@ -226,7 +240,10 @@ void vtkF3DMetaImporter::Clear()
 {
   this->Pimpl->Importers.clear();
   this->Pimpl->FlatNodes.clear();
+  this->Pimpl->RawGeometryBoundingBox.Reset();
   this->Pimpl->GeometryBoundingBox.Reset();
+  this->Pimpl->NormalizeTransform->Identity();
+  this->Pimpl->HasAppliedNormalization = false;
   this->ActorCollection->RemoveAllItems();
   this->Pimpl->ColoringActorsAndMappers.clear();
   this->Pimpl->PointSpritesActorsAndMappers.clear();
@@ -528,7 +545,7 @@ bool vtkF3DMetaImporter::Update()
       // Increase bounding box size if needed
       double bounds[6];
       surface->GetBounds(bounds);
-      this->Pimpl->GeometryBoundingBox.AddBounds(bounds);
+      this->Pimpl->RawGeometryBoundingBox.AddBounds(bounds);
 
       // Create and configure coloring actors
       this->Pimpl->ColoringActorsAndMappers.emplace_back(vtkF3DMetaImporter::ColoringStruct(actor));
@@ -632,6 +649,8 @@ bool vtkF3DMetaImporter::Update()
     ::FlattenAssembly(this->Pimpl->Importers[i].DataAssembly, vtkDataAssembly::GetRootNode(),
       static_cast<int>(i), -1, 0, this->Pimpl->FlatNodes);
   }
+
+  this->ApplyCoordinateNormalization();
 
   // XXX: UpdateStatus is not set, but libf3d does not use it
   return true;
@@ -1026,6 +1045,163 @@ F3DColoringInfoHandler& vtkF3DMetaImporter::GetColoringInfoHandler()
 {
   this->UpdateInfoForColoring();
   return this->Pimpl->ColoringInfoHandler;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DMetaImporter::SetCoordinateNormalize(bool normalize)
+{
+  if (this->Pimpl->CoordinateNormalize != normalize)
+  {
+    this->Pimpl->CoordinateNormalize = normalize;
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DMetaImporter::ApplyCoordinateNormalization()
+{
+  // The publicly reported bounding box always starts from the raw one, so that it stays correct
+  // even when normalization is disabled or the scene is degenerate.
+  this->Pimpl->GeometryBoundingBox = this->Pimpl->RawGeometryBoundingBox;
+
+  const bool shouldNormalize =
+    this->Pimpl->CoordinateNormalize && this->Pimpl->RawGeometryBoundingBox.IsValid();
+
+  double center[3] = { 0.0, 0.0, 0.0 };
+  double maxLength = 0.0;
+  if (shouldNormalize)
+  {
+    this->Pimpl->RawGeometryBoundingBox.GetCenter(center);
+    maxLength = this->Pimpl->RawGeometryBoundingBox.GetMaxLength();
+  }
+
+  if (!shouldNormalize || maxLength <= 0.0)
+  {
+    if (!this->Pimpl->HasAppliedNormalization)
+    {
+      // Normalization has never been applied and is not requested: nothing to do.
+      return;
+    }
+
+    // Normalization was previously applied but is no longer requested, or the scene became
+    // degenerate: reset to identity so previously transformed actors, cameras and lights are
+    // restored to their original coordinates.
+    this->Pimpl->NormalizeTransform->Identity();
+    this->Pimpl->HasAppliedNormalization = false;
+  }
+  else
+  {
+    // Shift the scene to the origin, then isotropically scale it so its largest extent is 1.
+    this->Pimpl->NormalizeTransform->Identity();
+    this->Pimpl->NormalizeTransform->PostMultiply();
+    this->Pimpl->NormalizeTransform->Translate(-center[0], -center[1], -center[2]);
+    this->Pimpl->NormalizeTransform->Scale(1.0 / maxLength, 1.0 / maxLength, 1.0 / maxLength);
+    this->Pimpl->HasAppliedNormalization = true;
+  }
+
+  // Apply the transform (identity when resetting) to every actor type
+  vtkCollectionSimpleIterator ait;
+  this->ActorCollection->InitTraversal(ait);
+  while (vtkActor* actor = this->ActorCollection->GetNextActor(ait))
+  {
+    actor->SetUserTransform(this->Pimpl->NormalizeTransform);
+  }
+  for (auto& coloring : this->Pimpl->ColoringActorsAndMappers)
+  {
+    coloring.Actor->SetUserTransform(this->Pimpl->NormalizeTransform);
+  }
+  for (auto& normalGlyph : this->Pimpl->NormalGlyphsActorsAndMappers)
+  {
+    normalGlyph.Actor->SetUserTransform(this->Pimpl->NormalizeTransform);
+  }
+  for (auto& sprites : this->Pimpl->PointSpritesActorsAndMappers)
+  {
+    sprites.Actor->SetUserTransform(this->Pimpl->NormalizeTransform);
+  }
+  for (auto& volume : this->Pimpl->VolumePropsAndMappers)
+  {
+    volume.Prop->SetUserTransform(this->Pimpl->NormalizeTransform);
+  }
+
+  // Transform all imported cameras, plus the renderer's active camera if already created, as it
+  // may be a default camera not part of any importer
+  std::set<vtkCamera*> camerasToTransform;
+  for (const auto& importerInfo : this->Pimpl->Importers)
+  {
+    vtkCollection* cameraCollection = importerInfo.Importer->GetImportedCameras();
+    if (cameraCollection)
+    {
+      vtkCollectionSimpleIterator cit;
+      cameraCollection->InitTraversal(cit);
+      while (vtkObject* obj = cameraCollection->GetNextItemAsObject(cit))
+      {
+        vtkCamera* camera = vtkCamera::SafeDownCast(obj);
+        if (camera)
+        {
+          camerasToTransform.insert(camera);
+        }
+      }
+    }
+  }
+  if (this->Renderer && this->Renderer->IsActiveCameraCreated())
+  {
+    camerasToTransform.insert(this->Renderer->GetActiveCamera());
+  }
+  for (vtkCamera* camera : camerasToTransform)
+  {
+    double position[3];
+    camera->GetPosition(position);
+    this->Pimpl->NormalizeTransform->TransformPoint(position, position);
+    camera->SetPosition(position);
+
+    double focalPoint[3];
+    camera->GetFocalPoint(focalPoint);
+    this->Pimpl->NormalizeTransform->TransformPoint(focalPoint, focalPoint);
+    camera->SetFocalPoint(focalPoint);
+  }
+
+  // Transform all imported lights
+  std::set<vtkLight*> lightsToTransform;
+  for (const auto& importerInfo : this->Pimpl->Importers)
+  {
+    vtkLightCollection* lightCollection = importerInfo.Importer->GetImportedLights();
+    if (lightCollection)
+    {
+      vtkCollectionSimpleIterator lit;
+      lightCollection->InitTraversal(lit);
+      while (vtkLight* light = lightCollection->GetNextLight(lit))
+      {
+        lightsToTransform.insert(light);
+      }
+    }
+  }
+  for (vtkLight* light : lightsToTransform)
+  {
+    double position[3];
+    light->GetPosition(position);
+    this->Pimpl->NormalizeTransform->TransformPoint(position, position);
+    light->SetPosition(position);
+
+    double focalPoint[3];
+    light->GetFocalPoint(focalPoint);
+    this->Pimpl->NormalizeTransform->TransformPoint(focalPoint, focalPoint);
+    light->SetFocalPoint(focalPoint);
+  }
+
+  if (shouldNormalize && maxLength > 0.0)
+  {
+    // Keep the publicly reported bounding box in sync with the applied transform
+    double bounds[6];
+    this->Pimpl->GeometryBoundingBox.GetBounds(bounds);
+    double minPoint[3] = { bounds[0], bounds[2], bounds[4] };
+    double maxPoint[3] = { bounds[1], bounds[3], bounds[5] };
+    double newMin[3];
+    double newMax[3];
+    this->Pimpl->NormalizeTransform->TransformPoint(minPoint, newMin);
+    this->Pimpl->NormalizeTransform->TransformPoint(maxPoint, newMax);
+    this->Pimpl->GeometryBoundingBox.SetBounds(
+      newMin[0], newMax[0], newMin[1], newMax[1], newMin[2], newMax[2]);
+  }
 }
 
 //----------------------------------------------------------------------------

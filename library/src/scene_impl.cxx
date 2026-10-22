@@ -219,6 +219,8 @@ public:
       this->MetaImporter->SetCameraIndex(this->Options.scene.camera.index.value());
     }
 
+    this->MetaImporter->SetCoordinateNormalize(this->Options.scene.coordinate_normalize);
+
     // Manage progress bar
     vtkNew<vtkProgressBarWidget> progressWidget;
     const vtkNew<vtkTimerLog> timer;

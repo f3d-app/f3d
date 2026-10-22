@@ -106,6 +106,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "coloring-scalar-bar", "ui.scalar_bar" },
   { "colormap", "model.scivis.colormap" },
   { "colormap-discretization", "model.scivis.discretization" },
+  { "coordinate-normalize", "scene.coordinate_normalize" },
   { "display-depth", "render.effect.display_depth" },
   { "dpi-aware", "ui.dpi_aware" },
   { "edges", "render.show_edges" },
