@@ -42,6 +42,8 @@ class vtkOrientationMarkerWidget;
 class vtkScalarBarActor;
 class vtkSkybox;
 class vtkTextActor;
+class vtkLightRepresentation;
+class vtkLightWidget;
 
 class vtkF3DRenderer : public vtkOpenGLRenderer
 {
@@ -691,6 +693,13 @@ public:
    */
   void SetXRMode(bool enable, bool showBbox = false);
 
+  /**
+   * Changes the light representable visibility
+   * if visible is true, Then all the representables will be turned on
+   * else all representables will not be visible
+   */
+  void SetLightRepresentationVisibility(bool visible);
+
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;
@@ -823,6 +832,11 @@ private:
   void ConfigureNormalGlyphs();
 
   /**
+   * Configure all light representations
+   */
+  void UpdateLightRepresentations();
+
+  /**
    * Updates the normal glyph scale aiming to keep a consistent screen size
    */
   void UpdateNormalGlyphsScale();
@@ -850,6 +864,7 @@ private:
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
   vtkSmartPointer<vtkCameraOrientationWidget> ModernAxisWidget;
   vtkSmartPointer<vtkCameraOrientationRepresentation> ModernAxisRepresentation;
+
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
   int ModernAxisBasePadding[2] = { 0, 0 };
 #endif
@@ -857,6 +872,13 @@ private:
   double TotalTime = 0.0;
 
   vtkSmartPointer<vtkGridAxesActor3D> GridAxesActor;
+
+  struct LightRepresentationBundle
+  {
+    vtkSmartPointer<vtkLightRepresentation> representation;
+    vtkSmartPointer<vtkLightWidget> widget;
+  };
+  std::map<vtkLight*, LightRepresentationBundle> LightRepresentations;
 
   vtkNew<vtkActor> GridActor;
   vtkNew<vtkF3DOpenGLGridMapper> GridMapper;

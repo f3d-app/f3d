@@ -43,6 +43,8 @@
 #include <vtkLight.h>
 #include <vtkLightCollection.h>
 #include <vtkLineSource.h>
+#include <vtkLightRepresentation.h>
+#include <vtkLightWidget.h>
 #include <vtkMath.h>
 #include <vtkMathUtilities.h>
 #include <vtkMatrix4x4.h>
@@ -3524,6 +3526,56 @@ void vtkF3DRenderer::ConfigureNormalGlyphs()
 
   this->NormalGlyphsConfigured = true;
 }
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::UpdateLightRepresentations()
+{
+  vtkCollectionSimpleIterator it;
+  vtkLightCollection* lc = this->GetLights();
+  vtkLight* light = nullptr;
+  std::set<vtkLight*> visitedLights;
+  for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
+  {
+
+    visitedLights.insert(light);
+
+    auto& lightRep = LightRepresentations[light];
+
+    if (lightRep.representation == nullptr)
+    {
+      lightRep.representation = vtkSmartPointer<vtkLightRepresentation>::New();
+    }
+    if (lightRep.widget == nullptr)
+    {
+      lightRep.widget = vtkSmartPointer<vtkLightWidget>::New();
+      lightRep.widget->SetRepresentation(lightRep.representation);
+      lightRep.widget->SetInteractor(this->RenderWindow->GetInteractor());
+    }
+
+    lightRep.representation->SetLightPosition(light->GetPosition());
+    lightRep.representation->SetPositional(light->GetPositional());
+    lightRep.representation->SetFocalPoint(light->GetFocalPoint());
+    lightRep.representation->SetConeAngle(light->GetConeAngle());
+  }
+
+  // remove unwanted light representations
+  for (auto it = LightRepresentations.begin(); it != LightRepresentations.end();)
+  {
+    if (visitedLights.count(it->first))
+    {
+      it++;
+      continue;
+    }
+
+    // safely removing the widget and representation
+    it->second.widget->Off();
+    it->second.widget->SetRepresentation(nullptr);
+    it->second.widget->SetInteractor(nullptr);
+    it->second.widget = nullptr;
+    it->second.representation = nullptr;
+
+    it = LightRepresentations.erase(it);
+  }
+}
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::UpdateNormalGlyphsScale()
@@ -3808,6 +3860,24 @@ void vtkF3DRenderer::SetXRMode(bool enable, bool showBbox)
     }
   }
   // LCOV_EXCL_STOP
+}
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetLightRepresentationVisibility(bool visible)
+{
+  // Make sure all lights are being tracked by a representation
+  UpdateLightRepresentations();
+
+  for (auto& [light, bundle] : LightRepresentations)
+  {
+    if (visible)
+    {
+      bundle.widget->On();
+    }
+    else
+    {
+      bundle.widget->Off();
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
