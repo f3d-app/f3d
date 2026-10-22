@@ -34,10 +34,6 @@ ImGuiKey GetImGuiKeyFromKeySym(std::string_view&& keySym)
       { "Insert", ImGuiKey_Insert },
       { "Delete", ImGuiKey_Delete },
       { "BackSpace", ImGuiKey_Backspace },
-// https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11738
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 4, 20241210)
-      { "Backspace", ImGuiKey_Backspace },
-#endif
       { "space", ImGuiKey_Space },
       { "Return", ImGuiKey_Enter },
       { "Escape", ImGuiKey_Escape },

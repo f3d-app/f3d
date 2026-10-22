@@ -47,11 +47,9 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
 endif()
 
 # Armature
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219)
-  f3d_test(NAME TestUSDRigArmature DATA RiggedSimple.usdz ARGS --animation-time=1 --armature PLUGIN usd)
-  f3d_test(NAME TestUSDRigArmatureWithOpacity DATA RiggedSimple.usdz ARGS --animation-time=1 --armature --opacity=0.5 -p PLUGIN usd)
-  f3d_test(NAME TestUSDRigArmatureSphereTube DATA RiggedSimple.usdz ARGS --animation-time=1 --armature --point-size=20 --line-width=5 PLUGIN usd)
-endif()
+f3d_test(NAME TestUSDRigArmature DATA RiggedSimple.usdz ARGS --animation-time=1 --armature PLUGIN usd)
+f3d_test(NAME TestUSDRigArmatureWithOpacity DATA RiggedSimple.usdz ARGS --animation-time=1 --armature --opacity=0.5 -p PLUGIN usd)
+f3d_test(NAME TestUSDRigArmatureSphereTube DATA RiggedSimple.usdz ARGS --animation-time=1 --armature --point-size=20 --line-width=5 PLUGIN usd)
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251016)
   f3d_test(NAME TestPipedUSD DATA suzanne.usd PLUGIN usd PIPED_READER USD PIPED)

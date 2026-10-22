@@ -3,7 +3,6 @@
 #include <vtkImporter.h>
 #include <vtkNew.h>
 #include <vtkTestUtilities.h>
-#include <vtkVersion.h>
 
 #include <iostream>
 
@@ -14,12 +13,10 @@ int TestF3DUSDImporter(int vtkNotUsed(argc), char* argv[])
   importer->SetFileName(filename.c_str());
   importer->DisableAnimation(0);
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250507)
   if (importer->GetAnimationSupportLevel() != vtkImporter::AnimationSupportLevel::UNIQUE)
   {
     return EXIT_FAILURE;
   }
-#endif
 
   importer->Update();
   importer->Print(std::cout);

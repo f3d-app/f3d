@@ -31,6 +31,7 @@
 #include <vtkCullerCollection.h>
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkFloatArray.h>
+#include <vtkGridAxesActor3D.h>
 #include <vtkHDRReader.h>
 #include <vtkImageAppendComponents.h>
 #include <vtkImageData.h>
@@ -92,10 +93,6 @@
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
 #include <vtkMemoryResourceStream.h>
-#endif
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
-#include <vtkGridAxesActor3D.h>
 #endif
 
 #if F3D_MODULE_RAYTRACING
@@ -277,7 +274,7 @@ void vtkF3DRenderer::Initialize()
   this->AddActor(this->SkyboxActor);
   this->AddActor(this->UIActor);
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513) && !defined(F3D_USE_GLES)
+#if !defined(F3D_USE_GLES)
   // Add the grid axes actor if already initialized
   if (this->GridAxesActor != nullptr)
   {
@@ -553,9 +550,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   if (this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::SSAA)
   {
     vtkNew<vtkSSAAPass> ssaaP;
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250329)
     ssaaP->SetColorFormat(vtkTextureObject::Float16);
-#endif
     ssaaP->SetDelegatePass(renderingPass);
     renderingPass = ssaaP;
   }
@@ -989,7 +984,6 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowAxesGrid([[maybe_unused]] bool show)
 {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   if (this->AxesGridVisible != show)
   {
     this->AxesGridVisible = show;
@@ -997,7 +991,6 @@ void vtkF3DRenderer::ShowAxesGrid([[maybe_unused]] bool show)
     this->GridAxesConfigured = false;
     this->CheatSheetConfigured = false;
   }
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -1009,7 +1002,6 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
     F3DLog::Print(F3DLog::Severity::Warning, "Grid axes are not supported on OpenGL ES, ignoring.");
   }
 #else
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   bool show = this->AxesGridVisible;
   if (show)
   {
@@ -1074,7 +1066,6 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
   {
     this->GridAxesActor->SetVisibility(show);
   }
-#endif
 #endif
 }
 
@@ -1354,12 +1345,10 @@ void vtkF3DRenderer::AlignSceneToBounds(const vtkBoundingBox& bounds)
       continue;
     }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
     if (vtkGridAxesActor3D::SafeDownCast(prop3D))
     {
       continue;
     }
-#endif
 
     prop3D->SetPosition(targetCenter[0], targetCenter[1], targetCenter[2]);
     prop3D->SetScale(scale, scale, scale);
@@ -2433,12 +2422,10 @@ void vtkF3DRenderer::UpdateActors()
   // We assume animation change do not change the number of actors
   const vtkMTimeType importerUpdateMTime = this->Importer->GetUpdateMTime();
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   if (this->AxesGridVisible && importerUpdateMTime > this->ImporterUpdateTimeStamp)
   {
     this->GridAxesConfigured = false;
   }
-#endif
 
   if (this->UsingExpandingRange && (importerUpdateMTime > this->ImporterUpdateTimeStamp) &&
     (this->Coloring != vtkF3DRenderer::ColoringMode::MATERIAL ||

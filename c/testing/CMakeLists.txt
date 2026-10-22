@@ -8,6 +8,7 @@ list(APPEND f3d_c_api_tests_list
   test_log.c
   test_options.c
   test_scene.c
+  test_scene_buffer.c
   test_types.c
   test_utils.c
   test_window.c
@@ -17,12 +18,6 @@ if(F3D_MODULE_FFMPEG)
   list(APPEND f3d_c_api_tests_list
     test_video.c
   )
-endif()
-
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
-  list(APPEND f3d_c_api_tests_list
-    test_scene_buffer.c
-    )
 endif()
 
 # Zero-copy mesh_view C API (f3d_scene_add_mesh_view). Needs strided arrays
