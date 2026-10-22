@@ -195,7 +195,7 @@ f3d_test_doc(NAME TestDocNormalGlyphsScale07 DATA DamagedHelmet.glb REF_IMAGE no
 
 ## --normal-glyphs-color
 ### white: normal_glyphs_on.png
-f3d_test_doc(NAME TestDocNormalGlyphsColorMarron DATA DamagedHelmet.glb REF_IMAGE normal_glyphs_maroon.png ROTATE ARGS --normal-glyphs --normal-glyphs-scale=.3 --normal-glyphs-color=maroon -f)
+f3d_test_doc(NAME TestDocNormalGlyphsColorMaroon DATA DamagedHelmet.glb REF_IMAGE normal_glyphs_maroon.png ROTATE ARGS --normal-glyphs --normal-glyphs-scale=.3 --normal-glyphs-color=maroon -f)
 
 ## --normal-glyphs-shape
 ### arrow: normal_glyphs_on.png
