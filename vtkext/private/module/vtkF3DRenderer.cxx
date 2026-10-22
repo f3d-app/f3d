@@ -2829,6 +2829,8 @@ int vtkF3DRenderer::UpdateLights()
     this->LightIntensitiesConfigured = true;
   }
 
+  UpdateLightRepresentations();
+
   // Push IBLIntensity to every actor's custom uniforms so the HDRI ambient
   // contribution (iblDiffuse + iblSpecular) scales with the same factor.
   // This runs every frame (not just when intensity changes) to ensure that newly
