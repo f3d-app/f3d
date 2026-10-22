@@ -4,6 +4,10 @@
 #include "exception.h"
 #include "export.h"
 
+/// @cond
+#include <cstdint>
+/// @endcond
+
 namespace f3d
 {
 /**
