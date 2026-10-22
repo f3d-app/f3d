@@ -308,8 +308,6 @@ jobs:
       github.ref == 'refs/heads/master'
     strategy:
       fail-fast: false
-      matrix:
-        vtk_version: ${{fromJSON(needs.recover_vtk_matrix.outputs.vtk_matrix)}}
 
     runs-on: macos-15-intel
 
@@ -330,10 +328,10 @@ jobs:
         uses: ./source/.github/actions/generic-ci
         with:
           versions_file: ./source/.github/workflows/versions.json
-          vtk_version: ${{matrix.vtk_version}}
+          vtk_version: commit
           cpu: x86_64
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-          rendering_backend: ${{matrix.vtk_version == 'commit' && 'osmesa' || 'auto'}}
+          rendering_backend: osmesa
 
   #----------------------------------------------------------------------------
   # MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
