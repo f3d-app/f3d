@@ -5,7 +5,6 @@
 #include "vtkF3DImporter.h"
 
 #include <vtkActorCollection.h>
-#include <vtkArrowSource.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
 #include <vtkDataAssembly.h>
@@ -554,15 +553,16 @@ bool vtkF3DMetaImporter::Update()
 
       if (ngs.InputDataHasNormals)
       {
-        vtkNew<vtkArrowSource> arrowSource;
         ngs.GlyphMapper->SetInputData(points);
-        ngs.GlyphMapper->SetSourceConnection(arrowSource->GetOutputPort());
         ngs.GlyphMapper->SetOrientationModeToDirection();
         ngs.GlyphMapper->SetOrientationArray(vtkDataSetAttributes::NORMALS);
         ngs.GlyphMapper->ScalingOn();
         ngs.Actor->SetMapper(ngs.GlyphMapper);
         this->Renderer->AddActor(ngs.Actor);
         ngs.Actor->VisibilityOff();
+        ngs.Actor->GetProperty()->SetInterpolationToPBR();
+        ngs.Actor->GetProperty()->SetRoughness(0.3);
+        ngs.Actor->GetProperty()->RenderLinesAsTubesOn();
       }
 
       // Create and configure point sprites actors

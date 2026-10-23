@@ -147,8 +147,15 @@ f3d_test(NAME TestVolumeMaterialError DATA HeadMRVolume.mhd ARGS -v NO_BASELINE 
 
 ## Normal Glyphs
 f3d_test(NAME TestNormalGlyphsPerspectiveEnable DATA suzanne.obj ARGS --normal-glyphs LONG_TIMEOUT)
-f3d_test(NAME TestNormalGlyphsOrthographicEnable DATA suzanne.obj ARGS --normal-glyphs --camera-orthographic)
-f3d_test(NAME TestNormalGlyphsScale DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-scale=0.1)
+f3d_test(NAME TestNormalGlyphsOrthographicEnable DATA suzanne.obj ARGS --normal-glyphs --camera-orthographic LONG_TIMEOUT)
+f3d_test(NAME TestNormalGlyphsScale DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-scale=0.1 LONG_TIMEOUT)
+f3d_test(NAME TestNormalGlyphsColor DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-color=1,0,0 LONG_TIMEOUT)
+f3d_test(NAME TestNormalGlyphsCylinder DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-shape=cylinder LONG_TIMEOUT)
+f3d_test(NAME TestNormalGlyphsCone DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-shape=cone LONG_TIMEOUT)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.0) # Line color is different before VTK 9.6 for unknown reason
+  f3d_test(NAME TestNormalGlyphsLine DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-shape=line LONG_TIMEOUT)
+endif()
+f3d_test(NAME TestNormalGlyphsInvalidShape DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-shape=foo LONG_TIMEOUT NO_BASELINE REGEXP "foo is an invalid normal glyphs shape")
 f3d_test(NAME TestNormalGlyphsNoNormalsAvailable DATA cow.vtp ARGS --normal-glyphs NO_BASELINE REGEXP "does not contain any normals")
 
 ## Textures

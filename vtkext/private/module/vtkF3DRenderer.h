@@ -105,6 +105,17 @@ public:
     ANY
   };
 
+  /**
+   * Enum listing possible normal glyph shapes.
+   */
+  enum class NormalGlyphShape : unsigned char
+  {
+    ARROW,
+    CONE,
+    CYLINDER,
+    LINE
+  };
+
   ///@{
   /**
    * Set visibility of different actors
@@ -392,6 +403,16 @@ public:
    * Sets the GlyphScaleMultiplier
    */
   void SetNormalGlyphScaleMultiplier(double multiplier);
+
+  /**
+   * Sets the color of the normal glyphs
+   */
+  void SetNormalGlyphColor(const std::array<double, 3>& color);
+
+  /**
+   * Sets the shape of the normal glyphs
+   */
+  void SetNormalGlyphShape(const NormalGlyphShape& shape);
 
   /**
    * Set the visibility of the point sprites actor.
@@ -983,6 +1004,8 @@ private:
   bool ScalarBarVisible = false;
   bool UseNormalGlyphs = false;
   double NormalGlyphScaleMultiplier = 1.0;
+  std::array<double, 3> NormalGlyphColor = { 1.0, 1.0, 1.0 };
+  NormalGlyphShape GlyphShape = NormalGlyphShape::ARROW;
   bool UsePointSprites = false;
   bool UseVolume = false;
   bool UseInverseOpacityFunction = false;
