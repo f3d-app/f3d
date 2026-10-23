@@ -1253,9 +1253,9 @@ void vtkF3DMetaImporter::ApplyCoordinateNormalization(bool importedCamerasAreRaw
   {
     const bool imported = importedCameras.count(camera) != 0;
     const bool holding = this->Pimpl->CamerasHoldingNormalize.count(camera) != 0;
-    const bool useFull = (imported && (importedCamerasAreRaw || !holding)) ||
+    const bool applyFull = (imported && (importedCamerasAreRaw || !holding)) ||
       (refreshActiveSceneCamera && camera == activeCamera && !imported);
-    transformPositionAndFocal(camera, useFull ? normalize : delta);
+    transformPositionAndFocal(camera, applyFull ? normalize : delta);
   }
   this->Pimpl->CamerasHoldingNormalize = camerasToTransform;
 
@@ -1265,8 +1265,8 @@ void vtkF3DMetaImporter::ApplyCoordinateNormalization(bool importedCamerasAreRaw
   {
     auto& binding = this->Pimpl->LightBindings[light];
     vtkMatrix4x4* current = light->GetTransformMatrix();
-    const bool installedByUs = current != nullptr && binding.Combined != nullptr &&
-      current == binding.Combined->GetMatrix();
+    const bool installedByUs =
+      current != nullptr && binding.Combined != nullptr && current == binding.Combined->GetMatrix();
     if (current != nullptr && !installedByUs)
     {
       binding.OriginalMatrix = current;
