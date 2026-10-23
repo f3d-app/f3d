@@ -105,8 +105,8 @@
         },
         {
           "longName": "rendering-backend",
-          "helpText": "Backend to use when rendering (auto|glx|wgl|egl|osmesa)",
-          "valueHelper": "<string>"
+          "helpText": "Backend to use when rendering",
+          "valueHelper": "auto|glx|wgl|egl|osmesa|xr"
         },
         {
           "longName": "list-rendering-backends",
@@ -182,7 +182,7 @@
         {
           "longName": "verbose",
           "helpText": "Set verbose level, providing more information about the loaded data in the console output",
-          "valueHelper": "{debug, info, warning, error, quiet}",
+          "valueHelper": "debug|info|warning|error|quiet",
           "implicitValue": "debug"
         },
         {
@@ -193,14 +193,14 @@
         },
         {
           "longName": "animation-progress",
-          "helpText": "Animation progress bar mode (\"none\", \"default\" or \"advanced\")",
-          "valueHelper": "<string>",
+          "helpText": "Animation progress bar mode",
+          "valueHelper": "none|default|advanced",
           "implicitValue": "default"
         },
         {
           "longName": "multi-file-mode",
           "helpText": "Choose the behavior when opening multiple files. \"single\" will show one file at a time, \"all\" will show all files in a single scene, \"dir\" will show files from the same directory in the same scene.",
-          "valueHelper": "<single|all|dir>"
+          "valueHelper": "single|all|dir"
         },
         {
           "longName": "multi-file-regex",
@@ -282,7 +282,8 @@
         {
           "longName": "grid-reflection",
           "helpText": "Reflection strength of the grid",
-          "valueHelper": "<value>"
+          "valueHelper": "<value>",
+          "implicitValue": "0.5"
         },
         {
           "longName": "shadows",
@@ -318,7 +319,7 @@
           "longName": "interaction-style",
           "shortName": "k",
           "helpText": "Interaction style",
-          "valueHelper": "<style>",
+          "valueHelper": "default|trackball|2d",
           "implicitValue": "2d"
         },
         {
@@ -409,8 +410,8 @@
         {
           "longName": "point-sprites",
           "shortName": "o",
-          "helpText": "Select point sprites type (\"none\", \"sphere\", \"gaussian\", \"circle\", \"stddev\", \"bound\")",
-          "valueHelper": "<string>",
+          "helpText": "Select point sprites type ",
+          "valueHelper": "none|sphere|gaussian|circle|stddev|bound|cross",
           "implicitValue": "sphere"
         },
         {
@@ -437,7 +438,7 @@
         {
           "longName": "backface-type",
           "helpText": "Backface type, can be visible or hidden, model specified by default",
-          "valueHelper": "<visible|hidden>"
+          "valueHelper": "visible|hidden"
         },
         {
           "longName": "color",
@@ -480,7 +481,7 @@
           "longName": "hdri-skybox",
           "shortName": "j",
           "helpText": "Enable HDRI skybox background",
-          "valueHelper": "<string>",
+          "valueHelper": "disabled|enabled|blurred",
           "implicitValue": "enabled"
         },
         {
@@ -613,7 +614,7 @@
           "longName": "coloring-mode",
           "shortName": "s",
           "helpText": "Change the color mode",
-          "valueHelper": "<material|scivis|direct>",
+          "valueHelper": "material|scivis|direct",
           "implicitValue": "scivis"
         },
         {
@@ -630,8 +631,8 @@
         },
         {
           "longName": "coloring-field",
-          "helpText": "Use the specified field for coloring (e.g., \"cells\" or \"points\")",
-          "valueHelper": "<string>",
+          "helpText": "Use the specified field for coloring",
+          "valueHelper": "any|points|cells",
           "implicitValue": "cells"
         },
         {
@@ -769,8 +770,8 @@
         {
           "longName": "blending",
           "shortName": "p",
-          "helpText": "Select translucency blending mode (\"none\", \"ddp\", \"sort\", \"sort_cpu\" or \"stochastic\")",
-          "valueHelper": "<string>",
+          "helpText": "Select translucency blending mode",
+          "valueHelper": "none|ddp|sort|sort_cpu|stochastic",
           "implicitValue": "ddp"
         },
         {
@@ -783,8 +784,8 @@
         {
           "longName": "anti-aliasing",
           "shortName": "a",
-          "helpText": "Select anti-aliasing method (\"none\", \"fxaa\", \"ssaa\" or \"taa\")",
-          "valueHelper": "<string>",
+          "helpText": "Select anti-aliasing method",
+          "valueHelper": "none|fxaa|ssaa|taa",
           "implicitValue": "fxaa"
         },
         {
