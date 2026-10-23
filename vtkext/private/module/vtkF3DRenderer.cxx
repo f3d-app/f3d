@@ -39,6 +39,8 @@
 #include <vtkImageReader2Factory.h>
 #include <vtkLight.h>
 #include <vtkLightCollection.h>
+#include <vtkLightRepresentation.h>
+#include <vtkLightWidget.h>
 #include <vtkMath.h>
 #include <vtkMathUtilities.h>
 #include <vtkMatrix4x4.h>
@@ -2740,6 +2742,8 @@ int vtkF3DRenderer::UpdateLights()
     this->LightIntensitiesConfigured = true;
   }
 
+  this->UpdateLightRepresentations();
+
   // Push IBLIntensity to every actor's custom uniforms so the HDRI ambient
   // contribution (iblDiffuse + iblSpecular) scales with the same factor.
   // This runs every frame (not just when intensity changes) to ensure that newly
@@ -3369,6 +3373,68 @@ void vtkF3DRenderer::ConfigureNormalGlyphs()
 
   this->NormalGlyphsConfigured = true;
 }
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::UpdateLightRepresentations()
+{
+  vtkCollectionSimpleIterator it;
+  vtkLightCollection* lc = this->GetLights();
+  vtkLight* light = nullptr;
+  std::set<vtkLight*> visitedLights;
+  for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
+  {
+    // ignore camera lights
+    int lightType = light->GetLightType();
+    if (lightType == VTK_LIGHT_TYPE_CAMERA_LIGHT || lightType == VTK_LIGHT_TYPE_HEADLIGHT)
+    {
+      continue;
+    }
+
+    visitedLights.insert(light);
+
+    auto& lightRep = this->LightRepresentations[light];
+
+    if (lightRep.representation == nullptr)
+    {
+      lightRep.representation = vtkSmartPointer<vtkLightRepresentation>::New();
+    }
+    if (lightRep.widget == nullptr)
+    {
+      lightRep.widget = vtkSmartPointer<vtkLightWidget>::New();
+      lightRep.widget->SetRepresentation(lightRep.representation);
+      lightRep.widget->SetInteractor(this->RenderWindow->GetInteractor());
+      lightRep.widget->SetProcessEvents(false);
+    }
+
+    lightRep.representation->SetLightPosition(light->GetPosition());
+    lightRep.representation->SetPositional(light->GetPositional());
+    lightRep.representation->SetFocalPoint(light->GetFocalPoint());
+    lightRep.representation->SetConeAngle(light->GetConeAngle());
+
+    if (this->LightRepresentationVisible)
+    {
+      lightRep.widget->On();
+    }
+    else
+    {
+      lightRep.widget->Off();
+    }
+  }
+
+  // remove unwanted light representations
+  for (auto it = LightRepresentations.begin(); it != LightRepresentations.end();)
+  {
+    if (visitedLights.count(it->first))
+    {
+      it++;
+      continue;
+    }
+
+    // safely removing the widget and representation
+    it->second.widget->Off();
+
+    it = LightRepresentations.erase(it);
+  }
+}
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::UpdateNormalGlyphsScale()
@@ -3653,6 +3719,13 @@ void vtkF3DRenderer::SetXRMode(bool enable, bool showBbox)
     }
   }
   // LCOV_EXCL_STOP
+}
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetLightRepresentationVisibility(bool visible)
+{
+  // Make sure all lights are being tracked by a representation
+  LightRepresentationVisible = visible;
+  UpdateLightRepresentations();
 }
 
 //----------------------------------------------------------------------------
