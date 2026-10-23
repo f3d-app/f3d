@@ -43,6 +43,20 @@ const settings = {
       "command not removed",
     );
 
+    // animations
+    interactor.jumpToFrame(24);
+    interactor.jumpToFrameRelative(1);
+    interactor.jumpToFrame(0);
+    interactor.jumpToKeyframe(4);
+    interactor.jumpToKeyframeRelative(1);
+    interactor.jumpToKeyframe(0);
+
+    interactor.triggerEventLoop(0.1);
+    utils.assert(
+      interactor.getDeltaTime() === 0.1,
+      "getDeltaTime should be 0.1 after triggerEventLoop",
+    );
+
     // bindings
     interactor.initBindings();
 

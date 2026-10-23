@@ -42,6 +42,14 @@ public class TestInteractor {
     parsed.compareTo(parsed2);
     parsed2.hashCode();
 
+    interactor.getDeltaTime();
+    interactor.jumpToFrame(24);
+    interactor.jumpToFrameRelative(1);
+    interactor.jumpToFrame(0);
+    interactor.jumpToKeyframe(4);
+    interactor.jumpToKeyframeRelative(1);
+    interactor.jumpToKeyframe(0);
+
     Interactor.InteractionBind repeatBind = new Interactor.InteractionBind();
     repeatBind.mod = Interactor.ModifierKeys.NONE;
     repeatBind.inter = "R";

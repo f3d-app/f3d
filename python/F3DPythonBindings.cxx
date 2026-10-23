@@ -500,6 +500,17 @@ PYBIND11_MODULE(pyf3d, module)
     .export_values();
 
   interactor //
+    .def("get_delta_time", &f3d::interactor::getDeltaTime,
+      "Returns the delta time used by the event loop")
+    .def("jump_to_frame", &f3d::interactor::jumpToFrame, "Jump to a specific frame by index",
+      py::arg("index"))
+    .def("jump_to_frame_relative", &f3d::interactor::jumpToFrameRelative,
+      "Move the animation by a number of frames relative to the current frame", py::arg("offset"))
+    .def("jump_to_keyframe", &f3d::interactor::jumpToKeyframe,
+      "Jump to a specific keyframe by index", py::arg("index"))
+    .def("jump_to_keyframe_relative", &f3d::interactor::jumpToKeyframeRelative,
+      "Move the animation by a number of keyframes relative to the closest keyframe",
+      py::arg("offset"))
     .def("enable_camera_movement", &f3d::interactor::enableCameraMovement,
       "Enable the camera interaction")
     .def("disable_camera_movement", &f3d::interactor::disableCameraMovement,
@@ -967,6 +978,8 @@ PYBIND11_MODULE(pyf3d, module)
         scene.add(reinterpret_cast<const std::byte*>(sv.data()), sv.size());
       },
       "Add a memory buffer containing a file the scene", py::arg("buffer"), py::prepend())
+    .def("animation_time", &f3d::scene::animationTime)
+    .def("animation_frame", &f3d::scene::animationFrame)
     .def("add_light", &f3d::scene::addLight, "Add a light to the scene", py::arg("light_state"))
     .def(
       "remove_light", &f3d::scene::removeLight, "Remove a light from the scene", py::arg("index"))

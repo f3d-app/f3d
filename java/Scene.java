@@ -195,9 +195,19 @@ public class Scene {
     public native FileAvailability supports(String filePath);
 
     /**
-     * Get the animation
-     * @return Animation instance
+     * Get current animation time of the loaded files.
+     *
+     * @return current animation time
      */
+    public native double animationTime();
+
+    /**
+     * Get current animation frame of the loaded files.
+     *
+     * @return current animation frame
+     */
+    public native long animationFrame();
+
     public Animation getAnimation() { return mAnimation; }
 
     private long mNativeAddress;

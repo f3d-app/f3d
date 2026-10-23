@@ -53,6 +53,52 @@ def test_animation():
         "walk",
     ]
 
+    # triggerEventLoop returns self
+    inter_ref = engine.interactor.trigger_event_loop(0.1)
+    assert inter_ref == engine.interactor
+
+    # getDeltaTime after triggerEventLoop
+    assert engine.interactor.get_delta_time() == 0.03333333333333333
+
+    # animationTime
+    engine.scene.animation.load_time(0.0)
+    assert engine.scene.animation_time() == 0.0
+
+    engine.scene.animation.load_time(0.5)
+    assert engine.scene.animation_time() == 0.5
+
+    # animationFrame
+    engine.scene.animation.load_time(0.0)
+    assert engine.scene.animation_frame() == 0
+
+    engine.scene.animation.load_time(0.5)
+    assert engine.scene.animation_frame() == 15
+
+    # jumpToFrame absolute
+    engine.interactor.jump_to_frame(10)
+    assert engine.scene.animation_frame() == 10
+
+    # jumpToFrameRelative
+    engine.interactor.jump_to_frame_relative(1)
+    assert engine.scene.animation_frame() == 11
+
+    # jumpToFrame absolute 0
+    engine.interactor.jump_to_frame(0)
+    assert engine.scene.animation_frame() == 0
+
+    # jumpToKeyframe absolute
+    engine.scene.animation.load_time(0.0)
+    engine.interactor.jump_to_keyframe(4)
+    assert engine.scene.animation_time() == keyFrames[4]
+
+    # jumpToKeyframeRelative
+    engine.interactor.jump_to_keyframe_relative(1)
+    assert engine.scene.animation_time() == keyFrames[5]
+
+    # jumpToKeyframe absolute 0
+    engine.interactor.jump_to_keyframe(0)
+    assert engine.scene.animation_time() == keyFrames[0]
+
 
 def test_animation_start_stop():
     engine = f3d.Engine.create(True)
