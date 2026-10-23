@@ -2829,7 +2829,7 @@ int vtkF3DRenderer::UpdateLights()
     this->LightIntensitiesConfigured = true;
   }
 
-  UpdateLightRepresentations();
+  this->UpdateLightRepresentations();
 
   // Push IBLIntensity to every actor's custom uniforms so the HDRI ambient
   // contribution (iblDiffuse + iblSpecular) scales with the same factor.
@@ -3546,7 +3546,7 @@ void vtkF3DRenderer::UpdateLightRepresentations()
 
     visitedLights.insert(light);
 
-    auto& lightRep = LightRepresentations[light];
+    auto& lightRep = this->LightRepresentations[light];
 
     if (lightRep.representation == nullptr)
     {
@@ -3565,7 +3565,7 @@ void vtkF3DRenderer::UpdateLightRepresentations()
     lightRep.representation->SetFocalPoint(light->GetFocalPoint());
     lightRep.representation->SetConeAngle(light->GetConeAngle());
 
-    if (LightRepresentationVisible)
+    if (this->LightRepresentationVisible)
     {
       lightRep.widget->On();
     }
@@ -3586,10 +3586,6 @@ void vtkF3DRenderer::UpdateLightRepresentations()
 
     // safely removing the widget and representation
     it->second.widget->Off();
-    it->second.widget->SetRepresentation(nullptr);
-    it->second.widget->SetInteractor(nullptr);
-    it->second.widget = nullptr;
-    it->second.representation = nullptr;
 
     it = LightRepresentations.erase(it);
   }
