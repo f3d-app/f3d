@@ -485,6 +485,13 @@ Adjust the intensity of every light in the scene, including HDRI image-based lig
 
 CLI: `--light-intensity`.
 
+### `render.light.representation` (_bool_, default: `false`)
+
+Set visibility of light representations of every _scene_ light.
+This option doesn't show representations for headlights and camera lights
+
+CLI: `--light-representation`.
+
 ### `render.armature.enable` (_bool_, default: `false`)
 
 Display armatures if present in the scene (glTF only).
