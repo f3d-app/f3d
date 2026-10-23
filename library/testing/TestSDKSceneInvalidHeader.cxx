@@ -5,6 +5,9 @@
 #include <log.h>
 #include <scene.h>
 
+#include <fstream>
+#include <vector>
+
 int TestSDKSceneInvalidHeader([[maybe_unused]] int argc, char* argv[])
 {
   PseudoUnitTest test;
@@ -24,6 +27,18 @@ int TestSDKSceneInvalidHeader([[maybe_unused]] int argc, char* argv[])
     sce.supports(invalidHeader) == f3d::file_availability::UNSUPPORTED_CONTENT);
   eng.getOptions().scene.skip_content_check = true;
   test("skip content check", sce.supports(invalidHeader) == f3d::file_availability::SUPPORTED);
+  eng.getOptions().scene.skip_content_check = false;
+
+  // supports method with a buffer
+  // To be merged in TestSDKSceneFromBuffer after VTK v9.6 support is dropped
+  {
+    std::ifstream invalidHeaderFile(invalidHeader, std::ios::binary);
+    std::vector<char> invalidHeaderBuffer(
+      (std::istreambuf_iterator<char>(invalidHeaderFile)), std::istreambuf_iterator<char>());
+    test("not supported with unrecognized buffer content",
+      sce.supports(reinterpret_cast<const std::byte*>(invalidHeaderBuffer.data()),
+        invalidHeaderBuffer.size()) == f3d::file_availability::UNSUPPORTED_CONTENT);
+  }
 
   // add method with content check on (default)
   {

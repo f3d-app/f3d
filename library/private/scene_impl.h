@@ -52,6 +52,7 @@ public:
   scene& setNodeVisibility(int nodeId, bool visible) override;
   scene_info_t getSceneInfo() const override;
   file_availability supports(const std::filesystem::path& filePath) override;
+  file_availability supports(const std::byte* buffer, std::size_t size) override;
   animation& getAnimation() override;
   ///@}
 

@@ -454,12 +454,20 @@ EMSCRIPTEN_BINDINGS(f3d)
   emscripten::enum_<f3d::file_availability>("FileAvailability")
     .value("SUPPORTED", f3d::file_availability::SUPPORTED)
     .value("UNSUPPORTED_EXTENSION", f3d::file_availability::UNSUPPORTED_EXTENSION)
-    .value("UNSUPPORTED_CONTENT", f3d::file_availability::UNSUPPORTED_CONTENT);
+    .value("UNSUPPORTED_CONTENT", f3d::file_availability::UNSUPPORTED_CONTENT)
+    .value("EMPTY_STREAM", f3d::file_availability::EMPTY_STREAM);
 
   emscripten::class_<f3d::scene>("Scene")
     .function(
       "supports", +[](f3d::scene& scene, const std::string& path) -> f3d::file_availability
       { return scene.supports(path); })
+    .function(
+      "supportsBuffer",
+      +[](f3d::scene& scene, emscripten::val jsbuf) -> f3d::file_availability
+      {
+        std::vector<unsigned char> data = emscripten::vecFromJSArray<unsigned char>(jsbuf);
+        return scene.supports(reinterpret_cast<const std::byte*>(data.data()), data.size());
+      })
     .function(
       "add",
       +[](f3d::scene& scene, emscripten::val arg) -> f3d::scene&
