@@ -106,7 +106,7 @@
         {
           "longName": "rendering-backend",
           "helpText": "Backend to use when rendering",
-          "valueHelper": "auto|glx|wgl|egl|osmesa"
+          "valueHelper": "auto|glx|wgl|egl|osmesa|xr"
         },
         {
           "longName": "list-rendering-backends",
@@ -282,8 +282,7 @@
         {
           "longName": "grid-reflection",
           "helpText": "Reflection strength of the grid",
-          "valueHelper": "<value>",
-          "implicitValue": "0.5"
+          "valueHelper": "<value>"
         },
         {
           "longName": "axes-grid",
