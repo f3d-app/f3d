@@ -17,6 +17,10 @@
     "version": "1.8.11",
     "min_version": "1.8.5"
   },
+  "anari": {
+    "version": "v0.16.0",
+    "min_version": "v0.16.0"
+  },
   "assimp": {
     "version": "v6.0.5",
     "min_version": "v5.4.0"

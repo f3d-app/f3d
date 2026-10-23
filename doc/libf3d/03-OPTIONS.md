@@ -426,21 +426,32 @@ Show _axes grid_ in the scene.
 
 CLI: `--axes-grid`.
 
-### `render.raytracing.enable` (_bool_, default: `false`)
+### `render.mode` (_string_, default: `opengl`, enumeration domain: `opengl, ospray, anari`)
 
-Enable _raytracing_. Requires the raytracing module to be enabled.
+Select the rendering mode.
+`ospray` and `anari` require their associated VTK module to be enabled.
 
-CLI: `--raytracing`.
+> [!NOTE]
+> `anari` render mode is experimental
+
+CLI: `--rendering-mode`.
+
+### `render.anari_library` (_string_, optional)
+
+Select the Anari library to use.
+If not specified, the library name will be retrieved using the `ANARI_LIBRARY` environment variable.
+
+CLI: `--anari-library`.
 
 ### `render.raytracing.samples` (_int_, default: `5`, range domain: `[1, 50]`, increment: `1`)
 
-The number of _samples per pixel_.
+The number of _samples per pixel_. Affects `ospray` render mode only.
 
 CLI: `--raytracing-samples`.
 
 ### `render.raytracing.denoise` (_bool_, default: `false`)
 
-_Denoise_ the raytracing rendering.
+_Denoise_ the raytracing rendering. Affects `ospray` render mode only.
 
 CLI: `--raytracing-denoise`.
 

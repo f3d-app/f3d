@@ -116,6 +116,16 @@ public:
     LINE
   };
 
+  /**
+   * Enum listing possible rendering modes.
+   */
+  enum class RenderingMode : unsigned char
+  {
+    OPENGL,
+    OSPRAY,
+    ANARI
+  };
+
   ///@{
   /**
    * Set visibility of different actors
@@ -188,7 +198,8 @@ public:
   /**
    * Set usages and configurations of different render passes
    */
-  void SetUseRaytracing(bool use);
+  void SetRenderingMode(RenderingMode mode);
+  void SetAnariLibrary(const std::string& anariLibrary);
   void SetUseRaytracingDenoiser(bool use);
   void SetBlendingMode(BlendingMode mode);
   BlendingMode GetBlendingMode() const;
@@ -903,7 +914,8 @@ private:
   bool DropZoneLogoVisible = false;
   bool HDRISkyboxVisible = false;
   bool ArmatureVisible = false;
-  bool UseRaytracing = false;
+  RenderingMode CurrentRenderingMode = RenderingMode::OPENGL;
+  std::string AnariLibrary = "environment";
   bool UseRaytracingDenoiser = false;
   AntiAliasingMode AntiAliasingModeEnabled = AntiAliasingMode::NONE;
   BlendingMode BlendingModeEnabled = BlendingMode::NONE;

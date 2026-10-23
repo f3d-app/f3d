@@ -79,6 +79,7 @@ static inline const OptionsDict DefaultAppOptions = {
  */
 static inline const std::map<std::string_view, std::string_view> LibOptionsNames = {
   { "ambient-occlusion", "render.effect.ambient_occlusion" },
+  { "anari-library", "render.anari_library" },
   { "animation-autoplay", "scene.animation.autoplay" },
   { "animation-indices", "scene.animation.indices" },
   { "animation-progress", "ui.animation_progress" },
@@ -146,9 +147,9 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "point-sprites", "model.point_sprites.type" },
   { "point-sprites-absolute-size", "model.point_sprites.absolute_size" },
   { "point-sprites-size", "model.point_sprites.size" },
-  { "raytracing", "render.raytracing.enable" },
   { "raytracing-denoise", "render.raytracing.denoise" },
   { "raytracing-samples", "render.raytracing.samples" },
+  { "rendering-mode", "render.mode" },
   { "roughness", "model.material.roughness" },
   { "scene-hierarchy", "ui.scene_hierarchy.enable" },
   { "shadows", "render.shadows.enable" },
