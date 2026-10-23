@@ -17,6 +17,7 @@
 #include <vtkLight.h>
 #include <vtkLightCollection.h>
 #include <vtkLightKit.h>
+#include <vtkMatrix4x4.h>
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
@@ -24,12 +25,15 @@
 #include <vtkRendererCollection.h>
 #include <vtkSmartPointer.h>
 #include <vtkTexture.h>
+#include <vtkTransform.h>
 #include <vtkUnsignedIntArray.h>
 #include <vtkVersion.h>
 
 #include <cassert>
 #include <iostream>
 #include <numeric>
+#include <set>
+#include <unordered_map>
 #include <vector>
 
 namespace
@@ -194,9 +198,43 @@ struct vtkF3DMetaImporter::Internals
   std::vector<::FlatNode> FlatNodes;
 
   std::optional<vtkIdType> CameraIndex;
+
+  // World-space bounds of every imported actor, including the actor's existing matrix, taken
+  // once at import. Never rewritten from normalized bounds, so it stays the source of truth for
+  // the normalization transform.
+  vtkBoundingBox RawGeometryBoundingBox;
+  // Publicly reported bounding box, kept in sync with RawGeometryBoundingBox, transformed by
+  // NormalizeTransform when coordinate normalization is enabled.
   vtkBoundingBox GeometryBoundingBox;
+
   vtkTimeStamp ColoringInfoTime;
   vtkTimeStamp UpdateTime;
+
+  bool CoordinateNormalize = false;
+  bool HasAppliedNormalization = false;
+  vtkNew<vtkTransform> NormalizeTransform;
+  // The matrix of NormalizeTransform as of the last time it was applied to cameras and positional
+  // lights. Those objects store absolute positions, so going from one normalization state to
+  // another (including back to identity) requires undoing this previously applied transform
+  // before applying the new one.
+  vtkNew<vtkMatrix4x4> PreviousNormalizeMatrix;
+
+  // Placement matrix an actor or light already had (node transforms from glTF, USD, assimp),
+  // plus the transform that concatenates normalization in front of it. The original pointer is
+  // replaced whenever the importer installs a different matrix, which happens every animation
+  // frame for some importers.
+  struct MatrixBinding
+  {
+    vtkSmartPointer<vtkMatrix4x4> OriginalMatrix;
+    vtkSmartPointer<vtkTransform> Combined;
+  };
+  std::unordered_map<vtkProp3D*, MatrixBinding> PropBindings;
+  std::unordered_map<vtkLight*, MatrixBinding> LightBindings;
+
+  // Cameras and positional lights whose current coordinates already include
+  // PreviousNormalizeMatrix. Objects missing from these sets are still in source coordinates.
+  std::set<vtkCamera*> CamerasHoldingNormalize;
+  std::set<vtkLight*> LightsHoldingNormalize;
 
   F3DColoringInfoHandler ColoringInfoHandler;
 };
@@ -226,7 +264,15 @@ void vtkF3DMetaImporter::Clear()
 {
   this->Pimpl->Importers.clear();
   this->Pimpl->FlatNodes.clear();
+  this->Pimpl->RawGeometryBoundingBox.Reset();
   this->Pimpl->GeometryBoundingBox.Reset();
+  this->Pimpl->NormalizeTransform->Identity();
+  this->Pimpl->PreviousNormalizeMatrix->Identity();
+  this->Pimpl->HasAppliedNormalization = false;
+  this->Pimpl->PropBindings.clear();
+  this->Pimpl->LightBindings.clear();
+  this->Pimpl->CamerasHoldingNormalize.clear();
+  this->Pimpl->LightsHoldingNormalize.clear();
   this->ActorCollection->RemoveAllItems();
   this->Pimpl->ColoringActorsAndMappers.clear();
   this->Pimpl->PointSpritesActorsAndMappers.clear();
@@ -525,10 +571,11 @@ bool vtkF3DMetaImporter::Update()
         }
       }
 
-      // Increase bounding box size if needed
+      // World bounds, including the actor's existing matrix. Captured before normalization is
+      // applied, and never fed back from the normalized result.
       double bounds[6];
-      surface->GetBounds(bounds);
-      this->Pimpl->GeometryBoundingBox.AddBounds(bounds);
+      actor->GetBounds(bounds);
+      this->Pimpl->RawGeometryBoundingBox.AddBounds(bounds);
 
       // Create and configure coloring actors
       this->Pimpl->ColoringActorsAndMappers.emplace_back(vtkF3DMetaImporter::ColoringStruct(actor));
@@ -633,6 +680,8 @@ bool vtkF3DMetaImporter::Update()
       static_cast<int>(i), -1, 0, this->Pimpl->FlatNodes);
   }
 
+  this->ApplyCoordinateNormalization();
+
   // XXX: UpdateStatus is not set, but libf3d does not use it
   return true;
 }
@@ -653,6 +702,9 @@ std::string vtkF3DMetaImporter::GetOutputsDescription()
 //----------------------------------------------------------------------------
 vtkF3DImporter::AnimationSupportLevel vtkF3DMetaImporter::GetAnimationSupportLevel()
 {
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 4, 20250507)
+  vtkF3DImporter::AnimationSupportLevel levelAccum = vtkF3DImporter::AnimationSupportLevel::MULTI;
+#else
   vtkImporter::AnimationSupportLevel levelAccum = vtkImporter::AnimationSupportLevel::NONE;
   for (const auto& importerInfo : this->Pimpl->Importers)
   {
@@ -691,6 +743,7 @@ vtkF3DImporter::AnimationSupportLevel vtkF3DMetaImporter::GetAnimationSupportLev
         break;
     }
   }
+#endif
   return levelAccum;
 }
 
@@ -920,6 +973,10 @@ bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
     }
   }
 
+  // Importers rebuild actor matrices and camera positions from source data above. Re-apply
+  // normalization on top of those fresh coordinates.
+  this->ApplyCoordinateNormalization(true);
+
   this->Pimpl->UpdateTime.Modified();
   return ret;
 }
@@ -1022,6 +1079,264 @@ F3DColoringInfoHandler& vtkF3DMetaImporter::GetColoringInfoHandler()
 {
   this->UpdateInfoForColoring();
   return this->Pimpl->ColoringInfoHandler;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DMetaImporter::SetCoordinateNormalize(bool normalize)
+{
+  if (this->Pimpl->CoordinateNormalize != normalize)
+  {
+    this->Pimpl->CoordinateNormalize = normalize;
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DMetaImporter::ApplyCoordinateNormalization(bool importedCamerasAreRaw)
+{
+  // The publicly reported bounding box always starts from the raw one, so that it stays correct
+  // even when normalization is disabled or the scene is degenerate.
+  this->Pimpl->GeometryBoundingBox = this->Pimpl->RawGeometryBoundingBox;
+
+  const bool shouldNormalize =
+    this->Pimpl->CoordinateNormalize && this->Pimpl->RawGeometryBoundingBox.IsValid();
+
+  double center[3] = { 0.0, 0.0, 0.0 };
+  double maxLength = 0.0;
+  if (shouldNormalize)
+  {
+    this->Pimpl->RawGeometryBoundingBox.GetCenter(center);
+    maxLength = this->Pimpl->RawGeometryBoundingBox.GetMaxLength();
+  }
+
+  if (!shouldNormalize || maxLength <= 0.0)
+  {
+    if (!this->Pimpl->HasAppliedNormalization)
+    {
+      // Normalization has never been applied and is not requested: nothing to do.
+      return;
+    }
+
+    // Normalization was previously applied but is no longer requested, or the scene became
+    // degenerate: reset to identity so previously transformed actors, cameras and lights are
+    // restored to their original coordinates.
+    this->Pimpl->NormalizeTransform->Identity();
+    this->Pimpl->HasAppliedNormalization = false;
+  }
+  else
+  {
+    // Shift the scene to the origin, then isotropically scale it so its largest extent is 1.
+    // PostMultiply applies each new operation after the ones already recorded, so the center
+    // lands on the origin before the scale.
+    this->Pimpl->NormalizeTransform->Identity();
+    this->Pimpl->NormalizeTransform->PostMultiply();
+    this->Pimpl->NormalizeTransform->Translate(-center[0], -center[1], -center[2]);
+    this->Pimpl->NormalizeTransform->Scale(1.0 / maxLength, 1.0 / maxLength, 1.0 / maxLength);
+    this->Pimpl->HasAppliedNormalization = true;
+  }
+
+  vtkTransform* normalize = this->Pimpl->NormalizeTransform;
+
+  // SetUserTransform replaces whatever matrix the prop already has. Importers such as glTF, USD
+  // and assimp store node placement there, and animation writes a new matrix each frame, so
+  // concatenate normalization in front of that matrix instead of discarding it. A prop with no
+  // matrix shares the normalization transform directly; setting it again is absolute.
+  auto applyToProp = [&](vtkProp3D* prop)
+  {
+    auto& binding = this->Pimpl->PropBindings[prop];
+    vtkMatrix4x4* current = prop->GetUserMatrix();
+    const bool installedByUs = current != nullptr &&
+      (current == normalize->GetMatrix() ||
+        (binding.Combined != nullptr && current == binding.Combined->GetMatrix()));
+    if (!installedByUs)
+    {
+      binding.OriginalMatrix = current;
+    }
+
+    if (binding.OriginalMatrix)
+    {
+      if (!binding.Combined)
+      {
+        binding.Combined = vtkSmartPointer<vtkTransform>::New();
+      }
+      binding.Combined->Identity();
+      binding.Combined->PostMultiply();
+      binding.Combined->Concatenate(binding.OriginalMatrix);
+      binding.Combined->Concatenate(normalize->GetMatrix());
+      prop->SetUserTransform(binding.Combined);
+    }
+    else
+    {
+      prop->SetUserTransform(normalize);
+    }
+  };
+
+  vtkCollectionSimpleIterator ait;
+  this->ActorCollection->InitTraversal(ait);
+  while (vtkActor* actor = this->ActorCollection->GetNextActor(ait))
+  {
+    applyToProp(actor);
+  }
+  for (auto& coloring : this->Pimpl->ColoringActorsAndMappers)
+  {
+    applyToProp(coloring.Actor);
+  }
+  for (auto& normalGlyph : this->Pimpl->NormalGlyphsActorsAndMappers)
+  {
+    applyToProp(normalGlyph.Actor);
+  }
+  for (auto& sprites : this->Pimpl->PointSpritesActorsAndMappers)
+  {
+    applyToProp(sprites.Actor);
+  }
+  for (auto& volume : this->Pimpl->VolumePropsAndMappers)
+  {
+    applyToProp(volume.Prop);
+  }
+
+  // Positional cameras and lights store absolute coordinates. Re-applying the normalization
+  // matrix on every update would compose, so objects that already carry PreviousNormalizeMatrix
+  // receive only the delta newMatrix * inverse(previous). Objects that are still in source
+  // coordinates (just imported, or rebuilt by an animation update) receive the full matrix.
+  vtkNew<vtkMatrix4x4> previousInverse;
+  vtkMatrix4x4::Invert(this->Pimpl->PreviousNormalizeMatrix, previousInverse);
+  vtkNew<vtkMatrix4x4> deltaMatrix;
+  vtkMatrix4x4::Multiply4x4(normalize->GetMatrix(), previousInverse, deltaMatrix);
+  vtkNew<vtkTransform> deltaTransform;
+  deltaTransform->SetMatrix(deltaMatrix);
+  vtkTransform* delta = deltaTransform;
+
+  auto transformPositionAndFocal = [](auto* object, vtkTransform* transform)
+  {
+    double position[3];
+    object->GetPosition(position);
+    transform->TransformPoint(position, position);
+    object->SetPosition(position);
+
+    double focalPoint[3];
+    object->GetFocalPoint(focalPoint);
+    transform->TransformPoint(focalPoint, focalPoint);
+    object->SetFocalPoint(focalPoint);
+  };
+
+  // The same camera can be both an importer camera and the renderer's active camera.
+  std::set<vtkCamera*> importedCameras;
+  for (const auto& importerInfo : this->Pimpl->Importers)
+  {
+    vtkCollection* cameraCollection = importerInfo.Importer->GetImportedCameras();
+    if (cameraCollection)
+    {
+      vtkCollectionSimpleIterator cit;
+      cameraCollection->InitTraversal(cit);
+      while (vtkObject* obj = cameraCollection->GetNextItemAsObject(cit))
+      {
+        vtkCamera* camera = vtkCamera::SafeDownCast(obj);
+        if (camera)
+        {
+          importedCameras.insert(camera);
+        }
+      }
+    }
+  }
+  std::set<vtkCamera*> camerasToTransform = importedCameras;
+  vtkCamera* activeCamera = nullptr;
+  if (this->Renderer && this->Renderer->IsActiveCameraCreated())
+  {
+    activeCamera = this->Renderer->GetActiveCamera();
+    camerasToTransform.insert(activeCamera);
+  }
+  // Some importers place their scene camera on the renderer without adding it to the camera
+  // collection, and rewrite that camera from source data on every animation update.
+  const bool refreshActiveSceneCamera =
+    importedCamerasAreRaw && this->Pimpl->CameraIndex.has_value();
+  for (vtkCamera* camera : camerasToTransform)
+  {
+    const bool imported = importedCameras.count(camera) != 0;
+    const bool holding = this->Pimpl->CamerasHoldingNormalize.count(camera) != 0;
+    const bool useFull = (imported && (importedCamerasAreRaw || !holding)) ||
+      (refreshActiveSceneCamera && camera == activeCamera && !imported);
+    transformPositionAndFocal(camera, useFull ? normalize : delta);
+  }
+  this->Pimpl->CamerasHoldingNormalize = camerasToTransform;
+
+  // Matrix lights keep their direction in the matrix. Concatenate, as for actors. Positional
+  // lights without a matrix are transformed like cameras.
+  auto applyLightMatrix = [&](vtkLight* light)
+  {
+    auto& binding = this->Pimpl->LightBindings[light];
+    vtkMatrix4x4* current = light->GetTransformMatrix();
+    const bool installedByUs = current != nullptr && binding.Combined != nullptr &&
+      current == binding.Combined->GetMatrix();
+    if (current != nullptr && !installedByUs)
+    {
+      binding.OriginalMatrix = current;
+    }
+    else if (current == nullptr)
+    {
+      binding.OriginalMatrix = nullptr;
+    }
+
+    if (!binding.OriginalMatrix)
+    {
+      return false;
+    }
+
+    if (!binding.Combined)
+    {
+      binding.Combined = vtkSmartPointer<vtkTransform>::New();
+    }
+    binding.Combined->Identity();
+    binding.Combined->PostMultiply();
+    binding.Combined->Concatenate(binding.OriginalMatrix);
+    binding.Combined->Concatenate(normalize->GetMatrix());
+    light->SetTransformMatrix(binding.Combined->GetMatrix());
+    return true;
+  };
+
+  std::set<vtkLight*> lightsToTransform;
+  for (const auto& importerInfo : this->Pimpl->Importers)
+  {
+    vtkLightCollection* lightCollection = importerInfo.Importer->GetImportedLights();
+    if (lightCollection)
+    {
+      vtkCollectionSimpleIterator lit;
+      lightCollection->InitTraversal(lit);
+      while (vtkLight* light = lightCollection->GetNextLight(lit))
+      {
+        lightsToTransform.insert(light);
+      }
+    }
+  }
+  std::set<vtkLight*> positionalLights;
+  for (vtkLight* light : lightsToTransform)
+  {
+    if (applyLightMatrix(light))
+    {
+      continue;
+    }
+    const bool holding = this->Pimpl->LightsHoldingNormalize.count(light) != 0;
+    transformPositionAndFocal(light, holding ? delta : normalize);
+    positionalLights.insert(light);
+  }
+  this->Pimpl->LightsHoldingNormalize = positionalLights;
+
+  // Record the now-applied transform so the next call can correctly undo it if needed.
+  this->Pimpl->PreviousNormalizeMatrix->DeepCopy(normalize->GetMatrix());
+
+  if (shouldNormalize && maxLength > 0.0)
+  {
+    // Keep the publicly reported bounding box in sync with the applied transform
+    double bounds[6];
+    this->Pimpl->GeometryBoundingBox.GetBounds(bounds);
+    double minPoint[3] = { bounds[0], bounds[2], bounds[4] };
+    double maxPoint[3] = { bounds[1], bounds[3], bounds[5] };
+    double newMin[3];
+    double newMax[3];
+    this->Pimpl->NormalizeTransform->TransformPoint(minPoint, newMin);
+    this->Pimpl->NormalizeTransform->TransformPoint(maxPoint, newMax);
+    this->Pimpl->GeometryBoundingBox.SetBounds(
+      newMin[0], newMax[0], newMin[1], newMax[1], newMin[2], newMax[2]);
+  }
 }
 
 //----------------------------------------------------------------------------

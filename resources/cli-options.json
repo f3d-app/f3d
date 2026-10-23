@@ -66,6 +66,12 @@
           "implicitValue": "1"
         },
         {
+          "longName": "coordinate-normalize",
+          "helpText": "Normalize the scene coordinates by shifting it to the origin and isotropically scaling it to a unit bounding box, which can help with rendering and precision issues on scenes with very large or very offset coordinates.",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
           "longName": "list-bindings",
           "helpText": "Print the list of interaction bindings and exits, ignored with `--no-render`, only considers the first file group.",
           "valueHelper": "<bool>",
