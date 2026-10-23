@@ -516,6 +516,7 @@ void window_impl::UpdateDynamicOptions()
   // Make sure lights are created before we take options into account
   renderer->UpdateLights();
 
+
   const options& opt = this->Internals->Options;
 
   // Update pending up direction if changed
@@ -593,6 +594,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetBackdropOpacity(opt.ui.backdrop.opacity);
   renderer->ShowNotification(opt.ui.notifications.enable);
   renderer->ShowBindings(opt.ui.notifications.show_bindings);
+  renderer->SetLightRepresentationVisibility(opt.render.light.representation);
 
   if (this->Internals->Interactor)
   {
