@@ -139,11 +139,19 @@ Select the rendering mode to use.
 If OSPRay raytracing is used, requires OSPRay raytracing to be enabled in the linked VTK dependency.
 If Anari is used, requires Anari to be enabled in the linked VTK dependency.
 
+> [!NOTE]
+> The `anari` rendering mode is experimental
+
 #### compare
 
 | OpenGL                                         | OSPRay raytracing                            |
 | ---------------------------------------------- | -------------------------------------------- |
 | ![raytracing off](./images/raytracing_off.png) | ![raytracing on](./images/raytracing_on.png) |
+
+### `--anari-library=<opengl|ospray|anari>` (_string_, default: `opengl`)
+
+Select the Anari library to use.
+If not specified, the library is selected from the value of the `ANARI_LIBRARY` environment variable.
 
 ### `-D`, `--define=<libf3d.option=value>` (_special_)
 

@@ -53,7 +53,7 @@ Here is some CMake options of interest:
 
 Some modules, plugins and language bindings depending on external libraries can be optionally enabled with the following CMake variables:
 
-- `F3D_MODULE_ANARI`: Support for ANARI rendering. Requires that VTK has been built with `RenderingAnariOpenGL` turned on. Disabled by default.
+- `F3D_MODULE_ANARI`: **Experimental** support for ANARI rendering. Requires that VTK has been built with `RenderingAnariOpenGL` turned on. Disabled by default.
 - `F3D_MODULE_RAYTRACING`: Support for raytracing rendering. Requires that VTK has been built with `OSPRay` and `RenderingRayTracing` turned on. Disabled by default.
 - `F3D_MODULE_EXR`: Support for OpenEXR images. Requires `OpenEXR`. Disabled by default.
 - `F3D_MODULE_UI`: Support for ImGui widgets. Uses provided ImGui. Enabled by default.

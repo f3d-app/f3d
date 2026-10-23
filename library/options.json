@@ -119,15 +119,14 @@
         "enum": ["opengl", "ospray", "anari"]
       }
     },
+    "anari_library": {
+      "type": "string"
+    },
     "raytracing": {
       "enable": {
         "type": "bool",
         "default_value": "false",
         "deprecated": "use render.backend=ospray instead"
-      },
-      "anari_library": {
-        "type": "string",
-        "default_value": "environment"
       },
       "denoise": {
         "type": "bool",

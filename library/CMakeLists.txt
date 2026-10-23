@@ -43,7 +43,7 @@ if(F3D_MODULE_ANARI)
     message(STATUS "VTK::RenderingAnariOpenGL module found")
     set(F3D_VTK_MODULES ${F3D_VTK_MODULES} VTK::RenderingAnariOpenGL)
   else()
-    message(FATAL_ERROR "F3D_MODULE_ANARI option is enabled but VTK::RenderingAnariOpenGL is not found")
+    message(FATAL_ERROR "F3D_MODULE_ANARI option is enabled but VTK::RenderingAnariOpenGL is not found. (VTK > 9.7.20260914 is needed)")
   endif()
 endif()
 

@@ -407,11 +407,11 @@ f3d_test(NAME TestHDRIAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=
 f3d_test(NAME TestHDRINone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr LONG_TIMEOUT)
 
 if(F3D_MODULE_RAYTRACING)
-  f3d_test(NAME TestHDRIRaytracing DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --rendering-mode=ospray -d --raytracing-samples=4)
-  f3d_test(NAME TestHDRIRaytracingSkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-skybox --rendering-mode=ospray -d --raytracing-samples=4 LONG_TIMEOUT)
-  f3d_test(NAME TestHDRIRaytracingAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-ambient --rendering-mode=ospray -d --raytracing-samples=4 LONG_TIMEOUT)
-  f3d_test(NAME TestHDRIRaytracingAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-ambient --rendering-mode=ospray -d --raytracing-samples=4 --no-background LONG_TIMEOUT)
-  f3d_test(NAME TestHDRIRaytracingNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --rendering-mode=ospray -d --raytracing-samples=4 LONG_TIMEOUT)
+  f3d_test(NAME TestHDRIRaytracing DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -rd --raytracing-samples=4)
+  f3d_test(NAME TestHDRIRaytracingSkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-skybox -rd --raytracing-samples=4 LONG_TIMEOUT)
+  f3d_test(NAME TestHDRIRaytracingAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-ambient -rd --raytracing-samples=4 LONG_TIMEOUT)
+  f3d_test(NAME TestHDRIRaytracingAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr --hdri-ambient -rd --raytracing-samples=4 --no-background LONG_TIMEOUT)
+  f3d_test(NAME TestHDRIRaytracingNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr -rd --raytracing-samples=4 LONG_TIMEOUT)
 endif()
 
 f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -t --anti-aliasing=ssaa)
@@ -428,26 +428,26 @@ endif()
 
 ## Raytracing
 if(F3D_MODULE_RAYTRACING)
-  f3d_test(NAME TestRaytracingGLTF DATA WaterBottle.glb ARGS --rendering-mode=ospray -d --raytracing-samples=4)
-  f3d_test(NAME TestRaytracingBackground DATA suzanne.ply ARGS --rendering-mode=ospray -d --raytracing-samples=4 --background-color=1,0,0)
-  f3d_test(NAME TestRaytracingPointCloud DATA pointsCloud.vtp ARGS --rendering-mode=ospray -d --raytracing-samples=4 --point-size=20)
-  f3d_test(NAME TestRaytracingDenoise DATA suzanne.ply ARGS --rendering-mode=ospray -d --raytracing-samples=4)
-  f3d_test(NAME TestRaytracingNoDenoise DATA suzanne.stl ARGS --rendering-mode=ospray --raytracing-samples=20)
+  f3d_test(NAME TestRaytracingGLTF DATA WaterBottle.glb ARGS -rd --raytracing-samples=4)
+  f3d_test(NAME TestRaytracingBackground DATA suzanne.ply ARGS -rd --raytracing-samples=4 --background-color=1,0,0)
+  f3d_test(NAME TestRaytracingPointCloud DATA pointsCloud.vtp ARGS -rd --raytracing-samples=4 --point-size=20)
+  f3d_test(NAME TestRaytracingDenoise DATA suzanne.ply ARGS -rd --raytracing-samples=4)
+  f3d_test(NAME TestRaytracingNoDenoise DATA suzanne.stl ARGS -r --raytracing-samples=20)
   f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Module Raytracing: ON")
   f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply ARGS --raytracing-samples=4 -d INTERACTION) #R
-  f3d_test(NAME TestRaytracingScalarBar DATA dragon.vtu ARGS --rendering-mode=ospray -sbd --raytracing-samples=4)
+  f3d_test(NAME TestRaytracingScalarBar DATA dragon.vtu ARGS -rsbd --raytracing-samples=4)
   f3d_test(NAME TestRaytracingDeprecated DATA dragon.vtu ARGS --raytracing NO_BASELINE REGEXP "Option 'raytracing' is deprecated, use 'rendering-mode=ospray' instead")
 
   if(NOT F3D_MACOS_BUNDLE)
     # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-      f3d_test(NAME TestRaytracingDefaultConfigFile DATA dragon.vtu CONFIG config_build ARGS --rendering-mode=ospray -d --raytracing-samples=4 LONG_TIMEOUT DEFAULT_HDRI)
+      f3d_test(NAME TestRaytracingDefaultConfigFile DATA dragon.vtu CONFIG config_build ARGS -rd --raytracing-samples=4 LONG_TIMEOUT DEFAULT_HDRI)
     endif()
 
-    f3d_test(NAME TestRaytracingThumbnailConfigFile DATA dragon.vtu CONFIG thumbnail_build ARGS --rendering-mode=ospray -d --raytracing-samples=4 LONG_TIMEOUT DEFAULT_HDRI)
+    f3d_test(NAME TestRaytracingThumbnailConfigFile DATA dragon.vtu CONFIG thumbnail_build ARGS -rd --raytracing-samples=4 LONG_TIMEOUT DEFAULT_HDRI)
   endif()
 
-  f3d_test(NAME TestRaytracingNoBackground DATA suzanne.ply ARGS --rendering-mode=ospray -d --raytracing-samples=4 --no-background)
+  f3d_test(NAME TestRaytracingNoBackground DATA suzanne.ply ARGS -rd --raytracing-samples=4 --no-background)
 else()
   f3d_test(NAME TestCommandScriptRaytracing SCRIPT DATA suzanne.ply NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing")
 endif()

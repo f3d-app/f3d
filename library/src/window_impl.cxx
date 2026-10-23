@@ -660,7 +660,11 @@ void window_impl::UpdateDynamicOptions()
   else if (opt.render.mode == "anari")
   {
     renderer->SetRenderingMode(vtkF3DRenderer::RenderingMode::ANARI);
-    renderer->SetAnariLibrary(opt.render.raytracing.anari_library);
+
+    // "environment" is a magic keyword in Anari to specify that ANARI_LIBRARY should be taken from
+    // the environment variable.
+    renderer->SetAnariLibrary(
+      opt.render.anari_library.has_value() ? opt.render.anari_library.value() : "environment");
   }
   else
   {

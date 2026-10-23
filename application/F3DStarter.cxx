@@ -865,6 +865,7 @@ public:
               {
                 f3d::log::warn(
                   "Option 'raytracing' is deprecated, use 'rendering-mode=ospray' instead");
+                libOptions.render.mode = "ospray";
                 continue;
               }
 
