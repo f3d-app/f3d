@@ -342,7 +342,8 @@ f3d_test(NAME TestBackdropOpacityTransparent DATA suzanne.ply ARGS -n --backdrop
 f3d_test(NAME TestBackdropOpacityMedium DATA suzanne.ply ARGS -n --backdrop-opacity=0.5 UI)
 f3d_test(NAME TestBackdropColor DATA suzanne.ply ARGS -n --backdrop-color=0.5,1.0,0.5 UI)
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13818
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016)
   f3d_test(NAME TestDefaultConfigFileHDRIFilename DATA dragon.vtu CONFIG config_build HDRI shanghai_bund_1k.hdr UI SKIP_GLES)
 endif()
 
@@ -414,6 +415,16 @@ if(F3D_MODULE_RAYTRACING)
 endif()
 
 f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -t --anti-aliasing=ssaa)
+
+## Shadows
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13818
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016)
+  f3d_test(NAME TestShadows DATA suzanne.ply ARGS --shadows)
+  f3d_test(NAME TestShadowsTranslucent DATA suzanne.ply ARGS --shadows --opacity=0.9 --blending=ddp SKIP_GLES) # No ddp on GLES
+  f3d_test(NAME TestShadowsGrid DATA suzanne.ply ARGS --shadows -g)
+  f3d_test(NAME TestShadowsGridLowRes DATA suzanne.ply ARGS --shadows -g -Drender.shadows.resolution=8)
+  f3d_test(NAME TestShadowsGridLowExp DATA suzanne.ply ARGS --shadows -g -Drender.shadows.exponential_constant=1)
+endif()
 
 ## Raytracing
 if(F3D_MODULE_RAYTRACING)

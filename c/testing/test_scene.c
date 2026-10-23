@@ -135,6 +135,7 @@ int test_scene()
   light_state.type = F3D_LIGHT_TYPE_HEADLIGHT;
   light_state.intensity = 1.0;
   light_state.switch_state = 1;
+  light_state.cast_shadows = 1;
 
   int light_idx = f3d_scene_add_light(scene, &light_state);
   (void)light_idx;

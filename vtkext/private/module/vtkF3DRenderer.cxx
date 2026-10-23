@@ -70,6 +70,8 @@
 #include <vtkSSAAPass.h>
 #include <vtkScalarBarActor.h>
 #include <vtkShaderProperty.h>
+#include <vtkShadowMapBakerPass.h>
+#include <vtkShadowMapPass.h>
 #include <vtkSkybox.h>
 #include <vtkSphericalHarmonics.h>
 #include <vtkTable.h>
@@ -239,8 +241,14 @@ vtkF3DRenderer::vtkF3DRenderer()
 
   this->SkyboxActor->SetProjection(vtkSkybox::Sphere);
   this->SkyboxActor->GammaCorrectOn();
-
   this->SkyboxActor->VisibilityOff();
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
+  vtkNew<vtkInformation> keys;
+  keys->Set(vtkShadowMapBakerPass::OCCLUDER(), 0);
+  keys->Set(vtkShadowMapPass::RECEIVER(), 0);
+  this->SkyboxActor->SetPropertyKeys(keys);
+#endif
 
   // Make sure an active camera is available on the renderer
   this->GetActiveCamera();
@@ -528,6 +536,9 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   newPass->SetArmatureVisible(this->ArmatureVisible);
   newPass->SetRenderReflection(this->GridVisible && this->GridReflection > 0.0);
   newPass->SetXRMode(this->UseXR);
+  newPass->SetRenderShadows(this->UseShadows);
+  newPass->SetShadowExponentialConstant(this->ShadowExponentialConstant);
+  newPass->SetShadowResolution(this->ShadowResolution);
 
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
@@ -827,6 +838,48 @@ void vtkF3DRenderer::SetGridReflection(const double strength)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetGridShadow(const double strength)
+{
+  if (this->GridShadow != strength)
+  {
+    this->GridShadow = strength;
+    this->GridConfigured = false;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetShadows(bool use)
+{
+  if (this->UseShadows != use)
+  {
+    this->UseShadows = use;
+    this->RenderPassesConfigured = false;
+    this->GridConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetShadowExponentialConstant(double constant)
+{
+  if (this->ShadowExponentialConstant != constant)
+  {
+    this->ShadowExponentialConstant = constant;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetShadowResolution(int resolution)
+{
+  if (this->ShadowResolution != resolution)
+  {
+    this->ShadowResolution = resolution;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetAxesColor(const std::vector<double>& colorXAxis,
   const std::vector<double>& colorYAxis, const std::vector<double>& colorZAxis)
 {
@@ -936,6 +989,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       this->GridMapper->SetSubdivisions(this->GridSubdivisions);
       this->GridMapper->SetLineOpacity(this->GridOpacity);
       this->GridMapper->SetReflectionStrength(this->GridReflection);
+      this->GridMapper->SetShadowStrength(this->UseShadows ? this->GridShadow : 0.0);
 
       if (this->GridAbsolute)
       {
@@ -973,6 +1027,13 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
         (this->ColorAxisX[1] * fX2 + this->ColorAxisY[1] * fY2 + this->ColorAxisZ[1] * fZ2) / f2,
         (this->ColorAxisX[2] * fX2 + this->ColorAxisY[2] * fY2 + this->ColorAxisZ[2] * fZ2) / f2,
         1);
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
+      vtkNew<vtkInformation> keys;
+      keys->Set(vtkShadowMapBakerPass::OCCLUDER(), 0);
+      keys->Set(vtkShadowMapPass::RECEIVER(), 1);
+      this->GridActor->SetPropertyKeys(keys);
+#endif
 
       this->GridActor->ForceTranslucentOn();
       this->GridActor->SetMapper(this->GridMapper);
@@ -2325,6 +2386,7 @@ void vtkF3DRenderer::ShowArmature(bool show)
   {
     this->ArmatureVisible = show;
     this->RenderPassesConfigured = false;
+    this->ActorsPropertiesConfigured = false;
     this->CheatSheetConfigured = false;
   }
 }
@@ -3217,6 +3279,17 @@ void vtkF3DRenderer::ConfigureActorsProperties()
           "Texture coordinates are required to display checkerboard texture.");
       }
     }
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
+    // exclude armature from shadows
+    vtkInformation* info = coloring.OriginalActor->GetPropertyKeys();
+    if (info && info->Has(vtkF3DImporter::ACTOR_IS_ARMATURE()))
+    {
+      coloring.OriginalActor->GetPropertyKeys()->Set(
+        vtkShadowMapBakerPass::OCCLUDER(), this->ArmatureVisible);
+      coloring.OriginalActor->GetPropertyKeys()->Set(vtkShadowMapPass::RECEIVER(), 0);
+    }
+#endif
   }
 
   for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
