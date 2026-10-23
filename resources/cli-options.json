@@ -282,7 +282,8 @@
         {
           "longName": "grid-reflection",
           "helpText": "Reflection strength of the grid",
-          "valueHelper": "<value>"
+          "valueHelper": "<value>",
+          "implicitValue": "0.5"
         },
         {
           "longName": "axes-grid",
