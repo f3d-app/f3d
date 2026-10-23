@@ -413,6 +413,7 @@ f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI shanghai_bund_1k.hdr
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13818
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016)
   f3d_test(NAME TestShadows DATA suzanne.ply ARGS --shadows)
+  f3d_test(NAME TestShadowsTranslucent DATA suzanne.ply ARGS --shadows --opacity=0.9 --blending=ddp SKIP_GLES) # No ddp on GLES
   f3d_test(NAME TestShadowsGrid DATA suzanne.ply ARGS --shadows -g)
   f3d_test(NAME TestShadowsGridLowRes DATA suzanne.ply ARGS --shadows -g -Drender.shadows.resolution=8)
   f3d_test(NAME TestShadowsGridLowExp DATA suzanne.ply ARGS --shadows -g -Drender.shadows.exponential_constant=1)

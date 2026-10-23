@@ -20,6 +20,7 @@ int TestSDKSceneLights([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   f3d::options& options = eng.getOptions();
 
   options.render.grid.enable = true;
+  options.render.grid.shadow = 0.4;
   options.render.shadows.enable = true;
 
   const f3d::light_state_t topFrontBlueLight = { .type = f3d::light_type::SCENE_LIGHT,
