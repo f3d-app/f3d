@@ -392,8 +392,8 @@
         },
         {
           "longName": "normal-glyphs-shape",
-          "helpText": "Shape of normal glyphs (\"arrow\", \"cone\", \"cylinder\", \"line\")",
-          "valueHelper": "<shape>"
+          "helpText": "Shape of normal glyphs",
+          "valueHelper": "arrow|cone|cylinder|line"
         }
       ]
     },
