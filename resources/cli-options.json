@@ -604,6 +604,12 @@
           "longName": "light-intensity",
           "helpText": "Light intensity",
           "valueHelper": "<value>"
+        },
+        {
+          "longName": "light-representation",
+          "helpText": "Display light representation",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
         }
       ]
     },
