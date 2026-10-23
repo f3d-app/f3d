@@ -18,7 +18,7 @@ Maintainers may decide to list a returning contributor as inactive after a year 
 Contributors with a single contribution or that may not want to are not listed here but can be found in the git history.
 
 | **Name/Alias**                  | **Handle**     | **Active** |
-|---------------------------------|----------------| ---------- |
+| ------------------------------- | -------------- | ---------- |
 | jrushlow                        | 19jrushlow     | Yes        |
 | ssmncrf                         | samoncrief     | Yes        |
 | Evgenii Startcev (PhilHellmuth) | exbluesbreaker | Yes        |
