@@ -990,6 +990,24 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{ "clear", "clear console" });
 
   this->addCommand(
+    "toggle_axis_lock",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 1, "toggle_axis_lock");
+      auto direction = options::parse<f3d::direction_t>(args[0]);
+      if (this->Internals->Options.interactor.axis_lock &&
+        this->Internals->Options.interactor.axis_lock.value() == direction)
+      {
+        this->Internals->Options.interactor.axis_lock = std::nullopt;
+      }
+      else
+      {
+        this->Internals->Options.interactor.axis_lock = direction;
+      }
+    },
+    command_documentation_t{ "toggle_axis_lock direction", "lock rotation to one direction" });
+
+  this->addCommand(
     "increase",
     [&](const std::vector<std::string>& args)
     {
@@ -1716,6 +1734,20 @@ interactor& interactor_impl::initBindings()
   this->addBinding({.Bind = {mod_t::CTRL, "N"}, .Commands = {"toggle model.normal_glyphs.enable"},.Group = "Scene", .DocCallback = std::bind(docTgl, "Normal glyphs", std::cref(opts.model.normal_glyphs.enable)), .Type = f3d::interactor::BindingType::TOGGLE});
   this->addBinding({.Bind = {mod_t::NONE, "O"}, .Commands = {"cycle model.point_sprites.type"},.Group = "Scene", .DocCallback = std::bind(docStr, "Point sprites", std::cref(opts.model.point_sprites.type)), .Type = f3d::interactor::BindingType::CYCLIC});
   this->addBinding({.Bind = {mod_t::NONE, "K"}, .Commands = {"cycle interactor.style"},.Group = "Scene", .DocCallback = std::bind(docStr, "Interaction style", std::cref(opts.interactor.style)), .Type = f3d::interactor::BindingType::CYCLIC});
+
+  auto docAxisTgl = [&](const std::string& doc, const std::string& val)
+  {
+    auto expected = options::parse<f3d::direction_t>(val);
+    return std::make_pair(doc,
+      (opts.interactor.axis_lock &&
+        opts.interactor.axis_lock.value() == expected)
+        ? "ON"
+        : "OFF");
+  };
+  this->addBinding({.Bind = {mod_t::CTRL_SHIFT, "X"}, .Commands = {"toggle_axis_lock +X"},.Group = "Scene", .DocCallback = [=]() { return docAxisTgl("Toggle x axis lock", "+X"); }, .Type = f3d::interactor::BindingType::TOGGLE});
+  this->addBinding({.Bind = {mod_t::CTRL_SHIFT, "Y"}, .Commands = {"toggle_axis_lock +Y"},.Group = "Scene", .DocCallback = [=]() { return docAxisTgl("Toggle y axis lock", "+Y"); }, .Type = f3d::interactor::BindingType::TOGGLE});
+  this->addBinding({.Bind = {mod_t::CTRL_SHIFT, "Z"}, .Commands = {"toggle_axis_lock +Z"},.Group = "Scene", .DocCallback = [=]() { return docAxisTgl("Toggle z axis lock", "+Z"); }, .Type = f3d::interactor::BindingType::TOGGLE});
+
   this->addBinding({.Bind = {mod_t::NONE, "F"}, .Commands = {"toggle render.hdri.ambient"},.Group = "Scene", .DocCallback = std::bind(docTgl, "HDRI ambient lighting", std::cref(opts.render.hdri.ambient)), .Type = f3d::interactor::BindingType::TOGGLE});
   this->addBinding({.Bind = {mod_t::NONE, "J"}, .Commands = {"cycle render.background.skybox"},.Group = "Scene", .DocCallback = std::bind(docStr, "Skybox mode", std::cref(opts.render.background.skybox)), .Type = f3d::interactor::BindingType::CYCLIC});
   this->addBinding({.Bind = {mod_t::NONE, "L"}, .Commands = {"increase render.light.intensity"}, .Group = "Scene", .DocCallback = std::bind(docDbl, "Increase lights intensity", std::cref(opts.render.light.intensity)), .Type = f3d::interactor::BindingType::NUMERICAL, .Repeat = true});
