@@ -3397,7 +3397,7 @@ void vtkF3DRenderer::UpdateLightRepresentations()
   {
     // ignore camera lights
     int lightType = light->GetLightType();
-    if (lightType  == VTK_LIGHT_TYPE_CAMERA_LIGHT || lightType == VTK_LIGHT_TYPE_HEADLIGHT)
+    if (lightType == VTK_LIGHT_TYPE_CAMERA_LIGHT || lightType == VTK_LIGHT_TYPE_HEADLIGHT)
     {
       continue;
     }
