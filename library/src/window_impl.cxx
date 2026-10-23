@@ -516,7 +516,6 @@ void window_impl::UpdateDynamicOptions()
   // Make sure lights are created before we take options into account
   renderer->UpdateLights();
 
-
   const options& opt = this->Internals->Options;
 
   // Update pending up direction if changed
