@@ -151,7 +151,44 @@ void vtkF3DInteractorStyle::Rotate()
 
   vtkCamera* camera = ren->GetActiveCamera();
 
-  if (this->InteractionMode != TRACKBALL)
+  vtkNew<vtkTransform> Transform;
+  const double* fp = camera->GetFocalPoint();
+  double newPos[3];
+
+  constexpr double maxAbsElevation = 90 - 1e-10;
+
+  if (ren->GetRotationAxis().has_value())
+  {
+    const auto& axis = ren->GetRotationAxis().value();
+
+    double delta = (std::abs(rxf) > std::abs(ryf) ? rxf : ryf);
+
+    if (axis[0] == 1.0 && axis[1] == 0.0 && axis[2] == 0.0 && this->InteractionMode != TRACKBALL)
+    {
+      double elevation = vtkMath::DegreesFromRadians(
+        vtkMath::AngleBetweenVectors(ren->GetUpDirection(), camera->GetDirectionOfProjection()) -
+        vtkMath::Pi() / 2);
+      camera->Elevation(
+        std::clamp(delta, -maxAbsElevation - elevation, +maxAbsElevation - elevation));
+    }
+    else
+    {
+      Transform->Identity();
+      Transform->Translate(+fp[0], +fp[1], +fp[2]);
+      Transform->RotateWXYZ(delta, axis.data());
+      Transform->Translate(-fp[0], -fp[1], -fp[2]);
+
+      Transform->TransformPoint(camera->GetPosition(), newPos);
+      camera->SetPosition(newPos);
+    }
+
+    double newViewUp[3];
+    Transform->TransformVector(camera->GetViewUp(), newViewUp);
+    camera->SetViewUp(newViewUp);
+
+    camera->OrthogonalizeViewUp();
+  }
+  else if (this->InteractionMode != TRACKBALL)
   {
     double up[3];
     this->InterpolateTemporaryUp(0.1, ren->GetUpDirection(), up);
@@ -168,9 +205,7 @@ void vtkF3DInteractorStyle::Rotate()
     }
 
     // Rotate camera around the focal point about the environment's up vector
-    vtkNew<vtkTransform> Transform;
     Transform->Identity();
-    const double* fp = camera->GetFocalPoint();
     Transform->Translate(+fp[0], +fp[1], +fp[2]);
     Transform->RotateWXYZ(rxf, ren->GetUpDirection());
     Transform->Translate(-fp[0], -fp[1], -fp[2]);
@@ -179,7 +214,6 @@ void vtkF3DInteractorStyle::Rotate()
     camera->SetViewUp(up);
 
     // Clamp parameter to `camera->Elevation()` to maintain -90 < elevation < +90
-    constexpr double maxAbsElevation = 90 - 1e-10;
     const double elevation = vtkMath::DegreesFromRadians(
       vtkMath::AngleBetweenVectors(ren->GetUpDirection(), camera->GetDirectionOfProjection()) -
       vtkMath::Pi() / 2);
@@ -195,7 +229,6 @@ void vtkF3DInteractorStyle::Rotate()
   }
 
   this->UpdateRendererAfterInteraction();
-
   rwi->Render();
 }
 
