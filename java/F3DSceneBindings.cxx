@@ -478,7 +478,7 @@ extern "C"
   {
     return static_cast<jlong>(GetEngine(env, self)->getScene().animationFrame());
   }
-  
+
   JNIEXPORT jobject JAVA_BIND(Scene, supportsBuffer)(JNIEnv* env, jobject self, jbyteArray buffer)
   {
     jsize bufferLen = env->GetArrayLength(buffer);
