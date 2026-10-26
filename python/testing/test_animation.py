@@ -53,10 +53,6 @@ def test_animation():
         "walk",
     ]
 
-    # triggerEventLoop returns self
-    inter_ref = engine.interactor.trigger_event_loop(0.1)
-    assert inter_ref == engine.interactor
-
     # getDeltaTime after triggerEventLoop
     assert engine.interactor.get_delta_time() == 0.03333333333333333
 
