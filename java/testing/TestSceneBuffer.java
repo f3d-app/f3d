@@ -19,7 +19,13 @@ public class TestSceneBuffer {
     input.close();
     Options options = engine.getOptions();
     options.setAsString("scene.force_reader", "PLYReader");
-    scene.add(new String(array).getBytes());
+
+    byte[] buffer = new String(array).getBytes();
+    if (scene.supports(buffer) != Scene.FileAvailability.SUPPORTED) {
+      throw new RuntimeException("a ply buffer should be supported");
+    }
+
+    scene.add(buffer);
 
     engine.close();
   }

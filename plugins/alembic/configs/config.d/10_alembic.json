@@ -3,7 +3,8 @@
     "match-type": "glob",
     "match": "*.abc",
     "options": {
-      "load-plugins": "alembic"
+      "load-plugins": "alembic",
+      "shadows": true
     }
   }
 ]

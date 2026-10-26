@@ -99,6 +99,9 @@ F3D is a community-driven, inclusive and beginner-friendly project. We love to s
   <img src="https://contrib.rocks/image?repo=f3d-app/f3d" />
 </a>
 
+Please note that F3D is not a AI friendly project in order to limit maintainer load.
+Note that it can be used in specific case, please review carefully the [AI policy](AI_POLICY.md) if you use generative AI.
+
 # Acknowledgments
 
 F3D was initially created by [Kitware SAS](https://www.kitware.eu/), by Joachim Pouderoux, Michael Migliore and Mathieu Westphal, and is relying on many awesome open source projects, including [VTK](https://vtk.org/), [OCCT](https://dev.opencascade.org/), [Assimp](https://www.assimp.org/), [Alembic](http://www.alembic.io/), [Draco](https://google.github.io/draco/), [web-ifc](https://github.com/ThatOpen/engine_web-ifc), [OpenUSD](https://openusd.org/release/index.html), [OpenVDB](https://www.openvdb.org/), [PDAL](https://pdal.org), [OSPRay](https://www.ospray.org/) and [ImGui](https://github.com/ocornut/imgui/).

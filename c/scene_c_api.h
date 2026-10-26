@@ -208,6 +208,17 @@ extern "C"
   F3D_EXPORT int f3d_scene_supports(f3d_scene_t* scene, const char* file_path);
 
   /**
+   * @brief Check if a memory buffer is supported by the scene.
+   *
+   * @param scene Scene handle.
+   * @param buffer Memory buffer containing a file.
+   * @param size Size of the buffer in bytes.
+   * @return 0 if supported, 1 for unsupported extension, 2 for unsupported content, 3 if buffer
+   * is NULL or size is 0, -1 if scene is NULL.
+   */
+  F3D_EXPORT int f3d_scene_supports_buffer(f3d_scene_t* scene, const void* buffer, size_t size);
+
+  /**
    * @brief Get the animation from the scene.
    *
    * @param scene Scene handle.

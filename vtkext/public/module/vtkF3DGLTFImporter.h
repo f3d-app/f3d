@@ -27,14 +27,11 @@ protected:
   vtkF3DGLTFImporter();
   ~vtkF3DGLTFImporter() override = default;
 
-  // need https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11774
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20241219)
   /**
    * This method is reimplemented to add information to the actor in order
    * to properly draw armatures on top.
    */
   void ApplyArmatureProperties(vtkActor* actor) override;
-#endif
 
   // need https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13116
   // which is backported in 9.6.2 in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13185

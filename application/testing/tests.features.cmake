@@ -17,7 +17,7 @@ f3d_test(NAME TestGridReflection DATA suzanne.ply ARGS -g --grid-reflection=0.8)
 f3d_test(NAME TestGridAbsoluteReflection DATA suzanne.ply ARGS -g --grid-absolute --grid-reflection=0.8 --camera-elevation-angle=40)
 f3d_test(NAME TestGridOpacity DATA suzanne.ply ARGS -g --grid-opacity=.25 --anti-aliasing=ssaa)
 f3d_test(NAME TestGridSSAAReflection DATA suzanne.ply ARGS -g --grid-reflection=0.8 --anti-aliasing=ssaa)
-f3d_test(NAME TestGridReflectionOnly DATA suzanne.ply ARGS -g --grid-reflection=0.5 --grid-opacity=0 --anti-aliasing=ssaa)
+f3d_test(NAME TestGridReflectionOnly DATA suzanne.ply ARGS -g --grid-reflection --grid-opacity=0 --anti-aliasing=ssaa)
 
 # Backface
 f3d_test(NAME TestBackfaceVisible DATA backface.vtp ARGS --backface-type=visible)
@@ -147,8 +147,15 @@ f3d_test(NAME TestVolumeMaterialError DATA HeadMRVolume.mhd ARGS -v NO_BASELINE 
 
 ## Normal Glyphs
 f3d_test(NAME TestNormalGlyphsPerspectiveEnable DATA suzanne.obj ARGS --normal-glyphs LONG_TIMEOUT)
-f3d_test(NAME TestNormalGlyphsOrthographicEnable DATA suzanne.obj ARGS --normal-glyphs --camera-orthographic)
-f3d_test(NAME TestNormalGlyphsScale DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-scale=0.1)
+f3d_test(NAME TestNormalGlyphsOrthographicEnable DATA suzanne.obj ARGS --normal-glyphs --camera-orthographic LONG_TIMEOUT)
+f3d_test(NAME TestNormalGlyphsScale DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-scale=0.1 LONG_TIMEOUT)
+f3d_test(NAME TestNormalGlyphsColor DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-color=1,0,0 LONG_TIMEOUT)
+f3d_test(NAME TestNormalGlyphsCylinder DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-shape=cylinder LONG_TIMEOUT)
+f3d_test(NAME TestNormalGlyphsCone DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-shape=cone LONG_TIMEOUT)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.0) # Line color is different before VTK 9.6 for unknown reason
+  f3d_test(NAME TestNormalGlyphsLine DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-shape=line LONG_TIMEOUT)
+endif()
+f3d_test(NAME TestNormalGlyphsInvalidShape DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-shape=foo LONG_TIMEOUT NO_BASELINE REGEXP "foo is an invalid normal glyphs shape")
 f3d_test(NAME TestNormalGlyphsNoNormalsAvailable DATA cow.vtp ARGS --normal-glyphs NO_BASELINE REGEXP "does not contain any normals")
 
 ## Textures
@@ -335,7 +342,8 @@ f3d_test(NAME TestBackdropOpacityTransparent DATA suzanne.ply ARGS -n --backdrop
 f3d_test(NAME TestBackdropOpacityMedium DATA suzanne.ply ARGS -n --backdrop-opacity=0.5 UI)
 f3d_test(NAME TestBackdropColor DATA suzanne.ply ARGS -n --backdrop-color=0.5,1.0,0.5 UI)
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13818
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016)
   f3d_test(NAME TestDefaultConfigFileHDRIFilename DATA dragon.vtu CONFIG config_build HDRI shanghai_bund_1k.hdr UI SKIP_GLES)
 endif()
 
@@ -343,20 +351,16 @@ endif()
 if(APPLE AND NOT F3D_TESTING_FORCE_RENDERING_BACKEND STREQUAL "osmesa") # MacOS driver does not support OpenGL 4.3
   f3d_test(NAME TestSkinningManyBonesFailure DATA tube_254bones.glb ARGS --verbose REGEXP "which requires OpenGL" NO_BASELINE)
 else()
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219) # The baseline changed with armature support
-    # Strictly speaking, this test can also fail if ran without OpenGL 4.3 support on Windows and Linux
-    # Instead of checking MacOS only, we should try to get OpenGL capabilities from CMake later instead
-    f3d_test(NAME TestSkinningManyBones DATA tube_254bones.glb SKIP_GLES)
-  endif()
+  # Strictly speaking, this test can also fail if ran without OpenGL 4.3 support on Windows and Linux
+  # Instead of checking MacOS only, we should try to get OpenGL capabilities from CMake later instead
+  f3d_test(NAME TestSkinningManyBones DATA tube_254bones.glb SKIP_GLES)
 endif()
 
 ## Armature
 f3d_test(NAME TestGLTFRigArmatureNoArmature DATA RiggedFigure.glb ARGS --animation-time=1 --opacity=0.5 -p SKIP_GLES) # GLES skipped because of depth peeling
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219)
-  f3d_test(NAME TestGLTFRigArmature DATA RiggedFigure.glb ARGS --animation-time=1 --armature)
-  f3d_test(NAME TestGLTFRigArmatureWithOpacity DATA RiggedFigure.glb ARGS --animation-time=1 --armature --opacity=0.5 -p SKIP_GLES) # GLES skipped because of depth peeling
-  f3d_test(NAME TestGLTFRigArmatureSphereTube DATA RiggedFigure.glb ARGS --animation-time=1 --armature --point-size=20 --line-width=5)
-endif()
+f3d_test(NAME TestGLTFRigArmature DATA RiggedFigure.glb ARGS --animation-time=1 --armature)
+f3d_test(NAME TestGLTFRigArmatureWithOpacity DATA RiggedFigure.glb ARGS --animation-time=1 --armature --opacity=0.5 -p SKIP_GLES) # GLES skipped because of depth peeling
+f3d_test(NAME TestGLTFRigArmatureSphereTube DATA RiggedFigure.glb ARGS --animation-time=1 --armature --point-size=20 --line-width=5)
 
 ## HDRI
 f3d_test(NAME TestHDRI DATA suzanne.ply HDRI shanghai_bund_1k.hdr THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
@@ -410,9 +414,16 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestHDRIRaytracingNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr -rd --raytracing-samples=4 LONG_TIMEOUT)
 endif()
 
-# SSAA with HDR framebuffer support in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12026
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250329)
-  f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -t --anti-aliasing=ssaa)
+f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -t --anti-aliasing=ssaa)
+
+## Shadows
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13818
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016)
+  f3d_test(NAME TestShadows DATA suzanne.ply ARGS --shadows)
+  f3d_test(NAME TestShadowsTranslucent DATA suzanne.ply ARGS --shadows --opacity=0.9 --blending=ddp SKIP_GLES) # No ddp on GLES
+  f3d_test(NAME TestShadowsGrid DATA suzanne.ply ARGS --shadows -g)
+  f3d_test(NAME TestShadowsGridLowRes DATA suzanne.ply ARGS --shadows -g -Drender.shadows.resolution=8)
+  f3d_test(NAME TestShadowsGridLowExp DATA suzanne.ply ARGS --shadows -g -Drender.shadows.exponential_constant=1)
 endif()
 
 ## Raytracing
@@ -446,10 +457,7 @@ endif()
 
 if(F3D_MODULE_WEBP)
   f3d_test(NAME TestVersionWebP ARGS --version REGEXP "Module WebP: ON")
-  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11922
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250220)
-    f3d_test(NAME TestOBJWebP DATA cube_webp.obj)
-  endif()
+  f3d_test(NAME TestOBJWebP DATA cube_webp.obj)
 endif()
 
 ## Final shader
@@ -654,13 +662,10 @@ f3d_test(NAME TestAnimationIndicesWarningNone DATA cow.vtp ARGS --animation-indi
 f3d_test(NAME TestAnimationIndicesWarningAllAnimations DATA InterpolationTest.glb ARGS --animation-indices=-1,2,3 REGEXP "Multiple animation indices have been specified include a negative one, all animations will be selected" NO_BASELINE)
 f3d_test(NAME TestVerboseAnimationNoAnimationTime DATA cow.vtp ARGS --animation-time=2 --verbose REGEXP "No animation available, cannot load a specific animation time" NO_BASELINE)
 f3d_test(NAME TestInvalidAnimationProgressMode DATA cow.vtp ARGS --animation-progress=foo REGEXP "foo is an invalid animation progress mode" NO_BASELINE)
-
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250507)
-  f3d_test(NAME TestAnimationIndicesWarningSingle DATA soldier_animations.mdl ARGS --animation-indices=1,2 REGEXP "Multiple animation indices have been specified but currently loaded files may not support enabling multiple animations" NO_BASELINE)
-  if(F3D_PLUGIN_BUILD_HDF)
-    f3d_test(NAME TestAnimationIndicesWarningUniqueNonZero DATA blob.vtkhdf ARGS --animation-indices=1 --load-plugins=hdf REGEXP "Non-zero or multiple animation indices have been specified but currently loaded file does not support it." NO_BASELINE)
-    f3d_test(NAME TestAnimationIndicesWarningUniqueMulti DATA blob.vtkhdf ARGS --animation-indices=0,2 --load-plugins=hdf REGEXP "Non-zero or multiple animation indices have been specified but currently loaded file does not support it." NO_BASELINE)
-  endif()
+f3d_test(NAME TestAnimationIndicesWarningSingle DATA soldier_animations.mdl ARGS --animation-indices=1,2 REGEXP "Multiple animation indices have been specified but currently loaded files may not support enabling multiple animations" NO_BASELINE)
+if(F3D_PLUGIN_BUILD_HDF)
+  f3d_test(NAME TestAnimationIndicesWarningUniqueNonZero DATA blob.vtkhdf ARGS --animation-indices=1 --load-plugins=hdf REGEXP "Non-zero or multiple animation indices have been specified but currently loaded file does not support it." NO_BASELINE)
+  f3d_test(NAME TestAnimationIndicesWarningUniqueMulti DATA blob.vtkhdf ARGS --animation-indices=0,2 --load-plugins=hdf REGEXP "Non-zero or multiple animation indices have been specified but currently loaded file does not support it." NO_BASELINE)
 endif()
 
 # Test Grid verbose output
@@ -868,11 +873,9 @@ f3d_test(NAME TestHelpPrecedenceWithUnknownOption ARGS --help --unknown REGEXP "
 f3d_test(NAME TestVersionPrecedenceWithUnknownOption ARGS --version --unknown REGEXP "Version:" NO_BASELINE)
 
 # PIPED error code path
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
-  f3d_test(NAME TestPipedForced DATA suzanne.ply ARGS --force-reader=PLYReader --verbose PIPED_READER PLYReader REGEXP "Forcing reader" NO_BASELINE PIPED)
-  f3d_test(NAME TestPipedForcedInvalid DATA suzanne.ply ARGS --force-reader=invalid PIPED_READER invalid REGEXP "is not a valid force reader" NO_BASELINE PIPED)
-  f3d_test(NAME TestPipedForcedInvalidStream DATA beach.nrrd ARGS --force-reader=Nrrd PIPED_READER Nrrd REGEXP "does not support reading streams" NO_BASELINE PIPED)
-endif()
+f3d_test(NAME TestPipedForced DATA suzanne.ply ARGS --force-reader=PLYReader --verbose PIPED_READER PLYReader REGEXP "Forcing reader" NO_BASELINE PIPED)
+f3d_test(NAME TestPipedForcedInvalid DATA suzanne.ply ARGS --force-reader=invalid PIPED_READER invalid REGEXP "is not a valid force reader" NO_BASELINE PIPED)
+f3d_test(NAME TestPipedForcedInvalidStream DATA beach.nrrd ARGS --force-reader=Nrrd PIPED_READER Nrrd REGEXP "does not support reading streams" NO_BASELINE PIPED)
 
 ## Filesystem error code path
 if(NOT WIN32)

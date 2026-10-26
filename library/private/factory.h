@@ -52,8 +52,8 @@ public:
   /**
    * Get the reader that can read the given buffer, nullptr if none
    */
-  reader* getReader(
-    const std::byte* buffer, std::size_t size, std::optional<std::string> forceReader);
+  reader* getReader(const std::byte* buffer, std::size_t size,
+    std::optional<std::string> forceReader, file_availability& availability);
 
   /**
    * Get the list of the registered plugins

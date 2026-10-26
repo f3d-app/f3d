@@ -193,6 +193,14 @@ f3d_test_doc(NAME TestDocNormalGlyphsOn DATA DamagedHelmet.glb REF_IMAGE normal_
 f3d_test_doc(NAME TestDocNormalGlyphsScale03 DATA DamagedHelmet.glb REF_IMAGE normal_glyphs_scale_0.3.png ROTATE ARGS --normal-glyphs --normal-glyphs-scale=.3 -f)
 f3d_test_doc(NAME TestDocNormalGlyphsScale07 DATA DamagedHelmet.glb REF_IMAGE normal_glyphs_scale_0.7.png ROTATE ARGS --normal-glyphs --normal-glyphs-scale=.7 -f)
 
+## --normal-glyphs-color
+### white: normal_glyphs_on.png
+f3d_test_doc(NAME TestDocNormalGlyphsColorMaroon DATA DamagedHelmet.glb REF_IMAGE normal_glyphs_maroon.png ROTATE ARGS --normal-glyphs --normal-glyphs-scale=.3 --normal-glyphs-color=maroon -f)
+
+## --normal-glyphs-shape
+### arrow: normal_glyphs_on.png
+f3d_test_doc(NAME TestDocNormalGlyphsShapeCylinder DATA DamagedHelmet.glb REF_IMAGE normal_glyphs_shape_cylinder.png ROTATE ARGS --normal-glyphs --normal-glyphs-scale=.3 --normal-glyphs-shape=cylinder -f)
+
 ## --point-sprites
 ### OFF: damaged_helmet_baseline.png
 f3d_test_doc(NAME TestDocPointSpritesSphere DATA DamagedHelmet.glb REF_IMAGE point_sprites_sphere.png ROTATE ARGS --point-sprites=sphere --point-sprites-size=5)
@@ -382,6 +390,11 @@ f3d_test_doc(NAME TestDocBlendingON DATA dragon.vtu REF_IMAGE blending_on.png RO
 ## --ambient-occlusion
 f3d_test_doc(NAME TestDocAmbientOcclusionOFF DATA dragon.vtu REF_IMAGE ambient_occlusion_off.png ROTATE ARGS -f)
 f3d_test_doc(NAME TestDocAmbientOcclusionON DATA dragon.vtu REF_IMAGE ambient_occlusion_on.png ROTATE ARGS -f --ambient-occlusion)
+
+## --shadows
+### OFF: ambient_occlusion_off.png
+f3d_test_doc(NAME TestDocShadowsOFF DATA dragon.vtu REF_IMAGE shadows_off.png ROTATE ARGS -g)
+f3d_test_doc(NAME TestDocShadowsON DATA dragon.vtu REF_IMAGE shadows_on.png ROTATE ARGS -g --shadows)
 
 ## --anti-aliasing
 f3d_test_doc(NAME TestDocAntiAliasingOFF DATA dragon.vtu REF_IMAGE anti_aliasing_off.png ROTATE ARGS -f --anti-aliasing=none)

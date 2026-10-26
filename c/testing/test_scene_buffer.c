@@ -36,6 +36,22 @@ int test_scene_buffer()
   }
   f3d_options_t* options = f3d_engine_get_options(engine);
   f3d_options_set_as_string(options, "scene.force_reader", "PLYReader");
+
+  // Test checking support of a memory buffer
+  if (f3d_scene_supports_buffer(scene, source, readLength) != 0)
+  {
+    puts("[ERROR] Expected buffer to be supported");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  if (f3d_scene_supports_buffer(NULL, source, readLength) != -1)
+  {
+    puts("[ERROR] Expected null scene to return -1");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
   f3d_scene_add_buffer(scene, source, readLength);
   f3d_options_reset(options, "scene.force_reader");
 

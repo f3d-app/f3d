@@ -34,6 +34,12 @@ const settings = {
       "a file with an invalid header should be reported as unsupported content",
     );
 
+    utils.assert(
+      scene.supportsBuffer(new Array()) ===
+        Module.FileAvailability.EMPTY_STREAM,
+      "an empty buffer should not be supported",
+    );
+
     const options = Module.engineInstance.getOptions();
 
     // background must be set to black for proper blending with transparent canvas
@@ -175,6 +181,7 @@ const settings = {
     // modify first light color / intensity
     light0.color = new Module.Color(1.0, 0.0, 0.0);
     light0.intensity *= 3.0;
+    light0.castShadows = false;
     scene.updateLight(0, light0);
 
     // remove last light

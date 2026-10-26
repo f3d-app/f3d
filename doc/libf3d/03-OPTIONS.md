@@ -158,9 +158,25 @@ CLI: `--texture-material`.
 
 Render vertex normals as arrows on top of the geometry.
 
+CLI: `--normal-glyphs`.
+
 ### `model.normal_glyphs.scale` (_ratio_, default: `1.0`, range domain: `[0, 10]`, increment: `0.1`)
 
 Scales the normal glyphs
+
+CLI: `--normal-glyphs-scale`.
+
+### `model.normal_glyphs.color` (_color_, default: `1.0, 1.0, 1.0`)
+
+Color of the normal glyphs.
+
+CLI: `--normal-glyphs-color`.
+
+### `model.normal_glyphs.shape` (_string_, default: `arrow`, enum domain: `arrow, cylinder, cone, line`)
+
+Shape of the normal glyphs.
+
+CLI: `--normal-glyphs-shape`.
 
 ### `model.normal.scale` (_double_, optional, range domain: `[0, 3]`, increment: `0.1`)
 
@@ -326,6 +342,20 @@ CLI: `--display-depth`
 Set the _width_ of lines when showing edges. Model-specified by default.
 
 CLI: `--line-width`.
+
+### `render.shadows.enable` (_bool_, default: `false`)
+
+Set to true to show shadows. All lights from files cast shadows and only opaque objects are considered as occluder. Shadows are visible on the grid.
+
+CLI: `--shadows`.
+
+### `render.shadows.resolution` (_int_, default: `1024`, range domain: `[256, 4096]`, increment: `256`)
+
+Set the resolution of the shadow maps.
+
+### `render.shadows.exponential_constant` (_double_, default: `25`, range domain: `[10, 120]`, increment: `5`)
+
+Set the constant value used during shadow evaluation. Higher values give better results but if it's too high, it introduces artifacts.
 
 ### `render.show_edges` (_bool_, optional)
 

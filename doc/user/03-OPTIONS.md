@@ -426,6 +426,26 @@ Adjusts the scales of normal glyphs.
 | ---------------------------------------------------------------- | ---------------------------------------------------------------- |
 | ![normal glyphs scale 0.3](./images/normal_glyphs_scale_0.3.png) | ![normal glyphs scale 0.7](./images/normal_glyphs_scale_0.7.png) |
 
+### `--normal-glyphs-color` (_color_, default: `0.82, 0.82, 0.82`)
+
+Set the color of normal glyphs.
+
+#### compare
+
+| Default                                                       | Maroon                                                           |
+| ------------------------------------------------------------- | ---------------------------------------------------------------- |
+| ![normal glyphs default color](./images/normal_glyphs_on.png) | ![normal glyphs marron color](./images/normal_glyphs_maroon.png) |
+
+### `--normal-glyphs-shape=<arrow|cone|cylinder|line>` (_string_, default: `arrow`)
+
+Set the shape of normal glyphs.
+
+#### compare
+
+| Arrow                                                       | Cylinder                                                                   |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------- |
+| ![normal glyphs arrow shape](./images/normal_glyphs_on.png) | ![normal glyphs cylinder shape](./images/normal_glyphs_shape_cylinder.png) |
+
 ### `-o`, `--point-sprites=<none|sphere|gaussian|circle|stddev|bound|cross>` (_string_, default: `none`, implicit: `sphere`)
 
 Select _points sprites_ types to show instead of the geometry.
@@ -1014,6 +1034,16 @@ Enable _ambient occlusion_. This is a technique used to improve the depth percep
 | OFF                                                          | ON                                                         |
 | ------------------------------------------------------------ | ---------------------------------------------------------- |
 | ![ambient occlusion off](./images/ambient_occlusion_off.png) | ![ambient occlusion on](./images/ambient_occlusion_on.png) |
+
+### `--shadows` (_bool_, default: `false`)
+
+Enable _shadows_. All lights from files cast shadows and only opaque objects are considered as occluder. Shadows are visible on the grid.
+
+#### compare
+
+| OFF                                      | ON                                     |
+| ---------------------------------------- | -------------------------------------- |
+| ![shadows off](./images/shadows_off.png) | ![shadows on](./images/shadows_on.png) |
 
 ### `-a`, `--anti-aliasing` (_string_, default: `none`, implicit: `fxaa`)
 

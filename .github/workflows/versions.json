@@ -132,5 +132,5 @@
   "vtk_commit_sha": "dbb73e9cc80d20821ae63949c5f80e72fa5ea240",
   "docker_timestamp": "20261016_1",
   "global_cache_index": "3",
-  "vtk_matrix": "['commit', 'v9.7.1', 'v9.6.2', 'v9.5.2', 'v9.4.2']"
+  "vtk_matrix": "['commit', 'v9.7.1', 'v9.6.2', 'v9.5.2']"
 }

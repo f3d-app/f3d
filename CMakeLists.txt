@@ -34,7 +34,7 @@ set(F3D_MINOR_VERSION 0)
 set(F3D_PATCH_VERSION 0)
 set(F3D_VERSION ${F3D_MAJOR_VERSION}.${F3D_MINOR_VERSION}.${F3D_PATCH_VERSION})
 
-set(F3D_PATCH_VERSION_EXTRA "RC3")
+set(F3D_PATCH_VERSION_EXTRA "")
 if(F3D_PATCH_VERSION_EXTRA STREQUAL "")
   set(F3D_VERSION_FULL ${F3D_VERSION})
 else()
@@ -55,7 +55,7 @@ mark_as_advanced(F3D_EXCLUDE_DEPRECATED)
 # VTK dependency
 # Optional components should list VTK modules
 # needed by plugins and optional modules
-find_package(VTK 9.4.0 REQUIRED
+find_package(VTK 9.5.0 REQUIRED
   COMPONENTS
     CommonCore
     CommonDataModel
@@ -263,7 +263,7 @@ endif()
 # F3D Application
 cmake_dependent_option(F3D_BUILD_APPLICATION "Build the application" ON "NOT ANDROID AND NOT EMSCRIPTEN" OFF)
 
-# Build external dependencies that needs it
+# Build external dependencies that need it
 add_subdirectory(external)
 
 # Build VTK extension modules
@@ -273,7 +273,7 @@ add_subdirectory(vtkext)
 option(F3D_PLUGINS_STATIC_BUILD "Make all plugins static (embedded into libf3d) and automatically loaded by F3D" ON)
 mark_as_advanced(F3D_PLUGINS_STATIC_BUILD)
 if (F3D_MACOS_BUNDLE AND NOT F3D_PLUGINS_STATIC_BUILD)
-  message(FATAL_ERROR "Building a macOS Bundle do not support loading plugins dynamically")
+  message(FATAL_ERROR "Building a macOS Bundle does not support loading plugins dynamically")
 endif()
 set(F3D_PLUGINS_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}" CACHE STRING "Plugins install directory relative path")
 mark_as_advanced(F3D_PLUGINS_INSTALL_DIR)

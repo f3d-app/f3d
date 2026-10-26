@@ -283,14 +283,12 @@ int vtkF3DSPZReader::RequestData(
 
   vtkSmartPointer<vtkResourceStream> stream;
 
-#if VTK_VERSION_NUMBER > VTK_VERSION_CHECK(9, 4, 20250501)
   if (this->Stream)
   {
     stream = this->Stream;
     assert(this->Stream->SupportSeek());
   }
   else
-#endif
   {
     vtkNew<vtkFileResourceStream> fileStream;
     fileStream->Open(this->FileName);

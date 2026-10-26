@@ -48,7 +48,16 @@ public class TestScene {
       }
     }
     try {
-      scene.supports(null);
+      scene.supports((String) null);
+      throw new RuntimeException("Expected IllegalArgumentException was not thrown");
+    } catch (IllegalArgumentException e) {
+    }
+
+    if (scene.supports(new byte[0]) != Scene.FileAvailability.EMPTY_STREAM) {
+      throw new RuntimeException("an empty buffer should not be supported");
+    }
+    try {
+      scene.supports((byte[]) null);
       throw new RuntimeException("Expected IllegalArgumentException was not thrown");
     } catch (IllegalArgumentException e) {
     }
@@ -84,6 +93,7 @@ public class TestScene {
     lightState.type = Types.LightType.HEADLIGHT;
     lightState.intensity = 1.0;
     lightState.switchState = true;
+    lightState.castShadows = true;
 
     int lightIdx = scene.addLight(lightState);
 
@@ -97,6 +107,7 @@ public class TestScene {
       updateLight.type = Types.LightType.HEADLIGHT;
       updateLight.intensity = 2.0;
       updateLight.switchState = true;
+      updateLight.castShadows = true;
 
       scene.updateLight(lightIdx, updateLight);
 

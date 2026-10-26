@@ -14,7 +14,7 @@ set(_f3dPlugin_dir "${CMAKE_CURRENT_LIST_DIR}")
 f3d_plugin_init()
 ~~~
 
-This initializes the variable used internally to accumulate the reader declarations.
+This initializes the variables used internally to accumulate the reader declarations.
 #]==]
 
 macro(f3d_plugin_init)
@@ -53,7 +53,7 @@ The `NAME` argument is required. The arguments are as follows:
   * `VTK_READER`: The VTK reader class to use.
   * `FORMAT_DESCRIPTION`: The description of the format read by the reader.
   * `SCORE`: The score of the reader (from 0 to 100). Default value is 50.
-  * `SUPPORTS_STREAM`: Flag to indicate that a reader support reading from streams, default is false
+  * `SUPPORTS_STREAM`: Flag to indicate that a reader supports reading from streams, default is false
   * `CAN_READ`: Style of CAN_READ to use, STATIC, MEMBER or CUSTOM. A CAN_READ is required with SUPPORTS_STREAM
   * `EXCLUDE_FROM_THUMBNAILER`: If specified, the reader will not be used for generating thumbnails.
   * `CUSTOM_CODE`: A custom code file containing the implementation of ``applyCustomReader`` function.
@@ -242,7 +242,7 @@ The `NAME` argument is required. The arguments are as follows:
 macro(f3d_plugin_build)
   cmake_parse_arguments(F3D_PLUGIN "FREEDESKTOP;FORCE_STATIC" "NAME;DESCRIPTION;VERSION" "VTK_MODULES;ADDITIONAL_RPATHS;MIMETYPE_XML_FILES;CONFIGURATION_DIRS;RESOURCES" ${ARGN})
 
-  find_package(VTK 9.4.0 REQUIRED COMPONENTS
+  find_package(VTK 9.5.0 REQUIRED COMPONENTS
                CommonCore CommonExecutionModel IOImport
                ${F3D_PLUGIN_VTK_MODULES})
 
