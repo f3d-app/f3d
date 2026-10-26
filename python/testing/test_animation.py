@@ -53,7 +53,7 @@ def test_animation():
         "walk",
     ]
 
-    # getDeltaTime after triggerEventLoop
+    # getDeltaTime
     assert engine.interactor.get_delta_time() == 0.03333333333333333
 
     # animationTime
