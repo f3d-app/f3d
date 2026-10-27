@@ -3563,7 +3563,7 @@ void vtkF3DRenderer::UpdateLightRepresentations()
     lightRep.representation->SetLightPosition(light->GetTransformedPosition());
     lightRep.representation->SetFocalPoint(light->GetTransformedFocalPoint());
     lightRep.representation->SetPositional(light->GetPositional());
-    lightRep.representation->SetConeAngle(100);
+    lightRep.representation->SetConeAngle(light->GetConeAngle());
 
     if (this->LightRepresentationVisible)
     {
