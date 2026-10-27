@@ -42,9 +42,9 @@
 #include <vtkImageReader2Factory.h>
 #include <vtkLight.h>
 #include <vtkLightCollection.h>
-#include <vtkLineSource.h>
 #include <vtkLightRepresentation.h>
 #include <vtkLightWidget.h>
+#include <vtkLineSource.h>
 #include <vtkMath.h>
 #include <vtkMathUtilities.h>
 #include <vtkMatrix4x4.h>
@@ -3565,6 +3565,13 @@ void vtkF3DRenderer::UpdateLightRepresentations()
     lightRep.representation->SetFocalPoint(light->GetFocalPoint());
     lightRep.representation->SetConeAngle(light->GetConeAngle());
 
+    double* lightPos = light->GetPosition();
+    double* repPos = lightRep.representation->GetLightPosition();
+    // Debug
+    F3DLog::Print(F3DLog::Severity::Info,
+      std::format("light position -> ({}, {}, {})\nrep position -> ({:.5}, {:.5}, {:.5})",
+        lightPos[0], lightPos[1], lightPos[2], repPos[0], repPos[1], repPos[2]));
+
     if (this->LightRepresentationVisible)
     {
       lightRep.widget->On();
@@ -3574,6 +3581,9 @@ void vtkF3DRenderer::UpdateLightRepresentations()
       lightRep.widget->Off();
     }
   }
+    F3DLog::Print(F3DLog::Severity::Info,
+      std::format("light count -> {}", visitedLights.size()));
+
 
   // remove unwanted light representations
   for (auto it = LightRepresentations.begin(); it != LightRepresentations.end();)
