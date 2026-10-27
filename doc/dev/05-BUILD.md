@@ -15,13 +15,13 @@ please take a look at our [getting started guide](04-GETTING_STARTED.md).
 - A C++20 compiler.
 - A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
 - Optionally, [Alembic](http://www.alembic.io/) >= 1.8.5.
-- Optionally, [Assimp](https://www.assimp.org/) >= 5.4.0 (6.0.2 recommended).
+- Optionally, [Assimp](https://www.assimp.org/) >= 5.4.0 (>= 6.0.2 recommended).
 - Optionally, [Draco](https://google.github.io/draco/) >= 1.5.6.
 - Optionally, [Java](https://www.java.com) >= 17.
 - Optionally, [FFmpeg](https://code.ffmpeg.org/FFmpeg/FFmpeg) >= 8.0.1.
-- Optionally, [OpenCASCADE](https://dev.opencascade.org/) >= 7.6.3 (7.9.1 recommended).
+- Optionally, [OpenCASCADE](https://dev.opencascade.org/) >= 7.6.3 (>= 7.9.1 recommended).
 - Optionally, [OpenEXR](https://openexr.com/en/latest/) >= 3.0.1.
-- Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 24.08 (25.05.01 recommended).
+- Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 24.08 (>= 25.05.01 recommended).
 - Optionally, [OpenVDB](https://www.openvdb.org/download/) >= 12.0.0, enable `IOOpenVDB` module during VTK configuration.
 - Optionally, [OpenXR](https://github.com/KhronosGroup/OpenXR-SDK), enable `RenderingOpenXR` module during VTK configuration.
 - Optionally, [OSPray](https://www.ospray.org/) == 2.12.0, enable `RenderingRayTracing` module during VTK configuration.
@@ -31,6 +31,7 @@ please take a look at our [getting started guide](04-GETTING_STARTED.md).
 - Optionally, [WebP](https://chromium.googlesource.com/webm/libwebp) >= 1.2.4.
 
 F3D is tested continuously against versions recommended by the [VFX reference platform](https://vfxplatform.com) defined for **CY2025**
+Exact tested versions can be found in `.github/workflows/versions.json`.
 
 ## VTK compatibility
 
