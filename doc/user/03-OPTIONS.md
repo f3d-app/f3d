@@ -791,7 +791,6 @@ _Adjust the intensity_ of every light in the scene, including HDRI image-based l
 Set visibility of light representations of every _scene_ light.
 This option doesn't show representations for headlights and camera lights
 
-
 #### compare
 
 | 1 (default)                                          | 2                                                    |
