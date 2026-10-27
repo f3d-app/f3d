@@ -10,25 +10,28 @@ please take a look at our [getting started guide](04-GETTING_STARTED.md).
 
 ## Dependencies
 
-- [CMake](https://cmake.org) >= 3.1.
+- [CMake](https://cmake.org) >= 3.21.
 - [VTK](https://vtk.org) >= 9.5.0 (9.7.1 recommended).
 - A C++20 compiler.
 - A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
-- Optionally, [Assimp](https://www.assimp.org/) >= 5.4.0 (6.0.2 recommended).
-- Optionally, Open CASCADE [OCCT](https://dev.opencascade.org/) >= 7.6.3 (7.9.1 recommended).
 - Optionally, [Alembic](http://www.alembic.io/) >= 1.8.5.
-- Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 24.08 (25.05.01 recommended).
-- Optionally, [OpenVDB](https://www.openvdb.org/download/) >= 12.0.0, enable `IOOpenVDB` module during VTK configuration.
-- Optionally, [PDAL](https://pdal.org/en/2.10.0/) >= 2.0.0 (2.9.0 recommended), enable `IOPDAL` module during VTK configuration.
-- Optionally, [web-ifc](https://github.com/ThatOpen/engine_web-ifc) >= 0.75 (only C++ library).
-- Optionally, [OSPray](https://www.ospray.org/) == 2.12.0, enable `RenderingRayTracing` module during VTK configuration.
+- Optionally, [Assimp](https://www.assimp.org/) >= 5.4.0 (>= 6.0.2 recommended).
 - Optionally, [Draco](https://google.github.io/draco/) >= 1.5.6.
-- Optionally, [Python](https://www.python.org/) >= 3.11 and [pybind11](https://github.com/pybind/pybind11) >= 3.0.0.
 - Optionally, [Java](https://www.java.com) >= 17.
+- Optionally, [FFmpeg](https://code.ffmpeg.org/FFmpeg/FFmpeg) >= 8.0.1.
+- Optionally, [OpenCASCADE](https://dev.opencascade.org/) >= 7.6.3 (>= 7.9.1 recommended).
 - Optionally, [OpenEXR](https://openexr.com/en/latest/) >= 3.0.1.
+- Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 24.08 (>= 25.05.01 recommended).
+- Optionally, [OpenVDB](https://www.openvdb.org/download/) >= 12.0.0, enable `IOOpenVDB` module during VTK configuration.
+- Optionally, [OpenXR](https://github.com/KhronosGroup/OpenXR-SDK), enable `RenderingOpenXR` module during VTK configuration.
+- Optionally, [OSPray](https://www.ospray.org/) == 2.12.0, enable `RenderingRayTracing` module during VTK configuration.
+- Optionally, [PDAL](https://pdal.org/en/2.10.0/) >= 2.9.0, enable `IOPDAL` module during VTK configuration.
+- Optionally, [Python](https://www.python.org/) >= 3.11 and [pybind11](https://github.com/pybind/pybind11) >= 3.0.0.
+- Optionally, [web-ifc](https://github.com/ThatOpen/engine_web-ifc) >= 0.75 (only C++ library).
 - Optionally, [WebP](https://chromium.googlesource.com/webm/libwebp) >= 1.2.4.
 
 F3D is tested continuously against versions recommended by the [VFX reference platform](https://vfxplatform.com) defined for **CY2025**
+Exact tested versions can be found in `.github/workflows/versions.json`.
 
 ## VTK compatibility
 
