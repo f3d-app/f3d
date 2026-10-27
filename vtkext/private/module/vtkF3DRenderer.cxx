@@ -3560,17 +3560,10 @@ void vtkF3DRenderer::UpdateLightRepresentations()
       lightRep.widget->SetProcessEvents(false);
     }
 
-    lightRep.representation->SetLightPosition(light->GetPosition());
+    lightRep.representation->SetLightPosition(light->GetTransformedPosition());
+    lightRep.representation->SetFocalPoint(light->GetTransformedFocalPoint());
     lightRep.representation->SetPositional(light->GetPositional());
-    lightRep.representation->SetFocalPoint(light->GetFocalPoint());
-    lightRep.representation->SetConeAngle(light->GetConeAngle());
-
-    double* lightPos = light->GetPosition();
-    double* repPos = lightRep.representation->GetLightPosition();
-    // Debug
-    F3DLog::Print(F3DLog::Severity::Info,
-      std::format("light position -> ({}, {}, {})\nrep position -> ({:.5}, {:.5}, {:.5})",
-        lightPos[0], lightPos[1], lightPos[2], repPos[0], repPos[1], repPos[2]));
+    lightRep.representation->SetConeAngle(100);
 
     if (this->LightRepresentationVisible)
     {
@@ -3581,9 +3574,6 @@ void vtkF3DRenderer::UpdateLightRepresentations()
       lightRep.widget->Off();
     }
   }
-    F3DLog::Print(F3DLog::Severity::Info,
-      std::format("light count -> {}", visitedLights.size()));
-
 
   // remove unwanted light representations
   for (auto it = LightRepresentations.begin(); it != LightRepresentations.end();)
