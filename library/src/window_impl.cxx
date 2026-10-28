@@ -653,7 +653,29 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->ShowArmature(opt.render.armature.enable);
 
-  renderer->SetUseRaytracing(opt.render.raytracing.enable);
+  if (opt.render.mode == "ospray")
+  {
+    renderer->SetRenderingMode(vtkF3DRenderer::RenderingMode::OSPRAY);
+  }
+  else if (opt.render.mode == "anari")
+  {
+    renderer->SetRenderingMode(vtkF3DRenderer::RenderingMode::ANARI);
+
+    // "environment" is a magic keyword in Anari to specify that ANARI_LIBRARY should be taken from
+    // the environment variable.
+    renderer->SetAnariLibrary(
+      opt.render.anari_library.has_value() ? opt.render.anari_library.value() : "environment");
+  }
+  else
+  {
+    if (opt.render.mode != "opengl")
+    {
+      log::warn("'render.mode' is set to an unknown value: ", opt.render.mode,
+        ". Valid modes are: 'opengl', 'ospray', 'anari'");
+    }
+    renderer->SetRenderingMode(vtkF3DRenderer::RenderingMode::OPENGL);
+  }
+
   renderer->SetRaytracingSamples(opt.render.raytracing.samples);
   renderer->SetUseRaytracingDenoiser(opt.render.raytracing.denoise);
 

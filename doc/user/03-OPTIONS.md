@@ -133,6 +133,26 @@ Filename to save [screenshots](04-INTERACTIONS.md#take-screenshots) to. Can use 
 Rendering backend to load, `auto` means to let F3D pick the correct one for you depending on your system capabilities. Use `egl` or `osmesa` to force headless rendering. Use `rendering-backend=xr` to specify F3D should use the xr rendering backend, referred in this doc as "XR mode".
 See [rendering backends](12-DESKTOP_INTEGRATION.md#rendering-backends).
 
+### `-r`, `--rendering-mode=<opengl|ospray|anari>` (_string_, default: `opengl`, implicit: `ospray`)
+
+Select the rendering mode to use.
+If OSPRay raytracing is used, requires OSPRay raytracing to be enabled in the linked VTK dependency.
+If Anari is used, requires Anari to be enabled in the linked VTK dependency.
+
+> [!NOTE]
+> The `anari` rendering mode is experimental and not available in the binary release
+
+#### compare
+
+| OpenGL                                         | OSPRay raytracing                            |
+| ---------------------------------------------- | -------------------------------------------- |
+| ![raytracing off](./images/raytracing_off.png) | ![raytracing on](./images/raytracing_on.png) |
+
+### `--anari-library=<name>` (_string_)
+
+Select the Anari library to use.
+If not specified, the library is selected from the value of the `ANARI_LIBRARY` environment variable.
+
 ### `-D`, `--define=<libf3d.option=value>` (_special_)
 
 A repeatable option to set [libf3d](../libf3d/03-OPTIONS.md) and [reader](02-SUPPORTED_FORMATS.md#reader-options) option manually. May trigger unexpected behavior.
@@ -794,7 +814,7 @@ _Adjust the intensity_ of every light in the scene, including HDRI image-based l
 
 ## Scientific visualization options
 
-### `-s`, `--coloring-mode` (_string_, default: `material`)
+### `-s`, `--coloring-mode` (_string_, default: `material`, implicit: `scivis`)
 
 Specify the coloring mode.
 _material_ means default file materials (textured or solid color)
@@ -975,16 +995,6 @@ Apply an elevation transformation to the camera, in degrees, added after other c
 Set the camera to use the orthographic projection. Model-specified by default.
 
 ## Raytracing options
-
-### `-r`, `--raytracing` (_bool_, default: `false`)
-
-Enable _OSPRay raytracing_. Requires OSPRay raytracing to be enabled in the linked VTK dependency.
-
-#### compare
-
-| OFF                                            | ON                                           |
-| ---------------------------------------------- | -------------------------------------------- |
-| ![raytracing off](./images/raytracing_off.png) | ![raytracing on](./images/raytracing_on.png) |
 
 ### `--raytracing-samples=<samples>` (_int_, default: `5`)
 

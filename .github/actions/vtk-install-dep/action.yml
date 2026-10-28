@@ -51,6 +51,15 @@ runs:
       shell: bash
       run: echo "VTK_VERSION=${{inputs.vtk_version}}" >> $GITHUB_ENV
 
+    - name: Extract anari version
+      if: inputs.optdeps_label == 'optdeps'
+      id: anari_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: anari
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
     - name: Extract zlib version
       id: zlib_ver
       uses: f3d-app/extract-version-action@main
@@ -169,7 +178,7 @@ runs:
       uses: actions/cache/restore@v6
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_VERSION}}-${{steps.zlib_ver.outputs.extract}}-${{steps.blosc_ver.outputs.extract}}-${{steps.tbb_ver.outputs.extract}}${{ steps.openvdb_ver.outputs.extract != '' && format('-openvdb-{0}', steps.openvdb_ver.outputs.extract) || '' }}${{ steps.ospray_ver.outputs.extract != '' && format('-ospray-{0}', steps.ospray_ver.outputs.extract) || '' }}${{ steps.curl_ver.outputs.extract != '' && format('-curl-{0}', steps.curl_ver.outputs.extract) || '' }}${{ steps.gdal_ver.outputs.extract != '' && format('-gdal-{0}', steps.gdal_ver.outputs.extract) || '' }}${{ steps.geotiff_ver.outputs.extract != '' && format('-geotiff-{0}', steps.geotiff_ver.outputs.extract) || '' }}${{ steps.pdal_ver.outputs.extract != '' && format('-pdal-{0}', steps.pdal_ver.outputs.extract) || '' }}${{ steps.proj_ver.outputs.extract != '' && format('-proj-{0}', steps.proj_ver.outputs.extract) || '' }}${{ steps.sqlite_csb_ver.outputs.extract != '' && format('-sqlite-{0}', steps.sqlite_csb_ver.outputs.extract) || '' }}${{ steps.tiff_ver.outputs.extract != '' && format('-tiff-{0}', steps.tiff_ver.outputs.extract) || '' }}${{ inputs.gles_label == 'gles' && '-gles' || '' }}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-6
+        key: vtk-${{env.VTK_VERSION}}-${{steps.zlib_ver.outputs.extract}}-${{steps.blosc_ver.outputs.extract}}-${{steps.tbb_ver.outputs.extract}}${{ steps.openvdb_ver.outputs.extract != '' && format('-openvdb-{0}', steps.openvdb_ver.outputs.extract) || '' }}${{ steps.anari_ver.outputs.extract != '' && format('-anari-{0}', steps.anari_ver.outputs.extract) || '' }}${{ steps.ospray_ver.outputs.extract != '' && format('-ospray-{0}', steps.ospray_ver.outputs.extract) || '' }}${{ steps.curl_ver.outputs.extract != '' && format('-curl-{0}', steps.curl_ver.outputs.extract) || '' }}${{ steps.gdal_ver.outputs.extract != '' && format('-gdal-{0}', steps.gdal_ver.outputs.extract) || '' }}${{ steps.geotiff_ver.outputs.extract != '' && format('-geotiff-{0}', steps.geotiff_ver.outputs.extract) || '' }}${{ steps.pdal_ver.outputs.extract != '' && format('-pdal-{0}', steps.pdal_ver.outputs.extract) || '' }}${{ steps.proj_ver.outputs.extract != '' && format('-proj-{0}', steps.proj_ver.outputs.extract) || '' }}${{ steps.sqlite_csb_ver.outputs.extract != '' && format('-sqlite-{0}', steps.sqlite_csb_ver.outputs.extract) || '' }}${{ steps.tiff_ver.outputs.extract != '' && format('-tiff-{0}', steps.tiff_ver.outputs.extract) || '' }}${{ inputs.gles_label == 'gles' && '-gles' || '' }}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-8
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -204,6 +213,7 @@ runs:
       # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160 and
       # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10393
       # CMAKE_MODULE_PATH is not used because OpenVDB_CMAKE_PATH seems to be the canonical way to handle this with VTK
+      # AnariOpenGL module only available since 9.7.20260914 (https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13561)
     - name: Configure VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/vtk_build
@@ -244,6 +254,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_ImagingHybrid=YES
         -DVTK_MODULE_ENABLE_VTK_InteractionStyle=YES
         -DVTK_MODULE_ENABLE_VTK_InteractionWidgets=YES
+        -DVTK_MODULE_ENABLE_VTK_RenderingAnariOpenGL=${{ (inputs.optdeps_label == 'optdeps' && inputs.vtk_version == 'commit') && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_RenderingAnnotation=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingCore=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingGridAxes=YES
