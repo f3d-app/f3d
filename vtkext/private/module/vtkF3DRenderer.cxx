@@ -3586,18 +3586,18 @@ void vtkF3DRenderer::UpdateLightRepresentations()
   }
 
   // remove unwanted light representations
-  for (auto it = LightRepresentations.begin(); it != LightRepresentations.end();)
+  for (auto repItr = LightRepresentations.begin(); repItr != LightRepresentations.end();)
   {
-    if (visitedLights.count(it->first))
+    if (visitedLights.count(repItr->first))
     {
-      it++;
+      repItr++;
       continue;
     }
 
     // safely removing the widget and representation
-    it->second.widget->Off();
+    repItr->second.widget->Off();
 
-    it = LightRepresentations.erase(it);
+    repItr = LightRepresentations.erase(repItr);
   }
 }
 
