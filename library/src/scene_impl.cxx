@@ -1076,6 +1076,22 @@ animation& scene_impl::getAnimation()
 }
 
 //----------------------------------------------------------------------------
+double scene_impl::animationTime()
+{
+  return this->Internals->Animation->GetCurrentTime();
+}
+
+//----------------------------------------------------------------------------
+size_t scene_impl::animationFrame()
+{
+  assert(this->Internals->Interactor);
+  assert(this->Internals->Animation);
+
+  this->Internals->Animation->SetDeltaTime(this->Internals->Interactor->getDeltaTime());
+  return this->Internals->Animation->GetCurrentFrame();
+}
+
+//----------------------------------------------------------------------------
 animation_impl& scene_impl::GetAnimationImpl()
 {
   return *this->Internals->Animation;

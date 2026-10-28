@@ -517,6 +517,30 @@ int f3d_scene_add_buffer(f3d_scene_t* scene, void* buffer, size_t size)
 }
 
 //----------------------------------------------------------------------------
+double f3d_scene_animation_time(f3d_scene_t* scene)
+{
+  if (!scene)
+  {
+    return 0.0;
+  }
+
+  f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
+  return cpp_scene->animationTime();
+}
+
+//----------------------------------------------------------------------------
+size_t f3d_scene_animation_frame(f3d_scene_t* scene)
+{
+  if (!scene)
+  {
+    return 0;
+  }
+
+  f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
+  return cpp_scene->animationFrame();
+}
+
+//----------------------------------------------------------------------------
 int f3d_scene_add_light(const f3d_scene_t* scene, const f3d_light_state_t* light_state)
 {
   if (!scene || !light_state)

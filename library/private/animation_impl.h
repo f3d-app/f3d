@@ -91,9 +91,21 @@ public:
 
   /**
    * Implementation only API
+   * Return the current animation frame number
+   */
+  size_t GetCurrentFrame() const;
+
+  /**
+   * Implementation only API
    *Set the animation in delta time in seconds
    */
   void SetDeltaTime(double deltaTime);
+
+  /**
+   * Implementation only API
+   * Return the animation delta time in seconds
+   */
+  double GetDeltaTime() const;
 
   /**
    * Implementation only API
