@@ -58,3 +58,10 @@ f3d_plugin_build(
   RESOURCES "lib/usd/f3d/resources/plugInfo.json"
   FREEDESKTOP
 )
+
+# When built with emscripten, the default resource path in OpenUSD is /usd in the virtual filesystem
+if(EMSCRIPTEN)
+  target_link_options(f3d-plugin-usd PUBLIC
+    "SHELL:--embed-file=${CMAKE_CURRENT_SOURCE_DIR}/resources/plugInfo.json@/usd/f3d/resources/plugInfo.json"
+  )
+endif()
