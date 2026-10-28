@@ -1,13 +1,9 @@
 {
   "$comments": [
-    "Alembic is part of VFX reference platform (CY2026: 1.8.x)",
     "Java version is fixed at 26 until we drop macos-intel support",
     "OSPRay is fixed at 2.12.0 until full support for OSPRay 3.0 is added in VTK",
-    "OpenEXR is part of VFX reference platform (CY2026: 3.4.x)",
     "OpenEXR v3.0.1 is actually not using OpenJPH",
-    "OpenVDB is part of VFX reference platform (CY2025: 13.x)",
     "OpenVDB min version is not enforced by F3D code and missing from VTK code",
-    "Python is part of VFX reference platform (CY2026: 3.13)",
     "TBB is set at v2021.13.1 because OpenUSD seems to not support more recent versions: https://github.com/PixarAnimationStudios/OpenUSD/issues/3878 and https://github.com/PixarAnimationStudios/OpenUSD/issues/4078",
     "libx264 is using git hash because there are no proper releases",
     "mesa is fixed at 25.0.7 because OSMesa has been removed from 25.1.0",
@@ -80,7 +76,7 @@
     "min_version": "0.27.3"
   },
   "openvdb": {
-    "version": "v13.1.0",
+    "version": "v13.2.0",
     "min_version": "v12.0.0"
   },
   "ospray": {
@@ -108,7 +104,7 @@
     "min_version": "bb237f11ca039bd01314bb2252eb282086723c18"
   },
   "tbb": {
-    "version": "v2021.13.1",
+    "version": "v2023.2.0",
     "min_version": "v2021.10.0"
   },
   "tiff": {
@@ -116,7 +112,7 @@
     "min_version": "v4.2.0"
   },
   "usd": {
-    "version": "v26.11",
+    "version": "v26.11.1",
     "min_version": "v24.08"
   },
   "webifc": {
@@ -136,7 +132,7 @@
     "min_version": "v1.2.13"
   },
   "vtk_commit_sha": "dbb73e9cc80d20821ae63949c5f80e72fa5ea240",
-  "docker_timestamp": "20261026_0",
+  "docker_timestamp": "20261028_0",
   "global_cache_index": "3",
   "vtk_matrix": "['commit', 'v9.7.1', 'v9.6.2', 'v9.5.2']"
 }
