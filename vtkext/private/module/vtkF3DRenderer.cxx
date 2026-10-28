@@ -3540,7 +3540,7 @@ void vtkF3DRenderer::UpdateLightRepresentations()
   for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
   {
     // ignore camera lights
-    int lightType = light->GetLightType();
+    const int lightType = light->GetLightType();
     if (lightType == VTK_LIGHT_TYPE_CAMERA_LIGHT || lightType == VTK_LIGHT_TYPE_HEADLIGHT)
     {
       continue;
