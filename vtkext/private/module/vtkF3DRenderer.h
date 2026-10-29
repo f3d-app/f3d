@@ -207,7 +207,7 @@ public:
    * Set/Get RotationAxis
    */
   void SetRotationAxis(const std::optional<std::array<double, 3>>& axis);
-  std::optional<std::array<double, 3>> GetRotationAxis() const;
+  const std::optional<std::array<double, 3>>& GetRotationAxis() const;
   ///@}
 
   /**

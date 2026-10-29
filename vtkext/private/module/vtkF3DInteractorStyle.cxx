@@ -157,9 +157,10 @@ void vtkF3DInteractorStyle::Rotate()
 
   constexpr double maxAbsElevation = 90 - 1e-10;
 
-  if (ren->GetRotationAxis().has_value())
+  const auto& rotationAxis = ren->GetRotationAxis();
+  if (rotationAxis.has_value())
   {
-    const auto& axis = ren->GetRotationAxis().value();
+    const auto axis = rotationAxis.value();
 
     double delta = (std::abs(rxf) > std::abs(ryf) ? rxf : ryf);
 

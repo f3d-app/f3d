@@ -2389,7 +2389,7 @@ void vtkF3DRenderer::SetRotationAxis(const std::optional<std::array<double, 3>>&
 }
 
 //----------------------------------------------------------------------------
-std::optional<std::array<double, 3>> vtkF3DRenderer::GetRotationAxis() const
+const std::optional<std::array<double, 3>>& vtkF3DRenderer::GetRotationAxis() const
 {
   return this->RotationAxis;
 }
