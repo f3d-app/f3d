@@ -29,18 +29,18 @@ public class TestInteractor {
   private String testCommand = null;
 
   @BeforeEach
-  public void engineLoad(){
+  public void engineLoad() {
     Engine.autoloadPlugins();
     engine = Engine.create(true);
     interactor = engine.getInteractor();
   }
   @AfterEach
-  public void closeEngine(){
+  public void closeEngine() {
     engine.close();
   }
 
   @Test
-  public void testAddCommand(){
+  public void testAddCommand() {
     List<String> testingString = interactor.getCommandActions();
     assertNotNull(testingString,"List of commands should not be null");
     interactor.addCommand("test::hello", command -> {System.out.println("This is testing command");});
@@ -48,7 +48,7 @@ public class TestInteractor {
   }
 
   @Test
-  public void testExecteAddedCommand(){
+  public void testExecteAddedCommand() {
     interactor.addCommand("test::hello", command -> {testCommand = "Success";});
     boolean triggerCommand = interactor.triggerCommand("test::hello");
     assertNotNull(testCommand,"Test String should not be null");
@@ -58,7 +58,7 @@ public class TestInteractor {
   }
 
   @Test
-  public void testRemoveAddedCommand(){
+  public void testRemoveAddedCommand() {
     List<String> listCommands = interactor.getCommandActions();
     interactor.addCommand("test::hello", command -> {testCommand = "Success";});
     interactor.removeCommand("test::hello");
@@ -66,7 +66,7 @@ public class TestInteractor {
   }
 
   @Test
-  public void testBindKey(){
+  public void testBindKey() {
     Interactor.InteractionBind testingBind = new Interactor.InteractionBind();
     testingBind.inter = "A";
     testingBind.format();
@@ -75,7 +75,7 @@ public class TestInteractor {
   }
 
   @Test
-  public void testDifferentModBindKey(){
+  public void testDifferentModBindKey() {
     Interactor.InteractionBind testingBind = new Interactor.InteractionBind();
     testingBind.inter = "A";
     testingBind.mod = Interactor.ModifierKeys.CTRL;
@@ -97,7 +97,7 @@ public class TestInteractor {
   }
 
   @Test
-  public void testParseMethod(){
+  public void testParseMethod() {
     Interactor.InteractionBind parsed = Interactor.InteractionBind.parse("A");
     assertEquals("A", parsed.inter.toString(),"Parse method key should be equal to value set (A)");
     assertEquals("NONE", parsed.mod.toString(),"Parse modifier key should be equal to value set (NONE)");
@@ -117,7 +117,7 @@ public class TestInteractor {
   }
 
   @Test
-  public void testCompareTo(){
+  public void testCompareTo() {
     Interactor.InteractionBind testingBind = new Interactor.InteractionBind();
     testingBind.inter = "A";
     Interactor.InteractionBind parsed = Interactor.InteractionBind.parse("A");
@@ -129,7 +129,7 @@ public class TestInteractor {
   }
 
   @Test
-  public void testEquals(){
+  public void testEquals() {
     Interactor.InteractionBind testingBind = new Interactor.InteractionBind();
     testingBind.inter = "A";
     Interactor.InteractionBind parsed = Interactor.InteractionBind.parse("A");
@@ -141,7 +141,7 @@ public class TestInteractor {
   }
 
   @Test
-  public void testHashCode(){
+  public void testHashCode() {
     Interactor.InteractionBind testingBind = new Interactor.InteractionBind();
     testingBind.inter = "A";
     int testHash[] = new int[5];
@@ -153,7 +153,7 @@ public class TestInteractor {
   }
 
   @Test
-  public void testAddExistingBinding(){
+  public void testAddExistingBinding() {
     Interactor.InteractionBind testingBind = new Interactor.InteractionBind();
     testingBind.inter = "A";
     testingBind.format();
@@ -165,7 +165,7 @@ public class TestInteractor {
   }
 
   @Test
-  public void testAddBinding(){
+  public void testAddBinding() {
     Interactor.InteractionBind testingBind = new Interactor.InteractionBind();
     testingBind.inter = "l";
     testingBind.format();
@@ -182,7 +182,7 @@ public class TestInteractor {
   }
 
   @Test
-  public void testGroupBindings(){
+  public void testGroupBindings() {
     Interactor.InteractionBind repeatBind = new Interactor.InteractionBind();
     repeatBind.mod = Interactor.ModifierKeys.NONE;
     repeatBind.inter = "R";
@@ -198,7 +198,7 @@ public class TestInteractor {
   }
 
   @Test
-  public void testAnimationControls(){
+  public void testAnimationControls() {
     assertDoesNotThrow(() -> {
       interactor.startAnimation();
       assertTrue(interactor.isPlayingAnimation(), "Animation should be playing after start");
@@ -217,7 +217,7 @@ public class TestInteractor {
   }
 
   @Test
-  public void testAnimationDirectionEnum(){
+  public void testAnimationDirectionEnum() {
     assertNotNull(Interactor.AnimationDirection.FORWARD.getValue(), "Value of animation should not be null (Forward)");
     assertNotNull(Interactor.AnimationDirection.BACKWARD.getValue(), "Value of animation should not be null (Forward)");
 
@@ -228,7 +228,7 @@ public class TestInteractor {
   // This needs more testing because there is no documentation on what is in bindStr and output of these values are mapped wrong
   @Test
   @Disabled("This needs more testing on how setNotificationCallback binds parameters")
-  public void testNotificationCallbackValues(){
+  public void testNotificationCallbackValues() {
     final String[] capturedDesc = new String[1];
     final String[] capturedValue = new String[1];
     final String[] capturedBindStr = new String[1];
@@ -254,7 +254,7 @@ public class TestInteractor {
   }
 
   @Test
-  public void testCameraMovementAndRender(){
+  public void testCameraMovementAndRender() {
     assertDoesNotThrow(() -> {
       interactor.disableCameraMovement();
       interactor.enableCameraMovement();
@@ -263,7 +263,7 @@ public class TestInteractor {
   }
 
   @Test
-  public void testInteractorMethodChaining(){
+  public void testInteractorMethodChaining() {
     assertDoesNotThrow(() -> {
       interactor.toggleAnimation()
              .enableCameraMovement();

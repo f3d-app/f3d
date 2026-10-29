@@ -11,7 +11,7 @@ import app.f3d.F3D.Types.Mesh.ValidationResult;
 public class TestTypes {
 
   @Test
-  public void testLightTypeEnum(){
+  public void testLightTypeEnum() {
     Types.LightType lightType = Types.LightType.SCENE_LIGHT;
     assertNotNull(lightType.getValue(), "LightType value should not be null");
 
@@ -22,14 +22,14 @@ public class TestTypes {
   }
 
   @Test
-  public void testLightTypeException(){
+  public void testLightTypeException() {
     assertThrows(IllegalArgumentException.class, () -> {
       Types.LightType.fromValue(-1);
     },"Inputting wrong LightType should result in IllegalArgumentException");
   }
 
   @Test
-  public void testLightStateConstructors(){
+  public void testLightStateConstructors() {
     Types.LightState defaultLight = new Types.LightState();
     assertNotNull(defaultLight, "Default LightState should not be null");
 

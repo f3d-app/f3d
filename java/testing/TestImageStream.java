@@ -7,14 +7,15 @@ import app.f3d.F3D.*;
 public class TestImageStream {
 
   @Test
-  public void testSaveBufferObject(){
+  public void testSaveBufferObject() {
     Image img = new Image(300,200,3);
     byte[] imgBuffer = img.saveBuffer(Image.SaveFormat.PNG);
     assertNotNull(imgBuffer,"Buffer from image should not be null");
     img.delete();
   }
+  
   @Test
-  public void testSaveBufferToImage(){
+  public void testSaveBufferToImage() {
     Image fromImg = new Image(300,200,3);
     byte[] imgBuffer = fromImg.saveBuffer(Image.SaveFormat.PNG);
     Image toImg = new Image(imgBuffer);

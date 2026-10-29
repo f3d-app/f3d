@@ -26,21 +26,19 @@ public class TestOptions {
   private Options options;
 
   @BeforeEach
-  public void setUp(){
+  public void setUp() {
     Engine.autoloadPlugins();
     engine = Engine.createNone();
     options = engine.getOptions();
   }
 
   @AfterEach
-  public void tearDown(){
-    if (engine != null){
+  public void tearDown() {
       engine.close();
-    }
   }
 
   @Test
-  public void testBooleanOptions(){
+  public void testBooleanOptions() {
     options.setAsBool("ui.scalar_bar", true);
     assertTrue(options.getAsBool("ui.scalar_bar"), "Option should be true");
 
@@ -49,32 +47,32 @@ public class TestOptions {
   }
 
   @Test
-  public void testIntOptions(){
+  public void testIntOptions() {
     options.setAsInt("model.scivis.component", 5);
     assertEquals(5, options.getAsInt("model.scivis.component"), "Integer option value should match");
   }
 
   @Test
-  public void testDoubleOptions(){
+  public void testDoubleOptions() {
     options.setAsDouble("render.line_width", 2.0);
     assertEquals(2.0, options.getAsDouble("render.line_width"), "Double option value should match");
   }
 
   @Test
-  public void testStringOptions(){
+  public void testStringOptions() {
     options.setAsString("model.color.texture", "test.png");
     assertEquals("test.png", options.getAsString("model.color.texture"), "String option value should match");
   }
 
   @Test
-  public void testDoubleVectorOptions(){
+  public void testDoubleVectorOptions() {
     double[] vec = new double[]{1.0, 2.0, 3.0};
     options.setAsDoubleVector("render.background.color", vec);
     assertArrayEquals(vec, options.getAsDoubleVector("render.background.color"),"Double vector options should match");
   }
 
   @Test
-  public void testIntVectorOptions(){
+  public void testIntVectorOptions() {
     int[] vec = new int[]{1, 2};
     options.setAsIntVector("scene.animation.indices", vec);
     assertArrayEquals(vec, options.getAsIntVector("scene.animation.indices"), "Int vector options should match");
@@ -82,14 +80,14 @@ public class TestOptions {
 
   @Test
   @Disabled ("Function getAsStringRepresentation is return 2 different values for 5.0 -> 5 and for 5.3 -> 5.3, the return value should be uniformed")
-  public void testStringRepresentationOptions(){
+  public void testStringRepresentationOptions() {
     options.setAsStringRepresentation("render.point_size", "5.0");
     assertEquals("5.0", options.getAsStringRepresentation("render.point_size"), "String representation should match");
   }
 
   @Test // getAllNames in not dependant on anything, it can return null or list so i don not know how to make a test for it
   // isOptional is not stated how it is determining the value so i can not make a test for it
-  public void testIntrospectionAndQueries(){
+  public void testIntrospectionAndQueries() {
     options.setAsBool("ui.scalar_bar", true);
     assertTrue(options.hasValue("ui.scalar_bar"), "Function hasValue should return true for ui.scalar_bar");
     assertNotNull(options.getNames(), "Base names list should not be null");
@@ -99,7 +97,7 @@ public class TestOptions {
   }
 
   @Test
-  public void testOptionsCopy(){
+  public void testOptionsCopy() {
     options.setAsBool("ui.scalar_bar", true);
     Engine engineToCopy = Engine.create(true);
     Options optionsToCopy = engineToCopy.getOptions();
@@ -110,7 +108,7 @@ public class TestOptions {
   }
 
   @Test
-  public void testReset(){
+  public void testReset() {
     options.setAsInt("model.scivis.component", 5);
     assertEquals(5,options.getAsInt("model.scivis.component"),"Option should be value of setter");
     options.reset("model.scivis.component");
@@ -118,7 +116,7 @@ public class TestOptions {
   }
 
   @Test
-  public void testRemove(){
+  public void testRemove() {
     options.setAsString("model.color.texture", "test.png");
     assertEquals("test.png", options.getAsString("model.color.texture"),"Value of string option should be equal to set value");
     options.removeValue("model.color.texture");
@@ -127,7 +125,7 @@ public class TestOptions {
 
   @Test // options for increase, decrease and cycle have no value returning so it can not be checked explicitly
   @Disabled("Index is null for domain with fresh options")
-  public void testDomains(){
+  public void testDomains() {
     assertTrue(options.hasDomain("scene.camera.index"),"Option hasDomain should not be null");
     assertNotNull(options.getDomainStyle("scene.camera.index"),"Option DomainStyle should not be null");
     assertNotNull(options.getRangeDomainAsDouble("render.line_width"),"Option RangeDomainAsDouble should not be null");
@@ -142,14 +140,14 @@ public class TestOptions {
   }
 
   @Test
-  public void testInexistentOptionThrowsException(){
+  public void testInexistentOptionThrowsException() {
     assertThrows(Options.InexistentException.class, () -> {
       options.setAsBool("this.option.does.not.exist.at.all", true);
     }, "Setting a nonexistent option should throw Options.InexistentException");
   }
 
   @Test
-  public void testIncompatibleTypeThrowsException(){
+  public void testIncompatibleTypeThrowsException() {
     options.setAsDoubleVector("render.background.color", new double[]{1.0, 2.0, 3.0});
 
     assertThrows(Options.IncompatibleException.class, () -> {

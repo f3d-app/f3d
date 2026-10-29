@@ -24,7 +24,7 @@ public class TestWindow {
   private Window window;
 
   @BeforeEach
-  public void setUp(){
+  public void setUp() {
     Engine.autoloadPlugins();
     engine = Engine.create(true);
     window = engine.getWindow();
@@ -32,13 +32,11 @@ public class TestWindow {
 
   @AfterEach
   public void tearDown(){
-    if (engine != null) {
       engine.close();
-    }
   }
 
   @Test
-  public void testWindowBasicProperties(){
+  public void testWindowBasicProperties() {
     assertDoesNotThrow(() -> {
       window.setUseHDRICache(true);
       assertNotNull(window.getType(),"Window type should not be null");
@@ -52,13 +50,13 @@ public class TestWindow {
   }
 
   @Test
-  public void testDPI(){
+  public void testDPI() {
     double dpiScale = window.getDPIScale();
     assertTrue(dpiScale >= 1.0, "DPI scale should be at greater or at least 1.0, but got " + dpiScale);
   }
 
   @Test // I can not find how the variable in renderToImage is working
-  public void testRenderToImage(){
+  public void testRenderToImage() {
     window.render();
 
     Image img = window.renderToImage(true);
@@ -75,7 +73,7 @@ public class TestWindow {
   }
 
   @Test
-  public void testWindowResize(){
+  public void testWindowResize() {
     window.setSize(800, 600);
     int[] size = window.getSize();
     assertNotNull(size, "Window size array should not be null");
@@ -89,7 +87,7 @@ public class TestWindow {
   }
 
   @Test
-  public void testWindowPosition(){
+  public void testWindowPosition() {
     window.setPosition(100, 100);
     window.render();
 
@@ -103,7 +101,7 @@ public class TestWindow {
   }
 
   @Test // There are not getters for Icon and WindowsName so this test only check if nothing throws exception
-  public void testWindowIconAndName(){
+  public void testWindowIconAndName() {
     byte[] icon = new byte[]{1, 2, 3, 4};
     assertDoesNotThrow(() -> {
       window.setIcon(icon);
@@ -112,7 +110,7 @@ public class TestWindow {
   }
 
   @Test // There are not getters so checking if they return what they should is not possible, only checking if throw exception is not applied
-  public void testCoordinateTransformations(){
+  public void testCoordinateTransformations() {
     assertDoesNotThrow(() -> {
       double[] worldPoint = new double[]{0.0, 0.0, 0.0};
       window.getDisplayFromWorld(worldPoint);
@@ -123,7 +121,7 @@ public class TestWindow {
   }
 
   @Test // There are no getters to see if these actions are valid, only checking if nothing throws exception
-  public void testWindowMethodChaining(){
+  public void testWindowMethodChaining() {
     assertDoesNotThrow(() -> {
       window.setSize(1024, 768)
            .setPosition(50, 50)

@@ -76,7 +76,7 @@ public class TestUtils {
   }
 
   @Test
-  public void testFromValueError(){
+  public void testFromValueError() {
     assertThrows(IllegalArgumentException.class, () -> {
       Utils.KnownFolder.fromValue(-1);
     },"Unknown folder should throw IllegalArgumentException");

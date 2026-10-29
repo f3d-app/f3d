@@ -29,29 +29,28 @@ public class TestCamera {
 
   // Making and unmaking of test classes
   @BeforeEach
-  public void setUp(){
+  public void setUp() {
     Engine.autoloadPlugins();
     engine = Engine.create(true);
     window = engine.getWindow();
     camera = window.getCamera();
   }
-  @AfterEach
-  public void clearTestEngine(){
-    if(engine != null)
-      engine.close();
-  }
 
+  @AfterEach
+  public void clearTestEngine() {
+    engine.close();
+  }
 
   // Check if camera is created correctly
   @Test
-  public void checkOfCreatingCamera(){
+  public void checkOfCreatingCamera() {
     assertNotNull(engine,"Engine should be created");
     assertNotNull(window,"Window of engine should be created");
     assertNotNull(camera,"Camera of window should be created");
   }
 
   // Helper method for checking coordinates for camera testing
-  private void assertionTests(Class<?> testedClass, double[] setPos, double[] getPos, String testingFunction){
+  private void assertionTests(Class<?> testedClass, double[] setPos, double[] getPos, String testingFunction) {
     String nameOfClass = testedClass.getSimpleName();
     assertNotNull(getPos,"Get of " + nameOfClass + " position should not be null");
     assertEquals(setPos[0], getPos[0], 0.00001 , "First position[0] of " + nameOfClass + " should be same to set and get method (Function: " + testingFunction + ")");
@@ -60,7 +59,7 @@ public class TestCamera {
   }
 
   @Test
-  public void testCameraPosition(){
+  public void testCameraPosition() {
     double[] setPos = new double[]{1.0,2.0,3.0};
     camera.setPosition(setPos);
     double[] getPos = camera.getPosition();
@@ -69,7 +68,7 @@ public class TestCamera {
   }
 
   @Test
-  public void testCameraFocalPoint(){
+  public void testCameraFocalPoint() {
     double[] setPos = new double[]{0.5,0.6,0.7};
     camera.setFocalPoint(setPos);
     double[] getPos = camera.getFocalPoint();
@@ -78,7 +77,7 @@ public class TestCamera {
   }
 
   @Test
-  public void testViewUp(){
+  public void testViewUp() {
     double[] setPos = new double[]{0.0,1.0,0.0};
     camera.setViewUp(setPos);
     double[] getPos = camera.getViewUp();
@@ -87,7 +86,7 @@ public class TestCamera {
   }
 
   @Test
-  public void testViewAngle(){
+  public void testViewAngle() {
     double setPos = 45.0;
     camera.setViewAngle(setPos);
     double getPos = camera.getViewAngle();
@@ -98,7 +97,7 @@ public class TestCamera {
 
   @Test
   @Disabled("view up state is returning wrong value")
-  public void testCameraState(){
+  public void testCameraState() {
     double[] setPosition = new double[]{2.0, 3.0, 4.0};
     double[] setFocalPoint = new double[]{1.0, 1.0, 1.0};
     double[] setViewUp = new double[]{0.0, 1.0, 0.0};
@@ -118,7 +117,7 @@ public class TestCamera {
   }
 
   @Test // These two tests have exception rule but more or less they are still smoke tests because i do not have means to validate if before and after operation are equal
-  public void testCameraManipulation(){
+  public void testCameraManipulation() {
     assertDoesNotThrow(() -> {
       camera.dolly(1.5);
       camera.pan(0.1, 0.2, 0.3);
@@ -138,7 +137,7 @@ public class TestCamera {
   }
 
   @Test
-  public void testCustomCamera(){
+  public void testCustomCamera() {
     assertDoesNotThrow(() -> {
         camera.setPosition(new double[]{1.0, 1.0, 1.0})
           .setFocalPoint(new double[]{0.0, 0.0, 0.0})

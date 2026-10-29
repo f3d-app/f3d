@@ -34,19 +34,17 @@ public class TestVideo {
 
   @AfterEach
   public void tearDown() {
-    if (engine != null) {
       engine.close();
-    }
   }
 
   @Test
-  public void testAvailableEncoders(){
+  public void testAvailableEncoders() {
     Iterable<VideoEncoder.StringPair> encoders = VideoEncoder.getAvailableEncoders();
     assertNotNull(encoders, "Available video encoders list should not be null");
   }
 
   @Test
-  public void testParams(){
+  public void testParams() {
     window.render();
     VideoEncoder.Params params = new VideoEncoder.Params();
     assertNotNull(params,"Params should not be null");
@@ -59,7 +57,7 @@ public class TestVideo {
   }
 
   @Test
-  public void testAtomicBoolean(){
+  public void testAtomicBoolean() {
     AtomicBoolean packetReceived = new AtomicBoolean(false);
     assertNotNull(packetReceived,"Atomic boolean should not be null");
     assertFalse(packetReceived.get(), "Atomic value should be false");
@@ -67,7 +65,7 @@ public class TestVideo {
 
   @Test
   @Disabled("As of now, this test can not be completed because it needs f3d to be build with FFMPEG support and i can not achieve that at the moment, so it needs to be tested on another machine")
-  public void testVideoEncode(){
+  public void testVideoEncode() {
     window.render();
 
     VideoEncoder.Params params = new VideoEncoder.Params();

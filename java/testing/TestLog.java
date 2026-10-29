@@ -14,13 +14,13 @@ public class TestLog {
       messageReceived = true;
     }
 
-    public boolean isMessageReceived(){
+    public boolean isMessageReceived() {
       return messageReceived;
     }
   }
 
   @Test
-  public void testObjectMaking(){
+  public void testObjectMaking() {
     Log.VerboseLevel testLevel = Log.getVerboseLevel();
     assertNotNull(testLevel, "Verbose level should not be null");
     TestCallback callback = new TestCallback();
@@ -28,7 +28,7 @@ public class TestLog {
   }
 
   @Test
-  public void testVerboseLevelGetAndSet(){
+  public void testVerboseLevelGetAndSet() {
     Log.VerboseLevel originalLevel = Log.getVerboseLevel();
     try{
       Log.setVerboseLevel(Log.VerboseLevel.DEBUG);
@@ -42,7 +42,7 @@ public class TestLog {
 
   @Test
   @Disabled("There is no documentation on how boolean is affecting setter")
-  public void testVerboseLevelBooleanSetting(){
+  public void testVerboseLevelBooleanSetting() {
     Log.VerboseLevel originalLevel = Log.getVerboseLevel();
     try{
       // TODO
@@ -52,7 +52,7 @@ public class TestLog {
   }
 
   @Test // There is missing getter for use color setting so this only tests if operation of setting color does not throw exception
-  public void testColoringSetting(){
+  public void testColoringSetting() {
     assertDoesNotThrow(() -> {
       Log.setUseColoring(true);
       Log.setUseColoring(false);
@@ -60,7 +60,7 @@ public class TestLog {
   }
 
   @Test // For better testing i suggest print function to not be void but boolean so it is easier to check individual callings
-  public void testLogPrintingAndShorthands(){
+  public void testLogPrintingAndShorthands() {
     Log.VerboseLevel originalLevel = Log.getVerboseLevel();
     try{
       Log.setVerboseLevel(Log.VerboseLevel.DEBUG);
@@ -82,7 +82,7 @@ public class TestLog {
   }
 
   @Test // There should be some kind of return value or getter for verbose level with print function to see if it was correctly received
-  public void testForwardCallback(){
+  public void testForwardCallback() {
     TestCallback callback = new TestCallback();
     Log.forward(callback);
 
@@ -97,7 +97,7 @@ public class TestLog {
   }
 
   @Test
-  public void testVerboseLevelEnumValues(){
+  public void testVerboseLevelEnumValues() {
     assertNotNull(Log.VerboseLevel.DEBUG.getValue());
     assertNotNull(Log.VerboseLevel.INFO.getValue());
     assertNotNull(Log.VerboseLevel.WARN.getValue());
@@ -112,7 +112,7 @@ public class TestLog {
   }
 
   @Test
-  public void testIllegalArgumentFromValue(){
+  public void testIllegalArgumentFromValue() {
     assertThrows(IllegalArgumentException.class, () -> {
       Log.VerboseLevel.fromValue(-1);
     },"Making invalid verbose level from invalid value with fromValue should thor IllegalArgumentException");

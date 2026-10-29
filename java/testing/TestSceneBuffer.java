@@ -29,7 +29,7 @@ public class TestSceneBuffer {
   private Path pointsPlyPath;
 
   @BeforeEach
-  public void setUp(){
+  public void setUp() {
     Engine.autoloadPlugins();
     engine = Engine.createNone();
     scene = engine.getScene();
@@ -38,14 +38,12 @@ public class TestSceneBuffer {
   }
 
   @AfterEach
-  public void tearDown(){
-    if (engine != null) {
+  public void tearDown() {
       engine.close();
-    }
   }
 
   @Test
-  public void testScenePath(){
+  public void testScenePath() {
     assertTrue(Files.exists(pointsPlyPath), "points.ply file should exist on disk");
   }
 
@@ -57,7 +55,7 @@ public class TestSceneBuffer {
   }
 
   @Test
-  public void testOptions(){
+  public void testOptions() {
     Options options = engine.getOptions();
     options.setAsString("scene.force_reader", "PLYReader");
     assertEquals("PLYReader", options.getAsString("scene.force_reader"),"Force reader option should match PLYReader");
