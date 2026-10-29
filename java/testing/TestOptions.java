@@ -85,7 +85,7 @@ public class TestOptions {
     assertEquals("5.0", options.getAsStringRepresentation("render.point_size"), "String representation should match");
   }
 
-  @Test // getAllNames in not dependant on anything, it can return null or list so i don not know how to make a test for it
+  @Test // getAllNames is not dependent on anything, it can return null or list so i don not know how to make a test for it
   // isOptional is not stated how it is determining the value so i can not make a test for it
   public void testIntrospectionAndQueries() {
     options.setAsBool("ui.scalar_bar", true);

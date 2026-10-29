@@ -1,7 +1,5 @@
 {
-  "files": [
-    "E:/ESS/dev/f3d/src/testing/data/cow.vtp"
-  ],
+  "files": ["E:/ESS/dev/f3d/src/testing/data/cow.vtp"],
   "options": {
     "interactor.invert_zoom": "false",
     "interactor.style": "default",

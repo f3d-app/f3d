@@ -46,7 +46,7 @@ public class TestImage {
     assertArrayEquals(buffer, img.getContent(), "Content of image should be modified");
   }
 
-  // i cant find how this operates so i can not make test
+  // i can not find how this operates so i can not make test
   @Test
   public void testNormalizedPixels() {
     //img = new Image(300,200,3);
