@@ -1,5 +1,16 @@
 import app.f3d.F3D.*;
 
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.io.IOException;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 public class TestEngine {
 
   // On Windows, try to load opengl32 from Java path
@@ -15,123 +26,146 @@ public class TestEngine {
     }
   }
 
-  public static void main(String[] args) {
+  private Engine engine;
+
+  @BeforeEach
+  public void setUp(){
     Engine.autoloadPlugins();
-
-    Engine eng1 = Engine.create(true);
-    eng1.close();
-
-    Engine eng2 = Engine.create();
-    eng2.close();
-
-    Engine eng3 = Engine.createNone();
-    eng3.close();
-
-    Engine.loadPlugin("native");
-
-    Engine.getPluginsList(".");
-
-    Engine.getAllReaderOptionNames();
-
-    Engine.getLibInfo();
-
-    Engine.getReadersInfo();
-
-    Engine.getRenderingBackendList();
-
-    Engine engine = Engine.create(true);
-
-    engine.setCachePath("/tmp/f3d_test");
-    if (!engine.getCachePath().equals("/tmp/f3d_test")) {
-      throw new RuntimeException("getCachePath should return the path set with setCachePath");
-    }
-
-    engine.getOptions();
-
-    engine.getScene();
-
-    engine.getWindow();
-
-    engine.getInteractor();
-
-    engine.close();
-
-    // --- Exception handling tests ---
-
-    // Engine.createNone() has no interactor; calling getInteractor() must throw
-    // NoInteractorException and must NOT crash the JVM.
-    try (Engine noWinEngine = Engine.createNone()) {
-      noWinEngine.getInteractor();
-      throw new RuntimeException("Expected Engine.NoInteractorException was not thrown");
-    } catch (Engine.NoInteractorException e) {
-    }
-
-    // Loading a nonexistent plugin must throw PluginException.
-    try {
-      Engine.loadPlugin("__nonexistent_plugin_f3d_test__");
-      throw new RuntimeException("Expected Engine.PluginException was not thrown");
-    } catch (Engine.PluginException e) {
-    }
-
-    testStatefile(args);
   }
 
-  // Set an option, add a file, save the state then restore it into a fresh engine and check both
-  // the option and the loaded scene are restored, through both the file and the string API
-  static void testStatefile(String[] args) {
-    String dataDir = args.length > 0 ? args[0] : "";
-    String tempDir = args.length > 1 ? args[1] : "";
-    String cow = dataDir + "data/cow.vtp";
-    String statefile = tempDir + "TestEngineJavaStatefile.json";
+  @AfterEach
+  public void clearTestEngine(){
+    if(engine != null)
+      engine.close();
 
-    Engine src = Engine.createNone();
-    src.getOptions().setAsBool("ui.scalar_bar", true);
-    src.getScene().add(cow);
+  }
 
-    // File based round trip
-    try (Engine.State state = src.dump()) {
-      state.toFile(statefile);
+  @Test
+  public void testNativeCreateEngineTrue(){
+    // Use try-with-resources to guarantee proper cleanup
+    try (Engine eng = Engine.create(true)){
+      assertNotNull(eng, "Engine created with true should not be null");
     }
-    Engine dst = Engine.createNone();
-    try (Engine.State state = Engine.State.fromFile(statefile)) {
-      dst.load(state);
-    }
-    if (!dst.getOptions().getAsBool("ui.scalar_bar")) {
-      throw new RuntimeException("options should be restored from the statefile");
-    }
-    if (dst.getScene().getAddedFiles().size() != 1) {
-      throw new RuntimeException("scene should be restored from the statefile");
-    }
-    dst.close();
+  }
 
-    // String based round trip
-    String content;
-    try (Engine.State state = src.dump()) {
-      content = state.toString();
+  @Test
+  public void testNativeCreateEngineFalse(){
+    try (Engine eng = Engine.create()){
+      assertNotNull(eng, "Engine created with false should not be null");
     }
-    Engine dstStr = Engine.createNone();
-    try (Engine.State state = Engine.State.fromString(content)) {
-      dstStr.load(state);
-    }
-    if (!dstStr.getOptions().getAsBool("ui.scalar_bar")) {
-      throw new RuntimeException("options should be restored from the statefile string");
-    }
-    if (dstStr.getScene().getAddedFiles().size() != 1) {
-      throw new RuntimeException("scene should be restored from the statefile string");
-    }
-    dstStr.close();
+  }
 
-    // Reading an invalid statefile should throw
-    boolean threw = false;
-    try {
+  @Test
+  public void testNativeCreateEngineNone(){
+    try (Engine eng = Engine.createNone()){
+      assertNotNull(eng, "Engine created with createNone should not be null");
+      assertThrows(Engine.NoInteractorException.class, () -> {
+        eng.getInteractor();
+      }, "Calling getInteractor on engine created with createNone should throw exception");
+    }
+  }
+
+  @Test
+  public void testLoadValidPlugin(){
+    assertDoesNotThrow(() -> {
+      Engine.loadPlugin("native");
+    }, "Loading the native plugin should succeed without errors");
+  }
+
+  @Test
+  public void testLoadNonExistentPluginThrowsException(){
+    assertThrows(Engine.PluginException.class, () -> {
+      Engine.loadPlugin("__nonexistent_plugin_f3d_test__");
+    }, "Loading a nonexistent plugin must throw Engine.PluginException");
+  }
+
+  @Test
+  public void testEngineStaticInfoAndPlugins(){
+    assertNotNull(Engine.getPluginsList("."), "Plugins list should not be null");
+    assertNotNull(Engine.getAllReaderOptionNames(), "All reader option names should not be null");
+    assertNotNull(Engine.getLibInfo(), "Library info should not be null");
+    assertNotNull(Engine.getReadersInfo(), "Readers info should not be null");
+    assertNotNull(Engine.getRenderingBackendList(), "Rendering backend list should not be null");
+  }
+
+  @Test
+  public void testEngineCachePathAndComponents(){
+    engine = Engine.create(true);
+    assertNotNull(engine, "Engine should not be null");
+
+    String testPath = "/tmp/f3d_test";
+    engine.setCachePath(testPath);
+    assertEquals(testPath, engine.getCachePath(), "getCachePath should return the path set with setCachePath");
+
+    assertNotNull(engine.getOptions(), "Engine options should not be null");
+    assertNotNull(engine.getScene(), "Engine scene should not be null");
+    assertNotNull(engine.getWindow(), "Engine window should not be null");
+    assertNotNull(engine.getInteractor(), "Engine interactor should not be null");
+  }
+
+  @Test
+  public void testInvalidStateFileThrows(){
+    assertThrows(RuntimeException.class, () -> {
       Engine.State.fromFile("/does/not/exist/state.json");
-    } catch (RuntimeException e) {
-      threw = true;
-    }
-    if (!threw) {
-      throw new RuntimeException("State.fromFile should throw on a missing file");
-    }
+    }, "State.fromFile should throw on a missing file");
+  }
 
-    src.close();
+  @Test
+  public void testLoadFile() throws IOException{
+    Path filePath = Path.of("dev", "f3d", "src", "testing", "data", "cow.vtp");
+    assertTrue(Files.exists(filePath), "File should exist");
+    String cow = filePath.toAbsolutePath().toString().replace('\\', '/');
+
+    engine = Engine.createNone();
+    engine.getOptions().setAsBool("ui.scalar_bar", true);
+    engine.getScene().add(cow);
+
+    assertNotNull(engine.getScene().getSceneInfo(), "Scene info should not be null");
+    assertEquals(1, engine.getScene().getAddedFiles().size(), "Scene should have 1 added file");
+
+    Path testingPath = Path.of(System.getProperty("java.io.tmpdir"), "TestEngineJavaStatefile.json");
+    String loadedTestingPath = testingPath.toAbsolutePath().toString().replace('\\', '/');
+
+    try(Engine.State state = engine.dump()){
+      assertNotNull(state, "New state should not be null");
+      state.toFile(loadedTestingPath);
+    }
+    assertTrue(Files.exists(testingPath), "File should be created");
+
+    try(Engine dst = Engine.createNone();
+    Engine.State state = Engine.State.fromFile(loadedTestingPath)){
+      assertNotNull(dst, "Destination Engine should be created");
+      dst.load(state);
+      assertTrue(dst.getOptions().getAsBool("ui.scalar_bar"), "Option should be loaded from file");
+      assertEquals(1, dst.getScene().getAddedFiles().size(), "Should load one item from scene from file");
+    }
+  }
+
+  @Test
+  public void testLoadString() throws IOException{
+    Path filePath = Path.of("dev", "f3d", "src", "testing", "data", "cow.vtp");
+    assertTrue(Files.exists(filePath), "File should exist");
+    String cow = filePath.toAbsolutePath().toString().replace('\\', '/');
+
+    engine = Engine.createNone();
+    engine.getOptions().setAsBool("ui.scalar_bar", true);
+    engine.getScene().add(cow);
+
+    assertNotNull(engine.getScene().getSceneInfo(), "Scene info should not be null");
+    assertEquals(1, engine.getScene().getAddedFiles().size(), "Scene should have 1 added file");
+
+    String fileFromString;
+    try (Engine.State state = engine.dump()){
+      fileFromString = state.toString();
+    }
+    assertNotNull(fileFromString, "File from string should not be null");
+
+    try (Engine dst = Engine.createNone();
+         Engine.State state = Engine.State.fromString(fileFromString)){
+      assertNotNull(dst, "Destination Engine should be created");
+      dst.load(state);
+      assertTrue(dst.getOptions().getAsBool("ui.scalar_bar"), "Option should be loaded from string");
+      assertEquals(1, dst.getScene().getAddedFiles().size(), "Should load one item from scene from string");
+    }
   }
 }
