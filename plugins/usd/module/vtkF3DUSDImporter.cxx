@@ -1781,6 +1781,51 @@ public:
     timeRange[1] = this->Stage->GetEndTimeCode() / this->Stage->GetTimeCodesPerSecond();
   }
 
+  void GetTimeSteps(vtkDoubleArray* timeSteps, int& nbTimeSteps)
+  {
+    nbTimeSteps = 0;
+    if (timeSteps)
+    {
+      timeSteps->SetNumberOfComponents(1);
+      timeSteps->SetNumberOfTuples(0);
+    }
+
+    pxr::UsdAttributeVector allAttributes;
+
+    for (const pxr::UsdPrim& prim : this->Stage->Traverse())
+    {
+      const pxr::UsdAttributeVector primAttribute = prim.GetAttributes();
+
+      allAttributes.insert(allAttributes.end(), primAttribute.begin(), primAttribute.end());
+    }
+
+    // tmp vector for the time codes
+    std::vector<double> tmpTimeCodes;
+
+    // populating tmp vector
+    pxr::UsdAttribute::GetUnionedTimeSamples(allAttributes, &tmpTimeCodes);
+
+    double timeCodesPerSecond = this->Stage->GetTimeCodesPerSecond();
+
+    double timeRange[2];
+    this->GetTimeRange(timeRange);
+
+    if (timeSteps)
+    {
+      for (double tc : tmpTimeCodes)
+      {
+        const double time = tc / timeCodesPerSecond;
+        if (time >= timeRange[0] && time <= timeRange[1])
+        {
+          // adding time code only if in the range
+          timeSteps->InsertNextValue(time);
+        }
+      }
+    }
+
+    nbTimeSteps = static_cast<int>(timeSteps->GetNumberOfTuples());
+  }
+
   pxr::UsdStageRefPtr Stage = nullptr;
   F3DUSDMemoryResolverContext MemoryResolverContext;
   int SubdivisionLevel = 0;
@@ -1918,9 +1963,10 @@ vtkIdType vtkF3DUSDImporter::GetNumberOfAnimations()
 
 //----------------------------------------------------------------------------
 bool vtkF3DUSDImporter::GetTemporalInformation(vtkIdType vtkNotUsed(animationIndex),
-  double timeRange[2], int& vtkNotUsed(nbTimeSteps), vtkDoubleArray* vtkNotUsed(timeSteps))
+  double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps)
 {
   this->Internals->GetTimeRange(timeRange);
+  this->Internals->GetTimeSteps(timeSteps, nbTimeSteps);
   return true;
 }
 
