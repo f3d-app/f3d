@@ -389,7 +389,7 @@ macro(f3d_plugin_build)
     get_filename_component(_resource_dest_dir "${_resource_dest}" DIRECTORY)
     set(_resource_source "${CMAKE_CURRENT_SOURCE_DIR}/resources/${_resource_filename}")
     install(FILES "${_resource_source}"
-      DESTINATION "${_f3d_plugins_install_dir}/${_resource_dest_dir}"
+      DESTINATION "${CMAKE_INSTALL_PREFIX}/${_resource_dest_dir}"
       COMPONENT plugin)
     configure_file(
       "${_resource_source}"
