@@ -127,6 +127,7 @@ endif()
 f3d_test(NAME TestInteractionVerticalDragRotate DATA dragon.vtu ARGS --up=y INTERACTION LONG_TIMEOUT) # 7 (top-view); left click and drag
 f3d_test(NAME TestInteractionInitUpVectorOption DATA dragon.vtu ARGS --up=-Y INTERACTION LONG_TIMEOUT) #Small drag left, camera should maintain orientation
 f3d_test(NAME TestInteractionDynamicUpDirection DATA dragon.vtu INTERACTION) # Ctrl+Z
+f3d_test(NAME TestInteractionAxisLock DATA cow.vtp INTERACTION)
 f3d_test(NAME TestInteractionCameraHotkeys DATA cow.vtp INTERACTION)
 f3d_test(NAME TestInteractionZoomToMouse DATA cow.vtp INTERACTION)
 f3d_test(NAME TestInteractionOrthographicProjection DATA cow.vtp INTERACTION) #5;5
