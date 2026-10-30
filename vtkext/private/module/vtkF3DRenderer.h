@@ -261,7 +261,7 @@ public:
   int UpdateLights() override;
 
   /**
-   * Configure all light representations
+   * Updates all light representations
    */
   void UpdateLightRepresentations();
 
