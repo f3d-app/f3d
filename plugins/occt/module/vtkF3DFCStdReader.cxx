@@ -761,6 +761,7 @@ public:
     const int node =
       assembly->AddNode(vtkDataAssembly::MakeValidNodeName(obj.Label.c_str()).c_str(), parent);
     assembly->SetAttribute(node, "label", obj.Label.c_str());
+    assembly->SetAttribute(node, "f3d_visible", this->IsEffectivelyVisible(obj) ? 1 : 0);
     nodes[name] = node;
     return node;
   }
@@ -776,10 +777,6 @@ public:
     for (const std::string& name : this->ObjectOrder)
     {
       const FCObject& obj = this->Objects[name];
-      if (!this->IsEffectivelyVisible(obj))
-      {
-        continue;
-      }
       if (this->IsRedundantContainerShape(obj))
       {
         continue;
