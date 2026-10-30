@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <iterator>
 #include <optional>
 #include <string>
@@ -23,6 +24,7 @@
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkFloatArray.h>
+#include <vtkInformation.h>
 #include <vtkLightCollection.h>
 #include <vtkMemoryResourceStream.h>
 #include <vtkPointData.h>
@@ -30,6 +32,7 @@
 #include <vtkPolyData.h>
 #include <vtkProgressBarRepresentation.h>
 #include <vtkProgressBarWidget.h>
+#include <vtkShadowMapBakerPass.h>
 #include <vtkTimerLog.h>
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
@@ -388,6 +391,11 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
              "check to skip content validation or force reader to "
              "force a specific reader");
         break;
+      // LCOV_EXCL_START
+      case file_availability::EMPTY_STREAM:
+        assert(false); // Unreachable
+        break;
+        // LCOV_EXCL_STOP
     }
 
     vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(filePath.string());
@@ -444,7 +452,9 @@ scene& scene_impl::add(const std::byte* buffer, std::size_t size)
   }
 #endif
 
-  const f3d::reader* reader = f3d::factory::instance()->getReader(buffer, size, forceReader);
+  f3d::file_availability availability = f3d::file_availability::UNSUPPORTED_EXTENSION;
+  const f3d::reader* reader =
+    f3d::factory::instance()->getReader(buffer, size, forceReader, availability);
   if (reader)
   {
     if (forceReader)
@@ -899,6 +909,13 @@ int scene_impl::addLight(const light_state_t& lightState) const
     lightState.position[2] + lightState.direction[2]);
   newLight->SetIntensity(lightState.intensity);
   newLight->SetSwitch(lightState.switchState);
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
+  vtkNew<vtkInformation> lightInfo;
+  lightInfo->Set(vtkShadowMapBakerPass::CAST_SHADOWS(), lightState.castShadows ? 1 : 0);
+  newLight->SetInformation(lightInfo);
+#endif
+
   this->Internals->Window.GetRenderer()->AddLight(newLight);
   return this->getLightCount() - 1;
 }
@@ -933,6 +950,15 @@ light_state_t scene_impl::getLight(int index) const
   lightState.positionalLight = light->GetPositional();
   lightState.intensity = light->GetIntensity();
   lightState.switchState = light->GetSwitch();
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
+  vtkInformation* lightInfo = light->GetInformation();
+  if (lightInfo->Has(vtkShadowMapBakerPass::CAST_SHADOWS()))
+  {
+    lightState.castShadows = lightInfo->Get(vtkShadowMapBakerPass::CAST_SHADOWS()) != 0;
+  }
+#endif
+
   return lightState;
 }
 
@@ -1026,6 +1052,20 @@ f3d::file_availability scene_impl::supports(const fs::path& filePath)
   f3d::factory::instance()->getReader(filePath.string(),
     this->Internals->Options.scene.force_reader, this->Internals->Options.scene.skip_content_check,
     availability);
+  return availability;
+}
+
+//----------------------------------------------------------------------------
+f3d::file_availability scene_impl::supports(const std::byte* buffer, std::size_t size)
+{
+  if (buffer == nullptr || size == 0)
+  {
+    return f3d::file_availability::EMPTY_STREAM;
+  }
+
+  f3d::file_availability availability = f3d::file_availability::UNSUPPORTED_EXTENSION;
+  f3d::factory::instance()->getReader(
+    buffer, size, this->Internals->Options.scene.force_reader, availability);
   return availability;
 }
 

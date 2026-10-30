@@ -1727,8 +1727,8 @@ interactor& interactor_impl::initBindings()
   this->addBinding({.Bind = {mod_t::SHIFT, "N"}, .Commands = {"toggle ui.hdri_filename"},.Group = "Scene", .DocCallback = std::bind(docTgl, "HDRI filename", std::cref(opts.ui.hdri_filename)), .Type = f3d::interactor::BindingType::TOGGLE});
   this->addBinding({.Bind = {mod_t::NONE, "H"}, .Commands = {"toggle ui.scene_hierarchy.enable"},.Group = "Scene", .DocCallback = std::bind(docTgl, "Scene hierarchy", std::cref(opts.ui.scene_hierarchy.enable)), .Type = f3d::interactor::BindingType::TOGGLE});
 #endif
-#if F3D_MODULE_RAYTRACING
-  this->addBinding({.Bind = {mod_t::NONE, "R"}, .Commands = {"toggle render.raytracing.enable"},.Group = "Scene", .DocCallback = std::bind(docTgl, "Raytracing rendering", std::cref(opts.render.raytracing.enable)), .Type = f3d::interactor::BindingType::TOGGLE});
+#if F3D_MODULE_RAYTRACING || F3D_MODULE_ANARI
+  this->addBinding({.Bind = {mod_t::NONE, "R"}, .Commands = {"cycle render.mode"},.Group = "Scene", .DocCallback = std::bind(docStr, "Rendering mode", std::cref(opts.render.mode)), .Type = f3d::interactor::BindingType::CYCLIC});
 #endif
   this->addBinding({.Bind = {mod_t::NONE, "V"}, .Commands = {"toggle_volume_rendering"},.Group = "Scene", .DocCallback = std::bind(docTgl, "Volume rendering", std::cref(opts.model.volume.enable)), .Type = f3d::interactor::BindingType::TOGGLE});
   this->addBinding({.Bind = {mod_t::CTRL, "N"}, .Commands = {"toggle model.normal_glyphs.enable"},.Group = "Scene", .DocCallback = std::bind(docTgl, "Normal glyphs", std::cref(opts.model.normal_glyphs.enable)), .Type = f3d::interactor::BindingType::TOGGLE});

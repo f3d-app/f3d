@@ -86,6 +86,52 @@ the command line options logic.
 
 There is also a dedicated `testing` directory which contains all of the [applicative testing](06-TESTING.md#application-layer) of the F3D application as well as many functional testing of the libf3d.
 
+## Render passes
+
+Here's a raw overview of the render passes:
+
+```mermaid
+graph TD
+
+    SSAA --> rp
+    ToneMapping --> SSAA
+    BlendBackground["Blend background\n(if no skybox)"] --> ToneMapping
+    FXAA --> BlendBackground
+    FinalShader --> FXAA
+
+    subgraph rp[F3D Render Pass]
+        direction LR
+
+        Blend --> Blur
+        Blend --> TAA
+        Blend --> Top["Always on top"]
+
+        Blur --> Skybox["Opaque\n(skybox only)"]
+        Top --> Armature["Opaque\n(armature only)"]
+
+        subgraph Sequence
+            direction LR
+            Light -.-> SSAO -.-> Translucency@{ label: "Depth peeling\nStochastic", shape: processes }
+
+            SSAO --> Opaque["Opaque\n(except skybox/armature)"]
+            Translucency --> Translucent
+            Translucency --> Volume
+        end
+
+        Camera --> Sequence
+        TAA --> Camera
+        Reflection --> Camera
+    end
+
+    classDef optional stroke-dasharray: 5 5
+    class Blur,Reflection,TAA,SSAO,Translucency,SSAA,ToneMapping,FXAA,FinalShader optional
+```
+
+- A dashed node means it's optional, in which case it's just a passthrough to the next node.
+- A stacked node means one of the options is selected.
+- A dashed edge means the next node is run on the same framebuffer.
+- A solid edge means the next node is a delegate pass (it's run before and the pass uses its result).
+
 ## Other f3d-app repositories
 
 Although almost everything is contained in the [f3d-app/f3d](https://github.com/f3d-app/f3d) repository, other repositories in the [f3d-app](https://github.com/f3d-app) organisation are handling certains specific tasks in the F3D ecosystem.

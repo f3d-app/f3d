@@ -20,6 +20,7 @@
 
 #include <vtkActor.h>
 #include <vtkActorCollection.h>
+#include <vtkArrowSource.h>
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -27,10 +28,13 @@
 #include <vtkCameraOrientationWidget.h>
 #include <vtkCameraPass.h>
 #include <vtkCellData.h>
+#include <vtkConeSource.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkCullerCollection.h>
+#include <vtkCylinderSource.h>
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkFloatArray.h>
+#include <vtkGridAxesActor3D.h>
 #include <vtkHDRReader.h>
 #include <vtkImageAppendComponents.h>
 #include <vtkImageData.h>
@@ -38,6 +42,7 @@
 #include <vtkImageReader2Factory.h>
 #include <vtkLight.h>
 #include <vtkLightCollection.h>
+#include <vtkLineSource.h>
 #include <vtkMath.h>
 #include <vtkMathUtilities.h>
 #include <vtkMatrix4x4.h>
@@ -65,6 +70,8 @@
 #include <vtkSSAAPass.h>
 #include <vtkScalarBarActor.h>
 #include <vtkShaderProperty.h>
+#include <vtkShadowMapBakerPass.h>
+#include <vtkShadowMapPass.h>
 #include <vtkSkybox.h>
 #include <vtkSphericalHarmonics.h>
 #include <vtkTable.h>
@@ -73,6 +80,7 @@
 #include <vtkTextureObject.h>
 #include <vtkToneMappingPass.h>
 #include <vtkTransform.h>
+#include <vtkTransformFilter.h>
 #include <vtkUniforms.h>
 #include <vtkVersion.h>
 #include <vtkVolumeProperty.h>
@@ -92,10 +100,6 @@
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
 #include <vtkMemoryResourceStream.h>
-#endif
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
-#include <vtkGridAxesActor3D.h>
 #endif
 
 #if F3D_MODULE_RAYTRACING
@@ -237,8 +241,14 @@ vtkF3DRenderer::vtkF3DRenderer()
 
   this->SkyboxActor->SetProjection(vtkSkybox::Sphere);
   this->SkyboxActor->GammaCorrectOn();
-
   this->SkyboxActor->VisibilityOff();
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
+  vtkNew<vtkInformation> keys;
+  keys->Set(vtkShadowMapBakerPass::OCCLUDER(), 0);
+  keys->Set(vtkShadowMapPass::RECEIVER(), 0);
+  this->SkyboxActor->SetPropertyKeys(keys);
+#endif
 
   // Make sure an active camera is available on the renderer
   this->GetActiveCamera();
@@ -277,7 +287,7 @@ void vtkF3DRenderer::Initialize()
   this->AddActor(this->SkyboxActor);
   this->AddActor(this->UIActor);
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513) && !defined(F3D_USE_GLES)
+#if !defined(F3D_USE_GLES)
   // Add the grid axes actor if already initialized
   if (this->GridAxesActor != nullptr)
   {
@@ -517,7 +527,11 @@ void vtkF3DRenderer::ConfigureRenderPasses()
 
   vtkNew<vtkF3DRenderPass> newPass;
 #if F3D_MODULE_RAYTRACING
-  newPass->SetUseRaytracing(this->UseRaytracing);
+  newPass->SetUseRaytracing(this->CurrentRenderingMode == RenderingMode::OSPRAY);
+#endif
+#if F3D_MODULE_ANARI
+  newPass->SetUseAnari(this->CurrentRenderingMode == RenderingMode::ANARI);
+  newPass->SetAnariLibrary(this->AnariLibrary);
 #endif
   newPass->SetUseSSAOPass(this->UseSSAOPass);
   newPass->SetUseBlurBackground(this->UseBlurBackground);
@@ -526,6 +540,9 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   newPass->SetArmatureVisible(this->ArmatureVisible);
   newPass->SetRenderReflection(this->GridVisible && this->GridReflection > 0.0);
   newPass->SetXRMode(this->UseXR);
+  newPass->SetRenderShadows(this->UseShadows);
+  newPass->SetShadowExponentialConstant(this->ShadowExponentialConstant);
+  newPass->SetShadowResolution(this->ShadowResolution);
 
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
@@ -553,9 +570,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   if (this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::SSAA)
   {
     vtkNew<vtkSSAAPass> ssaaP;
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250329)
     ssaaP->SetColorFormat(vtkTextureObject::Float16);
-#endif
     ssaaP->SetDelegatePass(renderingPass);
     renderingPass = ssaaP;
   }
@@ -624,7 +639,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   }
   vtkOSPRayRendererNode::SetBackgroundMode(mode, this);
 #else
-  if (this->UseRaytracing || this->UseRaytracingDenoiser)
+  if ((this->CurrentRenderingMode == RenderingMode::OSPRAY) || this->UseRaytracingDenoiser)
   {
     F3DLog::Print(F3DLog::Severity::Warning,
       "Raytracing options can't be used if F3D has not been built with raytracing");
@@ -827,6 +842,48 @@ void vtkF3DRenderer::SetGridReflection(const double strength)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetGridShadow(const double strength)
+{
+  if (this->GridShadow != strength)
+  {
+    this->GridShadow = strength;
+    this->GridConfigured = false;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetShadows(bool use)
+{
+  if (this->UseShadows != use)
+  {
+    this->UseShadows = use;
+    this->RenderPassesConfigured = false;
+    this->GridConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetShadowExponentialConstant(double constant)
+{
+  if (this->ShadowExponentialConstant != constant)
+  {
+    this->ShadowExponentialConstant = constant;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetShadowResolution(int resolution)
+{
+  if (this->ShadowResolution != resolution)
+  {
+    this->ShadowResolution = resolution;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetAxesColor(const std::vector<double>& colorXAxis,
   const std::vector<double>& colorYAxis, const std::vector<double>& colorZAxis)
 {
@@ -936,6 +993,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       this->GridMapper->SetSubdivisions(this->GridSubdivisions);
       this->GridMapper->SetLineOpacity(this->GridOpacity);
       this->GridMapper->SetReflectionStrength(this->GridReflection);
+      this->GridMapper->SetShadowStrength(this->UseShadows ? this->GridShadow : 0.0);
 
       if (this->GridAbsolute)
       {
@@ -974,6 +1032,13 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
         (this->ColorAxisX[2] * fX2 + this->ColorAxisY[2] * fY2 + this->ColorAxisZ[2] * fZ2) / f2,
         1);
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
+      vtkNew<vtkInformation> keys;
+      keys->Set(vtkShadowMapBakerPass::OCCLUDER(), 0);
+      keys->Set(vtkShadowMapPass::RECEIVER(), 1);
+      this->GridActor->SetPropertyKeys(keys);
+#endif
+
       this->GridActor->ForceTranslucentOn();
       this->GridActor->SetMapper(this->GridMapper);
       this->GridActor->UseBoundsOff();
@@ -989,7 +1054,6 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowAxesGrid([[maybe_unused]] bool show)
 {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   if (this->AxesGridVisible != show)
   {
     this->AxesGridVisible = show;
@@ -997,7 +1061,6 @@ void vtkF3DRenderer::ShowAxesGrid([[maybe_unused]] bool show)
     this->GridAxesConfigured = false;
     this->CheatSheetConfigured = false;
   }
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -1009,7 +1072,6 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
     F3DLog::Print(F3DLog::Severity::Warning, "Grid axes are not supported on OpenGL ES, ignoring.");
   }
 #else
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   bool show = this->AxesGridVisible;
   if (show)
   {
@@ -1074,7 +1136,6 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
   {
     this->GridAxesActor->SetVisibility(show);
   }
-#endif
 #endif
 }
 
@@ -1354,12 +1415,10 @@ void vtkF3DRenderer::AlignSceneToBounds(const vtkBoundingBox& bounds)
       continue;
     }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
     if (vtkGridAxesActor3D::SafeDownCast(prop3D))
     {
       continue;
     }
-#endif
 
     prop3D->SetPosition(targetCenter[0], targetCenter[1], targetCenter[2]);
     prop3D->SetScale(scale, scale, scale);
@@ -1589,7 +1648,7 @@ void vtkF3DRenderer::ConfigureHDRITexture()
       needHDRITexture = this->HDRISkyboxVisible ||
         (this->GetUseImageBasedLighting() &&
           (!this->CheckForSHCache(dummy) || !this->CheckForSpecCache(dummy) ||
-            this->UseRaytracing));
+            this->CurrentRenderingMode != RenderingMode::OPENGL));
     }
 
     if (needHDRITexture)
@@ -2061,6 +2120,26 @@ void vtkF3DRenderer::SetNormalGlyphScaleMultiplier(double multiplier)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetNormalGlyphColor(const std::array<double, 3>& color)
+{
+  if (this->NormalGlyphColor != color)
+  {
+    this->NormalGlyphColor = color;
+    this->NormalGlyphsConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetNormalGlyphShape(const NormalGlyphShape& shape)
+{
+  if (this->GlyphShape != shape)
+  {
+    this->GlyphShape = shape;
+    this->NormalGlyphsConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseSSAOPass(bool use)
 {
   if (this->UseSSAOPass != use)
@@ -2121,13 +2200,23 @@ void vtkF3DRenderer::SetDisplayDepth(bool use)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetUseRaytracing(bool use)
+void vtkF3DRenderer::SetRenderingMode(RenderingMode mode)
 {
-  if (this->UseRaytracing != use)
+  if (this->CurrentRenderingMode != mode)
   {
-    this->UseRaytracing = use;
+    this->CurrentRenderingMode = mode;
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetAnariLibrary(const std::string& anariLibrary)
+{
+  if (this->AnariLibrary != anariLibrary)
+  {
+    this->AnariLibrary = anariLibrary;
+    this->RenderPassesConfigured = false;
   }
 }
 
@@ -2311,6 +2400,7 @@ void vtkF3DRenderer::ShowArmature(bool show)
   {
     this->ArmatureVisible = show;
     this->RenderPassesConfigured = false;
+    this->ActorsPropertiesConfigured = false;
     this->CheatSheetConfigured = false;
   }
 }
@@ -2449,16 +2539,14 @@ void vtkF3DRenderer::UpdateActors()
   // We assume animation change do not change the number of actors
   const vtkMTimeType importerUpdateMTime = this->Importer->GetUpdateMTime();
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   if (this->AxesGridVisible && importerUpdateMTime > this->ImporterUpdateTimeStamp)
   {
     this->GridAxesConfigured = false;
   }
-#endif
 
   if (this->UsingExpandingRange && (importerUpdateMTime > this->ImporterUpdateTimeStamp) &&
     (this->Coloring != vtkF3DRenderer::ColoringMode::MATERIAL ||
-      (!this->UseRaytracing && this->UseVolume)))
+      (this->CurrentRenderingMode == RenderingMode::OPENGL && this->UseVolume)))
   {
     // XXX: This could be improved further to only configure mappers and actors
     // when the coloring range actually change
@@ -3221,6 +3309,17 @@ void vtkF3DRenderer::ConfigureActorsProperties()
           "Texture coordinates are required to display checkerboard texture.");
       }
     }
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
+    // exclude armature from shadows
+    vtkInformation* info = coloring.OriginalActor->GetPropertyKeys();
+    if (info && info->Has(vtkF3DImporter::ACTOR_IS_ARMATURE()))
+    {
+      coloring.OriginalActor->GetPropertyKeys()->Set(
+        vtkShadowMapBakerPass::OCCLUDER(), this->ArmatureVisible);
+      coloring.OriginalActor->GetPropertyKeys()->Set(vtkShadowMapPass::RECEIVER(), 0);
+    }
+#endif
   }
 
   for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
@@ -3382,7 +3481,8 @@ void vtkF3DRenderer::ConfigurePointSprites()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureNormalGlyphs()
 {
-  const bool normalGlyphsVisible = !this->UseRaytracing && this->UseNormalGlyphs;
+  const bool normalGlyphsVisible =
+    (this->CurrentRenderingMode == RenderingMode::OPENGL) && this->UseNormalGlyphs;
   for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
   {
     if (normalGlyphsVisible && !normalGlyph.InputDataHasNormals)
@@ -3392,7 +3492,64 @@ void vtkF3DRenderer::ConfigureNormalGlyphs()
       continue;
     }
 
+    if (this->LineWidth.has_value())
+    {
+      normalGlyph.Actor->GetProperty()->SetLineWidth(this->LineWidth.value());
+    }
+
+    vtkSmartPointer<vtkAlgorithm> glyphSource;
+
+    switch (this->GlyphShape)
+    {
+      case NormalGlyphShape::ARROW:
+        glyphSource = vtkSmartPointer<vtkArrowSource>::New();
+        break;
+      case NormalGlyphShape::CONE:
+      {
+        const vtkNew<vtkConeSource> coneSource;
+        coneSource->SetRadius(0.1);
+        coneSource->SetResolution(16);
+        coneSource->SetCenter(0.5, 0.0, 0.0);
+        glyphSource = coneSource;
+        break;
+      }
+      break;
+      case NormalGlyphShape::CYLINDER:
+      {
+        const vtkNew<vtkCylinderSource> cylinderSource;
+        cylinderSource->SetRadius(0.1);
+        cylinderSource->SetResolution(16);
+        const vtkNew<vtkTransform> transformFilter;
+        transformFilter->RotateZ(-90.0);
+        transformFilter->Translate(0.0, 0.5, 0.0);
+        const vtkNew<vtkTransformFilter> transformPolyDataFilter;
+        transformPolyDataFilter->SetInputConnection(cylinderSource->GetOutputPort());
+        transformPolyDataFilter->SetTransform(transformFilter);
+        glyphSource = transformPolyDataFilter;
+        break;
+      }
+      case NormalGlyphShape::LINE:
+      {
+        const vtkNew<vtkLineSource> lineSource;
+        lineSource->SetPoint1(0.0, 0.0, 0.0);
+        lineSource->SetPoint2(1.0, 0.0, 0.0);
+        glyphSource = lineSource;
+        break;
+      }
+    }
+
+    normalGlyph.GlyphMapper->SetSourceConnection(glyphSource->GetOutputPort());
+
     this->UpdateNormalGlyphsScale();
+
+    const double* normalGlyphColor = this->NormalGlyphColor.data();
+    // default color (0.82, 0.82, 0.82) is (0.65, 0.65, 0.65) in linear space
+    // which match the default generic importer surface color
+    double linearColor[3];
+    linearColor[0] = std::pow(normalGlyphColor[0], 2.2);
+    linearColor[1] = std::pow(normalGlyphColor[1], 2.2);
+    linearColor[2] = std::pow(normalGlyphColor[2], 2.2);
+    normalGlyph.Actor->GetProperty()->SetColor(linearColor);
     normalGlyph.Actor->SetVisibility(normalGlyphsVisible);
   }
 
@@ -3710,8 +3867,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle surface geometry
-  const bool geometriesVisible =
-    this->UseRaytracing || (!this->UseVolume && !this->UsePointSprites);
+  const bool geometriesVisible = (this->CurrentRenderingMode != RenderingMode::OPENGL) ||
+    (!this->UseVolume && !this->UsePointSprites);
   for (const auto& coloring : this->Importer->GetColoringActorsAndMappers())
   {
     if (geometriesVisible &&
@@ -3746,8 +3903,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle point sprites
-  const bool pointSpritesVisible =
-    !this->UseRaytracing && !this->UseVolume && this->UsePointSprites;
+  const bool pointSpritesVisible = (this->CurrentRenderingMode == RenderingMode::OPENGL) &&
+    !this->UseVolume && this->UsePointSprites;
   for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
   {
     if (pointSpritesVisible &&
@@ -3777,7 +3934,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle Volume prop
-  const bool volumeVisible = !this->UseRaytracing && this->UseVolume;
+  const bool volumeVisible =
+    (this->CurrentRenderingMode == RenderingMode::OPENGL) && this->UseVolume;
   const auto& volPropsAndMappers = this->Importer->GetVolumePropsAndMappers();
   for (const auto& volume : volPropsAndMappers)
   {

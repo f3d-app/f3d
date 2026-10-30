@@ -1,5 +1,145 @@
 # Changelog
 
+## v4.0.0
+
+For F3D users:
+
+- BREAKING: Major release, deprecated CLI options have been removed, some CLI options and interactions have been reworked: https://f3d.app/docs/user/MIGRATION
+- BREAKING: Removed support for `F3D_PLUGINS_PATH` env var in favor of `--plugins-path` CLI option
+- BREAKING: Added an advanced animation bar which is shown by default
+- BREAKING: Removed all `cycle_*` commands in favor of the new `cycle` libf3d provided command
+- BREAKING: Improved the `jump_to_*` commands with new `jump_to_frame_relative` and `jump_to_key_frame_relative` commands
+- BREAKING: Reworked the coloring interactions
+- BREAKING: Reworked many default interactions, removing niche ones and improving current ones
+- Added support for loading and saving statefile though dedicated CLI options and interactive binds
+- Added support for saving statefile to clipboard using `Ctrl+C` bind
+- Added support for saving and restoring window size and position
+- Added support for outputting animation to video using `--video-output` CLI option
+- Added a `--normal-glyphs-scale` CLI option to control the size of normal glyphs
+- Added a grid reflection and a `--grid-reflection=<strength>` CLI option to control it
+- Added a `--grid-opacity` CLI option to control the opacity of the grid
+- Added keyframe control for non-full-scene file formats (eg: VTKHDF)
+- Added a distinction between unsupported extension and unsupported content
+- Added `--skip-content-check` CLI option to skip the content check when loading a file
+- Added a `--no-cache` CLI option to disable caching
+- Added FreeCAD format (.FCstd) support in occt plugin
+- Added `.amf` support to assimp plugin
+- Added support for old `.dxf` file format in assimp plugin
+- Added armature support to assimp formats (.fbx and others)
+- Added support for displaying multiple animations for assimp formats
+- Added support for selecting animation keyframes in alembic plugin
+- Added armature support for OpenUSD format
+- Added streaming support for OpenUSD format
+- Added GPU-based skinning for OpenUSD format
+- Added support for points primitive for OpenUSD format
+- Added a `USD.resources_path` OpenUSD reader option to select a custom usd plugin.info
+- Added a `USD.subdivision_level` OpenUSD reader option to control subdivision
+- Added headless rendering support on Windows
+- Added headless rendering support on macOS
+- Added support for showing `cmd` instead of `Ctrl` in cheatsheet on macOS
+- Added support for repeated key binds
+- Added images in the [options doc](https://f3d.app/docs/user/OPTIONS)
+- Added proper [named color documentation](https://f3d.app/docs/user/NAMED_COLORS)
+- Added DPI support on all OSes
+- Added support for 16bits textures
+- Added progress bar in terminal
+- Added support for copying console output to clipboard
+- Fixed a critical issue with PDAL's proj.db that prevented installation of .deb binary package
+- Fixed a crash with empty OpenUSD files
+- Fixed coloring with unlit and sRGB colors
+- Fixed coloring with unlit OBJ files
+- Fixed a PBR coloring issue
+- Fixed an issue with depth coloring bar label
+- Fixed an issue with axes grid rendering and animations
+- Fixed an issue with STEP file not opening
+- Fixed an issue with VRML not read correctly
+- Fixed crashes when reading invalid BMP and HDR data
+- Fixed an OpenGL error displayed when displaying the FPS counter
+- Fixed a small issue with rendering backend detection
+- Fixed a performance issue with grid axes rendering
+- Fixed grid axes rendering when using screen space anti aliasing
+- Fixed a RGBA image comparison issue
+- Fixed an issue where opacity map was not updated right away when set from a command
+- Fixed an issue with the console not scrolling down when it should
+- Fixed issues with `--camera-*` CLI options not being taken into account properly
+- Fixed issue with textures not being properly rendered
+- Fixed a crash when no rendering backend is available
+- Fixed a potential crash with ImGUI initialization
+- Fixed lighting intensity control when using an HDRI
+- Fixed interactive resizing of the scene hierarchy panel
+- Fixed a PLY gaussian splatting crash when no spherical harmonics are present
+- Fixed a thumbnailer issue on Linux with STEP files
+- Fixed non-ASCII text rendering issue in UI
+- Fixed a scivis coloring issue with degenerate scalar range
+- Fixed an issue with lights initialization
+- Fixed an issue with temporal anti aliasing accumulating black dots
+- Reduced size of binary package by shipping pdal statically
+- Improved gaussian splatting performance
+- Improved checkerboard rendering
+- Improved documentation, testing and code quality
+- Improved startup performance greatly (1.2s -> 0.3s)
+- Improved the occt plugin performance
+
+For libf3d users:
+
+- BREAKING: Major release, deprecated API have been removed, some APIs and options have been reworked: https://f3d.app/docs/libf3d/MIGRATION
+- BREAKING: Reworked deeply the coloring option logic
+- BREAKING: Reworked the interactor::addBinding API
+- Added a `model.normal_glyphs.scale` option to control the size of normal glyphs
+- Added `scene.skip_content_check` option to skip the content check when loading a file
+- Added `render.grid.reflection` option to control the grid reflection
+- Added `render.grid.opacity` option to control the grid opacity
+- Added a `mesh_view` API to load a dataset from memory without any copy (no binding on Java, and limited support on webassembly)
+- Added a scene hierarchy AP to control visibility of each nodes in the geometry
+- Added a `scene::getSceneInfo` API to recover information about the scene
+- Added a `interactor::setEventLoopUserCallback` instead of specifying callback in `start` and `playInteraction`
+- Added a way to recover current timestep in `interactor` callback mechanism
+- Added a concept of domains (range, enum, index) for options, with a dedicated API
+- Added a `options::getType` API to recover the true type of an option
+- Added a callback to handled notifications manually
+- Added a new API to output to video
+- Added a `window::setUseHDRICache` API to control HDRI cache usage
+- Added exception catching in C bindings
+- Added exception forwarding in Java bindings
+- Added in-situ zero-copy examples
+- Added complete WASM bindings of the libf3d
+- Added complete WASM examples
+- Added skinning support to GLES rendering (WASM)
+- Added pdal and webifc plugin to python wheels
+- Reworked deeply the WASM integration for easier usage ( `<f3d-viewer>` element)
+- Moved all animation related API from `scene` and `interactor` to a dedicated `animation` API
+- Fixed many GLES rendering issues (WASM)
+- Renamed C bindings to use coherent vocabulary
+- Fixed issues with C binding sanity checks
+- Improved Java bindings quality
+
+For F3D packagers:
+
+- BREAKING: Removed VTK v9.3.0 support
+- BREAKING: Changed default location for config files on linux, which is now `/usr/share/f3d/configs`
+- BREAKING: Add many cmake component to `ALL`, making default install fully functional
+- Added support for OCCT 8.0
+- Added a new optional dependency: FFmpeg
+- Added a new vendored dependency: [clip](https://github.com/dacap/clip)
+- Added support for shipping pkg-config files for libf3d and libf3d C bindings
+
+For Web viewer users:
+
+- Added support for HDF based formats
+- Fixed many rendering issues
+
+For f3d-android users:
+
+- Fixed a crash with Android 16+
+- Added more file support (plugins: usd, hdf, vdb)
+- Fixed many rendering issues
+- Added support for GPU skinning/morphing
+- Added an option panel
+- Added a console widget
+- Added animation support
+- Added scene hierarchy and metadata widget
+- Added a donation button
+
 ## v3.5.0
 
 For F3D users:

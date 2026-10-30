@@ -46,7 +46,8 @@ if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
     f3d_test(NAME TestPipedXBF DATA f3d.xbf PLUGIN occt ARGS --up=+Z PIPED_READER XBF PIPED)
   endif()
 
-  if (NOT F3D_MACOS_BUNDLE)
+  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13818
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016 AND NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/occt/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)

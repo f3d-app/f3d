@@ -39,6 +39,9 @@
 #include <vtkSequencePass.h>
 #include <vtkShaderProgram.h>
 #include <vtkShaderProperty.h>
+#include <vtkShadowMapBakerPass.h>
+#include <vtkShadowMapPass.h>
+
 #include <vtkSkybox.h>
 #include <vtkTextureObject.h>
 #include <vtkToneMappingPass.h>
@@ -46,6 +49,10 @@
 #include <vtkUniforms.h>
 #include <vtkVersion.h>
 #include <vtkVolumetricPass.h>
+
+#if F3D_MODULE_ANARI
+#include <vtkAnariPass.h>
+#endif
 
 #if F3D_MODULE_RAYTRACING
 #include <vtkOSPRayPass.h>
@@ -62,6 +69,7 @@ void vtkF3DRenderPass::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "UseRaytracing: " << this->UseRaytracing << "\n";
+  os << indent << "UseAnari: " << this->UseAnari << "\n";
   os << indent << "UseSSAOPass: " << this->UseSSAOPass << "\n";
   os << indent << "UseBlurBackground: " << this->UseBlurBackground << "\n";
   os << indent << "ForceOpaqueBackground: " << this->ForceOpaqueBackground << "\n";
@@ -245,13 +253,32 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   }
 
   // main pass
+  this->MainPass = vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass>::New();
+  this->MainPass->SetColorFormat(vtkTextureObject::Float32);
+
+  // Needed because VTK can pick the wrong format with certain drivers
+#ifdef F3D_USE_GLES
+  // Fixed32 not supported on GLES
+  this->MainPass->SetDepthFormat(vtkTextureObject::Fixed24);
+#else
+  this->MainPass->SetDepthFormat(vtkTextureObject::Fixed32);
+#endif
+
 #if F3D_MODULE_RAYTRACING
   if (this->UseRaytracing)
   {
     vtkNew<vtkOSPRayPass> ospP;
-    this->MainPass = vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass>::New();
     this->MainPass->SetDelegatePass(ospP);
-    this->MainPass->SetColorFormat(vtkTextureObject::Float32);
+  }
+  else
+#endif
+#ifdef F3D_MODULE_ANARI
+    if (this->UseAnari)
+  {
+    vtkNew<vtkAnariPass> anariP;
+    anariP->GetAnariDevice()->SetupAnariDeviceFromLibrary(
+      this->AnariLibrary.c_str(), "default", false);
+    this->MainPass->SetDelegatePass(anariP);
   }
   else
 #endif
@@ -326,22 +353,37 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     vtkNew<vtkCameraPass> camP;
     camP->SetDelegatePass(sequence);
 
-    this->MainPass = vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass>::New();
-    this->MainPass->SetColorFormat(vtkTextureObject::Float32);
+    vtkSmartPointer<vtkRenderPass> mainSequencePass = camP;
 
-    // Needed because VTK can pick the wrong format with certain drivers
-#ifdef F3D_USE_GLES
-    // Fixed32 not supported on GLES
-    this->MainPass->SetDepthFormat(vtkTextureObject::Fixed24);
-#else
-    this->MainPass->SetDepthFormat(vtkTextureObject::Fixed32);
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
+    if (this->RenderShadows)
+    {
+      // shadows
+      const vtkNew<vtkShadowMapBakerPass> shadowBakeP;
+      shadowBakeP->SetExponentialConstant(this->ShadowExponentialConstant);
+      shadowBakeP->SetResolution(this->ShadowResolution);
+      shadowBakeP->SetDelegatePass(camP);
+
+      const vtkNew<vtkShadowMapPass> shadowP;
+      shadowP->SetDelegatePass(camP);
+      shadowP->SetShadowMapBakerPass(shadowBakeP);
+
+      vtkNew<vtkRenderPassCollection> collectionShadows;
+      collectionShadows->AddItem(shadowBakeP);
+      collectionShadows->AddItem(shadowP);
+
+      vtkNew<vtkSequencePass> sequenceShadows;
+      sequenceShadows->SetPasses(collectionShadows);
+
+      mainSequencePass = sequenceShadows;
+    }
 #endif
 
     // TAA
     if (renderer && renderer->GetAntiAliasingMode() == vtkF3DRenderer::AntiAliasingMode::TAA)
     {
       vtkNew<vtkF3DTAAPass> taaP;
-      taaP->SetDelegatePass(camP);
+      taaP->SetDelegatePass(mainSequencePass);
 
       glRenderer->GetRenderWindow()->AddObserver(
         vtkCommand::WindowResizeEvent, taaP.Get(), &vtkF3DTAAPass::ResetIterations);
@@ -352,7 +394,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     }
     else
     {
-      this->MainPass->SetDelegatePass(camP);
+      this->MainPass->SetDelegatePass(mainSequencePass);
     }
 
     // reflection baking pass, same as main pass but with reflected camera

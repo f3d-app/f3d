@@ -106,6 +106,7 @@ static f3d::light_state_t JavaLightStateToCppLightState(JNIEnv* env, jobject jli
   jfieldID positionalLightField = env->GetFieldID(lightStateClass, "positionalLight", "Z");
   jfieldID intensityField = env->GetFieldID(lightStateClass, "intensity", "D");
   jfieldID switchStateField = env->GetFieldID(lightStateClass, "switchState", "Z");
+  jfieldID castShadowsField = env->GetFieldID(lightStateClass, "castShadows", "Z");
 
   const JniLocalRef<jobject> jtype(env, env->GetObjectField(jlightState, typeField));
   const JniLocalRef<jclass> typeEnumClass(env, env->GetObjectClass(jtype));
@@ -143,6 +144,7 @@ static f3d::light_state_t JavaLightStateToCppLightState(JNIEnv* env, jobject jli
   cppLightState.positionalLight = env->GetBooleanField(jlightState, positionalLightField);
   cppLightState.intensity = env->GetDoubleField(jlightState, intensityField);
   cppLightState.switchState = env->GetBooleanField(jlightState, switchStateField);
+  cppLightState.castShadows = env->GetBooleanField(jlightState, castShadowsField);
 
   return cppLightState;
 }
@@ -460,6 +462,25 @@ extern "C"
 
     const JniUTFString str(env, filePath);
     const f3d::file_availability result = GetEngine(env, self)->getScene().supports(str.c_str());
+
+    const JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Scene$FileAvailability"));
+    jmethodID fromValueMethod =
+      env->GetStaticMethodID(enumClass, "fromValue", "(I)Lapp/f3d/F3D/Scene$FileAvailability;");
+    return env->CallStaticObjectMethod(enumClass, fromValueMethod, static_cast<int>(result));
+  }
+
+  JNIEXPORT jobject JAVA_BIND(Scene, supportsBuffer)(JNIEnv* env, jobject self, jbyteArray buffer)
+  {
+    jsize bufferLen = env->GetArrayLength(buffer);
+    jbyte* bufferData = bufferLen > 0 ? env->GetByteArrayElements(buffer, nullptr) : nullptr;
+
+    f3d::file_availability result = GetEngine(env, self)->getScene().supports(
+      reinterpret_cast<std::byte*>(bufferData), static_cast<size_t>(bufferLen));
+
+    if (bufferData)
+    {
+      env->ReleaseByteArrayElements(buffer, bufferData, 0);
+    }
 
     const JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Scene$FileAvailability"));
     jmethodID fromValueMethod =

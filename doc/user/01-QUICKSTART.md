@@ -58,7 +58,7 @@ For **default scene** formats, certain default values are set automatically:
 - line-width: 1.0
 - point-size: 10.0
 - opacity: 1.0
-- color: 0.65, 0.65, 0.65
+- color: 0.82, 0.82, 0.82
 - emissive-factor: 1.0, 1.0, 1.0
 - normal-scale: 1.0
 - metallic: 0.0

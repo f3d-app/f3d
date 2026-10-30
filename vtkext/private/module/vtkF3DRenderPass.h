@@ -44,6 +44,7 @@ public:
 
   vtkSetMacro(ArmatureVisible, bool);
   vtkSetMacro(UseRaytracing, bool);
+  vtkSetMacro(UseAnari, bool);
   vtkSetMacro(UseSSAOPass, bool);
   vtkSetMacro(UseBlurBackground, bool);
   vtkSetMacro(ForceOpaqueBackground, bool);
@@ -51,6 +52,10 @@ public:
   vtkSetMacro(CircleOfConfusionRadius, double);
   vtkSetMacro(RenderReflection, bool);
   vtkSetMacro(XRMode, bool);
+  vtkSetMacro(RenderShadows, bool);
+  vtkSetMacro(ShadowExponentialConstant, double);
+  vtkSetMacro(ShadowResolution, int);
+  vtkSetMacro(AnariLibrary, std::string);
 
   /**
    * Modify shader code for matcap/gamma/skinning
@@ -79,11 +84,16 @@ protected:
 
   bool ArmatureVisible = false;
   bool UseRaytracing = false;
+  bool UseAnari = false;
+  std::string AnariLibrary = "environment";
   bool UseSSAOPass = false;
   bool UseBlurBackground = false;
   bool ForceOpaqueBackground = false;
   bool RenderReflection = false;
   bool XRMode = false;
+  bool RenderShadows = false;
+  double ShadowExponentialConstant = 25.0;
+  int ShadowResolution = 1024;
 
   double CircleOfConfusionRadius = 20.0;
 

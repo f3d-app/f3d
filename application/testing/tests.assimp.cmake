@@ -59,7 +59,7 @@ if("${F3D_ASSIMP_VERSION}" VERSION_GREATER_EQUAL "6.0.1")
 endif()
 
 # Armature support
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219 AND "${F3D_ASSIMP_VERSION}" VERSION_GREATER_EQUAL "5.4.3")
+if("${F3D_ASSIMP_VERSION}" VERSION_GREATER_EQUAL "5.4.3")
   f3d_test(NAME TestFBXRigArmature DATA punch.fbx ARGS --animation-time=1 --armature PLUGIN assimp)
   f3d_test(NAME TestFBXRigArmatureWithOpacity DATA punch.fbx ARGS --animation-time=1 --armature --opacity=0.5 -p PLUGIN assimp)
   f3d_test(NAME TestFBXRigArmatureSphereTube DATA punch.fbx ARGS --animation-time=1 --armature --point-size=20 --line-width=5 PLUGIN assimp THRESHOLD 0.06) # Sphere and tube are slightly different on GLES
@@ -67,8 +67,8 @@ endif()
 
 if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/plugins/assimp/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13818
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016)
     f3d_test(NAME TestDefaultConfigFileAssimpFBX DATA phong_cube.fbx CONFIG config_build LONG_TIMEOUT UI SKIP_GLES LABELS "plugin;assimp")
     f3d_test(NAME TestDefaultConfigFileAssimpDXF DATA PinkEggFromLW.dxf ARGS -p CONFIG config_build LONG_TIMEOUT UI SKIP_GLES LABELS "plugin;assimp")
     f3d_test(NAME TestDefaultConfigFileAssimpOFF DATA teapot.off CONFIG config_build LONG_TIMEOUT UI SKIP_GLES LABELS "plugin;assimp")

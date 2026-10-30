@@ -7,6 +7,7 @@ list(APPEND javaf3dTests_list
   ${CMAKE_CURRENT_SOURCE_DIR}/TestLog.java
   ${CMAKE_CURRENT_SOURCE_DIR}/TestOptions.java
   ${CMAKE_CURRENT_SOURCE_DIR}/TestScene.java
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestSceneBuffer.java
   ${CMAKE_CURRENT_SOURCE_DIR}/TestTypes.java
   ${CMAKE_CURRENT_SOURCE_DIR}/TestUtils.java
   ${CMAKE_CURRENT_SOURCE_DIR}/TestWindow.java
@@ -15,12 +16,6 @@ list(APPEND javaf3dTests_list
 if(F3D_MODULE_FFMPEG)
   list(APPEND javaf3dTests_list
     ${CMAKE_CURRENT_SOURCE_DIR}/TestVideo.java
-    )
-endif()
-
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
-  list(APPEND javaf3dTests_list
-    ${CMAKE_CURRENT_SOURCE_DIR}/TestSceneBuffer.java
     )
 endif()
 

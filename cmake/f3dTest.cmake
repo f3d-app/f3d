@@ -53,9 +53,9 @@ f3d_test(<NAME> [ARGS...])
   - `HDRI` Provide the `--hdri-file` to use for this test
   - `RENDERING_BACKEND` Provide the `--rendering-backend` to use for this test instead of `auto`
   - `WORKING_DIR` Provide a specific working directory to use for this test instead of current dir
-  - `LABELS` Provide a specific labels to identify and group tests
+  - `LABELS` Provide specific labels to identify and group tests
   - `DATA` Data to open, support multiple input, also set test labels accordingly
-  - `DEPENDS` Tests the this test depends on if any
+  - `DEPENDS` Tests this test depends on if any
   - `ENV` Environment variables to set for this test
   - `ARGS` Supplement arguments to add to the f3d command line
 #]==]

@@ -6,19 +6,12 @@ set(F3D_VTK_MODULES
   VTK::CommonColor
   VTK::IOImage
   VTK::InteractionWidgets
+  VTK::RenderingGridAxes
   f3d::vtkext
   f3d::vtkextPrivate
 )
 
 # Check modules
-
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
-  if(TARGET VTK::RenderingGridAxes)
-    set(F3D_VTK_MODULES ${F3D_VTK_MODULES} VTK::RenderingGridAxes)
-  else()
-    message(FATAL_ERROR "VTK::RenderingGridAxes is not found, please enable it")
-  endif()
-endif()
 
 if(F3D_MODULE_RAYTRACING)
   if(TARGET VTK::RenderingRayTracing)
@@ -45,6 +38,14 @@ if (F3D_MODULE_OPENXR)
   endif()
 endif()
 
+if(F3D_MODULE_ANARI)
+  if(TARGET VTK::RenderingAnariOpenGL)
+    message(STATUS "VTK::RenderingAnariOpenGL module found")
+    set(F3D_VTK_MODULES ${F3D_VTK_MODULES} VTK::RenderingAnariOpenGL)
+  else()
+    message(FATAL_ERROR "F3D_MODULE_ANARI option is enabled but VTK::RenderingAnariOpenGL is not found. (VTK > 9.7.20260914 is needed)")
+  endif()
+endif()
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/src/config.cxx.in"
@@ -239,6 +240,11 @@ endif ()
 # clip
 if (F3D_MODULE_CLIP)
   target_compile_definitions(libf3d PRIVATE F3D_MODULE_CLIP)
+endif ()
+
+# anari
+if (F3D_MODULE_ANARI)
+  target_compile_definitions(libf3d PRIVATE F3D_MODULE_ANARI)
 endif ()
 
 # raytracing

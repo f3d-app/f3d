@@ -20,21 +20,18 @@ if(NOT APPLE) # MacOS does not support compute shaders
   f3d_test(NAME TestSPZDegree0 DATA hornedlizard_small_d0.spz ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,4.2 SKIP_GLES)
   f3d_test(NAME TestInvalidSH DATA invalid_spherical_harmonics.vtp ARGS -o --coloring-mode=direct --verbose REGEXP "Spherical harmonics array is not valid" NO_BASELINE)
 
-  # Needs texture array support: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12112
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
-    f3d_test(NAME TestSPZDegree1 DATA hornedlizard_small_d1.spz ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,4.2 SKIP_GLES)
-    f3d_test(NAME TestSPZDegree2 DATA hornedlizard_small_d2.spz ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,4.2 SKIP_GLES)
-    f3d_test(NAME TestSPZDegree3 DATA hornedlizard_small_d3.spz ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,4.2 SKIP_GLES)
-    f3d_test(NAME TestSPZDegree1Stochastic DATA hornedlizard_small_d1.spz ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=stochastic --camera-position=-3.6,0.5,4.2 SKIP_GLES) # Test instancing with spherical harmonics
+  f3d_test(NAME TestSPZDegree1 DATA hornedlizard_small_d1.spz ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,4.2 SKIP_GLES)
+  f3d_test(NAME TestSPZDegree2 DATA hornedlizard_small_d2.spz ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,4.2 SKIP_GLES)
+  f3d_test(NAME TestSPZDegree3 DATA hornedlizard_small_d3.spz ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,4.2 SKIP_GLES)
+  f3d_test(NAME TestSPZDegree1Stochastic DATA hornedlizard_small_d1.spz ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=stochastic --camera-position=-3.6,0.5,4.2 SKIP_GLES) # Test instancing with spherical harmonics
 
-    # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
-    if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-      f3d_test(NAME TestDefaultConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
-    endif()
-    f3d_test(NAME TestThumbnailConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG thumbnail_build LONG_TIMEOUT SKIP_GLES)
-    f3d_test(NAME TestSPZVersion3 DATA bonsai.spz ARGS --coloring-mode=direct --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-2.6,0.5,-3.2 SKIP_GLES)
-    f3d_test(NAME TestInvalidSPZTruncated DATA invalid_spz_gzip_truncated.spz ARGS -o --coloring-mode=direct --verbose REGEXP "Invalid GZIP file" NO_BASELINE)
-    f3d_test(NAME TestInvalidSPZMagic DATA invalid_spz_magic.spz ARGS -o --coloring-mode=direct --verbose REGEXP "Incompatible SPZ header" NO_BASELINE)
-    f3d_test(NAME TestInvalidSPZVersion DATA invalid_spz_version.spz ARGS -o --coloring-mode=direct --verbose REGEXP "Incompatible SPZ version. Only 2 and 3 are supported" NO_BASELINE)
+  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+    f3d_test(NAME TestDefaultConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
   endif()
+  f3d_test(NAME TestThumbnailConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG thumbnail_build LONG_TIMEOUT SKIP_GLES)
+  f3d_test(NAME TestSPZVersion3 DATA bonsai.spz ARGS --coloring-mode=direct --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-2.6,0.5,-3.2 SKIP_GLES)
+  f3d_test(NAME TestInvalidSPZTruncated DATA invalid_spz_gzip_truncated.spz ARGS -o --coloring-mode=direct --verbose REGEXP "Invalid GZIP file" NO_BASELINE)
+  f3d_test(NAME TestInvalidSPZMagic DATA invalid_spz_magic.spz ARGS -o --coloring-mode=direct --verbose REGEXP "Incompatible SPZ header" NO_BASELINE)
+  f3d_test(NAME TestInvalidSPZVersion DATA invalid_spz_version.spz ARGS -o --coloring-mode=direct --verbose REGEXP "Incompatible SPZ version. Only 2 and 3 are supported" NO_BASELINE)
 endif()

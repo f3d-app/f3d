@@ -133,6 +133,26 @@ Filename to save [screenshots](04-INTERACTIONS.md#take-screenshots) to. Can use 
 Rendering backend to load, `auto` means to let F3D pick the correct one for you depending on your system capabilities. Use `egl` or `osmesa` to force headless rendering. Use `rendering-backend=xr` to specify F3D should use the xr rendering backend, referred in this doc as "XR mode".
 See [rendering backends](12-DESKTOP_INTEGRATION.md#rendering-backends).
 
+### `-r`, `--rendering-mode=<opengl|ospray|anari>` (_string_, default: `opengl`, implicit: `ospray`)
+
+Select the rendering mode to use.
+If OSPRay raytracing is used, requires OSPRay raytracing to be enabled in the linked VTK dependency.
+If Anari is used, requires Anari to be enabled in the linked VTK dependency.
+
+> [!NOTE]
+> The `anari` rendering mode is experimental and not available in the binary release
+
+#### compare
+
+| OpenGL                                         | OSPRay raytracing                            |
+| ---------------------------------------------- | -------------------------------------------- |
+| ![raytracing off](./images/raytracing_off.png) | ![raytracing on](./images/raytracing_on.png) |
+
+### `--anari-library=<name>` (_string_)
+
+Select the Anari library to use.
+If not specified, the library is selected from the value of the `ANARI_LIBRARY` environment variable.
+
 ### `-D`, `--define=<libf3d.option=value>` (_special_)
 
 A repeatable option to set [libf3d](../libf3d/03-OPTIONS.md) and [reader](02-SUPPORTED_FORMATS.md#reader-options) option manually. May trigger unexpected behavior.
@@ -425,6 +445,26 @@ Adjusts the scales of normal glyphs.
 | 0.3                                                              | 0.7                                                              |
 | ---------------------------------------------------------------- | ---------------------------------------------------------------- |
 | ![normal glyphs scale 0.3](./images/normal_glyphs_scale_0.3.png) | ![normal glyphs scale 0.7](./images/normal_glyphs_scale_0.7.png) |
+
+### `--normal-glyphs-color` (_color_, default: `0.82, 0.82, 0.82`)
+
+Set the color of normal glyphs.
+
+#### compare
+
+| Default                                                       | Maroon                                                           |
+| ------------------------------------------------------------- | ---------------------------------------------------------------- |
+| ![normal glyphs default color](./images/normal_glyphs_on.png) | ![normal glyphs marron color](./images/normal_glyphs_maroon.png) |
+
+### `--normal-glyphs-shape=<arrow|cone|cylinder|line>` (_string_, default: `arrow`)
+
+Set the shape of normal glyphs.
+
+#### compare
+
+| Arrow                                                       | Cylinder                                                                   |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------- |
+| ![normal glyphs arrow shape](./images/normal_glyphs_on.png) | ![normal glyphs cylinder shape](./images/normal_glyphs_shape_cylinder.png) |
 
 ### `-o`, `--point-sprites=<none|sphere|gaussian|circle|stddev|bound|cross>` (_string_, default: `none`, implicit: `sphere`)
 
@@ -774,7 +814,7 @@ _Adjust the intensity_ of every light in the scene, including HDRI image-based l
 
 ## Scientific visualization options
 
-### `-s`, `--coloring-mode` (_string_, default: `material`)
+### `-s`, `--coloring-mode` (_string_, default: `material`, implicit: `scivis`)
 
 Specify the coloring mode.
 _material_ means default file materials (textured or solid color)
@@ -956,16 +996,6 @@ Set the camera to use the orthographic projection. Model-specified by default.
 
 ## Raytracing options
 
-### `-r`, `--raytracing` (_bool_, default: `false`)
-
-Enable _OSPRay raytracing_. Requires OSPRay raytracing to be enabled in the linked VTK dependency.
-
-#### compare
-
-| OFF                                            | ON                                           |
-| ---------------------------------------------- | -------------------------------------------- |
-| ![raytracing off](./images/raytracing_off.png) | ![raytracing on](./images/raytracing_on.png) |
-
 ### `--raytracing-samples=<samples>` (_int_, default: `5`)
 
 Set the number of _samples per pixel_ when using raytracing.
@@ -1014,6 +1044,16 @@ Enable _ambient occlusion_. This is a technique used to improve the depth percep
 | OFF                                                          | ON                                                         |
 | ------------------------------------------------------------ | ---------------------------------------------------------- |
 | ![ambient occlusion off](./images/ambient_occlusion_off.png) | ![ambient occlusion on](./images/ambient_occlusion_on.png) |
+
+### `--shadows` (_bool_, default: `false`)
+
+Enable _shadows_. All lights from files cast shadows and only opaque objects are considered as occluder. Shadows are visible on the grid.
+
+#### compare
+
+| OFF                                      | ON                                     |
+| ---------------------------------------- | -------------------------------------- |
+| ![shadows off](./images/shadows_off.png) | ![shadows on](./images/shadows_on.png) |
 
 ### `-a`, `--anti-aliasing` (_string_, default: `none`, implicit: `fxaa`)
 

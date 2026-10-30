@@ -64,6 +64,7 @@ def test_scene():
         intensity=0.5,
         positional_light=True,
         switch_state=True,
+        cast_shadows=True,
         type=f3d.LightType.HEADLIGHT,
     )
     engine.scene.add_light(red_light)
@@ -72,6 +73,7 @@ def test_scene():
     assert engine.scene.get_light_count() == 2
     assert engine.scene.get_light(0).color.to_tuple() == (1.0, 0.0, 0.0)
     assert engine.scene.get_light(1).color.to_tuple() == (0.0, 1.0, 0.0)
+    assert engine.scene.get_light(1).cast_shadows == True
 
     blue_light = green_light
     blue_light.color = f3d.Color(0.0, 0.0, 1.0)

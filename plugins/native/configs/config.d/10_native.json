@@ -1,17 +1,20 @@
 [
   {
     "match-type": "glob",
-    "match": "*.{dcm,nrrd,nhdr,mhd,mha,vtp,vtu,vtr,vti,vts,vtm}",
+    "match": "*.{dcm,nrrd,nhdr,mhd,mha,vti}",
     "options": {
       "coloring-mode": "scivis",
-      "coloring-scalar-bar": true
+      "coloring-scalar-bar": true,
+      "volume": true
     }
   },
   {
     "match-type": "glob",
-    "match": "*.{dcm,nrrd,nhdr,mhd,mha,vti}",
+    "match": "*.{vtp,vtu,vtr,vts,vtm}",
     "options": {
-      "volume": true
+      "coloring-mode": "scivis",
+      "coloring-scalar-bar": true,
+      "shadows": true
     }
   },
   {
@@ -19,14 +22,16 @@
     "match": "*.{3ds,stl}",
     "options": {
       "up": "+Z",
-      "camera-direction": "-1,1,-0.5"
+      "camera-direction": "-1,1,-0.5",
+      "shadows": true
     }
   },
   {
     "match-type": "glob",
     "match": "*.{stl,gml,pts}",
     "options": {
-      "coloring-mode": "scivis"
+      "coloring-mode": "scivis",
+      "shadows": true
     }
   },
   {
@@ -94,7 +99,8 @@
     "match-type": "glob",
     "match": "*.mdl",
     "options": {
-      "up": "+Z"
+      "up": "+Z",
+      "shadows": true
     }
   }
 ]

@@ -47,11 +47,9 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
 endif()
 
 # Armature
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219)
-  f3d_test(NAME TestUSDRigArmature DATA RiggedSimple.usdz ARGS --animation-time=1 --armature PLUGIN usd)
-  f3d_test(NAME TestUSDRigArmatureWithOpacity DATA RiggedSimple.usdz ARGS --animation-time=1 --armature --opacity=0.5 -p PLUGIN usd)
-  f3d_test(NAME TestUSDRigArmatureSphereTube DATA RiggedSimple.usdz ARGS --animation-time=1 --armature --point-size=20 --line-width=5 PLUGIN usd)
-endif()
+f3d_test(NAME TestUSDRigArmature DATA RiggedSimple.usdz ARGS --animation-time=1 --armature PLUGIN usd)
+f3d_test(NAME TestUSDRigArmatureWithOpacity DATA RiggedSimple.usdz ARGS --animation-time=1 --armature --opacity=0.5 -p PLUGIN usd)
+f3d_test(NAME TestUSDRigArmatureSphereTube DATA RiggedSimple.usdz ARGS --animation-time=1 --armature --point-size=20 --line-width=5 PLUGIN usd)
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251016)
   f3d_test(NAME TestPipedUSD DATA suzanne.usd PLUGIN usd PIPED_READER USD PIPED)
@@ -59,7 +57,8 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251016)
   f3d_test(NAME TestPipedUSDZRigged DATA RiggedSimple.usdz PLUGIN usd PIPED_READER USD PIPED)
 endif()
 
-if(NOT F3D_MACOS_BUNDLE)
+  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13818
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016 AND NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/plugins/usd/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)

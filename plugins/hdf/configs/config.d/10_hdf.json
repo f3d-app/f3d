@@ -7,5 +7,12 @@
       "load-plugins": "hdf",
       "coloring-scalar-bar": true
     }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.{exo,ex2,e,g,vtkhdf}",
+    "options": {
+      "shadows": true
+    }
   }
 ]
