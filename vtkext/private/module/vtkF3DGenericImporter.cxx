@@ -635,8 +635,8 @@ void vtkF3DGenericImporter::ImportPartitionedDataSet(int nodeid,
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DGenericImporter::ImportPartitionedDataSet(
-  int nodeid, vtkPartitionedDataSet* pds, vtkRenderer* ren, const std::string& pdsName, bool visible)
+void vtkF3DGenericImporter::ImportPartitionedDataSet(int nodeid, vtkPartitionedDataSet* pds,
+  vtkRenderer* ren, const std::string& pdsName, bool visible)
 {
   std::string baseName = pdsName;
   if (baseName.empty())
