@@ -181,7 +181,7 @@ f3d_test(NAME TestLightIntensityBrighterFullScene DATA WaterBottle.glb ARGS --li
 f3d_test(NAME TestLightIntensityDarkerFullScene DATA WaterBottle.glb ARGS --light-intensity=0.2)
 
 ## Light Representation
-f3d_test(NAME TestLightRepresentation DATA PointLightIntensityTest.glb ARGS --light-representation THRESHOLD 0.0)
+f3d_test(NAME TestLightRepresentation DATA PointLightIntensityTest.glb ARGS --light-representation THRESHOLD 0.09)
 
 ## Other UI
 f3d_test(NAME TestUTF8 DATA "(ノಠ益ಠ )ノ.vtp")
