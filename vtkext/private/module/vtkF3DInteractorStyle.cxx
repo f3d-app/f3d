@@ -162,11 +162,11 @@ void vtkF3DInteractorStyle::Rotate()
   {
     const auto axis = rotationAxis.value();
 
-    double delta = (std::abs(rxf) > std::abs(ryf) ? rxf : ryf);
+    const double delta = (std::abs(rxf) > std::abs(ryf) ? rxf : ryf);
 
     if (axis[0] == 1.0 && axis[1] == 0.0 && axis[2] == 0.0 && this->InteractionMode != TRACKBALL)
     {
-      double elevation = vtkMath::DegreesFromRadians(
+      const double elevation = vtkMath::DegreesFromRadians(
         vtkMath::AngleBetweenVectors(ren->GetUpDirection(), camera->GetDirectionOfProjection()) -
         vtkMath::Pi() / 2);
       camera->Elevation(
