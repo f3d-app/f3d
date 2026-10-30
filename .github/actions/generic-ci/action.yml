@@ -162,6 +162,7 @@ runs:
         -DF3D_EXCLUDE_DEPRECATED=${{ inputs.exclude_deprecated_label == 'exclude-deprecated' && 'ON' || 'OFF' }}
         -DF3D_LINUX_GENERATE_MAN=ON
         -DF3D_MACOS_BUNDLE=${{ inputs.bundle_label == 'bundle' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_ANARI=${{ (inputs.optdeps_label == 'optdeps' && inputs.vtk_version == 'commit') && 'ON' || 'OFF' }}
         -DF3D_MODULE_CLIP=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_EXR=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_FFMPEG=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
@@ -455,8 +456,7 @@ runs:
 
     - name: Check Install Windows Console Executable
       if: |
-        inputs.vtk_version != 'v9.4.2' && inputs.vtk_version != 'v9.5.2'
-        && runner.os == 'Windows'
+        inputs.vtk_version != 'v9.5.2' && runner.os == 'Windows'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |

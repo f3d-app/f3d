@@ -45,14 +45,14 @@ Not every binary ships every plugin, so a file may open in one binary but not an
 | Plugin    | Desktop | Python wheel | npm / WebAssembly |      Android       |
 | --------- | :-----: | :----------: | :---------------: | :----------------: |
 | `native`  |   Yes   |     Yes      |        Yes        |        Yes         |
-| `alembic` |   Yes   |     Yes      |        No         |        Yes         |
+| `alembic` |   Yes   |     Yes      |        Yes        |        Yes         |
 | `assimp`  |   Yes   |     Yes      |        Yes        |        Yes         |
 | `draco`   |   Yes   |     Yes      |        Yes        |        Yes         |
 | `hdf`     |   Yes   |     Yes      |        Yes        |        Yes         |
 | `occt`    |   Yes   |     Yes      |        Yes        |        Yes         |
 | `pdal`    |   Yes   |     Yes      |        No         |         No         |
-| `usd`     |   Yes   |      No      |        No         | Yes (64-bits only) |
-| `vdb`     |   Yes   |      No      |        No         |        Yes         |
+| `usd`     |   Yes   |      No      |        Yes        | Yes (64-bits only) |
+| `vdb`     |   Yes   |      No      |        Yes        |        Yes         |
 | `webifc`  |   Yes   |     Yes      |        Yes        |        Yes         |
 
 F3D searches for plugins in this order:

@@ -1857,9 +1857,7 @@ vtkInformationKeyMacro(vtkF3DUSDImporter, TCOORDS_NAME, String);
 vtkF3DUSDImporter::vtkF3DUSDImporter()
   : Internals(new vtkF3DUSDImporter::vtkInternals(this))
 {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20241219)
   this->ImportArmatureOn();
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -1904,11 +1902,7 @@ void vtkF3DUSDImporter::ImportActors(vtkRenderer* renderer)
   this->SceneHierarchy = vtkSmartPointer<vtkDataAssembly>::New();
   this->SceneHierarchy->SetAttribute(vtkDataAssembly::GetRootNode(), "label", "root");
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20241219)
   const bool armature = this->GetImportArmature();
-#else
-  constexpr bool armature = false;
-#endif
 
   if (!this->Internals->ImportRoot(renderer, this->SceneHierarchy, this->ActorCollection, armature))
   {

@@ -3,7 +3,8 @@
     "match-type": "glob",
     "match": "*.usd{,a,c,z}",
     "options": {
-      "load-plugins": "usd"
+      "load-plugins": "usd",
+      "shadows": true
     }
   }
 ]

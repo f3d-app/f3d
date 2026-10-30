@@ -105,6 +105,27 @@ public:
     ANY
   };
 
+  /**
+   * Enum listing possible normal glyph shapes.
+   */
+  enum class NormalGlyphShape : unsigned char
+  {
+    ARROW,
+    CONE,
+    CYLINDER,
+    LINE
+  };
+
+  /**
+   * Enum listing possible rendering modes.
+   */
+  enum class RenderingMode : unsigned char
+  {
+    OPENGL,
+    OSPRAY,
+    ANARI
+  };
+
   ///@{
   /**
    * Set visibility of different actors
@@ -153,6 +174,10 @@ public:
   void SetGridColor(const std::vector<double>& color);
   void SetGridOpacity(const double strength);
   void SetGridReflection(const double strength);
+  void SetGridShadow(const double strength);
+  void SetShadows(bool use);
+  void SetShadowExponentialConstant(double constant);
+  void SetShadowResolution(int resolution);
   void SetAxesColor(const std::vector<double>& colorXAxis, const std::vector<double>& colorYAxis,
     const std::vector<double>& colorZAxis);
   void SetSceneHierarchyMaxWidth(const int width);
@@ -173,7 +198,8 @@ public:
   /**
    * Set usages and configurations of different render passes
    */
-  void SetUseRaytracing(bool use);
+  void SetRenderingMode(RenderingMode mode);
+  void SetAnariLibrary(const std::string& anariLibrary);
   void SetUseRaytracingDenoiser(bool use);
   void SetBlendingMode(BlendingMode mode);
   BlendingMode GetBlendingMode() const;
@@ -400,6 +426,16 @@ public:
    * Sets the GlyphScaleMultiplier
    */
   void SetNormalGlyphScaleMultiplier(double multiplier);
+
+  /**
+   * Sets the color of the normal glyphs
+   */
+  void SetNormalGlyphColor(const std::array<double, 3>& color);
+
+  /**
+   * Sets the shape of the normal glyphs
+   */
+  void SetNormalGlyphShape(const NormalGlyphShape& shape);
 
   /**
    * Set the visibility of the point sprites actor.
@@ -839,10 +875,7 @@ private:
   double ModernAxisBackdropOpacity = 0.0;
   double TotalTime = 0.0;
 
-  // Does vtk version support GridAxesActor
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   vtkSmartPointer<vtkGridAxesActor3D> GridAxesActor;
-#endif
 
   vtkNew<vtkActor> GridActor;
   vtkNew<vtkF3DOpenGLGridMapper> GridMapper;
@@ -875,9 +908,7 @@ private:
   bool GridVisible = false;
   bool GridAbsolute = false;
   bool AxisVisible = false;
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   bool AxesGridVisible = false;
-#endif
   std::optional<bool> EdgeVisible;
   bool TimerVisible = false;
   bool FilenameVisible = false;
@@ -891,7 +922,8 @@ private:
   bool DropZoneLogoVisible = false;
   bool HDRISkyboxVisible = false;
   bool ArmatureVisible = false;
-  bool UseRaytracing = false;
+  RenderingMode CurrentRenderingMode = RenderingMode::OPENGL;
+  std::string AnariLibrary = "environment";
   bool UseRaytracingDenoiser = false;
   AntiAliasingMode AntiAliasingModeEnabled = AntiAliasingMode::NONE;
   BlendingMode BlendingModeEnabled = BlendingMode::NONE;
@@ -915,6 +947,10 @@ private:
   double GridColor[3] = { 0.0, 0.0, 0.0 };
   double GridOpacity = 1.0;
   double GridReflection = 0.0;
+  double GridShadow = 0.4;
+  bool UseShadows = true;
+  double ShadowExponentialConstant = 25.0;
+  int ShadowResolution = 1024;
 
   double ColorAxisX[3] = { 0.0, 0.0, 0.0 };
   double ColorAxisY[3] = { 0.0, 0.0, 0.0 };
@@ -997,6 +1033,8 @@ private:
   bool ScalarBarVisible = false;
   bool UseNormalGlyphs = false;
   double NormalGlyphScaleMultiplier = 1.0;
+  std::array<double, 3> NormalGlyphColor = { 1.0, 1.0, 1.0 };
+  NormalGlyphShape GlyphShape = NormalGlyphShape::ARROW;
   bool UsePointSprites = false;
   bool UseVolume = false;
   bool UseInverseOpacityFunction = false;

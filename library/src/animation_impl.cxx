@@ -511,27 +511,21 @@ void animation_impl::CycleAnimation()
     // If we reach/exceeded the last animation
     if (this->Internals->Options.scene.animation.indices[0] >= this->Internals->AvailAnimations)
     {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250507)
       // If importer support multi animations and there are multiple animations
       if (this->Internals->Importer->GetAnimationSupportLevel() ==
           vtkImporter::AnimationSupportLevel::MULTI &&
         this->Internals->AvailAnimations > 1)
-#else
-      if (this->Internals->AvailAnimations > 1)
-#endif
       {
         // Then select all
         this->Internals->Options.scene.animation.indices.resize(this->Internals->AvailAnimations);
         std::iota(this->Internals->Options.scene.animation.indices.begin(),
           this->Internals->Options.scene.animation.indices.end(), 0);
       }
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250507)
       else
       {
         // If not, select none
         this->Internals->Options.scene.animation.indices.clear();
       }
-#endif
     }
   }
 
@@ -599,7 +593,6 @@ void animation_impl::PrepareForAnimationIndices()
     }
     else
     {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250507)
       switch (this->Internals->Importer->GetAnimationSupportLevel())
       {
         case vtkImporter::AnimationSupportLevel::UNIQUE:
@@ -623,7 +616,6 @@ void animation_impl::PrepareForAnimationIndices()
           // MULTI there is nothing to warn about
           break;
       }
-#endif
     }
   }
 

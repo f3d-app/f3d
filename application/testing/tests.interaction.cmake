@@ -57,6 +57,12 @@ endif()
 # Test reflection strength change to validate shader recompilation
 f3d_test(NAME TestInteractionGridReflectionChanged DATA suzanne.ply ARGS -g INTERACTION UI) #Escape;"set render.grid.reflection=0.8";Escape
 
+# Test shadow change to validate shader recompilation
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13818
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016)
+  f3d_test(NAME TestInteractionShadowsChanged DATA suzanne.ply ARGS -g --verbose INTERACTION UI) #Escape;"toggle render.shadows.enable";Escape
+endif()
+
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12987
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260306)
   f3d_test(NAME TestInteractionNotificationsAndSceneHierarchy DATA vtk-dasm-test.glb ARGS --notifications INTERACTION UI) #H;E
@@ -69,14 +75,11 @@ endif()
 
 f3d_test(NAME TestInteractionPointCloudTAA DATA pointsCloud.vtp ARGS --anti-aliasing=taa -o --point-sprites-size=20 INTERACTION) #Render;Render...
 
-# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12098
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250504)
-  # Random values are different on GLES so the result is different, but still converges
-  # It's not a bug but we should find a solution to have the exact same result
-  f3d_test(NAME TestInteractionStochasticTAA DATA alpha.glb ARGS --anti-aliasing=taa --blending=stochastic INTERACTION SKIP_GLES) #Render;Render...
-  f3d_test(NAME TestInteractionGaussianStochasticTAA DATA small.splat ARGS --coloring-mode=direct --point-sprites=gaussian --point-sprites-absolute-size --point-sprites-size=1 --blending=stochastic --anti-aliasing=taa --camera-position=-1.65,-0.06,1.96 --camera-focal-point=-1.65,1.24,1.96 --camera-view-up=0.9954,0,0.0955 INTERACTION LONG_TIMEOUT SKIP_GLES) #Render;Render...
-  f3d_test(NAME TestInteractionAndCLIBlending ARGS --blending DATA suzanne.stl alpha.glb INTERACTION SKIP_GLES) #PP;Down
-endif()
+# Random values are different on GLES so the result is different, but still converges
+# It's not a bug but we should find a solution to have the exact same result
+f3d_test(NAME TestInteractionStochasticTAA DATA alpha.glb ARGS --anti-aliasing=taa --blending=stochastic INTERACTION SKIP_GLES) #Render;Render...
+f3d_test(NAME TestInteractionGaussianStochasticTAA DATA small.splat ARGS --coloring-mode=direct --point-sprites=gaussian --point-sprites-absolute-size --point-sprites-size=1 --blending=stochastic --anti-aliasing=taa --camera-position=-1.65,-0.06,1.96 --camera-focal-point=-1.65,1.24,1.96 --camera-view-up=0.9954,0,0.0955 INTERACTION LONG_TIMEOUT SKIP_GLES) #Render;Render...
+f3d_test(NAME TestInteractionAndCLIBlending ARGS --blending DATA suzanne.stl alpha.glb INTERACTION SKIP_GLES) #PP;Down
 
 f3d_test(NAME TestInteractionConfigFileAndCommand DATA multi ARGS -o CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI LONG_TIMEOUT) #OX;Down;N;Down;Down;Down
 
@@ -153,10 +156,7 @@ f3d_test(NAME TestInteractionAnimationNotStopped DATA InterpolationTest.glb NO_B
 f3d_test(NAME TestInteractionAnimationCycleAnimation DATA InterpolationTest.glb INTERACTION) #WWWWWWWWWWWW;Space;Space;
 f3d_test(NAME TestInteractionCycleAnimationNoAnimation DATA cow.vtp INTERACTION NO_BASELINE) #W
 f3d_test(NAME TestInteractionCycleAnimationOneAnimation DATA f3d.glb ARGS --verbose INTERACTION NO_BASELINE REGEXP "Current animation is: No animation") #W
-
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250507)
-  f3d_test(NAME TestInteractionAnimationCycleAnimationSingle DATA soldier_animations.mdl INTERACTION) #WWWWWWWWWWWW;Space;Space;
-endif()
+f3d_test(NAME TestInteractionAnimationCycleAnimationSingle DATA soldier_animations.mdl INTERACTION) #WWWWWWWWWWWW;Space;Space;
 
 # Test interactive animation and speed factor
 f3d_test(NAME TestInteractionAnimation DATA f3d.glb ARGS --animation-progress INTERACTION UI) #Space;Wait;Space;
@@ -235,7 +235,7 @@ f3d_test(NAME TestInteractionConsoleAutoComplete DATA BoxAnimated.gltf INTERACTI
 f3d_test(NAME TestInteractionConsoleAutoCompleteNoMatch DATA BoxAnimated.gltf INTERACTION UI) #Escape;zz;Tab
 f3d_test(NAME TestInteractionConsoleAutoCompleteCandidates DATA BoxAnimated.gltf INTERACTION UI) #Escape;Tab;to;Tab
 f3d_test(NAME TestInteractionConsoleAutoCompleteHide DATA BoxAnimated.gltf INTERACTION UI) #Escape;Tab;to;Tab;Esc;Esc;Esc
-f3d_test(NAME TestInteractionConsoleAutoCompleteToggleOptions DATA cow.vtp INTERACTION UI) #Escape;to;Tab;space;r;Tab;s;Tab;Enter
+f3d_test(NAME TestInteractionConsoleAutoCompleteToggleOptions DATA cow.vtp INTERACTION UI) #Escape;to;Tab;space;r;Tab;s;Tab;o;Tab;Enter
 f3d_test(NAME TestInteractionConsoleAutoCompleteSetOptions ARGS --point-sprites=gaussian DATA cow.vtp INTERACTION UI RESOLUTION 400,300) #Escape;se;Tab;space;m;Tab;p;Tab;t;Tab;Tab;s;p;Tab;Enter
 f3d_test(NAME TestInteractionConsoleAutoCompleteSetDisplayCompl DATA cow.vtp INTERACTION UI RESOLUTION 400,300) #Escape;se;Tab;space;m;Tab;p;Tab;t;Tab;Tab;Tab
 f3d_test(NAME TestInteractionConsoleAutoCompleteReaderOptions DATA BoxAnimated.gltf INTERACTION UI) #Escape;set_r;Tab;Q;Tab;Enter

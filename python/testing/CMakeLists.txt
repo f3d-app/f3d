@@ -8,6 +8,7 @@ list(APPEND pyf3dTests_list
      test_log.py
      test_options.py
      test_scene.py
+     test_scene_buffer.py
      test_utils.py
      test_video.py
      test_window.py
@@ -16,13 +17,6 @@ list(APPEND pyf3dTests_list
 if(NOT F3D_MACOS_BUNDLE)
   list(APPEND pyf3dTests_list
        test_engine.py
-  )
-endif()
-
-
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
-  list(APPEND pyf3dTests_list
-       test_scene_buffer.py
   )
 endif()
 

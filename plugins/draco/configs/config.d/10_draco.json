@@ -4,7 +4,8 @@
     "match": "*.drc",
     "options": {
       "coloring-mode": "scivis",
-      "load-plugins": "draco"
+      "load-plugins": "draco",
+      "shadows": true
     }
   }
 ]

@@ -75,18 +75,13 @@ f3d_test(NAME TestSPLATCross DATA small.splat ARGS ${_splat_args} --point-sprite
 
 f3d_test(NAME TestQuakeMDLActorCollection DATA zombie.mdl ARGS --coloring-mode=scivis)
 
-# TGA support for OBJ added in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11922
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250220)
-  f3d_test(NAME TestOBJWithTGATexture DATA world_tga.obj)
-endif()
+f3d_test(NAME TestOBJWithTGATexture DATA world_tga.obj)
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
-  f3d_test(NAME TestPipedPLY DATA suzanne.ply PIPED_READER PLYReader PIPED)
-  f3d_test(NAME TestPipedQuakeMDL DATA zombie.mdl PIPED_READER QuakeMDL PIPED)
-  f3d_test(NAME TestPipedSPLAT DATA small.splat ARGS -o --coloring-mode=direct --up=-Y --point-sprites-absolute-size --point-sprites-size=1 PIPED_READER Splat PIPED)
-  f3d_test(NAME TestPipedSPZ DATA hornedlizard_small_d0.spz ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1 PIPED_READER SPZ PIPED)
-  f3d_test(NAME TestPipedInvalid DATA suzanne.ply ARGS --force-reader=QuakeMDL PIPED_READER QuakeMDL REGEXP "Input stream could not be loaded" NO_BASELINE PIPED)
-endif()
+f3d_test(NAME TestPipedPLY DATA suzanne.ply PIPED_READER PLYReader PIPED)
+f3d_test(NAME TestPipedQuakeMDL DATA zombie.mdl PIPED_READER QuakeMDL PIPED)
+f3d_test(NAME TestPipedSPLAT DATA small.splat ARGS -o --coloring-mode=direct --up=-Y --point-sprites-absolute-size --point-sprites-size=1 PIPED_READER Splat PIPED)
+f3d_test(NAME TestPipedSPZ DATA hornedlizard_small_d0.spz ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1 PIPED_READER SPZ PIPED)
+f3d_test(NAME TestPipedInvalid DATA suzanne.ply ARGS --force-reader=QuakeMDL PIPED_READER QuakeMDL REGEXP "Input stream could not be loaded" NO_BASELINE PIPED)
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250923)
   f3d_test(NAME TestPipedGLTFImporter DATA f3d.glb PIPED_READER GLB PIPED)
@@ -99,7 +94,8 @@ endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251104)
   f3d_test(NAME TestPipedSTL DATA suzanne.stl PIPED_READER STL PIPED)
-  if(NOT F3D_MACOS_BUNDLE)
+  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13818
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016 AND NOT F3D_MACOS_BUNDLE)
     f3d_test(NAME TestDefaultConfigFilePipedSTL DATA suzanne.stl PIPED_READER STL CONFIG config_build LONG_TIMEOUT UI PIPED SKIP_GLES)
   endif()
 endif()
@@ -144,8 +140,8 @@ if(NOT F3D_MACOS_BUNDLE)
   # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
   configure_file("${F3D_SOURCE_DIR}/testing/configs/complex.json" "${CMAKE_BINARY_DIR}/share/f3d/configs/complex_build.json" COPYONLY)
   file(COPY "${F3D_SOURCE_DIR}/resources/configs/config.d/" "${F3D_SOURCE_DIR}/plugins/native/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13818
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016)
     f3d_test(NAME TestConfigFileBuild DATA dragon.vtu CONFIG complex_build.json UI)
     f3d_test(NAME TestConfigStemBuild DATA dragon.vtu CONFIG complex_build UI)
     f3d_test(NAME TestConfigFileUpperCase DATA suzanne_upper.STL CONFIG complex_build UI)
@@ -180,11 +176,9 @@ if(NOT F3D_MACOS_BUNDLE)
   f3d_test(NAME TestThumbnailConfigFileSTL DATA suzanne.stl CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI)
   f3d_test(NAME TestThumbnailConfigFilePLY DATA suzanneRGBA.ply CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI SKIP_GLES)
   f3d_test(NAME TestThumbnailConfigFileTGA DATA world.tga CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI)
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250118)
-    f3d_test(NAME TestThumbnailConfigFileHDR DATA shanghai_bund_1k.hdr CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI)
-    if(F3D_MODULE_EXR)
-      f3d_test(NAME TestThumbnailConfigFileEXR DATA Rec709.exr CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI)
-    endif()
+  f3d_test(NAME TestThumbnailConfigFileHDR DATA shanghai_bund_1k.hdr CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI)
+  if(F3D_MODULE_EXR)
+    f3d_test(NAME TestThumbnailConfigFileEXR DATA Rec709.exr CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI)
   endif()
   if(F3D_MODULE_WEBP)
     f3d_test(NAME TestThumbnailConfigFileWebP DATA image.webp CONFIG thumbnail_build LONG_TIMEOUT THRESHOLD 0.07 DEFAULT_HDRI) # Threshold is needed even for newer VTK

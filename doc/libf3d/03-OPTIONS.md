@@ -162,9 +162,25 @@ CLI: `--texture-material`.
 
 Render vertex normals as arrows on top of the geometry.
 
+CLI: `--normal-glyphs`.
+
 ### `model.normal_glyphs.scale` (_ratio_, default: `1.0`, range domain: `[0, 10]`, increment: `0.1`)
 
 Scales the normal glyphs
+
+CLI: `--normal-glyphs-scale`.
+
+### `model.normal_glyphs.color` (_color_, default: `1.0, 1.0, 1.0`)
+
+Color of the normal glyphs.
+
+CLI: `--normal-glyphs-color`.
+
+### `model.normal_glyphs.shape` (_string_, default: `arrow`, enum domain: `arrow, cylinder, cone, line`)
+
+Shape of the normal glyphs.
+
+CLI: `--normal-glyphs-shape`.
 
 ### `model.normal.scale` (_double_, optional, range domain: `[0, 3]`, increment: `0.1`)
 
@@ -331,6 +347,20 @@ Set the _width_ of lines when showing edges. Model-specified by default.
 
 CLI: `--line-width`.
 
+### `render.shadows.enable` (_bool_, default: `false`)
+
+Set to true to show shadows. All lights from files cast shadows and only opaque objects are considered as occluder. Shadows are visible on the grid.
+
+CLI: `--shadows`.
+
+### `render.shadows.resolution` (_int_, default: `1024`, range domain: `[256, 4096]`, increment: `256`)
+
+Set the resolution of the shadow maps.
+
+### `render.shadows.exponential_constant` (_double_, default: `25`, range domain: `[10, 120]`, increment: `5`)
+
+Set the constant value used during shadow evaluation. Higher values give better results but if it's too high, it introduces artifacts.
+
 ### `render.show_edges` (_bool_, optional)
 
 Set to true to show the _cell edges_. Model-specified by default.
@@ -400,21 +430,32 @@ Show _axes grid_ in the scene.
 
 CLI: `--axes-grid`.
 
-### `render.raytracing.enable` (_bool_, default: `false`)
+### `render.mode` (_string_, default: `opengl`, enumeration domain: `opengl, ospray, anari`)
 
-Enable _raytracing_. Requires the raytracing module to be enabled.
+Select the rendering mode.
+`ospray` and `anari` require their associated VTK module to be enabled.
 
-CLI: `--raytracing`.
+> [!NOTE]
+> `anari` render mode is experimental and not available in the binary release
+
+CLI: `--rendering-mode`.
+
+### `render.anari_library` (_string_, optional)
+
+Select the Anari library to use.
+If not specified, the library name will be retrieved using the `ANARI_LIBRARY` environment variable.
+
+CLI: `--anari-library`.
 
 ### `render.raytracing.samples` (_int_, default: `5`, range domain: `[1, 50]`, increment: `1`)
 
-The number of _samples per pixel_.
+The number of _samples per pixel_. Affects `ospray` render mode only.
 
 CLI: `--raytracing-samples`.
 
 ### `render.raytracing.denoise` (_bool_, default: `false`)
 
-_Denoise_ the raytracing rendering.
+_Denoise_ the raytracing rendering. Affects `ospray` render mode only.
 
 CLI: `--raytracing-denoise`.
 

@@ -13,16 +13,16 @@ target_link_options(f3djs PRIVATE
   "--emit-tsd=f3d.d.ts"
   "SHELL:-sASSERTIONS=1"
   "SHELL:-sEXPORT_NAME=f3d"
+  "SHELL:-sMAXIMUM_MEMORY=4GB" # 4GB is the maximum with wasm 32-bits
   "SHELL:-sALLOW_MEMORY_GROWTH=1"
   "SHELL:-sEMULATE_FUNCTION_POINTER_CASTS=0"
   "SHELL:-sMODULARIZE=1"
   "SHELL:-sEXPORT_ES6=1"
   "SHELL:-sENVIRONMENT=web"
-  "SHELL:-sSTACK_SIZE=1048576"
+  "SHELL:-sSTACK_SIZE=1MB"
   "SHELL:-sWASM=1"
   "SHELL:-sFORCE_FILESYSTEM"
   "SHELL:-sEXPORTED_RUNTIME_METHODS=['getExceptionMessage','decrementExceptionRefcount','FS']"
-  "SHELL:-sWASM_BIGINT"
   "SHELL:--post-js=${CMAKE_CURRENT_SOURCE_DIR}/f3d-utils.js"
 )
 

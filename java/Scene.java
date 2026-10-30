@@ -25,7 +25,8 @@ public class Scene {
     public enum FileAvailability {
         SUPPORTED(0),
         UNSUPPORTED_EXTENSION(1),
-        UNSUPPORTED_CONTENT(2);
+        UNSUPPORTED_CONTENT(2),
+        EMPTY_STREAM(3);
 
         private final int value;
 
@@ -193,6 +194,23 @@ public class Scene {
      * @return file availability
      */
     public native FileAvailability supports(String filePath);
+
+    private native FileAvailability supportsBuffer(byte[] buffer);
+
+    /**
+     * Check if a memory buffer is supported by the scene.
+     *
+     * @param buffer memory buffer to check
+     * @throws IllegalArgumentException if buffer is null
+     * @return file availability
+     */
+    public FileAvailability supports(byte[] buffer)
+    {
+        if (buffer == null) {
+            throw new IllegalArgumentException("buffer must not be null");
+        }
+        return this.supportsBuffer(buffer);
+    }
 
     /**
      * Get the animation

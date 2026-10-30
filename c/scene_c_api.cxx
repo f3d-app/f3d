@@ -44,6 +44,7 @@ f3d::light_state_t to_cpp_light_state(const f3d_light_state_t* c_state)
   cpp_state.positionalLight = c_state->positional_light != 0;
   cpp_state.intensity = c_state->intensity;
   cpp_state.switchState = c_state->switch_state != 0;
+  cpp_state.castShadows = c_state->cast_shadows != 0;
 
   return cpp_state;
 }
@@ -81,6 +82,7 @@ f3d_light_state_t* to_c_light_state(const f3d::light_state_t& cpp_state)
   c_state->positional_light = cpp_state.positionalLight ? 1 : 0;
   c_state->intensity = cpp_state.intensity;
   c_state->switch_state = cpp_state.switchState ? 1 : 0;
+  c_state->cast_shadows = cpp_state.castShadows ? 1 : 0;
 
   return c_state;
 }
@@ -229,6 +231,19 @@ int f3d_scene_supports(f3d_scene_t* scene, const char* file_path)
 
   f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
   auto availability = cpp_scene->supports(std::filesystem::path(file_path));
+  return static_cast<int>(availability);
+}
+
+//----------------------------------------------------------------------------
+int f3d_scene_supports_buffer(f3d_scene_t* scene, const void* buffer, size_t size)
+{
+  if (!scene)
+  {
+    return -1;
+  }
+
+  f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
+  auto availability = cpp_scene->supports(reinterpret_cast<const std::byte*>(buffer), size);
   return static_cast<int>(availability);
 }
 

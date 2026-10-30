@@ -5,7 +5,6 @@
 #include "vtkF3DImporter.h"
 
 #include <vtkActorCollection.h>
-#include <vtkArrowSource.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
 #include <vtkDataAssembly.h>
@@ -22,6 +21,8 @@
 #include <vtkPolyData.h>
 #include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
+#include <vtkShadowMapBakerPass.h>
+#include <vtkShadowMapPass.h>
 #include <vtkSmartPointer.h>
 #include <vtkTexture.h>
 #include <vtkUnsignedIntArray.h>
@@ -554,15 +555,16 @@ bool vtkF3DMetaImporter::Update()
 
       if (ngs.InputDataHasNormals)
       {
-        vtkNew<vtkArrowSource> arrowSource;
         ngs.GlyphMapper->SetInputData(points);
-        ngs.GlyphMapper->SetSourceConnection(arrowSource->GetOutputPort());
         ngs.GlyphMapper->SetOrientationModeToDirection();
         ngs.GlyphMapper->SetOrientationArray(vtkDataSetAttributes::NORMALS);
         ngs.GlyphMapper->ScalingOn();
         ngs.Actor->SetMapper(ngs.GlyphMapper);
         this->Renderer->AddActor(ngs.Actor);
         ngs.Actor->VisibilityOff();
+        ngs.Actor->GetProperty()->SetInterpolationToPBR();
+        ngs.Actor->GetProperty()->SetRoughness(0.3);
+        ngs.Actor->GetProperty()->RenderLinesAsTubesOn();
       }
 
       // Create and configure point sprites actors
@@ -574,6 +576,13 @@ bool vtkF3DMetaImporter::Update()
       pss.Mapper->SetInputData(points);
       this->Renderer->AddActor(pss.Actor);
       pss.Actor->VisibilityOff();
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
+      // the point mapper doesn't support shadows, so we exclude it from shadow receivers
+      const vtkNew<vtkInformation> keys;
+      pss.Actor->SetPropertyKeys(keys);
+      pss.Actor->GetPropertyKeys()->Set(vtkShadowMapPass::RECEIVER(), 0);
+#endif
 
       // Create and configure volume props
       if (genericImporter)
@@ -612,8 +621,25 @@ bool vtkF3DMetaImporter::Update()
 
   if (!hasActiveLight)
   {
+    vtkLightCollection* lights = this->Renderer->GetLights();
+
+    [[maybe_unused]] const int offset = lights->GetNumberOfItems();
+
     vtkNew<vtkLightKit> lightKit;
     lightKit->AddLightsToRenderer(this->Renderer);
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
+    // the first light is a headlight so it doesn't cast shadow, the key doesn't matter
+    // the second light is the key light, that's the one that will cast shadows
+    // the 3 last lights are minor lights, so let's disable shadows for them
+    for (int i = offset + 2; i < lights->GetNumberOfItems(); i++)
+    {
+      vtkLight* newLight = vtkLight::SafeDownCast(lights->GetItemAsObject(i));
+      vtkNew<vtkInformation> info;
+      info->Set(vtkShadowMapBakerPass::CAST_SHADOWS(), 0);
+      newLight->SetInformation(info);
+    }
+#endif
   }
 
   if (localCameraIndex > 0)
@@ -653,9 +679,6 @@ std::string vtkF3DMetaImporter::GetOutputsDescription()
 //----------------------------------------------------------------------------
 vtkF3DImporter::AnimationSupportLevel vtkF3DMetaImporter::GetAnimationSupportLevel()
 {
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 4, 20250507)
-  vtkF3DImporter::AnimationSupportLevel levelAccum = vtkF3DImporter::AnimationSupportLevel::MULTI;
-#else
   vtkImporter::AnimationSupportLevel levelAccum = vtkImporter::AnimationSupportLevel::NONE;
   for (const auto& importerInfo : this->Pimpl->Importers)
   {
@@ -694,7 +717,6 @@ vtkF3DImporter::AnimationSupportLevel vtkF3DMetaImporter::GetAnimationSupportLev
         break;
     }
   }
-#endif
   return levelAccum;
 }
 
