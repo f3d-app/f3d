@@ -1328,31 +1328,34 @@ public:
   /* Store the last recorded window geometry in the cache so that the next run can restore it */
   void CacheWindowGeometry() const
   {
-    const fs::path cachePath = this->CacheFilePath();
-    std::ofstream stream(cachePath);
-    if (!stream.is_open())
+    if (this->LastWindowGeometry.Width > 0 && this->LastWindowGeometry.Height > 0)
     {
-      // Only reached when there is no cache path or when it is not writable, and only once an
-      // interactive window has been closed, which the coverage CI never does with such a path
-      // LCOV_EXCL_START
-      f3d::log::debug("Could not open ", cachePath.string(), " to cache the window geometry");
-      return;
-      // LCOV_EXCL_STOP
+      const fs::path cachePath = this->CacheFilePath();
+      std::ofstream stream(cachePath);
+      if (!stream.is_open())
+      {
+        // Only reached when there is no cache path or when it is not writable, and only once an
+        // interactive window has been closed, which the coverage CI never does with such a path
+        // LCOV_EXCL_START
+        f3d::log::debug("Could not open ", cachePath.string(), " to cache the window geometry");
+        return;
+        // LCOV_EXCL_STOP
+      }
+
+      nlohmann::ordered_json windowJson;
+      windowJson["width"] = this->LastWindowGeometry.Width;
+      windowJson["height"] = this->LastWindowGeometry.Height;
+      windowJson["left"] = this->LastWindowGeometry.Left;
+      windowJson["top"] = this->LastWindowGeometry.Top;
+
+      nlohmann::ordered_json root;
+      root["window"] = windowJson;
+
+      stream << root.dump(2);
+      f3d::log::debug("Window geometry ", this->LastWindowGeometry.Width, "x",
+        this->LastWindowGeometry.Height, " at ", this->LastWindowGeometry.Left, ",",
+        this->LastWindowGeometry.Top, " cached in ", cachePath.string());
     }
-
-    nlohmann::ordered_json windowJson;
-    windowJson["width"] = this->LastWindowGeometry.Width;
-    windowJson["height"] = this->LastWindowGeometry.Height;
-    windowJson["left"] = this->LastWindowGeometry.Left;
-    windowJson["top"] = this->LastWindowGeometry.Top;
-
-    nlohmann::ordered_json root;
-    root["window"] = windowJson;
-
-    stream << root.dump(2);
-    f3d::log::debug("Window geometry ", this->LastWindowGeometry.Width, "x",
-      this->LastWindowGeometry.Height, " at ", this->LastWindowGeometry.Left, ",",
-      this->LastWindowGeometry.Top, " cached in ", cachePath.string());
   }
 
   struct WindowGeometry
