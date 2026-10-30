@@ -11,7 +11,7 @@ Copyright (c) 2014 - 2025 Guillaume Vareille http://ysengrin.com
 
 ********* TINY FILE DIALOGS OFFICIAL WEBSITE IS ON SOURCEFORGE *********
   _________
- /         \ tinyfiledialogs.c v3.21.3 [Feb 12, 2026] zlib licence
+ /         \ tinyfiledialogs.c v3.22.1 [Oct 21, 2026] zlib licence
  |tiny file| Unique code file created [November 9, 2014]
  | dialogs |
  \____  ___/ http://tinyfiledialogs.sourceforge.net
@@ -57,6 +57,8 @@ misrepresented as being the original software.
     |__________________________________________|
 */
 
+#define STR_(x) #x
+#define STR(x) STR_(x)
 
 #if defined(__GNUC__) || defined(__clang__)
 #ifndef _GNU_SOURCE
@@ -69,12 +71,18 @@ misrepresented as being the original software.
     #define _POSIX_C_SOURCE 199506L /* 199506L is enough for freebsd for realpath() */
   #elif defined(__illumos__) || defined(__solaris__)
     #define _POSIX_C_SOURCE 200112L /* illumos/solaris needs 200112L for realpath() */
+  #elif defined(__clang__) && (__clang_major__ >= 21)
+    #define _POSIX_C_SOURCE 199506L /* to define strtok_r */
   #else
-    #define _POSIX_C_SOURCE 2 /* to accept POSIX 2 in old ANSI C standards */
+    #define _POSIX_C_SOURCE 2 /* to accept POSIX 2 in old ANSI C standards (equivalent 199209L) */
   #endif
  #endif
 #endif
 #endif
+
+/*
+#pragma message("_POSIX_C_SOURCE = " STR(_POSIX_C_SOURCE)) // asking value set by me before including the headers
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -86,14 +94,22 @@ misrepresented as being the original software.
  #ifdef __BORLANDC__
   #define _getch getch
  #endif
+
+ #define WIN32_LEAN_AND_MEAN
  #ifndef _WIN32_WINNT
   #define _WIN32_WINNT 0x0500
  #endif
+
  #include <windows.h>
  #include <commdlg.h>
  #include <shlobj.h>
  #include <conio.h>
  #include <direct.h>
+
+ #include <shellapi.h>
+ #include <wchar.h>
+ #include <stddef.h>
+
  #define TINYFD_NOCCSUNICODE
  #define TINYFD_SLASH "\\"
 #else
@@ -115,7 +131,11 @@ misrepresented as being the original software.
 #endif
 #define LOW_MULTIPLE_FILES 32
 
-char tinyfd_version[8] = "3.21.3";
+char tinyfd_version[8] = "3.22.1";
+
+/*
+#pragma message("_POSIX_VERSION = " STR(_POSIX_VERSION)) // what the compiler can do (read in the headers)
+*/
 
 /******************************************************************************************************/
 /**************************************** UTF-8 on Windows ********************************************/
@@ -200,6 +220,33 @@ char tinyfd_needs[] = "\
 #pragma warning(disable:4706) /* allows usage of strncpy, strcpy, strcat, sprintf, fopen */
 #endif
 
+#ifdef _WIN32
+typedef LONG(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
+
+static int IsBelowVista(void)
+{
+	HMODULE hNtdll;
+	RtlGetVersionPtr pRtlGetVersion ;
+	RTL_OSVERSIONINFOW osvi = {0};
+
+	hNtdll = GetModuleHandleW(L"ntdll.dll");
+	if (!hNtdll)
+		return 0; /* Detection failed */
+
+	pRtlGetVersion =
+		(RtlGetVersionPtr)GetProcAddress(hNtdll, "RtlGetVersion");
+
+	if (!pRtlGetVersion)
+		return 0; /* Detection failed */
+
+	osvi.dwOSVersionInfoSize = sizeof(osvi);
+
+	if (pRtlGetVersion(&osvi) != 0)
+		return 0; /* Detection failed */
+
+	return osvi.dwMajorVersion < 6;
+}
+#endif
 
 static int getenvDISPLAY(void)
 {
@@ -722,31 +769,6 @@ void tinyfd_beep(void)
 }
 
 
-static void wipefileW(wchar_t const * aFilename)
-{
-	int i;
-	FILE * lIn;
-#if (defined(__MINGW32_MAJOR_VERSION) && !defined(__MINGW64__) && (__MINGW32_MAJOR_VERSION <= 3)) || defined(__BORLANDC__) || defined(__WATCOMC__) || defined(__DMC__)
-	struct _stat st;
-	if (_wstat(aFilename, &st) == 0)
-#else
-	struct __stat64 st;
-	if (_wstat64(aFilename, &st) == 0)
-#endif
-	{
-		lIn = ( FILE * ) _wfopen(aFilename, L"w");
-		if ( lIn )
-		{
-			for (i = 0; i < st.st_size; i++)
-			{
-				fputc('A', lIn);
-			}
-			fclose(lIn);
-		}
-	}
-}
-
-
 static wchar_t * getPathWithoutFinalSlashW(
 		wchar_t * aoDestination, /* make sure it is allocated, use _MAX_PATH */
 		wchar_t const * aSource) /* aoDestination and aSource can be the same */
@@ -950,34 +972,6 @@ static int fileExists(char const * aFilePathAndName)
 				fclose(lIn);
 				return 1;
 		}
-}
-
-static void replaceWchar(wchar_t * aString,
-		wchar_t aOldChr,
-		wchar_t aNewChr)
-{
-		wchar_t * p;
-
-		if (!aString)
-		{
-				return ;
-		}
-
-		if (aOldChr == aNewChr)
-		{
-				return ;
-		}
-
-		p = aString;
-		while ((p = wcsrchr(p, aOldChr)))
-		{
-				*p = aNewChr;
-#ifdef TINYFD_NOCCSUNICODE
-				p++;
-#endif
-				p++;
-		}
-		return ;
 }
 
 
@@ -1198,7 +1192,6 @@ int tinyfd_messageBoxW(
 		size_t lDialogStringLen;
 
 		if (aTitle && !wcscmp(aTitle, L"tinyfd_query")) { strcpy(tinyfd_response, "windows_wchar"); return 1; }
-
 		if (quoteDetectedW(aTitle)) return tinyfd_notifyPopupW(L"INVALID TITLE WITH QUOTES", aMessage, aIconType);
 		if (quoteDetectedW(aMessage)) return tinyfd_notifyPopupW(aTitle, L"INVALID MESSAGE WITH QUOTES", aIconType);
 
@@ -1257,8 +1250,188 @@ Show-BalloonTip");
 }*/
 
 
-/* return has only meaning for tinyfd_query */
-int tinyfd_notifyPopupW(
+#define TFD_NOTIFY_CB       (WM_APP + 101)
+#define TFD_NOTIFY_ID       1
+#define TFD_NOTIFY_TIMER_ID 1
+
+typedef struct TFD_NOTIFY_CONTEXT {
+	BOOL iconAdded;
+} TFD_NOTIFY_CONTEXT;
+
+static LRESULT CALLBACK tfd_notify_WndProc(
+	HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
+{
+	TFD_NOTIFY_CONTEXT* ctx =
+		(TFD_NOTIFY_CONTEXT*)GetWindowLongPtrW(
+			hwnd, GWLP_USERDATA);
+
+	if (msg == TFD_NOTIFY_CB) {
+		switch ((UINT)lp) {
+		case NIN_BALLOONHIDE:
+		case NIN_BALLOONTIMEOUT:
+		case NIN_BALLOONUSERCLICK:
+			PostMessageW(hwnd, WM_CLOSE, 0, 0);
+			return 0;
+		}
+	}
+
+	if (msg == WM_TIMER && wp == TFD_NOTIFY_TIMER_ID) {
+		KillTimer(hwnd, TFD_NOTIFY_TIMER_ID);
+		PostMessageW(hwnd, WM_CLOSE, 0, 0);
+		return 0;
+	}
+
+	if (msg == WM_CLOSE) {
+		if (ctx && ctx->iconAdded) {
+			NOTIFYICONDATAW nid;
+
+			ZeroMemory(&nid, sizeof(nid));
+			nid.cbSize = sizeof(nid);
+			nid.hWnd = hwnd;
+			nid.uID = TFD_NOTIFY_ID;
+
+			Shell_NotifyIconW(NIM_DELETE, &nid);
+			ctx->iconAdded = FALSE;
+		}
+
+		DestroyWindow(hwnd);
+		return 0;
+	}
+
+	/* Do not post WM_QUIT into the caller's message queue. */
+	if (msg == WM_DESTROY)
+		return 0;
+
+	return DefWindowProcW(hwnd, msg, wp, lp);
+}
+
+static int tinyfd_notifyPopupVista11(
+	const wchar_t* aTitle,
+	const wchar_t* aMessage,
+	const wchar_t* aIconType)
+{
+	static const wchar_t className[] =
+		L"tinyfd_notifyPopupW_Class";
+
+	WNDCLASSW wc;
+	NOTIFYICONDATAW nid;
+	TFD_NOTIFY_CONTEXT ctx = { FALSE };
+	HINSTANCE instance = GetModuleHandleW(NULL);
+	HWND hwnd = NULL;
+	HICON icon;
+	BOOL registeredHere = FALSE;
+	BOOL requestAccepted = FALSE;
+	DWORD infoFlags = NIIF_INFO;
+
+	if (!aTitle)
+		aTitle = L"Notification";
+
+	if (!aMessage)
+		aMessage = L"";
+
+	if (aIconType) {
+		if (_wcsicmp(aIconType, L"warning") == 0)
+			infoFlags = NIIF_WARNING;
+		else if (_wcsicmp(aIconType, L"error") == 0)
+			infoFlags = NIIF_ERROR;
+	}
+
+	ZeroMemory(&wc, sizeof(wc));
+	wc.lpfnWndProc = tfd_notify_WndProc;
+	wc.hInstance = instance;
+	wc.lpszClassName = className;
+
+	if (RegisterClassW(&wc)) {
+		registeredHere = TRUE;
+	}
+	else if (GetLastError() != ERROR_CLASS_ALREADY_EXISTS) {
+		return 0;
+	}
+
+	hwnd = CreateWindowExW(
+		0, className, L"", WS_POPUP,
+		0, 0, 0, 0,
+		NULL, NULL, instance, NULL);
+
+	if (!hwnd)
+		goto cleanup;
+
+	SetWindowLongPtrW(
+		hwnd, GWLP_USERDATA, (LONG_PTR)&ctx);
+
+	icon = LoadIconW(
+		NULL, MAKEINTRESOURCEW(32516));
+
+	if (!icon)
+		goto cleanup;
+
+	/* Add the notification-area icon. */
+	ZeroMemory(&nid, sizeof(nid));
+	nid.cbSize = sizeof(nid);
+	nid.hWnd = hwnd;
+	nid.uID = TFD_NOTIFY_ID;
+	nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+	nid.uCallbackMessage = TFD_NOTIFY_CB;
+	nid.hIcon = icon;
+
+	wcscpy_s(nid.szTip, ARRAYSIZE(nid.szTip),
+		L"Notification");
+
+	if (!Shell_NotifyIconW(NIM_ADD, &nid))
+		goto cleanup;
+
+	ctx.iconAdded = TRUE;
+
+	/* Request the balloon notification. */
+	ZeroMemory(&nid, sizeof(nid));
+	nid.cbSize = sizeof(nid);
+	nid.hWnd = hwnd;
+	nid.uID = TFD_NOTIFY_ID;
+	nid.uFlags = NIF_INFO;
+	nid.dwInfoFlags = infoFlags;
+
+	wcsncpy(nid.szInfoTitle, aTitle, ARRAYSIZE(nid.szInfoTitle) - 1);
+	nid.szInfoTitle[ARRAYSIZE(nid.szInfoTitle) - 1] = L'\0';
+	wcsncpy(nid.szInfo, aMessage, ARRAYSIZE(nid.szInfo) - 1);
+	nid.szInfo[ARRAYSIZE(nid.szInfo) - 1] = L'\0';
+
+	if (!Shell_NotifyIconW(NIM_MODIFY, &nid))
+		goto cleanup;
+
+	requestAccepted = TRUE;
+
+	/*
+	 * The timer limits the lifetime of our temporary tray icon.
+	 * It does not guarantee how long Windows displays the balloon.
+	 */
+	if (!SetTimer(hwnd, TFD_NOTIFY_TIMER_ID, 30000, NULL))
+		goto cleanup;
+
+cleanup:
+	if (hwnd && IsWindow(hwnd)) {
+		KillTimer(hwnd, TFD_NOTIFY_TIMER_ID);
+
+		if (ctx.iconAdded) {
+			ZeroMemory(&nid, sizeof(nid));
+			nid.cbSize = sizeof(nid);
+			nid.hWnd = hwnd;
+			nid.uID = TFD_NOTIFY_ID;
+
+			Shell_NotifyIconW(NIM_DELETE, &nid);
+			ctx.iconAdded = FALSE;
+		}
+
+		DestroyWindow(hwnd);
+	}
+
+	if (registeredHere)
+		UnregisterClassW(className, instance);
+
+	return requestAccepted ? 1 : 0;
+}
+
+
+static int tinyfd_notifyPopupVBS(
 	wchar_t const* aTitle, /* NULL or L"" */
 	wchar_t const* aMessage, /* NULL or L"" may contain \n \t */
 	wchar_t const* aIconType) /* L"info" L"warning" L"error" */
@@ -1267,13 +1440,7 @@ int tinyfd_notifyPopupW(
 	size_t lTitleLen;
 	size_t lMessageLen;
 	size_t lDialogStringLen;
-
-	FILE* lIn;
-
-	if (aTitle && !wcscmp(aTitle, L"tinyfd_query")) { strcpy(tinyfd_response, "windows_wchar"); return 1; }
-
-	if (quoteDetectedW(aTitle)) return tinyfd_notifyPopupW(L"INVALID TITLE WITH QUOTES", aMessage, aIconType);
-	if (quoteDetectedW(aMessage)) return tinyfd_notifyPopupW(aTitle, L"INVALID MESSAGE WITH QUOTES", aIconType);
+  FILE* lIn;
 
 	lTitleLen = aTitle ? wcslen(aTitle) : 0;
 	lMessageLen = aMessage ? wcslen(aMessage) : 0;
@@ -1371,281 +1538,284 @@ End Sub\n\
 }
 
 
-wchar_t * tinyfd_inputBoxW(
-		wchar_t const * aTitle, /* NULL or L"" */
-		wchar_t const * aMessage, /* NULL or L"" (\n and \t have no effect) */
-		wchar_t const * aDefaultInput) /* L"" , if NULL it's a passwordBox */
+/* return has only meaning for tinyfd_query */
+int tinyfd_notifyPopupW(
+	wchar_t const* aTitle, /* NULL or L"" */
+	wchar_t const* aMessage, /* NULL or L"" may contain \n \t */
+	wchar_t const* aIconType) /* L"info" L"warning" L"error" */
 {
-		static wchar_t lBuff[MAX_PATH_OR_CMD];
-		wchar_t * lDialogString;
-		FILE * lIn;
-		FILE * lFile;
-		int lResult;
-		size_t lTitleLen;
-		size_t lMessageLen;
-		size_t lDialogStringLen;
+	if (aTitle && !wcscmp(aTitle, L"tinyfd_query")) { strcpy(tinyfd_response, "windows_wchar"); return 1; }
+	if (quoteDetectedW(aTitle)) return tinyfd_notifyPopupW(L"INVALID TITLE WITH QUOTES", aMessage, aIconType);
+	if (quoteDetectedW(aMessage)) return tinyfd_notifyPopupW(aTitle, L"INVALID MESSAGE WITH QUOTES", aIconType);
 
-		if (aTitle&&!wcscmp(aTitle, L"tinyfd_query")){ strcpy(tinyfd_response, "windows_wchar"); return (wchar_t *)1; }
+	if (IsBelowVista())
+	{
+		return tinyfd_notifyPopupVBS(aTitle, aMessage, aIconType);
+	}
+	else
+	{
+		return tinyfd_notifyPopupVista11(aTitle, aMessage, aIconType);
+	}
+}
 
-		if (quoteDetectedW(aTitle)) return tinyfd_inputBoxW(L"INVALID TITLE WITH QUOTES", aMessage, aDefaultInput);
-		if (quoteDetectedW(aMessage)) return tinyfd_inputBoxW(aTitle, L"INVALID MESSAGE WITH QUOTES", aDefaultInput);
-		if (quoteDetectedW(aDefaultInput)) return tinyfd_inputBoxW(aTitle, aMessage, L"INVALID DEFAULT_INPUT WITH QUOTES: use the GRAVE ACCENT \\x60 instead.");
 
-		lTitleLen =  aTitle ? wcslen(aTitle) : 0 ;
-		lMessageLen =  aMessage ? wcslen(aMessage) : 0 ;
-		lDialogStringLen = 3 * MAX_PATH_OR_CMD + lTitleLen + lMessageLen;
-		lDialogString = (wchar_t *) malloc(2 * lDialogStringLen);
+typedef struct
+{
+	wchar_t result[MAX_PATH_OR_CMD];
+	HWND edit;
+	HINSTANCE instance;
+	int cancelled;
+	int password;
+} InputDialogState;
 
-		if (aDefaultInput)
+
+static LRESULT CALLBACK
+InputDialogProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	InputDialogState* state;
+	CREATESTRUCTW* cs;
+	HFONT font;
+	HWND prompt;
+	HWND ok;
+	HWND cancel;
+
+	state = (InputDialogState*)
+		GetWindowLongPtrW(hwnd, GWLP_USERDATA);
+
+	switch (msg)
+	{
+	case WM_NCCREATE:
+		cs = (CREATESTRUCTW*)lParam;
+		state = (InputDialogState*)cs->lpCreateParams;
+
+		SetWindowLongPtrW(
+			hwnd, GWLP_USERDATA, (LONG_PTR)state);
+
+		return DefWindowProcW(hwnd, msg, wParam, lParam);
+
+	case WM_CREATE:
+		font = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
+
+		prompt = CreateWindowExW(
+			0, L"STATIC", L"Enter a value:",
+			WS_CHILD | WS_VISIBLE,
+			12, 12, 356, 22,
+			hwnd, NULL, state->instance, NULL);
+
+		state->edit = CreateWindowExW(
+			WS_EX_CLIENTEDGE, L"EDIT", L"",
+			WS_CHILD | WS_VISIBLE | WS_TABSTOP |
+			ES_AUTOHSCROLL |
+			(state->password ? ES_PASSWORD : 0),
+			12, 38, 356, 25,
+			hwnd, (HMENU)1001, state->instance, NULL);
+
+		ok = CreateWindowExW(
+			0, L"BUTTON", L"OK",
+			WS_CHILD | WS_VISIBLE | WS_TABSTOP |
+			BS_DEFPUSHBUTTON,
+			192, 76, 84, 27,
+			hwnd, (HMENU)IDOK, state->instance, NULL);
+
+		cancel = CreateWindowExW(
+			0, L"BUTTON", L"Cancel",
+			WS_CHILD | WS_VISIBLE | WS_TABSTOP,
+			284, 76, 84, 27,
+			hwnd, (HMENU)IDCANCEL, state->instance, NULL);
+
+		SendMessageW(prompt, WM_SETFONT, (WPARAM)font, TRUE);
+		SendMessageW(state->edit, WM_SETFONT, (WPARAM)font, TRUE);
+		SendMessageW(ok, WM_SETFONT, (WPARAM)font, TRUE);
+		SendMessageW(cancel, WM_SETFONT, (WPARAM)font, TRUE);
+
+		return 0;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
 		{
-						swprintf(lDialogString,
-#if !defined(__BORLANDC__) && !defined(__TINYC__) && !(defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR))
-				lDialogStringLen,
-#endif
-				L"%ls\\tinyfd.vbs", _wgetenv(L"TEMP"));
+		case IDOK:
+			GetWindowTextW(
+				state->edit,
+				state->result,
+				MAX_PATH_OR_CMD);
+
+			DestroyWindow(hwnd);
+			return 0;
+
+		case IDCANCEL:
+			state->cancelled = 1;
+			DestroyWindow(hwnd);
+			return 0;
 		}
-		else
+		break;
+
+	case WM_CLOSE:
+		state->cancelled = 1;
+		DestroyWindow(hwnd);
+		return 0;
+
+	case WM_NCDESTROY:
+		SetWindowLongPtrW(hwnd, GWLP_USERDATA, 0);
+		return DefWindowProcW(hwnd, msg, wParam, lParam);
+	}
+
+	return DefWindowProcW(hwnd, msg, wParam, lParam);
+}
+
+
+/*
+ * Returns a pointer to a static wide-character buffer on success.
+ * Returns NULL on cancellation or error.
+ *
+ * The returned buffer must NOT be freed.
+ * Its contents are overwritten by the next call.
+ */
+wchar_t* tinyfd_inputBoxW(
+	const wchar_t* aTitle,
+	const wchar_t* aMessage,
+	const wchar_t* aDefaultInput)
+{
+	const wchar_t* lClassName;
+	static wchar_t lResult[MAX_PATH_OR_CMD];
+
+	InputDialogState state;
+	WNDCLASSW wc;
+	MSG msg;
+	RECT rc;
+	HWND dialog;
+	HWND prompt;
+	BOOL registered;
+	BOOL r;
+
+	lClassName = L"TinyInputDialogClass";
+
+	memset(&state, 0, sizeof(state));
+	memset(&wc, 0, sizeof(wc));
+
+	registered = FALSE;
+
+	if (aTitle && !wcscmp(aTitle, L"tinyfd_query"))
+	{
+		strcpy(tinyfd_response, "windows_wchar");
+		return (wchar_t*)1;
+	}
+
+	if (quoteDetectedW(aTitle))
+		return tinyfd_inputBoxW(
+			L"INVALID TITLE WITH QUOTES",
+			aMessage, aDefaultInput);
+
+	if (quoteDetectedW(aMessage))
+		return tinyfd_inputBoxW(
+			aTitle,
+			L"INVALID MESSAGE WITH QUOTES",
+			aDefaultInput);
+
+	if (quoteDetectedW(aDefaultInput))
+		return tinyfd_inputBoxW(
+			aTitle, aMessage,
+			L"INVALID DEFAULT_INPUT WITH QUOTES: use the GRAVE ACCENT \\x60 instead.");
+
+	lResult[0] = L'\0';
+
+	state.instance = GetModuleHandleW(NULL);
+
+	/* NULL default input means password mode. */
+	state.password = (aDefaultInput == NULL);
+
+	wc.lpfnWndProc = InputDialogProc;
+	wc.hInstance = state.instance;
+	wc.lpszClassName = lClassName;
+	wc.hCursor = LoadCursorW(NULL, MAKEINTRESOURCEW(32512));
+	wc.hbrBackground = (HBRUSH)(COLOR_BTNFACE + 1);
+
+	if (RegisterClassW(&wc))
+	{
+		registered = TRUE;
+	}
+	else if (GetLastError() != ERROR_CLASS_ALREADY_EXISTS)
+	{
+		return NULL;
+	}
+
+	dialog = CreateWindowExW(
+		WS_EX_DLGMODALFRAME,
+		lClassName,
+		aTitle ? aTitle : L"Input",
+		WS_CAPTION | WS_SYSMENU | WS_POPUP | WS_VISIBLE,
+		CW_USEDEFAULT, CW_USEDEFAULT, 392, 145,
+		GetActiveWindow(), NULL,
+		state.instance, &state);
+
+	if (!dialog)
+	{
+		if (registered)
+			UnregisterClassW(lClassName, state.instance);
+		return NULL;
+	}
+
+	prompt = FindWindowExW(
+		dialog, NULL, L"STATIC", NULL);
+
+	if (prompt)
+		SetWindowTextW(
+			prompt,
+			aMessage ? aMessage : L"Enter a value:");
+
+	/*
+	 * If aDefaultInput is not NULL, show its contents as normal text.
+	 * If aDefaultInput is NULL, leave the password field empty.
+	 */
+	if (state.edit && aDefaultInput != NULL)
+		SetWindowTextW(state.edit, aDefaultInput);
+
+	GetWindowRect(dialog, &rc);
+
+	SetWindowPos(
+		dialog, HWND_TOP,
+		(GetSystemMetrics(SM_CXSCREEN) -
+			(rc.right - rc.left)) / 2,
+		(GetSystemMetrics(SM_CYSCREEN) -
+			(rc.bottom - rc.top)) / 2,
+		0, 0, SWP_NOSIZE | SWP_SHOWWINDOW);
+
+	SetForegroundWindow(dialog);
+	SetFocus(state.edit);
+
+	while (IsWindow(dialog))
+	{
+		r = GetMessageW(&msg, NULL, 0, 0);
+
+		if (r <= 0)
 		{
-				swprintf(lDialogString,
-#if !defined(__BORLANDC__) && !defined(__TINYC__) && !(defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR))
-						lDialogStringLen,
-#endif
-				L"%ls\\tinyfd.hta", _wgetenv(L"TEMP"));
+			state.cancelled = 1;
+
+			if (r == 0)
+				PostQuitMessage((int)msg.wParam);
+
+			if (IsWindow(dialog))
+				DestroyWindow(dialog);
+
+			break;
 		}
-		lIn = ( FILE * ) _wfopen(lDialogString, L"w");
-		if (!lIn)
+
+		if (!IsDialogMessageW(dialog, &msg))
 		{
-				free(lDialogString);
-				return NULL;
+			TranslateMessage(&msg);
+			DispatchMessageW(&msg);
 		}
+	}
 
-		if ( aDefaultInput )
-		{
-				wcscpy(lDialogString, L"Dim result:result=InputBox(\"");
-				if (aMessage && wcslen(aMessage))
-				{
-										wcscpy(lBuff, aMessage);
-										replaceWchar(lBuff, L'\n', L' ');
-										wcscat(lDialogString, lBuff);
-				}
-				wcscat(lDialogString, L"\",\"");
-				if (aTitle) wcscat(lDialogString, aTitle);
-				wcscat(lDialogString, L"\",\"");
+	if (registered)
+		UnregisterClassW(lClassName, state.instance);
 
-				if (aDefaultInput && wcslen(aDefaultInput))
-				{
-										wcscpy(lBuff, aDefaultInput);
-										replaceWchar(lBuff, L'\n', L' ');
-										wcscat(lDialogString, lBuff);
-				}
-				wcscat(lDialogString, L"\"):If IsEmpty(result) then:WScript.Echo 0");
-				wcscat(lDialogString, L":Else: WScript.Echo \"1\" & result : End If");
-		}
-		else
-		{
-				wcscpy(lDialogString, L"\n\
-<html>\n\
-<head>\n\
-<title>");
-				if (aTitle) wcscat(lDialogString, aTitle);
-				wcscat(lDialogString, L"</title>\n\
-</head>\n\
-<HTA:APPLICATION\n\
-ID = 'tinyfdHTA'\n\
-APPLICATIONNAME = 'tinyfd_inputBox'\n\
-MINIMIZEBUTTON = 'no'\n\
-MAXIMIZEBUTTON = 'no'\n\
-BORDER = 'dialog'\n\
-SCROLL = 'no'\n\
-SINGLEINSTANCE = 'yes'\n\
-WINDOWSTATE = 'hidden'>\n\
-\n\
-<script language = 'VBScript'>\n\
-\n\
-intWidth = Screen.Width/4\n\
-intHeight = Screen.Height/6\n\
-ResizeTo intWidth, intHeight\n\
-MoveTo((Screen.Width/2)-(intWidth/2)),((Screen.Height/2)-(intHeight/2))\n\
-result = 0\n\
-\n\
-Sub Window_onLoad\n\
-txt_input.Focus\n\
-End Sub\n\
-\n");
+	if (state.cancelled)
+		return NULL;
 
-				wcscat(lDialogString, L"\
-Sub Window_onUnload\n\
-Set objFSO = CreateObject(\"Scripting.FileSystemObject\")\n\
-Set oShell = CreateObject(\"WScript.Shell\")\n\
-strTempFolder = oShell.ExpandEnvironmentStrings(\"%TEMP%\")\n\
-Set objFile = objFSO.CreateTextFile(strTempFolder & \"\\tinyfd.txt\",True,True)\n\
-If result = 1 Then\n\
-objFile.Write 1 & txt_input.Value\n\
-Else\n\
-objFile.Write 0\n\
-End If\n\
-objFile.Close\n\
-End Sub\n\
-\n\
-Sub Run_ProgramOK\n\
-result = 1\n\
-window.Close\n\
-End Sub\n\
-\n\
-Sub Run_ProgramCancel\n\
-window.Close\n\
-End Sub\n\
-\n");
+	wcsncpy(lResult, state.result, MAX_PATH_OR_CMD - 1);
+	lResult[MAX_PATH_OR_CMD - 1] = L'\0';
 
-				wcscat(lDialogString, L"Sub Default_Buttons\n\
-If Window.Event.KeyCode = 13 Then\n\
-btn_OK.Click\n\
-ElseIf Window.Event.KeyCode = 27 Then\n\
-btn_Cancel.Click\n\
-End If\n\
-End Sub\n\
-\n\
-</script>\n\
-<body style = 'background-color:#EEEEEE' onkeypress = 'vbs:Default_Buttons' align = 'top'>\n\
-<table width = '100%' height = '80%' align = 'center' border = '0'>\n\
-<tr border = '0'>\n\
-<td align = 'left' valign = 'middle' style='Font-Family:Arial'>\n");
-
-				wcscat(lDialogString, aMessage ? aMessage : L"");
-
-				wcscat(lDialogString, L"\n\
-</td>\n\
-<td align = 'right' valign = 'middle' style = 'margin-top: 0em'>\n\
-<table  align = 'right' style = 'margin-right: 0em;'>\n\
-<tr align = 'right' style = 'margin-top: 5em;'>\n\
-<input type = 'button' value = 'OK' name = 'btn_OK' onClick = 'vbs:Run_ProgramOK' style = 'width: 5em; margin-top: 2em;'><br>\n\
-<input type = 'button' value = 'Cancel' name = 'btn_Cancel' onClick = 'vbs:Run_ProgramCancel' style = 'width: 5em;'><br><br>\n\
-</tr>\n\
-</table>\n\
-</td>\n\
-</tr>\n\
-</table>\n");
-
-				wcscat(lDialogString, L"<table width = '100%' height = '100%' align = 'center' border = '0'>\n\
-<tr>\n\
-<td align = 'left' valign = 'top'>\n\
-<input type = 'password' id = 'txt_input'\n\
-name = 'txt_input' value = '' style = 'float:left;width:100%' ><BR>\n\
-</td>\n\
-</tr>\n\
-</table>\n\
-</body>\n\
-</html>\n\
-"               ) ;
-		}
-		fputws(lDialogString, lIn);
-		fclose(lIn);
-
-		if (aDefaultInput)
-		{
-				swprintf(lDialogString,
-#if !defined(__BORLANDC__) && !defined(__TINYC__) && !(defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR))
-						lDialogStringLen,
-#endif
-						L"%ls\\tinyfd.txt",_wgetenv(L"TEMP"));
-
-#ifdef TINYFD_NOCCSUNICODE
-								lFile = _wfopen(lDialogString, L"w");
-								fputc(0xFF, lFile);
-								fputc(0xFE, lFile);
-#else
-								lFile = _wfopen(lDialogString, L"wt, ccs=UNICODE"); /*or ccs=UTF-16LE*/
-#endif
-								fclose(lFile);
-
-				wcscpy(lDialogString, L"cmd.exe /c cscript.exe //U //Nologo ");
-				wcscat(lDialogString, L"\"%TEMP%\\tinyfd.vbs\" ");
-				wcscat(lDialogString, L">> \"%TEMP%\\tinyfd.txt\"");
-		}
-		else
-		{
-				wcscpy(lDialogString,
-						L"cmd.exe /c mshta.exe \"%TEMP%\\tinyfd.hta\"");
-		}
-
-		/* wprintf ( "lDialogString: %ls\n" , lDialogString ) ; */
-
-		hiddenConsoleW(lDialogString, aTitle, 1);
-
-		swprintf(lDialogString,
-#if !defined(__BORLANDC__) && !defined(__TINYC__) && !(defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR))
-				lDialogStringLen,
-#endif
-				L"%ls\\tinyfd.txt", _wgetenv(L"TEMP"));
-		/* wprintf(L"lDialogString: %ls\n", lDialogString); */
-#ifdef TINYFD_NOCCSUNICODE
-		lIn = ( FILE * ) _wfopen(lDialogString, L"r") ;
-#else
-		lIn = ( FILE * ) _wfopen(lDialogString, L"rt, ccs=UNICODE") /*or ccs=UTF-16LE*/
-#endif
-		if ( ! lIn )
-		{
-			_wremove(lDialogString);
-			free(lDialogString);
-			return NULL;
-		}
-
-		memset(lBuff, 0, MAX_PATH_OR_CMD * sizeof(wchar_t) );
-
-#ifdef TINYFD_NOCCSUNICODE
-				fgets((char *)lBuff, 2*MAX_PATH_OR_CMD, lIn);
-#else
-				fgetws(lBuff, MAX_PATH_OR_CMD, lIn);
-#endif
-				fclose(lIn);
-				wipefileW(lDialogString);
-				_wremove(lDialogString);
-
-				if (aDefaultInput)
-				{
-						swprintf(lDialogString,
-#if !defined(__BORLANDC__) && !defined(__TINYC__) && !(defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR))
-						lDialogStringLen,
-#endif
-						L"%ls\\tinyfd.vbs", _wgetenv(L"TEMP"));
-		}
-		else
-		{
-				swprintf(lDialogString,
-#if !defined(__BORLANDC__) && !defined(__TINYC__) && !(defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR))
-						lDialogStringLen,
-#endif
-						L"%ls\\tinyfd.hta", _wgetenv(L"TEMP"));
-		}
-		_wremove(lDialogString);
-		free(lDialogString);
-		/* wprintf( L"lBuff: %ls\n" , lBuff ) ; */
-#ifdef TINYFD_NOCCSUNICODE
-				lResult = !wcsncmp(lBuff+1, L"1", 1);
-#else
-				lResult = !wcsncmp(lBuff, L"1", 1);
-#endif
-
-		/* printf( "lResult: %d \n" , lResult ) ; */
-		if (!lResult)
-		{
-			return NULL ;
-		}
-
-		/* wprintf( "lBuff+1: %ls\n" , lBuff+1 ) ; */
-
-#ifdef TINYFD_NOCCSUNICODE
-				if (aDefaultInput)
-				{
-						lDialogStringLen = wcslen(lBuff) ;
-						lBuff[lDialogStringLen - 1] = L'\0';
-						lBuff[lDialogStringLen - 2] = L'\0';
-				}
-				return lBuff + 2;
-#else
-				if (aDefaultInput) lBuff[wcslen(lBuff) - 1] = L'\0';
-				return lBuff + 1;
-#endif
+	return lResult;
 }
 
 
@@ -3516,13 +3686,23 @@ static int * getMajorMinorPatch( char const * aExecutable )
 {
 		static int lArray[3] ;
 		char * lTmp ;
+		char * lRest ;
 
 		lTmp = (char *) getVersion(aExecutable);
+		lRest = lTmp ;
+
+#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 199506L
+		lArray[0] = atoi( strtok_r(lTmp," ,.-", & lRest) ) ;
+		lArray[1] = atoi( strtok_r(0," ,.-", & lRest) ) ;
+		lArray[2] = atoi( strtok_r(0," ,.-", & lRest) ) ;
+#else
+		(void) lRest ;
 		lArray[0] = atoi( strtok(lTmp," ,.-") ) ;
-		/* printf("lArray0 %d\n", lArray[0]); */
 		lArray[1] = atoi( strtok(0," ,.-") ) ;
-		/* printf("lArray1 %d\n", lArray[1]); */
 		lArray[2] = atoi( strtok(0," ,.-") ) ;
+#endif
+		/* printf("lArray0 %d\n", lArray[0]); */
+		/* printf("lArray1 %d\n", lArray[1]); */
 		/* printf("lArray2 %d\n", lArray[2]); */
 
 		if ( !lArray[0] && !lArray[1] && !lArray[2] ) return NULL;
@@ -3571,6 +3751,9 @@ static char * dialogNameOnly(void)
 				{
 						strcpy(lDialogName , "" );
 				}
+				else if ( * strcpy(lDialogName , "bsddialog" )
+						&& detectPresence( lDialogName ) )
+				{}
 				else if ( tfd_isDarwin() && * strcpy(lDialogName , "/opt/local/bin/dialog" )
 						&& detectPresence( lDialogName ) )
 				{}
@@ -3597,6 +3780,7 @@ int isDialogVersionBetter09b(void)
 		char * lMinorP ;
 		char * lLetter ;
 		char lBuff[128] ;
+		char * lRest ;
 
 		/*char lTest[128] = " 0.9b-20031126" ;*/
 
@@ -3605,18 +3789,31 @@ int isDialogVersionBetter09b(void)
 		/*lVersion = lTest ;*/
 		/*printf("lVersion %s\n", lVersion);*/
 		strcpy(lBuff,lVersion);
+		lRest = lVersion ;
+#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 199506L
+		lMajor = atoi( strtok_r(lVersion," ,.-", & lRest) ) ;
+		lMinorP = strtok_r(0," ,.-abcdefghijklmnopqrstuvxyz", & lRest);
+		lDate = atoi( strtok_r(0," ,.-", & lRest) ) ;
+#else
+		(void) lRest ;
 		lMajor = atoi( strtok(lVersion," ,.-") ) ;
-		/*printf("lMajor %d\n", lMajor);*/
 		lMinorP = strtok(0," ,.-abcdefghijklmnopqrstuvxyz");
-		lMinor = atoi( lMinorP ) ;
-		/*printf("lMinor %d\n", lMinor );*/
 		lDate = atoi( strtok(0," ,.-") ) ;
+#endif
+		/*printf("lMajor %d\n", lMajor);*/
 		if (lDate<0) lDate = - lDate;
 		/*printf("lDate %d\n", lDate);*/
 		lLetter = lMinorP + strlen(lMinorP) ;
+		lRest = lLetter ;
 		strcpy(lVersion,lBuff);
+#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 199506L
+		strtok_r(lLetter," ,.-", & lRest);
+#else
 		strtok(lLetter," ,.-");
+#endif
 		/*printf("lLetter %s\n", lLetter);*/
+		lMinor = atoi( lMinorP ) ;
+		/*printf("lMinor %d\n", lMinor );*/
 		lResult = (lMajor > 0) || ( ( lMinor == 9 ) && (*lLetter == 'b') && (lDate >= 20031126) );
 		/*printf("lResult %d\n", lResult);*/
 		return lResult;
@@ -4224,6 +4421,7 @@ int tfd_zenityVersion(void)
 	static int lZenityVersion = -1 ;
 	char lBuff[MAX_PATH_OR_CMD] ;
 	FILE * lIn ;
+	char * lRest ;
 
 	if ( lZenityVersion < 0 )
 	{
@@ -4233,7 +4431,13 @@ int tfd_zenityVersion(void)
 			if ( fgets( lBuff , sizeof( lBuff ) , lIn ) != NULL )
 			{
 				lZenityVersion = 1000 * atoi( lBuff ) ;
+				lRest = lBuff ;
+#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 199506L
+				lZenityVersion += atoi( strtok_r( lBuff, "." , & lRest) + 2 ) ;
+#else
+				(void) lRest ;
 				lZenityVersion += atoi( strtok( lBuff, "." ) + 2 ) ;
+#endif
 				/* 3018 , 3010 , 3000, 2032 was 5 , 4 , 3, 2 */ 
 			}
 			pclose( lIn ) ;
