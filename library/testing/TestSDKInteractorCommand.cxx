@@ -41,6 +41,19 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, char* argv[])
   inter.triggerCommand("toggle scene.camera.orthographic");
   test("triggerCommand toggle", options.scene.camera.orthographic == true);
 
+  // Test toggle_axis_lock
+  inter.triggerCommand("toggle_axis_lock +X");
+  test("triggerCommand toggle_axis_lock enable",
+    options.interactor.axis_lock == f3d::direction_t({ 1, 0, 0 }));
+  test("docAxisTgl ON",
+    inter.getBindingDocumentation({ f3d::interaction_bind_t::ModifierKeys::CTRL_SHIFT, "X" }).second == "ON");
+  inter.triggerCommand("toggle_axis_lock +X");
+  test("triggerCommand toggle_axis_lock disable", !options.interactor.axis_lock.has_value());
+  test("docAxisTgl OFF",
+    inter.getBindingDocumentation({ f3d::interaction_bind_t::ModifierKeys::CTRL_SHIFT, "X" }).second == "OFF");
+  test("triggerCommand toggle_axis_lock invalid args",
+    inter.triggerCommand("toggle_axis_lock") == false);
+
   // Test increase/decrease
   inter.triggerCommand("increase render.light.intensity");
   inter.triggerCommand("increase render.light.intensity");
