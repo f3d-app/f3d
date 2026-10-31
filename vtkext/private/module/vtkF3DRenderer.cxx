@@ -3586,7 +3586,7 @@ void vtkF3DRenderer::UpdateLightRepresentations()
   }
 
   // remove unwanted light representations
-  for (auto repItr = LightRepresentations.begin(); repItr != LightRepresentations.end();)
+  for (auto repItr = this->LightRepresentations.begin(); repItr != this->LightRepresentations.end();)
   {
     if (visitedLights.count(repItr->first))
     {
