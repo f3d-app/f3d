@@ -3889,8 +3889,11 @@ void vtkF3DRenderer::SetXRMode(bool enable, bool showBbox)
 void vtkF3DRenderer::SetLightRepresentationVisibility(bool visible)
 {
   // Make sure all lights are being tracked by a representation
-  LightRepresentationVisible = visible;
-  UpdateLightRepresentations();
+  if (this->LightRepresentationVisible != visible)
+  {
+    this->LightRepresentationVisible = visible;
+    this->UpdateLightRepresentations();
+  }
 }
 
 //----------------------------------------------------------------------------
