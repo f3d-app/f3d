@@ -228,6 +228,14 @@ public:
   vtkGetMacro(InvertZoom, bool);
   ///@}
 
+  ///@{
+  /**
+   * Set/Get RotationAxis
+   */
+  void SetRotationAxis(const std::optional<std::array<double, 3>>& axis);
+  const std::optional<std::array<double, 3>>& GetRotationAxis() const;
+  ///@}
+
   /**
    * Set the interaction style from a string.
    * Accepted values: "default", "trackball", "2d".
@@ -925,6 +933,7 @@ private:
   bool UseBlurBackground = false;
   std::optional<bool> UseOrthographicProjection = false;
   bool InvertZoom = false;
+  std::optional<std::array<double, 3>> RotationAxis;
 
   int RaytracingSamples = 0;
   double UpDirection[3] = { 0.0, 1.0, 0.0 };
