@@ -180,8 +180,8 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     ret &= CheckPartitionCount(pdc, 2, "link_transform");
     if (pdc->GetNumberOfPartitionedDataSets() == 2)
     {
-      ret &=
-      CheckBounds(FirstVisiblePartition(pdc), { 1., 6.732, 20., 27.928, 0., 2. }, "link_transform");
+      ret &= CheckBounds(
+        FirstVisiblePartition(pdc), { 1., 6.732, 20., 27.928, 0., 2. }, "link_transform");
     }
   }
 
@@ -332,10 +332,10 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     ret &= CheckPartitionCount(pdc, 3, "partdesign_body");
     if (pdc->GetNumberOfPartitionedDataSets() == 3)
     {
-      ret &= CheckBounds(
-        FirstVisiblePartition(pdc), { -3., 10., -3., 10., 0., 20. }, "partdesign_body");
-      ret &= CheckBounds(
-        FirstVisiblePartition(pdc, 1), { 20., 24., 0., 4., 0., 4. }, "partdesign_body");
+      ret &=
+        CheckBounds(FirstVisiblePartition(pdc), { -3., 10., -3., 10., 0., 20. }, "partdesign_body");
+      ret &=
+        CheckBounds(FirstVisiblePartition(pdc, 1), { 20., 24., 0., 4., 0., 4. }, "partdesign_body");
       const vtkDataAssembly* assembly = pdc->GetDataAssembly();
       const int container = assembly->FindFirstNodeWithName("Assembly");
       const int body = assembly->FindFirstNodeWithName("Body");
@@ -369,8 +369,8 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     ret &= CheckPartitionCount(pdc, 2, "link_array_transform");
     if (pdc->GetNumberOfPartitionedDataSets() == 2)
     {
-      ret &=
-        CheckBounds(FirstVisiblePartition(pdc), { 3., 25., -7., 5., 0., 3. }, "link_array_transform");
+      ret &= CheckBounds(
+        FirstVisiblePartition(pdc), { 3., 25., -7., 5., 0., 3. }, "link_array_transform");
     }
   }
 
@@ -401,7 +401,7 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     if (pdc->GetNumberOfPartitionedDataSets() == 2)
     {
       ret &=
-      CheckBounds(FirstVisiblePartition(pdc), { 20., 30., 0., 10., 0., 10. }, "hidden_container");
+        CheckBounds(FirstVisiblePartition(pdc), { 20., 30., 0., 10., 0., 10. }, "hidden_container");
     }
   }
 
@@ -442,7 +442,8 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
           visibility != (objectName == "VisibleBox" ? 1 : 0) ||
           assembly->GetDataSetIndices(node, false).empty())
         {
-          std::cerr << "hidden_parts: incorrect visibility or missing geometry for " << objectName << "\n";
+          std::cerr << "hidden_parts: incorrect visibility or missing geometry for " << objectName
+                    << "\n";
           ret = false;
         }
 
