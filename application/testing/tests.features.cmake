@@ -180,6 +180,9 @@ f3d_test(NAME TestLightIntensityDarker DATA cow.vtp ARGS --light-intensity=0.2)
 f3d_test(NAME TestLightIntensityBrighterFullScene DATA WaterBottle.glb ARGS --light-intensity=5.0)
 f3d_test(NAME TestLightIntensityDarkerFullScene DATA WaterBottle.glb ARGS --light-intensity=0.2)
 
+## Light Representation
+f3d_test(NAME TestLightRepresentation DATA PointLightIntensityTest.glb ARGS --light-representation SKIP_GLES) # Big rendering differences on GLES
+
 ## Other UI
 f3d_test(NAME TestUTF8 DATA "(ノಠ益ಠ )ノ.vtp")
 f3d_test(NAME TestGlyphsRangeFilename DATA "şΞβЦй€±©.vtp" ARGS -n UI)
