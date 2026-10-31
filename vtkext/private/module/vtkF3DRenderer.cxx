@@ -3597,7 +3597,7 @@ void vtkF3DRenderer::UpdateLightRepresentations()
     // safely removing the widget and representation
     repItr->second.widget->Off();
 
-    repItr = LightRepresentations.erase(repItr);
+    repItr = this->LightRepresentations.erase(repItr);
   }
 }
 
