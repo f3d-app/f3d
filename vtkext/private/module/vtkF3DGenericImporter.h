@@ -136,8 +136,8 @@ private:
   /**
    * Create an actor for a single dataset block
    */
-  void CreateActorForBlock(
-    int nodeid, vtkDataSet* block, vtkRenderer* ren, const std::string& blockName = "");
+  void CreateActorForBlock(int nodeid, vtkDataSet* block, vtkRenderer* ren,
+    const std::string& blockName = "", bool visible = true);
 
   /**
    * Import blocks from a vtkMultiBlockDataSet with proper name extraction
@@ -162,13 +162,13 @@ private:
    * after pdsName, or its metadata when pdsName is empty
    */
   void ImportPartitionedDataSet(int nodeid, vtkPartitionedDataSetCollection* pdc,
-    unsigned int index, vtkRenderer* ren, const std::string& pdsName);
+    unsigned int index, vtkRenderer* ren, const std::string& pdsName, bool visible = true);
 
   /**
    * Import blocks from a vtkPartitionedDataSet under the provided scene hierarchy node
    */
-  void ImportPartitionedDataSet(
-    int nodeid, vtkPartitionedDataSet* pds, vtkRenderer* ren, const std::string& pdsName = "");
+  void ImportPartitionedDataSet(int nodeid, vtkPartitionedDataSet* pds, vtkRenderer* ren,
+    const std::string& pdsName = "", bool visible = true);
 
   struct Internals;
   std::unique_ptr<Internals> Pimpl;
