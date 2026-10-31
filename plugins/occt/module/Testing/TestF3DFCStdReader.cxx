@@ -54,6 +54,34 @@ bool CheckBounds(
   }
   return true;
 }
+
+vtkDataSet* FirstVisiblePartition(vtkPartitionedDataSetCollection* pdc, unsigned int offset = 0)
+{
+  const vtkDataAssembly* assembly = pdc->GetDataAssembly();
+  if (!assembly)
+  {
+    return nullptr;
+  }
+
+  for (const int node : assembly->GetChildNodes(vtkDataAssembly::GetRootNode(), true))
+  {
+    int visible = 0;
+    if (assembly->GetAttribute(node, "f3d_visible", visible) && visible == 1)
+    {
+      for (const unsigned int index : assembly->GetDataSetIndices(node, false))
+      {
+        if (offset == 0)
+        {
+          return pdc->GetPartition(index, 0);
+        }
+        --offset;
+      }
+    }
+  }
+
+  return nullptr;
+}
+
 }
 
 int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
@@ -62,21 +90,28 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
   bool ret = true;
 
   {
-    // a red 10x5x3 box and a hidden box that must not be read
+    // a red 10x5x3 box and a hidden box, both imported.
     const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
       ReadFile(data + "/colored_visibility.FCStd");
-    ret &= CheckPartitionCount(pdc, 1, "colored_visibility");
-    if (pdc->GetNumberOfPartitionedDataSets() == 1)
+    ret &= CheckPartitionCount(pdc, 2, "colored_visibility");
+    if (pdc->GetNumberOfPartitionedDataSets() == 2)
     {
-      vtkDataSet* dataset = pdc->GetPartition(0, 0);
-      ret &= CheckBounds(dataset, { 0., 10., 0., 5., 0., 3. }, "colored_visibility");
-      const vtkUnsignedCharArray* colors =
-        vtkUnsignedCharArray::SafeDownCast(dataset->GetCellData()->GetScalars());
-      if (!colors || colors->GetTypedComponent(0, 0) != 204 ||
-        colors->GetTypedComponent(0, 1) != 26)
+      vtkDataSet* dataset = FirstVisiblePartition(pdc);
+      if (!dataset)
       {
-        std::cerr << "colored_visibility: unexpected colors\n";
+        std::cerr << "colored_visibility: visible box not found\n";
         ret = false;
+      }
+      else
+      {
+        const vtkUnsignedCharArray* colors =
+          vtkUnsignedCharArray::SafeDownCast(dataset->GetCellData()->GetScalars());
+        if (!colors || colors->GetTypedComponent(0, 0) != 204 ||
+          colors->GetTypedComponent(0, 1) != 26)
+        {
+          std::cerr << "colored_visibility: unexpected colors\n";
+          ret = false;
+        }
       }
     }
   }
@@ -109,10 +144,10 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     // (0, 20, 0). LinkTransform is disabled so the source placement must be
     // discarded: the box must be axis aligned at the link placement.
     const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc = ReadFile(data + "/link.FCStd");
-    ret &= CheckPartitionCount(pdc, 1, "link");
-    if (pdc->GetNumberOfPartitionedDataSets() == 1)
+    ret &= CheckPartitionCount(pdc, 2, "link");
+    if (pdc->GetNumberOfPartitionedDataSets() == 2)
     {
-      ret &= CheckBounds(pdc->GetPartition(0, 0), { 0., 2., 20., 28., 0., 2. }, "link");
+      ret &= CheckBounds(FirstVisiblePartition(pdc), { 0., 2., 20., 28., 0., 2. }, "link");
     }
   }
 
@@ -142,11 +177,11 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     // (translation and 30 degrees rotation) must be composed with the link one
     const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
       ReadFile(data + "/link_transform.FCStd");
-    ret &= CheckPartitionCount(pdc, 1, "link_transform");
-    if (pdc->GetNumberOfPartitionedDataSets() == 1)
+    ret &= CheckPartitionCount(pdc, 2, "link_transform");
+    if (pdc->GetNumberOfPartitionedDataSets() == 2)
     {
       ret &=
-        CheckBounds(pdc->GetPartition(0, 0), { 1., 6.732, 20., 27.928, 0., 2. }, "link_transform");
+      CheckBounds(FirstVisiblePartition(pdc), { 1., 6.732, 20., 27.928, 0., 2. }, "link_transform");
     }
   }
 
@@ -164,7 +199,7 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     // must still hide the hidden box
     const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
       ReadFile(data + "/legacy_visibility.FCStd");
-    ret &= CheckPartitionCount(pdc, 1, "legacy_visibility");
+    ret &= CheckPartitionCount(pdc, 2, "legacy_visibility");
   }
 
   {
@@ -173,10 +208,10 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     // stored placements.
     const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
       ReadFile(data + "/link_array.FCStd");
-    ret &= CheckPartitionCount(pdc, 1, "link_array");
-    if (pdc->GetNumberOfPartitionedDataSets() == 1)
+    ret &= CheckPartitionCount(pdc, 2, "link_array");
+    if (pdc->GetNumberOfPartitionedDataSets() == 2)
     {
-      ret &= CheckBounds(pdc->GetPartition(0, 0), { 0., 22., 0., 12., 0., 3. }, "link_array");
+      ret &= CheckBounds(FirstVisiblePartition(pdc), { 0., 22., 0., 12., 0., 3. }, "link_array");
     }
   }
 
@@ -291,15 +326,16 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
 
   {
     // a PartDesign body (hidden box, cylinder tip) and a box in an App::Part:
-    // only the tip and the box are read, under the same container node
+    // all geometry is imported, but only the tip and side box are visible.
     const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
       ReadFile(data + "/partdesign_body.FCStd");
-    ret &= CheckPartitionCount(pdc, 2, "partdesign_body");
-    if (pdc->GetNumberOfPartitionedDataSets() == 2)
+    ret &= CheckPartitionCount(pdc, 3, "partdesign_body");
+    if (pdc->GetNumberOfPartitionedDataSets() == 3)
     {
-      ret &=
-        CheckBounds(pdc->GetPartition(0, 0), { -3., 10., -3., 10., 0., 20. }, "partdesign_body");
-      ret &= CheckBounds(pdc->GetPartition(1, 0), { 20., 24., 0., 4., 0., 4. }, "partdesign_body");
+      ret &= CheckBounds(
+        FirstVisiblePartition(pdc), { -3., 10., -3., 10., 0., 20. }, "partdesign_body");
+      ret &= CheckBounds(
+        FirstVisiblePartition(pdc, 1), { 20., 24., 0., 4., 0., 4. }, "partdesign_body");
       const vtkDataAssembly* assembly = pdc->GetDataAssembly();
       const int container = assembly->FindFirstNodeWithName("Assembly");
       const int body = assembly->FindFirstNodeWithName("Body");
@@ -330,11 +366,11 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     // placements, like FreeCAD displays it
     const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
       ReadFile(data + "/link_array_transform.FCStd");
-    ret &= CheckPartitionCount(pdc, 1, "link_array_transform");
-    if (pdc->GetNumberOfPartitionedDataSets() == 1)
+    ret &= CheckPartitionCount(pdc, 2, "link_array_transform");
+    if (pdc->GetNumberOfPartitionedDataSets() == 2)
     {
       ret &=
-        CheckBounds(pdc->GetPartition(0, 0), { 3., 25., -7., 5., 0., 3. }, "link_array_transform");
+        CheckBounds(FirstVisiblePartition(pdc), { 3., 25., -7., 5., 0., 3. }, "link_array_transform");
     }
   }
 
@@ -361,11 +397,11 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     // placed at (20, 0, 0) outside of it: the hidden container hides its child
     const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
       ReadFile(data + "/hidden_container.FCStd");
-    ret &= CheckPartitionCount(pdc, 1, "hidden_container");
-    if (pdc->GetNumberOfPartitionedDataSets() == 1)
+    ret &= CheckPartitionCount(pdc, 2, "hidden_container");
+    if (pdc->GetNumberOfPartitionedDataSets() == 2)
     {
       ret &=
-        CheckBounds(pdc->GetPartition(0, 0), { 20., 30., 0., 10., 0., 10. }, "hidden_container");
+      CheckBounds(FirstVisiblePartition(pdc), { 20., 30., 0., 10., 0., 10. }, "hidden_container");
     }
   }
 
@@ -375,6 +411,57 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
     const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
       ReadFile(data + "/gui_without_view_providers.FCStd");
     ret &= CheckPartitionCount(pdc, 2, "gui_without_view_providers");
+  }
+
+  {
+    // hidden FreeCAD objects must remain available in the scene hierarchy.
+    const auto pdc = ReadFile(data + "/hidden_parts.FCStd");
+    ret &= CheckPartitionCount(pdc, 2, "hidden_parts");
+
+    const vtkDataAssembly* assembly = pdc->GetDataAssembly();
+    if (!assembly)
+    {
+      std::cerr << "hidden_parts: missing data assembly\n";
+      ret = false;
+    }
+    else
+    {
+      bool foundVisible = false;
+      bool foundHidden = false;
+
+      for (const int node : assembly->GetChildNodes(vtkDataAssembly::GetRootNode(), true))
+      {
+        const std::string objectName = assembly->GetNodeName(node);
+        if (objectName != "VisibleBox" && objectName != "HiddenBox")
+        {
+          continue;
+        }
+
+        int visibility = -1;
+        if (!assembly->GetAttribute(node, "f3d_visible", visibility) ||
+          visibility != (objectName == "VisibleBox" ? 1 : 0) ||
+          assembly->GetDataSetIndices(node, false).empty())
+        {
+          std::cerr << "hidden_parts: incorrect visibility or missing geometry for " << objectName << "\n";
+          ret = false;
+        }
+
+        if (objectName == "VisibleBox")
+        {
+          foundVisible = true;
+        }
+        else
+        {
+          foundHidden = true;
+        }
+      }
+
+      if (!foundVisible || !foundHidden)
+      {
+        std::cerr << "hidden_parts: missing objects in hierarchy\n";
+        ret = false;
+      }
+    }
   }
 
   return ret ? EXIT_SUCCESS : EXIT_FAILURE;
