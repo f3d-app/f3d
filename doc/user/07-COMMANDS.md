@@ -62,6 +62,8 @@ Supports `front`, `top`, `right`, `back`, `bottom`, `left`, `isometric` argument
 
 `toggle_volume_rendering`: A specific command to toggle `model.volume.enable` and print coloring information. No argument.
 
+`toggle_axis_lock direction`: A specific command to lock rotation to one direction, or unlock it if already locked to that direction, eg: `toggle_axis_lock +X`.
+
 `stop_interactor`: A specific command to stop the interactor hence quitting the application. No argument.
 
 `reset_camera`: A specific command to reset the camera to its original location. No argument.
