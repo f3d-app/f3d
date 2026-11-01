@@ -722,12 +722,12 @@ void vtkF3DImguiActor::RenderDropZone()
     }
 
     // Draw left and right line
-    for (float y = p0.y; y < p1.y; y += tickLength + tickSpaceH)
+    for (float y = p0.y + 1; y < p1.y; y += tickLength + tickSpaceH)
     {
       const float x1 = p1.x - halfTickThickness;
       const float y1 = std::min(p1.y, y + tickLength);
-      drawList->AddLine(ImVec2(p0.x, y), ImVec2(p0.x, y1), color, tickThickness);
-      drawList->AddLine(ImVec2(x1, y), ImVec2(x1, y1), color, tickThickness);
+      drawList->AddLine(ImVec2(p0.x + 1, y), ImVec2(p0.x, y1), color, tickThickness);
+      drawList->AddLine(ImVec2(x1 + 1, y), ImVec2(x1, y1), color, tickThickness);
     }
 
     ImGui::End();
