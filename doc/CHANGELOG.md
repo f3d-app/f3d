@@ -1,5 +1,17 @@
 # Changelog
 
+## v4.0.1
+
+For F3D users:
+
+- Fixed an issue on Windows where F3D could be opened outside of the monitor
+- Fixed USD streaming
+
+For libf3d users:
+
+- Fixed a crash when the event loop is triggered before a first rendering
+- Fixed missing includes in video headers
+
 ## v4.0.0
 
 For F3D users:
