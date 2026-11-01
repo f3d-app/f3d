@@ -159,7 +159,7 @@ bool vtkF3DGenericImporter::GetTemporalInformation([[maybe_unused]] vtkIdType an
 
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::CreateActorForBlock(
-  int nodeid, vtkDataSet* block, vtkRenderer* ren, const std::string& blockName)
+  int nodeid, vtkDataSet* block, vtkRenderer* ren, const std::string& blockName, bool visible)
 {
   this->Pimpl->Blocks.emplace_back();
   Internals::BlockData& bd = this->Pimpl->Blocks.back();
@@ -177,6 +177,8 @@ void vtkF3DGenericImporter::CreateActorForBlock(
     this->SceneHierarchy->SetAttribute(childNodeId, "label", blockName.c_str());
   }
 
+  this->SceneHierarchy->SetAttribute(childNodeId, "f3d_visible", visible ? 1 : 0);
+
   bd.Mapper->SetInputConnection(bd.PostPro->GetOutputPort(0));
   bd.Mapper->ScalarVisibilityOff();
 
@@ -191,7 +193,7 @@ void vtkF3DGenericImporter::CreateActorForBlock(
   ren->AddActor(bd.Actor);
   this->ActorCollection->AddItem(bd.Actor);
 
-  bd.Actor->VisibilityOn();
+  bd.Actor->SetVisibility(visible);
 }
 
 //----------------------------------------------------------------------------
@@ -579,6 +581,10 @@ void vtkF3DGenericImporter::ImportAssemblyNode(int nodeid, vtkDataAssembly* asse
     const std::string label = assembly->GetAttributeOrDefault(child, "label", nodeName);
     const std::vector<unsigned int> indices = assembly->GetDataSetIndices(child, false);
 
+    int visibility = 1;
+    assembly->GetAttribute(child, "f3d_visible", visibility);
+    const bool visible = visibility != 0;
+
     // a node with children or several datasets is a group, a node with a single dataset is the
     // dataset itself
     int childNodeId = nodeid;
@@ -587,6 +593,7 @@ void vtkF3DGenericImporter::ImportAssemblyNode(int nodeid, vtkDataAssembly* asse
     {
       childNodeId = this->SceneHierarchy->AddNode(nodeName, nodeid);
       this->SceneHierarchy->SetAttribute(childNodeId, "label", label.c_str());
+      this->SceneHierarchy->SetAttribute(childNodeId, "f3d_visible", visible ? 1 : 0);
     }
 
     for (const unsigned int index : indices)
@@ -594,7 +601,7 @@ void vtkF3DGenericImporter::ImportAssemblyNode(int nodeid, vtkDataAssembly* asse
       if (index < imported.size() && !imported[index])
       {
         imported[index] = true;
-        this->ImportPartitionedDataSet(childNodeId, pdc, index, ren, isGroup ? "" : label);
+        this->ImportPartitionedDataSet(childNodeId, pdc, index, ren, isGroup ? "" : label, visible);
       }
     }
 
@@ -605,7 +612,7 @@ void vtkF3DGenericImporter::ImportAssemblyNode(int nodeid, vtkDataAssembly* asse
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::ImportPartitionedDataSet(int nodeid,
   vtkPartitionedDataSetCollection* pdc, unsigned int index, vtkRenderer* ren,
-  const std::string& pdsName)
+  const std::string& pdsName, bool visible)
 {
   vtkPartitionedDataSet* pds = pdc->GetPartitionedDataSet(index);
   assert(pds);
@@ -624,12 +631,12 @@ void vtkF3DGenericImporter::ImportPartitionedDataSet(int nodeid,
     name = "PartitionedDataSet_" + std::to_string(index);
   }
 
-  this->ImportPartitionedDataSet(nodeid, pds, ren, name);
+  this->ImportPartitionedDataSet(nodeid, pds, ren, name, visible);
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DGenericImporter::ImportPartitionedDataSet(
-  int nodeid, vtkPartitionedDataSet* pds, vtkRenderer* ren, const std::string& pdsName)
+void vtkF3DGenericImporter::ImportPartitionedDataSet(int nodeid, vtkPartitionedDataSet* pds,
+  vtkRenderer* ren, const std::string& pdsName, bool visible)
 {
   std::string baseName = pdsName;
   if (baseName.empty())
@@ -667,6 +674,6 @@ void vtkF3DGenericImporter::ImportPartitionedDataSet(
       blockName += std::to_string(j);
     }
 
-    this->CreateActorForBlock(nodeid, ds, ren, blockName);
+    this->CreateActorForBlock(nodeid, ds, ren, blockName, visible);
   }
 }
