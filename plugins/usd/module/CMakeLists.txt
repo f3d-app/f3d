@@ -17,8 +17,8 @@ if(_target_type STREQUAL "STATIC_LIBRARY")
   # The following ensures that certain USD symbols are linked correctly is USD is built as a static library.
   # However, that will only work if `PXR_ENABLE_NAMESPACES` is disabled.
   if (WIN32)
-    foreach (_usd_symbols _ZTIN8pxr_half4halfE SdfUsdzFileFormatTokens)
-      vtk_module_link_options(f3d::vtkextUSD INTERFACE "/INCLUDE:??0${_usd_symbols}@@QEAA@XZ") # TODO: check on Windows
+    foreach (_usd_symbols "??_R0?AV?$VtArray@Vhalf@pxr_half@@@@@8" "??_R3SdfUsdzFileFormat@@8")
+      vtk_module_link_options(f3d::vtkextUSD INTERFACE "/INCLUDE:${_usd_symbols}")
     endforeach ()
   else ()
     foreach (_usd_symbols _ZTIN8pxr_half4halfE SdfUsdzFileFormatTokens)
