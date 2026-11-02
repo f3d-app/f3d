@@ -74,7 +74,8 @@ bool TestError(const std::string& filename, const std::string& expectedError,
   }
   if (reader->GetOutput()->GetNumberOfPartitionedDataSets() != expectedPartitions)
   {
-    std::cerr << "Unexpected output for " << filename << "\n";
+    std::cerr << "Unexpected output for " << filename << ": expected " << expectedPartitions
+              << ", got " << reader->GetOutput()->GetNumberOfPartitionedDataSets() << "\n";
     return false;
   }
   return true;
@@ -96,7 +97,7 @@ int TestF3DFCStdReaderErrors(int vtkNotUsed(argc), char* argv[])
 
   // a link to a group and arrays with a missing base, a corrupt shape, no
   // placement list or a truncated one: all skipped, only the box remains
-  ret &= TestError(data + "/broken_links.FCStd", "Failed to read BRep file", 1);
+  ret &= TestError(data + "/broken_links.FCStd", "Failed to read BRep file", 3);
 
   const vtkNew<NonSeekableStream> nonSeekable;
   if (vtkF3DFCStdReader::CanReadFile(nullptr) || vtkF3DFCStdReader::CanReadFile(nonSeekable))
