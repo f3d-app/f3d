@@ -65,3 +65,16 @@ if(EMSCRIPTEN)
     "SHELL:--embed-file=${CMAKE_CURRENT_SOURCE_DIR}/resources/plugInfo.json@/usd/f3d/resources/plugInfo.json"
   )
 endif()
+
+# When building python wheels, install the USD resource files
+if(SKBUILD)
+  # Get USD root path
+  get_target_property(_first_lib_location ${_first_lib} LOCATION)
+  cmake_path(GET _first_lib_location PARENT_PATH _first_lib_dir)
+  cmake_path(GET _first_lib_dir PARENT_PATH _first_lib_root_dir)
+
+  install(
+    DIRECTORY "${_first_lib_root_dir}/lib/usd"
+    DESTINATION "lib"
+  )
+endif()
