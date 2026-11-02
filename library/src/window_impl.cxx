@@ -618,6 +618,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetBackdropOpacity(opt.ui.backdrop.opacity);
   renderer->ShowNotification(opt.ui.notifications.enable);
   renderer->ShowBindings(opt.ui.notifications.show_bindings);
+  renderer->SetLightRepresentationVisibility(opt.render.light.representation);
 
   if (this->Internals->Interactor)
   {

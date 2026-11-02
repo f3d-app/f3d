@@ -132,6 +132,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "interaction-style", "interactor.style" },
   { "invert-zoom", "interactor.invert_zoom" },
   { "light-intensity", "render.light.intensity" },
+  { "light-representation", "render.light.representation" },
   { "line-width", "render.line_width" },
   { "loading-progress", "ui.loader_progress" },
   { "metadata", "ui.metadata" },

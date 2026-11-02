@@ -42,6 +42,8 @@ class vtkOrientationMarkerWidget;
 class vtkScalarBarActor;
 class vtkSkybox;
 class vtkTextActor;
+class vtkLightRepresentation;
+class vtkLightWidget;
 
 class vtkF3DRenderer : public vtkOpenGLRenderer
 {
@@ -268,6 +270,11 @@ public:
    * return the number of lights in the renderer.
    */
   int UpdateLights() override;
+
+  /**
+   * Updates all light representations
+   */
+  void UpdateLightRepresentations();
 
   /**
    * Initialize the renderer actors and flags.
@@ -702,6 +709,13 @@ public:
    */
   void SetXRMode(bool enable, bool showBbox = false);
 
+  /**
+   * Changes the light representable visibility
+   * if visible is true, Then all the representables will be turned on
+   * else all representables will not be visible
+   */
+  void SetLightRepresentationVisibility(bool visible);
+
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;
@@ -869,6 +883,13 @@ private:
 
   vtkSmartPointer<vtkGridAxesActor3D> GridAxesActor;
 
+  struct LightRepresentationBundle
+  {
+    vtkSmartPointer<vtkLightRepresentation> representation;
+    vtkSmartPointer<vtkLightWidget> widget;
+  };
+  std::map<vtkLight*, LightRepresentationBundle> LightRepresentations;
+
   vtkNew<vtkActor> GridActor;
   vtkNew<vtkF3DOpenGLGridMapper> GridMapper;
   vtkNew<vtkSkybox> SkyboxActor;
@@ -897,6 +918,7 @@ private:
   bool HDRISkyboxConfigured = false;
   bool XrBoundingBoxConfigured = false;
 
+  bool LightRepresentationVisible = false;
   bool GridVisible = false;
   bool GridAbsolute = false;
   bool AxisVisible = false;
