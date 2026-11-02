@@ -67,7 +67,7 @@ if(EMSCRIPTEN)
 endif()
 
 # When building python wheels, install the USD resource files
-if(SKBUILD)
+#if(SKBUILD)
   # Get USD root path
   get_target_property(_first_lib_location ${_first_lib} LOCATION)
   cmake_path(GET _first_lib_location PARENT_PATH _first_lib_dir)
@@ -77,4 +77,4 @@ if(SKBUILD)
     DIRECTORY "${_first_lib_root_dir}/lib/usd"
     DESTINATION "lib"
   )
-endif()
+#endif()
