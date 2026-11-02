@@ -76,5 +76,6 @@ endif()
   install(
     DIRECTORY "${_first_lib_root_dir}/lib/usd"
     DESTINATION "lib"
+    COMPONENT plugin
   )
 #endif()
