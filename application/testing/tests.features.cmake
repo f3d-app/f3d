@@ -181,7 +181,10 @@ f3d_test(NAME TestLightIntensityBrighterFullScene DATA WaterBottle.glb ARGS --li
 f3d_test(NAME TestLightIntensityDarkerFullScene DATA WaterBottle.glb ARGS --light-intensity=0.2)
 
 ## Light Representation
-f3d_test(NAME TestLightRepresentation DATA PointLightIntensityTest.glb ARGS --light-representation SKIP_GLES) # Big rendering differences on GLES
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13881
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261027)
+  f3d_test(NAME TestLightRepresentation DATA PointLightIntensityTest.glb ARGS --light-representation SKIP_GLES) # Big rendering differences on GLES
+endif()
 
 ## Other UI
 f3d_test(NAME TestUTF8 DATA "(ノಠ益ಠ )ノ.vtp")
