@@ -80,6 +80,7 @@ Linux testing protocol:
 - `f3d testing/data/f3d.stp` -> check render, orientation
 - `f3d testing/data/f3d.glb` -> press "Space", check animation is going smoothly and takes 4 seconds
 - `f3d /path/to/any/new/file.format` -> check render
+- open f3d, minimize it, close it from taskbar, open f3d again and check f3d window is visible in the expected location
 - `rm -rf ~/.cache/thumbnails`
 - `pcmanfm` (or another supported file manager)
 - Check that all supported files in testing/data have a generated thumbnails, especially for new file formats if any
@@ -97,6 +98,7 @@ macOS testing protocol:
 - Double click on cow.vtp, check render and orientation, press R and check raytracing
 - Double click on f3d.stp, check render and orientation
 - Double click on f3d.glb, press "Space", check animation is going smoothly and takes 4 seconds
+- open f3d, minimize it, close it from taskbar, open f3d again and check f3d window is visible in the expected location
 - Double click on any new supported file.format, check render
 - Check all supported file in testing/data directory in finder have the f3d mark, if not, check that "open with" suggest F3D
 - Drag&Drop cow.vtp, Drag&Drop shanghai_bund.hdr, check render
@@ -109,6 +111,7 @@ macOS testing protocol:
 Windows testing protocol:
 
 - Install F3D-X.Y.Z-RCN-Windows-x86_64-raytracing.exe, add F3D to path for all users
+- open f3d, minimize it, close it from taskbar, open f3d again and check f3d window is visible in the expected location
 - Start -> Disk Cleanup -> select thumbnails -> Ok -> Delete Files
 - Open testing/data directory in file manager
 - Wait for thumbnails to be generated
