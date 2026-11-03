@@ -31,7 +31,7 @@ please take a look at our [getting started guide](04-GETTING_STARTED.md).
 - Optionally, [web-ifc](https://github.com/ThatOpen/engine_web-ifc) >= 0.75 (only C++ library).
 - Optionally, [WebP](https://chromium.googlesource.com/webm/libwebp) >= 1.2.4.
 
-F3D is tested continuously against versions recommended by the [VFX reference platform](https://vfxplatform.com) defined for **CY2025**
+F3D is tested continuously against minimum/maximum versions including the one recommended by the [VFX reference platform](https://vfxplatform.com) defined for **CY2025**
 Exact tested versions can be found in `.github/workflows/versions.json`.
 
 ## VTK compatibility
