@@ -51,8 +51,8 @@ Not every binary ships every plugin, so a file may open in one binary but not an
 | `hdf`     |   Yes   |     Yes      |        Yes        |        Yes         |
 | `occt`    |   Yes   |     Yes      |        Yes        |        Yes         |
 | `pdal`    |   Yes   |     Yes      |        No         |         No         |
-| `usd`     |   Yes   |      No      |        Yes        | Yes (64-bits only) |
-| `vdb`     |   Yes   |      No      |        Yes        |        Yes         |
+| `usd`     |   Yes   |     Yes      |        Yes        | Yes (64-bits only) |
+| `vdb`     |   Yes   |     Yes      |        Yes        |        Yes         |
 | `webifc`  |   Yes   |     Yes      |        Yes        |        Yes         |
 
 F3D searches for plugins in this order:
