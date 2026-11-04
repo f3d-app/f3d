@@ -121,7 +121,7 @@ public:
           reinterpret_cast<void*>(&vtkF3DUSDImporter::New), &libPath, nullptr, nullptr, nullptr))
     {
       // NOLINTNEXTLINE(misc-const-correctness) not const on Windows
-      std::string plugInfoDir = PXR_NS::TfGetPathName(libPath) + "../lib/usd";
+      std::string plugInfoDir = PXR_NS::TfGetPathName(libPath) + "..";
 
 #ifdef _WIN32
       // On Windows, we can get a Universal Naming Convention prefix. Strip it if that's the case.
@@ -131,8 +131,8 @@ public:
       }
 #endif
 
-      PXR_NS::PlugRegistry::GetInstance().RegisterPlugins(plugInfoDir);
-      PXR_NS::PlugRegistry::GetInstance().RegisterPlugins(plugInfoDir + "/f3d/resources");
+      PXR_NS::PlugRegistry::GetInstance().RegisterPlugins({ plugInfoDir + "/plugin/usd",
+        plugInfoDir + "/lib/usd", plugInfoDir + "/lib/usd/f3d/resources" });
     }
   }
 
