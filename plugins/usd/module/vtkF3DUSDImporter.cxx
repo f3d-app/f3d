@@ -131,8 +131,9 @@ public:
       }
 #endif
 
-      PXR_NS::PlugRegistry::GetInstance().RegisterPlugins({ plugInfoDir + "/plugin/usd",
-        plugInfoDir + "/lib/usd", plugInfoDir + "/lib/usd/f3d/resources" });
+      PXR_NS::PlugRegistry::GetInstance().RegisterPlugins(
+        { plugInfoDir + "/plugin/usd", plugInfoDir + "/lib/usd", plugInfoDir + "/bin/usd",
+          plugInfoDir + "/lib/usd/f3d/resources" });
     }
   }
 
