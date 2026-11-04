@@ -1,0 +1,8 @@
+# StreamVersion 1.2
+ExposeEvent 0 299 0 0 0 0 0
+RenderEvent 0 299 0 0 0 0 0
+# Left click 0.3 px right of key frame marker 22 (x=134.7), must snap to that key frame
+MouseMoveEvent 135 8 0 0 0 0 0
+LeftButtonPressEvent 135 8 0 0 0 0 0
+TimerEvent 135 8 0 0 0 0 0
+LeftButtonReleaseEvent 135 8 0 0 0 0 0

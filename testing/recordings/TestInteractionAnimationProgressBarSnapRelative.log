@@ -1,0 +1,8 @@
+# StreamVersion 1.2
+ExposeEvent 0 299 0 0 0 0 0
+RenderEvent 0 299 0 0 0 0 0
+# Left click 2.5 px right of key frame marker 4 (x=24.5): beyond 1/8 of the 6.1 px key frame spacing, must not snap
+MouseMoveEvent 27 8 0 0 0 0 0
+LeftButtonPressEvent 27 8 0 0 0 0 0
+TimerEvent 27 8 0 0 0 0 0
+LeftButtonReleaseEvent 27 8 0 0 0 0 0
