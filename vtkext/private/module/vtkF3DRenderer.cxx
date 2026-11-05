@@ -3547,6 +3547,7 @@ void vtkF3DRenderer::ConfigureNormalGlyphs()
 void vtkF3DRenderer::UpdateLightRepresentations()
 {
   constexpr double maxConeAngle = 89.0;
+  constexpr double pointLightConeAngle = 90.0;
 
   vtkCollectionSimpleIterator it;
   vtkLightCollection* lc = this->GetLights();
@@ -3587,6 +3588,10 @@ void vtkF3DRenderer::UpdateLightRepresentations()
     else
     {
       lightRep.representation->SetPositional(false);
+    }
+    if (light->GetPositional() && light->GetConeAngle() == pointLightConeAngle)
+    {
+      lightRep.representation->SetFocalPoint(lightRep.representation->GetLightPosition());
     }
     lightRep.representation->SetLightColor(light->GetDiffuseColor());
 
