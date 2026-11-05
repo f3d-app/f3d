@@ -1775,10 +1775,41 @@ public:
     this->CurrentTime = currentTime;
   }
 
-  void GetTimeRange(double timeRange[2])
+  void GetTimeInformation(double timeRange[2], vtkDoubleArray* timeSteps, int& nbTimeSteps)
   {
-    timeRange[0] = this->Stage->GetStartTimeCode() / this->Stage->GetTimeCodesPerSecond();
-    timeRange[1] = this->Stage->GetEndTimeCode() / this->Stage->GetTimeCodesPerSecond();
+
+    const double timeCodesPerSecond = this->Stage->GetTimeCodesPerSecond();
+
+    timeRange[0] = this->Stage->GetStartTimeCode() / timeCodesPerSecond;
+    timeRange[1] = this->Stage->GetEndTimeCode() / timeCodesPerSecond;
+
+    if (!timeSteps)
+    {
+      return;
+    }
+
+    pxr::UsdAttributeVector allAttributes;
+
+    for (const pxr::UsdPrim& prim : this->Stage->Traverse())
+    {
+      const pxr::UsdAttributeVector primAttributes = prim.GetAttributes();
+
+      allAttributes.insert(allAttributes.end(), primAttributes.begin(), primAttributes.end());
+    }
+
+    std::vector<double> timeCodes;
+    pxr::UsdAttribute::GetUnionedTimeSamples(allAttributes, &timeCodes);
+
+    timeSteps->SetNumberOfComponents(1);
+    nbTimeSteps = timeCodes.size();
+    timeSteps->SetNumberOfTuples(static_cast<vtkIdType>(nbTimeSteps));
+
+    // for (const double timeCode : timeCodes)
+    for (int i = 0; i < timeCodes.size(); ++i)
+    {
+      const double time = timeCodes[i] / timeCodesPerSecond;
+      timeSteps->SetValue(static_cast<vtkIdType>(i), time);
+    }
   }
 
   pxr::UsdStageRefPtr Stage = nullptr;
@@ -1918,9 +1949,9 @@ vtkIdType vtkF3DUSDImporter::GetNumberOfAnimations()
 
 //----------------------------------------------------------------------------
 bool vtkF3DUSDImporter::GetTemporalInformation(vtkIdType vtkNotUsed(animationIndex),
-  double timeRange[2], int& vtkNotUsed(nbTimeSteps), vtkDoubleArray* vtkNotUsed(timeSteps))
+  double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps)
 {
-  this->Internals->GetTimeRange(timeRange);
+  this->Internals->GetTimeInformation(timeRange, timeSteps, nbTimeSteps);
   return true;
 }
 
