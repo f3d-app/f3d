@@ -519,6 +519,14 @@ f3d_test(NAME TestStatefileCameraReframeSave DATA suzanne.obj cow.vtp NO_BASELIN
 f3d_test(NAME TestStatefileCameraReframe SCRIPT DEPENDS TestStatefileCameraReframeSave ARGS --load-statefile=${CMAKE_BINARY_DIR}/Testing/Temporary/TestStatefileCameraReframe.json THRESHOLD 0.05)
 
 ## Command Script
+f3d_test(NAME TestCommandScriptAxisLockEnable SCRIPT DATA cow.vtp REGEXP "interactor.axis_lock: [+]X" REGEXP_FAIL "Error in command script" NO_BASELINE) # toggle_axis_lock +X;print_options_info
+f3d_test(NAME TestCommandScriptAxisLockReplace SCRIPT DATA cow.vtp REGEXP "interactor.axis_lock: [+]Y" REGEXP_FAIL "Error in command script" NO_BASELINE) # toggle_axis_lock +X;toggle_axis_lock +Y;print_options_info
+f3d_test(NAME TestCommandScriptAxisLockDifferent SCRIPT DATA cow.vtp REGEXP "interactor.axis_lock: 1,2,1" REGEXP_FAIL "Error in command script" NO_BASELINE) # toggle_axis_lock 1,1,1;toggle_axis_lock 1,2,1;print_options_info
+f3d_test(NAME TestCommandScriptAxisLockDisable SCRIPT DATA cow.vtp REGEXP "interactor.style: default" REGEXP_FAIL "interactor.axis_lock:|Error in command script" NO_BASELINE) # toggle_axis_lock +X;toggle_axis_lock +X;print_options_info
+f3d_test(NAME TestCommandScriptAxisLockNear SCRIPT DATA cow.vtp REGEXP "interactor.style: default" REGEXP_FAIL "interactor.axis_lock:|Error in command script" NO_BASELINE) # toggle_axis_lock 1,1,1;toggle_axis_lock 1.0000001,1,1;print_options_info
+f3d_test(NAME TestCommandScriptAxisLockMissing SCRIPT DATA cow.vtp REGEXP "Command: toggle_axis_lock is expecting 1 arguments" NO_BASELINE) # toggle_axis_lock
+f3d_test(NAME TestCommandScriptAxisLockExtra SCRIPT DATA cow.vtp REGEXP "Command: toggle_axis_lock is expecting 1 arguments" NO_BASELINE) # toggle_axis_lock +X +Y
+f3d_test(NAME TestCommandScriptAxisLockInvalid SCRIPT DATA cow.vtp REGEXP "cannot be parsed into an option" NO_BASELINE) # toggle_axis_lock invalid
 f3d_test(NAME TestCommandScriptBasic SCRIPT DATA dragon.vtu) # roll_camera 90;toggle ui.scalar_bar;print_scene_info
 f3d_test(NAME TestCommandScriptElevation SCRIPT DATA dragon.vtu) # elevation_camera 90;toggle ui.scalar_bar;print_scene_info
 f3d_test(NAME TestCommandScriptAzimuth SCRIPT DATA dragon.vtu) # azimuth_camera 90;toggle ui.scalar_bar;print_scene_info

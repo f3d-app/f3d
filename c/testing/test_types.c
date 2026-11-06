@@ -24,6 +24,19 @@ int test_types()
   double z = f3d_direction_z(&direction);
   (void)z;
 
+  const f3d_direction_t near = { { 1.0000005, 0.0, 0.0 } };
+  const f3d_direction_t different = { { 1.0, 0.01, 0.0 } };
+
+  if (f3d_direction_compare(&direction, &direction, 0.0) != 1 ||
+    f3d_direction_compare(&direction, &near, 1e-6) != 1 ||
+    f3d_direction_compare(&direction, &different, 1e-6) != 0 ||
+    f3d_direction_compare(NULL, &direction, 1e-6) != 0 ||
+    f3d_direction_compare(&direction, NULL, 1e-6) != 0)
+  {
+    fprintf(stderr, "Direction comparison failed\n");
+    return 1;
+  }
+
   f3d_transform2d_t transform;
   f3d_transform2d_create(&transform, 1.0, 1.0, 10.0, 20.0, 45.0);
 

@@ -92,6 +92,11 @@ Invert the zoom direction.
 
 CLI: `--invert-zoom`.
 
+### `interactor.axis_lock` (_direction_, optional)
+
+Lock camera rotation to a single direction axis.
+If not set, rotation is unlocked.
+
 ## Model Options
 
 ### `model.matcap.texture` (_path_, optional)

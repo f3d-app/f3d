@@ -89,6 +89,19 @@ void f3d_direction_set(f3d_direction_t* dir, double x, double y, double z)
   dir->data[2] = z;
 }
 
+//----------------------------------------------------------------------------
+int f3d_direction_compare(const f3d_direction_t* a, const f3d_direction_t* b, double epsilon)
+{
+  if (!a || !b)
+  {
+    return 0;
+  }
+
+  const f3d::direction_t first{ a->data[0], a->data[1], a->data[2] };
+  const f3d::direction_t second{ b->data[0], b->data[1], b->data[2] };
+  return first.compare(second, epsilon);
+}
+
 // f3d_transform2d_t functions
 //----------------------------------------------------------------------------
 void f3d_transform2d_create(f3d_transform2d_t* transform, double scale_x, double scale_y,
