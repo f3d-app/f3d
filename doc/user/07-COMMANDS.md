@@ -62,8 +62,6 @@ Supports `front`, `top`, `right`, `back`, `bottom`, `left`, `isometric` argument
 
 `toggle_volume_rendering`: A specific command to toggle `model.volume.enable` and print coloring information. No argument.
 
-`toggle_axis_lock direction`: A specific command to lock rotation to one direction, or unlock it if already locked to that direction, eg: `toggle_axis_lock +X`.
-
 `stop_interactor`: A specific command to stop the interactor hence quitting the application. No argument.
 
 `reset_camera`: A specific command to reset the camera to its original location. No argument.
@@ -146,6 +144,11 @@ eg: `alias myrotate roll_camera 90`.
 ## F3D commands
 
 F3D provides a few more commands.
+
+`toggle_axis_lock direction`: A specific command to lock camera rotation to one direction, or unlock it if already locked to that direction. Takes one direction as argument.
+Direction components are compared with an absolute tolerance of `1e-6`.
+Providing a different direction replaces the current lock.
+eg: `toggle_axis_lock +X`.
 
 `exit`: A specific command to quit F3D. No argument.
 

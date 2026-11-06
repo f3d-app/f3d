@@ -91,6 +91,17 @@ extern "C"
   F3D_EXPORT void f3d_direction_set(f3d_direction_t* dir, double x, double y, double z);
 
   /**
+   * @brief Compare two directions using an absolute component tolerance.
+   *
+   * @param a First direction.
+   * @param b Second direction.
+   * @param epsilon Absolute tolerance for each component.
+   * @return 1 if all components match within tolerance, 0 otherwise. NULL inputs return 0.
+   */
+  F3D_EXPORT int f3d_direction_compare(
+    const f3d_direction_t* a, const f3d_direction_t* b, double epsilon);
+
+  /**
    * @brief Store a 3x3 transform matrix as a sequence of 9 double values.
    */
   typedef struct f3d_transform2d_t

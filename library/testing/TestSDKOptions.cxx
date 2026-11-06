@@ -177,6 +177,16 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("direction y", dir.y() == -0.707);
   test("direction z", dir.z() == 0);
 
+  const f3d::direction_t nearDir{ 0.7070005, -0.707, 0 };
+  test("direction compare identical", dir.compare(dir, 0.0));
+  test("direction compare near", dir.compare(nearDir, 1e-6));
+  test("direction compare symmetric", nearDir.compare(dir, 1e-6));
+  test("direction compare different x", !dir.compare({ 0.707002, -0.707, 0 }, 1e-6));
+  test("direction compare different y", !dir.compare({ 0.707, -0.707002, 0 }, 1e-6));
+  test("direction compare different z", !dir.compare({ 0.707, -0.707, 0.000002 }, 1e-6));
+  test("direction compare boundary", f3d::direction_t(0, 1, 0).compare({ 1e-6, 1, 0 }, 1e-6));
+  test("direction equality remains exact", !(dir == nearDir));
+
   std::stringstream ssDir;
   ssDir << f3d::direction_t(0, 0, -1.0);
   test("direction to string", ssDir.str(), "-Z"s);

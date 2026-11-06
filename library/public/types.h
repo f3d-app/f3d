@@ -7,6 +7,7 @@
 /// @cond
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstdint>
 #include <iostream>
 #include <string>
@@ -212,6 +213,11 @@ public:
   [[nodiscard]] inline double z() const
   {
     return (*this)[2];
+  }
+  [[nodiscard]] bool compare(const direction_t& other, double epsilon) const
+  {
+    return std::abs(this->x() - other.x()) <= epsilon &&
+      std::abs(this->y() - other.y()) <= epsilon && std::abs(this->z() - other.z()) <= epsilon;
   }
   [[nodiscard]] operator f3d::vector3_t() const
   {

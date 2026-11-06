@@ -1168,7 +1168,17 @@ public:
       f3d::interactor& interactor = this->Engine->getInteractor();
       interactor.initBindings();
 
+      auto docAxisTgl = [this](const std::string& doc, const f3d::direction_t& expected)
+      {
+        const auto& axisLock = this->Engine->getOptions().interactor.axis_lock;
+
+        return std::make_pair(doc, axisLock && axisLock->compare(expected, 1e-6) ? "ON" : "OFF");
+      };
+
       // clang-format off
+      interactor.addBinding({.Bind = { mod_t::CTRL_SHIFT, "X" }, .Commands = {"toggle_axis_lock +X"}, .Group = "Scene", .DocCallback = std::bind(docAxisTgl, "Toggle X axis lock", f3d::direction_t{ 1, 0, 0 }), .Type = f3d::interactor::BindingType::TOGGLE});
+      interactor.addBinding({.Bind = { mod_t::CTRL_SHIFT, "Y" }, .Commands = {"toggle_axis_lock +Y"}, .Group = "Scene", .DocCallback = std::bind(docAxisTgl, "Toggle Y axis lock", f3d::direction_t{ 0, 1, 0 }), .Type = f3d::interactor::BindingType::TOGGLE});
+      interactor.addBinding({.Bind = { mod_t::CTRL_SHIFT, "Z" }, .Commands = {"toggle_axis_lock +Z"}, .Group = "Scene", .DocCallback = std::bind(docAxisTgl, "Toggle Z axis lock", f3d::direction_t{ 0, 0, 1 }), .Type = f3d::interactor::BindingType::TOGGLE});
       interactor.addBinding({.Bind = { mod_t::NONE, "Up" }, .Commands = {"load_previous_file_group"}, .Group = "Others", .DocCallback = std::bind(docString, "Load previous file group")});
       interactor.addBinding({.Bind = { mod_t::NONE, "Down" }, .Commands = {"load_next_file_group"}, .Group = "Others", .DocCallback = std::bind(docString, "Load next file group")});
       interactor.addBinding({.Bind = { mod_t::CTRL, "Up" }, .Commands = {"load_previous_file_group true"}, .Group = "Others", .DocCallback = std::bind(docString, "Load previous file group, keeping camera")});
@@ -3003,6 +3013,31 @@ std::vector<std::string> F3DStarter::GetExtensions()
 void F3DStarter::AddCommands()
 {
   f3d::interactor& interactor = this->Internals->Engine->getInteractor();
+
+  interactor.addCommand(
+    "toggle_axis_lock",
+    [this](const std::vector<std::string>& args)
+    {
+      if (args.size() != 1)
+      {
+        throw f3d::interactor::invalid_args_exception(
+          "Command: toggle_axis_lock is expecting 1 arguments");
+      }
+
+      const auto direction = f3d::options::parse<f3d::direction_t>(args[0]);
+      auto& axisLock = this->Internals->Engine->getOptions().interactor.axis_lock;
+
+      if (axisLock && axisLock->compare(direction, 1e-6))
+      {
+        axisLock.reset();
+      }
+      else
+      {
+        axisLock = direction;
+      }
+    },
+    f3d::interactor::command_documentation_t{
+      "toggle_axis_lock direction", "toggle rotation lock for a direction" });
 
   static const auto parse_optional_bool_flag =
     [](const std::vector<std::string>& args, std::string_view commandName, bool defaultValue)
