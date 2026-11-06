@@ -207,7 +207,7 @@ Update package on Windows store:
 - Next
 - Package name: `F3D-APP.F3D`
 - Package display name: `F3D`
-- Publisher name: `CN=BD1ECF00-C39E-4B04-9820-E5F950526AB1`
+- Publisher name: check internal document
 - Publisher display name: `F3D-APP`
 - Version: `X.Y.Z`
 - Description: `F3D and minimalist open source 3D viewer. Visualize data in the simplest way.`
