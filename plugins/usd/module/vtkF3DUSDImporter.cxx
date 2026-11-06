@@ -112,16 +112,16 @@ public:
   explicit vtkInternals(vtkF3DUSDImporter* parent)
     : Delegate(parent)
   {
-    pxr::TfDiagnosticMgr::GetInstance().AddDelegate(&this->Delegate);
+    PXR_NS::TfDiagnosticMgr::GetInstance().AddDelegate(&this->Delegate);
 
     // register our own stream plugin
     // safe to call several times
     std::string libPath;
-    if (pxr::ArchGetAddressInfo(
+    if (PXR_NS::ArchGetAddressInfo(
           reinterpret_cast<void*>(&vtkF3DUSDImporter::New), &libPath, nullptr, nullptr, nullptr))
     {
       // NOLINTNEXTLINE(misc-const-correctness) not const on Windows
-      std::string plugInfoDir = pxr::TfGetPathName(libPath) + "../lib/usd/f3d/resources/";
+      std::string plugInfoDir = PXR_NS::TfGetPathName(libPath) + "..";
 
 #ifdef _WIN32
       // On Windows, we can get a Universal Naming Convention prefix. Strip it if that's the case.
@@ -131,13 +131,15 @@ public:
       }
 #endif
 
-      pxr::PlugRegistry::GetInstance().RegisterPlugins(plugInfoDir);
+      PXR_NS::PlugRegistry::GetInstance().RegisterPlugins(
+        { plugInfoDir + "/plugin/usd", plugInfoDir + "/lib/usd", plugInfoDir + "/bin/usd",
+          plugInfoDir + "/lib/usd/f3d/resources" });
     }
   }
 
   ~vtkInternals()
   {
-    pxr::TfDiagnosticMgr::GetInstance().RemoveDelegate(&this->Delegate);
+    PXR_NS::TfDiagnosticMgr::GetInstance().RemoveDelegate(&this->Delegate);
   }
 
   vtkInternals(const vtkInternals&) = delete;
@@ -148,7 +150,7 @@ public:
     // in case of failure, you may want to set PXR_PLUGINPATH_NAME to the lib/usd path
     if (!this->Stage)
     {
-      this->Stage = pxr::UsdStage::Open(filePath);
+      this->Stage = PXR_NS::UsdStage::Open(filePath);
       this->InitStage();
     }
   }
@@ -159,8 +161,8 @@ public:
     if (!this->Stage)
     {
       this->MemoryResolverContext.Stream = stream;
-      const pxr::ArResolverContext ctx(this->MemoryResolverContext);
-      this->Stage = pxr::UsdStage::Open("f3dmem:stream." + hint, ctx);
+      const PXR_NS::ArResolverContext ctx(this->MemoryResolverContext);
+      this->Stage = PXR_NS::UsdStage::Open("f3dmem:stream." + hint, ctx);
       this->InitStage();
     }
   }
@@ -170,39 +172,39 @@ public:
   {
     if (this->Stage)
     {
-      this->SkelCache = pxr::UsdSkelCache();
+      this->SkelCache = PXR_NS::UsdSkelCache();
       this->MorphingMap.clear();
 
-      for (const pxr::UsdPrim& prim : this->Stage->Traverse())
+      for (const PXR_NS::UsdPrim& prim : this->Stage->Traverse())
       {
-        if (prim.IsA<pxr::UsdSkelRoot>())
+        if (prim.IsA<PXR_NS::UsdSkelRoot>())
         {
-          const pxr::UsdSkelRoot skelRoot(prim);
-          this->SkelCache.Populate(skelRoot, pxr::UsdPrimDefaultPredicate);
+          const PXR_NS::UsdSkelRoot skelRoot(prim);
+          this->SkelCache.Populate(skelRoot, PXR_NS::UsdPrimDefaultPredicate);
         }
       }
     }
   }
 
   template<typename T>
-  std::pair<pxr::UsdShadeShader, pxr::TfToken> GetConnectedShaderPrim(const T& port)
+  std::pair<PXR_NS::UsdShadeShader, PXR_NS::TfToken> GetConnectedShaderPrim(const T& port)
   {
     if (port)
     {
-      pxr::UsdShadeConnectableAPI api;
-      pxr::UsdShadeAttributeType type;
-      pxr::TfToken token;
+      PXR_NS::UsdShadeConnectableAPI api;
+      PXR_NS::UsdShadeAttributeType type;
+      PXR_NS::TfToken token;
       port.GetConnectedSource(&api, &token, &type);
 
-      if (api && api.GetPrim().IsA<pxr::UsdShadeShader>())
+      if (api && api.GetPrim().IsA<PXR_NS::UsdShadeShader>())
       {
-        return { pxr::UsdShadeShader(api.GetPrim()), token };
+        return { PXR_NS::UsdShadeShader(api.GetPrim()), token };
       }
     }
-    return { pxr::UsdShadeShader(), pxr::TfToken() };
+    return { PXR_NS::UsdShadeShader(), PXR_NS::TfToken() };
   }
 
-  vtkSmartPointer<vtkMatrix4x4> ConvertMatrix(const pxr::GfMatrix4d& uMatrix)
+  vtkSmartPointer<vtkMatrix4x4> ConvertMatrix(const PXR_NS::GfMatrix4d& uMatrix)
   {
     vtkNew<vtkMatrix4x4> mat;
 
@@ -213,22 +215,22 @@ public:
   }
 
   vtkSmartPointer<vtkMatrix4x4> GetLocalTransform(
-    const pxr::UsdGeomImageable& node, pxr::UsdTimeCode timeCode)
+    const PXR_NS::UsdGeomImageable& node, PXR_NS::UsdTimeCode timeCode)
   {
     // get xform
     return this->ConvertMatrix(node.ComputeLocalToWorldTransform(timeCode));
   }
 
   int GetOrCreateHierarchyNode(
-    vtkDataAssembly* hierarchy, const pxr::SdfPath& path, const std::string& name)
+    vtkDataAssembly* hierarchy, const PXR_NS::SdfPath& path, const std::string& name)
   {
     const std::string pathStr = path.GetAsString();
     assert(this->NodeIdMap.find(pathStr) == this->NodeIdMap.end());
 
     // Get parent node ID
     int parentNodeId = vtkDataAssembly::GetRootNode();
-    const pxr::SdfPath parentPath = path.GetParentPath();
-    if (!parentPath.IsEmpty() && parentPath != pxr::SdfPath("/"))
+    const PXR_NS::SdfPath parentPath = path.GetParentPath();
+    if (!parentPath.IsEmpty() && parentPath != PXR_NS::SdfPath("/"))
     {
       auto parentIt = this->NodeIdMap.find(parentPath.GetAsString());
       if (parentIt != this->NodeIdMap.end())
@@ -248,11 +250,11 @@ public:
   }
 
   void AddActor(vtkRenderer* renderer, vtkDataAssembly* hierarchy,
-    vtkActorCollection* actorCollection, const pxr::SdfPath& path,
-    const pxr::UsdGeomGprim& geomPrim, const pxr::UsdPrim& prim, vtkMatrix4x4* mat,
+    vtkActorCollection* actorCollection, const PXR_NS::SdfPath& path,
+    const PXR_NS::UsdGeomGprim& geomPrim, const PXR_NS::UsdPrim& prim, vtkMatrix4x4* mat,
     vtkPolyData* polydata, bool useDirectScalars = false)
   {
-    const pxr::SdfPath actorPath = path.AppendChild(pxr::TfToken(prim.GetName()));
+    const PXR_NS::SdfPath actorPath = path.AppendChild(PXR_NS::TfToken(prim.GetName()));
 
     auto& actor = this->ActorMap[actorPath.GetAsString()];
     const bool actorAlreadyExists = (actor != nullptr);
@@ -271,8 +273,9 @@ public:
       hierarchy->SetAttribute(nodeId, "flat_actor_id", actorIndex);
 
       // get associated material/shader
-      const pxr::UsdShadeMaterial material =
-        pxr::UsdShadeMaterialBindingAPI(prim).ComputeBoundMaterial(pxr::UsdShadeTokens->preview);
+      const PXR_NS::UsdShadeMaterial material =
+        PXR_NS::UsdShadeMaterialBindingAPI(prim).ComputeBoundMaterial(
+          PXR_NS::UsdShadeTokens->preview);
 
       if (material)
       {
@@ -305,12 +308,12 @@ public:
       else
       {
         // if there is no material, fallback on display color
-        const pxr::UsdAttribute displayColorAttr = geomPrim.GetDisplayColorAttr();
+        const PXR_NS::UsdAttribute displayColorAttr = geomPrim.GetDisplayColorAttr();
 
         vtkNew<vtkProperty> prop;
         prop->SetInterpolationToPBR();
 
-        pxr::VtArray<pxr::GfVec3f> color;
+        PXR_NS::VtArray<PXR_NS::GfVec3f> color;
         if (displayColorAttr.Get(&color) && color.size() == 1)
         {
           prop->SetColor(color[0][0], color[0][1], color[0][2]);
@@ -320,17 +323,17 @@ public:
       }
 
       // backface culling
-      const pxr::UsdAttribute doubleSidedAttr = geomPrim.GetDoubleSidedAttr();
+      const PXR_NS::UsdAttribute doubleSidedAttr = geomPrim.GetDoubleSidedAttr();
 
       bool doubleSided;
       if (doubleSidedAttr.Get(&doubleSided) && !doubleSided)
       {
-        const pxr::UsdAttribute orientationAttr = geomPrim.GetOrientationAttr();
+        const PXR_NS::UsdAttribute orientationAttr = geomPrim.GetOrientationAttr();
 
-        pxr::TfToken orientation;
+        PXR_NS::TfToken orientation;
         if (orientationAttr && orientationAttr.Get(&orientation))
         {
-          if (orientation == pxr::UsdGeomTokens->rightHanded)
+          if (orientation == PXR_NS::UsdGeomTokens->rightHanded)
           {
             actor->GetProperty()->BackfaceCullingOn();
           }
@@ -385,31 +388,31 @@ public:
   }
 
   void ImportNode(vtkRenderer* renderer, vtkDataAssembly* hierarchy,
-    vtkActorCollection* actorCollection, const pxr::UsdPrim& node, const pxr::SdfPath& path,
+    vtkActorCollection* actorCollection, const PXR_NS::UsdPrim& node, const PXR_NS::SdfPath& path,
     vtkMatrix4x4* currentMatrix)
   {
-    const pxr::UsdTimeCode timeCode = this->CurrentTime * this->Stage->GetTimeCodesPerSecond();
+    const PXR_NS::UsdTimeCode timeCode = this->CurrentTime * this->Stage->GetTimeCodesPerSecond();
 
     // simple range-for iteration
-    for (const pxr::UsdPrim prim : pxr::UsdPrimSiblingRange(node.GetAllChildren()))
+    for (const PXR_NS::UsdPrim prim : PXR_NS::UsdPrimSiblingRange(node.GetAllChildren()))
     {
-      if (prim.IsA<pxr::UsdGeomImageable>())
+      if (prim.IsA<PXR_NS::UsdGeomImageable>())
       {
-        const pxr::UsdGeomImageable imageable = pxr::UsdGeomImageable(prim);
+        const PXR_NS::UsdGeomImageable imageable = PXR_NS::UsdGeomImageable(prim);
 
-        pxr::TfToken visibility;
-        const pxr::UsdAttribute visAttr = imageable.GetVisibilityAttr();
+        PXR_NS::TfToken visibility;
+        const PXR_NS::UsdAttribute visAttr = imageable.GetVisibilityAttr();
         if (visAttr && visAttr.HasAuthoredValue() && visAttr.Get(&visibility, timeCode) &&
-          visibility == pxr::UsdGeomTokens->invisible)
+          visibility == PXR_NS::UsdGeomTokens->invisible)
         {
           // not visible, skip
           continue;
         }
 
-        pxr::TfToken purpose;
-        const pxr::UsdAttribute purpAttr = imageable.GetPurposeAttr();
+        PXR_NS::TfToken purpose;
+        const PXR_NS::UsdAttribute purpAttr = imageable.GetPurposeAttr();
         if (purpAttr && purpAttr.HasAuthoredValue() && purpAttr.Get(&purpose, timeCode) &&
-          (purpose == pxr::UsdGeomTokens->proxy || purpose == pxr::UsdGeomTokens->guide))
+          (purpose == PXR_NS::UsdGeomTokens->proxy || purpose == PXR_NS::UsdGeomTokens->guide))
         {
           // proxy, skip
           continue;
@@ -418,7 +421,7 @@ public:
 
       if (prim.IsInstance())
       {
-        const pxr::UsdGeomXform xform = pxr::UsdGeomXform(prim);
+        const PXR_NS::UsdGeomXform xform = PXR_NS::UsdGeomXform(prim);
 
         auto mat = this->GetLocalTransform(xform, timeCode);
         vtkMatrix4x4::Multiply4x4(currentMatrix, mat, mat);
@@ -426,52 +429,52 @@ public:
         this->ImportNode(renderer, hierarchy, actorCollection, prim.GetPrototype(),
           path.AppendChild(prim.GetName()), mat);
       }
-      else if (prim.IsA<pxr::UsdGeomPointInstancer>())
+      else if (prim.IsA<PXR_NS::UsdGeomPointInstancer>())
       {
-        const pxr::UsdGeomPointInstancer glyphs = pxr::UsdGeomPointInstancer(prim);
+        const PXR_NS::UsdGeomPointInstancer glyphs = PXR_NS::UsdGeomPointInstancer(prim);
 
         // TODO: Ideally, we should use the 3D glyph mapper, but it's left for future work
         // See https://github.com/f3d-app/f3d/issues/1075
-        pxr::VtMatrix4dArray xforms;
+        PXR_NS::VtMatrix4dArray xforms;
 
         if (glyphs.ComputeInstanceTransformsAtTime(&xforms, timeCode, timeCode))
         {
           int i = 0;
-          for (const pxr::GfMatrix4d& currInstMatrix : xforms)
+          for (const PXR_NS::GfMatrix4d& currInstMatrix : xforms)
           {
             auto mat = this->ConvertMatrix(currInstMatrix);
             vtkMatrix4x4::Multiply4x4(currentMatrix, mat, mat);
 
-            const pxr::TfToken tok(std::string("instance_") + std::to_string(i++));
+            const PXR_NS::TfToken tok(std::string("instance_") + std::to_string(i++));
 
             this->ImportNode(renderer, hierarchy, actorCollection, prim,
               path.AppendChild(prim.GetName()).AppendChild(tok), mat);
           }
         }
       }
-      else if (prim.IsA<pxr::UsdGeomGprim>())
+      else if (prim.IsA<PXR_NS::UsdGeomGprim>())
       {
-        const pxr::UsdGeomGprim geomPrim = pxr::UsdGeomGprim(prim);
+        const PXR_NS::UsdGeomGprim geomPrim = PXR_NS::UsdGeomGprim(prim);
 
         vtkSmartPointer<vtkPolyData> polydata;
         bool useDirectScalars = false;
 
-        if (prim.IsA<pxr::UsdGeomMesh>())
+        if (prim.IsA<PXR_NS::UsdGeomMesh>())
         {
-          const pxr::UsdGeomMesh meshPrim = pxr::UsdGeomMesh(prim);
+          const PXR_NS::UsdGeomMesh meshPrim = PXR_NS::UsdGeomMesh(prim);
 
           vtkSmartPointer<vtkPolyData>& mappedPolydata =
             this->MeshMap[meshPrim.GetPath().GetAsString()];
           const bool meshAlreadyExists = (mappedPolydata != nullptr);
 
           // attributes
-          const pxr::UsdAttribute normalsAttr = meshPrim.GetNormalsAttr();
-          const pxr::UsdAttribute pointsAttr = meshPrim.GetPointsAttr();
-          const pxr::UsdAttribute facesCountAttr = meshPrim.GetFaceVertexCountsAttr();
-          const pxr::UsdAttribute facesIndicesAttr = meshPrim.GetFaceVertexIndicesAttr();
+          const PXR_NS::UsdAttribute normalsAttr = meshPrim.GetNormalsAttr();
+          const PXR_NS::UsdAttribute pointsAttr = meshPrim.GetPointsAttr();
+          const PXR_NS::UsdAttribute facesCountAttr = meshPrim.GetFaceVertexCountsAttr();
+          const PXR_NS::UsdAttribute facesIndicesAttr = meshPrim.GetFaceVertexIndicesAttr();
 
-          std::vector<pxr::UsdGeomPrimvar> primVars =
-            pxr::UsdGeomPrimvarsAPI(meshPrim).GetPrimvars();
+          std::vector<PXR_NS::UsdGeomPrimvar> primVars =
+            PXR_NS::UsdGeomPrimvarsAPI(meshPrim).GetPrimvars();
 
           auto TimeVarying = [](const auto& a) { return a.ValueMightBeTimeVarying(); };
 
@@ -487,7 +490,7 @@ public:
             vtkNew<vtkPolyData> newPolyData;
 
             // normals
-            pxr::VtArray<pxr::GfVec3f> normals;
+            PXR_NS::VtArray<PXR_NS::GfVec3f> normals;
             normalsAttr.Get(&normals, timeCode);
 
             if (normals.size() > 0)
@@ -501,25 +504,25 @@ public:
               vNormals->Allocate(normals.size());
 #endif
 
-              for (const pxr::GfVec3f& n : normals)
+              for (const PXR_NS::GfVec3f& n : normals)
               {
                 vNormals->InsertNextTuple3(n[0], n[1], n[2]);
               }
 
               vtkInformation* info = vNormals->GetInformation();
               info->Set(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE(),
-                meshPrim.GetNormalsInterpolation() == pxr::UsdGeomTokens->faceVarying ? 1 : 0);
+                meshPrim.GetNormalsInterpolation() == PXR_NS::UsdGeomTokens->faceVarying ? 1 : 0);
 
               newPolyData->GetPointData()->SetNormals(vNormals);
             }
 
             // texture coordinates
             bool firstArray = true;
-            for (const pxr::UsdGeomPrimvar& primVar : primVars)
+            for (const PXR_NS::UsdGeomPrimvar& primVar : primVars)
             {
               if (primVar.GetTypeName() == "texCoord2f[]" || primVar.GetTypeName() == "float2[]")
               {
-                pxr::VtArray<pxr::GfVec2f> uvs;
+                PXR_NS::VtArray<PXR_NS::GfVec2f> uvs;
                 primVar.Get(&uvs, timeCode);
 
                 if (uvs.size() > 0)
@@ -532,9 +535,9 @@ public:
 
                   if (primVar.IsIndexed())
                   {
-                    const pxr::UsdAttribute indicesAttr = primVar.GetIndicesAttr();
+                    const PXR_NS::UsdAttribute indicesAttr = primVar.GetIndicesAttr();
 
-                    pxr::VtArray<int> indices;
+                    PXR_NS::VtArray<int> indices;
                     if (indicesAttr.Get(&indices) && indices.size() > 0)
                     {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260320)
@@ -545,7 +548,7 @@ public:
 
                       for (const int index : indices)
                       {
-                        const pxr::GfVec2f& uv = uvs[index];
+                        const PXR_NS::GfVec2f& uv = uvs[index];
                         texCoords->InsertNextTuple2(uv[0], uv[1]);
                       }
                     }
@@ -558,7 +561,7 @@ public:
                     texCoords->Allocate(uvs.size());
 #endif
 
-                    for (const pxr::GfVec2f& uv : uvs)
+                    for (const PXR_NS::GfVec2f& uv : uvs)
                     {
                       texCoords->InsertNextTuple2(uv[0], uv[1]);
                     }
@@ -566,7 +569,7 @@ public:
 
                   vtkInformation* info = texCoords->GetInformation();
                   info->Set(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE(),
-                    primVar.GetInterpolation() == pxr::UsdGeomTokens->faceVarying ? 1 : 0);
+                    primVar.GetInterpolation() == PXR_NS::UsdGeomTokens->faceVarying ? 1 : 0);
 
                   // the size of the array can be larger than the number of points if the attribute
                   // interpolation is face-varying.
@@ -586,7 +589,7 @@ public:
             }
 
             // points
-            pxr::VtArray<pxr::GfVec3f> positions;
+            PXR_NS::VtArray<PXR_NS::GfVec3f> positions;
             pointsAttr.Get(&positions, timeCode);
 
             vtkNew<vtkPoints> points;
@@ -595,7 +598,7 @@ public:
 #else
             points->Allocate(positions.size());
 #endif
-            for (const pxr::GfVec3f& p : positions)
+            for (const PXR_NS::GfVec3f& p : positions)
             {
               points->InsertNextPoint(p[0], p[1], p[2]);
             }
@@ -603,10 +606,10 @@ public:
             newPolyData->SetPoints(points);
 
             // faces
-            pxr::VtArray<int> counts;
+            PXR_NS::VtArray<int> counts;
             facesCountAttr.Get(&counts, timeCode);
 
-            pxr::VtArray<int> indices;
+            PXR_NS::VtArray<int> indices;
             facesIndicesAttr.Get(&indices, timeCode);
 
             // add polygons
@@ -625,16 +628,17 @@ public:
 
             if (this->SubdivisionLevel > 0)
             {
-              pxr::TfToken subdivisionScheme;
-              const pxr::UsdAttribute subdivisionSchemeAttr = meshPrim.GetSubdivisionSchemeAttr();
+              PXR_NS::TfToken subdivisionScheme;
+              const PXR_NS::UsdAttribute subdivisionSchemeAttr =
+                meshPrim.GetSubdivisionSchemeAttr();
               if (subdivisionSchemeAttr && subdivisionSchemeAttr.Get(&subdivisionScheme, timeCode))
               {
                 vtkSmartPointer<vtkSubdivisionFilter> subdivisionFilter;
-                if (subdivisionScheme == pxr::UsdGeomTokens->loop)
+                if (subdivisionScheme == PXR_NS::UsdGeomTokens->loop)
                 {
                   subdivisionFilter = vtkSmartPointer<vtkLoopSubdivisionFilter>::New();
                 }
-                else if (subdivisionScheme == pxr::UsdGeomTokens->catmullClark)
+                else if (subdivisionScheme == PXR_NS::UsdGeomTokens->catmullClark)
                 {
                   subdivisionFilter = vtkSmartPointer<vtkF3DCatmullClarkSubdivisionFilter>::New();
                 }
@@ -663,14 +667,14 @@ public:
               }
             }
 
-            if (const pxr::UsdSkelSkinningQuery skinningQuery =
+            if (const PXR_NS::UsdSkelSkinningQuery skinningQuery =
                   this->SkelCache.GetSkinningQuery(prim))
             {
               // save skinning buffers to the polydata
               if (skinningQuery.HasJointInfluences() && !meshAlreadyExists)
               {
-                pxr::VtIntArray jointIndices;
-                pxr::VtFloatArray jointWeights;
+                PXR_NS::VtIntArray jointIndices;
+                PXR_NS::VtFloatArray jointWeights;
                 const int numInfluences = skinningQuery.GetNumInfluencesPerComponent();
 
                 if (skinningQuery.ComputeVaryingJointInfluences(
@@ -742,8 +746,8 @@ public:
 
                 // Cache blend shape data for per-frame CPU deformation
                 info.BindPositions = positions;
-                const pxr::UsdSkelBindingAPI binding(prim);
-                const pxr::UsdSkelBlendShapeQuery blendShapeQuery(binding);
+                const PXR_NS::UsdSkelBindingAPI binding(prim);
+                const PXR_NS::UsdSkelBlendShapeQuery blendShapeQuery(binding);
                 if (blendShapeQuery)
                 {
                   info.BlendShapePointIndices = blendShapeQuery.ComputeBlendShapePointIndices();
@@ -761,9 +765,9 @@ public:
 
           polydata = mappedPolydata;
         }
-        else if (prim.IsA<pxr::UsdGeomSphere>())
+        else if (prim.IsA<PXR_NS::UsdGeomSphere>())
         {
-          const pxr::UsdGeomSphere spherePrim = pxr::UsdGeomSphere(prim);
+          const PXR_NS::UsdGeomSphere spherePrim = PXR_NS::UsdGeomSphere(prim);
 
           vtkNew<vtkSphereSource> sphere;
           sphere->SetThetaResolution(20);
@@ -778,9 +782,9 @@ public:
           sphere->Update();
           polydata = sphere->GetOutput();
         }
-        else if (prim.IsA<pxr::UsdGeomCube>())
+        else if (prim.IsA<PXR_NS::UsdGeomCube>())
         {
-          const pxr::UsdGeomCube cubePrim = pxr::UsdGeomCube(prim);
+          const PXR_NS::UsdGeomCube cubePrim = PXR_NS::UsdGeomCube(prim);
 
           vtkNew<vtkCubeSource> cube;
 
@@ -795,9 +799,9 @@ public:
           cube->Update();
           polydata = cube->GetOutput();
         }
-        else if (prim.IsA<pxr::UsdGeomCapsule>())
+        else if (prim.IsA<PXR_NS::UsdGeomCapsule>())
         {
-          const pxr::UsdGeomCapsule capsulePrim = pxr::UsdGeomCapsule(prim);
+          const PXR_NS::UsdGeomCapsule capsulePrim = PXR_NS::UsdGeomCapsule(prim);
 
           vtkNew<vtkCylinderSource> capsule;
           capsule->CapsuleCapOn();
@@ -821,14 +825,14 @@ public:
           vtkNew<vtkTransform> t;
           transform->SetTransform(t);
 
-          pxr::TfToken axisToken(pxr::UsdGeomTokens->z);
+          PXR_NS::TfToken axisToken(PXR_NS::UsdGeomTokens->z);
           capsulePrim.GetAxisAttr().Get(&axisToken);
 
-          if (axisToken == pxr::UsdGeomTokens->x)
+          if (axisToken == PXR_NS::UsdGeomTokens->x)
           {
             t->RotateZ(90.0);
           }
-          else if (axisToken == pxr::UsdGeomTokens->z)
+          else if (axisToken == PXR_NS::UsdGeomTokens->z)
           {
             t->RotateX(90.0);
           }
@@ -837,9 +841,9 @@ public:
           transform->Update();
           polydata = vtkPolyData::SafeDownCast(transform->GetOutput());
         }
-        else if (prim.IsA<pxr::UsdGeomCylinder>())
+        else if (prim.IsA<PXR_NS::UsdGeomCylinder>())
         {
-          const pxr::UsdGeomCylinder cylinderPrim = pxr::UsdGeomCylinder(prim);
+          const PXR_NS::UsdGeomCylinder cylinderPrim = PXR_NS::UsdGeomCylinder(prim);
           vtkNew<vtkCylinderSource> cylinder;
           cylinder->SetResolution(20);
 
@@ -862,14 +866,14 @@ public:
           vtkNew<vtkTransform> t;
           transform->SetTransform(t);
 
-          pxr::TfToken axisToken(pxr::UsdGeomTokens->z);
+          PXR_NS::TfToken axisToken(PXR_NS::UsdGeomTokens->z);
           cylinderPrim.GetAxisAttr().Get(&axisToken);
 
-          if (axisToken == pxr::TfToken(pxr::UsdGeomTokens->x))
+          if (axisToken == PXR_NS::TfToken(PXR_NS::UsdGeomTokens->x))
           {
             t->RotateZ(90.0);
           }
-          else if (axisToken == pxr::TfToken(pxr::UsdGeomTokens->z))
+          else if (axisToken == PXR_NS::TfToken(PXR_NS::UsdGeomTokens->z))
           {
             t->RotateX(90.0);
           }
@@ -878,9 +882,9 @@ public:
           transform->Update();
           polydata = vtkPolyData::SafeDownCast(transform->GetOutput());
         }
-        else if (prim.IsA<pxr::UsdGeomCone>())
+        else if (prim.IsA<PXR_NS::UsdGeomCone>())
         {
-          const pxr::UsdGeomCone conePrim = pxr::UsdGeomCone(prim);
+          const PXR_NS::UsdGeomCone conePrim = PXR_NS::UsdGeomCone(prim);
           vtkNew<vtkConeSource> cone;
           cone->SetResolution(20);
 
@@ -903,14 +907,14 @@ public:
           vtkNew<vtkTransform> t;
           transform->SetTransform(t);
 
-          pxr::TfToken axisToken(pxr::UsdGeomTokens->z);
+          PXR_NS::TfToken axisToken(PXR_NS::UsdGeomTokens->z);
           conePrim.GetAxisAttr().Get(&axisToken);
 
-          if (axisToken == pxr::TfToken(pxr::UsdGeomTokens->y))
+          if (axisToken == PXR_NS::TfToken(PXR_NS::UsdGeomTokens->y))
           {
             t->RotateZ(90.0);
           }
-          else if (axisToken == pxr::TfToken(pxr::UsdGeomTokens->z))
+          else if (axisToken == PXR_NS::TfToken(PXR_NS::UsdGeomTokens->z))
           {
             t->RotateY(90.0);
           }
@@ -919,11 +923,11 @@ public:
           transform->Update();
           polydata = vtkPolyData::SafeDownCast(transform->GetOutput());
         }
-        else if (prim.IsA<pxr::UsdGeomPoints>())
+        else if (prim.IsA<PXR_NS::UsdGeomPoints>())
         {
-          const pxr::UsdGeomPoints pointsPrim = pxr::UsdGeomPoints(prim);
+          const PXR_NS::UsdGeomPoints pointsPrim = PXR_NS::UsdGeomPoints(prim);
 
-          pxr::VtArray<pxr::GfVec3f> positions;
+          PXR_NS::VtArray<PXR_NS::GfVec3f> positions;
           pointsPrim.GetPointsAttr().Get(&positions, timeCode);
 
           vtkNew<vtkPolyData> newPolyData;
@@ -932,7 +936,7 @@ public:
           points->SetNumberOfPoints(static_cast<vtkIdType>(positions.size()));
           for (std::size_t i = 0; i < positions.size(); i++)
           {
-            const pxr::GfVec3f& p = positions[i];
+            const PXR_NS::GfVec3f& p = positions[i];
             points->SetPoint(static_cast<vtkIdType>(i), p[0], p[1], p[2]);
           }
           newPolyData->SetPoints(points);
@@ -951,14 +955,14 @@ public:
             newPolyData->SetVerts(verts);
           }
 
-          const pxr::UsdGeomPrimvar colorPrimvar = pointsPrim.GetDisplayColorPrimvar();
-          const pxr::UsdGeomPrimvar opacityPrimvar = pointsPrim.GetDisplayOpacityPrimvar();
+          const PXR_NS::UsdGeomPrimvar colorPrimvar = pointsPrim.GetDisplayColorPrimvar();
+          const PXR_NS::UsdGeomPrimvar opacityPrimvar = pointsPrim.GetDisplayOpacityPrimvar();
 
-          pxr::VtArray<pxr::GfVec3f> colors;
+          PXR_NS::VtArray<PXR_NS::GfVec3f> colors;
           const bool hasColors =
             colorPrimvar && colorPrimvar.Get(&colors, timeCode) && colors.size() > 0;
 
-          pxr::VtArray<float> opacities;
+          PXR_NS::VtArray<float> opacities;
           const bool hasOpacity =
             opacityPrimvar && opacityPrimvar.Get(&opacities, timeCode) && opacities.size() > 0;
 
@@ -975,7 +979,7 @@ public:
               const std::size_t colorIndex = hasColors && colors.size() == positions.size() ? i : 0;
               const std::size_t opacityIndex =
                 hasOpacity && opacities.size() == positions.size() ? i : 0;
-              const pxr::GfVec3f c = hasColors ? colors[colorIndex] : pxr::GfVec3f(1.f);
+              const PXR_NS::GfVec3f c = hasColors ? colors[colorIndex] : PXR_NS::GfVec3f(1.f);
 
               if (hasOpacity)
               {
@@ -1008,8 +1012,8 @@ public:
         auto mat = this->GetLocalTransform(geomPrim, timeCode);
         vtkMatrix4x4::Multiply4x4(currentMatrix, mat, mat);
 
-        const std::vector<pxr::UsdGeomSubset> subsets =
-          pxr::UsdGeomSubset::GetGeomSubsets(geomPrim);
+        const std::vector<PXR_NS::UsdGeomSubset> subsets =
+          PXR_NS::UsdGeomSubset::GetGeomSubsets(geomPrim);
 
         if (subsets.empty())
         {
@@ -1019,11 +1023,11 @@ public:
         else
         {
           // split subsets
-          for (const pxr::UsdGeomSubset& subset : subsets)
+          for (const PXR_NS::UsdGeomSubset& subset : subsets)
           {
-            const pxr::UsdAttribute indicesAttr = subset.GetIndicesAttr();
+            const PXR_NS::UsdAttribute indicesAttr = subset.GetIndicesAttr();
 
-            pxr::VtArray<int> indices;
+            PXR_NS::VtArray<int> indices;
             indicesAttr.Get(&indices, timeCode);
 
             vtkNew<vtkPolyData> polydataSubset;
@@ -1045,7 +1049,7 @@ public:
             polydataSubset->SetPolys(cells);
 
             this->AddActor(renderer, hierarchy, actorCollection,
-              path.AppendChild(pxr::TfToken(prim.GetName())), geomPrim, subset.GetPrim(), mat,
+              path.AppendChild(PXR_NS::TfToken(prim.GetName())), geomPrim, subset.GetPrim(), mat,
               polydataSubset);
           }
         }
@@ -1053,7 +1057,7 @@ public:
       else
       {
         // Create hierarchy node for this intermediate node (Xform, Scope, etc.)
-        const pxr::SdfPath nodePath = path.AppendChild(prim.GetName());
+        const PXR_NS::SdfPath nodePath = path.AppendChild(prim.GetName());
         this->GetOrCreateHierarchyNode(hierarchy, nodePath, prim.GetName().GetString());
 
         // just traverse the node
@@ -1065,23 +1069,23 @@ public:
   void BuildArmature(
     vtkRenderer* renderer, vtkActorCollection* actorCollection, vtkMatrix4x4* rootTransform)
   {
-    const pxr::UsdTimeCode timeCode = this->CurrentTime * this->Stage->GetTimeCodesPerSecond();
-    pxr::UsdGeomXformCache xfCache(timeCode);
+    const PXR_NS::UsdTimeCode timeCode = this->CurrentTime * this->Stage->GetTimeCodesPerSecond();
+    PXR_NS::UsdGeomXformCache xfCache(timeCode);
 
-    for (const pxr::UsdPrim& prim : this->Stage->Traverse())
+    for (const PXR_NS::UsdPrim& prim : this->Stage->Traverse())
     {
-      if (!prim.IsA<pxr::UsdSkelSkeleton>())
+      if (!prim.IsA<PXR_NS::UsdSkelSkeleton>())
       {
         continue;
       }
 
-      const pxr::UsdSkelSkeleton skel = pxr::UsdSkelSkeleton(prim);
-      const pxr::UsdSkelSkeletonQuery skelQuery = this->SkelCache.GetSkelQuery(skel);
+      const PXR_NS::UsdSkelSkeleton skel = PXR_NS::UsdSkelSkeleton(prim);
+      const PXR_NS::UsdSkelSkeletonQuery skelQuery = this->SkelCache.GetSkelQuery(skel);
 
-      pxr::VtArray<pxr::GfMatrix4d> jointXforms;
+      PXR_NS::VtArray<PXR_NS::GfMatrix4d> jointXforms;
       skelQuery.ComputeJointWorldTransforms(&jointXforms, &xfCache);
 
-      const pxr::UsdSkelTopology& topology = skelQuery.GetTopology();
+      const PXR_NS::UsdSkelTopology& topology = skelQuery.GetTopology();
       const std::size_t numJoints = topology.GetNumJoints();
 
       if (numJoints > 0)
@@ -1137,7 +1141,7 @@ public:
         points->SetNumberOfPoints(static_cast<vtkIdType>(numJoints));
         for (std::size_t i = 0; i < numJoints; i++)
         {
-          pxr::GfVec3d pos = jointXforms[i].ExtractTranslation();
+          PXR_NS::GfVec3d pos = jointXforms[i].ExtractTranslation();
           points->SetPoint(static_cast<vtkIdType>(i), pos[0], pos[1], pos[2]);
         }
         polyData->SetPoints(points);
@@ -1147,21 +1151,21 @@ public:
 
   void UpdateSkinningAndMorphing()
   {
-    const pxr::UsdTimeCode timeCode = this->CurrentTime * this->Stage->GetTimeCodesPerSecond();
-    pxr::UsdGeomXformCache xfCache(timeCode);
+    const PXR_NS::UsdTimeCode timeCode = this->CurrentTime * this->Stage->GetTimeCodesPerSecond();
+    PXR_NS::UsdGeomXformCache xfCache(timeCode);
 
-    for (const pxr::UsdPrim& prim : this->Stage->Traverse())
+    for (const PXR_NS::UsdPrim& prim : this->Stage->Traverse())
     {
-      if (prim.IsA<pxr::UsdSkelRoot>())
+      if (prim.IsA<PXR_NS::UsdSkelRoot>())
       {
-        const pxr::UsdSkelRoot skelRoot(prim);
-        this->SkelCache.Populate(skelRoot, pxr::UsdPrimDefaultPredicate);
+        const PXR_NS::UsdSkelRoot skelRoot(prim);
+        this->SkelCache.Populate(skelRoot, PXR_NS::UsdPrimDefaultPredicate);
 
-        std::vector<pxr::UsdSkelBinding> bindings;
-        this->SkelCache.ComputeSkelBindings(skelRoot, &bindings, pxr::UsdPrimDefaultPredicate);
+        std::vector<PXR_NS::UsdSkelBinding> bindings;
+        this->SkelCache.ComputeSkelBindings(skelRoot, &bindings, PXR_NS::UsdPrimDefaultPredicate);
         for (const auto& binding : bindings)
         {
-          const pxr::UsdSkelSkeletonQuery skelQuery =
+          const PXR_NS::UsdSkelSkeletonQuery skelQuery =
             this->SkelCache.GetSkelQuery(binding.GetSkeleton());
 
           for (const auto& skinTarget : binding.GetSkinningTargets())
@@ -1171,14 +1175,14 @@ public:
             vtkActor* actor = this->ActorMap[primPath];
 
             // Skinning: update shader joint matrices
-            pxr::VtMatrix4dArray skinningXforms;
+            PXR_NS::VtMatrix4dArray skinningXforms;
             skelQuery.ComputeSkinningTransforms(&skinningXforms, timeCode);
 
             // Remap to local joint order if needed
-            const pxr::UsdSkelAnimMapperRefPtr& jointMapper = skinTarget.GetJointMapper();
+            const PXR_NS::UsdSkelAnimMapperRefPtr& jointMapper = skinTarget.GetJointMapper();
             if (jointMapper && !jointMapper->IsIdentity())
             {
-              pxr::VtMatrix4dArray remapped;
+              PXR_NS::VtMatrix4dArray remapped;
               jointMapper->RemapTransforms(skinningXforms, &remapped);
               skinningXforms = remapped;
             }
@@ -1201,7 +1205,7 @@ public:
             std::vector<float> jointMatrices;
             jointMatrices.reserve(skinningXforms.size() * 16);
 
-            for (const pxr::GfMatrix4d& xform : skinningXforms)
+            for (const PXR_NS::GfMatrix4d& xform : skinningXforms)
             {
               // jointMatrix = actorInverse * skelToWorld * xform * geomBind
               vtkNew<vtkMatrix4x4> jointMat;
@@ -1230,35 +1234,35 @@ public:
             }
 
             // Morphing: compute blend shape deformations and update points
-            pxr::VtFloatArray allWeights;
-            const pxr::UsdSkelAnimQuery& animQuery = skelQuery.GetAnimQuery();
+            PXR_NS::VtFloatArray allWeights;
+            const PXR_NS::UsdSkelAnimQuery& animQuery = skelQuery.GetAnimQuery();
             if (!animQuery || !animQuery.ComputeBlendShapeWeights(&allWeights, timeCode))
             {
               continue;
             }
 
             // Remap from animation order to mesh-local blend shape order
-            const pxr::UsdSkelAnimMapperRefPtr& blendMapper = skinTarget.GetBlendShapeMapper();
+            const PXR_NS::UsdSkelAnimMapperRefPtr& blendMapper = skinTarget.GetBlendShapeMapper();
             if (blendMapper && !blendMapper->IsIdentity())
             {
-              pxr::VtFloatArray remapped;
+              PXR_NS::VtFloatArray remapped;
               const float zero = 0.0f;
               blendMapper->Remap(allWeights, &remapped, 1, &zero);
               allWeights = remapped;
             }
 
-            const pxr::UsdSkelBindingAPI bindingAPI(skinTarget.GetPrim());
-            const pxr::UsdSkelBlendShapeQuery blendShapeQuery(bindingAPI);
+            const PXR_NS::UsdSkelBindingAPI bindingAPI(skinTarget.GetPrim());
+            const PXR_NS::UsdSkelBlendShapeQuery blendShapeQuery(bindingAPI);
 
-            pxr::VtFloatArray subShapeWeights;
-            pxr::VtUIntArray blendShapeIndices, subShapeIndices;
+            PXR_NS::VtFloatArray subShapeWeights;
+            PXR_NS::VtUIntArray blendShapeIndices, subShapeIndices;
             blendShapeQuery.ComputeSubShapeWeights(
               allWeights, &subShapeWeights, &blendShapeIndices, &subShapeIndices);
 
             const auto& morphInfo = this->MorphingMap[primPath];
 
             // Execute CPU-side morphing
-            pxr::VtArray<pxr::GfVec3f> positions = morphInfo.BindPositions;
+            PXR_NS::VtArray<PXR_NS::GfVec3f> positions = morphInfo.BindPositions;
             blendShapeQuery.ComputeDeformedPoints(subShapeWeights, blendShapeIndices,
               subShapeIndices, morphInfo.BlendShapePointIndices, morphInfo.SubShapePointOffsets,
               positions);
@@ -1278,7 +1282,7 @@ public:
                 const vtkIdType srcIdx = sourceIds->GetValue(i);
                 if (srcIdx < static_cast<vtkIdType>(positions.size()))
                 {
-                  const pxr::GfVec3f& p = positions[srcIdx];
+                  const PXR_NS::GfVec3f& p = positions[srcIdx];
                   outputPoints->SetPoint(i, p[0], p[1], p[2]);
                 }
               }
@@ -1289,7 +1293,7 @@ public:
               {
                 if (i < static_cast<vtkIdType>(positions.size()))
                 {
-                  const pxr::GfVec3f& p = positions[i];
+                  const PXR_NS::GfVec3f& p = positions[i];
                   outputPoints->SetPoint(i, p[0], p[1], p[2]);
                 }
               }
@@ -1314,9 +1318,9 @@ public:
 
     vtkNew<vtkMatrix4x4> rootTransform;
 
-    const pxr::TfToken up = pxr::UsdGeomGetStageUpAxis(this->Stage);
+    const PXR_NS::TfToken up = PXR_NS::UsdGeomGetStageUpAxis(this->Stage);
 
-    if (up == pxr::UsdGeomTokens->z)
+    if (up == PXR_NS::UsdGeomTokens->z)
     {
       vtkWarningWithObjectMacro(
         renderer, << "This USD file up axis is +Z, internally rotate it to align with +Y axis");
@@ -1330,7 +1334,7 @@ public:
     this->RootTransform->DeepCopy(rootTransform);
 
     this->ImportNode(renderer, hierarchy, actorCollection, this->Stage->GetPseudoRoot(),
-      pxr::SdfPath("/"), rootTransform);
+      PXR_NS::SdfPath("/"), rootTransform);
 
     this->UpdateSkinningAndMorphing();
 
@@ -1428,34 +1432,35 @@ public:
 
   // returns the image and the texture coordinate name
   vtkSmartPointer<vtkImageData> GetVTKTexture(
-    const pxr::UsdShadeShader& samplerPrim, const pxr::TfToken& token)
+    const PXR_NS::UsdShadeShader& samplerPrim, const PXR_NS::TfToken& token)
   {
     if (!samplerPrim)
     {
       return nullptr;
     }
 
-    pxr::TfToken idToken;
+    PXR_NS::TfToken idToken;
     const bool defined = samplerPrim.GetIdAttr().Get(&idToken);
-    if (!defined || idToken != pxr::TfToken("UsdUVTexture"))
+    if (!defined || idToken != PXR_NS::TfToken("UsdUVTexture"))
     {
       // only UsdUVTexture supported for now
       return nullptr;
     }
 
     // get array name
-    auto [uvset, uvtoken] = this->GetConnectedShaderPrim(samplerPrim.GetInput(pxr::TfToken("st")));
+    auto [uvset, uvtoken] =
+      this->GetConnectedShaderPrim(samplerPrim.GetInput(PXR_NS::TfToken("st")));
     std::string name;
 
     if (uvset)
     {
-      const pxr::UsdShadeInput arrayName = uvset.GetInput(pxr::TfToken("varname"));
+      const PXR_NS::UsdShadeInput arrayName = uvset.GetInput(PXR_NS::TfToken("varname"));
 
       if (arrayName)
       {
         if (arrayName.GetTypeName() == "token")
         {
-          pxr::TfToken tokenName;
+          PXR_NS::TfToken tokenName;
           if (arrayName.Get(&tokenName))
           {
             name = tokenName;
@@ -1472,8 +1477,8 @@ public:
 
     if (tex == nullptr)
     {
-      pxr::SdfAssetPath path;
-      const pxr::UsdShadeInput fileInput = samplerPrim.GetInput(pxr::TfToken("file"));
+      PXR_NS::SdfAssetPath path;
+      const PXR_NS::UsdShadeInput fileInput = samplerPrim.GetInput(PXR_NS::TfToken("file"));
       if (fileInput && fileInput.Get(&path))
       {
         vtkSmartPointer<vtkImageReader2> reader;
@@ -1489,8 +1494,8 @@ public:
         }
 
         const std::string& resolvedPath = path.GetResolvedPath();
-        const pxr::ArResolverContextBinder binder(this->MemoryResolverContext);
-        auto asset = pxr::ArGetResolver().OpenAsset(pxr::ArResolvedPath(resolvedPath));
+        const PXR_NS::ArResolverContextBinder binder(this->MemoryResolverContext);
+        auto asset = PXR_NS::ArGetResolver().OpenAsset(PXR_NS::ArResolvedPath(resolvedPath));
 
         if (!asset)
         {
@@ -1567,21 +1572,21 @@ public:
     return extract->GetOutput();
   }
 
-  vtkSmartPointer<vtkProperty> GetVTKProperty(const pxr::UsdShadeShader& shaderPrim)
+  vtkSmartPointer<vtkProperty> GetVTKProperty(const PXR_NS::UsdShadeShader& shaderPrim)
   {
     auto& prop = this->ShaderMap[shaderPrim.GetPath().GetAsString()];
 
     if (prop == nullptr)
     {
-      const pxr::UsdAttribute attr = shaderPrim.GetIdAttr();
+      const PXR_NS::UsdAttribute attr = shaderPrim.GetIdAttr();
 
       if (attr)
       {
-        pxr::TfToken materialToken;
+        PXR_NS::TfToken materialToken;
 
         const bool defined = attr.Get(&materialToken);
 
-        if (!defined || materialToken != pxr::TfToken("UsdPreviewSurface"))
+        if (!defined || materialToken != PXR_NS::TfToken("UsdPreviewSurface"))
         {
           // only UsdPreviewSurface supported for now
           return nullptr;
@@ -1593,8 +1598,9 @@ public:
         vtkInformation* info = prop->GetInformation();
 
         // diffuseColor
-        pxr::GfVec3f diffuseColorValue;
-        const pxr::UsdShadeInput diffuseColor = shaderPrim.GetInput(pxr::TfToken("diffuseColor"));
+        PXR_NS::GfVec3f diffuseColorValue;
+        const PXR_NS::UsdShadeInput diffuseColor =
+          shaderPrim.GetInput(PXR_NS::TfToken("diffuseColor"));
         if (diffuseColor && diffuseColor.Get(&diffuseColorValue))
         {
           prop->SetColor(diffuseColorValue[0], diffuseColorValue[1], diffuseColorValue[2]);
@@ -1614,7 +1620,7 @@ public:
 
         // opacity
         float opacityValue;
-        const pxr::UsdShadeInput opacity = shaderPrim.GetInput(pxr::TfToken("opacity"));
+        const PXR_NS::UsdShadeInput opacity = shaderPrim.GetInput(PXR_NS::TfToken("opacity"));
         if (opacity && opacity.Get(&opacityValue))
         {
           prop->SetOpacity(opacityValue);
@@ -1648,7 +1654,8 @@ public:
         }
 
         // emissive
-        const pxr::UsdShadeInput emissive = shaderPrim.GetInput(pxr::TfToken("emissiveColor"));
+        const PXR_NS::UsdShadeInput emissive =
+          shaderPrim.GetInput(PXR_NS::TfToken("emissiveColor"));
         auto [emissiveSampler, emissiveToken] = this->GetConnectedShaderPrim(emissive);
         if (emissiveSampler)
         {
@@ -1672,7 +1679,7 @@ public:
 
         // ORM texture
         float roughnessValue;
-        const pxr::UsdShadeInput roughness = shaderPrim.GetInput(pxr::TfToken("roughness"));
+        const PXR_NS::UsdShadeInput roughness = shaderPrim.GetInput(PXR_NS::TfToken("roughness"));
         if (roughness && roughness.Get(&roughnessValue))
         {
           prop->SetRoughness(roughnessValue);
@@ -1692,7 +1699,7 @@ public:
         }
 
         float metallicValue;
-        const pxr::UsdShadeInput metallic = shaderPrim.GetInput(pxr::TfToken("metallic"));
+        const PXR_NS::UsdShadeInput metallic = shaderPrim.GetInput(PXR_NS::TfToken("metallic"));
         if (metallic && metallic.Get(&metallicValue))
         {
           prop->SetMetallic(metallicValue);
@@ -1711,7 +1718,7 @@ public:
           }
         }
 
-        const pxr::UsdShadeInput occlusion = shaderPrim.GetInput(pxr::TfToken("occlusion"));
+        const PXR_NS::UsdShadeInput occlusion = shaderPrim.GetInput(PXR_NS::TfToken("occlusion"));
         auto [occlusionSampler, occlusionToken] = this->GetConnectedShaderPrim(occlusion);
         vtkSmartPointer<vtkImageData> occlusionImage;
         if (occlusionSampler)
@@ -1739,7 +1746,7 @@ public:
         }
 
         // normal
-        const pxr::UsdShadeInput normal = shaderPrim.GetInput(pxr::TfToken("normal"));
+        const PXR_NS::UsdShadeInput normal = shaderPrim.GetInput(PXR_NS::TfToken("normal"));
         auto [normalSampler, normalToken] = this->GetConnectedShaderPrim(normal);
         if (normalSampler)
         {
@@ -1781,16 +1788,16 @@ public:
     timeRange[1] = this->Stage->GetEndTimeCode() / this->Stage->GetTimeCodesPerSecond();
   }
 
-  pxr::UsdStageRefPtr Stage = nullptr;
+  PXR_NS::UsdStageRefPtr Stage = nullptr;
   F3DUSDMemoryResolverContext MemoryResolverContext;
   int SubdivisionLevel = 0;
 
 private:
   struct MorphingInfo
   {
-    pxr::VtArray<pxr::GfVec3f> BindPositions;
-    std::vector<pxr::VtIntArray> BlendShapePointIndices;
-    std::vector<pxr::VtVec3fArray> SubShapePointOffsets;
+    PXR_NS::VtArray<PXR_NS::GfVec3f> BindPositions;
+    std::vector<PXR_NS::VtIntArray> BlendShapePointIndices;
+    std::vector<PXR_NS::VtVec3fArray> SubShapePointOffsets;
   };
 
   std::unordered_map<std::string,
@@ -1802,13 +1809,13 @@ private:
   std::unordered_map<std::string, vtkSmartPointer<vtkImageData>> TextureMap;
   std::unordered_map<std::string, MorphingInfo> MorphingMap;
 
-  pxr::UsdSkelCache SkelCache;
+  PXR_NS::UsdSkelCache SkelCache;
   vtkNew<vtkMatrix4x4> RootTransform;
   std::unordered_map<std::string, int> NodeIdMap;
 
   double CurrentTime = 0.0;
 
-  class DiagDelegate : public pxr::TfDiagnosticMgr::Delegate
+  class DiagDelegate : public PXR_NS::TfDiagnosticMgr::Delegate
   {
   public:
     explicit DiagDelegate(vtkF3DUSDImporter* parent)
@@ -1816,19 +1823,19 @@ private:
     {
     }
 
-    void IssueError(const pxr::TfError& err) override
+    void IssueError(const PXR_NS::TfError& err) override
     {
       vtkErrorWithObjectMacro(this->Parent, << err.GetCommentary());
     }
 
-    void IssueFatalError(const pxr::TfCallContext&, const std::string& msg) override
+    void IssueFatalError(const PXR_NS::TfCallContext&, const std::string& msg) override
     {
       // if we do not throw here, OpenUSD just exit(1) the process
       // we catch this exception upstream and only report an importer failure
       throw std::runtime_error(msg);
     }
 
-    void IssueStatus(const pxr::TfStatus& status) override
+    void IssueStatus(const PXR_NS::TfStatus& status) override
     {
 #ifdef NDEBUG
       (void)status;
@@ -1837,7 +1844,7 @@ private:
 #endif
     }
 
-    void IssueWarning(const pxr::TfWarning& warn) override
+    void IssueWarning(const PXR_NS::TfWarning& warn) override
     {
       vtkWarningWithObjectMacro(this->Parent, << warn.GetCommentary());
     }
@@ -2014,5 +2021,5 @@ bool vtkF3DUSDImporter::CanReadFile(vtkResourceStream* stream, std::string& hint
 //------------------------------------------------------------------------------
 void vtkF3DUSDImporter::SetResourcesPath(const std::string& path)
 {
-  pxr::PlugRegistry::GetInstance().RegisterPlugins(path);
+  PXR_NS::PlugRegistry::GetInstance().RegisterPlugins(path);
 }
