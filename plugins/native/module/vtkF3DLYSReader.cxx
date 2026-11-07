@@ -62,7 +62,13 @@ int vtkF3DLYSReader::RequestData(
     stream = fileStream;
   }
 
-  // Seek to the beginning in case the stream was already read (e.g. by CanReadFile).
+  if (!vtkF3DLYSReader::CanReadFile(stream))
+  {
+    vtkErrorMacro("Failed to read LYS file: invalid or corrupted file format");
+    return 0;
+  }
+
+  // Rewind stream to read manifest details
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
 
   // Read the 16-byte container header
@@ -71,44 +77,14 @@ int vtkF3DLYSReader::RequestData(
   // bytes 8-11 : secondary size field (uint32 LE); not used by this reader
   // bytes 12-15: actual JSON content length (uint32 LE)
   unsigned char header[16];
-  if (stream->Read(header, 16) != 16)
-  {
-    vtkErrorMacro("Failed to read LYS container header");
-    return 0;
-  }
+  stream->Read(header, 16);
   const uint32_t jsonBlockSize = ::ReadU32LE(header, 4); // padded size used to seek past the block
   const uint32_t jsonLen = ::ReadU32LE(header, 12);      // actual JSON content length
 
-  if (jsonBlockSize < 2 || jsonLen < 2 || jsonLen > jsonBlockSize)
-  {
-    vtkErrorMacro("Invalid LYS container header dimensions");
-    return 0;
-  }
-
   // Read and parse the JSON manifest (jsonLen bytes, padded to jsonBlockSize in the file)
   std::vector<char> jsonBuf(jsonLen);
-  if (stream->Read(jsonBuf.data(), jsonLen) != jsonLen)
-  {
-    vtkErrorMacro("Failed to read LYS JSON manifest");
-    return 0;
-  }
-
-  nlohmann::json manifest;
-  try
-  {
-    manifest = nlohmann::json::parse(jsonBuf.begin(), jsonBuf.end());
-  }
-  catch (const nlohmann::json::exception& e)
-  {
-    vtkErrorMacro("Failed to parse LYS JSON manifest: " << e.what());
-    return 0;
-  }
-
-  if (!manifest.contains("mangoFiles"))
-  {
-    vtkErrorMacro("LYS JSON manifest has no 'mangoFiles' key");
-    return 0;
-  }
+  stream->Read(jsonBuf.data(), jsonLen);
+  const auto manifest = nlohmann::json::parse(jsonBuf.begin(), jsonBuf.end());
   const auto& mangoFiles = manifest["mangoFiles"];
   std::string geomKey;
   uint64_t geomOffset = 0;

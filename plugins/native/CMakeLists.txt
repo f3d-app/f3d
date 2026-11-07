@@ -421,7 +421,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.lys
   VTK_READER vtkF3DLYSReader
   FORMAT_DESCRIPTION "Lychee Slicer"
-  ${_SUPPORTS_STREAM}
+  SUPPORTS_STREAM
   CAN_READ STATIC
 )
 
