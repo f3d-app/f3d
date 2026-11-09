@@ -28,6 +28,11 @@ protected:
   ~vtkF3DGLTFImporter() override = default;
 
   /**
+   * Overridden to instantiate our own document loader
+   */
+  void InitializeLoader() override;
+
+  /**
    * This method is reimplemented to add information to the actor in order
    * to properly draw armatures on top.
    */

@@ -63,6 +63,10 @@
     "version": "25.0.7",
     "min_version": "24.3.4"
   },
+  "meshoptimizer": {
+    "version": "v1.3",
+    "min_version": "v1.0"
+  },
   "occt": {
     "version": "V8_0_1",
     "min_version": "V7_6_3"

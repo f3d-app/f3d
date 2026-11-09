@@ -1,5 +1,6 @@
 #include "vtkF3DGLTFImporter.h"
 
+#include "vtkF3DGLTFDocumentLoader.h"
 #include "vtkF3DImporter.h"
 
 #include <vtkActor.h>
@@ -22,6 +23,12 @@ vtkStandardNewMacro(vtkF3DGLTFImporter);
 vtkF3DGLTFImporter::vtkF3DGLTFImporter()
 {
   this->SetImportArmature(true);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DGLTFImporter::InitializeLoader()
+{
+  this->Loader = vtkSmartPointer<vtkF3DGLTFDocumentLoader>::New();
 }
 
 //----------------------------------------------------------------------------
