@@ -65,7 +65,7 @@ bool CheckPackedDeformation(vtkPolyData* polydata)
     }
     for (int j = range[0]; j < range[1]; j++)
     {
-      float offset[4];
+      float offset[4] = {};
       offsets->GetTypedTuple(j, offset);
       const vtkIdType subshape = static_cast<vtkIdType>(offset[3]);
       if (subshape < 0 || subshape >= weights->GetNumberOfValues())
