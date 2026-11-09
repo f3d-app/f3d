@@ -7,6 +7,7 @@
 #include "vtkF3DPolyDataMapper.h"
 #include "vtkF3DPreserveCameraFramebufferPass.h"
 #include "vtkF3DRenderer.h"
+#include "vtkF3DSparseMorphing.h"
 #include "vtkF3DStochasticTransparentPass.h"
 #include "vtkF3DTAAPass.h"
 
@@ -81,6 +82,7 @@ void vtkF3DRenderPass::ReleaseGraphicsResources(vtkWindow* w)
   if (this->BlendQuadHelper)
   {
     this->BlendQuadHelper->ReleaseGraphicsResources(w);
+    this->BlendQuadHelper.reset();
   }
   if (this->BackgroundPass)
   {
@@ -159,6 +161,12 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
               {
                 // skip rendering if no point
                 continue;
+              }
+
+              if (auto* mapper = vtkF3DPolyDataMapper::SafeDownCast(polyMapper))
+              {
+                mapper->PrepareSparseMorphing(
+                  vtkOpenGLRenderWindow::SafeDownCast(s->GetRenderer()->GetRenderWindow()), input);
               }
 
               // skinning
@@ -495,8 +503,10 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(
       uniforms->GetUniformTupleType("morphWeights") != vtkUniforms::TupleTypeInvalid;
     const bool hasSkinning =
       uniforms->GetUniformTupleType("jointMatrices") != vtkUniforms::TupleTypeInvalid;
+    auto* mapper = vtkF3DPolyDataMapper::SafeDownCast(actor->GetMapper());
+    const bool hasSparseMorphing = mapper && mapper->GetHasSparseMorphing();
 
-    if (hasMorphing || hasSkinning)
+    if (hasMorphing || hasSkinning || hasSparseMorphing)
     {
       bool hasTangents =
         polyData->GetPointData()->GetTangents() && actor->GetProperty()->GetLighting();
@@ -508,6 +518,15 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(
       std::string beginImpl = "//VTK::CustomBegin::Impl\n";
       std::string posImpl = "//VTK::PositionVC::Impl\n"
                             "  vec4 posMC = vertexMC;\n";
+      if (hasSparseMorphing)
+      {
+        vtkShaderProgram::Substitute(vertexShader, "//VTK::System::Dec", "#version 430");
+        customDecl += vtkF3DSparseMorphing;
+        customDecl += "in vec3 blendShapeBindPositions;\n"
+                      "in vec2 blendShapeRanges;\n";
+        posImpl += "  posMC = vec4(f3dSparseMorphPosition(blendShapeBindPositions, "
+                   "ivec2(blendShapeRanges)), 1.0);\n";
+      }
 
       // normals and tangents can be modified by skinnning and morphing in model space
       std::string normalImpl = "//VTK::Normal::Impl\n";
@@ -635,7 +654,11 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(
 
       posImpl += "  gl_Position = MCDCMatrix * posMC;\n";
 
-      if (this->LightComplexity > 0)
+      if (hasSparseMorphing)
+      {
+        posImpl += "//F3D::SparsePositionVC::Impl\n";
+      }
+      else if (this->LightComplexity > 0 && actor->GetProperty()->GetLighting())
       {
         posImpl += "  vertexVCVSOutput = MCVCMatrix * posMC;\n";
       }

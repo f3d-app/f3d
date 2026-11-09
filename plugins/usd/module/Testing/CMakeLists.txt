@@ -1,5 +1,6 @@
 list(APPEND VTKExtensionsPluginUSD_list
      TestF3DUSDImporter.cxx
+     TestF3DUSDImporterBlendShapes.cxx
      TestF3DUSDImporterPoints.cxx
     )
 

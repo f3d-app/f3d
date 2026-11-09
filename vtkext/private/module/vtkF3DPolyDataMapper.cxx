@@ -5,7 +5,10 @@
 
 #include <vtkActor.h>
 #include <vtkDoubleArray.h>
+#include <vtkFieldData.h>
+#include <vtkFloatArray.h>
 #include <vtkImageData.h>
+#include <vtkIntArray.h>
 #include <vtkMatrix4x4.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLRenderWindow.h>
@@ -22,11 +25,133 @@
 #include <vtkUniforms.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkVersion.h>
+#include <vtk_glad.h>
 
+#include <algorithm>
 #include <cmath>
 #include <regex>
 
 vtkStandardNewMacro(vtkF3DPolyDataMapper);
+
+//-----------------------------------------------------------------------------
+bool vtkF3DPolyDataMapper::PrepareSparseMorphing(
+  vtkOpenGLRenderWindow* window, vtkPolyData* polydata)
+{
+  bool enabled = false;
+#ifndef F3D_USE_GLES
+  int major, minor;
+  window->GetOpenGLVersion(major, minor);
+  if (major > 4 || (major == 4 && minor >= 3))
+  {
+    int blocks = 0;
+    glGetIntegerv(GL_MAX_VERTEX_SHADER_STORAGE_BLOCKS, &blocks);
+    auto* positions = polydata->GetPointData()->GetArray("blendShapeBindPositions");
+    auto* ranges =
+      vtkIntArray::SafeDownCast(polydata->GetPointData()->GetArray("blendShapeRanges"));
+    auto* offsets = polydata->GetFieldData()->GetArray("blendShapeOffsets");
+    auto* weights = polydata->GetFieldData()->GetArray("blendShapeWeights");
+    GLint64 maxBlockSize = 0;
+    glGetInteger64v(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &maxBlockSize);
+    bool validRanges = false;
+    if (ranges && ranges->GetNumberOfComponents() == 2 && ranges->GetNumberOfTuples() && offsets)
+    {
+      double begin[2], end[2];
+      ranges->GetRange(begin, 0);
+      ranges->GetRange(end, 1);
+      // Attributes are converted to floats by VTK; integers above 2^24 can round.
+      const double limit = std::min<double>(offsets->GetNumberOfTuples(), 16777216.);
+      validRanges = begin[0] >= 0. && end[0] >= 0. && begin[1] <= limit && end[1] <= limit;
+    }
+    // Leave room for the optional skinning SSBO as well.
+    enabled = blocks >= 3 && positions && weights && offsets && validRanges &&
+      offsets->GetNumberOfValues() <= maxBlockSize / static_cast<GLint64>(sizeof(float)) &&
+      weights->GetNumberOfValues() <= maxBlockSize / static_cast<GLint64>(sizeof(float)) &&
+      positions->GetNumberOfComponents() == 3 &&
+      positions->GetNumberOfTuples() == polydata->GetNumberOfPoints() &&
+      ranges->GetNumberOfTuples() == polydata->GetNumberOfPoints() &&
+      this->UpdateMorphingBuffers(polydata);
+  }
+#endif
+  if (enabled != this->HasSparseMorphing)
+  {
+    this->HasSparseMorphing = enabled;
+    this->Modified();
+  }
+  if (enabled)
+  {
+    this->MapDataArrayToVertexAttribute("blendShapeBindPositions", "blendShapeBindPositions",
+      vtkDataObject::FIELD_ASSOCIATION_POINTS);
+    this->MapDataArrayToVertexAttribute(
+      "blendShapeRanges", "blendShapeRanges", vtkDataObject::FIELD_ASSOCIATION_POINTS);
+  }
+  return enabled;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkF3DPolyDataMapper::UpdateMorphingBuffers(vtkPolyData* polydata)
+{
+  auto* offsets =
+    vtkFloatArray::SafeDownCast(polydata->GetFieldData()->GetArray("blendShapeOffsets"));
+  auto* weights =
+    vtkFloatArray::SafeDownCast(polydata->GetFieldData()->GetArray("blendShapeWeights"));
+  if (!offsets || offsets->GetNumberOfComponents() != 4 || !offsets->GetNumberOfTuples() ||
+    !weights || weights->GetNumberOfComponents() != 1 || !weights->GetNumberOfValues())
+  {
+    return false;
+  }
+
+  if (this->UploadedBlendShapeOffsets != offsets ||
+    offsets->GetMTime() > this->BlendShapeOffsetsUploadTime ||
+    this->BlendShapeWeights->GetSize() / sizeof(float) !=
+      static_cast<size_t>(weights->GetNumberOfValues()))
+  {
+    for (vtkIdType i = 0; i < offsets->GetNumberOfTuples(); ++i)
+    {
+      const double index = offsets->GetComponent(i, 3);
+      if (!std::isfinite(index) || index < 0. || index >= weights->GetNumberOfValues() ||
+        std::floor(index) != index)
+      {
+        return false;
+      }
+    }
+  }
+
+  auto upload = [](vtkFloatArray* array, vtkOpenGLBufferObject* buffer,
+                  vtkWeakPointer<vtkFloatArray>& previous, vtkTimeStamp& uploadTime)
+  {
+    if (previous != array || array->GetMTime() > uploadTime || !buffer->IsReady())
+    {
+      if (!buffer->Upload(array->GetPointer(0), static_cast<size_t>(array->GetNumberOfValues()),
+            vtkOpenGLBufferObject::ArrayBuffer))
+      {
+        return false;
+      }
+      previous = array;
+      uploadTime.Modified();
+    }
+    return true;
+  };
+  return upload(offsets, this->BlendShapeOffsets, this->UploadedBlendShapeOffsets,
+           this->BlendShapeOffsetsUploadTime) &&
+    upload(weights, this->BlendShapeWeights, this->UploadedBlendShapeWeights,
+      this->BlendShapeWeightsUploadTime) &&
+    this->BlendShapeOffsets->BindShaderStorage(1) && this->BlendShapeWeights->BindShaderStorage(2);
+}
+
+//-----------------------------------------------------------------------------
+void vtkF3DPolyDataMapper::ReleaseGraphicsResources(vtkWindow* window)
+{
+  if (this->HasSparseMorphing)
+  {
+    this->HasSparseMorphing = false;
+    this->Modified();
+  }
+  this->BlendShapeOffsets->ReleaseGraphicsResources();
+  this->BlendShapeWeights->ReleaseGraphicsResources();
+  this->UploadedBlendShapeOffsets = nullptr;
+  this->UploadedBlendShapeWeights = nullptr;
+  this->Superclass::ReleaseGraphicsResources(window);
+}
 
 //-----------------------------------------------------------------------------
 void vtkF3DPolyDataMapper::SetUseLinearColorSpace(bool use)
@@ -85,6 +210,14 @@ void vtkF3DPolyDataMapper::ReplaceShaderValues(
   std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
 {
   this->Superclass::ReplaceShaderValues(shaders, ren, actor);
+  this->HasSSBOSkinning = false;
+  auto* morphingVertexShader = shaders[vtkShader::Vertex];
+  std::string source = morphingVertexShader->GetSource();
+  vtkShaderProgram::Substitute(source, "//F3D::SparsePositionVC::Impl",
+    source.find("out vec4 vertexVCVSOutput;") != std::string::npos
+      ? "vertexVCVSOutput = MCVCMatrix * posMC;"
+      : "");
+  morphingVertexShader->SetSource(source);
 
   vtkUniforms* uniforms = actor->GetShaderProperty()->GetVertexCustomUniforms();
   const vtkUniforms::TupleType type = uniforms->GetUniformTupleType("jointMatrices");
@@ -137,6 +270,11 @@ void vtkF3DPolyDataMapper::ReplaceShaderValues(
 void vtkF3DPolyDataMapper::SetCustomUniforms(vtkOpenGLHelper& cellBO, vtkActor* actor)
 {
   this->Superclass::SetCustomUniforms(cellBO, actor);
+
+  if (this->HasSparseMorphing)
+  {
+    this->UpdateMorphingBuffers(this->GetInput());
+  }
 
   if (this->HasSSBOSkinning)
   {

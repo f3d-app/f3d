@@ -34,6 +34,14 @@ public:
   static vtkInformationIntegerKey* ACTOR_IS_ARMATURE();
 
   /**
+   * Keep bind-pose geometry and update morph weights for GPU rendering.
+   * The caller must ensure the renderer supports the imported morph data.
+   * Defaults to false so standalone importers retain CPU-deformed geometry.
+   */
+  vtkSetMacro(UseGPUMorphing, bool);
+  vtkGetMacro(UseGPUMorphing, bool);
+
+  /**
    * This method should be reimplemented in importer
    * implementations to handle update the importer at a specific time value
    * then call this method and return what it returns.
@@ -75,6 +83,7 @@ public:
 #endif
 
 private:
+  bool UseGPUMorphing = false;
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20250923)
   char* FileName = nullptr;
   vtkSmartPointer<vtkResourceStream> Stream;

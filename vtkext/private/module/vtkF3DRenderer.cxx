@@ -2647,6 +2647,10 @@ bool vtkF3DRenderer::CaptureVideoFrame(std::byte* yPlane, std::byte* uPlane, std
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
+  if (this->Importer && !this->Importer->RefreshMorphingMode())
+  {
+    F3DLog::Print(F3DLog::Severity::Warning, "Failed to update morphing mode");
+  }
   if (this->UseNormalGlyphs)
   {
     this->UpdateNormalGlyphsScale();
@@ -3607,7 +3611,7 @@ void vtkF3DRenderer::UpdateLightRepresentations()
 
   // remove unwanted light representations
   for (auto repItr = this->LightRepresentations.begin();
-       repItr != this->LightRepresentations.end();)
+    repItr != this->LightRepresentations.end();)
   {
     if (visitedLights.count(repItr->first))
     {
