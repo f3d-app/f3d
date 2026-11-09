@@ -9,6 +9,7 @@
 
 namespace
 {
+// Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13979
 #if defined(F3D_MODULE_MESHOPT) && (VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261109))
 //----------------------------------------------------------------------------
 std::vector<char> DecodeBufferView(
