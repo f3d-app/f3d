@@ -282,7 +282,7 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
   if (!importer->UpdateAtTimeValue(12.5 / 24.) ||
     !CheckPackedDeformation(vtkPolyDataMapper::SafeDownCast(
       importer->GetRenderer()->GetActors()->GetLastActor()->GetMapper())
-        ->GetInput()))
+                              ->GetInput()))
   {
     std::cerr << "CPU fallback did not restore current deformation\n";
     return EXIT_FAILURE;
