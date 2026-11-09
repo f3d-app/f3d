@@ -47,7 +47,7 @@ bool CheckPackedDeformation(vtkPolyData* polydata)
     {
       return false;
     }
-    int range[2];
+    int range[2] = {};
     ranges->GetTypedTuple(i, range);
     if (range[0] < 0 || range[1] < range[0] || range[1] > offsets->GetNumberOfTuples())
     {
@@ -127,14 +127,14 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
     for (vtkIdType i = 0; i < polydata->GetNumberOfPoints(); i++)
     {
       const vtkIdType source = sourceIds ? sourceIds->GetValue(i) : i;
-      int range[2];
+      int range[2] = {};
       ranges->GetTypedTuple(i, range);
       if (range[0] != source || range[1] != source + 1)
       {
         std::cerr << "Blend shape range does not follow the source vertex\n";
         return EXIT_FAILURE;
       }
-      float offset[4];
+      float offset[4] = {};
       offsets->GetTypedTuple(range[0], offset);
       if (offset[0] != 0.f || std::abs(offset[1] - 0.2f) > 1e-6f || offset[2] != 0.f ||
         offset[3] != (source < 4 ? 1.f : 3.f))
