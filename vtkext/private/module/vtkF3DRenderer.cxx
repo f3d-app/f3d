@@ -324,6 +324,7 @@ void vtkF3DRenderer::Initialize()
   this->ScalarBarActorConfigured = false;
   this->CheatSheetConfigured = false;
   this->ColoringConfigured = false;
+  this->PointSpritesConfigured = false;
   this->NormalGlyphsConfigured = false;
 
   // create ImGui context if F3D_MODULE_UI is enabled
@@ -3333,11 +3334,6 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigurePointSprites()
 {
-  if (!this->UsePointSprites)
-  {
-    return;
-  }
-
   if (this->GetBlendingMode() == vtkF3DRenderer::BlendingMode::SORT &&
     !vtkShader::IsComputeShaderSupported())
   {
@@ -3358,6 +3354,14 @@ void vtkF3DRenderer::ConfigurePointSprites()
   {
     vtkF3DPointSplatMapper* splatMapper = vtkF3DPointSplatMapper::SafeDownCast(sprites.Mapper);
     splatMapper->SetUseInstancing(this->PointSpritesUseInstancing);
+
+    // if the original mapper is a vtkF3DPointSplatMapper, we can configure it for instancing
+    vtkF3DPointSplatMapper* originalSplatMapper =
+      vtkF3DPointSplatMapper::SafeDownCast(sprites.OriginalActor->GetMapper());
+    if (originalSplatMapper)
+    {
+      originalSplatMapper->SetUseInstancing(this->PointSpritesUseInstancing);
+    }
 
     // add SDF functions
     vtkShaderProperty* sp = sprites.Actor->GetShaderProperty();
@@ -3381,12 +3385,21 @@ void vtkF3DRenderer::ConfigurePointSprites()
     sprites.Mapper->SetLowpassMatrix(lowPass);
 
     vtkPolyData* polyData = vtkPolyData::SafeDownCast(sprites.Mapper->GetInput());
-    if (polyData && polyData->GetPointData()->HasArray("scale") &&
-      polyData->GetPointData()->HasArray("rotation"))
+    char* scaleArray = sprites.Mapper->GetScaleArray();
+    char* rotationArray = sprites.Mapper->GetRotationArray();
+    if (polyData && (scaleArray || polyData->GetPointData()->HasArray("scale")) &&
+      (rotationArray || polyData->GetPointData()->HasArray("rotation")))
     {
       sprites.Mapper->AnisotropicOn();
-      sprites.Mapper->SetRotationArray("rotation");
-      sprites.Mapper->SetScaleArray("scale");
+
+      if (!scaleArray)
+      {
+        sprites.Mapper->SetScaleArray("scale");
+      }
+      if (!rotationArray)
+      {
+        sprites.Mapper->SetRotationArray("rotation");
+      }
     }
     else
     {
@@ -3464,6 +3477,8 @@ void vtkF3DRenderer::ConfigurePointSprites()
       sprites.Actor->ForceTranslucentOff();
     }
   }
+
+  this->PointSpritesConfigured = true;
 }
 
 //----------------------------------------------------------------------------

@@ -42,6 +42,11 @@ protected:
   void InitializeLoader() override;
 
   /**
+   * Overridden to process SH arrays
+   */
+  int ImportBegin() override;
+
+  /**
    * This method is reimplemented to add information to the actor in order
    * to properly draw armatures on top.
    */
