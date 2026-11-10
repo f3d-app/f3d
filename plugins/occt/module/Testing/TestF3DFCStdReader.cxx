@@ -196,7 +196,7 @@ int TestF3DFCStdReader(int vtkNotUsed(argc), char* argv[])
   {
     // colored_visibility.FCStd without the App side Visibility properties,
     // like files written before FreeCAD 0.19: the GuiDocument.xml fallback
-    // must still hide the hidden box
+    // must still preserve the visibility state
     const vtkSmartPointer<vtkPartitionedDataSetCollection> pdc =
       ReadFile(data + "/legacy_visibility.FCStd");
     ret &= CheckPartitionCount(pdc, 2, "legacy_visibility");

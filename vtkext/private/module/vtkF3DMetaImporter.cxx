@@ -437,7 +437,7 @@ bool vtkF3DMetaImporter::Update()
     importerInfo.DataAssembly->SetAttribute(
       vtkDataAssembly::GetRootNode(), "label", importerInfo.Name.c_str());
 
-    // Initialize visibility of objects imported as hidden.
+    // Mark hidden objects for the renderer
     for (const int nodeId : importerInfo.DataAssembly->SelectNodes({ "//*[@f3d_visible='0']" }))
     {
       ::SetSubtreeVisibility(importerInfo.DataAssembly, nodeId, actorCollection, false);
