@@ -112,6 +112,11 @@ public:
   {
     return this->Array == other.Array;
   }
+  [[nodiscard]] bool compare(const double_array_t& other, double epsilon) const
+  {
+    return std::equal(this->Array.begin(), this->Array.end(), other.Array.begin(),
+      [epsilon](double a, double b) { return std::abs(a - b) <= epsilon; });
+  }
   [[nodiscard]] bool operator!=(const double_array_t& other) const
   {
     return this->Array != other.Array;
@@ -213,11 +218,6 @@ public:
   [[nodiscard]] inline double z() const
   {
     return (*this)[2];
-  }
-  [[nodiscard]] bool compare(const direction_t& other, double epsilon) const
-  {
-    return std::abs(this->x() - other.x()) <= epsilon &&
-      std::abs(this->y() - other.y()) <= epsilon && std::abs(this->z() - other.z()) <= epsilon;
   }
   [[nodiscard]] operator f3d::vector3_t() const
   {

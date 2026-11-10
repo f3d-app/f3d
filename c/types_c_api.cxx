@@ -46,6 +46,19 @@ void f3d_color_set(f3d_color_t* color, double r, double g, double b)
   color->data[2] = b;
 }
 
+//----------------------------------------------------------------------------
+int f3d_color_compare(const f3d_color_t* a, const f3d_color_t* b, double epsilon)
+{
+  if (!a || !b)
+  {
+    return 0;
+  }
+
+  const f3d::color_t first{ a->data[0], a->data[1], a->data[2] };
+  const f3d::color_t second{ b->data[0], b->data[1], b->data[2] };
+  return first.compare(second, epsilon);
+}
+
 // f3d_direction_t functions
 //----------------------------------------------------------------------------
 double f3d_direction_x(const f3d_direction_t* dir)
@@ -122,6 +135,24 @@ void f3d_transform2d_create(f3d_transform2d_t* transform, double scale_x, double
   {
     transform->data[i] = cpp_transform[i];
   }
+}
+
+//----------------------------------------------------------------------------
+int f3d_transform2d_compare(const f3d_transform2d_t* a, const f3d_transform2d_t* b, double epsilon)
+{
+  if (!a || !b)
+  {
+    return 0;
+  }
+
+  f3d::transform2d_t first;
+  f3d::transform2d_t second;
+  for (int i = 0; i < 9; ++i)
+  {
+    first[i] = a->data[i];
+    second[i] = b->data[i];
+  }
+  return first.compare(second, epsilon);
 }
 
 // f3d_colormap_t functions

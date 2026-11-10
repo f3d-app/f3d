@@ -181,7 +181,10 @@ EMSCRIPTEN_BINDINGS(f3d)
     .constructor<double, double, double>()
     .property("r", &f3d::color_t::r)
     .property("g", &f3d::color_t::g)
-    .property("b", &f3d::color_t::b);
+    .property("b", &f3d::color_t::b)
+    .function(
+      "compare", +[](const f3d::color_t& color, const f3d::color_t& other, double epsilon) -> bool
+      { return color.compare(other, epsilon); });
 
   emscripten::enum_<f3d::light_type>("LightType")
     .value("HEADLIGHT", f3d::light_type::HEADLIGHT)

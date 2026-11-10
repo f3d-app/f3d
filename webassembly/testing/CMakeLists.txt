@@ -66,6 +66,7 @@ f3d_js_test(NAME "test_skinning")
 f3d_js_test(NAME "test_splats")
 f3d_js_test(NAME "test_custom_canvas" CANVAS_ID "custom_id")
 f3d_js_test(NAME "test_statefile")
+f3d_js_test(NAME "test_types")
 f3d_js_test(NAME "test_viewer_element" USE_UTILS INPUT_PATH "testing/data/cow.vtp")
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)

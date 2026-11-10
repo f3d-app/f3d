@@ -28,4 +28,14 @@ public class Transform2D {
      * @return Transform2D object with computed matrix
      */
     public static native Transform2D create(double[] scale, double[] translate, double angleDeg);
+
+    /**
+     * Compare two transforms using an absolute component tolerance.
+     *
+     * @param other transform to compare against
+     * @param epsilon absolute tolerance for each component
+     * @return true if all components match within tolerance, false if other is null
+     * @throws IllegalArgumentException if either data array does not have exactly 9 elements
+     */
+    public native boolean compare(Transform2D other, double epsilon);
 }
