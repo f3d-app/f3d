@@ -1,13 +1,13 @@
 /**
  * @class   vtkF3DSOGReader
- * @brief   Reader for bundled PlayCanvas SOG files.
+ * @brief   Reader for the SOG file format.
  *
- * SOG (Spatially Ordered Gaussians) stores 3D Gaussian splats as lossless WebP
- * images described by a meta.json. A bundled .sog file is a zip of those files.
- * This reader supports version 2 only. Any other meta.json version fails the whole
- * file. Higher-order spherical harmonics and blind data are ignored, so a version 2
- * file that contains them still loads, with base color only. A loose directory of
- * images is not read.
+ * SOG is the PlayCanvas format for 3D Gaussians. A .sog file is a zip of
+ * lossless WebP images plus meta.json.
+ * Only version 2 is supported. Any other version fails the file.
+ * Higher-order spherical harmonics and blind data are ignored, so a version 2
+ * file that has them still loads, with base color only.
+ * A loose folder of images is not read.
  *
  * @sa https://developer.playcanvas.com/user-manual/gaussian-splatting/formats/sog/
  */
@@ -26,10 +26,11 @@ public:
   vtkTypeMacro(vtkF3DSOGReader, vtkPolyDataAlgorithm);
 
   /**
-   * Return true if the stream looks like a bundled SOG file.
-   * Checks the ZIP local-file magic (PK\x03\x04), then that meta.json is an
-   * entry at the archive root. The stream position is restored. A zip without
-   * that entry returns false.
+   * Return true if, after a quick check of the file header, it looks like the provided stream
+   * can be read. Return false if it is sure it cannot be read as a stream.
+   *
+   * Checks the ZIP magic (PK\x03\x04), then that meta.json is at the archive root.
+   * Puts the stream back afterwards. A zip without that entry does not pass.
    */
   static bool CanReadFile(vtkResourceStream* stream);
 
