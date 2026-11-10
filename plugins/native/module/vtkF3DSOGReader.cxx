@@ -105,8 +105,8 @@ bool ReadImage(vtkF3DArchiveReader* archive, const std::string& name, SogImage& 
 
   int width = 0;
   int height = 0;
-  uint8_t* decoded = WebPDecodeRGBA(
-    reinterpret_cast<const uint8_t*>(bytes.data()), bytes.size(), &width, &height);
+  uint8_t* decoded =
+    WebPDecodeRGBA(reinterpret_cast<const uint8_t*>(bytes.data()), bytes.size(), &width, &height);
   if (!decoded || width <= 0 || height <= 0)
   {
     if (decoded)
@@ -169,9 +169,7 @@ bool DecodeQuaternion(const uint8_t* pixel, std::array<float, 4>& rotation)
   }
 
   const auto component = [](uint8_t channel)
-  {
-    return (static_cast<double>(channel) / 255.0 - 0.5) * 2.0 / std::sqrt(2.0);
-  };
+  { return (static_cast<double>(channel) / 255.0 - 0.5) * 2.0 / std::sqrt(2.0); };
   const double a = component(pixel[0]);
   const double b = component(pixel[1]);
   const double c = component(pixel[2]);
