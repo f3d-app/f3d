@@ -256,6 +256,12 @@ endif ()
 if (F3D_MODULE_FFMPEG)
   target_compile_definitions(libf3d PRIVATE F3D_MODULE_FFMPEG)
 endif ()
+
+# meshoptimizer
+if (F3D_MODULE_MESHOPT)
+  target_compile_definitions(libf3d PRIVATE F3D_MODULE_MESHOPT)
+endif ()
+
 # XR
 if (F3D_MODULE_OPENXR)
   target_compile_definitions(libf3d PRIVATE F3D_MODULE_OPENXR)

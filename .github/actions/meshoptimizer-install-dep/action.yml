@@ -42,7 +42,7 @@ runs:
       uses: actions/cache/restore@v6
       with:
         path: dependencies/meshoptimizer_install
-        key: meshoptimizer-${{steps.meshoptimizer_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-1
+        key: meshoptimizer-${{steps.meshoptimizer_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-0
 
     - name: Checkout meshoptimizer
       if: steps.cache-meshoptimizer.outputs.cache-hit != 'true'
@@ -69,7 +69,6 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../meshoptimizer_install
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-        -DMESHOPT_BUILD_SHARED_LIBS=ON
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
