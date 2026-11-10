@@ -5,9 +5,10 @@
  * SOG is the PlayCanvas format for 3D Gaussians. A .sog file is a zip of
  * lossless WebP images plus meta.json.
  * Only version 2 is supported. Any other version fails the file.
- * Higher-order spherical harmonics and blind data are ignored, so a version 2
- * file that has them still loads, with base color only.
- * A loose folder of images is not read.
+ * shN.bands selects how far it reads, up to degree 3. Bands 1 writes
+ * degree 1, bands 2 writes degrees 1 and 2. Degree 4 is not.
+ * A file with no shN still loads, with base color only.
+ * Blind data is ignored. A loose folder of images is not read.
  *
  * @sa https://developer.playcanvas.com/user-manual/gaussian-splatting/formats/sog/
  */
