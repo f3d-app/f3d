@@ -70,3 +70,25 @@ void vtkF3DGLTFImporter::ImportActors(vtkRenderer* renderer)
   }
 }
 #endif
+
+//------------------------------------------------------------------------------
+bool vtkF3DGLTFImporter::CanReadFile(vtkResourceStream* stream)
+{
+  if (!stream)
+  {
+    return false;
+  }
+
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  vtkNew<vtkF3DGLTFDocumentLoader> loader;
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260212)
+  if (!loader->LoadModelMetaDataFromStream(stream, nullptr, true))
+#else
+  if (!loader->LoadModelMetaDataFromStream(stream))
+#endif
+  {
+    return false;
+  }
+  return true;
+}

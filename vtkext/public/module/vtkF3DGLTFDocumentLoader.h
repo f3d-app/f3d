@@ -8,9 +8,13 @@
 #ifndef vtkF3DGLTFDocumentLoader_h
 #define vtkF3DGLTFDocumentLoader_h
 
-#include <vtkGLTFDocumentLoader.h>
+#include "vtkextModule.h"
 
-class vtkF3DGLTFDocumentLoader : public vtkGLTFDocumentLoader
+/// @cond
+#include <vtkGLTFDocumentLoader.h>
+/// @endcond
+
+class VTKEXT_EXPORT vtkF3DGLTFDocumentLoader : public vtkGLTFDocumentLoader
 {
 public:
   static vtkF3DGLTFDocumentLoader* New();
