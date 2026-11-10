@@ -16,12 +16,10 @@ std::vector<char> DecodeBufferView(
   const vtkGLTFDocumentLoader::BufferView::Extensions::MeshoptCompression& metaData,
   const std::vector<char>& sourceBuffer)
 {
-  if (metaData.ByteOffset < 0 || metaData.ByteLength <= 0 || metaData.Count <= 0 ||
-    metaData.ByteStride <= 0 ||
-    static_cast<size_t>(metaData.ByteOffset) + metaData.ByteLength > sourceBuffer.size())
-  {
-    return {};
-  }
+  assert(metaData.ByteOffset >= 0);
+  assert(metaData.ByteLength > 0);
+  assert(metaData.Count > 0);
+  assert(metaData.ByteStride > 0);
 
   const size_t count = metaData.Count;
   const size_t stride = metaData.ByteStride;
@@ -65,11 +63,6 @@ std::vector<char> DecodeBufferView(
       break;
   }
 
-  if (ret != 0)
-  {
-    return {};
-  }
-
   return decoded;
 }
 #endif
@@ -101,31 +94,16 @@ void vtkF3DGLTFDocumentLoader::PrepareData()
   {
     const auto& metaData = bufferView.ExtensionMetaData.MeshoptMetaData;
 
-    if (metaData.Buffer < 0)
+    if (metaData.Buffer >= 0)
     {
-      continue;
+      // The buffer view now points to the decoded data, replacing the (optional) fallback buffer
+      model->Buffers.emplace_back(::DecodeBufferView(metaData, model->Buffers[metaData.Buffer]));
+      bufferView.Buffer = static_cast<int>(model->Buffers.size() - 1);
+      bufferView.ByteOffset = 0;
+      bufferView.ByteLength = static_cast<int>(model->Buffers.back().size());
+      bufferView.ByteStride =
+        metaData.Mode == BufferView::Extensions::MeshoptMode::ATTRIBUTES ? metaData.ByteStride : 0;
     }
-
-    if (static_cast<size_t>(metaData.Buffer) >= model->Buffers.size())
-    {
-      vtkErrorMacro("Invalid meshopt compressed buffer index: " << metaData.Buffer);
-      continue;
-    }
-
-    std::vector<char> decoded = DecodeBufferView(metaData, model->Buffers[metaData.Buffer]);
-    if (decoded.empty())
-    {
-      vtkErrorMacro("Failed to decode meshopt compressed buffer view");
-      continue;
-    }
-
-    // The buffer view now points to the decoded data, replacing the (optional) fallback buffer
-    model->Buffers.emplace_back(std::move(decoded));
-    bufferView.Buffer = static_cast<int>(model->Buffers.size() - 1);
-    bufferView.ByteOffset = 0;
-    bufferView.ByteLength = static_cast<int>(model->Buffers.back().size());
-    bufferView.ByteStride =
-      metaData.Mode == BufferView::Extensions::MeshoptMode::ATTRIBUTES ? metaData.ByteStride : 0;
   }
 #endif
 }

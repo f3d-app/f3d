@@ -82,6 +82,7 @@
 - UnlitTest.glb: glTF-Sample-Models/Analytical Graphics, Inc.: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - v_rock2.mdl: LibreQuake Project: BSD-3-Clause
 - vase_4comp.vti: VTK Data: BSD-3-Clause
+- vertex_color_meshopt.glb: glTF-Sample-Models/Analytical Graphics, Inc.: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - warsaw_small.las: PDAL: Copyright (c) 2025, Hobu, Inc.
 - WaterBottle.glb: glTF-Sample-Models: Public Domain
 - world\*: VTK Data: BSD-3-Clause
