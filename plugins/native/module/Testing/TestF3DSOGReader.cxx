@@ -56,7 +56,7 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  // CanReadFile has to leave the cursor where it found it.
+  // Start away from 0 so a CanReadFile that forgets to rewind fails.
   stream->Seek(4, vtkResourceStream::SeekDirection::Begin);
   const vtkTypeInt64 position = stream->Tell();
   if (!vtkF3DSOGReader::CanReadFile(stream) || stream->Tell() != position)
@@ -71,7 +71,7 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
 
   vtkPolyData* output = reader->GetOutput();
   vtkPoints* points = output->GetPoints();
-  // 2x2 images, count 3. Gaussian 2 is the first pixel of the second row.
+  // 2x2 images, 3 gaussians. Index 2 is the first pixel of the second row.
   constexpr vtkIdType gaussian = 2;
   if (!points || points->GetDataType() != VTK_FLOAT || points->GetNumberOfPoints() != 3 ||
     !points->GetData() || !points->GetData()->GetName() ||
@@ -81,9 +81,8 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  // mins [0, -ln(2), 0], maxs [ln(2), 0, 1]
-  // low bytes (255, 0, 0), high bytes (255, 0, 128)
-  // q = (65535, 0, 32768) -> (1, -1, exp(32768/65535) - 1)
+  // low (255, 0, 0), high (255, 0, 128)
+  // mins [0, -ln2, 0], maxs [ln2, 0, 1] -> (1, -1, ~0.649)
   double point[3];
   points->GetPoint(gaussian, point);
   if (!::Near("position.x", point[0], 1.0) || !::Near("position.y", point[1], -1.0) ||
@@ -101,10 +100,7 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  // sh0 codebook[0] = 0, codebook[4] = 1, pixel (4, 0, 4, 200)
-  // 0.5 + 0 * SH_C0 = 0.5 -> 127.5, truncated to 127
-  // 0.5 + 1 * 0.28209479177387814 = 0.7820947917738781 -> 199.434..., truncated to 199
-  // version 2 opacity is the alpha byte
+  // pixel (4, 0, 4, 200). codebook 0 -> 127, codebook 1 -> 199. Alpha kept as-is.
   const unsigned char expectedColor[4] = { 199, 127, 199, 200 };
   for (int component = 0; component < 4; ++component)
   {
@@ -125,7 +121,7 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  // codebook[0] = 0, [1] = ln(2), [2] = -ln(2), pixel (1, 2, 0) -> (2, 0.5, 1)
+  // indices (1, 2, 0) are ln2, -ln2, 0 -> (2, 0.5, 1)
   if (!::Near("scale.x", scale->GetTypedComponent(gaussian, 0), 2.0) ||
     !::Near("scale.y", scale->GetTypedComponent(gaussian, 1), 0.5) ||
     !::Near("scale.z", scale->GetTypedComponent(gaussian, 2), 1.0))
@@ -141,9 +137,7 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  // bytes (64, 128, 192, 253): mode 1, so x is the omitted component.
-  // toComp(c) = (c/255 - 0.5) * 2/sqrt(2)
-  // w = toComp(64), x = sqrt(1 - sum of squares), y = toComp(128), z = toComp(192)
+  // (64, 128, 192, 253): mode 1, so the rebuilt component lands in x.
   const double expectedRotation[4] = { -0.35216692090034485, 0.8648770451545715,
     0.0027729677967727184, 0.35771283507347107 };
   for (int component = 0; component < 4; ++component)
