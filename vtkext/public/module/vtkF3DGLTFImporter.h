@@ -28,7 +28,7 @@ public:
    * can be read. Return false if it is sure it cannot be read. The stream version can move the
    * stream cursor, the filename version calls the stream version.
    *
-   * This only checks that the metadata of the file can be loaded using the draco document loader.
+   * This only checks that the metadata of the file can be loaded using the f3d document loader.
    */
   static bool CanReadFile(vtkResourceStream* stream);
 
