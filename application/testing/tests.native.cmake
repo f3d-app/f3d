@@ -64,6 +64,7 @@ if(F3D_MODULE_MESHOPT AND VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261109)
   f3d_test(NAME TestGLTFKHRMeshopt DATA RiggedFigure_khr_meshopt.glb ARGS --animation-time=0.5)
   f3d_test(NAME TestGLTFEXTMeshopt DATA RiggedFigure_ext_meshopt.glb ARGS --animation-time=0.5)
   f3d_test(NAME TestGLTFKHRMeshoptColor DATA vertex_color_meshopt.glb)
+  f3d_test(NAME TestGLTFKHRMeshoptPrims DATA MeshPrimitiveModes_meshopt.glb)
 endif()
 
 f3d_test(NAME TestSPLAT DATA small.splat ARGS -o --coloring-mode=direct --up=-Y --point-sprites-absolute-size --point-sprites-size=1)

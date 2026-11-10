@@ -47,6 +47,7 @@
 - joint1.abc: Public Domain
 - Lantern: glTF-Sample-Models: Public Domain
 - McUSD.usdz: [USD Working Group](https://github.com/usd-wg/assets): CC-NC-BY-SA, textures by [jasonjgardner](https://github.com/jasonjgardner)
+- MeshPrimitiveModes_meshopt.glb: glTF-Sample-Models: Public Domain
 - normal.png: glTF-Sample-Models: Public Domain
 - normalMapping.fbx: assimp test models: BSD-3-Clause; rubberduck: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - nurb.usda: [Arnold USD](https://github.com/Autodesk/arnold-usd): Apache 2.0
