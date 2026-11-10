@@ -393,6 +393,18 @@ f3d_plugin_declare_reader(
   CAN_READ STATIC
 )
 
+if(F3D_MODULE_WEBP)
+  f3d_plugin_declare_reader(
+    NAME SOG
+    EXTENSIONS sog
+    MIMETYPES application/vnd.sog
+    VTK_READER vtkF3DSOGReader
+    FORMAT_DESCRIPTION "Spatially ordered gaussians"
+    SUPPORTS_STREAM
+    CAN_READ STATIC
+  )
+endif()
+
 f3d_plugin_declare_reader(
   NAME Splat
   EXTENSIONS splat

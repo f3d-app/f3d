@@ -32,7 +32,7 @@
   },
   {
     "match-type": "glob",
-    "match": "*.{splat,spz}",
+    "match": "*.{splat,spz,sog}",
     "options": {
       "point-sprites": "gaussian",
       "point-sprites-absolute-size": true,
