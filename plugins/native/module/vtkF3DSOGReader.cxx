@@ -1,11 +1,14 @@
 #include "vtkF3DSOGReader.h"
 
 #include "vtkF3DArchiveReader.h"
+#include "vtkF3DWebPReader.h"
 
 #include <vtkFileResourceStream.h>
 #include <vtkFloatArray.h>
+#include <vtkImageData.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
+#include <vtkMemoryResourceStream.h>
 #include <vtkNew.h>
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
@@ -14,9 +17,9 @@
 #include <vtkResourceStream.h>
 #include <vtkSmartPointer.h>
 #include <vtkUnsignedCharArray.h>
+#include <vtkVersion.h>
 
 #include <nlohmann/json.hpp>
-#include <webp/decode.h>
 
 #include <algorithm>
 #include <array>
@@ -27,12 +30,24 @@
 
 namespace
 {
-struct SogImage
+// SetBuffer does not copy.
+struct Image
 {
-  int Width = 0;
-  int Height = 0;
-  std::vector<uint8_t> Pixels;
+  std::vector<char> Bytes;
+  vtkSmartPointer<vtkImageData> Data;
 };
+
+//----------------------------------------------------------------------------
+int Width(const Image& image)
+{
+  return image.Data->GetDimensions()[0];
+}
+
+//----------------------------------------------------------------------------
+int Height(const Image& image)
+{
+  return image.Data->GetDimensions()[1];
+}
 
 //----------------------------------------------------------------------------
 bool ReadFiles(const nlohmann::json& node, std::size_t count, std::vector<std::string>& names)
@@ -95,44 +110,55 @@ bool ReadCodebook(const nlohmann::json& node, std::array<double, 256>& codebook)
 }
 
 //----------------------------------------------------------------------------
-bool ReadImage(vtkF3DArchiveReader* archive, const std::string& name, SogImage& image)
+bool ReadImage(vtkF3DArchiveReader* archive, const std::string& name, Image& image)
 {
-  std::vector<char> bytes;
-  if (!archive->Extract(name, bytes) || bytes.empty())
+  if (!archive->Extract(name, image.Bytes) || image.Bytes.empty())
   {
     return false;
   }
 
-  int width = 0;
-  int height = 0;
-  uint8_t* decoded =
-    WebPDecodeRGBA(reinterpret_cast<const uint8_t*>(bytes.data()), bytes.size(), &width, &height);
-  if (!decoded || width <= 0 || height <= 0)
+  vtkNew<vtkF3DWebPReader> webp;
+  // vtkImageReader2 errors if FileName is empty, even with a stream.
+  webp->SetFileName(name.c_str());
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+  vtkNew<vtkMemoryResourceStream> stream;
+  stream->SetBuffer(image.Bytes.data(), image.Bytes.size());
+  webp->SetStream(stream);
+#else
+  webp->SetMemoryBuffer(image.Bytes.data());
+  webp->SetMemoryBufferLength(static_cast<vtkIdType>(image.Bytes.size()));
+#endif
+  webp->Update();
+
+  image.Data = webp->GetOutput();
+  if (!image.Data)
   {
-    if (decoded)
-    {
-      WebPFree(decoded);
-    }
     return false;
   }
 
-  const std::size_t byteCount =
-    static_cast<std::size_t>(width) * static_cast<std::size_t>(height) * 4;
-  image.Width = width;
-  image.Height = height;
-  image.Pixels.assign(decoded, decoded + byteCount);
-  WebPFree(decoded);
-  return true;
+  const int width = ::Width(image);
+  const int height = ::Height(image);
+  if (width <= 0 || height <= 0)
+  {
+    return false;
+  }
+
+  vtkUnsignedCharArray* scalars =
+    vtkUnsignedCharArray::SafeDownCast(image.Data->GetPointData()->GetScalars());
+  const vtkIdType valueCount = static_cast<vtkIdType>(width) * static_cast<vtkIdType>(height) * 4;
+  return scalars && scalars->GetNumberOfComponents() == 4 &&
+    scalars->GetNumberOfValues() >= valueCount;
 }
 
 //----------------------------------------------------------------------------
-const uint8_t* Pixel(const SogImage& image, vtkIdType index)
+const uint8_t* Pixel(const Image& image, vtkIdType index)
 {
-  return image.Pixels.data() + static_cast<std::size_t>(index) * 4;
+  vtkUnsignedCharArray* scalars =
+    vtkUnsignedCharArray::SafeDownCast(image.Data->GetPointData()->GetScalars());
+  return scalars->GetPointer(static_cast<vtkIdType>(static_cast<std::size_t>(index) * 4));
 }
 
 //----------------------------------------------------------------------------
-// Section 3.1 Positions. 16 bits per axis, then sign(n) * (exp(|n|) - 1).
 float DecodePosition(uint8_t low, uint8_t high, double minimum, double maximum)
 {
   const unsigned int quantized = (static_cast<unsigned int>(high) << 8) | low;
@@ -143,14 +169,12 @@ float DecodePosition(uint8_t low, uint8_t high, double minimum, double maximum)
 }
 
 //----------------------------------------------------------------------------
-// Section 3.3 Scales. The codebook is log-domain.
 float DecodeScale(double coefficient)
 {
   return static_cast<float>(std::exp(coefficient));
 }
 
 //----------------------------------------------------------------------------
-// Section 3.4 Base color. SH_C0 = 1 / (2 * sqrt(pi)). Truncate to a byte, as SPZ does.
 unsigned char DecodeColor(double coefficient)
 {
   constexpr double shC0 = 0.28209479177387814;
@@ -159,7 +183,24 @@ unsigned char DecodeColor(double coefficient)
 }
 
 //----------------------------------------------------------------------------
-// Section 3.2 Version 2 smallest-three quaternion, stored (w, x, y, z).
+unsigned char QuantizeCoefficient(double coefficient)
+{
+  const double scaled = std::round((coefficient + 1.0) / 2.0 * 255.0);
+  return static_cast<unsigned char>(std::clamp(scaled, 0.0, 255.0));
+}
+
+//----------------------------------------------------------------------------
+int CoefficientCount(int bands)
+{
+  constexpr int countByBand[4] = { 0, 3, 8, 15 };
+  return countByBand[bands];
+}
+
+//----------------------------------------------------------------------------
+constexpr const char* ShNames[15] = { "sh1m1", "sh10", "sh1p1", "sh2m2", "sh2m1", "sh20", "sh2p1",
+  "sh2p2", "sh3m3", "sh3m2", "sh3m1", "sh30", "sh3p1", "sh3p2", "sh3p3" };
+
+//----------------------------------------------------------------------------
 bool DecodeQuaternion(const uint8_t* pixel, std::array<float, 4>& rotation)
 {
   const int mode = static_cast<int>(pixel[3]) - 252;
@@ -293,10 +334,15 @@ int vtkF3DSOGReader::RequestData(
   std::vector<std::string> scaleFiles;
   std::vector<std::string> quatFiles;
   std::vector<std::string> sh0Files;
+  std::vector<std::string> shNFiles;
   std::array<double, 256> scaleCodebook{};
   std::array<double, 256> sh0Codebook{};
+  std::array<double, 256> shNCodebook{};
   double mins[3] = { 0.0, 0.0, 0.0 };
   double maxs[3] = { 0.0, 0.0, 0.0 };
+  bool hasSH = false;
+  int bands = 0;
+  std::int64_t shCount = 0;
 
   try
   {
@@ -312,8 +358,7 @@ int vtkF3DSOGReader::RequestData(
       return 0;
     }
 
-    // Names come from each files array. Order is significant: means files are
-    // low byte, then high byte. The names themselves are not fixed.
+    // means files are low byte, then high byte
     if (!meta.contains("means") || !::ReadFiles(meta["means"], 2, meansFiles) ||
       !::ReadRange(meta["means"], "mins", mins) || !::ReadRange(meta["means"], "maxs", maxs) ||
       !meta.contains("scales") || !::ReadFiles(meta["scales"], 1, scaleFiles) ||
@@ -324,6 +369,34 @@ int vtkF3DSOGReader::RequestData(
       vtkErrorMacro("Invalid SOG meta.json");
       return 0;
     }
+
+    // shN files are the centroid palette, then the label
+    hasSH = meta.contains("shN");
+    if (hasSH)
+    {
+      const nlohmann::json& shN = meta["shN"];
+      if (!shN.is_object() || !shN.contains("bands") || !shN["bands"].is_number_integer() ||
+        !shN.contains("count") || !shN["count"].is_number_integer())
+      {
+        vtkErrorMacro("Invalid SOG meta.json");
+        return 0;
+      }
+
+      bands = shN["bands"].get<int>();
+      shCount = shN["count"].get<std::int64_t>();
+      if (bands < 1 || bands > 3)
+      {
+        vtkErrorMacro(
+          "Incompatible SOG spherical harmonics. Only degrees 1 through 3 are supported");
+        return 0;
+      }
+      if (shCount < 1 || shCount > 65536 || !::ReadFiles(shN, 2, shNFiles) ||
+        !::ReadCodebook(shN, shNCodebook))
+      {
+        vtkErrorMacro("Invalid SOG meta.json");
+        return 0;
+      }
+    }
   }
   catch (const nlohmann::json::exception&)
   {
@@ -331,13 +404,15 @@ int vtkF3DSOGReader::RequestData(
     return 0;
   }
 
-  ::SogImage meansLow;
-  ::SogImage meansHigh;
-  ::SogImage scales;
-  ::SogImage quats;
-  ::SogImage sh0;
+  ::Image meansLow;
+  ::Image meansHigh;
+  ::Image scales;
+  ::Image quats;
+  ::Image sh0;
+  ::Image shCentroids;
+  ::Image shLabels;
 
-  const auto readImage = [&](const std::string& name, ::SogImage& image)
+  const auto readImage = [&](const std::string& name, ::Image& image)
   {
     if (!::ReadImage(archive, name, image))
     {
@@ -349,16 +424,18 @@ int vtkF3DSOGReader::RequestData(
 
   if (!readImage(meansFiles[0], meansLow) || !readImage(meansFiles[1], meansHigh) ||
     !readImage(scaleFiles[0], scales) || !readImage(quatFiles[0], quats) ||
-    !readImage(sh0Files[0], sh0))
+    !readImage(sh0Files[0], sh0) ||
+    (hasSH && (!readImage(shNFiles[0], shCentroids) || !readImage(shNFiles[1], shLabels))))
   {
     return 0;
   }
 
-  const int width = meansLow.Width;
-  const int height = meansLow.Height;
-  if (meansHigh.Width != width || meansHigh.Height != height || scales.Width != width ||
-    scales.Height != height || quats.Width != width || quats.Height != height ||
-    sh0.Width != width || sh0.Height != height)
+  const int width = ::Width(meansLow);
+  const int height = ::Height(meansLow);
+  if (::Width(meansHigh) != width || ::Height(meansHigh) != height || ::Width(scales) != width ||
+    ::Height(scales) != height || ::Width(quats) != width || ::Height(quats) != height ||
+    ::Width(sh0) != width || ::Height(sh0) != height ||
+    (hasSH && (::Width(shLabels) != width || ::Height(shLabels) != height)))
   {
     vtkErrorMacro("SOG images do not share one width and height");
     return 0;
@@ -394,9 +471,17 @@ int vtkF3DSOGReader::RequestData(
   rotationArray->SetNumberOfTuples(count);
   rotationArray->SetName("rotation");
 
+  const int numCoeffs = hasSH ? ::CoefficientCount(bands) : 0;
+  vtkNew<vtkUnsignedCharArray> shArrays[15];
+  for (int coefficient = 0; coefficient < numCoeffs; ++coefficient)
+  {
+    shArrays[coefficient]->SetNumberOfComponents(3);
+    shArrays[coefficient]->SetNumberOfTuples(count);
+    shArrays[coefficient]->SetName(::ShNames[coefficient]);
+  }
+
   for (vtkIdType splatIndex = 0; splatIndex < count; ++splatIndex)
   {
-    // Same order WebPDecodeRGBA returns: x = i % width, y = i / width, top row first.
     const uint8_t* low = ::Pixel(meansLow, splatIndex);
     const uint8_t* high = ::Pixel(meansHigh, splatIndex);
     const float position[3] = { ::DecodePosition(low[0], high[0], mins[0], maxs[0]),
@@ -422,6 +507,32 @@ int vtkF3DSOGReader::RequestData(
       return 0;
     }
     rotationArray->SetTypedTuple(splatIndex, rotation.data());
+
+    if (hasSH)
+    {
+      const uint8_t* labelPixel = ::Pixel(shLabels, splatIndex);
+      const unsigned int label =
+        static_cast<unsigned int>(labelPixel[0]) + (static_cast<unsigned int>(labelPixel[1]) << 8);
+      const int xOrigin = static_cast<int>(label % 64) * numCoeffs;
+      const int y = static_cast<int>(label / 64);
+      if (label >= static_cast<unsigned int>(shCount) || y < 0 || y >= ::Height(shCentroids) ||
+        xOrigin < 0 || xOrigin + numCoeffs > ::Width(shCentroids))
+      {
+        vtkErrorMacro("Invalid SOG spherical harmonics");
+        return 0;
+      }
+
+      for (int coefficient = 0; coefficient < numCoeffs; ++coefficient)
+      {
+        const vtkIdType centroidIndex = static_cast<vtkIdType>(y) * ::Width(shCentroids) +
+          static_cast<vtkIdType>(xOrigin + coefficient);
+        const uint8_t* centroid = ::Pixel(shCentroids, centroidIndex);
+        const unsigned char quantized[3] = { ::QuantizeCoefficient(shNCodebook[centroid[0]]),
+          ::QuantizeCoefficient(shNCodebook[centroid[1]]),
+          ::QuantizeCoefficient(shNCodebook[centroid[2]]) };
+        shArrays[coefficient]->SetTypedTuple(splatIndex, quantized);
+      }
+    }
   }
 
   vtkNew<vtkPoints> points;
@@ -432,6 +543,10 @@ int vtkF3DSOGReader::RequestData(
   output->GetPointData()->SetScalars(colorArray);
   output->GetPointData()->AddArray(scaleArray);
   output->GetPointData()->AddArray(rotationArray);
+  for (int coefficient = 0; coefficient < numCoeffs; ++coefficient)
+  {
+    output->GetPointData()->AddArray(shArrays[coefficient]);
+  }
   return 1;
 }
 

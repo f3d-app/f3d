@@ -56,7 +56,6 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  // Start away from 0 so a CanReadFile that forgets to rewind fails.
   stream->Seek(4, vtkResourceStream::SeekDirection::Begin);
   const vtkTypeInt64 position = stream->Tell();
   if (!vtkF3DSOGReader::CanReadFile(stream) || stream->Tell() != position)
@@ -71,7 +70,6 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
 
   vtkPolyData* output = reader->GetOutput();
   vtkPoints* points = output->GetPoints();
-  // 2x2 images, 3 gaussians. Index 2 is the first pixel of the second row.
   constexpr vtkIdType gaussian = 2;
   if (!points || points->GetDataType() != VTK_FLOAT || points->GetNumberOfPoints() != 3 ||
     !points->GetData() || !points->GetData()->GetName() ||
@@ -81,8 +79,6 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  // low (255, 0, 0), high (255, 0, 128)
-  // mins [0, -ln2, 0], maxs [ln2, 0, 1] -> (1, -1, ~0.649)
   double point[3];
   points->GetPoint(gaussian, point);
   if (!::Near("position.x", point[0], 1.0) || !::Near("position.y", point[1], -1.0) ||
@@ -100,7 +96,6 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  // pixel (4, 0, 4, 200). codebook 0 -> 127, codebook 1 -> 199. Alpha kept as-is.
   const unsigned char expectedColor[4] = { 199, 127, 199, 200 };
   for (int component = 0; component < 4; ++component)
   {
@@ -121,7 +116,6 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  // indices (1, 2, 0) are ln2, -ln2, 0 -> (2, 0.5, 1)
   if (!::Near("scale.x", scale->GetTypedComponent(gaussian, 0), 2.0) ||
     !::Near("scale.y", scale->GetTypedComponent(gaussian, 1), 0.5) ||
     !::Near("scale.z", scale->GetTypedComponent(gaussian, 2), 1.0))
@@ -137,7 +131,6 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  // (64, 128, 192, 253): mode 1, so the rebuilt component lands in x.
   const double expectedRotation[4] = { -0.35216692090034485, 0.8648770451545715,
     0.0027729677967727184, 0.35771283507347107 };
   for (int component = 0; component < 4; ++component)
@@ -147,6 +140,53 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     {
       return EXIT_FAILURE;
     }
+  }
+
+  if (output->GetPointData()->GetArray("sh1m1"))
+  {
+    std::cerr << "tiny.sog has no shN, so there should be no sh1m1\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!stream->Open((data + "tiny_sh.sog").c_str()))
+  {
+    std::cerr << "Cannot open tiny_sh.sog\n";
+    return EXIT_FAILURE;
+  }
+
+  vtkNew<vtkF3DSOGReader> shReader;
+  shReader->SetStream(stream);
+  if (!shReader->Update())
+  {
+    std::cerr << "tiny_sh.sog did not load\n";
+    return EXIT_FAILURE;
+  }
+
+  vtkUnsignedCharArray* sh1m1 =
+    vtkUnsignedCharArray::SafeDownCast(shReader->GetOutput()->GetPointData()->GetArray("sh1m1"));
+  if (!sh1m1 || sh1m1->GetNumberOfComponents() != 3 || sh1m1->GetNumberOfTuples() != 3)
+  {
+    std::cerr << "Unexpected sh1m1 array\n";
+    return EXIT_FAILURE;
+  }
+
+  const unsigned char expectedSH[3] = { 255, 0, 128 };
+  for (int component = 0; component < 3; ++component)
+  {
+    const unsigned char value = sh1m1->GetTypedComponent(gaussian, component);
+    if (value != expectedSH[component])
+    {
+      std::cerr << "sh1m1[" << component << "]: expected "
+                << static_cast<int>(expectedSH[component]) << " got " << static_cast<int>(value)
+                << "\n";
+      return EXIT_FAILURE;
+    }
+  }
+
+  if (shReader->GetOutput()->GetPointData()->GetArray("sh2m2"))
+  {
+    std::cerr << "bands 1 should not write sh2\n";
+    return EXIT_FAILURE;
   }
 
   if (!stream->Open((data + "cube_gears.3mf").c_str()))

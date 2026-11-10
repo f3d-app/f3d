@@ -18,8 +18,6 @@ vtk_module_add_module(f3d::vtkextNative
 vtk_module_set_properties(f3d::vtkextNative CXX_STANDARD 20)
 
 if(F3D_MODULE_WEBP)
-  find_package(WebP REQUIRED)
-  vtk_module_link(f3d::vtkextNative PRIVATE WebP::webp)
   if(F3D_USE_EXTERNAL_NLOHMANN_JSON)
     vtk_module_link(f3d::vtkextNative PRIVATE nlohmann_json::nlohmann_json)
   else()
