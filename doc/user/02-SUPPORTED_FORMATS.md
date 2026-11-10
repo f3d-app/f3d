@@ -49,6 +49,7 @@ F3D supports the following file formats:
 | Industry Foundation Classes               | `.ifc`                                         | No         | NONE              | YES               | `webifc`  | `IFC`                   |
 | 3D Gaussian splatting                     | `.splat`                                       | No         | NONE              | YES (VTK 9.5)     | `native`  | `Splat`                 |
 | Compressed 3D Gaussian splatting          | `.spz`                                         | No         | NONE              | YES (VTK 9.5)     | `native`  | `SPZ`                   |
+| Spatially Ordered Gaussians               | `.sog`                                         | No         | NONE              | YES (VTK 9.5)     | `native`  | `SOG`                   |
 | LASer format for lidar point cloud        | `.las`, `.laz`                                 | No         | NONE              | NO                | `pdal`    | `LAS`                   |
 | Binary Point File                         | `.bpf`                                         | No         | NONE              | NO                | `pdal`    | `BinaryPointFile`       |
 | TerraScan binary files                    | `.bin`                                         | No         | NONE              | NO                | `pdal`    | `TerraScanBIN`          |
@@ -113,13 +114,14 @@ For booleans, 0 means false and any other value means true. Unsigned int interpr
 
 ### 3D Gaussian splatting
 
-F3D supports 4 different formats:
+F3D supports 5 different formats:
 
 - `.ply`: Original 3DGS format
 - `.splat`: Format specified by the [splat repository](https://github.com/antimatter15/splat). Does not support spherical harmonics.
 - `.spz`: Niantic's [SPZ format](https://github.com/nianticlabs/spz) (v2 and v3)
+- `.sog`: PlayCanvas [SOG format](https://developer.playcanvas.com/user-manual/gaussian-splatting/formats/sog/) (version 2 only)
 - `.gltf`/`.glb`: GLTF with KHR_gaussian_splatting extension
 
 No config files come with the `.ply` format because this format is not dedicated to 3DGS only.
-If you use `.ply` for 3DGS only, set up a config file similar to what is done for `.splat` or `.spz`.
+If you use `.ply` for 3DGS only, set up a config file similar to what is done for `.splat`, `.spz`, or `.sog`.
 See the [configuration file documentation](06-CONFIGURATION_FILE.md).

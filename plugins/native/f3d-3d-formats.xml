@@ -45,4 +45,8 @@
     <comment>Compressed 3D gaussian splats</comment>
     <glob pattern="*.spz"/>
   </mime-type>
+  <mime-type type="application/vnd.sog">
+    <comment>Spatially ordered gaussians</comment>
+    <glob pattern="*.sog"/>
+  </mime-type>
 </mime-info>
