@@ -60,6 +60,8 @@ Some modules, plugins and language bindings depending on external libraries can 
 - `F3D_MODULE_ANARI`: **Experimental** support for ANARI rendering. Requires that VTK has been built with `RenderingAnariOpenGL` turned on. Disabled by default.
 - `F3D_MODULE_RAYTRACING`: Support for raytracing rendering. Requires that VTK has been built with `OSPRay` and `RenderingRayTracing` turned on. Disabled by default.
 - `F3D_MODULE_EXR`: Support for OpenEXR images. Requires `OpenEXR`. Disabled by default.
+- `F3D_MODULE_FFMPEG`: Support for FFMpeg video streaming. Requires `FFMpeg`. Disabled by default.
+- `F3D_MODULE_MESHOPT`: Support for meshoptimizer. Requires `meshoptimizer`. Disabled by default.
 - `F3D_MODULE_UI`: Support for ImGui widgets. Uses provided ImGui. Enabled by default.
 - `F3D_MODULE_WEBP`: Support for WebP images. Requires `libwebp`. Disabled by default.
 - `F3D_MODULE_CLIP`: Support for clipboard interaction in libf3d, used by `engine::state` and by the application to save/load statefiles to/from the system clipboard. Uses provided clip. Enabled by default.

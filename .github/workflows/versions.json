@@ -63,6 +63,10 @@
     "version": "25.0.7",
     "min_version": "24.3.4"
   },
+  "meshoptimizer": {
+    "version": "v1.3",
+    "min_version": "v1.0"
+  },
   "occt": {
     "version": "V8_0_1",
     "min_version": "V7_6_3"
@@ -131,8 +135,8 @@
     "version": "v1.3.2",
     "min_version": "v1.2.13"
   },
-  "vtk_commit_sha": "291682726ea9dfd1a481eb0c4deaa7a6df5f6d4f",
-  "docker_timestamp": "20261103_0",
+  "vtk_commit_sha": "f5469839f85929e7bf9507bb873fb33b41710ad1",
+  "docker_timestamp": "20261109_0",
   "global_cache_index": "3",
   "vtk_matrix": "['commit', 'v9.7.1', 'v9.6.2', 'v9.5.2']"
 }

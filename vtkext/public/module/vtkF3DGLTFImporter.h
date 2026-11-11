@@ -23,9 +23,23 @@ public:
   static vtkF3DGLTFImporter* New();
   vtkTypeMacro(vtkF3DGLTFImporter, vtkGLTFImporter);
 
+  /**
+   * Return true if, after a quick check of file header, it looks like the provided stream
+   * can be read. Return false if it is sure it cannot be read. The stream version can move the
+   * stream cursor, the filename version calls the stream version.
+   *
+   * This only checks that the metadata of the file can be loaded using the f3d document loader.
+   */
+  static bool CanReadFile(vtkResourceStream* stream);
+
 protected:
   vtkF3DGLTFImporter();
   ~vtkF3DGLTFImporter() override = default;
+
+  /**
+   * Overridden to instantiate our own document loader
+   */
+  void InitializeLoader() override;
 
   /**
    * This method is reimplemented to add information to the actor in order

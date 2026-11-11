@@ -47,6 +47,7 @@
 - joint1.abc: Public Domain
 - Lantern: glTF-Sample-Models: Public Domain
 - McUSD.usdz: [USD Working Group](https://github.com/usd-wg/assets): CC-NC-BY-SA, textures by [jasonjgardner](https://github.com/jasonjgardner)
+- MeshPrimitiveModes_meshopt.glb: glTF-Sample-Models: Public Domain
 - normal.png: glTF-Sample-Models: Public Domain
 - normalMapping.fbx: assimp test models: BSD-3-Clause; rubberduck: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - nurb.usda: [Arnold USD](https://github.com/Autodesk/arnold-usd): Apache 2.0
@@ -82,6 +83,7 @@
 - UnlitTest.glb: glTF-Sample-Models/Analytical Graphics, Inc.: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - v_rock2.mdl: LibreQuake Project: BSD-3-Clause
 - vase_4comp.vti: VTK Data: BSD-3-Clause
+- vertex_color_meshopt.glb: glTF-Sample-Models/Analytical Graphics, Inc.: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - warsaw_small.las: PDAL: Copyright (c) 2025, Hobu, Inc.
 - WaterBottle.glb: glTF-Sample-Models: Public Domain
 - world\*: VTK Data: BSD-3-Clause

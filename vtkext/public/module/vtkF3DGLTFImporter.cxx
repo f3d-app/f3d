@@ -1,5 +1,6 @@
 #include "vtkF3DGLTFImporter.h"
 
+#include "vtkF3DGLTFDocumentLoader.h"
 #include "vtkF3DImporter.h"
 
 #include <vtkActor.h>
@@ -22,6 +23,12 @@ vtkStandardNewMacro(vtkF3DGLTFImporter);
 vtkF3DGLTFImporter::vtkF3DGLTFImporter()
 {
   this->SetImportArmature(true);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DGLTFImporter::InitializeLoader()
+{
+  this->Loader = vtkSmartPointer<vtkF3DGLTFDocumentLoader>::New();
 }
 
 //----------------------------------------------------------------------------
@@ -63,3 +70,25 @@ void vtkF3DGLTFImporter::ImportActors(vtkRenderer* renderer)
   }
 }
 #endif
+
+//------------------------------------------------------------------------------
+bool vtkF3DGLTFImporter::CanReadFile(vtkResourceStream* stream)
+{
+  if (!stream)
+  {
+    return false;
+  }
+
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  vtkNew<vtkF3DGLTFDocumentLoader> loader;
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260212)
+  if (!loader->LoadModelMetaDataFromStream(stream, nullptr, true))
+#else
+  if (!loader->LoadModelMetaDataFromStream(stream))
+#endif
+  {
+    return false;
+  }
+  return true;
+}
