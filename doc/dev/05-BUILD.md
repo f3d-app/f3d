@@ -11,7 +11,7 @@ please take a look at our [getting started guide](04-GETTING_STARTED.md).
 ## Dependencies
 
 - [CMake](https://cmake.org) >= 3.21.
-- [VTK](https://vtk.org) >= 9.5.0 (9.7.1 recommended).
+- [VTK](https://vtk.org) >= 9.5.0 (9.7.2 recommended).
 - A C++20 compiler.
 - A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
 - Optionally, [Alembic](http://www.alembic.io/) >= 1.8.5.
@@ -36,7 +36,7 @@ Exact tested versions can be found in `.github/workflows/versions.json`.
 
 ## VTK compatibility
 
-As stated in the dependencies, F3D is compatible with VTK >= 9.5.0, however, some features may not be available. We suggest using VTK 9.7.1 with RenderingRayTracing, IOExodus, IOHDF, IONetCDF, IOPDAL and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
+As stated in the dependencies, F3D is compatible with VTK >= 9.5.0, however, some features may not be available. We suggest using VTK 9.7.2 with RenderingRayTracing, IOExodus, IOHDF, IONetCDF, IOPDAL and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
 
 > NOTE: When VTK is compiled for GLES (usually the case for Android and WebAssembly only), F3D is only compatible with the VTK version specified in `.github/workflows/versions.json` file.
 
