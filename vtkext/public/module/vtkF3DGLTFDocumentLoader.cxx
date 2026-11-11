@@ -28,13 +28,11 @@ std::vector<char> DecodeBufferView(
     reinterpret_cast<const unsigned char*>(sourceBuffer.data()) + metaData.ByteOffset;
 
   std::vector<char> decoded(count * stride);
-  int ret = -1;
 
   switch (metaData.Mode)
   {
     case vtkGLTFDocumentLoader::BufferView::Extensions::MeshoptMode::ATTRIBUTES:
-      ret = meshopt_decodeVertexBuffer(decoded.data(), count, stride, source, sourceSize);
-      if (ret == 0)
+      if (meshopt_decodeVertexBuffer(decoded.data(), count, stride, source, sourceSize) == 0)
       {
         switch (metaData.Filter)
         {
@@ -56,10 +54,10 @@ std::vector<char> DecodeBufferView(
       }
       break;
     case vtkGLTFDocumentLoader::BufferView::Extensions::MeshoptMode::TRIANGLES:
-      ret = meshopt_decodeIndexBuffer(decoded.data(), count, stride, source, sourceSize);
+      meshopt_decodeIndexBuffer(decoded.data(), count, stride, source, sourceSize);
       break;
     case vtkGLTFDocumentLoader::BufferView::Extensions::MeshoptMode::INDICES:
-      ret = meshopt_decodeIndexSequence(decoded.data(), count, stride, source, sourceSize);
+      meshopt_decodeIndexSequence(decoded.data(), count, stride, source, sourceSize);
       break;
   }
 
