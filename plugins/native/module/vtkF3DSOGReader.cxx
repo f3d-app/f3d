@@ -118,8 +118,6 @@ bool ReadImage(vtkF3DArchiveReader* archive, const std::string& name, Image& ima
   }
 
   vtkNew<vtkF3DWebPReader> webp;
-  // vtkImageReader2 errors if FileName is empty, even with a stream.
-  webp->SetFileName(name.c_str());
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
   vtkNew<vtkMemoryResourceStream> stream;
   stream->SetBuffer(image.Bytes.data(), image.Bytes.size());
