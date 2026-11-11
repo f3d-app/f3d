@@ -171,7 +171,6 @@ if(NOT F3D_MACOS_BUNDLE)
       f3d_test(NAME TestDefaultConfigFileEXR DATA Rec709.exr CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
     endif()
     f3d_test(NAME TestDefaultConfigFilePLY DATA suzanneRGBA.ply CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
-    f3d_test(NAME TestDefaultConfigFileQuakeMDL DATA zombie.mdl CONFIG config_build LONG_TIMEOUT UI SKIP_GLES THRESHOLD 0.07) # Threshold is needed for IBL change after VTK 9.6
     f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y --camera-direction=-1,0.5,-1 CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
     f3d_test(NAME TestDefaultConfigTranslucent DATA red_translucent_monkey.gltf CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
     f3d_test(NAME TestDefaultConfigRemoveEmptyFileGroups DATA invalid_body.vtp cow.vtp CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
@@ -190,5 +189,11 @@ if(NOT F3D_MACOS_BUNDLE)
   if(F3D_MODULE_WEBP)
     f3d_test(NAME TestThumbnailConfigFileWebP DATA image.webp CONFIG thumbnail_build LONG_TIMEOUT THRESHOLD 0.07 DEFAULT_HDRI) # Threshold is needed even for newer VTK
   endif()
-  f3d_test(NAME TestThumbnailConfigFileQuakeMDL DATA zombie.mdl CONFIG thumbnail_build LONG_TIMEOUT THRESHOLD 0.07 DEFAULT_HDRI SKIP_GLES) # Threshold is needed for IBL change after VTK 9.6
+
+  # Specular has been modified at grazing angles for when F0 != 0.04
+  # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13970
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261110)
+    f3d_test(NAME TestDefaultConfigFileQuakeMDL DATA zombie.mdl CONFIG config_build LONG_TIMEOUT UI SKIP_GLES THRESHOLD 0.07) # Threshold is needed for IBL change after VTK 9.6
+    f3d_test(NAME TestThumbnailConfigFileQuakeMDL DATA zombie.mdl CONFIG thumbnail_build LONG_TIMEOUT THRESHOLD 0.07 DEFAULT_HDRI SKIP_GLES) # Threshold is needed for IBL change after VTK 9.6
+  endif()
 endif()
