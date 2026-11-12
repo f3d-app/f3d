@@ -3385,8 +3385,8 @@ void vtkF3DRenderer::ConfigurePointSprites()
     sprites.Mapper->SetLowpassMatrix(lowPass);
 
     vtkPolyData* polyData = vtkPolyData::SafeDownCast(sprites.Mapper->GetInput());
-    char* scaleArray = sprites.Mapper->GetScaleArray();
-    char* rotationArray = sprites.Mapper->GetRotationArray();
+    const char* scaleArray = sprites.Mapper->GetScaleArray();
+    const char* rotationArray = sprites.Mapper->GetRotationArray();
     if (polyData && (scaleArray || polyData->GetPointData()->HasArray("scale")) &&
       (rotationArray || polyData->GetPointData()->HasArray("rotation")))
     {

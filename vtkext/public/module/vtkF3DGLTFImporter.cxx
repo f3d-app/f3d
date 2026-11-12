@@ -78,7 +78,7 @@ void vtkF3DGLTFImporter::ImportActors(vtkRenderer* renderer)
 //------------------------------------------------------------------------------
 int vtkF3DGLTFImporter::ImportBegin()
 {
-  int ret = this->Superclass::ImportBegin();
+  const int ret = this->Superclass::ImportBegin();
 
   if (ret != 0)
   {
@@ -95,7 +95,7 @@ int vtkF3DGLTFImporter::ImportBegin()
         // format expected by F3D point splat mapper.
         auto convertSH = [&](const std::string& floatArrayName, const std::string& ucharArrayName)
         {
-          vtkFloatArray* floatArray =
+          const vtkFloatArray* floatArray =
             vtkFloatArray::SafeDownCast(pointData->GetArray(floatArrayName.c_str()));
           if (floatArray)
           {
