@@ -203,8 +203,7 @@ EMSCRIPTEN_BINDINGS(f3d)
     .constructor<>()
     .property(
       "points",
-      +[](const f3d::mesh_t& mesh) -> emscripten::val
-      {
+      +[](const f3d::mesh_t& mesh) -> emscripten::val {
         return emscripten::val(
           emscripten::typed_memory_view(mesh.points.size(), mesh.points.data()));
       },
