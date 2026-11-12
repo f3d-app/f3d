@@ -577,6 +577,16 @@ bool vtkF3DMetaImporter::Update()
       this->Renderer->AddActor(pss.Actor);
       pss.Actor->VisibilityOff();
 
+      // copy anisotropic settings from the original actor's mapper if available
+      vtkPointGaussianMapper* originalSplatMapper =
+        vtkPointGaussianMapper::SafeDownCast(pss.OriginalActor->GetMapper());
+      if (originalSplatMapper)
+      {
+        pss.Mapper->SetAnisotropic(originalSplatMapper->GetAnisotropic());
+        pss.Mapper->SetScaleArray(originalSplatMapper->GetScaleArray());
+        pss.Mapper->SetRotationArray(originalSplatMapper->GetRotationArray());
+      }
+
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
       // the point mapper doesn't support shadows, so we exclude it from shadow receivers
       const vtkNew<vtkInformation> keys;

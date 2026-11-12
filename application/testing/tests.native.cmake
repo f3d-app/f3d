@@ -60,11 +60,21 @@ else()
 endif()
 f3d_test(NAME TestVerboseQuakeMDLInvalid ARGS --verbose --force-reader=QuakeMDL DATA invalid_version.mdl REGEXP ${_FORCE_READER_MDL_REGEXP} NO_BASELINE)
 
+# https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13979
 if(F3D_MODULE_MESHOPT AND VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261109)
   f3d_test(NAME TestGLTFKHRMeshopt DATA RiggedFigure_khr_meshopt.glb ARGS --animation-time=0.5)
   f3d_test(NAME TestGLTFEXTMeshopt DATA RiggedFigure_ext_meshopt.glb ARGS --animation-time=0.5)
   f3d_test(NAME TestGLTFKHRMeshoptColor DATA vertex_color_meshopt.glb)
   f3d_test(NAME TestGLTFKHRMeshoptPrims DATA MeshPrimitiveModes_meshopt.glb)
+endif()
+
+# https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13983
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261111)
+  f3d_test(NAME TestGLTFKHRGaussianSplatting DATA bonsai_small.glb ARGS --blending=sort_cpu SKIP_GLES) # Sort isn't supported in GLES
+
+  if(F3D_MODULE_MESHOPT)
+    f3d_test(NAME TestGLTFKHRMeshoptAndGaussianSplatting DATA bonsai_small_meshopt.glb ARGS --blending=sort_cpu SKIP_GLES) # Sort isn't supported in GLES
+  endif()
 endif()
 
 f3d_test(NAME TestSPLAT DATA small.splat ARGS -o --coloring-mode=direct --up=-Y --point-sprites-absolute-size --point-sprites-size=1)
