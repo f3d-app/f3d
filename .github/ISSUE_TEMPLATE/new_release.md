@@ -51,6 +51,8 @@ Release :
 - [ ] Tag `vX.Y.Z` and push it to https://github.com/f3d-app/f3d-superbuild: `git tag vX.Y.Z -m vX.Y.Z`
 - Update Android
   - [ ] Run `./update_native_libs.sh --ref vX.Y.Z` and merge new libraries, jar file and lock file in https://github.com/f3d-app/f3d-android master branch
+  - [ ] In `f3d/build.gradle`, edit `versionName` to `vX.Y.Z` and `versionCode` to `XXYYZZ00`.
+  - [ ] Add a file `fastlane/metadata/android/en-US/changelogs/XXYYZZ00.txt` and copy Android relevant parts from the changelog.
   - [ ] Commit, review and merge the resulting changes in https://github.com/f3d-app/f3d-android
   - [ ] Tag `vX.Y.Z` and push it to https://github.com/f3d-app/f3d-android: `git tag vX.Y.Z -m vX.Y.Z`
 - [ ] Merge F3D release into master: https://github.com/f3d-app/f3d/compare/master...release
