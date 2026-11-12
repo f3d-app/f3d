@@ -171,7 +171,7 @@ int TestSDKCamera([[maybe_unused]] int argc, char* argv[])
 
   cam.setPosition({ 0., -10., 0. });
   cam.setFocalPoint({ 0., 0., 0 });
-  test("Distance: 1", cam.getDistance(), approx(10.0));
+  test("Distance: 10", cam.getDistance(), approx(10.0));
 
   cam.setPosition({ -3., -4., 0. });
   cam.setFocalPoint({ 0., 0., 0 });
@@ -203,15 +203,15 @@ int TestSDKCamera([[maybe_unused]] int argc, char* argv[])
 
   cam.setPosition({ 0., 0., -10. });
   cam.setFocalPoint({ 0., 0., 0 });
-  test("Elevation: straight up", cam.getWorldElevation(), approx(90.0));
+  test("Elevation: straight up", cam.getWorldElevation(), approx(-90.0));
 
   cam.setPosition({ 0., 0., 10. });
   cam.setFocalPoint({ 0., 0., 0 });
-  test("Elevation: straight down", cam.getWorldElevation(), approx(-90.0));
+  test("Elevation: straight down", cam.getWorldElevation(), approx(90.0));
 
   cam.setPosition({ 0., -10., -10. });
   cam.setFocalPoint({ 0., 0., 0 });
-  test("Elevation: +45 degrees", cam.getWorldElevation(), approx(45.0));
+  test("Elevation: +45 degrees", cam.getWorldElevation(), approx(-45.0));
 
   cam.setPosition({ 1., 1., 1. });
   cam.setFocalPoint({ 1., 1., 1 });
@@ -226,7 +226,7 @@ int TestSDKCamera([[maybe_unused]] int argc, char* argv[])
 
   cam.setPosition({ 0., -10., 0. });
   cam.setFocalPoint({ 0., 0., 0 });
-  test("Elevation (Y-up): straight up", cam.getWorldElevation(), approx(90.0));
+  test("Elevation (Y-up): straight up", cam.getWorldElevation(), approx(-90.0));
 
   // test world azimuth getter
   opt.scene.up_direction = { 0, 0, 1 };
@@ -240,22 +240,22 @@ int TestSDKCamera([[maybe_unused]] int argc, char* argv[])
   cam.setPosition({ -10., 0., 0. });
   cam.setFocalPoint({ 0., 0., 0. });
   cam.setViewUp({ 0., 0., 1. });
-  test("Azimuth: right (+X)", cam.getWorldAzimuth(), approx(90.0));
+  test("Azimuth: right (+X)", cam.getWorldAzimuth(), approx(-90.0));
 
   cam.setPosition({ 10., 0., 0. });
   cam.setFocalPoint({ 0., 0., 0. });
   cam.setViewUp({ 0., 0., 1. });
-  test("Azimuth: left (-X)", cam.getWorldAzimuth(), approx(-90.0));
+  test("Azimuth: left (-X)", cam.getWorldAzimuth(), approx(90.0));
 
   cam.setPosition({ 0., 10., 0. });
   cam.setFocalPoint({ 0., 0., 0. });
   cam.setViewUp({ 0., 0., 1. });
-  test("Azimuth: backward (-Y)", cam.getWorldAzimuth(), approx(180.0));
+  test("Azimuth: backward (-Y)", cam.getWorldAzimuth(), approx(-180.0));
 
   cam.setPosition({ -10., -10., 0. });
   cam.setFocalPoint({ 0., 0., 0. });
   cam.setViewUp({ 0., 0., 1. });
-  test("Azimuth: diagonal +X/+Y", cam.getWorldAzimuth(), approx(45.0));
+  test("Azimuth: diagonal +X/+Y", cam.getWorldAzimuth(), approx(-45.0));
 
   cam.setPosition({ 0., 0., -10. });
   cam.setFocalPoint({ 0., 0., 10. });
@@ -268,6 +268,31 @@ int TestSDKCamera([[maybe_unused]] int argc, char* argv[])
   cam.setPosition({ -10., 0., 0. });
   cam.setFocalPoint({ 0., 0., 0. });
   cam.setViewUp({ 0., 1., 0 });
-  test("Azimuth (Y-up): environment forward (+X)", cam.getWorldAzimuth(), approx(90.0));
+  test("Azimuth (Y-up): environment forward (+X)", cam.getWorldAzimuth(), approx(-90.0));
+
+  std::vector<f3d::direction_t> up_directions = { { 0, 0, +1 }, { 0, +1, 0 }, { +1, 0, 0 },
+    { 0, 0, -1 }, { 0, -1, 0 }, { -1, 0, 0 }, { -1, +2, +3 }, { +4, -5, -6 } };
+
+  const std::vector<std::pair<double, double>> azimuths_elevations = { { 0, 0 }, { +12, +34 },
+    { +12, -34 }, { -12, +34 }, { -12, -34 } };
+
+  for (const auto up : up_directions)
+  {
+    for (auto [a, e] : azimuths_elevations)
+    {
+      f3d::engine eng = f3d::engine::create(true);
+      f3d::window& win = eng.getWindow();
+      f3d::camera& cam = win.getCamera();
+      opt.scene.up_direction = up;
+      win.render();
+
+      cam.azimuth(a).elevation(e);
+      const std::string title = "after .azimuth(" + f3d::options::format(a) + ").elevation(" +
+        f3d::options::format(e) + ") with up = " + f3d::options::format(up);
+      test("azimuth " + title, cam.getWorldAzimuth(), approx(a, 1e-10));
+      test("elevation " + title, cam.getWorldElevation(), approx(e, 1e-10));
+    }
+  }
+
   return test.result();
 }
