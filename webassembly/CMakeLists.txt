@@ -10,7 +10,6 @@ target_link_libraries(f3djs PRIVATE libf3d embind)
 
 target_link_options(f3djs PRIVATE
   "$<IF:$<CONFIG:Release>,-Oz,-O0>"
-  "--emit-tsd=f3d.d.ts"
   "SHELL:-sASSERTIONS=1"
   "SHELL:-sEXPORT_NAME=f3d"
   "SHELL:-sMAXIMUM_MEMORY=4GB" # 4GB is the maximum with wasm 32-bits
@@ -23,6 +22,7 @@ target_link_options(f3djs PRIVATE
   "SHELL:-sWASM=1"
   "SHELL:-sFORCE_FILESYSTEM"
   "SHELL:-sEXPORTED_RUNTIME_METHODS=['getExceptionMessage','decrementExceptionRefcount','FS']"
+  "SHELL:-sERROR_ON_UNDEFINED_SYMBOLS=0"
   "SHELL:--post-js=${CMAKE_CURRENT_SOURCE_DIR}/f3d-utils.js"
 )
 
