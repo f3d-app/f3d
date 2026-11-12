@@ -70,10 +70,10 @@ endif()
 
 # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13983
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261111)
-  f3d_test(NAME TestGLTFKHRGaussianSplatting DATA bonsai_small.glb ARGS --blending=sort_cpu)
+  f3d_test(NAME TestGLTFKHRGaussianSplatting DATA bonsai_small.glb ARGS --blending=sort_cpu SKIP_GLES) # Sort isn't supported in GLES
 
   if(F3D_MODULE_MESHOPT)
-    f3d_test(NAME TestGLTFKHRMeshoptAndGaussianSplatting DATA bonsai_small_meshopt.glb ARGS --blending=sort_cpu)
+    f3d_test(NAME TestGLTFKHRMeshoptAndGaussianSplatting DATA bonsai_small_meshopt.glb ARGS --blending=sort_cpu SKIP_GLES) # Sort isn't supported in GLES
   endif()
 endif()
 
