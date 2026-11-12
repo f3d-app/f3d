@@ -193,7 +193,7 @@ if(NOT F3D_MACOS_BUNDLE)
   # Specular has been modified at grazing angles for when F0 != 0.04
   # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13970
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261110)
-    f3d_test(NAME TestDefaultConfigFileQuakeMDL DATA zombie.mdl CONFIG config_build LONG_TIMEOUT UI SKIP_GLES THRESHOLD 0.07) # Threshold is needed for IBL change after VTK 9.6
-    f3d_test(NAME TestThumbnailConfigFileQuakeMDL DATA zombie.mdl CONFIG thumbnail_build LONG_TIMEOUT THRESHOLD 0.07 DEFAULT_HDRI SKIP_GLES) # Threshold is needed for IBL change after VTK 9.6
+    f3d_test(NAME TestDefaultConfigFileQuakeMDL DATA zombie.mdl CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
+    f3d_test(NAME TestThumbnailConfigFileQuakeMDL DATA zombie.mdl CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI SKIP_GLES)
   endif()
 endif()
