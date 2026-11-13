@@ -1297,7 +1297,7 @@ interactor& interactor_impl::initCommands()
         }
         this->Internals->Window.setSize(resolution[0],resolution[1]);
       }
-      catch(exception e)
+      catch(const std::exception& e)
       {
         throw interactor::invalid_args_exception(
         std::string("Command: set_resolution arg: wrong argument"));
