@@ -41,6 +41,14 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, char* argv[])
   inter.triggerCommand("toggle scene.camera.orthographic");
   test("triggerCommand toggle", options.scene.camera.orthographic == true);
 
+  // Test axis lock through libf3d options
+  test("triggerCommand set axis lock", inter.triggerCommand("set interactor.axis_lock +X"));
+  test("set axis lock", options.interactor.axis_lock == f3d::direction_t({ 1, 0, 0 }));
+  test("triggerCommand reset axis lock", inter.triggerCommand("reset interactor.axis_lock"));
+  test("reset axis lock", !options.interactor.axis_lock.has_value());
+  test("axis lock toggle belongs to application",
+    inter.triggerCommand("toggle_axis_lock +X") == false);
+
   // Test increase/decrease
   inter.triggerCommand("increase render.light.intensity");
   inter.triggerCommand("increase render.light.intensity");

@@ -125,6 +125,14 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     std::get<std::vector<double>>(opt.get("model.scivis.range")) ==
       std::vector<double>{ 0.5, 1.5 });
 
+  // Test double_array_t
+  const f3d::double_array_t<2> array{ 0.0, 1.0 };
+  test("double array compare identical", array.compare(array, 0.0));
+  test("double array compare boundary", array.compare({ 1e-6, 1.0 }, 1e-6));
+  test("double array compare different", !array.compare({ 0.0, 1.000002 }, 1e-6));
+  test("double array compare NaN",
+    !array.compare({ std::numeric_limits<double>::quiet_NaN(), 1.0 }, 1e-6));
+
   // Test color_t
   opt.setAsString("render.background.color", "0.1,0.2,0.4");
   test("setAsString color", opt.getAsString("render.background.color") == "0.1,0.2,0.4");
@@ -157,6 +165,8 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("color red", color.r() == 0.7);
   test("color green", color.g() == 0.2);
   test("color blue", color.b() == 0.3);
+  test("color compare near", color.compare({ 0.7, 0.2, 0.3000005 }, 1e-6));
+  test("color compare different", !color.compare({ 0.7, 0.2, 0.300002 }, 1e-6));
 
   std::stringstream ss;
   ss << f3d::color_t(0.1, 0.2, 0.3);
@@ -176,6 +186,16 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("direction x", dir.x() == 0.707);
   test("direction y", dir.y() == -0.707);
   test("direction z", dir.z() == 0);
+
+  const f3d::direction_t nearDir{ 0.7070005, -0.707, 0 };
+  test("direction compare identical", dir.compare(dir, 0.0));
+  test("direction compare near", dir.compare(nearDir, 1e-6));
+  test("direction compare symmetric", nearDir.compare(dir, 1e-6));
+  test("direction compare different x", !dir.compare({ 0.707002, -0.707, 0 }, 1e-6));
+  test("direction compare different y", !dir.compare({ 0.707, -0.707002, 0 }, 1e-6));
+  test("direction compare different z", !dir.compare({ 0.707, -0.707, 0.000002 }, 1e-6));
+  test("direction compare boundary", f3d::direction_t(0, 1, 0).compare({ 1e-6, 1, 0 }, 1e-6));
+  test("direction equality remains exact", !(dir == nearDir));
 
   std::stringstream ssDir;
   ssDir << f3d::direction_t(0, 0, -1.0);
@@ -232,6 +252,12 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
         0.1 * -std::sin(TestSDKHelpers::Degrees2Radians(60.0)), 0.51,
         0.1 * std::sin(TestSDKHelpers::Degrees2Radians(60.0)),
         0.1 * std::cos(TestSDKHelpers::Degrees2Radians(60.0)), 2.1, 0, 0, 1 });
+
+  const f3d::transform2d_t transform{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+  test("transform compare identical", transform.compare(transform, 0.0));
+  test("transform compare near", transform.compare({ 1, 0, 0, 0, 1, 0, 0, 0, 1.0000005 }, 1e-6));
+  test(
+    "transform compare different", !transform.compare({ 1, 0, 0, 0, 1, 0, 0, 0, 1.000002 }, 1e-6));
 
   f3d::transform2d_t nanTransform =
     f3d::transform2d_t(f3d::double_array_t<2>(std::vector<double>(2, 1)),

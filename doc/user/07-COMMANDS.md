@@ -145,6 +145,11 @@ eg: `alias myrotate roll_camera 90`.
 
 F3D provides a few more commands.
 
+`toggle_axis_lock direction`: A specific command to lock camera rotation to one direction, or unlock it if already locked to that direction. Takes one direction as argument.
+Direction components are compared with an absolute tolerance of `1e-6`.
+Providing a different direction replaces the current lock.
+eg: `toggle_axis_lock +X`.
+
 `exit`: A specific command to quit F3D. No argument.
 
 `load_previous_file_group [keep_camera]`: A specific command to load the previous file or file group. Camera state is kept if `keep_camera` is true (default: false).
