@@ -1343,7 +1343,7 @@ public:
               }
               if (!std::equal(weights.begin(), weights.end(), packedWeights->GetPointer(0)))
               {
-                std::copy(weights.begin(), weights.end(), packedWeights->GetPointer(0));
+                std::ranges::copy(weights, packedWeights->GetPointer(0));
                 packedWeights->Modified();
               }
             }

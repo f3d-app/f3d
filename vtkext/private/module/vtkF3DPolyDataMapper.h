@@ -45,6 +45,10 @@ public:
 
   void ReleaseGraphicsResources(vtkWindow* window) override;
 
+  // Camera framing must use the deformed surface even when CPU points stay in bind pose.
+  double* GetBounds() override;
+  using vtkOpenGLPolyDataMapper::GetBounds;
+
   bool PrepareSparseMorphing(vtkOpenGLRenderWindow* window, vtkPolyData* polydata);
   bool GetHasSparseMorphing() const
   {
@@ -79,6 +83,9 @@ protected:
 
 private:
   bool HasSparseMorphing = false;
+  vtkWeakPointer<vtkPolyData> BoundsInput;
+  vtkTimeStamp MorphingBoundsTime;
+  double MorphingBounds[6];
   vtkWeakPointer<vtkFloatArray> UploadedBlendShapeOffsets;
   vtkWeakPointer<vtkFloatArray> UploadedBlendShapeWeights;
   vtkTimeStamp BlendShapeOffsetsUploadTime;

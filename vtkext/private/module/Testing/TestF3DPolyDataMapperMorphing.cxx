@@ -88,7 +88,7 @@ int TestF3DPolyDataMapperMorphing(int, char*[])
     return EXIT_FAILURE;
   }
 
-  for (int invalidEnd : { -1, 2, 16777217 })
+  for (const int invalidEnd : { -1, 2, 16777217 })
   {
     vertexRange->SetComponent(0, 1, invalidEnd);
     vertexRange->Modified();
@@ -106,7 +106,7 @@ int TestF3DPolyDataMapperMorphing(int, char*[])
     return EXIT_FAILURE;
   }
 
-  for (float weight : { 0.f, 1.f, 0.5f, 0.f })
+  for (const float weight : { 0.f, 1.f, 0.5f, 0.f })
   {
     weights->SetValue(0, weight);
     weights->Modified();
@@ -191,7 +191,7 @@ void main()
   program->ReleaseGraphicsResources(window);
   positions->ReleaseGraphicsResources();
   rangeBuffer->ReleaseGraphicsResources();
-  for (float invalidIndex : { -1.f, 2.f, 0.5f, std::numeric_limits<float>::quiet_NaN() })
+  for (const float invalidIndex : { -1.f, 2.f, 0.5f, std::numeric_limits<float>::quiet_NaN() })
   {
     offsets->SetComponent(1, 3, invalidIndex);
     offsets->Modified();

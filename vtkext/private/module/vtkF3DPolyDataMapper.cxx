@@ -4,6 +4,7 @@
 #include "vtkF3DRenderer.h"
 
 #include <vtkActor.h>
+#include <vtkBoundingBox.h>
 #include <vtkDoubleArray.h>
 #include <vtkFieldData.h>
 #include <vtkFloatArray.h>
@@ -32,6 +33,68 @@
 #include <regex>
 
 vtkStandardNewMacro(vtkF3DPolyDataMapper);
+
+//-----------------------------------------------------------------------------
+double* vtkF3DPolyDataMapper::GetBounds()
+{
+  double* bounds = this->Superclass::GetBounds();
+  auto* data = this->GetInput();
+  if (!data || !this->HasSparseMorphing)
+  {
+    return bounds;
+  }
+  auto* ranges = vtkIntArray::SafeDownCast(data->GetPointData()->GetArray("blendShapeRanges"));
+  auto* positions =
+    vtkFloatArray::SafeDownCast(data->GetPointData()->GetArray("blendShapeBindPositions"));
+  auto* offsets = vtkFloatArray::SafeDownCast(data->GetFieldData()->GetArray("blendShapeOffsets"));
+  auto* weights = vtkFloatArray::SafeDownCast(data->GetFieldData()->GetArray("blendShapeWeights"));
+  if (!ranges || !positions || !offsets || !weights || ranges->GetNumberOfComponents() != 2 ||
+    positions->GetNumberOfComponents() != 3 || offsets->GetNumberOfComponents() != 4 ||
+    weights->GetNumberOfComponents() != 1 ||
+    ranges->GetNumberOfTuples() != data->GetNumberOfPoints() ||
+    positions->GetNumberOfTuples() != data->GetNumberOfPoints())
+  {
+    return bounds;
+  }
+  const vtkMTimeType modified = std::max({ data->GetMTime(), ranges->GetMTime(),
+    positions->GetMTime(), offsets->GetMTime(), weights->GetMTime() });
+  if (this->BoundsInput == data && this->MorphingBoundsTime > modified)
+  {
+    return this->MorphingBounds;
+  }
+  vtkBoundingBox box;
+  for (vtkIdType i = 0; i < positions->GetNumberOfTuples(); ++i)
+  {
+    int range[2] = {};
+    ranges->GetTypedTuple(i, range);
+    if (range[0] < 0 || range[1] < range[0] || range[1] > offsets->GetNumberOfTuples())
+    {
+      return bounds;
+    }
+    double point[3];
+    positions->GetTuple(i, point);
+    for (int j = range[0]; j < range[1]; ++j)
+    {
+      float offset[4] = {};
+      offsets->GetTypedTuple(j, offset);
+      if (!std::isfinite(offset[3]) || offset[3] < 0 || offset[3] >= weights->GetNumberOfValues() ||
+        std::floor(offset[3]) != offset[3])
+      {
+        return bounds;
+      }
+      const double weight = weights->GetValue(static_cast<vtkIdType>(offset[3]));
+      for (int component = 0; component < 3; ++component)
+      {
+        point[component] += offset[component] * weight;
+      }
+    }
+    box.AddPoint(point);
+  }
+  box.GetBounds(this->MorphingBounds);
+  this->BoundsInput = data;
+  this->MorphingBoundsTime.Modified();
+  return this->MorphingBounds;
+}
 
 //-----------------------------------------------------------------------------
 bool vtkF3DPolyDataMapper::PrepareSparseMorphing(

@@ -8,11 +8,11 @@
 #include <vtkFloatArray.h>
 #include <vtkIntArray.h>
 #include <vtkLight.h>
-#include <vtkOpenGLRenderWindow.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkProperty.h>
+#include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkShader.h>
 #include <vtkShaderProperty.h>
@@ -21,13 +21,14 @@
 #include <vtk_glad.h>
 
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <memory>
 #include <vector>
 
 int TestF3DSparseMorphingRender(int, char*[])
 {
-  vtkNew<vtkOpenGLRenderWindow> window;
+  vtkNew<vtkRenderWindow> window;
   window->OffScreenRenderingOn();
   window->SetSize(64, 64);
   window->SetMultiSamples(0);
@@ -82,19 +83,32 @@ int TestF3DSparseMorphingRender(int, char*[])
   actor->SetMapper(mapper);
   actor->GetProperty()->LightingOff();
   vtkNew<vtkRenderer> renderer;
-  vtkNew<vtkF3DRenderPass> pass;
+  const vtkNew<vtkF3DRenderPass> pass;
   renderer->AddActor(actor);
   window->AddRenderer(renderer);
   renderer->GetActiveCamera()->SetPosition(0., 0., 3.);
   renderer->GetActiveCamera()->SetFocalPoint(0., 0., 0.);
   renderer->GetActiveCamera()->SetClippingRange(0.1, 10.);
   window->Render();
-  std::unique_ptr<unsigned char[]> reference(window->GetPixelData(0, 0, 63, 63, 0, 0));
+  const std::unique_ptr<unsigned char[]> reference(window->GetPixelData(0, 0, 63, 63, 0, 0));
   renderer->SetPass(pass);
   window->Render();
   if (!mapper->GetHasSparseMorphing())
   {
     return EXIT_FAILURE;
+  }
+  // Camera framing must follow the GPU deformation and invalidate on weight changes.
+  for (const float weight : { 1.f, 0.5f, 1.f })
+  {
+    weights->SetValue(0, weight);
+    weights->Modified();
+    const double* bounds = mapper->GetBounds();
+    if (std::abs(bounds[0] - (-0.5 + 0.2 * weight)) > 1e-6 ||
+      std::abs(bounds[1] - (0.5 + 0.2 * weight)) > 1e-6)
+    {
+      std::cerr << "Sparse morphing bounds do not follow animation weights\n";
+      return EXIT_FAILURE;
+    }
   }
   for (vtkIdType i = 0; i < 3; ++i)
   {
@@ -105,10 +119,10 @@ int TestF3DSparseMorphingRender(int, char*[])
   }
   points->Modified();
   window->Render();
-  std::unique_ptr<unsigned char[]> gpu(window->GetPixelData(0, 0, 63, 63, 0, 0));
+  const std::unique_ptr<unsigned char[]> gpu(window->GetPixelData(0, 0, 63, 63, 0, 0));
   polydata->GetPointData()->RemoveArray("blendShapeRanges");
   window->Render();
-  std::unique_ptr<unsigned char[]> cpu(window->GetPixelData(0, 0, 63, 63, 0, 0));
+  const std::unique_ptr<unsigned char[]> cpu(window->GetPixelData(0, 0, 63, 63, 0, 0));
   const bool valid = reference && gpu && cpu && !mapper->GetHasSparseMorphing() &&
     std::equal(reference.get(), reference.get() + 64 * 64 * 3, gpu.get()) &&
     !std::equal(reference.get(), reference.get() + 64 * 64 * 3, cpu.get());
@@ -122,7 +136,7 @@ int TestF3DSparseMorphingRender(int, char*[])
   polydata->GetPointData()->AddArray(ranges);
   actor->SetScale(1.5, 1., 1.);
   window->Render();
-  std::unique_ptr<unsigned char[]> scaled(window->GetPixelData(0, 0, 63, 63, 0, 0));
+  const std::unique_ptr<unsigned char[]> scaled(window->GetPixelData(0, 0, 63, 63, 0, 0));
   actor->SetScale(1., 1., 1.);
   vtkNew<vtkFloatArray> jointWeights;
   jointWeights->SetName("WEIGHTS_0");
@@ -142,7 +156,7 @@ int TestF3DSparseMorphingRender(int, char*[])
   actor->GetShaderProperty()->GetVertexCustomUniforms()->SetUniformMatrix4x4v(
     "jointMatrices", 1, jointMatrix);
   window->Render();
-  std::unique_ptr<unsigned char[]> skinned(window->GetPixelData(0, 0, 63, 63, 0, 0));
+  const std::unique_ptr<unsigned char[]> skinned(window->GetPixelData(0, 0, 63, 63, 0, 0));
   if (!scaled || !skinned || !mapper->GetHasSparseMorphing() ||
     !std::equal(scaled.get(), scaled.get() + 64 * 64 * 3, skinned.get()))
   {
@@ -158,7 +172,7 @@ int TestF3DSparseMorphingRender(int, char*[])
   actor->GetShaderProperty()->GetVertexCustomUniforms()->SetUniformMatrix4x4v(
     "jointMatrices", 251, jointMatrices.data());
   window->Render();
-  std::unique_ptr<unsigned char[]> ssboSkinned(window->GetPixelData(0, 0, 63, 63, 0, 0));
+  const std::unique_ptr<unsigned char[]> ssboSkinned(window->GetPixelData(0, 0, 63, 63, 0, 0));
   if (!ssboSkinned || !std::equal(scaled.get(), scaled.get() + 64 * 64 * 3, ssboSkinned.get()))
   {
     std::cerr << "Sparse morphing conflicts with SSBO skinning\n";
@@ -170,7 +184,7 @@ int TestF3DSparseMorphingRender(int, char*[])
   window->Render();
   int skinningBuffer = 0;
   glGetIntegeri_v(GL_SHADER_STORAGE_BUFFER_BINDING, 0, &skinningBuffer);
-  std::unique_ptr<unsigned char[]> uniformSkinned(window->GetPixelData(0, 0, 63, 63, 0, 0));
+  const std::unique_ptr<unsigned char[]> uniformSkinned(window->GetPixelData(0, 0, 63, 63, 0, 0));
   if (skinningBuffer || !uniformSkinned ||
     !std::equal(scaled.get(), scaled.get() + 64 * 64 * 3, uniformSkinned.get()))
   {
@@ -199,10 +213,10 @@ int TestF3DSparseMorphingRender(int, char*[])
   renderer->AddLight(light);
   polydata->GetPointData()->RemoveArray("blendShapeRanges");
   window->Render();
-  std::unique_ptr<unsigned char[]> litCPU(window->GetPixelData(0, 0, 63, 63, 0, 0));
+  const std::unique_ptr<unsigned char[]> litCPU(window->GetPixelData(0, 0, 63, 63, 0, 0));
   polydata->GetPointData()->AddArray(ranges);
   window->Render();
-  std::unique_ptr<unsigned char[]> litGPU(window->GetPixelData(0, 0, 63, 63, 0, 0));
+  const std::unique_ptr<unsigned char[]> litGPU(window->GetPixelData(0, 0, 63, 63, 0, 0));
   if (!litCPU || !litGPU || !mapper->GetHasSparseMorphing() ||
     !std::equal(litCPU.get(), litCPU.get() + 64 * 64 * 3, litGPU.get()))
   {
@@ -231,11 +245,11 @@ int TestF3DSparseMorphingRender(int, char*[])
   ranges->Modified();
   points->Modified();
   window->Render();
-  std::unique_ptr<unsigned char[]> flatCPU(window->GetPixelData(0, 0, 63, 63, 0, 0));
-  vtkNew<vtkF3DRenderPass> flatPass;
+  const std::unique_ptr<unsigned char[]> flatCPU(window->GetPixelData(0, 0, 63, 63, 0, 0));
+  const vtkNew<vtkF3DRenderPass> flatPass;
   renderer->SetPass(flatPass);
   window->Render();
-  std::unique_ptr<unsigned char[]> flatGPU(window->GetPixelData(0, 0, 63, 63, 0, 0));
+  const std::unique_ptr<unsigned char[]> flatGPU(window->GetPixelData(0, 0, 63, 63, 0, 0));
   if (!flatCPU || !flatGPU ||
     !std::equal(flatCPU.get(), flatCPU.get() + 64 * 64 * 3, flatGPU.get()))
   {
@@ -244,7 +258,7 @@ int TestF3DSparseMorphingRender(int, char*[])
   }
   window->Finalize();
   window->Render();
-  std::unique_ptr<unsigned char[]> restored(window->GetPixelData(0, 0, 63, 63, 0, 0));
+  const std::unique_ptr<unsigned char[]> restored(window->GetPixelData(0, 0, 63, 63, 0, 0));
   if (!restored || !mapper->GetHasSparseMorphing() ||
     !std::equal(flatGPU.get(), flatGPU.get() + 64 * 64 * 3, restored.get()))
   {

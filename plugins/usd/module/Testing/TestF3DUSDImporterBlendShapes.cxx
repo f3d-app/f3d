@@ -94,7 +94,7 @@ bool CheckPackedDeformation(vtkPolyData* polydata)
 
 int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
 {
-  for (bool faceVarying : { false, true })
+  for (const bool faceVarying : { false, true })
   {
     const std::string filename = std::string(argv[1]) + "data/" +
       (faceVarying ? "SimpleBlendShapesFaceVarying.usda" : "SimpleBlendShapes.usda");
@@ -145,7 +145,7 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
     }
 
     // Animation order is reversed relative to the mesh's blend shape order.
-    for (double frame : { 1., 12.5, 24., 36., 48., 1. })
+    for (const double frame : { 1., 12.5, 24., 36., 48., 1. })
     {
       if (!importer->UpdateAtTimeValue(frame / 24.))
       {
@@ -189,7 +189,7 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
   const std::string filename = std::string(argv[1]) + "data/SimpleBlendShapesInbetween.usda";
   importer->SetFileName(filename.c_str());
   importer->Update();
-  for (double frame : { 1., 12.5, 24., 36., 48., 1. })
+  for (const double frame : { 1., 12.5, 24., 36., 48., 1. })
   {
     if (!importer->UpdateAtTimeValue(frame / 24.))
     {
@@ -218,7 +218,7 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
   }
   importer->SetUseGPUMorphing(true);
   vtkMTimeType bindTime = 0;
-  for (double frame : { 1., 12.5, 24., 36., 48. })
+  for (const double frame : { 1., 12.5, 24., 36., 48. })
   {
     if (!importer->UpdateAtTimeValue(frame / 24.))
     {
@@ -291,7 +291,7 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
   const std::string subsetFile = std::string(argv[1]) + "data/SimpleBlendShapesSubsets.usda";
   subsetImporter->SetFileName(subsetFile.c_str());
   subsetImporter->Update();
-  for (double frame : { 1., 12.5, 24., 48. })
+  for (const double frame : { 1., 12.5, 24., 48. })
   {
     if (!subsetImporter->UpdateAtTimeValue(frame / 24.) ||
       subsetImporter->GetRenderer()->GetActors()->GetNumberOfItems() != 2)
@@ -301,7 +301,7 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
     vtkCollectionSimpleIterator iterator;
     auto* actors = subsetImporter->GetRenderer()->GetActors();
     actors->InitTraversal(iterator);
-    vtkFloatArray* sharedWeights = nullptr;
+    const vtkFloatArray* sharedWeights = nullptr;
     while (auto* actor = actors->GetNextActor(iterator))
     {
       auto* polydata = vtkPolyDataMapper::SafeDownCast(actor->GetMapper())->GetInput();
