@@ -87,6 +87,11 @@ function(f3d_create_exec target_name)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_WEBP)
   endif ()
 
+  # PSD
+  if (F3D_MODULE_PSD)
+    target_compile_definitions(${target_name} PRIVATE F3D_MODULE_PSD)
+  endif ()
+
   # clip
   if (F3D_MODULE_CLIP)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_CLIP)

@@ -232,6 +232,11 @@ if (F3D_MODULE_WEBP)
   target_compile_definitions(libf3d PRIVATE F3D_MODULE_WEBP)
 endif ()
 
+# PSD
+if (F3D_MODULE_PSD)
+  target_compile_definitions(libf3d PRIVATE F3D_MODULE_PSD)
+endif ()
+
 # ui
 if (F3D_MODULE_UI)
   target_compile_definitions(libf3d PRIVATE F3D_MODULE_UI)

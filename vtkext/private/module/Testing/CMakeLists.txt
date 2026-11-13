@@ -28,6 +28,13 @@ if(F3D_MODULE_WEBP)
        TestF3DWebPMemReader.cxx)
 endif()
 
+if(F3D_MODULE_PSD)
+  list(APPEND test_sources
+       TestF3DPSDReader.cxx
+       TestF3DPSDReaderInvalid.cxx
+       TestF3DPSDMemReader.cxx)
+endif()
+
 if(TARGET VTK::IOHDF)
   list(APPEND test_sources TestF3DGenericImporterTimeSteps.cxx)
 endif()
@@ -63,6 +70,12 @@ endif()
 
 if(F3D_MODULE_WEBP)
   set_tests_properties(f3d::vtkextPrivateCxx-TestF3DWebPReaderInvalid f3d::vtkextPrivateCxx-TestF3DWebPMemReader
+    PROPERTIES
+    FAIL_REGULAR_EXPRESSION "")
+endif()
+
+if(F3D_MODULE_PSD)
+  set_tests_properties(f3d::vtkextPrivateCxx-TestF3DPSDReaderInvalid f3d::vtkextPrivateCxx-TestF3DPSDMemReader
     PROPERTIES
     FAIL_REGULAR_EXPRESSION "")
 endif()

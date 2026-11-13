@@ -45,7 +45,7 @@
   },
   {
     "match-type": "glob",
-    "match": "*.{png,jpg,jpeg,bmp,tga,hdr,webp,exr}",
+    "match": "*.{png,jpg,jpeg,bmp,tga,hdr,webp,psd,exr}",
     "options": {
       "camera-direction": "0,0,-1",
       "camera-orthographic": true,

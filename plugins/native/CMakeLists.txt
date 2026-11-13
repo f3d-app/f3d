@@ -181,6 +181,9 @@ set(_image_formats "png;jpeg;bmp;tga;hdr")
 if(F3D_MODULE_WEBP)
   list(APPEND _image_formats "webp")
 endif()
+if(F3D_MODULE_PSD)
+  list(APPEND _image_formats "psd")
+endif()
 if(F3D_MODULE_EXR)
   list(APPEND _image_formats "exr")
 endif()
@@ -260,6 +263,20 @@ if(F3D_MODULE_WEBP)
     ${_SUPPORTS_STREAM}
     CAN_READ CUSTOM
     CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/webp.inl"
+  )
+endif()
+
+if(F3D_MODULE_PSD)
+  f3d_plugin_declare_reader(
+    NAME PSD
+    EXTENSIONS psd
+    MIMETYPES image/vnd.adobe.photoshop
+    VTK_IMPORTER vtkF3DImageImporter
+    FORMAT_DESCRIPTION "Photoshop Image"
+    EXCLUDE_FROM_THUMBNAILER
+    ${_SUPPORTS_STREAM}
+    CAN_READ CUSTOM
+    CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/psd.inl"
   )
 endif()
 
