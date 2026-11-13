@@ -44,7 +44,7 @@ eg: `roll_camera 120`.
 `zoom_camera value`: A specific command to zoom the view relatively to current zoom, takes a factor as an argument.
 eg: `zoom_camera 1.5`.
 
-`set_camera_look_at position focal up`: A specific command to set the camera at the given position looking in focal direction, takes 3 direction3_t
+`set_camera_look_at position focal up`: A specific command to set the camera at the given position looking in focal direction, takes 3 vectors x,y,z. Does nothing in 2d.
 eg: `set_camera_look_at 10,10,10 0,0,0 1,1,1`
 
 `elevation_camera value`: A specific command to tilt the camera up or down, takes an angle in degrees as an argument.
