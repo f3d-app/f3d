@@ -114,15 +114,15 @@ Frame rate used to refresh animation and other repeated tasks (watch, UI). Does 
 
 ### `--load-plugins=<paths or names>` (_string_)
 
-List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `hdf`, `occt`, `pdal`, `usd`, `vdb`, `webifc`. See the [plugin documentation](13-PLUGINS.md) for more info.
+List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `hdf`, `occt`, `pdal`, `usd`, `vdb`, `webifc`. See the [plugin documentation](13-PLUGINS_AND_MODULES.md) for more info.
 
 ### `--plugins-path=<path>` (_string_)
 
-Supplementary path to specify where to load plugins from, on top of [default paths](13-PLUGINS.md#supported-plugins).
+Supplementary path to specify where to load plugins from, on top of [default paths](13-PLUGINS_AND_MODULES.md#supported-plugins).
 
 ### `--scan-plugins`
 
-Scan standard directories for plugins and display their names. Results may be incomplete. See the [plugin documentation](13-PLUGINS.md) for more info.
+Scan standard directories for plugins and display their names. Results may be incomplete. See the [plugin documentation](13-PLUGINS_AND_MODULES.md) for more info.
 
 ### `--screenshot-filename=<png file>` (_string_, default: `{app}/{model}_{n}.png`)
 
