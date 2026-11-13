@@ -49,6 +49,10 @@ Force a specific [reader](02-SUPPORTED_FORMATS.md) to be used, disregarding the 
 
 Select reader to read file without checking its header content, but only based on the file extension.
 
+### `--coordinate-normalize` (_bool_, default: `false`)
+
+Normalize the scene coordinates by shifting it to the origin and isotropically scaling it to a unit bounding box. This can help with rendering and precision issues on scenes with very large or very offset coordinates.
+
 ### `--list-bindings`
 
 List available _bindings_ and exit. Ignore `--verbose`.

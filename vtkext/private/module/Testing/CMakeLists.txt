@@ -3,6 +3,7 @@ set(test_sources
   TestF3DGenericImporter.cxx
   TestF3DInteractorEventRecorder.cxx
   TestF3DLog.cxx
+  TestF3DMetaImporterCoordinateNormalize.cxx
   TestF3DMetaImporterMultiColoring.cxx
   TestF3DMetaImporterAnimation.cxx
   TestF3DMetaImporterNonPolyActor.cxx
