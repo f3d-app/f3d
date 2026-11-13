@@ -183,9 +183,15 @@ public:
     double fwd[3];
     vtkMath::Cross(right, up, fwd);
     const double m[9] = {
-      right[0], right[1], right[2], //
-      fwd[0], fwd[1], fwd[2],       //
-      up[0], up[1], up[2],          //
+      right[0],
+      right[1],
+      right[2], //
+      fwd[0],
+      fwd[1],
+      fwd[2], //
+      up[0],
+      up[1],
+      up[2], //
     };
     transform->DeepCopy(m);
   }
@@ -1098,6 +1104,17 @@ interactor& interactor_impl::initCommands()
         this->Internals->Window.getCamera().getViewUp().data());
     },
     command_documentation_t{ "roll_camera value", "roll the camera on its side" });
+
+  this->addCommand(
+    "zoom_camera",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 1, "zoom_camera");
+      this->Internals->Window.getCamera().zoom(options::parse<double>(args[0]));
+      this->Internals->Style->SetTemporaryUp(
+        this->Internals->Window.getCamera().getViewUp().data());
+    },
+    command_documentation_t{ "zoom_camera value", "apply zoom to view" });
 
   this->addCommand(
     "jump_to_frame",
