@@ -27,6 +27,7 @@ set(classes
   vtkF3DArchiveReader
   vtkF3DCatmullClarkSubdivisionFilter
   vtkF3DFaceVaryingPointDispatcher
+  vtkF3DGLTFDocumentLoader
   vtkF3DGLTFImporter
   vtkF3DImporter
   )
@@ -70,3 +71,9 @@ if (F3D_MODULE_CLIP)
 
   vtk_module_definitions(f3d::vtkext PRIVATE F3D_MODULE_CLIP)
 endif ()
+
+if (F3D_MODULE_MESHOPT)
+  find_package(meshoptimizer REQUIRED)
+  vtk_module_link(f3d::vtkext PRIVATE meshoptimizer::meshoptimizer)
+  vtk_module_definitions(f3d::vtkext PRIVATE F3D_MODULE_MESHOPT)
+endif()

@@ -42,6 +42,8 @@
 #include <vtkImageReader2Factory.h>
 #include <vtkLight.h>
 #include <vtkLightCollection.h>
+#include <vtkLightRepresentation.h>
+#include <vtkLightWidget.h>
 #include <vtkLineSource.h>
 #include <vtkMath.h>
 #include <vtkMathUtilities.h>
@@ -322,6 +324,7 @@ void vtkF3DRenderer::Initialize()
   this->ScalarBarActorConfigured = false;
   this->CheatSheetConfigured = false;
   this->ColoringConfigured = false;
+  this->PointSpritesConfigured = false;
   this->NormalGlyphsConfigured = false;
 
   // create ImGui context if F3D_MODULE_UI is enabled
@@ -2841,6 +2844,8 @@ int vtkF3DRenderer::UpdateLights()
     this->LightIntensitiesConfigured = true;
   }
 
+  this->UpdateLightRepresentations();
+
   // Push IBLIntensity to every actor's custom uniforms so the HDRI ambient
   // contribution (iblDiffuse + iblSpecular) scales with the same factor.
   // This runs every frame (not just when intensity changes) to ensure that newly
@@ -3329,11 +3334,6 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigurePointSprites()
 {
-  if (!this->UsePointSprites)
-  {
-    return;
-  }
-
   if (this->GetBlendingMode() == vtkF3DRenderer::BlendingMode::SORT &&
     !vtkShader::IsComputeShaderSupported())
   {
@@ -3354,6 +3354,14 @@ void vtkF3DRenderer::ConfigurePointSprites()
   {
     vtkF3DPointSplatMapper* splatMapper = vtkF3DPointSplatMapper::SafeDownCast(sprites.Mapper);
     splatMapper->SetUseInstancing(this->PointSpritesUseInstancing);
+
+    // if the original mapper is a vtkF3DPointSplatMapper, we can configure it for instancing
+    vtkF3DPointSplatMapper* originalSplatMapper =
+      vtkF3DPointSplatMapper::SafeDownCast(sprites.OriginalActor->GetMapper());
+    if (originalSplatMapper)
+    {
+      originalSplatMapper->SetUseInstancing(this->PointSpritesUseInstancing);
+    }
 
     // add SDF functions
     vtkShaderProperty* sp = sprites.Actor->GetShaderProperty();
@@ -3377,12 +3385,21 @@ void vtkF3DRenderer::ConfigurePointSprites()
     sprites.Mapper->SetLowpassMatrix(lowPass);
 
     vtkPolyData* polyData = vtkPolyData::SafeDownCast(sprites.Mapper->GetInput());
-    if (polyData && polyData->GetPointData()->HasArray("scale") &&
-      polyData->GetPointData()->HasArray("rotation"))
+    const char* scaleArray = sprites.Mapper->GetScaleArray();
+    const char* rotationArray = sprites.Mapper->GetRotationArray();
+    if (polyData && (scaleArray || polyData->GetPointData()->HasArray("scale")) &&
+      (rotationArray || polyData->GetPointData()->HasArray("rotation")))
     {
       sprites.Mapper->AnisotropicOn();
-      sprites.Mapper->SetRotationArray("rotation");
-      sprites.Mapper->SetScaleArray("scale");
+
+      if (!scaleArray)
+      {
+        sprites.Mapper->SetScaleArray("scale");
+      }
+      if (!rotationArray)
+      {
+        sprites.Mapper->SetRotationArray("rotation");
+      }
     }
     else
     {
@@ -3460,6 +3477,8 @@ void vtkF3DRenderer::ConfigurePointSprites()
       sprites.Actor->ForceTranslucentOff();
     }
   }
+
+  this->PointSpritesConfigured = true;
 }
 
 //----------------------------------------------------------------------------
@@ -3538,6 +3557,84 @@ void vtkF3DRenderer::ConfigureNormalGlyphs()
   }
 
   this->NormalGlyphsConfigured = true;
+}
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::UpdateLightRepresentations()
+{
+  constexpr double maxConeAngle = 89.0;
+  constexpr double pointLightConeAngle = 90.0;
+
+  vtkCollectionSimpleIterator it;
+  vtkLightCollection* lc = this->GetLights();
+  vtkLight* light = nullptr;
+  std::set<vtkLight*> visitedLights;
+  for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
+  {
+    // ignore camera lights
+    const int lightType = light->GetLightType();
+    if (lightType == VTK_LIGHT_TYPE_CAMERA_LIGHT || lightType == VTK_LIGHT_TYPE_HEADLIGHT)
+    {
+      continue;
+    }
+
+    visitedLights.insert(light);
+
+    auto& lightRep = this->LightRepresentations[light];
+
+    if (lightRep.representation == nullptr)
+    {
+      lightRep.representation = vtkSmartPointer<vtkLightRepresentation>::New();
+    }
+    if (lightRep.widget == nullptr)
+    {
+      lightRep.widget = vtkSmartPointer<vtkLightWidget>::New();
+      lightRep.widget->SetRepresentation(lightRep.representation);
+      lightRep.widget->SetInteractor(this->RenderWindow->GetInteractor());
+      lightRep.widget->SetProcessEvents(false);
+    }
+
+    lightRep.representation->SetLightPosition(light->GetTransformedPosition());
+    lightRep.representation->SetFocalPoint(light->GetTransformedFocalPoint());
+    if (light->GetPositional() && light->GetConeAngle() < maxConeAngle)
+    {
+      lightRep.representation->SetPositional(light->GetPositional());
+      lightRep.representation->SetConeAngle(light->GetConeAngle());
+    }
+    else
+    {
+      lightRep.representation->SetPositional(false);
+    }
+    if (light->GetPositional() && light->GetConeAngle() == pointLightConeAngle)
+    {
+      lightRep.representation->SetFocalPoint(lightRep.representation->GetLightPosition());
+    }
+    lightRep.representation->SetLightColor(light->GetDiffuseColor());
+
+    if (this->LightRepresentationVisible)
+    {
+      lightRep.widget->On();
+    }
+    else
+    {
+      lightRep.widget->Off();
+    }
+  }
+
+  // remove unwanted light representations
+  for (auto repItr = this->LightRepresentations.begin();
+       repItr != this->LightRepresentations.end();)
+  {
+    if (visitedLights.count(repItr->first))
+    {
+      repItr++;
+      continue;
+    }
+
+    // safely removing the widget and representation
+    repItr->second.widget->Off();
+
+    repItr = this->LightRepresentations.erase(repItr);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -3823,6 +3920,16 @@ void vtkF3DRenderer::SetXRMode(bool enable, bool showBbox)
     }
   }
   // LCOV_EXCL_STOP
+}
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetLightRepresentationVisibility(bool visible)
+{
+  // Make sure all lights are being tracked by a representation
+  if (this->LightRepresentationVisible != visible)
+  {
+    this->LightRepresentationVisible = visible;
+    this->UpdateLightRepresentations();
+  }
 }
 
 //----------------------------------------------------------------------------

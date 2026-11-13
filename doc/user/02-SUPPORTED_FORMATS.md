@@ -113,11 +113,12 @@ For booleans, 0 means false and any other value means true. Unsigned int interpr
 
 ### 3D Gaussian splatting
 
-F3D supports 3 different formats:
+F3D supports 4 different formats:
 
 - `.ply`: Original 3DGS format
 - `.splat`: Format specified by the [splat repository](https://github.com/antimatter15/splat). Does not support spherical harmonics.
 - `.spz`: Niantic's [SPZ format](https://github.com/nianticlabs/spz) (v2 and v3)
+- `.gltf`/`.glb`: GLTF with KHR_gaussian_splatting extension
 
 No config files come with the `.ply` format because this format is not dedicated to 3DGS only.
 If you use `.ply` for 3DGS only, set up a config file similar to what is done for `.splat` or `.spz`.

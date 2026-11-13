@@ -249,6 +249,10 @@
           "max": "5.0",
           "increment": "0.02"
         }
+      },
+      "representation": {
+        "type": "bool",
+        "default_value": "false"
       }
     },
     "armature": {

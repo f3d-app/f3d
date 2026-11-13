@@ -714,6 +714,12 @@ engine::libInformation engine::getLibInfo()
   libInfo.Modules["FFmpeg"] = false;
 #endif
 
+#if F3D_MODULE_MESHOPT
+  libInfo.Modules["MeshOptimizer"] = true;
+#else
+  libInfo.Modules["MeshOptimizer"] = false;
+#endif
+
   const std::string vtkVersion = std::string(vtkVersion::GetVTKVersionFull());
   if (!vtkVersion.empty())
   {

@@ -11,7 +11,7 @@ please take a look at our [getting started guide](04-GETTING_STARTED.md).
 ## Dependencies
 
 - [CMake](https://cmake.org) >= 3.21.
-- [VTK](https://vtk.org) >= 9.5.0 (9.7.1 recommended).
+- [VTK](https://vtk.org) >= 9.5.0 (9.7.2 recommended).
 - A C++20 compiler.
 - A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
 - Optionally, [Alembic](http://www.alembic.io/) >= 1.8.5.
@@ -31,12 +31,12 @@ please take a look at our [getting started guide](04-GETTING_STARTED.md).
 - Optionally, [web-ifc](https://github.com/ThatOpen/engine_web-ifc) >= 0.75 (only C++ library).
 - Optionally, [WebP](https://chromium.googlesource.com/webm/libwebp) >= 1.2.4.
 
-F3D is tested continuously against versions recommended by the [VFX reference platform](https://vfxplatform.com) defined for **CY2025**
+F3D is tested continuously against minimum/maximum versions including the one recommended by the [VFX reference platform](https://vfxplatform.com) defined for **CY2025**
 Exact tested versions can be found in `.github/workflows/versions.json`.
 
 ## VTK compatibility
 
-As stated in the dependencies, F3D is compatible with VTK >= 9.5.0, however, some features may not be available. We suggest using VTK 9.7.1 with RenderingRayTracing, IOExodus, IOHDF, IONetCDF, IOPDAL and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
+As stated in the dependencies, F3D is compatible with VTK >= 9.5.0, however, some features may not be available. We suggest using VTK 9.7.2 with RenderingRayTracing, IOExodus, IOHDF, IONetCDF, IOPDAL and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
 
 > NOTE: When VTK is compiled for GLES (usually the case for Android and WebAssembly only), F3D is only compatible with the VTK version specified in `.github/workflows/versions.json` file.
 
@@ -60,6 +60,8 @@ Some modules, plugins and language bindings depending on external libraries can 
 - `F3D_MODULE_ANARI`: **Experimental** support for ANARI rendering. Requires that VTK has been built with `RenderingAnariOpenGL` turned on. Disabled by default.
 - `F3D_MODULE_RAYTRACING`: Support for raytracing rendering. Requires that VTK has been built with `OSPRay` and `RenderingRayTracing` turned on. Disabled by default.
 - `F3D_MODULE_EXR`: Support for OpenEXR images. Requires `OpenEXR`. Disabled by default.
+- `F3D_MODULE_FFMPEG`: Support for FFMpeg video streaming. Requires `FFMpeg`. Disabled by default.
+- `F3D_MODULE_MESHOPT`: Support for meshoptimizer. Requires `meshoptimizer`. Disabled by default.
 - `F3D_MODULE_UI`: Support for ImGui widgets. Uses provided ImGui. Enabled by default.
 - `F3D_MODULE_WEBP`: Support for WebP images. Requires `libwebp`. Disabled by default.
 - `F3D_MODULE_CLIP`: Support for clipboard interaction in libf3d, used by `engine::state` and by the application to save/load statefiles to/from the system clipboard. Uses provided clip. Enabled by default.
