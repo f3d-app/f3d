@@ -20,6 +20,8 @@
 #include <vtkCallbackCommand.h>
 #include <vtkLight.h>
 #include <vtkOpenGLRenderer.h>
+#include <vtkSmartPointer.h>
+#include <vtkTextureObject.h>
 #include <vtkVersion.h>
 
 #include <array>
@@ -216,6 +218,9 @@ public:
   void SetBackfaceType(const std::optional<std::string>& backfaceType);
   void SetFinalShader(const std::optional<std::string>& finalShader);
   ///@}
+
+  vtkSetSmartPointerMacro(SceneDepthTexture, vtkTextureObject);
+  vtkGetSmartPointerMacro(SceneDepthTexture, vtkTextureObject);
 
   /**
    * Set SetUseOrthographicProjection
@@ -895,6 +900,7 @@ private:
   vtkNew<vtkSkybox> SkyboxActor;
   vtkNew<vtkF3DUIActor> UIActor;
   vtkNew<vtkF3DFrameCapture> FrameCapture;
+  vtkSmartPointer<vtkTextureObject> SceneDepthTexture;
 
   unsigned int Timer = 0; // Timer OpenGL query
 

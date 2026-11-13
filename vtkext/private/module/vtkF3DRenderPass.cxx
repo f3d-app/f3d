@@ -814,7 +814,7 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
     this->BackgroundPass->Render(&backgroundState);
 
     // the reflection result is used in the main pass so it must be rendered before
-    const vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(r);
+    vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(r);
 
 #if F3D_MODULE_RAYTRACING
     if (!this->UseRaytracing)
@@ -850,6 +850,11 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
     mainState.SetFrameBuffer(s->GetFrameBuffer());
 
     this->MainPass->Render(&mainState);
+
+    if (renderer)
+    {
+      renderer->SetSceneDepthTexture(this->MainPass->GetDepthTexture());
+    }
 
     vtkRenderState mainOnTopState(s->GetRenderer());
     mainOnTopState.SetPropArrayAndCount(
