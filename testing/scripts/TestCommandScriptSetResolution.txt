@@ -1,0 +1,5 @@
+set_resolution 300,800
+set_resolution 200,200
+set_resolution 400,-300
+set_resolution 300,120,400
+set_resolution x,y 
