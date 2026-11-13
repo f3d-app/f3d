@@ -143,6 +143,7 @@ f3d_test_doc(NAME TestDocGridColorCyan DATA DamagedHelmet.glb REF_IMAGE grid_col
 ## --grid-reflection
 f3d_test_doc(NAME TestDocGridReflectionOFF DATA DamagedHelmet.glb REF_IMAGE grid_reflection_off.png ROTATE ARGS -gf)
 f3d_test_doc(NAME TestDocGridReflectionON DATA DamagedHelmet.glb REF_IMAGE grid_reflection_on.png ROTATE ARGS -gf --grid-reflection=0.5)
+f3d_test_doc(NAME TestDocGridReflectionNoLines DATA DamagedHelmet.glb REF_IMAGE grid_reflection_no_lines.png ROTATE ARGS -gf --grid-reflection=0.5 --grid-opacity=0)
 
 ## --grid-absolute
 f3d_test_doc(NAME TestDocGridAbsoluteOFF DATA DamagedHelmet.glb REF_IMAGE grid_absolute_off.png ROTATE ARGS -gf)
@@ -191,6 +192,14 @@ f3d_test_doc(NAME TestDocNormalGlyphsOn DATA DamagedHelmet.glb REF_IMAGE normal_
 ## --normal-glyphs-scale
 f3d_test_doc(NAME TestDocNormalGlyphsScale03 DATA DamagedHelmet.glb REF_IMAGE normal_glyphs_scale_0.3.png ROTATE ARGS --normal-glyphs --normal-glyphs-scale=.3 -f)
 f3d_test_doc(NAME TestDocNormalGlyphsScale07 DATA DamagedHelmet.glb REF_IMAGE normal_glyphs_scale_0.7.png ROTATE ARGS --normal-glyphs --normal-glyphs-scale=.7 -f)
+
+## --normal-glyphs-color
+### white: normal_glyphs_on.png
+f3d_test_doc(NAME TestDocNormalGlyphsColorMaroon DATA DamagedHelmet.glb REF_IMAGE normal_glyphs_maroon.png ROTATE ARGS --normal-glyphs --normal-glyphs-scale=.3 --normal-glyphs-color=maroon -f)
+
+## --normal-glyphs-shape
+### arrow: normal_glyphs_on.png
+f3d_test_doc(NAME TestDocNormalGlyphsShapeCylinder DATA DamagedHelmet.glb REF_IMAGE normal_glyphs_shape_cylinder.png ROTATE ARGS --normal-glyphs --normal-glyphs-scale=.3 --normal-glyphs-shape=cylinder -f)
 
 ## --point-sprites
 ### OFF: damaged_helmet_baseline.png
@@ -306,17 +315,17 @@ f3d_test_doc(NAME TestDocHDRISkyboxON DATA DamagedHelmet.glb REF_IMAGE hdri_skyb
 
 ## --blur-background
 f3d_test_doc(NAME TestDocHDRIBlurOFF DATA DamagedHelmet.glb REF_IMAGE hdri_blur_off.png RESOLUTION 800,600 ROTATE ARGS -fj)
-f3d_test_doc(NAME TestDocHDRIBlurON DATA DamagedHelmet.glb REF_IMAGE hdri_blur_on.png RESOLUTION 800,600 ROTATE ARGS -fju)
+f3d_test_doc(NAME TestDocHDRIBlurON DATA DamagedHelmet.glb REF_IMAGE hdri_blur_on.png RESOLUTION 800,600 ROTATE ARGS -f --hdri-skybox=blurred)
 
 ## --blur-coc
-f3d_test_doc(NAME TestDocHDRICOCDefault DATA DamagedHelmet.glb REF_IMAGE hdri_coc_default.png RESOLUTION 800,600 ROTATE ARGS -fju)
-f3d_test_doc(NAME TestDocHDRICOC50 DATA DamagedHelmet.glb REF_IMAGE hdri_coc_50.png RESOLUTION 800,600 ROTATE ARGS -fju --blur-coc=50)
+f3d_test_doc(NAME TestDocHDRICOCDefault DATA DamagedHelmet.glb REF_IMAGE hdri_coc_default.png RESOLUTION 800,600 ROTATE ARGS -f --hdri-skybox=blurred)
+f3d_test_doc(NAME TestDocHDRICOC50 DATA DamagedHelmet.glb REF_IMAGE hdri_coc_50.png RESOLUTION 800,600 ROTATE ARGS -f --hdri-skybox=blurred --blur-coc=50)
 
 ## --light-intensity
 f3d_test_doc(NAME TestDocLightIntensity1 DATA DamagedHelmet.glb REF_IMAGE light_intensity_1.png ROTATE)
 f3d_test_doc(NAME TestDocLightIntensity2 DATA DamagedHelmet.glb REF_IMAGE light_intensity_2.png ROTATE ARGS --light-intensity=2)
 
-## --scalar-coloring
+## --coloring-mode
 f3d_test_doc(NAME TestDocScalarColoringOFF DATA dragon.vtu REF_IMAGE scalar_coloring_off.png ROTATE ARGS)
 f3d_test_doc(NAME TestDocScalarColoringON DATA dragon.vtu REF_IMAGE scalar_coloring_on.png ROTATE ARGS -s --coloring-component=2)
 
@@ -328,9 +337,9 @@ f3d_test_doc(NAME TestDocColoringArrayHeight DATA dragon.vtu REF_IMAGE coloring_
 f3d_test_doc(NAME TestDocColoringComponentX DATA dragon.vtu REF_IMAGE coloring_component_x.png ROTATE ARGS -s --coloring-array=Normals --coloring-component=0)
 f3d_test_doc(NAME TestDocColoringComponentY DATA dragon.vtu REF_IMAGE coloring_component_y.png ROTATE ARGS -s --coloring-array=Normals --coloring-component=1)
 
-## --coloring-by-cells
-f3d_test_doc(NAME TestDocColoringByCellsOFF DATA ${F3D_SOURCE_DIR}/testing/data/waveletArrays.vti REF_IMAGE coloring_by_cells_off.png ROTATE ARGS -fes --line-width=4)
-f3d_test_doc(NAME TestDocColoringByCellsON DATA ${F3D_SOURCE_DIR}/testing/data/waveletArrays.vti REF_IMAGE coloring_by_cells_on.png ROTATE ARGS -fesc  --line-width=4)
+## --coloring-field
+f3d_test_doc(NAME TestDocColoringByCellsOFF DATA ${F3D_SOURCE_DIR}/testing/data/waveletArrays.vti REF_IMAGE coloring_by_cells_off.png ROTATE ARGS -fes --coloring-field=points --line-width=4)
+f3d_test_doc(NAME TestDocColoringByCellsON DATA ${F3D_SOURCE_DIR}/testing/data/waveletArrays.vti REF_IMAGE coloring_by_cells_on.png ROTATE ARGS -fes --coloring-field=cells --line-width=4)
 
 ## --coloring-range
 f3d_test_doc(NAME TestDocColoringRangeAuto DATA skull.vti REF_IMAGE coloring_range_auto.png ARGS -sv --up=z)
@@ -361,17 +370,17 @@ f3d_test_doc(NAME TestDocVolumeInverseOFF DATA skull.vti REF_IMAGE volume_invers
 f3d_test_doc(NAME TestDocVolumeInverseON DATA skull.vti REF_IMAGE volume_inverse_on.png ARGS -vs --up=z --coloring-range=40,200 --volume-inverse)
 
 if(F3D_MODULE_RAYTRACING)
-  ## --raytracing
+  ## --rendering-mode=ospray
   f3d_test_doc(NAME TestDocRaytracingOFF DATA dragon.vtu REF_IMAGE raytracing_off.png ROTATE ARGS -f --color=0.5,0.5,0.5)
-  f3d_test_doc(NAME TestDocRaytracingON DATA dragon.vtu REF_IMAGE raytracing_on.png ROTATE ARGS -f --color=0.5,0.5,0.5 --raytracing --raytracing-samples=32)
+  f3d_test_doc(NAME TestDocRaytracingON DATA dragon.vtu REF_IMAGE raytracing_on.png ROTATE ARGS -f --color=0.5,0.5,0.5 -r --raytracing-samples=32)
 
   ## --raytracing-samples
-  f3d_test_doc(NAME TestDocRaytracingSamples2 DATA dragon.vtu REF_IMAGE raytracing_samples_2.png ROTATE ARGS -f --color=0.5,0.5,0.5 --raytracing --raytracing-samples=2)
-  f3d_test_doc(NAME TestDocRaytracingSamples6 DATA dragon.vtu REF_IMAGE raytracing_samples_6.png ROTATE ARGS -f --color=0.5,0.5,0.5 --raytracing --raytracing-samples=6)
+  f3d_test_doc(NAME TestDocRaytracingSamples2 DATA dragon.vtu REF_IMAGE raytracing_samples_2.png ROTATE ARGS -f --color=0.5,0.5,0.5 -r --raytracing-samples=2)
+  f3d_test_doc(NAME TestDocRaytracingSamples6 DATA dragon.vtu REF_IMAGE raytracing_samples_6.png ROTATE ARGS -f --color=0.5,0.5,0.5 -r --raytracing-samples=6)
 
   ## --raytracing-denoise
-  f3d_test_doc(NAME TestDocRaytracingDenoiseOFF DATA dragon.vtu REF_IMAGE raytracing_denoise_off.png ROTATE ARGS -f --color=0.5,0.5,0.5 --raytracing --raytracing-samples=2)
-  f3d_test_doc(NAME TestDocRaytracingDenoiseON DATA dragon.vtu REF_IMAGE raytracing_denoise_on.png ROTATE ARGS -f --color=0.5,0.5,0.5 --raytracing --raytracing-samples=2 --raytracing-denoise)
+  f3d_test_doc(NAME TestDocRaytracingDenoiseOFF DATA dragon.vtu REF_IMAGE raytracing_denoise_off.png ROTATE ARGS -f --color=0.5,0.5,0.5 -r --raytracing-samples=2)
+  f3d_test_doc(NAME TestDocRaytracingDenoiseON DATA dragon.vtu REF_IMAGE raytracing_denoise_on.png ROTATE ARGS -f --color=0.5,0.5,0.5 -r --raytracing-samples=2 --raytracing-denoise)
 endif()
 
 ## --blending
@@ -381,6 +390,11 @@ f3d_test_doc(NAME TestDocBlendingON DATA dragon.vtu REF_IMAGE blending_on.png RO
 ## --ambient-occlusion
 f3d_test_doc(NAME TestDocAmbientOcclusionOFF DATA dragon.vtu REF_IMAGE ambient_occlusion_off.png ROTATE ARGS -f)
 f3d_test_doc(NAME TestDocAmbientOcclusionON DATA dragon.vtu REF_IMAGE ambient_occlusion_on.png ROTATE ARGS -f --ambient-occlusion)
+
+## --shadows
+### OFF: ambient_occlusion_off.png
+f3d_test_doc(NAME TestDocShadowsOFF DATA dragon.vtu REF_IMAGE shadows_off.png ROTATE ARGS -g)
+f3d_test_doc(NAME TestDocShadowsON DATA dragon.vtu REF_IMAGE shadows_on.png ROTATE ARGS -g --shadows)
 
 ## --anti-aliasing
 f3d_test_doc(NAME TestDocAntiAliasingOFF DATA dragon.vtu REF_IMAGE anti_aliasing_off.png ROTATE ARGS -f --anti-aliasing=none)

@@ -65,6 +65,8 @@ runs:
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_MODULE_CLIP=ON
         -DF3D_MODULE_EXR=ON
+        -DF3D_MODULE_FFMPEG=ON
+        -DF3D_MODULE_MESHOPT=ON
         -DF3D_MODULE_UI=ON
         -DF3D_MODULE_WEBP=ON
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
@@ -87,15 +89,19 @@ runs:
     - name: Clang-tidy
       shell: bash
       working-directory: ${{github.workspace}}/source
-      run: run-clang-tidy -quiet -p ../build
+      run: >
+        run-clang-tidy -quiet -j2
+        -p ../build
+        -source-filter='(?!.*external.*)'
 
     - name: Cppcheck
       shell: bash
       working-directory: ${{github.workspace}}/source
       run: >
-        cppcheck -q
+        cppcheck -q -j2
         --project=../build/compile_commands.json
-        --enable=all
+        --cppcheck-build-dir=../build
+        --enable=warning
         --suppressions-list=.cppcheck.supp
         --inline-suppr
         --error-exitcode=1

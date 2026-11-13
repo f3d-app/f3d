@@ -85,7 +85,7 @@ endforeach()
 f3d_plugin_declare_reader(
   NAME STEP
   EXTENSIONS stp step stpnc p21 210
-  MIMETYPES application/vnd.step
+  MIMETYPES application/vnd.step model/step
   VTK_READER vtkF3DOCCTReader
   FORMAT_DESCRIPTION "STEP ISO 10303"
   ${_SUPPORTS_STREAM}
@@ -119,6 +119,18 @@ if (F3D_PLUGIN_OCCT_COLORING_SUPPORT)
     OPTIONS linear_deflection angular_deflection read_wire relative_deflection
   )
 endif()
+
+f3d_plugin_declare_reader(
+  NAME FCStd
+  EXTENSIONS fcstd
+  MIMETYPES application/x-extension-fcstd
+  VTK_READER vtkF3DFCStdReader
+  FORMAT_DESCRIPTION "FreeCAD Standard"
+  ${_SUPPORTS_STREAM}
+  CAN_READ STATIC
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/FCStd.inl"
+  OPTIONS linear_deflection angular_deflection read_wire relative_deflection
+)
 
 set(rpaths "")
 get_target_property(target_type TKernel TYPE)

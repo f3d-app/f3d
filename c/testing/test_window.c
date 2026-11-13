@@ -17,15 +17,17 @@ int test_window()
   if (!window)
   {
     puts("[ERROR] Failed to get window");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return 1;
   }
+
+  f3d_window_set_use_hdri_cache(window, 1);
 
   double dpi_scale = f3d_window_get_dpi_scale(window);
   if (dpi_scale < 1.0)
   {
     puts("[ERROR] DPI scale value unexpected");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return 1;
   }
 
@@ -43,7 +45,7 @@ int test_window()
   f3d_image_t* img = f3d_window_render_to_image(window, 0);
   if (img)
   {
-    f3d_image_delete(img);
+    f3d_image_destroy(img);
   }
 
   f3d_window_set_size(window, 800, 600);
@@ -56,7 +58,7 @@ int test_window()
   if (sizeWidth != width || sizeHeight != height)
   {
     puts("[ERROR] Window size does not match the window width/height");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return 1;
   }
 
@@ -73,14 +75,14 @@ int test_window()
   if (posX != posX2 || posY != posY2)
   {
     puts("[ERROR] Window position is not stable");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return 1;
   }
 
   if (f3d_window_get_left(window) != posX || f3d_window_get_top(window) != posY)
   {
     puts("[ERROR] Window left/top do not match the window position");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return 1;
   }
 
@@ -97,6 +99,6 @@ int test_window()
   f3d_point3_t display_out;
   f3d_window_get_display_from_world(window, test_world, display_out);
 
-  f3d_engine_delete(engine);
+  f3d_engine_destroy(engine);
   return 0;
 }

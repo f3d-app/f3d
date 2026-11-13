@@ -107,8 +107,8 @@ public:
   F3DStarter();
   ~F3DStarter();
 
-  F3DStarter(F3DStarter const&) = delete;
-  void operator=(F3DStarter const&) = delete;
+  F3DStarter(const F3DStarter&) = delete;
+  void operator=(const F3DStarter&) = delete;
 
 private:
   class F3DInternals;

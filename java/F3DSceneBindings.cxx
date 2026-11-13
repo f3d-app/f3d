@@ -11,20 +11,20 @@ static std::vector<std::string> JavaListToStringVector(JNIEnv* env, jobject list
 {
   std::vector<std::string> vec;
 
-  jclass listClass = env->GetObjectClass(list);
+  const JniLocalRef<jclass> listClass(env, env->GetObjectClass(list));
   jmethodID sizeMethod = env->GetMethodID(listClass, "size", "()I");
   jmethodID getMethod = env->GetMethodID(listClass, "get", "(I)Ljava/lang/Object;");
 
-  jint size = env->CallIntMethod(list, sizeMethod);
+  const jint size = env->CallIntMethod(list, sizeMethod);
 
   for (jint i = 0; i < size; i++)
   {
-    if (jstring jstr = static_cast<jstring>(env->CallObjectMethod(list, getMethod, i)))
+    const JniLocalRef<jstring> jstr(
+      env, static_cast<jstring>(env->CallObjectMethod(list, getMethod, i)));
+    if (jstr.get())
     {
-      const char* str = env->GetStringUTFChars(jstr, nullptr);
-      vec.push_back(str);
-      env->ReleaseStringUTFChars(jstr, str);
-      env->DeleteLocalRef(jstr);
+      const JniUTFString str(env, jstr);
+      vec.push_back(str.c_str());
     }
   }
 
@@ -35,7 +35,7 @@ static f3d::mesh_t JavaMeshToCppMesh(JNIEnv* env, jobject jmesh)
 {
   f3d::mesh_t cppMesh;
 
-  jclass meshClass = env->GetObjectClass(jmesh);
+  const JniLocalRef<jclass> meshClass(env, env->GetObjectClass(jmesh));
 
   jfieldID pointsField = env->GetFieldID(meshClass, "points", "[F");
   jfieldID normalsField = env->GetFieldID(meshClass, "normals", "[F");
@@ -52,7 +52,7 @@ static f3d::mesh_t JavaMeshToCppMesh(JNIEnv* env, jobject jmesh)
 
   if (pointsArray)
   {
-    jsize pointsLen = env->GetArrayLength(pointsArray);
+    const jsize pointsLen = env->GetArrayLength(pointsArray);
     float* pointsData = env->GetFloatArrayElements(pointsArray, nullptr);
     cppMesh.points.assign(pointsData, pointsData + pointsLen);
     env->ReleaseFloatArrayElements(pointsArray, pointsData, 0);
@@ -60,7 +60,7 @@ static f3d::mesh_t JavaMeshToCppMesh(JNIEnv* env, jobject jmesh)
 
   if (normalsArray)
   {
-    jsize normalsLen = env->GetArrayLength(normalsArray);
+    const jsize normalsLen = env->GetArrayLength(normalsArray);
     float* normalsData = env->GetFloatArrayElements(normalsArray, nullptr);
     cppMesh.normals.assign(normalsData, normalsData + normalsLen);
     env->ReleaseFloatArrayElements(normalsArray, normalsData, 0);
@@ -68,7 +68,7 @@ static f3d::mesh_t JavaMeshToCppMesh(JNIEnv* env, jobject jmesh)
 
   if (textureCoordinatesArray)
   {
-    jsize texCoordsLen = env->GetArrayLength(textureCoordinatesArray);
+    const jsize texCoordsLen = env->GetArrayLength(textureCoordinatesArray);
     float* texCoordsData = env->GetFloatArrayElements(textureCoordinatesArray, nullptr);
     cppMesh.texture_coordinates.assign(texCoordsData, texCoordsData + texCoordsLen);
     env->ReleaseFloatArrayElements(textureCoordinatesArray, texCoordsData, 0);
@@ -76,7 +76,7 @@ static f3d::mesh_t JavaMeshToCppMesh(JNIEnv* env, jobject jmesh)
 
   if (faceSidesArray)
   {
-    jsize faceSidesLen = env->GetArrayLength(faceSidesArray);
+    const jsize faceSidesLen = env->GetArrayLength(faceSidesArray);
     int* faceSidesData = env->GetIntArrayElements(faceSidesArray, nullptr);
     cppMesh.face_sides.assign(faceSidesData, faceSidesData + faceSidesLen);
     env->ReleaseIntArrayElements(faceSidesArray, faceSidesData, 0);
@@ -84,7 +84,7 @@ static f3d::mesh_t JavaMeshToCppMesh(JNIEnv* env, jobject jmesh)
 
   if (faceIndicesArray)
   {
-    jsize faceIndicesLen = env->GetArrayLength(faceIndicesArray);
+    const jsize faceIndicesLen = env->GetArrayLength(faceIndicesArray);
     int* faceIndicesData = env->GetIntArrayElements(faceIndicesArray, nullptr);
     cppMesh.face_indices.assign(faceIndicesData, faceIndicesData + faceIndicesLen);
     env->ReleaseIntArrayElements(faceIndicesArray, faceIndicesData, 0);
@@ -97,7 +97,7 @@ static f3d::light_state_t JavaLightStateToCppLightState(JNIEnv* env, jobject jli
 {
   f3d::light_state_t cppLightState;
 
-  jclass lightStateClass = env->GetObjectClass(jlightState);
+  const JniLocalRef<jclass> lightStateClass(env, env->GetObjectClass(jlightState));
 
   jfieldID typeField = env->GetFieldID(lightStateClass, "type", "Lapp/f3d/F3D/Types$LightType;");
   jfieldID positionField = env->GetFieldID(lightStateClass, "position", "[D");
@@ -106,30 +106,35 @@ static f3d::light_state_t JavaLightStateToCppLightState(JNIEnv* env, jobject jli
   jfieldID positionalLightField = env->GetFieldID(lightStateClass, "positionalLight", "Z");
   jfieldID intensityField = env->GetFieldID(lightStateClass, "intensity", "D");
   jfieldID switchStateField = env->GetFieldID(lightStateClass, "switchState", "Z");
+  jfieldID castShadowsField = env->GetFieldID(lightStateClass, "castShadows", "Z");
 
-  jobject jtype = env->GetObjectField(jlightState, typeField);
-  jclass typeEnumClass = env->GetObjectClass(jtype);
+  const JniLocalRef<jobject> jtype(env, env->GetObjectField(jlightState, typeField));
+  const JniLocalRef<jclass> typeEnumClass(env, env->GetObjectClass(jtype));
   jmethodID getValueMethod = env->GetMethodID(typeEnumClass, "getValue", "()I");
-  jint typeValue = env->CallIntMethod(jtype, getValueMethod);
+  const jint typeValue = env->CallIntMethod(jtype, getValueMethod);
   cppLightState.type = static_cast<f3d::light_type>(typeValue);
 
-  if (jdoubleArray jposition =
-        static_cast<jdoubleArray>(env->GetObjectField(jlightState, positionField)))
+  const JniLocalRef<jdoubleArray> jposition(
+    env, static_cast<jdoubleArray>(env->GetObjectField(jlightState, positionField)));
+  if (jposition.get())
   {
     double* posData = env->GetDoubleArrayElements(jposition, nullptr);
     cppLightState.position = { posData[0], posData[1], posData[2] };
     env->ReleaseDoubleArrayElements(jposition, posData, 0);
   }
 
-  if (jdoubleArray jcolor = static_cast<jdoubleArray>(env->GetObjectField(jlightState, colorField)))
+  const JniLocalRef<jdoubleArray> jcolor(
+    env, static_cast<jdoubleArray>(env->GetObjectField(jlightState, colorField)));
+  if (jcolor.get())
   {
     double* colorData = env->GetDoubleArrayElements(jcolor, nullptr);
     cppLightState.color = { colorData[0], colorData[1], colorData[2] };
     env->ReleaseDoubleArrayElements(jcolor, colorData, 0);
   }
 
-  if (jdoubleArray jdirection =
-        static_cast<jdoubleArray>(env->GetObjectField(jlightState, directionField)))
+  const JniLocalRef<jdoubleArray> jdirection(
+    env, static_cast<jdoubleArray>(env->GetObjectField(jlightState, directionField)));
+  if (jdirection.get())
   {
     double* dirData = env->GetDoubleArrayElements(jdirection, nullptr);
     cppLightState.direction = { dirData[0], dirData[1], dirData[2] };
@@ -139,6 +144,7 @@ static f3d::light_state_t JavaLightStateToCppLightState(JNIEnv* env, jobject jli
   cppLightState.positionalLight = env->GetBooleanField(jlightState, positionalLightField);
   cppLightState.intensity = env->GetDoubleField(jlightState, intensityField);
   cppLightState.switchState = env->GetBooleanField(jlightState, switchStateField);
+  cppLightState.castShadows = env->GetBooleanField(jlightState, castShadowsField);
 
   return cppLightState;
 }
@@ -152,16 +158,15 @@ extern "C"
       return self;
     }
 
-    const char* str = env->GetStringUTFChars(path, nullptr);
+    const JniUTFString str(env, path);
     try
     {
-      GetEngine(env, self)->getScene().add(str);
+      GetEngine(env, self)->getScene().add(str.c_str());
     }
     catch (const f3d::scene::load_failure_exception& e)
     {
       F3DThrowJavaException(env, "app/f3d/F3D/Scene$LoadFailureException", e.what());
     }
-    env->ReleaseStringUTFChars(path, str);
     return self;
   }
 
@@ -172,7 +177,7 @@ extern "C"
       return self;
     }
 
-    std::vector<std::string> vec = JavaListToStringVector(env, paths);
+    const std::vector<std::string> vec = JavaListToStringVector(env, paths);
     try
     {
       GetEngine(env, self)->getScene().add(vec);
@@ -191,7 +196,7 @@ extern "C"
       return self;
     }
 
-    f3d::mesh_t cppMesh = JavaMeshToCppMesh(env, mesh);
+    const f3d::mesh_t cppMesh = JavaMeshToCppMesh(env, mesh);
     try
     {
       GetEngine(env, self)->getScene().add(cppMesh);
@@ -205,7 +210,7 @@ extern "C"
 
   JNIEXPORT jobject JAVA_BIND(Scene, addBuffer)(JNIEnv* env, jobject self, jbyteArray buffer)
   {
-    jsize bufferLen = env->GetArrayLength(buffer);
+    const jsize bufferLen = env->GetArrayLength(buffer);
     jbyte* bufferData = env->GetByteArrayElements(buffer, nullptr);
     if (!bufferData || bufferLen <= 0)
     {
@@ -231,6 +236,19 @@ extern "C"
     return self;
   }
 
+  JNIEXPORT jobject JAVA_BIND(Scene, getAddedFiles)(JNIEnv* env, jobject self)
+  {
+    const std::vector<std::filesystem::path> files =
+      GetEngine(env, self)->getScene().getAddedFiles();
+    std::vector<std::string> fileStrings;
+    fileStrings.reserve(files.size());
+    for (const std::filesystem::path& file : files)
+    {
+      fileStrings.push_back(file.string());
+    }
+    return CreateStringList(env, fileStrings);
+  }
+
   JNIEXPORT jint JAVA_BIND(Scene, addLight)(JNIEnv* env, jobject self, jobject lightState)
   {
     if (!lightState)
@@ -238,7 +256,7 @@ extern "C"
       return -1;
     }
 
-    f3d::light_state_t cppLightState = JavaLightStateToCppLightState(env, lightState);
+    const f3d::light_state_t cppLightState = JavaLightStateToCppLightState(env, lightState);
     try
     {
       return GetEngine(env, self)->getScene().addLight(cppLightState);
@@ -261,34 +279,38 @@ extern "C"
     {
       f3d::light_state_t cppLightState = GetEngine(env, self)->getScene().getLight(index);
 
-      jclass lightStateClass = env->FindClass("app/f3d/F3D/Types$LightState");
+      const JniLocalRef<jclass> lightStateClass(
+        env, env->FindClass("app/f3d/F3D/Types$LightState"));
       jmethodID constructor = env->GetMethodID(lightStateClass, "<init>", "()V");
+      // Not wrapped in JniLocalRef: this is the return value, and its local reference
+      // must remain valid until it crosses back into the JVM after this function returns.
       jobject jlightState = env->NewObject(lightStateClass, constructor);
 
-      jclass typeEnumClass = env->FindClass("app/f3d/F3D/Types$LightType");
+      const JniLocalRef<jclass> typeEnumClass(env, env->FindClass("app/f3d/F3D/Types$LightType"));
       jmethodID fromValueMethod =
         env->GetStaticMethodID(typeEnumClass, "fromValue", "(I)Lapp/f3d/F3D/Types$LightType;");
-      jobject jtype = env->CallStaticObjectMethod(
-        typeEnumClass, fromValueMethod, static_cast<int>(cppLightState.type));
+      const JniLocalRef<jobject> jtype(env,
+        env->CallStaticObjectMethod(
+          typeEnumClass, fromValueMethod, static_cast<int>(cppLightState.type)));
       jfieldID typeField =
         env->GetFieldID(lightStateClass, "type", "Lapp/f3d/F3D/Types$LightType;");
       env->SetObjectField(jlightState, typeField, jtype);
 
-      jdoubleArray jposition = env->NewDoubleArray(3);
+      const JniLocalRef<jdoubleArray> jposition(env, env->NewDoubleArray(3));
       double posData[] = { cppLightState.position[0], cppLightState.position[1],
         cppLightState.position[2] };
       env->SetDoubleArrayRegion(jposition, 0, 3, posData);
       jfieldID positionField = env->GetFieldID(lightStateClass, "position", "[D");
       env->SetObjectField(jlightState, positionField, jposition);
 
-      jdoubleArray jcolor = env->NewDoubleArray(3);
+      const JniLocalRef<jdoubleArray> jcolor(env, env->NewDoubleArray(3));
       double colorData[] = { cppLightState.color[0], cppLightState.color[1],
         cppLightState.color[2] };
       env->SetDoubleArrayRegion(jcolor, 0, 3, colorData);
       jfieldID colorField = env->GetFieldID(lightStateClass, "color", "[D");
       env->SetObjectField(jlightState, colorField, jcolor);
 
-      jdoubleArray jdirection = env->NewDoubleArray(3);
+      const JniLocalRef<jdoubleArray> jdirection(env, env->NewDoubleArray(3));
       double dirData[] = { cppLightState.direction[0], cppLightState.direction[1],
         cppLightState.direction[2] };
       env->SetDoubleArrayRegion(jdirection, 0, 3, dirData);
@@ -321,7 +343,7 @@ extern "C"
       return self;
     }
 
-    f3d::light_state_t cppLightState = JavaLightStateToCppLightState(env, lightState);
+    const f3d::light_state_t cppLightState = JavaLightStateToCppLightState(env, lightState);
     try
     {
       GetEngine(env, self)->getScene().updateLight(index, cppLightState);
@@ -357,12 +379,12 @@ extern "C"
     const std::vector<f3d::node_state_t> cppNodeStates =
       GetEngine(env, self)->getScene().getSceneHierarchy();
 
-    jclass arrayListClass = env->FindClass("java/util/ArrayList");
+    const JniLocalRef<jclass> arrayListClass(env, env->FindClass("java/util/ArrayList"));
     jmethodID arrayListConstructor = env->GetMethodID(arrayListClass, "<init>", "()V");
     jmethodID addMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
     jobject list = env->NewObject(arrayListClass, arrayListConstructor);
 
-    jclass nodeStateClass = env->FindClass("app/f3d/F3D/Types$NodeState");
+    const JniLocalRef<jclass> nodeStateClass(env, env->FindClass("app/f3d/F3D/Types$NodeState"));
     jmethodID nodeStateConstructor = env->GetMethodID(nodeStateClass, "<init>", "()V");
 
     jfieldID idField = env->GetFieldID(nodeStateClass, "id", "I");
@@ -375,22 +397,21 @@ extern "C"
 
     for (const f3d::node_state_t& cppNodeState : cppNodeStates)
     {
-      jobject jnodeState = env->NewObject(nodeStateClass, nodeStateConstructor);
+      const JniLocalRef<jobject> jnodeState(
+        env, env->NewObject(nodeStateClass, nodeStateConstructor));
 
       env->SetIntField(jnodeState, idField, cppNodeState.id);
       env->SetIntField(jnodeState, parentIdField, cppNodeState.parentId);
       env->SetIntField(jnodeState, levelField, cppNodeState.level);
 
-      jstring jlabel = env->NewStringUTF(cppNodeState.label.c_str());
+      const JniLocalRef<jstring> jlabel(env, env->NewStringUTF(cppNodeState.label.c_str()));
       env->SetObjectField(jnodeState, labelField, jlabel);
-      env->DeleteLocalRef(jlabel);
 
       env->SetBooleanField(jnodeState, visibleField, cppNodeState.visible);
       env->SetBooleanField(jnodeState, hasChildrenField, cppNodeState.hasChildren);
       env->SetBooleanField(jnodeState, collapsedField, cppNodeState.collapsed);
 
-      env->CallBooleanMethod(list, addMethod, jnodeState);
-      env->DeleteLocalRef(jnodeState);
+      env->CallBooleanMethod(list, addMethod, jnodeState.get());
     }
 
     return list;
@@ -410,70 +431,60 @@ extern "C"
     return self;
   }
 
-  JNIEXPORT jboolean JAVA_BIND(Scene, supports)(JNIEnv* env, jobject self, jstring filePath)
+  JNIEXPORT jobject JAVA_BIND(Scene, getSceneInfo)(JNIEnv* env, jobject self)
+  {
+    const f3d::scene_info_t cppSceneInfo = GetEngine(env, self)->getScene().getSceneInfo();
+
+    jclass sceneInfoClass = env->FindClass("app/f3d/F3D/Types$SceneInfo");
+    jmethodID sceneInfoConstructor = env->GetMethodID(sceneInfoClass, "<init>", "()V");
+    jobject jsceneInfo = env->NewObject(sceneInfoClass, sceneInfoConstructor);
+
+    jfieldID numberOfFilesField = env->GetFieldID(sceneInfoClass, "numberOfFiles", "I");
+    jfieldID numberOfActorsField = env->GetFieldID(sceneInfoClass, "numberOfActors", "I");
+    jfieldID numberOfPointsField = env->GetFieldID(sceneInfoClass, "numberOfPoints", "J");
+    jfieldID numberOfCellsField = env->GetFieldID(sceneInfoClass, "numberOfCells", "J");
+
+    env->SetIntField(jsceneInfo, numberOfFilesField, cppSceneInfo.numberOfFiles);
+    env->SetIntField(jsceneInfo, numberOfActorsField, cppSceneInfo.numberOfActors);
+    env->SetLongField(jsceneInfo, numberOfPointsField, cppSceneInfo.numberOfPoints);
+    env->SetLongField(jsceneInfo, numberOfCellsField, cppSceneInfo.numberOfCells);
+
+    return jsceneInfo;
+  }
+
+  JNIEXPORT jobject JAVA_BIND(Scene, supports)(JNIEnv* env, jobject self, jstring filePath)
   {
     if (!filePath)
     {
-      return false;
+      F3DThrowJavaException(env, "java/lang/IllegalArgumentException", "filePath must not be null");
+      return nullptr;
     }
 
-    const char* str = env->GetStringUTFChars(filePath, nullptr);
-    bool result = GetEngine(env, self)->getScene().supports(str);
-    env->ReleaseStringUTFChars(filePath, str);
-    return result;
+    const JniUTFString str(env, filePath);
+    const f3d::file_availability result = GetEngine(env, self)->getScene().supports(str.c_str());
+
+    const JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Scene$FileAvailability"));
+    jmethodID fromValueMethod =
+      env->GetStaticMethodID(enumClass, "fromValue", "(I)Lapp/f3d/F3D/Scene$FileAvailability;");
+    return env->CallStaticObjectMethod(enumClass, fromValueMethod, static_cast<int>(result));
   }
 
-  JNIEXPORT jobject JAVA_BIND(Scene, loadAnimationTime)(
-    JNIEnv* env, jobject self, jdouble timeValue)
+  JNIEXPORT jobject JAVA_BIND(Scene, supportsBuffer)(JNIEnv* env, jobject self, jbyteArray buffer)
   {
-    GetEngine(env, self)->getScene().loadAnimationTime(timeValue);
-    return self;
-  }
+    jsize bufferLen = env->GetArrayLength(buffer);
+    jbyte* bufferData = bufferLen > 0 ? env->GetByteArrayElements(buffer, nullptr) : nullptr;
 
-  JNIEXPORT jdoubleArray JAVA_BIND(Scene, animationTimeRange)(JNIEnv* env, jobject self)
-  {
-    auto [minTime, maxTime] = GetEngine(env, self)->getScene().animationTimeRange();
+    f3d::file_availability result = GetEngine(env, self)->getScene().supports(
+      reinterpret_cast<std::byte*>(bufferData), static_cast<size_t>(bufferLen));
 
-    jdoubleArray result = env->NewDoubleArray(2);
-    double timeRange[] = { minTime, maxTime };
-    env->SetDoubleArrayRegion(result, 0, 2, timeRange);
-
-    return result;
-  }
-
-  JNIEXPORT jdoubleArray JAVA_BIND(Scene, getAnimationKeyFrames)(JNIEnv* env, jobject self)
-  {
-    auto keyframeVec = GetEngine(env, self)->getScene().getAnimationKeyFrames();
-    jdoubleArray result = env->NewDoubleArray(keyframeVec.size());
-    const jdouble* keyframes = keyframeVec.data();
-    env->SetDoubleArrayRegion(result, 0, keyframeVec.size(), keyframes);
-    return result;
-  }
-
-  JNIEXPORT jint JAVA_BIND(Scene, availableAnimations)(JNIEnv* env, jobject self)
-  {
-    return GetEngine(env, self)->getScene().availableAnimations();
-  }
-
-  JNIEXPORT jstring JAVA_BIND(Scene, getAnimationName)(JNIEnv* env, jobject self, jint index)
-  {
-    return env->NewStringUTF(GetEngine(env, self)->getScene().getAnimationName(index).c_str());
-  }
-
-  JNIEXPORT jobject JAVA_BIND(Scene, getAnimationNames)(JNIEnv* env, jobject self)
-  {
-    return CreateStringList(env, GetEngine(env, self)->getScene().getAnimationNames());
-  }
-
-  JNIEXPORT jobject JAVA_BIND(Scene, getAddedFiles)(JNIEnv* env, jobject self)
-  {
-    std::vector<std::filesystem::path> files = GetEngine(env, self)->getScene().getAddedFiles();
-    std::vector<std::string> fileStrings;
-    fileStrings.reserve(files.size());
-    for (const std::filesystem::path& file : files)
+    if (bufferData)
     {
-      fileStrings.push_back(file.string());
+      env->ReleaseByteArrayElements(buffer, bufferData, 0);
     }
-    return CreateStringList(env, fileStrings);
+
+    const JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Scene$FileAvailability"));
+    jmethodID fromValueMethod =
+      env->GetStaticMethodID(enumClass, "fromValue", "(I)Lapp/f3d/F3D/Scene$FileAvailability;");
+    return env->CallStaticObjectMethod(enumClass, fromValueMethod, static_cast<int>(result));
   }
 }

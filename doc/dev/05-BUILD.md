@@ -2,7 +2,7 @@
 
 > [!NOTE]
 > For WebAssembly cross-compilation, follow the dedicated guide [here](14-BUILD_WASM.md).
-> For other dedicated tools and builds setupo, see [this doc](07-TOOLING.md).
+> For other dedicated tools and build setups, see [this doc](07-TOOLING.md).
 
 F3D uses a CMake based build system, so building F3D just requires installing
 needed dependencies, configuring and building. If you are not used to such processes
@@ -10,29 +10,33 @@ please take a look at our [getting started guide](04-GETTING_STARTED.md).
 
 ## Dependencies
 
-- [CMake](https://cmake.org) >= 3.1.
-- [VTK](https://vtk.org) >= 9.4.0 (9.6.2 recommended).
+- [CMake](https://cmake.org) >= 3.21.
+- [VTK](https://vtk.org) >= 9.5.0 (9.7.2 recommended).
 - A C++20 compiler.
 - A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
-- Optionally, [Assimp](https://www.assimp.org/) >= 5.4.0 (6.0.2 recommended).
-- Optionally, Open CASCADE [OCCT](https://dev.opencascade.org/) >= 7.6.3 (7.9.1 recommended).
 - Optionally, [Alembic](http://www.alembic.io/) >= 1.8.5.
-- Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 24.08 (25.05.01 recommended).
-- Optionally, [OpenVDB](https://www.openvdb.org/download/) >= 12.0.0, enable `IOOpenVDB` module during VTK configuration.
-- Optionally, [PDAL](https://pdal.org/en/2.10.0/) >= 2.0.0 (2.9.0 recommended), enable `IOPDAL` module during VTK configuration.
-- Optionally, [web-ifc](https://github.com/ThatOpen/engine_web-ifc) >= 0.75 (only C++ library).
-- Optionally, [OSPray](https://www.ospray.org/) == 2.12.0, enable `RenderingRayTracing` module during VTK configuration.
+- Optionally, [Assimp](https://www.assimp.org/) >= 5.4.0 (>= 6.0.2 recommended).
+- Optionally, [ANARI](https://github.com/KhronosGroup/ANARI-SDK) >= 0.16.0.
 - Optionally, [Draco](https://google.github.io/draco/) >= 1.5.6.
-- Optionally, [Python](https://www.python.org/) >= 3.10 and [pybind11](https://github.com/pybind/pybind11) >= 3.0.0.
 - Optionally, [Java](https://www.java.com) >= 17.
+- Optionally, [FFmpeg](https://code.ffmpeg.org/FFmpeg/FFmpeg) >= 8.0.1.
+- Optionally, [OpenCASCADE](https://dev.opencascade.org/) >= 7.6.3 (>= 7.9.1 recommended).
 - Optionally, [OpenEXR](https://openexr.com/en/latest/) >= 3.0.1.
+- Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 24.08 (>= 25.05.01 recommended).
+- Optionally, [OpenVDB](https://www.openvdb.org/download/) >= 12.0.0, enable `IOOpenVDB` module during VTK configuration.
+- Optionally, [OpenXR](https://github.com/KhronosGroup/OpenXR-SDK), enable `RenderingOpenXR` module during VTK configuration.
+- Optionally, [OSPray](https://www.ospray.org/) == 2.12.0, enable `RenderingRayTracing` module during VTK configuration.
+- Optionally, [PDAL](https://pdal.org/en/2.10.0/) >= 2.9.0, enable `IOPDAL` module during VTK configuration.
+- Optionally, [Python](https://www.python.org/) >= 3.11 and [pybind11](https://github.com/pybind/pybind11) >= 3.0.0.
+- Optionally, [web-ifc](https://github.com/ThatOpen/engine_web-ifc) >= 0.75 (only C++ library).
 - Optionally, [WebP](https://chromium.googlesource.com/webm/libwebp) >= 1.2.4.
 
-F3D is tested continuously against versions recommended by the [VFX reference platform](https://vfxplatform.com) defined for **CY2025**
+F3D is tested continuously against minimum/maximum versions including the one recommended by the [VFX reference platform](https://vfxplatform.com) defined for **CY2025**
+Exact tested versions can be found in `.github/workflows/versions.json`.
 
 ## VTK compatibility
 
-As stated in the dependencies, F3D is compatible with VTK >= 9.4.0, however, some features may not be available. We suggest using VTK 9.6.2 with RenderingRayTracing, IOExodus, IOHDF, IONetCDF, IOPDAL and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
+As stated in the dependencies, F3D is compatible with VTK >= 9.5.0, however, some features may not be available. We suggest using VTK 9.7.2 with RenderingRayTracing, IOExodus, IOHDF, IONetCDF, IOPDAL and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
 
 > NOTE: When VTK is compiled for GLES (usually the case for Android and WebAssembly only), F3D is only compatible with the VTK version specified in `.github/workflows/versions.json` file.
 
@@ -53,11 +57,15 @@ Here is some CMake options of interest:
 
 Some modules, plugins and language bindings depending on external libraries can be optionally enabled with the following CMake variables:
 
+- `F3D_MODULE_ANARI`: **Experimental** support for ANARI rendering. Requires that VTK has been built with `RenderingAnariOpenGL` turned on. Disabled by default.
 - `F3D_MODULE_RAYTRACING`: Support for raytracing rendering. Requires that VTK has been built with `OSPRay` and `RenderingRayTracing` turned on. Disabled by default.
 - `F3D_MODULE_EXR`: Support for OpenEXR images. Requires `OpenEXR`. Disabled by default.
+- `F3D_MODULE_FFMPEG`: Support for FFMpeg video streaming. Requires `FFMpeg`. Disabled by default.
+- `F3D_MODULE_MESHOPT`: Support for meshoptimizer. Requires `meshoptimizer`. Disabled by default.
 - `F3D_MODULE_UI`: Support for ImGui widgets. Uses provided ImGui. Enabled by default.
 - `F3D_MODULE_WEBP`: Support for WebP images. Requires `libwebp`. Disabled by default.
 - `F3D_MODULE_CLIP`: Support for clipboard interaction in libf3d, used by `engine::state` and by the application to save/load statefiles to/from the system clipboard. Uses provided clip. Enabled by default.
+- `F3D_MODULE_OPENXR`: Support for experimental OpenXR rendering. Requires that VTK has been built with `RenderingOpenXR` module. Disabled by default.
 - `F3D_PLUGIN_BUILD_HDF`: Support for VTKHDF (.vtkhdf), ExodusII (.ex2), and NetCDF (.nc) file formats. Requires that VTK has been built with `IOHDF`, `IOExodus`, and `IONetCDF` modules (and `hdf5`). Enabled by default.
 - `F3D_PLUGIN_BUILD_OCCT`: Support for STEP, IGES, BREP, and XBF file formats. Requires `OpenCASCADE`. Disabled by default.
 - `F3D_PLUGIN_BUILD_ASSIMP`: Support for FBX, DAE, OFF, DXF, X, 3MF and AMF file formats. Requires `Assimp`. Disabled by default.
@@ -157,17 +165,17 @@ Here is the list of all the components:
 | Name            | Installed by default | Operating system | Description                                                                                                                 |
 | --------------- | -------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `application`   | YES                  | ALL              | F3D application.                                                                                                            |
-| `configuration` | NO                   | ALL              | Default configuration files, `config` and `thumbnail`.                                                                      |
+| `configuration` | YES                  | ALL              | Default configuration files, `config` and `thumbnail`.                                                                      |
 | `library`       | YES                  | ALL              | libf3d library binaries.                                                                                                    |
 | `plugin`        | YES                  | ALL              | libf3d plugins.                                                                                                             |
 | `dependencies`  | NO                   | ALL              | libf3d runtime dependencies. Can be used to create a self-contained and relocatable package. System libraries are excluded. |
-| `sdk`           | NO                   | ALL              | libf3d SDK (headers and CMake config files) for `library` and `application` find_package components.                        |
-| `plugin_sdk`    | NO                   | ALL              | libf3d plugin SDK (headers and CMake config files including macros) for `pluginsdk` find_package components.                |
+| `sdk`           | YES                  | ALL              | libf3d SDK (headers, CMake config files and pkg-config files) for `library` and `application` find_package components.      |
+| `plugin_sdk`    | YES                  | ALL              | libf3d plugin SDK (headers and CMake config files including macros) for `pluginsdk` find_package components.                |
 | `licenses`      | YES                  | ALL              | F3D and third party licenses.                                                                                               |
 | `documentation` | YES                  | Linux            | `man` documentation.                                                                                                        |
 | `shellext`      | YES                  | Windows/Linux    | Desktop integration.                                                                                                        |
 | `python`        | YES                  | ALL              | Python bindings.                                                                                                            |
 | `java`          | YES                  | ALL              | Java bindings.                                                                                                              |
-| `mimetypes`     | NO                   | Linux            | Plugins mimetype XML files for integration with Freedesktop.                                                                |
+| `mimetypes`     | YES                  | Linux            | Plugins mimetype XML files for integration with Freedesktop.                                                                |
 | `assets`        | YES                  | Linux            | Assets for integration with Freedesktop.                                                                                    |
-| `colormaps`     | NO                   | ALL              | Color maps presets, see [documentation](../user/10-COLOR_MAPS.md)                                                           |
+| `colormaps`     | YES                  | ALL              | Color maps presets, see [documentation](../user/10-COLOR_MAPS.md)                                                           |

@@ -54,3 +54,24 @@ void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)
       break;
   }
 }
+
+//----------------------------------------------------------------------------
+void vtkF3DConsoleOutputWindow::DisplayProgress(const char* str)
+{
+  this->Superclass::DisplayText(str);
+
+  switch (this->GetDisplayStream(this->GetCurrentMessageType()))
+  {
+    case vtkOutputWindow::StreamType::StdOutput:
+      std::cout.flush();
+      break;
+    case vtkOutputWindow::StreamType::StdError:
+      std::cerr.flush();
+      break;
+    // Other value that cannot be hit
+    // LCOV_EXCL_START
+    default:
+      break;
+      // LCOV_EXCL_STOP
+  }
+}

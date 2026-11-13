@@ -9,10 +9,10 @@ This roadmap is discussed publicly on [discord](https://discord.f3d.app) and is 
 
 If you want to get involved, please feel free to join the [discord](https://discord.f3d.app), comment on the issues to get assigned to them and contribute to the issues that matters to you!
 
-## 4.0.0
+## 4.1.0
 
-Our next planned release is a major release, 4.0.0 planned for October 2026.
-This [milestone](https://github.com/f3d-app/f3d/milestone/16) contains the work we would like to put into, but things may shift a bit.
+Our next planned release is a minor release, 4.1.0 planned for January 2027.
+This [milestone](https://github.com/f3d-app/f3d/milestone/18) contains the work we would like to put into, but things may shift a bit.
 
 ## Release cycle
 

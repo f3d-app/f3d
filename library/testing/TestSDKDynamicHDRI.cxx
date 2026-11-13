@@ -16,7 +16,7 @@ int TestSDKDynamicHDRI([[maybe_unused]] int argc, char* argv[])
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::INFO);
 
-  std::string renderingBackend = std::string(argv[4]);
+  const std::string renderingBackend = std::string(argv[4]);
   f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
 
   f3d::scene& sce = eng.getScene();
@@ -34,12 +34,12 @@ int TestSDKDynamicHDRI([[maybe_unused]] int argc, char* argv[])
   std::random_device r;
   std::default_random_engine e1(r());
   std::uniform_int_distribution<int> dist(1, 100000);
-  std::string cachePath = std::string(argv[2]) + "/cache_" + std::to_string(dist(e1));
+  const std::string cachePath = std::string(argv[2]) + "/cache_" + std::to_string(dist(e1));
   eng.setCachePath(cachePath);
 
   // Enable HDRI ambient and skybox and check the default HDRI
   opt.render.hdri.ambient = true;
-  opt.render.background.skybox = true;
+  opt.render.background.skybox = "enabled";
   test("render with default HDRI",
     TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
       std::string(argv[2]), "TestSDKDynamicHDRIDefault"));

@@ -24,7 +24,7 @@ Release Split :
 
 Release Candidates :
 
-- [ ] Commit, review and merge a `vX.Y.Z-RCN` version change in https://github.com/f3d-app/f3d `CMakeLists.txt`, `pyproject.toml` and `package.json` in the `release` branch
+- [ ] Commit, review and merge a `vX.Y.Z-RCN` version change in https://github.com/f3d-app/f3d `CMakeLists.txt`, `pyproject.toml`, `package.json` and `examples/libf3d/web/package-lock.json` in the `release` branch
 - [ ] Tag and push to https://github.com/f3d-app/f3d: `git tag vX.Y.Z-RCN -m vX.Y.Z-RCN`
 - [ ] Trigger a release build using https://github.com/f3d-app/f3d-superbuild actions with `vX.Y.Z-RCN` F3D version, superbuild `main` branch and prerelease publish `true`
 - [ ] Download the prerelease from https://github.com/f3d-app/f3d/releases
@@ -51,6 +51,8 @@ Release :
 - [ ] Tag `vX.Y.Z` and push it to https://github.com/f3d-app/f3d-superbuild: `git tag vX.Y.Z -m vX.Y.Z`
 - Update Android
   - [ ] Run `./update_native_libs.sh --ref vX.Y.Z` and merge new libraries, jar file and lock file in https://github.com/f3d-app/f3d-android master branch
+  - [ ] In `f3d/build.gradle`, edit `versionName` to `vX.Y.Z` and `versionCode` to `XXYYZZ00`.
+  - [ ] Add a file `fastlane/metadata/android/en-US/changelogs/XXYYZZ00.txt` and copy Android relevant parts from the changelog.
   - [ ] Commit, review and merge the resulting changes in https://github.com/f3d-app/f3d-android
   - [ ] Tag `vX.Y.Z` and push it to https://github.com/f3d-app/f3d-android: `git tag vX.Y.Z -m vX.Y.Z`
 - [ ] Merge F3D release into master: https://github.com/f3d-app/f3d/compare/master...release
@@ -61,12 +63,13 @@ Release :
 - [ ] Change f3d version to `^X.Y.Z` in `package.json` in f3d-website, then build locally as described above, then commit review and merge the resulting changes into https://github.com/f3d-app/f3d-website
 - [ ] Update **download links** using `GITHUB_TOKEN=$PAT F3D_RELEASE=vX.Y.Z npm run update-downloads`, commit/review/merge into https://github.com/f3d-app/f3d-website and then immediately
 - [ ] Release
+- [ ] Update package on Windows Store
+- [ ] Update package on Android Play Store (TODO: Write steps)
 - [ ] Communicate on discord
 - [ ] Communicate on reddit
 - [ ] Communicate on hackernews
 - [ ] Communicate on linkedin
 - [ ] Communicate on mastodon
-- [ ] Communicate on bluesky
 - [ ] Communicate by email
 - [ ] Create next release milestone, move all issue from current milestone to next milestone and close current milestone
 - [ ] Commit review and merge an update of `doc/dev/ROADMAPS_AND_RELEASES.md` for next release in https://github.com/f3d-app/f3d
@@ -80,15 +83,16 @@ Linux testing protocol:
 - `f3d testing/data/f3d.stp` -> check render, orientation
 - `f3d testing/data/f3d.glb` -> press "Space", check animation is going smoothly and takes 4 seconds
 - `f3d /path/to/any/new/file.format` -> check render
+- open f3d, minimize it, close it from taskbar, open f3d again and check f3d window is visible in the expected location
 - `rm -rf ~/.cache/thumbnails`
 - `pcmanfm` (or another supported file manager)
 - Check that all supported files in testing/data have a generated thumbnails, especially for new file formats if any
 - Double click on supported file in testing/data, especially for new file formats if any and check it opens in F3D
 - Drag&Drop cow.vtp, Drag&Drop shanghai_bund.hdr, check render
 - Check that CTRL+O (file dialog) is working
-- Check that CTRL+S then CTRL+L (statefile save/load file dialogs) are working: save a statefile, change the background color, load it back and check the color is restored
-- Check that CTRL+C then CTRL+V (statefile save/load to clipboard) are working: copy the state, change the background color, paste it back and check the color is restored
-- Check that `--dpi-aware` has an effect and match the system value.
+- Check that CTRL+S then CTRL+L (statefile save/load file dialogs) are working: save a statefile, `set render.background.color 1,0,0`, load it back and check the color is restored
+- Check that CTRL+C then CTRL+V (statefile save/load to clipboard) are working: copy the state, `set render.background.color 0,1,0`, paste it back and check the color is restored
+- Check that `--dpi-aware` has an effect and match the system value, eg. on Xfce, Applications -> Settings -> Appearance -> Fonts -> Custom DPI, then `f3d --verbose` and check log for DPI info and font size in drop zone.
 - Press "Esc" and check the following commands `reload_current_file_group`, `set_camera top`, `toggle_volume_rendering`, `exit`
 
 macOS testing protocol:
@@ -97,18 +101,20 @@ macOS testing protocol:
 - Double click on cow.vtp, check render and orientation, press R and check raytracing
 - Double click on f3d.stp, check render and orientation
 - Double click on f3d.glb, press "Space", check animation is going smoothly and takes 4 seconds
+- open f3d, minimize it, close it from taskbar, open f3d again and check f3d window is visible in the expected location
 - Double click on any new supported file.format, check render
 - Check all supported file in testing/data directory in finder have the f3d mark, if not, check that "open with" suggest F3D
 - Drag&Drop cow.vtp, Drag&Drop shanghai_bund.hdr, check render
 - Check that CMD+O (file dialog) is working
-- Check that CMD+S then CMD+L (statefile save/load file dialogs) are working: save a statefile, change the background color, load it back and check the color is restored
-- Check that CMD+C then CMD+V (statefile save/load to clipboard) are working: copy the state, change the background color, paste it back and check the color is restored
-- Check that `--dpi-aware` has an effect and match the system value.
+- Check that CMD+S then CMD+L (statefile save/load file dialogs) are working: save a statefile, `set render.background.color 1,0,0`, load it back and check the color is restored
+- Check that CMD+C then CMD+V (statefile save/load to clipboard) are working: copy the state, `set render.background.color 0,1,0`, paste it back and check the color is restored
+- Check that `--dpi-aware` has an effect and match the system value. `f3d --dpi-aware=0 --verbose` should stop respecting the HiDPI default on MacOS, check log for DPI info and font size in drop zone.
 - Press "Esc" and check the following commands `reload_current_file_group`, `set_camera top`, `toggle_volume_rendering`, `exit`
 
 Windows testing protocol:
 
 - Install F3D-X.Y.Z-RCN-Windows-x86_64-raytracing.exe, add F3D to path for all users
+- open f3d, minimize it, close it from taskbar, open f3d again and check f3d window is visible in the expected location
 - Start -> Disk Cleanup -> select thumbnails -> Ok -> Delete Files
 - Open testing/data directory in file manager
 - Wait for thumbnails to be generated
@@ -119,10 +125,10 @@ Windows testing protocol:
 - Double click on f3d.glb, press "Space", check animation is going smoothly and takes 4 seconds
 - Double click on any new supported file format, check render
 - Check that CTRL+O (file dialog) is working
-- Check that CTRL+S then CTRL+L (statefile save/load file dialogs) are working: save a statefile, change the background color, load it back and check the color is restored
-- Check that CTRL+C then CTRL+V (statefile save/load to clipboard) are working: copy the state, change the background color, paste it back and check the color is restored
+- Check that CTRL+S then CTRL+L (statefile save/load file dialogs) are working: save a statefile, `set render.background.color 1,0,0`, load it back and check the color is restored
+- Check that CTRL+C then CTRL+V (statefile save/load to clipboard) are working: copy the state, `set render.background.color 0,1,0`, paste it back and check the color is restored
 - run `f3d-console --version` in a Windows command line and check it output the version
-- Check that `--dpi-aware` has an effect and match the system value.
+- Check that `--dpi-aware` has an effect and match the system value, Settings -> System -> Display -> Scale -> 175% then `f3d --verbose` and check log for DPI info and font size in drop zone.
 - Press "Esc" and check the following commands `reload_current_file_group`, `set_camera top`, `toggle_volume_rendering`, `exit`
 
 Python testing protocol:
@@ -160,11 +166,12 @@ npm install f3d --tag rc
 npm run start
 ```
 
-- Test examples manually (Docker required)
+- Clone https://github.com/f3d-app/f3d (on `vX.Y.Z-RCN`) and test examples manually
 
 ```bash
 cd examples/libf3d/web
-npm run install
+npm uninstall f3d
+npm install f3d --tag rc
 npm run dev --workspace simple-ui
 npm run dev --workspace volume-rendering
 npm run dev --workspace multiple-instances
@@ -175,17 +182,50 @@ Once a release cycle:
 
 - Check that completions are still working with `fish` and `zsh` when tab is pressed
 - Check that F3D is added for extensions on a fresh Windows installation
-- Check that F3D binary on linux works on ubuntu with almost nothing installed (libosmesa6 should NOT install Xorg, check it)
+- Check that F3D binary on linux works on ubuntu with almost nothing installed
 
 ```
 docker run -it ubuntu:latest /bin/bash
 apt update
-apt install wget xz-utils libosmesa6
+apt install wget xz-utils
 wget https://github.com/f3d-app/f3d/raw/refs/heads/master/testing/data/dragon.vtu
 wget https://github.com/f3d-app/f3d/releases/download/X.Y.Z/F3D-X.Y.Z-Linux-x86_64-raytracing.tar.xz
-tar -xzvf F3D-X.Y.Z-Linux-x86_64-raytracing.tar.xz
+tar -xvf F3D-X.Y.Z-Linux-x86_64-raytracing.tar.xz
 apt autoremove wget xz-utils
 ./F3D-X.Y.Z-Linux-x86_64-raytracing/bin/f3d dragon.vtu --output=img.png
 apt install catimg
 catimg img.png
 ```
+
+Update package on Windows store:
+
+- Install MSIX Packaging Tool: https://apps.microsoft.com/detail/9n5lw3jbcxkf?hl=en-US&gl=FR
+- Run MSIX Packaging Tool
+- Click on "Application Package"
+- "Create package on this computer", Next, Next
+- browse for F3D installer
+- set `/S` installer arguments
+- Do not sign package
+- Next
+- Package name: `F3D-APP.F3D`
+- Package display name: `F3D`
+- Publisher name: check internal document
+- Publisher display name: `F3D-APP`
+- Version: `X.Y.Z`
+- Description: `F3D and minimalist open source 3D viewer. Visualize data in the simplest way.`
+- Next, Next, Next, Next, Yes move on, Next
+- Create -> .msix is created on your desktop
+- Close
+- https://storedeveloper.microsoft.com/en-US/home
+- login using contact@f3d.app
+- https://partner.microsoft.com/en-US/dashboard/products/9NQ7X4Q8HPC2/overview
+- Click on "Start update"
+- Click on "package"
+- Remove previous package
+- Browse and upload new .msix package
+- Save
+- Submit for certification
+- Wait for certification (up to 24h)
+- Remove all version of F3D installed on your machine (including the one installed by above process)
+- Install through the Windows store
+- Run F3D, drop a file in it, check it renders

@@ -18,6 +18,7 @@ class ClothSolver:
     def __init__(self, grid_size: int = 10, iterations: int = 20):
         self._grid_size = grid_size
         self._iterations = iterations
+        self.buffers_need_update = False
         self._current_time = 0.0
 
         self.initialize()
@@ -93,6 +94,8 @@ class ClothSolver:
         self.face_offsets = np.array(face_offsets_list, dtype=np.int32)
         self._constraints = constraints
 
+        self.buffers_need_update = True
+
     def update(self, new_time: float) -> None:
         if new_time == 0.0:
             if self._current_time != 0.0:
@@ -148,8 +151,8 @@ class ClothMesh(f3d.MeshView):
         super().__init__()
         self._solver = solver
 
-    def get_time_range(self) -> list:
-        return [0.0, 10.0]
+    def get_time_range(self) -> tuple[float, float]:
+        return 0.0, 10.0
 
     def get_memory_view(self, time: float) -> f3d.MeshMemoryView:
         view = f3d.MeshMemoryView()
@@ -168,6 +171,12 @@ class ClothMesh(f3d.MeshView):
         view.set_point_scalars_time_dependent("Mass", False)
         view.set_point_scalars_time_dependent("Velocity", True)
         return view
+
+    def buffers_need_update(self) -> bool:
+        return self._solver.buffers_need_update
+
+    def buffers_updated(self) -> None:
+        self._solver.buffers_need_update = False
 
 
 def main(argv=None):
@@ -205,6 +214,7 @@ def main(argv=None):
 
     solver = ClothSolver()
     inter = eng.interactor
+    scene = eng.scene
 
     # Remove bindings that conflict with our custom ones or are unused in this example
     NONE = f3d.InteractionBind.ModifierKeys.NONE
@@ -229,7 +239,7 @@ def main(argv=None):
     # Commands
     def reset_simulation(_args):
         solver.initialize()
-        scene.load_animation_time(0.0)
+        scene.animation.load_time(0.0)
 
     inter.add_command(
         "reset_simulation",
@@ -297,40 +307,40 @@ def main(argv=None):
 
     # Bindings
     inter.add_binding(
-        f3d.InteractionBind(NONE, "W"),
-        "reset_simulation",
-        "Simulation",
-        lambda: ("Reset simulation", ""),
+        bind=f3d.InteractionBind(NONE, "W"),
+        command=["reset_simulation"],
+        group="Simulation",
+        documentation_callback=lambda: ("Reset simulation", ""),
     )
     inter.add_binding(
-        f3d.InteractionBind(NONE, "N"),
-        ["set_cloth_resolution 10", "reset_simulation"],
-        "Simulation",
-        lambda: ("10x10", ""),
+        bind=f3d.InteractionBind(NONE, "N"),
+        command=["set_cloth_resolution 10", "reset_simulation"],
+        group="Simulation",
+        documentation_callback=lambda: ("10x10", ""),
     )
     inter.add_binding(
-        f3d.InteractionBind(SHIFT, "N"),
-        ["set_cloth_resolution 20", "reset_simulation"],
-        "Simulation",
-        lambda: ("20x20", ""),
+        bind=f3d.InteractionBind(SHIFT, "N"),
+        command=["set_cloth_resolution 20", "reset_simulation"],
+        group="Simulation",
+        documentation_callback=lambda: ("20x20", ""),
     )
     inter.add_binding(
-        f3d.InteractionBind(NONE, "I"),
-        "set_cloth_iterations 10",
-        "Simulation",
-        lambda: ("10 iterations", ""),
+        bind=f3d.InteractionBind(NONE, "I"),
+        command=["set_cloth_iterations 10"],
+        group="Simulation",
+        documentation_callback=lambda: ("10 iterations", ""),
     )
     inter.add_binding(
-        f3d.InteractionBind(NONE, "O"),
-        "set_cloth_iterations 20",
-        "Simulation",
-        lambda: ("20 iterations", ""),
+        bind=f3d.InteractionBind(NONE, "O"),
+        command=["set_cloth_iterations 20"],
+        group="Simulation",
+        documentation_callback=lambda: ("20 iterations", ""),
     )
 
     # Add the cloth mesh to the scene
     cloth_mesh = ClothMesh(solver)
     try:
-        eng.scene.add(cloth_mesh)
+        scene.add(cloth_mesh)
     except Exception as e:
         print(e)
         return 1

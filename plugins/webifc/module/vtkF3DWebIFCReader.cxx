@@ -142,7 +142,7 @@ int vtkF3DWebIFCReader::RequestData(
   settings.CIRCLE_SEGMENTS = this->CircleSegments;
   settings.COORDINATE_TO_ORIGIN = false;
 
-  uint32_t modelID = this->Internals->Manager.CreateModel(settings);
+  const uint32_t modelID = this->Internals->Manager.CreateModel(settings);
 
   try
   {
@@ -192,7 +192,7 @@ int vtkF3DWebIFCReader::RequestData(
           static_cast<unsigned char>(placedGeom.color.b * 255),
           static_cast<unsigned char>(placedGeom.color.a * 255) };
 
-        vtkIdType pointOffset = allPoints->GetNumberOfPoints();
+        const vtkIdType pointOffset = allPoints->GetNumberOfPoints();
         constexpr int vertexSize = 6;
 
 #ifdef __linux__
@@ -207,20 +207,20 @@ int vtkF3DWebIFCReader::RequestData(
 
         for (size_t i = 0; i < vertexData.size(); i += vertexSize)
         {
-          double x = vertexData[i];
-          double y = vertexData[i + 1];
-          double z = vertexData[i + 2];
-          double nx = vertexData[i + 3];
-          double ny = vertexData[i + 4];
-          double nz = vertexData[i + 5];
+          const double x = vertexData[i];
+          const double y = vertexData[i + 1];
+          const double z = vertexData[i + 2];
+          const double nx = vertexData[i + 3];
+          const double ny = vertexData[i + 4];
+          const double nz = vertexData[i + 5];
 
-          double tx = transform[0] * x + transform[4] * y + transform[8] * z + transform[12];
-          double ty = transform[1] * x + transform[5] * y + transform[9] * z + transform[13];
-          double tz = transform[2] * x + transform[6] * y + transform[10] * z + transform[14];
+          const double tx = transform[0] * x + transform[4] * y + transform[8] * z + transform[12];
+          const double ty = transform[1] * x + transform[5] * y + transform[9] * z + transform[13];
+          const double tz = transform[2] * x + transform[6] * y + transform[10] * z + transform[14];
 
-          double tnx = transform[0] * nx + transform[4] * ny + transform[8] * nz;
-          double tny = transform[1] * nx + transform[5] * ny + transform[9] * nz;
-          double tnz = transform[2] * nx + transform[6] * ny + transform[10] * nz;
+          const double tnx = transform[0] * nx + transform[4] * ny + transform[8] * nz;
+          const double tny = transform[1] * nx + transform[5] * ny + transform[9] * nz;
+          const double tnz = transform[2] * nx + transform[6] * ny + transform[10] * nz;
 
           localPositions.push_back({ tx, ty, tz });
           localNormals.push_back({ tnx, tny, tnz });
@@ -230,7 +230,7 @@ int vtkF3DWebIFCReader::RequestData(
 
         for (size_t i = 0; i < indexData.size(); i += 3)
         {
-          uint32_t i0 = indexData[i];
+          const uint32_t i0 = indexData[i];
           uint32_t i1 = indexData[i + 1];
           uint32_t i2 = indexData[i + 2];
 
@@ -238,20 +238,20 @@ int vtkF3DWebIFCReader::RequestData(
           const auto& p1 = localPositions[i1];
           const auto& p2 = localPositions[i2];
 
-          double e1x = p1[0] - p0[0], e1y = p1[1] - p0[1], e1z = p1[2] - p0[2];
-          double e2x = p2[0] - p0[0], e2y = p2[1] - p0[1], e2z = p2[2] - p0[2];
-          double gnx = e1y * e2z - e1z * e2y;
-          double gny = e1z * e2x - e1x * e2z;
-          double gnz = e1x * e2y - e1y * e2x;
+          const double e1x = p1[0] - p0[0], e1y = p1[1] - p0[1], e1z = p1[2] - p0[2];
+          const double e2x = p2[0] - p0[0], e2y = p2[1] - p0[1], e2z = p2[2] - p0[2];
+          const double gnx = e1y * e2z - e1z * e2y;
+          const double gny = e1z * e2x - e1x * e2z;
+          const double gnz = e1x * e2y - e1y * e2x;
 
           const auto& n0 = localNormals[i0];
           const auto& n1 = localNormals[i1];
           const auto& n2 = localNormals[i2];
-          double avgNx = n0[0] + n1[0] + n2[0];
-          double avgNy = n0[1] + n1[1] + n2[1];
-          double avgNz = n0[2] + n1[2] + n2[2];
+          const double avgNx = n0[0] + n1[0] + n2[0];
+          const double avgNy = n0[1] + n1[1] + n2[1];
+          const double avgNz = n0[2] + n1[2] + n2[2];
 
-          bool windingIsWrong = (gnx * avgNx + gny * avgNy + gnz * avgNz) < 0;
+          const bool windingIsWrong = (gnx * avgNx + gny * avgNy + gnz * avgNz) < 0;
           if (windingIsWrong)
           {
             std::swap(i1, i2);
@@ -265,20 +265,20 @@ int vtkF3DWebIFCReader::RequestData(
 #else
         for (size_t i = 0; i < vertexData.size(); i += vertexSize)
         {
-          double x = vertexData[i];
-          double y = vertexData[i + 1];
-          double z = vertexData[i + 2];
-          double nx = vertexData[i + 3];
-          double ny = vertexData[i + 4];
-          double nz = vertexData[i + 5];
+          const double x = vertexData[i];
+          const double y = vertexData[i + 1];
+          const double z = vertexData[i + 2];
+          const double nx = vertexData[i + 3];
+          const double ny = vertexData[i + 4];
+          const double nz = vertexData[i + 5];
 
-          double tx = transform[0] * x + transform[4] * y + transform[8] * z + transform[12];
-          double ty = transform[1] * x + transform[5] * y + transform[9] * z + transform[13];
-          double tz = transform[2] * x + transform[6] * y + transform[10] * z + transform[14];
+          const double tx = transform[0] * x + transform[4] * y + transform[8] * z + transform[12];
+          const double ty = transform[1] * x + transform[5] * y + transform[9] * z + transform[13];
+          const double tz = transform[2] * x + transform[6] * y + transform[10] * z + transform[14];
 
-          double tnx = transform[0] * nx + transform[4] * ny + transform[8] * nz;
-          double tny = transform[1] * nx + transform[5] * ny + transform[9] * nz;
-          double tnz = transform[2] * nx + transform[6] * ny + transform[10] * nz;
+          const double tnx = transform[0] * nx + transform[4] * ny + transform[8] * nz;
+          const double tny = transform[1] * nx + transform[5] * ny + transform[9] * nz;
+          const double tnz = transform[2] * nx + transform[6] * ny + transform[10] * nz;
 
           allPoints->InsertNextPoint(tx, ty, tz);
           normals->InsertNextTuple3(tnx, tny, tnz);
@@ -300,7 +300,7 @@ int vtkF3DWebIFCReader::RequestData(
 
     for (const auto& type : elementTypes)
     {
-      std::string typeStr = std::string(schemaManager.IfcTypeCodeToType(type));
+      const std::string typeStr = std::string(schemaManager.IfcTypeCodeToType(type));
 
       if (!this->ReadOpenings && typeStr == "IfcOpeningElement")
       {

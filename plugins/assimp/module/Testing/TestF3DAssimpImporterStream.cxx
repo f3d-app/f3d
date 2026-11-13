@@ -11,7 +11,7 @@
 
 int TestF3DAssimpImporterStream(int vtkNotUsed(argc), char* argv[])
 {
-  std::string filename = std::string(argv[1]) + "data/texturedCube.fbx";
+  const std::string filename = std::string(argv[1]) + "data/texturedCube.fbx";
   vtkNew<vtkFileResourceStream> stream;
   if (!stream->Open(filename.c_str()))
   {

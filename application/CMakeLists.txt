@@ -72,6 +72,11 @@ function(f3d_create_exec target_name)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_RAYTRACING)
   endif ()
 
+  # anari
+  if (F3D_MODULE_ANARI)
+    target_compile_definitions(${target_name} PRIVATE F3D_MODULE_ANARI)
+  endif ()
+
   # exr
   if (F3D_MODULE_EXR)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_EXR)
@@ -92,7 +97,7 @@ function(f3d_create_exec target_name)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_DMON)
   endif ()
 
-  #ui
+  # ui
   if (F3D_MODULE_UI)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_UI)
   endif()
@@ -101,6 +106,11 @@ function(f3d_create_exec target_name)
   if (F3D_MODULE_TINYFILEDIALOGS)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_TINYFILEDIALOGS)
   endif ()
+
+  # ffmpeg
+  if (F3D_MODULE_FFMPEG)
+    target_compile_definitions(${target_name} PRIVATE F3D_MODULE_FFMPEG)
+  endif()
 
   # F3D_STRICT_BUILD
   list(APPEND f3d_compile_options_private ${f3d_strict_build_compile_options})
@@ -184,6 +194,9 @@ set(f3d_enabled_conditionals)
 if(F3D_MODULE_RAYTRACING)
   list(APPEND f3d_enabled_conditionals "F3D_MODULE_RAYTRACING")
 endif()
+if(F3D_MODULE_ANARI)
+  list(APPEND f3d_enabled_conditionals "F3D_MODULE_ANARI")
+endif()
 if(F3D_MODULE_DMON)
   list(APPEND f3d_enabled_conditionals "F3D_MODULE_DMON")
 endif()
@@ -248,7 +261,7 @@ if(UNIX AND NOT APPLE)
       add_custom_target(man ALL DEPENDS ${MAN_OUTPUT_FILE})
 
       install(FILES "${CMAKE_BINARY_DIR}/f3d.1.gz"
-        DESTINATION "share/man/man1/" COMPONENT documentation)
+        DESTINATION "${CMAKE_INSTALL_MANDIR}/man1/" COMPONENT documentation)
     else()
       message(FATAL_ERROR "help2man or gzip not found, cannot create man entry, please disable F3D_LINUX_GENERATE_MAN or install them")
     endif()
@@ -277,30 +290,26 @@ endif()
 install(EXPORT f3dTargets
   NAMESPACE f3d::
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-  COMPONENT sdk
-  EXCLUDE_FROM_ALL)
+  COMPONENT sdk)
 
 install(
   FILES
     "${F3D_SOURCE_DIR}/cmake/application-config.cmake"
   DESTINATION
     "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-  COMPONENT sdk
-  EXCLUDE_FROM_ALL)
+  COMPONENT sdk)
 
 # Default config files
 install(
   DIRECTORY "${F3D_SOURCE_DIR}/resources/configs/"
   DESTINATION "${f3d_config_dir}"
-  COMPONENT configuration
-  EXCLUDE_FROM_ALL)
+  COMPONENT configuration)
 
 # Default color maps
 install(
   DIRECTORY "${F3D_SOURCE_DIR}/resources/colormaps/"
   DESTINATION "${f3d_resources_dir}/colormaps"
-  COMPONENT colormaps
-  EXCLUDE_FROM_ALL)
+  COMPONENT colormaps)
 
 # Other ressoure files
 if(UNIX AND NOT APPLE AND NOT ANDROID)

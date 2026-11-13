@@ -29,9 +29,9 @@ list(INSERT CMAKE_MODULE_PATH 0 "${f3d_cmake_dir}")
 include(f3dVersion)
 
 # Handle F3D_VERSION
-set(F3D_MAJOR_VERSION 3)
-set(F3D_MINOR_VERSION 5)
-set(F3D_PATCH_VERSION 0)
+set(F3D_MAJOR_VERSION 4)
+set(F3D_MINOR_VERSION 0)
+set(F3D_PATCH_VERSION 1)
 set(F3D_VERSION ${F3D_MAJOR_VERSION}.${F3D_MINOR_VERSION}.${F3D_PATCH_VERSION})
 
 set(F3D_PATCH_VERSION_EXTRA "")
@@ -55,7 +55,7 @@ mark_as_advanced(F3D_EXCLUDE_DEPRECATED)
 # VTK dependency
 # Optional components should list VTK modules
 # needed by plugins and optional modules
-find_package(VTK 9.4.0 REQUIRED
+find_package(VTK 9.5.0 REQUIRED
   COMPONENTS
     CommonCore
     CommonDataModel
@@ -73,6 +73,7 @@ find_package(VTK 9.4.0 REQUIRED
     IOImport
     IOPLY
     IOXML
+    IOXMLParser
     RenderingAnnotation
     RenderingCore
     RenderingOpenGL2
@@ -85,7 +86,9 @@ find_package(VTK 9.4.0 REQUIRED
     IONetCDF
     IOOpenVDB
     IOPDAL
+    RenderingAnariOpenGL
     RenderingGridAxes
+    RenderingOpenXR
     RenderingRayTracing)
 message(STATUS "VTK ${VTK_VERSION} found")
 
@@ -98,18 +101,23 @@ else()
 endif()
 
 # Modules
+option(F3D_MODULE_ANARI "ANARI module" OFF)
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
+option(F3D_MODULE_OPENXR "OpenXR module" OFF)
 option(F3D_MODULE_EXR "OpenEXR images module" OFF)
 option(F3D_MODULE_WEBP "WebP images module" OFF)
 option(F3D_MODULE_UI "ImGui widgets module" ON)
 option(F3D_MODULE_DMON "dmon (watch) module" ON)
 option(F3D_MODULE_TINYFILEDIALOGS "tinyfiledialogs module" ON)
 option(F3D_MODULE_CLIP "clip module" ON)
+option(F3D_MODULE_FFMPEG "ffmpeg module" OFF)
+option(F3D_MODULE_MESHOPT "Meshopt module" OFF)
 
 # Use externals
 option(F3D_USE_EXTERNAL_CXXOPTS "Use external cxxopts dependency" OFF)
 option(F3D_USE_EXTERNAL_NLOHMANN_JSON "Use external nlohmann_json dependency" OFF)
 option(F3D_USE_EXTERNAL_CLIP "Use external clip dependency" OFF)
+option(F3D_USE_EXTERNAL_MINIZ "Use external miniz dependency" OFF)
 cmake_dependent_option(F3D_USE_EXTERNAL_DMON "Use external dmon dependency" OFF "F3D_MODULE_DMON" OFF)
 cmake_dependent_option(F3D_USE_EXTERNAL_IMGUI "Use external imgui dependency" OFF "F3D_MODULE_UI" OFF)
 cmake_dependent_option(F3D_USE_EXTERNAL_CLIP "Use external clip dependency" OFF "F3D_MODULE_CLIP" OFF)
@@ -128,6 +136,9 @@ if (F3D_USE_EXTERNAL_IMGUI)
 endif ()
 if (F3D_USE_EXTERNAL_CLIP)
   find_package(clip REQUIRED)
+endif ()
+if (F3D_USE_EXTERNAL_MINIZ)
+  find_package(miniz REQUIRED)
 endif ()
 
 # Shared options between application and library
@@ -153,9 +164,9 @@ if(F3D_STRICT_BUILD)
     set(f3d_strict_build_compile_options /W4 /WX)
     set(f3d_strict_build_link_options /WX)
   else()
-    set(f3d_strict_build_compile_options -Wall -Wextra -Wshadow -Woverloaded-virtual -Wno-deprecated -Wno-strict-overflow -Wno-array-bounds -Wunreachable-code -Wno-missing-field-initializers -Wno-unused-parameter -Wredundant-decls -Wpointer-arith -Werror)
+    set(f3d_strict_build_compile_options -Wall -Wextra -Wshadow $<$<COMPILE_LANGUAGE:CXX>:-Woverloaded-virtual> -Wno-deprecated -Wno-strict-overflow -Wno-array-bounds -Wunreachable-code -Wno-missing-field-initializers -Wno-unused-parameter -Wredundant-decls -Wpointer-arith -Werror)
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-      list(APPEND f3d_strict_build_compile_options -Wsuggest-override)
+      list(APPEND f3d_strict_build_compile_options $<$<COMPILE_LANGUAGE:CXX>:-Wsuggest-override>)
     endif()
   endif()
 endif()
@@ -235,8 +246,8 @@ mark_as_advanced(F3D_TESTING_FORCE_RENDERING_BACKEND)
 
 # Figure out F3D configuration directory
 if(UNIX AND NOT APPLE)
-  option(F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX "Install the default configuration at the prefix root instead of system wide" OFF)
-  mark_as_advanced(F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
+  option(F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_SYSCONFDIR "Install the default configuration in SYSCONFDIR instead of share/f3d" OFF)
+  mark_as_advanced(F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_SYSCONFDIR)
 endif()
 
 set(f3d_resources_dir "share/f3d")
@@ -247,7 +258,7 @@ endif()
 ## Will be stored in f3dConfig.cmake
 set(f3d_config_dir "${f3d_resources_dir}/configs")
 if (UNIX AND NOT APPLE)
-  if (NOT F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
+  if (F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_SYSCONFDIR)
     set(f3d_config_dir "${CMAKE_INSTALL_FULL_SYSCONFDIR}/f3d")
   endif()
 endif()
@@ -255,7 +266,7 @@ endif()
 # F3D Application
 cmake_dependent_option(F3D_BUILD_APPLICATION "Build the application" ON "NOT ANDROID AND NOT EMSCRIPTEN" OFF)
 
-# Build external dependencies that needs it
+# Build external dependencies that need it
 add_subdirectory(external)
 
 # Build VTK extension modules
@@ -265,7 +276,7 @@ add_subdirectory(vtkext)
 option(F3D_PLUGINS_STATIC_BUILD "Make all plugins static (embedded into libf3d) and automatically loaded by F3D" ON)
 mark_as_advanced(F3D_PLUGINS_STATIC_BUILD)
 if (F3D_MACOS_BUNDLE AND NOT F3D_PLUGINS_STATIC_BUILD)
-  message(FATAL_ERROR "Building a macOS Bundle do not support loading plugins dynamically")
+  message(FATAL_ERROR "Building a macOS Bundle does not support loading plugins dynamically")
 endif()
 set(F3D_PLUGINS_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}" CACHE STRING "Plugins install directory relative path")
 mark_as_advanced(F3D_PLUGINS_INSTALL_DIR)
@@ -314,13 +325,8 @@ if (UNIX AND NOT APPLE AND NOT ANDROID)
   set(F3D_LIC_DIR ${CMAKE_INSTALL_DOCDIR})
 endif()
 
-install(FILES LICENSE.md
+install(FILES LICENSE.md THIRD_PARTY_LICENSES.md
   DESTINATION ${F3D_LIC_DIR} COMPONENT licenses)
-
-if (F3D_BUILD_APPLICATION)
-  install(FILES THIRD_PARTY_LICENSES.md
-    DESTINATION ${F3D_LIC_DIR} COMPONENT licenses)
-endif ()
 
 # Check that a LFS data file is big enough to be an actual file
 file(SIZE "${F3D_SOURCE_DIR}/testing/data/dragon.vtu" f3d_lfs_file_size)
@@ -342,7 +348,11 @@ f3d_report_variable(F3D_BINDINGS_C)
 f3d_report_variable(F3D_BINDINGS_JAVA)
 f3d_report_variable(F3D_BINDINGS_PYTHON)
 f3d_report_variable(F3D_BUILD_APPLICATION)
+f3d_report_variable(F3D_MODULE_ANARI)
 f3d_report_variable(F3D_MODULE_EXR)
+f3d_report_variable(F3D_MODULE_FFMPEG)
+f3d_report_variable(F3D_MODULE_MESHOPT)
+f3d_report_variable(F3D_MODULE_OPENXR)
 f3d_report_variable(F3D_MODULE_RAYTRACING)
 f3d_report_variable(F3D_MODULE_UI)
 f3d_report_variable(F3D_MODULE_WEBP)

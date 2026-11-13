@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Multiple instance demo</title>
     <style>
-      /* Reset page spacing and base styles */
       html,
       body {
         height: 100%;
@@ -16,13 +15,13 @@
         padding: 18px 24px;
         text-align: center;
       }
+
       .page-header h1 {
         margin: 0;
         font-size: 18px;
         font-weight: 600;
       }
 
-      /* Layout: two cards side-by-side with a small gap and padding */
       .container {
         box-sizing: border-box;
         display: flex;
@@ -33,7 +32,6 @@
         justify-content: center;
       }
 
-      /* Card wrapper for a canvas + label */
       .card {
         position: relative;
         flex: 0 0 50%;
@@ -52,15 +50,10 @@
         max-height: 640px;
       }
 
-      /* Canvas fills remaining card space */
-      .card canvas {
+      f3d-viewer {
         width: 100%;
         height: 100%;
-      }
-
-      /* Keep rendering crisp (JS should also set drawing buffer size) */
-      canvas:where(#canvas1, #canvas2) {
-        image-rendering: auto;
+        display: block;
       }
     </style>
   </head>
@@ -71,10 +64,18 @@
 
     <div class="container" id="main">
       <div class="card">
-        <canvas id="canvas1"></canvas>
+        <f3d-viewer
+          id="viewer1"
+          up="+Y"
+          src="https://f3d.app/data/DamagedHelmet.glb"
+        ></f3d-viewer>
       </div>
       <div class="card">
-        <canvas id="canvas2"></canvas>
+        <f3d-viewer
+          id="viewer2"
+          up="+Y"
+          src="https://f3d.app/data/202.vtp"
+        ></f3d-viewer>
       </div>
     </div>
     <script type="module" src="/src/main.js"></script>

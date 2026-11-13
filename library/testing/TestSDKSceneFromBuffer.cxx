@@ -11,7 +11,7 @@ int TestSDKSceneFromBuffer([[maybe_unused]] int argc, char* argv[])
   PseudoUnitTest test;
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  std::string renderingBackend = std::string(argv[4]);
+  const std::string renderingBackend = std::string(argv[4]);
   f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::scene& sce = eng.getScene();
   f3d::options& opt = eng.getOptions();
@@ -34,6 +34,13 @@ int TestSDKSceneFromBuffer([[maybe_unused]] int argc, char* argv[])
   opt.scene.force_reader = "Nrrd";
   test.expect<f3d::scene::load_failure_exception>(
     "add buffer with reader that doesn't support streams", [&]() { sce.add(&y, 1); });
+
+  opt.scene.force_reader = std::nullopt;
+
+  // supports method
+  test("not supported with null buffer",
+    sce.supports(nullptr, 0) == f3d::file_availability::EMPTY_STREAM);
+  test("not supported with zero size", sce.supports(&y, 0) == f3d::file_availability::EMPTY_STREAM);
 
   return test.result();
 }

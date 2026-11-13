@@ -40,7 +40,7 @@ f3d_test(<NAME> [ARGS...])
   - `PIPED_ARG` Prepend the provided string to the `-` standard input marker of a `PIPED` test, so the piped
     data is consumed by an option (e.g. pass `--load-statefile=` to load a statefile from `--load-statefile=-`)
     instead of as the input model.
-  - `SCRIPT` Mark the test to use a `--script` of the same name as the test
+  - `SCRIPT` Mark the test to use a `--command-script` of the same name as the test
   - `NAME` Provide the name of the test, mandatory and must be unique
   - `BASELINE_PATH` Provide the path to the baseline to use, instead of the default
   - `OUTPUT_PATH` Provide the path to the output to use, instead of the default
@@ -53,9 +53,9 @@ f3d_test(<NAME> [ARGS...])
   - `HDRI` Provide the `--hdri-file` to use for this test
   - `RENDERING_BACKEND` Provide the `--rendering-backend` to use for this test instead of `auto`
   - `WORKING_DIR` Provide a specific working directory to use for this test instead of current dir
-  - `LABELS` Provide a specific labels to identify and group tests
+  - `LABELS` Provide specific labels to identify and group tests
   - `DATA` Data to open, support multiple input, also set test labels accordingly
-  - `DEPENDS` Tests the this test depends on if any
+  - `DEPENDS` Tests this test depends on if any
   - `ENV` Environment variables to set for this test
   - `ARGS` Supplement arguments to add to the f3d command line
 #]==]
@@ -97,7 +97,7 @@ function(f3d_test)
 
   if (F3D_TEST_HDRI)
     list(PREPEND F3D_TEST_LABELS "hdri")
-    list(APPEND F3D_TEST_ARGS "--hdri-file=${F3D_SOURCE_DIR}/testing/data/${F3D_TEST_HDRI}" "--hdri-ambient" "--hdri-skybox")
+    list(PREPEND F3D_TEST_ARGS "--hdri-file=${F3D_SOURCE_DIR}/testing/data/${F3D_TEST_HDRI}" "--hdri-ambient" "--hdri-skybox")
     set(F3D_TEST_LONG_TIMEOUT ON)
   endif()
 

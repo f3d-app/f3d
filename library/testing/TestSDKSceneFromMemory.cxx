@@ -11,12 +11,12 @@ int TestSDKSceneFromMemory([[maybe_unused]] int argc, char* argv[])
   PseudoUnitTest test;
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  std::string renderingBackend = std::string(argv[4]);
+  const std::string renderingBackend = std::string(argv[4]);
   f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::scene& sce = eng.getScene();
   f3d::window& win = eng.getWindow().setSize(300, 300);
 
-  std::string texturePath = std::string(argv[1]) + "data/world.png";
+  const std::string texturePath = std::string(argv[1]) + "data/world.png";
   eng.getOptions().model.color.texture = texturePath;
 
   // Add mesh with invalid number of points

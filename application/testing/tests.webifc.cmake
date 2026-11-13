@@ -5,7 +5,8 @@ f3d_test(NAME TestWebIFCDefines DATA IfcOpenHouse_IFC4.ifc PLUGIN webifc ARGS -D
 
 f3d_test(NAME TestPipedWebIFC DATA IfcOpenHouse_IFC4.ifc PLUGIN webifc PIPED_READER IFC PIPED)
 
-if(NOT F3D_MACOS_BUNDLE)
+  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13818
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016 AND NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/plugins/webifc/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
     f3d_test(NAME TestDefaultConfigFileWebIFC DATA IfcOpenHouse_IFC4.ifc CONFIG config_build LONG_TIMEOUT SKIP_GLES LABELS "plugin;webifc" THRESHOLD 0.06)

@@ -1,4 +1,6 @@
-set(vtkextTests_list)
+set(vtkextTests_list
+  TestF3DArchiveReader.cxx
+  TestF3DGLTFImporter.cxx)
 
 # Also needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
 # Sanitizer exclusion because of https://github.com/f3d-app/f3d/issues/1323
@@ -20,6 +22,4 @@ foreach(test ${vtkextTests_list})
   )
 endforeach()
 
-if(NOT F3D_USE_GLES AND NOT F3D_SANITIZER STREQUAL "address")
-  set_target_properties(vtkextTests PROPERTIES CXX_STANDARD 20)
-endif()
+set_target_properties(vtkextTests PROPERTIES CXX_STANDARD 20)

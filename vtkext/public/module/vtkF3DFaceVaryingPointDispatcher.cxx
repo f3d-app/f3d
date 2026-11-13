@@ -27,7 +27,7 @@ int vtkF3DFaceVaryingPointDispatcher::RequestData(vtkInformation* vtkNotUsed(req
   // early exit if all interpolations are "vertex"
   vtkPointData* inputPointData = input->GetPointData();
 
-  vtkIdType nbArrays = inputPointData->GetNumberOfArrays();
+  const vtkIdType nbArrays = inputPointData->GetNumberOfArrays();
 
   bool earlyExit = true;
 
@@ -36,7 +36,7 @@ int vtkF3DFaceVaryingPointDispatcher::RequestData(vtkInformation* vtkNotUsed(req
     vtkDataArray* inputArray = inputPointData->GetArray(i);
 
     vtkInformation* info = inputArray->GetInformation();
-    int interpType = info->Get(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE());
+    const int interpType = info->Get(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE());
 
     if (interpType != 0) // vertex
     {
@@ -55,8 +55,8 @@ int vtkF3DFaceVaryingPointDispatcher::RequestData(vtkInformation* vtkNotUsed(req
   vtkPoints* inputPoints = input->GetPoints();
   vtkCellArray* inputFaces = input->GetPolys();
 
-  vtkIdType nbCells = inputFaces->GetNumberOfCells();
-  vtkIdType nbConnectivity = inputFaces->GetNumberOfConnectivityIds();
+  const vtkIdType nbCells = inputFaces->GetNumberOfCells();
+  const vtkIdType nbConnectivity = inputFaces->GetNumberOfConnectivityIds();
 
   // the number of output points is the number of total cells connectivity
   vtkNew<vtkPoints> outputPoints;
@@ -75,7 +75,7 @@ int vtkF3DFaceVaryingPointDispatcher::RequestData(vtkInformation* vtkNotUsed(req
     vtkDataArray* inputArray = inputPointData->GetArray(i);
 
     vtkInformation* info = inputArray->GetInformation();
-    int interpType = info->Get(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE());
+    const int interpType = info->Get(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE());
 
     if (interpType == 0) // vertex
     {
@@ -118,7 +118,7 @@ int vtkF3DFaceVaryingPointDispatcher::RequestData(vtkInformation* vtkNotUsed(req
         vtkDataArray* inputArray = inputPointData->GetArray(k);
 
         vtkInformation* info = inputArray->GetInformation();
-        int interpType = info->Get(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE());
+        const int interpType = info->Get(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE());
 
         if (interpType == 0) // vertex
         {

@@ -9,7 +9,7 @@ f3d_test(NAME TestExodusE DATA single_timestep.e PLUGIN hdf ARGS NO_RENDER NO_BA
 f3d_test(NAME TestExodusConfig DATA disk_out_ref.ex2 CONFIG ${F3D_SOURCE_DIR}/testing/configs/exodus.json ARGS -s --camera-position=-11,-2,-49 LABELS "plugin;hdf")
 f3d_test(NAME TestNetCDF DATA temperature_grid.nc PLUGIN hdf ARGS -s)
 f3d_test(NAME TestVTKHDF DATA blob.vtkhdf PLUGIN hdf ARGS -s)
-f3d_test(NAME TestAMRDataSet DATA amr.vtkhdf PLUGIN hdf ARGS -s)
+f3d_test(NAME TestAMRDataSet DATA amr.vtkhdf PLUGIN hdf ARGS -s --coloring-field=points)
 f3d_test(NAME TestVTKHDFPartitionedDataSetCollection DATA pdc_sphere_cone.vtkhdf PLUGIN hdf ARGS -s)
 
 if (VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251109)
@@ -18,22 +18,22 @@ endif()
 
 if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/plugins/hdf/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13818
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016)
     f3d_test(NAME TestDefaultConfigFileExodus DATA disk_out_ref.ex2 CONFIG config_build LONG_TIMEOUT UI SKIP_GLES LABELS "plugin;hdf")
   endif()
 
   file(COPY "${F3D_SOURCE_DIR}/plugins/hdf/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
   f3d_test(NAME TestThumbnailConfigFileExodus DATA disk_out_ref.ex2 CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI SKIP_GLES LABELS "plugin;hdf")
 
-  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13818
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016)
     f3d_test(NAME TestDefaultConfigFileVTKHDF DATA blob.vtkhdf CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
   endif()
   f3d_test(NAME TestThumbnailConfigFileVTKHDF DATA blob.vtkhdf CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI SKIP_GLES LABELS "plugin;hdf")
 
-  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13818
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016)
     f3d_test(NAME TestDefaultConfigFileNetCDF DATA temperature_grid.nc CONFIG config_build LONG_TIMEOUT UI SKIP_GLES LABELS "plugin;hdf")
   endif()
   f3d_test(NAME TestThumbnailConfigFileNetCDF DATA temperature_grid.nc CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI SKIP_GLES LABELS "plugin;hdf")

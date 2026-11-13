@@ -66,6 +66,12 @@ Force a specific reader to be used, disregarding the file extension and file con
 
 CLI: `--force-reader`.
 
+### `scene.skip_content_check` (_bool_, default: `false`)
+
+Select reader to read file without checking its header content but only based on the file extension.
+
+CLI: `--skip-content-check`.
+
 ### `scene.camera.orthographic` (_bool_, optional)
 
 Set to true to force orthographic projection. Model-specified by default, which is false if not specified.
@@ -102,7 +108,7 @@ CLI: `--opacity`.
 
 ### `model.color.rgb` (_color_, optional)
 
-Set a _color_ on the geometry. Multiplied with the `model.color.texture` when present. Model-specified by default. Overridden by `model.scivis.enable`.
+Set a _color_ on the geometry. Multiplied with the `model.color.texture` when present. Model-specified by default. Ignored if `model.coloring` is not `material`.
 
 CLI: `--color`.
 
@@ -152,9 +158,25 @@ CLI: `--texture-material`.
 
 Render vertex normals as arrows on top of the geometry.
 
+CLI: `--normal-glyphs`.
+
 ### `model.normal_glyphs.scale` (_ratio_, default: `1.0`, range domain: `[0, 10]`, increment: `0.1`)
 
 Scales the normal glyphs
+
+CLI: `--normal-glyphs-scale`.
+
+### `model.normal_glyphs.color` (_color_, default: `1.0, 1.0, 1.0`)
+
+Color of the normal glyphs.
+
+CLI: `--normal-glyphs-color`.
+
+### `model.normal_glyphs.shape` (_string_, default: `arrow`, enum domain: `arrow, cylinder, cone, line`)
+
+Shape of the normal glyphs.
+
+CLI: `--normal-glyphs-shape`.
 
 ### `model.normal.scale` (_double_, optional, range domain: `[0, 3]`, increment: `0.1`)
 
@@ -181,17 +203,21 @@ If the value is true, no shading is applied and the model will be unlit.
 
 CLI: `--unlit`.
 
-### `model.scivis.enable` (_bool_, default: `false`)
+### `model.coloring` (_string_, default: `material`, enum domain: `material, scivis, direct`)
 
-_Color by an array_ present in on the data. If `model.scivis.array_name` is not set, the first available array will be used.
+Specify the coloring mode.
+_material_ means default file materials (textured or solid color)
+_scivis_ and _direct_ mean the array specified with option `model.scivis.array_name` will be used for coloring (or the first available if not set)
+In the case of _scivis_, the array is mapped to a color using the colormap defined in `model.scivis.colormap`
+In the case of _direct_, it is assumed that the array defines colors directly as L, LA, RGB, RGBA values depending on the number of components.
 
-CLI: `--scalar-coloring`.
+CLI: `--coloring-mode`.
 
-### `model.scivis.cells` (_bool_, default: `false`)
+### `model.scivis.field` (_string_, default: `any`, enum domain: `any, points, cells`)
 
-Color the data with value found _on the cells_ instead of points
+Specify which array field must be used in `scivis` or `direct` coloring mode..
 
-CLI: `--coloring-by-cells`.
+CLI: `--coloring-field`.
 
 ### `model.scivis.discretization` (_int_, optional, range domain: `[1, 1024]`, increment: `5`)
 
@@ -212,9 +238,9 @@ It is only used for volume rendering currently.
 
 CLI: `--volume-opacity-map`.
 
-### `model.scivis.component` (_int_, default: `-1`)
+### `model.scivis.component` (_int_, optional)
 
-Specify the component to color with. `-1` means _magnitude_. `-2` means _direct values_.
+Specify the component to color with in `scivis` or `direct` coloring mode. If not set, it means _magnitude_.
 
 CLI: `--coloring-component`.
 
@@ -227,6 +253,7 @@ CLI: `--coloring-array`.
 ### `model.scivis.range` (_vector\<double\>_, optional)
 
 Set the _coloring range_. Automatically computed by default.
+When automatically computed and minimum and maximum values are nearly equal, the object is colored with the mid value.
 
 CLI: `--coloring-range`.
 
@@ -305,7 +332,7 @@ CLI: `--final-shader`
 
 ### `render.effect.display_depth` (_bool_, default: `false`)
 
-Display the depth buffer as a grayscale image or with a colormap if `model.scivis.enable` is specified.
+Display the depth buffer as a grayscale image or with a colormap if `model.coloring` is `scivis`.
 Only opaque objects are displayed, the grid and translucent/volumetric objects are ignored.
 
 CLI: `--display-depth`
@@ -315,6 +342,20 @@ CLI: `--display-depth`
 Set the _width_ of lines when showing edges. Model-specified by default.
 
 CLI: `--line-width`.
+
+### `render.shadows.enable` (_bool_, default: `false`)
+
+Set to true to show shadows. All lights from files cast shadows and only opaque objects are considered as occluder. Shadows are visible on the grid.
+
+CLI: `--shadows`.
+
+### `render.shadows.resolution` (_int_, default: `1024`, range domain: `[256, 4096]`, increment: `256`)
+
+Set the resolution of the shadow maps.
+
+### `render.shadows.exponential_constant` (_double_, default: `25`, range domain: `[10, 120]`, increment: `5`)
+
+Set the constant value used during shadow evaluation. Higher values give better results but if it's too high, it introduces artifacts.
 
 ### `render.show_edges` (_bool_, optional)
 
@@ -342,7 +383,7 @@ CLI: `--grid`.
 
 ### `render.grid.absolute` (_bool_, default: `false`)
 
-Position the grid at the _absolute origin_ of the model's coordinate system instead of below the model.
+Position the grid at the _absolute origin_ of the model's coordinate system instead of below the model. Forced to true with `xr` rendering backend.
 
 CLI: `--grid-absolute`.
 
@@ -364,6 +405,12 @@ Set the color of grid lines.
 
 CLI: `--grid-color`.
 
+### `render.grid.opacity` (_ratio_, default: `1.0`)
+
+Set the opacity for the grid lines. Can be set to `0` to show reflection only.
+
+CLI: `--grid-opacity`.
+
 ### `render.grid.reflection` (_ratio_, default: `0.0`)
 
 Set the reflection strength on the grid.
@@ -379,21 +426,32 @@ Show _axes grid_ in the scene.
 
 CLI: `--axes-grid`.
 
-### `render.raytracing.enable` (_bool_, default: `false`)
+### `render.mode` (_string_, default: `opengl`, enumeration domain: `opengl, ospray, anari`)
 
-Enable _raytracing_. Requires the raytracing module to be enabled.
+Select the rendering mode.
+`ospray` and `anari` require their associated VTK module to be enabled.
 
-CLI: `--raytracing`.
+> [!NOTE]
+> `anari` render mode is experimental and not available in the binary release
+
+CLI: `--rendering-mode`.
+
+### `render.anari_library` (_string_, optional)
+
+Select the Anari library to use.
+If not specified, the library name will be retrieved using the `ANARI_LIBRARY` environment variable.
+
+CLI: `--anari-library`.
 
 ### `render.raytracing.samples` (_int_, default: `5`, range domain: `[1, 50]`, increment: `1`)
 
-The number of _samples per pixel_.
+The number of _samples per pixel_. Affects `ospray` render mode only.
 
 CLI: `--raytracing-samples`.
 
 ### `render.raytracing.denoise` (_bool_, default: `false`)
 
-_Denoise_ the raytracing rendering.
+_Denoise_ the raytracing rendering. Affects `ospray` render mode only.
 
 CLI: `--raytracing-denoise`.
 
@@ -419,20 +477,14 @@ Ignored if a _hdri_ skybox is used.
 
 CLI: `--background-color`.
 
-### `render.background.skybox` (_bool_, default: `false`)
+### `render.background.skybox` (_string_, default: `disabled`, enum domain: `disabled`, `enabled`, `blurred`)
 
-Show the _HDRI_ image as a skybox
+Define how to show the _HDRI_ image as a skybox
 Overrides the the background color if any
 
 CLI: `--hdri-skybox`.
 
-### `render.background.blur.enable` (_bool_, default: `false`)
-
-Blur background, useful with a skybox.
-
-CLI: `--blur-background`.
-
-### `render.background.blur.coc` (_double_, default: `20.0`, range domain: `[0, 100]`, increment: `5`)
+### `render.background.blur_coc` (_double_, default: `20.0`, range domain: `[0, 100]`, increment: `5`)
 
 Blur background circle of confusion radius.
 
@@ -440,9 +492,16 @@ CLI: `--blur-coc`.
 
 ### `render.light.intensity` (_double_, default: `1.0`, range domain: `[0, 5]`, increment: `0.02`)
 
-Adjust the intensity of every light in the scene (except HDRI).
+Adjust the intensity of every light in the scene, including HDRI image-based lighting.
 
 CLI: `--light-intensity`.
+
+### `render.light.representation` (_bool_, default: `false`)
+
+Set visibility of light representations of every _scene_ light.
+This option doesn't show representations for headlights and camera lights
+
+CLI: `--light-representation`.
 
 ### `render.armature.enable` (_bool_, default: `false`)
 
@@ -558,7 +617,7 @@ Set loader progress bar color.
 Control the _progress bar_ shown when playing the animation. Can be `none` (hidden),
 `default` (only the progress bar, which can be clicked or dragged to jump to a
 time) or `advanced` (the progress bar plus time range, animation name and current
-time labels, with a marker for each keyframe).
+time labels, with a marker for each key frame).
 
 CLI: `--animation-progress`.
 
@@ -596,12 +655,16 @@ Set the opacity of the backdrop behind the UI elements. Value is between 0.0 (fu
 
 CLI: `--backdrop-opacity`.
 
-### `ui.scene_hierarchy` (_bool_, default: `false`)
+### `ui.scene_hierarchy.enable` (_bool_, default: `false`)
 
 Display the _scene hierarchy_ as a tree representing the internal structure of the model, with checkboxes allowing to hide or show individual parts.
 By default the tree is only expanded enough to show nodes that have meaningful names, but all nodes can be fully expanded manually.
 
 CLI: `--scene-hierarchy`.
+
+### `ui.scene_hierarchy.max_width` (_int_, default: `600`)
+
+Maximum width of the _scene hierarchy_ widget in pixels.
 
 ### `ui.notifications.enable` (_bool_, default: `false`)
 
@@ -626,7 +689,8 @@ Enum domains are intended for options that have a finite set of possible value.
 Index domains are intended for integer options that are between 0 and a maximum.
 
 If an option has a `dynamic` domains, it means the libf3d can change the domain.
-It is possible to directly change a domain using the [struct API](#struct-api).
+It is possible to directly read/write a domain using the [struct API](#struct-api).
+It is possible to read a domain using the [variant API](#variant-api).
 
 ## APIs
 
@@ -727,6 +791,33 @@ An API that is similar to the F3D 2.0 options API thanks to std::variant.
   opt.set("render.grid.enable", true);
   opt.set("ui.metadata", true);
   opt.set("model.material.roughness", 0.6);
+```
+
+This API can read domains using `hasDomain`, `getDomainStyle`, `getRangeDomain`, `getEnumDomain` and `getIndexDomain`.
+
+```cpp
+  f3d::engine eng = f3d::engine::create();
+  f3d::options& opt = eng.getOptions();
+
+  std::string optionName = "option.name";
+  if (opt.hasDomain(optionName))
+  {
+    switch (opt.getDomainStyle(optionName))
+    {
+      case f3d::domain_style::RANGE:
+        DomainRange<option_variant_t> domain = opt.getRangeDomain("optionName");
+        ...
+        break;
+      case f3d::domain_style::ENUM:
+        DomainEnum<option_variant_t> domain = opt.getEnumDomain("optionName");
+        ...
+        break;
+      case f3d::domain_style::INDEX:
+        DomainIndex domain = opt.getIndexDomain("optionName");
+        ...
+        break;
+    }
+  }
 ```
 
 When using this API make sure to catch exception shown above with the string API.

@@ -1,3 +1,4 @@
+import os
 import tempfile
 from pathlib import Path
 
@@ -45,10 +46,9 @@ def test_scene():
     engine.scene.add(sphere1)
     engine.scene.add([sphere2, cube])
 
-    assert engine.window.get_dpi_scale() >= 1.0
+    engine.scene.animation.load_time(2)
 
-    assert engine.scene.animation_time_range() == (0.0, 4.0)
-    engine.scene.load_animation_time(2)
+    assert engine.window.get_dpi_scale() >= 1.0
 
     img = engine.window.render_to_image()
     img.save(output)
@@ -64,6 +64,7 @@ def test_scene():
         intensity=0.5,
         positional_light=True,
         switch_state=True,
+        cast_shadows=True,
         type=f3d.LightType.HEADLIGHT,
     )
     engine.scene.add_light(red_light)
@@ -72,6 +73,7 @@ def test_scene():
     assert engine.scene.get_light_count() == 2
     assert engine.scene.get_light(0).color.to_tuple() == (1.0, 0.0, 0.0)
     assert engine.scene.get_light(1).color.to_tuple() == (0.0, 1.0, 0.0)
+    assert engine.scene.get_light(1).cast_shadows == True
 
     blue_light = green_light
     blue_light.color = f3d.Color(0.0, 0.0, 1.0)
@@ -159,3 +161,53 @@ def test_scene_hierarchy():
 
     engine.scene.clear()
     assert engine.scene.get_scene_hierarchy() == []
+
+
+def test_scene_info():
+    testing_dir = Path(__file__).parent.parent.parent / "testing"
+    cube = testing_dir / "data/mb/recursive/mb_0_0.vtu"
+    sphere = testing_dir / "data/mb/recursive/mb_1_0.vtp"
+
+    engine = f3d.Engine.create_none()
+    info = engine.scene.get_scene_info()
+    assert info.number_of_files == 0
+    assert info.number_of_actors == 0
+    assert info.number_of_points == 0
+    assert info.number_of_cells == 0
+
+    engine.scene.add(cube)
+    info = engine.scene.get_scene_info()
+    assert info.number_of_files == 1
+    assert info.number_of_actors > 0
+    assert info.number_of_points > 0
+    assert info.number_of_cells > 0
+
+    engine.scene.add(sphere)
+    appended = engine.scene.get_scene_info()
+    assert appended.number_of_files == 2
+    assert appended.number_of_actors > info.number_of_actors
+    assert appended.number_of_points > info.number_of_points
+    assert appended.number_of_cells > info.number_of_cells
+
+    engine.scene.clear()
+    info = engine.scene.get_scene_info()
+    assert info.number_of_files == 0
+    assert info.number_of_actors == 0
+    assert info.number_of_points == 0
+    assert info.number_of_cells == 0
+
+
+def test_scene_supports():
+    testing_dir = Path(__file__).parent.parent.parent / "testing"
+    cow = testing_dir / "data/cow.vtp"
+    invalid_mdl = testing_dir / "data/invalid.mdl"
+    unsupported = testing_dir / "data/unsupportedFile.dummy"
+
+    engine = f3d.Engine.create_none()
+    scene = engine.scene
+
+    assert scene.supports(cow) == f3d.FileAvailability.SUPPORTED
+    assert scene.supports(unsupported) == f3d.FileAvailability.UNSUPPORTED_EXTENSION
+
+    if os.environ.get("F3D_TESTING_CONTENT_CHECK") == "1":
+        assert scene.supports(invalid_mdl) == f3d.FileAvailability.UNSUPPORTED_CONTENT

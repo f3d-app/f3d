@@ -159,7 +159,8 @@ void vtkF3DSplatMapperHelper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act
       return false;
     }
 
-    bool isValid = array->GetNumberOfComponents() == 3 && array->GetNumberOfTuples() == splatCount;
+    const bool isValid =
+      array->GetNumberOfComponents() == 3 && array->GetNumberOfTuples() == splatCount;
 
     if (!isValid)
     {
@@ -179,9 +180,6 @@ void vtkF3DSplatMapperHelper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act
 
   if (arrayValid(sh1m1) && arrayValid(sh10) && arrayValid(sh1p1))
   {
-    // Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12112
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
-
     // we store each spherical harmonics packed in a RGB 8-bits texture.
     // we use the GPU maximum texture size to set the width of the texture.
     // the height will depends on the number of gaussians.
@@ -193,8 +191,8 @@ void vtkF3DSplatMapperHelper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act
       return;
     }
 
-    int width = this->MaxTextureSize;
-    int height = 1 + (splatCount / this->MaxTextureSize);
+    const int width = this->MaxTextureSize;
+    const int height = 1 + (splatCount / this->MaxTextureSize);
 
     const int sliceSize = 3 * width * height;
     std::vector<unsigned char> packedData(sliceSize * 15, 0);
@@ -277,9 +275,6 @@ void vtkF3DSplatMapperHelper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act
       static_cast<vtkOpenGLRenderWindow*>(ren->GetRenderWindow()));
     this->SphericalHarmonicsTexture->Create2DArrayFromRaw(
       width, height, 3, VTK_UNSIGNED_CHAR, layers, packedData.data());
-#else
-    vtkWarningMacro("VTK < 9.5.0 does not support gaussian spherical harmonics");
-#endif
   }
 }
 
@@ -351,13 +346,13 @@ void vtkF3DSplatMapperHelper::SortSplats(vtkRenderer* ren)
     return;
   }
 
-  int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
+  const int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
 
   vtkOpenGLShaderCache* shaderCache =
     vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow())->GetShaderCache();
 
   // compute next power of two
-  unsigned int numVertsExt = vtkMath::NearestPowerOfTwo(numVerts);
+  const unsigned int numVertsExt = vtkMath::NearestPowerOfTwo(numVerts);
 
   // depth computation
   shaderCache->ReadyShaderProgram(this->DepthProgram);
@@ -385,7 +380,7 @@ void vtkF3DSplatMapperHelper::SortSplatsCPU(vtkRenderer* ren)
     return;
   }
 
-  int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
+  const int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
 
   if (numVerts != static_cast<int>(this->CPUSortedIndices.size()))
   {
@@ -442,7 +437,7 @@ void vtkF3DSplatMapperHelper::RenderPieceDraw(vtkRenderer* ren, vtkActor* actor)
 
   if (this->OwnerUseInstancing())
   {
-    int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
+    const int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
     if (numVerts)
     {
       this->UpdateShaders(this->Primitives[PrimitivePoints], ren, actor);

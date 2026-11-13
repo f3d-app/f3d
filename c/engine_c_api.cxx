@@ -105,7 +105,7 @@ f3d_engine_t* f3d_engine_create_external(f3d_context_function_t get_proc_address
     return nullptr;
   }
 
-  f3d::context::function func = [get_proc_address](const char* name) -> f3d::context::fptr
+  const f3d::context::function func = [get_proc_address](const char* name) -> f3d::context::fptr
   { return get_proc_address(name); };
 
   try
@@ -196,14 +196,14 @@ f3d_engine_t* f3d_engine_create_external_osmesa()
 }
 
 //----------------------------------------------------------------------------
-void f3d_engine_delete(f3d_engine_t* engine)
+void f3d_engine_destroy(f3d_engine_t* engine)
 {
   if (!engine)
   {
     return;
   }
 
-  f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
+  const f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
   delete cpp_engine;
 }
 
@@ -393,7 +393,7 @@ int f3d_engine_load_from_clipboard(f3d_engine_t* engine)
 }
 
 //----------------------------------------------------------------------------
-void f3d_engine_free_string(const char* str)
+void f3d_engine_destroy_string(const char* str)
 {
   delete[] str;
 }
@@ -407,7 +407,7 @@ void f3d_engine_set_options(f3d_engine_t* engine, f3d_options_t* options)
   }
 
   f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
-  f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
+  const f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
   cpp_engine->setOptions(*cpp_options);
 }
 
@@ -576,7 +576,7 @@ int f3d_engine_set_reader_option(const char* name, const char* value)
 //----------------------------------------------------------------------------
 f3d_backend_info_t* f3d_engine_get_rendering_backend_list(int* count)
 {
-  std::map<std::string, bool> backends = f3d::engine::getRenderingBackendList();
+  const std::map<std::string, bool> backends = f3d::engine::getRenderingBackendList();
 
   f3d_backend_info_t* result = new f3d_backend_info_t[backends.size() + 1];
 
@@ -601,7 +601,7 @@ f3d_backend_info_t* f3d_engine_get_rendering_backend_list(int* count)
 }
 
 //----------------------------------------------------------------------------
-void f3d_engine_free_backend_list(f3d_backend_info_t* backends)
+void f3d_engine_destroy_backend_list(f3d_backend_info_t* backends)
 {
   if (!backends)
   {
@@ -617,7 +617,7 @@ void f3d_engine_free_backend_list(f3d_backend_info_t* backends)
 }
 
 //----------------------------------------------------------------------------
-void f3d_engine_free_string_array(char** array)
+void f3d_engine_destroy_string_array(char** array)
 {
   if (!array)
   {
@@ -684,7 +684,7 @@ f3d_lib_info_t* f3d_engine_get_lib_info()
 }
 
 //----------------------------------------------------------------------------
-void f3d_engine_free_lib_info(f3d_lib_info_t* info)
+void f3d_engine_destroy_lib_info(f3d_lib_info_t* info)
 {
   if (!info)
   {
@@ -777,7 +777,7 @@ f3d_reader_info_t* f3d_engine_get_readers_info(int* count)
 }
 
 //----------------------------------------------------------------------------
-void f3d_engine_free_readers_info(f3d_reader_info_t* readers)
+void f3d_engine_destroy_readers_info(f3d_reader_info_t* readers)
 {
   if (!readers)
   {

@@ -68,11 +68,21 @@ const utils = {
     f3d(settings)
       .then(async (Module) => {
         // write in the wasm filesystem
-        await utils.copyLocalFileToWasmFS(
-          Module,
-          "/src/testing/data/" + args.data,
-          args.data,
-        );
+        if (args.data) {
+          await utils.copyLocalFileToWasmFS(
+            Module,
+            "/src/testing/data/" + args.data,
+            args.data,
+          );
+        }
+
+        for (const extraData of args.extraData ?? []) {
+          await utils.copyLocalFileToWasmFS(
+            Module,
+            "/src/testing/data/" + extraData,
+            extraData,
+          );
+        }
 
         await utils.copyLocalFileToWasmFS(
           Module,
@@ -113,14 +123,18 @@ const utils = {
 
         const scene = Module.engineInstance.getScene();
 
-        utils.assert(
-          scene.supports(args.data),
-          args.data + " is not supported",
-        );
+        if (args.data) {
+          utils.assert(
+            scene.supports(args.data) === Module.FileAvailability.SUPPORTED,
+            args.data + " is not supported",
+          );
+        }
 
         Module.runBefore?.(Module);
 
-        scene.add(args.data);
+        if (args.data) {
+          scene.add(args.data);
+        }
 
         Module.runAfter?.(Module);
 
@@ -152,6 +166,42 @@ const utils = {
         console.error('F3D_ERROR: exception thrown "' + error.stack + '"');
         window.close();
       });
+  },
+
+  runElementRenderTest: async (settings, args) => {
+    const viewer = document.getElementById("viewer");
+    viewer.addEventListener("ready", async () => {
+      // copy baseline
+      await utils.copyLocalFileToWasmFS(
+        viewer.module,
+        "/src/testing/baselines/" + args.baseline,
+        "baseline.png",
+      );
+
+      settings.runReady(viewer);
+
+      // compare images
+      const result = viewer.engine.getWindow().renderToImage(true);
+
+      try {
+        const baseline = new viewer.module.Image("/baseline.png");
+        const ssim = result.compare(baseline);
+
+        if (ssim <= 0.05) {
+          console.log("Passed with SSIM = " + ssim);
+        } else {
+          console.log("F3D_ERROR: Comparison failed with SSIM " + ssim);
+        }
+      } catch (error) {
+        console.error("F3D_ERROR: Cannot read baseline image");
+      }
+
+      utils.printImageBase64(viewer.module, result);
+
+      window.close();
+    });
+
+    await f3d();
   },
 };
 

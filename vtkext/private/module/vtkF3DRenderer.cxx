@@ -18,6 +18,9 @@
 #include "vtkF3DSolidBackgroundPass.h"
 #include "vtkF3DUserRenderPass.h"
 
+#include <vtkActor.h>
+#include <vtkActorCollection.h>
+#include <vtkArrowSource.h>
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -25,10 +28,13 @@
 #include <vtkCameraOrientationWidget.h>
 #include <vtkCameraPass.h>
 #include <vtkCellData.h>
+#include <vtkConeSource.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkCullerCollection.h>
+#include <vtkCylinderSource.h>
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkFloatArray.h>
+#include <vtkGridAxesActor3D.h>
 #include <vtkHDRReader.h>
 #include <vtkImageAppendComponents.h>
 #include <vtkImageData.h>
@@ -36,7 +42,9 @@
 #include <vtkImageReader2Factory.h>
 #include <vtkLight.h>
 #include <vtkLightCollection.h>
-#include <vtkLightKit.h>
+#include <vtkLightRepresentation.h>
+#include <vtkLightWidget.h>
+#include <vtkLineSource.h>
 #include <vtkMath.h>
 #include <vtkMathUtilities.h>
 #include <vtkMatrix4x4.h>
@@ -50,18 +58,22 @@
 #include <vtkOpenGLState.h>
 #include <vtkOpenGLTexture.h>
 #include <vtkOrientationMarkerWidget.h>
+#include <vtkOutlineSource.h>
 #include <vtkPBRLUTTexture.h>
 #include <vtkPNGReader.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkPixelBufferObject.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
+#include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkSSAAPass.h>
 #include <vtkScalarBarActor.h>
 #include <vtkShaderProperty.h>
+#include <vtkShadowMapBakerPass.h>
+#include <vtkShadowMapPass.h>
 #include <vtkSkybox.h>
 #include <vtkSphericalHarmonics.h>
 #include <vtkTable.h>
@@ -70,6 +82,7 @@
 #include <vtkTextureObject.h>
 #include <vtkToneMappingPass.h>
 #include <vtkTransform.h>
+#include <vtkTransformFilter.h>
 #include <vtkUniforms.h>
 #include <vtkVersion.h>
 #include <vtkVolumeProperty.h>
@@ -91,16 +104,17 @@
 #include <vtkMemoryResourceStream.h>
 #endif
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
-#include <vtkGridAxesActor3D.h>
-#endif
-
 #if F3D_MODULE_RAYTRACING
 #include <vtkOSPRayRendererNode.h>
 #endif
 
+#if F3D_MODULE_OPENXR
+#include <vtkOpenXRRenderWindow.h>
+#endif
+
 #include <cctype>
 #include <chrono>
+#include <cmath>
 #include <numbers>
 #include <sstream>
 
@@ -111,26 +125,6 @@ constexpr double ScalarBarPositionX = 0.1;
 constexpr double ScalarBarPositionY = 0.01;
 constexpr double ScalarBarHeight = 0.07;
 
-std::string DeprecatedCollapsePath(const fs::path& path)
-{
-  std::string collapsed;
-  std::string origin = path.string();
-
-  // Handle retro-compatibility but warn for deprecation
-  // For easier removal when removing deprecation: F3D_DEPRECATED
-  if (!origin.empty())
-  {
-    collapsed = vtksys::SystemTools::CollapseFullPath(origin);
-    if (collapsed != origin)
-    {
-      F3DLog::Print(F3DLog::Severity::Warning,
-        std::string("Collapsing path inside the libf3d is now deprecated, use "
-                    "utils::collapsePath manually."));
-    }
-  }
-  return collapsed;
-}
-
 //----------------------------------------------------------------------------
 // Compute the MD5 hash of an existing file on disk
 std::string ComputeFileHash(const std::string& filepath)
@@ -139,7 +133,7 @@ std::string ComputeFileHash(const std::string& filepath)
   char md5Hash[33];
   md5Hash[32] = '\0';
 
-  std::size_t length = vtksys::SystemTools::FileLength(filepath);
+  const std::size_t length = vtksys::SystemTools::FileLength(filepath);
   std::vector<char> buffer(length);
 
   vtksys::ifstream file;
@@ -162,8 +156,8 @@ std::string ComputeFileHash(const std::string& filepath)
 vtkSmartPointer<vtkImageData> SaveTextureToImage(
   vtkTextureObject* tex, unsigned int target, unsigned int level, unsigned int size)
 {
-  unsigned int nbFaces = tex->GetTarget() == GL_TEXTURE_CUBE_MAP ? 6 : 1;
-  int type = tex->GetVTKDataType();
+  const unsigned int nbFaces = tex->GetTarget() == GL_TEXTURE_CUBE_MAP ? 6 : 1;
+  const int type = tex->GetVTKDataType();
 
   vtkNew<vtkImageData> img;
   img->SetDimensions(size, size, nbFaces);
@@ -196,7 +190,7 @@ vtkSmartPointer<vtkImageData> SaveTextureToImage(
 vtkSmartPointer<vtkTexture> GetTexture(const fs::path& filePath, bool isSRGB = false)
 {
   vtkSmartPointer<vtkTexture> texture;
-  std::string fullPath = ::DeprecatedCollapsePath(filePath);
+  const std::string fullPath = filePath.string();
   if (!fullPath.empty())
   {
     if (!vtksys::SystemTools::FileExists(fullPath))
@@ -249,8 +243,14 @@ vtkF3DRenderer::vtkF3DRenderer()
 
   this->SkyboxActor->SetProjection(vtkSkybox::Sphere);
   this->SkyboxActor->GammaCorrectOn();
-
   this->SkyboxActor->VisibilityOff();
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
+  vtkNew<vtkInformation> keys;
+  keys->Set(vtkShadowMapBakerPass::OCCLUDER(), 0);
+  keys->Set(vtkShadowMapPass::RECEIVER(), 0);
+  this->SkyboxActor->SetPropertyKeys(keys);
+#endif
 
   // Make sure an active camera is available on the renderer
   this->GetActiveCamera();
@@ -269,6 +269,7 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
   }
 
   this->UIActor->ReleaseGraphicsResources(w);
+  this->FrameCapture->ReleaseGraphicsResources(w);
 
   this->Superclass::ReleaseGraphicsResources(w);
 }
@@ -288,9 +289,12 @@ void vtkF3DRenderer::Initialize()
   this->AddActor(this->SkyboxActor);
   this->AddActor(this->UIActor);
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513) && !defined(F3D_USE_GLES)
-  this->AddActor(this->GridAxesActor);
-  this->GridAxesActor->SetUseBounds(false);
+#if !defined(F3D_USE_GLES)
+  // Add the grid axes actor if already initialized
+  if (this->GridAxesActor != nullptr)
+  {
+    this->AddActor(this->GridAxesActor);
+  }
 #endif
 
   this->GridConfigured = false;
@@ -320,6 +324,7 @@ void vtkF3DRenderer::Initialize()
   this->ScalarBarActorConfigured = false;
   this->CheatSheetConfigured = false;
   this->ColoringConfigured = false;
+  this->PointSpritesConfigured = false;
   this->NormalGlyphsConfigured = false;
 
   // create ImGui context if F3D_MODULE_UI is enabled
@@ -345,14 +350,61 @@ void vtkF3DRenderer::Initialize()
   dpiChangedCallback->SetCallback(
     [](vtkObject* const, unsigned long, void* clientData, void* callData)
     {
+      // Unreachable in CI
+      // LCOV_EXCL_START
       vtkF3DRenderer* self = static_cast<vtkF3DRenderer*>(clientData);
       self->TextActorsConfigured = false;
       self->ConfigureTextActors();
       F3DLog::Print(
-        F3DLog::Severity::Info, "DPI changed to " + std::to_string(*static_cast<int*>(callData)));
+        F3DLog::Severity::Debug, "DPI changed to " + std::to_string(*static_cast<int*>(callData)));
+      // LCOV_EXCL_STOP
     });
   this->RenderWindow->AddObserver(vtkCommand::DPIChangedEvent, dpiChangedCallback);
 #endif
+
+  // camera only gets updated by openxr on the first render, so we have to create the bounding box
+  // and align the scene on the first render as well.
+  // OpenXR not tested yet
+  // LCOV_EXCL_START
+  vtkNew<vtkCallbackCommand> startEventCallback;
+  startEventCallback->SetClientData(this);
+  startEventCallback->SetCallback(
+    [](vtkObject* const, unsigned long, void* clientData, void*)
+    {
+      vtkF3DRenderer* self = static_cast<vtkF3DRenderer*>(clientData);
+      if (!self->UseXR)
+      {
+        return;
+      }
+      vtkCamera* cam = self->GetActiveCamera();
+      const vtkBoundingBox bbox = self->CreateCameraFacingBoundingBox(cam, 1.0f, 0.5f);
+      if (bbox.IsValid())
+      {
+        double bounds[6];
+        bbox.GetBounds(bounds);
+
+        vtkNew<vtkOutlineSource> outlineSource;
+        outlineSource->SetBounds(bounds);
+
+        vtkNew<vtkPolyDataMapper> outlineMapper;
+        outlineMapper->SetInputConnection(outlineSource->GetOutputPort());
+
+        self->XRBBoxActor->SetMapper(outlineMapper);
+        std::apply([&](auto r, auto g, auto b)
+          { self->XRBBoxActor->GetProperty()->SetColor(r, g, b); }, F3DStyle::GetF3DRed());
+        self->XRBBoxActor->GetProperty()->SetLineWidth(2.0);
+        self->XRBBoxActor->GetProperty()->LightingOff();
+      }
+
+      self->XrBoundingBoxConfigured = true;
+      self->AlignSceneToBounds(bbox);
+
+      self->AxesActorConfigured = false;
+      self->GridConfigured = false;
+      self->UpdateActors();
+    });
+  this->RenderWindow->AddObserver(vtkCommand::StartEvent, startEventCallback);
+  // LCOV_EXCL_STOP
 }
 
 //----------------------------------------------------------------------------
@@ -437,9 +489,9 @@ void vtkF3DRenderer::ConfigureUpDirection()
 
   std::array<double, 3> axis;
   vtkMath::Cross(oldUp.data(), newUp.data(), axis.data());
-  double sinAngle = vtkMath::Normalize(axis.data());
-  double cosAngle = vtkMath::Dot(oldUp.data(), newUp.data());
-  double angle = std::atan2(sinAngle, cosAngle) * 180.0 / std::numbers::pi;
+  const double sinAngle = vtkMath::Normalize(axis.data());
+  const double cosAngle = vtkMath::Dot(oldUp.data(), newUp.data());
+  const double angle = std::atan2(sinAngle, cosAngle) * 180.0 / std::numbers::pi;
 
   vtkCamera* cam = this->GetActiveCamera();
   double foc[3];
@@ -478,7 +530,11 @@ void vtkF3DRenderer::ConfigureRenderPasses()
 
   vtkNew<vtkF3DRenderPass> newPass;
 #if F3D_MODULE_RAYTRACING
-  newPass->SetUseRaytracing(this->UseRaytracing);
+  newPass->SetUseRaytracing(this->CurrentRenderingMode == RenderingMode::OSPRAY);
+#endif
+#if F3D_MODULE_ANARI
+  newPass->SetUseAnari(this->CurrentRenderingMode == RenderingMode::ANARI);
+  newPass->SetAnariLibrary(this->AnariLibrary);
 #endif
   newPass->SetUseSSAOPass(this->UseSSAOPass);
   newPass->SetUseBlurBackground(this->UseBlurBackground);
@@ -486,6 +542,10 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   newPass->SetForceOpaqueBackground(this->HDRISkyboxVisible);
   newPass->SetArmatureVisible(this->ArmatureVisible);
   newPass->SetRenderReflection(this->GridVisible && this->GridReflection > 0.0);
+  newPass->SetXRMode(this->UseXR);
+  newPass->SetRenderShadows(this->UseShadows);
+  newPass->SetShadowExponentialConstant(this->ShadowExponentialConstant);
+  newPass->SetShadowResolution(this->ShadowResolution);
 
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
@@ -497,12 +557,12 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   if (this->DisplayDepth)
   {
     // discard vtkF3DRenderPass if displaying depth
-    vtkNew<vtkOpaquePass> opaqueP;
+    const vtkNew<vtkOpaquePass> opaqueP;
     vtkNew<vtkCameraPass> camP;
     vtkNew<vtkF3DDisplayDepthRenderPass> depthP;
     camP->SetDelegatePass(opaqueP);
     depthP->SetDelegatePass(camP);
-    if (this->EnableColoring)
+    if (this->Coloring == vtkF3DRenderer::ColoringMode::SCIVIS)
     {
       this->ConfigureColoringAndVisibilities();
       depthP->SetColorMap(this->ColorTransferFunction);
@@ -513,9 +573,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   if (this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::SSAA)
   {
     vtkNew<vtkSSAAPass> ssaaP;
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250329)
     ssaaP->SetColorFormat(vtkTextureObject::Float16);
-#endif
     ssaaP->SetDelegatePass(renderingPass);
     renderingPass = ssaaP;
   }
@@ -541,8 +599,6 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   {
     vtkNew<vtkOpenGLFXAAPass> fxaaP;
     fxaaP->SetDelegatePass(renderingPass);
-
-    this->SetPass(fxaaP);
     renderingPass = fxaaP;
   }
 
@@ -563,10 +619,14 @@ void vtkF3DRenderer::ConfigureRenderPasses()
     }
   }
 
-  vtkNew<vtkF3DOverlayRenderPass> overlayP;
-  overlayP->SetDelegatePass(renderingPass);
+  if (!this->UseXR)
+  {
+    vtkNew<vtkF3DOverlayRenderPass> overlayP;
+    overlayP->SetDelegatePass(renderingPass);
+    renderingPass = overlayP;
+  }
 
-  this->SetPass(overlayP);
+  this->SetPass(renderingPass);
 
 #if F3D_MODULE_RAYTRACING
   vtkOSPRayRendererNode::SetRendererType("pathtracer", this);
@@ -582,7 +642,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   }
   vtkOSPRayRendererNode::SetBackgroundMode(mode, this);
 #else
-  if (this->UseRaytracing || this->UseRaytracingDenoiser)
+  if ((this->CurrentRenderingMode == RenderingMode::OSPRAY) || this->UseRaytracingDenoiser)
   {
     F3DLog::Print(F3DLog::Severity::Warning,
       "Raytracing options can't be used if F3D has not been built with raytracing");
@@ -636,9 +696,9 @@ void vtkF3DRenderer::UpdateAxisWidgetSize()
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
   if (this->ModernAxisRepresentation)
   {
-    int* size = this->GetSize();
+    const int* size = this->GetSize();
     // Maintain the axis widget size proportional (15%) to the shortest viewport dimension.
-    int widgetSize = static_cast<int>(std::min(size[0], size[1]) * 0.15);
+    const int widgetSize = static_cast<int>(std::min(size[0], size[1]) * 0.15);
     this->ModernAxisRepresentation->SetSize(widgetSize, widgetSize);
   }
 #endif
@@ -763,12 +823,65 @@ void vtkF3DRenderer::SetGridColor(const std::vector<double>& color)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetGridOpacity(const double opacity)
+{
+  if (this->GridOpacity != opacity)
+  {
+    this->GridOpacity = opacity;
+    this->GridConfigured = false;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetGridReflection(const double strength)
 {
   if (this->GridReflection != strength)
   {
     this->GridReflection = strength;
     this->GridConfigured = false;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetGridShadow(const double strength)
+{
+  if (this->GridShadow != strength)
+  {
+    this->GridShadow = strength;
+    this->GridConfigured = false;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetShadows(bool use)
+{
+  if (this->UseShadows != use)
+  {
+    this->UseShadows = use;
+    this->RenderPassesConfigured = false;
+    this->GridConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetShadowExponentialConstant(double constant)
+{
+  if (this->ShadowExponentialConstant != constant)
+  {
+    this->ShadowExponentialConstant = constant;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetShadowResolution(int resolution)
+{
+  if (this->ShadowResolution != resolution)
+  {
+    this->ShadowResolution = resolution;
     this->RenderPassesConfigured = false;
   }
 }
@@ -811,8 +924,8 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
   bool show = this->GridVisible;
   if (show)
   {
-    double* up = this->GetEnvironmentUp();
-    double* right = this->GetEnvironmentRight();
+    const double* up = this->GetEnvironmentUp();
+    const double* right = this->GetEnvironmentRight();
     double front[3];
     vtkMath::Cross(right, up, front);
 
@@ -838,7 +951,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
     }
     else
     {
-      double diag = bbox.GetDiagonalLength();
+      const double diag = bbox.GetDiagonalLength();
 
       double tmpUnitSquare;
       if (this->GridUnitSquare.has_value())
@@ -881,7 +994,9 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       this->GridMapper->SetFadeDistance(diag);
       this->GridMapper->SetUnitSquare(tmpUnitSquare);
       this->GridMapper->SetSubdivisions(this->GridSubdivisions);
+      this->GridMapper->SetLineOpacity(this->GridOpacity);
       this->GridMapper->SetReflectionStrength(this->GridReflection);
+      this->GridMapper->SetShadowStrength(this->UseShadows ? this->GridShadow : 0.0);
 
       if (this->GridAbsolute)
       {
@@ -920,6 +1035,13 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
         (this->ColorAxisX[2] * fX2 + this->ColorAxisY[2] * fY2 + this->ColorAxisZ[2] * fZ2) / f2,
         1);
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
+      vtkNew<vtkInformation> keys;
+      keys->Set(vtkShadowMapBakerPass::OCCLUDER(), 0);
+      keys->Set(vtkShadowMapPass::RECEIVER(), 1);
+      this->GridActor->SetPropertyKeys(keys);
+#endif
+
       this->GridActor->ForceTranslucentOn();
       this->GridActor->SetMapper(this->GridMapper);
       this->GridActor->UseBoundsOff();
@@ -935,7 +1057,6 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowAxesGrid([[maybe_unused]] bool show)
 {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   if (this->AxesGridVisible != show)
   {
     this->AxesGridVisible = show;
@@ -943,7 +1064,6 @@ void vtkF3DRenderer::ShowAxesGrid([[maybe_unused]] bool show)
     this->GridAxesConfigured = false;
     this->CheatSheetConfigured = false;
   }
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -955,12 +1075,11 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
     F3DLog::Print(F3DLog::Severity::Warning, "Grid axes are not supported on OpenGL ES, ignoring.");
   }
 #else
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   bool show = this->AxesGridVisible;
   if (show)
   {
-    double* up = this->GetEnvironmentUp();
-    double* right = this->GetEnvironmentRight();
+    const double* up = this->GetEnvironmentUp();
+    const double* right = this->GetEnvironmentRight();
     double front[3];
     vtkMath::Cross(right, up, front);
 
@@ -988,6 +1107,13 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
     }
     else
     {
+      if (this->GridAxesActor == nullptr)
+      {
+        this->GridAxesActor = vtkSmartPointer<vtkGridAxesActor3D>::New();
+        this->GridAxesActor->SetUseBounds(false);
+        this->AddActor(this->GridAxesActor);
+      }
+
       this->GridAxesActor->SetOrientation(orientation);
       this->GridAxesActor->SetVisibility(true);
 
@@ -1008,8 +1134,11 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
       this->GridAxesConfigured = true;
     }
   }
-  this->GridAxesActor->SetVisibility(show);
-#endif
+
+  if (this->GridAxesActor != nullptr)
+  {
+    this->GridAxesActor->SetVisibility(show);
+  }
 #endif
 }
 
@@ -1045,7 +1174,7 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
    * Only gives the thightest bounds if the transformation is axis-aligned. */
   const auto extendBoxAxisAligned = [&](vtkProp3D* prop3d, vtkBoundingBox& box)
   {
-    vtkNew<vtkMatrix4x4> tmpMatrix;
+    const vtkNew<vtkMatrix4x4> tmpMatrix;
     vtkMatrix4x4::Multiply4x4(matrix, prop3d->GetMatrix(), tmpMatrix);
     prop3d->PokeMatrix(tmpMatrix);
 
@@ -1118,12 +1247,195 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUseCache(bool useCache)
+{
+  if (this->UseCache != useCache)
+  {
+    this->UseCache = useCache;
+
+    this->HasValidHDRIReader = false;
+    this->HasValidHDRIHash = false;
+    this->HasValidHDRITexture = false;
+    this->HasValidHDRILUT = false;
+    this->HasValidHDRISH = false;
+    this->HasValidHDRISpec = false;
+
+    this->HDRIReaderConfigured = false;
+    this->HDRIHashConfigured = false;
+    this->HDRITextureConfigured = false;
+    this->HDRILUTConfigured = false;
+    this->HDRISphericalHarmonicsConfigured = false;
+    this->HDRISpecularConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+// OpenXR not tested yet
+// LCOV_EXCL_START
+vtkBoundingBox vtkF3DRenderer::CreateCameraFacingBoundingBox(
+  vtkCamera* camera, double scale, double distance)
+{
+  if (this->XrBoundingBoxConfigured)
+  {
+    return {};
+  }
+
+  double position[3];
+  double focalPoint[3];
+
+  camera->GetPosition(position);
+  camera->GetFocalPoint(focalPoint);
+
+  double forward[3] = { focalPoint[0] - position[0], 0.0f, focalPoint[2] - position[2] };
+  vtkMath::Normalize(forward);
+
+  double right[3];
+  const double worldUp[3] = { 0.0, 1.0, 0.0 };
+  vtkMath::Cross(worldUp, forward, right);
+  vtkMath::Normalize(right);
+
+  double up[3];
+  vtkMath::Cross(forward, right, up);
+  vtkMath::Normalize(up);
+
+  const double center[3] = { position[0] + forward[0] * distance, position[1] - scale * 0.5,
+    position[2] + forward[2] * distance };
+
+  vtkBoundingBox bbox;
+  const double halfScale = scale * 0.5;
+
+  for (const double dx : { -halfScale, halfScale })
+  {
+    for (const double dy : { -halfScale, halfScale })
+    {
+      for (const double dz : { -halfScale, halfScale })
+      {
+        double point[3] = {
+          center[0] + right[0] * dx + up[0] * dy + forward[0] * dz,
+          center[1] + right[1] * dx + up[1] * dy + forward[1] * dz,
+          center[2] + right[2] * dx + up[2] * dy + forward[2] * dz,
+        };
+        bbox.AddPoint(point);
+      }
+    }
+  }
+
+  return bbox;
+}
+// LCOV_EXCL_STOP
+
+//----------------------------------------------------------------------------
+// OpenXR not tested yet
+// LCOV_EXCL_START
+void vtkF3DRenderer::AlignSceneToBounds(const vtkBoundingBox& bounds)
+{
+  if (!bounds.IsValid() || !this->Importer)
+  {
+    return;
+  }
+
+  const double* up = this->GetEnvironmentUp();
+  const double* right = this->GetEnvironmentRight();
+  double front[3];
+  vtkMath::Cross(right, up, front);
+
+  vtkNew<vtkMatrix4x4> upMatrix;
+  const double m[16] = {
+    right[0], right[1], right[2],
+    0, //
+    up[0], up[1], up[2],
+    0, //
+    front[0], front[1], front[2],
+    0, //
+    0, 0, 0,
+    1, //
+  };
+  upMatrix->DeepCopy(m);
+  vtkNew<vtkMatrix4x4> upMatrixInv;
+  upMatrixInv->DeepCopy(upMatrix);
+  upMatrixInv->Transpose();
+
+  double orientation[3];
+  vtkTransform::GetOrientation(orientation, upMatrixInv);
+  const vtkBoundingBox sourceBounds = this->ComputeVisiblePropOrientedBounds(upMatrix);
+
+  if (!sourceBounds.IsValid())
+  {
+    return;
+  }
+
+  double sourceCenter[3];
+  sourceBounds.GetCenter(sourceCenter);
+
+  double targetCenter[3];
+  bounds.GetCenter(targetCenter);
+
+  const double sourceLengths[3] = {
+    sourceBounds.GetLength(0),
+    sourceBounds.GetLength(1),
+    sourceBounds.GetLength(2),
+  };
+  const double targetLengths[3] = {
+    bounds.GetLength(0),
+    bounds.GetLength(1),
+    bounds.GetLength(2),
+  };
+
+  double scale = 1.0;
+  bool scaleInitialized = false;
+  for (int i = 0; i < 3; ++i)
+  {
+    if (sourceLengths[i] <= 0.0)
+    {
+      continue;
+    }
+
+    const double ratio = targetLengths[i] / sourceLengths[i];
+    if (!scaleInitialized)
+    {
+      scale = ratio;
+      scaleInitialized = true;
+    }
+    else
+    {
+      scale = std::min(scale, ratio);
+    }
+  }
+
+  vtkPropCollection* props = this->GetViewProps();
+  props->InitTraversal();
+
+  while (vtkProp* prop = props->GetNextProp())
+  {
+    vtkProp3D* prop3D = vtkProp3D::SafeDownCast(prop);
+    if (!prop3D)
+    {
+      continue;
+    }
+
+    if (prop3D == this->GridActor || prop3D == this->XRBBoxActor || vtkSkybox::SafeDownCast(prop3D))
+    {
+      continue;
+    }
+
+    if (vtkGridAxesActor3D::SafeDownCast(prop3D))
+    {
+      continue;
+    }
+
+    prop3D->SetPosition(targetCenter[0], targetCenter[1], targetCenter[2]);
+    prop3D->SetScale(scale, scale, scale);
+  }
+}
+// LCOV_EXCL_STOP
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetHDRIFile(const std::optional<fs::path>& hdriFile)
 {
   std::string hdriFileStr;
   if (hdriFile.has_value())
   {
-    hdriFileStr = ::DeprecatedCollapsePath(hdriFile.value());
+    hdriFileStr = hdriFile.value().string();
   }
 
   // Check HDRI is different than current one
@@ -1195,6 +1507,10 @@ void vtkF3DRenderer::SetCachePath(const std::string& cachePath)
 //----------------------------------------------------------------------------
 bool vtkF3DRenderer::CheckForSHCache(std::string& path)
 {
+  if (!this->UseCache)
+  {
+    return false;
+  }
   assert(this->HasValidHDRIHash);
   path = this->CachePath + "/" + this->HDRIHash + "/sh.vtt";
   return vtksys::SystemTools::FileExists(path, true);
@@ -1203,6 +1519,10 @@ bool vtkF3DRenderer::CheckForSHCache(std::string& path)
 //----------------------------------------------------------------------------
 bool vtkF3DRenderer::CheckForSpecCache(std::string& path)
 {
+  if (!this->UseCache)
+  {
+    return false;
+  }
   assert(this->HasValidHDRIHash);
   path = this->CachePath + "/" + this->HDRIHash + "/specular.vtm";
   return vtksys::SystemTools::FileExists(path, true);
@@ -1267,7 +1587,7 @@ void vtkF3DRenderer::ConfigureHDRIReader()
         if (this->HDRIReader)
         {
           this->HDRIReader->SetFileName(this->HDRIFile.c_str());
-          std::filesystem::path hdriPath(this->HDRIFile);
+          const std::filesystem::path hdriPath(this->HDRIFile);
           this->UIActor->SetHDRIFileName(hdriPath.filename().string().c_str());
         }
         else
@@ -1331,7 +1651,7 @@ void vtkF3DRenderer::ConfigureHDRITexture()
       needHDRITexture = this->HDRISkyboxVisible ||
         (this->GetUseImageBasedLighting() &&
           (!this->CheckForSHCache(dummy) || !this->CheckForSpecCache(dummy) ||
-            this->UseRaytracing));
+            this->CurrentRenderingMode != RenderingMode::OPENGL));
     }
 
     if (needHDRITexture)
@@ -1408,8 +1728,9 @@ void vtkF3DRenderer::ConfigureHDRILUT()
     assert(lut);
 
     // Check LUT cache
-    std::string lutCachePath = this->CachePath + "/lut.vti";
-    bool lutCacheExists = vtksys::SystemTools::FileExists(lutCachePath, true);
+    const std::string lutCachePath = this->CachePath + "/lut.vti";
+    const bool lutCacheExists =
+      this->UseCache && vtksys::SystemTools::FileExists(lutCachePath, true);
     if (lutCacheExists)
     {
       lut->SetFileName(lutCachePath.c_str());
@@ -1427,14 +1748,17 @@ void vtkF3DRenderer::ConfigureHDRILUT()
 
       if (!this->CachePath.empty())
       {
-        vtkSmartPointer<vtkImageData> img =
-          ::SaveTextureToImage(lut->GetTextureObject(), GL_TEXTURE_2D, 0, lut->GetLUTSize());
-        assert(img);
+        if (this->UseCache)
+        {
+          const vtkSmartPointer<vtkImageData> img =
+            ::SaveTextureToImage(lut->GetTextureObject(), GL_TEXTURE_2D, 0, lut->GetLUTSize());
+          assert(img);
 
-        vtkNew<vtkXMLImageDataWriter> writer;
-        writer->SetFileName(lutCachePath.c_str());
-        writer->SetInputData(img);
-        writer->Write();
+          vtkNew<vtkXMLImageDataWriter> writer;
+          writer->SetFileName(lutCachePath.c_str());
+          writer->SetInputData(img);
+          writer->Write();
+        }
       }
       else
       {
@@ -1477,14 +1801,17 @@ void vtkF3DRenderer::ConfigureHDRISphericalHarmonics()
 
       if (!this->CachePath.empty())
       {
-        // Create spherical harmonics cache file
-        vtkNew<vtkTable> table;
-        table->AddColumn(this->SphericalHarmonics);
+        if (this->UseCache)
+        {
+          // Create spherical harmonics cache file
+          vtkNew<vtkTable> table;
+          table->AddColumn(this->SphericalHarmonics);
 
-        vtkNew<vtkXMLTableWriter> writer;
-        writer->SetInputData(table);
-        writer->SetFileName(shCachePath.c_str());
-        writer->Write();
+          vtkNew<vtkXMLTableWriter> writer;
+          writer->SetInputData(table);
+          writer->SetFileName(shCachePath.c_str());
+          writer->Write();
+        }
       }
       else
       {
@@ -1525,28 +1852,31 @@ void vtkF3DRenderer::ConfigureHDRISpecular()
 
       if (!this->CachePath.empty())
       {
-        unsigned int nbLevels = spec->GetPrefilterLevels();
-        unsigned int size = spec->GetPrefilterSize();
-
-        vtkNew<vtkMultiBlockDataSet> mb;
-        mb->SetNumberOfBlocks(nbLevels);
-
-        for (unsigned int i = 0; i < nbLevels; i++)
+        if (this->UseCache)
         {
-          vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
-            spec->GetTextureObject(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, i, size >> i);
-          assert(img);
-          mb->SetBlock(i, img);
-        }
+          const unsigned int nbLevels = spec->GetPrefilterLevels();
+          const unsigned int size = spec->GetPrefilterSize();
 
-        vtkNew<vtkXMLMultiBlockDataWriter> writer;
-        writer->SetCompressorTypeToNone();
-        writer->SetDataModeToAppended();
-        writer->EncodeAppendedDataOff();
-        writer->SetHeaderTypeToUInt64();
-        writer->SetFileName(specCachePath.c_str());
-        writer->SetInputData(mb);
-        writer->Write();
+          vtkNew<vtkMultiBlockDataSet> mb;
+          mb->SetNumberOfBlocks(nbLevels);
+
+          for (unsigned int i = 0; i < nbLevels; i++)
+          {
+            const vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
+              spec->GetTextureObject(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, i, size >> i);
+            assert(img);
+            mb->SetBlock(i, img);
+          }
+
+          vtkNew<vtkXMLMultiBlockDataWriter> writer;
+          writer->SetCompressorTypeToNone();
+          writer->SetDataModeToAppended();
+          writer->EncodeAppendedDataOff();
+          writer->SetHeaderTypeToUInt64();
+          writer->SetFileName(specCachePath.c_str());
+          writer->SetInputData(mb);
+          writer->Write();
+        }
       }
       else
       {
@@ -1606,7 +1936,7 @@ void vtkF3DRenderer::ConfigureTextActors()
   std::string fontFileStr;
   if (this->FontFile.has_value())
   {
-    fontFileStr = ::DeprecatedCollapsePath(this->FontFile.value());
+    fontFileStr = this->FontFile.value().string();
   }
 
   if (!fontFileStr.empty())
@@ -1795,6 +2125,26 @@ void vtkF3DRenderer::SetNormalGlyphScaleMultiplier(double multiplier)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetNormalGlyphColor(const std::array<double, 3>& color)
+{
+  if (this->NormalGlyphColor != color)
+  {
+    this->NormalGlyphColor = color;
+    this->NormalGlyphsConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetNormalGlyphShape(const NormalGlyphShape& shape)
+{
+  if (this->GlyphShape != shape)
+  {
+    this->GlyphShape = shape;
+    this->NormalGlyphsConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseSSAOPass(bool use)
 {
   if (this->UseSSAOPass != use)
@@ -1855,13 +2205,23 @@ void vtkF3DRenderer::SetDisplayDepth(bool use)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetUseRaytracing(bool use)
+void vtkF3DRenderer::SetRenderingMode(RenderingMode mode)
 {
-  if (this->UseRaytracing != use)
+  if (this->CurrentRenderingMode != mode)
   {
-    this->UseRaytracing = use;
+    this->CurrentRenderingMode = mode;
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetAnariLibrary(const std::string& anariLibrary)
+{
+  if (this->AnariLibrary != anariLibrary)
+  {
+    this->AnariLibrary = anariLibrary;
+    this->RenderPassesConfigured = false;
   }
 }
 
@@ -1941,6 +2301,12 @@ void vtkF3DRenderer::ConfigureMetaData()
     this->UIActor->SetMetaData(this->Importer->GetMetaDataDescription());
   }
   this->MetaDataConfigured = true;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetSceneHierarchyMaxWidth(const int maxWidth)
+{
+  this->UIActor->SetSceneHierarchyMaxWidth(maxWidth);
 }
 
 //----------------------------------------------------------------------------
@@ -2039,6 +2405,7 @@ void vtkF3DRenderer::ShowArmature(bool show)
   {
     this->ArmatureVisible = show;
     this->RenderPassesConfigured = false;
+    this->ActorsPropertiesConfigured = false;
     this->CheatSheetConfigured = false;
   }
 }
@@ -2148,7 +2515,7 @@ void vtkF3DRenderer::UpdateActors()
   // Handle importer changes
   // XXX: Importer only modify itself when adding a new importer,
   // not when updating at a time step
-  vtkMTimeType importerMTime = this->Importer->GetMTime();
+  const vtkMTimeType importerMTime = this->Importer->GetMTime();
   if (importerMTime > this->ImporterTimeStamp)
   {
     this->ActorsPropertiesConfigured = false;
@@ -2159,17 +2526,16 @@ void vtkF3DRenderer::UpdateActors()
 
   // XXX: Handle animation update in importer, which may have an impact on the colormap
   // We assume animation change do not change the number of actors
-  vtkMTimeType importerUpdateMTime = this->Importer->GetUpdateMTime();
+  const vtkMTimeType importerUpdateMTime = this->Importer->GetUpdateMTime();
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   if (this->AxesGridVisible && importerUpdateMTime > this->ImporterUpdateTimeStamp)
   {
     this->GridAxesConfigured = false;
   }
-#endif
 
   if (this->UsingExpandingRange && (importerUpdateMTime > this->ImporterUpdateTimeStamp) &&
-    (this->EnableColoring || (!this->UseRaytracing && this->UseVolume)))
+    (this->Coloring != vtkF3DRenderer::ColoringMode::MATERIAL ||
+      (this->CurrentRenderingMode == RenderingMode::OPENGL && this->UseVolume)))
   {
     // XXX: This could be improved further to only configure mappers and actors
     // when the coloring range actually change
@@ -2264,6 +2630,24 @@ void vtkF3DRenderer::UpdateActors()
 }
 
 //----------------------------------------------------------------------------
+bool vtkF3DRenderer::CaptureVideoFrame(std::byte* yPlane, std::byte* uPlane, std::byte* vPlane)
+{
+  // Use the final rendered texture as input for the frame capture
+  vtkF3DOverlayRenderPass* overlayPass = vtkF3DOverlayRenderPass::SafeDownCast(this->GetPass());
+
+  if (overlayPass == nullptr)
+  {
+    F3DLog::Print(
+      F3DLog::Severity::Error, "Cannot capture video frame: renderer is not initialized");
+    return false;
+  }
+
+  this->FrameCapture->SetInputTexture(overlayPass->GetColorTexture());
+  this->FrameCapture->Capture(this, yPlane, uPlane, vPlane);
+  return true;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
   if (this->UseNormalGlyphs)
@@ -2284,7 +2668,7 @@ void vtkF3DRenderer::Render()
   }
 
   vtkInformation* info = this->GetInformation();
-  bool uiOnly = info->Get(vtkF3DRenderPass::RENDER_UI_ONLY());
+  const bool uiOnly = info->Get(vtkF3DRenderPass::RENDER_UI_ONLY());
 
 #ifndef F3D_USE_GLES
   if (!uiOnly)
@@ -2321,40 +2705,128 @@ void vtkF3DRenderer::ResetCameraClippingRange()
 {
   const bool gridUseBounds = this->GridActor->GetUseBounds();
   this->GridActor->SetUseBounds(!this->DisplayDepth);
-  this->Superclass::ResetCameraClippingRange();
+  if (!this->UseXR)
+  {
+    this->Superclass::ResetCameraClippingRange();
+  }
+  else
+  {
+#ifdef F3D_MODULE_OPENXR
+    // Adapted from `vtkOpenXRRenderer::ResetCameraClippingRange()`
+    // Copyright (c) Kitware, Inc.
+    double bounds[6];
+
+    this->ComputeVisiblePropBounds(bounds);
+
+    this->GetActiveCameraAndResetIfCreated();
+    if (this->ActiveCamera == nullptr)
+    {
+      vtkErrorMacro(<< "Trying to reset clipping range of non-existent camera");
+      return;
+    }
+
+    vtkVRRenderWindow* win = static_cast<vtkVRRenderWindow*>(this->GetRenderWindow());
+    double physicalScale = win->GetPhysicalScale();
+
+    // reset the clipping range when we don't have any 3D visible props
+    if (!vtkMath::AreBoundsInitialized(bounds))
+    {
+      // default to 0.2 to 10.0 meters in physical space if no data bounds
+      this->ActiveCamera->SetClippingRange(0.2 * physicalScale, 10.0 * physicalScale);
+      return;
+    }
+
+    this->ResetCameraClippingRange(bounds);
+#else
+    assert(false); // Unreachable
+#endif
+  }
   this->GridActor->SetUseBounds(gridUseBounds);
+}
+
+//---------------------------------------------------------------------------
+void vtkF3DRenderer::ResetCameraClippingRange(const double bounds[6])
+{
+  if (!this->UseXR)
+  {
+    this->Superclass::ResetCameraClippingRange(bounds);
+  }
+  else
+  {
+#ifdef F3D_MODULE_OPENXR
+    // adapted from `vtkF3DRenderer::ResetCameraClippingRange(const double bounds[6])`
+    // Copyright (c) Kitware, Inc.
+    this->GetActiveCameraAndResetIfCreated();
+    if (this->ActiveCamera == nullptr)
+    {
+      vtkErrorMacro(<< "Trying to reset clipping range of non-existent camera");
+      return;
+    }
+
+    double range[2];
+    int i, j, k;
+    vtkVRRenderWindow* win = static_cast<vtkVRRenderWindow*>(this->GetRenderWindow());
+    double physicalScale = win->GetPhysicalScale();
+
+    // reset the clipping range when we don't have any 3D visible props
+    if (!vtkMath::AreBoundsInitialized(bounds))
+    {
+      // default to 0.2 to 10.0 meters in physical space if no data bounds
+      this->ActiveCamera->SetClippingRange(0.2 * physicalScale, 10.0 * physicalScale);
+      return;
+    }
+
+    double expandedBounds[6] = { bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5] };
+    this->ExpandBounds(expandedBounds, this->ActiveCamera->GetModelTransformMatrix());
+
+    double trans[3];
+    win->GetPhysicalTranslation(trans);
+
+    range[0] = 0.2; // 20 cm in front of HMD
+    range[1] = 0.0;
+
+    // Find the farthest bounding box vertex
+    for (k = 0; k < 2; k++)
+    {
+      for (j = 0; j < 2; j++)
+      {
+        for (i = 0; i < 2; i++)
+        {
+          double fard = sqrt((expandedBounds[i] - trans[0]) * (expandedBounds[i] - trans[0]) +
+            (expandedBounds[2 + j] - trans[1]) * (expandedBounds[2 + j] - trans[1]) +
+            (expandedBounds[4 + k] - trans[2]) * (expandedBounds[4 + k] - trans[2]));
+          range[1] = (fard > range[1]) ? fard : range[1];
+        }
+      }
+    }
+
+    range[1] /= physicalScale; // convert to physical scale
+    range[1] += 3.0;           // add 3 meters for room to walk around
+
+    // to see transmitters make sure far is at least 10 meters
+    if (range[1] < 10.0)
+    {
+      range[1] = 10.0;
+    }
+
+    this->ActiveCamera->SetClippingRange(range[0] * physicalScale, range[1] * physicalScale);
+#else
+    assert(false); // Unreachable
+#endif
+  }
 }
 
 //----------------------------------------------------------------------------
 int vtkF3DRenderer::UpdateLights()
 {
-  // Recover the number of lights that are on
-  vtkLightCollection* lc = this->GetLights();
-  vtkLight* light;
-  int lightCount = 0;
-  vtkCollectionSimpleIterator it;
-  for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
-  {
-    if (light->GetSwitch())
-    {
-      lightCount++;
-    }
-  }
-
-  // If no lights are turned on, add a light kit, even when using a HDRI
-  if (lightCount == 0)
-  {
-    vtkNew<vtkLightKit> lightKit;
-    lightKit->AddLightsToRenderer(this);
-    this->LightIntensitiesConfigured = false;
-  }
-
   // Update light shaders
-  lightCount = this->Superclass::UpdateLights();
+  const int lightCount = this->Superclass::UpdateLights();
 
   if (!this->LightIntensitiesConfigured)
   {
-    lc = this->GetLights();
+    vtkCollectionSimpleIterator it;
+    vtkLightCollection* lc = this->GetLights();
+    vtkLight* light = nullptr;
     for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
     {
       double originalIntensity;
@@ -2370,7 +2842,29 @@ int vtkF3DRenderer::UpdateLights()
 
       light->SetIntensity(originalIntensity * this->LightIntensity);
     }
+
     this->LightIntensitiesConfigured = true;
+  }
+
+  this->UpdateLightRepresentations();
+
+  // Push IBLIntensity to every actor's custom uniforms so the HDRI ambient
+  // contribution (iblDiffuse + iblSpecular) scales with the same factor.
+  // This runs every frame (not just when intensity changes) to ensure that newly
+  // added actors always have the uniform set before their shader is compiled.
+  // VTK's //VTK::CustomUniforms::Dec mechanism then declares the uniform in the
+  // GLSL shader source. The actual GPU upload (glUniform1f) is already performed
+  // each frame by VTK's SetCustomUniforms, so this dict update is negligible.
+  // see https://github.com/f3d-app/f3d/issues/3312
+  {
+    vtkActorCollection* actors = this->GetActors();
+    vtkCollectionSimpleIterator ait;
+    vtkActor* actor;
+    for (actors->InitTraversal(ait); (actor = actors->GetNextActor(ait));)
+    {
+      actor->GetShaderProperty()->GetFragmentCustomUniforms()->SetUniformf(
+        "IBLIntensity", static_cast<float>(this->LightIntensity));
+    }
   }
 
   return lightCount;
@@ -2381,10 +2875,10 @@ void vtkF3DRenderer::CreateCacheDirectory()
 {
   assert(this->HasValidHDRIHash);
 
-  if (!this->CachePath.empty())
+  if (!this->CachePath.empty() && this->UseCache)
   {
     // Cache folder for this HDRI
-    std::string currentCachePath = this->CachePath + "/" + this->HDRIHash;
+    const std::string currentCachePath = this->CachePath + "/" + this->HDRIHash;
 
     // Create the folder if it does not exists
     vtksys::SystemTools::MakeDirectory(currentCachePath);
@@ -2802,6 +3296,17 @@ void vtkF3DRenderer::ConfigureActorsProperties()
           "Texture coordinates are required to display checkerboard texture.");
       }
     }
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
+    // exclude armature from shadows
+    vtkInformation* info = coloring.OriginalActor->GetPropertyKeys();
+    if (info && info->Has(vtkF3DImporter::ACTOR_IS_ARMATURE()))
+    {
+      coloring.OriginalActor->GetPropertyKeys()->Set(
+        vtkShadowMapBakerPass::OCCLUDER(), this->ArmatureVisible);
+      coloring.OriginalActor->GetPropertyKeys()->Set(vtkShadowMapPass::RECEIVER(), 0);
+    }
+#endif
   }
 
   for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
@@ -2827,11 +3332,6 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigurePointSprites()
 {
-  if (!this->UsePointSprites)
-  {
-    return;
-  }
-
   if (this->GetBlendingMode() == vtkF3DRenderer::BlendingMode::SORT &&
     !vtkShader::IsComputeShaderSupported())
   {
@@ -2853,11 +3353,19 @@ void vtkF3DRenderer::ConfigurePointSprites()
     vtkF3DPointSplatMapper* splatMapper = vtkF3DPointSplatMapper::SafeDownCast(sprites.Mapper);
     splatMapper->SetUseInstancing(this->PointSpritesUseInstancing);
 
+    // if the original mapper is a vtkF3DPointSplatMapper, we can configure it for instancing
+    vtkF3DPointSplatMapper* originalSplatMapper =
+      vtkF3DPointSplatMapper::SafeDownCast(sprites.OriginalActor->GetMapper());
+    if (originalSplatMapper)
+    {
+      originalSplatMapper->SetUseInstancing(this->PointSpritesUseInstancing);
+    }
+
     // add SDF functions
     vtkShaderProperty* sp = sprites.Actor->GetShaderProperty();
     sp->ClearAllFragmentShaderReplacements();
 
-    std::string sdfFunctions = vtkF3DPointSplatUtilsSDF;
+    const std::string sdfFunctions = vtkF3DPointSplatUtilsSDF;
     sp->AddFragmentShaderReplacement(
       "//VTK::PositionVC::Dec\n", true, sdfFunctions + "//VTK::PositionVC::Dec\n", true);
 
@@ -2875,12 +3383,21 @@ void vtkF3DRenderer::ConfigurePointSprites()
     sprites.Mapper->SetLowpassMatrix(lowPass);
 
     vtkPolyData* polyData = vtkPolyData::SafeDownCast(sprites.Mapper->GetInput());
-    if (polyData && polyData->GetPointData()->HasArray("scale") &&
-      polyData->GetPointData()->HasArray("rotation"))
+    const char* scaleArray = sprites.Mapper->GetScaleArray();
+    const char* rotationArray = sprites.Mapper->GetRotationArray();
+    if (polyData && (scaleArray || polyData->GetPointData()->HasArray("scale")) &&
+      (rotationArray || polyData->GetPointData()->HasArray("rotation")))
     {
       sprites.Mapper->AnisotropicOn();
-      sprites.Mapper->SetRotationArray("rotation");
-      sprites.Mapper->SetScaleArray("scale");
+
+      if (!scaleArray)
+      {
+        sprites.Mapper->SetScaleArray("scale");
+      }
+      if (!rotationArray)
+      {
+        sprites.Mapper->SetRotationArray("rotation");
+      }
     }
     else
     {
@@ -2958,12 +3475,15 @@ void vtkF3DRenderer::ConfigurePointSprites()
       sprites.Actor->ForceTranslucentOff();
     }
   }
+
+  this->PointSpritesConfigured = true;
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureNormalGlyphs()
 {
-  bool normalGlyphsVisible = !this->UseRaytracing && this->UseNormalGlyphs;
+  const bool normalGlyphsVisible =
+    (this->CurrentRenderingMode == RenderingMode::OPENGL) && this->UseNormalGlyphs;
   for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
   {
     if (normalGlyphsVisible && !normalGlyph.InputDataHasNormals)
@@ -2973,11 +3493,146 @@ void vtkF3DRenderer::ConfigureNormalGlyphs()
       continue;
     }
 
+    if (this->LineWidth.has_value())
+    {
+      normalGlyph.Actor->GetProperty()->SetLineWidth(this->LineWidth.value());
+    }
+
+    vtkSmartPointer<vtkAlgorithm> glyphSource;
+
+    switch (this->GlyphShape)
+    {
+      case NormalGlyphShape::ARROW:
+        glyphSource = vtkSmartPointer<vtkArrowSource>::New();
+        break;
+      case NormalGlyphShape::CONE:
+      {
+        const vtkNew<vtkConeSource> coneSource;
+        coneSource->SetRadius(0.1);
+        coneSource->SetResolution(16);
+        coneSource->SetCenter(0.5, 0.0, 0.0);
+        glyphSource = coneSource;
+        break;
+      }
+      break;
+      case NormalGlyphShape::CYLINDER:
+      {
+        const vtkNew<vtkCylinderSource> cylinderSource;
+        cylinderSource->SetRadius(0.1);
+        cylinderSource->SetResolution(16);
+        const vtkNew<vtkTransform> transformFilter;
+        transformFilter->RotateZ(-90.0);
+        transformFilter->Translate(0.0, 0.5, 0.0);
+        const vtkNew<vtkTransformFilter> transformPolyDataFilter;
+        transformPolyDataFilter->SetInputConnection(cylinderSource->GetOutputPort());
+        transformPolyDataFilter->SetTransform(transformFilter);
+        glyphSource = transformPolyDataFilter;
+        break;
+      }
+      case NormalGlyphShape::LINE:
+      {
+        const vtkNew<vtkLineSource> lineSource;
+        lineSource->SetPoint1(0.0, 0.0, 0.0);
+        lineSource->SetPoint2(1.0, 0.0, 0.0);
+        glyphSource = lineSource;
+        break;
+      }
+    }
+
+    normalGlyph.GlyphMapper->SetSourceConnection(glyphSource->GetOutputPort());
+
     this->UpdateNormalGlyphsScale();
+
+    const double* normalGlyphColor = this->NormalGlyphColor.data();
+    // default color (0.82, 0.82, 0.82) is (0.65, 0.65, 0.65) in linear space
+    // which match the default generic importer surface color
+    double linearColor[3];
+    linearColor[0] = std::pow(normalGlyphColor[0], 2.2);
+    linearColor[1] = std::pow(normalGlyphColor[1], 2.2);
+    linearColor[2] = std::pow(normalGlyphColor[2], 2.2);
+    normalGlyph.Actor->GetProperty()->SetColor(linearColor);
     normalGlyph.Actor->SetVisibility(normalGlyphsVisible);
   }
 
   this->NormalGlyphsConfigured = true;
+}
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::UpdateLightRepresentations()
+{
+  constexpr double maxConeAngle = 89.0;
+  constexpr double pointLightConeAngle = 90.0;
+
+  vtkCollectionSimpleIterator it;
+  vtkLightCollection* lc = this->GetLights();
+  vtkLight* light = nullptr;
+  std::set<vtkLight*> visitedLights;
+  for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
+  {
+    // ignore camera lights
+    const int lightType = light->GetLightType();
+    if (lightType == VTK_LIGHT_TYPE_CAMERA_LIGHT || lightType == VTK_LIGHT_TYPE_HEADLIGHT)
+    {
+      continue;
+    }
+
+    visitedLights.insert(light);
+
+    auto& lightRep = this->LightRepresentations[light];
+
+    if (lightRep.representation == nullptr)
+    {
+      lightRep.representation = vtkSmartPointer<vtkLightRepresentation>::New();
+    }
+    if (lightRep.widget == nullptr)
+    {
+      lightRep.widget = vtkSmartPointer<vtkLightWidget>::New();
+      lightRep.widget->SetRepresentation(lightRep.representation);
+      lightRep.widget->SetInteractor(this->RenderWindow->GetInteractor());
+      lightRep.widget->SetProcessEvents(false);
+    }
+
+    lightRep.representation->SetLightPosition(light->GetTransformedPosition());
+    lightRep.representation->SetFocalPoint(light->GetTransformedFocalPoint());
+    if (light->GetPositional() && light->GetConeAngle() < maxConeAngle)
+    {
+      lightRep.representation->SetPositional(light->GetPositional());
+      lightRep.representation->SetConeAngle(light->GetConeAngle());
+    }
+    else
+    {
+      lightRep.representation->SetPositional(false);
+    }
+    if (light->GetPositional() && light->GetConeAngle() == pointLightConeAngle)
+    {
+      lightRep.representation->SetFocalPoint(lightRep.representation->GetLightPosition());
+    }
+    lightRep.representation->SetLightColor(light->GetDiffuseColor());
+
+    if (this->LightRepresentationVisible)
+    {
+      lightRep.widget->On();
+    }
+    else
+    {
+      lightRep.widget->Off();
+    }
+  }
+
+  // remove unwanted light representations
+  for (auto repItr = this->LightRepresentations.begin();
+       repItr != this->LightRepresentations.end();)
+  {
+    if (visitedLights.count(repItr->first))
+    {
+      repItr++;
+      continue;
+    }
+
+    // safely removing the widget and representation
+    repItr->second.widget->Off();
+
+    repItr = this->LightRepresentations.erase(repItr);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -3143,23 +3798,29 @@ void vtkF3DRenderer::SetOpacityMap(const std::vector<double>& opacityMap)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetEnableColoring(bool enable)
+void vtkF3DRenderer::SetColoring(ColoringMode mode)
 {
-  if (enable != this->EnableColoring)
+  if (mode != this->Coloring)
   {
-    this->EnableColoring = enable;
+    this->Coloring = mode;
+    this->ColorTransferFunctionConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
+    this->ColoringMappersConfigured = false;
+    this->ColoringPointSpritesMappersConfigured = false;
+    this->VolumePropsAndMappersConfigured = false;
+    this->ScalarBarActorConfigured = false;
     this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
-    this->RenderPassesConfigured = false;
+    this->ExpandingRangeSet = false;
   }
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetUseCellColoring(bool useCell)
+void vtkF3DRenderer::SetDataFieldForColoring(const DataField& dataField)
 {
-  if (useCell != this->UseCellColoring)
+  if (dataField != this->DataFieldForColoring)
   {
-    this->UseCellColoring = useCell;
+    this->DataFieldForColoring = dataField;
     this->ColorTransferFunctionConfigured = false;
     this->OpacityTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
@@ -3191,18 +3852,19 @@ void vtkF3DRenderer::SetArrayNameForColoring(const std::optional<std::string>& a
 }
 
 //----------------------------------------------------------------------------
-std::optional<std::string> vtkF3DRenderer::GetArrayNameForColoring()
+std::optional<std::string> vtkF3DRenderer::GetArrayNameForColoring() const
 {
   return this->ArrayNameForColoring;
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetComponentForColoring(int component)
+void vtkF3DRenderer::SetArrayIsCellData(const std::optional<bool>& arrayIsCellData)
 {
-  if (component != this->ComponentForColoring)
+  if (arrayIsCellData != this->ArrayIsCellData)
   {
-    this->ComponentForColoring = component;
+    this->ArrayIsCellData = arrayIsCellData;
     this->ColorTransferFunctionConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
     this->ColoringPointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
@@ -3214,24 +3876,88 @@ void vtkF3DRenderer::SetComponentForColoring(int component)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetComponentForColoring(const std::optional<int>& component)
+{
+  if (component != this->ComponentForColoring)
+  {
+    this->ComponentForColoring = component;
+    this->ColorTransferFunctionConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
+    this->ColoringMappersConfigured = false;
+    this->ColoringPointSpritesMappersConfigured = false;
+    this->VolumePropsAndMappersConfigured = false;
+    this->ScalarBarActorConfigured = false;
+    this->CheatSheetConfigured = false;
+    this->ColoringConfigured = false;
+    this->ExpandingRangeSet = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetXRMode(bool enable, bool showBbox)
+{
+  // OpenXR not tested yet
+  // LCOV_EXCL_START
+  if (enable != this->UseXR)
+  {
+    this->UseXR = enable;
+    this->RenderPassesConfigured = false;
+  }
+
+  if (this->UseXR)
+  {
+    this->ClippingRangeExpansion = 0.05;
+
+    if (showBbox)
+    {
+      this->AddActor(this->XRBBoxActor);
+    }
+    else
+    {
+      this->RemoveActor(this->XRBBoxActor);
+    }
+  }
+  // LCOV_EXCL_STOP
+}
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetLightRepresentationVisibility(bool visible)
+{
+  // Make sure all lights are being tracked by a representation
+  if (this->LightRepresentationVisible != visible)
+  {
+    this->LightRepresentationVisible = visible;
+    this->UpdateLightRepresentations();
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureColoringAndVisibilities()
 {
   assert(this->Importer);
 
   // Recover coloring information and update handler
-  bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
   F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
-  auto info = coloringHandler.SetCurrentColoring(
-    enableColoring, this->UseCellColoring, this->ArrayNameForColoring, false);
-  bool hasColoring = info.has_value();
+
+  const bool forcePoints = this->DataFieldForColoring == DataField::POINTS;
+  const bool forceCells = this->DataFieldForColoring == DataField::CELLS;
+
+  const auto info = coloringHandler.SetCurrentColoring(
+    forcePoints, forceCells, this->ArrayIsCellData, this->ArrayNameForColoring, false);
+
+  const bool hasColoring =
+    info.has_value() && this->Coloring != vtkF3DRenderer::ColoringMode::MATERIAL;
   if (hasColoring && !this->ColorTransferFunctionConfigured)
   {
-    this->ConfigureRangeAndCTFForColoring(info.value());
+    if (this->Coloring == vtkF3DRenderer::ColoringMode::SCIVIS)
+    {
+      this->ConfigureRangeAndCTFForColoring(info.value());
+    }
     this->ColorTransferFunctionConfigured = true;
   }
 
   // Handle surface geometry
-  bool geometriesVisible = this->UseRaytracing || (!this->UseVolume && !this->UsePointSprites);
+  const bool geometriesVisible = (this->CurrentRenderingMode != RenderingMode::OPENGL) ||
+    (!this->UseVolume && !this->UsePointSprites);
   for (const auto& coloring : this->Importer->GetColoringActorsAndMappers())
   {
     if (geometriesVisible &&
@@ -3247,8 +3973,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
         if (!this->ColoringMappersConfigured)
         {
           visible = vtkF3DRenderer::ConfigureMapperForColoring(coloring.Mapper, info.value().Name,
-            this->ComponentForColoring, this->ColorTransferFunction, this->ColorRange,
-            this->UseCellColoring);
+            this->Coloring == vtkF3DRenderer::ColoringMode::DIRECT, this->ComponentForColoring,
+            this->ColorTransferFunction, this->ColorRange, info.value().IsCellData);
         }
       }
       coloring.Actor->SetVisibility(visible);
@@ -3266,7 +3992,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle point sprites
-  bool pointSpritesVisible = !this->UseRaytracing && !this->UseVolume && this->UsePointSprites;
+  const bool pointSpritesVisible = (this->CurrentRenderingMode == RenderingMode::OPENGL) &&
+    !this->UseVolume && this->UsePointSprites;
   for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
   {
     if (pointSpritesVisible &&
@@ -3279,8 +4006,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
         if (!this->ColoringPointSpritesMappersConfigured)
         {
           vtkF3DRenderer::ConfigureMapperForColoring(sprites.Mapper, info.value().Name,
-            this->ComponentForColoring, this->ColorTransferFunction, this->ColorRange,
-            this->UseCellColoring);
+            this->Coloring == vtkF3DRenderer::ColoringMode::DIRECT, this->ComponentForColoring,
+            this->ColorTransferFunction, this->ColorRange, info.value().IsCellData);
         }
       }
       sprites.Mapper->SetScalarVisibility(hasColoring);
@@ -3296,7 +4023,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle Volume prop
-  bool volumeVisible = !this->UseRaytracing && this->UseVolume;
+  const bool volumeVisible =
+    (this->CurrentRenderingMode == RenderingMode::OPENGL) && this->UseVolume;
   const auto& volPropsAndMappers = this->Importer->GetVolumePropsAndMappers();
   for (const auto& volume : volPropsAndMappers)
   {
@@ -3312,15 +4040,21 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
         if (!this->VolumePropsAndMappersConfigured)
         {
           visible = vtkF3DRenderer::ConfigureVolumeForColoring(volume.Mapper, volume.Prop,
-            info.value().Name, this->ComponentForColoring, this->ColorTransferFunction,
-            this->OpacityMap, this->ColorRange, this->OpacityTransferFunctionConfigured,
-            this->UseCellColoring, this->UseInverseOpacityFunction);
+            info.value().Name, this->Coloring == vtkF3DRenderer::ColoringMode::DIRECT,
+            this->ComponentForColoring, this->ColorTransferFunction, this->OpacityMap,
+            this->ColorRange, this->OpacityTransferFunctionConfigured, info.value().IsCellData,
+            this->UseInverseOpacityFunction);
           if (!visible)
           {
             F3DLog::Print(F3DLog::Severity::Warning,
               "Cannot find the array \"" + info.value().Name + "\" to display volume with");
           }
         }
+      }
+      else
+      {
+        F3DLog::Print(
+          F3DLog::Severity::Warning, "Volume rendering in material color mode is invalid");
       }
       volume.Prop->SetVisibility(visible);
     }
@@ -3331,7 +4065,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
   if (volumeVisible)
   {
-    if (!this->VolumePropsAndMappersConfigured && volPropsAndMappers.size() == 0)
+    if (!this->VolumePropsAndMappersConfigured && volPropsAndMappers.size() == 0 &&
+      this->Importer->GetColoringActorsAndMappers().size() > 0)
     {
       F3DLog::Print(F3DLog::Severity::Error, "Cannot use volume with this data");
     }
@@ -3339,12 +4074,13 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle scalar bar
-  bool barVisible = this->ScalarBarVisible && hasColoring && this->ComponentForColoring >= -1;
+  const bool barVisible =
+    this->ScalarBarVisible && hasColoring && this->Coloring == vtkF3DRenderer::ColoringMode::SCIVIS;
   this->ScalarBarActor->SetVisibility(barVisible);
   if (barVisible && !this->ScalarBarActorConfigured)
   {
-    vtkF3DRenderer::ConfigureScalarBarActorForColoring(this->ScalarBarActor, info.value().Name,
-      this->ComponentForColoring, this->ColorTransferFunction);
+    vtkF3DRenderer::ConfigureScalarBarActorForColoring(
+      this->ScalarBarActor, info.value().Name, this->ColorTransferFunction);
     this->ScalarBarActorConfigured = true;
   }
 
@@ -3358,29 +4094,35 @@ std::string vtkF3DRenderer::GetColoringDescription()
   assert(this->Importer);
 
   std::stringstream stream;
+
+  if (this->Coloring == vtkF3DRenderer::ColoringMode::MATERIAL)
+  {
+    return "Material";
+  }
+
   auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
   if (info.has_value())
   {
-    stream << "Coloring using " << (this->UseCellColoring ? "cell" : "point") << " array named "
-           << info.value().Name << (this->EnableColoring ? ", " : " (forced), ")
-           << vtkF3DRenderer::ComponentToString(this->ComponentForColoring);
+    stream << "Coloring using " << (info.value().IsCellData ? "cell" : "point") << " array named "
+           << info.value().Name << ", " << vtkF3DRenderer::ComponentToString();
   }
   else
   {
-    stream << "Not coloring";
+    stream << "No coloring array";
   }
   return stream.str();
 }
 
 //----------------------------------------------------------------------------
 bool vtkF3DRenderer::ConfigureMapperForColoring(vtkPolyDataMapper* mapper, const std::string& name,
-  int component, vtkColorTransferFunction* ctf, double range[2], bool cellFlag)
+  bool directColor, const std::optional<int>& component, vtkColorTransferFunction* ctf,
+  double range[2], bool cellFlag)
 {
   vtkDataSetAttributes* data = cellFlag
     ? static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetCellData())
     : static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetPointData());
-  vtkDataArray* array = data->GetArray(name.c_str());
-  if (!array || component >= array->GetNumberOfComponents())
+  const vtkDataArray* array = data->GetArray(name.c_str());
+  if (!array || (component.has_value() && (component.value() >= array->GetNumberOfComponents())))
   {
     mapper->ScalarVisibilityOff();
     return false;
@@ -3392,7 +4134,7 @@ bool vtkF3DRenderer::ConfigureMapperForColoring(vtkPolyDataMapper* mapper, const
     cellFlag ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
   mapper->ScalarVisibilityOn();
 
-  if (component == -2)
+  if (directColor)
   {
     if (array->GetNumberOfComponents() > 4)
     {
@@ -3417,15 +4159,15 @@ bool vtkF3DRenderer::ConfigureMapperForColoring(vtkPolyDataMapper* mapper, const
 
 //----------------------------------------------------------------------------
 bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vtkVolume* volume,
-  const std::string& name, int component, vtkColorTransferFunction* ctf,
-  const std::vector<double>& opacityMap, double range[2], bool& opacityTransferFunctionConfigured,
-  bool cellFlag, bool inverseOpacityFlag)
+  const std::string& name, bool directColor, const std::optional<int>& component,
+  vtkColorTransferFunction* ctf, const std::vector<double>& opacityMap, double range[2],
+  bool& opacityTransferFunctionConfigured, bool cellFlag, bool inverseOpacityFlag)
 {
   vtkDataSetAttributes* data = cellFlag
     ? static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetCellData())
     : static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetPointData());
-  vtkDataArray* array = data->GetArray(name.c_str());
-  if (!array || component >= array->GetNumberOfComponents())
+  const vtkDataArray* array = data->GetArray(name.c_str());
+  if (!array || (component.has_value() && (component.value() >= array->GetNumberOfComponents())))
   {
     // We rely on the selected scalar array to check if this mapper can be shown or not
     mapper->SelectScalarArray("");
@@ -3436,16 +4178,7 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
     cellFlag ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
   mapper->SelectScalarArray(name.c_str());
 
-  if (component >= 0)
-  {
-    mapper->SetVectorMode(vtkSmartVolumeMapper::COMPONENT);
-    mapper->SetVectorComponent(component);
-  }
-  else if (component == -1)
-  {
-    mapper->SetVectorMode(vtkSmartVolumeMapper::MAGNITUDE);
-  }
-  else if (component == -2)
+  if (directColor)
   {
     if (array->GetNumberOfComponents() > 4)
     {
@@ -3459,20 +4192,33 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
       mapper->SetVectorMode(vtkSmartVolumeMapper::DISABLED);
     }
   }
-
-  vtkPiecewiseFunction* otf = volume->GetProperty()->GetScalarOpacity();
-  if (!opacityTransferFunctionConfigured)
+  else if (!component.has_value())
   {
-    otf->RemoveAllPoints();
-    vtkF3DRenderer::ConfigureOpacityTransferFunction(otf, range, opacityMap, inverseOpacityFlag);
-    opacityTransferFunctionConfigured = true;
+    mapper->SetVectorMode(vtkSmartVolumeMapper::MAGNITUDE);
+  }
+  else if (component.value() >= 0)
+  {
+    mapper->SetVectorMode(vtkSmartVolumeMapper::COMPONENT);
+    mapper->SetVectorComponent(component.value());
   }
 
   vtkNew<vtkVolumeProperty> property;
-  property->SetColor(ctf);
-  property->SetScalarOpacity(otf);
   property->ShadeOff();
   property->SetInterpolationTypeToLinear();
+
+  if (!directColor)
+  {
+    vtkPiecewiseFunction* otf = volume->GetProperty()->GetScalarOpacity();
+    if (!opacityTransferFunctionConfigured)
+    {
+      otf->RemoveAllPoints();
+      vtkF3DRenderer::ConfigureOpacityTransferFunction(otf, range, opacityMap, inverseOpacityFlag);
+      opacityTransferFunctionConfigured = true;
+    }
+
+    property->SetColor(ctf);
+    property->SetScalarOpacity(otf);
+  }
 
   volume->SetProperty(property);
   return true;
@@ -3499,7 +4245,7 @@ void vtkF3DRenderer::ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf,
   {
     for (size_t i = 0; i + 1 < opacityMap.size(); i += 2)
     {
-      double value = inverseOpacityFlag ? 1.0 - opacityMap[i + 1] : opacityMap[i + 1];
+      const double value = inverseOpacityFlag ? 1.0 - opacityMap[i + 1] : opacityMap[i + 1];
       otf->AddPoint(range[0] + (range[1] - range[0]) * opacityMap[i], value);
     }
   }
@@ -3507,7 +4253,7 @@ void vtkF3DRenderer::ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf,
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
-  vtkScalarBarActor* scalarBar, std::string arrayName, int component, vtkColorTransferFunction* ctf)
+  vtkScalarBarActor* scalarBar, std::string arrayName, vtkColorTransferFunction* ctf)
 {
   if (this->DisplayDepth)
   {
@@ -3516,7 +4262,7 @@ void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
   else
   {
     arrayName += " (";
-    arrayName += this->ComponentToString(component);
+    arrayName += this->ComponentToString();
     arrayName += ")";
   }
 
@@ -3534,16 +4280,13 @@ void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
 void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
   const F3DColoringInfoHandler::ColoringInfo& info)
 {
-  if (this->ComponentForColoring == -2)
-  {
-    return;
-  }
+  std::optional<int> componentIndex = this->ComponentForColoring;
 
-  if (this->ComponentForColoring >= info.MaximumNumberOfComponents)
+  if (componentIndex.has_value() && (componentIndex.value() >= info.MaximumNumberOfComponents))
   {
     F3DLog::Print(F3DLog::Severity::Warning,
-      std::string("Invalid component index: ") + std::to_string(this->ComponentForColoring));
-    return;
+      std::string("Invalid component index: ") + std::to_string(componentIndex.value()));
+    componentIndex.reset();
   }
 
   // Set range
@@ -3568,10 +4311,10 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
   {
     double minRange;
     double maxRange;
-    if (this->ComponentForColoring >= 0)
+    if (componentIndex.has_value())
     {
-      minRange = info.ComponentRanges[this->ComponentForColoring][0];
-      maxRange = info.ComponentRanges[this->ComponentForColoring][1];
+      minRange = info.ComponentRanges[componentIndex.value()][0];
+      maxRange = info.ComponentRanges[componentIndex.value()][1];
     }
     else
     {
@@ -3592,6 +4335,19 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
     this->ExpandingRangeSet = true;
   }
 
+  // Only adjust automatic ranges. Respect an explicit --coloring-range as-is.
+  if (this->UsingExpandingRange)
+  {
+    constexpr double degenerateColoringRangeEpsilon = 1e-4;
+
+    if (vtkMathUtilities::NearlyEqual(
+          this->ColorRange[0], this->ColorRange[1], degenerateColoringRangeEpsilon))
+    {
+      this->ColorRange[0] -= degenerateColoringRangeEpsilon;
+      this->ColorRange[1] += degenerateColoringRangeEpsilon;
+    }
+  }
+
   // Create lookup table
   this->ColorTransferFunction = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 
@@ -3601,14 +4357,14 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
     {
       for (size_t i = 0; i < this->Colormap.size(); i += 4)
       {
-        double val = this->Colormap[i];
-        double r = this->Colormap[i + 1];
-        double g = this->Colormap[i + 2];
-        double b = this->Colormap[i + 3];
+        const double val = this->Colormap[i];
+        const double r = this->Colormap[i + 1];
+        const double g = this->Colormap[i + 2];
+        const double b = this->Colormap[i + 3];
         this->ColorTransferFunction->AddRGBPoint(
           this->ColorRange[0] + val * (this->ColorRange[1] - this->ColorRange[0]), r, g, b);
       }
-      if (this->ColormapDiscretization.has_value() && this->ColormapDiscretization.value() > 0)
+      if (this->ColormapDiscretization.has_value() && (this->ColormapDiscretization.value() > 0))
       {
         this->ColorTransferFunction->DiscretizeOn();
         this->ColorTransferFunction->SetNumberOfValues(this->ColormapDiscretization.value());
@@ -3625,10 +4381,10 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
     }
   }
 
-  if (this->ComponentForColoring >= 0)
+  if (this->ComponentForColoring.has_value())
   {
     this->ColorTransferFunction->SetVectorModeToComponent();
-    this->ColorTransferFunction->SetVectorComponent(this->ComponentForColoring);
+    this->ColorTransferFunction->SetVectorComponent(this->ComponentForColoring.value());
   }
   else
   {
@@ -3637,19 +4393,23 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::CycleFieldForColoring()
+void vtkF3DRenderer::CycleModeForColoring()
 {
-  // XXX: A generic approach will be better when adding categorical field data coloring
-  this->SetUseCellColoring(!this->UseCellColoring);
-  bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
-  F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
-  auto info = coloringHandler.SetCurrentColoring(
-    enableColoring, this->UseCellColoring, this->ArrayNameForColoring, true);
-  if (!info.has_value())
+  ColoringMode nextColoring;
+  if (this->Coloring == ColoringMode::MATERIAL)
   {
-    // Cycle array if the current one is not valid
-    this->CycleArrayForColoring();
+    nextColoring = ColoringMode::SCIVIS;
   }
+  else if (this->Coloring == ColoringMode::SCIVIS)
+  {
+    nextColoring = ColoringMode::DIRECT;
+  }
+  else
+  {
+    nextColoring = ColoringMode::MATERIAL;
+  }
+
+  this->SetColoring(nextColoring);
 }
 
 //----------------------------------------------------------------------------
@@ -3700,14 +4460,14 @@ void vtkF3DRenderer::CycleArrayForColoring()
 {
   assert(this->Importer);
   this->Importer->GetColoringInfoHandler().CycleColoringArray(
-    !this->UseVolume); // TODO check this cond
+    this->DataFieldForColoring == DataField::POINTS,
+    this->DataFieldForColoring == DataField::CELLS);
   auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
-  bool enable = info.has_value();
 
-  this->SetEnableColoring(enable);
-  if (this->EnableColoring)
+  if (info.has_value())
   {
     this->SetArrayNameForColoring(info.value().Name);
+    this->SetArrayIsCellData(info.value().IsCellData);
     if (this->ComponentForColoring >= info.value().MaximumNumberOfComponents)
     {
       // Cycle component if the current one is not valid
@@ -3717,6 +4477,7 @@ void vtkF3DRenderer::CycleArrayForColoring()
   else
   {
     this->SetArrayNameForColoring(std::nullopt);
+    this->SetArrayIsCellData(std::nullopt);
   }
 }
 
@@ -3728,51 +4489,73 @@ void vtkF3DRenderer::CycleComponentForColoring()
   auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
   if (!info.has_value())
   {
+    this->SetComponentForColoring(std::nullopt);
     return;
   }
 
-  // -2 -1 0 1 2 3 4
-  this->SetComponentForColoring(
-    (this->ComponentForColoring + 3) % (info.value().MaximumNumberOfComponents + 2) - 2);
-}
-
-//----------------------------------------------------------------------------
-std::string vtkF3DRenderer::ComponentToString(int component)
-{
-  assert(this->Importer);
-
-  if (component == -2)
+  if (this->ComponentForColoring.has_value())
   {
-    return "Direct Scalars";
-  }
-  else if (component == -1)
-  {
-    return "Magnitude";
+    if (this->ComponentForColoring.value() >= info.value().MaximumNumberOfComponents - 1)
+    {
+      this->SetComponentForColoring(std::nullopt);
+    }
+    else
+    {
+      this->SetComponentForColoring(this->ComponentForColoring.value() + 1);
+    }
   }
   else
   {
-    auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
-    if (!info.has_value())
-    {
-      return "";
-    }
-    if (component >= info.value().MaximumNumberOfComponents)
-    {
-      return "";
-    }
-
-    std::string componentName;
-    if (component < static_cast<int>(info.value().ComponentNames.size()))
-    {
-      componentName = info.value().ComponentNames[component];
-    }
-    if (componentName.empty())
-    {
-      componentName = "Component #";
-      componentName += std::to_string(component);
-    }
-    return componentName;
+    this->SetComponentForColoring(0);
   }
+}
+
+//----------------------------------------------------------------------------
+std::string vtkF3DRenderer::ComponentToString()
+{
+  assert(this->Importer);
+
+  auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
+  if (!info.has_value())
+  {
+    return "No Array";
+  }
+
+  if (!this->ComponentForColoring.has_value() ||
+    this->ComponentForColoring.value() >= info.value().MaximumNumberOfComponents)
+  {
+    return "Magnitude";
+  }
+
+  std::string componentName;
+  if (this->ComponentForColoring.value() < static_cast<int>(info.value().ComponentNames.size()))
+  {
+    componentName = info.value().ComponentNames[this->ComponentForColoring.value()];
+  }
+  if (componentName.empty())
+  {
+    componentName = "Component #";
+    componentName += std::to_string(this->ComponentForColoring.value());
+  }
+  return componentName;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkF3DRenderer::ArrayToString()
+{
+  assert(this->Importer);
+
+  auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
+  if (!info.has_value())
+  {
+    return "No array";
+  }
+
+  // Unicode symbols represent a square for cell data and a dot for point data
+  std::string arrayName = info.value().IsCellData ? "\uea72 " : "\uf4c3 ";
+  arrayName += info.value().Name;
+
+  return arrayName;
 }
 
 //----------------------------------------------------------------------------

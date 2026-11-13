@@ -48,7 +48,7 @@ void vtkF3DStochasticTransparentPass::Render(const vtkRenderState* s)
   this->PreRender(s);
 
   // force usage of depth buffer, even if the actors are translucents
-  int numProps = s->GetPropArrayCount();
+  const int numProps = s->GetPropArrayCount();
   for (int j = 0; j < numProps; ++j)
   {
     vtkProp* prop = s->GetPropArray()[j];
@@ -98,7 +98,7 @@ bool vtkF3DStochasticTransparentPass::PreReplaceShaderValues(std::string& vtkNot
 
     // If we are using instancing, use the instance id instead of the primitive id
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251120)
-    vtkOpenGLPointGaussianMapperHelper* splatHelper =
+    const vtkOpenGLPointGaussianMapperHelper* splatHelper =
       vtkOpenGLPointGaussianMapperHelper::SafeDownCast(mapper);
 
     if (splatHelper)

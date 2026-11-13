@@ -83,6 +83,13 @@ void log::errorInternal(const std::string& str)
 }
 
 //----------------------------------------------------------------------------
+void log::progressInternal(const std::string& str)
+{
+  detail::init::initialize();
+  F3DLog::Progress(str);
+}
+
+//----------------------------------------------------------------------------
 void log::setUseColoring(bool use)
 {
   detail::init::initialize();

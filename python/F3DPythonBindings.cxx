@@ -4,6 +4,8 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl/filesystem.h>
 
+#include <utility>
+
 #include "camera.h"
 #include "engine.h"
 #include "image.h"
@@ -14,6 +16,7 @@
 #include "scene.h"
 #include "types.h"
 #include "utils.h"
+#include "video_encoder.h"
 #include "window.h"
 
 namespace py = pybind11;
@@ -73,7 +76,7 @@ public:
   PYBIND11_TYPE_CASTER(f3d::vector3_t, const_name("f3d.vector3_t"));
 };
 
-std::pair<size_t, f3d::mesh_view::data_array_t> fromBuffer(py::buffer buf)
+std::pair<size_t, f3d::mesh_view::data_array_t> fromBuffer(const py::buffer& buf)
 {
   py::buffer_info info = buf.request();
 
@@ -165,7 +168,7 @@ PYBIND11_MODULE(pyf3d, module)
   auto setImageBytes = [](f3d::image& img, const py::bytes& data)
   {
     const py::buffer_info info(py::buffer(data).request());
-    size_t expectedSize =
+    const size_t expectedSize =
       img.getChannelCount() * img.getWidth() * img.getHeight() * img.getChannelTypeSize();
     if (info.itemsize != 1 || info.size != expectedSize)
     {
@@ -176,7 +179,7 @@ PYBIND11_MODULE(pyf3d, module)
 
   auto getImageBytes = [](const f3d::image& img)
   {
-    size_t expectedSize =
+    const size_t expectedSize =
       img.getChannelCount() * img.getWidth() * img.getHeight() * img.getChannelTypeSize();
     return py::bytes(static_cast<char*>(img.getContent()), expectedSize);
   };
@@ -191,6 +194,12 @@ PYBIND11_MODULE(pyf3d, module)
     .def(py::init<>())
     .def(py::init<const std::filesystem::path&>())
     .def(py::init<unsigned int, unsigned int, unsigned int, f3d::image::ChannelType>())
+    .def(py::init(
+      [](const py::bytes& buffer)
+      {
+        const py::buffer_info info(py::buffer(buffer).request());
+        return f3d::image(reinterpret_cast<std::byte*>(info.ptr), info.size);
+      }))
     .def(py::self == py::self)
     .def(py::self != py::self)
     .def_static("supported_formats", &f3d::image::getSupportedFormats)
@@ -209,11 +218,11 @@ PYBIND11_MODULE(pyf3d, module)
     .def("to_terminal_text", [](const f3d::image& img) { return img.toTerminalText(); })
     .def("set_metadata", &f3d::image::setMetadata)
     .def("get_metadata",
-      [](const f3d::image& img, std::string key)
+      [](const f3d::image& img, const std::string& key)
       {
         try
         {
-          return img.getMetadata(std::move(key));
+          return img.getMetadata(key);
         }
         catch (const f3d::image::metadata_exception&)
         {
@@ -222,6 +231,57 @@ PYBIND11_MODULE(pyf3d, module)
       })
     .def("all_metadata", &f3d::image::allMetadata)
     .def("normalized_pixel", &f3d::image::getNormalizedPixel);
+
+  // f3d::video_frame
+  py::class_<f3d::video_frame, std::shared_ptr<f3d::video_frame>> video_frame(module, "VideoFrame");
+  video_frame.def("set_timestamp", &f3d::video_frame::setTimestamp, py::arg("timestamp"));
+
+  // f3d::video_packet
+  py::class_<f3d::video_packet, std::shared_ptr<f3d::video_packet>> video_packet(
+    module, "VideoPacket");
+  video_packet
+    .def("get_packet_data",
+      [](const f3d::video_packet& packet) -> py::bytes
+      {
+        const auto* data = packet.getPacketData();
+        if (!data || packet.getPacketSize() == 0)
+        {
+          return {};
+        }
+        return py::bytes(reinterpret_cast<const char*>(data), packet.getPacketSize());
+      })
+    .def("get_timestamp", &f3d::video_packet::getTimestamp)
+    .def("is_key_frame", &f3d::video_packet::isKeyFrame);
+
+  // f3d::video_encoder
+  py::enum_<f3d::video_encoder::codec>(module, "VideoEncoderCodec")
+    .value("H264", f3d::video_encoder::codec::H264)
+    .value("HEVC", f3d::video_encoder::codec::HEVC)
+    .value("VP8", f3d::video_encoder::codec::VP8)
+    .value("VP9", f3d::video_encoder::codec::VP9)
+    .value("AV1", f3d::video_encoder::codec::AV1)
+    .value("EXPLICIT", f3d::video_encoder::codec::EXPLICIT)
+    .export_values();
+
+  py::class_<f3d::video_encoder::params> video_encoder_params(module, "VideoEncoderParams");
+  video_encoder_params.def(py::init<>())
+    .def_readwrite("codec", &f3d::video_encoder::params::Codec)
+    .def_readwrite("explicit_codec_name", &f3d::video_encoder::params::ExplicitCodecName)
+    .def_readwrite("width", &f3d::video_encoder::params::Width)
+    .def_readwrite("height", &f3d::video_encoder::params::Height)
+    .def_readwrite("frame_rate", &f3d::video_encoder::params::FrameRate)
+    .def_readwrite("bitrate", &f3d::video_encoder::params::Bitrate)
+    .def_readwrite("low_latency", &f3d::video_encoder::params::LowLatency);
+
+  py::class_<f3d::video_encoder, std::shared_ptr<f3d::video_encoder>> video_encoder(
+    module, "VideoEncoder");
+  video_encoder.def_static("create", &f3d::video_encoder::create, py::arg("params"))
+    .def_static("get_available_encoders", &f3d::video_encoder::getAvailableEncoders)
+    .def_property_readonly("width", &f3d::video_encoder::getWidth)
+    .def_property_readonly("height", &f3d::video_encoder::getHeight)
+    .def("listen", &f3d::video_encoder::listen, py::arg("callback"))
+    .def("submit", &f3d::video_encoder::submit, py::arg("frame"))
+    .def("flush", &f3d::video_encoder::flush, py::call_guard<py::gil_scoped_release>());
 
   // f3d::options
   py::class_<f3d::options> options(module, "Options");
@@ -325,19 +385,42 @@ PYBIND11_MODULE(pyf3d, module)
     .def("remove_value", &f3d::options::removeValue)
     .def("has_domain", &f3d::options::hasDomain)
     .def("get_domain_style", &f3d::options::getDomainStyle)
-    .def("get_enum_domain", &f3d::options::getEnumDomain)
     .def("get_range_domain",
-      [](const f3d::options& opts, std::string_view name) -> py::tuple
+      [](const f3d::options& opts, std::string_view name)
+        -> std::variant<std::tuple<int, int, int>, std::tuple<double, double, double>>
       {
         f3d::options::DomainRange<f3d::option_variant_t> domain = opts.getRangeDomain(name);
         // min, max and increment all hold the same alternative (int or double)
-        return std::visit(
-          [&domain](const auto& min) -> py::tuple
-          {
-            using T = std::decay_t<decltype(min)>;
-            return py::make_tuple(min, std::get<T>(domain.max), std::get<T>(domain.increment));
-          },
-          domain.min);
+        if (std::holds_alternative<int>(domain.min))
+        {
+          return std::make_tuple(
+            std::get<int>(domain.min), std::get<int>(domain.max), std::get<int>(domain.increment));
+        }
+        if (std::holds_alternative<double>(domain.min))
+        {
+          return std::make_tuple(std::get<double>(domain.min), std::get<double>(domain.max),
+            std::get<double>(domain.increment));
+        }
+        assert(false); // opts.getRangeDomain(name) would have thrown on anything not int or double
+        return {};
+      })
+    .def("get_enum_domain",
+      [](const f3d::options& opts, std::string_view name)
+      {
+        f3d::options::DomainEnum<f3d::option_variant_t> domain = opts.getEnumDomain(name);
+
+        // only string is supported for now
+        std::list<std::string> list;
+        list.resize(domain.enumeration.size());
+        std::ranges::transform(domain.enumeration, list.begin(),
+          [](const auto& value) { return std::get<std::string>(value); });
+        return list;
+      })
+    .def("get_index_domain",
+      [](const f3d::options& opts, std::string_view name)
+      {
+        const f3d::options::DomainIndex domain = opts.getIndexDomain(name);
+        return domain.max;
       })
     .def("increase", &f3d::options::increase)
     .def("decrease", &f3d::options::decrease)
@@ -416,21 +499,7 @@ PYBIND11_MODULE(pyf3d, module)
     .value("CTRL_SHIFT", f3d::interactor::InputModifier::CTRL_SHIFT)
     .export_values();
 
-  py::enum_<f3d::interactor::AnimationDirection>(interactor, "AnimationDirection")
-    .value("FORWARD", f3d::interactor::AnimationDirection::FORWARD)
-    .value("BACKWARD", f3d::interactor::AnimationDirection::BACKWARD)
-    .export_values();
-
   interactor //
-    .def("toggle_animation", &f3d::interactor::toggleAnimation, "Toggle the animation",
-      py::arg("direction") = f3d::interactor::AnimationDirection::FORWARD)
-    .def("start_animation", &f3d::interactor::startAnimation, "Start the animation",
-      py::arg("direction") = f3d::interactor::AnimationDirection::FORWARD)
-    .def("stop_animation", &f3d::interactor::stopAnimation, "Stop the animation")
-    .def("is_playing_animation", &f3d::interactor::isPlayingAnimation,
-      "Returns True if the animation is currently started")
-    .def("get_animation_direction", &f3d::interactor::getAnimationDirection,
-      "Returns the current animation direction")
     .def("enable_camera_movement", &f3d::interactor::enableCameraMovement,
       "Enable the camera interaction")
     .def("disable_camera_movement", &f3d::interactor::disableCameraMovement,
@@ -439,7 +508,7 @@ PYBIND11_MODULE(pyf3d, module)
       "Set the user callback of the event loop", py::arg("user_callback") = nullptr)
     .def(
       "set_notification_callback",
-      [](f3d::interactor& interactor, py::object callback)
+      [](f3d::interactor& interactor, const py::object& callback)
       {
         if (callback.is_none())
         {
@@ -475,7 +544,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def("init_commands", &f3d::interactor::initCommands,
       "Remove all commands and add all default command callbacks")
     .def("add_command", &f3d::interactor::addCommand, "Add a command", py::arg("action"),
-      py::arg("callback"), py::arg("doc") = std::nullopt, py::arg("completionCallback") = nullptr)
+      py::arg("callback"), py::arg("doc") = std::nullopt, py::arg("completion_callback") = nullptr)
     .def("remove_command", &f3d::interactor::removeCommand, "Remove a command")
     .def("get_command_actions", &f3d::interactor::getCommandActions, "Get all command actions")
     .def("trigger_command", &f3d::interactor::triggerCommand, "Trigger a command",
@@ -492,21 +561,27 @@ PYBIND11_MODULE(pyf3d, module)
       "Trigger a single text line notification at the bottom left of viewport", py::arg("desc"),
       py::arg("value") = "", py::arg("duration") = 3.0);
 
-  interactor
-    .def("add_binding",
-      py::overload_cast<const f3d::interaction_bind_t&, std::string, std::string,
-        std::function<std::pair<std::string, std::string>()>, f3d::interactor::BindingType, bool>(
-        &f3d::interactor::addBinding),
-      "Add a binding command", py::arg("bind"), py::arg("command"), py::arg("group"),
-      py::arg("documentationCallback") = nullptr,
-      py::arg("type") = f3d::interactor::BindingType::OTHER, py::arg("notify") = true)
-    .def("add_binding",
-      py::overload_cast<const f3d::interaction_bind_t&, std::vector<std::string>, std::string,
-        std::function<std::pair<std::string, std::string>()>, f3d::interactor::BindingType, bool>(
-        &f3d::interactor::addBinding),
-      "Add binding commands", py::arg("bind"), py::arg("command"), py::arg("group"),
-      py::arg("documentationCallback") = nullptr,
-      py::arg("type") = f3d::interactor::BindingType::OTHER, py::arg("notify") = true);
+  interactor.def(
+    "add_binding",
+    [](f3d::interactor& interactor, const f3d::interaction_bind_t& bind,
+      std::vector<std::string> commands, std::string group,
+      std::function<std::pair<std::string, std::string>()> docCb, f3d::interactor::BindingType type,
+      bool notify, bool repeat)
+    {
+      interactor.addBinding({
+        .Bind = bind,
+        .Commands = commands,
+        .Group = group,
+        .DocCallback = docCb,
+        .Type = type,
+        .Notify = notify,
+        .Repeat = repeat,
+      });
+    },
+    "Add binding commands", py::kw_only(), py::arg("bind"), py::arg("command"), py::arg("group"),
+    py::arg("documentation_callback") = nullptr,
+    py::arg("type") = f3d::interactor::BindingType::OTHER, py::arg("notify") = true,
+    py::arg("repeat") = false);
 
   // f3d::mesh_t
   py::class_<f3d::mesh_t>(module, "Mesh")
@@ -529,10 +604,10 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property("points", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [count, dataArray] = fromBuffer(b);
+        auto [count, dataArray] = fromBuffer(std::move(b));
 
         self.pointCount = count;
-        bool timeDependent = self.points.timeDependent;
+        const bool timeDependent = self.points.timeDependent;
         self.points = std::move(dataArray);
         self.points.timeDependent = timeDependent;
       })
@@ -542,14 +617,14 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property("normals", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [count, dataArray] = fromBuffer(b);
+        auto [count, dataArray] = fromBuffer(std::move(b));
 
         if (count != self.pointCount)
         {
           throw std::runtime_error("Incompatible buffer shape: point count does not match!");
         }
 
-        bool timeDependent = self.normals.timeDependent;
+        const bool timeDependent = self.normals.timeDependent;
         self.normals = std::move(dataArray);
         self.normals.timeDependent = timeDependent;
       })
@@ -559,14 +634,14 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property("texture_coordinates", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [count, dataArray] = fromBuffer(b);
+        auto [count, dataArray] = fromBuffer(std::move(b));
 
         if (count != self.pointCount)
         {
           throw std::runtime_error("Incompatible buffer shape: point count does not match!");
         }
 
-        bool timeDependent = self.textureCoordinates.timeDependent;
+        const bool timeDependent = self.textureCoordinates.timeDependent;
         self.textureCoordinates = std::move(dataArray);
         self.textureCoordinates.timeDependent = timeDependent;
       })
@@ -576,18 +651,18 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property("vertices_offsets", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [count, array] = fromBuffer(b);
+        auto [count, array] = fromBuffer(std::move(b));
         self.vertices.offsetCount = count;
-        bool timeDependent = self.vertices.offsets.timeDependent;
+        const bool timeDependent = self.vertices.offsets.timeDependent;
         self.vertices.offsets = std::move(array);
         self.vertices.offsets.timeDependent = timeDependent;
       })
     .def_property("vertices_indices", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [count, array] = fromBuffer(b);
+        auto [count, array] = fromBuffer(std::move(b));
         self.vertices.indexCount = count;
-        bool timeDependent = self.vertices.indices.timeDependent;
+        const bool timeDependent = self.vertices.indices.timeDependent;
         self.vertices.indices = std::move(array);
         self.vertices.indices.timeDependent = timeDependent;
       })
@@ -600,18 +675,18 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property("lines_offsets", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [count, array] = fromBuffer(b);
+        auto [count, array] = fromBuffer(std::move(b));
         self.lines.offsetCount = count;
-        bool timeDependent = self.lines.offsets.timeDependent;
+        const bool timeDependent = self.lines.offsets.timeDependent;
         self.lines.offsets = std::move(array);
         self.lines.offsets.timeDependent = timeDependent;
       })
     .def_property("lines_indices", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [count, array] = fromBuffer(b);
+        auto [count, array] = fromBuffer(std::move(b));
         self.lines.indexCount = count;
-        bool timeDependent = self.lines.indices.timeDependent;
+        const bool timeDependent = self.lines.indices.timeDependent;
         self.lines.indices = std::move(array);
         self.lines.indices.timeDependent = timeDependent;
       })
@@ -624,18 +699,18 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property("polygons_offsets", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [count, array] = fromBuffer(b);
+        auto [count, array] = fromBuffer(std::move(b));
         self.polygons.offsetCount = count;
-        bool timeDependent = self.polygons.offsets.timeDependent;
+        const bool timeDependent = self.polygons.offsets.timeDependent;
         self.polygons.offsets = std::move(array);
         self.polygons.offsets.timeDependent = timeDependent;
       })
     .def_property("polygons_indices", nullptr,
       [](f3d::mesh_view::memory_view_t& self, py::buffer b)
       {
-        auto [count, array] = fromBuffer(b);
+        auto [count, array] = fromBuffer(std::move(b));
         self.polygons.indexCount = count;
-        bool timeDependent = self.polygons.indices.timeDependent;
+        const bool timeDependent = self.polygons.indices.timeDependent;
         self.polygons.indices = std::move(array);
         self.polygons.indices.timeDependent = timeDependent;
       })
@@ -646,7 +721,7 @@ PYBIND11_MODULE(pyf3d, module)
         self.polygons.offsets.timeDependent = timeDependent;
       })
     .def_property("point_scalars", nullptr,
-      [](f3d::mesh_view::memory_view_t& self, py::dict d)
+      [](f3d::mesh_view::memory_view_t& self, const py::dict& d)
       {
         self.pointScalars.clear();
 
@@ -670,7 +745,7 @@ PYBIND11_MODULE(pyf3d, module)
         it->timeDependent = timeDependent;
       })
     .def_property("cell_scalars", nullptr,
-      [](f3d::mesh_view::memory_view_t& self, py::dict d)
+      [](f3d::mesh_view::memory_view_t& self, const py::dict& d)
       {
         self.cellScalars.clear();
 
@@ -699,21 +774,21 @@ PYBIND11_MODULE(pyf3d, module)
     , public py::trampoline_self_life_support
   {
   public:
-    std::array<double, 2> getTimeRange() const override
+    std::pair<double, double> getTimeRange() const override
     {
-      py::gil_scoped_acquire gil;
-      py::function fn = py::get_override(this, "get_time_range");
+      const py::gil_scoped_acquire gil;
+      const py::function fn = py::get_override(this, "get_time_range");
       if (fn)
       {
-        return fn().cast<std::array<double, 2>>();
+        return fn().cast<std::pair<double, double>>();
       }
       return f3d::mesh_view::getTimeRange();
     }
 
     std::string getName() const override
     {
-      py::gil_scoped_acquire gil;
-      py::function fn = py::get_override(this, "get_name");
+      const py::gil_scoped_acquire gil;
+      const py::function fn = py::get_override(this, "get_name");
       if (fn)
       {
         return fn().cast<std::string>();
@@ -723,13 +798,34 @@ PYBIND11_MODULE(pyf3d, module)
 
     memory_view_t getMemoryView(double time) const override
     {
-      py::gil_scoped_acquire gil;
-      py::function fn = py::get_override(this, "get_memory_view");
+      const py::gil_scoped_acquire gil;
+      const py::function fn = py::get_override(this, "get_memory_view");
       if (fn)
       {
         return fn(time).cast<memory_view_t>();
       }
       throw std::domain_error("Tried to call pure virtual function getMemoryView");
+    }
+
+    bool buffersNeedUpdate() const override
+    {
+      const py::gil_scoped_acquire gil;
+      const py::function fn = py::get_override(this, "buffers_need_update");
+      if (fn)
+      {
+        return fn().cast<bool>();
+      }
+      return false;
+    }
+
+    void buffersUpdated() override
+    {
+      const py::gil_scoped_acquire gil;
+      const py::function fn = py::get_override(this, "buffers_updated");
+      if (fn)
+      {
+        fn();
+      }
     }
   };
 
@@ -737,7 +833,9 @@ PYBIND11_MODULE(pyf3d, module)
     .def(py::init<>())
     .def("get_time_range", &f3d::mesh_view::getTimeRange)
     .def("get_name", &f3d::mesh_view::getName)
-    .def("get_memory_view", &f3d::mesh_view::getMemoryView);
+    .def("get_memory_view", &f3d::mesh_view::getMemoryView,
+      py::arg("time").noconvert() // keep `float` not `SupportsFloat` for subclassing
+    );
 
   // f3d::color_t
   py::class_<f3d::color_t>(module, "Color")
@@ -776,19 +874,28 @@ PYBIND11_MODULE(pyf3d, module)
   py::class_<f3d::light_state_t>(module, "LightState")
     .def(py::init<>())
     .def(py::init<const f3d::light_type&, const f3d::point3_t&, const f3d::color_t&,
-           const f3d::vector3_t&, const bool&, const double&, const bool&>(),
+           const f3d::vector3_t&, const bool&, const double&, const bool&, const bool&>(),
       py::arg("type") = f3d::light_type::SCENE_LIGHT,
       py::arg("position") = f3d::point3_t({ 0.0, 0.0, 0.0 }),
       py::arg_v("color", f3d::color_t({ 1.0, 1.0, 1.0 }), "Color(1.0, 1.0, 1.0)"),
       py::arg("direction") = f3d::vector3_t({ 1.0, 0.0, 0.0 }), py::arg("positional_light") = false,
-      py::arg("intensity") = 1.0, py::arg("switch_state") = true)
+      py::arg("intensity") = 1.0, py::arg("switch_state") = true, py::arg("cast_shadows") = false)
     .def_readwrite("type", &f3d::light_state_t::type)
     .def_readwrite("color", &f3d::light_state_t::color)
     .def_readwrite("position", &f3d::light_state_t::position)
     .def_readwrite("direction", &f3d::light_state_t::direction)
     .def_readwrite("positional_light", &f3d::light_state_t::positionalLight)
     .def_readwrite("intensity", &f3d::light_state_t::intensity)
-    .def_readwrite("switch_state", &f3d::light_state_t::switchState);
+    .def_readwrite("switch_state", &f3d::light_state_t::switchState)
+    .def_readwrite("cast_shadows", &f3d::light_state_t::castShadows);
+
+  // f3d::file_availability
+  py::enum_<f3d::file_availability>(module, "FileAvailability")
+    .value("SUPPORTED", f3d::file_availability::SUPPORTED)
+    .value("UNSUPPORTED_EXTENSION", f3d::file_availability::UNSUPPORTED_EXTENSION)
+    .value("UNSUPPORTED_CONTENT", f3d::file_availability::UNSUPPORTED_CONTENT)
+    .value("EMPTY_STREAM", f3d::file_availability::EMPTY_STREAM)
+    .export_values();
 
   // f3d::node_state_t
   py::class_<f3d::node_state_t>(module, "NodeState")
@@ -801,10 +908,55 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readonly("has_children", &f3d::node_state_t::hasChildren)
     .def_readonly("collapsed", &f3d::node_state_t::collapsed);
 
+  // f3d::scene_info_t
+  py::class_<f3d::scene_info_t>(module, "SceneInfo")
+    .def(py::init<>())
+    .def_readonly("number_of_files", &f3d::scene_info_t::numberOfFiles)
+    .def_readonly("number_of_actors", &f3d::scene_info_t::numberOfActors)
+    .def_readonly("number_of_points", &f3d::scene_info_t::numberOfPoints)
+    .def_readonly("number_of_cells", &f3d::scene_info_t::numberOfCells);
+
+  // f3d::animation
+  py::class_<f3d::animation, std::unique_ptr<f3d::animation, py::nodelete>> animation(
+    module, "Animation");
+
+  // f3d::animation::Direction
+  py::enum_<f3d::animation::Direction>(animation, "Direction")
+    .value("FORWARD", f3d::animation::Direction::FORWARD)
+    .value("BACKWARD", f3d::animation::Direction::BACKWARD)
+    .export_values();
+
+  animation.def("load_time", &f3d::animation::loadTime)
+    .def("get_time_range", &f3d::animation::getTimeRange)
+    .def("get_key_frames", &f3d::animation::getKeyFrames)
+    .def("count", &f3d::animation::count)
+    .def("get_name", &f3d::animation::getName, py::arg("index") = std::nullopt,
+      "Returns the animation at an index (defaults to current)")
+    .def("get_names", &f3d::animation::getNames, "Returns all animation names")
+    .def("toggle", &f3d::animation::toggle, "Toggle the animation",
+      py::arg("direction") = f3d::animation::Direction::FORWARD)
+    .def("start", &f3d::animation::start, "Start the animation",
+      py::arg("direction") = f3d::animation::Direction::FORWARD)
+    .def("stop", &f3d::animation::stop, "Stop the animation")
+    .def("is_playing", &f3d::animation::isPlaying,
+      "Returns True if the animation is currently playing")
+    .def("get_direction", &f3d::animation::getDirection, "Returns the current animation direction");
+
   // f3d::scene
   py::class_<f3d::scene, std::unique_ptr<f3d::scene, py::nodelete>> scene(module, "Scene");
   scene //
-    .def("supports", &f3d::scene::supports)
+    .def_property_readonly(
+      "animation", &f3d::scene::getAnimation, py::return_value_policy::reference)
+    .def("supports", py::overload_cast<const std::filesystem::path&>(&f3d::scene::supports),
+      "Check if the provided file path is supported", py::arg("file_path"))
+    .def(
+      "supports",
+      [](f3d::scene& scene, py::bytes buffer) -> f3d::file_availability
+      {
+        std::string_view sv(buffer);
+        return scene.supports(reinterpret_cast<const std::byte*>(sv.data()), sv.size());
+      },
+      "Check if the provided memory buffer is supported", py::arg("buffer"), py::prepend())
     .def("clear", &f3d::scene::clear)
     .def("get_added_files", &f3d::scene::getAddedFiles,
       "Return the list of files currently added to the scene")
@@ -820,29 +972,12 @@ PYBIND11_MODULE(pyf3d, module)
       "Add a surfacic mesh view from memory into the scene", py::arg("mesh"))
     .def(
       "add",
-      [](f3d::scene& scene, py::bytes buffer, std::size_t size)
+      [](f3d::scene& scene, const py::bytes& buffer)
       {
-        PyErr_WarnEx(
-          PyExc_DeprecationWarning, "add(buffer, size) is deprecated, use add(buffer) instead.", 1);
-        std::string_view sv(buffer);
-        scene.add(reinterpret_cast<const std::byte*>(sv.data()), size);
-      },
-      "Add a memory buffer containing a file the scene", py::arg("buffer"), py::arg("size"))
-    .def(
-      "add",
-      [](f3d::scene& scene, py::bytes buffer)
-      {
-        std::string_view sv(buffer);
+        const std::string_view sv(buffer);
         scene.add(reinterpret_cast<const std::byte*>(sv.data()), sv.size());
       },
       "Add a memory buffer containing a file the scene", py::arg("buffer"), py::prepend())
-    .def("load_animation_time", &f3d::scene::loadAnimationTime)
-    .def("animation_time_range", &f3d::scene::animationTimeRange)
-    .def("get_animation_keyframes", &f3d::scene::getAnimationKeyFrames)
-    .def("available_animations", &f3d::scene::availableAnimations)
-    .def("get_animation_name", &f3d::scene::getAnimationName, py::arg("index") = -1,
-      "Returns the animation at an index (defaults to current)")
-    .def("get_animation_names", &f3d::scene::getAnimationNames, "Returns all animation names")
     .def("add_light", &f3d::scene::addLight, "Add a light to the scene", py::arg("light_state"))
     .def(
       "remove_light", &f3d::scene::removeLight, "Remove a light from the scene", py::arg("index"))
@@ -855,7 +990,9 @@ PYBIND11_MODULE(pyf3d, module)
       "Return the scene hierarchy of all added files, in depth-first pre-order")
     .def("set_node_visibility", &f3d::scene::setNodeVisibility,
       "Set the visibility of a scene hierarchy node and of its subtree", py::arg("node_id"),
-      py::arg("visible"));
+      py::arg("visible"))
+    .def("get_scene_info", &f3d::scene::getSceneInfo,
+      "Return information about the contents of the scene");
 
   // f3d::camera_state_t
   py::class_<f3d::camera_state_t>(module, "CameraState")
@@ -931,6 +1068,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def("render", &f3d::window::render, "Render the window")
     .def("render_to_image", &f3d::window::renderToImage, "Render the window to an image",
       py::arg("no_background") = false)
+    .def(
+      "get_video_frame", &f3d::window::getVideoFrame, "Get the current video frame of the window")
     .def("set_icon", &f3d::window::setIcon,
       "Set the icon of the window using a memory buffer representing a PNG file")
     .def("set_window_name", &f3d::window::setWindowName, "Set the window name")
@@ -938,7 +1077,9 @@ PYBIND11_MODULE(pyf3d, module)
       "Get world coordinate point from display coordinate")
     .def("get_display_from_world", &f3d::window::getDisplayFromWorld,
       "Get display coordinate point from world coordinate")
-    .def("get_dpi_scale", &f3d::window::getDPIScale, "Get the DPI scale of the window");
+    .def("get_dpi_scale", &f3d::window::getDPIScale, "Get the DPI scale of the window")
+    .def("set_use_hdri_cache", &f3d::window::setUseHDRICache,
+      "Enable or disable the use of HDRI cache");
 
   // libInformation
   py::class_<f3d::engine::libInformation>(module, "LibInformation")
@@ -992,11 +1133,11 @@ PYBIND11_MODULE(pyf3d, module)
       "Create an engine with an OSMesa window (Windows/Linux only)")
     .def_static(
       "create_external",
-      [](py::object py_get_proc)
+      [](const py::object& py_get_proc)
       {
-        f3d::context::function func = [py_get_proc](const char* name) -> f3d::context::fptr
+        const f3d::context::function func = [py_get_proc](const char* name) -> f3d::context::fptr
         {
-          uintptr_t addr = py::int_(py_get_proc(py::bytes(name)));
+          const uintptr_t addr = py::int_(py_get_proc(py::bytes(name)));
           return reinterpret_cast<f3d::context::fptr>(addr);
         };
         return f3d::engine::createExternal(func);
@@ -1057,7 +1198,7 @@ PYBIND11_MODULE(pyf3d, module)
     .value("QUIET", f3d::log::VerboseLevel::QUIET)
     .export_values();
 
-  auto forwardWrapper = [](f3d::log::forward_fn_t callback) { f3d::log::forward(callback); };
+  auto forwardWrapper = [](const f3d::log::forward_fn_t& callback) { f3d::log::forward(callback); };
 
   module.add_object("forwardcleanup",
     py::capsule(&forwardWrapper, nullptr, [](PyObject*) { f3d::log::forward(nullptr); }));

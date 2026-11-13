@@ -5,7 +5,6 @@
 #include "vtkF3DImporter.h"
 
 #include <vtkActorCollection.h>
-#include <vtkArrowSource.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
 #include <vtkDataAssembly.h>
@@ -14,11 +13,16 @@
 #include <vtkImageData.h>
 #include <vtkInformation.h>
 #include <vtkInformationIntegerKey.h>
+#include <vtkLight.h>
+#include <vtkLightCollection.h>
+#include <vtkLightKit.h>
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
+#include <vtkShadowMapBakerPass.h>
+#include <vtkShadowMapPass.h>
 #include <vtkSmartPointer.h>
 #include <vtkTexture.h>
 #include <vtkUnsignedIntArray.h>
@@ -247,7 +251,7 @@ void vtkF3DMetaImporter::AddImporter(
     [](vtkObject* const caller, unsigned long, void* clientData, void* callData)
     {
       vtkF3DMetaImporter* self = static_cast<vtkF3DMetaImporter*>(clientData);
-      double progress = *static_cast<double*>(callData);
+      const double progress = *static_cast<double*>(callData);
       double actualProgress = 0.0;
       for (size_t i = 0; i < self->Pimpl->Importers.size(); i++)
       {
@@ -423,7 +427,7 @@ bool vtkF3DMetaImporter::Update()
       // add one node per actor
       for (int actorIndex = 0; actorIndex < actorCollection->GetNumberOfItems(); actorIndex++)
       {
-        std::string actorName = "object" + std::to_string(actorIndex);
+        const std::string actorName = "object" + std::to_string(actorIndex);
         const int nodeid = importerInfo.DataAssembly->AddNode(
           actorName.c_str(), importerInfo.DataAssembly->GetRootNode());
         importerInfo.DataAssembly->SetAttribute(nodeid, "flat_actor_id", actorIndex);
@@ -433,7 +437,7 @@ bool vtkF3DMetaImporter::Update()
     importerInfo.DataAssembly->SetAttribute(
       vtkDataAssembly::GetRootNode(), "label", importerInfo.Name.c_str());
 
-    vtkNew<::vtkF3DCollapseOnLoadVisitor> visitor;
+    const vtkNew<::vtkF3DCollapseOnLoadVisitor> visitor;
     importerInfo.DataAssembly->Visit(vtkDataAssembly::GetRootNode(), visitor);
     // Unset the attr on all nodes which have an ancestor that has it already.
     // This avoids having to expand the collapsed levels one by one.
@@ -551,15 +555,16 @@ bool vtkF3DMetaImporter::Update()
 
       if (ngs.InputDataHasNormals)
       {
-        vtkNew<vtkArrowSource> arrowSource;
         ngs.GlyphMapper->SetInputData(points);
-        ngs.GlyphMapper->SetSourceConnection(arrowSource->GetOutputPort());
         ngs.GlyphMapper->SetOrientationModeToDirection();
         ngs.GlyphMapper->SetOrientationArray(vtkDataSetAttributes::NORMALS);
         ngs.GlyphMapper->ScalingOn();
         ngs.Actor->SetMapper(ngs.GlyphMapper);
         this->Renderer->AddActor(ngs.Actor);
         ngs.Actor->VisibilityOff();
+        ngs.Actor->GetProperty()->SetInterpolationToPBR();
+        ngs.Actor->GetProperty()->SetRoughness(0.3);
+        ngs.Actor->GetProperty()->RenderLinesAsTubesOn();
       }
 
       // Create and configure point sprites actors
@@ -571,6 +576,23 @@ bool vtkF3DMetaImporter::Update()
       pss.Mapper->SetInputData(points);
       this->Renderer->AddActor(pss.Actor);
       pss.Actor->VisibilityOff();
+
+      // copy anisotropic settings from the original actor's mapper if available
+      vtkPointGaussianMapper* originalSplatMapper =
+        vtkPointGaussianMapper::SafeDownCast(pss.OriginalActor->GetMapper());
+      if (originalSplatMapper)
+      {
+        pss.Mapper->SetAnisotropic(originalSplatMapper->GetAnisotropic());
+        pss.Mapper->SetScaleArray(originalSplatMapper->GetScaleArray());
+        pss.Mapper->SetRotationArray(originalSplatMapper->GetRotationArray());
+      }
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
+      // the point mapper doesn't support shadows, so we exclude it from shadow receivers
+      const vtkNew<vtkInformation> keys;
+      pss.Actor->SetPropertyKeys(keys);
+      pss.Actor->GetPropertyKeys()->Set(vtkShadowMapPass::RECEIVER(), 0);
+#endif
 
       // Create and configure volume props
       if (genericImporter)
@@ -591,6 +613,43 @@ bool vtkF3DMetaImporter::Update()
     }
 
     importerInfo.Updated = true;
+  }
+
+  // Add a light kit if there's no active light
+  vtkLightCollection* lc = this->Renderer->GetLights();
+  vtkLight* light;
+  bool hasActiveLight = false;
+  vtkCollectionSimpleIterator it;
+  for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
+  {
+    if (light->GetSwitch())
+    {
+      hasActiveLight = true;
+      break;
+    }
+  }
+
+  if (!hasActiveLight)
+  {
+    vtkLightCollection* lights = this->Renderer->GetLights();
+
+    [[maybe_unused]] const int offset = lights->GetNumberOfItems();
+
+    vtkNew<vtkLightKit> lightKit;
+    lightKit->AddLightsToRenderer(this->Renderer);
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
+    // the first light is a headlight so it doesn't cast shadow, the key doesn't matter
+    // the second light is the key light, that's the one that will cast shadows
+    // the 3 last lights are minor lights, so let's disable shadows for them
+    for (int i = offset + 2; i < lights->GetNumberOfItems(); i++)
+    {
+      vtkLight* newLight = vtkLight::SafeDownCast(lights->GetItemAsObject(i));
+      vtkNew<vtkInformation> info;
+      info->Set(vtkShadowMapBakerPass::CAST_SHADOWS(), 0);
+      newLight->SetInformation(info);
+    }
+#endif
   }
 
   if (localCameraIndex > 0)
@@ -630,13 +689,10 @@ std::string vtkF3DMetaImporter::GetOutputsDescription()
 //----------------------------------------------------------------------------
 vtkF3DImporter::AnimationSupportLevel vtkF3DMetaImporter::GetAnimationSupportLevel()
 {
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 4, 20250507)
-  vtkF3DImporter::AnimationSupportLevel levelAccum = vtkF3DImporter::AnimationSupportLevel::MULTI;
-#else
   vtkImporter::AnimationSupportLevel levelAccum = vtkImporter::AnimationSupportLevel::NONE;
   for (const auto& importerInfo : this->Pimpl->Importers)
   {
-    AnimationSupportLevel level = importerInfo.Importer->GetAnimationSupportLevel();
+    const AnimationSupportLevel level = importerInfo.Importer->GetAnimationSupportLevel();
     switch (level)
     {
       case vtkImporter::AnimationSupportLevel::NONE:
@@ -671,7 +727,6 @@ vtkF3DImporter::AnimationSupportLevel vtkF3DMetaImporter::GetAnimationSupportLev
         break;
     }
   }
-#endif
   return levelAccum;
 }
 
@@ -683,7 +738,7 @@ vtkIdType vtkF3DMetaImporter::GetNumberOfAnimations()
   return std::accumulate(this->Pimpl->Importers.begin(), this->Pimpl->Importers.end(), 0,
     [](vtkIdType a, const auto& importerInfo)
     {
-      vtkIdType nAnim = importerInfo.Importer->GetNumberOfAnimations();
+      const vtkIdType nAnim = importerInfo.Importer->GetNumberOfAnimations();
       a += nAnim >= 0 ? nAnim : 0;
       return a;
     });
@@ -806,7 +861,7 @@ std::string vtkF3DMetaImporter::GetCameraName(vtkIdType camIndex)
   vtkIdType localCameraIndex = camIndex;
   for (const auto& importerInfo : this->Pimpl->Importers)
   {
-    vtkIdType nCam = importerInfo.Importer->GetNumberOfCameras();
+    const vtkIdType nCam = importerInfo.Importer->GetNumberOfCameras();
     if (localCameraIndex < nCam)
     {
       std::string name = importerInfo.Importer->GetCameraName(localCameraIndex);
@@ -885,7 +940,7 @@ bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
     cs.Mapper->SetInputData(
       vtkPolyDataMapper::SafeDownCast(cs.OriginalActor->GetMapper())->GetInput());
 
-    bool visi = cs.Actor->GetVisibility();
+    const bool visi = cs.Actor->GetVisibility();
     cs.Actor->vtkProp3D::ShallowCopy(cs.OriginalActor);
     cs.Actor->SetVisibility(visi);
   }
@@ -895,7 +950,7 @@ bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
     {
       pss.Mapper->SetInputData(
         vtkPolyDataMapper::SafeDownCast(pss.OriginalActor->GetMapper())->GetInput());
-      bool visi = pss.Actor->GetVisibility();
+      const bool visi = pss.Actor->GetVisibility();
       pss.Actor->vtkProp3D::ShallowCopy(pss.OriginalActor);
       pss.Actor->SetVisibility(visi);
     }
@@ -946,8 +1001,7 @@ void vtkF3DMetaImporter::UpdateInfoForColoring()
             datasetForColoring = genericImporter->GetImportedPoints(actorIndex);
           }
         }
-        this->Pimpl->ColoringInfoHandler.UpdateColoringInfo(datasetForColoring, false);
-        this->Pimpl->ColoringInfoHandler.UpdateColoringInfo(datasetForColoring, true);
+        this->Pimpl->ColoringInfoHandler.UpdateColoringInfo(datasetForColoring);
 
         actorIndex++;
       }
@@ -957,36 +1011,45 @@ void vtkF3DMetaImporter::UpdateInfoForColoring()
 }
 
 //----------------------------------------------------------------------------
-std::string vtkF3DMetaImporter::GetMetaDataDescription() const
+vtkF3DMetaImporter::SceneInfo vtkF3DMetaImporter::GetSceneInfo() const
 {
-  std::string description;
-  if (this->Pimpl->Importers.size() > 1)
-  {
-    description += "Number of files: ";
-    description += std::to_string(this->Pimpl->Importers.size());
-    description += "\n";
-  }
+  vtkF3DMetaImporter::SceneInfo info;
+  info.NumberOfImporters = static_cast<int>(this->Pimpl->Importers.size());
+  info.NumberOfActors = this->ActorCollection->GetNumberOfItems();
 
-  description += "Number of actors: ";
-  description += std::to_string(this->ActorCollection->GetNumberOfItems());
-  description += "\n";
-
-  vtkIdType nPoints = 0;
-  vtkIdType nCells = 0;
   vtkCollectionSimpleIterator ait;
   this->ActorCollection->InitTraversal(ait);
   while (auto* actor = this->ActorCollection->GetNextActor(ait))
   {
     vtkPolyData* surface = vtkPolyDataMapper::SafeDownCast(actor->GetMapper())->GetInput();
-    nPoints += surface->GetNumberOfPoints();
-    nCells += surface->GetNumberOfCells();
+    info.NumberOfPoints += surface->GetNumberOfPoints();
+    info.NumberOfCells += surface->GetNumberOfCells();
   }
 
+  return info;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkF3DMetaImporter::GetMetaDataDescription() const
+{
+  const vtkF3DMetaImporter::SceneInfo info = this->GetSceneInfo();
+
+  std::string description;
+  if (info.NumberOfImporters > 1)
+  {
+    description += "Number of files: ";
+    description += std::to_string(info.NumberOfImporters);
+    description += "\n";
+  }
+
+  description += "Number of actors: ";
+  description += std::to_string(info.NumberOfActors);
+  description += "\n";
   description += "Number of points: ";
-  description += std::to_string(nPoints);
+  description += std::to_string(info.NumberOfPoints);
   description += "\n";
   description += "Number of cells: ";
-  description += std::to_string(nCells);
+  description += std::to_string(info.NumberOfCells);
   return description;
 }
 

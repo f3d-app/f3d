@@ -32,7 +32,32 @@ public class TestScene {
     Engine engine = Engine.createNone();
     Scene scene = engine.getScene();
 
-    scene.supports("test.obj");
+    if (scene.supports(sphere) != Scene.FileAvailability.SUPPORTED) {
+      throw new RuntimeException("a vtp file should be supported");
+    }
+    if (scene.supports(testDataPath + "data/unsupportedFile.dummy") != Scene.FileAvailability.UNSUPPORTED_EXTENSION) {
+      throw new RuntimeException("an unknown extension should not be supported");
+    }
+    // Content validation needs proper CanReadFile support from VTK
+    if (Boolean.getBoolean("f3d.testing.contentCheck")) {
+      if (scene.supports(testDataPath + "data/invalid.mdl") != Scene.FileAvailability.UNSUPPORTED_CONTENT) {
+        throw new RuntimeException("a file with an invalid header should have unsupported content");
+      }
+    }
+    try {
+      scene.supports((String) null);
+      throw new RuntimeException("Expected IllegalArgumentException was not thrown");
+    } catch (IllegalArgumentException e) {
+    }
+
+    if (scene.supports(new byte[0]) != Scene.FileAvailability.EMPTY_STREAM) {
+      throw new RuntimeException("an empty buffer should not be supported");
+    }
+    try {
+      scene.supports((byte[]) null);
+      throw new RuntimeException("Expected IllegalArgumentException was not thrown");
+    } catch (IllegalArgumentException e) {
+    }
 
     scene.add(sphere);
     scene.add(new ArrayList<>(Arrays.asList(world, logo)));
@@ -59,18 +84,11 @@ public class TestScene {
 
     scene.add(mesh);
 
-    scene.loadAnimationTime(0.5);
-    scene.animationTimeRange();
-    scene.getAnimationKeyFrames();
-    scene.availableAnimations();
-    scene.getAnimationName();
-    scene.getAnimationName(0);
-    scene.getAnimationNames();
-
     Types.LightState lightState = new Types.LightState();
     lightState.type = Types.LightType.HEADLIGHT;
     lightState.intensity = 1.0;
     lightState.switchState = true;
+    lightState.castShadows = true;
 
     int lightIdx = scene.addLight(lightState);
 
@@ -84,6 +102,7 @@ public class TestScene {
       updateLight.type = Types.LightType.HEADLIGHT;
       updateLight.intensity = 2.0;
       updateLight.switchState = true;
+      updateLight.castShadows = true;
 
       scene.updateLight(lightIdx, updateLight);
 
@@ -153,6 +172,36 @@ public class TestScene {
       throw new RuntimeException(
           "Expected Scene.NodeException was not thrown with an out of range index");
     } catch (Scene.NodeException e) {
+    }
+
+    // Test the scene info
+    scene.clear();
+    Types.SceneInfo info = scene.getSceneInfo();
+    if (info.numberOfFiles != 0 || info.numberOfActors != 0 || info.numberOfPoints != 0
+        || info.numberOfCells != 0) {
+      throw new RuntimeException("a cleared scene should have zeroed scene info");
+    }
+
+    scene.add(sphere);
+    info = scene.getSceneInfo();
+    if (info.numberOfFiles != 1 || info.numberOfActors <= 0 || info.numberOfPoints <= 0
+        || info.numberOfCells <= 0) {
+      throw new RuntimeException("unexpected scene info after adding a file");
+    }
+
+    scene.add(world);
+    Types.SceneInfo appendedInfo = scene.getSceneInfo();
+    if (appendedInfo.numberOfFiles != 2 || appendedInfo.numberOfActors <= info.numberOfActors
+        || appendedInfo.numberOfPoints <= info.numberOfPoints
+        || appendedInfo.numberOfCells <= info.numberOfCells) {
+      throw new RuntimeException("scene info should increase when adding a file");
+    }
+
+    scene.clear();
+    info = scene.getSceneInfo();
+    if (info.numberOfFiles != 0 || info.numberOfActors != 0 || info.numberOfPoints != 0
+        || info.numberOfCells != 0) {
+      throw new RuntimeException("scene info should be cleared with the scene");
     }
 
     engine.close();

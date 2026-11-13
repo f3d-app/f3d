@@ -27,8 +27,8 @@ void vtkF3DTAAPass::Render(const vtkRenderState* state)
   vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(renderer->GetRenderWindow());
   vtkOpenGLState* ostate = renWin->GetState();
 
-  vtkOpenGLState::ScopedglEnableDisable bsaver(ostate, GL_BLEND);
-  vtkOpenGLState::ScopedglEnableDisable dsaver(ostate, GL_DEPTH_TEST);
+  const vtkOpenGLState::ScopedglEnableDisable bsaver(ostate, GL_BLEND);
+  const vtkOpenGLState::ScopedglEnableDisable dsaver(ostate, GL_DEPTH_TEST);
 
   assert(this->DelegatePass != nullptr);
 
@@ -189,11 +189,11 @@ float vtkF3DTAAPass::ConfigureHaltonSequence(int direction)
 {
   assert(direction == 0 || direction == 1);
 
-  int base = 2 + direction;
+  const int base = 2 + direction;
   int& numerator = this->TaaHaltonNumerator[direction];
   int& denominator = this->TaaHaltonDenominator[direction];
 
-  int difference = denominator - numerator;
+  const int difference = denominator - numerator;
   if (difference == 1)
   {
     numerator = 1;

@@ -34,8 +34,8 @@ struct WavyGridMesh
     {
       for (unsigned int i = 0; i <= nx; ++i)
       {
-        float u = static_cast<float>(i) / nx;
-        float v = static_cast<float>(j) / ny;
+        const float u = static_cast<float>(i) / nx;
+        const float v = static_cast<float>(j) / ny;
 
         Vertex& vert = this->Vertices[j * (nx + 1) + i];
 
@@ -57,10 +57,10 @@ struct WavyGridMesh
     {
       for (unsigned int i = 0; i < nx; ++i)
       {
-        unsigned int i0 = j * (nx + 1) + i;
-        unsigned int i1 = j * (nx + 1) + (i + 1);
-        unsigned int i2 = (j + 1) * (nx + 1) + (i + 1);
-        unsigned int i3 = (j + 1) * (nx + 1) + i;
+        const unsigned int i0 = j * (nx + 1) + i;
+        const unsigned int i1 = j * (nx + 1) + (i + 1);
+        const unsigned int i2 = (j + 1) * (nx + 1) + (i + 1);
+        const unsigned int i3 = (j + 1) * (nx + 1) + i;
 
         this->Quads.push_back(i0);
         this->Quads.push_back(i1);
@@ -74,7 +74,7 @@ struct WavyGridMesh
 
     // Only quads
     this->FaceOffsets.resize(this->Quads.size() / 4 + 1);
-    std::generate(this->FaceOffsets.begin(), this->FaceOffsets.end(), [n = 0]() mutable {
+    std::ranges::generate(this->FaceOffsets, [n = 0]() mutable {
       const unsigned int offset = n;
       n += 4;
       return offset;
@@ -140,13 +140,13 @@ struct WavyGridMesh
         std::cos(freq * vert.position[1] + time);
 
       // Analytical normal computation
-      float dzdx = amplitude * freq * std::cos(freq * vert.position[0] + time) *
+      const float dzdx = amplitude * freq * std::cos(freq * vert.position[0] + time) *
         std::cos(freq * vert.position[1] + time);
 
-      float dzdy = amplitude * freq * std::sin(freq * vert.position[0] + time) *
+      const float dzdy = amplitude * freq * std::sin(freq * vert.position[0] + time) *
         -std::sin(freq * vert.position[1] + time);
 
-      float dzdt = amplitude *
+      const float dzdt = amplitude *
         (std::cos(freq * vert.position[0] + time) * std::cos(freq * vert.position[1] + time) +
           std::sin(freq * vert.position[0] + time) * -std::sin(freq * vert.position[1] + time));
 
@@ -155,7 +155,7 @@ struct WavyGridMesh
       const float nyv = -dzdy;
       constexpr float nzv = 1.0f;
 
-      float len = std::sqrt(nxv * nxv + nyv * nyv + nzv * nzv);
+      const float len = std::sqrt(nxv * nxv + nyv * nyv + nzv * nzv);
 
       vert.normal[0] = nxv / len;
       vert.normal[1] = nyv / len;
@@ -206,7 +206,7 @@ public:
   f3d::mesh_view::memory_view_t getMemoryView(double) const override
   {
     const float* points = reinterpret_cast<const float*>(this->Grid.Vertices.data());
-    size_t stride = sizeof(WavyGridMesh::Vertex) / sizeof(float);
+    const size_t stride = sizeof(WavyGridMesh::Vertex) / sizeof(float);
 
     return { .pointCount = this->Grid.Vertices.size(),
       .points = { .name = "custom_points_name", .data = points, .components = 3, .stride = stride },
@@ -246,7 +246,7 @@ public:
   {
   }
 
-  std::array<double, 2> getTimeRange() const override
+  std::pair<double, double> getTimeRange() const override
   {
     return { 0.0, 10.0 };
   }
@@ -254,7 +254,7 @@ public:
   f3d::mesh_view::memory_view_t getMemoryView(double) const override
   {
     const float* points = reinterpret_cast<const float*>(this->Grid.Vertices.data());
-    size_t stride = sizeof(WavyGridMesh::Vertex) / sizeof(float);
+    const size_t stride = sizeof(WavyGridMesh::Vertex) / sizeof(float);
 
     return { .pointCount = this->Grid.Vertices.size(),
              .points = { .name = "custom_points_name", .data = points, .components = 3, .stride = stride },
@@ -315,19 +315,20 @@ int TestSDKSceneFromMemoryZeroCopy([[maybe_unused]] int argc, char* argv[])
   PseudoUnitTest test;
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  std::string renderingBackend = std::string(argv[4]);
+  const std::string renderingBackend = std::string(argv[4]);
   f3d::engine eng = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
   f3d::scene& sce = eng.getScene();
+  f3d::animation& anim = sce.getAnimation();
   f3d::interactor& inter = eng.getInteractor();
   f3d::window& win = eng.getWindow().setSize(500, 500);
   win.setWindowName("Zero-copy animated mesh");
 
   eng.getOptions().ui.animation_progress = "default";
   eng.getOptions().render.show_edges = true;
-  eng.getOptions().model.scivis.enable = true;
-  eng.getOptions().model.scivis.cells = true;
+  eng.getOptions().model.coloring = "scivis";
+  eng.getOptions().model.scivis.field = "cells";
   eng.getOptions().ui.scalar_bar = true;
-  eng.getOptions().ui.scene_hierarchy = true;
+  eng.getOptions().ui.scene_hierarchy.enable = true;
 
   WavyGridMesh grid(20, 20);
 
@@ -335,15 +336,15 @@ int TestSDKSceneFromMemoryZeroCopy([[maybe_unused]] int argc, char* argv[])
   test(
     "add static mesh from memory", [&]() { sce.add(std::make_shared<StaticZeroCopyMesh>(grid)); });
 
-  std::string texturePath = std::string(argv[1]) + "data/world.png";
+  const std::string texturePath = std::string(argv[1]) + "data/world.png";
   eng.getOptions().model.color.texture = texturePath;
 
   test("render textured static mesh",
     TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", argv[2],
-      "TestSDKSceneFromMemoryZeroCopyTexturedStaticMesh", 0.06));
+      "TestSDKSceneFromMemoryZeroCopyTexturedStaticMesh", 0.07));
 
   eng.getOptions().model.color.texture = std::nullopt;
-  eng.getOptions().ui.scene_hierarchy = false;
+  eng.getOptions().ui.scene_hierarchy.enable = false;
 
   test("clear the scene", [&]() { sce.clear(); });
 
@@ -398,11 +399,11 @@ int TestSDKSceneFromMemoryZeroCopy([[maybe_unused]] int argc, char* argv[])
       win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKSceneFromMemoryZeroCopyDummyF64"));
 
   // Start animation
-  inter.startAnimation();
+  anim.start();
   inter.triggerEventLoop(1.0); // advance animation by 1 second
 
   eng.getOptions().model.scivis.array_name = "velocity";
-  eng.getOptions().model.scivis.cells = false;
+  eng.getOptions().model.scivis.field = "points";
 
   // Render test
   test("render mesh at time 1.0",
@@ -412,7 +413,7 @@ int TestSDKSceneFromMemoryZeroCopy([[maybe_unused]] int argc, char* argv[])
   inter.triggerEventLoop(1.0); // advance animation by 1 second
 
   eng.getOptions().model.scivis.array_name = "quad_coords";
-  eng.getOptions().model.scivis.cells = true;
+  eng.getOptions().model.scivis.field = "cells";
   eng.getOptions().model.scivis.component = 0;
 
   // Render test

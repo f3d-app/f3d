@@ -18,6 +18,7 @@ std::vector<std::string> GetVectorEnvironnementVariable(const std::string& envVa
 std::filesystem::path GetUserConfigFileDirectory();
 std::filesystem::path GetUserScreenshotDirectory();
 std::filesystem::path GetBinaryResourceDirectory();
+std::filesystem::path GetBinarySysConfDirectory();
 }
 
 #endif

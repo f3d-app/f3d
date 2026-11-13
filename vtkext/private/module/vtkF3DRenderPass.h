@@ -15,7 +15,8 @@
 #ifndef vtkF3DRenderPass_h
 #define vtkF3DRenderPass_h
 
-#include <vtkFramebufferPass.h>
+#include "vtkF3DPreserveCameraFramebufferPass.h"
+
 #include <vtkOpenGLQuadHelper.h>
 #include <vtkOpenGLRenderPass.h>
 #include <vtkSmartPointer.h>
@@ -43,12 +44,18 @@ public:
 
   vtkSetMacro(ArmatureVisible, bool);
   vtkSetMacro(UseRaytracing, bool);
+  vtkSetMacro(UseAnari, bool);
   vtkSetMacro(UseSSAOPass, bool);
   vtkSetMacro(UseBlurBackground, bool);
   vtkSetMacro(ForceOpaqueBackground, bool);
   vtkSetVector6Macro(Bounds, double);
   vtkSetMacro(CircleOfConfusionRadius, double);
   vtkSetMacro(RenderReflection, bool);
+  vtkSetMacro(XRMode, bool);
+  vtkSetMacro(RenderShadows, bool);
+  vtkSetMacro(ShadowExponentialConstant, double);
+  vtkSetMacro(ShadowResolution, int);
+  vtkSetMacro(AnariLibrary, std::string);
 
   /**
    * Modify shader code for matcap/gamma/skinning
@@ -77,17 +84,23 @@ protected:
 
   bool ArmatureVisible = false;
   bool UseRaytracing = false;
+  bool UseAnari = false;
+  std::string AnariLibrary = "environment";
   bool UseSSAOPass = false;
   bool UseBlurBackground = false;
   bool ForceOpaqueBackground = false;
   bool RenderReflection = false;
+  bool XRMode = false;
+  bool RenderShadows = false;
+  double ShadowExponentialConstant = 25.0;
+  int ShadowResolution = 1024;
 
   double CircleOfConfusionRadius = 20.0;
 
-  vtkSmartPointer<vtkFramebufferPass> BackgroundPass;
-  vtkSmartPointer<vtkFramebufferPass> BakeReflectionPass;
-  vtkSmartPointer<vtkFramebufferPass> MainPass;
-  vtkSmartPointer<vtkFramebufferPass> MainOnTopPass;
+  vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass> BackgroundPass;
+  vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass> BakeReflectionPass;
+  vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass> MainPass;
+  vtkSmartPointer<vtkF3DPreserveCameraFramebufferPass> MainOnTopPass;
 
   double Bounds[6] = {};
 

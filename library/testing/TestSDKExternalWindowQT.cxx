@@ -51,7 +51,7 @@ protected:
   {
     f3d::engine::autoloadPlugins();
 
-    f3d::context::function loadFunc = [this](const char* name) {
+    const f3d::context::function loadFunc = [this](const char* name) {
       return this->context()->getProcAddress(name);
     };
     this->mEngine = std::make_unique<f3d::engine>(f3d::engine::createExternal(loadFunc));
@@ -140,7 +140,7 @@ private:
 
 int TestSDKExternalWindowQT(int argc, char** argv)
 {
-  QApplication app(argc, argv);
+  const QApplication app(argc, argv);
 
   MainWindow win(
     std::string(argv[1]) + "/data/cow.vtp", std::string(argv[1]) + "/baselines/", argv[2]);

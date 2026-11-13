@@ -15,7 +15,9 @@ f3d_test(NAME TestGridColor DATA suzanne.ply ARGS -g --grid-color=1,1,1)
 f3d_test(NAME TestGridWithDepthPeeling DATA suzanne.ply ARGS -gp --opacity=0.2)
 f3d_test(NAME TestGridReflection DATA suzanne.ply ARGS -g --grid-reflection=0.8)
 f3d_test(NAME TestGridAbsoluteReflection DATA suzanne.ply ARGS -g --grid-absolute --grid-reflection=0.8 --camera-elevation-angle=40)
+f3d_test(NAME TestGridOpacity DATA suzanne.ply ARGS -g --grid-opacity=.25 --anti-aliasing=ssaa)
 f3d_test(NAME TestGridSSAAReflection DATA suzanne.ply ARGS -g --grid-reflection=0.8 --anti-aliasing=ssaa)
+f3d_test(NAME TestGridReflectionOnly DATA suzanne.ply ARGS -g --grid-reflection --grid-opacity=0 --anti-aliasing=ssaa)
 
 # Backface
 f3d_test(NAME TestBackfaceVisible DATA backface.vtp ARGS --backface-type=visible)
@@ -57,25 +59,26 @@ f3d_test(NAME TestUnlit DATA cow.vtp ARGS --unlit --color=0.9,0.1,0.1)
 
 # Scalar coloring
 f3d_test(NAME TestScalars DATA suzanne.ply ARGS -s --coloring-array=Normals --coloring-component=1)
-f3d_test(NAME TestScalarsCell DATA f3d.vtp ARGS --scalar-coloring --coloring-by-cells --coloring-component=-2 --up=+Z)
+f3d_test(NAME TestScalarsCell DATA f3d.vtp ARGS --coloring-mode=direct --coloring-field=cells --up=+Z)
 f3d_test(NAME TestScalarsRange DATA suzanne.ply ARGS -s --coloring-array=Normals --coloring-component=1 --coloring-range=0,1)
 f3d_test(NAME TestScalarsWithBar DATA suzanne.ply ARGS -b -s --coloring-array=Normals --coloring-component=0)
 f3d_test(NAME TestScalarsWithBarContinuity DATA suzanne.ply ARGS -b -s --coloring-array=Normals --coloring-component=0)
-f3d_test(NAME TestComponentName DATA from_abq.vtu ARGS --scalar-coloring --coloring-scalar-bar --coloring-component=2)
-f3d_test(NAME TestUserMatrixColoring DATA InterpolationTest.glb ARGS --scalar-coloring --coloring-array=TEXCOORD_0)
-f3d_test(NAME TestSkinColoring DATA SimpleSkin.gltf ARGS --scalar-coloring --coloring-array=WEIGHTS_0)
+f3d_test(NAME TestScalarsDegenerateRange DATA suzanne.ply ARGS --no-config -sb)
+f3d_test(NAME TestComponentName DATA from_abq.vtu ARGS --coloring-mode=scivis --coloring-scalar-bar --coloring-component=2)
+f3d_test(NAME TestUserMatrixColoring DATA InterpolationTest.glb ARGS --coloring-mode=scivis --coloring-array=TEXCOORD_0)
+f3d_test(NAME TestSkinColoring DATA SimpleSkin.gltf ARGS --coloring-mode=scivis --coloring-array=WEIGHTS_0)
 f3d_test(NAME TestSkinEdges DATA RiggedFigure.glb ARGS --animation-time=1 --edges --line-width=5)
-f3d_test(NAME TestMorphColoring DATA SimpleMorph.gltf ARGS --scalar-coloring)
+f3d_test(NAME TestMorphColoring DATA SimpleMorph.gltf ARGS --coloring-mode=scivis)
 f3d_test(NAME TestMorphEdges DATA SimpleMorph.gltf ARGS --edges --line-width=5)
-f3d_test(NAME TestAnimationUserMatrixColoring DATA InterpolationTest.glb ARGS --scalar-coloring --coloring-array=TEXCOORD_0 --animation-time=0.5)
-f3d_test(NAME TestAnimationSkinColoring DATA SimpleSkin.gltf ARGS --scalar-coloring --coloring-array=WEIGHTS_0 --animation-time=2)
-f3d_test(NAME TestAnimationMorphColoring DATA SimpleMorph.gltf ARGS --scalar-coloring --animation-time=0.5)
-f3d_test(NAME TestAnimationInputChangeColoring DATA v_rock2.mdl ARGS --scalar-coloring --animation-time=0.01 --animation-indices=1)
+f3d_test(NAME TestAnimationUserMatrixColoring DATA InterpolationTest.glb ARGS --coloring-mode=scivis --coloring-array=TEXCOORD_0 --animation-time=0.5)
+f3d_test(NAME TestAnimationSkinColoring DATA SimpleSkin.gltf ARGS --coloring-mode=scivis --coloring-array=WEIGHTS_0 --animation-time=2)
+f3d_test(NAME TestAnimationMorphColoring DATA SimpleMorph.gltf ARGS --coloring-mode=scivis --animation-time=0.5)
+f3d_test(NAME TestAnimationInputChangeColoring DATA v_rock2.mdl ARGS --coloring-mode=scivis --animation-time=0.01 --animation-indices=1)
 
 # Depth
 f3d_test(NAME TestDisplayDepth DATA dragon.vtu ARGS --display-depth)
-f3d_test(NAME TestDisplayDepthColorMap DATA dragon.vtu ARGS --display-depth --scalar-coloring=True --coloring-scalar-bar=True)
-f3d_test(NAME TestDisplayDepthCustomColorMap DATA dragon.vtu ARGS --display-depth --scalar-coloring --colormap=0,red,1,blue)
+f3d_test(NAME TestDisplayDepthColorMap DATA dragon.vtu ARGS --display-depth --coloring-mode=scivis --coloring-scalar-bar=True)
+f3d_test(NAME TestDisplayDepthCustomColorMap DATA dragon.vtu ARGS --display-depth --coloring-mode=scivis --colormap=0,red,1,blue)
 f3d_test(NAME TestDisplayDepthWithGrid DATA cow.vtp ARGS --display-depth -g)
 
 # DPI scaling
@@ -84,24 +87,24 @@ f3d_test(NAME TestDPI150 DATA dragon.vtu ARGS -nm --dpi-aware DPI_SCALE 1.5 UI)
 f3d_test(NAME TestDPIInvalid DATA dragon.vtu ARGS -nm --dpi-aware DPI_SCALE invalid UI NO_BASELINE)
 
 ## Color/opacity map
-f3d_test(NAME TestColormap DATA IM-0001-1983.dcm ARGS --scalar-coloring --roughness=1 --colormap=0,1,0,0,1,0,1,0)
-f3d_test(NAME TestOpacityMap DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-map=0.0,0.0,0.5,1.0,1.0,0.0)
-f3d_test(NAME TestOpacityMapFile DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/gaussian_opacity_map.png)
-f3d_test(NAME TestOpacityMapFileNonExistent DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/nonexistent_opacity_map.png)
-f3d_test(NAME TestOpacityMapFileInvalid DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/invalid.png)
-f3d_test(NAME TestColorMapFileFullPath DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis8.png --scalar-coloring --coloring-component=1)
-f3d_test(NAME TestColorMapInvalid DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/invalid.png --scalar-coloring REGEXP "Cannot read colormap at" NO_BASELINE)
-f3d_test(NAME TestColorMapNonExistent DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/non_existent.png --scalar-coloring REGEXP "Cannot find the colormap" NO_BASELINE)
-f3d_test(NAME TestColorMapGrayscale DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/white_grayscale.png --scalar-coloring REGEXP "The specified color map must have at least 3 channels" NO_BASELINE)
-f3d_test(NAME TestColorMapMore1pxWarning DATA dragon.vtu ARGS --verbose=warning --colormap-file=${F3D_SOURCE_DIR}/testing/data/16bit.png --scalar-coloring REGEXP "The specified color map height is not equal to 1" NO_BASELINE)
-f3d_test(NAME TestColorMap16bits DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis16.png --scalar-coloring --coloring-component=1)
-f3d_test(NAME TestColorMap32bits DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis32.hdr --scalar-coloring --coloring-component=1)
-f3d_test(NAME TestColorDiscretization DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis32.hdr --scalar-coloring --coloring-component=1 --colormap-discretization=4)
+f3d_test(NAME TestColormap DATA IM-0001-1983.dcm ARGS --coloring-mode=scivis --roughness=1 --colormap=0,1,0,0,1,0,1,0)
+f3d_test(NAME TestOpacityMap DATA waveletArrays.vti ARGS -vsb --coloring-array=Result --volume-opacity-map=0.0,0.0,0.5,1.0,1.0,0.0)
+f3d_test(NAME TestOpacityMapFile DATA waveletArrays.vti ARGS -vsb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/gaussian_opacity_map.png)
+f3d_test(NAME TestOpacityMapFileNonExistent DATA waveletArrays.vti ARGS -vsb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/nonexistent_opacity_map.png)
+f3d_test(NAME TestOpacityMapFileInvalid DATA waveletArrays.vti ARGS -vsb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/invalid.png)
+f3d_test(NAME TestColorMapFileFullPath DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis8.png --coloring-mode=scivis --coloring-component=1)
+f3d_test(NAME TestColorMapInvalid DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/invalid.png --coloring-mode=scivis REGEXP "Cannot read colormap at" NO_BASELINE)
+f3d_test(NAME TestColorMapNonExistent DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/non_existent.png --coloring-mode=scivis REGEXP "Cannot find the colormap" NO_BASELINE)
+f3d_test(NAME TestColorMapGrayscale DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/white_grayscale.png --coloring-mode=scivis REGEXP "The specified color map must have at least 3 channels" NO_BASELINE)
+f3d_test(NAME TestColorMapMore1pxWarning DATA dragon.vtu ARGS --verbose=warning --colormap-file=${F3D_SOURCE_DIR}/testing/data/16bit.png --coloring-mode=scivis REGEXP "The specified color map height is not equal to 1" NO_BASELINE)
+f3d_test(NAME TestColorMap16bits DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis16.png --coloring-mode=scivis --coloring-component=1)
+f3d_test(NAME TestColorMap32bits DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis32.hdr --coloring-mode=scivis --coloring-component=1)
+f3d_test(NAME TestColorDiscretization DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis32.hdr --coloring-mode=scivis --coloring-component=1 --colormap-discretization=4)
 
 if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/resources/colormaps/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/colormaps")
-  f3d_test(NAME TestColorMapStem DATA dragon.vtu ARGS --colormap-file=magma --scalar-coloring --coloring-component=1)
-  f3d_test(NAME TestColorMapFile DATA dragon.vtu ARGS --colormap-file=magma.png --scalar-coloring --coloring-component=1)
+  f3d_test(NAME TestColorMapStem DATA dragon.vtu ARGS --colormap-file=magma --coloring-mode=scivis --coloring-component=1)
+  f3d_test(NAME TestColorMapFile DATA dragon.vtu ARGS --colormap-file=magma.png --coloring-mode=scivis --coloring-component=1)
 endif()
 
 ## Axes grid
@@ -133,18 +136,26 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
 endif()
 
 ## Volume
-f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 THRESHOLD 0.08) # Small rendering differences on macOS OSMesa
-f3d_test(NAME TestVolumeInverse DATA HeadMRVolume.mhd ARGS -vi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 THRESHOLD 0.11) # Small rendering differences on macOS OSMesa
-f3d_test(NAME TestVolumeMag DATA vase_4comp.vti ARGS -vb)
-f3d_test(NAME TestVolumeComp DATA vase_4comp.vti ARGS -vb --coloring-component=3 LONG_TIMEOUT)
-f3d_test(NAME TestVolumeDirect DATA vase_4comp.vti ARGS -vb --coloring-component=-2)
-f3d_test(NAME TestVolumeCells DATA waveletArrays.vti ARGS -vb --coloring-by-cells)
-f3d_test(NAME TestVolumeColoringArray DATA waveletArrays.vti ARGS -vb --coloring-array=Result LONG_TIMEOUT)
+f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -vs --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 THRESHOLD 0.08) # Small rendering differences on macOS OSMesa
+f3d_test(NAME TestVolumeInverse DATA HeadMRVolume.mhd ARGS -vsi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 THRESHOLD 0.11) # Small rendering differences on macOS OSMesa
+f3d_test(NAME TestVolumeMag DATA vase_4comp.vti ARGS -vsb)
+f3d_test(NAME TestVolumeComp DATA vase_4comp.vti ARGS -vsb --coloring-component=3 LONG_TIMEOUT)
+f3d_test(NAME TestVolumeDirect DATA vase_4comp.vti ARGS -vb --coloring-mode=direct)
+f3d_test(NAME TestVolumeCells DATA waveletArrays.vti ARGS -vsb --coloring-field=cells)
+f3d_test(NAME TestVolumeColoringArray DATA waveletArrays.vti ARGS -vsb --coloring-array=Result LONG_TIMEOUT)
+f3d_test(NAME TestVolumeMaterialError DATA HeadMRVolume.mhd ARGS -v NO_BASELINE REGEXP "Volume rendering in material color mode is invalid")
 
 ## Normal Glyphs
 f3d_test(NAME TestNormalGlyphsPerspectiveEnable DATA suzanne.obj ARGS --normal-glyphs LONG_TIMEOUT)
-f3d_test(NAME TestNormalGlyphsOrthographicEnable DATA suzanne.obj ARGS --normal-glyphs --camera-orthographic)
-f3d_test(NAME TestNormalGlyphsScale DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-scale=0.1)
+f3d_test(NAME TestNormalGlyphsOrthographicEnable DATA suzanne.obj ARGS --normal-glyphs --camera-orthographic LONG_TIMEOUT)
+f3d_test(NAME TestNormalGlyphsScale DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-scale=0.1 LONG_TIMEOUT)
+f3d_test(NAME TestNormalGlyphsColor DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-color=1,0,0 LONG_TIMEOUT)
+f3d_test(NAME TestNormalGlyphsCylinder DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-shape=cylinder LONG_TIMEOUT)
+f3d_test(NAME TestNormalGlyphsCone DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-shape=cone LONG_TIMEOUT)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.0) # Line color is different before VTK 9.6 for unknown reason
+  f3d_test(NAME TestNormalGlyphsLine DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-shape=line LONG_TIMEOUT)
+endif()
+f3d_test(NAME TestNormalGlyphsInvalidShape DATA suzanne.obj ARGS --normal-glyphs --normal-glyphs-shape=foo LONG_TIMEOUT NO_BASELINE REGEXP "foo is an invalid normal glyphs shape")
 f3d_test(NAME TestNormalGlyphsNoNormalsAvailable DATA cow.vtp ARGS --normal-glyphs NO_BASELINE REGEXP "does not contain any normals")
 
 ## Textures
@@ -156,7 +167,7 @@ f3d_test(NAME TestTextures DATA WaterBottle.glb ARGS --texture-material=${F3D_SO
 f3d_test(NAME TestTextureMatCap DATA suzanne.ply ARGS --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png)
 f3d_test(NAME TestTexturesTransform DATA world.obj ARGS --textures-transform=1,0,0,0,-1,0,0,0,1)
 f3d_test(NAME TestTexturesTransformGL DATA WaterBottle.glb ARGS --textures-transform=1,0,0,0,-1,0,0,0,1 --camera-direction=-1,0,0)
-f3d_test(NAME TestTextureMatCapWithEdges DATA suzanne.ply ARGS -e --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png THRESHOLD 0.05) # Small rendering differences on GLES
+f3d_test(NAME TestTextureMatCapWithEdges DATA suzanne.ply ARGS -e --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png THRESHOLD 0.06) # Small rendering differences on GLES
 f3d_test(NAME TestTextureColorWithOptions DATA WaterBottle.glb ARGS --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --color=1,1,0 --opacity=0.4 --blending)
 f3d_test(NAME TestTextureCheckerBoard DATA WaterBottle.glb ARGS --checkerboard)
 f3d_test(NAME TestTextureCheckerBoardSSAA DATA WaterBottle.glb ARGS --checkerboard --anti-aliasing=ssaa)
@@ -169,8 +180,15 @@ f3d_test(NAME TestLightIntensityDarker DATA cow.vtp ARGS --light-intensity=0.2)
 f3d_test(NAME TestLightIntensityBrighterFullScene DATA WaterBottle.glb ARGS --light-intensity=5.0)
 f3d_test(NAME TestLightIntensityDarkerFullScene DATA WaterBottle.glb ARGS --light-intensity=0.2)
 
+## Light Representation
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13881
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261027)
+  f3d_test(NAME TestLightRepresentation DATA PointLightIntensityTest.glb ARGS --light-representation SKIP_GLES) # Big rendering differences on GLES
+endif()
+
 ## Other UI
 f3d_test(NAME TestUTF8 DATA "(ノಠ益ಠ )ノ.vtp")
+f3d_test(NAME TestGlyphsRangeFilename DATA "şΞβЦй€±©.vtp" ARGS -n UI)
 f3d_test(NAME TestFilenameCommasSpaces DATA "tetrahedron, with commas & spaces.stl")
 f3d_test(NAME TestFilename DATA suzanne.ply ARGS -n UI)
 f3d_test(NAME TestHDRIFilename DATA dragon.vtu ARGS --hdri-filename HDRI shanghai_bund_1k.hdr UI LONG_TIMEOUT THRESHOLD 0.05) # Small rendering differences on GLES
@@ -204,6 +222,7 @@ endif()
 f3d_test(NAME TestSceneHierarchyNonGLTF DATA cow.vtp ARGS --scene-hierarchy UI)
 f3d_test(NAME TestSceneHierarchyMultipleFiles DATA cow.vtp suzanne.obj ARGS --scene-hierarchy --multi-file-mode=all --opacity=0.3 UI)
 f3d_test(NAME TestSceneHierarchyMultiBlock DATA mb.vtm ARGS --scene-hierarchy UI)
+f3d_test(NAME TestSceneHierarchyMaxWidth DATA cow.vtp ARGS --scene-hierarchy -Dui.scene_hierarchy.max_width=30 UI)
 
 ## Special files handling
 f3d_test(NAME TestRemoveEmptyFileGroups DATA mb/mb_3_0.vtt mb/mb_0_0.vtu ARGS -n --remove-empty-file-groups UI)
@@ -227,13 +246,18 @@ f3d_test(NAME TestMultiFileColoring DATA mb/recursive ARGS --multi-file-mode=all
 f3d_test(NAME TestMultiFileVolume DATA multi ARGS --multi-file-mode=all -vsb --coloring-array=Scalars_)
 f3d_test(NAME TestMultiFileColoringTexture DATA mb/recursive/mb_1_0.vtp mb/recursive/mb_2_0.vtp world.obj ARGS --multi-file-mode=all -sb --coloring-array=Normals --coloring-component=1)
 f3d_test(NAME TestMultiFilePositionals DATA mb/recursive/mb_0_0.vtu mb/recursive/mb_1_0.vtp ARGS --multi-file-mode=all -s --coloring-array=Polynomial -b)
-f3d_test(NAME TestMultiFileNonCoherentComponentNames DATA bluntfin.vts bluntfin_t.vtu ARGS --multi-file-mode=all --scalar-coloring --coloring-array=Momentum --coloring-component=2 --coloring-scalar-bar)
+f3d_test(NAME TestMultiFileNonCoherentComponentNames DATA bluntfin.vts bluntfin_t.vtu ARGS --multi-file-mode=all --coloring-mode=scivis --coloring-array=Momentum --coloring-component=2 --coloring-scalar-bar)
 f3d_test(NAME TestMultiInputArg ARGS --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_0_0.vtu ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_1_0.vtp --multi-file-mode=all -s --coloring-array=Polynomial -b)
 f3d_test(NAME TestMultiInputMultiArgs ARGS --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_0_0.vtu --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_1_0.vtp --multi-file-mode=all -s --coloring-array=Polynomial -b)
 f3d_test(NAME TestInvalidFileFileNameEmpty DATA invalid_body.vtp ARGS --filename NO_DATA_FORCE_RENDER UI)
 f3d_test(NAME TestMultiFileInvalid DATA cow.vtp invalid_body.vtp dragon.vtu ARGS --multi-file-mode=all NO_DATA_FORCE_RENDER UI)
 f3d_test(NAME TestMultiFileUnsupportedFilesFileName DATA unsupportedFile.dummy cow.vtp ARGS --multi-file-mode=all --filename NO_DATA_FORCE_RENDER UI)
 f3d_test(NAME TestMultiFileCameraIndex DATA Cameras.gltf CameraAnimated.glb ARGS --multi-file-mode=all --camera-index=2 --opacity=0.5 --blending)
+f3d_test(NAME TestSkipContentCheck DATA invalid.mdl ARGS --skip-content-check REGEXP "Invalid MDL file" NO_RENDER)
+# Test file with a supported extension but unsupported content (needs VTK CanReadFile support)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
+  f3d_test(NAME TestUnsupportedContent DATA invalid.mdl REGEXP ".*invalid.mdl contains unsupported contents" NO_RENDER)
+endif()
 
 ## Font
 f3d_test(NAME TestFont DATA suzanne.ply ARGS -n --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf UI)
@@ -248,6 +272,10 @@ f3d_test(NAME TestDefinesInexistent DATA dragon.vtu ARGS -Dscene.up_director=+Z 
 f3d_test(NAME TestAlternativeOptionSyntax DATA WaterBottle.glb ARGS --max-size 0.2 REGEXP "file is bigger than max size" NO_BASELINE)
 f3d_test(NAME TestCustomOptionsNone DATA red_translucent_monkey.gltf ARGS --blending=none --anti-aliasing=none --point-sprites=none)
 
+## Cover incorrect coloring enum libf3d options
+f3d_test(NAME TestIncorrectColoringMode DATA dragon.vtu ARGS -Dmodel.coloring=foo NO_BASELINE REGEXP "Unknown coloring mode")
+f3d_test(NAME TestIncorrectScivisField DATA dragon.vtu ARGS -Dmodel.scivis.field=foo NO_BASELINE REGEXP "Unknown scivis field")
+
 ## Config
 f3d_test(NAME TestConfigReset DATA suzanne.stl ARGS -Rrender.grid.enable --reset=ui.axis CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json)
 f3d_test(NAME TestConfigResetInexistent DATA suzanne.stl ARGS -Rrender.glid.enable REGEXP "option from CLI options does not exists" NO_BASELINE)
@@ -260,9 +288,8 @@ endif()
 ## Animation
 f3d_test(NAME TestAnimationIndicesSingle DATA soldier_animations.mdl ARGS --animation-indices=7 --animation-time=0.5 --animation-progress UI)
 f3d_test(NAME TestAnimationIndicesMulti DATA InterpolationTest.glb ARGS --animation-indices=7,6 --animation-time=0.5 --animation-progress UI)
-f3d_test(NAME TestAnimationIndexDeprecated DATA InterpolationTest.glb ARGS --animation-index=7 --animation-time=0.5 --animation-progress UI)
 f3d_test(NAME TestMultiFileAnimationIndices DATA InterpolationTest.glb BoxAnimated.gltf ARGS --animation-indices=9 --animation-time=0.85 --animation-progress --multi-file-mode=all UI)
-f3d_test(NAME TestAnimationProgressBarWithScalarBar DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress=advanced --scalar-coloring --coloring-scalar-bar UI)
+f3d_test(NAME TestAnimationProgressBarWithScalarBar DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress=advanced --coloring-mode=scivis --coloring-scalar-bar UI)
 f3d_test(NAME TestAnimationProgressBarSpeedFactor DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress=advanced --animation-speed-factor=1.5 RESOLUTION 400,300 UI)
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12688
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251006)
@@ -321,7 +348,8 @@ f3d_test(NAME TestBackdropOpacityTransparent DATA suzanne.ply ARGS -n --backdrop
 f3d_test(NAME TestBackdropOpacityMedium DATA suzanne.ply ARGS -n --backdrop-opacity=0.5 UI)
 f3d_test(NAME TestBackdropColor DATA suzanne.ply ARGS -n --backdrop-color=0.5,1.0,0.5 UI)
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13818
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016)
   f3d_test(NAME TestDefaultConfigFileHDRIFilename DATA dragon.vtu CONFIG config_build HDRI shanghai_bund_1k.hdr UI SKIP_GLES)
 endif()
 
@@ -329,31 +357,31 @@ endif()
 if(APPLE AND NOT F3D_TESTING_FORCE_RENDERING_BACKEND STREQUAL "osmesa") # MacOS driver does not support OpenGL 4.3
   f3d_test(NAME TestSkinningManyBonesFailure DATA tube_254bones.glb ARGS --verbose REGEXP "which requires OpenGL" NO_BASELINE)
 else()
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219) # The baseline changed with armature support
-    # Strictly speaking, this test can also fail if ran without OpenGL 4.3 support on Windows and Linux
-    # Instead of checking MacOS only, we should try to get OpenGL capabilities from CMake later instead
-    f3d_test(NAME TestSkinningManyBones DATA tube_254bones.glb SKIP_GLES)
-  endif()
+  # Strictly speaking, this test can also fail if ran without OpenGL 4.3 support on Windows and Linux
+  # Instead of checking MacOS only, we should try to get OpenGL capabilities from CMake later instead
+  f3d_test(NAME TestSkinningManyBones DATA tube_254bones.glb SKIP_GLES)
 endif()
 
 ## Armature
 f3d_test(NAME TestGLTFRigArmatureNoArmature DATA RiggedFigure.glb ARGS --animation-time=1 --opacity=0.5 -p SKIP_GLES) # GLES skipped because of depth peeling
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219)
-  f3d_test(NAME TestGLTFRigArmature DATA RiggedFigure.glb ARGS --animation-time=1 --armature)
-  f3d_test(NAME TestGLTFRigArmatureWithOpacity DATA RiggedFigure.glb ARGS --animation-time=1 --armature --opacity=0.5 -p SKIP_GLES) # GLES skipped because of depth peeling
-  f3d_test(NAME TestGLTFRigArmatureSphereTube DATA RiggedFigure.glb ARGS --animation-time=1 --armature --point-size=20 --line-width=5)
-endif()
+f3d_test(NAME TestGLTFRigArmature DATA RiggedFigure.glb ARGS --animation-time=1 --armature)
+f3d_test(NAME TestGLTFRigArmatureWithOpacity DATA RiggedFigure.glb ARGS --animation-time=1 --armature --opacity=0.5 -p SKIP_GLES) # GLES skipped because of depth peeling
+f3d_test(NAME TestGLTFRigArmatureSphereTube DATA RiggedFigure.glb ARGS --animation-time=1 --armature --point-size=20 --line-width=5)
 
 ## HDRI
 f3d_test(NAME TestHDRI DATA suzanne.ply HDRI shanghai_bund_1k.hdr THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
 f3d_test(NAME TestHDRICache DATA suzanne.ply HDRI shanghai_bund_1k.hdr DEPENDS TestHDRI THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
-f3d_test(NAME TestHDRIBlur DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
-f3d_test(NAME TestHDRIBlurCoCSmall DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=10 --camera-position=-20,0,20)
-f3d_test(NAME TestHDRIBlurCoCMedium DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=50 --camera-position=-20,0,20)
-f3d_test(NAME TestHDRIBlurCoCLarge DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=100 --camera-position=-20,0,20 THRESHOLD 0.05) # Small rendering differences on GLES due to LUT precision
-f3d_test(NAME TestHDRIBlurCoCZero DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=0 --camera-position=-20,0,20)
-f3d_test(NAME TestHDRIBlurCoCNegative DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=-100 --camera-position=-20,0,20 THRESHOLD 0.05) # Small rendering differences on GLES due to LUT precision
-f3d_test(NAME TestHDRIBlurRatio DATA suzanne.ply HDRI shanghai_bund_1k.hdr RESOLUTION 600,100 ARGS -u)
+f3d_test(NAME TestHDRINoCache DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --no-cache DEPENDS TestHDRI THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
+# HDRI ambient lighting must follow render.light.intensity (see https://github.com/f3d-app/f3d/issues/3312)
+f3d_test(NAME TestHDRILightIntensityDimmer DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --light-intensity=0.1 DEPENDS TestHDRI THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
+f3d_test(NAME TestHDRILightIntensityBrighter DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --light-intensity=2.0 DEPENDS TestHDRI THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
+f3d_test(NAME TestHDRIBlur DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --hdri-skybox=blurred THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
+f3d_test(NAME TestHDRIBlurCoCSmall DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --hdri-skybox=blurred --blur-coc=10 --camera-position=-20,0,20)
+f3d_test(NAME TestHDRIBlurCoCMedium DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --hdri-skybox=blurred --blur-coc=50 --camera-position=-20,0,20)
+f3d_test(NAME TestHDRIBlurCoCLarge DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --hdri-skybox=blurred --blur-coc=100 --camera-position=-20,0,20 THRESHOLD 0.05) # Small rendering differences on GLES due to LUT precision
+f3d_test(NAME TestHDRIBlurCoCZero DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --hdri-skybox=blurred --blur-coc=0 --camera-position=-20,0,20)
+f3d_test(NAME TestHDRIBlurCoCNegative DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --hdri-skybox=blurred --blur-coc=-100 --camera-position=-20,0,20 THRESHOLD 0.05) # Small rendering differences on GLES due to LUT precision
+f3d_test(NAME TestHDRIBlurRatio DATA suzanne.ply HDRI shanghai_bund_1k.hdr RESOLUTION 600,100 ARGS --hdri-skybox=blurred)
 f3d_test(NAME TestHDRIEdges DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -e THRESHOLD 0.06 THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
 f3d_test(NAME TestHDRI8Bit DATA suzanne.ply HDRI f3d.tif ARGS --color=1.0,0.0,0.0 THRESHOLD 0.1) # Threshold is needed for IBL change after VTK 9.6
 f3d_test(NAME TestHDRIOrient DATA suzanne.stl HDRI shanghai_bund_1k.hdr ARGS --up=+Z THRESHOLD 0.05) # Small rendering differences on GLES due to LUT precision
@@ -392,9 +420,16 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestHDRIRaytracingNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr -rd --raytracing-samples=4 LONG_TIMEOUT)
 endif()
 
-# SSAA with HDR framebuffer support in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12026
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250329)
-  f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -t --anti-aliasing=ssaa)
+f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -t --anti-aliasing=ssaa)
+
+## Shadows
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13818
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016)
+  f3d_test(NAME TestShadows DATA suzanne.ply ARGS --shadows)
+  f3d_test(NAME TestShadowsTranslucent DATA suzanne.ply ARGS --shadows --opacity=0.9 --blending=ddp SKIP_GLES) # No ddp on GLES
+  f3d_test(NAME TestShadowsGrid DATA suzanne.ply ARGS --shadows -g)
+  f3d_test(NAME TestShadowsGridLowRes DATA suzanne.ply ARGS --shadows -g -Drender.shadows.resolution=8)
+  f3d_test(NAME TestShadowsGridLowExp DATA suzanne.ply ARGS --shadows -g -Drender.shadows.exponential_constant=1)
 endif()
 
 ## Raytracing
@@ -405,8 +440,9 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestRaytracingDenoise DATA suzanne.ply ARGS -rd --raytracing-samples=4)
   f3d_test(NAME TestRaytracingNoDenoise DATA suzanne.stl ARGS -r --raytracing-samples=20)
   f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Module Raytracing: ON")
-  f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply ARGS --raytracing-samples=4 INTERACTION) #RD
+  f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply ARGS --raytracing-samples=4 -d INTERACTION) #R
   f3d_test(NAME TestRaytracingScalarBar DATA dragon.vtu ARGS -rsbd --raytracing-samples=4)
+  f3d_test(NAME TestRaytracingDeprecated DATA dragon.vtu ARGS --raytracing NO_BASELINE REGEXP "Option 'raytracing' is deprecated, use 'rendering-mode=ospray' instead")
 
   if(NOT F3D_MACOS_BUNDLE)
     # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
@@ -418,8 +454,17 @@ if(F3D_MODULE_RAYTRACING)
   endif()
 
   f3d_test(NAME TestRaytracingNoBackground DATA suzanne.ply ARGS -rd --raytracing-samples=4 --no-background)
-else(F3D_MODULE_RAYTRACING)
+else()
   f3d_test(NAME TestCommandScriptRaytracing SCRIPT DATA suzanne.ply NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing")
+endif()
+
+f3d_test(NAME TestRenderModeInvalid DATA suzanne.ply ARGS --rendering-mode=invalid NO_BASELINE REGEXP "'render.mode' is set to an unknown value: invalid")
+
+## Anari
+# This render mode is experimental, it may not be fully stable and baselines will change in the future.
+# It is also assumed that "helide" is available as an Anari library, which is usually the case except if it's disabled explicitly when building AnariSDK.
+if(F3D_MODULE_ANARI)
+  f3d_test(NAME TestAnariGLTF DATA WaterBottle.glb ARGS --rendering-mode=anari --anari-library=helide LONG_TIMEOUT DEFAULT_HDRI)
 endif()
 
 if(F3D_MODULE_EXR)
@@ -428,10 +473,7 @@ endif()
 
 if(F3D_MODULE_WEBP)
   f3d_test(NAME TestVersionWebP ARGS --version REGEXP "Module WebP: ON")
-  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11922
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250220)
-    f3d_test(NAME TestOBJWebP DATA cube_webp.obj)
-  endif()
+  f3d_test(NAME TestOBJWebP DATA cube_webp.obj)
 endif()
 
 ## Final shader
@@ -484,7 +526,7 @@ f3d_test(NAME TestCommandScriptInvalid SCRIPT DATA dragon.vtu REGEXP "Command: \
 f3d_test(NAME TestCommandScriptMissingFile SCRIPT DATA dragon.vtu REGEXP "Unable to open command script file" NO_BASELINE)
 f3d_test(NAME TestCommandScriptPrintScene SCRIPT DATA dragon.vtu REGEXP "Camera position: 2.23745, 3.83305, 507.598" NO_BASELINE) # print_scene_info
 f3d_test(NAME TestCommandScriptPrintConfig SCRIPT DATA dragon.vtu REGEXP "Found available config path" NO_BASELINE) # print_config_info
-f3d_test(NAME TestCommandScriptPrintColoring SCRIPT DATA dragon.vtu REGEXP "Not coloring" NO_BASELINE) # print_coloring_info
+f3d_test(NAME TestCommandScriptPrintColoring SCRIPT DATA dragon.vtu REGEXP "Material" NO_BASELINE) # print_coloring_info
 f3d_test(NAME TestCommandScriptPrintMesh SCRIPT DATA dragon.vtu REGEXP "Number of points: 13268" NO_BASELINE) # print_mesh_info
 f3d_test(NAME TestCommandScriptPrintOptions SCRIPT DATA dragon.vtu REGEXP "interactor.invert_zoom: false" NO_BASELINE) # print_options_info
 f3d_test(NAME TestCommandScriptAlias SCRIPT DATA dragon.vtu --reference=${F3D_SOURCE_DIR}/testing/baselines/TestCommandScriptAlias.png) # alias myrotate roll_camera 90;myrotate
@@ -523,7 +565,7 @@ f3d_test(NAME TestCommandScriptSetCameraBottom SCRIPT DATA dragon.vtu) # set_cam
 f3d_test(NAME TestCommandScriptSetCameraLeft SCRIPT DATA dragon.vtu) # set_camera left
 f3d_test(NAME TestCommandScriptCycleCameraIndex SCRIPT DATA Cameras.gltf) # cycle scene.camera.index;cycle scene.camera.index;reload_current_file_group
 f3d_test(NAME TestCommandScriptIncreaseDecreaseCameraIndex SCRIPT DATA Cameras.gltf) # increase scene.camera.index;increase scene.camera.index;increase.camera.index;decrease.camera.index;reload_current_file_group
-f3d_test(NAME TestCommandScriptOpacityMap SCRIPT DATA vase_4comp.vti ARGS -v) # set model.scivis.opacity_map 0,0.03,1,1
+f3d_test(NAME TestCommandScriptOpacityMap SCRIPT DATA vase_4comp.vti ARGS -vs) # set model.scivis.opacity_map 0,0.03,1,1
 
 # Statefile interactor command load_statefile, each test covers a distinct behavior. The save_statefile
 # command shares its implementation with the --save-statefile option covered above, the tests below
@@ -612,7 +654,7 @@ f3d_test(NAME TestVerboseWrongArray DATA dragon.vtu ARGS -s --coloring-array=dum
 f3d_test(NAME TestVerboseDefaultScalar DATA HeadMRVolume.mhd ARGS -s --verbose REGEXP "Coloring using point array named MetaImage, Magnitude" NO_BASELINE)
 
 # Volume array verbosity test
-f3d_test(NAME TestVerboseVolume DATA HeadMRVolume.mhd ARGS -v --verbose REGEXP "Coloring using point array named MetaImage .forced., Magnitude" NO_BASELINE)
+f3d_test(NAME TestVerboseVolume DATA HeadMRVolume.mhd ARGS -vs --verbose REGEXP "Coloring using point array named MetaImage, Magnitude" NO_BASELINE)
 
 # Incorrect component test
 f3d_test(NAME TestIncorrectComponent DATA dragon.vtu ARGS -s --coloring-component=4 REGEXP "Invalid component index: 4" NO_BASELINE)
@@ -621,7 +663,7 @@ f3d_test(NAME TestIncorrectComponent DATA dragon.vtu ARGS -s --coloring-componen
 f3d_test(NAME TestIncorrectMultiFileVolume DATA multi ARGS -sv --coloring-array=Normals --multi-file-mode=all REGEXP "Cannot find the array \"Normals\" to display volume with" NO_BASELINE LONG_TIMEOUT)
 
 # Incorrect color map
-f3d_test(NAME TestIncorrectColormap DATA IM-0001-1983.dcm ARGS --scalar-coloring --roughness=1 --colormap=0,1,0,0,1,0,1 REGEXP "Incorrect number of tokens in provided colormap" NO_BASELINE)
+f3d_test(NAME TestIncorrectColormap DATA IM-0001-1983.dcm ARGS --coloring-mode=scivis --roughness=1 --colormap=0,1,0,0,1,0,1 REGEXP "Incorrect number of tokens in provided colormap" NO_BASELINE)
 
 # Test opening a directory
 f3d_test(NAME TestVerboseDirectory DATA mb REGEXP "mb_0_0.vtu" NO_RENDER)
@@ -636,13 +678,10 @@ f3d_test(NAME TestAnimationIndicesWarningNone DATA cow.vtp ARGS --animation-indi
 f3d_test(NAME TestAnimationIndicesWarningAllAnimations DATA InterpolationTest.glb ARGS --animation-indices=-1,2,3 REGEXP "Multiple animation indices have been specified include a negative one, all animations will be selected" NO_BASELINE)
 f3d_test(NAME TestVerboseAnimationNoAnimationTime DATA cow.vtp ARGS --animation-time=2 --verbose REGEXP "No animation available, cannot load a specific animation time" NO_BASELINE)
 f3d_test(NAME TestInvalidAnimationProgressMode DATA cow.vtp ARGS --animation-progress=foo REGEXP "foo is an invalid animation progress mode" NO_BASELINE)
-
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250507)
-  f3d_test(NAME TestAnimationIndicesWarningSingle DATA soldier_animations.mdl ARGS --animation-indices=1,2 REGEXP "Multiple animation indices have been specified but currently loaded files may not support enabling multiple animations" NO_BASELINE)
-  if(F3D_PLUGIN_BUILD_HDF)
-    f3d_test(NAME TestAnimationIndicesWarningUniqueNonZero DATA blob.vtkhdf ARGS --animation-indices=1 --load-plugins=hdf REGEXP "Non-zero or multiple animation indices have been specified but currently loaded file does not support it." NO_BASELINE)
-    f3d_test(NAME TestAnimationIndicesWarningUniqueMulti DATA blob.vtkhdf ARGS --animation-indices=0,2 --load-plugins=hdf REGEXP "Non-zero or multiple animation indices have been specified but currently loaded file does not support it." NO_BASELINE)
-  endif()
+f3d_test(NAME TestAnimationIndicesWarningSingle DATA soldier_animations.mdl ARGS --animation-indices=1,2 REGEXP "Multiple animation indices have been specified but currently loaded files may not support enabling multiple animations" NO_BASELINE)
+if(F3D_PLUGIN_BUILD_HDF)
+  f3d_test(NAME TestAnimationIndicesWarningUniqueNonZero DATA blob.vtkhdf ARGS --animation-indices=1 --load-plugins=hdf REGEXP "Non-zero or multiple animation indices have been specified but currently loaded file does not support it." NO_BASELINE)
+  f3d_test(NAME TestAnimationIndicesWarningUniqueMulti DATA blob.vtkhdf ARGS --animation-indices=0,2 --load-plugins=hdf REGEXP "Non-zero or multiple animation indices have been specified but currently loaded file does not support it." NO_BASELINE)
 endif()
 
 # Test Grid verbose output
@@ -655,10 +694,10 @@ f3d_test(NAME TestNoRenderBBox DATA suzanne.ply NO_RENDER REGEXP "Scene bounding
 f3d_test(NAME TestVerboseScalars DATA suzanne.ply ARGS -s --verbose REGEXP "Coloring using point array named Normals, Magnitude." NO_BASELINE)
 
 # Test direct scalars surface rendering with a 9 comp array
-f3d_test(NAME TestTensorsDirect DATA tensors.vti ARGS -s --coloring-array=tensors1 --coloring-component=-2 REGEXP "Direct scalars rendering not supported by array with more than 4 components" NO_BASELINE)
+f3d_test(NAME TestTensorsDirect DATA tensors.vti ARGS --coloring-array=tensors1 --coloring-mode=direct REGEXP "Direct scalars rendering not supported by array with more than 4 components" NO_BASELINE)
 
 # Test direct scalars volume rendering with a 9 comp array
-f3d_test(NAME TestTensorsVolumeDirect DATA tensors.vti ARGS -v -s --coloring-array=tensors1 --coloring-component=-2 REGEXP "Direct scalars rendering not supported by array with more than 4 components" NO_BASELINE)
+f3d_test(NAME TestTensorsVolumeDirect DATA tensors.vti ARGS -v --coloring-array=tensors1 --coloring-mode=direct REGEXP "Direct scalars rendering not supported by array with more than 4 components" NO_BASELINE)
 
 # Test volume rendering without any array
 f3d_test(NAME TestVerboseVolumeNoArray DATA cow.vtp ARGS -v REGEXP "Cannot use volume with this data" NO_BASELINE)
@@ -668,6 +707,10 @@ f3d_test(NAME TestVerboseNoArray DATA cow.vtp ARGS -s --verbose=debug REGEXP "No
 
 # Test invalid scalar range
 f3d_test(NAME TestInvalidScalarsRange DATA suzanne.ply ARGS -s --coloring-array=Normals --coloring-component=1 --coloring-range=0,1,2 REGEXP "Invalid scalar range provided, using automatic range" NO_BASELINE)
+
+# Test invalid color array names
+f3d_test(NAME TestInvalidScalarsNamePoints DATA suzanne.ply ARGS -s --coloring-array=foo --coloring-field=points REGEXP "Unknown scalar array: \"foo\" \\(point data\\)" NO_BASELINE)
+f3d_test(NAME TestInvalidScalarsNameCells DATA suzanne.ply ARGS -s --coloring-array=foo --coloring-field=cells REGEXP "Unknown scalar array: \"foo\" \\(cell data\\)" NO_BASELINE)
 
 # Test invalid backface type
 f3d_test(NAME TestInvalidBackface DATA backface.vtp ARGS --backface-type=invalid REGEXP "is not a valid backface type, assuming it is not set" NO_BASELINE)
@@ -816,10 +859,10 @@ f3d_test(NAME TestVersion ARGS --version REGEXP "Version:")
 f3d_test(NAME TestReadersList ARGS --list-readers REGEXP_FAIL "No registered reader found")
 
 # Test invalid component string coverage
-f3d_test(NAME TestInteractionInvalidComponent INTERACTION UI DATA cow.vtp ARGS --coloring-component=1 NO_BASELINE) #H
+f3d_test(NAME TestInteractionInvalidComponent INTERACTION UI DATA cow.vtp ARGS --coloring-component=1 NO_BASELINE) #F1
 
 # Test opening invalid file then switching to another file
-f3d_test(NAME TestInteractionInvalidFile INTERACTION DATA invalid_body.vtp cow.vtp ARGS --loading-progress) #Right
+f3d_test(NAME TestInteractionInvalidFile INTERACTION DATA invalid_body.vtp cow.vtp ARGS --loading-progress) #Down
 
 # Test bindings-list display
 f3d_test(NAME TestBindingsList ARGS --list-bindings REGEXP "Any.5        Orthographic Projection")
@@ -846,16 +889,14 @@ f3d_test(NAME TestHelpPrecedenceWithUnknownOption ARGS --help --unknown REGEXP "
 f3d_test(NAME TestVersionPrecedenceWithUnknownOption ARGS --version --unknown REGEXP "Version:" NO_BASELINE)
 
 # PIPED error code path
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
-  f3d_test(NAME TestPipedForced DATA suzanne.ply ARGS --force-reader=PLYReader --verbose PIPED_READER PLYReader REGEXP "Forcing reader" NO_BASELINE PIPED)
-  f3d_test(NAME TestPipedForcedInvalid DATA suzanne.ply ARGS --force-reader=invalid PIPED_READER invalid REGEXP "is not a valid force reader" NO_BASELINE PIPED)
-  f3d_test(NAME TestPipedForcedInvalidStream DATA beach.nrrd ARGS --force-reader=Nrrd PIPED_READER Nrrd REGEXP "does not support reading streams" NO_BASELINE PIPED)
-endif()
+f3d_test(NAME TestPipedForced DATA suzanne.ply ARGS --force-reader=PLYReader --verbose PIPED_READER PLYReader REGEXP "Forcing reader" NO_BASELINE PIPED)
+f3d_test(NAME TestPipedForcedInvalid DATA suzanne.ply ARGS --force-reader=invalid PIPED_READER invalid REGEXP "is not a valid force reader" NO_BASELINE PIPED)
+f3d_test(NAME TestPipedForcedInvalidStream DATA beach.nrrd ARGS --force-reader=Nrrd PIPED_READER Nrrd REGEXP "does not support reading streams" NO_BASELINE PIPED)
 
 ## Filesystem error code path
 if(NOT WIN32)
   STRING(RANDOM LENGTH 257 ALPHABET "x" _f3d_test_invalid_folder)
-  f3d_test(NAME TestColorMapTooLong DATA dragon.vtu ARGS --colormap-file=${_f3d_test_invalid_folder}/file.ext --scalar-coloring REGEXP "File name too long" NO_BASELINE)
+  f3d_test(NAME TestColorMapTooLong DATA dragon.vtu ARGS --colormap-file=${_f3d_test_invalid_folder}/file.ext --coloring-mode=scivis REGEXP "File name too long" NO_BASELINE)
   f3d_test(NAME TestScreenshotTooLong DATA suzanne.ply ARGS --screenshot-filename=${_f3d_test_invalid_folder}/file.ext --interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/TestScreenshot.log REGEXP "File name too long" NO_BASELINE)
   f3d_test(NAME TestInputTooLong ARGS --input=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE)
   f3d_test(NAME TestReferenceTooLong DATA suzanne.ply ARGS --output=file.png --reference=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE NO_OUTPUT)

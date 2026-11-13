@@ -84,12 +84,18 @@ runs:
         path: "./dependencies/usd"
         ref: ${{steps.usd_ver.outputs.extract}}
 
-    # Upstream issue: https://github.com/PixarAnimationStudios/OpenUSD/issues/2490
+    # Upstream issues/PRs:
+    # - mindep: https://github.com/PixarAnimationStudios/OpenUSD/issues/2490
+    # - cstdint: zipFile.cpp removed in v25.08
+    # - recent compiler: https://github.com/PixarAnimationStudios/OpenUSD/pull/3434
     - name: Patch USD
       if: steps.cache-usd.outputs.cache-hit != 'true' && steps.usd_ver.outputs.extract == 'v24.08'
       working-directory: ${{github.workspace}}/dependencies/usd
       shell: bash
-      run: patch -p1 < $GITHUB_ACTION_PATH/usd-install-bin-mindep.patch
+      run: |
+        patch -p1 < $GITHUB_ACTION_PATH/usd-install-bin-mindep.patch
+        patch -p1 < $GITHUB_ACTION_PATH/usd-missing-cstdint.patch
+        patch -p1 < $GITHUB_ACTION_PATH/usd-recent-compiler-fix.patch
 
     # Upstream issue: https://github.com/PixarAnimationStudios/OpenUSD/issues/2490
     - name: Patch USD

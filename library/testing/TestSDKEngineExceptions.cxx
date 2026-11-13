@@ -30,6 +30,9 @@ int TestSDKEngineExceptions([[maybe_unused]] int argc, [[maybe_unused]] char* ar
   test.expect<f3d::engine::no_window_exception>(
     "create wasm context", []() { std::ignore = f3d::engine::createWasm(); });
 
+  test.expect<f3d::engine::no_window_exception>(
+    "create xr context", []() { std::ignore = f3d::engine::createXR(); });
+
   {
     f3d::engine eng = f3d::engine::createNone();
     test.expect<f3d::engine::no_window_exception>(
@@ -42,6 +45,11 @@ int TestSDKEngineExceptions([[maybe_unused]] int argc, [[maybe_unused]] char* ar
       "set cache path with empty name", [&]() { eng.setCachePath(""); });
     test.expect<f3d::engine::cache_exception>("set cache path with invalid long name",
       [&]() { eng.setCachePath("/" + std::string(257, 'x')); });
+
+    test.expect<f3d::engine::resource_exception>(
+      "set resources path with empty name", [&]() { eng.setResourcesPath(""); });
+    test.expect<f3d::engine::resource_exception>("set resources path with invalid long name",
+      [&]() { eng.setResourcesPath("/" + std::string(257, 'x')); });
 
     // cover operator=(engine&&)
     // test with offscreen window because it works with all backends

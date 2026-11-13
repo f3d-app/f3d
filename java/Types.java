@@ -60,13 +60,14 @@ public class Types {
         public boolean positionalLight = false;
         public double intensity = 1.0;
         public boolean switchState = true;
+        public boolean castShadows = true;
 
         public LightState() {
         }
 
         public LightState(LightType type, double[] position, double[] color,
                          double[] direction, boolean positionalLight,
-                         double intensity, boolean switchState) {
+                         double intensity, boolean switchState, boolean castShadows) {
             this.type = type;
             this.position = position;
             this.color = color;
@@ -74,6 +75,7 @@ public class Types {
             this.positionalLight = positionalLight;
             this.intensity = intensity;
             this.switchState = switchState;
+            this.castShadows = castShadows;
         }
 
         @Override
@@ -87,7 +89,8 @@ public class Types {
                    java.util.Arrays.equals(direction, other.direction) &&
                    positionalLight == other.positionalLight &&
                    intensity == other.intensity &&
-                   switchState == other.switchState;
+                   switchState == other.switchState &&
+                   castShadows == other.castShadows;
         }
     }
 
@@ -104,6 +107,22 @@ public class Types {
         public boolean collapsed = false;
 
         public NodeState() {
+        }
+    }
+
+    /**
+     * Structure describing the contents of the scene.
+     *
+     * numberOfFiles counts every file added with Scene.add as well as every mesh and buffer
+     * added with it.
+     */
+    public static class SceneInfo {
+        public int numberOfFiles = 0;
+        public int numberOfActors = 0;
+        public long numberOfPoints = 0;
+        public long numberOfCells = 0;
+
+        public SceneInfo() {
         }
     }
 

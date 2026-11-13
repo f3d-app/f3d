@@ -357,13 +357,14 @@ struct F3D_EXPORT light_state_t
   bool positionalLight = false;
   double intensity = 1.0;
   bool switchState = true;
+  bool castShadows = true;
 
   [[nodiscard]] bool operator==(const light_state_t& other) const
   {
     return this->type == other.type && this->position == other.position &&
       this->color == other.color && this->direction == other.direction &&
       this->positionalLight == other.positionalLight && this->intensity == other.intensity &&
-      this->switchState == other.switchState;
+      this->switchState == other.switchState && this->castShadows == other.castShadows;
   }
 };
 
@@ -403,6 +404,32 @@ struct node_state_t
     return this->id == other.id && this->parentId == other.parentId && this->level == other.level &&
       this->label == other.label && this->visible == other.visible &&
       this->hasChildren == other.hasChildren && this->collapsed == other.collapsed;
+  }
+};
+
+/**
+ * Describe the contents of the scene, as returned by scene::getSceneInfo.
+ */
+struct scene_info_t
+{
+  /// Number of files in the scene, which counts every file added with scene::add as well as
+  /// every mesh and buffer added with it
+  int numberOfFiles = 0;
+
+  /// Number of actors in the scene
+  int numberOfActors = 0;
+
+  /// Total number of points of all the actors in the scene.
+  std::int64_t numberOfPoints = 0;
+
+  /// Total number of cells of all the actors in the scene.
+  std::int64_t numberOfCells = 0;
+
+  [[nodiscard]] bool operator==(const scene_info_t& other) const
+  {
+    return this->numberOfFiles == other.numberOfFiles &&
+      this->numberOfActors == other.numberOfActors &&
+      this->numberOfPoints == other.numberOfPoints && this->numberOfCells == other.numberOfCells;
   }
 };
 

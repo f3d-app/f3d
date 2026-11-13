@@ -69,6 +69,13 @@ public class Window {
     }
 
     /**
+     * Get the current video frame of the window.
+     *
+     * @return video frame
+     */
+    public native VideoFrame getVideoFrame();
+
+    /**
      * Set the size of the window.
      *
      * @param width window width
@@ -167,6 +174,14 @@ public class Window {
     * @return DPI scale.
     */
     public native double getDPIScale();
+
+    /**
+     * Enable or disable the use of HDRI cache for the window.
+     *
+     * @param useHDRICache true to enable HDRI cache, false to disable
+     * @return this window for method chaining
+     */
+    public native Window setUseHDRICache(boolean useHDRICache);
 
     private long mNativeAddress;
     private Camera mCamera;

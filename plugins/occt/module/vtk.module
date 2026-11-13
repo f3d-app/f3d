@@ -3,8 +3,11 @@ NAME
 DESCRIPTION
   A VTK module for the OCCT plugin
 DEPENDS
+  f3d::vtkext
   VTK::IOCore
+  VTK::IOXMLParser
   VTK::CommonCore
+  VTK::CommonDataModel
   VTK::CommonExecutionModel
   VTK::FiltersGeneral
 TEST_DEPENDS

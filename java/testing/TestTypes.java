@@ -17,6 +17,7 @@ public class TestTypes {
       new double[] { 0.0, 0.0, -1.0 },
       true,
       0.5,
+      false,
       false
     );
     customLight.equals(lightState);

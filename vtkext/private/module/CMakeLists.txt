@@ -28,7 +28,7 @@ list(APPEND sources ${CMAKE_CURRENT_BINARY_DIR}/F3DCheckerBoard.cxx)
 list(APPEND private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DCheckerBoard.h)
 
 if(F3D_MODULE_UI)
-  set(F3D_FONT_FILE "${F3D_SOURCE_DIR}/resources/MonaspaceNeon-Regular.otf" CACHE PATH "Font used in UI widgets")
+  set(F3D_FONT_FILE "${F3D_SOURCE_DIR}/resources/MonaspaceNeonNF-Regular.otf" CACHE PATH "Font used in UI widgets")
   mark_as_advanced(F3D_FONT_FILE)
 
   f3d_embed_file(
@@ -79,6 +79,7 @@ set(classes
   vtkF3DCachedSpecularTexture
   vtkF3DConsoleOutputWindow
   vtkF3DExternalRenderWindow
+  vtkF3DFrameCapture
   vtkF3DGenericImporter
   vtkF3DHexagonalBokehBlurPass
   vtkF3DInteractorEventRecorder
@@ -102,6 +103,7 @@ set(classes
   vtkF3DUserRenderPass
   vtkF3DDisplayDepthRenderPass
   vtkF3DTAAPass
+  vtkF3DPreserveCameraFramebufferPass
   )
 
 if (F3D_MODULE_UI)
@@ -182,7 +184,17 @@ if (MSVC)
   vtk_module_compile_options(f3d::vtkextPrivate PRIVATE /utf-8)
 endif()
 
+# anari
+if (F3D_MODULE_ANARI)
+  vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_ANARI)
+endif ()
+
 # raytracing
 if (F3D_MODULE_RAYTRACING)
   vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_RAYTRACING)
 endif ()
+
+# openxr
+if (F3D_MODULE_OPENXR)
+  vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_OPENXR)
+endif()

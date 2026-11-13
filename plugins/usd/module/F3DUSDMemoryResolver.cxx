@@ -6,41 +6,41 @@
 #include <pxr/usd/ar/inMemoryAsset.h>
 
 // Register the resolver
-namespace pxr
-{
+PXR_NAMESPACE_OPEN_SCOPE
 AR_DEFINE_RESOLVER(F3DUSDMemoryResolver, ArResolver);
-}
+PXR_NAMESPACE_CLOSE_SCOPE
 
 //----------------------------------------------------------------------------
 std::string F3DUSDMemoryResolver::_CreateIdentifier(
-  const std::string& assetPath, const pxr::ArResolvedPath&) const
+  const std::string& assetPath, const PXR_NS::ArResolvedPath&) const
 {
   return assetPath;
 }
 
 //----------------------------------------------------------------------------
 std::string F3DUSDMemoryResolver::_CreateIdentifierForNewAsset(
-  const std::string&, const pxr::ArResolvedPath&) const
+  const std::string&, const PXR_NS::ArResolvedPath&) const
 {
   // unreachable
   return {};
 }
 
 //----------------------------------------------------------------------------
-pxr::ArResolvedPath F3DUSDMemoryResolver::_Resolve(const std::string& assetPath) const
+PXR_NS::ArResolvedPath F3DUSDMemoryResolver::_Resolve(const std::string& assetPath) const
 {
-  return pxr::ArResolvedPath(assetPath);
+  return PXR_NS::ArResolvedPath(assetPath);
 }
 
 //----------------------------------------------------------------------------
-pxr::ArResolvedPath F3DUSDMemoryResolver::_ResolveForNewAsset(const std::string&) const
+PXR_NS::ArResolvedPath F3DUSDMemoryResolver::_ResolveForNewAsset(const std::string&) const
 {
   // unreachable
   return {};
 }
 
 //----------------------------------------------------------------------------
-std::shared_ptr<pxr::ArAsset> F3DUSDMemoryResolver::_OpenAsset(const pxr::ArResolvedPath&) const
+std::shared_ptr<PXR_NS::ArAsset> F3DUSDMemoryResolver::_OpenAsset(
+  const PXR_NS::ArResolvedPath&) const
 {
   vtkResourceStream* stream = _GetCurrentContextObject<F3DUSDMemoryResolverContext>()->Stream;
 
@@ -49,16 +49,16 @@ std::shared_ptr<pxr::ArAsset> F3DUSDMemoryResolver::_OpenAsset(const pxr::ArReso
   const std::size_t size = stream->Tell();
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
 
-  std::shared_ptr<char> buffer(new char[size], std::default_delete<char[]>());
+  const std::shared_ptr<char> buffer(new char[size], std::default_delete<char[]>());
 
   stream->Read(buffer.get(), size);
 
-  return pxr::ArInMemoryAsset::FromBuffer(buffer, size);
+  return PXR_NS::ArInMemoryAsset::FromBuffer(buffer, size);
 }
 
 //----------------------------------------------------------------------------
-std::shared_ptr<pxr::ArWritableAsset> F3DUSDMemoryResolver::_OpenAssetForWrite(
-  const pxr::ArResolvedPath&, WriteMode) const
+std::shared_ptr<PXR_NS::ArWritableAsset> F3DUSDMemoryResolver::_OpenAssetForWrite(
+  const PXR_NS::ArResolvedPath&, WriteMode) const
 {
   // unreachable
   return nullptr;

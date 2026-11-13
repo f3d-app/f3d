@@ -25,12 +25,12 @@ namespace f3d
 class plugin
 {
 public:
-  plugin(const std::string& name, const std::string& desc, const std::string& vers,
-    const std::vector<std::shared_ptr<reader>>& readers)
-    : Name(name)
-    , Description(desc)
-    , Version(vers)
-    , Readers(readers)
+  plugin(std::string name, std::string desc, std::string vers,
+    std::vector<std::shared_ptr<reader>> readers)
+    : Name(std::move(name))
+    , Description(std::move(desc))
+    , Version(std::move(vers))
+    , Readers(std::move(readers))
   {
   }
 

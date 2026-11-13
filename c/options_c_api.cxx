@@ -2,6 +2,7 @@
 #include "log.h"
 #include "options.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstring>
 #include <string>
@@ -15,14 +16,14 @@ f3d_options_t* f3d_options_create()
 }
 
 //----------------------------------------------------------------------------
-void f3d_options_delete(f3d_options_t* options)
+void f3d_options_destroy(f3d_options_t* options)
 {
   if (!options)
   {
     return;
   }
 
-  f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
+  const f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
   delete cpp_options;
 }
 
@@ -285,7 +286,7 @@ void f3d_options_get_as_double_vector(
     const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
     const std::vector<double> vec = std::get<std::vector<double>>(cpp_options->get(name));
     *count = vec.size();
-    std::copy(vec.begin(), vec.end(), values);
+    std::ranges::copy(vec, values);
   }
   catch (f3d::options::inexistent_exception& ex)
   {
@@ -315,7 +316,7 @@ void f3d_options_get_as_int_vector(
     const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
     const std::vector<int> vec = std::get<std::vector<int>>(cpp_options->get(name));
     *count = vec.size();
-    std::copy(vec.begin(), vec.end(), values);
+    std::ranges::copy(vec, values);
   }
   catch (f3d::options::inexistent_exception& ex)
   {
@@ -459,7 +460,7 @@ char** f3d_options_get_names(const f3d_options_t* options, size_t* count)
 }
 
 //----------------------------------------------------------------------------
-void f3d_options_free_names(char** names, size_t count)
+void f3d_options_destroy_names(char** names, size_t count)
 {
   if (!names)
   {
@@ -616,7 +617,7 @@ f3d_domain_style_t f3d_options_get_domain_style(const f3d_options_t* options, co
   try
   {
     const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
-    f3d::options::domain_style ds = cpp_options->getDomainStyle(name);
+    const f3d::options::domain_style ds = cpp_options->getDomainStyle(name);
     switch (ds)
     {
       case f3d::options::domain_style::RANGE:
@@ -637,52 +638,6 @@ f3d_domain_style_t f3d_options_get_domain_style(const f3d_options_t* options, co
   {
     f3d::log::error(ex.what());
     return F3D_DOMAIN_STYLE_NONE;
-  }
-}
-
-//----------------------------------------------------------------------------
-char** f3d_options_get_enum_domain(const f3d_options_t* options, const char* name, int* count)
-{
-  if (!options || !name || !count)
-  {
-    if (count)
-    {
-      *count = 0;
-    }
-    return nullptr;
-  }
-
-  try
-  {
-    const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
-    std::vector<std::string> enumeration = cpp_options->getEnumDomain(name);
-
-    *count = static_cast<int>(enumeration.size());
-    if (enumeration.empty())
-    {
-      return nullptr;
-    }
-
-    char** result = new char*[enumeration.size()];
-
-    for (size_t i = 0; i < enumeration.size(); ++i)
-    {
-      result[i] = new char[enumeration[i].length() + 1];
-      std::strcpy(result[i], enumeration[i].c_str());
-    }
-
-    return result;
-  }
-
-  catch (const f3d::options::incompatible_exception& ex)
-  {
-    f3d::log::error(ex.what());
-    return nullptr;
-  }
-  catch (const f3d::options::inexistent_exception& ex)
-  {
-    f3d::log::error(ex.what());
-    return nullptr;
   }
 }
 
@@ -743,6 +698,93 @@ int f3d_options_get_range_domain_int(const f3d_options_t* options, const char* n
     range[2] = std::get<int>(domain.increment);
     return 1;
   }
+  catch (const f3d::options::incompatible_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return 0;
+  }
+  catch (const f3d::options::inexistent_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return 0;
+  }
+}
+
+//----------------------------------------------------------------------------
+char** f3d_options_get_enum_domain_string(
+  const f3d_options_t* options, const char* name, int* count)
+{
+  if (!options || !name || !count)
+  {
+    if (count)
+    {
+      *count = 0;
+    }
+    return nullptr;
+  }
+
+  try
+  {
+    const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
+    f3d::options::DomainEnum<f3d::option_variant_t> domain = cpp_options->getEnumDomain(name);
+    std::vector<std::string> enumeration(domain.enumeration.size());
+    std::ranges::transform(domain.enumeration, enumeration.begin(),
+      [](const auto& value) { return std::get<std::string>(value); });
+
+    *count = static_cast<int>(enumeration.size());
+    if (enumeration.empty())
+    {
+      return nullptr;
+    }
+
+    char** result = new char*[enumeration.size()];
+
+    for (size_t i = 0; i < enumeration.size(); ++i)
+    {
+      result[i] = new char[enumeration[i].length() + 1];
+      std::strcpy(result[i], enumeration[i].c_str());
+    }
+
+    return result;
+  }
+
+  catch (const f3d::options::incompatible_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return nullptr;
+  }
+  catch (const f3d::options::inexistent_exception& ex)
+  {
+    f3d::log::error(ex.what());
+    return nullptr;
+  }
+}
+
+//----------------------------------------------------------------------------
+int f3d_options_get_index_domain(const f3d_options_t* options, const char* name, unsigned int* max)
+{
+  if (!options || !name || !max)
+  {
+    return 0;
+  }
+
+  try
+  {
+    const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
+    f3d::options::DomainIndex domain = cpp_options->getIndexDomain(name);
+    if (domain.max.has_value())
+    {
+      *max = domain.max.value();
+    }
+    else
+    {
+      // Use a different return code when max value is not set
+      return 2;
+    }
+
+    return 1;
+  }
+
   catch (const f3d::options::incompatible_exception& ex)
   {
     f3d::log::error(ex.what());
@@ -835,7 +877,7 @@ const char* f3d_options_get_as_string_representation(const f3d_options_t* option
   const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
   try
   {
-    std::string str = cpp_options->getAsString(name);
+    const std::string str = cpp_options->getAsString(name);
     char* result = new char[str.length() + 1];
     std::strcpy(result, str.c_str());
     return result;
@@ -877,7 +919,7 @@ void f3d_options_set_as_string_representation(
 }
 
 //----------------------------------------------------------------------------
-void f3d_options_free_string(const char* str)
+void f3d_options_destroy_string(const char* str)
 {
   if (!str)
   {
@@ -888,7 +930,7 @@ void f3d_options_free_string(const char* str)
 }
 
 //----------------------------------------------------------------------------
-void f3d_options_free_string_array(char** array, int count)
+void f3d_options_destroy_string_array(char** array, int count)
 {
   if (!array)
   {
@@ -987,7 +1029,7 @@ const char* f3d_options_parse_string(const char* str)
 
   try
   {
-    std::string result = f3d::options::parse<std::string>(str);
+    const std::string result = f3d::options::parse<std::string>(str);
     char* result_str = new char[result.length() + 1];
     std::strcpy(result_str, result.c_str());
     return result_str;
@@ -1011,7 +1053,7 @@ void f3d_options_parse_double_vector(const char* str, double* values, size_t* co
   {
     std::vector<double> vec = f3d::options::parse<std::vector<double>>(str);
     *count = vec.size();
-    std::copy(vec.begin(), vec.end(), values);
+    std::ranges::copy(vec, values);
   }
   catch (const f3d::options::parsing_exception& ex)
   {
@@ -1032,7 +1074,7 @@ void f3d_options_parse_int_vector(const char* str, int* values, size_t* count)
   {
     std::vector<int> vec = f3d::options::parse<std::vector<int>>(str);
     *count = vec.size();
-    std::copy(vec.begin(), vec.end(), values);
+    std::ranges::copy(vec, values);
   }
   catch (const f3d::options::parsing_exception& ex)
   {
@@ -1044,7 +1086,7 @@ void f3d_options_parse_int_vector(const char* str, int* values, size_t* count)
 //----------------------------------------------------------------------------
 const char* f3d_options_format_bool(int value)
 {
-  std::string result = f3d::options::format(static_cast<bool>(value));
+  const std::string result = f3d::options::format(static_cast<bool>(value));
   char* result_str = new char[result.length() + 1];
   std::strcpy(result_str, result.c_str());
   return result_str;
@@ -1053,7 +1095,7 @@ const char* f3d_options_format_bool(int value)
 //----------------------------------------------------------------------------
 const char* f3d_options_format_int(int value)
 {
-  std::string result = f3d::options::format(value);
+  const std::string result = f3d::options::format(value);
   char* result_str = new char[result.length() + 1];
   std::strcpy(result_str, result.c_str());
   return result_str;
@@ -1062,7 +1104,7 @@ const char* f3d_options_format_int(int value)
 //----------------------------------------------------------------------------
 const char* f3d_options_format_double(double value)
 {
-  std::string result = f3d::options::format(value);
+  const std::string result = f3d::options::format(value);
   char* result_str = new char[result.length() + 1];
   std::strcpy(result_str, result.c_str());
   return result_str;
@@ -1076,7 +1118,7 @@ const char* f3d_options_format_string(const char* value)
     return nullptr;
   }
 
-  std::string result = f3d::options::format(std::string(value));
+  const std::string result = f3d::options::format(std::string(value));
   char* result_str = new char[result.length() + 1];
   std::strcpy(result_str, result.c_str());
   return result_str;
@@ -1090,8 +1132,8 @@ const char* f3d_options_format_double_vector(const double* values, size_t count)
     return nullptr;
   }
 
-  std::vector<double> vec(values, values + count);
-  std::string result = f3d::options::format(vec);
+  const std::vector<double> vec(values, values + count);
+  const std::string result = f3d::options::format(vec);
   char* result_str = new char[result.length() + 1];
   std::strcpy(result_str, result.c_str());
   return result_str;
@@ -1105,8 +1147,8 @@ const char* f3d_options_format_int_vector(const int* values, size_t count)
     return nullptr;
   }
 
-  std::vector<int> vec(values, values + count);
-  std::string result = f3d::options::format(vec);
+  const std::vector<int> vec(values, values + count);
+  const std::string result = f3d::options::format(vec);
   char* result_str = new char[result.length() + 1];
   std::strcpy(result_str, result.c_str());
   return result_str;

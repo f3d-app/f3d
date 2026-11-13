@@ -29,7 +29,7 @@ public:
   /**
    * Get the temporal range
    */
-  [[nodiscard]] virtual std::array<double, 2> getTimeRange() const
+  [[nodiscard]] virtual std::pair<double, double> getTimeRange() const
   {
     return { 0.0, 0.0 };
   }
@@ -40,6 +40,24 @@ public:
   [[nodiscard]] virtual std::string getName() const
   {
     return "";
+  }
+
+  /**
+   * Signal that the buffers need to be updated. This can be used to indicate that the underlying
+   * data has changed and the mesh view should refresh its buffers accordingly.
+   * Usually derived when the time independent buffers have changed.
+   */
+  virtual bool buffersNeedUpdate() const
+  {
+    return false;
+  }
+
+  /**
+   * Notify that the buffers have been updated.
+   * This can be used to determine when the underlying data has been successfully updated.
+   */
+  virtual void buffersUpdated()
+  {
   }
 
   /**

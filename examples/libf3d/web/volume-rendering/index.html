@@ -46,12 +46,6 @@
         flex: 1 1 auto;
         min-width: 0;
       }
-      .viewer canvas {
-        width: 100%;
-        height: 100%;
-        display: block;
-        image-rendering: auto;
-      }
 
       .controls {
         width: 280px;
@@ -99,7 +93,11 @@
 
     <div class="container" id="main">
       <div class="card viewer">
-        <canvas id="canvas"></canvas>
+        <f3d-viewer
+          id="viewer"
+          src="https://f3d.app/data/skull.vti"
+          up="+Z"
+        ></f3d-viewer>
       </div>
       <div class="card controls">
         <div class="ui-section">

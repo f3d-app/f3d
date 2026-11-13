@@ -20,6 +20,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKRenderFinalShader.cxx
      TestSDKScene.cxx
      TestSDKSceneFromBuffer.cxx
+     TestSDKSceneFromBufferSupported.cxx
      TestSDKSceneFromMemory.cxx
      TestSDKStatefile.cxx
      TestSDKStatefileCamera.cxx
@@ -28,12 +29,31 @@ list(APPEND libf3dSDKTests_list
      TestTestSDKHelpers.cxx
 )
 
+if(F3D_MODULE_FFMPEG)
+  list(APPEND libf3dSDKTests_list
+    TestSDKVideo.cxx
+    )
+endif()
+
+# Default HDRI
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001 AND NOT F3D_USE_GLES)
+  list(APPEND libf3dSDKTests_list
+    TestSDKWindowNoCache.cxx
+    )
+endif()
+
+# Shadows
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261016)
+  list(APPEND libf3dSDKTests_list
+    TestSDKSceneLights.cxx
+    )
+endif()
+
 # Tests having UI widgets
 if(F3D_MODULE_UI)
   list(APPEND libf3dSDKTests_list
     TestSDKConsole.cxx
     TestSDKDropZone.cxx
-    TestSDKDropZoneDeprecated.cxx
     TestSDKDropZoneNoLogo.cxx
     TestSDKDropZoneMinSize.cxx
     TestSDKDynamicBackgroundColor.cxx
@@ -71,6 +91,13 @@ endif()
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
   list(APPEND libf3dSDKTests_list
     TestSDKSceneInvalidHeader.cxx
+    TestSDKImageStream.cxx
+    )
+endif()
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20260828)
+  list(APPEND libf3dSDKTests_list
+    TestSDKBindingRepeat.cxx
     )
 endif()
 
@@ -222,6 +249,10 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001 AND NOT F3D_USE_GLES)
     if(NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
       set_tests_properties(libf3d::TestSDKInteractorCallBack PROPERTIES DISABLED ON)
     endif()
+  endif()
+  set_tests_properties(libf3d::TestSDKWindowNoCache PROPERTIES TIMEOUT 120)
+  if(NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
+    set_tests_properties(libf3d::TestSDKWindowNoCache PROPERTIES DISABLED ON)
   endif()
 endif()
 

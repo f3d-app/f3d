@@ -17,7 +17,7 @@ int test_camera()
   if (!window)
   {
     puts("[ERROR] Failed to get window");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return 1;
   }
 
@@ -25,7 +25,7 @@ int test_camera()
   if (!camera)
   {
     puts("[ERROR] Failed to get camera");
-    f3d_engine_delete(engine);
+    f3d_engine_destroy(engine);
     return 1;
   }
 
@@ -76,6 +76,6 @@ int test_camera()
   f3d_camera_reset_to_default(camera);
   f3d_camera_reset_to_bounds(camera, 0.9);
 
-  f3d_engine_delete(engine);
+  f3d_engine_destroy(engine);
   return 0;
 }

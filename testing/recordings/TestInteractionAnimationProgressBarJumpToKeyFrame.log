@@ -1,7 +1,7 @@
 # StreamVersion 1.2
 ExposeEvent 0 299 0 0 0 0 0
 RenderEvent 0 299 0 0 0 0 0
-# Left click on a keyframe marker to jump to that keyframe
+# Left click on a key frame marker to jump to that key frame
 MouseMoveEvent 82 8 0 0 0 0 0
 LeftButtonPressEvent 82 8 0 0 0 0 0
 TimerEvent 82 8 0 0 0 0 0

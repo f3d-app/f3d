@@ -37,7 +37,7 @@ f3d_plugin_declare_reader(
   ${_SUPPORTS_STREAM}
   CAN_READ STATIC
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/usd.inl"
-  OPTIONS resources_path
+  OPTIONS resources_path subdivision_level
 )
 
 set(_additional_rpath "")
@@ -58,3 +58,24 @@ f3d_plugin_build(
   RESOURCES "lib/usd/f3d/resources/plugInfo.json"
   FREEDESKTOP
 )
+
+# When built with emscripten, the default resource path in OpenUSD is /usd in the virtual filesystem
+if(EMSCRIPTEN)
+  target_link_options(f3d-plugin-usd PUBLIC
+    "SHELL:--embed-file=${CMAKE_CURRENT_SOURCE_DIR}/resources/plugInfo.json@/usd/f3d/resources/plugInfo.json"
+  )
+endif()
+
+# When building python wheels, install the USD resource files
+if(SKBUILD)
+  # Get USD root path
+  get_target_property(_first_lib_location ${_first_lib} LOCATION)
+  cmake_path(GET _first_lib_location PARENT_PATH _first_lib_dir)
+  cmake_path(GET _first_lib_dir PARENT_PATH _first_lib_root_dir)
+
+  install(
+    DIRECTORY "${_first_lib_root_dir}/lib/usd"
+    DESTINATION "lib"
+    COMPONENT plugin
+  )
+endif()

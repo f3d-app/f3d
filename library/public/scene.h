@@ -1,6 +1,7 @@
 #ifndef f3d_scene_h
 #define f3d_scene_h
 
+#include "animation.h"
 #include "exception.h"
 #include "export.h"
 #include "mesh_view.h"
@@ -27,13 +28,22 @@ namespace f3d
  *  f3d::engine eng(f3d::window::Type::NATIVE);
  *  f3d::scene& load = eng.getScene();
  *
- *  if (load.supports(path)
+ *  if (load.supports(path) == file_availability::SUPPORTED)
  *  {
  *    load.add(path);
  *  }
  * \endcode
  *
  */
+
+enum class file_availability : unsigned char
+{
+  SUPPORTED = 0,
+  UNSUPPORTED_EXTENSION = 1,
+  UNSUPPORTED_CONTENT = 2,
+  EMPTY_STREAM = 3,
+};
+
 class F3D_EXPORT scene
 {
 public:
@@ -181,61 +191,35 @@ public:
   virtual scene& setNodeVisibility(int nodeId, bool visible) = 0;
 
   /**
-   * Return true if provided file in path uses a supported extension, exists and its content
-   * correspond to a supported file format, false otherwise.
-   * content validation is only performed with VTK >= 9.6.20260228
+   * Return information about the contents of the scene, eg. its number of points and cells.
+   * See types::scene_info_t documentation for more information.
+   * Returns zeroed counters if the scene is empty.
+   */
+  [[nodiscard]] virtual scene_info_t getSceneInfo() const = 0;
+
+  /**
+   * Return enum file_availability which indicates if the file at the specified path has
+   * supported extension, unsupported extension or unsupported content.
+   * content validation is only performed with VTK >= 9.6.20260228.
+   * Setting scene.skip_content_check to true disables content validation.
    * scene.force_reader is taken into account and plugin should be loaded for their readers to be
    * found.
    */
-  [[nodiscard]] virtual bool supports(const std::filesystem::path& filePath) = 0;
+  [[nodiscard]] virtual file_availability supports(const std::filesystem::path& filePath) = 0;
 
   /**
-   * Load added files at provided time value if they contain any animation
-   * Providing a time value outside of the current animation time range will clamp
-   * to the closest value in the range.
-   * Does not do anything if there is no animations.
+   * Return enum file_availability which indicates if the provided buffer is supported.
+   * As a buffer has no extension, this never returns UNSUPPORTED_EXTENSION.
+   * Returns EMPTY_STREAM if buffer is null or size is zero.
+   * scene.force_reader is taken into account and plugin should be loaded for their readers to be
+   * found.
    */
-  virtual scene& loadAnimationTime(double timeValue) = 0;
+  [[nodiscard]] virtual file_availability supports(const std::byte* buffer, std::size_t size) = 0;
 
   /**
-   * Get animation time range of currently added files.
-   * Returns [0, 0] if there is no animations.
+   * Get the animation available on the scene.
    */
-  [[nodiscard]] virtual std::pair<double, double> animationTimeRange() = 0;
-
-  /**
-   * Get animation keyframe's time of currently added files.
-   * Can be used in loadAnimationTime to request a specific keyframe.
-   * Returns empty vector if there is no animations.
-   */
-  [[nodiscard]] virtual std::vector<double> getAnimationKeyFrames() = 0;
-
-  /**
-   * Return the number of animations available in the currently loaded files.
-   */
-  [[nodiscard]] virtual unsigned int availableAnimations() const = 0;
-
-  /**
-   * Return the animation name of a given animation index, if any.
-   *
-   * Specific animation (0..availableAnimations): Returns the name of the animation at that index
-   * Current animation (-1):
-   *   - Returns the name of the current animation
-   *   - Returns "Multi animations" if more than one animation is current
-   *   - Returns "All animations" if all animations are current
-   *   - Returns "No animations" if no animations are current
-   * Fallback: Returns "No animation" for out-of-bounds requests.
-   *
-   * Can be called before initialization safely
-   */
-  [[nodiscard]] virtual std::string getAnimationName(int index = -1) = 0;
-
-  /**
-   * Return all of the animation names, if any.
-   * Returns a vector of length 0 if none.
-   * Can be called before initialization safely
-   */
-  [[nodiscard]] virtual std::vector<std::string> getAnimationNames() = 0;
+  [[nodiscard]] virtual animation& getAnimation() = 0;
 
 protected:
   //! @cond

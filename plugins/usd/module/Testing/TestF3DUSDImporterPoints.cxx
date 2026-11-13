@@ -72,7 +72,7 @@ vtkPolyData* GetPointsPolyData(vtkF3DUSDImporter* importer, vtkIdType expectedPo
 
 int TestF3DUSDImporterPoints(int vtkNotUsed(argc), char* argv[])
 {
-  std::string filename = std::string(argv[1]) + "data/usd_points_rgb.usda";
+  const std::string filename = std::string(argv[1]) + "data/usd_points_rgb.usda";
   vtkNew<vtkF3DUSDImporter> importer;
   importer->SetFileName(filename.c_str());
   importer->Update();

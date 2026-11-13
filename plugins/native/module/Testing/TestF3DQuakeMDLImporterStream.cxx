@@ -12,7 +12,7 @@
 int TestF3DQuakeMDLImporterStream(int vtkNotUsed(argc), char* argv[])
 {
   vtkNew<vtkFileResourceStream> stream;
-  std::string path = std::string(argv[1]) + "data/zombie.mdl";
+  const std::string path = std::string(argv[1]) + "data/zombie.mdl";
   if (!stream->Open(path.c_str()))
   {
     std::cerr << "Cannot open file\n";

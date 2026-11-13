@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "export.h"
 #include "image.h"
+#include "video_frame.h"
 
 /// @cond
 #include <string>
@@ -45,6 +46,7 @@ public:
     EGL,
     OSMESA,
     WASM,
+    XR,
     UNKNOWN
   };
 
@@ -83,6 +85,17 @@ public:
    * Returns the resulting f3d::image.
    */
   [[nodiscard]] virtual image renderToImage(bool noBackground = false) = 0;
+
+  /**
+   * Get the current video frame of the window.
+   * This construct the video frame, allocates and fills the Y and UV planes with the current window
+   * content in the expected layout.
+   * Requires F3D_MODULE_FFMPEG to be enabled.
+   * Throws a video_frame::invalid_frame_exception if F3D_MODULE_FFMPEG is disabled or
+   * if the resolution is not even or positive.
+   * Returns the resulting f3d::video_frame.
+   */
+  [[nodiscard]] virtual std::shared_ptr<video_frame> getVideoFrame() = 0;
 
   /**
    * Set the size of the window.
@@ -145,6 +158,13 @@ public:
    * Convert a point in world coordinate to display coordinate.
    */
   [[nodiscard]] virtual point3_t getDisplayFromWorld(const point3_t& worldPoint) const = 0;
+
+  /**
+   * Set whether to use HDRI caching or not. Enabled by default.
+   * HDRI caching can improve performance by storing precomputed data in cache path.
+   * Use engine::setCachePath for specifying the cache location.
+   */
+  virtual window& setUseHDRICache(bool use) = 0;
 
 protected:
   //! @cond

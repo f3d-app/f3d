@@ -8,31 +8,31 @@ int test_context()
   context = f3d_context_glx();
   if (context)
   {
-    f3d_context_delete(context);
+    f3d_context_destroy(context);
   }
 
   context = f3d_context_wgl();
   if (context)
   {
-    f3d_context_delete(context);
+    f3d_context_destroy(context);
   }
 
   context = f3d_context_cocoa();
   if (context)
   {
-    f3d_context_delete(context);
+    f3d_context_destroy(context);
   }
 
   context = f3d_context_egl();
   if (context)
   {
-    f3d_context_delete(context);
+    f3d_context_destroy(context);
   }
 
   context = f3d_context_osmesa();
   if (context)
   {
-    f3d_context_delete(context);
+    f3d_context_destroy(context);
   }
 
   return 0;

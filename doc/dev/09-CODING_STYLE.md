@@ -1,6 +1,6 @@
-# Coding Style
+# Coding style
 
-F3D use different coding styles in each component, however there are some common rules
+F3D uses different coding styles in each component. However, there are some common rules.
 
 ## C++
 
@@ -11,12 +11,12 @@ Overall syntax:
 - CamelCase.
 - Avoid using `using` for namespaces.
 - Initialize variables in header when possible.
-- Local variables starts with a lower case char.
-- Class members starts with a upper case char.
+- Local variables start with a lower case char.
+- Class members start with an upper case char.
 - Indents are two spaces.
 - One space between instruction and parenthesis.
 - Always add curly brace after instruction.
-- Curly brace one a new line, aligned with instruction.
+- Curly braces on a new line, aligned with instruction.
 - Add `//----------------------------------------------------------------------------` before any method in implementation.
 
 Example:
@@ -37,7 +37,7 @@ Includes:
 - Organized by category: `F3DApplication`, `libf3d`, `VTKExtensions`, `other deps`, `std`, `system`.
 - Sorted inside category.
 
-### F3D Application rules
+### F3D application rules
 
 - Class starts with `F3D`
 - Method starts with an uppercase char.
@@ -45,7 +45,7 @@ Includes:
 ### libf3d rules
 
 - Class starts with a lower case char.
-- Method starts with an lower case char.
+- Method starts with a lower case char.
 
 ### VTKExtensions rules
 
@@ -68,9 +68,9 @@ on the version in use. You may need to fix these manually.
 
 ## Python
 
-All python code is simply formatted using [Black style](https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html).
+All Python code is formatted using [Black style](https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html).
 
-The continuous integration checks the formatting of python code using `black`.
+The continuous integration checks the formatting of Python code using `black`.
 You can fix it locally by running:
 
 - single file: `black /path/to/file.py`
@@ -79,6 +79,7 @@ You can fix it locally by running:
 ## Markdown and others
 
 Markdown, JavaScript, JSON, HTML and YAML files are formatted using [Prettier](https://prettier.io/docs/).
+For documentation prose, use the [documentation style guide](15-DOCUMENTATION_STYLE.md).
 
 The continuous integration checks the formatting of all these files using `prettier`.
 You can fix them locally by running:

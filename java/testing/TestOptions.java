@@ -25,8 +25,8 @@ public class TestOptions {
     options.getAsBool("ui.scalar_bar");
     options.toggle("ui.scalar_bar");
 
-    options.setAsInt("scene.animation.index", 5);
-    options.getAsInt("scene.animation.index");
+    options.setAsInt("model.scivis.component", 5);
+    options.getAsInt("model.scivis.component");
 
     options.setAsDouble("render.line_width", 2.0);
     options.getAsDouble("render.line_width");
@@ -61,9 +61,10 @@ public class TestOptions {
 
     options.hasDomain("scene.camera.index");
     options.getDomainStyle("scene.camera.index");
-    options.getEnumDomain("render.effect.blending.mode");
     options.getRangeDomainAsDouble("render.line_width");
     options.getRangeDomainAsInt("render.raytracing.samples");
+    options.getEnumDomainAsString("render.effect.blending.mode");
+    options.getIndexDomain("scene.camera.index");
     options.increase("render.raytracing.samples");
     options.decrease("render.raytracing.samples");
     options.cycle("render.effect.blending.mode");

@@ -1,0 +1,60 @@
+From 5a6437e44269534bfde0c35cc2c7bdef087b70e8 Mon Sep 17 00:00:00 2001
+From: Dhruv Govil <dgovil2@apple.com>
+Date: Sat, 23 Nov 2024 13:41:57 -0800
+Subject: [PATCH 1/2] An upcoming change in mainline clang will be validating
+ templated code even when the specific path is not taken during compilation.
+
+This fix removes on such unused path from SdfChildrenProxy in the assignment operator where there is no implementation of _Set
+---
+ pxr/usd/sdf/childrenProxy.h | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/pxr/usd/sdf/childrenProxy.h b/pxr/usd/sdf/childrenProxy.h
+index f51552853d7..c28d8f03c2b 100644
+--- a/pxr/usd/sdf/childrenProxy.h
++++ b/pxr/usd/sdf/childrenProxy.h
+@@ -52,13 +52,6 @@ class SdfChildrenProxy {
+             return *_pos;
+         }
+ 
+-        template <class U>
+-        _ValueProxy& operator=(const U& x)
+-        {
+-            _owner->_Set(*_pos, x);
+-            return *this;
+-        }
+-
+         bool operator==(const mapped_type& other) const
+         {
+             return *_pos == other;
+
+From 274cf7c6fe1c121d095acd38dd1a33214e0c8448 Mon Sep 17 00:00:00 2001
+From: Dhruv Govil <dgovil2@apple.com>
+Date: Sat, 23 Nov 2024 14:06:17 -0800
+Subject: [PATCH 2/2] An upcoming change in mainline LLVM is a little stricter
+ about template syntax, causing OpenUSD to fail to compile.
+
+`Sdf_Children<ChildPolicy>::_UpdateChildNames()` includes a template call that was in violation of ISO C standards to compile properly.
+
+ISO C++03 14.2/4:
+
+> When the name of a member template specialization appears after . or -> in a postfix-expression, or after nested-name-specifier in a qualified-id, and the postfix-expression or qualified-id explicitly depends on a template-parameter (14.6.2), the member template name must be prefixed by the keyword template. Otherwise the name is assumed to name a non-template.
+
+Explicitly adding the template keyword resolves this. Unfortunately this also gets tagged as unnecessary by older LLVM versions or other compilers, but c'est la vie.
+---
+ pxr/usd/sdf/children.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pxr/usd/sdf/children.cpp b/pxr/usd/sdf/children.cpp
+index 55eb4a9747b..5370056366b 100644
+--- a/pxr/usd/sdf/children.cpp
++++ b/pxr/usd/sdf/children.cpp
+@@ -190,7 +190,7 @@ Sdf_Children<ChildPolicy>::_UpdateChildNames() const
+     _childNamesValid = true;
+ 
+     if (_layer) {
+-        _childNames = _layer->GetFieldAs<std::vector<FieldType> >(
++        _childNames = _layer->template GetFieldAs<std::vector<FieldType>>(
+             _parentPath, _childrenKey);
+     } else {
+         _childNames.clear();

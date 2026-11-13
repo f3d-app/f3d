@@ -1,6 +1,7 @@
 #ifndef F3D_SCENE_C_API_H
 #define F3D_SCENE_C_API_H
 
+#include "animation_c_api.h"
 #include "export.h"
 #include "types_c_api.h"
 
@@ -45,6 +46,18 @@ extern "C"
   F3D_EXPORT int f3d_scene_add_mesh(f3d_scene_t* scene, const f3d_mesh_t* mesh);
 
   /**
+   * @brief Add a zero-copy in-memory mesh view into the scene.
+   *
+   * Unlike f3d_scene_add_mesh (which copies all arrays into F3D), this keeps references
+   * to the caller-owned arrays described by the memory views, no data is copied.
+   *
+   * @param scene Scene handle.
+   * @param mesh_view Mesh view describing caller-owned arrays.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_scene_add_mesh_view(f3d_scene_t* scene, const f3d_mesh_view_t* mesh_view);
+
+  /**
    * @brief Add and load a memory buffer into the scene.
    *
    * @param scene Scene handle.
@@ -65,7 +78,7 @@ extern "C"
    * @brief Get the list of files currently added to the scene.
    *
    * The returned array and its strings must be freed using
-   * f3d_scene_free_added_files().
+   * f3d_scene_destroy_added_files().
    *
    * @param scene Scene handle.
    * @param count Output pointer that receives the number of files.
@@ -79,7 +92,7 @@ extern "C"
    * @param files Array to free.
    * @param count Number of files in the array.
    */
-  F3D_EXPORT void f3d_scene_free_added_files(char** files, unsigned int count);
+  F3D_EXPORT void f3d_scene_destroy_added_files(char** files, unsigned int count);
 
   /**
    * @brief Add a light based on a light state.
@@ -103,7 +116,7 @@ extern "C"
    * @brief Get the light state at provided index.
    *
    * The returned light_state is heap-allocated and must be freed with
-   * f3d_light_state_free().
+   * f3d_light_state_destroy().
    *
    * @param scene Scene handle.
    * @param index Index of the light.
@@ -145,7 +158,7 @@ extern "C"
    * children.
    *
    * The returned array and the labels it contains must be freed with
-   * f3d_scene_free_scene_hierarchy().
+   * f3d_scene_destroy_scene_hierarchy().
    *
    * @param scene Scene handle.
    * @param count Output pointer that receives the number of nodes.
@@ -160,7 +173,7 @@ extern "C"
    * @param nodes Array to free.
    * @param count Number of nodes in the array.
    */
-  F3D_EXPORT void f3d_scene_free_scene_hierarchy(f3d_node_state_t* nodes, unsigned int count);
+  F3D_EXPORT void f3d_scene_destroy_scene_hierarchy(f3d_node_state_t* nodes, unsigned int count);
 
   /**
    * @brief Set the visibility of a scene hierarchy node and of its whole subtree.
@@ -173,58 +186,45 @@ extern "C"
   F3D_EXPORT int f3d_scene_set_node_visibility(f3d_scene_t* scene, int node_id, int visible);
 
   /**
+   * @brief Get information about the contents of the scene.
+   *
+   * All the counters are zero when the scene is empty.
+   * See f3d_scene_info_t documentation for more information.
+   *
+   * @param scene Scene handle.
+   * @param info Output pointer that receives the scene information.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_scene_get_scene_info(const f3d_scene_t* scene, f3d_scene_info_t* info);
+
+  /**
    * @brief Check if a file path is supported by the scene.
    *
    * @param scene Scene handle.
    * @param file_path File path to check.
-   * @return 1 if supported, 0 otherwise.
+   * @return 0 if supported, 1 for unsupported extension, 2 for unsupported content, -1 if file path
+   * or scene is NULL.
    */
   F3D_EXPORT int f3d_scene_supports(f3d_scene_t* scene, const char* file_path);
 
   /**
-   * @brief Load added files at provided time value if they contain any animation.
+   * @brief Check if a memory buffer is supported by the scene.
    *
    * @param scene Scene handle.
-   * @param time_value Time value to load.
+   * @param buffer Memory buffer containing a file.
+   * @param size Size of the buffer in bytes.
+   * @return 0 if supported, 1 for unsupported extension, 2 for unsupported content, 3 if buffer
+   * is NULL or size is 0, -1 if scene is NULL.
    */
-  F3D_EXPORT void f3d_scene_load_animation_time(f3d_scene_t* scene, double time_value);
+  F3D_EXPORT int f3d_scene_supports_buffer(f3d_scene_t* scene, const void* buffer, size_t size);
 
   /**
-   * @brief Get keyframes times of loaded files
-   *
-   * The returned keyframes is heap-allocated and must be freed with
-   * f3d_scene_free_animation_keyframes().
+   * @brief Get the animation from the scene.
    *
    * @param scene Scene handle.
-   * @param count Pointer to store the count of keyframes
-   * @return Pointer to the array of keyframe time keys
+   * @return Animation handle (not owned by caller).
    */
-  F3D_EXPORT double* f3d_scene_get_animation_keyframes(f3d_scene_t* scene, unsigned int* count);
-
-  /**
-   * @brief Free the animation keyframes array.
-   *
-   * @param keyframes Pointer to the keyframes array to free.
-   */
-  F3D_EXPORT void f3d_scene_free_animation_keyframes(double* keyframes);
-
-  /**
-   * @brief Get animation time range of currently added files.
-   *
-   * @param scene Scene handle.
-   * @param min_time Pointer to store minimum time.
-   * @param max_time Pointer to store maximum time.
-   */
-  F3D_EXPORT void f3d_scene_animation_time_range(
-    f3d_scene_t* scene, double* min_time, double* max_time);
-
-  /**
-   * @brief Return the number of animations available in the currently loaded files.
-   *
-   * @param scene Scene handle.
-   * @return Number of available animations.
-   */
-  F3D_EXPORT unsigned int f3d_scene_available_animations(const f3d_scene_t* scene);
+  F3D_EXPORT f3d_animation_t* f3d_scene_get_animation(f3d_scene_t* scene);
 
 #ifdef __cplusplus
 }

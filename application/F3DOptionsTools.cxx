@@ -10,6 +10,7 @@
 #include "interactor.h"
 #include "log.h"
 #include "utils.h"
+#include "video_encoder.h"
 
 #include <cassert>
 #include <filesystem>
@@ -30,7 +31,7 @@ namespace
  * This is the easiest, compile time way to do it
  */
 constexpr std::array CLIBooleans = { "version", "help", "list-readers", "scan-plugins",
-  "list-rendering-backends", "define", "reset" };
+  "list-rendering-backends", "list-video-encoders", "define", "reset" };
 
 //----------------------------------------------------------------------------
 /**
@@ -55,7 +56,7 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
       "View a unstructured mesh in a typical nice looking sciviz style" },
     { execName + " file.glb -tuqap --hdri-file=file.hdr --hdri-ambient --hdri-skybox",
       "View a gltf file in a realistic environment" },
-    { execName + " file.ply -so --point-size=0 --coloring-component=-2",
+    { execName + " file.ply -o --point-size=0 --coloring-mode=direct",
       "View a point cloud file with direct scalars rendering" },
     { execName + " folder", "View all files in folder" },
   } };
@@ -134,6 +135,22 @@ void PrintRenderingBackendList()
 }
 
 //----------------------------------------------------------------------------
+void PrintVideoEncodersList()
+{
+  auto encoders = f3d::video_encoder::getAvailableEncoders();
+
+  f3d::log::setUseColoring(false);
+  f3d::log::info("Video encoders:");
+  for (const auto& [name, longName] : encoders)
+  {
+    std::string line = name;
+    line += ": ";
+    line += longName;
+    f3d::log::info(line);
+  }
+}
+
+//----------------------------------------------------------------------------
 void PrintReadersList()
 {
   size_t nameColSize = 0;
@@ -144,7 +161,7 @@ void PrintReadersList()
   constexpr std::string_view streamStr = "Supports Stream";
   size_t streamColSize = streamStr.size();
 
-  std::vector<f3d::engine::readerInformation> readersInfo = f3d::engine::getReadersInfo();
+  const std::vector<f3d::engine::readerInformation> readersInfo = f3d::engine::getReadersInfo();
   if (readersInfo.empty())
   {
     f3d::log::warn("No registered reader found!");
@@ -173,7 +190,7 @@ void PrintReadersList()
   plugColSize += colGap;
   streamColSize += colGap;
 
-  std::string separator = std::string(
+  const std::string separator = std::string(
     nameColSize + extsColSize + descColSize + mimeColSize + plugColSize + streamColSize - colGap,
     '-');
 
@@ -215,7 +232,7 @@ std::pair<std::string, int> F3DOptionsTools::GetClosestOption(
   auto checkDistance =
     [](const std::string& key, const std::string& name, std::pair<std::string, int>& ref)
   {
-    int distance = f3d::utils::textDistance(key, name);
+    const int distance = f3d::utils::textDistance(key, name);
     if (distance < ref.second)
     {
       ref = { key, distance };
@@ -226,7 +243,7 @@ std::pair<std::string, int> F3DOptionsTools::GetClosestOption(
   checkDistance("input", option, ret);
 
   // Check true boolean options
-  for (std::string_view key : ::CLIBooleans)
+  for (const std::string_view key : ::CLIBooleans)
   {
     checkDistance(std::string(key), option, ret);
   }
@@ -263,7 +280,8 @@ std::pair<std::string, int> F3DOptionsTools::GetClosestOption(
 F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
   int argc, char** argv, std::vector<std::string>& positionals)
 {
-  std::string execName = argc > 0 && argv[0][0] ? fs::path(argv[0]).filename().string() : "f3d";
+  const std::string execName =
+    argc > 0 && argv[0][0] ? fs::path(argv[0]).filename().string() : "f3d";
 
   // cxxopts values need to live somewhere until parsing is done
   std::vector<std::shared_ptr<cxxopts::Value>> cxxoptsValues;
@@ -306,7 +324,7 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
           // Add the default value to the help text if any
           std::string defaultValue;
           std::string helpText(cliOption.HelpText);
-          std::string longName(cliOption.LongName);
+          const std::string longName(cliOption.LongName);
 
           // Recover default value from app options
           auto appIter = F3DOptionsTools::DefaultAppOptions.find(longName);
@@ -320,8 +338,8 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
             auto libIter = F3DOptionsTools::LibOptionsNames.find(cliOption.LongName);
             if (libIter != F3DOptionsTools::LibOptionsNames.end())
             {
-              f3d::options opt;
-              std::string name = std::string(libIter->second);
+              const f3d::options opt;
+              const std::string name = std::string(libIter->second);
               // let default value empty for unset options
               defaultValue = opt.hasValue(name) ? opt.getAsString(name) : "";
             }
@@ -374,6 +392,11 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       ::PrintRenderingBackendList();
       throw F3DExNoProcess("rendering backend list requested");
     }
+    if (result.count("list-video-encoders") > 0)
+    {
+      ::PrintVideoEncodersList();
+      throw F3DExNoProcess("video encoders list requested");
+    }
     if (result.count("scan-plugins") > 0)
     {
       ::PrintPluginsScan();
@@ -410,7 +433,7 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       foundUnknownOption = true;
 
       // check if it's a long option
-      if (unknownOption.substr(0, 2) == "--")
+      if (unknownOption.starts_with("--"))
       {
         const size_t equalPos = unknownOption.find('=');
 
@@ -445,7 +468,7 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
     // Handle defines and add them as proper options
     for (const std::string& define : defines)
     {
-      std::string::size_type sepIdx = define.find_first_of('=');
+      const std::string::size_type sepIdx = define.find_first_of('=');
       if (sepIdx == std::string::npos)
       {
         f3d::log::warn("Could not parse a define '", define, "'");

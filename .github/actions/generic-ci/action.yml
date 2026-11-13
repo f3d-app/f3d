@@ -91,14 +91,14 @@ runs:
         cpu: ${{inputs.cpu}}
         vtk_version: ${{inputs.vtk_version}}
 
-    # numpy pinned to 2.2.X until python 3.10 support is dropped
     - name: Install Python dependencies
       if: inputs.optdeps_label == 'optdeps'
       shell: bash
       run: |
-        python -m pip install pytest==9.0.3
+        python -m pip install pytest
         python -m pip install pybind11_stubgen
-        python -m pip install "numpy>=2.2.6"
+        python -m pip install typing_extensions
+        python -m pip install numpy
 
     - name: Extract java version
       id: java_ver
@@ -110,7 +110,7 @@ runs:
 
     - name: Setup JDK
       if: inputs.optdeps_label == 'optdeps'
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@v6
       with:
         distribution: "temurin"
         java-version: ${{steps.java_ver.outputs.extract}}
@@ -122,26 +122,6 @@ runs:
         mkdir build
         mkdir install
         mkdir install/output
-
-    - name: Set PATH windows
-      if: runner.os == 'Windows'
-      shell: powershell
-      working-directory: ${{github.workspace}}
-      run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\dependencies\install\lib\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-
-    - name: Set DYLD_LIBRARY_PATH on macOS for OSPRay/OSMesa dynamic loading
-      if: |
-        runner.os == 'macOS' &&
-        inputs.optdeps_label == 'optdeps'
-      shell: bash
-      run: echo "DYLD_LIBRARY_PATH=$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
-
-    - name: Set LD_LIBRARY_PATH on Linux for OSMesa dynamic loading
-      if: |
-        runner.os == 'Linux' &&
-        inputs.optdeps_label == 'optdeps'
-      shell: bash
-      run: echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
 
     # Works around for https://github.com/actions/runner-images/issues/10055
     - name: Remove conflicting libraries for Java bindings on Windows
@@ -181,10 +161,12 @@ runs:
         -DF3D_BINDINGS_PYTHON_GENERATE_STUBS=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_EXCLUDE_DEPRECATED=${{ inputs.exclude_deprecated_label == 'exclude-deprecated' && 'ON' || 'OFF' }}
         -DF3D_LINUX_GENERATE_MAN=ON
-        -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
         -DF3D_MACOS_BUNDLE=${{ inputs.bundle_label == 'bundle' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_ANARI=${{ (inputs.optdeps_label == 'optdeps' && inputs.vtk_version == 'commit') && 'ON' || 'OFF' }}
         -DF3D_MODULE_CLIP=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_EXR=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_FFMPEG=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_MESHOPT=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_WEBP=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_RAYTRACING=${{ (inputs.optdeps_label == 'optdeps' && inputs.gles_label == 'no-gles') && 'ON' || 'OFF' }}
         -DF3D_MODULE_UI=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
@@ -215,6 +197,26 @@ runs:
         -DF3D_WINDOWS_BUILD_CONSOLE_APPLICATION=ON
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0' || null }}
+
+    - name: Set PATH windows
+      if: runner.os == 'Windows'
+      shell: powershell
+      working-directory: ${{github.workspace}}
+      run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\dependencies\install\lib\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+    - name: Set DYLD_LIBRARY_PATH on macOS for OSPRay/OSMesa dynamic loading
+      if: |
+        runner.os == 'macOS' &&
+        inputs.optdeps_label == 'optdeps'
+      shell: bash
+      run: echo "DYLD_LIBRARY_PATH=$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
+
+    - name: Set LD_LIBRARY_PATH on Linux for OSMesa dynamic loading
+      if: |
+        runner.os == 'Linux' &&
+        inputs.optdeps_label == 'optdeps'
+      shell: bash
+      run: echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
 
     - name: Build
       shell: bash
@@ -289,6 +291,17 @@ runs:
       shell: bash
       run: echo "F3D_CTEST_EXCEPTIONS=(test_scene_zero_copy)" >> $GITHUB_ENV
 
+    # Regression in Mesa without VTK workaround
+    # https://gitlab.freedesktop.org/mesa/mesa/-/work_items/15660
+    # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13207
+    - name: Set CI test exception for Linux
+      if: |
+        runner.os == 'Linux' &&
+        inputs.vtk_version != 'commit' &&
+        inputs.rendering_backend != 'osmesa'
+      shell: bash
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestVTICell|TestDefaultConfigFilePipedSTL|TestPipedVTICell|TestDefaultConfigFileVTI|TestDefaultConfigFilePLY|TestDefaultConfigTranslucent|TestScalarsCell|TestRaytracingDefaultConfigFile|TestInteractionCycleCellInvalidIndex|TestInteractionStochasticTAA|TestInteractionAndCLIBlending|TestInteractionConfigFileBindings|TestDefaultConfigFileAlembic|TestDefaultConfigFileDraco|TestDefaultConfigFileExodus|TestDefaultConfigFileVTKHDF|TestDefaultConfigFileWebIFC|TestThumbnailConfigFileWebIFC|TestFCStd|TestFCStdFaceColors|TestFCStdLink|TestFCStdReadWire|TestFCStd1x|TestFCStdTransparency|TestFCStdPartDesign|TestXCAFColors|TestXCAFColorsXBF|TestDefaultConfigFileOCCT|TestThumbnailConfigFileOCCT|TestDefaultConfigFileUSD|TestDefaultConfigFileSBET|TestDefaultConfigFileSLPK|TestInteractionCycleArraysCellsField|TestInteractionCycleArraysSameName)" >> $GITHUB_ENV
+
     # Certain tests are failing on macOS software rendering
     # OSMesa is used for VTK > 9.7.20260706, remove when it's dropped
     - name: Set CI test exception for macOS x86_64
@@ -297,7 +310,7 @@ runs:
         inputs.cpu == 'x86_64' &&
         inputs.rendering_backend == 'auto'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionCycleComp)|(TestGLTFRigArmature)|(TestInteractionNoModelScrollWheel)|(TestInteractionNoModelScrollBar)|(TestInteractionTAA)|(TestInteractionPointCloudTAA)|(TestInteractionStochasticTAA)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestFCStdFaceColors|TestFCStd1x|TestFCStdTransparency|TestFCStdPartDesign)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionCycleComp)|(TestGLTFRigArmature)|(TestInteractionNoModelScrollWheel)|(TestInteractionNoModelScrollBar)|(TestInteractionTAA)|(TestInteractionPointCloudTAA)|(TestInteractionStochasticTAA)|(TestInteractionCycleModeToDirect)" >> $GITHUB_ENV
 
     # Certain tests are failing on macOS software rendering
     # OSMesa is used for VTK > 9.7.20260706, remove when it's dropped
@@ -307,7 +320,7 @@ runs:
         inputs.cpu == 'arm64' &&
         inputs.rendering_backend == 'auto'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheet)|(TestMaxSizeAboveMultiFile)|(TestAxesCustomColor)|(TestInteractionTAA)|(TestInteractionStochasticTAA)|(TestInteractionPointCloudTAA)|(TestSDKNotification)|(TestUnlitOBJOpacity)|(TestInteractionGridReflectionChanged)|(TestUSDRigArmatureWithOpacity)|(TestInteractionTextureCheckerBoardTAA)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestLightRepresentation)|(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestFCStdFaceColors|TestFCStd1x|TestFCStdTransparency|TestFCStdPartDesign)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheet)|(TestMaxSizeAboveMultiFile)|(TestAxesCustomColor)|(TestInteractionTAA)|(TestInteractionStochasticTAA)|(TestInteractionPointCloudTAA)|(TestSDKNotification)|(TestUnlitOBJOpacity)|(TestInteractionGridReflectionChanged)|(TestUSDRigArmatureWithOpacity)|(TestInteractionTextureCheckerBoardTAA)" >> $GITHUB_ENV
 
     - name: Test
       shell: bash
@@ -378,6 +391,20 @@ runs:
       working-directory: ${{github.workspace}}
       run: ctest --test-dir build_examples --no-tests=error -C Release -VV
 
+    # These use pkg-config directly instead of find_package(f3d), so they are built
+    # separately from the other examples with a plain Makefile instead of CMake.
+    - name: Build and run pkg-config examples
+      if: runner.os == 'Linux' && inputs.static_label == 'no-static'
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        export PKG_CONFIG_PATH=$(pwd)/install/lib/pkgconfig
+        export LD_LIBRARY_PATH=$(pwd)/dependencies/install/lib
+        for lang in c cpp; do
+          make -C source/examples/libf3d/$lang/pkgconfig
+          source/examples/libf3d/$lang/pkgconfig/check-engine-pkgconfig
+        done
+
     - name: Install optional component f3d plugins
       shell: bash
       working-directory: ${{github.workspace}}/build
@@ -430,8 +457,7 @@ runs:
 
     - name: Check Install Windows Console Executable
       if: |
-        inputs.vtk_version != 'v9.4.2' && inputs.vtk_version != 'v9.5.2'
-        && runner.os == 'Windows'
+        inputs.vtk_version != 'v9.5.2' && runner.os == 'Windows'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |

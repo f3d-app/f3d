@@ -133,7 +133,7 @@ std::vector<std::string> options::getNames() const
 {
   const std::vector<std::string> names = options::getAllNames();
   std::vector<std::string> setNames;
-  std::copy_if(names.begin(), names.end(), std::back_inserter(setNames),
+  std::ranges::copy_if(names, std::back_inserter(setNames),
     [&](const std::string& name) { return this->hasValue(name); });
   return setNames;
 }
@@ -151,7 +151,7 @@ std::pair<std::string, unsigned int> options::getClosestOption(std::string_view 
 
   for (const auto& name : names)
   {
-    int distance = utils::textDistance(name, option);
+    const int distance = utils::textDistance(name, option);
     if (distance < ret.second)
     {
       ret = { name, distance };
@@ -216,15 +216,21 @@ f3d::options::domain_style options::getDomainStyle(std::string_view name) const
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> options::getEnumDomain(std::string_view name) const
+options::DomainRange<option_variant_t> options::getRangeDomain(std::string_view name) const
+{
+  return options_generated::getRangeDomain(*this, name);
+}
+
+//----------------------------------------------------------------------------
+options::DomainEnum<option_variant_t> options::getEnumDomain(std::string_view name) const
 {
   return options_generated::getEnumDomain(*this, name);
 }
 
 //----------------------------------------------------------------------------
-options::DomainRange<option_variant_t> options::getRangeDomain(std::string_view name) const
+options::DomainIndex options::getIndexDomain(std::string_view name) const
 {
-  return options_generated::getRangeDomain(*this, name);
+  return options_generated::getIndexDomain(*this, name);
 }
 
 //----------------------------------------------------------------------------

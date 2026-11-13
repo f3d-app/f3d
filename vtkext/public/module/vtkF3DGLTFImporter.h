@@ -23,18 +23,34 @@ public:
   static vtkF3DGLTFImporter* New();
   vtkTypeMacro(vtkF3DGLTFImporter, vtkGLTFImporter);
 
+  /**
+   * Return true if, after a quick check of file header, it looks like the provided stream
+   * can be read. Return false if it is sure it cannot be read. The stream version can move the
+   * stream cursor, the filename version calls the stream version.
+   *
+   * This only checks that the metadata of the file can be loaded using the f3d document loader.
+   */
+  static bool CanReadFile(vtkResourceStream* stream);
+
 protected:
   vtkF3DGLTFImporter();
   ~vtkF3DGLTFImporter() override = default;
 
-  // need https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11774
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20241219)
+  /**
+   * Overridden to instantiate our own document loader
+   */
+  void InitializeLoader() override;
+
+  /**
+   * Overridden to process SH arrays
+   */
+  int ImportBegin() override;
+
   /**
    * This method is reimplemented to add information to the actor in order
    * to properly draw armatures on top.
    */
   void ApplyArmatureProperties(vtkActor* actor) override;
-#endif
 
   // need https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13116
   // which is backported in 9.6.2 in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13185

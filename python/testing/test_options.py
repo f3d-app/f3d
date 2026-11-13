@@ -12,7 +12,7 @@ def test_get_type():
 def test_setitem():
     options = f3d.Options()
     options["ui.axis"] = False
-    options["render.background.blur.coc"] = 33.33
+    options["render.background.blur_coc"] = 33.33
     options["scene.animation.speed_factor"] = 3.3
     options["render.raytracing.samples"] = 5
     options["render.grid.color"] = [1.0, 1.0, 1.0]
@@ -34,7 +34,7 @@ def test_getitem():
     options = engine.options
 
     assert options["ui.axis"] is False
-    assert options["render.background.blur.coc"] == 20.0
+    assert options["render.background.blur_coc"] == 20.0
     assert options["scene.animation.speed_factor"] == 1.0
     assert options["render.raytracing.samples"] == 5
     assert options["render.grid.color"] == [0.0, 0.0, 0.0]
@@ -232,16 +232,21 @@ def test_get_domain_style():
     )
 
 
+def test_get_range_domain():
+    options = f3d.Options()
+    assert options.get_range_domain("render.line_width") == (0.0, 10.0, 0.1)
+    assert options.get_range_domain("render.raytracing.samples") == (1, 50, 1)
+
+
 def test_get_enum_domain():
     options = f3d.Options()
     enum = options.get_enum_domain("render.effect.blending.mode")
     assert len(enum) == 5
 
 
-def test_get_range_domain():
+def test_get_index_domain():
     options = f3d.Options()
-    assert options.get_range_domain("render.line_width") == (0.0, 10.0, 0.1)
-    assert options.get_range_domain("render.raytracing.samples") == (1, 50, 1)
+    assert options.get_index_domain("scene.camera.index") is None
 
 
 def test_increase_decrease():

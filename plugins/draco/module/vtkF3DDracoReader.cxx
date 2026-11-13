@@ -46,8 +46,8 @@ public:
 
     for (int i = 0; i < nbPoints; i++)
     {
-      draco::AttributeValueIndex idx = attribute->mapped_index(draco::PointIndex(i));
-      T* p = reinterpret_cast<T*>(attribute->buffer()->data() +
+      const draco::AttributeValueIndex idx = attribute->mapped_index(draco::PointIndex(i));
+      const T* p = reinterpret_cast<T*>(attribute->buffer()->data() +
         attribute->byte_stride() * idx.value() + attribute->byte_offset());
       arr->SetTypedTuple(i, p);
     }
@@ -58,8 +58,8 @@ public:
   template<typename T>
   static void FillPoints(const T& input, vtkPolyData* output)
   {
-    int nbAttr = input->num_attributes();
-    int nbPoints = input->num_points();
+    const int nbAttr = input->num_attributes();
+    const int nbPoints = input->num_points();
 
     for (int i = 0; i < nbAttr; i++)
     {
@@ -139,7 +139,7 @@ public:
 
   static void FillFaces(const std::unique_ptr<draco::Mesh>& mesh, vtkPolyData* output)
   {
-    int nbCells = mesh->num_faces();
+    const int nbCells = mesh->num_faces();
 
     vtkNew<vtkIdTypeArray> offsets;
     vtkNew<vtkIdTypeArray> connectivity;
@@ -193,7 +193,7 @@ int vtkF3DDracoReader::RequestData(
   if (this->Stream)
   {
     this->Stream->Seek(0, vtkResourceStream::SeekDirection::End);
-    size_t length = this->Stream->Tell();
+    const size_t length = this->Stream->Tell();
     this->Stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
 
     // Read stream into buffer

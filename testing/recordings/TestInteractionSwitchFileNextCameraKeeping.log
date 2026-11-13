@@ -20,7 +20,7 @@ EndInteractionEvent 517 294 0 0 0 0 0
 RenderEvent 517 294 0 0 0 0 0
 TimerEvent 517 294 0 0 0 0 0
 
-# Ctrl + Right
+# Ctrl + Down
 KeyPressEvent 517 294 0 0 1 Control_L 0
 CharEvent 517 294 0 0 1 Control_L 0
 TimerEvent 517 294 0 0 1 Control_L 0
@@ -28,10 +28,10 @@ MouseMoveEvent 517 293 2 0 0 Control_L 0
 TimerEvent 517 293 2 0 0 Control_L 0
 MouseMoveEvent 517 292 2 0 0 Control_L 0
 TimerEvent 517 292 2 0 0 Control_L 0
-KeyPressEvent 517 292 2 0 1 Right 0
-CharEvent 517 292 2 0 1 Right 0
-TimerEvent 517 292 2 0 1 Right 0
-KeyReleaseEvent 517 292 2 0 1 Right 0
-TimerEvent 517 292 2 0 1 Right 0
+KeyPressEvent 517 292 2 0 1 Down 0
+CharEvent 517 292 2 0 1 Down 0
+TimerEvent 517 292 2 0 1 Down 0
+KeyReleaseEvent 517 292 2 0 1 Down 0
+TimerEvent 517 292 2 0 1 Down 0
 KeyReleaseEvent 517 292 2 0 1 Control_L 0
 TimerEvent 517 292 2 0 1 Control_L 0

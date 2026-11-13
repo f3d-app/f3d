@@ -52,7 +52,7 @@ void vtkF3DCachedSpecularTexture::Load(vtkRenderer* ren)
 
     vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(reader->GetOutput());
 
-    unsigned int nbLevels = mb->GetNumberOfBlocks();
+    const unsigned int nbLevels = mb->GetNumberOfBlocks();
 
     this->TextureObject->SetMaxLevel(static_cast<int>(nbLevels) - 1);
 
@@ -79,7 +79,7 @@ void vtkF3DCachedSpecularTexture::Load(vtkRenderer* ren)
     for (unsigned int i = 1; i < nbLevels; i++)
     {
       vtkImageData* img = vtkImageData::SafeDownCast(mb->GetBlock(i));
-      int* dims = img->GetDimensions();
+      const int* dims = img->GetDimensions();
 
       for (int j = 0; j < 6; j++)
       {

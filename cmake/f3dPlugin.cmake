@@ -14,7 +14,7 @@ set(_f3dPlugin_dir "${CMAKE_CURRENT_LIST_DIR}")
 f3d_plugin_init()
 ~~~
 
-This initializes the variable used internally to accumulate the reader declarations.
+This initializes the variables used internally to accumulate the reader declarations.
 #]==]
 
 macro(f3d_plugin_init)
@@ -53,7 +53,7 @@ The `NAME` argument is required. The arguments are as follows:
   * `VTK_READER`: The VTK reader class to use.
   * `FORMAT_DESCRIPTION`: The description of the format read by the reader.
   * `SCORE`: The score of the reader (from 0 to 100). Default value is 50.
-  * `SUPPORTS_STREAM`: Flag to indicate that a reader support reading from streams, default is false
+  * `SUPPORTS_STREAM`: Flag to indicate that a reader supports reading from streams, default is false
   * `CAN_READ`: Style of CAN_READ to use, STATIC, MEMBER or CUSTOM. A CAN_READ is required with SUPPORTS_STREAM
   * `EXCLUDE_FROM_THUMBNAILER`: If specified, the reader will not be used for generating thumbnails.
   * `CUSTOM_CODE`: A custom code file containing the implementation of ``applyCustomReader`` function.
@@ -242,7 +242,7 @@ The `NAME` argument is required. The arguments are as follows:
 macro(f3d_plugin_build)
   cmake_parse_arguments(F3D_PLUGIN "FREEDESKTOP;FORCE_STATIC" "NAME;DESCRIPTION;VERSION" "VTK_MODULES;ADDITIONAL_RPATHS;MIMETYPE_XML_FILES;CONFIGURATION_DIRS;RESOURCES" ${ARGN})
 
-  find_package(VTK 9.4.0 REQUIRED COMPONENTS
+  find_package(VTK 9.5.0 REQUIRED COMPONENTS
                CommonCore CommonExecutionModel IOImport
                ${F3D_PLUGIN_VTK_MODULES})
 
@@ -346,7 +346,9 @@ macro(f3d_plugin_build)
   else()
     # In-source plugin path
     set(_f3d_has_application "${F3D_BUILD_APPLICATION}")
-    set(_f3d_include_path "${F3D_SOURCE_DIR}/library/plugin")
+    set(_f3d_include_path "${F3D_SOURCE_DIR}/library/plugin"
+        "${F3D_SOURCE_DIR}/library/public"
+        "${F3D_BINARY_DIR}/library/public")
     set(_f3d_config_dir ${f3d_config_dir})
     set(_f3d_plugins_install_dir ${F3D_PLUGINS_INSTALL_DIR})
   endif()
@@ -378,8 +380,7 @@ macro(f3d_plugin_build)
     install(
       DIRECTORY "${config_dir}"
       DESTINATION "${_f3d_config_dir}"
-      COMPONENT configuration
-      EXCLUDE_FROM_ALL)
+      COMPONENT configuration)
   endforeach()
 
   # Install resource files and copy them into the build directory
@@ -388,7 +389,7 @@ macro(f3d_plugin_build)
     get_filename_component(_resource_dest_dir "${_resource_dest}" DIRECTORY)
     set(_resource_source "${CMAKE_CURRENT_SOURCE_DIR}/resources/${_resource_filename}")
     install(FILES "${_resource_source}"
-      DESTINATION "${_f3d_plugins_install_dir}/${_resource_dest_dir}"
+      DESTINATION "${_resource_dest_dir}"
       COMPONENT plugin)
     configure_file(
       "${_resource_source}"
@@ -401,8 +402,7 @@ macro(f3d_plugin_build)
     foreach(mimetype_xml ${F3D_PLUGIN_MIMETYPE_XML_FILES})
       install(FILES "${mimetype_xml}"
         DESTINATION "share/mime/packages"
-        COMPONENT mimetypes
-        EXCLUDE_FROM_ALL)
+        COMPONENT mimetypes)
     endforeach()
 
     if(F3D_PLUGIN_FREEDESKTOP AND "${_f3d_has_application}")
