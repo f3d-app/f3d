@@ -311,6 +311,18 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     { "nomeans.sog", "Invalid SOG meta.json" },
     { "missingimage.sog", "Cannot read SOG image" },
     { "bands4.sog", "Only degrees 1 through 3 are supported" },
+    { "shortfiles.sog", "Invalid SOG meta.json" },
+    { "badfile.sog", "Invalid SOG meta.json" },
+    { "badmins.sog", "Invalid SOG meta.json" },
+    { "badminvalue.sog", "Invalid SOG meta.json" },
+    { "shortcodebook.sog", "Invalid SOG meta.json" },
+    { "badcodebook.sog", "Invalid SOG meta.json" },
+    { "badshn.sog", "Invalid SOG meta.json" },
+    { "shcount0.sog", "Invalid SOG meta.json" },
+    { "toomany.sog", "SOG count exceeds" },
+    { "badlabel.sog", "Invalid SOG spherical harmonics" },
+    { "badimage.sog", "Cannot read SOG image" },
+    { "badquat.sog", "Invalid SOG quaternion" },
   };
   for (const Failure& failure : failures)
   {
@@ -325,6 +337,25 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     if (!::Reports(failureReader, failure.Error))
     {
       std::cerr << failure.File << "\n";
+      return EXIT_FAILURE;
+    }
+  }
+
+  const char* modes[] = { "mode2.sog", "mode3.sog" };
+  for (const char* mode : modes)
+  {
+    vtkNew<vtkFileResourceStream> modeStream;
+    if (!modeStream->Open((data + mode).c_str()))
+    {
+      std::cerr << "Cannot open " << mode << "\n";
+      return EXIT_FAILURE;
+    }
+    vtkNew<vtkF3DSOGReader> modeReader;
+    modeReader->SetStream(modeStream);
+    modeReader->Update();
+    if (!modeReader->GetOutput() || modeReader->GetOutput()->GetNumberOfPoints() != 3)
+    {
+      std::cerr << mode << " did not load 3 points\n";
       return EXIT_FAILURE;
     }
   }

@@ -3,6 +3,8 @@
 #include "vtkF3DArchiveReader.h"
 #include "vtkF3DWebPReader.h"
 
+#include <vtkCallbackCommand.h>
+#include <vtkCommand.h>
 #include <vtkFileResourceStream.h>
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
@@ -127,6 +129,9 @@ bool ReadImage(vtkF3DArchiveReader* archive, const std::string& name, Image& ima
   webp->SetMemoryBuffer(image.Bytes.data());
   webp->SetMemoryBufferLength(static_cast<vtkIdType>(image.Bytes.size()));
 #endif
+  vtkNew<vtkCallbackCommand> ignoreError;
+  ignoreError->SetCallback([](vtkObject*, unsigned long, void*, void*) {});
+  webp->AddObserver(vtkCommand::ErrorEvent, ignoreError);
   webp->Update();
 
   image.Data = webp->GetOutput();
