@@ -25,6 +25,7 @@
 #include <array>
 #include <cmath>
 #include <cstdint>
+#include <numbers>
 #include <string>
 #include <vector>
 
@@ -141,7 +142,7 @@ bool ReadImage(vtkF3DArchiveReader* archive, const std::string& name, Image& ima
     return false;
   }
 
-  vtkUnsignedCharArray* scalars =
+  const vtkUnsignedCharArray* scalars =
     vtkUnsignedCharArray::SafeDownCast(image.Data->GetPointData()->GetScalars());
   const vtkIdType valueCount = static_cast<vtkIdType>(width) * static_cast<vtkIdType>(height) * 4;
   return scalars && scalars->GetNumberOfComponents() == 4 &&
@@ -208,7 +209,7 @@ bool DecodeQuaternion(const uint8_t* pixel, std::array<float, 4>& rotation)
   }
 
   const auto component = [](uint8_t channel)
-  { return (static_cast<double>(channel) / 255.0 - 0.5) * 2.0 / std::sqrt(2.0); };
+  { return (static_cast<double>(channel) / 255.0 - 0.5) * 2.0 / std::numbers::sqrt2; };
   const double a = component(pixel[0]);
   const double b = component(pixel[1]);
   const double c = component(pixel[2]);

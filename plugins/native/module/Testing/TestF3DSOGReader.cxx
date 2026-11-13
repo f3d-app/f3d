@@ -9,6 +9,7 @@
 #include <vtkPolyData.h>
 #include <vtkTestUtilities.h>
 #include <vtkUnsignedCharArray.h>
+#include <vtkVersion.h>
 
 #include "vtkF3DSOGReader.h"
 
@@ -109,7 +110,8 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     }
   }
 
-  vtkFloatArray* scale = vtkFloatArray::SafeDownCast(output->GetPointData()->GetArray("scale"));
+  const vtkFloatArray* scale =
+    vtkFloatArray::SafeDownCast(output->GetPointData()->GetArray("scale"));
   if (!scale || scale->GetNumberOfComponents() != 3 || scale->GetNumberOfTuples() != 3)
   {
     std::cerr << "Unexpected scale array\n";
@@ -123,7 +125,7 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  vtkFloatArray* rotation =
+  const vtkFloatArray* rotation =
     vtkFloatArray::SafeDownCast(output->GetPointData()->GetArray("rotation"));
   if (!rotation || rotation->GetNumberOfComponents() != 4 || rotation->GetNumberOfTuples() != 3)
   {
@@ -156,13 +158,22 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
 
   vtkNew<vtkF3DSOGReader> shReader;
   shReader->SetStream(stream);
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 0)
   if (!shReader->Update())
   {
     std::cerr << "tiny_sh.sog did not load\n";
     return EXIT_FAILURE;
   }
+#else
+  shReader->Update();
+  if (!shReader->GetOutput() || shReader->GetOutput()->GetNumberOfPoints() != 3)
+  {
+    std::cerr << "tiny_sh.sog did not load\n";
+    return EXIT_FAILURE;
+  }
+#endif
 
-  vtkUnsignedCharArray* sh1m1 =
+  const vtkUnsignedCharArray* sh1m1 =
     vtkUnsignedCharArray::SafeDownCast(shReader->GetOutput()->GetPointData()->GetArray("sh1m1"));
   if (!sh1m1 || sh1m1->GetNumberOfComponents() != 3 || sh1m1->GetNumberOfTuples() != 3)
   {
@@ -237,11 +248,15 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
   versionReader->SetStream(stream);
   versionReader->AddObserver(vtkCommand::ErrorEvent, recordError);
   versionReader->GetExecutive()->AddObserver(vtkCommand::ErrorEvent, ignoreError);
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 0)
   if (versionReader->Update())
   {
     std::cerr << "Unexpected Update success for version 3\n";
     return EXIT_FAILURE;
   }
+#else
+  versionReader->Update();
+#endif
 
   bool reported = false;
   for (const std::string& message : errors)
