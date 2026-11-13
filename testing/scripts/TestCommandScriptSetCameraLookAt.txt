@@ -1,0 +1,2 @@
+set_camera_look_at 10,13,10 0,0,0 -5,17,8
+set_camera_look_at 10,10,10 0,0,0 -1,1,3
