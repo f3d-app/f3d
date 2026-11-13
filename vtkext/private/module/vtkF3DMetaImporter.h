@@ -90,9 +90,11 @@ public:
       this->Actor->vtkProp3D::ShallowCopy(originalActor);
       this->Actor->SetMapper(this->Mapper);
       this->Mapper->InterpolateScalarsBeforeMappingOn();
+      this->OriginalProperty->DeepCopy(originalActor->GetProperty());
     }
     vtkNew<vtkActor> Actor;
     vtkNew<vtkPolyDataMapper> Mapper;
+    vtkNew<vtkProperty> OriginalProperty;
     vtkActor* OriginalActor;
   };
 
