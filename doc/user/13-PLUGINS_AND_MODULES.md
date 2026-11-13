@@ -1,4 +1,6 @@
-# Plugins
+# Plugins and modules
+
+## Plugins
 
 An F3D plugin is an optional component that adds support for one or more file readers.
 If you installed F3D using the binary release, you do not need to load these plugins manually when opening your file.
@@ -27,7 +29,7 @@ multiple plugins in a single comma-separated list, like in the example below:
 ]
 ```
 
-## Supported plugins
+### Supported plugins
 
 F3D supports loading plugins and contains the following plugins:
 `native`, `alembic`, `assimp`, `draco`, `hdf`, `occt`, `pdal`, `usd`, `vdb`, `webifc`.
@@ -38,7 +40,7 @@ See the [supported file formats](02-SUPPORTED_FORMATS.md) page for more details.
 > The `native` plugin is always loaded automatically.
 > If you downloaded the binaries from the release page, you do not need to specify the plugins above manually. F3D loads them automatically.
 
-### Plugin availability per binary
+#### Plugin availability per binary
 
 Not every binary ships every plugin, so a file may open in one binary but not another. This table shows which plugins are available in each official binary. The `native` plugin is always present.
 
@@ -67,3 +69,45 @@ You can also try plugins maintained by the community. If you have created a plug
 
 - **Abaqus**: ODB support by @YangShen398 ([F3D ODB Reader Plugin repository](https://github.com/YangShen398/F3D-ODB-Reader-Plugin))
 - **Davilex**: Davilex file format support ([f3d-davilex repository](https://github.com/Davilex-Reverse-Engineering/f3d-davilex))
+
+## Modules
+
+An F3D module is an optional component that adds a specific feature to the application or the library.
+It usually comes with a dependency on a library or a non-generic VTK module.
+They are enabled when configuring and compiling the project.
+
+### Module list
+
+F3D supports the following modules:
+
+- `ANARI`: Supports experimental Anari renderer, requires VTK `RenderingAnariOpenGL` module.
+- `CLIP`: Supports clipboard operations, required `clip` library (vendored).
+- `DMON`: Supports `--watch` option, requires `dmon` library (vendored).
+- `EXR`: Supports `.exr` images, required `OpenEXR` library.
+- `FFMPEG`: Supports `--output-video` and `f3d::video_*` API.
+- `MESHOPT`: Supports GLTF `meshopt_compression` extension, requires `meshoptimizer` library.
+- `OPENXR`: Supports experimental OpenXR rendering backend, requires VTK `RenderingOpenXR` module.
+- `RAYTRACING`: Supports `--raytracing` option, requires VTK `RenderingRayTracing` module.
+- `TINYFILEDIALOGS`: Supports open/save dialogs, requires `tinyfiledialogs` library (vendored).
+- `UI`: Supports UI widgets, requires `imgui` library (vendored).
+- `WEBP`: Supports `.webp` images, requires `libwebp` library.
+
+Modules are enabled by default for modules with vendored libraries.
+
+#### Module availability per binary
+
+Not every binary ships every module. This table shows which modules are available in each official binary.
+
+| Plugin            | Desktop | Python wheel | npm / WebAssembly | Android |
+| ----------------- | :-----: | :----------: | :---------------: | :-----: |
+| `ANARI`           |   No    |      No      |        No         |   No    |
+| `CLIP`            |   Yes   |     Yes      |        N/A        |   N/A   |
+| `DMON`            |   Yes   |     N/A      |        N/A        |   N/A   |
+| `EXR`             |   Yes   |     Yes      |        Yes        |   Yes   |
+| `FFMPEG`          |   Yes   |     Yes      |        No         |   No    |
+| `MESHOPT`         |   No    |      No      |        Yes        |   No    |
+| `OPENXR`          |   No    |      No      |        No         |   No    |
+| `RAYTRACING`      |   Yes   |      No      |        No         |   No    |
+| `TINYFILEDIALOGS` |   Yes   |     Yes      |        N/A        |   N/A   |
+| `UI`              |   Yes   |     Yes      |        No         |   No    |
+| `WEBP`            |   Yes   |     Yes      |        Yes        |   Yes   |
