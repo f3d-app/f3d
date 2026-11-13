@@ -546,6 +546,7 @@ f3d_test(NAME TestCommandScriptJumpToPreviousKeyFrame SCRIPT DATA soldier_animat
 f3d_test(NAME TestCommandScriptJumpToNextKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress UI)
 f3d_test(NAME TestCommandScriptJumpToFirstKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress UI)
 f3d_test(NAME TestCommandScriptJumpToAbsoluteKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress UI)
+f3d_test(NAME TestCommandScriptZoom SCRIPT DATA dragon.vtu)
 if (VTK_VERSION VERSION_GREATER_EQUAL 9.5.0 AND F3D_PLUGIN_BUILD_ASSIMP AND F3D_ASSIMP_VERSION VERSION_GREATER_EQUAL "6.0.1")
   # TODO: Update this test to NOT use assimp once generic importer supports timesteps properly (issue: https://github.com/f3d-app/f3d/issues/2733)
   f3d_test(NAME TestCommandScriptJumpToAbsoluteKeyFrameMultipleAnimations SCRIPT DATA punch.fbx soldier_animations.mdl ARGS --load-plugins=assimp --multi-file-mode=all --animation-indices=0,2 --animation-progress UI)
