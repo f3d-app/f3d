@@ -2601,7 +2601,7 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 
   bool setBackfaceCulling = false;
   bool backfaceCulling = true;
-  
+
   if (this->BackfaceType != BackfaceCullingType::DEFAULT)
   {
     setBackfaceCulling = true;
