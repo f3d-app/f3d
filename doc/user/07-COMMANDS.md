@@ -44,7 +44,6 @@ eg: `roll_camera 120`.
 `zoom_camera value`: A specific command to zoom the view relatively to current zoom.
 eg: `zoom_camera 2`.
 
-
 `elevation_camera value`: A specific command to tilt the camera up or down, takes an angle in degrees as an argument.
 eg: `elevation_camera 120`.
 
