@@ -1107,6 +1107,31 @@ interactor& interactor_impl::initCommands()
       this->Internals->Window.getCamera().zoom(options::parse<double>(args[0]));
     },
     command_documentation_t{ "zoom_camera value", "apply zoom to view" });
+  
+  this->addCommand(
+    "set_camera_look_at",
+    [&](const std::vector<std::string>& args)
+    {
+      if (this->Internals->Options.interactor.style == "2d")
+      {
+        return;
+      }
+      check_args(args, 3, "set_camera_look_at");
+      const direction_t direction = options::parse<direction_t>(args[0]);
+      const point3_t direction_point = { direction[0], direction[1], direction[2] };
+
+      const direction_t focal_dir = options::parse<direction_t>(args[1]);
+      const point3_t focal_point = { focal_dir[0], focal_dir[1], focal_dir[2] };
+
+      this->Internals->Window.getCamera().setPosition(direction_point);
+      this->Internals->Window.getCamera().setFocalPoint(focal_point);
+      this->Internals->Window.getCamera().setViewUp(options::parse<direction_t>(args[2]));
+
+      this->Internals->Style->SetTemporaryUp(
+        this->Internals->Window.getCamera().getViewUp().data());
+    },
+    command_documentation_t{
+      "set_camera_look_at position focal up", "set camera at given position pointing " });
 
   this->addCommand(
     "jump_to_frame",
