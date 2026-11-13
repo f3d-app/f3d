@@ -1,5 +1,7 @@
 #include "vtkF3DUserRenderPass.h"
 
+#include <vtkCamera.h>
+
 #include "vtkF3DRenderer.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLError.h"
@@ -75,6 +77,8 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Decl",
       "uniform sampler2D source;\n"
       "uniform sampler2D sourceDepth;\n"
+      "uniform vec2 cameraClippingRange;\n"
+      "uniform bool cameraParallelProjection;\n"
       "uniform ivec2 resolution;\n"
       "uniform float time;\n"
       "//VTK::FSQ::Decl");
@@ -97,6 +101,21 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
   {
     vtkErrorMacro("Couldn't build the shader program.");
     return;
+  }
+
+  vtkCamera* camera = r->GetActiveCamera();
+  const double* range = camera->GetClippingRange();
+  const float clippingRange[2] = { static_cast<float>(range[0]), static_cast<float>(range[1]) };
+
+  if (this->QuadHelper->Program->IsUniformUsed("cameraClippingRange"))
+  {
+    this->QuadHelper->Program->SetUniform2f("cameraClippingRange", clippingRange);
+  }
+
+  if (this->QuadHelper->Program->IsUniformUsed("cameraParallelProjection"))
+  {
+    this->QuadHelper->Program->SetUniformi(
+      "cameraParallelProjection", camera->GetParallelProjection());
   }
 
   if (this->QuadHelper->Program->IsUniformUsed("sourceDepth"))
