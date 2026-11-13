@@ -38,6 +38,31 @@ void RecordError(vtkObject*, unsigned long, void* clientData, void* callData)
     static_cast<std::vector<std::string>*>(clientData)->emplace_back(static_cast<char*>(callData));
   }
 }
+
+bool Reports(vtkF3DSOGReader* reader, const char* expected)
+{
+  std::vector<std::string> errors;
+  vtkNew<vtkCallbackCommand> recordError;
+  recordError->SetClientData(&errors);
+  recordError->SetCallback(::RecordError);
+
+  vtkNew<vtkCallbackCommand> ignoreError;
+  ignoreError->SetCallback([](vtkObject*, unsigned long, void*, void*) {});
+
+  reader->AddObserver(vtkCommand::ErrorEvent, recordError);
+  reader->GetExecutive()->AddObserver(vtkCommand::ErrorEvent, ignoreError);
+  reader->Update();
+
+  for (const std::string& message : errors)
+  {
+    if (message.find(expected) != std::string::npos)
+    {
+      return true;
+    }
+  }
+  std::cerr << "Did not report \"" << expected << "\"\n";
+  return false;
+}
 }
 
 int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
@@ -269,6 +294,85 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
   if (!reported)
   {
     std::cerr << "Version 3 did not report that only version 2 is supported\n";
+    return EXIT_FAILURE;
+  }
+
+  struct Failure
+  {
+    const char* File;
+    const char* Error;
+  };
+  const Failure failures[] = {
+    { "notjson.sog", "Invalid SOG meta.json" },
+    { "array.sog", "Invalid SOG meta.json" },
+    { "noversion.sog", "Only version 2 is supported" },
+    { "nocount.sog", "Invalid SOG meta.json" },
+    { "negcount.sog", "Invalid SOG meta.json" },
+    { "nomeans.sog", "Invalid SOG meta.json" },
+    { "missingimage.sog", "Cannot read SOG image" },
+    { "bands4.sog", "Only degrees 1 through 3 are supported" },
+  };
+  for (const Failure& failure : failures)
+  {
+    vtkNew<vtkFileResourceStream> failureStream;
+    if (!failureStream->Open((data + failure.File).c_str()))
+    {
+      std::cerr << "Cannot open " << failure.File << "\n";
+      return EXIT_FAILURE;
+    }
+    vtkNew<vtkF3DSOGReader> failureReader;
+    failureReader->SetStream(failureStream);
+    if (!::Reports(failureReader, failure.Error))
+    {
+      std::cerr << failure.File << "\n";
+      return EXIT_FAILURE;
+    }
+  }
+
+  vtkNew<vtkF3DSOGReader> missingFile;
+  missingFile->SetFileName((data + "does-not-exist.sog").c_str());
+  if (!::Reports(missingFile, "Cannot open SOG file"))
+  {
+    return EXIT_FAILURE;
+  }
+
+  vtkNew<vtkF3DSOGReader> fileReader;
+  fileReader->SetFileName((data + "tiny.sog").c_str());
+  fileReader->Update();
+  if (!fileReader->GetOutput() || !fileReader->GetOutput()->GetPoints() ||
+    fileReader->GetOutput()->GetNumberOfPoints() != 3)
+  {
+    std::cerr << "Unexpected points from tiny.sog file\n";
+    return EXIT_FAILURE;
+  }
+  fileReader->GetOutput()->GetPoints()->GetPoint(gaussian, point);
+  if (!::Near("file position.x", point[0], 1.0) || !::Near("file position.y", point[1], -1.0) ||
+    !::Near("file position.z", point[2], 0.6487338542938232))
+  {
+    return EXIT_FAILURE;
+  }
+
+  if (!stream->Open((data + "f3d.vtp").c_str()))
+  {
+    std::cerr << "Cannot open f3d.vtp\n";
+    return EXIT_FAILURE;
+  }
+  vtkNew<vtkF3DSOGReader> archiveReader;
+  archiveReader->SetStream(stream);
+  if (!::Reports(archiveReader, "Invalid SOG archive"))
+  {
+    return EXIT_FAILURE;
+  }
+
+  if (!stream->Open((data + "cube_gears.3mf").c_str()))
+  {
+    std::cerr << "Cannot open cube_gears.3mf\n";
+    return EXIT_FAILURE;
+  }
+  vtkNew<vtkF3DSOGReader> metaReader;
+  metaReader->SetStream(stream);
+  if (!::Reports(metaReader, "Invalid SOG meta.json"))
+  {
     return EXIT_FAILURE;
   }
 
