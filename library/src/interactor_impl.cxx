@@ -1291,7 +1291,7 @@ interactor& interactor_impl::initCommands()
       const std::vector<int> resolution = options::parse<std::vector<int>>(args[0]);
       this->Internals->Window.setSize(resolution[0],resolution[1]);
     },
-    command_documentation_t{ "set_resolution", "set the image resolution" });
+    command_documentation_t{ "set_resolution", "set a new screen resolution" });
 
   this->addCommand(
     "jump_to_key_frame",
