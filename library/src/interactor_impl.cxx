@@ -1105,8 +1105,6 @@ interactor& interactor_impl::initCommands()
     {
       check_args(args, 1, "zoom_camera");
       this->Internals->Window.getCamera().zoom(options::parse<double>(args[0]));
-      this->Internals->Style->SetTemporaryUp(
-        this->Internals->Window.getCamera().getViewUp().data());
     },
     command_documentation_t{ "zoom_camera value", "apply zoom to view" });
 
