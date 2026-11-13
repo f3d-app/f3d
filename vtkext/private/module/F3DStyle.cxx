@@ -4,6 +4,14 @@
 
 #include <imgui.h>
 
+namespace
+{
+// ~30% opacity, so that regular, highlighted and completion text stay readable when selected.
+// An opaque F3D green would hide completion text, which uses the same color.
+constexpr int SELECTION_ALPHA = 77;
+}
+
+//----------------------------------------------------------------------------
 const inline ImVec4 intToImVec4(int rgb, int alpha = 255)
 {
   return ImVec4{
@@ -14,31 +22,43 @@ const inline ImVec4 intToImVec4(int rgb, int alpha = 255)
   };
 }
 
+//----------------------------------------------------------------------------
 const ImVec4 F3DStyle::imgui::GetErrorColor()
 {
   return intToImVec4(F3DStyle::F3D_RED);
 }
 
+//----------------------------------------------------------------------------
 const ImVec4 F3DStyle::imgui::GetWarningColor()
 {
   return intToImVec4(F3DStyle::F3D_YELLOW);
 }
 
+//----------------------------------------------------------------------------
 const ImVec4 F3DStyle::imgui::GetHighlightColor()
 {
   return intToImVec4(F3DStyle::F3D_BLUE);
 }
 
+//----------------------------------------------------------------------------
+const ImVec4 F3DStyle::imgui::GetSelectionColor()
+{
+  return intToImVec4(F3DStyle::F3D_GREEN, SELECTION_ALPHA);
+}
+
+//----------------------------------------------------------------------------
 const ImVec4 F3DStyle::imgui::GetCompletionColor()
 {
   return intToImVec4(F3DStyle::F3D_GREEN);
 }
 
+//----------------------------------------------------------------------------
 const ImVec4 F3DStyle::imgui::GetMidColor()
 {
   return intToImVec4(F3DStyle::F3D_GREY);
 }
 
+//----------------------------------------------------------------------------
 const ImVec4 F3DStyle::imgui::GetBackgroundColor()
 {
   return intToImVec4(F3DStyle::F3D_BLACK);

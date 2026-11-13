@@ -571,7 +571,7 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   style->Colors[ImGuiCol_ScrollbarGrab] = F3DStyle::imgui::GetMidColor();
   style->Colors[ImGuiCol_ScrollbarGrabHovered] = F3DStyle::imgui::GetHighlightColor();
   style->Colors[ImGuiCol_ScrollbarGrabActive] = F3DStyle::imgui::GetHighlightColor();
-  style->Colors[ImGuiCol_TextSelectedBg] = F3DStyle::imgui::GetHighlightColor();
+  style->Colors[ImGuiCol_TextSelectedBg] = F3DStyle::imgui::GetSelectionColor();
   style->Colors[ImGuiCol_CheckMark] = F3DStyle::imgui::GetHighlightColor();
   style->Colors[ImGuiCol_ResizeGrip] = F3DStyle::imgui::GetMidColor();
   style->Colors[ImGuiCol_ResizeGripHovered] = F3DStyle::imgui::GetHighlightColor();
