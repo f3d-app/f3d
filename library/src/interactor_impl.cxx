@@ -1049,7 +1049,6 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{
       "cycle_animation", "cycle scene.animation.indices option using model information" });
 
-
   const std::vector<std::string> cycleColoringValidArgs = { "mode", "array", "component" };
   this->addCommand(
     "cycle_coloring",
@@ -1295,13 +1294,12 @@ interactor& interactor_impl::initCommands()
         {
           throw std::invalid_argument("wrong number of argument");
         }
-        this->Internals->Window.setSize(resolution[0],resolution[1]);
+        this->Internals->Window.setSize(resolution[0], resolution[1]);
       }
-      catch(const std::exception& e)
+      catch (const std::exception& e)
       {
         throw interactor::invalid_args_exception(
-        std::string("Command: set_resolution arg: wrong argument"));
-
+          std::string("Command: set_resolution arg: wrong argument"));
       }
     },
     command_documentation_t{ "set_resolution", "set a new screen resolution" });
