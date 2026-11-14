@@ -798,6 +798,16 @@ void vtkF3DRenderer::SetGridUnitSquare(const std::optional<double>& unitSquare)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetGridScale(double scale)
+{
+  if (this->GridScale != scale)
+  {
+    this->GridScale = scale;
+    this->GridConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetGridSubdivisions(int subdivisions)
 {
   if (this->GridSubdivisions != subdivisions)
@@ -991,7 +1001,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
              << "]\n\n";
       this->GridInfo = stream.str();
 
-      this->GridMapper->SetFadeDistance(diag);
+      this->GridMapper->SetFadeDistance(diag * this->GridScale);
       this->GridMapper->SetUnitSquare(tmpUnitSquare);
       this->GridMapper->SetSubdivisions(this->GridSubdivisions);
       this->GridMapper->SetLineOpacity(this->GridOpacity);
