@@ -10,5 +10,5 @@ shift
 
 "$f3d_executable" \
     ./examples/demo/meshes/christmas_low-poly_scene/scene.gltf \
-    --final-shader "$(cat ./examples/shaders/background-blur.glsl)" \
+    --final-shader "$(cat ./examples/shaders/depth-fog.glsl)" \
     "$@"
