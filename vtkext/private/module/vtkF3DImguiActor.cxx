@@ -142,6 +142,22 @@ protected:
     bool visible = (this->GetAssembly()->GetAttributeOrDefault(nodeid, "f3d_visible", 1) != 0);
 
     ImGui::PushID(uuid);
+
+    // check if a parent is unchecked
+    int currParent = this->GetAssembly()->GetParent(nodeid);
+    bool parentUnchecked = false;
+    while (currParent != -1)
+    {
+      if (this->GetAssembly()->GetAttributeOrDefault(currParent, "f3d_visible", 1) == 0)
+      {
+        parentUnchecked = true;
+        break;
+      }
+      currParent = this->GetAssembly()->GetParent(currParent);
+    }
+    ImGui::BeginDisabled(
+      parentUnchecked); // if a parent is unchecked the current box become disabled
+
     if (ImGui::Checkbox(vtkF3DMetaImporter::GetNodeLabel(this->GetAssembly(), nodeid), &visible))
     {
       // if the checkbox is toggled, the whole subtree is updated
@@ -150,6 +166,7 @@ protected:
       this->RenderWindow->GetInteractor()->InvokeEvent(
         vtkF3DUserEvents::SceneHierarchyChangedEvent, nullptr);
     }
+    ImGui::EndDisabled();
 
     ImGui::PopID();
     ImGui::PopStyleVar();
