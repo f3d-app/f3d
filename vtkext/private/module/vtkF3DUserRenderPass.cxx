@@ -83,6 +83,28 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
       "uniform float time;\n"
       "//VTK::FSQ::Decl");
 
+    vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Decl",
+      "float readRawDepth(vec2 uv)\n"
+      "{\n"
+      "  return texture(sourceDepth, uv).r;\n"
+      "}\n"
+      "\n"
+      "float readDepth(vec2 uv)\n"
+      "{\n"
+      "  float d = readRawDepth(uv);\n"
+      "  float n = cameraClippingRange.x;\n"
+      "  float f = cameraClippingRange.y;\n"
+      "\n"
+      "  if (cameraParallelProjection)\n"
+      "  {\n"
+      "    return mix(n, f, d);\n"
+      "  }\n"
+      "\n"
+      "  return (n * f) / mix(f, n, d);\n"
+      "}\n"
+      "\n"
+      "//VTK::FSQ::Decl");
+
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Decl", this->UserShader);
 
     // Apply user shader
