@@ -6,6 +6,7 @@ Load a shader file with `--final-shader`:
 | --- | --- |
 | `outline.glsl` | Binary depth contours over the model colors, with area opening and adjustable thickness. |
 | `depth-preview.glsl` | Linear-depth preview, blue at 0 and red at 100 model units. |
+| `depth-test.glsl` | Reference depth sample, blue at 500 and red at 2000 model units. |
 | `outline-depth.glsl` | Previous contour experiment on the grayscale image produced by `--display-depth`. |
 | `depth-fog.glsl` | Fog based on the visible depth range. |
 | `depth-gradient-bw.glsl` | Grayscale depth gradient. |
@@ -40,15 +41,18 @@ Do not use `--display-depth` with `outline.glsl`: keep the normal rendering path
 so both scene color and scene depth are available. Tone mapping and anti-aliasing
 can stay enabled because edge detection samples the separate depth texture.
 
-The shader reads linear depth with the built-in `readDepth` function, for both
-perspective and orthographic cameras. It compares
+The shader follows `depth-test.glsl`: use `readRawDepth(uv)` to identify the
+background, then `readDepth(uv)` for linear camera-space depth. Neither shader
+reimplements depth sampling or linearization.
+Neighbor coordinates are clamped to the depth texture bounds to avoid wrapping
+at screen edges when the model fills the view.
+
+The outline shader compares
 opposite neighbors at a fixed one-pixel spacing to detect changes in depth slope,
 using second differences rather than a first-derivative Sobel filter.
 
 For a projected plane, inverse camera-space depth (`1/z`) varies affinely in
 perspective, while camera-space depth (`z`) varies affinely in orthographic.
-Samples are snapped to depth-texel centers to avoid interpolating across depth
-discontinuities, including when anti-aliasing changes the depth texture size.
 Using the corresponding representation cancels a regular planar slope, including
 at grazing angles. The second differences are normalized by the center value.
 The threshold therefore measures a relative departure from a planar surface,

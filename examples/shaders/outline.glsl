@@ -5,16 +5,11 @@ const int OPENING_MIN_PIXELS = 8;
 const vec3 INK_COLOR = vec3(0.02);
 const bool OUTLINE_ONLY = false;
 
-vec2 depthUV(vec2 uv)
-{
-    ivec2 size = textureSize(sourceDepth, 0);
-    ivec2 coord = clamp(ivec2(floor(uv * vec2(size))), ivec2(0), size - ivec2(1));
-    return (vec2(coord) + 0.5) / vec2(size);
-}
-
 float depthAt(vec2 uv)
 {
-    float depth = readDepth(depthUV(uv));
+    vec2 halfTexel = 0.5 / vec2(textureSize(sourceDepth, 0));
+    float depth = readDepth(clamp(uv, halfTexel, vec2(1.0) - halfTexel));
+    // Keep planar faces contour-free; readDepth already supplies linear camera-space depth.
     return cameraParallelProjection ? depth : 1.0 / depth;
 }
 
@@ -23,9 +18,11 @@ float edgeAt(vec2 uv)
     if (any(lessThan(uv, vec2(0.0))) || any(greaterThanEqual(uv, vec2(1.0))))
         return 0.0;
 
-    float rawDepth = readRawDepth(depthUV(uv));
+    float rawDepth = readRawDepth(uv);
     if (rawDepth >= 1.0)
+    {
         return 0.0;
+    }
 
     vec2 texel = 1.0 / vec2(resolution);
     float center = depthAt(uv);
