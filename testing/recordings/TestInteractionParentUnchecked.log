@@ -1,16 +1,16 @@
 # StreamVersion 1.2
 EnterEvent 182 272 0 0 0 Alt_L 0
 MouseMoveEvent 182 272 0 0 0 Alt_L 0
-KeyPressEvent 188 189 0 104 1 h 0
+KeyPressEvent 188 189 0 104 1 h 0 # open scene hierarchy
 CharEvent 188 189 0 104 1 h 0
 KeyReleaseEvent 188 189 0 104 1 h 0
 MouseMoveEvent 43 252 0 0 0 h 0
-LeftButtonPressEvent 43 252 0 0 0 h 0
+LeftButtonPressEvent 43 252 0 0 0 h 0 # extend hierarchy
 LeftButtonReleaseEvent 43 252 0 0 0 h 0
 MouseMoveEvent 63 256 0 0 0 h 0
-LeftButtonPressEvent 63 256 0 0 0 h 0
+LeftButtonPressEvent 63 256 0 0 0 h 0 # uncheck parent box
 LeftButtonReleaseEvent 63 256 0 0 0 h 0
 NoEvent 63 256 0 0 0 h 0
 MouseMoveEvent 92 231 0 0 0 h 0
-LeftButtonPressEvent 92 232 0 0 0 h 0
+LeftButtonPressEvent 92 232 0 0 0 h 0 # test to check children box
 LeftButtonReleaseEvent 92 232 0 0 0 h 0
