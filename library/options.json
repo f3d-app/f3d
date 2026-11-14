@@ -69,10 +69,7 @@
       "type": "string",
       "domain": {
         "style": "enum",
-        "enum": [
-          "visible",
-          "hidden"
-        ]
+        "enum": ["visible", "hidden"]
       }
     },
     "grid": {
@@ -123,11 +120,7 @@
       "default_value": "opengl",
       "domain": {
         "style": "enum",
-        "enum": [
-          "opengl",
-          "ospray",
-          "anari"
-        ]
+        "enum": ["opengl", "ospray", "anari"]
       }
     },
     "anari_library": {
@@ -187,13 +180,7 @@
           "default_value": "none",
           "domain": {
             "style": "enum",
-            "enum": [
-              "none",
-              "ddp",
-              "sort",
-              "sort_cpu",
-              "stochastic"
-            ]
+            "enum": ["none", "ddp", "sort", "sort_cpu", "stochastic"]
           }
         }
       },
@@ -203,12 +190,7 @@
           "default_value": "none",
           "domain": {
             "style": "enum",
-            "enum": [
-              "none",
-              "fxaa",
-              "ssaa",
-              "taa"
-            ]
+            "enum": ["none", "fxaa", "ssaa", "taa"]
           }
         }
       },
@@ -247,11 +229,7 @@
         "default_value": "disabled",
         "domain": {
           "style": "enum",
-          "enum": [
-            "disabled",
-            "enabled",
-            "blurred"
-          ]
+          "enum": ["disabled", "enabled", "blurred"]
         }
       },
       "blur_coc": {
@@ -401,11 +379,7 @@
       "default_value": "none",
       "domain": {
         "style": "enum",
-        "enum": [
-          "none",
-          "default",
-          "advanced"
-        ]
+        "enum": ["none", "default", "advanced"]
       }
     },
     "animation_progress_color": {
@@ -531,11 +505,7 @@
       "default_value": "material",
       "domain": {
         "style": "enum",
-        "enum": [
-          "material",
-          "scivis",
-          "direct"
-        ]
+        "enum": ["material", "scivis", "direct"]
       }
     },
     "scivis": {
@@ -544,11 +514,7 @@
         "default_value": "any",
         "domain": {
           "style": "enum",
-          "enum": [
-            "any",
-            "points",
-            "cells"
-          ]
+          "enum": ["any", "points", "cells"]
         }
       },
       "discretization": {
@@ -634,12 +600,7 @@
         "default_value": "arrow",
         "domain": {
           "style": "enum",
-          "enum": [
-            "arrow",
-            "cone",
-            "cylinder",
-            "line"
-          ]
+          "enum": ["arrow", "cone", "cylinder", "line"]
         }
       }
     },
@@ -660,11 +621,7 @@
       "default_value": "default",
       "domain": {
         "style": "enum",
-        "enum": [
-          "default",
-          "trackball",
-          "2d"
-        ]
+        "enum": ["default", "trackball", "2d"]
       }
     },
     "invert_zoom": {
