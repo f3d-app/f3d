@@ -1,2 +1,1 @@
 set_resolution 300,800
-set_resolution 300,120,300
