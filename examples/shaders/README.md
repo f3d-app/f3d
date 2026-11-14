@@ -5,7 +5,7 @@ Load a shader file with `--final-shader`:
 | File | Effect |
 | --- | --- |
 | `outline.glsl` | Binary depth contours over the model colors, with area opening and adjustable thickness. |
-| `comics.glsl` | The same contours with depth-driven halftone dots. |
+| `comics.glsl` | The same contours with cel shading and depth-driven halftone dots. |
 | `depth-preview.glsl` | Linear-depth preview, blue at 0 and red at 100 model units. |
 | `depth-test.glsl` | Reference depth sample, blue at 500 and red at 2000 model units. |
 | `depth-fog.glsl` | Fog based on the visible depth range. |
@@ -88,6 +88,24 @@ Both shaders share the contour implementation and these constants:
 | `INK_COLOR` | Line color. |
 | `OUTLINE_ONLY` | Set to `true` for an opaque binary ink-on-white diagnostic view, or `false` to keep the model colors. |
 
+## Cel shading
+
+`comics.glsl` quantizes the rendered RGB luminance into four bands before drawing
+the dots and contours. Scaling the original color preserves its channel ratios
+until clipping. The band midpoints keep the lowest band above black, while pure
+black input stays black. Background pixels and `OUTLINE_ONLY` mode bypass this
+stage; `outline.glsl` is unchanged.
+
+This is a post-processing approximation of cel shading: it quantizes the image
+already rendered by F3D, rather than recomputing lighting from normals. Dark
+materials and shadows both affect the luminance.
+
+| Constant | Effect |
+| --- | --- |
+| `CEL_SHADING_ENABLED` | Enable cel shading. Set to `false` to restore the previous comics rendering. |
+| `CEL_SHADING_LEVELS` | Number of luminance bands, at least 2. Default 4. |
+| `CEL_SHADING_STRENGTH` | Blend between original colors (0) and full banding (1). Default 1. |
+
 ## Depth-driven halftone
 
 Use `comics.glsl` to add dots to the same contours:
@@ -104,12 +122,12 @@ fixed screen-space grid. Their
 number increases as the model gets closer, using normalized inverse camera-space
 depth (`1/z`). A deterministic rank selects
 each grid cell according to its center's depth, so a selected cell contains a
-complete dot. Foreground depth clips dots at the model boundary. RGB values are
-used only for compositing, never for deciding where dots appear.
+complete dot. Foreground depth clips dots at the model boundary. Dot placement
+uses only depth; the separate cel-shading stage processes the rendered RGB.
 
 | Constant | Effect |
 | --- | --- |
-| `HALFTONE_ENABLED` | Enable the depth-driven dots. Set to `false` to restore contours alone. |
+| `HALFTONE_ENABLED` | Enable the depth-driven dots. This toggle does not disable cel shading. |
 | `HALFTONE_CELL_SIZE` | Grid spacing in screen pixels. Default 6. |
 | `HALFTONE_RADIUS` | Fixed dot radius in pixels. Default 1.35. Does not vary with depth. |
 | `HALFTONE_DEPTH_START` | Positive depth in scene units where every grid cell is selected. Default 15. Closer surfaces keep this maximum density. |

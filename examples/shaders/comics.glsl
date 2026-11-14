@@ -1,9 +1,26 @@
 const float DEPTH_THRESHOLD = 0.0205;
-const float OUTLINE_WIDTH = 3.0;
+const float OUTLINE_WIDTH = 2.5;
 const bool OPENING_ENABLED = true;
 const int OPENING_MIN_PIXELS = 8;
 const vec3 INK_COLOR = vec3(0.02);
 const bool OUTLINE_ONLY = false;
+
+const bool CEL_SHADING_ENABLED = true;
+const int CEL_SHADING_LEVELS = 4;
+const float CEL_SHADING_STRENGTH = 1.0;
+
+vec3 celShade(vec3 color)
+{
+    float luminance = dot(color, vec3(0.2126, 0.7152, 0.0722));
+    if (luminance <= 0.000001)
+        return color;
+
+    float levels = float(max(CEL_SHADING_LEVELS, 2));
+    // Midpoint bands avoid turning every dark surface completely black.
+    float band = min((floor(clamp(luminance, 0.0, 1.0) * levels) + 0.5) / levels, 1.0);
+    vec3 shaded = clamp(color * (band / luminance), 0.0, 1.0);
+    return mix(color, shaded, clamp(CEL_SHADING_STRENGTH, 0.0, 1.0));
+}
 
 const bool HALFTONE_ENABLED = true;
 const float HALFTONE_CELL_SIZE = 6.0; // Screen pixels.
@@ -128,6 +145,8 @@ vec4 pixel(vec2 uv)
             edge = openedEdgeAt(uv + vec2(x, y) * texel);
 
     vec3 base = OUTLINE_ONLY ? vec3(1.0) : color.rgb;
+    if (CEL_SHADING_ENABLED && !OUTLINE_ONLY && readRawDepth(uv) < 1.0)
+        base = celShade(base);
     float dots = OUTLINE_ONLY || edge > 0.0 ? 0.0 : halftoneAt(uv);
     base = mix(base, INK_COLOR, dots);
     float alpha = OUTLINE_ONLY || edge > 0.0 || dots > 0.0 ? 1.0 : color.a;
