@@ -9,6 +9,6 @@ f3d_executable="$1"
 shift
 
 "$f3d_executable" \
-    ./examples/demo/meshes/warehouse/scene.gltf \
+    ./examples/demo/meshes/city/scene.gltf \
     --final-shader "$(cat ./examples/shaders/depth-gradient-bw.glsl)" \
     "$@"
