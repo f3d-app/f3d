@@ -84,10 +84,12 @@ protected:
 
 private:
   bool HasSparseMorphing = false;
+#ifndef F3D_USE_GLES
   vtkWeakPointer<vtkIntArray> ValidatedBlendShapeRanges;
   vtkTimeStamp BlendShapeRangesValidationTime;
   vtkIdType ValidatedBlendShapeOffsetCount = -1;
   bool BlendShapeRangesValid = false;
+#endif
   vtkWeakPointer<vtkPolyData> BoundsInput;
   vtkTimeStamp MorphingBoundsTime;
   double MorphingBounds[6];
