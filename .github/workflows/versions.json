@@ -9,7 +9,7 @@
     "libx264 is using git hash because there are no proper releases",
     "mesa is fixed at 25.0.7 because OSMesa has been removed from 25.1.0",
     "sqlite is using a common-superbuild hash as it is not a CMake project",
-    "webifc is fixed at 0.77 until https://github.com/ThatOpen/engine_web-ifc/issues/2309 is fixed.",
+    "webifc is fixed at 0.77 until https://github.com/ThatOpen/engine_web-ifc/issues/2309 and https://github.com/ThatOpen/engine_web-ifc/issues/2396 are fixed.",
     "zlib is fixed at v1.3.1 until https://github.com/madler/zlib/issues/1181 is fixed"
   ],
   "alembic": {
@@ -121,7 +121,7 @@
     "min_version": "v24.08"
   },
   "webifc": {
-    "version": "0.79",
+    "version": "0.77",
     "min_version": "0.75"
   },
   "webp": {
