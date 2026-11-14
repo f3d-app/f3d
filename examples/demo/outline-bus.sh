@@ -9,6 +9,6 @@ f3d_executable="$1"
 shift
 
 "$f3d_executable" \
-    ../saviem_sc_10_renault.glb \
+    ./examples/demo/meshes/saviem_sc_10_renault.glb \
     --final-shader "$(cat ./examples/shaders/outline.glsl)" \
     "$@"
