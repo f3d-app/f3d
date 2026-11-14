@@ -184,6 +184,14 @@ int TestSDKOptionsIO([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test.format<f3d::direction_t>("direction_t", { -0.1, -0.1, +0.1 }, "-XY+Z");
   test.format<f3d::direction_t>("direction_t", { +0.1, -0.1, +0.2 }, "0.1,-0.1,0.2");
 
+  test.parse<f3d::point3_t>("point3_t", "0.0,1.1,2.2", { 0.0, 1.1, 2.2 });
+  test.parse<f3d::point3_t>("point3_t", "0.0, 1.1, 2.2 ", { 0.0, 1.1, 2.2 });
+  test.parse_expect<f3d::point3_t, parsing_exception>(
+    "too many values point3_t", "0.0,1.1,2.2,3.3");
+  test.parse_expect<f3d::point3_t, parsing_exception>("too few values point3_t", "2,3");
+  test.parse_expect<f3d::point3_t, parsing_exception>("non numeric values point3_t", "a,3");
+  test.format<f3d::point3_t>("point3_t", { 0.1, 0.2, 0.3 }, "0.1,0.2,0.3");
+
   test.parse<f3d::colormap_t>("colormap_t", "0,0,0,0,1,1,1,1", { 0, 0, 0, 0, 1, 1, 1, 1 });
   test.parse<f3d::colormap_t>(
     "colormap_t", "  -0.0,   0,   0   , 0.0,1,1.0  ,1,  1.0 ", { 0, 0, 0, 0, 1, 1, 1, 1 });
