@@ -1,0 +1,8 @@
+Model Information:
+* title:	Warehouse
+* source:	https://sketchfab.com/3d-models/warehouse-9872e067f06b4c4d88dc3bc36deac6c8
+* author:	Pasha (https://sketchfab.com/Pasha.)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works
