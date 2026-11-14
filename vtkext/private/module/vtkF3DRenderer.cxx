@@ -1001,8 +1001,8 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
              << "]\n\n";
       this->GridInfo = stream.str();
 
-      this->GridMapper->SetFadeDistance(diag * this->GridScale);
-      this->GridMapper->SetUnitSquare(tmpUnitSquare);
+      this->GridMapper->SetFadeDistance(diag);
+      this->GridMapper->SetUnitSquare(tmpUnitSquare * this->GridScale);
       this->GridMapper->SetSubdivisions(this->GridSubdivisions);
       this->GridMapper->SetLineOpacity(this->GridOpacity);
       this->GridMapper->SetReflectionStrength(this->GridReflection);
