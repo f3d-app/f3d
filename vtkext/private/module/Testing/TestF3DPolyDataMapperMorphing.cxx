@@ -1,3 +1,5 @@
+#include "F3DSparseMorphingTestUtilities.h"
+
 #include "vtkF3DPolyDataMapper.h"
 #include "vtkF3DSparseMorphing.h"
 
@@ -31,6 +33,11 @@ public:
   }
   using vtkF3DPolyDataMapper::UpdateMorphingBuffers;
 
+  bool MakeOffsetsBufferIncompatible()
+  {
+    return this->BlendShapeOffsets->GenerateBuffer(vtkOpenGLBufferObject::ElementArrayBuffer);
+  }
+
   bool Check(float expected)
   {
     float offset[4], weight;
@@ -46,9 +53,9 @@ int TestF3DPolyDataMapperMorphing(int, char*[])
   vtkNew<vtkRenderWindow> window;
   window->OffScreenRenderingOn();
   window->Start();
-  if (!vtkShader::IsComputeShaderSupported())
+  if (!F3DTest::SupportsSparseMorphing(window))
   {
-    std::cout << "OpenGL 4.3 is unavailable; skipping morphing buffer test\n";
+    std::cout << "Sparse morphing is unavailable; skipping morphing buffer test\n";
     return EXIT_SUCCESS;
   }
 
@@ -69,6 +76,14 @@ int TestF3DPolyDataMapperMorphing(int, char*[])
   weights->InsertNextValue(0.f);
   polydata->GetFieldData()->AddArray(weights);
 
+  // Exercise an actual VTK upload refusal without exhausting GPU memory.
+  if (!mapper->MakeOffsetsBufferIncompatible() || mapper->UpdateMorphingBuffers(polydata))
+  {
+    std::cerr << "An incompatible OpenGL buffer was accepted for morphing\n";
+    return EXIT_FAILURE;
+  }
+  mapper->ReleaseGraphicsResources(window);
+
   vtkNew<vtkPoints> point;
   point->InsertNextPoint(0., 0., 0.);
   polydata->SetPoints(point);
@@ -88,6 +103,45 @@ int TestF3DPolyDataMapperMorphing(int, char*[])
     return EXIT_FAILURE;
   }
 
+  const vtkMTimeType preparedTime = mapper->GetMTime();
+  if (!mapper->PrepareSparseMorphing(vtkOpenGLRenderWindow::SafeDownCast(window), polydata) ||
+    mapper->GetMTime() != preparedTime)
+  {
+    std::cerr << "Unchanged sparse data invalidated the mapper\n";
+    return EXIT_FAILURE;
+  }
+
+  // Unsupported contexts and missing geometry must disable GPU morphing safely.
+  if (mapper->PrepareSparseMorphing(nullptr, polydata) || mapper->GetHasSparseMorphing() ||
+    mapper->PrepareSparseMorphing(vtkOpenGLRenderWindow::SafeDownCast(window), nullptr) ||
+    !mapper->PrepareSparseMorphing(vtkOpenGLRenderWindow::SafeDownCast(window), polydata))
+  {
+    return EXIT_FAILURE;
+  }
+
+  // An inverted interval is invalid even when both endpoints are in the buffer.
+  vertexRange->SetTuple2(0, 1, 0);
+  vertexRange->Modified();
+  if (mapper->PrepareSparseMorphing(vtkOpenGLRenderWindow::SafeDownCast(window), polydata))
+  {
+    std::cerr << "Inverted sparse interval enabled GPU morphing\n";
+    return EXIT_FAILURE;
+  }
+  vertexRange->SetTuple2(0, 0, 1);
+  vertexRange->Modified();
+
+  vtkNew<vtkIntArray> replacementRange;
+  replacementRange->SetName("blendShapeRanges");
+  replacementRange->SetNumberOfComponents(2);
+  replacementRange->InsertNextTuple2(1, 0);
+  polydata->GetPointData()->AddArray(replacementRange);
+  if (mapper->PrepareSparseMorphing(vtkOpenGLRenderWindow::SafeDownCast(window), polydata))
+  {
+    std::cerr << "Replacing ranges retained cached validation\n";
+    return EXIT_FAILURE;
+  }
+  polydata->GetPointData()->AddArray(vertexRange);
+
   for (const int invalidEnd : { -1, 2, 16777217 })
   {
     vertexRange->SetComponent(0, 1, invalidEnd);
@@ -100,6 +154,60 @@ int TestF3DPolyDataMapperMorphing(int, char*[])
     }
   }
   vertexRange->SetComponent(0, 1, 1);
+  vertexRange->Modified();
+  if (!mapper->PrepareSparseMorphing(vtkOpenGLRenderWindow::SafeDownCast(window), polydata))
+  {
+    return EXIT_FAILURE;
+  }
+
+  // The range-validation cache must also follow changes in offset count.
+  offsets->InsertNextTuple4(0., 0.1, 0., 0.);
+  offsets->Modified();
+  vertexRange->SetTuple2(0, 0, 2);
+  vertexRange->Modified();
+  if (!mapper->PrepareSparseMorphing(vtkOpenGLRenderWindow::SafeDownCast(window), polydata))
+  {
+    return EXIT_FAILURE;
+  }
+  offsets->SetNumberOfTuples(1);
+  offsets->Modified();
+  if (mapper->PrepareSparseMorphing(vtkOpenGLRenderWindow::SafeDownCast(window), polydata))
+  {
+    std::cerr << "Shrinking offsets retained cached range validation\n";
+    return EXIT_FAILURE;
+  }
+  offsets->InsertNextTuple4(0., 0.1, 0., 0.);
+  offsets->Modified();
+  if (!mapper->PrepareSparseMorphing(vtkOpenGLRenderWindow::SafeDownCast(window), polydata))
+  {
+    return EXIT_FAILURE;
+  }
+  offsets->SetNumberOfTuples(1);
+  offsets->Modified();
+  vertexRange->SetTuple2(0, 0, 1);
+  vertexRange->Modified();
+
+  // A topology update must not enable GPU morphing until all point arrays agree.
+  point->InsertNextPoint(1., 0., 0.);
+  point->Modified();
+  if (mapper->PrepareSparseMorphing(vtkOpenGLRenderWindow::SafeDownCast(window), polydata))
+  {
+    std::cerr << "Mismatched point arrays enabled GPU morphing\n";
+    return EXIT_FAILURE;
+  }
+  bindPosition->InsertNextTuple3(1., 0., 0.);
+  bindPosition->Modified();
+  vertexRange->InsertNextTuple2(0, 1);
+  vertexRange->Modified();
+  if (!mapper->PrepareSparseMorphing(vtkOpenGLRenderWindow::SafeDownCast(window), polydata))
+  {
+    return EXIT_FAILURE;
+  }
+  point->SetNumberOfPoints(1);
+  point->Modified();
+  bindPosition->SetNumberOfTuples(1);
+  bindPosition->Modified();
+  vertexRange->SetNumberOfTuples(1);
   vertexRange->Modified();
   if (!mapper->PrepareSparseMorphing(vtkOpenGLRenderWindow::SafeDownCast(window), polydata))
   {

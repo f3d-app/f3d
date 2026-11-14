@@ -361,6 +361,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     vtkNew<vtkCameraPass> camP;
     camP->SetDelegatePass(sequence);
 
+    // NOLINTNEXTLINE(misc-const-correctness) reassigned below when VTK supports shadows
     vtkSmartPointer<vtkRenderPass> mainSequencePass = camP;
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)

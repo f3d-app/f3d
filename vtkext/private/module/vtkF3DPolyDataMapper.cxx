@@ -37,11 +37,11 @@ vtkStandardNewMacro(vtkF3DPolyDataMapper);
 //-----------------------------------------------------------------------------
 double* vtkF3DPolyDataMapper::GetBounds()
 {
-  double* bounds = this->Superclass::GetBounds();
+  this->Superclass::GetBounds();
   auto* data = this->GetInput();
-  if (!data || !this->HasSparseMorphing)
+  if (!data)
   {
-    return bounds;
+    return this->Bounds;
   }
   auto* ranges = vtkIntArray::SafeDownCast(data->GetPointData()->GetArray("blendShapeRanges"));
   auto* positions =
@@ -54,7 +54,7 @@ double* vtkF3DPolyDataMapper::GetBounds()
     ranges->GetNumberOfTuples() != data->GetNumberOfPoints() ||
     positions->GetNumberOfTuples() != data->GetNumberOfPoints())
   {
-    return bounds;
+    return this->Bounds;
   }
   const vtkMTimeType modified = std::max({ data->GetMTime(), ranges->GetMTime(),
     positions->GetMTime(), offsets->GetMTime(), weights->GetMTime() });
@@ -69,7 +69,7 @@ double* vtkF3DPolyDataMapper::GetBounds()
     ranges->GetTypedTuple(i, range);
     if (range[0] < 0 || range[1] < range[0] || range[1] > offsets->GetNumberOfTuples())
     {
-      return bounds;
+      return this->Bounds;
     }
     double point[3];
     positions->GetTuple(i, point);
@@ -80,7 +80,7 @@ double* vtkF3DPolyDataMapper::GetBounds()
       if (!std::isfinite(offset[3]) || offset[3] < 0 || offset[3] >= weights->GetNumberOfValues() ||
         std::floor(offset[3]) != offset[3])
       {
-        return bounds;
+        return this->Bounds;
       }
       const double weight = weights->GetValue(static_cast<vtkIdType>(offset[3]));
       for (int component = 0; component < 3; ++component)
@@ -102,8 +102,11 @@ bool vtkF3DPolyDataMapper::PrepareSparseMorphing(
 {
   bool enabled = false;
 #ifndef F3D_USE_GLES
-  int major, minor;
-  window->GetOpenGLVersion(major, minor);
+  int major = 0, minor = 0;
+  if (window && polydata)
+  {
+    window->GetOpenGLVersion(major, minor);
+  }
   if (major > 4 || (major == 4 && minor >= 3))
   {
     int blocks = 0;
@@ -118,12 +121,28 @@ bool vtkF3DPolyDataMapper::PrepareSparseMorphing(
     bool validRanges = false;
     if (ranges && ranges->GetNumberOfComponents() == 2 && ranges->GetNumberOfTuples() && offsets)
     {
-      double begin[2], end[2];
-      ranges->GetRange(begin, 0);
-      ranges->GetRange(end, 1);
-      // Attributes are converted to floats by VTK; integers above 2^24 can round.
-      const double limit = std::min<double>(offsets->GetNumberOfTuples(), 16777216.);
-      validRanges = begin[0] >= 0. && end[0] >= 0. && begin[1] <= limit && end[1] <= limit;
+      const vtkIdType offsetCount = offsets->GetNumberOfTuples();
+      if (this->ValidatedBlendShapeRanges != ranges ||
+        ranges->GetMTime() > this->BlendShapeRangesValidationTime ||
+        this->ValidatedBlendShapeOffsetCount != offsetCount)
+      {
+        // Attributes become floats in VTK, so indices above 2^24 can round.
+        const vtkIdType limit = std::min<vtkIdType>(offsetCount, 16777216);
+        this->BlendShapeRangesValid = true;
+        const int* values = ranges->GetPointer(0);
+        for (vtkIdType i = 0; i < ranges->GetNumberOfTuples(); ++i)
+        {
+          if (values[2 * i] < 0 || values[2 * i + 1] < values[2 * i] || values[2 * i + 1] > limit)
+          {
+            this->BlendShapeRangesValid = false;
+            break;
+          }
+        }
+        this->ValidatedBlendShapeRanges = ranges;
+        this->ValidatedBlendShapeOffsetCount = offsetCount;
+        this->BlendShapeRangesValidationTime.Modified();
+      }
+      validRanges = this->BlendShapeRangesValid;
     }
     // Leave room for the optional skinning SSBO as well.
     enabled = blocks >= 3 && positions && weights && offsets && validRanges &&
@@ -135,12 +154,13 @@ bool vtkF3DPolyDataMapper::PrepareSparseMorphing(
       this->UpdateMorphingBuffers(polydata);
   }
 #endif
+  const bool newlyEnabled = enabled && !this->HasSparseMorphing;
   if (enabled != this->HasSparseMorphing)
   {
     this->HasSparseMorphing = enabled;
     this->Modified();
   }
-  if (enabled)
+  if (newlyEnabled)
   {
     this->MapDataArrayToVertexAttribute("blendShapeBindPositions", "blendShapeBindPositions",
       vtkDataObject::FIELD_ASSOCIATION_POINTS);

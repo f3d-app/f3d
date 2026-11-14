@@ -2,6 +2,8 @@
 
 #include <vtkActor.h>
 #include <vtkActorCollection.h>
+#include <vtkCallbackCommand.h>
+#include <vtkCommand.h>
 #include <vtkFieldData.h>
 #include <vtkFloatArray.h>
 #include <vtkIdTypeArray.h>
@@ -183,6 +185,25 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
         return EXIT_FAILURE;
       }
     }
+    if (sourceIds)
+    {
+      const vtkIdType originalSource = sourceIds->GetValue(0);
+      sourceIds->SetValue(0, -1);
+      sourceIds->Modified();
+      polydata->GetPoints()->SetPoint(0, 100., 100., 100.);
+      polydata->GetPoints()->Modified();
+      if (!importer->UpdateAtTimeValue(12.5 / 24.) || polydata->GetPoint(0)[0] != 100.)
+      {
+        std::cerr << "Invalid source ID accessed blend shape positions\n";
+        return EXIT_FAILURE;
+      }
+      sourceIds->SetValue(0, originalSource);
+      sourceIds->Modified();
+      if (!importer->UpdateAtTimeValue(12.5 / 24.) || !CheckPackedDeformation(polydata))
+      {
+        return EXIT_FAILURE;
+      }
+    }
   }
 
   vtkNew<vtkF3DUSDImporter> importer;
@@ -314,6 +335,138 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
       }
       sharedWeights = weights;
     }
+  }
+  // Time-sampled base points must remain animated alongside blend shape weights.
+  vtkNew<vtkF3DUSDImporter> animatedImporter;
+  const std::string animatedFile =
+    std::string(argv[1]) + "data/SimpleBlendShapesAnimatedPoints.usda";
+  animatedImporter->SetFileName(animatedFile.c_str());
+  animatedImporter->Update();
+  for (const bool gpu : { false, true, false })
+  {
+    animatedImporter->SetUseGPUMorphing(gpu);
+    for (const double frame : { 1., 24., 48., 1. })
+    {
+      if (!animatedImporter->UpdateAtTimeValue(frame / 24.))
+      {
+        return EXIT_FAILURE;
+      }
+      auto* actor = animatedImporter->GetRenderer()->GetActors()->GetLastActor();
+      auto* data = vtkPolyDataMapper::SafeDownCast(actor->GetMapper())->GetInput();
+      const double shift = frame == 1. ? 0. : (frame == 24. ? 1. : 2.);
+      const double expectedY = -0.5 + (!gpu && frame == 24. ? 0.2 : 0.);
+      auto* bind =
+        vtkFloatArray::SafeDownCast(data->GetPointData()->GetArray("blendShapeBindPositions"));
+      if (!bind || std::abs(bind->GetComponent(0, 0) - (-0.5 + shift)) > 1e-6 ||
+        std::abs(data->GetPoint(0)[0] - (-0.5 + shift)) > 1e-6 ||
+        std::abs(data->GetPoint(0)[1] - expectedY) > 1e-6)
+      {
+        std::cerr << "Morphing froze time-sampled base points\n";
+        return EXIT_FAILURE;
+      }
+    }
+  }
+  vtkNew<vtkF3DUSDImporter> skinImporter;
+  const std::string skinFile = std::string(argv[1]) + "data/SimpleBlendShapesAnimatedSkin.usda";
+  skinImporter->SetFileName(skinFile.c_str());
+  skinImporter->Update();
+  for (const bool gpu : { false, true, false })
+  {
+    skinImporter->SetUseGPUMorphing(gpu);
+    for (const double frame : { 1., 24., 48., 1. })
+    {
+      if (!skinImporter->UpdateAtTimeValue(frame / 24.))
+      {
+        return EXIT_FAILURE;
+      }
+      vtkPolyData* data = nullptr;
+      vtkCollectionSimpleIterator iterator;
+      auto* actors = skinImporter->GetImportedActors();
+      for (actors->InitTraversal(iterator); auto* actor = actors->GetNextActor(iterator);)
+      {
+        auto* mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
+        auto* input = mapper ? mapper->GetInput() : nullptr;
+        if (input && input->GetFieldData()->GetArray("blendShapeOffsets"))
+        {
+          data = input;
+          break;
+        }
+      }
+      if (!data)
+      {
+        return EXIT_FAILURE;
+      }
+      auto* joints = data->GetPointData()->GetArray("JOINTS_0");
+      auto* skinWeights = data->GetPointData()->GetArray("WEIGHTS_0");
+      if (!joints || !skinWeights || joints->GetNumberOfTuples() != data->GetNumberOfPoints() ||
+        skinWeights->GetNumberOfTuples() != data->GetNumberOfPoints() ||
+        joints->GetNumberOfComponents() != 4 || skinWeights->GetNumberOfComponents() != 4)
+      {
+        std::cerr << "Rebuilding animated geometry discarded skinning attributes\n";
+        return EXIT_FAILURE;
+      }
+      for (vtkIdType i = 0; i < data->GetNumberOfPoints(); ++i)
+      {
+        if (joints->GetComponent(i, 0) != (frame == 24. ? 1. : 0.) ||
+          skinWeights->GetComponent(i, 0) != 1.)
+        {
+          std::cerr << "Joint influences were not sampled at the current time\n";
+          return EXIT_FAILURE;
+        }
+      }
+    }
+  }
+  // Hidden blend shapes, skinning-only targets and malformed offsets share a skeleton.
+  vtkNew<vtkF3DUSDImporter> errorImporter;
+  const std::string errorFile = std::string(argv[1]) + "data/SimpleBlendShapesErrorPaths.usda";
+  errorImporter->SetFileName(errorFile.c_str());
+  int warningCount = 0;
+  vtkNew<vtkCallbackCommand> warningObserver;
+  warningObserver->SetClientData(&warningCount);
+  warningObserver->SetCallback(
+    [](vtkObject*, unsigned long, void* data, void*) { ++(*static_cast<int*>(data)); });
+  errorImporter->AddObserver(vtkCommand::WarningEvent, warningObserver);
+  if (!errorImporter->Update())
+  {
+    return EXIT_FAILURE;
+  }
+  warningCount = 0;
+  if (!errorImporter->UpdateAtTimeValue(1.) || warningCount == 0)
+  {
+    std::cerr << "Invalid blend shape indices were not diagnosed\n";
+    return EXIT_FAILURE;
+  }
+  vtkCollectionSimpleIterator errorIterator;
+  auto* errorActors = errorImporter->GetImportedActors();
+  int skinnedMeshes = 0;
+  int morphingMeshes = 0;
+  for (errorActors->InitTraversal(errorIterator);
+       auto* actor = errorActors->GetNextActor(errorIterator);)
+  {
+    auto* mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
+    auto* data = mapper ? mapper->GetInput() : nullptr;
+    if (!data || !data->GetPointData()->GetArray("WEIGHTS_0"))
+    {
+      continue;
+    }
+    ++skinnedMeshes;
+    morphingMeshes += data->GetFieldData()->GetArray("blendShapeOffsets") != nullptr;
+    if (data->GetNumberOfPoints() != 8 || std::abs(data->GetPoint(0)[1] + 0.5) > 1e-6)
+    {
+      std::cerr << "Invalid deformation modified the mesh or affected a skinning-only target\n";
+      return EXIT_FAILURE;
+    }
+  }
+  if (skinnedMeshes != 2 || morphingMeshes != 1)
+  {
+    std::cerr << "Hidden and skinning-only targets were not handled independently\n";
+    return EXIT_FAILURE;
+  }
+  warningCount = 0;
+  if (!errorImporter->UpdateAtTimeValue(1. / 24.) || warningCount != 0)
+  {
+    std::cerr << "The importer did not recover at a valid blend shape sample\n";
+    return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;
 }

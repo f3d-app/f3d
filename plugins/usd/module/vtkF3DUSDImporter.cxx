@@ -678,14 +678,14 @@ public:
                   this->SkelCache.GetSkinningQuery(prim))
             {
               // save skinning buffers to the polydata
-              if (skinningQuery.HasJointInfluences() && !meshAlreadyExists)
+              if (skinningQuery.HasJointInfluences())
               {
                 PXR_NS::VtIntArray jointIndices;
                 PXR_NS::VtFloatArray jointWeights;
                 const int numInfluences = skinningQuery.GetNumInfluencesPerComponent();
 
                 if (skinningQuery.ComputeVaryingJointInfluences(
-                      positions.size(), &jointIndices, &jointWeights))
+                      positions.size(), &jointIndices, &jointWeights, timeCode))
                 {
                   vtkNew<vtkUnsignedShortArray> jointsArr;
                   jointsArr->SetName("JOINTS_0");
@@ -751,10 +751,11 @@ public:
               {
                 MorphingInfo& info = this->MorphingMap[meshPrim.GetPath().GetAsString()];
 
+                // A mesh rebuild can include newly sampled base points, independently of
+                // the blend shape weights. Keep both CPU and GPU bind positions current.
+                info.BindPositions = positions;
                 if (!meshAlreadyExists)
                 {
-                  // Cache blend shape data for per-frame CPU deformation
-                  info.BindPositions = positions;
                   const PXR_NS::UsdSkelBindingAPI binding(prim);
                   info.BlendShapeQuery = PXR_NS::UsdSkelBlendShapeQuery(binding);
                   if (info.BlendShapeQuery)
@@ -1388,7 +1389,7 @@ public:
               {
                 // Remap if face-varying
                 const vtkIdType srcIdx = sourceIds->GetValue(i);
-                if (srcIdx < static_cast<vtkIdType>(positions.size()))
+                if (srcIdx >= 0 && srcIdx < static_cast<vtkIdType>(positions.size()))
                 {
                   const PXR_NS::GfVec3f& p = positions[srcIdx];
                   outputPoints->SetPoint(i, p[0], p[1], p[2]);

@@ -14,6 +14,7 @@
 #include <vtkWeakPointer.h>
 
 class vtkFloatArray;
+class vtkIntArray;
 class vtkOpenGLRenderWindow;
 
 class vtkF3DPolyDataMapper : public vtkOpenGLPolyDataMapper
@@ -83,6 +84,10 @@ protected:
 
 private:
   bool HasSparseMorphing = false;
+  vtkWeakPointer<vtkIntArray> ValidatedBlendShapeRanges;
+  vtkTimeStamp BlendShapeRangesValidationTime;
+  vtkIdType ValidatedBlendShapeOffsetCount = -1;
+  bool BlendShapeRangesValid = false;
   vtkWeakPointer<vtkPolyData> BoundsInput;
   vtkTimeStamp MorphingBoundsTime;
   double MorphingBounds[6];
