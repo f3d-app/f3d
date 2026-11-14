@@ -1117,14 +1117,11 @@ interactor& interactor_impl::initCommands()
         return;
       }
       check_args(args, 3, "set_camera_look_at");
-      const direction_t direction = options::parse<direction_t>(args[0]);
-      const point3_t direction_point = { direction[0], direction[1], direction[2] };
+      const point3_t position = options::parse<point3_t>(args[0]);
+      const point3_t focal = options::parse<point3_t>(args[1]);
 
-      const direction_t focal_dir = options::parse<direction_t>(args[1]);
-      const point3_t focal_point = { focal_dir[0], focal_dir[1], focal_dir[2] };
-
-      this->Internals->Window.getCamera().setPosition(direction_point);
-      this->Internals->Window.getCamera().setFocalPoint(focal_point);
+      this->Internals->Window.getCamera().setPosition(position);
+      this->Internals->Window.getCamera().setFocalPoint(focal);
       this->Internals->Window.getCamera().setViewUp(options::parse<direction_t>(args[2]));
 
       this->Internals->Style->SetTemporaryUp(

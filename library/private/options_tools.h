@@ -413,6 +413,27 @@ direction_t parse(const std::string& str)
 
 //----------------------------------------------------------------------------
 /**
+ * Parse provided string into a point3_t.
+ * Supported format: "X,Y,Z"
+ * rely on parse<std::vector<double>>(str)
+ * Can throw options::parsing_exception in case of failure to parse
+ */
+template<>
+point3_t parse(const std::string& str)
+{
+
+  std::vector<double> point = options_tools::parse<std::vector<double>>(str);
+  if (point.size() != 3)
+  {
+    throw options::parsing_exception("Cannot parse " + str +
+      " into a point3_t: " + "point3_t must be format x,y,z. x, y and z are doubles");
+  }
+
+  return { point[0], point[1], point[2] };
+}
+
+//----------------------------------------------------------------------------
+/**
  * Return provided string stripped of leading and trailing spaces.
  */
 template<>
@@ -825,6 +846,17 @@ std::string format(const color_t& var)
   {
     return options_tools::format(static_cast<std::vector<double>>(var));
   }
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Format provided var into a string from provided point3_t.
+ * Rely on `format(std::vector<double>&)`
+ */
+std::string format(const point3_t& var)
+{
+  const std::vector<double> vect = { var[0], var[1], var[2] };
+  return options_tools::format(static_cast<std::vector<double>>(vect));
 }
 
 //----------------------------------------------------------------------------
