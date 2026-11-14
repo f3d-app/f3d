@@ -31,7 +31,7 @@ It's also used to save and restore HDRI related information.
 
 ### `--offscreen` (_bool_, default: `false`)
 
-Run application without showing the render view. Useful with [--command-script](#--command-scriptcommand-script-script).
+Run application without showing the render view. Useful with [--command-script](#--command-script).
 
 ### `-h`, `--help`
 
