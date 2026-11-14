@@ -1100,6 +1100,15 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{ "roll_camera value", "roll the camera on its side" });
 
   this->addCommand(
+    "zoom_camera",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 1, "zoom_camera");
+      this->Internals->Window.getCamera().zoom(options::parse<double>(args[0]));
+    },
+    command_documentation_t{ "zoom_camera value", "apply zoom to view" });
+
+  this->addCommand(
     "jump_to_frame",
     [&](const std::vector<std::string>& args)
     {

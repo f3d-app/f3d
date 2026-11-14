@@ -564,6 +564,7 @@ f3d_test(NAME TestCommandScriptSetCameraBack SCRIPT DATA dragon.vtu) # set_camer
 f3d_test(NAME TestCommandScriptSetCameraBottom SCRIPT DATA dragon.vtu) # set_camera bottom
 f3d_test(NAME TestCommandScriptSetCameraLeft SCRIPT DATA dragon.vtu) # set_camera left
 f3d_test(NAME TestCommandScriptCycleCameraIndex SCRIPT DATA Cameras.gltf) # cycle scene.camera.index;cycle scene.camera.index;reload_current_file_group
+f3d_test(NAME TestCommandScriptCameraZoom SCRIPT DATA dragon.vtu) 
 f3d_test(NAME TestCommandScriptIncreaseDecreaseCameraIndex SCRIPT DATA Cameras.gltf) # increase scene.camera.index;increase scene.camera.index;increase.camera.index;decrease.camera.index;reload_current_file_group
 f3d_test(NAME TestCommandScriptOpacityMap SCRIPT DATA vase_4comp.vti ARGS -vs) # set model.scivis.opacity_map 0,0.03,1,1
 
