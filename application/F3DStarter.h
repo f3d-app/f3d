@@ -6,6 +6,7 @@
 
 #ifndef F3DStarter_h
 #define F3DStarter_h
+#include "F3DOptionsTools.h"
 
 #include <filesystem>
 #include <map>
@@ -98,7 +99,7 @@ public:
    * current state.
    * Used by LoadStatefile and LoadStatefileFromClipboard.
    */
-  void ApplyStatefile(const std::map<std::string, std::string>& statefileOptions,
+  void ApplyStatefile(const F3DOptionsTools::OptionsDict& statefileOptions,
     const std::vector<std::string>& statefileFiles,
     const std::optional<StatefileFileGroups>& statefileFileGroups,
     const std::optional<std::pair<int, int>>& statefileWindowSize,
