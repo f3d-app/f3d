@@ -49,6 +49,8 @@ f3d_test(NAME TestInteractionHoverCopyLog DATA f3d.glb INTERACTION UI) #Mouse mo
 f3d_test(NAME TestInteractionHoverCopyLogDPI DATA f3d.glb ARGS --dpi-aware DPI_SCALE 1.5 INTERACTION UI) #Mouse move to copy log button
 f3d_test(NAME TestInteractionClickCopyLog DATA f3d.glb ARGS -Dfoo INTERACTION UI) #Mouse move to copy log button;Click # -Dfoo is used to add a random log line to copy
 
+f3d_test(NAME TestInteractionParentUnchecked DATA sphere_box.glb INTERACTION UI) # Uncheck a parent in scene hierarchy and test to check children
+
 # OSMesa and EGL do not support clipboard operations, so we skip the copy-paste test for these backends.
 if (F3D_MODULE_CLIP AND NOT F3D_TESTING_FORCE_RENDERING_BACKEND MATCHES "osmesa|egl")
   f3d_test(NAME TestInteractionCopyPaste DATA f3d.glb  SCRIPT INTERACTION UI THRESHOLD 0.06) #Esc;Select text;CTRL+C;CTRL+V in input;Enter
