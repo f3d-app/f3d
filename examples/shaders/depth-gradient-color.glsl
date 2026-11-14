@@ -1,18 +1,13 @@
-const int SAMPLES = 32;
-
-const int BANDS = 30;
+const int SAMPLES = 16;
+const int BANDS = 20;
 
 // choose the color according to the depth
 vec3 depthGradient(float t)
 {
-    // 5 colors for the color gradient
-    const int N = 5;
+    const int N = 2;
     vec3 stops[N] = vec3[N](
-        vec3(1.00, 0.95, 0.10),
-        vec3(0.30, 0.85, 0.30),
-        vec3(0.10, 0.75, 1.00),
-        vec3(0.10, 0.25, 0.95),
-        vec3(0.02, 0.03, 0.25)
+        vec3(1.00, 1.00, 1.00), // white
+        vec3(0.00, 0.00, 0.00)  // black
     );
     float x = clamp(t, 0.0, 1.0) * float(N - 1);
     int i = int(min(floor(x), float(N - 2)));
@@ -38,15 +33,8 @@ vec2 visibleDistanceRange()
     return range;
 }
 
-const vec3 BACKGROUND_COLOR = vec3(0.0, 0.0, 0.0);
-
 vec4 pixel(vec2 uv)
 {
-    if (readRawDepth(uv) >= 1.0)
-    {
-        return vec4(BACKGROUND_COLOR, 1.0);
-    }
-
     vec2 range = visibleDistanceRange();
 
     float t = 1.0;
