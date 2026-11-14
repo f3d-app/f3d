@@ -66,7 +66,7 @@ Supports `front`, `top`, `right`, `back`, `bottom`, `left`, `isometric` argument
 
 `reset_camera`: A specific command to reset the camera to its original location. No argument.
 
-`set_resolution`: A specific command to set a new screen resolution. eg: `set_resolution 300,900`.
+`set_resolution`: A specific command to set a new window resolution. eg: `set_resolution 300,900`.
 
 `toggle_animation`: A specific command to start/stop the animation. No argument.
 

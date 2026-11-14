@@ -1287,22 +1287,14 @@ interactor& interactor_impl::initCommands()
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "set_resolution");
-      try
+      const std::vector<int> resolution = options::parse<std::vector<int>>(args[0]);
+      if (resolution.size() != 2)
       {
-        const std::vector<int> resolution = options::parse<std::vector<int>>(args[0]);
-        if (resolution.size() != 2)
-        {
-          throw std::invalid_argument("wrong number of argument");
-        }
-        this->Internals->Window.setSize(resolution[0], resolution[1]);
+        throw interactor::invalid_args_exception(std::string("Command: set_resolution arg: wrong number of argument"));
       }
-      catch (const std::exception& e)
-      {
-        throw interactor::invalid_args_exception(
-          std::string("Command: set_resolution arg: wrong argument"));
-      }
+      this->Internals->Window.setSize(resolution[0], resolution[1]);
     },
-    command_documentation_t{ "set_resolution", "set a new screen resolution" });
+    command_documentation_t{ "set_resolution", "set a new window resolution" });
 
   this->addCommand(
     "jump_to_key_frame",
