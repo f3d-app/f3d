@@ -1107,7 +1107,7 @@ interactor& interactor_impl::initCommands()
       this->Internals->Window.getCamera().zoom(options::parse<double>(args[0]));
     },
     command_documentation_t{ "zoom_camera value", "apply zoom to view" });
-  
+
   this->addCommand(
     "set_camera_look_at",
     [&](const std::vector<std::string>& args)
