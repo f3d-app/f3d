@@ -5,12 +5,14 @@
 #ifndef vtkF3DWebPReader_h
 #define vtkF3DWebPReader_h
 
+#include "vtkextModule.h"
+
 #include "vtkImageReader.h"
 #include "vtkVersion.h"
 
 class vtkResourceStream;
 
-class vtkF3DWebPReader : public vtkImageReader
+class VTKEXT_EXPORT vtkF3DWebPReader : public vtkImageReader
 {
 public:
   static vtkF3DWebPReader* New();

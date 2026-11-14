@@ -45,6 +45,11 @@ if(NOT F3D_USE_GLES)
   set(classes ${classes} vtkF3DBitonicSort)
 endif()
 
+if(F3D_MODULE_WEBP)
+  find_package(WebP REQUIRED)
+  list(APPEND classes vtkF3DWebPReader)
+endif()
+
 vtk_module_add_module(f3d::vtkext
   ${f3d_vtk_no_install}
   ${f3d_vtk_force_static}
@@ -52,6 +57,10 @@ vtk_module_add_module(f3d::vtkext
   SOURCES ${sources}
   PRIVATE_HEADERS ${private_headers}
   )
+
+if(F3D_MODULE_WEBP)
+  vtk_module_link(f3d::vtkext PRIVATE WebP::webp)
+endif()
 
 if(F3D_USE_EXTERNAL_MINIZ)
   vtk_module_link(f3d::vtkext PRIVATE miniz::miniz)
