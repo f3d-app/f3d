@@ -28,7 +28,7 @@ if(F3D_MODULE_WEBP)
        TestF3DWebPMemReader.cxx)
 endif()
 
-if(F3D_MODULE_PSD)
+if(F3D_MODULE_STB)
   list(APPEND test_sources
        TestF3DPSDReader.cxx
        TestF3DPSDReaderInvalid.cxx
@@ -74,7 +74,7 @@ if(F3D_MODULE_WEBP)
     FAIL_REGULAR_EXPRESSION "")
 endif()
 
-if(F3D_MODULE_PSD)
+if(F3D_MODULE_STB)
   set_tests_properties(f3d::vtkextPrivateCxx-TestF3DPSDReaderInvalid f3d::vtkextPrivateCxx-TestF3DPSDMemReader
     PROPERTIES
     FAIL_REGULAR_EXPRESSION "")

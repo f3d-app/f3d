@@ -181,7 +181,7 @@ set(_image_formats "png;jpeg;bmp;tga;hdr")
 if(F3D_MODULE_WEBP)
   list(APPEND _image_formats "webp")
 endif()
-if(F3D_MODULE_PSD)
+if(F3D_MODULE_STB)
   list(APPEND _image_formats "psd")
 endif()
 if(F3D_MODULE_EXR)
@@ -266,7 +266,7 @@ if(F3D_MODULE_WEBP)
   )
 endif()
 
-if(F3D_MODULE_PSD)
+if(F3D_MODULE_STB)
   f3d_plugin_declare_reader(
     NAME PSD
     EXTENSIONS psd

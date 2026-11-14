@@ -12,7 +12,7 @@
 #include "vtkF3DWebPReader.h"
 #endif
 
-#if F3D_MODULE_PSD
+#if F3D_MODULE_STB
 #include "vtkF3DPSDReader.h"
 #endif
 
@@ -78,7 +78,7 @@ init::init()
   vtkImageReader2Factory::RegisterReader(webpReader);
 #endif
 
-#if F3D_MODULE_PSD
+#if F3D_MODULE_STB
   const vtkNew<vtkF3DPSDReader> PSDReader;
   vtkImageReader2Factory::RegisterReader(PSDReader);
 #endif

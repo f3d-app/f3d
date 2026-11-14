@@ -136,7 +136,7 @@ if(F3D_MODULE_WEBP)
   list(APPEND classes vtkF3DWebPReader)
 endif()
 
-if(F3D_MODULE_PSD)
+if(F3D_MODULE_STB)
   list(APPEND classes vtkF3DPSDReader)
 endif()
 
@@ -158,11 +158,12 @@ vtk_module_add_module(f3d::vtkextPrivate
   )
 
 # stb_image (psd)
-if(F3D_MODULE_PSD)
+if(F3D_MODULE_STB)
   if(F3D_USE_EXTERNAL_STB)
     vtk_module_include(f3d::vtkextPrivate PRIVATE "${Stb_INCLUDE_DIR}")
   else()
     vtk_module_include(f3d::vtkextPrivate PRIVATE "${F3D_SOURCE_DIR}/external/stb")
+  endif()
 endif()
 
 if(MSVC)
