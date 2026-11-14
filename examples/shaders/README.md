@@ -90,7 +90,8 @@ Tune these constants at the top of `outline.glsl`:
 ## Depth-driven halftone
 
 `outline.glsl` also draws fixed-size dots on a fixed screen-space grid. Their
-number increases with linear camera-space depth. A deterministic rank selects
+number increases as the model gets closer, using normalized inverse camera-space
+depth (`1/z`). A deterministic rank selects
 each grid cell according to its center's depth, so a selected cell contains a
 complete dot. Foreground depth clips dots at the model boundary. RGB values are
 used only for compositing, never for deciding where dots appear.
@@ -100,8 +101,8 @@ used only for compositing, never for deciding where dots appear.
 | `HALFTONE_ENABLED` | Enable the depth-driven dots. Set to `false` to restore contours alone. |
 | `HALFTONE_CELL_SIZE` | Grid spacing in screen pixels. Default 8. |
 | `HALFTONE_RADIUS` | Fixed dot radius in pixels. Default 1.35. Does not vary with depth. |
-| `HALFTONE_DEPTH_START` | Depth in scene units where density is zero. Default 15. |
-| `HALFTONE_DEPTH_END` | Depth where every grid cell is selected. Default 35. Must exceed the start distance. |
+| `HALFTONE_DEPTH_START` | Positive depth in scene units where every grid cell is selected. Default 15. Closer surfaces keep this maximum density. |
+| `HALFTONE_DEPTH_END` | Depth where density reaches zero. Default 35. Must exceed the start distance. |
 
 The 15–35 range is a starting point for the bus model; adjust it to your model's
 distances and scale. Dot edges are softened over one pixel. The cell selection

@@ -8,8 +8,8 @@ const bool OUTLINE_ONLY = false;
 const bool HALFTONE_ENABLED = true;
 const float HALFTONE_CELL_SIZE = 8.0; // Screen pixels.
 const float HALFTONE_RADIUS = 1.35; // Fixed dot radius in pixels.
-const float HALFTONE_DEPTH_START = 15.0; // No dots at or before this distance.
-const float HALFTONE_DEPTH_END = 35.0; // All grid cells selected at or beyond this distance.
+const float HALFTONE_DEPTH_START = 15.0; // All grid cells selected at or before this distance.
+const float HALFTONE_DEPTH_END = 35.0; // No dots at or beyond this distance.
 
 float halftoneAt(vec2 uv)
 {
@@ -31,8 +31,10 @@ float halftoneAt(vec2 uv)
         return 0.0;
 
     float depth = readDepth(centerUV);
-    float density = clamp((depth - HALFTONE_DEPTH_START) /
-        max(HALFTONE_DEPTH_END - HALFTONE_DEPTH_START, 0.000001), 0.0, 1.0);
+    float inverseNear = 1.0 / HALFTONE_DEPTH_START;
+    float inverseFar = 1.0 / HALFTONE_DEPTH_END;
+    float density = clamp((1.0 / max(depth, 0.000001) - inverseFar) /
+        (inverseNear - inverseFar), 0.0, 1.0);
     // Fixed screen-space selection: no time-dependent noise or RGB classification.
     float rank = fract(sin(dot(cell, vec2(127.1, 311.7))) * 43758.5453);
     if (rank >= density)
