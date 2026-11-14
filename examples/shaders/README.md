@@ -4,7 +4,8 @@ Load a shader file with `--final-shader`:
 
 | File | Effect |
 | --- | --- |
-| `outline.glsl` | Binary depth contours and depth-driven halftone dots over the model colors. |
+| `outline.glsl` | Binary depth contours over the model colors, with area opening and adjustable thickness. |
+| `comics.glsl` | The same contours with depth-driven halftone dots. |
 | `depth-preview.glsl` | Linear-depth preview, blue at 0 and red at 100 model units. |
 | `depth-test.glsl` | Reference depth sample, blue at 500 and red at 2000 model units. |
 | `depth-fog.glsl` | Fog based on the visible depth range. |
@@ -36,7 +37,7 @@ Rebuild once after switching branches:
 cmake --build build --parallel 4
 ```
 
-Do not use `--display-depth` with `outline.glsl`: keep the normal rendering path
+Do not use `--display-depth` with `outline.glsl` or `comics.glsl`: keep the normal rendering path
 so both scene color and scene depth are available. Tone mapping and anti-aliasing
 can stay enabled because edge detection samples the separate depth texture.
 
@@ -76,7 +77,7 @@ Restart F3D after editing the shader to load the updated file. Shader edits do
 not require recompilation. F3D supplies the GLSL version and uniforms; the file
 only defines helper functions, constants and `pixel`.
 
-Tune these constants at the top of `outline.glsl`:
+Both shaders share the contour implementation and these constants:
 
 | Constant | Effect |
 | --- | --- |
@@ -89,7 +90,17 @@ Tune these constants at the top of `outline.glsl`:
 
 ## Depth-driven halftone
 
-`outline.glsl` also draws fixed-size dots on a fixed screen-space grid. Their
+Use `comics.glsl` to add dots to the same contours:
+
+```bash
+GALLIUM_DRIVER=d3d12 ./build/bin/f3d \
+  --rendering-backend=glx \
+  --final-shader "$(cat examples/shaders/comics.glsl)" \
+  /path/to/model.glb
+```
+
+`outline.glsl` contains no halftone code. `comics.glsl` draws fixed-size dots on a
+fixed screen-space grid. Their
 number increases as the model gets closer, using normalized inverse camera-space
 depth (`1/z`). A deterministic rank selects
 each grid cell according to its center's depth, so a selected cell contains a
@@ -99,7 +110,7 @@ used only for compositing, never for deciding where dots appear.
 | Constant | Effect |
 | --- | --- |
 | `HALFTONE_ENABLED` | Enable the depth-driven dots. Set to `false` to restore contours alone. |
-| `HALFTONE_CELL_SIZE` | Grid spacing in screen pixels. Default 8. |
+| `HALFTONE_CELL_SIZE` | Grid spacing in screen pixels. Default 6. |
 | `HALFTONE_RADIUS` | Fixed dot radius in pixels. Default 1.35. Does not vary with depth. |
 | `HALFTONE_DEPTH_START` | Positive depth in scene units where every grid cell is selected. Default 15. Closer surfaces keep this maximum density. |
 | `HALFTONE_DEPTH_END` | Depth where density reaches zero. Default 35. Must exceed the start distance. |
