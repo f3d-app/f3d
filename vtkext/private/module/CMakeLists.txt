@@ -136,6 +136,10 @@ if(F3D_MODULE_WEBP)
   list(APPEND classes vtkF3DWebPReader)
 endif()
 
+if(F3D_MODULE_STB)
+  list(APPEND classes vtkF3DPSDReader)
+endif()
+
 if(F3D_MODULE_UI AND NOT F3D_USE_EXTERNAL_IMGUI)
   list(APPEND sources
     "${F3D_SOURCE_DIR}/external/imgui/imgui.cpp"
@@ -152,6 +156,15 @@ vtk_module_add_module(f3d::vtkextPrivate
   SOURCES ${sources}
   PRIVATE_HEADERS ${private_headers}
   )
+
+# stb_image (psd)
+if(F3D_MODULE_STB)
+  if(F3D_USE_EXTERNAL_STB)
+    vtk_module_include(f3d::vtkextPrivate PRIVATE "${Stb_INCLUDE_DIR}")
+  else()
+    vtk_module_include(f3d::vtkextPrivate PRIVATE "${F3D_SOURCE_DIR}/external/stb")
+  endif()
+endif()
 
 if(MSVC)
   vtk_module_definitions(f3d::vtkextPrivate PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _CRT_SECURE_NO_WARNINGS)
