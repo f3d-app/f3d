@@ -1,0 +1,11 @@
+Model Information:
+* title:	Christmas Low-poly Scene
+* source:	https://sketchfab.com/3d-models/christmas-low-poly-scene-7984bd6024db4b89928ddeb625eebac0
+* author:	lumoize (https://sketchfab.com/lumoize)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Christmas Low-poly Scene" (https://sketchfab.com/3d-models/christmas-low-poly-scene-7984bd6024db4b89928ddeb625eebac0) by lumoize (https://sketchfab.com/lumoize) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
