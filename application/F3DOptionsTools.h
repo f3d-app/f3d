@@ -125,6 +125,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "grid-reflection", "render.grid.reflection" },
   { "grid-subdivisions", "render.grid.subdivisions" },
   { "grid-unit", "render.grid.unit" },
+  { "grid-scale", "render.grid.scale" },
   { "hdri-ambient", "render.hdri.ambient" },
   { "hdri-file", "render.hdri.file" },
   { "hdri-filename", "ui.hdri_filename" },

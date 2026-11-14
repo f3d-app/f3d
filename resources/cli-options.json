@@ -299,6 +299,12 @@
           "implicitValue": "0.5"
         },
         {
+          "longName": "grid-scale",
+          "helpText": "Scale multiplier of the grid",
+          "valueHelper": "<value>",
+          "implicitValue": "1.0"
+        },
+        {
           "longName": "shadows",
           "helpText": "Add shadows to the scene",
           "valueHelper": "<bool>",

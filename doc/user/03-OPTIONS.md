@@ -269,6 +269,16 @@ Set the number of subdivisions for the grid.
 | -------------------------------------------------------------------- | -------------------------------------------------------- |
 | ![grid subdivisions default](./images/grid_subdivisions_default.png) | ![grid subdivisions 4](./images/grid_subdivisions_4.png) |
 
+### `--grid-scale=<scale>` (_double_, default: `1.0`)
+
+Set a multiplier for the grid scale
+
+#### compare
+
+| 10 (default)                                                         | 4                                                        |
+| -------------------------------------------------------------------- | -------------------------------------------------------- |
+| ![grid scale default](./images/grid_scale_1_0.png) | ![grid scale 5](./images/grid_scale_5_0.png) |
+
 ### `--grid-color=<color>` (_color_, default: `0,0,0`)
 
 Set the color grid lines.

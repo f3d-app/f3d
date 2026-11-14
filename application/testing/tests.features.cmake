@@ -18,6 +18,7 @@ f3d_test(NAME TestGridAbsoluteReflection DATA suzanne.ply ARGS -g --grid-absolut
 f3d_test(NAME TestGridOpacity DATA suzanne.ply ARGS -g --grid-opacity=.25 --anti-aliasing=ssaa)
 f3d_test(NAME TestGridSSAAReflection DATA suzanne.ply ARGS -g --grid-reflection=0.8 --anti-aliasing=ssaa)
 f3d_test(NAME TestGridReflectionOnly DATA suzanne.ply ARGS -g --grid-reflection --grid-opacity=0 --anti-aliasing=ssaa)
+f3d_test(NAME TestGridScale DATA suzanne.ply ARGS -g --grid-scale=3)
 
 # Backface
 f3d_test(NAME TestBackfaceVisible DATA backface.vtp ARGS --backface-type=visible)
