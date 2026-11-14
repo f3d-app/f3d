@@ -5,6 +5,43 @@ const int OPENING_MIN_PIXELS = 8;
 const vec3 INK_COLOR = vec3(0.02);
 const bool OUTLINE_ONLY = false;
 
+const bool HALFTONE_ENABLED = true;
+const float HALFTONE_CELL_SIZE = 8.0; // Screen pixels.
+const float HALFTONE_RADIUS = 1.35; // Fixed dot radius in pixels.
+const float HALFTONE_DEPTH_START = 15.0; // No dots at or before this distance.
+const float HALFTONE_DEPTH_END = 35.0; // All grid cells selected at or beyond this distance.
+
+float halftoneAt(vec2 uv)
+{
+    if (!HALFTONE_ENABLED || readRawDepth(uv) >= 1.0)
+        return 0.0;
+
+    float cellSize = max(HALFTONE_CELL_SIZE, 1.0);
+    float radius = clamp(HALFTONE_RADIUS, 0.0, 0.5 * cellSize);
+    vec2 position = uv * vec2(resolution);
+    vec2 cell = floor(position / cellSize);
+    vec2 center = (cell + 0.5) * cellSize;
+    float distanceToCenter = length(position - center);
+    if (radius <= 0.0 || distanceToCenter >= radius + 0.5)
+        return 0.0;
+
+    // Decide once per cell so depth changes do not cut a dot into pieces.
+    vec2 centerUV = center / vec2(resolution);
+    if (any(greaterThanEqual(centerUV, vec2(1.0))) || readRawDepth(centerUV) >= 1.0)
+        return 0.0;
+
+    float depth = readDepth(centerUV);
+    float density = clamp((depth - HALFTONE_DEPTH_START) /
+        max(HALFTONE_DEPTH_END - HALFTONE_DEPTH_START, 0.000001), 0.0, 1.0);
+    // Fixed screen-space selection: no time-dependent noise or RGB classification.
+    float rank = fract(sin(dot(cell, vec2(127.1, 311.7))) * 43758.5453);
+    if (rank >= density)
+        return 0.0;
+
+    // Only the dot boundary is softened; its size does not depend on density.
+    return 1.0 - smoothstep(radius - 0.5, radius + 0.5, distanceToCenter);
+}
+
 float depthAt(vec2 uv)
 {
     vec2 halfTexel = 0.5 / vec2(textureSize(sourceDepth, 0));
@@ -89,6 +126,8 @@ vec4 pixel(vec2 uv)
             edge = openedEdgeAt(uv + vec2(x, y) * texel);
 
     vec3 base = OUTLINE_ONLY ? vec3(1.0) : color.rgb;
-    float alpha = OUTLINE_ONLY || edge > 0.0 ? 1.0 : color.a;
+    float dots = OUTLINE_ONLY || edge > 0.0 ? 0.0 : halftoneAt(uv);
+    base = mix(base, INK_COLOR, dots);
+    float alpha = OUTLINE_ONLY || edge > 0.0 || dots > 0.0 ? 1.0 : color.a;
     return vec4(mix(base, INK_COLOR, edge), alpha);
 }

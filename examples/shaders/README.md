@@ -4,10 +4,9 @@ Load a shader file with `--final-shader`:
 
 | File | Effect |
 | --- | --- |
-| `outline.glsl` | Binary depth contours over the model colors, with area opening and adjustable thickness. |
+| `outline.glsl` | Binary depth contours and depth-driven halftone dots over the model colors. |
 | `depth-preview.glsl` | Linear-depth preview, blue at 0 and red at 100 model units. |
 | `depth-test.glsl` | Reference depth sample, blue at 500 and red at 2000 model units. |
-| `outline-depth.glsl` | Previous contour experiment on the grayscale image produced by `--display-depth`. |
 | `depth-fog.glsl` | Fog based on the visible depth range. |
 | `depth-gradient-bw.glsl` | Grayscale depth gradient. |
 | `depth-gradient-color.glsl` | Color depth gradient. |
@@ -88,6 +87,30 @@ Tune these constants at the top of `outline.glsl`:
 | `INK_COLOR` | Line color. |
 | `OUTLINE_ONLY` | Set to `true` for an opaque binary ink-on-white diagnostic view, or `false` to keep the model colors. |
 
+## Depth-driven halftone
+
+`outline.glsl` also draws fixed-size dots on a fixed screen-space grid. Their
+number increases with linear camera-space depth. A deterministic rank selects
+each grid cell according to its center's depth, so a selected cell contains a
+complete dot. Foreground depth clips dots at the model boundary. RGB values are
+used only for compositing, never for deciding where dots appear.
+
+| Constant | Effect |
+| --- | --- |
+| `HALFTONE_ENABLED` | Enable the depth-driven dots. Set to `false` to restore contours alone. |
+| `HALFTONE_CELL_SIZE` | Grid spacing in screen pixels. Default 8. |
+| `HALFTONE_RADIUS` | Fixed dot radius in pixels. Default 1.35. Does not vary with depth. |
+| `HALFTONE_DEPTH_START` | Depth in scene units where density is zero. Default 15. |
+| `HALFTONE_DEPTH_END` | Depth where every grid cell is selected. Default 35. Must exceed the start distance. |
+
+The 15–35 range is a starting point for the bus model; adjust it to your model's
+distances and scale. Dot edges are softened over one pixel. The cell selection
+does not depend on time, but cells can switch on or off as the camera changes
+their depth. The grid stays fixed on screen rather than following the surface.
+
+The area opening affects only the contour mask. Dots are composited separately
+before the contours, and are hidden in `OUTLINE_ONLY` diagnostic mode.
+
 Window openings and internal occlusions can produce contours. This experiment
 does not classify meshes or detect every crease between touching surfaces.
 The depth texture contains the scene depth published by the main render pass;
@@ -98,5 +121,3 @@ transparency does not guarantee a depth sample for every visible layer.
 - `depth-preview.glsl`: the supplied linear-depth visualization, blue at 0 and
   red at 100 model units, with a black background. Run it with the normal rendering
   path and the new uniforms, without `--display-depth`.
-- `outline-depth.glsl`: the previous binary Sobel experiment on an 8-bit depth
-  visualization. Run it with `--display-depth --tone-mapping=false --anti-aliasing=none`.
