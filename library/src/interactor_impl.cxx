@@ -1292,6 +1292,21 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{ "reset_camera", "reset the camera to its original location" });
 
   this->addCommand(
+    "set_resolution",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 1, "set_resolution");
+      const std::vector<int> resolution = options::parse<std::vector<int>>(args[0]);
+      if (resolution.size() != 2)
+      {
+        throw interactor::invalid_args_exception(
+          std::string("Command: set_resolution arg: wrong number of argument"));
+      }
+      this->Internals->Window.setSize(resolution[0], resolution[1]);
+    },
+    command_documentation_t{ "set_resolution", "set a new window resolution" });
+
+  this->addCommand(
     "jump_to_key_frame",
     [&](const std::vector<std::string>& args)
     {
