@@ -1290,7 +1290,8 @@ interactor& interactor_impl::initCommands()
       const std::vector<int> resolution = options::parse<std::vector<int>>(args[0]);
       if (resolution.size() != 2)
       {
-        throw interactor::invalid_args_exception(std::string("Command: set_resolution arg: wrong number of argument"));
+        throw interactor::invalid_args_exception(
+          std::string("Command: set_resolution arg: wrong number of argument"));
       }
       this->Internals->Window.setSize(resolution[0], resolution[1]);
     },
