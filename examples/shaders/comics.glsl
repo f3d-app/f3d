@@ -22,8 +22,10 @@ vec3 celShade(vec3 color)
 }
 
 const bool HALFTONE_ENABLED = true;
-const float HALFTONE_CELL_SIZE = 6.0;
-const float HALFTONE_RADIUS = 1.35;
+const float HALFTONE_REFERENCE_SIZE = 600.0;
+const float HALFTONE_CELL_SIZE = 2.75;
+const float HALFTONE_RADIUS = 0.5;
+const float HALFTONE_DENSITY_SCALE = 1.1;
 const float HALFTONE_DEPTH_START = 15.0;
 const float HALFTONE_DEPTH_END = 35.0;
 
@@ -34,21 +36,23 @@ float halftoneAt(vec2 uv)
 
     float cellSize = max(HALFTONE_CELL_SIZE, 1.0);
     float radius = clamp(HALFTONE_RADIUS, 0.0, 0.5 * cellSize);
-    vec2 position = uv * vec2(resolution);
+    float shortSide = max(float(min(resolution.x, resolution.y)), 1.0);
+    vec2 gridResolution = vec2(resolution) * (HALFTONE_REFERENCE_SIZE / shortSide);
+    vec2 position = uv * gridResolution;
     vec2 cell = floor(position / cellSize);
     vec2 center = (cell + 0.5) * cellSize;
     float distanceToCenter = length(position - center);
     if (radius <= 0.0 || distanceToCenter >= radius + 0.5)
         return 0.0;
 
-    vec2 centerUV = center / vec2(resolution);
+    vec2 centerUV = center / gridResolution;
     if (any(greaterThanEqual(centerUV, vec2(1.0))) || readRawDepth(centerUV) >= 1.0)
         return 0.0;
 
     float depth = readDepth(centerUV);
     float inverseNear = 1.0 / HALFTONE_DEPTH_START;
     float inverseFar = 1.0 / HALFTONE_DEPTH_END;
-    float density = clamp((1.0 / max(depth, 0.000001) - inverseFar) /
+    float density = clamp(HALFTONE_DENSITY_SCALE * (1.0 / max(depth, 0.000001) - inverseFar) /
         (inverseNear - inverseFar), 0.0, 1.0);
     float rank = fract(sin(dot(cell, vec2(127.1, 311.7))) * 43758.5453);
     if (rank >= density)
