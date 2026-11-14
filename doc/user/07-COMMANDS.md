@@ -53,6 +53,9 @@ eg: `elevation_camera 120`.
 `azimuth_camera value`: A specific command to tilt the camera right or left, takes an angle in degrees as an argument.
 eg: `azimuth_camera 120`.
 
+`set_camera_look_at position focal up`: A specific command to set the camera at the given position looking in focal direction, takes 3 vectors x,y,z. Does nothing in 2d.
+eg: `set_camera_look_at 10,10,10 0,0,0 1,1,1`
+
 `print_scene_info`: A specific command to print information about the scene. No argument.
 
 `print_coloring_info`: A specific command to print information about coloring settings. No argument.
