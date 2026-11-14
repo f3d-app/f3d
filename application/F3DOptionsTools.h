@@ -39,6 +39,7 @@ static inline const OptionsDict DefaultAppOptions = {
   { "no-config", "false" },
   { "no-render", "false" },
   { "no-cache", "false" },
+  { "offscreen", "false" },
   { "load-statefile", "" },
   { "save-statefile", "" },
   { "statefile-filename", "" },
