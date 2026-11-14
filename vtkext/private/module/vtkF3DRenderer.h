@@ -201,6 +201,11 @@ public:
    * Set usages and configurations of different render passes
    */
   void SetRenderingMode(RenderingMode mode);
+  bool SupportsGPUMorphing() const
+  {
+    return this->CurrentRenderingMode == RenderingMode::OPENGL && !this->UsePointSprites &&
+      !this->UseVolume && !this->UseNormalGlyphs;
+  }
   void SetAnariLibrary(const std::string& anariLibrary);
   void SetUseRaytracingDenoiser(bool use);
   void SetBlendingMode(BlendingMode mode);

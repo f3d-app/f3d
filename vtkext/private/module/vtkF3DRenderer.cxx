@@ -1197,6 +1197,15 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
         vtkPolyData* polydata = polyMapper->GetInput();
         if (polydata)
         {
+          if (vtkF3DPolyDataMapper::SafeDownCast(polyMapper) &&
+            polydata->GetPointData()->GetArray("blendShapeBindPositions") &&
+            polydata->GetPointData()->GetArray("blendShapeRanges"))
+          {
+            // CPU points may still be in bind pose. Transform the deformed mapper bounds
+            // conservatively instead of measuring the undeformed points in the new basis.
+            extendBoxAxisAligned(prop3d, box);
+            return;
+          }
           vtkNew<vtkMatrix4x4> tmpMatrix;
           vtkMatrix4x4::Multiply4x4(matrix, actor->GetMatrix(), tmpMatrix);
           double p[4] = { 0, 0, 0, 1 };
@@ -2648,6 +2657,10 @@ bool vtkF3DRenderer::CaptureVideoFrame(std::byte* yPlane, std::byte* uPlane, std
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
+  if (this->Importer && !this->Importer->RefreshMorphingMode())
+  {
+    F3DLog::Print(F3DLog::Severity::Warning, "Failed to update morphing mode");
+  }
   if (this->UseNormalGlyphs)
   {
     this->UpdateNormalGlyphsScale();

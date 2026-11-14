@@ -1,5 +1,6 @@
 list(APPEND VTKExtensionsPluginUSD_list
      TestF3DUSDImporter.cxx
+     TestF3DUSDImporterBlendShapes.cxx
      TestF3DUSDImporterPoints.cxx
     )
 
@@ -15,6 +16,10 @@ vtk_add_test_cxx(vtkextUSDTests tests
   ${VTKExtensionsPluginUSD_list}
   ${CMAKE_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
 vtk_test_cxx_executable(vtkextUSDTests tests)
+
+# Actors in the blend shape test need the OpenGL shader property factory in static builds.
+target_link_libraries(vtkextUSDTests PRIVATE VTK::RenderingOpenGL2)
+vtk_module_autoinit(TARGETS vtkextUSDTests MODULES VTK::RenderingOpenGL2)
 
 foreach(test ${VTKExtensionsPluginUSD_list})
   get_filename_component (TName ${test} NAME_WE)

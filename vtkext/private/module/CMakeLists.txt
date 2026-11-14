@@ -52,6 +52,7 @@ if(F3D_MODULE_UI)
 endif()
 
 set(shader_files glsl/vtkF3DRandomFS.glsl glsl/vtkF3DPointSplatVS.glsl glsl/vtkF3DPointSplatUtilsSDF.glsl)
+list(APPEND shader_files glsl/vtkF3DSparseMorphing.glsl)
 
 if (NOT ANDROID AND NOT EMSCRIPTEN)
   list(APPEND shader_files glsl/vtkF3DComputeDepthCS.glsl)

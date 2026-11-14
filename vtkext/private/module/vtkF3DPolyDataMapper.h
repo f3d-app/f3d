@@ -11,6 +11,11 @@
 
 #include <vtkOpenGLPolyDataMapper.h>
 #include <vtkVersion.h>
+#include <vtkWeakPointer.h>
+
+class vtkFloatArray;
+class vtkIntArray;
+class vtkOpenGLRenderWindow;
 
 class vtkF3DPolyDataMapper : public vtkOpenGLPolyDataMapper
 {
@@ -39,6 +44,18 @@ public:
    */
   void SetCustomUniforms(vtkOpenGLHelper& cellBO, vtkActor* actor) override;
 
+  void ReleaseGraphicsResources(vtkWindow* window) override;
+
+  // Camera framing must use the deformed surface even when CPU points stay in bind pose.
+  double* GetBounds() override;
+  using vtkOpenGLPolyDataMapper::GetBounds;
+
+  bool PrepareSparseMorphing(vtkOpenGLRenderWindow* window, vtkPolyData* polydata);
+  bool GetHasSparseMorphing() const
+  {
+    return this->HasSparseMorphing;
+  }
+
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20260730)
   bool FragmentShaderUsesPrimitiveID(vtkRenderer*, vtkActor*) override;
 #endif
@@ -60,7 +77,24 @@ protected:
   vtkF3DPolyDataMapper() = default;
   ~vtkF3DPolyDataMapper() override = default;
 
+  // Requires a current OpenGL context supporting shader storage buffers.
+  bool UpdateMorphingBuffers(vtkPolyData* polydata);
+  vtkNew<vtkOpenGLBufferObject> BlendShapeOffsets;
+  vtkNew<vtkOpenGLBufferObject> BlendShapeWeights;
+
 private:
+  bool HasSparseMorphing = false;
+  vtkWeakPointer<vtkIntArray> ValidatedBlendShapeRanges;
+  vtkTimeStamp BlendShapeRangesValidationTime;
+  vtkIdType ValidatedBlendShapeOffsetCount = -1;
+  bool BlendShapeRangesValid = false;
+  vtkWeakPointer<vtkPolyData> BoundsInput;
+  vtkTimeStamp MorphingBoundsTime;
+  double MorphingBounds[6];
+  vtkWeakPointer<vtkFloatArray> UploadedBlendShapeOffsets;
+  vtkWeakPointer<vtkFloatArray> UploadedBlendShapeWeights;
+  vtkTimeStamp BlendShapeOffsetsUploadTime;
+  vtkTimeStamp BlendShapeWeightsUploadTime;
   vtkNew<vtkOpenGLBufferObject> JointMatrices;
   bool HasSSBOSkinning = false;
 
