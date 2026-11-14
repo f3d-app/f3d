@@ -155,7 +155,8 @@ protected:
       }
       currParent = this->GetAssembly()->GetParent(currParent);
     }
-    ImGui::BeginDisabled(parentUnchecked); // if a parent is unchecked the current box become disabled
+    ImGui::BeginDisabled(
+      parentUnchecked); // if a parent is unchecked the current box become disabled
 
     if (ImGui::Checkbox(vtkF3DMetaImporter::GetNodeLabel(this->GetAssembly(), nodeid), &visible))
     {
