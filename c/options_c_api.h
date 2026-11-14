@@ -177,10 +177,11 @@ extern "C"
    * @brief Get an option value as a double vector.
    *
    * The caller must provide a pre-allocated array large enough to hold the values.
+   * To query the required size, pass NULL for `values`, then `count` will be written.
    *
    * @param options Options handle.
    * @param name Option name.
-   * @param values Pre-allocated array to store the double values.
+   * @param values Pre-allocated array to store the double values, or NULL to query the size.
    * @param count Pointer to store the number of values retrieved. Set to 0 if the option hasn't
    * been set or doesn't exist.
    */
@@ -191,10 +192,11 @@ extern "C"
    * @brief Get an option value as an integer vector.
    *
    * The caller must provide a pre-allocated array large enough to hold the values.
+   * To query the required size, pass NULL for `values`, then `count` will be written.
    *
    * @param options Options handle.
    * @param name Option name.
-   * @param values Pre-allocated array to store the integer values.
+   * @param values Pre-allocated array to store the integer values, or NULL to query the size.
    * @param count Pointer to store the number of values retrieved. Set to 0 if the option hasn't
    * been set or doesn't exist.
    */
@@ -478,8 +480,11 @@ extern "C"
   /**
    * @brief Parse a string as a double vector.
    *
+   * The caller must provide a pre-allocated array large enough to hold the values.
+   * To query the required size, pass NULL for `values`, then `count` will be written.
+   *
    * @param str String to parse.
-   * @param values Pre-allocated array to store the double values.
+   * @param values Pre-allocated array to store the double values, or NULL to query the size.
    * @param count Pointer to store the number of values retrieved. 0 if the option cannot be parsed.
    */
   F3D_EXPORT void f3d_options_parse_double_vector(const char* str, double* values, size_t* count);
@@ -487,8 +492,11 @@ extern "C"
   /**
    * @brief Parse a string as an integer vector.
    *
+   * The caller must provide a pre-allocated array large enough to hold the values.
+   * To query the required size, pass NULL for `values`, then `count` will be written.
+   *
    * @param str String to parse.
-   * @param values Pre-allocated array to store the integer values.
+   * @param values Pre-allocated array to store the integer values, or NULL to query the size.
    * @param count Pointer to store the number of values retrieved. 0 if the option cannot be parsed.
    */
   F3D_EXPORT void f3d_options_parse_int_vector(const char* str, int* values, size_t* count);
