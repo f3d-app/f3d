@@ -66,6 +66,30 @@ extern "C"
   F3D_EXPORT void f3d_camera_set_view_up(f3d_camera_t* camera, const f3d_vector3_t view_up);
 
   /**
+   * @brief Get the camera world azimuth angle in degrees.
+   *
+   * @param camera Camera handle.
+   * @return World elevation angle in degrees.
+   */
+  F3D_EXPORT f3d_angle_deg_t f3d_camera_get_world_azimuth(const f3d_camera_t* camera);
+
+  /**
+   * @brief Get the camera world elevation angle in degrees.
+   *
+   * @param camera Camera handle.
+   * @return World elevation angle in degrees.
+   */
+  F3D_EXPORT f3d_angle_deg_t f3d_camera_get_world_elevation(const f3d_camera_t* camera);
+
+  /**
+   * @brief Get the distance between the camera position and its focal point.
+   *
+   * @param camera Camera handle.
+   * @return Distance to focal point.
+   */
+  F3D_EXPORT double f3d_camera_get_distance(const f3d_camera_t* camera);
+
+  /**
    * @brief Get the view up vector of the camera.
    *
    * @param camera Camera handle.

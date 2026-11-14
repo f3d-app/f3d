@@ -87,6 +87,27 @@ public class Camera {
     public native double[] getFocalPoint();
 
     /**
+     * Get the world azimuth angle in degrees of the camera
+     *
+     * @return world azimuth angles in degrees
+     */
+    public native double getWorldAzimuth();
+
+    /**
+     * Get the world elevation angle in degrees of the camera
+     *
+     * @return world elevation angles in degrees
+     */
+    public native double getWorldElevation();
+
+    /**
+     * Get the distance between the camera position and its focal point.
+     *
+     * @return distance to focal point
+     */
+    public native double getDistance();
+
+    /**
      * Set the view up vector of the camera.
      *
      * @param up array of 3 doubles [x, y, z]

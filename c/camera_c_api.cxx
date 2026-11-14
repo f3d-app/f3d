@@ -60,6 +60,27 @@ void f3d_camera_get_focal_point(const f3d_camera_t* camera, f3d_point3_t focal_p
 }
 
 //----------------------------------------------------------------------------
+f3d_angle_deg_t f3d_camera_get_world_azimuth(const f3d_camera_t* camera)
+{
+  const f3d::camera* cpp_camera = reinterpret_cast<const f3d::camera*>(camera);
+  return cpp_camera->getWorldAzimuth();
+}
+
+//----------------------------------------------------------------------------
+f3d_angle_deg_t f3d_camera_get_world_elevation(const f3d_camera_t* camera)
+{
+  const f3d::camera* cpp_camera = reinterpret_cast<const f3d::camera*>(camera);
+  return cpp_camera->getWorldElevation();
+}
+
+//----------------------------------------------------------------------------
+double f3d_camera_get_distance(const f3d_camera_t* camera)
+{
+  const f3d::camera* cpp_camera = reinterpret_cast<const f3d::camera*>(camera);
+  return cpp_camera->getDistance();
+}
+
+//----------------------------------------------------------------------------
 void f3d_camera_set_view_up(f3d_camera_t* camera, const f3d_vector3_t view_up)
 {
   if (!camera || !view_up)
