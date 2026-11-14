@@ -140,7 +140,6 @@ if(F3D_MODULE_PSD)
   list(APPEND classes vtkF3DPSDReader)
 endif()
 
-
 if(F3D_MODULE_UI AND NOT F3D_USE_EXTERNAL_IMGUI)
   list(APPEND sources
     "${F3D_SOURCE_DIR}/external/imgui/imgui.cpp"
@@ -160,7 +159,10 @@ vtk_module_add_module(f3d::vtkextPrivate
 
 # stb_image (psd)
 if(F3D_MODULE_PSD)
-  vtk_module_include(f3d::vtkextPrivate PRIVATE "${F3D_SOURCE_DIR}/external/stb")
+  if(F3D_USE_EXTERNAL_STB)
+    vtk_module_include(f3d::vtkextPrivate PRIVATE "${Stb_INCLUDE_DIR}")
+  else()
+    vtk_module_include(f3d::vtkextPrivate PRIVATE "${F3D_SOURCE_DIR}/external/stb")
 endif()
 
 if(MSVC)
