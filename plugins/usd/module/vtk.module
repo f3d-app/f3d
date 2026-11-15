@@ -11,4 +11,5 @@ DEPENDS
   VTK::IOImage
   f3d::vtkext
 TEST_DEPENDS
+  VTK::RenderingOpenGL2
   VTK::TestingCore

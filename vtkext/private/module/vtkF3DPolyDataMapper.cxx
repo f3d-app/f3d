@@ -126,7 +126,9 @@ bool vtkF3DPolyDataMapper::PrepareSparseMorphing(
         ranges->GetMTime() > this->BlendShapeRangesValidationTime ||
         this->ValidatedBlendShapeOffsetCount != offsetCount)
       {
-        // Attributes become floats in VTK, so indices above 2^24 can round.
+        // MapDataArrayToVertexAttribute uses VTK_FLOAT VBOs, even for vtkIntArray.
+        // GLSL converts these vec2 attributes back to ivec2; above 2^24 integer
+        // endpoints can round and select the wrong SSBO offsets.
         const vtkIdType limit = std::min<vtkIdType>(offsetCount, 16777216);
         this->BlendShapeRangesValid = true;
         const int* values = ranges->GetPointer(0);

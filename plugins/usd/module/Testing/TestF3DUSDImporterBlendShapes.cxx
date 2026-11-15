@@ -164,7 +164,7 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
         std::cerr << "Unexpected packed blend shape weights at frame " << frame << '\n';
         return EXIT_FAILURE;
       }
-      if (!CheckPackedDeformation(polydata))
+      if (!::CheckPackedDeformation(polydata))
       {
         return EXIT_FAILURE;
       }
@@ -172,7 +172,7 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
       const vtkMTimeType weightsTime = weights->GetMTime();
       if (!importer->UpdateAtTimeValue(frame / 24.) ||
         pointsTime != polydata->GetPoints()->GetMTime() || weightsTime != weights->GetMTime() ||
-        !CheckPackedDeformation(polydata))
+        !::CheckPackedDeformation(polydata))
       {
         std::cerr << "Unchanged weights recomputed the output points\n";
         return EXIT_FAILURE;
@@ -180,7 +180,7 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
       // External edits must invalidate the cached deformation even at the same time.
       polydata->GetPoints()->SetPoint(0, 100., 100., 100.);
       polydata->GetPoints()->Modified();
-      if (!importer->UpdateAtTimeValue(frame / 24.) || !CheckPackedDeformation(polydata))
+      if (!importer->UpdateAtTimeValue(frame / 24.) || !::CheckPackedDeformation(polydata))
       {
         return EXIT_FAILURE;
       }
@@ -199,7 +199,7 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
       }
       sourceIds->SetValue(0, originalSource);
       sourceIds->Modified();
-      if (!importer->UpdateAtTimeValue(12.5 / 24.) || !CheckPackedDeformation(polydata))
+      if (!importer->UpdateAtTimeValue(12.5 / 24.) || !::CheckPackedDeformation(polydata))
       {
         return EXIT_FAILURE;
       }
@@ -232,7 +232,7 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
       std::cerr << "Unexpected in-between weights at frame " << frame << '\n';
       return EXIT_FAILURE;
     }
-    if (!CheckPackedDeformation(mapper->GetInput()))
+    if (!::CheckPackedDeformation(mapper->GetInput()))
     {
       return EXIT_FAILURE;
     }
@@ -301,9 +301,9 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
   }
   importer->SetUseGPUMorphing(false);
   if (!importer->UpdateAtTimeValue(12.5 / 24.) ||
-    !CheckPackedDeformation(vtkPolyDataMapper::SafeDownCast(
+    !::CheckPackedDeformation(vtkPolyDataMapper::SafeDownCast(
       importer->GetRenderer()->GetActors()->GetLastActor()->GetMapper())
-                              ->GetInput()))
+                                ->GetInput()))
   {
     std::cerr << "CPU fallback did not restore current deformation\n";
     return EXIT_FAILURE;
@@ -328,7 +328,7 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
       auto* polydata = vtkPolyDataMapper::SafeDownCast(actor->GetMapper())->GetInput();
       auto* weights =
         vtkFloatArray::SafeDownCast(polydata->GetFieldData()->GetArray("blendShapeWeights"));
-      if (!CheckPackedDeformation(polydata) || (sharedWeights && sharedWeights != weights))
+      if (!::CheckPackedDeformation(polydata) || (sharedWeights && sharedWeights != weights))
       {
         std::cerr << "Subset morphing data is not shared or correctly deformed\n";
         return EXIT_FAILURE;
@@ -342,6 +342,7 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
     std::string(argv[1]) + "data/SimpleBlendShapesAnimatedPoints.usda";
   animatedImporter->SetFileName(animatedFile.c_str());
   animatedImporter->Update();
+  // Exercise CPU -> GPU -> CPU transitions, including restoration of CPU deformation.
   for (const bool gpu : { false, true, false })
   {
     animatedImporter->SetUseGPUMorphing(gpu);
@@ -370,6 +371,7 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
   const std::string skinFile = std::string(argv[1]) + "data/SimpleBlendShapesAnimatedSkin.usda";
   skinImporter->SetFileName(skinFile.c_str());
   skinImporter->Update();
+  // Exercise CPU -> GPU -> CPU transitions, including restoration of CPU deformation.
   for (const bool gpu : { false, true, false })
   {
     skinImporter->SetUseGPUMorphing(gpu);
