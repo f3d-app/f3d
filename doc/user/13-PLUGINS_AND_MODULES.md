@@ -105,7 +105,7 @@ Not every binary ships every module. This table shows which modules are availabl
 | `DMON`            |   Yes   |     N/A      |        N/A        |   N/A   |
 | `EXR`             |   Yes   |     Yes      |        Yes        |   Yes   |
 | `FFMPEG`          |   Yes   |     Yes      |        No         |   No    |
-| `MESHOPT`         |   No    |      No      |        Yes        |   No    |
+| `MESHOPT`         |   Yes   |     Yes      |        Yes        |   Yes   |
 | `OPENXR`          |   No    |      No      |        No         |   No    |
 | `RAYTRACING`      |   Yes   |      No      |        No         |   No    |
 | `TINYFILEDIALOGS` |   Yes   |     Yes      |        N/A        |   N/A   |
