@@ -4,11 +4,12 @@
     "OSPRay is fixed at 2.12.0 until full support for OSPRay 3.0 is added in VTK",
     "OpenEXR v3.0.1 is actually not using OpenJPH",
     "OpenVDB min version is not enforced by F3D code and missing from VTK code",
+    "OpenVDB version is locked by https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13996",
     "TBB is set at v2021.13.1 because OpenUSD seems to not support more recent versions: https://github.com/PixarAnimationStudios/OpenUSD/issues/3878 and https://github.com/PixarAnimationStudios/OpenUSD/issues/4078",
     "libx264 is using git hash because there are no proper releases",
     "mesa is fixed at 25.0.7 because OSMesa has been removed from 25.1.0",
     "sqlite is using a common-superbuild hash as it is not a CMake project",
-    "webifc is fixed at 0.77 until https://github.com/ThatOpen/engine_web-ifc/issues/2309 is fixed.",
+    "webifc is fixed at 0.77 until https://github.com/ThatOpen/engine_web-ifc/issues/2309 and https://github.com/ThatOpen/engine_web-ifc/issues/2396 are fixed.",
     "zlib is fixed at v1.3.1 until https://github.com/madler/zlib/issues/1181 is fixed"
   ],
   "alembic": {
@@ -20,7 +21,7 @@
     "min_version": "v0.16.0"
   },
   "assimp": {
-    "version": "v6.0.5",
+    "version": "v6.0.6",
     "min_version": "v5.4.0"
   },
   "blosc": {
@@ -72,11 +73,11 @@
     "min_version": "V7_6_3"
   },
   "openexr": {
-    "version": "v3.5.3",
+    "version": "v3.5.4",
     "min_version": "v3.0.1"
   },
   "openjph": {
-    "version": "0.32.0",
+    "version": "0.33.0",
     "min_version": "0.27.3"
   },
   "openvdb": {
@@ -136,7 +137,7 @@
     "min_version": "v1.2.13"
   },
   "vtk_commit_sha": "6040bfbbe27a46a2482724234d5aed470e66eff5",
-  "docker_timestamp": "20261111_0",
+  "docker_timestamp": "20261114_1",
   "global_cache_index": "3",
   "vtk_matrix": "['commit', 'v9.7.2', 'v9.6.2', 'v9.5.2']"
 }
