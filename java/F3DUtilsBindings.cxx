@@ -112,21 +112,21 @@ extern "C"
     const jint folderOrdinal = env->CallIntMethod(knownFolder, ordinalMethod);
 
     const f3d::utils::KnownFolder folder;
-    switch(folderOrdinal)
-      {
-        case 0:
-	  folder = f3d::utils::KnownFolder::ROAMINGAPPDATA;
-	  break;
-        case 1:
-	  folder = f3d::utils::KnownFolder::LOCALAPPDATA;
-	  break;
-        case 3:
-	  folder = f3d::utils::KnownFolder::PICTURES;
-	  break;
-        default:
-	  return  nullptr;
-      }
-    
+    switch (folderOrdinal)
+    {
+      case 0:
+        folder = f3d::utils::KnownFolder::ROAMINGAPPDATA;
+        break;
+      case 1:
+        folder = f3d::utils::KnownFolder::LOCALAPPDATA;
+        break;
+      case 2:
+        folder = f3d::utils::KnownFolder::PICTURES;
+        break;
+      default:
+        return nullptr;
+    }
+
     std::optional<std::string> result = f3d::utils::getKnownFolder(folder);
     return result.has_value() ? env->NewStringUTF(result.value().c_str()) : nullptr;
   }
