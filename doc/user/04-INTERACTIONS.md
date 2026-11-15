@@ -23,7 +23,7 @@ Interact with the displayed data directly in the window:
 F3D supports a 2D interaction mode designed for viewing images and flat content. In 2D mode:
 
 - Rotation is disabled
-- Camera commands (`set_camera`, `roll_camera`, `elevation_camera`, `azimuth_camera`) are disabled
+- Camera commands (`set_camera`, `roll_camera`, `elevation_camera`, `azimuth_camera`, `set_camera_look_at`) are disabled
 - _Click and drag_ with the _left_ or _middle_ mouse button to pan
 - _Click and drag_ with the _right_ mouse button or use the _mouse wheel_ to zoom
 - The default camera zoom factor is `1.0` (no padding) instead of `0.9`
