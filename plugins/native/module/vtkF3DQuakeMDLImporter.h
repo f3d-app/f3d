@@ -70,6 +70,14 @@ public:
   vtkGetMacro(SkinIndex, unsigned int);
   ///@}
 
+  ///@{
+  /**
+   * Set/Get whether to interpolate between animation frames. Default is false.
+   */
+  vtkSetMacro(Interpolate, bool);
+  vtkGetMacro(Interpolate, bool);
+  ///@}
+
   /**
    * Return true if, after a quick check of file header, it looks like the provided stream
    * can be read. Return false if it is sure it cannot be read as a strean.
@@ -92,6 +100,7 @@ private:
 
   struct vtkInternals;
   unsigned int SkinIndex = 0;
+  bool Interpolate = false;
 
   std::unique_ptr<vtkInternals> Internals;
 };
