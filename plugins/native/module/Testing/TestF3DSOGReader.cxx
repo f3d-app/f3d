@@ -4,9 +4,11 @@
 #include <vtkFileResourceStream.h>
 #include <vtkFloatArray.h>
 #include <vtkNew.h>
+#include <vtkObjectFactory.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
+#include <vtkResourceStream.h>
 #include <vtkTestUtilities.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkVersion.h>
@@ -21,6 +23,24 @@
 
 namespace
 {
+// A stream that cannot seek, which the SOG reader must refuse
+class NonSeekableStream : public vtkResourceStream
+{
+public:
+  static NonSeekableStream* New();
+  vtkTypeMacro(NonSeekableStream, vtkResourceStream);
+
+  std::size_t Read(void*, std::size_t) override { return 0; }
+  bool EndOfStream() override { return true; }
+
+protected:
+  NonSeekableStream()
+    : vtkResourceStream(false)
+  {
+  }
+};
+vtkStandardNewMacro(NonSeekableStream);
+
 bool Near(const char* label, double value, double expected)
 {
   if (std::abs(value - expected) > 1e-5)
@@ -321,6 +341,8 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     { "shcount0.sog", "Invalid SOG meta.json" },
     { "toomany.sog", "SOG count exceeds" },
     { "badlabel.sog", "Invalid SOG spherical harmonics" },
+    { "shoutofrange.sog", "Invalid SOG spherical harmonics" },
+    { "sizemismatch.sog", "do not share one width and height" },
     { "badimage.sog", "Cannot read SOG image" },
     { "badquat.sog", "Invalid SOG quaternion" },
   };
@@ -403,6 +425,14 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
   vtkNew<vtkF3DSOGReader> metaReader;
   metaReader->SetStream(stream);
   if (!::Reports(metaReader, "Invalid SOG meta.json"))
+  {
+    return EXIT_FAILURE;
+  }
+
+  vtkNew<NonSeekableStream> nonSeekable;
+  vtkNew<vtkF3DSOGReader> nonSeekableReader;
+  nonSeekableReader->SetStream(nonSeekable);
+  if (!::Reports(nonSeekableReader, "non-seekable stream"))
   {
     return EXIT_FAILURE;
   }

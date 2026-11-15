@@ -25,6 +25,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <cmath>
 #include <cstdint>
 #include <numbers>
@@ -135,10 +136,7 @@ bool ReadImage(vtkF3DArchiveReader* archive, const std::string& name, Image& ima
   webp->Update();
 
   image.Data = webp->GetOutput();
-  if (!image.Data)
-  {
-    return false;
-  }
+  assert(image.Data);
 
   const int width = ::Width(image);
   const int height = ::Height(image);
@@ -348,64 +346,56 @@ int vtkF3DSOGReader::RequestData(
   int bands = 0;
   std::int64_t shCount = 0;
 
-  try
-  {
-    if (!meta.contains("count") || !meta["count"].is_number_integer())
-    {
-      vtkErrorMacro("Invalid SOG meta.json");
-      return 0;
-    }
-    countValue = meta["count"].get<std::int64_t>();
-    if (countValue < 0)
-    {
-      vtkErrorMacro("Invalid SOG meta.json");
-      return 0;
-    }
-
-    // means files are low byte, then high byte
-    if (!meta.contains("means") || !::ReadFiles(meta["means"], 2, meansFiles) ||
-      !::ReadRange(meta["means"], "mins", mins) || !::ReadRange(meta["means"], "maxs", maxs) ||
-      !meta.contains("scales") || !::ReadFiles(meta["scales"], 1, scaleFiles) ||
-      !::ReadCodebook(meta["scales"], scaleCodebook) || !meta.contains("quats") ||
-      !::ReadFiles(meta["quats"], 1, quatFiles) || !meta.contains("sh0") ||
-      !::ReadFiles(meta["sh0"], 1, sh0Files) || !::ReadCodebook(meta["sh0"], sh0Codebook))
-    {
-      vtkErrorMacro("Invalid SOG meta.json");
-      return 0;
-    }
-
-    // shN files are the centroid palette, then the label
-    hasSH = meta.contains("shN");
-    if (hasSH)
-    {
-      const nlohmann::json& shN = meta["shN"];
-      if (!shN.is_object() || !shN.contains("bands") || !shN["bands"].is_number_integer() ||
-        !shN.contains("count") || !shN["count"].is_number_integer())
-      {
-        vtkErrorMacro("Invalid SOG meta.json");
-        return 0;
-      }
-
-      bands = shN["bands"].get<int>();
-      shCount = shN["count"].get<std::int64_t>();
-      if (bands < 1 || bands > 3)
-      {
-        vtkErrorMacro(
-          "Incompatible SOG spherical harmonics. Only degrees 1 through 3 are supported");
-        return 0;
-      }
-      if (shCount < 1 || shCount > 65536 || !::ReadFiles(shN, 2, shNFiles) ||
-        !::ReadCodebook(shN, shNCodebook))
-      {
-        vtkErrorMacro("Invalid SOG meta.json");
-        return 0;
-      }
-    }
-  }
-  catch (const nlohmann::json::exception&)
+  if (!meta.contains("count") || !meta["count"].is_number_integer())
   {
     vtkErrorMacro("Invalid SOG meta.json");
     return 0;
+  }
+  countValue = meta["count"].get<std::int64_t>();
+  if (countValue < 0)
+  {
+    vtkErrorMacro("Invalid SOG meta.json");
+    return 0;
+  }
+
+  // means files are low byte, then high byte
+  if (!meta.contains("means") || !::ReadFiles(meta["means"], 2, meansFiles) ||
+    !::ReadRange(meta["means"], "mins", mins) || !::ReadRange(meta["means"], "maxs", maxs) ||
+    !meta.contains("scales") || !::ReadFiles(meta["scales"], 1, scaleFiles) ||
+    !::ReadCodebook(meta["scales"], scaleCodebook) || !meta.contains("quats") ||
+    !::ReadFiles(meta["quats"], 1, quatFiles) || !meta.contains("sh0") ||
+    !::ReadFiles(meta["sh0"], 1, sh0Files) || !::ReadCodebook(meta["sh0"], sh0Codebook))
+  {
+    vtkErrorMacro("Invalid SOG meta.json");
+    return 0;
+  }
+
+  // shN files are the centroid palette, then the label
+  hasSH = meta.contains("shN");
+  if (hasSH)
+  {
+    const nlohmann::json& shN = meta["shN"];
+    if (!shN.is_object() || !shN.contains("bands") || !shN["bands"].is_number_integer() ||
+      !shN.contains("count") || !shN["count"].is_number_integer())
+    {
+      vtkErrorMacro("Invalid SOG meta.json");
+      return 0;
+    }
+
+    bands = shN["bands"].get<int>();
+    shCount = shN["count"].get<std::int64_t>();
+    if (bands < 1 || bands > 3)
+    {
+      vtkErrorMacro(
+        "Incompatible SOG spherical harmonics. Only degrees 1 through 3 are supported");
+      return 0;
+    }
+    if (shCount < 1 || shCount > 65536 || !::ReadFiles(shN, 2, shNFiles) ||
+      !::ReadCodebook(shN, shNCodebook))
+    {
+      vtkErrorMacro("Invalid SOG meta.json");
+      return 0;
+    }
   }
 
   ::Image meansLow;
@@ -519,8 +509,8 @@ int vtkF3DSOGReader::RequestData(
         static_cast<unsigned int>(labelPixel[0]) + (static_cast<unsigned int>(labelPixel[1]) << 8);
       const int xOrigin = static_cast<int>(label % 64) * numCoeffs;
       const int y = static_cast<int>(label / 64);
-      if (label >= static_cast<unsigned int>(shCount) || y < 0 || y >= ::Height(shCentroids) ||
-        xOrigin < 0 || xOrigin + numCoeffs > ::Width(shCentroids))
+      if (label >= static_cast<unsigned int>(shCount) || y >= ::Height(shCentroids) ||
+        xOrigin + numCoeffs > ::Width(shCentroids))
       {
         vtkErrorMacro("Invalid SOG spherical harmonics");
         return 0;
