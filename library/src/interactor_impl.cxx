@@ -1127,8 +1127,8 @@ interactor& interactor_impl::initCommands()
       this->Internals->Style->SetTemporaryUp(
         this->Internals->Window.getCamera().getViewUp().data());
     },
-    command_documentation_t{ "set_camera_look_at position focal up",
-      "set camera at given position looking in focal direction" });
+    command_documentation_t{ "set_camera_look_at position focal_point up",
+      "set camera at given position looking at focal point using provided up direction" });
 
   this->addCommand(
     "jump_to_frame",

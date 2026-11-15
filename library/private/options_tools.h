@@ -434,7 +434,7 @@ point3_t parse(const std::string& str)
   if (point.size() != 3)
   {
     throw options::parsing_exception("Cannot parse " + str +
-      " into a point3_t: " + "point3_t must be format x,y,z. x, y and z are doubles");
+      " into a point3_t: point3_t must be format x,y,z. x, y and z are doubles");
   }
   return { point[0], point[1], point[2] };
 }
