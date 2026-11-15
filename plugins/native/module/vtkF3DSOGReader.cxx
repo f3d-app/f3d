@@ -386,8 +386,7 @@ int vtkF3DSOGReader::RequestData(
     shCount = shN["count"].get<std::int64_t>();
     if (bands < 1 || bands > 3)
     {
-      vtkErrorMacro(
-        "Incompatible SOG spherical harmonics. Only degrees 1 through 3 are supported");
+      vtkErrorMacro("Incompatible SOG spherical harmonics. Only degrees 1 through 3 are supported");
       return 0;
     }
     if (shCount < 1 || shCount > 65536 || !::ReadFiles(shN, 2, shNFiles) ||

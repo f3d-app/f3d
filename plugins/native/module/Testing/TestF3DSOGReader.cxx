@@ -30,8 +30,14 @@ public:
   static NonSeekableStream* New();
   vtkTypeMacro(NonSeekableStream, vtkResourceStream);
 
-  std::size_t Read(void*, std::size_t) override { return 0; }
-  bool EndOfStream() override { return true; }
+  std::size_t Read(void*, std::size_t) override
+  {
+    return 0;
+  }
+  bool EndOfStream() override
+  {
+    return true;
+  }
 
 protected:
   NonSeekableStream()
