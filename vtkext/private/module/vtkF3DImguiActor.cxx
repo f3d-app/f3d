@@ -451,9 +451,11 @@ void SetupNextWindow(std::optional<ImVec2> position, std::optional<ImVec2> size)
 // Painted thickness of the progress bar itself, independent of font scale.
 constexpr float PROGRESS_BAR_THICKNESS = 5.f;
 
-// Unscaled reach of the pointer around the bar: sizes the click/drag row and the
-// distance at which the tooltip snaps to a key frame.
+// Unscaled vertical reach of the pointer around the bar: sizes the click/drag row.
 constexpr float PROGRESS_BAR_GRAB_RADIUS = 6.f;
+
+// Snap distance as a fraction of the key frame interval under the pointer
+constexpr float PROGRESS_BAR_SNAP_FRACTION = 1.f / 4.f;
 
 std::string FormatSpeedFactor(double speedFactor)
 {
@@ -1218,7 +1220,6 @@ void vtkF3DImguiActor::RenderAnimationProgressBar()
   // row (start/end/current times and the animation name) above the bar.
   const bool advanced = (this->AnimationProgressMode == AnimationProgressBarMode::ADVANCED);
 
-  const float grabRadius = ::PROGRESS_BAR_GRAB_RADIUS * this->FontScale;
   const float lineHeight = ImGui::GetTextLineHeight();
   const float barWidth = viewport->WorkSize.x;
 
@@ -1247,11 +1248,13 @@ void vtkF3DImguiActor::RenderAnimationProgressBar()
   const ImVec2 barMin(origin.x, barBottom - ::PROGRESS_BAR_THICKNESS);
   const ImVec2 barMax(origin.x + barWidth, barBottom);
 
-  // Map an animation time to its horizontal position on the bar
+  const float pixelSpan = std::max(barWidth - 1.f, 1.f);
+
+  // Map an animation time to the left edge of its pixel on the bar
   const auto timeToX = [&](double time)
   {
     const float frac = std::clamp(static_cast<float>((time - rangeMin) / span), 0.f, 1.f);
-    return barMin.x + frac * barWidth;
+    return barMin.x + frac * pixelSpan;
   };
 
   const ImColor fillColor = ::ColorToImVec4(this->AnimationProgressColor);
@@ -1271,13 +1274,35 @@ void vtkF3DImguiActor::RenderAnimationProgressBar()
   const bool active = ImGui::IsItemActive();
   const bool hovered = ImGui::IsItemHovered();
 
-  const float mouseFrac = std::clamp((ImGui::GetIO().MousePos.x - barMin.x) / barWidth, 0.f, 1.f);
-  const double mouseTime = rangeMin + static_cast<double>(mouseFrac) * span;
+  const float mouseFrac = std::clamp((ImGui::GetIO().MousePos.x - barMin.x) / pixelSpan, 0.f, 1.f);
+  const double mouseTime = std::min(rangeMin + static_cast<double>(mouseFrac) * span, rangeMax);
+
+  std::optional<size_t> snappedKeyFrame;
+  if (advanced)
+  {
+    // Determine if click and tooltip should snap to a key frame near the mouse
+    const std::vector<double>& keyFrames = this->AnimationKeyFrames;
+    const size_t next =
+      static_cast<size_t>(std::ranges::lower_bound(keyFrames, mouseTime) - keyFrames.begin());
+    const double lo = next > 0 ? keyFrames[next - 1] : rangeMin;
+    const double hi = next < keyFrames.size() ? keyFrames[next] : rangeMax;
+    const double snapDist = (hi - lo) * ::PROGRESS_BAR_SNAP_FRACTION;
+
+    if (next < keyFrames.size() && hi - mouseTime <= snapDist)
+    {
+      snappedKeyFrame = next;
+    }
+    else if (next > 0 && mouseTime - lo <= snapDist)
+    {
+      snappedKeyFrame = next - 1;
+    }
+  }
 
   if (active)
   {
-    // Jump to the exact time under the cursor
-    const std::string command = "jump_to_time " + std::to_string(mouseTime);
+    const std::string command = snappedKeyFrame
+      ? "jump_to_key_frame " + std::to_string(*snappedKeyFrame)
+      : "jump_to_time " + std::to_string(mouseTime);
     vtkOutputWindow::GetInstance()->InvokeEvent(
       vtkF3DUserEvents::TriggerEvent, const_cast<char*>(command.c_str()));
   }
@@ -1292,7 +1317,8 @@ void vtkF3DImguiActor::RenderAnimationProgressBar()
     // Key frame markers
     for (const double kf : this->AnimationKeyFrames)
     {
-      const float kfX = timeToX(kf);
+      // Center the marker on its pixel, consistent with the mouse position used for snapping
+      const float kfX = timeToX(kf) + 0.5f;
       drawList->AddLine(
         ImVec2(kfX, barMin.y - 2.f), ImVec2(kfX, barMax.y), fontColor, 1.f * this->FontScale);
     }
@@ -1338,22 +1364,9 @@ void vtkF3DImguiActor::RenderAnimationProgressBar()
     // key frame marker, show key frame time.
     if (hovered)
     {
-      bool onKeyFrame = false;
-      double keyFrameTime = 0.0;
-      float nearestDist = grabRadius;
-      for (const double kf : this->AnimationKeyFrames)
-      {
-        const float dist = std::fabs(ImGui::GetIO().MousePos.x - timeToX(kf));
-        if (dist <= nearestDist)
-        {
-          nearestDist = dist;
-          keyFrameTime = kf;
-          onKeyFrame = true;
-        }
-      }
-
-      const std::string tooltipText =
-        onKeyFrame ? "Key frame\n" + label(keyFrameTime) : label(mouseTime);
+      const std::string tooltipText = snappedKeyFrame
+        ? "Key frame\n" + label(this->AnimationKeyFrames[*snappedKeyFrame])
+        : label(mouseTime);
 
       // Restore padding for tooltip
       const float tooltipPadding = margin * this->FontScale;

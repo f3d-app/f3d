@@ -172,6 +172,8 @@ f3d_test(NAME TestInteractionAnimationProgressBarHover DATA soldier_animations.m
 f3d_test(NAME TestInteractionAnimationProgressBarHoverLeave DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress=advanced INTERACTION UI) #Hover then leave the window, the tooltip must disappear
 f3d_test(NAME TestInteractionAnimationProgressBarNotifications DATA soldier_animations.mdl ARGS --animation-indices=2 --notifications --animation-progress=advanced INTERACTION UI) #Space twice then hover the first key frame
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+  f3d_test(NAME TestInteractionAnimationProgressBarSnapClick DATA f3d.glb ARGS --animation-progress=advanced INTERACTION UI) #Left click 1.2px from a key frame marker, within 1/4 of the 6.1px key frame spacing, must land on the key frame
+  f3d_test(NAME TestInteractionAnimationProgressBarSnapRelative DATA f3d.glb ARGS --animation-progress=advanced INTERACTION UI) #Left click 1.8px from a key frame marker, farther than 1/4 of the 6.1px key frame spacing, must not snap
   f3d_test(NAME TestInteractionAnimationProgressBarAxis DATA soldier_animations.mdl ARGS --animation-indices=2 -x --animation-progress=advanced INTERACTION UI) #Hover the last key frame
 endif()
 
