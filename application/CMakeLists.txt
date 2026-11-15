@@ -87,6 +87,11 @@ function(f3d_create_exec target_name)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_WEBP)
   endif ()
 
+  # stb
+  if (F3D_MODULE_STB)
+    target_compile_definitions(${target_name} PRIVATE F3D_MODULE_STB)
+  endif ()
+
   # clip
   if (F3D_MODULE_CLIP)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_CLIP)

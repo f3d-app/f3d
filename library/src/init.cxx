@@ -12,6 +12,10 @@
 #include "vtkF3DWebPReader.h"
 #endif
 
+#if F3D_MODULE_STB
+#include "vtkF3DPSDReader.h"
+#endif
+
 #include <vtkCellArray.h>
 #include <vtkImageReader2Factory.h>
 #include <vtkLogger.h>
@@ -72,6 +76,11 @@ init::init()
 #if F3D_MODULE_WEBP
   const vtkNew<vtkF3DWebPReader> webpReader;
   vtkImageReader2Factory::RegisterReader(webpReader);
+#endif
+
+#if F3D_MODULE_STB
+  const vtkNew<vtkF3DPSDReader> PSDReader;
+  vtkImageReader2Factory::RegisterReader(PSDReader);
 #endif
 }
 }
