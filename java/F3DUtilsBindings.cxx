@@ -111,7 +111,7 @@ extern "C"
     jmethodID ordinalMethod = env->GetMethodID(enumClass, "ordinal", "()I");
     const jint folderOrdinal = env->CallIntMethod(knownFolder, ordinalMethod);
 
-    const f3d::utils::KnownFolder folder;
+    f3d::utils::KnownFolder folder;
     switch (folderOrdinal)
     {
       case 0:
