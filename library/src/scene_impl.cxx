@@ -191,11 +191,6 @@ public:
 
         f3d::log::progress(
           "Loading ", filename, " : ", percentageStr, "% |", bar, "| [", time, "]");
-
-        if (progress >= 1.0)
-        {
-          f3d::log::progress("\n");
-        }
       });
     importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
     data->timer->StartTimer();
