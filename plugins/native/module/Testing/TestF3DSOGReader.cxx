@@ -369,7 +369,7 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     }
   }
 
-  const char* modes[] = { "mode2.sog", "mode3.sog" };
+  const char* const modes[] = { "mode2.sog", "mode3.sog" };
   for (const char* mode : modes)
   {
     vtkNew<vtkFileResourceStream> modeStream;
@@ -435,7 +435,7 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  vtkNew<NonSeekableStream> nonSeekable;
+  const vtkNew<NonSeekableStream> nonSeekable;
   vtkNew<vtkF3DSOGReader> nonSeekableReader;
   nonSeekableReader->SetStream(nonSeekable);
   if (!::Reports(nonSeekableReader, "non-seekable stream"))
