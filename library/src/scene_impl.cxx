@@ -190,7 +190,7 @@ public:
           "{:02}:{:02}/{:02}:{:02}", elapsedMin, elapsedSec, estimatedMin, estimatedSec);
 
         f3d::log::progress(
-          "\rLoading ", filename, " : ", percentageStr, "% |", bar, "| [", time, "]");
+          "Loading ", filename, " : ", percentageStr, "% |", bar, "| [", time, "]");
 
         if (progress >= 1.0)
         {
