@@ -10,7 +10,7 @@ static JavaVM* g_jvm = nullptr;
 f3d::log::VerboseLevel JavaVerboseLevelToNative(JNIEnv* env, jobject level)
 {
   const JniLocalRef<jclass> enumClass(env, env->GetObjectClass(level));
-  jmethodId ordinalMethod = env->GetMethodID(enumClass, "ordinal", "()");
+  jmethodID ordinalMethod = env->GetMethodID(enumClass, "ordinal", "()I");
   const jint ordinal = env->CallIntMethod(level, ordinalMethod);
 
   switch (ordinal)
@@ -30,8 +30,8 @@ f3d::log::VerboseLevel JavaVerboseLevelToNative(JNIEnv* env, jobject level)
 
 jobject NativeVerboseLevelToJava(JNIEnv* env, const f3d::log::VerboseLevel level)
 {
-  const JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Log/$VerboseLevel"));
-  jfieldId fieldID;
+  const JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Log$VerboseLevel"));
+  jfieldID fieldID;
 
   switch (level)
   {
@@ -48,7 +48,7 @@ jobject NativeVerboseLevelToJava(JNIEnv* env, const f3d::log::VerboseLevel level
       fieldID = env->GetStaticFieldID(enumClass, "ERROR", "Lapp/f3d/F3D/Log$VerboseLevel;");
       break;
     default:
-      fieldId = envGetStaticFieldID(enumClass, "QUIET", "Lapp/f3d/F3D/Log$VeboseLevel;");
+      fieldID = env->envGetStaticFieldID(enumClass, "QUIET", "Lapp/f3d/F3D/Log$VerboseLevel;");
       break;
   }
   return env->GetStaticObjectField(enumClass, fieldID);
