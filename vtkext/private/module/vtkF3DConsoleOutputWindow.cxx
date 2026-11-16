@@ -12,7 +12,6 @@ vtkF3DConsoleOutputWindow::vtkF3DConsoleOutputWindow() = default;
 //----------------------------------------------------------------------------
 void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)
 {
-  lastMessageIsProgress = false;
 
   std::string fmtText = "\n";
 
@@ -54,12 +53,13 @@ void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)
     default:
       break;
   }
+
+  lastMessageIsProgress = false;
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DConsoleOutputWindow::DisplayProgress(const char* str)
 {
-  lastMessageIsProgress = true;
 
   std::string fmtText;
   fmtText += (this->lastMessageIsProgress ? "\r" : "\n");
@@ -81,4 +81,6 @@ void vtkF3DConsoleOutputWindow::DisplayProgress(const char* str)
       break;
       // LCOV_EXCL_STOP
   }
+
+  lastMessageIsProgress = true;
 }
