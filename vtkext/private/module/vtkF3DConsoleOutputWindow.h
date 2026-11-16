@@ -44,6 +44,7 @@ protected:
 
 private:
   bool UseColoring = true;
+  bool lastMessageIsProgress = false;
 };
 
 #endif
