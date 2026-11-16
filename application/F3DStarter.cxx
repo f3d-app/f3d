@@ -114,6 +114,7 @@ public:
     bool NoBackground;
     bool NoRender;
     bool NoCache;
+    bool OffScreen;
     std::string RenderingBackend;
     std::optional<double> MaxSize;
     std::optional<double> AnimationTime;
@@ -1022,6 +1023,7 @@ public:
     this->ParseOption(appOptions, "no-background", this->AppOptions.NoBackground);
     this->ParseOption(appOptions, "no-render", this->AppOptions.NoRender);
     this->ParseOption(appOptions, "no-cache", this->AppOptions.NoCache);
+    this->ParseOption(appOptions, "offscreen", this->AppOptions.OffScreen);
     this->ParseOption(appOptions, "rendering-backend", this->AppOptions.RenderingBackend);
     this->ParseOption(appOptions, "max-size", this->AppOptions.MaxSize);
     this->ParseOption(appOptions, "animation-time", this->AppOptions.AnimationTime);
@@ -1593,8 +1595,8 @@ int F3DStarter::Start(int argc, char** argv)
   {
     const bool offscreen = !this->Internals->AppOptions.Reference.empty() ||
       !this->Internals->AppOptions.Output.empty() ||
-      !this->Internals->AppOptions.OutputVideo.empty() || this->Internals->AppOptions.BindingsList;
-
+      !this->Internals->AppOptions.OutputVideo.empty() ||
+      this->Internals->AppOptions.BindingsList || this->Internals->AppOptions.OffScreen;
     try
     {
       if (this->Internals->AppOptions.RenderingBackend == "egl")
@@ -1657,7 +1659,8 @@ int F3DStarter::Start(int argc, char** argv)
 
     if (!this->Internals->AppOptions.NoRender && this->Internals->AppOptions.Output.empty() &&
       this->Internals->AppOptions.OutputVideo.empty() &&
-      this->Internals->AppOptions.Reference.empty() && !this->Internals->AppOptions.NoCache)
+      this->Internals->AppOptions.Reference.empty() && !this->Internals->AppOptions.OffScreen &&
+      !this->Internals->AppOptions.NoCache)
     {
       const F3DOptionsTools::OptionsDict cachedGeometry =
         this->Internals->ReadCachedWindowGeometry();

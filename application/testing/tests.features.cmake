@@ -611,6 +611,7 @@ f3d_test(NAME TestOutput DATA cow.vtp NO_BASELINE)
 f3d_test(NAME TestOutputOutput DATA cow.vtp ARGS --reference=${CMAKE_BINARY_DIR}/Testing/Temporary/TestOutput.png DEPENDS TestOutput NO_BASELINE)
 f3d_test(NAME TestUnsupportedInputOutput DATA unsupportedFile.dummy REGEXP "No files loaded, no rendering performed" NO_BASELINE)
 f3d_test(NAME TestOutputNoBackground DATA cow.vtp ARGS --no-background NO_BASELINE)
+f3d_test(NAME TestOutputOffscreen DATA cow.vtp ARGS --offscreen REGEXP "You are using an offscreen configuration, interactive rendering is disabled" NO_BASELINE NO_OUTPUT)
 
 # Multi-frame output tests
 f3d_test(NAME TestOutputFrameCount DATA BoxAnimated.gltf ARGS --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestOutputFrameCount_{frame:4}.png --frame-rate=0.25 REGEXP "Saved 2 animation frame" NO_BASELINE NO_OUTPUT)
