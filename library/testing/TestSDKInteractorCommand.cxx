@@ -87,6 +87,7 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, char* argv[])
   inter.triggerCommand("roll_camera 90");
   inter.triggerCommand("elevation_camera 90");
   inter.triggerCommand("azimuth_camera 90");
+  inter.triggerCommand("set_camera_look_at 10,10,10 0,0,0 -3,2,4.2");
   test("camera commands no-op in 2d mode", cam.getPosition() == posBefore);
   options.interactor.style = "default";
 
