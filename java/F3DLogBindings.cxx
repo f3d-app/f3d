@@ -7,6 +7,53 @@
 static jobject g_callback_ref = nullptr;
 static JavaVM* g_jvm = nullptr;
 
+f3d::log::VerboseLevel JavaVerboseLevelToNative(JNIEnv* env, jobject level)
+{
+  const JniLocalRef<jclass> enumClass(env, env->GetObjectClass(level));
+  jmethodId ordinalMethod = env->GetMethodID(enumClass, "ordinal", "()");
+  const jint ordinal = env->CallIntMethod(level, ordinalMethod);
+
+  switch (ordinal)
+  {
+    case 0:
+      return f3d::log::VerboseLevel::DEBUG;
+    case 1:
+      return f3d::log::VerboseLevel::INFO;
+    case 2:
+      return f3d::log::VerboseLevel::WARN;
+    case 3:
+      return f3d::log::VerboseLevel::ERROR;
+    default:
+      return f3d::log::VerboseLevel::QUIET;
+  }
+}
+
+jobject NativeVerboseLevelToJava(JNIEnv* env, const f3d::log::VerboseLevel level)
+{
+  const JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Log/$VerboseLevel"));
+  jfieldId fieldID;
+
+  switch (level)
+  {
+    case f3d::log::VerboseLevel::DEBUG:
+      fieldID = env->GetStaticFieldID(enumClass, "DEBUG", "Lapp/f3d/F3D/Log$VerboseLevel;");
+      break;
+    case f3d::log::VerboseLevel::INFO:
+      fieldID = env->GetStaticFieldID(enumClass, "INFO", "Lapp/f3d/F3D/Log$VerboseLevel;");
+      break;
+    case f3d::log::VerboseLevel::WARN:
+      fieldID = env->GetStaticFieldID(enumClass, "WARN", "Lapp/f3d/F3D/Log$VerboseLevel;");
+      break;
+    case f3d::log::VerboseLevel::ERROR:
+      fieldID = env->GetStaticFieldID(enumClass, "ERROR", "Lapp/f3d/F3D/Log$VerboseLevel;");
+      break;
+    default:
+      fieldId = envGetStaticFieldID(enumClass, "QUIET", "Lapp/f3d/F3D/Log$VeboseLevel;");
+      break;
+  }
+  return env->GetStaticObjectField(enumClass, fieldID);
+}
+
 static void cpp_log_forwarder(f3d::log::VerboseLevel level, const std::string& message)
 {
   if (g_callback_ref == nullptr || g_jvm == nullptr)
@@ -35,11 +82,7 @@ static void cpp_log_forwarder(f3d::log::VerboseLevel level, const std::string& m
     return;
   }
 
-  const JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Log$VerboseLevel"));
-  jmethodID fromValueMethod =
-    env->GetStaticMethodID(enumClass, "fromValue", "(I)Lapp/f3d/F3D/Log$VerboseLevel;");
-  const JniLocalRef<jobject> jLevel(
-    env, env->CallStaticObjectMethod(enumClass, fromValueMethod, static_cast<int>(level)));
+  const JniLocalRef<jobject> jLevel(env, NativeVerboseLevelToJava(env, level));
 
   const JniLocalRef<jstring> jMessage(env, env->NewStringUTF(message.c_str()));
 
@@ -64,13 +107,9 @@ extern "C"
       return;
     }
 
-    const JniLocalRef<jclass> enumClass(env, env->GetObjectClass(level));
-    jmethodID getValueMethod = env->GetMethodID(enumClass, "getValue", "()I");
-    const jint levelValue = env->CallIntMethod(level, getValueMethod);
-
     const JniUTFString messageStr(env, message);
 
-    const f3d::log::VerboseLevel cppLevel = static_cast<f3d::log::VerboseLevel>(levelValue);
+    const f3d::log::VerboseLevel cppLevel = JavaVerboseLevelToNative(env, level);
     f3d::log::print(cppLevel, messageStr.c_str());
   }
 
@@ -131,11 +170,7 @@ extern "C"
       return;
     }
 
-    const JniLocalRef<jclass> enumClass(env, env->GetObjectClass(level));
-    jmethodID getValueMethod = env->GetMethodID(enumClass, "getValue", "()I");
-    const jint levelValue = env->CallIntMethod(level, getValueMethod);
-
-    const f3d::log::VerboseLevel cppLevel = static_cast<f3d::log::VerboseLevel>(levelValue);
+    const f3d::log::VerboseLevel cppLevel = JavaVerboseLevelToNative(env, level);
     f3d::log::setVerboseLevel(cppLevel, forceStdErr != 0);
   }
 
@@ -143,11 +178,7 @@ extern "C"
   {
     const f3d::log::VerboseLevel cppLevel = f3d::log::getVerboseLevel();
 
-    const JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Log$VerboseLevel"));
-    jmethodID fromValueMethod =
-      env->GetStaticMethodID(enumClass, "fromValue", "(I)Lapp/f3d/F3D/Log$VerboseLevel;");
-
-    return env->CallStaticObjectMethod(enumClass, fromValueMethod, static_cast<int>(cppLevel));
+    return NativeVerboseLevelToJava(env, cppLevel);
   }
 
   JNIEXPORT void JAVA_BIND(Log, forward)(JNIEnv* env, jclass, jobject callback)
