@@ -179,3 +179,6 @@ Here is the list of all the components:
 | `mimetypes`     | YES                  | Linux            | Plugins mimetype XML files for integration with Freedesktop.                                                                |
 | `assets`        | YES                  | Linux            | Assets for integration with Freedesktop.                                                                                    |
 | `colormaps`     | YES                  | ALL              | Color maps presets, see [documentation](../user/10-COLOR_MAPS.md)                                                           |
+
+> [!WARNING]
+> `dependencies` component will not install VTK extension shared library dependencies if enabled (`meshoptimizer` and `webp`)
