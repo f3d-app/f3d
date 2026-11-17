@@ -1117,11 +1117,9 @@ interactor& interactor_impl::initCommands()
         return;
       }
       check_args(args, 3, "set_camera_look_at");
-      const point3_t position = options::parse<point3_t>(args[0]);
-      const point3_t focal = options::parse<point3_t>(args[1]);
 
-      this->Internals->Window.getCamera().setPosition(position);
-      this->Internals->Window.getCamera().setFocalPoint(focal);
+      this->Internals->Window.getCamera().setPosition(options::parse<point3_t>(args[0]));
+      this->Internals->Window.getCamera().setFocalPoint(options::parse<point3_t>(args[1]));
       this->Internals->Window.getCamera().setViewUp(options::parse<direction_t>(args[2]));
 
       this->Internals->Style->SetTemporaryUp(

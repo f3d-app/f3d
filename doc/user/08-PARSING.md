@@ -106,7 +106,7 @@ When formatting a direction into a string, F3D formats it in the `±XYZ` form if
 
 F3D support strings composed of three doubles to parse them into a point, for example `1,2,3.4`
 
-When formatting a direction into a string, F3D formats as a vector of doubles.
+When formatting a point into a string, F3D formats as a vector of doubles.
 
 ## Colormap
 
