@@ -1,8 +1,6 @@
 #include "camera_impl.h"
-
 #include <vtkCamera.h>
 #include <vtkMatrix4x4.h>
-#include <vtkPlane.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkVersion.h>
@@ -110,9 +108,12 @@ double camera_impl::getWorldAzimuth() const
   vtkRenderer* ren = this->Internals->VTKRenderer;
   const double* up = ren->GetEnvironmentUp();
 
+  double* dop = this->GetVTKCamera()->GetDirectionOfProjection();
+  double dopUp[3];
+  vtkMath::ProjectVector(dop, up, dopUp);
+
   double projectedView[3];
-  vtkPlane::ProjectVector(this->GetVTKCamera()->GetDirectionOfProjection(),
-    this->getFocalPoint().data(), up, projectedView);
+  vtkMath::Subtract(dop, dopUp, projectedView);
 
   static constexpr double EPS = 128 * std::numeric_limits<double>::epsilon();
   if (vtkMath::Norm(projectedView) < EPS)
