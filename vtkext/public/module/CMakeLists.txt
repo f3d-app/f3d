@@ -70,10 +70,6 @@ vtk_module_add_module(f3d::vtkext
   PRIVATE_HEADERS ${private_headers}
   )
 
-if(F3D_MODULE_WEBP)
-  vtk_module_link(f3d::vtkext PRIVATE WebP::webp)
-endif()
-
 if(F3D_USE_EXTERNAL_MINIZ)
   vtk_module_link(f3d::vtkext PRIVATE miniz::miniz)
 else()
