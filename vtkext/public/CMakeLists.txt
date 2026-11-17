@@ -8,12 +8,14 @@ vtk_module_scan(
   WANT_BY_DEFAULT   ON
   ENABLE_TESTS      ${BUILD_TESTING})
   
+# When building a shared library, VTK is not static and not building Python wheels,
+# the module will be installed as part of the plugin SDK
 set(export_name "")
 set(headers_component "")
 set(f3d_vtk_no_install "")
 set(f3d_vtk_force_static "")
 get_target_property(f3d_vtk_target_type VTK::CommonCore TYPE)
-if(BUILD_SHARED_LIBS AND NOT f3d_vtk_target_type STREQUAL STATIC_LIBRARY)
+if(BUILD_SHARED_LIBS AND NOT f3d_vtk_target_type STREQUAL STATIC_LIBRARY AND NOT SKBUILD)
   # The headers and all "dev" part are installed as part of the plugin SDK
   # The library itself is installed as part of the library
   set(export_name "f3d_vtkext")
