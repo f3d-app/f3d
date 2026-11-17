@@ -49,12 +49,28 @@ int test_options()
     f3d_options_destroy_string(str_val);
   }
 
-  double out_vec[3];
   size_t out_count;
+  f3d_options_get_as_double_vector(options, "render.background.color", NULL, &out_count);
+  if (out_count != 3)
+  {
+    puts("[ERROR] f3d_options_get_as_double_vector with NULL did not return expected size");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  double out_vec[3];
   f3d_options_get_as_double_vector(options, "render.background.color", out_vec, &out_count);
 
-  int out_int_vec[3];
   size_t out_int_count;
+  f3d_options_get_as_int_vector(options, "scene.animation.indices", NULL, &out_int_count);
+  if (out_count != 3)
+  {
+    puts("[ERROR] f3d_options_get_as_int_vector with NULL did not return expected size");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  int out_int_vec[3];
   f3d_options_get_as_int_vector(options, "scene.animation.indices", out_int_vec, &out_int_count);
 
   f3d_options_toggle(options, "scene.camera.orthographic");
@@ -286,12 +302,28 @@ int test_options()
     f3d_options_destroy_string(parsed_string);
   }
 
-  double parsed_dvec[3];
   size_t parsed_dvec_count;
+  f3d_options_parse_double_vector("1.0,2.0,3.0", NULL, &parsed_dvec_count);
+  if (parsed_dvec_count != 3)
+  {
+    puts("[ERROR] f3d_options_parse_double_vector with NULL should return the size");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  double parsed_dvec[3];
   f3d_options_parse_double_vector("1.0,2.0,3.0", parsed_dvec, &parsed_dvec_count);
 
-  int parsed_ivec[3];
   size_t parsed_ivec_count;
+  f3d_options_parse_int_vector("1.0,2.0,3.0", NULL, &parsed_dvec_count);
+  if (parsed_dvec_count != 3)
+  {
+    puts("[ERROR] f3d_options_parse_int_vector with NULL should return the size");
+    f3d_engine_destroy(engine);
+    return 1;
+  }
+
+  int parsed_ivec[3];
   f3d_options_parse_int_vector("1,2,3", parsed_ivec, &parsed_ivec_count);
 
   const char* fmt_bool = f3d_options_format_bool(1);
