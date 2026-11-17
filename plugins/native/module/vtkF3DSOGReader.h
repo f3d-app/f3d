@@ -6,7 +6,7 @@
  * lossless WebP images plus meta.json.
  * Only version 2 is supported. Any other version fails the file.
  * shN.bands selects how far it reads, up to degree 3. Bands 1 writes
- * degree 1, bands 2 writes degrees 1 and 2. Degree 4 is not.
+ * degree 1, bands 2 writes degrees 1 and 2. Degree 4 is not supported.
  * A file with no shN still loads, with base color only.
  * Blind data is ignored. A loose folder of images is not read.
  *
