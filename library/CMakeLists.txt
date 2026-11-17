@@ -229,9 +229,7 @@ endif ()
 
 # webp
 if (F3D_MODULE_WEBP)
-  find_package(WebP REQUIRED)
   target_compile_definitions(libf3d PRIVATE F3D_MODULE_WEBP)
-  target_link_libraries(libf3d PRIVATE WebP::webp)
 endif ()
 
 # ui

@@ -10,7 +10,6 @@
 
 #if F3D_MODULE_WEBP
 #include "vtkF3DWebPReader.h"
-#include <webp/decode.h>
 #endif
 
 #include <vtkCellArray.h>
@@ -73,8 +72,6 @@ init::init()
 #if F3D_MODULE_WEBP
   const vtkNew<vtkF3DWebPReader> webpReader;
   vtkImageReader2Factory::RegisterReader(webpReader);
-  // Reference libwebp directly so libf3d keeps a dependency on it and it gets bundled
-  WebPFree(nullptr);
 #endif
 }
 }
