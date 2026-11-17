@@ -8,7 +8,7 @@ layout(std430, binding = 2) readonly buffer BlendShapeWeights
   float blendShapeWeights[];
 };
 
-vec3 f3dSparseMorphPosition(vec3 bindPosition, ivec2 range)
+vec3 sparseMorphPosition(vec3 bindPosition, ivec2 range)
 {
   vec3 position = bindPosition;
   for (int i = range.x; i < range.y; ++i)

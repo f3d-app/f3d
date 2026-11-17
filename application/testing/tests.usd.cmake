@@ -36,8 +36,8 @@ f3d_test(NAME TestUSDZAnimated DATA AnimatedCube.usdz PLUGIN usd ARGS --animatio
 f3d_test(NAME TestUSDZRigged DATA RiggedSimple.usdz PLUGIN usd ARGS --animation-time=0.3)
 f3d_test(NAME TestUSDZMaterials DATA McUsd.usdz PLUGIN usd ARGS --camera-position=1055,912,-247 --camera-focal-point=69,173,63 THRESHOLD 0.09 SKIP_GLES) # The threshold is high because of the complex materials (disabled on GLES)
 f3d_test(NAME TestUSDZMaterialsInterationReload DATA McUsd.usdz PLUGIN usd INTERACTION NO_BASELINE) # Up
-f3d_test(NAME TestUSDBlendShapes DATA SimpleBlendShapes.usda ARGS --animation-time=1 --animation-progress PLUGIN usd UI)
-f3d_test(NAME TestUSDBlendShapesFaceVarying DATA SimpleBlendShapesFaceVarying.usda ARGS --animation-time=1 --animation-progress PLUGIN usd UI)
+f3d_test(NAME TestUSDBlendShapes DATA SimpleBlendShapes.usda ARGS --animation-time=1 --animation-progress --camera-position=3,3,6 --camera-focal-point=0,0.1,0 PLUGIN usd UI)
+f3d_test(NAME TestUSDBlendShapesFaceVarying DATA SimpleBlendShapesFaceVarying.usda ARGS --animation-time=1 --animation-progress --camera-position=3,3,6 --camera-focal-point=0,0.1,0 PLUGIN usd UI)
 f3d_test(NAME TestUSDSkinJointOrder DATA skel_animation_sparsity.usda ARGS --animation-time=0.3 --animation-progress PLUGIN usd UI)
 f3d_test(NAME TestUSDPointsPrimitive DATA usd_points_rgb.usda ARGS --point-size=20 THRESHOLD 0.05 PLUGIN usd)
 

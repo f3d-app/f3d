@@ -3,7 +3,6 @@
 #include "F3DLog.h"
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DImporter.h"
-#include "vtkF3DPolyDataMapper.h"
 #include "vtkF3DRenderer.h"
 
 #include <vtkActorCollection.h>
@@ -20,7 +19,6 @@
 #include <vtkLightCollection.h>
 #include <vtkLightKit.h>
 #include <vtkObjectFactory.h>
-#include <vtkOpenGLRenderWindow.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkRenderWindow.h>
@@ -920,65 +918,8 @@ bool vtkF3DMetaImporter::GetTemporalInformation(
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DMetaImporter::ConfigureMorphingMode()
-{
-  auto* renderer = vtkF3DRenderer::SafeDownCast(this->Renderer);
-  auto* window = vtkOpenGLRenderWindow::SafeDownCast(this->RenderWindow);
-  const bool available =
-    renderer && renderer->SupportsGPUMorphing() && window && !window->GetNeverRendered();
-  if (available)
-  {
-    window->MakeCurrent();
-  }
-  bool changed = false;
-  for (const auto& info : this->Pimpl->Importers)
-  {
-    auto* importer = vtkF3DImporter::SafeDownCast(info.Importer);
-    if (!importer)
-    {
-      continue;
-    }
-    bool enabled = available;
-    bool hasMorphing = false;
-    vtkCollectionSimpleIterator iterator;
-    vtkActorCollection* actors = importer->GetImportedActors();
-    for (actors->InitTraversal(iterator); enabled;)
-    {
-      vtkActor* actor = actors->GetNextActor(iterator);
-      if (!actor)
-      {
-        break;
-      }
-      auto* polyMapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
-      vtkPolyData* input = polyMapper ? polyMapper->GetInput() : nullptr;
-      if (input && input->GetFieldData()->GetArray("blendShapeOffsets"))
-      {
-        hasMorphing = true;
-        auto* mapper = vtkF3DPolyDataMapper::SafeDownCast(polyMapper);
-        enabled = mapper && mapper->PrepareSparseMorphing(window, input);
-      }
-    }
-    enabled = enabled && hasMorphing;
-    changed = changed || importer->GetUseGPUMorphing() != enabled;
-    if (importer->GetUseGPUMorphing() != enabled)
-    {
-      importer->SetUseGPUMorphing(enabled);
-    }
-  }
-  return changed;
-}
-
-//----------------------------------------------------------------------------
-bool vtkF3DMetaImporter::RefreshMorphingMode()
-{
-  return !this->ConfigureMorphingMode() || this->UpdateAtTimeValue(this->CurrentAnimationTime);
-}
-
-//----------------------------------------------------------------------------
 bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
 {
-  this->CurrentAnimationTime = timeValue;
-  this->ConfigureMorphingMode();
   bool ret = true;
   for (const auto& importerInfo : this->Pimpl->Importers)
   {

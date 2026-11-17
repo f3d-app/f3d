@@ -105,6 +105,14 @@ For booleans, 0 means false and any other value means true. Unsigned int interpr
 
 ## Format details
 
+### USD blend shapes
+
+USD blend shapes use GPU morphing for OpenGL surface rendering when the context and
+data support it. The morphing method is selected when the scene is loaded and does
+not change when rendering options are toggled. GPU morphing is not currently
+applied to point sprites, normal glyphs, volume rendering or ray tracing. Automatic
+camera framing uses the undeformed geometry on the GPU path.
+
 ### QuakeMDL
 
 - F3D loads model textures with a simple PBR lighting (diffuse color only, no specular, index of refraction set to 1.0).

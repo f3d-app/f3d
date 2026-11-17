@@ -75,11 +75,6 @@ int TestF3DSparseMorphingRender(int, char*[])
   offsets->SetNumberOfComponents(4);
   offsets->InsertNextTuple4(0.2, 0., 0., 0.);
   polydata->GetFieldData()->AddArray(offsets);
-  // Construct a detached replacement before caching bounds to test older array timestamps.
-  vtkNew<vtkFloatArray> replacementOffsets;
-  replacementOffsets->SetName("blendShapeOffsets");
-  replacementOffsets->SetNumberOfComponents(4);
-  replacementOffsets->InsertNextTuple4(0.4, 0., 0., 0.);
   vtkNew<vtkFloatArray> weights;
   weights->SetName("blendShapeWeights");
   weights->InsertNextValue(1.f);
@@ -96,62 +91,11 @@ int TestF3DSparseMorphingRender(int, char*[])
   renderer->GetActiveCamera()->SetPosition(0., 0., 3.);
   renderer->GetActiveCamera()->SetFocalPoint(0., 0., 0.);
   renderer->GetActiveCamera()->SetClippingRange(0.1, 10.);
-  // Bounds are needed for camera setup before the first render prepares GPU buffers.
-  weights->SetValue(0, 0.5f);
-  weights->Modified();
-  if (std::abs(mapper->GetBounds()[0] + 0.4) > 1e-6)
-  {
-    std::cerr << "Sparse bounds depend on GPU buffer preparation\n";
-    return EXIT_FAILURE;
-  }
-  weights->SetValue(0, 1.f);
-  weights->Modified();
   window->Render();
   const std::unique_ptr<unsigned char[]> reference(window->GetPixelData(0, 0, 63, 63, 0, 0));
   renderer->SetPass(pass);
   window->Render();
   if (!mapper->GetHasSparseMorphing())
-  {
-    return EXIT_FAILURE;
-  }
-  // Malformed sparse data must fall back to CPU bounds without reading past arrays.
-  ranges->SetComponent(0, 1, 2);
-  ranges->Modified();
-  if (std::abs(mapper->GetBounds()[0] + 0.3) > 1e-6)
-  {
-    return EXIT_FAILURE;
-  }
-  ranges->SetComponent(0, 1, 1);
-  ranges->Modified();
-  offsets->SetComponent(0, 3, -1);
-  offsets->Modified();
-  if (std::abs(mapper->GetBounds()[0] + 0.3) > 1e-6)
-  {
-    return EXIT_FAILURE;
-  }
-  offsets->SetComponent(0, 3, 0);
-  offsets->Modified();
-  // Camera framing must follow the GPU deformation and invalidate on weight changes.
-  for (const float weight : { 1.f, 0.5f, 1.f })
-  {
-    weights->SetValue(0, weight);
-    weights->Modified();
-    const double* bounds = mapper->GetBounds();
-    if (std::abs(bounds[0] - (-0.5 + 0.2 * weight)) > 1e-6 ||
-      std::abs(bounds[1] - (0.5 + 0.2 * weight)) > 1e-6)
-    {
-      std::cerr << "Sparse morphing bounds do not follow animation weights\n";
-      return EXIT_FAILURE;
-    }
-  }
-  polydata->GetFieldData()->AddArray(replacementOffsets);
-  if (std::abs(mapper->GetBounds()[0] + 0.1) > 1e-6)
-  {
-    std::cerr << "Replacing offsets retained stale bounds\n";
-    return EXIT_FAILURE;
-  }
-  polydata->GetFieldData()->AddArray(offsets);
-  if (std::abs(mapper->GetBounds()[0] + 0.3) > 1e-6)
   {
     return EXIT_FAILURE;
   }

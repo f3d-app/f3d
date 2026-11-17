@@ -269,7 +269,7 @@ layout(std430, binding = 4) readonly buffer Ranges { ivec2 ranges[]; };
 void main()
 {
   uint vertex = gl_GlobalInvocationID.x;
-  positions[vertex].xyz = f3dSparseMorphPosition(positions[vertex].xyz, ranges[vertex]);
+  positions[vertex].xyz = sparseMorphPosition(positions[vertex].xyz, ranges[vertex]);
 }
 )glsl");
   vtkNew<vtkShaderProgram> program;

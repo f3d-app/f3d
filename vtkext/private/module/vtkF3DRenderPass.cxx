@@ -524,7 +524,7 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(
         customDecl += vtkF3DSparseMorphing;
         customDecl += "in vec3 blendShapeBindPositions;\n"
                       "in vec2 blendShapeRanges;\n";
-        posImpl += "  posMC = vec4(f3dSparseMorphPosition(blendShapeBindPositions, "
+        posImpl += "  posMC = vec4(sparseMorphPosition(blendShapeBindPositions, "
                    "ivec2(blendShapeRanges)), 1.0);\n";
       }
 

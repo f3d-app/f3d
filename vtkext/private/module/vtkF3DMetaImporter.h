@@ -249,9 +249,6 @@ public:
    */
   bool UpdateAtTimeValue(double timeValue) override;
 
-  // Reevaluate rendering capabilities, including when animation is paused.
-  bool RefreshMorphingMode();
-
   /**
    * Get the update mTime
    */
@@ -275,8 +272,6 @@ private:
    * and store result in internal fields
    */
   void UpdateInfoForColoring();
-  bool ConfigureMorphingMode();
-  double CurrentAnimationTime = 0.;
 
   struct Internals;
   std::unique_ptr<Internals> Pimpl;

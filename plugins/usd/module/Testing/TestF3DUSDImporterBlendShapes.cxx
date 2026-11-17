@@ -9,11 +9,14 @@
 #include <vtkIdTypeArray.h>
 #include <vtkIntArray.h>
 #include <vtkNew.h>
+#include <vtkOpenGLRenderWindow.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
+#include <vtk_glad.h>
 
 #include <cmath>
 #include <iostream>
@@ -21,6 +24,32 @@
 
 namespace
 {
+// A non-OpenGL window exercises the importer's capability-based CPU fallback.
+class CPUWindow : public vtkRenderWindow
+{
+public:
+  static CPUWindow* New()
+  {
+    return new CPUWindow;
+  }
+  vtkTypeMacro(CPUWindow, vtkRenderWindow);
+};
+
+vtkSmartPointer<vtkF3DUSDImporter> CreateImporter(vtkRenderWindow* window)
+{
+  auto importer = vtkSmartPointer<vtkF3DUSDImporter>::New();
+  if (CPUWindow::SafeDownCast(window))
+  {
+    const vtkNew<CPUWindow> cpuWindow;
+    importer->SetRenderWindow(cpuWindow);
+  }
+  else
+  {
+    importer->SetRenderWindow(window);
+  }
+  return importer;
+}
+
 bool CheckPackedDeformation(vtkPolyData* polydata)
 {
   auto* offsets =
@@ -96,11 +125,30 @@ bool CheckPackedDeformation(vtkPolyData* polydata)
 
 int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
 {
+  const vtkNew<CPUWindow> cpuWindow;
+  vtkNew<vtkRenderWindow> gpuWindow;
+  gpuWindow->OffScreenRenderingOn();
+  gpuWindow->Start();
+  bool gpuSupported = false;
+#ifndef GL_ES_VERSION_3_0
+  if (auto* context = vtkOpenGLRenderWindow::SafeDownCast(gpuWindow))
+  {
+    int major = 0, minor = 0;
+    context->GetOpenGLVersion(major, minor);
+    if (major > 4 || (major == 4 && minor >= 3))
+    {
+      int blocks = 0;
+      glGetIntegerv(GL_MAX_VERTEX_SHADER_STORAGE_BLOCKS, &blocks);
+      gpuSupported = blocks >= 3;
+    }
+  }
+#endif
+  gpuWindow->End();
   for (const bool faceVarying : { false, true })
   {
     const std::string filename = std::string(argv[1]) + "data/" +
       (faceVarying ? "SimpleBlendShapesFaceVarying.usda" : "SimpleBlendShapes.usda");
-    vtkNew<vtkF3DUSDImporter> importer;
+    auto importer = ::CreateImporter(cpuWindow);
     importer->SetFileName(filename.c_str());
     importer->Update();
 
@@ -206,7 +254,7 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
     }
   }
 
-  vtkNew<vtkF3DUSDImporter> importer;
+  auto importer = ::CreateImporter(cpuWindow);
   const std::string filename = std::string(argv[1]) + "data/SimpleBlendShapesInbetween.usda";
   importer->SetFileName(filename.c_str());
   importer->Update();
@@ -237,78 +285,52 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
       return EXIT_FAILURE;
     }
   }
-  importer->SetUseGPUMorphing(true);
-  vtkMTimeType bindTime = 0;
-  for (const double frame : { 1., 12.5, 24., 36., 48. })
+  if (gpuSupported)
   {
-    if (!importer->UpdateAtTimeValue(frame / 24.))
+    auto gpuImporter = ::CreateImporter(gpuWindow);
+    gpuImporter->SetFileName(filename.c_str());
+    gpuImporter->Update();
+    vtkMTimeType bindTime = 0;
+    for (const double frame : { 1., 12.5, 24., 36., 48. })
     {
-      return EXIT_FAILURE;
-    }
-    auto* mapper = vtkPolyDataMapper::SafeDownCast(
-      importer->GetRenderer()->GetActors()->GetLastActor()->GetMapper());
-    vtkPolyData* polydata = mapper->GetInput();
-    auto* bindPositions = polydata->GetPointData()->GetArray("blendShapeBindPositions");
-    auto* weights =
-      vtkFloatArray::SafeDownCast(polydata->GetFieldData()->GetArray("blendShapeWeights"));
-    const double firstWeight = frame <= 24. ? (frame - 1.) / 23. : (48. - frame) / 24.;
-    if (!weights || std::abs(weights->GetValue(4) - (1. - firstWeight)) > 1e-6)
-    {
-      std::cerr << "GPU morphing did not update weights\n";
-      return EXIT_FAILURE;
-    }
-    if (bindTime && polydata->GetPoints()->GetMTime() != bindTime)
-    {
-      std::cerr << "GPU morphing modified CPU points\n";
-      return EXIT_FAILURE;
-    }
-    bindTime = polydata->GetPoints()->GetMTime();
-    for (vtkIdType i = 0; i < polydata->GetNumberOfPoints(); ++i)
-    {
-      double actual[3], expected[3];
-      polydata->GetPoint(i, actual);
-      bindPositions->GetTuple(i, expected);
-      for (int component = 0; component < 3; ++component)
+      if (!gpuImporter->UpdateAtTimeValue(frame / 24.))
       {
-        if (actual[component] != expected[component])
+        return EXIT_FAILURE;
+      }
+      auto* mapper = vtkPolyDataMapper::SafeDownCast(
+        gpuImporter->GetRenderer()->GetActors()->GetLastActor()->GetMapper());
+      vtkPolyData* polydata = mapper->GetInput();
+      auto* bindPositions = polydata->GetPointData()->GetArray("blendShapeBindPositions");
+      auto* weights =
+        vtkFloatArray::SafeDownCast(polydata->GetFieldData()->GetArray("blendShapeWeights"));
+      const double firstWeight = frame <= 24. ? (frame - 1.) / 23. : (48. - frame) / 24.;
+      if (!weights || std::abs(weights->GetValue(4) - (1. - firstWeight)) > 1e-6)
+      {
+        std::cerr << "GPU morphing did not update weights\n";
+        return EXIT_FAILURE;
+      }
+      if (bindTime && polydata->GetPoints()->GetMTime() != bindTime)
+      {
+        std::cerr << "GPU morphing modified CPU points\n";
+        return EXIT_FAILURE;
+      }
+      bindTime = polydata->GetPoints()->GetMTime();
+      for (vtkIdType i = 0; i < polydata->GetNumberOfPoints(); ++i)
+      {
+        double actual[3], expected[3];
+        polydata->GetPoint(i, actual);
+        bindPositions->GetTuple(i, expected);
+        for (int component = 0; component < 3; ++component)
         {
-          return EXIT_FAILURE;
+          if (actual[component] != expected[component])
+          {
+            return EXIT_FAILURE;
+          }
         }
       }
     }
   }
-  auto* gpuPolydata = vtkPolyDataMapper::SafeDownCast(
-    importer->GetRenderer()->GetActors()->GetLastActor()->GetMapper())
-                        ->GetInput();
-  vtkNew<vtkPoints> replacement;
-  replacement->DeepCopy(gpuPolydata->GetPoints());
-  replacement->SetPoint(0, 100., 100., 100.);
-  gpuPolydata->SetPoints(replacement);
-  if (!importer->UpdateAtTimeValue(0.5))
-  {
-    return EXIT_FAILURE;
-  }
-  double restored[3], expectedBind[3];
-  gpuPolydata->GetPoint(0, restored);
-  gpuPolydata->GetPointData()->GetArray("blendShapeBindPositions")->GetTuple(0, expectedBind);
-  for (int component = 0; component < 3; ++component)
-  {
-    if (restored[component] != expectedBind[component])
-    {
-      std::cerr << "Replacement CPU geometry was not initialized to bind pose\n";
-      return EXIT_FAILURE;
-    }
-  }
-  importer->SetUseGPUMorphing(false);
-  if (!importer->UpdateAtTimeValue(12.5 / 24.) ||
-    !::CheckPackedDeformation(vtkPolyDataMapper::SafeDownCast(
-      importer->GetRenderer()->GetActors()->GetLastActor()->GetMapper())
-                                ->GetInput()))
-  {
-    std::cerr << "CPU fallback did not restore current deformation\n";
-    return EXIT_FAILURE;
-  }
-  vtkNew<vtkF3DUSDImporter> subsetImporter;
+  auto subsetImporter = ::CreateImporter(cpuWindow);
   const std::string subsetFile = std::string(argv[1]) + "data/SimpleBlendShapesSubsets.usda";
   subsetImporter->SetFileName(subsetFile.c_str());
   subsetImporter->Update();
@@ -337,15 +359,16 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
     }
   }
   // Time-sampled base points must remain animated alongside blend shape weights.
-  vtkNew<vtkF3DUSDImporter> animatedImporter;
-  const std::string animatedFile =
-    std::string(argv[1]) + "data/SimpleBlendShapesAnimatedPoints.usda";
-  animatedImporter->SetFileName(animatedFile.c_str());
-  animatedImporter->Update();
-  // Exercise CPU -> GPU -> CPU transitions, including restoration of CPU deformation.
-  for (const bool gpu : { false, true, false })
+  // Independent importers select their path once, before any animation updates.
+  for (const bool render : { false, true })
   {
-    animatedImporter->SetUseGPUMorphing(gpu);
+    const bool gpu = render && gpuSupported;
+    auto animatedImporter =
+      ::CreateImporter(render ? gpuWindow.GetPointer() : cpuWindow.GetPointer());
+    const std::string animatedFile =
+      std::string(argv[1]) + "data/SimpleBlendShapesAnimatedPoints.usda";
+    animatedImporter->SetFileName(animatedFile.c_str());
+    animatedImporter->Update();
     for (const double frame : { 1., 24., 48., 1. })
     {
       if (!animatedImporter->UpdateAtTimeValue(frame / 24.))
@@ -367,14 +390,13 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
       }
     }
   }
-  vtkNew<vtkF3DUSDImporter> skinImporter;
-  const std::string skinFile = std::string(argv[1]) + "data/SimpleBlendShapesAnimatedSkin.usda";
-  skinImporter->SetFileName(skinFile.c_str());
-  skinImporter->Update();
-  // Exercise CPU -> GPU -> CPU transitions, including restoration of CPU deformation.
-  for (const bool gpu : { false, true, false })
+  // Independent importers select their path once, before any animation updates.
+  for (const bool render : { false, true })
   {
-    skinImporter->SetUseGPUMorphing(gpu);
+    auto skinImporter = ::CreateImporter(render ? gpuWindow.GetPointer() : cpuWindow.GetPointer());
+    const std::string skinFile = std::string(argv[1]) + "data/SimpleBlendShapesAnimatedSkin.usda";
+    skinImporter->SetFileName(skinFile.c_str());
+    skinImporter->Update();
     for (const double frame : { 1., 24., 48., 1. })
     {
       if (!skinImporter->UpdateAtTimeValue(frame / 24.))
@@ -419,7 +441,7 @@ int TestF3DUSDImporterBlendShapes(int vtkNotUsed(argc), char* argv[])
     }
   }
   // Hidden blend shapes, skinning-only targets and malformed offsets share a skeleton.
-  vtkNew<vtkF3DUSDImporter> errorImporter;
+  auto errorImporter = ::CreateImporter(cpuWindow);
   const std::string errorFile = std::string(argv[1]) + "data/SimpleBlendShapesErrorPaths.usda";
   errorImporter->SetFileName(errorFile.c_str());
   int warningCount = 0;

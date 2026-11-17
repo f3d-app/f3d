@@ -16,7 +16,6 @@ set(test_sources
 
 if(NOT F3D_USE_GLES)
   list(APPEND test_sources
-    TestF3DMetaImporterMorphing.cxx
     TestF3DPolyDataMapperMorphing.cxx
     TestF3DSparseMorphingRender.cxx)
 endif()

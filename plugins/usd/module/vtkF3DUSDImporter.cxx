@@ -27,6 +27,7 @@
 #include <vtkLoopSubdivisionFilter.h>
 #include <vtkMatrix4x4.h>
 #include <vtkObjectFactory.h>
+#include <vtkOpenGLRenderWindow.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
@@ -46,6 +47,7 @@
 #include <vtkUnsignedShortArray.h>
 #include <vtkVersion.h>
 #include <vtkWeakPointer.h>
+#include <vtk_glad.h>
 
 #include <algorithm>
 #include <cassert>
@@ -1352,18 +1354,16 @@ public:
             vtkPoints* outputPoints = polydata->GetPoints();
             auto* bindPositions = vtkFloatArray::SafeDownCast(
               polydata->GetPointData()->GetArray("blendShapeBindPositions"));
-            if (useGPUMorphing && packedWeights && bindPositions)
+            auto* packedOffsets = polydata->GetFieldData()->GetArray("blendShapeOffsets");
+            if (useGPUMorphing && packedWeights && bindPositions && packedOffsets &&
+              packedOffsets->GetNumberOfTuples() <= 16777216 &&
+              packedOffsets->GetNumberOfValues() <=
+                this->MorphingBufferSize / static_cast<vtkIdType>(sizeof(float)) &&
+              packedWeights->GetNumberOfValues() <=
+                this->MorphingBufferSize / static_cast<vtkIdType>(sizeof(float)))
             {
-              if (morphInfo.GPUPoints != outputPoints)
-              {
-                vtkNew<vtkPoints> bindPoints;
-                bindPoints->SetData(bindPositions);
-                outputPoints->DeepCopy(bindPoints);
-                morphInfo.GPUPoints = outputPoints;
-              }
               continue;
             }
-            morphInfo.GPUPoints = nullptr;
             auto* sourceIds =
               vtkIdTypeArray::SafeDownCast(polydata->GetPointData()->GetArray("SourceIds"));
             const vtkMTimeType sourceTime = sourceIds ? sourceIds->GetMTime() : 0;
@@ -1906,6 +1906,7 @@ public:
   PXR_NS::UsdStageRefPtr Stage = nullptr;
   F3DUSDMemoryResolverContext MemoryResolverContext;
   int SubdivisionLevel = 0;
+  vtkIdType MorphingBufferSize = 0;
 
 private:
   struct MorphingInfo
@@ -1920,7 +1921,6 @@ private:
     vtkWeakPointer<vtkIdTypeArray> LastSourceIds;
     vtkMTimeType LastPointsTime = 0;
     vtkMTimeType LastSourceTime = 0;
-    vtkWeakPointer<vtkPoints> GPUPoints;
   };
 
   std::unordered_map<std::string,
@@ -2029,6 +2029,29 @@ int vtkF3DUSDImporter::ImportBegin()
 //----------------------------------------------------------------------------
 void vtkF3DUSDImporter::ImportActors(vtkRenderer* renderer)
 {
+  if (!this->MorphingModeInitialized)
+  {
+#ifndef GL_ES_VERSION_3_0
+    // Establish the context once at load time; animation does not change this decision.
+    if (auto* window = vtkOpenGLRenderWindow::SafeDownCast(this->RenderWindow))
+    {
+      window->Start();
+      int major = 0, minor = 0;
+      window->GetOpenGLVersion(major, minor);
+      if (major > 4 || (major == 4 && minor >= 3))
+      {
+        int blocks = 0;
+        glGetIntegerv(GL_MAX_VERTEX_SHADER_STORAGE_BLOCKS, &blocks);
+        this->UseGPUMorphing = blocks >= 3;
+        GLint64 maxBlockSize = 0;
+        glGetInteger64v(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &maxBlockSize);
+        this->Internals->MorphingBufferSize = maxBlockSize;
+      }
+      window->End();
+    }
+#endif
+    this->MorphingModeInitialized = true;
+  }
   // Initialize the scene hierarchy
   this->SceneHierarchy = vtkSmartPointer<vtkDataAssembly>::New();
   this->SceneHierarchy->SetAttribute(vtkDataAssembly::GetRootNode(), "label", "root");
@@ -2036,7 +2059,7 @@ void vtkF3DUSDImporter::ImportActors(vtkRenderer* renderer)
   const bool armature = this->GetImportArmature();
 
   if (!this->Internals->ImportRoot(
-        renderer, this->SceneHierarchy, this->ActorCollection, armature, this->GetUseGPUMorphing()))
+        renderer, this->SceneHierarchy, this->ActorCollection, armature, this->UseGPUMorphing))
   {
     this->SetFailureStatus();
   }
