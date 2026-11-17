@@ -137,9 +137,8 @@ public:
         plugInfoDir + "/plugin/usd", // macOS bundle
         plugInfoDir + "/lib/usd", // standard linux for USD plugins
         plugInfoDir + "/bin/usd", // standard windows for USD plugins
-        plugInfoDir + "/lib/usd/f3d/resources", // standard f3d plugin path
         plugInfoDir + "/lib/f3d/usd", // usd plugin in linux superbuild package
-        plugInfoDir + "/lib/f3d/usd/f3d/resources", // f3d plugin is linux superbuild package
+        plugInfoDir + "/lib/f3d/usd/f3d/resources", // standard and superbuild f3d plugin path
         });
       // clang-format on
     }
