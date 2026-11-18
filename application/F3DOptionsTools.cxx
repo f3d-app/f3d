@@ -285,6 +285,9 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
   // cxxopts values need to live somewhere until parsing is done
   std::vector<std::shared_ptr<cxxopts::Value>> cxxoptsValues;
   auto cxxoptsInputPositionals = cxxopts::value<std::vector<std::string>>(positionals);
+  // keep track of options that can accept multiple values. Currenly these use <string_list> as
+  // ValueHelper
+  std::set<std::string> usesStringList;
 
   try
   {
@@ -352,6 +355,7 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
           if (valueHelper == "<string_list>")
           {
             cxxoptsValues.emplace_back(cxxopts::value<std::vector<std::string>>());
+            usesStringList.emplace(cliOption.LongName);
           }
           else
           {
@@ -459,28 +463,38 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
     F3DOptionsTools::OptionsDict cliOptionsDict;
     for (const auto& res : result)
     {
+      //    std::cerr << __PRETTY_FUNCTION__ << " " <<res.key() << "\n";
       // Discard boolean option like `--version` or `--help`
       if (std::ranges::find(::CLIBooleans, res.key()) != ::CLIBooleans.end())
       {
         continue;
       }
-      auto iter = cliOptionsDict.find(res.key());
+      const auto& key = res.key();
+      const auto& value = res.value();
+      auto iter = cliOptionsDict.find(key);
       if (iter == cliOptionsDict.end())
       {
-        cliOptionsDict[res.key()] = res.value();
-      }
-      else
-      {
-        // key already exists. Create or append to vector
-        if (std::holds_alternative<std::vector<std::string>>(iter->second))
+        if (usesStringList.contains(key))
         {
-          auto& vec = std::get<std::vector<std::string>>(iter->second);
-          vec.push_back(res.value());
+          cliOptionsDict[key] = std::vector<std::string>{ value };
         }
         else
         {
-          auto& item = std::get<std::string>(iter->second);
-          cliOptionsDict[res.key()] = std::vector<std::string>{ item, res.value() };
+          cliOptionsDict[key] = value;
+        }
+      }
+      else
+      {
+        // key already exists. unless this accepts multiple values replace the previous value
+        if (usesStringList.contains(key))
+        {
+          assert(std::holds_alternative<std::vector<std::string>>(cliOptionsDict[key]));
+          auto& vec = std::get<std::vector<std::string>>(cliOptionsDict[key]);
+          vec.push_back(value);
+        }
+        else
+        {
+          cliOptionsDict[key] = value;
         }
       }
     }
