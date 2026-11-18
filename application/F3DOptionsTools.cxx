@@ -285,7 +285,7 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
   // cxxopts values need to live somewhere until parsing is done
   std::vector<std::shared_ptr<cxxopts::Value>> cxxoptsValues;
   auto cxxoptsInputPositionals = cxxopts::value<std::vector<std::string>>(positionals);
-  // keep track of options that can accept multiple values. Currenly these use <string_list> as
+  // keep track of options that can accept multiple values. Currently these use <string_list> as
   // ValueHelper
   std::set<std::string> usesStringList;
 
