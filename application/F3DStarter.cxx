@@ -947,13 +947,13 @@ public:
               for (const auto& libf3dOption : F3DOptionsTools::ConvertToLibf3dOptions(key, value))
               {
                 auto [libf3dOptionName, libf3dOptionValue] = libf3dOption;
-                auto log_option = [&](const std::string& keyForLog, const std::string& value)
+                auto log_option = [&](const std::string& keyForLog_, const std::string& str_value)
                 {
                   // Log the option if needed
                   if (logOptions)
                   {
                     loggingMap[libf3dOptionName] =
-                      std::tuple(keyForLog, source, matchType, match, value);
+                      std::tuple(keyForLog_, source, matchType, match, str_value);
                   }
                 };
                 try
@@ -972,15 +972,16 @@ public:
                     apply_to_all(libf3dOptionValue,
                       [&libOptions, &keyForLog, &log_option, &quiet](const std::string& optionValue)
                       {
-                        auto value = HandleDefine(libOptions, keyForLog, optionValue, quiet);
-                        log_option(keyForLog, value);
+                        auto value_str = HandleDefine(libOptions, keyForLog, optionValue, quiet);
+                        log_option(keyForLog, value_str);
                       });
                   }
                   else
                   {
-                    const std::string value = F3DOptionsTools::ConvertToString(libf3dOptionValue);
-                    libOptions.setAsString(libf3dOptionName, value);
-                    log_option(keyForLog, value);
+                    const std::string str_value =
+                      F3DOptionsTools::ConvertToString(libf3dOptionValue);
+                    libOptions.setAsString(libf3dOptionName, str_value);
+                    log_option(keyForLog, str_value);
                   }
                 }
                 catch (const f3d::options::parsing_exception& ex)
