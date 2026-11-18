@@ -109,17 +109,42 @@ void apply_to_all(F3DOptionsTools::OptionValue& option, Callable f)
     },
     option);
 }
-void HandleDefine(f3d::options& libOptions, const std::string& optionValue)
+std::string HandleDefine(
+  f3d::options& libOptions, std::string& keyForLog, const std::string& optionValue, bool quiet)
 {
+  keyForLog = optionValue;
   const std::string::size_type sepidx = optionValue.find_first_of('=');
-  if (sepidx == std::string::npos)
+  if (sepidx == std::string::npos && !quiet)
   {
     f3d::log::warn("Could not parse a define '", optionValue, "'");
-    return;
+    return optionValue;
   }
   const auto key = optionValue.substr(0, sepidx);
   const auto value = optionValue.substr(sepidx + 1);
-  libOptions.setAsString(key, value);
+  // Handle reader options
+  std::vector<std::string> readerOptionNames = f3d::engine::getAllReaderOptionNames();
+  if (std::ranges::find(readerOptionNames, key) != readerOptionNames.end())
+  {
+    f3d::engine::setReaderOption(key, value);
+  }
+  else
+  {
+    libOptions.setAsString(key, value);
+  }
+  keyForLog = key;
+  return value;
+}
+
+void HandleReset(f3d::options& libOptions, std::string& keyForLog, const std::string& optionValue)
+{
+  keyForLog = optionValue;
+  if (optionValue.empty())
+  {
+    f3d::log::warn("Invalid option: 'reset' must be followed by a valid "
+                   "option name, ignoring entry");
+    return;
+  }
+  libOptions.reset(optionValue);
 }
 }
 
@@ -922,58 +947,40 @@ public:
               for (const auto& libf3dOption : F3DOptionsTools::ConvertToLibf3dOptions(key, value))
               {
                 auto [libf3dOptionName, libf3dOptionValue] = libf3dOption;
-
-                // Handle reader options
-                std::vector<std::string> readerOptionNames = f3d::engine::getAllReaderOptionNames();
-                if (std::ranges::find(readerOptionNames, libf3dOptionName) !=
-                  readerOptionNames.end())
+                auto log_option = [&](const std::string& keyForLog, const std::string& value)
                 {
-                  assert(std::holds_alternative<std::string>(libf3dOptionValue));
-                  std::string libf3dOptionValueStr = std::get<std::string>(libf3dOptionValue);
-
-                  f3d::engine::setReaderOption(libf3dOptionName, libf3dOptionValueStr);
-                  continue;
-                }
-
+                  // Log the option if needed
+                  if (logOptions)
+                  {
+                    loggingMap[libf3dOptionName] =
+                      std::tuple(keyForLog, source, matchType, match, value);
+                  }
+                };
                 try
                 {
                   if (libf3dOptionName == "reset")
                   {
                     apply_to_all(libf3dOptionValue,
-                      [&libOptions, &keyForLog](const std::string& optionValue)
+                      [&libOptions, &keyForLog, &log_option](const std::string& optionValue)
                       {
-                        keyForLog = optionValue;
-                        if (optionValue.empty())
-                        {
-                          f3d::log::warn("Invalid option: 'reset' must be followed by a valid "
-                                         "option name, ignoring entry");
-                          return;
-                        }
-                        libOptions.reset(optionValue);
+                        HandleReset(libOptions, keyForLog, optionValue);
+                        log_option("reset", optionValue);
                       });
                   }
                   else if (libf3dOptionName == "define")
                   {
                     apply_to_all(libf3dOptionValue,
-                      [&libOptions, &keyForLog](const std::string& optionValue)
+                      [&libOptions, &keyForLog, &log_option, &quiet](const std::string& optionValue)
                       {
-                        keyForLog = optionValue;
-                        HandleDefine(libOptions, optionValue);
+                        auto value = HandleDefine(libOptions, keyForLog, optionValue, quiet);
+                        log_option(keyForLog, value);
                       });
                   }
                   else
                   {
-                    assert(std::holds_alternative<std::string>(libf3dOptionValue));
-                    const std::string libf3dOptionValueStr =
-                      std::get<std::string>(libf3dOptionValue);
-                    libOptions.setAsString(libf3dOptionName, libf3dOptionValueStr);
-                  }
-
-                  // Log the option if needed
-                  if (logOptions)
-                  {
-                    loggingMap[libf3dOptionName] =
-                      std::tuple(keyForLog, source, matchType, match, libf3dOptionValue);
+                    const std::string value = F3DOptionsTools::ConvertToString(libf3dOptionValue);
+                    libOptions.setAsString(libf3dOptionName, value);
+                    log_option(keyForLog, value);
                   }
                 }
                 catch (const f3d::options::parsing_exception& ex)
