@@ -3355,12 +3355,22 @@ void vtkF3DRenderer::ConfigurePointSprites()
     vtkF3DPointSplatMapper* splatMapper = vtkF3DPointSplatMapper::SafeDownCast(sprites.Mapper);
     splatMapper->SetUseInstancing(this->PointSpritesUseInstancing);
 
+    // in order to make sure the sprites are at least 1 pixel large we set a lowpass matrix
+    // that will convolve the splat with another isotropic splat
+    // the value 0.3 is coming from the Gaussian Splatting paper
+    // ideally we should expose this as a parameter
+    const int* viewport = this->GetSize();
+
+    float lowPass[3] = { 0.3f / (viewport[0] * viewport[0]), 0.f,
+      0.3f / (viewport[1] * viewport[1]) };
+
     // if the original mapper is a vtkF3DPointSplatMapper, we can configure it for instancing
     vtkF3DPointSplatMapper* originalSplatMapper =
       vtkF3DPointSplatMapper::SafeDownCast(sprites.OriginalActor->GetMapper());
     if (originalSplatMapper)
     {
       originalSplatMapper->SetUseInstancing(this->PointSpritesUseInstancing);
+      originalSplatMapper->SetLowpassMatrix(lowPass);
     }
 
     // add SDF functions
@@ -3373,15 +3383,6 @@ void vtkF3DRenderer::ConfigurePointSprites()
 
     sprites.Mapper->EmissiveOff();
     sprites.Mapper->SetScaleFactor(scaleFactor);
-
-    // in order to make sure the sprites are at least 1 pixel large we set a lowpass matrix
-    // that will convolve the splat with another isotropic splat
-    // the value 0.3 is coming from the Gaussian Splatting paper
-    // ideally we should expose this as a parameter
-    const int* viewport = this->GetSize();
-
-    float lowPass[3] = { 0.3f / (viewport[0] * viewport[0]), 0.f,
-      0.3f / (viewport[1] * viewport[1]) };
     sprites.Mapper->SetLowpassMatrix(lowPass);
 
     vtkPolyData* polyData = vtkPolyData::SafeDownCast(sprites.Mapper->GetInput());
