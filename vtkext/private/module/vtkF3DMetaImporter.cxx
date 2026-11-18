@@ -3,7 +3,6 @@
 #include "F3DLog.h"
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DImporter.h"
-#include "vtkF3DRenderer.h"
 
 #include <vtkActorCollection.h>
 #include <vtkCallbackCommand.h>
@@ -11,7 +10,6 @@
 #include <vtkDataAssembly.h>
 #include <vtkDataAssemblyVisitor.h>
 #include <vtkDataSetAttributes.h>
-#include <vtkFieldData.h>
 #include <vtkImageData.h>
 #include <vtkInformation.h>
 #include <vtkInformationIntegerKey.h>

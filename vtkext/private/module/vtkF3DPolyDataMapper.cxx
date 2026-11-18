@@ -93,20 +93,22 @@ bool vtkF3DPolyDataMapper::PrepareSparseMorphing(
       this->UpdateMorphingBuffers(polydata);
   }
 #endif
-  const bool newlyEnabled = enabled && !this->HasSparseMorphing;
-  if (enabled != this->HasSparseMorphing)
+  if (enabled == this->HasSparseMorphing)
   {
-    this->HasSparseMorphing = enabled;
-    this->Modified();
+    return this->HasSparseMorphing;
   }
-  if (newlyEnabled)
+
+  this->HasSparseMorphing = enabled;
+  this->Modified();
+  // VTK removes the existing mapping and modifies the mapper on every registration.
+  if (this->HasSparseMorphing)
   {
     this->MapDataArrayToVertexAttribute("blendShapeBindPositions", "blendShapeBindPositions",
       vtkDataObject::FIELD_ASSOCIATION_POINTS);
     this->MapDataArrayToVertexAttribute(
       "blendShapeRanges", "blendShapeRanges", vtkDataObject::FIELD_ASSOCIATION_POINTS);
   }
-  return enabled;
+  return this->HasSparseMorphing;
 }
 
 //-----------------------------------------------------------------------------
