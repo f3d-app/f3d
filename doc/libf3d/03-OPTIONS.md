@@ -82,7 +82,7 @@ CLI: `--camera-orthographic`.
 
 ### `interactor.style` (_string_, default: `default`, enum domain: `default, trackball, 2d`)
 
-Set the interaction style. `default` uses standard 3D interaction, `trackball` enables trackball interaction, `2d` enables 2D interaction mode (pan/zoom only, no rotation). In `2d` mode, camera commands (`set_camera`, `roll_camera`, `elevation_camera`, `azimuth_camera`) are disabled.
+Set the interaction style. `default` uses standard 3D interaction, `trackball` enables trackball interaction, `2d` enables 2D interaction mode (pan/zoom only, no rotation). In `2d` mode, camera commands (`set_camera`, `roll_camera`, `elevation_camera`, `azimuth_camera`, `set_camera_look_at`) are disabled.
 
 CLI: `--interaction-style`.
 
