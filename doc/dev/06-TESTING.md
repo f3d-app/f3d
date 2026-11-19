@@ -57,6 +57,16 @@ Labels can be combined to further refine test selection.
 ctest -L assimp -L piped # run all piped tests which use assimp plugin
 ```
 
+### Generate summary
+
+It's possible to output a XML file by adding `--output-junit out.xml` and process this file with
+the script `utils/generate_summary.py` in order to generate a markdown file.
+
+```bash
+ctest --output-junit out.xml
+python <source>/utils/generate_summary.py --source_dir <source_dir> --build_dir . out.xml > summary.md
+```
+
 ## Testing architecture
 
 There are multiple layers of tests to ensure that testing covers all aspects of the application. The layers of the application are

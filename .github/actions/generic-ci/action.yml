@@ -100,6 +100,10 @@ runs:
         python -m pip install typing_extensions
         python -m pip install numpy
 
+    - name: Install pillow for image comparisons
+      shell: bash
+      run: python -m pip install pillow
+
     - name: Extract java version
       id: java_ver
       uses: f3d-app/extract-version-action@main
@@ -325,7 +329,7 @@ runs:
     - name: Test
       shell: bash
       working-directory: ${{github.workspace}}/build
-      run: ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 2 --output-on-failure --no-tests=error || ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 1 --rerun-failed --no-tests=error -VV
+      run: ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 2 --output-on-failure --no-tests=error --repeat until-pass:2 --output-junit junit.xml
 
     - name: Upload Tests Artifact
       if: failure()
@@ -333,6 +337,12 @@ runs:
       with:
         path: ./build/Testing/Temporary
         name: f3d-tests-artifact-${{runner.os}}-${{inputs.vtk_version}}-${{inputs.build_type}}-${{inputs.cpu}}-${{inputs.bundle_label}}-${{inputs.static_label}}
+
+    - name: Generate summary
+      if: always()
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: python source/utils/generate_summary.py --source_dir source --build_dir build --upload build/junit.xml >> $GITHUB_STEP_SUMMARY
 
     - name: Install (ALL)
       shell: bash
