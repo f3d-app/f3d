@@ -40,12 +40,11 @@ public:
 
 protected:
   vtkF3DConsoleOutputWindow();
-  ~vtkF3DConsoleOutputWindow() override;
+  ~vtkF3DConsoleOutputWindow() override = default;
 
 private:
   bool UseColoring = true;
   bool lastMessageIsProgress = false;
-  bool isFirstMessage = true;
 };
 
 #endif
