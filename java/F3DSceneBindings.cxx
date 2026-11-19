@@ -110,10 +110,22 @@ static f3d::light_state_t JavaLightStateToCppLightState(JNIEnv* env, jobject jli
 
   const JniLocalRef<jobject> jtype(env, env->GetObjectField(jlightState, typeField));
   const JniLocalRef<jclass> typeEnumClass(env, env->GetObjectClass(jtype));
-  jmethodID getValueMethod = env->GetMethodID(typeEnumClass, "getValue", "()I");
-  const jint typeValue = env->CallIntMethod(jtype, getValueMethod);
-  cppLightState.type = static_cast<f3d::light_type>(typeValue);
-
+  jmethodID ordinalMethod = env->GetMethodID(typeEnumClass, "ordinal", "()I");
+  const jint typeOrdinal = env->CallIntMethod(jtype, ordinalMethod);
+ 
+  switch(typeOrdinal)
+    {
+    case 0:
+      cppLightState.type = f3d::light_type::HEADLIGHT;
+      break;
+    case 1:
+      cppLightState.type = f3d::light_type::CAMERA_LIGHT;
+      break;
+    default:
+      cppLightState.type = f3d::light_type::SCENE_LIGHT;
+      break;
+    }
+  
   const JniLocalRef<jdoubleArray> jposition(
     env, static_cast<jdoubleArray>(env->GetObjectField(jlightState, positionField)));
   if (jposition.get())
@@ -287,13 +299,24 @@ extern "C"
       jobject jlightState = env->NewObject(lightStateClass, constructor);
 
       const JniLocalRef<jclass> typeEnumClass(env, env->FindClass("app/f3d/F3D/Types$LightType"));
-      jmethodID fromValueMethod =
-        env->GetStaticMethodID(typeEnumClass, "fromValue", "(I)Lapp/f3d/F3D/Types$LightType;");
-      const JniLocalRef<jobject> jtype(env,
-        env->CallStaticObjectMethod(
-          typeEnumClass, fromValueMethod, static_cast<int>(cppLightState.type)));
+      jfieldID enumFieldID;
+      
+      switch(cppLightState.type)
+	{
+	case f3d::light_type::HEADLIGHT:
+	  enumFieldID = env->GetStaticFieldID(typeEnumClass, "HEADLIGHT", "Lapp/f3d/F3D/Types$LightType;");
+	  break;
+	case f3d::light_type::CAMERA_LIGHT:
+	  enumFieldID = env->GetStaticFieldID(typeEnumClass, "CAMERA_LIGHT", "Lapp/f3d/F3D/Types$LightType;");
+	  break;
+	default:
+	  enumFieldID = env->GetStaticFieldID(typeEnumClass, "SCENE_LIGHT", "Lapp/f3d/F3D/Types$LightType;");
+	  break;
+	}
+
+      const JniLocalRef<jobject> jtype(env, env->GetStaticObjectField(typeEnumClass, enumFieldID));
       jfieldID typeField =
-        env->GetFieldID(lightStateClass, "type", "Lapp/f3d/F3D/Types$LightType;");
+  env->GetFieldID(lightStateClass, "type", "Lapp/f3d/F3D/Types$LightType;");
       env->SetObjectField(jlightState, typeField, jtype);
 
       const JniLocalRef<jdoubleArray> jposition(env, env->NewDoubleArray(3));
