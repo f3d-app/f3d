@@ -179,6 +179,8 @@ float DecodeScale(double coefficient)
 //----------------------------------------------------------------------------
 unsigned char DecodeColor(double coefficient)
 {
+  // Degree-0 spherical harmonic basis, 1/sqrt(4*pi).
+  // https://developer.playcanvas.com/user-manual/gaussian-splatting/formats/sog/
   constexpr double shC0 = 0.28209479177387814;
   const double color = std::clamp(0.5 + coefficient * shC0, 0.0, 1.0);
   return static_cast<unsigned char>(color * 255.0);
@@ -213,36 +215,37 @@ bool DecodeQuaternion(const uint8_t* pixel, std::array<float, 4>& rotation)
 
   const auto component = [](uint8_t channel)
   { return (static_cast<double>(channel) / 255.0 - 0.5) * 2.0 / std::numbers::sqrt2; };
-  const double a = component(pixel[0]);
-  const double b = component(pixel[1]);
-  const double c = component(pixel[2]);
-  const double omitted = std::sqrt(std::max(0.0, 1.0 - (a * a + b * b + c * c)));
+  const double first = component(pixel[0]);
+  const double second = component(pixel[1]);
+  const double third = component(pixel[2]);
+  const double omitted =
+    std::sqrt(std::max(0.0, 1.0 - (first * first + second * second + third * third)));
 
   double wxyz[4] = { 0.0, 0.0, 0.0, 0.0 };
   switch (mode)
   {
     case 0: // omitted w
       wxyz[0] = omitted;
-      wxyz[1] = a;
-      wxyz[2] = b;
-      wxyz[3] = c;
+      wxyz[1] = first;
+      wxyz[2] = second;
+      wxyz[3] = third;
       break;
     case 1: // omitted x
-      wxyz[0] = a;
+      wxyz[0] = first;
       wxyz[1] = omitted;
-      wxyz[2] = b;
-      wxyz[3] = c;
+      wxyz[2] = second;
+      wxyz[3] = third;
       break;
     case 2: // omitted y
-      wxyz[0] = a;
-      wxyz[1] = b;
+      wxyz[0] = first;
+      wxyz[1] = second;
       wxyz[2] = omitted;
-      wxyz[3] = c;
+      wxyz[3] = third;
       break;
     case 3: // omitted z
-      wxyz[0] = a;
-      wxyz[1] = b;
-      wxyz[2] = c;
+      wxyz[0] = first;
+      wxyz[1] = second;
+      wxyz[2] = third;
       wxyz[3] = omitted;
       break;
   }
@@ -551,7 +554,6 @@ bool vtkF3DSOGReader::CanReadFile(vtkResourceStream* stream)
     return false;
   }
 
-  const vtkTypeInt64 position = stream->Tell();
   bool canRead = false;
 
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
@@ -566,6 +568,5 @@ bool vtkF3DSOGReader::CanReadFile(vtkResourceStream* stream)
     }
   }
 
-  stream->Seek(position, vtkResourceStream::SeekDirection::Begin);
   return canRead;
 }

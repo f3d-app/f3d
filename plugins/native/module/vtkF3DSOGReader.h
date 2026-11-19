@@ -31,7 +31,7 @@ public:
    * can be read. Return false if it is sure it cannot be read as a stream.
    *
    * Checks the ZIP magic (PK\x03\x04), then that meta.json is at the archive root.
-   * Puts the stream back afterwards. A zip without that entry does not pass.
+   * A zip without that entry does not pass.
    */
   static bool CanReadFile(vtkResourceStream* stream);
 

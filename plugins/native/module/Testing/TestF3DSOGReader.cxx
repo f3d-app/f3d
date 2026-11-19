@@ -108,9 +108,7 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  stream->Seek(4, vtkResourceStream::SeekDirection::Begin);
-  const vtkTypeInt64 position = stream->Tell();
-  if (!vtkF3DSOGReader::CanReadFile(stream) || stream->Tell() != position)
+  if (!vtkF3DSOGReader::CanReadFile(stream))
   {
     std::cerr << "Unexpected CanReadFile failure for tiny.sog\n";
     return EXIT_FAILURE;
@@ -209,7 +207,7 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
 
   vtkNew<vtkF3DSOGReader> shReader;
   shReader->SetStream(stream);
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 0)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260113)
   if (!shReader->Update())
   {
     std::cerr << "tiny_sh.sog did not load\n";
@@ -275,9 +273,9 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  if (!stream->Open((data + "version3.sog").c_str()))
+  if (!stream->Open((data + "invalid_version3.sog").c_str()))
   {
-    std::cerr << "Cannot open version3.sog\n";
+    std::cerr << "Cannot open invalid_version3.sog\n";
     return EXIT_FAILURE;
   }
 
@@ -299,7 +297,7 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
   versionReader->SetStream(stream);
   versionReader->AddObserver(vtkCommand::ErrorEvent, recordError);
   versionReader->GetExecutive()->AddObserver(vtkCommand::ErrorEvent, ignoreError);
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 0)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260113)
   if (versionReader->Update())
   {
     std::cerr << "Unexpected Update success for version 3\n";
@@ -329,28 +327,28 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     const char* Error;
   };
   const Failure failures[] = {
-    { "notjson.sog", "Invalid SOG meta.json" },
-    { "array.sog", "Invalid SOG meta.json" },
-    { "noversion.sog", "Only version 2 is supported" },
-    { "nocount.sog", "Invalid SOG meta.json" },
-    { "negcount.sog", "Invalid SOG meta.json" },
-    { "nomeans.sog", "Invalid SOG meta.json" },
-    { "missingimage.sog", "Cannot read SOG image" },
-    { "bands4.sog", "Only degrees 1 through 3 are supported" },
-    { "shortfiles.sog", "Invalid SOG meta.json" },
-    { "badfile.sog", "Invalid SOG meta.json" },
-    { "badmins.sog", "Invalid SOG meta.json" },
-    { "badminvalue.sog", "Invalid SOG meta.json" },
-    { "shortcodebook.sog", "Invalid SOG meta.json" },
-    { "badcodebook.sog", "Invalid SOG meta.json" },
-    { "badshn.sog", "Invalid SOG meta.json" },
-    { "shcount0.sog", "Invalid SOG meta.json" },
-    { "toomany.sog", "SOG count exceeds" },
-    { "badlabel.sog", "Invalid SOG spherical harmonics" },
-    { "shoutofrange.sog", "Invalid SOG spherical harmonics" },
-    { "sizemismatch.sog", "do not share one width and height" },
-    { "badimage.sog", "Cannot read SOG image" },
-    { "badquat.sog", "Invalid SOG quaternion" },
+    { "invalid_notjson.sog", "Invalid SOG meta.json" },
+    { "invalid_array.sog", "Invalid SOG meta.json" },
+    { "invalid_noversion.sog", "Only version 2 is supported" },
+    { "invalid_nocount.sog", "Invalid SOG meta.json" },
+    { "invalid_negcount.sog", "Invalid SOG meta.json" },
+    { "invalid_nomeans.sog", "Invalid SOG meta.json" },
+    { "invalid_missingimage.sog", "Cannot read SOG image" },
+    { "invalid_bands4.sog", "Only degrees 1 through 3 are supported" },
+    { "invalid_shortfiles.sog", "Invalid SOG meta.json" },
+    { "invalid_badfile.sog", "Invalid SOG meta.json" },
+    { "invalid_badmins.sog", "Invalid SOG meta.json" },
+    { "invalid_badminvalue.sog", "Invalid SOG meta.json" },
+    { "invalid_shortcodebook.sog", "Invalid SOG meta.json" },
+    { "invalid_badcodebook.sog", "Invalid SOG meta.json" },
+    { "invalid_badshn.sog", "Invalid SOG meta.json" },
+    { "invalid_shcount0.sog", "Invalid SOG meta.json" },
+    { "invalid_toomany.sog", "SOG count exceeds" },
+    { "invalid_badlabel.sog", "Invalid SOG spherical harmonics" },
+    { "invalid_shoutofrange.sog", "Invalid SOG spherical harmonics" },
+    { "invalid_sizemismatch.sog", "do not share one width and height" },
+    { "invalid_badimage.sog", "Cannot read SOG image" },
+    { "invalid_badquat.sog", "Invalid SOG quaternion" },
   };
   for (const Failure& failure : failures)
   {
