@@ -53,7 +53,7 @@ void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)
       break;
   }
 
-  lastMessageIsProgress = false;
+  this->lastMessageIsProgress = false;
 }
 
 //----------------------------------------------------------------------------
@@ -81,5 +81,5 @@ void vtkF3DConsoleOutputWindow::DisplayProgress(const char* str)
       // LCOV_EXCL_STOP
   }
 
-  lastMessageIsProgress = true;
+  this->lastMessageIsProgress = true;
 }
