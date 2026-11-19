@@ -1,3 +1,5 @@
+#include "vtkF3DSOGReader.h"
+
 #include <vtkCallbackCommand.h>
 #include <vtkCommand.h>
 #include <vtkExecutive.h>
@@ -12,8 +14,6 @@
 #include <vtkTestUtilities.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkVersion.h>
-
-#include "vtkF3DSOGReader.h"
 
 #include <cmath>
 #include <cstdlib>
