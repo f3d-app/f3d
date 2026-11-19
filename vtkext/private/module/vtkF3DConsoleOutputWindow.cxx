@@ -10,20 +10,10 @@ vtkStandardNewMacro(vtkF3DConsoleOutputWindow);
 vtkF3DConsoleOutputWindow::vtkF3DConsoleOutputWindow() = default;
 
 //----------------------------------------------------------------------------
-vtkF3DConsoleOutputWindow::~vtkF3DConsoleOutputWindow()
-{
-  if (!this->isFirstMessage)
-  {
-    this->SetUseColoring(false);
-    this->DisplayText("");
-  }
-}
-
-//----------------------------------------------------------------------------
 void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)
 {
   std::string fmtText;
-  if (!this->isFirstMessage)
+  if (this->lastMessageIsProgress)
   {
     fmtText += '\n';
   }
@@ -53,6 +43,8 @@ void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)
     fmtText += txt;
   }
 
+  fmtText += '\n';
+
   this->Superclass::DisplayText(fmtText.c_str());
 
   switch (this->GetDisplayStream(this->GetCurrentMessageType()))
@@ -68,18 +60,13 @@ void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)
   }
 
   this->lastMessageIsProgress = false;
-  this->isFirstMessage = false;
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DConsoleOutputWindow::DisplayProgress(const char* str)
 {
 
-  std::string fmtText;
-  if (!this->isFirstMessage)
-  {
-    fmtText += (this->lastMessageIsProgress ? "\r" : "\n");
-  }
+  std::string fmtText = "\r";
   fmtText += str;
 
   this->Superclass::DisplayText(fmtText.c_str());
@@ -100,5 +87,4 @@ void vtkF3DConsoleOutputWindow::DisplayProgress(const char* str)
   }
 
   this->lastMessageIsProgress = true;
-  this->isFirstMessage = false;
 }
