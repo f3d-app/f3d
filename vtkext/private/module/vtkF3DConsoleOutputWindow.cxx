@@ -10,6 +10,16 @@ vtkStandardNewMacro(vtkF3DConsoleOutputWindow);
 vtkF3DConsoleOutputWindow::vtkF3DConsoleOutputWindow() = default;
 
 //----------------------------------------------------------------------------
+vtkF3DConsoleOutputWindow::~vtkF3DConsoleOutputWindow()
+{
+  if (!this->isFirstMessage)
+  {
+    this->SetUseColoring(false);
+    this->DisplayText("");
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)
 {
   std::string fmtText;

@@ -40,7 +40,7 @@ public:
 
 protected:
   vtkF3DConsoleOutputWindow();
-  ~vtkF3DConsoleOutputWindow() override = default;
+  ~vtkF3DConsoleOutputWindow() override;
 
 private:
   bool UseColoring = true;
