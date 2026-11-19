@@ -3,6 +3,7 @@ list(APPEND vtkextNativeTests_list
   TestF3DSPZReader.cxx
   TestF3DSplatReader.cxx
   TestF3DPLYReader.cxx
+  TestF3DLYSReader.cxx
   TestF3DQuakeMDLImporterStream.cxx
   TestF3DQuakeMDLImporterStreamError.cxx
   TestF3DQuakeMDLImporterInexistent.cxx
@@ -21,6 +22,9 @@ vtk_add_test_cxx(vtkextNativeTests tests
 vtk_test_cxx_executable(vtkextNativeTests tests)
 
 set_tests_properties(f3d::vtkextNativeCxx-TestF3DPLYReader
+  PROPERTIES
+  FAIL_REGULAR_EXPRESSION "")
+set_tests_properties(f3d::vtkextNativeCxx-TestF3DLYSReader
   PROPERTIES
   FAIL_REGULAR_EXPRESSION "")
 set_tests_properties(f3d::vtkextNativeCxx-TestF3DQuakeMDLImporterInexistent
