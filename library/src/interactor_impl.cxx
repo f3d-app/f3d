@@ -1604,6 +1604,13 @@ bool interactor_impl::triggerCommand(std::string_view command, bool keepComments
     if (callbackIt != this->Internals->Commands.end())
     {
       callbackIt->second.Callback({ tokens.begin() + 1, tokens.end() });
+
+      vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
+      vtkF3DRenderer* ren =
+        vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+      assert(ren);
+      ren->SetCheatSheetConfigured(false);
+
       return true;
     }
     else
