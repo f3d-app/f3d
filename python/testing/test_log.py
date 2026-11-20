@@ -2,10 +2,8 @@ from f3d import Log
 from pytest import CaptureFixture, mark, fixture
 
 
-@fixture(autouse=True)
-def reset_state():
-    Log.print(Log.DEBUG, "resetting state...")
-    yield
+def setup_module():
+    Log.print(Log.ERROR, "Resetting state...")
 
 
 @mark.parametrize(
