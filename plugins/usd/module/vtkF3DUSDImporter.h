@@ -125,6 +125,8 @@ private:
   vtkF3DUSDImporter(const vtkF3DUSDImporter&) = delete;
   void operator=(const vtkF3DUSDImporter&) = delete;
 
+  bool MorphingModeInitialized = false;
+  bool UseGPUMorphing = false;
   bool AnimationEnabled = false;
   int SubdivisionLevel = 0;
 
