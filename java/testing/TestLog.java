@@ -48,17 +48,5 @@ public class TestLog {
     Log.warn("Second message");
 
     Log.forward(null);
-
-    Log.VerboseLevel.DEBUG.getValue();
-    Log.VerboseLevel.INFO.getValue();
-    Log.VerboseLevel.WARN.getValue();
-    Log.VerboseLevel.ERROR.getValue();
-    Log.VerboseLevel.QUIET.getValue();
-
-    Log.VerboseLevel.fromValue(0);
-    Log.VerboseLevel.fromValue(1);
-    Log.VerboseLevel.fromValue(2);
-    Log.VerboseLevel.fromValue(3);
-    Log.VerboseLevel.fromValue(4);
   }
 }

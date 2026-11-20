@@ -25,28 +25,9 @@ public class Types {
      * Light type enumeration.
      */
     public enum LightType {
-        HEADLIGHT(1),
-        CAMERA_LIGHT(2),
-        SCENE_LIGHT(3);
-
-        private final int value;
-
-        LightType(int value) {
-            this.value = value;
-        }
-
-        public int getValue() {
-            return value;
-        }
-
-        public static LightType fromValue(int value) {
-            for (LightType type : values()) {
-                if (type.value == value) {
-                    return type;
-                }
-            }
-            throw new IllegalArgumentException("Unknown light type: " + value);
-        }
+        HEADLIGHT,
+        CAMERA_LIGHT,
+        SCENE_LIGHT
     }
 
     /**
