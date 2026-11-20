@@ -1,5 +1,4 @@
 #include "camera_impl.h"
-
 #include <vtkCamera.h>
 #include <vtkMatrix4x4.h>
 #include <vtkRenderWindow.h>
@@ -101,6 +100,53 @@ void camera_impl::getFocalPoint(point3_t& foc) const
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetFocalPoint(foc.data());
+}
+
+//----------------------------------------------------------------------------
+double camera_impl::getWorldAzimuth() const
+{
+  vtkRenderer* ren = this->Internals->VTKRenderer;
+  const double* up = ren->GetEnvironmentUp();
+
+  double* dop = this->GetVTKCamera()->GetDirectionOfProjection();
+  double dopUp[3];
+  vtkMath::ProjectVector(dop, up, dopUp);
+
+  double projectedView[3];
+  vtkMath::Subtract(dop, dopUp, projectedView);
+
+  static constexpr double EPS = 128 * std::numeric_limits<double>::epsilon();
+  if (vtkMath::Norm(projectedView) < EPS)
+  {
+    return 0.0;
+  }
+
+  double angleRad =
+    vtkMath::SignedAngleBetweenVectors(ren->GetEnvironmentRight(), projectedView, up);
+
+  return vtkMath::DegreesFromRadians(angleRad) - 90.0;
+}
+
+//----------------------------------------------------------------------------
+double camera_impl::getWorldElevation() const
+{
+  double* view = this->GetVTKCamera()->GetDirectionOfProjection();
+
+  static constexpr double EPS = 128 * std::numeric_limits<double>::epsilon();
+  if (vtkMath::Norm(view) < EPS)
+  {
+    return 0.0;
+  }
+
+  vtkRenderer* ren = this->Internals->VTKRenderer;
+  const double angleRad = vtkMath::AngleBetweenVectors(ren->GetEnvironmentUp(), view);
+  return vtkMath::DegreesFromRadians(angleRad) - 90.0;
+}
+
+//----------------------------------------------------------------------------
+double camera_impl::getDistance() const
+{
+  return this->GetVTKCamera()->GetDistance();
 }
 
 //----------------------------------------------------------------------------

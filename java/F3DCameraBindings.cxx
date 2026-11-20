@@ -38,6 +38,21 @@ extern "C"
     return ret;
   }
 
+  JNIEXPORT jdouble JAVA_BIND(Camera, getWorldAzimuth)(JNIEnv* env, jobject self)
+  {
+    return GetEngine(env, self)->getWindow().getCamera().getWorldAzimuth();
+  }
+
+  JNIEXPORT jdouble JAVA_BIND(Camera, getWorldElevation)(JNIEnv* env, jobject self)
+  {
+    return GetEngine(env, self)->getWindow().getCamera().getWorldElevation();
+  }
+
+  JNIEXPORT jdouble JAVA_BIND(Camera, getDistance)(JNIEnv* env, jobject self)
+  {
+    return GetEngine(env, self)->getWindow().getCamera().getDistance();
+  }
+
   JNIEXPORT jobject JAVA_BIND(Camera, setViewUp)(JNIEnv* env, jobject self, jdoubleArray up)
   {
     double* arr = env->GetDoubleArrayElements(up, nullptr);
