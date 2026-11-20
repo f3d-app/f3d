@@ -249,6 +249,65 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
+  if (!stream->Open((data + "tiny_v3.sog").c_str()))
+  {
+    std::cerr << "Cannot open tiny_v3.sog\n";
+    return EXIT_FAILURE;
+  }
+
+  vtkNew<vtkF3DSOGReader> version3Reader;
+  version3Reader->SetStream(stream);
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260113)
+  if (!version3Reader->Update())
+  {
+    std::cerr << "tiny_v3.sog did not load\n";
+    return EXIT_FAILURE;
+  }
+#else
+  version3Reader->Update();
+  if (!version3Reader->GetOutput() || version3Reader->GetOutput()->GetNumberOfPoints() != 1)
+  {
+    std::cerr << "tiny_v3.sog did not load\n";
+    return EXIT_FAILURE;
+  }
+#endif
+
+  vtkPolyData* version3Output = version3Reader->GetOutput();
+  const vtkFloatArray* version3Rotation =
+    vtkFloatArray::SafeDownCast(version3Output->GetPointData()->GetArray("rotation"));
+  if (!version3Rotation || version3Rotation->GetNumberOfTuples() != 1 ||
+    !::Near("rotation.w", version3Rotation->GetTypedComponent(0, 0), 1.0) ||
+    !::Near("rotation.x", version3Rotation->GetTypedComponent(0, 1), 0.0) ||
+    !::Near("rotation.y", version3Rotation->GetTypedComponent(0, 2), 0.0) ||
+    !::Near("rotation.z", version3Rotation->GetTypedComponent(0, 3), 0.0))
+  {
+    std::cerr << "Identity quaternion was not stored as (1, 0, 0, 0)\n";
+    return EXIT_FAILURE;
+  }
+
+  vtkUnsignedCharArray* version3Color =
+    vtkUnsignedCharArray::SafeDownCast(version3Output->GetPointData()->GetScalars());
+  if (!version3Color || version3Color->GetTypedComponent(0, 3) != 255)
+  {
+    std::cerr << "Opacity byte 204 should clamp to 255\n";
+    return EXIT_FAILURE;
+  }
+
+  const vtkUnsignedCharArray* version3SH =
+    vtkUnsignedCharArray::SafeDownCast(version3Output->GetPointData()->GetArray("sh1m1"));
+  if (!version3SH || version3SH->GetTypedComponent(0, 0) != 255 ||
+    version3SH->GetTypedComponent(0, 1) != 255 || version3SH->GetTypedComponent(0, 2) != 255)
+  {
+    std::cerr << "24-bit label did not read the blue byte\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!version3Output->GetPointData()->GetArray("sh3p3"))
+  {
+    std::cerr << "Bands 4 should still write degree 3\n";
+    return EXIT_FAILURE;
+  }
+
   if (!stream->Open((data + "cube_gears.3mf").c_str()))
   {
     std::cerr << "Cannot open cube_gears.3mf\n";
@@ -281,7 +340,7 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
 
   if (!vtkF3DSOGReader::CanReadFile(stream))
   {
-    std::cerr << "Unexpected CanReadFile failure for version 3\n";
+    std::cerr << "Unexpected CanReadFile failure for an unsupported version\n";
     return EXIT_FAILURE;
   }
 
@@ -300,7 +359,7 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260113)
   if (versionReader->Update())
   {
-    std::cerr << "Unexpected Update success for version 3\n";
+    std::cerr << "Unexpected Update success for an unsupported version\n";
     return EXIT_FAILURE;
   }
 #else
@@ -310,14 +369,14 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
   bool reported = false;
   for (const std::string& message : errors)
   {
-    if (message.find("Only version 2 is supported") != std::string::npos)
+    if (message.find("Only versions 2 and 3 are supported") != std::string::npos)
     {
       reported = true;
     }
   }
   if (!reported)
   {
-    std::cerr << "Version 3 did not report that only version 2 is supported\n";
+    std::cerr << "Unsupported version did not report that only versions 2 and 3 are supported\n";
     return EXIT_FAILURE;
   }
 
@@ -329,7 +388,7 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
   const Failure failures[] = {
     { "invalid_notjson.sog", "Invalid SOG meta.json" },
     { "invalid_array.sog", "Invalid SOG meta.json" },
-    { "invalid_noversion.sog", "Only version 2 is supported" },
+    { "invalid_noversion.sog", "Only versions 2 and 3 are supported" },
     { "invalid_nocount.sog", "Invalid SOG meta.json" },
     { "invalid_negcount.sog", "Invalid SOG meta.json" },
     { "invalid_nomeans.sog", "Invalid SOG meta.json" },

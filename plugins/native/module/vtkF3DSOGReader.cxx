@@ -187,6 +187,20 @@ unsigned char DecodeColor(double coefficient)
 }
 
 //----------------------------------------------------------------------------
+unsigned char DecodeOpacity(int version, unsigned char encoded)
+{
+  if (version == 2)
+  {
+    return encoded;
+  }
+
+  // (byte / 204)^2 can pass 1. The color array stops at 255.
+  const double opacity = std::pow(static_cast<double>(encoded) / 204.0, 2.0);
+  const double clamped = std::min(opacity, 1.0);
+  return static_cast<unsigned char>(std::round(clamped * 255.0));
+}
+
+//----------------------------------------------------------------------------
 unsigned char QuantizeCoefficient(double coefficient)
 {
   const double scaled = std::round((coefficient + 1.0) / 2.0 * 255.0);
@@ -194,10 +208,10 @@ unsigned char QuantizeCoefficient(double coefficient)
 }
 
 //----------------------------------------------------------------------------
-int CoefficientCount(int bands)
+int PaletteStride(int bands)
 {
-  constexpr int countByBand[4] = { 0, 3, 8, 15 };
-  return countByBand[bands];
+  constexpr int strideByBand[5] = { 0, 3, 8, 15, 24 };
+  return strideByBand[bands];
 }
 
 //----------------------------------------------------------------------------
@@ -255,6 +269,22 @@ bool DecodeQuaternion(const uint8_t* pixel, std::array<float, 4>& rotation)
     rotation[static_cast<std::size_t>(i)] = static_cast<float>(wxyz[i]);
   }
   return true;
+}
+
+//----------------------------------------------------------------------------
+void DecodeExponentialQuaternion(const uint8_t* pixel, std::array<float, 4>& rotation)
+{
+  const double px = (static_cast<double>(pixel[0]) - 128.0) / 127.0;
+  const double py = (static_cast<double>(pixel[1]) - 128.0) / 127.0;
+  const double pz = (static_cast<double>(pixel[2]) - 128.0) / 127.0;
+  const double length = std::hypot(px, py, pz);
+  const double theta = (std::numbers::pi / 2.0) * length;
+  const double scale = length > 0.0 ? std::sin(theta) / length : 0.0;
+  const double wxyz[4] = { std::cos(theta), px * scale, py * scale, pz * scale };
+  for (int i = 0; i < 4; ++i)
+  {
+    rotation[static_cast<std::size_t>(i)] = static_cast<float>(wxyz[i]);
+  }
 }
 }
 
@@ -328,9 +358,9 @@ int vtkF3DSOGReader::RequestData(
   {
     version = 0;
   }
-  if (version != 2)
+  if (version != 2 && version != 3)
   {
-    vtkErrorMacro("Incompatible SOG version. Only version 2 is supported");
+    vtkErrorMacro("Incompatible SOG version. Only versions 2 and 3 are supported");
     return 0;
   }
 
@@ -387,12 +417,15 @@ int vtkF3DSOGReader::RequestData(
 
     bands = shN["bands"].get<int>();
     shCount = shN["count"].get<std::int64_t>();
-    if (bands < 1 || bands > 3)
+    const int maxBands = version == 3 ? 4 : 3;
+    if (bands < 1 || bands > maxBands)
     {
-      vtkErrorMacro("Incompatible SOG spherical harmonics. Only degrees 1 through 3 are supported");
+      vtkErrorMacro("Incompatible SOG spherical harmonics. Only degrees 1 through "
+        << maxBands << " are supported");
       return 0;
     }
-    if (shCount < 1 || shCount > 65536 || !::ReadFiles(shN, 2, shNFiles) ||
+    const std::int64_t maxPalette = version == 3 ? 16777216 : 65536;
+    if (shCount < 1 || shCount > maxPalette || !::ReadFiles(shN, 2, shNFiles) ||
       !::ReadCodebook(shN, shNCodebook))
     {
       vtkErrorMacro("Invalid SOG meta.json");
@@ -467,9 +500,10 @@ int vtkF3DSOGReader::RequestData(
   rotationArray->SetNumberOfTuples(count);
   rotationArray->SetName("rotation");
 
-  const int numCoeffs = hasSH ? ::CoefficientCount(bands) : 0;
+  const int stride = hasSH ? ::PaletteStride(bands) : 0;
+  const int written = std::min(stride, 15);
   vtkNew<vtkUnsignedCharArray> shArrays[15];
-  for (int coefficient = 0; coefficient < numCoeffs; ++coefficient)
+  for (int coefficient = 0; coefficient < written; ++coefficient)
   {
     shArrays[coefficient]->SetNumberOfComponents(3);
     shArrays[coefficient]->SetNumberOfTuples(count);
@@ -493,11 +527,15 @@ int vtkF3DSOGReader::RequestData(
     const uint8_t* colorPixel = ::Pixel(sh0, splatIndex);
     const unsigned char color[4] = { ::DecodeColor(sh0Codebook[colorPixel[0]]),
       ::DecodeColor(sh0Codebook[colorPixel[1]]), ::DecodeColor(sh0Codebook[colorPixel[2]]),
-      colorPixel[3] };
+      ::DecodeOpacity(version, colorPixel[3]) };
     colorArray->SetTypedTuple(splatIndex, color);
 
-    std::array<float, 4> rotation;
-    if (!::DecodeQuaternion(::Pixel(quats, splatIndex), rotation))
+    std::array<float, 4> rotation = { 0.f, 0.f, 0.f, 0.f };
+    if (version == 3)
+    {
+      ::DecodeExponentialQuaternion(::Pixel(quats, splatIndex), rotation);
+    }
+    else if (!::DecodeQuaternion(::Pixel(quats, splatIndex), rotation))
     {
       vtkErrorMacro("Invalid SOG quaternion");
       return 0;
@@ -507,18 +545,22 @@ int vtkF3DSOGReader::RequestData(
     if (hasSH)
     {
       const uint8_t* labelPixel = ::Pixel(shLabels, splatIndex);
-      const unsigned int label =
+      unsigned int label =
         static_cast<unsigned int>(labelPixel[0]) + (static_cast<unsigned int>(labelPixel[1]) << 8);
-      const int xOrigin = static_cast<int>(label % 64) * numCoeffs;
+      if (version == 3)
+      {
+        label += static_cast<unsigned int>(labelPixel[2]) << 16;
+      }
+      const int xOrigin = static_cast<int>(label % 64) * stride;
       const int y = static_cast<int>(label / 64);
       if (label >= static_cast<unsigned int>(shCount) || y >= ::Height(shCentroids) ||
-        xOrigin + numCoeffs > ::Width(shCentroids))
+        xOrigin + written > ::Width(shCentroids))
       {
         vtkErrorMacro("Invalid SOG spherical harmonics");
         return 0;
       }
 
-      for (int coefficient = 0; coefficient < numCoeffs; ++coefficient)
+      for (int coefficient = 0; coefficient < written; ++coefficient)
       {
         const vtkIdType centroidIndex = static_cast<vtkIdType>(y) * ::Width(shCentroids) +
           static_cast<vtkIdType>(xOrigin + coefficient);
@@ -539,7 +581,7 @@ int vtkF3DSOGReader::RequestData(
   output->GetPointData()->SetScalars(colorArray);
   output->GetPointData()->AddArray(scaleArray);
   output->GetPointData()->AddArray(rotationArray);
-  for (int coefficient = 0; coefficient < numCoeffs; ++coefficient)
+  for (int coefficient = 0; coefficient < written; ++coefficient)
   {
     output->GetPointData()->AddArray(shArrays[coefficient]);
   }
