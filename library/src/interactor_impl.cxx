@@ -1605,9 +1605,7 @@ bool interactor_impl::triggerCommand(std::string_view command, bool keepComments
     {
       callbackIt->second.Callback({ tokens.begin() + 1, tokens.end() });
 
-      vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
-      vtkF3DRenderer* ren =
-        vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+      vtkF3DRenderer* ren = this->Internals->Window.GetRenderer();
       assert(ren);
       ren->SetCheatSheetConfigured(false);
 
