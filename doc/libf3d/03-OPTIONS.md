@@ -72,6 +72,12 @@ Select reader to read file without checking its header content but only based on
 
 CLI: `--skip-content-check`.
 
+### `scene.coordinate_normalize` (_bool_, default: `false`)
+
+Normalize the scene coordinates by shifting it to the origin and isotropically scaling it to a unit bounding box. This can help with rendering and precision issues on scenes with very large or very offset coordinates.
+
+CLI: `--coordinate-normalize`.
+
 ### `scene.camera.orthographic` (_bool_, optional)
 
 Set to true to force orthographic projection. Model-specified by default, which is false if not specified.
