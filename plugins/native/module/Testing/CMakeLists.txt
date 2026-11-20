@@ -14,6 +14,11 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
     TestF3DImageImporterCanReadFile.cxx)
 endif()
 
+if(F3D_MODULE_WEBP)
+  list(APPEND vtkextNativeTests_list
+    TestF3DSOGReader.cxx)
+endif()
+
 vtk_add_test_cxx(vtkextNativeTests tests
   NO_DATA NO_VALID NO_OUTPUT
   ${vtkextNativeTests_list}

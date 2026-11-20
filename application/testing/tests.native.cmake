@@ -82,6 +82,9 @@ f3d_test(NAME TestSPLAT DATA small.splat ARGS -o --coloring-mode=direct --up=-Y 
 # Sort (CPU) isn't supported in GLES because the mapper relies on geometry shaders
 f3d_test(NAME TestSPLATSortCPU DATA small.splat ARGS -o --coloring-mode=direct --point-sprites=gaussian --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --blending=sort_cpu --camera-position=2,0,0 SKIP_GLES)
 f3d_test(NAME TestSPZ DATA hornedlizard_small_d0.spz ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1)
+if(F3D_MODULE_WEBP)
+  f3d_test(NAME TestSOG DATA tiny.sog ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1)
+endif()
 
 set(_splat_args --coloring-mode=direct --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --camera-position=-2.00335,1.09654,-0.459485 --camera-focal-point=-0.796712,2.22795,0.705742)
 f3d_test(NAME TestSPLATSphere DATA small.splat ARGS ${_splat_args} --point-sprites=sphere)
@@ -98,6 +101,9 @@ f3d_test(NAME TestPipedPLY DATA suzanne.ply PIPED_READER PLYReader PIPED)
 f3d_test(NAME TestPipedQuakeMDL DATA zombie.mdl PIPED_READER QuakeMDL PIPED)
 f3d_test(NAME TestPipedSPLAT DATA small.splat ARGS -o --coloring-mode=direct --up=-Y --point-sprites-absolute-size --point-sprites-size=1 PIPED_READER Splat PIPED)
 f3d_test(NAME TestPipedSPZ DATA hornedlizard_small_d0.spz ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1 PIPED_READER SPZ PIPED)
+if(F3D_MODULE_WEBP)
+  f3d_test(NAME TestPipedSOG DATA tiny.sog ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1 PIPED_READER SOG PIPED)
+endif()
 f3d_test(NAME TestPipedInvalid DATA suzanne.ply ARGS --force-reader=QuakeMDL PIPED_READER QuakeMDL REGEXP "Input stream could not be loaded" NO_BASELINE PIPED)
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250923)
