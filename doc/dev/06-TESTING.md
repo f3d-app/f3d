@@ -125,7 +125,7 @@ All keywords are documented in the `cmake/f3dTest.cmake` file.
 
 ### Recovering baselines from CI
 
-Occasionally you may need to recover a baseline from the CI. If this is required, create a PR and let the test run and fail on CI. Check the actions run summary on Github and download the appropriate `baseline` archive. Extract the archive and navigate to the `build/Testing/Temporary/TestName.png`. Visually check that the generated file looks as expected, then add it to the F3D sources in `testing/baselines`.
+Occasionally you may need to recover a baseline from the CI. If this is required, create a PR and let the test run and fail on CI. Check the actions run summary on Github and download the appropriate `baseline` archive. Extract the archive and navigate to the `build/Testing/Temporary/TestName.png`. Visually check that the generated file looks as expected, then add it to the F3D sources in `testing/baselines`. You can also get a single output image from a specific job summary directly if the image table is available.
 
 ### Creating Interaction tests
 
