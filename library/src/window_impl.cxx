@@ -772,6 +772,7 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->SetGridUnitSquare(opt.render.grid.unit);
   renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
+  renderer->SetGridScale(opt.render.grid.scale);
   renderer->SetGridAbsolute(opt.render.grid.absolute);
   renderer->SetGridOpacity(opt.render.grid.opacity);
   renderer->SetGridAbsolute(this->getType() == Type::XR

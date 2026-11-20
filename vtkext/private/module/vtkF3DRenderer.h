@@ -173,6 +173,7 @@ public:
   void SetGridAbsolute(bool absolute);
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
+  void SetGridScale(double scale);
   void SetGridColor(const std::vector<double>& color);
   void SetGridOpacity(const double strength);
   void SetGridReflection(const double strength);
@@ -957,6 +958,7 @@ private:
   std::optional<double> LineWidth;
   std::optional<double> GridUnitSquare;
   int GridSubdivisions = 10;
+  double GridScale = 1.0;
   double GridColor[3] = { 0.0, 0.0, 0.0 };
   double GridOpacity = 1.0;
   double GridReflection = 0.0;
