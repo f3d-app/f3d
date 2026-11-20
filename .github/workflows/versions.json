@@ -105,7 +105,7 @@
     "min_version": "3.11"
   },
   "sqlite_csb": {
-    "version": "fee2c760fd54b08104d0c8e9d80f6d52d3a11106",
+    "version": "3855583b5a3e7d1a868756a1783a5a85ba97f04f",
     "min_version": "bb237f11ca039bd01314bb2252eb282086723c18"
   },
   "tbb": {
