@@ -285,7 +285,7 @@ int TestF3DSOGReader(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  vtkUnsignedCharArray* version3Color =
+  const vtkUnsignedCharArray* version3Color =
     vtkUnsignedCharArray::SafeDownCast(version3Output->GetPointData()->GetScalars());
   if (!version3Color || version3Color->GetTypedComponent(0, 3) != 255)
   {
