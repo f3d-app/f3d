@@ -4,7 +4,6 @@
     "OSPRay is fixed at 2.12.0 until full support for OSPRay 3.0 is added in VTK",
     "OpenEXR v3.0.1 is actually not using OpenJPH",
     "OpenVDB min version is not enforced by F3D code and missing from VTK code",
-    "OpenVDB version is locked by https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13996",
     "TBB is set at v2021.13.1 because OpenUSD seems to not support more recent versions: https://github.com/PixarAnimationStudios/OpenUSD/issues/3878 and https://github.com/PixarAnimationStudios/OpenUSD/issues/4078",
     "libx264 is using git hash because there are no proper releases",
     "mesa is fixed at 25.0.7 because OSMesa has been removed from 25.1.0",
@@ -81,7 +80,7 @@
     "min_version": "0.27.3"
   },
   "openvdb": {
-    "version": "v13.2.0",
+    "version": "v14.0.0",
     "min_version": "v12.0.0"
   },
   "ospray": {

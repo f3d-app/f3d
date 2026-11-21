@@ -136,6 +136,7 @@ runs:
       # Exodus not supported on Apple Silicon because of #976
       # CMAKE_MODULE_PATH is required because of
       # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160
+      # which is fixed in OpenVDB v14.0.0
       # OCCT plugin causes issues with static build because it exports symbols with the executable for some reasons
       # https://github.com/f3d-app/f3d/issues/1322
       # MacOS x86_64 occasionally segfault with Java
@@ -157,7 +158,7 @@ runs:
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
-        -DCMAKE_MODULE_PATH=${{ inputs.optdeps_label == 'optdeps' && '$(pwd)/../dependencies/install/lib/cmake/OpenVDB/' || '' }}
+        -DCMAKE_MODULE_PATH=${{ inputs.optdeps_label == 'optdeps' && inputs.mindeps_label == 'mindeps' && '$(pwd)/../dependencies/install/lib/cmake/OpenVDB/' || '' }}
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_BINDINGS_C=ON
         -DF3D_BINDINGS_JAVA=${{ (runner.os != 'macOS' || inputs.cpu == 'arm64') && inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
@@ -422,12 +423,13 @@ runs:
 
       # CMAKE_MODULE_PATH is required because of
       # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160
+      # which is fixed in OpenVDB v14.0.0
     - name: Build plugin examples
       if: inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -DCMAKE_MODULE_PATH=$(pwd)/dependencies/install/lib/cmake/OpenVDB/ -Df3d_DIR=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DCMAKE_INSTALL_PREFIX=$(pwd)/install/ -DBUILD_TESTING=ON -B build_plugins source/examples/plugins
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized  -DCMAKE_MODULE_PATH=${{ inputs.optdeps_label == 'optdeps' && inputs.mindeps_label == 'mindeps' && '$(pwd)/dependencies/install/lib/cmake/OpenVDB/' || '' }} -Df3d_DIR=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DCMAKE_INSTALL_PREFIX=$(pwd)/install/ -DBUILD_TESTING=ON -B build_plugins source/examples/plugins
         cmake --build build_plugins --config Release
 
     - name: Test plugin examples
