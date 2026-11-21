@@ -175,7 +175,9 @@ public:
           : progressData->fileName;
 
         const int percentage = std::round(100 * progress);
-        const std::string percentageStr = std::format("{:3}", percentage);
+        char percentageBuf[16];
+        std::snprintf(percentageBuf, sizeof(percentageBuf), "%3d", percentage);
+        const std::string percentageStr = percentageBuf;
 
         progressData->timer->StopTimer();
 
@@ -186,8 +188,9 @@ public:
         const int elapsedMin = progressData->timer->GetElapsedTime() / 60;
         const int elapsedSec = static_cast<int>(progressData->timer->GetElapsedTime()) % 60;
 
-        const std::string time = std::format(
-          "{:02}:{:02}/{:02}:{:02}", elapsedMin, elapsedSec, estimatedMin, estimatedSec);
+        char timeBuf[32];
+        std::snprintf(timeBuf, sizeof(timeBuf), "%02d:%02d/%02d:%02d", elapsedMin, elapsedSec, estimatedMin, estimatedSec);
+        const std::string time = timeBuf;
 
         f3d::log::progress(
           "\rLoading ", filename, " : ", percentageStr, "% |", bar, "| [", time, "]");

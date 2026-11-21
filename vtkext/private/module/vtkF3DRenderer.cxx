@@ -115,6 +115,7 @@
 #include <cctype>
 #include <chrono>
 #include <cmath>
+#include <cstdio>
 #include <numbers>
 #include <sstream>
 
@@ -1351,13 +1352,21 @@ void vtkF3DRenderer::AlignSceneToBounds(const vtkBoundingBox& bounds)
 
   vtkNew<vtkMatrix4x4> upMatrix;
   const double m[16] = {
-    right[0], right[1], right[2],
+    right[0],
+    right[1],
+    right[2],
     0, //
-    up[0], up[1], up[2],
+    up[0],
+    up[1],
+    up[2],
     0, //
-    front[0], front[1], front[2],
+    front[0],
+    front[1],
+    front[2],
     0, //
-    0, 0, 0,
+    0,
+    0,
+    0,
     1, //
   };
   upMatrix->DeepCopy(m);
@@ -2170,6 +2179,27 @@ void vtkF3DRenderer::SetFinalShader(const std::optional<std::string>& finalShade
   {
     this->FinalShader = finalShader;
     this->RenderPassesConfigured = false;
+    this->ClearSliders();
+    if (!finalShader.has_value())
+    {
+      return;
+    }
+    std::istringstream final_shader_stream;
+    final_shader_stream.str(finalShader.value().c_str());
+    for (std::string line; std::getline(final_shader_stream, line);)
+    {
+      char name[64];
+      float defaultValue = 0.f;
+      float minValue = 0.f;
+      float maxValue = 0.f;
+      int filledVarCount =
+        std::sscanf(line.c_str(), " uniform float %63[^ =] = %f ; // slider(%f, %f)", name,
+          &defaultValue, &minValue, &maxValue);
+      if (filledVarCount == 4)
+      {
+        this->AddShaderSliders(std::string(name), defaultValue, minValue, maxValue);
+      }
+    }
   }
 }
 
@@ -3633,7 +3663,7 @@ void vtkF3DRenderer::UpdateLightRepresentations()
 
   // remove unwanted light representations
   for (auto repItr = this->LightRepresentations.begin();
-       repItr != this->LightRepresentations.end();)
+    repItr != this->LightRepresentations.end();)
   {
     if (visitedLights.count(repItr->first))
     {

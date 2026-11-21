@@ -42,6 +42,8 @@
 #include <algorithm>
 #include <array>
 #include <cstdint>
+#include <filesystem>
+#include <fstream>
 #include <functional>
 #include <iomanip>
 #include <numeric>
@@ -1463,8 +1465,71 @@ void vtkF3DImguiActor::StartFrame(vtkOpenGLRenderWindow* renWin)
 }
 
 //----------------------------------------------------------------------------
+// TODO lancelot
+void RenderFinalShaderSlider(vtkOpenGLRenderWindow* renWin)
+{
+  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+  for (auto& slider : ren->shaderSliders)
+  {
+    if (ImGui::SliderFloat(slider.name.c_str(), &slider.defaultValue, slider.min, slider.max))
+    {
+      renWin->GetInteractor()->InvokeEvent(vtkF3DUserEvents::SceneHierarchyChangedEvent, nullptr);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void RenderFinalShaderDropdown()
+{
+  namespace fs = std::filesystem;
+  const fs::path dir = fs::path(__FILE__).parent_path() / "../../../final_shaders";
+  static std::string selectedShader;
+
+  const char* preview = selectedShader.empty() ? "Select Shader" : selectedShader.c_str();
+  if (ImGui::BeginCombo("##FinalShader", preview))
+  {
+    std::error_code err_code;
+    for (const fs::directory_entry& entry : fs::directory_iterator(dir, err_code))
+    {
+      std::string fileName = entry.path().filename().string();
+      std::string filePath = entry.path().string();
+      const bool isSelected = (fileName == selectedShader);
+      if (ImGui::Selectable(fileName.c_str(), isSelected))
+      {
+        selectedShader = fileName;
+        std::ifstream file(filePath.c_str());
+        std::string shaderCode;
+        std::string line;
+        while (std::getline(file, line))
+        {
+          shaderCode += line + "\n";
+        }
+        std::string command = "set render.effect.final_shader `" + shaderCode + "`";
+        vtkOutputWindow::GetInstance()->InvokeEvent(
+          vtkF3DUserEvents::TriggerEvent, (void*)command.c_str());
+      }
+      if (isSelected)
+      {
+        ImGui::SetItemDefaultFocus();
+      }
+    }
+    ImGui::EndCombo();
+  }
+}
+
+
+//----------------------------------------------------------------------------
 void vtkF3DImguiActor::EndFrame(vtkOpenGLRenderWindow* renWin)
 {
+  // One panel in the top right corner: shader dropdown, then the slider under it
+  ImGui::SetNextWindowPos(
+    ImVec2(ImGui::GetMainViewport()->WorkSize.x, 0.f), ImGuiCond_Always, ImVec2(1.f, 0.f));
+  ImGui::Begin(
+    "FinalShaderPanel", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize);
+  ::RenderFinalShaderDropdown();
+  ::RenderFinalShaderSlider(renWin);
+  ImGui::End();
+
   ImGui::Render();
   this->Pimpl->RenderDrawData(renWin, ImGui::GetDrawData());
 }
