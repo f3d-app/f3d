@@ -190,12 +190,7 @@ public:
           "{:02}:{:02}/{:02}:{:02}", elapsedMin, elapsedSec, estimatedMin, estimatedSec);
 
         f3d::log::progress(
-          "\rLoading ", filename, " : ", percentageStr, "% |", bar, "| [", time, "]");
-
-        if (progress >= 1.0)
-        {
-          f3d::log::progress("\n");
-        }
+          "Loading ", filename, " : ", percentageStr, "% |", bar, "| [", time, "]");
       });
     importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
     data->timer->StartTimer();

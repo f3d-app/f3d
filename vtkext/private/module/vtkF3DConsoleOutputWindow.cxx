@@ -13,33 +13,38 @@ vtkF3DConsoleOutputWindow::vtkF3DConsoleOutputWindow() = default;
 void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)
 {
   std::string fmtText;
+  if (this->lastMessageIsProgress)
+  {
+    fmtText += '\n';
+  }
 
   if (this->UseColoring)
   {
     switch (this->GetCurrentMessageType())
     {
       case vtkOutputWindow::MESSAGE_TYPE_ERROR:
-        fmtText = "\033[31;1m";
+        fmtText += "\033[31;1m";
         fmtText += txt;
         fmtText += "\033[0m";
         break;
       case vtkOutputWindow::MESSAGE_TYPE_WARNING:
       case vtkOutputWindow::MESSAGE_TYPE_GENERIC_WARNING:
-        fmtText = "\033[33m";
+        fmtText += "\033[33m";
         fmtText += txt;
         fmtText += "\033[0m";
         break;
       default:
-        fmtText = txt;
+        fmtText += txt;
         break;
     }
   }
   else
   {
-    fmtText = txt;
+    fmtText += txt;
   }
 
-  fmtText += "\n";
+  fmtText += '\n';
+
   this->Superclass::DisplayText(fmtText.c_str());
 
   switch (this->GetDisplayStream(this->GetCurrentMessageType()))
@@ -53,12 +58,18 @@ void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)
     default:
       break;
   }
+
+  this->lastMessageIsProgress = false;
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DConsoleOutputWindow::DisplayProgress(const char* str)
 {
-  this->Superclass::DisplayText(str);
+
+  std::string fmtText = "\r";
+  fmtText += str;
+
+  this->Superclass::DisplayText(fmtText.c_str());
 
   switch (this->GetDisplayStream(this->GetCurrentMessageType()))
   {
@@ -74,4 +85,6 @@ void vtkF3DConsoleOutputWindow::DisplayProgress(const char* str)
       break;
       // LCOV_EXCL_STOP
   }
+
+  this->lastMessageIsProgress = true;
 }
