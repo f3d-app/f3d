@@ -2020,6 +2020,37 @@ interactor& interactor_impl::triggerTextCharacter(unsigned int codepoint)
 }
 
 //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+interactor& interactor_impl::jumpToFrame(int index)
+{
+  this->Internals->Anim.SetDeltaTime(this->Internals->CallbackDeltaTime);
+  this->Internals->Anim.JumpToFrame(index, false);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::jumpToFrameRelative(int offset)
+{
+  this->Internals->Anim.SetDeltaTime(this->Internals->CallbackDeltaTime);
+  this->Internals->Anim.JumpToFrame(offset, true);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::jumpToKeyframe(int index)
+{
+  this->Internals->Anim.JumpToKeyFrame(index, false);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::jumpToKeyframeRelative(int offset)
+{
+  this->Internals->Anim.JumpToKeyFrame(offset, true);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 interactor& interactor_impl::enableCameraMovement()
 {
   this->Internals->Style->SetCameraMovementDisabled(false);
@@ -2160,6 +2191,12 @@ interactor& interactor_impl::requestStop()
 {
   this->Internals->StopRequested = true;
   return *this;
+}
+
+//----------------------------------------------------------------------------
+double interactor_impl::getDeltaTime() const
+{
+  return this->Internals->CallbackDeltaTime;
 }
 
 //----------------------------------------------------------------------------

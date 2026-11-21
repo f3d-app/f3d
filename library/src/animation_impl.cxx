@@ -734,4 +734,23 @@ double animation_impl::GetCurrentTime() const
 {
   return this->Internals->CurrentTime;
 }
+
+//----------------------------------------------------------------------------
+size_t animation_impl::GetCurrentFrame() const
+{
+  assert(this->Internals->DeltaTime != 0.0);
+  const double frameDuration = (this->Internals->DeltaTime * this->Internals->SpeedFactor);
+  if (frameDuration == 0.0)
+  {
+    return 0;
+  }
+  return static_cast<size_t>(
+    (this->Internals->CurrentTime - this->Internals->TimeRange[0]) / frameDuration);
+}
+
+//----------------------------------------------------------------------------
+double animation_impl::GetDeltaTime() const
+{
+  return this->Internals->DeltaTime;
+}
 }

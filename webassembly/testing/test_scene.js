@@ -53,7 +53,47 @@ const settings = {
   runAfter: (Module) => {
     const scene = Module.engineInstance.getScene();
 
-    scene.getAnimation().loadTime(0.5);
+    const animation = scene.getAnimation();
+
+    utils.assert(animation.count() == 10, "There should be 10 animations");
+
+    const [start, end] = animation.getTimeRange();
+
+    utils.assert(start === 0, "Start value should be 0");
+    utils.assert(
+      end === 0.7999999999999999,
+      "End value should be 0.7999999999999999",
+    );
+
+    utils.assert(
+      animation.getKeyFrames().length === 9,
+      "KeyFrames length should be 9",
+    );
+    utils.assert(
+      animation.getKeyFrames()[0] === 0,
+      "First KeyFrame should be 0",
+    );
+    utils.assert(
+      animation.getKeyFrames()[8] === 0.7999999999999999,
+      "First KeyFrame should be 0.7999999999999999",
+    );
+
+    animation.loadTime(0.5);
+
+    utils.assert(
+      scene.animationTime() === 0.5,
+      "animationTime should be 0.5 after loading",
+    );
+
+    utils.assert(
+      scene.animationFrame() === 15,
+      "animationFrame should be 15 after loading 0.5",
+    );
+
+    utils.assert(animation.getName() == "stand", "getName returns name");
+
+    // array comparison in JS is a little annoying so we just compare the 0th element
+    utils.assert(animation.getNames()[0] == "stand", "getNames returns names");
 
     const hierarchy = scene.getSceneHierarchy();
 
