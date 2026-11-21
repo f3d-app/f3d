@@ -1395,7 +1395,6 @@ interactor& interactor_impl::initCommands()
       log::setVerboseLevel(newLevel);
 
       vtkF3DRenderer* ren = this->Internals->Window.GetRenderer();
-      assert(ren);
       ren->SetCheatSheetConfigured(false);
 
       log::info("Verbose level changed to: ", this->Internals->VerboseLevelToString(newLevel));
@@ -1600,7 +1599,6 @@ bool interactor_impl::triggerCommand(std::string_view command, bool keepComments
       callbackIt->second.Callback({ tokens.begin() + 1, tokens.end() });
 
       vtkF3DRenderer* ren = this->Internals->Window.GetRenderer();
-      assert(ren);
       ren->SetCheatSheetConfigured(false);
 
       return true;
