@@ -119,7 +119,7 @@ F3D supports 5 different formats:
 - `.ply`: Original 3DGS format
 - `.splat`: Format specified by the [splat repository](https://github.com/antimatter15/splat). Does not support spherical harmonics.
 - `.spz`: Niantic's [SPZ format](https://github.com/nianticlabs/spz) (v2 and v3)
-- `.sog`: PlayCanvas [SOG format](https://developer.playcanvas.com/user-manual/gaussian-splatting/formats/sog/) (version 2 only)
+- `.sog`: PlayCanvas [SOG format](https://developer.playcanvas.com/user-manual/gaussian-splatting/formats/sog/) (versions 2 and 3)
 - `.gltf`/`.glb`: GLTF with KHR_gaussian_splatting extension
 
 No config files come with the `.ply` format because this format is not dedicated to 3DGS only.
