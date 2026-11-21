@@ -49,8 +49,6 @@ runs:
       working-directory: ${{github.workspace}}
       run: mkdir build
 
-    # CMAKE_MODULE_PATH is required because of
-    # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160
     - name: Configure
       shell: bash
       working-directory: ${{github.workspace}}/build
@@ -61,7 +59,6 @@ runs:
         --warn-uninitialized
         -DBUILD_TESTING=ON
         -DCMAKE_BUILD_TYPE=Release
-        -DCMAKE_MODULE_PATH=$(pwd)/../dependencies/install/lib/cmake/OpenVDB/
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_MODULE_CLIP=ON
         -DF3D_MODULE_EXR=ON
