@@ -491,8 +491,7 @@ public:
       }
     }
 
-    vtkRenderWindow* renWin = this->Window.GetRenderWindow();
-    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    vtkF3DRenderer* ren = this->Window.GetRenderer();
 
     ren->AddNotification(desc, value, bind, duration);
   }
@@ -667,8 +666,7 @@ public:
     this->Anim.SetDeltaTime(deltaTime);
     this->Anim.Tick();
 
-    vtkRenderWindow* renWin = this->Window.GetRenderWindow();
-    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    vtkF3DRenderer* ren = this->Window.GetRenderer();
     ren->SetUIDeltaTime(deltaTime);
     ren->SetTotalTime(ren->GetTotalTime() + deltaTime);
 
@@ -1056,9 +1054,7 @@ interactor& interactor_impl::initCommands()
     {
       check_args(args, 1, "cycle_coloring");
       const std::string_view type = args[0];
-      vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
-      vtkF3DRenderer* ren =
-        vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+      vtkF3DRenderer* ren = this->Internals->Window.GetRenderer();
       if (type == "mode")
       {
         ren->CycleModeForColoring();
@@ -1398,9 +1394,7 @@ interactor& interactor_impl::initCommands()
 
       log::setVerboseLevel(newLevel);
 
-      vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
-      vtkF3DRenderer* ren =
-        vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+      vtkF3DRenderer* ren = this->Internals->Window.GetRenderer();
       assert(ren);
       ren->SetCheatSheetConfigured(false);
 
@@ -1604,6 +1598,11 @@ bool interactor_impl::triggerCommand(std::string_view command, bool keepComments
     if (callbackIt != this->Internals->Commands.end())
     {
       callbackIt->second.Callback({ tokens.begin() + 1, tokens.end() });
+
+      vtkF3DRenderer* ren = this->Internals->Window.GetRenderer();
+      assert(ren);
+      ren->SetCheatSheetConfigured(false);
+
       return true;
     }
     else
@@ -1675,16 +1674,14 @@ interactor& interactor_impl::initBindings()
   // "Cycle array to color with" , "arrayName"
   auto docArray = [&]()
   {
-    vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
-    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    vtkF3DRenderer* ren = this->Internals->Window.GetRenderer();
     return std::pair("Color array", shortName(ren->ArrayToString(), 15));
   };
 
   // "Cycle component to color with" , "component"
   auto docComp = [&]()
   {
-    vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
-    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    vtkF3DRenderer* ren = this->Internals->Window.GetRenderer();
     return std::pair("Color component", ren->ComponentToString());
   };
 

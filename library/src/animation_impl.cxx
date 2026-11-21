@@ -535,8 +535,7 @@ void animation_impl::CycleAnimation()
     // The loaded animation changed: refresh the progress bar's time range and name
     this->PushAnimationProgress();
 
-    vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
-    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    vtkF3DRenderer* ren = this->Internals->Window.GetRenderer();
     ren->SetCheatSheetConfigured(false);
   }
 }
