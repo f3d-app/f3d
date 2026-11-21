@@ -1,5 +1,7 @@
 #include "vtkF3DUserRenderPass.h"
 
+#include <vtkCamera.h>
+
 #include "vtkF3DRenderer.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLError.h"
@@ -61,6 +63,8 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
     s, size[0], size[1], size[0], size[1], this->FrameBufferObject, this->ColorTexture);
   renWin->GetState()->PopFramebufferBindings();
 
+  vtkTextureObject* depthTexture = ren ? ren->GetSceneDepthTexture() : nullptr;
+
   if (this->QuadHelper && this->QuadHelper->ShaderChangeValue < this->GetMTime())
   {
     this->QuadHelper = nullptr;
@@ -72,8 +76,33 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Decl",
       "uniform sampler2D source;\n"
+      "uniform sampler2D sourceDepth;\n"
+      "uniform vec2 cameraClippingRange;\n"
+      "uniform bool cameraParallelProjection;\n"
       "uniform ivec2 resolution;\n"
       "uniform float time;\n"
+      "//VTK::FSQ::Decl");
+
+    vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Decl",
+      "float readRawDepth(vec2 uv)\n"
+      "{\n"
+      "  return texture(sourceDepth, uv).r;\n"
+      "}\n"
+      "\n"
+      "float readDepth(vec2 uv)\n"
+      "{\n"
+      "  float d = readRawDepth(uv);\n"
+      "  float n = cameraClippingRange.x;\n"
+      "  float f = cameraClippingRange.y;\n"
+      "\n"
+      "  if (cameraParallelProjection)\n"
+      "  {\n"
+      "    return mix(n, f, d);\n"
+      "  }\n"
+      "\n"
+      "  return (n * f) / mix(f, n, d);\n"
+      "}\n"
+      "\n"
       "//VTK::FSQ::Decl");
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Decl", this->UserShader);
@@ -96,6 +125,33 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
     return;
   }
 
+  vtkCamera* camera = r->GetActiveCamera();
+  const double* range = camera->GetClippingRange();
+  const float clippingRange[2] = { static_cast<float>(range[0]), static_cast<float>(range[1]) };
+
+  if (this->QuadHelper->Program->IsUniformUsed("cameraClippingRange"))
+  {
+    this->QuadHelper->Program->SetUniform2f("cameraClippingRange", clippingRange);
+  }
+
+  if (this->QuadHelper->Program->IsUniformUsed("cameraParallelProjection"))
+  {
+    this->QuadHelper->Program->SetUniformi(
+      "cameraParallelProjection", camera->GetParallelProjection());
+  }
+
+  if (this->QuadHelper->Program->IsUniformUsed("sourceDepth"))
+  {
+    if (!depthTexture || depthTexture->GetHandle() == 0)
+    {
+      vtkErrorMacro("Scene depth texture is unavailable.");
+      return;
+    }
+
+    depthTexture->Activate();
+    this->QuadHelper->Program->SetUniformi("sourceDepth", depthTexture->GetTextureUnit());
+  }
+
   this->ColorTexture->Activate();
   this->QuadHelper->Program->SetUniformi("source", this->ColorTexture->GetTextureUnit());
   this->QuadHelper->Program->SetUniform2i("resolution", size);
@@ -116,6 +172,11 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
   ostate->vtkglScissor(pos[0], pos[1], size[0], size[1]);
 
   this->QuadHelper->Render();
+
+  if (this->QuadHelper->Program->IsUniformUsed("sourceDepth"))
+  {
+    depthTexture->Deactivate();
+  }
 
   this->ColorTexture->Deactivate();
 
