@@ -34,4 +34,13 @@ if(NOT APPLE) # MacOS does not support compute shaders
   f3d_test(NAME TestInvalidSPZTruncated DATA invalid_spz_gzip_truncated.spz ARGS -o --coloring-mode=direct --verbose REGEXP "Invalid GZIP file" NO_BASELINE)
   f3d_test(NAME TestInvalidSPZMagic DATA invalid_spz_magic.spz ARGS -o --coloring-mode=direct --verbose REGEXP "Incompatible SPZ header" NO_BASELINE)
   f3d_test(NAME TestInvalidSPZVersion DATA invalid_spz_version.spz ARGS -o --coloring-mode=direct --verbose REGEXP "Incompatible SPZ version. Only 2 and 3 are supported" NO_BASELINE)
+
+  if(F3D_MODULE_WEBP)
+    f3d_test(NAME TestSOGGaussian DATA tiny.sog ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort SKIP_GLES)
+    f3d_test(NAME TestSOGSH DATA tiny_sh.sog ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort SKIP_GLES)
+    if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+      f3d_test(NAME TestDefaultConfigFileSOG DATA tiny_sh.sog CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
+    endif()
+    f3d_test(NAME TestThumbnailConfigFileSOG DATA tiny_sh.sog CONFIG thumbnail_build LONG_TIMEOUT SKIP_GLES)
+  endif()
 endif()

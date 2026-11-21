@@ -32,6 +32,7 @@ Contributors with a single contribution or that may not want to are not listed h
 | Jean Fechter                    | noclone        | Yes        |
 | Ash Carter                      | iommu          | Yes        |
 | Ao Gao                          | AoGao-Kedoka   | Yes        |
+| Cody Perry                      | CPerry26       | Yes        |
 
 ---
 

@@ -55,6 +55,10 @@ KeyPressEvent 1281 35 0 9 1 Tab 0
 CharEvent 1281 35 0 9 1 Tab 0
 KeyReleaseEvent 1281 35 0 9 1 Tab 0
 
+KeyPressEvent 1281 35 0 32 1 space 0
+CharEvent 1281 35 0 32 1 space 0
+KeyReleaseEvent 1281 35 0 32 1 space 0
+
 KeyPressEvent 1281 35 0 116 1 t 0
 CharEvent 1281 35 0 116 1 t 0
 KeyReleaseEvent 1281 35 0 116 1 t 0

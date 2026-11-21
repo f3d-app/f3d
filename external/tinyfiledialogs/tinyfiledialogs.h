@@ -7,7 +7,7 @@ Copyright (c) 2014 - 2025 Guillaume Vareille http://ysengrin.com
 
 ********* TINY FILE DIALOGS OFFICIAL WEBSITE IS ON SOURCEFORGE *********
   _________
- /         \ tinyfiledialogs.h v3.21.3 [Feb 12, 2026]
+ /         \ tinyfiledialogs.h v3.22.1 [Oct 21, 2026]
  |tiny file| Unique header file created [November 9, 2014]
  | dialogs |
  \____  ___/ http://tinyfiledialogs.sourceforge.net

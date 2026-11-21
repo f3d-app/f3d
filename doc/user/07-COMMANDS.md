@@ -41,11 +41,17 @@ eg: `cycle_coloring array`.
 `roll_camera value`: A specific command to roll the camera on its side, takes an angle in degrees as an argument.
 eg: `roll_camera 120`.
 
+`zoom_camera value`: A specific command to zoom the view relatively to current zoom, takes a factor as an argument.
+eg: `zoom_camera 1.5`.
+
 `elevation_camera value`: A specific command to tilt the camera up or down, takes an angle in degrees as an argument.
 eg: `elevation_camera 120`.
 
 `azimuth_camera value`: A specific command to tilt the camera right or left, takes an angle in degrees as an argument.
 eg: `azimuth_camera 120`.
+
+`set_camera_look_at position focal up`: A specific command to set the camera at the given position looking in focal direction, takes two 3D points and a direction as arguments. Does nothing in 2d.
+eg: `set_camera_look_at 10,10,10 0,0,0 1,1,1`
 
 `print_scene_info`: A specific command to print information about the scene. No argument.
 
@@ -65,6 +71,8 @@ Supports `front`, `top`, `right`, `back`, `bottom`, `left`, `isometric` argument
 `stop_interactor`: A specific command to stop the interactor hence quitting the application. No argument.
 
 `reset_camera`: A specific command to reset the camera to its original location. No argument.
+
+`set_resolution`: A specific command to set the window resolution. eg: `set_resolution 300,900`.
 
 `toggle_animation`: A specific command to start/stop the animation. No argument.
 

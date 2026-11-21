@@ -1,0 +1,2 @@
+zoom_camera 4
+zoom_camera 0.5

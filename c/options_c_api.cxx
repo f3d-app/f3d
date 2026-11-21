@@ -276,7 +276,7 @@ const char* f3d_options_get_as_string(const f3d_options_t* options, const char* 
 void f3d_options_get_as_double_vector(
   const f3d_options_t* options, const char* name, double* values, size_t* count)
 {
-  if (!options || !name || !values || !count)
+  if (!options || !name || !count)
   {
     return;
   }
@@ -286,7 +286,10 @@ void f3d_options_get_as_double_vector(
     const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
     const std::vector<double> vec = std::get<std::vector<double>>(cpp_options->get(name));
     *count = vec.size();
-    std::ranges::copy(vec, values);
+    if (values)
+    {
+      std::ranges::copy(vec, values);
+    }
   }
   catch (f3d::options::inexistent_exception& ex)
   {
@@ -306,7 +309,7 @@ void f3d_options_get_as_double_vector(
 void f3d_options_get_as_int_vector(
   const f3d_options_t* options, const char* name, int* values, size_t* count)
 {
-  if (!options || !name || !values || !count)
+  if (!options || !name || !count)
   {
     return;
   }
@@ -316,7 +319,10 @@ void f3d_options_get_as_int_vector(
     const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
     const std::vector<int> vec = std::get<std::vector<int>>(cpp_options->get(name));
     *count = vec.size();
-    std::ranges::copy(vec, values);
+    if (values)
+    {
+      std::ranges::copy(vec, values);
+    }
   }
   catch (f3d::options::inexistent_exception& ex)
   {
@@ -1044,7 +1050,7 @@ const char* f3d_options_parse_string(const char* str)
 //----------------------------------------------------------------------------
 void f3d_options_parse_double_vector(const char* str, double* values, size_t* count)
 {
-  if (!str || !values || !count)
+  if (!str || !count)
   {
     return;
   }
@@ -1053,7 +1059,10 @@ void f3d_options_parse_double_vector(const char* str, double* values, size_t* co
   {
     std::vector<double> vec = f3d::options::parse<std::vector<double>>(str);
     *count = vec.size();
-    std::ranges::copy(vec, values);
+    if (values)
+    {
+      std::ranges::copy(vec, values);
+    }
   }
   catch (const f3d::options::parsing_exception& ex)
   {
@@ -1065,7 +1074,7 @@ void f3d_options_parse_double_vector(const char* str, double* values, size_t* co
 //----------------------------------------------------------------------------
 void f3d_options_parse_int_vector(const char* str, int* values, size_t* count)
 {
-  if (!str || !values || !count)
+  if (!str || !count)
   {
     return;
   }
@@ -1074,7 +1083,10 @@ void f3d_options_parse_int_vector(const char* str, int* values, size_t* count)
   {
     std::vector<int> vec = f3d::options::parse<std::vector<int>>(str);
     *count = vec.size();
-    std::ranges::copy(vec, values);
+    if (values)
+    {
+      std::ranges::copy(vec, values);
+    }
   }
   catch (const f3d::options::parsing_exception& ex)
   {

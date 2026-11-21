@@ -57,6 +57,16 @@ Labels can be combined to further refine test selection.
 ctest -L assimp -L piped # run all piped tests which use assimp plugin
 ```
 
+### Generate summary
+
+It's possible to output a XML file by adding `--output-junit out.xml` and process this file with
+the script `utils/generate_summary.py` in order to generate a markdown file.
+
+```bash
+ctest --output-junit out.xml
+python <source>/utils/generate_summary.py --source_dir <source_dir> --build_dir . out.xml > summary.md
+```
+
 ## Testing architecture
 
 There are multiple layers of tests to ensure that testing covers all aspects of the application. The layers of the application are
@@ -115,7 +125,7 @@ All keywords are documented in the `cmake/f3dTest.cmake` file.
 
 ### Recovering baselines from CI
 
-Occasionally you may need to recover a baseline from the CI. If this is required, create a PR and let the test run and fail on CI. Check the actions run summary on Github and download the appropriate `baseline` archive. Extract the archive and navigate to the `build/Testing/Temporary/TestName.png`. Visually check that the generated file looks as expected, then add it to the F3D sources in `testing/baselines`.
+Occasionally you may need to recover a baseline from the CI. If this is required, create a PR and let the test run and fail on CI. Check the actions run summary on Github and download the appropriate `baseline` archive. Extract the archive and navigate to the `build/Testing/Temporary/TestName.png`. Visually check that the generated file looks as expected, then add it to the F3D sources in `testing/baselines`. You can also get a single output image from a specific job summary directly if the image table is available.
 
 ### Creating Interaction tests
 

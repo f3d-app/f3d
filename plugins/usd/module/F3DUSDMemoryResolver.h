@@ -16,7 +16,7 @@ class vtkResourceStream;
 /**
  * The actual resolver class that implements the ArResolver interface.
  */
-class F3DUSDMemoryResolver final : public pxr::ArResolver
+class F3DUSDMemoryResolver final : public PXR_NS::ArResolver
 {
 protected:
   /**
@@ -24,29 +24,30 @@ protected:
    * resolver.
    */
   std::string _CreateIdentifier(
-    const std::string& assetPath, const pxr::ArResolvedPath& anchorAssetPath) const override;
+    const std::string& assetPath, const PXR_NS::ArResolvedPath& anchorAssetPath) const override;
 
   /**
    * Returns a resolved path copying assetPath as is.
    */
-  pxr::ArResolvedPath _Resolve(const std::string& assetPath) const override;
+  PXR_NS::ArResolvedPath _Resolve(const std::string& assetPath) const override;
 
   /**
    * Function called by usd to open assets, implemented to read data from a vtkResourceStream
    */
-  std::shared_ptr<pxr::ArAsset> _OpenAsset(const pxr::ArResolvedPath& resolvedPath) const override;
+  std::shared_ptr<PXR_NS::ArAsset> _OpenAsset(
+    const PXR_NS::ArResolvedPath& resolvedPath) const override;
 
   //@{
   /**
    * Implements dummy pure virtual functions
    */
   std::string _CreateIdentifierForNewAsset(
-    const std::string& assetPath, const pxr::ArResolvedPath& anchorAssetPath) const override;
+    const std::string& assetPath, const PXR_NS::ArResolvedPath& anchorAssetPath) const override;
 
-  pxr::ArResolvedPath _ResolveForNewAsset(const std::string& assetPath) const override;
+  PXR_NS::ArResolvedPath _ResolveForNewAsset(const std::string& assetPath) const override;
 
-  std::shared_ptr<pxr::ArWritableAsset> _OpenAssetForWrite(
-    const pxr::ArResolvedPath& resolvedPath, WriteMode writeMode) const override;
+  std::shared_ptr<PXR_NS::ArWritableAsset> _OpenAssetForWrite(
+    const PXR_NS::ArResolvedPath& resolvedPath, WriteMode writeMode) const override;
   //@}
 };
 
@@ -63,10 +64,12 @@ struct F3DUSDMemoryResolverContext
 
 size_t hash_value(const F3DUSDMemoryResolverContext&);
 
+PXR_NAMESPACE_OPEN_SCOPE
 template<>
-struct pxr::ArIsContextObject<F3DUSDMemoryResolverContext>
+struct ArIsContextObject<F3DUSDMemoryResolverContext>
 {
   static const bool value = true;
 };
+PXR_NAMESPACE_CLOSE_SCOPE
 
 #endif

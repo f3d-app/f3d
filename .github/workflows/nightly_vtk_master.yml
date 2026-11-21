@@ -72,6 +72,10 @@ jobs:
         include:
           - rendering_backend: auto
           - gles_label: no-gles
+          - os: macos-15
+            rendering_backend: osmesa
+          - os: macos-15-intel
+            rendering_backend: osmesa
           - build_type: egl
             os: ubuntu-24.04
             rendering_backend: egl

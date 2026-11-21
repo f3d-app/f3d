@@ -131,11 +131,6 @@ if(F3D_MODULE_EXR)
   list(APPEND classes vtkF3DEXRReader)
 endif()
 
-if(F3D_MODULE_WEBP)
-  find_package(WebP REQUIRED)
-  list(APPEND classes vtkF3DWebPReader)
-endif()
-
 if(F3D_MODULE_UI AND NOT F3D_USE_EXTERNAL_IMGUI)
   list(APPEND sources
     "${F3D_SOURCE_DIR}/external/imgui/imgui.cpp"
@@ -162,11 +157,6 @@ if(F3D_MODULE_EXR)
   vtk_module_link(f3d::vtkextPrivate PRIVATE OpenEXR::OpenEXR)
 endif()
 
-# webp
-if(F3D_MODULE_WEBP)
-  vtk_module_link(f3d::vtkextPrivate PRIVATE WebP::webp)
-endif()
-
 # imgui
 if (F3D_MODULE_UI)
   vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_UI)
@@ -183,6 +173,11 @@ endif ()
 if (MSVC)
   vtk_module_compile_options(f3d::vtkextPrivate PRIVATE /utf-8)
 endif()
+
+# anari
+if (F3D_MODULE_ANARI)
+  vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_ANARI)
+endif ()
 
 # raytracing
 if (F3D_MODULE_RAYTRACING)

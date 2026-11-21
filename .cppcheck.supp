@@ -9,3 +9,4 @@ syntaxError
 
 // specific checks
 preprocessorErrorDirective:plugins/draco/module/vtkF3DDracoReader.cxx
+unknownMacro:plugins/usd/module/F3DUSDMemoryResolver.h

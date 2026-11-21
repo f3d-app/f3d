@@ -42,9 +42,9 @@ int TestF3DFCStdReaderStream(int vtkNotUsed(argc), char* argv[])
   reader->RelativeDeflectionOn();
   reader->Update();
 
-  if (reader->GetOutput()->GetNumberOfPartitionedDataSets() != 1)
+  if (reader->GetOutput()->GetNumberOfPartitionedDataSets() != 2)
   {
-    std::cerr << "Expected 1 partition from the stream, got "
+    std::cerr << "Expected 2 partitions from the stream, got "
               << reader->GetOutput()->GetNumberOfPartitionedDataSets() << "\n";
     return EXIT_FAILURE;
   }

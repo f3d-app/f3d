@@ -1,0 +1,91 @@
+name: "Install meshoptimizer Dependency"
+description: "Install meshoptimizer Dependency using cache when possible"
+inputs:
+  versions_file:
+    description: "File to recover versions from"
+    required: true
+  mindeps_label:
+    description: "Label to flag for minimum versions dependencies"
+    required: false
+    default: "no-mindeps"
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{inputs.versions_file}}" ]] || { echo "versions_file is empty" ; exit 1; }
+
+    - name: Extract meshoptimizer version
+      id: meshoptimizer_ver
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        name: meshoptimizer
+        minver_label: ${{inputs.mindeps_label == 'mindeps' && 'minver' || ''}}
+
+    - name: Extract global cache index
+      id: global_idx
+      uses: f3d-app/extract-version-action@main
+      with:
+        file: ${{inputs.versions_file}}
+        special_name: global_cache_index
+
+    - name: Cache meshoptimizer
+      id: cache-meshoptimizer
+      continue-on-error: true # https://github.com/actions/cache/issues/1754
+      uses: actions/cache/restore@v6
+      with:
+        path: dependencies/meshoptimizer_install
+        key: meshoptimizer-${{steps.meshoptimizer_ver.outputs.extract}}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-0
+
+    - name: Checkout meshoptimizer
+      if: steps.cache-meshoptimizer.outputs.cache-hit != 'true'
+      uses: actions/checkout@v7
+      with:
+        repository: zeux/meshoptimizer
+        path: "./dependencies/meshoptimizer"
+        ref: ${{steps.meshoptimizer_ver.outputs.extract}}
+
+    - name: Setup meshoptimizer
+      if: steps.cache-meshoptimizer.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir meshoptimizer_build
+        mkdir meshoptimizer_install
+
+    - name: Configure meshoptimizer
+      if: steps.cache-meshoptimizer.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/meshoptimizer_build
+      shell: bash
+      run: >
+        cmake ../meshoptimizer
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX=../meshoptimizer_install
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build meshoptimizer
+      if: steps.cache-meshoptimizer.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/meshoptimizer_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/meshoptimizer_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-meshoptimizer.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v6
+      with:
+        key: ${{ steps.cache-meshoptimizer.outputs.cache-primary-key }}
+        path: dependencies/meshoptimizer_install

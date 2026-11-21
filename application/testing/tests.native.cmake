@@ -60,11 +60,31 @@ else()
 endif()
 f3d_test(NAME TestVerboseQuakeMDLInvalid ARGS --verbose --force-reader=QuakeMDL DATA invalid_version.mdl REGEXP ${_FORCE_READER_MDL_REGEXP} NO_BASELINE)
 
+# https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13979
+if(F3D_MODULE_MESHOPT AND VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261109)
+  f3d_test(NAME TestGLTFKHRMeshopt DATA RiggedFigure_khr_meshopt.glb ARGS --animation-time=0.5)
+  f3d_test(NAME TestGLTFEXTMeshopt DATA RiggedFigure_ext_meshopt.glb ARGS --animation-time=0.5)
+  f3d_test(NAME TestGLTFKHRMeshoptColor DATA vertex_color_meshopt.glb)
+  f3d_test(NAME TestGLTFKHRMeshoptPrims DATA MeshPrimitiveModes_meshopt.glb)
+endif()
+
+# https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13983
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261111)
+  f3d_test(NAME TestGLTFKHRGaussianSplatting DATA bonsai_small.glb ARGS --blending=sort_cpu SKIP_GLES) # Sort isn't supported in GLES
+
+  if(F3D_MODULE_MESHOPT)
+    f3d_test(NAME TestGLTFKHRMeshoptAndGaussianSplatting DATA bonsai_small_meshopt.glb ARGS --blending=sort_cpu SKIP_GLES) # Sort isn't supported in GLES
+  endif()
+endif()
+
 f3d_test(NAME TestSPLAT DATA small.splat ARGS -o --coloring-mode=direct --up=-Y --point-sprites-absolute-size --point-sprites-size=1)
 
 # Sort (CPU) isn't supported in GLES because the mapper relies on geometry shaders
 f3d_test(NAME TestSPLATSortCPU DATA small.splat ARGS -o --coloring-mode=direct --point-sprites=gaussian --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --blending=sort_cpu --camera-position=2,0,0 SKIP_GLES)
 f3d_test(NAME TestSPZ DATA hornedlizard_small_d0.spz ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1)
+if(F3D_MODULE_WEBP)
+  f3d_test(NAME TestSOG DATA tiny.sog ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1)
+endif()
 
 set(_splat_args --coloring-mode=direct --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --camera-position=-2.00335,1.09654,-0.459485 --camera-focal-point=-0.796712,2.22795,0.705742)
 f3d_test(NAME TestSPLATSphere DATA small.splat ARGS ${_splat_args} --point-sprites=sphere)
@@ -81,6 +101,9 @@ f3d_test(NAME TestPipedPLY DATA suzanne.ply PIPED_READER PLYReader PIPED)
 f3d_test(NAME TestPipedQuakeMDL DATA zombie.mdl PIPED_READER QuakeMDL PIPED)
 f3d_test(NAME TestPipedSPLAT DATA small.splat ARGS -o --coloring-mode=direct --up=-Y --point-sprites-absolute-size --point-sprites-size=1 PIPED_READER Splat PIPED)
 f3d_test(NAME TestPipedSPZ DATA hornedlizard_small_d0.spz ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1 PIPED_READER SPZ PIPED)
+if(F3D_MODULE_WEBP)
+  f3d_test(NAME TestPipedSOG DATA tiny.sog ARGS --coloring-mode=direct --point-sprites-absolute-size --point-sprites-size=1 PIPED_READER SOG PIPED)
+endif()
 f3d_test(NAME TestPipedInvalid DATA suzanne.ply ARGS --force-reader=QuakeMDL PIPED_READER QuakeMDL REGEXP "Input stream could not be loaded" NO_BASELINE PIPED)
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250923)
@@ -164,7 +187,6 @@ if(NOT F3D_MACOS_BUNDLE)
       f3d_test(NAME TestDefaultConfigFileEXR DATA Rec709.exr CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
     endif()
     f3d_test(NAME TestDefaultConfigFilePLY DATA suzanneRGBA.ply CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
-    f3d_test(NAME TestDefaultConfigFileQuakeMDL DATA zombie.mdl CONFIG config_build LONG_TIMEOUT UI SKIP_GLES THRESHOLD 0.07) # Threshold is needed for IBL change after VTK 9.6
     f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y --camera-direction=-1,0.5,-1 CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
     f3d_test(NAME TestDefaultConfigTranslucent DATA red_translucent_monkey.gltf CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
     f3d_test(NAME TestDefaultConfigRemoveEmptyFileGroups DATA invalid_body.vtp cow.vtp CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
@@ -183,5 +205,11 @@ if(NOT F3D_MACOS_BUNDLE)
   if(F3D_MODULE_WEBP)
     f3d_test(NAME TestThumbnailConfigFileWebP DATA image.webp CONFIG thumbnail_build LONG_TIMEOUT THRESHOLD 0.07 DEFAULT_HDRI) # Threshold is needed even for newer VTK
   endif()
-  f3d_test(NAME TestThumbnailConfigFileQuakeMDL DATA zombie.mdl CONFIG thumbnail_build LONG_TIMEOUT THRESHOLD 0.07 DEFAULT_HDRI SKIP_GLES) # Threshold is needed for IBL change after VTK 9.6
+
+  # Specular has been modified at grazing angles for when F0 != 0.04
+  # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13970
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261110)
+    f3d_test(NAME TestDefaultConfigFileQuakeMDL DATA zombie.mdl CONFIG config_build LONG_TIMEOUT UI SKIP_GLES)
+    f3d_test(NAME TestThumbnailConfigFileQuakeMDL DATA zombie.mdl CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_HDRI SKIP_GLES)
+  endif()
 endif()

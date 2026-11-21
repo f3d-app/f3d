@@ -47,12 +47,14 @@
 - joint1.abc: Public Domain
 - Lantern: glTF-Sample-Models: Public Domain
 - McUSD.usdz: [USD Working Group](https://github.com/usd-wg/assets): CC-NC-BY-SA, textures by [jasonjgardner](https://github.com/jasonjgardner)
+- MeshPrimitiveModes_meshopt.glb: glTF-Sample-Models: Public Domain
 - normal.png: glTF-Sample-Models: Public Domain
 - normalMapping.fbx: assimp test models: BSD-3-Clause; rubberduck: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - nurb.usda: [Arnold USD](https://github.com/Autodesk/arnold-usd): Apache 2.0
 - palermo_park_1k.tif : Polyhaven: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - Part-4-Buildings-V4-one.gml: VTK Data: BSD-3-Clause
 - phong_cube.fbx: assimp test models: BSD-3-Clause
+- PointLightIntensityTest.glb: [KhronosGroup](https://github.com/KhronosGroup/glTF-Sample-Assets): [CC0-1.0](https://creativecommons.org/publicdomain/zero/1.0/legalcode)
 - PinkEggFromLW.dxf: assimp test models: BSD-3-Clause
 - punch.fbx: batrisya1501: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - Rec709.exr: [Copyright 2006 Industrial Light & Magic](https://github.com/AcademySoftwareFoundation/openexr/blob/370db2835843ac75f85e1386c05455f26a6ff58c/website/test_images/Chromaticities/Rec709.rst): BSD-3-Clause
@@ -81,6 +83,7 @@
 - UnlitTest.glb: glTF-Sample-Models/Analytical Graphics, Inc.: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - v_rock2.mdl: LibreQuake Project: BSD-3-Clause
 - vase_4comp.vti: VTK Data: BSD-3-Clause
+- vertex_color_meshopt.glb: glTF-Sample-Models/Analytical Graphics, Inc.: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - warsaw_small.las: PDAL: Copyright (c) 2025, Hobu, Inc.
 - WaterBottle.glb: glTF-Sample-Models: Public Domain
 - world\*: VTK Data: BSD-3-Clause

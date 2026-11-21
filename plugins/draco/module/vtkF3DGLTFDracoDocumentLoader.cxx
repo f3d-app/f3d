@@ -114,6 +114,8 @@ std::vector<std::string> vtkF3DGLTFDracoDocumentLoader::GetSupportedExtensions()
 //----------------------------------------------------------------------------
 void vtkF3DGLTFDracoDocumentLoader::PrepareData()
 {
+  this->Superclass::PrepareData();
+
   const std::shared_ptr<Model> model = this->GetInternalModel();
 
   for (size_t i = 0; i < model->Meshes.size(); i++)

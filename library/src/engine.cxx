@@ -678,6 +678,12 @@ engine::libInformation engine::getLibInfo()
   libInfo.BuildSystem = detail::LibBuildSystem;
   libInfo.Compiler = detail::LibCompiler;
 
+#if F3D_MODULE_ANARI
+  libInfo.Modules["ANARI"] = true;
+#else
+  libInfo.Modules["ANARI"] = false;
+#endif
+
 #if F3D_MODULE_RAYTRACING
   libInfo.Modules["Raytracing"] = true;
 #else
@@ -706,6 +712,12 @@ engine::libInformation engine::getLibInfo()
   libInfo.Modules["FFmpeg"] = true;
 #else
   libInfo.Modules["FFmpeg"] = false;
+#endif
+
+#if F3D_MODULE_MESHOPT
+  libInfo.Modules["MeshOptimizer"] = true;
+#else
+  libInfo.Modules["MeshOptimizer"] = false;
 #endif
 
   const std::string vtkVersion = std::string(vtkVersion::GetVTKVersionFull());

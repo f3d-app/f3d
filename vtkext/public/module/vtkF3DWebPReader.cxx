@@ -29,8 +29,15 @@ void vtkF3DWebPReader::ExecuteInformation()
   delete[] this->FilePattern;
   this->FilePattern = nullptr;
 
-  // Setup filename to read the header
-  this->ComputeInternalFileName(this->DataExtent[4]);
+  // A stream has no filename to set up.
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+  if (!this->GetStream())
+#else
+  if (!this->GetMemoryBuffer())
+#endif
+  {
+    this->ComputeInternalFileName(this->DataExtent[4]);
+  }
   if ((this->InternalFileName == nullptr || this->InternalFileName[0] == '\0'))
   {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)

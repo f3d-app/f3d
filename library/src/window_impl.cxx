@@ -595,10 +595,10 @@ void window_impl::UpdateDynamicOptions()
     renderer->SetPointSpritesType(splatType);
     renderer->SetPointSpritesSize(
       opt.model.point_sprites.absolute_size, opt.model.point_sprites.size);
-    renderer->SetPointSpritesUseInstancing(
-      opt.render.effect.blending.mode != "sort" && opt.render.effect.blending.mode != "sort_cpu");
   }
 
+  renderer->SetPointSpritesUseInstancing(
+    opt.render.effect.blending.mode != "sort" && opt.render.effect.blending.mode != "sort_cpu");
   renderer->SetLineWidth(opt.render.line_width);
   renderer->SetPointSize(opt.render.point_size);
   renderer->ShowEdge(opt.render.show_edges);
@@ -618,6 +618,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetBackdropOpacity(opt.ui.backdrop.opacity);
   renderer->ShowNotification(opt.ui.notifications.enable);
   renderer->ShowBindings(opt.ui.notifications.show_bindings);
+  renderer->SetLightRepresentationVisibility(opt.render.light.representation);
 
   if (this->Internals->Interactor)
   {
@@ -653,7 +654,29 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->ShowArmature(opt.render.armature.enable);
 
-  renderer->SetUseRaytracing(opt.render.raytracing.enable);
+  if (opt.render.mode == "ospray")
+  {
+    renderer->SetRenderingMode(vtkF3DRenderer::RenderingMode::OSPRAY);
+  }
+  else if (opt.render.mode == "anari")
+  {
+    renderer->SetRenderingMode(vtkF3DRenderer::RenderingMode::ANARI);
+
+    // "environment" is a magic keyword in Anari to specify that ANARI_LIBRARY should be taken from
+    // the environment variable.
+    renderer->SetAnariLibrary(
+      opt.render.anari_library.has_value() ? opt.render.anari_library.value() : "environment");
+  }
+  else
+  {
+    if (opt.render.mode != "opengl")
+    {
+      log::warn("'render.mode' is set to an unknown value: ", opt.render.mode,
+        ". Valid modes are: 'opengl', 'ospray', 'anari'");
+    }
+    renderer->SetRenderingMode(vtkF3DRenderer::RenderingMode::OPENGL);
+  }
+
   renderer->SetRaytracingSamples(opt.render.raytracing.samples);
   renderer->SetUseRaytracingDenoiser(opt.render.raytracing.denoise);
 
@@ -749,6 +772,7 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->SetGridUnitSquare(opt.render.grid.unit);
   renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
+  renderer->SetGridScale(opt.render.grid.scale);
   renderer->SetGridAbsolute(opt.render.grid.absolute);
   renderer->SetGridOpacity(opt.render.grid.opacity);
   renderer->SetGridAbsolute(this->getType() == Type::XR

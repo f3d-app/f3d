@@ -18,6 +18,7 @@ f3d_test(NAME TestGridAbsoluteReflection DATA suzanne.ply ARGS -g --grid-absolut
 f3d_test(NAME TestGridOpacity DATA suzanne.ply ARGS -g --grid-opacity=.25 --anti-aliasing=ssaa)
 f3d_test(NAME TestGridSSAAReflection DATA suzanne.ply ARGS -g --grid-reflection=0.8 --anti-aliasing=ssaa)
 f3d_test(NAME TestGridReflectionOnly DATA suzanne.ply ARGS -g --grid-reflection --grid-opacity=0 --anti-aliasing=ssaa)
+f3d_test(NAME TestGridScale DATA suzanne.ply ARGS -g --grid-scale=3)
 
 # Backface
 f3d_test(NAME TestBackfaceVisible DATA backface.vtp ARGS --backface-type=visible)
@@ -179,6 +180,12 @@ f3d_test(NAME TestLightIntensityBrighter DATA cow.vtp ARGS --light-intensity=5.0
 f3d_test(NAME TestLightIntensityDarker DATA cow.vtp ARGS --light-intensity=0.2)
 f3d_test(NAME TestLightIntensityBrighterFullScene DATA WaterBottle.glb ARGS --light-intensity=5.0)
 f3d_test(NAME TestLightIntensityDarkerFullScene DATA WaterBottle.glb ARGS --light-intensity=0.2)
+
+## Light Representation
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13881
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.7.20261027)
+  f3d_test(NAME TestLightRepresentation DATA PointLightIntensityTest.glb ARGS --light-representation SKIP_GLES) # Big rendering differences on GLES
+endif()
 
 ## Other UI
 f3d_test(NAME TestUTF8 DATA "(ノಠ益ಠ )ノ.vtp")
@@ -436,6 +443,7 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Module Raytracing: ON")
   f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply ARGS --raytracing-samples=4 -d INTERACTION) #R
   f3d_test(NAME TestRaytracingScalarBar DATA dragon.vtu ARGS -rsbd --raytracing-samples=4)
+  f3d_test(NAME TestRaytracingDeprecated DATA dragon.vtu ARGS --raytracing NO_BASELINE REGEXP "Option 'raytracing' is deprecated, use 'rendering-mode=ospray' instead")
 
   if(NOT F3D_MACOS_BUNDLE)
     # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
@@ -447,8 +455,17 @@ if(F3D_MODULE_RAYTRACING)
   endif()
 
   f3d_test(NAME TestRaytracingNoBackground DATA suzanne.ply ARGS -rd --raytracing-samples=4 --no-background)
-else(F3D_MODULE_RAYTRACING)
+else()
   f3d_test(NAME TestCommandScriptRaytracing SCRIPT DATA suzanne.ply NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing")
+endif()
+
+f3d_test(NAME TestRenderModeInvalid DATA suzanne.ply ARGS --rendering-mode=invalid NO_BASELINE REGEXP "'render.mode' is set to an unknown value: invalid")
+
+## Anari
+# This render mode is experimental, it may not be fully stable and baselines will change in the future.
+# It is also assumed that "helide" is available as an Anari library, which is usually the case except if it's disabled explicitly when building AnariSDK.
+if(F3D_MODULE_ANARI)
+  f3d_test(NAME TestAnariGLTF DATA WaterBottle.glb ARGS --rendering-mode=anari --anari-library=helide LONG_TIMEOUT DEFAULT_HDRI)
 endif()
 
 if(F3D_MODULE_EXR)
@@ -530,6 +547,8 @@ f3d_test(NAME TestCommandScriptJumpToPreviousKeyFrame SCRIPT DATA soldier_animat
 f3d_test(NAME TestCommandScriptJumpToNextKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress UI)
 f3d_test(NAME TestCommandScriptJumpToFirstKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress UI)
 f3d_test(NAME TestCommandScriptJumpToAbsoluteKeyFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress UI)
+f3d_test(NAME TestCommandScriptSetResolution SCRIPT DATA dragon.vtu)
+f3d_test(NAME TestCommandScriptSetResolutionInvalidArgument SCRIPT DATA dragon.vtu NO_BASELINE REGEX "Command: set_resolution arg: wrong number of argument")
 if (VTK_VERSION VERSION_GREATER_EQUAL 9.5.0 AND F3D_PLUGIN_BUILD_ASSIMP AND F3D_ASSIMP_VERSION VERSION_GREATER_EQUAL "6.0.1")
   # TODO: Update this test to NOT use assimp once generic importer supports timesteps properly (issue: https://github.com/f3d-app/f3d/issues/2733)
   f3d_test(NAME TestCommandScriptJumpToAbsoluteKeyFrameMultipleAnimations SCRIPT DATA punch.fbx soldier_animations.mdl ARGS --load-plugins=assimp --multi-file-mode=all --animation-indices=0,2 --animation-progress UI)
@@ -548,6 +567,8 @@ f3d_test(NAME TestCommandScriptSetCameraBack SCRIPT DATA dragon.vtu) # set_camer
 f3d_test(NAME TestCommandScriptSetCameraBottom SCRIPT DATA dragon.vtu) # set_camera bottom
 f3d_test(NAME TestCommandScriptSetCameraLeft SCRIPT DATA dragon.vtu) # set_camera left
 f3d_test(NAME TestCommandScriptCycleCameraIndex SCRIPT DATA Cameras.gltf) # cycle scene.camera.index;cycle scene.camera.index;reload_current_file_group
+f3d_test(NAME TestCommandScriptCameraZoom SCRIPT DATA dragon.vtu) 
+f3d_test(NAME TestCommandScriptSetCameraLookAt SCRIPT DATA dragon.vtu)
 f3d_test(NAME TestCommandScriptIncreaseDecreaseCameraIndex SCRIPT DATA Cameras.gltf) # increase scene.camera.index;increase scene.camera.index;increase.camera.index;decrease.camera.index;reload_current_file_group
 f3d_test(NAME TestCommandScriptOpacityMap SCRIPT DATA vase_4comp.vti ARGS -vs) # set model.scivis.opacity_map 0,0.03,1,1
 
@@ -594,6 +615,7 @@ f3d_test(NAME TestOutput DATA cow.vtp NO_BASELINE)
 f3d_test(NAME TestOutputOutput DATA cow.vtp ARGS --reference=${CMAKE_BINARY_DIR}/Testing/Temporary/TestOutput.png DEPENDS TestOutput NO_BASELINE)
 f3d_test(NAME TestUnsupportedInputOutput DATA unsupportedFile.dummy REGEXP "No files loaded, no rendering performed" NO_BASELINE)
 f3d_test(NAME TestOutputNoBackground DATA cow.vtp ARGS --no-background NO_BASELINE)
+f3d_test(NAME TestOutputOffscreen DATA cow.vtp ARGS --offscreen REGEXP "You are using an offscreen configuration, interactive rendering is disabled" NO_BASELINE NO_OUTPUT)
 
 # Multi-frame output tests
 f3d_test(NAME TestOutputFrameCount DATA BoxAnimated.gltf ARGS --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestOutputFrameCount_{frame:4}.png --frame-rate=0.25 REGEXP "Saved 2 animation frame" NO_BASELINE NO_OUTPUT)

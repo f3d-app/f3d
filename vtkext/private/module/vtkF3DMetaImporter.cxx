@@ -437,6 +437,12 @@ bool vtkF3DMetaImporter::Update()
     importerInfo.DataAssembly->SetAttribute(
       vtkDataAssembly::GetRootNode(), "label", importerInfo.Name.c_str());
 
+    // Mark hidden objects for the renderer
+    for (const int nodeId : importerInfo.DataAssembly->SelectNodes({ "//*[@f3d_visible='0']" }))
+    {
+      ::SetSubtreeVisibility(importerInfo.DataAssembly, nodeId, actorCollection, false);
+    }
+
     const vtkNew<::vtkF3DCollapseOnLoadVisitor> visitor;
     importerInfo.DataAssembly->Visit(vtkDataAssembly::GetRootNode(), visitor);
     // Unset the attr on all nodes which have an ancestor that has it already.
@@ -576,6 +582,16 @@ bool vtkF3DMetaImporter::Update()
       pss.Mapper->SetInputData(points);
       this->Renderer->AddActor(pss.Actor);
       pss.Actor->VisibilityOff();
+
+      // copy anisotropic settings from the original actor's mapper if available
+      vtkPointGaussianMapper* originalSplatMapper =
+        vtkPointGaussianMapper::SafeDownCast(pss.OriginalActor->GetMapper());
+      if (originalSplatMapper)
+      {
+        pss.Mapper->SetAnisotropic(originalSplatMapper->GetAnisotropic());
+        pss.Mapper->SetScaleArray(originalSplatMapper->GetScaleArray());
+        pss.Mapper->SetRotationArray(originalSplatMapper->GetRotationArray());
+      }
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
       // the point mapper doesn't support shadows, so we exclude it from shadow receivers

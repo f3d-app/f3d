@@ -100,6 +100,10 @@ runs:
         python -m pip install typing_extensions
         python -m pip install numpy
 
+    - name: Install pillow for image comparisons
+      shell: bash
+      run: python -m pip install pillow
+
     - name: Extract java version
       id: java_ver
       uses: f3d-app/extract-version-action@main
@@ -162,9 +166,11 @@ runs:
         -DF3D_EXCLUDE_DEPRECATED=${{ inputs.exclude_deprecated_label == 'exclude-deprecated' && 'ON' || 'OFF' }}
         -DF3D_LINUX_GENERATE_MAN=ON
         -DF3D_MACOS_BUNDLE=${{ inputs.bundle_label == 'bundle' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_ANARI=${{ (inputs.optdeps_label == 'optdeps' && inputs.vtk_version == 'commit') && 'ON' || 'OFF' }}
         -DF3D_MODULE_CLIP=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_EXR=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_FFMPEG=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_MESHOPT=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_WEBP=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_RAYTRACING=${{ (inputs.optdeps_label == 'optdeps' && inputs.gles_label == 'no-gles') && 'ON' || 'OFF' }}
         -DF3D_MODULE_UI=${{ inputs.optdeps_label == 'optdeps' && 'ON' || 'OFF' }}
@@ -318,12 +324,12 @@ runs:
         inputs.cpu == 'arm64' &&
         inputs.rendering_backend == 'auto'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestFCStdFaceColors|TestFCStd1x|TestFCStdTransparency|TestFCStdPartDesign)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheet)|(TestMaxSizeAboveMultiFile)|(TestAxesCustomColor)|(TestInteractionTAA)|(TestInteractionStochasticTAA)|(TestInteractionPointCloudTAA)|(TestSDKNotification)|(TestUnlitOBJOpacity)|(TestInteractionGridReflectionChanged)|(TestUSDRigArmatureWithOpacity)|(TestInteractionTextureCheckerBoardTAA)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestLightRepresentation)|(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestFCStdFaceColors|TestFCStd1x|TestFCStdTransparency|TestFCStdPartDesign)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheet)|(TestMaxSizeAboveMultiFile)|(TestAxesCustomColor)|(TestInteractionTAA)|(TestInteractionStochasticTAA)|(TestInteractionPointCloudTAA)|(TestSDKNotification)|(TestUnlitOBJOpacity)|(TestInteractionGridReflectionChanged)|(TestUSDRigArmatureWithOpacity)|(TestInteractionTextureCheckerBoardTAA)" >> $GITHUB_ENV
 
     - name: Test
       shell: bash
       working-directory: ${{github.workspace}}/build
-      run: ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 2 --output-on-failure --no-tests=error || ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 1 --rerun-failed --no-tests=error -VV
+      run: ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 2 --output-on-failure --no-tests=error --repeat until-pass:2 --output-junit junit.xml
 
     - name: Upload Tests Artifact
       if: failure()
@@ -331,6 +337,12 @@ runs:
       with:
         path: ./build/Testing/Temporary
         name: f3d-tests-artifact-${{runner.os}}-${{inputs.vtk_version}}-${{inputs.build_type}}-${{inputs.cpu}}-${{inputs.bundle_label}}-${{inputs.static_label}}
+
+    - name: Generate summary
+      if: always()
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: python source/utils/generate_summary.py --source_dir source --build_dir build --upload build/junit.xml >> $GITHUB_STEP_SUMMARY
 
     - name: Install (ALL)
       shell: bash

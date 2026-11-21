@@ -42,6 +42,8 @@
 #include <vtkImageReader2Factory.h>
 #include <vtkLight.h>
 #include <vtkLightCollection.h>
+#include <vtkLightRepresentation.h>
+#include <vtkLightWidget.h>
 #include <vtkLineSource.h>
 #include <vtkMath.h>
 #include <vtkMathUtilities.h>
@@ -322,6 +324,7 @@ void vtkF3DRenderer::Initialize()
   this->ScalarBarActorConfigured = false;
   this->CheatSheetConfigured = false;
   this->ColoringConfigured = false;
+  this->PointSpritesConfigured = false;
   this->NormalGlyphsConfigured = false;
 
   // create ImGui context if F3D_MODULE_UI is enabled
@@ -527,7 +530,11 @@ void vtkF3DRenderer::ConfigureRenderPasses()
 
   vtkNew<vtkF3DRenderPass> newPass;
 #if F3D_MODULE_RAYTRACING
-  newPass->SetUseRaytracing(this->UseRaytracing);
+  newPass->SetUseRaytracing(this->CurrentRenderingMode == RenderingMode::OSPRAY);
+#endif
+#if F3D_MODULE_ANARI
+  newPass->SetUseAnari(this->CurrentRenderingMode == RenderingMode::ANARI);
+  newPass->SetAnariLibrary(this->AnariLibrary);
 #endif
   newPass->SetUseSSAOPass(this->UseSSAOPass);
   newPass->SetUseBlurBackground(this->UseBlurBackground);
@@ -635,7 +642,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   }
   vtkOSPRayRendererNode::SetBackgroundMode(mode, this);
 #else
-  if (this->UseRaytracing || this->UseRaytracingDenoiser)
+  if ((this->CurrentRenderingMode == RenderingMode::OSPRAY) || this->UseRaytracingDenoiser)
   {
     F3DLog::Print(F3DLog::Severity::Warning,
       "Raytracing options can't be used if F3D has not been built with raytracing");
@@ -786,6 +793,16 @@ void vtkF3DRenderer::SetGridUnitSquare(const std::optional<double>& unitSquare)
   if (this->GridUnitSquare != unitSquare)
   {
     this->GridUnitSquare = unitSquare;
+    this->GridConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetGridScale(double scale)
+{
+  if (this->GridScale != scale)
+  {
+    this->GridScale = scale;
     this->GridConfigured = false;
   }
 }
@@ -985,7 +1002,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       this->GridInfo = stream.str();
 
       this->GridMapper->SetFadeDistance(diag);
-      this->GridMapper->SetUnitSquare(tmpUnitSquare);
+      this->GridMapper->SetUnitSquare(tmpUnitSquare * this->GridScale);
       this->GridMapper->SetSubdivisions(this->GridSubdivisions);
       this->GridMapper->SetLineOpacity(this->GridOpacity);
       this->GridMapper->SetReflectionStrength(this->GridReflection);
@@ -1644,7 +1661,7 @@ void vtkF3DRenderer::ConfigureHDRITexture()
       needHDRITexture = this->HDRISkyboxVisible ||
         (this->GetUseImageBasedLighting() &&
           (!this->CheckForSHCache(dummy) || !this->CheckForSpecCache(dummy) ||
-            this->UseRaytracing));
+            this->CurrentRenderingMode != RenderingMode::OPENGL));
     }
 
     if (needHDRITexture)
@@ -2196,13 +2213,23 @@ void vtkF3DRenderer::SetDisplayDepth(bool use)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetUseRaytracing(bool use)
+void vtkF3DRenderer::SetRenderingMode(RenderingMode mode)
 {
-  if (this->UseRaytracing != use)
+  if (this->CurrentRenderingMode != mode)
   {
-    this->UseRaytracing = use;
+    this->CurrentRenderingMode = mode;
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetAnariLibrary(const std::string& anariLibrary)
+{
+  if (this->AnariLibrary != anariLibrary)
+  {
+    this->AnariLibrary = anariLibrary;
+    this->RenderPassesConfigured = false;
   }
 }
 
@@ -2516,7 +2543,7 @@ void vtkF3DRenderer::UpdateActors()
 
   if (this->UsingExpandingRange && (importerUpdateMTime > this->ImporterUpdateTimeStamp) &&
     (this->Coloring != vtkF3DRenderer::ColoringMode::MATERIAL ||
-      (!this->UseRaytracing && this->UseVolume)))
+      (this->CurrentRenderingMode == RenderingMode::OPENGL && this->UseVolume)))
   {
     // XXX: This could be improved further to only configure mappers and actors
     // when the coloring range actually change
@@ -2826,6 +2853,8 @@ int vtkF3DRenderer::UpdateLights()
 
     this->LightIntensitiesConfigured = true;
   }
+
+  this->UpdateLightRepresentations();
 
   // Push IBLIntensity to every actor's custom uniforms so the HDRI ambient
   // contribution (iblDiffuse + iblSpecular) scales with the same factor.
@@ -3315,11 +3344,6 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigurePointSprites()
 {
-  if (!this->UsePointSprites)
-  {
-    return;
-  }
-
   if (this->GetBlendingMode() == vtkF3DRenderer::BlendingMode::SORT &&
     !vtkShader::IsComputeShaderSupported())
   {
@@ -3341,6 +3365,24 @@ void vtkF3DRenderer::ConfigurePointSprites()
     vtkF3DPointSplatMapper* splatMapper = vtkF3DPointSplatMapper::SafeDownCast(sprites.Mapper);
     splatMapper->SetUseInstancing(this->PointSpritesUseInstancing);
 
+    // in order to make sure the sprites are at least 1 pixel large we set a lowpass matrix
+    // that will convolve the splat with another isotropic splat
+    // the value 0.3 is coming from the Gaussian Splatting paper
+    // ideally we should expose this as a parameter
+    const int* viewport = this->GetSize();
+
+    float lowPass[3] = { 0.3f / (viewport[0] * viewport[0]), 0.f,
+      0.3f / (viewport[1] * viewport[1]) };
+
+    // if the original mapper is a vtkF3DPointSplatMapper, we can configure it for instancing
+    vtkF3DPointSplatMapper* originalSplatMapper =
+      vtkF3DPointSplatMapper::SafeDownCast(sprites.OriginalActor->GetMapper());
+    if (originalSplatMapper)
+    {
+      originalSplatMapper->SetUseInstancing(this->PointSpritesUseInstancing);
+      originalSplatMapper->SetLowpassMatrix(lowPass);
+    }
+
     // add SDF functions
     vtkShaderProperty* sp = sprites.Actor->GetShaderProperty();
     sp->ClearAllFragmentShaderReplacements();
@@ -3351,24 +3393,24 @@ void vtkF3DRenderer::ConfigurePointSprites()
 
     sprites.Mapper->EmissiveOff();
     sprites.Mapper->SetScaleFactor(scaleFactor);
-
-    // in order to make sure the sprites are at least 1 pixel large we set a lowpass matrix
-    // that will convolve the splat with another isotropic splat
-    // the value 0.3 is coming from the Gaussian Splatting paper
-    // ideally we should expose this as a parameter
-    const int* viewport = this->GetSize();
-
-    float lowPass[3] = { 0.3f / (viewport[0] * viewport[0]), 0.f,
-      0.3f / (viewport[1] * viewport[1]) };
     sprites.Mapper->SetLowpassMatrix(lowPass);
 
     vtkPolyData* polyData = vtkPolyData::SafeDownCast(sprites.Mapper->GetInput());
-    if (polyData && polyData->GetPointData()->HasArray("scale") &&
-      polyData->GetPointData()->HasArray("rotation"))
+    const char* scaleArray = sprites.Mapper->GetScaleArray();
+    const char* rotationArray = sprites.Mapper->GetRotationArray();
+    if (polyData && (scaleArray || polyData->GetPointData()->HasArray("scale")) &&
+      (rotationArray || polyData->GetPointData()->HasArray("rotation")))
     {
       sprites.Mapper->AnisotropicOn();
-      sprites.Mapper->SetRotationArray("rotation");
-      sprites.Mapper->SetScaleArray("scale");
+
+      if (!scaleArray)
+      {
+        sprites.Mapper->SetScaleArray("scale");
+      }
+      if (!rotationArray)
+      {
+        sprites.Mapper->SetRotationArray("rotation");
+      }
     }
     else
     {
@@ -3446,12 +3488,15 @@ void vtkF3DRenderer::ConfigurePointSprites()
       sprites.Actor->ForceTranslucentOff();
     }
   }
+
+  this->PointSpritesConfigured = true;
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureNormalGlyphs()
 {
-  const bool normalGlyphsVisible = !this->UseRaytracing && this->UseNormalGlyphs;
+  const bool normalGlyphsVisible =
+    (this->CurrentRenderingMode == RenderingMode::OPENGL) && this->UseNormalGlyphs;
   for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
   {
     if (normalGlyphsVisible && !normalGlyph.InputDataHasNormals)
@@ -3523,6 +3568,84 @@ void vtkF3DRenderer::ConfigureNormalGlyphs()
   }
 
   this->NormalGlyphsConfigured = true;
+}
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::UpdateLightRepresentations()
+{
+  constexpr double maxConeAngle = 89.0;
+  constexpr double pointLightConeAngle = 90.0;
+
+  vtkCollectionSimpleIterator it;
+  vtkLightCollection* lc = this->GetLights();
+  vtkLight* light = nullptr;
+  std::set<vtkLight*> visitedLights;
+  for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
+  {
+    // ignore camera lights
+    const int lightType = light->GetLightType();
+    if (lightType == VTK_LIGHT_TYPE_CAMERA_LIGHT || lightType == VTK_LIGHT_TYPE_HEADLIGHT)
+    {
+      continue;
+    }
+
+    visitedLights.insert(light);
+
+    auto& lightRep = this->LightRepresentations[light];
+
+    if (lightRep.representation == nullptr)
+    {
+      lightRep.representation = vtkSmartPointer<vtkLightRepresentation>::New();
+    }
+    if (lightRep.widget == nullptr)
+    {
+      lightRep.widget = vtkSmartPointer<vtkLightWidget>::New();
+      lightRep.widget->SetRepresentation(lightRep.representation);
+      lightRep.widget->SetInteractor(this->RenderWindow->GetInteractor());
+      lightRep.widget->SetProcessEvents(false);
+    }
+
+    lightRep.representation->SetLightPosition(light->GetTransformedPosition());
+    lightRep.representation->SetFocalPoint(light->GetTransformedFocalPoint());
+    if (light->GetPositional() && light->GetConeAngle() < maxConeAngle)
+    {
+      lightRep.representation->SetPositional(light->GetPositional());
+      lightRep.representation->SetConeAngle(light->GetConeAngle());
+    }
+    else
+    {
+      lightRep.representation->SetPositional(false);
+    }
+    if (light->GetPositional() && light->GetConeAngle() == pointLightConeAngle)
+    {
+      lightRep.representation->SetFocalPoint(lightRep.representation->GetLightPosition());
+    }
+    lightRep.representation->SetLightColor(light->GetDiffuseColor());
+
+    if (this->LightRepresentationVisible)
+    {
+      lightRep.widget->On();
+    }
+    else
+    {
+      lightRep.widget->Off();
+    }
+  }
+
+  // remove unwanted light representations
+  for (auto repItr = this->LightRepresentations.begin();
+       repItr != this->LightRepresentations.end();)
+  {
+    if (visitedLights.count(repItr->first))
+    {
+      repItr++;
+      continue;
+    }
+
+    // safely removing the widget and representation
+    repItr->second.widget->Off();
+
+    repItr = this->LightRepresentations.erase(repItr);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -3809,6 +3932,16 @@ void vtkF3DRenderer::SetXRMode(bool enable, bool showBbox)
   }
   // LCOV_EXCL_STOP
 }
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetLightRepresentationVisibility(bool visible)
+{
+  // Make sure all lights are being tracked by a representation
+  if (this->LightRepresentationVisible != visible)
+  {
+    this->LightRepresentationVisible = visible;
+    this->UpdateLightRepresentations();
+  }
+}
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureColoringAndVisibilities()
@@ -3836,8 +3969,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle surface geometry
-  const bool geometriesVisible =
-    this->UseRaytracing || (!this->UseVolume && !this->UsePointSprites);
+  const bool geometriesVisible = (this->CurrentRenderingMode != RenderingMode::OPENGL) ||
+    (!this->UseVolume && !this->UsePointSprites);
   for (const auto& coloring : this->Importer->GetColoringActorsAndMappers())
   {
     if (geometriesVisible &&
@@ -3872,8 +4005,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle point sprites
-  const bool pointSpritesVisible =
-    !this->UseRaytracing && !this->UseVolume && this->UsePointSprites;
+  const bool pointSpritesVisible = (this->CurrentRenderingMode == RenderingMode::OPENGL) &&
+    !this->UseVolume && this->UsePointSprites;
   for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
   {
     if (pointSpritesVisible &&
@@ -3903,7 +4036,8 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
   }
 
   // Handle Volume prop
-  const bool volumeVisible = !this->UseRaytracing && this->UseVolume;
+  const bool volumeVisible =
+    (this->CurrentRenderingMode == RenderingMode::OPENGL) && this->UseVolume;
   const auto& volPropsAndMappers = this->Importer->GetVolumePropsAndMappers();
   for (const auto& volume : volPropsAndMappers)
   {

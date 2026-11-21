@@ -172,6 +172,8 @@ f3d_test(NAME TestInteractionAnimationProgressBarHover DATA soldier_animations.m
 f3d_test(NAME TestInteractionAnimationProgressBarHoverLeave DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress=advanced INTERACTION UI) #Hover then leave the window, the tooltip must disappear
 f3d_test(NAME TestInteractionAnimationProgressBarNotifications DATA soldier_animations.mdl ARGS --animation-indices=2 --notifications --animation-progress=advanced INTERACTION UI) #Space twice then hover the first key frame
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+  f3d_test(NAME TestInteractionAnimationProgressBarSnapClick DATA f3d.glb ARGS --animation-progress=advanced INTERACTION UI) #Left click 1.2px from a key frame marker, within 1/4 of the 6.1px key frame spacing, must land on the key frame
+  f3d_test(NAME TestInteractionAnimationProgressBarSnapRelative DATA f3d.glb ARGS --animation-progress=advanced INTERACTION UI) #Left click 1.8px from a key frame marker, farther than 1/4 of the 6.1px key frame spacing, must not snap
   f3d_test(NAME TestInteractionAnimationProgressBarAxis DATA soldier_animations.mdl ARGS --animation-indices=2 -x --animation-progress=advanced INTERACTION UI) #Hover the last key frame
 endif()
 
@@ -237,7 +239,7 @@ f3d_test(NAME TestInteractionConsoleAutoCompleteHide DATA BoxAnimated.gltf INTER
 f3d_test(NAME TestInteractionConsoleAutoCompleteToggleOptions DATA cow.vtp INTERACTION UI) #Escape;to;Tab;space;r;Tab;s;Tab;o;Tab;Enter
 f3d_test(NAME TestInteractionConsoleAutoCompleteSetOptions ARGS --point-sprites=gaussian DATA cow.vtp INTERACTION UI RESOLUTION 400,300) #Escape;se;Tab;space;m;Tab;p;Tab;t;Tab;Tab;s;p;Tab;Enter
 f3d_test(NAME TestInteractionConsoleAutoCompleteSetDisplayCompl DATA cow.vtp INTERACTION UI RESOLUTION 400,300) #Escape;se;Tab;space;m;Tab;p;Tab;t;Tab;Tab;Tab
-f3d_test(NAME TestInteractionConsoleAutoCompleteReaderOptions DATA BoxAnimated.gltf INTERACTION UI) #Escape;set_r;Tab;Q;Tab;Enter
+f3d_test(NAME TestInteractionConsoleAutoCompleteReaderOptions DATA BoxAnimated.gltf INTERACTION UI) #Escape;set_rea;Tab;Q;Tab;Enter
 f3d_test(NAME TestInteractionConsoleAutoCompleteColoring DATA BoxAnimated.gltf ARGS -s INTERACTION UI) #Escape;cy;Tab;;c;Tab;a;Tab;Enter
 f3d_test(NAME TestInteractionConsoleAutoCompleteCamera DATA BoxAnimated.gltf INTERACTION UI) #Escape;se;Tab;_c;Tab;i;Tab;Enter
 f3d_test(NAME TestInteractionConsoleAutoCompleteHelp DATA BoxAnimated.gltf INTERACTION UI) #Escape;h;Tab;h;Tab;Enter

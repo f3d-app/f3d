@@ -1,3 +1,15 @@
+# Installation of runtime dependencies is not possible with VTK modules
+# This function checks if both the module and the dependency target are built as shared libraries
+# and warns the dependency will not be copied to the installation directory
+function(_check_install_and_warn target)
+  if (NOT f3d_vtk_force_static)
+    get_target_property(target_type ${target} TYPE)
+    if (NOT target_type STREQUAL STATIC_LIBRARY)
+      message(WARNING "Dependency target ${target} will not be copied to the installation directory")
+    endif()
+  endif()
+endfunction()
+
 set(shader_files "")
 set(sources "")
 set(private_headers "")
@@ -27,6 +39,7 @@ set(classes
   vtkF3DArchiveReader
   vtkF3DCatmullClarkSubdivisionFilter
   vtkF3DFaceVaryingPointDispatcher
+  vtkF3DGLTFDocumentLoader
   vtkF3DGLTFImporter
   vtkF3DImporter
   )
@@ -42,6 +55,11 @@ endif()
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
 if(NOT F3D_USE_GLES)
   set(classes ${classes} vtkF3DBitonicSort)
+endif()
+
+if(F3D_MODULE_WEBP)
+  find_package(WebP REQUIRED)
+  list(APPEND classes vtkF3DWebPReader)
 endif()
 
 vtk_module_add_module(f3d::vtkext
@@ -70,3 +88,15 @@ if (F3D_MODULE_CLIP)
 
   vtk_module_definitions(f3d::vtkext PRIVATE F3D_MODULE_CLIP)
 endif ()
+
+if (F3D_MODULE_MESHOPT)
+  find_package(meshoptimizer REQUIRED)
+  vtk_module_link(f3d::vtkext PRIVATE meshoptimizer::meshoptimizer)
+  vtk_module_definitions(f3d::vtkext PRIVATE F3D_MODULE_MESHOPT)
+  _check_install_and_warn(meshoptimizer::meshoptimizer)
+endif()
+
+if(F3D_MODULE_WEBP)
+  vtk_module_link(f3d::vtkext PRIVATE WebP::webp)
+  _check_install_and_warn(WebP::webp)
+endif()

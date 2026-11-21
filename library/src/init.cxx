@@ -53,6 +53,11 @@ init::init()
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPointGaussianMapper", "vtkOpenGLPointGaussianMapper");
 
+  // Disable Anari GPU volume ray cast mapper to avoid potential conflicts
+  // with the standard (OpenGL) GPU volume ray cast mapper
+  vtkObjectFactory::SetAllEnableFlags(
+    0, "vtkGPUVolumeRayCastMapper", "vtkAnariGPUVolumeRayCastMapper");
+
 #ifdef __EMSCRIPTEN__
   vtkObjectFactory::SetAllEnableFlags(0, "vtkRenderWindow", "vtkOpenGLRenderWindow");
   vtkObjectFactory::SetAllEnableFlags(

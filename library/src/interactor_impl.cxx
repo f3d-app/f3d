@@ -1100,6 +1100,35 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{ "roll_camera value", "roll the camera on its side" });
 
   this->addCommand(
+    "zoom_camera",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 1, "zoom_camera");
+      this->Internals->Window.getCamera().zoom(options::parse<double>(args[0]));
+    },
+    command_documentation_t{ "zoom_camera value", "apply zoom to view" });
+
+  this->addCommand(
+    "set_camera_look_at",
+    [&](const std::vector<std::string>& args)
+    {
+      if (this->Internals->Options.interactor.style == "2d")
+      {
+        return;
+      }
+      check_args(args, 3, "set_camera_look_at");
+
+      this->Internals->Window.getCamera().setPosition(options::parse<point3_t>(args[0]));
+      this->Internals->Window.getCamera().setFocalPoint(options::parse<point3_t>(args[1]));
+      this->Internals->Window.getCamera().setViewUp(options::parse<direction_t>(args[2]));
+
+      this->Internals->Style->SetTemporaryUp(
+        this->Internals->Window.getCamera().getViewUp().data());
+    },
+    command_documentation_t{ "set_camera_look_at position focal_point up",
+      "set camera at given position looking at focal point using provided up direction" });
+
+  this->addCommand(
     "jump_to_frame",
     [&](const std::vector<std::string>& args)
     {
@@ -1281,6 +1310,21 @@ interactor& interactor_impl::initCommands()
       this->Internals->Style->ResetTemporaryUp();
     },
     command_documentation_t{ "reset_camera", "reset the camera to its original location" });
+
+  this->addCommand(
+    "set_resolution",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 1, "set_resolution");
+      const std::vector<int> resolution = options::parse<std::vector<int>>(args[0]);
+      if (resolution.size() != 2)
+      {
+        throw interactor::invalid_args_exception(
+          std::string("Command: set_resolution arg: wrong number of argument"));
+      }
+      this->Internals->Window.setSize(resolution[0], resolution[1]);
+    },
+    command_documentation_t{ "set_resolution", "set a new window resolution" });
 
   this->addCommand(
     "jump_to_key_frame",
@@ -1709,8 +1753,8 @@ interactor& interactor_impl::initBindings()
   this->addBinding({.Bind = {mod_t::SHIFT, "N"}, .Commands = {"toggle ui.hdri_filename"},.Group = "Scene", .DocCallback = std::bind(docTgl, "HDRI filename", std::cref(opts.ui.hdri_filename)), .Type = f3d::interactor::BindingType::TOGGLE});
   this->addBinding({.Bind = {mod_t::NONE, "H"}, .Commands = {"toggle ui.scene_hierarchy.enable"},.Group = "Scene", .DocCallback = std::bind(docTgl, "Scene hierarchy", std::cref(opts.ui.scene_hierarchy.enable)), .Type = f3d::interactor::BindingType::TOGGLE});
 #endif
-#if F3D_MODULE_RAYTRACING
-  this->addBinding({.Bind = {mod_t::NONE, "R"}, .Commands = {"toggle render.raytracing.enable"},.Group = "Scene", .DocCallback = std::bind(docTgl, "Raytracing rendering", std::cref(opts.render.raytracing.enable)), .Type = f3d::interactor::BindingType::TOGGLE});
+#if F3D_MODULE_RAYTRACING || F3D_MODULE_ANARI
+  this->addBinding({.Bind = {mod_t::NONE, "R"}, .Commands = {"cycle render.mode"},.Group = "Scene", .DocCallback = std::bind(docStr, "Rendering mode", std::cref(opts.render.mode)), .Type = f3d::interactor::BindingType::CYCLIC});
 #endif
   this->addBinding({.Bind = {mod_t::NONE, "V"}, .Commands = {"toggle_volume_rendering"},.Group = "Scene", .DocCallback = std::bind(docTgl, "Volume rendering", std::cref(opts.model.volume.enable)), .Type = f3d::interactor::BindingType::TOGGLE});
   this->addBinding({.Bind = {mod_t::CTRL, "N"}, .Commands = {"toggle model.normal_glyphs.enable"},.Group = "Scene", .DocCallback = std::bind(docTgl, "Normal glyphs", std::cref(opts.model.normal_glyphs.enable)), .Type = f3d::interactor::BindingType::TOGGLE});

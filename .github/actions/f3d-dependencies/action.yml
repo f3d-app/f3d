@@ -65,6 +65,13 @@ runs:
         mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
+    - name: Install meshoptimizer dependency
+      uses: ./source/.github/actions/meshoptimizer-install-dep
+      with:
+        versions_file: ${{inputs.versions_file}}
+        mindeps_label: ${{inputs.mindeps_label}}
+        cpu: ${{inputs.cpu}}
+
     - name: Install OpenJPH dependency
       uses: ./source/.github/actions/openjph-install-dep
       with:

@@ -31,7 +31,7 @@ include(f3dVersion)
 # Handle F3D_VERSION
 set(F3D_MAJOR_VERSION 4)
 set(F3D_MINOR_VERSION 0)
-set(F3D_PATCH_VERSION 0)
+set(F3D_PATCH_VERSION 1)
 set(F3D_VERSION ${F3D_MAJOR_VERSION}.${F3D_MINOR_VERSION}.${F3D_PATCH_VERSION})
 
 set(F3D_PATCH_VERSION_EXTRA "")
@@ -86,6 +86,7 @@ find_package(VTK 9.5.0 REQUIRED
     IONetCDF
     IOOpenVDB
     IOPDAL
+    RenderingAnariOpenGL
     RenderingGridAxes
     RenderingOpenXR
     RenderingRayTracing)
@@ -100,6 +101,7 @@ else()
 endif()
 
 # Modules
+option(F3D_MODULE_ANARI "ANARI module" OFF)
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
 option(F3D_MODULE_OPENXR "OpenXR module" OFF)
 option(F3D_MODULE_EXR "OpenEXR images module" OFF)
@@ -109,6 +111,7 @@ option(F3D_MODULE_DMON "dmon (watch) module" ON)
 option(F3D_MODULE_TINYFILEDIALOGS "tinyfiledialogs module" ON)
 option(F3D_MODULE_CLIP "clip module" ON)
 option(F3D_MODULE_FFMPEG "ffmpeg module" OFF)
+option(F3D_MODULE_MESHOPT "Meshopt module" OFF)
 
 # Use externals
 option(F3D_USE_EXTERNAL_CXXOPTS "Use external cxxopts dependency" OFF)
@@ -345,10 +348,12 @@ f3d_report_variable(F3D_BINDINGS_C)
 f3d_report_variable(F3D_BINDINGS_JAVA)
 f3d_report_variable(F3D_BINDINGS_PYTHON)
 f3d_report_variable(F3D_BUILD_APPLICATION)
+f3d_report_variable(F3D_MODULE_ANARI)
 f3d_report_variable(F3D_MODULE_EXR)
 f3d_report_variable(F3D_MODULE_FFMPEG)
-f3d_report_variable(F3D_MODULE_RAYTRACING)
+f3d_report_variable(F3D_MODULE_MESHOPT)
 f3d_report_variable(F3D_MODULE_OPENXR)
+f3d_report_variable(F3D_MODULE_RAYTRACING)
 f3d_report_variable(F3D_MODULE_UI)
 f3d_report_variable(F3D_MODULE_WEBP)
 f3d_report_variable(F3D_PLUGIN_BUILD_ALEMBIC)

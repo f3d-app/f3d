@@ -42,6 +42,12 @@
           "implicitValue": "1"
         },
         {
+          "longName": "offscreen",
+          "helpText": "Start application offscreen, useful with --command-script option",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
+        },
+        {
           "longName": "help",
           "shortName": "h",
           "helpText": "Print help"
@@ -107,6 +113,19 @@
           "longName": "rendering-backend",
           "helpText": "Backend to use when rendering",
           "valueHelper": "auto|glx|wgl|egl|osmesa|xr"
+        },
+        {
+          "longName": "rendering-mode",
+          "shortName": "r",
+          "helpText": "Rendering mode to use",
+          "valueHelper": "opengl|ospray|anari",
+          "implicitValue": "ospray"
+        },
+        {
+          "longName": "anari-library",
+          "helpText": "Specify the ANARI library to use",
+          "valueHelper": "<name>",
+          "conditional": "F3D_MODULE_ANARI"
         },
         {
           "longName": "list-rendering-backends",
@@ -284,6 +303,12 @@
           "helpText": "Reflection strength of the grid",
           "valueHelper": "<value>",
           "implicitValue": "0.5"
+        },
+        {
+          "longName": "grid-scale",
+          "helpText": "Scale multiplier of the grid",
+          "valueHelper": "<value>",
+          "implicitValue": "1.0"
         },
         {
           "longName": "shadows",
@@ -604,6 +629,12 @@
           "longName": "light-intensity",
           "helpText": "Light intensity",
           "valueHelper": "<value>"
+        },
+        {
+          "longName": "light-representation",
+          "helpText": "Display light representation",
+          "valueHelper": "<bool>",
+          "implicitValue": "1"
         }
       ]
     },
@@ -744,8 +775,7 @@
       "options": [
         {
           "longName": "raytracing",
-          "shortName": "r",
-          "helpText": "Enable raytracing",
+          "helpText": "Enable raytracing (deprecated)",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },

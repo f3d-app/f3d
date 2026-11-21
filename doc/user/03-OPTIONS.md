@@ -29,6 +29,10 @@ No [cache](#caches) is used (both reading and writing).
 Cache is currently used to save and restore last window size and position.
 It's also used to save and restore HDRI related information.
 
+### `--offscreen` (_bool_, default: `false`)
+
+Run application without showing the render view. Useful with [--command-script](#--command-script).
+
 ### `-h`, `--help`
 
 Print _help_ and exit. Ignore `--verbose`.
@@ -114,15 +118,15 @@ Frame rate used to refresh animation and other repeated tasks (watch, UI). Does 
 
 ### `--load-plugins=<paths or names>` (_string_)
 
-List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `hdf`, `occt`, `pdal`, `usd`, `vdb`, `webifc`. See the [plugin documentation](13-PLUGINS.md) for more info.
+List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `hdf`, `occt`, `pdal`, `usd`, `vdb`, `webifc`. See the [plugin documentation](13-PLUGINS_AND_MODULES.md) for more info.
 
 ### `--plugins-path=<path>` (_string_)
 
-Supplementary path to specify where to load plugins from, on top of [default paths](13-PLUGINS.md#supported-plugins).
+Supplementary path to specify where to load plugins from, on top of [default paths](13-PLUGINS_AND_MODULES.md#supported-plugins).
 
 ### `--scan-plugins`
 
-Scan standard directories for plugins and display their names. Results may be incomplete. See the [plugin documentation](13-PLUGINS.md) for more info.
+Scan standard directories for plugins and display their names. Results may be incomplete. See the [plugin documentation](13-PLUGINS_AND_MODULES.md) for more info.
 
 ### `--screenshot-filename=<png file>` (_string_, default: `{app}/{model}_{n}.png`)
 
@@ -132,6 +136,26 @@ Filename to save [screenshots](04-INTERACTIONS.md#take-screenshots) to. Can use 
 
 Rendering backend to load, `auto` means to let F3D pick the correct one for you depending on your system capabilities. Use `egl` or `osmesa` to force headless rendering. Use `rendering-backend=xr` to specify F3D should use the xr rendering backend, referred in this doc as "XR mode".
 See [rendering backends](12-DESKTOP_INTEGRATION.md#rendering-backends).
+
+### `-r`, `--rendering-mode=<opengl|ospray|anari>` (_string_, default: `opengl`, implicit: `ospray`)
+
+Select the rendering mode to use.
+If OSPRay raytracing is used, requires OSPRay raytracing to be enabled in the linked VTK dependency.
+If Anari is used, requires Anari to be enabled in the linked VTK dependency.
+
+> [!NOTE]
+> The `anari` rendering mode is experimental and not available in the binary release
+
+#### compare
+
+| OpenGL                                         | OSPRay raytracing                            |
+| ---------------------------------------------- | -------------------------------------------- |
+| ![raytracing off](./images/raytracing_off.png) | ![raytracing on](./images/raytracing_on.png) |
+
+### `--anari-library=<name>` (_string_)
+
+Select the Anari library to use.
+If not specified, the library is selected from the value of the `ANARI_LIBRARY` environment variable.
 
 ### `-D`, `--define=<libf3d.option=value>` (_special_)
 
@@ -248,6 +272,16 @@ Set the number of subdivisions for the grid.
 | 10 (default)                                                         | 4                                                        |
 | -------------------------------------------------------------------- | -------------------------------------------------------- |
 | ![grid subdivisions default](./images/grid_subdivisions_default.png) | ![grid subdivisions 4](./images/grid_subdivisions_4.png) |
+
+### `--grid-scale=<scale>` (_double_, default: `1.0`)
+
+Set a multiplier for the grid scale
+
+#### compare
+
+| 10 (default)                                       | 4                                            |
+| -------------------------------------------------- | -------------------------------------------- |
+| ![grid scale default](./images/grid_scale_1_0.png) | ![grid scale 5](./images/grid_scale_5_0.png) |
 
 ### `--grid-color=<color>` (_color_, default: `0,0,0`)
 
@@ -786,6 +820,11 @@ Blur circle of confusion radius.
 
 _Adjust the intensity_ of every light in the scene, including HDRI image-based lighting.
 
+### `--light-representation` (_bool_, default: `false`, implicit: `true`)
+
+Set visibility of light representations of every _scene_ light.
+This option doesn't show representations for headlights and camera lights
+
 #### compare
 
 | 1 (default)                                          | 2                                                    |
@@ -794,7 +833,7 @@ _Adjust the intensity_ of every light in the scene, including HDRI image-based l
 
 ## Scientific visualization options
 
-### `-s`, `--coloring-mode` (_string_, default: `material`)
+### `-s`, `--coloring-mode` (_string_, default: `material`, implicit: `scivis`)
 
 Specify the coloring mode.
 _material_ means default file materials (textured or solid color)
@@ -975,16 +1014,6 @@ Apply an elevation transformation to the camera, in degrees, added after other c
 Set the camera to use the orthographic projection. Model-specified by default.
 
 ## Raytracing options
-
-### `-r`, `--raytracing` (_bool_, default: `false`)
-
-Enable _OSPRay raytracing_. Requires OSPRay raytracing to be enabled in the linked VTK dependency.
-
-#### compare
-
-| OFF                                            | ON                                           |
-| ---------------------------------------------- | -------------------------------------------- |
-| ![raytracing off](./images/raytracing_off.png) | ![raytracing on](./images/raytracing_on.png) |
 
 ### `--raytracing-samples=<samples>` (_int_, default: `5`)
 

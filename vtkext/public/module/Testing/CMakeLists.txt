@@ -1,5 +1,6 @@
 set(vtkextTests_list
-  TestF3DArchiveReader.cxx)
+  TestF3DArchiveReader.cxx
+  TestF3DGLTFImporter.cxx)
 
 # Also needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
 # Sanitizer exclusion because of https://github.com/f3d-app/f3d/issues/1323

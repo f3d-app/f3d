@@ -36,6 +36,10 @@ STEP, IGES, BREP, XBF and FCStd file formats rely on [OpenCASCADE](https://githu
 
 ### General
 
+> The F3D window does not appear anywhere visible
+
+The [caches](03-OPTIONS.md#caches) may be corrupted, just delete it.
+
 > I have built F3D with raytracing support but the denoiser is not working.
 
 Build VTK with _OpenImageDenoise_ support (`VTKOSPRAY_ENABLE_DENOISER` option).

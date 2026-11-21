@@ -104,5 +104,5 @@ For more information, see the [Animations](05-ANIMATIONS.md) page.
 - [How to interact with scenes in F3D.](04-INTERACTIONS.md)
 - [How to play animations in F3D.](05-ANIMATIONS.md)
 - [How to specify colormaps in F3D.](10-COLOR_MAPS.md)
-- [How to configure plugins in F3D.](13-PLUGINS.md)
+- [How to configure plugins in F3D.](13-PLUGINS_AND_MODULES.md)
 - [Limitations and how to troubleshoot F3D.](14-LIMITATIONS_AND_TROUBLESHOOTING.md)

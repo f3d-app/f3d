@@ -42,6 +42,8 @@ class vtkOrientationMarkerWidget;
 class vtkScalarBarActor;
 class vtkSkybox;
 class vtkTextActor;
+class vtkLightRepresentation;
+class vtkLightWidget;
 
 class vtkF3DRenderer : public vtkOpenGLRenderer
 {
@@ -116,6 +118,16 @@ public:
     LINE
   };
 
+  /**
+   * Enum listing possible rendering modes.
+   */
+  enum class RenderingMode : unsigned char
+  {
+    OPENGL,
+    OSPRAY,
+    ANARI
+  };
+
   ///@{
   /**
    * Set visibility of different actors
@@ -161,6 +173,7 @@ public:
   void SetGridAbsolute(bool absolute);
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
+  void SetGridScale(double scale);
   void SetGridColor(const std::vector<double>& color);
   void SetGridOpacity(const double strength);
   void SetGridReflection(const double strength);
@@ -188,7 +201,8 @@ public:
   /**
    * Set usages and configurations of different render passes
    */
-  void SetUseRaytracing(bool use);
+  void SetRenderingMode(RenderingMode mode);
+  void SetAnariLibrary(const std::string& anariLibrary);
   void SetUseRaytracingDenoiser(bool use);
   void SetBlendingMode(BlendingMode mode);
   BlendingMode GetBlendingMode() const;
@@ -257,6 +271,11 @@ public:
    * return the number of lights in the renderer.
    */
   int UpdateLights() override;
+
+  /**
+   * Updates all light representations
+   */
+  void UpdateLightRepresentations();
 
   /**
    * Initialize the renderer actors and flags.
@@ -691,6 +710,13 @@ public:
    */
   void SetXRMode(bool enable, bool showBbox = false);
 
+  /**
+   * Changes the light representable visibility
+   * if visible is true, Then all the representables will be turned on
+   * else all representables will not be visible
+   */
+  void SetLightRepresentationVisibility(bool visible);
+
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;
@@ -858,6 +884,13 @@ private:
 
   vtkSmartPointer<vtkGridAxesActor3D> GridAxesActor;
 
+  struct LightRepresentationBundle
+  {
+    vtkSmartPointer<vtkLightRepresentation> representation;
+    vtkSmartPointer<vtkLightWidget> widget;
+  };
+  std::map<vtkLight*, LightRepresentationBundle> LightRepresentations;
+
   vtkNew<vtkActor> GridActor;
   vtkNew<vtkF3DOpenGLGridMapper> GridMapper;
   vtkNew<vtkSkybox> SkyboxActor;
@@ -886,6 +919,7 @@ private:
   bool HDRISkyboxConfigured = false;
   bool XrBoundingBoxConfigured = false;
 
+  bool LightRepresentationVisible = false;
   bool GridVisible = false;
   bool GridAbsolute = false;
   bool AxisVisible = false;
@@ -903,7 +937,8 @@ private:
   bool DropZoneLogoVisible = false;
   bool HDRISkyboxVisible = false;
   bool ArmatureVisible = false;
-  bool UseRaytracing = false;
+  RenderingMode CurrentRenderingMode = RenderingMode::OPENGL;
+  std::string AnariLibrary = "environment";
   bool UseRaytracingDenoiser = false;
   AntiAliasingMode AntiAliasingModeEnabled = AntiAliasingMode::NONE;
   BlendingMode BlendingModeEnabled = BlendingMode::NONE;
@@ -923,6 +958,7 @@ private:
   std::optional<double> LineWidth;
   std::optional<double> GridUnitSquare;
   int GridSubdivisions = 10;
+  double GridScale = 1.0;
   double GridColor[3] = { 0.0, 0.0, 0.0 };
   double GridOpacity = 1.0;
   double GridReflection = 0.0;
