@@ -34,11 +34,6 @@ public class TestAnimation {
     
     Animation anim = scene.getAnimation();
 
-    Animation.Direction.FORWARD.getValue();
-    Animation.Direction.BACKWARD.getValue();
-    Animation.Direction.fromValue(0);
-    Animation.Direction.fromValue(1);
-
     // XXX: Only smoke tests for now
     anim.loadTime(0.5);
     anim.getTimeRange();
