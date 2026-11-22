@@ -5639,6 +5639,7 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
 
     // Render text. We currently only render selection when the widget is active or while scrolling.
     const ImU32 text_col = GetColorU32(is_displaying_mixed ? ImGuiCol_TextMixedValue : is_displaying_hint ? ImGuiCol_TextDisabled : ImGuiCol_Text);
+    const char* text_selected_begin = NULL, *text_selected_end = NULL;
     if (render_cursor || render_selection)
     {
         // Render text (with cursor and selection)
@@ -5707,8 +5708,8 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
             const float bg_offy_dn = is_multiline ? 0.0f : 2.0f;
             const float bg_eol_width = IM_TRUNC(g.FontBaked->GetCharAdvance((ImWchar)' ') * 0.50f); // So we can see selected empty lines
 
-            const char* text_selected_begin = buf_display + ImMin(state->Stb->select_start, state->Stb->select_end);
-            const char* text_selected_end = buf_display + ImMax(state->Stb->select_start, state->Stb->select_end);
+            text_selected_begin = buf_display + ImMin(state->Stb->select_start, state->Stb->select_end);
+            text_selected_end = buf_display + ImMax(state->Stb->select_start, state->Stb->select_end);
             for (int line_n = line_visible_n0; line_n < line_visible_n1; line_n++)
             {
                 const char* p = line_index->get_line_begin(buf_display, line_n);
@@ -5746,12 +5747,17 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
 
     // Render text
     if ((is_multiline || (buf_display_end - buf_display) < buf_display_max_length) && (text_col & IM_COL32_A_MASK) && (line_visible_n0 < line_visible_n1))
+    {
+        const ImU32 selected_text_col = GetColorU32(IM_COL32(20, 20, 20, 255));
+
         g.Font->RenderText(draw_window->DrawList, g.FontSize,
             draw_pos - draw_scroll + ImVec2(0.0f, line_visible_n0 * g.FontSize),
             text_col, clip_rect.AsVec4(),
             line_index->get_line_begin(buf_display, line_visible_n0),
             line_index->get_line_end(buf_display, line_visible_n1 - 1),
-            wrap_width, ImDrawTextFlags_WrapKeepBlanks | ImDrawTextFlags_CpuFineClip);
+            wrap_width, ImDrawTextFlags_WrapKeepBlanks | ImDrawTextFlags_CpuFineClip,
+            text_selected_begin, text_selected_end, selected_text_col);
+    }
 
     // Render blinking cursor
     if (render_cursor)

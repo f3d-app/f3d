@@ -7330,10 +7330,16 @@ void ImFont::RenderChar(ImDrawList* draw_list, float size, const ImVec2& pos, Im
     draw_list->PrimReserve(6, 4);
     draw_list->PrimRectUV(ImVec2(x1, y1), ImVec2(x2, y2), ImVec2(u1, v1), ImVec2(u2, v2), col);
 }
+void ImFont::RenderText(ImDrawList* draw_list, float size, const ImVec2& pos, ImU32 col, const ImVec4& clip_rect, const char* text_begin, const char* text_end, float wrap_width, ImDrawTextFlags flags)
+{
+
+    RenderText(draw_list, size, pos, col, clip_rect, text_begin, text_end,
+        wrap_width, flags, NULL, NULL, 0);
+}
 
 // Note: as with every ImDrawList drawing function, this expects that the font atlas texture is bound.
 // DO NOT CALL DIRECTLY THIS WILL CHANGE WILDLY IN 2026. Use ImDrawList::AddText().
-void ImFont::RenderText(ImDrawList* draw_list, float size, const ImVec2& pos, ImU32 col, const ImVec4& clip_rect, const char* text_begin, const char* text_end, float wrap_width, ImDrawTextFlags flags)
+void ImFont::RenderText(ImDrawList* draw_list, float size, const ImVec2& pos, ImU32 col, const ImVec4& clip_rect, const char* text_begin, const char* text_end, float wrap_width, ImDrawTextFlags flags, const char* selection_begin, const char* selection_end, ImU32 selection_color)
 {
 begin:
     // Align to be pixel perfect
@@ -7431,6 +7437,7 @@ begin:
         }
 
         // Decode and advance source
+        const char* char_begin = s;
         unsigned int c = (unsigned int)*s;
         if (c < 0x80)
             s += 1;
@@ -7503,7 +7510,8 @@ begin:
 
                 // Support for untinted glyphs
                 ImU32 glyph_col = glyph->Colored ? col_untinted : col;
-
+                if (!glyph->Colored && selection_begin && selection_end && char_begin >= selection_begin && char_begin < selection_end)
+                    glyph_col = selection_color;
                 // We are NOT calling PrimRectUV() here because non-inlined causes too much overhead in a debug builds. Inlined here:
                 {
                     vtx_write[0].pos.x = x1; vtx_write[0].pos.y = y1; vtx_write[0].col = glyph_col; vtx_write[0].uv.x = u1; vtx_write[0].uv.y = v1;
