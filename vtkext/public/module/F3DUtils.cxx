@@ -63,7 +63,7 @@ int F3DUtils::ParseToInt(const std::string& str, int def, const std::string& nam
 }
 
 //----------------------------------------------------------------------------
-bool F3DUtils::CopyToClipboard(const std::string& text)
+bool F3DUtils::CopyToClipboard([[maybe_unused]] const std::string& text)
 {
 #ifdef F3D_MODULE_CLIP
   clip::set_x11_wait_timeout(50);
