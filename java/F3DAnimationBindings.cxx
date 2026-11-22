@@ -36,12 +36,12 @@ static f3d::animation::Direction JavaDirectionToNative(JNIEnv* env, jobject dire
   const jint ordinal = env->CallIntMethod(direction, ordinalMethod);
 
   switch (ordinal)
-    {
+  {
     case 0:
       return f3d::animation::Direction::FORWARD;
     default:
       return f3d::animation::Direction::BACKWARD;
-    }
+  }
 }
 
 extern "C"
@@ -126,17 +126,16 @@ extern "C"
     const JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Animation$Direction"));
     jfieldID fieldID;
 
-    switch(nativeDirection)
-      {
+    switch (nativeDirection)
+    {
       case f3d::animation::Direction::FORWARD:
-	fieldID = env->GetStaticFieldID(enumClass, "FORWARD", "Lapp/f3d/F3D/Animation$Direction;");
-	break;
+        fieldID = env->GetStaticFieldID(enumClass, "FORWARD", "Lapp/f3d/F3D/Animation$Direction;");
+        break;
       default:
-	fieldID = env->GetStaticFieldID(enumClass, "BACKWARD", "Lapp/f3d/F3D/Animation$Direction;");
-	break;
-      }
-    
-    return env->CallStaticObjectField(
-      enumClass, fieldID);
+        fieldID = env->GetStaticFieldID(enumClass, "BACKWARD", "Lapp/f3d/F3D/Animation$Direction;");
+        break;
+    }
+
+    return env->CallStaticObjectField(enumClass, fieldID);
   }
 }
