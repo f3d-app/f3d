@@ -136,6 +136,6 @@ extern "C"
         break;
     }
 
-    return env->CallStaticObjectField(enumClass, fieldID);
+    return env->GetStaticObjectField(enumClass, fieldID);
   }
 }
