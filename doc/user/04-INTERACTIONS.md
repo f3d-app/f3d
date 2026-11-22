@@ -67,6 +67,7 @@ Toggle or cycle other options directly with these hotkeys:
 - <kbd>Shift</kbd>+<kbd>P</kbd>: decrease opacity.
 - <kbd>Shift</kbd>+<kbd>A</kbd>: toggle armature.
 - <kbd>Ctrl</kbd>+<kbd>N</kbd>: toggle normal glyphs.
+- <kbd>Ctrl</kbd>+<kbd>B</kbd>: cycle backface culling type (default, visible, hidden).
 
 Raytracing hotkeys are only available if F3D is built with raytracing enabled.
 
