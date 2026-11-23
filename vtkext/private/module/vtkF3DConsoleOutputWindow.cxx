@@ -24,13 +24,14 @@ void vtkF3DConsoleOutputWindow::EndProgress()
 {
   if (this->ProgressStarted)
   {
+    this->ProgressStarted = false;
+
     // Shows empty text to add a newline after the progress bar
     if (this->LastMessageIsProgress)
     {
       this->DisplayText("");
     }
 
-    this->ProgressStarted = false;
     this->LastMessageIsProgress = false;
   }
 }

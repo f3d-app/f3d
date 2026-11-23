@@ -224,6 +224,7 @@ public:
     scene_impl::internals::ProgressDataStruct callbackData;
     scene_impl::internals::CLIProgressBarDataStruct cliCallbackData;
 
+    f3d::log::startProgress();
     constexpr size_t maxFileNameLength = 51;
     cliCallbackData.timer = timer;
     cliCallbackData.importerCount = this->MetaImporter->GetImporterInfoCount();
@@ -255,6 +256,7 @@ public:
     // Remove anything progress related if any
     this->MetaImporter->RemoveObservers(vtkCommand::ProgressEvent);
     progressWidget->Off();
+    f3d::log::endProgress();
 
     // Initialize the animation using temporal information from the importer
     this->Animation->UpdateDynamicOptions();
