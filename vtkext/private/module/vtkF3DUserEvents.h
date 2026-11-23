@@ -18,7 +18,8 @@ enum vtkF3DUserEvents
   TriggerEvent,
   ShowEvent,
   HideEvent,
-  SceneHierarchyChangedEvent
+  SceneHierarchyChangedEvent,
+  InvalidateHistoryEvent
 };
 
 #endif

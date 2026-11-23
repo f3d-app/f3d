@@ -9,6 +9,7 @@
 #include "vtkF3DRenderer.h"
 #include "vtkF3DStochasticTransparentPass.h"
 #include "vtkF3DTAAPass.h"
+#include "vtkF3DUserEvents.h"
 
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -389,6 +390,8 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
         vtkCommand::WindowResizeEvent, taaP.Get(), &vtkF3DTAAPass::ResetIterations);
       glRenderer->GetRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(
         vtkCommand::InteractionEvent, taaP.Get(), &vtkF3DTAAPass::ResetIterations);
+      glRenderer->AddObserver(
+        vtkF3DUserEvents::InvalidateHistoryEvent, taaP.Get(), &vtkF3DTAAPass::ResetIterations);
 
       this->MainPass->SetDelegatePass(taaP);
     }
