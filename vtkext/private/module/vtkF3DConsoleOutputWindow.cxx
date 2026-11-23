@@ -10,10 +10,36 @@ vtkStandardNewMacro(vtkF3DConsoleOutputWindow);
 vtkF3DConsoleOutputWindow::vtkF3DConsoleOutputWindow() = default;
 
 //----------------------------------------------------------------------------
+void vtkF3DConsoleOutputWindow::StartProgress()
+{
+  if (!this->ProgressStarted)
+  {
+    this->ProgressStarted = true;
+    this->LastMessageIsProgress = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DConsoleOutputWindow::EndProgress()
+{
+  if (this->ProgressStarted)
+  {
+    // Shows empty text to add a newline after the progress bar
+    if (this->LastMessageIsProgress)
+    {
+      this->DisplayText("");
+    }
+
+    this->ProgressStarted = false;
+    this->LastMessageIsProgress = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)
 {
   std::string fmtText;
-  if (this->lastMessageIsProgress)
+  if (this->ProgressStarted && this->LastMessageIsProgress)
   {
     fmtText += '\n';
   }
@@ -59,12 +85,16 @@ void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)
       break;
   }
 
-  this->lastMessageIsProgress = false;
+  this->LastMessageIsProgress = false;
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DConsoleOutputWindow::DisplayProgress(const char* str)
 {
+  if (!this->ProgressStarted)
+  {
+    return;
+  }
 
   std::string fmtText = "\r";
   fmtText += str;
@@ -86,5 +116,5 @@ void vtkF3DConsoleOutputWindow::DisplayProgress(const char* str)
       // LCOV_EXCL_STOP
   }
 
-  this->lastMessageIsProgress = true;
+  this->LastMessageIsProgress = true;
 }

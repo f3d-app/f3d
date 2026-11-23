@@ -22,6 +22,16 @@ public:
   void DisplayText(const char*) override;
 
   /**
+   * Initializes progress line in the console output window
+   */
+  void StartProgress();
+
+  /**
+   * Ends the progress line in the console output window
+   */
+  void EndProgress();
+
+  /**
    * Display a progress message in the console output window.
    */
   void DisplayProgress(const char*);
@@ -44,7 +54,8 @@ protected:
 
 private:
   bool UseColoring = true;
-  bool lastMessageIsProgress = false;
+  bool LastMessageIsProgress = false;
+  bool ProgressStarted = false;
 };
 
 #endif
