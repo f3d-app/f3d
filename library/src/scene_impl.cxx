@@ -49,6 +49,19 @@ namespace fs = std::filesystem;
 
 namespace f3d::detail
 {
+namespace
+{
+std::string pathToUtf8String(const fs::path& path)
+{
+#if defined(_WIN32)
+  const std::u8string utf8Path = path.u8string();
+  return std::string(reinterpret_cast<const char*>(utf8Path.data()), utf8Path.size());
+#else
+  return path.string();
+#endif
+}
+}
+
 class scene_impl::internals
 {
 public:
@@ -348,15 +361,16 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       continue;
     }
 
-    if (!vtksys::SystemTools::FileExists(filePath.string(), true))
+    const std::string filePathString = pathToUtf8String(filePath);
+    if (!vtksys::SystemTools::FileExists(filePathString, true))
     {
-      throw scene::load_failure_exception(filePath.string() + " does not exists");
+      throw scene::load_failure_exception(filePathString + " does not exists");
     }
     std::optional<std::string> forceReader = this->Internals->Options.scene.force_reader;
     file_availability availability = f3d::file_availability::UNSUPPORTED_EXTENSION;
     // Recover the importer for the provided file path
-    const f3d::reader* reader = f3d::factory::instance()->getReader(filePath.string(), forceReader,
-      this->Internals->Options.scene.skip_content_check, availability);
+    const f3d::reader* reader = f3d::factory::instance()->getReader(
+      filePathString, forceReader, this->Internals->Options.scene.skip_content_check, availability);
     auto fail = [&](const std::string& message)
     {
       if (forceReader)
@@ -365,7 +379,7 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       }
       else
       {
-        throw scene::load_failure_exception(filePath.string() + message);
+        throw scene::load_failure_exception(filePathString + message);
       }
     };
 
@@ -374,12 +388,11 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       case file_availability::SUPPORTED:
         if (forceReader)
         {
-          log::debug("Forcing reader ", (*forceReader), " for ", filePath.string());
+          log::debug("Forcing reader ", (*forceReader), " for ", filePathString);
         }
         else
         {
-          log::debug(
-            "Found a reader for \"", filePath.string(), "\" : \"", reader->getName(), "\"");
+          log::debug("Found a reader for \"", filePathString, "\" : \"", reader->getName(), "\"");
         }
         break;
       case file_availability::UNSUPPORTED_EXTENSION:
@@ -398,18 +411,18 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
         // LCOV_EXCL_STOP
     }
 
-    vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(filePath.string());
+    vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(filePathString);
     if (!importer)
     {
       // XXX: F3D Plugin CMake logic ensure there is either a scene reader or a geometry reader
-      auto vtkReader = reader->createGeometryReader(filePath.string());
+      auto vtkReader = reader->createGeometryReader(filePathString);
       assert(vtkReader);
       const vtkSmartPointer<vtkF3DGenericImporter> genericImporter =
         vtkSmartPointer<vtkF3DGenericImporter>::New();
       genericImporter->SetInternalReader(vtkReader);
       importer = genericImporter;
     }
-    importers.emplace_back(filePath.filename().string(), importer);
+    importers.emplace_back(pathToUtf8String(filePath.filename()), importer);
 
     this->Internals->AddedFiles.emplace_back(filePath);
   }
@@ -417,13 +430,13 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
   log::debug("\nLoading files: ");
   if (filePaths.size() == 1)
   {
-    log::debug(filePaths[0].string());
+    log::debug(pathToUtf8String(filePaths[0]));
   }
   else
   {
     for (const fs::path& filePathStr : filePaths)
     {
-      log::debug("- ", filePathStr.string());
+      log::debug("- ", pathToUtf8String(filePathStr));
     }
   }
   log::debug("");
@@ -1049,7 +1062,7 @@ scene_info_t scene_impl::getSceneInfo() const
 f3d::file_availability scene_impl::supports(const fs::path& filePath)
 {
   f3d::file_availability availability = f3d::file_availability::UNSUPPORTED_EXTENSION;
-  f3d::factory::instance()->getReader(filePath.string(),
+  f3d::factory::instance()->getReader(pathToUtf8String(filePath),
     this->Internals->Options.scene.force_reader, this->Internals->Options.scene.skip_content_check,
     availability);
   return availability;

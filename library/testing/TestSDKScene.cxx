@@ -7,6 +7,10 @@
 #include <window.h>
 
 #include <algorithm>
+#include <chrono>
+#include <filesystem>
+#include <string>
+#include <system_error>
 
 namespace fs = std::filesystem;
 
@@ -59,6 +63,49 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test(
     "supported with default scene format", sce.supports(cube) == f3d::file_availability::SUPPORTED);
   test("supported with full scene format", sce.supports(logo) == f3d::file_availability::SUPPORTED);
+#if defined(_WIN32)
+  const fs::path unicodeDirectory = fs::temp_directory_path() /
+    fs::path(std::wstring(L"f3d-\u4E2D\u6587-") +
+      std::to_wstring(
+        static_cast<long long>(std::chrono::steady_clock::now().time_since_epoch().count())));
+  const fs::path unicodeFile = unicodeDirectory / fs::path(L"cow-\u6A21\u578B.vtp");
+  struct UnicodeDirectoryCleanup
+  {
+    const fs::path& Directory;
+    std::error_code& Error;
+
+    ~UnicodeDirectoryCleanup() noexcept
+    {
+      fs::remove_all(this->Directory, this->Error);
+    }
+  };
+  bool unicodeFixtureExists = false;
+  std::error_code cleanupError;
+  {
+    [[maybe_unused]] const UnicodeDirectoryCleanup cleanup{ unicodeDirectory, cleanupError };
+    test("std::filesystem::exists succeeds for a Unicode path", [&]() {
+      fs::create_directories(unicodeDirectory);
+      fs::copy_file(fs::path(argv[1]) / "data" / "cow.vtp", unicodeFile);
+      unicodeFixtureExists = fs::exists(unicodeFile);
+      return unicodeFixtureExists;
+    });
+    if (unicodeFixtureExists)
+    {
+      test("load a file at a Unicode path", [&]() {
+        f3d::engine unicodeEngine = TestSDKHelpers::CreateOffscreenEngine(renderingBackend);
+        f3d::scene& unicodeScene = unicodeEngine.getScene();
+        test("supports a file at a Unicode path", [&]() {
+          return unicodeScene.supports(unicodeFile) == f3d::file_availability::SUPPORTED;
+        });
+        test("adds a file at a Unicode path", [&]() {
+          unicodeScene.add(unicodeFile);
+          return true;
+        });
+      });
+    }
+  }
+  test("remove temporary Unicode fixture", !cleanupError);
+#endif
   // invalid
   test.expect<f3d::scene::load_failure_exception>(
     "add with invalid default scene file", [&]() { sce.add(invalidDefaultScene); });
