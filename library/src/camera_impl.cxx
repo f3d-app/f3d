@@ -1,4 +1,5 @@
 #include "camera_impl.h"
+
 #include <vtkCamera.h>
 #include <vtkMatrix4x4.h>
 #include <vtkRenderWindow.h>
