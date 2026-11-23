@@ -1,5 +1,4 @@
 #include "vtkF3DRenderer.h"
-
 #include "F3DCheckerBoard.h"
 #include "F3DColoringInfoHandler.h"
 #include "F3DDefaultHDRI.h"
@@ -112,11 +111,13 @@
 #include <vtkOpenXRRenderWindow.h>
 #endif
 
+#include <array>
 #include <cctype>
 #include <chrono>
 #include <cmath>
 #include <numbers>
 #include <sstream>
+#include <vector>
 
 namespace
 {
@@ -125,6 +126,15 @@ constexpr double ScalarBarPositionX = 0.1;
 constexpr double ScalarBarPositionY = 0.01;
 constexpr double ScalarBarHeight = 0.07;
 
+// The 6 faces of a bounding box, as indices of its 8 corners
+constexpr int BoxFaces[6][4] = {
+  { 0, 2, 6, 4 },
+  { 1, 3, 7, 5 },
+  { 0, 1, 5, 4 },
+  { 2, 3, 7, 6 },
+  { 0, 1, 3, 2 },
+  { 4, 5, 7, 6 },
+};
 //----------------------------------------------------------------------------
 // Compute the MD5 hash of an existing file on disk
 std::string ComputeFileHash(const std::string& filepath)
@@ -223,6 +233,44 @@ vtkSmartPointer<vtkTexture> GetTexture(const fs::path& filePath, bool isSRGB = f
   }
 
   return texture;
+}
+//----------------------------------------------------------------------------
+// Evaluate a plane against a point if the result is >= 0 it means "inside".
+double EvaluatePlane(const double plane[4], const std::array<double, 3> point)
+{
+  return plane[0] * point[0] + plane[1] * point[1] + plane[2] * point[2] + plane[3];
+}
+//----------------------------------------------------------------------------
+// Clip a bounding box against a plane and keep the part where EvaluatePlane >=0
+std::vector<std::array<double, 3>> ClipBoundingBoxByPlane(
+  const double plane[4], const std::vector<std::array<double, 3>>& points)
+{
+  std::vector<std::array<double, 3>> result;
+  size_t pointsSize = points.size();
+
+  for (size_t i = 0; i < pointsSize; i++)
+  {
+    std::array<double, 3> currPoint = points[i];
+    std::array<double, 3> nextPoint = points[(i + 1) % pointsSize];
+
+    const double dCurr = EvaluatePlane(plane, currPoint);
+    const double dNext = EvaluatePlane(plane, nextPoint);
+
+    const bool currInside = dCurr >= 0.0;
+    const bool nextInside = dNext >= 0.0;
+    if (currInside)
+    {
+      result.push_back(currPoint);
+    }
+    if (nextInside != currInside)
+    {
+      const double t = dCurr / (dCurr - dNext);
+      result.push_back({ currPoint[0] + t * (nextPoint[0] - currPoint[0]),
+        currPoint[1] + t * (nextPoint[1] - currPoint[1]),
+        currPoint[2] + t * (nextPoint[2] - currPoint[2]) });
+    }
+  }
+  return result;
 }
 }
 
@@ -2715,7 +2763,207 @@ void vtkF3DRenderer::ResetCameraClippingRange()
   this->GridActor->SetUseBounds(!this->DisplayDepth);
   if (!this->UseXR)
   {
-    this->Superclass::ResetCameraClippingRange();
+    // Adapted from `vtkRenderer::ResetCameraClippingRange(const double bounds[6])`
+    // Copyright (c) Kitware, Inc.
+    double vn[3], position[3], a, b, c, d;
+    double range[2], aspect, planes[24];
+    int i, j, k;
+
+    this->GetActiveCameraAndResetIfCreated();
+    if (this->ActiveCamera == nullptr)
+    {
+      vtkErrorMacro(<< "Trying to reset clipping range of non-existent camera");
+    }
+    else
+    {
+      if (!this->ActiveCamera->GetUseOffAxisProjection())
+      {
+        this->ActiveCamera->GetViewPlaneNormal(vn);
+        this->ActiveCamera->GetPosition(position);
+      }
+      else
+      {
+        this->ActiveCamera->GetEyePosition(position);
+        this->ActiveCamera->GetEyePlaneNormal(vn);
+      }
+      a = -vn[0];
+      b = -vn[1];
+      c = -vn[2];
+      d = -(a * position[0] + b * position[1] + c * position[2]);
+
+      aspect = this->GetTiledAspectRatio();
+      this->ActiveCamera->GetFrustumPlanes(aspect, planes);
+
+      double clipPlanes[5][4];
+      for (int p = 0; p < 4; p++)
+      {
+        for (int q = 0; q < 4; q++)
+        {
+          clipPlanes[p][q] = planes[4 * p + q];
+        }
+      }
+
+      clipPlanes[4][0] = a;
+      clipPlanes[4][1] = b;
+      clipPlanes[4][2] = c;
+      clipPlanes[4][3] = d;
+
+      range[0] = +VTK_DOUBLE_MAX;
+      range[1] = -VTK_DOUBLE_MAX;
+
+      vtkProp* prop;
+      vtkCollectionSimpleIterator pit;
+      for (this->Props->InitTraversal(pit); (prop = this->Props->GetNextProp(pit));)
+      {
+        if (!prop->GetVisibility() || !prop->GetUseBounds())
+        {
+          continue;
+        }
+        double* propBounds = prop->GetBounds();
+        if (!propBounds || !vtkMath::AreBoundsInitialized(propBounds))
+        {
+          continue;
+        }
+
+        double expandedBounds[6] = { propBounds[0], propBounds[1], propBounds[2], propBounds[3],
+          propBounds[4], propBounds[5] };
+
+        this->ExpandBounds(expandedBounds, this->ActiveCamera->GetModelTransformMatrix());
+
+        std::array<double, 3> corners[8];
+
+        bool allOutside[4] = { true, true, true, true };
+        bool allBehind = true;
+        int n = 0;
+        for (k = 0; k < 2; k++)
+        {
+          for (j = 0; j < 2; j++)
+          {
+            for (i = 0; i < 2; i++, n++)
+            {
+              corners[n] = { expandedBounds[i], expandedBounds[2 + j], expandedBounds[4 + k] };
+
+              if (EvaluatePlane(clipPlanes[4], corners[n]) > 0)
+              {
+                allBehind = false;
+              }
+              for (int p = 0; p < 4; p++)
+              {
+                if (EvaluatePlane(clipPlanes[p], corners[n]) >= 0)
+                {
+                  allOutside[p] = false;
+                }
+              }
+            }
+          }
+        }
+        bool outside =
+          allBehind || allOutside[0] || allOutside[1] || allOutside[2] || allOutside[3];
+        if (outside)
+        {
+          continue;
+        }
+
+        double boxNear = VTK_DOUBLE_MAX;
+        double boxFar = -VTK_DOUBLE_MAX;
+
+        for (const auto& face : BoxFaces)
+        {
+          std::vector<std::array<double, 3>> polygon = { corners[face[0]], corners[face[1]],
+            corners[face[2]], corners[face[3]] };
+          for (int p = 0; p < 5 && !polygon.empty(); p++)
+          {
+            polygon = ClipBoundingBoxByPlane(clipPlanes[p], polygon);
+          }
+          for (const std::array<double, 3>& point : polygon)
+          {
+            const double depth = EvaluatePlane(clipPlanes[4], point);
+            boxNear = std::min(boxNear, depth);
+            boxFar = std::max(boxFar, depth);
+          }
+        }
+
+        if (boxNear == VTK_DOUBLE_MAX)
+        {
+          continue;
+        }
+
+        if (position[0] >= expandedBounds[0] && position[0] <= expandedBounds[1] &&
+          position[1] >= expandedBounds[2] && position[1] <= expandedBounds[3] &&
+          position[2] >= expandedBounds[4] && position[2] <= expandedBounds[5])
+        {
+          boxNear = 0.0;
+        }
+
+        range[0] = std::min(range[0], boxNear);
+        range[1] = std::max(range[1], boxFar);
+      }
+
+      if (range[0] == VTK_DOUBLE_MAX)
+      {
+        this->Superclass::ResetCameraClippingRange();
+      }
+      else
+      {
+        // do not let far - near be less than 0.1 of the window height
+        // this is for cases such as 2D images which may have zero range
+        double minGap = 0.0;
+        if (this->ActiveCamera->GetParallelProjection())
+        {
+          minGap = 0.1 * this->ActiveCamera->GetParallelScale();
+        }
+        else if (this->ActiveCamera->GetUseOffAxisProjection())
+        {
+          double offAxisAdustment = this->ActiveCamera->GetOffAxisClippingAdjustment();
+          range[0] -= offAxisAdustment;
+          range[1] += offAxisAdustment;
+        }
+        else
+        {
+          double angle = vtkMath::RadiansFromDegrees(this->ActiveCamera->GetViewAngle());
+          minGap = 0.2 * tan(angle / 2.0) * range[1];
+        }
+        if (range[1] - range[0] < minGap)
+        {
+          minGap = minGap - range[1] + range[0];
+          range[1] += minGap / 2.0;
+          range[0] -= minGap / 2.0;
+        }
+
+        // Do not let the range behind the camera throw off the calculation.
+        range[0] = std::max(range[0], 0.0);
+
+        // Give ourselves a little breathing room
+        range[0] = 0.99 * range[0] - (range[1] - range[0]) * this->ClippingRangeExpansion;
+        range[1] = 1.01 * range[1] + (range[1] - range[0]) * this->ClippingRangeExpansion;
+
+        // Make sure near is not bigger than far
+        range[0] = (range[0] >= range[1]) ? (0.01 * range[1]) : (range[0]);
+
+        // Make sure near is at least some fraction of far - this prevents near
+        // from being behind the camera or too close in front. How close is too
+        // close depends on the resolution of the depth buffer
+        if (!this->NearClippingPlaneTolerance)
+        {
+          this->NearClippingPlaneTolerance = 0.01;
+          if (this->RenderWindow)
+          {
+            int ZBufferDepth = this->RenderWindow->GetDepthBufferSize();
+            if (ZBufferDepth > 16)
+            {
+              this->NearClippingPlaneTolerance = 0.001;
+            }
+          }
+        }
+
+        // make sure the front clipping range is not too far from the far clippnig
+        // range, this is to make sure that the zbuffer resolution is effectively
+        // used
+        range[0] = std::max(range[0], this->NearClippingPlaneTolerance * range[1]);
+
+        this->ActiveCamera->SetClippingRange(range);
+      }
+    }
   }
   else
   {
