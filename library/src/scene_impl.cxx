@@ -247,6 +247,7 @@ public:
     {
       this->MetaImporter->RemoveObservers(vtkCommand::ProgressEvent);
       progressWidget->Off();
+      f3d::log::endProgress();
 
       this->MetaImporter->Clear();
       this->Window.Initialize();
