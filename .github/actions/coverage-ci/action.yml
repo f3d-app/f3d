@@ -101,7 +101,7 @@ runs:
     - name: Test
       shell: bash
       working-directory: ${{github.workspace}}/source
-      run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+      run: ctest -C Release -j 2 --output-on-failure --no-tests=error --repeat until-pass:2 --output-junit junit.xml
 
     - name: Upload Tests Artifact
       if: failure()
@@ -109,6 +109,12 @@ runs:
       with:
         path: ./source/Testing/Temporary
         name: f3d-tests-artifact-coverage
+
+    - name: Generate summary
+      if: always()
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: python source/utils/generate_summary.py --source_dir source --build_dir build --upload build/junit.xml >> $GITHUB_STEP_SUMMARY
 
     - name: Generate XML Coverage
       shell: bash
