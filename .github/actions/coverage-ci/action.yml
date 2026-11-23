@@ -47,6 +47,10 @@ runs:
       with:
         versions_file: ${{inputs.versions_file}}
 
+    - name: Install pillow for image comparisons
+      shell: bash
+      run: python -m pip install pillow
+
     # coverage build is done in source as it seems to be required for codecov
     # CMAKE_MODULE_PATH is required because of
     # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160
