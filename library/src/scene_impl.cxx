@@ -119,9 +119,7 @@ public:
 
   struct CLIProgressBarDataStruct
   {
-    vtkTimerLog* timer = nullptr;
-    std::string fileName;
-    int importerCount = 0;
+    log::ProgressBar progressBar;
   };
 
   template<std::size_t N>
@@ -158,42 +156,12 @@ public:
     progressCallback->SetCallback(
       [](vtkObject*, unsigned long, void* clientData, void* callData)
       {
-        constexpr int barCount = 16;
-        // hex characters correspond to the filled progression bars.
-        // sorted from least filled to mostly filled.
-        constexpr std::array charRamp = std::to_array<std::string_view>(
-          { " ", "\u258f", "\u258e", "\u258d", "\u258c", "\u258b", "\u258a", "\u2589", "\u2588" });
-
         const auto progressData = static_cast<CLIProgressBarDataStruct*>(clientData);
         const double progress = *static_cast<double*>(callData);
-
-        const std::string bar =
-          scene_impl::internals::GenerateCLIBarString(progress, barCount, charRamp);
-
-        const std::string filename = (progressData->importerCount > 1)
-          ? std::to_string(progressData->importerCount) + " files"
-          : progressData->fileName;
-
-        const int percentage = std::round(100 * progress);
-        const std::string percentageStr = std::format("{:3}", percentage);
-
-        progressData->timer->StopTimer();
-
-        const double estimatedTime =
-          (progress <= 1e-4) ? 0 : progressData->timer->GetElapsedTime() / progress;
-        const int estimatedMin = estimatedTime / 60;
-        const int estimatedSec = static_cast<int>(estimatedTime) % 60;
-        const int elapsedMin = progressData->timer->GetElapsedTime() / 60;
-        const int elapsedSec = static_cast<int>(progressData->timer->GetElapsedTime()) % 60;
-
-        const std::string time = std::format(
-          "{:02}:{:02}/{:02}:{:02}", elapsedMin, elapsedSec, estimatedMin, estimatedSec);
-
-        f3d::log::progress(
-          "Loading ", filename, " : ", percentageStr, "% |", bar, "| [", time, "]");
+        progressData->progressBar(progress);
       });
     importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
-    data->timer->StartTimer();
+    data->progressBar.timer->StartTimer();
   }
 
   void Load(const std::vector<std::pair<std::string, vtkSmartPointer<vtkImporter>>>& importers)
@@ -226,11 +194,23 @@ public:
 
     f3d::log::startProgress();
     constexpr size_t maxFileNameLength = 51;
-    cliCallbackData.timer = timer;
-    cliCallbackData.importerCount = this->MetaImporter->GetImporterInfoCount();
-    cliCallbackData.fileName = (cliCallbackData.importerCount > 0)
-      ? this->MetaImporter->GetImporterInfo(0).Name.substr(0, maxFileNameLength)
-      : "";
+    const int importerCount = this->MetaImporter->GetImporterInfoCount();
+    if (importerCount > 1)
+    {
+      cliCallbackData.progressBar.title = std::format("Loading {} files", importerCount);
+    }
+    else
+    {
+
+      std::string fileName = (importerCount > 0)
+        ? this->MetaImporter->GetImporterInfo(0).Name.substr(0, maxFileNameLength)
+        : "";
+
+      cliCallbackData.progressBar.title = std::format("Loading {}", fileName);
+    }
+
+    cliCallbackData.progressBar.timer = timer;
+
     scene_impl::internals::CreateCLIProgressBarAndCallback(&cliCallbackData, this->MetaImporter);
 
     if (this->Interactor && !this->Window.isOffscreen())

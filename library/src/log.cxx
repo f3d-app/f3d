@@ -5,6 +5,7 @@
 #include "F3DLog.h"
 
 #include <vtkObject.h>
+#include <vtkTimerLog.h>
 
 namespace f3d
 {
@@ -27,6 +28,76 @@ log::VerboseLevel convertLevel(F3DLog::Severity level)
       return log::VerboseLevel::QUIET;
   }
 }
+}
+
+//----------------------------------------------------------------------------
+// Progress bar helper function
+template<std::size_t N>
+static std::string GenerateCLIBarString(
+  double progress, int barCount, const std::array<std::string_view, N>& strRamp)
+{
+  std::string bar;
+  double filledBars;
+  const double lastBarProgression = std::modf(progress * barCount, &filledBars);
+  int totalFilled = static_cast<int>(filledBars);
+  for (int i = 0; i < filledBars; i++)
+  {
+    bar += strRamp.back();
+  }
+  if (filledBars < barCount)
+  {
+    const size_t charRampIdx =
+      static_cast<size_t>(std::round(lastBarProgression * (strRamp.size() - 1)));
+    bar += strRamp[charRampIdx];
+    totalFilled++;
+  }
+  while (totalFilled < barCount)
+  {
+    bar += strRamp.front();
+    totalFilled++;
+  }
+  return bar;
+}
+
+//----------------------------------------------------------------------------
+log::ProgressBar::ProgressBar()
+{
+  detail::init::initialize();
+  F3DLog::StartProgress();
+}
+
+//----------------------------------------------------------------------------
+log::ProgressBar::~ProgressBar()
+{
+  F3DLog::EndProgress();
+}
+
+//----------------------------------------------------------------------------
+void log::ProgressBar::operator()(const float progressPercentage)
+{
+  constexpr int barCount = 16;
+  // hex characters correspond to the filled progression bars.
+  // sorted from least filled to mostly filled.
+  constexpr std::array charRamp = std::to_array<std::string_view>(
+    { " ", "\u258f", "\u258e", "\u258d", "\u258c", "\u258b", "\u258a", "\u2589", "\u2588" });
+
+  const std::string bar = GenerateCLIBarString(progressPercentage, barCount, charRamp);
+
+  const int percentage = std::round(100 * progressPercentage);
+  const std::string percentageStr = std::format("{:3}", percentage);
+  this->timer->StopTimer();
+
+  const double estimatedTime =
+    (progressPercentage <= 1e-4) ? 0 : timer->GetElapsedTime() / progressPercentage;
+  const int estimatedMin = estimatedTime / 60;
+  const int estimatedSec = static_cast<int>(estimatedTime) % 60;
+  const int elapsedMin = timer->GetElapsedTime() / 60;
+  const int elapsedSec = static_cast<int>(timer->GetElapsedTime()) % 60;
+
+  const std::string time =
+    std::format("{:02}:{:02}/{:02}:{:02}", elapsedMin, elapsedSec, estimatedMin, estimatedSec);
+
+  f3d::log::progress(this->title, " : ", percentageStr, "% |", bar, "| [", time, "]");
 }
 
 //----------------------------------------------------------------------------

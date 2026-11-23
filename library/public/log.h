@@ -9,6 +9,8 @@
 #include <string>
 /// @endcond
 
+struct vtkTimerLog;
+
 namespace f3d
 {
 /**
@@ -23,6 +25,29 @@ namespace f3d
 class F3D_EXPORT log
 {
 public:
+  /**
+   * @class   progress
+   * @brief   Class used to represent progress bars
+   *
+   * A RAII class to show initialize and terminate the progres bar.
+   * Note that it doesn't support multiple instances of this class
+   *
+   */
+  class ProgressBar
+  {
+  public:
+    ProgressBar();
+    ~ProgressBar();
+    void operator()(float progressPercentage);
+    ProgressBar(const ProgressBar& other) = delete;
+    ProgressBar& operator=(const ProgressBar& other) = delete;
+    ProgressBar(const ProgressBar&& other) = delete;
+    ProgressBar& operator=(const ProgressBar&& other) = delete;
+
+    std::string title;
+    vtkTimerLog* timer;
+  };
+
   /**
    * Enumeration of verbose levels
    * - DEBUG: All logs are displayed, including from third parties.
