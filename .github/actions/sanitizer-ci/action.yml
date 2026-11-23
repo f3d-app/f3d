@@ -52,6 +52,10 @@ runs:
         versions_file: ${{inputs.versions_file}}
         vtk_version: ${{inputs.vtk_version}}
 
+    - name: Install pillow for image comparisons
+      shell: bash
+      run: python -m pip install pillow
+
     - name: Setup Build Directory
       shell: bash
       working-directory: ${{github.workspace}}
@@ -114,7 +118,7 @@ runs:
       run: |
         export LSAN_OPTIONS=suppressions=$(pwd)/../source/.lsan.supp:use_tls=0
         export TSAN_OPTIONS=suppressions=$(pwd)/../source/.tsan.supp
-        ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 2 --output-on-failure || ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 1 --rerun-failed -VV
+        ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 2 --output-on-failure --no-tests=error --repeat until-pass:2 --output-junit junit.xml
 
     - name: Upload Tests Artifact
       if: failure()
@@ -122,3 +126,9 @@ runs:
       with:
         path: ./build/Testing/Temporary
         name: f3d-tests-artifact-sanitizer-${{inputs.sanitizer_type}}
+
+    - name: Generate summary
+      if: always()
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: python source/utils/generate_summary.py --source_dir source --build_dir build --upload build/junit.xml >> $GITHUB_STEP_SUMMARY

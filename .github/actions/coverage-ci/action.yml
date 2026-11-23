@@ -47,6 +47,10 @@ runs:
       with:
         versions_file: ${{inputs.versions_file}}
 
+    - name: Install pillow for image comparisons
+      shell: bash
+      run: python -m pip install pillow
+
     # coverage build is done in source as it seems to be required for codecov
     # CMAKE_MODULE_PATH is required because of
     # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160
@@ -101,7 +105,7 @@ runs:
     - name: Test
       shell: bash
       working-directory: ${{github.workspace}}/source
-      run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+      run: ctest -C Release -j 2 --output-on-failure --no-tests=error --repeat until-pass:2 --output-junit junit.xml
 
     - name: Upload Tests Artifact
       if: failure()
@@ -109,6 +113,12 @@ runs:
       with:
         path: ./source/Testing/Temporary
         name: f3d-tests-artifact-coverage
+
+    - name: Generate summary
+      if: always()
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: python source/utils/generate_summary.py --source_dir source --build_dir source --upload source/junit.xml >> $GITHUB_STEP_SUMMARY
 
     - name: Generate XML Coverage
       shell: bash
