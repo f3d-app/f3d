@@ -96,5 +96,25 @@ int TestSDKInteractorDocumentation([[maybe_unused]] int argc, char* argv[])
     test("Initial doc and val after init", doc == initDoc && val == initVal);
   }
 
+  std::string ip = "127.0.0.1";
+  inter.addCommand("select_server", [&ip](const std::vector<std::string>& args) {
+    if (!args.empty())
+    {
+      ip = args[0];
+    }
+  });
+  inter.addBinding({ .Bind = { mod_t::NONE, "B" }, .Group = "Server", .DocCallback = [&ip]() {
+                      return std::make_pair(std::string("Load from server"), ip);
+                    } });
+  {
+    const auto& [doc, val] = inter.getBindingDocumentation({ mod_t::NONE, "B" });
+    test("Server binding initial value", doc == "Load from server" && val == "127.0.0.1");
+  }
+  inter.triggerCommand("select_server 192.168.0.1");
+  {
+    const auto& [doc, val] = inter.getBindingDocumentation({ mod_t::NONE, "B" });
+    test("Server binding updated value", doc == "Load from server" && val == "192.168.0.1");
+  }
+
   return test.result();
 }
