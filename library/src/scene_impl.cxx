@@ -242,22 +242,20 @@ public:
         &callbackData, this->MetaImporter, this->Interactor, color);
     }
 
-    // Update the meta importer, the will only update importers that have not been updated before
-    if (!this->MetaImporter->Update())
-    {
-      this->MetaImporter->RemoveObservers(vtkCommand::ProgressEvent);
-      progressWidget->Off();
-      f3d::log::endProgress();
-
-      this->MetaImporter->Clear();
-      this->Window.Initialize();
-      throw scene::load_failure_exception("failed to load scene");
-    }
+    bool updateSuccess = this->MetaImporter->Update();
 
     // Remove anything progress related if any
     this->MetaImporter->RemoveObservers(vtkCommand::ProgressEvent);
     progressWidget->Off();
     f3d::log::endProgress();
+
+    // Update the meta importer, the will only update importers that have not been updated before
+    if (!updateSuccess)
+    {
+      this->MetaImporter->Clear();
+      this->Window.Initialize();
+      throw scene::load_failure_exception("failed to load scene");
+    }
 
     // Initialize the animation using temporal information from the importer
     this->Animation->UpdateDynamicOptions();
