@@ -118,7 +118,7 @@ runs:
       if: always()
       shell: bash
       working-directory: ${{github.workspace}}
-      run: python source/utils/generate_summary.py --source_dir source --build_dir build --upload build/junit.xml >> $GITHUB_STEP_SUMMARY
+      run: python source/utils/generate_summary.py --source_dir source --build_dir source --upload source/junit.xml >> $GITHUB_STEP_SUMMARY
 
     - name: Generate XML Coverage
       shell: bash
