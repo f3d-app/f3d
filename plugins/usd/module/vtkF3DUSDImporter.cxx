@@ -12,6 +12,7 @@
 #include <vtkDataAssembly.h>
 #include <vtkDoubleArray.h>
 #include <vtkExecutive.h>
+#include <vtkFieldData.h>
 #include <vtkFloatArray.h>
 #include <vtkIdTypeArray.h>
 #include <vtkImageAppendComponents.h>
@@ -22,9 +23,11 @@
 #include <vtkImageResize.h>
 #include <vtkInformation.h>
 #include <vtkInformationStringKey.h>
+#include <vtkIntArray.h>
 #include <vtkLoopSubdivisionFilter.h>
 #include <vtkMatrix4x4.h>
 #include <vtkObjectFactory.h>
+#include <vtkOpenGLRenderWindow.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
@@ -43,6 +46,8 @@
 #include <vtkUniforms.h>
 #include <vtkUnsignedShortArray.h>
 #include <vtkVersion.h>
+#include <vtkWeakPointer.h>
+#include <vtk_glad.h>
 
 #include <algorithm>
 #include <cassert>
@@ -269,6 +274,10 @@ public:
     if (!actorAlreadyExists)
     {
       actor = vtkSmartPointer<vtkActor>::New();
+      if (geomPrim.GetPrim().IsA<PXR_NS::UsdGeomMesh>())
+      {
+        this->MeshActors[geomPrim.GetPath().GetAsString()].push_back(actor);
+      }
 
       // Add actor to the collection and update hierarchy
       const int actorIndex = actorCollection->GetNumberOfItems();
@@ -678,14 +687,14 @@ public:
                   this->SkelCache.GetSkinningQuery(prim))
             {
               // save skinning buffers to the polydata
-              if (skinningQuery.HasJointInfluences() && !meshAlreadyExists)
+              if (skinningQuery.HasJointInfluences())
               {
                 PXR_NS::VtIntArray jointIndices;
                 PXR_NS::VtFloatArray jointWeights;
                 const int numInfluences = skinningQuery.GetNumInfluencesPerComponent();
 
                 if (skinningQuery.ComputeVaryingJointInfluences(
-                      positions.size(), &jointIndices, &jointWeights))
+                      positions.size(), &jointIndices, &jointWeights, timeCode))
                 {
                   vtkNew<vtkUnsignedShortArray> jointsArr;
                   jointsArr->SetName("JOINTS_0");
@@ -747,18 +756,70 @@ public:
               }
 
               // save morphing info (aka blend shapes)
-              if (skinningQuery.HasBlendShapes() && !meshAlreadyExists)
+              if (skinningQuery.HasBlendShapes())
               {
                 MorphingInfo& info = this->MorphingMap[meshPrim.GetPath().GetAsString()];
 
-                // Cache blend shape data for per-frame CPU deformation
+                // A mesh rebuild can include newly sampled base points, independently of
+                // the blend shape weights. Keep both CPU and GPU bind positions current.
                 info.BindPositions = positions;
-                const PXR_NS::UsdSkelBindingAPI binding(prim);
-                const PXR_NS::UsdSkelBlendShapeQuery blendShapeQuery(binding);
-                if (blendShapeQuery)
+                if (!meshAlreadyExists)
                 {
-                  info.BlendShapePointIndices = blendShapeQuery.ComputeBlendShapePointIndices();
-                  info.SubShapePointOffsets = blendShapeQuery.ComputeSubShapePointOffsets();
+                  const PXR_NS::UsdSkelBindingAPI binding(prim);
+                  info.BlendShapeQuery = PXR_NS::UsdSkelBlendShapeQuery(binding);
+                  if (info.BlendShapeQuery)
+                  {
+                    info.BlendShapePointIndices =
+                      info.BlendShapeQuery.ComputeBlendShapePointIndices();
+                    info.SubShapePointOffsets = info.BlendShapeQuery.ComputeSubShapePointOffsets();
+                  }
+                }
+
+                if (info.BlendShapeQuery)
+                {
+                  // Per-point ranges also follow face-varying duplication when rebuilding a mesh.
+                  PXR_NS::VtVec4fArray offsets;
+                  PXR_NS::VtVec2iArray ranges;
+                  if (info.BlendShapeQuery.ComputePackedShapeTable(&offsets, &ranges))
+                  {
+                    vtkNew<vtkFloatArray> offsetsArray;
+                    offsetsArray->SetName("blendShapeOffsets");
+                    offsetsArray->SetNumberOfComponents(4);
+                    for (const PXR_NS::GfVec4f& offset : offsets)
+                    {
+                      offsetsArray->InsertNextTypedTuple(offset.data());
+                    }
+                    newPolyData->GetFieldData()->AddArray(offsetsArray);
+
+                    vtkNew<vtkFloatArray> weightsArray;
+                    weightsArray->SetName("blendShapeWeights");
+                    weightsArray->SetNumberOfValues(
+                      static_cast<vtkIdType>(info.BlendShapeQuery.GetNumSubShapes()));
+                    weightsArray->FillValue(0.f);
+                    newPolyData->GetFieldData()->AddArray(weightsArray);
+
+                    // Keep bind positions separate from the CPU-deformed points.
+                    vtkNew<vtkFloatArray> bindPositions;
+                    bindPositions->SetName("blendShapeBindPositions");
+                    bindPositions->SetNumberOfComponents(3);
+                    for (const PXR_NS::GfVec3f& position : info.BindPositions)
+                    {
+                      bindPositions->InsertNextTypedTuple(position.data());
+                    }
+                    newPolyData->GetPointData()->AddArray(bindPositions);
+
+                    vtkNew<vtkIntArray> rangesArray;
+                    rangesArray->SetName("blendShapeRanges");
+                    rangesArray->SetNumberOfComponents(2);
+                    for (size_t i = 0; i < positions.size(); i++)
+                    {
+                      // Sparse shapes may leave trailing vertices unaffected.
+                      const PXR_NS::GfVec2i range =
+                        i < ranges.size() ? ranges[i] : PXR_NS::GfVec2i(0);
+                      rangesArray->InsertNextTypedTuple(range.data());
+                    }
+                    newPolyData->GetPointData()->AddArray(rangesArray);
+                  }
                 }
               }
             }
@@ -768,6 +829,7 @@ public:
             faceVaryingFilter->Update();
 
             mappedPolydata = faceVaryingFilter->GetOutput();
+            mappedPolydata->GetFieldData()->ShallowCopy(newPolyData->GetFieldData());
           }
 
           polydata = mappedPolydata;
@@ -1040,6 +1102,7 @@ public:
             vtkNew<vtkPolyData> polydataSubset;
             polydataSubset->SetPoints(polydata->GetPoints());
             polydataSubset->GetPointData()->ShallowCopy(polydata->GetPointData());
+            polydataSubset->GetFieldData()->ShallowCopy(polydata->GetFieldData());
 
             vtkCellArray* mainPolys = polydata->GetPolys();
 
@@ -1156,7 +1219,7 @@ public:
     }
   }
 
-  void UpdateSkinningAndMorphing()
+  void UpdateSkinningAndMorphing(bool useGPUMorphing)
   {
     const PXR_NS::UsdTimeCode timeCode = this->CurrentTime * this->Stage->GetTimeCodesPerSecond();
     PXR_NS::UsdGeomXformCache xfCache(timeCode);
@@ -1179,7 +1242,12 @@ public:
           {
             const std::string primPath = skinTarget.GetPrim().GetPath().GetAsString();
 
-            vtkActor* actor = this->ActorMap[primPath];
+            const auto& actors = this->MeshActors[primPath];
+            if (actors.empty())
+            {
+              continue;
+            }
+            vtkActor* actor = actors.front();
 
             // Skinning: update shader joint matrices
             PXR_NS::VtMatrix4dArray skinningXforms;
@@ -1230,14 +1298,15 @@ public:
               }
             }
 
-            vtkShaderProperty* shaderProp = actor->GetShaderProperty();
-            vtkUniforms* uniforms = shaderProp->GetVertexCustomUniforms();
-            uniforms->RemoveAllUniforms();
-
-            if (jointMatrices.size() > 0)
+            for (vtkActor* meshActor : actors)
             {
-              uniforms->SetUniformMatrix4x4v(
-                "jointMatrices", static_cast<int>(skinningXforms.size()), jointMatrices.data());
+              vtkUniforms* uniforms = meshActor->GetShaderProperty()->GetVertexCustomUniforms();
+              uniforms->RemoveAllUniforms();
+              if (!jointMatrices.empty())
+              {
+                uniforms->SetUniformMatrix4x4v(
+                  "jointMatrices", static_cast<int>(skinningXforms.size()), jointMatrices.data());
+              }
             }
 
             // Morphing: compute blend shape deformations and update points
@@ -1258,28 +1327,68 @@ public:
               allWeights = remapped;
             }
 
-            const PXR_NS::UsdSkelBindingAPI bindingAPI(skinTarget.GetPrim());
-            const PXR_NS::UsdSkelBlendShapeQuery blendShapeQuery(bindingAPI);
+            auto& morphInfo = this->MorphingMap[primPath];
+            const auto& blendShapeQuery = morphInfo.BlendShapeQuery;
+            if (!blendShapeQuery)
+            {
+              continue;
+            }
 
             PXR_NS::VtFloatArray subShapeWeights;
             PXR_NS::VtUIntArray blendShapeIndices, subShapeIndices;
             blendShapeQuery.ComputeSubShapeWeights(
               allWeights, &subShapeWeights, &blendShapeIndices, &subShapeIndices);
 
-            const auto& morphInfo = this->MorphingMap[primPath];
+            vtkPolyData* polydata = this->MeshMap[primPath];
+            auto* packedWeights =
+              vtkFloatArray::SafeDownCast(polydata->GetFieldData()->GetArray("blendShapeWeights"));
+            if (packedWeights)
+            {
+              // Packed offsets index all sub-shapes, including inactive in-betweens.
+              auto& weights = morphInfo.PackedWeights;
+              weights.assign(static_cast<size_t>(packedWeights->GetNumberOfValues()), 0.f);
+              for (size_t i = 0; i < subShapeWeights.size(); i++)
+              {
+                weights[subShapeIndices[i]] = subShapeWeights[i];
+              }
+              if (!std::equal(weights.begin(), weights.end(), packedWeights->GetPointer(0)))
+              {
+                std::ranges::copy(weights, packedWeights->GetPointer(0));
+                packedWeights->Modified();
+              }
+            }
+
+            vtkPoints* outputPoints = polydata->GetPoints();
+            auto* bindPositions = vtkFloatArray::SafeDownCast(
+              polydata->GetPointData()->GetArray("blendShapeBindPositions"));
+            auto* packedOffsets = polydata->GetFieldData()->GetArray("blendShapeOffsets");
+            if (useGPUMorphing && packedWeights && bindPositions && packedOffsets &&
+              packedOffsets->GetNumberOfTuples() <= 16777216 &&
+              packedOffsets->GetNumberOfValues() <=
+                this->MorphingBufferSize / static_cast<vtkIdType>(sizeof(float)) &&
+              packedWeights->GetNumberOfValues() <=
+                this->MorphingBufferSize / static_cast<vtkIdType>(sizeof(float)))
+            {
+              continue;
+            }
+            auto* sourceIds =
+              vtkIdTypeArray::SafeDownCast(polydata->GetPointData()->GetArray("SourceIds"));
+            const vtkMTimeType sourceTime = sourceIds ? sourceIds->GetMTime() : 0;
+            if (morphInfo.LastPoints == outputPoints && morphInfo.LastSourceIds == sourceIds &&
+              morphInfo.LastPointsTime == outputPoints->GetMTime() &&
+              morphInfo.LastSourceTime == sourceTime && morphInfo.LastWeights == allWeights)
+            {
+              continue;
+            }
 
             // Execute CPU-side morphing
             PXR_NS::VtArray<PXR_NS::GfVec3f> positions = morphInfo.BindPositions;
-            blendShapeQuery.ComputeDeformedPoints(subShapeWeights, blendShapeIndices,
-              subShapeIndices, morphInfo.BlendShapePointIndices, morphInfo.SubShapePointOffsets,
-              positions);
-
-            // Find the VTK polydata for this mesh and update its points in-place
-            vtkPolyData* polydata = this->MeshMap[primPath];
-            vtkPoints* outputPoints = polydata->GetPoints();
-
-            const vtkIdTypeArray* sourceIds =
-              vtkIdTypeArray::SafeDownCast(polydata->GetPointData()->GetArray("SourceIds"));
+            if (!blendShapeQuery.ComputeDeformedPoints(subShapeWeights, blendShapeIndices,
+                  subShapeIndices, morphInfo.BlendShapePointIndices, morphInfo.SubShapePointOffsets,
+                  positions))
+            {
+              continue;
+            }
 
             if (sourceIds)
             {
@@ -1287,7 +1396,7 @@ public:
               {
                 // Remap if face-varying
                 const vtkIdType srcIdx = sourceIds->GetValue(i);
-                if (srcIdx < static_cast<vtkIdType>(positions.size()))
+                if (srcIdx >= 0 && srcIdx < static_cast<vtkIdType>(positions.size()))
                 {
                   const PXR_NS::GfVec3f& p = positions[srcIdx];
                   outputPoints->SetPoint(i, p[0], p[1], p[2]);
@@ -1305,6 +1414,12 @@ public:
                 }
               }
             }
+            outputPoints->Modified();
+            morphInfo.LastPoints = outputPoints;
+            morphInfo.LastSourceIds = sourceIds;
+            morphInfo.LastPointsTime = outputPoints->GetMTime();
+            morphInfo.LastSourceTime = sourceTime;
+            morphInfo.LastWeights = allWeights;
           }
         }
       }
@@ -1312,7 +1427,7 @@ public:
   }
 
   bool ImportRoot(vtkRenderer* renderer, vtkDataAssembly* hierarchy,
-    vtkActorCollection* actorCollection, bool armature)
+    vtkActorCollection* actorCollection, bool armature, bool useGPUMorphing)
   {
     if (!this->Stage)
     {
@@ -1343,7 +1458,7 @@ public:
     this->ImportNode(renderer, hierarchy, actorCollection, this->Stage->GetPseudoRoot(),
       PXR_NS::SdfPath("/"), rootTransform);
 
-    this->UpdateSkinningAndMorphing();
+    this->UpdateSkinningAndMorphing(useGPUMorphing);
 
     if (armature)
     {
@@ -1798,19 +1913,28 @@ public:
   PXR_NS::UsdStageRefPtr Stage = nullptr;
   F3DUSDMemoryResolverContext MemoryResolverContext;
   int SubdivisionLevel = 0;
+  vtkIdType MorphingBufferSize = 0;
 
 private:
   struct MorphingInfo
   {
+    PXR_NS::UsdSkelBlendShapeQuery BlendShapeQuery;
     PXR_NS::VtArray<PXR_NS::GfVec3f> BindPositions;
     std::vector<PXR_NS::VtIntArray> BlendShapePointIndices;
     std::vector<PXR_NS::VtVec3fArray> SubShapePointOffsets;
+    PXR_NS::VtFloatArray LastWeights;
+    std::vector<float> PackedWeights;
+    vtkWeakPointer<vtkPoints> LastPoints;
+    vtkWeakPointer<vtkIdTypeArray> LastSourceIds;
+    vtkMTimeType LastPointsTime = 0;
+    vtkMTimeType LastSourceTime = 0;
   };
 
   std::unordered_map<std::string,
     std::pair<vtkSmartPointer<vtkActor>, vtkSmartPointer<vtkPolyData>>>
     ArmatureMap;
   std::unordered_map<std::string, vtkSmartPointer<vtkActor>> ActorMap;
+  std::unordered_map<std::string, std::vector<vtkSmartPointer<vtkActor>>> MeshActors;
   std::unordered_map<std::string, vtkSmartPointer<vtkPolyData>> MeshMap;
   std::unordered_map<std::string, vtkSmartPointer<vtkProperty>> ShaderMap;
   std::unordered_map<std::string, vtkSmartPointer<vtkImageData>> TextureMap;
@@ -1912,13 +2036,37 @@ int vtkF3DUSDImporter::ImportBegin()
 //----------------------------------------------------------------------------
 void vtkF3DUSDImporter::ImportActors(vtkRenderer* renderer)
 {
+  if (!this->MorphingModeInitialized)
+  {
+#ifndef GL_ES_VERSION_3_0
+    // Establish the context once at load time; animation does not change this decision.
+    if (auto* window = vtkOpenGLRenderWindow::SafeDownCast(this->RenderWindow))
+    {
+      window->Start();
+      int major = 0, minor = 0;
+      window->GetOpenGLVersion(major, minor);
+      if (major > 4 || (major == 4 && minor >= 3))
+      {
+        int blocks = 0;
+        glGetIntegerv(GL_MAX_VERTEX_SHADER_STORAGE_BLOCKS, &blocks);
+        this->UseGPUMorphing = blocks >= 3;
+        GLint64 maxBlockSize = 0;
+        glGetInteger64v(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &maxBlockSize);
+        this->Internals->MorphingBufferSize = maxBlockSize;
+      }
+      window->End();
+    }
+#endif
+    this->MorphingModeInitialized = true;
+  }
   // Initialize the scene hierarchy
   this->SceneHierarchy = vtkSmartPointer<vtkDataAssembly>::New();
   this->SceneHierarchy->SetAttribute(vtkDataAssembly::GetRootNode(), "label", "root");
 
   const bool armature = this->GetImportArmature();
 
-  if (!this->Internals->ImportRoot(renderer, this->SceneHierarchy, this->ActorCollection, armature))
+  if (!this->Internals->ImportRoot(
+        renderer, this->SceneHierarchy, this->ActorCollection, armature, this->UseGPUMorphing))
   {
     this->SetFailureStatus();
   }

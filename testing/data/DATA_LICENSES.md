@@ -67,6 +67,7 @@
 - shanghai_bund_1k.hdr: Polyhaven: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - simple.laz: PDAL: Copyright (c) 2025, Hobu, Inc.
 - simple_extra.bpf: PDAL: Copyright (c) 2025, Hobu, Inc.
+- SimpleBlendShapesAnimatedPoints.usda, SimpleBlendShapesAnimatedSkin.usda, SimpleBlendShapesErrorPaths.usda, SimpleBlendShapesInbetween.usda, SimpleBlendShapesSubsets.usda: F3D regression fixtures, authored for F3D using the existing SimpleBlendShapes scenes: [BSD-3-Clause](../../LICENSE.md)
 - SimpleMorph.gltf: glTF-Sample-Models: Public Domain
 - SimpleSkin.gltf: glTF-Sample-Models: Public Domain
 - skel_animation_sparsity.usda: modified from [godot-usd](https://github.com/migueldeicaza/godot-usd/issues/2) : [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
