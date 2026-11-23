@@ -192,7 +192,6 @@ public:
     scene_impl::internals::ProgressDataStruct callbackData;
     scene_impl::internals::CLIProgressBarDataStruct cliCallbackData;
 
-    f3d::log::startProgress();
     constexpr size_t maxFileNameLength = 51;
     const int importerCount = this->MetaImporter->GetImporterInfoCount();
     if (importerCount > 1)
@@ -227,7 +226,6 @@ public:
     // Remove anything progress related if any
     this->MetaImporter->RemoveObservers(vtkCommand::ProgressEvent);
     progressWidget->Off();
-    f3d::log::endProgress();
 
     // Update the meta importer, the will only update importers that have not been updated before
     if (!updateSuccess)

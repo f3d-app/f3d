@@ -97,8 +97,9 @@ void log::ProgressBar::operator()(const float progressPercentage)
   const std::string time =
     std::format("{:02}:{:02}/{:02}:{:02}", elapsedMin, elapsedSec, estimatedMin, estimatedSec);
 
-  f3d::log::progress(this->title, " : ", percentageStr, "% |", bar, "| [", time, "]");
-}
+    std::string progressFormat = std::format("{} : {}% |{}| [{}]",this->title, percentageStr, bar, time);
+    F3DLog::Progress(progressFormat);
+};
 
 //----------------------------------------------------------------------------
 void log::printInternal(log::VerboseLevel level, const std::string& str)
@@ -151,27 +152,6 @@ void log::errorInternal(const std::string& str)
 {
   detail::init::initialize();
   F3DLog::Print(F3DLog::Severity::Error, str);
-}
-
-//----------------------------------------------------------------------------
-void log::startProgressInternal()
-{
-  detail::init::initialize();
-  F3DLog::StartProgress();
-}
-
-//----------------------------------------------------------------------------
-void log::endProgressInternal()
-{
-  detail::init::initialize();
-  F3DLog::EndProgress();
-}
-
-//----------------------------------------------------------------------------
-void log::progressInternal(const std::string& str)
-{
-  detail::init::initialize();
-  F3DLog::Progress(str);
 }
 
 //----------------------------------------------------------------------------
