@@ -46,21 +46,6 @@ runs:
         mindeps_label: ${{inputs.mindeps_label}}
         cpu: ${{inputs.cpu}}
 
-    # LLVM and Mesa are always needed
-    - name: Install LLVM dependency
-      uses: ./source/.github/actions/llvm-install-dep
-      with:
-        versions_file: ${{inputs.versions_file}}
-        mindeps_label: ${{inputs.mindeps_label}}
-        cpu: ${{inputs.cpu}}
-
-    - name: Install MESA
-      uses: ./source/.github/actions/mesa-install-dep
-      with:
-        versions_file: ${{inputs.versions_file}}
-        mindeps_label: ${{inputs.mindeps_label}}
-        cpu: ${{inputs.cpu}}
-
     - name: Install F3D dependencies
       if: inputs.optdeps_label == 'optdeps'
       uses: ./source/.github/actions/f3d-dependencies
