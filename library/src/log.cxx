@@ -83,6 +83,20 @@ void log::errorInternal(const std::string& str)
 }
 
 //----------------------------------------------------------------------------
+void log::startProgressInternal()
+{
+  detail::init::initialize();
+  F3DLog::StartProgress();
+}
+
+//----------------------------------------------------------------------------
+void log::endProgressInternal()
+{
+  detail::init::initialize();
+  F3DLog::EndProgress();
+}
+
+//----------------------------------------------------------------------------
 void log::progressInternal(const std::string& str)
 {
   detail::init::initialize();

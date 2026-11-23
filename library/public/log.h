@@ -96,6 +96,22 @@ public:
   }
 
   /**
+   * Initializes progress bar
+   */
+  static void startProgress()
+  {
+    startProgressInternal();
+  }
+
+  /**
+   * Ends the progress line in the console output window.
+   */
+  static void endProgress()
+  {
+    endProgressInternal();
+  }
+
+  /**
    * Prints provided args to update progress bar in the terminal/console output.
    * Does NOT print in the f3d internal command log.
    * if VerboseLevel is above Info, then it will not print
@@ -158,6 +174,8 @@ protected:
   static void infoInternal(const std::string& msg);
   static void debugInternal(const std::string& msg);
   static void progressInternal(const std::string& msg);
+  static void startProgressInternal();
+  static void endProgressInternal();
   //! @endcond
 };
 }
