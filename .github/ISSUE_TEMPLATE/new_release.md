@@ -26,6 +26,7 @@ Release Candidates :
 
 - [ ] Commit, review and merge a `vX.Y.Z-RCN` version change in https://github.com/f3d-app/f3d `CMakeLists.txt`, `pyproject.toml`, `package.json` and `examples/libf3d/web/package-lock.json` in the `release` branch
 - [ ] Tag and push to https://github.com/f3d-app/f3d: `git tag vX.Y.Z-RCN -m vX.Y.Z-RCN`
+- [ ] **ONLY ONCE:** Add `f3d-app/f3d-superbuild` `release.yml` to the NPM trusted publisher with all permissions (publish/dist-tags). This should be removed from the issue template after RC1 release and trusted publisher validation.
 - [ ] Trigger a release build using https://github.com/f3d-app/f3d-superbuild actions with `vX.Y.Z-RCN` F3D version, superbuild `main` branch and prerelease publish `true`
 - [ ] Download the prerelease from https://github.com/f3d-app/f3d/releases
 - [ ] Locally test the prerelease on Linux
@@ -55,6 +56,7 @@ Release :
   - [ ] Add a file `fastlane/metadata/android/en-US/changelogs/XXYYZZ00.txt` and copy Android relevant parts from the changelog.
   - [ ] Commit, review and merge the resulting changes in https://github.com/f3d-app/f3d-android
   - [ ] Tag `vX.Y.Z` and push it to https://github.com/f3d-app/f3d-android: `git tag vX.Y.Z -m vX.Y.Z`
+  - [ ] Publish library to maven central: `./gradlew :library:publishToMavenCentral -Plibf3dVersion="X.Y.Z" -PsigningInMemoryKey="$(cat gpg-key.asc)" -PsigningInMemoryKeyPassword="$MAVEN_PASSPHRASE" -PmavenCentralUsername=$MAVEN_USERNAME -PmavenCentralPassword=$MAVEN_PASSWORD`
 - [ ] Merge F3D release into master: https://github.com/f3d-app/f3d/compare/master...release
 - [ ] Trigger a release build using https://github.com/f3d-app/f3d-superbuild actions with `vX.Y.Z` F3D version, `vX.Y.Z` sb version and prerelease publish true
 - [ ] Finalize release note and add them to the release
