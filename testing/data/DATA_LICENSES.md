@@ -54,6 +54,7 @@
 - palermo_park_1k.tif : Polyhaven: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - Part-4-Buildings-V4-one.gml: VTK Data: BSD-3-Clause
 - phong_cube.fbx: assimp test models: BSD-3-Clause
+- phong_cube_ascii.fbx: converted from phong_cube.fbx: BSD-3-Clause
 - PointLightIntensityTest.glb: [KhronosGroup](https://github.com/KhronosGroup/glTF-Sample-Assets): [CC0-1.0](https://creativecommons.org/publicdomain/zero/1.0/legalcode)
 - PinkEggFromLW.dxf: assimp test models: BSD-3-Clause
 - punch.fbx: batrisya1501: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)

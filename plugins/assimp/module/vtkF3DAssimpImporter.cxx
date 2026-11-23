@@ -1460,6 +1460,35 @@ bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream, std::string& h
     }
   }
 
+  // FBX ascii detection
+  // skips comments and blank lines
+  // searches for line starting with FBXHeaderExtension:
+  parser->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  if (parser->ReadLine(line) == vtkParseResult::EndOfLine)
+  {
+    if (line.starts_with("; FBX"))
+    {
+      while (parser->ReadLine(line) == vtkParseResult::EndOfLine)
+      {
+        if (line.starts_with(";"))
+        {
+          continue;
+        }
+        // first line after comments is usually blank
+        if (line.empty())
+        {
+          continue;
+        }
+        if (line.starts_with("FBXHeaderExtension:"))
+        {
+          hint = "fbx";
+          return true;
+        }
+        break;
+      }
+    }
+  }
+
   /* DXF:
    * 0
    * SECTION
