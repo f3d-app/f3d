@@ -97,6 +97,7 @@ int TestF3DQuakeMDLParser(int vtkNotUsed(argc), char* argv[])
   std::vector<uint8_t> testMinedHeader;
   std::vector<uint8_t> testOverflowSF;
   std::vector<uint8_t> testOverflowVerts;
+  std::vector<uint8_t> testTruncatedSingleFrame;
 
   // .mdl file with no data
   {
@@ -187,6 +188,28 @@ int TestF3DQuakeMDLParser(int vtkNotUsed(argc), char* argv[])
     // sizeof(mdl_vertex_t) "mdl_simpleframe_t::verts"
     // (note : this was negated from the testOverflowSF test to trigger the specific error)
     testOverflowVerts.insert(testOverflowVerts.end(), 4, 0);
+  }
+
+  // .mdl file where a single frame is cut off
+  {
+    auto header = *PeekFromVector<mdl_header_t>(defaultFile, 0);
+    header.numSkins = 0;
+    header.skinWidth = 0;
+    header.skinHeight = 0;
+    header.numFrames = 1;
+    header.numVertices = 1;
+    header.numTriangles = 0;
+
+    // header
+    const uint8_t* data = reinterpret_cast<const uint8_t*>(&header);
+    testTruncatedSingleFrame.insert(
+      testTruncatedSingleFrame.end(), data, data + sizeof(mdl_header_t));
+    // texcoords
+    testTruncatedSingleFrame.insert(testTruncatedSingleFrame.end(), 12, 0);
+    // type
+    testTruncatedSingleFrame.insert(testTruncatedSingleFrame.end(), 4, 0);
+    // incomplete mdl_simpleframe_t
+    testTruncatedSingleFrame.insert(testTruncatedSingleFrame.end(), 8, 0);
   }
 
   // Setup
@@ -357,6 +380,32 @@ int TestF3DQuakeMDLParser(int vtkNotUsed(argc), char* argv[])
 
     vtkNew<vtkMemoryResourceStream> stream;
     stream->SetBuffer(testOverflowVerts);
+
+    vtkNew<vtkF3DQuakeMDLImporter> importer;
+    importer->SetStream(stream);
+    importer->AddObserver(vtkCommand::ErrorEvent, errorCallback);
+
+    importer->Update();
+
+    if (errors.size() != 2 ||
+      errors[0].errorString != "CreateMesh Accessed data out of range, aborting." ||
+      errors[1].errorString != "No frame read, there is nothing to display in this file.")
+    {
+      std::cerr << "Test \"" << testName << "\" failed\n";
+      return EXIT_FAILURE;
+    }
+  }
+
+  // Test "truncated single frame"
+  {
+    testName = "truncated single frame";
+    std::cout << "Running test \"" << testName << "\"\n";
+
+    std::vector<Error> errors;
+    errorCallback->SetClientData(&errors);
+
+    vtkNew<vtkMemoryResourceStream> stream;
+    stream->SetBuffer(testTruncatedSingleFrame);
 
     vtkNew<vtkF3DQuakeMDLImporter> importer;
     importer->SetStream(stream);
