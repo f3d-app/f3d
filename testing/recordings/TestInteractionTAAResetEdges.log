@@ -1,0 +1,46 @@
+# StreamVersion 1.2
+ConfigureEvent 0 1039 0 0 0 0 0
+ExposeEvent 0 1039 0 0 0 0 0
+
+# Trigger some renders to accumulate TAA samples
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+
+# Toggle edge visibility
+KeyPressEvent 0 1039 0 101 0 e 0
+CharEvent 0 1039 0 101 0 e 0
+KeyReleaseEvent 0 1039 0 101 0 e 0
+
+# Trigger some renders to accumulate TAA samples
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0
+RenderEvent 0 1039 0 0 0 0 0

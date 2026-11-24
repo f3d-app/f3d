@@ -16,6 +16,7 @@
 #include "vtkF3DPolyDataMapper.h"
 #include "vtkF3DRenderPass.h"
 #include "vtkF3DSolidBackgroundPass.h"
+#include "vtkF3DUserEvents.h"
 #include "vtkF3DUserRenderPass.h"
 
 #include <vtkActor.h>
@@ -2057,6 +2058,7 @@ void vtkF3DRenderer::SetLightIntensity(const double intensityFactor)
     this->LightIntensity = intensityFactor;
     this->LightIntensitiesConfigured = false;
     this->CheatSheetConfigured = false;
+    this->InvokeEvent(vtkF3DUserEvents::InvalidateHistoryEvent);
   }
 }
 
@@ -2438,6 +2440,7 @@ void vtkF3DRenderer::ShowEdge(const std::optional<bool>& show)
     this->EdgeVisible = show;
     this->ActorsPropertiesConfigured = false;
     this->CheatSheetConfigured = false;
+    this->InvokeEvent(vtkF3DUserEvents::InvalidateHistoryEvent);
   }
 }
 
@@ -3058,6 +3061,7 @@ void vtkF3DRenderer::SetPointSpritesType(vtkF3DRenderer::SplatType type)
     this->PointSpritesType = type;
     this->PointSpritesConfigured = false;
     this->CheatSheetConfigured = false;
+    this->InvokeEvent(vtkF3DUserEvents::InvalidateHistoryEvent);
   }
 }
 

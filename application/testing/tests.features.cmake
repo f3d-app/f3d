@@ -383,7 +383,7 @@ f3d_test(NAME TestHDRIBlurCoCLarge DATA suzanne.ply HDRI shanghai_bund_1k.hdr AR
 f3d_test(NAME TestHDRIBlurCoCZero DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --hdri-skybox=blurred --blur-coc=0 --camera-position=-20,0,20)
 f3d_test(NAME TestHDRIBlurCoCNegative DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS --hdri-skybox=blurred --blur-coc=-100 --camera-position=-20,0,20 THRESHOLD 0.05) # Small rendering differences on GLES due to LUT precision
 f3d_test(NAME TestHDRIBlurRatio DATA suzanne.ply HDRI shanghai_bund_1k.hdr RESOLUTION 600,100 ARGS --hdri-skybox=blurred)
-f3d_test(NAME TestHDRIEdges DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -e THRESHOLD 0.06 THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
+f3d_test(NAME TestHDRIEdges DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -e THRESHOLD 0.07) # Small rendering differences on GLES due to LUT precision
 f3d_test(NAME TestHDRI8Bit DATA suzanne.ply HDRI f3d.tif ARGS --color=1.0,0.0,0.0 THRESHOLD 0.1) # Threshold is needed for IBL change after VTK 9.6
 f3d_test(NAME TestHDRIOrient DATA suzanne.stl HDRI shanghai_bund_1k.hdr ARGS --up=+Z THRESHOLD 0.05) # Small rendering differences on GLES due to LUT precision
 f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -t THRESHOLD 0.06) # Small rendering differences on GLES due to LUT precision
