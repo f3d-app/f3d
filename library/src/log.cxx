@@ -4,6 +4,10 @@
 
 #include "F3DLog.h"
 
+#include <array>
+#include <cmath>
+#include <format>
+#include <string>
 #include <vtkObject.h>
 #include <vtkTimerLog.h>
 
