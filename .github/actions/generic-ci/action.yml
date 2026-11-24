@@ -327,6 +327,7 @@ runs:
       run: echo "F3D_CTEST_EXCEPTIONS=(TestLightRepresentation)|(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestPipedDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestFCStdFaceColors|TestFCStd1x|TestFCStdTransparency|TestFCStdPartDesign)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheet)|(TestMaxSizeAboveMultiFile)|(TestAxesCustomColor)|(TestInteractionTAA)|(TestInteractionStochasticTAA)|(TestInteractionPointCloudTAA)|(TestSDKNotification)|(TestUnlitOBJOpacity)|(TestInteractionGridReflectionChanged)|(TestUSDRigArmatureWithOpacity)|(TestInteractionTextureCheckerBoardTAA)" >> $GITHUB_ENV
 
     - name: Test
+      id: test
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 2 --output-on-failure --no-tests=error --repeat until-pass:2 --output-junit junit.xml
@@ -339,7 +340,7 @@ runs:
         name: f3d-tests-artifact-${{runner.os}}-${{inputs.vtk_version}}-${{inputs.build_type}}-${{inputs.cpu}}-${{inputs.bundle_label}}-${{inputs.static_label}}
 
     - name: Generate summary
-      if: always()
+      if: ${{ always() && steps.test.outcome == 'failure' }}
       shell: bash
       working-directory: ${{github.workspace}}
       run: python source/utils/generate_summary.py --source_dir source --build_dir build --upload build/junit.xml >> $GITHUB_STEP_SUMMARY

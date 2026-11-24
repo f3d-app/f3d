@@ -103,6 +103,7 @@ runs:
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
     - name: Test
+      id: test
       shell: bash
       working-directory: ${{github.workspace}}/source
       run: ctest -C Release -j 2 --output-on-failure --no-tests=error --repeat until-pass:2 --output-junit junit.xml
@@ -115,7 +116,7 @@ runs:
         name: f3d-tests-artifact-coverage
 
     - name: Generate summary
-      if: always()
+      if: ${{ always() && steps.test.outcome == 'failure' }}
       shell: bash
       working-directory: ${{github.workspace}}
       run: python source/utils/generate_summary.py --source_dir source --build_dir source --upload source/junit.xml >> $GITHUB_STEP_SUMMARY

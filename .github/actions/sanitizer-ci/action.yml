@@ -113,6 +113,7 @@ runs:
       run: echo "F3D_CTEST_EXCEPTIONS=(TestInteractionAnimationSlow)" >> $GITHUB_ENV
 
     - name: Test
+      id: test
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: |
@@ -128,7 +129,7 @@ runs:
         name: f3d-tests-artifact-sanitizer-${{inputs.sanitizer_type}}
 
     - name: Generate summary
-      if: always()
+      if: ${{ always() && steps.test.outcome == 'failure' }}
       shell: bash
       working-directory: ${{github.workspace}}
       run: python source/utils/generate_summary.py --source_dir source --build_dir build --upload build/junit.xml >> $GITHUB_STEP_SUMMARY
