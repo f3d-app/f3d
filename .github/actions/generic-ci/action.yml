@@ -266,7 +266,7 @@ runs:
     - name: Check rendering backend logic
       if: |
         runner.os != 'Windows' ||
-        inputs.optdeps_label != 'optdeps'
+        inputs.optdeps_label == 'optdeps'
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: |
