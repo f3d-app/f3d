@@ -234,6 +234,7 @@ f3d_test(NAME TestInteractionConsoleScrollbar DATA f3d.glb INTERACTION UI) #Esca
 f3d_test(NAME TestInteractionConsoleEmptyCommand DATA f3d.glb INTERACTION UI) #Escape;Enter
 f3d_test(NAME TestInteractionConsoleOverCheatSheet DATA f3d.glb INTERACTION UI) #h;Escape;Enter
 f3d_test(NAME TestInteractionConsoleAutoComplete DATA BoxAnimated.gltf INTERACTION UI) #Escape;Tab;to;Tab;Tab;_a;Tab;Enter
+f3d_test(NAME TestInteractionConsoleSelectAutoComplete DATA f3d.glb INTERACTION UI)
 f3d_test(NAME TestInteractionConsoleAutoCompleteNoMatch DATA BoxAnimated.gltf INTERACTION UI) #Escape;zz;Tab
 f3d_test(NAME TestInteractionConsoleAutoCompleteCandidates DATA BoxAnimated.gltf INTERACTION UI) #Escape;Tab;to;Tab
 f3d_test(NAME TestInteractionConsoleAutoCompleteHide DATA BoxAnimated.gltf INTERACTION UI) #Escape;Tab;to;Tab;Esc;Esc;Esc

@@ -29,6 +29,11 @@ const ImVec4 F3DStyle::imgui::GetHighlightColor()
   return intToImVec4(F3DStyle::F3D_BLUE);
 }
 
+const ImVec4 F3DStyle::imgui::GetSelectionColor()
+{
+  return intToImVec4(F3DStyle::F3D_BLUE);
+}
+
 const ImVec4 F3DStyle::imgui::GetCompletionColor()
 {
   return intToImVec4(F3DStyle::F3D_GREEN);
