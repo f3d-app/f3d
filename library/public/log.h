@@ -29,7 +29,7 @@ public:
    * @class   progress
    * @brief   Class used to represent progress bars
    *
-   * A RAII class to show initialize and terminate the progres bar.
+   * A RAII class to show initialize and terminate the progress bar.
    * Note that it doesn't support multiple instances of this class
    *
    */
