@@ -65,6 +65,8 @@ static std::string GenerateCLIBarString(
 
 //----------------------------------------------------------------------------
 log::ProgressBar::ProgressBar()
+  : timer(nullptr)
+  , title()
 {
   detail::init::initialize();
   F3DLog::StartProgress();
