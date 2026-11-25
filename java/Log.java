@@ -5,30 +5,11 @@ public class Log {
      * Enumeration of verbose levels.
      */
     public enum VerboseLevel {
-        DEBUG(0),
-        INFO(1),
-        WARN(2),
-        ERROR(3),
-        QUIET(4);
-
-        private final int value;
-
-        VerboseLevel(int value) {
-            this.value = value;
-        }
-
-        public int getValue() {
-            return value;
-        }
-
-        public static VerboseLevel fromValue(int value) {
-            for (VerboseLevel level : VerboseLevel.values()) {
-                if (level.value == value) {
-                    return level;
-                }
-            }
-            throw new IllegalArgumentException("Invalid VerboseLevel value: " + value);
-        }
+        DEBUG,
+        INFO,
+        WARN,
+        ERROR,
+        QUIET
     }
 
     /**

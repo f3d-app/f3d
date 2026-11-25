@@ -23,13 +23,6 @@ public class TestUtils {
     String envPath = Utils.getEnv("PATH");
     String envNonExistent = Utils.getEnv("F3D_NONEXISTENT_VAR_12345");
 
-    Utils.KnownFolder.ROAMINGAPPDATA.getValue();
-    Utils.KnownFolder.LOCALAPPDATA.getValue();
-    Utils.KnownFolder.PICTURES.getValue();
-    Utils.KnownFolder.fromValue(0);
-    Utils.KnownFolder.fromValue(1);
-    Utils.KnownFolder.fromValue(2);
-
     String knownFolder1 = Utils.getKnownFolder(Utils.KnownFolder.ROAMINGAPPDATA);
     String knownFolder2 = Utils.getKnownFolder(Utils.KnownFolder.LOCALAPPDATA);
     String knownFolder3 = Utils.getKnownFolder(Utils.KnownFolder.PICTURES);

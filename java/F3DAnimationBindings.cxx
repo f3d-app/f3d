@@ -29,6 +29,21 @@ static std::vector<std::string> JavaListToStringVector(JNIEnv* env, jobject list
   return vec;
 }
 
+static f3d::animation::Direction JavaDirectionToNative(JNIEnv* env, jobject direction)
+{
+  const JniLocalRef<jclass> directionEnum(env, env->GetObjectClass(direction));
+  jmethodID ordinalMethod = env->GetMethodID(directionEnum, "ordinal", "()I");
+  const jint ordinal = env->CallIntMethod(direction, ordinalMethod);
+
+  switch (ordinal)
+  {
+    case 0:
+      return f3d::animation::Direction::FORWARD;
+    default:
+      return f3d::animation::Direction::BACKWARD;
+  }
+}
+
 extern "C"
 {
   JNIEXPORT jobject JAVA_BIND(Animation, loadTime)(JNIEnv* env, jobject self, jdouble timeValue)
@@ -80,26 +95,14 @@ extern "C"
 
   JNIEXPORT jobject JAVA_BIND(Animation, toggle)(JNIEnv* env, jobject self, jobject direction)
   {
-    const JniLocalRef<jclass> directionEnum(env, env->GetObjectClass(direction));
-    jmethodID getValueMethod = env->GetMethodID(directionEnum, "getValue", "()I");
-    const jint directionValue = env->CallIntMethod(direction, getValueMethod);
-
-    const f3d::animation::Direction nativeDirection =
-      static_cast<f3d::animation::Direction>(directionValue);
-
+    const f3d::animation::Direction nativeDirection = JavaDirectionToNative(env, direction);
     GetEngine(env, self)->getScene().getAnimation().toggle(nativeDirection);
     return self;
   }
 
   JNIEXPORT jobject JAVA_BIND(Animation, start)(JNIEnv* env, jobject self, jobject direction)
   {
-    const JniLocalRef<jclass> directionEnum(env, env->GetObjectClass(direction));
-    jmethodID getValueMethod = env->GetMethodID(directionEnum, "getValue", "()I");
-    const jint directionValue = env->CallIntMethod(direction, getValueMethod);
-
-    const f3d::animation::Direction nativeDirection =
-      static_cast<f3d::animation::Direction>(directionValue);
-
+    const f3d::animation::Direction nativeDirection = JavaDirectionToNative(env, direction);
     GetEngine(env, self)->getScene().getAnimation().start(nativeDirection);
     return self;
   }
@@ -121,10 +124,18 @@ extern "C"
       GetEngine(env, self)->getScene().getAnimation().getDirection();
 
     const JniLocalRef<jclass> enumClass(env, env->FindClass("app/f3d/F3D/Animation$Direction"));
-    jmethodID fromValueMethod =
-      env->GetStaticMethodID(enumClass, "fromValue", "(I)Lapp/f3d/F3D/Animation$Direction;");
+    jfieldID fieldID;
 
-    return env->CallStaticObjectMethod(
-      enumClass, fromValueMethod, static_cast<int>(nativeDirection));
+    switch (nativeDirection)
+    {
+      case f3d::animation::Direction::FORWARD:
+        fieldID = env->GetStaticFieldID(enumClass, "FORWARD", "Lapp/f3d/F3D/Animation$Direction;");
+        break;
+      default:
+        fieldID = env->GetStaticFieldID(enumClass, "BACKWARD", "Lapp/f3d/F3D/Animation$Direction;");
+        break;
+    }
+
+    return env->GetStaticObjectField(enumClass, fieldID);
   }
 }

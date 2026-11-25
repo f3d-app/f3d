@@ -4,10 +4,6 @@ public class TestTypes {
 
   public static void main(String[] args) {
     Types.LightType lightType = Types.LightType.SCENE_LIGHT;
-    lightType.getValue();
-    Types.LightType.fromValue(1);
-    Types.LightType.fromValue(2);
-    Types.LightType.fromValue(3);
 
     Types.LightState lightState = new Types.LightState();
     Types.LightState customLight = new Types.LightState(

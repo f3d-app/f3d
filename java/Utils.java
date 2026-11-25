@@ -8,28 +8,9 @@ public class Utils {
      * Enumeration of supported Windows known folders.
      */
     public enum KnownFolder {
-        ROAMINGAPPDATA(0),
-        LOCALAPPDATA(1),
-        PICTURES(2);
-
-        private final int value;
-
-        KnownFolder(int value) {
-            this.value = value;
-        }
-
-        public int getValue() {
-            return value;
-        }
-
-        public static KnownFolder fromValue(int value) {
-            for (KnownFolder folder : KnownFolder.values()) {
-                if (folder.value == value) {
-                    return folder;
-                }
-            }
-            throw new IllegalArgumentException("Invalid KnownFolder value: " + value);
-        }
+        ROAMINGAPPDATA,
+        LOCALAPPDATA,
+        PICTURES
     }
 
     // Load the native library

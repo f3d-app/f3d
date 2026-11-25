@@ -9,27 +9,8 @@ public class Animation {
     }
 
     public enum Direction {
-        FORWARD(0),
-        BACKWARD(1);
-
-        private final int value;
-
-        Direction(int value) {
-            this.value = value;
-        }
-
-        public int getValue() {
-            return value;
-        }
-
-        public static Direction fromValue(int value) {
-            for (Direction dir : Direction.values()) {
-                if (dir.value == value) {
-                    return dir;
-                }
-            }
-            throw new IllegalArgumentException("Invalid Direction value: " + value);
-        }
+        FORWARD,
+        BACKWARD
     }
 
 
