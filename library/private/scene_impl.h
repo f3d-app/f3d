@@ -54,6 +54,8 @@ public:
   file_availability supports(const std::filesystem::path& filePath) override;
   file_availability supports(const std::byte* buffer, std::size_t size) override;
   animation& getAnimation() override;
+  double animationTime() override;
+  size_t animationFrame() override;
   ///@}
 
   /**

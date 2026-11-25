@@ -131,6 +131,9 @@ int test_scene()
 
   // Test the rest of the API
 
+f3d_scene_animation_time(scene);
+  f3d_scene_animation_frame(scene);
+
   f3d_light_state_t light_state = { 0 };
   light_state.type = F3D_LIGHT_TYPE_HEADLIGHT;
   light_state.intensity = 1.0;

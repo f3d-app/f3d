@@ -469,6 +469,16 @@ extern "C"
     return env->CallStaticObjectMethod(enumClass, fromValueMethod, static_cast<int>(result));
   }
 
+  JNIEXPORT jdouble JAVA_BIND(Scene, animationTime)(JNIEnv* env, jobject self)
+  {
+    return GetEngine(env, self)->getScene().animationTime();
+  }
+
+  JNIEXPORT jlong JAVA_BIND(Scene, animationFrame)(JNIEnv* env, jobject self)
+  {
+    return static_cast<jlong>(GetEngine(env, self)->getScene().animationFrame());
+  }
+
   JNIEXPORT jobject JAVA_BIND(Scene, supportsBuffer)(JNIEnv* env, jobject self, jbyteArray buffer)
   {
     jsize bufferLen = env->GetArrayLength(buffer);
