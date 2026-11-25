@@ -221,7 +221,7 @@ public:
         &callbackData, this->MetaImporter, this->Interactor, color);
     }
 
-    bool updateSuccess = this->MetaImporter->Update();
+    const bool updateSuccess = this->MetaImporter->Update();
 
     // Remove anything progress related if any
     this->MetaImporter->RemoveObservers(vtkCommand::ProgressEvent);

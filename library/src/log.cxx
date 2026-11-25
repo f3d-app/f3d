@@ -101,7 +101,7 @@ void log::ProgressBar::operator()(const float progressPercentage)
   const std::string time =
     std::format("{:02}:{:02}/{:02}:{:02}", elapsedMin, elapsedSec, estimatedMin, estimatedSec);
 
-  std::string progressFormat =
+  const std::string progressFormat =
     std::format("{} : {}% |{}| [{}]", this->title, percentageStr, bar, time);
   F3DLog::Progress(progressFormat);
 };
