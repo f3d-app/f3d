@@ -284,6 +284,7 @@ runs:
       with:
         path: C:\Windows\system32
         cpu: ${{ inputs.cpu == 'arm64' && 'arm64' || 'x64' }}
+        implementation: d3d12
 
     # When running standard test with auto rendering backend on linux, use glx
     - name: Run Xvfb ubuntu
