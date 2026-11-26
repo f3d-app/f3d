@@ -884,7 +884,7 @@ scene& scene_impl::clear()
   this->Internals->AddedFiles.clear();
 
   // Clear animation state
-  this->Internals->Animation->Reset();
+  this->Internals->Animation->Uninitialize();
 
   return *this;
 }

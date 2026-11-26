@@ -41,11 +41,14 @@ public:
   unsigned int count() const override;
   std::string getName(std::optional<int> index = std::nullopt) const override;
   std::vector<std::string> getNames() const override;
-  animation& toggle(Direction direction = Direction::FORWARD) override;
-  animation& start(Direction direction = Direction::FORWARD) override;
+//  animation& toggle(Direction direction = Direction::FORWARD) override;
+  animation& toggle()
+//  animation& start(Direction direction = Direction::FORWARD) override;
+  animation& start();
   animation& stop() override;
   bool isPlaying() override;
-  animation::Direction getDirection() override;
+//  animation::Direction getDirection() override;
+  animation::Mode getMode() override;
   ///@}
 
   /**
@@ -72,9 +75,9 @@ public:
 
   /**
    * Implementation only API
-   * Reset the animation to a no-animation state.
+   * Unitialized the animation to a no-animation state.
    */
-  void Reset();
+  void Uninitialize();
 
   /**
    * Implementation only API
@@ -87,7 +90,7 @@ public:
    * Implementation only API
    * Return the current animation time in seconds
    */
-  double GetCurrentTime() const;
+  std::optional<double> GetCurrentTime() const;
 
   /**
    * Implementation only API

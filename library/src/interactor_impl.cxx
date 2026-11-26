@@ -640,7 +640,11 @@ public:
 
     if (this->EventLoopUserCallback)
     {
-      this->EventLoopUserCallback({ .animationTime = this->Anim.GetCurrentTime() });
+      std::optional<double> time = this->Anim.GetCurrentTime(); 
+      this->EventLoopUserCallback(
+        { 
+          .animationTime = time.has_value() ? time.value() : 0.0
+        });
     }
 
     if (this->CommandBuffer.has_value())
@@ -1340,13 +1344,41 @@ interactor& interactor_impl::initCommands()
       "jump_to_key_frame_relative offset", "move a number of key frames forward or backward" });
 
   this->addCommand(
-    "toggle_animation", [&](const std::vector<std::string>&) { this->Internals->Anim.toggle(); },
-    command_documentation_t{ "toggle_animation", "start/stop the animation" });
+    "toggle_animation", [&](const std::vector<std::string>& args)
+    { 
+      animation::Mode mode = animation::Mode::FORWARD;
+      if (args.size() >= 1)
+      {
+        const std::string_view modeStr = args[0];
+        if (modeStr == "backward")
+        {
+          mode = animation::Mode::BACKWARD;
+        }
+        else if (modeStr == "ping_pong")
+        {
+          mode = animation::Mode::PING_PONG;
+        }
+        else if (modeStr != "forward")
+        {
+          throw interactor::invalid_args_exception(
+            std::string("Command: toggle_animation arg:\"") + std::string(modeStr) + "\" is not recognized.");
+        }
+      }
 
-  this->addCommand(
+      std::optional<int> nRepeat = std::nullopt;
+      if (args.size() >= 2)
+      {
+        nRepeat = options::parse<int>(args[1]);
+      }
+ 
+      this->Internals->Anim.toggle(mode, nRepeat); 
+    },
+    command_documentation_t{ "toggle_animation [forward/backward/ping_pong] [nRepeat]", "start/stop the animation" });
+
+/*  this->addCommand(
     "toggle_animation_backward", [&](const std::vector<std::string>&)
-    { this->Internals->Anim.toggle(animation::Direction::BACKWARD); },
-    command_documentation_t{ "toggle_animation_backward", "start/stop the animation backward" });
+    { this->Internals->Anim.toggle(animation::Mode::BACKWARD); },
+    command_documentation_t{ "toggle_animation_backward", "start/stop the animation backward" });*/
 
   // XXX: No filesystem completion, F3DStarter add its own command anyway
   this->addCommand(
@@ -1777,7 +1809,8 @@ interactor& interactor_impl::initBindings()
   this->addBinding({.Bind = {mod_t::CTRL, "Q"}, .Commands = {"stop_interactor"}, .Group = "Others", .DocCallback = std::bind(docStr, "Stop the interactor"), .Type = f3d::interactor::BindingType::OTHER, .Notify = true});
   this->addBinding({.Bind = {mod_t::NONE, "Return"}, .Commands = {"reset_camera"}, .Group = "Others", .DocCallback = std::bind(docStr, "Reset camera to initial parameters")});
   this->addBinding({.Bind = {mod_t::NONE, "Space"}, .Commands = {"toggle_animation"}, .Group = "Others", .DocCallback = std::bind(docStr, "Play/Pause animation if any")});
-  this->addBinding({.Bind = {mod_t::CTRL_SHIFT, "Space"}, .Commands = {"toggle_animation_backward"}, .Group = "Others", .DocCallback = std::bind(docStr, "Play/Pause animation backward if any")});
+  this->addBinding({.Bind = {mod_t::CTRL, "Space"}, .Commands = {"toggle_animation backward"}, .Group = "Others", .DocCallback = std::bind(docStr, "Play/Pause animation backward if any")});
+  this->addBinding({.Bind = {mod_t::CTRL_SHIFT, "Space"}, .Commands = {"toggle_animation ping_pong"}, .Group = "Others", .DocCallback = std::bind(docStr, "Play/Pause animation in ping/pong mode if any")});
   this->addBinding({.Bind = {mod_t::NONE, "Drop"}, .Commands = {"add_files"}, .Group = "Others", .DocCallback = std::bind(docStr, "Add files to the scene"), .Type = f3d::interactor::BindingType::OTHER, .Notify = true});
   this->addBinding({.Bind = {mod_t::SHIFT, "V"}, .Commands = {"cycle_verbose_level"}, .Group = "Others", .DocCallback = docVerbose, .Type  =  f3d::interactor::BindingType::CYCLIC});
   // clang-format on
