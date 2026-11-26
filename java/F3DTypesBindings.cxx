@@ -49,6 +49,37 @@ extern "C"
 
     return result;
   }
+
+  JNIEXPORT jboolean JAVA_BIND(Transform2D, compare)(
+    JNIEnv* env, jobject self, jobject other, jdouble epsilon)
+  {
+    if (!other)
+    {
+      return JNI_FALSE;
+    }
+
+    const JniLocalRef<jclass> transformClass(env, env->GetObjectClass(self));
+    jfieldID dataField = env->GetFieldID(transformClass, "data", "[D");
+    const JniLocalRef<jdoubleArray> firstArray(
+      env, static_cast<jdoubleArray>(env->GetObjectField(self, dataField)));
+    const JniLocalRef<jdoubleArray> secondArray(
+      env, static_cast<jdoubleArray>(env->GetObjectField(other, dataField)));
+
+    if (!firstArray || !secondArray || env->GetArrayLength(firstArray) != 9 ||
+      env->GetArrayLength(secondArray) != 9)
+    {
+      F3DThrowJavaException(
+        env, "java/lang/IllegalArgumentException", "Matrix arrays must have exactly 9 elements");
+      return JNI_FALSE;
+    }
+
+    std::vector<double> first(9);
+    std::vector<double> second(9);
+    env->GetDoubleArrayRegion(firstArray, 0, 9, first.data());
+    env->GetDoubleArrayRegion(secondArray, 0, 9, second.data());
+    return f3d::transform2d_t(first).compare(f3d::transform2d_t(second), epsilon);
+  }
+
   JNIEXPORT jobject JAVA_BIND(Types_00024Mesh, isValid)(JNIEnv* env, jobject self)
   {
     const JniLocalRef<jclass> meshClass(env, env->GetObjectClass(self));

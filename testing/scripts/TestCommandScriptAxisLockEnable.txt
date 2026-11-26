@@ -1,0 +1,2 @@
+toggle_axis_lock +X
+print_options_info

@@ -59,6 +59,9 @@ Toggle or cycle other options directly with these hotkeys:
 - <kbd>H</kbd>: toggle scene hierarchy.
 - <kbd>R</kbd>: toggle raytracing rendering.
 - <kbd>K</kbd>: cycle interaction style.
+- <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd>: toggle X axis rotation lock.
+- <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Y</kbd>: toggle Y axis rotation lock.
+- <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd>: toggle Z axis rotation lock.
 - <kbd>F</kbd>: toggle HDRI ambient lighting.
 - <kbd>J</kbd>: cycle HDRI skybox modes (disabled, enabled, blurred).
 - <kbd>L</kbd>: increase lights intensity.

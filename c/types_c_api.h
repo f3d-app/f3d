@@ -63,6 +63,16 @@ extern "C"
   F3D_EXPORT void f3d_color_set(f3d_color_t* color, double r, double g, double b);
 
   /**
+   * @brief Compare two colors using an absolute component tolerance.
+   *
+   * @param a First color.
+   * @param b Second color.
+   * @param epsilon Absolute tolerance for each component.
+   * @return 1 if all components match within tolerance, 0 otherwise. NULL inputs return 0.
+   */
+  F3D_EXPORT int f3d_color_compare(const f3d_color_t* a, const f3d_color_t* b, double epsilon);
+
+  /**
    * @brief Describe a 3D direction.
    */
   typedef struct f3d_direction_t
@@ -91,6 +101,17 @@ extern "C"
   F3D_EXPORT void f3d_direction_set(f3d_direction_t* dir, double x, double y, double z);
 
   /**
+   * @brief Compare two directions using an absolute component tolerance.
+   *
+   * @param a First direction.
+   * @param b Second direction.
+   * @param epsilon Absolute tolerance for each component.
+   * @return 1 if all components match within tolerance, 0 otherwise. NULL inputs return 0.
+   */
+  F3D_EXPORT int f3d_direction_compare(
+    const f3d_direction_t* a, const f3d_direction_t* b, double epsilon);
+
+  /**
    * @brief Store a 3x3 transform matrix as a sequence of 9 double values.
    */
   typedef struct f3d_transform2d_t
@@ -110,6 +131,17 @@ extern "C"
    */
   F3D_EXPORT void f3d_transform2d_create(f3d_transform2d_t* transform, double scale_x,
     double scale_y, double translate_x, double translate_y, f3d_angle_deg_t angle_deg);
+
+  /**
+   * @brief Compare two transforms using an absolute component tolerance.
+   *
+   * @param a First transform.
+   * @param b Second transform.
+   * @param epsilon Absolute tolerance for each component.
+   * @return 1 if all components match within tolerance, 0 otherwise. NULL inputs return 0.
+   */
+  F3D_EXPORT int f3d_transform2d_compare(
+    const f3d_transform2d_t* a, const f3d_transform2d_t* b, double epsilon);
 
   /**
    * @brief Describe a colormap.

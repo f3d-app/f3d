@@ -841,6 +841,9 @@ PYBIND11_MODULE(pyf3d, module)
   py::class_<f3d::color_t>(module, "Color")
     .def(py::init<>())
     .def(py::init<double, double, double>(), py::arg("r"), py::arg("g"), py::arg("b"))
+    .def(
+      "compare", [](const f3d::color_t& color, const f3d::color_t& other, double epsilon)
+      { return color.compare(other, epsilon); }, py::arg("other"), py::arg("epsilon"))
     .def_property(
       "r", [](const f3d::color_t& color) { return color.r(); },
       [](f3d::color_t& color, double value) { color[0] = value; })

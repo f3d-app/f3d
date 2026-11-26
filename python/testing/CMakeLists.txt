@@ -9,6 +9,7 @@ list(APPEND pyf3dTests_list
      test_options.py
      test_scene.py
      test_scene_buffer.py
+     test_types.py
      test_utils.py
      test_video.py
      test_window.py
@@ -29,6 +30,7 @@ endif()
 list(APPEND pyf3dTestsNoRender_list
      test_options.py
      test_engine.py
+     test_types.py
      test_utils.py
 )
 
