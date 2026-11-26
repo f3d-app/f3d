@@ -508,9 +508,7 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   // Setup backend name
   io.BackendPlatformName = io.BackendRendererName = "F3D/VTK";
   io.BackendFlags |= ImGuiBackendFlags_RendererHasTextures;
-#ifdef VTK_CURSOR_IBEAM
   io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
-#endif
 
 #if F3D_MODULE_CLIP
   ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
@@ -1471,7 +1469,6 @@ void vtkF3DImguiActor::EndFrame(vtkOpenGLRenderWindow* renWin)
   ImGui::Render();
   this->Pimpl->RenderDrawData(renWin, ImGui::GetDrawData());
 
-#ifdef VTK_CURSOR_IBEAM
   ImGuiIO& io = ImGui::GetIO();
   if ((io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange) == 0)
   {
@@ -1484,9 +1481,11 @@ void vtkF3DImguiActor::EndFrame(vtkOpenGLRenderWindow* renWin)
     renWin->ShowCursor();
     switch (cursor)
     {
+#ifdef VTK_CURSOR_IBEAM
       case ImGuiMouseCursor_TextInput:
         renWin->SetCurrentCursor(VTK_CURSOR_IBEAM);
         break;
+#endif
       case ImGuiMouseCursor_ResizeAll:
         renWin->SetCurrentCursor(VTK_CURSOR_SIZEALL);
         break;
@@ -1505,22 +1504,27 @@ void vtkF3DImguiActor::EndFrame(vtkOpenGLRenderWindow* renWin)
       case ImGuiMouseCursor_Hand:
         renWin->SetCurrentCursor(VTK_CURSOR_HAND);
         break;
+#ifdef VTK_CURSOR_WAIT
       case ImGuiMouseCursor_Wait:
         renWin->SetCurrentCursor(VTK_CURSOR_WAIT);
         break;
+#endif
+#ifdef VTK_CURSOR_PROGRESS
       case ImGuiMouseCursor_Progress:
         renWin->SetCurrentCursor(VTK_CURSOR_PROGRESS);
         break;
+#endif
+#ifdef VTK_CURSOR_NOTALLOWED
       case ImGuiMouseCursor_NotAllowed:
         renWin->SetCurrentCursor(VTK_CURSOR_NOTALLOWED);
         break;
+#endif
       case ImGuiMouseCursor_Arrow:
       default:
         renWin->SetCurrentCursor(VTK_CURSOR_ARROW);
         break;
     }
   }
-#endif
 }
 
 //----------------------------------------------------------------------------
