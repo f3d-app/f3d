@@ -573,9 +573,6 @@ public:
       }
     }
 
-    // Update the dynamic options of the animation so check if the cheatsheet needs an
-    // update.
-    this->Anim.UpdateDynamicOptions();
     // Always render after interaction
     this->Window.render();
   }
@@ -662,7 +659,6 @@ public:
       this->CommandBuffer.reset();
     }
 
-    this->Anim.UpdateDynamicOptions();
     this->Anim.SetDeltaTime(deltaTime);
     this->Anim.Tick();
 
