@@ -41,6 +41,10 @@
     "skip_content_check": {
       "type": "bool",
       "default_value": "false"
+    },
+    "coordinate_normalize": {
+      "type": "bool",
+      "default_value": "false"
     }
   },
   "render": {
