@@ -169,7 +169,7 @@ std::vector<std::string> animation_impl::getNames() const
 // DEPRECATED
 animation& animation_impl::toggle(Direction direction)
 {
-  this->Internals->Options.scene.animation.mode = "forward";
+  this->Internals->Options.scene.animation.mode = direction == Direction::BACKWARD ? "backward" : "forward";
   this->toggle();
   return *this;
 }
@@ -198,7 +198,7 @@ animation& animation_impl::toggle()
 // DEPRECATED
 animation& animation_impl::start(Direction direction)
 {
-  this->Internals->Options.scene.animation.mode = "forward";
+  this->Internals->Options.scene.animation.mode = direction == Direction::BACKWARD ? "backward" : "forward";
   this->toggle();
   return *this;
 }

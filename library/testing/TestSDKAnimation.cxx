@@ -15,6 +15,7 @@ int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
   f3d::scene& sce = eng.getScene();
   f3d::animation& anim = sce.getAnimation();
   f3d::interactor& inter = eng.getInteractor();
+  f3d::options& opt = eng.getOptions();
 
   test("animations count for empty scene", anim.count() == 0);
 
@@ -31,14 +32,12 @@ int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
 
   anim.start();
   test("isPlaying after start", anim.isPlaying());
-  test("isPlaying forward after start", anim.getDirection() == f3d::animation::Direction::FORWARD);
 
   anim.toggle();
   test("isPlaying after toggle off", !anim.isPlaying());
 
   anim.toggle();
   test("isPlaying after toggle on", anim.isPlaying());
-  test("isPlaying forward toggle on", anim.getDirection() == f3d::animation::Direction::FORWARD);
 
   f3d::interactor& interRef = inter.triggerEventLoop(0.1);
   test("triggerEventLoop returns self", &interRef == &inter);
@@ -61,24 +60,11 @@ int TestSDKAnimation([[maybe_unused]] int argc, char* argv[])
   test("check first key frames", keyFrames[0], 0.0);
   test("check last key frames", keyFrames[8], 0.7999999999999999);
 
-  anim.start(f3d::animation::Direction::FORWARD);
-  test("isPlaying backward after forward start",
-    anim.getDirection() == f3d::animation::Direction::FORWARD);
+  // TODO better test ?
+  opt.scene.animation.mode = "backward";
+  anim.start();
   anim.stop();
-
-  anim.start(f3d::animation::Direction::BACKWARD);
-  test("isPlaying backward after backward start",
-    anim.getDirection() == f3d::animation::Direction::BACKWARD);
-  anim.stop();
-
-  anim.toggle(f3d::animation::Direction::FORWARD);
-  test("isPlaying backward after forward toggle on",
-    anim.getDirection() == f3d::animation::Direction::FORWARD);
-  anim.stop();
-
-  anim.toggle(f3d::animation::Direction::BACKWARD);
-  test("isPlaying backward after backward toggle on",
-    anim.getDirection() == f3d::animation::Direction::BACKWARD);
+  anim.toggle();
   anim.stop();
 
   return test.result();

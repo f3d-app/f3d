@@ -67,7 +67,7 @@ public:
    * Enumeration of animation direction.
    * Deprecated, do not use.
    */
-  enum [[deprecated]] class Direction : std::uint8_t
+  enum class Direction : std::uint8_t
   {
     FORWARD,
     BACKWARD
@@ -89,7 +89,7 @@ public:
    * Set the animation direction in the provided direction then
    * start the animation if not already started.
    */
-  [[deprecated]] virtual animation& start(Direction direction = Direction::FORWARD) = 0;
+  [[deprecated]] virtual animation& start(Direction direction) = 0;
 
   /**
    * start the animation if not already started.
