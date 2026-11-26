@@ -48,10 +48,6 @@ public:
   double CurrentTime = 0;
   double DeltaTime = 0;
   bool CurrentTimeSet = false;
-
-  // Dynamic options
-  bool Autoplay = false;
-  double SpeedFactor = 1.0;
 };
 
 //----------------------------------------------------------------------------
@@ -287,7 +283,7 @@ void animation_impl::Initialize()
     log::debug(i, ": ", this->Internals->Importer->GetAnimationName(i));
   }
 
-  if (this->Internals->Autoplay)
+  if (this->Internals->Options.scene.animation.autoplay)
   {
     this->start();
   }
@@ -316,7 +312,8 @@ void animation_impl::Tick()
   if (this->Internals->Playing)
   {
     this->Internals->CurrentTime +=
-      (this->Internals->DeltaTime * this->Internals->SpeedFactor) * this->Internals->AnimDir;
+      (this->Internals->DeltaTime * this->Internals->Options.scene.animation.speed_factor) *
+      this->Internals->AnimDir;
 
     // Modulo computation, compute CurrentTime in the time range.
     if (this->Internals->CurrentTime < this->Internals->TimeRange[0] ||
@@ -343,7 +340,8 @@ void animation_impl::Tick()
 void animation_impl::JumpToFrame(int frame, bool relative)
 {
   assert(this->Internals->DeltaTime > 0);
-  const double frameDuration = (this->Internals->DeltaTime * this->Internals->SpeedFactor);
+  const double frameDuration =
+    (this->Internals->DeltaTime * this->Internals->Options.scene.animation.speed_factor);
   const double currentFrame =
     (this->Internals->CurrentTime - this->Internals->TimeRange[0]) / frameDuration;
 
@@ -362,7 +360,8 @@ void animation_impl::JumpToFrame(int frame, bool relative)
   }
 
   this->Internals->CurrentTime = this->Internals->TimeRange[0] +
-    (nextFrame * this->Internals->DeltaTime * this->Internals->SpeedFactor);
+    (nextFrame * this->Internals->DeltaTime *
+      this->Internals->Options.scene.animation.speed_factor);
 
   if (this->LoadAtTime(this->Internals->CurrentTime))
   {
@@ -692,40 +691,6 @@ void animation_impl::PrepareForAnimationIndices()
   }
 
   log::debug("");
-}
-
-//----------------------------------------------------------------------------
-void animation_impl::SetCheatSheetConfigured(bool configured)
-{
-  vtkF3DRenderer* ren = this->Internals->Window.GetRenderer();
-  ren->SetCheatSheetConfigured(configured);
-}
-
-//----------------------------------------------------------------------------
-void animation_impl::SetAutoplay(bool enable)
-{
-  if (this->Internals->Autoplay != enable)
-  {
-    this->Internals->Autoplay = enable;
-    this->SetCheatSheetConfigured(false);
-  }
-}
-
-//----------------------------------------------------------------------------
-void animation_impl::SetSpeedFactor(double speedFactor)
-{
-  if (this->Internals->SpeedFactor != speedFactor)
-  {
-    this->Internals->SpeedFactor = speedFactor;
-    this->SetCheatSheetConfigured(false);
-  }
-}
-
-//----------------------------------------------------------------------------
-void animation_impl::UpdateDynamicOptions()
-{
-  this->SetAutoplay(this->Internals->Options.scene.animation.autoplay);
-  this->SetSpeedFactor(this->Internals->Options.scene.animation.speed_factor);
 }
 
 //----------------------------------------------------------------------------

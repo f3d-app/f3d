@@ -130,12 +130,6 @@ public:
    */
   void JumpToTime(double timeValue, bool relative);
 
-  /**
-   * Implementation only API
-   * Update the dynamic options value to trigger cheatsheet update if needed.
-   */
-  void UpdateDynamicOptions();
-
 private:
   /**
    * Prepare time range and internal members for animation indices from options
@@ -147,21 +141,6 @@ private:
    * Push the current animation's time range and name to the UI actor.
    */
   void PushAnimationProgress();
-
-  /**
-   * Internal setter for Autoplay.
-   */
-  void SetAutoplay(bool enable);
-
-  /**
-   * Internal setter for SpeedFactor.
-   */
-  void SetSpeedFactor(double speedFactor);
-
-  /**
-   * Helper method to call the homonymous method from vtkF3DRenderer.
-   */
-  void SetCheatSheetConfigured(bool configured);
 
 private:
   class internals;
