@@ -65,36 +65,35 @@ public:
 
   /**
    * Enumeration of animation direction.
+   * Deprecated, do not use.
    */
-/*  enum class Direction : std::uint8_t
+  enum [[deprecated]] class Direction : std::uint8_t
   {
     FORWARD,
     BACKWARD
-  };*/
-
-  /**
-   * Enumeration of animation mode.
-   */
-  enum class Mode : std::uint8_t
-  {
-    FORWARD,
-    BACKWARD,
-    PING_PONG
   };
 
   /**
    * Set the animation direction in the provided direction then
    * toggle (start if stopped or stop is started) the animation.
+   * Deprecated, do not use.
    */
-  //virtual animation& toggle(Direction direction = Direction::FORWARD) = 0;
+  [[deprecated]] virtual animation& toggle(Direction direction) = 0;
+
+  /**
+   * toggle (start if stopped or stop is started) the animation.
+   */
   virtual animation& toggle() = 0;
-  virtual animation& reset() = 0;
 
   /**
    * Set the animation direction in the provided direction then
    * start the animation if not already started.
    */
-  //virtual animation& start(Direction direction = Direction::FORWARD) = 0;
+  [[deprecated]] virtual animation& start(Direction direction = Direction::FORWARD) = 0;
+
+  /**
+   * start the animation if not already started.
+   */
   virtual animation& start() = 0;
 
   /**
@@ -103,15 +102,21 @@ public:
   virtual animation& stop() = 0;
 
   /**
+   * Reset the animation to original state, before starting.
+   */
+  virtual animation& reset() = 0;
+
+
+  /**
    * Return if the animation is currently playing or not
    */
   [[nodiscard]] virtual bool isPlaying() = 0;
 
   /**
    * Return the animation direction, default is Direction::FORWARD
+   * Deprecated, do not use
    */
-//  [[nodiscard]] virtual animation::Direction getDirection() = 0;
-//  [[nodiscard]] virtual animation::Mode getMode() = 0;
+  [[deprecated]] [[nodiscard]] virtual animation::Direction getDirection() = 0;
 
 protected:
   //! @cond
