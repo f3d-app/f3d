@@ -68,7 +68,12 @@ public:
   [[nodiscard]] virtual camera_state_t getState() const = 0;
   /** Get the complete state of the camera into the provided arg */
   virtual void getState(camera_state_t& state) const = 0;
-
+  /** Return the camera azimuth angle in degrees */
+  [[nodiscard]] virtual double getWorldAzimuth() const = 0;
+  /** Return the camera elevation angle in degrees */
+  [[nodiscard]] virtual double getWorldElevation() const = 0;
+  /** Return the distance between the camera position and its focal point */
+  [[nodiscard]] virtual double getDistance() const = 0;
   ///@}
 
   ///@{ @name Manipulation

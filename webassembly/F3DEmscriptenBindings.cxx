@@ -695,6 +695,9 @@ EMSCRIPTEN_BINDINGS(f3d)
       "state", +[](const f3d::camera& cam) -> f3d::camera_state_t { return cam.getState(); },
       +[](f3d::camera& cam, const f3d::camera_state_t& state) -> f3d::camera&
       { return cam.setState(state); })
+    .function("getWorldAzimuth", &f3d::camera::getWorldAzimuth)
+    .function("getWorldElevation", &f3d::camera::getWorldElevation)
+    .function("getDistance", &f3d::camera::getDistance)
     .function("dolly", &f3d::camera::dolly, emscripten::return_value_policy::reference())
     .function("pan", &f3d::camera::pan, emscripten::return_value_policy::reference())
     .function("zoom", &f3d::camera::zoom, emscripten::return_value_policy::reference())

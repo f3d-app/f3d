@@ -28,6 +28,10 @@ public class TestCamera {
     camera.setFocalPoint(new double[]{0.5, 0.6, 0.7});
     camera.getFocalPoint();
 
+    camera.getWorldAzimuth();
+    camera.getWorldElevation();
+    camera.getDistance();
+
     camera.setViewUp(new double[]{0.0, 1.0, 0.0});
     camera.getViewUp();
 
