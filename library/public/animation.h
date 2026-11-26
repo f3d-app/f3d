@@ -88,6 +88,7 @@ public:
    */
   //virtual animation& toggle(Direction direction = Direction::FORWARD) = 0;
   virtual animation& toggle() = 0;
+  virtual animation& reset() = 0;
 
   /**
    * Set the animation direction in the provided direction then
@@ -110,7 +111,7 @@ public:
    * Return the animation direction, default is Direction::FORWARD
    */
 //  [[nodiscard]] virtual animation::Direction getDirection() = 0;
-  [[nodiscard]] virtual animation::Mode getMode() = 0;
+//  [[nodiscard]] virtual animation::Mode getMode() = 0;
 
 protected:
   //! @cond

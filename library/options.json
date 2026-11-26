@@ -21,16 +21,18 @@
           "min": "0.0",
           "max": "2.0",
           "increment": "0.1"
-        },
+        }
+      },
       "mode": {
         "type": "string",
         "default_value": "forward",
         "domain": {
           "style": "enum",
           "enum": ["forward", "backward", "ping_pong"]
-        },
+        }
+      },
       "number_of_loops": {
-        "type": "int",
+        "type": "int"
       }
     },
     "camera": {
