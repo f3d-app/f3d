@@ -508,6 +508,7 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   // Setup backend name
   io.BackendPlatformName = io.BackendRendererName = "F3D/VTK";
   io.BackendFlags |= ImGuiBackendFlags_RendererHasTextures;
+  io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
 
 #if F3D_MODULE_CLIP
   ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
@@ -1467,6 +1468,63 @@ void vtkF3DImguiActor::EndFrame(vtkOpenGLRenderWindow* renWin)
 {
   ImGui::Render();
   this->Pimpl->RenderDrawData(renWin, ImGui::GetDrawData());
+
+  ImGuiIO& io = ImGui::GetIO();
+  if ((io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange) == 0)
+  {
+    ImGuiMouseCursor cursor = ImGui::GetMouseCursor();
+    if (cursor == ImGuiMouseCursor_None)
+    {
+      renWin->HideCursor();
+      return;
+    }
+    renWin->ShowCursor();
+    switch (cursor)
+    {
+#ifdef VTK_CURSOR_IBEAM
+      case ImGuiMouseCursor_TextInput:
+        renWin->SetCurrentCursor(VTK_CURSOR_IBEAM);
+        break;
+#endif
+      case ImGuiMouseCursor_ResizeAll:
+        renWin->SetCurrentCursor(VTK_CURSOR_SIZEALL);
+        break;
+      case ImGuiMouseCursor_ResizeNS:
+        renWin->SetCurrentCursor(VTK_CURSOR_SIZENS);
+        break;
+      case ImGuiMouseCursor_ResizeEW:
+        renWin->SetCurrentCursor(VTK_CURSOR_SIZEWE);
+        break;
+      case ImGuiMouseCursor_ResizeNESW:
+        renWin->SetCurrentCursor(VTK_CURSOR_SIZESW);
+        break;
+      case ImGuiMouseCursor_ResizeNWSE:
+        renWin->SetCurrentCursor(VTK_CURSOR_SIZESE);
+        break;
+      case ImGuiMouseCursor_Hand:
+        renWin->SetCurrentCursor(VTK_CURSOR_HAND);
+        break;
+#ifdef VTK_CURSOR_WAIT
+      case ImGuiMouseCursor_Wait:
+        renWin->SetCurrentCursor(VTK_CURSOR_WAIT);
+        break;
+#endif
+#ifdef VTK_CURSOR_PROGRESS
+      case ImGuiMouseCursor_Progress:
+        renWin->SetCurrentCursor(VTK_CURSOR_PROGRESS);
+        break;
+#endif
+#ifdef VTK_CURSOR_NOTALLOWED
+      case ImGuiMouseCursor_NotAllowed:
+        renWin->SetCurrentCursor(VTK_CURSOR_NOTALLOWED);
+        break;
+#endif
+      case ImGuiMouseCursor_Arrow:
+      default:
+        renWin->SetCurrentCursor(VTK_CURSOR_ARROW);
+        break;
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
