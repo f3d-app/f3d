@@ -41,8 +41,11 @@ public:
   unsigned int count() const override;
   std::string getName(std::optional<int> index = std::nullopt) const override;
   std::vector<std::string> getNames() const override;
-  animation& toggle(Direction direction = Direction::FORWARD) override;
-  animation& start(Direction direction = Direction::FORWARD) override;
+  animation& toggle(Direction direction) override;
+  animation& toggle();
+  animation& reset();
+  animation& start(Direction direction) override;
+  animation& start();
   animation& stop() override;
   bool isPlaying() override;
   animation::Direction getDirection() override;
@@ -72,9 +75,9 @@ public:
 
   /**
    * Implementation only API
-   * Reset the animation to a no-animation state.
+   * Unitialized the animation to a no-animation state.
    */
-  void Reset();
+  void Uninitialize();
 
   /**
    * Implementation only API
@@ -87,7 +90,7 @@ public:
    * Implementation only API
    * Return the current animation time in seconds
    */
-  double GetCurrentTime() const;
+  std::optional<double> GetCurrentTime() const;
 
   /**
    * Implementation only API
@@ -130,12 +133,6 @@ public:
    */
   void JumpToTime(double timeValue, bool relative);
 
-  /**
-   * Implementation only API
-   * Update the dynamic options value to trigger cheatsheet update if needed.
-   */
-  void UpdateDynamicOptions();
-
 private:
   /**
    * Prepare time range and internal members for animation indices from options
@@ -147,21 +144,6 @@ private:
    * Push the current animation's time range and name to the UI actor.
    */
   void PushAnimationProgress();
-
-  /**
-   * Internal setter for Autoplay.
-   */
-  void SetAutoplay(bool enable);
-
-  /**
-   * Internal setter for SpeedFactor.
-   */
-  void SetSpeedFactor(double speedFactor);
-
-  /**
-   * Helper method to call the homonymous method from vtkF3DRenderer.
-   */
-  void SetCheatSheetConfigured(bool configured);
 
 private:
   class internals;

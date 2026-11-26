@@ -39,19 +39,15 @@ public:
   interactor_impl* Interactor = nullptr;
 
   int AvailAnimations = 0;
-  int AnimDir = 1;
-
   std::optional<std::vector<int>> PreparedAnimationIndices;
   vtkNew<vtkDoubleArray> AnimationTimeSteps;
   double TimeRange[2] = { 0.0, 0.0 };
   bool Playing = false;
-  double CurrentTime = 0;
   double DeltaTime = 0;
-  bool CurrentTimeSet = false;
 
-  // Dynamic options
-  bool Autoplay = false;
-  double SpeedFactor = 1.0;
+  std::optional<double> CurrentTime = std::nullopt;
+  std::optional<int> CurrentAnimDir = std::nullopt;
+  int CurrentNumberOfLoop = 0;
 };
 
 //----------------------------------------------------------------------------
@@ -170,25 +166,21 @@ std::vector<std::string> animation_impl::getNames() const
 }
 
 //----------------------------------------------------------------------------
+// DEPRECATED
 animation& animation_impl::toggle(Direction direction)
 {
-  this->Internals->AnimDir = (direction == Direction::FORWARD ? 1 : -1);
+  this->Internals->Options.scene.animation.mode = direction == Direction::BACKWARD ? "backward" : "forward";
+  this->toggle();
+  return *this;
+}
 
+//----------------------------------------------------------------------------
+animation& animation_impl::toggle()
+{
   this->PrepareForAnimationIndices();
   if (!this->Internals->PreparedAnimationIndices.value().empty() && this->Internals->Interactor)
   {
     this->Internals->Playing = !this->Internals->Playing;
-
-    if (this->Internals->Playing)
-    {
-      // Initialize time if not already
-      if (!this->Internals->CurrentTimeSet)
-      {
-        this->Internals->CurrentTime = this->Internals->TimeRange[0];
-        this->Internals->CurrentTimeSet = true;
-      }
-    }
-
     if (this->Internals->Playing && this->Internals->Options.scene.camera.index.has_value())
     {
       this->Internals->Interactor->disableCameraMovement();
@@ -203,11 +195,20 @@ animation& animation_impl::toggle(Direction direction)
 }
 
 //----------------------------------------------------------------------------
+// DEPRECATED
 animation& animation_impl::start(Direction direction)
+{
+  this->Internals->Options.scene.animation.mode = direction == Direction::BACKWARD ? "backward" : "forward";
+  this->toggle();
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+animation& animation_impl::start()
 {
   if (!this->isPlaying())
   {
-    this->toggle(direction);
+    this->toggle();
   }
 
   return *this;
@@ -225,15 +226,32 @@ animation& animation_impl::stop()
 }
 
 //----------------------------------------------------------------------------
+animation& animation_impl::reset()
+{
+  this->stop();
+  this->PrepareForAnimationIndices();
+  this->Internals->CurrentTime = std::nullopt;
+  this->Internals->CurrentAnimDir = std::nullopt;
+  this->Internals->CurrentNumberOfLoop = 0;
+  if (this->LoadAtTime(this->Internals->TimeRange[0]))
+  {
+    this->Internals->Window.render();
+  }
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 bool animation_impl::isPlaying()
 {
   return this->Internals->Playing;
 }
 
 //----------------------------------------------------------------------------
+// DEPRECATED
 animation::Direction animation_impl::getDirection()
 {
-  return this->Internals->AnimDir == 1 ? Direction::FORWARD : Direction::BACKWARD;
+  return this->Internals->Options.scene.animation.mode == "backward" ? Direction::BACKWARD : Direction::FORWARD;
+  return  Direction::FORWARD;
 }
 
 //----------------------------------------------------------------------------
@@ -259,8 +277,7 @@ void animation_impl::Initialize()
 {
   assert(this->Internals->Importer);
   this->Internals->Playing = false;
-  this->Internals->CurrentTime = 0;
-  this->Internals->CurrentTimeSet = false;
+  this->Internals->CurrentTime = std::nullopt;
 
   this->Internals->AvailAnimations = this->Internals->Importer->GetNumberOfAnimations();
 
@@ -287,19 +304,18 @@ void animation_impl::Initialize()
     log::debug(i, ": ", this->Internals->Importer->GetAnimationName(i));
   }
 
-  if (this->Internals->Autoplay)
+  if (this->Internals->Options.scene.animation.autoplay)
   {
     this->start();
   }
 }
 
 //----------------------------------------------------------------------------
-void animation_impl::Reset()
+void animation_impl::Uninitialize()
 {
   assert(this->Internals->Importer);
   this->Internals->Playing = false;
-  this->Internals->CurrentTime = 0;
-  this->Internals->CurrentTimeSet = false;
+  this->Internals->CurrentTime = std::nullopt;
   this->Internals->AvailAnimations = 0;
 
   this->Internals->PreparedAnimationIndices.reset();
@@ -315,24 +331,69 @@ void animation_impl::Tick()
   assert(this->Internals->DeltaTime > 0);
   if (this->Internals->Playing)
   {
-    this->Internals->CurrentTime +=
-      (this->Internals->DeltaTime * this->Internals->SpeedFactor) * this->Internals->AnimDir;
+    // Initialize time if not already
+    if (!this->Internals->CurrentTime.has_value())
+    {
+      this->Internals->CurrentTime = this->Internals->Options.scene.animation.mode == "backward" ? this->Internals->TimeRange[1] : this->Internals->TimeRange[0];
+    }
+
+    if (this->Internals->Options.scene.animation.mode == "forward")
+    {
+      this->Internals->CurrentAnimDir = 1;
+    }
+    else if (this->Internals->Options.scene.animation.mode == "backward")
+    {
+      this->Internals->CurrentAnimDir = -1;
+    }
+    else if (this->Internals->Options.scene.animation.mode == "ping_pong")
+    {
+      if (this->Internals->CurrentAnimDir == std::nullopt)
+      {
+        this->Internals->CurrentAnimDir = 1;
+      }
+    }
+    else
+    {
+      log::warn(this->Internals->Options.scene.animation.mode,
+        R"( is an invalid animation mode. Valid modes are: "forward", "backward", "ping_pong". Using forward mode.)");
+    }
+
+    double actualDeltaTime = this->Internals->DeltaTime * this->Internals->Options.scene.animation.speed_factor * this->Internals->CurrentAnimDir.value();
+    this->Internals->CurrentTime = this->Internals->CurrentTime.value() + actualDeltaTime;
 
     // Modulo computation, compute CurrentTime in the time range.
-    if (this->Internals->CurrentTime < this->Internals->TimeRange[0] ||
-      this->Internals->CurrentTime > this->Internals->TimeRange[1])
+    if (this->Internals->CurrentTime.value() < this->Internals->TimeRange[0] ||
+        this->Internals->CurrentTime.value() > this->Internals->TimeRange[1])
     {
+      if (this->Internals->Options.scene.animation.mode != "ping_pong" || this->Internals->CurrentAnimDir.value() == -1)
+      {
+        this->Internals->CurrentNumberOfLoop++;
+      }
+
+      if (this->Internals->Options.scene.animation.number_of_loops.has_value()
+        &&  this->Internals->CurrentNumberOfLoop >= this->Internals->Options.scene.animation.number_of_loops.value())
+      {
+        this->reset();
+        return;
+      }
+
+      if (this->Internals->Options.scene.animation.mode == "ping_pong")
+      {
+        this->Internals->CurrentAnimDir = -1 * this->Internals->CurrentAnimDir.value();
+        this->Internals->CurrentTime = this->Internals->CurrentTime.value() - 2 * actualDeltaTime;
+      }
+
       auto modulo = [](double val, double mod)
       {
         const double remainder = fmod(val, mod);
         return remainder < 0 ? remainder + mod : remainder;
       };
-      this->Internals->CurrentTime = this->Internals->TimeRange[0] +
-        modulo(this->Internals->CurrentTime - this->Internals->TimeRange[0],
-          this->Internals->TimeRange[1] - this->Internals->TimeRange[0]);
+      this->Internals->CurrentTime.value() = this->Internals->TimeRange[0] +
+        modulo(this->Internals->CurrentTime.value() - this->Internals->TimeRange[0],
+               this->Internals->TimeRange[1] - this->Internals->TimeRange[0]);
     }
 
-    if (this->LoadAtTime(this->Internals->CurrentTime))
+    if (this->LoadAtTime(this->Internals->CurrentTime.value()))
     {
       this->Internals->Window.render();
     }
@@ -342,10 +403,12 @@ void animation_impl::Tick()
 //----------------------------------------------------------------------------
 void animation_impl::JumpToFrame(int frame, bool relative)
 {
+  this->PrepareForAnimationIndices();
+
   assert(this->Internals->DeltaTime > 0);
-  const double frameDuration = (this->Internals->DeltaTime * this->Internals->SpeedFactor);
+  const double frameDuration = (this->Internals->DeltaTime * this->Internals->Options.scene.animation.speed_factor);
   const double currentFrame =
-    (this->Internals->CurrentTime - this->Internals->TimeRange[0]) / frameDuration;
+    (this->Internals->CurrentTime.value() - this->Internals->TimeRange[0]) / frameDuration;
 
   double nextFrame = 0;
   if (relative)
@@ -362,9 +425,9 @@ void animation_impl::JumpToFrame(int frame, bool relative)
   }
 
   this->Internals->CurrentTime = this->Internals->TimeRange[0] +
-    (nextFrame * this->Internals->DeltaTime * this->Internals->SpeedFactor);
+    (nextFrame * this->Internals->DeltaTime * this->Internals->Options.scene.animation.speed_factor);
 
-  if (this->LoadAtTime(this->Internals->CurrentTime))
+  if (this->LoadAtTime(this->Internals->CurrentTime.value()))
   {
     this->Internals->Window.render();
   }
@@ -373,7 +436,9 @@ void animation_impl::JumpToFrame(int frame, bool relative)
 //----------------------------------------------------------------------------
 void animation_impl::JumpToTime(double timeValue, bool relative)
 {
-  const double target = relative ? this->Internals->CurrentTime + timeValue : timeValue;
+  this->PrepareForAnimationIndices();
+
+  const double target = relative ? this->Internals->CurrentTime.value() + timeValue : timeValue;
 
   if (this->LoadAtTime(target))
   {
@@ -384,6 +449,8 @@ void animation_impl::JumpToTime(double timeValue, bool relative)
 //----------------------------------------------------------------------------
 void animation_impl::JumpToKeyFrame(int keyFrame, bool relative)
 {
+  this->PrepareForAnimationIndices();
+
   if (this->Internals->AnimationTimeSteps->GetNumberOfTuples() == 0)
   {
     return;
@@ -392,7 +459,7 @@ void animation_impl::JumpToKeyFrame(int keyFrame, bool relative)
   const int timeStepsAvailable = this->Internals->AnimationTimeSteps->GetNumberOfTuples();
 
   auto it = std::lower_bound(this->Internals->AnimationTimeSteps->Begin(),
-    this->Internals->AnimationTimeSteps->End(), this->Internals->CurrentTime);
+    this->Internals->AnimationTimeSteps->End(), this->Internals->CurrentTime.value());
   const int closestKeyFrame = (it != this->Internals->AnimationTimeSteps->End())
     ? static_cast<int>(std::distance(this->Internals->AnimationTimeSteps->Begin(), it))
     : timeStepsAvailable - 1;
@@ -413,9 +480,9 @@ void animation_impl::JumpToKeyFrame(int keyFrame, bool relative)
     }
   }
 
-  this->Internals->CurrentTime = this->Internals->AnimationTimeSteps->GetValue(nextKeyFrame);
+  this->Internals->CurrentTime.value() = this->Internals->AnimationTimeSteps->GetValue(nextKeyFrame);
 
-  if (this->LoadAtTime(this->Internals->CurrentTime))
+  if (this->LoadAtTime(this->Internals->CurrentTime.value()))
   {
     this->Internals->Window.render();
   }
@@ -463,14 +530,13 @@ bool animation_impl::LoadAtTime(double timeValue)
     timeValue = this->Internals->TimeRange[1];
   }
   this->Internals->CurrentTime = timeValue;
-  this->Internals->CurrentTimeSet = true;
-  if (!this->Internals->Importer->UpdateAtTimeValue(this->Internals->CurrentTime))
+  if (!this->Internals->Importer->UpdateAtTimeValue(this->Internals->CurrentTime.value()))
   {
-    log::error("Could not load time value: ", this->Internals->CurrentTime);
+    log::error("Could not load time value: ", this->Internals->CurrentTime.value());
     return false;
   }
 
-  this->Internals->Window.GetRenderer()->UpdateAnimationTime(this->Internals->CurrentTime);
+  this->Internals->Window.GetRenderer()->UpdateAnimationTime(this->Internals->CurrentTime.value());
 
   if (this->Internals->AvailAnimations > 0 && this->Internals->Interactor)
   {
@@ -695,41 +761,7 @@ void animation_impl::PrepareForAnimationIndices()
 }
 
 //----------------------------------------------------------------------------
-void animation_impl::SetCheatSheetConfigured(bool configured)
-{
-  vtkF3DRenderer* ren = this->Internals->Window.GetRenderer();
-  ren->SetCheatSheetConfigured(configured);
-}
-
-//----------------------------------------------------------------------------
-void animation_impl::SetAutoplay(bool enable)
-{
-  if (this->Internals->Autoplay != enable)
-  {
-    this->Internals->Autoplay = enable;
-    this->SetCheatSheetConfigured(false);
-  }
-}
-
-//----------------------------------------------------------------------------
-void animation_impl::SetSpeedFactor(double speedFactor)
-{
-  if (this->Internals->SpeedFactor != speedFactor)
-  {
-    this->Internals->SpeedFactor = speedFactor;
-    this->SetCheatSheetConfigured(false);
-  }
-}
-
-//----------------------------------------------------------------------------
-void animation_impl::UpdateDynamicOptions()
-{
-  this->SetAutoplay(this->Internals->Options.scene.animation.autoplay);
-  this->SetSpeedFactor(this->Internals->Options.scene.animation.speed_factor);
-}
-
-//----------------------------------------------------------------------------
-double animation_impl::GetCurrentTime() const
+std::optional<double> animation_impl::GetCurrentTime() const
 {
   return this->Internals->CurrentTime;
 }

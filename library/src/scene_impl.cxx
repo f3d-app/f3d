@@ -262,7 +262,6 @@ public:
     progressWidget->Off();
 
     // Initialize the animation using temporal information from the importer
-    this->Animation->UpdateDynamicOptions();
     this->Animation->Initialize();
 
     // Update all window options and reset camera to bounds if needed
@@ -885,7 +884,7 @@ scene& scene_impl::clear()
   this->Internals->AddedFiles.clear();
 
   // Clear animation state
-  this->Internals->Animation->Reset();
+  this->Internals->Animation->Uninitialize();
 
   return *this;
 }
