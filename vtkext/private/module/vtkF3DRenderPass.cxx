@@ -643,6 +643,8 @@ void vtkF3DRenderPass::ReplaceSkinningMorphing(
         posImpl += "  vertexVCVSOutput = MCVCMatrix * posMC;\n";
       }
 
+      posImpl += "//VTK::PositionVC::Impl\n";
+
       if (hasNormals)
       {
         normalImpl += "  normalVCVSOutput = normalMatrix * normalVCVSOutput;\n";
