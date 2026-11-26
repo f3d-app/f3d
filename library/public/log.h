@@ -36,7 +36,7 @@ public:
   class ProgressBar
   {
   public:
-    ProgressBar();
+    ProgressBar(vtkTimerLog* timer, std::string title);
     ~ProgressBar();
     void operator()(float progressPercentage);
     ProgressBar(const ProgressBar& other) = delete;

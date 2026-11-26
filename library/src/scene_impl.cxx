@@ -120,6 +120,11 @@ public:
   struct CLIProgressBarDataStruct
   {
     log::ProgressBar progressBar;
+
+    CLIProgressBarDataStruct(vtkTimerLog* timer, std::string title)
+      : progressBar(timer, std::move(title))
+    {
+    }
   };
 
   template<std::size_t N>
@@ -190,13 +195,14 @@ public:
     const vtkNew<vtkTimerLog> timer;
 
     scene_impl::internals::ProgressDataStruct callbackData;
-    scene_impl::internals::CLIProgressBarDataStruct cliCallbackData;
+
+    std::string title;
 
     constexpr size_t maxFileNameLength = 51;
     const int importerCount = this->MetaImporter->GetImporterInfoCount();
     if (importerCount > 1)
     {
-      cliCallbackData.progressBar.title = std::format("Loading {} files", importerCount);
+      title = std::format("Loading {} files", importerCount);
     }
     else
     {
@@ -205,10 +211,10 @@ public:
         ? this->MetaImporter->GetImporterInfo(0).Name.substr(0, maxFileNameLength)
         : "";
 
-      cliCallbackData.progressBar.title = std::format("Loading {}", fileName);
+      title = std::format("Loading {}", fileName);
     }
 
-    cliCallbackData.progressBar.timer = timer;
+    scene_impl::internals::CLIProgressBarDataStruct cliCallbackData(timer, title);
 
     scene_impl::internals::CreateCLIProgressBarAndCallback(&cliCallbackData, this->MetaImporter);
 
