@@ -166,39 +166,13 @@ std::vector<std::string> animation_impl::getNames() const
 }
 
 //----------------------------------------------------------------------------
-  /*
+// DEPRECATED
 animation& animation_impl::toggle(Direction direction)
 {
-  this->Internals->AnimDir = (direction == Direction::FORWARD ? 1 : -1);
-
-  this->PrepareForAnimationIndices();
-  if (!this->Internals->PreparedAnimationIndices.value().empty() && this->Internals->Interactor)
-  {
-    this->Internals->Playing = !this->Internals->Playing;
-
-    if (this->Internals->Playing)
-    {
-      // Initialize time if not already
-      if (!this->Internals->CurrentTimeSet)
-      {
-        this->Internals->CurrentTime = this->Internals->TimeRange[0];
-        this->Internals->CurrentTimeSet = true;
-      }
-    }
-
-    if (this->Internals->Playing && this->Internals->Options.scene.camera.index.has_value())
-    {
-      this->Internals->Interactor->disableCameraMovement();
-    }
-    else
-    {
-      this->Internals->Interactor->enableCameraMovement();
-    }
-  }
-
+  this->Internals->Options.scene.animation.mode = "forward";
+  this->toggle();
   return *this;
 }
-  */
 
 //----------------------------------------------------------------------------
 animation& animation_impl::toggle()
@@ -221,17 +195,13 @@ animation& animation_impl::toggle()
 }
 
 //----------------------------------------------------------------------------
-/*
+// DEPRECATED
 animation& animation_impl::start(Direction direction)
 {
-  if (!this->isPlaying())
-  {
-    this->toggle(direction);
-  }
-
+  this->Internals->Options.scene.animation.mode = "forward";
+  this->toggle();
   return *this;
 }
-  */
 
 //----------------------------------------------------------------------------
 animation& animation_impl::start()
@@ -277,18 +247,12 @@ bool animation_impl::isPlaying()
 }
 
 //----------------------------------------------------------------------------
-/*
+// DEPRECATED
 animation::Direction animation_impl::getDirection()
 {
+  return this->Internals->Options.scene.animation.mode == "backward" ? Direction::BACKWARD : Direction::FORWARD;
   return  Direction::FORWARD;
-//  return this->Internals->AnimDir == 1 ? Direction::FORWARD : Direction::BACKWARD;
-}*/
-
-//----------------------------------------------------------------------------
-/*animation::Mode animation_impl::getMode()
-{
-  return this->Internals->AnimMode;
-}*/
+}
 
 //----------------------------------------------------------------------------
 void animation_impl::SetImporter(vtkF3DMetaImporter* importer)

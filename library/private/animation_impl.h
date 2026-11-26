@@ -41,15 +41,14 @@ public:
   unsigned int count() const override;
   std::string getName(std::optional<int> index = std::nullopt) const override;
   std::vector<std::string> getNames() const override;
-//  animation& toggle(Direction direction = Direction::FORWARD) override;
+  animation& toggle(Direction direction = Direction::FORWARD) override;
   animation& toggle();
   animation& reset();
-//  animation& start(Direction direction = Direction::FORWARD) override;
+  animation& start(Direction direction = Direction::FORWARD) override;
   animation& start();
   animation& stop() override;
   bool isPlaying() override;
-//  animation::Direction getDirection() override;
-//  animation::Mode getMode() override;
+  animation::Direction getDirection() override;
   ///@}
 
   /**
