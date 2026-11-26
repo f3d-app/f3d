@@ -49,7 +49,6 @@
 #include <cmath>
 #include <csignal>
 #include <filesystem>
-#include <format>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -292,13 +291,14 @@ public:
         const nlohmann::ordered_json& camera = root.at("camera");
         const auto vecToStr = [](const nlohmann::ordered_json& arr)
         {
-          return std::format(
-            "{}, {}, {}", arr[0].get<double>(), arr[1].get<double>(), arr[2].get<double>());
+          std::ostringstream ss;
+          ss << arr[0].get<double>() << ", " << arr[1].get<double>() << ", " << arr[2].get<double>();
+          return ss.str();
         };
         outOptions["camera-position"] = vecToStr(camera.at("position"));
         outOptions["camera-focal-point"] = vecToStr(camera.at("focal_point"));
         outOptions["camera-view-up"] = vecToStr(camera.at("view_up"));
-        outOptions["camera-view-angle"] = std::format("{}", camera.at("view_angle").get<double>());
+        outOptions["camera-view-angle"] = std::to_string(camera.at("view_angle").get<double>());
       }
 
       if (root.contains("window"))
@@ -791,7 +791,7 @@ public:
       return match;
     }
 
-    return std::format("{}:`{}` ({})", source, match, matchType);
+    return std::string(source) + ":`" + match + "` (" + matchType + ")";
   }
 
   static void PrintLoggingMap(const std::map<std::string, log_entry_t>& loggingMap, char sep)
@@ -1299,13 +1299,13 @@ public:
         const nlohmann::ordered_json& windowJson = root.at("window");
         if (windowJson.contains("width") && windowJson.contains("height"))
         {
-          geometry["resolution"] = std::format(
-            "{}, {}", windowJson.at("width").get<int>(), windowJson.at("height").get<int>());
+          geometry["resolution"] =
+            std::to_string(windowJson.at("width").get<int>()) + ", " + std::to_string(windowJson.at("height").get<int>());
         }
         if (windowJson.contains("left") && windowJson.contains("top"))
         {
-          geometry["position"] = std::format(
-            "{}, {}", windowJson.at("left").get<int>(), windowJson.at("top").get<int>());
+          geometry["position"] =
+            std::to_string(windowJson.at("left").get<int>()) + ", " + std::to_string(windowJson.at("top").get<int>());
         }
       }
     }

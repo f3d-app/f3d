@@ -50,6 +50,18 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
   }
   this->ColorTexture->Resize(size[0], size[1]);
 
+  if (this->HistoryTexture == nullptr)
+  {
+    this->HistoryTexture = vtkSmartPointer<vtkTextureObject>::New();
+    this->HistoryTexture->SetContext(renWin);
+    this->HistoryTexture->SetMinificationFilter(vtkTextureObject::Linear);
+    this->HistoryTexture->SetMagnificationFilter(vtkTextureObject::Linear);
+    this->HistoryTexture->SetWrapS(vtkTextureObject::ClampToEdge);
+    this->HistoryTexture->SetWrapT(vtkTextureObject::ClampToEdge);
+    this->HistoryTexture->Allocate2D(size[0], size[1], 4, VTK_UNSIGNED_CHAR);
+  }
+  this->HistoryTexture->Resize(size[0], size[1]);
+
   if (this->FrameBufferObject == nullptr)
   {
     this->FrameBufferObject = vtkSmartPointer<vtkOpenGLFramebufferObject>::New();
@@ -72,6 +84,7 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Decl",
       "uniform sampler2D source;\n"
+      "uniform sampler2D history;\n"
       "uniform ivec2 resolution;\n"
       "uniform float time;\n"
       "//VTK::FSQ::Decl");
@@ -97,7 +110,9 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
   }
 
   this->ColorTexture->Activate();
+  this->HistoryTexture->Activate();
   this->QuadHelper->Program->SetUniformi("source", this->ColorTexture->GetTextureUnit());
+  this->QuadHelper->Program->SetUniformi("history", this->HistoryTexture->GetTextureUnit());
   this->QuadHelper->Program->SetUniform2i("resolution", size);
 
   if (!ren)
@@ -107,6 +122,10 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
   else
   {
     this->QuadHelper->Program->SetUniformf("time", ren->GetTotalTime());
+    for (const auto& slider : ren->shaderSliders)
+    {
+      this->QuadHelper->Program->SetUniformf(slider.name.c_str(), slider.defaultValue);
+    }
   }
 
   ostate->vtkglDisable(GL_BLEND);
@@ -118,6 +137,10 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
   this->QuadHelper->Render();
 
   this->ColorTexture->Deactivate();
+  this->HistoryTexture->Deactivate();
+
+  this->HistoryTexture->CopyFromFrameBuffer(pos[0], pos[1], 0, 0, size[0], size[1]);
+
 
   vtkOpenGLCheckErrorMacro("failed after Render");
 }
@@ -134,5 +157,9 @@ void vtkF3DUserRenderPass::ReleaseGraphicsResources(vtkWindow* w)
   if (this->ColorTexture)
   {
     this->ColorTexture->ReleaseGraphicsResources(w);
+  }
+  if (this->HistoryTexture)
+  {
+    this->HistoryTexture->ReleaseGraphicsResources(w);
   }
 }

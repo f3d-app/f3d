@@ -185,8 +185,13 @@ void vtkF3DPolyDataMapper::ReplaceShaderLight(
   // Fixed in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13116
   // which is backported in 9.6.2 in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13185
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 2)
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 4, 2)
+  if (actor->GetProperty()->GetInterpolation() == VTK_PBR &&
+    this->PrimitiveInfo[this->LastBoundBO].LastLightComplexity == vtkOpenGLRenderer::NoLighting)
+#else
   if (actor->GetProperty()->GetInterpolation() == VTK_PBR &&
     this->PrimitiveInfo[this->LastBoundBO].LastLightComplexity == primitiveInfo::NoLighting)
+#endif
   {
     // Convert unlit to sRGB
     auto fragmentShader = shaders[vtkShader::Fragment];

@@ -73,6 +73,7 @@ private:
 
   vtkSmartPointer<vtkOpenGLFramebufferObject> FrameBufferObject;
   vtkSmartPointer<vtkTextureObject> ColorTexture;
+  vtkSmartPointer<vtkTextureObject> HistoryTexture;
 
   std::shared_ptr<vtkOpenGLQuadHelper> QuadHelper;
   std::string UserShader;
