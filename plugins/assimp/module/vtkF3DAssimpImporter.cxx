@@ -1460,6 +1460,42 @@ bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream, std::string& h
     }
   }
 
+  // FBX ASCII detection
+  // skips comments and blank lines
+  // searches for line starting with FBXHeaderExtension:
+  // based on the example file linked below
+  // https://download.autodesk.com/us/fbx/sdkdocs/fbx_sdk_help/files/fbxsdkprog/WS1a9193826455f5ff-150b16da11960d83164-6b83.htm
+
+  // generous upper bound, there's usually only around 5 comment lines.
+  constexpr int fbxAsciiMaxLines = 32;
+  parser->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  if (parser->ReadLine(line) == vtkParseResult::EndOfLine)
+  {
+    if (line.starts_with("; FBX"))
+    {
+      int lineCount = 1;
+      while (lineCount < fbxAsciiMaxLines && parser->ReadLine(line) == vtkParseResult::EndOfLine)
+      {
+        lineCount++;
+        if (line.starts_with(";"))
+        {
+          continue;
+        }
+        // first line after comments is usually blank
+        if (line.empty())
+        {
+          continue;
+        }
+        if (line.starts_with("FBXHeaderExtension:"))
+        {
+          hint = "fbx";
+          return true;
+        }
+        break;
+      }
+    }
+  }
+
   /* DXF:
    * 0
    * SECTION
