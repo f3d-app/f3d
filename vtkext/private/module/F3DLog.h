@@ -44,6 +44,17 @@ extern Severity VerboseLevel;
 void Print(Severity sev, const std::string& msg);
 
 /**
+ * Initializes progress line in the console output window
+ */
+void StartProgress();
+
+/**
+ * Ends the progress line in the console output window.
+ * If last message is a progress it will print a newline.
+ */
+void EndProgress();
+
+/**
  * Prints progression bar output in the terminal/console output.
  * Does NOT print in the f3d internal command log.
  * If current VerboseLevel is above Info, then it will not print

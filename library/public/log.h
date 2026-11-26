@@ -9,6 +9,8 @@
 #include <string>
 /// @endcond
 
+struct vtkTimerLog;
+
 namespace f3d
 {
 /**
@@ -23,6 +25,29 @@ namespace f3d
 class F3D_EXPORT log
 {
 public:
+  /**
+   * @class   progress
+   * @brief   Class used to represent progress bars
+   *
+   * A RAII class to show initialize and terminate the progress bar.
+   * Note that it doesn't support multiple instances of this class
+   *
+   */
+  class ProgressBar
+  {
+  public:
+    ProgressBar(vtkTimerLog* timerLog, std::string barTitle);
+    ~ProgressBar();
+    void operator()(float progressPercentage);
+    ProgressBar(const ProgressBar& other) = delete;
+    ProgressBar& operator=(const ProgressBar& other) = delete;
+    ProgressBar(const ProgressBar&& other) = delete;
+    ProgressBar& operator=(const ProgressBar&& other) = delete;
+
+    std::string title;
+    vtkTimerLog* timer;
+  };
+
   /**
    * Enumeration of verbose levels
    * - DEBUG: All logs are displayed, including from third parties.
@@ -96,20 +121,6 @@ public:
   }
 
   /**
-   * Prints provided args to update progress bar in the terminal/console output.
-   * Does NOT print in the f3d internal command log.
-   * if VerboseLevel is above Info, then it will not print
-   * otherwise, it will print the provided args.
-   */
-  template<typename... Args>
-  static void progress(Args... args)
-  {
-    std::stringstream ss;
-    log::appendArg(ss, args...);
-    log::progressInternal(ss.str());
-  }
-
-  /**
    * Set the coloring usage, if applicable (eg: console output).
    */
   static void setUseColoring(bool use);
@@ -157,7 +168,8 @@ protected:
   static void warnInternal(const std::string& msg);
   static void infoInternal(const std::string& msg);
   static void debugInternal(const std::string& msg);
-  static void progressInternal(const std::string& msg);
+  static void startProgressInternal();
+  static void endProgressInternal();
   //! @endcond
 };
 }
