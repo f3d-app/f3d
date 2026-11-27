@@ -86,6 +86,7 @@ set(classes
   vtkF3DCachedSpecularTexture
   vtkF3DConsoleOutputWindow
   vtkF3DDepthPrePass
+  vtkF3DExternalRenderPass
   vtkF3DExternalRenderWindow
   vtkF3DFixColorSpacePass
   vtkF3DFrameCapture

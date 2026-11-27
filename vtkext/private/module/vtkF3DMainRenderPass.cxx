@@ -136,6 +136,11 @@ void vtkF3DMainRenderPass::ReleaseGraphicsResources(vtkWindow* w)
   this->FrameBufferObject = nullptr;
   this->ColorTexture->ReleaseGraphicsResources(w);
 
+  if (this->DelegatePass)
+  {
+    this->DelegatePass->ReleaseGraphicsResources(w);
+  }
+
   if (this->OnTopDepthTexture)
   {
     this->OnTopDepthTexture->ReleaseGraphicsResources(w);

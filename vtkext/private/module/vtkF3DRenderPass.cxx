@@ -3,6 +3,7 @@
 #include "F3DLog.h"
 #include "vtkF3DBakeSSAOPass.h"
 #include "vtkF3DDepthPrePass.h"
+#include "vtkF3DExternalRenderPass.h"
 #include "vtkF3DFixColorSpacePass.h"
 #include "vtkF3DImporter.h"
 #include "vtkF3DMainRenderPass.h"
@@ -56,14 +57,6 @@
 #include <vtkUniforms.h>
 #include <vtkVersion.h>
 #include <vtkVolumetricPass.h>
-
-#if F3D_MODULE_ANARI
-#include <vtkAnariPass.h>
-#endif
-
-#if F3D_MODULE_RAYTRACING
-#include <vtkOSPRayPass.h>
-#endif
 
 #include <sstream>
 
@@ -200,7 +193,6 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     vtkOpenGLRenderWindow::SafeDownCast(glRenderer->GetRenderWindow());
 
   this->ReleaseGraphicsResources(glRenderWindow);
-  this->BakeSSAOPass = nullptr;
 
   // depth pre-pass, write normals and depth of opaque actors, it owns the depth texture
   this->DepthPrePass = vtkSmartPointer<vtkF3DDepthPrePass>::New();
@@ -223,24 +215,28 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   this->MainPass->SetCircleOfConfusionRadius(this->CircleOfConfusionRadius);
   this->MainPass->SetDepthTexture(this->DepthPrePass->GetDepthTexture());
 
-#if F3D_MODULE_RAYTRACING
-  if (this->UseRaytracing)
+  vtkSmartPointer<vtkF3DExternalRenderPass> externalP;
+  if (this->UseRaytracing &&
+    vtkF3DExternalRenderPass::IsBackendAvailable(vtkF3DExternalRenderPass::Backend::OSPRAY))
   {
-    vtkNew<vtkOSPRayPass> ospP;
-    this->MainPass->SetDelegatePass(ospP);
+    externalP = vtkSmartPointer<vtkF3DExternalRenderPass>::New();
+    externalP->SetBackend(vtkF3DExternalRenderPass::Backend::OSPRAY);
+  }
+  else if (this->UseAnari &&
+    vtkF3DExternalRenderPass::IsBackendAvailable(vtkF3DExternalRenderPass::Backend::ANARI))
+  {
+    externalP = vtkSmartPointer<vtkF3DExternalRenderPass>::New();
+    externalP->SetBackend(vtkF3DExternalRenderPass::Backend::ANARI);
+    externalP->SetAnariLibrary(this->AnariLibrary);
+  }
+
+  if (externalP)
+  {
+    // the main pass target is in linear color space only without sRGB blending
+    externalP->SetOutputColorIsLinear(!renderer || !renderer->GetSRGBBlending());
+    this->MainPass->SetDelegatePass(externalP);
   }
   else
-#endif
-#ifdef F3D_MODULE_ANARI
-    if (this->UseAnari)
-  {
-    vtkNew<vtkAnariPass> anariP;
-    anariP->GetAnariDevice()->SetupAnariDeviceFromLibrary(
-      this->AnariLibrary.c_str(), "default", false);
-    this->MainPass->SetDelegatePass(anariP);
-  }
-  else
-#endif
   {
     // SSAO is baked from the depth pre-pass buffers
     const vtkBoundingBox bbox(this->Bounds);
@@ -249,6 +245,10 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
       this->BakeSSAOPass = vtkSmartPointer<vtkF3DBakeSSAOPass>::New();
       this->BakeSSAOPass->SetRadius(0.1 * bbox.GetDiagonalLength());
       this->BakeSSAOPass->SetBias(0.001 * bbox.GetDiagonalLength());
+    }
+    else
+    {
+      this->BakeSSAOPass = nullptr;
     }
 
     bool useDualDepthPeeling =
@@ -485,17 +485,14 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
     // the props are filtered here as the depth pre-pass needs them before the main pass is rendered
     this->MainPass->FilterProps(s);
 
-    // the depth pre-pass must be the first pass to run, it is not relevant with external renderers
-    if (!this->UseRaytracing && !this->UseAnari)
-    {
-      this->DepthPrePass->Render(s);
+    // the depth pre-pass must be the first pass to run
+    this->DepthPrePass->Render(s);
 
-      if (this->BakeSSAOPass)
-      {
-        this->BakeSSAOPass->SetDepthTexture(this->DepthPrePass->GetDepthTexture());
-        this->BakeSSAOPass->SetNormalTexture(this->DepthPrePass->GetNormalTexture());
-        this->BakeSSAOPass->Render(s);
-      }
+    if (this->BakeSSAOPass)
+    {
+      this->BakeSSAOPass->SetDepthTexture(this->DepthPrePass->GetDepthTexture());
+      this->BakeSSAOPass->SetNormalTexture(this->DepthPrePass->GetNormalTexture());
+      this->BakeSSAOPass->Render(s);
     }
 
     const vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(r);
