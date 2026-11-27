@@ -1789,10 +1789,46 @@ public:
     this->CurrentTime = currentTime;
   }
 
-  void GetTimeRange(double timeRange[2])
+  bool GetTimeInformation(double timeRange[2], vtkDoubleArray* timeSteps, int& nbTimeSteps)
   {
-    timeRange[0] = this->Stage->GetStartTimeCode() / this->Stage->GetTimeCodesPerSecond();
-    timeRange[1] = this->Stage->GetEndTimeCode() / this->Stage->GetTimeCodesPerSecond();
+
+    const double timeCodesPerSecond = this->Stage->GetTimeCodesPerSecond();
+
+    timeRange[0] = this->Stage->GetStartTimeCode() / timeCodesPerSecond;
+    timeRange[1] = this->Stage->GetEndTimeCode() / timeCodesPerSecond;
+
+    assert(timeSteps);
+
+    PXR_NS::UsdAttributeVector allAttributes;
+
+    for (const PXR_NS::UsdPrim& prim : this->Stage->Traverse())
+    {
+      const PXR_NS::UsdAttributeVector primAttributes = prim.GetAttributes();
+
+      allAttributes.insert(allAttributes.end(), primAttributes.begin(), primAttributes.end());
+    }
+
+    std::vector<double> timeCodes;
+
+    if (!PXR_NS::UsdAttribute::GetUnionedTimeSamples(allAttributes, &timeCodes))
+    {
+      nbTimeSteps = 0;
+      timeSteps->SetNumberOfComponents(1);
+      timeSteps->SetNumberOfTuples(0);
+      return false;
+    }
+
+    nbTimeSteps = static_cast<int>(timeCodes.size());
+    timeSteps->SetNumberOfComponents(1);
+    timeSteps->SetNumberOfTuples(static_cast<vtkIdType>(nbTimeSteps));
+
+    for (std::size_t i = 0; i < timeCodes.size(); ++i)
+    {
+      const double time = timeCodes[i] / timeCodesPerSecond;
+      timeSteps->SetValue(static_cast<vtkIdType>(i), time);
+    }
+
+    return true;
   }
 
   PXR_NS::UsdStageRefPtr Stage = nullptr;
@@ -1932,10 +1968,9 @@ vtkIdType vtkF3DUSDImporter::GetNumberOfAnimations()
 
 //----------------------------------------------------------------------------
 bool vtkF3DUSDImporter::GetTemporalInformation(vtkIdType vtkNotUsed(animationIndex),
-  double timeRange[2], int& vtkNotUsed(nbTimeSteps), vtkDoubleArray* vtkNotUsed(timeSteps))
+  double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps)
 {
-  this->Internals->GetTimeRange(timeRange);
-  return true;
+  return this->Internals->GetTimeInformation(timeRange, timeSteps, nbTimeSteps);
 }
 
 //----------------------------------------------------------------------------
