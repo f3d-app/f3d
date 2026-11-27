@@ -141,6 +141,8 @@ void vtkF3DMainRenderPass::ReleaseGraphicsResources(vtkWindow* w)
     this->OnTopDepthTexture->ReleaseGraphicsResources(w);
     this->OnTopDepthTexture = nullptr;
   }
+
+  this->BackgroundPass->ReleaseGraphicsResources(w);
 }
 
 //------------------------------------------------------------------------------
@@ -208,17 +210,20 @@ void vtkF3DMainRenderPass::InitializeResources(vtkOpenGLRenderWindow* renWin, in
   }
   this->FrameBufferObject->SetContext(renWin);
 
-  const vtkNew<vtkOpaquePass> bgP;
-  if (this->UseBlurBackground)
+  if (!this->BackgroundPass)
   {
-    vtkNew<vtkF3DHexagonalBokehBlurPass> blurP;
-    blurP->SetCircleOfConfusionRadius(this->CircleOfConfusionRadius);
-    blurP->SetDelegatePass(bgP);
-    this->BackgroundPass = blurP;
-  }
-  else
-  {
-    this->BackgroundPass = bgP;
+    const vtkNew<vtkOpaquePass> bgP;
+    if (this->UseBlurBackground)
+    {
+      vtkNew<vtkF3DHexagonalBokehBlurPass> blurP;
+      blurP->SetCircleOfConfusionRadius(this->CircleOfConfusionRadius);
+      blurP->SetDelegatePass(bgP);
+      this->BackgroundPass = blurP;
+    }
+    else
+    {
+      this->BackgroundPass = bgP;
+    }
   }
 }
 
