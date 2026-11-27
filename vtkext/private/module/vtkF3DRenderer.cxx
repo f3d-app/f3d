@@ -3376,7 +3376,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
         // so scaling with this value gives an approximation of the Lambertian diffuse
         "diffuseColor *= clamp(-dist, 0.0, 1.0);\n");
 
-      sprites.Actor->ForceTranslucentOff();
+      sprites.Actor->SetForceTranslucent(this->BlendingModeEnabled != BlendingMode::NONE);
     }
     else if (this->PointSpritesType == SplatType::CIRCLE)
     {
@@ -3385,7 +3385,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
         "//VTK::Color::Impl\n"
         "opacity = stroke(sdCircle(offsetVCVSOutput, 1.0), 2.0);\n");
 
-      sprites.Actor->ForceTranslucentOff();
+      sprites.Actor->SetForceTranslucent(this->BlendingModeEnabled != BlendingMode::NONE);
     }
     else if (this->PointSpritesType == SplatType::STD_DEV)
     {
@@ -3397,7 +3397,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
         "opacity += stroke(sdCircle(offsetVCVSOutput, 3.0), 1.0);\n"
         "opacity = clamp(opacity, 0.0, 1.0);\n");
 
-      sprites.Actor->ForceTranslucentOff();
+      sprites.Actor->SetForceTranslucent(this->BlendingModeEnabled != BlendingMode::NONE);
     }
     else if (this->PointSpritesType == SplatType::BOUND)
     {
@@ -3408,7 +3408,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
         "vec2 p = offsetVCVSOutput / g;\n"
         "opacity = strokePx(sdRoundBox(p, vec2(3.0) / g, 4.0), 2.0);\n");
 
-      sprites.Actor->ForceTranslucentOff();
+      sprites.Actor->SetForceTranslucent(this->BlendingModeEnabled != BlendingMode::NONE);
     }
     else if (this->PointSpritesType == SplatType::CROSS)
     {
@@ -3424,7 +3424,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
         "d2 = opShift(d2, thickness);\n"
         "opacity = fillPx(opRoundMerge(d1, d2, thickness));\n");
 
-      sprites.Actor->ForceTranslucentOff();
+      sprites.Actor->SetForceTranslucent(this->BlendingModeEnabled != BlendingMode::NONE);
     }
   }
 
