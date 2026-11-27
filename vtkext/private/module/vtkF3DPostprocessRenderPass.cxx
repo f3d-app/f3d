@@ -34,7 +34,6 @@ void vtkF3DPostprocessRenderPass::SetColorMap(vtkDiscretizableColorTransferFunct
   if (this->ColorMap != colorMap)
   {
     this->ColorMap = colorMap;
-    this->ColorMapTextureValid = false;
     this->Modified();
   }
 }
@@ -55,9 +54,8 @@ void vtkF3DPostprocessRenderPass::UpdateColorMapTexture(vtkOpenGLRenderWindow* r
     this->ColorMapTexture->SetDataType(GL_FLOAT);
   }
 
-  const bool upToDate = this->ColorMapTexture->GetHandle() && this->ColorMapTextureValid &&
-    (!this->ColorMap || this->ColorMapBuildTime.GetMTime() > this->ColorMap->GetMTime());
-  if (upToDate)
+  if (this->ColorMapTexture->GetHandle() &&
+    (!this->ColorMap || this->ColorMapBuildTime.GetMTime() > this->ColorMap->GetMTime()))
   {
     return;
   }
@@ -79,7 +77,6 @@ void vtkF3DPostprocessRenderPass::UpdateColorMapTexture(vtkOpenGLRenderWindow* r
   }
 
   this->ColorMapTexture->Create2DFromRaw(tableSize, 1, 3, VTK_FLOAT, table.data());
-  this->ColorMapTextureValid = true;
   this->ColorMapBuildTime.Modified();
 }
 
@@ -98,7 +95,6 @@ void vtkF3DPostprocessRenderPass::ReleaseGraphicsResources(vtkWindow* w)
   {
     this->ColorMapTexture->ReleaseGraphicsResources(w);
     this->ColorMapTexture = nullptr;
-    this->ColorMapTextureValid = false;
   }
 }
 

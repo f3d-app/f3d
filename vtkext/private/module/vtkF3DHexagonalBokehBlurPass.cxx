@@ -275,7 +275,6 @@ void vtkF3DHexagonalBokehBlurPass::Render(const vtkRenderState* s)
 
   vtkRenderer* r = s->GetRenderer();
   vtkOpenGLRenderWindow* renWin = static_cast<vtkOpenGLRenderWindow*>(r->GetRenderWindow());
-  vtkOpenGLState* ostate = renWin->GetState();
 
   assert(this->DelegatePass != nullptr);
 

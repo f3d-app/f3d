@@ -94,7 +94,6 @@ protected:
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap;
   vtkSmartPointer<vtkTextureObject> ColorMapTexture;
   vtkTimeStamp ColorMapBuildTime;
-  bool ColorMapTextureValid = false;
 
   bool ColorInputIsLinear = true;
   bool UseToneMapping = false;
