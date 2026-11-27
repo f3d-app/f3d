@@ -50,7 +50,7 @@ runs:
       uses: actions/cache/restore@v6
       with:
         path: dependencies/curl_install
-        key: curl-${{steps.curl_ver.outputs.extract}}-${{ steps.zlib_ver.outputs.extract }}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-2
+        key: curl-${{steps.curl_ver.outputs.extract}}-${{ steps.zlib_ver.outputs.extract }}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-3
 
     # Dependents: pdal vtk
     - name: Checkout curl
@@ -79,9 +79,10 @@ runs:
         -DBUILD_EXAMPLES=OFF
         -DBUILD_LIBCURL_DOCS=OFF
         -DBUILD_MISC_DOCS=OFF
-        -DBUILD_SHARED_LIBS=ON
+        -DBUILD_SHARED_LIBS=OFF
         -DBUILD_TESTING=OFF
         -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
         -DCMAKE_INSTALL_PREFIX=../curl_install
         -DCURL_ENABLE_SSL=OFF
         -DCURL_USE_LIBPSL=OFF
