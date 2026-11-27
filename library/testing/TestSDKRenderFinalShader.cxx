@@ -24,7 +24,7 @@ int TestSDKRenderFinalShader([[maybe_unused]] int argc, char* argv[])
   const std::string negativeShader = R"=(
     vec4 pixel(vec2 uv)
     {
-        vec3 value = texture(source, uv).rgb;
+        vec3 value = getLinearColor(uv).rgb;
         return vec4(vec3(1.0) - value, 1.0);
     }
   )=";
@@ -33,7 +33,8 @@ int TestSDKRenderFinalShader([[maybe_unused]] int argc, char* argv[])
     vec4 pixel(vec2 uv)
     {
         float l = clamp(1.0 - 2.0 * length(uv - 0.5), 0.0, 1.0);
-        return vec4(l*texture(source, uv).rgb, 1.0);
+        vec4 color = getLinearColor(uv);
+        return vec4(l*color.rgb, max(color.a, 1.0 - l));
     }
   )=";
 

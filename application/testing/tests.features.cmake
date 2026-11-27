@@ -81,6 +81,7 @@ f3d_test(NAME TestDisplayDepth DATA dragon.vtu ARGS --display-depth)
 f3d_test(NAME TestDisplayDepthColorMap DATA dragon.vtu ARGS --display-depth --coloring-mode=scivis --coloring-scalar-bar=True)
 f3d_test(NAME TestDisplayDepthCustomColorMap DATA dragon.vtu ARGS --display-depth --coloring-mode=scivis --colormap=0,red,1,blue)
 f3d_test(NAME TestDisplayDepthWithGrid DATA cow.vtp ARGS --display-depth -g)
+f3d_test(NAME TestDisplayDepthDeprecated DATA dragon.vtu ARGS --display-depth NO_BASELINE REGEXP "Option 'display-depth' is deprecated")
 
 # DPI scaling
 f3d_test(NAME TestDPI125 DATA dragon.vtu ARGS -nm --dpi-aware DPI_SCALE 1.25 UI)
@@ -195,6 +196,7 @@ f3d_test(NAME TestFilename DATA suzanne.ply ARGS -n UI)
 f3d_test(NAME TestHDRIFilename DATA dragon.vtu ARGS --hdri-filename HDRI shanghai_bund_1k.hdr UI LONG_TIMEOUT THRESHOLD 0.05) # Small rendering differences on GLES
 f3d_test(NAME TestFilenameHDRIFilename DATA dragon.vtu ARGS --hdri-filename -n HDRI shanghai_bund_1k.hdr RESOLUTION 400,400 UI LONG_TIMEOUT THRESHOLD 0.05) # Small rendering differences on GLES
 f3d_test(NAME TestHDRIFilenameDefault DATA dragon.vtu ARGS --hdri-filename -f -j UI LONG_TIMEOUT DEFAULT_HDRI)
+f3d_test(NAME TestHDRISSAO DATA suzanne.ply ARGS -q -fj HDRI shanghai_bund_1k.hdr)
 f3d_test(NAME TestFilenameWhiteBg DATA suzanne.ply ARGS -n --background-color=1,1,1 UI)
 f3d_test(NAME TestConsoleBadgeWarning DATA suzanne.ply ARGS --position=0 UI)
 f3d_test(NAME TestConsoleBadgeQuiet DATA suzanne.ply ARGS --position=0 --verbose=quiet UI)
@@ -478,11 +480,11 @@ if(F3D_MODULE_WEBP)
 endif()
 
 ## Final shader
-f3d_test(NAME TestFinalShaderNegative DATA cow.vtp ARGS --final-shader "vec4 pixel(vec2 uv){return vec4(vec3(1.0) - texture(source, uv).rgb, 1.0)\\\\\\\;}")
-f3d_test(NAME TestFinalShaderNegativeFileName DATA cow.vtp ARGS --filename --final-shader "vec4 pixel(vec2 uv){return vec4(vec3(1.0) - texture(source, uv).rgb, 1.0)\\\\\\\;}" UI)
+f3d_test(NAME TestFinalShaderNegative DATA cow.vtp ARGS --final-shader "vec4 pixel(vec2 uv){return vec4(vec3(1.0) - getLinearColor(uv).rgb, 1.0)\\\\\\\;}")
+f3d_test(NAME TestFinalShaderNegativeFileName DATA cow.vtp ARGS --filename --final-shader "vec4 pixel(vec2 uv){return vec4(vec3(1.0) - getLinearColor(uv).rgb, 1.0)\\\\\\\;}" UI)
 f3d_test(NAME TestFinalShaderUndefined DATA cow.vtp ARGS --final-shader "undefined" REGEXP "Final shader must define a function" NO_BASELINE)
-f3d_test(NAME TestFinalShaderCompilationFailure DATA cow.vtp ARGS --final-shader "vec4 pixel(vec2 uv){}" --verbose REGEXP " build the shader program" NO_BASELINE)
-f3d_test(NAME TestFinalShaderTimeUniform DATA cow.vtp ARGS --final-shader "vec4 pixel(vec2 uv){return vec4(texture(source, uv).rgb * (0.5 + 0.5*cos(time+uv.xyx+vec3(0,2,4))), 1.0)\\\\\\\;}")
+f3d_test(NAME TestFinalShaderCompilationFailure DATA cow.vtp ARGS --final-shader "vec4 pixel(vec2 uv){}" --verbose REGEXP " build the full screen shader program" NO_BASELINE)
+f3d_test(NAME TestFinalShaderTimeUniform DATA cow.vtp ARGS --final-shader "vec4 pixel(vec2 uv){return vec4(getLinearColor(uv).rgb * (0.5 + 0.5*cos(time+uv.xyx+vec3(0,2,4))), 1.0)\\\\\\\;}")
 
 ## Statefile
 # Round trip: one test saves a statefile, a dependent test loads it back and renders it,

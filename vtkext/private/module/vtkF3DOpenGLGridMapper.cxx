@@ -74,6 +74,11 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
     "//VTK::Reflection::Dec\n"
     "//VTK::Shadow::Dec\n"
 
+    "vec4 convertColorSpace(vec4 color){\n"
+    "  //VTK::ColorSpace::Impl\n"
+    "  return vec4(pow(color.rgb, vec3(2.2)), color.a);\n"
+    "}\n"
+
     "float antialias(float dist, float linewidth){\n"
     "  float aa = lineAntialias;\n"
     "  float lw = max(linewidth, lineAntialias) / 2.0;\n"
@@ -114,20 +119,33 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
     "  float zoomFadeFactor = 1.0 - clamp(fwidth(majorCoord.x / unitSquare * fadeDist), 0.0, 1.0);\n"
     "  float alpha = max(majorAlpha, minorAlpha * minorOpacity * zoomFadeFactor) * lineOpacity;\n"
 
-    "  vec4 color = vec4(diffuseColorUniform, alpha);\n"
+    "  vec4 color = convertColorSpace(vec4(diffuseColorUniform, alpha));\n"
 
     "  float axis1Weight = abs(majorCoord.y) < 0.5 ? antialias(majorGrid.y, axesLineWidth) * lineOpacity : 0.0;\n"
     "  float axis2Weight = abs(majorCoord.x) < 0.5 ? antialias(majorGrid.x, axesLineWidth) * lineOpacity : 0.0;\n"
-    "  color = mix(color, axis2Color, axis2Weight);\n"
-    "  color = mix(color, axis1Color, axis1Weight);\n"
+    "  color = mix(color, convertColorSpace(axis2Color), axis2Weight);\n"
+    "  color = mix(color, convertColorSpace(axis1Color), axis1Weight);\n"
     "  //VTK::Shadow::Impl\n"
     "  //VTK::Reflection::Impl\n"
     "  float sqDist = unitSquare * unitSquare * dot(fromCenter, fromCenter);\n"
     "  float radialFadeFactor = 1.0 - sqDist / (fadeDist * fadeDist);\n"
     "  color.a *= radialFadeFactor;\n"
-
     "  gl_FragData[0] = color;\n"
   );
+
+  vtkF3DRenderer* f3dRen = vtkF3DRenderer::SafeDownCast(ren);
+  if (f3dRen && !f3dRen->GetSRGBBlending())
+  {
+    vtkShaderProgram::Substitute(FSSource, "//VTK::ColorSpace::Impl",
+      "return vec4(pow(color.rgb, vec3(2.2)), color.a);"
+    );
+  }
+  else
+  {
+    vtkShaderProgram::Substitute(FSSource, "//VTK::ColorSpace::Impl",
+      "return color;"
+    );
+  }
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
   if (this->ShadowStrength > 0.0)

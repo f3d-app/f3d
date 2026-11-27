@@ -1110,6 +1110,9 @@ Add a final shader to the output image. See the [final shader documentation](11-
 
 ### `--display-depth` (_bool_, default: `false`)
 
+> [!WARNING]
+> This option is deprecated, use `--final-shader`, see [final shaders](11-FINAL_SHADER.md).
+
 Display the depth buffer as a grayscale image or with a colormap if `--coloring-mode` is `scivis`.
 Only opaque objects are displayed, the grid and translucent/volumetric objects are ignored.
 

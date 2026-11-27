@@ -51,7 +51,13 @@ if(F3D_MODULE_UI)
   list(APPEND private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultLogo.h)
 endif()
 
-set(shader_files glsl/vtkF3DRandomFS.glsl glsl/vtkF3DPointSplatVS.glsl glsl/vtkF3DPointSplatUtilsSDF.glsl)
+set(shader_files
+  glsl/vtkF3DRandomFS.glsl
+  glsl/vtkF3DPointSplatVS.glsl
+  glsl/vtkF3DPointSplatUtilsSDF.glsl
+  glsl/vtkF3DPostprocessFS.glsl
+  glsl/vtkF3DBakeSSAOFS.glsl
+ )
 
 if (NOT ANDROID AND NOT EMSCRIPTEN)
   list(APPEND shader_files glsl/vtkF3DComputeDepthCS.glsl)
@@ -75,33 +81,38 @@ endforeach()
 set(classes
   F3DLog
   F3DColoringInfoHandler
+  vtkF3DBakeSSAOPass
   vtkF3DCachedLUTTexture
   vtkF3DCachedSpecularTexture
   vtkF3DConsoleOutputWindow
+  vtkF3DDepthPrePass
   vtkF3DExternalRenderWindow
+  vtkF3DFixColorSpacePass
   vtkF3DFrameCapture
   vtkF3DGenericImporter
   vtkF3DHexagonalBokehBlurPass
+  vtkF3DHookShaderRenderPass
   vtkF3DInteractorEventRecorder
   vtkF3DInteractorStyle
+  vtkF3DMainRenderPass
   vtkF3DMemoryMesh
+  vtkF3DModulateSSAOPass
   vtkF3DMetaImporter
   vtkF3DNamedColors
   vtkF3DNoRenderWindow
   vtkF3DObjectFactory
   vtkF3DOpenGLGridMapper
-  vtkF3DOverlayRenderPass
   vtkF3DPointSplatMapper
   vtkF3DPolyDataMapper
   vtkF3DPostProcessFilter
+  vtkF3DPostprocessRenderPass
+  vtkF3DReflectionRenderPass
   vtkF3DRenderPass
   vtkF3DRenderer
-  vtkF3DSolidBackgroundPass
+  vtkF3DSkinningMorphingPass
   vtkF3DStochasticTransparentPass
   vtkF3DUIObserver
   vtkF3DUIActor
-  vtkF3DUserRenderPass
-  vtkF3DDisplayDepthRenderPass
   vtkF3DTAAPass
   vtkF3DPreserveCameraFramebufferPass
   )
