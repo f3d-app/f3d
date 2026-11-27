@@ -75,7 +75,7 @@ void vtkF3DReflectionRenderPass::InitializeResources(
   this->DepthTexture->SetContext(renWin);
   if (!this->DepthTexture->GetHandle())
   {
-    this->DepthTexture->AllocateDepth(width, height, vtkTextureObject::Float32);
+    this->DepthTexture->AllocateDepth(width, height, vtkTextureObject::Fixed32);
   }
   this->DepthTexture->Resize(width, height);
 
