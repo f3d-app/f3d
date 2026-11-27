@@ -476,17 +476,9 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
 
   this->Initialize(s);
 
-  double bgColor[3];
-
   vtkRenderer* r = s->GetRenderer();
   vtkInformation* info = r->GetInformation();
   const bool uiOnly = info->Has(vtkF3DRenderPass::RENDER_UI_ONLY());
-
-  r->GetBackground(bgColor);
-
-  // force background to full black when generating offscreen layers to avoid blending
-  // problems when compositing layers in the full screen pass
-  r->SetBackground(0.0, 0.0, 0.0);
 
   if (!uiOnly)
   {
@@ -514,9 +506,6 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
 
     this->MainPass->Render(s);
   }
-
-  // restore background color before the postprocess pass
-  r->SetBackground(bgColor);
 
   // FXAA requires the default framebuffer to be bound
   // TODO: apply FXAA in the post-process directly with our own shader
