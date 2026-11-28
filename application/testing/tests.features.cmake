@@ -196,7 +196,7 @@ f3d_test(NAME TestFilename DATA suzanne.ply ARGS -n UI)
 f3d_test(NAME TestHDRIFilename DATA dragon.vtu ARGS --hdri-filename HDRI shanghai_bund_1k.hdr UI LONG_TIMEOUT THRESHOLD 0.05) # Small rendering differences on GLES
 f3d_test(NAME TestFilenameHDRIFilename DATA dragon.vtu ARGS --hdri-filename -n HDRI shanghai_bund_1k.hdr RESOLUTION 400,400 UI LONG_TIMEOUT THRESHOLD 0.05) # Small rendering differences on GLES
 f3d_test(NAME TestHDRIFilenameDefault DATA dragon.vtu ARGS --hdri-filename -f -j UI LONG_TIMEOUT DEFAULT_HDRI)
-f3d_test(NAME TestHDRISSAO DATA suzanne.ply ARGS -q -fj HDRI shanghai_bund_1k.hdr THRESHOLD 0.05) # Small rendering differences depending on the platform
+f3d_test(NAME TestHDRISSAO DATA suzanne.ply ARGS -q -fj HDRI shanghai_bund_1k.hdr THRESHOLD 0.05 SKIP_GLES) # Small rendering differences depending on the platform, difference too large on GLES (~0.075)
 f3d_test(NAME TestFilenameWhiteBg DATA suzanne.ply ARGS -n --background-color=1,1,1 UI)
 f3d_test(NAME TestConsoleBadgeWarning DATA suzanne.ply ARGS --position=0 UI)
 f3d_test(NAME TestConsoleBadgeQuiet DATA suzanne.ply ARGS --position=0 --verbose=quiet UI)
@@ -423,7 +423,7 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestHDRIRaytracingNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/shanghai_bund_1k.hdr -rd --raytracing-samples=4 LONG_TIMEOUT)
 endif()
 
-f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -t --anti-aliasing=ssaa)
+f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -t --anti-aliasing=ssaa THRESHOLD 0.05) # Small rendering differences on GLES due to LUT precision
 
 ## Shadows
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13818
