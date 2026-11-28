@@ -46,14 +46,13 @@ void vtkF3DDepthPrePass::InitializeResources(vtkOpenGLRenderWindow* renWin, int 
   if (!this->NormalTexture->GetHandle())
   {
     this->NormalTexture->SetFormat(GL_RG);
-    // TODO: is RG8 sufficient for normals encoding? (RG16 not available on GLES)
-    this->NormalTexture->SetInternalFormat(GL_RG16);
-    this->NormalTexture->SetDataType(GL_UNSIGNED_SHORT);
+    this->NormalTexture->SetInternalFormat(GL_RG8);
+    this->NormalTexture->SetDataType(GL_UNSIGNED_BYTE);
     this->NormalTexture->SetMinificationFilter(vtkTextureObject::Nearest);
     this->NormalTexture->SetMagnificationFilter(vtkTextureObject::Nearest);
     this->NormalTexture->SetWrapS(vtkTextureObject::ClampToEdge);
     this->NormalTexture->SetWrapT(vtkTextureObject::ClampToEdge);
-    this->NormalTexture->Allocate2D(width, height, 2, VTK_UNSIGNED_SHORT);
+    this->NormalTexture->Allocate2D(width, height, 2, VTK_UNSIGNED_CHAR);
   }
   this->NormalTexture->Resize(width, height);
 

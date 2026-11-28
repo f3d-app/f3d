@@ -3,7 +3,7 @@
  * @brief   Render pass writing octahedrally encoded view space normals and depth of opaque actors.
  *
  * vtkF3DDepthPrePass renders the opaque actors only into an internal framebuffer made of
- * a 32 bits depth texture and a RG16 color texture.
+ * a 32 bits depth texture and a RG8 color texture.
  * The color texture contains the view space normals, octahedrally encoded.
  *
  * The resulting textures are exposed with GetNormalTexture() and GetDepthTexture(), they are
@@ -43,7 +43,7 @@ public:
   void SetDelegatePass(vtkRenderPass* delegate);
 
   /**
-   * Get the RG16 texture containing the octahedrally encoded view space normals.
+   * Get the RG8 texture containing the octahedrally encoded view space normals.
    */
   vtkTextureObject* GetNormalTexture() const
   {
