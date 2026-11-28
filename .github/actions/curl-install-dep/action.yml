@@ -53,6 +53,7 @@ runs:
         key: curl-${{steps.curl_ver.outputs.extract}}-${{ steps.zlib_ver.outputs.extract }}-${{runner.os}}-${{inputs.cpu}}-${{steps.global_idx.outputs.extract}}-3
 
     # Dependents: pdal vtk
+    # Build statically to avoid issues with CMake picking it up instead of system libcurl
     - name: Checkout curl
       if: steps.cache-curl.outputs.cache-hit != 'true'
       uses: actions/checkout@v7
