@@ -2512,7 +2512,8 @@ void F3DStarter::LoadFileGroupInternal(
       this->Internals->Engine->getWindow().setWindowName(filenameInfo + " - " + F3D::AppName);
     }
 
-    if (dynamicOptions.scene.camera.index.has_value())
+    if (dynamicOptions.scene.camera.index.has_value() ||
+      dynamicOptions.scene.camera.orbit_period != 0.0)
     {
       // Camera is setup by importer, save its configuration as default
       this->Internals->Engine->getWindow().getCamera().setCurrentAsDefault();

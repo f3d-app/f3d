@@ -1,5 +1,6 @@
 #include "vtkF3DMetaImporter.h"
 
+#include <vtkDoubleArray.h>
 #include <vtkNew.h>
 #include <vtkOBJImporter.h>
 #include <vtkRenderWindow.h>
@@ -69,6 +70,40 @@ int TestF3DMetaImporterAnimation(int argc, char* argv[])
   if (importer->IsAnimationEnabled(0))
   {
     std::cerr << "Unexpected enable animation name after disabling without animation available\n";
+    return EXIT_FAILURE;
+  }
+
+  importer->SetVirtualCameraOrbitPeriod(-4.0);
+  if (importer->GetNumberOfAnimations() != 1)
+  {
+    std::cerr << "Unexpected number of animations with a virtual camera\n";
+    return EXIT_FAILURE;
+  }
+
+  if (importer->GetAnimationSupportLevel() != vtkImporter::AnimationSupportLevel::UNIQUE)
+  {
+    std::cerr << "Unexpected animation support level with a virtual camera\n";
+    return EXIT_FAILURE;
+  }
+
+  if (importer->GetAnimationName(0) != "Camera Orbit" || !importer->GetAnimationName(1).empty())
+  {
+    std::cerr << "Unexpected animation names with a virtual camera\n";
+    return EXIT_FAILURE;
+  }
+
+  vtkNew<vtkDoubleArray> timeSteps;
+  if (!importer->GetTemporalInformation(0, timeRange, nbTimeSteps, timeSteps) ||
+    timeRange[0] != 0.0 || timeRange[1] != 4.0 || nbTimeSteps != 5 ||
+    timeSteps->GetValue(1) != 1.0 || timeSteps->GetValue(4) != 4.0)
+  {
+    std::cerr << "Unexpected temporal information of the virtual animation\n";
+    return EXIT_FAILURE;
+  }
+
+  if (importer->GetTemporalInformation(1, timeRange, nbTimeSteps, timeSteps))
+  {
+    std::cerr << "Unexpected temporal information for an animation that does not exist\n";
     return EXIT_FAILURE;
   }
 

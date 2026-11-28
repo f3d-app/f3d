@@ -767,6 +767,11 @@
           "helpText": "Use an orthographic camera",
           "valueHelper": "<bool>",
           "implicitValue": "1"
+        },
+        {
+          "longName": "camera-orbit",
+          "helpText": "Orbit the camera around the scene, one turn in the given time in seconds (positive: counter-clockwise seen from above, negative: clockwise)",
+          "valueHelper": "<seconds>"
         }
       ]
     },

@@ -10,6 +10,7 @@
 #include <vtkDataAssembly.h>
 #include <vtkDataAssemblyVisitor.h>
 #include <vtkDataSetAttributes.h>
+#include <vtkDoubleArray.h>
 #include <vtkImageData.h>
 #include <vtkInformation.h>
 #include <vtkInformationIntegerKey.h>
@@ -29,6 +30,7 @@
 #include <vtkVersion.h>
 
 #include <cassert>
+#include <cmath>
 #include <iostream>
 #include <numeric>
 #include <vector>
@@ -200,6 +202,30 @@ struct vtkF3DMetaImporter::Internals
   vtkTimeStamp UpdateTime;
 
   F3DColoringInfoHandler ColoringInfoHandler;
+
+  struct VirtualCameraPose
+  {
+    double Position[3] = { 0.0, 0.0, 1.0 };
+    double FocalPoint[3] = { 0.0, 0.0, 0.0 };
+    double ViewUp[3] = { 0.0, 1.0, 0.0 };
+    double ViewAngle = 30.0;
+  };
+
+  double VirtualCameraOrbitPeriod = 0.0;
+  VirtualCameraPose VirtualCameraStartPose;
+  bool VirtualAnimationEnabled = false;
+
+  bool HasVirtualCamera() const
+  {
+    return this->VirtualCameraOrbitPeriod != 0.0;
+  }
+
+  bool HasVirtualAnimation() const
+  {
+    return this->HasVirtualCamera() &&
+      std::ranges::none_of(this->Importers, [](const auto& importerInfo)
+        { return importerInfo.Importer->GetNumberOfAnimations() > 0; });
+  }
 };
 
 //----------------------------------------------------------------------------
@@ -695,6 +721,11 @@ std::string vtkF3DMetaImporter::GetOutputsDescription()
 //----------------------------------------------------------------------------
 vtkF3DImporter::AnimationSupportLevel vtkF3DMetaImporter::GetAnimationSupportLevel()
 {
+  if (this->Pimpl->HasVirtualAnimation())
+  {
+    return vtkImporter::AnimationSupportLevel::UNIQUE;
+  }
+
   vtkImporter::AnimationSupportLevel levelAccum = vtkImporter::AnimationSupportLevel::NONE;
   for (const auto& importerInfo : this->Pimpl->Importers)
   {
@@ -739,6 +770,11 @@ vtkF3DImporter::AnimationSupportLevel vtkF3DMetaImporter::GetAnimationSupportLev
 //----------------------------------------------------------------------------
 vtkIdType vtkF3DMetaImporter::GetNumberOfAnimations()
 {
+  if (this->Pimpl->HasVirtualAnimation())
+  {
+    return 1;
+  }
+
   // Importer->GetNumberOfAnimations() can be -1 if animation support is not implemented in the
   // importer
   return std::accumulate(this->Pimpl->Importers.begin(), this->Pimpl->Importers.end(), 0,
@@ -753,6 +789,11 @@ vtkIdType vtkF3DMetaImporter::GetNumberOfAnimations()
 //----------------------------------------------------------------------------
 std::string vtkF3DMetaImporter::GetAnimationName(vtkIdType animationIndex)
 {
+  if (this->Pimpl->HasVirtualAnimation())
+  {
+    return animationIndex == 0 ? "Camera Orbit" : "";
+  }
+
   // Importer->GetNumberOfAnimations() can be -1 if animation support is not implemented in the
   // importer
   vtkIdType localAnimationIndex = animationIndex;
@@ -784,6 +825,15 @@ std::string vtkF3DMetaImporter::GetAnimationName(vtkIdType animationIndex)
 //----------------------------------------------------------------------------
 void vtkF3DMetaImporter::EnableAnimation(vtkIdType animationIndex)
 {
+  if (this->Pimpl->HasVirtualAnimation())
+  {
+    if (animationIndex == 0)
+    {
+      this->Pimpl->VirtualAnimationEnabled = true;
+    }
+    return;
+  }
+
   vtkIdType localAnimationIndex = animationIndex;
   for (const auto& importerInfo : this->Pimpl->Importers)
   {
@@ -808,6 +858,15 @@ void vtkF3DMetaImporter::EnableAnimation(vtkIdType animationIndex)
 //----------------------------------------------------------------------------
 void vtkF3DMetaImporter::DisableAnimation(vtkIdType animationIndex)
 {
+  if (this->Pimpl->HasVirtualAnimation())
+  {
+    if (animationIndex == 0)
+    {
+      this->Pimpl->VirtualAnimationEnabled = false;
+    }
+    return;
+  }
+
   vtkIdType localAnimationIndex = animationIndex;
   for (const auto& importerInfo : this->Pimpl->Importers)
   {
@@ -832,6 +891,11 @@ void vtkF3DMetaImporter::DisableAnimation(vtkIdType animationIndex)
 //----------------------------------------------------------------------------
 bool vtkF3DMetaImporter::IsAnimationEnabled(vtkIdType animationIndex)
 {
+  if (this->Pimpl->HasVirtualAnimation())
+  {
+    return animationIndex == 0 && this->Pimpl->VirtualAnimationEnabled;
+  }
+
   vtkIdType localAnimationIndex = animationIndex;
   for (const auto& importerInfo : this->Pimpl->Importers)
   {
@@ -892,9 +956,45 @@ void vtkF3DMetaImporter::SetCameraIndex(std::optional<vtkIdType> camIndex)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DMetaImporter::SetVirtualCameraOrbitPeriod(double period)
+{
+  this->Pimpl->VirtualCameraOrbitPeriod = period;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DMetaImporter::StoreVirtualCameraStartPose()
+{
+  assert(this->Renderer);
+  vtkCamera* camera = this->Renderer->GetActiveCamera();
+  camera->GetPosition(this->Pimpl->VirtualCameraStartPose.Position);
+  camera->GetFocalPoint(this->Pimpl->VirtualCameraStartPose.FocalPoint);
+  camera->GetViewUp(this->Pimpl->VirtualCameraStartPose.ViewUp);
+  this->Pimpl->VirtualCameraStartPose.ViewAngle = camera->GetViewAngle();
+}
+
+//----------------------------------------------------------------------------
 bool vtkF3DMetaImporter::GetTemporalInformation(
   vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps)
 {
+  if (this->Pimpl->HasVirtualAnimation())
+  {
+    if (animationIndex != 0)
+    {
+      return false;
+    }
+
+    timeRange[0] = 0.0;
+    timeRange[1] = std::abs(this->Pimpl->VirtualCameraOrbitPeriod);
+
+    nbTimeSteps = 5;
+    timeSteps->SetNumberOfTuples(nbTimeSteps);
+    for (int i = 0; i < nbTimeSteps; i++)
+    {
+      timeSteps->SetValue(i, timeRange[1] * i / (nbTimeSteps - 1));
+    }
+    return true;
+  }
+
   vtkIdType localAnimationIndex = animationIndex;
   for (const auto& importerInfo : this->Pimpl->Importers)
   {
@@ -938,6 +1038,16 @@ bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
   for (const auto& importerInfo : this->Pimpl->Importers)
   {
     ret = ret && importerInfo.Importer->UpdateAtTimeValue(timeValue);
+  }
+
+  if (this->Pimpl->HasVirtualCamera())
+  {
+    vtkCamera* camera = this->Renderer->GetActiveCamera();
+    camera->SetPosition(this->Pimpl->VirtualCameraStartPose.Position);
+    camera->SetFocalPoint(this->Pimpl->VirtualCameraStartPose.FocalPoint);
+    camera->SetViewUp(this->Pimpl->VirtualCameraStartPose.ViewUp);
+    camera->SetViewAngle(this->Pimpl->VirtualCameraStartPose.ViewAngle);
+    camera->Azimuth(360.0 * timeValue / this->Pimpl->VirtualCameraOrbitPeriod);
   }
 
   // Update coloring and point sprites

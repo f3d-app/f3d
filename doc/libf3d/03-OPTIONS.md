@@ -78,6 +78,16 @@ Set to true to force orthographic projection. Model-specified by default, which 
 
 CLI: `--camera-orthographic`.
 
+### `scene.camera.orbit_period` (_double_, default: `0.0`, **on load**)
+
+Set the time in seconds an orbiting camera takes for one turn around the scene, following the animation time.
+A positive value turns the camera counter-clockwise seen from above, a negative value clockwise, `0` disables the orbit.
+A scene without animation gets a "Camera Orbit" animation that lasts one turn.
+The camera pose is set each time the animation time changes, starting from the pose computed when loading the scene.
+Ignored when `scene.camera.index` is set.
+
+CLI: `--camera-orbit`.
+
 ## Interactor Options
 
 ### `interactor.style` (_string_, default: `default`, enum domain: `default, trackball, 2d`)

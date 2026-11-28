@@ -31,6 +31,10 @@
           "style": "index"
         }
       },
+      "orbit_period": {
+        "type": "double",
+        "default_value": "0.0"
+      },
       "orthographic": {
         "type": "bool"
       }

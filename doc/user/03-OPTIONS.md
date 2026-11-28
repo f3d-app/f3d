@@ -1013,6 +1013,14 @@ Apply an elevation transformation to the camera, in degrees, added after other c
 
 Set the camera to use the orthographic projection. Model-specified by default.
 
+### `--camera-orbit=<seconds>` (_double_, default: `0.0`)
+
+Orbit the camera around the scene following the animation time, the value is the time of one turn in seconds.
+A positive value turns the camera counter-clockwise seen from above, a negative value clockwise, `0` disables the orbit.
+A file without animation gets a "Camera Orbit" animation that lasts one turn.
+The orbit starts from the default camera: other camera configuration options are ignored, except `--camera-orthographic`, and the camera cannot be moved with the mouse while the animation is playing.
+Ignored when `--camera-index` is set.
+
 ## Raytracing options
 
 ### `--raytracing-samples=<samples>` (_int_, default: `5`)
