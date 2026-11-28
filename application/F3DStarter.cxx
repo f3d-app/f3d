@@ -1624,13 +1624,13 @@ int F3DStarter::Start(int argc, char** argv)
       }
       else if (this->Internals->AppOptions.RenderingBackend == "cocoa")
       {
-        #if __APPLE__
-          // Defaults to Cocoa anyways
-          this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::create(offscreen));
-        #else
-          f3d::log::error("Could not load graphic library: ", ex.what());
-          return EXIT_FAILURE;
-        #endif
+#if __APPLE__
+        // Defaults to Cocoa anyways
+        this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::create(offscreen));
+#else
+        f3d::log::error("Could not load graphic library: ", ex.what());
+        return EXIT_FAILURE;
+#endif
       }
       else
       {
