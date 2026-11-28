@@ -6,7 +6,6 @@ cmake -S /src -B /src/_wasm_build \
     -DBUILD_SHARED_LIBS=OFF \
     -DCMAKE_BUILD_TYPE=$1 \
     -DCMAKE_FIND_ROOT_PATH:PATH=/depends \
-    -DCMAKE_MODULE_PATH=/depends/lib/cmake/OpenVDB/ \
     -DF3D_MODULE_EXR=ON \
     -DF3D_MODULE_MESHOPT=ON \
     -DF3D_MODULE_UI=OFF \

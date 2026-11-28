@@ -621,7 +621,7 @@ jobs:
         arch: [armeabi-v7a, arm64-v8a, x86, x86_64]
 
     runs-on: ubuntu-24.04
-    container: ghcr.io/f3d-app/f3d-android-${{ matrix.arch }}:${{needs.recover_docker_timestamp.outputs.docker_timestamp}}
+    container: ghcr.io/f3d-app/f3d-android-${{ matrix.arch }}:${{needs.recover_docker_timestamp.outputs.docker_timestamp}}_0
 
     steps:
       - name: Checkout
@@ -652,7 +652,7 @@ jobs:
 
     env:
       CMAKE_BUILD_PARALLEL_LEVEL: 4
-      F3D_DOCKER_TIMESTAMP: ${{needs.recover_docker_timestamp.outputs.docker_timestamp}}
+      F3D_DOCKER_TIMESTAMP: ${{needs.recover_docker_timestamp.outputs.docker_timestamp}}_0
 
     steps:
       - name: Checkout
