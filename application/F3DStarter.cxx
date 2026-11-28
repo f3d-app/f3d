@@ -1628,7 +1628,7 @@ int F3DStarter::Start(int argc, char** argv)
         // Defaults to Cocoa anyways
         this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::create(offscreen));
 #else
-        f3d::log::error("Could not load graphic library: ", ex.what());
+        f3d::log::error("Could not load graphic library: Cannot use a COCOA on this platform");
         return EXIT_FAILURE;
 #endif
       }
