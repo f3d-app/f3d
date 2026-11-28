@@ -27,11 +27,10 @@ namespace
 {
 /**
  * True boolean options need to be filtered out in ParseCLIOptions
- * Also filter out special options like `define` and `reset`
  * This is the easiest, compile time way to do it
  */
 constexpr std::array CLIBooleans = { "version", "help", "list-readers", "scan-plugins",
-  "list-rendering-backends", "list-video-encoders", "define", "reset" };
+  "list-rendering-backends", "list-video-encoders" };
 
 //----------------------------------------------------------------------------
 /**
@@ -286,12 +285,9 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
   // cxxopts values need to live somewhere until parsing is done
   std::vector<std::shared_ptr<cxxopts::Value>> cxxoptsValues;
   auto cxxoptsInputPositionals = cxxopts::value<std::vector<std::string>>(positionals);
-
-  std::vector<std::string> defines;
-  auto cxxoptsDefines = cxxopts::value<std::vector<std::string>>(defines);
-
-  std::vector<std::string> resets;
-  auto cxxoptsResets = cxxopts::value<std::vector<std::string>>(resets);
+  // keep track of options that can accept multiple values. Currently these use <string_list> as
+  // ValueHelper
+  std::set<std::string> usesStringList;
 
   try
   {
@@ -306,8 +302,6 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       if (std::string(optionGroup.GroupName) == "Applicative")
       {
         group("input", "Input files", cxxoptsInputPositionals, "<files>");
-        group("D,define", "Define libf3d options", cxxoptsDefines, "libf3d.option=value");
-        group("R,reset", "Reset libf3d options", cxxoptsResets, "libf3d.option");
       }
 
       // Add each option to cxxopts
@@ -325,12 +319,15 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
           std::string defaultValue;
           std::string helpText(cliOption.HelpText);
           const std::string longName(cliOption.LongName);
+          const std::string valueHelper(cliOption.ValueHelper);
 
           // Recover default value from app options
           auto appIter = F3DOptionsTools::DefaultAppOptions.find(longName);
           if (appIter != F3DOptionsTools::DefaultAppOptions.end())
           {
-            defaultValue = appIter->second;
+            // defaults are always stored as strings
+            assert(std::holds_alternative<std::string>(appIter->second));
+            defaultValue = std::get<std::string>(appIter->second);
           }
           else
           {
@@ -355,7 +352,15 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
           }
 
           // Recover the implicit value and set it if any
-          cxxoptsValues.emplace_back(cxxopts::value<std::string>());
+          if (valueHelper == "<string_list>")
+          {
+            cxxoptsValues.emplace_back(cxxopts::value<std::vector<std::string>>());
+            usesStringList.emplace(cliOption.LongName);
+          }
+          else
+          {
+            cxxoptsValues.emplace_back(cxxopts::value<std::string>());
+          }
           auto& val = cxxoptsValues.back();
           if (!cliOption.ImplicitValue.empty())
           {
@@ -454,33 +459,42 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       throw F3DExFailure("unknown options");
     }
 
-    // Add each CLI options into a vector of string/string and return it
+    // Add each CLI options into a OptionsDict and return it
     F3DOptionsTools::OptionsDict cliOptionsDict;
     for (const auto& res : result)
     {
       // Discard boolean option like `--version` or `--help`
-      if (std::ranges::find(::CLIBooleans, res.key()) == ::CLIBooleans.end())
+      if (std::ranges::find(::CLIBooleans, res.key()) != ::CLIBooleans.end())
       {
-        cliOptionsDict[res.key()] = res.value();
-      }
-    }
-
-    // Handle defines and add them as proper options
-    for (const std::string& define : defines)
-    {
-      const std::string::size_type sepIdx = define.find_first_of('=');
-      if (sepIdx == std::string::npos)
-      {
-        f3d::log::warn("Could not parse a define '", define, "'");
         continue;
       }
-      cliOptionsDict[define.substr(0, sepIdx)] = define.substr(sepIdx + 1);
-    }
-
-    // Handles reset using the dedicated syntax
-    for (const std::string& reset : resets)
-    {
-      cliOptionsDict["reset-" + reset] = "";
+      const auto& key = res.key();
+      const auto& value = res.value();
+      if (!cliOptionsDict.contains(key))
+      {
+        if (usesStringList.contains(key))
+        {
+          cliOptionsDict[key] = std::vector<std::string>{ value };
+        }
+        else
+        {
+          cliOptionsDict[key] = value;
+        }
+      }
+      else
+      {
+        // key already exists. Unless this accepts multiple values replace the previous value
+        if (usesStringList.contains(key))
+        {
+          assert(std::holds_alternative<std::vector<std::string>>(cliOptionsDict[key]));
+          auto& vec = std::get<std::vector<std::string>>(cliOptionsDict[key]);
+          vec.push_back(value);
+        }
+        else
+        {
+          cliOptionsDict[key] = value;
+        }
+      }
     }
 
     return cliOptionsDict;
@@ -507,10 +521,11 @@ void F3DOptionsTools::PrintHelpPair(
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3dOptions(
-  const std::string& key, const std::string& value)
+std::vector<std::pair<std::string, F3DOptionsTools::OptionValue>>
+F3DOptionsTools::ConvertToLibf3dOptions(const std::string& key, const OptionValue& value)
 {
-  std::vector<std::pair<std::string, std::string>> libf3dOptions;
+  std::vector<std::pair<std::string, F3DOptionsTools::OptionValue>> libf3dOptions;
+  [[maybe_unused]] const bool is_single_valued = std::holds_alternative<std::string>(value);
 
   // Simple one-to-one case
   auto libf3dIter = F3DOptionsTools::LibOptionsNames.find(key);
@@ -525,4 +540,27 @@ std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3
   }
 
   return libf3dOptions;
+}
+
+std::string F3DOptionsTools::ConvertToString(const F3DOptionsTools::OptionValue& optionValue)
+{
+  if (std::holds_alternative<std::string>(optionValue))
+  {
+    return std::get<std::string>(optionValue);
+  }
+  else if (std::holds_alternative<std::vector<std::string>>(optionValue))
+  {
+    const auto& vec = std::get<std::vector<std::string>>(optionValue);
+    std::string result;
+    for (size_t i = 0; i < vec.size(); i++)
+    {
+      result += vec[i];
+      if (i != vec.size() - 1)
+      {
+        result += " , ";
+      }
+    }
+    return result;
+  }
+  return "";
 }
