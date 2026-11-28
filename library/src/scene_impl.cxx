@@ -220,6 +220,15 @@ public:
     if (this->Options.scene.camera.index.has_value())
     {
       this->MetaImporter->SetCameraIndex(this->Options.scene.camera.index.value());
+      this->MetaImporter->SetVirtualCameraOrbitPeriod(0.0);
+      if (this->Options.scene.camera.orbit_period != 0.0)
+      {
+        log::warn("Camera orbit is ignored when a camera index is set");
+      }
+    }
+    else
+    {
+      this->MetaImporter->SetVirtualCameraOrbitPeriod(this->Options.scene.camera.orbit_period);
     }
 
     // Manage progress bar
@@ -270,6 +279,7 @@ public:
     if (!this->Options.scene.camera.index.has_value())
     {
       this->Window.getCamera().resetToBounds();
+      this->MetaImporter->StoreVirtualCameraStartPose();
     }
 
     // Set the camera index domain

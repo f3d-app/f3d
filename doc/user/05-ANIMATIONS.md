@@ -85,6 +85,24 @@ It can be done more efficiently in one line using piping:
 f3d example.file --output-video=- | ffmpeg -f h264 -i - video.mp4
 ```
 
+## Camera orbit
+
+Use `--camera-orbit` to turn the camera around the scene following the animation time. The value is the time of one turn, in seconds:
+
+```bash
+f3d example.file --camera-orbit=8
+```
+
+Press <kbd>Space</kbd> to play the animation and see the camera turn, or add `--animation-autoplay`.
+
+A file without animation gets a "Camera Orbit" animation that lasts one turn. Combine it with the frame export to save a turntable of a static model:
+
+```bash
+f3d example.file --camera-orbit=4 --output=frame_{frame:04}.png --frame-rate=30
+```
+
+See the [`--camera-orbit` option](03-OPTIONS.md#camera-configuration-options) for the direction of the turn and the limitations.
+
 ## Animation interactions
 
 - Press <kbd>W</kbd> to cycle through animations.

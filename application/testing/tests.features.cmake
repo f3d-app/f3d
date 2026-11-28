@@ -129,6 +129,8 @@ f3d_test(NAME TestCameraIndexConfiguration DATA Cameras.gltf ARGS --camera-index
 f3d_test(NAME TestCameraIndexInvalid DATA Cameras.gltf ARGS --camera-index=3 REGEXP "is higher than the number of available camera" NO_BASELINE)
 f3d_test(NAME TestCameraIndexNegative DATA Cameras.gltf ARGS --camera-index=-1 REGEXP "Invalid camera index" NO_BASELINE)
 f3d_test(NAME TestVerboseCamera DATA Cameras.gltf ARGS --camera-index=1 --verbose NO_RENDER REGEXP "0:.*1:")
+f3d_test(NAME TestCameraOrbitStaticScene DATA suzanne.ply ARGS --camera-orbit=-4 --animation-time=1)
+f3d_test(NAME TestCameraOrbitCameraIndex DATA Cameras.gltf ARGS --camera-index=0 --camera-orbit=4 --animation-time=1 REGEXP "Camera orbit is ignored when a camera index is set.*Image comparison success")
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)

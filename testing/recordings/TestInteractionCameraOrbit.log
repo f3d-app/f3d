@@ -1,0 +1,16 @@
+# StreamVersion 1.2
+ConfigureEvent 960 1033 0 0 0 0 0
+ExposeEvent 0 1055 0 0 0 0 0
+RenderEvent 0 1055 0 0 0 0 0
+KeyPressEvent 234 509 0 32 1 space 0
+CharEvent 234 509 0 32 1 space 0
+KeyReleaseEvent 234 509 0 32 1 space 0
+TimerEvent 234 509 0 32 1 space 0
+TimerEvent 234 509 0 32 1 space 0
+LeftButtonPressEvent 100 150 0 0 0 0 0
+MouseMoveEvent 150 150 0 0 0 0 0
+MouseMoveEvent 200 150 0 0 0 0 0
+LeftButtonReleaseEvent 200 150 0 0 0 0 0
+KeyPressEvent 200 150 0 32 1 space 0
+CharEvent 200 150 0 32 1 space 0
+KeyReleaseEvent 200 150 0 32 1 space 0

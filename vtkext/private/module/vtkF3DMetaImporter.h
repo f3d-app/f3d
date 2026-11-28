@@ -245,6 +245,18 @@ public:
   ///@}
 
   /**
+   * Set the time in seconds the virtual camera takes for one turn around its focal point.
+   * Positive turns it counter-clockwise seen from above, negative clockwise.
+   * Zero, the default, disables the virtual camera.
+   */
+  void SetVirtualCameraOrbitPeriod(double period);
+
+  /**
+   * Store the pose of the active camera as the start pose of the virtual camera.
+   */
+  void StoreVirtualCameraStartPose();
+
+  /**
    * Update each individual importer at the provided value
    */
   bool UpdateAtTimeValue(double timeValue) override;

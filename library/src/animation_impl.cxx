@@ -189,7 +189,9 @@ animation& animation_impl::toggle(Direction direction)
       }
     }
 
-    if (this->Internals->Playing && this->Internals->Options.scene.camera.index.has_value())
+    const bool cameraSetByImporter = this->Internals->Options.scene.camera.index.has_value() ||
+      this->Internals->Options.scene.camera.orbit_period != 0.0;
+    if (this->Internals->Playing && cameraSetByImporter)
     {
       this->Internals->Interactor->disableCameraMovement();
     }

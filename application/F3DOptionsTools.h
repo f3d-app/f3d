@@ -97,6 +97,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "blending", "render.effect.blending.mode" },
   { "blur-coc", "render.background.blur_coc" },
   { "camera-index", "scene.camera.index" },
+  { "camera-orbit", "scene.camera.orbit_period" },
   { "camera-orthographic", "scene.camera.orthographic" },
   { "checkerboard", "model.checkerboard.enable" },
   { "color", "model.color.rgb" },
