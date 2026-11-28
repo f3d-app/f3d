@@ -406,7 +406,7 @@ f3d_test_doc(NAME TestDocToneMappingON DATA DamagedHelmet.glb REF_IMAGE tone_map
 
 ## --final-shader
 ### OFF: damaged_helmet_baseline.png
-f3d_test_doc(NAME TestDocFinalShaderGrayScale DATA DamagedHelmet.glb REF_IMAGE final_shader_gray.png ROTATE ARGS -f --verbose --final-shader "vec4 pixel(vec2 uv) { vec4 value = texture(source, uv)\\\\\\\\\\\\\\\\; float g = dot(value.rgb, vec3(0.299, 0.587, 0.114))\\\\\\\\\\\\\\\\; return vec4(vec3(g), value.a)\\\\\\\\\\\\\\\\; }")
+f3d_test_doc(NAME TestDocFinalShaderGrayScale DATA DamagedHelmet.glb REF_IMAGE final_shader_gray.png ROTATE ARGS -f --verbose --final-shader "vec4 pixel(vec2 uv) { vec4 value = getLinearColor(uv)\\\\\\\\\\\\\\\\; float g = dot(value.rgb, vec3(0.299, 0.587, 0.114))\\\\\\\\\\\\\\\\; return vec4(vec3(g), value.a)\\\\\\\\\\\\\\\\; }")
 
 ## --display-depth
 f3d_test_doc(NAME TestDocDisplayDepthOFF DATA DamagedHelmet.glb REF_IMAGE display_depth_off.png ARGS -f)

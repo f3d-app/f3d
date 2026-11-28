@@ -10,8 +10,7 @@
 #ifndef vtkF3DTAAPass_h
 #define vtkF3DTAAPass_h
 
-#include "vtkImageProcessingPass.h"
-
+#include <vtkOpenGLRenderPass.h>
 #include <vtkSmartPointer.h>
 
 #include <memory>
@@ -20,11 +19,11 @@ class vtkOpenGLFramebufferObject;
 class vtkOpenGLQuadHelper;
 class vtkTextureObject;
 
-class vtkF3DTAAPass : public vtkImageProcessingPass
+class vtkF3DTAAPass : public vtkOpenGLRenderPass
 {
 public:
   static vtkF3DTAAPass* New();
-  vtkTypeMacro(vtkF3DTAAPass, vtkImageProcessingPass);
+  vtkTypeMacro(vtkF3DTAAPass, vtkOpenGLRenderPass);
 
   /**
    * Perform rendering according to a render state.
@@ -35,6 +34,17 @@ public:
    * Release graphics resources and ask components to release their own resources.
    */
   void ReleaseGraphicsResources(vtkWindow* window) override;
+
+  ///@{
+  /**
+   * Set/Get the pass rendering the props, with jittering applied.
+   */
+  void SetDelegatePass(vtkRenderPass* delegate);
+  vtkRenderPass* GetDelegatePass() const
+  {
+    return this->DelegatePass;
+  }
+  ///@}
 
   /**
    * Reset the iterations count.
@@ -71,11 +81,15 @@ private:
    */
   float ConfigureHaltonSequence(int direction);
 
+  vtkSmartPointer<vtkRenderPass> DelegatePass;
   vtkSmartPointer<vtkOpenGLFramebufferObject> FrameBufferObject;
+  vtkSmartPointer<vtkOpenGLFramebufferObject> AccumulateFrameBufferObject;
   vtkSmartPointer<vtkTextureObject> ColorTexture;
   vtkSmartPointer<vtkTextureObject> HistoryTexture;
+  vtkSmartPointer<vtkTextureObject> ResultTexture;
 
   std::shared_ptr<vtkOpenGLQuadHelper> QuadHelper;
+  std::shared_ptr<vtkOpenGLQuadHelper> ResultQuadHelper;
 
   int HistoryIteration = 0;
   float Jitter[2] = { 0.0f, 0.0f };

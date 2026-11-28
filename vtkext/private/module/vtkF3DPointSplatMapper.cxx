@@ -511,6 +511,9 @@ void vtkF3DSplatMapperHelper::ReplaceShaderPositionVC(
 void vtkF3DSplatMapperHelper::ReplaceShaderColor(
   std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
 {
+  vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(ren);
+  bool useSRGBBlending = renderer ? renderer->GetSRGBBlending() : true;
+
   if (this->VBOs->GetNumberOfComponents("scalarColor") != 0 && !this->DrawingVertices)
   {
     std::string VSSource = shaders[vtkShader::Vertex]->GetSource();
@@ -596,7 +599,15 @@ void vtkF3DSplatMapperHelper::ReplaceShaderColor(
 
     // With spherical harmonics, we can have very small negative values resulting in blending
     // errors. The color needs to be clamped to positive values to avoid this.
-    shStr << "  vertexColorVSOutput.rgb = max(vertexColorVSOutput.rgb, vec3(0.));\n";
+    if (useSRGBBlending)
+    {
+      shStr << "  vertexColorVSOutput.rgb = max(vertexColorVSOutput.rgb, vec3(0.));\n";
+    }
+    else
+    {
+      shStr
+        << "  vertexColorVSOutput.rgb = pow(max(vertexColorVSOutput.rgb, vec3(0.)), vec3(2.2));\n";
+    }
 
     vtkShaderProgram::Substitute(VSSource, "//VTK::Color::Impl", shStr.str(), false);
 

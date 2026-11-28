@@ -7,17 +7,13 @@
 #include "F3DUtils.h"
 #include "vtkF3DCachedLUTTexture.h"
 #include "vtkF3DCachedSpecularTexture.h"
-#include "vtkF3DDisplayDepthRenderPass.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DOpenGLGridMapper.h"
-#include "vtkF3DOverlayRenderPass.h"
 #include "vtkF3DPointSplatMapper.h"
 #include "vtkF3DPointSplatUtilsSDF.h"
 #include "vtkF3DPolyDataMapper.h"
 #include "vtkF3DRenderPass.h"
-#include "vtkF3DSolidBackgroundPass.h"
 #include "vtkF3DUserEvents.h"
-#include "vtkF3DUserRenderPass.h"
 
 #include <vtkActor.h>
 #include <vtkActorCollection.h>
@@ -27,7 +23,6 @@
 #include <vtkCamera.h>
 #include <vtkCameraOrientationRepresentation.h>
 #include <vtkCameraOrientationWidget.h>
-#include <vtkCameraPass.h>
 #include <vtkCellData.h>
 #include <vtkConeSource.h>
 #include <vtkCornerAnnotation.h>
@@ -51,8 +46,6 @@
 #include <vtkMatrix4x4.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkObjectFactory.h>
-#include <vtkOpaquePass.h>
-#include <vtkOpenGLFXAAPass.h>
 #include <vtkOpenGLFramebufferObject.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLRenderer.h>
@@ -70,7 +63,6 @@
 #include <vtkProperty.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkSSAAPass.h>
 #include <vtkScalarBarActor.h>
 #include <vtkShaderProperty.h>
 #include <vtkShadowMapBakerPass.h>
@@ -81,7 +73,6 @@
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
 #include <vtkTextureObject.h>
-#include <vtkToneMappingPass.h>
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
 #include <vtkUniforms.h>
@@ -243,7 +234,6 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->EnvMapPrefiltered->HalfPrecisionOff();
 
   this->SkyboxActor->SetProjection(vtkSkybox::Sphere);
-  this->SkyboxActor->GammaCorrectOn();
   this->SkyboxActor->VisibilityOff();
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 7, 20261016)
@@ -539,6 +529,34 @@ void vtkF3DRenderer::ConfigureRenderPasses()
 #endif
   newPass->SetUseSSAOPass(this->UseSSAOPass);
   newPass->SetUseBlurBackground(this->UseBlurBackground);
+  newPass->SetUseToneMappingPass(this->UseToneMappingPass);
+
+  if (this->FinalShader.has_value())
+  {
+    // basic validation
+    if (this->FinalShader.value().find("pixel") != std::string::npos)
+    {
+      newPass->SetUserShader(this->FinalShader.value());
+    }
+    else
+    {
+      F3DLog::Print(
+        F3DLog::Severity::Warning, "Final shader must define a function named \"pixel\"");
+    }
+  }
+  if (this->DisplayDepth)
+  {
+    constexpr std::string_view displayDepthShader =
+      "vec4 pixel(vec2 uv)\n"
+      "{\n"
+      "  float depth = texture(texDepth, uv).r;\n"
+      "  return vec4(pow(texture(texColorMap, vec2(depth, 0.5)).rgb, vec3(2.2)), 1.0);\n"
+      "}\n";
+
+    newPass->SetUserShader(std::string(displayDepthShader));
+  }
+
+  newPass->SetColorMap(this->ColorTransferFunction);
   newPass->SetCircleOfConfusionRadius(this->CircleOfConfusionRadius);
   newPass->SetForceOpaqueBackground(this->HDRISkyboxVisible);
   newPass->SetArmatureVisible(this->ArmatureVisible);
@@ -552,82 +570,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   this->ComputeVisiblePropBounds(bounds);
   newPass->SetBounds(bounds);
 
-  // Image post processing passes
-  vtkSmartPointer<vtkRenderPass> renderingPass = newPass;
-
-  if (this->DisplayDepth)
-  {
-    // discard vtkF3DRenderPass if displaying depth
-    const vtkNew<vtkOpaquePass> opaqueP;
-    vtkNew<vtkCameraPass> camP;
-    vtkNew<vtkF3DDisplayDepthRenderPass> depthP;
-    camP->SetDelegatePass(opaqueP);
-    depthP->SetDelegatePass(camP);
-    if (this->Coloring == vtkF3DRenderer::ColoringMode::SCIVIS)
-    {
-      this->ConfigureColoringAndVisibilities();
-      depthP->SetColorMap(this->ColorTransferFunction);
-    }
-    renderingPass = depthP;
-  }
-
-  if (this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::SSAA)
-  {
-    vtkNew<vtkSSAAPass> ssaaP;
-    ssaaP->SetColorFormat(vtkTextureObject::Float16);
-    ssaaP->SetDelegatePass(renderingPass);
-    renderingPass = ssaaP;
-  }
-
-  if (this->UseToneMappingPass)
-  {
-    vtkNew<vtkToneMappingPass> toneP;
-    toneP->SetToneMappingType(vtkToneMappingPass::NeutralPBR);
-    toneP->SetDelegatePass(renderingPass);
-    renderingPass = toneP;
-  }
-
-  if (!this->HDRISkyboxVisible)
-  {
-    // if the background is transparent, we need to blend the result to the RGB background
-    // before it goes through the next passes
-    vtkNew<vtkF3DSolidBackgroundPass> bgPass;
-    bgPass->SetDelegatePass(renderingPass);
-    renderingPass = bgPass;
-  }
-
-  if (this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::FXAA)
-  {
-    vtkNew<vtkOpenGLFXAAPass> fxaaP;
-    fxaaP->SetDelegatePass(renderingPass);
-    renderingPass = fxaaP;
-  }
-
-  if (this->FinalShader.has_value())
-  {
-    // basic validation
-    if (this->FinalShader.value().find("pixel") != std::string::npos)
-    {
-      vtkNew<vtkF3DUserRenderPass> userP;
-      userP->SetUserShader(this->FinalShader.value().c_str());
-      userP->SetDelegatePass(renderingPass);
-      renderingPass = userP;
-    }
-    else
-    {
-      F3DLog::Print(
-        F3DLog::Severity::Warning, "Final shader must define a function named \"pixel\"");
-    }
-  }
-
-  if (!this->UseXR)
-  {
-    vtkNew<vtkF3DOverlayRenderPass> overlayP;
-    overlayP->SetDelegatePass(renderingPass);
-    renderingPass = overlayP;
-  }
-
-  this->SetPass(renderingPass);
+  this->SetPass(newPass);
 
 #if F3D_MODULE_RAYTRACING
   vtkOSPRayRendererNode::SetRendererType("pathtracer", this);
@@ -1906,6 +1849,7 @@ void vtkF3DRenderer::ConfigureHDRISkybox()
 {
   this->SkyboxActor->SetTexture(this->HDRITexture);
   this->SkyboxActor->SetVisibility(this->HDRISkyboxVisible);
+  this->SkyboxActor->SetGammaCorrect(this->GetSRGBBlending());
   this->HDRISkyboxConfigured = true;
 }
 
@@ -2641,21 +2585,12 @@ void vtkF3DRenderer::UpdateActors()
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DRenderer::CaptureVideoFrame(std::byte* yPlane, std::byte* uPlane, std::byte* vPlane)
+void vtkF3DRenderer::CaptureVideoFrame(std::byte* yPlane, std::byte* uPlane, std::byte* vPlane)
 {
-  // Use the final rendered texture as input for the frame capture
-  vtkF3DOverlayRenderPass* overlayPass = vtkF3DOverlayRenderPass::SafeDownCast(this->GetPass());
-
-  if (overlayPass == nullptr)
-  {
-    F3DLog::Print(
-      F3DLog::Severity::Error, "Cannot capture video frame: renderer is not initialized");
-    return false;
-  }
-
-  this->FrameCapture->SetInputTexture(overlayPass->GetColorTexture());
+  vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(this->RenderWindow);
+  this->FrameCapture->SetInputTexture(
+    renWin->GetDisplayFramebuffer()->GetColorAttachmentAsTextureObject(0));
   this->FrameCapture->Capture(this, yPlane, uPlane, vPlane);
-  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -3441,7 +3376,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
         // so scaling with this value gives an approximation of the Lambertian diffuse
         "diffuseColor *= clamp(-dist, 0.0, 1.0);\n");
 
-      sprites.Actor->ForceTranslucentOff();
+      sprites.Actor->SetForceTranslucent(this->BlendingModeEnabled != BlendingMode::NONE);
     }
     else if (this->PointSpritesType == SplatType::CIRCLE)
     {
@@ -3450,7 +3385,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
         "//VTK::Color::Impl\n"
         "opacity = stroke(sdCircle(offsetVCVSOutput, 1.0), 2.0);\n");
 
-      sprites.Actor->ForceTranslucentOff();
+      sprites.Actor->SetForceTranslucent(this->BlendingModeEnabled != BlendingMode::NONE);
     }
     else if (this->PointSpritesType == SplatType::STD_DEV)
     {
@@ -3462,7 +3397,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
         "opacity += stroke(sdCircle(offsetVCVSOutput, 3.0), 1.0);\n"
         "opacity = clamp(opacity, 0.0, 1.0);\n");
 
-      sprites.Actor->ForceTranslucentOff();
+      sprites.Actor->SetForceTranslucent(this->BlendingModeEnabled != BlendingMode::NONE);
     }
     else if (this->PointSpritesType == SplatType::BOUND)
     {
@@ -3473,7 +3408,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
         "vec2 p = offsetVCVSOutput / g;\n"
         "opacity = strokePx(sdRoundBox(p, vec2(3.0) / g, 4.0), 2.0);\n");
 
-      sprites.Actor->ForceTranslucentOff();
+      sprites.Actor->SetForceTranslucent(this->BlendingModeEnabled != BlendingMode::NONE);
     }
     else if (this->PointSpritesType == SplatType::CROSS)
     {
@@ -3489,7 +3424,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
         "d2 = opShift(d2, thickness);\n"
         "opacity = fillPx(opRoundMerge(d1, d2, thickness));\n");
 
-      sprites.Actor->ForceTranslucentOff();
+      sprites.Actor->SetForceTranslucent(this->BlendingModeEnabled != BlendingMode::NONE);
     }
   }
 

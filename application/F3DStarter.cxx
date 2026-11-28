@@ -869,6 +869,11 @@ public:
                 libOptions.render.mode = "ospray";
                 continue;
               }
+              if (key == "display-depth")
+              {
+                // TODO: Add final-shader preset and document which preset to use
+                f3d::log::warn("Option 'display-depth' is deprecated");
+              }
 
               // Convert key into a libf3d option name if possible
               std::string keyForLog = key;

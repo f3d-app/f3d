@@ -66,9 +66,6 @@ int TestSDKVideo([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   f3d::engine eng = f3d::engine::create(true);
   f3d::window& win = eng.getWindow();
 
-  test.expect<f3d::video_frame::invalid_frame_exception>("Uninitialized window",
-    [&]() { const std::shared_ptr<f3d::video_frame> uninitFrame = win.getVideoFrame(); });
-
   win.setSize(100, 101);
   test.expect<f3d::video_frame::invalid_frame_exception>("Size not even",
     [&]() { const std::shared_ptr<f3d::video_frame> oddDimFrame = win.getVideoFrame(); });

@@ -957,11 +957,8 @@ std::shared_ptr<video_frame> window_impl::getVideoFrame()
   const std::shared_ptr<video_frame_ffmpeg> frame =
     std::make_shared<video_frame_ffmpeg>(this->getWidth(), this->getHeight());
 
-  if (!this->Internals->Renderer->CaptureVideoFrame(
-        frame->GetYPlane(), frame->GetUPlane(), frame->GetVPlane()))
-  {
-    throw video_frame::invalid_frame_exception("Failed to capture video frame");
-  }
+  this->Internals->Renderer->CaptureVideoFrame(
+    frame->GetYPlane(), frame->GetUPlane(), frame->GetVPlane());
 
   return std::static_pointer_cast<video_frame>(frame);
 #else

@@ -335,7 +335,7 @@ CLI: `--final-shader`
 Display the depth buffer as a grayscale image or with a colormap if `model.coloring` is `scivis`.
 Only opaque objects are displayed, the grid and translucent/volumetric objects are ignored.
 
-CLI: `--display-depth`
+CLI: `--display-depth` (deprecated, use [final shader](#TODO_LINK))
 
 ### `render.line_width` (_double_, optional, range domain: `[0, 10]`, increment: `0.1`)
 

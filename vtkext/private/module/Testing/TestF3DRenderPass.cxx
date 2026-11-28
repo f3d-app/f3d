@@ -6,7 +6,6 @@
 #include "vtkF3DHexagonalBokehBlurPass.h"
 #include "vtkF3DRenderPass.h"
 #include "vtkF3DTAAPass.h"
-#include "vtkF3DUserRenderPass.h"
 
 #include <iostream>
 
@@ -29,23 +28,19 @@ int TestF3DRenderPass(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  vtkNew<vtkF3DUserRenderPass> user;
-  user->SetDelegatePass(bokeh);
-  user->Print(std::cout);
-
   vtkNew<vtkRenderer> renderer;
-  renderer->SetPass(user);
+  renderer->SetPass(pass);
 
   vtkNew<vtkRenderWindow> renWin;
   renWin->AddRenderer(renderer);
   renWin->OffScreenRenderingOn();
 
   // set valid shader
-  user->SetUserShader("vec4 pixel(vec2 uv) { return vec4(uv, 0.0, 1.0); }");
+  pass->SetUserShader("vec4 pixel(vec2 uv) { return vec4(uv, 0.0, 1.0); }");
   renWin->Render();
 
   // change to another valid shader
-  user->SetUserShader("vec4 pixel(vec2 uv) { return vec4(uv, 1.0, 1.0); }");
+  pass->SetUserShader("vec4 pixel(vec2 uv) { return vec4(uv, 1.0, 1.0); }");
   renWin->Render();
 
   // render a second time to check if recompilation skipping is working

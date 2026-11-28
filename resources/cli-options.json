@@ -832,7 +832,7 @@
         },
         {
           "longName": "display-depth",
-          "helpText": "Display depth buffer as grayscale image or with a colormap if \"--scalar-coloring\" is specified",
+          "helpText": "Display depth buffer as grayscale image or with a colormap if \"--scalar-coloring\" is specified (deprecated)",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         }

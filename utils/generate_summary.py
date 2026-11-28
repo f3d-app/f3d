@@ -175,10 +175,11 @@ def print_summary(
                 img2 = Image.open(output).convert("RGB")
 
                 diff = ImageChops.difference(img1, img2)
-                diff.save(output.parent / "diff.png")
+                diffName = output.parent / Path(output.stem + ".diff.png")
+                diff.save(diffName)
                 baseline = image_markdown(reference, token, upload)
                 result = image_markdown(output, token, upload)
-                diff_img = image_markdown(output.parent / "diff.png", token, upload)
+                diff_img = image_markdown(diffName, token, upload)
                 print("#### Images")
                 print_table(
                     ["Baseline", "Output", "Diff"], [baseline, result, diff_img]
