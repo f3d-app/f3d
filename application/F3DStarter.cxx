@@ -1622,6 +1622,16 @@ int F3DStarter::Start(int argc, char** argv)
         this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createXR());
         // LCOV_EXCL_STOP
       }
+      else if (this->Internals->AppOptions.RenderingBackend == "cocoa")
+      {
+#if __APPLE__
+        // Defaults to Cocoa anyways
+        this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::create(offscreen));
+#else
+        f3d::log::error("Could not load graphic library: Cannot use a COCOA on this platform");
+        return EXIT_FAILURE;
+#endif
+      }
       else
       {
         if (this->Internals->AppOptions.RenderingBackend != "auto")

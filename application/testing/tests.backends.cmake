@@ -22,6 +22,10 @@ endif()
 
 if(APPLE)
   f3d_test(NAME TestRenderingBackenListCOCOA ARGS --list-rendering-backends NO_RENDER NO_BASELINE REGEXP "cocoa: available")
+  f3d_test(NAME TestRenderingBackendValidCOCOA DATA cow.vtp RENDERING_BACKEND cocoa ARGS --verbose REGEXP_FAIL "rendering-backend value is invalid, falling back to" NO_BASELINE)
+endif()
+if(NOT APPLE)
+  f3d_test(NAME TestRenderingBackendInvalidCOCOA DATA cow.vtp RENDERING_BACKEND cocoa REGEXP "Could not load graphic library" NO_BASELINE)
 endif()
 
 if(F3D_TESTING_ENABLE_GLX_TESTS)
