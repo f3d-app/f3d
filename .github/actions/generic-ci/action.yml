@@ -277,15 +277,6 @@ runs:
       shell: cmd
       run: rm 'C:\Windows\system32\OPENGL32.dll'
 
-    # When running standard test on windows, use wgl
-    - name: Install Mesa opengl instead
-      if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v4
-      with:
-        path: ${{github.workspace}}/build/${{ env.F3D_BUILD_BIN_PATH }}
-        cpu: ${{ inputs.cpu == 'arm64' && 'arm64' || 'x64' }}
-        implementation: d3d12
-
     # When running standard test with auto rendering backend on linux, use glx
     - name: Run Xvfb ubuntu
       if: |
