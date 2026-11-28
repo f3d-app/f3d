@@ -170,7 +170,7 @@ void vtkF3DMainRenderPass::RenderOnTopProps(
   {
     this->OnTopDepthTexture = vtkSmartPointer<vtkTextureObject>::New();
     this->OnTopDepthTexture->SetContext(renWin);
-    this->OnTopDepthTexture->AllocateDepth(width, height, vtkTextureObject::Fixed32);
+    this->OnTopDepthTexture->AllocateDepth(width, height, vtkTextureObject::Fixed24);
   }
   this->OnTopDepthTexture->Resize(width, height);
 

@@ -59,7 +59,11 @@ void vtkF3DDepthPrePass::InitializeResources(vtkOpenGLRenderWindow* renWin, int 
   this->DepthTexture->SetContext(renWin);
   if (!this->DepthTexture->GetHandle())
   {
+#ifdef F3D_USE_GLES
+    this->DepthTexture->AllocateDepth(width, height, vtkTextureObject::Fixed24);
+#else
     this->DepthTexture->AllocateDepth(width, height, vtkTextureObject::Fixed32);
+#endif
     this->DepthTexture->SetWrapS(vtkTextureObject::ClampToEdge);
     this->DepthTexture->SetWrapT(vtkTextureObject::ClampToEdge);
   }

@@ -75,7 +75,11 @@ void vtkF3DReflectionRenderPass::InitializeResources(
   this->DepthTexture->SetContext(renWin);
   if (!this->DepthTexture->GetHandle())
   {
+#ifdef F3D_USE_GLES
+    this->DepthTexture->AllocateDepth(width, height, vtkTextureObject::Fixed24);
+#else
     this->DepthTexture->AllocateDepth(width, height, vtkTextureObject::Fixed32);
+#endif
   }
   this->DepthTexture->Resize(width, height);
 
