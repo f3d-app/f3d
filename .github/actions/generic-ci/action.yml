@@ -261,9 +261,12 @@ runs:
         echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
 
     # Linux: Xvfb is not running, should fallback to egl
-    # Windows: mesa binary is not installed and faulty OPENGL32.dll is insufficient, should fallback to osmesa
+    # Windows: mesa binary is not installed and faulty OPENGL32.dll is insufficient, should fallback to osmesa (needs optdeps)
     # macOS: No fallback mechanism to test, CI always uses osmesa (with VTK > 9.7.20260706), check cocoa is functional
     - name: Check rendering backend logic
+      if: |
+        runner.os != 'Windows' ||
+        inputs.optdeps_label == 'optdeps'
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: |
@@ -277,9 +280,11 @@ runs:
     # When running standard test on windows, use wgl
     - name: Install Mesa opengl instead
       if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v3
+      uses: f3d-app/install-mesa-windows-action@v4
       with:
-        path: C:\Windows\system32
+        path: ${{github.workspace}}/build/${{ env.F3D_BUILD_BIN_PATH }}
+        cpu: ${{ inputs.cpu == 'arm64' && 'arm64' || 'x64' }}
+        implementation: d3d12
 
     # When running standard test with auto rendering backend on linux, use glx
     - name: Run Xvfb ubuntu

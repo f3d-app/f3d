@@ -7,10 +7,10 @@
 namespace f3d
 {
 //----------------------------------------------------------------------------
-std::shared_ptr<video_encoder> video_encoder::create(const params& p)
+std::shared_ptr<video_encoder> video_encoder::create([[maybe_unused]] const params& parameters)
 {
 #ifdef F3D_MODULE_FFMPEG
-  return std::make_shared<detail::video_encoder_ffmpeg>(p);
+  return std::make_shared<detail::video_encoder_ffmpeg>(parameters);
 #else
   throw codec_exception("Video encoder is not supported, please build f3d with FFMPEG support");
 #endif
