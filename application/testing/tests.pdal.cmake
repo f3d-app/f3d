@@ -20,7 +20,7 @@ if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/plugins/pdal/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
     f3d_test(NAME TestDefaultConfigFileLAS DATA warsaw_small.las CONFIG config_build LONG_TIMEOUT SKIP_GLES LABELS "pdal;plugin" THRESHOLD 0.08)
-    f3d_test(NAME TestDefaultConfigFileLAZ DATA simple.laz CONFIG config_build LONG_TIMEOUT SKIP_GLES LABELS "pdal;plugin")
+    f3d_test(NAME TestDefaultConfigFileLAZ DATA simple.laz CONFIG config_build LONG_TIMEOUT THRESHOLD 0.05 SKIP_GLES LABELS "pdal;plugin") # Small rendering difference on some drivers with axis widget
     f3d_test(NAME TestDefaultConfigFileBPF DATA simple-extra.bpf CONFIG config_build LONG_TIMEOUT SKIP_GLES LABELS "pdal;plugin")
     f3d_test(NAME TestDefaultConfigFileTerraScanBin DATA 20020715-time-color.bin CONFIG config_build LONG_TIMEOUT SKIP_GLES LABELS "pdal;plugin" THRESHOLD 0.06)
     f3d_test(NAME TestDefaultConfigFilePCD DATA autzen-utm.pcd CONFIG config_build LONG_TIMEOUT SKIP_GLES LABELS "pdal;plugin" THRESHOLD 0.05)
